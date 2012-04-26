@@ -1,0 +1,35 @@
+====================
+Using the Middleware
+====================
+
+Follow the steps below to instantiate Manager classes and use their functions:
+
+1. Create a ManagerFactory instance.
+
+A ManagerFactory instance produces the Manager objects you can use in your application.
+Creation of the ManagerFactory included opening a connection to the database specified
+by the DatabaseConnectionParameters.
+
+Sample code:
+
+DatabaseConnectionParameters params = new DatabaseConnectionParameters("localhost", "3306", "dbname", 
+					"username", "password");
+ManagerFactory factory = new ManagerFactory(params);
+
+2. Call the getter method for the Manager object you want to use.
+
+In the example below, I am interested in retrieving Germplasm data so I need a 
+GermplasmDataManager object.
+
+Sample code:
+
+GermplasmDataManager manager = factory.getGermplasmDataManager();
+
+3. Call the function of the Manager object you want to use.
+
+Sample code:
+
+Germplasm germplasm = manager.getGermplasmByGID(new Integer(50533));
+System.out.println(germplasm);
+ 
+		

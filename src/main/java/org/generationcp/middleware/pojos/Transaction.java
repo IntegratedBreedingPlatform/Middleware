@@ -1,0 +1,275 @@
+package org.generationcp.middleware.pojos;
+
+import java.io.Serializable;
+
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+
+@NamedQueries
+({
+	@NamedQuery
+	(
+		name = "getEmptyLot",
+		query = "FROM Transaction where status=1 group by lot_id having sum(quantity) = 0"
+	),
+	@NamedQuery
+	(
+		name = "getLotWithMinimumAmount",
+		query = "FROM Transaction where status=1 group by lot_id having sum(quantity) <:minAmount"
+	)
+	
+})
+
+
+
+
+@Entity
+@Table(name = "transaction")
+public class Transaction implements Serializable
+{
+	private static final long serialVersionUID = 77866453513905521L;
+	public static final String GET_EMPTY_LOT = "getEmptyLot";
+	public static final String GET_LOT_WITH_MINIMUM_AMOUNT = "getLotWithMinimumAmount";
+
+	
+
+	@Id
+	@Basic(optional = false)
+	@Column(name = "transaction_id")
+	private Integer id;
+	
+	@Basic(optional = false)
+	@Column(name = "user_id")
+	private Integer userId;
+	
+	@ManyToOne(targetEntity = Lot.class)
+	@JoinColumn(name = "lot_id", nullable = false, updatable = false)
+	private Lot lot;
+	
+	@Basic(optional = false)
+	@Column(name = "transaction_date")
+	private Integer date;
+	
+	@Basic(optional = false)
+	@Column(name = "status")
+	private Integer status;
+	
+	@Basic(optional = false)
+	@Column(name = "quantity")
+	private Integer quantity;
+	
+	@Column(name = "comments")
+	private String comments;
+	
+	@Column(name = "source_type")
+	private String sourceType;
+	
+	@Column(name = "source_id")
+	private Integer sourceId;
+	
+	@Column(name = "source_record_id")
+	private Integer sourceRecordId;
+	
+	@Column(name = "previous_amount")
+	private Integer previousAmount;
+	
+	@Column(name = "person_id")
+	private Integer personId;
+	
+	public Transaction()
+	{
+	}
+
+	public Transaction(Integer id)
+	{
+		super();
+		this.id = id;
+	}
+
+	public Transaction(Integer id, Integer userId, Lot lot, Integer date,
+			Integer status, Integer quantity, String comments,
+			String sourceType, Integer sourceId, Integer sourceRecordId,
+			Integer previousAmount, Integer personId)
+	{
+		super();
+		this.id = id;
+		this.userId = userId;
+		this.lot = lot;
+		this.date = date;
+		this.status = status;
+		this.quantity = quantity;
+		this.comments = comments;
+		this.sourceType = sourceType;
+		this.sourceId = sourceId;
+		this.sourceRecordId = sourceRecordId;
+		this.previousAmount = previousAmount;
+		this.personId = personId;
+	}
+
+	public Integer getId()
+	{
+		return id;
+	}
+
+	public void setId(Integer id)
+	{
+		this.id = id;
+	}
+
+	public Integer getUserId()
+	{
+		return userId;
+	}
+
+	public void setUserId(Integer userId)
+	{
+		this.userId = userId;
+	}
+
+	public Lot getLot()
+	{
+		return lot;
+	}
+
+	public void setLot(Lot lot)
+	{
+		this.lot = lot;
+	}
+
+	public Integer getDate()
+	{
+		return date;
+	}
+
+	public void setDate(Integer date)
+	{
+		this.date = date;
+	}
+
+	public Integer getStatus()
+	{
+		return status;
+	}
+
+	public void setStatus(Integer status)
+	{
+		this.status = status;
+	}
+
+	public Integer getQuantity()
+	{
+		return quantity;
+	}
+
+	public void setQuantity(Integer quantity)
+	{
+		this.quantity = quantity;
+	}
+
+	public String getComments()
+	{
+		return comments;
+	}
+
+	public void setComments(String comments)
+	{
+		this.comments = comments;
+	}
+
+	public String getSourceType()
+	{
+		return sourceType;
+	}
+
+	public void setSourceType(String sourceType)
+	{
+		this.sourceType = sourceType;
+	}
+
+	public Integer getSourceId()
+	{
+		return sourceId;
+	}
+
+	public void setSourceId(Integer sourceId)
+	{
+		this.sourceId = sourceId;
+	}
+
+	public Integer getSourceRecordId()
+	{
+		return sourceRecordId;
+	}
+
+	public void setSourceRecordId(Integer sourceRecordId)
+	{
+		this.sourceRecordId = sourceRecordId;
+	}
+
+	public Integer getPreviousAmount()
+	{
+		return previousAmount;
+	}
+
+	public void setPreviousAmount(Integer previousAmount)
+	{
+		this.previousAmount = previousAmount;
+	}
+
+	public Integer getPersonId()
+	{
+		return personId;
+	}
+
+	public void setPersonId(Integer personId)
+	{
+		this.personId = personId;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "Transaction [id=" + id + ", userId=" + userId + ", lot=" + lot
+				+ ", date=" + date + ", status=" + status + ", quantity="
+				+ quantity + ", comments=" + comments + ", sourceType="
+				+ sourceType + ", sourceId=" + sourceId + ", sourceRecordId="
+				+ sourceRecordId + ", previousAmount=" + previousAmount
+				+ ", personId=" + personId + "]";
+	}
+	
+	@Override
+	public boolean equals(Object obj) 
+	{
+	   if (obj == null)
+		   return false;
+	   if (obj == this) 
+		   return true; 
+	   if (!(obj instanceof Transaction)) 
+		   return false;
+	
+	   Transaction rhs = (Transaction) obj;
+	   return new EqualsBuilder()
+	                 .appendSuper(super.equals(obj))
+	                 .append(id, rhs.id)
+	                 .isEquals();
+	}
+	
+	@Override
+	public int hashCode() 
+	{
+	     return new HashCodeBuilder(17, 37).
+	       append(id).
+	       toHashCode();
+	}
+}

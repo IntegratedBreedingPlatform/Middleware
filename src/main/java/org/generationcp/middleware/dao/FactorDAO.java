@@ -1,0 +1,42 @@
+package org.generationcp.middleware.dao;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.generationcp.middleware.pojos.Factor;
+import org.hibernate.SQLQuery;
+
+public class FactorDAO extends GenericDAO<FactorDAO, Integer>
+{
+	@SuppressWarnings("unchecked")
+	public Set<Integer> getGIDSGivenObservationUnitIds(Set<Integer> ounitIds, int start, int numOfRows)
+	{
+		Set<Integer> results = new HashSet<Integer>();
+		
+		SQLQuery levelNQuery = getSession().createSQLQuery(Factor.GET_GID_FROM_NUMERIC_LEVELS_GIVEN_OBSERVATION_UNIT_IDS);
+		levelNQuery.setParameterList("ounitids", ounitIds);
+		levelNQuery.setFirstResult(start);
+		levelNQuery.setMaxResults(numOfRows);
+		
+		List<Double> gids1 = levelNQuery.list();
+		for(Double gid : gids1)
+		{
+			results.add(gid.intValue());
+		}
+		
+		SQLQuery levelCQuery = getSession().createSQLQuery(Factor.GET_GID_FROM_CHARACTER_LEVELS_GIVEN_OBSERVATION_UNIT_IDS);
+		levelCQuery.setParameterList("ounitids", ounitIds);
+		levelCQuery.setFirstResult(start);
+		levelCQuery.setMaxResults(numOfRows);
+		
+		List<String> gids2 = levelCQuery.list();
+		for(String gid : gids2)
+		{
+			results.add(Integer.parseInt(gid));
+		}
+		
+		return results;
+	}
+	
+}

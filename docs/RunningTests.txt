@@ -1,0 +1,15 @@
+===================
+Running JUnit tests
+===================
+
+1. To run the JUnit tests in the project, you need: Java, Maven, and an IBDB database you can connect 
+to.  The current schema tested right now is the ICIS 5.5 schema, in the future versions of
+the IBDB schema will be tested.
+
+2. Edit the file named "test-hibernate.cfg.xml" in the src/test/resources folder of the project.
+Change the values for url, username, password, default_schema properties, replacing them
+with values which reflect your setup.
+
+3. Navigate to the root directory of the project and run the command: mvn clean test.  You can also
+limit the test class to run by using the option "-Dtest=TestClassName", for example:
+mvn clean test -Dtest=TestGermplasmDataManagerImpl

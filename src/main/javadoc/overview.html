@@ -1,0 +1,137 @@
+<body>
+<h3>Welcome to the IBP Middleware Documentation.</h3>
+
+<h4>Adding Middleware as a dependency of your project</h4>
+
+<p>
+It is recommended to use Apache Maven.  Add the following to your list of dependencies:</br>
+</br>
+<code>
+groupId: org.generationcp</br>
+artifactId: middleware</br>
+version: 1.0.0</br>
+</code>
+</br>
+Take note of the version.  Use of the latest version is recommended.</br>
+The latest version as of April 25, 2012: 0.3.0
+</p>
+<p>
+Right now, the Middleware is not yet deployed to any online Maven repository.  Users have to checkout
+the project from the maven repository and manually install the project's jar into the local
+maven repository.  This is done by simply running "mvn clean install" command while on the
+home directory of the project.  To skip JUnit tests, use this command: "mvn -DskipTests=true clean install".
+</p>
+<p>
+If you do not want to use Maven, you can get a jar of the Middleware project by sending a request to Kevin
+Manansala (kevin@efficio.us.com).
+</p>
+
+<h4>Checking out the Middleware Project</h4>
+<p>
+The project is stored in the SVN repository hosted at gcp.efficio.us.com.  The URL for the repository is: 
+http://gcp.efficio.us.com/svn/.  An anonymous account may be used to checkout the project.  The 
+username is "efficio" and the password is "3ff1ci000".
+</p>
+
+<h4>Using the Middleware</h4>
+<p>
+Follow the steps below to instantiate Manager classes and use their functions:
+</p>
+<p>
+1. Create a ManagerFactory instance.</br>
+</br>
+A ManagerFactory instance produces the Manager objects you can use in your application.
+Creation of the ManagerFactory includes opening a connection to the database specified
+by the DatabaseConnectionParameters.  The ManagerFactory accepts two DatabaseConnectionParameters 
+objects as parameters.  The first is used to connect to a local instance of IBDB and
+the second is used to connect to a central instance of IBDB.  The user can provide both 
+or can provide one of the two.
+</br>
+Sample code:</br>
+</br>
+<code>
+DatabaseConnectionParameters params = new DatabaseConnectionParameters("localhost", "3306", "dbname", 
+					"username", "password");</br>
+ManagerFactory factory = new ManagerFactory(params, null);<br>
+<br>
+1. creating a ManagerFactory which uses connections to both local and central instances</br>
+</br>
+DatabaseConnectionParameters local = new DatabaseConnectionParameters(...);</br>
+DatabaseConnectionParameters central = new DatabaseConnectionParameters(...);</br>
+ManagerFactory factory = new ManagerFactory(local, central);</br>
+</br>
+2. creating a ManagerFactory which uses a connection to local only</br>
+</br>
+DatabaseConnectionParameters local = new DatabaseConnectionParameters(...);</br>
+ManagerFactory factory = new ManagerFactory(local, null);</br>
+</br>
+3. creating a ManagerFactory which uses a connection to central only</br>
+</br>
+DatabaseConnectionParameters central = new DatabaseConnectionParameters(...);</br>
+ManagerFactory factory = new ManagerFactory(null, central);</br>
+</br>
+</code>
+</p>
+<p>
+2. Call the getter method for the Manager object you want to use.</br>
+</br>
+In the example below, I am interested in retrieving Germplasm data so I need a 
+GermplasmDataManager object.</br>
+</br>
+Sample code:</br>
+</br>
+<code>
+GermplasmDataManager manager = factory.getGermplasmDataManager();
+</code>
+</p>
+<p>
+3. Call the function of the Manager object you want to use.</br>
+</br>
+Sample code:</br>
+</br>
+<code>
+Germplasm germplasm = manager.getGermplasmByGID(new Integer(50533));</br>
+System.out.println(germplasm);
+</code>
+</p>
+<p>
+The way the methods of the Manager implementation classes work depends on the available connection/s given by
+the ManagerFactory.  Some methods work with a connection to a local instance only.  Some methods retrieve
+results from both connections, local and central.  The methods will throw a QueryException when they have
+a problem with the connection passed to them.
+</p>
+<h4>Running JUnit tests</h4>
+
+<p>
+1. To run the JUnit tests in the project, you need: Java, Maven, and an IBDB database you can connect 
+to.  The current schema tested right now is the ICIS 5.5 schema, in the future versions of
+the IBDB schema will be tested.</br>
+</br>
+2. Create a file named "testDatabaseConfig.properties" in the src/test/resources folder of the project.
+The content of the file should be like this:</br>
+</br>
+local.host = localhost</br>
+local.port = 3306</br>
+local.dbname = dbname</br>
+local.username = user</br>
+local.password = password</br>
+</br>
+central.host = localhost</br>
+central.port = 3306</br>
+central.dbname = dbname</br>
+central.username = user</br>
+central.password = password</br>
+</br>
+Set the correct values for your set-up of the databases.</br>
+</br>
+3. Navigate to the root directory of the project and run the command: mvn clean test.  You can also
+limit the test class to run by using the option "-Dtest=TestClassName", for example:
+mvn clean test -Dtest=TestGermplasmDataManagerImpl</br>
+</br>
+</p>
+
+<h4>Technical Support</h4>
+<p>
+For any concerns about the IBP Middleware please email Kevin Manansala (kevin@efficio.us.com).
+</p>
+</body>
