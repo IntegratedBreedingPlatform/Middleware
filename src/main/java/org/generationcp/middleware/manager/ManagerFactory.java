@@ -70,8 +70,10 @@ public class ManagerFactory
 			this.hibernateUtilForCentral = null;
 		}
 		
-		if(this.hibernateUtilForCentral == null && this.hibernateUtilForLocal == null)
+		if((this.hibernateUtilForCentral == null) && (this.hibernateUtilForLocal == null))
+		{
 			throw new ConfigException("No connection was established because database connection parameters were null.");
+		}
 	}
 	
 	public GermplasmDataManager getGermplasmDataManager()

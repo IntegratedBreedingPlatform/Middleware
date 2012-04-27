@@ -3,6 +3,7 @@ package org.generationcp.middleware.manager.api;
 import java.util.List;
 
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 
 /**
@@ -22,4 +23,6 @@ public interface WorkbenchDataManager {
     List<WorkflowTemplate> getWorkflowTemplates();
     
     List<WorkflowTemplate> getWorkflowTemplates(int start, int numOfRows);
+    
+    Tool getToolWithName(String toolName);
 }

@@ -3,9 +3,11 @@ package org.generationcp.middleware.manager;
 import java.util.List;
 
 import org.generationcp.middleware.dao.ProjectDAO;
+import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.dao.WorkflowTemplateDAO;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 import org.generationcp.middleware.util.HibernateUtil;
 import org.hibernate.QueryException;
@@ -102,5 +104,12 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         WorkflowTemplateDAO workflowTemplateDAO = new WorkflowTemplateDAO();
         workflowTemplateDAO.setSession(hibernateUtil.getCurrentSession());
         return workflowTemplateDAO.findAll(start, numOfRows);
+    }
+    
+    @Override
+    public Tool getToolWithName(String toolId) {
+        ToolDAO toolDAO = new ToolDAO();
+        toolDAO.setSession(hibernateUtil.getCurrentSession());
+        return toolDAO.findByToolName(toolId);
     }
 }

@@ -7,6 +7,7 @@ import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -58,6 +59,12 @@ public class TestWorkbenchDataManagerImpl {
     public void testDeleteProject() {
         List<Project> projects = manager.getProjects();
         manager.deleteProject(projects.get(0));
+    }
+    
+    @Test
+    public void testFindTool() {
+        Tool tool = manager.getToolWithName("fieldbook");
+        System.out.println(tool);
     }
     
     @AfterClass
