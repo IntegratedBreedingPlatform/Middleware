@@ -1,25 +1,43 @@
-====================
 Using the Middleware
-====================
 
 Follow the steps below to instantiate Manager classes and use their functions:
 
 1. Create a ManagerFactory instance.
 
-A ManagerFactory instance produces the Manager objects you can use in your application.
-Creation of the ManagerFactory included opening a connection to the database specified
-by the DatabaseConnectionParameters.
-
+A ManagerFactory instance produces the Manager objects you can use in your application. Creation of the 
+ManagerFactory includes opening a connection to the database specified by the 
+DatabaseConnectionParameters. The ManagerFactory accepts two DatabaseConnectionParameters 
+objects as parameters. The first is used to connect to a local instance of IBDB and the second 
+is used to connect to a central instance of IBDB. The user can provide both or can provide one 
+of the two.
+ 
 Sample code:
 
-DatabaseConnectionParameters params = new DatabaseConnectionParameters("localhost", "3306", "dbname", 
-					"username", "password");
-ManagerFactory factory = new ManagerFactory(params);
+DatabaseConnectionParameters params = new DatabaseConnectionParameters
+				("localhost", "3306", "dbname", "username", "password");
+ManagerFactory factory = new ManagerFactory(params, null);
+
+1. creating a ManagerFactory which uses connections to both local and central instances
+
+DatabaseConnectionParameters local = new DatabaseConnectionParameters(...);
+DatabaseConnectionParameters central = new DatabaseConnectionParameters(...);
+ManagerFactory factory = new ManagerFactory(local, central);
+
+2. creating a ManagerFactory which uses a connection to local only
+
+DatabaseConnectionParameters local = new DatabaseConnectionParameters(...);
+ManagerFactory factory = new ManagerFactory(local, null);
+
+3. creating a ManagerFactory which uses a connection to central only
+
+DatabaseConnectionParameters central = new DatabaseConnectionParameters(...);
+ManagerFactory factory = new ManagerFactory(null, central);
+
 
 2. Call the getter method for the Manager object you want to use.
 
-In the example below, I am interested in retrieving Germplasm data so I need a 
-GermplasmDataManager object.
+In the example below, I am interested in retrieving Germplasm data so I need a GermplasmDataManager 
+object.
 
 Sample code:
 
@@ -31,5 +49,8 @@ Sample code:
 
 Germplasm germplasm = manager.getGermplasmByGID(new Integer(50533));
 System.out.println(germplasm);
- 
-		
+
+The way the methods of the Manager implementation classes work depends on the available connection/s 
+given by the ManagerFactory. Some methods work with a connection to a local instance only. Some 
+methods retrieve results from both connections, local and central. The methods will throw a 
+QueryException when they have a problem with the connection passed to them.

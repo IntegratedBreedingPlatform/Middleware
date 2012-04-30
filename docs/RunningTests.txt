@@ -6,9 +6,23 @@ Running JUnit tests
 to.  The current schema tested right now is the ICIS 5.5 schema, in the future versions of
 the IBDB schema will be tested.
 
-2. Edit the file named "test-hibernate.cfg.xml" in the src/test/resources folder of the project.
-Change the values for url, username, password, default_schema properties, replacing them
-with values which reflect your setup.
+2. Create a file named "testDatabaseConfig.properties" in the src/test/resources folder of the project.
+The content of the file should be like this:
+
+local.host = localhost
+local.port = 3306
+local.dbname = dbname
+local.username = user
+local.password = password
+
+central.host = localhost
+central.port = 3306
+central.dbname = dbname
+central.username = user
+central.password = password
+
+Set the correct values for your set-up of the databases.
+
 
 3. Navigate to the root directory of the project and run the command: mvn clean test.  You can also
 limit the test class to run by using the option "-Dtest=TestClassName", for example:
