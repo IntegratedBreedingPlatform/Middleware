@@ -62,6 +62,10 @@ public class Factor implements Serializable
 	@Column(name = "ltype")
 	private String dataType;
 	
+	@Basic(optional = false)
+	@Column(name = "tid")
+	private Integer tid;
+	
 	public Factor()
 	{
 	}
@@ -164,6 +168,16 @@ public class Factor implements Serializable
 	public void setDataType(String dataType)
 	{
 		this.dataType = dataType;
+	}
+	
+	public Integer getTid() 
+	{
+		return tid;
+	}
+
+	public void setTid(Integer tid) 
+	{
+		this.tid = tid;
 	}
 
 	@Override

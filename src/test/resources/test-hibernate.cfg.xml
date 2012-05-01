@@ -4,13 +4,15 @@
 <hibernate-configuration>
  <session-factory>
   <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
-  <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/iris_myisam_test</property>
-  <property name="hibernate.connection.username">iris_myisam</property>
-  <property name="hibernate.connection.password">iris_myisam</property>
-  <property name="hibernate.default_schema">iris_myisam_test</property>
+  <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/ibdb_rice_20120405</property>
+  <property name="hibernate.connection.username">root</property>
+  <property name="hibernate.connection.password">lich27king</property>
+  <property name="hibernate.default_schema">ibdb_rice_20120405</property>
   <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+  <!--   
   <property name="hibernate.show_sql">true</property>
   <property name="hibernate.format_sql">true</property>
+  -->
   
   <!-- Specify JDBC Batch Size for Batch Operations -->
   <property name="hibernate.jdbc.batch_size">50</property>
@@ -50,7 +52,10 @@
   <mapping class="org.generationcp.middleware.pojos.Variate"/>
   <mapping class="org.generationcp.middleware.pojos.Factor"/>
   <mapping class="org.generationcp.middleware.pojos.Oindex"/>
-  <mapping class="org.generationcp.middleware.pojos.OindexPK"/>
+  <mapping class="org.generationcp.middleware.pojos.Study"/>
+  <mapping class="org.generationcp.middleware.pojos.StudyEffect"/>
+  <mapping class="org.generationcp.middleware.pojos.StudyEffectPK"/>
+  <mapping class="org.generationcp.middleware.pojos.Representation"/>
   <mapping class="org.generationcp.middleware.pojos.Lot"/>
   <mapping class="org.generationcp.middleware.pojos.Transaction"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.Person"/>

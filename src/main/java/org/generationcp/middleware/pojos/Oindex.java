@@ -2,71 +2,138 @@ package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
 
-import javax.persistence.EmbeddedId;
+import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Entity
 @Table(name = "oindex")
 public class Oindex implements Serializable
 {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -6609291577310766245L;
+
+	@Id
+	@Basic(optional = false)
+	@Column(name = "oindexid")
+	private Integer id;
 	
-	@EmbeddedId
-	private OindexPK id;
+	@Basic(optional = false)
+    @Column(name = "ounitid")
+	private Integer observationUnitId;
+	
+	@Basic(optional = false)
+    @Column(name = "factorid")
+	private Integer factorId;
+	
+	@Basic(optional = false)
+    @Column(name = "levelno")
+	private Integer levelNumber;
+	
+	@Basic(optional = false)
+    @Column(name = "represno")
+	private Integer representationNumber;
 
 	public Oindex()
 	{
 	}
 	
-	public Oindex(OindexPK id)
+	public Oindex(Integer id, Integer observationUnitId, Integer factorId,
+			Integer levelNumber, Integer representationNumber)
 	{
 		super();
 		this.id = id;
+		this.observationUnitId = observationUnitId;
+		this.factorId = factorId;
+		this.levelNumber = levelNumber;
+		this.representationNumber = representationNumber;
 	}
 
-	public OindexPK getId()
+	public Integer getId()
 	{
 		return id;
 	}
 
-	public void setId(OindexPK id)
+	public void setId(Integer id)
 	{
 		this.id = id;
 	}
 
-	@Override
-	public int hashCode()
+	public Integer getObservationUnitId()
 	{
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
+		return observationUnitId;
 	}
 
-	@Override
-	public boolean equals(Object obj)
+	public void setObservationUnitId(Integer observationUnitId)
 	{
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Oindex other = (Oindex) obj;
-		if (id == null)
-		{
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
+		this.observationUnitId = observationUnitId;
+	}
+
+	public Integer getFactorId()
+	{
+		return factorId;
+	}
+
+	public void setFactorId(Integer factorId)
+	{
+		this.factorId = factorId;
+	}
+
+	public Integer getLevelNumber()
+	{
+		return levelNumber;
+	}
+
+	public void setLevelNumber(Integer levelNumber)
+	{
+		this.levelNumber = levelNumber;
+	}
+
+	public Integer getRepresentationNumber()
+	{
+		return representationNumber;
+	}
+
+	public void setRepresentationNumber(Integer representationNumber)
+	{
+		this.representationNumber = representationNumber;
 	}
 
 	@Override
 	public String toString()
 	{
-		return "Oindex [id=" + id + "]";
+		return "Oindex [id=" + id + ", observationUnitId=" + observationUnitId
+				+ ", factorId=" + factorId + ", levelNumber=" + levelNumber
+				+ ", representationNumber=" + representationNumber + "]";
+	}
+
+	@Override
+	public boolean equals(Object obj) 
+	{
+	   if (obj == null)
+		   return false;
+	   if (obj == this) 
+		   return true; 
+	   if (!(obj instanceof Oindex)) 
+		   return false;
+	
+	   Oindex rhs = (Oindex) obj;
+	   return new EqualsBuilder()
+	                 .appendSuper(super.equals(obj))
+	                 .append(id, rhs.id)
+	                 .isEquals();
+	}
+	
+	@Override
+	public int hashCode() 
+	{
+	     return new HashCodeBuilder(9, 29).
+	       append(id).
+	       toHashCode();
 	}
 	
 }

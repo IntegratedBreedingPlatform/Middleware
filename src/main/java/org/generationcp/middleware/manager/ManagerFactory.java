@@ -94,24 +94,34 @@ public class ManagerFactory
 	public StudyDataManager getStudyDataManager() throws ConfigException
 	{
 		if(this.hibernateUtilForCentral == null)
+		{
 			throw new ConfigException("The StudyDataManager only works with a connection to a central IBDB instance for now.");
+		}
 		return new StudyDataManagerImpl(this.hibernateUtilForCentral);
 	}
 	
 	public InventoryDataManager getInventoryDataManager() throws ConfigException
 	{
 		if(this.hibernateUtilForLocal == null)
+		{
 			throw new ConfigException("The InventoryDataManager needs a connection to a local IBDB instance which is not provided.");
+		}
 		else
+		{
 			return new InventoryDataManagerImpl(this.hibernateUtilForLocal, this.hibernateUtilForCentral);
+		}
 	}
 	
 	public WorkbenchDataManager getWorkbenchDataManager() throws ConfigException 
 	{
 		if(this.hibernateUtilForLocal == null)
+		{
 			throw new ConfigException("The WorkbenchDataManager needs a connection to a local IBDB instance which is not provided.");
+		}
 		else
+		{
 			return new WorkbenchDataManagerImpl(this.hibernateUtilForLocal);
+		}
 	}
 	
 	/**
@@ -120,9 +130,13 @@ public class ManagerFactory
 	public void close()
 	{
 		if(this.hibernateUtilForLocal != null)
+		{
 			this.hibernateUtilForLocal.shutdown();
+		}
 		
 		if(this.hibernateUtilForCentral != null)
+		{
 			this.hibernateUtilForCentral.shutdown();
+		}
 	}
 }

@@ -7,22 +7,27 @@ import org.generationcp.middleware.pojos.CharacterData;
 import org.generationcp.middleware.pojos.Factor;
 import org.generationcp.middleware.pojos.NumericData;
 import org.generationcp.middleware.pojos.Oindex;
+import org.generationcp.middleware.pojos.Representation;
+import org.generationcp.middleware.pojos.Study;
+import org.generationcp.middleware.pojos.StudyEffect;
 import org.generationcp.middleware.pojos.Variate;
 import org.generationcp.middleware.util.HibernateUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class DMSPojosSimpleTest
 {
 	private static final String CONFIG = "test-hibernate.cfg.xml";
-	private HibernateUtil hibernateUtil;
+	private static HibernateUtil hibernateUtil;
 
-	@Before
-	public void setUp() throws Exception
+	@BeforeClass
+	public static void setUp() throws Exception
 	{
 		hibernateUtil = new HibernateUtil(CONFIG);
 	}
@@ -112,8 +117,59 @@ public class DMSPojosSimpleTest
 		}
 	}
 	
-	@After
-	public void tearDown() throws Exception
+	@Test
+	public void testStudyEffect()
+	{
+		Session session = hibernateUtil.getCurrentSession();
+		Query query = session.createQuery("FROM StudyEffect");
+		query.setMaxResults(5);
+		List results = query.list();
+		
+		for(Object obj : results)
+		{
+			Assert.assertTrue(obj instanceof StudyEffect);
+			Assert.assertTrue(obj != null);
+			StudyEffect holder = (StudyEffect) obj;
+			System.out.println(holder);
+		}
+	}
+	
+	@Test
+	public void testStudy()
+	{
+		Session session = hibernateUtil.getCurrentSession();
+		Query query = session.createQuery("FROM Study");
+		query.setMaxResults(5);
+		List results = query.list();
+		
+		for(Object obj : results)
+		{
+			Assert.assertTrue(obj instanceof Study);
+			Assert.assertTrue(obj != null);
+			Study holder = (Study) obj;
+			System.out.println(holder);
+		}
+	}
+	
+	@Test
+	public void testRepresentation()
+	{
+		Session session = hibernateUtil.getCurrentSession();
+		Query query = session.createQuery("FROM Representation");
+		query.setMaxResults(5);
+		List results = query.list();
+		
+		for(Object obj : results)
+		{
+			Assert.assertTrue(obj instanceof Representation);
+			Assert.assertTrue(obj != null);
+			Representation holder = (Representation) obj;
+			System.out.println(holder);
+		}
+	}
+	
+	@AfterClass
+	public static void tearDown() throws Exception
 	{
 		hibernateUtil.shutdown();
 	}

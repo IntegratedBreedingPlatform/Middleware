@@ -47,6 +47,10 @@ public class Variate implements Serializable
 	@Column(name = "vtype")
 	private String type;
 	
+	@Basic(optional = false)
+	@Column(name = "tid")
+	private Integer tid;
+	
 	public Variate()
 	{
 	}
@@ -152,6 +156,18 @@ public class Variate implements Serializable
 	{
 		this.type = type;
 	}
+	
+	public Integer getTid() 
+	{
+		return tid;
+	}
+
+
+	public void setTid(Integer tid) 
+	{
+		this.tid = tid;
+	}
+
 
 	@Override
 	public int hashCode()

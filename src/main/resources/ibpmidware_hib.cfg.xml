@@ -44,7 +44,10 @@
   <mapping class="org.generationcp.middleware.pojos.Variate"/>
   <mapping class="org.generationcp.middleware.pojos.Factor"/>
   <mapping class="org.generationcp.middleware.pojos.Oindex"/>
-  <mapping class="org.generationcp.middleware.pojos.OindexPK"/>
+  <mapping class="org.generationcp.middleware.pojos.Study"/>
+  <mapping class="org.generationcp.middleware.pojos.StudyEffect"/>
+  <mapping class="org.generationcp.middleware.pojos.StudyEffectPK"/>
+  <mapping class="org.generationcp.middleware.pojos.Representation"/>
   <mapping class="org.generationcp.middleware.pojos.Lot"/>
   <mapping class="org.generationcp.middleware.pojos.Transaction"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.Person"/>
