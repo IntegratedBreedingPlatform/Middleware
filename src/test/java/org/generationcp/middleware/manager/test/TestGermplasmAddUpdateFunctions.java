@@ -33,6 +33,7 @@ public class TestGermplasmAddUpdateFunctions
 		manager = factory.getGermplasmDataManager();
 	}
 	
+	/**
 	@Test
 	public void testUpdateGermplasmPrefName() throws Exception
 	{
@@ -248,20 +249,21 @@ public class TestGermplasmAddUpdateFunctions
 		int updated = manager.updateGermplasm(germplasms);
 		Assert.assertTrue(updated == 2);
 	}
+	**/
 	
 	@Test
 	public void testAddGermplasm() throws Exception
 	{
 		Germplasm g = new Germplasm();
 		g.setGdate(new Integer(20120412));
-		g.setGnpgs(new Integer(-1));
-		g.setGpid1(new Integer(1));
-		g.setGpid2(new Integer(2));
+		g.setGnpgs(new Integer(0));
+		g.setGpid1(new Integer(0));
+		g.setGpid2(new Integer(0));
 		g.setGrplce(new Integer(0));
 		g.setLocationId(new Integer(9000));
 		g.setMethodId(new Integer(1));
 		g.setMgid(new Integer(1));
-		g.setUserId(new Integer(1234567));
+		g.setUserId(new Integer(527));
 		g.setReferenceId(new Integer(1));
 		
 		Name n = new Name();

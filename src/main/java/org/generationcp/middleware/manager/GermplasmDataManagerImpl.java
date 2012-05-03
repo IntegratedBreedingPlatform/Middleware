@@ -122,14 +122,35 @@ public class GermplasmDataManagerImpl implements GermplasmDataManager
 	
 	@Override
 	public List<Germplasm> findGermplasmByName(String name, int start, int numOfRows,
-			FindGermplasmByNameModes mode, Operation op, Integer status, GermplasmNameType type) throws QueryException
+			FindGermplasmByNameModes mode, Operation op, Integer status, GermplasmNameType type, Database instance) throws QueryException
 	{
-		//TODO handle local-central
-		if(this.hibernateUtilForCentral == null)
-			throw new QueryException("This method only works with a connection to a central instance for now.");
-		
 		GermplasmDAO dao = new GermplasmDAO();
-		dao.setSession(hibernateUtilForCentral.getCurrentSession());
+		
+		if(instance == Database.CENTRAL)
+		{
+			if(this.hibernateUtilForCentral != null)
+			{
+				dao.setSession(hibernateUtilForCentral.getCurrentSession());
+			}
+			else
+			{
+				throw new QueryException("The central instance was specified for the search but there is no database connection" +
+						"for central provided.");
+			}
+		}
+		else if(instance == Database.LOCAL)
+		{
+			if(this.hibernateUtilForLocal != null)
+			{
+				dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+			}
+			else
+			{
+				throw new QueryException("The local instance was specified for the search but there is no database connection" +
+					"for local provided.");
+			}
+		}
+		
 		List<Germplasm> germplasms = null;
 		
 		//do string manipulation on name parameter depending on FindGermplasmByNameModes parameter
@@ -160,7 +181,7 @@ public class GermplasmDataManagerImpl implements GermplasmDataManager
 
 	@Override
 	public int countGermplasmByName(String name, FindGermplasmByNameModes mode,
-			Operation op, Integer status, GermplasmNameType type)
+			Operation op, Integer status, GermplasmNameType type, Database instance) throws QueryException
 	{
 		//do string manipulation on name parameter depending on FindGermplasmByNameModes parameter
 		String nameToUse = "";
@@ -186,20 +207,33 @@ public class GermplasmDataManagerImpl implements GermplasmDataManager
 		
 		int count = 0;
 		
-		if(this.hibernateUtilForLocal != null)
+		GermplasmDAO dao = new GermplasmDAO();
+		if(instance == Database.CENTRAL)
 		{
-			GermplasmDAO dao = new GermplasmDAO();
-			dao.setSession(hibernateUtilForLocal.getCurrentSession());
-			count = count + dao.countByName(nameToUse, op, status, type).intValue();
+			if(this.hibernateUtilForCentral != null)
+			{
+				dao.setSession(hibernateUtilForCentral.getCurrentSession());
+			}
+			else
+			{
+				throw new QueryException("The central instance was specified for the search but there is no database connection" +
+						"for central provided.");
+			}
+		}
+		else if(instance == Database.LOCAL)
+		{
+			if(this.hibernateUtilForLocal != null)
+			{
+				dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+			}
+			else
+			{
+				throw new QueryException("The local instance was specified for the search but there is no database connection" +
+					"for local provided.");
+			}
 		}
 		
-		if(this.hibernateUtilForCentral != null)
-		{
-			GermplasmDAO centralDao = new GermplasmDAO();
-			centralDao.setSession(hibernateUtilForCentral.getCurrentSession());
-			count = count + centralDao.countByName(nameToUse, op, status, type).intValue();
-		}
-		
+		count = dao.countByName(nameToUse, op, status, type).intValue();
 		return count;
 	}
 

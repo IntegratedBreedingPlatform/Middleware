@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.FindGermplasmByNameModes;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.Operation;
@@ -44,10 +45,12 @@ public interface GermplasmDataManager
 	 * @param op - can be EQUAL OR LIKE
 	 * @param status - nstat of the names to be included in the search
 	 * @param type - name type
+	 * @param instance - can be Database.LOCAL or Database.CENTRAL
+	 * 
 	 * @return List of Germplasm POJOs
 	 * @throws QueryException
 	 */
-	public List<Germplasm> findGermplasmByName(String name, int start, int numOfRows, FindGermplasmByNameModes mode, Operation op, Integer status, GermplasmNameType type) throws QueryException;
+	public List<Germplasm> findGermplasmByName(String name, int start, int numOfRows, FindGermplasmByNameModes mode, Operation op, Integer status, GermplasmNameType type, Database instance) throws QueryException;
 	
 	/**
 	 * Returns the number of germplasm records with any name matching the given parameter.  Search modes
@@ -65,10 +68,12 @@ public interface GermplasmDataManager
 	 * @param op - can be EQUAL OR LIKE
 	 * @param status - nstat of the names to be included in the search
 	 * @param type - name type
+	 * @param instance - can be Database.LOCAL or Database.CENTRAL
 	 * 
 	 * @return number of germplasm records
+	 * @throws QueryException
 	 */
-	public int countGermplasmByName(String name, FindGermplasmByNameModes mode, Operation op, Integer status, GermplasmNameType type);
+	public int countGermplasmByName(String name, FindGermplasmByNameModes mode, Operation op, Integer status, GermplasmNameType type, Database instance) throws QueryException;
 	
 	/**
 	 * Returns the germplasm records that were created at the locations with names

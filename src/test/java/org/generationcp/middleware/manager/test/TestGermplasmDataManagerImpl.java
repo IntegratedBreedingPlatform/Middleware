@@ -4,6 +4,7 @@ package org.generationcp.middleware.manager.test;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.FindGermplasmByNameModes;
 import org.generationcp.middleware.manager.GermplasmNameType;
@@ -45,7 +46,7 @@ public class TestGermplasmDataManagerImpl
 	public void testFindGermplasmByName() throws Exception
 	{
 		long start = System.currentTimeMillis();
-		List<Germplasm> germplasmList = manager.findGermplasmByName("IR 64", 0, 5, FindGermplasmByNameModes.NORMAL, Operation.EQUAL, null, null);
+		List<Germplasm> germplasmList = manager.findGermplasmByName("IR 64", 0, 5, FindGermplasmByNameModes.NORMAL, Operation.EQUAL, null, null, Database.CENTRAL);
 		Assert.assertTrue(germplasmList != null);
 		Assert.assertTrue(germplasmList.size() >= 5);
 		
@@ -62,7 +63,7 @@ public class TestGermplasmDataManagerImpl
 	public void testCountGermplasmByName() throws Exception
 	{
 		long start = System.currentTimeMillis();
-		int count = manager.countGermplasmByName("IR 64", FindGermplasmByNameModes.NORMAL, Operation.EQUAL, null, null);
+		int count = manager.countGermplasmByName("IR 64", FindGermplasmByNameModes.NORMAL, Operation.EQUAL, null, null, Database.CENTRAL);
 		System.out.println(count);
 		long end = System.currentTimeMillis();
 		System.out.println("QUERY TIME: " + (end - start) + " ms");
@@ -72,7 +73,7 @@ public class TestGermplasmDataManagerImpl
 	public void testFindGermplasmByNameUsingLike() throws Exception
 	{
 		long start = System.currentTimeMillis();
-		List<Germplasm> germplasmList = manager.findGermplasmByName("IR%", 0, 5, FindGermplasmByNameModes.NORMAL, Operation.LIKE, null, null);
+		List<Germplasm> germplasmList = manager.findGermplasmByName("IR%", 0, 5, FindGermplasmByNameModes.NORMAL, Operation.LIKE, null, null, Database.CENTRAL);
 		Assert.assertTrue(germplasmList != null);
 		Assert.assertTrue(germplasmList.size() >= 5);
 		
@@ -89,7 +90,7 @@ public class TestGermplasmDataManagerImpl
 	public void testCountGermplasmByNameUsingLike() throws Exception
 	{
 		long start = System.currentTimeMillis();
-		int count = manager.countGermplasmByName("IR%", FindGermplasmByNameModes.NORMAL, Operation.LIKE, null, null);
+		int count = manager.countGermplasmByName("IR%", FindGermplasmByNameModes.NORMAL, Operation.LIKE, null, null, Database.CENTRAL);
 		System.out.println(count);
 		long end = System.currentTimeMillis();
 		System.out.println("QUERY TIME: " + (end - start) + " ms");
@@ -99,7 +100,7 @@ public class TestGermplasmDataManagerImpl
 	public void testFindGermplasmByNameWithStatus() throws Exception
 	{
 		long start = System.currentTimeMillis();
-		List<Germplasm> germplasmList = manager.findGermplasmByName("IR 64", 0, 5, FindGermplasmByNameModes.NORMAL, Operation.EQUAL, new Integer(1), null);
+		List<Germplasm> germplasmList = manager.findGermplasmByName("IR 64", 0, 5, FindGermplasmByNameModes.NORMAL, Operation.EQUAL, new Integer(1), null, Database.CENTRAL);
 		Assert.assertTrue(germplasmList != null);
 		Assert.assertTrue(germplasmList.size() >= 5);
 		
@@ -116,7 +117,7 @@ public class TestGermplasmDataManagerImpl
 	public void testCountGermplasmByNameWithStatus() throws Exception
 	{
 		long start = System.currentTimeMillis();
-		int count = manager.countGermplasmByName("IR 64", FindGermplasmByNameModes.NORMAL, Operation.EQUAL, new Integer(1), null);
+		int count = manager.countGermplasmByName("IR 64", FindGermplasmByNameModes.NORMAL, Operation.EQUAL, new Integer(1), null, Database.CENTRAL);
 		System.out.println(count);
 		long end = System.currentTimeMillis();
 		System.out.println("QUERY TIME: " + (end - start) + " ms");
@@ -126,7 +127,7 @@ public class TestGermplasmDataManagerImpl
 	public void testFindGermplasmByNameWithStatusAndType() throws Exception
 	{
 		long start = System.currentTimeMillis();
-		List<Germplasm> germplasmList = manager.findGermplasmByName("IR 64", 0, 5, FindGermplasmByNameModes.NORMAL, Operation.EQUAL, new Integer(1), GermplasmNameType.RELEASE_NAME);
+		List<Germplasm> germplasmList = manager.findGermplasmByName("IR 64", 0, 5, FindGermplasmByNameModes.NORMAL, Operation.EQUAL, new Integer(1), GermplasmNameType.RELEASE_NAME, Database.CENTRAL);
 		Assert.assertTrue(germplasmList != null);
 		Assert.assertTrue(germplasmList.size() >= 5);
 		
@@ -143,7 +144,7 @@ public class TestGermplasmDataManagerImpl
 	public void testCountGermplasmByNameWithStatusAndType() throws Exception
 	{
 		long start = System.currentTimeMillis();
-		int count = manager.countGermplasmByName("IR 64", FindGermplasmByNameModes.NORMAL, Operation.EQUAL, new Integer(1), GermplasmNameType.RELEASE_NAME);
+		int count = manager.countGermplasmByName("IR 64", FindGermplasmByNameModes.NORMAL, Operation.EQUAL, new Integer(1), GermplasmNameType.RELEASE_NAME, Database.CENTRAL);
 		System.out.println(count);
 		long end = System.currentTimeMillis();
 		System.out.println("QUERY TIME: " + (end - start) + " ms");
@@ -153,7 +154,7 @@ public class TestGermplasmDataManagerImpl
 	public void testFindGermplasmByNameWithStatusUsingLike() throws Exception
 	{
 		long start = System.currentTimeMillis();
-		List<Germplasm> germplasmList = manager.findGermplasmByName("IR%", 0, 5, FindGermplasmByNameModes.NORMAL, Operation.LIKE, new Integer(1), null);
+		List<Germplasm> germplasmList = manager.findGermplasmByName("IR%", 0, 5, FindGermplasmByNameModes.NORMAL, Operation.LIKE, new Integer(1), null, Database.CENTRAL);
 		Assert.assertTrue(germplasmList != null);
 		Assert.assertTrue(germplasmList.size() >= 5);
 		
@@ -170,7 +171,7 @@ public class TestGermplasmDataManagerImpl
 	public void testFindGermplasmByNameWithStatusAndTypeUsingLike() throws Exception
 	{
 		long start = System.currentTimeMillis();
-		List<Germplasm> germplasmList = manager.findGermplasmByName("IR%", 0, 5, FindGermplasmByNameModes.NORMAL, Operation.LIKE, new Integer(1), GermplasmNameType.RELEASE_NAME);
+		List<Germplasm> germplasmList = manager.findGermplasmByName("IR%", 0, 5, FindGermplasmByNameModes.NORMAL, Operation.LIKE, new Integer(1), GermplasmNameType.RELEASE_NAME, Database.CENTRAL);
 		Assert.assertTrue(germplasmList != null);
 		Assert.assertTrue(germplasmList.size() >= 5);
 		
@@ -183,6 +184,7 @@ public class TestGermplasmDataManagerImpl
 		System.out.println("QUERY TIME: " + (end - start) + " ms");
 	}
 	
+	/**
 	@Test
 	public void testFindGermplasmByLocationNameUsingEqual() throws Exception
 	{
@@ -408,6 +410,7 @@ public class TestGermplasmDataManagerImpl
 			System.out.println(attribute);
 		}
 	}
+	**/
 	
 	@AfterClass
 	public static void tearDown() throws Exception 
