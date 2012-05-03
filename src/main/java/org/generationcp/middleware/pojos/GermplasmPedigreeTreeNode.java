@@ -25,6 +25,12 @@ public class GermplasmPedigreeTreeNode
 		this.germplasm = germplasm;
 	}
 	
+	/**
+	 * Returns a List of GermplasmPedigreeTreeNode objects representing the
+	 * child nodes.
+	 * 
+	 * @return
+	 */
 	public List<GermplasmPedigreeTreeNode> getLinkedNodes()
 	{
 		return linkedNodes;
