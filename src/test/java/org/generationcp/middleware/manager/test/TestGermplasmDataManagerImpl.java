@@ -184,7 +184,6 @@ public class TestGermplasmDataManagerImpl
 		System.out.println("QUERY TIME: " + (end - start) + " ms");
 	}
 	
-	/**
 	@Test
 	public void testFindGermplasmByLocationNameUsingEqual() throws Exception
 	{
@@ -410,7 +409,6 @@ public class TestGermplasmDataManagerImpl
 			System.out.println(attribute);
 		}
 	}
-	**/
 	
 	@AfterClass
 	public static void tearDown() throws Exception 
