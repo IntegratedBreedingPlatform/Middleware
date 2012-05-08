@@ -342,7 +342,6 @@ public class TestGermplasmDataManagerImpl
 		List<Name> names = manager.getNamesByGID(new Integer(50533), null, null);
 		Assert.assertTrue(names != null);
 		Assert.assertTrue(!names.isEmpty());
-		Assert.assertTrue(names.size() == 3);
 		
 		for(Name name: names)
 		{
