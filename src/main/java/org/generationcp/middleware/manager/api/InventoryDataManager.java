@@ -365,6 +365,18 @@ public interface InventoryDataManager
 	public List<LotReportRow> generateReportOnAllLots(int start, int numOfRows);
 	
 	/**
+	 * Returns a report on all dormant Lot records given a specific year. All lots with non-zero balance
+	 * on or before the given year are retrieved as dormant lots. Included information are: lot balance, 
+	 * location of the lot, and scale of the lot.
+	 * 
+	 * @param year - filter dormant lots depending on the year specified
+	 * @param start - the starting index of the sublist of results to be returned
+	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
+	 * @return List of LotReportRow objects
+	 */
+	public List<LotReportRow> generateReportOnDormantLots(int year, int start, int numOfRows);
+	
+	/**
 	 * Returns a report Lot with zero balance
 	 * Included information are: lot id of the lot, entity id of the lot, lot balance,
 	 * location of the lot, and scale of the lot.

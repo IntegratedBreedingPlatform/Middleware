@@ -1,5 +1,6 @@
 package org.generationcp.middleware.manager;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -16,6 +17,7 @@ import org.generationcp.middleware.pojos.report.LotReportRow;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
 import org.generationcp.middleware.pojos.workbench.Person;
 import org.generationcp.middleware.util.HibernateUtil;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -494,6 +496,44 @@ public class InventoryDataManagerImpl implements InventoryDataManager
 	{
 		List<Lot> allLots = getAllLots(start, numOfRows);
 		return generateLotReportRows(allLots);
+	}
+	
+	@Override
+	public List<LotReportRow> generateReportOnDormantLots(int year, int start, int numOfRows)
+	{
+		SQLQuery query = this.hibernateUtilForLocal.getCurrentSession()
+			.createSQLQuery(Lot.GENERATE_REPORT_ON_DORMANT);
+		query.setParameter("year", year);
+		query.setFirstResult(start);
+		query.setMaxResults(numOfRows);
+		
+		GermplasmDataManagerImpl germplasmManager = new GermplasmDataManagerImpl(this.hibernateUtilForLocal, this.hibernateUtilForCentral);
+		TraitDataManagerImpl traitManager = new TraitDataManagerImpl(this.hibernateUtilForLocal, this.hibernateUtilForCentral);
+		List<LotReportRow> report = new ArrayList<LotReportRow>();
+		
+		List results = query.list();
+		for (Object o : results) {
+			Object[] result = (Object[]) o;
+			if(result != null)
+			{
+				LotReportRow row = new LotReportRow();
+				
+				row.setLotId((Integer) result[0]);
+				
+				row.setEntityIdOfLot((Integer) result[1]);
+				
+				row.setActualLotBalance(((BigDecimal) result[2]).longValue());
+				
+				Location location = germplasmManager.getLocationByID((Integer) result[3]);
+				row.setLocationOfLot(location);
+				
+				Scale scale = traitManager.getScaleByID((Integer) result[4]);
+				row.setScaleOfLot(scale);
+				
+				report.add(row);
+			}
+		}
+		return report;
 	}
 	
 	/**

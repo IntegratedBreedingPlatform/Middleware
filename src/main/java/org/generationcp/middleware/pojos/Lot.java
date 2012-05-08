@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -22,6 +21,16 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 public class Lot implements Serializable
 {
 	private static final long serialVersionUID = -7110592680243974512L;
+	
+	//string contants for name of queries
+    public static final String GENERATE_REPORT_ON_DORMANT = 
+    	"select l.lot_id, l.entity_id, sum(t.quantity) balance, l.location_id, l.scale_id " +
+    		"from transaction t, lot l " +
+    		"where t.lot_id = l.lot_id " +
+    		"and t.transaction_date < (:year + 1) * 10000 " +
+    		"and t.status = 1 " +
+    		"group by l.lot_id, l.entity_id, l.location_id, l.scale_id " +
+    		"having sum(quantity) <> 0";
 
 	@Id
 	@Basic(optional = false)

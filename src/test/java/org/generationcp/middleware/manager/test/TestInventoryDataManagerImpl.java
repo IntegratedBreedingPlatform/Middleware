@@ -13,9 +13,7 @@ import org.generationcp.middleware.pojos.Lot;
 import org.generationcp.middleware.pojos.Transaction;
 import org.generationcp.middleware.pojos.report.LotReportRow;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -300,6 +298,18 @@ public class TestInventoryDataManagerImpl
 		System.out.println("Balance Report on All Lots");
 		System.out.println("Number of lots: " + manager.countAllLots());
 		List<LotReportRow> report = manager.generateReportOnAllLots(0, 10);
+		Assert.assertTrue(report != null);
+		Assert.assertTrue(!report.isEmpty());
+		System.out.println("REPORT:");
+		for(LotReportRow row: report)
+			System.out.println(row);
+	}
+	
+	@Test
+	public void testGenerateReportsOnDormantLots() throws Exception
+	{
+		System.out.println("Balance Report on DORMANT Lots");
+		List<LotReportRow> report = manager.generateReportOnDormantLots(2012, 0, 10);
 		Assert.assertTrue(report != null);
 		Assert.assertTrue(!report.isEmpty());
 		System.out.println("REPORT:");
