@@ -130,11 +130,11 @@ public class GermplasmDataManagerImpl implements GermplasmDataManager
 		{
 			if(this.hibernateUtilForCentral != null)
 			{
-				dao.setSession(hibernateUtilForCentral.getCurrentSession());
+				dao.setSession(this.hibernateUtilForCentral.getCurrentSession());
 			}
 			else
 			{
-				throw new QueryException("The central instance was specified for the search but there is no database connection" +
+				throw new QueryException("The central instance was specified for the search but there is no database connection " +
 						"for central provided.");
 			}
 		}
@@ -146,7 +146,7 @@ public class GermplasmDataManagerImpl implements GermplasmDataManager
 			}
 			else
 			{
-				throw new QueryException("The local instance was specified for the search but there is no database connection" +
+				throw new QueryException("The local instance was specified for the search but there is no database connection " +
 					"for local provided.");
 			}
 		}
@@ -216,7 +216,7 @@ public class GermplasmDataManagerImpl implements GermplasmDataManager
 			}
 			else
 			{
-				throw new QueryException("The central instance was specified for the search but there is no database connection" +
+				throw new QueryException("The central instance was specified for the search but there is no database connection " +
 						"for central provided.");
 			}
 		}
@@ -228,7 +228,7 @@ public class GermplasmDataManagerImpl implements GermplasmDataManager
 			}
 			else
 			{
-				throw new QueryException("The local instance was specified for the search but there is no database connection" +
+				throw new QueryException("The local instance was specified for the search but there is no database connection " +
 					"for local provided.");
 			}
 		}

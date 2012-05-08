@@ -23,8 +23,8 @@ public class HibernateUtil
 	
 	private static final String MIDDLEWARE_INTERNAL_HIBERNATE_CFG = "ibpmidware_hib.cfg.xml";
 	
-	private static SessionFactory sessionFactory;
-	private static ThreadLocal<Session> threadSession;
+	private SessionFactory sessionFactory;
+	private ThreadLocal<Session> threadSession;
 	
 	/**
 	 * Given a file name of a hibernate cfg xml file, this constructor creates a SessionFactory based on it.
