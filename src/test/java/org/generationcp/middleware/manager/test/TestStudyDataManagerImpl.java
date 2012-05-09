@@ -9,14 +9,13 @@ import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.Factor;
-import org.generationcp.middleware.pojos.Variate;
-import org.generationcp.middleware.pojos.StudyEffect;
 import org.generationcp.middleware.pojos.NumericRange;
+import org.generationcp.middleware.pojos.Study;
+import org.generationcp.middleware.pojos.StudyEffect;
 import org.generationcp.middleware.pojos.TraitCombinationFilter;
-import org.junit.After;
+import org.generationcp.middleware.pojos.Variate;
 import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -83,6 +82,24 @@ public class TestStudyDataManagerImpl
 		
 		for(StudyEffect studyEffect : studyEffects){
 			System.out.println(studyEffect);
+		}
+	}
+	
+	@Test
+	public void testGetAllTopLevelStudies() throws Exception {
+		List<Study> topLevelStudies = manager.getAllTopLevelStudies(0, 10, Database.LOCAL);
+		System.out.println("TOP LEVEL STUDIES: ");
+		for (Study study : topLevelStudies) {
+			System.out.println(study);
+		}
+	}
+	
+	@Test
+	public void testGetStudiesByParentFolderID() throws Exception {
+		List<Study> studies = manager.getStudiesByParentFolderID(640, 0, 100);
+		System.out.println("STUDIES: ");
+		for (Study study : studies) {
+			System.out.println(study);
 		}
 	}
 	

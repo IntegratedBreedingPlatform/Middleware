@@ -6,9 +6,8 @@ import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.Factor;
 import org.generationcp.middleware.pojos.Variate;
+import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.pojos.StudyEffect;
-
-
 import org.generationcp.middleware.pojos.TraitCombinationFilter;
 
 /**
@@ -34,8 +33,9 @@ public interface StudyDataManager
 	 * @param start - the starting index of the sublist of results to be returned
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
 	 * @return
+	 * @throws QueryException 
 	 */
-	public List<Integer> getGIDSByPhenotypicData(List<TraitCombinationFilter> filters, int start, int numOfRows);
+	public List<Integer> getGIDSByPhenotypicData(List<TraitCombinationFilter> filters, int start, int numOfRows) throws QueryException;
 	
 	/**
 	 * Returns all Factor records which belong to the Study identified by the given id.
@@ -61,4 +61,28 @@ public interface StudyDataManager
 	 */
 	public List<StudyEffect> getEffectsByStudyID(Integer studyId) throws QueryException;
 
+	/**
+	 * Returns a List of {@code Study} objects that are top-level studies, or studies that do
+	 * not have parent folders.
+	 * 
+	 * @param start - the starting index of the sublist of results to be returned
+	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
+	 * @param instance - can be Database.LOCAL or Database.CENTRAL
+	 * @return The list of all the top-level studies
+	 * @throws QueryException
+	 */
+	public List<Study> getAllTopLevelStudies(int start, int numOfRows, Database instance) throws QueryException;
+
+	/**
+	 * Returns a List of {@code Study} objects that belong to the specified Parent Folder ID.
+	 * 
+	 * @param parentFolderId - the parent folder's studyid
+	 * @param start - the starting index of the sublist of results to be returned
+	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
+	 * @return The list of all the studies belonging to the specified parent folder. Returns {@code null} if
+	 * there are no connections detected for both local and central instances.
+	 * @throws QueryException
+	 */
+	public List<Study> getStudiesByParentFolderID(Integer parentFolderId, int start,
+			int numOfRows) throws QueryException;
 }

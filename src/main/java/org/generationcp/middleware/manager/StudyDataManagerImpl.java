@@ -8,11 +8,13 @@ import java.util.Set;
 import org.generationcp.middleware.dao.CharacterDataDAO;
 import org.generationcp.middleware.dao.FactorDAO;
 import org.generationcp.middleware.dao.NumericDataDAO;
+import org.generationcp.middleware.dao.StudyDAO;
 import org.generationcp.middleware.dao.StudyEffectDAO;
 import org.generationcp.middleware.dao.VariateDAO;
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.Factor;
+import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.pojos.StudyEffect;
 import org.generationcp.middleware.pojos.TraitCombinationFilter;
 import org.generationcp.middleware.pojos.Variate;
@@ -30,8 +32,12 @@ public class StudyDataManagerImpl implements StudyDataManager
 	}
 
 	@Override
-	public List<Integer> getGIDSByPhenotypicData(List<TraitCombinationFilter> filters, int start, int numOfRows)
+	public List<Integer> getGIDSByPhenotypicData(List<TraitCombinationFilter> filters, int start, int numOfRows) throws QueryException
 	{
+		//TODO handle local-central
+		if(this.hibernateUtilForCentral == null)
+			throw new QueryException("This method only works with a connection to a central instance for now.");
+		
 		NumericDataDAO dataNDao = new NumericDataDAO();
 		dataNDao.setSession(this.hibernateUtilForCentral.getCurrentSession());
 		
@@ -129,6 +135,50 @@ public class StudyDataManagerImpl implements StudyDataManager
 		List<StudyEffect> studyEffect = studyEffectDao.getByStudyID(studyId);
 		return studyEffect;
 		
+	}
+	
+	@Override
+	public List<Study> getAllTopLevelStudies(int start, int numOfRows, Database instance) throws QueryException {
+		StudyDAO dao = new StudyDAO();
+		
+		if(instance == Database.CENTRAL) {
+			if(this.hibernateUtilForCentral != null) {
+				dao.setSession(hibernateUtilForCentral.getCurrentSession());
+			} else {
+				throw new QueryException("The central instance was specified for the search but there is no database connection " +
+						"for central provided.");
+			}
+		}
+		else if(instance == Database.LOCAL) {
+			if(this.hibernateUtilForLocal != null) {
+				dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+			}
+			else {
+				throw new QueryException("The local instance was specified for the search but there is no database connection " +
+					"for local provided.");
+			}
+		}
+		
+		List<Study> topLevelStudies = dao.getTopLevelStudies(start, numOfRows);
+		
+		return topLevelStudies;
+	}
+	
+	@Override
+	public List<Study> getStudiesByParentFolderID(Integer parentFolderId, int start, int numOfRows) throws QueryException {
+		StudyDAO dao = new StudyDAO();
+		
+		if(parentFolderId < 0 && this.hibernateUtilForLocal != null) {
+			dao.setSession(hibernateUtilForLocal.getCurrentSession());
+		} else if(parentFolderId > 0 && this.hibernateUtilForCentral != null) {
+			dao.setSession(hibernateUtilForCentral.getCurrentSession());
+		} else {
+			return null;
+		}
+		
+		List<Study> studies = dao.getStudiesByParentFolderID(parentFolderId, start, numOfRows);
+		
+		return studies;
 	}
 
 }
