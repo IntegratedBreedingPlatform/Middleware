@@ -265,7 +265,7 @@ public class StudyDataManagerImpl implements StudyDataManager{
 	}
 
 	@Override
-	public List<Factor> getFactorsByRepresentationId(Integer representationId, int start, int numOfRows) throws QueryException {
+	public List<Factor> getFactorsByRepresentationId(Integer representationId) throws QueryException {
 		FactorDAO dao = new FactorDAO();
 		
 		HibernateUtil hibernateUtil = getHibernateUtil(representationId);
@@ -276,13 +276,13 @@ public class StudyDataManagerImpl implements StudyDataManager{
 			return new ArrayList<Factor>();
 		}
 		
-		List<Factor> factors = dao.getByRepresentationID(representationId, start, numOfRows);
+		List<Factor> factors = dao.getByRepresentationID(representationId);
 		
 		return factors;
 	}
 	
 	@Override
-	public List<Integer> getOunitIDsByRepresentationId(Integer representationId, int start, int numOfRows) throws QueryException {
+	public List<Integer> getOunitIDsByRepresentationId(Integer representationId) throws QueryException {
 		OindexDAO dao = new OindexDAO();
 		
 		HibernateUtil hibernateUtil = getHibernateUtil(representationId);
@@ -293,7 +293,7 @@ public class StudyDataManagerImpl implements StudyDataManager{
 			return new ArrayList<Integer>();
 		}
 		
-		List<Integer> ounitIDs = dao.getOunitIDsByRepresentationId(representationId, start, numOfRows);
+		List<Integer> ounitIDs = dao.getOunitIDsByRepresentationId(representationId);
 		
 		return ounitIDs;
 	}

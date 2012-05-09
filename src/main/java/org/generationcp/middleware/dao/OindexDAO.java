@@ -10,13 +10,10 @@ import org.hibernate.SQLQuery;
 public class OindexDAO extends GenericDAO<OindexDAO, Integer> {
 
 	@SuppressWarnings("unchecked")
-	public List<Integer> getOunitIDsByRepresentationId (Integer representationId, int start, int numOfRows) throws QueryException {
+	public List<Integer> getOunitIDsByRepresentationId (Integer representationId) throws QueryException {
 		try {
 			SQLQuery query = getSession().createSQLQuery(Oindex.GET_BY_REPRESENTATION_ID);
 			query.setParameter("representationId", representationId);
-			
-			query.setFirstResult(start);
-			query.setMaxResults(numOfRows);
 			
 			List<Integer> ounitIDs = query.list();
 			

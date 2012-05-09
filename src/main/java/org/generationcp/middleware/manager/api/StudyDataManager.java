@@ -125,25 +125,19 @@ public interface StudyDataManager
 	 * Returns a List of {@code Factor} objects that belong to the specified Representation ID.
 	 * 
 	 * @param representationId - the ID of the Representation
-	 * @param start - the starting index of the sublist of results to be returned
-	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
 	 * @return The list of all the factors belonging to the specified Representation. Returns an empty list
 	 * if there are no connections detected for both local and central instances.
 	 * @throws QueryException
 	 */
-	public List<Factor> getFactorsByRepresentationId(Integer representationId,
-			int start, int numOfRows) throws QueryException;
+	public List<Factor> getFactorsByRepresentationId(Integer representationId) throws QueryException;
 
 	/**
 	 * Returns a List of OunitIDs that are associated to the specified Representation ID.
 	 * 
 	 * @param representationId - the ID of the Representation
-	 * @param start - the starting index of the sublist of results to be returned
-	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
 	 * @return The list of all the OunitIDs associated to the specified Representation. Returns an empty list
 	 * if there are no connections detected for both local and central instances.
 	 * @throws QueryException
 	 */
-	public List<Integer> getOunitIDsByRepresentationId(Integer representationId,
-			int start, int numOfRows) throws QueryException;
+	public List<Integer> getOunitIDsByRepresentationId(Integer representationId) throws QueryException;
 }

@@ -10,8 +10,8 @@ import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.Factor;
-import org.generationcp.middleware.pojos.Representation;
 import org.generationcp.middleware.pojos.NumericRange;
+import org.generationcp.middleware.pojos.Representation;
 import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.pojos.StudyEffect;
 import org.generationcp.middleware.pojos.TraitCombinationFilter;
@@ -152,7 +152,7 @@ public class TestStudyDataManagerImpl
 	
 	@Test
 	public void testGetFactorsByRepresentationId() throws Exception {
-		List<Factor> factors = manager.getFactorsByRepresentationId(1176, 0, 10);
+		List<Factor> factors = manager.getFactorsByRepresentationId(1176);
 		System.out.println("FACTORS BY REPRESENTATION: " + factors.size());
 		for (Factor factor : factors) {
 			System.out.println(factor);
@@ -161,7 +161,7 @@ public class TestStudyDataManagerImpl
 	
 	@Test
 	public void testGetOunitIDsByRepresentationId() throws Exception {
-		List<Integer> ounitIDs = manager.getOunitIDsByRepresentationId(1176, 0, 100);
+		List<Integer> ounitIDs = manager.getOunitIDsByRepresentationId(1176);
 		System.out.println("OUNIT IDS BY REPRESENTATION: " + ounitIDs.size());
 		System.out.println(ounitIDs);
 	}
