@@ -6,10 +6,60 @@ import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.pojos.Study;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
 
-public class StudyDAO extends GenericDAO<Study, Integer> {
+
+public class StudyDAO extends GenericDAO<StudyDAO, Integer>
+{
+	@SuppressWarnings("unchecked")
+	public List<Study> findByNameUsingEqual(String name, int start, int numOfRows) throws QueryException
+	{
+		try
+		{
+			Query query = getSession().getNamedQuery(Study.FIND_BY_NAME_USING_EQUAL);
+			query.setParameter("name", name);
+			query.setFirstResult(start);
+			query.setMaxResults(numOfRows);
+			
+			List<Study> results = query.list();
+			return results;
+		}
+		catch(HibernateException ex)
+		{
+			throw new QueryException("Error with find by  name query using equal for Study: " + ex.getMessage());
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Study> findByNameUsingLike(String name, int start, int numOfRows) throws QueryException{
+		try{
+			Query query = getSession().getNamedQuery(Study.FIND_BY_NAME_USING_LIKE);
+			query.setParameter("name", name);
+			query.setFirstResult(start);
+			query.setMaxResults(numOfRows);
+			
+			List<Study> results = query.list();
+			return results;
+		}
+		catch(HibernateException ex){
+			throw new QueryException("Error with find by  name query using like for Study: " + ex.getMessage());
+		}
+	}
 	
+	@SuppressWarnings("unchecked")
+	public List<Study> getByID(Integer id) throws QueryException {
+		try {
+			Query query = getSession().getNamedQuery(Study.GET_STUDY_BY_ID);
+			query.setParameter("id", id);
+			
+			List<Study> results = query.list();
+			return results;
+		} catch(HibernateException ex) {
+			throw new QueryException("Error with get Study records by Study ID query: " + ex.getMessage());
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<Study> getTopLevelStudies(int start, int numOfRows) throws QueryException {
 		try {
@@ -41,4 +91,5 @@ public class StudyDAO extends GenericDAO<Study, Integer> {
 		}
 	}
 	
+
 }

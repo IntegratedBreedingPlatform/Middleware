@@ -6,16 +6,33 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+
+
+//select * from represtn where effectid = 1176
+@NamedQueries
+({
+	@NamedQuery
+	(
+		name = "getRepresentationByEffectId",
+		query = "SELECT r FROM Representation r WHERE r.effectId = :effectId"
+	)
+})
 
 @Entity
 @Table(name = "represtn")
 public class Representation implements Serializable
 {
 	private static final long serialVersionUID = 3521757463492775303L;
+	
+    public static final String GET_REPRESENTATION_BY_EFFECT_ID = "getRepresentationByEffectId";
+
 
 	@Id
 	@Basic(optional = false)

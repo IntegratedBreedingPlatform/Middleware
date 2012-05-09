@@ -4,7 +4,10 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Factor;
+import org.generationcp.middleware.pojos.Representation;
+import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.pojos.Variate;
 import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.pojos.StudyEffect;
@@ -38,28 +41,29 @@ public interface StudyDataManager
 	public List<Integer> getGIDSByPhenotypicData(List<TraitCombinationFilter> filters, int start, int numOfRows) throws QueryException;
 	
 	/**
-	 * Returns all Factor records which belong to the Study identified by the given id.
+	 * Returns the study records matching the given name
 	 * 
-	 * @param studyId - id of the Study
-	 * @return List of Factor POJOs
+	 * @param name - search string (pattern or exact match) for the name of the study
+	 * @param start - the starting index of the sublist of results to be returned
+	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
+	 * @param op - can be EQUAL like LIKE
+	 * 				For LIKE operation, the parameter name may include the following:
+	 * 				"%" - to indicate 0 or more characters in the pattern
+	 * 				"_" - to indicate any single character in the pattern 
+	 * @param instance - can be CENTRAL or LOCAL
+	 * @return List of Study POJOs
+	 * @throws QueryException
 	 */
-	public List<Factor> getFactorsByStudyID(Integer studyId) throws QueryException;
+	public List<Study> findStudyByName(String name, int start, int numOfRows, Operation op, Database instance) throws QueryException;
 
 	/**
-	 * Returns all Variate records which belong to the Study identified by the given id.
+	 * Retrieves a Study record of the given id
 	 * 
-	 * @param studyId - id of the Study
-	 * @return List of Variate POJOs
+	 * @param id
+	 * @return List of Study POJOs
+	 * @throws QueryException
 	 */
-	public List<Variate> getVariatesByStudyID(Integer studyId) throws QueryException;
-	
-	/**
-	 * Returns all the Effect records which belong to the Study identified by the given id.
-	 * 
-	 * @param studyId - id of the Study
-	 * @return List of StudyEffect POJOs
-	 */
-	public List<StudyEffect> getEffectsByStudyID(Integer studyId) throws QueryException;
+	public List<Study> getStudyByID(Integer id) throws QueryException;
 
 	/**
 	 * Returns a List of {@code Study} objects that are top-level studies, or studies that do
@@ -85,4 +89,37 @@ public interface StudyDataManager
 	 */
 	public List<Study> getStudiesByParentFolderID(Integer parentFolderId, int start,
 			int numOfRows) throws QueryException;
+
+	/**
+	 * Returns all Factor records which belong to the Study identified by the given id.
+	 * 
+	 * @param studyId - id of the Study
+	 * @return List of Factor POJOs
+	 */
+	public List<Factor> getFactorsByStudyID(Integer studyId) throws QueryException;
+
+	/**
+	 * Returns all Variate records which belong to the Study identified by the given id.
+	 * 
+	 * @param studyId - id of the Study
+	 * @return List of Variate POJOs
+	 */
+	public List<Variate> getVariatesByStudyID(Integer studyId) throws QueryException;
+	
+	/**
+	 * Returns all the Effect records which belong to the Study identified by the given id.
+	 * 
+	 * @param studyId - id of the Study
+	 * @return List of StudyEffect POJOs
+	 */
+	public List<StudyEffect> getEffectsByStudyID(Integer studyId) throws QueryException;
+	
+	/**
+	 * Returns all the Representation records with the given effectId.
+	 * 
+	 * @param effectId
+	 * @return List of Representation POJOs
+	 */
+	public List<Representation> getRepresentationByEffectID(Integer effectId) throws QueryException;
+
 }

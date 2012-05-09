@@ -6,17 +6,43 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+
+@NamedQueries
+({
+	@NamedQuery
+	(
+		name = "getStudyById",
+		query = "SELECT s FROM Study s WHERE s.id = :id"
+	),
+	@NamedQuery
+	(
+		name = "findStudyByNameUsingEqual",
+		query = "SELECT s FROM Study s WHERE s.name = :name"
+	),
+	@NamedQuery
+	(
+		name = "findStudyByNameUsingLike",
+		query = "SELECT s FROM Study s WHERE s.name like :name"
+	)
+})
 
 @Entity
 @Table(name = "study")
 public class Study implements Serializable 
 {
 	private static final long serialVersionUID = -8809692556025457504L;
-	
+
+    public static final String GET_STUDY_BY_ID = "getStudyById";
+    public static final String FIND_BY_NAME_USING_EQUAL = "findStudyByNameUsingEqual";
+    public static final String FIND_BY_NAME_USING_LIKE = "findStudyByNameUsingLike";
+
 	@Id
 	@Basic(optional = false)
 	@Column(name = "studyid")

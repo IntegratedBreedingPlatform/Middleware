@@ -7,8 +7,10 @@ import java.util.List;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
+import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.Factor;
+import org.generationcp.middleware.pojos.Representation;
 import org.generationcp.middleware.pojos.NumericRange;
 import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.pojos.StudyEffect;
@@ -52,6 +54,58 @@ public class TestStudyDataManagerImpl
 			System.out.println(gid);
 	}
 	
+
+	@Test
+	public void testFindStudyByNameUsingLike() throws Exception{
+		List<Study> studyList = manager.findStudyByName("IRTN%", 0, 5, Operation.LIKE, Database.CENTRAL);
+		Assert.assertTrue(studyList != null);
+		Assert.assertTrue(!studyList.isEmpty());
+		
+		for(Study study : studyList){
+			System.out.println(study);
+		}
+	}
+
+	@Test
+	public void testFindStudyByNameUsingEqual() throws Exception{
+		List<Study> studyList = manager.findStudyByName("PEATSOIL", 0, 5, Operation.EQUAL, Database.CENTRAL);
+		Assert.assertTrue(studyList != null);
+		Assert.assertTrue(!studyList.isEmpty());
+		
+		for(Study study : studyList){
+			System.out.println(study);
+		}
+	}
+
+	@Test
+	public void testGetStudyByID() throws Exception{
+		List<Study> studyList = manager.getStudyByID(new Integer(714));
+		Assert.assertTrue(studyList != null);
+		Assert.assertTrue(!studyList.isEmpty());
+		
+		for(Study study : studyList){
+			System.out.println(study);
+		}
+	}
+
+	@Test
+	public void testGetAllTopLevelStudies() throws Exception {
+		List<Study> topLevelStudies = manager.getAllTopLevelStudies(0, 10, Database.LOCAL);
+		System.out.println("TOP LEVEL STUDIES: ");
+		for (Study study : topLevelStudies) {
+			System.out.println(study);
+		}
+	}
+	
+	@Test
+	public void testGetStudiesByParentFolderID() throws Exception {
+		List<Study> studies = manager.getStudiesByParentFolderID(640, 0, 100);
+		System.out.println("STUDIES: ");
+		for (Study study : studies) {
+			System.out.println(study);
+		}
+	}
+
 	@Test
 	public void testGetFactorsByStudyID() throws Exception{
 		List<Factor> factors = manager.getFactorsByStudyID(new Integer(430));
@@ -86,20 +140,13 @@ public class TestStudyDataManagerImpl
 	}
 	
 	@Test
-	public void testGetAllTopLevelStudies() throws Exception {
-		List<Study> topLevelStudies = manager.getAllTopLevelStudies(0, 10, Database.LOCAL);
-		System.out.println("TOP LEVEL STUDIES: ");
-		for (Study study : topLevelStudies) {
-			System.out.println(study);
-		}
-	}
-	
-	@Test
-	public void testGetStudiesByParentFolderID() throws Exception {
-		List<Study> studies = manager.getStudiesByParentFolderID(640, 0, 100);
-		System.out.println("STUDIES: ");
-		for (Study study : studies) {
-			System.out.println(study);
+	public void testGetRepresentationByStudyID() throws Exception{
+		List<Representation> representations = manager.getRepresentationByEffectID(new Integer(430));
+		Assert.assertTrue(representations != null);
+		Assert.assertTrue(!representations.isEmpty());
+		
+		for(Representation representation : representations){
+			System.out.println(representation);
 		}
 	}
 	
