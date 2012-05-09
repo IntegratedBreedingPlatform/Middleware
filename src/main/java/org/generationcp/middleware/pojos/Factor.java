@@ -24,7 +24,14 @@ import javax.persistence.Table;
 public class Factor implements Serializable
 {
 	private static final long serialVersionUID = 1L;
+	
+	//string contants for name of queries
     public static final String GET_FACTORS_BY_STUDYID = "getFactorsByStudyID";
+    
+    public static final String GET_BY_REPRESENTATION_ID = "select {f.*} " +
+    	"from factor f join effect e " +
+    	"on f.factorid = e.factorid " +
+    	"where e.represno = :representationId";
 
 	public static final String GET_GID_FROM_NUMERIC_LEVELS_GIVEN_OBSERVATION_UNIT_IDS = "SELECT DISTINCT ln.lvalue " +
 			"FROM factor f INNER JOIN oindex ou ON f.factorid = ou.factorid " +

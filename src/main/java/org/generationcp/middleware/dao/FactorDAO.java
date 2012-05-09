@@ -7,6 +7,7 @@ import java.util.Set;
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Factor;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -53,6 +54,23 @@ public class FactorDAO extends GenericDAO<FactorDAO, Integer>
 			return results;
 		} catch(HibernateException ex) {
 			throw new QueryException("Error with get Factors by Study ID query: " + ex.getMessage());
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Factor> getByRepresentationID(Integer representationId, int start, int numOfRows) throws QueryException {
+		try {
+			SQLQuery query = getSession().createSQLQuery(Factor.GET_BY_REPRESENTATION_ID);
+			query.setParameter("representationId", representationId);
+			query.addEntity("f", Factor.class);
+			
+			query.setFirstResult(start);
+			query.setMaxResults(numOfRows);
+			
+			List<Factor> results = query.list();
+			return results;
+		} catch(HibernateException ex) {
+			throw new QueryException("Error with get Factors by Representation ID query: " + ex.getMessage());
 		}
 	}
 

@@ -16,6 +16,9 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 public class Oindex implements Serializable
 {
 	private static final long serialVersionUID = -6609291577310766245L;
+	
+	public static final String GET_BY_REPRESENTATION_ID = "select distinct ounitid " +
+		"from oindex where represno = :representationId";
 
 	@Id
 	@Basic(optional = false)

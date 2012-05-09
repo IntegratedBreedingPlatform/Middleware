@@ -8,10 +8,9 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Factor;
 import org.generationcp.middleware.pojos.Representation;
 import org.generationcp.middleware.pojos.Study;
-import org.generationcp.middleware.pojos.Variate;
-import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.pojos.StudyEffect;
 import org.generationcp.middleware.pojos.TraitCombinationFilter;
+import org.generationcp.middleware.pojos.Variate;
 
 /**
  * This is the API for retrieving phenotypic data stored as
@@ -122,4 +121,29 @@ public interface StudyDataManager
 	 */
 	public List<Representation> getRepresentationByEffectID(Integer effectId) throws QueryException;
 
+	/**
+	 * Returns a List of {@code Factor} objects that belong to the specified Representation ID.
+	 * 
+	 * @param representationId - the ID of the Representation
+	 * @param start - the starting index of the sublist of results to be returned
+	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
+	 * @return The list of all the factors belonging to the specified Representation. Returns an empty list
+	 * if there are no connections detected for both local and central instances.
+	 * @throws QueryException
+	 */
+	public List<Factor> getFactorsByRepresentationId(Integer representationId,
+			int start, int numOfRows) throws QueryException;
+
+	/**
+	 * Returns a List of OunitIDs that are associated to the specified Representation ID.
+	 * 
+	 * @param representationId - the ID of the Representation
+	 * @param start - the starting index of the sublist of results to be returned
+	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
+	 * @return The list of all the OunitIDs associated to the specified Representation. Returns an empty list
+	 * if there are no connections detected for both local and central instances.
+	 * @throws QueryException
+	 */
+	public List<Integer> getOunitIDsByRepresentationId(Integer representationId,
+			int start, int numOfRows) throws QueryException;
 }

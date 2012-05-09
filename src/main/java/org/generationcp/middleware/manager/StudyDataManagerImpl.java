@@ -8,6 +8,7 @@ import java.util.Set;
 import org.generationcp.middleware.dao.CharacterDataDAO;
 import org.generationcp.middleware.dao.FactorDAO;
 import org.generationcp.middleware.dao.NumericDataDAO;
+import org.generationcp.middleware.dao.OindexDAO;
 import org.generationcp.middleware.dao.RepresentationDAO;
 import org.generationcp.middleware.dao.StudyDAO;
 import org.generationcp.middleware.dao.StudyEffectDAO;
@@ -196,7 +197,7 @@ public class StudyDataManagerImpl implements StudyDataManager{
 		
 		return studies;
 	}
-
+	
 	@Override
 	public List<Variate> getVariatesByStudyID(Integer studyId) throws QueryException{
 		
@@ -263,6 +264,38 @@ public class StudyDataManagerImpl implements StudyDataManager{
 		return representations;
 	}
 
-
+	@Override
+	public List<Factor> getFactorsByRepresentationId(Integer representationId, int start, int numOfRows) throws QueryException {
+		FactorDAO dao = new FactorDAO();
+		
+		HibernateUtil hibernateUtil = getHibernateUtil(representationId);
+		
+		if (hibernateUtil != null) {
+			dao.setSession(hibernateUtil.getCurrentSession());
+		} else {
+			return new ArrayList<Factor>();
+		}
+		
+		List<Factor> factors = dao.getByRepresentationID(representationId, start, numOfRows);
+		
+		return factors;
+	}
+	
+	@Override
+	public List<Integer> getOunitIDsByRepresentationId(Integer representationId, int start, int numOfRows) throws QueryException {
+		OindexDAO dao = new OindexDAO();
+		
+		HibernateUtil hibernateUtil = getHibernateUtil(representationId);
+		
+		if (hibernateUtil != null) {
+			dao.setSession(hibernateUtil.getCurrentSession());
+		} else {
+			return new ArrayList<Integer>();
+		}
+		
+		List<Integer> ounitIDs = dao.getOunitIDsByRepresentationId(representationId, start, numOfRows);
+		
+		return ounitIDs;
+	}
 
 }

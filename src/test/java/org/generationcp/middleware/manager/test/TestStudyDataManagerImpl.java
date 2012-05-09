@@ -91,7 +91,7 @@ public class TestStudyDataManagerImpl
 	@Test
 	public void testGetAllTopLevelStudies() throws Exception {
 		List<Study> topLevelStudies = manager.getAllTopLevelStudies(0, 10, Database.LOCAL);
-		System.out.println("TOP LEVEL STUDIES: ");
+		System.out.println("TOP LEVEL STUDIES: " + topLevelStudies.size());
 		for (Study study : topLevelStudies) {
 			System.out.println(study);
 		}
@@ -100,7 +100,7 @@ public class TestStudyDataManagerImpl
 	@Test
 	public void testGetStudiesByParentFolderID() throws Exception {
 		List<Study> studies = manager.getStudiesByParentFolderID(640, 0, 100);
-		System.out.println("STUDIES: ");
+		System.out.println("STUDIES BY PARENT FOLDER: " + studies.size());
 		for (Study study : studies) {
 			System.out.println(study);
 		}
@@ -148,6 +148,22 @@ public class TestStudyDataManagerImpl
 		for(Representation representation : representations){
 			System.out.println(representation);
 		}
+	}
+	
+	@Test
+	public void testGetFactorsByRepresentationId() throws Exception {
+		List<Factor> factors = manager.getFactorsByRepresentationId(1176, 0, 10);
+		System.out.println("FACTORS BY REPRESENTATION: " + factors.size());
+		for (Factor factor : factors) {
+			System.out.println(factor);
+		}
+	}
+	
+	@Test
+	public void testGetOunitIDsByRepresentationId() throws Exception {
+		List<Integer> ounitIDs = manager.getOunitIDsByRepresentationId(1176, 0, 100);
+		System.out.println("OUNIT IDS BY REPRESENTATION: " + ounitIDs.size());
+		System.out.println(ounitIDs);
 	}
 	
 	@AfterClass
