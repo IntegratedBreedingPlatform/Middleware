@@ -6,16 +6,25 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.NamedNativeQueries;
-import org.hibernate.annotations.NamedNativeQuery;
+@NamedQueries
+({
+	@NamedQuery
+	(
+		name = "getFactorsByStudyID",
+		query = "FROM Factor f WHERE f.studyId = :studyId"
+	)
+})
 
 @Entity
 @Table(name = "factor")
 public class Factor implements Serializable
 {
 	private static final long serialVersionUID = 1L;
+    public static final String GET_FACTORS_BY_STUDYID = "getFactorsByStudyID";
 
 	public static final String GET_GID_FROM_NUMERIC_LEVELS_GIVEN_OBSERVATION_UNIT_IDS = "SELECT DISTINCT ln.lvalue " +
 			"FROM factor f INNER JOIN oindex ou ON f.factorid = ou.factorid " +

@@ -4,7 +4,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Factor;
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 
 public class FactorDAO extends GenericDAO<FactorDAO, Integer>
@@ -39,4 +43,17 @@ public class FactorDAO extends GenericDAO<FactorDAO, Integer>
 		return results;
 	}
 	
+	@SuppressWarnings("unchecked")
+	public List<Factor> getByStudyID(Integer studyId) throws QueryException {
+		try {
+			Query query = getSession().getNamedQuery(Factor.GET_FACTORS_BY_STUDYID);
+			query.setParameter("studyId", studyId);
+			
+			List<Factor> results = query.list();
+			return results;
+		} catch(HibernateException ex) {
+			throw new QueryException("Error with get Factors by Study ID query: " + ex.getMessage());
+		}
+	}
+
 }

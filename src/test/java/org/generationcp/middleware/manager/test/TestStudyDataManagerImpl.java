@@ -4,14 +4,18 @@ package org.generationcp.middleware.manager.test;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
-import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.pojos.Factor;
+import org.generationcp.middleware.pojos.Variate;
+import org.generationcp.middleware.pojos.StudyEffect;
 import org.generationcp.middleware.pojos.NumericRange;
 import org.generationcp.middleware.pojos.TraitCombinationFilter;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -47,6 +51,39 @@ public class TestStudyDataManagerImpl
 		System.out.println("RESULTS:");
 		for(Integer gid: results)
 			System.out.println(gid);
+	}
+	
+	@Test
+	public void testGetFactorsByStudyID() throws Exception{
+		List<Factor> factors = manager.getFactorsByStudyID(new Integer(430));
+		Assert.assertTrue(factors != null);
+		Assert.assertTrue(!factors.isEmpty());
+		
+		for(Factor factor : factors){
+			System.out.println(factor);
+		}
+	}
+	
+	@Test
+	public void testGetVariatesByStudyID() throws Exception{
+		List<Variate> variates = manager.getVariatesByStudyID(new Integer(430));
+		Assert.assertTrue(variates != null);
+		Assert.assertTrue(!variates.isEmpty());
+		
+		for(Variate variate : variates){
+			System.out.println(variate);
+		}
+	}
+
+	@Test
+	public void testGetEffectsByStudyID() throws Exception{
+		List<StudyEffect> studyEffects = manager.getEffectsByStudyID(new Integer(430));
+		Assert.assertTrue(studyEffects != null);
+		Assert.assertTrue(!studyEffects.isEmpty());
+		
+		for(StudyEffect studyEffect : studyEffects){
+			System.out.println(studyEffect);
+		}
 	}
 	
 	@AfterClass

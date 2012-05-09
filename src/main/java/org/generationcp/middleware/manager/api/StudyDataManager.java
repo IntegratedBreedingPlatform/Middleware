@@ -2,6 +2,13 @@ package org.generationcp.middleware.manager.api;
 
 import java.util.List;
 
+import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.pojos.Factor;
+import org.generationcp.middleware.pojos.Variate;
+import org.generationcp.middleware.pojos.StudyEffect;
+
+
 import org.generationcp.middleware.pojos.TraitCombinationFilter;
 
 /**
@@ -29,4 +36,29 @@ public interface StudyDataManager
 	 * @return
 	 */
 	public List<Integer> getGIDSByPhenotypicData(List<TraitCombinationFilter> filters, int start, int numOfRows);
+	
+	/**
+	 * Returns all Factor records which belong to the Study identified by the given id.
+	 * 
+	 * @param studyId - id of the Study
+	 * @return List of Factor POJOs
+	 */
+	public List<Factor> getFactorsByStudyID(Integer studyId) throws QueryException;
+
+	/**
+	 * Returns all Variate records which belong to the Study identified by the given id.
+	 * 
+	 * @param studyId - id of the Study
+	 * @return List of Variate POJOs
+	 */
+	public List<Variate> getVariatesByStudyID(Integer studyId) throws QueryException;
+	
+	/**
+	 * Returns all the Effect records which belong to the Study identified by the given id.
+	 * 
+	 * @param studyId - id of the Study
+	 * @return List of StudyEffect POJOs
+	 */
+	public List<StudyEffect> getEffectsByStudyID(Integer studyId) throws QueryException;
+
 }

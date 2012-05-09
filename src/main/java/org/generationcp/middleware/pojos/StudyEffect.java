@@ -6,16 +6,29 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+@NamedQueries
+({
+	@NamedQuery  
+	(
+			name = "getStudyEffectsByStudyID",
+			query = "FROM StudyEffect se WHERE se.studyId = :studyId"
+	)
+})
+
 
 @Entity
 @Table(name = "steffect")
 public class StudyEffect implements Serializable
 {
 	private static final long serialVersionUID = 1L;
+    public static final String GET_STUDY_EFFECTS_BY_STUDYID = "getStudyEffectsByStudyID";
 
 	@EmbeddedId
 	private StudyEffectPK id;
@@ -23,6 +36,8 @@ public class StudyEffect implements Serializable
 	@Basic(optional = false)
 	@Column(name = "effectname")
 	private String name;
+	
+	private Integer studyId;
 	
 	public StudyEffect()
 	{
@@ -33,6 +48,7 @@ public class StudyEffect implements Serializable
 		super();
 		this.id = id;
 		this.name = name;
+		this.studyId = (id != null ? id.getStudyId() : null);
 	}
 
 	public StudyEffectPK getId()
@@ -43,6 +59,7 @@ public class StudyEffect implements Serializable
 	public void setId(StudyEffectPK id)
 	{
 		this.id = id;
+		this.studyId = (id != null ? id.getStudyId() : null);
 	}
 
 	public String getName()
@@ -53,6 +70,22 @@ public class StudyEffect implements Serializable
 	public void setName(String name)
 	{
 		this.name = name;
+	}
+
+	public Integer getStudyId() 
+	{
+		if (id != null){
+			return id.getStudyId();
+		}
+		return null;
+	}
+
+	public void setStudyId(Integer studyId) 
+	{
+		if (id != null){
+			id.setStudyId(studyId);
+			this.studyId = studyId;
+		}
 	}
 
 	@Override
@@ -85,4 +118,5 @@ public class StudyEffect implements Serializable
 	       .append(id)
 	       .toHashCode();
 	}
+
 }

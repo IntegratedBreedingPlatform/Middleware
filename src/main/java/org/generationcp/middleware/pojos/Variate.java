@@ -6,13 +6,25 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+
+@NamedQueries
+({
+	@NamedQuery  
+	(
+			name = "getVariatesByStudyID",
+			query = "FROM Variate v WHERE v.studyId = :studyId"
+	)
+})
 
 @Entity
 @Table(name = "variate")
 public class Variate implements Serializable
 {
 	private static final long serialVersionUID = 1L;
+    public static final String GET_VARIATES_BY_STUDYID = "getVariatesByStudyID";
 
 	@Id
 	@Basic(optional = false)

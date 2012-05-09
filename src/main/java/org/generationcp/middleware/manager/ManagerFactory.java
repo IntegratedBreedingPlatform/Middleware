@@ -93,11 +93,7 @@ public class ManagerFactory
 	
 	public StudyDataManager getStudyDataManager() throws ConfigException
 	{
-		if(this.hibernateUtilForCentral == null)
-		{
-			throw new ConfigException("The StudyDataManager only works with a connection to a central IBDB instance for now.");
-		}
-		return new StudyDataManagerImpl(this.hibernateUtilForCentral);
+		return new StudyDataManagerImpl(this.hibernateUtilForLocal, this.hibernateUtilForCentral);
 	}
 	
 	public InventoryDataManager getInventoryDataManager() throws ConfigException
