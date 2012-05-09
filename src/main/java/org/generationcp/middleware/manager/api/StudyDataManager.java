@@ -79,8 +79,8 @@ public interface StudyDataManager
 	 * @param parentFolderId - the parent folder's studyid
 	 * @param start - the starting index of the sublist of results to be returned
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
-	 * @return The list of all the studies belonging to the specified parent folder. Returns {@code null} if
-	 * there are no connections detected for both local and central instances.
+	 * @return The list of all the studies belonging to the specified parent folder. Returns an empty list
+	 * if there are no connections detected for both local and central instances.
 	 * @throws QueryException
 	 */
 	public List<Study> getStudiesByParentFolderID(Integer parentFolderId, int start,

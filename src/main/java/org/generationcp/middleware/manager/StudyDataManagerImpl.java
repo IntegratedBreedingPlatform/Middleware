@@ -168,12 +168,12 @@ public class StudyDataManagerImpl implements StudyDataManager
 	public List<Study> getStudiesByParentFolderID(Integer parentFolderId, int start, int numOfRows) throws QueryException {
 		StudyDAO dao = new StudyDAO();
 		
-		if(parentFolderId < 0 && this.hibernateUtilForLocal != null) {
-			dao.setSession(hibernateUtilForLocal.getCurrentSession());
-		} else if(parentFolderId > 0 && this.hibernateUtilForCentral != null) {
-			dao.setSession(hibernateUtilForCentral.getCurrentSession());
+		HibernateUtil hibernateUtil = getHibernateUtil(parentFolderId);
+
+		if (hibernateUtil != null){
+			dao.setSession(hibernateUtil.getCurrentSession());
 		} else {
-			return null;
+			return new ArrayList<Study>();
 		}
 		
 		List<Study> studies = dao.getByParentFolderID(parentFolderId, start, numOfRows);
