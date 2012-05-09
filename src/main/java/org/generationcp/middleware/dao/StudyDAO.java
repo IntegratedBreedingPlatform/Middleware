@@ -27,7 +27,7 @@ public class StudyDAO extends GenericDAO<Study, Integer> {
 	
 	
 	@SuppressWarnings("unchecked")
-	public List<Study> getStudiesByParentFolderID(Integer parentFolderId, int start, int numOfRows) throws QueryException {
+	public List<Study> getByParentFolderID(Integer parentFolderId, int start, int numOfRows) throws QueryException {
 		try {
 			Criteria crit = getSession().createCriteria(Study.class);
 			//top level studies are studies without parent folders (shierarchy = 0)

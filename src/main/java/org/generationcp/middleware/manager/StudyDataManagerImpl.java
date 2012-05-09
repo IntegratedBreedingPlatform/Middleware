@@ -176,7 +176,7 @@ public class StudyDataManagerImpl implements StudyDataManager
 			return null;
 		}
 		
-		List<Study> studies = dao.getStudiesByParentFolderID(parentFolderId, start, numOfRows);
+		List<Study> studies = dao.getByParentFolderID(parentFolderId, start, numOfRows);
 		
 		return studies;
 	}
