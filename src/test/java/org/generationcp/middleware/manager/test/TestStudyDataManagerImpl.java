@@ -166,6 +166,15 @@ public class TestStudyDataManagerImpl
 		System.out.println(ounitIDs);
 	}
 	
+	@Test
+	public void testGetVariatesByRepresentationId() throws Exception {
+		List<Variate> variates = manager.getVariatesByRepresentationId(1176);
+		System.out.println("VARIATES BY REPRESENTATION: " + variates.size());
+		for (Variate variate: variates) {
+			System.out.println(variate);
+		}
+	}
+	
 	@AfterClass
 	public static void tearDown() throws Exception 
 	{

@@ -140,4 +140,14 @@ public interface StudyDataManager
 	 * @throws QueryException
 	 */
 	public List<Integer> getOunitIDsByRepresentationId(Integer representationId) throws QueryException;
+
+	/**
+	 * Returns a List of {@code Variate} objects that belong to the specified Representation ID.
+	 * 
+	 * @param representationId - the ID of the Representation
+	 * @return The list of all the variates belonging to the specified Representation. Returns an empty list
+	 * if there are no connections detected for both local and central instances.
+	 * @throws QueryException
+	 */
+	public List<Variate> getVariatesByRepresentationId(Integer representationId) throws QueryException;
 }

@@ -297,5 +297,22 @@ public class StudyDataManagerImpl implements StudyDataManager{
 		
 		return ounitIDs;
 	}
+	
+	@Override
+	public List<Variate> getVariatesByRepresentationId(Integer representationId) throws QueryException {
+		VariateDAO dao = new VariateDAO();
+		
+		HibernateUtil hibernateUtil = getHibernateUtil(representationId);
+		
+		if (hibernateUtil != null) {
+			dao.setSession(hibernateUtil.getCurrentSession());
+		} else {
+			return new ArrayList<Variate>();
+		}
+		
+		List<Variate> variates = dao.getByRepresentationId(representationId);
+		
+		return variates;
+	}
 
 }

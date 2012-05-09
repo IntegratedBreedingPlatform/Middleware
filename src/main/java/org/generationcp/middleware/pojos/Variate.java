@@ -24,7 +24,19 @@ import javax.persistence.Table;
 public class Variate implements Serializable
 {
 	private static final long serialVersionUID = 1L;
+	
+	//string contants for name of queries
     public static final String GET_VARIATES_BY_STUDYID = "getVariatesByStudyID";
+    
+    public static final String GET_BY_REPRESENTATION_ID = "select distinct {v.*} " +
+    	"from variate v join data_n dn on v.variatid = dn.variatid " +
+    	"join oindex oi on oi.ounitid = dn.ounitid " +
+    	"where oi.represno = :representationId " +
+    	"union " +
+    	"select distinct {v.*} " +
+    	"from variate v join data_c dn on v.variatid = dn.variatid " +
+    	"join oindex oi on oi.ounitid = dn.ounitid " +
+    	"where oi.represno = :representationId";
 
 	@Id
 	@Basic(optional = false)
