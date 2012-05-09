@@ -384,7 +384,7 @@ public interface InventoryDataManager
 	 * @return List of LotReportRow
 	 * @throws QueryException 
 	 */
-	//public List<LotReportRow> generateReportOnEmptyLot(int start, int numOfRows);
+	public List<LotReportRow> generateReportOnEmptyLot(int start, int numOfRows);
 	
 	/**
 	 * Returns a report of  Lot with balance less than the amount specified
@@ -395,7 +395,7 @@ public interface InventoryDataManager
 	 * @return List of LotReportRow objects
 	 * @throws QueryException 
 	 */
-	//public List<LotReportRow> generateReportOnLotWithMinimumAmount(long minimumAmount,int start,int numOfRows);
+	public List<LotReportRow> generateReportOnLotWithMinimumAmount(long minimumAmount,int start,int numOfRows);
 	
 	/**
 	 * Returns a report on all Lot records associated with the given entity type. 

@@ -31,7 +31,7 @@ public class TestInventoryDataManagerImpl
 		factory = new ManagerFactory(local, central);
 		manager = factory.getInventoryDataManager();
 	}
-	
+
 	@Test
 	public void testFindLotsByEntityType() throws Exception
 	{
@@ -343,6 +343,33 @@ public class TestInventoryDataManagerImpl
 		for(LotReportRow row: report)
 			System.out.println(row);
 	}
+
+	
+	@Test
+	public void testGenerateReportOnEmptyLot()  throws Exception
+	{
+		System.out.println("Report on empty lot");
+		List<LotReportRow> report=manager.generateReportOnEmptyLot(0, 2);
+		Assert.assertTrue(report != null);
+		Assert.assertTrue(!report.isEmpty());
+		System.out.println("REPORT:");
+		for(LotReportRow row: report)
+			System.out.println(row);
+	}
+	
+	
+	@Test
+	public void testGenerateReportOnLotWithMinimumAmount()  throws Exception
+	{
+		System.out.println("Report on lot with minimum balance");
+		List<LotReportRow> report=manager.generateReportOnLotWithMinimumAmount(200, 0, 1);
+		Assert.assertTrue(report != null);
+		Assert.assertTrue(!report.isEmpty());
+		System.out.println("REPORT:");
+		for(LotReportRow row: report)
+			System.out.println(row);
+	}
+	
 	
 	@AfterClass
 	public static void tearDown() throws Exception

@@ -536,7 +536,7 @@ public class InventoryDataManagerImpl implements InventoryDataManager
 		return report;
 	}
 	
-	/**
+	
 	@Override
 	public List<LotReportRow> generateReportOnEmptyLot(int start, int numOfRows)
 			 {
@@ -571,7 +571,7 @@ public class InventoryDataManagerImpl implements InventoryDataManager
 		}
 		return generateLotReportRows(lotsWithMinimunAmount);
 	}
-	**/
+	
 	
 	@Override
 	public List<LotReportRow> generateReportOnLotsByEntityType(String type, int start, int numOfRows)
