@@ -7,7 +7,7 @@ import org.generationcp.middleware.pojos.StudyEffect;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 
-public class StudyEffectDAO extends GenericDAO<StudyEffectDAO, Integer>
+public class StudyEffectDAO extends GenericDAO<StudyEffect, Integer>
 {
 	@SuppressWarnings("unchecked")
 	public List<StudyEffect> getByStudyID(Integer studyId) throws QueryException {

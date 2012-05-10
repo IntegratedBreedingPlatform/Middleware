@@ -7,7 +7,7 @@ import org.generationcp.middleware.pojos.Representation;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 
-public class RepresentationDAO extends GenericDAO<RepresentationDAO, Integer>
+public class RepresentationDAO extends GenericDAO<Representation, Integer>
 {
 	@SuppressWarnings("unchecked")
 	public List<Representation> getRepresentationByEffectID(Integer effectId) throws QueryException

@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
+import org.generationcp.middleware.manager.FindGermplasmByNameModes;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -77,16 +78,23 @@ public class TestStudyDataManagerImpl
 			System.out.println(study);
 		}
 	}
+	
+
+	@Test
+	public void testCountStudyByName() throws Exception{
+		long start = System.currentTimeMillis();
+		int count = manager.countStudyByName("IRTN%", Operation.LIKE, Database.CENTRAL);
+		long end = System.currentTimeMillis();
+		System.out.println(count);
+		System.out.println("QUERY TIME: " + (end - start) + " ms");
+	}
 
 	@Test
 	public void testGetStudyByID() throws Exception{
-		List<Study> studyList = manager.getStudyByID(new Integer(714));
-		Assert.assertTrue(studyList != null);
-		Assert.assertTrue(!studyList.isEmpty());
-		
-		for(Study study : studyList){
-			System.out.println(study);
-		}
+		Study study = manager.getStudyByID(new Integer(714));
+		Assert.assertTrue(study != null);
+		Assert.assertTrue(study.getId() == 714);
+		System.out.println(study);
 	}
 
 	@Test

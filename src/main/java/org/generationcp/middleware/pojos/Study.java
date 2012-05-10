@@ -18,11 +18,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 ({
 	@NamedQuery
 	(
-		name = "getStudyById",
-		query = "SELECT s FROM Study s WHERE s.id = :id"
-	),
-	@NamedQuery
-	(
 		name = "findStudyByNameUsingEqual",
 		query = "SELECT s FROM Study s WHERE s.name = :name"
 	),
@@ -30,7 +25,18 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 	(
 		name = "findStudyByNameUsingLike",
 		query = "SELECT s FROM Study s WHERE s.name like :name"
+	),
+	@NamedQuery
+	(
+		name = "countStudyByNameUsingEqual",
+		query = "SELECT COUNT(s) FROM Study s WHERE s.name = :name"
+	),
+	@NamedQuery
+	(
+		name = "countStudyByNameUsingLike",
+		query = "SELECT COUNT(s) FROM Study s WHERE s.name like :name"
 	)
+
 })
 
 @Entity
@@ -39,9 +45,10 @@ public class Study implements Serializable
 {
 	private static final long serialVersionUID = -8809692556025457504L;
 
-    public static final String GET_STUDY_BY_ID = "getStudyById";
     public static final String FIND_BY_NAME_USING_EQUAL = "findStudyByNameUsingEqual";
     public static final String FIND_BY_NAME_USING_LIKE = "findStudyByNameUsingLike";
+    public static final String COUNT_BY_NAME_USING_EQUAL = "countStudyByNameUsingEqual";
+    public static final String COUNT_BY_NAME_USING_LIKE = "countStudyByNameUsingLike";
 
 	@Id
 	@Basic(optional = false)

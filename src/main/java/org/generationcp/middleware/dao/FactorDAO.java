@@ -10,7 +10,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 
-public class FactorDAO extends GenericDAO<FactorDAO, Integer>
+public class FactorDAO extends GenericDAO<Factor, Integer>
 {
 	@SuppressWarnings("unchecked")
 	public Set<Integer> getGIDSGivenObservationUnitIds(Set<Integer> ounitIds, int start, int numOfRows)

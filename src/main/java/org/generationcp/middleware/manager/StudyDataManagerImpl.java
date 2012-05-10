@@ -139,18 +139,35 @@ public class StudyDataManagerImpl implements StudyDataManager{
 	}
 	
 	@Override
-	public List<Study> getStudyByID(Integer id) throws QueryException{
+	public int countStudyByName(String name, Operation op, Database instance) 
+					throws QueryException{
+
+		StudyDAO dao = new StudyDAO();
+		HibernateUtil hibernateUtil = getHibernateUtil(instance);
+		
+		if (hibernateUtil != null){
+			dao.setSession(hibernateUtil.getCurrentSession());
+		} else {
+			return 0;
+		}
+	
+		return dao.countByName(name, op);
+
+	}
+	
+	@Override
+	public Study getStudyByID(Integer id) throws QueryException{
 		StudyDAO dao = new StudyDAO();
 		HibernateUtil hibernateUtil = getHibernateUtil(id);
 		
 		if (hibernateUtil != null){
 			dao.setSession(hibernateUtil.getCurrentSession());
 		} else {
-			return new ArrayList<Study>();
+			return null;
 		}
 		
-		List<Study> studyList = dao.getByID(id);
-		return studyList;
+		Study study = dao.findById(id, false);
+		return study;
 	}
 
 	

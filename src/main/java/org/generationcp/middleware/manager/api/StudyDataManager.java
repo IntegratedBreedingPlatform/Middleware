@@ -57,13 +57,27 @@ public interface StudyDataManager
 	public List<Study> findStudyByName(String name, int start, int numOfRows, Operation op, Database instance) throws QueryException;
 
 	/**
+	 * Returns the study records matching the given name
+	 * 
+	 * @param name - search string (pattern or exact match) for the name of the study
+	 * @param op - can be EQUAL like LIKE
+	 * 				For LIKE operation, the parameter name may include the following:
+	 * 				"%" - to indicate 0 or more characters in the pattern
+	 * 				"_" - to indicate any single character in the pattern 
+	 * @param instance - can be CENTRAL or LOCAL
+	 * @return number of Study records matching the given criteria
+	 * @throws QueryException
+	 */
+	public int countStudyByName(String name, Operation op, Database instance) throws QueryException;
+
+	/**
 	 * Retrieves a Study record of the given id
 	 * 
 	 * @param id
-	 * @return List of Study POJOs
+	 * @return A Study POJO
 	 * @throws QueryException
 	 */
-	public List<Study> getStudyByID(Integer id) throws QueryException;
+	public Study getStudyByID(Integer id) throws QueryException;
 
 	/**
 	 * Returns a List of {@code Study} objects that are top-level studies, or studies that do

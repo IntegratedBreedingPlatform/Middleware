@@ -1,16 +1,23 @@
 package org.generationcp.middleware.dao;
 
+import java.math.BigInteger;
 import java.util.List;
 
+import javax.persistence.NamedQuery;
+
 import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.manager.GermplasmNameType;
+import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Study;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.Projection;
 
-
-public class StudyDAO extends GenericDAO<StudyDAO, Integer>
+public class StudyDAO extends GenericDAO<Study, Integer>
 {
 	@SuppressWarnings("unchecked")
 	public List<Study> findByNameUsingEqual(String name, int start, int numOfRows) throws QueryException
@@ -47,19 +54,24 @@ public class StudyDAO extends GenericDAO<StudyDAO, Integer>
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
-	public List<Study> getByID(Integer id) throws QueryException {
-		try {
-			Query query = getSession().getNamedQuery(Study.GET_STUDY_BY_ID);
-			query.setParameter("id", id);
+	public int countByName(String name, Operation operation) throws QueryException{
+		
+		try{
+			// if operation == null or operation = Operation.EQUAL
+			Query query = getSession().getNamedQuery(Study.COUNT_BY_NAME_USING_EQUAL);
+			if(operation == Operation.LIKE){
+				query = getSession().getNamedQuery(Study.COUNT_BY_NAME_USING_LIKE);
+			}
+			query.setParameter("name", name);
+			return ((Long) query.uniqueResult()).intValue();
 			
-			List<Study> results = query.list();
-			return results;
 		} catch(HibernateException ex) {
-			throw new QueryException("Error with get Study records by Study ID query: " + ex.getMessage());
+			throw new QueryException("Error with count by name for Study: " + ex.getMessage());
 		}
+
 	}
 
+	
 	@SuppressWarnings("unchecked")
 	public List<Study> getTopLevelStudies(int start, int numOfRows) throws QueryException {
 		try {

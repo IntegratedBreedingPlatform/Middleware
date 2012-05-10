@@ -8,7 +8,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 
-public class VariateDAO extends GenericDAO<VariateDAO, Integer>
+public class VariateDAO extends GenericDAO<Variate, Integer>
 {
 	@SuppressWarnings("unchecked")
 	public List<Variate> getByStudyID(Integer studyId) throws QueryException {
