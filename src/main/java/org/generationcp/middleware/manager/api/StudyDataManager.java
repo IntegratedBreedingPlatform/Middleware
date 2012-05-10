@@ -6,6 +6,7 @@ import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Factor;
+import org.generationcp.middleware.pojos.NumericDataElement;
 import org.generationcp.middleware.pojos.Representation;
 import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.pojos.StudyEffect;
@@ -150,4 +151,15 @@ public interface StudyDataManager
 	 * @throws QueryException
 	 */
 	public List<Variate> getVariatesByRepresentationId(Integer representationId) throws QueryException;
+
+	/**
+	 * Returns a list of NumericDataElements that represents the column values for each specified ounitID
+	 * (for each specified row).
+	 * @param ounitIdList - list of ounitIDs to get the corresponding column values. IDs in the list must
+	 * be all from the Central DB or all from the Local DB.
+	 * @return The list of column values / NumericDataElements for the specified ounitIDs
+	 * @throws QueryException
+	 */
+	public List<NumericDataElement> getNumericDataValuesByOunitIdList(List<Integer> ounitIdList) 
+		throws QueryException;
 }

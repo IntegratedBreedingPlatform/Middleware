@@ -10,6 +10,7 @@ import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.Factor;
+import org.generationcp.middleware.pojos.NumericDataElement;
 import org.generationcp.middleware.pojos.NumericRange;
 import org.generationcp.middleware.pojos.Representation;
 import org.generationcp.middleware.pojos.Study;
@@ -172,6 +173,21 @@ public class TestStudyDataManagerImpl
 		System.out.println("VARIATES BY REPRESENTATION: " + variates.size());
 		for (Variate variate: variates) {
 			System.out.println(variate);
+		}
+	}
+	
+	@Test
+	public void testGetNumericDataValuesByOunitIdList() throws Exception {
+		List<Integer> ounitIdList = new ArrayList<Integer>();
+		ounitIdList.add(447201);
+		ounitIdList.add(447202);
+		ounitIdList.add(447203);
+		ounitIdList.add(447204);
+		ounitIdList.add(447205);
+		List<NumericDataElement> dataElements = manager.getNumericDataValuesByOunitIdList(ounitIdList);
+		System.out.println("NUMERIC DATA VALUES BY OUNITIDLIST: " + dataElements.size());
+		for (NumericDataElement data : dataElements) {
+			System.out.println(data);
 		}
 	}
 	

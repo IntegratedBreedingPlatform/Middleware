@@ -3,11 +3,15 @@ package org.generationcp.middleware.dao;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.pojos.NumericData;
+import org.generationcp.middleware.pojos.NumericDataElement;
 import org.generationcp.middleware.pojos.NumericDataPK;
 import org.generationcp.middleware.pojos.NumericRange;
 import org.generationcp.middleware.pojos.TraitCombinationFilter;
 import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -63,6 +67,35 @@ public class NumericDataDAO extends GenericDAO<NumericData, NumericDataPK>
 		{
 			//return empty list if no filter was added
 			return new ArrayList<Integer>();
+		}
+	}
+	
+	public List<NumericDataElement> getValuesByOunitIDList(List<Integer> ounitIdList) throws QueryException {
+		try {
+			SQLQuery query = getSession().createSQLQuery(NumericData.GET_BY_OUNIT_ID_LIST);
+			query.setParameterList("ounitIdList", ounitIdList);
+			
+			List<NumericDataElement> dataValues = new ArrayList<NumericDataElement>();
+			
+			List results = query.list();
+			for (Object o : results) {
+				Object[] result = (Object[]) o;
+				if(result != null)
+				{
+					Integer ounitId = (Integer) result[0];
+					Integer variateId = (Integer) result[1];
+					String variateName = (String) result[2];
+					Double value = (Double) result[3];
+					
+					NumericDataElement dataElement = new NumericDataElement(ounitId, variateId, variateName, value);
+					
+					dataValues.add(dataElement);
+				}
+			}
+			
+			return dataValues;
+		} catch(HibernateException ex) {
+			throw new QueryException("Error with get Numeric Data Values by list of Observation Unit IDs query: " + ex.getMessage());
 		}
 	}
 }

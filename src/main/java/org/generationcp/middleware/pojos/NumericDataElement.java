@@ -12,15 +12,15 @@ public class NumericDataElement implements Serializable
 	private Integer ounitId;
 	private Integer variateId;
 	private String variateName;
-	private Integer value;
+	private Double value;
 	
-	public NumericDataElement(Integer ounitId, Integer factorId,
-			String factorName, Integer value)
+	public NumericDataElement(Integer ounitId, Integer variateId,
+			String variateName, Double value)
 	{
 		super();
 		this.ounitId = ounitId;
-		this.variateId = factorId;
-		this.variateName = factorName;
+		this.variateId = variateId;
+		this.variateName = variateName;
 		this.value = value;
 	}
 
@@ -54,12 +54,12 @@ public class NumericDataElement implements Serializable
 		this.variateName = factorName;
 	}
 
-	public Integer getValue()
+	public Double getValue()
 	{
 		return value;
 	}
 
-	public void setValue(Integer value)
+	public void setValue(Double value)
 	{
 		this.value = value;
 	}

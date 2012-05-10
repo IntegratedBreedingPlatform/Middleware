@@ -14,6 +14,10 @@ import javax.persistence.Table;
 public class NumericData implements Serializable
 {
 	private static final long serialVersionUID = 1L;
+	
+	public static final String GET_BY_OUNIT_ID_LIST = "select dn.ounitid, dn.variatid, v.vname, dn.dvalue " +
+			"from data_n dn join variate v on dn.variatid = v.variatid " +
+			"where dn.ounitid in (:ounitIdList)";
 
 	@EmbeddedId
 	protected NumericDataPK id;
