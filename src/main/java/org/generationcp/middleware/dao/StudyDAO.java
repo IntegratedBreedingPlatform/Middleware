@@ -80,7 +80,7 @@ public class StudyDAO extends GenericDAO<StudyDAO, Integer>
 	public List<Study> getByParentFolderID(Integer parentFolderId, int start, int numOfRows) throws QueryException {
 		try {
 			Criteria crit = getSession().createCriteria(Study.class);
-			//top level studies are studies without parent folders (shierarchy = 0)
+			//studies with parent folder = parentFolderId
 			crit.add(Restrictions.eq("hierarchy", parentFolderId));
 			crit.setFirstResult(start);
 			crit.setMaxResults(numOfRows);
