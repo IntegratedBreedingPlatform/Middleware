@@ -14,13 +14,13 @@ public class CharacterDataElement implements Serializable
 	private String variateName;
 	private String value;
 	
-	public CharacterDataElement(Integer ounitId, Integer factorId,
-			String factorName, String value)
+	public CharacterDataElement(Integer ounitId, Integer variateId,
+			String variateName, String value)
 	{
 		super();
 		this.ounitId = ounitId;
-		this.variateId = factorId;
-		this.variateName = factorName;
+		this.variateId = variateId;
+		this.variateName = variateName;
 		this.value = value;
 	}
 
@@ -34,24 +34,24 @@ public class CharacterDataElement implements Serializable
 		this.ounitId = ounitId;
 	}
 
-	public Integer getFactorId()
+	public Integer getVariateId()
 	{
 		return variateId;
 	}
 
-	public void setFactorId(Integer factorId)
+	public void setVariateId(Integer variateId)
 	{
-		this.variateId = factorId;
+		this.variateId = variateId;
 	}
 
-	public String getFactorName()
+	public String getVariateName()
 	{
 		return variateName;
 	}
 
-	public void setFactorName(String factorName)
+	public void setVariateName(String variateName)
 	{
-		this.variateName = factorName;
+		this.variateName = variateName;
 	}
 
 	public String getValue()

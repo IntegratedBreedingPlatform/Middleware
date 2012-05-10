@@ -15,6 +15,7 @@ import org.generationcp.middleware.dao.StudyEffectDAO;
 import org.generationcp.middleware.dao.VariateDAO;
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.pojos.CharacterDataElement;
 import org.generationcp.middleware.pojos.Factor;
 import org.generationcp.middleware.pojos.NumericDataElement;
 import org.generationcp.middleware.pojos.Representation;
@@ -367,6 +368,25 @@ public class StudyDataManagerImpl implements StudyDataManager{
 		List<NumericDataElement> numDataValues = dao.getValuesByOunitIDList(ounitIdList);
 		
 		return numDataValues;
+	}
+	
+	@Override
+	public List<CharacterDataElement> getCharacterDataValuesByOunitIdList(List<Integer> ounitIdList) throws QueryException {
+		CharacterDataDAO dao = new CharacterDataDAO();
+		
+		//get 1st element from list to check whether the list is for the Central instance or the Local instance
+		Integer sampleId = ounitIdList.get(0);
+		HibernateUtil hibernateUtil = getHibernateUtil(sampleId);
+		
+		if (hibernateUtil != null) {
+			dao.setSession(hibernateUtil.getCurrentSession());
+		} else {
+			return new ArrayList<CharacterDataElement>();
+		}
+		
+		List<CharacterDataElement> charDataValues = dao.getValuesByOunitIDList(ounitIdList);
+		
+		return charDataValues;
 	}
 
 }

@@ -10,6 +10,7 @@ import org.generationcp.middleware.manager.FindGermplasmByNameModes;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.pojos.CharacterDataElement;
 import org.generationcp.middleware.pojos.Factor;
 import org.generationcp.middleware.pojos.NumericDataElement;
 import org.generationcp.middleware.pojos.NumericRange;
@@ -201,6 +202,21 @@ public class TestStudyDataManagerImpl
 		List<NumericDataElement> dataElements = manager.getNumericDataValuesByOunitIdList(ounitIdList);
 		System.out.println("NUMERIC DATA VALUES BY OUNITIDLIST: " + dataElements.size());
 		for (NumericDataElement data : dataElements) {
+			System.out.println(data);
+		}
+	}
+	
+	@Test
+	public void testGetCharacterDataValuesByOunitIdList() throws Exception {
+		List<Integer> ounitIdList = new ArrayList<Integer>();
+		ounitIdList.add(447201);
+		ounitIdList.add(447202);
+		ounitIdList.add(447203);
+		ounitIdList.add(447204);
+		ounitIdList.add(447205);
+		List<CharacterDataElement> dataElements = manager.getCharacterDataValuesByOunitIdList(ounitIdList);
+		System.out.println("CHARACTER DATA VALUES BY OUNITIDLIST: " + dataElements.size());
+		for (CharacterDataElement data : dataElements) {
 			System.out.println(data);
 		}
 	}

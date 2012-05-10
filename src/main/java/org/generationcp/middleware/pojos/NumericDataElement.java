@@ -39,19 +39,19 @@ public class NumericDataElement implements Serializable
 		return variateId;
 	}
 
-	public void setFactorId(Integer factorId)
+	public void setVariateId(Integer variateId)
 	{
-		this.variateId = factorId;
+		this.variateId = variateId;
 	}
 
-	public String getFactorName()
+	public String getVariateName()
 	{
 		return variateName;
 	}
 
-	public void setFactorName(String factorName)
+	public void setVariateName(String variateName)
 	{
-		this.variateName = factorName;
+		this.variateName = variateName;
 	}
 
 	public Double getValue()

@@ -5,6 +5,7 @@ import java.util.List;
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.pojos.CharacterDataElement;
 import org.generationcp.middleware.pojos.Factor;
 import org.generationcp.middleware.pojos.NumericDataElement;
 import org.generationcp.middleware.pojos.Representation;
@@ -187,6 +188,17 @@ public interface StudyDataManager
 	 * @throws QueryException
 	 */
 	public List<NumericDataElement> getNumericDataValuesByOunitIdList(List<Integer> ounitIdList) 
+		throws QueryException;
+
+	/**
+	 * Returns a list of CharacterDataElements that represents the column values for each specified ounitID
+	 * (for each specified row).
+	 * @param ounitIdList - list of ounitIDs to get the corresponding column values. IDs in the list must
+	 * be all from the Central DB or all from the Local DB.
+	 * @return The list of column values / CharacterDataElements for the specified ounitIDs
+	 * @throws QueryException
+	 */
+	List<CharacterDataElement> getCharacterDataValuesByOunitIdList(List<Integer> ounitIdList) 
 		throws QueryException;
 	
 }
