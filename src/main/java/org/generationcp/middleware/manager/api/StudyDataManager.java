@@ -131,16 +131,28 @@ public interface StudyDataManager
 	 * @throws QueryException
 	 */
 	public List<Factor> getFactorsByRepresentationId(Integer representationId) throws QueryException;
+	
+	/**
+	 * Returns the number of OunitIDs that are associated to the specified Representation ID.
+	 * 
+	 * @param representationId - the ID of the Representation
+	 * @return The number of all the OunitIDs associated to the specified Representation. Returns 0
+	 * if there are no connections detected for both local and central instances.
+	 * @throws QueryException
+	 */
+	public Long countOunitIDsByRepresentationId(Integer representationId) throws QueryException;
 
 	/**
 	 * Returns a List of OunitIDs that are associated to the specified Representation ID.
 	 * 
 	 * @param representationId - the ID of the Representation
+	 * @param start - the starting index of the sublist of results to be returned
+	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
 	 * @return The list of all the OunitIDs associated to the specified Representation. Returns an empty list
 	 * if there are no connections detected for both local and central instances.
 	 * @throws QueryException
 	 */
-	public List<Integer> getOunitIDsByRepresentationId(Integer representationId) throws QueryException;
+	public List<Integer> getOunitIDsByRepresentationId(Integer representationId, int start, int numOfRows) throws QueryException;
 
 	/**
 	 * Returns a List of {@code Variate} objects that belong to the specified Representation ID.
@@ -162,4 +174,5 @@ public interface StudyDataManager
 	 */
 	public List<NumericDataElement> getNumericDataValuesByOunitIdList(List<Integer> ounitIdList) 
 		throws QueryException;
+	
 }

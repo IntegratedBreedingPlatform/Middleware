@@ -283,7 +283,24 @@ public class StudyDataManagerImpl implements StudyDataManager{
 	}
 	
 	@Override
-	public List<Integer> getOunitIDsByRepresentationId(Integer representationId) throws QueryException {
+	public Long countOunitIDsByRepresentationId(Integer representationId) throws QueryException {
+		OindexDAO dao = new OindexDAO();
+		
+		HibernateUtil hibernateUtil = getHibernateUtil(representationId);
+		
+		if (hibernateUtil != null) {
+			dao.setSession(hibernateUtil.getCurrentSession());
+		} else {
+			return new Long(0);
+		}
+		
+		Long ounitIdCount = dao.countOunitIDsByRepresentationId(representationId);
+		
+		return ounitIdCount;
+	}
+	
+	@Override
+	public List<Integer> getOunitIDsByRepresentationId(Integer representationId, int start, int numOfRows) throws QueryException {
 		OindexDAO dao = new OindexDAO();
 		
 		HibernateUtil hibernateUtil = getHibernateUtil(representationId);
@@ -294,7 +311,7 @@ public class StudyDataManagerImpl implements StudyDataManager{
 			return new ArrayList<Integer>();
 		}
 		
-		List<Integer> ounitIDs = dao.getOunitIDsByRepresentationId(representationId);
+		List<Integer> ounitIDs = dao.getOunitIDsByRepresentationId(representationId, start, numOfRows);
 		
 		return ounitIDs;
 	}

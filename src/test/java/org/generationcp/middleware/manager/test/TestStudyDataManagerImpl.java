@@ -161,8 +161,14 @@ public class TestStudyDataManagerImpl
 	}
 	
 	@Test
+	public void testCountOunitIDsByRepresentationId() throws Exception {
+		Long ounitIdCount = manager.countOunitIDsByRepresentationId(1176);
+		System.out.println("COUNT OF OUNIT IDS BY REPRESENTATION: " + ounitIdCount);
+	}
+	
+	@Test
 	public void testGetOunitIDsByRepresentationId() throws Exception {
-		List<Integer> ounitIDs = manager.getOunitIDsByRepresentationId(1176);
+		List<Integer> ounitIDs = manager.getOunitIDsByRepresentationId(1176, 0, 100);
 		System.out.println("OUNIT IDS BY REPRESENTATION: " + ounitIDs.size());
 		System.out.println(ounitIDs);
 	}
