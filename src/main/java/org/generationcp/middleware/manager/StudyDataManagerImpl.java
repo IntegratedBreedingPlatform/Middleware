@@ -6,8 +6,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.generationcp.middleware.dao.CharacterDataDAO;
+import org.generationcp.middleware.dao.CharacterLevelDAO;
 import org.generationcp.middleware.dao.FactorDAO;
 import org.generationcp.middleware.dao.NumericDataDAO;
+import org.generationcp.middleware.dao.NumericLevelDAO;
 import org.generationcp.middleware.dao.OindexDAO;
 import org.generationcp.middleware.dao.RepresentationDAO;
 import org.generationcp.middleware.dao.StudyDAO;
@@ -16,8 +18,10 @@ import org.generationcp.middleware.dao.VariateDAO;
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.CharacterDataElement;
+import org.generationcp.middleware.pojos.CharacterLevelElement;
 import org.generationcp.middleware.pojos.Factor;
 import org.generationcp.middleware.pojos.NumericDataElement;
+import org.generationcp.middleware.pojos.NumericLevelElement;
 import org.generationcp.middleware.pojos.Representation;
 import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.pojos.StudyEffect;
@@ -387,6 +391,44 @@ public class StudyDataManagerImpl implements StudyDataManager{
 		List<CharacterDataElement> charDataValues = dao.getValuesByOunitIDList(ounitIdList);
 		
 		return charDataValues;
+	}
+	
+	@Override
+	public List<NumericLevelElement> getNumericLevelValuesByOunitIdList(List<Integer> ounitIdList) throws QueryException {
+		NumericLevelDAO dao = new NumericLevelDAO();
+		
+		//get 1st element from list to check whether the list is for the Central instance or the Local instance
+		Integer sampleId = ounitIdList.get(0);
+		HibernateUtil hibernateUtil = getHibernateUtil(sampleId);
+		
+		if (hibernateUtil != null) {
+			dao.setSession(hibernateUtil.getCurrentSession());
+		} else {
+			return new ArrayList<NumericLevelElement>();
+		}
+		
+		List<NumericLevelElement> numLevelValues = dao.getValuesByOunitIDList(ounitIdList);
+		
+		return numLevelValues;
+	}
+	
+	@Override
+	public List<CharacterLevelElement> getCharacterLevelValuesByOunitIdList(List<Integer> ounitIdList) throws QueryException {
+		CharacterLevelDAO dao = new CharacterLevelDAO();
+		
+		//get 1st element from list to check whether the list is for the Central instance or the Local instance
+		Integer sampleId = ounitIdList.get(0);
+		HibernateUtil hibernateUtil = getHibernateUtil(sampleId);
+		
+		if (hibernateUtil != null) {
+			dao.setSession(hibernateUtil.getCurrentSession());
+		} else {
+			return new ArrayList<CharacterLevelElement>();
+		}
+		
+		List<CharacterLevelElement> charLevelValues = dao.getValuesByOunitIDList(ounitIdList);
+		
+		return charLevelValues;
 	}
 
 }

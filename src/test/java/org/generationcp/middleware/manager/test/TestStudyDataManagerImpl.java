@@ -6,13 +6,14 @@ import java.util.List;
 
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
-import org.generationcp.middleware.manager.FindGermplasmByNameModes;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.CharacterDataElement;
+import org.generationcp.middleware.pojos.CharacterLevelElement;
 import org.generationcp.middleware.pojos.Factor;
 import org.generationcp.middleware.pojos.NumericDataElement;
+import org.generationcp.middleware.pojos.NumericLevelElement;
 import org.generationcp.middleware.pojos.NumericRange;
 import org.generationcp.middleware.pojos.Representation;
 import org.generationcp.middleware.pojos.Study;
@@ -221,6 +222,36 @@ public class TestStudyDataManagerImpl
 		}
 	}
 	
+	@Test
+	public void testGetNumericLevelValuesByOunitIdList() throws Exception {
+		List<Integer> ounitIdList = new ArrayList<Integer>();
+		ounitIdList.add(447201);
+		ounitIdList.add(447202);
+		ounitIdList.add(447203);
+		ounitIdList.add(447204);
+		ounitIdList.add(447205);
+		List<NumericLevelElement> levelElements = manager.getNumericLevelValuesByOunitIdList(ounitIdList);
+		System.out.println("NUMERIC LEVEL VALUES BY OUNITIDLIST: " + levelElements.size());
+		for (NumericLevelElement level : levelElements) {
+			System.out.println(level);
+		}
+	}
+	
+	@Test
+	public void testGetCharacterLevelValuesByOunitIdList() throws Exception {
+		List<Integer> ounitIdList = new ArrayList<Integer>();
+		ounitIdList.add(447201);
+		ounitIdList.add(447202);
+		ounitIdList.add(447203);
+		ounitIdList.add(447204);
+		ounitIdList.add(447205);
+		List<CharacterLevelElement> levelElements = manager.getCharacterLevelValuesByOunitIdList(ounitIdList);
+		System.out.println("CHARACTER LEVEL VALUES BY OUNITIDLIST: " + levelElements.size());
+		for (CharacterLevelElement level : levelElements) {
+			System.out.println(level);
+		}
+	}
+
 	@AfterClass
 	public static void tearDown() throws Exception 
 	{

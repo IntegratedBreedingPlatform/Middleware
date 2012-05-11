@@ -12,10 +12,10 @@ public class NumericLevelElement implements Serializable
 	private Integer ounitId;
 	private Integer factorId;
 	private String factorName;
-	private Integer value;
+	private Double value;
 	
 	public NumericLevelElement(Integer ounitId, Integer factorId,
-			String factorName, Integer value)
+			String factorName, Double value)
 	{
 		super();
 		this.ounitId = ounitId;
@@ -54,12 +54,12 @@ public class NumericLevelElement implements Serializable
 		this.factorName = factorName;
 	}
 
-	public Integer getValue()
+	public Double getValue()
 	{
 		return value;
 	}
 
-	public void setValue(Integer value)
+	public void setValue(Double value)
 	{
 		this.value = value;
 	}
