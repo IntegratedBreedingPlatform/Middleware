@@ -13,7 +13,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Entity
-@Table(name = "tool")
+@Table(name = "workbench_tool")
 public class Tool implements Serializable {
     private static final long serialVersionUID = 1L;
 

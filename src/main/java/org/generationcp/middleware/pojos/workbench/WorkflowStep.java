@@ -20,7 +20,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Entity
-@Table(name = "workflow_step")
+@Table(name = "workbench_workflow_step")
 public class WorkflowStep implements Serializable {
     private static final long serialVersionUID = 1L;
 
