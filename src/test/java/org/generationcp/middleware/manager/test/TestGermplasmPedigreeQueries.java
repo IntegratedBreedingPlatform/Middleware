@@ -144,7 +144,8 @@ public class TestGermplasmPedigreeQueries
 		System.out.println("RESULTS:");
 		for(Germplasm g : neighbors)
 		{
-			System.out.println(g.getGid() + " : " + g.getPreferredName().getNval());
+			String name = g.getPreferredName() != null ? g.getPreferredName().getNval() : null;
+			System.out.println(g.getGid() + " : " + name);
 		}
 	}
 	
@@ -158,7 +159,8 @@ public class TestGermplasmPedigreeQueries
 		System.out.println("RESULTS:");
 		for(Germplasm g : neighbors)
 		{
-			System.out.println(g.getGid() + " : " + g.getPreferredName().getNval());
+			String name = g.getPreferredName() != null ? g.getPreferredName().getNval() : null;
+			System.out.println(g.getGid() + " : " + name);
 		}
 	}
 	
@@ -172,7 +174,8 @@ public class TestGermplasmPedigreeQueries
 		System.out.println("RESULTS:");
 		for(Germplasm g : results)
 		{
-			System.out.println(g.getGid() + " : " + g.getPreferredName().getNval());
+			String name = g.getPreferredName() != null ? g.getPreferredName().getNval() : null;
+			System.out.println(g.getGid() + " : " + name);
 		}
 	}
 	
