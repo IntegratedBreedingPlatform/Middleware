@@ -351,7 +351,6 @@ public class TestInventoryDataManagerImpl
 		System.out.println("Report on empty lot");
 		List<LotReportRow> report=manager.generateReportOnEmptyLot(0, 2);
 		Assert.assertTrue(report != null);
-		Assert.assertTrue(!report.isEmpty());
 		System.out.println("REPORT:");
 		for(LotReportRow row: report)
 			System.out.println(row);
