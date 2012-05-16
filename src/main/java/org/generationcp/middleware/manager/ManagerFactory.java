@@ -1,5 +1,7 @@
 package org.generationcp.middleware.manager;
 
+import java.io.Serializable;
+
 import org.generationcp.middleware.exceptions.ConfigException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
@@ -14,8 +16,10 @@ import org.generationcp.middleware.util.HibernateUtil;
  * connection to the databases.  
  *
  */
-public class ManagerFactory
+public class ManagerFactory implements Serializable
 {
+	private static final long serialVersionUID = -2846462010022009403L;
+	
 	private HibernateUtil hibernateUtilForLocal;
 	private HibernateUtil hibernateUtilForCentral;
 	

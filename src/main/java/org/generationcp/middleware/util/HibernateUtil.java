@@ -1,6 +1,7 @@
 package org.generationcp.middleware.util;
 
 import java.io.FileNotFoundException;
+import java.io.Serializable;
 import java.net.URL;
 
 import org.apache.commons.logging.Log;
@@ -17,8 +18,10 @@ import org.hibernate.cfg.AnnotationConfiguration;
  * @author klmanansala
  *
  */
-public class HibernateUtil 
+public class HibernateUtil implements Serializable 
 {
+	private static final long serialVersionUID = -6399030839728425831L;
+
 	private static final Log log = LogFactory.getLog(HibernateUtil.class);
 	
 	private static final String MIDDLEWARE_INTERNAL_HIBERNATE_CFG = "ibpmidware_hib.cfg.xml";
