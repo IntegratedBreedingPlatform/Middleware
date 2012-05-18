@@ -377,17 +377,17 @@ public interface InventoryDataManager
 	public List<LotReportRow> generateReportOnDormantLots(int year, int start, int numOfRows);
 	
 	/**
-	 * Returns a report Lot with zero balance
+	 * Returns a report about Lots with zero balance
 	 * Included information are: lot id of the lot, entity id of the lot, lot balance,
 	 * location of the lot, and scale of the lot.
 	 * 
 	 * @return List of LotReportRow
 	 * @throws QueryException 
 	 */
-	public List<LotReportRow> generateReportOnEmptyLot(int start, int numOfRows);
+	public List<LotReportRow> generateReportOnEmptyLots(int start, int numOfRows);
 	
 	/**
-	 * Returns a report of  Lot with balance less than the amount specified
+	 * Returns a report about Lots with balance less than the amount specified
 	 * Included information are: lot id of the lot, entity id of the lot, lot balance,
 	 * location of the lot, and scale of the lot.
 	 * 
@@ -395,7 +395,7 @@ public interface InventoryDataManager
 	 * @return List of LotReportRow objects
 	 * @throws QueryException 
 	 */
-	public List<LotReportRow> generateReportOnLotWithMinimumAmount(long minimumAmount,int start,int numOfRows);
+	public List<LotReportRow> generateReportOnLotsWithMinimumAmount(long minimumAmount,int start,int numOfRows);
 	
 	/**
 	 * Returns a report on all Lot records associated with the given entity type. 

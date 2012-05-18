@@ -538,36 +538,26 @@ public class InventoryDataManagerImpl implements InventoryDataManager
 	
 	
 	@Override
-	public List<LotReportRow> generateReportOnEmptyLot(int start, int numOfRows)
+	public List<LotReportRow> generateReportOnEmptyLots(int start, int numOfRows)
 			 {
 		TransactionDAO dao = new TransactionDAO();
 		dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
 		List<Lot> emptyLots = new ArrayList<Lot>();
 		
 		for(org.generationcp.middleware.pojos.Transaction t:dao.getEmptyLot(start,numOfRows)){
-			Lot lot = new Lot();
-			lot.setId(t.getId());
-			lot.setLocationId(t.getLot().getLocationId());
-			lot.setEntityId(t.getLot().getEntityId());
-			lot.setScaleId(t.getLot().getScaleId());
-			emptyLots.add(lot);
+			emptyLots.add(t.getLot());
 		}
 		return generateLotReportRows(emptyLots);
 	}
 	
 	@Override
-	public List<LotReportRow> generateReportOnLotWithMinimumAmount(long minAmount,int start, int numOfRows){
+	public List<LotReportRow> generateReportOnLotsWithMinimumAmount(long minAmount,int start, int numOfRows){
 		TransactionDAO dao = new TransactionDAO();
 		dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
 		
 		List<Lot> lotsWithMinimunAmount = new ArrayList<Lot>();
 		for(org.generationcp.middleware.pojos.Transaction t:dao.getLotWithMinimumAmount(minAmount,start,numOfRows)){
-			Lot lot = new Lot();
-			lot.setId(t.getId());
-			lot.setLocationId(t.getLot().getLocationId());
-			lot.setEntityId(t.getLot().getEntityId());
-			lot.setScaleId(t.getLot().getScaleId());
-			lotsWithMinimunAmount.add(lot);
+			lotsWithMinimunAmount.add(t.getLot());
 		}
 		return generateLotReportRows(lotsWithMinimunAmount);
 	}
