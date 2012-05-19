@@ -39,6 +39,11 @@ public class NumericDataElement implements Serializable
 		return variateId;
 	}
 
+	public Integer getVariateId()
+	{
+		return variateId;
+	}
+
 	public void setVariateId(Integer variateId)
 	{
 		this.variateId = variateId;
