@@ -45,8 +45,6 @@ public class TestGermplasmPedigreeQueries
 	public void testGetMethodById() throws Exception
 	{
 		Method method = manager.getMethodByID(new Integer(1));
-		Assert.assertTrue(method != null);
-		Assert.assertTrue(method.getMid() == 1);
 		System.out.println(method);
 	}
 	
@@ -54,8 +52,6 @@ public class TestGermplasmPedigreeQueries
 	public void testGetAllMethods() throws Exception
 	{
 		List<Method> methods = manager.getAllMethods();
-		Assert.assertTrue(methods != null);
-		Assert.assertTrue(methods.size() > 0);
 		
 		List<Method> sublist = methods.subList(0, 4);
 		for(Method method : sublist)
@@ -68,8 +64,6 @@ public class TestGermplasmPedigreeQueries
 	public void testGetUserDefinedFieldById() throws Exception
 	{
 		UserDefinedField udfld = manager.getUserDefinedFieldByID(new Integer(1));
-		Assert.assertTrue(udfld != null);
-		Assert.assertTrue(udfld.getFldno() == 1);
 		System.out.println(udfld);
 	}
 	
@@ -84,8 +78,6 @@ public class TestGermplasmPedigreeQueries
 	public void testGetLocationById() throws Exception
 	{
 		Location location = manager.getLocationByID(new Integer(1));
-		Assert.assertTrue(location != null);
-		Assert.assertTrue(location.getLocid() == 1);
 		System.out.println(location);
 	}
 	
@@ -93,8 +85,6 @@ public class TestGermplasmPedigreeQueries
 	public void testGetBibliographicalReferenceById() throws Exception
 	{
 		Bibref bibref = manager.getBibliographicReferenceByID(new Integer(1));
-		Assert.assertTrue(bibref != null);
-		Assert.assertTrue(bibref.getRefid() == 1);
 		System.out.println(bibref);
 	}
 	
@@ -102,7 +92,6 @@ public class TestGermplasmPedigreeQueries
 	public void testGetGermplasmDescendants() throws Exception
 	{
 		List<Object[]> germplsmList = manager.findDescendants(47888, 0, 20);
-		Assert.assertTrue(germplsmList != null);
 		
 		for(Object[] object : germplsmList)
 		{
@@ -122,8 +111,6 @@ public class TestGermplasmPedigreeQueries
 	public void testGetProgenitorByGID() throws Exception
 	{
 		Germplasm germplasm = manager.getParentByGIDAndProgenitorNumber(779745, 10);
-		Assert.assertTrue(germplasm != null);
-		
 		System.out.println(germplasm);
 	}
 	
@@ -138,8 +125,6 @@ public class TestGermplasmPedigreeQueries
 	public void testGetManagementNeighbors() throws Exception
 	{
 		List<Germplasm> neighbors = manager.getManagementNeighbors(new Integer(625));
-		Assert.assertTrue(neighbors != null);
-		Assert.assertTrue(neighbors.size() > 0);
 		
 		System.out.println("RESULTS:");
 		for(Germplasm g : neighbors)
@@ -153,8 +138,6 @@ public class TestGermplasmPedigreeQueries
 	public void testGetGroupRelatives() throws Exception
 	{
 		List<Germplasm> neighbors = manager.getGroupRelatives(new Integer(1));
-		Assert.assertTrue(neighbors != null);
-		Assert.assertTrue(neighbors.size() > 0);
 		
 		System.out.println("RESULTS:");
 		for(Germplasm g : neighbors)
@@ -168,8 +151,6 @@ public class TestGermplasmPedigreeQueries
 	public void testGetGenerationHistory() throws Exception
 	{
 		List<Germplasm> results = manager.getGenerationHistory(new Integer(50533));
-		Assert.assertTrue(results != null);
-		Assert.assertTrue(results.size() > 0);
 		
 		System.out.println("RESULTS:");
 		for(Germplasm g : results)

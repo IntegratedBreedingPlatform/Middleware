@@ -34,7 +34,6 @@ public class TestTraitDataManagerImpl
 	public void testGetScaleById() throws Exception
 	{
 		Scale scale = manager.getScaleByID(new Integer(1));
-		Assert.assertTrue(scale != null);
 		System.out.println(scale);
 	}
 	
@@ -42,8 +41,6 @@ public class TestTraitDataManagerImpl
 	public void testGetAllScales() throws Exception
 	{
 		List<Scale> scales = manager.getAllScales(0, 5);
-		Assert.assertTrue(scales != null);
-		Assert.assertTrue(!scales.isEmpty());
 		
 		System.out.println("RESULTS:");
 		for(Scale scale : scales)
@@ -62,8 +59,6 @@ public class TestTraitDataManagerImpl
 	public void testGetScaleDiscreteDescription() throws Exception
 	{
 		String desc = manager.getScaleDiscreteDescription(new Integer(1), "1");
-		Assert.assertTrue(desc != null);
-		Assert.assertTrue(desc.length() > 0);
 		System.out.println(desc);
 	}
 	
@@ -71,8 +66,6 @@ public class TestTraitDataManagerImpl
 	public void testGetDiscreteValuesOfScale() throws Exception
 	{
 		List<ScaleDiscrete> results = manager.getDiscreteValuesOfScale(new Integer(1));
-		Assert.assertTrue(results != null);
-		Assert.assertTrue(!results.isEmpty());
 		
 		System.out.println("RESULTS:");
 		for(ScaleDiscrete sd : results)
@@ -85,7 +78,6 @@ public class TestTraitDataManagerImpl
 	public void testGetRangeOfContinuousScale() throws Exception
 	{
 		ScaleContinuous range = manager.getRangeOfContinuousScale(new Integer(68));
-		Assert.assertTrue(range != null);
 		System.out.println(range);
 	}
 	
@@ -93,7 +85,6 @@ public class TestTraitDataManagerImpl
 	public void testGetTraitById() throws Exception
 	{
 		Trait trait = manager.getTraitById(new Integer(305));
-		Assert.assertTrue(trait != null);
 		System.out.println(trait);
 	}
 	
@@ -101,8 +92,6 @@ public class TestTraitDataManagerImpl
 	public void testGetAllTraits() throws Exception
 	{
 		List<Trait> traits = manager.getAllTraits(0, 5);
-		Assert.assertTrue(traits != null);
-		Assert.assertTrue(!traits.isEmpty());
 		
 		System.out.println("RESULTS:");
 		for(Trait trait : traits)
@@ -121,7 +110,6 @@ public class TestTraitDataManagerImpl
 	public void testGetTraitMethodById() throws Exception
 	{
 		TraitMethod method = manager.getTraitMethodById(new Integer(1));
-		Assert.assertTrue(method != null);
 		System.out.println(method);
 	}
 	
@@ -129,8 +117,6 @@ public class TestTraitDataManagerImpl
 	public void testGetAllTraitMethods() throws Exception
 	{
 		List<TraitMethod> traits = manager.getAllTraitMethods(0, 5);
-		Assert.assertTrue(traits != null);
-		Assert.assertTrue(!traits.isEmpty());
 		
 		System.out.println("RESULTS:");
 		for(TraitMethod trait : traits)
@@ -149,8 +135,6 @@ public class TestTraitDataManagerImpl
 	public void testGetTraitMethodsByTraitId() throws Exception
 	{
 		List<TraitMethod> traits = manager.getTraitMethodsByTraitId(new Integer(1215));
-		Assert.assertTrue(traits != null);
-		Assert.assertTrue(!traits.isEmpty());
 		
 		System.out.println("RESULTS:");
 		for(TraitMethod trait : traits)
@@ -163,8 +147,6 @@ public class TestTraitDataManagerImpl
 	public void testGetScalesByTraitId() throws Exception
 	{
 		List<Scale> scales = manager.getScalesByTraitId(new Integer(1215));
-		Assert.assertTrue(scales != null);
-		Assert.assertTrue(!scales.isEmpty());
 		
 		System.out.println("RESULTS:");
 		for(Scale scale : scales)

@@ -62,8 +62,6 @@ public class TestStudyDataManagerImpl
 	@Test
 	public void testFindStudyByNameUsingLike() throws Exception{
 		List<Study> studyList = manager.findStudyByName("IRTN%", 0, 5, Operation.LIKE, Database.CENTRAL);
-		Assert.assertTrue(studyList != null);
-		Assert.assertTrue(!studyList.isEmpty());
 		
 		for(Study study : studyList){
 			System.out.println(study);
@@ -73,8 +71,6 @@ public class TestStudyDataManagerImpl
 	@Test
 	public void testFindStudyByNameUsingEqual() throws Exception{
 		List<Study> studyList = manager.findStudyByName("PEATSOIL", 0, 5, Operation.EQUAL, Database.CENTRAL);
-		Assert.assertTrue(studyList != null);
-		Assert.assertTrue(!studyList.isEmpty());
 		
 		for(Study study : studyList){
 			System.out.println(study);
@@ -94,8 +90,6 @@ public class TestStudyDataManagerImpl
 	@Test
 	public void testGetStudyByID() throws Exception{
 		Study study = manager.getStudyByID(new Integer(714));
-		Assert.assertTrue(study != null);
-		Assert.assertTrue(study.getId() == 714);
 		System.out.println(study);
 	}
 
@@ -120,8 +114,6 @@ public class TestStudyDataManagerImpl
 	@Test
 	public void testGetFactorsByStudyID() throws Exception{
 		List<Factor> factors = manager.getFactorsByStudyID(new Integer(430));
-		Assert.assertTrue(factors != null);
-		Assert.assertTrue(!factors.isEmpty());
 		
 		for(Factor factor : factors){
 			System.out.println(factor);
@@ -131,8 +123,6 @@ public class TestStudyDataManagerImpl
 	@Test
 	public void testGetVariatesByStudyID() throws Exception{
 		List<Variate> variates = manager.getVariatesByStudyID(new Integer(430));
-		Assert.assertTrue(variates != null);
-		Assert.assertTrue(!variates.isEmpty());
 		
 		for(Variate variate : variates){
 			System.out.println(variate);
@@ -142,8 +132,6 @@ public class TestStudyDataManagerImpl
 	@Test
 	public void testGetEffectsByStudyID() throws Exception{
 		List<StudyEffect> studyEffects = manager.getEffectsByStudyID(new Integer(430));
-		Assert.assertTrue(studyEffects != null);
-		Assert.assertTrue(!studyEffects.isEmpty());
 		
 		for(StudyEffect studyEffect : studyEffects){
 			System.out.println(studyEffect);
@@ -153,8 +141,6 @@ public class TestStudyDataManagerImpl
 	@Test
 	public void testGetRepresentationByStudyID() throws Exception{
 		List<Representation> representations = manager.getRepresentationByEffectID(new Integer(430));
-		Assert.assertTrue(representations != null);
-		Assert.assertTrue(!representations.isEmpty());
 		
 		for(Representation representation : representations){
 			System.out.println(representation);

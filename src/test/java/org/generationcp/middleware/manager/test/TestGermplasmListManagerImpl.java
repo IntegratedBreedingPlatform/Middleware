@@ -36,7 +36,6 @@ public class TestGermplasmListManagerImpl
 	public void testGetGermplasmListById() throws Exception
 	{
 		GermplasmList list = manager.getGermplasmListById(new Integer(1));
-		Assert.assertTrue(list != null);
 		System.out.println(list);
 	}
 	
@@ -44,9 +43,6 @@ public class TestGermplasmListManagerImpl
 	public void testGetAllGermplasmLists() throws Exception
 	{
 		List<GermplasmList> lists = manager.getAllGermplasmLists(0, 5);
-		Assert.assertTrue(lists != null);
-		Assert.assertTrue(!lists.isEmpty());
-		Assert.assertTrue(lists.size() == 5);
 		
 		System.out.println("RESULTS:");
 		for(GermplasmList list : lists)
@@ -65,8 +61,6 @@ public class TestGermplasmListManagerImpl
 	public void testFindGermplasmListByName() throws Exception
 	{
 		List<GermplasmList> lists = manager.findGermplasmListByName("2002%", 0, 5, Operation.LIKE);
-		Assert.assertTrue(lists != null);
-		Assert.assertTrue(!lists.isEmpty());
 		
 		System.out.println("RESULTS:");
 		for(GermplasmList list : lists)
@@ -85,8 +79,6 @@ public class TestGermplasmListManagerImpl
 	public void testFindGermplasmListByStatus() throws Exception
 	{
 		List<GermplasmList> lists = manager.findGermplasmListByStatus(new Integer(1), 0, 5);
-		Assert.assertTrue(lists != null);
-		Assert.assertTrue(!lists.isEmpty());
 		
 		System.out.println("RESULTS:");
 		for(GermplasmList list : lists)
@@ -105,8 +97,6 @@ public class TestGermplasmListManagerImpl
 	public void testGetGermplasmListDataByListId() throws Exception
 	{
 		List<GermplasmListData> results = manager.getGermplasmListDataByListId(new Integer(1), 0, 5);
-		Assert.assertTrue(results != null);
-		Assert.assertTrue(!results.isEmpty());
 		
 		System.out.println("RESULTS:");
 		for(GermplasmListData data : results)
@@ -125,8 +115,6 @@ public class TestGermplasmListManagerImpl
 	public void testGetGermplasmListDataByListIdAndGID() throws Exception
 	{
 		List<GermplasmListData> results = manager.getGermplasmListDataByListIdAndGID(new Integer(1), new Integer(91959));
-		Assert.assertTrue(results != null);
-		Assert.assertTrue(!results.isEmpty());
 		
 		System.out.println("RESULTS:");
 		for(GermplasmListData data : results)
@@ -139,7 +127,6 @@ public class TestGermplasmListManagerImpl
 	public void testGetGermplasmListDataByListIdAndEntryId() throws Exception
 	{
 		GermplasmListData data = manager.getGermplasmListDataByListIdAndEntryId(new Integer(1), new Integer(1));
-		Assert.assertTrue(data != null);
 		System.out.println(data);
 	}
 	
@@ -147,8 +134,6 @@ public class TestGermplasmListManagerImpl
 	public void testGetGermplasmListDataByGID() throws Exception
 	{
 		List<GermplasmListData> results = manager.getGermplasmListDataByGID(new Integer(91959), 0, 5);
-		Assert.assertTrue(results != null);
-		Assert.assertTrue(!results.isEmpty());
 		
 		System.out.println("RESULTS:");
 		for(GermplasmListData data : results)

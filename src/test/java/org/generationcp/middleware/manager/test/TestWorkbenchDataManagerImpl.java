@@ -55,11 +55,13 @@ public class TestWorkbenchDataManagerImpl {
         }
     }
     
+    /**
     @Test
     public void testDeleteProject() {
         List<Project> projects = manager.getProjects();
         manager.deleteProject(projects.get(0));
     }
+    **/
     
     @Test
     public void testFindTool() {
