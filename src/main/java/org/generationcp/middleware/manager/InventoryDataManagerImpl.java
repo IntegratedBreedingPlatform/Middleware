@@ -522,7 +522,7 @@ public class InventoryDataManagerImpl implements InventoryDataManager
 				
 				row.setEntityIdOfLot((Integer) result[1]);
 				
-				row.setActualLotBalance(((BigDecimal) result[2]).longValue());
+				row.setActualLotBalance(((Double) result[2]).longValue());
 				
 				Location location = germplasmManager.getLocationByID((Integer) result[3]);
 				row.setLocationOfLot(location);

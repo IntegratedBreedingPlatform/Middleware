@@ -21,12 +21,12 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 	@NamedQuery
 	(
 		name = "getEmptyLot",
-		query = "FROM Transaction where status=1 group by lot_id having sum(quantity) = 0"
+		query = "FROM Transaction where status=1 group by lotid having sum(quantity) = 0"
 	),
 	@NamedQuery
 	(
 		name = "getLotWithMinimumAmount",
-		query = "FROM Transaction where status=1 group by lot_id having sum(quantity) <:minAmount"
+		query = "FROM Transaction where status=1 group by lotid having sum(quantity) <:minAmount"
 	)
 	
 })
@@ -35,56 +35,54 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 
 @Entity
-@Table(name = "transaction")
+@Table(name = "ims_transaction")
 public class Transaction implements Serializable
 {
 	private static final long serialVersionUID = 77866453513905521L;
 	public static final String GET_EMPTY_LOT = "getEmptyLot";
 	public static final String GET_LOT_WITH_MINIMUM_AMOUNT = "getLotWithMinimumAmount";
 
-	
-
 	@Id
 	@Basic(optional = false)
-	@Column(name = "transaction_id")
+	@Column(name = "trnid")
 	private Integer id;
 	
 	@Basic(optional = false)
-	@Column(name = "user_id")
+	@Column(name = "userid")
 	private Integer userId;
 	
 	@ManyToOne(targetEntity = Lot.class)
-	@JoinColumn(name = "lot_id", nullable = false, updatable = false)
+	@JoinColumn(name = "lotid", nullable = false, updatable = false)
 	private Lot lot;
 	
 	@Basic(optional = false)
-	@Column(name = "transaction_date")
+	@Column(name = "trndate")
 	private Integer date;
 	
 	@Basic(optional = false)
-	@Column(name = "status")
+	@Column(name = "trnstat")
 	private Integer status;
 	
 	@Basic(optional = false)
-	@Column(name = "quantity")
+	@Column(name = "trnqty")
 	private Integer quantity;
 	
 	@Column(name = "comments")
 	private String comments;
 	
-	@Column(name = "source_type")
+	@Column(name = "sourcetype")
 	private String sourceType;
 	
-	@Column(name = "source_id")
+	@Column(name = "sourceid")
 	private Integer sourceId;
 	
-	@Column(name = "source_record_id")
+	@Column(name = "recordid")
 	private Integer sourceRecordId;
 	
-	@Column(name = "previous_amount")
+	@Column(name = "prevamount")
 	private Integer previousAmount;
 	
-	@Column(name = "person_id")
+	@Column(name = "personid")
 	private Integer personId;
 	
 	public Transaction()

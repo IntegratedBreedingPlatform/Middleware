@@ -32,7 +32,6 @@ public class TestInventoryDataManagerImpl
 		manager = factory.getInventoryDataManager();
 	}
 
-	/**
 	@Test
 	public void testFindLotsByEntityType() throws Exception
 	{
@@ -344,7 +343,6 @@ public class TestInventoryDataManagerImpl
 		for(LotReportRow row: report)
 			System.out.println(row);
 	}
-	**/
 	
 	@Test
 	public void testGenerateReportOnEmptyLot()  throws Exception

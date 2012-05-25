@@ -17,44 +17,44 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Entity
-@Table(name = "lot")
+@Table(name = "ims_lot")
 public class Lot implements Serializable
 {
 	private static final long serialVersionUID = -7110592680243974512L;
 	
 	//string contants for name of queries
     public static final String GENERATE_REPORT_ON_DORMANT = 
-    	"select l.lot_id, l.entity_id, sum(t.quantity) balance, l.location_id, l.scale_id " +
-    		"from transaction t, lot l " +
-    		"where t.lot_id = l.lot_id " +
-    		"and t.transaction_date < (:year + 1) * 10000 " +
-    		"and t.status = 1 " +
-    		"group by l.lot_id, l.entity_id, l.location_id, l.scale_id " +
-    		"having sum(quantity) <> 0";
+    	"select l.lotid, l.eid, sum(t.trnqty) balance, l.locid, l.scaleid " +
+    		"from ims_transaction t, ims_lot l " +
+    		"where t.lotid = l.lotid " +
+    		"and t.trndate < (:year + 1) * 10000 " +
+    		"and t.trnstat = 1 " +
+    		"group by l.lotid, l.eid, l.locid, l.scaleid " +
+    		"having sum(trnqty) <> 0";
 
-	@Id
+    @Id
 	@Basic(optional = false)
-	@Column(name = "lot_id")
+	@Column(name = "lotid")
 	private Integer id;
 	
 	@Basic(optional = false)
-	@Column(name = "user_id")
+	@Column(name = "userid")
 	private Integer userId;
 	
 	@Basic(optional = false)
-	@Column(name = "entity_type")
+	@Column(name = "etype")
 	private String entityType;
 	
 	@Basic(optional = false)
-	@Column(name = "entity_id")
+	@Column(name = "eid")
 	private Integer entityId;
 	
 	@Basic(optional = false)
-	@Column(name = "location_id")
+	@Column(name = "locid")
 	private Integer locationId;
 	
 	@Basic(optional = false)
-	@Column(name = "scale_id")
+	@Column(name = "scaleid")
 	private Integer scaleId;
 	
 	@Basic(optional = false)
@@ -62,7 +62,7 @@ public class Lot implements Serializable
 	private Integer status;
 	
 	@ManyToOne(targetEntity = Lot.class)
-	@JoinColumn(name = "source_id", nullable = true)
+	@JoinColumn(name = "sourceid", nullable = true)
 	private Lot source;
 	
 	@Column(name = "comments")
