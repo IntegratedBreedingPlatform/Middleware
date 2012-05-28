@@ -1162,17 +1162,25 @@ public class GermplasmDataManagerImpl implements GermplasmDataManager
 		GermplasmPedigreeTree tree = new GermplasmPedigreeTree();
 		//set root node
 		Germplasm root = getGermplasmWithPrefName(gid);
-		GermplasmPedigreeTreeNode rootNode = new GermplasmPedigreeTreeNode();
-		rootNode.setGermplasm(root);
 		
-		if(level > 1)
+		if(root != null)
 		{
-			rootNode = addParents(rootNode, level);
+			GermplasmPedigreeTreeNode rootNode = new GermplasmPedigreeTreeNode();
+			rootNode.setGermplasm(root);
+			
+			if(level > 1)
+			{
+				rootNode = addParents(rootNode, level);
+			}
+			
+			tree.setRoot(rootNode);
+			
+			return tree;
 		}
-		
-		tree.setRoot(rootNode);
-		
-		return tree;
+		else
+		{
+			return null;
+		}
 	}
 	
 	/**
@@ -1330,20 +1338,27 @@ public class GermplasmDataManagerImpl implements GermplasmDataManager
 		
 		//get the root of the neighborhood
 		Object[] traceResult = traceDerivativeRoot(gid, numberOfStepsBackward);
-		Germplasm root = (Germplasm) traceResult[0];
-		Integer stepsLeft = (Integer) traceResult[1];
 		
-		GermplasmPedigreeTreeNode rootNode = new GermplasmPedigreeTreeNode();
-		rootNode.setGermplasm(root);
-		
-		//get the derived lines from the root until the whole neighborhood is created
-		int treeLevel = (numberOfStepsBackward - stepsLeft) + numberOfStepsForward + 1;
-		System.out.println("tree level: " + treeLevel);
-		rootNode = getDerivedLines(rootNode, treeLevel);
-		
-		derivativeNeighborhood.setRoot(rootNode);
-		
-		return derivativeNeighborhood;
+		if(traceResult != null)
+		{
+			Germplasm root = (Germplasm) traceResult[0];
+			Integer stepsLeft = (Integer) traceResult[1];
+			
+			GermplasmPedigreeTreeNode rootNode = new GermplasmPedigreeTreeNode();
+			rootNode.setGermplasm(root);
+			
+			//get the derived lines from the root until the whole neighborhood is created
+			int treeLevel = (numberOfStepsBackward - stepsLeft) + numberOfStepsForward + 1;
+			rootNode = getDerivedLines(rootNode, treeLevel);
+			
+			derivativeNeighborhood.setRoot(rootNode);
+			
+			return derivativeNeighborhood;
+		}
+		else
+		{
+			return null;
+		}
 	}
 	
 	/**

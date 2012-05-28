@@ -357,7 +357,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>
 				Name prefName = (Name) result[1];
 				Name prefAbbrev = (Name) result[2];
 				germplasm.setPreferredName(prefName);
-				germplasm.setPreferredAbbreviation(prefAbbrev.getNval());
+				if(prefAbbrev != null)
+				{
+					germplasm.setPreferredAbbreviation(prefAbbrev.getNval());
+				}
 				return germplasm;
 			}
 			else

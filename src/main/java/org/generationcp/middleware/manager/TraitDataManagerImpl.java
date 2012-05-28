@@ -96,7 +96,15 @@ public class TraitDataManagerImpl implements TraitDataManager
 		id.setValue(value);
 		
 		ScaleDiscrete sd = dao.findById(id, false);
-		return sd.getValueDescription();
+		
+		if(sd != null)
+		{
+			return sd.getValueDescription();
+		}
+		else
+		{
+			return null;
+		}
 	}
 	
 	@Override
