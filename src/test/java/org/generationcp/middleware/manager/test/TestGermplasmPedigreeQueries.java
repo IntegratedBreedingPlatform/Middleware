@@ -118,7 +118,10 @@ public class TestGermplasmPedigreeQueries
 	public void testGeneratePedigreeTree() throws Exception
 	{
 		GermplasmPedigreeTree tree = manager.generatePedigreeTree(new Integer(306436), 4);
-		printNode(tree.getRoot(), 1);
+		if(tree != null)
+		{
+			printNode(tree.getRoot(), 1);
+		}
 	}
 	
 	@Test
@@ -164,7 +167,10 @@ public class TestGermplasmPedigreeQueries
 	public void testGetDerivativeNeighborhood() throws Exception
 	{
 		GermplasmPedigreeTree tree = manager.getDerivativeNeighborhood(new Integer(1), 3, 3);
-		printNode(tree.getRoot(), 1);
+		if(tree != null)
+		{
+			printNode(tree.getRoot(), 1);
+		}
 	}
 	
 	/**
