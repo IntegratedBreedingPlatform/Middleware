@@ -4,8 +4,8 @@ import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.net.URL;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.generationcp.middleware.exceptions.ConfigException;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -22,7 +22,7 @@ public class HibernateUtil implements Serializable
 {
 	private static final long serialVersionUID = -6399030839728425831L;
 
-	private static final Log log = LogFactory.getLog(HibernateUtil.class);
+    private final static Logger log = LoggerFactory.getLogger(HibernateUtil.class);
 	
 	private static final String MIDDLEWARE_INTERNAL_HIBERNATE_CFG = "ibpmidware_hib.cfg.xml";
 	

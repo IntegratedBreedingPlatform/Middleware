@@ -1,0 +1,50 @@
+<configuration>
+    <!-- properties -->
+    <property name="log-dir" value="logs"/>
+
+    <!-- console appender -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%method [%line] - %msg%n</pattern>
+        </encoder>
+    </appender>
+  
+    <!-- rolling file appender for system logs -->
+    <!--
+    NOTE: You can use ${HOSTNAME} property to separate logs of each host.
+    -->
+    <appender name="SYSTEM-LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- Enable prudent mode if log file will be written from multiple JVMs -->
+        <!--
+        -->
+        <prudent>true</prudent>
+        <append>true</append>
+        
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log-dir}/%d{yyyy/MM}/system-log.${HOSTNAME}.%d{dd}.log</fileNamePattern>
+        </rollingPolicy>
+        
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%method [%line] - %msg%n</pattern>
+        </encoder>
+    </appender>
+    
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="SYSTEM-LOG" />
+    </root>
+    
+    <!-- Set the log levels -->
+    <logger name="org.generationcp.middleware" level="TRACE"/>
+    <logger name="org.hibernate.cfg" level="WARN"/>
+    <logger name="org.hibernate.SQL" level="DEBUG"/>
+    <logger name="org.hibernate.type" level="INFO"/>
+    <logger name="org.hibernate.hql" level="DEBUG"/>
+    <logger name="org.hibernate.cache" level="DEBUG"/>
+    <logger name="org.hibernate.transaction" level="DEBUG"/>
+    <logger name="org.hibernate.jdbc" level="DEBUG"/>
+    <logger name="org.springframework" level="WARN"/>
+    <logger name="org.eclipse.jetty.server.nio.SelectChannelConnector" level="INFO"/>
+    <logger name="org.eclipse.jetty.util.log" level="INFO"/>
+</configuration>
