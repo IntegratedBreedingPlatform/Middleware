@@ -182,7 +182,7 @@ public class TestGermplasmDataManagerImpl
 	public void testFindGermplasmByLocationNameUsingEqual() throws Exception
 	{
 		long start = System.currentTimeMillis();
-		List<Germplasm> germplasmList = manager.findGermplasmByLocationName("Philippines", 0, 5, Operation.EQUAL);
+		List<Germplasm> germplasmList = manager.findGermplasmByLocationName("Philippines", 0, 5, Operation.EQUAL, Database.CENTRAL);
 		
 		System.out.println("SEARCH RESULTS");
 		for(Germplasm g : germplasmList)
@@ -197,7 +197,7 @@ public class TestGermplasmDataManagerImpl
 	public void testCountGermplasmByLocationNameUsingEqual() throws Exception
 	{
 		long start = System.currentTimeMillis();
-		int count = manager.countGermplasmByLocationName("Philippines", Operation.EQUAL);
+		int count = manager.countGermplasmByLocationName("Philippines", Operation.EQUAL, Database.CENTRAL);
 		System.out.println("COUNT = " + count);
 		long end = System.currentTimeMillis();
 		System.out.println("QUERY TIME: " + (end - start) + " ms");
@@ -207,7 +207,7 @@ public class TestGermplasmDataManagerImpl
 	public void testFindGermplasmByLocationNameUsingLike() throws Exception
 	{
 		long start = System.currentTimeMillis();
-		List<Germplasm> germplasmList = manager.findGermplasmByLocationName("International%", 0, 5, Operation.LIKE);
+		List<Germplasm> germplasmList = manager.findGermplasmByLocationName("International%", 0, 5, Operation.LIKE, Database.CENTRAL);
 		Assert.assertTrue(germplasmList != null);
 		
 		System.out.println("SEARCH RESULTS");
@@ -223,7 +223,7 @@ public class TestGermplasmDataManagerImpl
 	public void testCountGermplasmByLocationNameUsingLike() throws Exception
 	{
 		long start = System.currentTimeMillis();
-		int count = manager.countGermplasmByLocationName("International%", Operation.LIKE);
+		int count = manager.countGermplasmByLocationName("International%", Operation.LIKE, Database.CENTRAL);
 		System.out.println("COUNT = " + count);
 		long end = System.currentTimeMillis();
 		System.out.println("QUERY TIME: " + (end - start) + " ms");
@@ -233,7 +233,7 @@ public class TestGermplasmDataManagerImpl
 	public void testFindGermplasmByMethodNameUsingEqual() throws Exception
 	{
 		long start = System.currentTimeMillis();
-		List<Germplasm> germplasmList = manager.findGermplasmByMethodName("SINGLE CROSS", 0, 5, Operation.EQUAL);
+		List<Germplasm> germplasmList = manager.findGermplasmByMethodName("SINGLE CROSS", 0, 5, Operation.EQUAL, Database.CENTRAL);
 		Assert.assertTrue(germplasmList != null);
 		
 		System.out.println("SEARCH RESULTS");
@@ -249,7 +249,7 @@ public class TestGermplasmDataManagerImpl
 	public void testCountGermplasmByMethodNameUsingEqual() throws Exception
 	{
 		long start = System.currentTimeMillis();
-		int count = manager.countGermplasmByMethodName("SINGLE CROSS", Operation.EQUAL);
+		int count = manager.countGermplasmByMethodName("SINGLE CROSS", Operation.EQUAL, Database.CENTRAL);
 		System.out.println("COUNT = " + count);
 		long end = System.currentTimeMillis();
 		System.out.println("QUERY TIME: " + (end - start) + " ms");
@@ -259,7 +259,7 @@ public class TestGermplasmDataManagerImpl
 	public void testFindGermplasmByMethodNameUsingLike() throws Exception
 	{
 		long start = System.currentTimeMillis();
-		List<Germplasm> germplasmList = manager.findGermplasmByMethodName("%CROSS%", 0, 5, Operation.LIKE);
+		List<Germplasm> germplasmList = manager.findGermplasmByMethodName("%CROSS%", 0, 5, Operation.LIKE, Database.CENTRAL);
 		Assert.assertTrue(germplasmList != null);
 		
 		System.out.println("SEARCH RESULTS");
@@ -275,7 +275,7 @@ public class TestGermplasmDataManagerImpl
 	public void testCountGermplasmByMethodNameUsingLike() throws Exception
 	{
 		long start = System.currentTimeMillis();
-		int count = manager.countGermplasmByMethodName("%CROSS%", Operation.LIKE);
+		int count = manager.countGermplasmByMethodName("%CROSS%", Operation.LIKE, Database.CENTRAL);
 		System.out.println("COUNT = " + count);
 		long end = System.currentTimeMillis();
 		System.out.println("QUERY TIME: " + (end - start) + " ms");

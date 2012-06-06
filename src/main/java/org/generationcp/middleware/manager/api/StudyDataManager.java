@@ -38,10 +38,11 @@ public interface StudyDataManager
 	 * @param filters
 	 * @param start - the starting index of the sublist of results to be returned
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
+	 * @param instance - the database instance to connect to: Database.CENTRAL, Database.LOCAL
 	 * @return
 	 * @throws QueryException 
 	 */
-	public List<Integer> getGIDSByPhenotypicData(List<TraitCombinationFilter> filters, int start, int numOfRows) throws QueryException;
+	public List<Integer> getGIDSByPhenotypicData(List<TraitCombinationFilter> filters, int start, int numOfRows, Database instance) throws QueryException;
 	
 	/**
 	 * Returns the study records matching the given name

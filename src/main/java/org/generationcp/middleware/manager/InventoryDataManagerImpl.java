@@ -28,17 +28,11 @@ import org.hibernate.Transaction;
  * @author Kevin Manansala
  *
  */
-public class InventoryDataManagerImpl implements InventoryDataManager
+public class InventoryDataManagerImpl extends DataManager implements InventoryDataManager
 {
-	private HibernateUtil hibernateUtilForLocal;
-	private HibernateUtil hibernateUtilForCentral;
-	
-	private static final int JDBC_BATCH_SIZE = 50;
-	
 	public InventoryDataManagerImpl(HibernateUtil hibernateUtilForLocal, HibernateUtil hibernateUtilForCentral)
 	{
-		this.hibernateUtilForLocal = hibernateUtilForLocal;
-		this.hibernateUtilForCentral = hibernateUtilForCentral;
+		super(hibernateUtilForLocal, hibernateUtilForCentral);
 	}
 
 	@Override
@@ -465,12 +459,13 @@ public class InventoryDataManagerImpl implements InventoryDataManager
 	public Person getPersonById(Integer id)
 	{
 		PersonDAO dao = new PersonDAO();
-		if(id < 0 && this.hibernateUtilForLocal != null)
-			dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
-		else if(id > 0 && this.hibernateUtilForCentral != null)
-			dao.setSession(this.hibernateUtilForCentral.getCurrentSession());
-		else
+		HibernateUtil hibernateUtil = getHibernateUtil(id);
+		
+		if (hibernateUtil != null){
+			dao.setSession(hibernateUtil.getCurrentSession());
+		} else {
 			return null;
+		}
 		
 		return dao.findById(id, false);
 	}

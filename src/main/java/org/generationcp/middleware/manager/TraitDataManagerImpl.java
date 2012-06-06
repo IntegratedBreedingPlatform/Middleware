@@ -14,47 +14,48 @@ import org.generationcp.middleware.pojos.Scale;
 import org.generationcp.middleware.pojos.ScaleContinuous;
 import org.generationcp.middleware.pojos.ScaleDiscrete;
 import org.generationcp.middleware.pojos.ScaleDiscretePK;
+import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.pojos.Trait;
 import org.generationcp.middleware.pojos.TraitMethod;
 import org.generationcp.middleware.util.HibernateUtil;
 import org.hibernate.Session;
 
-public class TraitDataManagerImpl implements TraitDataManager
+public class TraitDataManagerImpl extends DataManager implements TraitDataManager
 {
-	private HibernateUtil hibernateUtilForLocal;
-	private HibernateUtil hibernateUtilForCentral;
-	
 	public TraitDataManagerImpl(HibernateUtil hibernateUtilForLocal, HibernateUtil hibernateUtilForCentral)
 	{
-		this.hibernateUtilForLocal = hibernateUtilForLocal;
-		this.hibernateUtilForCentral = hibernateUtilForCentral;
+		super(hibernateUtilForLocal, hibernateUtilForCentral);
 	}
 	
 	@Override
 	public Scale getScaleByID(Integer id)
 	{
 		ScaleDAO dao = new ScaleDAO();
+		HibernateUtil hibernateUtil = getHibernateUtil(id);
 		
-		if(id < 0 && this.hibernateUtilForLocal != null)
-			dao.setSession(hibernateUtilForLocal.getCurrentSession());
-		else if(id > 0 && this.hibernateUtilForCentral != null)
-			dao.setSession(hibernateUtilForCentral.getCurrentSession());
-		else
+		if (hibernateUtil != null){
+			dao.setSession(hibernateUtil.getCurrentSession());
+		} else {
 			return null;
+		}
 		
 		Scale scale = dao.findById(id, false);
 		return scale;
 	}
 
 	@Override
-	public List<Scale> getAllScales(int start, int numOfRows) throws QueryException
+	public List<Scale> getAllScales(int start, int numOfRows, Database instance) throws QueryException
 	{
-		//TODO handle local-central
-		if(this.hibernateUtilForCentral == null)
-			throw new QueryException("This method only works with a connection to a central instance for now.");
 		ScaleDAO dao = new ScaleDAO();
-		dao.setSession(hibernateUtilForCentral.getCurrentSession());
+		HibernateUtil hibernateUtil = getHibernateUtil(instance);
+		
+		if (hibernateUtil != null){
+			dao.setSession(hibernateUtil.getCurrentSession());
+		} else {
+			return null;
+		}
 		return dao.getAll(start, numOfRows);
+
 	}
 	
 	@Override
@@ -83,13 +84,13 @@ public class TraitDataManagerImpl implements TraitDataManager
 	public String getScaleDiscreteDescription(Integer scaleId, String value)
 	{
 		ScaleDiscreteDAO dao = new ScaleDiscreteDAO();
+		HibernateUtil hibernateUtil = getHibernateUtil(scaleId);
 		
-		if(scaleId < 0 && this.hibernateUtilForLocal != null)
-			dao.setSession(hibernateUtilForLocal.getCurrentSession());
-		else if(scaleId > 0 && this.hibernateUtilForCentral != null)
-			dao.setSession(hibernateUtilForCentral.getCurrentSession());
-		else
+		if (hibernateUtil != null){
+			dao.setSession(hibernateUtil.getCurrentSession());
+		} else {
 			return null;
+		}
 		
 		ScaleDiscretePK id = new ScaleDiscretePK();
 		id.setScaleId(scaleId);
@@ -111,13 +112,13 @@ public class TraitDataManagerImpl implements TraitDataManager
 	public List<ScaleDiscrete> getDiscreteValuesOfScale(Integer scaleId)
 	{
 		ScaleDiscreteDAO dao = new ScaleDiscreteDAO();
+		HibernateUtil hibernateUtil = getHibernateUtil(scaleId);
 		
-		if(scaleId < 0 && this.hibernateUtilForLocal != null)
-			dao.setSession(hibernateUtilForLocal.getCurrentSession());
-		else if(scaleId > 0 && this.hibernateUtilForCentral != null)
-			dao.setSession(hibernateUtilForCentral.getCurrentSession());
-		else
+		if (hibernateUtil != null){
+			dao.setSession(hibernateUtil.getCurrentSession());
+		} else {
 			return new ArrayList<ScaleDiscrete>();
+		}
 		
 		return dao.getByScaleId(scaleId);
 	}
@@ -126,13 +127,13 @@ public class TraitDataManagerImpl implements TraitDataManager
 	public ScaleContinuous getRangeOfContinuousScale(Integer scaleId)
 	{
 		ScaleContinuousDAO dao = new ScaleContinuousDAO();
+		HibernateUtil hibernateUtil = getHibernateUtil(scaleId);
 		
-		if(scaleId < 0 && this.hibernateUtilForLocal != null)
-			dao.setSession(hibernateUtilForLocal.getCurrentSession());
-		else if(scaleId > 0 && this.hibernateUtilForCentral != null)
-			dao.setSession(hibernateUtilForCentral.getCurrentSession());
-		else
+		if (hibernateUtil != null){
+			dao.setSession(hibernateUtil.getCurrentSession());
+		} else {
 			return null;
+		}
 		
 		return dao.findById(scaleId, false);
 	}
@@ -141,25 +142,28 @@ public class TraitDataManagerImpl implements TraitDataManager
 	public Trait getTraitById(Integer id)
 	{
 		TraitDAO dao = new TraitDAO();
+		HibernateUtil hibernateUtil = getHibernateUtil(id);
 		
-		if(id < 0 && this.hibernateUtilForLocal != null)
-			dao.setSession(hibernateUtilForLocal.getCurrentSession());
-		else if(id > 0 && this.hibernateUtilForCentral != null)
-			dao.setSession(hibernateUtilForCentral.getCurrentSession());
-		else
+		if (hibernateUtil != null){
+			dao.setSession(hibernateUtil.getCurrentSession());
+		} else {
 			return null;
-		
+		}
+
 		return dao.getByTraitId(id);
 	}
 	
 	@Override
-	public List<Trait> getAllTraits(int start, int numOfRows) throws QueryException
+	public List<Trait> getAllTraits(int start, int numOfRows, Database instance) throws QueryException
 	{
-		//TODO handle local-central
-		if(this.hibernateUtilForCentral == null)
-			throw new QueryException("This method only works with a connection to a central instance for now.");	
 		TraitDAO dao = new TraitDAO();
-		dao.setSession(hibernateUtilForCentral.getCurrentSession());
+		HibernateUtil hibernateUtil = getHibernateUtil(instance);
+		
+		if (hibernateUtil != null){
+			dao.setSession(hibernateUtil.getCurrentSession());
+		} else {
+			return null;
+		}
 		return dao.getAll(start, numOfRows);
 	}
 	
@@ -189,25 +193,29 @@ public class TraitDataManagerImpl implements TraitDataManager
 	public TraitMethod getTraitMethodById(Integer id)
 	{
 		TraitMethodDAO dao = new TraitMethodDAO();
+		HibernateUtil hibernateUtil = getHibernateUtil(id);
 		
-		if(id < 0 && this.hibernateUtilForLocal != null)
-			dao.setSession(hibernateUtilForLocal.getCurrentSession());
-		else if(id > 0 && this.hibernateUtilForCentral != null)
-			dao.setSession(hibernateUtilForCentral.getCurrentSession());
-		else
+		if (hibernateUtil != null){
+			dao.setSession(hibernateUtil.getCurrentSession());
+		} else {
 			return null;
+		}
 		
 		return dao.findById(id, false);
 	}
 	
 	@Override
-	public List<TraitMethod> getAllTraitMethods(int start, int numOfRows) throws QueryException
+	public List<TraitMethod> getAllTraitMethods(int start, int numOfRows, Database instance) throws QueryException
 	{
-		//TODO handle local-central
-		if(this.hibernateUtilForCentral == null)
-			throw new QueryException("This method only works with a connection to a central instance for now.");
 		TraitMethodDAO dao = new TraitMethodDAO();
-		dao.setSession(hibernateUtilForCentral.getCurrentSession());
+		HibernateUtil hibernateUtil = getHibernateUtil(instance);
+		
+		if (hibernateUtil != null){
+			dao.setSession(hibernateUtil.getCurrentSession());
+		} else {
+			return null;
+		}
+
 		return dao.getAll(start, numOfRows);
 	}
 	
@@ -237,13 +245,13 @@ public class TraitDataManagerImpl implements TraitDataManager
 	public List<TraitMethod> getTraitMethodsByTraitId(Integer traitId)
 	{
 		TraitMethodDAO dao = new TraitMethodDAO();
+		HibernateUtil hibernateUtil = getHibernateUtil(traitId);
 		
-		if(traitId < 0 && this.hibernateUtilForLocal != null)
-			dao.setSession(hibernateUtilForLocal.getCurrentSession());
-		else if(traitId > 0 && this.hibernateUtilForCentral != null)
-			dao.setSession(hibernateUtilForCentral.getCurrentSession());
-		else
+		if (hibernateUtil != null){
+			dao.setSession(hibernateUtil.getCurrentSession());
+		} else {
 			return new ArrayList<TraitMethod>();
+		}
 		
 		return dao.getByTraitId(traitId);
 	}
@@ -252,13 +260,13 @@ public class TraitDataManagerImpl implements TraitDataManager
 	public List<Scale> getScalesByTraitId(Integer traitId)
 	{
 		ScaleDAO dao = new ScaleDAO();
+		HibernateUtil hibernateUtil = getHibernateUtil(traitId);
 		
-		if(traitId < 0 && this.hibernateUtilForLocal != null)
-			dao.setSession(hibernateUtilForLocal.getCurrentSession());
-		else if(traitId > 0 && this.hibernateUtilForCentral != null)
-			dao.setSession(hibernateUtilForCentral.getCurrentSession());
-		else
+		if (hibernateUtil != null){
+			dao.setSession(hibernateUtil.getCurrentSession());
+		} else {
 			return new ArrayList<Scale>();
+		}
 		
 		return dao.getByTraitId(traitId);
 	}

@@ -3,6 +3,7 @@ package org.generationcp.middleware.manager.api;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
@@ -28,11 +29,12 @@ public interface GermplasmListManager
 	 * 
 	 * @param start - the starting index of the sublist of results to be returned
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
+	 * @param instance - can either be Database.CENTRAL or Database.LOCAL
 	 * 
 	 * @return List of GermplasmList POJOs
 	 * @throws QueryException
 	 */
-	public List<GermplasmList> getAllGermplasmLists(int start, int numOfRows) throws QueryException;
+	public List<GermplasmList> getAllGermplasmLists(int start, int numOfRows, Database instance) throws QueryException;
 	
 	/**
 	 * Returns the total number of Germplasm Lists.
@@ -49,10 +51,11 @@ public interface GermplasmListManager
 	 * @param start - the starting index of the sublist of results to be returned
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
 	 * @param operation - can be equal or like
+	 * @param instance - can either be Database.CENTRAL or Database.LOCAL
 	 * @return List of GermplasmList POJOs
 	 * @throws QueryException
 	 */
-	public List<GermplasmList> findGermplasmListByName(String name, int start, int numOfRows, Operation operation) throws QueryException;
+	public List<GermplasmList> findGermplasmListByName(String name, int start, int numOfRows, Operation operation, Database instance) throws QueryException;
 	
 	/**
 	 * Returns the number of Germplasm List records with names matching the given
@@ -70,11 +73,12 @@ public interface GermplasmListManager
 	 * @param status
 	 * @param start - the starting index of the sublist of results to be returned
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
+	 * @param instance - can either be Database.CENTRAL or Database.LOCAL
 	 * 
 	 * @return List of Germplasm POJOs
 	 * @throws QueryException
 	 */
-	public List<GermplasmList> findGermplasmListByStatus(Integer status, int start, int numOfRows) throws QueryException;
+	public List<GermplasmList> findGermplasmListByStatus(Integer status, int start, int numOfRows, Database instance) throws QueryException;
 	
 	/**
 	 * Returns the number of Germplasm List records that have the given status.

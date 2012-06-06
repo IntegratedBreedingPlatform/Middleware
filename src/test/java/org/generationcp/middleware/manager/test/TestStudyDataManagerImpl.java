@@ -52,7 +52,7 @@ public class TestStudyDataManagerImpl
 		//TraitCombinationFilter combination2 = new TraitCombinationFilter(new Integer(1007), new Integer(266), new Integer(260), "5");
 		//filters.add(combination2);
 		
-		List<Integer> results = manager.getGIDSByPhenotypicData(filters, 0, 10);
+		List<Integer> results = manager.getGIDSByPhenotypicData(filters, 0, 10, Database.CENTRAL);
 		System.out.println("RESULTS:");
 		for(Integer gid: results)
 			System.out.println(gid);

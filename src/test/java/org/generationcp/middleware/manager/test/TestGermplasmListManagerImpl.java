@@ -3,6 +3,7 @@ package org.generationcp.middleware.manager.test;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.Operation;
@@ -42,7 +43,7 @@ public class TestGermplasmListManagerImpl
 	@Test
 	public void testGetAllGermplasmLists() throws Exception
 	{
-		List<GermplasmList> lists = manager.getAllGermplasmLists(0, 5);
+		List<GermplasmList> lists = manager.getAllGermplasmLists(0, 5, Database.CENTRAL);
 		
 		System.out.println("RESULTS:");
 		for(GermplasmList list : lists)
@@ -60,7 +61,7 @@ public class TestGermplasmListManagerImpl
 	@Test
 	public void testFindGermplasmListByName() throws Exception
 	{
-		List<GermplasmList> lists = manager.findGermplasmListByName("2002%", 0, 5, Operation.LIKE);
+		List<GermplasmList> lists = manager.findGermplasmListByName("2002%", 0, 5, Operation.LIKE, Database.CENTRAL);
 		
 		System.out.println("RESULTS:");
 		for(GermplasmList list : lists)
@@ -78,7 +79,7 @@ public class TestGermplasmListManagerImpl
 	@Test
 	public void testFindGermplasmListByStatus() throws Exception
 	{
-		List<GermplasmList> lists = manager.findGermplasmListByStatus(new Integer(1), 0, 5);
+		List<GermplasmList> lists = manager.findGermplasmListByStatus(new Integer(1), 0, 5, Database.CENTRAL);
 		
 		System.out.println("RESULTS:");
 		for(GermplasmList list : lists)

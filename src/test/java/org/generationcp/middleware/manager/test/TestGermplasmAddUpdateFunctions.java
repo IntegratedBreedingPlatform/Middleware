@@ -263,7 +263,8 @@ public class TestGermplasmAddUpdateFunctions
 		g.setLocationId(new Integer(9000));
 		g.setMethodId(new Integer(1));
 		g.setMgid(new Integer(1));
-		g.setUserId(new Integer(527));
+		//g.setUserId(new Integer(527));
+		g.setUserId(new Integer(1));
 		g.setReferenceId(new Integer(1));
 		
 		Name n = new Name();

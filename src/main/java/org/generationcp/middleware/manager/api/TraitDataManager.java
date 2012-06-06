@@ -3,6 +3,7 @@ package org.generationcp.middleware.manager.api;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.Scale;
 import org.generationcp.middleware.pojos.ScaleContinuous;
 import org.generationcp.middleware.pojos.ScaleDiscrete;
@@ -30,11 +31,12 @@ public interface TraitDataManager
 	 * 
 	 * @param start - the starting index of the sublist of results to be returned
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
+	 * @param instance - can either be Database.CENTRAL or Database.LOCAL
 	 * 
 	 * @return List of Scale POJOs
 	 * @throws QueryException
 	 */
-	public List<Scale> getAllScales(int start, int numOfRows) throws QueryException;
+	public List<Scale> getAllScales(int start, int numOfRows, Database instance) throws QueryException;
 	
 	/**
 	 * Returns the total number of Scale records.
@@ -90,10 +92,11 @@ public interface TraitDataManager
 	 * 
 	 * @param start - the starting index of the sublist of results to be returned
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
+	 * @param instance - can either be Database.CENTRAL or Database.LOCAL
 	 * @return
 	 * @throws QueryException
 	 */
-	public List<Trait> getAllTraits(int start, int numOfRows) throws QueryException;
+	public List<Trait> getAllTraits(int start, int numOfRows, Database instance) throws QueryException;
 	
 	/**
 	 * Returns the total number of Trait records.
@@ -115,11 +118,12 @@ public interface TraitDataManager
 	 * 
 	 * @param start - the starting index of the sublist of results to be returned
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
+	 * @param instance - can either be Database.CENTRAL or Database.LOCAL
 	 * 
 	 * @return List of TraitMethod POJOs
 	 * @throws QueryException
 	 */
-	public List<TraitMethod> getAllTraitMethods(int start, int numOfRows) throws QueryException;
+	public List<TraitMethod> getAllTraitMethods(int start, int numOfRows, Database instance) throws QueryException;
 	
 	/**
 	 * Returns the total number of Trait Method records.

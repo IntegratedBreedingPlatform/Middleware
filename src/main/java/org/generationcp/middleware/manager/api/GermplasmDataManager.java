@@ -83,10 +83,11 @@ public interface GermplasmDataManager
 	 * @param start - the starting index of the sublist of results to be returned
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
 	 * @param op - can be EQUAL like LIKE
+	 * @param instance - can be Database.CENTRAL or Database.LOCAL
 	 * @return List of Germplasm POJOs
 	 * @throws QueryException
 	 */
-	public List<Germplasm> findGermplasmByLocationName(String name, int start, int numOfRows, Operation op) throws QueryException;
+	public List<Germplasm> findGermplasmByLocationName(String name, int start, int numOfRows, Operation op, Database instance) throws QueryException;
 	
 	/**
 	 * Returns the number of germplasm records that were created at the locations with names
@@ -94,9 +95,10 @@ public interface GermplasmDataManager
 	 * 
 	 * @param name - search string for the name or the locations
 	 * @param op - can be EQUAL or LIKE
+	 * @param instance - can be Database.CENTRAL or Database.LOCAL
 	 * @return the number of germplasm records
 	 */
-	public int countGermplasmByLocationName(String name, Operation op) throws QueryException;
+	public int countGermplasmByLocationName(String name, Operation op, Database instance) throws QueryException;
 	
 	/**
 	 * Returns the germplasm records that were created by the methods with names matching
@@ -106,10 +108,11 @@ public interface GermplasmDataManager
 	 * @param start - the starting index of the sublist of results to be returned
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
 	 * @param op - can be EQUAL or LIKE
+	 * @param instance - can be Database.CENTRAL or Database.LOCAL
 	 * @return List of Germplasm POJOS
 	 * @throws QueryException
 	 */
-	public List<Germplasm> findGermplasmByMethodName(String name, int start, int numOfRows, Operation op) throws QueryException;
+	public List<Germplasm> findGermplasmByMethodName(String name, int start, int numOfRows, Operation op, Database instance) throws QueryException;
 	
 	/**
 	 * Returns the number of germplasm records that were created by methods with names matching the given
@@ -117,10 +120,11 @@ public interface GermplasmDataManager
 	 * 
 	 * @param name - search string for the name of the methods
 	 * @param op - can be equal or like
+	 * @param instance - can be Database.CENTRAL or Database.LOCAL
 	 * @return number of germplasm records
 	 * @throws QueryException
 	 */
-	public int countGermplasmByMethodName(String name, Operation op) throws QueryException;
+	public int countGermplasmByMethodName(String name, Operation op, Database instance) throws QueryException;
 	
 	/**
 	 * Returns the germplasm record identified by the given id.

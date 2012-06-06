@@ -3,6 +3,7 @@ package org.generationcp.middleware.manager.test;
 
 import java.util.List;
 
+import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.TraitDataManager;
@@ -40,7 +41,7 @@ public class TestTraitDataManagerImpl
 	@Test
 	public void testGetAllScales() throws Exception
 	{
-		List<Scale> scales = manager.getAllScales(0, 5);
+		List<Scale> scales = manager.getAllScales(0, 5, Database.CENTRAL);
 		
 		System.out.println("RESULTS:");
 		for(Scale scale : scales)
@@ -91,7 +92,7 @@ public class TestTraitDataManagerImpl
 	@Test
 	public void testGetAllTraits() throws Exception
 	{
-		List<Trait> traits = manager.getAllTraits(0, 5);
+		List<Trait> traits = manager.getAllTraits(0, 5, Database.CENTRAL);
 		
 		System.out.println("RESULTS:");
 		for(Trait trait : traits)
@@ -116,7 +117,7 @@ public class TestTraitDataManagerImpl
 	@Test
 	public void testGetAllTraitMethods() throws Exception
 	{
-		List<TraitMethod> traits = manager.getAllTraitMethods(0, 5);
+		List<TraitMethod> traits = manager.getAllTraitMethods(0, 5, Database.CENTRAL);
 		
 		System.out.println("RESULTS:");
 		for(TraitMethod trait : traits)
