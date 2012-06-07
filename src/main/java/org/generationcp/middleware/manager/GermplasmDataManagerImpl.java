@@ -1,6 +1,5 @@
 package org.generationcp.middleware.manager;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +40,7 @@ import org.hibernate.Transaction;
  * @author Kevin Manansala, Lord Hendrix Barboza
  *
  */
-public class GermplasmDataManagerImpl extends DataManager implements GermplasmDataManager
+public class GermplasmDataManagerImpl extends DataManager<Germplasm> implements GermplasmDataManager
 {
 	
 	public GermplasmDataManagerImpl(HibernateUtil hibernateUtilForLocal, HibernateUtil hibernateUtilForCentral)

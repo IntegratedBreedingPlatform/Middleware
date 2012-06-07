@@ -13,6 +13,8 @@
  **************************************************************/
 package org.generationcp.middleware.manager;
 
+import java.util.List;
+
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.util.HibernateUtil;
 
@@ -21,7 +23,7 @@ import org.generationcp.middleware.util.HibernateUtil;
 /**
  * The Class DataManager.
  */
-public class DataManager {
+public abstract class DataManager<T> {
 	
 	/** The hibernate util for local. */
 	protected HibernateUtil hibernateUtilForLocal;
@@ -80,6 +82,16 @@ public class DataManager {
 		return null;
 	}
 
+	// TODO List common methods for all specific manager instances, some commented examples below
+	
+	//abstract List<T> getAll(int start, int numOfRows, Database instance) throws QueryException;
+	
+	//abstract T getByID(Integer id) throws QueryException;
+	
+	//abstract List<T> getByName(int start, int numOfRows, Database instance) throws QueryException;
+	
+	//also consider generic count methods
+	
 	/**
 	 * Utility function that returns the appropriate HibernateUtil based on the given id.
 	 * If the id is negative, hibernateUtilForLocal is returned
