@@ -29,358 +29,389 @@ import org.generationcp.middleware.pojos.TraitCombinationFilter;
 import org.generationcp.middleware.pojos.Variate;
 import org.generationcp.middleware.util.HibernateUtil;
 
-public class StudyDataManagerImpl extends DataManager<Study> implements StudyDataManager{
+public class StudyDataManagerImpl extends DataManager<Study> implements
+	StudyDataManager {
 
-	public StudyDataManagerImpl(HibernateUtil hibernateUtilForLocal, HibernateUtil hibernateUtilForCentral){
-		super(hibernateUtilForLocal, hibernateUtilForCentral);
-	}
+    public StudyDataManagerImpl(HibernateUtil hibernateUtilForLocal,
+	    HibernateUtil hibernateUtilForCentral) {
+	super(hibernateUtilForLocal, hibernateUtilForCentral);
+    }
 
-	
-	@Override
-	public List<Integer> getGIDSByPhenotypicData(List<TraitCombinationFilter> filters, int start, int numOfRows, Database instance) throws QueryException
-	{
-		// TODO Local-Central: Verify if existing implementation for CENTRAL is also applicable to LOCAL		
-		HibernateUtil hibernateUtil  = getHibernateUtil(instance);
-		
-		if (hibernateUtil != null){
-		
-			NumericDataDAO dataNDao = new NumericDataDAO();
-			dataNDao.setSession(hibernateUtil.getCurrentSession());
-			
-			CharacterDataDAO dataCDao = new CharacterDataDAO();
-			dataCDao.setSession(hibernateUtil.getCurrentSession());
-		
-			Set<Integer> ounitIds = new HashSet<Integer>();
-		
-			//first get the observation unit ids for the rows in datasets which has the data specified in the filter
-			//check numeric data
-			ounitIds.addAll(dataNDao.getObservationUnitIdsByTraitScaleMethodAndValueCombinations(filters, start, numOfRows));
-			//check character data
-			ounitIds.addAll(dataCDao.getObservationUnitIdsByTraitScaleMethodAndValueCombinations(filters, start, numOfRows));
-		
-			//use the retrieved observation unit ids to get the GIDs being observed in the rows in datasets identified by the 
-			//observation unit ids
-			if(!ounitIds.isEmpty()){
-				FactorDAO factorDao = new FactorDAO();
-				factorDao.setSession(hibernateUtil.getCurrentSession());
-				
-				Set<Integer> gids = factorDao.getGIDSGivenObservationUnitIds(ounitIds, start, numOfRows*2);
-				List<Integer> toreturn = new ArrayList<Integer>();
-				toreturn.addAll(gids);
-				return toreturn;
-			} else {
-				return new ArrayList<Integer>();
-			}
-		
-		} else {
-			return new ArrayList<Integer>();
-		}
-		
-		
-	}
-	
-	@Override
-	public List<Study> findStudyByName(String name, int start, 
-					int numOfRows, Operation op, Database instance) 
-					throws QueryException{
+    @Override
+    public List<Integer> getGIDSByPhenotypicData(
+	    List<TraitCombinationFilter> filters, int start, int numOfRows,
+	    Database instance) throws QueryException {
+	// TODO Local-Central: Verify if existing implementation for CENTRAL is
+	// also applicable to LOCAL
+	HibernateUtil hibernateUtil = getHibernateUtil(instance);
 
-		StudyDAO dao = new StudyDAO();
-		HibernateUtil hibernateUtil = getHibernateUtil(instance);
-		
-		if (hibernateUtil != null){
-			dao.setSession(hibernateUtil.getCurrentSession());
-		} else {
-			return new ArrayList<Study>();
-		}
-		
-		List<Study> studyList = null;		
-		if(op == Operation.EQUAL){
-			studyList = dao.findByNameUsingEqual(name, start, numOfRows);
-		}else if(op == Operation.LIKE){
-			studyList = dao.findByNameUsingLike(name, start, numOfRows);
-		}
-		
-		return studyList;
-		
-	}
-	
-	@Override
-	public int countStudyByName(String name, Operation op, Database instance) 
-					throws QueryException{
+	if (hibernateUtil != null) {
 
-		StudyDAO dao = new StudyDAO();
-		HibernateUtil hibernateUtil = getHibernateUtil(instance);
-		
-		if (hibernateUtil != null){
-			dao.setSession(hibernateUtil.getCurrentSession());
-		} else {
-			return 0;
-		}
-	
-		return dao.countByName(name, op);
+	    NumericDataDAO dataNDao = new NumericDataDAO();
+	    dataNDao.setSession(hibernateUtil.getCurrentSession());
 
-	}
-	
-	@Override
-	public Study getStudyByID(Integer id) throws QueryException{
-		StudyDAO dao = new StudyDAO();
-		HibernateUtil hibernateUtil = getHibernateUtil(id);
-		
-		if (hibernateUtil != null){
-			dao.setSession(hibernateUtil.getCurrentSession());
-		} else {
-			return null;
-		}
-		
-		Study study = dao.findById(id, false);
-		return study;
-	}
+	    CharacterDataDAO dataCDao = new CharacterDataDAO();
+	    dataCDao.setSession(hibernateUtil.getCurrentSession());
 
-	
-	
-	@Override
-	public List<Study> getAllTopLevelStudies(int start, int numOfRows, Database instance) throws QueryException {
-		StudyDAO dao = new StudyDAO();
-		
-		HibernateUtil hibernateUtil = getHibernateUtil(instance);
+	    Set<Integer> ounitIds = new HashSet<Integer>();
 
-		if (hibernateUtil != null){
-			dao.setSession(hibernateUtil.getCurrentSession());
-		} else {
-			return new ArrayList<Study>();
-		}
+	    // first get the observation unit ids for the rows in datasets which
+	    // has the data specified in the filter
+	    // check numeric data
+	    ounitIds.addAll(dataNDao
+		    .getObservationUnitIdsByTraitScaleMethodAndValueCombinations(
+			    filters, start, numOfRows));
+	    // check character data
+	    ounitIds.addAll(dataCDao
+		    .getObservationUnitIdsByTraitScaleMethodAndValueCombinations(
+			    filters, start, numOfRows));
 
-		
-		List<Study> topLevelStudies = dao.getTopLevelStudies(start, numOfRows);
-		
-		return topLevelStudies;
-	}
-	
-	@Override
-	public List<Study> getStudiesByParentFolderID(Integer parentFolderId, int start, int numOfRows) throws QueryException {
-		StudyDAO dao = new StudyDAO();
-		
-		HibernateUtil hibernateUtil = getHibernateUtil(parentFolderId);
-
-		if (hibernateUtil != null){
-			dao.setSession(hibernateUtil.getCurrentSession());
-		} else {
-			return new ArrayList<Study>();
-		}
-		
-		List<Study> studies = dao.getByParentFolderID(parentFolderId, start, numOfRows);
-		
-		return studies;
-	}
-	
-	@Override
-	public List<Variate> getVariatesByStudyID(Integer studyId) throws QueryException{
-		
-		VariateDAO variateDao = new VariateDAO();
-		HibernateUtil hibernateUtil = getHibernateUtil(studyId);
-
-		if (hibernateUtil != null){
-			variateDao.setSession(hibernateUtil.getCurrentSession());
-		} else {
-			return new ArrayList<Variate>();
-		}
-		
-		List<Variate> variates = variateDao.getByStudyID(studyId);
-		return variates;
-		
-	}
-
-	@Override
-	public List<StudyEffect> getEffectsByStudyID(Integer studyId) throws QueryException{
-		
-		StudyEffectDAO studyEffectDao = new StudyEffectDAO();
-		HibernateUtil hibernateUtil = getHibernateUtil(studyId);
-
-		if (hibernateUtil != null){
-			studyEffectDao.setSession(hibernateUtil.getCurrentSession());
-		} else {
-			return new ArrayList<StudyEffect>();
-		}
-		
-		List<StudyEffect> studyEffect = studyEffectDao.getByStudyID(studyId);
-		return studyEffect;
-		
-	}
-	
-	@Override
-	public List<Factor> getFactorsByStudyID(Integer studyId) throws QueryException{
-		
+	    // use the retrieved observation unit ids to get the GIDs being
+	    // observed in the rows in datasets identified by the
+	    // observation unit ids
+	    if (!ounitIds.isEmpty()) {
 		FactorDAO factorDao = new FactorDAO();
-		HibernateUtil hibernateUtil = getHibernateUtil(studyId);
+		factorDao.setSession(hibernateUtil.getCurrentSession());
 
-		if (hibernateUtil != null){
-			factorDao.setSession(hibernateUtil.getCurrentSession());
-		} else {
-			return new ArrayList<Factor>();
-		}
+		Set<Integer> gids = factorDao.getGIDSGivenObservationUnitIds(
+			ounitIds, start, numOfRows * 2);
+		List<Integer> toreturn = new ArrayList<Integer>();
+		toreturn.addAll(gids);
+		return toreturn;
+	    } else {
+		return new ArrayList<Integer>();
+	    }
 
-		List<Factor> factors = factorDao.getByStudyID(studyId);
-		return factors;
-	}
-
-	@Override
-	public List<Representation> getRepresentationByEffectID(Integer effectId)
-			throws QueryException {
-		RepresentationDAO representationDao = new RepresentationDAO();
-		HibernateUtil hibernateUtil = getHibernateUtil(effectId);
-
-		if (hibernateUtil != null){
-			representationDao.setSession(hibernateUtil.getCurrentSession());
-		} else {
-			return new ArrayList<Representation>();
-		}
-
-		List<Representation> representations = representationDao.getRepresentationByEffectID(effectId);
-		return representations;
+	} else {
+	    return new ArrayList<Integer>();
 	}
 
-	@Override
-	public List<Factor> getFactorsByRepresentationId(Integer representationId) throws QueryException {
-		FactorDAO dao = new FactorDAO();
-		
-		HibernateUtil hibernateUtil = getHibernateUtil(representationId);
-		
-		if (hibernateUtil != null) {
-			dao.setSession(hibernateUtil.getCurrentSession());
-		} else {
-			return new ArrayList<Factor>();
-		}
-		
-		List<Factor> factors = dao.getByRepresentationID(representationId);
-		
-		return factors;
+    }
+
+    @Override
+    public List<Study> findStudyByName(String name, int start, int numOfRows,
+	    Operation op, Database instance) throws QueryException {
+
+	StudyDAO dao = new StudyDAO();
+	HibernateUtil hibernateUtil = getHibernateUtil(instance);
+
+	if (hibernateUtil != null) {
+	    dao.setSession(hibernateUtil.getCurrentSession());
+	} else {
+	    return new ArrayList<Study>();
 	}
-	
-	@Override
-	public Long countOunitIDsByRepresentationId(Integer representationId) throws QueryException {
-		OindexDAO dao = new OindexDAO();
-		
-		HibernateUtil hibernateUtil = getHibernateUtil(representationId);
-		
-		if (hibernateUtil != null) {
-			dao.setSession(hibernateUtil.getCurrentSession());
-		} else {
-			return new Long(0);
-		}
-		
-		Long ounitIdCount = dao.countOunitIDsByRepresentationId(representationId);
-		
-		return ounitIdCount;
+
+	List<Study> studyList = null;
+	if (op == Operation.EQUAL) {
+	    studyList = dao.findByNameUsingEqual(name, start, numOfRows);
+	} else if (op == Operation.LIKE) {
+	    studyList = dao.findByNameUsingLike(name, start, numOfRows);
 	}
-	
-	@Override
-	public List<Integer> getOunitIDsByRepresentationId(Integer representationId, int start, int numOfRows) throws QueryException {
-		OindexDAO dao = new OindexDAO();
-		
-		HibernateUtil hibernateUtil = getHibernateUtil(representationId);
-		
-		if (hibernateUtil != null) {
-			dao.setSession(hibernateUtil.getCurrentSession());
-		} else {
-			return new ArrayList<Integer>();
-		}
-		
-		List<Integer> ounitIDs = dao.getOunitIDsByRepresentationId(representationId, start, numOfRows);
-		
-		return ounitIDs;
+
+	return studyList;
+
+    }
+
+    @Override
+    public int countStudyByName(String name, Operation op, Database instance)
+	    throws QueryException {
+
+	StudyDAO dao = new StudyDAO();
+	HibernateUtil hibernateUtil = getHibernateUtil(instance);
+
+	if (hibernateUtil != null) {
+	    dao.setSession(hibernateUtil.getCurrentSession());
+	} else {
+	    return 0;
 	}
-	
-	@Override
-	public List<Variate> getVariatesByRepresentationId(Integer representationId) throws QueryException {
-		VariateDAO dao = new VariateDAO();
-		
-		HibernateUtil hibernateUtil = getHibernateUtil(representationId);
-		
-		if (hibernateUtil != null) {
-			dao.setSession(hibernateUtil.getCurrentSession());
-		} else {
-			return new ArrayList<Variate>();
-		}
-		
-		List<Variate> variates = dao.getByRepresentationId(representationId);
-		
-		return variates;
+
+	return dao.countByName(name, op);
+
+    }
+
+    @Override
+    public Study getStudyByID(Integer id) throws QueryException {
+	StudyDAO dao = new StudyDAO();
+	HibernateUtil hibernateUtil = getHibernateUtil(id);
+
+	if (hibernateUtil != null) {
+	    dao.setSession(hibernateUtil.getCurrentSession());
+	} else {
+	    return null;
 	}
-	
-	@Override
-	public List<NumericDataElement> getNumericDataValuesByOunitIdList(List<Integer> ounitIdList) throws QueryException {
-		NumericDataDAO dao = new NumericDataDAO();
-		
-		//get 1st element from list to check whether the list is for the Central instance or the Local instance
-		Integer sampleId = ounitIdList.get(0);
-		HibernateUtil hibernateUtil = getHibernateUtil(sampleId);
-		
-		if (hibernateUtil != null) {
-			dao.setSession(hibernateUtil.getCurrentSession());
-		} else {
-			return new ArrayList<NumericDataElement>();
-		}
-		
-		List<NumericDataElement> numDataValues = dao.getValuesByOunitIDList(ounitIdList);
-		
-		return numDataValues;
+
+	Study study = dao.findById(id, false);
+	return study;
+    }
+
+    @Override
+    public List<Study> getAllTopLevelStudies(int start, int numOfRows,
+	    Database instance) throws QueryException {
+	StudyDAO dao = new StudyDAO();
+
+	HibernateUtil hibernateUtil = getHibernateUtil(instance);
+
+	if (hibernateUtil != null) {
+	    dao.setSession(hibernateUtil.getCurrentSession());
+	} else {
+	    return new ArrayList<Study>();
 	}
-	
-	@Override
-	public List<CharacterDataElement> getCharacterDataValuesByOunitIdList(List<Integer> ounitIdList) throws QueryException {
-		CharacterDataDAO dao = new CharacterDataDAO();
-		
-		//get 1st element from list to check whether the list is for the Central instance or the Local instance
-		Integer sampleId = ounitIdList.get(0);
-		HibernateUtil hibernateUtil = getHibernateUtil(sampleId);
-		
-		if (hibernateUtil != null) {
-			dao.setSession(hibernateUtil.getCurrentSession());
-		} else {
-			return new ArrayList<CharacterDataElement>();
-		}
-		
-		List<CharacterDataElement> charDataValues = dao.getValuesByOunitIDList(ounitIdList);
-		
-		return charDataValues;
+
+	List<Study> topLevelStudies = dao.getTopLevelStudies(start, numOfRows);
+
+	return topLevelStudies;
+    }
+
+    @Override
+    public List<Study> getStudiesByParentFolderID(Integer parentFolderId,
+	    int start, int numOfRows) throws QueryException {
+	StudyDAO dao = new StudyDAO();
+
+	HibernateUtil hibernateUtil = getHibernateUtil(parentFolderId);
+
+	if (hibernateUtil != null) {
+	    dao.setSession(hibernateUtil.getCurrentSession());
+	} else {
+	    return new ArrayList<Study>();
 	}
-	
-	@Override
-	public List<NumericLevelElement> getNumericLevelValuesByOunitIdList(List<Integer> ounitIdList) throws QueryException {
-		NumericLevelDAO dao = new NumericLevelDAO();
-		
-		//get 1st element from list to check whether the list is for the Central instance or the Local instance
-		Integer sampleId = ounitIdList.get(0);
-		HibernateUtil hibernateUtil = getHibernateUtil(sampleId);
-		
-		if (hibernateUtil != null) {
-			dao.setSession(hibernateUtil.getCurrentSession());
-		} else {
-			return new ArrayList<NumericLevelElement>();
-		}
-		
-		List<NumericLevelElement> numLevelValues = dao.getValuesByOunitIDList(ounitIdList);
-		
-		return numLevelValues;
+
+	List<Study> studies = dao.getByParentFolderID(parentFolderId, start,
+		numOfRows);
+
+	return studies;
+    }
+
+    @Override
+    public List<Variate> getVariatesByStudyID(Integer studyId)
+	    throws QueryException {
+
+	VariateDAO variateDao = new VariateDAO();
+	HibernateUtil hibernateUtil = getHibernateUtil(studyId);
+
+	if (hibernateUtil != null) {
+	    variateDao.setSession(hibernateUtil.getCurrentSession());
+	} else {
+	    return new ArrayList<Variate>();
 	}
-	
-	@Override
-	public List<CharacterLevelElement> getCharacterLevelValuesByOunitIdList(List<Integer> ounitIdList) throws QueryException {
-		CharacterLevelDAO dao = new CharacterLevelDAO();
-		
-		//get 1st element from list to check whether the list is for the Central instance or the Local instance
-		Integer sampleId = ounitIdList.get(0);
-		HibernateUtil hibernateUtil = getHibernateUtil(sampleId);
-		
-		if (hibernateUtil != null) {
-			dao.setSession(hibernateUtil.getCurrentSession());
-		} else {
-			return new ArrayList<CharacterLevelElement>();
-		}
-		
-		List<CharacterLevelElement> charLevelValues = dao.getValuesByOunitIDList(ounitIdList);
-		
-		return charLevelValues;
+
+	List<Variate> variates = variateDao.getByStudyID(studyId);
+	return variates;
+
+    }
+
+    @Override
+    public List<StudyEffect> getEffectsByStudyID(Integer studyId)
+	    throws QueryException {
+
+	StudyEffectDAO studyEffectDao = new StudyEffectDAO();
+	HibernateUtil hibernateUtil = getHibernateUtil(studyId);
+
+	if (hibernateUtil != null) {
+	    studyEffectDao.setSession(hibernateUtil.getCurrentSession());
+	} else {
+	    return new ArrayList<StudyEffect>();
 	}
+
+	List<StudyEffect> studyEffect = studyEffectDao.getByStudyID(studyId);
+	return studyEffect;
+
+    }
+
+    @Override
+    public List<Factor> getFactorsByStudyID(Integer studyId)
+	    throws QueryException {
+
+	FactorDAO factorDao = new FactorDAO();
+	HibernateUtil hibernateUtil = getHibernateUtil(studyId);
+
+	if (hibernateUtil != null) {
+	    factorDao.setSession(hibernateUtil.getCurrentSession());
+	} else {
+	    return new ArrayList<Factor>();
+	}
+
+	List<Factor> factors = factorDao.getByStudyID(studyId);
+	return factors;
+    }
+
+    @Override
+    public List<Representation> getRepresentationByEffectID(Integer effectId)
+	    throws QueryException {
+	RepresentationDAO representationDao = new RepresentationDAO();
+	HibernateUtil hibernateUtil = getHibernateUtil(effectId);
+
+	if (hibernateUtil != null) {
+	    representationDao.setSession(hibernateUtil.getCurrentSession());
+	} else {
+	    return new ArrayList<Representation>();
+	}
+
+	List<Representation> representations = representationDao
+		.getRepresentationByEffectID(effectId);
+	return representations;
+    }
+
+    @Override
+    public List<Factor> getFactorsByRepresentationId(Integer representationId)
+	    throws QueryException {
+	FactorDAO dao = new FactorDAO();
+
+	HibernateUtil hibernateUtil = getHibernateUtil(representationId);
+
+	if (hibernateUtil != null) {
+	    dao.setSession(hibernateUtil.getCurrentSession());
+	} else {
+	    return new ArrayList<Factor>();
+	}
+
+	List<Factor> factors = dao.getByRepresentationID(representationId);
+
+	return factors;
+    }
+
+    @Override
+    public Long countOunitIDsByRepresentationId(Integer representationId)
+	    throws QueryException {
+	OindexDAO dao = new OindexDAO();
+
+	HibernateUtil hibernateUtil = getHibernateUtil(representationId);
+
+	if (hibernateUtil != null) {
+	    dao.setSession(hibernateUtil.getCurrentSession());
+	} else {
+	    return new Long(0);
+	}
+
+	Long ounitIdCount = dao
+		.countOunitIDsByRepresentationId(representationId);
+
+	return ounitIdCount;
+    }
+
+    @Override
+    public List<Integer> getOunitIDsByRepresentationId(
+	    Integer representationId, int start, int numOfRows)
+	    throws QueryException {
+	OindexDAO dao = new OindexDAO();
+
+	HibernateUtil hibernateUtil = getHibernateUtil(representationId);
+
+	if (hibernateUtil != null) {
+	    dao.setSession(hibernateUtil.getCurrentSession());
+	} else {
+	    return new ArrayList<Integer>();
+	}
+
+	List<Integer> ounitIDs = dao.getOunitIDsByRepresentationId(
+		representationId, start, numOfRows);
+
+	return ounitIDs;
+    }
+
+    @Override
+    public List<Variate> getVariatesByRepresentationId(Integer representationId)
+	    throws QueryException {
+	VariateDAO dao = new VariateDAO();
+
+	HibernateUtil hibernateUtil = getHibernateUtil(representationId);
+
+	if (hibernateUtil != null) {
+	    dao.setSession(hibernateUtil.getCurrentSession());
+	} else {
+	    return new ArrayList<Variate>();
+	}
+
+	List<Variate> variates = dao.getByRepresentationId(representationId);
+
+	return variates;
+    }
+
+    @Override
+    public List<NumericDataElement> getNumericDataValuesByOunitIdList(
+	    List<Integer> ounitIdList) throws QueryException {
+	NumericDataDAO dao = new NumericDataDAO();
+
+	// get 1st element from list to check whether the list is for the
+	// Central instance or the Local instance
+	Integer sampleId = ounitIdList.get(0);
+	HibernateUtil hibernateUtil = getHibernateUtil(sampleId);
+
+	if (hibernateUtil != null) {
+	    dao.setSession(hibernateUtil.getCurrentSession());
+	} else {
+	    return new ArrayList<NumericDataElement>();
+	}
+
+	List<NumericDataElement> numDataValues = dao
+		.getValuesByOunitIDList(ounitIdList);
+
+	return numDataValues;
+    }
+
+    @Override
+    public List<CharacterDataElement> getCharacterDataValuesByOunitIdList(
+	    List<Integer> ounitIdList) throws QueryException {
+	CharacterDataDAO dao = new CharacterDataDAO();
+
+	// get 1st element from list to check whether the list is for the
+	// Central instance or the Local instance
+	Integer sampleId = ounitIdList.get(0);
+	HibernateUtil hibernateUtil = getHibernateUtil(sampleId);
+
+	if (hibernateUtil != null) {
+	    dao.setSession(hibernateUtil.getCurrentSession());
+	} else {
+	    return new ArrayList<CharacterDataElement>();
+	}
+
+	List<CharacterDataElement> charDataValues = dao
+		.getValuesByOunitIDList(ounitIdList);
+
+	return charDataValues;
+    }
+
+    @Override
+    public List<NumericLevelElement> getNumericLevelValuesByOunitIdList(
+	    List<Integer> ounitIdList) throws QueryException {
+	NumericLevelDAO dao = new NumericLevelDAO();
+
+	// get 1st element from list to check whether the list is for the
+	// Central instance or the Local instance
+	Integer sampleId = ounitIdList.get(0);
+	HibernateUtil hibernateUtil = getHibernateUtil(sampleId);
+
+	if (hibernateUtil != null) {
+	    dao.setSession(hibernateUtil.getCurrentSession());
+	} else {
+	    return new ArrayList<NumericLevelElement>();
+	}
+
+	List<NumericLevelElement> numLevelValues = dao
+		.getValuesByOunitIDList(ounitIdList);
+
+	return numLevelValues;
+    }
+
+    @Override
+    public List<CharacterLevelElement> getCharacterLevelValuesByOunitIdList(
+	    List<Integer> ounitIdList) throws QueryException {
+	CharacterLevelDAO dao = new CharacterLevelDAO();
+
+	// get 1st element from list to check whether the list is for the
+	// Central instance or the Local instance
+	Integer sampleId = ounitIdList.get(0);
+	HibernateUtil hibernateUtil = getHibernateUtil(sampleId);
+
+	if (hibernateUtil != null) {
+	    dao.setSession(hibernateUtil.getCurrentSession());
+	} else {
+	    return new ArrayList<CharacterLevelElement>();
+	}
+
+	List<CharacterLevelElement> charLevelValues = dao
+		.getValuesByOunitIDList(ounitIdList);
+
+	return charLevelValues;
+    }
 
 }

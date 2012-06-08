@@ -13,250 +13,223 @@ import javax.persistence.Table;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-
-@NamedQueries
-({
-	@NamedQuery
-	(
-		name = "findStudyByNameUsingEqual",
-		query = "SELECT s FROM Study s WHERE s.name = :name"
-	),
-	@NamedQuery
-	(
-		name = "findStudyByNameUsingLike",
-		query = "SELECT s FROM Study s WHERE s.name like :name"
-	),
-	@NamedQuery
-	(
-		name = "countStudyByNameUsingEqual",
-		query = "SELECT COUNT(s) FROM Study s WHERE s.name = :name"
-	),
-	@NamedQuery
-	(
-		name = "countStudyByNameUsingLike",
-		query = "SELECT COUNT(s) FROM Study s WHERE s.name like :name"
-	)
+@NamedQueries({
+	@NamedQuery(name = "findStudyByNameUsingEqual", query = "SELECT s FROM Study s WHERE s.name = :name"),
+	@NamedQuery(name = "findStudyByNameUsingLike", query = "SELECT s FROM Study s WHERE s.name like :name"),
+	@NamedQuery(name = "countStudyByNameUsingEqual", query = "SELECT COUNT(s) FROM Study s WHERE s.name = :name"),
+	@NamedQuery(name = "countStudyByNameUsingLike", query = "SELECT COUNT(s) FROM Study s WHERE s.name like :name")
 
 })
-
 @Entity
 @Table(name = "study")
-public class Study implements Serializable 
-{
-	private static final long serialVersionUID = -8809692556025457504L;
+public class Study implements Serializable {
+    private static final long serialVersionUID = -8809692556025457504L;
 
     public static final String FIND_BY_NAME_USING_EQUAL = "findStudyByNameUsingEqual";
     public static final String FIND_BY_NAME_USING_LIKE = "findStudyByNameUsingLike";
     public static final String COUNT_BY_NAME_USING_EQUAL = "countStudyByNameUsingEqual";
     public static final String COUNT_BY_NAME_USING_LIKE = "countStudyByNameUsingLike";
 
-	@Id
-	@Basic(optional = false)
-	@Column(name = "studyid")
-	private Integer id;
-	
-	@Basic(optional = false)
-	@Column(name = "sname")
-	private String name;
-	
-	@Basic(optional = false)
-	@Column(name = "pmkey")
-	private Integer projectKey;
-	
-	@Basic(optional = false)
-	@Column(name = "title")
-	private String title;
-	
-	@Column(name = "objectiv")
-	private String objective;
-	
-	@Basic(optional = false)
-	@Column(name = "investid")
-	private Integer primaryInvestigator;
-	
-	@Column(name = "stype")
-	private String type;
-	
-	@Column(name = "sdate")
-	private Integer startDate;
-	
-	@Column(name = "edate")
-	private Integer endDate;
-	
-	@Column(name = "userid")
-	private Integer user;
-	
-	@Basic(optional = false)
-	@Column(name = "sstatus")
-	private Integer status;
-	
-	@Basic(optional = false)
-	@Column(name = "shierarchy")
-	private Integer hierarchy;
-	
-	@Column(name = "studydate")
-	private Integer creationDate;
-	
-	public Study()
-	{
-	}
+    @Id
+    @Basic(optional = false)
+    @Column(name = "studyid")
+    private Integer id;
 
-	public Study(Integer id, String name, Integer projectKey, String title,
-			String objective, Integer primaryInvestigator, String type,
-			Integer startDate, Integer endDate, Integer user, Integer status,
-			Integer hierarchy, Integer creationDate) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.projectKey = projectKey;
-		this.title = title;
-		this.objective = objective;
-		this.primaryInvestigator = primaryInvestigator;
-		this.type = type;
-		this.startDate = startDate;
-		this.endDate = endDate;
-		this.user = user;
-		this.status = status;
-		this.hierarchy = hierarchy;
-		this.creationDate = creationDate;
-	}
+    @Basic(optional = false)
+    @Column(name = "sname")
+    private String name;
 
-	public Integer getId() {
-		return id;
-	}
+    @Basic(optional = false)
+    @Column(name = "pmkey")
+    private Integer projectKey;
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+    @Basic(optional = false)
+    @Column(name = "title")
+    private String title;
 
-	public String getName() {
-		return name;
-	}
+    @Column(name = "objectiv")
+    private String objective;
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    @Basic(optional = false)
+    @Column(name = "investid")
+    private Integer primaryInvestigator;
 
-	public Integer getProjectKey() {
-		return projectKey;
-	}
+    @Column(name = "stype")
+    private String type;
 
-	public void setProjectKey(Integer projectKey) {
-		this.projectKey = projectKey;
-	}
+    @Column(name = "sdate")
+    private Integer startDate;
 
-	public String getTitle() {
-		return title;
-	}
+    @Column(name = "edate")
+    private Integer endDate;
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    @Column(name = "userid")
+    private Integer user;
 
-	public String getObjective() {
-		return objective;
-	}
+    @Basic(optional = false)
+    @Column(name = "sstatus")
+    private Integer status;
 
-	public void setObjective(String objective) {
-		this.objective = objective;
-	}
+    @Basic(optional = false)
+    @Column(name = "shierarchy")
+    private Integer hierarchy;
 
-	public Integer getPrimaryInvestigator() {
-		return primaryInvestigator;
-	}
+    @Column(name = "studydate")
+    private Integer creationDate;
 
-	public void setPrimaryInvestigator(Integer primaryInvestigator) {
-		this.primaryInvestigator = primaryInvestigator;
-	}
+    public Study() {
+    }
 
-	public String getType() {
-		return type;
-	}
+    public Study(Integer id, String name, Integer projectKey, String title,
+	    String objective, Integer primaryInvestigator, String type,
+	    Integer startDate, Integer endDate, Integer user, Integer status,
+	    Integer hierarchy, Integer creationDate) {
+	super();
+	this.id = id;
+	this.name = name;
+	this.projectKey = projectKey;
+	this.title = title;
+	this.objective = objective;
+	this.primaryInvestigator = primaryInvestigator;
+	this.type = type;
+	this.startDate = startDate;
+	this.endDate = endDate;
+	this.user = user;
+	this.status = status;
+	this.hierarchy = hierarchy;
+	this.creationDate = creationDate;
+    }
 
-	public void setType(String type) {
-		this.type = type;
-	}
+    public Integer getId() {
+	return id;
+    }
 
-	public Integer getStartDate() {
-		return startDate;
-	}
+    public void setId(Integer id) {
+	this.id = id;
+    }
 
-	public void setStartDate(Integer startDate) {
-		this.startDate = startDate;
-	}
+    public String getName() {
+	return name;
+    }
 
-	public Integer getEndDate() {
-		return endDate;
-	}
+    public void setName(String name) {
+	this.name = name;
+    }
 
-	public void setEndDate(Integer endDate) {
-		this.endDate = endDate;
-	}
+    public Integer getProjectKey() {
+	return projectKey;
+    }
 
-	public Integer getUser() {
-		return user;
-	}
+    public void setProjectKey(Integer projectKey) {
+	this.projectKey = projectKey;
+    }
 
-	public void setUser(Integer user) {
-		this.user = user;
-	}
+    public String getTitle() {
+	return title;
+    }
 
-	public Integer getStatus() {
-		return status;
-	}
+    public void setTitle(String title) {
+	this.title = title;
+    }
 
-	public void setStatus(Integer status) {
-		this.status = status;
-	}
+    public String getObjective() {
+	return objective;
+    }
 
-	public Integer getHierarchy() {
-		return hierarchy;
-	}
+    public void setObjective(String objective) {
+	this.objective = objective;
+    }
 
-	public void setHierarchy(Integer hierarchy) {
-		this.hierarchy = hierarchy;
-	}
+    public Integer getPrimaryInvestigator() {
+	return primaryInvestigator;
+    }
 
-	public Integer getCreationDate() {
-		return creationDate;
-	}
+    public void setPrimaryInvestigator(Integer primaryInvestigator) {
+	this.primaryInvestigator = primaryInvestigator;
+    }
 
-	public void setCreationDate(Integer creationDate) {
-		this.creationDate = creationDate;
-	}
+    public String getType() {
+	return type;
+    }
 
-	@Override
-	public String toString() {
-		return "Study [id=" + id + ", name=" + name + ", projectKey="
-				+ projectKey + ", title=" + title + ", objective=" + objective
-				+ ", primaryInvestigator=" + primaryInvestigator + ", type="
-				+ type + ", startDate=" + startDate + ", endDate=" + endDate
-				+ ", user=" + user + ", status=" + status + ", hierarchy="
-				+ hierarchy + ", creationDate=" + creationDate + "]";
-	}
-	
-	@Override
-	public boolean equals(Object obj) 
-	{
-	   if (obj == null)
-		   return false;
-	   if (obj == this) 
-		   return true; 
-	   if (!(obj instanceof Study)) 
-		   return false;
-	
-	   Study rhs = (Study) obj;
-	   return new EqualsBuilder()
-	                 .appendSuper(super.equals(obj))
-	                 .append(id, rhs.id)
-	                 .isEquals();
-	}
-	
-	@Override
-	public int hashCode() 
-	{
-	     return new HashCodeBuilder(19, 27).
-	       append(id).
-	       toHashCode();
-	}
+    public void setType(String type) {
+	this.type = type;
+    }
+
+    public Integer getStartDate() {
+	return startDate;
+    }
+
+    public void setStartDate(Integer startDate) {
+	this.startDate = startDate;
+    }
+
+    public Integer getEndDate() {
+	return endDate;
+    }
+
+    public void setEndDate(Integer endDate) {
+	this.endDate = endDate;
+    }
+
+    public Integer getUser() {
+	return user;
+    }
+
+    public void setUser(Integer user) {
+	this.user = user;
+    }
+
+    public Integer getStatus() {
+	return status;
+    }
+
+    public void setStatus(Integer status) {
+	this.status = status;
+    }
+
+    public Integer getHierarchy() {
+	return hierarchy;
+    }
+
+    public void setHierarchy(Integer hierarchy) {
+	this.hierarchy = hierarchy;
+    }
+
+    public Integer getCreationDate() {
+	return creationDate;
+    }
+
+    public void setCreationDate(Integer creationDate) {
+	this.creationDate = creationDate;
+    }
+
+    @Override
+    public String toString() {
+	return "Study [id=" + id + ", name=" + name + ", projectKey="
+		+ projectKey + ", title=" + title + ", objective=" + objective
+		+ ", primaryInvestigator=" + primaryInvestigator + ", type="
+		+ type + ", startDate=" + startDate + ", endDate=" + endDate
+		+ ", user=" + user + ", status=" + status + ", hierarchy="
+		+ hierarchy + ", creationDate=" + creationDate + "]";
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+	if (obj == null)
+	    return false;
+	if (obj == this)
+	    return true;
+	if (!(obj instanceof Study))
+	    return false;
+
+	Study rhs = (Study) obj;
+	return new EqualsBuilder().appendSuper(super.equals(obj))
+		.append(id, rhs.id).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+	return new HashCodeBuilder(19, 27).append(id).toHashCode();
+    }
 }

@@ -20,288 +20,255 @@ import org.hibernate.annotations.NotFoundAction;
 
 /**
  * POJO for bibrefs table
+ * 
  * @author Kevin Manansala, Mark Agarrado
  */
 @Entity
 @Table(name = "bibrefs")
 // JAXB Element Tags for JSON output
 @XmlRootElement(name = "bibref")
-@XmlType(propOrder = {"refid", "typeFname", "pubdate", "authors", "editors", "analyt", "series", 
-		"volume", "issue", "publish", "pucity", "pucntry"})
+@XmlType(propOrder = { "refid", "typeFname", "pubdate", "authors", "editors",
+	"analyt", "series", "volume", "issue", "publish", "pucity", "pucntry" })
 @XmlAccessorType(XmlAccessType.NONE)
-public class Bibref implements Serializable 
-{
+public class Bibref implements Serializable {
     private static final long serialVersionUID = 1L;
-    
+
     @Id
     @Basic(optional = false)
     @Column(name = "refid")
     @XmlElement(name = "bibrefId")
     private Integer refid;
-    
+
     @ManyToOne(targetEntity = UserDefinedField.class)
     @JoinColumn(name = "pubtype", nullable = false)
     @NotFound(action = NotFoundAction.IGNORE)
     private UserDefinedField type;
-    
+
     @Column(name = "pubdate")
     @XmlElement(name = "publicationDate")
     private Integer pubdate;
-    
+
     @Basic(optional = false)
     @Column(name = "authors")
     @XmlElement(name = "authors")
     private String authors;
-    
+
     @Basic(optional = false)
     @Column(name = "editors")
     @XmlElement(name = "editors")
     private String editors;
-    
+
     @Basic(optional = false)
     @Column(name = "analyt")
     @XmlElement(name = "title")
     private String analyt;
-    
+
     @Basic(optional = false)
     @Column(name = "monogr")
     private String monogr;
-    
+
     @Basic(optional = false)
     @Column(name = "series")
     @XmlElement(name = "series")
     private String series;
-    
+
     @Basic(optional = false)
     @Column(name = "volume")
     @XmlElement(name = "volume")
     private String volume;
-    
+
     @Basic(optional = false)
     @Column(name = "issue")
     @XmlElement(name = "issue")
     private String issue;
-    
+
     @Basic(optional = false)
     @Column(name = "pagecol")
     private String pagecol;
-    
+
     @Basic(optional = false)
     @Column(name = "publish")
     @XmlElement(name = "publisher")
     private String publish;
-    
+
     @Basic(optional = false)
     @Column(name = "pucity")
     @XmlElement(name = "publishingCity")
     private String pucity;
-    
+
     @Basic(optional = false)
     @Column(name = "pucntry")
     @XmlElement(name = "publishingCountry")
     private String pucntry;
 
-    public Bibref() 
-    {
-    }
-    
-    public Bibref(Integer refid) 
-    {
-        this.refid = refid;
+    public Bibref() {
     }
 
-    public Bibref(Integer refid, String authors, String editors, String analyt, String monogr, String series, String volume, String issue, 
-    		String pagecol, String publish, String pucity, String pucntry) 
-    {
-        this.refid = refid;
-        this.authors = authors;
-        this.editors = editors;
-        this.analyt = analyt;
-        this.monogr = monogr;
-        this.series = series;
-        this.volume = volume;
-        this.issue = issue;
-        this.pagecol = pagecol;
-        this.publish = publish;
-        this.pucity = pucity;
-        this.pucntry = pucntry;
+    public Bibref(Integer refid) {
+	this.refid = refid;
     }
 
-    public Integer getRefid() 
-    {
-        return refid;
+    public Bibref(Integer refid, String authors, String editors, String analyt,
+	    String monogr, String series, String volume, String issue,
+	    String pagecol, String publish, String pucity, String pucntry) {
+	this.refid = refid;
+	this.authors = authors;
+	this.editors = editors;
+	this.analyt = analyt;
+	this.monogr = monogr;
+	this.series = series;
+	this.volume = volume;
+	this.issue = issue;
+	this.pagecol = pagecol;
+	this.publish = publish;
+	this.pucity = pucity;
+	this.pucntry = pucntry;
     }
 
-    public void setRefid(Integer refid) 
-    {
-        this.refid = refid;
+    public Integer getRefid() {
+	return refid;
     }
 
-    public UserDefinedField getType()
-	{
-		return type;
-	}
-    
+    public void setRefid(Integer refid) {
+	this.refid = refid;
+    }
+
+    public UserDefinedField getType() {
+	return type;
+    }
+
     @XmlElement(name = "type")
-    public String getTypeFname()
-    {
-    	return type.getFname();
+    public String getTypeFname() {
+	return type.getFname();
     }
 
-	public void setType(UserDefinedField type)
-	{
-		this.type = type;
-	}
-
-	public Integer getPubdate() 
-    {
-        return pubdate;
+    public void setType(UserDefinedField type) {
+	this.type = type;
     }
 
-    public void setPubdate(Integer pubdate) 
-    {
-        this.pubdate = pubdate;
+    public Integer getPubdate() {
+	return pubdate;
     }
 
-    public String getAuthors() 
-    {
-        return authors;
+    public void setPubdate(Integer pubdate) {
+	this.pubdate = pubdate;
     }
 
-    public void setAuthors(String authors) 
-    {
-        this.authors = authors;
+    public String getAuthors() {
+	return authors;
     }
 
-    public String getEditors() 
-    {
-        return editors;
+    public void setAuthors(String authors) {
+	this.authors = authors;
     }
 
-    public void setEditors(String editors) 
-    {
-        this.editors = editors;
+    public String getEditors() {
+	return editors;
     }
 
-    public String getAnalyt() 
-    {
-        return analyt;
+    public void setEditors(String editors) {
+	this.editors = editors;
     }
 
-    public void setAnalyt(String analyt) 
-    {
-        this.analyt = analyt;
+    public String getAnalyt() {
+	return analyt;
     }
 
-    public String getMonogr() 
-    {
-        return monogr;
+    public void setAnalyt(String analyt) {
+	this.analyt = analyt;
     }
 
-    public void setMonogr(String monogr) 
-    {
-        this.monogr = monogr;
+    public String getMonogr() {
+	return monogr;
     }
 
-    public String getSeries() 
-    {
-        return series;
+    public void setMonogr(String monogr) {
+	this.monogr = monogr;
     }
 
-    public void setSeries(String series) 
-    {
-    	this.series = series;
+    public String getSeries() {
+	return series;
     }
 
-    public String getVolume() 
-    {
-        return volume;
+    public void setSeries(String series) {
+	this.series = series;
     }
 
-    public void setVolume(String volume) 
-    {
-        this.volume = volume;
+    public String getVolume() {
+	return volume;
     }
 
-    public String getIssue() 
-    {
-        return issue;
+    public void setVolume(String volume) {
+	this.volume = volume;
     }
 
-    public void setIssue(String issue) 
-    {
-        this.issue = issue;
+    public String getIssue() {
+	return issue;
     }
 
-    public String getPagecol() 
-    {
-        return pagecol;
+    public void setIssue(String issue) {
+	this.issue = issue;
     }
 
-    public void setPagecol(String pagecol) 
-    {
-        this.pagecol = pagecol;
+    public String getPagecol() {
+	return pagecol;
     }
 
-    public String getPublish() 
-    {
-        return publish;
+    public void setPagecol(String pagecol) {
+	this.pagecol = pagecol;
     }
 
-    public void setPublish(String publish) 
-    {
-        this.publish = publish;
+    public String getPublish() {
+	return publish;
     }
 
-    public String getPucity() 
-    {
-        return pucity;
+    public void setPublish(String publish) {
+	this.publish = publish;
     }
 
-    public void setPucity(String pucity) 
-    {
-        this.pucity = pucity;
+    public String getPucity() {
+	return pucity;
     }
 
-    public String getPucntry() 
-    {
-    	return pucntry;
+    public void setPucity(String pucity) {
+	this.pucity = pucity;
     }
 
-    public void setPucntry(String pucntry) 
-    {
-        this.pucntry = pucntry;
+    public String getPucntry() {
+	return pucntry;
+    }
+
+    public void setPucntry(String pucntry) {
+	this.pucntry = pucntry;
     }
 
     @Override
-    public int hashCode() 
-    {
-        return this.getRefid();
+    public int hashCode() {
+	return this.getRefid();
     }
 
     @Override
-    public boolean equals(Object obj) 
-    {
-    	if(obj == null) 
-            return false;
-        
-        if(obj instanceof Bibref)
-        {
-	        Bibref param = (Bibref) obj;
-	        if (this.getRefid() == param.getRefid()) 
-	            return true;
-	    }
-        
-        return false;
+    public boolean equals(Object obj) {
+	if (obj == null)
+	    return false;
+
+	if (obj instanceof Bibref) {
+	    Bibref param = (Bibref) obj;
+	    if (this.getRefid() == param.getRefid())
+		return true;
+	}
+
+	return false;
     }
 
-	@Override
-	public String toString() {
-		return "Bibrefs [refid=" + refid + ", pubdate=" + pubdate + ", authors=" + authors
-				+ ", editors=" + editors + ", analyt=" + analyt + ", monogr="
-				+ monogr + ", series=" + series + ", volume=" + volume
-				+ ", issue=" + issue + ", pagecol=" + pagecol + ", publish="
-				+ publish + ", pucity=" + pucity + ", pucntry=" + pucntry + "]";
-	}
+    @Override
+    public String toString() {
+	return "Bibrefs [refid=" + refid + ", pubdate=" + pubdate
+		+ ", authors=" + authors + ", editors=" + editors + ", analyt="
+		+ analyt + ", monogr=" + monogr + ", series=" + series
+		+ ", volume=" + volume + ", issue=" + issue + ", pagecol="
+		+ pagecol + ", publish=" + publish + ", pucity=" + pucity
+		+ ", pucntry=" + pucntry + "]";
+    }
 
 }

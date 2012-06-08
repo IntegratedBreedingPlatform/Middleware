@@ -22,295 +22,255 @@ import org.hibernate.annotations.NotFoundAction;
 
 /**
  * POJO for methods table
+ * 
  * @author Kevin Manansala, Mark Agarrado
  */
-@NamedQueries
-({
-	@NamedQuery
-	(
-		name = "getAllMethods",
-		query = "FROM Method"
-	)
-})
+@NamedQueries({ @NamedQuery(name = "getAllMethods", query = "FROM Method") })
 @Entity
 @Table(name = "methods")
 // JAXB Element Tags for JSON output
 @XmlRootElement(name = "method")
-@XmlType(propOrder = {"mid", "mtype", "mcode", "mname", "mdesc", "mprgn", "mfprg", "mgrp"})
+@XmlType(propOrder = { "mid", "mtype", "mcode", "mname", "mdesc", "mprgn",
+	"mfprg", "mgrp" })
 @XmlAccessorType(XmlAccessType.NONE)
-public class Method implements Serializable 
-{
+public class Method implements Serializable {
     private static final long serialVersionUID = 1L;
-    
+
     public static final String GET_ALL = "getAllMethods";
-    
+
     @Id
     @Basic(optional = false)
     @Column(name = "mid")
     @XmlElement(name = "methodId")
     private Integer mid;
-    
+
     @Basic(optional = false)
     @Column(name = "mtype")
     @XmlElement(name = "type")
     private String mtype;
-    
+
     @Basic(optional = false)
     @Column(name = "mgrp")
     @XmlElement(name = "breedingSystem")
     private String mgrp;
-    
+
     @Basic(optional = false)
     @Column(name = "mcode")
     @XmlElement(name = "code")
     private String mcode;
-    
+
     @Basic(optional = false)
     @Column(name = "mname")
     @XmlElement(name = "name")
     private String mname;
-    
+
     @Basic(optional = false)
     @Column(name = "mdesc")
     @XmlElement(name = "description")
     private String mdesc;
-    
+
     @ManyToOne(targetEntity = Bibref.class)
     @JoinColumn(name = "mref", nullable = true)
     @NotFound(action = NotFoundAction.IGNORE)
     private Bibref reference;
-    
+
     @Basic(optional = false)
     @Column(name = "mprgn")
     @XmlElement(name = "numberOfProgenitors")
     private Integer mprgn;
-    
+
     @Basic(optional = false)
     @Column(name = "mfprg")
     @XmlElement(name = "numberOfFemaleParents")
     private Integer mfprg;
-    
+
     @Basic(optional = false)
     @Column(name = "mattr")
     private Integer mattr;
-    
+
     @Basic(optional = false)
     @Column(name = "geneq")
     private Integer geneq;
-    
+
     @ManyToOne(targetEntity = User.class)
     @JoinColumn(name = "muid", nullable = true)
     @NotFound(action = NotFoundAction.IGNORE)
     private User user;
-    
+
     @Basic(optional = false)
     @Column(name = "lmid")
     private Integer lmid;
-    
+
     @Basic(optional = false)
     @Column(name = "mdate")
     private Integer mdate;
 
-    public Method() 
-    {
+    public Method() {
     }
-    
-    public Method(Integer mid) 
-    {
-        this.mid = mid;
+
+    public Method(Integer mid) {
+	this.mid = mid;
     }
 
     public Method(Integer mid, String mtype, String mgrp, String mcode,
-			String mname, String mdesc, Bibref reference, Integer mprgn,
-			Integer mfprg, Integer mattr, Integer geneq, User user,
-			Integer lmid, Integer mdate)
-	{
-		super();
-		this.mid = mid;
-		this.mtype = mtype;
-		this.mgrp = mgrp;
-		this.mcode = mcode;
-		this.mname = mname;
-		this.mdesc = mdesc;
-		this.reference = reference;
-		this.mprgn = mprgn;
-		this.mfprg = mfprg;
-		this.mattr = mattr;
-		this.geneq = geneq;
-		this.user = user;
-		this.lmid = lmid;
-		this.mdate = mdate;
-	}
-
-	public Integer getMid() 
-    {
-        return mid;
+	    String mname, String mdesc, Bibref reference, Integer mprgn,
+	    Integer mfprg, Integer mattr, Integer geneq, User user,
+	    Integer lmid, Integer mdate) {
+	super();
+	this.mid = mid;
+	this.mtype = mtype;
+	this.mgrp = mgrp;
+	this.mcode = mcode;
+	this.mname = mname;
+	this.mdesc = mdesc;
+	this.reference = reference;
+	this.mprgn = mprgn;
+	this.mfprg = mfprg;
+	this.mattr = mattr;
+	this.geneq = geneq;
+	this.user = user;
+	this.lmid = lmid;
+	this.mdate = mdate;
     }
 
-    public void setMid(Integer mid) 
-    {
-        this.mid = mid;
+    public Integer getMid() {
+	return mid;
     }
 
-    public String getMtype() 
-    {
-        return mtype;
+    public void setMid(Integer mid) {
+	this.mid = mid;
     }
 
-    public void setMtype(String mtype) 
-    {
-        this.mtype = mtype;
+    public String getMtype() {
+	return mtype;
     }
 
-    public String getMgrp() 
-    {
-        return mgrp;
+    public void setMtype(String mtype) {
+	this.mtype = mtype;
     }
 
-    public void setMgrp(String mgrp) 
-    {
-        this.mgrp = mgrp;
+    public String getMgrp() {
+	return mgrp;
     }
 
-    public String getMcode() 
-    {
-        return mcode;
+    public void setMgrp(String mgrp) {
+	this.mgrp = mgrp;
     }
 
-    public void setMcode(String mcode) 
-    {
-        this.mcode = mcode;
+    public String getMcode() {
+	return mcode;
     }
 
-    public String getMname() 
-    {
-        return mname;
+    public void setMcode(String mcode) {
+	this.mcode = mcode;
     }
 
-    public void setMname(String mname) 
-    {
-        this.mname = mname;
+    public String getMname() {
+	return mname;
     }
 
-    public String getMdesc() 
-    {
-        return mdesc;
+    public void setMname(String mname) {
+	this.mname = mname;
     }
 
-    public void setMdesc(String mdesc) 
-    {
-        this.mdesc = mdesc;
+    public String getMdesc() {
+	return mdesc;
     }
 
-    public Integer getMprgn()
-    {
-        return mprgn;
+    public void setMdesc(String mdesc) {
+	this.mdesc = mdesc;
     }
 
-    public void setMprgn(Integer mprgn) 
-    {
-        this.mprgn = mprgn;
+    public Integer getMprgn() {
+	return mprgn;
     }
 
-    public Integer getMfprg() 
-    {
-        return mfprg;
+    public void setMprgn(Integer mprgn) {
+	this.mprgn = mprgn;
     }
 
-    public void setMfprg(Integer mfprg) 
-    {
-        this.mfprg = mfprg;
+    public Integer getMfprg() {
+	return mfprg;
     }
 
-    public Integer getMattr()
-    {
-        return mattr;
+    public void setMfprg(Integer mfprg) {
+	this.mfprg = mfprg;
     }
 
-    public void setMattr(Integer mattr)
-    {
-        this.mattr = mattr;
+    public Integer getMattr() {
+	return mattr;
     }
 
-    public Integer getGeneq() 
-    {
-        return geneq;
+    public void setMattr(Integer mattr) {
+	this.mattr = mattr;
     }
 
-    public void setGeneq(Integer geneq) 
-    {
-        this.geneq = geneq;
+    public Integer getGeneq() {
+	return geneq;
     }
 
-    public Integer getLmid() 
-    {
-        return lmid;
+    public void setGeneq(Integer geneq) {
+	this.geneq = geneq;
     }
 
-    public void setLmid(Integer lmid)
-    {
-        this.lmid = lmid;
+    public Integer getLmid() {
+	return lmid;
     }
 
-    public Integer getMdate() 
-    {
-        return mdate;
+    public void setLmid(Integer lmid) {
+	this.lmid = lmid;
     }
 
-    public void setMdate(Integer mdate) 
-    {
-        this.mdate = mdate;
+    public Integer getMdate() {
+	return mdate;
     }
-    
-    public Bibref getReference()
-	{
-		return reference;
-	}
 
-	public void setReference(Bibref reference)
-	{
-		this.reference = reference;
-	}
+    public void setMdate(Integer mdate) {
+	this.mdate = mdate;
+    }
 
-	public User getUser()
-	{
-		return user;
-	}
+    public Bibref getReference() {
+	return reference;
+    }
 
-	public void setUser(User user)
-	{
-		this.user = user;
-	}
+    public void setReference(Bibref reference) {
+	this.reference = reference;
+    }
 
-	@Override
-    public int hashCode() 
-    {
-        return this.getMid();
+    public User getUser() {
+	return user;
+    }
+
+    public void setUser(User user) {
+	this.user = user;
     }
 
     @Override
-    public boolean equals(Object obj) 
-    {
-    	 if(obj == null) 
-             return false;
-         
-         if(obj instanceof Method)
-         {
- 	        Method param = (Method) obj;
- 	        if (this.getMid() == param.getMid()) 
- 	            return true;
- 	    }
-         
-         return false;
+    public int hashCode() {
+	return this.getMid();
     }
 
-	@Override
-	public String toString() 
-	{
-		return "Methods [mid=" + mid + ", mtype=" + mtype + ", mgrp=" + mgrp
-				+ ", mcode=" + mcode + ", mname=" + mname + ", mdesc=" + mdesc
-				+ ", mprgn=" + mprgn + ", mfprg=" + mfprg
-				+ ", mattr=" + mattr + ", geneq=" + geneq + ", lmid=" + lmid + ", mdate=" + mdate + "]";
+    @Override
+    public boolean equals(Object obj) {
+	if (obj == null)
+	    return false;
+
+	if (obj instanceof Method) {
+	    Method param = (Method) obj;
+	    if (this.getMid() == param.getMid())
+		return true;
 	}
-    
+
+	return false;
+    }
+
+    @Override
+    public String toString() {
+	return "Methods [mid=" + mid + ", mtype=" + mtype + ", mgrp=" + mgrp
+		+ ", mcode=" + mcode + ", mname=" + mname + ", mdesc=" + mdesc
+		+ ", mprgn=" + mprgn + ", mfprg=" + mfprg + ", mattr=" + mattr
+		+ ", geneq=" + geneq + ", lmid=" + lmid + ", mdate=" + mdate
+		+ "]";
+    }
+
 }

@@ -8,13 +8,11 @@ import org.hibernate.Criteria;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
-public class ScaleDAO extends GenericDAO<Scale, Integer>
-{
-	@SuppressWarnings("unchecked")
-	public List<Scale> getByTraitId(Integer traitId)
-	{
-		Criteria crit = getSession().createCriteria(Scale.class);
-		crit.add(Restrictions.eq("traitId", traitId));
-		return crit.list();
-	}
+public class ScaleDAO extends GenericDAO<Scale, Integer> {
+    @SuppressWarnings("unchecked")
+    public List<Scale> getByTraitId(Integer traitId) {
+	Criteria crit = getSession().createCriteria(Scale.class);
+	crit.add(Restrictions.eq("traitId", traitId));
+	return crit.list();
+    }
 }

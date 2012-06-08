@@ -6,19 +6,18 @@ import org.hibernate.HibernateException;
 import org.hibernate.QueryException;
 import org.hibernate.criterion.Restrictions;
 
-public class ToolDAO extends GenericDAO<Tool, Long>{
+public class ToolDAO extends GenericDAO<Tool, Long> {
 
     public Tool findByToolName(String toolName) {
-        try {
-            Criteria criteria = getSession().createCriteria(Tool.class)
-                                            .add(Restrictions.eq("toolName", toolName))
-                                            .setMaxResults(1);
+	try {
+	    Criteria criteria = getSession().createCriteria(Tool.class)
+		    .add(Restrictions.eq("toolName", toolName))
+		    .setMaxResults(1);
 
-            return (Tool) criteria.uniqueResult();
-        }
-        catch (HibernateException ex) {
-            throw new QueryException(ex);
-        }
+	    return (Tool) criteria.uniqueResult();
+	} catch (HibernateException ex) {
+	    throw new QueryException(ex);
+	}
     }
 
 }

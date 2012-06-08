@@ -14,7 +14,8 @@ public class TestHibernateUtil
 	@Test
 	public void testHibernateUtil() throws Exception
 	{
-		HibernateUtil util = new HibernateUtil("localhost", "3306", "iris_myisam_20100330", "root", "lich27king");
+//		HibernateUtil util = new HibernateUtil("localhost", "3306", "iris_myisam_20100330", "root", "lich27king");
+		HibernateUtil util = new HibernateUtil("localhost", "3306", "ibdbv1_rice_central", "ibdb_user", "ibdb_password");
 		Session session = util.getCurrentSession();
 		Query query = session.createQuery("FROM Germplasm");
 		query.setFirstResult(0);

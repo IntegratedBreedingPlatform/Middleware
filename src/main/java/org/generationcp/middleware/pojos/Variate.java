@@ -10,224 +10,186 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
-@NamedQueries
-({
-	@NamedQuery  
-	(
-			name = "getVariatesByStudyID",
-			query = "FROM Variate v WHERE v.studyId = :studyId"
-	)
-})
-
+@NamedQueries({ @NamedQuery(name = "getVariatesByStudyID", query = "FROM Variate v WHERE v.studyId = :studyId") })
 @Entity
 @Table(name = "variate")
-public class Variate implements Serializable
-{
-	private static final long serialVersionUID = 1L;
-	
-	//string contants for name of queries
+public class Variate implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    // string contants for name of queries
     public static final String GET_VARIATES_BY_STUDYID = "getVariatesByStudyID";
-    
-    public static final String GET_BY_REPRESENTATION_ID = "select distinct {v.*} " +
-    	"from variate v join data_n dn on v.variatid = dn.variatid " +
-    	"join oindex oi on oi.ounitid = dn.ounitid " +
-    	"where oi.represno = :representationId " +
-    	"union " +
-    	"select distinct {v.*} " +
-    	"from variate v join data_c dn on v.variatid = dn.variatid " +
-    	"join oindex oi on oi.ounitid = dn.ounitid " +
-    	"where oi.represno = :representationId";
 
-	@Id
-	@Basic(optional = false)
-	@Column(name = "variatid")
-	private Integer id;
-	
-	@Basic(optional = false)
-	@Column(name = "studyid")
-	private Integer studyId;
-	
-	@Basic(optional = false)
-	@Column(name = "vname")
-	private String name;
-	
-	@Basic(optional = false)
-	@Column(name = "traitid")
-	private Integer traitId;
-	
-	@Basic(optional = false)
-	@Column(name = "scaleid")
-	private Integer scaleId;
-	
-	@Basic(optional = false)
-	@Column(name = "tmethid")
-	private Integer methodId;
-	
-	@Basic(optional = false)
-	@Column(name = "dtype")
-	private String dataType;
-	
-	@Basic(optional = false)
-	@Column(name = "vtype")
-	private String type;
-	
-	@Basic(optional = false)
-	@Column(name = "tid")
-	private Integer tid;
-	
-	public Variate()
-	{
-	}
+    public static final String GET_BY_REPRESENTATION_ID = "select distinct {v.*} "
+	    + "from variate v join data_n dn on v.variatid = dn.variatid "
+	    + "join oindex oi on oi.ounitid = dn.ounitid "
+	    + "where oi.represno = :representationId "
+	    + "union "
+	    + "select distinct {v.*} "
+	    + "from variate v join data_c dn on v.variatid = dn.variatid "
+	    + "join oindex oi on oi.ounitid = dn.ounitid "
+	    + "where oi.represno = :representationId";
 
-	
-	public Variate(Integer id)
-	{
-		super();
-		this.id = id;
-	}
+    @Id
+    @Basic(optional = false)
+    @Column(name = "variatid")
+    private Integer id;
 
-	public Variate(Integer id, Integer studyId, String name, Integer traitId,
-			Integer scaleId, Integer methodId, String dataType, String type)
-	{
-		super();
-		this.id = id;
-		this.studyId = studyId;
-		this.name = name;
-		this.traitId = traitId;
-		this.scaleId = scaleId;
-		this.methodId = methodId;
-		this.dataType = dataType;
-		this.type = type;
-	}
+    @Basic(optional = false)
+    @Column(name = "studyid")
+    private Integer studyId;
 
+    @Basic(optional = false)
+    @Column(name = "vname")
+    private String name;
 
-	public Integer getId()
-	{
-		return id;
-	}
+    @Basic(optional = false)
+    @Column(name = "traitid")
+    private Integer traitId;
 
-	public void setId(Integer id)
-	{
-		this.id = id;
-	}
+    @Basic(optional = false)
+    @Column(name = "scaleid")
+    private Integer scaleId;
 
-	public Integer getStudyId()
-	{
-		return studyId;
-	}
+    @Basic(optional = false)
+    @Column(name = "tmethid")
+    private Integer methodId;
 
-	public void setStudyId(Integer studyId)
-	{
-		this.studyId = studyId;
-	}
+    @Basic(optional = false)
+    @Column(name = "dtype")
+    private String dataType;
 
-	public String getName()
-	{
-		return name;
-	}
+    @Basic(optional = false)
+    @Column(name = "vtype")
+    private String type;
 
-	public void setName(String name)
-	{
-		this.name = name;
-	}
+    @Basic(optional = false)
+    @Column(name = "tid")
+    private Integer tid;
 
-	public Integer getTraitId()
-	{
-		return traitId;
-	}
+    public Variate() {
+    }
 
-	public void setTraitId(Integer traitId)
-	{
-		this.traitId = traitId;
-	}
+    public Variate(Integer id) {
+	super();
+	this.id = id;
+    }
 
-	public Integer getScaleId()
-	{
-		return scaleId;
-	}
+    public Variate(Integer id, Integer studyId, String name, Integer traitId,
+	    Integer scaleId, Integer methodId, String dataType, String type) {
+	super();
+	this.id = id;
+	this.studyId = studyId;
+	this.name = name;
+	this.traitId = traitId;
+	this.scaleId = scaleId;
+	this.methodId = methodId;
+	this.dataType = dataType;
+	this.type = type;
+    }
 
-	public void setScaleId(Integer scaleId)
-	{
-		this.scaleId = scaleId;
-	}
+    public Integer getId() {
+	return id;
+    }
 
-	public Integer getMethodId()
-	{
-		return methodId;
-	}
+    public void setId(Integer id) {
+	this.id = id;
+    }
 
-	public void setMethodId(Integer methodId)
-	{
-		this.methodId = methodId;
-	}
+    public Integer getStudyId() {
+	return studyId;
+    }
 
-	public String getDataType()
-	{
-		return dataType;
-	}
+    public void setStudyId(Integer studyId) {
+	this.studyId = studyId;
+    }
 
-	public void setDataType(String dataType)
-	{
-		this.dataType = dataType;
-	}
+    public String getName() {
+	return name;
+    }
 
-	public String getType()
-	{
-		return type;
-	}
+    public void setName(String name) {
+	this.name = name;
+    }
 
-	public void setType(String type)
-	{
-		this.type = type;
-	}
-	
-	public Integer getTid() 
-	{
-		return tid;
-	}
+    public Integer getTraitId() {
+	return traitId;
+    }
 
+    public void setTraitId(Integer traitId) {
+	this.traitId = traitId;
+    }
 
-	public void setTid(Integer tid) 
-	{
-		this.tid = tid;
-	}
+    public Integer getScaleId() {
+	return scaleId;
+    }
 
+    public void setScaleId(Integer scaleId) {
+	this.scaleId = scaleId;
+    }
 
-	@Override
-	public int hashCode()
-	{
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
-	}
+    public Integer getMethodId() {
+	return methodId;
+    }
 
-	@Override
-	public boolean equals(Object obj)
-	{
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Variate other = (Variate) obj;
-		if (id == null)
-		{
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
-	}
+    public void setMethodId(Integer methodId) {
+	this.methodId = methodId;
+    }
 
-	@Override
-	public String toString()
-	{
-		return "Variate [id=" + id + ", studyId=" + studyId + ", name=" + name
-				+ ", traitId=" + traitId + ", scaleId=" + scaleId
-				+ ", methodId=" + methodId + ", dataType=" + dataType
-				+ ", type=" + type + "]";
-	}
-	
+    public String getDataType() {
+	return dataType;
+    }
+
+    public void setDataType(String dataType) {
+	this.dataType = dataType;
+    }
+
+    public String getType() {
+	return type;
+    }
+
+    public void setType(String type) {
+	this.type = type;
+    }
+
+    public Integer getTid() {
+	return tid;
+    }
+
+    public void setTid(Integer tid) {
+	this.tid = tid;
+    }
+
+    @Override
+    public int hashCode() {
+	final int prime = 31;
+	int result = 1;
+	result = prime * result + ((id == null) ? 0 : id.hashCode());
+	return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+	if (this == obj)
+	    return true;
+	if (obj == null)
+	    return false;
+	if (getClass() != obj.getClass())
+	    return false;
+	Variate other = (Variate) obj;
+	if (id == null) {
+	    if (other.id != null)
+		return false;
+	} else if (!id.equals(other.id))
+	    return false;
+	return true;
+    }
+
+    @Override
+    public String toString() {
+	return "Variate [id=" + id + ", studyId=" + studyId + ", name=" + name
+		+ ", traitId=" + traitId + ", scaleId=" + scaleId
+		+ ", methodId=" + methodId + ", dataType=" + dataType
+		+ ", type=" + type + "]";
+    }
+
 }

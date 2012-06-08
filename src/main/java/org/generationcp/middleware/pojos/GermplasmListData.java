@@ -17,231 +17,196 @@ import org.hibernate.annotations.NotFoundAction;
 
 /**
  * POJO for listdata table
+ * 
  * @author Kevin Manansala
- *
+ * 
  */
-@NamedQueries
-({
-	@NamedQuery
-	(
-		name = "deleteGermplasmListDataByListId",
-		query = "delete from GermplasmListData where list = :listId"
-	)
-})
-
+@NamedQueries({ @NamedQuery(name = "deleteGermplasmListDataByListId", query = "delete from GermplasmListData where list = :listId") })
 @Entity
 @Table(name = "listdata")
-public class GermplasmListData implements Serializable
-{
-	private static final long serialVersionUID = 1L;
-	
-	//string contants for name of queries
+public class GermplasmListData implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    // string contants for name of queries
     public static final String DELETE_BY_LIST_ID = "deleteGermplasmListDataByListId";
 
-	@Id
-	@Basic(optional = false)
-	@Column(name = "lrecid")
-	private Integer id;
-	
-	@ManyToOne(targetEntity = GermplasmList.class)
-	@JoinColumn(name = "listid", nullable = false)
-	@NotFound(action = NotFoundAction.IGNORE)
-	private GermplasmList list;
-	
-	@Basic(optional = false)
-	@Column(name = "gid")
-	private Integer gid;
-	
-	@Basic(optional = false)
-	@Column(name = "entryid")
-	private Integer entryId;
-	
-	@Column(name = "entrycd")
-	private String entryCode;
-	
-	@Column(name = "source")
-	private String seedSource;
-	
-	@Basic(optional = false)
-	@Column(name = "desig")
-	private String designation;
-	
-	@Column(name = "grpname")
-	private String groupName;
-	
-	@Basic(optional = false)
-	@Column(name = "lrstatus")
-	private Integer status;
-	
-	@Basic(optional = false)
-	@Column(name = "llrecid")
-	private Integer localRecordId;
-	
-	public GermplasmListData()
-	{
-		
-	}
+    @Id
+    @Basic(optional = false)
+    @Column(name = "lrecid")
+    private Integer id;
 
-	public GermplasmListData(Integer id)
-	{
-		super();
-		this.id = id;
-	}
+    @ManyToOne(targetEntity = GermplasmList.class)
+    @JoinColumn(name = "listid", nullable = false)
+    @NotFound(action = NotFoundAction.IGNORE)
+    private GermplasmList list;
 
-	public GermplasmListData(Integer id, GermplasmList list,
-			Integer gid, Integer entryId, String entryCode,
-			String seedSource, String designation, String groupName,
-			Integer status, Integer localRecordId)
-	{
-		super();
-		this.id = id;
-		this.list = list;
-		this.gid = gid;
-		this.entryId = entryId;
-		this.entryCode = entryCode;
-		this.seedSource = seedSource;
-		this.designation = designation;
-		this.groupName = groupName;
-		this.status = status;
-		this.localRecordId = localRecordId;
-	}
+    @Basic(optional = false)
+    @Column(name = "gid")
+    private Integer gid;
 
-	public Integer getId()
-	{
-		return id;
-	}
+    @Basic(optional = false)
+    @Column(name = "entryid")
+    private Integer entryId;
 
-	public void setId(Integer id)
-	{
-		this.id = id;
-	}
+    @Column(name = "entrycd")
+    private String entryCode;
 
-	public GermplasmList getList()
-	{
-		return list;
-	}
+    @Column(name = "source")
+    private String seedSource;
 
-	public void setList(GermplasmList list)
-	{
-		this.list = list;
-	}
+    @Basic(optional = false)
+    @Column(name = "desig")
+    private String designation;
 
-	public Integer getGid()
-	{
-		return gid;
-	}
+    @Column(name = "grpname")
+    private String groupName;
 
-	public void setGid(Integer gid)
-	{
-		this.gid = gid;
-	}
+    @Basic(optional = false)
+    @Column(name = "lrstatus")
+    private Integer status;
 
-	public Integer getEntryId()
-	{
-		return entryId;
-	}
+    @Basic(optional = false)
+    @Column(name = "llrecid")
+    private Integer localRecordId;
 
-	public void setEntryId(Integer entryId)
-	{
-		this.entryId = entryId;
-	}
+    public GermplasmListData() {
 
-	public String getEntryCode()
-	{
-		return entryCode;
-	}
+    }
 
-	public void setEntryCode(String entryCode)
-	{
-		this.entryCode = entryCode;
-	}
+    public GermplasmListData(Integer id) {
+	super();
+	this.id = id;
+    }
 
-	public String getSeedSource()
-	{
-		return seedSource;
-	}
+    public GermplasmListData(Integer id, GermplasmList list, Integer gid,
+	    Integer entryId, String entryCode, String seedSource,
+	    String designation, String groupName, Integer status,
+	    Integer localRecordId) {
+	super();
+	this.id = id;
+	this.list = list;
+	this.gid = gid;
+	this.entryId = entryId;
+	this.entryCode = entryCode;
+	this.seedSource = seedSource;
+	this.designation = designation;
+	this.groupName = groupName;
+	this.status = status;
+	this.localRecordId = localRecordId;
+    }
 
-	public void setSeedSource(String seedSource)
-	{
-		this.seedSource = seedSource;
-	}
+    public Integer getId() {
+	return id;
+    }
 
-	public String getDesignation()
-	{
-		return designation;
-	}
+    public void setId(Integer id) {
+	this.id = id;
+    }
 
-	public void setDesignation(String designation)
-	{
-		this.designation = designation;
-	}
+    public GermplasmList getList() {
+	return list;
+    }
 
-	public String getGroupName()
-	{
-		return groupName;
-	}
+    public void setList(GermplasmList list) {
+	this.list = list;
+    }
 
-	public void setGroupName(String groupName)
-	{
-		this.groupName = groupName;
-	}
+    public Integer getGid() {
+	return gid;
+    }
 
-	public Integer getStatus()
-	{
-		return status;
-	}
+    public void setGid(Integer gid) {
+	this.gid = gid;
+    }
 
-	public void setStatus(Integer status)
-	{
-		this.status = status;
-	}
+    public Integer getEntryId() {
+	return entryId;
+    }
 
-	public Integer getLocalRecordId()
-	{
-		return localRecordId;
-	}
+    public void setEntryId(Integer entryId) {
+	this.entryId = entryId;
+    }
 
-	public void setLocalRecordId(Integer localRecordId)
-	{
-		this.localRecordId = localRecordId;
-	}
+    public String getEntryCode() {
+	return entryCode;
+    }
 
-	@Override
-	public String toString()
-	{
-		return "GermplasmListData [id=" + id + ", list=" + list + ", gid="
-				+ gid + ", entryId=" + entryId + ", entryCode=" + entryCode
-				+ ", seedSource=" + seedSource + ", designation=" + designation
-				+ ", groupName=" + groupName + ", status=" + status
-				+ ", localRecordId=" + localRecordId + "]";
-	}
+    public void setEntryCode(String entryCode) {
+	this.entryCode = entryCode;
+    }
 
-	@Override
-	public int hashCode()
-	{
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
-	}
+    public String getSeedSource() {
+	return seedSource;
+    }
 
-	@Override
-	public boolean equals(Object obj)
-	{
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		GermplasmListData other = (GermplasmListData) obj;
-		if (id == null)
-		{
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
-	}
-	
+    public void setSeedSource(String seedSource) {
+	this.seedSource = seedSource;
+    }
+
+    public String getDesignation() {
+	return designation;
+    }
+
+    public void setDesignation(String designation) {
+	this.designation = designation;
+    }
+
+    public String getGroupName() {
+	return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+	this.groupName = groupName;
+    }
+
+    public Integer getStatus() {
+	return status;
+    }
+
+    public void setStatus(Integer status) {
+	this.status = status;
+    }
+
+    public Integer getLocalRecordId() {
+	return localRecordId;
+    }
+
+    public void setLocalRecordId(Integer localRecordId) {
+	this.localRecordId = localRecordId;
+    }
+
+    @Override
+    public String toString() {
+	return "GermplasmListData [id=" + id + ", list=" + list + ", gid="
+		+ gid + ", entryId=" + entryId + ", entryCode=" + entryCode
+		+ ", seedSource=" + seedSource + ", designation=" + designation
+		+ ", groupName=" + groupName + ", status=" + status
+		+ ", localRecordId=" + localRecordId + "]";
+    }
+
+    @Override
+    public int hashCode() {
+	final int prime = 31;
+	int result = 1;
+	result = prime * result + ((id == null) ? 0 : id.hashCode());
+	return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+	if (this == obj)
+	    return true;
+	if (obj == null)
+	    return false;
+	if (getClass() != obj.getClass())
+	    return false;
+	GermplasmListData other = (GermplasmListData) obj;
+	if (id == null) {
+	    if (other.id != null)
+		return false;
+	} else if (!id.equals(other.id))
+	    return false;
+	return true;
+    }
+
 }

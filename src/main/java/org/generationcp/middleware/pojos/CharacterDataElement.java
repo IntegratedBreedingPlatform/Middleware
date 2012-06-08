@@ -5,97 +5,80 @@ import java.io.Serializable;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class CharacterDataElement implements Serializable
-{
-	private static final long serialVersionUID = -4284129132975100671L;
+public class CharacterDataElement implements Serializable {
+    private static final long serialVersionUID = -4284129132975100671L;
 
-	private Integer ounitId;
-	private Integer variateId;
-	private String variateName;
-	private String value;
-	
-	public CharacterDataElement(Integer ounitId, Integer variateId,
-			String variateName, String value)
-	{
-		super();
-		this.ounitId = ounitId;
-		this.variateId = variateId;
-		this.variateName = variateName;
-		this.value = value;
-	}
+    private Integer ounitId;
+    private Integer variateId;
+    private String variateName;
+    private String value;
 
-	public Integer getOunitId()
-	{
-		return ounitId;
-	}
+    public CharacterDataElement(Integer ounitId, Integer variateId,
+	    String variateName, String value) {
+	super();
+	this.ounitId = ounitId;
+	this.variateId = variateId;
+	this.variateName = variateName;
+	this.value = value;
+    }
 
-	public void setOunitId(Integer ounitId)
-	{
-		this.ounitId = ounitId;
-	}
+    public Integer getOunitId() {
+	return ounitId;
+    }
 
-	public Integer getVariateId()
-	{
-		return variateId;
-	}
+    public void setOunitId(Integer ounitId) {
+	this.ounitId = ounitId;
+    }
 
-	public void setVariateId(Integer variateId)
-	{
-		this.variateId = variateId;
-	}
+    public Integer getVariateId() {
+	return variateId;
+    }
 
-	public String getVariateName()
-	{
-		return variateName;
-	}
+    public void setVariateId(Integer variateId) {
+	this.variateId = variateId;
+    }
 
-	public void setVariateName(String variateName)
-	{
-		this.variateName = variateName;
-	}
+    public String getVariateName() {
+	return variateName;
+    }
 
-	public String getValue()
-	{
-		return value;
-	}
+    public void setVariateName(String variateName) {
+	this.variateName = variateName;
+    }
 
-	public void setValue(String value)
-	{
-		this.value = value;
-	}
+    public String getValue() {
+	return value;
+    }
 
-	@Override
-	public String toString()
-	{
-		return "CharacterDataElement [ounitId=" + ounitId + ", variateId="
-				+ variateId + ", variateName=" + variateName + ", value="
-				+ value + "]";
-	}
+    public void setValue(String value) {
+	this.value = value;
+    }
 
-	@Override
-	public boolean equals(Object obj) 
-	{
-	   if (obj == null)
-		   return false;
-	   if (obj == this) 
-		   return true; 
-	   if (!(obj instanceof CharacterDataElement)) 
-		   return false;
-	
-	   CharacterDataElement rhs = (CharacterDataElement) obj;
-	   return new EqualsBuilder()
-	                 .appendSuper(super.equals(obj))
-	                 .append(ounitId, rhs.ounitId)
-	                 .append(variateId, rhs.variateId)
-	                 .isEquals();
-	}
-	
-	@Override
-	public int hashCode() 
-	{
-	     return new HashCodeBuilder(41, 29).
-	       append(ounitId).
-	       append(variateId).
-	       toHashCode();
-	}
+    @Override
+    public String toString() {
+	return "CharacterDataElement [ounitId=" + ounitId + ", variateId="
+		+ variateId + ", variateName=" + variateName + ", value="
+		+ value + "]";
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+	if (obj == null)
+	    return false;
+	if (obj == this)
+	    return true;
+	if (!(obj instanceof CharacterDataElement))
+	    return false;
+
+	CharacterDataElement rhs = (CharacterDataElement) obj;
+	return new EqualsBuilder().appendSuper(super.equals(obj))
+		.append(ounitId, rhs.ounitId).append(variateId, rhs.variateId)
+		.isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+	return new HashCodeBuilder(41, 29).append(ounitId).append(variateId)
+		.toHashCode();
+    }
 }

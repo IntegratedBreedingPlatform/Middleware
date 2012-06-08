@@ -12,92 +12,81 @@ import javax.persistence.Table;
 
 /**
  * POJO for progntrs table
+ * 
  * @author klmanansala
  */
 @Entity
 @Table(name = "progntrs")
-public class Progenitor implements Serializable 
-{
+public class Progenitor implements Serializable {
     private static final long serialVersionUID = 1L;
-    
+
     @EmbeddedId
     protected ProgenitorPK progntrsPK;
-    
+
     @Basic(optional = false)
     @Column(name = "pid")
     private Integer pid;
-    
+
     /**
-    @ManyToOne(targetEntity = Germplasm.class)
-    @JoinColumn(name = "gid", nullable = false, insertable=false, updatable=false)
-    private Germplasm germplasm;
-    **/
+     * @ManyToOne(targetEntity = Germplasm.class)
+     * @JoinColumn(name = "gid", nullable = false, insertable=false,
+     *                  updatable=false) private Germplasm germplasm;
+     **/
 
-    public Progenitor() 
-    {
-    }
-    
-    public Progenitor(ProgenitorPK progntrsPK) 
-    {
-        this.progntrsPK = progntrsPK;
+    public Progenitor() {
     }
 
-    public Progenitor(ProgenitorPK progntrsPK, Integer pid) 
-    {
-        this.progntrsPK = progntrsPK;
-        this.pid = pid;
+    public Progenitor(ProgenitorPK progntrsPK) {
+	this.progntrsPK = progntrsPK;
     }
 
-    public Progenitor(Germplasm germplasm, Integer pno) 
-    {
-        this.progntrsPK = new ProgenitorPK(germplasm.getGid(), pno);
+    public Progenitor(ProgenitorPK progntrsPK, Integer pid) {
+	this.progntrsPK = progntrsPK;
+	this.pid = pid;
     }
 
-    public ProgenitorPK getProgntrsPK() 
-    {
-        return progntrsPK;
+    public Progenitor(Germplasm germplasm, Integer pno) {
+	this.progntrsPK = new ProgenitorPK(germplasm.getGid(), pno);
     }
 
-    public void setProgntrsPK(ProgenitorPK progntrsPK) 
-    {
-        this.progntrsPK = progntrsPK;
+    public ProgenitorPK getProgntrsPK() {
+	return progntrsPK;
     }
 
-    public Integer getPid() 
-    {
-        return pid;
+    public void setProgntrsPK(ProgenitorPK progntrsPK) {
+	this.progntrsPK = progntrsPK;
     }
 
-    public void setPid(Integer pid) 
-    {
-        this.pid = pid;
+    public Integer getPid() {
+	return pid;
+    }
+
+    public void setPid(Integer pid) {
+	this.pid = pid;
     }
 
     @Override
-    public int hashCode() 
-    {
-        return this.getProgntrsPK().hashCode();
+    public int hashCode() {
+	return this.getProgntrsPK().hashCode();
     }
 
     @Override
-    public boolean equals(Object obj) 
-    {
-    	 if(obj == null) 
-             return false;
-         
-         if(obj instanceof Progenitor)
-         {
- 	        Progenitor param = (Progenitor) obj;
- 	        if (this.getProgntrsPK().equals(param.getProgntrsPK())) 
- 	            return true;
- 	    }
-         
-         return false;
-    }
+    public boolean equals(Object obj) {
+	if (obj == null)
+	    return false;
 
-	@Override
-	public String toString() {
-		return "Progntrs [progntrsPK=" + progntrsPK + ", pid=" + pid + "]";
+	if (obj instanceof Progenitor) {
+	    Progenitor param = (Progenitor) obj;
+	    if (this.getProgntrsPK().equals(param.getProgntrsPK()))
+		return true;
 	}
+
+	return false;
+    }
+
+    @Override
+    public String toString() {
+	return "Progntrs [progntrsPK=" + progntrsPK + ", pid=" + pid + "]";
+    }
 
 }

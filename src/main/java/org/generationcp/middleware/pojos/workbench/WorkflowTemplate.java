@@ -29,93 +29,85 @@ public class WorkflowTemplate implements Serializable {
     @GeneratedValue
     @Column(name = "template_id")
     private Long templateId;
-    
+
     @Basic(optional = false)
     @Column(name = "name")
     private String name;
-    
+
     @Basic(optional = false)
     @Column(name = "user_defined")
     private boolean userDefined;
-    
-    @OneToMany(
-        cascade = CascadeType.ALL
-        ,orphanRemoval = true
-        ,fetch = FetchType.LAZY
-    )
-    @JoinTable (
-        name = "workflow_template_step"
-        ,joinColumns = {
-            @JoinColumn(name = "template_id")
-        }
-        ,inverseJoinColumns = {
-            @JoinColumn(name = "step_id")
-        }
-    )
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinTable(name = "workflow_template_step", joinColumns = { @JoinColumn(name = "template_id") }, inverseJoinColumns = { @JoinColumn(name = "step_id") })
     @OrderColumn(name = "step_number")
     private List<WorkflowStep> steps;
-    
+
     public WorkflowTemplate() {
     }
-    
+
     public WorkflowTemplate(Long templateId) {
-        this.templateId = templateId;
+	this.templateId = templateId;
     }
-    
+
     public WorkflowTemplate(String templateIdStr) {
-        templateId = Long.parseLong(templateIdStr);
+	templateId = Long.parseLong(templateIdStr);
     }
 
     public Long getTemplateId() {
-        return templateId;
+	return templateId;
     }
 
     public void setTemplateId(Long templateId) {
-        this.templateId = templateId;
+	this.templateId = templateId;
     }
 
     public String getName() {
-        return name;
+	return name;
     }
 
     public void setName(String name) {
-        this.name = name;
+	this.name = name;
     }
 
     public boolean isUserDefined() {
-        return userDefined;
+	return userDefined;
     }
 
     public void setUserDefined(boolean userDefined) {
-        this.userDefined = userDefined;
+	this.userDefined = userDefined;
     }
 
     public List<WorkflowStep> getSteps() {
-        return steps;
+	return steps;
     }
 
     public void setSteps(List<WorkflowStep> steps) {
-        this.steps = steps;
+	this.steps = steps;
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(templateId).hashCode();
+	return new HashCodeBuilder().append(templateId).hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) return false;
-        if (obj == this) return true;
-        if (!WorkflowTemplate.class.isInstance(obj)) return false;
+	if (obj == null)
+	    return false;
+	if (obj == this)
+	    return true;
+	if (!WorkflowTemplate.class.isInstance(obj))
+	    return false;
 
-        WorkflowTemplate otherObj = (WorkflowTemplate) obj;
+	WorkflowTemplate otherObj = (WorkflowTemplate) obj;
 
-        return new EqualsBuilder().append(templateId, otherObj.templateId).isEquals();
+	return new EqualsBuilder().append(templateId, otherObj.templateId)
+		.isEquals();
     }
-    
+
     @Override
     public String toString() {
-        return name;
+	return name;
     }
 }

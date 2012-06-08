@@ -15,7 +15,7 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
      * @return
      */
     public List<Project> findAll() {
-        return findAll(null, null);
+	return findAll(null, null);
     }
 
     /**
@@ -30,21 +30,20 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
      * @return
      */
     public List<Project> findAll(Integer start, Integer numOfRows) {
-        try {
-            Criteria criteria = getSession().createCriteria(Project.class);
-            if (start != null) {
-                criteria.setFirstResult(start);
-            }
-            if (numOfRows != null) {
-                criteria.setMaxResults(numOfRows);
-            }
-            @SuppressWarnings("unchecked")
-            List<Project> projects = criteria.list();
+	try {
+	    Criteria criteria = getSession().createCriteria(Project.class);
+	    if (start != null) {
+		criteria.setFirstResult(start);
+	    }
+	    if (numOfRows != null) {
+		criteria.setMaxResults(numOfRows);
+	    }
+	    @SuppressWarnings("unchecked")
+	    List<Project> projects = criteria.list();
 
-            return projects;
-        }
-        catch (HibernateException ex) {
-            throw new QueryException(ex);
-        }
+	    return projects;
+	} catch (HibernateException ex) {
+	    throw new QueryException(ex);
+	}
     }
 }

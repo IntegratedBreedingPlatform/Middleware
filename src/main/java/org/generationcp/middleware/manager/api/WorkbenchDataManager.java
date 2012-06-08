@@ -7,7 +7,8 @@ import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 
 /**
- * This is the API used by the Workbench to retrieve Workbench project information. 
+ * This is the API used by the Workbench to retrieve Workbench project
+ * information.
  * 
  */
 public interface WorkbenchDataManager {
@@ -19,10 +20,10 @@ public interface WorkbenchDataManager {
     Project saveOrUpdateProject(Project project);
 
     void deleteProject(Project project);
-    
+
     List<WorkflowTemplate> getWorkflowTemplates();
-    
+
     List<WorkflowTemplate> getWorkflowTemplates(int start, int numOfRows);
-    
+
     Tool getToolWithName(String toolName);
 }

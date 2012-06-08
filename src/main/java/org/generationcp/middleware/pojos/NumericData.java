@@ -11,97 +11,84 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "data_n")
-public class NumericData implements Serializable
-{
-	private static final long serialVersionUID = 1L;
-	
-	public static final String GET_BY_OUNIT_ID_LIST = "select dn.ounitid, dn.variatid, v.vname, dn.dvalue " +
-			"from data_n dn join variate v on dn.variatid = v.variatid " +
-			"where dn.ounitid in (:ounitIdList)";
+public class NumericData implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-	@EmbeddedId
-	protected NumericDataPK id;
-	
-	@Column(name = "dvalue")
-	private Double value;
-	
-	@ManyToOne(targetEntity = Variate.class)
-	@JoinColumn(name = "variatid", nullable = false, insertable=false, updatable=false)
-	private Variate variate;
-	
-	public NumericData()
-	{
-	}
+    public static final String GET_BY_OUNIT_ID_LIST = "select dn.ounitid, dn.variatid, v.vname, dn.dvalue "
+	    + "from data_n dn join variate v on dn.variatid = v.variatid "
+	    + "where dn.ounitid in (:ounitIdList)";
 
-	public NumericData(NumericDataPK id, Double value)
-	{
-		super();
-		this.id = id;
-		this.value = value;
-	}
+    @EmbeddedId
+    protected NumericDataPK id;
 
-	public NumericDataPK getId()
-	{
-		return id;
-	}
+    @Column(name = "dvalue")
+    private Double value;
 
-	public void setId(NumericDataPK id)
-	{
-		this.id = id;
-	}
+    @ManyToOne(targetEntity = Variate.class)
+    @JoinColumn(name = "variatid", nullable = false, insertable = false, updatable = false)
+    private Variate variate;
 
-	public Double getValue()
-	{
-		return value;
-	}
+    public NumericData() {
+    }
 
-	public void setValue(Double value)
-	{
-		this.value = value;
-	}
+    public NumericData(NumericDataPK id, Double value) {
+	super();
+	this.id = id;
+	this.value = value;
+    }
 
-	public Variate getVariate()
-	{
-		return variate;
-	}
+    public NumericDataPK getId() {
+	return id;
+    }
 
-	public void setVariate(Variate variate)
-	{
-		this.variate = variate;
-	}
+    public void setId(NumericDataPK id) {
+	this.id = id;
+    }
 
-	@Override
-	public int hashCode()
-	{
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
-	}
+    public Double getValue() {
+	return value;
+    }
 
-	@Override
-	public boolean equals(Object obj)
-	{
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		NumericData other = (NumericData) obj;
-		if (id == null)
-		{
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
-	}
+    public void setValue(Double value) {
+	this.value = value;
+    }
 
-	@Override
-	public String toString()
-	{
-		return "NumericData [id=" + id + ", value=" + value + "]";
-	}
-	
+    public Variate getVariate() {
+	return variate;
+    }
+
+    public void setVariate(Variate variate) {
+	this.variate = variate;
+    }
+
+    @Override
+    public int hashCode() {
+	final int prime = 31;
+	int result = 1;
+	result = prime * result + ((id == null) ? 0 : id.hashCode());
+	return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+	if (this == obj)
+	    return true;
+	if (obj == null)
+	    return false;
+	if (getClass() != obj.getClass())
+	    return false;
+	NumericData other = (NumericData) obj;
+	if (id == null) {
+	    if (other.id != null)
+		return false;
+	} else if (!id.equals(other.id))
+	    return false;
+	return true;
+    }
+
+    @Override
+    public String toString() {
+	return "NumericData [id=" + id + ", value=" + value + "]";
+    }
+
 }

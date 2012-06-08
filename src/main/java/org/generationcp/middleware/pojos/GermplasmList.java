@@ -18,202 +18,174 @@ import javax.persistence.Table;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
-
 /**
  * POJO for listnms table
  * 
  * @author Kevin Manansala, Mark Agarrado
- *
+ * 
  */
 
 @Entity
 @Table(name = "listnms")
-public class GermplasmList implements Serializable
-{
-	private static final long serialVersionUID = 1L;
-	
-	@Id
-	@Basic(optional = false)
-	@Column(name = "listid")
-	private Integer id;
-	
-	@Column(name = "listname")
-	private String name;
-	
-	@Column(name = "listdate")
-	private Long date;
-	
-	@Column(name = "listtype")
-	private String type;
-	
-	@Column(name = "listuid")
+public class GermplasmList implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @Basic(optional = false)
+    @Column(name = "listid")
+    private Integer id;
+
+    @Column(name = "listname")
+    private String name;
+
+    @Column(name = "listdate")
+    private Long date;
+
+    @Column(name = "listtype")
+    private String type;
+
+    @Column(name = "listuid")
     private Integer userId;
-	
-	@Column(name = "listdesc")
-	private String description;
-	
-	@ManyToOne(targetEntity = GermplasmList.class)
-	@JoinColumn(name = "lhierarchy")
-	@NotFound(action = NotFoundAction.IGNORE)
-	private GermplasmList parent;
-	
-	@Column(name = "liststatus")
-	private Integer status;
-	
-	@OneToMany(mappedBy = "list",
-			cascade = CascadeType.REMOVE,
-			orphanRemoval = true,
-			fetch = FetchType.LAZY)
-	private List<GermplasmListData> listData = new ArrayList<GermplasmListData>();
-	
-	public GermplasmList()
-	{
-		
-	}
 
-	public GermplasmList(Integer id)
-	{
-		super();
-		this.id = id;
-	}
+    @Column(name = "listdesc")
+    private String description;
 
-	public GermplasmList(Integer id, String name, Long date, String type,
-			Integer userId, String description, GermplasmList parent,
-			Integer status)
-	{
-		super();
-		this.id = id;
-		this.name = name;
-		this.date = date;
-		this.type = type;
-		this.userId = userId;
-		this.description = description;
-		this.parent = parent;
-		this.status = status;
-	}
+    @ManyToOne(targetEntity = GermplasmList.class)
+    @JoinColumn(name = "lhierarchy")
+    @NotFound(action = NotFoundAction.IGNORE)
+    private GermplasmList parent;
 
-	public Integer getId()
-	{
-		return id;
-	}
+    @Column(name = "liststatus")
+    private Integer status;
 
-	public void setId(Integer id)
-	{
-		this.id = id;
-	}
+    @OneToMany(mappedBy = "list", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<GermplasmListData> listData = new ArrayList<GermplasmListData>();
 
-	public String getName()
-	{
-		return name;
-	}
+    public GermplasmList() {
 
-	public void setName(String name)
-	{
-		this.name = name;
-	}
+    }
 
-	public Long getDate()
-	{
-		return date;
-	}
+    public GermplasmList(Integer id) {
+	super();
+	this.id = id;
+    }
 
-	public void setDate(Long date)
-	{
-		this.date = date;
-	}
+    public GermplasmList(Integer id, String name, Long date, String type,
+	    Integer userId, String description, GermplasmList parent,
+	    Integer status) {
+	super();
+	this.id = id;
+	this.name = name;
+	this.date = date;
+	this.type = type;
+	this.userId = userId;
+	this.description = description;
+	this.parent = parent;
+	this.status = status;
+    }
 
-	public String getType()
-	{
-		return type;
-	}
+    public Integer getId() {
+	return id;
+    }
 
-	public void setType(String type)
-	{
-		this.type = type;
-	}
+    public void setId(Integer id) {
+	this.id = id;
+    }
 
-	public Integer getUserId()
-	{
-		return userId;
-	}
+    public String getName() {
+	return name;
+    }
 
-	public void setUserId(Integer userId)
-	{
-		this.userId = userId;
-	}
+    public void setName(String name) {
+	this.name = name;
+    }
 
-	public String getDescription()
-	{
-		return description;
-	}
+    public Long getDate() {
+	return date;
+    }
 
-	public void setDescription(String description)
-	{
-		this.description = description;
-	}
+    public void setDate(Long date) {
+	this.date = date;
+    }
 
-	public GermplasmList getParent()
-	{
-		return parent;
-	}
+    public String getType() {
+	return type;
+    }
 
-	public void setParent(GermplasmList parent)
-	{
-		this.parent = parent;
-	}
+    public void setType(String type) {
+	this.type = type;
+    }
 
-	public Integer getStatus()
-	{
-		return status;
-	}
+    public Integer getUserId() {
+	return userId;
+    }
 
-	public void setStatus(Integer status)
-	{
-		this.status = status;
-	}
-	
-	public List<GermplasmListData> getListData() {
-		return listData;
-	}
+    public void setUserId(Integer userId) {
+	this.userId = userId;
+    }
 
-	public void setListData(List<GermplasmListData> listData) {
-		this.listData = listData;
-	}
+    public String getDescription() {
+	return description;
+    }
 
-	@Override
-	public String toString()
-	{
-		return "GermplasmList [id=" + id + ", name=" + name + ", date=" + date
-				+ ", type=" + type + ", description=" + description
-				+ ", status=" + status + "]";
-	}
+    public void setDescription(String description) {
+	this.description = description;
+    }
 
-	@Override
-	public int hashCode()
-	{
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
-	}
+    public GermplasmList getParent() {
+	return parent;
+    }
 
-	@Override
-	public boolean equals(Object obj)
-	{
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		GermplasmList other = (GermplasmList) obj;
-		if (id == null)
-		{
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
-	}
-	
+    public void setParent(GermplasmList parent) {
+	this.parent = parent;
+    }
+
+    public Integer getStatus() {
+	return status;
+    }
+
+    public void setStatus(Integer status) {
+	this.status = status;
+    }
+
+    public List<GermplasmListData> getListData() {
+	return listData;
+    }
+
+    public void setListData(List<GermplasmListData> listData) {
+	this.listData = listData;
+    }
+
+    @Override
+    public String toString() {
+	return "GermplasmList [id=" + id + ", name=" + name + ", date=" + date
+		+ ", type=" + type + ", description=" + description
+		+ ", status=" + status + "]";
+    }
+
+    @Override
+    public int hashCode() {
+	final int prime = 31;
+	int result = 1;
+	result = prime * result + ((id == null) ? 0 : id.hashCode());
+	return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+	if (this == obj)
+	    return true;
+	if (obj == null)
+	    return false;
+	if (getClass() != obj.getClass())
+	    return false;
+	GermplasmList other = (GermplasmList) obj;
+	if (id == null) {
+	    if (other.id != null)
+		return false;
+	} else if (!id.equals(other.id))
+	    return false;
+	return true;
+    }
+
 }

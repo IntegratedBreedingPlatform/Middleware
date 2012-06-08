@@ -10,104 +10,90 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "scalecon")
-public class ScaleContinuous implements Serializable
-{
-	private static final long serialVersionUID = 1L;
-	
-	@Id
-	@Basic(optional = false)
-	@Column(name = "scaleid")
-	private Integer scaleId;
-	
-	@Basic(optional = false)
-	@Column(name = "slevel")
-	private Double start;
-	
-	@Basic(optional = false)
-	@Column(name = "elevel")
-	private Double end;
+public class ScaleContinuous implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-	public ScaleContinuous()
-	{
-	}
-	
-	public ScaleContinuous(Integer scaleId)
-	{
-		super();
-		this.scaleId = scaleId;
-	}
+    @Id
+    @Basic(optional = false)
+    @Column(name = "scaleid")
+    private Integer scaleId;
 
-	public ScaleContinuous(Integer scaleId, Double start, Double end)
-	{
-		super();
-		this.scaleId = scaleId;
-		this.start = start;
-		this.end = end;
-	}
+    @Basic(optional = false)
+    @Column(name = "slevel")
+    private Double start;
 
-	public Integer getScaleId()
-	{
-		return scaleId;
-	}
+    @Basic(optional = false)
+    @Column(name = "elevel")
+    private Double end;
 
-	public void setScaleId(Integer scaleId)
-	{
-		this.scaleId = scaleId;
-	}
+    public ScaleContinuous() {
+    }
 
-	public Double getStart()
-	{
-		return start;
-	}
+    public ScaleContinuous(Integer scaleId) {
+	super();
+	this.scaleId = scaleId;
+    }
 
-	public void setStart(Double start)
-	{
-		this.start = start;
-	}
+    public ScaleContinuous(Integer scaleId, Double start, Double end) {
+	super();
+	this.scaleId = scaleId;
+	this.start = start;
+	this.end = end;
+    }
 
-	public Double getEnd()
-	{
-		return end;
-	}
+    public Integer getScaleId() {
+	return scaleId;
+    }
 
-	public void setEnd(Double end)
-	{
-		this.end = end;
-	}
+    public void setScaleId(Integer scaleId) {
+	this.scaleId = scaleId;
+    }
 
-	@Override
-	public String toString()
-	{
-		return "ScaleContinuous [scaleId=" + scaleId + ", start=" + start
-				+ ", end=" + end + "]";
-	}
+    public Double getStart() {
+	return start;
+    }
 
-	@Override
-	public int hashCode()
-	{
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((scaleId == null) ? 0 : scaleId.hashCode());
-		return result;
-	}
+    public void setStart(Double start) {
+	this.start = start;
+    }
 
-	@Override
-	public boolean equals(Object obj)
-	{
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		ScaleContinuous other = (ScaleContinuous) obj;
-		if (scaleId == null)
-		{
-			if (other.scaleId != null)
-				return false;
-		} else if (!scaleId.equals(other.scaleId))
-			return false;
-		return true;
-	}
-	
+    public Double getEnd() {
+	return end;
+    }
+
+    public void setEnd(Double end) {
+	this.end = end;
+    }
+
+    @Override
+    public String toString() {
+	return "ScaleContinuous [scaleId=" + scaleId + ", start=" + start
+		+ ", end=" + end + "]";
+    }
+
+    @Override
+    public int hashCode() {
+	final int prime = 31;
+	int result = 1;
+	result = prime * result + ((scaleId == null) ? 0 : scaleId.hashCode());
+	return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+	if (this == obj)
+	    return true;
+	if (obj == null)
+	    return false;
+	if (getClass() != obj.getClass())
+	    return false;
+	ScaleContinuous other = (ScaleContinuous) obj;
+	if (scaleId == null) {
+	    if (other.scaleId != null)
+		return false;
+	} else if (!scaleId.equals(other.scaleId))
+	    return false;
+	return true;
+    }
+
 }

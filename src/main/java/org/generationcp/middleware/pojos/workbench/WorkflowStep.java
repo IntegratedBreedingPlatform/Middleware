@@ -29,65 +29,56 @@ public class WorkflowStep implements Serializable {
     @GeneratedValue
     @Column(name = "step_id")
     private Long stepId;
-    
+
     @Basic(optional = false)
     @Column(name = "name")
     private String name;
-    
-    @OneToMany(
-        cascade = CascadeType.ALL
-        ,orphanRemoval = true
-        ,fetch = FetchType.LAZY
-    )
-    @JoinTable (
-        name = "workflow_step_tool"
-        ,joinColumns = {
-            @JoinColumn(name="step_id")
-        }
-        ,inverseJoinColumns = {
-            @JoinColumn(name="tool_id")
-        }
-    )
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinTable(name = "workflow_step_tool", joinColumns = { @JoinColumn(name = "step_id") }, inverseJoinColumns = { @JoinColumn(name = "tool_id") })
     @OrderColumn(name = "tool_number")
     private List<Tool> tools;
 
     public Long getStepId() {
-        return stepId;
+	return stepId;
     }
 
     public void setStepId(Long stepId) {
-        this.stepId = stepId;
+	this.stepId = stepId;
     }
 
     public String getName() {
-        return name;
+	return name;
     }
 
     public void setName(String name) {
-        this.name = name;
+	this.name = name;
     }
 
     public List<Tool> getTools() {
-        return tools;
+	return tools;
     }
 
     public void setTools(List<Tool> tools) {
-        this.tools = tools;
+	this.tools = tools;
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(stepId).hashCode();
+	return new HashCodeBuilder().append(stepId).hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) return false;
-        if (obj == this) return true;
-        if (!WorkflowStep.class.isInstance(obj)) return false;
+	if (obj == null)
+	    return false;
+	if (obj == this)
+	    return true;
+	if (!WorkflowStep.class.isInstance(obj))
+	    return false;
 
-        WorkflowStep otherObj = (WorkflowStep) obj;
+	WorkflowStep otherObj = (WorkflowStep) obj;
 
-        return new EqualsBuilder().append(stepId, otherObj.stepId).isEquals();
+	return new EqualsBuilder().append(stepId, otherObj.stepId).isEquals();
     }
 }

@@ -13,231 +13,204 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Entity
 @Table(name = "persons")
-public class Person implements Serializable
-{
-	private static final long serialVersionUID = -3159738927364282485L;
+public class Person implements Serializable {
+    private static final long serialVersionUID = -3159738927364282485L;
 
-	@Id
-	@Basic(optional = false)
-	@Column(name = "personid")
-	private Integer id;
-	
-	@Column(name = "fname")
-	private String firstName;
-	
-	@Column(name = "lname")
-	private String lastName;
-	
-	@Column(name = "ioname")
-	private String middleName;
-	
-	@Column(name = "institid")
-	private Integer instituteId;
-	
-	@Column(name = "ptitle")
-	private String title;
-	
-	@Column(name = "poname")
-	private String positionName;
-	
-	@Column(name = "plangu")
-	private Integer language;
-	
-	@Column(name = "pphone")
-	private String phone;
-	
-	@Column(name = "pextent")
-	private String extension;
-	
-	@Column(name = "pfax")
-	private String fax;
-	
-	@Column(name = "pemail")
-	private String email;
-	
-	@Column(name = "pnotes")
-	private String notes;
+    @Id
+    @Basic(optional = false)
+    @Column(name = "personid")
+    private Integer id;
 
-	public Person()
-	{
-	}
-	
-	public Person(Integer id, String firstName, String lastName,
-			String middleName, Integer instituteId, String title,
-			String positionName, Integer language, String phone,
-			String extension, String fax, String email, String notes)
-	{
-		super();
-		this.id = id;
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.middleName = middleName;
-		this.instituteId = instituteId;
-		this.title = title;
-		this.positionName = positionName;
-		this.language = language;
-		this.phone = phone;
-		this.extension = extension;
-		this.fax = fax;
-		this.email = email;
-		this.notes = notes;
-	}
+    @Column(name = "fname")
+    private String firstName;
 
-	public Integer getId()
-	{
-		return id;
-	}
+    @Column(name = "lname")
+    private String lastName;
 
-	public void setId(Integer id)
-	{
-		this.id = id;
-	}
+    @Column(name = "ioname")
+    private String middleName;
 
-	public String getFirstName()
-	{
-		return firstName;
-	}
+    @Column(name = "institid")
+    private Integer instituteId;
 
-	public void setFirstName(String firstName)
-	{
-		this.firstName = firstName;
-	}
+    @Column(name = "ptitle")
+    private String title;
 
-	public String getLastName()
-	{
-		return lastName;
-	}
+    @Column(name = "poname")
+    private String positionName;
 
-	public void setLastName(String lastName)
-	{
-		this.lastName = lastName;
-	}
+    @Column(name = "plangu")
+    private Integer language;
 
-	public String getMiddleName()
-	{
-		return middleName;
-	}
+    @Column(name = "pphone")
+    private String phone;
 
-	public void setMiddleName(String middleName)
-	{
-		this.middleName = middleName;
-	}
+    @Column(name = "pextent")
+    private String extension;
 
-	public Integer getInstituteId()
-	{
-		return instituteId;
-	}
+    @Column(name = "pfax")
+    private String fax;
 
-	public void setInstituteId(Integer instituteId)
-	{
-		this.instituteId = instituteId;
-	}
+    @Column(name = "pemail")
+    private String email;
 
-	public String getTitle()
-	{
-		return title;
-	}
+    @Column(name = "pnotes")
+    private String notes;
 
-	public void setTitle(String title)
-	{
-		this.title = title;
-	}
+    public Person() {
+    }
 
-	public String getPositionName()
-	{
-		return positionName;
-	}
+    public Person(Integer id, String firstName, String lastName,
+	    String middleName, Integer instituteId, String title,
+	    String positionName, Integer language, String phone,
+	    String extension, String fax, String email, String notes) {
+	super();
+	this.id = id;
+	this.firstName = firstName;
+	this.lastName = lastName;
+	this.middleName = middleName;
+	this.instituteId = instituteId;
+	this.title = title;
+	this.positionName = positionName;
+	this.language = language;
+	this.phone = phone;
+	this.extension = extension;
+	this.fax = fax;
+	this.email = email;
+	this.notes = notes;
+    }
 
-	public void setPositionName(String positionName)
-	{
-		this.positionName = positionName;
-	}
+    public Integer getId() {
+	return id;
+    }
 
-	public Integer getLanguage()
-	{
-		return language;
-	}
+    public void setId(Integer id) {
+	this.id = id;
+    }
 
-	public void setLanguage(Integer language)
-	{
-		this.language = language;
-	}
+    public String getFirstName() {
+	return firstName;
+    }
 
-	public String getPhone()
-	{
-		return phone;
-	}
+    public void setFirstName(String firstName) {
+	this.firstName = firstName;
+    }
 
-	public void setPhone(String phone)
-	{
-		this.phone = phone;
-	}
+    public String getLastName() {
+	return lastName;
+    }
 
-	public String getExtension()
-	{
-		return extension;
-	}
+    public void setLastName(String lastName) {
+	this.lastName = lastName;
+    }
 
-	public void setExtension(String extension)
-	{
-		this.extension = extension;
-	}
+    public String getMiddleName() {
+	return middleName;
+    }
 
-	public String getFax()
-	{
-		return fax;
-	}
+    public void setMiddleName(String middleName) {
+	this.middleName = middleName;
+    }
 
-	public void setFax(String fax)
-	{
-		this.fax = fax;
-	}
+    public Integer getInstituteId() {
+	return instituteId;
+    }
 
-	public String getEmail()
-	{
-		return email;
-	}
+    public void setInstituteId(Integer instituteId) {
+	this.instituteId = instituteId;
+    }
 
-	public void setEmail(String email)
-	{
-		this.email = email;
-	}
+    public String getTitle() {
+	return title;
+    }
 
-	public String getNotes()
-	{
-		return notes;
-	}
+    public void setTitle(String title) {
+	this.title = title;
+    }
 
-	public void setNotes(String notes)
-	{
-		this.notes = notes;
-	}
+    public String getPositionName() {
+	return positionName;
+    }
 
-	@Override
-	public String toString()
-	{
-		return "Person [id=" + id + ", firstName=" + firstName + ", lastName="
-				+ lastName + ", middleName=" + middleName + ", instituteId="
-				+ instituteId + ", title=" + title + ", positionName="
-				+ positionName + ", language=" + language + ", phone=" + phone
-				+ ", extension=" + extension + ", fax=" + fax + ", email="
-				+ email + ", notes=" + notes + "]";
-	}
-	
-	@Override
+    public void setPositionName(String positionName) {
+	this.positionName = positionName;
+    }
+
+    public Integer getLanguage() {
+	return language;
+    }
+
+    public void setLanguage(Integer language) {
+	this.language = language;
+    }
+
+    public String getPhone() {
+	return phone;
+    }
+
+    public void setPhone(String phone) {
+	this.phone = phone;
+    }
+
+    public String getExtension() {
+	return extension;
+    }
+
+    public void setExtension(String extension) {
+	this.extension = extension;
+    }
+
+    public String getFax() {
+	return fax;
+    }
+
+    public void setFax(String fax) {
+	this.fax = fax;
+    }
+
+    public String getEmail() {
+	return email;
+    }
+
+    public void setEmail(String email) {
+	this.email = email;
+    }
+
+    public String getNotes() {
+	return notes;
+    }
+
+    public void setNotes(String notes) {
+	this.notes = notes;
+    }
+
+    @Override
+    public String toString() {
+	return "Person [id=" + id + ", firstName=" + firstName + ", lastName="
+		+ lastName + ", middleName=" + middleName + ", instituteId="
+		+ instituteId + ", title=" + title + ", positionName="
+		+ positionName + ", language=" + language + ", phone=" + phone
+		+ ", extension=" + extension + ", fax=" + fax + ", email="
+		+ email + ", notes=" + notes + "]";
+    }
+
+    @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(id).hashCode();
+	return new HashCodeBuilder().append(id).hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) return false;
-        if (obj == this) return true;
-        if (!Person.class.isInstance(obj)) return false;
+	if (obj == null)
+	    return false;
+	if (obj == this)
+	    return true;
+	if (!Person.class.isInstance(obj))
+	    return false;
 
-        Person otherObj = (Person) obj;
+	Person otherObj = (Person) obj;
 
-        return new EqualsBuilder().append(id, otherObj.id).isEquals();
+	return new EqualsBuilder().append(id, otherObj.id).isEquals();
     }
 
 }

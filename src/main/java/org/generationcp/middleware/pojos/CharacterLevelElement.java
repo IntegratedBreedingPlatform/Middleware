@@ -5,97 +5,80 @@ import java.io.Serializable;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class CharacterLevelElement implements Serializable
-{
-	private static final long serialVersionUID = -4284129132975100671L;
+public class CharacterLevelElement implements Serializable {
+    private static final long serialVersionUID = -4284129132975100671L;
 
-	private Integer ounitId;
-	private Integer factorId;
-	private String factorName;
-	private String value;
-	
-	public CharacterLevelElement(Integer ounitId, Integer factorId,
-			String factorName, String value)
-	{
-		super();
-		this.ounitId = ounitId;
-		this.factorId = factorId;
-		this.factorName = factorName;
-		this.value = value;
-	}
+    private Integer ounitId;
+    private Integer factorId;
+    private String factorName;
+    private String value;
 
-	public Integer getOunitId()
-	{
-		return ounitId;
-	}
+    public CharacterLevelElement(Integer ounitId, Integer factorId,
+	    String factorName, String value) {
+	super();
+	this.ounitId = ounitId;
+	this.factorId = factorId;
+	this.factorName = factorName;
+	this.value = value;
+    }
 
-	public void setOunitId(Integer ounitId)
-	{
-		this.ounitId = ounitId;
-	}
+    public Integer getOunitId() {
+	return ounitId;
+    }
 
-	public Integer getFactorId()
-	{
-		return factorId;
-	}
+    public void setOunitId(Integer ounitId) {
+	this.ounitId = ounitId;
+    }
 
-	public void setFactorId(Integer factorId)
-	{
-		this.factorId = factorId;
-	}
+    public Integer getFactorId() {
+	return factorId;
+    }
 
-	public String getFactorName()
-	{
-		return factorName;
-	}
+    public void setFactorId(Integer factorId) {
+	this.factorId = factorId;
+    }
 
-	public void setFactorName(String factorName)
-	{
-		this.factorName = factorName;
-	}
+    public String getFactorName() {
+	return factorName;
+    }
 
-	public String getValue()
-	{
-		return value;
-	}
+    public void setFactorName(String factorName) {
+	this.factorName = factorName;
+    }
 
-	public void setValue(String value)
-	{
-		this.value = value;
-	}
+    public String getValue() {
+	return value;
+    }
 
-	@Override
-	public String toString()
-	{
-		return "CharacterLevelElement [ounitId=" + ounitId + ", factorId="
-				+ factorId + ", factorName=" + factorName + ", value=" + value
-				+ "]";
-	}
-	
-	@Override
-	public boolean equals(Object obj) 
-	{
-	   if (obj == null)
-		   return false;
-	   if (obj == this) 
-		   return true; 
-	   if (!(obj instanceof CharacterLevelElement)) 
-		   return false;
-	
-	   CharacterLevelElement rhs = (CharacterLevelElement) obj;
-	   return new EqualsBuilder()
-	                 .appendSuper(super.equals(obj))
-	                 .append(ounitId, rhs.ounitId)
-	                 .append(factorId, rhs.factorId)
-	                 .isEquals();
-	}
-	
-	@Override
-	public int hashCode() 
-	{
-	     return new HashCodeBuilder(41, 29).
-	       append(ounitId).
-	       append(factorId).
-	       toHashCode();
-	}
+    public void setValue(String value) {
+	this.value = value;
+    }
+
+    @Override
+    public String toString() {
+	return "CharacterLevelElement [ounitId=" + ounitId + ", factorId="
+		+ factorId + ", factorName=" + factorName + ", value=" + value
+		+ "]";
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+	if (obj == null)
+	    return false;
+	if (obj == this)
+	    return true;
+	if (!(obj instanceof CharacterLevelElement))
+	    return false;
+
+	CharacterLevelElement rhs = (CharacterLevelElement) obj;
+	return new EqualsBuilder().appendSuper(super.equals(obj))
+		.append(ounitId, rhs.ounitId).append(factorId, rhs.factorId)
+		.isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+	return new HashCodeBuilder(41, 29).append(ounitId).append(factorId)
+		.toHashCode();
+    }
 }
