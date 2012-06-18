@@ -264,6 +264,23 @@ public class StudyDataManagerImpl extends DataManager<Study> implements
     }
 
     @Override
+    public List<Representation> getRepresentationByStudyID(Integer studyId)
+	    throws QueryException {
+	RepresentationDAO representationDao = new RepresentationDAO();
+	HibernateUtil hibernateUtil = getHibernateUtil(studyId);
+
+	if (hibernateUtil != null) {
+	    representationDao.setSession(hibernateUtil.getCurrentSession());
+	} else {
+	    return new ArrayList<Representation>();
+	}
+
+	List<Representation> representations = representationDao
+		.getRepresentationByStudyID(studyId);
+	return representations;
+    }
+
+    @Override
     public List<Factor> getFactorsByRepresentationId(Integer representationId)
 	    throws QueryException {
 	FactorDAO dao = new FactorDAO();

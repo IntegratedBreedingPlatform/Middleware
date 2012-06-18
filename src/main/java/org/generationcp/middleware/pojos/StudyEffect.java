@@ -39,6 +39,7 @@ public class StudyEffect implements Serializable {
     @Column(name = "effectname")
     private String name;
 
+    private Integer effectId;
     private Integer studyId;
 
     public StudyEffect() {
@@ -79,6 +80,20 @@ public class StudyEffect implements Serializable {
 	if (id != null) {
 	    id.setStudyId(studyId);
 	    this.studyId = studyId;
+	}
+    }
+
+    public Integer getEffectId() {
+	if (id != null) {
+	    return id.getEffectId();
+	}
+	return null;
+    }
+
+    public void setEffectId(Integer effectId) {
+	if (id != null) {
+	    id.setEffectId(effectId);
+	    this.effectId = effectId;
 	}
     }
 

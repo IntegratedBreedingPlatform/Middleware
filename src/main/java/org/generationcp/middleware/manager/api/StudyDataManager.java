@@ -193,6 +193,15 @@ public interface StudyDataManager {
 	    throws QueryException;
 
     /**
+     * Returns all the Representation records with the given studyId.
+     * 
+     * @param studyId
+     * @return List of Representation POJOs
+     */
+    public List<Representation> getRepresentationByStudyID(Integer studyId)
+	    throws QueryException;
+
+    /**
      * Returns a List of {@code Factor} objects that belong to the specified
      * Representation ID.
      * 

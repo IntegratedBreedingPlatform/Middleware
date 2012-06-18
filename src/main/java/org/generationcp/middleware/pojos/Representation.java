@@ -25,14 +25,18 @@ import javax.persistence.Table;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-//select * from represtn where effectid = 1176
-@NamedQueries({ @NamedQuery(name = "getRepresentationByEffectId", query = "SELECT r FROM Representation r WHERE r.effectId = :effectId") })
+@NamedQueries({ 
+    //select * from represtn where effectid = 1176
+    @NamedQuery(name = "getRepresentationByEffectId", query = "SELECT r FROM Representation r WHERE r.effectId = :effectId"), 
+    @NamedQuery(name = "getRepresentationByStudyId", query = "SELECT r FROM Representation r, StudyEffect se WHERE r.effectId = se.effectId AND se.studyId = :studyId") 
+})
 @Entity
 @Table(name = "represtn")
 public class Representation implements Serializable {
     private static final long serialVersionUID = 3521757463492775303L;
 
     public static final String GET_REPRESENTATION_BY_EFFECT_ID = "getRepresentationByEffectId";
+    public static final String GET_REPRESENTATION_BY_STUDY_ID = "getRepresentationByStudyId";
 
     @Id
     @Basic(optional = false)

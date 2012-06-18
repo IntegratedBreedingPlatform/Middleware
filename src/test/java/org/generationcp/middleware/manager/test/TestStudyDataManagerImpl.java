@@ -151,8 +151,17 @@ public class TestStudyDataManagerImpl
 	}
 	
 	@Test
-	public void testGetRepresentationByStudyID() throws Exception{
+	public void testGetRepresentationByEffectID() throws Exception{
 		List<Representation> representations = manager.getRepresentationByEffectID(new Integer(430));
+		
+		for(Representation representation : representations){
+			System.out.println(representation);
+		}
+	}
+	
+	@Test
+	public void testGetRepresentationByStudyID() throws Exception{
+		List<Representation> representations = manager.getRepresentationByStudyID(new Integer(1));
 		
 		for(Representation representation : representations){
 			System.out.println(representation);
