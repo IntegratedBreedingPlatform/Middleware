@@ -41,7 +41,7 @@ import org.hibernate.Transaction;
  * @author Kevin Manansala
  * 
  */
-public class InventoryDataManagerImpl extends DataManager<Lot> implements
+public class InventoryDataManagerImpl extends DataManager implements
 	InventoryDataManager {
     public InventoryDataManagerImpl(HibernateUtil hibernateUtilForLocal,
 	    HibernateUtil hibernateUtilForCentral) {

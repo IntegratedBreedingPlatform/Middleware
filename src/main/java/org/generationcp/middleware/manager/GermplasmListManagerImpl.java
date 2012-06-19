@@ -25,7 +25,7 @@ import org.generationcp.middleware.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-public class GermplasmListManagerImpl extends DataManager<GermplasmList>
+public class GermplasmListManagerImpl extends DataManager
 	implements GermplasmListManager {
     public GermplasmListManagerImpl(HibernateUtil hibernateUtilForLocal,
 	    HibernateUtil hibernateUtilForCentral) {

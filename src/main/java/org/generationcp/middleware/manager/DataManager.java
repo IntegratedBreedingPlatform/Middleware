@@ -23,7 +23,7 @@ import org.generationcp.middleware.util.HibernateUtil;
 /**
  * The Class DataManager.
  */
-public abstract class DataManager<T> {
+public abstract class DataManager {
 
     /** The hibernate util for local. */
     protected HibernateUtil hibernateUtilForLocal;

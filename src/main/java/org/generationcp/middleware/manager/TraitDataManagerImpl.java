@@ -32,7 +32,7 @@ import org.generationcp.middleware.pojos.TraitMethod;
 import org.generationcp.middleware.util.HibernateUtil;
 import org.hibernate.Session;
 
-public class TraitDataManagerImpl extends DataManager<Trait> implements
+public class TraitDataManagerImpl extends DataManager implements
 	TraitDataManager {
     public TraitDataManagerImpl(HibernateUtil hibernateUtilForLocal,
 	    HibernateUtil hibernateUtilForCentral) {
