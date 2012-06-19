@@ -41,7 +41,7 @@ import org.generationcp.middleware.pojos.TraitCombinationFilter;
 import org.generationcp.middleware.pojos.Variate;
 import org.generationcp.middleware.util.HibernateUtil;
 
-public class StudyDataManagerImpl extends DataManager<Study> implements
+public class StudyDataManagerImpl extends DataManager implements
 	StudyDataManager {
 
     public StudyDataManagerImpl(HibernateUtil hibernateUtilForLocal,
