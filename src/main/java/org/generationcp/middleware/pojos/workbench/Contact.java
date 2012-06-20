@@ -1,15 +1,15 @@
-/***************************************************************
+/*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  * 
  * Generation Challenge Programme (GCP)
  * 
  * 
- * This software is licensed for use under the terms of the 
- * GNU General Public License (http://bit.ly/8Ztv8M) and the 
- * provisions of Part F of the Generation Challenge Programme 
- * Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
- **************************************************************/
+ *******************************************************************************/
+
 package org.generationcp.middleware.pojos.workbench;
 
 import java.io.Serializable;
@@ -25,7 +25,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Entity
 @Table(name = "persons")
-public class Contact implements Serializable {
+public class Contact implements Serializable{
+
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -63,110 +64,112 @@ public class Contact implements Serializable {
     private String description;
 
     public Long getContactId() {
-	return contactId;
+        return contactId;
     }
 
     public void setContactId(Long contactId) {
-	this.contactId = contactId;
+        this.contactId = contactId;
     }
 
     public String getTitle() {
-	return title;
+        return title;
     }
 
     public void setTitle(String title) {
-	this.title = title;
+        this.title = title;
     }
 
     public String getFirstName() {
-	return firstName;
+        return firstName;
     }
 
     public void setFirstName(String firstName) {
-	this.firstName = firstName;
+        this.firstName = firstName;
     }
 
     public String getLastName() {
-	return lastName;
+        return lastName;
     }
 
     public void setLastName(String lastName) {
-	this.lastName = lastName;
+        this.lastName = lastName;
     }
 
     public String getEmail() {
-	return email;
+        return email;
     }
 
     public void setEmail(String email) {
-	this.email = email;
+        this.email = email;
     }
 
     public String getPhoneNumber() {
-	return phoneNumber;
+        return phoneNumber;
     }
 
     public void setPhoneNumber(String phoneNumber) {
-	this.phoneNumber = phoneNumber;
+        this.phoneNumber = phoneNumber;
     }
 
     public String getInstitution() {
-	return institution;
+        return institution;
     }
 
     public void setInstitution(String institution) {
-	this.institution = institution;
+        this.institution = institution;
     }
 
     public String getAddress1() {
-	return address1;
+        return address1;
     }
 
     public void setAddress1(String address) {
-	this.address1 = address;
+        this.address1 = address;
     }
 
     public String getAddress2() {
-	return address2;
+        return address2;
     }
 
     public void setAddress2(String address2) {
-	this.address2 = address2;
+        this.address2 = address2;
     }
 
     public String getSkypeId() {
-	return skypeId;
+        return skypeId;
     }
 
     public void setSkypeId(String skypeId) {
-	this.skypeId = skypeId;
+        this.skypeId = skypeId;
     }
 
     public String getDescription() {
-	return description;
+        return description;
     }
 
     public void setDescription(String description) {
-	this.description = description;
+        this.description = description;
     }
 
     @Override
     public int hashCode() {
-	return new HashCodeBuilder().append(contactId).hashCode();
+        return new HashCodeBuilder().append(contactId).hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
-	if (obj == null)
-	    return false;
-	if (obj == this)
-	    return true;
-	if (!Contact.class.isInstance(obj))
-	    return false;
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (!Contact.class.isInstance(obj)) {
+            return false;
+        }
 
-	Contact otherObj = (Contact) obj;
+        Contact otherObj = (Contact) obj;
 
-	return new EqualsBuilder().append(contactId, otherObj.contactId)
-		.isEquals();
+        return new EqualsBuilder().append(contactId, otherObj.contactId).isEquals();
     }
 }

@@ -1,15 +1,15 @@
-/***************************************************************
+/*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  * 
  * Generation Challenge Programme (GCP)
  * 
  * 
- * This software is licensed for use under the terms of the 
- * GNU General Public License (http://bit.ly/8Ztv8M) and the 
- * provisions of Part F of the Generation Challenge Programme 
- * Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
- **************************************************************/
+ *******************************************************************************/
+
 package org.generationcp.middleware.pojos.workbench;
 
 import java.io.Serializable;
@@ -33,7 +33,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Entity
 @Table(name = "workbench_workflow_template")
-public class WorkflowTemplate implements Serializable {
+public class WorkflowTemplate implements Serializable{
+
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -51,7 +52,8 @@ public class WorkflowTemplate implements Serializable {
     private boolean userDefined;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JoinTable(name = "workflow_template_step", joinColumns = { @JoinColumn(name = "template_id") }, inverseJoinColumns = { @JoinColumn(name = "step_id") })
+    @JoinTable(name = "workflow_template_step", joinColumns = { @JoinColumn(name = "template_id") }, inverseJoinColumns = { @JoinColumn(
+            name = "step_id") })
     @OrderColumn(name = "step_number")
     private List<WorkflowStep> steps;
 
@@ -59,67 +61,69 @@ public class WorkflowTemplate implements Serializable {
     }
 
     public WorkflowTemplate(Long templateId) {
-	this.templateId = templateId;
+        this.templateId = templateId;
     }
 
     public WorkflowTemplate(String templateIdStr) {
-	templateId = Long.parseLong(templateIdStr);
+        templateId = Long.parseLong(templateIdStr);
     }
 
     public Long getTemplateId() {
-	return templateId;
+        return templateId;
     }
 
     public void setTemplateId(Long templateId) {
-	this.templateId = templateId;
+        this.templateId = templateId;
     }
 
     public String getName() {
-	return name;
+        return name;
     }
 
     public void setName(String name) {
-	this.name = name;
+        this.name = name;
     }
 
     public boolean isUserDefined() {
-	return userDefined;
+        return userDefined;
     }
 
     public void setUserDefined(boolean userDefined) {
-	this.userDefined = userDefined;
+        this.userDefined = userDefined;
     }
 
     public List<WorkflowStep> getSteps() {
-	return steps;
+        return steps;
     }
 
     public void setSteps(List<WorkflowStep> steps) {
-	this.steps = steps;
+        this.steps = steps;
     }
 
     @Override
     public int hashCode() {
-	return new HashCodeBuilder().append(templateId).hashCode();
+        return new HashCodeBuilder().append(templateId).hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
-	if (obj == null)
-	    return false;
-	if (obj == this)
-	    return true;
-	if (!WorkflowTemplate.class.isInstance(obj))
-	    return false;
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (!WorkflowTemplate.class.isInstance(obj)) {
+            return false;
+        }
 
-	WorkflowTemplate otherObj = (WorkflowTemplate) obj;
+        WorkflowTemplate otherObj = (WorkflowTemplate) obj;
 
-	return new EqualsBuilder().append(templateId, otherObj.templateId)
-		.isEquals();
+        return new EqualsBuilder().append(templateId, otherObj.templateId).isEquals();
     }
 
     @Override
     public String toString() {
-	return name;
+        return name;
     }
 }

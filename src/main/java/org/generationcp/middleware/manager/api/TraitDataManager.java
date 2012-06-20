@@ -1,15 +1,15 @@
-/***************************************************************
+/*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  * 
  * Generation Challenge Programme (GCP)
  * 
  * 
- * This software is licensed for use under the terms of the 
- * GNU General Public License (http://bit.ly/8Ztv8M) and the 
- * provisions of Part F of the Generation Challenge Programme 
- * Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
- **************************************************************/
+ *******************************************************************************/
+
 package org.generationcp.middleware.manager.api;
 
 import java.util.List;
@@ -29,7 +29,8 @@ import org.generationcp.middleware.pojos.TraitMethod;
  * @author Kevin Manansala
  * 
  */
-public interface TraitDataManager {
+public interface TraitDataManager{
+
     /**
      * Returns the Scale record identified by the given id.
      * 
@@ -52,8 +53,7 @@ public interface TraitDataManager {
      * @return List of Scale POJOs
      * @throws QueryException
      */
-    public List<Scale> getAllScales(int start, int numOfRows, Database instance)
-	    throws QueryException;
+    public List<Scale> getAllScales(int start, int numOfRows, Database instance) throws QueryException;
 
     /**
      * Returns the total number of Scale records.
@@ -120,8 +120,7 @@ public interface TraitDataManager {
      * @return
      * @throws QueryException
      */
-    public List<Trait> getAllTraits(int start, int numOfRows, Database instance)
-	    throws QueryException;
+    public List<Trait> getAllTraits(int start, int numOfRows, Database instance) throws QueryException;
 
     /**
      * Returns the total number of Trait records.
@@ -152,8 +151,7 @@ public interface TraitDataManager {
      * @return List of TraitMethod POJOs
      * @throws QueryException
      */
-    public List<TraitMethod> getAllTraitMethods(int start, int numOfRows,
-	    Database instance) throws QueryException;
+    public List<TraitMethod> getAllTraitMethods(int start, int numOfRows, Database instance) throws QueryException;
 
     /**
      * Returns the total number of Trait Method records.

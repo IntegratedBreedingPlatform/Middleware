@@ -1,15 +1,15 @@
-/***************************************************************
+/*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  * 
  * Generation Challenge Programme (GCP)
  * 
  * 
- * This software is licensed for use under the terms of the 
- * GNU General Public License (http://bit.ly/8Ztv8M) and the 
- * provisions of Part F of the Generation Challenge Programme 
- * Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
- **************************************************************/
+ *******************************************************************************/
+
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
@@ -18,8 +18,6 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedNativeQueries;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
@@ -34,69 +32,74 @@ import javax.xml.bind.annotation.XmlType;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
 
 /**
  * POJO for germplsm table
  * 
  * @author Kevin Manansala, Mark Agarrado
  */
-@NamedQueries({
-	@NamedQuery(name = "findAllGermplasm", query = "FROM Germplasm"),
-	@NamedQuery(name = "countAllGermplasm", query = "SELECT COUNT(g) FROM Germplasm g"),
-	// @NamedQuery
-	// (
-	// name = "findGermplasmByMethodNameUsingEqual",
-	// query = "FROM Germplasm g WHERE g.method.mname = :name"
-	// ),
-	@NamedQuery(name = "findGermplasmByMethodNameUsingEqual", query = "SELECT g FROM Germplasm g, Method m WHERE g.methodId = m.mid AND m.mname = :name"),
-	// @NamedQuery
-	// (
-	// name = "countGermplasmByMethodNameUsingEqual",
-	// query =
-	// "SELECT COUNT(g) FROM Germplasm g WHERE g.method.mname = :name"
-	// ),
-	@NamedQuery(name = "countGermplasmByMethodNameUsingEqual", query = "SELECT COUNT(g) FROM Germplasm g, Method m WHERE g.methodId = m.mid AND m.mname = :name"),
-	// @NamedQuery
-	// (
-	// name = "findGermplasmByMethodNameUsingLike",
-	// query = "FROM Germplasm g WHERE g.method.mname like :name"
-	// ),
-	@NamedQuery(name = "findGermplasmByMethodNameUsingLike", query = "SELECT g FROM Germplasm g, Method m WHERE g.methodId = m.mid AND m.mname like :name"),
-	// @NamedQuery
-	// (
-	// name = "countGermplasmByMethodNameUsingLike",
-	// query =
-	// "SELECT COUNT(g) FROM Germplasm g WHERE g.method.mname like :name"
-	// ),
-	@NamedQuery(name = "countGermplasmByMethodNameUsingLike", query = "SELECT COUNT(g) FROM Germplasm g, Method m WHERE g.methodId = m.mid AND m.mname like :name"),
-	// @NamedQuery
-	// (
-	// name = "findGermplasmByLocationNameUsingEqual",
-	// query = "FROM Germplasm g WHERE g.location.lname = :name"
-	// ),
-	@NamedQuery(name = "findGermplasmByLocationNameUsingEqual", query = "SELECT g FROM Germplasm g, Location l WHERE g.locationId = l.locid AND l.lname = :name"),
-	// @NamedQuery
-	// (
-	// name = "countGermplasmByLocationNameUsingEqual",
-	// query =
-	// "SELECT COUNT(g) FROM Germplasm g WHERE g.location.lname = :name"
-	// ),
-	@NamedQuery(name = "countGermplasmByLocationNameUsingEqual", query = "SELECT COUNT(g) FROM Germplasm g, Location l WHERE g.locationId = l.locid AND l.lname = :name"),
-	// @NamedQuery
-	// (
-	// name = "findGermplasmByLocationNameUsingLike",
-	// query = "FROM Germplasm g WHERE g.location.lname like :name"
-	// ),
-	@NamedQuery(name = "findGermplasmByLocationNameUsingLike", query = "SELECT g FROM Germplasm g, Location l WHERE g.locationId = l.locid AND l.lname like :name"),
-	// @NamedQuery
-	// (
-	// name = "countGermplasmByLocationNameUsingLike",
-	// query =
-	// "SELECT COUNT(g) FROM Germplasm g WHERE g.location.lname like :name"
-	// ),
-	@NamedQuery(name = "countGermplasmByLocationNameUsingLike", query = "SELECT COUNT(g) FROM Germplasm g, Location l WHERE g.locationId = l.locid AND l.lname like :name")
+@NamedQueries({ @NamedQuery(name = "findAllGermplasm", query = "FROM Germplasm"),
+        @NamedQuery(name = "countAllGermplasm", query = "SELECT COUNT(g) FROM Germplasm g"),
+        // @NamedQuery
+        // (
+        // name = "findGermplasmByMethodNameUsingEqual",
+        // query = "FROM Germplasm g WHERE g.method.mname = :name"
+        // ),
+        @NamedQuery(name = "findGermplasmByMethodNameUsingEqual",
+                query = "SELECT g FROM Germplasm g, Method m WHERE g.methodId = m.mid AND m.mname = :name"),
+        // @NamedQuery
+        // (
+        // name = "countGermplasmByMethodNameUsingEqual",
+        // query =
+        // "SELECT COUNT(g) FROM Germplasm g WHERE g.method.mname = :name"
+        // ),
+        @NamedQuery(name = "countGermplasmByMethodNameUsingEqual",
+                query = "SELECT COUNT(g) FROM Germplasm g, Method m WHERE g.methodId = m.mid AND m.mname = :name"),
+        // @NamedQuery
+        // (
+        // name = "findGermplasmByMethodNameUsingLike",
+        // query = "FROM Germplasm g WHERE g.method.mname like :name"
+        // ),
+        @NamedQuery(name = "findGermplasmByMethodNameUsingLike",
+                query = "SELECT g FROM Germplasm g, Method m WHERE g.methodId = m.mid AND m.mname like :name"),
+        // @NamedQuery
+        // (
+        // name = "countGermplasmByMethodNameUsingLike",
+        // query =
+        // "SELECT COUNT(g) FROM Germplasm g WHERE g.method.mname like :name"
+        // ),
+        @NamedQuery(name = "countGermplasmByMethodNameUsingLike",
+                query = "SELECT COUNT(g) FROM Germplasm g, Method m WHERE g.methodId = m.mid AND m.mname like :name"),
+        // @NamedQuery
+        // (
+        // name = "findGermplasmByLocationNameUsingEqual",
+        // query = "FROM Germplasm g WHERE g.location.lname = :name"
+        // ),
+        @NamedQuery(name = "findGermplasmByLocationNameUsingEqual",
+                query = "SELECT g FROM Germplasm g, Location l WHERE g.locationId = l.locid AND l.lname = :name"),
+        // @NamedQuery
+        // (
+        // name = "countGermplasmByLocationNameUsingEqual",
+        // query =
+        // "SELECT COUNT(g) FROM Germplasm g WHERE g.location.lname = :name"
+        // ),
+        @NamedQuery(name = "countGermplasmByLocationNameUsingEqual",
+                query = "SELECT COUNT(g) FROM Germplasm g, Location l WHERE g.locationId = l.locid AND l.lname = :name"),
+        // @NamedQuery
+        // (
+        // name = "findGermplasmByLocationNameUsingLike",
+        // query = "FROM Germplasm g WHERE g.location.lname like :name"
+        // ),
+        @NamedQuery(name = "findGermplasmByLocationNameUsingLike",
+                query = "SELECT g FROM Germplasm g, Location l WHERE g.locationId = l.locid AND l.lname like :name"),
+        // @NamedQuery
+        // (
+        // name = "countGermplasmByLocationNameUsingLike",
+        // query =
+        // "SELECT COUNT(g) FROM Germplasm g WHERE g.location.lname like :name"
+        // ),
+        @NamedQuery(name = "countGermplasmByLocationNameUsingLike",
+                query = "SELECT COUNT(g) FROM Germplasm g, Location l WHERE g.locationId = l.locid AND l.lname like :name")
 // @NamedQuery
 // (
 // name = "getGermplasmByGIDWithPrefName",
@@ -145,16 +148,20 @@ import org.hibernate.annotations.NotFoundAction;
 // )
 })
 @NamedNativeQueries({
-	@NamedNativeQuery(name = "getGermplasmDescendants", query = "SELECT DISTINCT g.* FROM germplsm g LEFT JOIN progntrs p ON g.gid = p.gid "
-		+ "WHERE g.gpid1=:gid OR g.gpid2=:gid OR p.pid=:gid", resultClass = Germplasm.class),
-	@NamedNativeQuery(name = "findGermplasmByPrefName", query = "SELECT g.* FROM germplsm g LEFT JOIN names n ON g.gid = n.gid "
-		+ "AND n.nstat = 1 " + "WHERE n.nval = :name", resultClass = Germplasm.class),
-	@NamedNativeQuery(name = "getProgenitor1", query = "select * from germplsm g1 where g1.gid = (SELECT g.gpid1 FROM germplsm g LEFT JOIN progntrs p ON g.gid = p.gid "
-		+ "WHERE g.gid = :gid)", resultClass = Germplasm.class),
-	@NamedNativeQuery(name = "getProgenitor2", query = "select * from germplsm g1 where g1.gid = (SELECT g.gpid2 FROM germplsm g LEFT JOIN progntrs p ON g.gid = p.gid "
-		+ "WHERE g.gid = :gid)", resultClass = Germplasm.class),
-	@NamedNativeQuery(name = "getProgenitor", query = "select * from germplsm g1 where g1.gid = (SELECT p.pid FROM germplsm g LEFT JOIN progntrs p ON g.gid = p.gid "
-		+ "WHERE g.gid = :gid and p.pno=:pno)", resultClass = Germplasm.class)
+        @NamedNativeQuery(name = "getGermplasmDescendants",
+                query = "SELECT DISTINCT g.* FROM germplsm g LEFT JOIN progntrs p ON g.gid = p.gid "
+                        + "WHERE g.gpid1=:gid OR g.gpid2=:gid OR p.pid=:gid", resultClass = Germplasm.class),
+        @NamedNativeQuery(name = "findGermplasmByPrefName", query = "SELECT g.* FROM germplsm g LEFT JOIN names n ON g.gid = n.gid "
+                + "AND n.nstat = 1 " + "WHERE n.nval = :name", resultClass = Germplasm.class),
+        @NamedNativeQuery(name = "getProgenitor1",
+                query = "select * from germplsm g1 where g1.gid = (SELECT g.gpid1 FROM germplsm g LEFT JOIN progntrs p ON g.gid = p.gid "
+                        + "WHERE g.gid = :gid)", resultClass = Germplasm.class),
+        @NamedNativeQuery(name = "getProgenitor2",
+                query = "select * from germplsm g1 where g1.gid = (SELECT g.gpid2 FROM germplsm g LEFT JOIN progntrs p ON g.gid = p.gid "
+                        + "WHERE g.gid = :gid)", resultClass = Germplasm.class),
+        @NamedNativeQuery(name = "getProgenitor",
+                query = "select * from germplsm g1 where g1.gid = (SELECT p.pid FROM germplsm g LEFT JOIN progntrs p ON g.gid = p.gid "
+                        + "WHERE g.gid = :gid and p.pno=:pno)", resultClass = Germplasm.class)
 
 })
 @Entity
@@ -165,7 +172,8 @@ import org.hibernate.annotations.NotFoundAction;
 // @XmlType(propOrder = {"gid", "gnpgs", "gpid1", "gpid2", "gdate",
 // "methodMname", "locationLname"})
 @XmlAccessorType(XmlAccessType.NONE)
-public class Germplasm implements Serializable {
+public class Germplasm implements Serializable{
+
     private static final long serialVersionUID = 1L;
 
     // string contants for name of queries
@@ -187,30 +195,30 @@ public class Germplasm implements Serializable {
     // public static final String GET_BY_GID_WITH_PREF_ABBREV =
     // "getGermplasmByGIDWithPrefAbbrev";
     public static final String GET_BY_GID_WITH_PREF_ABBREV = "SELECT {g.*}, {n.*}, {abbrev.*} FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 "
-	    + "LEFT JOIN names abbrev ON g.gid = abbrev.gid AND abbrev.nstat = 2 WHERE g.gid = :gid";
+            + "LEFT JOIN names abbrev ON g.gid = abbrev.gid AND abbrev.nstat = 2 WHERE g.gid = :gid";
     public static final String FIND_DESCENDANTS = "getGermplasmDescendants";
     // public static final String COUNT_DESCENDANTS =
     // "countGermplasmDescendants";
     public static final String COUNT_DESCENDANTS = "SELECT COUNT(DISTINCT g.gid) FROM germplsm g LEFT JOIN progntrs p ON g.gid = p.gid "
-	    + "WHERE g.gpid1=:gid OR g.gpid2=:gid OR p.pid=:gid";
+            + "WHERE g.gpid1=:gid OR g.gpid2=:gid OR p.pid=:gid";
     public static final String FIND_PROGENITOR1 = "getProgenitor1";
     public static final String FIND_PROGENITOR2 = "getProgenitor2";
     public static final String FIND_PROGENITOR = "getProgenitor";
     // public static final String GET_PROGENITORS_BY_GID_WITH_PREF_NAME =
     // "getProgenitorsByGIDWithPrefName";
     public static final String GET_PROGENITORS_BY_GID_WITH_PREF_NAME = "SELECT {g.*}, {n.*} FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 "
-	    + "JOIN progntrs p ON p.pid = g.gid WHERE p.gid = :gid";
+            + "JOIN progntrs p ON p.pid = g.gid WHERE p.gid = :gid";
     // public static final String GET_MANAGEMENT_NEIGHBORS =
     // "getGermplasmManagementNeighbors";
     public static final String GET_MANAGEMENT_NEIGHBORS = "SELECT {g.*}, {n.*} FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 WHERE g.mgid = :gid";
     // public static final String GET_GROUP_RELATIVES =
     // "getGermplasmGroupRelatives";
     public static final String GET_GROUP_RELATIVES = "SELECT {g.*}, {n.*} FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 "
-	    + "JOIN germplsm g2 ON g.gpid1 = g2.gpid1 WHERE g.gnpgs = -1 AND g.gid <> :gid AND g2.gid = :gid";
+            + "JOIN germplsm g2 ON g.gpid1 = g2.gpid1 WHERE g.gnpgs = -1 AND g.gid <> :gid AND g2.gid = :gid";
     // public static final String GET_DERIVATIVE_CHILDREN =
     // "getGermplasmDerivativeChildren";
     public static final String GET_DERIVATIVE_CHILDREN = "SELECT {g.*}, {n.*} FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 "
-	    + "WHERE g.gnpgs = -1 AND g.gpid2 = :gid";
+            + "WHERE g.gnpgs = -1 AND g.gpid2 = :gid";
 
     @Id
     @Basic(optional = false)
@@ -325,71 +333,71 @@ public class Germplasm implements Serializable {
     }
 
     public Germplasm(Integer gid) {
-	this.gid = gid;
+        this.gid = gid;
     }
 
     public Integer getGid() {
-	return gid;
+        return gid;
     }
 
     public void setGid(Integer gid) {
-	this.gid = gid;
+        this.gid = gid;
     }
 
     public Integer getGnpgs() {
-	return gnpgs;
+        return gnpgs;
     }
 
     public void setGnpgs(Integer gnpgs) {
-	this.gnpgs = gnpgs;
+        this.gnpgs = gnpgs;
     }
 
     public Integer getGpid1() {
-	return gpid1;
+        return gpid1;
     }
 
     public void setGpid1(Integer gpid1) {
-	this.gpid1 = gpid1;
+        this.gpid1 = gpid1;
     }
 
     public Integer getGpid2() {
-	return gpid2;
+        return gpid2;
     }
 
     public void setGpid2(Integer gpid2) {
-	this.gpid2 = gpid2;
+        this.gpid2 = gpid2;
     }
 
     public Integer getLgid() {
-	return lgid;
+        return lgid;
     }
 
     public void setLgid(Integer lgid) {
-	this.lgid = lgid;
+        this.lgid = lgid;
     }
 
     public Integer getGdate() {
-	return gdate;
+        return gdate;
     }
 
     public void setGdate(Integer gdate) {
-	this.gdate = gdate;
+        this.gdate = gdate;
     }
 
     public Integer getGrplce() {
-	return grplce;
+        return grplce;
     }
 
     public void setGrplce(Integer grplce) {
-	this.grplce = grplce;
+        this.grplce = grplce;
     }
 
     public Integer getMgid() {
-	return mgid;
+        return mgid;
     }
 
     public void setMgid(Integer mgid) {
-	this.mgid = mgid;
+        this.mgid = mgid;
     }
 
     // public Integer getCid()
@@ -440,11 +448,11 @@ public class Germplasm implements Serializable {
      **/
 
     public Integer getMethodId() {
-	return methodId;
+        return methodId;
     }
 
     public void setMethodId(Integer methodId) {
-	this.methodId = methodId;
+        this.methodId = methodId;
     }
 
     /**
@@ -454,11 +462,11 @@ public class Germplasm implements Serializable {
      **/
 
     public Integer getUserId() {
-	return userId;
+        return userId;
     }
 
     public void setUserId(Integer userId) {
-	this.userId = userId;
+        this.userId = userId;
     }
 
     /**
@@ -472,11 +480,11 @@ public class Germplasm implements Serializable {
      **/
 
     public Integer getLocationId() {
-	return locationId;
+        return locationId;
     }
 
     public void setLocationId(Integer locationId) {
-	this.locationId = locationId;
+        this.locationId = locationId;
     }
 
     /**
@@ -487,11 +495,11 @@ public class Germplasm implements Serializable {
      **/
 
     public Integer getReferenceId() {
-	return referenceId;
+        return referenceId;
     }
 
     public void setReferenceId(Integer referenceId) {
-	this.referenceId = referenceId;
+        this.referenceId = referenceId;
     }
 
     /**
@@ -501,19 +509,19 @@ public class Germplasm implements Serializable {
      **/
 
     public Name getPreferredName() {
-	return preferredName;
+        return preferredName;
     }
 
     public void setPreferredName(Name preferredName) {
-	this.preferredName = preferredName;
+        this.preferredName = preferredName;
     }
 
     public String getPreferredAbbreviation() {
-	return preferredAbbreviation;
+        return preferredAbbreviation;
     }
 
     public void setPreferredAbbreviation(String preferredAbbreviation) {
-	this.preferredAbbreviation = preferredAbbreviation;
+        this.preferredAbbreviation = preferredAbbreviation;
     }
 
     /**
@@ -525,35 +533,36 @@ public class Germplasm implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-	if (obj == null)
-	    return false;
-	if (obj == this)
-	    return true;
-	if (!(obj instanceof Germplasm))
-	    return false;
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (!(obj instanceof Germplasm)) {
+            return false;
+        }
 
-	Germplasm rhs = (Germplasm) obj;
-	return new EqualsBuilder().appendSuper(super.equals(obj))
-		.append(gid, rhs.gid).isEquals();
+        Germplasm rhs = (Germplasm) obj;
+        return new EqualsBuilder().appendSuper(super.equals(obj)).append(gid, rhs.gid).isEquals();
     }
 
     @Override
     public int hashCode() {
-	return new HashCodeBuilder(17, 37).append(gid).toHashCode();
+        return new HashCodeBuilder(17, 37).append(gid).toHashCode();
     }
 
     @Override
     public String toString() {
-	return "Germplsm [gid=" + gid + ", gnpgs=" + gnpgs + ", gpid1=" + gpid1
-		+ ", gpid2=" + gpid2 + ", " + "lgid=" + lgid + ", gdate="
-		+ gdate + ", grplce=" + grplce + ", mgid=" + mgid /*
-								   * + ", cid="
-								   * + cid +
-								   * ", sid=" +
-								   * sid +
-								   * ", gchange="
-								   * + gchange
-								   */+ "]";
+        return "Germplsm [gid=" + gid + ", gnpgs=" + gnpgs + ", gpid1=" + gpid1 + ", gpid2=" + gpid2 + ", " + "lgid=" + lgid + ", gdate="
+                + gdate + ", grplce=" + grplce + ", mgid=" + mgid /*
+                                                                   * + ", cid="
+                                                                   * + cid +
+                                                                   * ", sid=" +
+                                                                   * sid +
+                                                                   * ", gchange="
+                                                                   * + gchange
+                                                                   */+ "]";
     }
 
 }

@@ -1,15 +1,15 @@
-/***************************************************************
+/*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  * 
  * Generation Challenge Programme (GCP)
  * 
  * 
- * This software is licensed for use under the terms of the 
- * GNU General Public License (http://bit.ly/8Ztv8M) and the 
- * provisions of Part F of the Generation Challenge Programme 
- * Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
- **************************************************************/
+ *******************************************************************************/
+
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
@@ -24,7 +24,8 @@ import javax.persistence.Embeddable;
  * @author klmanansala
  */
 @Embeddable
-public class ProgenitorPK implements Serializable {
+public class ProgenitorPK implements Serializable{
+
     private static final long serialVersionUID = 1L;
 
     @Basic(optional = false)
@@ -39,52 +40,53 @@ public class ProgenitorPK implements Serializable {
     }
 
     public ProgenitorPK(Integer gid, Integer pno) {
-	this.gid = gid;
-	this.pno = pno;
+        this.gid = gid;
+        this.pno = pno;
     }
 
     public Integer getGid() {
-	return gid;
+        return gid;
     }
 
     public void setGid(Integer gid) {
-	this.gid = gid;
+        this.gid = gid;
     }
 
     public Integer getPno() {
-	return pno;
+        return pno;
     }
 
     public void setPno(Integer pno) {
-	this.pno = pno;
+        this.pno = pno;
     }
 
     @Override
     public int hashCode() {
-	int hash = 0;
-	hash += (int) gid;
-	hash += (int) pno;
-	return hash;
+        int hash = 0;
+        hash += gid;
+        hash += pno;
+        return hash;
     }
 
     @Override
     public boolean equals(Object obj) {
-	if (obj == null)
-	    return false;
+        if (obj == null) {
+            return false;
+        }
 
-	if (obj instanceof ProgenitorPK) {
-	    ProgenitorPK param = (ProgenitorPK) obj;
-	    if ((this.getGid() == param.getGid())
-		    && (this.getPno() == param.getPno()))
-		return true;
-	}
+        if (obj instanceof ProgenitorPK) {
+            ProgenitorPK param = (ProgenitorPK) obj;
+            if (this.getGid() == param.getGid() && this.getPno() == param.getPno()) {
+                return true;
+            }
+        }
 
-	return false;
+        return false;
     }
 
     @Override
     public String toString() {
-	return "ProgntrsPK [gid=" + gid + ", pno=" + pno + "]";
+        return "ProgntrsPK [gid=" + gid + ", pno=" + pno + "]";
     }
 
 }

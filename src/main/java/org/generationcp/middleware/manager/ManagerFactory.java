@@ -1,15 +1,15 @@
-/***************************************************************
+/*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  * 
  * Generation Challenge Programme (GCP)
  * 
  * 
- * This software is licensed for use under the terms of the 
- * GNU General Public License (http://bit.ly/8Ztv8M) and the 
- * provisions of Part F of the Generation Challenge Programme 
- * Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
- **************************************************************/
+ *******************************************************************************/
+
 package org.generationcp.middleware.manager;
 
 import java.io.Serializable;
@@ -29,7 +29,8 @@ import org.generationcp.middleware.util.HibernateUtil;
  * databases.
  * 
  */
-public class ManagerFactory implements Serializable {
+public class ManagerFactory implements Serializable{
+
     private static final long serialVersionUID = -2846462010022009403L;
 
     private HibernateUtil hibernateUtilForLocal;
@@ -58,89 +59,72 @@ public class ManagerFactory implements Serializable {
      * @param paramsForCentral
      * @throws ConfigException
      */
-    public ManagerFactory(DatabaseConnectionParameters paramsForLocal,
-	    DatabaseConnectionParameters paramsForCentral)
-	    throws ConfigException {
-	// instantiate HibernateUtil with given db connection parameters
-	// one for local
-	if (paramsForLocal != null) {
-	    this.hibernateUtilForLocal = new HibernateUtil(
-		    paramsForLocal.getHost(), paramsForLocal.getPort(),
-		    paramsForLocal.getDbName(), paramsForLocal.getUsername(),
-		    paramsForLocal.getPassword());
-	} else {
-	    this.hibernateUtilForLocal = null;
-	}
+    public ManagerFactory(DatabaseConnectionParameters paramsForLocal, DatabaseConnectionParameters paramsForCentral)
+            throws ConfigException {
+        // instantiate HibernateUtil with given db connection parameters
+        // one for local
+        if (paramsForLocal != null) {
+            this.hibernateUtilForLocal = new HibernateUtil(paramsForLocal.getHost(), paramsForLocal.getPort(), paramsForLocal.getDbName(),
+                    paramsForLocal.getUsername(), paramsForLocal.getPassword());
+        } else {
+            this.hibernateUtilForLocal = null;
+        }
 
-	// one for central
-	if (paramsForCentral != null) {
-	    this.hibernateUtilForCentral = new HibernateUtil(
-		    paramsForCentral.getHost(), paramsForCentral.getPort(),
-		    paramsForCentral.getDbName(),
-		    paramsForCentral.getUsername(),
-		    paramsForCentral.getPassword());
-	} else {
-	    this.hibernateUtilForCentral = null;
-	}
+        // one for central
+        if (paramsForCentral != null) {
+            this.hibernateUtilForCentral = new HibernateUtil(paramsForCentral.getHost(), paramsForCentral.getPort(),
+                    paramsForCentral.getDbName(), paramsForCentral.getUsername(), paramsForCentral.getPassword());
+        } else {
+            this.hibernateUtilForCentral = null;
+        }
 
-	if ((this.hibernateUtilForCentral == null)
-		&& (this.hibernateUtilForLocal == null)) {
-	    throw new ConfigException(
-		    "No connection was established because database connection parameters were null.");
-	}
+        if (this.hibernateUtilForCentral == null && this.hibernateUtilForLocal == null) {
+            throw new ConfigException("No connection was established because database connection parameters were null.");
+        }
     }
 
     public GermplasmDataManager getGermplasmDataManager() {
-	return new GermplasmDataManagerImpl(this.hibernateUtilForLocal,
-		this.hibernateUtilForCentral);
+        return new GermplasmDataManagerImpl(this.hibernateUtilForLocal, this.hibernateUtilForCentral);
     }
 
     public GermplasmListManager getGermplasmListManager() {
-	return new GermplasmListManagerImpl(this.hibernateUtilForLocal,
-		this.hibernateUtilForCentral);
+        return new GermplasmListManagerImpl(this.hibernateUtilForLocal, this.hibernateUtilForCentral);
     }
 
     public TraitDataManager getTraitDataManager() {
-	return new TraitDataManagerImpl(this.hibernateUtilForLocal,
-		this.hibernateUtilForCentral);
+        return new TraitDataManagerImpl(this.hibernateUtilForLocal, this.hibernateUtilForCentral);
     }
 
     public StudyDataManager getStudyDataManager() throws ConfigException {
-	return new StudyDataManagerImpl(this.hibernateUtilForLocal,
-		this.hibernateUtilForCentral);
+        return new StudyDataManagerImpl(this.hibernateUtilForLocal, this.hibernateUtilForCentral);
     }
 
-    public InventoryDataManager getInventoryDataManager()
-	    throws ConfigException {
-	if (this.hibernateUtilForLocal == null) {
-	    throw new ConfigException(
-		    "The InventoryDataManager needs a connection to a local IBDB instance which is not provided.");
-	} else {
-	    return new InventoryDataManagerImpl(this.hibernateUtilForLocal,
-		    this.hibernateUtilForCentral);
-	}
+    public InventoryDataManager getInventoryDataManager() throws ConfigException {
+        if (this.hibernateUtilForLocal == null) {
+            throw new ConfigException("The InventoryDataManager needs a connection to a local IBDB instance which is not provided.");
+        } else {
+            return new InventoryDataManagerImpl(this.hibernateUtilForLocal, this.hibernateUtilForCentral);
+        }
     }
 
-    public WorkbenchDataManager getWorkbenchDataManager()
-	    throws ConfigException {
-	if (this.hibernateUtilForLocal == null) {
-	    throw new ConfigException(
-		    "The WorkbenchDataManager needs a connection to a local IBDB instance which is not provided.");
-	} else {
-	    return new WorkbenchDataManagerImpl(this.hibernateUtilForLocal);
-	}
+    public WorkbenchDataManager getWorkbenchDataManager() throws ConfigException {
+        if (this.hibernateUtilForLocal == null) {
+            throw new ConfigException("The WorkbenchDataManager needs a connection to a local IBDB instance which is not provided.");
+        } else {
+            return new WorkbenchDataManagerImpl(this.hibernateUtilForLocal);
+        }
     }
 
     /**
      * Closes the db connection by shutting down the HibernateUtil object
      */
     public void close() {
-	if (this.hibernateUtilForLocal != null) {
-	    this.hibernateUtilForLocal.shutdown();
-	}
+        if (this.hibernateUtilForLocal != null) {
+            this.hibernateUtilForLocal.shutdown();
+        }
 
-	if (this.hibernateUtilForCentral != null) {
-	    this.hibernateUtilForCentral.shutdown();
-	}
+        if (this.hibernateUtilForCentral != null) {
+            this.hibernateUtilForCentral.shutdown();
+        }
     }
 }

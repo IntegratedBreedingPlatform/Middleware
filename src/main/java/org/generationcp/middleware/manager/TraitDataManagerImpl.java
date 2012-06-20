@@ -1,15 +1,15 @@
-/***************************************************************
+/*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  * 
  * Generation Challenge Programme (GCP)
  * 
  * 
- * This software is licensed for use under the terms of the 
- * GNU General Public License (http://bit.ly/8Ztv8M) and the 
- * provisions of Part F of the Generation Challenge Programme 
- * Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
- **************************************************************/
+ *******************************************************************************/
+
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
@@ -26,241 +26,235 @@ import org.generationcp.middleware.pojos.Scale;
 import org.generationcp.middleware.pojos.ScaleContinuous;
 import org.generationcp.middleware.pojos.ScaleDiscrete;
 import org.generationcp.middleware.pojos.ScaleDiscretePK;
-import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.pojos.Trait;
 import org.generationcp.middleware.pojos.TraitMethod;
 import org.generationcp.middleware.util.HibernateUtil;
-import org.hibernate.Session;
 
-public class TraitDataManagerImpl extends DataManager implements
-	TraitDataManager {
-    public TraitDataManagerImpl(HibernateUtil hibernateUtilForLocal,
-	    HibernateUtil hibernateUtilForCentral) {
-	super(hibernateUtilForLocal, hibernateUtilForCentral);
+public class TraitDataManagerImpl extends DataManager implements TraitDataManager{
+
+    public TraitDataManagerImpl(HibernateUtil hibernateUtilForLocal, HibernateUtil hibernateUtilForCentral) {
+        super(hibernateUtilForLocal, hibernateUtilForCentral);
     }
 
     @Override
     public Scale getScaleByID(Integer id) {
-	ScaleDAO dao = new ScaleDAO();
-	HibernateUtil hibernateUtil = getHibernateUtil(id);
+        ScaleDAO dao = new ScaleDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(id);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return null;
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return null;
+        }
 
-	Scale scale = dao.findById(id, false);
-	return scale;
+        Scale scale = dao.findById(id, false);
+        return scale;
     }
 
     @Override
-    public List<Scale> getAllScales(int start, int numOfRows, Database instance)
-	    throws QueryException {
-	ScaleDAO dao = new ScaleDAO();
-	HibernateUtil hibernateUtil = getHibernateUtil(instance);
+    public List<Scale> getAllScales(int start, int numOfRows, Database instance) throws QueryException {
+        ScaleDAO dao = new ScaleDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(instance);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return null;
-	}
-	return dao.getAll(start, numOfRows);
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return null;
+        }
+        return dao.getAll(start, numOfRows);
 
     }
 
     @Override
     public int countAllScales() {
-	int count = 0;
+        int count = 0;
 
-	if (this.hibernateUtilForLocal != null) {
-	    ScaleDAO dao = new ScaleDAO();
-	    dao.setSession(hibernateUtilForLocal.getCurrentSession());
-	    count = count + dao.countAll().intValue();
-	}
+        if (this.hibernateUtilForLocal != null) {
+            ScaleDAO dao = new ScaleDAO();
+            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+            count = count + dao.countAll().intValue();
+        }
 
-	if (this.hibernateUtilForCentral != null) {
-	    ScaleDAO centralDao = new ScaleDAO();
-	    centralDao.setSession(hibernateUtilForCentral.getCurrentSession());
-	    count = count + centralDao.countAll().intValue();
-	}
+        if (this.hibernateUtilForCentral != null) {
+            ScaleDAO centralDao = new ScaleDAO();
+            centralDao.setSession(hibernateUtilForCentral.getCurrentSession());
+            count = count + centralDao.countAll().intValue();
+        }
 
-	return count;
+        return count;
     }
 
     @Override
     public String getScaleDiscreteDescription(Integer scaleId, String value) {
-	ScaleDiscreteDAO dao = new ScaleDiscreteDAO();
-	HibernateUtil hibernateUtil = getHibernateUtil(scaleId);
+        ScaleDiscreteDAO dao = new ScaleDiscreteDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(scaleId);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return null;
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return null;
+        }
 
-	ScaleDiscretePK id = new ScaleDiscretePK();
-	id.setScaleId(scaleId);
-	id.setValue(value);
+        ScaleDiscretePK id = new ScaleDiscretePK();
+        id.setScaleId(scaleId);
+        id.setValue(value);
 
-	ScaleDiscrete sd = dao.findById(id, false);
+        ScaleDiscrete sd = dao.findById(id, false);
 
-	if (sd != null) {
-	    return sd.getValueDescription();
-	} else {
-	    return null;
-	}
+        if (sd != null) {
+            return sd.getValueDescription();
+        } else {
+            return null;
+        }
     }
 
     @Override
     public List<ScaleDiscrete> getDiscreteValuesOfScale(Integer scaleId) {
-	ScaleDiscreteDAO dao = new ScaleDiscreteDAO();
-	HibernateUtil hibernateUtil = getHibernateUtil(scaleId);
+        ScaleDiscreteDAO dao = new ScaleDiscreteDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(scaleId);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return new ArrayList<ScaleDiscrete>();
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return new ArrayList<ScaleDiscrete>();
+        }
 
-	return dao.getByScaleId(scaleId);
+        return dao.getByScaleId(scaleId);
     }
 
     @Override
     public ScaleContinuous getRangeOfContinuousScale(Integer scaleId) {
-	ScaleContinuousDAO dao = new ScaleContinuousDAO();
-	HibernateUtil hibernateUtil = getHibernateUtil(scaleId);
+        ScaleContinuousDAO dao = new ScaleContinuousDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(scaleId);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return null;
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return null;
+        }
 
-	return dao.findById(scaleId, false);
+        return dao.findById(scaleId, false);
     }
 
     @Override
     public Trait getTraitById(Integer id) {
-	TraitDAO dao = new TraitDAO();
-	HibernateUtil hibernateUtil = getHibernateUtil(id);
+        TraitDAO dao = new TraitDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(id);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return null;
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return null;
+        }
 
-	return dao.getByTraitId(id);
+        return dao.getByTraitId(id);
     }
 
     @Override
-    public List<Trait> getAllTraits(int start, int numOfRows, Database instance)
-	    throws QueryException {
-	TraitDAO dao = new TraitDAO();
-	HibernateUtil hibernateUtil = getHibernateUtil(instance);
+    public List<Trait> getAllTraits(int start, int numOfRows, Database instance) throws QueryException {
+        TraitDAO dao = new TraitDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(instance);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return null;
-	}
-	return dao.getAll(start, numOfRows);
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return null;
+        }
+        return dao.getAll(start, numOfRows);
     }
 
     @Override
     public int countAllTraits() {
-	int count = 0;
+        int count = 0;
 
-	if (this.hibernateUtilForLocal != null) {
-	    TraitDAO dao = new TraitDAO();
-	    dao.setSession(hibernateUtilForLocal.getCurrentSession());
-	    count = count + dao.countAll().intValue();
-	}
+        if (this.hibernateUtilForLocal != null) {
+            TraitDAO dao = new TraitDAO();
+            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+            count = count + dao.countAll().intValue();
+        }
 
-	if (this.hibernateUtilForCentral != null) {
-	    TraitDAO centralDao = new TraitDAO();
-	    centralDao.setSession(hibernateUtilForCentral.getCurrentSession());
-	    count = count + centralDao.countAll().intValue();
-	}
+        if (this.hibernateUtilForCentral != null) {
+            TraitDAO centralDao = new TraitDAO();
+            centralDao.setSession(hibernateUtilForCentral.getCurrentSession());
+            count = count + centralDao.countAll().intValue();
+        }
 
-	return count;
+        return count;
     }
 
     @Override
     public TraitMethod getTraitMethodById(Integer id) {
-	TraitMethodDAO dao = new TraitMethodDAO();
-	HibernateUtil hibernateUtil = getHibernateUtil(id);
+        TraitMethodDAO dao = new TraitMethodDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(id);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return null;
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return null;
+        }
 
-	return dao.findById(id, false);
+        return dao.findById(id, false);
     }
 
     @Override
-    public List<TraitMethod> getAllTraitMethods(int start, int numOfRows,
-	    Database instance) throws QueryException {
-	TraitMethodDAO dao = new TraitMethodDAO();
-	HibernateUtil hibernateUtil = getHibernateUtil(instance);
+    public List<TraitMethod> getAllTraitMethods(int start, int numOfRows, Database instance) throws QueryException {
+        TraitMethodDAO dao = new TraitMethodDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(instance);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return null;
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return null;
+        }
 
-	return dao.getAll(start, numOfRows);
+        return dao.getAll(start, numOfRows);
     }
 
     @Override
     public int countAllTraitMethods() {
-	int count = 0;
+        int count = 0;
 
-	if (this.hibernateUtilForLocal != null) {
-	    TraitMethodDAO dao = new TraitMethodDAO();
-	    dao.setSession(hibernateUtilForLocal.getCurrentSession());
-	    count = count + dao.countAll().intValue();
-	}
+        if (this.hibernateUtilForLocal != null) {
+            TraitMethodDAO dao = new TraitMethodDAO();
+            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+            count = count + dao.countAll().intValue();
+        }
 
-	if (this.hibernateUtilForCentral != null) {
-	    TraitMethodDAO centralDao = new TraitMethodDAO();
-	    centralDao.setSession(hibernateUtilForCentral.getCurrentSession());
-	    count = count + centralDao.countAll().intValue();
-	}
+        if (this.hibernateUtilForCentral != null) {
+            TraitMethodDAO centralDao = new TraitMethodDAO();
+            centralDao.setSession(hibernateUtilForCentral.getCurrentSession());
+            count = count + centralDao.countAll().intValue();
+        }
 
-	return count;
+        return count;
     }
 
     @Override
     public List<TraitMethod> getTraitMethodsByTraitId(Integer traitId) {
-	TraitMethodDAO dao = new TraitMethodDAO();
-	HibernateUtil hibernateUtil = getHibernateUtil(traitId);
+        TraitMethodDAO dao = new TraitMethodDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(traitId);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return new ArrayList<TraitMethod>();
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return new ArrayList<TraitMethod>();
+        }
 
-	return dao.getByTraitId(traitId);
+        return dao.getByTraitId(traitId);
     }
 
     @Override
     public List<Scale> getScalesByTraitId(Integer traitId) {
-	ScaleDAO dao = new ScaleDAO();
-	HibernateUtil hibernateUtil = getHibernateUtil(traitId);
+        ScaleDAO dao = new ScaleDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(traitId);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return new ArrayList<Scale>();
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return new ArrayList<Scale>();
+        }
 
-	return dao.getByTraitId(traitId);
+        return dao.getByTraitId(traitId);
     }
 
 }

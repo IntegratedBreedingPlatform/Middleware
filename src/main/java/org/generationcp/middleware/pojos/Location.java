@@ -1,15 +1,15 @@
-/***************************************************************
+/*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  * 
  * Generation Challenge Programme (GCP)
  * 
  * 
- * This software is licensed for use under the terms of the 
- * GNU General Public License (http://bit.ly/8Ztv8M) and the 
- * provisions of Part F of the Generation Challenge Programme 
- * Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
- **************************************************************/
+ *******************************************************************************/
+
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
@@ -44,7 +44,8 @@ import org.hibernate.annotations.NotFoundAction;
 @XmlRootElement(name = "location")
 @XmlType(propOrder = { "locid", "lname", "typeFname", "labbr", "countryIsofull" })
 @XmlAccessorType(XmlAccessType.NONE)
-public class Location implements Serializable {
+public class Location implements Serializable{
+
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -99,148 +100,147 @@ public class Location implements Serializable {
     }
 
     public Location(Integer locid) {
-	this.locid = locid;
+        this.locid = locid;
     }
 
-    public Location(Integer locid, UserDefinedField type, Integer nllp,
-	    String lname, String labbr, Integer snl3id, Integer snl2id,
-	    Integer snl1id, Country country, Integer lrplce) {
-	super();
-	this.locid = locid;
-	this.type = type;
-	this.nllp = nllp;
-	this.lname = lname;
-	this.labbr = labbr;
-	this.snl3id = snl3id;
-	this.snl2id = snl2id;
-	this.snl1id = snl1id;
-	this.country = country;
-	this.lrplce = lrplce;
+    public Location(Integer locid, UserDefinedField type, Integer nllp, String lname, String labbr, Integer snl3id, Integer snl2id,
+            Integer snl1id, Country country, Integer lrplce) {
+        super();
+        this.locid = locid;
+        this.type = type;
+        this.nllp = nllp;
+        this.lname = lname;
+        this.labbr = labbr;
+        this.snl3id = snl3id;
+        this.snl2id = snl2id;
+        this.snl1id = snl1id;
+        this.country = country;
+        this.lrplce = lrplce;
     }
 
     public Integer getLocid() {
-	return locid;
+        return locid;
     }
 
     public void setLocid(Integer locid) {
-	this.locid = locid;
+        this.locid = locid;
     }
 
     public UserDefinedField getType() {
-	return type;
+        return type;
     }
 
     @XmlElement(name = "type")
     public String getTypeFname() {
-	return type.getFname();
+        return type.getFname();
     }
 
     public void setType(UserDefinedField type) {
-	this.type = type;
+        this.type = type;
     }
 
     public Country getCountry() {
-	return country;
+        return country;
     }
 
     @XmlElement(name = "country")
     public String getCountryIsofull() {
-	return country.getIsofull();
+        return country.getIsofull();
     }
 
     public void setCountry(Country country) {
-	this.country = country;
+        this.country = country;
     }
 
     public Integer getNllp() {
-	return nllp;
+        return nllp;
     }
 
     public void setNllp(Integer nllp) {
-	this.nllp = nllp;
+        this.nllp = nllp;
     }
 
     public String getLname() {
-	return lname;
+        return lname;
     }
 
     public void setLname(String lname) {
-	this.lname = lname;
+        this.lname = lname;
     }
 
     public String getLabbr() {
-	return labbr;
+        return labbr;
     }
 
     public void setLabbr(String labbr) {
-	this.labbr = labbr;
+        this.labbr = labbr;
     }
 
     public Integer getSnl3id() {
-	return snl3id;
+        return snl3id;
     }
 
     public void setSnl3id(Integer snl3id) {
-	this.snl3id = snl3id;
+        this.snl3id = snl3id;
     }
 
     public Integer getSnl2id() {
-	return snl2id;
+        return snl2id;
     }
 
     public void setSnl2id(Integer snl2id) {
-	this.snl2id = snl2id;
+        this.snl2id = snl2id;
     }
 
     public Integer getSnl1id() {
-	return snl1id;
+        return snl1id;
     }
 
     public void setSnl1id(Integer snl1id) {
-	this.snl1id = snl1id;
+        this.snl1id = snl1id;
     }
 
     public Integer getLrplce() {
-	return lrplce;
+        return lrplce;
     }
 
     public void setLrplce(Integer lrplce) {
-	this.lrplce = lrplce;
+        this.lrplce = lrplce;
     }
 
     public Set<Locdes> getDescriptions() {
-	return descriptions;
+        return descriptions;
     }
 
     public void setDescriptions(Set<Locdes> descriptions) {
-	this.descriptions = descriptions;
+        this.descriptions = descriptions;
     }
 
     @Override
     public int hashCode() {
-	return this.getLocid();
+        return this.getLocid();
     }
 
     @Override
     public boolean equals(Object obj) {
-	if (obj == null)
-	    return false;
+        if (obj == null) {
+            return false;
+        }
 
-	if (obj instanceof Location) {
-	    Location param = (Location) obj;
-	    if (this.getLocid() == param.getLocid())
-		return true;
-	}
+        if (obj instanceof Location) {
+            Location param = (Location) obj;
+            if (this.getLocid() == param.getLocid()) {
+                return true;
+            }
+        }
 
-	return false;
+        return false;
     }
 
     @Override
     public String toString() {
-	return "Location [locid=" + locid + ", nllp=" + nllp + ", lname="
-		+ lname + ", labbr=" + labbr + ", snl3id=" + snl3id
-		+ ", snl2id=" + snl2id + ", snl1id=" + snl1id + ", lrplce="
-		+ lrplce + "]";
+        return "Location [locid=" + locid + ", nllp=" + nllp + ", lname=" + lname + ", labbr=" + labbr + ", snl3id=" + snl3id + ", snl2id="
+                + snl2id + ", snl1id=" + snl1id + ", lrplce=" + lrplce + "]";
     }
 
 }

@@ -1,15 +1,15 @@
-/***************************************************************
+/*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  * 
  * Generation Challenge Programme (GCP)
  * 
  * 
- * This software is licensed for use under the terms of the 
- * GNU General Public License (http://bit.ly/8Ztv8M) and the 
- * provisions of Part F of the Generation Challenge Programme 
- * Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
- **************************************************************/
+ *******************************************************************************/
+
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
@@ -41,7 +41,8 @@ import org.hibernate.annotations.NotFoundAction;
 @XmlRootElement(name = "udfield")
 @XmlType(propOrder = { "fldno", "fcode", "fname", "fdesc" })
 @XmlAccessorType(XmlAccessType.NONE)
-public class UserDefinedField implements Serializable {
+public class UserDefinedField implements Serializable{
+
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -97,139 +98,138 @@ public class UserDefinedField implements Serializable {
     }
 
     public UserDefinedField(Integer fldno) {
-	this.fldno = fldno;
+        this.fldno = fldno;
     }
 
-    public UserDefinedField(Integer fldno, String ftable, String ftype,
-	    String fcode, String fname, String ffmt, String fdesc,
-	    Integer lfldno, User user, Integer fdate, Integer scaleid) {
-	super();
-	this.fldno = fldno;
-	this.ftable = ftable;
-	this.ftype = ftype;
-	this.fcode = fcode;
-	this.fname = fname;
-	this.ffmt = ffmt;
-	this.fdesc = fdesc;
-	this.lfldno = lfldno;
-	this.user = user;
-	this.fdate = fdate;
-	this.scaleid = scaleid;
+    public UserDefinedField(Integer fldno, String ftable, String ftype, String fcode, String fname, String ffmt, String fdesc,
+            Integer lfldno, User user, Integer fdate, Integer scaleid) {
+        super();
+        this.fldno = fldno;
+        this.ftable = ftable;
+        this.ftype = ftype;
+        this.fcode = fcode;
+        this.fname = fname;
+        this.ffmt = ffmt;
+        this.fdesc = fdesc;
+        this.lfldno = lfldno;
+        this.user = user;
+        this.fdate = fdate;
+        this.scaleid = scaleid;
     }
 
     public Integer getFldno() {
-	return fldno;
+        return fldno;
     }
 
     public void setFldno(Integer fldno) {
-	this.fldno = fldno;
+        this.fldno = fldno;
     }
 
     public String getFtable() {
-	return ftable;
+        return ftable;
     }
 
     public void setFtable(String ftable) {
-	this.ftable = ftable;
+        this.ftable = ftable;
     }
 
     public String getFtype() {
-	return ftype;
+        return ftype;
     }
 
     public void setFtype(String ftype) {
-	this.ftype = ftype;
+        this.ftype = ftype;
     }
 
     public String getFcode() {
-	return fcode;
+        return fcode;
     }
 
     public void setFcode(String fcode) {
-	this.fcode = fcode;
+        this.fcode = fcode;
     }
 
     public String getFname() {
-	return fname;
+        return fname;
     }
 
     public void setFname(String fname) {
-	this.fname = fname;
+        this.fname = fname;
     }
 
     public String getFfmt() {
-	return ffmt;
+        return ffmt;
     }
 
     public void setFfmt(String ffmt) {
-	this.ffmt = ffmt;
+        this.ffmt = ffmt;
     }
 
     public String getFdesc() {
-	return fdesc;
+        return fdesc;
     }
 
     public void setFdesc(String fdesc) {
-	this.fdesc = fdesc;
+        this.fdesc = fdesc;
     }
 
     public Integer getLfldno() {
-	return lfldno;
+        return lfldno;
     }
 
     public void setLfldno(Integer lfldno) {
-	this.lfldno = lfldno;
+        this.lfldno = lfldno;
     }
 
     public User getUser() {
-	return user;
+        return user;
     }
 
     public void setUser(User user) {
-	this.user = user;
+        this.user = user;
     }
 
     public Integer getFdate() {
-	return fdate;
+        return fdate;
     }
 
     public void setFdate(Integer fdate) {
-	this.fdate = fdate;
+        this.fdate = fdate;
     }
 
     public Integer getScaleid() {
-	return scaleid;
+        return scaleid;
     }
 
     public void setScaleid(Integer scaleid) {
-	this.scaleid = scaleid;
+        this.scaleid = scaleid;
     }
 
     @Override
     public int hashCode() {
-	return this.getFldno();
+        return this.getFldno();
     }
 
     @Override
     public boolean equals(Object obj) {
-	if (obj == null)
-	    return false;
+        if (obj == null) {
+            return false;
+        }
 
-	if (obj instanceof Attribute) {
-	    UserDefinedField param = (UserDefinedField) obj;
-	    if (this.getFldno() == param.getFldno())
-		return true;
-	}
+        if (obj instanceof Attribute) {
+            UserDefinedField param = (UserDefinedField) obj;
+            if (this.getFldno() == param.getFldno()) {
+                return true;
+            }
+        }
 
-	return false;
+        return false;
     }
 
     @Override
     public String toString() {
-	return "Udflds [fldno=" + fldno + ", ftable=" + ftable + ", ftype="
-		+ ftype + ", fcode=" + fcode + ", fname=" + fname + ", ffmt="
-		+ ffmt + ", fdesc=" + fdesc + ", lfldno=" + lfldno + ", "
-		+ "fdate=" + fdate + ", scaleid=" + scaleid + "]";
+        return "Udflds [fldno=" + fldno + ", ftable=" + ftable + ", ftype=" + ftype + ", fcode=" + fcode + ", fname=" + fname + ", ffmt="
+                + ffmt + ", fdesc=" + fdesc + ", lfldno=" + lfldno + ", " + "fdate=" + fdate + ", scaleid=" + scaleid + "]";
     }
 
 }

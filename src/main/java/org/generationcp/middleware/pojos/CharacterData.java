@@ -1,15 +1,15 @@
-/***************************************************************
+/*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  * 
  * Generation Challenge Programme (GCP)
  * 
  * 
- * This software is licensed for use under the terms of the 
- * GNU General Public License (http://bit.ly/8Ztv8M) and the 
- * provisions of Part F of the Generation Challenge Programme 
- * Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
- **************************************************************/
+ *******************************************************************************/
+
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
@@ -23,12 +23,12 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "data_c")
-public class CharacterData implements Serializable {
+public class CharacterData implements Serializable{
+
     private static final long serialVersionUID = 1L;
 
     public static final String GET_BY_OUNIT_ID_LIST = "select dc.ounitid, dc.variatid, v.vname, dc.dvalue "
-	    + "from data_c dc join variate v on dc.variatid = v.variatid "
-	    + "where dc.ounitid in (:ounitIdList)";
+            + "from data_c dc join variate v on dc.variatid = v.variatid " + "where dc.ounitid in (:ounitIdList)";
 
     @EmbeddedId
     protected CharacterDataPK id;
@@ -44,63 +44,68 @@ public class CharacterData implements Serializable {
     }
 
     public CharacterData(CharacterDataPK id, String value) {
-	super();
-	this.id = id;
-	this.value = value;
+        super();
+        this.id = id;
+        this.value = value;
     }
 
     public CharacterDataPK getId() {
-	return id;
+        return id;
     }
 
     public void setId(CharacterDataPK id) {
-	this.id = id;
+        this.id = id;
     }
 
     public String getValue() {
-	return value;
+        return value;
     }
 
     public void setValue(String value) {
-	this.value = value;
+        this.value = value;
     }
 
     public Variate getVariate() {
-	return variate;
+        return variate;
     }
 
     public void setVariate(Variate variate) {
-	this.variate = variate;
+        this.variate = variate;
     }
 
     @Override
     public int hashCode() {
-	final int prime = 31;
-	int result = 1;
-	result = prime * result + ((id == null) ? 0 : id.hashCode());
-	return result;
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (id == null ? 0 : id.hashCode());
+        return result;
     }
 
     @Override
     public boolean equals(Object obj) {
-	if (this == obj)
-	    return true;
-	if (obj == null)
-	    return false;
-	if (getClass() != obj.getClass())
-	    return false;
-	CharacterData other = (CharacterData) obj;
-	if (id == null) {
-	    if (other.id != null)
-		return false;
-	} else if (!id.equals(other.id))
-	    return false;
-	return true;
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        CharacterData other = (CharacterData) obj;
+        if (id == null) {
+            if (other.id != null) {
+                return false;
+            }
+        } else if (!id.equals(other.id)) {
+            return false;
+        }
+        return true;
     }
 
     @Override
     public String toString() {
-	return "CharacterData [id=" + id + ", value=" + value + "]";
+        return "CharacterData [id=" + id + ", value=" + value + "]";
     }
 
 }

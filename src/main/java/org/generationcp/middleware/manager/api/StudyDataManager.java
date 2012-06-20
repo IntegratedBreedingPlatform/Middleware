@@ -1,15 +1,15 @@
-/***************************************************************
+/*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  * 
  * Generation Challenge Programme (GCP)
  * 
  * 
- * This software is licensed for use under the terms of the 
- * GNU General Public License (http://bit.ly/8Ztv8M) and the 
- * provisions of Part F of the Generation Challenge Programme 
- * Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
- **************************************************************/
+ *******************************************************************************/
+
 package org.generationcp.middleware.manager.api;
 
 import java.util.List;
@@ -35,7 +35,8 @@ import org.generationcp.middleware.pojos.Variate;
  * @author Kevin Manansala
  * 
  */
-public interface StudyDataManager {
+public interface StudyDataManager{
+
     /**
      * Returns a List of GIDs identifying Germplasms exhibiting specific values
      * of traits as observed in studies. The search filters are composed of
@@ -58,9 +59,8 @@ public interface StudyDataManager {
      * @return
      * @throws QueryException
      */
-    public List<Integer> getGIDSByPhenotypicData(
-	    List<TraitCombinationFilter> filters, int start, int numOfRows,
-	    Database instance) throws QueryException;
+    public List<Integer> getGIDSByPhenotypicData(List<TraitCombinationFilter> filters, int start, int numOfRows, Database instance)
+            throws QueryException;
 
     /**
      * Returns the study records matching the given name
@@ -83,8 +83,7 @@ public interface StudyDataManager {
      * @return List of Study POJOs
      * @throws QueryException
      */
-    public List<Study> findStudyByName(String name, int start, int numOfRows,
-	    Operation op, Database instance) throws QueryException;
+    public List<Study> findStudyByName(String name, int start, int numOfRows, Operation op, Database instance) throws QueryException;
 
     /**
      * Returns the study records matching the given name
@@ -102,8 +101,7 @@ public interface StudyDataManager {
      * @return number of Study records matching the given criteria
      * @throws QueryException
      */
-    public int countStudyByName(String name, Operation op, Database instance)
-	    throws QueryException;
+    public int countStudyByName(String name, Operation op, Database instance) throws QueryException;
 
     /**
      * Retrieves a Study record of the given id
@@ -128,8 +126,7 @@ public interface StudyDataManager {
      * @return The list of all the top-level studies
      * @throws QueryException
      */
-    public List<Study> getAllTopLevelStudies(int start, int numOfRows,
-	    Database instance) throws QueryException;
+    public List<Study> getAllTopLevelStudies(int start, int numOfRows, Database instance) throws QueryException;
 
     /**
      * Returns a List of {@code Study} objects that belong to the specified
@@ -147,8 +144,7 @@ public interface StudyDataManager {
      *         detected for both local and central instances.
      * @throws QueryException
      */
-    public List<Study> getStudiesByParentFolderID(Integer parentFolderId,
-	    int start, int numOfRows) throws QueryException;
+    public List<Study> getStudiesByParentFolderID(Integer parentFolderId, int start, int numOfRows) throws QueryException;
 
     /**
      * Returns all Factor records which belong to the Study identified by the
@@ -158,8 +154,7 @@ public interface StudyDataManager {
      *            - id of the Study
      * @return List of Factor POJOs
      */
-    public List<Factor> getFactorsByStudyID(Integer studyId)
-	    throws QueryException;
+    public List<Factor> getFactorsByStudyID(Integer studyId) throws QueryException;
 
     /**
      * Returns all Variate records which belong to the Study identified by the
@@ -169,8 +164,7 @@ public interface StudyDataManager {
      *            - id of the Study
      * @return List of Variate POJOs
      */
-    public List<Variate> getVariatesByStudyID(Integer studyId)
-	    throws QueryException;
+    public List<Variate> getVariatesByStudyID(Integer studyId) throws QueryException;
 
     /**
      * Returns all the Effect records which belong to the Study identified by
@@ -180,8 +174,7 @@ public interface StudyDataManager {
      *            - id of the Study
      * @return List of StudyEffect POJOs
      */
-    public List<StudyEffect> getEffectsByStudyID(Integer studyId)
-	    throws QueryException;
+    public List<StudyEffect> getEffectsByStudyID(Integer studyId) throws QueryException;
 
     /**
      * Returns all the Representation records with the given effectId.
@@ -189,8 +182,7 @@ public interface StudyDataManager {
      * @param effectId
      * @return List of Representation POJOs
      */
-    public List<Representation> getRepresentationByEffectID(Integer effectId)
-	    throws QueryException;
+    public List<Representation> getRepresentationByEffectID(Integer effectId) throws QueryException;
 
     /**
      * Returns all the Representation records with the given studyId.
@@ -198,8 +190,7 @@ public interface StudyDataManager {
      * @param studyId
      * @return List of Representation POJOs
      */
-    public List<Representation> getRepresentationByStudyID(Integer studyId)
-	    throws QueryException;
+    public List<Representation> getRepresentationByStudyID(Integer studyId) throws QueryException;
 
     /**
      * Returns a List of {@code Factor} objects that belong to the specified
@@ -212,8 +203,7 @@ public interface StudyDataManager {
      *         detected for both local and central instances.
      * @throws QueryException
      */
-    public List<Factor> getFactorsByRepresentationId(Integer representationId)
-	    throws QueryException;
+    public List<Factor> getFactorsByRepresentationId(Integer representationId) throws QueryException;
 
     /**
      * Returns the number of OunitIDs that are associated to the specified
@@ -226,8 +216,7 @@ public interface StudyDataManager {
      *         for both local and central instances.
      * @throws QueryException
      */
-    public Long countOunitIDsByRepresentationId(Integer representationId)
-	    throws QueryException;
+    public Long countOunitIDsByRepresentationId(Integer representationId) throws QueryException;
 
     /**
      * Returns a List of OunitIDs that are associated to the specified
@@ -245,9 +234,7 @@ public interface StudyDataManager {
      *         detected for both local and central instances.
      * @throws QueryException
      */
-    public List<Integer> getOunitIDsByRepresentationId(
-	    Integer representationId, int start, int numOfRows)
-	    throws QueryException;
+    public List<Integer> getOunitIDsByRepresentationId(Integer representationId, int start, int numOfRows) throws QueryException;
 
     /**
      * Returns a List of {@code Variate} objects that belong to the specified
@@ -260,8 +247,7 @@ public interface StudyDataManager {
      *         detected for both local and central instances.
      * @throws QueryException
      */
-    public List<Variate> getVariatesByRepresentationId(Integer representationId)
-	    throws QueryException;
+    public List<Variate> getVariatesByRepresentationId(Integer representationId) throws QueryException;
 
     /**
      * Returns a list of NumericDataElements that represents the column values
@@ -275,8 +261,7 @@ public interface StudyDataManager {
      *         ounitIDs
      * @throws QueryException
      */
-    public List<NumericDataElement> getNumericDataValuesByOunitIdList(
-	    List<Integer> ounitIdList) throws QueryException;
+    public List<NumericDataElement> getNumericDataValuesByOunitIdList(List<Integer> ounitIdList) throws QueryException;
 
     /**
      * Returns a list of CharacterDataElements that represents the column values
@@ -290,8 +275,7 @@ public interface StudyDataManager {
      *         specified ounitIDs
      * @throws QueryException
      */
-    List<CharacterDataElement> getCharacterDataValuesByOunitIdList(
-	    List<Integer> ounitIdList) throws QueryException;
+    List<CharacterDataElement> getCharacterDataValuesByOunitIdList(List<Integer> ounitIdList) throws QueryException;
 
     /**
      * Returns a list of NumericLevelElements that represents the column values
@@ -305,8 +289,7 @@ public interface StudyDataManager {
      *         specified ounitIDs
      * @throws QueryException
      */
-    List<NumericLevelElement> getNumericLevelValuesByOunitIdList(
-	    List<Integer> ounitIdList) throws QueryException;
+    List<NumericLevelElement> getNumericLevelValuesByOunitIdList(List<Integer> ounitIdList) throws QueryException;
 
     /**
      * Returns a list of CharacterLevelElements that represents the column
@@ -320,7 +303,6 @@ public interface StudyDataManager {
      *         specified ounitIDs
      * @throws QueryException
      */
-    List<CharacterLevelElement> getCharacterLevelValuesByOunitIdList(
-	    List<Integer> ounitIdList) throws QueryException;
+    List<CharacterLevelElement> getCharacterLevelValuesByOunitIdList(List<Integer> ounitIdList) throws QueryException;
 
 }

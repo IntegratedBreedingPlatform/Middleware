@@ -1,15 +1,15 @@
-/***************************************************************
+/*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  * 
  * Generation Challenge Programme (GCP)
  * 
  * 
- * This software is licensed for use under the terms of the 
- * GNU General Public License (http://bit.ly/8Ztv8M) and the 
- * provisions of Part F of the Generation Challenge Programme 
- * Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
- **************************************************************/
+ *******************************************************************************/
+
 package org.generationcp.middleware.pojos.workbench;
 
 import java.io.Serializable;
@@ -31,7 +31,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Entity
 @Table(name = "workbench_project")
-public class Project implements Serializable {
+public class Project implements Serializable{
+
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -68,105 +69,107 @@ public class Project implements Serializable {
     private Contact owner;
 
     public Long getProjectId() {
-	return projectId;
+        return projectId;
     }
 
     public void setProjectId(Long projectId) {
-	this.projectId = projectId;
+        this.projectId = projectId;
     }
 
     public String getProjectName() {
-	return projectName;
+        return projectName;
     }
 
     public void setProjectName(String projectName) {
-	this.projectName = projectName;
+        this.projectName = projectName;
     }
 
     public Date getTargetDueDate() {
-	return targetDueDate;
+        return targetDueDate;
     }
 
     public void setTargetDueDate(Date targetDueDate) {
-	this.targetDueDate = targetDueDate;
+        this.targetDueDate = targetDueDate;
     }
 
     public WorkflowTemplate getTemplate() {
-	return template;
+        return template;
     }
 
     public void setTemplate(WorkflowTemplate template) {
-	this.template = template;
+        this.template = template;
     }
 
     public boolean isTemplateModified() {
-	return templateModified;
+        return templateModified;
     }
 
     public void setTemplateModified(boolean templateModified) {
-	this.templateModified = templateModified;
+        this.templateModified = templateModified;
     }
 
     public List<ProjectWorkflowStep> getSteps() {
-	return steps;
+        return steps;
     }
 
     public void setSteps(List<ProjectWorkflowStep> steps) {
-	this.steps = steps;
+        this.steps = steps;
     }
 
     public String getAction() {
-	return action;
+        return action;
     }
 
     public void setAction(String action) {
-	this.action = action;
+        this.action = action;
     }
 
     public String getStatus() {
-	return status;
+        return status;
     }
 
     public void setStatus(String status) {
-	this.status = status;
+        this.status = status;
     }
 
     public Contact getOwner() {
-	return owner;
+        return owner;
     }
 
     public void setOwner(Contact owner) {
-	this.owner = owner;
+        this.owner = owner;
     }
 
     @Override
     public int hashCode() {
-	return new HashCodeBuilder().append(projectId).hashCode();
+        return new HashCodeBuilder().append(projectId).hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
-	if (obj == null)
-	    return false;
-	if (obj == this)
-	    return true;
-	if (!Project.class.isInstance(obj))
-	    return false;
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (!Project.class.isInstance(obj)) {
+            return false;
+        }
 
-	Project otherObj = (Project) obj;
+        Project otherObj = (Project) obj;
 
-	return new EqualsBuilder().append(projectId, otherObj.projectId)
-		.isEquals();
+        return new EqualsBuilder().append(projectId, otherObj.projectId).isEquals();
     }
 
     @Override
     public String toString() {
-	StringBuilder sb = new StringBuilder();
-	sb.append("Project {");
-	sb.append("project id = ").append(projectId);
-	sb.append("project name = ").append(projectName);
-	sb.append("}");
+        StringBuilder sb = new StringBuilder();
+        sb.append("Project {");
+        sb.append("project id = ").append(projectId);
+        sb.append("project name = ").append(projectName);
+        sb.append("}");
 
-	return sb.toString();
+        return sb.toString();
     }
 }

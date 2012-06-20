@@ -1,15 +1,15 @@
-/***************************************************************
+/*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  * 
  * Generation Challenge Programme (GCP)
  * 
  * 
- * This software is licensed for use under the terms of the 
- * GNU General Public License (http://bit.ly/8Ztv8M) and the 
- * provisions of Part F of the Generation Challenge Programme 
- * Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
- **************************************************************/
+ *******************************************************************************/
+
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
@@ -28,13 +28,15 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @NamedQueries({
-	@NamedQuery(name = "getEmptyLot", query = "FROM Transaction where status=1 group by lotid having sum(quantity) = 0"),
-	@NamedQuery(name = "getLotWithMinimumAmount", query = "FROM Transaction where status=1 group by lotid having sum(quantity) <:minAmount")
+        @NamedQuery(name = "getEmptyLot", query = "FROM Transaction where status=1 group by lotid having sum(quantity) = 0"),
+        @NamedQuery(name = "getLotWithMinimumAmount",
+                query = "FROM Transaction where status=1 group by lotid having sum(quantity) <:minAmount")
 
 })
 @Entity
 @Table(name = "ims_transaction")
-public class Transaction implements Serializable {
+public class Transaction implements Serializable{
+
     private static final long serialVersionUID = 77866453513905521L;
     public static final String GET_EMPTY_LOT = "getEmptyLot";
     public static final String GET_LOT_WITH_MINIMUM_AMOUNT = "getLotWithMinimumAmount";
@@ -86,151 +88,148 @@ public class Transaction implements Serializable {
     }
 
     public Transaction(Integer id) {
-	super();
-	this.id = id;
+        super();
+        this.id = id;
     }
 
-    public Transaction(Integer id, Integer userId, Lot lot, Integer date,
-	    Integer status, Integer quantity, String comments,
-	    String sourceType, Integer sourceId, Integer sourceRecordId,
-	    Integer previousAmount, Integer personId) {
-	super();
-	this.id = id;
-	this.userId = userId;
-	this.lot = lot;
-	this.date = date;
-	this.status = status;
-	this.quantity = quantity;
-	this.comments = comments;
-	this.sourceType = sourceType;
-	this.sourceId = sourceId;
-	this.sourceRecordId = sourceRecordId;
-	this.previousAmount = previousAmount;
-	this.personId = personId;
+    public Transaction(Integer id, Integer userId, Lot lot, Integer date, Integer status, Integer quantity, String comments,
+            String sourceType, Integer sourceId, Integer sourceRecordId, Integer previousAmount, Integer personId) {
+        super();
+        this.id = id;
+        this.userId = userId;
+        this.lot = lot;
+        this.date = date;
+        this.status = status;
+        this.quantity = quantity;
+        this.comments = comments;
+        this.sourceType = sourceType;
+        this.sourceId = sourceId;
+        this.sourceRecordId = sourceRecordId;
+        this.previousAmount = previousAmount;
+        this.personId = personId;
     }
 
     public Integer getId() {
-	return id;
+        return id;
     }
 
     public void setId(Integer id) {
-	this.id = id;
+        this.id = id;
     }
 
     public Integer getUserId() {
-	return userId;
+        return userId;
     }
 
     public void setUserId(Integer userId) {
-	this.userId = userId;
+        this.userId = userId;
     }
 
     public Lot getLot() {
-	return lot;
+        return lot;
     }
 
     public void setLot(Lot lot) {
-	this.lot = lot;
+        this.lot = lot;
     }
 
     public Integer getDate() {
-	return date;
+        return date;
     }
 
     public void setDate(Integer date) {
-	this.date = date;
+        this.date = date;
     }
 
     public Integer getStatus() {
-	return status;
+        return status;
     }
 
     public void setStatus(Integer status) {
-	this.status = status;
+        this.status = status;
     }
 
     public Integer getQuantity() {
-	return quantity;
+        return quantity;
     }
 
     public void setQuantity(Integer quantity) {
-	this.quantity = quantity;
+        this.quantity = quantity;
     }
 
     public String getComments() {
-	return comments;
+        return comments;
     }
 
     public void setComments(String comments) {
-	this.comments = comments;
+        this.comments = comments;
     }
 
     public String getSourceType() {
-	return sourceType;
+        return sourceType;
     }
 
     public void setSourceType(String sourceType) {
-	this.sourceType = sourceType;
+        this.sourceType = sourceType;
     }
 
     public Integer getSourceId() {
-	return sourceId;
+        return sourceId;
     }
 
     public void setSourceId(Integer sourceId) {
-	this.sourceId = sourceId;
+        this.sourceId = sourceId;
     }
 
     public Integer getSourceRecordId() {
-	return sourceRecordId;
+        return sourceRecordId;
     }
 
     public void setSourceRecordId(Integer sourceRecordId) {
-	this.sourceRecordId = sourceRecordId;
+        this.sourceRecordId = sourceRecordId;
     }
 
     public Integer getPreviousAmount() {
-	return previousAmount;
+        return previousAmount;
     }
 
     public void setPreviousAmount(Integer previousAmount) {
-	this.previousAmount = previousAmount;
+        this.previousAmount = previousAmount;
     }
 
     public Integer getPersonId() {
-	return personId;
+        return personId;
     }
 
     public void setPersonId(Integer personId) {
-	this.personId = personId;
+        this.personId = personId;
     }
 
     @Override
     public String toString() {
-	return "Transaction [id=" + id + ", userId=" + userId + ", lot=" + lot
-		+ ", date=" + date + ", status=" + status + ", quantity="
-		+ quantity + ", comments=" + comments + ", sourceType="
-		+ sourceType + ", sourceId=" + sourceId + ", sourceRecordId="
-		+ sourceRecordId + ", previousAmount=" + previousAmount
-		+ ", personId=" + personId + "]";
+        return "Transaction [id=" + id + ", userId=" + userId + ", lot=" + lot + ", date=" + date + ", status=" + status + ", quantity="
+                + quantity + ", comments=" + comments + ", sourceType=" + sourceType + ", sourceId=" + sourceId + ", sourceRecordId="
+                + sourceRecordId + ", previousAmount=" + previousAmount + ", personId=" + personId + "]";
     }
 
     @Override
     public boolean equals(Object obj) {
-	if (obj == null)
-	    return false;
-	if (obj == this)
-	    return true;
-	if (!(obj instanceof Transaction))
-	    return false;
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (!(obj instanceof Transaction)) {
+            return false;
+        }
 
-	Transaction rhs = (Transaction) obj;
-	return new EqualsBuilder().appendSuper(super.equals(obj))
-		.append(id, rhs.id).isEquals();
+        Transaction rhs = (Transaction) obj;
+        return new EqualsBuilder().appendSuper(super.equals(obj)).append(id, rhs.id).isEquals();
     }
 
     @Override
     public int hashCode() {
-	return new HashCodeBuilder(17, 37).append(id).toHashCode();
+        return new HashCodeBuilder(17, 37).append(id).toHashCode();
     }
 }

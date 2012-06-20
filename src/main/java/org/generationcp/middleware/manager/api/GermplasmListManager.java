@@ -1,15 +1,15 @@
-/***************************************************************
+/*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  * 
  * Generation Challenge Programme (GCP)
  * 
  * 
- * This software is licensed for use under the terms of the 
- * GNU General Public License (http://bit.ly/8Ztv8M) and the 
- * provisions of Part F of the Generation Challenge Programme 
- * Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
- **************************************************************/
+ *******************************************************************************/
+
 package org.generationcp.middleware.manager.api;
 
 import java.util.List;
@@ -26,7 +26,8 @@ import org.generationcp.middleware.pojos.GermplasmListData;
  * @author Kevin Manansala, Mark Agarrado
  * 
  */
-public interface GermplasmListManager {
+public interface GermplasmListManager{
+
     /**
      * Returns the GermplasmList identified by the given id.
      * 
@@ -49,8 +50,7 @@ public interface GermplasmListManager {
      * @return List of GermplasmList POJOs
      * @throws QueryException
      */
-    public List<GermplasmList> getAllGermplasmLists(int start, int numOfRows,
-	    Database instance) throws QueryException;
+    public List<GermplasmList> getAllGermplasmLists(int start, int numOfRows, Database instance) throws QueryException;
 
     /**
      * Returns the total number of Germplasm Lists.
@@ -76,9 +76,8 @@ public interface GermplasmListManager {
      * @return List of GermplasmList POJOs
      * @throws QueryException
      */
-    public List<GermplasmList> findGermplasmListByName(String name, int start,
-	    int numOfRows, Operation operation, Database instance)
-	    throws QueryException;
+    public List<GermplasmList> findGermplasmListByName(String name, int start, int numOfRows, Operation operation, Database instance)
+            throws QueryException;
 
     /**
      * Returns the number of Germplasm List records with names matching the
@@ -105,8 +104,7 @@ public interface GermplasmListManager {
      * @return List of Germplasm POJOs
      * @throws QueryException
      */
-    public List<GermplasmList> findGermplasmListByStatus(Integer status,
-	    int start, int numOfRows, Database instance) throws QueryException;
+    public List<GermplasmList> findGermplasmListByStatus(Integer status, int start, int numOfRows, Database instance) throws QueryException;
 
     /**
      * Returns the number of Germplasm List records that have the given status.
@@ -129,8 +127,7 @@ public interface GermplasmListManager {
      * 
      * @return List of GermplasmListData POJOs
      */
-    public List<GermplasmListData> getGermplasmListDataByListId(Integer id,
-	    int start, int numOfRows);
+    public List<GermplasmListData> getGermplasmListDataByListId(Integer id, int start, int numOfRows);
 
     /**
      * Returns the number of germplasm list entries that belong to the list
@@ -149,8 +146,7 @@ public interface GermplasmListManager {
      * @param gid
      * @return List of GermplasmListData POJOs
      */
-    public List<GermplasmListData> getGermplasmListDataByListIdAndGID(
-	    Integer listId, Integer gid);
+    public List<GermplasmListData> getGermplasmListDataByListIdAndGID(Integer listId, Integer gid);
 
     /**
      * Returns the germplasm list entry which is identified by the given
@@ -160,8 +156,7 @@ public interface GermplasmListManager {
      * @param entryId
      * @return List of GermplasmListData POJOs
      */
-    public GermplasmListData getGermplasmListDataByListIdAndEntryId(
-	    Integer listId, Integer entryId);
+    public GermplasmListData getGermplasmListDataByListIdAndEntryId(Integer listId, Integer entryId);
 
     /**
      * Returns the germplasm list entries associated with the Germplasm
@@ -177,8 +172,7 @@ public interface GermplasmListManager {
      * @return List of GermplasmListData POJOs
      * @throws QueryException
      */
-    public List<GermplasmListData> getGermplasmListDataByGID(Integer gid,
-	    int start, int numOfRows) throws QueryException;
+    public List<GermplasmListData> getGermplasmListDataByGID(Integer gid, int start, int numOfRows) throws QueryException;
 
     /**
      * Returns the number of germplasm list entries associated with the
@@ -199,8 +193,7 @@ public interface GermplasmListManager {
      *         the database.
      * @throws QueryException
      */
-    public int addGermplasmList(GermplasmList germplasmList)
-	    throws QueryException;
+    public int addGermplasmList(GermplasmList germplasmList) throws QueryException;
 
     /**
      * Inserts a list of multiple {@code GermplasmList} objects into the
@@ -213,8 +206,7 @@ public interface GermplasmListManager {
      *         the database.
      * @throws QueryException
      */
-    public int addGermplasmList(List<GermplasmList> germplasmLists)
-	    throws QueryException;
+    public int addGermplasmList(List<GermplasmList> germplasmLists) throws QueryException;
 
     /**
      * Updates the database with the {@code GermplasmList} object specified.
@@ -226,8 +218,7 @@ public interface GermplasmListManager {
      *         the database.
      * @throws QueryException
      */
-    public int updateGermplasmList(GermplasmList germplasmList)
-	    throws QueryException;
+    public int updateGermplasmList(GermplasmList germplasmList) throws QueryException;
 
     /**
      * Updates the database with multiple {@code GermplasmList} objects
@@ -240,8 +231,7 @@ public interface GermplasmListManager {
      *         the database.
      * @throws QueryException
      */
-    public int updateGermplasmList(List<GermplasmList> germplasmLists)
-	    throws QueryException;
+    public int updateGermplasmList(List<GermplasmList> germplasmLists) throws QueryException;
 
     /**
      * Removes the specified {@code GermplasmList} object from the database.
@@ -253,8 +243,7 @@ public interface GermplasmListManager {
      *         the database.
      * @throws QueryException
      */
-    public int deleteGermplasmList(GermplasmList germplasmList)
-	    throws QueryException;
+    public int deleteGermplasmList(GermplasmList germplasmList) throws QueryException;
 
     /**
      * Removes the specified {@code GermplasmList} objects from the database.
@@ -266,8 +255,7 @@ public interface GermplasmListManager {
      *         the database.
      * @throws QueryException
      */
-    public int deleteGermplasmList(List<GermplasmList> germplasmLists)
-	    throws QueryException;
+    public int deleteGermplasmList(List<GermplasmList> germplasmLists) throws QueryException;
 
     /**
      * Removes the corresponding {@code GermplasmList} record and all related
@@ -280,8 +268,7 @@ public interface GermplasmListManager {
      *         the database.
      * @throws QueryException
      */
-    public int deleteGermplasmListByListId(Integer listId)
-	    throws QueryException;
+    public int deleteGermplasmListByListId(Integer listId) throws QueryException;
 
     /**
      * Inserts a {@code GermplasmListData} object into the database.
@@ -293,8 +280,7 @@ public interface GermplasmListManager {
      *         in the database.
      * @throws QueryException
      */
-    public int addGermplasmListData(GermplasmListData germplasmListData)
-	    throws QueryException;
+    public int addGermplasmListData(GermplasmListData germplasmListData) throws QueryException;
 
     /**
      * Inserts a list of multiple {@code GermplasmListData} objects into the
@@ -308,8 +294,7 @@ public interface GermplasmListManager {
      *         in the database.
      * @throws QueryException
      */
-    public int addGermplasmListData(List<GermplasmListData> germplasmListDatas)
-	    throws QueryException;
+    public int addGermplasmListData(List<GermplasmListData> germplasmListDatas) throws QueryException;
 
     /**
      * Updates the database with the {@code GermplasmListData} object specified.
@@ -321,8 +306,7 @@ public interface GermplasmListManager {
      *         in the database.
      * @throws QueryException
      */
-    public int updateGermplasmListData(GermplasmListData germplasmListData)
-	    throws QueryException;
+    public int updateGermplasmListData(GermplasmListData germplasmListData) throws QueryException;
 
     /**
      * Updates the database with the {@code GermplasmListData} objects
@@ -335,8 +319,7 @@ public interface GermplasmListManager {
      *         in the database.
      * @throws QueryException
      */
-    public int updateGermplasmListData(
-	    List<GermplasmListData> germplasmListDatas) throws QueryException;
+    public int updateGermplasmListData(List<GermplasmListData> germplasmListDatas) throws QueryException;
 
     /**
      * Removes the corresponding {@code GermplasmListData} record from the
@@ -352,8 +335,7 @@ public interface GermplasmListManager {
      *         from the database.
      * @throws QueryException
      */
-    public int deleteGermplasmListDataByListIdEntryId(Integer listId,
-	    Integer entryId) throws QueryException;
+    public int deleteGermplasmListDataByListIdEntryId(Integer listId, Integer entryId) throws QueryException;
 
     /**
      * Removes the corresponding {@code GermplasmListData} records from the
@@ -366,8 +348,7 @@ public interface GermplasmListManager {
      *         from the database.
      * @throws QueryException
      */
-    public int deleteGermplasmListDataByListId(Integer listId)
-	    throws QueryException;
+    public int deleteGermplasmListDataByListId(Integer listId) throws QueryException;
 
     /**
      * Removes the specified {@code GermplasmListData} object from the database.
@@ -379,8 +360,7 @@ public interface GermplasmListManager {
      *         from the database.
      * @throws QueryException
      */
-    public int deleteGermplasmListData(GermplasmListData germplasmListData)
-	    throws QueryException;
+    public int deleteGermplasmListData(GermplasmListData germplasmListData) throws QueryException;
 
     /**
      * Removes the specified {@code GermplasmListData} objects from the
@@ -394,7 +374,6 @@ public interface GermplasmListManager {
      *         from the database.
      * @throws QueryException
      */
-    public int deleteGermplasmListData(
-	    List<GermplasmListData> germplasmListDatas) throws QueryException;
+    public int deleteGermplasmListData(List<GermplasmListData> germplasmListDatas) throws QueryException;
 
 }

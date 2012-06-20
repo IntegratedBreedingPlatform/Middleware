@@ -1,15 +1,15 @@
-/***************************************************************
+/*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  * 
  * Generation Challenge Programme (GCP)
  * 
  * 
- * This software is licensed for use under the terms of the 
- * GNU General Public License (http://bit.ly/8Ztv8M) and the 
- * provisions of Part F of the Generation Challenge Programme 
- * Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
- **************************************************************/
+ *******************************************************************************/
+
 package org.generationcp.middleware.manager.api;
 
 import java.util.List;
@@ -36,7 +36,8 @@ import org.generationcp.middleware.pojos.UserDefinedField;
  * @author Kevin Manansala
  * 
  */
-public interface GermplasmDataManager {
+public interface GermplasmDataManager{
+
     /**
      * Searches for all germplasm records which matches the given name. Three
      * searching modes are available; normal search, the spaces on the name will
@@ -73,10 +74,8 @@ public interface GermplasmDataManager {
      * @return List of Germplasm POJOs
      * @throws QueryException
      */
-    public List<Germplasm> findGermplasmByName(String name, int start,
-	    int numOfRows, FindGermplasmByNameModes mode, Operation op,
-	    Integer status, GermplasmNameType type, Database instance)
-	    throws QueryException;
+    public List<Germplasm> findGermplasmByName(String name, int start, int numOfRows, FindGermplasmByNameModes mode, Operation op,
+            Integer status, GermplasmNameType type, Database instance) throws QueryException;
 
     /**
      * Returns the number of germplasm records with any name matching the given
@@ -108,9 +107,8 @@ public interface GermplasmDataManager {
      * @return number of germplasm records
      * @throws QueryException
      */
-    public int countGermplasmByName(String name, FindGermplasmByNameModes mode,
-	    Operation op, Integer status, GermplasmNameType type,
-	    Database instance) throws QueryException;
+    public int countGermplasmByName(String name, FindGermplasmByNameModes mode, Operation op, Integer status, GermplasmNameType type,
+            Database instance) throws QueryException;
 
     /**
      * Returns the germplasm records that were created at the locations with
@@ -130,9 +128,8 @@ public interface GermplasmDataManager {
      * @return List of Germplasm POJOs
      * @throws QueryException
      */
-    public List<Germplasm> findGermplasmByLocationName(String name, int start,
-	    int numOfRows, Operation op, Database instance)
-	    throws QueryException;
+    public List<Germplasm> findGermplasmByLocationName(String name, int start, int numOfRows, Operation op, Database instance)
+            throws QueryException;
 
     /**
      * Returns the number of germplasm records that were created at the
@@ -146,8 +143,7 @@ public interface GermplasmDataManager {
      *            - can be Database.CENTRAL or Database.LOCAL
      * @return the number of germplasm records
      */
-    public int countGermplasmByLocationName(String name, Operation op,
-	    Database instance) throws QueryException;
+    public int countGermplasmByLocationName(String name, Operation op, Database instance) throws QueryException;
 
     /**
      * Returns the germplasm records that were created by the methods with names
@@ -167,9 +163,8 @@ public interface GermplasmDataManager {
      * @return List of Germplasm POJOS
      * @throws QueryException
      */
-    public List<Germplasm> findGermplasmByMethodName(String name, int start,
-	    int numOfRows, Operation op, Database instance)
-	    throws QueryException;
+    public List<Germplasm> findGermplasmByMethodName(String name, int start, int numOfRows, Operation op, Database instance)
+            throws QueryException;
 
     /**
      * Returns the number of germplasm records that were created by methods with
@@ -184,8 +179,7 @@ public interface GermplasmDataManager {
      * @return number of germplasm records
      * @throws QueryException
      */
-    public int countGermplasmByMethodName(String name, Operation op,
-	    Database instance) throws QueryException;
+    public int countGermplasmByMethodName(String name, Operation op, Database instance) throws QueryException;
 
     /**
      * Returns the germplasm record identified by the given id.
@@ -204,8 +198,7 @@ public interface GermplasmDataManager {
      *            - the id of the germplasm record to be retrieved
      * @return the Germplasm POJO representing the record
      */
-    public Germplasm getGermplasmWithPrefName(Integer gid)
-	    throws QueryException;
+    public Germplasm getGermplasmWithPrefName(Integer gid) throws QueryException;
 
     /**
      * Given a gid, return the Germplasm POJO representing the record identified
@@ -215,8 +208,7 @@ public interface GermplasmDataManager {
      *            - the id of the germplasm record to be retrieved
      * @return the Germplasm POJO representing the record
      */
-    public Germplasm getGermplasmWithPrefAbbrev(Integer gid)
-	    throws QueryException;
+    public Germplasm getGermplasmWithPrefAbbrev(Integer gid) throws QueryException;
 
     /**
      * Returns the Name record identified by the given id.
@@ -245,8 +237,7 @@ public interface GermplasmDataManager {
      *            - may be used to filter the results
      * @return List of Name POJOs
      */
-    public List<Name> getNamesByGID(Integer gid, Integer status,
-	    GermplasmNameType type) throws QueryException;
+    public List<Name> getNamesByGID(Integer gid, Integer status, GermplasmNameType type) throws QueryException;
 
     /**
      * Returns the preferred name of the Germplasm identified by the gid
@@ -285,8 +276,7 @@ public interface GermplasmDataManager {
      *         is found.
      * @throws QueryException
      */
-    public Name getNameByGIDAndNval(Integer gid, String nval)
-	    throws QueryException;
+    public Name getNameByGIDAndNval(Integer gid, String nval) throws QueryException;
 
     /**
      * Sets the specified Name as the specified Germplasm's new preferred Name.
@@ -297,8 +287,7 @@ public interface GermplasmDataManager {
      *            - new name to set as the preferred name
      * @throws QueryException
      */
-    public void updateGermplasmPrefName(Integer gid, String newPrefName)
-	    throws QueryException;
+    public void updateGermplasmPrefName(Integer gid, String newPrefName) throws QueryException;
 
     /**
      * Sets the specified Abbreviation as the specified Germplasm's new
@@ -310,8 +299,7 @@ public interface GermplasmDataManager {
      *            - new abbreviation to set as the preferred abbreviation
      * @throws QueryException
      */
-    public void updateGermplasmPrefAbbrev(Integer gid, String newPrefAbbrev)
-	    throws QueryException;
+    public void updateGermplasmPrefAbbrev(Integer gid, String newPrefAbbrev) throws QueryException;
 
     /**
      * Inserts a single {@code Name} object into the database.
@@ -368,8 +356,7 @@ public interface GermplasmDataManager {
      *            - id of the Germplasm
      * @return List of Atributs POJOs
      */
-    public List<Attribute> getAttributesByGID(Integer gid)
-	    throws QueryException;
+    public List<Attribute> getAttributesByGID(Integer gid) throws QueryException;
 
     /**
      * Returns the Method record identified by the id.
@@ -460,8 +447,7 @@ public interface GermplasmDataManager {
      * @return Germplasm POJO
      * @throws QueryException
      */
-    public Germplasm getParentByGIDAndProgenitorNumber(Integer gid,
-	    Integer progenitorNumber) throws QueryException;
+    public Germplasm getParentByGIDAndProgenitorNumber(Integer gid, Integer progenitorNumber) throws QueryException;
 
     /**
      * Returns the Germplasm representing the children of the Germplasm
@@ -480,8 +466,7 @@ public interface GermplasmDataManager {
      * @return List of Object arrays, the arrays have 2 elements in them
      * @throws QueryException
      */
-    public List<Object[]> findDescendants(Integer gid, int start, int numOfRows)
-	    throws QueryException;
+    public List<Object[]> findDescendants(Integer gid, int start, int numOfRows) throws QueryException;
 
     /**
      * Returns the number of children of the Germplasm identified by the given
@@ -524,8 +509,7 @@ public interface GermplasmDataManager {
      * @return GermplasmPedigreeTree representing the pedigree tree
      * @throws QueryException
      */
-    public GermplasmPedigreeTree generatePedigreeTree(Integer gid, int level)
-	    throws QueryException;
+    public GermplasmPedigreeTree generatePedigreeTree(Integer gid, int level) throws QueryException;
 
     /**
      * Returns the Germplasm which are management group neighbors of the
@@ -538,8 +522,7 @@ public interface GermplasmDataManager {
      * @return List of Germplasm POJOs
      * @throws QueryException
      */
-    public List<Germplasm> getManagementNeighbors(Integer gid)
-	    throws QueryException;
+    public List<Germplasm> getManagementNeighbors(Integer gid) throws QueryException;
 
     /**
      * Returns the Germplasm which are group relatives of the Germplasm
@@ -566,8 +549,7 @@ public interface GermplasmDataManager {
      *         to the last source on the generation history
      * @throws QueryException
      */
-    public List<Germplasm> getGenerationHistory(Integer gid)
-	    throws QueryException;
+    public List<Germplasm> getGenerationHistory(Integer gid) throws QueryException;
 
     /**
      * Returns the GermplasmPedigreeTree object which represents the derivative
@@ -596,9 +578,8 @@ public interface GermplasmDataManager {
      *            given gid
      * @return GermplasmPedigreeTree representing the neighborhood
      */
-    public GermplasmPedigreeTree getDerivativeNeighborhood(Integer gid,
-	    int numberOfStepsBackward, int numberOfStepsForward)
-	    throws QueryException;
+    public GermplasmPedigreeTree getDerivativeNeighborhood(Integer gid, int numberOfStepsBackward, int numberOfStepsForward)
+            throws QueryException;
 
     /**
      * Returns the Germplasm records with field values matching the specified
@@ -643,8 +624,7 @@ public interface GermplasmDataManager {
      * @return the number of Attribute records stored in the database
      * @throws QueryException
      */
-    public int addGermplasmAttribute(List<Attribute> attributes)
-	    throws QueryException;
+    public int addGermplasmAttribute(List<Attribute> attributes) throws QueryException;
 
     /**
      * Given a valid Attribute object, update the corresponding record in the
@@ -654,8 +634,7 @@ public interface GermplasmDataManager {
      * @return the number of Attribute records updated
      * @throws QueryException
      */
-    public int updateGermplasmAttribute(Attribute attribute)
-	    throws QueryException;
+    public int updateGermplasmAttribute(Attribute attribute) throws QueryException;
 
     /**
      * Given a List of valid Attribute objects, update their corresponding
@@ -666,8 +645,7 @@ public interface GermplasmDataManager {
      * @return the number of Attribute records updated
      * @throws QueryException
      */
-    public int updateGermplasmAttribute(List<Attribute> attributes)
-	    throws QueryException;
+    public int updateGermplasmAttribute(List<Attribute> attributes) throws QueryException;
 
     /**
      * Returns the attribute record identified by the given id.
@@ -693,8 +671,7 @@ public interface GermplasmDataManager {
      * @return true if the operation was successful
      * @throws QueryException
      */
-    public boolean updateProgenitor(Integer gid, Integer progenitorId,
-	    Integer progenitorNumber) throws QueryException;
+    public boolean updateProgenitor(Integer gid, Integer progenitorId, Integer progenitorNumber) throws QueryException;
 
     /**
      * Given a valid Germplasm object, update the corresponding record in the
@@ -714,8 +691,7 @@ public interface GermplasmDataManager {
      * @return the number of Germplasm records updated
      * @throws QueryException
      */
-    public int updateGermplasm(List<Germplasm> germplasms)
-	    throws QueryException;
+    public int updateGermplasm(List<Germplasm> germplasms) throws QueryException;
 
     /**
      * Given a valid Germplasm object with a matching valid Name object to be
@@ -727,8 +703,7 @@ public interface GermplasmDataManager {
      * @return the number of Germplasm records added
      * @throws QueryException
      */
-    public int addGermplasm(Germplasm germplasm, Name preferredName)
-	    throws QueryException;
+    public int addGermplasm(Germplasm germplasm, Name preferredName) throws QueryException;
 
     /**
      * Given a map of valid Germplasm and Name objects, add new records for the
@@ -745,6 +720,5 @@ public interface GermplasmDataManager {
      * @return the number of Germplasm records added
      * @throws QueryException
      */
-    public int addGermplasm(Map<Germplasm, Name> germplasmNameMap)
-	    throws QueryException;
+    public int addGermplasm(Map<Germplasm, Name> germplasmNameMap) throws QueryException;
 }

@@ -1,15 +1,15 @@
-/***************************************************************
+/*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  * 
  * Generation Challenge Programme (GCP)
  * 
  * 
- * This software is licensed for use under the terms of the 
- * GNU General Public License (http://bit.ly/8Ztv8M) and the 
- * provisions of Part F of the Generation Challenge Programme 
- * Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
- **************************************************************/
+ *******************************************************************************/
+
 package org.generationcp.middleware.pojos.report;
 
 import java.io.Serializable;
@@ -29,7 +29,8 @@ import org.generationcp.middleware.pojos.workbench.Person;
  * @author Kevin Manansala
  * 
  */
-public class TransactionReportRow implements Serializable {
+public class TransactionReportRow implements Serializable{
+
     private static final long serialVersionUID = 4363149565820886638L;
 
     private Integer date;
@@ -45,68 +46,65 @@ public class TransactionReportRow implements Serializable {
     }
 
     public Integer getDate() {
-	return date;
+        return date;
     }
 
     public void setDate(Integer date) {
-	this.date = date;
+        this.date = date;
     }
 
     public Integer getQuantity() {
-	return quantity;
+        return quantity;
     }
 
     public void setQuantity(Integer quantity) {
-	this.quantity = quantity;
+        this.quantity = quantity;
     }
 
     public Scale getScaleOfLot() {
-	return scaleOfLot;
+        return scaleOfLot;
     }
 
     public void setScaleOfLot(Scale scaleOfLot) {
-	this.scaleOfLot = scaleOfLot;
+        this.scaleOfLot = scaleOfLot;
     }
 
     public Location getLocationOfLot() {
-	return locationOfLot;
+        return locationOfLot;
     }
 
     public void setLocationOfLot(Location locationOfLot) {
-	this.locationOfLot = locationOfLot;
+        this.locationOfLot = locationOfLot;
     }
 
     public String getCommentOfLot() {
-	return commentOfLot;
+        return commentOfLot;
     }
 
     public void setCommentOfLot(String commentOfLot) {
-	this.commentOfLot = commentOfLot;
+        this.commentOfLot = commentOfLot;
     }
 
     public Integer getEntityIdOfLot() {
-	return entityIdOfLot;
+        return entityIdOfLot;
     }
 
     public void setEntityIdOfLot(Integer entityIdOfLot) {
-	this.entityIdOfLot = entityIdOfLot;
+        this.entityIdOfLot = entityIdOfLot;
     }
 
     public Person getPerson() {
-	return person;
+        return person;
     }
 
     public void setPerson(Person person) {
-	this.person = person;
+        this.person = person;
     }
 
     @Override
     public String toString() {
-	return "TransactionReportRow [date=" + date + ", quantity=" + quantity
-		+ ", scaleOfLot=" + scaleOfLot + ", locationOfLot="
-		+ locationOfLot + ", commentOfLot=" + commentOfLot
-		+ ", entityIdOfLot=" + entityIdOfLot + ", person=" + person
-		+ "]";
+        return "TransactionReportRow [date=" + date + ", quantity=" + quantity + ", scaleOfLot=" + scaleOfLot + ", locationOfLot="
+                + locationOfLot + ", commentOfLot=" + commentOfLot + ", entityIdOfLot=" + entityIdOfLot + ", person=" + person + "]";
     }
 
 }

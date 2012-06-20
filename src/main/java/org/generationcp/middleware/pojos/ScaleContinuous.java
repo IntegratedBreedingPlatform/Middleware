@@ -1,15 +1,15 @@
-/***************************************************************
+/*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  * 
  * Generation Challenge Programme (GCP)
  * 
  * 
- * This software is licensed for use under the terms of the 
- * GNU General Public License (http://bit.ly/8Ztv8M) and the 
- * provisions of Part F of the Generation Challenge Programme 
- * Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
- **************************************************************/
+ *******************************************************************************/
+
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
@@ -22,7 +22,8 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "scalecon")
-public class ScaleContinuous implements Serializable {
+public class ScaleContinuous implements Serializable{
+
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -42,70 +43,74 @@ public class ScaleContinuous implements Serializable {
     }
 
     public ScaleContinuous(Integer scaleId) {
-	super();
-	this.scaleId = scaleId;
+        super();
+        this.scaleId = scaleId;
     }
 
     public ScaleContinuous(Integer scaleId, Double start, Double end) {
-	super();
-	this.scaleId = scaleId;
-	this.start = start;
-	this.end = end;
+        super();
+        this.scaleId = scaleId;
+        this.start = start;
+        this.end = end;
     }
 
     public Integer getScaleId() {
-	return scaleId;
+        return scaleId;
     }
 
     public void setScaleId(Integer scaleId) {
-	this.scaleId = scaleId;
+        this.scaleId = scaleId;
     }
 
     public Double getStart() {
-	return start;
+        return start;
     }
 
     public void setStart(Double start) {
-	this.start = start;
+        this.start = start;
     }
 
     public Double getEnd() {
-	return end;
+        return end;
     }
 
     public void setEnd(Double end) {
-	this.end = end;
+        this.end = end;
     }
 
     @Override
     public String toString() {
-	return "ScaleContinuous [scaleId=" + scaleId + ", start=" + start
-		+ ", end=" + end + "]";
+        return "ScaleContinuous [scaleId=" + scaleId + ", start=" + start + ", end=" + end + "]";
     }
 
     @Override
     public int hashCode() {
-	final int prime = 31;
-	int result = 1;
-	result = prime * result + ((scaleId == null) ? 0 : scaleId.hashCode());
-	return result;
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (scaleId == null ? 0 : scaleId.hashCode());
+        return result;
     }
 
     @Override
     public boolean equals(Object obj) {
-	if (this == obj)
-	    return true;
-	if (obj == null)
-	    return false;
-	if (getClass() != obj.getClass())
-	    return false;
-	ScaleContinuous other = (ScaleContinuous) obj;
-	if (scaleId == null) {
-	    if (other.scaleId != null)
-		return false;
-	} else if (!scaleId.equals(other.scaleId))
-	    return false;
-	return true;
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        ScaleContinuous other = (ScaleContinuous) obj;
+        if (scaleId == null) {
+            if (other.scaleId != null) {
+                return false;
+            }
+        } else if (!scaleId.equals(other.scaleId)) {
+            return false;
+        }
+        return true;
     }
 
 }

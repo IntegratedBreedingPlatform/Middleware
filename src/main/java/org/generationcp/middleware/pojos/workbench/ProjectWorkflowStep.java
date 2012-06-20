@@ -1,15 +1,15 @@
-/***************************************************************
+/*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  * 
  * Generation Challenge Programme (GCP)
  * 
  * 
- * This software is licensed for use under the terms of the 
- * GNU General Public License (http://bit.ly/8Ztv8M) and the 
- * provisions of Part F of the Generation Challenge Programme 
- * Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
- **************************************************************/
+ *******************************************************************************/
+
 package org.generationcp.middleware.pojos.workbench;
 
 import java.io.Serializable;
@@ -29,7 +29,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Entity
 @Table(name = "workbench_project_workflow_step")
-public class ProjectWorkflowStep implements Serializable {
+public class ProjectWorkflowStep implements Serializable{
+
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -55,62 +56,64 @@ public class ProjectWorkflowStep implements Serializable {
     private String status;
 
     public Long getProjectWorkflowStepId() {
-	return projectWorkflowStepId;
+        return projectWorkflowStepId;
     }
 
     public void setProjectWorkflowStepId(Long projectWorkflowStepId) {
-	this.projectWorkflowStepId = projectWorkflowStepId;
+        this.projectWorkflowStepId = projectWorkflowStepId;
     }
 
     public WorkflowStep getStep() {
-	return step;
+        return step;
     }
 
     public void setStep(WorkflowStep step) {
-	this.step = step;
+        this.step = step;
     }
 
     public Contact getOwner() {
-	return owner;
+        return owner;
     }
 
     public void setOwner(Contact owner) {
-	this.owner = owner;
+        this.owner = owner;
     }
 
     public Date getDueDate() {
-	return dueDate;
+        return dueDate;
     }
 
     public void setDueDate(Date dueDate) {
-	this.dueDate = dueDate;
+        this.dueDate = dueDate;
     }
 
     public String getStatus() {
-	return status;
+        return status;
     }
 
     public void setStatus(String status) {
-	this.status = status;
+        this.status = status;
     }
 
     @Override
     public int hashCode() {
-	return new HashCodeBuilder().append(projectWorkflowStepId).hashCode();
+        return new HashCodeBuilder().append(projectWorkflowStepId).hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
-	if (obj == null)
-	    return false;
-	if (obj == this)
-	    return true;
-	if (!ProjectWorkflowStep.class.isInstance(obj))
-	    return false;
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (!ProjectWorkflowStep.class.isInstance(obj)) {
+            return false;
+        }
 
-	ProjectWorkflowStep otherObj = (ProjectWorkflowStep) obj;
+        ProjectWorkflowStep otherObj = (ProjectWorkflowStep) obj;
 
-	return new EqualsBuilder().append(projectWorkflowStepId,
-		otherObj.projectWorkflowStepId).isEquals();
+        return new EqualsBuilder().append(projectWorkflowStepId, otherObj.projectWorkflowStepId).isEquals();
     }
 }

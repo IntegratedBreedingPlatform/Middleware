@@ -1,15 +1,15 @@
-/***************************************************************
+/*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  * 
  * Generation Challenge Programme (GCP)
  * 
  * 
- * This software is licensed for use under the terms of the 
- * GNU General Public License (http://bit.ly/8Ztv8M) and the 
- * provisions of Part F of the Generation Challenge Programme 
- * Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
- **************************************************************/
+ *******************************************************************************/
+
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
@@ -27,7 +27,8 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "georef")
-public class Georef implements Serializable {
+public class Georef implements Serializable{
+
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -51,82 +52,82 @@ public class Georef implements Serializable {
     }
 
     public Georef(Integer locid) {
-	this.locid = locid;
+        this.locid = locid;
     }
 
-    public Georef(Integer locid, Integer llpn, Double lat, Double lon,
-	    Double alt) {
-	super();
-	this.locid = locid;
-	this.llpn = llpn;
-	this.lat = lat;
-	this.lon = lon;
-	this.alt = alt;
+    public Georef(Integer locid, Integer llpn, Double lat, Double lon, Double alt) {
+        super();
+        this.locid = locid;
+        this.llpn = llpn;
+        this.lat = lat;
+        this.lon = lon;
+        this.alt = alt;
     }
 
     public Integer getLocid() {
-	return locid;
+        return locid;
     }
 
     public void setLocid(Integer locid) {
-	this.locid = locid;
+        this.locid = locid;
     }
 
     public Integer getLlpn() {
-	return llpn;
+        return llpn;
     }
 
     public void setLlpn(Integer llpn) {
-	this.llpn = llpn;
+        this.llpn = llpn;
     }
 
     public Double getLat() {
-	return lat;
+        return lat;
     }
 
     public void setLat(Double lat) {
-	this.lat = lat;
+        this.lat = lat;
     }
 
     public Double getLon() {
-	return lon;
+        return lon;
     }
 
     public void setLon(Double lon) {
-	this.lon = lon;
+        this.lon = lon;
     }
 
     public Double getAlt() {
-	return alt;
+        return alt;
     }
 
     public void setAlt(Double alt) {
-	this.alt = alt;
+        this.alt = alt;
     }
 
     @Override
     public int hashCode() {
-	return this.getLocid();
+        return this.getLocid();
     }
 
     @Override
     public boolean equals(Object obj) {
-	if (obj == null)
-	    return false;
+        if (obj == null) {
+            return false;
+        }
 
-	if (obj instanceof Georef) {
-	    Georef param = (Georef) obj;
-	    if (this.getLocid() == param.getLocid())
-		return true;
-	}
+        if (obj instanceof Georef) {
+            Georef param = (Georef) obj;
+            if (this.getLocid() == param.getLocid()) {
+                return true;
+            }
+        }
 
-	return false;
+        return false;
     }
 
     @Override
     public String toString() {
-	return "Georef [locid=" + locid + ", llpn=" + llpn + ", lat=" + lat
-		+ ", lon=" + lon + ", alt=" + alt + "]";
+        return "Georef [locid=" + locid + ", llpn=" + llpn + ", lat=" + lat + ", lon=" + lon + ", alt=" + alt + "]";
     }
 
 }

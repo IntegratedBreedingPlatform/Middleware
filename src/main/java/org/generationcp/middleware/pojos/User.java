@@ -1,15 +1,15 @@
-/***************************************************************
+/*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  * 
  * Generation Challenge Programme (GCP)
  * 
  * 
- * This software is licensed for use under the terms of the 
- * GNU General Public License (http://bit.ly/8Ztv8M) and the 
- * provisions of Part F of the Generation Challenge Programme 
- * Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
- **************************************************************/
+ *******************************************************************************/
+
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
@@ -22,31 +22,31 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "users")
-public class User implements Serializable {
+public class User implements Serializable{
+
     private static final long serialVersionUID = 1L;
 
     public User() {
     }
 
     public User(Integer userid) {
-	super();
-	this.userid = userid;
+        super();
+        this.userid = userid;
     }
 
-    public User(Integer userid, Integer instalid, Integer status,
-	    Integer access, Integer type, String name, String password,
-	    Integer personid, Integer adate, Integer cdate) {
-	super();
-	this.userid = userid;
-	this.instalid = instalid;
-	this.status = status;
-	this.access = access;
-	this.type = type;
-	this.name = name;
-	this.password = password;
-	this.personid = personid;
-	this.adate = adate;
-	this.cdate = cdate;
+    public User(Integer userid, Integer instalid, Integer status, Integer access, Integer type, String name, String password,
+            Integer personid, Integer adate, Integer cdate) {
+        super();
+        this.userid = userid;
+        this.instalid = instalid;
+        this.status = status;
+        this.access = access;
+        this.type = type;
+        this.name = name;
+        this.password = password;
+        this.personid = personid;
+        this.adate = adate;
+        this.cdate = cdate;
     }
 
     @Id
@@ -83,11 +83,8 @@ public class User implements Serializable {
 
     @Override
     public String toString() {
-	return "User [userid=" + userid + ", instalid=" + instalid
-		+ ", status=" + status + ", access=" + access + ", type="
-		+ type + ", name=" + name + ", password=" + password
-		+ ", personid=" + personid + ", adate=" + adate + ", cdate="
-		+ cdate + "]";
+        return "User [userid=" + userid + ", instalid=" + instalid + ", status=" + status + ", access=" + access + ", type=" + type
+                + ", name=" + name + ", password=" + password + ", personid=" + personid + ", adate=" + adate + ", cdate=" + cdate + "]";
     }
 
 }

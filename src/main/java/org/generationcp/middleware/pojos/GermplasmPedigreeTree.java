@@ -1,15 +1,15 @@
-/***************************************************************
+/*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  * 
  * Generation Challenge Programme (GCP)
  * 
  * 
- * This software is licensed for use under the terms of the 
- * GNU General Public License (http://bit.ly/8Ztv8M) and the 
- * provisions of Part F of the Generation Challenge Programme 
- * Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
- **************************************************************/
+ *******************************************************************************/
+
 package org.generationcp.middleware.pojos;
 
 /**
@@ -25,14 +25,15 @@ package org.generationcp.middleware.pojos;
  * @author Kevin Manansala
  * 
  */
-public class GermplasmPedigreeTree {
+public class GermplasmPedigreeTree{
+
     private GermplasmPedigreeTreeNode root;
 
     public GermplasmPedigreeTreeNode getRoot() {
-	return root;
+        return root;
     }
 
     public void setRoot(GermplasmPedigreeTreeNode root) {
-	this.root = root;
+        this.root = root;
     }
 }

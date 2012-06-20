@@ -1,15 +1,15 @@
-/***************************************************************
+/*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  * 
  * Generation Challenge Programme (GCP)
  * 
  * 
- * This software is licensed for use under the terms of the 
- * GNU General Public License (http://bit.ly/8Ztv8M) and the 
- * provisions of Part F of the Generation Challenge Programme 
- * Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
- **************************************************************/
+ *******************************************************************************/
+
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
@@ -18,8 +18,6 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
@@ -29,7 +27,8 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "names")
-public class Name implements Serializable {
+public class Name implements Serializable{
+
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -71,122 +70,121 @@ public class Name implements Serializable {
     }
 
     public Name(Integer nid) {
-	super();
-	this.nid = nid;
+        super();
+        this.nid = nid;
     }
 
-    public Name(Integer nid, Integer germplasmId, Integer typeId,
-	    Integer nstat, Integer userId, String nval, Integer locationId,
-	    Integer ndate, Integer referenceId) {
-	super();
-	this.nid = nid;
-	this.germplasmId = germplasmId;
-	this.typeId = typeId;
-	this.nstat = nstat;
-	this.userId = userId;
-	this.nval = nval;
-	this.locationId = locationId;
-	this.ndate = ndate;
-	this.referenceId = referenceId;
+    public Name(Integer nid, Integer germplasmId, Integer typeId, Integer nstat, Integer userId, String nval, Integer locationId,
+            Integer ndate, Integer referenceId) {
+        super();
+        this.nid = nid;
+        this.germplasmId = germplasmId;
+        this.typeId = typeId;
+        this.nstat = nstat;
+        this.userId = userId;
+        this.nval = nval;
+        this.locationId = locationId;
+        this.ndate = ndate;
+        this.referenceId = referenceId;
     }
 
     public Integer getNid() {
-	return nid;
+        return nid;
     }
 
     public void setNid(Integer nid) {
-	this.nid = nid;
+        this.nid = nid;
     }
 
     public Integer getNstat() {
-	return nstat;
+        return nstat;
     }
 
     public void setNstat(Integer nstat) {
-	this.nstat = nstat;
+        this.nstat = nstat;
     }
 
     public String getNval() {
-	return nval;
+        return nval;
     }
 
     public void setNval(String nval) {
-	this.nval = nval;
+        this.nval = nval;
     }
 
     public Integer getNdate() {
-	return ndate;
+        return ndate;
     }
 
     public void setNdate(Integer ndate) {
-	this.ndate = ndate;
+        this.ndate = ndate;
     }
 
     public Integer getGermplasmId() {
-	return germplasmId;
+        return germplasmId;
     }
 
     public void setGermplasmId(Integer germplasmId) {
-	this.germplasmId = germplasmId;
+        this.germplasmId = germplasmId;
     }
 
     public Integer getTypeId() {
-	return typeId;
+        return typeId;
     }
 
     public void setTypeId(Integer typeId) {
-	this.typeId = typeId;
+        this.typeId = typeId;
     }
 
     public Integer getUserId() {
-	return userId;
+        return userId;
     }
 
     public void setUserId(Integer userId) {
-	this.userId = userId;
+        this.userId = userId;
     }
 
     public Integer getLocationId() {
-	return locationId;
+        return locationId;
     }
 
     public void setLocationId(Integer locationId) {
-	this.locationId = locationId;
+        this.locationId = locationId;
     }
 
     public Integer getReferenceId() {
-	return referenceId;
+        return referenceId;
     }
 
     public void setReferenceId(Integer referenceId) {
-	this.referenceId = referenceId;
+        this.referenceId = referenceId;
     }
 
     @Override
     public boolean equals(Object obj) {
-	if (obj == null)
-	    return false;
+        if (obj == null) {
+            return false;
+        }
 
-	if (obj instanceof Name) {
-	    Name param = (Name) obj;
-	    if (this.getNid() == param.getNid())
-		return true;
-	}
+        if (obj instanceof Name) {
+            Name param = (Name) obj;
+            if (this.getNid() == param.getNid()) {
+                return true;
+            }
+        }
 
-	return false;
+        return false;
     }
 
     @Override
     public int hashCode() {
-	return this.getNid();
+        return this.getNid();
     }
 
     @Override
     public String toString() {
-	return "Names [nid=" + nid + ", germplasmId=" + germplasmId
-		+ ", typeId=" + typeId + ", nstat=" + nstat + ", nuid="
-		+ userId + ", nval=" + nval + ", locationId=" + locationId
-		+ ", referenceId=" + referenceId + ", ndate=" + ndate + "]";
+        return "Names [nid=" + nid + ", germplasmId=" + germplasmId + ", typeId=" + typeId + ", nstat=" + nstat + ", nuid=" + userId
+                + ", nval=" + nval + ", locationId=" + locationId + ", referenceId=" + referenceId + ", ndate=" + ndate + "]";
     }
 
 }

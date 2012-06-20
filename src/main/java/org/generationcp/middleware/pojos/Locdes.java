@@ -1,15 +1,15 @@
-/***************************************************************
+/*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  * 
  * Generation Challenge Programme (GCP)
  * 
  * 
- * This software is licensed for use under the terms of the 
- * GNU General Public License (http://bit.ly/8Ztv8M) and the 
- * provisions of Part F of the Generation Challenge Programme 
- * Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
- **************************************************************/
+ *******************************************************************************/
+
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
@@ -32,7 +32,8 @@ import org.hibernate.annotations.NotFoundAction;
  */
 @Entity
 @Table(name = "locdes")
-public class Locdes implements Serializable {
+public class Locdes implements Serializable{
+
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -71,96 +72,96 @@ public class Locdes implements Serializable {
     }
 
     public Integer getLdid() {
-	return ldid;
+        return ldid;
     }
 
-    public Locdes(Integer ldid, Location location, UserDefinedField type,
-	    User user, String dval, Integer ddate, Bibref reference) {
-	super();
-	this.ldid = ldid;
-	this.location = location;
-	this.type = type;
-	this.user = user;
-	this.dval = dval;
-	this.ddate = ddate;
-	this.reference = reference;
+    public Locdes(Integer ldid, Location location, UserDefinedField type, User user, String dval, Integer ddate, Bibref reference) {
+        super();
+        this.ldid = ldid;
+        this.location = location;
+        this.type = type;
+        this.user = user;
+        this.dval = dval;
+        this.ddate = ddate;
+        this.reference = reference;
     }
 
     public void setLdid(Integer ldid) {
-	this.ldid = ldid;
+        this.ldid = ldid;
     }
 
     public Location getLocation() {
-	return location;
+        return location;
     }
 
     public void setLocation(Location location) {
-	this.location = location;
+        this.location = location;
     }
 
     public UserDefinedField getType() {
-	return type;
+        return type;
     }
 
     public void setType(UserDefinedField type) {
-	this.type = type;
+        this.type = type;
     }
 
     public User getUser() {
-	return user;
+        return user;
     }
 
     public void setUser(User user) {
-	this.user = user;
+        this.user = user;
     }
 
     public Bibref getReference() {
-	return reference;
+        return reference;
     }
 
     public void setReference(Bibref reference) {
-	this.reference = reference;
+        this.reference = reference;
     }
 
     public String getDval() {
-	return dval;
+        return dval;
     }
 
     public void setDval(String dval) {
-	this.dval = dval;
+        this.dval = dval;
     }
 
     public Integer getDdate() {
-	return ddate;
+        return ddate;
     }
 
     public void setDdate(Integer ddate) {
-	this.ddate = ddate;
+        this.ddate = ddate;
     }
 
     @Override
     public boolean equals(Object obj) {
-	if (obj == null)
-	    return false;
+        if (obj == null) {
+            return false;
+        }
 
-	if (obj instanceof Locdes) {
-	    Locdes param = (Locdes) obj;
-	    if (this.getLdid() == param.getLdid())
-		return true;
-	}
+        if (obj instanceof Locdes) {
+            Locdes param = (Locdes) obj;
+            if (this.getLdid() == param.getLdid()) {
+                return true;
+            }
+        }
 
-	return false;
+        return false;
     }
 
     @Override
     public int hashCode() {
-	return this.getLdid();
+        return this.getLdid();
     }
 
     @Override
     public String toString() {
-	return "Locdes [ldid=" + ldid + ", dval=" + dval + ", ddate=" + ddate
-		+ "]";
+        return "Locdes [ldid=" + ldid + ", dval=" + dval + ", ddate=" + ddate + "]";
     }
 
 }

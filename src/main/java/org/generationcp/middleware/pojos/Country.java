@@ -1,15 +1,15 @@
-/***************************************************************
+/*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  * 
  * Generation Challenge Programme (GCP)
  * 
  * 
- * This software is licensed for use under the terms of the 
- * GNU General Public License (http://bit.ly/8Ztv8M) and the 
- * provisions of Part F of the Generation Challenge Programme 
- * Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
- **************************************************************/
+ *******************************************************************************/
+
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
@@ -27,7 +27,8 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "cntry")
-public class Country implements Serializable {
+public class Country implements Serializable{
+
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -83,160 +84,158 @@ public class Country implements Serializable {
     }
 
     public Country(Integer cntryid) {
-	super();
-	this.cntryid = cntryid;
+        super();
+        this.cntryid = cntryid;
     }
 
-    public Country(Integer cntryid, Integer isonum, String isotwo,
-	    String isothree, String faothree, String fips, String wb,
-	    String isofull, String isoabbr, String cont, Integer scntry,
-	    Integer ecntry, Integer cchange) {
-	super();
-	this.cntryid = cntryid;
-	this.isonum = isonum;
-	this.isotwo = isotwo;
-	this.isothree = isothree;
-	this.faothree = faothree;
-	this.fips = fips;
-	this.wb = wb;
-	this.isofull = isofull;
-	this.isoabbr = isoabbr;
-	this.cont = cont;
-	this.scntry = scntry;
-	this.ecntry = ecntry;
-	this.cchange = cchange;
+    public Country(Integer cntryid, Integer isonum, String isotwo, String isothree, String faothree, String fips, String wb,
+            String isofull, String isoabbr, String cont, Integer scntry, Integer ecntry, Integer cchange) {
+        super();
+        this.cntryid = cntryid;
+        this.isonum = isonum;
+        this.isotwo = isotwo;
+        this.isothree = isothree;
+        this.faothree = faothree;
+        this.fips = fips;
+        this.wb = wb;
+        this.isofull = isofull;
+        this.isoabbr = isoabbr;
+        this.cont = cont;
+        this.scntry = scntry;
+        this.ecntry = ecntry;
+        this.cchange = cchange;
     }
 
     public Integer getCntryid() {
-	return cntryid;
+        return cntryid;
     }
 
     public void setCntryid(Integer cntryid) {
-	this.cntryid = cntryid;
+        this.cntryid = cntryid;
     }
 
     public Integer getIsonum() {
-	return isonum;
+        return isonum;
     }
 
     public void setIsonum(Integer isonum) {
-	this.isonum = isonum;
+        this.isonum = isonum;
     }
 
     public String getIsotwo() {
-	return isotwo;
+        return isotwo;
     }
 
     public void setIsotwo(String isotwo) {
-	this.isotwo = isotwo;
+        this.isotwo = isotwo;
     }
 
     public String getIsothree() {
-	return isothree;
+        return isothree;
     }
 
     public void setIsothree(String isothree) {
-	this.isothree = isothree;
+        this.isothree = isothree;
     }
 
     public String getFaothree() {
-	return faothree;
+        return faothree;
     }
 
     public void setFaothree(String faothree) {
-	this.faothree = faothree;
+        this.faothree = faothree;
     }
 
     public String getFips() {
-	return fips;
+        return fips;
     }
 
     public void setFips(String fips) {
-	this.fips = fips;
+        this.fips = fips;
     }
 
     public String getWb() {
-	return wb;
+        return wb;
     }
 
     public void setWb(String wb) {
-	this.wb = wb;
+        this.wb = wb;
     }
 
     public String getIsofull() {
-	return isofull;
+        return isofull;
     }
 
     public void setIsofull(String isofull) {
-	this.isofull = isofull;
+        this.isofull = isofull;
     }
 
     public String getIsoabbr() {
-	return isoabbr;
+        return isoabbr;
     }
 
     public void setIsoabbr(String isoabbr) {
-	this.isoabbr = isoabbr;
+        this.isoabbr = isoabbr;
     }
 
     public String getCont() {
-	return cont;
+        return cont;
     }
 
     public void setCont(String cont) {
-	this.cont = cont;
+        this.cont = cont;
     }
 
     public Integer getScntry() {
-	return scntry;
+        return scntry;
     }
 
     public void setScntry(Integer scntry) {
-	this.scntry = scntry;
+        this.scntry = scntry;
     }
 
     public Integer getEcntry() {
-	return ecntry;
+        return ecntry;
     }
 
     public void setEcntry(Integer ecntry) {
-	this.ecntry = ecntry;
+        this.ecntry = ecntry;
     }
 
     public Integer getCchange() {
-	return cchange;
+        return cchange;
     }
 
     public void setCchange(Integer cchange) {
-	this.cchange = cchange;
+        this.cchange = cchange;
     }
 
     @Override
     public boolean equals(Object obj) {
-	if (obj == null)
-	    return false;
+        if (obj == null) {
+            return false;
+        }
 
-	if (obj instanceof Country) {
-	    Country param = (Country) obj;
-	    if (this.getCntryid() == param.getCntryid())
-		return true;
-	}
+        if (obj instanceof Country) {
+            Country param = (Country) obj;
+            if (this.getCntryid() == param.getCntryid()) {
+                return true;
+            }
+        }
 
-	return false;
+        return false;
     }
 
     @Override
     public int hashCode() {
-	return this.getCntryid();
+        return this.getCntryid();
     }
 
     @Override
     public String toString() {
-	return "Cntry [cntryid=" + cntryid + ", isonum=" + isonum + ", isotwo="
-		+ isotwo + ", isothree=" + isothree + ", faothree=" + faothree
-		+ ", fips=" + fips + ", wb=" + wb + ", isofull=" + isofull
-		+ ", isoabbr=" + isoabbr + ", cont=" + cont + ", scntry="
-		+ scntry + ", ecntry=" + ecntry + ", cchange=" + cchange + "]";
+        return "Cntry [cntryid=" + cntryid + ", isonum=" + isonum + ", isotwo=" + isotwo + ", isothree=" + isothree + ", faothree="
+                + faothree + ", fips=" + fips + ", wb=" + wb + ", isofull=" + isofull + ", isoabbr=" + isoabbr + ", cont=" + cont
+                + ", scntry=" + scntry + ", ecntry=" + ecntry + ", cchange=" + cchange + "]";
     }
 
 }

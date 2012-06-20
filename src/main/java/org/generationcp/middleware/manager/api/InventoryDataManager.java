@@ -1,15 +1,15 @@
-/***************************************************************
+/*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  * 
  * Generation Challenge Programme (GCP)
  * 
  * 
- * This software is licensed for use under the terms of the 
- * GNU General Public License (http://bit.ly/8Ztv8M) and the 
- * provisions of Part F of the Generation Challenge Programme 
- * Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
- **************************************************************/
+ *******************************************************************************/
+
 package org.generationcp.middleware.manager.api;
 
 import java.util.List;
@@ -27,7 +27,8 @@ import org.generationcp.middleware.pojos.report.TransactionReportRow;
  * @author Kevin Manansala
  * 
  */
-public interface InventoryDataManager {
+public interface InventoryDataManager{
+
     /**
      * Returns the Lot records with entity type matching the given parameter.
      * 
@@ -65,8 +66,7 @@ public interface InventoryDataManager {
      * 
      * @return List of Lot POJOs
      */
-    public List<Lot> findLotsByEntityTypeAndEntityId(String type,
-	    Integer entityId, int start, int numOfRows);
+    public List<Lot> findLotsByEntityTypeAndEntityId(String type, Integer entityId, int start, int numOfRows);
 
     /**
      * Returns the number of Lot records with entity type and entity id matching
@@ -92,8 +92,7 @@ public interface InventoryDataManager {
      * 
      * @return List of Lot POJOs
      */
-    public List<Lot> findLotsByEntityTypeAndLocationId(String type,
-	    Integer locationId, int start, int numOfRows);
+    public List<Lot> findLotsByEntityTypeAndLocationId(String type, Integer locationId, int start, int numOfRows);
 
     /**
      * Returns the number of Lot records with entity type and location id
@@ -103,8 +102,7 @@ public interface InventoryDataManager {
      * @param locationId
      * @return
      */
-    public int countLotsByEntityTypeAndLocationId(String type,
-	    Integer locationId);
+    public int countLotsByEntityTypeAndLocationId(String type, Integer locationId);
 
     /**
      * Returns the Lot records with entity type, entity id, and location id
@@ -120,8 +118,8 @@ public interface InventoryDataManager {
      * 
      * @return List of Lot POJOs
      */
-    public List<Lot> findLotsByEntityTypeAndEntityIdAndLocationId(String type,
-	    Integer entityId, Integer locationId, int start, int numOfRows);
+    public List<Lot> findLotsByEntityTypeAndEntityIdAndLocationId(String type, Integer entityId, Integer locationId, int start,
+            int numOfRows);
 
     /**
      * Returns the number of Lot records with entity type, entity id, and
@@ -132,8 +130,7 @@ public interface InventoryDataManager {
      * @param locationId
      * @return
      */
-    public int countLotsByEntityTypeAndEntityIdAndLocationId(String type,
-	    Integer entityId, Integer locationId);
+    public int countLotsByEntityTypeAndEntityIdAndLocationId(String type, Integer entityId, Integer locationId);
 
     /**
      * Returns the actual transaction balance of the Lot with the specified
@@ -219,8 +216,7 @@ public interface InventoryDataManager {
      * @return the number of Transaction records added
      * @throws QueryException
      */
-    public int addTransaction(List<Transaction> transactions)
-	    throws QueryException;
+    public int addTransaction(List<Transaction> transactions) throws QueryException;
 
     /**
      * Given a valid Transaction record, update the database to the changes from
@@ -241,8 +237,7 @@ public interface InventoryDataManager {
      * @return the number of Transaction records updated
      * @throws QueryException
      */
-    public int updateTransaction(List<Transaction> transactions)
-	    throws QueryException;
+    public int updateTransaction(List<Transaction> transactions) throws QueryException;
 
     /**
      * Returns the Transaction object which represents the record identified by
@@ -317,8 +312,7 @@ public interface InventoryDataManager {
      *            to be returned
      * @return List of Transaction POJOs
      */
-    public List<Transaction> getAllReserveTransactionsByRequestor(
-	    Integer personId, int start, int numOfRows);
+    public List<Transaction> getAllReserveTransactionsByRequestor(Integer personId, int start, int numOfRows);
 
     /**
      * Returns the number of Transaction records which are classified as reserve
@@ -343,8 +337,7 @@ public interface InventoryDataManager {
      *            to be returned
      * @return List of Transaction POJOs
      */
-    public List<Transaction> getAllDepositTransactionsByDonor(Integer personId,
-	    int start, int numOfRows);
+    public List<Transaction> getAllDepositTransactionsByDonor(Integer personId, int start, int numOfRows);
 
     /**
      * Returns the number of Transaction records which are classified as deposit
@@ -368,8 +361,7 @@ public interface InventoryDataManager {
      *            to be returned
      * @return List of TransactionReportRow objects
      */
-    public List<TransactionReportRow> generateReportOnAllUncommittedTransactions(
-	    int start, int numOfRows);
+    public List<TransactionReportRow> generateReportOnAllUncommittedTransactions(int start, int numOfRows);
 
     /**
      * Return the number of all Transaction records which are uncommitted
@@ -392,8 +384,7 @@ public interface InventoryDataManager {
      *            to be returned
      * @return List of TransactionReportRow objects
      */
-    public List<TransactionReportRow> generateReportOnAllReserveTransactions(
-	    int start, int numOfRows);
+    public List<TransactionReportRow> generateReportOnAllReserveTransactions(int start, int numOfRows);
 
     /**
      * Returns a report on all Transaction records classified as withdrawal
@@ -409,8 +400,7 @@ public interface InventoryDataManager {
      *            to be returned
      * @return List of TransactionReportRow objects
      */
-    public List<TransactionReportRow> generateReportOnAllWithdrawalTransactions(
-	    int start, int numOfRows);
+    public List<TransactionReportRow> generateReportOnAllWithdrawalTransactions(int start, int numOfRows);
 
     /**
      * Returns the number of Transaction records classified as withdrawal
@@ -467,8 +457,7 @@ public interface InventoryDataManager {
      *            to be returned
      * @return List of LotReportRow objects
      */
-    public List<LotReportRow> generateReportOnDormantLots(int year, int start,
-	    int numOfRows);
+    public List<LotReportRow> generateReportOnDormantLots(int year, int start, int numOfRows);
 
     /**
      * Returns a report about Lots with zero balance Included information are:
@@ -490,8 +479,7 @@ public interface InventoryDataManager {
      * @return List of LotReportRow objects
      * @throws QueryException
      */
-    public List<LotReportRow> generateReportOnLotsWithMinimumAmount(
-	    long minimumAmount, int start, int numOfRows);
+    public List<LotReportRow> generateReportOnLotsWithMinimumAmount(long minimumAmount, int start, int numOfRows);
 
     /**
      * Returns a report on all Lot records associated with the given entity
@@ -507,8 +495,7 @@ public interface InventoryDataManager {
      *            to be returned
      * @return List of LotReportRow objects
      */
-    public List<LotReportRow> generateReportOnLotsByEntityType(String type,
-	    int start, int numOfRows);
+    public List<LotReportRow> generateReportOnLotsByEntityType(String type, int start, int numOfRows);
 
     /**
      * Returns a report on all Lot records associated with the given entity type
@@ -526,8 +513,7 @@ public interface InventoryDataManager {
      *            to be returned
      * @return List of LotReportRow objects
      */
-    public List<LotReportRow> generateReportOnLotsByEntityTypeAndEntityId(
-	    String type, Integer entityId, int start, int numOfRows);
+    public List<LotReportRow> generateReportOnLotsByEntityTypeAndEntityId(String type, Integer entityId, int start, int numOfRows);
 
     /**
      * Returns a report on all Lot records associated with the given entity type
@@ -546,7 +532,6 @@ public interface InventoryDataManager {
      *            to be returned
      * @return List of LotReportRow objects
      */
-    public List<LotReportRow> generateReportOnLotsByEntityTypeAndEntityId(
-	    String type, List<Integer> entityIds, int start, int numOfRows);
+    public List<LotReportRow> generateReportOnLotsByEntityTypeAndEntityId(String type, List<Integer> entityIds, int start, int numOfRows);
 
 }

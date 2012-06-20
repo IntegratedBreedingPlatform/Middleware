@@ -1,15 +1,15 @@
-/***************************************************************
+/*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  * 
  * Generation Challenge Programme (GCP)
  * 
  * 
- * This software is licensed for use under the terms of the 
- * GNU General Public License (http://bit.ly/8Ztv8M) and the 
- * provisions of Part F of the Generation Challenge Programme 
- * Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
- **************************************************************/
+ *******************************************************************************/
+
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
@@ -22,7 +22,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Embeddable
-public class CharacterLevelPK implements Serializable {
+public class CharacterLevelPK implements Serializable{
 
     private static final long serialVersionUID = -2491179486836968854L;
 
@@ -42,63 +42,62 @@ public class CharacterLevelPK implements Serializable {
 
     }
 
-    public CharacterLevelPK(Integer labelId, Integer factorId,
-	    Integer levelNumber) {
-	super();
-	this.labelId = labelId;
-	this.factorId = factorId;
-	this.levelNumber = levelNumber;
+    public CharacterLevelPK(Integer labelId, Integer factorId, Integer levelNumber) {
+        super();
+        this.labelId = labelId;
+        this.factorId = factorId;
+        this.levelNumber = levelNumber;
     }
 
     public Integer getLabelId() {
-	return labelId;
+        return labelId;
     }
 
     public void setLabelId(Integer labelId) {
-	this.labelId = labelId;
+        this.labelId = labelId;
     }
 
     public Integer getFactorId() {
-	return factorId;
+        return factorId;
     }
 
     public void setFactorId(Integer factorId) {
-	this.factorId = factorId;
+        this.factorId = factorId;
     }
 
     public Integer getLevelNumber() {
-	return levelNumber;
+        return levelNumber;
     }
 
     public void setLevelNumber(Integer levelNumber) {
-	this.levelNumber = levelNumber;
+        this.levelNumber = levelNumber;
     }
 
     @Override
     public boolean equals(Object obj) {
-	if (obj == null)
-	    return false;
-	if (obj == this)
-	    return true;
-	if (!(obj instanceof CharacterLevelPK))
-	    return false;
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (!(obj instanceof CharacterLevelPK)) {
+            return false;
+        }
 
-	CharacterLevelPK rhs = (CharacterLevelPK) obj;
-	return new EqualsBuilder().appendSuper(super.equals(obj))
-		.append(labelId, rhs.labelId).append(factorId, rhs.factorId)
-		.append(levelNumber, rhs.levelNumber).isEquals();
+        CharacterLevelPK rhs = (CharacterLevelPK) obj;
+        return new EqualsBuilder().appendSuper(super.equals(obj)).append(labelId, rhs.labelId).append(factorId, rhs.factorId)
+                .append(levelNumber, rhs.levelNumber).isEquals();
     }
 
     @Override
     public int hashCode() {
-	return new HashCodeBuilder(11, 17).append(labelId).append(factorId)
-		.append(levelNumber).toHashCode();
+        return new HashCodeBuilder(11, 17).append(labelId).append(factorId).append(levelNumber).toHashCode();
     }
 
     @Override
     public String toString() {
-	return "CharacterLevelPK [labelId=" + labelId + ", factorId="
-		+ factorId + ", levelNumber=" + levelNumber + "]";
+        return "CharacterLevelPK [labelId=" + labelId + ", factorId=" + factorId + ", levelNumber=" + levelNumber + "]";
     }
 
 }

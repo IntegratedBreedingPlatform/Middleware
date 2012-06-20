@@ -1,15 +1,15 @@
-/***************************************************************
+/*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  * 
  * Generation Challenge Programme (GCP)
  * 
  * 
- * This software is licensed for use under the terms of the 
- * GNU General Public License (http://bit.ly/8Ztv8M) and the 
- * provisions of Part F of the Generation Challenge Programme 
- * Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
- **************************************************************/
+ *******************************************************************************/
+
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
@@ -42,10 +42,10 @@ import org.hibernate.annotations.NotFoundAction;
 @Table(name = "methods")
 // JAXB Element Tags for JSON output
 @XmlRootElement(name = "method")
-@XmlType(propOrder = { "mid", "mtype", "mcode", "mname", "mdesc", "mprgn",
-	"mfprg", "mgrp" })
+@XmlType(propOrder = { "mid", "mtype", "mcode", "mname", "mdesc", "mprgn", "mfprg", "mgrp" })
 @XmlAccessorType(XmlAccessType.NONE)
-public class Method implements Serializable {
+public class Method implements Serializable{
+
     private static final long serialVersionUID = 1L;
 
     public static final String GET_ALL = "getAllMethods";
@@ -121,168 +121,166 @@ public class Method implements Serializable {
     }
 
     public Method(Integer mid) {
-	this.mid = mid;
+        this.mid = mid;
     }
 
-    public Method(Integer mid, String mtype, String mgrp, String mcode,
-	    String mname, String mdesc, Bibref reference, Integer mprgn,
-	    Integer mfprg, Integer mattr, Integer geneq, User user,
-	    Integer lmid, Integer mdate) {
-	super();
-	this.mid = mid;
-	this.mtype = mtype;
-	this.mgrp = mgrp;
-	this.mcode = mcode;
-	this.mname = mname;
-	this.mdesc = mdesc;
-	this.reference = reference;
-	this.mprgn = mprgn;
-	this.mfprg = mfprg;
-	this.mattr = mattr;
-	this.geneq = geneq;
-	this.user = user;
-	this.lmid = lmid;
-	this.mdate = mdate;
+    public Method(Integer mid, String mtype, String mgrp, String mcode, String mname, String mdesc, Bibref reference, Integer mprgn,
+            Integer mfprg, Integer mattr, Integer geneq, User user, Integer lmid, Integer mdate) {
+        super();
+        this.mid = mid;
+        this.mtype = mtype;
+        this.mgrp = mgrp;
+        this.mcode = mcode;
+        this.mname = mname;
+        this.mdesc = mdesc;
+        this.reference = reference;
+        this.mprgn = mprgn;
+        this.mfprg = mfprg;
+        this.mattr = mattr;
+        this.geneq = geneq;
+        this.user = user;
+        this.lmid = lmid;
+        this.mdate = mdate;
     }
 
     public Integer getMid() {
-	return mid;
+        return mid;
     }
 
     public void setMid(Integer mid) {
-	this.mid = mid;
+        this.mid = mid;
     }
 
     public String getMtype() {
-	return mtype;
+        return mtype;
     }
 
     public void setMtype(String mtype) {
-	this.mtype = mtype;
+        this.mtype = mtype;
     }
 
     public String getMgrp() {
-	return mgrp;
+        return mgrp;
     }
 
     public void setMgrp(String mgrp) {
-	this.mgrp = mgrp;
+        this.mgrp = mgrp;
     }
 
     public String getMcode() {
-	return mcode;
+        return mcode;
     }
 
     public void setMcode(String mcode) {
-	this.mcode = mcode;
+        this.mcode = mcode;
     }
 
     public String getMname() {
-	return mname;
+        return mname;
     }
 
     public void setMname(String mname) {
-	this.mname = mname;
+        this.mname = mname;
     }
 
     public String getMdesc() {
-	return mdesc;
+        return mdesc;
     }
 
     public void setMdesc(String mdesc) {
-	this.mdesc = mdesc;
+        this.mdesc = mdesc;
     }
 
     public Integer getMprgn() {
-	return mprgn;
+        return mprgn;
     }
 
     public void setMprgn(Integer mprgn) {
-	this.mprgn = mprgn;
+        this.mprgn = mprgn;
     }
 
     public Integer getMfprg() {
-	return mfprg;
+        return mfprg;
     }
 
     public void setMfprg(Integer mfprg) {
-	this.mfprg = mfprg;
+        this.mfprg = mfprg;
     }
 
     public Integer getMattr() {
-	return mattr;
+        return mattr;
     }
 
     public void setMattr(Integer mattr) {
-	this.mattr = mattr;
+        this.mattr = mattr;
     }
 
     public Integer getGeneq() {
-	return geneq;
+        return geneq;
     }
 
     public void setGeneq(Integer geneq) {
-	this.geneq = geneq;
+        this.geneq = geneq;
     }
 
     public Integer getLmid() {
-	return lmid;
+        return lmid;
     }
 
     public void setLmid(Integer lmid) {
-	this.lmid = lmid;
+        this.lmid = lmid;
     }
 
     public Integer getMdate() {
-	return mdate;
+        return mdate;
     }
 
     public void setMdate(Integer mdate) {
-	this.mdate = mdate;
+        this.mdate = mdate;
     }
 
     public Bibref getReference() {
-	return reference;
+        return reference;
     }
 
     public void setReference(Bibref reference) {
-	this.reference = reference;
+        this.reference = reference;
     }
 
     public User getUser() {
-	return user;
+        return user;
     }
 
     public void setUser(User user) {
-	this.user = user;
+        this.user = user;
     }
 
     @Override
     public int hashCode() {
-	return this.getMid();
+        return this.getMid();
     }
 
     @Override
     public boolean equals(Object obj) {
-	if (obj == null)
-	    return false;
+        if (obj == null) {
+            return false;
+        }
 
-	if (obj instanceof Method) {
-	    Method param = (Method) obj;
-	    if (this.getMid() == param.getMid())
-		return true;
-	}
+        if (obj instanceof Method) {
+            Method param = (Method) obj;
+            if (this.getMid() == param.getMid()) {
+                return true;
+            }
+        }
 
-	return false;
+        return false;
     }
 
     @Override
     public String toString() {
-	return "Methods [mid=" + mid + ", mtype=" + mtype + ", mgrp=" + mgrp
-		+ ", mcode=" + mcode + ", mname=" + mname + ", mdesc=" + mdesc
-		+ ", mprgn=" + mprgn + ", mfprg=" + mfprg + ", mattr=" + mattr
-		+ ", geneq=" + geneq + ", lmid=" + lmid + ", mdate=" + mdate
-		+ "]";
+        return "Methods [mid=" + mid + ", mtype=" + mtype + ", mgrp=" + mgrp + ", mcode=" + mcode + ", mname=" + mname + ", mdesc=" + mdesc
+                + ", mprgn=" + mprgn + ", mfprg=" + mfprg + ", mattr=" + mattr + ", geneq=" + geneq + ", lmid=" + lmid + ", mdate=" + mdate
+                + "]";
     }
 
 }

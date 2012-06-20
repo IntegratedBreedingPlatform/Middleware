@@ -1,15 +1,15 @@
-/***************************************************************
+/*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  * 
  * Generation Challenge Programme (GCP)
  * 
  * 
- * This software is licensed for use under the terms of the 
- * GNU General Public License (http://bit.ly/8Ztv8M) and the 
- * provisions of Part F of the Generation Challenge Programme 
- * Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
- **************************************************************/
+ *******************************************************************************/
+
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
@@ -52,724 +52,698 @@ import org.hibernate.Transaction;
  * @author Kevin Manansala, Lord Hendrix Barboza
  * 
  */
-public class GermplasmDataManagerImpl extends DataManager implements
-	GermplasmDataManager {
+public class GermplasmDataManagerImpl extends DataManager implements GermplasmDataManager{
 
-    public GermplasmDataManagerImpl(HibernateUtil hibernateUtilForLocal,
-	    HibernateUtil hibernateUtilForCentral) {
-	super(hibernateUtilForLocal, hibernateUtilForCentral);
+    public GermplasmDataManagerImpl(HibernateUtil hibernateUtilForLocal, HibernateUtil hibernateUtilForCentral) {
+        super(hibernateUtilForLocal, hibernateUtilForCentral);
     }
 
-    public List<Germplasm> findAllGermplasm(int start, int numOfRows,
-	    Database instance) throws QueryException {
-	GermplasmDAO dao = new GermplasmDAO();
-	HibernateUtil hibernateUtil = getHibernateUtil(instance);
+    public List<Germplasm> findAllGermplasm(int start, int numOfRows, Database instance) throws QueryException {
+        GermplasmDAO dao = new GermplasmDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(instance);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return new ArrayList<Germplasm>();
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return new ArrayList<Germplasm>();
+        }
 
-	List<Germplasm> toreturn = dao.findAll(start, numOfRows);
-	return toreturn;
+        List<Germplasm> toreturn = dao.findAll(start, numOfRows);
+        return toreturn;
     }
 
     public int countAllGermplasm(Database instance) throws QueryException {
-	int count = 0;
-	GermplasmDAO dao = new GermplasmDAO();
-	HibernateUtil hibernateUtil = getHibernateUtil(instance);
+        int count = 0;
+        GermplasmDAO dao = new GermplasmDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(instance);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	    count = count + dao.countAll().intValue();
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+            count = count + dao.countAll().intValue();
+        }
 
-	return count;
+        return count;
     }
 
-    public List<Germplasm> findGermplasmByPrefName(String name, int start,
-	    int numOfRows, Database instance) throws QueryException {
-	GermplasmDAO dao = new GermplasmDAO();
-	HibernateUtil hibernateUtil = getHibernateUtil(instance);
+    public List<Germplasm> findGermplasmByPrefName(String name, int start, int numOfRows, Database instance) throws QueryException {
+        GermplasmDAO dao = new GermplasmDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(instance);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return new ArrayList<Germplasm>();
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return new ArrayList<Germplasm>();
+        }
 
-	List<Germplasm> toreturn = dao.findByPrefName(name, start, numOfRows);
-	return toreturn;
+        List<Germplasm> toreturn = dao.findByPrefName(name, start, numOfRows);
+        return toreturn;
 
     }
 
     public int countGermplasmByPrefName(String name) throws QueryException {
-	int count = 0;
+        int count = 0;
 
-	if (this.hibernateUtilForLocal != null) {
-	    GermplasmDAO dao = new GermplasmDAO();
-	    dao.setSession(hibernateUtilForLocal.getCurrentSession());
-	    count = count + dao.countByPrefName(name).intValue();
-	}
+        if (this.hibernateUtilForLocal != null) {
+            GermplasmDAO dao = new GermplasmDAO();
+            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+            count = count + dao.countByPrefName(name).intValue();
+        }
 
-	if (this.hibernateUtilForCentral != null) {
-	    GermplasmDAO centralDao = new GermplasmDAO();
-	    centralDao.setSession(hibernateUtilForCentral.getCurrentSession());
-	    count = count + centralDao.countByPrefName(name).intValue();
-	}
+        if (this.hibernateUtilForCentral != null) {
+            GermplasmDAO centralDao = new GermplasmDAO();
+            centralDao.setSession(hibernateUtilForCentral.getCurrentSession());
+            count = count + centralDao.countByPrefName(name).intValue();
+        }
 
-	return count;
+        return count;
     }
 
     @Override
-    public List<Germplasm> findGermplasmByName(String name, int start,
-	    int numOfRows, FindGermplasmByNameModes mode, Operation op,
-	    Integer status, GermplasmNameType type, Database instance)
-	    throws QueryException {
-	GermplasmDAO dao = new GermplasmDAO();
-	HibernateUtil hibernateUtil = getHibernateUtil(instance);
+    public List<Germplasm> findGermplasmByName(String name, int start, int numOfRows, FindGermplasmByNameModes mode, Operation op,
+            Integer status, GermplasmNameType type, Database instance) throws QueryException {
+        GermplasmDAO dao = new GermplasmDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(instance);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return null;
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return null;
+        }
 
-	List<Germplasm> germplasms = null;
+        List<Germplasm> germplasms = null;
 
-	// do string manipulation on name parameter depending on
-	// FindGermplasmByNameModes parameter
-	String nameToUse = "";
-	if (mode == FindGermplasmByNameModes.NORMAL) {
-	    nameToUse = name;
-	} else if (mode == FindGermplasmByNameModes.SPACES_REMOVED) {
-	    StringTokenizer tokenizer = new StringTokenizer(name);
-	    StringBuffer nameWithSpacesRemoved = new StringBuffer();
-	    while (tokenizer.hasMoreTokens()) {
-		nameWithSpacesRemoved.append(tokenizer.nextToken());
-	    }
-	    nameToUse = nameWithSpacesRemoved.toString();
-	} else if (mode == FindGermplasmByNameModes.STANDARDIZED) {
-	    String standardizedName = GermplasmDataManagerImpl
-		    .standardaizeName(name);
-	    nameToUse = standardizedName;
-	}
+        // do string manipulation on name parameter depending on
+        // FindGermplasmByNameModes parameter
+        String nameToUse = "";
+        if (mode == FindGermplasmByNameModes.NORMAL) {
+            nameToUse = name;
+        } else if (mode == FindGermplasmByNameModes.SPACES_REMOVED) {
+            StringTokenizer tokenizer = new StringTokenizer(name);
+            StringBuffer nameWithSpacesRemoved = new StringBuffer();
+            while (tokenizer.hasMoreTokens()) {
+                nameWithSpacesRemoved.append(tokenizer.nextToken());
+            }
+            nameToUse = nameWithSpacesRemoved.toString();
+        } else if (mode == FindGermplasmByNameModes.STANDARDIZED) {
+            String standardizedName = GermplasmDataManagerImpl.standardaizeName(name);
+            nameToUse = standardizedName;
+        }
 
-	germplasms = dao.findByName(nameToUse, start, numOfRows, op, status,
-		type);
-	return germplasms;
+        germplasms = dao.findByName(nameToUse, start, numOfRows, op, status, type);
+        return germplasms;
     }
 
     @Override
-    public int countGermplasmByName(String name, FindGermplasmByNameModes mode,
-	    Operation op, Integer status, GermplasmNameType type,
-	    Database instance) throws QueryException {
-	// do string manipulation on name parameter depending on
-	// FindGermplasmByNameModes parameter
-	String nameToUse = "";
-	if (mode == FindGermplasmByNameModes.NORMAL) {
-	    nameToUse = name;
-	} else if (mode == FindGermplasmByNameModes.SPACES_REMOVED) {
-	    StringTokenizer tokenizer = new StringTokenizer(name);
-	    StringBuffer nameWithSpacesRemoved = new StringBuffer();
-	    while (tokenizer.hasMoreTokens()) {
-		nameWithSpacesRemoved.append(tokenizer.nextToken());
-	    }
-	    nameToUse = nameWithSpacesRemoved.toString();
-	} else if (mode == FindGermplasmByNameModes.STANDARDIZED) {
-	    String standardizedName = GermplasmDataManagerImpl
-		    .standardaizeName(name);
-	    nameToUse = standardizedName;
-	}
+    public int countGermplasmByName(String name, FindGermplasmByNameModes mode, Operation op, Integer status, GermplasmNameType type,
+            Database instance) throws QueryException {
+        // do string manipulation on name parameter depending on
+        // FindGermplasmByNameModes parameter
+        String nameToUse = "";
+        if (mode == FindGermplasmByNameModes.NORMAL) {
+            nameToUse = name;
+        } else if (mode == FindGermplasmByNameModes.SPACES_REMOVED) {
+            StringTokenizer tokenizer = new StringTokenizer(name);
+            StringBuffer nameWithSpacesRemoved = new StringBuffer();
+            while (tokenizer.hasMoreTokens()) {
+                nameWithSpacesRemoved.append(tokenizer.nextToken());
+            }
+            nameToUse = nameWithSpacesRemoved.toString();
+        } else if (mode == FindGermplasmByNameModes.STANDARDIZED) {
+            String standardizedName = GermplasmDataManagerImpl.standardaizeName(name);
+            nameToUse = standardizedName;
+        }
 
-	int count = 0;
+        int count = 0;
 
-	GermplasmDAO dao = new GermplasmDAO();
-	HibernateUtil hibernateUtil = getHibernateUtil(instance);
+        GermplasmDAO dao = new GermplasmDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(instance);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return 0;
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return 0;
+        }
 
-	count = dao.countByName(nameToUse, op, status, type).intValue();
-	return count;
+        count = dao.countByName(nameToUse, op, status, type).intValue();
+        return count;
     }
 
     @Override
-    public List<Germplasm> findGermplasmByLocationName(String name, int start,
-	    int numOfRows, Operation op, Database instance)
-	    throws QueryException {
-	GermplasmDAO dao = new GermplasmDAO();
-	List<Germplasm> germplasms = null;
-	HibernateUtil hibernateUtil = getHibernateUtil(instance);
+    public List<Germplasm> findGermplasmByLocationName(String name, int start, int numOfRows, Operation op, Database instance)
+            throws QueryException {
+        GermplasmDAO dao = new GermplasmDAO();
+        List<Germplasm> germplasms = null;
+        HibernateUtil hibernateUtil = getHibernateUtil(instance);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return germplasms;
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return germplasms;
+        }
 
-	if (op == Operation.EQUAL)
-	    germplasms = dao.findByLocationNameUsingEqual(name, start,
-		    numOfRows);
-	else if (op == Operation.LIKE)
-	    germplasms = dao
-		    .findByLocationNameUsingLike(name, start, numOfRows);
+        if (op == Operation.EQUAL) {
+            germplasms = dao.findByLocationNameUsingEqual(name, start, numOfRows);
+        } else if (op == Operation.LIKE) {
+            germplasms = dao.findByLocationNameUsingLike(name, start, numOfRows);
+        }
 
-	return germplasms;
+        return germplasms;
     }
 
     @Override
-    public int countGermplasmByLocationName(String name, Operation op,
-	    Database instance) throws QueryException {
-	GermplasmDAO dao = new GermplasmDAO();
-	HibernateUtil hibernateUtil = getHibernateUtil(instance);
+    public int countGermplasmByLocationName(String name, Operation op, Database instance) throws QueryException {
+        GermplasmDAO dao = new GermplasmDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(instance);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return 0;
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return 0;
+        }
 
-	Long count = null;
-	if (op == Operation.EQUAL)
-	    count = dao.countByLocationNameUsingEqual(name);
-	else if (op == Operation.LIKE)
-	    count = dao.countByLocationNameUsingLike(name);
+        Long count = null;
+        if (op == Operation.EQUAL) {
+            count = dao.countByLocationNameUsingEqual(name);
+        } else if (op == Operation.LIKE) {
+            count = dao.countByLocationNameUsingLike(name);
+        }
 
-	if (count != null)
-	    return count.intValue();
-	else
-	    throw new QueryException(
-		    "BigInteger object returned by DAO was null.");
+        if (count != null) {
+            return count.intValue();
+        } else {
+            throw new QueryException("BigInteger object returned by DAO was null.");
+        }
     }
 
     @Override
-    public List<Germplasm> findGermplasmByMethodName(String name, int start,
-	    int numOfRows, Operation op, Database instance)
-	    throws QueryException {
-	GermplasmDAO dao = new GermplasmDAO();
-	List<Germplasm> germplasms = null;
-	HibernateUtil hibernateUtil = getHibernateUtil(instance);
+    public List<Germplasm> findGermplasmByMethodName(String name, int start, int numOfRows, Operation op, Database instance)
+            throws QueryException {
+        GermplasmDAO dao = new GermplasmDAO();
+        List<Germplasm> germplasms = null;
+        HibernateUtil hibernateUtil = getHibernateUtil(instance);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return germplasms;
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return germplasms;
+        }
 
-	if (op == Operation.EQUAL)
-	    germplasms = dao.findByMethodNameUsingEqual(name, start, numOfRows);
-	else if (op == Operation.LIKE)
-	    germplasms = dao.findByMethodNameUsingLike(name, start, numOfRows);
+        if (op == Operation.EQUAL) {
+            germplasms = dao.findByMethodNameUsingEqual(name, start, numOfRows);
+        } else if (op == Operation.LIKE) {
+            germplasms = dao.findByMethodNameUsingLike(name, start, numOfRows);
+        }
 
-	return germplasms;
+        return germplasms;
     }
 
     @Override
-    public int countGermplasmByMethodName(String name, Operation op,
-	    Database instance) throws QueryException {
-	GermplasmDAO dao = new GermplasmDAO();
-	HibernateUtil hibernateUtil = getHibernateUtil(instance);
+    public int countGermplasmByMethodName(String name, Operation op, Database instance) throws QueryException {
+        GermplasmDAO dao = new GermplasmDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(instance);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return 0;
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return 0;
+        }
 
-	Long count = null;
+        Long count = null;
 
-	if (op == Operation.EQUAL)
-	    count = dao.countByMethodNameUsingEqual(name);
-	else if (op == Operation.LIKE)
-	    count = dao.countByMethodNameUsingLike(name);
+        if (op == Operation.EQUAL) {
+            count = dao.countByMethodNameUsingEqual(name);
+        } else if (op == Operation.LIKE) {
+            count = dao.countByMethodNameUsingLike(name);
+        }
 
-	if (count != null)
-	    return count.intValue();
-	else
-	    throw new QueryException(
-		    "BigInteger object returned by DAO was null.");
+        if (count != null) {
+            return count.intValue();
+        } else {
+            throw new QueryException("BigInteger object returned by DAO was null.");
+        }
     }
 
     @Override
     public Germplasm getGermplasmByGID(Integer gid) {
-	GermplasmDAO dao = new GermplasmDAO();
-	HibernateUtil hibernateUtil = getHibernateUtil(gid);
+        GermplasmDAO dao = new GermplasmDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(gid);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return null;
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return null;
+        }
 
-	Germplasm germplasm = dao.findById(gid, false);
-	return germplasm;
+        Germplasm germplasm = dao.findById(gid, false);
+        return germplasm;
     }
 
     @Override
-    public Germplasm getGermplasmWithPrefName(Integer gid)
-	    throws QueryException {
-	GermplasmDAO dao = new GermplasmDAO();
-	HibernateUtil hibernateUtil = getHibernateUtil(gid);
+    public Germplasm getGermplasmWithPrefName(Integer gid) throws QueryException {
+        GermplasmDAO dao = new GermplasmDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(gid);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return null;
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return null;
+        }
 
-	Germplasm germplasm = dao.getByGIDWithPrefName(gid);
-	return germplasm;
+        Germplasm germplasm = dao.getByGIDWithPrefName(gid);
+        return germplasm;
     }
 
     @Override
-    public Germplasm getGermplasmWithPrefAbbrev(Integer gid)
-	    throws QueryException {
-	GermplasmDAO dao = new GermplasmDAO();
-	HibernateUtil hibernateUtil = getHibernateUtil(gid);
+    public Germplasm getGermplasmWithPrefAbbrev(Integer gid) throws QueryException {
+        GermplasmDAO dao = new GermplasmDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(gid);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return null;
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return null;
+        }
 
-	Germplasm germplasm = dao.getByGIDWithPrefAbbrev(gid);
-	return germplasm;
+        Germplasm germplasm = dao.getByGIDWithPrefAbbrev(gid);
+        return germplasm;
     }
 
     @Override
     public Name getGermplasmNameByID(Integer id) {
-	NameDAO dao = new NameDAO();
-	HibernateUtil hibernateUtil = getHibernateUtil(id);
+        NameDAO dao = new NameDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(id);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return null;
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return null;
+        }
 
-	Name name = dao.findById(id, false);
-	return name;
+        Name name = dao.findById(id, false);
+        return name;
     }
 
     @Override
-    public List<Name> getNamesByGID(Integer gid, Integer status,
-	    GermplasmNameType type) throws QueryException {
-	NameDAO dao = new NameDAO();
-	HibernateUtil hibernateUtil = getHibernateUtil(gid);
+    public List<Name> getNamesByGID(Integer gid, Integer status, GermplasmNameType type) throws QueryException {
+        NameDAO dao = new NameDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(gid);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return new ArrayList<Name>();
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return new ArrayList<Name>();
+        }
 
-	List<Name> names = dao.getByGIDWithFilters(gid, status, type);
-	return names;
+        List<Name> names = dao.getByGIDWithFilters(gid, status, type);
+        return names;
     }
 
     @Override
     public Name getPreferredNameByGID(Integer gid) throws QueryException {
-	NameDAO dao = new NameDAO();
-	HibernateUtil hibernateUtil = getHibernateUtil(gid);
+        NameDAO dao = new NameDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(gid);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return null;
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return null;
+        }
 
-	List<Name> names = dao.getByGIDWithFilters(gid, 1, null);
-	if (!names.isEmpty()) {
-	    return names.get(0);
-	} else {
-	    return null;
-	}
+        List<Name> names = dao.getByGIDWithFilters(gid, 1, null);
+        if (!names.isEmpty()) {
+            return names.get(0);
+        } else {
+            return null;
+        }
     }
 
     @Override
     public Name getPreferredAbbrevByGID(Integer gid) throws QueryException {
-	NameDAO dao = new NameDAO();
-	HibernateUtil hibernateUtil = getHibernateUtil(gid);
+        NameDAO dao = new NameDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(gid);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return null;
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return null;
+        }
 
-	List<Name> names = dao.getByGIDWithFilters(gid, 2, null);
-	if (!names.isEmpty()) {
-	    return names.get(0);
-	} else {
-	    return null;
-	}
+        List<Name> names = dao.getByGIDWithFilters(gid, 2, null);
+        if (!names.isEmpty()) {
+            return names.get(0);
+        } else {
+            return null;
+        }
     }
 
     @Override
-    public Name getNameByGIDAndNval(Integer gid, String nval)
-	    throws QueryException {
-	NameDAO dao = new NameDAO();
-	HibernateUtil hibernateUtil = getHibernateUtil(gid);
+    public Name getNameByGIDAndNval(Integer gid, String nval) throws QueryException {
+        NameDAO dao = new NameDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(gid);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return null;
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return null;
+        }
 
-	return dao.getByGIDAndNval(gid, nval);
+        return dao.getByGIDAndNval(gid, nval);
     }
 
     @Override
-    public void updateGermplasmPrefName(Integer gid, String newPrefName)
-	    throws QueryException {
-	updateGermplasmPrefNameAbbrev(gid, newPrefName, "Name");
+    public void updateGermplasmPrefName(Integer gid, String newPrefName) throws QueryException {
+        updateGermplasmPrefNameAbbrev(gid, newPrefName, "Name");
     }
 
     @Override
-    public void updateGermplasmPrefAbbrev(Integer gid, String newPrefAbbrev)
-	    throws QueryException {
-	updateGermplasmPrefNameAbbrev(gid, newPrefAbbrev, "Abbreviation");
+    public void updateGermplasmPrefAbbrev(Integer gid, String newPrefAbbrev) throws QueryException {
+        updateGermplasmPrefNameAbbrev(gid, newPrefAbbrev, "Abbreviation");
     }
 
-    private void updateGermplasmPrefNameAbbrev(Integer gid,
-	    String newPrefValue, String nameOrAbbrev) throws QueryException {
-	if (hibernateUtilForLocal == null)
-	    throw new QueryException(
-		    "There is no connection to a local instance.");
+    private void updateGermplasmPrefNameAbbrev(Integer gid, String newPrefValue, String nameOrAbbrev) throws QueryException {
+        if (hibernateUtilForLocal == null) {
+            throw new QueryException("There is no connection to a local instance.");
+        }
 
-	// initialize session & transaction
-	Session session = hibernateUtilForLocal.getCurrentSession();
-	Transaction trans = null;
+        // initialize session & transaction
+        Session session = hibernateUtilForLocal.getCurrentSession();
+        Transaction trans = null;
 
-	try {
-	    // begin update transaction
-	    trans = session.beginTransaction();
-	    NameDAO dao = new NameDAO();
-	    dao.setSession(session);
+        try {
+            // begin update transaction
+            trans = session.beginTransaction();
+            NameDAO dao = new NameDAO();
+            dao.setSession(session);
 
-	    // check for a name record with germplasm = gid, and nval =
-	    // newPrefName
-	    Name newPref = getNameByGIDAndNval(gid, newPrefValue);
-	    // if a name record with the specified nval exists,
-	    if (newPref != null) {
-		// get germplasm's existing preferred name/abbreviation, set as
-		// alternative name, change nstat to 0
-		Name oldPref = null;
-		int newNstat = 0; // nstat to be assigned to newPref: 1 for
-				  // Name, 2 for Abbreviation
+            // check for a name record with germplasm = gid, and nval =
+            // newPrefName
+            Name newPref = getNameByGIDAndNval(gid, newPrefValue);
+            // if a name record with the specified nval exists,
+            if (newPref != null) {
+                // get germplasm's existing preferred name/abbreviation, set as
+                // alternative name, change nstat to 0
+                Name oldPref = null;
+                int newNstat = 0; // nstat to be assigned to newPref: 1 for
+                // Name, 2 for Abbreviation
 
-		if (nameOrAbbrev.equals("Name")) {
-		    oldPref = getPreferredNameByGID(gid);
-		    newNstat = 1;
-		} else if (nameOrAbbrev.equals("Abbreviation")) {
-		    oldPref = getPreferredAbbrevByGID(gid);
-		    newNstat = 2;
-		}
+                if (nameOrAbbrev.equals("Name")) {
+                    oldPref = getPreferredNameByGID(gid);
+                    newNstat = 1;
+                } else if (nameOrAbbrev.equals("Abbreviation")) {
+                    oldPref = getPreferredAbbrevByGID(gid);
+                    newNstat = 2;
+                }
 
-		if (oldPref != null) {
-		    oldPref.setNstat(0);
-		    dao.validateId(oldPref); // check if old Name is a local DB
-					     // record
-		    dao.saveOrUpdate(oldPref);
-		}
+                if (oldPref != null) {
+                    oldPref.setNstat(0);
+                    dao.validateId(oldPref); // check if old Name is a local DB
+                    // record
+                    dao.saveOrUpdate(oldPref);
+                }
 
-		newPref.setNstat(newNstat); // update specified name as the new
-					    // preferred name/abbreviation
-		dao.validateId(newPref); // check if new Name is a local DB
-					 // record
-		dao.saveOrUpdate(newPref); // save the new name's status to the
-					   // database
-	    } else {
-		// throw exception if no Name record with specified value does
-		// not exist
-		throw new QueryException(
-			"The specified Germplasm Name does not exist.");
-	    }
+                newPref.setNstat(newNstat); // update specified name as the new
+                // preferred name/abbreviation
+                dao.validateId(newPref); // check if new Name is a local DB
+                // record
+                dao.saveOrUpdate(newPref); // save the new name's status to the
+                // database
+            } else {
+                // throw exception if no Name record with specified value does
+                // not exist
+                throw new QueryException("The specified Germplasm Name does not exist.");
+            }
 
-	    // end transaction, commit to database
-	    trans.commit();
-	} catch (Exception ex) {
-	    // rollback transaction in case of errors
-	    if (trans != null) {
-		trans.rollback();
-	    }
-	    throw new QueryException("Error in updating Germplasm Preferred "
-		    + nameOrAbbrev + ": " + ex.getMessage(), ex);
-	} finally {
-	    hibernateUtilForLocal.closeCurrentSession();
-	}
+            // end transaction, commit to database
+            trans.commit();
+        } catch (Exception ex) {
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new QueryException("Error in updating Germplasm Preferred " + nameOrAbbrev + ": " + ex.getMessage(), ex);
+        } finally {
+            hibernateUtilForLocal.closeCurrentSession();
+        }
     }
 
     @Override
     public int addGermplasmName(Name name) throws QueryException {
-	List<Name> names = new ArrayList<Name>();
-	names.add(name);
-	return addOrUpdateGermplasmName(names, Operation.ADD);
+        List<Name> names = new ArrayList<Name>();
+        names.add(name);
+        return addOrUpdateGermplasmName(names, Operation.ADD);
     }
 
     @Override
     public int addGermplasmName(List<Name> names) throws QueryException {
-	return addOrUpdateGermplasmName(names, Operation.ADD);
+        return addOrUpdateGermplasmName(names, Operation.ADD);
     }
 
     @Override
     public int updateGermplasmName(Name name) throws QueryException {
-	List<Name> names = new ArrayList<Name>();
-	names.add(name);
-	return addOrUpdateGermplasmName(names, Operation.UPDATE);
+        List<Name> names = new ArrayList<Name>();
+        names.add(name);
+        return addOrUpdateGermplasmName(names, Operation.UPDATE);
     }
 
     @Override
     public int updateGermplasmName(List<Name> names) throws QueryException {
-	return addOrUpdateGermplasmName(names, Operation.UPDATE);
+        return addOrUpdateGermplasmName(names, Operation.UPDATE);
     }
 
-    private int addOrUpdateGermplasmName(List<Name> names, Operation operation)
-	    throws QueryException {
-	if (hibernateUtilForLocal == null)
-	    throw new QueryException(
-		    "There is no connection to a local instance.");
+    private int addOrUpdateGermplasmName(List<Name> names, Operation operation) throws QueryException {
+        if (hibernateUtilForLocal == null) {
+            throw new QueryException("There is no connection to a local instance.");
+        }
 
-	// initialize session & transaction
-	Session session = hibernateUtilForLocal.getCurrentSession();
-	Transaction trans = null;
+        // initialize session & transaction
+        Session session = hibernateUtilForLocal.getCurrentSession();
+        Transaction trans = null;
 
-	int namesSaved = 0;
-	try {
-	    // begin save transaction
-	    trans = session.beginTransaction();
-	    NameDAO dao = new NameDAO();
-	    dao.setSession(session);
+        int namesSaved = 0;
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
+            NameDAO dao = new NameDAO();
+            dao.setSession(session);
 
-	    for (Name name : names) {
-		if (operation == Operation.ADD) {
-		    // Auto-assign negative IDs for new local DB records
-		    Integer negativeId = dao.getNegativeId("nid");
-		    name.setNid(negativeId);
-		} else if (operation == Operation.UPDATE) {
-		    // Check if Name is a local DB record. Throws exception if
-		    // Name is a central DB record.
-		    dao.validateId(name);
-		}
-		dao.saveOrUpdate(name);
-		namesSaved++;
-		if (namesSaved % JDBC_BATCH_SIZE == 0) {
-		    // flush a batch of inserts and release memory
-		    dao.flush();
-		    dao.clear();
-		}
-	    }
-	    // end transaction, commit to database
-	    trans.commit();
-	} catch (Exception ex) {
-	    // rollback transaction in case of errors
-	    if (trans != null) {
-		trans.rollback();
-	    }
-	    throw new QueryException(
-		    "Error encountered while saving Germplasm Name: "
-			    + ex.getMessage(), ex);
-	} finally {
-	    hibernateUtilForLocal.closeCurrentSession();
-	}
+            for (Name name : names) {
+                if (operation == Operation.ADD) {
+                    // Auto-assign negative IDs for new local DB records
+                    Integer negativeId = dao.getNegativeId("nid");
+                    name.setNid(negativeId);
+                } else if (operation == Operation.UPDATE) {
+                    // Check if Name is a local DB record. Throws exception if
+                    // Name is a central DB record.
+                    dao.validateId(name);
+                }
+                dao.saveOrUpdate(name);
+                namesSaved++;
+                if (namesSaved % JDBC_BATCH_SIZE == 0) {
+                    // flush a batch of inserts and release memory
+                    dao.flush();
+                    dao.clear();
+                }
+            }
+            // end transaction, commit to database
+            trans.commit();
+        } catch (Exception ex) {
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new QueryException("Error encountered while saving Germplasm Name: " + ex.getMessage(), ex);
+        } finally {
+            hibernateUtilForLocal.closeCurrentSession();
+        }
 
-	return namesSaved;
+        return namesSaved;
     }
 
     @Override
-    public List<Attribute> getAttributesByGID(Integer gid)
-	    throws QueryException {
-	AttributeDAO dao = new AttributeDAO();
-	HibernateUtil hibernateUtil = getHibernateUtil(gid);
+    public List<Attribute> getAttributesByGID(Integer gid) throws QueryException {
+        AttributeDAO dao = new AttributeDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(gid);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return null;
-	}
-	List<Attribute> attributes = dao.getByGID(gid);
-	return attributes;
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return null;
+        }
+        List<Attribute> attributes = dao.getByGID(gid);
+        return attributes;
     }
 
     @Override
     public Method getMethodByID(Integer id) {
-	MethodDAO dao = new MethodDAO();
-	HibernateUtil hibernateUtil = getHibernateUtil(id);
+        MethodDAO dao = new MethodDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(id);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return null;
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return null;
+        }
 
-	Method method = dao.findById(id, false);
-	return method;
+        Method method = dao.findById(id, false);
+        return method;
 
     }
 
     @Override
     public List<Method> getAllMethods() throws QueryException {
-	List<Method> methods = new ArrayList<Method>();
+        List<Method> methods = new ArrayList<Method>();
 
-	if (this.hibernateUtilForLocal != null) {
-	    MethodDAO dao = new MethodDAO();
-	    dao.setSession(hibernateUtilForLocal.getCurrentSession());
-	    methods.addAll(dao.getAll());
-	}
+        if (this.hibernateUtilForLocal != null) {
+            MethodDAO dao = new MethodDAO();
+            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+            methods.addAll(dao.getAll());
+        }
 
-	if (this.hibernateUtilForCentral != null) {
-	    MethodDAO centralDao = new MethodDAO();
-	    centralDao.setSession(hibernateUtilForCentral.getCurrentSession());
-	    methods.addAll(centralDao.getAll());
-	}
+        if (this.hibernateUtilForCentral != null) {
+            MethodDAO centralDao = new MethodDAO();
+            centralDao.setSession(hibernateUtilForCentral.getCurrentSession());
+            methods.addAll(centralDao.getAll());
+        }
 
-	return methods;
+        return methods;
 
     }
 
     @Override
     public UserDefinedField getUserDefinedFieldByID(Integer id) {
-	UserDefinedFieldDAO dao = new UserDefinedFieldDAO();
-	HibernateUtil hibernateUtil = getHibernateUtil(id);
+        UserDefinedFieldDAO dao = new UserDefinedFieldDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(id);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return null;
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return null;
+        }
 
-	UserDefinedField field = dao.findById(id, false);
-	return field;
+        UserDefinedField field = dao.findById(id, false);
+        return field;
     }
 
     @Override
     public Country getCountryById(Integer id) {
-	CountryDAO dao = new CountryDAO();
-	HibernateUtil hibernateUtil = getHibernateUtil(id);
+        CountryDAO dao = new CountryDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(id);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return null;
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return null;
+        }
 
-	Country country = dao.findById(id, false);
-	return country;
+        Country country = dao.findById(id, false);
+        return country;
     }
 
     @Override
     public Location getLocationByID(Integer id) {
-	LocationDAO dao = new LocationDAO();
-	HibernateUtil hibernateUtil = getHibernateUtil(id);
+        LocationDAO dao = new LocationDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(id);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return null;
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return null;
+        }
 
-	Location location = dao.findById(id, false);
-	return location;
+        Location location = dao.findById(id, false);
+        return location;
 
     }
 
+    @Override
     public int addLocation(Location location) throws QueryException {
-	if (hibernateUtilForLocal == null)
-	    throw new QueryException(
-		    "There is no connection to a local instance.");
+        if (hibernateUtilForLocal == null) {
+            throw new QueryException("There is no connection to a local instance.");
+        }
 
-	// initialize session & transaction
-	Session session = hibernateUtilForLocal.getCurrentSession();
-	Transaction trans = null;
+        // initialize session & transaction
+        Session session = hibernateUtilForLocal.getCurrentSession();
+        Transaction trans = null;
 
-	int locationsSaved = 0;
-	try {
-	    // begin save transaction
-	    trans = session.beginTransaction();
-	    LocationDAO dao = new LocationDAO();
-	    dao.setSession(session);
+        int locationsSaved = 0;
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
+            LocationDAO dao = new LocationDAO();
+            dao.setSession(session);
 
-	    // Auto-assign negative IDs for new local DB records
-	    Integer negativeId = dao.getNegativeId("locid");
-	    location.setLocid(negativeId);
+            // Auto-assign negative IDs for new local DB records
+            Integer negativeId = dao.getNegativeId("locid");
+            location.setLocid(negativeId);
 
-	    dao.saveOrUpdate(location);
-	    locationsSaved++;
+            dao.saveOrUpdate(location);
+            locationsSaved++;
 
-	    trans.commit();
-	} catch (Exception ex) {
-	    // rollback transaction in case of errors
-	    if (trans != null) {
-		trans.rollback();
-	    }
-	    throw new QueryException(
-		    "Error encountered while saving Location: "
-			    + ex.getMessage(), ex);
-	} finally {
-	    hibernateUtilForLocal.closeCurrentSession();
-	}
+            trans.commit();
+        } catch (Exception ex) {
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new QueryException("Error encountered while saving Location: " + ex.getMessage(), ex);
+        } finally {
+            hibernateUtilForLocal.closeCurrentSession();
+        }
 
-	return locationsSaved;
+        return locationsSaved;
     }
 
     @Override
     public Bibref getBibliographicReferenceByID(Integer id) {
-	BibrefDAO dao = new BibrefDAO();
-	if (id < 0 && this.hibernateUtilForLocal != null)
-	    dao.setSession(hibernateUtilForLocal.getCurrentSession());
-	else if (id > 0 && this.hibernateUtilForCentral != null)
-	    dao.setSession(hibernateUtilForCentral.getCurrentSession());
-	else
-	    return null;
+        BibrefDAO dao = new BibrefDAO();
+        if (id < 0 && this.hibernateUtilForLocal != null) {
+            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+        } else if (id > 0 && this.hibernateUtilForCentral != null) {
+            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+        } else {
+            return null;
+        }
 
-	Bibref bibref = dao.findById(id, false);
-	return bibref;
+        Bibref bibref = dao.findById(id, false);
+        return bibref;
     }
 
+    @Override
     public int addBibliographicReference(Bibref bibref) throws QueryException {
-	if (hibernateUtilForLocal == null)
-	    throw new QueryException(
-		    "There is no connection to a local instance.");
+        if (hibernateUtilForLocal == null) {
+            throw new QueryException("There is no connection to a local instance.");
+        }
 
-	// initialize session & transaction
-	Session session = hibernateUtilForLocal.getCurrentSession();
-	Transaction trans = null;
+        // initialize session & transaction
+        Session session = hibernateUtilForLocal.getCurrentSession();
+        Transaction trans = null;
 
-	int bibrefSaved = 0;
-	try {
-	    // begin save transaction
-	    trans = session.beginTransaction();
-	    BibrefDAO dao = new BibrefDAO();
-	    dao.setSession(session);
+        int bibrefSaved = 0;
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
+            BibrefDAO dao = new BibrefDAO();
+            dao.setSession(session);
 
-	    // Auto-assign negative IDs for new local DB records
-	    Integer negativeId = dao.getNegativeId("refid");
-	    bibref.setRefid(negativeId);
+            // Auto-assign negative IDs for new local DB records
+            Integer negativeId = dao.getNegativeId("refid");
+            bibref.setRefid(negativeId);
 
-	    dao.saveOrUpdate(bibref);
-	    bibrefSaved++;
+            dao.saveOrUpdate(bibref);
+            bibrefSaved++;
 
-	    trans.commit();
-	} catch (Exception ex) {
-	    // rollback transaction in case of errors
-	    if (trans != null) {
-		trans.rollback();
-	    }
-	    throw new QueryException(
-		    "Error encountered while saving Bibliographic Reference: "
-			    + ex.getMessage(), ex);
-	} finally {
-	    hibernateUtilForLocal.closeCurrentSession();
-	}
+            trans.commit();
+        } catch (Exception ex) {
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new QueryException("Error encountered while saving Bibliographic Reference: " + ex.getMessage(), ex);
+        } finally {
+            hibernateUtilForLocal.closeCurrentSession();
+        }
 
-	return bibrefSaved;
+        return bibrefSaved;
     }
 
     /**
@@ -792,227 +766,224 @@ public class GermplasmDataManagerImpl extends DataManager implements
      * @return the standardized germplasm name
      */
     public static String standardaizeName(String name) {
-	String toreturn = name.trim();
+        String toreturn = name.trim();
 
-	// a) Capitalize all letters
-	toreturn = toreturn.toUpperCase();
+        // a) Capitalize all letters
+        toreturn = toreturn.toUpperCase();
 
-	int stringLength = toreturn.length();
-	for (int ctr = 0; ctr < stringLength; ctr++) {
-	    char currentChar = toreturn.charAt(ctr);
-	    if (currentChar == '(') {
-		if (ctr - 1 >= 0) {
-		    char previousChar = toreturn.charAt(ctr - 1);
-		    // L( becomes L^( or N( becomes N^(
-		    if (Character.isLetterOrDigit(previousChar)) {
-			String firstHalf = toreturn.substring(0, ctr);
-			String secondHalf = toreturn.substring(ctr);
-			toreturn = firstHalf + " " + secondHalf;
-			stringLength++;
-			continue;
-		    }
-		}
+        int stringLength = toreturn.length();
+        for (int ctr = 0; ctr < stringLength; ctr++) {
+            char currentChar = toreturn.charAt(ctr);
+            if (currentChar == '(') {
+                if (ctr - 1 >= 0) {
+                    char previousChar = toreturn.charAt(ctr - 1);
+                    // L( becomes L^( or N( becomes N^(
+                    if (Character.isLetterOrDigit(previousChar)) {
+                        String firstHalf = toreturn.substring(0, ctr);
+                        String secondHalf = toreturn.substring(ctr);
+                        toreturn = firstHalf + " " + secondHalf;
+                        stringLength++;
+                        continue;
+                    }
+                }
 
-		if (ctr + 1 < stringLength) {
-		    char nextChar = toreturn.charAt(ctr + 1);
-		    // (^ becomes (
-		    if (Character.isWhitespace(nextChar)) {
-			String firstHalf = toreturn.substring(0, ctr + 1);
-			String secondHalf = toreturn.substring(ctr + 2);
-			toreturn = firstHalf + secondHalf;
-			stringLength--;
-			continue;
-		    }
-		}
-	    } else if (currentChar == ')') {
-		if (ctr - 1 >= 0) {
-		    char previousChar = toreturn.charAt(ctr - 1);
-		    // ^) becomes )
-		    if (Character.isWhitespace(previousChar)) {
-			String firstHalf = toreturn.substring(0, ctr - 1);
-			String secondHalf = toreturn.substring(ctr);
-			toreturn = firstHalf + secondHalf;
-			stringLength--;
-			ctr--;
-			continue;
-		    }
-		}
+                if (ctr + 1 < stringLength) {
+                    char nextChar = toreturn.charAt(ctr + 1);
+                    // (^ becomes (
+                    if (Character.isWhitespace(nextChar)) {
+                        String firstHalf = toreturn.substring(0, ctr + 1);
+                        String secondHalf = toreturn.substring(ctr + 2);
+                        toreturn = firstHalf + secondHalf;
+                        stringLength--;
+                        continue;
+                    }
+                }
+            } else if (currentChar == ')') {
+                if (ctr - 1 >= 0) {
+                    char previousChar = toreturn.charAt(ctr - 1);
+                    // ^) becomes )
+                    if (Character.isWhitespace(previousChar)) {
+                        String firstHalf = toreturn.substring(0, ctr - 1);
+                        String secondHalf = toreturn.substring(ctr);
+                        toreturn = firstHalf + secondHalf;
+                        stringLength--;
+                        ctr--;
+                        continue;
+                    }
+                }
 
-		if (ctr + 1 < stringLength) {
-		    char nextChar = toreturn.charAt(ctr + 1);
-		    // )L becomes )^L or )N becomes )^N
-		    if (Character.isLetterOrDigit(nextChar)) {
-			String firstHalf = toreturn.substring(0, ctr + 1);
-			String secondHalf = toreturn.substring(ctr + 1);
-			toreturn = firstHalf + " " + secondHalf;
-			stringLength++;
-			continue;
-		    }
-		}
-	    } else if (currentChar == '.') {
-		if (ctr - 1 >= 0) {
-		    char previousChar = toreturn.charAt(ctr - 1);
-		    // L. becomes L^
-		    if (Character.isLetter(previousChar)) {
-			if (ctr + 1 < stringLength) {
-			    String firstHalf = toreturn.substring(0, ctr);
-			    String secondHalf = toreturn.substring(ctr + 1);
-			    toreturn = firstHalf + " " + secondHalf;
-			    continue;
-			} else {
-			    toreturn = toreturn.substring(0, ctr);
-			    break;
-			}
-		    }
-		}
-	    } else if (Character.isLetter(currentChar)) {
-		if (ctr + 1 < stringLength) {
-		    char nextChar = toreturn.charAt(ctr + 1);
-		    if (Character.isDigit(nextChar)) {
-			// LN becomes L^N EXCEPT SLN
-			// check if there is a special character before the
-			// letter
-			if (ctr - 1 >= 0) {
-			    char previousChar = toreturn.charAt(ctr - 1);
-			    if (GermplasmDataManagerImpl
-				    .isGermplasmNameSpecialChar(previousChar))
-				continue;
-			}
+                if (ctr + 1 < stringLength) {
+                    char nextChar = toreturn.charAt(ctr + 1);
+                    // )L becomes )^L or )N becomes )^N
+                    if (Character.isLetterOrDigit(nextChar)) {
+                        String firstHalf = toreturn.substring(0, ctr + 1);
+                        String secondHalf = toreturn.substring(ctr + 1);
+                        toreturn = firstHalf + " " + secondHalf;
+                        stringLength++;
+                        continue;
+                    }
+                }
+            } else if (currentChar == '.') {
+                if (ctr - 1 >= 0) {
+                    char previousChar = toreturn.charAt(ctr - 1);
+                    // L. becomes L^
+                    if (Character.isLetter(previousChar)) {
+                        if (ctr + 1 < stringLength) {
+                            String firstHalf = toreturn.substring(0, ctr);
+                            String secondHalf = toreturn.substring(ctr + 1);
+                            toreturn = firstHalf + " " + secondHalf;
+                            continue;
+                        } else {
+                            toreturn = toreturn.substring(0, ctr);
+                            break;
+                        }
+                    }
+                }
+            } else if (Character.isLetter(currentChar)) {
+                if (ctr + 1 < stringLength) {
+                    char nextChar = toreturn.charAt(ctr + 1);
+                    if (Character.isDigit(nextChar)) {
+                        // LN becomes L^N EXCEPT SLN
+                        // check if there is a special character before the
+                        // letter
+                        if (ctr - 1 >= 0) {
+                            char previousChar = toreturn.charAt(ctr - 1);
+                            if (GermplasmDataManagerImpl.isGermplasmNameSpecialChar(previousChar)) {
+                                continue;
+                            }
+                        }
 
-			String firstHalf = toreturn.substring(0, ctr + 1);
-			String secondHalf = toreturn.substring(ctr + 1);
-			toreturn = firstHalf + " " + secondHalf;
-			stringLength++;
-			continue;
-		    }
-		}
-	    } else if (currentChar == '0') {
-		// ^0N becomes ^N
-		if ((ctr - 1 >= 0) && (ctr + 1 < stringLength)) {
-		    char nextChar = toreturn.charAt(ctr + 1);
-		    char previousChar = toreturn.charAt(ctr - 1);
+                        String firstHalf = toreturn.substring(0, ctr + 1);
+                        String secondHalf = toreturn.substring(ctr + 1);
+                        toreturn = firstHalf + " " + secondHalf;
+                        stringLength++;
+                        continue;
+                    }
+                }
+            } else if (currentChar == '0') {
+                // ^0N becomes ^N
+                if (ctr - 1 >= 0 && ctr + 1 < stringLength) {
+                    char nextChar = toreturn.charAt(ctr + 1);
+                    char previousChar = toreturn.charAt(ctr - 1);
 
-		    if (Character.isDigit(nextChar)
-			    && Character.isWhitespace(previousChar)) {
-			String firstHalf = toreturn.substring(0, ctr);
-			String secondHalf = toreturn.substring(ctr + 1);
-			toreturn = firstHalf + secondHalf;
-			stringLength--;
-			ctr--;
-			continue;
-		    }
-		}
-	    } else if (Character.isDigit(currentChar)) {
-		if (ctr + 1 < stringLength) {
-		    char nextChar = toreturn.charAt(ctr + 1);
-		    if (Character.isLetter(nextChar)) {
-			// NL becomes N^L EXCEPT SNL
-			// check if there is a special character before the
-			// number
-			if (ctr - 1 >= 0) {
-			    char previousChar = toreturn.charAt(ctr - 1);
-			    if (GermplasmDataManagerImpl
-				    .isGermplasmNameSpecialChar(previousChar))
-				continue;
-			}
+                    if (Character.isDigit(nextChar) && Character.isWhitespace(previousChar)) {
+                        String firstHalf = toreturn.substring(0, ctr);
+                        String secondHalf = toreturn.substring(ctr + 1);
+                        toreturn = firstHalf + secondHalf;
+                        stringLength--;
+                        ctr--;
+                        continue;
+                    }
+                }
+            } else if (Character.isDigit(currentChar)) {
+                if (ctr + 1 < stringLength) {
+                    char nextChar = toreturn.charAt(ctr + 1);
+                    if (Character.isLetter(nextChar)) {
+                        // NL becomes N^L EXCEPT SNL
+                        // check if there is a special character before the
+                        // number
+                        if (ctr - 1 >= 0) {
+                            char previousChar = toreturn.charAt(ctr - 1);
+                            if (GermplasmDataManagerImpl.isGermplasmNameSpecialChar(previousChar)) {
+                                continue;
+                            }
+                        }
 
-			String firstHalf = toreturn.substring(0, ctr + 1);
-			String secondHalf = toreturn.substring(ctr + 1);
-			toreturn = firstHalf + " " + secondHalf;
-			stringLength++;
-			continue;
-		    }
-		}
-	    } else if (currentChar == '-') {
-		if ((ctr - 1 >= 0) && (ctr + 1 < stringLength)) {
-		    // L-N becomes L^N when there is only one дад in the name
-		    // and L is not preceded by a space
-		    char nextChar = toreturn.charAt(ctr + 1);
-		    char previousChar = toreturn.charAt(ctr - 1);
+                        String firstHalf = toreturn.substring(0, ctr + 1);
+                        String secondHalf = toreturn.substring(ctr + 1);
+                        toreturn = firstHalf + " " + secondHalf;
+                        stringLength++;
+                        continue;
+                    }
+                }
+            } else if (currentChar == '-') {
+                if (ctr - 1 >= 0 && ctr + 1 < stringLength) {
+                    // L-N becomes L^N when there is only one дад in the name
+                    // and L is not preceded by a space
+                    char nextChar = toreturn.charAt(ctr + 1);
+                    char previousChar = toreturn.charAt(ctr - 1);
 
-		    if (Character.isLetter(previousChar)
-			    && Character.isDigit(nextChar)
-			    // if there is only one '-' in the string then the
-			    // last occurrence of that char is the only
-			    // occurrence
-			    && toreturn.lastIndexOf(currentChar) == ctr) {
-			// check if the letter is preceded by a space or not
-			if (ctr - 2 >= 0) {
-			    char prevPrevChar = toreturn.charAt(ctr - 2);
-			    if (Character.isWhitespace(prevPrevChar))
-				continue;
-			}
+                    if (Character.isLetter(previousChar) && Character.isDigit(nextChar)
+                    // if there is only one '-' in the string then the
+                    // last occurrence of that char is the only
+                    // occurrence
+                            && toreturn.lastIndexOf(currentChar) == ctr) {
+                        // check if the letter is preceded by a space or not
+                        if (ctr - 2 >= 0) {
+                            char prevPrevChar = toreturn.charAt(ctr - 2);
+                            if (Character.isWhitespace(prevPrevChar)) {
+                                continue;
+                            }
+                        }
 
-			String firstHalf = toreturn.substring(0, ctr);
-			String secondHalf = toreturn.substring(ctr + 1);
-			toreturn = firstHalf + " " + secondHalf;
-			continue;
-		    }
-		}
+                        String firstHalf = toreturn.substring(0, ctr);
+                        String secondHalf = toreturn.substring(ctr + 1);
+                        toreturn = firstHalf + " " + secondHalf;
+                        continue;
+                    }
+                }
 
-		if ((ctr - 2 >= 0) && (ctr + 2 < stringLength)) {
-		    // LL-LL becomes LL^LL
-		    char nextChar = toreturn.charAt(ctr + 1);
-		    char nextNextChar = toreturn.charAt(ctr + 2);
-		    char previousChar = toreturn.charAt(ctr - 1);
-		    char prevPrevChar = toreturn.charAt(ctr - 2);
+                if (ctr - 2 >= 0 && ctr + 2 < stringLength) {
+                    // LL-LL becomes LL^LL
+                    char nextChar = toreturn.charAt(ctr + 1);
+                    char nextNextChar = toreturn.charAt(ctr + 2);
+                    char previousChar = toreturn.charAt(ctr - 1);
+                    char prevPrevChar = toreturn.charAt(ctr - 2);
 
-		    if (Character.isLetter(prevPrevChar)
-			    && Character.isLetter(previousChar)
-			    && Character.isLetter(nextChar)
-			    && Character.isLetter(nextNextChar)) {
-			String firstHalf = toreturn.substring(0, ctr);
-			String secondHalf = toreturn.substring(ctr + 1);
-			toreturn = firstHalf + " " + secondHalf;
-			continue;
-		    }
-		}
-	    } else if (currentChar == ' ') {
-		if (ctr + 1 < stringLength) {
-		    char nextChar = toreturn.charAt(ctr + 1);
-		    // ^^ becomes ^
-		    if (nextChar == ' ') {
-			String firstHalf = toreturn.substring(0, ctr);
-			String secondHalf = toreturn.substring(ctr + 1);
-			toreturn = firstHalf + secondHalf;
-			stringLength--;
-			ctr--;
-			continue;
-		    }
-		}
-	    } else if (currentChar == '/') {
-		// ^/ becomes / and /^ becomes /
-		if (ctr - 1 >= 0) {
-		    char previousChar = toreturn.charAt(ctr - 1);
-		    if (Character.isWhitespace(previousChar)) {
-			String firstHalf = toreturn.substring(0, ctr - 1);
-			String secondHalf = toreturn.substring(ctr);
-			toreturn = firstHalf + secondHalf;
-			stringLength--;
-			ctr = ctr - 2;
-			continue;
-		    }
-		}
+                    if (Character.isLetter(prevPrevChar) && Character.isLetter(previousChar) && Character.isLetter(nextChar)
+                            && Character.isLetter(nextNextChar)) {
+                        String firstHalf = toreturn.substring(0, ctr);
+                        String secondHalf = toreturn.substring(ctr + 1);
+                        toreturn = firstHalf + " " + secondHalf;
+                        continue;
+                    }
+                }
+            } else if (currentChar == ' ') {
+                if (ctr + 1 < stringLength) {
+                    char nextChar = toreturn.charAt(ctr + 1);
+                    // ^^ becomes ^
+                    if (nextChar == ' ') {
+                        String firstHalf = toreturn.substring(0, ctr);
+                        String secondHalf = toreturn.substring(ctr + 1);
+                        toreturn = firstHalf + secondHalf;
+                        stringLength--;
+                        ctr--;
+                        continue;
+                    }
+                }
+            } else if (currentChar == '/') {
+                // ^/ becomes / and /^ becomes /
+                if (ctr - 1 >= 0) {
+                    char previousChar = toreturn.charAt(ctr - 1);
+                    if (Character.isWhitespace(previousChar)) {
+                        String firstHalf = toreturn.substring(0, ctr - 1);
+                        String secondHalf = toreturn.substring(ctr);
+                        toreturn = firstHalf + secondHalf;
+                        stringLength--;
+                        ctr = ctr - 2;
+                        continue;
+                    }
+                }
 
-		if (ctr + 1 < stringLength) {
-		    char nextChar = toreturn.charAt(ctr + 1);
-		    if (Character.isWhitespace(nextChar)) {
-			String firstHalf = toreturn.substring(0, ctr + 1);
-			String secondHalf = toreturn.substring(ctr + 2);
-			toreturn = firstHalf + secondHalf;
-			stringLength--;
-			ctr--;
-			continue;
-		    }
-		}
-	    }
+                if (ctr + 1 < stringLength) {
+                    char nextChar = toreturn.charAt(ctr + 1);
+                    if (Character.isWhitespace(nextChar)) {
+                        String firstHalf = toreturn.substring(0, ctr + 1);
+                        String secondHalf = toreturn.substring(ctr + 2);
+                        toreturn = firstHalf + secondHalf;
+                        stringLength--;
+                        ctr--;
+                        continue;
+                    }
+                }
+            }
 
-	}
+        }
 
-	// REMOVE LEADING OR TRAILING ^
-	toreturn = toreturn.trim();
+        // REMOVE LEADING OR TRAILING ^
+        toreturn = toreturn.trim();
 
-	return toreturn;
+        return toreturn;
     }
 
     /**
@@ -1023,117 +994,114 @@ public class GermplasmDataManagerImpl extends DataManager implements
      * @return
      */
     private static boolean isGermplasmNameSpecialChar(char c) {
-	char specialCharacters[] = { '-', '\'', '[', ']', '+', '.' };
-	for (char sp : specialCharacters) {
-	    if (c == sp)
-		return true;
-	}
+        char specialCharacters[] = { '-', '\'', '[', ']', '+', '.' };
+        for (char sp : specialCharacters) {
+            if (c == sp) {
+                return true;
+            }
+        }
 
-	return false;
+        return false;
     }
 
     @Override
-    public Germplasm getParentByGIDAndProgenitorNumber(Integer gid,
-	    Integer progenitorNumber) throws QueryException {
-	GermplasmDAO dao = new GermplasmDAO();
-	HibernateUtil hibernateUtil = getHibernateUtil(gid);
+    public Germplasm getParentByGIDAndProgenitorNumber(Integer gid, Integer progenitorNumber) throws QueryException {
+        GermplasmDAO dao = new GermplasmDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(gid);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtilForCentral.getCurrentSession());
-	} else {
-	    return null;
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+        } else {
+            return null;
+        }
 
-	Germplasm parent = dao.getProgenitorByGID(gid, progenitorNumber);
+        Germplasm parent = dao.getProgenitorByGID(gid, progenitorNumber);
 
-	return parent;
+        return parent;
 
     }
 
     @Override
-    public List<Object[]> findDescendants(Integer gid, int start, int numOfRows)
-	    throws QueryException {
-	GermplasmDAO dao = new GermplasmDAO();
-	ProgenitorDAO pDao = new ProgenitorDAO();
-	List<Object[]> result = new ArrayList();
-	Object[] germplasmList;
+    public List<Object[]> findDescendants(Integer gid, int start, int numOfRows) throws QueryException {
+        GermplasmDAO dao = new GermplasmDAO();
+        ProgenitorDAO pDao = new ProgenitorDAO();
+        List<Object[]> result = new ArrayList();
+        Object[] germplasmList;
 
-	// TODO Local-Central: Verify if the method to identify the database
-	// instance is through gid
-	// If not, please use getHibernateUtil(instance) and add Database
-	// instance as parameter to countDescendants() method
-	HibernateUtil hibernateUtil = getHibernateUtil(gid);
+        // TODO Local-Central: Verify if the method to identify the database
+        // instance is through gid
+        // If not, please use getHibernateUtil(instance) and add Database
+        // instance as parameter to countDescendants() method
+        HibernateUtil hibernateUtil = getHibernateUtil(gid);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtilForCentral.getCurrentSession());
-	    pDao.setSession(hibernateUtilForCentral.getCurrentSession());
-	} else {
-	    return result;
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+            pDao.setSession(hibernateUtilForCentral.getCurrentSession());
+        } else {
+            return result;
+        }
 
-	List<Germplasm> germplasm_descendant = dao.getGermplasmDescendantByGID(
-		gid, start, numOfRows);
-	for (Germplasm g : germplasm_descendant) {
-	    germplasmList = new Object[2];
-	    if (g.getGpid1().equals(gid))
-		germplasmList[0] = 1;
-	    else if (g.getGpid2().equals(gid))
-		germplasmList[0] = 2;
-	    else
-		germplasmList[0] = pDao.getByGIDAndPID(g.getGid(), gid)
-			.getProgntrsPK().getPno().intValue();
+        List<Germplasm> germplasm_descendant = dao.getGermplasmDescendantByGID(gid, start, numOfRows);
+        for (Germplasm g : germplasm_descendant) {
+            germplasmList = new Object[2];
+            if (g.getGpid1().equals(gid)) {
+                germplasmList[0] = 1;
+            } else if (g.getGpid2().equals(gid)) {
+                germplasmList[0] = 2;
+            } else {
+                germplasmList[0] = pDao.getByGIDAndPID(g.getGid(), gid).getProgntrsPK().getPno().intValue();
+            }
 
-	    germplasmList[1] = g;
+            germplasmList[1] = g;
 
-	    result.add(germplasmList);
-	}
+            result.add(germplasmList);
+        }
 
-	return result;
+        return result;
 
     }
 
     @Override
     public int countDescendants(Integer gid) throws QueryException {
-	GermplasmDAO dao = new GermplasmDAO();
+        GermplasmDAO dao = new GermplasmDAO();
 
-	// TODO Local-Central: Verify if the method to identify the database
-	// instance is through gid
-	// If not, please use getHibernateUtil(instance) and add Database
-	// instance as parameter to countDescendants() method
-	HibernateUtil hibernateUtil = getHibernateUtil(gid);
+        // TODO Local-Central: Verify if the method to identify the database
+        // instance is through gid
+        // If not, please use getHibernateUtil(instance) and add Database
+        // instance as parameter to countDescendants() method
+        HibernateUtil hibernateUtil = getHibernateUtil(gid);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return 0;
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return 0;
+        }
 
-	Integer count = dao.countGermplasmDescendantByGID(gid);
-	return count;
+        Integer count = dao.countGermplasmDescendantByGID(gid);
+        return count;
 
     }
 
     @Override
-    public GermplasmPedigreeTree generatePedigreeTree(Integer gid, int level)
-	    throws QueryException {
-	GermplasmPedigreeTree tree = new GermplasmPedigreeTree();
-	// set root node
-	Germplasm root = getGermplasmWithPrefName(gid);
+    public GermplasmPedigreeTree generatePedigreeTree(Integer gid, int level) throws QueryException {
+        GermplasmPedigreeTree tree = new GermplasmPedigreeTree();
+        // set root node
+        Germplasm root = getGermplasmWithPrefName(gid);
 
-	if (root != null) {
-	    GermplasmPedigreeTreeNode rootNode = new GermplasmPedigreeTreeNode();
-	    rootNode.setGermplasm(root);
+        if (root != null) {
+            GermplasmPedigreeTreeNode rootNode = new GermplasmPedigreeTreeNode();
+            rootNode.setGermplasm(root);
 
-	    if (level > 1) {
-		rootNode = addParents(rootNode, level);
-	    }
+            if (level > 1) {
+                rootNode = addParents(rootNode, level);
+            }
 
-	    tree.setRoot(rootNode);
+            tree.setRoot(rootNode);
 
-	    return tree;
-	} else {
-	    return null;
-	}
+            return tree;
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -1146,175 +1114,155 @@ public class GermplasmDataManagerImpl extends DataManager implements
      * @return the given GermplasmPedigreeTreeNode with its parents added to it
      * @throws QueryException
      */
-    private GermplasmPedigreeTreeNode addParents(
-	    GermplasmPedigreeTreeNode node, int level) throws QueryException {
-	if (level == 1) {
-	    return node;
-	} else {
-	    // get parents of node
-	    Germplasm germplasmOfNode = node.getGermplasm();
-	    if (germplasmOfNode.getGnpgs() == -1) {
-		// get and add the source germplasm
-		Germplasm parent = getGermplasmWithPrefName(germplasmOfNode
-			.getGpid2());
-		if (parent != null) {
-		    GermplasmPedigreeTreeNode nodeForParent = new GermplasmPedigreeTreeNode();
-		    nodeForParent.setGermplasm(parent);
-		    node.getLinkedNodes().add(
-			    addParents(nodeForParent, level - 1));
-		}
-	    } else if (germplasmOfNode.getGnpgs() >= 2) {
-		// get and add female parent
-		Germplasm femaleParent = getGermplasmWithPrefName(germplasmOfNode
-			.getGpid1());
-		if (femaleParent != null) {
-		    GermplasmPedigreeTreeNode nodeForFemaleParent = new GermplasmPedigreeTreeNode();
-		    nodeForFemaleParent.setGermplasm(femaleParent);
-		    node.getLinkedNodes().add(
-			    addParents(nodeForFemaleParent, level - 1));
-		}
+    private GermplasmPedigreeTreeNode addParents(GermplasmPedigreeTreeNode node, int level) throws QueryException {
+        if (level == 1) {
+            return node;
+        } else {
+            // get parents of node
+            Germplasm germplasmOfNode = node.getGermplasm();
+            if (germplasmOfNode.getGnpgs() == -1) {
+                // get and add the source germplasm
+                Germplasm parent = getGermplasmWithPrefName(germplasmOfNode.getGpid2());
+                if (parent != null) {
+                    GermplasmPedigreeTreeNode nodeForParent = new GermplasmPedigreeTreeNode();
+                    nodeForParent.setGermplasm(parent);
+                    node.getLinkedNodes().add(addParents(nodeForParent, level - 1));
+                }
+            } else if (germplasmOfNode.getGnpgs() >= 2) {
+                // get and add female parent
+                Germplasm femaleParent = getGermplasmWithPrefName(germplasmOfNode.getGpid1());
+                if (femaleParent != null) {
+                    GermplasmPedigreeTreeNode nodeForFemaleParent = new GermplasmPedigreeTreeNode();
+                    nodeForFemaleParent.setGermplasm(femaleParent);
+                    node.getLinkedNodes().add(addParents(nodeForFemaleParent, level - 1));
+                }
 
-		// get and add male parent
-		Germplasm maleParent = getGermplasmWithPrefName(germplasmOfNode
-			.getGpid2());
-		if (maleParent != null) {
-		    GermplasmPedigreeTreeNode nodeForMaleParent = new GermplasmPedigreeTreeNode();
-		    nodeForMaleParent.setGermplasm(maleParent);
-		    node.getLinkedNodes().add(
-			    addParents(nodeForMaleParent, level - 1));
-		}
+                // get and add male parent
+                Germplasm maleParent = getGermplasmWithPrefName(germplasmOfNode.getGpid2());
+                if (maleParent != null) {
+                    GermplasmPedigreeTreeNode nodeForMaleParent = new GermplasmPedigreeTreeNode();
+                    nodeForMaleParent.setGermplasm(maleParent);
+                    node.getLinkedNodes().add(addParents(nodeForMaleParent, level - 1));
+                }
 
-		if (germplasmOfNode.getGnpgs() > 2) {
-		    // if there are more parents, get and add each of them
-		    List<Germplasm> otherParents = new ArrayList<Germplasm>();
+                if (germplasmOfNode.getGnpgs() > 2) {
+                    // if there are more parents, get and add each of them
+                    List<Germplasm> otherParents = new ArrayList<Germplasm>();
 
-		    if (germplasmOfNode.getGid() < 0
-			    && this.hibernateUtilForLocal != null) {
-			GermplasmDAO dao = new GermplasmDAO();
-			dao.setSession(hibernateUtilForLocal
-				.getCurrentSession());
-			otherParents = dao
-				.getProgenitorsByGIDWithPrefName(germplasmOfNode
-					.getGid());
-		    } else if (germplasmOfNode.getGid() > 0
-			    && this.hibernateUtilForCentral != null) {
-			GermplasmDAO centralDao = new GermplasmDAO();
-			centralDao.setSession(this.hibernateUtilForCentral
-				.getCurrentSession());
-			otherParents = centralDao
-				.getProgenitorsByGIDWithPrefName(germplasmOfNode
-					.getGid());
-		    }
+                    if (germplasmOfNode.getGid() < 0 && this.hibernateUtilForLocal != null) {
+                        GermplasmDAO dao = new GermplasmDAO();
+                        dao.setSession(hibernateUtilForLocal.getCurrentSession());
+                        otherParents = dao.getProgenitorsByGIDWithPrefName(germplasmOfNode.getGid());
+                    } else if (germplasmOfNode.getGid() > 0 && this.hibernateUtilForCentral != null) {
+                        GermplasmDAO centralDao = new GermplasmDAO();
+                        centralDao.setSession(this.hibernateUtilForCentral.getCurrentSession());
+                        otherParents = centralDao.getProgenitorsByGIDWithPrefName(germplasmOfNode.getGid());
+                    }
 
-		    for (Germplasm otherParent : otherParents) {
-			GermplasmPedigreeTreeNode nodeForOtherParent = new GermplasmPedigreeTreeNode();
-			nodeForOtherParent.setGermplasm(otherParent);
-			node.getLinkedNodes().add(
-				addParents(nodeForOtherParent, level - 1));
-		    }
-		}
-	    }
+                    for (Germplasm otherParent : otherParents) {
+                        GermplasmPedigreeTreeNode nodeForOtherParent = new GermplasmPedigreeTreeNode();
+                        nodeForOtherParent.setGermplasm(otherParent);
+                        node.getLinkedNodes().add(addParents(nodeForOtherParent, level - 1));
+                    }
+                }
+            }
 
-	    return node;
-	}
+            return node;
+        }
     }
 
     @Override
-    public List<Germplasm> getManagementNeighbors(Integer gid)
-	    throws QueryException {
-	List<Germplasm> neighbors = new ArrayList<Germplasm>();
-	GermplasmDAO dao = new GermplasmDAO();
-	if (gid < 0 && this.hibernateUtilForLocal != null) {
-	    dao.setSession(hibernateUtilForLocal.getCurrentSession());
-	    neighbors = dao.getManagementNeighbors(gid);
-	    return neighbors;
-	} else if (gid > 0 && this.hibernateUtilForCentral != null) {
-	    dao.setSession(hibernateUtilForCentral.getCurrentSession());
-	    neighbors = dao.getManagementNeighbors(gid);
+    public List<Germplasm> getManagementNeighbors(Integer gid) throws QueryException {
+        List<Germplasm> neighbors = new ArrayList<Germplasm>();
+        GermplasmDAO dao = new GermplasmDAO();
+        if (gid < 0 && this.hibernateUtilForLocal != null) {
+            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+            neighbors = dao.getManagementNeighbors(gid);
+            return neighbors;
+        } else if (gid > 0 && this.hibernateUtilForCentral != null) {
+            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+            neighbors = dao.getManagementNeighbors(gid);
 
-	    if (this.hibernateUtilForLocal != null) {
-		GermplasmDAO localDao = new GermplasmDAO();
-		localDao.setSession(this.hibernateUtilForLocal
-			.getCurrentSession());
-		neighbors.addAll(localDao.getManagementNeighbors(gid));
-	    }
-	}
+            if (this.hibernateUtilForLocal != null) {
+                GermplasmDAO localDao = new GermplasmDAO();
+                localDao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+                neighbors.addAll(localDao.getManagementNeighbors(gid));
+            }
+        }
 
-	return neighbors;
+        return neighbors;
     }
 
     @Override
     public List<Germplasm> getGroupRelatives(Integer gid) throws QueryException {
-	GermplasmDAO dao = new GermplasmDAO();
+        GermplasmDAO dao = new GermplasmDAO();
 
-	// TODO Local-Central: Verify if the method to identify the database
-	// instance is through gid
-	// If not, please use getHibernateUtil(instance) and add Database
-	// instance as parameter to getGroupRelatives() method
-	HibernateUtil hibernateUtil = getHibernateUtil(gid);
+        // TODO Local-Central: Verify if the method to identify the database
+        // instance is through gid
+        // If not, please use getHibernateUtil(instance) and add Database
+        // instance as parameter to getGroupRelatives() method
+        HibernateUtil hibernateUtil = getHibernateUtil(gid);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return new ArrayList<Germplasm>();
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return new ArrayList<Germplasm>();
+        }
 
-	List<Germplasm> relatives = dao.getGroupRelatives(gid);
-	return relatives;
+        List<Germplasm> relatives = dao.getGroupRelatives(gid);
+        return relatives;
     }
 
     @Override
-    public List<Germplasm> getGenerationHistory(Integer gid)
-	    throws QueryException {
-	List<Germplasm> toreturn = new ArrayList<Germplasm>();
+    public List<Germplasm> getGenerationHistory(Integer gid) throws QueryException {
+        List<Germplasm> toreturn = new ArrayList<Germplasm>();
 
-	Germplasm currentGermplasm = getGermplasmWithPrefName(gid);
-	if (currentGermplasm != null) {
-	    toreturn.add(currentGermplasm);
+        Germplasm currentGermplasm = getGermplasmWithPrefName(gid);
+        if (currentGermplasm != null) {
+            toreturn.add(currentGermplasm);
 
-	    while (currentGermplasm.getGnpgs() == -1) {
-		// trace back the sources
-		Integer sourceId = currentGermplasm.getGpid2();
-		currentGermplasm = getGermplasmWithPrefName(sourceId);
+            while (currentGermplasm.getGnpgs() == -1) {
+                // trace back the sources
+                Integer sourceId = currentGermplasm.getGpid2();
+                currentGermplasm = getGermplasmWithPrefName(sourceId);
 
-		if (currentGermplasm != null)
-		    toreturn.add(currentGermplasm);
-		else
-		    break;
-	    }
-	}
+                if (currentGermplasm != null) {
+                    toreturn.add(currentGermplasm);
+                } else {
+                    break;
+                }
+            }
+        }
 
-	return toreturn;
+        return toreturn;
     }
 
     @Override
-    public GermplasmPedigreeTree getDerivativeNeighborhood(Integer gid,
-	    int numberOfStepsBackward, int numberOfStepsForward)
-	    throws QueryException {
-	GermplasmPedigreeTree derivativeNeighborhood = new GermplasmPedigreeTree();
+    public GermplasmPedigreeTree getDerivativeNeighborhood(Integer gid, int numberOfStepsBackward, int numberOfStepsForward)
+            throws QueryException {
+        GermplasmPedigreeTree derivativeNeighborhood = new GermplasmPedigreeTree();
 
-	// get the root of the neighborhood
-	Object[] traceResult = traceDerivativeRoot(gid, numberOfStepsBackward);
+        // get the root of the neighborhood
+        Object[] traceResult = traceDerivativeRoot(gid, numberOfStepsBackward);
 
-	if (traceResult != null) {
-	    Germplasm root = (Germplasm) traceResult[0];
-	    Integer stepsLeft = (Integer) traceResult[1];
+        if (traceResult != null) {
+            Germplasm root = (Germplasm) traceResult[0];
+            Integer stepsLeft = (Integer) traceResult[1];
 
-	    GermplasmPedigreeTreeNode rootNode = new GermplasmPedigreeTreeNode();
-	    rootNode.setGermplasm(root);
+            GermplasmPedigreeTreeNode rootNode = new GermplasmPedigreeTreeNode();
+            rootNode.setGermplasm(root);
 
-	    // get the derived lines from the root until the whole neighborhood
-	    // is created
-	    int treeLevel = (numberOfStepsBackward - stepsLeft)
-		    + numberOfStepsForward + 1;
-	    rootNode = getDerivedLines(rootNode, treeLevel);
+            // get the derived lines from the root until the whole neighborhood
+            // is created
+            int treeLevel = numberOfStepsBackward - stepsLeft + numberOfStepsForward + 1;
+            rootNode = getDerivedLines(rootNode, treeLevel);
 
-	    derivativeNeighborhood.setRoot(rootNode);
+            derivativeNeighborhood.setRoot(rootNode);
 
-	    return derivativeNeighborhood;
-	} else {
-	    return null;
-	}
+            return derivativeNeighborhood;
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -1329,22 +1277,21 @@ public class GermplasmDataManagerImpl extends DataManager implements
      *         Integer which is the number of steps left to take
      * @throws QueryException
      */
-    private Object[] traceDerivativeRoot(Integer gid, int steps)
-	    throws QueryException {
-	Germplasm germplasm = getGermplasmWithPrefName(gid);
+    private Object[] traceDerivativeRoot(Integer gid, int steps) throws QueryException {
+        Germplasm germplasm = getGermplasmWithPrefName(gid);
 
-	if (germplasm == null) {
-	    return null;
-	} else if (steps == 0 || germplasm.getGnpgs() != -1) {
-	    return new Object[] { germplasm, new Integer(steps) };
-	} else {
-	    Object[] returned = traceDerivativeRoot(germplasm.getGpid2(),
-		    steps - 1);
-	    if (returned != null)
-		return returned;
-	    else
-		return new Object[] { germplasm, new Integer(steps) };
-	}
+        if (germplasm == null) {
+            return null;
+        } else if (steps == 0 || germplasm.getGnpgs() != -1) {
+            return new Object[] { germplasm, new Integer(steps) };
+        } else {
+            Object[] returned = traceDerivativeRoot(germplasm.getGpid2(), steps - 1);
+            if (returned != null) {
+                return returned;
+            } else {
+                return new Object[] { germplasm, new Integer(steps) };
+            }
+        }
     }
 
     /**
@@ -1356,381 +1303,362 @@ public class GermplasmDataManagerImpl extends DataManager implements
      * @return
      * @throws QueryException
      */
-    private GermplasmPedigreeTreeNode getDerivedLines(
-	    GermplasmPedigreeTreeNode node, int steps) throws QueryException {
-	if (steps <= 0) {
-	    return node;
-	} else {
-	    List<Germplasm> derivedGermplasms = new ArrayList<Germplasm>();
-	    Integer gid = node.getGermplasm().getGid();
+    private GermplasmPedigreeTreeNode getDerivedLines(GermplasmPedigreeTreeNode node, int steps) throws QueryException {
+        if (steps <= 0) {
+            return node;
+        } else {
+            List<Germplasm> derivedGermplasms = new ArrayList<Germplasm>();
+            Integer gid = node.getGermplasm().getGid();
 
-	    if (gid < 0 && this.hibernateUtilForLocal != null) {
-		GermplasmDAO dao = new GermplasmDAO();
-		dao.setSession(hibernateUtilForLocal.getCurrentSession());
-		derivedGermplasms = dao.getDerivativeChildren(gid);
-	    } else if (gid > 0 && this.hibernateUtilForCentral != null) {
-		GermplasmDAO dao = new GermplasmDAO();
-		dao.setSession(hibernateUtilForCentral.getCurrentSession());
-		derivedGermplasms = dao.getDerivativeChildren(gid);
+            if (gid < 0 && this.hibernateUtilForLocal != null) {
+                GermplasmDAO dao = new GermplasmDAO();
+                dao.setSession(hibernateUtilForLocal.getCurrentSession());
+                derivedGermplasms = dao.getDerivativeChildren(gid);
+            } else if (gid > 0 && this.hibernateUtilForCentral != null) {
+                GermplasmDAO dao = new GermplasmDAO();
+                dao.setSession(hibernateUtilForCentral.getCurrentSession());
+                derivedGermplasms = dao.getDerivativeChildren(gid);
 
-		if (this.hibernateUtilForLocal != null) {
-		    GermplasmDAO localDao = new GermplasmDAO();
-		    localDao.setSession(hibernateUtilForLocal
-			    .getCurrentSession());
-		    derivedGermplasms.addAll(dao.getDerivativeChildren(gid));
-		}
-	    }
+                if (this.hibernateUtilForLocal != null) {
+                    GermplasmDAO localDao = new GermplasmDAO();
+                    localDao.setSession(hibernateUtilForLocal.getCurrentSession());
+                    derivedGermplasms.addAll(dao.getDerivativeChildren(gid));
+                }
+            }
 
-	    for (Germplasm g : derivedGermplasms) {
-		GermplasmPedigreeTreeNode derivedNode = new GermplasmPedigreeTreeNode();
-		derivedNode.setGermplasm(g);
-		node.getLinkedNodes().add(
-			getDerivedLines(derivedNode, steps - 1));
-	    }
+            for (Germplasm g : derivedGermplasms) {
+                GermplasmPedigreeTreeNode derivedNode = new GermplasmPedigreeTreeNode();
+                derivedNode.setGermplasm(g);
+                node.getLinkedNodes().add(getDerivedLines(derivedNode, steps - 1));
+            }
 
-	    return node;
-	}
+            return node;
+        }
     }
 
     @Override
     public int addGermplasmAttribute(Attribute attribute) throws QueryException {
-	List<Attribute> attributes = new ArrayList<Attribute>();
-	attributes.add(attribute);
-	return addGermplasmAttribute(attributes);
+        List<Attribute> attributes = new ArrayList<Attribute>();
+        attributes.add(attribute);
+        return addGermplasmAttribute(attributes);
     }
 
     @Override
-    public int addGermplasmAttribute(List<Attribute> attributes)
-	    throws QueryException {
-	return addOrUpdateAttributes(attributes, Operation.ADD);
+    public int addGermplasmAttribute(List<Attribute> attributes) throws QueryException {
+        return addOrUpdateAttributes(attributes, Operation.ADD);
     }
 
     @Override
-    public int updateGermplasmAttribute(Attribute attribute)
-	    throws QueryException {
-	List<Attribute> attributes = new ArrayList<Attribute>();
-	attributes.add(attribute);
-	return updateGermplasmAttribute(attributes);
+    public int updateGermplasmAttribute(Attribute attribute) throws QueryException {
+        List<Attribute> attributes = new ArrayList<Attribute>();
+        attributes.add(attribute);
+        return updateGermplasmAttribute(attributes);
     }
 
     @Override
-    public int updateGermplasmAttribute(List<Attribute> attributes)
-	    throws QueryException {
-	return addOrUpdateAttributes(attributes, Operation.UPDATE);
+    public int updateGermplasmAttribute(List<Attribute> attributes) throws QueryException {
+        return addOrUpdateAttributes(attributes, Operation.UPDATE);
     }
 
-    private int addOrUpdateAttributes(List<Attribute> attributes,
-	    Operation operation) throws QueryException {
-	if (hibernateUtilForLocal == null)
-	    throw new QueryException(
-		    "There is no connection to a local instance.");
+    private int addOrUpdateAttributes(List<Attribute> attributes, Operation operation) throws QueryException {
+        if (hibernateUtilForLocal == null) {
+            throw new QueryException("There is no connection to a local instance.");
+        }
 
-	// initialize session & transaction
-	Session session = hibernateUtilForLocal.getCurrentSession();
-	Transaction trans = null;
+        // initialize session & transaction
+        Session session = hibernateUtilForLocal.getCurrentSession();
+        Transaction trans = null;
 
-	int attributesSaved = 0;
-	try {
-	    // begin save transaction
-	    trans = session.beginTransaction();
+        int attributesSaved = 0;
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
 
-	    AttributeDAO dao = new AttributeDAO();
-	    dao.setSession(session);
+            AttributeDAO dao = new AttributeDAO();
+            dao.setSession(session);
 
-	    for (Attribute attribute : attributes) {
-		if (operation == Operation.ADD) {
-		    // Auto-assign negative IDs for new local DB records
-		    Integer negativeId = dao.getNegativeId("aid");
-		    attribute.setAid(negativeId);
-		} else if (operation == Operation.UPDATE) {
-		    // Check if Attribute is a local DB record. Throws exception
-		    // if Attribute is a central DB record.
-		    dao.validateId(attribute);
-		}
-		dao.saveOrUpdate(attribute);
-		attributesSaved++;
-	    }
-	    // end transaction, commit to database
-	    trans.commit();
-	} catch (Exception ex) {
-	    // rollback transaction in case of errors
-	    if (trans != null) {
-		trans.rollback();
-	    }
-	    throw new QueryException(
-		    "Error encountered while saving Attribute: "
-			    + ex.getMessage(), ex);
-	} finally {
-	    hibernateUtilForLocal.closeCurrentSession();
-	}
+            for (Attribute attribute : attributes) {
+                if (operation == Operation.ADD) {
+                    // Auto-assign negative IDs for new local DB records
+                    Integer negativeId = dao.getNegativeId("aid");
+                    attribute.setAid(negativeId);
+                } else if (operation == Operation.UPDATE) {
+                    // Check if Attribute is a local DB record. Throws exception
+                    // if Attribute is a central DB record.
+                    dao.validateId(attribute);
+                }
+                dao.saveOrUpdate(attribute);
+                attributesSaved++;
+            }
+            // end transaction, commit to database
+            trans.commit();
+        } catch (Exception ex) {
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new QueryException("Error encountered while saving Attribute: " + ex.getMessage(), ex);
+        } finally {
+            hibernateUtilForLocal.closeCurrentSession();
+        }
 
-	return attributesSaved;
+        return attributesSaved;
     }
 
     @Override
     public Attribute getAttributeById(Integer id) {
-	AttributeDAO dao = new AttributeDAO();
-	HibernateUtil hibernateUtil = getHibernateUtil(id);
+        AttributeDAO dao = new AttributeDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(id);
 
-	if (hibernateUtil != null) {
-	    dao.setSession(hibernateUtil.getCurrentSession());
-	} else {
-	    return null;
-	}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return null;
+        }
 
-	return dao.findById(id, false);
+        return dao.findById(id, false);
     }
 
     @Override
-    public boolean updateProgenitor(Integer gid, Integer progenitorId,
-	    Integer progenitorNumber) throws QueryException {
-	if (hibernateUtilForLocal == null)
-	    throw new QueryException(
-		    "There is no connection to a local instance.");
+    public boolean updateProgenitor(Integer gid, Integer progenitorId, Integer progenitorNumber) throws QueryException {
+        if (hibernateUtilForLocal == null) {
+            throw new QueryException("There is no connection to a local instance.");
+        }
 
-	// check if the germplasm record identified by gid exists
-	Germplasm child = getGermplasmByGID(gid);
-	if (child == null)
-	    throw new QueryException("There is no germplasm record with gid: "
-		    + gid);
+        // check if the germplasm record identified by gid exists
+        Germplasm child = getGermplasmByGID(gid);
+        if (child == null) {
+            throw new QueryException("There is no germplasm record with gid: " + gid);
+        }
 
-	// check if the germplasm record identified by progenitorId exists
-	Germplasm parent = getGermplasmByGID(progenitorId);
-	if (parent == null)
-	    throw new QueryException("There is no germplasm record with gid: "
-		    + progenitorId);
+        // check if the germplasm record identified by progenitorId exists
+        Germplasm parent = getGermplasmByGID(progenitorId);
+        if (parent == null) {
+            throw new QueryException("There is no germplasm record with gid: " + progenitorId);
+        }
 
-	// check progenitor number
-	if (progenitorNumber == 1 || progenitorNumber == 2) {
-	    // check if given gid refers to a local record
-	    if (gid < 0) {
-		// proceed with update
-		if (progenitorNumber == 1)
-		    child.setGpid1(progenitorId);
-		else
-		    child.setGpid2(progenitorId);
+        // check progenitor number
+        if (progenitorNumber == 1 || progenitorNumber == 2) {
+            // check if given gid refers to a local record
+            if (gid < 0) {
+                // proceed with update
+                if (progenitorNumber == 1) {
+                    child.setGpid1(progenitorId);
+                } else {
+                    child.setGpid2(progenitorId);
+                }
 
-		List<Germplasm> germplasms = new ArrayList<Germplasm>();
-		germplasms.add(child);
-		int updated = addOrUpdateGermplasms(germplasms,
-			Operation.UPDATE);
-		if (updated == 1)
-		    return true;
-	    } else {
-		throw new QueryException(
-			"The gid supplied as parameter does not refer to a local record. Only local records may be updated.");
-	    }
-	} else if (progenitorNumber > 2) {
-	    ProgenitorDAO dao = new ProgenitorDAO();
-	    dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+                List<Germplasm> germplasms = new ArrayList<Germplasm>();
+                germplasms.add(child);
+                int updated = addOrUpdateGermplasms(germplasms, Operation.UPDATE);
+                if (updated == 1) {
+                    return true;
+                }
+            } else {
+                throw new QueryException(
+                        "The gid supplied as parameter does not refer to a local record. Only local records may be updated.");
+            }
+        } else if (progenitorNumber > 2) {
+            ProgenitorDAO dao = new ProgenitorDAO();
+            dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
 
-	    // check if there is an existing Progenitor record
-	    ProgenitorPK id = new ProgenitorPK(gid, progenitorNumber);
-	    Progenitor p = dao.findById(id, false);
+            // check if there is an existing Progenitor record
+            ProgenitorPK id = new ProgenitorPK(gid, progenitorNumber);
+            Progenitor p = dao.findById(id, false);
 
-	    if (p != null) {
-		// update the existing record
-		p.setPid(progenitorId);
+            if (p != null) {
+                // update the existing record
+                p.setPid(progenitorId);
 
-		List<Progenitor> progenitors = new ArrayList<Progenitor>();
-		progenitors.add(p);
-		int updated = addOrUpdateProgenitors(progenitors);
-		if (updated == 1)
-		    return true;
-	    } else {
-		// create new Progenitor record
-		Progenitor newRecord = new Progenitor(id);
-		newRecord.setPid(progenitorId);
+                List<Progenitor> progenitors = new ArrayList<Progenitor>();
+                progenitors.add(p);
+                int updated = addOrUpdateProgenitors(progenitors);
+                if (updated == 1) {
+                    return true;
+                }
+            } else {
+                // create new Progenitor record
+                Progenitor newRecord = new Progenitor(id);
+                newRecord.setPid(progenitorId);
 
-		List<Progenitor> progenitors = new ArrayList<Progenitor>();
-		progenitors.add(newRecord);
-		int added = addOrUpdateProgenitors(progenitors);
-		if (added == 1)
-		    return true;
-	    }
-	} else {
-	    throw new QueryException("Invalid progenitor number: "
-		    + progenitorNumber);
-	}
+                List<Progenitor> progenitors = new ArrayList<Progenitor>();
+                progenitors.add(newRecord);
+                int added = addOrUpdateProgenitors(progenitors);
+                if (added == 1) {
+                    return true;
+                }
+            }
+        } else {
+            throw new QueryException("Invalid progenitor number: " + progenitorNumber);
+        }
 
-	return false;
+        return false;
     }
 
-    private int addOrUpdateGermplasms(List<Germplasm> germplasms,
-	    Operation operation) throws QueryException {
-	if (hibernateUtilForLocal == null)
-	    throw new QueryException(
-		    "There is no connection to a local instance.");
+    private int addOrUpdateGermplasms(List<Germplasm> germplasms, Operation operation) throws QueryException {
+        if (hibernateUtilForLocal == null) {
+            throw new QueryException("There is no connection to a local instance.");
+        }
 
-	// initialize session & transaction
-	Session session = hibernateUtilForLocal.getCurrentSession();
-	Transaction trans = null;
+        // initialize session & transaction
+        Session session = hibernateUtilForLocal.getCurrentSession();
+        Transaction trans = null;
 
-	int germplasmsSaved = 0;
-	try {
-	    // begin save transaction
-	    trans = session.beginTransaction();
+        int germplasmsSaved = 0;
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
 
-	    GermplasmDAO dao = new GermplasmDAO();
-	    dao.setSession(session);
+            GermplasmDAO dao = new GermplasmDAO();
+            dao.setSession(session);
 
-	    for (Germplasm germplasm : germplasms) {
-		if (operation == Operation.ADD) {
-		    // Auto-assign negative IDs for new local DB records
-		    Integer negativeId = dao.getNegativeId("gid");
-		    germplasm.setGid(negativeId);
-		    germplasm.setLgid(negativeId);
-		} else if (operation == Operation.UPDATE) {
-		    // Check if Germplasm is a local DB record. Throws exception
-		    // if Germplasm is a central DB record.
-		    dao.validateId(germplasm);
-		}
-		dao.saveOrUpdate(germplasm);
-		germplasmsSaved++;
-		if (germplasmsSaved % JDBC_BATCH_SIZE == 0) {
-		    // flush a batch of inserts and release memory
-		    dao.flush();
-		    dao.clear();
-		}
-	    }
-	    // end transaction, commit to database
-	    trans.commit();
-	} catch (Exception ex) {
-	    // rollback transaction in case of errors
-	    if (trans != null) {
-		trans.rollback();
-	    }
-	    throw new QueryException(
-		    "Error encountered while saving Germplasm: "
-			    + ex.getMessage(), ex);
-	} finally {
-	    hibernateUtilForLocal.closeCurrentSession();
-	}
+            for (Germplasm germplasm : germplasms) {
+                if (operation == Operation.ADD) {
+                    // Auto-assign negative IDs for new local DB records
+                    Integer negativeId = dao.getNegativeId("gid");
+                    germplasm.setGid(negativeId);
+                    germplasm.setLgid(negativeId);
+                } else if (operation == Operation.UPDATE) {
+                    // Check if Germplasm is a local DB record. Throws exception
+                    // if Germplasm is a central DB record.
+                    dao.validateId(germplasm);
+                }
+                dao.saveOrUpdate(germplasm);
+                germplasmsSaved++;
+                if (germplasmsSaved % JDBC_BATCH_SIZE == 0) {
+                    // flush a batch of inserts and release memory
+                    dao.flush();
+                    dao.clear();
+                }
+            }
+            // end transaction, commit to database
+            trans.commit();
+        } catch (Exception ex) {
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new QueryException("Error encountered while saving Germplasm: " + ex.getMessage(), ex);
+        } finally {
+            hibernateUtilForLocal.closeCurrentSession();
+        }
 
-	return germplasmsSaved;
+        return germplasmsSaved;
     }
 
-    private int addOrUpdateProgenitors(List<Progenitor> progenitors)
-	    throws QueryException {
-	if (hibernateUtilForLocal == null)
-	    throw new QueryException(
-		    "There is no connection to a local instance.");
+    private int addOrUpdateProgenitors(List<Progenitor> progenitors) throws QueryException {
+        if (hibernateUtilForLocal == null) {
+            throw new QueryException("There is no connection to a local instance.");
+        }
 
-	// initialize session & transaction
-	Session session = hibernateUtilForLocal.getCurrentSession();
-	Transaction trans = null;
+        // initialize session & transaction
+        Session session = hibernateUtilForLocal.getCurrentSession();
+        Transaction trans = null;
 
-	int progenitorsSaved = 0;
-	try {
-	    // begin save transaction
-	    trans = session.beginTransaction();
+        int progenitorsSaved = 0;
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
 
-	    ProgenitorDAO dao = new ProgenitorDAO();
-	    dao.setSession(session);
+            ProgenitorDAO dao = new ProgenitorDAO();
+            dao.setSession(session);
 
-	    for (Progenitor progenitor : progenitors) {
-		dao.saveOrUpdate(progenitor);
-		progenitorsSaved++;
-	    }
-	    // end transaction, commit to database
-	    trans.commit();
-	} catch (Exception ex) {
-	    // rollback transaction in case of errors
-	    if (trans != null) {
-		trans.rollback();
-	    }
-	    throw new QueryException(
-		    "Error encountered while saving Progenitor: "
-			    + ex.getMessage(), ex);
-	} finally {
-	    hibernateUtilForLocal.closeCurrentSession();
-	}
+            for (Progenitor progenitor : progenitors) {
+                dao.saveOrUpdate(progenitor);
+                progenitorsSaved++;
+            }
+            // end transaction, commit to database
+            trans.commit();
+        } catch (Exception ex) {
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new QueryException("Error encountered while saving Progenitor: " + ex.getMessage(), ex);
+        } finally {
+            hibernateUtilForLocal.closeCurrentSession();
+        }
 
-	return progenitorsSaved;
+        return progenitorsSaved;
     }
 
     @Override
     public int updateGermplasm(Germplasm germplasm) throws QueryException {
-	List<Germplasm> germplasms = new ArrayList<Germplasm>();
-	germplasms.add(germplasm);
-	return updateGermplasm(germplasms);
+        List<Germplasm> germplasms = new ArrayList<Germplasm>();
+        germplasms.add(germplasm);
+        return updateGermplasm(germplasms);
     }
 
     @Override
-    public int updateGermplasm(List<Germplasm> germplasms)
-	    throws QueryException {
-	return addOrUpdateGermplasms(germplasms, Operation.UPDATE);
+    public int updateGermplasm(List<Germplasm> germplasms) throws QueryException {
+        return addOrUpdateGermplasms(germplasms, Operation.UPDATE);
     }
 
     @Override
-    public int addGermplasm(Germplasm germplasm, Name preferredName)
-	    throws QueryException {
-	Map<Germplasm, Name> germplasmNameMap = new HashMap<Germplasm, Name>();
-	germplasm.setGid(new Integer(1));
-	germplasmNameMap.put(germplasm, preferredName);
-	return addGermplasm(germplasmNameMap);
+    public int addGermplasm(Germplasm germplasm, Name preferredName) throws QueryException {
+        Map<Germplasm, Name> germplasmNameMap = new HashMap<Germplasm, Name>();
+        germplasm.setGid(new Integer(1));
+        germplasmNameMap.put(germplasm, preferredName);
+        return addGermplasm(germplasmNameMap);
     }
 
     @Override
-    public int addGermplasm(Map<Germplasm, Name> germplasmNameMap)
-	    throws QueryException {
-	if (hibernateUtilForLocal == null)
-	    throw new QueryException(
-		    "There is no connection to a local instance.");
+    public int addGermplasm(Map<Germplasm, Name> germplasmNameMap) throws QueryException {
+        if (hibernateUtilForLocal == null) {
+            throw new QueryException("There is no connection to a local instance.");
+        }
 
-	// initialize session & transaction
-	Session session = hibernateUtilForLocal.getCurrentSession();
-	Transaction trans = null;
+        // initialize session & transaction
+        Session session = hibernateUtilForLocal.getCurrentSession();
+        Transaction trans = null;
 
-	int germplasmsSaved = 0;
-	try {
-	    // begin save transaction
-	    trans = session.beginTransaction();
+        int germplasmsSaved = 0;
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
 
-	    GermplasmDAO dao = new GermplasmDAO();
-	    dao.setSession(session);
+            GermplasmDAO dao = new GermplasmDAO();
+            dao.setSession(session);
 
-	    NameDAO nameDao = new NameDAO();
-	    nameDao.setSession(session);
+            NameDAO nameDao = new NameDAO();
+            nameDao.setSession(session);
 
-	    for (Germplasm germplasm : germplasmNameMap.keySet()) {
-		Name name = germplasmNameMap.get(germplasm);
+            for (Germplasm germplasm : germplasmNameMap.keySet()) {
+                Name name = germplasmNameMap.get(germplasm);
 
-		// Auto-assign negative IDs for new local DB records
-		Integer negativeId = dao.getNegativeId("gid");
-		germplasm.setGid(negativeId);
-		germplasm.setLgid(new Integer(0));
+                // Auto-assign negative IDs for new local DB records
+                Integer negativeId = dao.getNegativeId("gid");
+                germplasm.setGid(negativeId);
+                germplasm.setLgid(new Integer(0));
 
-		Integer nameId = nameDao.getNegativeId("nid");
-		name.setNid(nameId);
-		name.setNstat(new Integer(1));
-		name.setGermplasmId(negativeId);
+                Integer nameId = nameDao.getNegativeId("nid");
+                name.setNid(nameId);
+                name.setNstat(new Integer(1));
+                name.setGermplasmId(negativeId);
 
-		dao.saveOrUpdate(germplasm);
-		nameDao.saveOrUpdate(name);
-		germplasmsSaved++;
+                dao.saveOrUpdate(germplasm);
+                nameDao.saveOrUpdate(name);
+                germplasmsSaved++;
 
-		if (germplasmsSaved % JDBC_BATCH_SIZE == 0) {
-		    // flush a batch of inserts and release memory
-		    dao.flush();
-		    dao.clear();
-		}
-	    }
-	    // end transaction, commit to database
-	    trans.commit();
-	} catch (Exception ex) {
-	    // rollback transaction in case of errors
-	    if (trans != null) {
-		trans.rollback();
-	    }
-	    throw new QueryException(
-		    "Error encountered while saving Germplasm: "
-			    + ex.getMessage(), ex);
-	} finally {
-	    hibernateUtilForLocal.closeCurrentSession();
-	}
+                if (germplasmsSaved % JDBC_BATCH_SIZE == 0) {
+                    // flush a batch of inserts and release memory
+                    dao.flush();
+                    dao.clear();
+                }
+            }
+            // end transaction, commit to database
+            trans.commit();
+        } catch (Exception ex) {
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new QueryException("Error encountered while saving Germplasm: " + ex.getMessage(), ex);
+        } finally {
+            hibernateUtilForLocal.closeCurrentSession();
+        }
 
-	return germplasmsSaved;
+        return germplasmsSaved;
     }
 
     /**
