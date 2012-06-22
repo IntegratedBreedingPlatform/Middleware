@@ -82,6 +82,12 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 
         return crit;
     }
+    
+    @SuppressWarnings("unchecked")
+    public List<T> getAll() {
+        Criteria criteria = getSession().createCriteria(getPersistentClass());
+        return criteria.list();
+    }
 
     @SuppressWarnings("unchecked")
     public List<T> getAll(int start, int numOfRows) {
