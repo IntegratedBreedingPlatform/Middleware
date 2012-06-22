@@ -22,7 +22,7 @@ import org.hibernate.Query;
 public class MethodDAO extends GenericDAO<Method, Integer>{
 
     @SuppressWarnings("unchecked")
-    public List<Method> getAll() throws QueryException {
+    public List<Method> getAllMethod() throws QueryException {
         try {
             Query query = getSession().getNamedQuery(Method.GET_ALL);
 

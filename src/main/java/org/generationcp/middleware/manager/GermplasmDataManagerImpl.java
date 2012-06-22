@@ -596,13 +596,13 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         if (this.hibernateUtilForLocal != null) {
             MethodDAO dao = new MethodDAO();
             dao.setSession(hibernateUtilForLocal.getCurrentSession());
-            methods.addAll(dao.getAll());
+            methods.addAll(dao.getAllMethod());
         }
 
         if (this.hibernateUtilForCentral != null) {
             MethodDAO centralDao = new MethodDAO();
             centralDao.setSession(hibernateUtilForCentral.getCurrentSession());
-            methods.addAll(centralDao.getAll());
+            methods.addAll(centralDao.getAllMethod());
         }
 
         return methods;

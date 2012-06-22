@@ -22,6 +22,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -32,6 +34,11 @@ import javax.xml.bind.annotation.XmlType;
 
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
+
+
+@NamedQueries({ @NamedQuery(name = "findAllLocation", query = "FROM Location"),
+    @NamedQuery(name = "countAllLocation", query = "SELECT COUNT(l) FROM Location l")
+})
 
 /**
  * POJO for location table
@@ -47,6 +54,9 @@ import org.hibernate.annotations.NotFoundAction;
 public class Location implements Serializable{
 
     private static final long serialVersionUID = 1L;
+    
+    public static final String FIND_ALL = "findAllLocation";
+    public static final String COUNT_ALL = "countAllLocation";
 
     @Id
     @Basic(optional = false)
