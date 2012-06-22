@@ -67,6 +67,20 @@ public class PersonDataManagerImpl extends DataManager implements PersonDataMana
             hibernateUtilForLocal.closeCurrentSession();
         }
     }
+    
+    @Override
+    public Person getPersonById(int id) {
+        PersonDAO dao = new PersonDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(id);
+
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return null;
+        }
+
+        return dao.findById(id, false);
+    }
 
     @Override
     public void deletePerson(Person person) throws QueryException {

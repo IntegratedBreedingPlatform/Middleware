@@ -57,6 +57,8 @@ public class TestPersonDataManagerImpl {
         // add the person
         manager.addPerson(person);
         
+        person = manager.getPersonById(-1);
+        
         // delete the person
         manager.deletePerson(person);
     }

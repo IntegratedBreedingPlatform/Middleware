@@ -11,5 +11,7 @@ public interface PersonDataManager {
     
     void addPerson(Person person) throws QueryException;
     
+    Person getPersonById(int id);
+    
     void deletePerson(Person person) throws QueryException;
 }
