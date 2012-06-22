@@ -101,4 +101,15 @@ public abstract class DataManager{
         return null;
     }
 
+    protected void requireLocalDatabaseInstance() throws QueryException {
+        if (hibernateUtilForLocal == null) {
+            throw new QueryException("There is no connection to a local instance.");
+        }
+    }
+    
+    protected void requireCentralDatabaseInstance() throws QueryException {
+        if (hibernateUtilForCentral == null) {
+            throw new QueryException("There is no connection to a central instance.");
+        }
+    }
 }
