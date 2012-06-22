@@ -15,8 +15,8 @@ package org.generationcp.middleware.pojos.report;
 import java.io.Serializable;
 
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Scale;
-import org.generationcp.middleware.pojos.workbench.Person;
 
 /**
  * This POJO represents a row in reports about Transaction records. Note that

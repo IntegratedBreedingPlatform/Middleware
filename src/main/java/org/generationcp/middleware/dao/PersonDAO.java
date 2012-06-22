@@ -12,7 +12,7 @@
 
 package org.generationcp.middleware.dao;
 
-import org.generationcp.middleware.pojos.workbench.Person;
+import org.generationcp.middleware.pojos.Person;
 
 public class PersonDAO extends GenericDAO<Person, Integer>{
 

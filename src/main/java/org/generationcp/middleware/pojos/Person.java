@@ -10,7 +10,7 @@
  * 
  *******************************************************************************/
 
-package org.generationcp.middleware.pojos.workbench;
+package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
 

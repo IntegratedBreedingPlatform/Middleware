@@ -15,8 +15,8 @@ package org.generationcp.middleware.pojos.test;
 import java.util.List;
 
 import org.generationcp.middleware.pojos.Lot;
+import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Transaction;
-import org.generationcp.middleware.pojos.workbench.Person;
 import org.generationcp.middleware.util.HibernateUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
