@@ -12,12 +12,10 @@
 
 package org.generationcp.middleware.dao;
 
-import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.User;
 
-public class UserDAO extends GenericDAO<UserDefinedField, Integer>{
+public class UserDAO extends GenericDAO<User, Integer>{
 
-	
-	
 	
 	
 }
