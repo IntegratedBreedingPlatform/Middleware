@@ -43,9 +43,9 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
         Criteria criteria = getSession().createCriteria(Location.class);
 
         if (operation == null || operation == Operation.EQUAL) {
-            criteria.add(Restrictions.eq("name", name));
+            criteria.add(Restrictions.eq("lname", name));
         } else if (operation == Operation.LIKE) {
-            criteria.add(Restrictions.like("name", name));
+            criteria.add(Restrictions.like("lname", name));
         }
 
         criteria.setFirstResult(start);
@@ -59,9 +59,9 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
         criteria.setProjection(Projections.rowCount());
 
         if (operation == null || operation == Operation.EQUAL) {
-            criteria.add(Restrictions.eq("name", name));
+            criteria.add(Restrictions.eq("lname", name));
         } else if (operation == Operation.LIKE) {
-            criteria.add(Restrictions.like("name", name));
+            criteria.add(Restrictions.like("lname", name));
         }
 
         Long count = (Long) criteria.uniqueResult();

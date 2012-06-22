@@ -145,6 +145,14 @@ public interface GermplasmDataManager{
      */
     public int countGermplasmByLocationName(String name, Operation op, Database instance) throws QueryException;
 
+    public List<Location> findLocationByName(String name, int start, int numOfRows, Operation op, Database instance) throws QueryException;
+    
+    public int countLocationByName(String name, Operation op, Database instance) throws QueryException;
+    
+    public List<Location> findAllLocation(int start, int numOfRows, Database instance) throws QueryException;
+    
+    public int countAllLocation(Database instance) throws QueryException;
+    
     /**
      * Returns the germplasm records that were created by the methods with names
      * matching the given parameter.

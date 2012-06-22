@@ -12,19 +12,11 @@
 
 package org.generationcp.middleware.manager.test;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.pojos.Attribute;
-import org.generationcp.middleware.pojos.Bibref;
-import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.UserDefinedField;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;

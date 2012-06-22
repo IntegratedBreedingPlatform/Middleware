@@ -26,6 +26,7 @@ import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
+import org.generationcp.middleware.dao.StudyDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -40,6 +41,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.ProgenitorPK;
+import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.util.HibernateUtil;
 import org.hibernate.Session;
@@ -56,6 +58,65 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     public GermplasmDataManagerImpl(HibernateUtil hibernateUtilForLocal, HibernateUtil hibernateUtilForCentral) {
         super(hibernateUtilForLocal, hibernateUtilForCentral);
+    }
+    
+    public List<Location> findAllLocation(int start, int numOfRows, Database instance) throws QueryException {
+        LocationDAO dao = new LocationDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(instance);
+
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return new ArrayList<Location>();
+        }
+
+        List<Location> toreturn = dao.findAll(start, numOfRows);
+        return toreturn;
+    }
+
+    public int countAllLocation(Database instance) throws QueryException {
+        int count = 0;
+        LocationDAO dao = new LocationDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(instance);
+
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+            count = count + dao.countAll().intValue();
+        }
+
+        return count;
+    } 
+    
+    public List<Location> findLocationByName(String name, int start, int numOfRows, Operation op, Database instance) throws QueryException {
+
+        LocationDAO dao = new LocationDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(instance);
+
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return new ArrayList<Location>();
+        }
+
+        List<Location> locationList = dao.findByName(name, start, numOfRows, op);
+
+        return locationList;
+
+    }
+
+    public int countLocationByName(String name, Operation op, Database instance) throws QueryException {
+
+        LocationDAO dao = new LocationDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(instance);
+
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return 0;
+        }
+
+        return dao.countByName(name, op).intValue();
+
     }
 
     public List<Germplasm> findAllGermplasm(int start, int numOfRows, Database instance) throws QueryException {

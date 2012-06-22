@@ -12,7 +12,6 @@
 
 package org.generationcp.middleware.manager.test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.manager.Database;
@@ -23,19 +22,11 @@ import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Attribute;
-import org.generationcp.middleware.pojos.Bibref;
-import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
-import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.UserDefinedField;
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -51,7 +42,53 @@ public class TestGermplasmDataManagerImpl{
         factory = new ManagerFactory(local, central);
         manager = factory.getGermplasmDataManager();
     }
+    
+    @Test
+    public void testAllLocation() throws Exception {
+        long start = System.currentTimeMillis();
+        List<Location> locationList = manager.findAllLocation(0, 5, Database.CENTRAL);
+        Assert.assertTrue(locationList != null);
 
+        System.out.println("SEARCH RESULTS");
+        for (Location l : locationList) {
+            System.out.println(l);
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("QUERY TIME: " + (end - start) + " ms");
+    }
+
+    @Test
+    public void testCountAllLocation() throws Exception {
+        long start = System.currentTimeMillis();
+        int count = manager.countAllLocation(Database.CENTRAL);
+        System.out.println(count);
+        long end = System.currentTimeMillis();
+        System.out.println("QUERY TIME: " + (end - start) + " ms");
+    }     
+
+    @Test
+    public void testFindLocationByName() throws Exception {
+        long start = System.currentTimeMillis();
+        List<Location> locationList = manager.findLocationByName("AFGHANISTAN", 0, 5, Operation.EQUAL, Database.CENTRAL);
+        Assert.assertTrue(locationList != null);
+
+        System.out.println("SEARCH RESULTS");
+        for (Location l : locationList) {
+            System.out.println(l);
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("QUERY TIME: " + (end - start) + " ms");
+    }
+
+    @Test
+    public void testCountLocationByName() throws Exception {
+        long start = System.currentTimeMillis();
+        int count = manager.countLocationByName("AFGHANISTAN", Operation.EQUAL, Database.CENTRAL);
+        System.out.println(count);
+        long end = System.currentTimeMillis();
+        System.out.println("QUERY TIME: " + (end - start) + " ms");
+    }       
+    
     @Test
     public void testFindGermplasmByName() throws Exception {
         long start = System.currentTimeMillis();
