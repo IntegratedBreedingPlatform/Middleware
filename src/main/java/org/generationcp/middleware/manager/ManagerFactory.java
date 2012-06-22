@@ -12,7 +12,13 @@
 
 package org.generationcp.middleware.manager;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
+import java.net.URISyntaxException;
+import java.util.Properties;
 
 import org.generationcp.middleware.exceptions.ConfigException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -22,6 +28,10 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.TraitDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.util.HibernateUtil;
+import org.generationcp.middleware.util.ResourceFinder;
+import org.hibernate.HibernateException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The ManagerFactory gives access to the different Manager implementation
@@ -31,11 +41,79 @@ import org.generationcp.middleware.util.HibernateUtil;
  */
 public class ManagerFactory implements Serializable{
 
+    private final static Logger LOG = LoggerFactory.getLogger(ManagerFactory.class);
+	
     private static final long serialVersionUID = -2846462010022009403L;
 
     private HibernateUtil hibernateUtilForLocal;
     private HibernateUtil hibernateUtilForCentral;
+    
+    private String localHost;
+    private String localPort;
+    private String localDbname;
+    private String localUsername;
+    private String localPassword;
 
+    private String centralHost;
+    private String centralPort;
+    private String centralDbname;
+    private String centralUsername;
+    private String centralPassword;
+
+    
+    public ManagerFactory() {
+    
+	    Properties prop = new Properties();
+	
+	    try {
+	        InputStream in = null;
+	
+	        try {
+	            in = new FileInputStream(new File(ResourceFinder.locateFile("IBPDatasource.properties").toURI()));
+	        } catch (IllegalArgumentException ex) {
+	            in = getClass().getClassLoader().getResourceAsStream("IBPDatasource.properties");
+	        }
+	        prop.load(in);
+	
+	        localHost = prop.getProperty("local.host");
+	        localDbname = prop.getProperty("local.dbname");
+	        localPort = prop.getProperty("local.port");
+	        localUsername = prop.getProperty("local.username");
+	        localPassword = prop.getProperty("local.password");
+	
+	        centralHost = prop.getProperty("central.host");
+	        centralDbname = prop.getProperty("central.dbname");
+	        centralPort = prop.getProperty("central.port");
+	        centralUsername = prop.getProperty("central.username");
+	        centralPassword = prop.getProperty("central.password");
+	
+	        in.close();
+	
+	        DatabaseConnectionParameters paramsForLocal = new DatabaseConnectionParameters(localHost, localPort, localDbname, localUsername,
+	                localPassword);
+	        DatabaseConnectionParameters paramsForCentral = new DatabaseConnectionParameters(centralHost, centralPort, centralDbname,
+	                centralUsername, centralPassword);
+	
+	        validateDatabaseParameters(paramsForLocal, paramsForCentral);
+	        
+	    } catch (URISyntaxException e) {
+	        e.printStackTrace();
+	    } catch (HibernateException e) {
+	        // Log the error
+	        LOG.error(e.toString() + "\n" + e.getStackTrace());
+	        e.printStackTrace();
+	    } catch (ConfigException e) {
+	        // Log the error
+	        LOG.error(e.toString() + "\n" + e.getStackTrace());
+	        e.printStackTrace();
+	    } catch (IOException e) {
+	        // Log the error
+	        LOG.error(e.toString() + "\n" + e.getStackTrace());
+	        e.printStackTrace();
+	    }
+
+    }
+    
     /**
      * This constructor accepts two DatabaseConnectionParameters objects as
      * parameters. The first is used to connect to a local instance of IBDB and
@@ -61,26 +139,41 @@ public class ManagerFactory implements Serializable{
      */
     public ManagerFactory(DatabaseConnectionParameters paramsForLocal, DatabaseConnectionParameters paramsForCentral)
             throws ConfigException {
-        // instantiate HibernateUtil with given db connection parameters
-        // one for local
-        if (paramsForLocal != null) {
-            this.hibernateUtilForLocal = new HibernateUtil(paramsForLocal.getHost(), paramsForLocal.getPort(), paramsForLocal.getDbName(),
-                    paramsForLocal.getUsername(), paramsForLocal.getPassword());
-        } else {
-            this.hibernateUtilForLocal = null;
-        }
-
-        // one for central
-        if (paramsForCentral != null) {
-            this.hibernateUtilForCentral = new HibernateUtil(paramsForCentral.getHost(), paramsForCentral.getPort(),
-                    paramsForCentral.getDbName(), paramsForCentral.getUsername(), paramsForCentral.getPassword());
-        } else {
-            this.hibernateUtilForCentral = null;
-        }
-
-        if (this.hibernateUtilForCentral == null && this.hibernateUtilForLocal == null) {
-            throw new ConfigException("No connection was established because database connection parameters were null.");
-        }
+    	
+    	 validateDatabaseParameters(paramsForLocal, paramsForCentral);
+    	 
+    }
+    
+    private void validateDatabaseParameters(DatabaseConnectionParameters paramsForLocal, DatabaseConnectionParameters paramsForCentral) {
+    	
+		// instantiate HibernateUtil with given db connection parameters
+		// one for local
+		if (paramsForLocal != null) {
+		    this.hibernateUtilForLocal = new HibernateUtil(
+			    paramsForLocal.getHost(), paramsForLocal.getPort(),
+			    paramsForLocal.getDbName(), paramsForLocal.getUsername(),
+			    paramsForLocal.getPassword());
+		} else {
+		    this.hibernateUtilForLocal = null;
+		}
+	
+		// one for central
+		if (paramsForCentral != null) {
+		    this.hibernateUtilForCentral = new HibernateUtil(
+			    paramsForCentral.getHost(), paramsForCentral.getPort(),
+			    paramsForCentral.getDbName(),
+			    paramsForCentral.getUsername(),
+			    paramsForCentral.getPassword());
+		} else {
+		    this.hibernateUtilForCentral = null;
+		}
+	
+		if ((this.hibernateUtilForCentral == null)
+			&& (this.hibernateUtilForLocal == null)) {
+		    throw new ConfigException(
+			    "No connection was established because database connection parameters were null.");
+		}
+    	
     }
 
     public GermplasmDataManager getGermplasmDataManager() {
