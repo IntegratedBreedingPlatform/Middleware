@@ -5,7 +5,6 @@ import java.util.List;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.api.UserDataManager;
-import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.util.HibernateUtil;
 import org.hibernate.Session;
@@ -25,13 +24,13 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
     public List<User> getAllUsers() {
         UserDAO dao = new UserDAO();
         
-        // get the list of Persons from the local instance
+        // get the list of Users from the local instance
         if (hibernateUtilForLocal != null) {
             dao.setSession(hibernateUtilForLocal.getCurrentSession());
         }
         List<User> users = dao.getAll();
         
-        // get the list of Persons from the central instance
+        // get the list of Users from the central instance
         if (hibernateUtilForCentral != null) {
             dao.setSession(hibernateUtilForCentral.getCurrentSession());
         }
@@ -63,7 +62,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
             if (trans != null) {
                 trans.rollback();
             }
-            throw new QueryException("Error encountered while saving Person: " + ex.getMessage(), ex);
+            throw new QueryException("Error encountered while saving User: " + ex.getMessage(), ex);
         } finally {
             hibernateUtilForLocal.closeCurrentSession();
         }
@@ -105,7 +104,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
             if (trans != null) {
                 trans.rollback();
             }
-            throw new QueryException("Error encountered while saving Person: " + ex.getMessage(), ex);
+            throw new QueryException("Error encountered while saving User: " + ex.getMessage(), ex);
         } finally {
             hibernateUtilForLocal.closeCurrentSession();
         }
