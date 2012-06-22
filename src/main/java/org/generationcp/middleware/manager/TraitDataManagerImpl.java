@@ -29,6 +29,8 @@ import org.generationcp.middleware.pojos.ScaleDiscretePK;
 import org.generationcp.middleware.pojos.Trait;
 import org.generationcp.middleware.pojos.TraitMethod;
 import org.generationcp.middleware.util.HibernateUtil;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 public class TraitDataManagerImpl extends DataManager implements TraitDataManager{
 
@@ -255,6 +257,62 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
         }
 
         return dao.getByTraitId(traitId);
+    }
+
+    @Override
+    public void addTraitMethod(TraitMethod traitMethod) throws QueryException {
+        requireLocalDatabaseInstance();
+        
+        Session session = hibernateUtilForLocal.getCurrentSession();
+        Transaction trans = null;
+        
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
+            
+            TraitMethodDAO dao = new TraitMethodDAO();
+            dao.setSession(session);
+            
+            dao.saveOrUpdate(traitMethod);
+            
+            trans.commit();
+        } catch (Exception ex) {
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new QueryException("Error encountered while saving TraitMethod: " + ex.getMessage(), ex);
+        } finally {
+            hibernateUtilForLocal.closeCurrentSession();
+        }
+    }
+
+    @Override
+    public void deleteTraitMethod(TraitMethod traitMethod) throws QueryException {
+        requireLocalDatabaseInstance();
+        
+        Session session = hibernateUtilForLocal.getCurrentSession();
+        Transaction trans = null;
+        
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
+            
+            TraitMethodDAO dao = new TraitMethodDAO();
+            dao.setSession(session);
+            
+            dao.makeTransient(traitMethod);
+            
+            trans.commit();
+        } catch (Exception ex) {
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new QueryException("Error encountered while saving TraitMethod: " + ex.getMessage(), ex);
+        } finally {
+            hibernateUtilForLocal.closeCurrentSession();
+        }
     }
 
 }

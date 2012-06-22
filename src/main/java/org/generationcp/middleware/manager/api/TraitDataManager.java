@@ -168,5 +168,9 @@ public interface TraitDataManager{
      * @return List of TraitMethod POJOs
      */
     public List<TraitMethod> getTraitMethodsByTraitId(Integer traitId);
+    
+    void addTraitMethod(TraitMethod traitmethod) throws QueryException;
+    
+    void deleteTraitMethod(TraitMethod traitmethod) throws QueryException;
 
 }

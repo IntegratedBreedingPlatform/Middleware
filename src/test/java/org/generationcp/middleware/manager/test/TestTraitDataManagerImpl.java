@@ -14,10 +14,12 @@ package org.generationcp.middleware.manager.test;
 
 import java.util.List;
 
+import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.TraitDataManager;
+import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Scale;
 import org.generationcp.middleware.pojos.ScaleContinuous;
 import org.generationcp.middleware.pojos.ScaleDiscrete;
@@ -146,6 +148,25 @@ public class TestTraitDataManagerImpl{
         }
     }
 
+    @Test
+    public void testAddTraitMethod() throws QueryException {
+        TraitMethod traitMethod = new TraitMethod();
+        traitMethod.setId(-1);
+        traitMethod.setAbbreviation("abrev");
+        traitMethod.setDescription("desc");
+        traitMethod.setName("Hoarding Method");
+        traitMethod.setTraitId(-1);
+
+        
+        // add the person
+        manager.addTraitMethod(traitMethod);
+        
+        traitMethod = manager.getTraitMethodById(-1);
+        
+        // delete the person
+        //manager.deleteTraitMethod(traitMethod);
+    }    
+    
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();
