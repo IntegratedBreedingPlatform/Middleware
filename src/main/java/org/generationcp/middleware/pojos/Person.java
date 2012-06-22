@@ -69,6 +69,9 @@ public class Person implements Serializable{
 
     @Column(name = "pnotes")
     private String notes;
+    
+    @Column(name = "contact")
+    private String contact;
 
     public Person() {
     }
@@ -193,6 +196,14 @@ public class Person implements Serializable{
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+    
+    public String getContact() {
+        return contact;
+    }
+
+    public void setContact(String contact) {
+        this.contact = contact;
     }
 
     @Override
