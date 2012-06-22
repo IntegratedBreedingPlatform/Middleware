@@ -28,6 +28,7 @@ public abstract class GenericDAO<T, ID extends Serializable> {
     private Class<T> persistentClass;
     private Session session;
 
+    @SuppressWarnings("unchecked")
     public GenericDAO() {
         this.persistentClass = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
@@ -67,7 +68,6 @@ public abstract class GenericDAO<T, ID extends Serializable> {
         return crit.list();
     }
 
-    @SuppressWarnings("unchecked")
     protected Criteria findByCriteriaWithAliases(List<Criterion> criterion, Map<String, String> aliases) {
         Criteria crit = getSession().createCriteria(getPersistentClass());
 
@@ -83,11 +83,11 @@ public abstract class GenericDAO<T, ID extends Serializable> {
         return crit;
     }
     
-/*    @SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked")
     public List<T> getAll() {
         Criteria criteria = getSession().createCriteria(getPersistentClass());
         return criteria.list();
-    }*/
+    }
 
     @SuppressWarnings("unchecked")
     public List<T> getAll(int start, int numOfRows) {
