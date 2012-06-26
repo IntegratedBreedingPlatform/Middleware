@@ -44,9 +44,9 @@ public class TestGermplasmDataManagerImpl{
     }
     
     @Test
-    public void testAllLocation() throws Exception {
+    public void testGetAllLocations() throws Exception {
         long start = System.currentTimeMillis();
-        List<Location> locationList = manager.findAllLocation(0, 5, Database.CENTRAL);
+        List<Location> locationList = manager.getAllLocations(0, 5);
         Assert.assertTrue(locationList != null);
 
         System.out.println("SEARCH RESULTS");
@@ -58,9 +58,9 @@ public class TestGermplasmDataManagerImpl{
     }
 
     @Test
-    public void testCountAllLocation() throws Exception {
+    public void testCountAllLocations() throws Exception {
         long start = System.currentTimeMillis();
-        int count = manager.countAllLocation(Database.CENTRAL);
+        int count = manager.countAllLocations();
         System.out.println(count);
         long end = System.currentTimeMillis();
         System.out.println("QUERY TIME: " + (end - start) + " ms");
@@ -69,7 +69,7 @@ public class TestGermplasmDataManagerImpl{
     @Test
     public void testFindLocationByName() throws Exception {
         long start = System.currentTimeMillis();
-        List<Location> locationList = manager.findLocationByName("AFGHANISTAN", 0, 5, Operation.EQUAL, Database.CENTRAL);
+        List<Location> locationList = manager.findLocationByName("AFGHANISTAN", 0, 5, Operation.EQUAL);
         Assert.assertTrue(locationList != null);
 
         System.out.println("SEARCH RESULTS");
@@ -83,7 +83,7 @@ public class TestGermplasmDataManagerImpl{
     @Test
     public void testCountLocationByName() throws Exception {
         long start = System.currentTimeMillis();
-        int count = manager.countLocationByName("AFGHANISTAN", Operation.EQUAL, Database.CENTRAL);
+        int count = manager.countLocationByName("AFGHANISTAN", Operation.EQUAL);
         System.out.println(count);
         long end = System.currentTimeMillis();
         System.out.println("QUERY TIME: " + (end - start) + " ms");

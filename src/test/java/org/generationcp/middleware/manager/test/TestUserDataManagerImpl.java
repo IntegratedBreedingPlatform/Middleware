@@ -6,6 +6,7 @@ import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.UserDataManager;
+import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -37,6 +38,14 @@ private final static Logger log = LoggerFactory.getLogger(TestUserDataManagerImp
     }
     
     @Test
+    public void testCountAllUsers() {
+    	
+        int count = manager.countAllUsers();
+        
+        log.info("Retrieved users count:" + count);
+    }  
+    
+    @Test
     public void testAddUser() throws QueryException {
         User user = new User();
         user.setUserid(-1);
@@ -57,4 +66,50 @@ private final static Logger log = LoggerFactory.getLogger(TestUserDataManagerImp
         
         manager.deleteUser(user);
     }
+ 
+    @Test
+    public void testGetAllPersons() {
+        List<Person> persons = manager.getAllPersons();
+        
+        log.info("Retrieved {} persons:", persons.size());
+        for (Person person : persons) {
+        	log.info("{} {} {}", new Object[] { person.getFirstName(), person.getMiddleName(), person.getLastName() });
+        }
+    }
+    
+    @Test
+    public void testCountAllPersons() {
+    	
+        int count = manager.countAllPersons();
+        
+        log.info("Retrieved persons count:" + count);
+    }   
+    
+    @Test
+    public void testAddPerson() throws QueryException {
+        Person person = new Person();
+        person.setId(-1);
+        person.setInstituteId(1);
+        person.setFirstName("Lich");
+        person.setMiddleName("Frozen");
+        person.setLastName("King");
+        person.setPositionName("King of Icewind Dale");
+        person.setTitle("His Highness");
+        person.setExtension("1");
+        person.setFax("2");
+        person.setEmail("lichking@blizzard.com");
+        person.setNotes("notes");
+        person.setContact("3");
+        person.setLanguage(-1);
+        person.setPhone("4");
+        
+        // add the person
+        manager.addPerson(person);
+        
+        person = manager.getPersonById(-1);
+        
+        // delete the person
+        manager.deletePerson(person);
+    }
+    
 }

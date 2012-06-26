@@ -24,19 +24,6 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 public class LocationDAO extends GenericDAO<Location, Integer>{
-
-    public List<Location> findAll(int start, int numOfRows) throws QueryException {
-        try {
-            Query query = getSession().getNamedQuery(Location.FIND_ALL);
-            query.setFirstResult(start);
-            query.setMaxResults(numOfRows);
-
-            List results = query.list();
-            return results;
-        } catch (HibernateException ex) {
-            throw new QueryException("Error with find all query for Location: " + ex.getMessage());
-        }
-    }
 	
     @SuppressWarnings("unchecked")
     public List<Location> findByName(String name, int start, int numOfRows, Operation operation) {

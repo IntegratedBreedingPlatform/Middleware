@@ -36,7 +36,7 @@ import org.generationcp.middleware.pojos.UserDefinedField;
  * @author Kevin Manansala
  * 
  */
-public interface GermplasmDataManager{
+public interface GermplasmDataManager {
 
     /**
      * Searches for all germplasm records which matches the given name. Three
@@ -132,26 +132,69 @@ public interface GermplasmDataManager{
             throws QueryException;
 
     /**
-     * Returns the number of germplasm records that were created at the
-     * locations with names matching the given parameter.
+     * Returns the number of germplasm records that were created at the locations with
+     * names matching the given parameter.
+     * 
+     * @param name
+     *            - search string for the name of the locations
+     * @param op
+     *            - can be EQUAL like LIKE
+     * @param instance
+     *            - can be Database.CENTRAL or Database.LOCAL
+     * @return Number of Germplasms
+     * @throws QueryException
+     */    
+    int countGermplasmByLocationName(String name, Operation op, Database instance) throws QueryException;
+
+
+    /**
+     * Returns the Location records that were created at the locations with
+     * names matching the given parameter.
+     * 
+     * @param name
+     *            - search string for the name of the locations
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
+     * @param op
+     *            - can be EQUAL like LIKE
+     * @return List of Location POJOs
+     * @throws QueryException
+     */
+    List<Location> findLocationByName(String name, int start, int numOfRows, Operation op) throws QueryException;
+    
+    /**
+     * Returns the number of Locations with
+     * names matching the given parameter.
+     * 
+     * @param name
+     *            - search string for the name of the locations
+     * @param op
+     *            - can be EQUAL like LIKE
+     * @return Number of Locations
+     * @throws QueryException
+     */
+    int countLocationByName(String name, Operation op) throws QueryException;
+    
+    /**
+     * Returns all Locations
      * 
      * @param name
      *            - search string for the name or the locations
      * @param op
      *            - can be EQUAL or LIKE
-     * @param instance
-     *            - can be Database.CENTRAL or Database.LOCAL
-     * @return the number of germplasm records
-     */
-    public int countGermplasmByLocationName(String name, Operation op, Database instance) throws QueryException;
-
-    public List<Location> findLocationByName(String name, int start, int numOfRows, Operation op, Database instance) throws QueryException;
+     * @return gets all Locations
+     */   
+    public List<Location> getAllLocations(int start, int numOfRows) throws QueryException;
     
-    public int countLocationByName(String name, Operation op, Database instance) throws QueryException;
-    
-    public List<Location> findAllLocation(int start, int numOfRows, Database instance) throws QueryException;
-    
-    public int countAllLocation(Database instance) throws QueryException;
+    /**
+     * Returns number of all Locations
+     * 
+     * @return the number of all Locations
+     */   
+    public int countAllLocations() throws QueryException;
     
     /**
      * Returns the germplasm records that were created by the methods with names

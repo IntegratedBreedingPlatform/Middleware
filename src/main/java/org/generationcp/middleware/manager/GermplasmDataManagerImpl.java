@@ -42,6 +42,7 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.ProgenitorPK;
 import org.generationcp.middleware.pojos.Study;
+import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.util.HibernateUtil;
 import org.hibernate.Session;
@@ -54,68 +55,96 @@ import org.hibernate.Transaction;
  * @author Kevin Manansala, Lord Hendrix Barboza
  * 
  */
-public class GermplasmDataManagerImpl extends DataManager implements GermplasmDataManager{
+public class GermplasmDataManagerImpl extends DataManager implements GermplasmDataManager {
 
     public GermplasmDataManagerImpl(HibernateUtil hibernateUtilForLocal, HibernateUtil hibernateUtilForCentral) {
         super(hibernateUtilForLocal, hibernateUtilForCentral);
     }
     
-    public List<Location> findAllLocation(int start, int numOfRows, Database instance) throws QueryException {
+    public List<Location> getAllLocations(int start, int numOfRows) throws QueryException {
         LocationDAO dao = new LocationDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(instance);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
-        } else {
-            return new ArrayList<Location>();
+        // get the list of Location from the local instance
+        if (hibernateUtilForLocal != null) {
+            dao.setSession(hibernateUtilForLocal.getCurrentSession());
         }
-
-        List<Location> toreturn = dao.findAll(start, numOfRows);
-        return toreturn;
+        List<Location> locations = dao.getAll();
+        
+        // get the list of Location from the central instance
+        if (hibernateUtilForCentral != null) {
+            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+        }
+        
+        List<Location> centralLocations = dao.getAll();
+        
+        locations.addAll(centralLocations);
+        
+        return locations;
     }
 
-    public int countAllLocation(Database instance) throws QueryException {
+    public int countAllLocations() throws QueryException {
+    	
         int count = 0;
+        
         LocationDAO dao = new LocationDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(instance);
-
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
-            count = count + dao.countAll().intValue();
+        
+        if (hibernateUtilForLocal != null) {
+            dao.setSession(hibernateUtilForLocal.getCurrentSession());
         }
+        
+        count = dao.countAll().intValue();
+        
+        // get the list of Users from the central instance
+        if (hibernateUtilForCentral != null) {
+            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+        }
+        
+        count = count + dao.countAll().intValue();
 
         return count;
     } 
     
-    public List<Location> findLocationByName(String name, int start, int numOfRows, Operation op, Database instance) throws QueryException {
+    public List<Location> findLocationByName(String name, int start, int numOfRows, Operation op) throws QueryException {
 
         LocationDAO dao = new LocationDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(instance);
-
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
-        } else {
-            return new ArrayList<Location>();
+        
+        if (hibernateUtilForLocal != null) {
+            dao.setSession(hibernateUtilForLocal.getCurrentSession());
         }
-
-        List<Location> locationList = dao.findByName(name, start, numOfRows, op);
-
-        return locationList;
+        List<Location> locations = dao.findByName(name, start, numOfRows, op);
+        
+        // get the list of Location from the central instance
+        if (hibernateUtilForCentral != null) {
+            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+        }
+        
+        List<Location> centralLocations =  dao.findByName(name, start, numOfRows, op);
+        
+        locations.addAll(centralLocations);
+        
+        return locations;
 
     }
 
-    public int countLocationByName(String name, Operation op, Database instance) throws QueryException {
-
+    public int countLocationByName(String name, Operation op) throws QueryException {
+    	
+    	int count = 0;
+    	
         LocationDAO dao = new LocationDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(instance);
-
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
-        } else {
-            return 0;
+        
+        if (hibernateUtilForLocal != null) {
+            dao.setSession(hibernateUtilForLocal.getCurrentSession());
         }
-
-        return dao.countByName(name, op).intValue();
+        count = dao.countByName(name, op).intValue();
+        
+        // get the list of Location from the central instance
+        if (hibernateUtilForCentral != null) {
+            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+        }
+        
+        count = count + dao.countByName(name, op).intValue();
+        
+        return count;
 
     }
 

@@ -24,7 +24,6 @@ import org.generationcp.middleware.exceptions.ConfigException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
-import org.generationcp.middleware.manager.api.PersonDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.TraitDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
@@ -200,14 +199,6 @@ public class ManagerFactory implements Serializable{
         } else {
             return new InventoryDataManagerImpl(this.hibernateUtilForLocal, this.hibernateUtilForCentral);
         }
-    }
-    
-    public PersonDataManager getPersonDataManager() throws ConfigException {
-        if (this.hibernateUtilForLocal == null) {
-            throw new ConfigException("The PersonDataManager needs a connection to a local IBDB instance which is not provided.");
-        }
-        
-        return new PersonDataManagerImpl(hibernateUtilForLocal, hibernateUtilForCentral);
     }
     
     public UserDataManager getUserDataManager() {
