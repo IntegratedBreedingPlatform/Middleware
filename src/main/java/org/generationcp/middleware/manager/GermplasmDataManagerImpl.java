@@ -64,20 +64,19 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public List<Location> getAllLocations(int start, int numOfRows) throws QueryException {
         LocationDAO dao = new LocationDAO();
 
+        List<Location> locations = new ArrayList<Location>();
+        
         // get the list of Location from the local instance
         if (hibernateUtilForLocal != null) {
             dao.setSession(hibernateUtilForLocal.getCurrentSession());
+            locations.addAll(dao.getAll());
         }
-        List<Location> locations = dao.getAll();
-        
+         
         // get the list of Location from the central instance
         if (hibernateUtilForCentral != null) {
             dao.setSession(hibernateUtilForCentral.getCurrentSession());
+            locations.addAll(dao.getAll());
         }
-        
-        List<Location> centralLocations = dao.getAll();
-        
-        locations.addAll(centralLocations);
         
         return locations;
     }
@@ -90,17 +89,15 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         
         if (hibernateUtilForLocal != null) {
             dao.setSession(hibernateUtilForLocal.getCurrentSession());
+            count = count + dao.countAll().intValue();
         }
-        
-        count = dao.countAll().intValue();
         
         // get the list of Users from the central instance
         if (hibernateUtilForCentral != null) {
             dao.setSession(hibernateUtilForCentral.getCurrentSession());
+            count = count + dao.countAll().intValue();
         }
         
-        count = count + dao.countAll().intValue();
-
         return count;
     } 
     

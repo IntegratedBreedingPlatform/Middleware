@@ -1,5 +1,6 @@
 package org.generationcp.middleware.manager;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.dao.PersonDAO;
@@ -26,19 +27,20 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
     public List<User> getAllUsers() {
         UserDAO dao = new UserDAO();
         
+        List<User> users = new ArrayList<User>();
+        
         // get the list of Users from the local instance
         if (hibernateUtilForLocal != null) {
             dao.setSession(hibernateUtilForLocal.getCurrentSession());
+            users.addAll(dao.getAll());
         }
-        List<User> users = dao.getAll();
         
         // get the list of Users from the central instance
         if (hibernateUtilForCentral != null) {
             dao.setSession(hibernateUtilForCentral.getCurrentSession());
+            users.addAll(dao.getAll());
         }
-        List<User> centralUsers = dao.getAll();
         
-        users.addAll(centralUsers);
         return users;
     }
     
@@ -50,17 +52,15 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
         
         if (hibernateUtilForLocal != null) {
             dao.setSession(hibernateUtilForLocal.getCurrentSession());
+            count = count + dao.countAll().intValue();
         }
-        
-        count = dao.countAll().intValue();
         
         // get the list of Users from the central instance
         if (hibernateUtilForCentral != null) {
             dao.setSession(hibernateUtilForCentral.getCurrentSession());
+            count = count + dao.countAll().intValue();
         }
         
-        count = count + dao.countAll().intValue();
-
         return count;
     }  
 
@@ -138,19 +138,20 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
     public List<Person> getAllPersons() {
         PersonDAO dao = new PersonDAO();
         
+        List<Person> persons = new ArrayList<Person>();
+        
         // get the list of Persons from the local instance
         if (hibernateUtilForLocal != null) {
             dao.setSession(hibernateUtilForLocal.getCurrentSession());
+            persons.addAll(dao.getAll());
         }
-        List<Person> persons = dao.getAll();
         
         // get the list of Persons from the central instance
         if (hibernateUtilForCentral != null) {
             dao.setSession(hibernateUtilForCentral.getCurrentSession());
+            persons.addAll(dao.getAll());
         }
-        List<Person> centralPersons = dao.getAll();
         
-        persons.addAll(centralPersons);
         return persons;
     }
     
@@ -162,17 +163,15 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
         
         if (hibernateUtilForLocal != null) {
             dao.setSession(hibernateUtilForLocal.getCurrentSession());
+            count = count + dao.countAll().intValue();
         }
-        
-        count = dao.countAll().intValue();
         
         // get the list of Users from the central instance
         if (hibernateUtilForCentral != null) {
             dao.setSession(hibernateUtilForCentral.getCurrentSession());
+            count = count + dao.countAll().intValue();
         }
         
-        count = count + dao.countAll().intValue();
-
         return count;
     }    
 
