@@ -28,8 +28,7 @@ public class VariateDAO extends GenericDAO<Variate, Integer>{
             Query query = getSession().getNamedQuery(Variate.GET_VARIATES_BY_STUDYID);
             query.setParameter("studyId", studyId);
 
-            List<Variate> results = query.list();
-            return results;
+            return (List<Variate>) query.list();
         } catch (HibernateException ex) {
             throw new QueryException("Error with get Variates by Study ID query: " + ex.getMessage());
         }
@@ -42,8 +41,7 @@ public class VariateDAO extends GenericDAO<Variate, Integer>{
             query.setParameter("representationId", representationId);
             query.addEntity("v", Variate.class);
 
-            List<Variate> results = query.list();
-            return results;
+            return (List<Variate>) query.list();
         } catch (HibernateException ex) {
             throw new QueryException("Error with get Variates by Representation ID query: " + ex.getMessage());
         }

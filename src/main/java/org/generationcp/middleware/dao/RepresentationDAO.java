@@ -27,20 +27,19 @@ public class RepresentationDAO extends GenericDAO<Representation, Integer>{
             Query query = getSession().getNamedQuery(Representation.GET_REPRESENTATION_BY_EFFECT_ID);
             query.setParameter("effectId", effectId);
 
-            List<Representation> results = query.list();
-            return results;
+            return (List<Representation>) query.list();
         } catch (HibernateException ex) {
             throw new QueryException("Error with get representation by effect id query: " + ex.getMessage());
         }
     }
 
+    @SuppressWarnings("unchecked")
     public List<Representation> getRepresentationByStudyID(Integer studyId) throws QueryException {
         try {
             Query query = getSession().getNamedQuery(Representation.GET_REPRESENTATION_BY_STUDY_ID);
             query.setParameter("studyId", studyId);
 
-            List<Representation> results = query.list();
-            return results;
+            return (List<Representation>) query.list();
         } catch (HibernateException ex) {
             throw new QueryException("Error with get representation by study id query: " + ex.getMessage());
         }

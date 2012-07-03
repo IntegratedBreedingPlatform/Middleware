@@ -26,7 +26,6 @@ import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
-import org.generationcp.middleware.dao.StudyDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -41,8 +40,6 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.ProgenitorPK;
-import org.generationcp.middleware.pojos.Study;
-import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.util.HibernateUtil;
 import org.hibernate.Session;
@@ -56,7 +53,7 @@ import org.hibernate.Transaction;
  * 
  */
 public class GermplasmDataManagerImpl extends DataManager implements GermplasmDataManager {
-
+    
     public GermplasmDataManagerImpl(HibernateUtil hibernateUtilForLocal, HibernateUtil hibernateUtilForCentral) {
         super(hibernateUtilForLocal, hibernateUtilForCentral);
     }
@@ -155,8 +152,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             return new ArrayList<Germplasm>();
         }
 
-        List<Germplasm> toreturn = dao.findAll(start, numOfRows);
-        return toreturn;
+        return (List<Germplasm>) dao.findAll(start, numOfRows);
     }
 
     public int countAllGermplasm(Database instance) throws QueryException {
@@ -182,9 +178,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             return new ArrayList<Germplasm>();
         }
 
-        List<Germplasm> toreturn = dao.findByPrefName(name, start, numOfRows);
-        return toreturn;
-
+        return (List<Germplasm>) dao.findByPrefName(name, start, numOfRows);
     }
 
     public int countGermplasmByPrefName(String name) throws QueryException {
@@ -381,8 +375,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             return null;
         }
 
-        Germplasm germplasm = dao.findById(gid, false);
-        return germplasm;
+        return (Germplasm) dao.findById(gid, false);
     }
 
     @Override
@@ -396,8 +389,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             return null;
         }
 
-        Germplasm germplasm = dao.getByGIDWithPrefName(gid);
-        return germplasm;
+        return (Germplasm) dao.getByGIDWithPrefName(gid);
     }
 
     @Override
@@ -411,8 +403,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             return null;
         }
 
-        Germplasm germplasm = dao.getByGIDWithPrefAbbrev(gid);
-        return germplasm;
+        return (Germplasm) dao.getByGIDWithPrefAbbrev(gid);
     }
 
     @Override
@@ -426,8 +417,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             return null;
         }
 
-        Name name = dao.findById(id, false);
-        return name;
+        return (Name) dao.findById(id, false);
     }
 
     @Override
@@ -441,8 +431,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             return new ArrayList<Name>();
         }
 
-        List<Name> names = dao.getByGIDWithFilters(gid, status, type);
-        return names;
+        return (List<Name>) dao.getByGIDWithFilters(gid, status, type); //names
     }
 
     @Override
@@ -509,7 +498,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     private void updateGermplasmPrefNameAbbrev(Integer gid, String newPrefValue, String nameOrAbbrev) throws QueryException {
         if (hibernateUtilForLocal == null) {
-            throw new QueryException("There is no connection to a local instance.");
+            throw new QueryException(NO_LOCAL_INSTANCE_MSG);
         }
 
         // initialize session & transaction
@@ -533,10 +522,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                 int newNstat = 0; // nstat to be assigned to newPref: 1 for
                 // Name, 2 for Abbreviation
 
-                if (nameOrAbbrev.equals("Name")) {
+                if ("Name".equals(nameOrAbbrev)) {
                     oldPref = getPreferredNameByGID(gid);
                     newNstat = 1;
-                } else if (nameOrAbbrev.equals("Abbreviation")) {
+                } else if ("Abbreviation".equals(nameOrAbbrev)) {
                     oldPref = getPreferredAbbrevByGID(gid);
                     newNstat = 2;
                 }
@@ -599,7 +588,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     private int addOrUpdateGermplasmName(List<Name> names, Operation operation) throws QueryException {
         if (hibernateUtilForLocal == null) {
-            throw new QueryException("There is no connection to a local instance.");
+            throw new QueryException(NO_LOCAL_INSTANCE_MSG);
         }
 
         // initialize session & transaction
@@ -656,8 +645,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         } else {
             return null;
         }
-        List<Attribute> attributes = dao.getByGID(gid);
-        return attributes;
+        return (List<Attribute>) dao.getByGID(gid); //attributes
     }
 
     @Override
@@ -671,9 +659,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             return null;
         }
 
-        Method method = dao.findById(id, false);
-        return method;
-
+        return (Method) dao.findById(id, false);
     }
 
     @Override
@@ -707,8 +693,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             return null;
         }
 
-        UserDefinedField field = dao.findById(id, false);
-        return field;
+        return (UserDefinedField) dao.findById(id, false);
     }
 
     @Override
@@ -745,7 +730,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public int addLocation(Location location) throws QueryException {
         if (hibernateUtilForLocal == null) {
-            throw new QueryException("There is no connection to a local instance.");
+            throw new QueryException(NO_LOCAL_INSTANCE_MSG);
         }
 
         // initialize session & transaction
@@ -798,7 +783,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public int addBibliographicReference(Bibref bibref) throws QueryException {
         if (hibernateUtilForLocal == null) {
-            throw new QueryException("There is no connection to a local instance.");
+            throw new QueryException(NO_LOCAL_INSTANCE_MSG);
         }
 
         // initialize session & transaction
@@ -1370,13 +1355,13 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         if (germplasm == null) {
             return null;
         } else if (steps == 0 || germplasm.getGnpgs() != -1) {
-            return new Object[] { germplasm, new Integer(steps) };
+            return new Object[] { germplasm, Integer.valueOf(steps) };
         } else {
             Object[] returned = traceDerivativeRoot(germplasm.getGpid2(), steps - 1);
             if (returned != null) {
                 return returned;
             } else {
-                return new Object[] { germplasm, new Integer(steps) };
+                return new Object[] { germplasm, Integer.valueOf(steps) };
             }
         }
     }
@@ -1449,7 +1434,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     private int addOrUpdateAttributes(List<Attribute> attributes, Operation operation) throws QueryException {
         if (hibernateUtilForLocal == null) {
-            throw new QueryException("There is no connection to a local instance.");
+            throw new QueryException(NO_LOCAL_INSTANCE_MSG);
         }
 
         // initialize session & transaction
@@ -1509,7 +1494,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public boolean updateProgenitor(Integer gid, Integer progenitorId, Integer progenitorNumber) throws QueryException {
         if (hibernateUtilForLocal == null) {
-            throw new QueryException("There is no connection to a local instance.");
+            throw new QueryException(NO_LOCAL_INSTANCE_MSG);
         }
 
         // check if the germplasm record identified by gid exists
@@ -1584,7 +1569,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     private int addOrUpdateGermplasms(List<Germplasm> germplasms, Operation operation) throws QueryException {
         if (hibernateUtilForLocal == null) {
-            throw new QueryException("There is no connection to a local instance.");
+            throw new QueryException(NO_LOCAL_INSTANCE_MSG);
         }
 
         // initialize session & transaction
@@ -1635,7 +1620,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     private int addOrUpdateProgenitors(List<Progenitor> progenitors) throws QueryException {
         if (hibernateUtilForLocal == null) {
-            throw new QueryException("There is no connection to a local instance.");
+            throw new QueryException(NO_LOCAL_INSTANCE_MSG);
         }
 
         // initialize session & transaction
@@ -1684,7 +1669,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public int addGermplasm(Germplasm germplasm, Name preferredName) throws QueryException {
         Map<Germplasm, Name> germplasmNameMap = new HashMap<Germplasm, Name>();
-        germplasm.setGid(new Integer(1));
+        germplasm.setGid(Integer.valueOf(1));
         germplasmNameMap.put(germplasm, preferredName);
         return addGermplasm(germplasmNameMap);
     }
@@ -1692,7 +1677,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public int addGermplasm(Map<Germplasm, Name> germplasmNameMap) throws QueryException {
         if (hibernateUtilForLocal == null) {
-            throw new QueryException("There is no connection to a local instance.");
+            throw new QueryException(NO_LOCAL_INSTANCE_MSG);
         }
 
         // initialize session & transaction
@@ -1716,11 +1701,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                 // Auto-assign negative IDs for new local DB records
                 Integer negativeId = dao.getNegativeId("gid");
                 germplasm.setGid(negativeId);
-                germplasm.setLgid(new Integer(0));
+                germplasm.setLgid(Integer.valueOf(0));
 
                 Integer nameId = nameDao.getNegativeId("nid");
                 name.setNid(nameId);
-                name.setNstat(new Integer(1));
+                name.setNstat(Integer.valueOf(1));
                 name.setGermplasmId(negativeId);
 
                 dao.saveOrUpdate(germplasm);

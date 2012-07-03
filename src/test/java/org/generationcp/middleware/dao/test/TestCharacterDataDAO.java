@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.dao.CharacterDataDAO;
-import org.generationcp.middleware.pojos.NumericRange;
 import org.generationcp.middleware.pojos.TraitCombinationFilter;
 import org.generationcp.middleware.util.HibernateUtil;
 import org.junit.After;
@@ -38,14 +37,15 @@ public class TestCharacterDataDAO{
 
     @Test
     public void testGetObservationUnitIdsByTraitScaleMethodAndValueCombinations() throws Exception {
-        TraitCombinationFilter combination = new TraitCombinationFilter(new Integer(1101), new Integer(163), new Integer(335), "7");
+        TraitCombinationFilter combination = new TraitCombinationFilter(Integer.valueOf(1101), Integer.valueOf(163), Integer.valueOf(335), "7");
         List<TraitCombinationFilter> filters = new ArrayList<TraitCombinationFilter>();
         filters.add(combination);
 
         List<Integer> results = dao.getObservationUnitIdsByTraitScaleMethodAndValueCombinations(filters, 0, 10);
         System.out.println("RESULTS:");
-        for (Integer result : results)
+        for (Integer result : results){
             System.out.println(result);
+        }
     }
 
     @After

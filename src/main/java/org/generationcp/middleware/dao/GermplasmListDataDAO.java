@@ -38,8 +38,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
         criteria.createAlias("list", "l");
         criteria.add(Restrictions.eq("l.id", id));
         criteria.setProjection(Projections.rowCount());
-        Long count = (Long) criteria.uniqueResult();
-        return count;
+        return (Long) criteria.uniqueResult(); //count
     }
 
     @SuppressWarnings("unchecked")
@@ -56,8 +55,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
         criteria.createAlias("list", "l");
         criteria.add(Restrictions.eq("l.id", listId));
         criteria.add(Restrictions.eq("entryId", entryId));
-        GermplasmListData result = (GermplasmListData) criteria.uniqueResult();
-        return result;
+        return (GermplasmListData) criteria.uniqueResult();
     }
 
     @SuppressWarnings("unchecked")
@@ -73,8 +71,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
         Criteria criteria = getSession().createCriteria(GermplasmListData.class);
         criteria.add(Restrictions.eq("gid", gid));
         criteria.setProjection(Projections.rowCount());
-        Long count = (Long) criteria.uniqueResult();
-        return count;
+        return (Long) criteria.uniqueResult(); //count
     }
 
     public int deleteByListId(Integer listId) {

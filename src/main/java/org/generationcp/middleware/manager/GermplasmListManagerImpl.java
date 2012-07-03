@@ -263,7 +263,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     private int addOrUpdateGermplasmList(List<GermplasmList> germplasmLists, Operation operation) throws QueryException {
         if (hibernateUtilForLocal == null) {
-            throw new QueryException("There is no connection to a local instance.");
+            throw new QueryException(NO_LOCAL_INSTANCE_MSG);
         }
 
         // initialize session & transaction
@@ -327,7 +327,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     @Override
     public int deleteGermplasmList(List<GermplasmList> germplasmLists) throws QueryException {
         if (hibernateUtilForLocal == null) {
-            throw new QueryException("There is no connection to a local instance.");
+            throw new QueryException(NO_LOCAL_INSTANCE_MSG);
         }
 
         // initialize session & transaction
@@ -387,7 +387,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     private int addOrUpdateGermplasmListData(List<GermplasmListData> germplasmListDatas, Operation operation) throws QueryException {
         if (hibernateUtilForLocal == null) {
-            throw new QueryException("There is no connection to a local instance.");
+            throw new QueryException(NO_LOCAL_INSTANCE_MSG);
         }
 
         // initialize session & transaction
@@ -438,7 +438,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     @Override
     public int deleteGermplasmListDataByListId(Integer listId) throws QueryException {
         if (hibernateUtilForLocal == null) {
-            throw new QueryException("There is no connection to a local instance.");
+            throw new QueryException(NO_LOCAL_INSTANCE_MSG);
         }
 
         // initialize session & transaction
@@ -485,7 +485,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     @Override
     public int deleteGermplasmListData(List<GermplasmListData> germplasmListDatas) throws QueryException {
         if (hibernateUtilForLocal == null) {
-            throw new QueryException("There is no connection to a local instance.");
+            throw new QueryException(NO_LOCAL_INSTANCE_MSG);
         }
 
         // initialize session & transaction

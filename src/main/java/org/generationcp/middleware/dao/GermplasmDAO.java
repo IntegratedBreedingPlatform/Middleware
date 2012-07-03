@@ -27,19 +27,20 @@ import org.hibernate.SQLQuery;
 
 public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 
+    @SuppressWarnings("unchecked")
     public List<Germplasm> findAll(int start, int numOfRows) throws QueryException {
         try {
             Query query = getSession().getNamedQuery(Germplasm.FIND_ALL);
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
 
-            List results = query.list();
-            return results;
+            return query.list();
         } catch (HibernateException ex) {
             throw new QueryException("Error with find all query for Germplasm: " + ex.getMessage());
         }
     }
 
+    @SuppressWarnings("unchecked")
     public List<Germplasm> findByPrefName(String name, int start, int numOfRows) throws QueryException {
         try {
             Query query = getSession().getNamedQuery(Germplasm.FIND_BY_PREF_NAME);
@@ -47,8 +48,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
 
-            List results = query.list();
-            return results;
+            return query.list();
         } catch (HibernateException ex) {
             throw new QueryException("Error with find by preferred name query for Germplasm: " + ex.getMessage());
         }
@@ -58,8 +58,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         try {
             Query query = getSession().createSQLQuery(Germplasm.COUNT_BY_PREF_NAME);
             query.setParameter("name", name);
-            BigInteger result = (BigInteger) query.uniqueResult();
-            return result;
+            return (BigInteger) query.uniqueResult();
         } catch (HibernateException ex) {
             throw new QueryException("Error with count by preferred name for Germplasm: " + ex.getMessage());
         }
@@ -93,7 +92,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         }
 
         if (type != null) {
-            query.setParameter("ntype", new Integer(type.getUserDefinedFieldID()));
+            query.setParameter("ntype", Integer.valueOf(type.getUserDefinedFieldID()));
         }
 
         query.setFirstResult(start);
@@ -148,11 +147,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         }
 
         if (type != null) {
-            query.setParameter("ntype", new Integer(type.getUserDefinedFieldID()));
+            query.setParameter("ntype", Integer.valueOf(type.getUserDefinedFieldID()));
         }
 
-        BigInteger count = (BigInteger) query.uniqueResult();
-        return count;
+        return (BigInteger) query.uniqueResult();
 
         /**
          * Criteria criteria = getSession().createCriteria(Germplasm.class);
@@ -183,8 +181,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
 
-            List<Germplasm> results = query.list();
-            return results;
+            return (List<Germplasm>) query.list();
         } catch (HibernateException ex) {
             throw new QueryException("Error with find by method name query using equal for Germplasm: " + ex.getMessage());
         }
@@ -194,8 +191,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         try {
             Query query = getSession().getNamedQuery(Germplasm.COUNT_BY_METHOD_NAME_USING_EQUAL);
             query.setParameter("name", name);
-            Long result = (Long) query.uniqueResult();
-            return result;
+            return (Long) query.uniqueResult();
         } catch (HibernateException ex) {
             throw new QueryException("Error with count by method name using equal for Germplasm: " + ex.getMessage());
         }
@@ -209,8 +205,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
 
-            List<Germplasm> results = query.list();
-            return results;
+            return (List<Germplasm>) query.list();
         } catch (HibernateException ex) {
             throw new QueryException("Error with find by method name using like query for Germplasm: " + ex.getMessage());
         }
@@ -220,8 +215,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         try {
             Query query = getSession().getNamedQuery(Germplasm.COUNT_BY_METHOD_NAME_USING_LIKE);
             query.setParameter("name", name);
-            Long result = (Long) query.uniqueResult();
-            return result;
+            return (Long) query.uniqueResult();
         } catch (HibernateException ex) {
             throw new QueryException("Error with count by method name using like for Germplasm: " + ex.getMessage());
         }
@@ -235,8 +229,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
 
-            List<Germplasm> results = query.list();
-            return results;
+            return (List<Germplasm>) query.list();
         } catch (HibernateException ex) {
             throw new QueryException("Error with find by location name query using equal for Germplasm: " + ex.getMessage());
         }
@@ -246,8 +239,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         try {
             Query query = getSession().getNamedQuery(Germplasm.COUNT_BY_LOCATION_NAME_USING_EQUAL);
             query.setParameter("name", name);
-            Long result = (Long) query.uniqueResult();
-            return result;
+            return (Long) query.uniqueResult();
         } catch (HibernateException ex) {
             throw new QueryException("Error with count by location name using equal for Germplasm: " + ex.getMessage());
         }

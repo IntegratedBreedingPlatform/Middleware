@@ -22,6 +22,8 @@ import org.generationcp.middleware.util.HibernateUtil;
  */
 public abstract class DataManager {
 
+    public final static String NO_LOCAL_INSTANCE_MSG = "There is no connection to a local instance.";
+
     /** The hibernate util for local. */
     protected HibernateUtil hibernateUtilForLocal;
 

@@ -72,7 +72,7 @@ public class ManagerFactory implements Serializable{
 	        try {
 	            in = new FileInputStream(new File(ResourceFinder.locateFile("IBPDatasource.properties").toURI()));
 	        } catch (IllegalArgumentException ex) {
-	            in = getClass().getClassLoader().getResourceAsStream("IBPDatasource.properties");
+	            in = Thread.currentThread().getContextClassLoader().getResourceAsStream("IBPDatasource.properties");
 	        }
 	        prop.load(in);
 	
@@ -100,15 +100,12 @@ public class ManagerFactory implements Serializable{
 	    } catch (URISyntaxException e) {
 	        e.printStackTrace();
 	    } catch (HibernateException e) {
-	        // Log the error
 	        LOG.error(e.toString() + "\n" + e.getStackTrace());
 	        e.printStackTrace();
 	    } catch (ConfigException e) {
-	        // Log the error
 	        LOG.error(e.toString() + "\n" + e.getStackTrace());
 	        e.printStackTrace();
 	    } catch (IOException e) {
-	        // Log the error
 	        LOG.error(e.toString() + "\n" + e.getStackTrace());
 	        e.printStackTrace();
 	    }

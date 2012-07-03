@@ -32,8 +32,7 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
 
-            List<Study> results = query.list();
-            return results;
+            return (List<Study>) query.list();
         } catch (HibernateException ex) {
             throw new QueryException("Error with find by  name query using equal for Study: " + ex.getMessage());
         }
@@ -47,8 +46,7 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
 
-            List<Study> results = query.list();
-            return results;
+            return (List<Study>) query.list();
         } catch (HibernateException ex) {
             throw new QueryException("Error with find by  name query using like for Study: " + ex.getMessage());
         }
@@ -77,11 +75,10 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
             Criteria crit = getSession().createCriteria(Study.class);
             // top level studies are studies without parent folders (shierarchy
             // = 0)
-            crit.add(Restrictions.eq("hierarchy", new Integer(0)));
+            crit.add(Restrictions.eq("hierarchy", Integer.valueOf(0)));
             crit.setFirstResult(start);
             crit.setMaxResults(numOfRows);
-            List<Study> topLevelStudies = crit.list();
-            return topLevelStudies;
+            return (List<Study>) crit.list();
         } catch (HibernateException ex) {
             throw new QueryException("Error with retrieving top level Studies: " + ex.getMessage());
         }
@@ -95,8 +92,7 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
             crit.add(Restrictions.eq("hierarchy", parentFolderId));
             crit.setFirstResult(start);
             crit.setMaxResults(numOfRows);
-            List<Study> studies = crit.list();
-            return studies;
+            return (List<Study>) crit.list();
         } catch (HibernateException ex) {
             throw new QueryException("Error with retrieving Studies by parent folder id: " + ex.getMessage());
         }

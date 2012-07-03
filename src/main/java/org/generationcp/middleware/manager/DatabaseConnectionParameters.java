@@ -25,11 +25,11 @@ import org.generationcp.middleware.util.ResourceFinder;
 
 public class DatabaseConnectionParameters{
 
-    String host;
-    String port;
-    String dbName;
-    String username;
-    String password;
+    private String host;
+    private String port;
+    private String dbName;
+    private String username;
+    private String password;
 
     public DatabaseConnectionParameters(String host, String port, String dbName, String username, String password) {
         super();

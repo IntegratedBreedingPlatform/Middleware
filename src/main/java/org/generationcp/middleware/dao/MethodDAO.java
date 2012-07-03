@@ -26,8 +26,7 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
         try {
             Query query = getSession().getNamedQuery(Method.GET_ALL);
 
-            List<Method> results = query.list();
-            return results;
+            return (List<Method>) query.list();
         } catch (HibernateException ex) {
             throw new QueryException("Error with find all query for Method: " + ex.getMessage());
         }

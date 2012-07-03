@@ -142,8 +142,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             return null;
         }
 
-        Study study = dao.findById(id, false);
-        return study;
+        return (Study) dao.findById(id, false);
     }
 
     @Override
@@ -182,7 +181,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
     @Override
     public List<Variate> getVariatesByStudyID(Integer studyId) throws QueryException {
-
         VariateDAO variateDao = new VariateDAO();
         HibernateUtil hibernateUtil = getHibernateUtil(studyId);
 
@@ -192,14 +190,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             return new ArrayList<Variate>();
         }
 
-        List<Variate> variates = variateDao.getByStudyID(studyId);
-        return variates;
-
+        return (List<Variate>) variateDao.getByStudyID(studyId);
     }
 
     @Override
     public List<StudyEffect> getEffectsByStudyID(Integer studyId) throws QueryException {
-
         StudyEffectDAO studyEffectDao = new StudyEffectDAO();
         HibernateUtil hibernateUtil = getHibernateUtil(studyId);
 
@@ -209,14 +204,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             return new ArrayList<StudyEffect>();
         }
 
-        List<StudyEffect> studyEffect = studyEffectDao.getByStudyID(studyId);
-        return studyEffect;
-
+        return (List<StudyEffect>) studyEffectDao.getByStudyID(studyId);
     }
 
     @Override
     public List<Factor> getFactorsByStudyID(Integer studyId) throws QueryException {
-
         FactorDAO factorDao = new FactorDAO();
         HibernateUtil hibernateUtil = getHibernateUtil(studyId);
 
@@ -226,8 +218,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             return new ArrayList<Factor>();
         }
 
-        List<Factor> factors = factorDao.getByStudyID(studyId);
-        return factors;
+        return (List<Factor>) factorDao.getByStudyID(studyId);
     }
 
     @Override
@@ -241,8 +232,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             return new ArrayList<Representation>();
         }
 
-        List<Representation> representations = representationDao.getRepresentationByEffectID(effectId);
-        return representations;
+        return (List<Representation>) representationDao.getRepresentationByEffectID(effectId);
     }
 
     @Override
@@ -286,7 +276,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         if (hibernateUtil != null) {
             dao.setSession(hibernateUtil.getCurrentSession());
         } else {
-            return new Long(0);
+            return Long.valueOf(0);
         }
 
         Long ounitIdCount = dao.countOunitIDsByRepresentationId(representationId);

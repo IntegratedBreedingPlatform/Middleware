@@ -14,12 +14,9 @@ package org.generationcp.middleware.dao;
 
 import java.util.List;
 
-import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Location;
 import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -51,8 +48,7 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
             criteria.add(Restrictions.like("lname", name));
         }
 
-        Long count = (Long) criteria.uniqueResult();
-        return count;
+        return (Long) criteria.uniqueResult(); //count
     }
 
 	

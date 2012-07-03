@@ -16,6 +16,8 @@ import java.io.Serializable;
 
 public class TraitCombinationFilter implements Serializable{
 
+    private static final long serialVersionUID = 5568757097327354065L;
+    
     private Integer traitId;
     private Integer scaleId;
     private Integer methodId;

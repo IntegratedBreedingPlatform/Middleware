@@ -12,7 +12,6 @@
 
 package org.generationcp.middleware.dao.test;
 
-import java.math.BigInteger;
 import java.util.List;
 
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -66,7 +65,7 @@ public class TestGermplasmDAO{
 
     @Test
     public void testGetDerivativeChildren() throws Exception {
-        List<Germplasm> results = dao.getDerivativeChildren(new Integer(1));
+        List<Germplasm> results = dao.getDerivativeChildren(Integer.valueOf(1));
         Assert.assertTrue(results.size() > 0);
         System.out.println("RESULTS:");
         for (Germplasm g : results) {

@@ -49,8 +49,7 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
             return null;
         }
 
-        Scale scale = dao.findById(id, false);
-        return scale;
+        return (Scale) dao.findById(id, false);
     }
 
     @Override

@@ -100,8 +100,7 @@ public abstract class GenericDAO<T, ID extends Serializable> {
     public Long countAll() {
         Criteria criteria = getSession().createCriteria(getPersistentClass());
         criteria.setProjection(Projections.rowCount());
-        Long count = (Long) criteria.uniqueResult();
-        return count;
+        return (Long) criteria.uniqueResult();
     }
 
     public T saveOrUpdate(T entity) {
@@ -119,12 +118,12 @@ public abstract class GenericDAO<T, ID extends Serializable> {
         Integer minId = (Integer) crit.uniqueResult();
         if (minId != null) {
             if (minId.intValue() >= 0) {
-                minId = new Integer(-1);
+                minId = Integer.valueOf(-1);
             } else {
-                minId = new Integer(minId.intValue() - 1);
+                minId = Integer.valueOf(minId.intValue() - 1);
             }
         } else {
-            minId = new Integer(-1);
+            minId = Integer.valueOf(-1);
         }
 
         return minId;

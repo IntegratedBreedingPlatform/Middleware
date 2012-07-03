@@ -47,7 +47,7 @@ public class NameDAO extends GenericDAO<Name, Integer>{
             }
 
             if (type != null) {
-                query.setParameter("ntype", new Integer(type.getUserDefinedFieldID()));
+                query.setParameter("ntype", Integer.valueOf(type.getUserDefinedFieldID()));
             }
 
             return query.list();
@@ -78,7 +78,7 @@ public class NameDAO extends GenericDAO<Name, Integer>{
         crit.add(Restrictions.eq("germplasmId", gid));
         crit.add(Restrictions.eq("nval", nval));
         List<Name> names = crit.list();
-        if (names.size() == 0) {
+        if (names.isEmpty()) {
             // return null if no Name objects match
             return null;
         } else {

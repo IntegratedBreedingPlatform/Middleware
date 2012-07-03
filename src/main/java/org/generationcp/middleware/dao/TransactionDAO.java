@@ -35,8 +35,8 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
     @SuppressWarnings("unchecked")
     public List<Transaction> getAllReserve(int start, int numOfRows) {
         Criteria crit = getSession().createCriteria(Transaction.class);
-        crit.add(Restrictions.eq("status", new Integer(0)));
-        crit.add(Restrictions.lt("quantity", new Integer(0)));
+        crit.add(Restrictions.eq("status", Integer.valueOf(0)));
+        crit.add(Restrictions.lt("quantity", Integer.valueOf(0)));
         crit.setFirstResult(start);
         crit.setMaxResults(numOfRows);
         return crit.list();
@@ -45,17 +45,16 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
     public Long countAllReserve() {
         Criteria crit = getSession().createCriteria(Transaction.class);
         crit.setProjection(Projections.rowCount());
-        crit.add(Restrictions.eq("status", new Integer(0)));
-        crit.add(Restrictions.lt("quantity", new Integer(0)));
-        Long count = (Long) crit.uniqueResult();
-        return count;
+        crit.add(Restrictions.eq("status", Integer.valueOf(0)));
+        crit.add(Restrictions.lt("quantity", Integer.valueOf(0)));
+        return (Long) crit.uniqueResult(); //count
     }
 
     @SuppressWarnings("unchecked")
     public List<Transaction> getAllDeposit(int start, int numOfRows) {
         Criteria crit = getSession().createCriteria(Transaction.class);
-        crit.add(Restrictions.eq("status", new Integer(0)));
-        crit.add(Restrictions.gt("quantity", new Integer(0)));
+        crit.add(Restrictions.eq("status", Integer.valueOf(0)));
+        crit.add(Restrictions.gt("quantity", Integer.valueOf(0)));
         crit.setFirstResult(start);
         crit.setMaxResults(numOfRows);
         return crit.list();
@@ -64,17 +63,16 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
     public Long countAllDeposit() {
         Criteria crit = getSession().createCriteria(Transaction.class);
         crit.setProjection(Projections.rowCount());
-        crit.add(Restrictions.eq("status", new Integer(0)));
-        crit.add(Restrictions.gt("quantity", new Integer(0)));
-        Long count = (Long) crit.uniqueResult();
-        return count;
+        crit.add(Restrictions.eq("status", Integer.valueOf(0)));
+        crit.add(Restrictions.gt("quantity", Integer.valueOf(0)));
+        return (Long) crit.uniqueResult(); //count
     }
 
     @SuppressWarnings("unchecked")
     public List<Transaction> getAllReserveByRequestor(Integer personId, int start, int numOfRows) {
         Criteria crit = getSession().createCriteria(Transaction.class);
-        crit.add(Restrictions.eq("status", new Integer(0)));
-        crit.add(Restrictions.lt("quantity", new Integer(0)));
+        crit.add(Restrictions.eq("status", Integer.valueOf(0)));
+        crit.add(Restrictions.lt("quantity", Integer.valueOf(0)));
         crit.add(Restrictions.eq("personId", personId));
         crit.setFirstResult(start);
         crit.setMaxResults(numOfRows);
@@ -84,18 +82,17 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
     public Long countAllReserveByRequestor(Integer personId) {
         Criteria crit = getSession().createCriteria(Transaction.class);
         crit.setProjection(Projections.rowCount());
-        crit.add(Restrictions.eq("status", new Integer(0)));
-        crit.add(Restrictions.lt("quantity", new Integer(0)));
+        crit.add(Restrictions.eq("status", Integer.valueOf(0)));
+        crit.add(Restrictions.lt("quantity", Integer.valueOf(0)));
         crit.add(Restrictions.eq("personId", personId));
-        Long count = (Long) crit.uniqueResult();
-        return count;
+        return (Long) crit.uniqueResult(); //count
     }
 
     @SuppressWarnings("unchecked")
     public List<Transaction> getAllDepositByDonor(Integer personId, int start, int numOfRows) {
         Criteria crit = getSession().createCriteria(Transaction.class);
-        crit.add(Restrictions.eq("status", new Integer(0)));
-        crit.add(Restrictions.gt("quantity", new Integer(0)));
+        crit.add(Restrictions.eq("status", Integer.valueOf(0)));
+        crit.add(Restrictions.gt("quantity", Integer.valueOf(0)));
         crit.add(Restrictions.eq("personId", personId));
         crit.setFirstResult(start);
         crit.setMaxResults(numOfRows);
@@ -105,17 +102,16 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
     public Long countAllDepositByDonor(Integer personId) {
         Criteria crit = getSession().createCriteria(Transaction.class);
         crit.setProjection(Projections.rowCount());
-        crit.add(Restrictions.eq("status", new Integer(0)));
-        crit.add(Restrictions.gt("quantity", new Integer(0)));
+        crit.add(Restrictions.eq("status", Integer.valueOf(0)));
+        crit.add(Restrictions.gt("quantity", Integer.valueOf(0)));
         crit.add(Restrictions.eq("personId", personId));
-        Long count = (Long) crit.uniqueResult();
-        return count;
+        return (Long) crit.uniqueResult(); //count
     }
 
     @SuppressWarnings("unchecked")
     public List<Transaction> getAllUncommitted(int start, int numOfRows) {
         Criteria crit = getSession().createCriteria(Transaction.class);
-        crit.add(Restrictions.eq("status", new Integer(0)));
+        crit.add(Restrictions.eq("status", Integer.valueOf(0)));
         crit.setFirstResult(start);
         crit.setMaxResults(numOfRows);
         return crit.list();
@@ -124,15 +120,14 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
     public Long countAllUncommitted() {
         Criteria crit = getSession().createCriteria(Transaction.class);
         crit.setProjection(Projections.rowCount());
-        crit.add(Restrictions.eq("status", new Integer(0)));
-        Long count = (Long) crit.uniqueResult();
-        return count;
+        crit.add(Restrictions.eq("status", Integer.valueOf(0)));
+        return (Long) crit.uniqueResult(); //count
     }
 
     @SuppressWarnings("unchecked")
     public List<Transaction> getAllWithdrawals(int start, int numOfRows) {
         Criteria crit = getSession().createCriteria(Transaction.class);
-        crit.add(Restrictions.lt("quantity", new Integer(0)));
+        crit.add(Restrictions.lt("quantity", Integer.valueOf(0)));
         crit.setFirstResult(start);
         crit.setMaxResults(numOfRows);
         return crit.list();
@@ -141,9 +136,8 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
     public Long countAllWithdrawals() {
         Criteria crit = getSession().createCriteria(Transaction.class);
         crit.setProjection(Projections.rowCount());
-        crit.add(Restrictions.lt("quantity", new Integer(0)));
-        Long count = (Long) crit.uniqueResult();
-        return count;
+        crit.add(Restrictions.lt("quantity", Integer.valueOf(0)));
+        return (Long) crit.uniqueResult(); //count
     }
 
     @SuppressWarnings("unchecked")
@@ -151,8 +145,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
         Query query = getSession().getNamedQuery(Transaction.GET_EMPTY_LOT);
         query.setFirstResult(start);
         query.setMaxResults(numOfRows);
-        List<Transaction> results = query.list();
-        return results;
+        return (List<Transaction>) query.list();
 
     }
 
@@ -162,7 +155,6 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
         query.setFirstResult(start);
         query.setMaxResults(numOfRows);
         query.setParameter("minAmount", minAmount);
-        List<Transaction> results = query.list();
-        return results;
+        return (List<Transaction>) query.list();
     }
 }

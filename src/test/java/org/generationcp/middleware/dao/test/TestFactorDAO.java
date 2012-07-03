@@ -50,8 +50,9 @@ public class TestFactorDAO{
 
         Set<Integer> gids = dao.getGIDSGivenObservationUnitIds(ounitIds, 0, 10);
         System.out.println("RESULTS");
-        for (Integer gid : gids)
+        for (Integer gid : gids){
             System.out.println(gid);
+        }
     }
 
     @After

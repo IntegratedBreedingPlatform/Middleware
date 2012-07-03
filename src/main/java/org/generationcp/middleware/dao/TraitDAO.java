@@ -23,7 +23,7 @@ public class TraitDAO extends GenericDAO<Trait, Integer>{
     public Trait getByTraitId(Integer id) {
         Criteria crit = getSession().createCriteria(Trait.class);
         crit.add(Restrictions.eq("traitId", id));
-        crit.add(Restrictions.eq("nameStatus", new Integer(1)));
+        crit.add(Restrictions.eq("nameStatus", Integer.valueOf(1)));
         List results = crit.list();
 
         if (results.isEmpty()) {

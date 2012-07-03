@@ -36,8 +36,7 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
         Criteria crit = getSession().createCriteria(Lot.class);
         crit.setProjection(Projections.rowCount());
         crit.add(Restrictions.eq("entityType", type));
-        Long count = (Long) crit.uniqueResult();
-        return count;
+        return (Long) crit.uniqueResult(); //count
     }
 
     @SuppressWarnings("unchecked")
@@ -55,8 +54,7 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
         crit.setProjection(Projections.rowCount());
         crit.add(Restrictions.eq("entityType", type));
         crit.add(Restrictions.eq("entityId", entityId));
-        Long count = (Long) crit.uniqueResult();
-        return count;
+        return (Long) crit.uniqueResult(); //count
     }
 
     @SuppressWarnings("unchecked")
@@ -74,8 +72,7 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
         crit.setProjection(Projections.rowCount());
         crit.add(Restrictions.eq("entityType", type));
         crit.add(Restrictions.eq("locationId", locationId));
-        Long count = (Long) crit.uniqueResult();
-        return count;
+        return (Long) crit.uniqueResult(); // count
     }
 
     @SuppressWarnings("unchecked")
@@ -95,8 +92,7 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
         crit.add(Restrictions.eq("entityType", type));
         crit.add(Restrictions.eq("entityId", entityId));
         crit.add(Restrictions.eq("locationId", locationId));
-        Long count = (Long) crit.uniqueResult();
-        return count;
+        return (Long) crit.uniqueResult(); //count
     }
 
     public Long getActualLotBalance(Integer lotId) {

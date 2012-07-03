@@ -35,7 +35,7 @@ public class HibernateUtil implements Serializable{
 
     private static final long serialVersionUID = -6399030839728425831L;
 
-    private final static Logger log = LoggerFactory.getLogger(HibernateUtil.class);
+    private final static Logger LOG = LoggerFactory.getLogger(HibernateUtil.class);
 
     private static final String MIDDLEWARE_INTERNAL_HIBERNATE_CFG = "ibpmidware_hib.cfg.xml";
 
@@ -53,11 +53,11 @@ public class HibernateUtil implements Serializable{
      */
     public HibernateUtil(String hibernateCfgFileName) throws ConfigException, HibernateException {
         try {
-            log.info("Reading Hibernate config file: " + hibernateCfgFileName);
+            LOG.info("Reading Hibernate config file: " + hibernateCfgFileName);
             URL urlOfCfgFile = ResourceFinder.locateFile(hibernateCfgFileName);
 
             AnnotationConfiguration cfg = new AnnotationConfiguration().configure(urlOfCfgFile);
-            log.info("Opening SessionFactory...");
+            LOG.info("Opening SessionFactory...");
             sessionFactory = cfg.buildSessionFactory();
 
             threadSession = new ThreadLocal<Session>();
@@ -84,7 +84,7 @@ public class HibernateUtil implements Serializable{
     public HibernateUtil(String host, String port, String dbName, String username, String password) throws ConfigException,
             HibernateException {
         try {
-            log.info("Reading Hibernate config file: " + MIDDLEWARE_INTERNAL_HIBERNATE_CFG);
+            LOG.info("Reading Hibernate config file: " + MIDDLEWARE_INTERNAL_HIBERNATE_CFG);
             URL urlOfCfgFile = ResourceFinder.locateFile(MIDDLEWARE_INTERNAL_HIBERNATE_CFG);
 
             AnnotationConfiguration cfg = new AnnotationConfiguration().configure(urlOfCfgFile);
@@ -92,7 +92,7 @@ public class HibernateUtil implements Serializable{
             cfg.setProperty("hibernate.connection.url", connectionURL);
             cfg.setProperty("hibernate.connection.username", username);
             cfg.setProperty("hibernate.connection.password", password);
-            log.info("Opening SessionFactory...");
+            LOG.info("Opening SessionFactory...");
             sessionFactory = cfg.buildSessionFactory();
 
             threadSession = new ThreadLocal<Session>();

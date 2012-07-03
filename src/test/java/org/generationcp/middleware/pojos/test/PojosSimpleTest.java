@@ -230,7 +230,7 @@ public class PojosSimpleTest{
     public void testGettingGermplasmDetails() {
         Session session = hibernateUtil.getCurrentSession();
         long start = System.currentTimeMillis();
-        Germplasm g = (Germplasm) session.load(Germplasm.class, new Integer(50533));
+        Germplasm g = (Germplasm) session.load(Germplasm.class, Integer.valueOf(50533));
         System.out.println(g);
         // System.out.println(g.getMethod());
         // System.out.println(g.getLocation());

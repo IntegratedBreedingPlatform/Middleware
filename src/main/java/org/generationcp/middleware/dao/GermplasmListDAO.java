@@ -49,8 +49,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
             criteria.add(Restrictions.like("name", name));
         }
 
-        Long count = (Long) criteria.uniqueResult();
-        return count;
+        return (Long) criteria.uniqueResult(); //count
     }
 
     @SuppressWarnings("unchecked")
@@ -71,8 +70,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
         criteria.add(Restrictions.eq("status", status));
         criteria.setProjection(Projections.rowCount());
 
-        Long count = (Long) criteria.uniqueResult();
-        return count;
+        return (Long) criteria.uniqueResult(); // count
     }
 
     public void validateId(GermplasmList germplasmList) throws QueryException {
