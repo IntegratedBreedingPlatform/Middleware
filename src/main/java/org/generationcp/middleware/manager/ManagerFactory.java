@@ -21,6 +21,7 @@ import java.net.URISyntaxException;
 import java.util.Properties;
 
 import org.generationcp.middleware.exceptions.ConfigException;
+import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
@@ -195,6 +196,15 @@ public class ManagerFactory implements Serializable{
             throw new ConfigException("The InventoryDataManager needs a connection to a local IBDB instance which is not provided.");
         } else {
             return new InventoryDataManagerImpl(this.hibernateUtilForLocal, this.hibernateUtilForCentral);
+        }
+    }
+    
+    public GenotypicDataManager getGenotypicDataManager() throws ConfigException {
+        //TODO
+        if (this.hibernateUtilForLocal == null) {
+            throw new ConfigException("The GenotypicDataManager needs a connection to a local IBDB instance which is not provided.");
+        } else {
+            return new GenotypicDataManagerImpl(this.hibernateUtilForLocal, this.hibernateUtilForCentral);
         }
     }
     

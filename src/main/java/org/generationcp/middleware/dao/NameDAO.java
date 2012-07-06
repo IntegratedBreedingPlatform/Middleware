@@ -12,10 +12,13 @@
 
 package org.generationcp.middleware.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.GermplasmNameType;
+import org.generationcp.middleware.pojos.AccMetadataSet;
+import org.generationcp.middleware.pojos.CharacterData;
 import org.generationcp.middleware.pojos.Name;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -94,5 +97,25 @@ public class NameDAO extends GenericDAO<Name, Integer>{
             throw new QueryException("Cannot update a Central Database record. "
                     + "Name object to update must be a Local Record (ID must be negative)");
         }
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<Name> getNamesByNameIds(List<Integer> nIds){
+        Criteria crit = getSession().createCriteria(Name.class);
+        crit.add(Restrictions.in("nid", nIds));
+        List<Name> names = crit.list();
+        if (names.isEmpty()) {
+            return null;
+        }
+        return names;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Integer> getNameIdsByGermplasmIds(List<Integer> gIds) {
+        SQLQuery query = getSession().createSQLQuery(AccMetadataSet.GET_NAME_IDS_BY_GERMPLASM_IDS);        
+        query.setParameterList("gIdList", gIds);
+        List<Integer> nameIds = query.list();        
+        return nameIds;
+
     }
 }
