@@ -13,9 +13,7 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer>{
     public List<Integer> getNameIdsByGermplasmIds(List<Integer> gIds) {
         SQLQuery query = getSession().createSQLQuery(AccMetadataSet.GET_NAME_IDS_BY_GERMPLASM_IDS);        
         query.setParameterList("gIdList", gIds);
-        List<Integer> nameIds = query.list();        
-        return nameIds;
-
+        return (List<Integer>) query.list();        
     }
 
 }

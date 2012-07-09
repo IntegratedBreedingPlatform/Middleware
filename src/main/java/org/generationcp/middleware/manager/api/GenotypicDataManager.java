@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.gdms.MapInfo;
 
 /**
  * This is the API for retrieving and storing genotypic data 
@@ -27,5 +28,6 @@ public interface GenotypicDataManager{
 
     public List<Name> getNamesByNameIds(List<Integer> nIds) throws QueryException;
 
-
+    public List<MapInfo> getMapInfoByMapName(String mapName) throws QueryException;
+    
 }

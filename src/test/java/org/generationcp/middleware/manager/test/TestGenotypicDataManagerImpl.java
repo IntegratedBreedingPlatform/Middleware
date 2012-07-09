@@ -34,6 +34,7 @@ import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.pojos.StudyEffect;
 import org.generationcp.middleware.pojos.TraitCombinationFilter;
 import org.generationcp.middleware.pojos.Variate;
+import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -88,6 +89,21 @@ public class TestGenotypicDataManagerImpl{
             }
         }
     }
+    
+    @Test
+    public void testGetMapInfoByMapName() throws Exception {
+        String mapName = ""; //TODO: test with a given map name
+        List<MapInfo> results = manager.getMapInfoByMapName(mapName);
+        System.out.println("RESULTS (testGetMapInfoByMapName):");
+        if (results == null || results.isEmpty()) {
+            System.out.println(" No records found.");
+        } else {
+            for (MapInfo mapInfo : results){
+                System.out.println(mapInfo);
+            }
+        }
+    }
+    
 
     @AfterClass
     public static void tearDown() throws Exception {

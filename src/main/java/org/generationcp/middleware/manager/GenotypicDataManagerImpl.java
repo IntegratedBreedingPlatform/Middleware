@@ -17,9 +17,11 @@ import java.util.List;
 
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.gdms.AccMetadataSetDAO;
+import org.generationcp.middleware.dao.gdms.MappingDataDAO;
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.generationcp.middleware.util.HibernateUtil;
 
 public class GenotypicDataManagerImpl extends DataManager implements GenotypicDataManager{
@@ -56,4 +58,17 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
         return (List<Name>) nameDao.getNamesByNameIds(nIds);
     }
+
+    public List<MapInfo> getMapInfoByMapName(String mapName) throws QueryException{
+        MappingDataDAO dao = new MappingDataDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(Database.LOCAL);  //TODO: Verify DB option
+        
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return new ArrayList<MapInfo>();
+        }
+        return (List<MapInfo>) dao.getMapInfoByMapName(mapName);
+    }
+
 }
