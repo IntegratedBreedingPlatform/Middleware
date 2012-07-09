@@ -83,13 +83,16 @@ public class HibernateUtil implements Serializable{
      */
     public HibernateUtil(String host, String port, String dbName, String username, String password) throws ConfigException,
             HibernateException {
+        this(MIDDLEWARE_INTERNAL_HIBERNATE_CFG, "jdbc:mysql://" + host + ":" + port + "/" + dbName, username, password);
+    }
+    
+    public HibernateUtil(String hibernateCfgFilename, String connectionUrl, String username, String password) {
         try {
-            LOG.info("Reading Hibernate config file: " + MIDDLEWARE_INTERNAL_HIBERNATE_CFG);
-            URL urlOfCfgFile = ResourceFinder.locateFile(MIDDLEWARE_INTERNAL_HIBERNATE_CFG);
+            LOG.info("Reading Hibernate config file: " + hibernateCfgFilename);
+            URL urlOfCfgFile = ResourceFinder.locateFile(hibernateCfgFilename);
 
             AnnotationConfiguration cfg = new AnnotationConfiguration().configure(urlOfCfgFile);
-            String connectionURL = "jdbc:mysql://" + host + ":" + port + "/" + dbName;
-            cfg.setProperty("hibernate.connection.url", connectionURL);
+            cfg.setProperty("hibernate.connection.url", connectionUrl);
             cfg.setProperty("hibernate.connection.username", username);
             cfg.setProperty("hibernate.connection.password", password);
             LOG.info("Opening SessionFactory...");
