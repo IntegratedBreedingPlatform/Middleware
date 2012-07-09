@@ -10,7 +10,7 @@
  * 
  *******************************************************************************/
 
-package org.generationcp.middleware.pojos;
+package org.generationcp.middleware.pojos.gdms;
 
 import java.io.Serializable;
 
@@ -19,6 +19,11 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.generationcp.middleware.pojos.Lot;
+import org.generationcp.middleware.util.HibernateUtil;
 
 /**
  * POJO for acc_metadataset table
@@ -84,20 +89,20 @@ public class AccMetadataSet implements Serializable{
         if (obj == null) {
             return false;
         }
-
-        if (obj instanceof AccMetadataSet) {
-            AccMetadataSet param = (AccMetadataSet) obj;
-            if (this.getDatasetId() == param.getDatasetId() && this.germplasmId == param.getGermplasmId() && this.getNameId() == param.getNameId()) {
-                return true;
-            }
+        if (obj == this) {
+            return true;
+        }
+        if (!(obj instanceof AccMetadataSet)) {
+            return false;
         }
 
-        return false;
+        AccMetadataSet rhs = (AccMetadataSet) obj;
+        return new EqualsBuilder().appendSuper(super.equals(obj)).append(datasetId, rhs.datasetId).isEquals();
     }
 
     @Override
     public int hashCode() {
-        return this.getNameId();
+        return new HashCodeBuilder(17, 37).append(datasetId).toHashCode();
     }
 
     @Override

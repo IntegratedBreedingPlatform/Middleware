@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.dao.NameDAO;
+import org.generationcp.middleware.dao.gdms.AccMetadataSetDAO;
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.pojos.Name;
@@ -30,16 +31,16 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public List<Integer> getNameIdsByGermplasmIds(List<Integer> gIds) throws QueryException{
-        NameDAO nameDao = new NameDAO();
+        AccMetadataSetDAO dao = new AccMetadataSetDAO();
         HibernateUtil hibernateUtil = getHibernateUtil(gIds.get(0));  //TODO: Verify DB option
 
         if (hibernateUtil != null) {
-            nameDao.setSession(hibernateUtil.getCurrentSession());
+            dao.setSession(hibernateUtil.getCurrentSession());
         } else {
             return new ArrayList<Integer>();
         }
 
-        return (List<Integer>) nameDao.getNameIdsByGermplasmIds(gIds);
+        return (List<Integer>) dao.getNameIdsByGermplasmIds(gIds);
     }
 
     @Override

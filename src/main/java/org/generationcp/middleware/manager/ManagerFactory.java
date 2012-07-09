@@ -200,12 +200,7 @@ public class ManagerFactory implements Serializable{
     }
     
     public GenotypicDataManager getGenotypicDataManager() throws ConfigException {
-        //TODO
-        if (this.hibernateUtilForLocal == null) {
-            throw new ConfigException("The GenotypicDataManager needs a connection to a local IBDB instance which is not provided.");
-        } else {
-            return new GenotypicDataManagerImpl(this.hibernateUtilForLocal, this.hibernateUtilForCentral);
-        }
+        return new GenotypicDataManagerImpl(this.hibernateUtilForLocal, this.hibernateUtilForCentral);
     }
     
     public UserDataManager getUserDataManager() {
