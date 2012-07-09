@@ -16,26 +16,29 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
-import org.generationcp.middleware.manager.ManagerFactory;
+import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
+import org.generationcp.middleware.util.HibernateUtil;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class TestWorkbenchDataManagerImpl{
 
-    private static ManagerFactory factory;
     private static WorkbenchDataManager manager;
+    private static HibernateUtil hibernateUtil;
 
     @BeforeClass
     public static void setUp() throws Exception {
         DatabaseConnectionParameters local = new DatabaseConnectionParameters("testDatabaseConfig.properties", "local");
-        DatabaseConnectionParameters central = new DatabaseConnectionParameters("testDatabaseConfig.properties", "central");
-        factory = new ManagerFactory(local, central);
-        manager = factory.getWorkbenchDataManager();
+        
+        hibernateUtil = new HibernateUtil(local.getHost(), local.getPort(),
+                                                        local.getDbName(), local.getUsername(),
+                                                        local.getPassword());
+        manager = new WorkbenchDataManagerImpl(hibernateUtil);
     }
 
     @Test
@@ -81,6 +84,6 @@ public class TestWorkbenchDataManagerImpl{
 
     @AfterClass
     public static void tearDown() throws Exception {
-        factory.close();
+        hibernateUtil.shutdown();
     }
 }

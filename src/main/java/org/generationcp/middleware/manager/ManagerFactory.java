@@ -28,7 +28,6 @@ import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.TraitDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.util.HibernateUtil;
 import org.generationcp.middleware.util.ResourceFinder;
 import org.hibernate.HibernateException;
@@ -209,14 +208,6 @@ public class ManagerFactory implements Serializable{
         }
         
         return new UserDataManagerImpl(hibernateUtilForLocal, hibernateUtilForCentral);
-    }
-
-    public WorkbenchDataManager getWorkbenchDataManager() throws ConfigException {
-        if (this.hibernateUtilForLocal == null) {
-            throw new ConfigException("The WorkbenchDataManager needs a connection to a local IBDB instance which is not provided.");
-        } else {
-            return new WorkbenchDataManagerImpl(this.hibernateUtilForLocal);
-        }
     }
 
     /**

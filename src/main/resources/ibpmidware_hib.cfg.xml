@@ -51,12 +51,5 @@
   <mapping class="org.generationcp.middleware.pojos.Lot"/>
   <mapping class="org.generationcp.middleware.pojos.Transaction"/>
   <mapping class="org.generationcp.middleware.pojos.Person"/>
-  
-  <mapping class="org.generationcp.middleware.pojos.workbench.Contact"/>
-  <mapping class="org.generationcp.middleware.pojos.workbench.Project"/>
-  <mapping class="org.generationcp.middleware.pojos.workbench.ProjectWorkflowStep"/>
-  <mapping class="org.generationcp.middleware.pojos.workbench.Tool"/>
-  <mapping class="org.generationcp.middleware.pojos.workbench.WorkflowStep"/>
-  <mapping class="org.generationcp.middleware.pojos.workbench.WorkflowTemplate"/>
  </session-factory>
 </hibernate-configuration>
