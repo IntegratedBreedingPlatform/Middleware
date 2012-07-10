@@ -17,19 +17,25 @@ import java.util.List;
 
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.gdms.AccMetadataSetDAO;
+import org.generationcp.middleware.dao.gdms.DatasetDAO;
 import org.generationcp.middleware.dao.gdms.MapDAO;
 import org.generationcp.middleware.dao.gdms.MappingDataDAO;
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.gdms.DatasetElement;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.generationcp.middleware.util.HibernateUtil;
 
+/**
+ * Implementation of GenotypicDataManager
+ * 
+ * @author Joyce Avestro
+ */
 public class GenotypicDataManagerImpl extends DataManager implements GenotypicDataManager{
 
     public GenotypicDataManagerImpl(HibernateUtil hibernateUtilForLocal, HibernateUtil hibernateUtilForCentral) {
-        //TODO
         super(hibernateUtilForLocal, hibernateUtilForCentral);
     }
 
@@ -75,6 +81,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return dao.getNameByNameId(nId);
     }
 
+    /* (non-Javadoc)
+     * @see org.generationcp.middleware.manager.api.GenotypicDataManager#getAllMaps(org.generationcp.middleware.manager.Database)
+     */
     @Override
     public List<Map> getAllMaps(Database instance) throws QueryException {
         return getAllMaps(null, null, instance);
@@ -105,5 +114,37 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         }
         return (List<MapInfo>) dao.getMapInfoByMapName(mapName);
     }
+    
+    @Override
+    public List<String> getDatasetNames() throws QueryException{
+        DatasetDAO dao = new DatasetDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(Database.LOCAL);  //TODO: Verify DB option
+        
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return new ArrayList<String>();
+        }
+        return (List<String>) dao.getDatasetNames();
+    }
+    
+    
+    /* (non-Javadoc)
+     * @see org.generationcp.middleware.manager.api.GenotypicDataManager#getDatasetDetailsByDatasetName(java.lang.String)
+     */
+    @Override
+    public List<DatasetElement> getDatasetDetailsByDatasetName(String datasetName) throws QueryException{
+        DatasetDAO dao = new DatasetDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(Database.LOCAL);  //TODO: Verify DB option
+        
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return new ArrayList<DatasetElement>();
+        }
+        return (List<DatasetElement>) dao.getDetailsByName(datasetName);
+    }
+    
+
     
 }

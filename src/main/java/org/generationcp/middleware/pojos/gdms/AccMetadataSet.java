@@ -24,33 +24,59 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 /**
  * POJO for acc_metadataset table
  * 
+ * @author Joyce Avestro
+ *  
  */
 @Entity
 @Table(name = "acc_metadataset")
 public class AccMetadataSet implements Serializable{
 
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
     
+    /** The Constant GET_NAME_IDS_BY_GERMPLASM_IDS. */
     public static final String GET_NAME_IDS_BY_GERMPLASM_IDS = "select nid from acc_metadataset where gid in (:gIdList)";
 
+    /** The id. */
     @EmbeddedId
     protected AccMetadataSetPK id;
 
+    /**
+     * Instantiates a new acc metadata set.
+     */
     public AccMetadataSet() {
     }
 
+    /**
+     * Instantiates a new acc metadata set.
+     *
+     * @param id the id
+     */
     public AccMetadataSet(AccMetadataSetPK id) {
         this.id = id;
     }
         
+    /**
+     * Gets the id.
+     *
+     * @return the id
+     */
     public AccMetadataSetPK getId() {
         return id;
     }
     
+    /**
+     * Sets the id.
+     *
+     * @param id the new id
+     */
     public void setId(AccMetadataSetPK id) {
         this.id = id;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -67,11 +93,17 @@ public class AccMetadataSet implements Serializable{
         return new EqualsBuilder().appendSuper(super.equals(obj)).append(id, rhs.id).isEquals();
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37).append(id).toHashCode();
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
         return "AccMetaDataSet [id=" + id + "]";

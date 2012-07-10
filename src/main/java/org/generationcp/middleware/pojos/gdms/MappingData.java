@@ -16,6 +16,7 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -34,6 +35,7 @@ public class MappingData implements Serializable{
     public static final String GET_MAP_INFO_BY_MAP_NAME = "select marker_name, linkage_group, start_position " +
             "from mapping_data where map_name = :mapName order by linkage_group, start_position , marker_name";
             
+    @Id
     @Column(name = "marker_id")
     private Integer markerId;
 

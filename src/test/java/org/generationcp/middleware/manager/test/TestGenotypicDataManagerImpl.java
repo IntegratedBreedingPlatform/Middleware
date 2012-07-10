@@ -20,9 +20,11 @@ import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.gdms.DatasetElement;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -117,6 +119,7 @@ public class TestGenotypicDataManagerImpl{
         }
     }
     
+    
     @Test
     public void testGetMapInfoByMapName() throws Exception {
         String mapName = ""; //TODO: test with a given map name
@@ -127,6 +130,40 @@ public class TestGenotypicDataManagerImpl{
         } else {
             for (MapInfo mapInfo : results){
                 System.out.println(mapInfo);
+            }
+        }
+    }
+
+    @Test
+    public void testGetDatasetNames() throws Exception {
+        List<String> results = manager.getDatasetNames();
+        System.out.println("RESULTS (testGetDatasetNames):");
+        if (results == null || results.isEmpty()) {
+            System.out.println(" No records found.");
+        } else {
+            for (Object obj : results){
+                Assert.assertTrue(obj instanceof String);
+                Assert.assertTrue(obj != null);
+                String element = (String) obj;
+                System.out.println(" " + element);
+            }
+        }
+    }
+    
+
+    @Test
+    public void testGetDatasetDetailsByDatasetName() throws Exception {
+        String datasetName = "MARS";
+        List<DatasetElement> results = manager.getDatasetDetailsByDatasetName(datasetName);
+        System.out.println("RESULTS (testGetDatasetDetailsByDatasetName):");
+        if (results == null || results.isEmpty()) {
+            System.out.println(" No records found.");
+        } else {
+            for (Object obj : results){
+                Assert.assertTrue(obj instanceof DatasetElement);
+                Assert.assertTrue(obj != null);
+                DatasetElement element = (DatasetElement) obj;
+                System.out.println(" " + element);
             }
         }
     }
