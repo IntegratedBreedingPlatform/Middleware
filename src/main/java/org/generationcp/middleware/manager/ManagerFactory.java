@@ -203,9 +203,6 @@ public class ManagerFactory implements Serializable{
     }
     
     public UserDataManager getUserDataManager() {
-        if (this.hibernateUtilForLocal == null) {
-            throw new ConfigException("The UserDataManager needs a connection to a local IBDB instance which is not provided.");
-        }
         
         return new UserDataManagerImpl(hibernateUtilForLocal, hibernateUtilForCentral);
     }

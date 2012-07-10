@@ -128,7 +128,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
             if (trans != null) {
                 trans.rollback();
             }
-            throw new QueryException("Error encountered while saving User: " + ex.getMessage(), ex);
+            throw new QueryException("Error encountered while deleting User: " + ex.getMessage(), ex);
         } finally {
             hibernateUtilForLocal.closeCurrentSession();
         }
@@ -239,7 +239,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
             if (trans != null) {
                 trans.rollback();
             }
-            throw new QueryException("Error encountered while saving Person: " + ex.getMessage(), ex);
+            throw new QueryException("Error encountered while deleting Person: " + ex.getMessage(), ex);
         } finally {
             hibernateUtilForLocal.closeCurrentSession();
         }

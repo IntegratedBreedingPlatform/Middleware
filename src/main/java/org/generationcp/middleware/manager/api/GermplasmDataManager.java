@@ -28,6 +28,7 @@ import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
 
 /**
@@ -463,7 +464,29 @@ public interface GermplasmDataManager {
      *         database.
      * @throws QueryException
      */
-    public int addLocation(Location location) throws QueryException;
+    int addLocation(Location location) throws QueryException;
+    
+    /**
+     * Inserts a single {@code Method} object into the database.
+     * 
+     * @param location
+     *            - The {@code Method} object to be persisted to the database.
+     *            Must be a valid {@code Method} object.
+     * @return Returns the number of {@code Method} records inserted in the
+     *         database.
+     * @throws QueryException
+     */
+    int addMethod(Method method) throws QueryException;
+    
+    /**
+     * Deletes a single {@code Method} object into the database.
+     * 
+     * @param location
+     *            - The {@code Method} object to be persisted to the database.
+     *            Must be a valid {@code Method} object.
+     * @throws QueryException
+     */
+    void deleteMethod(Method method) throws QueryException;
 
     /**
      * Returns the Bibref record identified by the given id.

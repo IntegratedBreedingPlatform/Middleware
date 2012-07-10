@@ -26,6 +26,7 @@ import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
+import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -40,6 +41,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.ProgenitorPK;
+import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.util.HibernateUtil;
 import org.hibernate.Session;
@@ -680,6 +682,70 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
         return methods;
 
+    }
+    
+    @Override
+    public int addMethod(Method method) throws QueryException {
+        requireLocalDatabaseInstance();
+
+        // initialize session & transaction
+        Session session = hibernateUtilForLocal.getCurrentSession();
+        Transaction trans = null;
+
+        int methodsSaved = 0;
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
+            MethodDAO dao = new MethodDAO();
+            dao.setSession(session);
+
+            // Auto-assign negative IDs for new local DB records
+            Integer negativeId = dao.getNegativeId("mid");
+            method.setMid(negativeId);
+
+            dao.saveOrUpdate(method);
+            methodsSaved++;
+
+            trans.commit();
+        } catch (Exception ex) {
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new QueryException("Error encountered while saving Method: " + ex.getMessage(), ex);
+        } finally {
+            hibernateUtilForLocal.closeCurrentSession();
+        }
+
+        return methodsSaved;
+    }
+    
+    @Override
+    public void deleteMethod(Method method) throws QueryException {
+        requireLocalDatabaseInstance();
+        
+        Session session = hibernateUtilForLocal.getCurrentSession();
+        Transaction trans = null;
+        
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
+            
+            MethodDAO dao = new MethodDAO();
+            dao.setSession(session);
+            
+            dao.makeTransient(method);
+            
+            trans.commit();
+        } catch (Exception ex) {
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new QueryException("Error encountered while deleting Method: " + ex.getMessage(), ex);
+        } finally {
+            hibernateUtilForLocal.closeCurrentSession();
+        }
     }
 
     @Override

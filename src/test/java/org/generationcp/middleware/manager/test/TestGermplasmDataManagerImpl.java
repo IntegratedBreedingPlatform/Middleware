@@ -14,6 +14,7 @@ package org.generationcp.middleware.manager.test;
 
 import java.util.List;
 
+import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.FindGermplasmByNameModes;
@@ -22,8 +23,10 @@ import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Attribute;
+import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -388,6 +391,31 @@ public class TestGermplasmDataManagerImpl{
         for (Attribute attribute : attributes) {
             System.out.println(attribute);
         }
+    }
+    
+    @Test
+    public void testAddMethod() throws QueryException {
+        Method method = new Method();
+        method.setMid(-1);
+        method.setMname("yesno");
+        method.setGeneq(0);
+        method.setLmid(2);
+        method.setMattr(0);
+        method.setMcode("UGM");
+        method.setMdate(19980610);
+        method.setMdesc("yay");
+        method.setMfprg(0);
+        method.setMgrp("S");
+        method.setMprgn(0);
+        method.setMtype("GEN");
+        
+        // add the method
+        manager.addMethod(method);
+        
+        method = manager.getMethodByID(-1);
+        
+        // delete the method
+        manager.deleteMethod(method);
     }
 
     @AfterClass
