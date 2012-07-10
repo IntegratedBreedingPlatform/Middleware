@@ -3,7 +3,6 @@ package org.generationcp.middleware.manager.api;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.QueryException;
-import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 
@@ -50,4 +49,5 @@ public interface UserDataManager {
     
     void deletePerson(Person person) throws QueryException; 
     
+    boolean isValidUserLogin(String username, String password) throws QueryException;
 }

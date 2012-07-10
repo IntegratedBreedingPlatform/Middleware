@@ -244,5 +244,30 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
             hibernateUtilForLocal.closeCurrentSession();
         }
     }
-
+    
+    @Override
+    public boolean isValidUserLogin(String username, String password) throws QueryException {
+        requireLocalDatabaseInstance();
+        
+        List<Session> sessions = new ArrayList<Session>();
+        
+        if (hibernateUtilForLocal != null) {
+            sessions.add(hibernateUtilForLocal.getCurrentSession());
+        }
+        
+        if (hibernateUtilForCentral != null) {
+            sessions.add(hibernateUtilForCentral.getCurrentSession());
+        }
+        
+        for (Session session : sessions) {
+            UserDAO dao = new UserDAO();
+            dao.setSession(session);
+            User user = dao.findByUsernameAndPassword(username, password);
+            if (user != null) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
 }
