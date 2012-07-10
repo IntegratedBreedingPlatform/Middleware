@@ -17,10 +17,12 @@ import java.util.List;
 
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.gdms.AccMetadataSetDAO;
+import org.generationcp.middleware.dao.gdms.MapDAO;
 import org.generationcp.middleware.dao.gdms.MappingDataDAO;
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.generationcp.middleware.util.HibernateUtil;
 
@@ -59,6 +61,39 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return (List<Name>) nameDao.getNamesByNameIds(nIds);
     }
 
+    @Override
+    public Name getNameByNameId(Integer nId) throws QueryException {
+        NameDAO dao = new NameDAO();
+        HibernateUtil util = getHibernateUtil(nId);
+        
+        if(util != null) {
+            dao.setSession(util.getCurrentSession());
+        } else {
+            return null;
+        }
+        
+        return dao.getNameByNameId(nId);
+    }
+
+    @Override
+    public List<Map> getAllMaps(Database instance) throws QueryException {
+        return getAllMaps(null, null, instance);
+    }
+
+    @Override
+    public List<Map> getAllMaps(Integer start, Integer numOfRows, Database instance) throws QueryException {
+        MapDAO dao = new MapDAO();
+        HibernateUtil util = getHibernateUtil(instance);
+        
+        if(util != null) {
+            dao.setSession(util.getCurrentSession());
+        } else {
+            return null;
+        }
+        
+        return dao.findAll(start, numOfRows);
+    }
+    
     public List<MapInfo> getMapInfoByMapName(String mapName) throws QueryException{
         MappingDataDAO dao = new MappingDataDAO();
         HibernateUtil hibernateUtil = getHibernateUtil(Database.LOCAL);  //TODO: Verify DB option
@@ -70,5 +105,5 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         }
         return (List<MapInfo>) dao.getMapInfoByMapName(mapName);
     }
-
+    
 }

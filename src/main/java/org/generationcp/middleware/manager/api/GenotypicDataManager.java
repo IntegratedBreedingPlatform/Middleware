@@ -15,7 +15,9 @@ package org.generationcp.middleware.manager.api;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
 
 /**
@@ -28,6 +30,11 @@ public interface GenotypicDataManager{
 
     public List<Name> getNamesByNameIds(List<Integer> nIds) throws QueryException;
 
-    public List<MapInfo> getMapInfoByMapName(String mapName) throws QueryException;
+    public Name getNameByNameId(Integer nId) throws QueryException;
     
+    public List<Map> getAllMaps(Database instance) throws QueryException;
+    
+    public List<Map> getAllMaps(Integer start, Integer numOfRows,  Database instance) throws QueryException;
+    
+    public List<MapInfo> getMapInfoByMapName(String mapName) throws QueryException;
 }

@@ -107,4 +107,13 @@ public class NameDAO extends GenericDAO<Name, Integer>{
         return names;
     }
     
+    public Name getNameByNameId(Integer nId) {
+        Criteria crit = getSession().createCriteria(Name.class);
+        crit.add(Restrictions.eq("nid", nId));
+        
+        Name name = (Name) crit.uniqueResult();
+        
+        return name;
+    }
+    
 }

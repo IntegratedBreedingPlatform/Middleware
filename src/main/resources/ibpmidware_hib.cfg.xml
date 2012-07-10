@@ -50,6 +50,7 @@
   <mapping class="org.generationcp.middleware.pojos.Representation"/>
   <mapping class="org.generationcp.middleware.pojos.Lot"/>
   <mapping class="org.generationcp.middleware.pojos.Transaction"/>
-  <mapping class="org.generationcp.middleware.pojos.Person"/>
+  <mapping class="org.generationcp.middleware.pojos.gdms.Map"/>
+  <mapping class="org.generationcp.middleware.pojos.Person"/> 
  </session-factory>
 </hibernate-configuration>

@@ -15,28 +15,14 @@ package org.generationcp.middleware.manager.test;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
-import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
-import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.pojos.CharacterDataElement;
-import org.generationcp.middleware.pojos.CharacterLevelElement;
-import org.generationcp.middleware.pojos.Factor;
 import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.NumericDataElement;
-import org.generationcp.middleware.pojos.NumericLevelElement;
-import org.generationcp.middleware.pojos.NumericRange;
-import org.generationcp.middleware.pojos.Representation;
-import org.generationcp.middleware.pojos.Study;
-import org.generationcp.middleware.pojos.StudyEffect;
-import org.generationcp.middleware.pojos.TraitCombinationFilter;
-import org.generationcp.middleware.pojos.Variate;
+import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -44,7 +30,7 @@ public class TestGenotypicDataManagerImpl{
 
     private static ManagerFactory factory;
     private static GenotypicDataManager manager;
-
+    
     @BeforeClass
     public static void setUp() throws Exception {
         DatabaseConnectionParameters local = new DatabaseConnectionParameters("testDatabaseConfig.properties", "local"); 
@@ -91,6 +77,47 @@ public class TestGenotypicDataManagerImpl{
     }
     
     @Test
+    public void testGetNameByNameId() throws Exception {
+        Name name = manager.getNameByNameId(-1);
+        System.out.println("RESULTS (testGetNameByNameId):");
+        
+        if(name == null) {
+            System.out.println("No record found.");
+        } else {
+            System.out.println(name);
+        }
+    }
+    
+    @Test
+    public void testGetAllMaps() throws Exception {
+        List<Map> maps = manager.getAllMaps(Database.LOCAL);
+        System.out.println("RESULTS (testGetAllMaps)");
+        
+        if(maps == null || maps.isEmpty()) {
+            System.out.println("No records found.");
+        } else {
+            for(Map map : maps) {
+                System.out.println(map);
+            }
+        }
+        
+    }
+    
+    @Test
+    public void testGetFirstFiveMaps() throws Exception {
+        List<Map> maps = manager.getAllMaps(0, 5, Database.LOCAL);
+        System.out.println("RESULTS (testGetFirstFiveMaps)");
+        
+        if(maps == null || maps.isEmpty()) {
+            System.out.println("No records found.");
+        } else {
+            for(Map map : maps) {
+                System.out.println(map);
+            }
+        }
+    }
+    
+    @Test
     public void testGetMapInfoByMapName() throws Exception {
         String mapName = ""; //TODO: test with a given map name
         List<MapInfo> results = manager.getMapInfoByMapName(mapName);
@@ -104,7 +131,6 @@ public class TestGenotypicDataManagerImpl{
         }
     }
     
-
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();

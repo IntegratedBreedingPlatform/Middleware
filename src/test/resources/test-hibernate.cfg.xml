@@ -4,10 +4,10 @@
 <hibernate-configuration>
  <session-factory>
   <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
-  <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/ibdb_rice_20120405</property>
+  <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/ibdbv1_chickpea_local</property>
   <property name="hibernate.connection.username">root</property>
-  <property name="hibernate.connection.password">lich27king</property>
-  <property name="hibernate.default_schema">ibdb_rice_20120405</property>
+  <property name="hibernate.connection.password">83yukie</property>
+  <property name="hibernate.default_schema">ibdbv1_chickpea_local</property>
   <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
   <!--   
   <property name="hibernate.show_sql">true</property>
@@ -58,7 +58,8 @@
   <mapping class="org.generationcp.middleware.pojos.Representation"/>
   <mapping class="org.generationcp.middleware.pojos.Lot"/>
   <mapping class="org.generationcp.middleware.pojos.Transaction"/>
-  <mapping class="org.generationcp.middleware.pojos.workbench.Person"/>
+  <mapping class="org.generationcp.middleware.pojos.Person"/>
+  <mapping class="org.generationcp.middleware.pojos.gdms.Map"/>
   
   <mapping class="org.generationcp.middleware.pojos.workbench.Contact"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.Project"/>
