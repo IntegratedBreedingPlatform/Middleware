@@ -23,6 +23,7 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
+import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -55,7 +56,7 @@ public class TestGenotypicDataManagerImpl{
             System.out.println(" No records found.");
         } else {
             for (Integer nId : results){
-                System.out.println(nId);
+                System.out.println(" " + nId);
             }
         }
     }
@@ -73,7 +74,7 @@ public class TestGenotypicDataManagerImpl{
             System.out.println(" No records found.");
         } else {
             for (Name name : results){
-                System.out.println(name);
+                System.out.println(" " + name);
             }
         }
     }
@@ -86,7 +87,7 @@ public class TestGenotypicDataManagerImpl{
         if(name == null) {
             System.out.println("No record found.");
         } else {
-            System.out.println(name);
+            System.out.println(" " + name);
         }
     }
     
@@ -99,7 +100,7 @@ public class TestGenotypicDataManagerImpl{
             System.out.println("No records found.");
         } else {
             for(Map map : maps) {
-                System.out.println(map);
+                System.out.println(" " + map);
             }
         }
         
@@ -114,7 +115,7 @@ public class TestGenotypicDataManagerImpl{
             System.out.println("No records found.");
         } else {
             for(Map map : maps) {
-                System.out.println(map);
+                System.out.println(" " + map);
             }
         }
     }
@@ -123,20 +124,20 @@ public class TestGenotypicDataManagerImpl{
     @Test
     public void testGetMapInfoByMapName() throws Exception {
         String mapName = ""; //TODO: test with a given map name
-        List<MapInfo> results = manager.getMapInfoByMapName(mapName);
+        List<MapInfo> results = manager.getMapInfoByMapName(mapName, Database.LOCAL);
         System.out.println("RESULTS (testGetMapInfoByMapName):");
         if (results == null || results.isEmpty()) {
             System.out.println(" No records found.");
         } else {
             for (MapInfo mapInfo : results){
-                System.out.println(mapInfo);
+                System.out.println(" " + mapInfo);
             }
         }
     }
 
     @Test
     public void testGetDatasetNames() throws Exception {
-        List<String> results = manager.getDatasetNames();
+        List<String> results = manager.getDatasetNames(Database.LOCAL);
         System.out.println("RESULTS (testGetDatasetNames):");
         if (results == null || results.isEmpty()) {
             System.out.println(" No records found.");
@@ -154,7 +155,7 @@ public class TestGenotypicDataManagerImpl{
     @Test
     public void testGetDatasetDetailsByDatasetName() throws Exception {
         String datasetName = "MARS";
-        List<DatasetElement> results = manager.getDatasetDetailsByDatasetName(datasetName);
+        List<DatasetElement> results = manager.getDatasetDetailsByDatasetName(datasetName, Database.LOCAL);
         System.out.println("RESULTS (testGetDatasetDetailsByDatasetName):");
         if (results == null || results.isEmpty()) {
             System.out.println(" No records found.");
@@ -179,6 +180,63 @@ public class TestGenotypicDataManagerImpl{
          * This is based on the sample input data templates uploaded to GDMS */
         List<Integer> markerIds = manager.getMarkerIdsByMarkerNames(markerNames, 0, 100);
         System.out.println("getMarkerIdsByMarkerNames: " + markerIds);
+    }
+
+    @Test
+    public void testGetMarkerIdByDatasetId() throws Exception {
+        Integer datasetId = Integer.valueOf(2);
+        List<Integer> results = manager.getMarkerIdByDatasetId(datasetId);
+        System.out.println("RESULTS (testGetMarkerIdByDatasetId):");
+        if (results == null || results.isEmpty()) {
+            System.out.println(" No records found.");
+        } else {
+            for (Object obj : results){
+                Assert.assertTrue(obj instanceof Integer);
+                Assert.assertTrue(obj != null);
+                Integer element = (Integer) obj;
+                System.out.println(" " + element);
+            }
+        }
+    }
+    
+    @Test
+    public void testGetParentsByDatasetId() throws Exception {
+        Integer datasetId = Integer.valueOf(2);
+        List<ParentElement> results = manager.getParentsByDatasetId(datasetId);
+        System.out.println("RESULTS (testGetParentsByDatasetId):");
+        if (results == null || results.isEmpty()) {
+            System.out.println(" No records found.");
+        } else {
+            for (Object obj : results){
+                Assert.assertTrue(obj instanceof ParentElement);
+                Assert.assertTrue(obj != null);
+                ParentElement element = (ParentElement) obj;
+                System.out.println(" " + element);
+            }
+        }
+    }
+    
+    @Test
+    public void testGetMarkerTypeByMarkerIds() throws Exception {
+        List<Integer> markerIds = new ArrayList<Integer>();
+        markerIds.add(Integer.valueOf(1));
+        markerIds.add(Integer.valueOf(2));
+        markerIds.add(Integer.valueOf(3));
+        markerIds.add(Integer.valueOf(4));
+        markerIds.add(Integer.valueOf(5));
+        
+        List<String> results = manager.getMarkerTypeByMarkerIds(markerIds);
+        System.out.println("RESULTS (testGetMarkerTypeByMarkerIds):");
+        if (results == null || results.isEmpty()) {
+            System.out.println(" No records found.");
+        } else {
+            for (Object obj : results){
+                Assert.assertTrue(obj instanceof String);
+                Assert.assertTrue(obj != null);
+                String element = (String) obj;
+                System.out.println(" " + element);
+            }
+        }
     }
     
     @AfterClass

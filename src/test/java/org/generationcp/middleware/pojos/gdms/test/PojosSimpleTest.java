@@ -18,6 +18,9 @@ import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MappingData;
+import org.generationcp.middleware.pojos.gdms.MappingPop;
+import org.generationcp.middleware.pojos.gdms.Marker;
+import org.generationcp.middleware.pojos.gdms.MarkerMetadataSet;
 import org.generationcp.middleware.util.HibernateUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -93,6 +96,51 @@ public class PojosSimpleTest{
             Assert.assertTrue(obj instanceof MappingData);
             Assert.assertTrue(obj != null);
             MappingData element = (MappingData) obj;
+            System.out.println(element);
+        }
+    }
+
+    @Test
+    public void testMappingPop() {
+        Session session = hibernateUtil.getCurrentSession();
+        Query query = session.createQuery("FROM MappingPop");
+        query.setMaxResults(5);
+        List results = query.list();
+
+        for (Object obj : results) {
+            Assert.assertTrue(obj instanceof MappingPop);
+            Assert.assertTrue(obj != null);
+            MappingPop element = (MappingPop) obj;
+            System.out.println(element);
+        }
+    }
+
+    @Test
+    public void testMarker() {
+        Session session = hibernateUtil.getCurrentSession();
+        Query query = session.createQuery("FROM Marker");
+        query.setMaxResults(5);
+        List results = query.list();
+
+        for (Object obj : results) {
+            Assert.assertTrue(obj instanceof Marker);
+            Assert.assertTrue(obj != null);
+            Marker element = (Marker) obj;
+            System.out.println(element);
+        }
+    }
+
+    @Test
+    public void testMarkerMetadataSet() {
+        Session session = hibernateUtil.getCurrentSession();
+        Query query = session.createQuery("FROM MarkerMetadataSet");
+        query.setMaxResults(5);
+        List results = query.list();
+
+        for (Object obj : results) {
+            Assert.assertTrue(obj instanceof MarkerMetadataSet);
+            Assert.assertTrue(obj != null);
+            MarkerMetadataSet element = (MarkerMetadataSet) obj;
             System.out.println(element);
         }
     }

@@ -20,9 +20,12 @@ import org.generationcp.middleware.dao.gdms.AccMetadataSetDAO;
 import org.generationcp.middleware.dao.gdms.DatasetDAO;
 import org.generationcp.middleware.dao.gdms.MapDAO;
 import org.generationcp.middleware.dao.gdms.MappingDataDAO;
+import org.generationcp.middleware.dao.gdms.MappingPopDAO;
 import org.generationcp.middleware.dao.gdms.MarkerDAO;
+import org.generationcp.middleware.dao.gdms.MarkerMetadataSetDAO;
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
+import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
 import org.generationcp.middleware.pojos.gdms.Map;
@@ -43,7 +46,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<Integer> getNameIdsByGermplasmIds(List<Integer> gIds) throws QueryException{
         AccMetadataSetDAO dao = new AccMetadataSetDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(gIds.get(0));  //TODO: Verify DB option
+        HibernateUtil hibernateUtil = getHibernateUtil(gIds.get(0));  
 
         if (hibernateUtil != null) {
             dao.setSession(hibernateUtil.getCurrentSession());
@@ -57,7 +60,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<Name> getNamesByNameIds(List<Integer> nIds) throws QueryException {
         NameDAO nameDao = new NameDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(nIds.get(0)); //TODO: Verify DB option
+        HibernateUtil hibernateUtil = getHibernateUtil(nIds.get(0)); 
 
         if (hibernateUtil != null) {
             nameDao.setSession(hibernateUtil.getCurrentSession());
@@ -104,9 +107,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return dao.findAll(start, numOfRows);
     }
     
-    public List<MapInfo> getMapInfoByMapName(String mapName) throws QueryException{
+    @Override
+    public List<MapInfo> getMapInfoByMapName(String mapName, Database instance) throws QueryException{
         MappingDataDAO dao = new MappingDataDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(Database.LOCAL);  //TODO: Verify DB option
+        HibernateUtil hibernateUtil = getHibernateUtil(instance);  
         
         if (hibernateUtil != null) {
             dao.setSession(hibernateUtil.getCurrentSession());
@@ -117,9 +121,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
     
     @Override
-    public List<String> getDatasetNames() throws QueryException{
+    public List<String> getDatasetNames(Database instance) throws QueryException{
         DatasetDAO dao = new DatasetDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(Database.LOCAL);  //TODO: Verify DB option
+        HibernateUtil hibernateUtil = getHibernateUtil(instance);  
         
         if (hibernateUtil != null) {
             dao.setSession(hibernateUtil.getCurrentSession());
@@ -134,9 +138,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
      * @see org.generationcp.middleware.manager.api.GenotypicDataManager#getDatasetDetailsByDatasetName(java.lang.String)
      */
     @Override
-    public List<DatasetElement> getDatasetDetailsByDatasetName(String datasetName) throws QueryException{
+    public List<DatasetElement> getDatasetDetailsByDatasetName(String datasetName, Database instance) throws QueryException{
         DatasetDAO dao = new DatasetDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(Database.LOCAL);  //TODO: Verify DB option
+        HibernateUtil hibernateUtil = getHibernateUtil(instance);  
         
         if (hibernateUtil != null) {
             dao.setSession(hibernateUtil.getCurrentSession());
@@ -145,6 +149,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         }
         return (List<DatasetElement>) dao.getDetailsByName(datasetName);
     }
+    
     
     @Override
     public List<Integer> getMarkerIdsByMarkerNames(List<String> markerNames, int start, int numOfRows) throws QueryException {
@@ -161,5 +166,52 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         
         return markerIds;
     }
+
+    @Override
+    public List<Integer> getMarkerIdByDatasetId(Integer datasetId) throws QueryException{
+        MarkerMetadataSetDAO dao = new MarkerMetadataSetDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(datasetId);  
+        
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return new ArrayList<Integer>();
+        }
+        return (List<Integer>) dao.getMarkerIdByDatasetId(datasetId);
+    }
+    
+    
+    /* (non-Javadoc)
+     * @see org.generationcp.middleware.manager.api.GenotypicDataManager#getParentsByDatasetId(java.lang.Integer)
+     */
+    @Override
+    public List<ParentElement> getParentsByDatasetId(Integer datasetId) throws QueryException{
+        MappingPopDAO dao = new MappingPopDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(datasetId);  
+        
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return new ArrayList<ParentElement>();
+        }
+        return (List<ParentElement>) dao.getParentsByDatasetId(datasetId);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.generationcp.middleware.manager.api.GenotypicDataManager#getMarkerTypeByMarkerIds(java.util.List)
+     */
+    @Override
+    public List<String> getMarkerTypeByMarkerIds(List<Integer> markerIds) throws QueryException{
+        MarkerDAO dao = new MarkerDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(markerIds.get(0));  
+        
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return new ArrayList<String>();
+        }
+        return (List<String>) dao.getMarkerTypeByMarkerIds(markerIds);
+    }
+    
     
 }

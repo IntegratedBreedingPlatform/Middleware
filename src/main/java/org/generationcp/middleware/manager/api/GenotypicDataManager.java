@@ -20,6 +20,7 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
+import org.generationcp.middleware.pojos.gdms.ParentElement;
 
 /**
  * This is the API for retrieving and storing genotypic data.
@@ -82,13 +83,13 @@ public interface GenotypicDataManager{
      * @return the map info by map name
      * @throws QueryException the query exception
      */
-    public List<MapInfo> getMapInfoByMapName(String mapName) throws QueryException;
+    public List<MapInfo> getMapInfoByMapName(String mapName, Database instance) throws QueryException;
     
     
-    public List<String> getDatasetNames() throws QueryException;
+    public List<String> getDatasetNames(Database instance) throws QueryException;
     
     
-    public List<DatasetElement> getDatasetDetailsByDatasetName(String datasetName) throws QueryException;
+    public List<DatasetElement> getDatasetDetailsByDatasetName(String datasetName, Database instance) throws QueryException;
     
     /**
      * Retrieves a list of matching Marker IDs from the Marker table based on 
@@ -105,4 +106,34 @@ public interface GenotypicDataManager{
      * @throws QueryException
      */
     public List<Integer> getMarkerIdsByMarkerNames(List<String> markerNames, int start, int numOfRows) throws QueryException;
+
+    /**
+     * Gets the markerId by datasetId.
+     *
+     * @param datasetId the dataset id
+     * @return the markerId by datasetId
+     * @throws QueryException the query exception
+     */
+    public List<Integer> getMarkerIdByDatasetId(Integer datasetId) throws QueryException;
+    
+    
+    /**
+     * Gets the parents by dataset id.
+     *
+     * @param datasetId the dataset id
+     * @return the parents by dataset id
+     * @throws QueryException the query exception
+     */
+    public List<ParentElement> getParentsByDatasetId(Integer datasetId) throws QueryException;
+    
+    
+    /**
+     * Gets the marker type by marker ids.
+     *
+     * @param markerIds the marker ids
+     * @return the marker type by marker ids
+     * @throws QueryException the query exception
+     */
+    public List<String> getMarkerTypeByMarkerIds(List<Integer> markerIds)  throws QueryException;
+    
 }

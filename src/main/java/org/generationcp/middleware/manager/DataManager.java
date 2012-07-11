@@ -15,10 +15,13 @@ package org.generationcp.middleware.manager;
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.util.HibernateUtil;
 
-// TODO Local-Central: Code Review: Superclass of data manager implementations.
-// Mainly used for local-central for now
 /**
  * The Class DataManager.
+ * Superclass of DataManager implementations.
+ * Mainly used for local-central initially.
+ * 
+ * @author Joyce Avestro
+ * 
  */
 public abstract class DataManager {
 

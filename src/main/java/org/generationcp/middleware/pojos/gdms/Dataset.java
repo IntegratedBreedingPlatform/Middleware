@@ -36,7 +36,7 @@ public class Dataset implements Serializable{
 
     private static final long serialVersionUID = 1L;
 
-    public static final String GET_DATASET_NAMES_NOT_QTL = "select concat(dataset_name,'') from dataset where dataset_type !='QTL'";
+    public static final String GET_DATASET_NAMES_NOT_QTL = "select concat(dataset_name, '') from dataset where dataset_type !='QTL'";
     public static final String GET_DETAILS_BY_NAME = "select dataset_id, concat(dataset_type, '') from dataset where dataset_name = :datasetName";
     
     /** The dataset id. */
@@ -205,16 +205,16 @@ public class Dataset implements Serializable{
 
     @Override
     public String toString() {
-        return "Dataset [datasetId=" + datasetId + ", " + 
-                "datasetName=" + datasetName + ", " + 
-                "datasetDesc=" + datasetDesc + ", " + 
-                "datasetType=" + datasetType + ", " + 
-                "genus=" + genus + ", " + 
-                "species=" + species + ", " + 
-                "uploadTemplateDate=" + uploadTemplateDate + ", " + 
-                "remarks=" + remarks + ", " + 
-                "dataType=" + dataType + ", " + 
-                "missingData=" + missingData + "]";
+        return "Dataset [datasetId=" + datasetId + 
+                ", datasetName=" + datasetName +  
+                ", datasetDesc=" + datasetDesc +  
+                ", datasetType=" + datasetType +  
+                ", genus=" + genus + 
+                ", species=" + species +  
+                ", uploadTemplateDate=" + uploadTemplateDate +  
+                ", remarks=" + remarks + 
+                ", dataType=" + dataType +  
+                ", missingData=" + missingData + "]";
     }
 
 }

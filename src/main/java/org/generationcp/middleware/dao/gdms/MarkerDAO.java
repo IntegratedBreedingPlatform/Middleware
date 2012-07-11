@@ -30,6 +30,7 @@ import org.hibernate.SQLQuery;
  */
 @SuppressWarnings("unchecked")
 public class MarkerDAO extends GenericDAO<Marker, Integer>{
+    
     public List<Integer> getIdsByNames (List<String> names, int start, int numOfRows) throws QueryException {
         try {
             SQLQuery query = getSession().createSQLQuery(Marker.GET_IDS_BY_NAMES);
@@ -44,4 +45,18 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
             throw new QueryException("Error with get Marker IDs by list of Marker Names query: " + ex.getMessage());
         }
     }
+
+    /**
+     * Gets the marker type by marker ids.
+     *
+     * @param markerIds the marker ids
+     * @return the marker type by marker ids
+     * @throws QueryException the query exception
+     */
+    public List<String> getMarkerTypeByMarkerIds(List<Integer> markerIds) throws QueryException{
+        SQLQuery query = getSession().createSQLQuery(Marker.GET_MARKER_TYPE_BY_MARKER_IDS); 
+        query.setParameterList("markerIdList", markerIds);
+        return (List<String>) query.list();
+    }
+    
 }

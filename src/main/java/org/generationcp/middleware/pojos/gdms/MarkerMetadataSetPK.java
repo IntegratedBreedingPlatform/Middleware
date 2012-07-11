@@ -22,51 +22,43 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
- * The Class AccMetadataSetPK.
- * 
+ * The Class MarkerMetadataSetPK.
+ *
  * @author Joyce Avestro
- * 
  */
 @Embeddable
-public class AccMetadataSetPK implements Serializable{
+public class MarkerMetadataSetPK implements Serializable{
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
-
+    
     /** The dataset id. */
     @Basic(optional = false)
     @Column(name = "dataset_id")
     private Integer datasetId;
 
-    /** The germplasm id. */
+    /** The marker id. */
     @Basic(optional = false)
-    @Column(name = "gid")
-    private Integer germplasmId;
-
-    /** The name id. */
-    @Basic(optional = false)
-    @Column(name = "nid")
-    private Integer nameId;
+    @Column(name = "marker_id")
+    private Integer markerId;
 
     /**
-     * Instantiates a new AccMetadataSetPK.
+     * Instantiates a new MarkerMetadataSetPK.
      */
-    public AccMetadataSetPK() {
+    public MarkerMetadataSetPK() {
     }
 
     /**
-     * Instantiates a new AccMetadataSetPK.
+     * Instantiates a new MarkerMetadataSetPK.
      *
      * @param datasetId the dataset id
-     * @param germplasmId the germplasm id
-     * @param nameId the name id
+     * @param markerId the marker id
      */
-    public AccMetadataSetPK(Integer datasetId, Integer germplasmId, Integer nameId) {
+    public MarkerMetadataSetPK(Integer datasetId, Integer markerId) {
         this.datasetId = datasetId;
-        this.germplasmId = germplasmId;
-        this.nameId = nameId;
+        this.markerId = markerId;
     }
-
+        
     /**
      * Gets the dataset id.
      *
@@ -86,47 +78,21 @@ public class AccMetadataSetPK implements Serializable{
     }
     
     /**
-     * Gets the germplasm id.
+     * Gets the marker id.
      *
-     * @return the germplasm id
+     * @return the marker id
      */
-    public Integer getGermplasmId() {
-        return germplasmId;
+    public Integer getMarkerId() {
+        return markerId;
     }
-
+    
     /**
-     * Sets the germplasm id.
+     * Sets the marker id.
      *
-     * @param germplasmId the new germplasm id
+     * @param markerId the new marker id
      */
-    public void setGermplasmId(Integer germplasmId) {
-        this.germplasmId = germplasmId;
-    }
-
-    /**
-     * Gets the name id.
-     *
-     * @return the name id
-     */
-    public Integer getNameId() {
-        return nameId;
-    }
-
-    /**
-     * Sets the name id.
-     *
-     * @param nameId the new name id
-     */
-    public void setNameId(Integer nameId) {
-        this.nameId = nameId;
-    }
-
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(11, 71).append(datasetId).append(germplasmId).append(nameId).toHashCode();
+    public void setMarkerId(Integer markerId) {
+        this.markerId = markerId;
     }
 
     /* (non-Javadoc)
@@ -140,13 +106,20 @@ public class AccMetadataSetPK implements Serializable{
         if (obj == this) {
             return true;
         }
-        if (!(obj instanceof AccMetadataSetPK)) {
+        if (!(obj instanceof MarkerMetadataSetPK)) {
             return false;
         }
 
-        AccMetadataSetPK rhs = (AccMetadataSetPK) obj;
-        return new EqualsBuilder().appendSuper(super.equals(obj)).append(datasetId, rhs.datasetId).append(germplasmId, rhs.germplasmId)
-                .append(nameId, rhs.nameId).isEquals();
+        MarkerMetadataSetPK rhs = (MarkerMetadataSetPK) obj;
+        return new EqualsBuilder().appendSuper(super.equals(obj)).append(datasetId, rhs.datasetId).append(markerId, rhs.markerId).isEquals();
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(37, 83).append(datasetId).append(markerId).toHashCode();
     }
 
     /* (non-Javadoc)
@@ -154,7 +127,7 @@ public class AccMetadataSetPK implements Serializable{
      */
     @Override
     public String toString() {
-        return "AccMetadataSetPK [datasetId=" + datasetId + ", germplasmId=" + germplasmId +  ", nameId=" + nameId + "]";
+        return "MarkerMetadataSetPK [datasetId=" + datasetId + ", markerId=" + markerId + "]";
     }
 
 }
