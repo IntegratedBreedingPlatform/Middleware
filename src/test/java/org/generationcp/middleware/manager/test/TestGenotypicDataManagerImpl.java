@@ -40,7 +40,7 @@ public class TestGenotypicDataManagerImpl{
         factory = new ManagerFactory(local, central);
         manager = factory.getGenotypicDataManager();
     }
-
+    
     @Test
     public void testGetNameIdsByGermplasmIds() throws Exception {
         List<Integer> germplasmIds = new ArrayList<Integer>();
@@ -166,6 +166,19 @@ public class TestGenotypicDataManagerImpl{
                 System.out.println(" " + element);
             }
         }
+    }
+    
+    @Test
+    public void testGetMarkerIdsByMarkerNames() throws Exception {
+        List<String> markerNames = new ArrayList<String>();
+        markerNames.add("1_0085");
+        markerNames.add("1_0319");
+        markerNames.add("1_0312");
+        
+        /* Expected results are: [1, 2, 3, 174, 199, 201]
+         * This is based on the sample input data templates uploaded to GDMS */
+        List<Integer> markerIds = manager.getMarkerIdsByMarkerNames(markerNames, 0, 100);
+        System.out.println("getMarkerIdsByMarkerNames: " + markerIds);
     }
     
     @AfterClass

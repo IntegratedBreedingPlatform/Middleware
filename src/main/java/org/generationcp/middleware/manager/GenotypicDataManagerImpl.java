@@ -20,6 +20,7 @@ import org.generationcp.middleware.dao.gdms.AccMetadataSetDAO;
 import org.generationcp.middleware.dao.gdms.DatasetDAO;
 import org.generationcp.middleware.dao.gdms.MapDAO;
 import org.generationcp.middleware.dao.gdms.MappingDataDAO;
+import org.generationcp.middleware.dao.gdms.MarkerDAO;
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.pojos.Name;
@@ -145,6 +146,20 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return (List<DatasetElement>) dao.getDetailsByName(datasetName);
     }
     
-
+    @Override
+    public List<Integer> getMarkerIdsByMarkerNames(List<String> markerNames, int start, int numOfRows) throws QueryException {
+        MarkerDAO dao = new MarkerDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(Database.LOCAL); //TODO: Check for Local/Central handling
+        
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return new ArrayList<Integer> ();
+        }
+        
+        List<Integer> markerIds = dao.getIdsByNames(markerNames, start, numOfRows);
+        
+        return markerIds;
+    }
     
 }

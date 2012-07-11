@@ -90,5 +90,19 @@ public interface GenotypicDataManager{
     
     public List<DatasetElement> getDatasetDetailsByDatasetName(String datasetName) throws QueryException;
     
-    
+    /**
+     * Retrieves a list of matching Marker IDs from the Marker table based on 
+     * the specified list of Marker Names.
+     * 
+     * @param markerNames
+     *            - List of Marker Names to search for the corresponding Marker IDs
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
+     * @return List of matching Marker IDs based on the specified Marker Names 
+     * @throws QueryException
+     */
+    public List<Integer> getMarkerIdsByMarkerNames(List<String> markerNames, int start, int numOfRows) throws QueryException;
 }
