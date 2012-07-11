@@ -23,7 +23,6 @@ import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Attribute;
-import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
@@ -407,6 +406,9 @@ public class TestGermplasmDataManagerImpl{
         method.setMfprg(0);
         method.setMgrp("S");
         method.setMprgn(0);
+        method.setReference(0);
+        method.setUser(0);
+        
         method.setMtype("GEN");
         
         // add the method

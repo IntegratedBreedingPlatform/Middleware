@@ -42,7 +42,7 @@ import org.hibernate.annotations.NotFoundAction;
 @Table(name = "methods")
 // JAXB Element Tags for JSON output
 @XmlRootElement(name = "method")
-@XmlType(propOrder = { "mid", "mtype", "mcode", "mname", "mdesc", "mprgn", "mfprg", "mgrp" })
+@XmlType(propOrder = { "mid", "mtype", "mcode", "mname", "mdesc", "mprgn", "mfprg", "mgrp", "mref", "muid" })
 @XmlAccessorType(XmlAccessType.NONE)
 public class Method implements Serializable{
 
@@ -81,10 +81,10 @@ public class Method implements Serializable{
     @XmlElement(name = "description")
     private String mdesc;
 
-    @ManyToOne(targetEntity = Bibref.class)
-    @JoinColumn(name = "mref", nullable = true)
-    @NotFound(action = NotFoundAction.IGNORE)
-    private Bibref reference;
+    @Basic(optional = false)
+    @Column(name = "mref")
+    @XmlElement(name = "reference")
+    private Integer mref;
 
     @Basic(optional = false)
     @Column(name = "mprgn")
@@ -104,10 +104,10 @@ public class Method implements Serializable{
     @Column(name = "geneq")
     private Integer geneq;
 
-    @ManyToOne(targetEntity = User.class)
-    @JoinColumn(name = "muid", nullable = true)
-    @NotFound(action = NotFoundAction.IGNORE)
-    private User user;
+    @Basic(optional = false)
+    @Column(name = "muid")
+    @XmlElement(name = "userid")
+    private Integer muid;
 
     @Basic(optional = false)
     @Column(name = "lmid")
@@ -124,8 +124,8 @@ public class Method implements Serializable{
         this.mid = mid;
     }
 
-    public Method(Integer mid, String mtype, String mgrp, String mcode, String mname, String mdesc, Bibref reference, Integer mprgn,
-            Integer mfprg, Integer mattr, Integer geneq, User user, Integer lmid, Integer mdate) {
+    public Method(Integer mid, String mtype, String mgrp, String mcode, String mname, String mdesc, Integer mref, Integer mprgn,
+            Integer mfprg, Integer mattr, Integer geneq, Integer muid, Integer lmid, Integer mdate) {
         super();
         this.mid = mid;
         this.mtype = mtype;
@@ -133,12 +133,12 @@ public class Method implements Serializable{
         this.mcode = mcode;
         this.mname = mname;
         this.mdesc = mdesc;
-        this.reference = reference;
+        this.mref = mref;
         this.mprgn = mprgn;
         this.mfprg = mfprg;
         this.mattr = mattr;
         this.geneq = geneq;
-        this.user = user;
+        this.muid = muid;
         this.lmid = lmid;
         this.mdate = mdate;
     }
@@ -239,20 +239,20 @@ public class Method implements Serializable{
         this.mdate = mdate;
     }
 
-    public Bibref getReference() {
-        return reference;
+    public Integer getReference() {
+        return mref;
     }
 
-    public void setReference(Bibref reference) {
-        this.reference = reference;
+    public void setReference(Integer mref) {
+        this.mref = mref;
     }
 
-    public User getUser() {
-        return user;
+    public Integer getUser() {
+        return muid;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUser(Integer muid) {
+        this.muid = muid;
     }
 
     @Override
