@@ -30,6 +30,7 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
+import org.generationcp.middleware.pojos.gdms.MappingValueElement;
 import org.generationcp.middleware.util.HibernateUtil;
 
 /**
@@ -152,9 +153,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     
     
     @Override
-    public List<Integer> getMarkerIdsByMarkerNames(List<String> markerNames, int start, int numOfRows) throws QueryException {
+    public List<Integer> getMarkerIdsByMarkerNames(List<String> markerNames, int start, int numOfRows, Database instance) throws QueryException {
         MarkerDAO dao = new MarkerDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(Database.LOCAL); //TODO: Check for Local/Central handling
+        HibernateUtil hibernateUtil = getHibernateUtil(instance);
         
         if (hibernateUtil != null) {
             dao.setSession(hibernateUtil.getCurrentSession());
@@ -213,5 +214,33 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return (List<String>) dao.getMarkerTypeByMarkerIds(markerIds);
     }
     
+    @Override
+    public List<MappingValueElement> getMappingValuesByGidsAndMarkerNames(
+            List<Integer> gids, List<String> markerNames, int start, int numOfRows) throws QueryException {
+        MarkerDAO markerDao = new MarkerDAO();
+        MappingPopDAO mappingPopDao = new MappingPopDAO();
+        
+        //get db connection based on the GIDs provided
+        Database instance;
+        if (gids.get(0) < 0) {
+            instance = Database.LOCAL;
+        } else {
+            instance = Database.CENTRAL;
+        }
+        HibernateUtil hibernateUtil = getHibernateUtil(instance);
+        
+        if (hibernateUtil != null) {
+            markerDao.setSession(hibernateUtil.getCurrentSession());
+            mappingPopDao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return new ArrayList<MappingValueElement> ();
+        }
+        
+        List<Integer> markerIds = markerDao.getIdsByNames(markerNames, start, numOfRows);
+        
+        List<MappingValueElement> mappingValues = mappingPopDao.getMappingValuesByGidAndMarkerIds(gids, markerIds);
+        
+        return mappingValues;
+    }
     
 }

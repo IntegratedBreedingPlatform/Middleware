@@ -20,6 +20,7 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
+import org.generationcp.middleware.pojos.gdms.MappingValueElement;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 
 /**
@@ -102,10 +103,13 @@ public interface GenotypicDataManager{
      * @param numOfRows
      *            - the number of rows to be included in the sublist of results
      *            to be returned
+     * @param instance
+     *            - specifies whether the data should be retrieved from either the Central
+     *            or the Local IBDB instance
      * @return List of matching Marker IDs based on the specified Marker Names 
      * @throws QueryException
      */
-    public List<Integer> getMarkerIdsByMarkerNames(List<String> markerNames, int start, int numOfRows) throws QueryException;
+    public List<Integer> getMarkerIdsByMarkerNames(List<String> markerNames, int start, int numOfRows, Database instance) throws QueryException;
 
     /**
      * Gets the markerId by datasetId.
@@ -135,5 +139,23 @@ public interface GenotypicDataManager{
      * @throws QueryException the query exception
      */
     public List<String> getMarkerTypeByMarkerIds(List<Integer> markerIds)  throws QueryException;
+    
+    /**
+     * Retrieves a list of Mapping Values based on the specified GIDs and Marker Names.
+     * 
+     * @param gids
+     *          - list of Germplasm IDs
+     * @param markerNames
+     *          - list of Marker Names
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
+     * @return List of Mapping Values based on the specified Germplasm IDs and Marker Names
+     * @throws QueryException
+     */
+    public List<MappingValueElement> getMappingValuesByGidsAndMarkerNames(
+            List<Integer> gids, List<String> markerNames, int start, int numOfRows) throws QueryException;
     
 }

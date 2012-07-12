@@ -23,6 +23,7 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
+import org.generationcp.middleware.pojos.gdms.MappingValueElement;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -178,7 +179,7 @@ public class TestGenotypicDataManagerImpl{
         
         /* Expected results are: [1, 2, 3, 174, 199, 201]
          * This is based on the sample input data templates uploaded to GDMS */
-        List<Integer> markerIds = manager.getMarkerIdsByMarkerNames(markerNames, 0, 100);
+        List<Integer> markerIds = manager.getMarkerIdsByMarkerNames(markerNames, 0, 100, Database.LOCAL);
         System.out.println("getMarkerIdsByMarkerNames: " + markerIds);
     }
 
@@ -237,6 +238,22 @@ public class TestGenotypicDataManagerImpl{
                 System.out.println(" " + element);
             }
         }
+    }
+    
+    @Test
+    public void testGetMappingValuesByGidsAndMarkerNames() throws Exception {
+        List<String> markerNames = new ArrayList<String>();
+        markerNames.add("1_0085");
+        markerNames.add("1_0319");
+        markerNames.add("1_0312");
+        List<Integer> gids = new ArrayList<Integer>();
+        gids.add(-3785);
+        gids.add(-3786);
+        gids.add(-3787);
+        /* Expected results are: [datasetId=2, mappingType=allelic, parentAGid=-6785, parentBGid=-6786, markerType=S]
+         * This is based on the sample input data templates uploaded to GDMS */
+        List<MappingValueElement> mappingValues = manager.getMappingValuesByGidsAndMarkerNames(gids, markerNames, 0, 100);
+        System.out.println("getMappingValuesByGidsAndMarkerNames: " + mappingValues);
     }
     
     @AfterClass
