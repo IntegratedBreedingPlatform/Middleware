@@ -39,7 +39,7 @@ public class UserDAO extends GenericDAO<User, Integer>{
     
     public boolean isUsernameExists(String userName) {
         Criteria criteria = getSession().createCriteria(User.class);
-        criteria.add(Restrictions.like("name", userName));
+        criteria.add(Restrictions.eq("name", userName));
         
         //used a List in case of dirty data
         @SuppressWarnings("unchecked")

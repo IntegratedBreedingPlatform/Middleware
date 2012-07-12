@@ -122,7 +122,7 @@ private final static Logger log = LoggerFactory.getLogger(TestUserDataManagerImp
     
     @Test
     public void testIsUsernameExists() throws QueryException {
-        Boolean result = manager.isUsernameExists("GMC%");
+        Boolean result = manager.isUsernameExists("GMCLAREN");
         log.info(result.toString());
         result = manager.isUsernameExists("GUESTret");
         log.info(result.toString());
