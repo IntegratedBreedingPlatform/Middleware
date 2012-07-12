@@ -14,6 +14,8 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 public class UserDataManagerImpl extends DataManager implements UserDataManager {
+    
+    private List<Session> sessions;
 
     public UserDataManagerImpl() {
         super();
@@ -245,11 +247,12 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
         }
     }
     
-    @Override
-    public boolean isValidUserLogin(String username, String password) throws QueryException {
-        requireLocalDatabaseInstance();
+    private List<Session> getSessions() {
+        if(sessions != null) {
+            return sessions;
+        } 
         
-        List<Session> sessions = new ArrayList<Session>();
+        sessions = new ArrayList<Session>();
         
         if (hibernateUtilForLocal != null) {
             sessions.add(hibernateUtilForLocal.getCurrentSession());
@@ -259,7 +262,19 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
             sessions.add(hibernateUtilForCentral.getCurrentSession());
         }
         
-        for (Session session : sessions) {
+        if(sessions.isEmpty()) {
+            return null; 
+        } else {
+            return sessions;
+        }
+        
+    }
+    
+    @Override
+    public boolean isValidUserLogin(String username, String password) throws QueryException {
+        requireLocalDatabaseInstance();
+        
+        for (Session session : getSessions()) {
             UserDAO dao = new UserDAO();
             dao.setSession(session);
             User user = dao.findByUsernameAndPassword(username, password);
@@ -270,4 +285,38 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
         
         return false;
     }
+    
+    @Override
+    public boolean isPersonExists(String firstName, String lastName) throws QueryException {
+        requireLocalDatabaseInstance();
+        
+        PersonDAO dao = new PersonDAO();
+        for(Session session : getSessions()) {
+            dao.setSession(session);
+            if(dao.isPersonExists(firstName, lastName)) {
+                return true;
+            }   
+            dao.clear();
+        }
+        
+        return false;
+    }
+    
+    @Override
+    public boolean isUsernameExists(String userName) throws QueryException {
+        requireLocalDatabaseInstance();
+        
+        UserDAO dao = new UserDAO();
+        for(Session session : getSessions()) {
+            dao.setSession(session);
+            if(dao.isUsernameExists(userName)) {
+                return true;
+            }
+            dao.clear();
+        }
+        
+        return false;
+    }
+    
+    
 }

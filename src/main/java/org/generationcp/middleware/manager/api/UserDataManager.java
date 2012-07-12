@@ -50,4 +50,8 @@ public interface UserDataManager {
     void deletePerson(Person person) throws QueryException; 
     
     boolean isValidUserLogin(String username, String password) throws QueryException;
+    
+    boolean isPersonExists(String firstName, String lastName) throws QueryException;
+    
+    boolean isUsernameExists(String userName) throws QueryException;
 }

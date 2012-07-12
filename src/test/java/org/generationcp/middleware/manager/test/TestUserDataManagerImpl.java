@@ -112,4 +112,20 @@ private final static Logger log = LoggerFactory.getLogger(TestUserDataManagerImp
         manager.deletePerson(person);
     }
     
+    @Test
+    public void testIsPersonExists() throws QueryException {
+        Boolean result = manager.isPersonExists("PATERNO", "BORLAGDAN");
+        log.info(result.toString());
+        result = manager.isPersonExists("PATTY", "Borly".toUpperCase());
+        log.info(result.toString());
+    }
+    
+    @Test
+    public void testIsUsernameExists() throws QueryException {
+        Boolean result = manager.isUsernameExists("GMC%");
+        log.info(result.toString());
+        result = manager.isUsernameExists("GUESTret");
+        log.info(result.toString());
+    }
+    
 }

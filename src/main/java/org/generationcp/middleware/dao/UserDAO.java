@@ -36,5 +36,16 @@ public class UserDAO extends GenericDAO<User, Integer>{
             throw new QueryException(ex);
         }
     }
+    
+    public boolean isUsernameExists(String userName) {
+        Criteria criteria = getSession().createCriteria(User.class);
+        criteria.add(Restrictions.like("name", userName));
+        
+        //used a List in case of dirty data
+        @SuppressWarnings("unchecked")
+        List<User> users = criteria.list();
+        
+        return !users.isEmpty();
+    }
 	
 }
