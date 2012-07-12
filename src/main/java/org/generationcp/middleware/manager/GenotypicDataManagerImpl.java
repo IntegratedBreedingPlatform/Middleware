@@ -30,6 +30,7 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
+import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MappingValueElement;
 import org.generationcp.middleware.util.HibernateUtil;
 
@@ -122,7 +123,20 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
     
     @Override
-    public List<String> getDatasetNames(Database instance) throws QueryException{
+    public int countDatasetNames(Database instance) throws QueryException{
+        DatasetDAO dao = new DatasetDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(instance);  
+        
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return 0;
+        }
+        return dao.countByName();
+    }
+    
+    @Override
+    public List<String> getDatasetNames(Integer start, Integer numOfRows, Database instance) throws QueryException{
         DatasetDAO dao = new DatasetDAO();
         HibernateUtil hibernateUtil = getHibernateUtil(instance);  
         
@@ -131,7 +145,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         } else {
             return new ArrayList<String>();
         }
-        return (List<String>) dao.getDatasetNames();
+        return (List<String>) dao.getDatasetNames(start, numOfRows);
     }
     
     
@@ -214,6 +228,19 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return (List<String>) dao.getMarkerTypeByMarkerIds(markerIds);
     }
     
+    @Override
+    public List<MarkerNameElement> getMarkerNamesByGIds(List<Integer> gIds) throws QueryException{
+        MarkerDAO dao = new MarkerDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(gIds.get(0));  
+        
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return new ArrayList<MarkerNameElement>();
+        }
+        return (List<MarkerNameElement>) dao.getMarkerNamesByGIds(gIds);
+    }
+
     @Override
     public List<MappingValueElement> getMappingValuesByGidsAndMarkerNames(
             List<Integer> gids, List<String> markerNames, int start, int numOfRows) throws QueryException {

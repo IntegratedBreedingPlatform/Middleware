@@ -44,6 +44,29 @@ public class Marker implements Serializable{
 
     public static final String GET_IDS_BY_NAMES = "select marker_id from marker where marker_name in (:markerNameList)";
 
+    // For getMarkNamesByGIds()
+    public static final String GET_ALLELE_COUNT_BY_GID = "select count(*) from allele_values where gid in (:gIdList)";
+    public static final String GET_CHAR_COUNT_BY_GID = "select count(*) from char_values where gid in (:gIdList)";
+    public static final String GET_MAPPING_COUNT_BY_GID = "select count(*) from mapping_pop_values where gid in (:gIdList)";
+    public static final String GET_ALLELE_MARKER_NAMES_BY_GID = 
+            "select distinct allele_values.gid, concat(marker.marker_name,'') " +
+            "from allele_values join marker on allele_values.marker_id = marker.marker_id " +
+            "where allele_values.gid in (:gIdList) " +
+            "order by gid, marker_name";
+    public static final String GET_CHAR_MARKER_NAMES_BY_GID =         
+            "select distinct char_values.gid, concat(marker.marker_name,'') " +
+            "from char_values join marker on char_values.marker_id = marker.marker_id " +
+            "where char_values.gid in (:gIdList) " +
+            "order by gid, marker_name";
+    public static final String GET_MAPPING_MARKER_NAMES_BY_GID = 
+            "select distinct mapping_pop_values.gid, concat(marker.marker_name,'') " + 
+            "from mapping_pop_values join marker on mapping_pop_values.marker_id = marker.marker_id " +
+            "where mapping_pop_values.gid in (:gIdList) " +
+            "order by gid, marker_name";
+
+    
+
+    
     /** The marker id. */
     @Id
     @Basic(optional = false)

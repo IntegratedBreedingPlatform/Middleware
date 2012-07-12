@@ -20,6 +20,7 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
+import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MappingValueElement;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 
@@ -87,7 +88,10 @@ public interface GenotypicDataManager{
     public List<MapInfo> getMapInfoByMapName(String mapName, Database instance) throws QueryException;
     
     
-    public List<String> getDatasetNames(Database instance) throws QueryException;
+    public int countDatasetNames(Database instance) throws QueryException;
+
+    
+    public List<String> getDatasetNames(Integer start, Integer numOfRows, Database instance) throws QueryException;
     
     
     public List<DatasetElement> getDatasetDetailsByDatasetName(String datasetName, Database instance) throws QueryException;
@@ -139,6 +143,8 @@ public interface GenotypicDataManager{
      * @throws QueryException the query exception
      */
     public List<String> getMarkerTypeByMarkerIds(List<Integer> markerIds)  throws QueryException;
+    
+    public List<MarkerNameElement> getMarkerNamesByGIds(List<Integer> gIds) throws QueryException;
     
     /**
      * Retrieves a list of Mapping Values based on the specified GIDs and Marker Names.

@@ -36,6 +36,7 @@ public class Dataset implements Serializable{
 
     private static final long serialVersionUID = 1L;
 
+    public static final String COUNT_BY_NAME = "select count(dataset_name) from dataset where dataset_type !='QTL'";
     public static final String GET_DATASET_NAMES_NOT_QTL = "select concat(dataset_name, '') from dataset where dataset_type !='QTL'";
     public static final String GET_DETAILS_BY_NAME = "select dataset_id, concat(dataset_type, '') from dataset where dataset_name = :datasetName";
     

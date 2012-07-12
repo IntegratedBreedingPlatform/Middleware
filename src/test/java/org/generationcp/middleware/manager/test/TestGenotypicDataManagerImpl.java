@@ -23,6 +23,7 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
+import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MappingValueElement;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.junit.AfterClass;
@@ -135,10 +136,18 @@ public class TestGenotypicDataManagerImpl{
             }
         }
     }
+    
 
     @Test
+    public void testCountDatasetNames() throws Exception {
+        int results = manager.countDatasetNames(Database.LOCAL);
+        System.out.println("RESULTS (testCountDatasetNames): " + results);
+    }
+
+    
+    @Test
     public void testGetDatasetNames() throws Exception {
-        List<String> results = manager.getDatasetNames(Database.LOCAL);
+        List<String> results = manager.getDatasetNames(0, 5, Database.LOCAL);
         System.out.println("RESULTS (testGetDatasetNames):");
         if (results == null || results.isEmpty()) {
             System.out.println(" No records found.");
@@ -240,6 +249,27 @@ public class TestGenotypicDataManagerImpl{
         }
     }
     
+    @Test
+    public void testGetMarkerNamesByGIds() throws Exception {
+        List<Integer> gIds = new ArrayList<Integer>();
+        gIds.add(Integer.valueOf(-4072));
+        gIds.add(Integer.valueOf(-4070));
+        gIds.add(Integer.valueOf(-4069));
+        
+        List<MarkerNameElement> results = manager.getMarkerNamesByGIds(gIds);
+        System.out.println("RESULTS (testGetMarkerNamesByGIds):");
+        if (results == null || results.isEmpty()) {
+            System.out.println(" No records found.");
+        } else {
+            for (Object obj : results){
+                Assert.assertTrue(obj instanceof MarkerNameElement);
+                Assert.assertTrue(obj != null);
+                MarkerNameElement element = (MarkerNameElement) obj;
+                System.out.println(" " + element);
+            }
+        }
+    }
+     
     @Test
     public void testGetMappingValuesByGidsAndMarkerNames() throws Exception {
         List<String> markerNames = new ArrayList<String>();

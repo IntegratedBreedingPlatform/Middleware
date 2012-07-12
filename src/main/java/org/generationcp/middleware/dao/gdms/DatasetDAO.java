@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao.gdms;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +20,7 @@ import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 
 /**
@@ -30,14 +32,22 @@ import org.hibernate.SQLQuery;
 @SuppressWarnings("unchecked")
 public class DatasetDAO extends GenericDAO<Dataset, Integer>{
     
+    public int countByName(){
+        Query query = getSession().createSQLQuery(Dataset.COUNT_BY_NAME);
+        BigInteger count = (BigInteger) query.uniqueResult();
+        return count.intValue();
+    }
+    
     /**
      * Gets the dataset names.
      *
      * @return the dataset names
      * @throws QueryException the query exception
      */
-    public List<String> getDatasetNames() throws QueryException{
+    public List<String> getDatasetNames(Integer start, Integer numOfRows) throws QueryException{
         SQLQuery query = getSession().createSQLQuery(Dataset.GET_DATASET_NAMES_NOT_QTL); 
+        query.setFirstResult(start);
+        query.setMaxResults(numOfRows);
         return (List<String>) query.list();
     }
     
