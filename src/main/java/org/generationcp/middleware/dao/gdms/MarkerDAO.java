@@ -17,6 +17,9 @@ import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.pojos.gdms.AlleleValues;
+import org.generationcp.middleware.pojos.gdms.CharValues;
+import org.generationcp.middleware.pojos.gdms.MappingPopValues;
 import org.generationcp.middleware.pojos.gdms.Marker;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.hibernate.HibernateException;
@@ -89,15 +92,15 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
             // Search the allele_values, char_values, mapping_pop_values tables for the existence of gids.
             // by getting alleleCount, charCount and mappingCount
             
-            SQLQuery query = getSession().createSQLQuery(Marker.GET_ALLELE_COUNT_BY_GID);
+            SQLQuery query = getSession().createSQLQuery(AlleleValues.GET_ALLELE_COUNT_BY_GID);
             query.setParameterList("gIdList", gIds);
             BigInteger alleleCount = (BigInteger) query.uniqueResult();
             
-            query = getSession().createSQLQuery(Marker.GET_CHAR_COUNT_BY_GID);
+            query = getSession().createSQLQuery(CharValues.GET_CHAR_COUNT_BY_GID);
             query.setParameterList("gIdList", gIds);
             BigInteger charCount = (BigInteger) query.uniqueResult();
             
-            query = getSession().createSQLQuery(Marker.GET_MAPPING_COUNT_BY_GID);
+            query = getSession().createSQLQuery(MappingPopValues.GET_MAPPING_COUNT_BY_GID);
             query.setParameterList("gIdList", gIds);
             BigInteger mappingCount = (BigInteger) query.uniqueResult();
 

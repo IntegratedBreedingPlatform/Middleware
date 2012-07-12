@@ -15,10 +15,13 @@ package org.generationcp.middleware.pojos.gdms.test;
 import java.util.List;
 
 import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
+import org.generationcp.middleware.pojos.gdms.AlleleValues;
+import org.generationcp.middleware.pojos.gdms.CharValues;
 import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MappingData;
 import org.generationcp.middleware.pojos.gdms.MappingPop;
+import org.generationcp.middleware.pojos.gdms.MappingPopValues;
 import org.generationcp.middleware.pojos.gdms.Marker;
 import org.generationcp.middleware.pojos.gdms.MarkerMetadataSet;
 import org.generationcp.middleware.util.HibernateUtil;
@@ -51,6 +54,36 @@ public class PojosSimpleTest{
             Assert.assertTrue(obj instanceof AccMetadataSet);
             Assert.assertTrue(obj != null);
             AccMetadataSet element = (AccMetadataSet) obj;
+            System.out.println(element);
+        }
+    }
+
+    @Test
+    public void testAlleleValues() {
+        Session session = hibernateUtil.getCurrentSession();
+        Query query = session.createQuery("FROM AlleleValues");
+        query.setMaxResults(5);
+        List results = query.list();
+
+        for (Object obj : results) {
+            Assert.assertTrue(obj instanceof AlleleValues);
+            Assert.assertTrue(obj != null);
+            AlleleValues element = (AlleleValues) obj;
+            System.out.println(element);
+        }
+    }
+
+    @Test
+    public void testCharValues() {
+        Session session = hibernateUtil.getCurrentSession();
+        Query query = session.createQuery("FROM CharValues");
+        query.setMaxResults(5);
+        List results = query.list();
+
+        for (Object obj : results) {
+            Assert.assertTrue(obj instanceof CharValues);
+            Assert.assertTrue(obj != null);
+            CharValues element = (CharValues) obj;
             System.out.println(element);
         }
     }
@@ -111,6 +144,21 @@ public class PojosSimpleTest{
             Assert.assertTrue(obj instanceof MappingPop);
             Assert.assertTrue(obj != null);
             MappingPop element = (MappingPop) obj;
+            System.out.println(element);
+        }
+    }
+
+    @Test
+    public void testMappingPopValues() {
+        Session session = hibernateUtil.getCurrentSession();
+        Query query = session.createQuery("FROM MappingPopValues");
+        query.setMaxResults(5);
+        List results = query.list();
+
+        for (Object obj : results) {
+            Assert.assertTrue(obj instanceof MappingPopValues);
+            Assert.assertTrue(obj != null);
+            MappingPopValues element = (MappingPopValues) obj;
             System.out.println(element);
         }
     }

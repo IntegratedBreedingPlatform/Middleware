@@ -60,13 +60,16 @@
   <mapping class="org.generationcp.middleware.pojos.Transaction"/>
   <mapping class="org.generationcp.middleware.pojos.Person"/>
   <mapping class="org.generationcp.middleware.pojos.gdms.AccMetadataSet"/>
+  <mapping class="org.generationcp.middleware.pojos.gdms.AlleleValues"/>
+  <mapping class="org.generationcp.middleware.pojos.gdms.CharValues"/>
   <mapping class="org.generationcp.middleware.pojos.gdms.Dataset"/>
   <mapping class="org.generationcp.middleware.pojos.gdms.Map"/>
   <mapping class="org.generationcp.middleware.pojos.gdms.MappingData"/>
   <mapping class="org.generationcp.middleware.pojos.gdms.MappingPop"/>
+  <mapping class="org.generationcp.middleware.pojos.gdms.MappingPopValues"/>
   <mapping class="org.generationcp.middleware.pojos.gdms.Marker"/>
   <mapping class="org.generationcp.middleware.pojos.gdms.MarkerMetadataSet"/>
-  
+
   <mapping class="org.generationcp.middleware.pojos.workbench.Contact"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.Project"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.ProjectWorkflowStep"/>

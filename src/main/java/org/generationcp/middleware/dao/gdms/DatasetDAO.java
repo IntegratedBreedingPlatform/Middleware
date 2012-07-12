@@ -32,6 +32,11 @@ import org.hibernate.SQLQuery;
 @SuppressWarnings("unchecked")
 public class DatasetDAO extends GenericDAO<Dataset, Integer>{
     
+    /**
+     * Gets the count by dataset name.
+     *
+     * @return the int
+     */
     public int countByName(){
         Query query = getSession().createSQLQuery(Dataset.COUNT_BY_NAME);
         BigInteger count = (BigInteger) query.uniqueResult();
@@ -41,6 +46,8 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer>{
     /**
      * Gets the dataset names.
      *
+     * @param start the start
+     * @param numOfRows the num of rows
      * @return the dataset names
      * @throws QueryException the query exception
      */

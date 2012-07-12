@@ -14,7 +14,6 @@ package org.generationcp.middleware.pojos.gdms;
 import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
-import javax.persistence.Embeddable;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -27,7 +26,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * @author Joyce Avestro
  *
  */
-@Embeddable
 public class MarkerNameElement implements Serializable{
         
     /** The Constant serialVersionUID. */
