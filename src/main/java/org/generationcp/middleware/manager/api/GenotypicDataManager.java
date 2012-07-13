@@ -34,7 +34,7 @@ public interface GenotypicDataManager{
     /**
      * Gets the name ids by germplasm ids.
      *
-     * @param gIds the g ids
+     * @param gIds the germplasm ids
      * @return the name ids by germplasm ids
      * @throws QueryException the query exception
      */
@@ -43,7 +43,7 @@ public interface GenotypicDataManager{
     /**
      * Gets the names by name ids.
      *
-     * @param nIds the n ids
+     * @param nIds the name ids
      * @return the names by name ids
      * @throws QueryException the query exception
      */
@@ -52,7 +52,7 @@ public interface GenotypicDataManager{
     /**
      * Gets the name by name id.
      *
-     * @param nId the n id
+     * @param nId the name id
      * @return the name by name id
      * @throws QueryException the query exception
      */
@@ -88,9 +88,25 @@ public interface GenotypicDataManager{
     public List<MapInfo> getMapInfoByMapName(String mapName, Database instance) throws QueryException;
     
     
+    /**
+     * Count the dataset names.
+     *
+     * @param instance the instance of the database - either Database.LOCAL or Database.CENTRAL 
+     * @return the number of dataset names
+     * @throws QueryException the query exception
+     */
     public int countDatasetNames(Database instance) throws QueryException;
 
     
+    /**
+     * Gets the dataset names.
+     *
+     * @param start the start row
+     * @param numOfRows the num of rows to retrieve
+     * @param instance the instance of the database - either Database.LOCAL or Database.CENTRAL 
+     * @return the dataset names
+     * @throws QueryException the query exception
+     */
     public List<String> getDatasetNames(Integer start, Integer numOfRows, Database instance) throws QueryException;
     
     
@@ -144,8 +160,25 @@ public interface GenotypicDataManager{
      */
     public List<String> getMarkerTypeByMarkerIds(List<Integer> markerIds)  throws QueryException;
     
+    /**
+     * Gets the marker names by germplasm ids.
+     *
+     * @param gIds the germplasm ids
+     * @return the marker names by germplasm ids
+     * @throws QueryException the query exception
+     */
     public List<MarkerNameElement> getMarkerNamesByGIds(List<Integer> gIds) throws QueryException;
     
+    /**
+     * Gets the germplasm names by marker names.
+     *
+     * @param markerNames the marker names
+     * @param instance the instance of the database - either Database.LOCAL or Database.CENTRAL 
+     * @return the germplasm names by marker names
+     * @throws QueryException the query exception
+     */
+    public List<String> getGermplasmNamesByMarkerNames(List<String> markerNames, Database instance) throws QueryException;
+
     /**
      * Retrieves a list of Mapping Values based on the specified GIDs and Marker Names.
      * 

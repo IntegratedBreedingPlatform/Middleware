@@ -270,6 +270,28 @@ public class TestGenotypicDataManagerImpl{
         }
     }
      
+    
+    @Test
+    public void testGetGermplasmNamesByMarkerNames() throws Exception {
+        List<String> markerNames = new ArrayList<String>();
+        markerNames.add("1_0001");
+        markerNames.add("1_0007");
+        markerNames.add("1_0013");
+        
+        List<String> results = manager.getGermplasmNamesByMarkerNames(markerNames, Database.LOCAL);
+        System.out.println("RESULTS (testGetGermplasmNamesByMarkerNames):");
+        if (results == null || results.isEmpty()) {
+            System.out.println(" No records found.");
+        } else {
+            for (Object obj : results){
+                Assert.assertTrue(obj instanceof String);
+                Assert.assertTrue(obj != null);
+                String element = (String) obj;
+                System.out.println(" " + element);
+            }
+        }
+    }
+    
     @Test
     public void testGetMappingValuesByGidsAndMarkerNames() throws Exception {
         List<String> markerNames = new ArrayList<String>();

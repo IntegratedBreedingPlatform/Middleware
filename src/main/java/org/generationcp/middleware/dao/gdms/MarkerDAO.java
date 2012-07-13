@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.AlleleValues;
 import org.generationcp.middleware.pojos.gdms.CharValues;
 import org.generationcp.middleware.pojos.gdms.MappingPopValues;
@@ -160,5 +161,64 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
         }
     }
     
+    
+    /**
+     * Gets the germplasm names by marker names.
+     *
+     * @param markerNames the marker names
+     * @return the germplasm names by marker names
+     * @throws QueryException the query exception
+     */
+    public List<String> getGermplasmNamesByMarkerNames (List<String> markerNames) throws QueryException {
+        
+        //Get marker_ids by marker_names
+        List<Integer> markerIds = getIdsByNames(markerNames, 0, countAll().intValue());
+        
+        try {
+            // Search the allele_values, char_values, mapping_pop_values tables for the existence of marker_ids.
+            // by getting alleleCount, charCount and mappingCount
+           
+            SQLQuery query = getSession().createSQLQuery(AlleleValues.GET_ALLELE_COUNT_BY_MARKER_ID);
+            query.setParameterList("markerIdList", markerIds);
+            BigInteger alleleCount = (BigInteger) query.uniqueResult();
+            
+            query = getSession().createSQLQuery(CharValues.GET_CHAR_COUNT_BY_MARKER_ID);
+            query.setParameterList("markerIdList", markerIds);
+            BigInteger charCount = (BigInteger) query.uniqueResult();
+            
+            query = getSession().createSQLQuery(MappingPopValues.GET_MAPPING_COUNT_BY_MARKER_ID);
+            query.setParameterList("markerIdList", markerIds);
+            BigInteger mappingCount = (BigInteger) query.uniqueResult();
+
+            // Get gids from allele_values, char_values, mapping_pop_values by marker ids
+            List<Integer> gIds = new ArrayList<Integer>();
+
+            if (alleleCount.intValue() > 0) {
+                query = getSession().createSQLQuery(AlleleValues.GET_ALLELE_GIDS_BY_MARKER_ID);
+                query.setParameterList("markerIdList", markerIds);
+                gIds.addAll((List<Integer>) query.list());
+            }
+
+            if (charCount.intValue() > 0) {
+                query = getSession().createSQLQuery(CharValues.GET_CHAR_GIDS_BY_MARKER_ID);
+                query.setParameterList("markerIdList", markerIds);
+                gIds.addAll((List<Integer>) query.list());
+            }
+            
+            if (mappingCount.intValue() > 0) {
+                query = getSession().createSQLQuery(MappingPopValues.GET_MAPPING_GIDS_BY_MARKER_ID);
+                query.setParameterList("markerIdList", markerIds);
+                gIds.addAll((List<Integer>) query.list());
+            }
+            
+            //Returns germplasm names matching the marker names
+            query = getSession().createSQLQuery(Name.GET_NVAL_BY_GID);
+            query.setParameterList("gIdList", gIds);
+            return (List<String>) query.list();
+            
+        } catch (HibernateException ex) {
+            throw new QueryException("Error with get Germplasm Names by list of Marker Names query: " + ex.getMessage());
+        }
+    }
 
 }

@@ -24,10 +24,9 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
- * POJO for allele_values table
- * 
+ * POJO for allele_values table.
+ *
  * @author Joyce Avestro
- *  
  */
 @Entity
 @Table(name = "allele_values")
@@ -37,27 +36,33 @@ public class AlleleValues implements Serializable{
     private static final long serialVersionUID = 1L;
     
     // For getMarkerNamesByGIds()
+    /** The Constant GET_ALLELE_COUNT_BY_GID. */
     public static final String GET_ALLELE_COUNT_BY_GID = "select count(*) from allele_values where gid in (:gIdList)";
     
     // For getGermplasmNamesByMarkerNames()
+    /** The Constant GET_ALLELE_COUNT_BY_MARKER_ID. */
     public static final String GET_ALLELE_COUNT_BY_MARKER_ID = "select count(*) from allele_values where marker_id in (:markerIdList)";
+    
+    /** The Constant GET_ALLELE_GIDS_BY_MARKER_ID. */
     public static final String GET_ALLELE_GIDS_BY_MARKER_ID = 
             "SELECT distinct gid FROM allele_values WHERE marker_id in (:markerIdList) ORDER BY gid";
 
-        
     @Id
     @Basic(optional = false)
     @Column(name = "an_id")
     private Integer anId;
 
+    /** The dataset id. */
     @Basic(optional = false)
     @Column(name = "dataset_id")
     private Integer datasetId;
 
+    /** The germplasm id. */
     @Basic(optional = false)
     @Column(name = "gid")
     private Integer gId;
     
+    /** The allele bin value. */
     @Basic(optional = false)
     @Column(name = "marker_id")
     private Integer markerId;
@@ -66,13 +71,26 @@ public class AlleleValues implements Serializable{
     @Column(name = "allele_bin_value")
     private String alleleBinValue;
 
+    /** The allele raw value. */
     @Basic(optional = false)
     @Column(name = "allele_raw_value")
     private String alleleRawValue;
     
+    /**
+     * Instantiates a new allele values.
+     */
     public AlleleValues() {
     }
 
+    /**
+     * Instantiates a new allele values.
+     *
+     * @param anId the anId
+     * @param datasetId the dataset id
+     * @param gId the germplasm id
+     * @param alleleBinValue the allele bin value
+     * @param alleleRawValue the allele raw value
+     */
     public AlleleValues(Integer anId, Integer datasetId, Integer gId, Integer markerId, String alleleBinValue, String alleleRawValue) {
         super();
         this.anId = anId;
@@ -83,26 +101,56 @@ public class AlleleValues implements Serializable{
         this.alleleRawValue = alleleRawValue;
     }
     
+    /**
+     * Gets the anId.
+     *
+     * @return the anId
+     */
     public Integer getAnId() {
         return anId;
     }
     
+    /**
+     * Sets the anId.
+     *
+     * @param anId the new anId
+     */
     public void setAnId(Integer anId) {
         this.anId = anId;
     }
     
+    /**
+     * Gets the dataset id.
+     *
+     * @return the dataset id
+     */
     public Integer getDatasetId() {
         return datasetId;
     }
     
+    /**
+     * Sets the dataset id.
+     *
+     * @param datasetId the new dataset id
+     */
     public void setDatasetId(Integer datasetId) {
         this.datasetId = datasetId;
     }
     
+    /**
+     * Gets the germplasm id.
+     *
+     * @return the germplasm id
+     */
     public Integer getgId() {
         return gId;
     }
     
+    /**
+     * Sets the germplasm id.
+     *
+     * @param gId the new germplasm id
+     */
     public void setgId(Integer gId) {
         this.gId = gId;
     }
@@ -115,18 +163,38 @@ public class AlleleValues implements Serializable{
         this.markerId = markerId;
     }
 
+    /**
+     * Gets the allele bin value.
+     *
+     * @return the allele bin value
+     */
     public String getAlleleBinValue() {
         return alleleBinValue;
     }
     
+    /**
+     * Sets the allele bin value.
+     *
+     * @param alleleBinValue the new allele bin value
+     */
     public void setAlleleBinValue(String alleleBinValue) {
         this.alleleBinValue = alleleBinValue;
     }
     
+    /**
+     * Gets the allele raw value.
+     *
+     * @return the allele raw value
+     */
     public String getAlleleRawValue() {
         return alleleRawValue;
     }
     
+    /**
+     * Sets the allele raw value.
+     *
+     * @param alleleRawValue the new allele raw value
+     */
     public void setAlleleRawValue(String alleleRawValue) {
         this.alleleRawValue = alleleRawValue;
     }
@@ -139,6 +207,9 @@ public class AlleleValues implements Serializable{
         return new HashCodeBuilder(37, 127).append(anId).toHashCode();
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {

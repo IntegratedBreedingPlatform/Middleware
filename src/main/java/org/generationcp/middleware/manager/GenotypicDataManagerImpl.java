@@ -240,6 +240,20 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         }
         return (List<MarkerNameElement>) dao.getMarkerNamesByGIds(gIds);
     }
+    
+    @Override
+    public List<String> getGermplasmNamesByMarkerNames(List<String> markerNames, Database instance) throws QueryException{
+        MarkerDAO dao = new MarkerDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(instance);  
+        
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return new ArrayList<String>();
+        }
+        return (List<String>) dao.getGermplasmNamesByMarkerNames(markerNames);
+    }
+    
 
     @Override
     public List<MappingValueElement> getMappingValuesByGidsAndMarkerNames(
