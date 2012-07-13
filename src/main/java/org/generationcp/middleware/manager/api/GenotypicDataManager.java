@@ -36,7 +36,7 @@ public interface GenotypicDataManager{
      *
      * @param gIds the germplasm ids
      * @return the name ids by germplasm ids
-     * @throws QueryException the query exception
+     * @throws QueryException
      */
     public List<Integer> getNameIdsByGermplasmIds(List<Integer> gIds) throws QueryException;
 
@@ -45,7 +45,7 @@ public interface GenotypicDataManager{
      *
      * @param nIds the name ids
      * @return the names by name ids
-     * @throws QueryException the query exception
+     * @throws QueryException
      */
     public List<Name> getNamesByNameIds(List<Integer> nIds) throws QueryException;
 
@@ -54,18 +54,9 @@ public interface GenotypicDataManager{
      *
      * @param nId the name id
      * @return the name by name id
-     * @throws QueryException the query exception
+     * @throws QueryException
      */
     public Name getNameByNameId(Integer nId) throws QueryException;
-    
-    /**
-     * Gets the all maps.
-     *
-     * @param instance the instance
-     * @return the all maps
-     * @throws QueryException the query exception
-     */
-    public List<Map> getAllMaps(Database instance) throws QueryException;
     
     /**
      * Gets the all maps.
@@ -135,10 +126,10 @@ public interface GenotypicDataManager{
      * Gets the markerId by datasetId.
      *
      * @param datasetId the dataset id
-     * @return the markerId by datasetId
+     * @return the markerIds by datasetId
      * @throws QueryException the query exception
      */
-    public List<Integer> getMarkerIdByDatasetId(Integer datasetId) throws QueryException;
+    public List<Integer> getMarkerIdsByDatasetId(Integer datasetId) throws QueryException;
     
     
     /**
@@ -158,7 +149,7 @@ public interface GenotypicDataManager{
      * @return the marker type by marker ids
      * @throws QueryException the query exception
      */
-    public List<String> getMarkerTypeByMarkerIds(List<Integer> markerIds)  throws QueryException;
+    public List<String> getMarkerTypesByMarkerIds(List<Integer> markerIds)  throws QueryException;
     
     /**
      * Gets the marker names by germplasm ids.
