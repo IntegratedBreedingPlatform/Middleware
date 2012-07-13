@@ -59,6 +59,10 @@ public class AlleleValues implements Serializable{
     private Integer gId;
     
     @Basic(optional = false)
+    @Column(name = "marker_id")
+    private Integer markerId;
+    
+    @Basic(optional = false)
     @Column(name = "allele_bin_value")
     private String alleleBinValue;
 
@@ -69,11 +73,12 @@ public class AlleleValues implements Serializable{
     public AlleleValues() {
     }
 
-    public AlleleValues(Integer anId, Integer datasetId, Integer gId, String alleleBinValue, String alleleRawValue) {
+    public AlleleValues(Integer anId, Integer datasetId, Integer gId, Integer markerId, String alleleBinValue, String alleleRawValue) {
         super();
         this.anId = anId;
         this.datasetId = datasetId;
         this.gId = gId;
+        this.markerId = markerId;
         this.alleleBinValue = alleleBinValue;
         this.alleleRawValue = alleleRawValue;
     }
@@ -100,6 +105,14 @@ public class AlleleValues implements Serializable{
     
     public void setgId(Integer gId) {
         this.gId = gId;
+    }
+
+    public Integer getMarkerId() {
+        return markerId;
+    }
+    
+    public void setMarkerId(Integer markerId) {
+        this.markerId = markerId;
     }
 
     public String getAlleleBinValue() {
@@ -147,11 +160,13 @@ public class AlleleValues implements Serializable{
      */
     @Override
     public String toString() {
-        return "AlleleValues [anId=" + anId 
-                        + ", datasetId=" + datasetId 
-                        + ", gId=" + gId 
-                        + ", alleleBinValue=" + alleleBinValue 
-                        + ", alleleRawValue=" + alleleRawValue + "]";
+        return "AlleleValues " +
+        		"[anId=" + anId + 
+        		", datasetId=" + datasetId + 
+        		", gId=" + gId + 
+        		", markerId=" + markerId + 
+        		", alleleBinValue=" + alleleBinValue + 
+        		", alleleRawValue=" + alleleRawValue + "]";
     }
-
+    
 }
