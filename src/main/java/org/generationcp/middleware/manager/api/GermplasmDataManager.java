@@ -469,7 +469,7 @@ public interface GermplasmDataManager {
     /**
      * Inserts a single {@code Method} object into the database.
      * 
-     * @param location
+     * @param method
      *            - The {@code Method} object to be persisted to the database.
      *            Must be a valid {@code Method} object.
      * @return Returns the number of {@code Method} records inserted in the
@@ -481,7 +481,7 @@ public interface GermplasmDataManager {
     /**
      * Deletes a single {@code Method} object into the database.
      * 
-     * @param location
+     * @param method
      *            - The {@code Method} object to be persisted to the database.
      *            Must be a valid {@code Method} object.
      * @throws QueryException
