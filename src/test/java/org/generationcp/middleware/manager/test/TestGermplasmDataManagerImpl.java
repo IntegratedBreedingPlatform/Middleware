@@ -48,7 +48,7 @@ public class TestGermplasmDataManagerImpl{
     @Test
     public void testGetAllLocations() throws Exception {
         long start = System.currentTimeMillis();
-        List<Location> locationList = manager.getAllLocations(0, 5);
+        List<Location> locationList = manager.getAllLocations(3869, 4);
         Assert.assertTrue(locationList != null);
 
         System.out.println("SEARCH RESULTS");

@@ -65,16 +65,23 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
         List<Location> locations = new ArrayList<Location>();
         
-        // get the list of Location from the local instance
-        if (hibernateUtilForLocal != null) {
-            dao.setSession(hibernateUtilForLocal.getCurrentSession());
-            locations.addAll(dao.getAll());
-        }
-         
         // get the list of Location from the central instance
         if (hibernateUtilForCentral != null) {
             dao.setSession(hibernateUtilForCentral.getCurrentSession());
-            locations.addAll(dao.getAll());
+            locations.addAll(dao.getAll(start, numOfRows));
+        }
+        
+        int diff = ((dao.countAll().intValue()+1)-start) - numOfRows;
+        
+        if (diff < 0) {
+        
+	        // get the list of Location from the local instance
+	        if (hibernateUtilForLocal != null) {
+	            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+	            locations.addAll(dao.getAll(0, Math.abs(diff)));   
+	            
+	        }
+        
         }
         
         return locations;
