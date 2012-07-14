@@ -55,7 +55,7 @@ import org.hibernate.Transaction;
  * 
  */
 public class GermplasmDataManagerImpl extends DataManager implements GermplasmDataManager {
-    
+	
     public GermplasmDataManagerImpl(HibernateUtil hibernateUtilForLocal, HibernateUtil hibernateUtilForCentral) {
         super(hibernateUtilForLocal, hibernateUtilForCentral);
     }
@@ -64,6 +64,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         LocationDAO dao = new LocationDAO();
 
         List<Location> locations = new ArrayList<Location>();
+        
+        int centralCount = 0;
         
         //TODO i think for this function, based on the start, numOfRows, and count from central
         //there are at most 3 cases:
@@ -87,7 +89,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             dao.setSession(hibernateUtilForCentral.getCurrentSession());
             //TODO better to check if the start parameter is greater than the number of locations in central
             //if it is then there is no need to query central
-            locations.addAll(dao.getAll(start, numOfRows));
+            centralCount = dao.countAll().intValue();
+            
+            if (centralCount > start) {
+            	locations.addAll(dao.getAll(start, numOfRows));
+            }
         }
         
         //TODO this will throw an error if there is no central connection because the dao will not have a Session
@@ -97,17 +103,17 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         //for this case diff will be = 10 + 1 - 20 = -9
         //so the call to query the local would have start = 0 and numOfRows = 9 thus returning only the first 9
         //from local when it should return 10
-        int diff = ((dao.countAll().intValue()+1)-start) - numOfRows;
+        int diff = centralCount - start - numOfRows;
         
         if (diff < 0) {
-        
 	        // get the list of Location from the local instance
 	        if (hibernateUtilForLocal != null) {
 	            dao.setSession(hibernateUtilForLocal.getCurrentSession());
-	            locations.addAll(dao.getAll(0, Math.abs(diff)));   
 	            
+	            if (dao.countAll().intValue() > 0) {
+	            	locations.addAll(dao.getAll(0, Math.abs(diff)));
+	            }  
 	        }
-        
         }
         
         return locations;
