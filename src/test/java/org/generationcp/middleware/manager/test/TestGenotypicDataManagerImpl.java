@@ -94,21 +94,6 @@ public class TestGenotypicDataManagerImpl{
     }
     
     @Test
-    public void testGetAllMaps() throws Exception {
-        List<Map> maps = manager.getAllMaps(Database.LOCAL);
-        System.out.println("RESULTS (testGetAllMaps)");
-        
-        if(maps == null || maps.isEmpty()) {
-            System.out.println("No records found.");
-        } else {
-            for(Map map : maps) {
-                System.out.println(" " + map);
-            }
-        }
-        
-    }
-    
-    @Test
     public void testGetFirstFiveMaps() throws Exception {
         List<Map> maps = manager.getAllMaps(0, 5, Database.LOCAL);
         System.out.println("RESULTS (testGetFirstFiveMaps)");
@@ -193,9 +178,9 @@ public class TestGenotypicDataManagerImpl{
     }
 
     @Test
-    public void testGetMarkerIdByDatasetId() throws Exception {
+    public void testGetMarkerIdsByDatasetId() throws Exception {
         Integer datasetId = Integer.valueOf(2);
-        List<Integer> results = manager.getMarkerIdByDatasetId(datasetId);
+        List<Integer> results = manager.getMarkerIdsByDatasetId(datasetId);
         System.out.println("RESULTS (testGetMarkerIdByDatasetId):");
         if (results == null || results.isEmpty()) {
             System.out.println(" No records found.");
@@ -227,7 +212,7 @@ public class TestGenotypicDataManagerImpl{
     }
     
     @Test
-    public void testGetMarkerTypeByMarkerIds() throws Exception {
+    public void testGetMarkerTypesByMarkerIds() throws Exception {
         List<Integer> markerIds = new ArrayList<Integer>();
         markerIds.add(Integer.valueOf(1));
         markerIds.add(Integer.valueOf(2));
@@ -235,7 +220,7 @@ public class TestGenotypicDataManagerImpl{
         markerIds.add(Integer.valueOf(4));
         markerIds.add(Integer.valueOf(5));
         
-        List<String> results = manager.getMarkerTypeByMarkerIds(markerIds);
+        List<String> results = manager.getMarkerTypesByMarkerIds(markerIds);
         System.out.println("RESULTS (testGetMarkerTypeByMarkerIds):");
         if (results == null || results.isEmpty()) {
             System.out.println(" No records found.");

@@ -87,14 +87,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return dao.getNameByNameId(nId);
     }
 
-    /* (non-Javadoc)
-     * @see org.generationcp.middleware.manager.api.GenotypicDataManager#getAllMaps(org.generationcp.middleware.manager.Database)
-     */
-    @Override
-    public List<Map> getAllMaps(Database instance) throws QueryException {
-        return getAllMaps(null, null, instance);
-    }
-
     @Override
     public List<Map> getAllMaps(Integer start, Integer numOfRows, Database instance) throws QueryException {
         MapDAO dao = new MapDAO();
@@ -183,7 +175,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
 
     @Override
-    public List<Integer> getMarkerIdByDatasetId(Integer datasetId) throws QueryException{
+    public List<Integer> getMarkerIdsByDatasetId(Integer datasetId) throws QueryException{
         MarkerMetadataSetDAO dao = new MarkerMetadataSetDAO();
         HibernateUtil hibernateUtil = getHibernateUtil(datasetId);  
         
@@ -216,7 +208,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
      * @see org.generationcp.middleware.manager.api.GenotypicDataManager#getMarkerTypeByMarkerIds(java.util.List)
      */
     @Override
-    public List<String> getMarkerTypeByMarkerIds(List<Integer> markerIds) throws QueryException{
+    public List<String> getMarkerTypesByMarkerIds(List<Integer> markerIds) throws QueryException{
         MarkerDAO dao = new MarkerDAO();
         HibernateUtil hibernateUtil = getHibernateUtil(markerIds.get(0));  
         
