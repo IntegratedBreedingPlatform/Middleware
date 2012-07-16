@@ -25,17 +25,58 @@ import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
  */
 public interface WorkbenchDataManager{
 
-    List<Project> getProjects();
+    /**
+     * Gets the projects.
+     *
+     * @return the projects
+     */
+    public List<Project> getProjects();
 
-    List<Project> getProjects(int start, int numOfRows);
+    /**
+     * Gets the projects.
+     *
+     * @param start the start
+     * @param numOfRows the num of rows
+     * @return the projects
+     */
+    public List<Project> getProjects(int start, int numOfRows);
 
-    Project saveOrUpdateProject(Project project);
+    /**
+     * Save or update project.
+     *
+     * @param project the project
+     * @return the project
+     */
+    public Project saveOrUpdateProject(Project project);
 
-    void deleteProject(Project project);
+    /**
+     * Delete project.
+     *
+     * @param project the project
+     */
+    public void deleteProject(Project project);
 
-    List<WorkflowTemplate> getWorkflowTemplates();
+    /**
+     * Gets the workflow templates.
+     *
+     * @return the workflow templates
+     */
+    public List<WorkflowTemplate> getWorkflowTemplates();
 
-    List<WorkflowTemplate> getWorkflowTemplates(int start, int numOfRows);
+    /**
+     * Gets the workflow templates.
+     *
+     * @param start the start
+     * @param numOfRows the num of rows
+     * @return the workflow templates
+     */
+    public List<WorkflowTemplate> getWorkflowTemplates(int start, int numOfRows);
 
-    Tool getToolWithName(String toolName);
+    /**
+     * Gets the tool with name.
+     *
+     * @param toolName the tool name
+     * @return the tool with name
+     */
+    public Tool getToolWithName(String toolName);
 }

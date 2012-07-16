@@ -56,7 +56,6 @@ public class MappingPop implements Serializable{
                 " mapping_pop_values.gid desc" +
                 ", marker.marker_name";
     
-    // TODO: VERIFY ID
     /** The dataset id. */
     @Id
     @Basic(optional = false)

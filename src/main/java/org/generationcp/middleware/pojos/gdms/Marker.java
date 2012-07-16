@@ -43,6 +43,7 @@ public class Marker implements Serializable{
                 "select distinct concat(marker_type, '') from marker where marker_id in (:markerIdList)";
 
     public static final String GET_IDS_BY_NAMES = "select marker_id from marker where marker_name in (:markerNameList)";
+    public static final String GET_ID_AND_NAME_BY_NAMES = "select marker_id, marker_name from marker where marker_name in (:markerNameList)";
 
     // For getMarkerNamesByGIds()
     public static final String GET_ALLELE_MARKER_NAMES_BY_GID = 

@@ -45,8 +45,14 @@ public class MappingPopValues implements Serializable{
 
     // For getGermplasmNamesByMarkerNames()
     public static final String GET_MAPPING_COUNT_BY_MARKER_ID = "select count(*) from mapping_pop_values where marker_id in (:markerIdList)";
-    public static final String GET_MAPPING_GIDS_BY_MARKER_ID = 
-            "select distinct gid from mapping_pop_values where marker_id in (:markerIdList) order by gid";    
+
+    // For getGermplasmNamesByMarkerNames()
+    public static final String GET_MAPPING_GERMPLASM_NAME_AND_MARKER_NAME_BY_MARKER_NAMES = 
+            "select n.nval, concat(m.marker_name, '') " +  
+            "from names n join mapping_pop_values mp on n.gid = mp.gid " +  
+            "           join marker m on mp.marker_id = m.marker_id " +
+            "where marker_name in (:markerNameList) and n.nstat = 1 " +
+            "order by n.nval, m.marker_name";
 
     /**
      * The Mp Id.

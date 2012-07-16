@@ -28,6 +28,7 @@ import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
+import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
@@ -234,16 +235,16 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
     
     @Override
-    public List<String> getGermplasmNamesByMarkerNames(List<String> markerNames, Database instance) throws QueryException{
+    public List<GermplasmMarkerElement>  getGermplasmNamesByMarkerNames(List<String> markerNames, Database instance) throws QueryException{
         MarkerDAO dao = new MarkerDAO();
         HibernateUtil hibernateUtil = getHibernateUtil(instance);  
         
         if (hibernateUtil != null) {
             dao.setSession(hibernateUtil.getCurrentSession());
         } else {
-            return new ArrayList<String>();
+            return new ArrayList<GermplasmMarkerElement>();
         }
-        return (List<String>) dao.getGermplasmNamesByMarkerNames(markerNames);
+        return (List<GermplasmMarkerElement>) dao.getGermplasmNamesByMarkerNames(markerNames);
     }
     
 

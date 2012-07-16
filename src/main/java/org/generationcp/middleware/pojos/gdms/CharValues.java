@@ -43,10 +43,13 @@ public class CharValues implements Serializable{
     /** The Constant GET_CHAR_COUNT_BY_MARKER_ID. */
     public static final String GET_CHAR_COUNT_BY_MARKER_ID = "select count(*) from char_values where marker_id in (:markerIdList)";
     
-    /** The Constant GET_CHAR_GIDS_BY_MARKER_ID. */
-    public static final String GET_CHAR_GIDS_BY_MARKER_ID =  
-            "SELECT distinct gid FROM char_values WHERE marker_id in (:markerIdList) ORDER BY gid";
-        
+    // For getGermplasmNamesByMarkerNames()
+    public static final String GET_CHAR_GERMPLASM_NAME_AND_MARKER_NAME_BY_MARKER_NAMES = 
+            "select n.nval, concat(m.marker_name, '') " +  
+            "from names n join char_values c on n.gid = c.gid " +  
+            "           join marker m on c.marker_id = m.marker_id " +
+            "where marker_name in (:markerNameList) and n.nstat = 1 " +
+            "order by n.nval, m.marker_name";
     
     /** The ac id. */
     @Id

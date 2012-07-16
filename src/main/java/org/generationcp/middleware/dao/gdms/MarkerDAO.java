@@ -17,15 +17,16 @@ import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.QueryException;
-import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.AlleleValues;
 import org.generationcp.middleware.pojos.gdms.CharValues;
+import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.MappingPopValues;
 import org.generationcp.middleware.pojos.gdms.Marker;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 
+// TODO: Auto-generated Javadoc
 /**
  * <b>Description</b>: DAO for Marker object.
  * 
@@ -163,13 +164,57 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
     
     
     /**
+     * Gets the GermplasmMarkerElement items from the given list. 
+     * Converts the result of SQL return values to GermplasmMarkerElement list.
+     * Used by getGermplasmNamesByMarkerNames().
+     *
+     * @param results the results
+     * @return the GermplasmMarkerElement items extracted from the list
+     */
+    @SuppressWarnings("rawtypes")
+    private List<GermplasmMarkerElement> getGermplasmMarkerElementsFromList(List results){
+        ArrayList<GermplasmMarkerElement> dataValues = new ArrayList<GermplasmMarkerElement>();
+        String prevGermplasmName = null;
+        ArrayList<String> markerNameList = new ArrayList<String>();
+
+        for (Object o : results) {
+            Object[] result = (Object[]) o;
+            if (result != null) {
+                String germplasmName = (String) result[0];
+                String markerName = (String) result[1];
+                
+                if (prevGermplasmName == null){
+                    prevGermplasmName = germplasmName;
+                }
+                
+                if (germplasmName.equals(prevGermplasmName) ){
+                    markerNameList.add(markerName);
+                } else {
+                    dataValues.add(new GermplasmMarkerElement(prevGermplasmName, markerNameList));
+                    prevGermplasmName = germplasmName;
+                    markerNameList = new ArrayList<String>();
+                    markerNameList.add(markerName);
+                }
+                
+                if (results.indexOf(result) == results.size()-1){
+                    dataValues.add(new GermplasmMarkerElement(germplasmName, markerNameList));                            
+                }
+                
+            }
+        } 
+        
+        return dataValues;
+    }
+    
+    /**
      * Gets the germplasm names by marker names.
      *
      * @param markerNames the marker names
      * @return the germplasm names by marker names
      * @throws QueryException the query exception
      */
-    public List<String> getGermplasmNamesByMarkerNames (List<String> markerNames) throws QueryException {
+    @SuppressWarnings("rawtypes")
+    public List<GermplasmMarkerElement> getGermplasmNamesByMarkerNames (List<String> markerNames) throws QueryException {
         
         //Get marker_ids by marker_names
         List<Integer> markerIds = getIdsByNames(markerNames, 0, countAll().intValue());
@@ -190,31 +235,33 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
             query.setParameterList("markerIdList", markerIds);
             BigInteger mappingCount = (BigInteger) query.uniqueResult();
 
-            // Get gids from allele_values, char_values, mapping_pop_values by marker ids
-            List<Integer> gIds = new ArrayList<Integer>();
+            ArrayList<GermplasmMarkerElement> dataValues = new ArrayList<GermplasmMarkerElement>();
 
+            // Get marker name, germplasm name from allele_values given the marker names
             if (alleleCount.intValue() > 0) {
-                query = getSession().createSQLQuery(AlleleValues.GET_ALLELE_GIDS_BY_MARKER_ID);
-                query.setParameterList("markerIdList", markerIds);
-                gIds.addAll((List<Integer>) query.list());
+                query = getSession().createSQLQuery(AlleleValues.GET_ALLELE_GERMPLASM_NAME_AND_MARKER_NAME_BY_MARKER_NAMES);
+                query.setParameterList("markerNameList", markerNames);
+                List results = query.list();                
+                dataValues.addAll(getGermplasmMarkerElementsFromList(results));
             }
 
+            // Get marker name, germplasm name from char_values given the marker names
             if (charCount.intValue() > 0) {
-                query = getSession().createSQLQuery(CharValues.GET_CHAR_GIDS_BY_MARKER_ID);
-                query.setParameterList("markerIdList", markerIds);
-                gIds.addAll((List<Integer>) query.list());
+                query = getSession().createSQLQuery(CharValues.GET_CHAR_GERMPLASM_NAME_AND_MARKER_NAME_BY_MARKER_NAMES);
+                query.setParameterList("markerNameList", markerNames);
+                List results = query.list();                
+                dataValues.addAll(getGermplasmMarkerElementsFromList(results));
             }
             
+            // Get marker name, germplasm name from mapping_pop_values given the marker names
             if (mappingCount.intValue() > 0) {
-                query = getSession().createSQLQuery(MappingPopValues.GET_MAPPING_GIDS_BY_MARKER_ID);
-                query.setParameterList("markerIdList", markerIds);
-                gIds.addAll((List<Integer>) query.list());
+                query = getSession().createSQLQuery(MappingPopValues.GET_MAPPING_GERMPLASM_NAME_AND_MARKER_NAME_BY_MARKER_NAMES);
+                query.setParameterList("markerNameList", markerNames);
+                List results = query.list();                
+                dataValues.addAll(getGermplasmMarkerElementsFromList(results));
             }
             
-            //Returns germplasm names matching the marker names
-            query = getSession().createSQLQuery(Name.GET_NVAL_BY_GID);
-            query.setParameterList("gIdList", gIds);
-            return (List<String>) query.list();
+            return dataValues;
             
         } catch (HibernateException ex) {
             throw new QueryException("Error with get Germplasm Names by list of Marker Names query: " + ex.getMessage());

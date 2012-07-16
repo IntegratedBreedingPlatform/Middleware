@@ -145,7 +145,7 @@ public interface GermplasmDataManager {
      * @return Number of Germplasms
      * @throws QueryException
      */    
-    int countGermplasmByLocationName(String name, Operation op, Database instance) throws QueryException;
+    public int countGermplasmByLocationName(String name, Operation op, Database instance) throws QueryException;
 
 
     /**
@@ -164,7 +164,7 @@ public interface GermplasmDataManager {
      * @return List of Location POJOs
      * @throws QueryException
      */
-    List<Location> findLocationByName(String name, int start, int numOfRows, Operation op) throws QueryException;
+    public List<Location> findLocationByName(String name, int start, int numOfRows, Operation op) throws QueryException;
     
     /**
      * Returns the number of Locations with
@@ -177,7 +177,7 @@ public interface GermplasmDataManager {
      * @return Number of Locations
      * @throws QueryException
      */
-    int countLocationByName(String name, Operation op) throws QueryException;
+    public int countLocationByName(String name, Operation op) throws QueryException;
     
     /**
      * Returns all Locations
@@ -464,7 +464,7 @@ public interface GermplasmDataManager {
      *         database.
      * @throws QueryException
      */
-    int addLocation(Location location) throws QueryException;
+    public int addLocation(Location location) throws QueryException;
     
     /**
      * Inserts a single {@code Method} object into the database.
@@ -476,7 +476,7 @@ public interface GermplasmDataManager {
      *         database.
      * @throws QueryException
      */
-    int addMethod(Method method) throws QueryException;
+    public int addMethod(Method method) throws QueryException;
     
     /**
      * Deletes a single {@code Method} object into the database.
@@ -486,7 +486,7 @@ public interface GermplasmDataManager {
      *            Must be a valid {@code Method} object.
      * @throws QueryException
      */
-    void deleteMethod(Method method) throws QueryException;
+    public void deleteMethod(Method method) throws QueryException;
 
     /**
      * Returns the Bibref record identified by the given id.

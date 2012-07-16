@@ -275,7 +275,7 @@ public interface StudyDataManager{
      *         specified ounitIDs
      * @throws QueryException
      */
-    List<CharacterDataElement> getCharacterDataValuesByOunitIdList(List<Integer> ounitIdList) throws QueryException;
+    public List<CharacterDataElement> getCharacterDataValuesByOunitIdList(List<Integer> ounitIdList) throws QueryException;
 
     /**
      * Returns a list of NumericLevelElements that represents the column values
@@ -289,7 +289,7 @@ public interface StudyDataManager{
      *         specified ounitIDs
      * @throws QueryException
      */
-    List<NumericLevelElement> getNumericLevelValuesByOunitIdList(List<Integer> ounitIdList) throws QueryException;
+    public List<NumericLevelElement> getNumericLevelValuesByOunitIdList(List<Integer> ounitIdList) throws QueryException;
 
     /**
      * Returns a list of CharacterLevelElements that represents the column
@@ -303,6 +303,6 @@ public interface StudyDataManager{
      *         specified ounitIDs
      * @throws QueryException
      */
-    List<CharacterLevelElement> getCharacterLevelValuesByOunitIdList(List<Integer> ounitIdList) throws QueryException;
+    public List<CharacterLevelElement> getCharacterLevelValuesByOunitIdList(List<Integer> ounitIdList) throws QueryException;
 
 }

@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
 import org.generationcp.middleware.pojos.gdms.Map;
@@ -165,10 +166,10 @@ public interface GenotypicDataManager{
      *
      * @param markerNames the marker names
      * @param instance the instance of the database - either Database.LOCAL or Database.CENTRAL 
-     * @return the germplasm names by marker names
+     * @return the GermplasmMarkerElement list that contains the germplasm name and the corresponding marker names
      * @throws QueryException the query exception
      */
-    public List<String> getGermplasmNamesByMarkerNames(List<String> markerNames, Database instance) throws QueryException;
+    public List<GermplasmMarkerElement> getGermplasmNamesByMarkerNames(List<String> markerNames, Database instance) throws QueryException;
 
     /**
      * Retrieves a list of Mapping Values based on the specified GIDs and Marker Names.

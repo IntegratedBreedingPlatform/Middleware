@@ -21,6 +21,7 @@ import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
+import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
@@ -263,15 +264,15 @@ public class TestGenotypicDataManagerImpl{
         markerNames.add("1_0007");
         markerNames.add("1_0013");
         
-        List<String> results = manager.getGermplasmNamesByMarkerNames(markerNames, Database.LOCAL);
+        List<GermplasmMarkerElement> results = (List<GermplasmMarkerElement>) manager.getGermplasmNamesByMarkerNames(markerNames, Database.LOCAL);
         System.out.println("RESULTS (testGetGermplasmNamesByMarkerNames):");
         if (results == null || results.isEmpty()) {
             System.out.println(" No records found.");
         } else {
             for (Object obj : results){
-                Assert.assertTrue(obj instanceof String);
+                Assert.assertTrue(obj instanceof GermplasmMarkerElement);
                 Assert.assertTrue(obj != null);
-                String element = (String) obj;
+                GermplasmMarkerElement element = (GermplasmMarkerElement) obj;
                 System.out.println(" " + element);
             }
         }

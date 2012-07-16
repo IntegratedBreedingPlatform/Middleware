@@ -42,11 +42,16 @@ public class AlleleValues implements Serializable{
     // For getGermplasmNamesByMarkerNames()
     /** The Constant GET_ALLELE_COUNT_BY_MARKER_ID. */
     public static final String GET_ALLELE_COUNT_BY_MARKER_ID = "select count(*) from allele_values where marker_id in (:markerIdList)";
-    
-    /** The Constant GET_ALLELE_GIDS_BY_MARKER_ID. */
-    public static final String GET_ALLELE_GIDS_BY_MARKER_ID = 
-            "SELECT distinct gid FROM allele_values WHERE marker_id in (:markerIdList) ORDER BY gid";
 
+    // For getGermplasmNamesByMarkerNames()
+    public static final String GET_ALLELE_GERMPLASM_NAME_AND_MARKER_NAME_BY_MARKER_NAMES = 
+            "select n.nval, concat(m.marker_name, '') " +  
+            "from names n join allele_values a on n.gid = a.gid " +  
+            "           join marker m on a.marker_id = m.marker_id " +
+            "where marker_name in (:markerNameList) and n.nstat = 1 " +
+            "order by n.nval, m.marker_name";
+
+    
     @Id
     @Basic(optional = false)
     @Column(name = "an_id")
