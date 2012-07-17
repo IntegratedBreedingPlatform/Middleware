@@ -18,6 +18,7 @@ import org.generationcp.middleware.pojos.workbench.Project;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.QueryException;
+import org.hibernate.criterion.Restrictions;
 
 public class ProjectDAO extends GenericDAO<Project, Long>{
 
@@ -54,6 +55,16 @@ public class ProjectDAO extends GenericDAO<Project, Long>{
             List<Project> projects = criteria.list();
 
             return projects;
+        } catch (HibernateException ex) {
+            throw new QueryException(ex);
+        }
+    }
+    
+    public Project getById(Long projectId){        
+        try {
+            Criteria criteria = getSession().createCriteria(Project.class)
+                    .add(Restrictions.eq("projectId", projectId)).setMaxResults(1);
+            return (Project) criteria.uniqueResult();
         } catch (HibernateException ex) {
             throw new QueryException(ex);
         }

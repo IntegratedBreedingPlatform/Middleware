@@ -122,4 +122,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         toolDAO.setSession(hibernateUtil.getCurrentSession());
         return toolDAO.findByToolName(toolId);
     }
+    
+    public Project getProjectById(Long projectId){
+        ProjectDAO projectDao = new ProjectDAO();
+        projectDao.setSession(hibernateUtil.getCurrentSession());
+        return projectDao.getById(projectId);
+    }
+
 }

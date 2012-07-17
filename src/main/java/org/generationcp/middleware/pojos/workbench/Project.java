@@ -166,8 +166,8 @@ public class Project implements Serializable{
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Project {");
-        sb.append("project id = ").append(projectId);
-        sb.append("project name = ").append(projectName);
+        sb.append(", project id = ").append(projectId);
+        sb.append(", project name = ").append(projectName);
         sb.append("}");
 
         return sb.toString();

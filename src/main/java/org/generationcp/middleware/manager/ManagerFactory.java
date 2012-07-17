@@ -98,16 +98,13 @@ public class ManagerFactory implements Serializable{
 	        validateDatabaseParameters(paramsForLocal, paramsForCentral);
 	        
 	    } catch (URISyntaxException e) {
-	        e.printStackTrace();
+                LOG.error(e.toString() + "\n" + e.getStackTrace());
 	    } catch (HibernateException e) {
 	        LOG.error(e.toString() + "\n" + e.getStackTrace());
-	        e.printStackTrace();
 	    } catch (ConfigException e) {
 	        LOG.error(e.toString() + "\n" + e.getStackTrace());
-	        e.printStackTrace();
 	    } catch (IOException e) {
 	        LOG.error(e.toString() + "\n" + e.getStackTrace());
-	        e.printStackTrace();
 	    }
 
     }

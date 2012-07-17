@@ -81,6 +81,12 @@ public class TestWorkbenchDataManagerImpl{
         Tool tool = manager.getToolWithName("fieldbook");
         System.out.println(tool);
     }
+    
+    @Test
+    public void testGetProjectById() {
+        Project project = manager.getProjectById(Long.valueOf(1));
+        System.out.println(project);
+    }
 
     @AfterClass
     public static void tearDown() throws Exception {

@@ -79,4 +79,14 @@ public interface WorkbenchDataManager{
      * @return the tool with name
      */
     public Tool getToolWithName(String toolName);
+    
+    
+    /**
+     * Gets the project by id.
+     *
+     * @param projectId the project id
+     * @return the project by id
+     */
+    public Project getProjectById(Long projectId);
+    
 }
