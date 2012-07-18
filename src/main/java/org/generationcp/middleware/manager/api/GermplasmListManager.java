@@ -189,11 +189,10 @@ public interface GermplasmListManager{
      * @param germplasmList
      *            - The {@code GermplasmList} object to be persisted to the
      *            database. Must be a valid {@code GermplasmList} object.
-     * @return Returns the number of {@code GermplasmList} records inserted in
-     *         the database.
+     * @return Returns the id that was assigned to the new GermplasmList
      * @throws QueryException
      */
-    public int addGermplasmList(GermplasmList germplasmList) throws QueryException;
+    public Integer addGermplasmList(GermplasmList germplasmList) throws QueryException;
 
     /**
      * Inserts a list of multiple {@code GermplasmList} objects into the

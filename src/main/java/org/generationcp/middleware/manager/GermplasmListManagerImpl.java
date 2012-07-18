@@ -238,7 +238,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     }
 
     @Override
-    public int addGermplasmList(GermplasmList germplasmList) throws QueryException {
+    public Integer addGermplasmList(GermplasmList germplasmList) throws QueryException {
         List<GermplasmList> list = new ArrayList<GermplasmList>();
         list.add(germplasmList);
         return addGermplasmList(list);
@@ -246,7 +246,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public int addGermplasmList(List<GermplasmList> germplasmLists) throws QueryException {
-        return addOrUpdateGermplasmList(germplasmLists, Operation.ADD);
+        return Integer.valueOf(addOrUpdateGermplasmList(germplasmLists, Operation.ADD));
     }
 
     @Override
@@ -270,6 +270,9 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
         Session session = hibernateUtilForLocal.getCurrentSession();
         Transaction trans = null;
 
+        //this is a quick fix to providing the id of the new list that was saved
+        int idOfNewList = 0;
+        
         int germplasmListsSaved = 0;
         try {
             // begin save transaction
@@ -282,6 +285,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
                 if (operation == Operation.ADD) {
                     // Auto-assign negative IDs for new local DB records
                     Integer negativeId = dao.getNegativeId("id");
+                    idOfNewList = negativeId.intValue();
                     germplasmList.setId(negativeId);
                 } else if (operation == Operation.UPDATE) {
                     // Check if GermplasmList is a local DB record. Throws
@@ -308,6 +312,10 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
             hibernateUtilForLocal.closeCurrentSession();
         }
 
+        if(operation == Operation.ADD && germplasmLists.size() == 1) {
+            return idOfNewList;
+        }
+        
         return germplasmListsSaved;
     }
 
