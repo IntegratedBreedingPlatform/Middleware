@@ -14,6 +14,8 @@ package org.generationcp.middleware.manager.api;
 
 import java.util.List;
 
+import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
@@ -88,5 +90,14 @@ public interface WorkbenchDataManager{
      * @return the project by id
      */
     public Project getProjectById(Long projectId);
+    
+    
+    /**
+     * Registers a dataset. Returns the id of the newly created dataset.
+     *
+     * @param dataset the dataset
+     * @return the id of the newly created dataset
+     */
+    public WorkbenchDataset addDataset(WorkbenchDataset dataset) throws QueryException;
     
 }

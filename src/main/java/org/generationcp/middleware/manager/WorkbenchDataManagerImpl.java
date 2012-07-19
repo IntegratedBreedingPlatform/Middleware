@@ -14,10 +14,12 @@ package org.generationcp.middleware.manager;
 
 import java.util.List;
 
+import org.generationcp.middleware.dao.DatasetDAO;
 import org.generationcp.middleware.dao.ProjectDAO;
 import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.dao.WorkflowTemplateDAO;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
@@ -127,6 +129,35 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         ProjectDAO projectDao = new ProjectDAO();
         projectDao.setSession(hibernateUtil.getCurrentSession());
         return projectDao.getById(projectId);
+    }
+
+    public WorkbenchDataset addDataset(WorkbenchDataset dataset) throws QueryException {
+        
+        Session session = hibernateUtil.getCurrentSession();
+        Transaction trans = null;
+
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
+            System.out.println("WorkbenchDatamanagerImpl.dataset: " + dataset);
+            DatasetDAO datasetDAO = new DatasetDAO();
+            datasetDAO.setSession(session);
+            datasetDAO.saveOrUpdate(dataset);
+            System.out.println("WorkbenchDatamanagerImpl.dataset: " + dataset);
+
+            trans.commit();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new QueryException("Error encountered while saving workbench dataset: " + ex.getMessage(), ex);
+        } finally {
+            hibernateUtil.closeCurrentSession();
+        }
+
+        return dataset;
     }
 
 }

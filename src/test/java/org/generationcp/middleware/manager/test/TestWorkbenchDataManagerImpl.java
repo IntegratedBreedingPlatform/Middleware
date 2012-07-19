@@ -12,14 +12,17 @@
 
 package org.generationcp.middleware.manager.test;
 
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.Tool;
+import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 import org.generationcp.middleware.util.HibernateUtil;
 import org.junit.AfterClass;
@@ -86,6 +89,22 @@ public class TestWorkbenchDataManagerImpl{
     public void testGetProjectById() {
         Project project = manager.getProjectById(Long.valueOf(1));
         System.out.println(project);
+    }
+    
+    @Test
+    public void testAddDataset() {
+        WorkbenchDataset dataset = new WorkbenchDataset();
+        dataset.setName("Test Dataset");
+        dataset.setDescription("Test Dataset Description");
+        dataset.setCreationDate(new Date(System.currentTimeMillis()));
+        dataset.setProject(manager.getProjectById(Long.valueOf(1)));
+        WorkbenchDataset result = null;
+        try {
+            result = manager.addDataset(dataset);
+        } catch (QueryException e) {
+            e.printStackTrace();
+        }
+        System.out.println("TestAddDataset: " + result);
     }
 
     @AfterClass
