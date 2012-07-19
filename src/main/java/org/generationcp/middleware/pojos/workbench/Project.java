@@ -48,6 +48,10 @@ public class Project implements Serializable{
     @Basic(optional = false)
     @Column(name = "target_due_date")
     private Date targetDueDate;
+    
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private int userId;
 
     @OneToOne
     @JoinColumn(name = "template_id")
@@ -74,6 +78,14 @@ public class Project implements Serializable{
 
     public void setProjectId(Long projectId) {
         this.projectId = projectId;
+    }
+    
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public String getProjectName() {
