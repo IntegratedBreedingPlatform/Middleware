@@ -18,13 +18,26 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
+@NamedQueries({ @NamedQuery(name = "findUserByNameUsingEqual", query = "SELECT s FROM User s WHERE s.name = :name"),
+    @NamedQuery(name = "findUserByNameUsingLike", query = "SELECT s FROM User s WHERE s.name like :name"),
+    @NamedQuery(name = "countUserByNameUsingEqual", query = "SELECT COUNT(s) FROM User s WHERE s.name = :name"),
+    @NamedQuery(name = "countUserByNameUsingLike", query = "SELECT COUNT(s) FROM User s WHERE s.name like :name")
+
+})
 @Entity
 @Table(name = "users")
 public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    public static final String FIND_BY_NAME_USING_EQUAL = "findUserByNameUsingEqual";
+    public static final String FIND_BY_NAME_USING_LIKE = "findUserByNameUsingLike";
+    public static final String COUNT_BY_NAME_USING_EQUAL = "countUserByNameUsingEqual";
+    public static final String COUNT_BY_NAME_USING_LIKE = "countUserByNameUsingLike";
 
     @Id
     @Basic(optional = false)

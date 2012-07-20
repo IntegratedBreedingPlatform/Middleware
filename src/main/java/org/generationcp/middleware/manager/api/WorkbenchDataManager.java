@@ -15,6 +15,7 @@ package org.generationcp.middleware.manager.api;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -131,6 +132,17 @@ public interface WorkbenchDataManager{
      * @return the user by id
      */
     public User getUserById(int id);
+    
+    /**
+     * Gets the user by name.
+     *
+     * @param name the name
+     * @param start the starting record
+     * @param numRows the totalRows
+     * @param operation the operation
+     * @return the user by name
+     */
+    public List<User> getUserByName(String name, int start, int numOfRows, Operation op);
     
     /**
      * Delete user.

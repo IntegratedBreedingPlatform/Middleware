@@ -18,11 +18,13 @@ import java.util.List;
 import org.generationcp.middleware.dao.DatasetDAO;
 import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.ProjectDAO;
+import org.generationcp.middleware.dao.StudyDAO;
 import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.WorkflowTemplateDAO;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -230,6 +232,29 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         }
 
         return dao.findById(id, false);
+    }
+    
+    @Override
+    public List<User> getUserByName(String name, int start, int numOfRows, Operation op) throws QueryException {
+
+    	UserDAO dao = new UserDAO();
+    	
+    	List<User> users = new ArrayList<User>();
+
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return null;
+        }
+
+        if (op == Operation.EQUAL) {
+        	users.add(dao.findByNameUsingEqual(name, start, numOfRows));
+        } else if (op == Operation.LIKE) {
+        	users = dao.findByNameUsingLike(name, start, numOfRows);
+        }
+
+        return users;
+
     }
 
     @Override

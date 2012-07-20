@@ -14,9 +14,11 @@ package org.generationcp.middleware.dao;
 
 import java.util.List;
 
+import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.pojos.User;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.QueryException;
 import org.hibernate.criterion.Restrictions;
 
@@ -48,4 +50,32 @@ public class UserDAO extends GenericDAO<User, Integer>{
         return !users.isEmpty();
     }
 	
+    @SuppressWarnings("unchecked")
+    public User findByNameUsingEqual(String name, int start, int numOfRows) throws QueryException {
+        try {
+            Query query = getSession().getNamedQuery(User.FIND_BY_NAME_USING_EQUAL);
+            query.setParameter("name", name);
+            query.setFirstResult(start);
+            query.setMaxResults(numOfRows);
+
+            return (User) query.list().get(0);
+        } catch (HibernateException ex) {
+            throw new QueryException("Error with find by name query using equal for User: " + ex.getMessage());
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<User> findByNameUsingLike(String name, int start, int numOfRows) throws QueryException {
+        try {
+            Query query = getSession().getNamedQuery(User.FIND_BY_NAME_USING_LIKE);
+            query.setParameter("name", name);
+            query.setFirstResult(start);
+            query.setMaxResults(numOfRows);
+
+            return (List<User>) query.list();
+        } catch (HibernateException ex) {
+            throw new QueryException("Error with find by  name query using like for User: " + ex.getMessage());
+        }
+    }
+    
 }

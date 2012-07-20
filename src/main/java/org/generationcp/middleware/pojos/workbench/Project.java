@@ -49,8 +49,8 @@ public class Project implements Serializable{
     @Column(name = "target_due_date")
     private Date targetDueDate;
     
-    @OneToOne
-    @JoinColumn(name = "user_id")
+    @Basic(optional = false)
+    @Column(name = "user_id")
     private int userId;
 
     @OneToOne
