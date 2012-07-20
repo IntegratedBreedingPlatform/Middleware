@@ -20,7 +20,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.QueryException;
 import org.hibernate.criterion.Restrictions;
 
-public class DatasetDAO extends GenericDAO<WorkbenchDataset, Long>{
+public class WorkbenchDatasetDAO extends GenericDAO<WorkbenchDataset, Long>{
 
     /**
      * Get the list of {@link WorkbenchDataset}s.

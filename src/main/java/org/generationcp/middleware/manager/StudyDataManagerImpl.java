@@ -50,8 +50,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
     public List<Integer> getGIDSByPhenotypicData(List<TraitCombinationFilter> filters, int start, int numOfRows, Database instance)
             throws QueryException {
-        // TODO Local-Central: Verify if existing implementation for CENTRAL is
-        // also applicable to LOCAL
+        // TODO Local-Central: Verify if existing implementation for CENTRAL is  also applicable to LOCAL
         HibernateUtil hibernateUtil = getHibernateUtil(instance);
 
         if (hibernateUtil != null) {

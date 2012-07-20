@@ -26,7 +26,6 @@ import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 
-// TODO: Auto-generated Javadoc
 /**
  * <b>Description</b>: DAO for Marker object.
  * 

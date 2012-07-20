@@ -21,7 +21,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -58,8 +58,8 @@ public class WorkbenchDataset implements Serializable{
     private Date creationDate;
 
     /** The project. */
-    @OneToOne
-    @JoinColumn(name = "project_id")
+    @ManyToOne(targetEntity = Project.class)
+    @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
     

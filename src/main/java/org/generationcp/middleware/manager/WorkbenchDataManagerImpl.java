@@ -15,16 +15,14 @@ package org.generationcp.middleware.manager;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.dao.DatasetDAO;
+import org.generationcp.middleware.dao.WorkbenchDatasetDAO;
 import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.ProjectDAO;
-import org.generationcp.middleware.dao.StudyDAO;
 import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.WorkflowTemplateDAO;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -147,7 +145,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
             // begin save transaction
             trans = session.beginTransaction();
             System.out.println("WorkbenchDatamanagerImpl.dataset: " + dataset);
-            DatasetDAO datasetDAO = new DatasetDAO();
+            WorkbenchDatasetDAO datasetDAO = new WorkbenchDatasetDAO();
             datasetDAO.setSession(session);
             datasetDAO.saveOrUpdate(dataset);
             System.out.println("WorkbenchDatamanagerImpl.dataset: " + dataset);
