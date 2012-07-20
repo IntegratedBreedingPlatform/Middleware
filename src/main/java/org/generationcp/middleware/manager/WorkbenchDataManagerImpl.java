@@ -12,13 +12,18 @@
 
 package org.generationcp.middleware.manager;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.dao.DatasetDAO;
+import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.ProjectDAO;
 import org.generationcp.middleware.dao.ToolDAO;
+import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.WorkflowTemplateDAO;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.Tool;
@@ -158,6 +163,243 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         }
 
         return dataset;
+    }
+    
+    @Override
+    public List<User> getAllUsers() {
+        UserDAO dao = new UserDAO();
+        
+        List<User> users = new ArrayList<User>();
+        
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+            users.addAll(dao.getAll());
+        }
+        
+        return users;
+    }
+    
+    public int countAllUsers() {
+    	
+        int count = 0;
+        
+        UserDAO dao = new UserDAO();
+        
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+            count = count + dao.countAll().intValue();
+        }
+        return count;
+    }  
+
+    @Override
+    public void addUser(User user) throws QueryException {
+        
+        Session session = hibernateUtil.getCurrentSession();
+        Transaction trans = null;
+        
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
+            
+            UserDAO dao = new UserDAO();
+            dao.setSession(session);
+            
+            dao.saveOrUpdate(user);
+            
+            trans.commit();
+        } catch (Exception ex) {
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new QueryException("Error encountered while saving User: " + ex.getMessage(), ex);
+        } finally {
+            hibernateUtil.closeCurrentSession();
+        }
+    }
+    
+    @Override
+    public User getUserById(int id) {
+        UserDAO dao = new UserDAO();
+        
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return null;
+        }
+
+        return dao.findById(id, false);
+    }
+
+    @Override
+    public void deleteUser(User user) throws QueryException {
+        
+        Session session = hibernateUtil.getCurrentSession();
+        Transaction trans = null;
+        
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
+            
+            UserDAO dao = new UserDAO();
+            dao.setSession(session);
+            
+            dao.makeTransient(user);
+            
+            trans.commit();
+        } catch (Exception ex) {
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new QueryException("Error encountered while deleting User: " + ex.getMessage(), ex);
+        } finally {
+            hibernateUtil.closeCurrentSession();
+        }
+    }
+    
+    @Override
+    public List<Person> getAllPersons() {
+        PersonDAO dao = new PersonDAO();
+        
+        List<Person> persons = new ArrayList<Person>();
+        
+        // get the list of Persons from the local instance
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+            persons.addAll(dao.getAll());
+        }
+        
+        return persons;
+    }
+    
+    public int countAllPersons() {
+    	
+        int count = 0;
+        
+        PersonDAO dao = new PersonDAO();
+        
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+            count = count + dao.countAll().intValue();
+        }
+        
+        return count;
+    }    
+
+    @Override
+    public void addPerson(Person person) throws QueryException {
+        
+        Session session = hibernateUtil.getCurrentSession();
+        Transaction trans = null;
+        
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
+            
+            PersonDAO dao = new PersonDAO();
+            dao.setSession(session);
+            
+            dao.saveOrUpdate(person);
+            
+            trans.commit();
+        } catch (Exception ex) {
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new QueryException("Error encountered while saving Person: " + ex.getMessage(), ex);
+        } finally {
+            hibernateUtil.closeCurrentSession();
+        }
+    }
+    
+    @Override
+    public Person getPersonById(int id) {
+        PersonDAO dao = new PersonDAO();
+
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return null;
+        }
+
+        return dao.findById(id, false);
+    }
+
+    @Override
+    public void deletePerson(Person person) throws QueryException {
+        
+        Session session = hibernateUtil.getCurrentSession();
+        Transaction trans = null;
+        
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
+            
+            PersonDAO dao = new PersonDAO();
+            dao.setSession(session);
+            
+            dao.makeTransient(person);
+            
+            trans.commit();
+        } catch (Exception ex) {
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new QueryException("Error encountered while deleting Person: " + ex.getMessage(), ex);
+        } finally {
+            hibernateUtil.closeCurrentSession();
+        }
+    }
+    
+    @Override
+    public boolean isValidUserLogin(String username, String password) throws QueryException {
+        
+        UserDAO dao = new UserDAO();
+        
+        dao.setSession(hibernateUtil.getCurrentSession());
+        
+        User user = dao.findByUsernameAndPassword(username, password);
+        
+        if (user != null) {
+            return true;
+        }
+        
+        
+        return false;
+    }
+    
+    @Override
+    public boolean isPersonExists(String firstName, String lastName) throws QueryException {
+        
+        PersonDAO dao = new PersonDAO();
+        
+        dao.setSession(hibernateUtil.getCurrentSession());
+        if(dao.isPersonExists(firstName, lastName)) {
+            return true;
+        }   
+        
+        
+        return false;
+    }
+    
+    @Override
+    public boolean isUsernameExists(String userName) throws QueryException {
+        
+        UserDAO dao = new UserDAO();
+        
+        dao.setSession(hibernateUtil.getCurrentSession());
+        
+        if(dao.isUsernameExists(userName)) {
+            return true;
+        }
+        
+        dao.clear();
+
+        return false;
     }
 
 }
