@@ -232,10 +232,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         
     }
     
-    
-    //////////
-    
-    
     public Project getProjectById(Long projectId){
         ProjectDAO projectDao = new ProjectDAO();
         projectDao.setSession(hibernateUtil.getCurrentSession());
