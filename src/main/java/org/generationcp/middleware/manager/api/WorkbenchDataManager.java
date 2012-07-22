@@ -85,6 +85,50 @@ public interface WorkbenchDataManager{
      */
     public Tool getToolWithName(String toolName);
     
+    /**
+     * Checks if is valid user login.
+     *
+     * @param username the username
+     * @param password the password
+     * @return true, if is valid user login
+     * @throws QueryException the query exception
+     */
+    public boolean isValidUserLogin(String username, String password) throws QueryException;
+    
+    /**
+     * Checks if is person exists.
+     *
+     * @param firstName the first name
+     * @param lastName the last name
+     * @return true, if is person exists
+     * @throws QueryException the query exception
+     */
+    public boolean isPersonExists(String firstName, String lastName) throws QueryException;
+    
+    /**
+     * Checks if is username exists.
+     *
+     * @param userName the user name
+     * @return true, if is username exists
+     * @throws QueryException the query exception
+     */
+    public boolean isUsernameExists(String userName) throws QueryException;
+    
+    /**
+     * Adds the person.
+     *
+     * @param person the person
+     * @throws QueryException the query exception
+     */
+    public void addPerson(Person person) throws QueryException;
+    
+    /**
+     * Adds the user.
+     *
+     * @param user the user
+     * @throws QueryException the query exception
+     */
+    public void addUser(User user) throws QueryException;
     
     /**
      * Gets the project by id.
@@ -93,7 +137,6 @@ public interface WorkbenchDataManager{
      * @return the project by id
      */
     public Project getProjectById(Long projectId);
-    
     
     /**
      * Registers a dataset. Returns the id of the newly created dataset.
@@ -116,14 +159,6 @@ public interface WorkbenchDataManager{
      * @return the number of all Users
      */   
     public int countAllUsers();
-    
-    /**
-     * Adds the user.
-     *
-     * @param user the user
-     * @throws QueryException the query exception
-     */
-    public void addUser(User user) throws QueryException;
     
     /**
      * Gets the user by id.
@@ -166,15 +201,6 @@ public interface WorkbenchDataManager{
      */   
     public int countAllPersons();
     
-    
-    /**
-     * Adds the person.
-     *
-     * @param person the person
-     * @throws QueryException the query exception
-     */
-    public void addPerson(Person person) throws QueryException;
-    
     /**
      * Gets the person by id.
      *
@@ -190,34 +216,5 @@ public interface WorkbenchDataManager{
      * @throws QueryException the query exception
      */
     public void deletePerson(Person person) throws QueryException; 
-    
-    /**
-     * Checks if is valid user login.
-     *
-     * @param username the username
-     * @param password the password
-     * @return true, if is valid user login
-     * @throws QueryException the query exception
-     */
-    public boolean isValidUserLogin(String username, String password) throws QueryException;
-    
-    /**
-     * Checks if is person exists.
-     *
-     * @param firstName the first name
-     * @param lastName the last name
-     * @return true, if is person exists
-     * @throws QueryException the query exception
-     */
-    public boolean isPersonExists(String firstName, String lastName) throws QueryException;
-    
-    /**
-     * Checks if is username exists.
-     *
-     * @param userName the user name
-     * @return true, if is username exists
-     * @throws QueryException the query exception
-     */
-    public boolean isUsernameExists(String userName) throws QueryException;
     
 }

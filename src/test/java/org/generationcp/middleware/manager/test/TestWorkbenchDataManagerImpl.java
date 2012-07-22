@@ -20,11 +20,13 @@ import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.WorkbenchManagerFactory;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
+import org.generationcp.middleware.util.HibernateUtil;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -32,8 +34,17 @@ import org.junit.Test;
 public class TestWorkbenchDataManagerImpl{
 
     private static WorkbenchDataManager manager;
-    //private static HibernateUtil hibernateUtil;
+    private static HibernateUtil hibernateUtil;
 
+    public static void main(String[] args) throws Exception {
+        TestWorkbenchDataManagerImpl t = new TestWorkbenchDataManagerImpl();
+        TestWorkbenchDataManagerImpl.setUp();
+        
+        t.testAddPerson();
+        
+        TestWorkbenchDataManagerImpl.tearDown();
+    }
+    
     @BeforeClass
     public static void setUp() throws Exception {
         manager = new WorkbenchManagerFactory().getWorkBenchDataManager();
@@ -81,6 +92,47 @@ public class TestWorkbenchDataManagerImpl{
     }
     
     @Test
+    public void testAddUser() throws QueryException {
+        User user = new User();
+        user.setUserid(1000);
+        user.setInstalid(-1);
+        user.setStatus(-1);
+        user.setAccess(-1);
+        user.setUserid(-1);
+        user.setType(-1);
+        user.setName("user_test");
+        user.setPassword("user_password");
+        user.setPersonid(1000);
+        user.setAdate(20120101);
+        user.setCdate(20120101);
+        
+        manager.addUser(user);
+    }
+    
+    @Test
+    public void testAddPerson() throws QueryException {
+        Person person = new Person();
+//        person.setId(1000);
+        person.setInstituteId(1);
+        person.setFirstName("Lich");
+        person.setMiddleName("Frozen");
+        person.setLastName("King");
+        person.setPositionName("King of Icewind Dale");
+        person.setTitle("His Highness");
+        person.setExtension("1");
+        person.setFax("2");
+        person.setEmail("lichking@blizzard.com");
+        person.setNotes("notes");
+        person.setContact("3");
+        person.setLanguage(-1);
+        person.setPhone("4");
+        
+        // add the person
+        manager.addPerson(person);
+    }
+    
+    
+    @Test
     public void testGetProjectById() {
         Project project = manager.getProjectById(Long.valueOf(1));
         System.out.println(project);
@@ -110,6 +162,6 @@ public class TestWorkbenchDataManagerImpl{
 
     @AfterClass
     public static void tearDown() throws Exception {
-       
+        hibernateUtil.shutdown();
     }
 }
