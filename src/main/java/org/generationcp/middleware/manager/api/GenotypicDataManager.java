@@ -21,8 +21,8 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
-import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MappingValueElement;
+import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 
 /**
@@ -58,6 +58,14 @@ public interface GenotypicDataManager{
      * @throws QueryException
      */
     public Name getNameByNameId(Integer nId) throws QueryException;
+    
+    /**
+     * Count all map records.
+     * @param instance
+     * @return
+     * @throws QueryException
+     */
+    public Long countAllMaps(Database instance) throws QueryException; 
     
     /**
      * Gets the all maps.

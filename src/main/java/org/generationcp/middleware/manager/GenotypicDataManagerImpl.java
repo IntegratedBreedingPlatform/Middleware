@@ -25,14 +25,14 @@ import org.generationcp.middleware.dao.gdms.MarkerDAO;
 import org.generationcp.middleware.dao.gdms.MarkerMetadataSetDAO;
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
-import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
 import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
-import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MappingValueElement;
+import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
+import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.generationcp.middleware.util.HibernateUtil;
 
 /**
@@ -86,6 +86,20 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         }
         
         return dao.getNameByNameId(nId);
+    }
+
+    @Override
+    public Long countAllMaps(Database instance) throws QueryException {
+        MapDAO dao = new MapDAO();
+        HibernateUtil util = getHibernateUtil(instance);
+        
+        if(util != null) {
+            dao.setSession(util.getCurrentSession());
+        } else {
+            return (long) 0;
+        }
+        
+        return dao.countAll();
     }
 
     @Override
@@ -189,9 +203,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
     
     
-    /* (non-Javadoc)
-     * @see org.generationcp.middleware.manager.api.GenotypicDataManager#getParentsByDatasetId(java.lang.Integer)
-     */
     @Override
     public List<ParentElement> getParentsByDatasetId(Integer datasetId) throws QueryException{
         MappingPopDAO dao = new MappingPopDAO();
@@ -205,9 +216,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return (List<ParentElement>) dao.getParentsByDatasetId(datasetId);
     }
     
-    /* (non-Javadoc)
-     * @see org.generationcp.middleware.manager.api.GenotypicDataManager#getMarkerTypeByMarkerIds(java.util.List)
-     */
     @Override
     public List<String> getMarkerTypesByMarkerIds(List<Integer> markerIds) throws QueryException{
         MarkerDAO dao = new MarkerDAO();
