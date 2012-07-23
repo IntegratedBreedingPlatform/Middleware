@@ -206,16 +206,54 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     public List<GermplasmListData> getGermplasmListDataByGID(Integer gid, int start, int numOfRows) throws QueryException {
         GermplasmListDataDAO dao = new GermplasmListDataDAO();
 
-        // TODO Local-Central: Verify if gid is enough condition to determine
-        // database instance, if not, call getHibernateUtil(instance) instead
-        HibernateUtil hibernateUtil = getHibernateUtil(gid);
-
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
-        } else {
-            return null;
+        List<GermplasmListData> toreturn = new ArrayList<GermplasmListData>();
+        
+        int centralCount = 0;
+        int localCount = 0;
+        int relativeLimit = 0;
+        
+        if (this.hibernateUtilForCentral != null) {
+            dao.setSession(this.hibernateUtilForCentral.getCurrentSession());
+            centralCount = dao.countByGID(gid).intValue();
+            
+            if (centralCount > start) {
+                toreturn.addAll(dao.getByGID(gid, start, numOfRows));
+                relativeLimit = numOfRows - (centralCount - start);
+                
+                if(relativeLimit > 0) {
+                    if (this.hibernateUtilForLocal != null) {
+                        dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+                        localCount = dao.countByGID(gid).intValue();
+                        
+                        if (localCount > 0) {
+                            toreturn.addAll(dao.getByGID(gid, 0, relativeLimit));
+                        }
+                    }
+                }
+            }
+            else {
+                relativeLimit = start - centralCount;
+                
+                if (this.hibernateUtilForLocal != null) {
+                    dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+                    localCount = dao.countByGID(gid).intValue();
+                    
+                    if (localCount > relativeLimit) {
+                        toreturn.addAll(dao.getByGID(gid, relativeLimit, numOfRows));
+                    }
+                }
+            }
         }
-        return dao.getByGID(gid, start, numOfRows);
+        else if (this.hibernateUtilForLocal != null) {
+            dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+            localCount = dao.countByGID(gid).intValue();
+            
+            if (localCount > start) {
+                toreturn.addAll(dao.getByGID(gid, start, numOfRows));
+            }
+        }
+                
+        return toreturn;
     }
 
     @Override

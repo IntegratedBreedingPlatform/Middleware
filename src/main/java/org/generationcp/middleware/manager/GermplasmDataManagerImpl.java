@@ -76,7 +76,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             	
             	locations.addAll(dao.getAll(start, numOfRows));
             	
-            	relativeLimit = numOfRows - centralCount - start;
+            	relativeLimit = numOfRows - (centralCount - start);
                 
                 if (relativeLimit > 0) {
 
