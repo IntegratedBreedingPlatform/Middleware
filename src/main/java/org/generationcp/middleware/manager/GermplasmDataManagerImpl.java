@@ -67,29 +67,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         int localCount = 0;
         int relativeLimit = 0;
         
-        //TODO i think for this function, based on the start, numOfRows, and count from central
-        //there are at most 3 cases:
-        //1. start < (count from central - 1) and (start + numOfRows - 1) <= (count from central - 1)
-        //this means all results to be returned are from central
-        //so query central passing the start and numOfRows and that's it
-        
-        //2. start > (count from central - 1)
-        //this means all results to be returned are from local
-        //so query local passing the start and numOfRows and that's it
-        
-        //3. start < (count from central - 1) and (start + numOfRows - 1) > (count from central - 1)
-        //this means some of the results are from central and some are from local
-        //the start and numOfRows to be used for querying central would be
-        //start = start and numOfRows = count from central - start
-        //the start and numOfRows to be used for querying local would be
-        //start = 0 and numOfRows = numOfRows - (count from central - start)
-        
-        // get the list of Location from the central instance
         if (hibernateUtilForCentral != null) {
         	
             dao.setSession(hibernateUtilForCentral.getCurrentSession());
-            //TODO better to check if the start parameter is greater than the number of locations in central
-            //if it is then there is no need to query central
             centralCount = dao.countAll().intValue();
             
             if (centralCount > start) {
@@ -145,15 +125,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             }  
         }
         
-        //TODO this will throw an error if there is no central connection because the dao will not have a Session
-        //it can use
-        //TODO the computation seems wrong, example case: there 10 central locations and 10 local locations
-        //the user supplies start = 0 and numOfRows = 20  (must get all locations from both local and central)
-        //for this case diff will be = 10 + 1 - 20 = -9
-        //so the call to query the local would have start = 0 and numOfRows = 9 thus returning only the first 9
-        //from local when it should return 10
-
-        
         return locations;
     }
 
@@ -168,7 +139,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             count = count + dao.countAll().intValue();
         }
         
-        // get the list of Users from the central instance
         if (hibernateUtilForCentral != null) {
             dao.setSession(hibernateUtilForCentral.getCurrentSession());
             count = count + dao.countAll().intValue();
