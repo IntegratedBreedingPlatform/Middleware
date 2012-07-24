@@ -86,6 +86,27 @@ public class HibernateUtil implements Serializable{
         this(MIDDLEWARE_INTERNAL_HIBERNATE_CFG, "jdbc:mysql://" + host + ":" + port + "/" + dbName, username, password);
     }
     
+    /**
+     * Creates a SessionFactory which connects to the database identified by the
+     * host, port, and dbname parameters. The username and password parameters
+     * are used for authentication with the database system. The parameters are
+     * used in conjuction with the ibpmidware_hib.cfg.xml file in
+     * src/main/config.
+     * 
+     * @param hibernateCfgFilename
+     * @param host
+     * @param port
+     * @param dbName
+     * @param username
+     * @param password
+     * @throws ConfigException
+     * @throws HibernateException
+     */
+    public HibernateUtil(String hibernateCfgFilename, String host, String port, String dbName, String username, String password) throws ConfigException,
+            HibernateException {
+        this(hibernateCfgFilename, "jdbc:mysql://" + host + ":" + port + "/" + dbName, username, password);
+    }
+    
     public HibernateUtil(String hibernateCfgFilename, String connectionUrl, String username, String password) {
         try {
             LOG.info("Reading Hibernate config file: " + hibernateCfgFilename);

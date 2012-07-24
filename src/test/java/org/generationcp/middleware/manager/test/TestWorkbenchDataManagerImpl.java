@@ -18,7 +18,7 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.manager.WorkbenchManagerFactory;
+import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
@@ -47,7 +47,9 @@ public class TestWorkbenchDataManagerImpl{
     
     @BeforeClass
     public static void setUp() throws Exception {
-        manager = new WorkbenchManagerFactory().getWorkBenchDataManager();
+    	
+    	hibernateUtil = new HibernateUtil("localhost", "3306", "workbench", "root", "password");
+        manager = new WorkbenchDataManagerImpl(hibernateUtil);
     }
 
     @Test
