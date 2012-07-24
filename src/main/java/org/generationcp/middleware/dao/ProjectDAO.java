@@ -15,9 +15,9 @@ package org.generationcp.middleware.dao;
 import java.util.List;
 
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.exceptions.QueryException;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.QueryException;
 import org.hibernate.criterion.Restrictions;
 
 public class ProjectDAO extends GenericDAO<Project, Long>{
@@ -27,7 +27,7 @@ public class ProjectDAO extends GenericDAO<Project, Long>{
      * 
      * @return
      */
-    public List<Project> findAll() {
+    public List<Project> findAll() throws QueryException{
         return findAll(null, null);
     }
 
@@ -42,7 +42,7 @@ public class ProjectDAO extends GenericDAO<Project, Long>{
      *            null.
      * @return
      */
-    public List<Project> findAll(Integer start, Integer numOfRows) {
+    public List<Project> findAll(Integer start, Integer numOfRows) throws QueryException{
         try {
             Criteria criteria = getSession().createCriteria(Project.class);
             if (start != null) {
@@ -55,18 +55,18 @@ public class ProjectDAO extends GenericDAO<Project, Long>{
             List<Project> projects = criteria.list();
 
             return projects;
-        } catch (HibernateException ex) {
-            throw new QueryException(ex);
+        } catch (HibernateException e) {
+            throw new QueryException(e.getMessage());
         }
     }
     
-    public Project getById(Long projectId){        
+    public Project getById(Long projectId) throws QueryException{        
         try {
             Criteria criteria = getSession().createCriteria(Project.class)
                     .add(Restrictions.eq("projectId", projectId)).setMaxResults(1);
             return (Project) criteria.uniqueResult();
-        } catch (HibernateException ex) {
-            throw new QueryException(ex);
+        } catch (HibernateException e) {
+            throw new QueryException("Error with get project by id: " + e.getMessage());
         }
     }
 }

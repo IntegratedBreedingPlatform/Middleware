@@ -15,9 +15,9 @@ package org.generationcp.middleware.dao;
 import java.util.List;
 
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
+import org.generationcp.middleware.exceptions.QueryException;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.QueryException;
 import org.hibernate.criterion.Restrictions;
 
 public class WorkbenchDatasetDAO extends GenericDAO<WorkbenchDataset, Long>{
@@ -27,7 +27,7 @@ public class WorkbenchDatasetDAO extends GenericDAO<WorkbenchDataset, Long>{
      * 
      * @return
      */
-    public List<WorkbenchDataset> findAll() {
+    public List<WorkbenchDataset> findAll() throws QueryException{
         return findAll(null, null);
     }
 
@@ -43,7 +43,7 @@ public class WorkbenchDatasetDAO extends GenericDAO<WorkbenchDataset, Long>{
      * @return
      */
     @SuppressWarnings("unchecked")
-    public List<WorkbenchDataset> findAll(Integer start, Integer numOfRows) {
+    public List<WorkbenchDataset> findAll(Integer start, Integer numOfRows)  throws QueryException{
         try {
             Criteria criteria = getSession().createCriteria(WorkbenchDataset.class);
             if (start != null) {
@@ -53,18 +53,18 @@ public class WorkbenchDatasetDAO extends GenericDAO<WorkbenchDataset, Long>{
                 criteria.setMaxResults(numOfRows);
             }
             return (List<WorkbenchDataset>) criteria.list();
-        } catch (HibernateException ex) {
-            throw new QueryException(ex);
+        } catch (HibernateException e) {
+            throw new QueryException("Error finding all workbench datasets: " + e.getMessage());
         }
     }
     
-    public WorkbenchDataset getById(Long datasetId){        
+    public WorkbenchDataset getById(Long datasetId) throws QueryException{        
         try {
             Criteria criteria = getSession().createCriteria(WorkbenchDataset.class)
                     .add(Restrictions.eq("datasetId", datasetId)).setMaxResults(1);
             return (WorkbenchDataset) criteria.uniqueResult();
-        } catch (HibernateException ex) {
-            throw new QueryException(ex);
+        } catch (HibernateException e) {
+            throw new QueryException("Error finding all workbench datasets: " + e.getMessage());
         }
     }
 }

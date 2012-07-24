@@ -16,15 +16,15 @@ import java.util.List;
 
 import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.exceptions.QueryException;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
-import org.hibernate.QueryException;
 import org.hibernate.criterion.Restrictions;
 
 public class UserDAO extends GenericDAO<User, Integer>{
 
-    public User findByUsernameAndPassword(String username, String password) {
+    public User findByUsernameAndPassword(String username, String password) throws QueryException{
         try {
             Criteria criteria = getSession().createCriteria(User.class)
                                             .add(Restrictions.eq("name", username))
@@ -34,8 +34,8 @@ public class UserDAO extends GenericDAO<User, Integer>{
             List<User> users = criteria.list();
             
             return users.size() > 0 ? users.get(0) : null;
-        } catch (HibernateException ex) {
-            throw new QueryException(ex);
+        } catch (HibernateException e) {
+            throw new QueryException("Error with finding user by user name and password: " + e.getMessage());
         }
     }
     

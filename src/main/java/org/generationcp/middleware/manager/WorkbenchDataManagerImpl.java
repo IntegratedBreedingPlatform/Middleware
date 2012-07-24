@@ -21,6 +21,7 @@ import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.WorkbenchDatasetDAO;
 import org.generationcp.middleware.dao.WorkflowTemplateDAO;
+import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
@@ -29,7 +30,6 @@ import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 import org.generationcp.middleware.util.HibernateUtil;
-import org.hibernate.QueryException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -43,21 +43,21 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     }
 
     @Override
-    public List<Project> getProjects() {
+    public List<Project> getProjects() throws QueryException{
         ProjectDAO projectDao = new ProjectDAO();
         projectDao.setSession(hibernateUtil.getCurrentSession());
         return projectDao.findAll();
     }
 
     @Override
-    public List<Project> getProjects(int start, int numOfRows) {
+    public List<Project> getProjects(int start, int numOfRows)  throws QueryException{
         ProjectDAO projectDao = new ProjectDAO();
         projectDao.setSession(hibernateUtil.getCurrentSession());
         return projectDao.findAll(start, numOfRows);
     }
 
     @Override
-    public Project saveOrUpdateProject(Project project) {
+    public Project saveOrUpdateProject(Project project)  throws QueryException{
         Session session = hibernateUtil.getCurrentSession();
         Transaction trans = null;
 
@@ -87,7 +87,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     }
 
     @Override
-    public void deleteProject(Project project) {
+    public void deleteProject(Project project)  throws QueryException{
         Session session = hibernateUtil.getCurrentSession();
         Transaction trans = null;
 
@@ -111,21 +111,21 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     }
 
     @Override
-    public List<WorkflowTemplate> getWorkflowTemplates() {
+    public List<WorkflowTemplate> getWorkflowTemplates()  throws QueryException{
         WorkflowTemplateDAO workflowTemplateDAO = new WorkflowTemplateDAO();
         workflowTemplateDAO.setSession(hibernateUtil.getCurrentSession());
         return workflowTemplateDAO.findAll();
     }
 
     @Override
-    public List<WorkflowTemplate> getWorkflowTemplates(int start, int numOfRows) {
+    public List<WorkflowTemplate> getWorkflowTemplates(int start, int numOfRows)  throws QueryException{
         WorkflowTemplateDAO workflowTemplateDAO = new WorkflowTemplateDAO();
         workflowTemplateDAO.setSession(hibernateUtil.getCurrentSession());
         return workflowTemplateDAO.findAll(start, numOfRows);
     }
 
     @Override
-    public Tool getToolWithName(String toolId) {
+    public Tool getToolWithName(String toolId)  throws QueryException{
         ToolDAO toolDAO = new ToolDAO();
         toolDAO.setSession(hibernateUtil.getCurrentSession());
         return toolDAO.findByToolName(toolId);
@@ -232,7 +232,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         
     }
     
-    public Project getProjectById(Long projectId){
+    public Project getProjectById(Long projectId) throws QueryException{
         ProjectDAO projectDao = new ProjectDAO();
         projectDao.setSession(hibernateUtil.getCurrentSession());
         return projectDao.getById(projectId);

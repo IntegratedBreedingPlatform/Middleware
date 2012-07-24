@@ -51,7 +51,7 @@ public class TestWorkbenchDataManagerImpl{
     }
 
     @Test
-    public void testSaveProject() {
+    public void testSaveProject() throws QueryException{
         Project project1 = new Project();
         project1.setProjectName("Test Project 1");
         project1.setTargetDueDate(new GregorianCalendar().getTime());
@@ -71,7 +71,7 @@ public class TestWorkbenchDataManagerImpl{
     }
 
     @Test
-    public void testGetProjects() {
+    public void testGetProjects()  throws QueryException{
         List<Project> projects = manager.getProjects();
 
         System.out.println("testGetProjects");
@@ -86,7 +86,7 @@ public class TestWorkbenchDataManagerImpl{
      **/
 
     @Test
-    public void testFindTool() {
+    public void testFindTool() throws QueryException {
         Tool tool = manager.getToolWithName("fieldbook");
         System.out.println(tool);
     }
@@ -133,19 +133,19 @@ public class TestWorkbenchDataManagerImpl{
     
     
     @Test
-    public void testGetProjectById() {
+    public void testGetProjectById()  throws QueryException{
         Project project = manager.getProjectById(Long.valueOf(1));
         System.out.println(project);
     }
     
     @Test
-    public void testGetUserByName() {
+    public void testGetUserByName() throws QueryException {
         User user = manager.getUserByName("jeff", 0, 1, Operation.EQUAL).get(0);
         System.out.println(user);
     }
     
     @Test
-    public void testAddDataset() {
+    public void testAddDataset() throws QueryException {
         WorkbenchDataset dataset = new WorkbenchDataset();
         dataset.setName("Test Dataset");
         dataset.setDescription("Test Dataset Description");

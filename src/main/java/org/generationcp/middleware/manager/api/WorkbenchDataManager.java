@@ -35,7 +35,7 @@ public interface WorkbenchDataManager{
      *
      * @return the projects
      */
-    public List<Project> getProjects();
+    public List<Project> getProjects()  throws QueryException;
 
     /**
      * Gets the projects.
@@ -44,7 +44,7 @@ public interface WorkbenchDataManager{
      * @param numOfRows the num of rows
      * @return the projects
      */
-    public List<Project> getProjects(int start, int numOfRows);
+    public List<Project> getProjects(int start, int numOfRows)  throws QueryException;
 
     /**
      * Save or update project.
@@ -52,21 +52,21 @@ public interface WorkbenchDataManager{
      * @param project the project
      * @return the project
      */
-    public Project saveOrUpdateProject(Project project);
+    public Project saveOrUpdateProject(Project project) throws QueryException;
 
     /**
      * Delete project.
      *
      * @param project the project
      */
-    public void deleteProject(Project project);
+    public void deleteProject(Project project) throws QueryException;
 
     /**
      * Gets the workflow templates.
      *
      * @return the workflow templates
      */
-    public List<WorkflowTemplate> getWorkflowTemplates();
+    public List<WorkflowTemplate> getWorkflowTemplates() throws QueryException;
 
     /**
      * Gets the workflow templates.
@@ -75,7 +75,7 @@ public interface WorkbenchDataManager{
      * @param numOfRows the num of rows
      * @return the workflow templates
      */
-    public List<WorkflowTemplate> getWorkflowTemplates(int start, int numOfRows);
+    public List<WorkflowTemplate> getWorkflowTemplates(int start, int numOfRows) throws QueryException;
 
     /**
      * Gets the tool with name.
@@ -83,7 +83,7 @@ public interface WorkbenchDataManager{
      * @param toolName the tool name
      * @return the tool with name
      */
-    public Tool getToolWithName(String toolName);
+    public Tool getToolWithName(String toolName) throws QueryException;
     
     /**
      * Checks if is valid user login.
@@ -136,7 +136,7 @@ public interface WorkbenchDataManager{
      * @param projectId the project id
      * @return the project by id
      */
-    public Project getProjectById(Long projectId);
+    public Project getProjectById(Long projectId) throws QueryException;
     
     /**
      * Registers a dataset. Returns the id of the newly created dataset.
@@ -177,7 +177,7 @@ public interface WorkbenchDataManager{
      * @param operation the operation
      * @return the user by name
      */
-    public List<User> getUserByName(String name, int start, int numOfRows, Operation op);
+    public List<User> getUserByName(String name, int start, int numOfRows, Operation op) throws QueryException;
     
     /**
      * Delete user.
