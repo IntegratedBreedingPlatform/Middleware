@@ -19,6 +19,8 @@ import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -56,6 +58,10 @@ public class Project implements Serializable{
     @OneToOne
     @JoinColumn(name = "template_id")
     private WorkflowTemplate template;
+    
+    @Column(name = "crop_type")
+    @Enumerated(value=EnumType.STRING)
+    private CropType cropType;
 
     @Basic(optional = false)
     @Column(name = "template_modified")
@@ -110,6 +116,14 @@ public class Project implements Serializable{
 
     public void setTemplate(WorkflowTemplate template) {
         this.template = template;
+    }
+
+    public CropType getCropType() {
+        return cropType;
+    }
+
+    public void setCropType(CropType cropType) {
+        this.cropType = cropType;
     }
 
     public boolean isTemplateModified() {

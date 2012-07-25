@@ -22,6 +22,7 @@ import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
@@ -48,7 +49,7 @@ public class TestWorkbenchDataManagerImpl{
     @BeforeClass
     public static void setUp() throws Exception {
     	
-    	hibernateUtil = new HibernateUtil("localhost", "3306", "workbench", "root", "password");
+    	hibernateUtil = new HibernateUtil("localhost", "3306", "workbench", "root", "");
         manager = new WorkbenchDataManagerImpl(hibernateUtil);
     }
 
@@ -56,10 +57,13 @@ public class TestWorkbenchDataManagerImpl{
     public void testSaveProject() throws QueryException{
         Project project1 = new Project();
         project1.setProjectName("Test Project 1");
+        project1.setUserId(1);
+        project1.setCropType(CropType.CHICKPEA);
         project1.setTargetDueDate(new GregorianCalendar().getTime());
 
         Project project2 = new Project();
         project2.setProjectName("Test Project 2");
+        project2.setCropType(CropType.CHICKPEA);
         project2.setTargetDueDate(new GregorianCalendar().getTime());
 
         WorkflowTemplate marsTemplate = new WorkflowTemplate();
