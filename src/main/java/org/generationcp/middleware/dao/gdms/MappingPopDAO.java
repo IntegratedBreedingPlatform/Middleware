@@ -73,7 +73,7 @@ public class MappingPopDAO extends GenericDAO<MappingPop, Integer>{
                     String mappingType = (String) result[1];
                     Integer parentAGid = (Integer) result[2];
                     Integer parentBGid = (Integer) result[3];
-                    String markerType = ((Character) result[4]).toString();
+                    String markerType = (String) result[4];
                     MappingValueElement mappingValueElement = new MappingValueElement(datasetId, mappingType, parentAGid, parentBGid, markerType);
                     mappingValues.add(mappingValueElement);
                 }

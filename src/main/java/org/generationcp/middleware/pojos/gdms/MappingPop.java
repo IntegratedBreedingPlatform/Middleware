@@ -44,7 +44,7 @@ public class MappingPop implements Serializable{
                 ", mapping_pop.mapping_type" +
                 ", mapping_pop.parent_a_gid" +
                 ", mapping_pop.parent_b_gid" +
-                ", marker.marker_type" +
+                ", concat(marker.marker_type, '')" +
             " from mapping_pop_values" +
                 ", mapping_pop" +
                 ", marker" +
