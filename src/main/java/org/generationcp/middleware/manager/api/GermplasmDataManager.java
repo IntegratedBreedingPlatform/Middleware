@@ -467,6 +467,18 @@ public interface GermplasmDataManager {
     public int addLocation(Location location) throws QueryException;
     
     /**
+     * Inserts a single {@code Location} object into the database.
+     * 
+     * @param locations
+     *            - The {@code Location} object to be persisted to the database.
+     *            Must be a valid {@code Location} object.
+     * @return Returns the number of {@code Location} records inserted in the
+     *         database.
+     * @throws QueryException
+     */
+    public int addLocation(List<Location> locations) throws QueryException;
+    
+    /**
      * Inserts a single {@code Method} object into the database.
      * 
      * @param method

@@ -63,11 +63,10 @@ public class Location implements Serializable{
     @Column(name = "locid")
     @XmlElement(name = "locationId")
     private Integer locid;
-
-    @ManyToOne(targetEntity = UserDefinedField.class)
-    @JoinColumn(name = "ltype", nullable = true)
-    @NotFound(action = NotFoundAction.IGNORE)
-    private UserDefinedField type;
+    
+    @Basic(optional = false)
+    @Column(name = "ltype")
+    private Integer ltype;
 
     @Basic(optional = false)
     @Column(name = "nllp")
@@ -94,17 +93,16 @@ public class Location implements Serializable{
     @Column(name = "snl1id")
     private Integer snl1id;
 
-    @ManyToOne(targetEntity = Country.class)
-    @JoinColumn(name = "cntryid", nullable = false)
-    @NotFound(action = NotFoundAction.IGNORE)
-    private Country country;
+    @Basic(optional = false)
+    @Column(name = "cntryid")
+    private Integer cntryid;
 
     @Basic(optional = false)
     @Column(name = "lrplce")
     private Integer lrplce;
 
-    @OneToMany(mappedBy = "location")
-    private Set<Locdes> descriptions = new HashSet<Locdes>();
+/*    @OneToMany(mappedBy = "location")
+    private Set<Locdes> descriptions = new HashSet<Locdes>();*/
 
     public Location() {
     }
@@ -113,18 +111,18 @@ public class Location implements Serializable{
         this.locid = locid;
     }
 
-    public Location(Integer locid, UserDefinedField type, Integer nllp, String lname, String labbr, Integer snl3id, Integer snl2id,
-            Integer snl1id, Country country, Integer lrplce) {
+    public Location(Integer locid, Integer ltype, Integer nllp, String lname, String labbr, Integer snl3id, Integer snl2id,
+            Integer snl1id, Integer cntryid, Integer lrplce) {
         super();
         this.locid = locid;
-        this.type = type;
+        this.ltype = ltype;
         this.nllp = nllp;
         this.lname = lname;
         this.labbr = labbr;
         this.snl3id = snl3id;
         this.snl2id = snl2id;
         this.snl1id = snl1id;
-        this.country = country;
+        this.cntryid = cntryid;
         this.lrplce = lrplce;
     }
 
@@ -136,30 +134,20 @@ public class Location implements Serializable{
         this.locid = locid;
     }
 
-    public UserDefinedField getType() {
-        return type;
+    public Integer getLtype() {
+        return ltype;
     }
 
-    @XmlElement(name = "type")
-    public String getTypeFname() {
-        return type.getFname();
+    public void setLtype(Integer ltype) {
+        this.ltype = ltype;
     }
 
-    public void setType(UserDefinedField type) {
-        this.type = type;
+    public Integer getCntryid() {
+        return cntryid;
     }
 
-    public Country getCountry() {
-        return country;
-    }
-
-    @XmlElement(name = "country")
-    public String getCountryIsofull() {
-        return country.getIsofull();
-    }
-
-    public void setCountry(Country country) {
-        this.country = country;
+    public void setCntryid(Integer cntryid) {
+        this.cntryid = cntryid;
     }
 
     public Integer getNllp() {
@@ -218,13 +206,13 @@ public class Location implements Serializable{
         this.lrplce = lrplce;
     }
 
-    public Set<Locdes> getDescriptions() {
+/*    public Set<Locdes> getDescriptions() {
         return descriptions;
     }
 
     public void setDescriptions(Set<Locdes> descriptions) {
         this.descriptions = descriptions;
-    }
+    }*/
 
     @Override
     public int hashCode() {

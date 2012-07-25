@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.manager.test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.QueryException;
@@ -418,6 +419,67 @@ public class TestGermplasmDataManagerImpl{
         
         // delete the method
         manager.deleteMethod(method);
+    }
+    
+    @Test
+    public void testAddLocation() throws QueryException {
+    	
+    	Location location = new Location();
+    	location.setLocid(-1);
+    	location.setCntryid(1);
+    	location.setLabbr("");
+    	location.setLname("");
+    	location.setLrplce(1);
+    	location.setLtype(1);
+    	location.setNllp(1);
+    	location.setSnl1id(1);
+    	location.setSnl2id(1);
+    	location.setSnl3id(1);
+        
+        // add the method
+        manager.addLocation(location);
+        
+        location = manager.getLocationByID(-1);
+        
+    }
+    
+    @Test
+    public void testAddLocations() throws QueryException {
+    	
+    	List<Location> locations = new ArrayList<Location>();
+    	
+    	Location location1 = new Location();
+    	location1.setLocid(-2);
+    	location1.setCntryid(1);
+    	location1.setLabbr("");
+    	location1.setLname("");
+    	location1.setLrplce(1);
+    	location1.setLtype(1);
+    	location1.setNllp(1);
+    	location1.setSnl1id(1);
+    	location1.setSnl2id(1);
+    	location1.setSnl3id(1);
+    	
+    	Location location2 = new Location();
+    	location2.setLocid(-3);
+    	location2.setCntryid(1);
+    	location2.setLabbr("");
+    	location2.setLname("");
+    	location2.setLrplce(1);
+    	location2.setLtype(1);
+    	location2.setNllp(1);
+    	location2.setSnl1id(1);
+    	location2.setSnl2id(1);
+    	location2.setSnl3id(1);
+    	
+    	locations.add(location1);
+    	locations.add(location2);
+        
+        // add the method
+        manager.addLocation(locations);
+        
+        location2 = manager.getLocationByID(-3);
+        
     }
 
     @AfterClass

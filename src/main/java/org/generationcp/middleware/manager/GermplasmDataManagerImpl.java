@@ -877,6 +877,48 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
         return locationsSaved;
     }
+    
+    @Override
+    public int addLocation(List<Location> locations) throws QueryException {
+        if (hibernateUtilForLocal == null) {
+            throw new QueryException(NO_LOCAL_INSTANCE_MSG);
+        }
+
+        // initialize session & transaction
+        Session session = hibernateUtilForLocal.getCurrentSession();
+        Transaction trans = null;
+
+        int locationsSaved = 0;
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
+            
+            LocationDAO dao = new LocationDAO();
+            dao.setSession(session);
+            
+            for (Location location : locations) {
+
+                // Auto-assign negative IDs for new local DB records
+                Integer negativeId = dao.getNegativeId("locid");
+                location.setLocid(negativeId);
+ 
+                dao.saveOrUpdate(location);
+                locationsSaved++;
+            }
+
+            trans.commit();
+        } catch (Exception ex) {
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new QueryException("Error encountered while saving Locations: " + ex.getMessage(), ex);
+        } finally {
+            hibernateUtilForLocal.closeCurrentSession();
+        }
+
+        return locationsSaved;
+    }
 
     @Override
     public Bibref getBibliographicReferenceByID(Integer id) {
