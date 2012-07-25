@@ -18,6 +18,7 @@ import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
@@ -196,5 +197,19 @@ public interface GenotypicDataManager{
      */
     public List<MappingValueElement> getMappingValuesByGidsAndMarkerNames(
             List<Integer> gids, List<String> markerNames, int start, int numOfRows) throws QueryException;
+    
+    /**
+     * Retrieves a list of Allelic Values based on the specified GIDs and Marker Names.
+     * Results are retrieved from 3 separate sources: Allele Values, Char Values, and Mapping Pop Values.
+     * 
+     * @param gids
+     *          - list of Germplasm IDs
+     * @param markerNames
+     *          - list of Marker Names
+     * @return List of Allelic Values based on the specified Germplasm IDs and Marker Names
+     * @throws QueryException
+     */
+    public List<AllelicValueElement> getAllelicValuesByGidsAndMarkerNames(
+            List<Integer> gids, List<String> markerNames) throws QueryException;
     
 }

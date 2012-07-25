@@ -20,6 +20,7 @@ import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
 import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.Map;
@@ -292,6 +293,34 @@ public class TestGenotypicDataManagerImpl{
          * This is based on the sample input data templates uploaded to GDMS */
         List<MappingValueElement> mappingValues = manager.getMappingValuesByGidsAndMarkerNames(gids, markerNames, 0, 100);
         System.out.println("getMappingValuesByGidsAndMarkerNames: " + mappingValues);
+    }
+    
+    @Test
+    public void testGetAllelicValuesByGidsAndMarkerNames() throws Exception {
+        List<String> markerNames = new ArrayList<String>();
+        markerNames.add("CaM0038");
+        markerNames.add("CaM0463");
+        markerNames.add("CaM0539");
+        markerNames.add("CaM0639");
+        markerNames.add("CaM0658");
+        markerNames.add("1_0001");
+        markerNames.add("1_0007");
+        markerNames.add("1_0013");
+        markerNames.add("1_0025");
+        markerNames.add("1_0031");
+        List<Integer> gids = new ArrayList<Integer>();
+        gids.add(-5276);
+        gids.add(-5287);
+        gids.add(-5484);
+        gids.add(-5485);
+        gids.add(-6786);
+        gids.add(-6785);
+        gids.add(-3785);
+        gids.add(-3786);
+        /* Results will vary depending on the database connected to.
+         * As of the moment, we have no data that contains test values in all 3 source tables */
+        List<AllelicValueElement> allelicValues = manager.getAllelicValuesByGidsAndMarkerNames(gids, markerNames);
+        System.out.println("getAllelicValuesByGidsAndMarkerNames: " + allelicValues);
     }
     
     @AfterClass

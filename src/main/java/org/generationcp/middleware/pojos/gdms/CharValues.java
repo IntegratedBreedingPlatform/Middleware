@@ -51,6 +51,19 @@ public class CharValues implements Serializable{
             "where marker_name in (:markerNameList) and n.nstat = 1 " +
             "order by n.nval, m.marker_name";
     
+    // For getAllelicValues by gid and marker names
+    public static final String GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_NAMES =
+            "SELECT DISTINCT " +
+                "char_values.gid, " +
+                "concat(char_values.char_value, ''), " +
+                "concat(marker.marker_name, '') " +
+            "FROM char_values, " +
+                "marker " +
+            "WHERE char_values.marker_id=marker.marker_id " +
+                "AND char_values.gid IN (:gidList) " +
+                "AND char_values.marker_id IN (:markerIdList) " +
+            "ORDER BY char_values.gid DESC, marker.marker_name";
+    
     /** The ac id. */
     @Id
     @Basic(optional = false)

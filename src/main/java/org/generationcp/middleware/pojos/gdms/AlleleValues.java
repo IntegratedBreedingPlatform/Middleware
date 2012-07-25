@@ -50,6 +50,19 @@ public class AlleleValues implements Serializable{
             "           join marker m on a.marker_id = m.marker_id " +
             "where marker_name in (:markerNameList) and n.nstat = 1 " +
             "order by n.nval, m.marker_name";
+    
+    // For getAllelicValues by gid and marker names
+    public static final String GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_NAMES = 
+            "SELECT DISTINCT " +
+                "allele_values.gid, " +
+                "concat(allele_values.allele_bin_value, ''), " +
+                "concat(marker.marker_name, '') " +
+            "FROM allele_values, " +
+                "marker " +
+            "WHERE allele_values.marker_id=marker.marker_id " +
+                "AND allele_values.gid IN (:gidList) " +
+                "AND allele_values.marker_id IN (:markerIdList) " +
+            "ORDER BY allele_values.gid DESC, marker.marker_name";
 
     
     @Id

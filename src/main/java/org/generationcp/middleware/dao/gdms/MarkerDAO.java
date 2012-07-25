@@ -18,6 +18,7 @@ import java.util.List;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.pojos.gdms.AlleleValues;
+import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.CharValues;
 import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.MappingPopValues;
@@ -264,6 +265,62 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
             
         } catch (HibernateException ex) {
             throw new QueryException("Error with get Germplasm Names by list of Marker Names query: " + ex.getMessage());
+        }
+    }
+    
+    @SuppressWarnings("rawtypes")
+    private List<AllelicValueElement> getAllelicValueElementsFromList(List results) {
+        List<AllelicValueElement> values = new ArrayList<AllelicValueElement>();
+        
+        for (Object o : results) {
+            Object[] result = (Object[]) o;
+            if (result != null) {
+                Integer gid = (Integer) result[0];
+                String data = (String) result[1];
+                String markerName = (String) result[2];
+                AllelicValueElement allelicValueElement = new AllelicValueElement(gid, data, markerName);
+                values.add(allelicValueElement);
+            }
+        }
+        
+        return values;
+    }
+    
+    @SuppressWarnings("rawtypes")
+    public List<AllelicValueElement> getAllelicValuesByGidsAndMarkerNames(List<Integer> gids, List<String> markerNames)
+            throws QueryException {
+        
+        //Get marker_ids by marker_names
+        List<Integer> markerIds = getIdsByNames(markerNames, 0, countAll().intValue());
+        
+        try {
+            List<AllelicValueElement> allelicValues = new ArrayList<AllelicValueElement>();
+            
+            //retrieve allelic values from allele_values
+            SQLQuery query = getSession().createSQLQuery(AlleleValues.GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_NAMES);
+            query.setParameterList("gidList", gids);
+            query.setParameterList("markerIdList", markerIds);
+            List results = query.list();
+            allelicValues.addAll(getAllelicValueElementsFromList(results));
+            
+            //retrieve allelic values from char_values
+            query = getSession().createSQLQuery(CharValues.GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_NAMES);
+            query.setParameterList("gidList", gids);
+            query.setParameterList("markerIdList", markerIds);
+            results = query.list();
+            allelicValues.addAll(getAllelicValueElementsFromList(results));
+            
+            //retrieve allelic values from mapping_pop_values
+            query = getSession().createSQLQuery(MappingPopValues.GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_NAMES);
+            query.setParameterList("gidList", gids);
+            query.setParameterList("markerIdList", markerIds);
+            results = query.list();
+            allelicValues.addAll(getAllelicValueElementsFromList(results));
+            
+            return allelicValues;
+        } catch (HibernateException ex) {
+            ex.printStackTrace();
+            throw new QueryException("Error with get Allelic Values by list of GIDs Marker Names query: " + ex.getMessage());
         }
     }
 

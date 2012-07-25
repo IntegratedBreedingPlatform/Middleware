@@ -26,6 +26,7 @@ import org.generationcp.middleware.dao.gdms.MarkerMetadataSetDAO;
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
 import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.Map;
@@ -283,6 +284,31 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         List<MappingValueElement> mappingValues = mappingPopDao.getMappingValuesByGidAndMarkerIds(gids, markerIds);
         
         return mappingValues;
+    }
+    
+    @Override
+    public List<AllelicValueElement> getAllelicValuesByGidsAndMarkerNames(
+            List<Integer> gids, List<String> markerNames) throws QueryException {
+        MarkerDAO markerDao = new MarkerDAO();
+        
+        //get db connection based on the GIDs provided
+        Database instance;
+        if (gids.get(0) < 0) {
+            instance = Database.LOCAL;
+        } else {
+            instance = Database.CENTRAL;
+        }
+        HibernateUtil hibernateUtil = getHibernateUtil(instance);
+        
+        if (hibernateUtil != null) {
+            markerDao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return new ArrayList<AllelicValueElement> ();
+        }
+        
+        List<AllelicValueElement> allelicValues = markerDao.getAllelicValuesByGidsAndMarkerNames(gids, markerNames);
+        
+        return allelicValues;
     }
     
 }

@@ -53,6 +53,19 @@ public class MappingPopValues implements Serializable{
             "           join marker m on mp.marker_id = m.marker_id " +
             "where marker_name in (:markerNameList) and n.nstat = 1 " +
             "order by n.nval, m.marker_name";
+    
+    // For getAllelicValues by gid and marker names
+    public static final String GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_NAMES =
+        "SELECT DISTINCT " +
+            "mapping_pop_values.gid, " +
+            "concat(mapping_pop_values.map_char_value, ''), " +
+            "concat(marker.marker_name, '') " +
+        "FROM mapping_pop_values, " +
+            "marker " +
+        "WHERE mapping_pop_values.marker_id=marker.marker_id " +
+            "AND mapping_pop_values.gid IN (:gidList) " +
+            "AND mapping_pop_values.marker_id IN (:markerIdList) " +
+        "ORDER BY mapping_pop_values.gid DESC, marker.marker_name";
 
     /**
      * The Mp Id.
