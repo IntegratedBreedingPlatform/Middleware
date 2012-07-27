@@ -48,7 +48,7 @@ public class NumericLevelDAO extends GenericDAO<NumericLevel, NumericLevelPK>{
 
             return levelValues;
         } catch (HibernateException ex) {
-            throw new QueryException("Error with get Numeric Level Values by list of Observation Unit IDs query: " + ex.getMessage());
+            throw new QueryException("Error with get Numeric Level Values by list of Observation Unit IDs query: " + ex.getMessage(), ex);
         }
     }
 }

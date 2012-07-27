@@ -85,7 +85,7 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer>{
             }
             return dataValues;        
         } catch (HibernateException ex) {
-            throw new QueryException("Error with get dataset details by dataset name: " + ex.getMessage());
+            throw new QueryException("Error with get dataset details by dataset name: " + ex.getMessage(), ex);
         }
     }
     

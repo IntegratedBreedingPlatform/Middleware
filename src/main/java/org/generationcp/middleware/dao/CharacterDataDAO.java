@@ -86,7 +86,7 @@ public class CharacterDataDAO extends GenericDAO<CharacterData, CharacterDataPK>
 
             return dataValues;
         } catch (HibernateException ex) {
-            throw new QueryException("Error with get Character Data Values by list of Observation Unit IDs query: " + ex.getMessage());
+            throw new QueryException("Error with get Character Data Values by list of Observation Unit IDs query: " + ex.getMessage(), ex);
         }
     }
 }

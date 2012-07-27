@@ -35,7 +35,7 @@ public class UserDAO extends GenericDAO<User, Integer>{
             
             return users.size() > 0 ? users.get(0) : null;
         } catch (HibernateException e) {
-            throw new QueryException("Error with finding user by user name and password: " + e.getMessage());
+            throw new QueryException("Error with finding user by user name and password: " + e.getMessage(), e);
         }
     }
     
@@ -60,7 +60,7 @@ public class UserDAO extends GenericDAO<User, Integer>{
 
             return (User) query.list().get(0);
         } catch (HibernateException ex) {
-            throw new QueryException("Error with find by name query using equal for User: " + ex.getMessage());
+            throw new QueryException("Error with find by name query using equal for User: " + ex.getMessage(), ex);
         }
     }
 
@@ -74,7 +74,7 @@ public class UserDAO extends GenericDAO<User, Integer>{
 
             return (List<User>) query.list();
         } catch (HibernateException ex) {
-            throw new QueryException("Error with find by  name query using like for User: " + ex.getMessage());
+            throw new QueryException("Error with find by  name query using like for User: " + ex.getMessage(), ex);
         }
     }
     

@@ -60,7 +60,7 @@ public class FactorDAO extends GenericDAO<Factor, Integer>{
             List<Factor> results = query.list();
             return results;
         } catch (HibernateException ex) {
-            throw new QueryException("Error with get Factors by Study ID query: " + ex.getMessage());
+            throw new QueryException("Error with get Factors by Study ID query: " + ex.getMessage(), ex);
         }
     }
 
@@ -74,7 +74,7 @@ public class FactorDAO extends GenericDAO<Factor, Integer>{
             List<Factor> results = query.list();
             return results;
         } catch (HibernateException ex) {
-            throw new QueryException("Error with get Factors by Representation ID query: " + ex.getMessage());
+            throw new QueryException("Error with get Factors by Representation ID query: " + ex.getMessage(), ex);
         }
     }
 

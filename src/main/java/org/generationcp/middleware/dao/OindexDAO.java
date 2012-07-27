@@ -34,7 +34,7 @@ public class OindexDAO extends GenericDAO<OindexDAO, Integer>{
 
             return ounitIdCount;
         } catch (HibernateException ex) {
-            throw new QueryException("Error with count Ounit IDs by Representation ID query: " + ex.getMessage());
+            throw new QueryException("Error with count Ounit IDs by Representation ID query: " + ex.getMessage(), ex);
         }
     }
 
@@ -53,7 +53,7 @@ public class OindexDAO extends GenericDAO<OindexDAO, Integer>{
 
             return ounitIDs;
         } catch (HibernateException ex) {
-            throw new QueryException("Error with get Ounit IDs by Representation ID query: " + ex.getMessage());
+            throw new QueryException("Error with get Ounit IDs by Representation ID query: " + ex.getMessage(), ex);
         }
     }
 }

@@ -53,7 +53,7 @@ public class MapDAO extends GenericDAO<Map, Integer>{
 
             return templates;
         } catch (HibernateException e) {
-            throw new QueryException("Error with finding all maps: " + e.getMessage());
+            throw new QueryException("Error with finding all maps: " + e.getMessage(), e);
         }
     }
     

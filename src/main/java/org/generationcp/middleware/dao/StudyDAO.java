@@ -34,7 +34,7 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
 
             return (List<Study>) query.list();
         } catch (HibernateException ex) {
-            throw new QueryException("Error with find by  name query using equal for Study: " + ex.getMessage());
+            throw new QueryException("Error with find by  name query using equal for Study: " + ex.getMessage(), ex);
         }
     }
 
@@ -48,7 +48,7 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
 
             return (List<Study>) query.list();
         } catch (HibernateException ex) {
-            throw new QueryException("Error with find by  name query using like for Study: " + ex.getMessage());
+            throw new QueryException("Error with find by  name query using like for Study: " + ex.getMessage(), ex);
         }
     }
 
@@ -64,7 +64,7 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
             return ((Long) query.uniqueResult()).intValue();
 
         } catch (HibernateException ex) {
-            throw new QueryException("Error with count by name for Study: " + ex.getMessage());
+            throw new QueryException("Error with count by name for Study: " + ex.getMessage(), ex);
         }
 
     }
@@ -80,7 +80,7 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
             crit.setMaxResults(numOfRows);
             return (List<Study>) crit.list();
         } catch (HibernateException ex) {
-            throw new QueryException("Error with retrieving top level Studies: " + ex.getMessage());
+            throw new QueryException("Error with retrieving top level Studies: " + ex.getMessage(), ex);
         }
     }
 
@@ -94,7 +94,7 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
             crit.setMaxResults(numOfRows);
             return (List<Study>) crit.list();
         } catch (HibernateException ex) {
-            throw new QueryException("Error with retrieving Studies by parent folder id: " + ex.getMessage());
+            throw new QueryException("Error with retrieving Studies by parent folder id: " + ex.getMessage(), ex);
         }
     }
 

@@ -48,7 +48,7 @@ public class CharacterLevelDAO extends GenericDAO<CharacterLevel, CharacterLevel
 
             return levelValues;
         } catch (HibernateException ex) {
-            throw new QueryException("Error with get Character Level Values by list of Observation Unit IDs query: " + ex.getMessage());
+            throw new QueryException("Error with get Character Level Values by list of Observation Unit IDs query: " + ex.getMessage(), ex);
         }
     }
 

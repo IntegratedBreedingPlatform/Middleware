@@ -29,7 +29,7 @@ public class RepresentationDAO extends GenericDAO<Representation, Integer>{
 
             return (List<Representation>) query.list();
         } catch (HibernateException ex) {
-            throw new QueryException("Error with get representation by effect id query: " + ex.getMessage());
+            throw new QueryException("Error with get representation by effect id query: " + ex.getMessage(), ex);
         }
     }
 
@@ -41,7 +41,7 @@ public class RepresentationDAO extends GenericDAO<Representation, Integer>{
 
             return (List<Representation>) query.list();
         } catch (HibernateException ex) {
-            throw new QueryException("Error with get representation by study id query: " + ex.getMessage());
+            throw new QueryException("Error with get representation by study id query: " + ex.getMessage(), ex);
         }
     }
 

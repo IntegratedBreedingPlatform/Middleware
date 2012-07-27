@@ -75,7 +75,7 @@ public interface TraitDataManager{
      * @param scaleId the scale id
      * @return List of ScaleDiscrete POJOs
      */
-    public List<ScaleDiscrete> getDiscreteValuesOfScale(Integer scaleId);
+    public List<ScaleDiscrete> getDiscreteValuesOfScale(Integer scaleId) throws QueryException;
 
     /**
      * Returns the ScaleContinuous object which contains the start and end of

@@ -39,7 +39,7 @@ public class WorkflowTemplateDAO extends GenericDAO<WorkflowTemplate, Long>{
 
             return templates;
         } catch (HibernateException e) {
-            throw new QueryException("Error with find all workflow templates: " + e.getMessage());
+            throw new QueryException("Error with find all workflow templates: " + e.getMessage(), e);
         }
     }
 }

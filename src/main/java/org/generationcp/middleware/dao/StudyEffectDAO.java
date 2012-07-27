@@ -28,7 +28,7 @@ public class StudyEffectDAO extends GenericDAO<StudyEffect, Integer>{
             query.setParameter("studyId", studyId);
             return (List<StudyEffect>) query.list();
         } catch (HibernateException ex) {
-            throw new QueryException("Error with get StudyEffect by Study ID query: " + ex.getMessage());
+            throw new QueryException("Error with get StudyEffect by Study ID query: " + ex.getMessage(), ex);
         }
     }
 

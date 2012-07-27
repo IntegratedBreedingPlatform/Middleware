@@ -99,7 +99,7 @@ public class NumericDataDAO extends GenericDAO<NumericData, NumericDataPK>{
 
             return dataValues;
         } catch (HibernateException ex) {
-            throw new QueryException("Error with get Numeric Data Values by list of Observation Unit IDs query: " + ex.getMessage());
+            throw new QueryException("Error with get Numeric Data Values by list of Observation Unit IDs query: " + ex.getMessage(), ex);
         }
     }
 }

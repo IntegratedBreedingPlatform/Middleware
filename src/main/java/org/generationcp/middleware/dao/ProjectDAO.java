@@ -56,7 +56,7 @@ public class ProjectDAO extends GenericDAO<Project, Long>{
 
             return projects;
         } catch (HibernateException e) {
-            throw new QueryException(e.getMessage());
+            throw new QueryException(e.getMessage(), e);
         }
     }
     
@@ -66,7 +66,7 @@ public class ProjectDAO extends GenericDAO<Project, Long>{
                     .add(Restrictions.eq("projectId", projectId)).setMaxResults(1);
             return (Project) criteria.uniqueResult();
         } catch (HibernateException e) {
-            throw new QueryException("Error with get project by id: " + e.getMessage());
+            throw new QueryException("Error with get project by id: " + e.getMessage(), e);
         }
     }
 }

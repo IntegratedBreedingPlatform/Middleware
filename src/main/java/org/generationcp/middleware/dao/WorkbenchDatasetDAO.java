@@ -54,7 +54,7 @@ public class WorkbenchDatasetDAO extends GenericDAO<WorkbenchDataset, Long>{
             }
             return (List<WorkbenchDataset>) criteria.list();
         } catch (HibernateException e) {
-            throw new QueryException("Error finding all workbench datasets: " + e.getMessage());
+            throw new QueryException("Error finding all workbench datasets: " + e.getMessage(), e);
         }
     }
     
@@ -64,7 +64,7 @@ public class WorkbenchDatasetDAO extends GenericDAO<WorkbenchDataset, Long>{
                     .add(Restrictions.eq("datasetId", datasetId)).setMaxResults(1);
             return (WorkbenchDataset) criteria.uniqueResult();
         } catch (HibernateException e) {
-            throw new QueryException("Error finding all workbench datasets: " + e.getMessage());
+            throw new QueryException("Error finding all workbench datasets: " + e.getMessage(), e);
         }
     }
 }

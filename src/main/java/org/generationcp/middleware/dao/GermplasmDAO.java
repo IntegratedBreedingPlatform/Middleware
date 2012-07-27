@@ -36,7 +36,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 
             return query.list();
         } catch (HibernateException ex) {
-            throw new QueryException("Error with find all query for Germplasm: " + ex.getMessage());
+            throw new QueryException("Error with find all query for Germplasm: " + ex.getMessage(), ex);
         }
     }
 
@@ -50,7 +50,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 
             return query.list();
         } catch (HibernateException ex) {
-            throw new QueryException("Error with find by preferred name query for Germplasm: " + ex.getMessage());
+            throw new QueryException("Error with find by preferred name query for Germplasm: " + ex.getMessage(), ex);
         }
     }
 
@@ -60,7 +60,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             query.setParameter("name", name);
             return (BigInteger) query.uniqueResult();
         } catch (HibernateException ex) {
-            throw new QueryException("Error with count by preferred name for Germplasm: " + ex.getMessage());
+            throw new QueryException("Error with count by preferred name for Germplasm: " + ex.getMessage(), ex);
         }
     }
 
@@ -183,7 +183,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 
             return (List<Germplasm>) query.list();
         } catch (HibernateException ex) {
-            throw new QueryException("Error with find by method name query using equal for Germplasm: " + ex.getMessage());
+            throw new QueryException("Error with find by method name query using equal for Germplasm: " + ex.getMessage(), ex);
         }
     }
 
@@ -193,7 +193,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             query.setParameter("name", name);
             return (Long) query.uniqueResult();
         } catch (HibernateException ex) {
-            throw new QueryException("Error with count by method name using equal for Germplasm: " + ex.getMessage());
+            throw new QueryException("Error with count by method name using equal for Germplasm: " + ex.getMessage(), ex);
         }
     }
 
@@ -207,7 +207,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 
             return (List<Germplasm>) query.list();
         } catch (HibernateException ex) {
-            throw new QueryException("Error with find by method name using like query for Germplasm: " + ex.getMessage());
+            throw new QueryException("Error with find by method name using like query for Germplasm: " + ex.getMessage(), ex);
         }
     }
 
@@ -217,7 +217,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             query.setParameter("name", name);
             return (Long) query.uniqueResult();
         } catch (HibernateException ex) {
-            throw new QueryException("Error with count by method name using like for Germplasm: " + ex.getMessage());
+            throw new QueryException("Error with count by method name using like for Germplasm: " + ex.getMessage(), ex);
         }
     }
 
@@ -231,7 +231,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 
             return (List<Germplasm>) query.list();
         } catch (HibernateException ex) {
-            throw new QueryException("Error with find by location name query using equal for Germplasm: " + ex.getMessage());
+            throw new QueryException("Error with find by location name query using equal for Germplasm: " + ex.getMessage(), ex);
         }
     }
 
@@ -241,7 +241,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             query.setParameter("name", name);
             return (Long) query.uniqueResult();
         } catch (HibernateException ex) {
-            throw new QueryException("Error with count by location name using equal for Germplasm: " + ex.getMessage());
+            throw new QueryException("Error with count by location name using equal for Germplasm: " + ex.getMessage(), ex);
         }
     }
 
@@ -256,7 +256,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             List<Germplasm> results = query.list();
             return results;
         } catch (HibernateException ex) {
-            throw new QueryException("Error with find by location name using like query for Germplasm: " + ex.getMessage());
+            throw new QueryException("Error with find by location name using like query for Germplasm: " + ex.getMessage(), ex);
         }
     }
 
@@ -267,7 +267,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             Long result = (Long) query.uniqueResult();
             return result;
         } catch (HibernateException ex) {
-            throw new QueryException("Error with count by location name using like for Germplasm: " + ex.getMessage());
+            throw new QueryException("Error with count by location name using like for Germplasm: " + ex.getMessage(), ex);
         }
     }
 
@@ -287,7 +287,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
                 return null;
             }
         } catch (HibernateException ex) {
-            throw new QueryException("Error with get by gid with pref name query for Germplasm: " + ex.getMessage());
+            throw new QueryException("Error with get by gid with pref name query for Germplasm: " + ex.getMessage(), ex);
         }
     }
 
@@ -312,7 +312,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
                 return null;
             }
         } catch (HibernateException ex) {
-            throw new QueryException("Error with get by gid with pref abbrev query for Germplasm: " + ex.getMessage());
+            throw new QueryException("Error with get by gid with pref abbrev query for Germplasm: " + ex.getMessage(), ex);
         }
     }
 
@@ -334,7 +334,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 
             return progenitors;
         } catch (HibernateException ex) {
-            throw new QueryException("Error with get progenitors by gid with pref name for Germplasm: " + ex.getMessage());
+            throw new QueryException("Error with get progenitors by gid with pref name for Germplasm: " + ex.getMessage(), ex);
         }
     }
 
@@ -348,7 +348,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 
             return result;
         } catch (HibernateException ex) {
-            throw new QueryException("Error with get Germplasm Descendant by Gid: " + ex.getMessage());
+            throw new QueryException("Error with get Germplasm Descendant by Gid: " + ex.getMessage(), ex);
         }
     }
 
@@ -375,7 +375,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 
             return result;
         } catch (HibernateException ex) {
-            throw new QueryException("Error with get Germplasm Progenitor by Gid: " + ex.getMessage());
+            throw new QueryException("Error with get Germplasm Progenitor by Gid: " + ex.getMessage(), ex);
         }
     }
 
@@ -407,7 +407,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 
             return toreturn;
         } catch (HibernateException ex) {
-            throw new QueryException("Error with get management neighbors query for Germplasm: " + ex.getMessage());
+            throw new QueryException("Error with get management neighbors query for Germplasm: " + ex.getMessage(), ex);
         }
     }
 
@@ -429,7 +429,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 
             return toreturn;
         } catch (HibernateException ex) {
-            throw new QueryException("Error with get group relatives query for Germplasm: " + ex.getMessage());
+            throw new QueryException("Error with get group relatives query for Germplasm: " + ex.getMessage(), ex);
         }
     }
 
@@ -451,7 +451,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 
             return toreturn;
         } catch (HibernateException ex) {
-            throw new QueryException("Error with get derivative children query for Germplasm: " + ex.getMessage());
+            throw new QueryException("Error with get derivative children query for Germplasm: " + ex.getMessage(), ex);
         }
     }
 

@@ -52,7 +52,7 @@ public class MappingPopDAO extends GenericDAO<MappingPop, Integer>{
             }
             return dataValues;        
         } catch (HibernateException ex) {
-            throw new QueryException("Error with get parents by dataset id: " + ex.getMessage());
+            throw new QueryException("Error with get parents by dataset id: " + ex.getMessage(), ex);
         }
     }
     
@@ -80,7 +80,7 @@ public class MappingPopDAO extends GenericDAO<MappingPop, Integer>{
             }
             return mappingValues;        
         } catch (HibernateException ex) {
-            throw new QueryException("Error with get mapping values by GIDs and Marker Ids: " + ex.getMessage());
+            throw new QueryException("Error with get mapping values by GIDs and Marker Ids: " + ex.getMessage(), ex);
         }
     }
 

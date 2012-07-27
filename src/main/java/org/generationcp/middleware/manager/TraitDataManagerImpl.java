@@ -110,7 +110,7 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
     }
 
     @Override
-    public List<ScaleDiscrete> getDiscreteValuesOfScale(Integer scaleId) {
+    public List<ScaleDiscrete> getDiscreteValuesOfScale(Integer scaleId) throws QueryException {
         ScaleDiscreteDAO dao = new ScaleDiscreteDAO();
         HibernateUtil hibernateUtil = getHibernateUtil(scaleId);
 

@@ -28,7 +28,7 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
 
             return (List<Method>) query.list();
         } catch (HibernateException ex) {
-            throw new QueryException("Error with find all query for Method: " + ex.getMessage());
+            throw new QueryException("Error with find all query for Method: " + ex.getMessage(), ex);
         }
     }
 }

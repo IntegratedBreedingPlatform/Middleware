@@ -28,7 +28,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer>{
             query.setParameter("gid", gid);
             return (List<Attribute>) query.list();
         } catch (HibernateException ex) {
-            throw new QueryException("Error with get Attributes by GID query: " + ex.getMessage());
+            throw new QueryException("Error with get Attributes by GID query: " + ex.getMessage(), ex);
         }
     }
 

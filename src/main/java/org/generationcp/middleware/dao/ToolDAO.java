@@ -26,7 +26,7 @@ public class ToolDAO extends GenericDAO<Tool, Long>{
 
             return (Tool) criteria.uniqueResult();
         } catch (HibernateException e) {
-            throw new QueryException("Error with finding tools by name: " + e.getMessage());
+            throw new QueryException("Error with finding tools by name: " + e.getMessage(), e);
         }
     }
 

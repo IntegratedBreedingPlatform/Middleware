@@ -68,7 +68,7 @@ public class NameDAO extends GenericDAO<Name, Integer>{
              * List<Name> results = findByCriteria(criterions); return results;
              **/
         } catch (HibernateException ex) {
-            throw new QueryException("Error with get Names by GID query: " + ex.getMessage());
+            throw new QueryException("Error with get Names by GID query: " + ex.getMessage(), ex);
         }
     }
 

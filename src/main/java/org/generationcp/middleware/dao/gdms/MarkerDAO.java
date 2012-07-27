@@ -59,7 +59,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
             
             return markerIds;
         } catch (HibernateException ex) {
-            throw new QueryException("Error with get Marker IDs by list of Marker Names query: " + ex.getMessage());
+            throw new QueryException("Error with get Marker IDs by list of Marker Names query: " + ex.getMessage(), ex);
         }
     }
 
@@ -158,7 +158,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
             return dataValues;
             
         } catch (HibernateException ex) {
-            throw new QueryException("Error with get Marker Names by list of GIds query: " + ex.getMessage());
+            throw new QueryException("Error with get Marker Names by list of GIds query: " + ex.getMessage(), ex);
         }
     }
     
@@ -264,7 +264,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
             return dataValues;
             
         } catch (HibernateException ex) {
-            throw new QueryException("Error with get Germplasm Names by list of Marker Names query: " + ex.getMessage());
+            throw new QueryException("Error with get Germplasm Names by list of Marker Names query: " + ex.getMessage(), ex);
         }
     }
     
@@ -320,7 +320,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
             return allelicValues;
         } catch (HibernateException ex) {
             ex.printStackTrace();
-            throw new QueryException("Error with get Allelic Values by list of GIDs Marker Names query: " + ex.getMessage());
+            throw new QueryException("Error with get Allelic Values by list of GIDs Marker Names query: " + ex.getMessage(), ex);
         }
     }
 
