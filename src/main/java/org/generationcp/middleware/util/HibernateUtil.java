@@ -16,6 +16,7 @@ import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.net.URL;
 
+import org.generationcp.commons.util.ResourceFinder;
 import org.generationcp.middleware.exceptions.ConfigException;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
