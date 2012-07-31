@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.QueryException;
@@ -98,6 +99,11 @@ public class NameDAO extends GenericDAO<Name, Integer>{
     
     @SuppressWarnings("unchecked")
     public List<Name> getNamesByNameIds(List<Integer> nIds){
+        
+        if (nIds == null || nIds.isEmpty()){
+            return new ArrayList<Name>();
+        }
+
         Criteria crit = getSession().createCriteria(Name.class);
         crit.add(Restrictions.in("nid", nIds));
         List<Name> names = crit.list();

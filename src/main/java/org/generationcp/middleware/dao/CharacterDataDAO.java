@@ -28,6 +28,7 @@ import org.hibernate.criterion.Restrictions;
 
 public class CharacterDataDAO extends GenericDAO<CharacterData, CharacterDataPK>{
 
+    @SuppressWarnings("unchecked")
     public List<Integer> getObservationUnitIdsByTraitScaleMethodAndValueCombinations(List<TraitCombinationFilter> filters, int start,
             int numOfRows) {
         Criteria crit = getSession().createCriteria(CharacterData.class);
@@ -62,6 +63,7 @@ public class CharacterDataDAO extends GenericDAO<CharacterData, CharacterDataPK>
         }
     }
 
+    @SuppressWarnings("rawtypes")
     public List<CharacterDataElement> getValuesByOunitIDList(List<Integer> ounitIdList) throws QueryException {
         try {
             SQLQuery query = getSession().createSQLQuery(CharacterData.GET_BY_OUNIT_ID_LIST);

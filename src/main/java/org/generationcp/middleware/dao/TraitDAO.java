@@ -20,6 +20,7 @@ import org.hibernate.criterion.Restrictions;
 
 public class TraitDAO extends GenericDAO<Trait, Integer>{
 
+    @SuppressWarnings("rawtypes")
     public Trait getByTraitId(Integer id) {
         Criteria crit = getSession().createCriteria(Trait.class);
         crit.add(Restrictions.eq("traitId", id));

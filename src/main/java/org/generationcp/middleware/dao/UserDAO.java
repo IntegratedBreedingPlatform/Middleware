@@ -14,7 +14,6 @@ package org.generationcp.middleware.dao;
 
 import java.util.List;
 
-import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.exceptions.QueryException;
 import org.hibernate.Criteria;
@@ -50,7 +49,6 @@ public class UserDAO extends GenericDAO<User, Integer>{
         return !users.isEmpty();
     }
 	
-    @SuppressWarnings("unchecked")
     public User findByNameUsingEqual(String name, int start, int numOfRows) throws QueryException {
         try {
             Query query = getSession().getNamedQuery(User.FIND_BY_NAME_USING_EQUAL);

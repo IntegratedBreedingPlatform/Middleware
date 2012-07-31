@@ -316,6 +316,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         }
     }
 
+    @SuppressWarnings("unchecked")
     public List<Germplasm> getProgenitorsByGIDWithPrefName(Integer gid) throws QueryException {
         try {
             List<Germplasm> progenitors = new ArrayList<Germplasm>();
@@ -338,6 +339,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         }
     }
 
+    @SuppressWarnings("unchecked")
     public List<Germplasm> getGermplasmDescendantByGID(Integer gid, Integer start, Integer numOfRows) throws QueryException {
         try {
             Query query = getSession().getNamedQuery(Germplasm.FIND_DESCENDANTS);

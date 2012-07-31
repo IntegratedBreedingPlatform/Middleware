@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao.gdms;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
@@ -33,6 +34,11 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer>{
      */
     @SuppressWarnings("unchecked")
     public List<Integer> getNameIdsByGermplasmIds(List<Integer> gIds) {
+        
+        if (gIds == null || gIds.isEmpty()){
+            return new ArrayList<Integer>();
+        }
+
         SQLQuery query = getSession().createSQLQuery(AccMetadataSet.GET_NAME_IDS_BY_GERMPLASM_IDS);        
         query.setParameterList("gIdList", gIds);
         return (List<Integer>) query.list();        

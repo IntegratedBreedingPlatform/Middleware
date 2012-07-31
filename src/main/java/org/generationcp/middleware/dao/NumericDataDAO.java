@@ -29,8 +29,14 @@ import org.hibernate.criterion.Restrictions;
 
 public class NumericDataDAO extends GenericDAO<NumericData, NumericDataPK>{
 
+    @SuppressWarnings("unchecked")
     public List<Integer> getObservationUnitIdsByTraitScaleMethodAndValueCombinations(List<TraitCombinationFilter> filters, int start,
             int numOfRows) {
+        
+        if (filters == null || filters.isEmpty()){
+            return new ArrayList<Integer>();
+        }
+
         Criteria crit = getSession().createCriteria(NumericData.class);
         crit.createAlias("variate", "variate");
         crit.setProjection(Projections.distinct(Projections.property("id.observationUnitId")));
@@ -75,7 +81,13 @@ public class NumericDataDAO extends GenericDAO<NumericData, NumericDataPK>{
         }
     }
 
+    @SuppressWarnings("rawtypes")
     public List<NumericDataElement> getValuesByOunitIDList(List<Integer> ounitIdList) throws QueryException {
+
+        if (ounitIdList == null || ounitIdList.isEmpty()){
+            return new ArrayList<NumericDataElement>();
+        }
+
         try {
             SQLQuery query = getSession().createSQLQuery(NumericData.GET_BY_OUNIT_ID_LIST);
             query.setParameterList("ounitIdList", ounitIdList);

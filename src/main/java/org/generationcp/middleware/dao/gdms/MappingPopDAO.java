@@ -58,11 +58,16 @@ public class MappingPopDAO extends GenericDAO<MappingPop, Integer>{
     
     @SuppressWarnings("rawtypes")
     public List<MappingValueElement> getMappingValuesByGidAndMarkerIds(List<Integer> gids, List<Integer> markerIds) throws QueryException {
+        List<MappingValueElement> mappingValues = new ArrayList<MappingValueElement>();
+        
+        if (gids == null || gids.isEmpty() || markerIds == null || markerIds.isEmpty()){
+            return mappingValues;
+        }
+        
         SQLQuery query = getSession().createSQLQuery(MappingPop.GET_MAPPING_VALUES_BY_GIDS_AND_MARKER_IDS);
         query.setParameterList("markerIdList", markerIds);
         query.setParameterList("gidList", gids);
         
-        List<MappingValueElement> mappingValues = new ArrayList<MappingValueElement>();
         try{
             List results = query.list();
         

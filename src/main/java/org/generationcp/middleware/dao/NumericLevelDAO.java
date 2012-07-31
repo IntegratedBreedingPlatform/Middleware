@@ -24,12 +24,18 @@ import org.hibernate.SQLQuery;
 
 public class NumericLevelDAO extends GenericDAO<NumericLevel, NumericLevelPK>{
 
+    @SuppressWarnings("rawtypes")
     public List<NumericLevelElement> getValuesByOunitIDList(List<Integer> ounitIdList) throws QueryException {
+        
+        List<NumericLevelElement> levelValues = new ArrayList<NumericLevelElement>();
+
+        if (ounitIdList == null || ounitIdList.isEmpty()){
+            return levelValues;
+        }
+
         try {
             SQLQuery query = getSession().createSQLQuery(NumericLevel.GET_BY_OUNIT_ID_LIST);
             query.setParameterList("ounitIdList", ounitIdList);
-
-            List<NumericLevelElement> levelValues = new ArrayList<NumericLevelElement>();
 
             List results = query.list();
             for (Object o : results) {

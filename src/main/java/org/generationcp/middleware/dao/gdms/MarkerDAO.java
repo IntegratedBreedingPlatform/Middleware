@@ -49,6 +49,11 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
      * @throws QueryException the query exception
      */
     public List<Integer> getIdsByNames (List<String> names, int start, int numOfRows) throws QueryException {
+        
+        if (names == null || names.isEmpty()){
+            return new ArrayList<Integer>();
+        }
+        
         try {
             SQLQuery query = getSession().createSQLQuery(Marker.GET_IDS_BY_NAMES);
             query.setParameterList("markerNameList", names);
@@ -71,6 +76,11 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
      * @throws QueryException the query exception
      */
     public List<String> getMarkerTypeByMarkerIds(List<Integer> markerIds) throws QueryException{
+
+        if (markerIds == null || markerIds.isEmpty()){
+            return new ArrayList<String>();
+        }
+        
         SQLQuery query = getSession().createSQLQuery(Marker.GET_MARKER_TYPE_BY_MARKER_IDS); 
         query.setParameterList("markerIdList", markerIds);
         return (List<String>) query.list();
@@ -90,6 +100,11 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
      */
     @SuppressWarnings("rawtypes")
     public List<MarkerNameElement> getMarkerNamesByGIds (List<Integer> gIds) throws QueryException {
+        
+        if (gIds == null || gIds.isEmpty()){
+            return new ArrayList<MarkerNameElement>();
+        }
+
         try {
             // Search the allele_values, char_values, mapping_pop_values tables for the existence of gids.
             // by getting alleleCount, charCount and mappingCount
@@ -216,8 +231,18 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
     @SuppressWarnings("rawtypes")
     public List<GermplasmMarkerElement> getGermplasmNamesByMarkerNames (List<String> markerNames) throws QueryException {
         
+        ArrayList<GermplasmMarkerElement> dataValues = new ArrayList<GermplasmMarkerElement>();
+        
+        if (markerNames == null || markerNames.isEmpty()) {
+            return dataValues;
+        }
+        
         //Get marker_ids by marker_names
         List<Integer> markerIds = getIdsByNames(markerNames, 0, countAll().intValue());
+        
+        if (markerIds.isEmpty()){
+            return dataValues;
+        }
         
         try {
             // Search the allele_values, char_values, mapping_pop_values tables for the existence of marker_ids.
@@ -235,7 +260,6 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
             query.setParameterList("markerIdList", markerIds);
             BigInteger mappingCount = (BigInteger) query.uniqueResult();
 
-            ArrayList<GermplasmMarkerElement> dataValues = new ArrayList<GermplasmMarkerElement>();
 
             // Get marker name, germplasm name from allele_values given the marker names
             if (alleleCount.intValue() > 0) {
@@ -289,12 +313,21 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
     @SuppressWarnings("rawtypes")
     public List<AllelicValueElement> getAllelicValuesByGidsAndMarkerNames(List<Integer> gids, List<String> markerNames)
             throws QueryException {
+
+        List<AllelicValueElement> allelicValues = new ArrayList<AllelicValueElement>();
+
+        if (gids == null || gids.isEmpty() || markerNames == null || markerNames.isEmpty()){
+            return allelicValues;
+        }
         
         //Get marker_ids by marker_names
         List<Integer> markerIds = getIdsByNames(markerNames, 0, countAll().intValue());
+
+        if (markerIds == null || markerIds.isEmpty()){
+            return allelicValues;
+        }
         
         try {
-            List<AllelicValueElement> allelicValues = new ArrayList<AllelicValueElement>();
             
             //retrieve allelic values from allele_values
             SQLQuery query = getSession().createSQLQuery(AlleleValues.GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_NAMES);

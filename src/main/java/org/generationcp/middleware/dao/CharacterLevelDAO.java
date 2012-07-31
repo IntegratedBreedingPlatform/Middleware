@@ -24,12 +24,18 @@ import org.hibernate.SQLQuery;
 
 public class CharacterLevelDAO extends GenericDAO<CharacterLevel, CharacterLevelPK>{
 
+    @SuppressWarnings("rawtypes")
     public List<CharacterLevelElement> getValuesByOunitIDList(List<Integer> ounitIdList) throws QueryException {
+
+        List<CharacterLevelElement> levelValues = new ArrayList<CharacterLevelElement>();
+
+        if (ounitIdList == null || ounitIdList.isEmpty()){
+            return levelValues;
+        }
+
         try {
             SQLQuery query = getSession().createSQLQuery(CharacterLevel.GET_BY_OUNIT_ID_LIST);
             query.setParameterList("ounitIdList", ounitIdList);
-
-            List<CharacterLevelElement> levelValues = new ArrayList<CharacterLevelElement>();
 
             List results = query.list();
             for (Object o : results) {
