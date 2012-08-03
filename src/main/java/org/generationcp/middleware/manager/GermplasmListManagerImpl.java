@@ -54,7 +54,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
         if (hibernateUtil != null) {
             dao.setSession(hibernateUtil.getCurrentSession());
         } else {
-            return null;
+            return new ArrayList<GermplasmList>();
         }
         return dao.getAll(start, numOfRows);
     }
@@ -87,7 +87,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
         if (hibernateUtil != null) {
             dao.setSession(hibernateUtil.getCurrentSession());
         } else {
-            return null;
+            return new ArrayList<GermplasmList>();
         }
         return dao.findByName(name, start, numOfRows, operation);
 
@@ -121,7 +121,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
         if (hibernateUtil != null) {
             dao.setSession(hibernateUtil.getCurrentSession());
         } else {
-            return null;
+            return new ArrayList<GermplasmList>();
         }
         return dao.findByStatus(status, start, numOfRows);
 

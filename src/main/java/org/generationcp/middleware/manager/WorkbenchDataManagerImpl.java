@@ -317,7 +317,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         if (hibernateUtil != null) {
             dao.setSession(hibernateUtil.getCurrentSession());
         } else {
-            return null;
+            return users;
         }
 
         if (op == Operation.EQUAL) {

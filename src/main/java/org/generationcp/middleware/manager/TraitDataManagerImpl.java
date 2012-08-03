@@ -60,7 +60,7 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
         if (hibernateUtil != null) {
             dao.setSession(hibernateUtil.getCurrentSession());
         } else {
-            return null;
+            return new ArrayList<Scale>();
         }
         return dao.getAll(start, numOfRows);
 
@@ -159,7 +159,7 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
         if (hibernateUtil != null) {
             dao.setSession(hibernateUtil.getCurrentSession());
         } else {
-            return null;
+            return new ArrayList<Trait>();
         }
         return dao.getAll(start, numOfRows);
     }
@@ -205,7 +205,7 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
         if (hibernateUtil != null) {
             dao.setSession(hibernateUtil.getCurrentSession());
         } else {
-            return null;
+            return new ArrayList<TraitMethod>();
         }
 
         return dao.getAll(start, numOfRows);

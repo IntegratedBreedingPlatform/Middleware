@@ -254,13 +254,13 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         GermplasmDAO dao = new GermplasmDAO();
         HibernateUtil hibernateUtil = getHibernateUtil(instance);
 
+        List<Germplasm> germplasms = new ArrayList<Germplasm>();
+
         if (hibernateUtil != null) {
             dao.setSession(hibernateUtil.getCurrentSession());
         } else {
-            return null;
+            return germplasms;
         }
-
-        List<Germplasm> germplasms = null;
 
         // do string manipulation on name parameter depending on
         // FindGermplasmByNameModes parameter
@@ -322,7 +322,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public List<Germplasm> findGermplasmByLocationName(String name, int start, int numOfRows, Operation op, Database instance)
             throws QueryException {
         GermplasmDAO dao = new GermplasmDAO();
-        List<Germplasm> germplasms = null;
+        List<Germplasm> germplasms = new ArrayList<Germplasm>();
         HibernateUtil hibernateUtil = getHibernateUtil(instance);
 
         if (hibernateUtil != null) {
@@ -692,7 +692,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         if (hibernateUtil != null) {
             dao.setSession(hibernateUtil.getCurrentSession());
         } else {
-            return null;
+            return new ArrayList<Attribute>();
         }
         return (List<Attribute>) dao.getByGID(gid); //attributes
     }

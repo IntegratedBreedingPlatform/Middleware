@@ -100,9 +100,12 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
      */
     @SuppressWarnings("rawtypes")
     public List<MarkerNameElement> getMarkerNamesByGIds (List<Integer> gIds) throws QueryException {
+
+        // Used to store the result
+        List<MarkerNameElement> dataValues = new ArrayList<MarkerNameElement>();
         
         if (gIds == null || gIds.isEmpty()){
-            return new ArrayList<MarkerNameElement>();
+            return dataValues;
         }
 
         try {
@@ -121,9 +124,6 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
             query.setParameterList("gIdList", gIds);
             BigInteger mappingCount = (BigInteger) query.uniqueResult();
 
-            // Used to store the result
-            List<MarkerNameElement> dataValues = new ArrayList<MarkerNameElement>();
-            
             // Retrieves markers that are being genotyped
             if (alleleCount.intValue() > 0){
                 query = getSession().createSQLQuery(Marker.GET_ALLELE_MARKER_NAMES_BY_GID);

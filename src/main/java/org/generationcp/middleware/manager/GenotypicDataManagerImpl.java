@@ -111,7 +111,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         if(util != null) {
             dao.setSession(util.getCurrentSession());
         } else {
-            return null;
+            return new ArrayList<Map>();
         }
         
         return dao.findAll(start, numOfRows);
@@ -276,7 +276,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             markerDao.setSession(hibernateUtil.getCurrentSession());
             mappingPopDao.setSession(hibernateUtil.getCurrentSession());
         } else {
-            return new ArrayList<MappingValueElement> ();
+            return new ArrayList<MappingValueElement>();
         }
         
         List<Integer> markerIds = markerDao.getIdsByNames(markerNames, start, numOfRows);
@@ -303,7 +303,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         if (hibernateUtil != null) {
             markerDao.setSession(hibernateUtil.getCurrentSession());
         } else {
-            return new ArrayList<AllelicValueElement> ();
+            return new ArrayList<AllelicValueElement>();
         }
         
         List<AllelicValueElement> allelicValues = markerDao.getAllelicValuesByGidsAndMarkerNames(gids, markerNames);
