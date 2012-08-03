@@ -66,6 +66,10 @@ public class Project implements Serializable{
     @Basic(optional = false)
     @Column(name = "template_modified")
     private boolean templateModified;
+    
+    @Basic(optional = false)
+    @Column(name = "last_open_date")
+    private Date lastOpenDate;
 
     @Transient
     private List<ProjectWorkflowStep> steps;
@@ -166,6 +170,14 @@ public class Project implements Serializable{
         this.owner = owner;
     }
 
+    public void setLastOpenDate(Date lastOpenDate) {
+        this.lastOpenDate = lastOpenDate;
+    }
+
+    public Date getLastOpenDate() {
+        return lastOpenDate;
+    }
+
     @Override
     public int hashCode() {
         return new HashCodeBuilder().append(projectId).hashCode();
@@ -198,4 +210,5 @@ public class Project implements Serializable{
 
         return sb.toString();
     }
+
 }

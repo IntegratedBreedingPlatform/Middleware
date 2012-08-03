@@ -217,4 +217,12 @@ public interface WorkbenchDataManager{
      */
     public void deletePerson(Person person) throws QueryException; 
     
+    /**
+     * Returns the project last accessed by the user.
+     * @param userId
+     * @return
+     * @throws QueryException
+     */
+    public Project getLastOpenedProject(Integer userId) throws QueryException;
+    
 }

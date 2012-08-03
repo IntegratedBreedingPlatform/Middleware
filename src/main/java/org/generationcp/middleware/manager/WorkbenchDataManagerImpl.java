@@ -425,5 +425,12 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
             hibernateUtil.closeCurrentSession();
         }
     }
+
+    @Override
+    public Project getLastOpenedProject(Integer userId) throws QueryException {
+        ProjectDAO dao = new ProjectDAO();
+        dao.setSession(hibernateUtil.getCurrentSession());
+        return dao.getLastOpenedProject(userId);
+    }
     
 }

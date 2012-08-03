@@ -14,10 +14,11 @@ package org.generationcp.middleware.dao;
 
 import java.util.List;
 
-import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
 
 public class ProjectDAO extends GenericDAO<Project, Long>{
@@ -67,6 +68,23 @@ public class ProjectDAO extends GenericDAO<Project, Long>{
             return (Project) criteria.uniqueResult();
         } catch (HibernateException e) {
             throw new QueryException("Error with get project by id: " + e.getMessage(), e);
+        }
+    }
+    
+    public Project getLastOpenedProject(Integer userId) throws QueryException {
+        try {
+            StringBuilder sb = new StringBuilder();
+            sb.append("SELECT {w.*} FROM workbench_project w ")
+              .append("WHERE w.last_open_date = (SELECT MAX(last_open_date) ")
+              .append("FROM workbench_project WHERE user_id = :userId) ");
+            
+            SQLQuery query = getSession().createSQLQuery(sb.toString());
+            query.addEntity("w", Project.class);
+            query.setParameter("userId", userId);
+            
+            return (Project) query.uniqueResult();
+        } catch (HibernateException e) {
+            throw new QueryException(e.toString(), e);
         }
     }
 }
