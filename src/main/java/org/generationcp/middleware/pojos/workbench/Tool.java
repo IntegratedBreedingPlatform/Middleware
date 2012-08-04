@@ -79,6 +79,11 @@ public class Tool implements Serializable{
     public void setPath(String path) {
         this.path = path;
     }
+    
+    @Override
+    public String toString() {
+        return "Tool [toolId=" + toolId + ", toolName=" + toolName + ", toolType=" + toolType + ", path=" + path + "]";
+    }
 
     @Override
     public int hashCode() {
