@@ -12,15 +12,18 @@
 
 package org.generationcp.middleware.dao;
 
-import org.generationcp.middleware.pojos.workbench.Tool;
+import java.util.List;
+
 import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.pojos.workbench.Tool;
+import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Restrictions;
 
 public class ToolDAO extends GenericDAO<Tool, Long>{
 
-    public Tool findByToolName(String toolName) throws QueryException{
+    public Tool findByToolName(String toolName) throws QueryException {
         try {
             Criteria criteria = getSession().createCriteria(Tool.class).add(Restrictions.eq("toolName", toolName)).setMaxResults(1);
 
@@ -29,5 +32,16 @@ public class ToolDAO extends GenericDAO<Tool, Long>{
             throw new QueryException("Error with finding tools by name: " + e.getMessage(), e);
         }
     }
+    
+    @SuppressWarnings("unchecked")
+    public List<Tool> findToolsByToolType(ToolType toolType) throws QueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(Tool.class)
+                                            .add(Restrictions.eq("toolType", toolType));
 
+            return criteria.list();
+        } catch (HibernateException e) {
+            throw new QueryException("Error with finding tools by type: " + e.getMessage(), e);
+        }
+    }
 }

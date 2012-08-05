@@ -20,6 +20,7 @@ import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.Tool;
+import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 
@@ -84,6 +85,15 @@ public interface WorkbenchDataManager{
      * @return the tool with name
      */
     public Tool getToolWithName(String toolName) throws QueryException;
+    
+    /**
+     * Get the list of tools with the specified type.
+     * 
+     * @param toolType
+     * @return
+     * @throws QueryException
+     */
+    public List<Tool> getToolsWithType(ToolType toolType) throws QueryException;
     
     /**
      * Checks if is valid user login.

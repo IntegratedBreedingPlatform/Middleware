@@ -27,6 +27,7 @@ import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.Tool;
+import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 import org.generationcp.middleware.util.HibernateUtil;
@@ -129,6 +130,13 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         ToolDAO toolDAO = new ToolDAO();
         toolDAO.setSession(hibernateUtil.getCurrentSession());
         return toolDAO.findByToolName(toolId);
+    }
+    
+    @Override
+    public List<Tool> getToolsWithType(ToolType toolType) throws QueryException {
+        ToolDAO toolDAO = new ToolDAO();
+        toolDAO.setSession(hibernateUtil.getCurrentSession());
+        return toolDAO.findToolsByToolType(toolType);
     }
 
     @Override
