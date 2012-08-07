@@ -431,7 +431,11 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
         try {
             SQLQuery query = getSession().createSQLQuery(Marker.COUNT_ALL_MARKER_TYPES);
             BigInteger result = (BigInteger) query.uniqueResult();
-            return result.longValue();
+            if(result != null) {
+                return result.longValue();
+            } else {
+                return 0L;
+            }
         } catch (HibernateException ex) {
             throw new QueryException("Error with count all Marker Types query: " + ex.getMessage(), ex);
         }
@@ -476,7 +480,11 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
             query.setParameter("markerType", markerType);
             BigInteger result = (BigInteger) query.uniqueResult();
             
-            return result.longValue();
+            if(result != null) {
+                return result.longValue();
+            } else {
+                return 0L;
+            }
         } catch (HibernateException ex) {
             throw new QueryException("Error with count marker names by Marker Type query: " + ex.getMessage(), ex);
         }
