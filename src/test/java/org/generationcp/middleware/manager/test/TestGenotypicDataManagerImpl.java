@@ -28,6 +28,7 @@ import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.generationcp.middleware.pojos.gdms.MarkerInfo;
 import org.generationcp.middleware.pojos.gdms.MappingValueElement;
+import org.generationcp.middleware.pojos.gdms.MarkerIdMarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.hibernate.QueryException;
@@ -384,9 +385,12 @@ public class TestGenotypicDataManagerImpl{
         markerIds.add(-4);
         markerIds.add(-5);
         
-        List<String> markerNames = manager.getMarkerNamesByMarkerIds(markerIds);
+        List<MarkerIdMarkerNameElement> markerNames = manager.getMarkerNamesByMarkerIds(markerIds);
+        System.out.println("testGetMarkerNamesByMarkerIds: ");
+        for(MarkerIdMarkerNameElement e : markerNames) {
+            System.out.println(e.getMarkerId() + " : " + e.getMarkerName());
+        }
         
-        System.out.println("testGetMarkerNamesByMarkerIds: " + markerNames);
     }
     
     @Test
@@ -403,7 +407,7 @@ public class TestGenotypicDataManagerImpl{
     
     @Test 
     public void testGetMarkerNamesByMarkerType() throws Exception {
-        List<String> markerNames = manager.getMarkerNamesByMarkerType("asdf", 1, 2);
+        List<String> markerNames = manager.getMarkerNamesByMarkerType("asdf", 1, 10);
         System.out.println("testGetMarkerNamesByMarkerType: " + markerNames);
     }
     

@@ -23,6 +23,7 @@ import org.generationcp.middleware.pojos.gdms.CharValues;
 import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.MappingPopValues;
 import org.generationcp.middleware.pojos.gdms.Marker;
+import org.generationcp.middleware.pojos.gdms.MarkerIdMarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -379,19 +380,30 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
      * @return the names by ids
      * @throws QueryException the query exception
      */
-    public List<String> getNamesByIds (List<Integer> ids) throws QueryException {
+    public List<MarkerIdMarkerNameElement> getNamesByIds(List<Integer> ids) throws QueryException {
         
         if (ids == null || ids.isEmpty()){
-            return new ArrayList<String>();
+            return new ArrayList<MarkerIdMarkerNameElement>();
         }
         
         try {
             SQLQuery query = getSession().createSQLQuery(Marker.GET_NAMES_BY_IDS);
             query.setParameterList("markerIdList", ids);
             
-            List<String> markerNames = query.list();
+            List<MarkerIdMarkerNameElement> dataValues = new ArrayList<MarkerIdMarkerNameElement>();
+            List<Object> results = query.list();
             
-            return markerNames;
+            for(Object o : results) {
+                Object[] result = (Object[]) o;
+                if(result != null) {
+                    Integer id = (Integer) result[0];
+                    String name = (String) result[1];
+                    MarkerIdMarkerNameElement elem = new MarkerIdMarkerNameElement(id, name);
+                    dataValues.add(elem);
+                }
+            }
+            
+            return dataValues;
         } catch (HibernateException ex) {
             throw new QueryException("Error with get Marker Names by list of Marker IDs query: " + ex.getMessage(), ex);
         }

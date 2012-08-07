@@ -44,12 +44,12 @@ public class Marker implements Serializable{
 
     public static final String GET_IDS_BY_NAMES = "select marker_id from marker where marker_name in (:markerNameList)";
     public static final String GET_ID_AND_NAME_BY_NAMES = "select marker_id, marker_name from marker where marker_name in (:markerNameList)";
-    public static final String GET_NAMES_BY_IDS = "select distinct concat(marker_name, '') from marker where marker_id in (:markerIdList)";
-    public static final String GET_ALL_MARKER_TYPES = "select distinct concat(marker_type, '') from marker";
-    public static final String GET_NAMES_BY_TYPE = "select distinct concat(marker_name, '') from marker where marker_type = :markerType";
+    public static final String GET_NAMES_BY_IDS = "select marker_id, concat(marker_name, '') as marker_name from marker where marker_id in (:markerIdList) order by marker_id asc";
+    public static final String GET_ALL_MARKER_TYPES = "select distinct concat(marker_type, '') from marker where upper(marker_type) != 'UA'";
+    public static final String GET_NAMES_BY_TYPE = "select distinct concat(marker_name, '') from marker where upper(marker_type) = upper(:markerType)";
     
-    public static final String COUNT_ALL_MARKER_TYPES = "select count(distinct marker_type) from marker";
-    public static final String COUNT_MARKER_NAMES_BY_MARKER_TYPE = "select count(distinct marker_name) from marker where marker_type = :markerType";
+    public static final String COUNT_ALL_MARKER_TYPES = "select count(distinct marker_type) from marker where upper(marker_type) != 'UA'";
+    public static final String COUNT_MARKER_NAMES_BY_MARKER_TYPE = "select count(distinct marker_name) from marker where upper(marker_type) = upper(:markerType)";
     
     // For getMarkerNamesByGIds()
     public static final String GET_ALLELE_MARKER_NAMES_BY_GID = 

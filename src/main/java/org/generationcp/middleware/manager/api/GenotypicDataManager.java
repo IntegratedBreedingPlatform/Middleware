@@ -25,6 +25,7 @@ import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.generationcp.middleware.pojos.gdms.MappingValueElement;
+import org.generationcp.middleware.pojos.gdms.MarkerIdMarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerInfo;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
@@ -303,10 +304,10 @@ public interface GenotypicDataManager{
      * the specified list of Marker IDs.
      *
      * @param markerIds - List of Marker Ids to search for the corresponding Marker Names
-     * @return List of matching Marker Names based on the specified Marker IDs
+     * @return List of matching Marker Names and Marker IDs based on the specified Marker IDs
      * @throws QueryException the query exception
      */
-    public List<String> getMarkerNamesByMarkerIds(List<Integer> markerIds) throws QueryException;
+    public List<MarkerIdMarkerNameElement> getMarkerNamesByMarkerIds(List<Integer> markerIds) throws QueryException;
 
     /**
      * Gets the all marker types.
