@@ -43,7 +43,9 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer>{
      */
     @SuppressWarnings("rawtypes")
     public List<AllelicValueWithMarkerIdElement> getAllelicValuesByDatasetId(Integer datasetId, int start, int numOfRows) throws QueryException{
+
         List<AllelicValueWithMarkerIdElement> toReturn = new ArrayList<AllelicValueWithMarkerIdElement>();
+
         if (datasetId == null){
             return toReturn;
         }

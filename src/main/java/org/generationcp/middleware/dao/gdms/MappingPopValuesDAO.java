@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.QueryException;
-import org.generationcp.middleware.pojos.gdms.AlleleValues;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
 import org.generationcp.middleware.pojos.gdms.MappingPopValues;
 import org.hibernate.HibernateException;
@@ -30,7 +29,7 @@ import org.hibernate.SQLQuery;
  * @author Joyce Avestro
  * 
  */
-public class MappingPopValuesDAO extends GenericDAO<AlleleValues, Integer>{
+public class MappingPopValuesDAO extends GenericDAO<MappingPopValues, Integer>{
     
     
     /**

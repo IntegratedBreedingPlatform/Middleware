@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
@@ -24,6 +25,7 @@ import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.generationcp.middleware.pojos.gdms.MappingValueElement;
+import org.generationcp.middleware.pojos.gdms.MarkerInfo;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 
@@ -217,7 +219,13 @@ public interface GenotypicDataManager{
     /**
      * Retrieves a list of Allelic Values (germplasm id, char_value, marker id) based on the specified datasetId from the char_values table.
      *
-     * @param datasetId - the datasetId matching the allelic values
+     * @param datasetId 
+     *            - the datasetId matching the allelic values
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
      * @param start the start
      * @param numOfRows the num of rows
      * @return List of Allelic Values based on the specified dataset id
@@ -238,7 +246,13 @@ public interface GenotypicDataManager{
     /**
      * Retrieves a list of Allelic Values (germplasm id, allele_bin_value, marker id) based on the specified datasetId from the allele_values table.
      *
-     * @param datasetId - the datasetId matching the allelic values
+     * @param datasetId 
+     *            - the datasetId matching the allelic values
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
      * @param start the start
      * @param numOfRows the num of rows
      * @return List of Allelic Values based on the specified dataset id
@@ -259,7 +273,13 @@ public interface GenotypicDataManager{
     /**
      * Retrieves a list of Allelic Values (germplasm id, map_char_value, marker id) based on the specified datasetId from the mapping_pop_values table.
      *
-     * @param datasetId - the datasetId matching the allelic values
+     * @param datasetId 
+     *            - the datasetId matching the allelic values
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
      * @param start the start
      * @param numOfRows the num of rows
      * @return List of Allelic Values based on the specified dataset id
@@ -276,6 +296,7 @@ public interface GenotypicDataManager{
      * @throws QueryException the query exception
      */
     public int countAllelicValuesFromMappingPopValuesByDatasetId(Integer datasetId) throws QueryException;
+
 
     /**
      * Retrieves a list of matching Marker Names from the Marker table based on
@@ -337,6 +358,55 @@ public interface GenotypicDataManager{
      * @throws QueryException the query exception
      */
     public List<Integer> getGIDsFromCharValuesByMarkerId(Integer markerId, int start, int numOfRows) throws QueryException;
+
+    /**
+     * Retrieves a list of MarkerInfo based on the specified marker name from the marker_retrieval_info table
+     * 
+     * @param markerName 
+     *            - the markerName to match
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
+     * @return List of MarkerInfo based on the specified marker name
+     * @throws QueryException
+     */
+    public List<MarkerInfo> getMarkerInfoByMarkerName(String markerName, int start, int numOfRows) throws QueryException;
+    
+    /**
+     * Counts the marker info entries corresponding to the given marker name
+     * 
+     * @param markerName 
+     * @return the count
+     * @throws QueryException
+     */
+    public int countMarkerInfoByMarkerName(String markerName) throws QueryException;
+    
+    /**
+     * Retrieves a list of MarkerInfo based on the specified genotype from the marker_retrieval_info table
+     * 
+     * @param genotype 
+     *            - the genotype to match
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
+     * @return List of MarkerInfo based on the specified genotype
+     * @throws QueryException
+     */
+    public List<MarkerInfo> getMarkerInfoByGenotype(String genotype, int start, int numOfRows) throws QueryException;
+    
+    /**
+     * Counts the marker info entries corresponding to the given genotype
+     * 
+     * @param genotype 
+     * @return the count
+     * @throws QueryException
+     */
+    public int countMarkerInfoByGenotype(String genotype) throws QueryException;
+    
 
     /**
      * Count gids from char values by marker id.
