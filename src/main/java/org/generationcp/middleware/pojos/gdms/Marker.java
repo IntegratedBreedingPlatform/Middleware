@@ -44,7 +44,13 @@ public class Marker implements Serializable{
 
     public static final String GET_IDS_BY_NAMES = "select marker_id from marker where marker_name in (:markerNameList)";
     public static final String GET_ID_AND_NAME_BY_NAMES = "select marker_id, marker_name from marker where marker_name in (:markerNameList)";
-
+    public static final String GET_NAMES_BY_IDS = "select distinct concat(marker_name, '') from marker where marker_id in (:markerIdList)";
+    public static final String GET_ALL_MARKER_TYPES = "select distinct concat(marker_type, '') from marker";
+    public static final String GET_NAMES_BY_TYPE = "select distinct concat(marker_name, '') from marker where marker_type = :markerType";
+    
+    public static final String COUNT_ALL_MARKER_TYPES = "select count(distinct marker_type) from marker";
+    public static final String COUNT_MARKER_NAMES_BY_MARKER_TYPE = "select count(distinct marker_name) from marker where marker_type = :markerType";
+    
     // For getMarkerNamesByGIds()
     public static final String GET_ALLELE_MARKER_NAMES_BY_GID = 
             "select distinct allele_values.gid, concat(marker.marker_name,'') " +

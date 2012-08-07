@@ -26,8 +26,8 @@ import org.generationcp.middleware.pojos.gdms.DatasetElement;
 import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
-import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MappingValueElement;
+import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.hibernate.QueryException;
 import org.junit.AfterClass;
@@ -373,6 +373,43 @@ public class TestGenotypicDataManagerImpl{
 
     }
     
+    @Test
+    public void testGetMarkerNamesByMarkerIds() throws Exception {
+        List<Integer> markerIds = new ArrayList<Integer>();
+        markerIds.add(-1);
+        markerIds.add(-2);
+        markerIds.add(-3);
+        markerIds.add(-4);
+        markerIds.add(-5);
+        
+        List<String> markerNames = manager.getMarkerNamesByMarkerIds(markerIds);
+        
+        System.out.println("testGetMarkerNamesByMarkerIds: " + markerNames);
+    }
+    
+    @Test
+    public void testGetAllMarkerTypes() throws Exception {
+        List<String> markerTypes = manager.getAllMarkerTypes(0, 10);
+        System.out.println("testGetAllMarkerTypes: " + markerTypes);
+    }
+    
+    @Test
+    public void testCountAllMarkerTypes() throws Exception {
+        long result = manager.countAllMarkerTypes(Database.LOCAL);
+        System.out.println("testCountAllMarkerTypes: " + result);
+    }
+    
+    @Test 
+    public void testGetMarkerNamesByMarkerType() throws Exception {
+        List<String> markerNames = manager.getMarkerNamesByMarkerType("asdf", 1, 2);
+        System.out.println("testGetMarkerNamesByMarkerType: " + markerNames);
+    }
+    
+    @Test
+    public void testCountMarkerNamesByMarkerType() throws Exception {
+        long result = manager.countMarkerNamesByMarkerType("asdf", Database.CENTRAL);
+        System.out.println("testCountMarkerNamesByMarkerType: " + result);
+    }
     
     @AfterClass
     public static void tearDown() throws Exception {

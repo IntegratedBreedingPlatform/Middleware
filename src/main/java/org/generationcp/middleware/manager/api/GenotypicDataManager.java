@@ -16,11 +16,11 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.Database;
-import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
+import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.generationcp.middleware.pojos.gdms.MappingValueElement;
@@ -270,5 +270,53 @@ public interface GenotypicDataManager{
      */
     public int countAllelicValuesFromMappingPopValuesByDatasetId(Integer datasetId) throws QueryException;
 
+    /**
+     * Retrieves a list of matching Marker Names from the Marker table based on 
+     * the specified list of Marker IDs.
+     * 
+     * @param markerIds
+     *            - List of Marker Ids to search for the corresponding Marker Names
+     * @return List of matching Marker Names based on the specified Marker IDs 
+     * @throws QueryException
+     */
+    public List<String> getMarkerNamesByMarkerIds(List<Integer> markerIds) throws QueryException;
+
+    /**
+     * Gets the all marker types.
+     *
+     * @param start the start
+     * @param numOfRows the num of rows
+     * @return the all marker types
+     * @throws QueryException the query exception
+     */
+    public List<String> getAllMarkerTypes(int start, int numOfRows) throws QueryException;
     
+    /**
+     * Get the number of all marker types.
+     * @return
+     * @throws QueryException
+     */
+    public Long countAllMarkerTypes(Database instance) throws QueryException;
+    
+    /**
+     * Gets the marker names by marker type.
+     *
+     * @param markerType the marker type
+     * @param start the start
+     * @param numOfRows the num of rows
+     * @return the marker names by marker type
+     * @throws QueryException the query exception
+     */
+    public List<String> getMarkerNamesByMarkerType(String markerType, int start, int numOfRows) throws QueryException;
+    
+    /**
+     * Count marker names by marker type.
+     *
+     * @param markerType the marker type
+     * @param instance the instance
+     * @return the long
+     * @throws QueryException the query exception
+     */
+    public Long countMarkerNamesByMarkerType(String markerType, Database instance) throws QueryException;
+
 }

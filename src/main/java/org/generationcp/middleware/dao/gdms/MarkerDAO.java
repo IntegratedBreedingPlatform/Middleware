@@ -27,6 +27,7 @@ import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 
+// TODO: Auto-generated Javadoc
 /**
  * <b>Description</b>: DAO for Marker object.
  * 
@@ -292,6 +293,12 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
         }
     }
     
+    /**
+     * Gets the allelic value elements from list.
+     *
+     * @param results the results
+     * @return the allelic value elements from list
+     */
     @SuppressWarnings("rawtypes")
     private List<AllelicValueElement> getAllelicValueElementsFromList(List results) {
         List<AllelicValueElement> values = new ArrayList<AllelicValueElement>();
@@ -310,6 +317,14 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
         return values;
     }
     
+    /**
+     * Gets the allelic values by gids and marker names.
+     *
+     * @param gids the gids
+     * @param markerNames the marker names
+     * @return the allelic values by gids and marker names
+     * @throws QueryException the query exception
+     */
     @SuppressWarnings("rawtypes")
     public List<AllelicValueElement> getAllelicValuesByGidsAndMarkerNames(List<Integer> gids, List<String> markerNames)
             throws QueryException {
@@ -356,5 +371,114 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
             throw new QueryException("Error with get Allelic Values by list of GIDs Marker Names query: " + ex.getMessage(), ex);
         }
     }
-
+    
+    /**
+     * Get list of marker names by marker ids.
+     *
+     * @param ids the ids
+     * @return the names by ids
+     * @throws QueryException the query exception
+     */
+    public List<String> getNamesByIds (List<Integer> ids) throws QueryException {
+        
+        if (ids == null || ids.isEmpty()){
+            return new ArrayList<String>();
+        }
+        
+        try {
+            SQLQuery query = getSession().createSQLQuery(Marker.GET_NAMES_BY_IDS);
+            query.setParameterList("markerIdList", ids);
+            
+            List<String> markerNames = query.list();
+            
+            return markerNames;
+        } catch (HibernateException ex) {
+            throw new QueryException("Error with get Marker Names by list of Marker IDs query: " + ex.getMessage(), ex);
+        }
+    }
+    
+    /**
+     * Get all marker types.
+     *
+     * @param start the start
+     * @param numOfRows the num of rows
+     * @return the all marker types
+     * @throws QueryException the query exception
+     */
+    public List<String> getAllMarkerTypes(int start, int numOfRows) throws QueryException {
+        try {
+            SQLQuery query = getSession().createSQLQuery(Marker.GET_ALL_MARKER_TYPES);
+            query.setFirstResult(start);
+            query.setMaxResults(numOfRows);
+            
+            List<String> markerTypes = query.list();
+            
+            return markerTypes;
+            
+        } catch (HibernateException ex) {
+            throw new QueryException("Error with get all Marker Types query: " + ex.getMessage(), ex);
+        }
+    }
+    
+    
+    /**
+     * Count all marker types.
+     *
+     * @return the long
+     * @throws QueryException the query exception
+     */
+    public Long countAllMarkerTypes() throws QueryException {
+        try {
+            SQLQuery query = getSession().createSQLQuery(Marker.COUNT_ALL_MARKER_TYPES);
+            BigInteger result = (BigInteger) query.uniqueResult();
+            return result.longValue();
+        } catch (HibernateException ex) {
+            throw new QueryException("Error with count all Marker Types query: " + ex.getMessage(), ex);
+        }
+    }
+    
+    /**
+     * Gets the all marker names by marker type.
+     *
+     * @param markerType the marker type
+     * @param start the start
+     * @param numOfRows the num of rows
+     * @return the all marker names by marker type
+     * @throws QueryException the query exception
+     */
+    public List<String> getMarkerNamesByMarkerType(String markerType, int start, int numOfRows) 
+        throws QueryException {
+        
+        try {
+            SQLQuery query = getSession().createSQLQuery(Marker.GET_NAMES_BY_TYPE);
+            query.setParameter("markerType", markerType);
+            query.setFirstResult(start);
+            query.setMaxResults(numOfRows);
+            
+            List<String> markerNames = query.list();
+            
+            return markerNames;
+        } catch (HibernateException ex) {
+            throw new QueryException("Error with get all Marker Names by Marker Type query: " + ex.getMessage(), ex);
+        }
+    }
+    
+    /**
+     * Count marker names by marker type.
+     *
+     * @param markerType the marker type
+     * @return the long
+     * @throws QueryException the query exception
+     */
+    public Long countMarkerNamesByMarkerType(String markerType) throws QueryException {
+        try {
+            SQLQuery query = getSession().createSQLQuery(Marker.COUNT_MARKER_NAMES_BY_MARKER_TYPE);
+            query.setParameter("markerType", markerType);
+            BigInteger result = (BigInteger) query.uniqueResult();
+            
+            return result.longValue();
+        } catch (HibernateException ex) {
+            throw new QueryException("Error with count marker names by Marker Type query: " + ex.getMessage(), ex);
+        }
+    } 
 }
