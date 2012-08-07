@@ -521,4 +521,68 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         
         return result;
     }
+
+    @Override
+    public List<Integer> getGIDsFromCharValuesByMarkerId(Integer markerId, int start, int numOfRows)
+        throws QueryException {
+        
+        CharValuesDAO dao = new CharValuesDAO();
+        HibernateUtil util = getHibernateUtil(markerId);
+        List<Integer> gids;
+        
+        if(util != null) {
+            dao.setSession(util.getCurrentSession());
+            gids = dao.getGIDsByMarkerId(markerId, start, numOfRows);
+        } else {
+            gids = new ArrayList<Integer>();
+        }
+        
+        return gids;
+    }
+
+    @Override
+    public Long countGIDsFromCharValuesByMarkerId(Integer markerId) throws QueryException {
+        CharValuesDAO dao = new CharValuesDAO();
+        HibernateUtil util = getHibernateUtil(markerId);
+        Long result = 0L;
+        
+        if(util != null) {
+            dao.setSession(util.getCurrentSession());
+            result = dao.countGIDsByMarkerId(markerId);
+        } 
+        
+        return result;
+    }
+
+    @Override
+    public List<Integer> getGIDsFromAlleleValuesByMarkerId(Integer markerId, int start, int numOfRows) throws QueryException {
+        AlleleValuesDAO dao = new AlleleValuesDAO();
+        HibernateUtil util = getHibernateUtil(markerId);
+        List<Integer> gids;
+        
+        if(util != null) {
+            dao.setSession(util.getCurrentSession());
+            gids = dao.getGIDsByMarkerId(markerId, start, numOfRows);
+        } else {
+            gids = new ArrayList<Integer>();
+        }
+        
+        return gids;
+    }
+
+    @Override
+    public Long countGIDsFromAlleleValuesByMarkerId(Integer markerId, int start, int numOfRows) throws QueryException {
+        AlleleValuesDAO dao = new AlleleValuesDAO();
+        HibernateUtil util = getHibernateUtil(markerId);
+        Long result = 0L;
+        
+        if(util != null) {
+            dao.setSession(util.getCurrentSession());
+            result = dao.countGIDsByMarkerId(markerId);
+        } 
+        
+        return result;
+    }
+    
+    
 }

@@ -16,8 +16,8 @@ import java.io.Serializable;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
-import javax.persistence.Id;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -73,6 +73,10 @@ public class AlleleValues implements Serializable{
 
     public static final String COUNT_BY_DATASET_ID = "select count(*) from allele_values where dataset_id = :datasetId";
 
+    public static final String GET_GIDS_BY_MARKER_ID = "select distinct gid from allele_values where marker_id = :markerId";
+    
+    public static final String COUNT_GIDS_BY_MARKER_ID = "select count(distinct gid) from allele_values where marker_id = :markerId";
+    
     @Id
     @Basic(optional = false)
     @Column(name = "an_id")

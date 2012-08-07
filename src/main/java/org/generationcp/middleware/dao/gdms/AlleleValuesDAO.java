@@ -90,5 +90,53 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer>{
             throw new QueryException("Error with count from allele_values by dataset id query: " + e.getMessage(), e);
         }
     }
+    
+    /**
+     * Gets the gids by marker id.
+     *
+     * @param markerId the marker id
+     * @param start the start
+     * @param numOfRows the num of rows
+     * @return the gI ds by marker id
+     * @throws QueryException the query exception
+     */
+    @SuppressWarnings("unchecked")
+    public List<Integer> getGIDsByMarkerId(Integer markerId, int start, int numOfRows)
+        throws QueryException {
+        try {
+            SQLQuery query = getSession().createSQLQuery(AlleleValues.GET_GIDS_BY_MARKER_ID);
+            query.setParameter("markerId", markerId);
+            query.setFirstResult(start);
+            query.setMaxResults(numOfRows);
+            
+            List<Integer> gids = query.list();
+            return gids;
+        } catch (HibernateException ex) {
+            throw new QueryException("Error with get GIDs by Marker Id query: " + ex.getMessage(), ex);
+        }
+    }
+    
+    /**
+     * Count gids by marker id.
+     *
+     * @param markerId the marker id
+     * @return the long
+     * @throws QueryException the query exception
+     */
+    public Long countGIDsByMarkerId(Integer markerId) throws QueryException {
+        try {
+            SQLQuery query = getSession().createSQLQuery(AlleleValues.COUNT_GIDS_BY_MARKER_ID);
+            query.setParameter("markerId", markerId);
+            BigInteger result = (BigInteger) query.uniqueResult();
+            
+            if(result != null) {
+                return result.longValue();
+            } else {
+                return 0L;
+            }
+        } catch (HibernateException ex) {
+            throw new QueryException("Error with count GIDs by Marker Id query: " + ex.getMessage(), ex);
+        }
+    }
 
 }

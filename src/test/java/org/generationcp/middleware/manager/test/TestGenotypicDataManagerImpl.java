@@ -411,6 +411,30 @@ public class TestGenotypicDataManagerImpl{
         System.out.println("testCountMarkerNamesByMarkerType: " + result);
     }
     
+    @Test 
+    public void testGetGidsFromCharValuesByMarkerId() throws Exception {
+        List<Integer> gids = manager.getGIDsFromCharValuesByMarkerId(1, 1, 10);
+        System.out.println("testGetGidsFromCharValuesByMarkerId: " + gids);
+    }
+    
+    @Test
+    public void testCountGidsFromCharValuesByMarkerId() throws Exception {
+        Long result = manager.countGIDsFromCharValuesByMarkerId(1);
+        System.out.println("testCountGidsFromCharValuesByMarkerId: " + result);
+    }
+    
+    @Test 
+    public void testGetGidsFromAlleleValuesByMarkerId() throws Exception {
+        List<Integer> gids = manager.getGIDsFromCharValuesByMarkerId(1, 1, 10);
+        System.out.println("testGetGidsFromAlleleValuesByMarkerId: " + gids);
+    }
+    
+    @Test
+    public void testCountGidsFromAlleleValuesByMarkerId() throws Exception {
+        Long result = manager.countGIDsFromCharValuesByMarkerId(1);
+        System.out.println("testCountGidsFromAlleleValuesByMarkerId: " + result);
+    }
+    
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();
