@@ -19,6 +19,7 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
+import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
@@ -199,7 +200,7 @@ public interface GenotypicDataManager{
             List<Integer> gids, List<String> markerNames, int start, int numOfRows) throws QueryException;
     
     /**
-     * Retrieves a list of Allelic Values based on the specified GIDs and Marker Names.
+     * Retrieves a list of Allelic Values (germplasm id, map_char_value, marker name) based on the specified GIDs and Marker Names.
      * Results are retrieved from 3 separate sources: Allele Values, Char Values, and Mapping Pop Values.
      * 
      * @param gids
@@ -211,5 +212,63 @@ public interface GenotypicDataManager{
      */
     public List<AllelicValueElement> getAllelicValuesByGidsAndMarkerNames(
             List<Integer> gids, List<String> markerNames) throws QueryException;
+    
+    /**
+     * Retrieves a list of Allelic Values (germplasm id, char_value, marker id) based on the specified datasetId from the char_values table
+     * 
+     * @param datasetId - the datasetId matching the allelic values
+     * @return List of Allelic Values based on the specified dataset id
+     * @throws QueryException
+     */
+    public List<AllelicValueWithMarkerIdElement> getAllelicValuesFromCharValuesByDatasetId(
+            Integer datasetId, int start, int numOfRows) throws QueryException;
+    
+    /**
+     * Counts the allelic values based on the specified datasetId from the char_values table
+     * 
+     * @param datasetId - the datasetId matching the allelic values
+     * @return the count
+     * @throws QueryException
+     */
+    public int countAllelicValuesFromCharValuesByDatasetId(Integer datasetId) throws QueryException;
+
+    /**
+     * Retrieves a list of Allelic Values (germplasm id, allele_bin_value, marker id) based on the specified datasetId from the allele_values table
+     * 
+     * @param datasetId - the datasetId matching the allelic values
+     * @return List of Allelic Values based on the specified dataset id
+     * @throws QueryException
+     */
+    public List<AllelicValueWithMarkerIdElement> getAllelicValuesFromAlleleValuesByDatasetId(
+            Integer datasetId, int start, int numOfRows) throws QueryException;
+    
+    /**
+     * Counts the allelic values based on the specified datasetId from the allele_values table
+     * 
+     * @param datasetId - the datasetId matching the allelic values
+     * @return the count
+     * @throws QueryException
+     */
+    public int countAllelicValuesFromAlleleValuesByDatasetId(Integer datasetId) throws QueryException;
+    
+    /**
+     * Retrieves a list of Allelic Values (germplasm id, map_char_value, marker id) based on the specified datasetId from the mapping_pop_values table
+     * 
+     * @param datasetId - the datasetId matching the allelic values
+     * @return List of Allelic Values based on the specified dataset id
+     * @throws QueryException
+     */
+    public List<AllelicValueWithMarkerIdElement> getAllelicValuesFromMappingPopValuesByDatasetId(
+            Integer datasetId, int start, int numOfRows) throws QueryException;
+    
+    /**
+     * Counts the allelic values based on the specified datasetId from the mapping_pop_values table
+     * 
+     * @param datasetId - the datasetId matching the allelic values
+     * @return the count
+     * @throws QueryException
+     */
+    public int countAllelicValuesFromMappingPopValuesByDatasetId(Integer datasetId) throws QueryException;
+
     
 }

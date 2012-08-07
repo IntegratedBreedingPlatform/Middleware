@@ -17,16 +17,17 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
- * <b>Description</b>: Placeholder POJO for Allelic Value Element
- * Used by GenotypicDataManager.getAllelicValuesByGidsAndMarkerNames().
+ * <b>Description</b>: Placeholder POJO for Allelic Value that stores the marker id
+ * Used by GenotypicDataManager.getAllelicValuesFromCharValuesByDatasetId().
+ * Used by GenotypicDataManager.getAllelicValuesFromAlleleValuesByDatasetId().
+ * Used by GenotypicDataManager.getAllelicValuesFromMappingPopValuesByDatasetId().
  * 
  * <br>
- * <br>
  * 
- * <b>Author</b>: Mark Agarrado <br>
- * <b>File Created</b>: Jul 13, 2012
+ * <b>Author</b>: Joyce Avestro <br>
+ * <b>File Created</b>: Aug 07, 2012
  */
-public class AllelicValueElement implements Serializable{
+public class AllelicValueWithMarkerIdElement implements Serializable{
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
@@ -34,23 +35,24 @@ public class AllelicValueElement implements Serializable{
     /** The Germplasm Id. */
     private Integer gid;
     
-    /** The Data value. */
+    /** The Data value (char_value for table char_values, 
+     * allele_bin_value for allele_values table and map_char_value for mapping_pop_values) */
     private String data;
     
-    /** The Marker Name. */
-    private String markerName;
+    /** The Marker Id. */
+    private Integer markerId;
 
     /**
-     * Instantiates a AllelicValueElement object.
+     * Instantiates a AllelicValueWithMarkerIdElement object.
      * 
      * @param gid
      * @param data
-     * @param markerName
+     * @param markerId
      */
-    public AllelicValueElement(Integer gid, String data, String markerName) {
+    public AllelicValueWithMarkerIdElement(Integer gid, String data, Integer markerId) {
         this.gid = gid;
         this.data = data;
-        this.markerName = markerName;
+        this.markerId = markerId;
     }
 
     
@@ -97,29 +99,29 @@ public class AllelicValueElement implements Serializable{
     /**
      * Gets the Marker Name.
      * 
-     * @return the markerName
+     * @return the markerId
      */
-    public String getMarkerName() {
-        return markerName;
+    public Integer getMarkerId() {
+        return markerId;
     }
 
     
     /**
      * Sets the Marker Name.
      * 
-     * @param markerName the markerName to set
+     * @param markerId the markerId to set
      */
-    public void setMarkerName(String markerName) {
-        this.markerName = markerName;
+    public void setmarkerId(Integer markerId) {
+        this.markerId = markerId;
     }
     
     /* (non-Javadoc)
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        return "AllelicValueElement [gid=" + gid + 
+        return "AllelicValueWithMarkerIdElement [gid=" + gid + 
                 ", data=" + data +
-                ", markerName=" + markerName + "]";
+                ", markerId=" + markerId + "]";
     }
     
     /* (non-Javadoc)
@@ -133,14 +135,14 @@ public class AllelicValueElement implements Serializable{
         if (obj == this) {
             return true;
         }
-        if (!(obj instanceof AllelicValueElement)) {
+        if (!(obj instanceof AllelicValueWithMarkerIdElement)) {
             return false;
         }
 
-        AllelicValueElement rhs = (AllelicValueElement) obj;
+        AllelicValueWithMarkerIdElement rhs = (AllelicValueWithMarkerIdElement) obj;
         return new EqualsBuilder().appendSuper(super.equals(obj)).append(gid, rhs.gid)
                 .append(data, rhs.data)
-                .append(markerName, rhs.markerName).isEquals();
+                .append(markerId, rhs.markerId).isEquals();
     }
     
     /* (non-Javadoc)
@@ -148,8 +150,8 @@ public class AllelicValueElement implements Serializable{
      */
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 77).append(gid)
+        return new HashCodeBuilder(17, 97).append(gid)
                 .append(data)
-                .append(markerName).toHashCode();
+                .append(markerId).toHashCode();
     }
 }

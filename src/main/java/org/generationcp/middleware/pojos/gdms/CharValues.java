@@ -64,6 +64,15 @@ public class CharValues implements Serializable{
                 "AND char_values.marker_id IN (:markerIdList) " +
             "ORDER BY char_values.gid DESC, marker.marker_name";
     
+    // For getAllelicValues by datasetId
+    public static final String GET_ALLELIC_VALUES_BY_DATASET_ID = 
+            "SELECT gid, marker_id,  concat(char_value, '') " +
+            "FROM char_values " +
+            "WHERE dataset_id = :datasetId " +
+            "ORDER BY gid DESC, marker_id asc";
+
+    public static final String COUNT_BY_DATASET_ID = "select count(*) from char_values where dataset_id = :datasetId";
+
     /** The ac id. */
     @Id
     @Basic(optional = false)

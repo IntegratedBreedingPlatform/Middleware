@@ -64,7 +64,15 @@ public class AlleleValues implements Serializable{
                 "AND allele_values.marker_id IN (:markerIdList) " +
             "ORDER BY allele_values.gid DESC, marker.marker_name";
 
-    
+    // For getAllelicValues by datasetId
+    public static final String GET_ALLELIC_VALUES_BY_DATASET_ID = 
+            "SELECT gid, marker_id, concat(allele_bin_value, '') " +
+            "FROM allele_values " +
+            "WHERE dataset_id = :datasetId " +
+            "ORDER BY gid DESC, marker_id asc";
+
+    public static final String COUNT_BY_DATASET_ID = "select count(*) from allele_values where dataset_id = :datasetId";
+
     @Id
     @Basic(optional = false)
     @Column(name = "an_id")

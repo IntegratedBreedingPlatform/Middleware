@@ -17,16 +17,20 @@ import java.util.List;
 
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.gdms.AccMetadataSetDAO;
+import org.generationcp.middleware.dao.gdms.AlleleValuesDAO;
+import org.generationcp.middleware.dao.gdms.CharValuesDAO;
 import org.generationcp.middleware.dao.gdms.DatasetDAO;
 import org.generationcp.middleware.dao.gdms.MapDAO;
 import org.generationcp.middleware.dao.gdms.MappingDataDAO;
 import org.generationcp.middleware.dao.gdms.MappingPopDAO;
+import org.generationcp.middleware.dao.gdms.MappingPopValuesDAO;
 import org.generationcp.middleware.dao.gdms.MarkerDAO;
 import org.generationcp.middleware.dao.gdms.MarkerMetadataSetDAO;
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
+import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
 import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.Map;
@@ -310,5 +314,77 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         
         return allelicValues;
     }
+
+    @Override
+    public List<AllelicValueWithMarkerIdElement> getAllelicValuesFromCharValuesByDatasetId(
+            Integer datasetId, int start, int numOfRows) throws QueryException{
+        CharValuesDAO dao = new CharValuesDAO();
+        HibernateUtil util = getHibernateUtil(datasetId);
+        if (util == null) {
+            return new ArrayList<AllelicValueWithMarkerIdElement>();
+        }
+        dao.setSession(util.getCurrentSession());        
+        return dao.getAllelicValuesByDatasetId(datasetId, start, numOfRows);
+    }
+    
+    @Override
+    public int countAllelicValuesFromCharValuesByDatasetId(Integer datasetId) throws QueryException{
+        CharValuesDAO dao = new CharValuesDAO();
+        HibernateUtil util = getHibernateUtil(datasetId);
+        if (util == null) {
+            return 0;
+        }
+        dao.setSession(util.getCurrentSession());
+        return dao.countByDatasetId(datasetId);
+    }
+
+    @Override
+    public List<AllelicValueWithMarkerIdElement> getAllelicValuesFromAlleleValuesByDatasetId(
+            Integer datasetId, int start, int numOfRows) throws QueryException{
+        AlleleValuesDAO dao = new AlleleValuesDAO();
+        HibernateUtil util = getHibernateUtil(datasetId);
+
+        if (util == null) {
+            return new ArrayList<AllelicValueWithMarkerIdElement>();
+        }
+        dao.setSession(util.getCurrentSession());
+        return dao.getAllelicValuesByDatasetId(datasetId, start, numOfRows);
+    }
+    
+    
+    @Override
+    public int countAllelicValuesFromAlleleValuesByDatasetId(Integer datasetId) throws QueryException{
+        AlleleValuesDAO dao = new AlleleValuesDAO();
+        HibernateUtil util = getHibernateUtil(datasetId);
+        if (util == null) {
+            return 0;
+        }
+        dao.setSession(util.getCurrentSession());
+        return dao.countByDatasetId(datasetId);
+    }
+
+    @Override
+    public List<AllelicValueWithMarkerIdElement> getAllelicValuesFromMappingPopValuesByDatasetId(
+            Integer datasetId, int start, int numOfRows) throws QueryException{
+        MappingPopValuesDAO dao = new MappingPopValuesDAO();
+        HibernateUtil util = getHibernateUtil(datasetId);
+        if (util == null) {
+            return  new ArrayList<AllelicValueWithMarkerIdElement>();
+        }
+        dao.setSession(util.getCurrentSession());
+        return dao.getAllelicValuesByDatasetId(datasetId, start, numOfRows);
+    }
+    
+    @Override
+    public int countAllelicValuesFromMappingPopValuesByDatasetId(Integer datasetId) throws QueryException{
+        MappingPopValuesDAO dao = new MappingPopValuesDAO();
+        HibernateUtil util = getHibernateUtil(datasetId);
+        if (util == null) {
+            return 0;
+        }
+        dao.setSession(util.getCurrentSession());
+        return dao.countByDatasetId(datasetId);
+    }
+
     
 }

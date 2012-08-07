@@ -21,6 +21,7 @@ import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
+import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
 import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.Map;
@@ -28,6 +29,7 @@ import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MappingValueElement;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
+import org.hibernate.QueryException;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -322,6 +324,55 @@ public class TestGenotypicDataManagerImpl{
         List<AllelicValueElement> allelicValues = manager.getAllelicValuesByGidsAndMarkerNames(gids, markerNames);
         System.out.println("getAllelicValuesByGidsAndMarkerNames: " + allelicValues);
     }
+    
+    @Test
+    public void testGetAllelicValuesFromCharValuesByDatasetId() throws Exception {        
+        Integer datasetId = Integer.valueOf(2);
+        try {
+            int count = manager.countAllelicValuesFromCharValuesByDatasetId(datasetId);
+            List<AllelicValueWithMarkerIdElement> allelicValues = manager.getAllelicValuesFromCharValuesByDatasetId(datasetId, 0, count);
+            System.out.println("RESULTS: getAllelicValuesByGidsAndMarkerNames: ");
+            for (Object o: allelicValues){
+                System.out.println("  " + o);
+            }
+        } catch(QueryException e){
+           e.printStackTrace();
+        }
+
+    }
+
+    @Test
+    public void testGetAllelicValuesFromAlleleValuesByDatasetId() throws Exception {        
+        Integer datasetId = Integer.valueOf(2);
+        try {
+            int count = manager.countAllelicValuesFromCharValuesByDatasetId(datasetId);
+            List<AllelicValueWithMarkerIdElement> allelicValues = manager.getAllelicValuesFromAlleleValuesByDatasetId(datasetId, 0, count);
+            System.out.println("RESULTS: getAllelicValuesByGidsAndMarkerNames: ");
+            for (Object o: allelicValues){
+                System.out.println("  " + o);
+            }
+        } catch(QueryException e){
+           e.printStackTrace();
+        }
+
+    }
+
+    @Test
+    public void testGetAllelicValuesFromMappingPopValuesByDatasetId() throws Exception {        
+        Integer datasetId = Integer.valueOf(2);
+        try {
+            int count = manager.countAllelicValuesFromCharValuesByDatasetId(datasetId);
+            List<AllelicValueWithMarkerIdElement> allelicValues = manager.getAllelicValuesFromMappingPopValuesByDatasetId(datasetId, 0, count);
+            System.out.println("RESULTS: getAllelicValuesByGidsAndMarkerNames: ");
+            for (Object o: allelicValues){
+                System.out.println("  " + o);
+            }
+        } catch(QueryException e){
+           e.printStackTrace();
+        }
+
+    }
+    
     
     @AfterClass
     public static void tearDown() throws Exception {

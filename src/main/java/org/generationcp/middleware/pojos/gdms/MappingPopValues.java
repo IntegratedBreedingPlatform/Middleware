@@ -67,6 +67,15 @@ public class MappingPopValues implements Serializable{
             "AND mapping_pop_values.marker_id IN (:markerIdList) " +
         "ORDER BY mapping_pop_values.gid DESC, marker.marker_name";
 
+    // For getAllelicValues by datasetId
+    public static final String GET_ALLELIC_VALUES_BY_DATASET_ID = 
+            "SELECT gid, marker_id, concat(map_char_value, '') " +
+            "FROM mapping_pop_values " +
+            "WHERE dataset_id = :datasetId " +
+            "ORDER BY gid DESC, marker_id asc";
+
+    public static final String COUNT_BY_DATASET_ID = "select count(*) from mapping_pop_values where dataset_id = :datasetId";
+
     /**
      * The Mp Id.
      */
