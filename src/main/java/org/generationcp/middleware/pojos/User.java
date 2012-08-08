@@ -23,9 +23,9 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 @NamedQueries({ @NamedQuery(name = "findUserByNameUsingEqual", query = "SELECT s FROM User s WHERE s.name = :name"),
-    @NamedQuery(name = "findUserByNameUsingLike", query = "SELECT s FROM User s WHERE s.name like :name"),
+    @NamedQuery(name = "findUserByNameUsingLike", query = "SELECT s FROM User s WHERE s.name LIKE :name"),
     @NamedQuery(name = "countUserByNameUsingEqual", query = "SELECT COUNT(s) FROM User s WHERE s.name = :name"),
-    @NamedQuery(name = "countUserByNameUsingLike", query = "SELECT COUNT(s) FROM User s WHERE s.name like :name")
+    @NamedQuery(name = "countUserByNameUsingLike", query = "SELECT COUNT(s) FROM User s WHERE s.name LIKE :name")
 
 })
 @Entity

@@ -28,9 +28,9 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @NamedQueries({
-        @NamedQuery(name = "getEmptyLot", query = "FROM Transaction where status=1 group by lotid having sum(quantity) = 0"),
+        @NamedQuery(name = "getEmptyLot", query = "FROM Transaction WHERE status=1 GROUP BY lotid HAVING SUM(quantity) = 0"),
         @NamedQuery(name = "getLotWithMinimumAmount",
-                query = "FROM Transaction where status=1 group by lotid having sum(quantity) <:minAmount")
+                query = "FROM Transaction WHERE status=1 GROUP BY lotid HAVING SUM(quantity) <:minAmount")
 
 })
 @Entity

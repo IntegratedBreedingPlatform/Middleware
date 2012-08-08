@@ -11,15 +11,9 @@
  *******************************************************************************/
 package org.generationcp.middleware.pojos.gdms;
 
-import java.io.Serializable;
 import java.util.List;
-
-import javax.persistence.Basic;
-import javax.persistence.Column;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 
 /**
  * The Class GermplasmMarkerName. Contains the germplasm name and marker names associated with it. 
@@ -28,21 +22,12 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * @author Joyce Avestro
  *
  */
-//public class GermplasmMarkerElement implements Serializable{
 public class GermplasmMarkerElement {
         
-//    /** The Constant serialVersionUID. */
-//    private static final long serialVersionUID = 1L;
-
     /** The germplasm name. */
-//    @Basic(optional = false)
-//    @Column(name = "nval")
     private String germplasmName;
     
     /** The marker names. */
-//    @Basic(optional = false)
-//    @Column(name = "marker_name")
-//    private String markerName;
     private List<String> markerNames;
     
     /**
@@ -57,11 +42,6 @@ public class GermplasmMarkerElement {
      * @param gId the germplasm id
      * @param markerName the marker name
      */
-//    public GermplasmMarkerElement(String markerName, String germplasmName){
-//        this.markerName = markerName;              
-//        this.germplasmName = germplasmName;
-//    }
-
     public GermplasmMarkerElement(String germplasmName, List<String> markerNames){
         this.germplasmName = germplasmName;
         this.markerNames = markerNames;

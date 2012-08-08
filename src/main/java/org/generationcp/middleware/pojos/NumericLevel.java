@@ -28,10 +28,13 @@ public class NumericLevel implements Serializable{
 
     private static final long serialVersionUID = 2864832968167403818L;
 
-    public static final String GET_BY_OUNIT_ID_LIST = "select oi.ounitid, oi.factorid, f.fname, ln.lvalue "
-            + "from oindex oi join obsunit ou on oi.ounitid = ou.ounitid "
-            + "join level_n ln on ln.factorid = oi.factorid and ln.levelno = oi.levelno " + "join factor f on f.labelid = ln.labelid "
-            + "where oi.ounitid in (:ounitIdList)";
+    public static final String GET_BY_OUNIT_ID_LIST = 
+            "SELECT oi.ounitid, oi.factorid, f.fname, ln.lvalue " +
+            "FROM oindex oi JOIN obsunit ou ON oi.ounitid = ou.ounitid " +
+                            "JOIN level_n ln ON ln.factorid = oi.factorid " +
+                                            "AND ln.levelno = oi.levelno " + 
+                            "JOIN factor f ON f.labelid = ln.labelid " +
+            "WHERE oi.ounitid IN (:ounitIdList)";
 
     @EmbeddedId
     protected NumericLevelPK id;

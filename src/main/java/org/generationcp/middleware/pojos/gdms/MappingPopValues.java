@@ -41,40 +41,49 @@ public class MappingPopValues implements Serializable{
     private static final long serialVersionUID = 1L;
     
     // For getMarkerNamesByGIds()
-    public static final String GET_MAPPING_COUNT_BY_GID = "select count(*) from mapping_pop_values where gid in (:gIdList)";
+    public static final String GET_MAPPING_COUNT_BY_GID = 
+            "SELECT COUNT(*) " +
+            "FROM mapping_pop_values " +
+            "WHERE gid IN (:gIdList)";
 
     // For getGermplasmNamesByMarkerNames()
-    public static final String GET_MAPPING_COUNT_BY_MARKER_ID = "select count(*) from mapping_pop_values where marker_id in (:markerIdList)";
+    public static final String GET_MAPPING_COUNT_BY_MARKER_ID = 
+            "SELECT count(*) " +
+            "FROM mapping_pop_values " +
+            "WHERE marker_id IN (:markerIdList)";
 
     // For getGermplasmNamesByMarkerNames()
     public static final String GET_MAPPING_GERMPLASM_NAME_AND_MARKER_NAME_BY_MARKER_NAMES = 
-            "select n.nval, concat(m.marker_name, '') " +  
-            "from names n join mapping_pop_values mp on n.gid = mp.gid " +  
-            "           join marker m on mp.marker_id = m.marker_id " +
-            "where marker_name in (:markerNameList) and n.nstat = 1 " +
-            "order by n.nval, m.marker_name";
+            "SELECT n.nval, CONCAT(m.marker_name, '') " +  
+            "FROM names n JOIN mapping_pop_values mp ON n.gid = mp.gid " +  
+            "           JOIN marker m ON mp.marker_id = m.marker_id " +
+            "WHERE marker_name IN (:markerNameList) AND n.nstat = 1 " +
+            "ORDER BY n.nval, m.marker_name";
     
     // For getAllelicValues by gid and marker names
     public static final String GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_NAMES =
         "SELECT DISTINCT " +
             "mapping_pop_values.gid, " +
-            "concat(mapping_pop_values.map_char_value, ''), " +
-            "concat(marker.marker_name, '') " +
+            "CONCAT(mapping_pop_values.map_char_value, ''), " +
+            "CONCAT(marker.marker_name, '') " +
         "FROM mapping_pop_values, " +
             "marker " +
-        "WHERE mapping_pop_values.marker_id=marker.marker_id " +
+        "WHERE mapping_pop_values.marker_id = marker.marker_id " +
             "AND mapping_pop_values.gid IN (:gidList) " +
             "AND mapping_pop_values.marker_id IN (:markerIdList) " +
         "ORDER BY mapping_pop_values.gid DESC, marker.marker_name";
 
     // For getAllelicValues by datasetId
     public static final String GET_ALLELIC_VALUES_BY_DATASET_ID = 
-            "SELECT gid, marker_id, concat(map_char_value, '') " +
+            "SELECT gid, marker_id, CONCAT(map_char_value, '') " +
             "FROM mapping_pop_values " +
             "WHERE dataset_id = :datasetId " +
-            "ORDER BY gid DESC, marker_id asc";
+            "ORDER BY gid DESC, marker_id ASC";
 
-    public static final String COUNT_BY_DATASET_ID = "select count(*) from mapping_pop_values where dataset_id = :datasetId";
+    public static final String COUNT_BY_DATASET_ID = 
+            "SELECT COUNT(*) " +
+            "FROM mapping_pop_values " +
+            "WHERE dataset_id = :datasetId";
 
     /**
      * The Mp Id.

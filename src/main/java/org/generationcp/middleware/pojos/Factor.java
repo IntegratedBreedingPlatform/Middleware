@@ -32,18 +32,28 @@ public class Factor implements Serializable{
     // string contants for name of queries
     public static final String GET_FACTORS_BY_STUDYID = "getFactorsByStudyID";
 
-    public static final String GET_BY_REPRESENTATION_ID = "select {f.*} " + "from factor f join effect e " + "on f.factorid = e.factorid "
-            + "where e.represno = :representationId";
+    public static final String GET_BY_REPRESENTATION_ID = 
+            "SELECT {f.*} " + 
+            "FROM factor f JOIN effect e ON f.factorid = e.factorid " +
+            "WHERE e.represno = :representationId";
 
-    public static final String GET_GID_FROM_NUMERIC_LEVELS_GIVEN_OBSERVATION_UNIT_IDS = "SELECT DISTINCT ln.lvalue "
-            + "FROM factor f INNER JOIN oindex ou ON f.factorid = ou.factorid " + "AND ou.ounitid IN (:ounitids) "
-            + "INNER JOIN level_n ln ON ln.factorid = f.factorid AND ln.labelid = f.labelid AND ou.levelno = ln.levelno "
-            + "WHERE f.traitid = 251 AND f.fname = 'GID'";
+    public static final String GET_GID_FROM_NUMERIC_LEVELS_GIVEN_OBSERVATION_UNIT_IDS = 
+            "SELECT DISTINCT ln.lvalue " +
+            "FROM factor f INNER JOIN oindex ou ON f.factorid = ou.factorid " + 
+                                                "AND ou.ounitid IN (:ounitids) " +
+                            "INNER JOIN level_n ln ON ln.factorid = f.factorid " +
+                                                "AND ln.labelid = f.labelid " +
+                                                "AND ou.levelno = ln.levelno " +
+            "WHERE f.traitid = 251 AND f.fname = 'GID'";
 
-    public static final String GET_GID_FROM_CHARACTER_LEVELS_GIVEN_OBSERVATION_UNIT_IDS = "SELECT DISTINCT lc.lvalue "
-            + "FROM factor f INNER JOIN oindex ou ON f.factorid = ou.factorid " + "AND ou.ounitid IN (:ounitids) "
-            + "INNER JOIN level_c lc ON lc.factorid = f.factorid AND lc.labelid = f.labelid AND ou.levelno = lc.levelno "
-            + "WHERE f.traitid = 251 AND f.fname = 'GID'";
+    public static final String GET_GID_FROM_CHARACTER_LEVELS_GIVEN_OBSERVATION_UNIT_IDS = 
+            "SELECT DISTINCT lc.lvalue " +
+            "FROM factor f INNER JOIN oindex ou ON f.factorid = ou.factorid " +
+                                                    "AND ou.ounitid IN (:ounitids) " +
+                            "INNER JOIN level_c lc ON lc.factorid = f.factorid " +
+                                                    "AND lc.labelid = f.labelid " +
+                                                    "AND ou.levelno = lc.levelno " +
+            "WHERE f.traitid = 251 AND f.fname = 'GID'";
 
     @Id
     @Basic(optional = false)

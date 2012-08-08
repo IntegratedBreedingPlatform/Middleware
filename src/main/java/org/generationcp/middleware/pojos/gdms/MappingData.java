@@ -32,8 +32,11 @@ public class MappingData implements Serializable{
 
     private static final long serialVersionUID = 1L;
     
-    public static final String GET_MAP_INFO_BY_MAP_NAME = "select marker_name, linkage_group, start_position " +
-            "from mapping_data where map_name = :mapName order by linkage_group, start_position , marker_name";
+    public static final String GET_MAP_INFO_BY_MAP_NAME = 
+            "SELECT marker_name, linkage_group, start_position " +
+            "FROM mapping_data " +
+            "WHERE map_name = :mapName " +
+            "ORDER BY linkage_group, start_position, marker_name";
             
     @Id
     @Column(name = "marker_id")

@@ -27,8 +27,10 @@ public class CharacterData implements Serializable{
 
     private static final long serialVersionUID = 1L;
 
-    public static final String GET_BY_OUNIT_ID_LIST = "select dc.ounitid, dc.variatid, v.vname, dc.dvalue "
-            + "from data_c dc join variate v on dc.variatid = v.variatid " + "where dc.ounitid in (:ounitIdList)";
+    public static final String GET_BY_OUNIT_ID_LIST = 
+            "SELECT dc.ounitid, dc.variatid, v.vname, dc.dvalue " +
+            "FROM data_c dc JOIN variate v on dc.variatid = v.variatid " + 
+            "WHERE dc.ounitid IN (:ounitIdList)";
 
     @EmbeddedId
     protected CharacterDataPK id;

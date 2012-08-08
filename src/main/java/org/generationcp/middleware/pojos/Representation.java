@@ -26,7 +26,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @NamedQueries({
-        // select * from represtn where effectid = 1176
+        // SELECT * FROM represtn WHERE effectid = 1176
         @NamedQuery(name = "getRepresentationByEffectId", query = "SELECT r FROM Representation r WHERE r.effectId = :effectId"),
         @NamedQuery(name = "getRepresentationByStudyId",
                 query = "SELECT r FROM Representation r, StudyEffect se WHERE r.effectId = se.effectId AND se.studyId = :studyId") })

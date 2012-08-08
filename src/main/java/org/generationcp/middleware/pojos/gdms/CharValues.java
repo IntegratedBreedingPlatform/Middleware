@@ -36,46 +36,59 @@ public class CharValues implements Serializable{
     private static final long serialVersionUID = 1L;
     
     // For getMarkerNamesByGIds()
-    /** The Constant GET_CHAR_COUNT_BY_GID. */
-    public static final String GET_CHAR_COUNT_BY_GID = "select count(*) from char_values where gid in (:gIdList)";
+    public static final String GET_CHAR_COUNT_BY_GID = 
+            "SELECT COUNT(*) " +
+            "FROM char_values " +
+            "WHERE gid IN (:gIdList)";
 
     // For getGermplasmNamesByMarkerNames()
-    /** The Constant GET_CHAR_COUNT_BY_MARKER_ID. */
-    public static final String GET_CHAR_COUNT_BY_MARKER_ID = "select count(*) from char_values where marker_id in (:markerIdList)";
+    public static final String GET_CHAR_COUNT_BY_MARKER_ID = 
+            "SELECT COUNT(*) " +
+            "FROM char_values " +
+            "WHERE marker_id IN (:markerIdList)";
     
     // For getGermplasmNamesByMarkerNames()
     public static final String GET_CHAR_GERMPLASM_NAME_AND_MARKER_NAME_BY_MARKER_NAMES = 
-            "select n.nval, concat(m.marker_name, '') " +  
-            "from names n join char_values c on n.gid = c.gid " +  
-            "           join marker m on c.marker_id = m.marker_id " +
-            "where marker_name in (:markerNameList) and n.nstat = 1 " +
-            "order by n.nval, m.marker_name";
+            "SELECT n.nval, CONCAT(m.marker_name, '') " +  
+            "FROM names n JOIN char_values c ON n.gid = c.gid " +  
+            "           JOIN marker m ON c.marker_id = m.marker_id " +
+            "WHERE marker_name IN (:markerNameList) AND n.nstat = 1 " +
+            "ORDER BY n.nval, m.marker_name";
     
     // For getAllelicValues by gid and marker names
     public static final String GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_NAMES =
             "SELECT DISTINCT " +
                 "char_values.gid, " +
-                "concat(char_values.char_value, ''), " +
-                "concat(marker.marker_name, '') " +
+                "CONCAT(char_values.char_value, ''), " +
+                "CONCAT(marker.marker_name, '') " +
             "FROM char_values, " +
                 "marker " +
-            "WHERE char_values.marker_id=marker.marker_id " +
+            "WHERE char_values.marker_id = marker.marker_id " +
                 "AND char_values.gid IN (:gidList) " +
                 "AND char_values.marker_id IN (:markerIdList) " +
             "ORDER BY char_values.gid DESC, marker.marker_name";
     
     // For getAllelicValues by datasetId
     public static final String GET_ALLELIC_VALUES_BY_DATASET_ID = 
-            "SELECT gid, marker_id,  concat(char_value, '') " +
+            "SELECT gid, marker_id,  CONCAT(char_value, '') " +
             "FROM char_values " +
             "WHERE dataset_id = :datasetId " +
-            "ORDER BY gid DESC, marker_id asc";
+            "ORDER BY gid DESC, marker_id ASC";
 
-    public static final String COUNT_BY_DATASET_ID = "select count(*) from char_values where dataset_id = :datasetId";
+    public static final String COUNT_BY_DATASET_ID = 
+            "SELECT COUNT(*) " +
+            "FROM char_values " +
+            "WHERE dataset_id = :datasetId";
     
-    public static final String GET_GIDS_BY_MARKER_ID = "select distinct gid from char_values where marker_id = :markerId";
+    public static final String GET_GIDS_BY_MARKER_ID = 
+            "SELECT DISTINCT gid " +
+            "FROM char_values " +
+            "WHERE marker_id = :markerId";
     
-    public static final String COUNT_GIDS_BY_MARKER_ID = "select count(distinct gid) from char_values where marker_id = :markerId";
+    public static final String COUNT_GIDS_BY_MARKER_ID = 
+            "SELECT COUNT(distinct gid) " +
+            "FROM char_values " +
+            "WHERE marker_id = :markerId";
 
     /** The ac id. */
     @Id

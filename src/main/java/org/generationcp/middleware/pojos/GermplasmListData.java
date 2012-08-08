@@ -33,7 +33,7 @@ import org.hibernate.annotations.NotFoundAction;
  * @author Kevin Manansala
  * 
  */
-@NamedQueries({ @NamedQuery(name = "deleteGermplasmListDataByListId", query = "delete from GermplasmListData where list = :listId") })
+@NamedQueries({ @NamedQuery(name = "deleteGermplasmListDataByListId", query = "DELETE FROM GermplasmListData WHERE list = :listId") })
 @Entity
 @Table(name = "listdata")
 public class GermplasmListData implements Serializable{

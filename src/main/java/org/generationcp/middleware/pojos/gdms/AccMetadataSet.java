@@ -35,7 +35,10 @@ public class AccMetadataSet implements Serializable{
     private static final long serialVersionUID = 1L;
     
     /** The Constant GET_NAME_IDS_BY_GERMPLASM_IDS. */
-    public static final String GET_NAME_IDS_BY_GERMPLASM_IDS = "select nid from acc_metadataset where gid in (:gIdList)";
+    public static final String GET_NAME_IDS_BY_GERMPLASM_IDS = 
+            "SELECT nid " +
+            "FROM acc_metadataset " +
+            "WHERE gid IN (:gIdList)";
 
     /** The id. */
     @EmbeddedId

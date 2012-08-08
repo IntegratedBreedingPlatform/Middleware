@@ -32,11 +32,16 @@ public class Variate implements Serializable{
     // string contants for name of queries
     public static final String GET_VARIATES_BY_STUDYID = "getVariatesByStudyID";
 
-    public static final String GET_BY_REPRESENTATION_ID = "select distinct {v.*} "
-            + "from variate v join data_n dn on v.variatid = dn.variatid " + "join oindex oi on oi.ounitid = dn.ounitid "
-            + "where oi.represno = :representationId " + "union " + "select distinct {v.*} "
-            + "from variate v join data_c dn on v.variatid = dn.variatid " + "join oindex oi on oi.ounitid = dn.ounitid "
-            + "where oi.represno = :representationId";
+    public static final String GET_BY_REPRESENTATION_ID = 
+            "SELECT DISTINCT {v.*} " +
+            "FROM variate v JOIN data_n dn ON v.variatid = dn.variatid " + 
+                    "JOIN oindex oi ON oi.ounitid = dn.ounitid " +
+            "WHERE oi.represno = :representationId " + 
+            "UNION " + 
+            "SELECT DISTINCT {v.*} " +
+            "FROM variate v JOIN data_c dn ON v.variatid = dn.variatid " + 
+                    "JOIN oindex oi ON oi.ounitid = dn.ounitid " +
+            "WHERE oi.represno = :representationId";
 
     @Id
     @Basic(optional = false)

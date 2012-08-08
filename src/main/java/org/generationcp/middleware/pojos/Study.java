@@ -26,9 +26,9 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @NamedQueries({ @NamedQuery(name = "findStudyByNameUsingEqual", query = "SELECT s FROM Study s WHERE s.name = :name"),
-        @NamedQuery(name = "findStudyByNameUsingLike", query = "SELECT s FROM Study s WHERE s.name like :name"),
+        @NamedQuery(name = "findStudyByNameUsingLike", query = "SELECT s FROM Study s WHERE s.name LIKE :name"),
         @NamedQuery(name = "countStudyByNameUsingEqual", query = "SELECT COUNT(s) FROM Study s WHERE s.name = :name"),
-        @NamedQuery(name = "countStudyByNameUsingLike", query = "SELECT COUNT(s) FROM Study s WHERE s.name like :name")
+        @NamedQuery(name = "countStudyByNameUsingLike", query = "SELECT COUNT(s) FROM Study s WHERE s.name LIKE :name")
 
 })
 @Entity

@@ -36,24 +36,26 @@ public class MappingPop implements Serializable{
     private static final long serialVersionUID = 1L;
     
     public static final String GET_PARENTS_BY_DATASET_ID =
-            "select parent_a_gid, parent_b_gid, mapping_type from mapping_pop where dataset_id = :datasetId";
+            "SELECT parent_a_gid, parent_b_gid, mapping_type " +
+            "FROM mapping_pop " +
+            "WHERE dataset_id = :datasetId";
     
     public static final String GET_MAPPING_VALUES_BY_GIDS_AND_MARKER_IDS =
-            "select distinct" +
+            "SELECT DISTINCT" +
                 " mapping_pop_values.dataset_id" +
                 ", mapping_pop.mapping_type" +
                 ", mapping_pop.parent_a_gid" +
                 ", mapping_pop.parent_b_gid" +
-                ", concat(marker.marker_type, '')" +
-            " from mapping_pop_values" +
+                ", CONCAT(marker.marker_type, '')" +
+            " FROM mapping_pop_values" +
                 ", mapping_pop" +
                 ", marker" +
-            " where mapping_pop_values.dataset_id = mapping_pop.dataset_id" +
+            " WHERE mapping_pop_values.dataset_id = mapping_pop.dataset_id" +
                 " and mapping_pop_values.marker_id = marker.marker_id" +
-                " and mapping_pop_values.marker_id in (:markerIdList)" +
-                " and mapping_pop_values.gid in (:gidList)" +
-            " order by" +
-                " mapping_pop_values.gid desc" +
+                " and mapping_pop_values.marker_id IN (:markerIdList)" +
+                " and mapping_pop_values.gid IN (:gidList)" +
+            " ORDER BY" +
+                " mapping_pop_values.gid DESC" +
                 ", marker.marker_name";
     
     /** The dataset id. */

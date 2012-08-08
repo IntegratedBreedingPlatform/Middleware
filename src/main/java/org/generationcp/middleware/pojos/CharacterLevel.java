@@ -28,10 +28,12 @@ public class CharacterLevel implements Serializable{
 
     private static final long serialVersionUID = -7870779107873158520L;
 
-    public static final String GET_BY_OUNIT_ID_LIST = "select oi.ounitid, oi.factorid, f.fname, lc.lvalue "
-            + "from oindex oi join obsunit ou on oi.ounitid = ou.ounitid "
-            + "join level_c lc on lc.factorid = oi.factorid and lc.levelno = oi.levelno " + "join factor f on f.labelid = lc.labelid "
-            + "where oi.ounitid in (:ounitIdList)";
+    public static final String GET_BY_OUNIT_ID_LIST = 
+            "SELECT oi.ounitid, oi.factorid, f.fname, lc.lvalue " + 
+            "FROM oindex oi JOIN obsunit ou ON oi.ounitid = ou.ounitid " +
+                            "JOIN level_c lc ON lc.factorid = oi.factorid AND lc.levelno = oi.levelno " + 
+                            "JOIN factor f ON f.labelid = lc.labelid " +
+            "WHERE oi.ounitid IN (:ounitIdList)";
 
     @EmbeddedId
     protected CharacterLevelPK id;

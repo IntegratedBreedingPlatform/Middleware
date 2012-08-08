@@ -35,7 +35,10 @@ public class MarkerMetadataSet implements Serializable{
 
     /** The Constant GET_MARKER_ID_BY_DATASET_ID. */
     public static final String GET_MARKER_ID_BY_DATASET_ID = 
-            "select marker_id from marker_metadataset where dataset_id = :datasetId order by marker_id;";
+            "SELECT marker_id " +
+            "FROM marker_metadataset " +
+            "WHERE dataset_id = :datasetId " +
+            "ORDER BY marker_id;";
 
     /** The id. */
     @EmbeddedId

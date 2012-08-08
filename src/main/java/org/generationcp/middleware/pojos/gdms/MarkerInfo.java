@@ -49,12 +49,15 @@ public class MarkerInfo implements Serializable{
                     ", contact " +
                     ", institute " +
                     ", genotypes_count " +
-            "FROM marker_retrieval_info WHERE LOWER(marker_name) LIKE LOWER(:markerName)";
+            "FROM marker_retrieval_info " +
+            "WHERE LOWER(marker_name) LIKE LOWER(:markerName)";
 
 
     /* Used by MarkerInfoDAO.countByMarkerName() */
     public static final String COUNT_BY_MARKER_NAME = 
-            "SELECT COUNT(*) FROM marker_retrieval_info WHERE LOWER(marker_name) LIKE LOWER(:markerName)";
+            "SELECT COUNT(*) " +
+            "FROM marker_retrieval_info " +
+            "WHERE LOWER(marker_name) LIKE LOWER(:markerName)";
 
     /* Used by MarkerInfoDAO.getByGenotype() */
     public static final String GET_BY_GENOTYPE = 
@@ -70,11 +73,14 @@ public class MarkerInfo implements Serializable{
                     ", contact " +
                     ", institute " +
                     ", genotypes_count " +
-            "FROM marker_retrieval_info WHERE LOWER(genotype) LIKE LOWER(:genotype)";
+            "FROM marker_retrieval_info " +
+            "WHERE LOWER(genotype) LIKE LOWER(:genotype)";
     
     /* Used by MarkerInfoDAO.countByGenotype() */
     public static final String COUNT_BY_GENOTYPE = 
-            "SELECT COUNT(*) FROM marker_retrieval_info WHERE LOWER(genotype) LIKE LOWER(:genotype)";
+            "SELECT COUNT(*) " +
+            "FROM marker_retrieval_info " +
+            "WHERE LOWER(genotype) LIKE LOWER(:genotype)";
 
     
     @Id

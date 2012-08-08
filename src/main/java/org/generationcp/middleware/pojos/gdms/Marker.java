@@ -40,33 +40,64 @@ public class Marker implements Serializable{
     private static final long serialVersionUID = 1L;
 
     public static final String GET_MARKER_TYPE_BY_MARKER_IDS = 
-                "select distinct concat(marker_type, '') from marker where marker_id in (:markerIdList)";
+            "SELECT DISTINCT CONCAT(marker_type, '') " +
+            "FROM marker " +
+            "WHERE marker_id IN (:markerIdList)";
 
-    public static final String GET_IDS_BY_NAMES = "select marker_id from marker where marker_name in (:markerNameList)";
-    public static final String GET_ID_AND_NAME_BY_NAMES = "select marker_id, marker_name from marker where marker_name in (:markerNameList)";
-    public static final String GET_NAMES_BY_IDS = "select marker_id, concat(marker_name, '') as marker_name from marker where marker_id in (:markerIdList) order by marker_id asc";
-    public static final String GET_ALL_MARKER_TYPES = "select distinct concat(marker_type, '') from marker where upper(marker_type) != 'UA'";
-    public static final String GET_NAMES_BY_TYPE = "select distinct concat(marker_name, '') from marker where upper(marker_type) = upper(:markerType)";
+    public static final String GET_IDS_BY_NAMES = 
+            "SELECT marker_id " +
+            "FROM marker " +
+            "WHERE marker_name IN (:markerNameList)";
     
-    public static final String COUNT_ALL_MARKER_TYPES = "select count(distinct marker_type) from marker where upper(marker_type) != 'UA'";
-    public static final String COUNT_MARKER_NAMES_BY_MARKER_TYPE = "select count(distinct marker_name) from marker where upper(marker_type) = upper(:markerType)";
+    public static final String GET_ID_AND_NAME_BY_NAMES = 
+            "SELECT marker_id, marker_name " +
+            "FROM marker " +
+            "WHERE marker_name IN (:markerNameList)";
+    
+    public static final String GET_NAMES_BY_IDS = 
+            "SELECT marker_id, CONCAT(marker_name, '') AS marker_name " +
+            "FROM marker " +
+            "WHERE marker_id IN (:markerIdList) " +
+            "ORDER BY marker_id asc";
+    
+    public static final String GET_ALL_MARKER_TYPES = 
+            "SELECT DISTINCT CONCAT(marker_type, '') " +
+            "FROM marker " +
+            "WHERE UPPER(marker_type) != 'UA'";
+    
+    public static final String GET_NAMES_BY_TYPE = 
+            "SELECT DISTINCT CONCAT(marker_name, '') " +
+            "FROM marker " +
+            "WHERE UPPER(marker_type) = UPPER(:markerType)";
+    
+    public static final String COUNT_ALL_MARKER_TYPES = 
+            "SELECT COUNT(DISTINCT marker_type) " +
+            "FROM marker " +
+            "WHERE UPPER(marker_type) != 'UA'";
+    
+    public static final String COUNT_MARKER_NAMES_BY_MARKER_TYPE = 
+            "SELECT COUNT(DISTINCT marker_name) " +
+            "FROM marker " +
+            "WHERE UPPER(marker_type) = UPPER(:markerType)";
     
     // For getMarkerNamesByGIds()
     public static final String GET_ALLELE_MARKER_NAMES_BY_GID = 
-            "select distinct allele_values.gid, concat(marker.marker_name,'') " +
-            "from allele_values join marker on allele_values.marker_id = marker.marker_id " +
-            "where allele_values.gid in (:gIdList) " +
-            "order by gid, marker_name";
+            "SELECT DISTINCT allele_values.gid, CONCAT(marker.marker_name,'') " +
+            "FROM allele_values JOIN marker ON allele_values.marker_id = marker.marker_id " +
+            "WHERE allele_values.gid IN (:gIdList) " +
+            "ORDER BY gid, marker_name";
+
     public static final String GET_CHAR_MARKER_NAMES_BY_GID =         
-            "select distinct char_values.gid, concat(marker.marker_name,'') " +
-            "from char_values join marker on char_values.marker_id = marker.marker_id " +
-            "where char_values.gid in (:gIdList) " +
-            "order by gid, marker_name";
+            "SELECT DISTINCT char_values.gid, CONCAT(marker.marker_name,'') " +
+            "FROM char_values JOIN marker ON char_values.marker_id = marker.marker_id " +
+            "WHERE char_values.gid IN (:gIdList) " +
+            "ORDER BY gid, marker_name";
+
     public static final String GET_MAPPING_MARKER_NAMES_BY_GID = 
-            "select distinct mapping_pop_values.gid, concat(marker.marker_name,'') " + 
-            "from mapping_pop_values join marker on mapping_pop_values.marker_id = marker.marker_id " +
-            "where mapping_pop_values.gid in (:gIdList) " +
-            "order by gid, marker_name";
+            "SELECT DISTINCT mapping_pop_values.gid, CONCAT(marker.marker_name,'') " + 
+            "FROM mapping_pop_values JOIN marker ON mapping_pop_values.marker_id = marker.marker_id " +
+            "WHERE mapping_pop_values.gid IN (:gIdList) " +
+            "ORDER BY gid, marker_name";
 
 
     

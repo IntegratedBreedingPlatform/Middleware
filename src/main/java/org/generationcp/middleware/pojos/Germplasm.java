@@ -154,13 +154,13 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
         @NamedNativeQuery(name = "findGermplasmByPrefName", query = "SELECT g.* FROM germplsm g LEFT JOIN names n ON g.gid = n.gid "
                 + "AND n.nstat = 1 " + "WHERE n.nval = :name", resultClass = Germplasm.class),
         @NamedNativeQuery(name = "getProgenitor1",
-                query = "select * from germplsm g1 where g1.gid = (SELECT g.gpid1 FROM germplsm g LEFT JOIN progntrs p ON g.gid = p.gid "
+                query = "SELECT * FROM germplsm g1 WHERE g1.gid = (SELECT g.gpid1 FROM germplsm g LEFT JOIN progntrs p ON g.gid = p.gid "
                         + "WHERE g.gid = :gid)", resultClass = Germplasm.class),
         @NamedNativeQuery(name = "getProgenitor2",
-                query = "select * from germplsm g1 where g1.gid = (SELECT g.gpid2 FROM germplsm g LEFT JOIN progntrs p ON g.gid = p.gid "
+                query = "SELECT * FROM germplsm g1 WHERE g1.gid = (SELECT g.gpid2 FROM germplsm g LEFT JOIN progntrs p ON g.gid = p.gid "
                         + "WHERE g.gid = :gid)", resultClass = Germplasm.class),
         @NamedNativeQuery(name = "getProgenitor",
-                query = "select * from germplsm g1 where g1.gid = (SELECT p.pid FROM germplsm g LEFT JOIN progntrs p ON g.gid = p.gid "
+                query = "SELECT * FROM germplsm g1 WHERE g1.gid = (SELECT p.pid FROM germplsm g LEFT JOIN progntrs p ON g.gid = p.gid "
                         + "WHERE g.gid = :gid and p.pno=:pno)", resultClass = Germplasm.class)
 
 })
@@ -180,7 +180,10 @@ public class Germplasm implements Serializable{
     public static final String FIND_ALL = "findAllGermplasm";
     public static final String COUNT_ALL = "countAllGermplasm";
     public static final String FIND_BY_PREF_NAME = "findGermplasmByPrefName";
-    public static final String COUNT_BY_PREF_NAME = "SELECT COUNT(g.gid) FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 WHERE n.nval = :name";
+    public static final String COUNT_BY_PREF_NAME = 
+            "SELECT COUNT(g.gid) " +
+            "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 " +
+            "WHERE n.nval = :name";
     public static final String FIND_BY_METHOD_NAME_USING_EQUAL = "findGermplasmByMethodNameUsingEqual";
     public static final String COUNT_BY_METHOD_NAME_USING_EQUAL = "countGermplasmByMethodNameUsingEqual";
     public static final String FIND_BY_METHOD_NAME_USING_LIKE = "findGermplasmByMethodNameUsingLike";
@@ -191,34 +194,53 @@ public class Germplasm implements Serializable{
     public static final String COUNT_BY_LOCATION_NAME_USING_LIKE = "countGermplasmByLocationNameUsingLike";
     // public static final String GET_BY_GID_WITH_PREF_NAME =
     // "getGermplasmByGIDWithPrefName";
-    public static final String GET_BY_GID_WITH_PREF_NAME = "SELECT {g.*}, {n.*} FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 WHERE g.gid = :gid";
+    public static final String GET_BY_GID_WITH_PREF_NAME = 
+            "SELECT {g.*}, {n.*} " +
+            "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 " +
+            "WHERE g.gid = :gid";
     // public static final String GET_BY_GID_WITH_PREF_ABBREV =
     // "getGermplasmByGIDWithPrefAbbrev";
-    public static final String GET_BY_GID_WITH_PREF_ABBREV = "SELECT {g.*}, {n.*}, {abbrev.*} FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 "
-            + "LEFT JOIN names abbrev ON g.gid = abbrev.gid AND abbrev.nstat = 2 WHERE g.gid = :gid";
+    public static final String GET_BY_GID_WITH_PREF_ABBREV = 
+            "SELECT {g.*}, {n.*}, {abbrev.*} " +
+            "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 " +
+                            "LEFT JOIN names abbrev ON g.gid = abbrev.gid AND abbrev.nstat = 2 " +
+            "WHERE g.gid = :gid";
     public static final String FIND_DESCENDANTS = "getGermplasmDescendants";
     // public static final String COUNT_DESCENDANTS =
     // "countGermplasmDescendants";
-    public static final String COUNT_DESCENDANTS = "SELECT COUNT(DISTINCT g.gid) FROM germplsm g LEFT JOIN progntrs p ON g.gid = p.gid "
-            + "WHERE g.gpid1=:gid OR g.gpid2=:gid OR p.pid=:gid";
+    public static final String COUNT_DESCENDANTS = 
+            "SELECT COUNT(DISTINCT g.gid) " +
+            "FROM germplsm g LEFT JOIN progntrs p ON g.gid = p.gid " +
+            "WHERE g.gpid1 = :gid OR g.gpid2 = :gid OR p.pid=:gid";
     public static final String FIND_PROGENITOR1 = "getProgenitor1";
     public static final String FIND_PROGENITOR2 = "getProgenitor2";
     public static final String FIND_PROGENITOR = "getProgenitor";
     // public static final String GET_PROGENITORS_BY_GID_WITH_PREF_NAME =
     // "getProgenitorsByGIDWithPrefName";
-    public static final String GET_PROGENITORS_BY_GID_WITH_PREF_NAME = "SELECT {g.*}, {n.*} FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 "
-            + "JOIN progntrs p ON p.pid = g.gid WHERE p.gid = :gid";
+    public static final String GET_PROGENITORS_BY_GID_WITH_PREF_NAME = 
+            "SELECT {g.*}, {n.*} " +
+            "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 " +
+                            "JOIN progntrs p ON p.pid = g.gid " +
+            "WHERE p.gid = :gid";
     // public static final String GET_MANAGEMENT_NEIGHBORS =
     // "getGermplasmManagementNeighbors";
-    public static final String GET_MANAGEMENT_NEIGHBORS = "SELECT {g.*}, {n.*} FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 WHERE g.mgid = :gid";
+    public static final String GET_MANAGEMENT_NEIGHBORS = 
+            "SELECT {g.*}, {n.*} " +
+            "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 " +
+            "WHERE g.mgid = :gid";
     // public static final String GET_GROUP_RELATIVES =
     // "getGermplasmGroupRelatives";
-    public static final String GET_GROUP_RELATIVES = "SELECT {g.*}, {n.*} FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 "
-            + "JOIN germplsm g2 ON g.gpid1 = g2.gpid1 WHERE g.gnpgs = -1 AND g.gid <> :gid AND g2.gid = :gid";
+    public static final String GET_GROUP_RELATIVES = 
+            "SELECT {g.*}, {n.*} " +
+            "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 " +
+                                    "JOIN germplsm g2 ON g.gpid1 = g2.gpid1 " +
+            "WHERE g.gnpgs = -1 AND g.gid <> :gid AND g2.gid = :gid";
     // public static final String GET_DERIVATIVE_CHILDREN =
     // "getGermplasmDerivativeChildren";
-    public static final String GET_DERIVATIVE_CHILDREN = "SELECT {g.*}, {n.*} FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 "
-            + "WHERE g.gnpgs = -1 AND g.gpid2 = :gid";
+    public static final String GET_DERIVATIVE_CHILDREN = 
+            "SELECT {g.*}, {n.*} " +
+            "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 " +
+            "WHERE g.gnpgs = -1 AND g.gpid2 = :gid";
 
     @Id
     @Basic(optional = false)

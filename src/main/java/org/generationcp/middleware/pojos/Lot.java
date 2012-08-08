@@ -35,9 +35,14 @@ public class Lot implements Serializable{
     private static final long serialVersionUID = -7110592680243974512L;
 
     // string contants for name of queries
-    public static final String GENERATE_REPORT_ON_DORMANT = "select l.lotid, l.eid, sum(t.trnqty) balance, l.locid, l.scaleid "
-            + "from ims_transaction t, ims_lot l " + "where t.lotid = l.lotid " + "and t.trndate < (:year + 1) * 10000 "
-            + "and t.trnstat = 1 " + "group by l.lotid, l.eid, l.locid, l.scaleid " + "having sum(trnqty) <> 0";
+    public static final String GENERATE_REPORT_ON_DORMANT = 
+            "SELECT l.lotid, l.eid, SUM(t.trnqty) balance, l.locid, l.scaleid " +
+            "FROM ims_transaction t, ims_lot l " + 
+            "WHERE t.lotid = l.lotid " + 
+                    "AND t.trndate < (:year + 1) * 10000 " +
+                    "AND t.trnstat = 1 " + 
+            "GROUP BY l.lotid, l.eid, l.locid, l.scaleid " + 
+            "HAVING SUM(trnqty) <> 0";
 
     @Id
     @Basic(optional = false)
