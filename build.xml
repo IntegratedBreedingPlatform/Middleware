@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<project name="IBPMiddleware" default="build" basedir="."
+    xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+    <property name="target.dir" location="target" />
+
+    <!--
+    When running this script, pass the following arguments:
+        -Dlib.dir=<IBPCommons lib directory> -Dmaven.home=<Maven Home directory>
+    For Eclipse,
+        -Dlib.dir=${workspace_loc:/IBPCommons/lib} -Dmaven.home=<Your Maven Home directory>
+    The default configuraton expects:
+        - you have checkout the IBPCommons project
+          in the same directory where you have checkout this project
+        - you have your maven installation
+          in the same directory where you have checkout this project
+    -->
+    <property name="lib.dir" location="../IBPCommons/lib" />
+    <property name="maven.home" value="../maven"/>
+    
+    <path id="maven-ant-tasks.classpath" path="${lib.dir}/maven-ant-tasks-2.1.3.jar" />
+    <typedef resource="org/apache/maven/artifact/ant/antlib.xml"
+             uri="antlib:org.apache.maven.artifact.ant"
+             classpathref="maven-ant-tasks.classpath" />
+
+    <target name="build" depends="clean,install" description="Compile optimized versions for deployment">
+    </target>
+    
+    <target name="clean" description="Remove all the compiled classes">
+        <artifact:mvn mavenHome="${maven.home}" fork="true">
+            <arg value="clean"/>
+        </artifact:mvn>
+    </target>
+    
+    <target name="install">
+        <artifact:mvn mavenHome="${maven.home}" fork="true">
+            <arg value="package"/>
+            <arg value="install"/>
+            <arg value="-DskipTests=true"/>
+        </artifact:mvn>
+    </target>
+</project>
