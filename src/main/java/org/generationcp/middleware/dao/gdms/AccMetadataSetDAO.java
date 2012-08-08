@@ -15,7 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
+import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 
 /**
@@ -42,6 +44,32 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer>{
         SQLQuery query = getSession().createSQLQuery(AccMetadataSet.GET_NAME_IDS_BY_GERMPLASM_IDS);        
         query.setParameterList("gIdList", gIds);
         return (List<Integer>) query.list();        
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<Integer> getNIDsByDatasetIds(List<Integer> datasetIds, List<Integer> gids, int start, int numOfRows) throws QueryException{
+        try {
+            List<Integer> nids;
+            SQLQuery query;
+            
+            if(gids == null || gids.isEmpty()) {
+                query = getSession().createSQLQuery(AccMetadataSet.GET_NIDS_BY_DATASET_IDS);
+            } else {
+                query = getSession().createSQLQuery(
+                        AccMetadataSet.GET_NIDS_BY_DATASET_IDS + 
+                        AccMetadataSet.GET_NIDS_BY_DATASET_IDS_FILTER_BY_GIDS);
+                query.setParameterList("gids", gids);
+            }
+            
+            query.setParameterList("datasetId", datasetIds);
+            query.setFirstResult(start);
+            query.setMaxResults(numOfRows);
+            nids = query.list();
+            
+            return nids;
+        } catch (HibernateException e) {
+            throw new QueryException("Error with getNIDsByDatasetIds query: " + e.getMessage(), e);
+        }
     }
 
 }

@@ -494,6 +494,29 @@ public interface GenotypicDataManager{
      */
     public Long countAllDbAccessionIdsFromMarker(Database instance) throws QueryException;
     
+    /**
+     * Gets the nids from acc metadataset by dataset ids.
+     *
+     * @param datasetIds the dataset ids
+     * @param start the start
+     * @param numOfRows the num of rows
+     * @return the nids from acc metadataset by dataset ids
+     * @throws QueryException the query exception
+     */
+    public List<Integer> getNidsFromAccMetadatasetByDatasetIds(List<Integer> datasetIds, int start, int numOfRows) throws QueryException;
+    
+    /**
+     * Gets the nids from acc metadataset by dataset ids filtered by gids.
+     *
+     * @param datasetIds the dataset ids
+     * @param gids the gids
+     * @param start the start
+     * @param numOfRows the num of rows
+     * @return the nids from acc metadataset by dataset ids
+     * @throws QueryException the query exception
+     */
+    public List<Integer> getNidsFromAccMetadatasetByDatasetIds(List<Integer> datasetIds, List<Integer> gids, int start, int numOfRows) throws QueryException;
+    
     
     /**
      * Gets the germplasm Id and name Id from the names table with the given germplasm name

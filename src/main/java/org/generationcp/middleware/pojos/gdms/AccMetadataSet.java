@@ -39,6 +39,14 @@ public class AccMetadataSet implements Serializable{
             "SELECT nid " +
             "FROM acc_metadataset " +
             "WHERE gid IN (:gIdList)";
+    
+    public static final String GET_NIDS_BY_DATASET_IDS = 
+            "SELECT DISTINCT(nid) " +
+            "FROM acc_metadataset " +
+            "WHERE dataset_id IN (:datasetId) ";
+    
+    public static final String GET_NIDS_BY_DATASET_IDS_FILTER_BY_GIDS = 
+            "AND gid NOT IN (:gids)";
 
     /** The id. */
     @EmbeddedId

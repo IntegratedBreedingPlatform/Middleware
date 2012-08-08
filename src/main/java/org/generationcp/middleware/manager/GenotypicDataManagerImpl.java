@@ -818,7 +818,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         
         return result;
     }
-
+    
     @Override
     public List<Integer> getGIDsFromMappingPopValuesByMarkerId(Integer markerId, int start, int numOfRows) throws QueryException {
         MappingPopValuesDAO dao = new MappingPopValuesDAO();
@@ -905,6 +905,31 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         }
         
         return result;
+    }
+
+    @Override
+    public List<Integer> getNidsFromAccMetadatasetByDatasetIds(List<Integer> datasetIds, 
+                                                               int start, int numOfRows) throws QueryException {
+        return getNidsFromAccMetadatasetByDatasetIds(datasetIds, null, start, numOfRows);
+    }
+
+    @Override
+    public List<Integer> getNidsFromAccMetadatasetByDatasetIds(List<Integer> datasetIds, 
+                                                               List<Integer> gids, 
+                                                               int start, int numOfRows) throws QueryException {
+        
+        AccMetadataSetDAO dao = new AccMetadataSetDAO();
+        HibernateUtil util = getHibernateUtil(datasetIds.get(0));
+        List<Integer> nids;
+        
+        if(util != null) {
+            dao.setSession(util.getCurrentSession());
+            nids = dao.getNIDsByDatasetIds(datasetIds, gids, start, numOfRows);
+        } else {
+            nids = new ArrayList<Integer>();
+        }
+        
+        return nids;
     }
 
     @Override

@@ -371,6 +371,23 @@ public class TestGenotypicDataManagerImpl{
         List<GidNidElement> results = manager.getGidAndNidByGermplasmNames(germplasmNames);
         System.out.println("RESULTS (getGidAndNidByGermplasmNames): " + results);
     }
+    
+    @Test
+    public void testGetNidsFromAccMetadatasetByDatasetIds() throws Exception {
+        List<Integer> datasetIds = new ArrayList<Integer>();
+        datasetIds.add(-1);
+        datasetIds.add(-2);
+        datasetIds.add(-3);
+        
+        List<Integer> gids = new ArrayList<Integer>();
+        gids.add(-2);
+        
+        List<Integer> nids = manager.getNidsFromAccMetadatasetByDatasetIds(datasetIds, 0, 10);
+        List<Integer> nidsWithGidFilter = manager.getNidsFromAccMetadatasetByDatasetIds(datasetIds, gids, 0, 10);
+        
+        System.out.println("testGetNidsFromAccMetadatasetByDatasetIds: " + nids);
+        System.out.println("testGetNidsFromAccMetadatasetByDatasetIds with gid filter: " + nidsWithGidFilter);
+    }
 
     @AfterClass
     public static void tearDown() throws Exception {
