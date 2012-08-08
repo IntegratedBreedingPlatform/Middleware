@@ -26,9 +26,9 @@ import org.generationcp.middleware.pojos.gdms.DatasetElement;
 import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
-import org.generationcp.middleware.pojos.gdms.MarkerInfo;
 import org.generationcp.middleware.pojos.gdms.MappingValueElement;
 import org.generationcp.middleware.pojos.gdms.MarkerIdMarkerNameElement;
+import org.generationcp.middleware.pojos.gdms.MarkerInfo;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.hibernate.QueryException;
@@ -503,6 +503,18 @@ public class TestGenotypicDataManagerImpl{
     public void testCountGidsFromAlleleValuesByMarkerId() throws Exception {
         Long result = manager.countGIDsFromCharValuesByMarkerId(1);
         System.out.println("testCountGidsFromAlleleValuesByMarkerId: " + result);
+    }
+    
+    @Test 
+    public void testGetGidsFromMappingPopValuesByMarkerId() throws Exception {
+        List<Integer> gids = manager.getGIDsFromMappingPopValuesByMarkerId(1, 1, 10);
+        System.out.println("testGetGidsFromMappingPopValuesByMarkerId: " + gids);
+    }
+    
+    @Test
+    public void testCountGidsFromMappingPopValuesByMarkerId() throws Exception {
+        Long result = manager.countGIDsFromMappingPopValuesByMarkerId(1);
+        System.out.println("testCountGidsFromMappingPopValuesByMarkerId: " + result);
     }
     
     @AfterClass

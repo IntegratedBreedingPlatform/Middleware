@@ -84,6 +84,17 @@ public class MappingPopValues implements Serializable{
             "SELECT COUNT(*) " +
             "FROM mapping_pop_values " +
             "WHERE dataset_id = :datasetId";
+    
+    public static final String GET_GIDS_BY_MARKER_ID = 
+        "SELECT DISTINCT gid " +
+        "FROM mapping_pop_values " +
+        "WHERE marker_id = :markerId";
+
+    public static final String COUNT_GIDS_BY_MARKER_ID = 
+        "SELECT COUNT(distinct gid) " +
+        "FROM mapping_pop_values " +
+        "WHERE marker_id = :markerId";
+    
 
     /**
      * The Mp Id.

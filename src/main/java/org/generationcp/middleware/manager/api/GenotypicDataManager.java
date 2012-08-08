@@ -16,7 +16,6 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.Database;
-import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
@@ -30,7 +29,6 @@ import org.generationcp.middleware.pojos.gdms.MarkerInfo;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 
-// TODO: Auto-generated Javadoc
 /**
  * This is the API for retrieving and storing genotypic data.
  * 
@@ -227,8 +225,6 @@ public interface GenotypicDataManager{
      * @param numOfRows
      *            - the number of rows to be included in the sublist of results
      *            to be returned
-     * @param start the start
-     * @param numOfRows the num of rows
      * @return List of Allelic Values based on the specified dataset id
      * @throws QueryException the query exception
      */
@@ -254,8 +250,6 @@ public interface GenotypicDataManager{
      * @param numOfRows
      *            - the number of rows to be included in the sublist of results
      *            to be returned
-     * @param start the start
-     * @param numOfRows the num of rows
      * @return List of Allelic Values based on the specified dataset id
      * @throws QueryException the query exception
      */
@@ -281,8 +275,6 @@ public interface GenotypicDataManager{
      * @param numOfRows
      *            - the number of rows to be included in the sublist of results
      *            to be returned
-     * @param start the start
-     * @param numOfRows the num of rows
      * @return List of Allelic Values based on the specified dataset id
      * @throws QueryException the query exception
      */
@@ -448,7 +440,7 @@ public interface GenotypicDataManager{
      * @param markerId the marker id
      * @param start the start
      * @param numOfRows the num of rows
-     * @return the gI ds from allele values by marker id
+     * @return the gids from allele values by marker id
      * @throws QueryException the query exception
      */
     public List<Integer> getGIDsFromAlleleValuesByMarkerId(Integer markerId, int start, int numOfRows) throws QueryException;
@@ -457,10 +449,28 @@ public interface GenotypicDataManager{
      * Count gi ds from allele values by marker id.
      *
      * @param markerId the marker id
-     * @param start the start
-     * @param numOfRows the num of rows
      * @return the long
      * @throws QueryException the query exception
      */
-    public Long countGIDsFromAlleleValuesByMarkerId(Integer markerId, int start, int numOfRows) throws QueryException;
+    public Long countGIDsFromAlleleValuesByMarkerId(Integer markerId) throws QueryException;
+    
+    /**
+     * Gets the gids from mapping pop values by marker id.
+     *
+     * @param markerId the marker id
+     * @param start the start
+     * @param numOfRows the num of rows
+     * @return the gids from mapping pop values by marker id
+     * @throws QueryException the query exception
+     */
+    public List<Integer> getGIDsFromMappingPopValuesByMarkerId(Integer markerId, int start, int numOfRows) throws QueryException;
+    
+    /**
+     * Count gids from mapping pop values by marker id.
+     *
+     * @param markerId the marker id
+     * @return the long
+     * @throws QueryException the query exception
+     */
+    public Long countGIDsFromMappingPopValuesByMarkerId(Integer markerId) throws QueryException;
 }
