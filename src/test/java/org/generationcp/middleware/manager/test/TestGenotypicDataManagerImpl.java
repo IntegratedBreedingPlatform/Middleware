@@ -19,6 +19,7 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
+import org.generationcp.middleware.pojos.GidNidElement;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
@@ -31,9 +32,7 @@ import org.generationcp.middleware.pojos.gdms.MarkerIdMarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerInfo;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
-import org.hibernate.QueryException;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -58,15 +57,7 @@ public class TestGenotypicDataManagerImpl{
         germplasmIds.add(Integer.valueOf(-4070));
         
         List<Integer> results = manager.getNameIdsByGermplasmIds(germplasmIds);
-        
-        System.out.println("RESULTS (testGetNameIdsByGermplasmIds):");
-        if (results == null || results.isEmpty()) {
-            System.out.println(" No records found.");
-        } else {
-            for (Integer nId : results){
-                System.out.println(" " + nId);
-            }
-        }
+        System.out.println("RESULTS (testGetNameIdsByGermplasmIds):" + results);
     }
 
     @Test
@@ -77,40 +68,19 @@ public class TestGenotypicDataManagerImpl{
         nameIds.add(Integer.valueOf(-3));
         
         List<Name> results = manager.getNamesByNameIds(nameIds);
-        System.out.println("RESULTS (testGetNamesByNameIds):");
-        if (results == null || results.isEmpty()) {
-            System.out.println(" No records found.");
-        } else {
-            for (Name name : results){
-                System.out.println(" " + name);
-            }
-        }
+        System.out.println("RESULTS (testGetNamesByNameIds):" + results);
     }
     
     @Test
     public void testGetNameByNameId() throws Exception {
         Name name = manager.getNameByNameId(-1);
-        System.out.println("RESULTS (testGetNameByNameId):");
-        
-        if(name == null) {
-            System.out.println("No record found.");
-        } else {
-            System.out.println(" " + name);
-        }
+        System.out.println("RESULTS (testGetNameByNameId): " + name);
     }
     
     @Test
     public void testGetFirstFiveMaps() throws Exception {
         List<Map> maps = manager.getAllMaps(0, 5, Database.LOCAL);
-        System.out.println("RESULTS (testGetFirstFiveMaps)");
-        
-        if(maps == null || maps.isEmpty()) {
-            System.out.println("No records found.");
-        } else {
-            for(Map map : maps) {
-                System.out.println(" " + map);
-            }
-        }
+        System.out.println("RESULTS (testGetFirstFiveMaps): " + maps);
     }
     
     
@@ -118,14 +88,7 @@ public class TestGenotypicDataManagerImpl{
     public void testGetMapInfoByMapName() throws Exception {
         String mapName = ""; //TODO: test with a given map name
         List<MapInfo> results = manager.getMapInfoByMapName(mapName, Database.LOCAL);
-        System.out.println("RESULTS (testGetMapInfoByMapName):");
-        if (results == null || results.isEmpty()) {
-            System.out.println(" No records found.");
-        } else {
-            for (MapInfo mapInfo : results){
-                System.out.println(" " + mapInfo);
-            }
-        }
+        System.out.println("RESULTS (testGetMapInfoByMapName): " + results);
     }
     
 
@@ -139,17 +102,7 @@ public class TestGenotypicDataManagerImpl{
     @Test
     public void testGetDatasetNames() throws Exception {
         List<String> results = manager.getDatasetNames(0, 5, Database.LOCAL);
-        System.out.println("RESULTS (testGetDatasetNames):");
-        if (results == null || results.isEmpty()) {
-            System.out.println(" No records found.");
-        } else {
-            for (Object obj : results){
-                Assert.assertTrue(obj instanceof String);
-                Assert.assertTrue(obj != null);
-                String element = (String) obj;
-                System.out.println(" " + element);
-            }
-        }
+        System.out.println("RESULTS (testGetDatasetNames): " + results);
     }
     
 
@@ -157,17 +110,7 @@ public class TestGenotypicDataManagerImpl{
     public void testGetDatasetDetailsByDatasetName() throws Exception {
         String datasetName = "MARS";
         List<DatasetElement> results = manager.getDatasetDetailsByDatasetName(datasetName, Database.LOCAL);
-        System.out.println("RESULTS (testGetDatasetDetailsByDatasetName):");
-        if (results == null || results.isEmpty()) {
-            System.out.println(" No records found.");
-        } else {
-            for (Object obj : results){
-                Assert.assertTrue(obj instanceof DatasetElement);
-                Assert.assertTrue(obj != null);
-                DatasetElement element = (DatasetElement) obj;
-                System.out.println(" " + element);
-            }
-        }
+        System.out.println("RESULTS (testGetDatasetDetailsByDatasetName): " + results);
     }
     
     @Test
@@ -187,34 +130,14 @@ public class TestGenotypicDataManagerImpl{
     public void testGetMarkerIdsByDatasetId() throws Exception {
         Integer datasetId = Integer.valueOf(2);
         List<Integer> results = manager.getMarkerIdsByDatasetId(datasetId);
-        System.out.println("RESULTS (testGetMarkerIdByDatasetId):");
-        if (results == null || results.isEmpty()) {
-            System.out.println(" No records found.");
-        } else {
-            for (Object obj : results){
-                Assert.assertTrue(obj instanceof Integer);
-                Assert.assertTrue(obj != null);
-                Integer element = (Integer) obj;
-                System.out.println(" " + element);
-            }
-        }
+        System.out.println("RESULTS (testGetMarkerIdByDatasetId): " + results);
     }
     
     @Test
     public void testGetParentsByDatasetId() throws Exception {
         Integer datasetId = Integer.valueOf(2);
         List<ParentElement> results = manager.getParentsByDatasetId(datasetId);
-        System.out.println("RESULTS (testGetParentsByDatasetId):");
-        if (results == null || results.isEmpty()) {
-            System.out.println(" No records found.");
-        } else {
-            for (Object obj : results){
-                Assert.assertTrue(obj instanceof ParentElement);
-                Assert.assertTrue(obj != null);
-                ParentElement element = (ParentElement) obj;
-                System.out.println(" " + element);
-            }
-        }
+        System.out.println("RESULTS (testGetParentsByDatasetId): " + results);
     }
     
     @Test
@@ -227,17 +150,7 @@ public class TestGenotypicDataManagerImpl{
         markerIds.add(Integer.valueOf(5));
         
         List<String> results = manager.getMarkerTypesByMarkerIds(markerIds);
-        System.out.println("RESULTS (testGetMarkerTypeByMarkerIds):");
-        if (results == null || results.isEmpty()) {
-            System.out.println(" No records found.");
-        } else {
-            for (Object obj : results){
-                Assert.assertTrue(obj instanceof String);
-                Assert.assertTrue(obj != null);
-                String element = (String) obj;
-                System.out.println(" " + element);
-            }
-        }
+        System.out.println("RESULTS (testGetMarkerTypeByMarkerIds): " + results);
     }
     
     @Test
@@ -248,17 +161,7 @@ public class TestGenotypicDataManagerImpl{
         gIds.add(Integer.valueOf(-4069));
         
         List<MarkerNameElement> results = manager.getMarkerNamesByGIds(gIds);
-        System.out.println("RESULTS (testGetMarkerNamesByGIds):");
-        if (results == null || results.isEmpty()) {
-            System.out.println(" No records found.");
-        } else {
-            for (Object obj : results){
-                Assert.assertTrue(obj instanceof MarkerNameElement);
-                Assert.assertTrue(obj != null);
-                MarkerNameElement element = (MarkerNameElement) obj;
-                System.out.println(" " + element);
-            }
-        }
+        System.out.println("RESULTS (testGetMarkerNamesByGIds): " + results);
     }
      
     
@@ -270,17 +173,7 @@ public class TestGenotypicDataManagerImpl{
         markerNames.add("1_0013");
         
         List<GermplasmMarkerElement> results = (List<GermplasmMarkerElement>) manager.getGermplasmNamesByMarkerNames(markerNames, Database.LOCAL);
-        System.out.println("RESULTS (testGetGermplasmNamesByMarkerNames):");
-        if (results == null || results.isEmpty()) {
-            System.out.println(" No records found.");
-        } else {
-            for (Object obj : results){
-                Assert.assertTrue(obj instanceof GermplasmMarkerElement);
-                Assert.assertTrue(obj != null);
-                GermplasmMarkerElement element = (GermplasmMarkerElement) obj;
-                System.out.println(" " + element);
-            }
-        }
+        System.out.println("RESULTS (testGetGermplasmNamesByMarkerNames): " + results);
     }
     
     @Test
@@ -330,49 +223,25 @@ public class TestGenotypicDataManagerImpl{
     @Test
     public void testGetAllelicValuesFromCharValuesByDatasetId() throws Exception {        
         Integer datasetId = Integer.valueOf(2);
-        try {
-            int count = manager.countAllelicValuesFromCharValuesByDatasetId(datasetId);
-            List<AllelicValueWithMarkerIdElement> allelicValues = manager.getAllelicValuesFromCharValuesByDatasetId(datasetId, 0, count);
-            System.out.println("RESULTS (testGetAllelicValuesFromCharValuesByDatasetId): ");
-            for (Object o: allelicValues){
-                System.out.println("  " + o);
-            }
-        } catch(QueryException e){
-           e.printStackTrace();
-        }
-
+        int count = manager.countAllelicValuesFromCharValuesByDatasetId(datasetId);
+        List<AllelicValueWithMarkerIdElement> allelicValues = manager.getAllelicValuesFromCharValuesByDatasetId(datasetId, 0, count);
+        System.out.println("RESULTS (testGetAllelicValuesFromCharValuesByDatasetId): " + allelicValues);
     }
 
     @Test
     public void testGetAllelicValuesFromAlleleValuesByDatasetId() throws Exception {        
         Integer datasetId = Integer.valueOf(2);
-        try {
-            int count = manager.countAllelicValuesFromCharValuesByDatasetId(datasetId);
-            List<AllelicValueWithMarkerIdElement> allelicValues = manager.getAllelicValuesFromAlleleValuesByDatasetId(datasetId, 0, count);
-            System.out.println("RESULTS (testGetAllelicValuesFromAlleleValuesByDatasetId): ");
-            for (Object o: allelicValues){
-                System.out.println("  " + o);
-            }
-        } catch(QueryException e){
-           e.printStackTrace();
-        }
-
+        int count = manager.countAllelicValuesFromCharValuesByDatasetId(datasetId);
+        List<AllelicValueWithMarkerIdElement> allelicValues = manager.getAllelicValuesFromAlleleValuesByDatasetId(datasetId, 0, count);
+        System.out.println("RESULTS (testGetAllelicValuesFromAlleleValuesByDatasetId): " + allelicValues);
     }
 
     @Test
     public void testGetAllelicValuesFromMappingPopValuesByDatasetId() throws Exception {        
         Integer datasetId = Integer.valueOf(2);
-        try {
-            int count = manager.countAllelicValuesFromCharValuesByDatasetId(datasetId);
-            List<AllelicValueWithMarkerIdElement> allelicValues = manager.getAllelicValuesFromMappingPopValuesByDatasetId(datasetId, 0, count);
-            System.out.println("RESULTS (testGetAllelicValuesFromMappingPopValuesByDatasetId): ");
-            for (Object o: allelicValues){
-                System.out.println("  " + o);
-            }
-        } catch(QueryException e){
-           e.printStackTrace();
-        }
-
+        int count = manager.countAllelicValuesFromCharValuesByDatasetId(datasetId);
+        List<AllelicValueWithMarkerIdElement> allelicValues = manager.getAllelicValuesFromMappingPopValuesByDatasetId(datasetId, 0, count);
+        System.out.println("RESULTS (testGetAllelicValuesFromMappingPopValuesByDatasetId): " + allelicValues);
     }
     
 
@@ -389,8 +258,7 @@ public class TestGenotypicDataManagerImpl{
         System.out.println("testGetMarkerNamesByMarkerIds: ");
         for(MarkerIdMarkerNameElement e : markerNames) {
             System.out.println(e.getMarkerId() + " : " + e.getMarkerName());
-        }
-        
+        }        
     }
     
     @Test
@@ -420,65 +288,29 @@ public class TestGenotypicDataManagerImpl{
     @Test
     public void testGetMarkerInfoByMarkerName() throws Exception {        
         String markerName = "1_0437";
-        try {
-            int count = manager.countMarkerInfoByMarkerName(markerName);
-            System.out.println("RESULT (countMarkerInfoByMarkerName) = " + count);
-            List<MarkerInfo> results = manager.getMarkerInfoByMarkerName(markerName, 0, count);
-            System.out.println("RESULTS (getMarkerInfoByMarkerName): ");
-            if (results == null || results.isEmpty()) {
-                System.out.println(" No records found.");
-            } else {
-                for (MarkerInfo markerInfo : results) {
-                    System.out.println(" " + markerInfo);
-                }
-            }
-        } catch(QueryException e){
-           e.printStackTrace();
-        }
-
+        int count = manager.countMarkerInfoByMarkerName(markerName);
+        System.out.println("RESULT (countMarkerInfoByMarkerName) = " + count);
+        List<MarkerInfo> results = manager.getMarkerInfoByMarkerName(markerName, 0, count);
+        System.out.println("RESULTS (getMarkerInfoByMarkerName): " + results);
     }
     
     @Test
     public void testGetMarkerInfoByGenotype() throws Exception {        
         String genotype = "";
-        try {
-            int count = manager.countMarkerInfoByGenotype(genotype);
-            System.out.println("RESULT (countMarkerInfoByGenotype) = " + count);
-            List<MarkerInfo> results = manager.getMarkerInfoByGenotype(genotype, 0, count);
-            System.out.println("RESULTS (getMarkerInfoByGenotype): ");
-            if (results == null || results.isEmpty()) {
-                System.out.println(" No records found.");
-            } else {
-                for (MarkerInfo markerInfo : results) {
-                    System.out.println(" " + markerInfo);
-                }
-            }
-        } catch(QueryException e){
-           e.printStackTrace();
-        }
-
+        int count = manager.countMarkerInfoByGenotype(genotype);
+        System.out.println("RESULT (countMarkerInfoByGenotype) = " + count);
+        List<MarkerInfo> results = manager.getMarkerInfoByGenotype(genotype, 0, count);
+        System.out.println("RESULTS (getMarkerInfoByGenotype): " + results);
     }
     
     
     @Test
     public void testGetMarkerInfoByDbAccessionId() throws Exception {        
         String dbAccessionId = "";
-        try {
-            int count = manager.countMarkerInfoByDbAccessionId(dbAccessionId);
-            System.out.println("RESULT (countMarkerInfoByDbAccessionId) = " + count);
-            List<MarkerInfo> results = manager.getMarkerInfoByDbAccessionId(dbAccessionId, 0, count);
-            System.out.println("RESULTS (getMarkerInfoByDbAccessionId): ");
-            if (results == null || results.isEmpty()) {
-                System.out.println(" No records found.");
-            } else {
-                for (MarkerInfo markerInfo : results) {
-                    System.out.println(" " + markerInfo);
-                }
-            }
-        } catch(QueryException e){
-           e.printStackTrace();
-        }
-
+        int count = manager.countMarkerInfoByDbAccessionId(dbAccessionId);
+        System.out.println("RESULT (countMarkerInfoByDbAccessionId) = " + count);
+        List<MarkerInfo> results = manager.getMarkerInfoByDbAccessionId(dbAccessionId, 0, count);
+        System.out.println("RESULTS (getMarkerInfoByDbAccessionId): " + results);
     }
 
     @Test 
@@ -529,6 +361,17 @@ public class TestGenotypicDataManagerImpl{
         System.out.println("testCountAllDbAccessionIdsFromMarker: " + result);
     }
     
+    @Test
+    public void testGetGidAndNidByGermplasmNames() throws Exception {        
+        List<String> germplasmNames = new ArrayList<String>();
+        germplasmNames.add("UCR2010001");
+        germplasmNames.add("UCR2010002");
+        germplasmNames.add("UCR2010003");
+
+        List<GidNidElement> results = manager.getGidAndNidByGermplasmNames(germplasmNames);
+        System.out.println("RESULTS (getGidAndNidByGermplasmNames): " + results);
+    }
+
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();

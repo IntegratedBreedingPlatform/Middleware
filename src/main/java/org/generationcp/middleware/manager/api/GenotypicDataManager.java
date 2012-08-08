@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.pojos.GidNidElement;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
@@ -492,4 +493,19 @@ public interface GenotypicDataManager{
      * @throws QueryException the query exception
      */
     public Long countAllDbAccessionIdsFromMarker(Database instance) throws QueryException;
+    
+    
+    /**
+     * Gets the germplasm Id and name Id from the names table with the given germplasm name
+     *
+     * @param germplasmName the germplasm name
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
+     * @return List of MarkerInfo based on the specified db accession id 
+     * @throws QueryException
+     */
+    public List<GidNidElement> getGidAndNidByGermplasmNames(List<String> germplasmNames) throws QueryException;
 }

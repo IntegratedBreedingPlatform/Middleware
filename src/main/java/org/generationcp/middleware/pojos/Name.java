@@ -31,6 +31,13 @@ public class Name implements Serializable{
 
     private static final long serialVersionUID = 1L;
 
+    // For getGidAndNidByGermplasmNames()
+    public static final String GET_GID_AND_NID_BY_GERMPLASM_NAME = 
+            "SELECT gid, nid " +
+            "FROM names " +
+            "WHERE nval IN (:germplasmNameList)";
+    
+
     @Id
     @Basic(optional = false)
     @Column(name = "nid")

@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.GermplasmNameType;
+import org.generationcp.middleware.pojos.GidNidElement;
 import org.generationcp.middleware.pojos.Name;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -121,5 +122,45 @@ public class NameDAO extends GenericDAO<Name, Integer>{
         
         return name;
     }
+    
+
+    
+    /**
+     * Retrieves the gId and nId pairs for the given germplasm names
+     * 
+     * @param germplasmNames the list of germplasm names
+     * @return the list of GidNidElement (gId and nId pairs)
+     * @throws QueryException
+     */
+    @SuppressWarnings("rawtypes")
+    public List<GidNidElement> getGidAndNidByGermplasmNames(List<String> germplasmNames)throws QueryException{
+
+        List<GidNidElement> toReturn = new ArrayList<GidNidElement>();
+
+        if (germplasmNames == null || germplasmNames.isEmpty()){
+            return toReturn;
+        }
+
+        try {
+            SQLQuery query = getSession().createSQLQuery(Name.GET_GID_AND_NID_BY_GERMPLASM_NAME);
+            query.setParameterList("germplasmNameList", germplasmNames);
+            List results = query.list();
+            
+            for (Object o : results) {
+                Object[] result = (Object[]) o;
+                if (result != null) {
+                    Integer gId = (Integer) result[0];
+                    Integer nId = (Integer) result[1];
+                    GidNidElement element = new GidNidElement(gId, nId);
+                    toReturn.add(element);
+                }
+            }
+
+            return toReturn;            
+        } catch (HibernateException e) {
+            throw new QueryException("Error with get gid and nid by germplasm names query: " + e.getMessage(), e);
+        }
+    }
+
     
 }
