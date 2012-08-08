@@ -542,6 +542,83 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return count;
     }
 
+    @Override
+   public List<MarkerInfo> getMarkerInfoByDbAccessionId(String dbAccessionId, int start, int numOfRows) throws QueryException{
+
+        MarkerInfoDAO dao = new MarkerInfoDAO();
+        List<MarkerInfo> markerInfoList = new ArrayList<MarkerInfo>();
+        
+        int centralCount = 0;
+        int localCount = 0;
+        int relativeLimit = 0;
+        
+        if (hibernateUtilForCentral != null) {
+                
+            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+            centralCount = dao.countByDbAccessionId(dbAccessionId);
+            
+            if (centralCount > start) {  
+                
+                markerInfoList.addAll((List<MarkerInfo>) dao.getByDbAccessionId(dbAccessionId, start, numOfRows));
+                relativeLimit = numOfRows - (centralCount - start);
+                
+                if (relativeLimit > 0) {
+                        if (hibernateUtilForLocal != null) {                                
+                            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+                            localCount = dao.countByDbAccessionId(dbAccessionId);
+                            
+                            if (localCount > 0) {
+                                markerInfoList.addAll((List<MarkerInfo>) dao.getByDbAccessionId(dbAccessionId, 0, relativeLimit));
+                            }  
+                        }
+                }
+                
+            } else {
+                
+                relativeLimit = start - centralCount;
+                
+                if (hibernateUtilForLocal != null) {
+                        
+                    dao.setSession(hibernateUtilForLocal.getCurrentSession());
+                    localCount = dao.countByDbAccessionId(dbAccessionId);
+                    
+                    if (localCount > relativeLimit) {
+                        markerInfoList.addAll((List<MarkerInfo>) dao.getByDbAccessionId(dbAccessionId, relativeLimit, numOfRows));
+                    }  
+                }
+            }
+            
+        } else if (hibernateUtilForLocal != null) {
+                
+            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+            localCount = dao.countByDbAccessionId(dbAccessionId);
+
+            if (localCount > start) {
+                markerInfoList.addAll((List<MarkerInfo>) dao.getByDbAccessionId(dbAccessionId, start, numOfRows));
+            }
+        }
+        
+        return markerInfoList;
+    }
+    
+    @Override
+    public int countMarkerInfoByDbAccessionId(String dbAccessionId) throws QueryException{
+        int count = 0;        
+        MarkerInfoDAO dao = new MarkerInfoDAO();
+        
+        if (hibernateUtilForLocal != null) {
+            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+            count = count + dao.countByDbAccessionId(dbAccessionId);
+        }
+        
+        if (hibernateUtilForCentral != null) {
+            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+            count = count + dao.countByDbAccessionId(dbAccessionId);
+        }
+        
+        return count;
+    }
+
     
     @Override
     public List<MarkerIdMarkerNameElement> getMarkerNamesByMarkerIds(List<Integer> markerIds)

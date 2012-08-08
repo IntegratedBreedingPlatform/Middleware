@@ -82,6 +82,29 @@ public class MarkerInfo implements Serializable{
             "FROM marker_retrieval_info " +
             "WHERE LOWER(genotype) LIKE LOWER(:genotype)";
 
+    /* Used by MarkerInfoDAO.getByDbAccessionId() */
+    public static final String GET_BY_DB_ACCESSION_ID = 
+            "SELECT marker_id " +
+                    ", CONCAT(marker_type, '') " + 
+                    ", CONCAT(marker_name, '')  " +
+                    ", CONCAT(species, '')  " +
+                    ", accession_id " +
+                    ", reference " +
+                    ", CONCAT(genotype, '') " + 
+                    ", ploidy " +
+                    ", CONCAT(principal_investigator, '') " + 
+                    ", contact " +
+                    ", institute " +
+                    ", genotypes_count " +
+            "FROM marker_retrieval_info " +
+            "WHERE LOWER(accession_id) LIKE LOWER(:dbAccessionId)";
+    
+    /* Used by MarkerInfoDAO.countByDbAccessionId() */
+    public static final String COUNT_BY_DB_ACCESSION_ID = 
+            "SELECT COUNT(*) " +
+            "FROM marker_retrieval_info " +
+            "WHERE LOWER(accession_id) LIKE LOWER(:dbAccessionId)";
+
     
     @Id
     @Column(name = "marker_id")

@@ -407,7 +407,31 @@ public interface GenotypicDataManager{
      * @throws QueryException
      */
     public int countMarkerInfoByGenotype(String genotype) throws QueryException;
+
+    /**
+     * Retrieves a list of MarkerInfo based on the specified db accession id from the marker_retrieval_info table
+     * 
+     * @param dbAccessionId  
+     *            - the db accession id  to match
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
+     * @return List of MarkerInfo based on the specified db accession id 
+     * @throws QueryException
+     */
+    public List<MarkerInfo> getMarkerInfoByDbAccessionId(String dbAccessionId, int start, int numOfRows) throws QueryException;
     
+    /**
+     * Counts the marker info entries corresponding to the given db accession id 
+     * 
+     * @param dbAccessionId  
+     * @return the count
+     * @throws QueryException
+     */
+    public int countMarkerInfoByDbAccessionId(String dbAccessionId) throws QueryException;
+
 
     /**
      * Count gids from char values by marker id.

@@ -458,6 +458,28 @@ public class TestGenotypicDataManagerImpl{
         }
 
     }
+    
+    
+    @Test
+    public void testGetMarkerInfoByDbAccessionId() throws Exception {        
+        String dbAccessionId = "";
+        try {
+            int count = manager.countMarkerInfoByDbAccessionId(dbAccessionId);
+            System.out.println("RESULT (countMarkerInfoByDbAccessionId) = " + count);
+            List<MarkerInfo> results = manager.getMarkerInfoByDbAccessionId(dbAccessionId, 0, count);
+            System.out.println("RESULTS (getMarkerInfoByDbAccessionId): ");
+            if (results == null || results.isEmpty()) {
+                System.out.println(" No records found.");
+            } else {
+                for (MarkerInfo markerInfo : results) {
+                    System.out.println(" " + markerInfo);
+                }
+            }
+        } catch(QueryException e){
+           e.printStackTrace();
+        }
+
+    }
 
     @Test 
     public void testGetGidsFromCharValuesByMarkerId() throws Exception {
