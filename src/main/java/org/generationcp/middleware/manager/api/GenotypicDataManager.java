@@ -473,4 +473,23 @@ public interface GenotypicDataManager{
      * @throws QueryException the query exception
      */
     public Long countGIDsFromMappingPopValuesByMarkerId(Integer markerId) throws QueryException;
+    
+    /**
+     * Gets the all db accession ids from marker.
+     *
+     * @param start the start
+     * @param numOfRows the num of rows
+     * @return all non-empty db accession ids from marker
+     * @throws QueryException the query exception
+     */
+    public List<String> getAllDbAccessionIdsFromMarker(int start, int numOfRows) throws QueryException;
+    
+    /**
+     * Count all db accession ids from marker.
+     *
+     * @param instance the instance
+     * @return the number of non-empty db accession ids from marker
+     * @throws QueryException the query exception
+     */
+    public Long countAllDbAccessionIdsFromMarker(Database instance) throws QueryException;
 }

@@ -98,8 +98,18 @@ public class Marker implements Serializable{
             "FROM mapping_pop_values JOIN marker ON mapping_pop_values.marker_id = marker.marker_id " +
             "WHERE mapping_pop_values.gid IN (:gIdList) " +
             "ORDER BY gid, marker_name";
-
-
+    
+    public static final String GET_ALL_DB_ACCESSION_IDS = 
+            "SELECT DISTINCT (db_accession_id) " +
+            "FROM marker " +
+            "WHERE db_accession_id is not null " +
+            "OR db_accession_id != ''";
+    
+    public static final String COUNT_ALL_DB_ACCESSION_IDS = 
+            "SELECT COUNT(DISTINCT db_accession_id) " +
+            "FROM marker " +
+            "WHERE db_accession_id is not null " +
+            "OR db_accession_id != ''";
     
     /** The marker id. */
     @Id

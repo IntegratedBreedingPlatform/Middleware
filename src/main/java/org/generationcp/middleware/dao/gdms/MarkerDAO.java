@@ -501,4 +501,47 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
             throw new QueryException("Error with count marker names by Marker Type query: " + ex.getMessage(), ex);
         }
     } 
+    
+    /**
+     * Gets the all db accession ids.
+     *
+     * @param start the start
+     * @param numOfRows the num of rows
+     * @return all non-empty db accession ids
+     * @throws QueryException 
+     */
+    public List<String> getAllDbAccessionIds(int start, int numOfRows) throws QueryException {
+        try {
+            SQLQuery query = getSession().createSQLQuery(Marker.GET_ALL_DB_ACCESSION_IDS);
+            query.setFirstResult(start);
+            query.setMaxResults(numOfRows);
+            
+            List<String> dbAccessionIds = query.list();
+            
+            return dbAccessionIds;
+            
+        } catch (HibernateException ex) {
+            throw new QueryException("Error with get all db accession ids query: " + ex.getMessage(), ex);
+        }
+    }
+    
+    /**
+     * Count all db accession ids.
+     *
+     * @return the number of distinct db accession ids
+     * @throws QueryException the query exception
+     */
+    public Long countAllDbAccessionIds() throws QueryException {
+        try {
+            SQLQuery query = getSession().createSQLQuery(Marker.COUNT_ALL_DB_ACCESSION_IDS);
+            BigInteger result = (BigInteger) query.uniqueResult();
+            if(result != null) {
+                return result.longValue();
+            } else {
+                return 0L;
+            }
+        } catch (HibernateException ex) {
+            throw new QueryException("Error with count all db accession ids query: " + ex.getMessage(), ex);
+        }
+    }
 }

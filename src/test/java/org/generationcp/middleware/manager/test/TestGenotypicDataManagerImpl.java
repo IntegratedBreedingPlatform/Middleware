@@ -517,6 +517,18 @@ public class TestGenotypicDataManagerImpl{
         System.out.println("testCountGidsFromMappingPopValuesByMarkerId: " + result);
     }
     
+    @Test
+    public void testGetAllDbAccessionIdsFromMarker() throws Exception {
+        List<String> dbAccessionIds = manager.getAllDbAccessionIdsFromMarker(1, 10);
+        System.out.println("testGetAllDbAccessionIdsFromMarker: " + dbAccessionIds);
+    }
+    
+    @Test 
+    public void testCountAllDbAccessionIdsFromMarker() throws Exception {
+        Long result = manager.countAllDbAccessionIdsFromMarker(Database.CENTRAL);
+        System.out.println("testCountAllDbAccessionIdsFromMarker: " + result);
+    }
+    
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();

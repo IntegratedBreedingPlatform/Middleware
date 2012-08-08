@@ -660,7 +660,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                     }
                 }
             } else {
-                relativeLimit = (int) (start - centralCount);
+                relativeLimit = start - centralCount;
                 if (hibernateUtilForLocal != null) {
                     dao.setSession(hibernateUtilForLocal.getCurrentSession());
                     localCount = countAllMarkerTypes(Database.LOCAL).intValue();
@@ -720,7 +720,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                     }
                 }
             } else {
-                relativeLimit = (int) (start - centralCount);
+                relativeLimit = start - centralCount;
                 if (hibernateUtilForLocal != null) {
                     dao.setSession(hibernateUtilForLocal.getCurrentSession());
                     localCount = dao.countAll().intValue();
@@ -844,6 +844,64 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             dao.setSession(util.getCurrentSession());
             result = dao.countGIDsByMarkerId(markerId);
         } 
+        
+        return result;
+    }
+
+    @Override
+    public List<String> getAllDbAccessionIdsFromMarker(int start, int numOfRows) throws QueryException {
+        MarkerDAO dao = new MarkerDAO();
+        List<String> dbAccessionIds = new ArrayList<String>();
+        int centralCount = 0;
+        int localCount = 0;
+        int relativeLimit = 0;
+        
+        if(hibernateUtilForCentral != null) {
+            
+            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+            centralCount = countAllDbAccessionIdsFromMarker(Database.CENTRAL).intValue();
+            
+            if(centralCount > start) {
+                dbAccessionIds.addAll(dao.getAllDbAccessionIds(start, numOfRows));
+                relativeLimit = numOfRows - dbAccessionIds.size();
+                if(relativeLimit > 0 && hibernateUtilForLocal != null) {
+                    dao.setSession(hibernateUtilForLocal.getCurrentSession());
+                    localCount = countAllDbAccessionIdsFromMarker(Database.LOCAL).intValue();
+                    if(localCount > 0) {
+                        dbAccessionIds.addAll(dao.getAllDbAccessionIds(0, relativeLimit));
+                    }
+                }
+            } else {
+                relativeLimit = start - centralCount;
+                if (hibernateUtilForLocal != null) {
+                    dao.setSession(hibernateUtilForLocal.getCurrentSession());
+                    localCount = countAllDbAccessionIdsFromMarker(Database.LOCAL).intValue();
+                    if (localCount > relativeLimit) {
+                        dbAccessionIds.addAll(dao.getAllDbAccessionIds(relativeLimit, numOfRows));
+                    }
+                }
+            }
+        } else if (hibernateUtilForLocal != null) {
+            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+            localCount = countAllDbAccessionIdsFromMarker(Database.LOCAL).intValue();
+            if (localCount > start) {
+                dbAccessionIds.addAll(dao.getAllDbAccessionIds(start, numOfRows));
+            }
+        }
+        
+        return dbAccessionIds;
+    }
+
+    @Override
+    public Long countAllDbAccessionIdsFromMarker(Database instance) throws QueryException {
+        MarkerDAO dao = new MarkerDAO();
+        HibernateUtil util = getHibernateUtil(instance);
+        Long result = 0L;
+        
+        if(util != null) {
+            dao.setSession(util.getCurrentSession());
+            result = dao.countAllDbAccessionIds();
+        }
         
         return result;
     }
