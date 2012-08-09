@@ -20,6 +20,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.ProjectUser;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
@@ -317,5 +318,62 @@ public interface WorkbenchDataManager{
      * @throws QueryException the query exception
      */
     public Long countMethodsByProjectId(Long projectId) throws QueryException;
+    
+    
+    /**
+     * Adds a single project user.
+     *
+     * @param projectUser the projectUser to save
+     * @return the number of records inserted
+     * @throws QueryException the query exception
+     */
+    public int addProjectUser(Project project, User user) throws QueryException;
+
+    /**
+     * Adds a single project user.
+     *
+     * @param projectUser the projectUser to save
+     * @return the number of records inserted
+     * @throws QueryException the query exception
+     */
+    public int addProjectUser(ProjectUser projectUser) throws QueryException;
+
+    /**
+     * Adds multiple project users.
+     *
+     * @param projectUsers the project users
+     * @return the number of records inserted
+     * @throws QueryException the query exception
+     */
+    public int addProjectUsers(List<ProjectUser> projectUsers) throws QueryException;
+
+    /**
+     * Retrieves a user by id.
+     *
+     * @param id the ProjectUser id
+     * @return the associated ProjectUser
+     * @throws QueryException the query exception
+     */
+    public ProjectUser getProjectUserById(Integer id) throws QueryException;
+    
+    /**
+     * Retrieves a user by project and user.
+     *
+     * @param project the project
+     * @param user the user
+     * @return the associated ProjectUser
+     * @throws QueryException the query exception
+     */
+    public ProjectUser getProjectUserByProjectAndUser(Project project, User user) throws QueryException;
+    
+    /**
+     * Deletes the given ProjectUser.
+     *
+     * @param project the project
+     * @param user the user
+     * @return the associated ProjectUser
+     * @throws QueryException the query exception
+     */
+    public void deleteProjectUser(ProjectUser projectUser) throws QueryException;
 
 }

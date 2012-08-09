@@ -19,6 +19,7 @@ import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.ProjectDAO;
 import org.generationcp.middleware.dao.ProjectLocationMapDAO;
 import org.generationcp.middleware.dao.ProjectMethodDAO;
+import org.generationcp.middleware.dao.ProjectUserDAO;
 import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.WorkbenchDatasetDAO;
@@ -29,6 +30,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.ProjectUser;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
@@ -37,8 +39,12 @@ import org.generationcp.middleware.util.HibernateUtil;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
+    
+    private static final Logger LOG = LoggerFactory.getLogger(WorkbenchDataManagerImpl.class);
 
     private HibernateUtil hibernateUtil;
 
@@ -195,6 +201,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
             
             trans.commit();
         } catch (Exception ex) {
+            LOG.error("Error in addPerson: " + ex.getMessage() + "\n" + ex.getStackTrace());
             ex.printStackTrace();
             // rollback transaction in case of errors
             if (trans != null) {
@@ -265,6 +272,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 
             trans.commit();
         } catch (Exception ex) {
+            LOG.error("Error in addDataset: " + ex.getMessage() + "\n" + ex.getStackTrace());
             ex.printStackTrace();
             // rollback transaction in case of errors
             if (trans != null) {
@@ -564,5 +572,130 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 
         return result;
     }
+    @Override
+    public int addProjectUser(Project project, User user) throws QueryException{
+        ProjectUser projectUser = new ProjectUser();
+        projectUser.setProject(project);
+        projectUser.setUserId(user.getUserid());
+        return addProjectUser(projectUser);
+    }
+
+    @Override
+    public int addProjectUser(ProjectUser projectUser) throws QueryException {
+        if(hibernateUtil == null) {
+            return 0;
+        }
+
+        Session session = hibernateUtil.getCurrentSession();
+        Transaction trans = null;
         
+        int recordsSaved = 0;
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();            
+            ProjectUserDAO dao = new ProjectUserDAO();
+            dao.setSession(session);
+
+            dao.saveOrUpdate(projectUser);
+            recordsSaved++;
+            
+            trans.commit();
+        } catch (Exception ex) {
+            LOG.error("Error in addProjectUser: " + ex.getMessage() + "\n" + ex.getStackTrace());
+            ex.printStackTrace();
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new QueryException("Error encountered while saving ProjectUser: " + ex.getMessage(), ex);
+        } finally {
+            hibernateUtil.closeCurrentSession();
+        }
+        return recordsSaved;
+    }
+
+    @Override
+    public int addProjectUsers(List<ProjectUser> projectUsers) throws QueryException{
+        if(hibernateUtil == null) {
+            return 0;
+        }
+        Session session = hibernateUtil.getCurrentSession();
+        Transaction trans = null;
+        
+        int recordsSaved = 0;
+        try {            
+            // begin save transaction
+            trans = session.beginTransaction();            
+            ProjectUserDAO dao = new ProjectUserDAO();
+            dao.setSession(session);
+
+            for (ProjectUser projectUser : projectUsers){
+                dao.saveOrUpdate(projectUser);
+                recordsSaved++;
+            }
+            
+            trans.commit();
+        } catch (Exception ex) {
+            LOG.error("Error in addProjectUsers: " + ex.getMessage() + "\n" + ex.getStackTrace());
+            ex.printStackTrace();
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new QueryException("Error encountered while saving ProjectUsers: " + ex.getMessage(), ex);
+        } finally {
+            hibernateUtil.closeCurrentSession();
+        }
+        return recordsSaved;
+    }
+    
+    @Override
+    public ProjectUser getProjectUserById(Integer id) throws QueryException {
+        ProjectUserDAO dao = new ProjectUserDAO();
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+            return dao.getById(id);
+        }
+        return null;
+    }
+
+    @Override
+    public ProjectUser getProjectUserByProjectAndUser(Project project, User user) throws QueryException{
+        ProjectUserDAO dao = new ProjectUserDAO();
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+            return dao.getByProjectAndUser(project, user);
+        }
+        return null;
+    }
+
+    @Override
+    public void deleteProjectUser(ProjectUser projectUser) throws QueryException {
+        if (hibernateUtil == null) {
+            return;
+        }
+
+        Session session = hibernateUtil.getCurrentSession();
+        Transaction trans = null;
+        
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
+            
+            ProjectUserDAO dao = new ProjectUserDAO();
+            dao.setSession(session);
+            
+            dao.makeTransient(projectUser);
+            
+            trans.commit();
+        } catch (Exception ex) {
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new QueryException("Error encountered while deleting ProjectUser: " + ex.getMessage(), ex);
+        } finally {
+            hibernateUtil.closeCurrentSession();
+        }
+    }
 }

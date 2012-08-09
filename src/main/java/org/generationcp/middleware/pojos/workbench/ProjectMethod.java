@@ -69,6 +69,18 @@ public class ProjectMethod implements Serializable{
     @JoinColumn(name = "method_id")
     private Method method;
 
+
+    public ProjectMethod() {
+        super();
+    }
+    
+    public ProjectMethod(Long projectMethodId, Project project, Method method) {
+        super();
+        this.projectMethodId = projectMethodId;
+        this.project = project;
+        this.method = method;
+    }
+
     /**
      * Gets the project method id.
      *

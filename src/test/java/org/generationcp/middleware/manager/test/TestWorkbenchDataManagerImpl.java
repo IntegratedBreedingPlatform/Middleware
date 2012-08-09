@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.manager.test;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -25,6 +26,7 @@ import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.ProjectUser;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
@@ -41,7 +43,7 @@ public class TestWorkbenchDataManagerImpl{
     @BeforeClass
     public static void setUp() throws Exception {
     	
-    	hibernateUtil = new HibernateUtil("localhost", "3306", "workbench", "root", "");
+    	hibernateUtil = new HibernateUtil("localhost", "3306", "workbench", "root", "admin");
         manager = new WorkbenchDataManagerImpl(hibernateUtil);
     }
 
@@ -52,11 +54,17 @@ public class TestWorkbenchDataManagerImpl{
         project1.setUserId(1);
         project1.setCropType(CropType.CHICKPEA);
         project1.setTargetDueDate(new GregorianCalendar().getTime());
+        project1.setLastOpenDate(new GregorianCalendar().getTime());
+//        project1.setLocId(0);
+//        project1.setmId(0);
 
         Project project2 = new Project();
         project2.setProjectName("Test Project 2");
         project2.setCropType(CropType.CHICKPEA);
         project2.setTargetDueDate(new GregorianCalendar().getTime());
+        project2.setLastOpenDate(new GregorianCalendar().getTime());
+//        project2.setLocId(0);
+//        project2.setmId(0);
 
         WorkflowTemplate marsTemplate = new WorkflowTemplate();
         marsTemplate.setTemplateId(1L);
@@ -138,7 +146,7 @@ public class TestWorkbenchDataManagerImpl{
     
     @Test
     public void testGetUserByName() throws QueryException {
-        User user = manager.getUserByName("jeff", 0, 1, Operation.EQUAL).get(0);
+        User user = (User) manager.getUserByName("jeff", 0, 1, Operation.EQUAL).get(0);
         System.out.println(user);
     }
     
@@ -269,6 +277,29 @@ public class TestWorkbenchDataManagerImpl{
             e.printStackTrace();
         }
     }
+    
+    @Test
+    public void testAddProjectUsers() throws QueryException {
+        List<ProjectUser> projectUsers = new ArrayList<ProjectUser>();
+
+        // Assumptions: Project with id=1, and Users with id=1 and id=2 exist in the database
+        Project project1 = manager.getProjectById(1L);
+        User user1 = manager.getUserById(1);
+        User user2 = manager.getUserById(2);
+        projectUsers.add(new ProjectUser(project1, user1));
+        projectUsers.add(new ProjectUser(project1, user2));
+
+        // add the projectUsers
+        int projectUsersAdded = manager.addProjectUsers(projectUsers);
+        
+        System.out.println("ProjectUsers added: " + projectUsersAdded);
+        System.out.println("  " + manager.getProjectUserByProjectAndUser(project1, user1));
+        System.out.println("  " + manager.getProjectUserByProjectAndUser(project1, user2));
+        
+        manager.deleteProjectUser(manager.getProjectUserByProjectAndUser(project1, user1));
+        manager.deleteProjectUser(manager.getProjectUserByProjectAndUser(project1, user2));
+    }
+    
     
     @AfterClass
     public static void tearDown() throws Exception {
