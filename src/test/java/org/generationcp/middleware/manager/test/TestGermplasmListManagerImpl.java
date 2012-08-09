@@ -22,7 +22,6 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.User;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -156,7 +155,6 @@ public class TestGermplasmListManagerImpl{
     public void testAddGermplasmLists() throws Exception {
         System.out.println("********** testAddGermplasmList(List<GermplasmList>) **********");
         try {
-            User user = new User(300);
             List<GermplasmList> germplasmLists = new ArrayList<GermplasmList>();
             System.out.println("Inserting new Germplasm List Test #2: Complete details with ID");
             GermplasmList germplasmList = new GermplasmList(null, "Test List #2", new Long(20120305), "LST", new Integer(1),
@@ -323,6 +321,34 @@ public class TestGermplasmListManagerImpl{
         }
         System.out.println("********** testDeleteGermplasmList() done **********");
     }
+    
+    @Test
+    public void testGetTopLevelFolders() throws Exception {
+        System.out.println("********** testGetTopLevelFolders() **********");
+        try {
+            System.out.println("Retrieving Top Level Folders: ");
+            List<GermplasmList> topLevelFolders = new ArrayList<GermplasmList>();
+            topLevelFolders = manager.getTopLevelFolders(0, 100, Database.LOCAL);
+            System.out.println(topLevelFolders);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println("********** testGetTopLevelFolders() done **********");
+    }
+    
+    @Test
+    public void testCountTopLevelFolders() throws Exception {
+        System.out.println("********** testCountTopLevelFolders() **********");
+        try {
+            System.out.println("Counting Top Level Folders: ");
+            int count = manager.countTopLevelFolders(Database.LOCAL);
+            System.out.println(count);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println("********** testCountTopLevelFolders() done **********");
+    }
+    
     
     @Test
     public void testGetGermplasmListChildren() throws Exception {

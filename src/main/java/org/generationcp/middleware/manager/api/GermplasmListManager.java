@@ -184,6 +184,31 @@ public interface GermplasmListManager{
     public int countGermplasmListDataByGID(Integer gid);
 
     /**
+     * Returns the Top Level Germplasm List Folders present in the specified database.
+     * 
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
+     * @param instance
+     *            - can either be Database.CENTRAL or Database.LOCAL
+     * @return - List of GermplasmList POJOs
+     * @throws QueryException
+     */
+    public List<GermplasmList> getTopLevelFolders(int start, int numOfRows, Database instance) throws QueryException;
+    
+    /**
+     * Returns the number of Top Level Germplasm List Folders in the specified database.
+     * 
+     * @param instance
+     *            - can either be Database.CENTRAL or Database.LOCAL
+     * @return
+     * @throws QueryException
+     */
+    public int countTopLevelFolders(Database instance) throws QueryException;
+
+    /**
      * Inserts a single {@code GermplasmList} object into the database.
      * 
      * @param germplasmList

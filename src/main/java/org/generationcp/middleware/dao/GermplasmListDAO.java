@@ -73,6 +73,30 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
 
         return (Long) criteria.uniqueResult(); // count
     }
+    
+    @SuppressWarnings("unchecked")
+    public List<GermplasmList> getTopLevelFolders(int start, int numOfRows) {
+        Criteria criteria = getSession().createCriteria(GermplasmList.class);
+
+        criteria.add(Restrictions.eq("status", 0));
+        criteria.add(Restrictions.eq("parent.id", 0));
+
+        criteria.setFirstResult(start);
+        criteria.setMaxResults(numOfRows);
+
+        return criteria.list();
+    }
+    
+    public Long countTopLevelFolders() {
+        Criteria criteria = getSession().createCriteria(GermplasmList.class);
+        
+        criteria.add(Restrictions.eq("status", 0));
+        criteria.add(Restrictions.eq("parent.id", 0));
+        
+        criteria.setProjection(Projections.rowCount());
+
+        return (Long) criteria.uniqueResult();
+    }
 
     public void validateId(GermplasmList germplasmList) throws QueryException {
         // Check if not a local record (has negative ID)

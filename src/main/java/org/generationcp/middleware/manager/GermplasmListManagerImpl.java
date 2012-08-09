@@ -274,6 +274,36 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
         return count;
     }
+    
+    @Override
+    public List<GermplasmList> getTopLevelFolders(int start, int numOfRows, Database instance) throws QueryException {
+        GermplasmListDAO dao = new GermplasmListDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(instance);
+
+        List<GermplasmList> topLevelFolders = new ArrayList<GermplasmList>();
+        
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+        } else {
+            return new ArrayList<GermplasmList>();
+        }
+        
+        topLevelFolders = dao.getTopLevelFolders(start, numOfRows);
+        
+        return topLevelFolders;
+    }
+    
+    @Override
+    public int countTopLevelFolders(Database instance) throws QueryException {
+        int count = 0;
+        
+        GermplasmListDAO dao = new GermplasmListDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(instance);
+        dao.setSession(hibernateUtil.getCurrentSession());
+        count = dao.countTopLevelFolders().intValue();
+        
+        return count;
+    }
 
     @Override
     public Integer addGermplasmList(GermplasmList germplasmList) throws QueryException {
