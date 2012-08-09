@@ -470,5 +470,36 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 
         return result;
     }
+
+    @Override
+    public List<WorkbenchDataset> getWorkbenchDatasetByName(String name, Operation op, 
+                                                            int start, int numOfRows) 
+        throws QueryException {
+        
+        WorkbenchDatasetDAO dao = new WorkbenchDatasetDAO();
+        List<WorkbenchDataset> list;
+        
+        if(hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+            list = dao.getByName(name, op, start, numOfRows);
+        } else {
+            list = new ArrayList<WorkbenchDataset>();
+        }
+        
+        return list;
+    }
+
+    @Override
+    public Long countWorkbenchDatasetByName(String name, Operation op) throws QueryException {
+        WorkbenchDatasetDAO dao = new WorkbenchDatasetDAO();
+        Long result = 0L;
+        
+        if(hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+            result = dao.countByName(name, op);
+        }
+
+        return result;
+    }
     
 }

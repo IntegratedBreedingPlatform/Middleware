@@ -254,4 +254,26 @@ public interface WorkbenchDataManager{
      * @throws QueryException the query exception
      */
     public Long countWorkbenchDatasetByProjectId(Long projectId) throws QueryException;
+    
+    /**
+     * Returns a list of {@link WorkbenchDataset} by name.
+     *
+     * @param name - the {@link WorkbenchDataset} name
+     * @param op - the operator; EQUAL, LIKE
+     * @param start - the start
+     * @param numOfRows - the num of rows
+     * @return the list of {@link WorkbenchDataset}
+     * @throws QueryException the query exception
+     */
+    public List<WorkbenchDataset> getWorkbenchDatasetByName(String name, Operation op, int start, int numOfRows) throws QueryException;
+    
+    /**
+     * Returns the number of {@link WorkbenchDataset} by name.
+     *
+     * @param name - the {@link WorkbenchDataset} name
+     * @param op - the operator; EQUAL, LIKE
+     * @return the number of {@link WorkbenchDataset}
+     * @throws QueryException the query exception
+     */
+    public Long countWorkbenchDatasetByName(String name, Operation op) throws QueryException;
 }

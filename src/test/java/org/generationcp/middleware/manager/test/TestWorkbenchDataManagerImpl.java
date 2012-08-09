@@ -187,6 +187,36 @@ public class TestWorkbenchDataManagerImpl{
         }
     }
     
+    @Test
+    public void testGetWorkbenchDatasetByName() {
+        try {
+            List<WorkbenchDataset> list = manager.getWorkbenchDatasetByName("a", Operation.EQUAL, 0, 10);
+            System.out.println("testGetWorkbenchDatasetByName(): ");
+            
+            if(list.isEmpty()) {
+                System.out.println("No records found.");
+            }
+            
+            for(WorkbenchDataset d : list) {
+                System.out.println(d.getDatasetId() + ": " + d.getName());
+            }
+        } catch (Exception e) {
+            System.out.println("Error in testGetWorkbenchDatasetByName(): " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    @Test
+    public void testCountWorkbenchDatasetByName() {
+        try {
+            Long result = manager.countWorkbenchDatasetByName("a", Operation.EQUAL);
+            System.out.println("testCountWorkbenchDatasetByName(): " + result);
+        } catch (Exception e) {
+            System.out.println("Error in testCountWorkbenchDatasetByName(): " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
     @AfterClass
     public static void tearDown() throws Exception {
         hibernateUtil.shutdown();
