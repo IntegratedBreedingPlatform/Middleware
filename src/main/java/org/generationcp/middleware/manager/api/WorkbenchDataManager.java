@@ -277,8 +277,27 @@ public interface WorkbenchDataManager{
      * @throws QueryException the query exception
      */
     public Long countWorkbenchDatasetByName(String name, Operation op) throws QueryException;
-
     
+    /**
+     * Returns a list of {@link Location} ids by project id.
+     *
+     * @param projectId - the project id
+     * @param start - the start
+     * @param numOfRows - the num of rows
+     * @return the list of {@link Location} ids
+     * @throws QueryException the query exception
+     */
+    public List<Long> getLocationIdsByProjectId(Long projectId, int start, int numOfRows) throws QueryException;
+    
+    /**
+     * Returns the number of {@link Location} ids by project id.
+     *
+     * @param projectId - the project id
+     * @return the number of {@link Location} ids 
+     * @throws QueryException the query exception
+     */
+    public Long countLocationIdsByProjectId(Long projectId) throws QueryException;
+
     /**
      * Returns a list of {@link Method} records by project id.
      *

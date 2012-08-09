@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.ProjectDAO;
+import org.generationcp.middleware.dao.ProjectLocationMapDAO;
 import org.generationcp.middleware.dao.ProjectMethodDAO;
 import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.dao.UserDAO;
@@ -504,6 +505,35 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         return result;
     }
 
+    @Override
+    public List<Long> getLocationIdsByProjectId(Long projectId, int start, int numOfRows) 
+        throws QueryException {
+        
+        ProjectLocationMapDAO dao = new ProjectLocationMapDAO();
+        List<Long> ids;
+        
+        if(hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+            ids = dao.getLocationIdsByProjectId(projectId, start, numOfRows);
+        } else {
+            ids = new ArrayList<Long>();
+        }
+        
+        return ids;
+    }
+
+    @Override
+    public Long countLocationIdsByProjectId(Long projectId) throws QueryException {
+        ProjectLocationMapDAO dao = new ProjectLocationMapDAO();
+        Long result = 0L;
+        
+        if(hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+            result = dao.countLocationIdsByProjectId(projectId);
+        } 
+        
+        return result;
+    }
 
     @Override
     public List<Method> getMethodsByProjectId(Long projectId, int start, int numOfRows) throws QueryException{
@@ -534,6 +564,5 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 
         return result;
     }
-
         
 }

@@ -180,18 +180,18 @@ public class TestWorkbenchDataManagerImpl{
     @Test
     public void testCountWorkbenchDatasetByProjectId() {
         try {
-            Long result = manager.countWorkbenchDatasetByProjectId(435L);
+            Long result = manager.countWorkbenchDatasetByProjectId(1L);
             System.out.println("testCountWorkbenchDatasetByProjectId(): " + result);
         } catch (Exception e) {
             System.out.println("Error in testCountWorkbenchDatasetByProjectId(): " + e.getMessage());
             e.printStackTrace();
         }
     }
-
+    
     @Test
     public void testGetWorkbenchDatasetByName() {
         try {
-            List<WorkbenchDataset> list = manager.getWorkbenchDatasetByName("a", Operation.EQUAL, 0, 10);
+            List<WorkbenchDataset> list = manager.getWorkbenchDatasetByName("D", Operation.EQUAL, 0, 10);
             System.out.println("testGetWorkbenchDatasetByName(): ");
             
             if(list.isEmpty()) {
@@ -214,6 +214,28 @@ public class TestWorkbenchDataManagerImpl{
             System.out.println("testCountWorkbenchDatasetByName(): " + result);
         } catch (Exception e) {
             System.out.println("Error in testCountWorkbenchDatasetByName(): " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    @Test
+    public void testGetLocationIdsByProjectId() {
+        try {
+            List<Long> ids = manager.getLocationIdsByProjectId(2L, 0, 10);
+            System.out.println("testgetLocationIdsByProjectId(): " + ids);
+        } catch (Exception e) {
+            System.out.println("Error in testGetLocationIdsByProjectId(): " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    @Test
+    public void testCountLocationIdsByProjectId() {
+        try {
+            Long result = manager.countLocationIdsByProjectId(1L);
+            System.out.println("testCountLocationIdsByProjectId(): " + result);
+        } catch (Exception e) {
+            System.out.println("Error in testCountLocationIdsByProjectId(): " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -247,8 +269,6 @@ public class TestWorkbenchDataManagerImpl{
             e.printStackTrace();
         }
     }
-    
-
     
     @AfterClass
     public static void tearDown() throws Exception {

@@ -77,5 +77,6 @@
   <mapping class="org.generationcp.middleware.pojos.workbench.Tool"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.WorkflowStep"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.WorkflowTemplate"/>
+  <mapping class="org.generationcp.middleware.pojos.workbench.ProjectLocationMap"/>
  </session-factory>
 </hibernate-configuration>
