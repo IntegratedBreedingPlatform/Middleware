@@ -20,6 +20,7 @@ import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -186,7 +187,7 @@ public class TestWorkbenchDataManagerImpl{
             e.printStackTrace();
         }
     }
-    
+
     @Test
     public void testGetWorkbenchDatasetByName() {
         try {
@@ -216,6 +217,38 @@ public class TestWorkbenchDataManagerImpl{
             e.printStackTrace();
         }
     }
+    
+    @Test 
+    public void testGetMethodsByProjectId() {
+        try {
+            List<Method> list = manager.getMethodsByProjectId(1L, 0, 10);
+            System.out.println("testGetMethodsByProjectId(): ");
+            
+            if(list.isEmpty()) {
+                System.out.println("No records found.");
+            }
+            
+            for(Method m : list) {
+                System.out.println("  " + m);
+            }
+        } catch (Exception e) {
+            System.out.println("Error in testGetMethodsByProjectId(): " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    @Test
+    public void testCountMethodsByProjectId() {
+        try {
+            Long result = manager.countMethodsByProjectId(1L);
+            System.out.println("testCountMethodsByProjectId(): " + result);
+        } catch (Exception e) {
+            System.out.println("Error in testCountMethodsByProjectId(): " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+
     
     @AfterClass
     public static void tearDown() throws Exception {

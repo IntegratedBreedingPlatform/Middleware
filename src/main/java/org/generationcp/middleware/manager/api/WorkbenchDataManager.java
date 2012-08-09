@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -276,4 +277,26 @@ public interface WorkbenchDataManager{
      * @throws QueryException the query exception
      */
     public Long countWorkbenchDatasetByName(String name, Operation op) throws QueryException;
+
+    
+    /**
+     * Returns a list of {@link Method} records by project id.
+     *
+     * @param projectId the project id
+     * @param start the start
+     * @param numOfRows the num of rows
+     * @return the list of {@link Method}s
+     * @throws QueryException the query exception
+     */
+    public List<Method> getMethodsByProjectId(Long projectId, int start, int numOfRows) throws QueryException;
+    
+    /**
+     * Returns the number of {@link Method} records by project id.
+     *
+     * @param projectId the project id
+     * @return the number of {@link Method} records
+     * @throws QueryException the query exception
+     */
+    public Long countMethodsByProjectId(Long projectId) throws QueryException;
+
 }

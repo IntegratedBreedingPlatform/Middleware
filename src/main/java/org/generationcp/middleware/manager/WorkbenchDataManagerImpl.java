@@ -17,12 +17,14 @@ import java.util.List;
 
 import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.ProjectDAO;
+import org.generationcp.middleware.dao.ProjectMethodDAO;
 import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.WorkbenchDatasetDAO;
 import org.generationcp.middleware.dao.WorkflowTemplateDAO;
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -501,5 +503,37 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 
         return result;
     }
-    
+
+
+    @Override
+    public List<Method> getMethodsByProjectId(Long projectId, int start, int numOfRows) throws QueryException{
+            
+        ProjectMethodDAO dao = new ProjectMethodDAO();
+        List<Method> list;
+        
+        if(hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+            list = dao.getByProjectId(projectId, start, numOfRows);
+        } else {
+            list = new ArrayList<Method>();
+        }
+
+        return list;
+
+    }
+
+    @Override
+    public Long countMethodsByProjectId(Long projectId) throws QueryException {
+        ProjectMethodDAO dao = new ProjectMethodDAO();
+        Long result = 0L;
+        
+        if(hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+            result = dao.countByProjectId(projectId);
+        }
+
+        return result;
+    }
+
+        
 }
