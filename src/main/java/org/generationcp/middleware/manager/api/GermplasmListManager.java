@@ -214,10 +214,10 @@ public interface GermplasmListManager{
      * @param germplasmList
      *            - The {@code GermplasmList} object to be persisted to the
      *            database. Must be a valid {@code GermplasmList} object.
-     * @return Returns the id that was assigned to the new GermplasmList
+     * @return Returns the list of GermplasmList ids that were assigned to the new GermplasmLists
      * @throws QueryException
      */
-    public Integer addGermplasmList(GermplasmList germplasmList) throws QueryException;
+    public List<Integer> addGermplasmList(GermplasmList germplasmList) throws QueryException;
 
     /**
      * Inserts a list of multiple {@code GermplasmList} objects into the
@@ -226,11 +226,10 @@ public interface GermplasmListManager{
      * @param germplasmLists
      *            - A list of {@code GermplasmList} objects to be persisted to
      *            the database. {@code GermplasmList} objects must be valid.
-     * @return Returns the number of {@code GermplasmList} records inserted in
-     *         the database.
+     * @return Returns the list of GermplasmList ids that were assigned to the new GermplasmLists
      * @throws QueryException
      */
-    public int addGermplasmList(List<GermplasmList> germplasmLists) throws QueryException;
+    public List<Integer> addGermplasmList(List<GermplasmList> germplasmLists) throws QueryException;
 
     /**
      * Updates the database with the {@code GermplasmList} object specified.
@@ -238,11 +237,10 @@ public interface GermplasmListManager{
      * @param germplasmList
      *            - The {@code GermplasmList} object to be updated in the
      *            database. Must be a valid {@code GermplasmList} object.
-     * @return Returns the number of {@code GermplasmList} records updated in
-     *         the database.
+     * @return Returns the list of GermplasmList ids that were updated in the database.
      * @throws QueryException
      */
-    public int updateGermplasmList(GermplasmList germplasmList) throws QueryException;
+    public List<Integer> updateGermplasmList(GermplasmList germplasmList) throws QueryException;
 
     /**
      * Updates the database with multiple {@code GermplasmList} objects
@@ -251,11 +249,10 @@ public interface GermplasmListManager{
      * @param germplasmLists
      *            - A list of {@code GermplasmList} objects to be updated in the
      *            database. {@code GermplasmList} objects must be valid.
-     * @return Returns the number of {@code GermplasmList} records updated in
-     *         the database.
+     * @return Returns the list of GermplasmList ids that were updated in the database.
      * @throws QueryException
      */
-    public int updateGermplasmList(List<GermplasmList> germplasmLists) throws QueryException;
+    public List<Integer> updateGermplasmList(List<GermplasmList> germplasmLists) throws QueryException;
 
     /**
      * Removes the specified {@code GermplasmList} object from the database.

@@ -306,30 +306,30 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     }
 
     @Override
-    public Integer addGermplasmList(GermplasmList germplasmList) throws QueryException {
+    public List<Integer> addGermplasmList(GermplasmList germplasmList) throws QueryException {
         List<GermplasmList> list = new ArrayList<GermplasmList>();
         list.add(germplasmList);
         return addGermplasmList(list);
     }
 
     @Override
-    public int addGermplasmList(List<GermplasmList> germplasmLists) throws QueryException {
-        return Integer.valueOf(addOrUpdateGermplasmList(germplasmLists, Operation.ADD));
+    public List<Integer> addGermplasmList(List<GermplasmList> germplasmLists) throws QueryException {
+        return addOrUpdateGermplasmList(germplasmLists, Operation.ADD);
     }
 
     @Override
-    public int updateGermplasmList(GermplasmList germplasmList) throws QueryException {
+    public List<Integer> updateGermplasmList(GermplasmList germplasmList) throws QueryException {
         List<GermplasmList> list = new ArrayList<GermplasmList>();
         list.add(germplasmList);
         return updateGermplasmList(list);
     }
 
     @Override
-    public int updateGermplasmList(List<GermplasmList> germplasmLists) throws QueryException {
+    public List<Integer> updateGermplasmList(List<GermplasmList> germplasmLists) throws QueryException {
         return addOrUpdateGermplasmList(germplasmLists, Operation.UPDATE);
     }
 
-    private int addOrUpdateGermplasmList(List<GermplasmList> germplasmLists, Operation operation) throws QueryException {
+    private List<Integer> addOrUpdateGermplasmList(List<GermplasmList> germplasmLists, Operation operation) throws QueryException {
         if (hibernateUtilForLocal == null) {
             throw new QueryException(NO_LOCAL_INSTANCE_MSG);
         }
@@ -338,10 +338,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
         Session session = hibernateUtilForLocal.getCurrentSession();
         Transaction trans = null;
 
-        //this is a quick fix to providing the id of the new list that was saved
-        int idOfNewList = 0;
-        
         int germplasmListsSaved = 0;
+        List<Integer> germplasmListIds = new ArrayList<Integer>();
         try {
             // begin save transaction
             trans = session.beginTransaction();
@@ -353,12 +351,13 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
                 if (operation == Operation.ADD) {
                     // Auto-assign negative IDs for new local DB records
                     Integer negativeId = dao.getNegativeId("id");
-                    idOfNewList = negativeId.intValue();
+                    germplasmListIds.add(negativeId);
                     germplasmList.setId(negativeId);
                 } else if (operation == Operation.UPDATE) {
                     // Check if GermplasmList is a local DB record. Throws
                     // exception if GermplasmList is a central DB record.
                     dao.validateId(germplasmList);
+                    germplasmListIds.add(germplasmList.getId());
                 }
                 dao.saveOrUpdate(germplasmList);
                 germplasmListsSaved++;
@@ -379,12 +378,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
         } finally {
             hibernateUtilForLocal.closeCurrentSession();
         }
-
-        if(operation == Operation.ADD && germplasmLists.size() == 1) {
-            return idOfNewList;
-        }
         
-        return germplasmListsSaved;
+        return germplasmListIds;
     }
 
     @Override
