@@ -306,10 +306,11 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     }
 
     @Override
-    public List<Integer> addGermplasmList(GermplasmList germplasmList) throws QueryException {
+    public Integer addGermplasmList(GermplasmList germplasmList) throws QueryException {
         List<GermplasmList> list = new ArrayList<GermplasmList>();
         list.add(germplasmList);
-        return addGermplasmList(list);
+        List<Integer> idList = addGermplasmList(list);
+        return idList.get(0);
     }
 
     @Override
@@ -318,10 +319,11 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     }
 
     @Override
-    public List<Integer> updateGermplasmList(GermplasmList germplasmList) throws QueryException {
+    public Integer updateGermplasmList(GermplasmList germplasmList) throws QueryException {
         List<GermplasmList> list = new ArrayList<GermplasmList>();
         list.add(germplasmList);
-        return updateGermplasmList(list);
+        List<Integer> idList = updateGermplasmList(list);
+        return idList.get(0);
     }
 
     @Override

@@ -217,7 +217,7 @@ public interface GermplasmListManager{
      * @return Returns the list of GermplasmList ids that were assigned to the new GermplasmLists
      * @throws QueryException
      */
-    public List<Integer> addGermplasmList(GermplasmList germplasmList) throws QueryException;
+    public Integer addGermplasmList(GermplasmList germplasmList) throws QueryException;
 
     /**
      * Inserts a list of multiple {@code GermplasmList} objects into the
@@ -240,7 +240,7 @@ public interface GermplasmListManager{
      * @return Returns the list of GermplasmList ids that were updated in the database.
      * @throws QueryException
      */
-    public List<Integer> updateGermplasmList(GermplasmList germplasmList) throws QueryException;
+    public Integer updateGermplasmList(GermplasmList germplasmList) throws QueryException;
 
     /**
      * Updates the database with multiple {@code GermplasmList} objects
