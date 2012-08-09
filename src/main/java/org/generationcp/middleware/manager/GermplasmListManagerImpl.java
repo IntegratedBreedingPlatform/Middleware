@@ -565,4 +565,36 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
         return germplasmListDataDeleted;
     }
 
+    @Override
+    public List<GermplasmList> getGermplasmListByParentFolderId(Integer parentId, int start, int numOfRows) 
+        throws QueryException {
+
+        GermplasmListDAO dao = new GermplasmListDAO();
+        HibernateUtil util = getHibernateUtil(parentId);
+        List<GermplasmList> children;
+        
+        if(util != null) {
+            dao.setSession(util.getCurrentSession());
+            children = dao.getByParentFolderId(parentId, start, numOfRows);
+        } else {
+            children = new ArrayList<GermplasmList>();
+        }
+        
+        return children;
+    }
+
+    @Override
+    public Long countGermplasmListByParentFolderId(Integer parentId) throws QueryException {
+        GermplasmListDAO dao = new GermplasmListDAO();
+        HibernateUtil util = getHibernateUtil(parentId);
+        Long result = 0L;
+        
+        if(util != null) {
+            dao.setSession(util.getCurrentSession());
+            result = dao.countByParentFolderId(parentId);
+        }
+        
+        return result;
+    }
+
 }

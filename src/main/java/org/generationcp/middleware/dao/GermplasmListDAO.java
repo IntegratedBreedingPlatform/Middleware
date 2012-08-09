@@ -18,6 +18,7 @@ import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -79,6 +80,50 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
         if (id != null && id.intValue() > 0) {
             throw new QueryException("Cannot update a Central Database record. "
                     + "GermplasmList object to update must be a Local Record (ID must be negative)");
+        }
+    }
+    
+    /**
+     * Gets the germplasm list children.
+     *
+     * @param parentId the parent id
+     * @param start the start
+     * @param numOfRows the num of rows
+     * @return the germplasm list children
+     * @throws QueryException the query exception
+     */
+    @SuppressWarnings("unchecked")
+    public List<GermplasmList> getByParentFolderId(Integer parentId, int start, int numOfRows) throws QueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(GermplasmList.class);
+            
+            criteria.add(Restrictions.eq("parent", new GermplasmList(parentId)));
+            criteria.setFirstResult(start);
+            criteria.setMaxResults(numOfRows);
+            
+            return criteria.list();
+        } catch (HibernateException e) {
+            throw new QueryException("Error with getGermplasmListChildren query: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Count germplasm list children.
+     *
+     * @param parentId the parent id
+     * @return number of germplasm list child records of a parent record
+     * @throws QueryException the query exception
+     */
+    public Long countByParentFolderId(Integer parentId) throws QueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(GermplasmList.class);
+    
+            criteria.add(Restrictions.eq("parent", new GermplasmList(parentId)));
+            criteria.setProjection(Projections.rowCount());
+    
+            return (Long) criteria.uniqueResult(); // count
+        } catch (HibernateException e) {
+            throw new QueryException("Error with countGermplasmListChildren query: " + e.getMessage(), e);
         }
     }
 }

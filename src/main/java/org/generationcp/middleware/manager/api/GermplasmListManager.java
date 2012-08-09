@@ -375,4 +375,23 @@ public interface GermplasmListManager{
      */
     public int deleteGermplasmListData(List<GermplasmListData> germplasmListDatas) throws QueryException;
 
+    /**
+     * Returns a list of {@code GermplasmList} child records given a parent id.
+     *
+     * @param parentId the parent id
+     * @param start the start
+     * @param numOfRows the num of rows
+     * @return the germplasm list children
+     * @throws QueryException the query exception
+     */
+    public List<GermplasmList> getGermplasmListByParentFolderId(Integer parentId, int start, int numOfRows) throws QueryException;
+    
+    /**
+     * Returns the number of {@code GermplasmList} child records given a parent id.
+     *
+     * @param parentId the parent id
+     * @return number of germplasm list child records of a parent record
+     * @throws QueryException the query exception
+     */
+    public Long countGermplasmListByParentFolderId(Integer parentId) throws QueryException;
 }

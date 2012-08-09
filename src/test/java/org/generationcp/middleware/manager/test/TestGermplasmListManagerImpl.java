@@ -20,14 +20,10 @@ import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.User;
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -327,7 +323,31 @@ public class TestGermplasmListManagerImpl{
         }
         System.out.println("********** testDeleteGermplasmList() done **********");
     }
-
+    
+    @Test
+    public void testGetGermplasmListChildren() throws Exception {
+        try {
+            List<GermplasmList> children = manager.getGermplasmListByParentFolderId(-1, 0, 10);
+            System.out.println("testGetGermplasmListChildren(): ");
+            for(GermplasmList child : children) {
+                System.out.println(child.getId() + ": " + child.getName());
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    @Test
+    public void testCountGermplasmListChildren() {
+        try {
+            Long result = manager.countGermplasmListByParentFolderId(-1);
+            System.out.println("testCountGermplasmListChildren(): " + result);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();
