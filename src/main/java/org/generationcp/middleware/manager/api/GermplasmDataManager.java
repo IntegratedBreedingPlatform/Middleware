@@ -25,10 +25,10 @@ import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
+import org.generationcp.middleware.pojos.GidNidElement;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
 
 /**
@@ -491,6 +491,18 @@ public interface GermplasmDataManager {
     public int addMethod(Method method) throws QueryException;
     
     /**
+     * Inserts a list of {@code Method} objects into the database.
+     * 
+     * @param methods
+     *            - The list of {@code Method} objects to be persisted to the database.
+     *            Must be valid {@code Method} objects.
+     * @return Returns the number of {@code Method} records inserted in the
+     *         database.
+     * @throws QueryException
+     */
+    public int addMethod(List<Method> methods) throws QueryException;
+    
+    /**
      * Deletes a single {@code Method} object into the database.
      * 
      * @param method
@@ -807,4 +819,19 @@ public interface GermplasmDataManager {
      * @throws QueryException
      */
     public int addGermplasm(Map<Germplasm, Name> germplasmNameMap) throws QueryException;
+    
+    /**
+     * Gets the germplasm Id and name Id from the names table with the given germplasm name
+     *
+     * @param germplasmName the germplasm name
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
+     * @return List of MarkerInfo based on the specified db accession id 
+     * @throws QueryException
+     */
+    public List<GidNidElement> getGidAndNidByGermplasmNames(List<String> germplasmNames) throws QueryException;
+
 }

@@ -26,6 +26,7 @@ import org.generationcp.middleware.util.HibernateUtil;
 public abstract class DataManager {
 
     public final static String NO_LOCAL_INSTANCE_MSG = "There is no connection to a local instance.";
+    public final static String NO_CENTRAL_INSTANCE_MSG = "There is no connection to a central instance.";
 
     /** The hibernate util for local. */
     protected HibernateUtil hibernateUtilForLocal;
@@ -82,7 +83,8 @@ public abstract class DataManager {
             if (this.hibernateUtilForLocal != null) {
                 return hibernateUtilForLocal;
             } else {
-                throw new QueryException("The local instance was specified " + "but there is no database connection for local provided.");
+                throw new QueryException("The local instance was specified " 
+                        + "but there is no database connection for local provided.");
             }
         }
         return null;
@@ -108,13 +110,13 @@ public abstract class DataManager {
 
     protected void requireLocalDatabaseInstance() throws QueryException {
         if (hibernateUtilForLocal == null) {
-            throw new QueryException("There is no connection to a local instance.");
+            throw new QueryException(NO_LOCAL_INSTANCE_MSG);
         }
     }
     
     protected void requireCentralDatabaseInstance() throws QueryException {
         if (hibernateUtilForCentral == null) {
-            throw new QueryException("There is no connection to a central instance.");
+            throw new QueryException(NO_CENTRAL_INSTANCE_MSG);
         }
     }
 }

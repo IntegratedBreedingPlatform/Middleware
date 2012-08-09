@@ -518,17 +518,4 @@ public interface GenotypicDataManager{
     public List<Integer> getNidsFromAccMetadatasetByDatasetIds(List<Integer> datasetIds, List<Integer> gids, int start, int numOfRows) throws QueryException;
     
     
-    /**
-     * Gets the germplasm Id and name Id from the names table with the given germplasm name
-     *
-     * @param germplasmName the germplasm name
-     * @param start
-     *            - the starting index of the sublist of results to be returned
-     * @param numOfRows
-     *            - the number of rows to be included in the sublist of results
-     *            to be returned
-     * @return List of MarkerInfo based on the specified db accession id 
-     * @throws QueryException
-     */
-    public List<GidNidElement> getGidAndNidByGermplasmNames(List<String> germplasmNames) throws QueryException;
 }

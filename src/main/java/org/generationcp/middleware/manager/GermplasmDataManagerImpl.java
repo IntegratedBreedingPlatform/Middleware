@@ -35,6 +35,7 @@ import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
+import org.generationcp.middleware.pojos.GidNidElement;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
@@ -760,6 +761,44 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                 trans.rollback();
             }
             throw new QueryException("Error encountered while saving Method: " + ex.getMessage(), ex);
+        } finally {
+            hibernateUtilForLocal.closeCurrentSession();
+        }
+
+        return methodsSaved;
+    }
+    
+    @Override
+    public int addMethod(List<Method> methods) throws QueryException {
+        requireLocalDatabaseInstance();
+
+        // initialize session & transaction
+        Session session = hibernateUtilForLocal.getCurrentSession();
+        Transaction trans = null;
+
+        int methodsSaved = 0;
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
+            MethodDAO dao = new MethodDAO();
+            dao.setSession(session);
+
+            for (Method method : methods){
+                // Auto-assign negative IDs for new local DB records
+                Integer negativeId = dao.getNegativeId("mid");
+                method.setMid(negativeId);
+    
+                dao.saveOrUpdate(method);
+                methodsSaved++;
+            }
+
+            trans.commit();
+        } catch (Exception ex) {
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new QueryException("Error encountered while saving a list of Methods: " + ex.getMessage(), ex);
         } finally {
             hibernateUtilForLocal.closeCurrentSession();
         }
@@ -1899,4 +1938,29 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
      *           dao.setSession(hibernateUtil.getCurrentSession()); return
      *           dao.countByExample(sample).intValue(); }
      **/
+    
+    
+    @Override
+    public List<GidNidElement> getGidAndNidByGermplasmNames(List<String> germplasmNames) throws QueryException{
+
+        HibernateUtil hibernateUtilForCentral = getHibernateUtil(Database.CENTRAL);
+        HibernateUtil hibernateUtilForLocal = getHibernateUtil(Database.LOCAL);
+        
+        List<GidNidElement> results = new ArrayList<GidNidElement>();
+        NameDAO dao = new NameDAO();
+        
+        if (hibernateUtilForCentral != null) {
+            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+            results = dao.getGidAndNidByGermplasmNames(germplasmNames);
+        } 
+
+        if (hibernateUtilForLocal != null) {
+            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+            results = dao.getGidAndNidByGermplasmNames(germplasmNames);
+        } 
+        
+        return results;
+    }
+
+
 }

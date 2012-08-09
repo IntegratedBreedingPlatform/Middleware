@@ -25,6 +25,7 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GidNidElement;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
@@ -422,6 +423,30 @@ public class TestGermplasmDataManagerImpl{
     }
     
     @Test
+    public void testAddMethods() throws QueryException {
+        List<Method> methods = new ArrayList<Method>();
+        methods.add( new Method(-1, "GEN", "S", "UGM", "yesno", "description 1", Integer.valueOf(0), Integer.valueOf(0),
+                Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2), Integer.valueOf(19980610)));
+        methods.add( new Method(-2, "GEN", "S", "UGM", "yesno", "description 2", Integer.valueOf(0), Integer.valueOf(0),
+                Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2), Integer.valueOf(19980610)));
+        methods.add( new Method(-3, "GEN", "S", "UGM", "yesno", "description 3", Integer.valueOf(0), Integer.valueOf(0),
+                Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2), Integer.valueOf(19980610)));
+        
+        // add the methods
+        int methodsAdded = manager.addMethod(methods);
+        
+        System.out.println("Methods added: " + methodsAdded);
+        
+        for (int i=1; i <= methodsAdded; i++){
+            Method method = manager.getMethodByID(-i);
+            System.out.println("Method[" + i + "]: " +  method);
+            // delete the method
+            manager.deleteMethod(method);
+        }
+        
+    }
+    
+    @Test
     public void testAddLocation() throws QueryException {
     	
     	Location location = new Location();
@@ -482,6 +507,17 @@ public class TestGermplasmDataManagerImpl{
         
     }
 
+    @Test
+    public void testGetGidAndNidByGermplasmNames() throws Exception {        
+        List<String> germplasmNames = new ArrayList<String>();
+        germplasmNames.add("UCR2010001");
+        germplasmNames.add("UCR2010002");
+        germplasmNames.add("UCR2010003");
+
+        List<GidNidElement> results = manager.getGidAndNidByGermplasmNames(germplasmNames);
+        System.out.println("RESULTS (getGidAndNidByGermplasmNames): " + results);
+    }
+    
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();

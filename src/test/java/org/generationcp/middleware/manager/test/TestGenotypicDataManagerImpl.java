@@ -19,7 +19,6 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
-import org.generationcp.middleware.pojos.GidNidElement;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
@@ -359,17 +358,6 @@ public class TestGenotypicDataManagerImpl{
     public void testCountAllDbAccessionIdsFromMarker() throws Exception {
         Long result = manager.countAllDbAccessionIdsFromMarker(Database.CENTRAL);
         System.out.println("testCountAllDbAccessionIdsFromMarker: " + result);
-    }
-    
-    @Test
-    public void testGetGidAndNidByGermplasmNames() throws Exception {        
-        List<String> germplasmNames = new ArrayList<String>();
-        germplasmNames.add("UCR2010001");
-        germplasmNames.add("UCR2010002");
-        germplasmNames.add("UCR2010003");
-
-        List<GidNidElement> results = manager.getGidAndNidByGermplasmNames(germplasmNames);
-        System.out.println("RESULTS (getGidAndNidByGermplasmNames): " + results);
     }
     
     @Test

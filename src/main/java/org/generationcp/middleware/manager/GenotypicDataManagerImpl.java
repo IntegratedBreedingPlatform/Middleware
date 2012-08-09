@@ -29,7 +29,6 @@ import org.generationcp.middleware.dao.gdms.MarkerInfoDAO;
 import org.generationcp.middleware.dao.gdms.MarkerMetadataSetDAO;
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
-import org.generationcp.middleware.pojos.GidNidElement;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
@@ -930,28 +929,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         }
         
         return nids;
-    }
-
-    @Override
-    public List<GidNidElement> getGidAndNidByGermplasmNames(List<String> germplasmNames) throws QueryException{
-
-        HibernateUtil hibernateUtilForCentral = getHibernateUtil(Database.CENTRAL);
-        HibernateUtil hibernateUtilForLocal = getHibernateUtil(Database.LOCAL);
-        
-        List<GidNidElement> results = new ArrayList<GidNidElement>();
-        NameDAO dao = new NameDAO();
-        
-        if (hibernateUtilForCentral != null) {
-            dao.setSession(hibernateUtilForCentral.getCurrentSession());
-            results = dao.getGidAndNidByGermplasmNames(germplasmNames);
-        } 
-
-        if (hibernateUtilForLocal != null) {
-            dao.setSession(hibernateUtilForLocal.getCurrentSession());
-            results = dao.getGidAndNidByGermplasmNames(germplasmNames);
-        } 
-        
-        return results;
     }
 
 }
