@@ -14,10 +14,12 @@ package org.generationcp.middleware.dao;
 
 import java.util.List;
 
-import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 public class WorkbenchDatasetDAO extends GenericDAO<WorkbenchDataset, Long>{
@@ -65,6 +67,56 @@ public class WorkbenchDatasetDAO extends GenericDAO<WorkbenchDataset, Long>{
             return (WorkbenchDataset) criteria.uniqueResult();
         } catch (HibernateException e) {
             throw new QueryException("Error finding all workbench datasets: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Returns a list of {@link WorkbenchDataset} records by project id.
+     *
+     * @param projectId the project id
+     * @param start the start
+     * @param numOfRows the num of rows
+     * @return the list of {@link WorkbenchDataset}s
+     * @throws QueryException the query exception
+     */
+    @SuppressWarnings("unchecked")
+    public List<WorkbenchDataset> getByProjectId(Long projectId, int start, int numOfRows) 
+        throws QueryException {
+        
+        try {
+            Criteria criteria = getSession().createCriteria(WorkbenchDataset.class);
+            Project p = new Project();
+            p.setProjectId(projectId);
+            
+            criteria.add(Restrictions.eq("project", p));
+            criteria.setFirstResult(start);
+            criteria.setMaxResults(numOfRows);
+            
+            return (List<WorkbenchDataset>) criteria.list();
+        } catch (HibernateException e) {
+            throw new QueryException("Error with getByWorkbenchProjectId query: " + e.getMessage(), e);
+        } 
+    }
+    
+    /**
+     * Returns the number of {@link WorkbenchDataset} records by project id.
+     *
+     * @param projectId the project id
+     * @return the number of {@link WorkbenchDataset} records
+     * @throws QueryException the query exception
+     */
+    public Long countByProjectId(Long projectId) throws QueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(WorkbenchDataset.class);
+            Project p = new Project();
+            p.setProjectId(projectId);
+            
+            criteria.add(Restrictions.eq("project", p));
+            criteria.setProjection(Projections.rowCount());
+            
+            return (Long) criteria.uniqueResult();
+        } catch (HibernateException e) {
+            throw new QueryException("Error with countByWorkbenchProjectId query: " + e.getMessage(), e);
         }
     }
 }

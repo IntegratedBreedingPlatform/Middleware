@@ -440,5 +440,35 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         dao.setSession(hibernateUtil.getCurrentSession());
         return dao.getLastOpenedProject(userId);
     }
+
+    @Override
+    public List<WorkbenchDataset> getWorkbenchDatasetByProjectId(Long projectId, int start, int numOfRows) 
+        throws QueryException {
+        
+        WorkbenchDatasetDAO dao = new WorkbenchDatasetDAO();
+        List<WorkbenchDataset> list;
+        
+        if(hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+            list = dao.getByProjectId(projectId, start, numOfRows);
+        } else {
+            list = new ArrayList<WorkbenchDataset>();
+        }
+
+        return list;
+    }
+
+    @Override
+    public Long countWorkbenchDatasetByProjectId(Long projectId) throws QueryException {
+        WorkbenchDatasetDAO dao = new WorkbenchDatasetDAO();
+        Long result = 0L;
+        
+        if(hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+            result = dao.countByProjectId(projectId);
+        }
+
+        return result;
+    }
     
 }

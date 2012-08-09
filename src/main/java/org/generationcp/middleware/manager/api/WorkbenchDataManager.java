@@ -235,4 +235,23 @@ public interface WorkbenchDataManager{
      */
     public Project getLastOpenedProject(Integer userId) throws QueryException;
     
+    /**
+     * Returns a list of {@link WorkbenchDataset} records by project id.
+     *
+     * @param projectId the project id
+     * @param start the start
+     * @param numOfRows the num of rows
+     * @return the list of {@link WorkbenchDataset}s
+     * @throws QueryException the query exception
+     */
+    public List<WorkbenchDataset> getWorkbenchDatasetByProjectId(Long projectId, int start, int numOfRows) throws QueryException;
+    
+    /**
+     * Returns the number of {@link WorkbenchDataset} records by project id.
+     *
+     * @param projectId the project id
+     * @return the number of {@link WorkbenchDataset} records
+     * @throws QueryException the query exception
+     */
+    public Long countWorkbenchDatasetByProjectId(Long projectId) throws QueryException;
 }

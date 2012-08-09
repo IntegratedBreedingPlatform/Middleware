@@ -37,15 +37,6 @@ public class TestWorkbenchDataManagerImpl{
     private static WorkbenchDataManager manager;
     private static HibernateUtil hibernateUtil;
 
-    public static void main(String[] args) throws Exception {
-        TestWorkbenchDataManagerImpl t = new TestWorkbenchDataManagerImpl();
-        TestWorkbenchDataManagerImpl.setUp();
-        
-        t.testAddPerson();
-        
-        TestWorkbenchDataManagerImpl.tearDown();
-    }
-    
     @BeforeClass
     public static void setUp() throws Exception {
     	
@@ -165,7 +156,37 @@ public class TestWorkbenchDataManagerImpl{
         }
         System.out.println("TestAddDataset: " + result);
     }
-
+    
+    @Test 
+    public void testGetWorkbenchDatasetByProjectId() {
+        try {
+            List<WorkbenchDataset> list = manager.getWorkbenchDatasetByProjectId(1L, 0, 10);
+            System.out.println("testGetWorkbenchDatasetByProjectId(): ");
+            
+            if(list.isEmpty()) {
+                System.out.println("No records found.");
+            }
+            
+            for(WorkbenchDataset d : list) {
+                System.out.println(d.getDatasetId() + ": " + d.getName());
+            }
+        } catch (Exception e) {
+            System.out.println("Error in testGetWorkbenchDatasetByProjectId(): " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    @Test
+    public void testCountWorkbenchDatasetByProjectId() {
+        try {
+            Long result = manager.countWorkbenchDatasetByProjectId(435L);
+            System.out.println("testCountWorkbenchDatasetByProjectId(): " + result);
+        } catch (Exception e) {
+            System.out.println("Error in testCountWorkbenchDatasetByProjectId(): " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
     @AfterClass
     public static void tearDown() throws Exception {
         hibernateUtil.shutdown();
