@@ -375,5 +375,22 @@ public interface WorkbenchDataManager{
      * @throws QueryException the query exception
      */
     public void deleteProjectUser(ProjectUser projectUser) throws QueryException;
+    
+    /**
+     * Return a List of {@link User} records associated with a {@link Project}
+     *
+     * @param projectId - the project id
+     * @return the List of {@link User} records
+     * @throws QueryException the query exception
+     */
+    public List<User> getUsersByProjectId(Long projectId) throws QueryException;
 
+    /**
+     * Returns the number of {@link User} records associated with a {@link Project}
+     *
+     * @param projectId - the project id
+     * @return the number of {@link User} records
+     * @throws QueryException the query exception
+     */
+    public Long countUsersByProjectId(Long projectId) throws QueryException;
 }

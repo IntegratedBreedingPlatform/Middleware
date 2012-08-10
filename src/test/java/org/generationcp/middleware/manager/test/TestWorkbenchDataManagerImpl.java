@@ -296,6 +296,35 @@ public class TestWorkbenchDataManagerImpl{
         manager.deleteProjectUser(manager.getProjectUserByProjectAndUser(project1, user2));
     }
     
+    @Test
+    public void testGetUsersByProjectId() {
+        try {
+            List<User> users =  manager.getUsersByProjectId(1L);
+            System.out.println("testGetUsersByProjectId(): ");
+            
+            if(users.isEmpty()) {
+                System.out.println("No records found.");
+            }
+            
+            for(User u : users) {
+                System.out.println(u.getUserid() + ": " + u.getName());
+            }
+        } catch (Exception e) {
+            System.out.println("Error in testGetUsersByProjectId(): " + e.getMessage());
+            e.printStackTrace();
+        } 
+    }
+    
+    @Test
+    public void testCountUsersByProjectId() {
+        try {
+            Long result =  manager.countUsersByProjectId(1L);
+            System.out.println("testCountUsersByProjectId(): " + result);
+        } catch (Exception e) {
+            System.out.println("Error in testCountUsersByProjectId(): " + e.getMessage());
+            e.printStackTrace();
+        } 
+    }
     
     @AfterClass
     public static void tearDown() throws Exception {

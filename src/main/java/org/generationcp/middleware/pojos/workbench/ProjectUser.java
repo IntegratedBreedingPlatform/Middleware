@@ -50,23 +50,24 @@ public class ProjectUser implements Serializable{
     @JoinColumn(name = "project_id")
     private Project project;
 
-    /** The method. */
-    @Column(name = "user_id")
-    private Integer userId;
+    /** The user. */
+    @OneToOne(optional = false)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     
     public ProjectUser() {
     }
 
-    public ProjectUser(Long projectUserId, Project project, Integer userId) {
+    public ProjectUser(Long projectUserId, Project project, User userId) {
         this.projectUserId = projectUserId;
         this.project = project;
-        this.userId = userId;
+        this.user = userId;
     }
 
     public ProjectUser(Project project, User user) {
         this.project = project;
-        this.userId = user.getUserid();
+        this.user = user;
     }
 
     public Long getProjectUserId() {
@@ -85,12 +86,12 @@ public class ProjectUser implements Serializable{
         this.project = project;
     }
     
-    public Integer getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
     
-    public void setUserId(Integer userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     /* (non-Javadoc)
@@ -125,7 +126,7 @@ public class ProjectUser implements Serializable{
     public String toString() {
         return "ProjectUser [projectUserId=" + projectUserId +
                 ", project=" + project +
-                ", userId=" + userId + "]";
+                ", user=" + user + "]";
     }
 
 }

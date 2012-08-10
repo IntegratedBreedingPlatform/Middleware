@@ -576,7 +576,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     public int addProjectUser(Project project, User user) throws QueryException{
         ProjectUser projectUser = new ProjectUser();
         projectUser.setProject(project);
-        projectUser.setUserId(user.getUserid());
+        projectUser.setUser(user);
         return addProjectUser(projectUser);
     }
 
@@ -697,5 +697,32 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         } finally {
             hibernateUtil.closeCurrentSession();
         }
+    }
+
+    @Override
+    public List<User> getUsersByProjectId(Long projectId) throws QueryException {
+        ProjectUserDAO dao = new ProjectUserDAO();
+        List<User> users;
+        if(hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+            users = dao.getUsersByProjectId(projectId);
+        } else {
+            users = new ArrayList<User>();
+        }
+        
+        return users;
+    }
+
+    @Override
+    public Long countUsersByProjectId(Long projectId) throws QueryException {
+        ProjectUserDAO dao = new ProjectUserDAO();
+        Long result = 0L;
+        
+        if(hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+            result = dao.countUsersByProjectId(projectId);
+        }
+        
+        return result;
     }
 }
