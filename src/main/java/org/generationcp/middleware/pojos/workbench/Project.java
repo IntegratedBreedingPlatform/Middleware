@@ -203,11 +203,15 @@ public class Project implements Serializable{
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Project {");
-        sb.append("project id = ").append(projectId);
-        sb.append(", project name = ").append(projectName);
-        sb.append("}");
-
+        sb.append("Project [");
+        sb.append("projectId=").append(projectId);
+        sb.append(", projectName=").append(projectName);
+        sb.append(", targetDueDate=").append(targetDueDate);
+        sb.append(", template=").append(template);
+        sb.append(", cropType=").append(cropType);
+        sb.append(", templateModified=").append(templateModified);
+        sb.append(", lastOpenDate=").append(lastOpenDate);
+        sb.append("]");
         return sb.toString();
     }
 

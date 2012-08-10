@@ -43,7 +43,7 @@ public class TestWorkbenchDataManagerImpl{
     @BeforeClass
     public static void setUp() throws Exception {
     	
-    	hibernateUtil = new HibernateUtil("localhost", "3306", "workbench", "root", "admin");
+    	hibernateUtil = new HibernateUtil("localhost", "3306", "workbench", "root", "");
         manager = new WorkbenchDataManagerImpl(hibernateUtil);
     }
 
@@ -55,16 +55,12 @@ public class TestWorkbenchDataManagerImpl{
         project1.setCropType(CropType.CHICKPEA);
         project1.setTargetDueDate(new GregorianCalendar().getTime());
         project1.setLastOpenDate(new GregorianCalendar().getTime());
-//        project1.setLocId(0);
-//        project1.setmId(0);
 
         Project project2 = new Project();
         project2.setProjectName("Test Project 2");
         project2.setCropType(CropType.CHICKPEA);
         project2.setTargetDueDate(new GregorianCalendar().getTime());
         project2.setLastOpenDate(new GregorianCalendar().getTime());
-//        project2.setLocId(0);
-//        project2.setmId(0);
 
         WorkflowTemplate marsTemplate = new WorkflowTemplate();
         marsTemplate.setTemplateId(1L);

@@ -52,7 +52,7 @@ public class WorkflowTemplate implements Serializable{
     private boolean userDefined;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JoinTable(name = "workflow_template_step", joinColumns = { @JoinColumn(name = "template_id") }, inverseJoinColumns = { @JoinColumn(
+    @JoinTable(name = "workbench_workflow_template_step", joinColumns = { @JoinColumn(name = "template_id") }, inverseJoinColumns = { @JoinColumn(
             name = "step_id") })
     @OrderColumn(name = "step_number")
     private List<WorkflowStep> steps;
@@ -121,9 +121,20 @@ public class WorkflowTemplate implements Serializable{
 
         return new EqualsBuilder().append(templateId, otherObj.templateId).isEquals();
     }
-
+    
     @Override
     public String toString() {
-        return name;
+        StringBuffer stepsString = new StringBuffer();
+        stepsString.append("[");
+        for (WorkflowStep step : steps){
+            stepsString.append(step + " | ");
+        }
+        stepsString.append("]");
+        
+        return "WorkflowTemplate [templateId=" + templateId +
+                ", name=" + name +
+                ", userDefined=" + userDefined +
+                ", steps=" + stepsString + "]";
     }
+
 }

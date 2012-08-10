@@ -120,4 +120,12 @@ public class ProjectUser implements Serializable{
 
         return new EqualsBuilder().append(projectUserId, otherObj.projectUserId).isEquals();
     }
+    
+    @Override
+    public String toString() {
+        return "ProjectUser [projectUserId=" + projectUserId +
+                ", project=" + project +
+                ", userId=" + userId + "]";
+    }
+
 }

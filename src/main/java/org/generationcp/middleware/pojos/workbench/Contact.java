@@ -172,4 +172,15 @@ public class Contact implements Serializable{
 
         return new EqualsBuilder().append(contactId, otherObj.contactId).isEquals();
     }
+    
+    @Override
+    public String toString() {
+        return "Contact [contactId=" + contactId +
+                ", title=" + title +
+                ", firstName=" + firstName +
+                ", lastName=" + lastName +
+                ", email=" + email +
+                ", phoneNumber=" + phoneNumber + "]";
+    }
+
 }

@@ -48,7 +48,7 @@ public class WorkflowStep implements Serializable{
     private String name;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JoinTable(name = "workflow_step_tool", joinColumns = { @JoinColumn(name = "step_id") }, inverseJoinColumns = { @JoinColumn(
+    @JoinTable(name = "workbench_workflow_step_tool", joinColumns = { @JoinColumn(name = "step_id") }, inverseJoinColumns = { @JoinColumn(
             name = "tool_id") })
     @OrderColumn(name = "tool_number")
     private List<Tool> tools;
@@ -98,4 +98,19 @@ public class WorkflowStep implements Serializable{
 
         return new EqualsBuilder().append(stepId, otherObj.stepId).isEquals();
     }
+    
+    @Override
+    public String toString() {
+        StringBuffer toolsString = new StringBuffer();
+        toolsString.append("[");
+        for (Tool tool : tools){
+            toolsString.append(tool + " | ");
+        }
+        toolsString.append("]");
+        
+        return "WorkflowStep [stepId=" + stepId +
+                ", name=" + name +
+                ", tools=" + toolsString + "]";
+    }
+
 }

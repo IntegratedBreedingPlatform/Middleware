@@ -65,7 +65,7 @@ public class ProjectUserDAO extends GenericDAO<ProjectUser, Integer>{
     public ProjectUser getByProjectAndUser(Project project, User user){
         List<Criterion> criteria = new ArrayList<Criterion>();
         criteria.add(Restrictions.eq("project", project));
-        criteria.add(Restrictions.eq("user", user));
+        criteria.add(Restrictions.eq("userId", user.getUserid()));
         List results = super.findByCriteria(criteria);
         return (ProjectUser) results.get(0);
     }

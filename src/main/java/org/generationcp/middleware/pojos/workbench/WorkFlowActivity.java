@@ -82,4 +82,16 @@ public class WorkFlowActivity implements Serializable{
     public void setStatus(String status) {
         this.status = status;
     }
+    
+    @Override
+    public String toString() {
+        return "WorkflowActivity [activityId=" + activityId +
+                ", title=" + title +
+                ", owner=" + owner +
+                ", date=" + date +
+                ", dueDate=" + dueDate +
+                ", project=" + project +
+                ", status=" + status + "]";
+    }
+
 }

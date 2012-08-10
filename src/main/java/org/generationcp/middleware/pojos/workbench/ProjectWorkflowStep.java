@@ -116,4 +116,13 @@ public class ProjectWorkflowStep implements Serializable{
 
         return new EqualsBuilder().append(projectWorkflowStepId, otherObj.projectWorkflowStepId).isEquals();
     }
+    
+    @Override
+    public String toString() {
+        return "ProjectWorkflowStep [step=" + step +
+                ", owner=" + owner +
+                ", dueDate=" + dueDate +
+                ", status=" + status + "]";
+    }
+
 }

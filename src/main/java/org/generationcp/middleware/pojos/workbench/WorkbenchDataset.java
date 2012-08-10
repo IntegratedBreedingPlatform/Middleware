@@ -242,13 +242,13 @@ public class WorkbenchDataset implements Serializable{
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Dataset {datasetId = ").append(datasetId);
-        sb.append(", datasetName = ").append(name);
-        sb.append(", description = ").append(description);
-        sb.append(", creationDate = ").append(creationDate);
-        sb.append(", project = ").append(project);
-        sb.append(", datasetType = ").append(datasetType);
-        sb.append("}");
+        sb.append("Dataset [datasetId=").append(datasetId);
+        sb.append(", datasetName=").append(name);
+        sb.append(", description=").append(description);
+        sb.append(", creationDate=").append(creationDate);
+        sb.append(", project=").append(project);
+        sb.append(", datasetType=").append(datasetType);
+        sb.append("]");
         return sb.toString();
     }
 }

@@ -25,7 +25,6 @@ import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.generationcp.middleware.pojos.Method;
 
 /**
  * The Class ProjectMethod.
@@ -65,20 +64,19 @@ public class ProjectMethod implements Serializable{
     private Project project;
 
     /** The method. */
-    @OneToOne(optional = false)
-    @JoinColumn(name = "method_id")
-    private Method method;
+    @Column(name = "method_id")
+    private Integer methodId;
 
 
     public ProjectMethod() {
         super();
     }
     
-    public ProjectMethod(Long projectMethodId, Project project, Method method) {
+    public ProjectMethod(Long projectMethodId, Project project, Integer methodId) {
         super();
         this.projectMethodId = projectMethodId;
         this.project = project;
-        this.method = method;
+        this.methodId = methodId;
     }
 
     /**
@@ -118,21 +116,21 @@ public class ProjectMethod implements Serializable{
     }
     
     /**
-     * Gets the method.
+     * Gets the methodId.
      *
-     * @return the method
+     * @return the methodId
      */
-    public Method getMethod() {
-        return method;
+    public Integer getMethodId() {
+        return methodId;
     }
     
     /**
-     * Sets the method.
+     * Sets the methodId.
      *
-     * @param method the new method
+     * @param methodId the new methodId
      */
-    public void setMethod(Method method) {
-        this.method = method;
+    public void setMethodId(Integer methodId) {
+        this.methodId = methodId;
     }
 
     /* (non-Javadoc)
@@ -162,4 +160,13 @@ public class ProjectMethod implements Serializable{
 
         return new EqualsBuilder().append(projectMethodId, otherObj.projectMethodId).isEquals();
     }
+    
+    @Override
+    public String toString() {
+        return "ProjectMethod [projectMethodId=" + projectMethodId +
+                ", project=" + project +
+                ", methodId=" + methodId + "]";
+    }
+
+
 }
