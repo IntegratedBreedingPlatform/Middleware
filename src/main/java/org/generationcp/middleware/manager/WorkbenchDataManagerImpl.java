@@ -54,16 +54,26 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 
     @Override
     public List<Project> getProjects() throws QueryException{
-        ProjectDAO projectDao = new ProjectDAO();
-        projectDao.setSession(hibernateUtil.getCurrentSession());
-        return projectDao.findAll();
+        try {
+            ProjectDAO projectDao = new ProjectDAO();
+            projectDao.setSession(hibernateUtil.getCurrentSession());
+            return projectDao.findAll();
+        }
+        finally {
+            hibernateUtil.closeCurrentSession();
+        }
     }
 
     @Override
     public List<Project> getProjects(int start, int numOfRows)  throws QueryException{
-        ProjectDAO projectDao = new ProjectDAO();
-        projectDao.setSession(hibernateUtil.getCurrentSession());
-        return projectDao.findAll(start, numOfRows);
+        try {
+            ProjectDAO projectDao = new ProjectDAO();
+            projectDao.setSession(hibernateUtil.getCurrentSession());
+            return projectDao.findAll(start, numOfRows);
+        }
+        finally {
+            hibernateUtil.closeCurrentSession();
+        }
     }
 
     @Override
@@ -122,39 +132,64 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 
     @Override
     public List<WorkflowTemplate> getWorkflowTemplates()  throws QueryException{
-        WorkflowTemplateDAO workflowTemplateDAO = new WorkflowTemplateDAO();
-        workflowTemplateDAO.setSession(hibernateUtil.getCurrentSession());
-        return workflowTemplateDAO.findAll();
+        try {
+            WorkflowTemplateDAO workflowTemplateDAO = new WorkflowTemplateDAO();
+            workflowTemplateDAO.setSession(hibernateUtil.getCurrentSession());
+            return workflowTemplateDAO.findAll();
+        }
+        finally {
+            hibernateUtil.closeCurrentSession();
+        }
     }
 
     @Override
     public List<WorkflowTemplate> getWorkflowTemplates(int start, int numOfRows)  throws QueryException{
-        WorkflowTemplateDAO workflowTemplateDAO = new WorkflowTemplateDAO();
-        workflowTemplateDAO.setSession(hibernateUtil.getCurrentSession());
-        return workflowTemplateDAO.findAll(start, numOfRows);
+        try {
+            WorkflowTemplateDAO workflowTemplateDAO = new WorkflowTemplateDAO();
+            workflowTemplateDAO.setSession(hibernateUtil.getCurrentSession());
+            return workflowTemplateDAO.findAll(start, numOfRows);
+        }
+        finally {
+            hibernateUtil.closeCurrentSession();
+        }
     }
 
     @Override
     public Tool getToolWithName(String toolId)  throws QueryException{
-        ToolDAO toolDAO = new ToolDAO();
-        toolDAO.setSession(hibernateUtil.getCurrentSession());
-        return toolDAO.findByToolName(toolId);
+        try {
+            ToolDAO toolDAO = new ToolDAO();
+            toolDAO.setSession(hibernateUtil.getCurrentSession());
+            return toolDAO.findByToolName(toolId);
+        }
+        finally {
+            hibernateUtil.closeCurrentSession();
+        }
     }
     
     @Override
     public List<Tool> getToolsWithType(ToolType toolType) throws QueryException {
-        ToolDAO toolDAO = new ToolDAO();
-        toolDAO.setSession(hibernateUtil.getCurrentSession());
-        return toolDAO.findToolsByToolType(toolType);
+        try {
+            ToolDAO toolDAO = new ToolDAO();
+            toolDAO.setSession(hibernateUtil.getCurrentSession());
+            return toolDAO.findToolsByToolType(toolType);
+        }
+        finally {
+            hibernateUtil.closeCurrentSession();
+        }
     }
 
     @Override
     public boolean isValidUserLogin(String username, String password) throws QueryException {
-        UserDAO dao = new UserDAO();
-        dao.setSession(hibernateUtil.getCurrentSession());
-        User user = dao.findByUsernameAndPassword(username, password);
-        if (user != null) {
-            return true;
+        try {
+            UserDAO dao = new UserDAO();
+            dao.setSession(hibernateUtil.getCurrentSession());
+            User user = dao.findByUsernameAndPassword(username, password);
+            if (user != null) {
+                return true;
+            }
+        }
+        finally {
+            hibernateUtil.closeCurrentSession();
         }
         
         return false;
@@ -162,18 +197,28 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 
     @Override
     public boolean isPersonExists(String firstName, String lastName) throws QueryException {
-        PersonDAO dao = new PersonDAO();
-        dao.setSession(hibernateUtil.getCurrentSession());
-        
-        return dao.isPersonExists(firstName, lastName);
+        try {
+            PersonDAO dao = new PersonDAO();
+            dao.setSession(hibernateUtil.getCurrentSession());
+            
+            return dao.isPersonExists(firstName, lastName);
+        }
+        finally {
+            hibernateUtil.closeCurrentSession();
+        }
     }
 
     @Override
     public boolean isUsernameExists(String userName) throws QueryException {
-        UserDAO dao = new UserDAO();
-        dao.setSession(hibernateUtil.getCurrentSession());
-        
-        return dao.isUsernameExists(userName);
+        try {
+            UserDAO dao = new UserDAO();
+            dao.setSession(hibernateUtil.getCurrentSession());
+
+            return dao.isUsernameExists(userName);
+        }
+        finally {
+            hibernateUtil.closeCurrentSession();
+        }
     }
 
     @Override
@@ -251,9 +296,14 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     }
     
     public Project getProjectById(Long projectId) throws QueryException{
-        ProjectDAO projectDao = new ProjectDAO();
-        projectDao.setSession(hibernateUtil.getCurrentSession());
-        return projectDao.getById(projectId);
+        try {
+            ProjectDAO projectDao = new ProjectDAO();
+            projectDao.setSession(hibernateUtil.getCurrentSession());
+            return projectDao.getById(projectId);
+        }
+        finally {
+            hibernateUtil.closeCurrentSession();
+        }
     }
 
     public WorkbenchDataset addDataset(WorkbenchDataset dataset) throws QueryException {
@@ -288,65 +338,82 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     
     @Override
     public List<User> getAllUsers() {
-        UserDAO dao = new UserDAO();
-        
-        List<User> users = new ArrayList<User>();
-        
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
-            users.addAll(dao.getAll());
+        try {
+            UserDAO dao = new UserDAO();
+
+            List<User> users = new ArrayList<User>();
+
+            if (hibernateUtil != null) {
+                dao.setSession(hibernateUtil.getCurrentSession());
+                users.addAll(dao.getAll());
+            }
+
+            return users;
         }
-        
-        return users;
+        finally {
+            hibernateUtil.closeCurrentSession();
+        }
     }
     
     public int countAllUsers() {
-        
-        int count = 0;
-        
-        UserDAO dao = new UserDAO();
-        
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
-            count = count + dao.countAll().intValue();
+        try {
+            int count = 0;
+
+            UserDAO dao = new UserDAO();
+
+            if (hibernateUtil != null) {
+                dao.setSession(hibernateUtil.getCurrentSession());
+                count = count + dao.countAll().intValue();
+            }
+            return count;
         }
-        return count;
+        finally {
+            hibernateUtil.closeCurrentSession();
+        }
     }  
 
     @Override
     public User getUserById(int id) {
-        UserDAO dao = new UserDAO();
-        
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
-        } else {
-            return null;
-        }
+        try {
+            UserDAO dao = new UserDAO();
 
-        return dao.findById(id, false);
+            if (hibernateUtil != null) {
+                dao.setSession(hibernateUtil.getCurrentSession());
+            } else {
+                return null;
+            }
+
+            return dao.findById(id, false);
+        }
+        finally {
+            hibernateUtil.closeCurrentSession();
+        }
     }
     
     @Override
     public List<User> getUserByName(String name, int start, int numOfRows, Operation op) throws QueryException {
+        try {
+            UserDAO dao = new UserDAO();
 
-        UserDAO dao = new UserDAO();
-        
-        List<User> users = new ArrayList<User>();
+            List<User> users = new ArrayList<User>();
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
-        } else {
+            if (hibernateUtil != null) {
+                dao.setSession(hibernateUtil.getCurrentSession());
+            } else {
+                return users;
+            }
+
+            if (op == Operation.EQUAL) {
+                users.add(dao.findByNameUsingEqual(name, start, numOfRows));
+            } else if (op == Operation.LIKE) {
+                users = dao.findByNameUsingLike(name, start, numOfRows);
+            }
+
             return users;
         }
-
-        if (op == Operation.EQUAL) {
-                users.add(dao.findByNameUsingEqual(name, start, numOfRows));
-        } else if (op == Operation.LIKE) {
-                users = dao.findByNameUsingLike(name, start, numOfRows);
+        finally {
+            hibernateUtil.closeCurrentSession();
         }
-
-        return users;
-
     }
 
     @Override
@@ -378,49 +445,62 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     
     @Override
     public List<Person> getAllPersons() {
-        PersonDAO dao = new PersonDAO();
-        
-        List<Person> persons = new ArrayList<Person>();
-        
-        // get the list of Persons from the local instance
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
-            persons.addAll(dao.getAll());
+        try {
+            PersonDAO dao = new PersonDAO();
+
+            List<Person> persons = new ArrayList<Person>();
+
+            // get the list of Persons from the local instance
+            if (hibernateUtil != null) {
+                dao.setSession(hibernateUtil.getCurrentSession());
+                persons.addAll(dao.getAll());
+            }
+
+            return persons;
         }
-        
-        return persons;
+        finally {
+            hibernateUtil.closeCurrentSession();
+        }
     }
     
     public int countAllPersons() {
-        
-        int count = 0;
-        
-        PersonDAO dao = new PersonDAO();
-        
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
-            count = count + dao.countAll().intValue();
+        try {
+            int count = 0;
+
+            PersonDAO dao = new PersonDAO();
+
+            if (hibernateUtil != null) {
+                dao.setSession(hibernateUtil.getCurrentSession());
+                count = count + dao.countAll().intValue();
+            }
+
+            return count;
         }
-        
-        return count;
-    }    
+        finally {
+            hibernateUtil.closeCurrentSession();
+        }
+    }
 
     @Override
     public Person getPersonById(int id) {
-        PersonDAO dao = new PersonDAO();
+        try {
+            PersonDAO dao = new PersonDAO();
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
-        } else {
-            return null;
+            if (hibernateUtil != null) {
+                dao.setSession(hibernateUtil.getCurrentSession());
+            } else {
+                return null;
+            }
+
+            return dao.findById(id, false);
         }
-
-        return dao.findById(id, false);
+        finally {
+            hibernateUtil.closeCurrentSession();
+        }
     }
 
     @Override
     public void deletePerson(Person person) throws QueryException {
-        
         Session session = hibernateUtil.getCurrentSession();
         Transaction trans = null;
         
@@ -447,137 +527,183 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 
     @Override
     public Project getLastOpenedProject(Integer userId) throws QueryException {
-        ProjectDAO dao = new ProjectDAO();
-        dao.setSession(hibernateUtil.getCurrentSession());
-        return dao.getLastOpenedProject(userId);
+        try {
+            ProjectDAO dao = new ProjectDAO();
+            dao.setSession(hibernateUtil.getCurrentSession());
+            return dao.getLastOpenedProject(userId);
+        }
+        finally {
+            hibernateUtil.closeCurrentSession();
+        }
     }
 
     @Override
     public List<WorkbenchDataset> getWorkbenchDatasetByProjectId(Long projectId, int start, int numOfRows) 
         throws QueryException {
         
-        WorkbenchDatasetDAO dao = new WorkbenchDatasetDAO();
-        List<WorkbenchDataset> list;
-        
-        if(hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
-            list = dao.getByProjectId(projectId, start, numOfRows);
-        } else {
-            list = new ArrayList<WorkbenchDataset>();
-        }
+        try {
+            WorkbenchDatasetDAO dao = new WorkbenchDatasetDAO();
+            List<WorkbenchDataset> list;
 
-        return list;
+            if(hibernateUtil != null) {
+                dao.setSession(hibernateUtil.getCurrentSession());
+                list = dao.getByProjectId(projectId, start, numOfRows);
+            } else {
+                list = new ArrayList<WorkbenchDataset>();
+            }
+
+            return list;
+        }
+        finally {
+            hibernateUtil.closeCurrentSession();
+        }
     }
 
     @Override
     public Long countWorkbenchDatasetByProjectId(Long projectId) throws QueryException {
-        WorkbenchDatasetDAO dao = new WorkbenchDatasetDAO();
-        Long result = 0L;
-        
-        if(hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
-            result = dao.countByProjectId(projectId);
-        }
+        try {
+            WorkbenchDatasetDAO dao = new WorkbenchDatasetDAO();
+            Long result = 0L;
 
-        return result;
+            if(hibernateUtil != null) {
+                dao.setSession(hibernateUtil.getCurrentSession());
+                result = dao.countByProjectId(projectId);
+            }
+
+            return result;
+        }
+        finally {
+            hibernateUtil.closeCurrentSession();
+        }
     }
 
     @Override
     public List<WorkbenchDataset> getWorkbenchDatasetByName(String name, Operation op, 
                                                             int start, int numOfRows) 
         throws QueryException {
-        
-        WorkbenchDatasetDAO dao = new WorkbenchDatasetDAO();
-        List<WorkbenchDataset> list;
-        
-        if(hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
-            list = dao.getByName(name, op, start, numOfRows);
-        } else {
-            list = new ArrayList<WorkbenchDataset>();
+        try {
+            WorkbenchDatasetDAO dao = new WorkbenchDatasetDAO();
+            List<WorkbenchDataset> list;
+
+            if(hibernateUtil != null) {
+                dao.setSession(hibernateUtil.getCurrentSession());
+                list = dao.getByName(name, op, start, numOfRows);
+            } else {
+                list = new ArrayList<WorkbenchDataset>();
+            }
+
+            return list;
         }
-        
-        return list;
+        finally {
+            hibernateUtil.closeCurrentSession();
+        }
     }
 
     @Override
     public Long countWorkbenchDatasetByName(String name, Operation op) throws QueryException {
-        WorkbenchDatasetDAO dao = new WorkbenchDatasetDAO();
-        Long result = 0L;
-        
-        if(hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
-            result = dao.countByName(name, op);
-        }
+        try {
+            WorkbenchDatasetDAO dao = new WorkbenchDatasetDAO();
+            Long result = 0L;
 
-        return result;
+            if(hibernateUtil != null) {
+                dao.setSession(hibernateUtil.getCurrentSession());
+                result = dao.countByName(name, op);
+            }
+
+            return result;
+        }
+        finally {
+            hibernateUtil.closeCurrentSession();
+        }
     }
 
     @Override
     public List<Long> getLocationIdsByProjectId(Long projectId, int start, int numOfRows) 
         throws QueryException {
-        
-        ProjectLocationMapDAO dao = new ProjectLocationMapDAO();
-        List<Long> ids;
-        
-        if(hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
-            ids = dao.getLocationIdsByProjectId(projectId, start, numOfRows);
-        } else {
-            ids = new ArrayList<Long>();
+        try {
+            ProjectLocationMapDAO dao = new ProjectLocationMapDAO();
+            List<Long> ids;
+
+            if(hibernateUtil != null) {
+                dao.setSession(hibernateUtil.getCurrentSession());
+                ids = dao.getLocationIdsByProjectId(projectId, start, numOfRows);
+            } else {
+                ids = new ArrayList<Long>();
+            }
+
+            return ids;
         }
-        
-        return ids;
+        finally {
+            hibernateUtil.closeCurrentSession();
+        }
     }
 
     @Override
     public Long countLocationIdsByProjectId(Long projectId) throws QueryException {
-        ProjectLocationMapDAO dao = new ProjectLocationMapDAO();
-        Long result = 0L;
-        
-        if(hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
-            result = dao.countLocationIdsByProjectId(projectId);
-        } 
-        
-        return result;
+        try {
+            ProjectLocationMapDAO dao = new ProjectLocationMapDAO();
+            Long result = 0L;
+
+            if(hibernateUtil != null) {
+                dao.setSession(hibernateUtil.getCurrentSession());
+                result = dao.countLocationIdsByProjectId(projectId);
+            } 
+
+            return result;
+        }
+        finally {
+            hibernateUtil.closeCurrentSession();
+        }
     }
 
     @Override
     public List<Method> getMethodsByProjectId(Long projectId, int start, int numOfRows) throws QueryException{
-            
-        ProjectMethodDAO dao = new ProjectMethodDAO();
-        List<Method> list;
-        
-        if(hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
-            list = dao.getByProjectId(projectId, start, numOfRows);
-        } else {
-            list = new ArrayList<Method>();
+        try {
+            ProjectMethodDAO dao = new ProjectMethodDAO();
+            List<Method> list;
+
+            if(hibernateUtil != null) {
+                dao.setSession(hibernateUtil.getCurrentSession());
+                list = dao.getByProjectId(projectId, start, numOfRows);
+            } else {
+                list = new ArrayList<Method>();
+            }
+
+            return list;
         }
-
-        return list;
-
+        finally {
+            hibernateUtil.closeCurrentSession();
+        }
     }
 
     @Override
     public Long countMethodsByProjectId(Long projectId) throws QueryException {
-        ProjectMethodDAO dao = new ProjectMethodDAO();
-        Long result = 0L;
-        
-        if(hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
-            result = dao.countByProjectId(projectId);
-        }
+        try {
+            ProjectMethodDAO dao = new ProjectMethodDAO();
+            Long result = 0L;
 
-        return result;
+            if(hibernateUtil != null) {
+                dao.setSession(hibernateUtil.getCurrentSession());
+                result = dao.countByProjectId(projectId);
+            }
+
+            return result;
+        }
+        finally {
+            hibernateUtil.closeCurrentSession();
+        }
     }
     @Override
     public int addProjectUser(Project project, User user) throws QueryException{
-        ProjectUser projectUser = new ProjectUser();
-        projectUser.setProject(project);
-        projectUser.setUser(user);
-        return addProjectUser(projectUser);
+        try {
+            ProjectUser projectUser = new ProjectUser();
+            projectUser.setProject(project);
+            projectUser.setUser(user);
+            return addProjectUser(projectUser);
+        }
+        finally {
+            hibernateUtil.closeCurrentSession();
+        }
     }
 
     @Override
@@ -651,22 +777,33 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     
     @Override
     public ProjectUser getProjectUserById(Integer id) throws QueryException {
-        ProjectUserDAO dao = new ProjectUserDAO();
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
-            return dao.getById(id);
+        try {
+            ProjectUserDAO dao = new ProjectUserDAO();
+            if (hibernateUtil != null) {
+                dao.setSession(hibernateUtil.getCurrentSession());
+                return dao.getById(id);
+            }
+            return null;
         }
-        return null;
+        finally {
+            hibernateUtil.closeCurrentSession();
+        }
+        
     }
 
     @Override
     public ProjectUser getProjectUserByProjectAndUser(Project project, User user) throws QueryException{
-        ProjectUserDAO dao = new ProjectUserDAO();
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
-            return dao.getByProjectAndUser(project, user);
+        try {
+            ProjectUserDAO dao = new ProjectUserDAO();
+            if (hibernateUtil != null) {
+                dao.setSession(hibernateUtil.getCurrentSession());
+                return dao.getByProjectAndUser(project, user);
+            }
+            return null;
         }
-        return null;
+        finally {
+            hibernateUtil.closeCurrentSession();
+        }
     }
 
     @Override
@@ -701,28 +838,38 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 
     @Override
     public List<User> getUsersByProjectId(Long projectId) throws QueryException {
-        ProjectUserDAO dao = new ProjectUserDAO();
-        List<User> users;
-        if(hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
-            users = dao.getUsersByProjectId(projectId);
-        } else {
-            users = new ArrayList<User>();
+        try {
+            ProjectUserDAO dao = new ProjectUserDAO();
+            List<User> users;
+            if(hibernateUtil != null) {
+                dao.setSession(hibernateUtil.getCurrentSession());
+                users = dao.getUsersByProjectId(projectId);
+            } else {
+                users = new ArrayList<User>();
+            }
+
+            return users;
         }
-        
-        return users;
+        finally {
+            hibernateUtil.closeCurrentSession();
+        }
     }
 
     @Override
     public Long countUsersByProjectId(Long projectId) throws QueryException {
-        ProjectUserDAO dao = new ProjectUserDAO();
-        Long result = 0L;
-        
-        if(hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
-            result = dao.countUsersByProjectId(projectId);
+        try {
+            ProjectUserDAO dao = new ProjectUserDAO();
+            Long result = 0L;
+
+            if(hibernateUtil != null) {
+                dao.setSession(hibernateUtil.getCurrentSession());
+                result = dao.countUsersByProjectId(projectId);
+            }
+
+            return result;
         }
-        
-        return result;
+        finally {
+            hibernateUtil.closeCurrentSession();
+        }
     }
 }
