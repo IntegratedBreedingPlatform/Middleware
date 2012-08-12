@@ -63,7 +63,8 @@ public class ManagerFactory implements Serializable{
 
     
     public ManagerFactory() {
-    
+        LOG.trace("Created ManagerFactory instance");
+        
 	    Properties prop = new Properties();
 	
 	    try {
@@ -134,7 +135,8 @@ public class ManagerFactory implements Serializable{
      */
     public ManagerFactory(DatabaseConnectionParameters paramsForLocal, DatabaseConnectionParameters paramsForCentral)
             throws ConfigException {
-    	
+        LOG.trace("Created ManagerFactory instance");
+        
     	 validateDatabaseParameters(paramsForLocal, paramsForCentral);
     	 
     }
@@ -208,6 +210,8 @@ public class ManagerFactory implements Serializable{
      * Closes the db connection by shutting down the HibernateUtil object
      */
     public void close() {
+        LOG.trace("Closing ManagerFactory...");
+        
         if (this.hibernateUtilForLocal != null) {
             this.hibernateUtilForLocal.shutdown();
         }
@@ -215,5 +219,7 @@ public class ManagerFactory implements Serializable{
         if (this.hibernateUtilForCentral != null) {
             this.hibernateUtilForCentral.shutdown();
         }
+        
+        LOG.trace("Closing ManagerFactory... DONE");
     }
 }
