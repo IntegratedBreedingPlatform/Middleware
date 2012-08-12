@@ -139,6 +139,7 @@ public class HibernateUtil implements Serializable{
      * Closes the SessionFactory object to release its resources.
      */
     public void shutdown() {
+        closeCurrentSession();
         getSessionFactory().close();
     }
 
