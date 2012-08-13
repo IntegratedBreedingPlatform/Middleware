@@ -21,6 +21,7 @@ import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectUser;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -48,7 +49,7 @@ public class ProjectUserDAO extends GenericDAO<ProjectUser, Integer>{
         if (projectUser.getProject() == null || projectUser.getProject().getProjectId() == null){
             throw new IllegalArgumentException("Project cannot be null");
         }
-        if (projectUser.getUser() == null){
+        if (projectUser.getUserId() == null){
             throw new IllegalArgumentException("User cannot be null");
         }
         
@@ -76,7 +77,7 @@ public class ProjectUserDAO extends GenericDAO<ProjectUser, Integer>{
     public ProjectUser getByProjectAndUser(Project project, User user){
         List<Criterion> criteria = new ArrayList<Criterion>();
         criteria.add(Restrictions.eq("project", project));
-        criteria.add(Restrictions.eq("user", user));
+        criteria.add(Restrictions.eq("userId", user.getUserid()));
         List results = super.findByCriteria(criteria);
         return (ProjectUser) results.get(0);
     }
@@ -92,13 +93,28 @@ public class ProjectUserDAO extends GenericDAO<ProjectUser, Integer>{
     @SuppressWarnings("unchecked")
     public List<User> getUsersByProjectId(Long projectId) throws QueryException {
         try {
-            Criteria criteria = getSession().createCriteria(ProjectUser.class);
-            Project p = new Project();
-            p.setProjectId(projectId);
-            criteria.add(Restrictions.eq("project", p));
-            criteria.setProjection(Projections.property("user"));
             
-            List<User> users = criteria.list();
+            SQLQuery query = getSession().createSQLQuery(ProjectUser.GET_USERS_BY_PROJECT_ID);
+            query.setParameter("projectId", projectId);
+            List<User> users = new ArrayList<User>();
+            
+            List<Object> results = query.list();
+            for(Object o : results) {
+                Object[] user = (Object[]) o;
+                Integer userId = (Integer) user[0];
+                Integer instalId = (Integer) user[1];
+                Integer uStatus = (Integer) user[2];
+                Integer uAccess = (Integer) user[3];
+                Integer uType = (Integer) user[4];
+                String uName = (String) user[5];
+                String upswd = (String) user[6];
+                Integer personId = (Integer) user[7];
+                Integer aDate = (Integer) user[8];
+                Integer cDate = (Integer) user[9];
+                User u = new User(userId, instalId, uStatus, uAccess, uType, uName, upswd, personId, aDate, cDate);
+                users.add(u);
+            }
+            
             return users;
         } catch (HibernateException e) {
             throw new QueryException("Error in getUsersByProjectId(): " + e.getMessage(), e);

@@ -16,7 +16,6 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.Database;
-import org.generationcp.middleware.pojos.GidNidElement;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
@@ -336,11 +335,10 @@ public interface GenotypicDataManager{
      * Count marker names by marker type.
      *
      * @param markerType the marker type
-     * @param instance the instance
      * @return the long
      * @throws QueryException the query exception
      */
-    public Long countMarkerNamesByMarkerType(String markerType, Database instance) throws QueryException;
+    public Long countMarkerNamesByMarkerType(String markerType) throws QueryException;
     
     /**
      * Gets the gids from char values by marker id.
@@ -488,11 +486,10 @@ public interface GenotypicDataManager{
     /**
      * Count all db accession ids from marker.
      *
-     * @param instance the instance
      * @return the number of non-empty db accession ids from marker
      * @throws QueryException the query exception
      */
-    public Long countAllDbAccessionIdsFromMarker(Database instance) throws QueryException;
+    public Long countAllDbAccessionIdsFromMarker() throws QueryException;
     
     /**
      * Gets the nids from acc metadataset by dataset ids.

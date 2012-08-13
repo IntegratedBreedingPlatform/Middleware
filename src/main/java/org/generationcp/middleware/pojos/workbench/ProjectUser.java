@@ -39,6 +39,19 @@ public class ProjectUser implements Serializable{
 
     private static final long serialVersionUID = 1L;
 
+    
+    
+    public static final String GET_USERS_BY_PROJECT_ID = 
+            "SELECT users.userid, users.instalid, users.ustatus, users.uaccess, users.utype, " +
+            "users.uname, users.upswd, users.personid, users.adate, users.cdate " + 
+            "FROM users JOIN workbench_project_user pu ON users.userid = pu.user_id " +
+            "WHERE pu.project_id = :projectId";
+    
+    public static final String COUNT_METHODS_BY_PROJECT_ID = 
+            "SELECT COUNT(users.userid) " + 
+            "FROM users JOIN workbench_project_user pu ON users.userid = pu.user_id " +
+            "WHERE pu.project_id = :projectId";
+    
     @Id
     @Basic(optional = false)
     @GeneratedValue
@@ -51,23 +64,22 @@ public class ProjectUser implements Serializable{
     private Project project;
 
     /** The user. */
-    @OneToOne(optional = false)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(name = "user_id")
+    private Integer userId;
 
     
     public ProjectUser() {
     }
 
-    public ProjectUser(Long projectUserId, Project project, User userId) {
+    public ProjectUser(Long projectUserId, Project project, Integer userId) {
         this.projectUserId = projectUserId;
         this.project = project;
-        this.user = userId;
+        this.userId = userId;
     }
 
     public ProjectUser(Project project, User user) {
         this.project = project;
-        this.user = user;
+        this.userId = user.getUserid();
     }
 
     public Long getProjectUserId() {
@@ -86,12 +98,12 @@ public class ProjectUser implements Serializable{
         this.project = project;
     }
     
-    public User getUser() {
-        return user;
+    public Integer getUserId() {
+        return userId;
     }
     
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
     /* (non-Javadoc)
@@ -126,7 +138,7 @@ public class ProjectUser implements Serializable{
     public String toString() {
         return "ProjectUser [projectUserId=" + projectUserId +
                 ", project=" + project +
-                ", user=" + user + "]";
+                ", userId=" + userId + "]";
     }
 
 }

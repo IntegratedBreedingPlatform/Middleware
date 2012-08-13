@@ -575,7 +575,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     public int addProjectUser(Project project, User user) throws QueryException{
         ProjectUser projectUser = new ProjectUser();
         projectUser.setProject(project);
-        projectUser.setUser(user);
+        projectUser.setUserId(user.getUserid());
         return addProjectUser(projectUser);
     }
 

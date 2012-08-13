@@ -707,14 +707,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         if(hibernateUtilForCentral != null) {
             
             dao.setSession(hibernateUtilForCentral.getCurrentSession());
-            centralCount = dao.countAll().intValue();
+            centralCount = dao.countMarkerNamesByMarkerType(markerType).intValue();
             
             if(centralCount > start) {
                 markerNames.addAll(dao.getMarkerNamesByMarkerType(markerType, start, numOfRows));
                 relativeLimit = numOfRows - markerNames.size();
                 if(relativeLimit > 0 && hibernateUtilForLocal != null) {
                     dao.setSession(hibernateUtilForLocal.getCurrentSession());
-                    localCount = dao.countAll().intValue();
+                    localCount = dao.countMarkerNamesByMarkerType(markerType).intValue();
                     if(localCount > 0) {
                         markerNames.addAll(dao.getMarkerNamesByMarkerType(markerType, 0, relativeLimit));
                     }
@@ -723,7 +723,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                 relativeLimit = start - centralCount;
                 if (hibernateUtilForLocal != null) {
                     dao.setSession(hibernateUtilForLocal.getCurrentSession());
-                    localCount = dao.countAll().intValue();
+                    localCount = dao.countMarkerNamesByMarkerType(markerType).intValue();
                     if (localCount > relativeLimit) {
                         markerNames.addAll(dao.getMarkerNamesByMarkerType(markerType, relativeLimit, numOfRows));
                     }
@@ -731,7 +731,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             }
         } else if (hibernateUtilForLocal != null) {
             dao.setSession(hibernateUtilForLocal.getCurrentSession());
-            localCount = dao.countAll().intValue();
+            localCount = dao.countMarkerNamesByMarkerType(markerType).intValue();
             if (localCount > start) {
                 markerNames.addAll(dao.getMarkerNamesByMarkerType(markerType, start, numOfRows));
             }
@@ -741,16 +741,20 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
 
     @Override
-    public Long countMarkerNamesByMarkerType(String markerType, Database instance) 
+    public Long countMarkerNamesByMarkerType(String markerType) 
         throws QueryException {
 
         MarkerDAO dao = new MarkerDAO();
-        HibernateUtil util = getHibernateUtil(instance);
         Long result = 0L;
         
-        if(util != null) {
-            dao.setSession(util.getCurrentSession());
+        if(hibernateUtilForCentral != null) {
+            dao.setSession(hibernateUtilForCentral.getCurrentSession());
             result = dao.countMarkerNamesByMarkerType(markerType);
+        }
+        
+        if(hibernateUtilForLocal != null) {
+            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+            result += dao.countMarkerNamesByMarkerType(markerType);
         }
         
         return result;
@@ -859,14 +863,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         if(hibernateUtilForCentral != null) {
             
             dao.setSession(hibernateUtilForCentral.getCurrentSession());
-            centralCount = countAllDbAccessionIdsFromMarker(Database.CENTRAL).intValue();
+            centralCount = dao.countAllDbAccessionIds().intValue();
             
             if(centralCount > start) {
                 dbAccessionIds.addAll(dao.getAllDbAccessionIds(start, numOfRows));
                 relativeLimit = numOfRows - dbAccessionIds.size();
                 if(relativeLimit > 0 && hibernateUtilForLocal != null) {
                     dao.setSession(hibernateUtilForLocal.getCurrentSession());
-                    localCount = countAllDbAccessionIdsFromMarker(Database.LOCAL).intValue();
+                    localCount = dao.countAllDbAccessionIds().intValue();
                     if(localCount > 0) {
                         dbAccessionIds.addAll(dao.getAllDbAccessionIds(0, relativeLimit));
                     }
@@ -875,7 +879,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                 relativeLimit = start - centralCount;
                 if (hibernateUtilForLocal != null) {
                     dao.setSession(hibernateUtilForLocal.getCurrentSession());
-                    localCount = countAllDbAccessionIdsFromMarker(Database.LOCAL).intValue();
+                    localCount = dao.countAllDbAccessionIds().intValue();
                     if (localCount > relativeLimit) {
                         dbAccessionIds.addAll(dao.getAllDbAccessionIds(relativeLimit, numOfRows));
                     }
@@ -883,7 +887,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             }
         } else if (hibernateUtilForLocal != null) {
             dao.setSession(hibernateUtilForLocal.getCurrentSession());
-            localCount = countAllDbAccessionIdsFromMarker(Database.LOCAL).intValue();
+            localCount = dao.countAllDbAccessionIds().intValue();
             if (localCount > start) {
                 dbAccessionIds.addAll(dao.getAllDbAccessionIds(start, numOfRows));
             }
@@ -893,14 +897,18 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
 
     @Override
-    public Long countAllDbAccessionIdsFromMarker(Database instance) throws QueryException {
+    public Long countAllDbAccessionIdsFromMarker() throws QueryException {
         MarkerDAO dao = new MarkerDAO();
-        HibernateUtil util = getHibernateUtil(instance);
         Long result = 0L;
         
-        if(util != null) {
-            dao.setSession(util.getCurrentSession());
+        if(hibernateUtilForCentral != null) {
+            dao.setSession(hibernateUtilForCentral.getCurrentSession());
             result = dao.countAllDbAccessionIds();
+        }
+        
+        if(hibernateUtilForLocal != null) {
+            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+            result += dao.countAllDbAccessionIds();
         }
         
         return result;

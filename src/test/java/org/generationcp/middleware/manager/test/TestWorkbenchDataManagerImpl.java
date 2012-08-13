@@ -224,7 +224,7 @@ public class TestWorkbenchDataManagerImpl{
     @Test
     public void testGetLocationIdsByProjectId() {
         try {
-            List<Long> ids = manager.getLocationIdsByProjectId(2L, 0, 10);
+            List<Long> ids = manager.getLocationIdsByProjectId(1L, 0, 10);
             System.out.println("testgetLocationIdsByProjectId(): " + ids);
         } catch (Exception e) {
             System.out.println("Error in testGetLocationIdsByProjectId(): " + e.getMessage());

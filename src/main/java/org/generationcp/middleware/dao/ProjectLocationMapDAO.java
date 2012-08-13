@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectLocationMap;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -49,8 +50,9 @@ public class ProjectLocationMapDAO extends GenericDAO<ProjectLocationMap, Long>{
         
         try {
             Criteria criteria = getSession().createCriteria(ProjectLocationMap.class);
-            
-            criteria.add(Restrictions.eq("projectId", projectId));
+            Project p = new Project();
+            p.setProjectId(projectId);
+            criteria.add(Restrictions.eq("project", p));
             criteria.setProjection(Projections.property("locationId"));
             criteria.setFirstResult(start);
             criteria.setMaxResults(numOfRows);
@@ -72,7 +74,9 @@ public class ProjectLocationMapDAO extends GenericDAO<ProjectLocationMap, Long>{
         throws QueryException {
         try {
             Criteria criteria = getSession().createCriteria(ProjectLocationMap.class);
-            criteria.add(Restrictions.eq("projectId", projectId));
+            Project p = new Project();
+            p.setProjectId(projectId);
+            criteria.add(Restrictions.eq("project", p));
             criteria.setProjection(Projections.rowCount());
             
             return (Long) criteria.uniqueResult();

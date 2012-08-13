@@ -19,6 +19,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 /**
@@ -42,9 +44,9 @@ public class ProjectLocationMap implements Serializable{
     @Column(name = "id")
     private Long id;
 
-    @Basic(optional = false)
-    @Column(name = "project_id")
-    private Long projectId;
+    @OneToOne(optional = false)
+    @JoinColumn(name = "project_id")
+    private Project project;
 
     @Basic(optional = false)
     @Column(name = "location_id")
@@ -57,13 +59,13 @@ public class ProjectLocationMap implements Serializable{
     public void setId(Long id) {
         this.id = id;
     }
-
-    public Long getProjectId() {
-        return projectId;
+    
+    public Project getProject() {
+        return project;
     }
 
-    public void setProjectId(Long projectId) {
-        this.projectId = projectId;
+    public void setProject(Project project) {
+        this.project = project;
     }
 
     public Long getLocationId() {
@@ -76,7 +78,6 @@ public class ProjectLocationMap implements Serializable{
 
     @Override
     public String toString() {
-        return "ProjectLocationMap [id=" + id + ", projectId=" + projectId + ", locationId=" + locationId + "]";
+        return "ProjectLocationMap [id=" + id + ", project=" + project + ", locationId=" + locationId + "]";
     }
-
 }

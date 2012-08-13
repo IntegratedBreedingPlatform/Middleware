@@ -280,7 +280,7 @@ public class TestGenotypicDataManagerImpl{
     
     @Test
     public void testCountMarkerNamesByMarkerType() throws Exception {
-        long result = manager.countMarkerNamesByMarkerType("asdf", Database.CENTRAL);
+        long result = manager.countMarkerNamesByMarkerType("asdf");
         System.out.println("testCountMarkerNamesByMarkerType: " + result);
     }
     
@@ -356,7 +356,7 @@ public class TestGenotypicDataManagerImpl{
     
     @Test 
     public void testCountAllDbAccessionIdsFromMarker() throws Exception {
-        Long result = manager.countAllDbAccessionIdsFromMarker(Database.CENTRAL);
+        Long result = manager.countAllDbAccessionIdsFromMarker();
         System.out.println("testCountAllDbAccessionIdsFromMarker: " + result);
     }
     
