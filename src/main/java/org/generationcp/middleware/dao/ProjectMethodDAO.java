@@ -40,13 +40,12 @@ public class ProjectMethodDAO extends GenericDAO<ProjectMethod, Integer>{
      * @return the list of {@link Method}s
      * @throws QueryException the query exception
      */
-    @SuppressWarnings({ "rawtypes" })
-    public List<Method> getByProjectId(Long projectId, int start, int numOfRows) 
+    @SuppressWarnings("unchecked")
+    public List<Integer> getByProjectId(Long projectId, int start, int numOfRows) 
         throws QueryException {
         
-        List<Method> dataValues = new ArrayList<Method>();
         if (projectId == null){
-            return dataValues;
+            return new ArrayList<Integer>();
         }
         
         try {
@@ -54,33 +53,7 @@ public class ProjectMethodDAO extends GenericDAO<ProjectMethod, Integer>{
             query.setParameter("projectId", projectId.intValue());
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
-            
-            List results = query.list();
-            
-            for (Object o : results){
-                Object[] result = (Object[]) o;
-                if (result != null) {
-                    Integer mid = (Integer) result[0];
-                    String mtype = (String) result[1];
-                    String mgrp = (String) result[2];
-                    String mcode = (String) result[3];
-                    String mname = (String) result[4];
-                    String mdesc = (String) result[5];
-                    Integer mref = (Integer) result[6];
-                    Integer mprgn = (Integer) result[7];
-                    Integer mfprg = (Integer) result[8];
-                    Integer mattr = (Integer) result[9];
-                    Integer geneq = (Integer) result[10];
-                    Integer muid = (Integer) result[11];
-                    Integer lmid = (Integer) result[12];
-                    Integer mdate = (Integer) result[13];
-                    Method method = new Method(mid, mtype, mgrp, mcode, mname, mdesc, mref, mprgn,
-                            mfprg, mattr, geneq, muid, lmid, mdate);
-                    dataValues.add(method);
-                }
-            }
-            return dataValues;
-            
+            return (List<Integer>) query.list();
         } catch (HibernateException e) {
             throw new QueryException("Error with getByProjectId query: " + e.getMessage(), e);
         } 

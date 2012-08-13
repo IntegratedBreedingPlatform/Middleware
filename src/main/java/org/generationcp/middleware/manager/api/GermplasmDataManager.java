@@ -827,9 +827,8 @@ public interface GermplasmDataManager {
      * @param start
      *            - the starting index of the sublist of results to be returned
      * @param numOfRows
-     *            - the number of rows to be included in the sublist of results
-     *            to be returned
-     * @return List of MarkerInfo based on the specified db accession id 
+     *            - the number of rows to be included in the sublist of results to be returned
+     * @return List of GidNidElement based on the specified list of germplasm names 
      * @throws QueryException
      */
     public List<GidNidElement> getGidAndNidByGermplasmNames(List<String> germplasmNames) throws QueryException;

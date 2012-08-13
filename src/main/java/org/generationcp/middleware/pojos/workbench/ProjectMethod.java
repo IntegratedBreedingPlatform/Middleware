@@ -41,15 +41,15 @@ public class ProjectMethod implements Serializable{
     
     /** The Constant GET_METHODS_BY_PROJECT_ID. Used by ProjectMethodDAO.getMethodsByProjectId() */
     public static final String GET_METHODS_BY_PROJECT_ID = 
-            "SELECT methods.* " + 
-            "FROM methods JOIN workbench_project_method pm ON methods.mid = pm.method_id " +
-            "WHERE pm.project_id = :projectId";
+            "SELECT method_id " + 
+            "FROM workbench_project_method " +
+            "WHERE project_id = :projectId";
     
     /** The Constant COUNT_METHODS_BY_PROJECT_ID. Used by ProjectMethodDAO.countMethodsByProjectId() */
     public static final String COUNT_METHODS_BY_PROJECT_ID = 
-            "SELECT COUNT(methods.mid) " + 
-            "FROM methods JOIN workbench_project_method pm ON methods.mid = pm.method_id " +
-            "WHERE pm.project_id = :projectId";
+            "SELECT COUNT(method_id) " + 
+            "FROM workbench_project_method " +
+            "WHERE project_id = :projectId";
             
     /** The project method id. */
     @Id

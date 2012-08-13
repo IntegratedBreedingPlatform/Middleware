@@ -26,7 +26,6 @@ import org.generationcp.middleware.dao.WorkbenchDatasetDAO;
 import org.generationcp.middleware.dao.WorkflowTemplateDAO;
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -544,16 +543,16 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     }
 
     @Override
-    public List<Method> getMethodsByProjectId(Long projectId, int start, int numOfRows) throws QueryException{
+    public List<Integer> getMethodIdsByProjectId(Long projectId, int start, int numOfRows) throws QueryException{
             
         ProjectMethodDAO dao = new ProjectMethodDAO();
-        List<Method> list;
+        List<Integer> list;
         
         if(hibernateUtil != null) {
             dao.setSession(hibernateUtil.getCurrentSession());
             list = dao.getByProjectId(projectId, start, numOfRows);
         } else {
-            list = new ArrayList<Method>();
+            list = new ArrayList<Integer>();
         }
 
         return list;
@@ -561,7 +560,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     }
 
     @Override
-    public Long countMethodsByProjectId(Long projectId) throws QueryException {
+    public Long countMethodIdsByProjectId(Long projectId) throws QueryException {
         ProjectMethodDAO dao = new ProjectMethodDAO();
         Long result = 0L;
         

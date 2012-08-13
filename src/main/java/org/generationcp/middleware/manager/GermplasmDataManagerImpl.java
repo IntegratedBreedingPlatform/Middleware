@@ -1951,12 +1951,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         
         if (hibernateUtilForCentral != null) {
             dao.setSession(hibernateUtilForCentral.getCurrentSession());
-            results = dao.getGidAndNidByGermplasmNames(germplasmNames);
+            results.addAll(dao.getGidAndNidByGermplasmNames(germplasmNames));
         } 
 
         if (hibernateUtilForLocal != null) {
             dao.setSession(hibernateUtilForLocal.getCurrentSession());
-            results = dao.getGidAndNidByGermplasmNames(germplasmNames);
+            results.addAll(dao.getGidAndNidByGermplasmNames(germplasmNames));
         } 
         
         return results;
