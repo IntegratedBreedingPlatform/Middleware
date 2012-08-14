@@ -22,6 +22,7 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.CharacterDataElement;
 import org.generationcp.middleware.pojos.CharacterLevelElement;
+import org.generationcp.middleware.pojos.DatasetCondition;
 import org.generationcp.middleware.pojos.Factor;
 import org.generationcp.middleware.pojos.NumericDataElement;
 import org.generationcp.middleware.pojos.NumericLevelElement;
@@ -255,7 +256,16 @@ public class TestStudyDataManagerImpl{
             System.out.println(level);
         }
     }
-
+    
+    @Test
+    public void testGetConditionsByRepresentationId() throws Exception {
+        List<DatasetCondition> results = manager.getConditionsByRepresentationId(Integer.valueOf(2));
+        System.out.println("RESULTS:");
+        for(DatasetCondition result : results) {
+            System.out.println(result);
+        }
+    }
+    
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();

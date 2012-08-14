@@ -31,6 +31,7 @@ import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.CharacterDataElement;
 import org.generationcp.middleware.pojos.CharacterLevelElement;
+import org.generationcp.middleware.pojos.DatasetCondition;
 import org.generationcp.middleware.pojos.Factor;
 import org.generationcp.middleware.pojos.NumericDataElement;
 import org.generationcp.middleware.pojos.NumericLevelElement;
@@ -397,4 +398,30 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         return charLevelValues;
     }
 
+    @Override
+    public List<DatasetCondition> getConditionsByRepresentationId(Integer representationId) throws QueryException {
+        List<DatasetCondition> toreturn = new ArrayList<DatasetCondition>();
+        
+        OindexDAO oindexDao = new OindexDAO();
+        NumericLevelDAO numericLevelDao = new NumericLevelDAO();
+        CharacterLevelDAO characterLevelDao = new CharacterLevelDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(representationId);
+        
+        if(hibernateUtil != null) {
+            oindexDao.setSession(hibernateUtil.getCurrentSession());
+            numericLevelDao.setSession(hibernateUtil.getCurrentSession());
+            characterLevelDao.setSession(hibernateUtil.getCurrentSession());
+            
+            List<Object[]> factorIdsAndLevelNos = oindexDao.getFactorIdAndLevelNoOfConditionsByRepresentationId(representationId);
+            for(Object[] ids : factorIdsAndLevelNos) {
+                Integer factorid = (Integer) ids[0];
+                Integer levelno = (Integer) ids[1];
+                
+                toreturn.addAll(numericLevelDao.getConditionAndValueByFactorIdAndLevelNo(factorid, levelno));
+                toreturn.addAll(characterLevelDao.getConditionAndValueByFactorIdAndLevelNo(factorid, levelno));
+            }
+        }
+        
+        return toreturn;
+    }
 }

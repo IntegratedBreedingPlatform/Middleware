@@ -19,6 +19,7 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.CharacterDataElement;
 import org.generationcp.middleware.pojos.CharacterLevelElement;
+import org.generationcp.middleware.pojos.DatasetCondition;
 import org.generationcp.middleware.pojos.Factor;
 import org.generationcp.middleware.pojos.NumericDataElement;
 import org.generationcp.middleware.pojos.NumericLevelElement;
@@ -305,4 +306,14 @@ public interface StudyDataManager{
      */
     public List<CharacterLevelElement> getCharacterLevelValuesByOunitIdList(List<Integer> ounitIdList) throws QueryException;
 
+    /**
+     * Returns a list of DatasetCondition objects representing the Factors 
+     * which have constant values in the dataset identified by the given 
+     * representation ID.
+     * 
+     * @param representationId
+     * @return
+     * @throws QueryException
+     */
+    public List<DatasetCondition> getConditionsByRepresentationId(Integer representationId) throws QueryException;
 }

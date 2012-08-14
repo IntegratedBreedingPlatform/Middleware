@@ -28,7 +28,14 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 public class Oindex implements Serializable{
 
     private static final long serialVersionUID = -6609291577310766245L;
-
+    
+    public static final String GET_FACTORID_AND_LEVELNO_OF_CONDITIONS_BY_REPRESNO = 
+                "SELECT factorid, levelno " +
+    		"FROM oindex " +
+    		"WHERE represno = :represno " +
+    		"GROUP BY factorid, levelno " +
+    		"HAVING COUNT(DISTINCT ounitid) = :count";
+    
     @Id
     @Basic(optional = false)
     @Column(name = "oindexid")

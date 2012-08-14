@@ -34,6 +34,11 @@ public class CharacterLevel implements Serializable{
                             "JOIN level_c lc ON lc.factorid = oi.factorid AND lc.levelno = oi.levelno " + 
                             "JOIN factor f ON f.labelid = lc.labelid " +
             "WHERE oi.ounitid IN (:ounitIdList)";
+    
+    public static final String GET_CONDITION_AND_VALUE = 
+        "SELECT f.fname, lc.lvalue, f.traitid, f.scaleid, f.tmethid, f.ltype " +
+        "FROM factor f JOIN level_c lc ON f.labelid = lc.labelid " +
+        "WHERE lc.factorid = :factorid AND lc.levelno = :levelno";
 
     @EmbeddedId
     protected CharacterLevelPK id;

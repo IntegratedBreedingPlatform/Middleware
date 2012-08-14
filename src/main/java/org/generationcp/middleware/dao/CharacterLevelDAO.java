@@ -19,6 +19,7 @@ import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.pojos.CharacterLevel;
 import org.generationcp.middleware.pojos.CharacterLevelElement;
 import org.generationcp.middleware.pojos.CharacterLevelPK;
+import org.generationcp.middleware.pojos.DatasetCondition;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 
@@ -58,4 +59,34 @@ public class CharacterLevelDAO extends GenericDAO<CharacterLevel, CharacterLevel
         }
     }
 
+    @SuppressWarnings("rawtypes")
+    public List<DatasetCondition> getConditionAndValueByFactorIdAndLevelNo(Integer factorId, Integer levelNo) throws QueryException {
+        try {
+            List<DatasetCondition> toreturn = new ArrayList<DatasetCondition>();
+            
+            SQLQuery query = getSession().createSQLQuery(CharacterLevel.GET_CONDITION_AND_VALUE);
+            query.setParameter("factorid", factorId);
+            query.setParameter("levelno", levelNo);
+            
+            List results = query.list();
+            for(Object o : results) {
+                Object[] result = (Object[]) o;
+                String name = (String) result[0];
+                String value = (String) result[1];
+                Integer traitid = (Integer) result[2];
+                Integer scaleid = (Integer) result[3];
+                Integer methodid = (Integer) result[4];
+                String type = (String) result[5];
+                
+                DatasetCondition condition = new DatasetCondition(name, value, traitid, scaleid, methodid, type);
+                toreturn.add(condition);
+            }
+            
+            return toreturn;
+        } catch (Exception ex) {
+            throw new QueryException("Error with get Condition and value by factorid and levelno query, " +
+                    "given factorid = " + factorId + " and levelno = " + levelNo +
+                    ": " + ex.getMessage(), ex);
+        }
+    }
 }

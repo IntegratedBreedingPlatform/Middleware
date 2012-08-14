@@ -35,6 +35,11 @@ public class NumericLevel implements Serializable{
                                             "AND ln.levelno = oi.levelno " + 
                             "JOIN factor f ON f.labelid = ln.labelid " +
             "WHERE oi.ounitid IN (:ounitIdList)";
+    
+    public static final String GET_CONDITION_AND_VALUE = 
+            "SELECT f.fname, ln.lvalue, f.traitid, f.scaleid, f.tmethid, f.ltype " +
+            "FROM factor f JOIN level_n ln ON f.labelid = ln.labelid " +
+            "WHERE ln.factorid = :factorid AND ln.levelno = :levelno";
 
     @EmbeddedId
     protected NumericLevelPK id;
