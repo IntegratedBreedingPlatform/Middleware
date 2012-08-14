@@ -36,7 +36,7 @@
     </root>
     
     <!-- Set the log levels -->
-    <logger name="org.generationcp.middleware" level="TRACE"/>
+    <logger name="org.generationcp" level="TRACE"/>
     <logger name="org.hibernate.cfg" level="WARN"/>
     <logger name="org.hibernate.SQL" level="DEBUG"/>
     <logger name="org.hibernate.type" level="INFO"/>
