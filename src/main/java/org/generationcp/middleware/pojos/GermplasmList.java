@@ -151,6 +151,40 @@ public class GermplasmList implements Serializable{
     public void setParent(GermplasmList parent) {
         this.parent = parent;
     }
+    
+    public String getStatusString() {
+        List<String> listStatus = new ArrayList<String> ();
+        String status = String.format("%04d", getStatus());
+        
+        if (status.charAt(0) == '1') {
+            listStatus.add("Final");
+        }
+        if (status.charAt(1) == '1') {
+            listStatus.add("Locked");
+        }
+        if (status.charAt(2) == '1') {
+            listStatus.add("Hidden");
+        }
+        if (status.charAt(3) == '1') {
+            listStatus.add("List");
+        } 
+        if (status.charAt(3) == '0') {
+            listStatus.add("Folder");
+        }
+        if (status.charAt(3) == '9') {
+            listStatus.add("Deleted");
+        }
+        
+        StringBuilder sb = new StringBuilder();
+        for (String str : listStatus) {
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append(str);
+        }
+        
+        return sb.toString();
+    }
 
     public Integer getStatus() {
         return status;
