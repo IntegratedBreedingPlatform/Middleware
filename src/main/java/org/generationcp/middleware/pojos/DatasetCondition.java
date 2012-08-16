@@ -29,6 +29,7 @@ public class DatasetCondition implements Serializable{
 
     private static final long serialVersionUID = 1883187407218392570L;
     
+    private Integer factorId;
     private String name;
     private Object value;
     private Integer traitId;
@@ -36,8 +37,9 @@ public class DatasetCondition implements Serializable{
     private Integer methodId;
     private String type;
     
-    public DatasetCondition(String name, Object value, Integer traitId, Integer scaleId, Integer methodId, String type) {
+    public DatasetCondition(Integer factorId, String name, Object value, Integer traitId, Integer scaleId, Integer methodId, String type) {
         super();
+        this.factorId = factorId;
         this.name = name;
         this.value = value;
         this.traitId = traitId;
@@ -46,6 +48,14 @@ public class DatasetCondition implements Serializable{
         this.type = type;
     }
     
+    public Integer getFactorId() {
+        return factorId;
+    }
+    
+    public void setFactorId(Integer factorId) {
+        this.factorId = factorId;
+    }
+
     public String getName() {
         return name;
     }
@@ -106,8 +116,8 @@ public class DatasetCondition implements Serializable{
 
     @Override
     public String toString() {
-        return "DatasetCondition [name=" + name + ", value=" + value + ", traitId=" + traitId + ", scaleId=" + scaleId + ", methodId="
-                + methodId + ", type=" + type + "]";
+        return "DatasetCondition [factorId=" + factorId + ", name=" + name + ", value=" + value + ", traitId=" + traitId + ", scaleId="
+                + scaleId + ", methodId=" + methodId + ", type=" + type + "]";
     }
     
 }

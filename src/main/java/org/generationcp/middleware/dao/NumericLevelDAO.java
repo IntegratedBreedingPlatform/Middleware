@@ -77,7 +77,7 @@ public class NumericLevelDAO extends GenericDAO<NumericLevel, NumericLevelPK>{
                 Integer methodid = (Integer) result[4];
                 String type = (String) result[5];
                 
-                DatasetCondition condition = new DatasetCondition(name, value, traitid, scaleid, methodid, type);
+                DatasetCondition condition = new DatasetCondition(factorId, name, value, traitid, scaleid, methodid, type);
                 toreturn.add(condition);
             }
             

@@ -316,4 +316,13 @@ public interface StudyDataManager{
      * @throws QueryException
      */
     public List<DatasetCondition> getConditionsByRepresentationId(Integer representationId) throws QueryException;
+    
+    /**
+     * Returns the main label given a value of the factorid column of a factor record.
+     * 
+     * @param factorid
+     * @return
+     * @throws QueryException
+     */
+    public String getMainLabelOfFactorByFactorId(Integer factorid) throws QueryException;
 }

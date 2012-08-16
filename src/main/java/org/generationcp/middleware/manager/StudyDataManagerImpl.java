@@ -424,4 +424,18 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         
         return toreturn;
     }
+    
+    @Override
+    public String getMainLabelOfFactorByFactorId(Integer factorid) throws QueryException {
+        FactorDAO dao = new FactorDAO();
+        HibernateUtil hibernateUtil = getHibernateUtil(factorid);
+        
+        if(hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+            
+            return dao.getMainLabel(factorid);
+        }
+        
+        return null;
+    }
 }

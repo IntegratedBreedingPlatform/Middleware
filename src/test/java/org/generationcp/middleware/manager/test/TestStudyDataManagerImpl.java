@@ -266,6 +266,11 @@ public class TestStudyDataManagerImpl{
         }
     }
     
+    @Test
+    public void testGetMainLabelOfFactorByFactorId() throws Exception {
+        System.out.println(manager.getMainLabelOfFactorByFactorId(Integer.valueOf(1031)));
+    }
+    
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();

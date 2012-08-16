@@ -18,9 +18,11 @@ import java.util.Set;
 
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.pojos.Factor;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Restrictions;
 
 public class FactorDAO extends GenericDAO<Factor, Integer>{
 
@@ -78,4 +80,21 @@ public class FactorDAO extends GenericDAO<Factor, Integer>{
         }
     }
 
+    public String getMainLabel(Integer factorid) throws QueryException {
+        try {
+            Criteria crit = getSession().createCriteria(getPersistentClass());
+            crit.add(Restrictions.eq("id", factorid));
+            crit.add(Restrictions.eq("factorId", factorid));
+            
+            List<Factor> results = crit.list();
+            if(!results.isEmpty()) {
+                Factor factor = results.get(0);
+                return factor.getName();
+            }
+            
+            return null;
+        } catch (HibernateException ex) {
+            throw new QueryException("Error with get main label query for factor id = " + factorid + ": " + ex.getMessage(), ex);
+        }
+    }
 }
