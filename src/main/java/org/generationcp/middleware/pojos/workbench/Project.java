@@ -67,7 +67,7 @@ public class Project implements Serializable{
     @Column(name = "template_modified")
     private boolean templateModified;
     
-    @Basic(optional = false)
+    @Basic(optional = true)
     @Column(name = "last_open_date")
     private Date lastOpenDate;
 
