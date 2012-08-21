@@ -15,6 +15,7 @@ package org.generationcp.middleware.pojos.workbench;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -30,6 +31,7 @@ import javax.persistence.Transient;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.generationcp.middleware.pojos.User;
 
 @Entity
 @Table(name = "workbench_project")
@@ -73,6 +75,9 @@ public class Project implements Serializable{
 
     @Transient
     private List<ProjectWorkflowStep> steps;
+    
+    @Transient
+    private Set<User> members;
 
     // TODO: remove these fields
     @Transient
@@ -176,6 +181,14 @@ public class Project implements Serializable{
 
     public Date getLastOpenDate() {
         return lastOpenDate;
+    }
+
+    public Set<User> getMembers() {
+        return members;
+    }
+
+    public void setMembers(Set<User> members) {
+        this.members = members;
     }
 
     @Override
