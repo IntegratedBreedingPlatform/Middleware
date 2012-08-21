@@ -81,6 +81,20 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 
             // TODO: copy the workbench template created by the project into the
             // project_workflow_step table
+            
+            // save the project members
+            // TODO: saving project members should be done by hibernate via mapping!
+            ProjectUserDAO dao = new ProjectUserDAO();
+            dao.setSession(session);
+            if (project.getMembers() != null) {
+                for (User user : project.getMembers()) {
+                    ProjectUser projectUser = new ProjectUser();
+                    projectUser.setProject(project);
+                    projectUser.setUserId(user.getUserid());
+
+                    dao.saveOrUpdate(projectUser);
+                }
+            }
 
             // commit transaction
             trans.commit();
@@ -738,7 +752,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
                 List<String> cropNames = session.createSQLQuery("SELECT crop_name FROM workbench_crops").list();
 
                 for (String cropName : cropNames) {
-                    CropType cropType = CropType.valueOf(cropName);
+                    CropType cropType = CropType.valueOf(cropName.toUpperCase());
                     cropTypes.add(cropType);
                 }
             }
