@@ -21,6 +21,7 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @NamedQueries({ @NamedQuery(name = "findUserByNameUsingEqual", query = "SELECT s FROM User s WHERE s.name = :name"),
     @NamedQuery(name = "findUserByNameUsingLike", query = "SELECT s FROM User s WHERE s.name LIKE :name"),
@@ -70,6 +71,9 @@ public class User implements Serializable {
 
     @Column(name = "cdate")
     private Integer cdate;
+    
+    @Transient
+    private Person person;
 
     public User() {
     }
@@ -171,6 +175,14 @@ public class User implements Serializable {
 
     public void setCdate(Integer cdate) {
         this.cdate = cdate;
+    }
+    
+    public Person getPerson() {
+        return person;
+    }
+
+    public void setPerson(Person person) {
+        this.person = person;
     }
 
     @Override
