@@ -22,6 +22,8 @@ import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.generationcp.commons.util.StringUtil;
+import org.generationcp.commons.util.Util;
 
 @Entity
 @Table(name = "persons")
@@ -124,6 +126,15 @@ public class Person implements Serializable{
 
     public void setMiddleName(String middleName) {
         this.middleName = middleName;
+    }
+    
+    public String getDisplayName() {
+        String displayName = StringUtil.joinIgnoreEmpty(" "
+                                                        ,firstName == null || Util.isOneOf(firstName, "-", "'-'") ? "" : firstName
+                                                        ,middleName == null || Util.isOneOf(middleName, "-", "'-'") ? "" : middleName
+                                                        ,lastName == null || Util.isOneOf(lastName, "-", "'-'") ? "" : lastName
+                                                        );
+        return displayName;
     }
 
     public Integer getInstituteId() {
