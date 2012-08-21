@@ -31,6 +31,8 @@ import javax.persistence.Transient;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.User;
 
 @Entity
@@ -78,6 +80,12 @@ public class Project implements Serializable{
     
     @Transient
     private Set<User> members;
+    
+    @Transient
+    private Set<Method> methods;
+    
+    @Transient
+    private Set<Location> locations;
 
     // TODO: remove these fields
     @Transient
@@ -189,6 +197,22 @@ public class Project implements Serializable{
 
     public void setMembers(Set<User> members) {
         this.members = members;
+    }
+
+    public Set<Method> getMethods() {
+        return methods;
+    }
+
+    public void setMethods(Set<Method> methods) {
+        this.methods = methods;
+    }
+
+    public Set<Location> getLocations() {
+        return locations;
+    }
+
+    public void setLocations(Set<Location> locations) {
+        this.locations = locations;
     }
 
     @Override
