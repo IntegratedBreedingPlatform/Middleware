@@ -28,6 +28,7 @@ import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectUser;
 import org.generationcp.middleware.pojos.workbench.Tool;
@@ -35,6 +36,7 @@ import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 import org.generationcp.middleware.util.HibernateUtil;
+import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -723,5 +725,30 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         }
         
         return result;
+    }
+    
+    public List<CropType> getInstalledCentralCrops() throws QueryException {
+        List<CropType> cropTypes = new ArrayList<CropType>();
+        
+        if(hibernateUtil != null) {
+            Session session = hibernateUtil.getCurrentSession();
+            
+            try {
+                @SuppressWarnings("unchecked")
+                List<String> cropNames = session.createSQLQuery("SELECT crop_name FROM workbench_crops").list();
+
+                for (String cropName : cropNames) {
+                    CropType cropType = CropType.valueOf(cropName);
+                    cropTypes.add(cropType);
+                }
+            }
+            catch (HibernateException e) {
+                throw new QueryException("Error getting crop types: " + e.getMessage(), e);
+            }
+            
+            return cropTypes;
+        }
+        
+        return cropTypes;
     }
 }

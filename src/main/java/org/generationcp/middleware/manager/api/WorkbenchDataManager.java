@@ -18,6 +18,7 @@ import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectUser;
 import org.generationcp.middleware.pojos.workbench.Tool;
@@ -392,4 +393,11 @@ public interface WorkbenchDataManager{
      * @throws QueryException the query exception
      */
     public Long countUsersByProjectId(Long projectId) throws QueryException;
+    
+    /**
+     * Get the list of all installed central crop databases.
+     * 
+     * @return
+     */
+    public List<CropType> getInstalledCentralCrops() throws QueryException;
 }
