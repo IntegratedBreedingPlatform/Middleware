@@ -173,6 +173,17 @@ public class GermplasmListData implements Serializable{
     public Integer getStatus() {
         return status;
     }
+    
+    public String getStatusString() {
+        //TODO: make internationalizable
+        if (getStatus().equals(0)) {
+            return "Active";
+        } else if (getStatus().equals(9)) {
+            return "Deleted";
+        } else {
+            return "";
+        }
+    }
 
     public void setStatus(Integer status) {
         this.status = status;

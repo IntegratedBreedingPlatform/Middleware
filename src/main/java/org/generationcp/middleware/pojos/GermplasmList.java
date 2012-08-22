@@ -153,6 +153,7 @@ public class GermplasmList implements Serializable{
     }
     
     public String getStatusString() {
+        //TODO: make internationalizable
         List<String> listStatus = new ArrayList<String> ();
         String status = String.format("%04d", getStatus());
         
