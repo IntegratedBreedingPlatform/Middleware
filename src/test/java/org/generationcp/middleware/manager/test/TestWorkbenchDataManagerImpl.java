@@ -25,6 +25,8 @@ import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.ProjectLocationMap;
+import org.generationcp.middleware.pojos.workbench.ProjectMethod;
 import org.generationcp.middleware.pojos.workbench.ProjectUser;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
@@ -42,7 +44,7 @@ public class TestWorkbenchDataManagerImpl{
     @BeforeClass
     public static void setUp() throws Exception {
     	
-    	hibernateUtil = new HibernateUtil("localhost", "3306", "workbench", "root", "");
+    	hibernateUtil = new HibernateUtil("localhost", "3306", "workbench", "root", "admin");
         manager = new WorkbenchDataManagerImpl(hibernateUtil);
     }
 
@@ -63,12 +65,49 @@ public class TestWorkbenchDataManagerImpl{
 
         WorkflowTemplate marsTemplate = new WorkflowTemplate();
         marsTemplate.setTemplateId(1L);
+        
 
         project1.setTemplate(marsTemplate);
         project2.setTemplate(marsTemplate);
 
-        manager.saveOrUpdateProject(project1);
-        manager.saveOrUpdateProject(project2);
+        Project projectNew1=manager.saveOrUpdateProject(project1);
+        Project projectNew2=manager.saveOrUpdateProject(project2);
+        
+        // Adding Project Locations
+        List<ProjectLocationMap> projectLocationMapList = new ArrayList<ProjectLocationMap>();
+        
+        ProjectLocationMap projectLocationMap1= new ProjectLocationMap();
+        projectLocationMap1.setProject(projectNew1);
+        projectLocationMap1.setLocationId(new Long(3));
+        
+        ProjectLocationMap projectLocationMap2= new ProjectLocationMap();
+        projectLocationMap2.setProject(projectNew1);
+        projectLocationMap2.setLocationId(new Long(4));
+        
+        projectLocationMapList.add(projectLocationMap1);
+        projectLocationMapList.add(projectLocationMap2);
+        
+        projectLocationMapList.add(projectLocationMap1);
+        projectLocationMapList.add(projectLocationMap2);
+        
+        manager.addProjectLocationMap(projectLocationMapList);
+        
+        // Adding Project Method
+        List<ProjectMethod> projectMethodList = new ArrayList<ProjectMethod>();
+        
+        ProjectMethod projectMethod1= new ProjectMethod();
+        projectMethod1.setProject(projectNew1);
+        projectMethod1.setMethodId(5);
+        
+        ProjectMethod projectMethod2= new ProjectMethod();
+        projectMethod2.setProject(projectNew1);
+        projectMethod2.setMethodId(6);
+        
+        projectMethodList.add(projectMethod1);
+        projectMethodList.add(projectMethod2);
+        
+        manager.addProjectMethod(projectMethodList);
+        
     }
 
     @Test

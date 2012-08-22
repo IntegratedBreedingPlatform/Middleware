@@ -16,10 +16,13 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.ProjectLocationMap;
+import org.generationcp.middleware.pojos.workbench.ProjectMethod;
 import org.generationcp.middleware.pojos.workbench.ProjectUser;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
@@ -347,6 +350,54 @@ public interface WorkbenchDataManager{
      */
     public int addProjectUsers(List<ProjectUser> projectUsers) throws QueryException;
 
+    /**
+     * Adds project location.
+     * 
+     * @param ProjectLocationMap
+     *            - The {@code ProjectLocationMap} object to be persisted to the
+     *            database. Must be a valid {@code ProjectLocationMap} object.
+     * @return Returns the number of {@code ProjectLocationMap} records inserted
+     *         in the database.
+     * @throws QueryException
+     */
+    public int addProjectLocationMap(ProjectLocationMap projectLocationMap) throws QueryException;
+    
+    /**
+     * Adds project locations.
+     * 
+     * @param ProjectLocationMaps
+     *            - The {@code ProjectLocationMap} object to be persisted to the
+     *            database. Must be a valid {@code ProjectLocationMap} object.
+     * @return Returns the number of {@code ProjectLocationMap} records inserted
+     *         in the database.
+     * @throws QueryException
+     */
+    public int addProjectLocationMap(List<ProjectLocationMap> projectLocationMapList) throws QueryException;
+    
+    /**
+     * Adds project method.
+     * 
+     * @param ProjectMethod
+     *            - The {@code ProjectMethod} object to be persisted to the
+     *            database. Must be a valid {@code ProjectMethod} object.
+     * @return Returns the number of {@code ProjectMethod} records inserted
+     *         in the database.
+     * @throws QueryException
+     */
+    public int addProjectMethod(ProjectMethod projectMethod) throws QueryException;
+    
+    /**
+     * Adds project methods.
+     * 
+     * @param ProjectMethod
+     *            - The {@code ProjectMethod} object to be persisted to the
+     *            database. Must be a valid {@code ProjectMethod} object.
+     * @return Returns the number of {@code ProjectMethods} records inserted
+     *         in the database.
+     * @throws QueryException
+     */
+    public int addProjectMethod(List<ProjectMethod> projectMethodList) throws QueryException;
+    
     /**
      * Retrieves a user by id.
      *
