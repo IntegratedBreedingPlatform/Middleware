@@ -1520,7 +1520,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
             // get the derived lines from the root until the whole neighborhood
             // is created
-            int treeLevel = numberOfStepsBackward - stepsLeft + numberOfStepsForward + 1;
+            int treeLevel = numberOfStepsBackward - stepsLeft + numberOfStepsForward;
             rootNode = getDerivedLines(rootNode, treeLevel);
 
             derivativeNeighborhood.setRoot(rootNode);
