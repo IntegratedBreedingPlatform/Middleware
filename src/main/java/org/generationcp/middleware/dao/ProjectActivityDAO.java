@@ -17,58 +17,64 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.QueryException;
-import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.pojos.workbench.ProjectMethod;
+import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.ProjectActivity;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Restrictions;
 
 /**
- * The Class ProjectMethodDAO.
+ * The Class ProjectActivityDAO.
  * 
  * @author Joyce Avestro
  * 
  */
-public class ProjectMethodDAO extends GenericDAO<ProjectMethod, Integer>{
+public class ProjectActivityDAO extends GenericDAO<ProjectActivity, Integer>{
 
 
     /**
-     * Returns a list of {@link Method} records by project id.
+     * Returns a list of {@link ProjectActivity} records by project id.
      *
      * @param projectId the project id
      * @param start the first row to retrieve
      * @param numOfRows the number of rows to retrieve
-     * @return the list of {@link Method}s
+     * @return the list of {@link ProjectActivity} records
      * @throws QueryException the query exception
      */
     @SuppressWarnings("unchecked")
-    public List<Integer> getByProjectId(Long projectId, int start, int numOfRows) 
+    public List<ProjectActivity> getByProjectId(Long projectId, int start, int numOfRows) 
         throws QueryException {
         
         if (projectId == null){
-            return new ArrayList<Integer>();
+            return new ArrayList<ProjectActivity>();
         }
         
         try {
-            SQLQuery query = getSession().createSQLQuery(ProjectMethod.GET_METHODS_BY_PROJECT_ID);
-            query.setParameter("projectId", projectId.intValue());
-            query.setFirstResult(start);
-            query.setMaxResults(numOfRows);
-            return (List<Integer>) query.list();
+            Criteria criteria = getSession().createCriteria(ProjectActivity.class);
+            Project p = new Project();
+            p.setProjectId(projectId);
+            criteria.add(Restrictions.eq("project", p));
+            criteria.setFirstResult(start);
+            criteria.setMaxResults(numOfRows);
+            return (List<ProjectActivity>) criteria.list();
         } catch (HibernateException e) {
             throw new QueryException("Error with getByProjectId query: " + e.getMessage(), e);
         } 
     }
     
+
+    
     /**
-     * Returns the number of {@link Method} records by project id.
+     * Returns the number of {@link ProjectActivity} records by project id.
      *
      * @param projectId the project id
-     * @return the number of {@link Method} records
+     * @return the number of {@link ProjectActivity} records
      * @throws QueryException the query exception
      */
     public Long countByProjectId(Long projectId) throws QueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(ProjectMethod.COUNT_METHODS_BY_PROJECT_ID);
+            SQLQuery query = getSession().createSQLQuery(ProjectActivity.COUNT_ACTIVITIES_BY_PROJECT_ID);
             query.setParameter("projectId", projectId.intValue());
             BigInteger result = (BigInteger) query.uniqueResult();
             return Long.valueOf(result.longValue());

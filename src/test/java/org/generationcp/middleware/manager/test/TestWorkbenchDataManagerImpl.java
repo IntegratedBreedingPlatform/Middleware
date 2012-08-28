@@ -25,6 +25,7 @@ import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectLocationMap;
 import org.generationcp.middleware.pojos.workbench.ProjectMethod;
 import org.generationcp.middleware.pojos.workbench.ProjectUser;
@@ -107,7 +108,29 @@ public class TestWorkbenchDataManagerImpl{
         projectMethodList.add(projectMethod2);
         
         manager.addProjectMethod(projectMethodList);
+
+        // Adding Project Activity
+        List<ProjectActivity> projectActivityList = new ArrayList<ProjectActivity>();
         
+        ProjectActivity projectActivity1= new ProjectActivity();
+        projectActivity1.setProject(projectNew1);
+        projectActivity1.setName("Activity 1");
+        projectActivity1.setDescription("Test Description for Activity 1");
+        projectActivity1.setDate(new Date(System.currentTimeMillis()));
+        projectActivity1.setUser(manager.getUserById(new Integer(1)));
+        
+        ProjectActivity projectActivity2= new ProjectActivity();
+        projectActivity2.setProject(projectNew1);
+        projectActivity2.setName("Activity 2");
+        projectActivity2.setDescription("Test Description for Activity 2");
+        projectActivity2.setDate(new Date(System.currentTimeMillis()));
+        projectActivity2.setUser(manager.getUserById(new Integer(1)));
+        
+        projectActivityList.add(projectActivity1);
+        projectActivityList.add(projectActivity2);
+        
+        manager.addProjectActivity(projectActivityList);
+
     }
 
     @Test
@@ -362,6 +385,37 @@ public class TestWorkbenchDataManagerImpl{
             System.out.println("Error in testCountUsersByProjectId(): " + e.getMessage());
             e.printStackTrace();
         } 
+    }
+    
+
+    @Test 
+    public void testGetActivitiesByProjectId() {
+        try {
+            List<ProjectActivity> list = manager.getProjectActivitiesByProjectId(20L, 0, 10);
+            System.out.println("testGetActivitiesByProjectId(): ");
+            
+            if(list.isEmpty()) {
+                System.out.println("No records found.");
+            }
+            
+            for(ProjectActivity m : list) {
+                System.out.println("  " + m);
+            }
+        } catch (Exception e) {
+            System.out.println("Error in testGetActivitiesByProjectId(): " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    @Test
+    public void testCountActivitiesByProjectId() {
+        try {
+            Long result = manager.countProjectActivitiesByProjectId(1L);
+            System.out.println("testCountActivitiesByProjectId(): " + result);
+        } catch (Exception e) {
+            System.out.println("Error in testCountActivitiesByProjectId(): " + e.getMessage());
+            e.printStackTrace();
+        }
     }
     
     @AfterClass

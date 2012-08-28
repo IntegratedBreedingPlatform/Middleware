@@ -15,8 +15,8 @@ package org.generationcp.middleware.manager;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.dao.PersonDAO;
+import org.generationcp.middleware.dao.ProjectActivityDAO;
 import org.generationcp.middleware.dao.ProjectDAO;
 import org.generationcp.middleware.dao.ProjectLocationMapDAO;
 import org.generationcp.middleware.dao.ProjectMethodDAO;
@@ -27,11 +27,11 @@ import org.generationcp.middleware.dao.WorkbenchDatasetDAO;
 import org.generationcp.middleware.dao.WorkflowTemplateDAO;
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectLocationMap;
 import org.generationcp.middleware.pojos.workbench.ProjectMethod;
 import org.generationcp.middleware.pojos.workbench.ProjectUser;
@@ -841,18 +841,94 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 			// end transaction, commit to database
 			trans.commit();
 		} catch (Exception ex) {
-			LOG.error("Error in addProjectLocation: " + ex.getMessage() + "\n" + ex.getStackTrace());
+			LOG.error("Error in addProjectMethod: " + ex.getMessage() + "\n" + ex.getStackTrace());
 			ex.printStackTrace();
 			// rollback transaction in case of errors
 			if (trans != null) {
 				trans.rollback();
 			}
-			throw new QueryException("Error encountered while adding ProjectLocation: " + ex.getMessage(), ex);
+			throw new QueryException("Error encountered while adding ProjectMethod: " + ex.getMessage(), ex);
 		} finally {
 			hibernateUtil.closeCurrentSession();
 		}
 
 		return recordsSaved;
 	}
+
+    @Override
+    public int addProjectActivity(ProjectActivity projectActivity) throws QueryException {
+        List<ProjectActivity> list = new ArrayList<ProjectActivity>();
+        list.add(projectActivity);
+        return addProjectActivity(list);
+    }
+
+    @Override
+    public int addProjectActivity(List<ProjectActivity> projectActivityList) throws QueryException {
+        return addOrUpdateProjectActivityData(projectActivityList, Operation.ADD);
+    }
+
+    private int addOrUpdateProjectActivityData(List<ProjectActivity> projectActivityList, Operation add) throws QueryException {
+        if (hibernateUtil == null) {
+            return 0;
+        }
+        Session session = hibernateUtil.getCurrentSession();
+        Transaction trans = null;
+
+        int recordsSaved = 0;
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
+
+            ProjectActivityDAO dao = new ProjectActivityDAO();
+            dao.setSession(session);
+
+            for (ProjectActivity projectActivityListData : projectActivityList) {
+                dao.saveOrUpdate(projectActivityListData);
+                recordsSaved++;
+
+            }
+            // end transaction, commit to database
+            trans.commit();
+        } catch (Exception ex) {
+            LOG.error("Error in addProjectActivity: " + ex.getMessage() + "\n" + ex.getStackTrace());
+            ex.printStackTrace();
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new QueryException("Error encountered while adding addProjectActivity: " + ex.getMessage(), ex);
+        } finally {
+            hibernateUtil.closeCurrentSession();
+        }
+
+        return recordsSaved;
+    }
+
+    @Override
+    public List<ProjectActivity> getProjectActivitiesByProjectId(Long projectId, int start, int numOfRows) throws QueryException {
+        ProjectActivityDAO dao = new ProjectActivityDAO();
+        List<ProjectActivity> projectActivities;
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+            projectActivities = (List<ProjectActivity>) dao.getByProjectId(projectId, start, numOfRows);
+        } else {
+            projectActivities = new ArrayList<ProjectActivity>();
+        }
+
+        return projectActivities;
+    }
+
+    @Override
+    public Long countProjectActivitiesByProjectId(Long projectId) throws QueryException {
+        ProjectActivityDAO dao = new ProjectActivityDAO();
+        Long result = 0L;
+
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+            result = dao.countByProjectId(projectId);
+        }
+
+        return result;
+    }
 
 }
