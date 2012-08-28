@@ -294,6 +294,47 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     }
     
     @Override
+    public List<GermplasmList> getTopLevelFoldersBatched(int batchSize, Database instance) throws QueryException {
+        List<GermplasmList> topLevelFolders = new ArrayList<GermplasmList>();
+        HibernateUtil hibernateUtil = getHibernateUtil(instance);
+        if (hibernateUtil == null) {
+            return topLevelFolders;
+        }
+        
+        // initialize session & transaction
+        Session session = hibernateUtil.getCurrentSession();
+        Transaction trans = null;
+        
+        try {
+            // begin transaction
+            trans = session.beginTransaction();
+            
+            GermplasmListDAO dao = new GermplasmListDAO();
+            dao.setSession(session);
+            
+            int topLevelCount = dao.countTopLevelFolders().intValue();
+            int start = 0;
+            while (start < topLevelCount) {
+                topLevelFolders.addAll(dao.getTopLevelFolders(start, batchSize));
+                start += batchSize;
+            }
+        
+            // end transaction, commit to database
+            trans.commit();
+        } catch (Exception ex) {
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new QueryException("Error encountered while retrieving top level folders: " + ex.getMessage(), ex);
+        } finally {
+            hibernateUtil.closeCurrentSession();
+        }
+        
+        return topLevelFolders;
+    }
+    
+    @Override
     public int countTopLevelFolders(Database instance) throws QueryException {
         int count = 0;
         
@@ -598,16 +639,55 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
         GermplasmListDAO dao = new GermplasmListDAO();
         HibernateUtil util = getHibernateUtil(parentId);
-        List<GermplasmList> children;
+        List<GermplasmList> childLists;
         
         if(util != null) {
             dao.setSession(util.getCurrentSession());
-            children = dao.getByParentFolderId(parentId, start, numOfRows);
+            childLists = dao.getByParentFolderId(parentId, start, numOfRows);
         } else {
-            children = new ArrayList<GermplasmList>();
+            childLists = new ArrayList<GermplasmList>();
         }
         
-        return children;
+        return childLists;
+    }
+    
+    @Override
+    public List<GermplasmList> getGermplasmListByParentFolderIdBatched(Integer parentId, int batchSize) 
+        throws QueryException {
+        List<GermplasmList> childLists = new ArrayList<GermplasmList>();
+        HibernateUtil hibernateUtil = getHibernateUtil(parentId);
+        if (hibernateUtil == null) {
+            return childLists;
+        }
+        
+        // initialize session & transaction
+        Session session = hibernateUtil.getCurrentSession();
+        Transaction trans = null;
+
+        try {
+            // begin transaction
+            trans = session.beginTransaction();
+            
+            GermplasmListDAO dao = new GermplasmListDAO();
+            dao.setSession(session);
+            
+            int start = 0;
+            int childListCount = dao.countByParentFolderId(parentId).intValue();
+            while (start < childListCount) {
+                childLists.addAll(dao.getByParentFolderId(parentId, start, batchSize));
+                start += batchSize;
+            }
+        } catch (Exception ex) {
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new QueryException("Error encountered while retrieving germplasm sub-lists: " + ex.getMessage(), ex);
+        } finally {
+            hibernateUtil.closeCurrentSession();
+        }
+        
+        return childLists;
     }
 
     @Override

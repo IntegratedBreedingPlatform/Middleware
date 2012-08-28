@@ -199,6 +199,21 @@ public interface GermplasmListManager{
     public List<GermplasmList> getTopLevelFolders(int start, int numOfRows, Database instance) throws QueryException;
     
     /**
+     * Returns the Top Level Germplasm List Folders present in the specified database.
+     * Retrieval from the database is done by batch (as specified in batchSize) to reduce the load
+     * in instances where there is a large volume of top level folders to be retrieved. Though
+     * retrieval is by batch, this method still returns all of the top level folders as a single list.
+     * 
+     * @param batchSize
+     *            - the number of records to be retrieved per iteration
+     * @param instance
+     *            - can either be Database.CENTRAL or Database.LOCAL
+     * @return - List of GermplasmList POJOs
+     * @throws QueryException
+     */
+    public List<GermplasmList> getTopLevelFoldersBatched(int batchSize, Database instance) throws QueryException;
+    
+    /**
      * Returns the number of Top Level Germplasm List Folders in the specified database.
      * 
      * @param instance
@@ -400,13 +415,27 @@ public interface GermplasmListManager{
     /**
      * Returns a list of {@code GermplasmList} child records given a parent id.
      *
-     * @param parentId the parent id
-     * @param start the start
-     * @param numOfRows the num of rows
-     * @return the germplasm list children
-     * @throws QueryException the query exception
+     * @param parentId - the ID of the parent to retrieve the child lists
+     * @param start - the starting point to retrieve the results
+     * @param numOfRows - the number of rows from the starting point to be retrieved
+     * @return Returns a List of GermplasmList POJOs for the child lists
+     * @throws QueryException
      */
     public List<GermplasmList> getGermplasmListByParentFolderId(Integer parentId, int start, int numOfRows) throws QueryException;
+    
+    /**
+     * Returns a list of {@code GermplasmList} child records given a parent id.
+     * Retrieval from the database is done by batch (as specified in batchSize) to reduce the load
+     * in instances where there is a large volume of child folders to be retrieved. Though
+     * retrieval is by batch, this method still returns all of the child folders as a single list.
+     * 
+     * @param parentId - the ID of the parent to retrieve the child lists
+     * @param batchSize
+     *            - the number of records to be retrieved per iteration
+     * @return Returns a List of GermplasmList POJOs for the child lists
+     * @throws QueryException
+     */
+    public List<GermplasmList> getGermplasmListByParentFolderIdBatched(Integer parentId, int batchSize) throws QueryException;
     
     /**
      * Returns the number of {@code GermplasmList} child records given a parent id.
