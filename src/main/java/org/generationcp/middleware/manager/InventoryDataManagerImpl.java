@@ -563,6 +563,8 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
             Scale scale = traitManager.getScaleByID(lot.getScaleId());
             row.setScaleOfLot(scale);
+            
+            row.setCommentOfLot(lot.getComments());
 
             report.add(row);
         }

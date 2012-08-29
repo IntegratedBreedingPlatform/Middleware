@@ -26,6 +26,7 @@ public class LotReportRow implements Serializable{
     private Long actualLotBalance;
     private Location locationOfLot;
     private Scale scaleOfLot;
+    private String commentOfLot;
 
     public Integer getLotId() {
         return lotId;
@@ -66,11 +67,19 @@ public class LotReportRow implements Serializable{
     public void setScaleOfLot(Scale scaleOfLot) {
         this.scaleOfLot = scaleOfLot;
     }
+    
+    public String getCommentOfLot() {
+        return commentOfLot;
+    }
+    
+    public void setCommentOfLot(String commentOfLot) {
+        this.commentOfLot = commentOfLot;
+    }
 
     @Override
     public String toString() {
         return "LotReportRow [lotId=" + lotId + ", entityIdOfLot=" + entityIdOfLot + ", actualLotBalance=" + actualLotBalance
-                + ", locationOfLot=" + locationOfLot + ", scaleOfLot=" + scaleOfLot + "]";
+                + ", locationOfLot=" + locationOfLot + ", scaleOfLot=" + scaleOfLot + ", commentOfLot=" + commentOfLot + "]";
     }
 
 }
