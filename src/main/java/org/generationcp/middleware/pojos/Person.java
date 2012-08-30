@@ -95,6 +95,31 @@ public class Person implements Serializable{
         this.email = email;
         this.notes = notes;
     }
+    
+    /**
+     * Create a copy of this Person object.
+     * Note that this method does not copy the {@link Person#id} field.
+     * 
+     * @return
+     */
+    public Person copy() {
+        Person person = new Person();
+        person.setFirstName(firstName);
+        person.setLastName(lastName);
+        person.setMiddleName(middleName);
+        person.setInstituteId(instituteId);
+        person.setTitle(title);
+        person.setPositionName(positionName);
+        person.setLanguage(language);
+        person.setPhone(phone);
+        person.setExtension(extension);
+        person.setFax(fax);
+        person.setEmail(email);
+        person.setNotes(notes);
+        person.setContact(contact);
+        
+        return person;
+    }
 
     public Integer getId() {
         return id;

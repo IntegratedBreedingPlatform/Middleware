@@ -96,6 +96,27 @@ public class User implements Serializable {
         this.adate = adate;
         this.cdate = cdate;
     }
+    
+    /**
+     * Get a copy of this {@link User} object.
+     * Note that this method will not copy the {@link User#userid} field.
+     * 
+     * @return
+     */
+    public User copy() {
+        User user = new User();
+        user.setInstalid(instalid);
+        user.setStatus(status);
+        user.setAccess(access);
+        user.setType(type);
+        user.setName(name);
+        user.setPassword(password);
+        user.setPersonid(personid);
+        user.setAdate(adate);
+        user.setCdate(cdate);
+        
+        return user;
+    }
 
     public Integer getUserid() {
         return userid;

@@ -19,6 +19,7 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectLocationMap;
@@ -540,4 +541,11 @@ public interface WorkbenchDataManager{
      */
     public ToolConfiguration getToolConfigurationByToolIdAndConfigKey(Long toolId, String configKey) throws QueryException;
     
+    /**
+     * Add a Workbench User and IBDB local database User mapping.
+     * 
+     * @param userMap
+     * @return
+     */
+    public IbdbUserMap addIbdbUserMap(IbdbUserMap userMap) throws QueryException;
 }

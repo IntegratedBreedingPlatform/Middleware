@@ -10,6 +10,7 @@ import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.util.HibernateUtil;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -76,6 +77,16 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
         try {
             // begin save transaction
             trans = session.beginTransaction();
+            
+            SQLQuery q = session.createSQLQuery("SELECT MAX(userid) FROM users");
+            Integer userId = (Integer) q.uniqueResult();
+
+            if (userId == null || userId.intValue() < 0) {
+                user.setUserid(1);
+            }
+            else {
+                user.setUserid(userId + 1);
+            }
             
             UserDAO dao = new UserDAO();
             dao.setSession(session);
@@ -187,6 +198,16 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
         try {
             // begin save transaction
             trans = session.beginTransaction();
+            
+            SQLQuery q = session.createSQLQuery("SELECT MAX(personid) FROM persons");
+            Integer personId = (Integer) q.uniqueResult();
+            
+            if (personId == null || personId.intValue() < 0) {
+                person.setId(1);
+            }
+            else {
+                person.setId(personId + 1);
+            }
             
             PersonDAO dao = new PersonDAO();
             dao.setSession(session);
