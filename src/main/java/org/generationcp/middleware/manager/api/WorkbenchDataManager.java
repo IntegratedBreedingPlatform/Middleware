@@ -25,6 +25,7 @@ import org.generationcp.middleware.pojos.workbench.ProjectLocationMap;
 import org.generationcp.middleware.pojos.workbench.ProjectMethod;
 import org.generationcp.middleware.pojos.workbench.ProjectUser;
 import org.generationcp.middleware.pojos.workbench.Tool;
+import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
@@ -486,7 +487,6 @@ public interface WorkbenchDataManager{
      * @throws QueryException 
      */
     public List<ProjectActivity> getProjectActivitiesByProjectId(Long projectId, int start, int numOfRows) throws QueryException;
-    
 
     /**
      * Returns the number of {@link ProjectActivity} records associated with a {@link Project}
@@ -496,5 +496,29 @@ public interface WorkbenchDataManager{
      * @throws QueryException 
      */
     public Long countProjectActivitiesByProjectId(Long projectId) throws QueryException;
+    
+    /**
+     * Adds the tool configuration.
+     *
+     * @param toolConfig the tool config
+     * @throws QueryException the query exception
+     */
+    public void addToolConfiguration(ToolConfiguration toolConfig) throws QueryException;
+    
+    /**
+     * Update tool configuration.
+     *
+     * @param toolConfig the tool config
+     * @throws QueryException the query exception
+     */
+    public void updateToolConfiguration(ToolConfiguration toolConfig) throws QueryException;
+    
+    /**
+     * Delete tool configuration.
+     *
+     * @param toolConfig the tool config
+     * @throws QueryException the query exception
+     */
+    public void deleteToolConfiguration(ToolConfiguration toolConfig) throws QueryException;
     
 }

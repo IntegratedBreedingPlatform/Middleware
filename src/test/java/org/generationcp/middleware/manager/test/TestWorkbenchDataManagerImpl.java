@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import org.generationcp.middleware.dao.ToolConfigurationDAO;
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
@@ -30,6 +31,7 @@ import org.generationcp.middleware.pojos.workbench.ProjectLocationMap;
 import org.generationcp.middleware.pojos.workbench.ProjectMethod;
 import org.generationcp.middleware.pojos.workbench.ProjectUser;
 import org.generationcp.middleware.pojos.workbench.Tool;
+import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 import org.generationcp.middleware.util.HibernateUtil;
@@ -414,6 +416,71 @@ public class TestWorkbenchDataManagerImpl{
             System.out.println("testCountActivitiesByProjectId(): " + result);
         } catch (Exception e) {
             System.out.println("Error in testCountActivitiesByProjectId(): " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    @Test 
+    public void testAddToolConfiguration() {
+        try {
+            ToolConfiguration toolConfig = new ToolConfiguration();
+            toolConfig.setToolId(1L);
+            toolConfig.setConfigKey("test");
+            toolConfig.setConfigValue("test value");
+            
+            manager.addToolConfiguration(toolConfig);
+            
+            ToolConfigurationDAO dao = new ToolConfigurationDAO();
+            ToolConfiguration result = dao.findById(1L, false);
+            
+            System.out.println("testAddToolConfiguration(): " + result);
+            
+        } catch (Exception e) {
+            System.out.println("Error in testAddToolConfiguration(): " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    @Test 
+    public void testUpdateToolConfiguration() {
+        try {
+            ToolConfiguration toolConfig = new ToolConfiguration();
+            toolConfig.setConfigId(1L);
+            toolConfig.setToolId(1L);
+            toolConfig.setConfigKey("test test");
+            toolConfig.setConfigValue("test value");
+            
+            manager.updateToolConfiguration(toolConfig);
+            
+            ToolConfigurationDAO dao = new ToolConfigurationDAO();
+            ToolConfiguration result = dao.findById(1L, false);
+            
+            System.out.println("testUpdateToolConfiguration(): " + result);
+            
+        } catch (Exception e) {
+            System.out.println("Error in testUpdateToolConfiguration(): " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    @Test 
+    public void testDeleteToolConfiguration() {
+        try {
+            ToolConfiguration toolConfig = new ToolConfiguration();
+            toolConfig.setConfigId(1L);
+            toolConfig.setToolId(1L);
+            toolConfig.setConfigKey("test test");
+            toolConfig.setConfigValue("test value");
+            
+            manager.deleteToolConfiguration(toolConfig);
+            
+            ToolConfigurationDAO dao = new ToolConfigurationDAO();
+            ToolConfiguration result = dao.findById(1L, false);
+            
+            System.out.println("testDeleteToolConfiguration(): " + result);
+            
+        } catch (Exception e) {
+            System.out.println("Error in testDeleteToolConfiguration(): " + e.getMessage());
             e.printStackTrace();
         }
     }

@@ -21,6 +21,7 @@ import org.generationcp.middleware.dao.ProjectDAO;
 import org.generationcp.middleware.dao.ProjectLocationMapDAO;
 import org.generationcp.middleware.dao.ProjectMethodDAO;
 import org.generationcp.middleware.dao.ProjectUserDAO;
+import org.generationcp.middleware.dao.ToolConfigurationDAO;
 import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.WorkbenchDatasetDAO;
@@ -36,6 +37,7 @@ import org.generationcp.middleware.pojos.workbench.ProjectLocationMap;
 import org.generationcp.middleware.pojos.workbench.ProjectMethod;
 import org.generationcp.middleware.pojos.workbench.ProjectUser;
 import org.generationcp.middleware.pojos.workbench.Tool;
+import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
@@ -931,4 +933,67 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         return result;
     }
 
+    @Override
+    public void addToolConfiguration(ToolConfiguration toolConfig) throws QueryException {
+        addOrUpdateToolConfiguration(toolConfig, Operation.ADD);
+    }
+
+    @Override
+    public void updateToolConfiguration(ToolConfiguration toolConfig) throws QueryException {
+        addOrUpdateToolConfiguration(toolConfig, Operation.UPDATE);
+    }
+    
+    private void addOrUpdateToolConfiguration(ToolConfiguration toolConfig, Operation op) throws QueryException {
+        Session session = hibernateUtil.getCurrentSession();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+
+            ToolConfigurationDAO dao = new ToolConfigurationDAO();
+            dao.setSession(session);
+
+//            Do specific add/update operations here
+//            if(Operation.ADD.equals(op)) {
+//                
+//            } else if (Operation.UPDATE.equals(op)) {
+//                
+//            }
+            dao.saveOrUpdate(toolConfig);
+
+            trans.commit();
+        } catch (Exception ex) {
+            if (trans != null) {
+                    trans.rollback();
+            }
+            throw new QueryException("Error encountered while saving ToolConfiguration: " + ex.getMessage(), ex);
+        } finally {
+            hibernateUtil.closeCurrentSession();
+        }
+    }
+    
+    @Override
+    public void deleteToolConfiguration(ToolConfiguration toolConfig) throws QueryException {
+        Session session = hibernateUtil.getCurrentSession();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+
+            ToolConfigurationDAO dao = new ToolConfigurationDAO();
+            dao.setSession(session);
+
+            dao.makeTransient(toolConfig);
+
+            trans.commit();
+        } catch (Exception ex) {
+            if (trans != null) {
+                    trans.rollback();
+            }
+            throw new QueryException("Error encountered while deleting ToolConfiguration: " + ex.getMessage(), ex);
+        } finally {
+            hibernateUtil.closeCurrentSession();
+        }
+    }
+    
 }
