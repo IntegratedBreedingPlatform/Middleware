@@ -20,6 +20,7 @@ import org.generationcp.middleware.pojos.Study;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 public class StudyDAO extends GenericDAO<Study, Integer>{
@@ -73,8 +74,7 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
     public List<Study> getTopLevelStudies(int start, int numOfRows) throws QueryException {
         try {
             Criteria crit = getSession().createCriteria(Study.class);
-            // top level studies are studies without parent folders (shierarchy
-            // = 0)
+            // top level studies are studies without parent folders (shierarchy = 0)
             crit.add(Restrictions.eq("hierarchy", Integer.valueOf(0)));
             crit.setFirstResult(start);
             crit.setMaxResults(numOfRows);
@@ -83,6 +83,19 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
             throw new QueryException("Error with retrieving top level Studies: " + ex.getMessage(), ex);
         }
     }
+    
+    public Long countAllTopLevelStudies() throws QueryException {
+        try {
+            Criteria crit = getSession().createCriteria(Study.class);
+            // top level studies are studies without parent folders (shierarchy = 0)
+            crit.add(Restrictions.eq("hierarchy", Integer.valueOf(0)));
+            crit.setProjection(Projections.countDistinct("id"));
+            return  (Long) crit.uniqueResult();
+        } catch (HibernateException ex) {
+            throw new QueryException("Error with retrieving top level Studies: " + ex.getMessage(), ex);
+        }
+    }
+    
 
     @SuppressWarnings("unchecked")
     public List<Study> getByParentFolderID(Integer parentFolderId, int start, int numOfRows) throws QueryException {

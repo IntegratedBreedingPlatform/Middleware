@@ -130,6 +130,14 @@ public interface StudyDataManager{
     public List<Study> getAllTopLevelStudies(int start, int numOfRows, Database instance) throws QueryException;
 
     /**
+     * Returns the total number of top level studies.
+     *
+     * @return the int
+     */
+    public Long countAllTopLevelStudies(Database instance) throws QueryException;
+    
+    
+    /**
      * Returns a List of {@code Study} objects that belong to the specified
      * Parent Folder ID.
      * 

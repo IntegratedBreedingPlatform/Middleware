@@ -111,6 +111,14 @@ public class TestStudyDataManagerImpl{
             System.out.println(study);
         }
     }
+    
+
+    @Test
+    public void testCountAllTopLevelStudies() throws Exception {
+        Long count = manager.countAllTopLevelStudies(Database.CENTRAL);
+        System.out.println("Number of Top-Level Studies: " + count);
+    }
+
 
     @Test
     public void testGetStudiesByParentFolderID() throws Exception {
