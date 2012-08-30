@@ -521,4 +521,23 @@ public interface WorkbenchDataManager{
      */
     public void deleteToolConfiguration(ToolConfiguration toolConfig) throws QueryException;
     
+    /**
+     * Gets the list of {@link ToolConfiguration} records by tool id.
+     *
+     * @param toolId - the tool id
+     * @return the list of tool configurations by tool id
+     * @throws QueryException the query exception
+     */
+    public List<ToolConfiguration> getListOfToolConfigurationsByToolId(Long toolId) throws QueryException;
+    
+    /**
+     * Gets the {@link ToolConfiguration} by tool id and config key.
+     *
+     * @param toolId - the tool id
+     * @param configKey - the config key
+     * @return the tool configuration by tool id and config key
+     * @throws QueryException the query exception
+     */
+    public ToolConfiguration getToolConfigurationByToolIdAndConfigKey(Long toolId, String configKey) throws QueryException;
+    
 }

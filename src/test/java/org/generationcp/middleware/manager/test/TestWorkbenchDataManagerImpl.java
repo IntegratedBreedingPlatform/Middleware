@@ -425,12 +425,13 @@ public class TestWorkbenchDataManagerImpl{
         try {
             ToolConfiguration toolConfig = new ToolConfiguration();
             toolConfig.setToolId(1L);
-            toolConfig.setConfigKey("test");
+            toolConfig.setConfigKey("3rd key");
             toolConfig.setConfigValue("test value");
             
             manager.addToolConfiguration(toolConfig);
             
             ToolConfigurationDAO dao = new ToolConfigurationDAO();
+            dao.setSession(hibernateUtil.getCurrentSession());
             ToolConfiguration result = dao.findById(1L, false);
             
             System.out.println("testAddToolConfiguration(): " + result);
@@ -453,6 +454,7 @@ public class TestWorkbenchDataManagerImpl{
             manager.updateToolConfiguration(toolConfig);
             
             ToolConfigurationDAO dao = new ToolConfigurationDAO();
+            dao.setSession(hibernateUtil.getCurrentSession());
             ToolConfiguration result = dao.findById(1L, false);
             
             System.out.println("testUpdateToolConfiguration(): " + result);
@@ -475,12 +477,44 @@ public class TestWorkbenchDataManagerImpl{
             manager.deleteToolConfiguration(toolConfig);
             
             ToolConfigurationDAO dao = new ToolConfigurationDAO();
+            dao.setSession(hibernateUtil.getCurrentSession());
             ToolConfiguration result = dao.findById(1L, false);
             
             System.out.println("testDeleteToolConfiguration(): " + result);
             
         } catch (Exception e) {
             System.out.println("Error in testDeleteToolConfiguration(): " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    @Test
+    public void testGetListOfToolConfigurationsByToolId() {
+        try {
+            List<ToolConfiguration> result = manager.getListOfToolConfigurationsByToolId(1L);
+            System.out.println("testGetListOfToolConfigurationsByToolId(): ");
+            
+            if(result.isEmpty()) {
+                System.out.println("No records found.");
+            } else {
+                for(ToolConfiguration t : result) {
+                    System.out.println(t);
+                }
+            }
+            
+        } catch (Exception e) {
+            System.out.println("Error in testGetListOfToolConfigurationsByToolId(): " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    @Test 
+    public void testGetToolConfigurationByToolIdAndConfigKey() {
+        try {
+            ToolConfiguration toolConfig = manager.getToolConfigurationByToolIdAndConfigKey(1L, "test");
+            System.out.println("testGetToolConfigurationByToolIdAndConfigKey(): " + toolConfig);
+        } catch (Exception e) {
+            System.out.println("Error in testGetToolConfigurationByToolIdAndConfigKey(): " + e.getMessage());
             e.printStackTrace();
         }
     }

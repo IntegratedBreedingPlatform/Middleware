@@ -995,5 +995,21 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
             hibernateUtil.closeCurrentSession();
         }
     }
+
+    @Override
+    public List<ToolConfiguration> getListOfToolConfigurationsByToolId(Long toolId) throws QueryException {
+        ToolConfigurationDAO dao = new ToolConfigurationDAO();
+        dao.setSession(hibernateUtil.getCurrentSession());
+        return dao.getListOfToolConfigurationsByToolId(toolId);
+    }
+
+    @Override
+    public ToolConfiguration getToolConfigurationByToolIdAndConfigKey(Long toolId, String configKey)
+        throws QueryException {
+        
+        ToolConfigurationDAO dao = new ToolConfigurationDAO();
+        dao.setSession(hibernateUtil.getCurrentSession());
+        return dao.getToolConfigurationByToolIdAndConfigKey(toolId, configKey);
+    }
     
 }

@@ -11,7 +11,13 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao;
 
+import java.util.List;
+
+import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
+import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.criterion.Restrictions;
 
 
 /**
@@ -26,6 +32,31 @@ import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
  */
 public class ToolConfigurationDAO extends GenericDAO<ToolConfiguration, Long>{
     
+    @SuppressWarnings("unchecked")
+    public List<ToolConfiguration> getListOfToolConfigurationsByToolId(Long toolId) throws QueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(ToolConfiguration.class);
+            criteria.add(Restrictions.eq("toolId", toolId));
+            
+            return criteria.list();
+            
+        } catch (HibernateException e) {
+            throw new QueryException("Error with getListOfToolConfigurationsByToolId(): " + e.getMessage(), e);
+        }
+    }
     
+    public ToolConfiguration getToolConfigurationByToolIdAndConfigKey(Long toolId, String configKey) 
+        throws QueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(ToolConfiguration.class);
+            criteria.add(Restrictions.eq("toolId", toolId));
+            criteria.add(Restrictions.eq("configKey", configKey));
+            
+            return (ToolConfiguration) criteria.uniqueResult();
+            
+        } catch (HibernateException e) {
+            throw new QueryException("Error with getToolConfigurationByToolIdAndConfigKey(): " + e.getMessage(), e);
+        }
+    }
 
 }
