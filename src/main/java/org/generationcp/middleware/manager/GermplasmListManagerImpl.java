@@ -276,7 +276,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     }
     
     @Override
-    public List<GermplasmList> getTopLevelFolders(int start, int numOfRows, Database instance) throws QueryException {
+    public List<GermplasmList> getAllTopLevelLists(int start, int numOfRows, Database instance) throws QueryException {
         GermplasmListDAO dao = new GermplasmListDAO();
         HibernateUtil hibernateUtil = getHibernateUtil(instance);
 
@@ -288,13 +288,13 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
             return new ArrayList<GermplasmList>();
         }
         
-        topLevelFolders = dao.getTopLevelFolders(start, numOfRows);
+        topLevelFolders = dao.getAllTopLevelLists(start, numOfRows);
         
         return topLevelFolders;
     }
     
     @Override
-    public List<GermplasmList> getTopLevelFoldersBatched(int batchSize, Database instance) throws QueryException {
+    public List<GermplasmList> getAllTopLevelListsBatched(int batchSize, Database instance) throws QueryException {
         List<GermplasmList> topLevelFolders = new ArrayList<GermplasmList>();
         HibernateUtil hibernateUtil = getHibernateUtil(instance);
         if (hibernateUtil == null) {
@@ -312,10 +312,10 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
             GermplasmListDAO dao = new GermplasmListDAO();
             dao.setSession(session);
             
-            int topLevelCount = dao.countTopLevelFolders().intValue();
+            int topLevelCount = dao.countAllTopLevelLists().intValue();
             int start = 0;
             while (start < topLevelCount) {
-                topLevelFolders.addAll(dao.getTopLevelFolders(start, batchSize));
+                topLevelFolders.addAll(dao.getAllTopLevelLists(start, batchSize));
                 start += batchSize;
             }
         
@@ -335,13 +335,13 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     }
     
     @Override
-    public int countTopLevelFolders(Database instance) throws QueryException {
+    public int countAllTopLevelLists(Database instance) throws QueryException {
         int count = 0;
         
         GermplasmListDAO dao = new GermplasmListDAO();
         HibernateUtil hibernateUtil = getHibernateUtil(instance);
         dao.setSession(hibernateUtil.getCurrentSession());
-        count = dao.countTopLevelFolders().intValue();
+        count = dao.countAllTopLevelLists().intValue();
         
         return count;
     }

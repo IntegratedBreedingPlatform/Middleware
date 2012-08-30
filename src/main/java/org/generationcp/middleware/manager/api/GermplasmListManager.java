@@ -196,7 +196,7 @@ public interface GermplasmListManager{
      * @return - List of GermplasmList POJOs
      * @throws QueryException
      */
-    public List<GermplasmList> getTopLevelFolders(int start, int numOfRows, Database instance) throws QueryException;
+    public List<GermplasmList> getAllTopLevelLists(int start, int numOfRows, Database instance) throws QueryException;
     
     /**
      * Returns the Top Level Germplasm List Folders present in the specified database.
@@ -211,7 +211,7 @@ public interface GermplasmListManager{
      * @return - List of GermplasmList POJOs
      * @throws QueryException
      */
-    public List<GermplasmList> getTopLevelFoldersBatched(int batchSize, Database instance) throws QueryException;
+    public List<GermplasmList> getAllTopLevelListsBatched(int batchSize, Database instance) throws QueryException;
     
     /**
      * Returns the number of Top Level Germplasm List Folders in the specified database.
@@ -221,7 +221,7 @@ public interface GermplasmListManager{
      * @return
      * @throws QueryException
      */
-    public int countTopLevelFolders(Database instance) throws QueryException;
+    public int countAllTopLevelLists(Database instance) throws QueryException;
 
     /**
      * Inserts a single {@code GermplasmList} object into the database.

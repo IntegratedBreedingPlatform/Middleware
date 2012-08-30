@@ -323,30 +323,30 @@ public class TestGermplasmListManagerImpl{
     }
     
     @Test
-    public void testGetTopLevelFolders() throws Exception {
-        System.out.println("********** testGetTopLevelFolders() **********");
+    public void testGetTopLevelLists() throws Exception {
+        System.out.println("********** testGetTopLevelLists() **********");
         try {
-            System.out.println("Retrieving Top Level Folders: ");
+            System.out.println("Retrieving Top Level Lists: ");
             List<GermplasmList> topLevelFolders = new ArrayList<GermplasmList>();
-            topLevelFolders = manager.getTopLevelFolders(0, 100, Database.LOCAL);
+            topLevelFolders = manager.getAllTopLevelLists(0, 100, Database.LOCAL);
             System.out.println(topLevelFolders);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println("********** testGetTopLevelFolders() done **********");
+        System.out.println("********** testGetTopLevelLists() done **********");
     }
     
     @Test
-    public void testCountTopLevelFolders() throws Exception {
-        System.out.println("********** testCountTopLevelFolders() **********");
+    public void testCountTopLevelLists() throws Exception {
+        System.out.println("********** testCountTopLevelLists() **********");
         try {
-            System.out.println("Counting Top Level Folders: ");
-            int count = manager.countTopLevelFolders(Database.LOCAL);
+            System.out.println("Counting Top Level Lists: ");
+            int count = manager.countAllTopLevelLists(Database.LOCAL);
             System.out.println(count);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println("********** testCountTopLevelFolders() done **********");
+        System.out.println("********** testCountTopLevelLists() done **********");
     }
     
     

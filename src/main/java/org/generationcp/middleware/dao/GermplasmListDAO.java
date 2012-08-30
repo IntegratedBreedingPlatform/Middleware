@@ -75,26 +75,18 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
     }
     
     @SuppressWarnings("unchecked")
-    public List<GermplasmList> getTopLevelFolders(int start, int numOfRows) {
+    public List<GermplasmList> getAllTopLevelLists(int start, int numOfRows) {
         Criteria criteria = getSession().createCriteria(GermplasmList.class);
-
-        criteria.add(Restrictions.eq("status", 0));
         criteria.add(Restrictions.eq("parent.id", 0));
-
         criteria.setFirstResult(start);
         criteria.setMaxResults(numOfRows);
-
         return criteria.list();
     }
     
-    public Long countTopLevelFolders() {
+    public Long countAllTopLevelLists() {
         Criteria criteria = getSession().createCriteria(GermplasmList.class);
-        
-        criteria.add(Restrictions.eq("status", 0));
-        criteria.add(Restrictions.eq("parent.id", 0));
-        
+        criteria.add(Restrictions.eq("parent.id", 0));        
         criteria.setProjection(Projections.rowCount());
-
         return (Long) criteria.uniqueResult();
     }
 
