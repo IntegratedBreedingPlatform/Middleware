@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectMethod;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -76,4 +77,36 @@ public class ProjectMethodDAO extends GenericDAO<ProjectMethod, Integer>{
             throw new QueryException("Error with countByProjectId query: " + e.getMessage(), e);
         }
     }
+    
+    @SuppressWarnings("rawtypes")
+    public List<ProjectMethod> getProjectMethodByProject(Project project, int start, int numOfRows) 
+            throws QueryException {
+            
+            if (project == null || project.getProjectId() == null){
+                return new ArrayList<ProjectMethod>();
+            }
+
+            try {
+                SQLQuery query = getSession().createSQLQuery(ProjectMethod.GET_PROJECT_METHODS_BY_PROJECT_ID);
+                query.setParameter("projectId", project.getProjectId().intValue());
+                query.setFirstResult(start);
+                query.setMaxResults(numOfRows);
+                List results = query.list();
+                List<ProjectMethod> toReturn = new ArrayList<ProjectMethod>();
+                for (Object o : results) {
+                    Object[] result = (Object[]) o;
+                    if (result != null) {
+                        Long projectMethodId = Long.valueOf((Integer)result[0]);
+                        Integer methodId = (Integer) result[2];
+                        ProjectMethod projectMethod = new ProjectMethod(projectMethodId, project, methodId);
+                        toReturn.add(projectMethod);
+                    }
+                }
+                return toReturn;
+                
+            } catch (HibernateException e) {
+                throw new QueryException("Error with getProjectMethodByProjectId query: " + e.getMessage(), e);
+            } 
+        }
+
 }

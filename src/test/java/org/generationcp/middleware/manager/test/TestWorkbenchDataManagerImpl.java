@@ -56,25 +56,24 @@ public class TestWorkbenchDataManagerImpl{
         Project project1 = new Project();
         project1.setProjectName("Test Project 1");
         project1.setUserId(1);
-        project1.setCropType(CropType.CHICKPEA);
+        project1.setCropType(manager.getCropTypeByName(CropType.CHICKPEA));
         project1.setTargetDueDate(new GregorianCalendar().getTime());
         project1.setLastOpenDate(new GregorianCalendar().getTime());
 
         Project project2 = new Project();
         project2.setProjectName("Test Project 2");
-        project2.setCropType(CropType.CHICKPEA);
+        project2.setCropType(manager.getCropTypeByName(CropType.CHICKPEA));
         project2.setTargetDueDate(new GregorianCalendar().getTime());
         project2.setLastOpenDate(new GregorianCalendar().getTime());
 
         WorkflowTemplate marsTemplate = new WorkflowTemplate();
         marsTemplate.setTemplateId(1L);
         
-
         project1.setTemplate(marsTemplate);
         project2.setTemplate(marsTemplate);
 
-        Project projectNew1=manager.saveOrUpdateProject(project1);
-        Project projectNew2=manager.saveOrUpdateProject(project2);
+        Project projectNew1 = manager.saveOrUpdateProject(project1);
+        Project projectNew2 = manager.saveOrUpdateProject(project2);
         
         // Adding Project Locations
         List<ProjectLocationMap> projectLocationMapList = new ArrayList<ProjectLocationMap>();
@@ -84,7 +83,7 @@ public class TestWorkbenchDataManagerImpl{
         projectLocationMap1.setLocationId(new Long(3));
         
         ProjectLocationMap projectLocationMap2= new ProjectLocationMap();
-        projectLocationMap2.setProject(projectNew1);
+        projectLocationMap2.setProject(projectNew2);
         projectLocationMap2.setLocationId(new Long(4));
         
         projectLocationMapList.add(projectLocationMap1);
@@ -132,6 +131,61 @@ public class TestWorkbenchDataManagerImpl{
         projectActivityList.add(projectActivity2);
         
         manager.addProjectActivity(projectActivityList);
+        
+        System.out.println("testSaveProject: ");
+        System.out.println(project1);
+        System.out.println(project2);
+        
+        // cleanup
+        deleteProject(project1);
+        deleteProject(project2);
+
+    }
+
+    // delete dependencies first, before deleting the project
+    private void deleteProject(Project project){
+        
+        Long projectId = project.getProjectId();
+        
+        try{
+
+            List<ProjectActivity> projectActivities = manager.getProjectActivitiesByProjectId(projectId, 0, manager
+                    .countProjectActivitiesByProjectId(projectId).intValue());
+            for (ProjectActivity projectActivity : projectActivities) {
+                manager.deleteProjectActivity(projectActivity);
+            }
+
+            List<ProjectMethod> projectMethods = manager.getProjectMethodByProject(project, 0,
+                    manager.countMethodIdsByProjectId(projectId).intValue());
+            for (Object o : projectMethods) {
+                ProjectMethod projectMethod = (ProjectMethod) o;
+                manager.deleteProjectMethod(projectMethod);
+            }
+
+            List<ProjectUser> projectUsers = manager.getProjectUserByProject(project);
+            for (ProjectUser projectUser : projectUsers) {
+                manager.deleteProjectUser(projectUser);
+            }
+
+            List<WorkbenchDataset> datasets = manager.getWorkbenchDatasetByProjectId(projectId, 0, manager
+                    .countWorkbenchDatasetByProjectId(projectId).intValue());
+            for (WorkbenchDataset dataset : datasets) {
+                manager.deleteWorkbenchDataset(dataset);
+            }
+
+            List<ProjectLocationMap> projectLocationMaps = manager.getProjectLocationMapByProjectId(projectId, 0, 
+                    manager.countLocationIdsByProjectId(projectId).intValue());
+            //manager.deleteProjectLocationMap(projectLocationMaps);
+            for (ProjectLocationMap projectLocationMap : projectLocationMaps) {
+                manager.deleteProjectLocationMap(projectLocationMap);
+            }
+
+            manager.deleteProject(project);
+            
+        } catch (QueryException e) {
+            System.out.println("Error in deleteProject(): " + e.getMessage());
+            e.printStackTrace();
+        }
 
     }
 
@@ -139,21 +193,17 @@ public class TestWorkbenchDataManagerImpl{
     public void testGetProjects()  throws QueryException{
         List<Project> projects = manager.getProjects();
 
-        System.out.println("testGetProjects");
+        System.out.println("testGetProjects: ");
         for (Project project : projects) {
             System.out.println(project);
         }
     }
 
-    /**
-     * @Test public void testDeleteProject() { List<Project> projects =
-     *       manager.getProjects(); manager.deleteProject(projects.get(0)); }
-     **/
 
     @Test
     public void testFindTool() throws QueryException {
         Tool tool = manager.getToolWithName("fieldbook");
-        System.out.println(tool);
+        System.out.println("testFindTool: " + tool);
     }
     
     @Test
@@ -171,7 +221,12 @@ public class TestWorkbenchDataManagerImpl{
         user.setAdate(20120101);
         user.setCdate(20120101);
         
+        // add user
         manager.addUser(user);
+        System.out.println("testAddUser: " + user);
+
+        // cleanup
+        manager.deleteUser(user);
     }
     
     @Test
@@ -193,7 +248,11 @@ public class TestWorkbenchDataManagerImpl{
         person.setPhone("4");
         
         // add the person
-        manager.addPerson(person);
+        manager.addPerson(person);        
+        System.out.println("testAddPerson: " + person);
+
+        // cleanup
+        manager.deletePerson(person);
     }
     
     
@@ -205,24 +264,28 @@ public class TestWorkbenchDataManagerImpl{
     
     @Test
     public void testGetUserByName() throws QueryException {
-        User user = (User) manager.getUserByName("jeff", 0, 1, Operation.EQUAL).get(0);
+        User user = (User) manager.getUserByName("test", 0, 1, Operation.EQUAL).get(0);
         System.out.println(user);
     }
     
     @Test
-    public void testAddDataset() throws QueryException {
+    public void testAddWorkbenchDataset() throws QueryException {
         WorkbenchDataset dataset = new WorkbenchDataset();
         dataset.setName("Test Dataset");
         dataset.setDescription("Test Dataset Description");
         dataset.setCreationDate(new Date(System.currentTimeMillis()));
         dataset.setProject(manager.getProjectById(Long.valueOf(1)));
-        WorkbenchDataset result = null;
         try {
-            result = manager.addDataset(dataset);
+            manager.addWorkbenchDataset(dataset);
+            System.out.println("testAddWorkbenchDataset: " + dataset);
+
+            // clean up
+            manager.deleteWorkbenchDataset(dataset);
+
         } catch (QueryException e) {
+            System.out.println("Error in testAddWorkbenchDataset(): " + e.getMessage());
             e.printStackTrace();
         }
-        System.out.println("TestAddDataset: " + result);
     }
     
     @Test 
@@ -342,7 +405,7 @@ public class TestWorkbenchDataManagerImpl{
         List<ProjectUser> projectUsers = new ArrayList<ProjectUser>();
 
         // Assumptions: Project with id=1, and Users with id=1 and id=2 exist in the database
-        Project project1 = manager.getProjectById(1L);
+        Project project1 = manager.getProjectById(Long.valueOf(1));
         User user1 = manager.getUserById(1);
         User user2 = manager.getUserById(2);
         projectUsers.add(new ProjectUser(project1, user1));
@@ -355,6 +418,7 @@ public class TestWorkbenchDataManagerImpl{
         System.out.println("  " + manager.getProjectUserByProjectAndUser(project1, user1));
         System.out.println("  " + manager.getProjectUserByProjectAndUser(project1, user2));
         
+        // clean up
         manager.deleteProjectUser(manager.getProjectUserByProjectAndUser(project1, user1));
         manager.deleteProjectUser(manager.getProjectUserByProjectAndUser(project1, user2));
     }
@@ -527,6 +591,43 @@ public class TestWorkbenchDataManagerImpl{
             e.printStackTrace();
         }
     }
+
+    @Test 
+    public void testGetInstalledCentralCrops() {
+        try {
+            ArrayList<CropType> cropTypes = (ArrayList<CropType>) manager.getInstalledCentralCrops();
+            System.out.println("testGetInstalledCentralCrops(): " + cropTypes);
+        } catch (Exception e) {
+            System.out.println("Error in testGetInstalledCentralCrops(): " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+
+    @Test 
+    public void testGetCropTypeByName() {
+        try {
+            CropType cropType = manager.getCropTypeByName(CropType.CHICKPEA);
+            System.out.println("testGetCropTypeByName(): " + cropType);
+        } catch (Exception e) {
+            System.out.println("Error in testGetCropTypeByName(): " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @Test 
+    public void testGetAddCropType() {
+        try {
+            int added = manager.addCropType(new CropType("Coconut"));
+            System.out.println("testGetCropTypeByName(): records added = " + added);
+        } catch (Exception e) {
+            System.out.println("Error in testGetAddCropType(): " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    
+    
     
     @AfterClass
     public static void tearDown() throws Exception {

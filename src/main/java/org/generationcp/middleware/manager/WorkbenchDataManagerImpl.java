@@ -15,6 +15,7 @@ package org.generationcp.middleware.manager;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.dao.CropTypeDAO;
 import org.generationcp.middleware.dao.IbdbUserMapDAO;
 import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.ProjectActivityDAO;
@@ -44,7 +45,6 @@ import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 import org.generationcp.middleware.util.HibernateUtil;
-import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -123,7 +123,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 				trans.rollback();
 			}
 
-			throw new QueryException("Cannot save Project", e);
+			throw new QueryException("Cannot delete Project", e);
 		} finally {
 			hibernateUtil.closeCurrentSession();
 		}
@@ -173,7 +173,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 	public boolean isPersonExists(String firstName, String lastName) throws QueryException {
 		PersonDAO dao = new PersonDAO();
 		dao.setSession(hibernateUtil.getCurrentSession());
-
 		return dao.isPersonExists(firstName, lastName);
 	}
 
@@ -265,20 +264,18 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 		return projectDao.getById(projectId);
 	}
 
-	public WorkbenchDataset addDataset(WorkbenchDataset dataset) throws QueryException {
+	public int addWorkbenchDataset(WorkbenchDataset dataset) throws QueryException {
 
 		Session session = hibernateUtil.getCurrentSession();
 		Transaction trans = null;
-
+		int recordSaved = 0;
 		try {
 			// begin save transaction
 			trans = session.beginTransaction();
-			System.out.println("WorkbenchDatamanagerImpl.dataset: " + dataset);
 			WorkbenchDatasetDAO datasetDAO = new WorkbenchDatasetDAO();
 			datasetDAO.setSession(session);
 			datasetDAO.saveOrUpdate(dataset);
-			System.out.println("WorkbenchDatamanagerImpl.dataset: " + dataset);
-
+			recordSaved++;
 			trans.commit();
 		} catch (Exception ex) {
 			LOG.error("Error in addDataset: " + ex.getMessage() + "\n" + ex.getStackTrace());
@@ -292,8 +289,41 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 			hibernateUtil.closeCurrentSession();
 		}
 
-		return dataset;
+		return recordSaved;
 	}
+	
+    @Override
+    public WorkbenchDataset getWorkbenchDatasetById(Long datasetId) throws QueryException{
+        WorkbenchDatasetDAO datasetDAO = new WorkbenchDatasetDAO();
+        datasetDAO.setSession(hibernateUtil.getCurrentSession());
+        return datasetDAO.getById(datasetId);
+    }
+    
+    @Override
+    public void deleteWorkbenchDataset(WorkbenchDataset dataset)  throws QueryException{
+        Session session = hibernateUtil.getCurrentSession();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+            WorkbenchDatasetDAO datasetDAO = new WorkbenchDatasetDAO();
+            datasetDAO.setSession(session);
+            datasetDAO.makeTransient(dataset);
+
+            trans.commit();
+        } catch (Exception e) {
+            if (trans != null) {
+                trans.rollback();
+            }
+
+            throw new QueryException("Cannot delete WorkbenchDataset. " + e.getMessage(), e);
+        } finally {
+            hibernateUtil.closeCurrentSession();
+        }
+    }
+
+
+
 
 	@Override
 	public List<User> getAllUsers() {
@@ -581,6 +611,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 
 		return result;
 	}
+	
 	@Override
 	public int addProjectUser(Project project, User user) throws QueryException{
 		ProjectUser projectUser = new ProjectUser();
@@ -668,15 +699,25 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 		return null;
 	}
 
-	@Override
-	public ProjectUser getProjectUserByProjectAndUser(Project project, User user) throws QueryException{
-		ProjectUserDAO dao = new ProjectUserDAO();
-		if (hibernateUtil != null) {
-			dao.setSession(hibernateUtil.getCurrentSession());
-			return dao.getByProjectAndUser(project, user);
-		}
-		return null;
-	}
+    @Override
+    public ProjectUser getProjectUserByProjectAndUser(Project project, User user) throws QueryException{
+        ProjectUserDAO dao = new ProjectUserDAO();
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+            return dao.getByProjectAndUser(project, user);
+        }
+        return null;
+    }
+
+    @Override
+    public List<ProjectUser> getProjectUserByProject(Project project) throws QueryException{
+        ProjectUserDAO dao = new ProjectUserDAO();
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+            return dao.getByProject(project);
+        }
+        return null;
+    }
 
 	@Override
 	public void deleteProjectUser(ProjectUser projectUser) throws QueryException {
@@ -735,30 +776,71 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 		return result;
 	}
 
-	public List<CropType> getInstalledCentralCrops() throws QueryException {
-		List<CropType> cropTypes = new ArrayList<CropType>();
+    @Override
+    public List<CropType> getInstalledCentralCrops() throws QueryException {
+        CropTypeDAO dao = new CropTypeDAO();
+        List<CropType> cropTypes = new ArrayList<CropType>();
 
-		if(hibernateUtil != null) {
-			Session session = hibernateUtil.getCurrentSession();
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+            cropTypes = (List<CropType>) dao.getAll();
+        }
 
-			try {
-				@SuppressWarnings("unchecked")
-				List<String> cropNames = session.createSQLQuery("SELECT crop_name FROM workbench_crops").list();
+        return cropTypes;
 
-				for (String cropName : cropNames) {
-					CropType cropType = CropType.valueOf(cropName);
-					cropTypes.add(cropType);
-				}
-			}
-			catch (HibernateException e) {
-				throw new QueryException("Error getting crop types: " + e.getMessage(), e);
-			}
+    }
+    
+    @Override
+    public CropType getCropTypeByName(String cropName) throws QueryException {
+        CropTypeDAO dao = new CropTypeDAO();
+        CropType cropType = null;
 
-			return cropTypes;
-		}
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+            cropType = dao.getByName(cropName);
+        }
 
-		return cropTypes;
-	}
+        return cropType;
+    }
+
+    @Override
+    public int addCropType(CropType cropType) throws QueryException {
+
+        if(hibernateUtil == null) {
+            return 0;
+        }
+        Session session = hibernateUtil.getCurrentSession();
+        CropTypeDAO dao = new CropTypeDAO();
+        dao.setSession(session);
+
+        if (dao.getByName(cropType.getCropName()) != null){
+            throw new QueryException("Error encountered while adding crop type: Value already exists");
+        }
+        
+        
+        Transaction trans = null;
+        int recordsSaved = 0;
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
+            dao.saveOrUpdate(cropType);
+            recordsSaved++;
+            // end transaction, commit to database
+            trans.commit();
+        } catch (Exception ex) {
+            LOG.error("Error in addCropType: " + ex.getMessage() + "\n" + ex.getStackTrace());
+            ex.printStackTrace();
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new QueryException("Error encountered while adding crop type: " + ex.getMessage(), ex);
+        } finally {
+            hibernateUtil.closeCurrentSession();
+        }
+
+        return recordsSaved;    
+    }
 
 	@Override
 	public int addProjectLocationMap(ProjectLocationMap projectLocationMap)
@@ -809,6 +891,48 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 
 		return recordsSaved;
 	}
+	
+    
+    @Override
+    public List<ProjectLocationMap> getProjectLocationMapByProjectId(Long projectId, int start, int numOfRows) throws QueryException{
+        ProjectLocationMapDAO dao = new ProjectLocationMapDAO();
+        List<ProjectLocationMap> projectLocationMap;
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+            projectLocationMap = (List<ProjectLocationMap>) dao.getByProjectId(projectId, start, numOfRows);
+        } else {
+            projectLocationMap = new ArrayList<ProjectLocationMap>();
+        }
+
+        return projectLocationMap;
+
+    }
+    
+    @Override
+    public void deleteProjectLocationMap(ProjectLocationMap projectLocationMap) throws QueryException{
+        Session session = hibernateUtil.getCurrentSession();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+
+            ProjectLocationMapDAO dao = new ProjectLocationMapDAO();
+            dao.setSession(session);
+
+            dao.makeTransient(projectLocationMap);
+
+            trans.commit();
+        } catch (Exception ex) {
+            if (trans != null) {
+                    trans.rollback();
+            }
+            throw new QueryException("Error encountered while deleting ProjectLocationMap: " + ex.getMessage(), ex);
+        } finally {
+            hibernateUtil.closeCurrentSession();
+        }
+    }
+
+
 
 	@Override
 	public int addProjectMethod(ProjectMethod projectMethod) throws QueryException {
@@ -821,7 +945,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 	public int addProjectMethod(List<ProjectMethod> projectMethodList) throws QueryException {
 		return addOrUpdateProjectMethodData(projectMethodList, Operation.ADD);
 	}
-
+	
 	private int addOrUpdateProjectMethodData(List<ProjectMethod> projectMethodList, Operation add) throws QueryException {
 		if(hibernateUtil == null) {
 			return 0;
@@ -858,6 +982,45 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 
 		return recordsSaved;
 	}
+	
+    @Override
+    public List<ProjectMethod> getProjectMethodByProject(Project project, int start, int numOfRows) throws QueryException{
+        ProjectMethodDAO dao = new ProjectMethodDAO();
+        List<ProjectMethod> projectMethods;
+        if (hibernateUtil != null) {
+            dao.setSession(hibernateUtil.getCurrentSession());
+            projectMethods = (List<ProjectMethod>) dao.getProjectMethodByProject(project, start, numOfRows);
+        } else {
+            projectMethods = new ArrayList<ProjectMethod>();
+        }
+
+        return projectMethods;
+
+    }
+    
+    @Override
+    public void deleteProjectMethod(ProjectMethod projectMethod) throws QueryException{
+        Session session = hibernateUtil.getCurrentSession();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+
+            ProjectMethodDAO dao = new ProjectMethodDAO();
+            dao.setSession(session);
+
+            dao.makeTransient(projectMethod);
+
+            trans.commit();
+        } catch (Exception ex) {
+            if (trans != null) {
+                    trans.rollback();
+            }
+            throw new QueryException("Error encountered while deleting ProjectMethod: " + ex.getMessage(), ex);
+        } finally {
+            hibernateUtil.closeCurrentSession();
+        }
+    }
 
     @Override
     public int addProjectActivity(ProjectActivity projectActivity) throws QueryException {
@@ -921,6 +1084,31 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 
         return projectActivities;
     }
+ 
+    @Override
+    public void deleteProjectActivity(ProjectActivity projectActivity) throws QueryException{
+        Session session = hibernateUtil.getCurrentSession();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+
+            ProjectActivityDAO dao = new ProjectActivityDAO();
+            dao.setSession(session);
+
+            dao.makeTransient(projectActivity);
+
+            trans.commit();
+        } catch (Exception ex) {
+            if (trans != null) {
+                    trans.rollback();
+            }
+            throw new QueryException("Error encountered while deleting ProjectActivity: " + ex.getMessage(), ex);
+        } finally {
+            hibernateUtil.closeCurrentSession();
+        }
+    }
+
 
     @Override
     public Long countProjectActivitiesByProjectId(Long projectId) throws QueryException {

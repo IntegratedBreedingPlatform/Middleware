@@ -42,6 +42,7 @@ public interface WorkbenchDataManager{
      * Gets the projects.
      *
      * @return the projects
+     * @throws QueryException
      */
     public List<Project> getProjects()  throws QueryException;
 
@@ -49,8 +50,9 @@ public interface WorkbenchDataManager{
      * Gets the projects.
      *
      * @param start - the starting record
-     * @param numRows - the number of rows to retrieve
+     * @param numOfRows - the number of rows to retrieve
      * @return the projects
+     * @throws QueryException
      */
     public List<Project> getProjects(int start, int numOfRows)  throws QueryException;
 
@@ -59,6 +61,7 @@ public interface WorkbenchDataManager{
      *
      * @param project - the project to save
      * @return the project saved
+     * @throws QueryException
      */
     public Project saveOrUpdateProject(Project project) throws QueryException;
 
@@ -66,6 +69,7 @@ public interface WorkbenchDataManager{
      * Delete project.
      *
      * @param project - the project to delete
+     * @throws QueryException
      */
     public void deleteProject(Project project) throws QueryException;
 
@@ -73,6 +77,7 @@ public interface WorkbenchDataManager{
      * Gets the workflow templates.
      *
      * @return the workflow templates
+     * @throws QueryException
      */
     public List<WorkflowTemplate> getWorkflowTemplates() throws QueryException;
 
@@ -80,8 +85,9 @@ public interface WorkbenchDataManager{
      * Gets the workflow templates.
      *
      * @param start - the starting record
-     * @param numRows - the number of rows to retrieve
+     * @param numOfRows - the number of rows to retrieve
      * @return the workflow templates
+     * @throws QueryException
      */
     public List<WorkflowTemplate> getWorkflowTemplates(int start, int numOfRows) throws QueryException;
 
@@ -90,13 +96,14 @@ public interface WorkbenchDataManager{
      *
      * @param toolName - the tool name to match
      * @return the tool with the given name
+     * @throws QueryException
      */
     public Tool getToolWithName(String toolName) throws QueryException;
     
     /**
      * Get the list of tools with the specified type.
-     * 
-     * @param toolType
+     *
+     * @param toolType the tool type
      * @return the list of matching tools
      * @throws QueryException
      */
@@ -108,7 +115,7 @@ public interface WorkbenchDataManager{
      * @param username - the username
      * @param password - the password
      * @return true, if is valid user login
-     * @throws QueryException 
+     * @throws QueryException
      */
     public boolean isValidUserLogin(String username, String password) throws QueryException;
     
@@ -118,7 +125,7 @@ public interface WorkbenchDataManager{
      * @param firstName - the first name
      * @param lastName - the last name
      * @return true, if is person exists
-     * @throws QueryException 
+     * @throws QueryException
      */
     public boolean isPersonExists(String firstName, String lastName) throws QueryException;
     
@@ -127,7 +134,7 @@ public interface WorkbenchDataManager{
      *
      * @param userName - the user name to check
      * @return true, if is username exists
-     * @throws QueryException 
+     * @throws QueryException
      */
     public boolean isUsernameExists(String userName) throws QueryException;
     
@@ -135,7 +142,7 @@ public interface WorkbenchDataManager{
      * Adds the person.
      *
      * @param person - the Person to add
-     * @throws QueryException 
+     * @throws QueryException
      */
     public void addPerson(Person person) throws QueryException;
     
@@ -143,7 +150,7 @@ public interface WorkbenchDataManager{
      * Adds a user.
      *
      * @param user - the user to add
-     * @throws QueryException 
+     * @throws QueryException
      */
     public void addUser(User user) throws QueryException;
     
@@ -152,17 +159,37 @@ public interface WorkbenchDataManager{
      *
      * @param projectId - the project id to match
      * @return the project matching the given id
+     * @throws QueryException
      */
     public Project getProjectById(Long projectId) throws QueryException;
     
     /**
-     * Registers a dataset. Returns the id of the newly created dataset.
+     * Registers a workbench dataset.
      *
-     * @param dataset the dataset
-     * @return the id of the newly created dataset
+     * @param dataset - the workbench dataset to save
+     * @return the number of records saved (0 or 1)
+     * @throws QueryException
      */
-    public WorkbenchDataset addDataset(WorkbenchDataset dataset) throws QueryException;
+    public int addWorkbenchDataset(WorkbenchDataset dataset) throws QueryException;
     
+    /**
+     * Gets the workbench dataset by id.
+     *
+     * @param datasetId 
+     * @return the workench dataset matching the given id
+     * @throws QueryException
+     */
+    public WorkbenchDataset getWorkbenchDatasetById(Long datasetId) throws QueryException;
+    
+    /**
+     * Delete a workbench dataset.
+     *
+     * @param dataset the dataset to delete
+     * @throws QueryException
+     */
+    public void deleteWorkbenchDataset(WorkbenchDataset dataset)  throws QueryException;
+
+
     /**
      * Returns all Persons.
      *
@@ -190,9 +217,10 @@ public interface WorkbenchDataManager{
      *
      * @param name - the name to match
      * @param start - the starting record
-     * @param numRows - the number of rows to retrieve
-     * @param operation - the operation to perform (EQUAL, LIKE)
+     * @param numOfRows - the number of rows to retrieve
+     * @param op the op
      * @return the user by name
+     * @throws QueryException
      */
     public List<User> getUserByName(String name, int start, int numOfRows, Operation op) throws QueryException;
     
@@ -236,7 +264,7 @@ public interface WorkbenchDataManager{
     
     /**
      * Returns the project last accessed by the user.
-     * 
+     *
      * @param userId - the user id to match
      * @return the last Project opened by the given user
      * @throws QueryException
@@ -248,7 +276,7 @@ public interface WorkbenchDataManager{
      *
      * @param projectId - the project id
      * @param start - the starting record
-     * @param numRows - the number of rows to retrieve
+     * @param numOfRows - the number of rows to retrieve
      * @return the list of {@link WorkbenchDataset}s
      * @throws QueryException
      */
@@ -269,7 +297,7 @@ public interface WorkbenchDataManager{
      * @param name - the {@link WorkbenchDataset} name
      * @param op - the operator; EQUAL, LIKE
      * @param start - the starting record
-     * @param numRows - the number of rows to retrieve
+     * @param numOfRows - the number of rows to retrieve
      * @return the list of {@link WorkbenchDataset}
      * @throws QueryException
      */
@@ -281,7 +309,7 @@ public interface WorkbenchDataManager{
      * @param name - the {@link WorkbenchDataset} name
      * @param op - the operator; EQUAL, LIKE
      * @return the number of {@link WorkbenchDataset}
-     * @throws QueryException 
+     * @throws QueryException
      */
     public Long countWorkbenchDatasetByName(String name, Operation op) throws QueryException;
     
@@ -290,9 +318,9 @@ public interface WorkbenchDataManager{
      *
      * @param projectId - the project id to match
      * @param start - the starting record
-     * @param numRows - the number of rows to retrieve
+     * @param numOfRows - the number of rows to retrieve
      * @return the list of {@link Location} ids
-     * @throws QueryException 
+     * @throws QueryException
      */
     public List<Long> getLocationIdsByProjectId(Long projectId, int start, int numOfRows) throws QueryException;
     
@@ -300,7 +328,7 @@ public interface WorkbenchDataManager{
      * Returns the number of {@link Location} ids by project id.
      *
      * @param projectId - the project id to match
-     * @return the number of {@link Location} ids 
+     * @return the number of {@link Location} ids
      * @throws QueryException
      */
     public Long countLocationIdsByProjectId(Long projectId) throws QueryException;
@@ -310,18 +338,18 @@ public interface WorkbenchDataManager{
      *
      * @param projectId - the project id to match
      * @param start - the starting record
-     * @param numRows - the number of rows to retrieve
+     * @param numOfRows - the number of rows to retrieve
      * @return the list of method ids
-     * @throws QueryException 
+     * @throws QueryException
      */
     public List<Integer> getMethodIdsByProjectId(Long projectId, int start, int numOfRows) throws QueryException;
-    
+
     /**
      * Returns the number of method ids by project id.
      *
      * @param projectId - the project id to match
      * @return the number of method ids
-     * @throws QueryException 
+     * @throws QueryException
      */
     public Long countMethodIdsByProjectId(Long projectId) throws QueryException;
     
@@ -329,9 +357,10 @@ public interface WorkbenchDataManager{
     /**
      * Adds a single project user given a Project object and a User object.
      *
-     * @param projectUser - the ProjectUser to save
+     * @param project the project
+     * @param user the user
      * @return the number of records inserted
-     * @throws QueryException 
+     * @throws QueryException
      */
     public int addProjectUser(Project project, User user) throws QueryException;
 
@@ -340,7 +369,7 @@ public interface WorkbenchDataManager{
      *
      * @param projectUser - the ProjectUser to save
      * @return the number of records inserted
-     * @throws QueryException 
+     * @throws QueryException
      */
     public int addProjectUser(ProjectUser projectUser) throws QueryException;
 
@@ -349,176 +378,236 @@ public interface WorkbenchDataManager{
      *
      * @param projectUsers - the project users to add
      * @return the number of records inserted
-     * @throws QueryException 
+     * @throws QueryException
      */
     public int addProjectUsers(List<ProjectUser> projectUsers) throws QueryException;
 
     /**
      * Adds a project location.
-     * 
-     * @param ProjectLocationMap
-     *            - The {@code ProjectLocationMap} object to be persisted to the
-     *            database. Must be a valid {@code ProjectLocationMap} object.
+     *
+     * @param projectLocationMap - the project location map
      * @return the number of {@code ProjectLocationMap} records inserted
-     *         in the database.
+     * in the database.
      * @throws QueryException
      */
     public int addProjectLocationMap(ProjectLocationMap projectLocationMap) throws QueryException;
     
     /**
      * Adds project locations.
-     * 
-     * @param ProjectLocationMaps
-     *            - The {@code ProjectLocationMap} object to be persisted to the
-     *            database. Must be valid {@code ProjectLocationMap} objects.
+     *
+     * @param projectLocationMapList - the project location map list
      * @return the number of {@code ProjectLocationMap} records inserted
-     *         in the database.
+     * in the database.
      * @throws QueryException
      */
     public int addProjectLocationMap(List<ProjectLocationMap> projectLocationMapList) throws QueryException;
     
+    
+    /**
+     * Gets the project location map by project id.
+     *
+     * @param projectId - the project id
+     * @param start - the start row
+     * @param numOfRows - the number of rows to retrieve
+     * @return the project location map by project id
+     * @throws QueryException the query exception
+     */
+    public List<ProjectLocationMap> getProjectLocationMapByProjectId(Long projectId, int start, int numOfRows) throws QueryException;
+    
+
+    public void deleteProjectLocationMap(ProjectLocationMap projectLocationMap) throws QueryException;
+
     /**
      * Adds project method.
-     * 
-     * @param ProjectMethod
-     *            - The {@code ProjectMethod} object to be persisted to the
-     *            database. Must be a valid {@code ProjectMethod} object.
+     *
+     * @param projectMethod - the project method
      * @return the number of {@code ProjectMethod} records inserted
-     *         in the database.
+     * in the database.
      * @throws QueryException
      */
     public int addProjectMethod(ProjectMethod projectMethod) throws QueryException;
     
     /**
      * Adds project methods.
-     * 
-     * @param ProjectMethod
-     *            - The {@code ProjectMethod} object to be persisted to the
-     *            database. Must be valid {@code ProjectMethod} objects.
+     *
+     * @param projectMethodList - the project method list
      * @return the number of {@code ProjectMethods} records inserted
-     *         in the database.
+     * in the database.
      * @throws QueryException
      */
     public int addProjectMethod(List<ProjectMethod> projectMethodList) throws QueryException;
+
     
+    /**
+     * Gets the project method by project.
+     *
+     * @param project - the project to match
+     * @param start - the start row
+     * @param numOfRows - the number of rows to retrieve
+     * @return the list of ProjectMethod records retrieved
+     * @throws QueryException 
+     */
+    public List<ProjectMethod> getProjectMethodByProject(Project project, int start, int numOfRows) throws QueryException;
+    
+
+    /**
+     * Delete project method.
+     *
+     * @param projectMethod - the project method
+     * @throws QueryException 
+     */
+    public void deleteProjectMethod(ProjectMethod projectMethod) throws QueryException;
     
     /**
      * Adds a project activity.
-     * 
-     * @param ProjectActivity
-     *            - The {@code ProjectActivity} object to be persisted to the
-     *            database. Must be a valid {@code ProjectActivity} object.
+     *
+     * @param projectActivity - the project activity
      * @return the number of {@code ProjectActivity} records inserted
-     *         in the database.
+     * in the database.
      * @throws QueryException
      */
     public int addProjectActivity(ProjectActivity projectActivity) throws QueryException;
     
     /**
      * Adds project activities.
-     * 
-     * @param ProjectActivityList
-     *            - The {@code ProjectActivity} objects to be persisted to the
-     *            database. Must be valid {@code ProjectActivity} objects.
+     *
+     * @param projectActivityList - the project activity list
      * @return the number of {@code ProjectActivity} records inserted
-     *         in the database.
+     * in the database.
      * @throws QueryException
      */
     public int addProjectActivity(List<ProjectActivity> projectActivityList) throws QueryException;
     
     /**
-     * Retrieves a user by id.
+     * Retrieves a project user by id.
      *
      * @param id - the ProjectUser id
      * @return the associated ProjectUser
-     * @throws QueryException 
+     * @throws QueryException
      */
     public ProjectUser getProjectUserById(Integer id) throws QueryException;
     
     /**
-     * Retrieves a user by project and user.
+     * Retrieves project user by project and user.
      *
      * @param project - the project
      * @param user - the user
      * @return the associated ProjectUser
-     * @throws QueryException 
+     * @throws QueryException
      */
     public ProjectUser getProjectUserByProjectAndUser(Project project, User user) throws QueryException;
     
     /**
+     * Retrieves project users by project.
+     *
+     * @param project - the project
+     * @param user - the user
+     * @return the associated ProjectUser
+     * @throws QueryException
+     */
+    public List<ProjectUser> getProjectUserByProject(Project project) throws QueryException;
+
+    /**
      * Deletes the given ProjectUser.
      *
      * @param projectUser - the ProjectUser to delete
-     * @throws QueryException 
+     * @throws QueryException
      */
     public void deleteProjectUser(ProjectUser projectUser) throws QueryException;
     
     /**
-     * Return a List of {@link User} records associated with a {@link Project}
+     * Return a List of {@link User} records associated with a {@link Project}.
      *
      * @param projectId - the project id
      * @return the List of {@link User} records
-     * @throws QueryException 
+     * @throws QueryException
      */
     public List<User> getUsersByProjectId(Long projectId) throws QueryException;
 
     /**
-     * Returns the number of {@link User} records associated with a {@link Project}
+     * Returns the number of {@link User} records associated with a {@link Project}.
      *
      * @param projectId - the project id
      * @return the number of {@link User} records
-     * @throws QueryException 
+     * @throws QueryException
      */
     public Long countUsersByProjectId(Long projectId) throws QueryException;
     
     /**
      * Get the list of all installed central crop databases.
-     * 
-     * @return
+     *
+     * @return the installed central crops
+     * @throws QueryException
      */
     public List<CropType> getInstalledCentralCrops() throws QueryException;
     
     /**
-     * Return a List of {@link ProjectActivity} records associated with a {@link Project}
+     * Get the crop type corresponding to the given name.
+     *
+     * @param cropName - the crop name to match
+     * @return the CropType retrieved
+     * @throws QueryException
+     */
+    public CropType getCropTypeByName(String cropName) throws QueryException;
+
+    /**
+     * Add a crop type to the database.
+     *
+     * @param cropType - the crop type to add
+     * @return the number of records added
+     * @throws QueryException
+     */
+    public int addCropType(CropType cropType) throws QueryException;
+
+    /**
+     * Return a List of {@link ProjectActivity} records associated with a {@link Project}.
      *
      * @param projectId - the project id
      * @param start - the starting record
-     * @param numRows - the number of rows to retrieve
+     * @param numOfRows - the number of rows to retrieve
      * @return the List of {@link ProjectActivity} records
-     * @throws QueryException 
+     * @throws QueryException
      */
     public List<ProjectActivity> getProjectActivitiesByProjectId(Long projectId, int start, int numOfRows) throws QueryException;
 
     /**
-     * Returns the number of {@link ProjectActivity} records associated with a {@link Project}
+     * Delete a project activity.
      *
-     * @param projectId - the project id
+     * @param projectActivity - the project activity to delete
+     * @throws QueryException
+     */
+    public void deleteProjectActivity(ProjectActivity projectActivity) throws QueryException;
+
+    /**
+     * Returns the number of {@link ProjectActivity} records associated with a {@link Project}.
+     *
+     * @param projectId - the project id to match
      * @return the number of {@link ProjectActivity} records associated to the given project
-     * @throws QueryException 
+     * @throws QueryException
      */
     public Long countProjectActivitiesByProjectId(Long projectId) throws QueryException;
     
     /**
      * Adds the tool configuration.
      *
-     * @param toolConfig the tool config
-     * @throws QueryException the query exception
+     * @param toolConfig - the tool config to add
+     * @throws QueryException
      */
     public void addToolConfiguration(ToolConfiguration toolConfig) throws QueryException;
     
     /**
      * Update tool configuration.
      *
-     * @param toolConfig the tool config
-     * @throws QueryException the query exception
+     * @param toolConfig - the tool config to update
+     * @throws QueryException
      */
     public void updateToolConfiguration(ToolConfiguration toolConfig) throws QueryException;
     
     /**
      * Delete tool configuration.
      *
-     * @param toolConfig the tool config
-     * @throws QueryException the query exception
+     * @param toolConfig - the tool config to delete
+     * @throws QueryException
      */
     public void deleteToolConfiguration(ToolConfiguration toolConfig) throws QueryException;
     
@@ -527,7 +616,7 @@ public interface WorkbenchDataManager{
      *
      * @param toolId - the tool id
      * @return the list of tool configurations by tool id
-     * @throws QueryException the query exception
+     * @throws QueryException
      */
     public List<ToolConfiguration> getListOfToolConfigurationsByToolId(Long toolId) throws QueryException;
     
@@ -537,15 +626,17 @@ public interface WorkbenchDataManager{
      * @param toolId - the tool id
      * @param configKey - the config key
      * @return the tool configuration by tool id and config key
-     * @throws QueryException the query exception
+     * @throws QueryException
      */
     public ToolConfiguration getToolConfigurationByToolIdAndConfigKey(Long toolId, String configKey) throws QueryException;
     
     /**
      * Add a Workbench User and IBDB local database User mapping.
-     * 
-     * @param userMap
-     * @return
+     *
+     * @param userMap the user map
+     * @return the ibdb user map
+     * @throws QueryException
      */
     public IbdbUserMap addIbdbUserMap(IbdbUserMap userMap) throws QueryException;
+
 }

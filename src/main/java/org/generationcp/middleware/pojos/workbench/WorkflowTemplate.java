@@ -126,6 +126,11 @@ public class WorkflowTemplate implements Serializable{
     public String toString() {
         StringBuffer stepsString = new StringBuffer();
         stepsString.append("[");
+        
+        if (steps == null){
+            return null;
+        }
+        
         for (WorkflowStep step : steps){
             stepsString.append(step + " | ");
         }

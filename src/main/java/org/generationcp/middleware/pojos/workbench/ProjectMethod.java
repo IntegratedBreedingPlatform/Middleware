@@ -37,7 +37,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 public class ProjectMethod implements Serializable{
 
     private static final long serialVersionUID = 1L;
-
     
     /** The Constant GET_METHODS_BY_PROJECT_ID. Used by ProjectMethodDAO.getMethodsByProjectId() */
     public static final String GET_METHODS_BY_PROJECT_ID = 
@@ -50,6 +49,14 @@ public class ProjectMethod implements Serializable{
             "SELECT COUNT(method_id) " + 
             "FROM workbench_project_method " +
             "WHERE project_id = :projectId";
+    
+    /** The Constant GET_PROJECT_METHODS_BY_PROJECT_ID. Used by ProjectMethodDAO.getProjectMethodsByProjectId() */
+    public static final String GET_PROJECT_METHODS_BY_PROJECT_ID = 
+            "SELECT * " + 
+            "FROM workbench_project_method " +
+            "WHERE project_id = :projectId";
+    
+
             
     /** The project method id. */
     @Id

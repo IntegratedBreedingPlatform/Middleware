@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.QueryException;
@@ -84,4 +85,25 @@ public class ProjectLocationMapDAO extends GenericDAO<ProjectLocationMap, Long>{
             throw new QueryException("Error with countLocationIdsByProjectId(): " + e.getMessage(), e);
         }
     }
+    
+    @SuppressWarnings("unchecked")
+    public List<ProjectLocationMap> getByProjectId(Long projectId, int start, int numOfRows) 
+            throws QueryException {
+            
+            if (projectId == null){
+                return new ArrayList<ProjectLocationMap>();
+            }
+            
+            try {
+                Criteria criteria = getSession().createCriteria(ProjectLocationMap.class);
+                Project p = new Project();
+                p.setProjectId(projectId);
+                criteria.add(Restrictions.eq("project", p));
+                criteria.setFirstResult(start);
+                criteria.setMaxResults(numOfRows);
+                return criteria.list();
+            } catch (HibernateException e) {
+                throw new QueryException("Error with getProjectLocationMapByProjectId query: " + e.getMessage(), e);
+            } 
+        }
 }

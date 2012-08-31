@@ -82,6 +82,22 @@ public class ProjectUserDAO extends GenericDAO<ProjectUser, Integer>{
         return (ProjectUser) results.get(0);
     }
     
+
+    /**
+     * Gets the ProjectUser by project and user.
+     *
+     * @param project the project
+     * @param user the user
+     * @return the ProjectUser associated to the given project and user
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public List<ProjectUser> getByProject(Project project){
+        List<Criterion> criteria = new ArrayList<Criterion>();
+        criteria.add(Restrictions.eq("project", project));
+        List results = super.findByCriteria(criteria);
+        return (List<ProjectUser>) results;
+    }
+    
     
     /**
      * Return a List of {@link User} records associated with a {@link Project}

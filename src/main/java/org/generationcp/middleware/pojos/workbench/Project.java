@@ -20,8 +20,6 @@ import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -63,8 +61,8 @@ public class Project implements Serializable{
     @JoinColumn(name = "template_id")
     private WorkflowTemplate template;
     
-    @Column(name = "crop_type")
-    @Enumerated(value=EnumType.STRING)
+    @OneToOne
+    @JoinColumn(name = "crop_type", referencedColumnName = "crop_name")
     private CropType cropType;
 
     @Basic(optional = false)
