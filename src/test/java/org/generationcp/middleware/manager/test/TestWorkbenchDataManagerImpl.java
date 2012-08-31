@@ -424,8 +424,11 @@ public class TestWorkbenchDataManagerImpl{
     public void testAddToolConfiguration() {
         try {
             ToolConfiguration toolConfig = new ToolConfiguration();
-            toolConfig.setToolId(1L);
-            toolConfig.setConfigKey("3rd key");
+            Tool tool = new Tool();
+            tool.setToolId(1L);
+            
+            toolConfig.setTool(tool);
+            toolConfig.setConfigKey("5th key");
             toolConfig.setConfigValue("test value");
             
             manager.addToolConfiguration(toolConfig);
@@ -446,8 +449,11 @@ public class TestWorkbenchDataManagerImpl{
     public void testUpdateToolConfiguration() {
         try {
             ToolConfiguration toolConfig = new ToolConfiguration();
+            Tool tool = new Tool();
+            tool.setToolId(1L);
+            
             toolConfig.setConfigId(1L);
-            toolConfig.setToolId(1L);
+            toolConfig.setTool(tool);
             toolConfig.setConfigKey("test test");
             toolConfig.setConfigValue("test value");
             
@@ -469,8 +475,11 @@ public class TestWorkbenchDataManagerImpl{
     public void testDeleteToolConfiguration() {
         try {
             ToolConfiguration toolConfig = new ToolConfiguration();
+            Tool tool = new Tool();
+            tool.setToolId(1L);
+            
+            toolConfig.setTool(tool);
             toolConfig.setConfigId(1L);
-            toolConfig.setToolId(1L);
             toolConfig.setConfigKey("test test");
             toolConfig.setConfigValue("test value");
             

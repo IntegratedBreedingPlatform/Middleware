@@ -19,6 +19,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 /**
@@ -41,10 +43,10 @@ public class ToolConfiguration implements Serializable{
     @Basic(optional = false)
     @Column(name = "config_id")
     private Long configId;
-
-    @Basic(optional = false)
-    @Column(name = "tool_id")
-    private Long toolId;
+    
+    @OneToOne(optional = false)
+    @JoinColumn(name = "tool_id")
+    private Tool tool;
 
     @Basic(optional = false)
     @Column(name = "config_key")
@@ -61,13 +63,13 @@ public class ToolConfiguration implements Serializable{
     public void setConfigId(Long configId) {
         this.configId = configId;
     }
-
-    public Long getToolId() {
-        return toolId;
+    
+    public Tool getTool() {
+        return tool;
     }
-
-    public void setToolId(Long toolId) {
-        this.toolId = toolId;
+    
+    public void setTool(Tool tool) {
+        this.tool = tool;
     }
 
     public String getConfigKey() {
@@ -91,8 +93,8 @@ public class ToolConfiguration implements Serializable{
         StringBuilder sb = new StringBuilder();
         sb.append("ToolConfiguration [configId=")
           .append(configId)
-          .append(", toolId=")
-          .append(toolId)
+          .append(", tool=")
+          .append(tool)
           .append(", configKey=")
           .append(configKey)
           .append(", configValue=")
