@@ -27,6 +27,7 @@ import org.generationcp.middleware.dao.ToolConfigurationDAO;
 import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.WorkbenchDatasetDAO;
+import org.generationcp.middleware.dao.WorkbenchRuntimeDataDAO;
 import org.generationcp.middleware.dao.WorkflowTemplateDAO;
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -43,6 +44,7 @@ import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
+import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 import org.generationcp.middleware.util.HibernateUtil;
 import org.hibernate.SQLQuery;
@@ -1225,5 +1227,46 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         }
         
         return userMap;
+    }
+    
+    @Override
+    public WorkbenchRuntimeData updateWorkbenchRuntimeData(WorkbenchRuntimeData workbenchRuntimeData) throws QueryException {
+        Session session = hibernateUtil.getCurrentSession();
+        Transaction trans = null;
+        
+        try {
+            trans = session.beginTransaction();
+            
+            WorkbenchRuntimeDataDAO dao = new WorkbenchRuntimeDataDAO();
+            dao.setSession(session);
+            dao.saveOrUpdate(workbenchRuntimeData);
+            
+            trans.commit();
+        }
+        catch (Exception e) {
+            if (trans != null) {
+                trans.rollback();
+            }
+            
+            throw new QueryException("Error encountered while adding IbdbUserMap: " + e.getMessage(), e);
+        }
+        
+        return workbenchRuntimeData;
+    }
+    
+    @Override
+    public WorkbenchRuntimeData getWorkbenchRuntimeData() throws QueryException {
+        Session session = hibernateUtil.getCurrentSession();
+        
+        try {
+            WorkbenchRuntimeDataDAO dao = new WorkbenchRuntimeDataDAO();
+            dao.setSession(session);
+            List<WorkbenchRuntimeData> list = dao.getAll(0, 1);
+            
+            return list.size() > 0 ? list.get(0) : null;
+        }
+        catch (Exception e) {
+            throw new QueryException("Error encountered while getting WorkbenchRuntimeData: " + e.getMessage(), e);
+        }
     }
 }

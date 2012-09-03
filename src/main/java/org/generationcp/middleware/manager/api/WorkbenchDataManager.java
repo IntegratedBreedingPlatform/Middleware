@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -29,6 +30,7 @@ import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
+import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 
 /**
@@ -638,5 +640,20 @@ public interface WorkbenchDataManager{
      * @throws QueryException
      */
     public IbdbUserMap addIbdbUserMap(IbdbUserMap userMap) throws QueryException;
-
+    
+    /**
+     * Save or update the specified {@link WorkbenchRuntimeData}.
+     * 
+     * @param workbenchRuntimeData
+     * @return
+     * @throws QueryException
+     */
+    public WorkbenchRuntimeData updateWorkbenchRuntimeData(WorkbenchRuntimeData workbenchRuntimeData) throws QueryException;
+    
+    /**
+     * 
+     * @return
+     * @throws QueryException
+     */
+    public WorkbenchRuntimeData getWorkbenchRuntimeData() throws QueryException;
 }
