@@ -82,7 +82,10 @@ public class ProjectDAO extends GenericDAO<Project, Long>{
             query.addEntity("w", Project.class);
             query.setParameter("userId", userId);
             
-            return (Project) query.list().get(0);
+            @SuppressWarnings("unchecked")
+            List<Project> projectList = query.list();
+            
+            return projectList.size() > 0 ? projectList.get(0) : null;
         } catch (HibernateException e) {
             throw new QueryException(e.toString(), e);
         }
