@@ -174,8 +174,25 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
         return (Long) dao.countAllTopLevelStudies();
     }
+    
+    
 
     @Override
+	public Long countAllStudyByParentFolderID(Integer parentFolderId,Database instance) throws QueryException {
+    	 StudyDAO dao = new StudyDAO();
+         HibernateUtil hibernateUtil = getHibernateUtil(instance);
+
+         if (hibernateUtil != null) {
+             dao.setSession(hibernateUtil.getCurrentSession());
+         } else {
+             return Long.valueOf(0);
+         }
+
+         return (Long) dao.countAllStudyByParentFolderID(parentFolderId);
+    	
+	}
+
+	@Override
     public List<Study> getStudiesByParentFolderID(Integer parentFolderId, int start, int numOfRows) throws QueryException {
         StudyDAO dao = new StudyDAO();
 

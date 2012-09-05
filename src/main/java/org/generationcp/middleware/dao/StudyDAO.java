@@ -96,6 +96,19 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
         }
     }
     
+    public Long countAllStudyByParentFolderID(Integer parentFolderId) throws QueryException {
+        try {
+            Criteria crit = getSession().createCriteria(Study.class);
+            // top level studies are studies without parent folders (shierarchy = 0)
+            crit.add(Restrictions.eq("hierarchy", parentFolderId));
+            crit.setProjection(Projections.countDistinct("id"));
+            return  (Long) crit.uniqueResult();
+        } catch (HibernateException ex) {
+            throw new QueryException("Error with retrieving top level Studies: " + ex.getMessage(), ex);
+        }
+    }
+    
+    
 
     @SuppressWarnings("unchecked")
     public List<Study> getByParentFolderID(Integer parentFolderId, int start, int numOfRows) throws QueryException {

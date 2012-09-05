@@ -119,6 +119,11 @@ public class TestStudyDataManagerImpl{
         System.out.println("Number of Top-Level Studies: " + count);
     }
 
+    @Test
+    public void testCountAllStudyByParentFolderID() throws Exception {
+        Long count = manager.countAllStudyByParentFolderID(640,Database.CENTRAL);
+        System.out.println("Number of Studies belong to this parent folder: " + count);
+    }
 
     @Test
     public void testGetStudiesByParentFolderID() throws Exception {

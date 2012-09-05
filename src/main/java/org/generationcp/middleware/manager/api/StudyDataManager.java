@@ -136,6 +136,14 @@ public interface StudyDataManager{
      */
     public Long countAllTopLevelStudies(Database instance) throws QueryException;
     
+    /**
+     * Returns the total number of studies belong to a study parent folder.
+     *
+     * @return the int
+     */
+    
+    public Long countAllStudyByParentFolderID(Integer parentFolderId,Database instance) throws QueryException;
+    
     
     /**
      * Returns a List of {@code Study} objects that belong to the specified
