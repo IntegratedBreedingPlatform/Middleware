@@ -109,6 +109,12 @@
             <groupId>ibpcommons</groupId>
             <artifactId>ibpcommons</artifactId>
             <version>1.0.0</version>
+            <exclusions>
+            	<exclusion>
+            		<groupId>org.eclipse.jetty.aggregate</groupId>
+            		<artifactId>jetty-all-server</artifactId>
+            	</exclusion>
+            </exclusions>
         </dependency>
 		
 	</dependencies>
