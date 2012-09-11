@@ -4,6 +4,8 @@ package org.generationcp.middleware.manager.test;
 import junit.framework.Assert;
 
 import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.hibernate.HibernateSessionPerThreadProvider;
+import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DefaultManagerFactoryProvider;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
@@ -24,7 +26,8 @@ public class TestManagerFactoryProvider{
     @BeforeClass
     public static void setUp() throws Exception {
         hibernateUtil = new HibernateUtil("localhost", "3306", "workbench", "root", "admin");
-        manager = new WorkbenchDataManagerImpl(hibernateUtil);
+        HibernateSessionProvider sessionProvider = new HibernateSessionPerThreadProvider(hibernateUtil.getSessionFactory());
+        manager = new WorkbenchDataManagerImpl(sessionProvider);
     }
 
     @Test

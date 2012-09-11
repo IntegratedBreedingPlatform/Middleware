@@ -28,6 +28,7 @@ import org.generationcp.middleware.dao.gdms.MarkerDAO;
 import org.generationcp.middleware.dao.gdms.MarkerInfoDAO;
 import org.generationcp.middleware.dao.gdms.MarkerMetadataSetDAO;
 import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
@@ -41,7 +42,7 @@ import org.generationcp.middleware.pojos.gdms.MarkerIdMarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerInfo;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
-import org.generationcp.middleware.util.HibernateUtil;
+import org.hibernate.Session;
 
 /**
  * Implementation of GenotypicDataManager
@@ -50,17 +51,24 @@ import org.generationcp.middleware.util.HibernateUtil;
  */
 public class GenotypicDataManagerImpl extends DataManager implements GenotypicDataManager{
 
-    public GenotypicDataManagerImpl(HibernateUtil hibernateUtilForLocal, HibernateUtil hibernateUtilForCentral) {
-        super(hibernateUtilForLocal, hibernateUtilForCentral);
+    public GenotypicDataManagerImpl() {
+    }
+    
+    public GenotypicDataManagerImpl(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
+        super(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    public GenotypicDataManagerImpl(Session sessionForLocal, Session sessionForCentral) {
+        super(sessionForLocal, sessionForCentral);
     }
 
     @Override
     public List<Integer> getNameIdsByGermplasmIds(List<Integer> gIds) throws QueryException{
         AccMetadataSetDAO dao = new AccMetadataSetDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(gIds.get(0));  
-
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        Session session = getSession(gIds.get(0));
+        
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return new ArrayList<Integer>();
         }
@@ -71,10 +79,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<Name> getNamesByNameIds(List<Integer> nIds) throws QueryException {
         NameDAO nameDao = new NameDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(nIds.get(0)); 
+        Session session = getSession(nIds.get(0));
 
-        if (hibernateUtil != null) {
-            nameDao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            nameDao.setSession(session);
         } else {
             return new ArrayList<Name>();
         }
@@ -85,10 +93,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public Name getNameByNameId(Integer nId) throws QueryException {
         NameDAO dao = new NameDAO();
-        HibernateUtil util = getHibernateUtil(nId);
+        Session session = getSession(nId);
         
-        if(util != null) {
-            dao.setSession(util.getCurrentSession());
+        if(session != null) {
+            dao.setSession(session);
         } else {
             return null;
         }
@@ -99,10 +107,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public Long countAllMaps(Database instance) throws QueryException {
         MapDAO dao = new MapDAO();
-        HibernateUtil util = getHibernateUtil(instance);
+        Session session = getSession(instance);
         
-        if(util != null) {
-            dao.setSession(util.getCurrentSession());
+        if(session != null) {
+            dao.setSession(session);
         } else {
             return (long) 0;
         }
@@ -113,10 +121,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<Map> getAllMaps(Integer start, Integer numOfRows, Database instance) throws QueryException {
         MapDAO dao = new MapDAO();
-        HibernateUtil util = getHibernateUtil(instance);
+        Session session = getSession(instance);
         
-        if(util != null) {
-            dao.setSession(util.getCurrentSession());
+        if(session != null) {
+            dao.setSession(session);
         } else {
             return new ArrayList<Map>();
         }
@@ -127,10 +135,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<MapInfo> getMapInfoByMapName(String mapName, Database instance) throws QueryException{
         MappingDataDAO dao = new MappingDataDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(instance);  
+        Session session = getSession(instance);
         
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return new ArrayList<MapInfo>();
         }
@@ -140,10 +148,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public int countDatasetNames(Database instance) throws QueryException{
         DatasetDAO dao = new DatasetDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(instance);  
+        Session session = getSession(instance);  
         
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return 0;
         }
@@ -153,10 +161,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<String> getDatasetNames(Integer start, Integer numOfRows, Database instance) throws QueryException{
         DatasetDAO dao = new DatasetDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(instance);  
+        Session session = getSession(instance);  
         
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return new ArrayList<String>();
         }
@@ -170,10 +178,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<DatasetElement> getDatasetDetailsByDatasetName(String datasetName, Database instance) throws QueryException{
         DatasetDAO dao = new DatasetDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(instance);  
+        Session session = getSession(instance);  
         
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return new ArrayList<DatasetElement>();
         }
@@ -184,10 +192,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<Integer> getMarkerIdsByMarkerNames(List<String> markerNames, int start, int numOfRows, Database instance) throws QueryException {
         MarkerDAO dao = new MarkerDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(instance);
+        Session session = getSession(instance);
         
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return new ArrayList<Integer> ();
         }
@@ -200,10 +208,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<Integer> getMarkerIdsByDatasetId(Integer datasetId) throws QueryException{
         MarkerMetadataSetDAO dao = new MarkerMetadataSetDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(datasetId);  
+        Session session = getSession(datasetId);
         
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return new ArrayList<Integer>();
         }
@@ -214,10 +222,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<ParentElement> getParentsByDatasetId(Integer datasetId) throws QueryException{
         MappingPopDAO dao = new MappingPopDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(datasetId);  
+        Session session = getSession(datasetId);  
         
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return new ArrayList<ParentElement>();
         }
@@ -227,10 +235,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<String> getMarkerTypesByMarkerIds(List<Integer> markerIds) throws QueryException{
         MarkerDAO dao = new MarkerDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(markerIds.get(0));  
+        Session session = getSession(markerIds.get(0));
         
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return new ArrayList<String>();
         }
@@ -240,10 +248,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<MarkerNameElement> getMarkerNamesByGIds(List<Integer> gIds) throws QueryException{
         MarkerDAO dao = new MarkerDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(gIds.get(0));  
+        Session session = getSession(gIds.get(0));  
         
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return new ArrayList<MarkerNameElement>();
         }
@@ -253,10 +261,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<GermplasmMarkerElement>  getGermplasmNamesByMarkerNames(List<String> markerNames, Database instance) throws QueryException{
         MarkerDAO dao = new MarkerDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(instance);  
+        Session session = getSession(instance);  
         
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return new ArrayList<GermplasmMarkerElement>();
         }
@@ -277,11 +285,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         } else {
             instance = Database.CENTRAL;
         }
-        HibernateUtil hibernateUtil = getHibernateUtil(instance);
+        Session session = getSession(instance);
         
-        if (hibernateUtil != null) {
-            markerDao.setSession(hibernateUtil.getCurrentSession());
-            mappingPopDao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            markerDao.setSession(session);
+            mappingPopDao.setSession(session);
         } else {
             return new ArrayList<MappingValueElement>();
         }
@@ -305,10 +313,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         } else {
             instance = Database.CENTRAL;
         }
-        HibernateUtil hibernateUtil = getHibernateUtil(instance);
+        Session session = getSession(instance);
         
-        if (hibernateUtil != null) {
-            markerDao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            markerDao.setSession(session);
         } else {
             return new ArrayList<AllelicValueElement>();
         }
@@ -322,22 +330,22 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     public List<AllelicValueWithMarkerIdElement> getAllelicValuesFromCharValuesByDatasetId(
             Integer datasetId, int start, int numOfRows) throws QueryException{
         CharValuesDAO dao = new CharValuesDAO();
-        HibernateUtil util = getHibernateUtil(datasetId);
-        if (util == null) {
+        Session session = getSession(datasetId);
+        if (session == null) {
             return new ArrayList<AllelicValueWithMarkerIdElement>();
         }
-        dao.setSession(util.getCurrentSession());        
+        dao.setSession(session);        
         return dao.getAllelicValuesByDatasetId(datasetId, start, numOfRows);
     }
     
     @Override
     public int countAllelicValuesFromCharValuesByDatasetId(Integer datasetId) throws QueryException{
         CharValuesDAO dao = new CharValuesDAO();
-        HibernateUtil util = getHibernateUtil(datasetId);
-        if (util == null) {
+        Session session = getSession(datasetId);
+        if (session == null) {
             return 0;
         }
-        dao.setSession(util.getCurrentSession());
+        dao.setSession(session);
         return dao.countByDatasetId(datasetId);
     }
 
@@ -345,12 +353,12 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     public List<AllelicValueWithMarkerIdElement> getAllelicValuesFromAlleleValuesByDatasetId(
             Integer datasetId, int start, int numOfRows) throws QueryException{
         AlleleValuesDAO dao = new AlleleValuesDAO();
-        HibernateUtil util = getHibernateUtil(datasetId);
+        Session session = getSession(datasetId);
 
-        if (util == null) {
+        if (session == null) {
             return new ArrayList<AllelicValueWithMarkerIdElement>();
         }
-        dao.setSession(util.getCurrentSession());
+        dao.setSession(session);
         return dao.getAllelicValuesByDatasetId(datasetId, start, numOfRows);
     }
     
@@ -358,11 +366,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public int countAllelicValuesFromAlleleValuesByDatasetId(Integer datasetId) throws QueryException{
         AlleleValuesDAO dao = new AlleleValuesDAO();
-        HibernateUtil util = getHibernateUtil(datasetId);
-        if (util == null) {
+        Session session = getSession(datasetId);
+        if (session == null) {
             return 0;
         }
-        dao.setSession(util.getCurrentSession());
+        dao.setSession(session);
         return dao.countByDatasetId(datasetId);
     }
 
@@ -370,22 +378,22 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     public List<AllelicValueWithMarkerIdElement> getAllelicValuesFromMappingPopValuesByDatasetId(
             Integer datasetId, int start, int numOfRows) throws QueryException{
         MappingPopValuesDAO dao = new MappingPopValuesDAO();
-        HibernateUtil util = getHibernateUtil(datasetId);
-        if (util == null) {
+        Session session = getSession(datasetId);
+        if (session == null) {
             return  new ArrayList<AllelicValueWithMarkerIdElement>();
         }
-        dao.setSession(util.getCurrentSession());
+        dao.setSession(session);
         return dao.getAllelicValuesByDatasetId(datasetId, start, numOfRows);
     }
     
     @Override
     public int countAllelicValuesFromMappingPopValuesByDatasetId(Integer datasetId) throws QueryException{
         MappingPopValuesDAO dao = new MappingPopValuesDAO();
-        HibernateUtil util = getHibernateUtil(datasetId);
-        if (util == null) {
+        Session session = getSession(datasetId);
+        if (session == null) {
             return 0;
         }
-        dao.setSession(util.getCurrentSession());
+        dao.setSession(session);
         return dao.countByDatasetId(datasetId);
     }
     @Override
@@ -398,9 +406,12 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         int localCount = 0;
         int relativeLimit = 0;
         
-        if (hibernateUtilForCentral != null) {
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if (sessionForCentral != null) {
                 
-            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+            dao.setSession(sessionForCentral);
             centralCount = dao.countByMarkerName(markerName);
             
             if (centralCount > start) {  
@@ -409,8 +420,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                 relativeLimit = numOfRows - (centralCount - start);
                 
                 if (relativeLimit > 0) {
-                        if (hibernateUtilForLocal != null) {                                
-                            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+                        if (sessionForLocal != null) {                                
+                            dao.setSession(sessionForLocal);
                             localCount = dao.countByMarkerName(markerName);
                             
                             if (localCount > 0) {
@@ -423,9 +434,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                 
                 relativeLimit = start - centralCount;
                 
-                if (hibernateUtilForLocal != null) {
+                if (sessionForLocal != null) {
                         
-                    dao.setSession(hibernateUtilForLocal.getCurrentSession());
+                    dao.setSession(sessionForLocal);
                     localCount = dao.countByMarkerName(markerName);
                     
                     if (localCount > relativeLimit) {
@@ -434,9 +445,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                 }
             }
             
-        } else if (hibernateUtilForLocal != null) {
+        } else if (sessionForLocal != null) {
                 
-            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+            dao.setSession(sessionForLocal);
             localCount = dao.countByMarkerName(markerName);
 
             if (localCount > start) {
@@ -452,13 +463,16 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         int count = 0;        
         MarkerInfoDAO dao = new MarkerInfoDAO();
         
-        if (hibernateUtilForLocal != null) {
-            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
             count = count + dao.countByMarkerName(markerName);
         }
         
-        if (hibernateUtilForCentral != null) {
-            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
             count = count + dao.countByMarkerName(markerName);
         }
         
@@ -475,9 +489,12 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         int localCount = 0;
         int relativeLimit = 0;
         
-        if (hibernateUtilForCentral != null) {
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if (sessionForCentral != null) {
                 
-            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+            dao.setSession(sessionForCentral);
             centralCount = dao.countByGenotype(genotype);
             
             if (centralCount > start) {  
@@ -486,8 +503,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                 relativeLimit = numOfRows - (centralCount - start);
                 
                 if (relativeLimit > 0) {
-                        if (hibernateUtilForLocal != null) {                                
-                            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+                        if (sessionForLocal != null) {                                
+                            dao.setSession(sessionForLocal);
                             localCount = dao.countByGenotype(genotype);
                             
                             if (localCount > 0) {
@@ -500,9 +517,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                 
                 relativeLimit = start - centralCount;
                 
-                if (hibernateUtilForLocal != null) {
+                if (sessionForLocal != null) {
                         
-                    dao.setSession(hibernateUtilForLocal.getCurrentSession());
+                    dao.setSession(sessionForLocal);
                     localCount = dao.countByGenotype(genotype);
                     
                     if (localCount > relativeLimit) {
@@ -511,9 +528,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                 }
             }
             
-        } else if (hibernateUtilForLocal != null) {
+        } else if (sessionForLocal != null) {
                 
-            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+            dao.setSession(sessionForLocal);
             localCount = dao.countByGenotype(genotype);
 
             if (localCount > start) {
@@ -529,13 +546,16 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         int count = 0;        
         MarkerInfoDAO dao = new MarkerInfoDAO();
         
-        if (hibernateUtilForLocal != null) {
-            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
             count = count + dao.countByGenotype(genotype);
         }
         
-        if (hibernateUtilForCentral != null) {
-            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
             count = count + dao.countByGenotype(genotype);
         }
         
@@ -552,9 +572,12 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         int localCount = 0;
         int relativeLimit = 0;
         
-        if (hibernateUtilForCentral != null) {
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if (sessionForCentral != null) {
                 
-            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+            dao.setSession(sessionForCentral);
             centralCount = dao.countByDbAccessionId(dbAccessionId);
             
             if (centralCount > start) {  
@@ -563,8 +586,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                 relativeLimit = numOfRows - (centralCount - start);
                 
                 if (relativeLimit > 0) {
-                        if (hibernateUtilForLocal != null) {                                
-                            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+                        if (sessionForLocal != null) {                                
+                            dao.setSession(sessionForLocal);
                             localCount = dao.countByDbAccessionId(dbAccessionId);
                             
                             if (localCount > 0) {
@@ -577,9 +600,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                 
                 relativeLimit = start - centralCount;
                 
-                if (hibernateUtilForLocal != null) {
+                if (sessionForLocal != null) {
                         
-                    dao.setSession(hibernateUtilForLocal.getCurrentSession());
+                    dao.setSession(sessionForLocal);
                     localCount = dao.countByDbAccessionId(dbAccessionId);
                     
                     if (localCount > relativeLimit) {
@@ -588,9 +611,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                 }
             }
             
-        } else if (hibernateUtilForLocal != null) {
+        } else if (sessionForLocal != null) {
                 
-            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+            dao.setSession(sessionForLocal);
             localCount = dao.countByDbAccessionId(dbAccessionId);
 
             if (localCount > start) {
@@ -606,13 +629,16 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         int count = 0;        
         MarkerInfoDAO dao = new MarkerInfoDAO();
         
-        if (hibernateUtilForLocal != null) {
-            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
             count = count + dao.countByDbAccessionId(dbAccessionId);
         }
         
-        if (hibernateUtilForCentral != null) {
-            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
             count = count + dao.countByDbAccessionId(dbAccessionId);
         }
         
@@ -624,10 +650,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     public List<MarkerIdMarkerNameElement> getMarkerNamesByMarkerIds(List<Integer> markerIds)
             throws QueryException {
         MarkerDAO dao = new MarkerDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(markerIds.get(0));
+        Session session = getSession(markerIds.get(0));
         
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return new ArrayList<MarkerIdMarkerNameElement>();
         }
@@ -644,16 +670,19 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         int localCount = 0;
         int relativeLimit = 0;
         
-        if(hibernateUtilForCentral != null) {
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if(sessionForCentral != null) {
             
-            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+            dao.setSession(sessionForCentral);
             centralCount = countAllMarkerTypes(Database.CENTRAL).intValue();
             
             if(centralCount > start) {
                 markerTypes.addAll(dao.getAllMarkerTypes(start, numOfRows));
                 relativeLimit = numOfRows - markerTypes.size();
-                if(relativeLimit > 0 && hibernateUtilForLocal != null) {
-                    dao.setSession(hibernateUtilForLocal.getCurrentSession());
+                if(relativeLimit > 0 && sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
                     localCount = countAllMarkerTypes(Database.LOCAL).intValue();
                     if(localCount > 0) {
                         markerTypes.addAll(dao.getAllMarkerTypes(0, relativeLimit));
@@ -661,16 +690,16 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                 }
             } else {
                 relativeLimit = start - centralCount;
-                if (hibernateUtilForLocal != null) {
-                    dao.setSession(hibernateUtilForLocal.getCurrentSession());
+                if (sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
                     localCount = countAllMarkerTypes(Database.LOCAL).intValue();
                     if (localCount > relativeLimit) {
                         markerTypes.addAll(dao.getAllMarkerTypes(relativeLimit, numOfRows));
                     }
                 }
             }
-        } else if (hibernateUtilForLocal != null) {
-            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+        } else if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
             localCount = countAllMarkerTypes(Database.LOCAL).intValue();
             if (localCount > start) {
                 markerTypes.addAll(dao.getAllMarkerTypes(start, numOfRows));
@@ -683,11 +712,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public Long countAllMarkerTypes(Database instance) throws QueryException {
         MarkerDAO dao = new MarkerDAO();
-        HibernateUtil util = getHibernateUtil(instance);
+        Session session = getSession(instance);
         Long result = 0L;
         
-        if(util != null) {
-            dao.setSession(util.getCurrentSession());
+        if(session != null) {
+            dao.setSession(session);
             result = dao.countAllMarkerTypes();
         }
         
@@ -704,16 +733,19 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         int localCount = 0;
         int relativeLimit = 0;
         
-        if(hibernateUtilForCentral != null) {
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if(sessionForCentral != null) {
             
-            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+            dao.setSession(sessionForCentral);
             centralCount = dao.countMarkerNamesByMarkerType(markerType).intValue();
             
             if(centralCount > start) {
                 markerNames.addAll(dao.getMarkerNamesByMarkerType(markerType, start, numOfRows));
                 relativeLimit = numOfRows - markerNames.size();
-                if(relativeLimit > 0 && hibernateUtilForLocal != null) {
-                    dao.setSession(hibernateUtilForLocal.getCurrentSession());
+                if(relativeLimit > 0 && sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
                     localCount = dao.countMarkerNamesByMarkerType(markerType).intValue();
                     if(localCount > 0) {
                         markerNames.addAll(dao.getMarkerNamesByMarkerType(markerType, 0, relativeLimit));
@@ -721,16 +753,16 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                 }
             } else {
                 relativeLimit = start - centralCount;
-                if (hibernateUtilForLocal != null) {
-                    dao.setSession(hibernateUtilForLocal.getCurrentSession());
+                if (sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
                     localCount = dao.countMarkerNamesByMarkerType(markerType).intValue();
                     if (localCount > relativeLimit) {
                         markerNames.addAll(dao.getMarkerNamesByMarkerType(markerType, relativeLimit, numOfRows));
                     }
                 }
             }
-        } else if (hibernateUtilForLocal != null) {
-            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+        } else if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
             localCount = dao.countMarkerNamesByMarkerType(markerType).intValue();
             if (localCount > start) {
                 markerNames.addAll(dao.getMarkerNamesByMarkerType(markerType, start, numOfRows));
@@ -747,13 +779,16 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         MarkerDAO dao = new MarkerDAO();
         Long result = 0L;
         
-        if(hibernateUtilForCentral != null) {
-            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if(sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
             result = dao.countMarkerNamesByMarkerType(markerType);
         }
         
-        if(hibernateUtilForLocal != null) {
-            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+        if(sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
             result += dao.countMarkerNamesByMarkerType(markerType);
         }
         
@@ -765,11 +800,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         throws QueryException {
         
         CharValuesDAO dao = new CharValuesDAO();
-        HibernateUtil util = getHibernateUtil(markerId);
+        Session session = getSession(markerId);
         List<Integer> gids;
         
-        if(util != null) {
-            dao.setSession(util.getCurrentSession());
+        if(session != null) {
+            dao.setSession(session);
             gids = dao.getGIDsByMarkerId(markerId, start, numOfRows);
         } else {
             gids = new ArrayList<Integer>();
@@ -781,11 +816,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public Long countGIDsFromCharValuesByMarkerId(Integer markerId) throws QueryException {
         CharValuesDAO dao = new CharValuesDAO();
-        HibernateUtil util = getHibernateUtil(markerId);
+        Session session = getSession(markerId);
         Long result = 0L;
         
-        if(util != null) {
-            dao.setSession(util.getCurrentSession());
+        if(session != null) {
+            dao.setSession(session);
             result = dao.countGIDsByMarkerId(markerId);
         } 
         
@@ -795,11 +830,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<Integer> getGIDsFromAlleleValuesByMarkerId(Integer markerId, int start, int numOfRows) throws QueryException {
         AlleleValuesDAO dao = new AlleleValuesDAO();
-        HibernateUtil util = getHibernateUtil(markerId);
+        Session session = getSession(markerId);
         List<Integer> gids;
         
-        if(util != null) {
-            dao.setSession(util.getCurrentSession());
+        if(session != null) {
+            dao.setSession(session);
             gids = dao.getGIDsByMarkerId(markerId, start, numOfRows);
         } else {
             gids = new ArrayList<Integer>();
@@ -811,11 +846,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public Long countGIDsFromAlleleValuesByMarkerId(Integer markerId) throws QueryException {
         AlleleValuesDAO dao = new AlleleValuesDAO();
-        HibernateUtil util = getHibernateUtil(markerId);
+        Session session = getSession(markerId);
         Long result = 0L;
         
-        if(util != null) {
-            dao.setSession(util.getCurrentSession());
+        if(session != null) {
+            dao.setSession(session);
             result = dao.countGIDsByMarkerId(markerId);
         } 
         
@@ -825,11 +860,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<Integer> getGIDsFromMappingPopValuesByMarkerId(Integer markerId, int start, int numOfRows) throws QueryException {
         MappingPopValuesDAO dao = new MappingPopValuesDAO();
-        HibernateUtil util = getHibernateUtil(markerId);
+        Session session = getSession(markerId);
         List<Integer> gids;
         
-        if(util != null) {
-            dao.setSession(util.getCurrentSession());
+        if(session != null) {
+            dao.setSession(session);
             gids = dao.getGIDsByMarkerId(markerId, start, numOfRows);
         } else {
             gids = new ArrayList<Integer>();
@@ -841,11 +876,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public Long countGIDsFromMappingPopValuesByMarkerId(Integer markerId) throws QueryException {
         MappingPopValuesDAO dao = new MappingPopValuesDAO();
-        HibernateUtil util = getHibernateUtil(markerId);
+        Session session = getSession(markerId);
         Long result = 0L;
         
-        if(util != null) {
-            dao.setSession(util.getCurrentSession());
+        if(session != null) {
+            dao.setSession(session);
             result = dao.countGIDsByMarkerId(markerId);
         } 
         
@@ -860,16 +895,19 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         int localCount = 0;
         int relativeLimit = 0;
         
-        if(hibernateUtilForCentral != null) {
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if(sessionForCentral != null) {
             
-            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+            dao.setSession(sessionForCentral);
             centralCount = dao.countAllDbAccessionIds().intValue();
             
             if(centralCount > start) {
                 dbAccessionIds.addAll(dao.getAllDbAccessionIds(start, numOfRows));
                 relativeLimit = numOfRows - dbAccessionIds.size();
-                if(relativeLimit > 0 && hibernateUtilForLocal != null) {
-                    dao.setSession(hibernateUtilForLocal.getCurrentSession());
+                if(relativeLimit > 0 && sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
                     localCount = dao.countAllDbAccessionIds().intValue();
                     if(localCount > 0) {
                         dbAccessionIds.addAll(dao.getAllDbAccessionIds(0, relativeLimit));
@@ -877,16 +915,16 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                 }
             } else {
                 relativeLimit = start - centralCount;
-                if (hibernateUtilForLocal != null) {
-                    dao.setSession(hibernateUtilForLocal.getCurrentSession());
+                if (sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
                     localCount = dao.countAllDbAccessionIds().intValue();
                     if (localCount > relativeLimit) {
                         dbAccessionIds.addAll(dao.getAllDbAccessionIds(relativeLimit, numOfRows));
                     }
                 }
             }
-        } else if (hibernateUtilForLocal != null) {
-            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+        } else if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
             localCount = dao.countAllDbAccessionIds().intValue();
             if (localCount > start) {
                 dbAccessionIds.addAll(dao.getAllDbAccessionIds(start, numOfRows));
@@ -901,13 +939,16 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         MarkerDAO dao = new MarkerDAO();
         Long result = 0L;
         
-        if(hibernateUtilForCentral != null) {
-            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if(sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
             result = dao.countAllDbAccessionIds();
         }
         
-        if(hibernateUtilForLocal != null) {
-            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+        if(sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
             result += dao.countAllDbAccessionIds();
         }
         
@@ -926,11 +967,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                                                                int start, int numOfRows) throws QueryException {
         
         AccMetadataSetDAO dao = new AccMetadataSetDAO();
-        HibernateUtil util = getHibernateUtil(datasetIds.get(0));
+        Session session = getSession(datasetIds.get(0));
         List<Integer> nids;
         
-        if(util != null) {
-            dao.setSession(util.getCurrentSession());
+        if(session != null) {
+            dao.setSession(session);
             nids = dao.getNIDsByDatasetIds(datasetIds, gids, start, numOfRows);
         } else {
             nids = new ArrayList<Integer>();

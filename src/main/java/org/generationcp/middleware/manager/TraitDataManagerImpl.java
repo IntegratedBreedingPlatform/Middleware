@@ -21,6 +21,7 @@ import org.generationcp.middleware.dao.ScaleDiscreteDAO;
 import org.generationcp.middleware.dao.TraitDAO;
 import org.generationcp.middleware.dao.TraitMethodDAO;
 import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.TraitDataManager;
 import org.generationcp.middleware.pojos.Scale;
 import org.generationcp.middleware.pojos.ScaleContinuous;
@@ -28,23 +29,29 @@ import org.generationcp.middleware.pojos.ScaleDiscrete;
 import org.generationcp.middleware.pojos.ScaleDiscretePK;
 import org.generationcp.middleware.pojos.Trait;
 import org.generationcp.middleware.pojos.TraitMethod;
-import org.generationcp.middleware.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 public class TraitDataManagerImpl extends DataManager implements TraitDataManager{
 
-    public TraitDataManagerImpl(HibernateUtil hibernateUtilForLocal, HibernateUtil hibernateUtilForCentral) {
-        super(hibernateUtilForLocal, hibernateUtilForCentral);
+    public TraitDataManagerImpl() {
+    }
+
+    public TraitDataManagerImpl(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
+        super(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
+    public TraitDataManagerImpl(Session sessionForLocal, Session sessionForCentral) {
+        super(sessionForLocal, sessionForCentral);
     }
 
     @Override
     public Scale getScaleByID(Integer id) {
         ScaleDAO dao = new ScaleDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(id);
+        Session session = getSession(id);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return null;
         }
@@ -55,10 +62,10 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
     @Override
     public List<Scale> getAllScales(int start, int numOfRows, Database instance) throws QueryException {
         ScaleDAO dao = new ScaleDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(instance);
+        Session session = getSession(instance);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return new ArrayList<Scale>();
         }
@@ -69,16 +76,19 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
     @Override
     public int countAllScales() {
         int count = 0;
+        
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
 
-        if (this.hibernateUtilForLocal != null) {
+        if (sessionForLocal != null) {
             ScaleDAO dao = new ScaleDAO();
-            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+            dao.setSession(sessionForLocal);
             count = count + dao.countAll().intValue();
         }
 
-        if (this.hibernateUtilForCentral != null) {
+        if (sessionForCentral != null) {
             ScaleDAO centralDao = new ScaleDAO();
-            centralDao.setSession(hibernateUtilForCentral.getCurrentSession());
+            centralDao.setSession(sessionForCentral);
             count = count + centralDao.countAll().intValue();
         }
 
@@ -88,10 +98,10 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
     @Override
     public String getScaleDiscreteDescription(Integer scaleId, String value) {
         ScaleDiscreteDAO dao = new ScaleDiscreteDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(scaleId);
+        Session session = getSession(scaleId);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return null;
         }
@@ -112,10 +122,10 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
     @Override
     public List<ScaleDiscrete> getDiscreteValuesOfScale(Integer scaleId) throws QueryException {
         ScaleDiscreteDAO dao = new ScaleDiscreteDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(scaleId);
+        Session session = getSession(scaleId);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return new ArrayList<ScaleDiscrete>();
         }
@@ -126,10 +136,10 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
     @Override
     public ScaleContinuous getRangeOfContinuousScale(Integer scaleId) {
         ScaleContinuousDAO dao = new ScaleContinuousDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(scaleId);
+        Session session = getSession(scaleId);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return null;
         }
@@ -140,10 +150,10 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
     @Override
     public Trait getTraitById(Integer id) {
         TraitDAO dao = new TraitDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(id);
+        Session session = getSession(id);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return null;
         }
@@ -154,10 +164,10 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
     @Override
     public List<Trait> getAllTraits(int start, int numOfRows, Database instance) throws QueryException {
         TraitDAO dao = new TraitDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(instance);
+        Session session = getSession(instance);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return new ArrayList<Trait>();
         }
@@ -167,16 +177,19 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
     @Override
     public int countAllTraits() {
         int count = 0;
+        
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
 
-        if (this.hibernateUtilForLocal != null) {
+        if (sessionForLocal != null) {
             TraitDAO dao = new TraitDAO();
-            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+            dao.setSession(sessionForLocal);
             count = count + dao.countAll().intValue();
         }
 
-        if (this.hibernateUtilForCentral != null) {
+        if (sessionForCentral != null) {
             TraitDAO centralDao = new TraitDAO();
-            centralDao.setSession(hibernateUtilForCentral.getCurrentSession());
+            centralDao.setSession(sessionForCentral);
             count = count + centralDao.countAll().intValue();
         }
 
@@ -186,10 +199,10 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
     @Override
     public TraitMethod getTraitMethodById(Integer id) {
         TraitMethodDAO dao = new TraitMethodDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(id);
+        Session session = getSession(id);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return null;
         }
@@ -200,10 +213,10 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
     @Override
     public List<TraitMethod> getAllTraitMethods(int start, int numOfRows, Database instance) throws QueryException {
         TraitMethodDAO dao = new TraitMethodDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(instance);
+        Session session = getSession(instance);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return new ArrayList<TraitMethod>();
         }
@@ -214,16 +227,19 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
     @Override
     public int countAllTraitMethods() {
         int count = 0;
+        
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
 
-        if (this.hibernateUtilForLocal != null) {
+        if (sessionForLocal != null) {
             TraitMethodDAO dao = new TraitMethodDAO();
-            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+            dao.setSession(sessionForLocal);
             count = count + dao.countAll().intValue();
         }
 
-        if (this.hibernateUtilForCentral != null) {
+        if (sessionForCentral != null) {
             TraitMethodDAO centralDao = new TraitMethodDAO();
-            centralDao.setSession(hibernateUtilForCentral.getCurrentSession());
+            centralDao.setSession(sessionForCentral);
             count = count + centralDao.countAll().intValue();
         }
 
@@ -233,10 +249,10 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
     @Override
     public List<TraitMethod> getTraitMethodsByTraitId(Integer traitId) {
         TraitMethodDAO dao = new TraitMethodDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(traitId);
+        Session session = getSession(traitId);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return new ArrayList<TraitMethod>();
         }
@@ -247,10 +263,10 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
     @Override
     public List<Scale> getScalesByTraitId(Integer traitId) {
         ScaleDAO dao = new ScaleDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(traitId);
+        Session session = getSession(traitId);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return new ArrayList<Scale>();
         }
@@ -262,7 +278,7 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
     public void addTraitMethod(TraitMethod traitMethod) throws QueryException {
         requireLocalDatabaseInstance();
         
-        Session session = hibernateUtilForLocal.getCurrentSession();
+        Session session = getCurrentSessionForLocal();
         Transaction trans = null;
         
         try {
@@ -282,7 +298,7 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
             }
             throw new QueryException("Error encountered while saving TraitMethod: " + ex.getMessage(), ex);
         } finally {
-            hibernateUtilForLocal.closeCurrentSession();
+            session.flush();
         }
     }
 
@@ -290,7 +306,7 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
     public void deleteTraitMethod(TraitMethod traitMethod) throws QueryException {
         requireLocalDatabaseInstance();
         
-        Session session = hibernateUtilForLocal.getCurrentSession();
+        Session session = getCurrentSessionForLocal();
         Transaction trans = null;
         
         try {
@@ -310,7 +326,7 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
             }
             throw new QueryException("Error encountered while saving TraitMethod: " + ex.getMessage(), ex);
         } finally {
-            hibernateUtilForLocal.closeCurrentSession();
+            session.flush();
         }
     }
 

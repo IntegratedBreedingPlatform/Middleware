@@ -33,6 +33,7 @@ public interface GermplasmListManager{
      * 
      * @param id
      * @return GermplasmList POJO
+     * @throws QueryException 
      */
     public GermplasmList getGermplasmListById(Integer id);
 

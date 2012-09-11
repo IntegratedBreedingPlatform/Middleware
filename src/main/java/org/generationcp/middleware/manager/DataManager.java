@@ -13,7 +13,8 @@
 package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.exceptions.QueryException;
-import org.generationcp.middleware.util.HibernateUtil;
+import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.hibernate.Session;
 
 /**
  * The Class DataManager.
@@ -21,19 +22,33 @@ import org.generationcp.middleware.util.HibernateUtil;
  * Mainly used for local-central initially.
  * 
  * @author Joyce Avestro
- * 
+ * @author Glenn Marintes
  */
 public abstract class DataManager {
 
     public final static String NO_LOCAL_INSTANCE_MSG = "There is no connection to a local instance.";
     public final static String NO_CENTRAL_INSTANCE_MSG = "There is no connection to a central instance.";
 
-    /** The hibernate util for local. */
-    protected HibernateUtil hibernateUtilForLocal;
-
-    /** The hibernate util for central. */
-    protected HibernateUtil hibernateUtilForCentral;
-
+    /**
+     * The {@link HibernateSessionProvider} for local database.
+     */
+    private HibernateSessionProvider sessionProviderForLocal;
+    
+    /**
+     * The {@link HibernateSessionProvider} for central database.
+     */
+    private HibernateSessionProvider sessionProviderForCentral;
+    
+    /**
+     * Hibernate {@link Session} for local.
+     */
+    private Session sessionForLocal;
+    
+    /**
+     * Hibernate {@link Session} for central.
+     */
+    private Session sessionForCentral;
+    
     /** The Constant JDBC_BATCH_SIZE. */
     protected static final int JDBC_BATCH_SIZE = 50;
 
@@ -41,81 +56,119 @@ public abstract class DataManager {
      * Instantiates a new data manager.
      */
     public DataManager() {
-        this.hibernateUtilForLocal = null;
-        this.hibernateUtilForCentral = null;
-
+    }
+    
+    public DataManager(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
+        this.sessionProviderForLocal = sessionProviderForLocal;
+        this.sessionProviderForCentral = sessionProviderForCentral;
     }
 
     /**
      * Instantiates a new data manager.
      * 
-     * @param hibernateUtilForLocal
-     *            the hibernate util for local
-     * @param hibernateUtilForCentral
-     *            the hibernate util for central
+     * @param sessionForLocal
+     * @param sessionForCentral
      */
-    public DataManager(HibernateUtil hibernateUtilForLocal, HibernateUtil hibernateUtilForCentral) {
-        this.hibernateUtilForLocal = hibernateUtilForLocal;
-        this.hibernateUtilForCentral = hibernateUtilForCentral;
+    public DataManager(Session sessionForLocal, Session sessionForCentral) {
+        this.sessionForLocal = sessionForLocal;
+        this.sessionForCentral = sessionForCentral;
+    }
+    
+    public HibernateSessionProvider getSessionProviderForLocal() {
+        return sessionProviderForLocal;
+    }
+
+    public void setSessionProviderForLocal(HibernateSessionProvider sessionProviderForLocal) {
+        this.sessionProviderForLocal = sessionProviderForLocal;
+    }
+
+    public HibernateSessionProvider getSessionProviderForCentral() {
+        return sessionProviderForCentral;
+    }
+
+    public void setSessionProviderForCentral(HibernateSessionProvider sessionProviderForCentral) {
+        this.sessionProviderForCentral = sessionProviderForCentral;
+    }
+
+    public Session getCurrentSessionForLocal() {
+        if (sessionForLocal != null) {
+            return sessionForLocal;
+        }
+        
+        if (sessionProviderForLocal != null) {
+            sessionForLocal = sessionProviderForLocal.getSession();
+        }
+        
+        return sessionForLocal;
+    }
+    
+    public Session getCurrentSessionForCentral() {
+        if (sessionForCentral != null) {
+            return sessionForCentral;
+        }
+        
+        if (sessionProviderForCentral != null) {
+            sessionForCentral = sessionProviderForCentral.getSession();
+        }
+        
+        return sessionForCentral;
     }
 
     /**
-     * Utility function that returns the appropriate HibernateUtil based on the
-     * given instance. If the instance is Database.CENTRAL, it returns
-     * hibernateUtilForCentral If the instance is Database.LOCAL, it returns
-     * hibernateUtilForLocal
+     * Utility method that returns the appropriate {@link Session} based on the
+     * given database instance.
      * 
      * @param instance
-     *            the instance
-     * @return the hibernate util
+     * @return
      * @throws QueryException
-     *             the query exception
+     *             if a {@link Session} for the specified database instance is
+     *             not available
      */
-    protected HibernateUtil getHibernateUtil(Database instance) throws QueryException {
+    protected Session getSession(Database instance) throws QueryException {
         if (instance == Database.CENTRAL) {
-            if (this.hibernateUtilForCentral != null) {
-                return hibernateUtilForCentral;
-            } else {
+            Session session = getCurrentSessionForCentral();
+            if (session == null) {
                 throw new QueryException("The central instance was specified "
-                        + "but there is no database connection for central provided.");
+                    + "but there is no database connection for central provided.");
             }
-        } else if (instance == Database.LOCAL) {
-            if (this.hibernateUtilForLocal != null) {
-                return hibernateUtilForLocal;
-            } else {
-                throw new QueryException("The local instance was specified " 
-                        + "but there is no database connection for local provided.");
-            }
+            
+            return session;
         }
+        else if (instance == Database.LOCAL) {
+            Session session = getCurrentSessionForLocal();
+            if (session == null) {
+                throw new QueryException("The local instance was specified " 
+                    + "but there is no database connection for local provided.");
+            }
+            
+            return session;
+        }
+        
         return null;
     }
-
+    
     /**
-     * Utility function that returns the appropriate HibernateUtil based on the
-     * given id. If the id is negative, hibernateUtilForLocal is returned If the
-     * id is positive, hibernateUtilForCentral is returned
+     * Utility method that returns the appropriate {@link Session} based on the
+     * specified <code>id</code>.
      * 
      * @param id
-     *            the id
-     * @return the hibernate util
+     * @return the {@link Session} for the central database if the specified
+     *         <code>id</code> is positive or equal to zero, otherwise, this
+     *         method returns <code>null</code>.
+     * @throws QueryException
      */
-    protected HibernateUtil getHibernateUtil(Integer id) {
-        if (id > 0 && this.hibernateUtilForCentral != null) {
-            return hibernateUtilForCentral;
-        } else if (id < 0 && this.hibernateUtilForLocal != null) {
-            return hibernateUtilForLocal;
-        }
-        return null;
+    protected Session getSession(int id) {
+        return id >= 0 ? getCurrentSessionForCentral() : getCurrentSessionForLocal();
     }
-
+    
     protected void requireLocalDatabaseInstance() throws QueryException {
-        if (hibernateUtilForLocal == null) {
+        if (getCurrentSessionForLocal() == null) {
             throw new QueryException(NO_LOCAL_INSTANCE_MSG);
         }
     }
     
     protected void requireCentralDatabaseInstance() throws QueryException {
-        if (hibernateUtilForCentral == null) {
+        if (getCurrentSessionForCentral() == null) {
             throw new QueryException(NO_CENTRAL_INSTANCE_MSG);
         }
     }

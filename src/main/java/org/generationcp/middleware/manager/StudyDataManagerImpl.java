@@ -28,6 +28,7 @@ import org.generationcp.middleware.dao.StudyDAO;
 import org.generationcp.middleware.dao.StudyEffectDAO;
 import org.generationcp.middleware.dao.VariateDAO;
 import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.CharacterDataElement;
 import org.generationcp.middleware.pojos.CharacterLevelElement;
@@ -40,27 +41,35 @@ import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.pojos.StudyEffect;
 import org.generationcp.middleware.pojos.TraitCombinationFilter;
 import org.generationcp.middleware.pojos.Variate;
-import org.generationcp.middleware.util.HibernateUtil;
+import org.hibernate.Session;
 
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager{
 
-    public StudyDataManagerImpl(HibernateUtil hibernateUtilForLocal, HibernateUtil hibernateUtilForCentral) {
-        super(hibernateUtilForLocal, hibernateUtilForCentral);
+    
+    public StudyDataManagerImpl() {
+    }
+
+    public StudyDataManagerImpl(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
+        super(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
+    public StudyDataManagerImpl(Session sessionForLocal, Session sessionForCentral) {
+        super(sessionForLocal, sessionForCentral);
     }
 
     @Override
     public List<Integer> getGIDSByPhenotypicData(List<TraitCombinationFilter> filters, int start, int numOfRows, Database instance)
             throws QueryException {
         // TODO Local-Central: Verify if existing implementation for CENTRAL is  also applicable to LOCAL
-        HibernateUtil hibernateUtil = getHibernateUtil(instance);
+        Session session = getSession(instance);
 
-        if (hibernateUtil != null) {
+        if (session != null) {
 
             NumericDataDAO dataNDao = new NumericDataDAO();
-            dataNDao.setSession(hibernateUtil.getCurrentSession());
+            dataNDao.setSession(session);
 
             CharacterDataDAO dataCDao = new CharacterDataDAO();
-            dataCDao.setSession(hibernateUtil.getCurrentSession());
+            dataCDao.setSession(session);
 
             Set<Integer> ounitIds = new HashSet<Integer>();
 
@@ -76,7 +85,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             // observation unit ids
             if (!ounitIds.isEmpty()) {
                 FactorDAO factorDao = new FactorDAO();
-                factorDao.setSession(hibernateUtil.getCurrentSession());
+                factorDao.setSession(session);
 
                 Set<Integer> gids = factorDao.getGIDSGivenObservationUnitIds(ounitIds, start, numOfRows * 2);
                 List<Integer> toreturn = new ArrayList<Integer>();
@@ -96,10 +105,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     public List<Study> findStudyByName(String name, int start, int numOfRows, Operation op, Database instance) throws QueryException {
 
         StudyDAO dao = new StudyDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(instance);
+        Session session = getSession(instance);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return new ArrayList<Study>();
         }
@@ -119,10 +128,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     public int countStudyByName(String name, Operation op, Database instance) throws QueryException {
 
         StudyDAO dao = new StudyDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(instance);
+        Session session = getSession(instance);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return 0;
         }
@@ -134,10 +143,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
     public Study getStudyByID(Integer id) throws QueryException {
         StudyDAO dao = new StudyDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(id);
+        Session session = getSession(id);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return null;
         }
@@ -149,10 +158,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     public List<Study> getAllTopLevelStudies(int start, int numOfRows, Database instance) throws QueryException {
         StudyDAO dao = new StudyDAO();
 
-        HibernateUtil hibernateUtil = getHibernateUtil(instance);
+        Session session = getSession(instance);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return new ArrayList<Study>();
         }
@@ -164,10 +173,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     
     public Long countAllTopLevelStudies(Database instance) throws QueryException{
         StudyDAO dao = new StudyDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(instance);
+        Session session = getSession(instance);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return Long.valueOf(0);
         }
@@ -180,10 +189,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
 	public Long countAllStudyByParentFolderID(Integer parentFolderId,Database instance) throws QueryException {
     	 StudyDAO dao = new StudyDAO();
-         HibernateUtil hibernateUtil = getHibernateUtil(instance);
+         Session session = getSession(instance);
 
-         if (hibernateUtil != null) {
-             dao.setSession(hibernateUtil.getCurrentSession());
+         if (session != null) {
+             dao.setSession(session);
          } else {
              return Long.valueOf(0);
          }
@@ -196,10 +205,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     public List<Study> getStudiesByParentFolderID(Integer parentFolderId, int start, int numOfRows) throws QueryException {
         StudyDAO dao = new StudyDAO();
 
-        HibernateUtil hibernateUtil = getHibernateUtil(parentFolderId);
+        Session session = getSession(parentFolderId);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return new ArrayList<Study>();
         }
@@ -212,10 +221,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
     public List<Variate> getVariatesByStudyID(Integer studyId) throws QueryException {
         VariateDAO variateDao = new VariateDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(studyId);
+        Session session = getSession(studyId);
 
-        if (hibernateUtil != null) {
-            variateDao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            variateDao.setSession(session);
         } else {
             return new ArrayList<Variate>();
         }
@@ -226,10 +235,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
     public List<StudyEffect> getEffectsByStudyID(Integer studyId) throws QueryException {
         StudyEffectDAO studyEffectDao = new StudyEffectDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(studyId);
+        Session session = getSession(studyId);
 
-        if (hibernateUtil != null) {
-            studyEffectDao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            studyEffectDao.setSession(session);
         } else {
             return new ArrayList<StudyEffect>();
         }
@@ -240,10 +249,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
     public List<Factor> getFactorsByStudyID(Integer studyId) throws QueryException {
         FactorDAO factorDao = new FactorDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(studyId);
+        Session session = getSession(studyId);
 
-        if (hibernateUtil != null) {
-            factorDao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            factorDao.setSession(session);
         } else {
             return new ArrayList<Factor>();
         }
@@ -254,10 +263,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
     public List<Representation> getRepresentationByEffectID(Integer effectId) throws QueryException {
         RepresentationDAO representationDao = new RepresentationDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(effectId);
+        Session session = getSession(effectId);
 
-        if (hibernateUtil != null) {
-            representationDao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            representationDao.setSession(session);
         } else {
             return new ArrayList<Representation>();
         }
@@ -268,10 +277,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
     public List<Representation> getRepresentationByStudyID(Integer studyId) throws QueryException {
         RepresentationDAO representationDao = new RepresentationDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(studyId);
+        Session session = getSession(studyId);
 
-        if (hibernateUtil != null) {
-            representationDao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            representationDao.setSession(session);
         } else {
             return new ArrayList<Representation>();
         }
@@ -284,10 +293,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     public List<Factor> getFactorsByRepresentationId(Integer representationId) throws QueryException {
         FactorDAO dao = new FactorDAO();
 
-        HibernateUtil hibernateUtil = getHibernateUtil(representationId);
+        Session session = getSession(representationId);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return new ArrayList<Factor>();
         }
@@ -301,10 +310,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     public Long countOunitIDsByRepresentationId(Integer representationId) throws QueryException {
         OindexDAO dao = new OindexDAO();
 
-        HibernateUtil hibernateUtil = getHibernateUtil(representationId);
+        Session session = getSession(representationId);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return Long.valueOf(0);
         }
@@ -318,10 +327,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     public List<Integer> getOunitIDsByRepresentationId(Integer representationId, int start, int numOfRows) throws QueryException {
         OindexDAO dao = new OindexDAO();
 
-        HibernateUtil hibernateUtil = getHibernateUtil(representationId);
+        Session session = getSession(representationId);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return new ArrayList<Integer>();
         }
@@ -335,10 +344,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     public List<Variate> getVariatesByRepresentationId(Integer representationId) throws QueryException {
         VariateDAO dao = new VariateDAO();
 
-        HibernateUtil hibernateUtil = getHibernateUtil(representationId);
+        Session session = getSession(representationId);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return new ArrayList<Variate>();
         }
@@ -355,10 +364,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         // get 1st element from list to check whether the list is for the
         // Central instance or the Local instance
         Integer sampleId = ounitIdList.get(0);
-        HibernateUtil hibernateUtil = getHibernateUtil(sampleId);
+        Session session = getSession(sampleId);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return new ArrayList<NumericDataElement>();
         }
@@ -375,10 +384,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         // get 1st element from list to check whether the list is for the
         // Central instance or the Local instance
         Integer sampleId = ounitIdList.get(0);
-        HibernateUtil hibernateUtil = getHibernateUtil(sampleId);
+        Session session = getSession(sampleId);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return new ArrayList<CharacterDataElement>();
         }
@@ -395,10 +404,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         // get 1st element from list to check whether the list is for the
         // Central instance or the Local instance
         Integer sampleId = ounitIdList.get(0);
-        HibernateUtil hibernateUtil = getHibernateUtil(sampleId);
+        Session session = getSession(sampleId);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return new ArrayList<NumericLevelElement>();
         }
@@ -415,10 +424,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         // get 1st element from list to check whether the list is for the
         // Central instance or the Local instance
         Integer sampleId = ounitIdList.get(0);
-        HibernateUtil hibernateUtil = getHibernateUtil(sampleId);
+        Session session = getSession(sampleId);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return new ArrayList<CharacterLevelElement>();
         }
@@ -435,12 +444,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         OindexDAO oindexDao = new OindexDAO();
         NumericLevelDAO numericLevelDao = new NumericLevelDAO();
         CharacterLevelDAO characterLevelDao = new CharacterLevelDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(representationId);
+        Session session = getSession(representationId);
         
-        if(hibernateUtil != null) {
-            oindexDao.setSession(hibernateUtil.getCurrentSession());
-            numericLevelDao.setSession(hibernateUtil.getCurrentSession());
-            characterLevelDao.setSession(hibernateUtil.getCurrentSession());
+        if(session != null) {
+            oindexDao.setSession(session);
+            numericLevelDao.setSession(session);
+            characterLevelDao.setSession(session);
             
             List<Object[]> factorIdsAndLevelNos = oindexDao.getFactorIdAndLevelNoOfConditionsByRepresentationId(representationId);
             for(Object[] ids : factorIdsAndLevelNos) {
@@ -458,10 +467,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
     public String getMainLabelOfFactorByFactorId(Integer factorid) throws QueryException {
         FactorDAO dao = new FactorDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(factorid);
+        Session session = getSession(factorid);
         
-        if(hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if(session != null) {
+            dao.setSession(session);
             
             return dao.getMainLabel(factorid);
         }

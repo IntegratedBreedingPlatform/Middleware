@@ -28,6 +28,7 @@ import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
@@ -42,7 +43,6 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.ProgenitorPK;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -55,8 +55,15 @@ import org.hibernate.Transaction;
  */
 public class GermplasmDataManagerImpl extends DataManager implements GermplasmDataManager {
 	
-    public GermplasmDataManagerImpl(HibernateUtil hibernateUtilForLocal, HibernateUtil hibernateUtilForCentral) {
-        super(hibernateUtilForLocal, hibernateUtilForCentral);
+    public GermplasmDataManagerImpl() {
+    }
+    
+    public GermplasmDataManagerImpl(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
+        super(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    public GermplasmDataManagerImpl(Session sessionForLocal, Session sessionForCentral) {
+        super(sessionForLocal, sessionForCentral);
     }
     
     public List<Location> getAllLocations(int start, int numOfRows) throws QueryException {
@@ -68,9 +75,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         int localCount = 0;
         int relativeLimit = 0;
         
-        if (hibernateUtilForCentral != null) {
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if (sessionForCentral != null) {
         	
-            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+            dao.setSession(sessionForCentral);
             centralCount = dao.countAll().intValue();
             
             if (centralCount > start) {
@@ -81,9 +91,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                 
                 if (relativeLimit > 0) {
 
-        	        if (hibernateUtilForLocal != null) {
+        	        if (sessionForLocal != null) {
         	        	
-        	            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+        	            dao.setSession(sessionForLocal);
         	            
         	            localCount = dao.countAll().intValue();
         	            
@@ -99,9 +109,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             	
             	relativeLimit = start - centralCount;
             	
-    	        if (hibernateUtilForLocal != null) {
+    	        if (sessionForLocal != null) {
     	        	
-    	            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+    	            dao.setSession(sessionForLocal);
     	            
     	            localCount = dao.countAll().intValue();
     	            
@@ -113,9 +123,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     	        }
             }
             
-        } else if (hibernateUtilForLocal != null) {
+        } else if (sessionForLocal != null) {
         	
-        	dao.setSession(hibernateUtilForLocal.getCurrentSession());
+        	dao.setSession(sessionForLocal);
         	
             localCount = dao.countAll().intValue();
             
@@ -135,13 +145,16 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         
         LocationDAO dao = new LocationDAO();
         
-        if (hibernateUtilForLocal != null) {
-            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
             count = count + dao.countAll().intValue();
         }
         
-        if (hibernateUtilForCentral != null) {
-            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
             count = count + dao.countAll().intValue();
         }
         
@@ -152,14 +165,17 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
         LocationDAO dao = new LocationDAO();
         
-        if (hibernateUtilForLocal != null) {
-            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
         }
         List<Location> locations = dao.findByName(name, start, numOfRows, op);
         
         // get the list of Location from the central instance
-        if (hibernateUtilForCentral != null) {
-            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
         }
         
         List<Location> centralLocations =  dao.findByName(name, start, numOfRows, op);
@@ -176,14 +192,17 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     	
         LocationDAO dao = new LocationDAO();
         
-        if (hibernateUtilForLocal != null) {
-            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
         }
         count = dao.countByName(name, op).intValue();
         
         // get the list of Location from the central instance
-        if (hibernateUtilForCentral != null) {
-            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
         }
         
         count = count + dao.countByName(name, op).intValue();
@@ -194,10 +213,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     public List<Germplasm> findAllGermplasm(int start, int numOfRows, Database instance) throws QueryException {
         GermplasmDAO dao = new GermplasmDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(instance);
+        Session session = getSession(instance);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return new ArrayList<Germplasm>();
         }
@@ -208,10 +227,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public int countAllGermplasm(Database instance) throws QueryException {
         int count = 0;
         GermplasmDAO dao = new GermplasmDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(instance);
+        Session session = getSession(instance);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
             count = count + dao.countAll().intValue();
         }
 
@@ -220,10 +239,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     public List<Germplasm> findGermplasmByPrefName(String name, int start, int numOfRows, Database instance) throws QueryException {
         GermplasmDAO dao = new GermplasmDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(instance);
+        Session session = getSession(instance);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return new ArrayList<Germplasm>();
         }
@@ -233,16 +252,19 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     public int countGermplasmByPrefName(String name) throws QueryException {
         int count = 0;
+        
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
 
-        if (this.hibernateUtilForLocal != null) {
+        if (sessionForLocal != null) {
             GermplasmDAO dao = new GermplasmDAO();
-            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+            dao.setSession(sessionForLocal);
             count = count + dao.countByPrefName(name).intValue();
         }
 
-        if (this.hibernateUtilForCentral != null) {
+        if (sessionForCentral != null) {
             GermplasmDAO centralDao = new GermplasmDAO();
-            centralDao.setSession(hibernateUtilForCentral.getCurrentSession());
+            centralDao.setSession(sessionForCentral);
             count = count + centralDao.countByPrefName(name).intValue();
         }
 
@@ -253,12 +275,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public List<Germplasm> findGermplasmByName(String name, int start, int numOfRows, FindGermplasmByNameModes mode, Operation op,
             Integer status, GermplasmNameType type, Database instance) throws QueryException {
         GermplasmDAO dao = new GermplasmDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(instance);
+        Session session = getSession(instance);
 
         List<Germplasm> germplasms = new ArrayList<Germplasm>();
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return germplasms;
         }
@@ -307,10 +329,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         int count = 0;
 
         GermplasmDAO dao = new GermplasmDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(instance);
+        Session session = getSession(instance);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return 0;
         }
@@ -324,10 +346,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             throws QueryException {
         GermplasmDAO dao = new GermplasmDAO();
         List<Germplasm> germplasms = new ArrayList<Germplasm>();
-        HibernateUtil hibernateUtil = getHibernateUtil(instance);
+        Session session = getSession(instance);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return germplasms;
         }
@@ -344,10 +366,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public int countGermplasmByLocationName(String name, Operation op, Database instance) throws QueryException {
         GermplasmDAO dao = new GermplasmDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(instance);
+        Session session = getSession(instance);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return 0;
         }
@@ -371,10 +393,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             throws QueryException {
         GermplasmDAO dao = new GermplasmDAO();
         List<Germplasm> germplasms = null;
-        HibernateUtil hibernateUtil = getHibernateUtil(instance);
+        Session session = getSession(instance);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return germplasms;
         }
@@ -391,10 +413,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public int countGermplasmByMethodName(String name, Operation op, Database instance) throws QueryException {
         GermplasmDAO dao = new GermplasmDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(instance);
+        Session session = getSession(instance);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return 0;
         }
@@ -417,10 +439,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public Germplasm getGermplasmByGID(Integer gid) {
         GermplasmDAO dao = new GermplasmDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(gid);
+        Session session = getSession(gid);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return null;
         }
@@ -431,10 +453,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public Germplasm getGermplasmWithPrefName(Integer gid) throws QueryException {
         GermplasmDAO dao = new GermplasmDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(gid);
+        Session session = getSession(gid);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return null;
         }
@@ -445,10 +467,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public Germplasm getGermplasmWithPrefAbbrev(Integer gid) throws QueryException {
         GermplasmDAO dao = new GermplasmDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(gid);
+        Session session = getSession(gid);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return null;
         }
@@ -459,10 +481,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public Name getGermplasmNameByID(Integer id) {
         NameDAO dao = new NameDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(id);
+        Session session = getSession(id);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return null;
         }
@@ -473,10 +495,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public List<Name> getNamesByGID(Integer gid, Integer status, GermplasmNameType type) throws QueryException {
         NameDAO dao = new NameDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(gid);
+        Session session = getSession(gid);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return new ArrayList<Name>();
         }
@@ -487,10 +509,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public Name getPreferredNameByGID(Integer gid) throws QueryException {
         NameDAO dao = new NameDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(gid);
+        Session session = getSession(gid);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return null;
         }
@@ -506,10 +528,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public Name getPreferredAbbrevByGID(Integer gid) throws QueryException {
         NameDAO dao = new NameDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(gid);
+        Session session = getSession(gid);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return null;
         }
@@ -525,10 +547,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public Name getNameByGIDAndNval(Integer gid, String nval) throws QueryException {
         NameDAO dao = new NameDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(gid);
+        Session session = getSession(gid);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return null;
         }
@@ -547,12 +569,14 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     private void updateGermplasmPrefNameAbbrev(Integer gid, String newPrefValue, String nameOrAbbrev) throws QueryException {
-        if (hibernateUtilForLocal == null) {
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if (sessionForLocal == null) {
             throw new QueryException(NO_LOCAL_INSTANCE_MSG);
         }
 
         // initialize session & transaction
-        Session session = hibernateUtilForLocal.getCurrentSession();
+        Session session = sessionForLocal;
         Transaction trans = null;
 
         try {
@@ -608,7 +632,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             }
             throw new QueryException("Error in updating Germplasm Preferred " + nameOrAbbrev + ": " + ex.getMessage(), ex);
         } finally {
-            hibernateUtilForLocal.closeCurrentSession();
+            sessionForLocal.flush();
         }
     }
 
@@ -637,12 +661,14 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     private int addOrUpdateGermplasmName(List<Name> names, Operation operation) throws QueryException {
-        if (hibernateUtilForLocal == null) {
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if (sessionForLocal == null) {
             throw new QueryException(NO_LOCAL_INSTANCE_MSG);
         }
 
         // initialize session & transaction
-        Session session = hibernateUtilForLocal.getCurrentSession();
+        Session session = sessionForLocal;
         Transaction trans = null;
 
         int namesSaved = 0;
@@ -679,7 +705,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             }
             throw new QueryException("Error encountered while saving Germplasm Name: " + ex.getMessage(), ex);
         } finally {
-            hibernateUtilForLocal.closeCurrentSession();
+            sessionForLocal.flush();
         }
 
         return namesSaved;
@@ -688,10 +714,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public List<Attribute> getAttributesByGID(Integer gid) throws QueryException {
         AttributeDAO dao = new AttributeDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(gid);
+        Session session = getSession(gid);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return new ArrayList<Attribute>();
         }
@@ -701,10 +727,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public Method getMethodByID(Integer id) {
         MethodDAO dao = new MethodDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(id);
+        Session session = getSession(id);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return null;
         }
@@ -716,15 +742,18 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public List<Method> getAllMethods() throws QueryException {
         List<Method> methods = new ArrayList<Method>();
 
-        if (this.hibernateUtilForLocal != null) {
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if (sessionForLocal != null) {
             MethodDAO dao = new MethodDAO();
-            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+            dao.setSession(sessionForLocal);
             methods.addAll(dao.getAllMethod());
         }
 
-        if (this.hibernateUtilForCentral != null) {
+        if (sessionForCentral != null) {
             MethodDAO centralDao = new MethodDAO();
-            centralDao.setSession(hibernateUtilForCentral.getCurrentSession());
+            centralDao.setSession(sessionForCentral);
             methods.addAll(centralDao.getAllMethod());
         }
 
@@ -737,7 +766,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         requireLocalDatabaseInstance();
 
         // initialize session & transaction
-        Session session = hibernateUtilForLocal.getCurrentSession();
+        Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
         int methodsSaved = 0;
@@ -762,7 +791,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             }
             throw new QueryException("Error encountered while saving Method: " + ex.getMessage(), ex);
         } finally {
-            hibernateUtilForLocal.closeCurrentSession();
+            session.flush();
         }
 
         return methodsSaved;
@@ -773,7 +802,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         requireLocalDatabaseInstance();
 
         // initialize session & transaction
-        Session session = hibernateUtilForLocal.getCurrentSession();
+        Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
         int methodsSaved = 0;
@@ -800,7 +829,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             }
             throw new QueryException("Error encountered while saving a list of Methods: " + ex.getMessage(), ex);
         } finally {
-            hibernateUtilForLocal.closeCurrentSession();
+            session.flush();
         }
 
         return methodsSaved;
@@ -810,7 +839,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public void deleteMethod(Method method) throws QueryException {
         requireLocalDatabaseInstance();
         
-        Session session = hibernateUtilForLocal.getCurrentSession();
+        Session session = getCurrentSessionForLocal();
         Transaction trans = null;
         
         try {
@@ -830,17 +859,17 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             }
             throw new QueryException("Error encountered while deleting Method: " + ex.getMessage(), ex);
         } finally {
-            hibernateUtilForLocal.closeCurrentSession();
+            session.flush();
         }
     }
 
     @Override
     public UserDefinedField getUserDefinedFieldByID(Integer id) {
         UserDefinedFieldDAO dao = new UserDefinedFieldDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(id);
+        Session session = getSession(id);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return null;
         }
@@ -851,10 +880,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public Country getCountryById(Integer id) {
         CountryDAO dao = new CountryDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(id);
+        Session session = getSession(id);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return null;
         }
@@ -866,10 +895,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public Location getLocationByID(Integer id) {
         LocationDAO dao = new LocationDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(id);
+        Session session = getSession(id);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return null;
         }
@@ -881,12 +910,14 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public int addLocation(Location location) throws QueryException {
-        if (hibernateUtilForLocal == null) {
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if (sessionForLocal == null) {
             throw new QueryException(NO_LOCAL_INSTANCE_MSG);
         }
 
         // initialize session & transaction
-        Session session = hibernateUtilForLocal.getCurrentSession();
+        Session session = sessionForLocal;
         Transaction trans = null;
 
         int locationsSaved = 0;
@@ -911,7 +942,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             }
             throw new QueryException("Error encountered while saving Location: " + ex.getMessage(), ex);
         } finally {
-            hibernateUtilForLocal.closeCurrentSession();
+            sessionForLocal.flush();
         }
 
         return locationsSaved;
@@ -919,12 +950,14 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     
     @Override
     public int addLocation(List<Location> locations) throws QueryException {
-        if (hibernateUtilForLocal == null) {
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if (sessionForLocal == null) {
             throw new QueryException(NO_LOCAL_INSTANCE_MSG);
         }
 
         // initialize session & transaction
-        Session session = hibernateUtilForLocal.getCurrentSession();
+        Session session = sessionForLocal;
         Transaction trans = null;
 
         int locationsSaved = 0;
@@ -953,7 +986,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             }
             throw new QueryException("Error encountered while saving Locations: " + ex.getMessage(), ex);
         } finally {
-            hibernateUtilForLocal.closeCurrentSession();
+            sessionForLocal.flush();
         }
 
         return locationsSaved;
@@ -961,11 +994,14 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public Bibref getBibliographicReferenceByID(Integer id) {
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
         BibrefDAO dao = new BibrefDAO();
-        if (id < 0 && this.hibernateUtilForLocal != null) {
-            dao.setSession(hibernateUtilForLocal.getCurrentSession());
-        } else if (id > 0 && this.hibernateUtilForCentral != null) {
-            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+        if (id < 0 && sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+        } else if (id > 0 && sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
         } else {
             return null;
         }
@@ -976,12 +1012,14 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public int addBibliographicReference(Bibref bibref) throws QueryException {
-        if (hibernateUtilForLocal == null) {
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if (sessionForLocal == null) {
             throw new QueryException(NO_LOCAL_INSTANCE_MSG);
         }
 
         // initialize session & transaction
-        Session session = hibernateUtilForLocal.getCurrentSession();
+        Session session = sessionForLocal;
         Transaction trans = null;
 
         int bibrefSaved = 0;
@@ -1006,7 +1044,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             }
             throw new QueryException("Error encountered while saving Bibliographic Reference: " + ex.getMessage(), ex);
         } finally {
-            hibernateUtilForLocal.closeCurrentSession();
+            sessionForLocal.flush();
         }
 
         return bibrefSaved;
@@ -1273,10 +1311,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public Germplasm getParentByGIDAndProgenitorNumber(Integer gid, Integer progenitorNumber) throws QueryException {
         GermplasmDAO dao = new GermplasmDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(gid);
-
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+        Session session = getSession(gid);
+        
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return null;
         }
@@ -1291,18 +1329,18 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public List<Object[]> findDescendants(Integer gid, int start, int numOfRows) throws QueryException {
         GermplasmDAO dao = new GermplasmDAO();
         ProgenitorDAO pDao = new ProgenitorDAO();
-        List<Object[]> result = new ArrayList();
+        List<Object[]> result = new ArrayList<Object[]>();
         Object[] germplasmList;
 
         // TODO Local-Central: Verify if the method to identify the database
         // instance is through gid
-        // If not, please use getHibernateUtil(instance) and add Database
+        // If not, please use getSession(instance) and add Database
         // instance as parameter to countDescendants() method
-        HibernateUtil hibernateUtil = getHibernateUtil(gid);
+        Session session = getSession(gid);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtilForCentral.getCurrentSession());
-            pDao.setSession(hibernateUtilForCentral.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
+            pDao.setSession(session);
         } else {
             return result;
         }
@@ -1333,12 +1371,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
         // TODO Local-Central: Verify if the method to identify the database
         // instance is through gid
-        // If not, please use getHibernateUtil(instance) and add Database
+        // If not, please use getSession(instance) and add Database
         // instance as parameter to countDescendants() method
-        HibernateUtil hibernateUtil = getHibernateUtil(gid);
+        Session session = getSession(gid);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return 0;
         }
@@ -1381,6 +1419,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
      * @throws QueryException
      */
     private GermplasmPedigreeTreeNode addParents(GermplasmPedigreeTreeNode node, int level) throws QueryException {
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
         if (level == 1) {
             return node;
         } else {
@@ -1415,13 +1456,13 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                     // if there are more parents, get and add each of them
                     List<Germplasm> otherParents = new ArrayList<Germplasm>();
 
-                    if (germplasmOfNode.getGid() < 0 && this.hibernateUtilForLocal != null) {
+                    if (germplasmOfNode.getGid() < 0 && sessionForLocal != null) {
                         GermplasmDAO dao = new GermplasmDAO();
-                        dao.setSession(hibernateUtilForLocal.getCurrentSession());
+                        dao.setSession(sessionForLocal);
                         otherParents = dao.getProgenitorsByGIDWithPrefName(germplasmOfNode.getGid());
-                    } else if (germplasmOfNode.getGid() > 0 && this.hibernateUtilForCentral != null) {
+                    } else if (germplasmOfNode.getGid() > 0 && sessionForCentral != null) {
                         GermplasmDAO centralDao = new GermplasmDAO();
-                        centralDao.setSession(this.hibernateUtilForCentral.getCurrentSession());
+                        centralDao.setSession(sessionForCentral);
                         otherParents = centralDao.getProgenitorsByGIDWithPrefName(germplasmOfNode.getGid());
                     }
 
@@ -1439,19 +1480,22 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public List<Germplasm> getManagementNeighbors(Integer gid) throws QueryException {
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
         List<Germplasm> neighbors = new ArrayList<Germplasm>();
         GermplasmDAO dao = new GermplasmDAO();
-        if (gid < 0 && this.hibernateUtilForLocal != null) {
-            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+        if (gid < 0 && sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
             neighbors = dao.getManagementNeighbors(gid);
             return neighbors;
-        } else if (gid > 0 && this.hibernateUtilForCentral != null) {
-            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+        } else if (gid > 0 && sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
             neighbors = dao.getManagementNeighbors(gid);
 
-            if (this.hibernateUtilForLocal != null) {
+            if (sessionForLocal != null) {
                 GermplasmDAO localDao = new GermplasmDAO();
-                localDao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+                localDao.setSession(sessionForLocal);
                 neighbors.addAll(localDao.getManagementNeighbors(gid));
             }
         }
@@ -1465,12 +1509,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
         // TODO Local-Central: Verify if the method to identify the database
         // instance is through gid
-        // If not, please use getHibernateUtil(instance) and add Database
+        // If not, please use getSession(instance) and add Database
         // instance as parameter to getGroupRelatives() method
-        HibernateUtil hibernateUtil = getHibernateUtil(gid);
+        Session session = getSession(gid);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return new ArrayList<Germplasm>();
         }
@@ -1570,24 +1614,27 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
      * @throws QueryException
      */
     private GermplasmPedigreeTreeNode getDerivedLines(GermplasmPedigreeTreeNode node, int steps) throws QueryException {
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
         if (steps <= 0) {
             return node;
         } else {
             List<Germplasm> derivedGermplasms = new ArrayList<Germplasm>();
             Integer gid = node.getGermplasm().getGid();
 
-            if (gid < 0 && this.hibernateUtilForLocal != null) {
+            if (gid < 0 && sessionForLocal != null) {
                 GermplasmDAO dao = new GermplasmDAO();
-                dao.setSession(hibernateUtilForLocal.getCurrentSession());
+                dao.setSession(sessionForLocal);
                 derivedGermplasms = dao.getDerivativeChildren(gid);
-            } else if (gid > 0 && this.hibernateUtilForCentral != null) {
+            } else if (gid > 0 && sessionForCentral != null) {
                 GermplasmDAO dao = new GermplasmDAO();
-                dao.setSession(hibernateUtilForCentral.getCurrentSession());
+                dao.setSession(sessionForCentral);
                 derivedGermplasms = dao.getDerivativeChildren(gid);
 
-                if (this.hibernateUtilForLocal != null) {
+                if (sessionForLocal != null) {
                     GermplasmDAO localDao = new GermplasmDAO();
-                    localDao.setSession(hibernateUtilForLocal.getCurrentSession());
+                    localDao.setSession(sessionForLocal);
                     derivedGermplasms.addAll(localDao.getDerivativeChildren(gid));
                 }
             }
@@ -1627,12 +1674,14 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     private int addOrUpdateAttributes(List<Attribute> attributes, Operation operation) throws QueryException {
-        if (hibernateUtilForLocal == null) {
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if (sessionForLocal == null) {
             throw new QueryException(NO_LOCAL_INSTANCE_MSG);
         }
 
         // initialize session & transaction
-        Session session = hibernateUtilForLocal.getCurrentSession();
+        Session session = sessionForLocal;
         Transaction trans = null;
 
         int attributesSaved = 0;
@@ -1665,7 +1714,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             }
             throw new QueryException("Error encountered while saving Attribute: " + ex.getMessage(), ex);
         } finally {
-            hibernateUtilForLocal.closeCurrentSession();
+            sessionForLocal.flush();
         }
 
         return attributesSaved;
@@ -1674,10 +1723,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public Attribute getAttributeById(Integer id) {
         AttributeDAO dao = new AttributeDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(id);
+        Session session = getSession(id);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return null;
         }
@@ -1687,7 +1736,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public boolean updateProgenitor(Integer gid, Integer progenitorId, Integer progenitorNumber) throws QueryException {
-        if (hibernateUtilForLocal == null) {
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if (sessionForLocal == null) {
             throw new QueryException(NO_LOCAL_INSTANCE_MSG);
         }
 
@@ -1726,7 +1777,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             }
         } else if (progenitorNumber > 2) {
             ProgenitorDAO dao = new ProgenitorDAO();
-            dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+            dao.setSession(sessionForLocal);
 
             // check if there is an existing Progenitor record
             ProgenitorPK id = new ProgenitorPK(gid, progenitorNumber);
@@ -1762,12 +1813,14 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     private int addOrUpdateGermplasms(List<Germplasm> germplasms, Operation operation) throws QueryException {
-        if (hibernateUtilForLocal == null) {
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if (sessionForLocal == null) {
             throw new QueryException(NO_LOCAL_INSTANCE_MSG);
         }
 
         // initialize session & transaction
-        Session session = hibernateUtilForLocal.getCurrentSession();
+        Session session = sessionForLocal;
         Transaction trans = null;
 
         int germplasmsSaved = 0;
@@ -1806,19 +1859,21 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             }
             throw new QueryException("Error encountered while saving Germplasm: " + ex.getMessage(), ex);
         } finally {
-            hibernateUtilForLocal.closeCurrentSession();
+            sessionForLocal.flush();
         }
 
         return germplasmsSaved;
     }
 
     private int addOrUpdateProgenitors(List<Progenitor> progenitors) throws QueryException {
-        if (hibernateUtilForLocal == null) {
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if (sessionForLocal == null) {
             throw new QueryException(NO_LOCAL_INSTANCE_MSG);
         }
 
         // initialize session & transaction
-        Session session = hibernateUtilForLocal.getCurrentSession();
+        Session session = sessionForLocal;
         Transaction trans = null;
 
         int progenitorsSaved = 0;
@@ -1842,7 +1897,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             }
             throw new QueryException("Error encountered while saving Progenitor: " + ex.getMessage(), ex);
         } finally {
-            hibernateUtilForLocal.closeCurrentSession();
+            sessionForLocal.flush();
         }
 
         return progenitorsSaved;
@@ -1870,12 +1925,14 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public int addGermplasm(Map<Germplasm, Name> germplasmNameMap) throws QueryException {
-        if (hibernateUtilForLocal == null) {
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if (sessionForLocal == null) {
             throw new QueryException(NO_LOCAL_INSTANCE_MSG);
         }
 
         // initialize session & transaction
-        Session session = hibernateUtilForLocal.getCurrentSession();
+        Session session = sessionForLocal;
         Transaction trans = null;
 
         int germplasmsSaved = 0;
@@ -1921,7 +1978,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             }
             throw new QueryException("Error encountered while saving Germplasm: " + ex.getMessage(), ex);
         } finally {
-            hibernateUtilForLocal.closeCurrentSession();
+            sessionForLocal.flush();
         }
 
         return germplasmsSaved;
@@ -1931,11 +1988,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
      * @Override public List<Germplasm> findGermplasmByExample(Germplasm sample,
      *           int start, int numOfRows) { GermplasmDAO dao = new
      *           GermplasmDAO();
-     *           dao.setSession(hibernateUtil.getCurrentSession()); return
+     *           dao.setSession(session); return
      *           dao.findByExample(sample, start, numOfRows); }
      * @Override public int countGermplasmByExample(Germplasm sample) {
      *           GermplasmDAO dao = new GermplasmDAO();
-     *           dao.setSession(hibernateUtil.getCurrentSession()); return
+     *           dao.setSession(session); return
      *           dao.countByExample(sample).intValue(); }
      **/
     
@@ -1943,19 +2000,19 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public List<GidNidElement> getGidAndNidByGermplasmNames(List<String> germplasmNames) throws QueryException{
 
-        HibernateUtil hibernateUtilForCentral = getHibernateUtil(Database.CENTRAL);
-        HibernateUtil hibernateUtilForLocal = getHibernateUtil(Database.LOCAL);
+        Session sessionForCentral = getSession(Database.CENTRAL);
+        Session sessionForLocal = getSession(Database.LOCAL);
         
         List<GidNidElement> results = new ArrayList<GidNidElement>();
         NameDAO dao = new NameDAO();
         
-        if (hibernateUtilForCentral != null) {
-            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
             results.addAll(dao.getGidAndNidByGermplasmNames(germplasmNames));
         } 
 
-        if (hibernateUtilForLocal != null) {
-            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+        if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
             results.addAll(dao.getGidAndNidByGermplasmNames(germplasmNames));
         } 
         

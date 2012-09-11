@@ -30,6 +30,7 @@ import org.generationcp.middleware.dao.WorkbenchDatasetDAO;
 import org.generationcp.middleware.dao.WorkbenchRuntimeDataDAO;
 import org.generationcp.middleware.dao.WorkflowTemplateDAO;
 import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
@@ -46,42 +47,45 @@ import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
-import org.generationcp.middleware.util.HibernateUtil;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
+public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(WorkbenchDataManagerImpl.class);
 
-    private HibernateUtil hibernateUtil;
-
-    public WorkbenchDataManagerImpl(HibernateUtil hibernateUtil) {
-        this.hibernateUtil = hibernateUtil;
+    private HibernateSessionProvider sessionProvider;
+    
+    public WorkbenchDataManagerImpl(HibernateSessionProvider sessionProvider) {
+        this.sessionProvider = sessionProvider;
     }
-
+    
+    public Session getCurrentSession() {
+        return sessionProvider.getSession();
+    }
+    
     @Override
     public List<Project> getProjects() throws QueryException{
         ProjectDAO projectDao = new ProjectDAO();
-        projectDao.setSession(hibernateUtil.getCurrentSession());
+        projectDao.setSession(getCurrentSession());
         return projectDao.findAll();
     }
 
     @Override
     public List<Project> getProjects(int start, int numOfRows)  throws QueryException{
         ProjectDAO projectDao = new ProjectDAO();
-        projectDao.setSession(hibernateUtil.getCurrentSession());
+        projectDao.setSession(getCurrentSession());
         return projectDao.findAll(start, numOfRows);
     }
 
     @Override
     public Project saveOrUpdateProject(Project project)  throws QueryException{
-        Session session = hibernateUtil.getCurrentSession();
         Transaction trans = null;
 
+        Session session = getCurrentSession();
         try {
             trans = session.beginTransaction();
 
@@ -100,8 +104,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
             }
 
             throw new QueryException("Cannot save Project", e);
-        } finally {
-            hibernateUtil.closeCurrentSession();
         }
 
         return project;
@@ -109,9 +111,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 
     @Override
     public void deleteProject(Project project)  throws QueryException{
-        Session session = hibernateUtil.getCurrentSession();
         Transaction trans = null;
 
+        Session session = getCurrentSession();
         try {
             trans = session.beginTransaction();
 
@@ -126,43 +128,41 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
             }
 
             throw new QueryException("Cannot delete Project", e);
-        } finally {
-            hibernateUtil.closeCurrentSession();
         }
     }
 
     @Override
     public List<WorkflowTemplate> getWorkflowTemplates()  throws QueryException{
         WorkflowTemplateDAO workflowTemplateDAO = new WorkflowTemplateDAO();
-        workflowTemplateDAO.setSession(hibernateUtil.getCurrentSession());
+        workflowTemplateDAO.setSession(getCurrentSession());
         return workflowTemplateDAO.findAll();
     }
 
     @Override
     public List<WorkflowTemplate> getWorkflowTemplates(int start, int numOfRows)  throws QueryException{
         WorkflowTemplateDAO workflowTemplateDAO = new WorkflowTemplateDAO();
-        workflowTemplateDAO.setSession(hibernateUtil.getCurrentSession());
+        workflowTemplateDAO.setSession(getCurrentSession());
         return workflowTemplateDAO.findAll(start, numOfRows);
     }
 
     @Override
     public Tool getToolWithName(String toolId)  throws QueryException{
         ToolDAO toolDAO = new ToolDAO();
-        toolDAO.setSession(hibernateUtil.getCurrentSession());
+        toolDAO.setSession(getCurrentSession());
         return toolDAO.findByToolName(toolId);
     }
 
     @Override
     public List<Tool> getToolsWithType(ToolType toolType) throws QueryException {
         ToolDAO toolDAO = new ToolDAO();
-        toolDAO.setSession(hibernateUtil.getCurrentSession());
+        toolDAO.setSession(getCurrentSession());
         return toolDAO.findToolsByToolType(toolType);
     }
 
     @Override
     public boolean isValidUserLogin(String username, String password) throws QueryException {
         UserDAO dao = new UserDAO();
-        dao.setSession(hibernateUtil.getCurrentSession());
+        dao.setSession(getCurrentSession());
         User user = dao.findByUsernameAndPassword(username, password);
         if (user != null) {
             return true;
@@ -174,23 +174,23 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     @Override
     public boolean isPersonExists(String firstName, String lastName) throws QueryException {
         PersonDAO dao = new PersonDAO();
-        dao.setSession(hibernateUtil.getCurrentSession());
+        dao.setSession(getCurrentSession());
         return dao.isPersonExists(firstName, lastName);
     }
 
     @Override
     public boolean isUsernameExists(String userName) throws QueryException {
         UserDAO dao = new UserDAO();
-        dao.setSession(hibernateUtil.getCurrentSession());
+        dao.setSession(getCurrentSession());
 
         return dao.isUsernameExists(userName);
     }
 
     @Override
     public void addPerson(Person person) throws QueryException {
-        Session session = hibernateUtil.getCurrentSession();
         Transaction trans = null;
 
+        Session session = getCurrentSession();
         try {
             // begin save transaction
             trans = session.beginTransaction();
@@ -218,17 +218,14 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
                 trans.rollback();
             }
             throw new QueryException("Error encountered while saving Person: " + ex.getMessage(), ex);
-        } finally {
-            hibernateUtil.closeCurrentSession();
         }
-
     }
 
     @Override
     public void addUser(User user) throws QueryException {
-        Session session = hibernateUtil.getCurrentSession();
         Transaction trans = null;
 
+        Session session = getCurrentSession();
         try {
             // begin save transaction
             trans = session.beginTransaction();
@@ -254,21 +251,19 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
                 trans.rollback();
             }
             throw new QueryException("Error encountered while saving User: " + ex.getMessage(), ex);
-        } finally {
-            hibernateUtil.closeCurrentSession();
         }
 
     }
 
     public Project getProjectById(Long projectId) throws QueryException{
         ProjectDAO projectDao = new ProjectDAO();
-        projectDao.setSession(hibernateUtil.getCurrentSession());
+        projectDao.setSession(getCurrentSession());
         return projectDao.getById(projectId);
     }
 
     public int addWorkbenchDataset(WorkbenchDataset dataset) throws QueryException {
-
-        Session session = hibernateUtil.getCurrentSession();
+        Session session = getCurrentSession();
+        
         Transaction trans = null;
         int recordSaved = 0;
         try {
@@ -287,8 +282,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
                 trans.rollback();
             }
             throw new QueryException("Error encountered while saving workbench dataset: " + ex.getMessage(), ex);
-        } finally {
-            hibernateUtil.closeCurrentSession();
         }
 
         return recordSaved;
@@ -297,15 +290,15 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     @Override
     public WorkbenchDataset getWorkbenchDatasetById(Long datasetId) throws QueryException{
         WorkbenchDatasetDAO datasetDAO = new WorkbenchDatasetDAO();
-        datasetDAO.setSession(hibernateUtil.getCurrentSession());
+        datasetDAO.setSession(getCurrentSession());
         return datasetDAO.getById(datasetId);
     }
     
     @Override
     public void deleteWorkbenchDataset(WorkbenchDataset dataset)  throws QueryException{
-        Session session = hibernateUtil.getCurrentSession();
         Transaction trans = null;
 
+        Session session = getCurrentSession();
         try {
             trans = session.beginTransaction();
             WorkbenchDatasetDAO datasetDAO = new WorkbenchDatasetDAO();
@@ -319,8 +312,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
             }
 
             throw new QueryException("Cannot delete WorkbenchDataset. " + e.getMessage(), e);
-        } finally {
-            hibernateUtil.closeCurrentSession();
         }
     }
 
@@ -333,8 +324,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 
         List<User> users = new ArrayList<User>();
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        Session session = getCurrentSession();
+        if (session != null) {
+            dao.setSession(session);
             users.addAll(dao.getAll());
         }
 
@@ -347,8 +339,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 
         UserDAO dao = new UserDAO();
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        Session session = getCurrentSession();
+        if (session != null) {
+            dao.setSession(session);
             count = count + dao.countAll().intValue();
         }
         return count;
@@ -358,8 +351,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     public User getUserById(int id) {
         UserDAO dao = new UserDAO();
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        Session session = getCurrentSession();
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return null;
         }
@@ -374,8 +368,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 
         List<User> users = new ArrayList<User>();
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        Session session = getCurrentSession();
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return users;
         }
@@ -392,10 +387,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 
     @Override
     public void deleteUser(User user) throws QueryException {
-
-        Session session = hibernateUtil.getCurrentSession();
         Transaction trans = null;
 
+        Session session = getCurrentSession();
         try {
             // begin save transaction
             trans = session.beginTransaction();
@@ -412,8 +406,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
                 trans.rollback();
             }
             throw new QueryException("Error encountered while deleting User: " + ex.getMessage(), ex);
-        } finally {
-            hibernateUtil.closeCurrentSession();
         }
     }
 
@@ -424,8 +416,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         List<Person> persons = new ArrayList<Person>();
 
         // get the list of Persons from the local instance
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        Session session = getCurrentSession();
+        if (session != null) {
+            dao.setSession(session);
             persons.addAll(dao.getAll());
         }
 
@@ -438,8 +431,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 
         PersonDAO dao = new PersonDAO();
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        Session session = getCurrentSession();
+        if (session != null) {
+            dao.setSession(session);
             count = count + dao.countAll().intValue();
         }
 
@@ -450,8 +444,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     public Person getPersonById(int id) {
         PersonDAO dao = new PersonDAO();
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        Session session = getCurrentSession();
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return null;
         }
@@ -461,10 +456,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 
     @Override
     public void deletePerson(Person person) throws QueryException {
-
-        Session session = hibernateUtil.getCurrentSession();
         Transaction trans = null;
 
+        Session session = getCurrentSession();
         try {
             // begin save transaction
             trans = session.beginTransaction();
@@ -481,15 +475,13 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
                 trans.rollback();
             }
             throw new QueryException("Error encountered while deleting Person: " + ex.getMessage(), ex);
-        } finally {
-            hibernateUtil.closeCurrentSession();
         }
     }
 
     @Override
     public Project getLastOpenedProject(Integer userId) throws QueryException {
         ProjectDAO dao = new ProjectDAO();
-        dao.setSession(hibernateUtil.getCurrentSession());
+        dao.setSession(getCurrentSession());
         return dao.getLastOpenedProject(userId);
     }
 
@@ -500,8 +492,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         WorkbenchDatasetDAO dao = new WorkbenchDatasetDAO();
         List<WorkbenchDataset> list;
 
-        if(hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        Session session = getCurrentSession();
+        if(session != null) {
+            dao.setSession(session);
             list = dao.getByProjectId(projectId, start, numOfRows);
         } else {
             list = new ArrayList<WorkbenchDataset>();
@@ -515,8 +508,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         WorkbenchDatasetDAO dao = new WorkbenchDatasetDAO();
         Long result = 0L;
 
-        if(hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        Session session = getCurrentSession();
+        if(session != null) {
+            dao.setSession(session);
             result = dao.countByProjectId(projectId);
         }
 
@@ -531,8 +525,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         WorkbenchDatasetDAO dao = new WorkbenchDatasetDAO();
         List<WorkbenchDataset> list;
 
-        if(hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        Session session = getCurrentSession();
+        if(session != null) {
+            dao.setSession(session);
             list = dao.getByName(name, op, start, numOfRows);
         } else {
             list = new ArrayList<WorkbenchDataset>();
@@ -546,8 +541,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         WorkbenchDatasetDAO dao = new WorkbenchDatasetDAO();
         Long result = 0L;
 
-        if(hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        Session session = getCurrentSession();
+        if(session != null) {
+            dao.setSession(session);
             result = dao.countByName(name, op);
         }
 
@@ -561,8 +557,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         ProjectLocationMapDAO dao = new ProjectLocationMapDAO();
         List<Long> ids;
 
-        if(hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        Session session = getCurrentSession();
+        if(session != null) {
+            dao.setSession(session);
             ids = dao.getLocationIdsByProjectId(projectId, start, numOfRows);
         } else {
             ids = new ArrayList<Long>();
@@ -576,8 +573,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         ProjectLocationMapDAO dao = new ProjectLocationMapDAO();
         Long result = 0L;
 
-        if(hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        Session session = getCurrentSession();
+        if(session != null) {
+            dao.setSession(session);
             result = dao.countLocationIdsByProjectId(projectId);
         } 
 
@@ -590,8 +588,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         ProjectMethodDAO dao = new ProjectMethodDAO();
         List<Integer> list;
 
-        if(hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        Session session = getCurrentSession();
+        if(session != null) {
+            dao.setSession(session);
             list = dao.getByProjectId(projectId, start, numOfRows);
         } else {
             list = new ArrayList<Integer>();
@@ -606,8 +605,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         ProjectMethodDAO dao = new ProjectMethodDAO();
         Long result = 0L;
 
-        if(hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        Session session = getCurrentSession();
+        if(session != null) {
+            dao.setSession(session);
             result = dao.countByProjectId(projectId);
         }
 
@@ -624,11 +624,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 
     @Override
     public int addProjectUser(ProjectUser projectUser) throws QueryException {
-        if(hibernateUtil == null) {
+        Session session = getCurrentSession();
+        if(session == null) {
             return 0;
         }
 
-        Session session = hibernateUtil.getCurrentSession();
         Transaction trans = null;
 
         int recordsSaved = 0;
@@ -650,18 +650,17 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
                 trans.rollback();
             }
             throw new QueryException("Error encountered while saving ProjectUser: " + ex.getMessage(), ex);
-        } finally {
-            hibernateUtil.closeCurrentSession();
         }
+        
         return recordsSaved;
     }
 
     @Override
     public int addProjectUsers(List<ProjectUser> projectUsers) throws QueryException{
-        if(hibernateUtil == null) {
+        Session session = getCurrentSession();
+        if(session == null) {
             return 0;
         }
-        Session session = hibernateUtil.getCurrentSession();
         Transaction trans = null;
 
         int recordsSaved = 0;
@@ -685,17 +684,17 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
                 trans.rollback();
             }
             throw new QueryException("Error encountered while saving ProjectUsers: " + ex.getMessage(), ex);
-        } finally {
-            hibernateUtil.closeCurrentSession();
         }
+        
         return recordsSaved;
     }
 
     @Override
     public ProjectUser getProjectUserById(Integer id) throws QueryException {
         ProjectUserDAO dao = new ProjectUserDAO();
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        Session session = getCurrentSession();
+        if (session != null) {
+            dao.setSession(session);
             return dao.getById(id);
         }
         return null;
@@ -704,8 +703,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     @Override
     public ProjectUser getProjectUserByProjectAndUser(Project project, User user) throws QueryException{
         ProjectUserDAO dao = new ProjectUserDAO();
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        Session session = getCurrentSession();
+        if (session != null) {
+            dao.setSession(session);
             return dao.getByProjectAndUser(project, user);
         }
         return null;
@@ -714,8 +714,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     @Override
     public List<ProjectUser> getProjectUserByProject(Project project) throws QueryException{
         ProjectUserDAO dao = new ProjectUserDAO();
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        Session session = getCurrentSession();
+        if (session != null) {
+            dao.setSession(session);
             return dao.getByProject(project);
         }
         return null;
@@ -723,11 +724,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 
     @Override
     public void deleteProjectUser(ProjectUser projectUser) throws QueryException {
-        if (hibernateUtil == null) {
+        Session session = getCurrentSession();
+        if (session == null) {
             return;
         }
 
-        Session session = hibernateUtil.getCurrentSession();
         Transaction trans = null;
 
         try {
@@ -746,17 +747,17 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
                 trans.rollback();
             }
             throw new QueryException("Error encountered while deleting ProjectUser: " + ex.getMessage(), ex);
-        } finally {
-            hibernateUtil.closeCurrentSession();
         }
     }
 
     @Override
     public List<User> getUsersByProjectId(Long projectId) throws QueryException {
+        Session session = getCurrentSession();
+        
         ProjectUserDAO dao = new ProjectUserDAO();
         List<User> users;
-        if(hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if(session != null) {
+            dao.setSession(session);
             users = dao.getUsersByProjectId(projectId);
         } else {
             users = new ArrayList<User>();
@@ -770,8 +771,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         ProjectUserDAO dao = new ProjectUserDAO();
         Long result = 0L;
 
-        if(hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        Session session = getCurrentSession();
+        if(session != null) {
+            dao.setSession(session);
             result = dao.countUsersByProjectId(projectId);
         }
 
@@ -783,8 +785,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         CropTypeDAO dao = new CropTypeDAO();
         List<CropType> cropTypes = new ArrayList<CropType>();
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        Session session = getCurrentSession();
+        if (session != null) {
+            dao.setSession(session);
             cropTypes = (List<CropType>) dao.getAll();
         }
 
@@ -797,8 +800,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         CropTypeDAO dao = new CropTypeDAO();
         CropType cropType = null;
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        Session session = getCurrentSession();
+        if (session != null) {
+            dao.setSession(session);
             cropType = dao.getByName(cropName);
         }
 
@@ -807,11 +811,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 
     @Override
     public int addCropType(CropType cropType) throws QueryException {
-
-        if(hibernateUtil == null) {
+        Session session = getCurrentSession();
+        if(session == null) {
             return 0;
         }
-        Session session = hibernateUtil.getCurrentSession();
+        
         CropTypeDAO dao = new CropTypeDAO();
         dao.setSession(session);
 
@@ -837,8 +841,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
                 trans.rollback();
             }
             throw new QueryException("Error encountered while adding crop type: " + ex.getMessage(), ex);
-        } finally {
-            hibernateUtil.closeCurrentSession();
         }
 
         return recordsSaved;    
@@ -857,11 +859,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     }
 
     private int addOrUpdateProjectLocationMapData(List<ProjectLocationMap> projectLocationMapDatas, Operation operation) throws QueryException {
-
-        if(hibernateUtil == null) {
+        Session session = getCurrentSession();
+        if(session == null) {
             return 0;
         }
-        Session session = hibernateUtil.getCurrentSession();
+        
         Transaction trans = null;
 
         int recordsSaved = 0;
@@ -887,8 +889,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
                 trans.rollback();
             }
             throw new QueryException("Error encountered while adding ProjectLocation: " + ex.getMessage(), ex);
-        } finally {
-            hibernateUtil.closeCurrentSession();
         }
 
         return recordsSaved;
@@ -899,8 +899,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     public List<ProjectLocationMap> getProjectLocationMapByProjectId(Long projectId, int start, int numOfRows) throws QueryException{
         ProjectLocationMapDAO dao = new ProjectLocationMapDAO();
         List<ProjectLocationMap> projectLocationMap;
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        Session session = getCurrentSession();
+        if (session != null) {
+            dao.setSession(session);
             projectLocationMap = (List<ProjectLocationMap>) dao.getByProjectId(projectId, start, numOfRows);
         } else {
             projectLocationMap = new ArrayList<ProjectLocationMap>();
@@ -912,7 +913,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     
     @Override
     public void deleteProjectLocationMap(ProjectLocationMap projectLocationMap) throws QueryException{
-        Session session = hibernateUtil.getCurrentSession();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         try {
@@ -929,8 +930,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
                     trans.rollback();
             }
             throw new QueryException("Error encountered while deleting ProjectLocationMap: " + ex.getMessage(), ex);
-        } finally {
-            hibernateUtil.closeCurrentSession();
         }
     }
 
@@ -949,10 +948,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     }
     
     private int addOrUpdateProjectMethodData(List<ProjectMethod> projectMethodList, Operation add) throws QueryException {
-        if(hibernateUtil == null) {
+        Session session = getCurrentSession();
+        if(session == null) {
             return 0;
         }
-        Session session = hibernateUtil.getCurrentSession();
+        
         Transaction trans = null;
 
         int recordsSaved = 0;
@@ -978,8 +978,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
                 trans.rollback();
             }
             throw new QueryException("Error encountered while adding ProjectMethod: " + ex.getMessage(), ex);
-        } finally {
-            hibernateUtil.closeCurrentSession();
         }
 
         return recordsSaved;
@@ -987,10 +985,12 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     
     @Override
     public List<ProjectMethod> getProjectMethodByProject(Project project, int start, int numOfRows) throws QueryException{
+        Session session = getCurrentSession();
+        
         ProjectMethodDAO dao = new ProjectMethodDAO();
         List<ProjectMethod> projectMethods;
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
             projectMethods = (List<ProjectMethod>) dao.getProjectMethodByProject(project, start, numOfRows);
         } else {
             projectMethods = new ArrayList<ProjectMethod>();
@@ -1002,7 +1002,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     
     @Override
     public void deleteProjectMethod(ProjectMethod projectMethod) throws QueryException{
-        Session session = hibernateUtil.getCurrentSession();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         try {
@@ -1019,8 +1019,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
                     trans.rollback();
             }
             throw new QueryException("Error encountered while deleting ProjectMethod: " + ex.getMessage(), ex);
-        } finally {
-            hibernateUtil.closeCurrentSession();
         }
     }
 
@@ -1037,10 +1035,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     }
 
     private int addOrUpdateProjectActivityData(List<ProjectActivity> projectActivityList, Operation add) throws QueryException {
-        if (hibernateUtil == null) {
+        Session session = getCurrentSession();
+        if (session == null) {
             return 0;
         }
-        Session session = hibernateUtil.getCurrentSession();
+        
         Transaction trans = null;
 
         int recordsSaved = 0;
@@ -1066,8 +1065,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
                 trans.rollback();
             }
             throw new QueryException("Error encountered while adding addProjectActivity: " + ex.getMessage(), ex);
-        } finally {
-            hibernateUtil.closeCurrentSession();
         }
 
         return recordsSaved;
@@ -1077,8 +1074,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     public List<ProjectActivity> getProjectActivitiesByProjectId(Long projectId, int start, int numOfRows) throws QueryException {
         ProjectActivityDAO dao = new ProjectActivityDAO();
         List<ProjectActivity> projectActivities;
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        Session session = getCurrentSession();
+        if (session != null) {
+            dao.setSession(session);
             projectActivities = (List<ProjectActivity>) dao.getByProjectId(projectId, start, numOfRows);
         } else {
             projectActivities = new ArrayList<ProjectActivity>();
@@ -1089,7 +1087,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
  
     @Override
     public void deleteProjectActivity(ProjectActivity projectActivity) throws QueryException{
-        Session session = hibernateUtil.getCurrentSession();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         try {
@@ -1106,8 +1104,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
                     trans.rollback();
             }
             throw new QueryException("Error encountered while deleting ProjectActivity: " + ex.getMessage(), ex);
-        } finally {
-            hibernateUtil.closeCurrentSession();
         }
     }
 
@@ -1117,8 +1113,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         ProjectActivityDAO dao = new ProjectActivityDAO();
         Long result = 0L;
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        Session session = getCurrentSession();
+        if (session != null) {
+            dao.setSession(session);
             result = dao.countByProjectId(projectId);
         }
 
@@ -1136,7 +1133,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     }
     
     private void addOrUpdateToolConfiguration(ToolConfiguration toolConfig, Operation op) throws QueryException {
-        Session session = hibernateUtil.getCurrentSession();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         try {
@@ -1159,14 +1156,12 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
                     trans.rollback();
             }
             throw new QueryException("Error encountered while saving ToolConfiguration: " + ex.getMessage(), ex);
-        } finally {
-            hibernateUtil.closeCurrentSession();
         }
     }
     
     @Override
     public void deleteToolConfiguration(ToolConfiguration toolConfig) throws QueryException {
-        Session session = hibernateUtil.getCurrentSession();
+        Session session = getCurrentSession();
         Transaction trans = null;
 
         try {
@@ -1183,15 +1178,13 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
                     trans.rollback();
             }
             throw new QueryException("Error encountered while deleting ToolConfiguration: " + ex.getMessage(), ex);
-        } finally {
-            hibernateUtil.closeCurrentSession();
         }
     }
 
     @Override
     public List<ToolConfiguration> getListOfToolConfigurationsByToolId(Long toolId) throws QueryException {
         ToolConfigurationDAO dao = new ToolConfigurationDAO();
-        dao.setSession(hibernateUtil.getCurrentSession());
+        dao.setSession(getCurrentSession());
         return dao.getListOfToolConfigurationsByToolId(toolId);
     }
 
@@ -1200,13 +1193,13 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         throws QueryException {
         
         ToolConfigurationDAO dao = new ToolConfigurationDAO();
-        dao.setSession(hibernateUtil.getCurrentSession());
+        dao.setSession(getCurrentSession());
         return dao.getToolConfigurationByToolIdAndConfigKey(toolId, configKey);
     }
     
     @Override
     public IbdbUserMap addIbdbUserMap(IbdbUserMap userMap) throws QueryException {
-        Session session = hibernateUtil.getCurrentSession();
+        Session session = getCurrentSession();
         Transaction trans = null;
         
         try {
@@ -1231,7 +1224,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     
     @Override
     public WorkbenchRuntimeData updateWorkbenchRuntimeData(WorkbenchRuntimeData workbenchRuntimeData) throws QueryException {
-        Session session = hibernateUtil.getCurrentSession();
+        Session session = getCurrentSession();
         Transaction trans = null;
         
         try {
@@ -1256,11 +1249,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     
     @Override
     public WorkbenchRuntimeData getWorkbenchRuntimeData() throws QueryException {
-        Session session = hibernateUtil.getCurrentSession();
-        
         try {
             WorkbenchRuntimeDataDAO dao = new WorkbenchRuntimeDataDAO();
-            dao.setSession(session);
+            dao.setSession(getCurrentSession());
             List<WorkbenchRuntimeData> list = dao.getAll(0, 1);
             
             return list.size() > 0 ? list.get(0) : null;

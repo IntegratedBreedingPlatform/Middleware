@@ -20,6 +20,7 @@ import org.generationcp.middleware.dao.LotDAO;
 import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.TransactionDAO;
 import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Lot;
@@ -27,7 +28,6 @@ import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Scale;
 import org.generationcp.middleware.pojos.report.LotReportRow;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
-import org.generationcp.middleware.util.HibernateUtil;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -41,50 +41,57 @@ import org.hibernate.Transaction;
  * 
  */
 public class InventoryDataManagerImpl extends DataManager implements InventoryDataManager{
+    
+    public InventoryDataManagerImpl() {
+    }
 
-    public InventoryDataManagerImpl(HibernateUtil hibernateUtilForLocal, HibernateUtil hibernateUtilForCentral) {
-        super(hibernateUtilForLocal, hibernateUtilForCentral);
+    public InventoryDataManagerImpl(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
+        super(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
+    public InventoryDataManagerImpl(Session sessionForLocal, Session sessionForCentral) {
+        super(sessionForLocal, sessionForCentral);
     }
 
     @Override
     public List<Lot> findLotsByEntityType(String type, int start, int numOfRows) {
         LotDAO dao = new LotDAO();
-        dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+        dao.setSession(getCurrentSessionForLocal());
         return dao.findByEntityType(type, start, numOfRows);
     }
 
     @Override
     public int countLotsByEntityType(String type) {
         LotDAO dao = new LotDAO();
-        dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+        dao.setSession(getCurrentSessionForLocal());
         return dao.countByEntityType(type).intValue();
     }
 
     @Override
     public List<Lot> findLotsByEntityTypeAndEntityId(String type, Integer entityId, int start, int numOfRows) {
         LotDAO dao = new LotDAO();
-        dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+        dao.setSession(getCurrentSessionForLocal());
         return dao.findByEntityTypeAndEntityId(type, entityId, start, numOfRows);
     }
 
     @Override
     public int countLotsByEntityTypeAndEntityId(String type, Integer entityId) {
         LotDAO dao = new LotDAO();
-        dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+        dao.setSession(getCurrentSessionForLocal());
         return dao.countByEntityTypeAndEntityId(type, entityId).intValue();
     }
 
     @Override
     public List<Lot> findLotsByEntityTypeAndLocationId(String type, Integer locationId, int start, int numOfRows) {
         LotDAO dao = new LotDAO();
-        dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+        dao.setSession(getCurrentSessionForLocal());
         return dao.findByEntityTypeAndLocationId(type, locationId, start, numOfRows);
     }
 
     @Override
     public int countLotsByEntityTypeAndLocationId(String type, Integer locationId) {
         LotDAO dao = new LotDAO();
-        dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+        dao.setSession(getCurrentSessionForLocal());
         return dao.countByEntityTypeAndLocationId(type, locationId).intValue();
     }
 
@@ -92,28 +99,28 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
     public List<Lot> findLotsByEntityTypeAndEntityIdAndLocationId(String type, Integer entityId, Integer locationId, int start,
             int numOfRows) {
         LotDAO dao = new LotDAO();
-        dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+        dao.setSession(getCurrentSessionForLocal());
         return dao.findByEntityTypeAndEntityIdAndLocationId(type, entityId, locationId, start, numOfRows);
     }
 
     @Override
     public int countLotsByEntityTypeAndEntityIdAndLocationId(String type, Integer entityId, Integer locationId) {
         LotDAO dao = new LotDAO();
-        dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+        dao.setSession(getCurrentSessionForLocal());
         return dao.countByEntityTypeAndEntityIdAndLocationId(type, entityId, locationId).intValue();
     }
 
     @Override
     public Long getActualLotBalance(Integer lotId) {
         LotDAO dao = new LotDAO();
-        dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+        dao.setSession(getCurrentSessionForLocal());
         return dao.getActualLotBalance(lotId);
     }
 
     @Override
     public Long getAvailableLotBalance(Integer lotId) {
         LotDAO dao = new LotDAO();
-        dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+        dao.setSession(getCurrentSessionForLocal());
         return dao.getAvailableLotBalance(lotId);
     }
 
@@ -143,7 +150,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
     private int addOrUpdateLot(List<Lot> lots, Operation operation) throws QueryException {
         // initialize session & transaction
-        Session session = hibernateUtilForLocal.getCurrentSession();
+        Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
         int lotsSaved = 0;
@@ -181,7 +188,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
             }
             throw new QueryException("Error encountered while saving Lot: " + ex.getMessage(), ex);
         } finally {
-            hibernateUtilForLocal.closeCurrentSession();
+            session.flush();
         }
 
         return lotsSaved;
@@ -214,7 +221,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
     private int addOrUpdateTransaction(List<org.generationcp.middleware.pojos.Transaction> transactions, Operation operation)
             throws QueryException {
         // initialize session & transaction
-        Session session = hibernateUtilForLocal.getCurrentSession();
+        Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
         int transactionsSaved = 0;
@@ -252,7 +259,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
             }
             throw new QueryException("Error encountered while saving Transaction: " + ex.getMessage(), ex);
         } finally {
-            hibernateUtilForLocal.closeCurrentSession();
+            session.flush();
         }
 
         return transactionsSaved;
@@ -261,14 +268,14 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
     @Override
     public org.generationcp.middleware.pojos.Transaction getTransactionById(Integer id) {
         TransactionDAO dao = new TransactionDAO();
-        dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+        dao.setSession(getCurrentSessionForLocal());
         return dao.findById(id, false);
     }
 
     @Override
     public Set<org.generationcp.middleware.pojos.Transaction> findTransactionsByLotId(Integer id) {
         LotDAO dao = new LotDAO();
-        dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+        dao.setSession(getCurrentSessionForLocal());
         Lot lot = dao.findById(id, false);
         return lot.getTransactions();
     }
@@ -276,28 +283,28 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
     @Override
     public List<org.generationcp.middleware.pojos.Transaction> getAllReserveTransactions(int start, int numOfRows) {
         TransactionDAO dao = new TransactionDAO();
-        dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+        dao.setSession(getCurrentSessionForLocal());
         return dao.getAllReserve(start, numOfRows);
     }
 
     @Override
     public int countAllReserveTransactions() {
         TransactionDAO dao = new TransactionDAO();
-        dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+        dao.setSession(getCurrentSessionForLocal());
         return dao.countAllReserve().intValue();
     }
 
     @Override
     public List<org.generationcp.middleware.pojos.Transaction> getAllDepositTransactions(int start, int numOfRows) {
         TransactionDAO dao = new TransactionDAO();
-        dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+        dao.setSession(getCurrentSessionForLocal());
         return dao.getAllDeposit(start, numOfRows);
     }
 
     @Override
     public int countAllDepositTransactions() {
         TransactionDAO dao = new TransactionDAO();
-        dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+        dao.setSession(getCurrentSessionForLocal());
         return dao.countAllDeposit().intValue();
     }
 
@@ -305,39 +312,42 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
     public List<org.generationcp.middleware.pojos.Transaction> getAllReserveTransactionsByRequestor(Integer personId, int start,
             int numOfRows) {
         TransactionDAO dao = new TransactionDAO();
-        dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+        dao.setSession(getCurrentSessionForLocal());
         return dao.getAllReserveByRequestor(personId, start, numOfRows);
     }
 
     @Override
     public int countAllReserveTransactionsByRequestor(Integer personId) {
         TransactionDAO dao = new TransactionDAO();
-        dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+        dao.setSession(getCurrentSessionForLocal());
         return dao.countAllReserveByRequestor(personId).intValue();
     }
 
     @Override
     public List<org.generationcp.middleware.pojos.Transaction> getAllDepositTransactionsByDonor(Integer personId, int start, int numOfRows) {
         TransactionDAO dao = new TransactionDAO();
-        dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+        dao.setSession(getCurrentSessionForLocal());
         return dao.getAllDepositByDonor(personId, start, numOfRows);
     }
 
     @Override
     public int countAllDepositTransactionsByDonor(Integer personId) {
         TransactionDAO dao = new TransactionDAO();
-        dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+        dao.setSession(getCurrentSessionForLocal());
         return dao.countAllDepositByDonor(personId).intValue();
     }
 
     @Override
     public List<TransactionReportRow> generateReportOnAllUncommittedTransactions(int start, int numOfRows) {
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
         List<TransactionReportRow> report = new ArrayList<TransactionReportRow>();
-        GermplasmDataManagerImpl germplasmManager = new GermplasmDataManagerImpl(this.hibernateUtilForLocal, this.hibernateUtilForCentral);
-        TraitDataManagerImpl traitManager = new TraitDataManagerImpl(this.hibernateUtilForLocal, this.hibernateUtilForCentral);
+        GermplasmDataManagerImpl germplasmManager = new GermplasmDataManagerImpl(sessionForLocal, sessionForCentral);
+        TraitDataManagerImpl traitManager = new TraitDataManagerImpl(sessionForLocal, sessionForCentral);
 
         TransactionDAO dao = new TransactionDAO();
-        dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+        dao.setSession(sessionForLocal);
         List<org.generationcp.middleware.pojos.Transaction> transactions = dao.getAllUncommitted(start, numOfRows);
 
         for (org.generationcp.middleware.pojos.Transaction t : transactions) {
@@ -361,15 +371,18 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
     @Override
     public int countAllUncommittedTransactions() {
         TransactionDAO dao = new TransactionDAO();
-        dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+        dao.setSession(getCurrentSessionForLocal());
         return dao.countAllUncommitted().intValue();
     }
 
     @Override
     public List<TransactionReportRow> generateReportOnAllReserveTransactions(int start, int numOfRows) {
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
         List<TransactionReportRow> report = new ArrayList<TransactionReportRow>();
-        GermplasmDataManagerImpl germplasmManager = new GermplasmDataManagerImpl(this.hibernateUtilForLocal, this.hibernateUtilForCentral);
-        TraitDataManagerImpl traitManager = new TraitDataManagerImpl(this.hibernateUtilForLocal, this.hibernateUtilForCentral);
+        GermplasmDataManagerImpl germplasmManager = new GermplasmDataManagerImpl(sessionForLocal, sessionForCentral);
+        TraitDataManagerImpl traitManager = new TraitDataManagerImpl(sessionForLocal, sessionForCentral);
 
         List<org.generationcp.middleware.pojos.Transaction> transactions = getAllReserveTransactions(start, numOfRows);
         for (org.generationcp.middleware.pojos.Transaction t : transactions) {
@@ -394,17 +407,20 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
     @Override
     public int countAllWithdrawalTransactions() {
         TransactionDAO dao = new TransactionDAO();
-        dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+        dao.setSession(getCurrentSessionForLocal());
         return dao.countAllWithdrawals().intValue();
     }
 
     @Override
     public List<TransactionReportRow> generateReportOnAllWithdrawalTransactions(int start, int numOfRows) {
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
         List<TransactionReportRow> report = new ArrayList<TransactionReportRow>();
-        GermplasmDataManagerImpl germplasmManager = new GermplasmDataManagerImpl(this.hibernateUtilForLocal, this.hibernateUtilForCentral);
-        TraitDataManagerImpl traitManager = new TraitDataManagerImpl(this.hibernateUtilForLocal, this.hibernateUtilForCentral);
+        GermplasmDataManagerImpl germplasmManager = new GermplasmDataManagerImpl(sessionForLocal, sessionForCentral);
+        TraitDataManagerImpl traitManager = new TraitDataManagerImpl(sessionForLocal, sessionForCentral);
         TransactionDAO dao = new TransactionDAO();
-        dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+        dao.setSession(sessionForLocal);
 
         List<org.generationcp.middleware.pojos.Transaction> transactions = dao.getAllWithdrawals(start, numOfRows);
         for (org.generationcp.middleware.pojos.Transaction t : transactions) {
@@ -431,10 +447,10 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
     public Person getPersonById(Integer id) {
         PersonDAO dao = new PersonDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(id);
+        Session session = getSession(id);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return null;
         }
@@ -445,14 +461,14 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
     @Override
     public List<Lot> getAllLots(int start, int numOfRows) {
         LotDAO dao = new LotDAO();
-        dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+        dao.setSession(getCurrentSessionForLocal());
         return dao.getAll(start, numOfRows);
     }
 
     @Override
     public Long countAllLots() {
         LotDAO dao = new LotDAO();
-        dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+        dao.setSession(getCurrentSessionForLocal());
         return dao.countAll();
     }
 
@@ -464,16 +480,19 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
     @Override
     public List<LotReportRow> generateReportOnDormantLots(int year, int start, int numOfRows) {
-        SQLQuery query = this.hibernateUtilForLocal.getCurrentSession().createSQLQuery(Lot.GENERATE_REPORT_ON_DORMANT);
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        SQLQuery query = sessionForLocal.createSQLQuery(Lot.GENERATE_REPORT_ON_DORMANT);
         query.setParameter("year", year);
         query.setFirstResult(start);
         query.setMaxResults(numOfRows);
 
-        GermplasmDataManagerImpl germplasmManager = new GermplasmDataManagerImpl(this.hibernateUtilForLocal, this.hibernateUtilForCentral);
-        TraitDataManagerImpl traitManager = new TraitDataManagerImpl(this.hibernateUtilForLocal, this.hibernateUtilForCentral);
+        GermplasmDataManagerImpl germplasmManager = new GermplasmDataManagerImpl(sessionForLocal, sessionForCentral);
+        TraitDataManagerImpl traitManager = new TraitDataManagerImpl(sessionForLocal, sessionForCentral);
         List<LotReportRow> report = new ArrayList<LotReportRow>();
 
-        List results = query.list();
+        List<?> results = query.list();
         for (Object o : results) {
             Object[] result = (Object[]) o;
             if (result != null) {
@@ -500,7 +519,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
     @Override
     public List<LotReportRow> generateReportOnEmptyLots(int start, int numOfRows) {
         TransactionDAO dao = new TransactionDAO();
-        dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+        dao.setSession(getCurrentSessionForLocal());
         List<Lot> emptyLots = new ArrayList<Lot>();
 
         for (org.generationcp.middleware.pojos.Transaction t : dao.getEmptyLot(start, numOfRows)) {
@@ -512,7 +531,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
     @Override
     public List<LotReportRow> generateReportOnLotsWithMinimumAmount(long minAmount, int start, int numOfRows) {
         TransactionDAO dao = new TransactionDAO();
-        dao.setSession(this.hibernateUtilForLocal.getCurrentSession());
+        dao.setSession(getCurrentSessionForLocal());
 
         List<Lot> lotsWithMinimunAmount = new ArrayList<Lot>();
         for (org.generationcp.middleware.pojos.Transaction t : dao.getLotWithMinimumAmount(minAmount, start, numOfRows)) {
@@ -545,8 +564,11 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
     }
 
     private List<LotReportRow> generateLotReportRows(List<Lot> listOfLots) {
-        GermplasmDataManagerImpl germplasmManager = new GermplasmDataManagerImpl(this.hibernateUtilForLocal, this.hibernateUtilForCentral);
-        TraitDataManagerImpl traitManager = new TraitDataManagerImpl(this.hibernateUtilForLocal, this.hibernateUtilForCentral);
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        GermplasmDataManagerImpl germplasmManager = new GermplasmDataManagerImpl(sessionForLocal, sessionForCentral);
+        TraitDataManagerImpl traitManager = new TraitDataManagerImpl(sessionForLocal, sessionForCentral);
         List<LotReportRow> report = new ArrayList<LotReportRow>();
         for (Lot lot : listOfLots) {
             LotReportRow row = new LotReportRow();

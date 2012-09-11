@@ -6,40 +6,45 @@ import java.util.List;
 import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
-import org.generationcp.middleware.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 public class UserDataManagerImpl extends DataManager implements UserDataManager {
     
-    private List<Session> sessions;
-
     public UserDataManagerImpl() {
         super();
     }
-
-    public UserDataManagerImpl(HibernateUtil hibernateUtilForLocal, HibernateUtil hibernateUtilForCentral) {
-        super(hibernateUtilForLocal, hibernateUtilForCentral);
+    
+    public UserDataManagerImpl(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
+        super(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    public UserDataManagerImpl(Session sessionForLocal, Session sessionForCentral) {
+        super(sessionForLocal, sessionForCentral);
     }
 
     @Override
     public List<User> getAllUsers() {
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
         UserDAO dao = new UserDAO();
         
         List<User> users = new ArrayList<User>();
         
         // get the list of Users from the local instance
-        if (hibernateUtilForLocal != null) {
-            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+        if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
             users.addAll(dao.getAll());
         }
         
         // get the list of Users from the central instance
-        if (hibernateUtilForCentral != null) {
-            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
             users.addAll(dao.getAll());
         }
         
@@ -47,19 +52,21 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
     }
     
     public int countAllUsers() {
-    	
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
         int count = 0;
         
         UserDAO dao = new UserDAO();
         
-        if (hibernateUtilForLocal != null) {
-            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+        if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
             count = count + dao.countAll().intValue();
         }
         
         // get the list of Users from the central instance
-        if (hibernateUtilForCentral != null) {
-            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
             count = count + dao.countAll().intValue();
         }
         
@@ -70,7 +77,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
     public void addUser(User user) throws QueryException {
         requireLocalDatabaseInstance();
         
-        Session session = hibernateUtilForLocal.getCurrentSession();
+        Session session = getCurrentSessionForLocal();
         Transaction trans = null;
         
         try {
@@ -93,17 +100,17 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
             }
             throw new QueryException("Error encountered while saving User: " + ex.getMessage(), ex);
         } finally {
-            hibernateUtilForLocal.closeCurrentSession();
+            session.flush();
         }
     }
     
     @Override
     public User getUserById(int id) {
         UserDAO dao = new UserDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(id);
+        Session session = getSession(id);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return null;
         }
@@ -115,7 +122,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
     public void deleteUser(User user) throws QueryException {
         requireLocalDatabaseInstance();
         
-        Session session = hibernateUtilForLocal.getCurrentSession();
+        Session session = getCurrentSessionForLocal();
         Transaction trans = null;
         
         try {
@@ -135,25 +142,28 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
             }
             throw new QueryException("Error encountered while deleting User: " + ex.getMessage(), ex);
         } finally {
-            hibernateUtilForLocal.closeCurrentSession();
+            session.flush();
         }
     }
     
     @Override
     public List<Person> getAllPersons() {
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
         PersonDAO dao = new PersonDAO();
         
         List<Person> persons = new ArrayList<Person>();
         
         // get the list of Persons from the local instance
-        if (hibernateUtilForLocal != null) {
-            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+        if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
             persons.addAll(dao.getAll());
         }
         
         // get the list of Persons from the central instance
-        if (hibernateUtilForCentral != null) {
-            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
             persons.addAll(dao.getAll());
         }
         
@@ -161,19 +171,21 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
     }
     
     public int countAllPersons() {
-    	
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
         int count = 0;
         
         PersonDAO dao = new PersonDAO();
         
-        if (hibernateUtilForLocal != null) {
-            dao.setSession(hibernateUtilForLocal.getCurrentSession());
+        if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
             count = count + dao.countAll().intValue();
         }
         
         // get the list of Users from the central instance
-        if (hibernateUtilForCentral != null) {
-            dao.setSession(hibernateUtilForCentral.getCurrentSession());
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
             count = count + dao.countAll().intValue();
         }
         
@@ -184,7 +196,9 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
     public void addPerson(Person person) throws QueryException {
         requireLocalDatabaseInstance();
         
-        Session session = hibernateUtilForLocal.getCurrentSession();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        Session session = sessionForLocal;
         Transaction trans = null;
         
         try {
@@ -207,17 +221,17 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
             }
             throw new QueryException("Error encountered while saving Person: " + ex.getMessage(), ex);
         } finally {
-            hibernateUtilForLocal.closeCurrentSession();
+            sessionForLocal.flush();
         }
     }
     
     @Override
     public Person getPersonById(int id) {
         PersonDAO dao = new PersonDAO();
-        HibernateUtil hibernateUtil = getHibernateUtil(id);
+        Session session = getSession(id);
 
-        if (hibernateUtil != null) {
-            dao.setSession(hibernateUtil.getCurrentSession());
+        if (session != null) {
+            dao.setSession(session);
         } else {
             return null;
         }
@@ -229,7 +243,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
     public void deletePerson(Person person) throws QueryException {
         requireLocalDatabaseInstance();
         
-        Session session = hibernateUtilForLocal.getCurrentSession();
+        Session session = getCurrentSessionForLocal();
         Transaction trans = null;
         
         try {
@@ -249,23 +263,22 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
             }
             throw new QueryException("Error encountered while deleting Person: " + ex.getMessage(), ex);
         } finally {
-            hibernateUtilForLocal.closeCurrentSession();
+            session.flush();
         }
     }
     
     private List<Session> getSessions() {
-        if(sessions != null) {
-            return sessions;
-        } 
+        List<Session> sessions = new ArrayList<Session>();
         
-        sessions = new ArrayList<Session>();
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
         
-        if (hibernateUtilForLocal != null) {
-            sessions.add(hibernateUtilForLocal.getCurrentSession());
+        if (sessionForLocal != null) {
+            sessions.add(sessionForLocal);
         }
         
-        if (hibernateUtilForCentral != null) {
-            sessions.add(hibernateUtilForCentral.getCurrentSession());
+        if (sessionForCentral != null) {
+            sessions.add(sessionForCentral);
         }
         
         if(sessions.isEmpty()) {
