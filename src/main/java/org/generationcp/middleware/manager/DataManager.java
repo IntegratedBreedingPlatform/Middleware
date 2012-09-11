@@ -94,24 +94,22 @@ public abstract class DataManager {
         if (sessionForLocal != null) {
             return sessionForLocal;
         }
-        
-        if (sessionProviderForLocal != null) {
-            sessionForLocal = sessionProviderForLocal.getSession();
+        else if (sessionProviderForLocal != null) {
+            return sessionProviderForLocal.getSession();
         }
         
-        return sessionForLocal;
+        return null;
     }
     
     public Session getCurrentSessionForCentral() {
         if (sessionForCentral != null) {
             return sessionForCentral;
         }
-        
-        if (sessionProviderForCentral != null) {
-            sessionForCentral = sessionProviderForCentral.getSession();
+        else if (sessionProviderForCentral != null) {
+            return sessionProviderForCentral.getSession();
         }
         
-        return sessionForCentral;
+        return null;
     }
 
     /**
