@@ -4,10 +4,10 @@
 <hibernate-configuration>
  <session-factory>
   <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
-  <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/ibdbv1_rice_local</property>
-  <property name="hibernate.connection.username">ibdb_user</property>
-  <property name="hibernate.connection.password">ibdb_password</property>
-  <property name="hibernate.default_schema">ibdbv1_rice_local</property>
+  <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/ibdb_rice_20120405</property>
+  <property name="hibernate.connection.username">root</property>
+  <property name="hibernate.connection.password">lich27king</property>
+  <property name="hibernate.default_schema">ibdb_rice_20120405</property>
   <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
   <!--   
   <property name="hibernate.show_sql">true</property>
@@ -71,8 +71,12 @@
   <mapping class="org.generationcp.middleware.pojos.gdms.MarkerMetadataSet"/>
 
   <mapping class="org.generationcp.middleware.pojos.workbench.Contact"/>
+  <mapping class="org.generationcp.middleware.pojos.workbench.CropType"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchDataset"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.Project"/>
+  <mapping class="org.generationcp.middleware.pojos.workbench.ProjectActivity"/>
+  <mapping class="org.generationcp.middleware.pojos.workbench.ProjectMethod"/>
+  <mapping class="org.generationcp.middleware.pojos.workbench.ProjectUser"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.ProjectWorkflowStep"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.Tool"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.WorkflowStep"/>
