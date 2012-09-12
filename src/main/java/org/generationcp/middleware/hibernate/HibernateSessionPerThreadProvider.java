@@ -8,10 +8,11 @@ import org.hibernate.SessionFactory;
  * Session-Per-Thread model.<br>
  * <br>
  * {@link HibernateSessionProvider#getSession()} is implemented to open a new
- * session if no session has been previously created for the current thread yet.<br>
+ * session if no session has been previously created for the current thread.<br>
  * <br>
- * Users of this {@link HibernateSessionProvider} are tasked to close the
- * {@link Session} when the calling thread ends.<br>
+ * Users of this {@link HibernateSessionProvider} must call the
+ * {@link HibernateSessionPerThreadProvider#close()} to close the
+ * {@link Session} before the calling {@link Thread} ends.<br>
  * 
  * @author Glenn Marintes
  */
@@ -48,11 +49,22 @@ public class HibernateSessionPerThreadProvider implements HibernateSessionProvid
     }
     
     /**
-     * This implementation does nothing.<br>
-     * One limitation of having a Session-Per-Thread model is that we do not
-     * know when a Thread ends so we do not know which Session we need to close.
+     * This implementation will close the {@link Session} for the calling
+     * {@link Thread} only.<br>
+     * Users of {@link HibernateSessionPerThreadProvider} must be careful that
+     * they are calling {@link HibernateSessionPerThreadProvider#close()} from
+     * the right thread.
      */
     @Override
     public void close() {
+        Session session = THREAD_SESSION.get();
+        if (session != null) {
+            try {
+                session.close();
+            }
+            finally {
+                THREAD_SESSION.remove();
+            }
+        }
     }
 }
