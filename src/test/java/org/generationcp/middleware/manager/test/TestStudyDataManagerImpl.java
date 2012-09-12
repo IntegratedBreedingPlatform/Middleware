@@ -30,6 +30,7 @@ import org.generationcp.middleware.pojos.NumericRange;
 import org.generationcp.middleware.pojos.Representation;
 import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.pojos.StudyEffect;
+import org.generationcp.middleware.pojos.StudyInfo;
 import org.generationcp.middleware.pojos.TraitCombinationFilter;
 import org.generationcp.middleware.pojos.Variate;
 import org.junit.AfterClass;
@@ -49,7 +50,7 @@ public class TestStudyDataManagerImpl{
         factory = new ManagerFactory(local, central);
         manager = factory.getStudyDataManager();
     }
-
+    
     @Test
     public void testGetGIDSByPhenotypicData() throws Exception {
         NumericRange range = new NumericRange(new Double(2000), new Double(3000));
@@ -284,6 +285,20 @@ public class TestStudyDataManagerImpl{
         System.out.println(manager.getMainLabelOfFactorByFactorId(Integer.valueOf(1031)));
     }
     
+    @Test
+    public void testCountStudyInformationByGID() throws Exception {
+        System.out.println(manager.countStudyInformationByGID(Long.valueOf(50533)));
+    }
+    
+    @Test
+    public void testGetStudyInformationByGID() throws Exception {
+        List<StudyInfo> results = manager.getStudyInformationByGID(Long.valueOf(50533));
+        System.out.println("RESULTS:");
+        for(StudyInfo info : results) {
+            System.out.println(info);
+        }
+    }
+
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();

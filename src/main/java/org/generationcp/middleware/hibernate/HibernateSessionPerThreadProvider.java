@@ -19,7 +19,7 @@ import org.hibernate.SessionFactory;
 public class HibernateSessionPerThreadProvider implements HibernateSessionProvider {
     private SessionFactory sessionFactory;
     
-    private final static ThreadLocal<Session> THREAD_SESSION = new ThreadLocal<Session>();
+    private final ThreadLocal<Session> THREAD_SESSION = new ThreadLocal<Session>();
     
     public HibernateSessionPerThreadProvider() {
     }

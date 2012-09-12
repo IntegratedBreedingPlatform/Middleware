@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.dao;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +21,9 @@ import org.generationcp.middleware.pojos.DatasetCondition;
 import org.generationcp.middleware.pojos.NumericLevel;
 import org.generationcp.middleware.pojos.NumericLevelElement;
 import org.generationcp.middleware.pojos.NumericLevelPK;
+import org.generationcp.middleware.pojos.StudyInfo;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 
 public class NumericLevelDAO extends GenericDAO<NumericLevel, NumericLevelPK>{
@@ -59,6 +62,7 @@ public class NumericLevelDAO extends GenericDAO<NumericLevel, NumericLevelPK>{
         }
     }
     
+    @SuppressWarnings("rawtypes")
     public List<DatasetCondition> getConditionAndValueByFactorIdAndLevelNo(Integer factorId, Integer levelNo) throws QueryException {
         try {
             List<DatasetCondition> toreturn = new ArrayList<DatasetCondition>();
@@ -86,6 +90,47 @@ public class NumericLevelDAO extends GenericDAO<NumericLevel, NumericLevelPK>{
             throw new QueryException("Error with get Condition and value by factorid and levelno query, " +
             		"given factorid = " + factorId + " and levelno = " + levelNo +
             		": " + ex.getMessage(), ex);
+        }
+    }
+    
+    public long countStudyInformationByGID(Long gid) throws QueryException {
+        try {
+            Query query = getSession().createSQLQuery(NumericLevel.COUNT_STUDIES_BY_GID);
+            query.setParameter("gid", gid);
+            
+            BigInteger count = (BigInteger) query.uniqueResult();
+            return count.longValue();
+        } catch (Exception ex) {
+            throw new QueryException("Error with count study information by GID query: " +
+                    ex.getMessage(), ex);
+        }
+    }
+    
+    @SuppressWarnings("rawtypes")
+    public List<StudyInfo> getStudyInformationByGID(Long gid) throws QueryException {
+        try {
+            List<StudyInfo> toreturn = new ArrayList<StudyInfo>();
+            Query query = getSession().createSQLQuery(NumericLevel.GET_STUDIES_BY_GID);
+            query.setParameter("gid", gid);
+            
+            List results = query.list();
+            for(Object o : results) {
+                Object[] result = (Object[]) o;
+                Integer studyid = (Integer) result[0];
+                String name = (String) result[1];
+                String title = (String) result[2];
+                String objective = (String) result[3];
+                BigInteger rowCount = (BigInteger) result[4];
+                
+                StudyInfo info = new StudyInfo(studyid, name.trim(), title.trim(), objective.trim(), rowCount.intValue());
+                toreturn.add(info);
+            }
+            
+            return toreturn;
+            
+        } catch (Exception ex) {
+            throw new QueryException("Error with get study information by GID query: " +
+                    ex.getMessage(), ex);
         }
     }
 }

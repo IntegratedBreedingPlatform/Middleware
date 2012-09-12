@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.generationcp.middleware.dao.CharacterLevelDAO;
 import org.generationcp.middleware.pojos.DatasetCondition;
+import org.generationcp.middleware.pojos.StudyInfo;
 import org.generationcp.middleware.util.HibernateUtil;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -36,13 +37,27 @@ public class TestCharacterLevelDAO{
         dao = new CharacterLevelDAO();
         dao.setSession(hibernateUtil.getCurrentSession());
     }
-
+    
     @Test
     public void testGetConditionAndValueByFactorIdAndLevelNo() throws Exception {
         List<DatasetCondition> results = dao.getConditionAndValueByFactorIdAndLevelNo(Integer.valueOf(1031), Integer.valueOf(146919));
         System.out.println("RESULTS:");
         for(DatasetCondition c : results) {
             System.out.println(c);
+        }
+    }
+    
+    @Test
+    public void testCountStudyInformationByGID() throws Exception {
+        System.out.println("count = " + dao.countStudyInformationByGID(Long.valueOf(50533)));
+    }
+    
+    @Test
+    public void testGetStudyInformationByGID() throws Exception {
+        List<StudyInfo> results = dao.getStudyInformationByGID(Long.valueOf(50533));
+        System.out.println("RESULTS:");
+        for(StudyInfo info : results) {
+            System.out.println(info);
         }
     }
     

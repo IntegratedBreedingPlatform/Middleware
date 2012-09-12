@@ -667,11 +667,11 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
         throws QueryException {
 
         GermplasmListDAO dao = new GermplasmListDAO();
-        Session util = getSession(parentId);
+        Session session = getSession(parentId);
         List<GermplasmList> childLists;
         
-        if(util != null) {
-            dao.setSession(util);
+        if(session != null) {
+            dao.setSession(session);
             childLists = dao.getByParentFolderId(parentId, start, numOfRows);
         } else {
             childLists = new ArrayList<GermplasmList>();
@@ -721,11 +721,11 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     @Override
     public Long countGermplasmListByParentFolderId(Integer parentId) throws QueryException {
         GermplasmListDAO dao = new GermplasmListDAO();
-        Session util = getSession(parentId);
+        Session session = getSession(parentId);
         Long result = 0L;
         
-        if(util != null) {
-            dao.setSession(util);
+        if(session != null) {
+            dao.setSession(session);
             result = dao.countByParentFolderId(parentId);
         }
         

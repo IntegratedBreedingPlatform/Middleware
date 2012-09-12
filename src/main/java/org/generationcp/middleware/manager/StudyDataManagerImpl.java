@@ -39,6 +39,7 @@ import org.generationcp.middleware.pojos.NumericLevelElement;
 import org.generationcp.middleware.pojos.Representation;
 import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.pojos.StudyEffect;
+import org.generationcp.middleware.pojos.StudyInfo;
 import org.generationcp.middleware.pojos.TraitCombinationFilter;
 import org.generationcp.middleware.pojos.Variate;
 import org.hibernate.Session;
@@ -476,5 +477,89 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         }
         
         return null;
+    }
+    
+    @Override
+    public long countStudyInformationByGID(Long gid) throws QueryException {
+        try {
+            CharacterLevelDAO characterLevelDao = new CharacterLevelDAO();
+            NumericLevelDAO numericLevelDao = new NumericLevelDAO();
+            
+            if(gid < 0) {
+                requireLocalDatabaseInstance();
+                
+                characterLevelDao.setSession(getCurrentSessionForLocal());
+                numericLevelDao.setSession(getCurrentSessionForLocal());
+                    
+                long count = characterLevelDao.countStudyInformationByGID(gid) 
+                    + numericLevelDao.countStudyInformationByGID(gid);
+                    
+                return count;
+            } else {
+                long count = 0;
+                
+                if(this.getCurrentSessionForLocal() != null) {
+                    characterLevelDao.setSession(getCurrentSessionForLocal());
+                    numericLevelDao.setSession(getCurrentSessionForLocal());
+                    
+                    count = characterLevelDao.countStudyInformationByGID(gid) 
+                        + numericLevelDao.countStudyInformationByGID(gid);
+                }
+                
+                if(this.getCurrentSessionForCentral() != null) {
+                    characterLevelDao.setSession(getCurrentSessionForCentral());
+                    numericLevelDao.setSession(getCurrentSessionForCentral());
+                    
+                    count = count + characterLevelDao.countStudyInformationByGID(gid) 
+                        + numericLevelDao.countStudyInformationByGID(gid);
+                }
+                
+                return count;
+            }
+        } catch(Exception ex) {
+            throw new QueryException("Error in count study information by GID, given gid = " 
+                    + gid + ": " + ex.getMessage(), ex);
+        }
+    }
+    
+    @Override
+    public List<StudyInfo> getStudyInformationByGID(Long gid) throws QueryException {
+        try {
+            List<StudyInfo> toreturn = new ArrayList<StudyInfo>();
+            
+            CharacterLevelDAO characterLevelDao = new CharacterLevelDAO();
+            NumericLevelDAO numericLevelDao = new NumericLevelDAO();
+            
+            if(gid < 0) {
+                requireLocalDatabaseInstance();
+                
+                characterLevelDao.setSession(getCurrentSessionForLocal());
+                numericLevelDao.setSession(getCurrentSessionForLocal());
+                
+                toreturn.addAll(characterLevelDao.getStudyInformationByGID(gid));
+                toreturn.addAll(numericLevelDao.getStudyInformationByGID(gid));
+            } else {
+                if(this.getCurrentSessionForLocal() != null) {
+                    characterLevelDao.setSession(getCurrentSessionForLocal());
+                    numericLevelDao.setSession(getCurrentSessionForLocal());
+                    
+                    toreturn.addAll(characterLevelDao.getStudyInformationByGID(gid));
+                    toreturn.addAll(numericLevelDao.getStudyInformationByGID(gid));
+                }
+                
+                if(this.getCurrentSessionForCentral() != null) {
+                    characterLevelDao.setSession(getCurrentSessionForCentral());
+                    numericLevelDao.setSession(getCurrentSessionForCentral());
+                    
+                    toreturn.addAll(characterLevelDao.getStudyInformationByGID(gid));
+                    toreturn.addAll(numericLevelDao.getStudyInformationByGID(gid));
+                }
+            }
+            
+            return toreturn;
+        } catch(Exception ex) {
+            throw new QueryException("Error in get study information by GID, given gid = " 
+                    + gid + ": " + ex.getMessage(), ex);
+        }
     }
 }

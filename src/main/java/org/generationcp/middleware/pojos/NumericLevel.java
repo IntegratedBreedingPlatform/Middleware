@@ -40,6 +40,21 @@ public class NumericLevel implements Serializable{
             "SELECT f.fname, ln.lvalue, f.traitid, f.scaleid, f.tmethid, f.ltype " +
             "FROM factor f JOIN level_n ln ON f.labelid = ln.labelid " +
             "WHERE ln.factorid = :factorid AND ln.levelno = :levelno";
+    
+    public static final String COUNT_STUDIES_BY_GID =
+        "SELECT COUNT(DISTINCT s.studyid) "
+        + "FROM oindex oi JOIN level_n ln ON ln.factorid = oi.factorid AND ln.levelno = oi.levelno "
+                + "JOIN factor f ON f.labelid = ln.labelid "
+                + "JOIN study s ON f.studyid = s.studyid "
+        + "WHERE f.fname = 'GID' AND ln.lvalue = :gid";
+    
+    public static final String GET_STUDIES_BY_GID =
+        "SELECT s.studyid, s.sname, s.title, s.objectiv, COUNT(DISTINCT oi.ounitid) " 
+        + "FROM oindex oi JOIN level_n ln ON ln.factorid = oi.factorid AND ln.levelno = oi.levelno "
+                + "JOIN factor f ON f.labelid = ln.labelid "
+                + "JOIN study s ON f.studyid = s.studyid "
+        + "WHERE f.fname = 'GID' AND ln.lvalue = :gid "
+        + "GROUP BY s.studyid";
 
     @EmbeddedId
     protected NumericLevelPK id;

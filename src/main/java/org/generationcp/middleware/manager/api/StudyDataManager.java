@@ -26,6 +26,7 @@ import org.generationcp.middleware.pojos.NumericLevelElement;
 import org.generationcp.middleware.pojos.Representation;
 import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.pojos.StudyEffect;
+import org.generationcp.middleware.pojos.StudyInfo;
 import org.generationcp.middleware.pojos.TraitCombinationFilter;
 import org.generationcp.middleware.pojos.Variate;
 
@@ -341,4 +342,24 @@ public interface StudyDataManager{
      * @throws QueryException
      */
     public String getMainLabelOfFactorByFactorId(Integer factorid) throws QueryException;
+    
+    /**
+     * Returns the number of studies where the Germplasm, identified
+     * by the given gid, is involved with. 
+     * 
+     * @param gid
+     * @return
+     * @throws QueryException
+     */
+    public long countStudyInformationByGID(Long gid) throws QueryException;
+    
+    /**
+     * Returns a list of StudyInfo objects for the studies where the Germplasm, 
+     * identified by the given gid, is involved with.
+     *  
+     * @param gid
+     * @return
+     * @throws QueryException
+     */
+    public List<StudyInfo> getStudyInformationByGID(Long gid) throws QueryException;
 }

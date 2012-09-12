@@ -39,6 +39,21 @@ public class CharacterLevel implements Serializable{
         "SELECT f.fname, lc.lvalue, f.traitid, f.scaleid, f.tmethid, f.ltype " +
         "FROM factor f JOIN level_c lc ON f.labelid = lc.labelid " +
         "WHERE lc.factorid = :factorid AND lc.levelno = :levelno";
+    
+    public static final String COUNT_STUDIES_BY_GID =
+        "SELECT COUNT(DISTINCT s.studyid) "
+        + "FROM oindex oi JOIN level_c lc ON lc.factorid = oi.factorid AND lc.levelno = oi.levelno "
+                + "JOIN factor f ON f.labelid = lc.labelid "
+                + "JOIN study s ON f.studyid = s.studyid "
+        + "WHERE f.fname = 'GID' AND lc.lvalue = :gid";
+    
+    public static final String GET_STUDIES_BY_GID =
+        "SELECT s.studyid, s.sname, s.title, s.objectiv, COUNT(DISTINCT oi.ounitid) " 
+        + "FROM oindex oi JOIN level_c lc ON lc.factorid = oi.factorid AND lc.levelno = oi.levelno "
+                + "JOIN factor f ON f.labelid = lc.labelid "
+                + "JOIN study s ON f.studyid = s.studyid "
+        + "WHERE f.fname = 'GID' AND lc.lvalue = :gid "
+        + "GROUP BY s.studyid";
 
     @EmbeddedId
     protected CharacterLevelPK id;
