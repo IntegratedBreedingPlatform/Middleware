@@ -276,6 +276,14 @@ public class ManagerFactory implements Serializable {
     public void close() {
         LOG.trace("Closing ManagerFactory...");
         
+        if(sessionProviderForLocal != null) {
+            sessionProviderForLocal.close();
+        }
+        
+        if(sessionProviderForCentral != null) {
+            sessionProviderForCentral.close();
+        }
+        
         if (sessionFactoryForLocal != null && !sessionFactoryForLocal.isClosed()) {
             sessionFactoryForLocal.close();
         }
