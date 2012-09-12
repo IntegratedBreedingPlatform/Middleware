@@ -51,6 +51,7 @@ public class HibernateSessionPerRequestProvider implements HibernateSessionProvi
     public void close() {
         if (session != null) {
             session.close();
+            session = null;
         }
     }
 }
