@@ -3,11 +3,14 @@ package org.generationcp.middleware.manager.test;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.UserDataManager;
+import org.generationcp.middleware.pojos.Installation;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -26,7 +29,7 @@ private final static Logger log = LoggerFactory.getLogger(TestUserDataManagerImp
         factory = new ManagerFactory(local, central);
         manager = factory.getUserDataManager();
     }
-    
+    /**
     @Test
     public void testGetAllUsers() {
         List<User> users = manager.getAllUsers();
@@ -127,5 +130,17 @@ private final static Logger log = LoggerFactory.getLogger(TestUserDataManagerImp
         result = manager.isUsernameExists("GUESTret");
         log.info(result.toString());
     }
+    **/
+    @Test
+    public void testGetAllInstallationRecords() throws Exception {
+        List<Installation> results = manager.getAllInstallationRecords(0, 5, Database.CENTRAL);
+        for(Installation holder : results){
+            System.out.println(holder);
+        }
+    }
     
+    @AfterClass
+    public static void tearDown() throws Exception {
+        factory.close();
+    }
 }

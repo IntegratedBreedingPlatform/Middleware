@@ -14,6 +14,8 @@ package org.generationcp.middleware.manager.api;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.pojos.Installation;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 
@@ -127,4 +129,20 @@ public interface UserDataManager {
      * @throws QueryException the query exception
      */
     public boolean isUsernameExists(String userName) throws QueryException;
+    
+    /**
+     * Returns all the installation records
+     * 
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
+     * @param instance - to specify the instace from where the records will be retrieved
+     *          either from the central or local
+     * @return
+     * @throws QueryException
+     */
+    public List<Installation> getAllInstallationRecords(int start, int numOfRows, Database instance) 
+        throws QueryException; 
 }

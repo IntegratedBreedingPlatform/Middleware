@@ -3,11 +3,13 @@ package org.generationcp.middleware.manager;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.dao.InstallationDAO;
 import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.exceptions.QueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.UserDataManager;
+import org.generationcp.middleware.pojos.Installation;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.hibernate.Session;
@@ -337,5 +339,17 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
         return false;
     }
     
-    
+    @Override
+    public List<Installation> getAllInstallationRecords(int start, int numOfRows, Database instance) throws QueryException {
+        try{
+            InstallationDAO dao = new InstallationDAO();
+            Session session = getSession(instance);
+            dao.setSession(session);
+            
+            return dao.getAll(start, numOfRows);
+        } catch(Exception ex) {
+            throw new QueryException("Error with getting all installation records: "
+                    + ex.getMessage(), ex);
+        }
+    }
 }
