@@ -21,6 +21,7 @@ import org.generationcp.middleware.pojos.Georef;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.Installation;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.Method;
@@ -45,7 +46,7 @@ public class PojosSimpleTest{
     public void setUp() throws Exception {
         hibernateUtil = new HibernateUtil(CONFIG);
     }
-
+    
     @Test
     public void testAtributs() {
         Session session = hibernateUtil.getCurrentSession();
@@ -269,7 +270,22 @@ public class PojosSimpleTest{
             System.out.println(holder);
         }
     }
+    
+    @Test
+    public void testInstallation() {
+        Session session = hibernateUtil.getCurrentSession();
+        Query query = session.createQuery("FROM Installation");
+        query.setMaxResults(5);
+        List results = query.list();
 
+        for (Object obj : results) {
+            Assert.assertTrue(obj instanceof Installation);
+            Assert.assertTrue(obj != null);
+            Installation holder = (Installation) obj;
+            System.out.println(holder);
+        }
+    }
+    
     @After
     public void tearDown() throws Exception {
         hibernateUtil.shutdown();
