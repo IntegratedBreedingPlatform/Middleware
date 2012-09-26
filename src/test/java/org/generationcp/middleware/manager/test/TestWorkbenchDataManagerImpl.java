@@ -49,7 +49,7 @@ public class TestWorkbenchDataManagerImpl{
     @BeforeClass
     public static void setUp() throws Exception {
     	
-    	hibernateUtil = new HibernateUtil("localhost", "3306", "workbench", "root", "admin");
+    	hibernateUtil = new HibernateUtil("localhost", "13306", "workbench", "root", "");
     	HibernateSessionProvider sessionProvider = new HibernateSessionPerThreadProvider(hibernateUtil.getSessionFactory());
         manager = new WorkbenchDataManagerImpl(sessionProvider);
     }
@@ -629,7 +629,16 @@ public class TestWorkbenchDataManagerImpl{
         }
     }
     
-    
+    @Test
+    public void testGetLocalIbdbUserId() {
+        try {
+            Integer localIbdbUserId = manager.getLocalIbdbUserId(1, (long) 3);
+            System.out.println("testGetLocalIbdbUserId(): " + localIbdbUserId);
+        } catch (Exception e) {
+            System.out.println("Error in testGetLocalIbdbUserId(): " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
     
     
     @AfterClass

@@ -16,6 +16,9 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @Table(name = "workbench_ibdb_user_map")
 public class IbdbUserMap implements Serializable {
     private static final long serialVersionUID = 1L;
+    
+    public static final String GET_LOCAL_IBDB_USER_ID = 
+        "SELECT ibdb_user_id FROM workbench_ibdb_user_map WHERE workbench_user_id = :workbenchUserId AND project_id = :projectId";
 
     @Id
     @Basic(optional = false)

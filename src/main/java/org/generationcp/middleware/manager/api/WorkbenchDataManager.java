@@ -642,6 +642,17 @@ public interface WorkbenchDataManager{
     public IbdbUserMap addIbdbUserMap(IbdbUserMap userMap) throws QueryException;
     
     /**
+     * Returns the Local IBDB User ID given a combination of a Workbench User ID and a Project ID.
+     * 
+     * @param workbenchUserId - the specified Workbench User ID
+     * @param projectId - the specified Project ID
+     * @return Returns the IBDB User ID associated with the specified Workbench User ID and Project ID. 
+     * Returns null when there is no IBDB User ID matching the specified Workbench User ID and Project ID.
+     * @throws QueryException
+     */
+    public Integer getLocalIbdbUserId(Integer workbenchUserId, Long projectId) throws QueryException;
+    
+    /**
      * Save or update the specified {@link WorkbenchRuntimeData}.
      * 
      * @param workbenchRuntimeData
