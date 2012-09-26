@@ -28,8 +28,18 @@ public class DatabaseConnectionParameters{
     private String host;
     private String port;
     private String dbName;
+    private String url;
+    private String driverName;
     private String username;
     private String password;
+
+    public DatabaseConnectionParameters(String driverName, String url, String username, String password) {
+
+        this.driverName = driverName;
+        this.url = url;
+        this.username = username;
+        this.password = password;
+    }
 
     public DatabaseConnectionParameters(String host, String port, String dbName, String username, String password) {
         super();
@@ -117,6 +127,22 @@ public class DatabaseConnectionParameters{
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getDriverName() {
+        return driverName;
+    }
+
+    public void setDriverName(String driverName) {
+        this.driverName = driverName;
     }
 
 }
