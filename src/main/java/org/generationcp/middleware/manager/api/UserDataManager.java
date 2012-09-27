@@ -145,4 +145,31 @@ public interface UserDataManager {
      */
     public List<Installation> getAllInstallationRecords(int start, int numOfRows, Database instance) 
         throws QueryException; 
+    
+    /**
+     * Return the installation record identified by the given id.
+     * 
+     * @param id 
+     * @return
+     * @throws QueryException
+     */
+    public Installation getInstallationRecordById(Long id) throws QueryException;
+    
+    /**
+     * Get the installation records with the admin id equal to the given id.
+     * 
+     * @param id
+     * @return
+     * @throws QueryException
+     */
+    public List<Installation> getInstallationRecordsByAdminId(Long id) throws QueryException;
+    
+    /**
+     * Returns the installation record which have been added last to the database.
+     * 
+     * @param instance
+     * @return
+     * @throws QueryException
+     */
+    public Installation getLatestInstallationRecord(Database instance) throws QueryException;
 }

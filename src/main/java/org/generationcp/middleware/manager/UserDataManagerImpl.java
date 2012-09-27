@@ -352,4 +352,56 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
                     + ex.getMessage(), ex);
         }
     }
+    
+    @Override
+    public Installation getInstallationRecordById(Long id) throws QueryException {
+        try{
+            InstallationDAO dao = new InstallationDAO();
+            
+            if(id < 0) {
+                dao.setSession(getCurrentSessionForLocal());
+            } else if(id > 0) {
+                dao.setSession(getCurrentSessionForCentral());
+            }
+            
+            return dao.findById(id, false);
+        } catch(Exception ex) {
+            throw new QueryException("Error with getting installation record by id, given id = "
+                    + id + ": "
+                    + ex.getMessage(), ex);
+        }
+    }
+    
+    @Override
+    public List<Installation> getInstallationRecordsByAdminId(Long id) throws QueryException {
+        try{
+            InstallationDAO dao = new InstallationDAO();
+            
+            if(id < 0) {
+                dao.setSession(getCurrentSessionForLocal());
+            } else if(id > 0) {
+                dao.setSession(getCurrentSessionForCentral());
+            }
+            
+            return dao.getByAdminId(id);
+        } catch(Exception ex) {
+            throw new QueryException("Error with getting installation record by admin id, given id = "
+                    + id + ": "
+                    + ex.getMessage(), ex);
+        }
+    }
+    
+    @Override
+    public Installation getLatestInstallationRecord(Database instance) throws QueryException {
+        try{
+            InstallationDAO dao = new InstallationDAO();
+            Session session = getSession(instance);
+            dao.setSession(session);
+            
+            return dao.getLatest(instance);
+        } catch(Exception ex) {
+            throw new QueryException("Error with getting latestinstallation record "
+                    + ex.getMessage(), ex);
+        }
+    }
 }

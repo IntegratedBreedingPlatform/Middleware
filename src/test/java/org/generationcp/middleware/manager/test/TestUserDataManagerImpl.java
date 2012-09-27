@@ -29,7 +29,7 @@ private final static Logger log = LoggerFactory.getLogger(TestUserDataManagerImp
         factory = new ManagerFactory(local, central);
         manager = factory.getUserDataManager();
     }
-    /**
+    
     @Test
     public void testGetAllUsers() {
         List<User> users = manager.getAllUsers();
@@ -130,13 +130,33 @@ private final static Logger log = LoggerFactory.getLogger(TestUserDataManagerImp
         result = manager.isUsernameExists("GUESTret");
         log.info(result.toString());
     }
-    **/
+    
     @Test
     public void testGetAllInstallationRecords() throws Exception {
         List<Installation> results = manager.getAllInstallationRecords(0, 5, Database.CENTRAL);
         for(Installation holder : results){
             System.out.println(holder);
         }
+    }
+    
+    @Test
+    public void testGetInstallationRecordById() throws Exception {
+        Installation result = manager.getInstallationRecordById(Long.valueOf(1));
+        System.out.println(result);
+    }
+    
+    @Test
+    public void testGetInstallationRecordsByAdminId() throws Exception {
+        List<Installation> results = manager.getInstallationRecordsByAdminId(Long.valueOf(1));
+        for(Installation holder : results){
+            System.out.println(holder);
+        }
+    }
+    
+    @Test
+    public void testGetLatestInstallationRecord() throws Exception {
+        Installation result = manager.getLatestInstallationRecord(Database.CENTRAL);
+        System.out.println(result);
     }
     
     @AfterClass
