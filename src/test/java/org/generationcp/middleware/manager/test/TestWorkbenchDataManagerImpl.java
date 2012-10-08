@@ -18,7 +18,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.generationcp.middleware.dao.ToolConfigurationDAO;
-import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionPerThreadProvider;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Operation;
@@ -48,14 +48,14 @@ public class TestWorkbenchDataManagerImpl{
 
     @BeforeClass
     public static void setUp() throws Exception {
-    	
-    	hibernateUtil = new HibernateUtil("localhost", "13306", "workbench", "root", "");
-    	HibernateSessionProvider sessionProvider = new HibernateSessionPerThreadProvider(hibernateUtil.getSessionFactory());
+
+        hibernateUtil = new HibernateUtil("localhost", "13306", "workbench", "root", "");
+        HibernateSessionProvider sessionProvider = new HibernateSessionPerThreadProvider(hibernateUtil.getSessionFactory());
         manager = new WorkbenchDataManagerImpl(sessionProvider);
     }
 
     @Test
-    public void testSaveProject() throws QueryException{
+    public void testSaveProject() throws MiddlewareQueryException {
         Project project1 = new Project();
         project1.setProjectName("Test Project 1");
         project1.setUserId(1);
@@ -71,74 +71,74 @@ public class TestWorkbenchDataManagerImpl{
 
         WorkflowTemplate marsTemplate = new WorkflowTemplate();
         marsTemplate.setTemplateId(1L);
-        
+
         project1.setTemplate(marsTemplate);
         project2.setTemplate(marsTemplate);
 
         Project projectNew1 = manager.saveOrUpdateProject(project1);
         Project projectNew2 = manager.saveOrUpdateProject(project2);
-        
+
         // Adding Project Locations
         List<ProjectLocationMap> projectLocationMapList = new ArrayList<ProjectLocationMap>();
-        
-        ProjectLocationMap projectLocationMap1= new ProjectLocationMap();
+
+        ProjectLocationMap projectLocationMap1 = new ProjectLocationMap();
         projectLocationMap1.setProject(projectNew1);
         projectLocationMap1.setLocationId(new Long(3));
-        
-        ProjectLocationMap projectLocationMap2= new ProjectLocationMap();
+
+        ProjectLocationMap projectLocationMap2 = new ProjectLocationMap();
         projectLocationMap2.setProject(projectNew2);
         projectLocationMap2.setLocationId(new Long(4));
-        
+
         projectLocationMapList.add(projectLocationMap1);
         projectLocationMapList.add(projectLocationMap2);
-        
+
         projectLocationMapList.add(projectLocationMap1);
         projectLocationMapList.add(projectLocationMap2);
-        
+
         manager.addProjectLocationMap(projectLocationMapList);
-        
+
         // Adding Project Method
         List<ProjectMethod> projectMethodList = new ArrayList<ProjectMethod>();
-        
-        ProjectMethod projectMethod1= new ProjectMethod();
+
+        ProjectMethod projectMethod1 = new ProjectMethod();
         projectMethod1.setProject(projectNew1);
         projectMethod1.setMethodId(5);
-        
-        ProjectMethod projectMethod2= new ProjectMethod();
+
+        ProjectMethod projectMethod2 = new ProjectMethod();
         projectMethod2.setProject(projectNew1);
         projectMethod2.setMethodId(6);
-        
+
         projectMethodList.add(projectMethod1);
         projectMethodList.add(projectMethod2);
-        
+
         manager.addProjectMethod(projectMethodList);
 
         // Adding Project Activity
         List<ProjectActivity> projectActivityList = new ArrayList<ProjectActivity>();
-        
-        ProjectActivity projectActivity1= new ProjectActivity();
+
+        ProjectActivity projectActivity1 = new ProjectActivity();
         projectActivity1.setProject(projectNew1);
         projectActivity1.setName("Activity 1");
         projectActivity1.setDescription("Test Description for Activity 1");
         projectActivity1.setDate(new Date(System.currentTimeMillis()));
         projectActivity1.setUser(manager.getUserById(new Integer(1)));
-        
-        ProjectActivity projectActivity2= new ProjectActivity();
+
+        ProjectActivity projectActivity2 = new ProjectActivity();
         projectActivity2.setProject(projectNew1);
         projectActivity2.setName("Activity 2");
         projectActivity2.setDescription("Test Description for Activity 2");
         projectActivity2.setDate(new Date(System.currentTimeMillis()));
         projectActivity2.setUser(manager.getUserById(new Integer(1)));
-        
+
         projectActivityList.add(projectActivity1);
         projectActivityList.add(projectActivity2);
-        
+
         manager.addProjectActivity(projectActivityList);
-        
-        System.out.println("testSaveProject: ");
-        System.out.println(project1);
-        System.out.println(project2);
-        
+
+        System.out.println("testSaveProject() RESULTS: ");
+        System.out.println("  " + project1);
+        System.out.println("  " + project2);
+
         // cleanup
         deleteProject(project1);
         deleteProject(project2);
@@ -146,22 +146,20 @@ public class TestWorkbenchDataManagerImpl{
     }
 
     // delete dependencies first, before deleting the project
-    private void deleteProject(Project project){
-        
-        Long projectId = project.getProjectId();
-        
-        try{
+    private void deleteProject(Project project) {
 
-            List<ProjectActivity> projectActivities = manager.getProjectActivitiesByProjectId(projectId, 0, manager
-                    .countProjectActivitiesByProjectId(projectId).intValue());
+        Long projectId = project.getProjectId();
+        try {
+
+            List<ProjectActivity> projectActivities = manager.getProjectActivitiesByProjectId(projectId, 0,
+                    (int) manager.countProjectActivitiesByProjectId(projectId));
             for (ProjectActivity projectActivity : projectActivities) {
                 manager.deleteProjectActivity(projectActivity);
             }
 
             List<ProjectMethod> projectMethods = manager.getProjectMethodByProject(project, 0,
-                    manager.countMethodIdsByProjectId(projectId).intValue());
-            for (Object o : projectMethods) {
-                ProjectMethod projectMethod = (ProjectMethod) o;
+                    (int) manager.countMethodIdsByProjectId(projectId));
+            for (ProjectMethod projectMethod : projectMethods) {
                 manager.deleteProjectMethod(projectMethod);
             }
 
@@ -170,47 +168,54 @@ public class TestWorkbenchDataManagerImpl{
                 manager.deleteProjectUser(projectUser);
             }
 
-            List<WorkbenchDataset> datasets = manager.getWorkbenchDatasetByProjectId(projectId, 0, manager
-                    .countWorkbenchDatasetByProjectId(projectId).intValue());
+            List<WorkbenchDataset> datasets = manager.getWorkbenchDatasetByProjectId(projectId, 0,
+                    (int) manager.countWorkbenchDatasetByProjectId(projectId));
             for (WorkbenchDataset dataset : datasets) {
                 manager.deleteWorkbenchDataset(dataset);
             }
 
-            List<ProjectLocationMap> projectLocationMaps = manager.getProjectLocationMapByProjectId(projectId, 0, 
-                    manager.countLocationIdsByProjectId(projectId).intValue());
+            List<ProjectLocationMap> projectLocationMaps = manager.getProjectLocationMapByProjectId(projectId, 0,
+                    (int) manager.countLocationIdsByProjectId(projectId));
             //manager.deleteProjectLocationMap(projectLocationMaps);
             for (ProjectLocationMap projectLocationMap : projectLocationMaps) {
                 manager.deleteProjectLocationMap(projectLocationMap);
             }
 
             manager.deleteProject(project);
-            
-        } catch (QueryException e) {
+
+        } catch (MiddlewareQueryException e) {
             System.out.println("Error in deleteProject(): " + e.getMessage());
             e.printStackTrace();
         }
 
     }
 
-    @Test
-    public void testGetProjects()  throws QueryException{
+    private void deleteAllProjects() throws MiddlewareQueryException {
         List<Project> projects = manager.getProjects();
-
-        System.out.println("testGetProjects: ");
         for (Project project : projects) {
-            System.out.println(project);
+            deleteProject(project);
         }
     }
 
+    @Test
+    public void testGetProjects() throws MiddlewareQueryException {
+        List<Project> projects = manager.getProjects();
+
+        System.out.println("testGetProjects(): ");
+        for (Project project : projects) {
+            System.out.println("  " + project);
+        }
+    }
 
     @Test
-    public void testFindTool() throws QueryException {
-        Tool tool = manager.getToolWithName("fieldbook");
-        System.out.println("testFindTool: " + tool);
+    public void testGetToolWithName() throws MiddlewareQueryException {
+        String toolName = "fieldbook";
+        Tool tool = manager.getToolWithName(toolName);
+        System.out.println("testGetToolWithName(" + toolName + "): " + tool);
     }
-    
+
     @Test
-    public void testAddUser() throws QueryException {
+    public void testAddUser() throws MiddlewareQueryException {
         User user = new User();
         user.setUserid(1000);
         user.setInstalid(-1);
@@ -223,19 +228,19 @@ public class TestWorkbenchDataManagerImpl{
         user.setPersonid(1000);
         user.setAdate(20120101);
         user.setCdate(20120101);
-        
+
         // add user
         manager.addUser(user);
-        System.out.println("testAddUser: " + user);
+        System.out.println("testAddUser(): " + user);
 
         // cleanup
         manager.deleteUser(user);
     }
-    
+
     @Test
-    public void testAddPerson() throws QueryException {
+    public void testAddPerson() throws MiddlewareQueryException {
         Person person = new Person();
-//        person.setId(1000);
+        //        person.setId(1000);
         person.setInstituteId(1);
         person.setFirstName("Lich");
         person.setMiddleName("Frozen");
@@ -249,166 +254,133 @@ public class TestWorkbenchDataManagerImpl{
         person.setContact("3");
         person.setLanguage(-1);
         person.setPhone("4");
-        
+
         // add the person
-        manager.addPerson(person);        
-        System.out.println("testAddPerson: " + person);
+        manager.addPerson(person);
+        System.out.println("testAddPerson(): " + person);
 
         // cleanup
         manager.deletePerson(person);
     }
-    
-    
+
     @Test
-    public void testGetProjectById()  throws QueryException{
-        Project project = manager.getProjectById(Long.valueOf(1));
-        System.out.println(project);
+    public void testGetProjectById() throws MiddlewareQueryException {
+        Long id = Long.valueOf(1);
+        Project project = manager.getProjectById(id);
+        System.out.println("testGetProjectById(" + id + "): " + project);
     }
-    
+
     @Test
-    public void testGetUserByName() throws QueryException {
-        User user = (User) manager.getUserByName("test", 0, 1, Operation.EQUAL).get(0);
-        System.out.println(user);
+    public void testGetUserByName() throws MiddlewareQueryException {
+        String name = "test";
+        User user = (User) manager.getUserByName(name, 0, 1, Operation.EQUAL).get(0);
+        System.out.println("testGetUserByName(name=" + name + "):" + user);
     }
-    
+
     @Test
-    public void testAddWorkbenchDataset() throws QueryException {
+    public void testAddWorkbenchDataset() throws MiddlewareQueryException {
+        // Assumption: There is at least one project in the db
+        Project project = manager.getProjects().get(0); // First project in db
+
         WorkbenchDataset dataset = new WorkbenchDataset();
         dataset.setName("Test Dataset");
         dataset.setDescription("Test Dataset Description");
         dataset.setCreationDate(new Date(System.currentTimeMillis()));
-        dataset.setProject(manager.getProjectById(Long.valueOf(1)));
-        try {
-            manager.addWorkbenchDataset(dataset);
-            System.out.println("testAddWorkbenchDataset: " + dataset);
+        dataset.setProject(project);
+        manager.addWorkbenchDataset(dataset);
+        System.out.println("testAddWorkbenchDataset(): " + dataset);
 
-            // clean up
-            manager.deleteWorkbenchDataset(dataset);
+        // clean up
+        manager.deleteWorkbenchDataset(dataset);
+    }
 
-        } catch (QueryException e) {
-            System.out.println("Error in testAddWorkbenchDataset(): " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-    
-    @Test 
-    public void testGetWorkbenchDatasetByProjectId() {
-        try {
-            List<WorkbenchDataset> list = manager.getWorkbenchDatasetByProjectId(1L, 0, 10);
-            System.out.println("testGetWorkbenchDatasetByProjectId(): ");
-            
-            if(list.isEmpty()) {
-                System.out.println("No records found.");
-            }
-            
-            for(WorkbenchDataset d : list) {
-                System.out.println(d.getDatasetId() + ": " + d.getName());
-            }
-        } catch (Exception e) {
-            System.out.println("Error in testGetWorkbenchDatasetByProjectId(): " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-    
     @Test
-    public void testCountWorkbenchDatasetByProjectId() {
-        try {
-            Long result = manager.countWorkbenchDatasetByProjectId(1L);
-            System.out.println("testCountWorkbenchDatasetByProjectId(): " + result);
-        } catch (Exception e) {
-            System.out.println("Error in testCountWorkbenchDatasetByProjectId(): " + e.getMessage());
-            e.printStackTrace();
+    public void testGetWorkbenchDatasetByProjectId() throws MiddlewareQueryException {
+        Long projectId = 1L;
+        List<WorkbenchDataset> list = manager.getWorkbenchDatasetByProjectId(projectId, 0, 10);
+        System.out.println("testGetWorkbenchDatasetByProjectId(" + projectId + "): ");
+
+        if (list.isEmpty()) {
+            System.out.println("  No records found.");
+        }
+
+        for (WorkbenchDataset d : list) {
+            System.out.println("  " + d.getDatasetId() + ": " + d.getName());
         }
     }
-    
+
     @Test
-    public void testGetWorkbenchDatasetByName() {
-        try {
-            List<WorkbenchDataset> list = manager.getWorkbenchDatasetByName("D", Operation.EQUAL, 0, 10);
-            System.out.println("testGetWorkbenchDatasetByName(): ");
-            
-            if(list.isEmpty()) {
-                System.out.println("No records found.");
-            }
-            
-            for(WorkbenchDataset d : list) {
-                System.out.println(d.getDatasetId() + ": " + d.getName());
-            }
-        } catch (Exception e) {
-            System.out.println("Error in testGetWorkbenchDatasetByName(): " + e.getMessage());
-            e.printStackTrace();
-        }
+    public void testCountWorkbenchDatasetByProjectId() throws MiddlewareQueryException {
+        Long projectId = 1L;
+        long result = manager.countWorkbenchDatasetByProjectId(projectId);
+        System.out.println("testCountWorkbenchDatasetByProjectId(" + projectId + "): " + result);
     }
-    
+
     @Test
-    public void testCountWorkbenchDatasetByName() {
-        try {
-            Long result = manager.countWorkbenchDatasetByName("a", Operation.EQUAL);
-            System.out.println("testCountWorkbenchDatasetByName(): " + result);
-        } catch (Exception e) {
-            System.out.println("Error in testCountWorkbenchDatasetByName(): " + e.getMessage());
-            e.printStackTrace();
+    public void testGetWorkbenchDatasetByName() throws MiddlewareQueryException {
+        String name = "D";
+        List<WorkbenchDataset> list = manager.getWorkbenchDatasetByName(name, Operation.EQUAL, 0, 10);
+        System.out.println("testGetWorkbenchDatasetByName(name=" + name + "): ");
+
+        if (list.isEmpty()) {
+            System.out.println("  No records found.");
+        }
+
+        for (WorkbenchDataset d : list) {
+            System.out.println("  " + d.getDatasetId() + ": " + d.getName());
         }
     }
-    
+
     @Test
-    public void testGetLocationIdsByProjectId() {
-        try {
-            List<Long> ids = manager.getLocationIdsByProjectId(1L, 0, 10);
-            System.out.println("testgetLocationIdsByProjectId(): " + ids);
-        } catch (Exception e) {
-            System.out.println("Error in testGetLocationIdsByProjectId(): " + e.getMessage());
-            e.printStackTrace();
-        }
+    public void testCountWorkbenchDatasetByName() throws MiddlewareQueryException {
+        String name = "a";
+        long result = manager.countWorkbenchDatasetByName(name, Operation.EQUAL);
+        System.out.println("testCountWorkbenchDatasetByName(name=" + name + "): " + result);
     }
-    
+
     @Test
-    public void testCountLocationIdsByProjectId() {
-        try {
-            Long result = manager.countLocationIdsByProjectId(1L);
-            System.out.println("testCountLocationIdsByProjectId(): " + result);
-        } catch (Exception e) {
-            System.out.println("Error in testCountLocationIdsByProjectId(): " + e.getMessage());
-            e.printStackTrace();
-        }
+    public void testGetLocationIdsByProjectId() throws MiddlewareQueryException {
+        Long projectId = 1L;
+        List<Long> ids = manager.getLocationIdsByProjectId(projectId, 0, 10);
+        System.out.println("testgetLocationIdsByProjectId(" + projectId + "): " + ids);
     }
-    
-    @Test 
-    public void testGetMethodsByProjectId() {
-        try {
-            List<Integer> list = manager.getMethodIdsByProjectId(1L, 0, 10);
-            System.out.println("testGetMethodsByProjectId(): ");
-            
-            if(list.isEmpty()) {
-                System.out.println("No records found.");
-            }
-            
-            for(Integer m : list) {
-                System.out.println("  " + m);
-            }
-        } catch (Exception e) {
-            System.out.println("Error in testGetMethodsByProjectId(): " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-    
+
     @Test
-    public void testCountMethodsByProjectId() {
-        try {
-            Long result = manager.countMethodIdsByProjectId(1L);
-            System.out.println("testCountMethodsByProjectId(): " + result);
-        } catch (Exception e) {
-            System.out.println("Error in testCountMethodsByProjectId(): " + e.getMessage());
-            e.printStackTrace();
+    public void testCountLocationIdsByProjectId() throws MiddlewareQueryException {
+        Long projectId = 1L;
+        long result = manager.countLocationIdsByProjectId(projectId);
+        System.out.println("testCountLocationIdsByProjectId(" + projectId + "): " + result);
+    }
+
+    @Test
+    public void testGetMethodsByProjectId() throws MiddlewareQueryException {
+        Long projectId = 1L;
+        List<Integer> list = manager.getMethodIdsByProjectId(projectId, 0, 10);
+        System.out.println("testGetMethodsByProjectId(" + projectId + "): ");
+
+        if (list.isEmpty()) {
+            System.out.println("  No records found.");
+        }
+
+        for (Integer m : list) {
+            System.out.println("  " + m);
         }
     }
-    
+
     @Test
-    public void testAddProjectUsers() throws QueryException {
+    public void testCountMethodsByProjectId() throws MiddlewareQueryException {
+        Long projectId = 1L;
+        long result = manager.countMethodIdsByProjectId(projectId);
+        System.out.println("testCountMethodsByProjectId(" + projectId + "): " + result);
+    }
+
+    @Test
+    public void testAddProjectUsers() throws MiddlewareQueryException {
+        Long projectId = manager.getProjects().get(0).getProjectId(); // First project found in db
         List<ProjectUser> projectUsers = new ArrayList<ProjectUser>();
 
         // Assumptions: Project with id=1, and Users with id=1 and id=2 exist in the database
-        Project project1 = manager.getProjectById(Long.valueOf(1));
+        Project project1 = manager.getProjectById(projectId);
         User user1 = manager.getUserById(1);
         User user2 = manager.getUserById(2);
         projectUsers.add(new ProjectUser(project1, user1));
@@ -416,231 +388,181 @@ public class TestWorkbenchDataManagerImpl{
 
         // add the projectUsers
         int projectUsersAdded = manager.addProjectUsers(projectUsers);
-        
-        System.out.println("ProjectUsers added: " + projectUsersAdded);
+
+        System.out.println("testAddProjectUsers(projectId=" + projectId + ") ADDED: " + projectUsersAdded);
         System.out.println("  " + manager.getProjectUserByProjectAndUser(project1, user1));
         System.out.println("  " + manager.getProjectUserByProjectAndUser(project1, user2));
-        
+
         // clean up
         manager.deleteProjectUser(manager.getProjectUserByProjectAndUser(project1, user1));
         manager.deleteProjectUser(manager.getProjectUserByProjectAndUser(project1, user2));
     }
-    
-    @Test
-    public void testGetUsersByProjectId() {
-        try {
-            List<User> users =  manager.getUsersByProjectId(1L);
-            System.out.println("testGetUsersByProjectId(): ");
-            
-            if(users.isEmpty()) {
-                System.out.println("No records found.");
-            }
-            
-            for(User u : users) {
-                System.out.println(u.getUserid() + ": " + u.getName());
-            }
-        } catch (Exception e) {
-            System.out.println("Error in testGetUsersByProjectId(): " + e.getMessage());
-            e.printStackTrace();
-        } 
-    }
-    
-    @Test
-    public void testCountUsersByProjectId() {
-        try {
-            Long result =  manager.countUsersByProjectId(1L);
-            System.out.println("testCountUsersByProjectId(): " + result);
-        } catch (Exception e) {
-            System.out.println("Error in testCountUsersByProjectId(): " + e.getMessage());
-            e.printStackTrace();
-        } 
-    }
-    
 
-    @Test 
-    public void testGetActivitiesByProjectId() {
-        try {
-            List<ProjectActivity> list = manager.getProjectActivitiesByProjectId(20L, 0, 10);
-            System.out.println("testGetActivitiesByProjectId(): ");
-            
-            if(list.isEmpty()) {
-                System.out.println("No records found.");
-            }
-            
-            for(ProjectActivity m : list) {
-                System.out.println("  " + m);
-            }
-        } catch (Exception e) {
-            System.out.println("Error in testGetActivitiesByProjectId(): " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-    
     @Test
-    public void testCountActivitiesByProjectId() {
-        try {
-            Long result = manager.countProjectActivitiesByProjectId(1L);
-            System.out.println("testCountActivitiesByProjectId(): " + result);
-        } catch (Exception e) {
-            System.out.println("Error in testCountActivitiesByProjectId(): " + e.getMessage());
-            e.printStackTrace();
+    public void testGetUsersByProjectId() throws MiddlewareQueryException {
+        Long projectId = 1L;
+        List<User> users = manager.getUsersByProjectId(projectId);
+        System.out.println("testGetUsersByProjectId(" + projectId + "): ");
+
+        if (users.isEmpty()) {
+            System.out.println("  No records found.");
         }
-    }
-    
-    @Test 
-    public void testAddToolConfiguration() {
-        try {
-            ToolConfiguration toolConfig = new ToolConfiguration();
-            Tool tool = new Tool();
-            tool.setToolId(1L);
-            
-            toolConfig.setTool(tool);
-            toolConfig.setConfigKey("5th key");
-            toolConfig.setConfigValue("test value");
-            
-            manager.addToolConfiguration(toolConfig);
-            
-            ToolConfigurationDAO dao = new ToolConfigurationDAO();
-            dao.setSession(hibernateUtil.getCurrentSession());
-            ToolConfiguration result = dao.findById(1L, false);
-            
-            System.out.println("testAddToolConfiguration(): " + result);
-            
-        } catch (Exception e) {
-            System.out.println("Error in testAddToolConfiguration(): " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-    
-    @Test 
-    public void testUpdateToolConfiguration() {
-        try {
-            ToolConfiguration toolConfig = new ToolConfiguration();
-            Tool tool = new Tool();
-            tool.setToolId(1L);
-            
-            toolConfig.setConfigId(1L);
-            toolConfig.setTool(tool);
-            toolConfig.setConfigKey("test test");
-            toolConfig.setConfigValue("test value");
-            
-            manager.updateToolConfiguration(toolConfig);
-            
-            ToolConfigurationDAO dao = new ToolConfigurationDAO();
-            dao.setSession(hibernateUtil.getCurrentSession());
-            ToolConfiguration result = dao.findById(1L, false);
-            
-            System.out.println("testUpdateToolConfiguration(): " + result);
-            
-        } catch (Exception e) {
-            System.out.println("Error in testUpdateToolConfiguration(): " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-    
-    @Test 
-    public void testDeleteToolConfiguration() {
-        try {
-            ToolConfiguration toolConfig = new ToolConfiguration();
-            Tool tool = new Tool();
-            tool.setToolId(1L);
-            
-            toolConfig.setTool(tool);
-            toolConfig.setConfigId(1L);
-            toolConfig.setConfigKey("test test");
-            toolConfig.setConfigValue("test value");
-            
-            manager.deleteToolConfiguration(toolConfig);
-            
-            ToolConfigurationDAO dao = new ToolConfigurationDAO();
-            dao.setSession(hibernateUtil.getCurrentSession());
-            ToolConfiguration result = dao.findById(1L, false);
-            
-            System.out.println("testDeleteToolConfiguration(): " + result);
-            
-        } catch (Exception e) {
-            System.out.println("Error in testDeleteToolConfiguration(): " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-    
-    @Test
-    public void testGetListOfToolConfigurationsByToolId() {
-        try {
-            List<ToolConfiguration> result = manager.getListOfToolConfigurationsByToolId(1L);
-            System.out.println("testGetListOfToolConfigurationsByToolId(): ");
-            
-            if(result.isEmpty()) {
-                System.out.println("No records found.");
-            } else {
-                for(ToolConfiguration t : result) {
-                    System.out.println(t);
-                }
-            }
-            
-        } catch (Exception e) {
-            System.out.println("Error in testGetListOfToolConfigurationsByToolId(): " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-    
-    @Test 
-    public void testGetToolConfigurationByToolIdAndConfigKey() {
-        try {
-            ToolConfiguration toolConfig = manager.getToolConfigurationByToolIdAndConfigKey(1L, "test");
-            System.out.println("testGetToolConfigurationByToolIdAndConfigKey(): " + toolConfig);
-        } catch (Exception e) {
-            System.out.println("Error in testGetToolConfigurationByToolIdAndConfigKey(): " + e.getMessage());
-            e.printStackTrace();
+
+        for (User u : users) {
+            System.out.println("  " + u.getUserid() + ": " + u.getName());
         }
     }
 
-    @Test 
-    public void testGetInstalledCentralCrops() {
-        try {
-            ArrayList<CropType> cropTypes = (ArrayList<CropType>) manager.getInstalledCentralCrops();
-            System.out.println("testGetInstalledCentralCrops(): " + cropTypes);
-        } catch (Exception e) {
-            System.out.println("Error in testGetInstalledCentralCrops(): " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-    
-
-    @Test 
-    public void testGetCropTypeByName() {
-        try {
-            CropType cropType = manager.getCropTypeByName(CropType.CHICKPEA);
-            System.out.println("testGetCropTypeByName(): " + cropType);
-        } catch (Exception e) {
-            System.out.println("Error in testGetCropTypeByName(): " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    @Test 
-    public void testGetAddCropType() {
-        try {
-            int added = manager.addCropType(new CropType("Coconut"));
-            System.out.println("testGetCropTypeByName(): records added = " + added);
-        } catch (Exception e) {
-            System.out.println("Error in testGetAddCropType(): " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-    
     @Test
-    public void testGetLocalIbdbUserId() {
-        try {
-            Integer localIbdbUserId = manager.getLocalIbdbUserId(1, (long) 3);
-            System.out.println("testGetLocalIbdbUserId(): " + localIbdbUserId);
-        } catch (Exception e) {
-            System.out.println("Error in testGetLocalIbdbUserId(): " + e.getMessage());
-            e.printStackTrace();
+    public void testCountUsersByProjectId() throws MiddlewareQueryException {
+        Long projectId = 1L;
+        long result = manager.countUsersByProjectId(projectId);
+        System.out.println("testCountUsersByProjectId(" + projectId + "): " + result);
+    }
+
+    @Test
+    public void testGetActivitiesByProjectId() throws MiddlewareQueryException {
+        Long projectId = 20L;
+        List<ProjectActivity> list = manager.getProjectActivitiesByProjectId(projectId, 0, 10);
+        System.out.println("testGetActivitiesByProjectId(" + projectId + "): ");
+
+        if (list.isEmpty()) {
+            System.out.println("  No records found.");
+        }
+
+        for (ProjectActivity m : list) {
+            System.out.println("  " + m);
         }
     }
-    
-    
+
+    @Test
+    public void testCountActivitiesByProjectId() throws MiddlewareQueryException {
+        Long projectId = 1L;
+        long result = manager.countProjectActivitiesByProjectId(projectId);
+        System.out.println("testCountActivitiesByProjectId(" + projectId + "): " + result);
+    }
+
+    @Test
+    public void testAddToolConfiguration() throws MiddlewareQueryException {
+        Long toolId = 1L;
+        ToolConfiguration toolConfig = new ToolConfiguration();
+        Tool tool = new Tool();
+        tool.setToolId(toolId);
+
+        toolConfig.setTool(tool);
+        toolConfig.setConfigKey("5th key");
+        toolConfig.setConfigValue("test value");
+
+        manager.addToolConfiguration(toolConfig);
+
+        ToolConfigurationDAO dao = new ToolConfigurationDAO();
+        dao.setSession(hibernateUtil.getCurrentSession());
+        ToolConfiguration result = dao.getById(toolId, false);
+
+        System.out.println("testAddToolConfiguration(toolId=" + toolId + "): " + result);
+    }
+
+    @Test
+    public void testUpdateToolConfiguration() throws MiddlewareQueryException {
+        Long toolId = 1L;
+        //        ToolConfiguration toolConfig = new ToolConfiguration();
+        //        Tool tool = new Tool();
+        //        tool.setToolId(toolId);
+        //
+        //        toolConfig.setConfigId(1L);
+        //        toolConfig.setTool(tool);
+        //        toolConfig.setConfigKey("test test");
+        //        toolConfig.setConfigValue("test value");
+        ToolConfiguration toolConfig = manager.getToolConfigurationByToolIdAndConfigKey(toolId, "5th key");
+        String oldToolConfigValue = toolConfig.toString();
+        toolConfig.setConfigValue("test test");
+
+        manager.updateToolConfiguration(toolConfig);
+
+        ToolConfigurationDAO dao = new ToolConfigurationDAO();
+        dao.setSession(hibernateUtil.getCurrentSession());
+        ToolConfiguration result = dao.getById(toolId, false);
+
+        System.out.println("testUpdateToolConfiguration(toolId=" + toolId + "): ");
+        System.out.println("  FROM: " + oldToolConfigValue);
+        System.out.println("    TO: " + result);
+    }
+
+    @Test
+    public void testDeleteToolConfiguration() throws MiddlewareQueryException {
+        Long toolId = 1L;
+        //        ToolConfiguration toolConfig = new ToolConfiguration();
+        //        Tool tool = new Tool();
+        //        tool.setToolId(toolId);
+        //
+        //        toolConfig.setTool(tool);
+        //        toolConfig.setConfigId(1L);
+        //        toolConfig.setConfigKey("test test");
+        //        toolConfig.setConfigValue("test value");
+        ToolConfiguration toolConfig = manager.getToolConfigurationByToolIdAndConfigKey(toolId, "5th key");
+
+        manager.deleteToolConfiguration(toolConfig);
+
+        ToolConfigurationDAO dao = new ToolConfigurationDAO();
+        dao.setSession(hibernateUtil.getCurrentSession());
+        ToolConfiguration result = dao.getById(toolId, false);
+
+        System.out.println("testDeleteToolConfiguration(toolId=" + toolId + "): " + result);
+    }
+
+    @Test
+    public void testGetListOfToolConfigurationsByToolId() throws MiddlewareQueryException {
+        Long toolId = 1L;
+        List<ToolConfiguration> result = manager.getListOfToolConfigurationsByToolId(toolId);
+        System.out.println("testGetListOfToolConfigurationsByToolId(" + toolId + "): ");
+
+        if (result.isEmpty()) {
+            System.out.println("  No records found.");
+        } else {
+            for (ToolConfiguration t : result) {
+                System.out.println("  " + t);
+            }
+        }
+    }
+
+    @Test
+    public void testGetToolConfigurationByToolIdAndConfigKey() throws MiddlewareQueryException {
+        Long toolId = 1L;
+        String configKey = "test";
+        ToolConfiguration toolConfig = manager.getToolConfigurationByToolIdAndConfigKey(toolId, configKey);
+        System.out.println("testGetToolConfigurationByToolIdAndConfigKey(toolId=" + toolId + ", configKey=" + configKey + "): "
+                + toolConfig);
+    }
+
+    @Test
+    public void testGetInstalledCentralCrops() throws MiddlewareQueryException {
+        ArrayList<CropType> cropTypes = (ArrayList<CropType>) manager.getInstalledCentralCrops();
+        System.out.println("testGetInstalledCentralCrops(): " + cropTypes);
+    }
+
+    @Test
+    public void testGetCropTypeByName() throws MiddlewareQueryException {
+        String cropName = CropType.CHICKPEA;
+        CropType cropType = manager.getCropTypeByName(cropName);
+        System.out.println("testGetCropTypeByName(" + cropName + "): " + cropType);
+    }
+
+    @Test
+    public void testAddCropType() throws MiddlewareQueryException {
+        CropType cropType = new CropType("Coconut");
+        int added = manager.addCropType(cropType);
+        System.out.println("testAddCropType(" + cropType + "): records added = " + added);
+    }
+
+    @Test
+    public void testGetLocalIbdbUserId() throws MiddlewareQueryException {
+        Integer workbenchUserId = Integer.valueOf(1);
+        Long projectId = Long.valueOf(3);
+        Integer localIbdbUserId = manager.getLocalIbdbUserId(workbenchUserId, projectId);
+        System.out.println("testGetLocalIbdbUserId(workbenchUserId=" + workbenchUserId + ", projectId=" + projectId + "): "
+                + localIbdbUserId);
+    }
+
     @AfterClass
     public static void tearDown() throws Exception {
         hibernateUtil.shutdown();

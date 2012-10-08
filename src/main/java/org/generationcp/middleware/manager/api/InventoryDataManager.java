@@ -15,7 +15,7 @@ package org.generationcp.middleware.manager.api;
 import java.util.List;
 import java.util.Set;
 
-import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Lot;
 import org.generationcp.middleware.pojos.Transaction;
 import org.generationcp.middleware.pojos.report.LotReportRow;
@@ -41,7 +41,7 @@ public interface InventoryDataManager{
      * 
      * @return List of Lot POJOs
      */
-    public List<Lot> findLotsByEntityType(String type, int start, int numOfRows);
+    public List<Lot> getLotsByEntityType(String type, int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Returns the number of Lot records with entity type matching the given
@@ -50,7 +50,7 @@ public interface InventoryDataManager{
      * @param type
      * @return
      */
-    public int countLotsByEntityType(String type);
+    public long countLotsByEntityType(String type) throws MiddlewareQueryException;
 
     /**
      * Returns the Lot records with entity type and entity id matching the given
@@ -66,7 +66,7 @@ public interface InventoryDataManager{
      * 
      * @return List of Lot POJOs
      */
-    public List<Lot> findLotsByEntityTypeAndEntityId(String type, Integer entityId, int start, int numOfRows);
+    public List<Lot> getLotsByEntityTypeAndEntityId(String type, Integer entityId, int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Returns the number of Lot records with entity type and entity id matching
@@ -76,7 +76,7 @@ public interface InventoryDataManager{
      * @param entityId
      * @return
      */
-    public int countLotsByEntityTypeAndEntityId(String type, Integer entityId);
+    public long countLotsByEntityTypeAndEntityId(String type, Integer entityId) throws MiddlewareQueryException;
 
     /**
      * Returns the Lot records with entity type and location id matching the
@@ -92,7 +92,7 @@ public interface InventoryDataManager{
      * 
      * @return List of Lot POJOs
      */
-    public List<Lot> findLotsByEntityTypeAndLocationId(String type, Integer locationId, int start, int numOfRows);
+    public List<Lot> getLotsByEntityTypeAndLocationId(String type, Integer locationId, int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Returns the number of Lot records with entity type and location id
@@ -102,7 +102,7 @@ public interface InventoryDataManager{
      * @param locationId
      * @return
      */
-    public int countLotsByEntityTypeAndLocationId(String type, Integer locationId);
+    public long countLotsByEntityTypeAndLocationId(String type, Integer locationId) throws MiddlewareQueryException;
 
     /**
      * Returns the Lot records with entity type, entity id, and location id
@@ -118,8 +118,8 @@ public interface InventoryDataManager{
      * 
      * @return List of Lot POJOs
      */
-    public List<Lot> findLotsByEntityTypeAndEntityIdAndLocationId(String type, Integer entityId, Integer locationId, int start,
-            int numOfRows);
+    public List<Lot> getLotsByEntityTypeAndEntityIdAndLocationId(String type, 
+            Integer entityId, Integer locationId, int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Returns the number of Lot records with entity type, entity id, and
@@ -130,7 +130,7 @@ public interface InventoryDataManager{
      * @param locationId
      * @return
      */
-    public int countLotsByEntityTypeAndEntityIdAndLocationId(String type, Integer entityId, Integer locationId);
+    public long countLotsByEntityTypeAndEntityIdAndLocationId(String type, Integer entityId, Integer locationId) throws MiddlewareQueryException;
 
     /**
      * Returns the actual transaction balance of the Lot with the specified
@@ -142,7 +142,7 @@ public interface InventoryDataManager{
      *            - id of the Lot record
      * @return The actual transaction balance of all the specified Lot
      */
-    public Long getActualLotBalance(Integer lotId);
+    public Long getActualLotBalance(Integer lotId) throws MiddlewareQueryException;
 
     /**
      * Returns the available transaction balance of the Lot with the specified
@@ -154,7 +154,7 @@ public interface InventoryDataManager{
      *            - id of the Lot record
      * @return The available transaction balance of all the specified Lot
      */
-    public Long getAvailableLotBalance(Integer lotId);
+    public Long getAvailableLotBalance(Integer lotId) throws MiddlewareQueryException;
 
     /**
      * Given a valid Lot object, add it as a new record to the database. It is
@@ -163,9 +163,9 @@ public interface InventoryDataManager{
      * 
      * @param lot
      * @return number of Lot records added
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public int addLot(Lot lot) throws QueryException;
+    public int addLot(Lot lot) throws MiddlewareQueryException;
 
     /**
      * Given a List of valid Lot objects, add them as new records to the
@@ -174,9 +174,9 @@ public interface InventoryDataManager{
      * 
      * @param lots
      * @return number of Lot records added
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public int addLot(List<Lot> lots) throws QueryException;
+    public int addLot(List<Lot> lots) throws MiddlewareQueryException;
 
     /**
      * Given a valid Lot object which represents an existing record in the
@@ -184,9 +184,9 @@ public interface InventoryDataManager{
      * 
      * @param lot
      * @return number of Lot records updated
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public int updateLot(Lot lot) throws QueryException;
+    public int updateLot(Lot lot) throws MiddlewareQueryException;
 
     /**
      * Given a List of valid Lot objects, each of them representing an existing
@@ -195,18 +195,18 @@ public interface InventoryDataManager{
      * 
      * @param lots
      * @return number of Lot records updated
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public int updateLot(List<Lot> lots) throws QueryException;
+    public int updateLot(List<Lot> lots) throws MiddlewareQueryException;
 
     /**
      * Given a valid Transaction record, add it as a new record to the database.
      * 
      * @param transaction
      * @return the number of Transaction records added
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public int addTransaction(Transaction transaction) throws QueryException;
+    public int addTransaction(Transaction transaction) throws MiddlewareQueryException;
 
     /**
      * Given a List of valid Transaction records, add them as new records to the
@@ -214,9 +214,9 @@ public interface InventoryDataManager{
      * 
      * @param transactions
      * @return the number of Transaction records added
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public int addTransaction(List<Transaction> transactions) throws QueryException;
+    public int addTransaction(List<Transaction> transactions) throws MiddlewareQueryException;
 
     /**
      * Given a valid Transaction record, update the database to the changes from
@@ -224,9 +224,9 @@ public interface InventoryDataManager{
      * 
      * @param transaction
      * @return the number of Transaction records updated
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public int updateTransaction(Transaction transaction) throws QueryException;
+    public int updateTransaction(Transaction transaction) throws MiddlewareQueryException;
 
     /**
      * Givan a List of valid Transaction objects, update their corresponding
@@ -235,9 +235,9 @@ public interface InventoryDataManager{
      * 
      * @param transactions
      * @return the number of Transaction records updated
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public int updateTransaction(List<Transaction> transactions) throws QueryException;
+    public int updateTransaction(List<Transaction> transactions) throws MiddlewareQueryException;
 
     /**
      * Returns the Transaction object which represents the record identified by
@@ -246,7 +246,7 @@ public interface InventoryDataManager{
      * @param id
      * @return
      */
-    public Transaction getTransactionById(Integer id);
+    public Transaction getTransactionById(Integer id) throws MiddlewareQueryException;
 
     /**
      * Return all Transaction records associated with the Lot identified by the
@@ -255,7 +255,7 @@ public interface InventoryDataManager{
      * @param id
      * @return Set of Transaction POJOs representing the records
      */
-    public Set<Transaction> findTransactionsByLotId(Integer id);
+    public Set<Transaction> getTransactionsByLotId(Integer id) throws MiddlewareQueryException;
 
     /**
      * Returns the Transaction records which are classified as reserve
@@ -268,7 +268,7 @@ public interface InventoryDataManager{
      *            to be returned
      * @return
      */
-    public List<Transaction> getAllReserveTransactions(int start, int numOfRows);
+    public List<Transaction> getAllReserveTransactions(int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Returns the number of Transaction records which are classified as reserve
@@ -276,7 +276,7 @@ public interface InventoryDataManager{
      * 
      * @return
      */
-    public int countAllReserveTransactions();
+    public long countAllReserveTransactions() throws MiddlewareQueryException;
 
     /**
      * Returns the Transaction records which are classified as deposit
@@ -289,7 +289,7 @@ public interface InventoryDataManager{
      *            to be returned
      * @return List of Transaction POJOs
      */
-    public List<Transaction> getAllDepositTransactions(int start, int numOfRows);
+    public List<Transaction> getAllDepositTransactions(int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Returns the number of Transaction records which are classified as deposit
@@ -297,7 +297,7 @@ public interface InventoryDataManager{
      * 
      * @return
      */
-    public int countAllDepositTransactions();
+    public long countAllDepositTransactions() throws MiddlewareQueryException;
 
     /**
      * Returns the Transaction records which are classified as reserve
@@ -312,7 +312,7 @@ public interface InventoryDataManager{
      *            to be returned
      * @return List of Transaction POJOs
      */
-    public List<Transaction> getAllReserveTransactionsByRequestor(Integer personId, int start, int numOfRows);
+    public List<Transaction> getAllReserveTransactionsByRequestor(Integer personId, int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Returns the number of Transaction records which are classified as reserve
@@ -322,7 +322,7 @@ public interface InventoryDataManager{
      * @param personId
      * @return
      */
-    public int countAllReserveTransactionsByRequestor(Integer personId);
+    public long countAllReserveTransactionsByRequestor(Integer personId) throws MiddlewareQueryException;
 
     /**
      * Returns the Transaction records which are classified as deposit
@@ -337,7 +337,7 @@ public interface InventoryDataManager{
      *            to be returned
      * @return List of Transaction POJOs
      */
-    public List<Transaction> getAllDepositTransactionsByDonor(Integer personId, int start, int numOfRows);
+    public List<Transaction> getAllDepositTransactionsByDonor(Integer personId, int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Returns the number of Transaction records which are classified as deposit
@@ -347,7 +347,7 @@ public interface InventoryDataManager{
      * @param personId
      * @return
      */
-    public int countAllDepositTransactionsByDonor(Integer personId);
+    public long countAllDepositTransactionsByDonor(Integer personId) throws MiddlewareQueryException;
 
     /**
      * Returns a report on all uncommitted Transaction records. Included
@@ -361,7 +361,7 @@ public interface InventoryDataManager{
      *            to be returned
      * @return List of TransactionReportRow objects
      */
-    public List<TransactionReportRow> generateReportOnAllUncommittedTransactions(int start, int numOfRows);
+    public List<TransactionReportRow> generateReportOnAllUncommittedTransactions(int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Return the number of all Transaction records which are uncommitted
@@ -369,7 +369,7 @@ public interface InventoryDataManager{
      * 
      * @return
      */
-    public int countAllUncommittedTransactions();
+    public long countAllUncommittedTransactions() throws MiddlewareQueryException;
 
     /**
      * Returns a report on all Transaction records classified as reserve
@@ -384,7 +384,7 @@ public interface InventoryDataManager{
      *            to be returned
      * @return List of TransactionReportRow objects
      */
-    public List<TransactionReportRow> generateReportOnAllReserveTransactions(int start, int numOfRows);
+    public List<TransactionReportRow> generateReportOnAllReserveTransactions(int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Returns a report on all Transaction records classified as withdrawal
@@ -400,7 +400,7 @@ public interface InventoryDataManager{
      *            to be returned
      * @return List of TransactionReportRow objects
      */
-    public List<TransactionReportRow> generateReportOnAllWithdrawalTransactions(int start, int numOfRows);
+    public List<TransactionReportRow> generateReportOnAllWithdrawalTransactions(int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Returns the number of Transaction records classified as withdrawal
@@ -408,7 +408,7 @@ public interface InventoryDataManager{
      * 
      * @return
      */
-    public int countAllWithdrawalTransactions();
+    public long countAllWithdrawalTransactions() throws MiddlewareQueryException;
 
     /**
      * Returns all Lot records in the database.
@@ -420,14 +420,14 @@ public interface InventoryDataManager{
      *            to be returned
      * @return List of Lot POJOs
      */
-    public List<Lot> getAllLots(int start, int numOfRows);
+    public List<Lot> getAllLots(int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Counts the lots in the database.
      * 
      * @return The number of lots in the database.
      */
-    public Long countAllLots();
+    public long countAllLots() throws MiddlewareQueryException;
 
     /**
      * Returns a report on all Lot records. Included information are: lot
@@ -440,7 +440,7 @@ public interface InventoryDataManager{
      *            to be returned
      * @return List of LotReportRow objects
      */
-    public List<LotReportRow> generateReportOnAllLots(int start, int numOfRows);
+    public List<LotReportRow> generateReportOnAllLots(int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Returns a report on all dormant Lot records given a specific year. All
@@ -457,7 +457,7 @@ public interface InventoryDataManager{
      *            to be returned
      * @return List of LotReportRow objects
      */
-    public List<LotReportRow> generateReportOnDormantLots(int year, int start, int numOfRows);
+    public List<LotReportRow> generateReportOnDormantLots(int year, int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Returns a report about Lots with zero balance Included information are:
@@ -465,9 +465,9 @@ public interface InventoryDataManager{
      * lot, and scale of the lot.
      * 
      * @return List of LotReportRow
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<LotReportRow> generateReportOnEmptyLots(int start, int numOfRows);
+    public List<LotReportRow> generateReportOnEmptyLots(int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Returns a report about Lots with balance less than the amount specified
@@ -477,9 +477,9 @@ public interface InventoryDataManager{
      * @param minAmount
      *            - value specified
      * @return List of LotReportRow objects
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<LotReportRow> generateReportOnLotsWithMinimumAmount(long minimumAmount, int start, int numOfRows);
+    public List<LotReportRow> generateReportOnLotsWithMinimumAmount(long minimumAmount, int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Returns a report on all Lot records associated with the given entity
@@ -495,7 +495,7 @@ public interface InventoryDataManager{
      *            to be returned
      * @return List of LotReportRow objects
      */
-    public List<LotReportRow> generateReportOnLotsByEntityType(String type, int start, int numOfRows);
+    public List<LotReportRow> generateReportOnLotsByEntityType(String type, int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Returns a report on all Lot records associated with the given entity type
@@ -513,7 +513,7 @@ public interface InventoryDataManager{
      *            to be returned
      * @return List of LotReportRow objects
      */
-    public List<LotReportRow> generateReportOnLotsByEntityTypeAndEntityId(String type, Integer entityId, int start, int numOfRows);
+    public List<LotReportRow> generateReportOnLotsByEntityTypeAndEntityId(String type, Integer entityId, int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Returns a report on all Lot records associated with the given entity type
@@ -532,6 +532,6 @@ public interface InventoryDataManager{
      *            to be returned
      * @return List of LotReportRow objects
      */
-    public List<LotReportRow> generateReportOnLotsByEntityTypeAndEntityId(String type, List<Integer> entityIds, int start, int numOfRows);
+    public List<LotReportRow> generateReportOnLotsByEntityTypeAndEntityId(String type, List<Integer> entityIds, int start, int numOfRows) throws MiddlewareQueryException;
 
 }

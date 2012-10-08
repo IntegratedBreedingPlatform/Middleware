@@ -46,7 +46,7 @@ public class PojosSimpleTest{
     public void setUp() throws Exception {
         hibernateUtil = new HibernateUtil(CONFIG);
     }
-    
+
     @Test
     public void testAtributs() {
         Session session = hibernateUtil.getCurrentSession();
@@ -54,11 +54,12 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testAtributs() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof Attribute);
             Assert.assertTrue(obj != null);
             Attribute atributs = (Attribute) obj;
-            System.out.println(atributs);
+            System.out.println("  " + atributs);
         }
     }
 
@@ -69,11 +70,12 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testBibrefs() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof Bibref);
             Assert.assertTrue(obj != null);
             Bibref holder = (Bibref) obj;
-            System.out.println(holder);
+            System.out.println("  " + holder);
         }
     }
 
@@ -84,11 +86,12 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testCntry() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof Country);
             Assert.assertTrue(obj != null);
             Country holder = (Country) obj;
-            System.out.println(holder);
+            System.out.println("  " + holder);
         }
     }
 
@@ -99,11 +102,12 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testGeoref() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof Georef);
             Assert.assertTrue(obj != null);
             Georef holder = (Georef) obj;
-            System.out.println(holder);
+            System.out.println("  " + holder);
         }
     }
 
@@ -114,11 +118,12 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testGermplsm() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof Germplasm);
             Assert.assertTrue(obj != null);
             Germplasm holder = (Germplasm) obj;
-            System.out.println(holder);
+            System.out.println("  " + holder);
         }
     }
 
@@ -129,11 +134,12 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testLocation() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof Location);
             Assert.assertTrue(obj != null);
             Location holder = (Location) obj;
-            System.out.println(holder);
+            System.out.println("  " + holder);
         }
     }
 
@@ -144,11 +150,12 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testLocdes() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof Locdes);
             Assert.assertTrue(obj != null);
             Locdes holder = (Locdes) obj;
-            System.out.println(holder);
+            System.out.println("  " + holder);
         }
     }
 
@@ -159,11 +166,12 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testMethods() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof Method);
             Assert.assertTrue(obj != null);
             Method holder = (Method) obj;
-            System.out.println(holder);
+            System.out.println("  " + holder);
         }
     }
 
@@ -174,11 +182,12 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testNames() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof Name);
             Assert.assertTrue(obj != null);
             Name holder = (Name) obj;
-            System.out.println(holder);
+            System.out.println("  " + holder);
         }
     }
 
@@ -189,11 +198,12 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testProgntrs() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof Progenitor);
             Assert.assertTrue(obj != null);
             Progenitor holder = (Progenitor) obj;
-            System.out.println(holder);
+            System.out.println("  " + holder);
         }
     }
 
@@ -204,11 +214,12 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testUdflds() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof UserDefinedField);
             Assert.assertTrue(obj != null);
             UserDefinedField holder = (UserDefinedField) obj;
-            System.out.println(holder);
+            System.out.println("  " + holder);
         }
     }
 
@@ -219,26 +230,24 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testUser() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof User);
             Assert.assertTrue(obj != null);
             User holder = (User) obj;
-            System.out.println(holder);
+            System.out.println("  " + holder);
         }
     }
 
     @Test
     public void testGettingGermplasmDetails() {
+        Integer gid = Integer.valueOf(50533);
         Session session = hibernateUtil.getCurrentSession();
         long start = System.currentTimeMillis();
-        Germplasm g = (Germplasm) session.load(Germplasm.class, Integer.valueOf(50533));
-        System.out.println(g);
-        // System.out.println(g.getMethod());
-        // System.out.println(g.getLocation());
-        // System.out.println(g.getReference());
-        // System.out.println(g.getUser());
+        Germplasm g = (Germplasm) session.load(Germplasm.class, gid);
         long end = System.currentTimeMillis();
-        System.out.println("QUERY TIME: " + (end - start) + " ms");
+        System.out.println("testGettingGermplasmDetails(" + gid + ") RESULTS: " + g);
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
     }
 
     @Test
@@ -248,11 +257,12 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testGermplasmList() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof GermplasmList);
             Assert.assertTrue(obj != null);
             GermplasmList holder = (GermplasmList) obj;
-            System.out.println(holder);
+            System.out.println("  " + holder);
         }
     }
 
@@ -263,14 +273,15 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testGermplasmListData() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof GermplasmListData);
             Assert.assertTrue(obj != null);
             GermplasmListData holder = (GermplasmListData) obj;
-            System.out.println(holder);
+            System.out.println("  " + holder);
         }
     }
-    
+
     @Test
     public void testInstallation() {
         Session session = hibernateUtil.getCurrentSession();
@@ -278,14 +289,15 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testInstallation() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof Installation);
             Assert.assertTrue(obj != null);
             Installation holder = (Installation) obj;
-            System.out.println(holder);
+            System.out.println("  " + holder);
         }
     }
-    
+
     @After
     public void tearDown() throws Exception {
         hibernateUtil.shutdown();

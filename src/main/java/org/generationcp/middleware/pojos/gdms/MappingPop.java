@@ -36,14 +36,14 @@ public class MappingPop implements Serializable{
     private static final long serialVersionUID = 1L;
     
     public static final String GET_PARENTS_BY_DATASET_ID =
-            "SELECT parent_a_gid, parent_b_gid, mapping_type " +
+            "SELECT parent_a_gid, parent_b_gid, mapping_pop_type " +
             "FROM mapping_pop " +
             "WHERE dataset_id = :datasetId";
     
     public static final String GET_MAPPING_VALUES_BY_GIDS_AND_MARKER_IDS =
             "SELECT DISTINCT" +
                 " mapping_pop_values.dataset_id" +
-                ", mapping_pop.mapping_type" +
+                ", mapping_pop.mapping_pop_type" +
                 ", mapping_pop.parent_a_gid" +
                 ", mapping_pop.parent_b_gid" +
                 ", CONCAT(marker.marker_type, '')" +

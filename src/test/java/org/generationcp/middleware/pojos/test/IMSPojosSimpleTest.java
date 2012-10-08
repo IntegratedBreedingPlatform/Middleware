@@ -42,11 +42,12 @@ public class IMSPojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testLot() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof Lot);
             Assert.assertTrue(obj != null);
             Lot holder = (Lot) obj;
-            System.out.println(holder);
+            System.out.println("  " + holder);
         }
     }
 
@@ -57,11 +58,12 @@ public class IMSPojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testTransaction() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof Transaction);
             Assert.assertTrue(obj != null);
             Transaction holder = (Transaction) obj;
-            System.out.println(holder);
+            System.out.println("  " + holder);
         }
     }
 
@@ -72,11 +74,12 @@ public class IMSPojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testPerson() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof Person);
             Assert.assertTrue(obj != null);
             Person holder = (Person) obj;
-            System.out.println(holder);
+            System.out.println("  " + holder);
         }
     }
 

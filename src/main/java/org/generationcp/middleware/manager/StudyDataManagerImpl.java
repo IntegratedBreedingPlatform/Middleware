@@ -27,7 +27,7 @@ import org.generationcp.middleware.dao.RepresentationDAO;
 import org.generationcp.middleware.dao.StudyDAO;
 import org.generationcp.middleware.dao.StudyEffectDAO;
 import org.generationcp.middleware.dao.VariateDAO;
-import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.CharacterDataElement;
@@ -46,7 +46,6 @@ import org.hibernate.Session;
 
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager{
 
-    
     public StudyDataManagerImpl() {
     }
 
@@ -60,7 +59,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
     @Override
     public List<Integer> getGIDSByPhenotypicData(List<TraitCombinationFilter> filters, int start, int numOfRows, Database instance)
-            throws QueryException {
+            throws MiddlewareQueryException {
         // TODO Local-Central: Verify if existing implementation for CENTRAL is  also applicable to LOCAL
         Session session = getSession(instance);
 
@@ -88,7 +87,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
                 FactorDAO factorDao = new FactorDAO();
                 factorDao.setSession(session);
 
-                Set<Integer> gids = factorDao.getGIDSGivenObservationUnitIds(ounitIds, start, numOfRows * 2);
+                Set<Integer> gids = factorDao.getGIDSByObservationUnitIds(ounitIds, start, numOfRows * 2);
                 List<Integer> toreturn = new ArrayList<Integer>();
                 toreturn.addAll(gids);
                 return toreturn;
@@ -103,7 +102,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public List<Study> findStudyByName(String name, int start, int numOfRows, Operation op, Database instance) throws QueryException {
+    public List<Study> getStudyByName(String name, int start, int numOfRows, Operation op, Database instance)
+            throws MiddlewareQueryException {
 
         StudyDAO dao = new StudyDAO();
         Session session = getSession(instance);
@@ -116,9 +116,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
         List<Study> studyList = null;
         if (op == Operation.EQUAL) {
-            studyList = dao.findByNameUsingEqual(name, start, numOfRows);
+            studyList = dao.getByNameUsingEqual(name, start, numOfRows);
         } else if (op == Operation.LIKE) {
-            studyList = dao.findByNameUsingLike(name, start, numOfRows);
+            studyList = dao.getByNameUsingLike(name, start, numOfRows);
         }
 
         return studyList;
@@ -126,7 +126,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public int countStudyByName(String name, Operation op, Database instance) throws QueryException {
+    public long countStudyByName(String name, Operation op, Database instance) throws MiddlewareQueryException {
 
         StudyDAO dao = new StudyDAO();
         Session session = getSession(instance);
@@ -142,7 +142,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public Study getStudyByID(Integer id) throws QueryException {
+    public Study getStudyByID(Integer id) throws MiddlewareQueryException {
         StudyDAO dao = new StudyDAO();
         Session session = getSession(id);
 
@@ -152,11 +152,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             return null;
         }
 
-        return (Study) dao.findById(id, false);
+        return (Study) dao.getById(id, false);
     }
 
     @Override
-    public List<Study> getAllTopLevelStudies(int start, int numOfRows, Database instance) throws QueryException {
+    public List<Study> getAllTopLevelStudies(int start, int numOfRows, Database instance) throws MiddlewareQueryException {
         StudyDAO dao = new StudyDAO();
 
         Session session = getSession(instance);
@@ -171,39 +171,37 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
         return topLevelStudies;
     }
-    
-    public Long countAllTopLevelStudies(Database instance) throws QueryException{
+
+    public long countAllTopLevelStudies(Database instance) throws MiddlewareQueryException {
         StudyDAO dao = new StudyDAO();
         Session session = getSession(instance);
 
         if (session != null) {
             dao.setSession(session);
         } else {
-            return Long.valueOf(0);
+            return 0;
         }
 
-        return (Long) dao.countAllTopLevelStudies();
+        return dao.countAllTopLevelStudies();
     }
-    
-    
 
     @Override
-	public Long countAllStudyByParentFolderID(Integer parentFolderId,Database instance) throws QueryException {
-    	 StudyDAO dao = new StudyDAO();
-         Session session = getSession(instance);
+    public long countAllStudyByParentFolderID(Integer parentFolderId, Database instance) throws MiddlewareQueryException {
+        StudyDAO dao = new StudyDAO();
+        Session session = getSession(instance);
 
-         if (session != null) {
-             dao.setSession(session);
-         } else {
-             return Long.valueOf(0);
-         }
+        if (session != null) {
+            dao.setSession(session);
+        } else {
+            return 0;
+        }
 
-         return (Long) dao.countAllStudyByParentFolderID(parentFolderId);
-    	
-	}
+        return dao.countAllStudyByParentFolderID(parentFolderId);
 
-	@Override
-    public List<Study> getStudiesByParentFolderID(Integer parentFolderId, int start, int numOfRows) throws QueryException {
+    }
+
+    @Override
+    public List<Study> getStudiesByParentFolderID(Integer parentFolderId, int start, int numOfRows) throws MiddlewareQueryException {
         StudyDAO dao = new StudyDAO();
 
         Session session = getSession(parentFolderId);
@@ -220,7 +218,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public List<Variate> getVariatesByStudyID(Integer studyId) throws QueryException {
+    public List<Variate> getVariatesByStudyID(Integer studyId) throws MiddlewareQueryException {
         VariateDAO variateDao = new VariateDAO();
         Session session = getSession(studyId);
 
@@ -234,7 +232,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public List<StudyEffect> getEffectsByStudyID(Integer studyId) throws QueryException {
+    public List<StudyEffect> getEffectsByStudyID(Integer studyId) throws MiddlewareQueryException {
         StudyEffectDAO studyEffectDao = new StudyEffectDAO();
         Session session = getSession(studyId);
 
@@ -248,7 +246,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public List<Factor> getFactorsByStudyID(Integer studyId) throws QueryException {
+    public List<Factor> getFactorsByStudyID(Integer studyId) throws MiddlewareQueryException {
         FactorDAO factorDao = new FactorDAO();
         Session session = getSession(studyId);
 
@@ -262,7 +260,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public List<Representation> getRepresentationByEffectID(Integer effectId) throws QueryException {
+    public List<Representation> getRepresentationByEffectID(Integer effectId) throws MiddlewareQueryException {
         RepresentationDAO representationDao = new RepresentationDAO();
         Session session = getSession(effectId);
 
@@ -276,7 +274,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public List<Representation> getRepresentationByStudyID(Integer studyId) throws QueryException {
+    public List<Representation> getRepresentationByStudyID(Integer studyId) throws MiddlewareQueryException {
         RepresentationDAO representationDao = new RepresentationDAO();
         Session session = getSession(studyId);
 
@@ -291,7 +289,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public List<Factor> getFactorsByRepresentationId(Integer representationId) throws QueryException {
+    public List<Factor> getFactorsByRepresentationId(Integer representationId) throws MiddlewareQueryException {
         FactorDAO dao = new FactorDAO();
 
         Session session = getSession(representationId);
@@ -308,7 +306,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public Long countOunitIDsByRepresentationId(Integer representationId) throws QueryException {
+    public long countOunitIDsByRepresentationId(Integer representationId) throws MiddlewareQueryException {
         OindexDAO dao = new OindexDAO();
 
         Session session = getSession(representationId);
@@ -316,16 +314,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         if (session != null) {
             dao.setSession(session);
         } else {
-            return Long.valueOf(0);
+            return 0;
         }
 
-        Long ounitIdCount = dao.countOunitIDsByRepresentationId(representationId);
-
-        return ounitIdCount;
+        return dao.countOunitIDsByRepresentationId(representationId);
     }
 
     @Override
-    public List<Integer> getOunitIDsByRepresentationId(Integer representationId, int start, int numOfRows) throws QueryException {
+    public List<Integer> getOunitIDsByRepresentationId(Integer representationId, int start, int numOfRows) throws MiddlewareQueryException {
         OindexDAO dao = new OindexDAO();
 
         Session session = getSession(representationId);
@@ -342,7 +338,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public List<Variate> getVariatesByRepresentationId(Integer representationId) throws QueryException {
+    public List<Variate> getVariatesByRepresentationId(Integer representationId) throws MiddlewareQueryException {
         VariateDAO dao = new VariateDAO();
 
         Session session = getSession(representationId);
@@ -359,7 +355,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public List<NumericDataElement> getNumericDataValuesByOunitIdList(List<Integer> ounitIdList) throws QueryException {
+    public List<NumericDataElement> getNumericDataValuesByOunitIdList(List<Integer> ounitIdList) throws MiddlewareQueryException {
         NumericDataDAO dao = new NumericDataDAO();
 
         // get 1st element from list to check whether the list is for the
@@ -379,7 +375,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public List<CharacterDataElement> getCharacterDataValuesByOunitIdList(List<Integer> ounitIdList) throws QueryException {
+    public List<CharacterDataElement> getCharacterDataValuesByOunitIdList(List<Integer> ounitIdList) throws MiddlewareQueryException {
         CharacterDataDAO dao = new CharacterDataDAO();
 
         // get 1st element from list to check whether the list is for the
@@ -399,7 +395,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public List<NumericLevelElement> getNumericLevelValuesByOunitIdList(List<Integer> ounitIdList) throws QueryException {
+    public List<NumericLevelElement> getNumericLevelValuesByOunitIdList(List<Integer> ounitIdList) throws MiddlewareQueryException {
         NumericLevelDAO dao = new NumericLevelDAO();
 
         // get 1st element from list to check whether the list is for the
@@ -419,7 +415,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public List<CharacterLevelElement> getCharacterLevelValuesByOunitIdList(List<Integer> ounitIdList) throws QueryException {
+    public List<CharacterLevelElement> getCharacterLevelValuesByOunitIdList(List<Integer> ounitIdList) throws MiddlewareQueryException {
         CharacterLevelDAO dao = new CharacterLevelDAO();
 
         // get 1st element from list to check whether the list is for the
@@ -439,127 +435,124 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public List<DatasetCondition> getConditionsByRepresentationId(Integer representationId) throws QueryException {
+    public List<DatasetCondition> getConditionsByRepresentationId(Integer representationId) throws MiddlewareQueryException {
         List<DatasetCondition> toreturn = new ArrayList<DatasetCondition>();
-        
+
         OindexDAO oindexDao = new OindexDAO();
         NumericLevelDAO numericLevelDao = new NumericLevelDAO();
         CharacterLevelDAO characterLevelDao = new CharacterLevelDAO();
         Session session = getSession(representationId);
-        
-        if(session != null) {
+
+        if (session != null) {
             oindexDao.setSession(session);
             numericLevelDao.setSession(session);
             characterLevelDao.setSession(session);
-            
+
             List<Object[]> factorIdsAndLevelNos = oindexDao.getFactorIdAndLevelNoOfConditionsByRepresentationId(representationId);
-            for(Object[] ids : factorIdsAndLevelNos) {
+            for (Object[] ids : factorIdsAndLevelNos) {
                 Integer factorid = (Integer) ids[0];
                 Integer levelno = (Integer) ids[1];
-                
+
                 toreturn.addAll(numericLevelDao.getConditionAndValueByFactorIdAndLevelNo(factorid, levelno));
                 toreturn.addAll(characterLevelDao.getConditionAndValueByFactorIdAndLevelNo(factorid, levelno));
             }
         }
-        
+
         return toreturn;
     }
-    
+
     @Override
-    public String getMainLabelOfFactorByFactorId(Integer factorid) throws QueryException {
+    public String getMainLabelOfFactorByFactorId(Integer factorid) throws MiddlewareQueryException {
         FactorDAO dao = new FactorDAO();
         Session session = getSession(factorid);
-        
-        if(session != null) {
+
+        if (session != null) {
             dao.setSession(session);
-            
+
             return dao.getMainLabel(factorid);
         }
-        
+
         return null;
     }
-    
+
     @Override
-    public long countStudyInformationByGID(Long gid) throws QueryException {
+    public long countStudyInformationByGID(Long gid) throws MiddlewareQueryException {
         try {
             CharacterLevelDAO characterLevelDao = new CharacterLevelDAO();
             NumericLevelDAO numericLevelDao = new NumericLevelDAO();
-            
-            if(gid < 0) {
+
+            if (gid < 0) {
                 requireLocalDatabaseInstance();
-                
+
                 characterLevelDao.setSession(getCurrentSessionForLocal());
                 numericLevelDao.setSession(getCurrentSessionForLocal());
-                    
-                long count = characterLevelDao.countStudyInformationByGID(gid) 
-                    + numericLevelDao.countStudyInformationByGID(gid);
-                    
+
+                long count = characterLevelDao.countStudyInformationByGID(gid) + numericLevelDao.countStudyInformationByGID(gid);
+
                 return count;
             } else {
                 long count = 0;
-                
-                if(this.getCurrentSessionForLocal() != null) {
+
+                if (this.getCurrentSessionForLocal() != null) {
                     characterLevelDao.setSession(getCurrentSessionForLocal());
                     numericLevelDao.setSession(getCurrentSessionForLocal());
-                    
-                    count = characterLevelDao.countStudyInformationByGID(gid) 
-                        + numericLevelDao.countStudyInformationByGID(gid);
+
+                    count = characterLevelDao.countStudyInformationByGID(gid) + numericLevelDao.countStudyInformationByGID(gid);
                 }
-                
-                if(this.getCurrentSessionForCentral() != null) {
+
+                if (this.getCurrentSessionForCentral() != null) {
                     characterLevelDao.setSession(getCurrentSessionForCentral());
                     numericLevelDao.setSession(getCurrentSessionForCentral());
-                    
-                    count = count + characterLevelDao.countStudyInformationByGID(gid) 
-                        + numericLevelDao.countStudyInformationByGID(gid);
+
+                    count = count + characterLevelDao.countStudyInformationByGID(gid) + numericLevelDao.countStudyInformationByGID(gid);
                 }
-                
+
                 return count;
             }
-        } catch(Exception ex) {
-            throw new QueryException("Error in count study information by GID, given gid = " 
-                    + gid + ": " + ex.getMessage(), ex);
+        } catch (Exception e) {
+            throw new MiddlewareQueryException("Error in count study information by GID: StudyDataManager.countStudyInformationByGID(gid="
+                    + gid + "): " + e.getMessage(), e);
         }
     }
-    
+
     @Override
-    public List<StudyInfo> getStudyInformationByGID(Long gid) throws QueryException {
+    public List<StudyInfo> getStudyInformationByGID(Long gid) throws MiddlewareQueryException {
         try {
             List<StudyInfo> toreturn = new ArrayList<StudyInfo>();
-            
+
             CharacterLevelDAO characterLevelDao = new CharacterLevelDAO();
             NumericLevelDAO numericLevelDao = new NumericLevelDAO();
-            
-            if(gid < 0) {
+
+            if (gid < 0) {
                 requireLocalDatabaseInstance();
-                
+
                 characterLevelDao.setSession(getCurrentSessionForLocal());
                 numericLevelDao.setSession(getCurrentSessionForLocal());
-                
+
                 toreturn.addAll(characterLevelDao.getStudyInformationByGID(gid));
                 toreturn.addAll(numericLevelDao.getStudyInformationByGID(gid));
             } else {
-                if(this.getCurrentSessionForLocal() != null) {
+                if (this.getCurrentSessionForLocal() != null) {
                     characterLevelDao.setSession(getCurrentSessionForLocal());
                     numericLevelDao.setSession(getCurrentSessionForLocal());
-                    
+
                     toreturn.addAll(characterLevelDao.getStudyInformationByGID(gid));
                     toreturn.addAll(numericLevelDao.getStudyInformationByGID(gid));
                 }
-                
-                if(this.getCurrentSessionForCentral() != null) {
+
+                if (this.getCurrentSessionForCentral() != null) {
                     characterLevelDao.setSession(getCurrentSessionForCentral());
                     numericLevelDao.setSession(getCurrentSessionForCentral());
-                    
+
                     toreturn.addAll(characterLevelDao.getStudyInformationByGID(gid));
                     toreturn.addAll(numericLevelDao.getStudyInformationByGID(gid));
                 }
             }
-            
+
             return toreturn;
-        } catch(Exception ex) {
-            throw new QueryException("Error in get study information by GID, given gid = " 
-                    + gid + ": " + ex.getMessage(), ex);
+        } catch (Exception e) {
+            throw new MiddlewareQueryException("Error in get study information by GID: StudyDataManager.getStudyInformationByGID(gid="
+                    + gid + "): " + e.getMessage(), e);
         }
     }
 }

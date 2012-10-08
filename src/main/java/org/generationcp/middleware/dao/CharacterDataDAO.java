@@ -15,7 +15,7 @@ package org.generationcp.middleware.dao;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.CharacterData;
 import org.generationcp.middleware.pojos.CharacterDataElement;
 import org.generationcp.middleware.pojos.CharacterDataPK;
@@ -30,41 +30,46 @@ public class CharacterDataDAO extends GenericDAO<CharacterData, CharacterDataPK>
 
     @SuppressWarnings("unchecked")
     public List<Integer> getObservationUnitIdsByTraitScaleMethodAndValueCombinations(List<TraitCombinationFilter> filters, int start,
-            int numOfRows) {
-        Criteria crit = getSession().createCriteria(CharacterData.class);
-        crit.createAlias("variate", "variate");
-        crit.setProjection(Projections.distinct(Projections.property("id.observationUnitId")));
+            int numOfRows) throws MiddlewareQueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(CharacterData.class);
+            criteria.createAlias("variate", "variate");
+            criteria.setProjection(Projections.distinct(Projections.property("id.observationUnitId")));
 
-        // keeps track if at least one filter was added
-        boolean filterAdded = false;
+            // keeps track if at least one filter was added
+            boolean filterAdded = false;
 
-        for (TraitCombinationFilter combination : filters) {
-            Object value = combination.getValue();
+            for (TraitCombinationFilter combination : filters) {
+                Object value = combination.getValue();
 
-            // accept only String values
-            if (value instanceof String) {
-                crit.add(Restrictions.eq("variate.traitId", combination.getTraitId()));
-                crit.add(Restrictions.eq("variate.scaleId", combination.getScaleId()));
-                crit.add(Restrictions.eq("variate.methodId", combination.getMethodId()));
-                crit.add(Restrictions.eq("value", value));
+                // accept only String values
+                if (value instanceof String) {
+                    criteria.add(Restrictions.eq("variate.traitId", combination.getTraitId()));
+                    criteria.add(Restrictions.eq("variate.scaleId", combination.getScaleId()));
+                    criteria.add(Restrictions.eq("variate.methodId", combination.getMethodId()));
+                    criteria.add(Restrictions.eq("value", value));
 
-                filterAdded = true;
+                    filterAdded = true;
+                }
             }
-        }
 
-        if (filterAdded) {
-            // if there is at least one filter, execute query and return results
-            crit.setFirstResult(start);
-            crit.setMaxResults(numOfRows);
-            return crit.list();
-        } else {
-            // return empty list if no filter was added
-            return new ArrayList<Integer>();
+            if (filterAdded) {
+                // if there is at least one filter, execute query and return results
+                criteria.setFirstResult(start);
+                criteria.setMaxResults((numOfRows));
+                return criteria.list();
+            } else {
+                // return empty list if no filter was added
+                return new ArrayList<Integer>();
+            }
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getObservationUnitIdsByTraitScaleMethodAndValueCombinations(filters=" + filters
+                    + ") query from CharacterData: " + e.getMessage(), e);
         }
     }
 
     @SuppressWarnings("rawtypes")
-    public List<CharacterDataElement> getValuesByOunitIDList(List<Integer> ounitIdList) throws QueryException {
+    public List<CharacterDataElement> getValuesByOunitIDList(List<Integer> ounitIdList) throws MiddlewareQueryException {
         try {
             SQLQuery query = getSession().createSQLQuery(CharacterData.GET_BY_OUNIT_ID_LIST);
             query.setParameterList("ounitIdList", ounitIdList);
@@ -87,8 +92,9 @@ public class CharacterDataDAO extends GenericDAO<CharacterData, CharacterDataPK>
             }
 
             return dataValues;
-        } catch (HibernateException ex) {
-            throw new QueryException("Error with get Character Data Values by list of Observation Unit IDs query: " + ex.getMessage(), ex);
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getValuesByOunitIDList(ounitIdList=" + ounitIdList + ") query from CharacterData: "
+                    + e.getMessage(), e);
         }
     }
 }

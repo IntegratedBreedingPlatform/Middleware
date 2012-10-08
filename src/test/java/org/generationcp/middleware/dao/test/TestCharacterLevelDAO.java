@@ -40,24 +40,30 @@ public class TestCharacterLevelDAO{
     
     @Test
     public void testGetConditionAndValueByFactorIdAndLevelNo() throws Exception {
-        List<DatasetCondition> results = dao.getConditionAndValueByFactorIdAndLevelNo(Integer.valueOf(1031), Integer.valueOf(146919));
-        System.out.println("RESULTS:");
+        Integer factorId = Integer.valueOf(1031);
+        Integer levelNo = Integer.valueOf(146919);
+        List<DatasetCondition> results = dao.getConditionAndValueByFactorIdAndLevelNo(factorId, levelNo);
+        System.out.println("testGetConditionAndValueByFactorIdAndLevelNo RESULTS: ");
+        System.out.println("  factorId = " + factorId);
+        System.out.println("  levelNo = " + levelNo);        
         for(DatasetCondition c : results) {
-            System.out.println(c);
+            System.out.println("  " + c);
         }
     }
     
     @Test
     public void testCountStudyInformationByGID() throws Exception {
-        System.out.println("count = " + dao.countStudyInformationByGID(Long.valueOf(50533)));
+        Long gid = Long.valueOf(50533);
+        System.out.println("testCountStudyInformationByGID(GID=" + gid + ") : " + dao.countStudyInformationByGID(gid));
     }
     
     @Test
     public void testGetStudyInformationByGID() throws Exception {
-        List<StudyInfo> results = dao.getStudyInformationByGID(Long.valueOf(50533));
-        System.out.println("RESULTS:");
+        Long gid = Long.valueOf(50533);
+        List<StudyInfo> results = dao.getStudyInformationByGID(gid);
+        System.out.println("testGetStudyInformationByGID(GID=" + gid + ") RESULTS: ");
         for(StudyInfo info : results) {
-            System.out.println(info);
+            System.out.println("  " + info);
         }
     }
     

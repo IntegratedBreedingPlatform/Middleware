@@ -14,7 +14,7 @@ package org.generationcp.middleware.dao;
 
 import java.util.List;
 
-import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.ScaleDiscrete;
 import org.generationcp.middleware.pojos.ScaleDiscretePK;
 import org.hibernate.Criteria;
@@ -24,13 +24,13 @@ import org.hibernate.criterion.Restrictions;
 public class ScaleDiscreteDAO extends GenericDAO<ScaleDiscrete, ScaleDiscretePK>{
 
     @SuppressWarnings("unchecked")
-    public List<ScaleDiscrete> getByScaleId(Integer id) throws QueryException{
-        try{
-        Criteria crit = getSession().createCriteria(ScaleDiscrete.class);
-        crit.add(Restrictions.eq("id.scaleId", id));
-        return crit.list();
+    public List<ScaleDiscrete> getByScaleId(Integer id) throws MiddlewareQueryException {
+        try {
+            Criteria crit = getSession().createCriteria(ScaleDiscrete.class);
+            crit.add(Restrictions.eq("id.scaleId", id));
+            return crit.list();
         } catch (HibernateException e) {
-            throw new QueryException("Error in getting scale discrete by id " + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error in getByScaleId(id=" + id + ") query from ScaleDiscrete: " + e.getMessage(), e);
         }
     }
 }

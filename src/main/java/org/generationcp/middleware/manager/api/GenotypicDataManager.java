@@ -14,7 +14,7 @@ package org.generationcp.middleware.manager.api;
 
 import java.util.List;
 
-import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
@@ -41,9 +41,9 @@ public interface GenotypicDataManager{
      *
      * @param gIds the list germplasm ids
      * @return the name ids matching the given germplasm ids
-     * @throws QueryException 
+     * @throws MiddlewareQueryException 
      */
-    public List<Integer> getNameIdsByGermplasmIds(List<Integer> gIds) throws QueryException;
+    public List<Integer> getNameIdsByGermplasmIds(List<Integer> gIds) throws MiddlewareQueryException;
 
     /**
      * Gets the Name records matching the given name ids.
@@ -51,18 +51,18 @@ public interface GenotypicDataManager{
      *
      * @param nIds the list of Name ids to match
      * @return the name records corresponding to the list of name ids
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<Name> getNamesByNameIds(List<Integer> nIds) throws QueryException;
+    public List<Name> getNamesByNameIds(List<Integer> nIds) throws MiddlewareQueryException;
 
     /**
      * Gets the Name record by the given name id.
      *
      * @param nId the name id to match
      * @return the Name record corresponding to the name id
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public Name getNameByNameId(Integer nId) throws QueryException;
+    public Name getNameByNameId(Integer nId) throws MiddlewareQueryException;
 
     /**
      * Counts all Map records.
@@ -71,9 +71,9 @@ public interface GenotypicDataManager{
      *          - specifies whether the data should be retrieved 
      *          from either the Central or the Local IBDB instance
      * @return the number of Map records found in the given instance
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public Long countAllMaps(Database instance) throws QueryException;
+    public long countAllMaps(Database instance) throws MiddlewareQueryException;
 
     /**
      * Gets all the Map records in the given range from the given database instance.
@@ -87,9 +87,9 @@ public interface GenotypicDataManager{
      *          - specifies whether the data should be retrieved 
      *          from either the Central or the Local IBDB instance
      * @return List of all the maps on the given range from the given database instance
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<Map> getAllMaps(Integer start, Integer numOfRows, Database instance) throws QueryException;
+    public List<Map> getAllMaps(int start, int numOfRows, Database instance) throws MiddlewareQueryException;
 
     /**
      * Gets map information (marker_name, linkage_group, start_position) 
@@ -101,9 +101,9 @@ public interface GenotypicDataManager{
      *          - specifies whether the data should be retrieved 
      *          from either the Central or the Local IBDB instance
      * @return the map info corresponding to the given map name
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<MapInfo> getMapInfoByMapName(String mapName, Database instance) throws QueryException;
+    public List<MapInfo> getMapInfoByMapName(String mapName, Database instance) throws MiddlewareQueryException;
 
     /**
      * Counts all the dataset names.
@@ -112,9 +112,9 @@ public interface GenotypicDataManager{
      *          - specifies whether the data should be retrieved 
      *          from either the Central or the Local IBDB instance
      * @return the number of dataset names found in the given instance
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public int countDatasetNames(Database instance) throws QueryException;
+    public long countDatasetNames(Database instance) throws MiddlewareQueryException;
 
     /**
      * Gets the dataset names from the dataset table. 
@@ -130,9 +130,9 @@ public interface GenotypicDataManager{
      *          from either the Central or the Local IBDB instance
      * @return List of the dataset names based on the given range 
      *          from the given database instance
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<String> getDatasetNames(Integer start, Integer numOfRows, Database instance) throws QueryException;
+    public List<String> getDatasetNames(int start, int numOfRows, Database instance) throws MiddlewareQueryException;
 
     /**
      * Gets the dataset details (dataset id, dataset type) 
@@ -144,9 +144,9 @@ public interface GenotypicDataManager{
      *          - specifies whether the data should be retrieved 
      *          from either the Central or the Local IBDB instance
      * @return the dataset details by dataset name
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<DatasetElement> getDatasetDetailsByDatasetName(String datasetName, Database instance) throws QueryException;
+    public List<DatasetElement> getDatasetDetailsByDatasetName(String datasetName, Database instance) throws MiddlewareQueryException;
 
     /**
      * Retrieves a list of matching marker ids from the marker table based on
@@ -163,10 +163,10 @@ public interface GenotypicDataManager{
      *          - specifies whether the data should be retrieved 
      *          from either the Central or the Local IBDB instance
      * @return List of matching marker ids based on the specified marker names
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
     public List<Integer> getMarkerIdsByMarkerNames(List<String> markerNames, int start, int numOfRows, Database instance)
-            throws QueryException;
+            throws MiddlewareQueryException;
 
     /**
      * Gets the list of marker ids from the marker_metadataset table 
@@ -174,9 +174,9 @@ public interface GenotypicDataManager{
      *
      * @param datasetId the dataset id to match
      * @return the markerIds by datasetId
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<Integer> getMarkerIdsByDatasetId(Integer datasetId) throws QueryException;
+    public List<Integer> getMarkerIdsByDatasetId(Integer datasetId) throws MiddlewareQueryException;
 
     /**
      * Gets the germplasm id of parents and the mapping type 
@@ -184,18 +184,18 @@ public interface GenotypicDataManager{
      *
      * @param datasetId the dataset id to match
      * @return the parents and mapping type corresponding to the dataset id
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<ParentElement> getParentsByDatasetId(Integer datasetId) throws QueryException;
+    public List<ParentElement> getParentsByDatasetId(Integer datasetId) throws MiddlewareQueryException;
 
     /**
      * Gets the marker type from the marker table based on the given marker ids.
      *
      * @param markerIds the marker ids to match
      * @return the marker type corresponding to the given marker ids
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<String> getMarkerTypesByMarkerIds(List<Integer> markerIds) throws QueryException;
+    public List<String> getMarkerTypesByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException;
 
     /**
      * Gets the marker names by germplasm ids. 
@@ -206,9 +206,9 @@ public interface GenotypicDataManager{
      *
      * @param gIds the germplasm ids to search for
      * @return the marker names corresponding to the given germplasm ids
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<MarkerNameElement> getMarkerNamesByGIds(List<Integer> gIds) throws QueryException;
+    public List<MarkerNameElement> getMarkerNamesByGIds(List<Integer> gIds) throws MiddlewareQueryException;
 
     /**
      * Gets the germplasm names by marker names.
@@ -224,9 +224,9 @@ public interface GenotypicDataManager{
      *          from either the Central or the Local IBDB instance
      * @return the GermplasmMarkerElement list that contains the germplasm name 
      *          and the corresponding marker names
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<GermplasmMarkerElement> getGermplasmNamesByMarkerNames(List<String> markerNames, Database instance) throws QueryException;
+    public List<GermplasmMarkerElement> getGermplasmNamesByMarkerNames(List<String> markerNames, Database instance) throws MiddlewareQueryException;
     
     /**
      * Retrieves a list of mapping values based on the specified germplasm ids and marker names.
@@ -243,10 +243,10 @@ public interface GenotypicDataManager{
      *          - the number of rows to be included in the sublist of results 
      *          to be returned
      * @return List of mapping values based on the specified germplasm ids and marker names
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<MappingValueElement> getMappingValuesByGidsAndMarkerNames(List<Integer> gids, List<String> markerNames, int start,
-            int numOfRows) throws QueryException;
+    public List<MappingValueElement> getMappingValuesByGidsAndMarkerNames(List<Integer> gids, 
+            List<String> markerNames, int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Retrieves a list of allelic values (germplasm id, map_char_value, marker name) 
@@ -257,10 +257,10 @@ public interface GenotypicDataManager{
      * @param gids list of germplasm ids
      * @param markerNames list of marker names
      * @return List of allelic values based on the specified germplasm ids and marker names
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
     public List<AllelicValueElement> getAllelicValuesByGidsAndMarkerNames(List<Integer> gids, List<String> markerNames)
-            throws QueryException;
+            throws MiddlewareQueryException;
 
     /**
      * Retrieves a list of allelic values (germplasm id, char_value, marker id) 
@@ -274,10 +274,10 @@ public interface GenotypicDataManager{
      *          - the number of rows to be included in the sublist of results 
      *          to be returned
      * @return List of allelic values based on the specified dataset id
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
     public List<AllelicValueWithMarkerIdElement> getAllelicValuesFromCharValuesByDatasetId(Integer datasetId, int start, int numOfRows)
-            throws QueryException;
+            throws MiddlewareQueryException;
 
     /**
      * Counts the allelic values based on the specified dataset id 
@@ -285,9 +285,9 @@ public interface GenotypicDataManager{
      *
      * @param datasetId the dataset id matching the allelic values
      * @return the number of allelic values from char_values table based on the specified dataset id
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public int countAllelicValuesFromCharValuesByDatasetId(Integer datasetId) throws QueryException;
+    public long countAllelicValuesFromCharValuesByDatasetId(Integer datasetId) throws MiddlewareQueryException;
 
     /**
      * Retrieves a list of allelic values (germplasm id, allele_bin_value, marker id) 
@@ -301,10 +301,10 @@ public interface GenotypicDataManager{
      *          - the number of rows to be included in the sublist of results 
      *          to be returned
      * @return List of allelic values based on the specified dataset id
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
     public List<AllelicValueWithMarkerIdElement> getAllelicValuesFromAlleleValuesByDatasetId(Integer datasetId, int start, int numOfRows)
-            throws QueryException;
+            throws MiddlewareQueryException;
 
     /**
      * Counts the allelic values based on the specified datasetId 
@@ -312,9 +312,9 @@ public interface GenotypicDataManager{
      *
      * @param datasetId the dataset id matching the allelic values
      * @return the number of allelic values from allele_values table based on the specified dataset id
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public int countAllelicValuesFromAlleleValuesByDatasetId(Integer datasetId) throws QueryException;
+    public long countAllelicValuesFromAlleleValuesByDatasetId(Integer datasetId) throws MiddlewareQueryException;
 
     /**
      * Retrieves a list of allelic values (germplasm id, map_char_value, marker id) 
@@ -328,19 +328,19 @@ public interface GenotypicDataManager{
      *          - the number of rows to be included in the sublist of results 
      *          to be returned
      * @return List of allelic values based on the specified dataset id
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
     public List<AllelicValueWithMarkerIdElement> getAllelicValuesFromMappingPopValuesByDatasetId(Integer datasetId, int start, int numOfRows)
-            throws QueryException;
+            throws MiddlewareQueryException;
 
     /**
      * Counts the allelic values based on the specified dataset id from the mapping_pop_values table.
      *
      * @param datasetId the dataset id matching the allelic values
      * @return the number of allelic values from mapping_pop_values table based on the specified dataset id
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public int countAllelicValuesFromMappingPopValuesByDatasetId(Integer datasetId) throws QueryException;
+    public long countAllelicValuesFromMappingPopValuesByDatasetId(Integer datasetId) throws MiddlewareQueryException;
 
     /**
      * Retrieves a list of matching marker names from the marker table based on
@@ -349,9 +349,9 @@ public interface GenotypicDataManager{
      * @param markerIds List of marker ids to search for the corresponding marker names
      * @return List of matching marker names and marker ids 
      *          based on the specified marker ids
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<MarkerIdMarkerNameElement> getMarkerNamesByMarkerIds(List<Integer> markerIds) throws QueryException;
+    public List<MarkerIdMarkerNameElement> getMarkerNamesByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException;
 
     /**
      * Gets all marker types.
@@ -362,9 +362,9 @@ public interface GenotypicDataManager{
      *          - the number of rows to be included in the sublist of results 
      *          to be returned
      * @return List of all marker types
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<String> getAllMarkerTypes(int start, int numOfRows) throws QueryException;
+    public List<String> getAllMarkerTypes(int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Gets the number of marker types.
@@ -373,9 +373,9 @@ public interface GenotypicDataManager{
      *          - specifies whether the data should be retrieved 
      *          from either the Central or the Local IBDB instance
      * @return the number of all marker types on the specified database instance
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public Long countAllMarkerTypes(Database instance) throws QueryException;
+    public long countAllMarkerTypes(Database instance) throws MiddlewareQueryException;
 
     /**
      * Retrieves the names of the the markers which have the specified marker type.
@@ -388,18 +388,18 @@ public interface GenotypicDataManager{
      *          - the number of rows to be included in the sublist of results 
      *          to be returned
      * @return List of marker names based on the specified marker type
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<String> getMarkerNamesByMarkerType(String markerType, int start, int numOfRows) throws QueryException;
+    public List<String> getMarkerNamesByMarkerType(String markerType, int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Count the number of marker names matching the given marker type.
      *
      * @param markerType the marker type to match
      * @return the number of marker names corresponding to the given marker type
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public Long countMarkerNamesByMarkerType(String markerType) throws QueryException;
+    public long countMarkerNamesByMarkerType(String markerType) throws MiddlewareQueryException;
 
     /**
      * Retrieves all the associated germplasm ids matching the given marker id 
@@ -413,9 +413,9 @@ public interface GenotypicDataManager{
      *          - the number of rows to be included in the sublist of results 
      *          to be returned
      * @return List of germplasm ids from char_values based on the given marker id
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<Integer> getGIDsFromCharValuesByMarkerId(Integer markerId, int start, int numOfRows) throws QueryException;
+    public List<Integer> getGIDsFromCharValuesByMarkerId(Integer markerId, int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Retrieves a list of marker info based on the specified marker name 
@@ -432,18 +432,18 @@ public interface GenotypicDataManager{
      *          - specifies whether the data should be retrieved 
      *          from either the Central or the Local IBDB instance
      * @return List of MarkerInfo based on the specified marker name
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<MarkerInfo> getMarkerInfoByMarkerName(String markerName, int start, int numOfRows) throws QueryException;
+    public List<MarkerInfo> getMarkerInfoByMarkerName(String markerName, int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Counts the marker info entries corresponding to the given marker name.
      * 
      * @param markerName 
      * @return the number of marker info entries
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public int countMarkerInfoByMarkerName(String markerName) throws QueryException;
+    public long countMarkerInfoByMarkerName(String markerName) throws MiddlewareQueryException;
 
     /**
      * Retrieves a list of MarkerInfo based on the specified genotype from the marker_retrieval_info table.
@@ -456,18 +456,18 @@ public interface GenotypicDataManager{
      *          - the number of rows to be included in the sublist of results 
      *          to be returned
      * @return List of MarkerInfo based on the specified genotype
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<MarkerInfo> getMarkerInfoByGenotype(String genotype, int start, int numOfRows) throws QueryException;
+    public List<MarkerInfo> getMarkerInfoByGenotype(String genotype, int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Counts the marker info entries corresponding to the given genotype.
      * 
      * @param genotype 
      * @return the number of marker info entries 
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public int countMarkerInfoByGenotype(String genotype) throws QueryException;
+    public long countMarkerInfoByGenotype(String genotype) throws MiddlewareQueryException;
 
     /**
      * Retrieves a list of marker info entries based on the specified db accession id 
@@ -481,18 +481,18 @@ public interface GenotypicDataManager{
      *          - the number of rows to be included in the sublist of results 
      *          to be returned
      * @return List of MarkerInfo based on the specified db accession id 
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<MarkerInfo> getMarkerInfoByDbAccessionId(String dbAccessionId, int start, int numOfRows) throws QueryException;
+    public List<MarkerInfo> getMarkerInfoByDbAccessionId(String dbAccessionId, int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Counts the marker info entries corresponding to the given db accession id.
      * 
      * @param dbAccessionId  
      * @return the number of marker info entries
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public int countMarkerInfoByDbAccessionId(String dbAccessionId) throws QueryException;
+    public long countMarkerInfoByDbAccessionId(String dbAccessionId) throws MiddlewareQueryException;
 
     /**
      * Counts the number of germplasm ids matching the given marker id
@@ -501,9 +501,9 @@ public interface GenotypicDataManager{
      * @param markerId the marker id
      * @return the count of germplasm ids corresponding to the given marker id 
      *          from char_values
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public Long countGIDsFromCharValuesByMarkerId(Integer markerId) throws QueryException;
+    public long countGIDsFromCharValuesByMarkerId(Integer markerId) throws MiddlewareQueryException;
 
     /**
      * Retrieves all the associated germplasm ids matching the given marker id 
@@ -516,9 +516,9 @@ public interface GenotypicDataManager{
      *          - the number of rows to be included in the sublist of results 
      *          to be returned
      * @return List of germplasm ids from allele values based on the given marker id
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<Integer> getGIDsFromAlleleValuesByMarkerId(Integer markerId, int start, int numOfRows) throws QueryException;
+    public List<Integer> getGIDsFromAlleleValuesByMarkerId(Integer markerId, int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Counts the number of germplasm ids matching the given marker id 
@@ -527,9 +527,9 @@ public interface GenotypicDataManager{
      * @param markerId the marker id
      * @return the count of germplasm ids corresponding to the given marker id 
      *          from allele_values
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public Long countGIDsFromAlleleValuesByMarkerId(Integer markerId) throws QueryException;
+    public long countGIDsFromAlleleValuesByMarkerId(Integer markerId) throws MiddlewareQueryException;
 
     /**
      * Retrieves all the associated germplasm ids matching the given marker id 
@@ -544,9 +544,9 @@ public interface GenotypicDataManager{
      *          to be returned
      * @return List of germplasm ids from mapping_pop_values table 
      *          based on the given marker id
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<Integer> getGIDsFromMappingPopValuesByMarkerId(Integer markerId, int start, int numOfRows) throws QueryException;
+    public List<Integer> getGIDsFromMappingPopValuesByMarkerId(Integer markerId, int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Counts the number of germplasm ids matching the given marker id 
@@ -555,9 +555,9 @@ public interface GenotypicDataManager{
      * @param markerId the marker id to match
      * @return the count of germplasm ids corresponding to the given marker id 
      *          from mapping_pop_values
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public Long countGIDsFromMappingPopValuesByMarkerId(Integer markerId) throws QueryException;
+    public long countGIDsFromMappingPopValuesByMarkerId(Integer markerId) throws MiddlewareQueryException;
 
     /**
      * Gets the all db accession ids from marker.
@@ -568,17 +568,17 @@ public interface GenotypicDataManager{
      *          - the number of rows to be included in the sublist of results 
      *          to be returned
      * @return List of all non-empty db_accession IDs from Marker
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<String> getAllDbAccessionIdsFromMarker(int start, int numOfRows) throws QueryException;
+    public List<String> getAllDbAccessionIdsFromMarker(int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Count all db accession ids from marker.
      *
      * @return the number of non-empty db accession ids from marker
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public Long countAllDbAccessionIdsFromMarker() throws QueryException;
+    public long countAllDbAccessionIdsFromMarker() throws MiddlewareQueryException;
 
     /**
      * Gets the nids from acc metadataset by dataset ids.
@@ -592,9 +592,9 @@ public interface GenotypicDataManager{
      *          to be returned
      * @return List of all name ids from acc_metadataset table 
      *          based on the given list of dataset ids
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<Integer> getNidsFromAccMetadatasetByDatasetIds(List<Integer> datasetIds, int start, int numOfRows) throws QueryException;
+    public List<Integer> getNidsFromAccMetadatasetByDatasetIds(List<Integer> datasetIds, int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Gets the nids from acc metadataset by dataset ids filtered by gids.
@@ -609,9 +609,9 @@ public interface GenotypicDataManager{
      *          - the number of rows to be included in the sublist of results 
      *          to be returned
      * @return List of name ids from acc_metadataset based on the given list of dataset ids
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
     public List<Integer> getNidsFromAccMetadatasetByDatasetIds(List<Integer> datasetIds, List<Integer> gids, int start, int numOfRows)
-            throws QueryException;
+            throws MiddlewareQueryException;
 
 }

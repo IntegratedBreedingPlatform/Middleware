@@ -34,7 +34,6 @@ import org.generationcp.middleware.pojos.StudyInfo;
 import org.generationcp.middleware.pojos.TraitCombinationFilter;
 import org.generationcp.middleware.pojos.Variate;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -50,11 +49,14 @@ public class TestStudyDataManagerImpl{
         factory = new ManagerFactory(local, central);
         manager = factory.getStudyDataManager();
     }
-    
+
     @Test
     public void testGetGIDSByPhenotypicData() throws Exception {
+        Integer traitId = Integer.valueOf(1003);
+        Integer scaleId = Integer.valueOf(9);
+        Integer methodId = Integer.valueOf(30);
         NumericRange range = new NumericRange(new Double(2000), new Double(3000));
-        TraitCombinationFilter combination = new TraitCombinationFilter(new Integer(1003), new Integer(9), new Integer(30), range);
+        TraitCombinationFilter combination = new TraitCombinationFilter(traitId, scaleId, methodId, range);
         List<TraitCombinationFilter> filters = new ArrayList<TraitCombinationFilter>();
         filters.add(combination);
 
@@ -66,148 +68,164 @@ public class TestStudyDataManagerImpl{
         // filters.add(combination2);
 
         List<Integer> results = manager.getGIDSByPhenotypicData(filters, 0, 10, Database.CENTRAL);
-        System.out.println("RESULTS:");
+        System.out.println("testGetGIDSByPhenotypicData(traitId=" + scaleId + ", scaleId=" + scaleId + ", methodId=" + methodId
+                + ", range(" + range.getStart() + ", " + range.getEnd() + ")) RESULTS:");
         for (Integer gid : results)
-            System.out.println(gid);
+            System.out.println("  " + gid);
     }
 
     @Test
-    public void testFindStudyByNameUsingLike() throws Exception {
-        List<Study> studyList = manager.findStudyByName("IRTN%", 0, 5, Operation.LIKE, Database.CENTRAL);
-
+    public void testGetStudyByNameUsingLike() throws Exception {
+        String name = "IRTN%";
+        List<Study> studyList = manager.getStudyByName(name, 0, 5, Operation.LIKE, Database.CENTRAL);
+        System.out.println("testGetStudyByNameUsingLike(" + name + ") RESULTS: ");
         for (Study study : studyList) {
-            System.out.println(study);
+            System.out.println("  " + study);
         }
     }
 
     @Test
-    public void testFindStudyByNameUsingEqual() throws Exception {
-        List<Study> studyList = manager.findStudyByName("PEATSOIL", 0, 5, Operation.EQUAL, Database.CENTRAL);
-
+    public void testGetStudyByNameUsingEqual() throws Exception {
+        String name = "PEATSOIL";
+        List<Study> studyList = manager.getStudyByName(name, 0, 5, Operation.EQUAL, Database.CENTRAL);
+        System.out.println("testGetStudyByNameUsingEqual(" + name + ") RESULTS: ");
         for (Study study : studyList) {
-            System.out.println(study);
+            System.out.println("  " + study);
         }
     }
 
     @Test
     public void testCountStudyByName() throws Exception {
+        String name = "IRTN%";
         long start = System.currentTimeMillis();
-        int count = manager.countStudyByName("IRTN%", Operation.LIKE, Database.CENTRAL);
+        long count = manager.countStudyByName("IRTN%", Operation.LIKE, Database.CENTRAL);
         long end = System.currentTimeMillis();
-        System.out.println(count);
-        System.out.println("QUERY TIME: " + (end - start) + " ms");
+        System.out.println("testCountStudyByName(" + name + "): " + count);
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
     }
 
     @Test
     public void testGetStudyByID() throws Exception {
-        Study study = manager.getStudyByID(new Integer(714));
-        System.out.println(study);
+        Integer id = Integer.valueOf(714);
+        Study study = manager.getStudyByID(id);
+        System.out.println("testGetStudyByID(" + id + "): " + study);
     }
 
     @Test
     public void testGetAllTopLevelStudies() throws Exception {
         List<Study> topLevelStudies = manager.getAllTopLevelStudies(0, 10, Database.LOCAL);
-        System.out.println("TOP LEVEL STUDIES: " + topLevelStudies.size());
+        System.out.println("testGetAllTopLevelStudies() Number of top-level studies: " + topLevelStudies.size());
         for (Study study : topLevelStudies) {
-            System.out.println(study);
+            System.out.println("  " + study);
         }
     }
-    
 
     @Test
     public void testCountAllTopLevelStudies() throws Exception {
-        Long count = manager.countAllTopLevelStudies(Database.CENTRAL);
-        System.out.println("Number of Top-Level Studies: " + count);
+        long count = manager.countAllTopLevelStudies(Database.CENTRAL);
+        System.out.println("testCountAllTopLevelStudies(): " + count);
     }
 
     @Test
     public void testCountAllStudyByParentFolderID() throws Exception {
-        Long count = manager.countAllStudyByParentFolderID(640,Database.CENTRAL);
-        System.out.println("Number of Studies belong to this parent folder: " + count);
+        Integer parentFolderId = Integer.valueOf(640);
+        long count = manager.countAllStudyByParentFolderID(parentFolderId, Database.CENTRAL);
+        System.out.println("testCountAllStudyByParentFolderID(" + parentFolderId + ") Number of Studies belong to this parent folder: "
+                + count);
     }
 
     @Test
     public void testGetStudiesByParentFolderID() throws Exception {
-        List<Study> studies = manager.getStudiesByParentFolderID(640, 0, 100);
-        System.out.println("STUDIES BY PARENT FOLDER: " + studies.size());
+        Integer parentFolderId = Integer.valueOf(640);
+        List<Study> studies = manager.getStudiesByParentFolderID(parentFolderId, 0, 100);
+        System.out.println("testGetStudiesByParentFolderID(" + parentFolderId + ") STUDIES BY PARENT FOLDER: " + studies.size());
         for (Study study : studies) {
-            System.out.println(study);
+            System.out.println("  " + study);
         }
     }
 
     @Test
     public void testGetFactorsByStudyID() throws Exception {
-        List<Factor> factors = manager.getFactorsByStudyID(new Integer(430));
-
+        Integer studyId = Integer.valueOf(430);
+        List<Factor> factors = manager.getFactorsByStudyID(studyId);
+        System.out.println("testGetFactorsByStudyID(" + studyId + ") RESULTS: " + factors.size());
         for (Factor factor : factors) {
-            System.out.println(factor);
+            System.out.println("  " + factor);
         }
     }
 
     @Test
     public void testGetVariatesByStudyID() throws Exception {
-        List<Variate> variates = manager.getVariatesByStudyID(new Integer(430));
-
+        Integer studyId = Integer.valueOf(430);
+        List<Variate> variates = manager.getVariatesByStudyID(studyId);
+        System.out.println("testGetVariatesByStudyID(" + studyId + ") RESULTS: " + variates.size());
         for (Variate variate : variates) {
-            System.out.println(variate);
+            System.out.println("  " + variate);
         }
     }
 
     @Test
     public void testGetEffectsByStudyID() throws Exception {
-        List<StudyEffect> studyEffects = manager.getEffectsByStudyID(new Integer(430));
-
+        Integer studyId = Integer.valueOf(430);
+        List<StudyEffect> studyEffects = manager.getEffectsByStudyID(studyId);
+        System.out.println("testGetEffectsByStudyID(" + studyId + ") RESULTS: " + studyEffects.size());
         for (StudyEffect studyEffect : studyEffects) {
-            System.out.println(studyEffect);
+            System.out.println("  " + studyEffect);
         }
     }
 
     @Test
     public void testGetRepresentationByEffectID() throws Exception {
-        List<Representation> representations = manager.getRepresentationByEffectID(new Integer(430));
-
+        Integer effectId = Integer.valueOf(430);
+        List<Representation> representations = manager.getRepresentationByEffectID(effectId);
+        System.out.println("testGetRepresentationByEffectID(" + effectId + ") RESULTS: " + representations.size());
         for (Representation representation : representations) {
-            System.out.println(representation);
+            System.out.println("  " + representation);
         }
     }
 
     @Test
     public void testGetRepresentationByStudyID() throws Exception {
-        List<Representation> representations = manager.getRepresentationByStudyID(new Integer(1));
-
+        Integer studyId = Integer.valueOf(1);
+        List<Representation> representations = manager.getRepresentationByStudyID(studyId);
+        System.out.println("testGetRepresentationByStudyID(" + studyId + ") RESULTS: " + representations.size());
         for (Representation representation : representations) {
-            System.out.println(representation);
+            System.out.println("  " + representation);
         }
     }
 
     @Test
     public void testGetFactorsByRepresentationId() throws Exception {
-        List<Factor> factors = manager.getFactorsByRepresentationId(1176);
-        System.out.println("FACTORS BY REPRESENTATION: " + factors.size());
+        Integer representationId = Integer.valueOf(1176);
+        List<Factor> factors = manager.getFactorsByRepresentationId(representationId);
+        System.out.println("testGetFactorsByRepresentationId(" + representationId + ") RESULTS: " + factors.size());
         for (Factor factor : factors) {
-            System.out.println(factor);
+            System.out.println("  " + factor);
         }
     }
 
     @Test
     public void testCountOunitIDsByRepresentationId() throws Exception {
-        Long ounitIdCount = manager.countOunitIDsByRepresentationId(1176);
-        System.out.println("COUNT OF OUNIT IDS BY REPRESENTATION: " + ounitIdCount);
+        Integer representationId = Integer.valueOf(1176);
+        long ounitIdCount = manager.countOunitIDsByRepresentationId(representationId);
+        System.out.println("testCountOunitIDsByRepresentationId(" + representationId + ") COUNT OF OUNIT IDS BY REPRESENTATION: "
+                + ounitIdCount);
     }
 
     @Test
     public void testGetOunitIDsByRepresentationId() throws Exception {
-        List<Integer> ounitIDs = manager.getOunitIDsByRepresentationId(1176, 0, 100);
-        System.out.println("OUNIT IDS BY REPRESENTATION: " + ounitIDs.size());
-        System.out.println(ounitIDs);
+        Integer representationId = Integer.valueOf(1176);
+        List<Integer> ounitIDs = manager.getOunitIDsByRepresentationId(representationId, 0, 100);
+        System.out.println("testGetOunitIDsByRepresentationId(" + representationId + ") RESULTS: " + ounitIDs.size() + "\n  " + ounitIDs);
     }
 
     @Test
     public void testGetVariatesByRepresentationId() throws Exception {
-        List<Variate> variates = manager.getVariatesByRepresentationId(1176);
-        System.out.println("VARIATES BY REPRESENTATION: " + variates.size());
+        Integer representationId = Integer.valueOf(1176);
+        List<Variate> variates = manager.getVariatesByRepresentationId(representationId);
+        System.out.println("testGetVariatesByRepresentationId(" + representationId + ") VARIATES BY REPRESENTATION: " + variates.size());
         for (Variate variate : variates) {
-            System.out.println(variate);
+            System.out.println("  " + variate);
         }
     }
 
@@ -220,9 +238,10 @@ public class TestStudyDataManagerImpl{
         ounitIdList.add(447204);
         ounitIdList.add(447205);
         List<NumericDataElement> dataElements = manager.getNumericDataValuesByOunitIdList(ounitIdList);
-        System.out.println("NUMERIC DATA VALUES BY OUNITIDLIST: " + dataElements.size());
+        System.out.println("testGetNumericDataValuesByOunitIdList(" + ounitIdList + ") NUMERIC DATA VALUES BY OUNITIDLIST: "
+                + dataElements.size());
         for (NumericDataElement data : dataElements) {
-            System.out.println(data);
+            System.out.println("  " + data);
         }
     }
 
@@ -235,9 +254,10 @@ public class TestStudyDataManagerImpl{
         ounitIdList.add(447204);
         ounitIdList.add(447205);
         List<CharacterDataElement> dataElements = manager.getCharacterDataValuesByOunitIdList(ounitIdList);
-        System.out.println("CHARACTER DATA VALUES BY OUNITIDLIST: " + dataElements.size());
+        System.out.println("testGetCharacterDataValuesByOunitIdList(" + ounitIdList + ") CHARACTER DATA VALUES BY OUNITIDLIST: "
+                + dataElements.size());
         for (CharacterDataElement data : dataElements) {
-            System.out.println(data);
+            System.out.println("  " + data);
         }
     }
 
@@ -250,9 +270,10 @@ public class TestStudyDataManagerImpl{
         ounitIdList.add(447204);
         ounitIdList.add(447205);
         List<NumericLevelElement> levelElements = manager.getNumericLevelValuesByOunitIdList(ounitIdList);
-        System.out.println("NUMERIC LEVEL VALUES BY OUNITIDLIST: " + levelElements.size());
+        System.out.println("testGetNumericLevelValuesByOunitIdList(" + ounitIdList + ") NUMERIC LEVEL VALUES BY OUNITIDLIST: "
+                + levelElements.size());
         for (NumericLevelElement level : levelElements) {
-            System.out.println(level);
+            System.out.println("  " + level);
         }
     }
 
@@ -266,36 +287,43 @@ public class TestStudyDataManagerImpl{
         ounitIdList.add(447205);
         List<CharacterLevelElement> levelElements = manager.getCharacterLevelValuesByOunitIdList(ounitIdList);
         System.out.println("CHARACTER LEVEL VALUES BY OUNITIDLIST: " + levelElements.size());
+        System.out.println("testGetCharacterLevelValuesByOunitIdList(" + ounitIdList + ") CHARACTER LEVEL VALUES BY OUNITIDLIST: "
+                + levelElements.size());
         for (CharacterLevelElement level : levelElements) {
-            System.out.println(level);
+            System.out.println("  " + level);
         }
     }
-    
+
     @Test
     public void testGetConditionsByRepresentationId() throws Exception {
-        List<DatasetCondition> results = manager.getConditionsByRepresentationId(Integer.valueOf(2));
-        System.out.println("RESULTS:");
-        for(DatasetCondition result : results) {
-            System.out.println(result);
+        Integer representationId = Integer.valueOf(2);
+        List<DatasetCondition> results = manager.getConditionsByRepresentationId(representationId);
+        System.out.println("testGetConditionsByRepresentationId(" + representationId + ") RESULTS: ");
+        for (DatasetCondition result : results) {
+            System.out.println("  " + result);
         }
     }
-    
+
     @Test
     public void testGetMainLabelOfFactorByFactorId() throws Exception {
-        System.out.println(manager.getMainLabelOfFactorByFactorId(Integer.valueOf(1031)));
+        Integer factorId = Integer.valueOf(1031);
+        System.out.println("testGetMainLabelOfFactorByFactorId(" + factorId + ") RESULTS: "
+                + manager.getMainLabelOfFactorByFactorId(factorId));
     }
-    
+
     @Test
     public void testCountStudyInformationByGID() throws Exception {
-        System.out.println(manager.countStudyInformationByGID(Long.valueOf(50533)));
+        Long gid = Long.valueOf(50533);
+        System.out.println("testCountStudyInformationByGID(" + gid + "): " + manager.countStudyInformationByGID(gid));
     }
-    
+
     @Test
     public void testGetStudyInformationByGID() throws Exception {
-        List<StudyInfo> results = manager.getStudyInformationByGID(Long.valueOf(50533));
-        System.out.println("RESULTS:");
-        for(StudyInfo info : results) {
-            System.out.println(info);
+        Long gid = Long.valueOf(50533);
+        List<StudyInfo> results = manager.getStudyInformationByGID(gid);
+        System.out.println("testGetStudyInformationByGID(" + gid + ") RESULTS:");
+        for (StudyInfo info : results) {
+            System.out.println("  " + info);
         }
     }
 

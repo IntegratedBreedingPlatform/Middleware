@@ -34,8 +34,8 @@ public class ParentElement implements Serializable{
     private Integer parentBGId;
 
     /** The mapping type. */
-    @Column(name = "mapping_type")
-    private String mappingType;
+    @Column(name = "mapping_pop_type")
+    private String mappingPopType;
 
 
     public ParentElement() {
@@ -44,7 +44,7 @@ public class ParentElement implements Serializable{
     public ParentElement(Integer parentAGId, Integer parentBGId, String mappingType) {
         this.parentAGId = parentAGId;
         this.parentBGId = parentBGId;
-        this.mappingType = mappingType;
+        this.mappingPopType = mappingType;
     }
 
     public Integer getParentAGId() {
@@ -64,11 +64,11 @@ public class ParentElement implements Serializable{
     }
     
     public String getMappingType() {
-        return mappingType;
+        return mappingPopType;
     }
 
     public void setMappingType(String mappingType) {
-        this.mappingType = mappingType;
+        this.mappingPopType = mappingType;
     }
     
     /* (non-Javadoc)
@@ -76,7 +76,7 @@ public class ParentElement implements Serializable{
      */
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 139).append(parentAGId).append(parentBGId).append(mappingType).toHashCode();
+        return new HashCodeBuilder(17, 139).append(parentAGId).append(parentBGId).append(mappingPopType).toHashCode();
     }
 
     /* (non-Javadoc)
@@ -96,7 +96,7 @@ public class ParentElement implements Serializable{
 
         ParentElement rhs = (ParentElement) obj;
         return new EqualsBuilder().appendSuper(super.equals(obj)).append(parentAGId, rhs.parentAGId).append(parentBGId, rhs.parentBGId)
-                .append(mappingType, rhs.mappingType).isEquals();
+                .append(mappingPopType, rhs.mappingPopType).isEquals();
     }
 
     /* (non-Javadoc)
@@ -104,7 +104,7 @@ public class ParentElement implements Serializable{
      */
     @Override
     public String toString() {
-        return "ParentElement [parentAGId=" + parentAGId + ", parentBGId=" + parentBGId +  ", mappingType=" + mappingType + "]";
+        return "ParentElement [parentAGId=" + parentAGId + ", parentBGId=" + parentBGId +  ", mappingType=" + mappingPopType + "]";
     }
     
 }

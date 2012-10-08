@@ -14,7 +14,7 @@ package org.generationcp.middleware.dao;
 
 import java.util.List;
 
-import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
@@ -26,49 +26,13 @@ import org.hibernate.criterion.Restrictions;
 
 public class WorkbenchDatasetDAO extends GenericDAO<WorkbenchDataset, Long>{
 
-    /**
-     * Get the list of {@link WorkbenchDataset}s.
-     * 
-     * @return
-     */
-    public List<WorkbenchDataset> findAll() throws QueryException{
-        return findAll(null, null);
-    }
-
-    /**
-     * Get the list of {@link WorkbenchDataset}s.
-     * 
-     * @param start
-     *            the index of the first result to return. This parameter is
-     *            ignored if null.
-     * @param numOfRows
-     *            the number of rows to return. This parameter is ignored if
-     *            null.
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-    public List<WorkbenchDataset> findAll(Integer start, Integer numOfRows)  throws QueryException{
-        try {
-            Criteria criteria = getSession().createCriteria(WorkbenchDataset.class);
-            if (start != null) {
-                criteria.setFirstResult(start);
-            }
-            if (numOfRows != null) {
-                criteria.setMaxResults(numOfRows);
-            }
-            return (List<WorkbenchDataset>) criteria.list();
-        } catch (HibernateException e) {
-            throw new QueryException("Error finding all workbench datasets: " + e.getMessage(), e);
-        }
-    }
-    
-    public WorkbenchDataset getById(Long datasetId) throws QueryException{        
+    public WorkbenchDataset getById(Long datasetId) throws MiddlewareQueryException{        
         try {
             Criteria criteria = getSession().createCriteria(WorkbenchDataset.class)
                     .add(Restrictions.eq("datasetId", datasetId)).setMaxResults(1);
             return (WorkbenchDataset) criteria.uniqueResult();
         } catch (HibernateException e) {
-            throw new QueryException("Error finding all workbench datasets: " + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error getById(datasetId="+datasetId+") query from WorkbenchDataset: " + e.getMessage(), e);
         }
     }
     
@@ -79,11 +43,11 @@ public class WorkbenchDatasetDAO extends GenericDAO<WorkbenchDataset, Long>{
      * @param start the start
      * @param numOfRows the num of rows
      * @return the list of {@link WorkbenchDataset}s
-     * @throws QueryException the query exception
+     * @throws MiddlewareQueryException the MiddlewareQueryException
      */
     @SuppressWarnings("unchecked")
     public List<WorkbenchDataset> getByProjectId(Long projectId, int start, int numOfRows) 
-        throws QueryException {
+        throws MiddlewareQueryException {
         
         try {
             Criteria criteria = getSession().createCriteria(WorkbenchDataset.class);
@@ -92,11 +56,10 @@ public class WorkbenchDatasetDAO extends GenericDAO<WorkbenchDataset, Long>{
             
             criteria.add(Restrictions.eq("project", p));
             criteria.setFirstResult(start);
-            criteria.setMaxResults(numOfRows);
-            
+            criteria.setMaxResults(numOfRows);            
             return (List<WorkbenchDataset>) criteria.list();
         } catch (HibernateException e) {
-            throw new QueryException("Error with getByWorkbenchProjectId query: " + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error with getByWorkbenchProjectId(projectId="+projectId+") query from WorkbenchDataset: " + e.getMessage(), e);
         } 
     }
     
@@ -105,9 +68,9 @@ public class WorkbenchDatasetDAO extends GenericDAO<WorkbenchDataset, Long>{
      *
      * @param projectId the project id
      * @return the number of {@link WorkbenchDataset} records
-     * @throws QueryException the query exception
+     * @throws MiddlewareQueryException the MiddlewareQueryException
      */
-    public Long countByProjectId(Long projectId) throws QueryException {
+    public long countByProjectId(Long projectId) throws MiddlewareQueryException {
         try {
             Criteria criteria = getSession().createCriteria(WorkbenchDataset.class);
             Project p = new Project();
@@ -116,9 +79,9 @@ public class WorkbenchDatasetDAO extends GenericDAO<WorkbenchDataset, Long>{
             criteria.add(Restrictions.eq("project", p));
             criteria.setProjection(Projections.rowCount());
             
-            return (Long) criteria.uniqueResult();
+            return ((Long) criteria.uniqueResult()).longValue();
         } catch (HibernateException e) {
-            throw new QueryException("Error with countByWorkbenchProjectId query: " + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error with countByWorkbenchProjectId(projectId="+projectId+") query from WorkbenchDataset: " + e.getMessage(), e);
         }
     }
     
@@ -130,11 +93,11 @@ public class WorkbenchDatasetDAO extends GenericDAO<WorkbenchDataset, Long>{
      * @param start - the start
      * @param numOfRows - the num of rows
      * @return the list of {@link WorkbenchDataset}
-     * @throws QueryException the query exception
+     * @throws MiddlewareQueryException the MiddlewareQueryException
      */
     @SuppressWarnings("unchecked")
     public List<WorkbenchDataset> getByName(String name, Operation op, int start, int numOfRows) 
-        throws QueryException {
+        throws MiddlewareQueryException {
         
         try {
             Criteria criteria = getSession().createCriteria(WorkbenchDataset.class);
@@ -144,15 +107,14 @@ public class WorkbenchDatasetDAO extends GenericDAO<WorkbenchDataset, Long>{
             } else if (Operation.LIKE.equals(op)) {
                 criteria.add(Restrictions.like("name", name, MatchMode.ANYWHERE));
             } else {
-                throw new QueryException("Operation " + op.toString() + " not supported.");
+                throw new MiddlewareQueryException("Error in getByName(name="+name+"): Operation " + op.toString() + " not supported.");
             }
            
             criteria.setFirstResult(start);
             criteria.setMaxResults(numOfRows);
-            
             return (List<WorkbenchDataset>) criteria.list();
         } catch (HibernateException e) {
-            throw new QueryException("Error with getByName query: " + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error with getByName(name=" + name + ") query from WorkbenchDataset: " + e.getMessage(), e);
         }
     }
     
@@ -162,9 +124,9 @@ public class WorkbenchDatasetDAO extends GenericDAO<WorkbenchDataset, Long>{
      * @param name - the {@link WorkbenchDataset} name
      * @param op - the operator; EQUAL, LIKE
      * @return the number of {@link WorkbenchDataset}
-     * @throws QueryException the query exception
+     * @throws MiddlewareQueryException the MiddlewareQueryException
      */
-    public Long countByName(String name, Operation op) throws QueryException {
+    public long countByName(String name, Operation op) throws MiddlewareQueryException {
         try {
             Criteria criteria = getSession().createCriteria(WorkbenchDataset.class);
             
@@ -173,14 +135,14 @@ public class WorkbenchDatasetDAO extends GenericDAO<WorkbenchDataset, Long>{
             } else if (Operation.LIKE.equals(op)) {
                 criteria.add(Restrictions.like("name", name, MatchMode.ANYWHERE));
             } else {
-                throw new QueryException("Operation " + op.toString() + " not supported.");
+                throw new MiddlewareQueryException("Error in countByName(name="+name+"): Operation " + op.toString() + " not supported.");
             }
             
             criteria.setProjection(Projections.rowCount());
             
-            return (Long) criteria.uniqueResult();
+            return ((Long) criteria.uniqueResult()).longValue();
         } catch (HibernateException e) {
-            throw new QueryException("Error with countByName query: " + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error with countByName(name="+name+") query from WorkbenchDataset: " + e.getMessage(), e);
         }
     }
 }

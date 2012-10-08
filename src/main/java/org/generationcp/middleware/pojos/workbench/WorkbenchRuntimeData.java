@@ -64,4 +64,11 @@ public class WorkbenchRuntimeData implements Serializable {
         
         return new EqualsBuilder().append(id, otherObj.id).isEquals();
     }
+
+    @Override
+    public String toString() {
+        return "WorkbenchRuntimeData [id=" + id + ", userId=" + userId + "]";
+    }
+    
+    
 }

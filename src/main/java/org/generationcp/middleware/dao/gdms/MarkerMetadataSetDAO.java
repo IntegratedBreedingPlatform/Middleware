@@ -14,7 +14,7 @@ package org.generationcp.middleware.dao.gdms;
 import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
-import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.MarkerMetadataSet;
 import org.hibernate.SQLQuery;
 
@@ -31,10 +31,10 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
      *
      * @param datasetId the dataset id
      * @return the marker id by dataset id
-     * @throws QueryException the query exception
+     * @throws MiddlewareQueryException the MiddlewareQueryException
      */
     @SuppressWarnings("unchecked")
-    public List<Integer> getMarkerIdByDatasetId(Integer datasetId) throws QueryException{
+    public List<Integer> getMarkerIdByDatasetId(Integer datasetId) throws MiddlewareQueryException{
         SQLQuery query = getSession().createSQLQuery(MarkerMetadataSet.GET_MARKER_ID_BY_DATASET_ID); 
         query.setParameter("datasetId", datasetId);
         return (List<Integer>) query.list();

@@ -29,7 +29,7 @@ import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.WorkbenchDatasetDAO;
 import org.generationcp.middleware.dao.WorkbenchRuntimeDataDAO;
 import org.generationcp.middleware.dao.WorkflowTemplateDAO;
-import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
@@ -53,36 +53,36 @@ import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
+public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 
     private static final Logger LOG = LoggerFactory.getLogger(WorkbenchDataManagerImpl.class);
 
     private HibernateSessionProvider sessionProvider;
-    
+
     public WorkbenchDataManagerImpl(HibernateSessionProvider sessionProvider) {
         this.sessionProvider = sessionProvider;
     }
-    
+
     public Session getCurrentSession() {
         return sessionProvider.getSession();
     }
-    
+
     @Override
-    public List<Project> getProjects() throws QueryException{
+    public List<Project> getProjects() throws MiddlewareQueryException {
         ProjectDAO projectDao = new ProjectDAO();
         projectDao.setSession(getCurrentSession());
-        return projectDao.findAll();
+        return projectDao.getAll();
     }
 
     @Override
-    public List<Project> getProjects(int start, int numOfRows)  throws QueryException{
+    public List<Project> getProjects(int start, int numOfRows) throws MiddlewareQueryException {
         ProjectDAO projectDao = new ProjectDAO();
         projectDao.setSession(getCurrentSession());
-        return projectDao.findAll(start, numOfRows);
+        return projectDao.getAll(start, numOfRows);
     }
 
     @Override
-    public Project saveOrUpdateProject(Project project)  throws QueryException{
+    public Project saveOrUpdateProject(Project project) throws MiddlewareQueryException {
         Transaction trans = null;
 
         Session session = getCurrentSession();
@@ -103,14 +103,15 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
                 trans.rollback();
             }
 
-            throw new QueryException("Cannot save Project", e);
+            throw new MiddlewareQueryException("Cannot save Project: WorkbenchDataManager.saveOrUpdateProject(project=" + project + "): "
+                    + e.getMessage(), e);
         }
 
         return project;
     }
 
     @Override
-    public void deleteProject(Project project)  throws QueryException{
+    public void deleteProject(Project project) throws MiddlewareQueryException {
         Transaction trans = null;
 
         Session session = getCurrentSession();
@@ -127,43 +128,44 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
                 trans.rollback();
             }
 
-            throw new QueryException("Cannot delete Project", e);
+            throw new MiddlewareQueryException("Cannot delete Project: WorkbenchDataManager.deleteProject(project=" + project + "): "
+                    + e.getMessage(), e);
         }
     }
 
     @Override
-    public List<WorkflowTemplate> getWorkflowTemplates()  throws QueryException{
+    public List<WorkflowTemplate> getWorkflowTemplates() throws MiddlewareQueryException {
         WorkflowTemplateDAO workflowTemplateDAO = new WorkflowTemplateDAO();
         workflowTemplateDAO.setSession(getCurrentSession());
-        return workflowTemplateDAO.findAll();
+        return workflowTemplateDAO.getAll();
     }
 
     @Override
-    public List<WorkflowTemplate> getWorkflowTemplates(int start, int numOfRows)  throws QueryException{
+    public List<WorkflowTemplate> getWorkflowTemplates(int start, int numOfRows) throws MiddlewareQueryException {
         WorkflowTemplateDAO workflowTemplateDAO = new WorkflowTemplateDAO();
         workflowTemplateDAO.setSession(getCurrentSession());
-        return workflowTemplateDAO.findAll(start, numOfRows);
+        return workflowTemplateDAO.getAll(start, numOfRows);
     }
 
     @Override
-    public Tool getToolWithName(String toolId)  throws QueryException{
+    public Tool getToolWithName(String toolId) throws MiddlewareQueryException {
         ToolDAO toolDAO = new ToolDAO();
         toolDAO.setSession(getCurrentSession());
-        return toolDAO.findByToolName(toolId);
+        return toolDAO.getByToolName(toolId);
     }
 
     @Override
-    public List<Tool> getToolsWithType(ToolType toolType) throws QueryException {
+    public List<Tool> getToolsWithType(ToolType toolType) throws MiddlewareQueryException {
         ToolDAO toolDAO = new ToolDAO();
         toolDAO.setSession(getCurrentSession());
-        return toolDAO.findToolsByToolType(toolType);
+        return toolDAO.getToolsByToolType(toolType);
     }
 
     @Override
-    public boolean isValidUserLogin(String username, String password) throws QueryException {
+    public boolean isValidUserLogin(String username, String password) throws MiddlewareQueryException {
         UserDAO dao = new UserDAO();
         dao.setSession(getCurrentSession());
-        User user = dao.findByUsernameAndPassword(username, password);
+        User user = dao.getByUsernameAndPassword(username, password);
         if (user != null) {
             return true;
         }
@@ -172,14 +174,14 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     }
 
     @Override
-    public boolean isPersonExists(String firstName, String lastName) throws QueryException {
+    public boolean isPersonExists(String firstName, String lastName) throws MiddlewareQueryException {
         PersonDAO dao = new PersonDAO();
         dao.setSession(getCurrentSession());
         return dao.isPersonExists(firstName, lastName);
     }
 
     @Override
-    public boolean isUsernameExists(String userName) throws QueryException {
+    public boolean isUsernameExists(String userName) throws MiddlewareQueryException {
         UserDAO dao = new UserDAO();
         dao.setSession(getCurrentSession());
 
@@ -187,7 +189,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     }
 
     @Override
-    public void addPerson(Person person) throws QueryException {
+    public void addPerson(Person person) throws MiddlewareQueryException {
         Transaction trans = null;
 
         Session session = getCurrentSession();
@@ -198,7 +200,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             SQLQuery q = session.createSQLQuery("SELECT MAX(personid) FROM persons");
             Integer personId = (Integer) q.uniqueResult();
 
-            if(personId == null || personId.intValue() < 0) {
+            if (personId == null || personId.intValue() < 0) {
                 person.setId(1);
             } else {
                 person.setId(personId + 1);
@@ -210,19 +212,20 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             dao.saveOrUpdate(person);
 
             trans.commit();
-        } catch (Exception ex) {
-            LOG.error("Error in addPerson: " + ex.getMessage() + "\n" + ex.getStackTrace());
-            ex.printStackTrace();
+        } catch (Exception e) {
+            LOG.error("Error in addPerson: " + e.getMessage() + "\n" + e.getStackTrace());
+            e.printStackTrace();
             // rollback transaction in case of errors
             if (trans != null) {
                 trans.rollback();
             }
-            throw new QueryException("Error encountered while saving Person: " + ex.getMessage(), ex);
+            throw new MiddlewareQueryException("Error encountered while saving Person: WorkbenchDataManager.addPerson(person=" + person
+                    + "): " + e.getMessage(), e);
         }
     }
 
     @Override
-    public void addUser(User user) throws QueryException {
+    public void addUser(User user) throws MiddlewareQueryException {
         Transaction trans = null;
 
         Session session = getCurrentSession();
@@ -233,7 +236,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             SQLQuery q = session.createSQLQuery("SELECT MAX(userid) FROM users");
             Integer userId = (Integer) q.uniqueResult();
 
-            if(userId == null || userId.intValue() < 0) {
+            if (userId == null || userId.intValue() < 0) {
                 user.setUserid(1);
             } else {
                 user.setUserid(userId + 1);
@@ -245,25 +248,26 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             dao.saveOrUpdate(user);
 
             trans.commit();
-        } catch (Exception ex) {
+        } catch (Exception e) {
             // rollback transaction in case of errors
             if (trans != null) {
                 trans.rollback();
             }
-            throw new QueryException("Error encountered while saving User: " + ex.getMessage(), ex);
+            throw new MiddlewareQueryException("Error encountered while saving User: WorkbenchDataManager.addUser(user=" + user + "): "
+                    + e.getMessage(), e);
         }
 
     }
 
-    public Project getProjectById(Long projectId) throws QueryException{
+    public Project getProjectById(Long projectId) throws MiddlewareQueryException {
         ProjectDAO projectDao = new ProjectDAO();
         projectDao.setSession(getCurrentSession());
         return projectDao.getById(projectId);
     }
 
-    public int addWorkbenchDataset(WorkbenchDataset dataset) throws QueryException {
+    public int addWorkbenchDataset(WorkbenchDataset dataset) throws MiddlewareQueryException {
         Session session = getCurrentSession();
-        
+
         Transaction trans = null;
         int recordSaved = 0;
         try {
@@ -274,28 +278,30 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             datasetDAO.saveOrUpdate(dataset);
             recordSaved++;
             trans.commit();
-        } catch (Exception ex) {
-            LOG.error("Error in addDataset: " + ex.getMessage() + "\n" + ex.getStackTrace());
-            ex.printStackTrace();
+        } catch (Exception e) {
+            LOG.error("Error in addDataset: " + e.getMessage() + "\n" + e.getStackTrace());
+            e.printStackTrace();
             // rollback transaction in case of errors
             if (trans != null) {
                 trans.rollback();
             }
-            throw new QueryException("Error encountered while saving workbench dataset: " + ex.getMessage(), ex);
+            throw new MiddlewareQueryException(
+                    "Error encountered while saving workbench dataset: WorkbenchDataManager.addWorkbenchDataset(dataset=" + dataset + "): "
+                            + e.getMessage(), e);
         }
 
         return recordSaved;
     }
-    
+
     @Override
-    public WorkbenchDataset getWorkbenchDatasetById(Long datasetId) throws QueryException{
+    public WorkbenchDataset getWorkbenchDatasetById(Long datasetId) throws MiddlewareQueryException {
         WorkbenchDatasetDAO datasetDAO = new WorkbenchDatasetDAO();
         datasetDAO.setSession(getCurrentSession());
         return datasetDAO.getById(datasetId);
     }
-    
+
     @Override
-    public void deleteWorkbenchDataset(WorkbenchDataset dataset)  throws QueryException{
+    public void deleteWorkbenchDataset(WorkbenchDataset dataset) throws MiddlewareQueryException {
         Transaction trans = null;
 
         Session session = getCurrentSession();
@@ -311,12 +317,10 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
                 trans.rollback();
             }
 
-            throw new QueryException("Cannot delete WorkbenchDataset. " + e.getMessage(), e);
+            throw new MiddlewareQueryException("Cannot delete WorkbenchDataset: WorkbenchDataManager.deleteWorkbenchDataset(dataset="
+                    + dataset + "):  " + e.getMessage(), e);
         }
     }
-
-
-
 
     @Override
     public List<User> getAllUsers() {
@@ -333,19 +337,16 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         return users;
     }
 
-    public int countAllUsers() {
-
-        int count = 0;
-
+    public long countAllUsers() {
+        long count = 0;
         UserDAO dao = new UserDAO();
-
         Session session = getCurrentSession();
         if (session != null) {
             dao.setSession(session);
-            count = count + dao.countAll().intValue();
+            count = count + dao.countAll();
         }
         return count;
-    }  
+    }
 
     @Override
     public User getUserById(int id) {
@@ -358,11 +359,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             return null;
         }
 
-        return dao.findById(id, false);
+        return dao.getById(id, false);
     }
 
     @Override
-    public List<User> getUserByName(String name, int start, int numOfRows, Operation op) throws QueryException {
+    public List<User> getUserByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException {
 
         UserDAO dao = new UserDAO();
 
@@ -376,9 +377,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         }
 
         if (op == Operation.EQUAL) {
-            users.add(dao.findByNameUsingEqual(name, start, numOfRows));
+            users.add(dao.getByNameUsingEqual(name, start, numOfRows));
         } else if (op == Operation.LIKE) {
-            users = dao.findByNameUsingLike(name, start, numOfRows);
+            users = dao.getByNameUsingLike(name, start, numOfRows);
         }
 
         return users;
@@ -386,7 +387,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     }
 
     @Override
-    public void deleteUser(User user) throws QueryException {
+    public void deleteUser(User user) throws MiddlewareQueryException {
         Transaction trans = null;
 
         Session session = getCurrentSession();
@@ -400,12 +401,13 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             dao.makeTransient(user);
 
             trans.commit();
-        } catch (Exception ex) {
+        } catch (Exception e) {
             // rollback transaction in case of errors
             if (trans != null) {
                 trans.rollback();
             }
-            throw new QueryException("Error encountered while deleting User: " + ex.getMessage(), ex);
+            throw new MiddlewareQueryException("Error encountered while deleting User: WorkbenchDataManager.deleteUser(user=" + user
+                    + "):  " + e.getMessage(), e);
         }
     }
 
@@ -425,20 +427,17 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         return persons;
     }
 
-    public int countAllPersons() {
-
-        int count = 0;
-
+    public long countAllPersons() {
+        long count = 0;
         PersonDAO dao = new PersonDAO();
-
         Session session = getCurrentSession();
         if (session != null) {
             dao.setSession(session);
-            count = count + dao.countAll().intValue();
+            count = count + dao.countAll();
         }
 
         return count;
-    }    
+    }
 
     @Override
     public Person getPersonById(int id) {
@@ -451,11 +450,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             return null;
         }
 
-        return dao.findById(id, false);
+        return dao.getById(id, false);
     }
 
     @Override
-    public void deletePerson(Person person) throws QueryException {
+    public void deletePerson(Person person) throws MiddlewareQueryException {
         Transaction trans = null;
 
         Session session = getCurrentSession();
@@ -469,31 +468,31 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             dao.makeTransient(person);
 
             trans.commit();
-        } catch (Exception ex) {
+        } catch (Exception e) {
             // rollback transaction in case of errors
             if (trans != null) {
                 trans.rollback();
             }
-            throw new QueryException("Error encountered while deleting Person: " + ex.getMessage(), ex);
+            throw new MiddlewareQueryException("Error encountered while deleting Person: WorkbenchDataManager.deletePerson(person="
+                    + person + "): " + e.getMessage(), e);
         }
     }
 
     @Override
-    public Project getLastOpenedProject(Integer userId) throws QueryException {
+    public Project getLastOpenedProject(Integer userId) throws MiddlewareQueryException {
         ProjectDAO dao = new ProjectDAO();
         dao.setSession(getCurrentSession());
         return dao.getLastOpenedProject(userId);
     }
 
     @Override
-    public List<WorkbenchDataset> getWorkbenchDatasetByProjectId(Long projectId, int start, int numOfRows) 
-            throws QueryException {
+    public List<WorkbenchDataset> getWorkbenchDatasetByProjectId(Long projectId, int start, int numOfRows) throws MiddlewareQueryException {
 
         WorkbenchDatasetDAO dao = new WorkbenchDatasetDAO();
         List<WorkbenchDataset> list;
 
         Session session = getCurrentSession();
-        if(session != null) {
+        if (session != null) {
             dao.setSession(session);
             list = dao.getByProjectId(projectId, start, numOfRows);
         } else {
@@ -504,29 +503,28 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     }
 
     @Override
-    public Long countWorkbenchDatasetByProjectId(Long projectId) throws QueryException {
+    public long countWorkbenchDatasetByProjectId(Long projectId) throws MiddlewareQueryException {
         WorkbenchDatasetDAO dao = new WorkbenchDatasetDAO();
-        Long result = 0L;
+        long count = 0;
 
         Session session = getCurrentSession();
-        if(session != null) {
+        if (session != null) {
             dao.setSession(session);
-            result = dao.countByProjectId(projectId);
+            count = dao.countByProjectId(projectId);
         }
 
-        return result;
+        return count;
     }
 
     @Override
-    public List<WorkbenchDataset> getWorkbenchDatasetByName(String name, Operation op, 
-            int start, int numOfRows) 
-                    throws QueryException {
+    public List<WorkbenchDataset> getWorkbenchDatasetByName(String name, Operation op, int start, int numOfRows)
+            throws MiddlewareQueryException {
 
         WorkbenchDatasetDAO dao = new WorkbenchDatasetDAO();
         List<WorkbenchDataset> list;
 
         Session session = getCurrentSession();
-        if(session != null) {
+        if (session != null) {
             dao.setSession(session);
             list = dao.getByName(name, op, start, numOfRows);
         } else {
@@ -537,28 +535,27 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     }
 
     @Override
-    public Long countWorkbenchDatasetByName(String name, Operation op) throws QueryException {
+    public long countWorkbenchDatasetByName(String name, Operation op) throws MiddlewareQueryException {
         WorkbenchDatasetDAO dao = new WorkbenchDatasetDAO();
-        Long result = 0L;
+        long count = 0;
 
         Session session = getCurrentSession();
-        if(session != null) {
+        if (session != null) {
             dao.setSession(session);
-            result = dao.countByName(name, op);
+            count = dao.countByName(name, op);
         }
 
-        return result;
+        return count;
     }
 
     @Override
-    public List<Long> getLocationIdsByProjectId(Long projectId, int start, int numOfRows) 
-            throws QueryException {
+    public List<Long> getLocationIdsByProjectId(Long projectId, int start, int numOfRows) throws MiddlewareQueryException {
 
         ProjectLocationMapDAO dao = new ProjectLocationMapDAO();
         List<Long> ids;
 
         Session session = getCurrentSession();
-        if(session != null) {
+        if (session != null) {
             dao.setSession(session);
             ids = dao.getLocationIdsByProjectId(projectId, start, numOfRows);
         } else {
@@ -569,27 +566,27 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     }
 
     @Override
-    public Long countLocationIdsByProjectId(Long projectId) throws QueryException {
+    public long countLocationIdsByProjectId(Long projectId) throws MiddlewareQueryException {
         ProjectLocationMapDAO dao = new ProjectLocationMapDAO();
-        Long result = 0L;
+        long count = 0;
 
         Session session = getCurrentSession();
-        if(session != null) {
+        if (session != null) {
             dao.setSession(session);
-            result = dao.countLocationIdsByProjectId(projectId);
-        } 
+            count = dao.countLocationIdsByProjectId(projectId);
+        }
 
-        return result;
+        return count;
     }
 
     @Override
-    public List<Integer> getMethodIdsByProjectId(Long projectId, int start, int numOfRows) throws QueryException{
+    public List<Integer> getMethodIdsByProjectId(Long projectId, int start, int numOfRows) throws MiddlewareQueryException {
 
         ProjectMethodDAO dao = new ProjectMethodDAO();
         List<Integer> list;
 
         Session session = getCurrentSession();
-        if(session != null) {
+        if (session != null) {
             dao.setSession(session);
             list = dao.getByProjectId(projectId, start, numOfRows);
         } else {
@@ -601,21 +598,21 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     }
 
     @Override
-    public Long countMethodIdsByProjectId(Long projectId) throws QueryException {
+    public long countMethodIdsByProjectId(Long projectId) throws MiddlewareQueryException {
         ProjectMethodDAO dao = new ProjectMethodDAO();
-        Long result = 0L;
+        long count = 0;
 
         Session session = getCurrentSession();
-        if(session != null) {
+        if (session != null) {
             dao.setSession(session);
-            result = dao.countByProjectId(projectId);
+            count = dao.countByProjectId(projectId);
         }
 
-        return result;
+        return count;
     }
-    
+
     @Override
-    public int addProjectUser(Project project, User user) throws QueryException{
+    public int addProjectUser(Project project, User user) throws MiddlewareQueryException {
         ProjectUser projectUser = new ProjectUser();
         projectUser.setProject(project);
         projectUser.setUserId(user.getUserid());
@@ -623,9 +620,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     }
 
     @Override
-    public int addProjectUser(ProjectUser projectUser) throws QueryException {
+    public int addProjectUser(ProjectUser projectUser) throws MiddlewareQueryException {
         Session session = getCurrentSession();
-        if(session == null) {
+        if (session == null) {
             return 0;
         }
 
@@ -634,7 +631,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         int recordsSaved = 0;
         try {
             // begin save transaction
-            trans = session.beginTransaction();            
+            trans = session.beginTransaction();
             ProjectUserDAO dao = new ProjectUserDAO();
             dao.setSession(session);
 
@@ -642,55 +639,59 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             recordsSaved++;
 
             trans.commit();
-        } catch (Exception ex) {
-            LOG.error("Error in addProjectUser: " + ex.getMessage() + "\n" + ex.getStackTrace());
-            ex.printStackTrace();
+        } catch (Exception e) {
+            LOG.error("Error in addProjectUser: " + e.getMessage() + "\n" + e.getStackTrace());
+            e.printStackTrace();
             // rollback transaction in case of errors
             if (trans != null) {
                 trans.rollback();
             }
-            throw new QueryException("Error encountered while saving ProjectUser: " + ex.getMessage(), ex);
+            throw new MiddlewareQueryException(
+                    "Error encountered while saving ProjectUser: WorkbenchDataManager.addProjectUser(projectUser=" + projectUser + "): "
+                            + e.getMessage(), e);
         }
-        
+
         return recordsSaved;
     }
 
     @Override
-    public int addProjectUsers(List<ProjectUser> projectUsers) throws QueryException{
+    public int addProjectUsers(List<ProjectUser> projectUsers) throws MiddlewareQueryException {
         Session session = getCurrentSession();
-        if(session == null) {
+        if (session == null) {
             return 0;
         }
         Transaction trans = null;
 
         int recordsSaved = 0;
-        try {            
+        try {
             // begin save transaction
-            trans = session.beginTransaction();            
+            trans = session.beginTransaction();
             ProjectUserDAO dao = new ProjectUserDAO();
             dao.setSession(session);
 
-            for (ProjectUser projectUser : projectUsers){
+            for (ProjectUser projectUser : projectUsers) {
                 dao.saveOrUpdate(projectUser);
                 recordsSaved++;
             }
 
             trans.commit();
-        } catch (Exception ex) {
-            LOG.error("Error in addProjectUsers: " + ex.getMessage() + "\n" + ex.getStackTrace());
-            ex.printStackTrace();
+        } catch (Exception e) {
+            LOG.error("Error in addProjectUsers: " + e.getMessage() + "\n" + e.getStackTrace());
+            e.printStackTrace();
             // rollback transaction in case of errors
             if (trans != null) {
                 trans.rollback();
             }
-            throw new QueryException("Error encountered while saving ProjectUsers: " + ex.getMessage(), ex);
+            throw new MiddlewareQueryException(
+                    "Error encountered while saving ProjectUsers: WorkbenchDataManager.addProjectUsers(projectUsers=" + projectUsers
+                            + "): " + e.getMessage(), e);
         }
-        
+
         return recordsSaved;
     }
 
     @Override
-    public ProjectUser getProjectUserById(Integer id) throws QueryException {
+    public ProjectUser getProjectUserById(Integer id) throws MiddlewareQueryException {
         ProjectUserDAO dao = new ProjectUserDAO();
         Session session = getCurrentSession();
         if (session != null) {
@@ -701,7 +702,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     }
 
     @Override
-    public ProjectUser getProjectUserByProjectAndUser(Project project, User user) throws QueryException{
+    public ProjectUser getProjectUserByProjectAndUser(Project project, User user) throws MiddlewareQueryException {
         ProjectUserDAO dao = new ProjectUserDAO();
         Session session = getCurrentSession();
         if (session != null) {
@@ -712,7 +713,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     }
 
     @Override
-    public List<ProjectUser> getProjectUserByProject(Project project) throws QueryException{
+    public List<ProjectUser> getProjectUserByProject(Project project) throws MiddlewareQueryException {
         ProjectUserDAO dao = new ProjectUserDAO();
         Session session = getCurrentSession();
         if (session != null) {
@@ -723,7 +724,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     }
 
     @Override
-    public void deleteProjectUser(ProjectUser projectUser) throws QueryException {
+    public void deleteProjectUser(ProjectUser projectUser) throws MiddlewareQueryException {
         Session session = getCurrentSession();
         if (session == null) {
             return;
@@ -741,22 +742,24 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             dao.makeTransient(projectUser);
 
             trans.commit();
-        } catch (Exception ex) {
+        } catch (Exception e) {
             // rollback transaction in case of errors
             if (trans != null) {
                 trans.rollback();
             }
-            throw new QueryException("Error encountered while deleting ProjectUser: " + ex.getMessage(), ex);
+            throw new MiddlewareQueryException(
+                    "Error encountered while deleting ProjectUser: WorkbenchDataManager.deleteProjectUser(projectUser=" + projectUser
+                            + "): " + e.getMessage(), e);
         }
     }
 
     @Override
-    public List<User> getUsersByProjectId(Long projectId) throws QueryException {
+    public List<User> getUsersByProjectId(Long projectId) throws MiddlewareQueryException {
         Session session = getCurrentSession();
-        
+
         ProjectUserDAO dao = new ProjectUserDAO();
         List<User> users;
-        if(session != null) {
+        if (session != null) {
             dao.setSession(session);
             users = dao.getUsersByProjectId(projectId);
         } else {
@@ -767,21 +770,21 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     }
 
     @Override
-    public Long countUsersByProjectId(Long projectId) throws QueryException {
+    public long countUsersByProjectId(Long projectId) throws MiddlewareQueryException {
         ProjectUserDAO dao = new ProjectUserDAO();
-        Long result = 0L;
+        long count = 0;
 
         Session session = getCurrentSession();
-        if(session != null) {
+        if (session != null) {
             dao.setSession(session);
-            result = dao.countUsersByProjectId(projectId);
+            count = dao.countUsersByProjectId(projectId);
         }
 
-        return result;
+        return count;
     }
 
     @Override
-    public List<CropType> getInstalledCentralCrops() throws QueryException {
+    public List<CropType> getInstalledCentralCrops() throws MiddlewareQueryException {
         CropTypeDAO dao = new CropTypeDAO();
         List<CropType> cropTypes = new ArrayList<CropType>();
 
@@ -794,9 +797,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         return cropTypes;
 
     }
-    
+
     @Override
-    public CropType getCropTypeByName(String cropName) throws QueryException {
+    public CropType getCropTypeByName(String cropName) throws MiddlewareQueryException {
         CropTypeDAO dao = new CropTypeDAO();
         CropType cropType = null;
 
@@ -810,20 +813,20 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     }
 
     @Override
-    public int addCropType(CropType cropType) throws QueryException {
+    public int addCropType(CropType cropType) throws MiddlewareQueryException {
         Session session = getCurrentSession();
-        if(session == null) {
+        if (session == null) {
             return 0;
         }
-        
+
         CropTypeDAO dao = new CropTypeDAO();
         dao.setSession(session);
 
-        if (dao.getByName(cropType.getCropName()) != null){
-            throw new QueryException("Error encountered while adding crop type: Value already exists");
+        if (dao.getByName(cropType.getCropName()) != null) {
+            LOG.info("Value already exists");
+            return 0;
         }
-        
-        
+
         Transaction trans = null;
         int recordsSaved = 0;
         try {
@@ -833,37 +836,39 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             recordsSaved++;
             // end transaction, commit to database
             trans.commit();
-        } catch (Exception ex) {
-            LOG.error("Error in addCropType: " + ex.getMessage() + "\n" + ex.getStackTrace());
-            ex.printStackTrace();
+        } catch (Exception e) {
+            LOG.error("Error in addCropType: WorkbenchDataManager.addCropType(cropType=" + cropType + "): " + e.getMessage() + "\n"
+                    + e.getStackTrace());
+            e.printStackTrace();
             // rollback transaction in case of errors
             if (trans != null) {
                 trans.rollback();
             }
-            throw new QueryException("Error encountered while adding crop type: " + ex.getMessage(), ex);
+            throw new MiddlewareQueryException("Error encountered while adding crop type: WorkbenchDataManager.addCropType(cropType="
+                    + cropType + "): " + e.getMessage(), e);
         }
 
-        return recordsSaved;    
+        return recordsSaved;
     }
 
     @Override
-    public int addProjectLocationMap(ProjectLocationMap projectLocationMap)
-            throws QueryException {
+    public int addProjectLocationMap(ProjectLocationMap projectLocationMap) throws MiddlewareQueryException {
         List<ProjectLocationMap> list = new ArrayList<ProjectLocationMap>();
         list.add(projectLocationMap);
         return addProjectLocationMap(list);
     }
 
-    public int addProjectLocationMap(List<ProjectLocationMap> projectLocationMapDatas) throws QueryException {
+    public int addProjectLocationMap(List<ProjectLocationMap> projectLocationMapDatas) throws MiddlewareQueryException {
         return addOrUpdateProjectLocationMapData(projectLocationMapDatas, Operation.ADD);
     }
 
-    private int addOrUpdateProjectLocationMapData(List<ProjectLocationMap> projectLocationMapDatas, Operation operation) throws QueryException {
+    private int addOrUpdateProjectLocationMapData(List<ProjectLocationMap> projectLocationMapDatas, Operation operation)
+            throws MiddlewareQueryException {
         Session session = getCurrentSession();
-        if(session == null) {
+        if (session == null) {
             return 0;
         }
-        
+
         Transaction trans = null;
 
         int recordsSaved = 0;
@@ -881,22 +886,24 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             }
             // end transaction, commit to database
             trans.commit();
-        } catch (Exception ex) {
-            LOG.error("Error in addProjectLocation: " + ex.getMessage() + "\n" + ex.getStackTrace());
-            ex.printStackTrace();
+        } catch (Exception e) {
+            LOG.error("Error in addProjectLocation: " + e.getMessage() + "\n" + e.getStackTrace());
+            e.printStackTrace();
             // rollback transaction in case of errors
             if (trans != null) {
                 trans.rollback();
             }
-            throw new QueryException("Error encountered while adding ProjectLocation: " + ex.getMessage(), ex);
+            throw new MiddlewareQueryException(
+                    "Error encountered while adding ProjectLocation: WorkbenchDataManager.addOrUpdateProjectLocationMapData(projectLocationMapDatas="
+                            + projectLocationMapDatas + ", operation=" + operation + "): " + e.getMessage(), e);
         }
 
         return recordsSaved;
     }
-    
-    
+
     @Override
-    public List<ProjectLocationMap> getProjectLocationMapByProjectId(Long projectId, int start, int numOfRows) throws QueryException{
+    public List<ProjectLocationMap> getProjectLocationMapByProjectId(Long projectId, int start, int numOfRows)
+            throws MiddlewareQueryException {
         ProjectLocationMapDAO dao = new ProjectLocationMapDAO();
         List<ProjectLocationMap> projectLocationMap;
         Session session = getCurrentSession();
@@ -910,9 +917,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         return projectLocationMap;
 
     }
-    
+
     @Override
-    public void deleteProjectLocationMap(ProjectLocationMap projectLocationMap) throws QueryException{
+    public void deleteProjectLocationMap(ProjectLocationMap projectLocationMap) throws MiddlewareQueryException {
         Session session = getCurrentSession();
         Transaction trans = null;
 
@@ -925,34 +932,34 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             dao.makeTransient(projectLocationMap);
 
             trans.commit();
-        } catch (Exception ex) {
+        } catch (Exception e) {
             if (trans != null) {
-                    trans.rollback();
+                trans.rollback();
             }
-            throw new QueryException("Error encountered while deleting ProjectLocationMap: " + ex.getMessage(), ex);
+            throw new MiddlewareQueryException(
+                    "Error encountered while deleting ProjectLocationMap: WorkbenchDataManager.deleteProjectLocationMap(projectLocationMap="
+                            + projectLocationMap + "): " + e.getMessage(), e);
         }
     }
 
-
-
     @Override
-    public int addProjectMethod(ProjectMethod projectMethod) throws QueryException {
+    public int addProjectMethod(ProjectMethod projectMethod) throws MiddlewareQueryException {
         List<ProjectMethod> list = new ArrayList<ProjectMethod>();
         list.add(projectMethod);
         return addProjectMethod(list);
     }
 
     @Override
-    public int addProjectMethod(List<ProjectMethod> projectMethodList) throws QueryException {
+    public int addProjectMethod(List<ProjectMethod> projectMethodList) throws MiddlewareQueryException {
         return addOrUpdateProjectMethodData(projectMethodList, Operation.ADD);
     }
-    
-    private int addOrUpdateProjectMethodData(List<ProjectMethod> projectMethodList, Operation add) throws QueryException {
+
+    private int addOrUpdateProjectMethodData(List<ProjectMethod> projectMethodList, Operation operation) throws MiddlewareQueryException {
         Session session = getCurrentSession();
-        if(session == null) {
+        if (session == null) {
             return 0;
         }
-        
+
         Transaction trans = null;
 
         int recordsSaved = 0;
@@ -966,27 +973,36 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             for (ProjectMethod projectMethodListData : projectMethodList) {
                 dao.saveOrUpdate(projectMethodListData);
                 recordsSaved++;
-
             }
             // end transaction, commit to database
             trans.commit();
-        } catch (Exception ex) {
-            LOG.error("Error in addProjectMethod: " + ex.getMessage() + "\n" + ex.getStackTrace());
-            ex.printStackTrace();
+
+            // remove ProjectMethod data from session cache
+            for (ProjectMethod projectMethodListData : projectMethodList) {
+                session.evict(projectMethodListData);
+                recordsSaved++;
+            }
+            session.evict(projectMethodList);
+
+        } catch (Exception e) {
+            LOG.error("Error in addProjectMethod: " + e.getMessage() + "\n" + e.getStackTrace());
+            e.printStackTrace();
             // rollback transaction in case of errors
             if (trans != null) {
                 trans.rollback();
             }
-            throw new QueryException("Error encountered while adding ProjectMethod: " + ex.getMessage(), ex);
+            throw new MiddlewareQueryException(
+                    "Error encountered while adding ProjectMethod: WorkbenchDataManager.addOrUpdateProjectMethodData(projectMethodList="
+                            + projectMethodList + ", operation=" + operation + "): " + e.getMessage(), e);
         }
 
         return recordsSaved;
     }
-    
+
     @Override
-    public List<ProjectMethod> getProjectMethodByProject(Project project, int start, int numOfRows) throws QueryException{
+    public List<ProjectMethod> getProjectMethodByProject(Project project, int start, int numOfRows) throws MiddlewareQueryException {
         Session session = getCurrentSession();
-        
+
         ProjectMethodDAO dao = new ProjectMethodDAO();
         List<ProjectMethod> projectMethods;
         if (session != null) {
@@ -995,13 +1011,12 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         } else {
             projectMethods = new ArrayList<ProjectMethod>();
         }
-
         return projectMethods;
 
     }
-    
+
     @Override
-    public void deleteProjectMethod(ProjectMethod projectMethod) throws QueryException{
+    public void deleteProjectMethod(ProjectMethod projectMethod) throws MiddlewareQueryException {
         Session session = getCurrentSession();
         Transaction trans = null;
 
@@ -1014,32 +1029,35 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             dao.makeTransient(projectMethod);
 
             trans.commit();
-        } catch (Exception ex) {
+        } catch (Exception e) {
             if (trans != null) {
-                    trans.rollback();
+                trans.rollback();
             }
-            throw new QueryException("Error encountered while deleting ProjectMethod: " + ex.getMessage(), ex);
+            throw new MiddlewareQueryException(
+                    "Error encountered while deleting ProjectMethod: WorkbenchDataManager.deleteProjectMethod(projectMethod="
+                            + projectMethod + "): " + e.getMessage(), e);
         }
     }
 
     @Override
-    public int addProjectActivity(ProjectActivity projectActivity) throws QueryException {
+    public int addProjectActivity(ProjectActivity projectActivity) throws MiddlewareQueryException {
         List<ProjectActivity> list = new ArrayList<ProjectActivity>();
         list.add(projectActivity);
         return addProjectActivity(list);
     }
 
     @Override
-    public int addProjectActivity(List<ProjectActivity> projectActivityList) throws QueryException {
+    public int addProjectActivity(List<ProjectActivity> projectActivityList) throws MiddlewareQueryException {
         return addOrUpdateProjectActivityData(projectActivityList, Operation.ADD);
     }
 
-    private int addOrUpdateProjectActivityData(List<ProjectActivity> projectActivityList, Operation add) throws QueryException {
+    private int addOrUpdateProjectActivityData(List<ProjectActivity> projectActivityList, Operation operation)
+            throws MiddlewareQueryException {
         Session session = getCurrentSession();
         if (session == null) {
             return 0;
         }
-        
+
         Transaction trans = null;
 
         int recordsSaved = 0;
@@ -1057,21 +1075,23 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             }
             // end transaction, commit to database
             trans.commit();
-        } catch (Exception ex) {
-            LOG.error("Error in addProjectActivity: " + ex.getMessage() + "\n" + ex.getStackTrace());
-            ex.printStackTrace();
+        } catch (Exception e) {
+            LOG.error("Error in addProjectActivity: " + e.getMessage() + "\n" + e.getStackTrace());
+            e.printStackTrace();
             // rollback transaction in case of errors
             if (trans != null) {
                 trans.rollback();
             }
-            throw new QueryException("Error encountered while adding addProjectActivity: " + ex.getMessage(), ex);
+            throw new MiddlewareQueryException(
+                    "Error encountered while adding addProjectActivity: WorkbenchDataManager.addOrUpdateProjectActivityData(projectActivityList="
+                            + projectActivityList + ", operation=" + operation + "): " + e.getMessage(), e);
         }
 
         return recordsSaved;
     }
 
     @Override
-    public List<ProjectActivity> getProjectActivitiesByProjectId(Long projectId, int start, int numOfRows) throws QueryException {
+    public List<ProjectActivity> getProjectActivitiesByProjectId(Long projectId, int start, int numOfRows) throws MiddlewareQueryException {
         ProjectActivityDAO dao = new ProjectActivityDAO();
         List<ProjectActivity> projectActivities;
         Session session = getCurrentSession();
@@ -1084,9 +1104,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
         return projectActivities;
     }
- 
+
     @Override
-    public void deleteProjectActivity(ProjectActivity projectActivity) throws QueryException{
+    public void deleteProjectActivity(ProjectActivity projectActivity) throws MiddlewareQueryException {
         Session session = getCurrentSession();
         Transaction trans = null;
 
@@ -1099,40 +1119,41 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             dao.makeTransient(projectActivity);
 
             trans.commit();
-        } catch (Exception ex) {
+        } catch (Exception e) {
             if (trans != null) {
-                    trans.rollback();
+                trans.rollback();
             }
-            throw new QueryException("Error encountered while deleting ProjectActivity: " + ex.getMessage(), ex);
+            throw new MiddlewareQueryException(
+                    "Error encountered while deleting ProjectActivity: WorkbenchDataManager.deleteProjectActivity(projectActivity="
+                            + projectActivity + "): " + e.getMessage(), e);
         }
     }
 
-
     @Override
-    public Long countProjectActivitiesByProjectId(Long projectId) throws QueryException {
+    public long countProjectActivitiesByProjectId(Long projectId) throws MiddlewareQueryException {
         ProjectActivityDAO dao = new ProjectActivityDAO();
-        Long result = 0L;
+        long count = 0;
 
         Session session = getCurrentSession();
         if (session != null) {
             dao.setSession(session);
-            result = dao.countByProjectId(projectId);
+            count = dao.countByProjectId(projectId);
         }
 
-        return result;
+        return count;
     }
 
     @Override
-    public void addToolConfiguration(ToolConfiguration toolConfig) throws QueryException {
+    public void addToolConfiguration(ToolConfiguration toolConfig) throws MiddlewareQueryException {
         addOrUpdateToolConfiguration(toolConfig, Operation.ADD);
     }
 
     @Override
-    public void updateToolConfiguration(ToolConfiguration toolConfig) throws QueryException {
+    public void updateToolConfiguration(ToolConfiguration toolConfig) throws MiddlewareQueryException {
         addOrUpdateToolConfiguration(toolConfig, Operation.UPDATE);
     }
-    
-    private void addOrUpdateToolConfiguration(ToolConfiguration toolConfig, Operation op) throws QueryException {
+
+    private void addOrUpdateToolConfiguration(ToolConfiguration toolConfig, Operation op) throws MiddlewareQueryException {
         Session session = getCurrentSession();
         Transaction trans = null;
 
@@ -1142,25 +1163,27 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             ToolConfigurationDAO dao = new ToolConfigurationDAO();
             dao.setSession(session);
 
-//            Do specific add/update operations here
-//            if(Operation.ADD.equals(op)) {
-//                
-//            } else if (Operation.UPDATE.equals(op)) {
-//                
-//            }
+            //            Do specific add/update operations here
+            //            if(Operation.ADD.equals(op)) {
+            //                
+            //            } else if (Operation.UPDATE.equals(op)) {
+            //                
+            //            }
             dao.saveOrUpdate(toolConfig);
 
             trans.commit();
-        } catch (Exception ex) {
+        } catch (Exception e) {
             if (trans != null) {
-                    trans.rollback();
+                trans.rollback();
             }
-            throw new QueryException("Error encountered while saving ToolConfiguration: " + ex.getMessage(), ex);
+            throw new MiddlewareQueryException(
+                    "Error encountered while saving ToolConfiguration: WorkbenchDataManager.addOrUpdateToolConfiguration(toolConfig="
+                            + toolConfig + ", operation=" + op + "): " + e.getMessage(), e);
         }
     }
-    
+
     @Override
-    public void deleteToolConfiguration(ToolConfiguration toolConfig) throws QueryException {
+    public void deleteToolConfiguration(ToolConfiguration toolConfig) throws MiddlewareQueryException {
         Session session = getCurrentSession();
         Transaction trans = null;
 
@@ -1173,116 +1196,121 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             dao.makeTransient(toolConfig);
 
             trans.commit();
-        } catch (Exception ex) {
+        } catch (Exception e) {
             if (trans != null) {
-                    trans.rollback();
+                trans.rollback();
             }
-            throw new QueryException("Error encountered while deleting ToolConfiguration: " + ex.getMessage(), ex);
+            throw new MiddlewareQueryException(
+                    "Error encountered while deleting ToolConfiguration: WorkbenchDataManager.deleteToolConfiguration(toolConfig="
+                            + toolConfig + "): " + e.getMessage(), e);
         }
     }
 
     @Override
-    public List<ToolConfiguration> getListOfToolConfigurationsByToolId(Long toolId) throws QueryException {
+    public List<ToolConfiguration> getListOfToolConfigurationsByToolId(Long toolId) throws MiddlewareQueryException {
         ToolConfigurationDAO dao = new ToolConfigurationDAO();
         dao.setSession(getCurrentSession());
         return dao.getListOfToolConfigurationsByToolId(toolId);
     }
 
     @Override
-    public ToolConfiguration getToolConfigurationByToolIdAndConfigKey(Long toolId, String configKey)
-        throws QueryException {
-        
+    public ToolConfiguration getToolConfigurationByToolIdAndConfigKey(Long toolId, String configKey) throws MiddlewareQueryException {
+
         ToolConfigurationDAO dao = new ToolConfigurationDAO();
         dao.setSession(getCurrentSession());
         return dao.getToolConfigurationByToolIdAndConfigKey(toolId, configKey);
     }
-    
+
     @Override
-    public IbdbUserMap addIbdbUserMap(IbdbUserMap userMap) throws QueryException {
+    public IbdbUserMap addIbdbUserMap(IbdbUserMap userMap) throws MiddlewareQueryException {
         Session session = getCurrentSession();
         Transaction trans = null;
-        
+
         try {
             trans = session.beginTransaction();
-            
+
             IbdbUserMapDAO dao = new IbdbUserMapDAO();
             dao.setSession(session);
             dao.saveOrUpdate(userMap);
-            
-            trans.commit();
-        }
-        catch (Exception e) {
-            if (trans != null) {
-                trans.rollback();
-            }
-            
-            throw new QueryException("Error encountered while adding IbdbUserMap: " + e.getMessage(), e);
-        }
-        
-        return userMap;
-    }
-    
-    @Override
-    public Integer getLocalIbdbUserId(Integer workbenchUserId, Long projectId) throws QueryException {
-        Session session = getCurrentSession();
-        Transaction trans = null;
-        
-        Integer ibdbUserId;
-        try {
-            trans = session.beginTransaction();
-            
-            IbdbUserMapDAO dao = new IbdbUserMapDAO();
-            dao.setSession(session);
-            ibdbUserId = dao.getLocalIbdbUserId(workbenchUserId, projectId);
-            
+
             trans.commit();
         } catch (Exception e) {
             if (trans != null) {
                 trans.rollback();
             }
-            
-            throw new QueryException("Error encountered while retrieving Local IBDB user id: " + e.getMessage(), e);
+
+            throw new MiddlewareQueryException("Error encountered while adding IbdbUserMap: WorkbenchDataManager.addIbdbUserMap(userMap="
+                    + userMap + "): " + e.getMessage(), e);
         }
-        
-        return ibdbUserId;
+
+        return userMap;
     }
-    
+
     @Override
-    public WorkbenchRuntimeData updateWorkbenchRuntimeData(WorkbenchRuntimeData workbenchRuntimeData) throws QueryException {
+    public Integer getLocalIbdbUserId(Integer workbenchUserId, Long projectId) throws MiddlewareQueryException {
         Session session = getCurrentSession();
         Transaction trans = null;
-        
+
+        Integer ibdbUserId;
         try {
             trans = session.beginTransaction();
-            
-            WorkbenchRuntimeDataDAO dao = new WorkbenchRuntimeDataDAO();
+
+            IbdbUserMapDAO dao = new IbdbUserMapDAO();
             dao.setSession(session);
-            dao.saveOrUpdate(workbenchRuntimeData);
-            
+            ibdbUserId = dao.getLocalIbdbUserId(workbenchUserId, projectId);
+
             trans.commit();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             if (trans != null) {
                 trans.rollback();
             }
-            
-            throw new QueryException("Error encountered while adding IbdbUserMap: " + e.getMessage(), e);
+
+            throw new MiddlewareQueryException(
+                    "Error encountered while retrieving Local IBDB user id: WorkbenchDataManager.getLocalIbdbUserId(workbenchUserId="
+                            + workbenchUserId + ", projectId=" + projectId + "): " + e.getMessage(), e);
         }
-        
+
+        return ibdbUserId;
+    }
+
+    @Override
+    public WorkbenchRuntimeData updateWorkbenchRuntimeData(WorkbenchRuntimeData workbenchRuntimeData) throws MiddlewareQueryException {
+        Session session = getCurrentSession();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+
+            WorkbenchRuntimeDataDAO dao = new WorkbenchRuntimeDataDAO();
+            dao.setSession(session);
+            dao.saveOrUpdate(workbenchRuntimeData);
+
+            trans.commit();
+        } catch (Exception e) {
+            if (trans != null) {
+                trans.rollback();
+            }
+
+            throw new MiddlewareQueryException(
+                    "Error encountered while adding IbdbUserMap: WorkbenchDataManager.updateWorkbenchRuntimeData(workbenchRuntimeData="
+                            + workbenchRuntimeData + "): " + e.getMessage(), e);
+        }
+
         return workbenchRuntimeData;
     }
-    
+
     @Override
-    public WorkbenchRuntimeData getWorkbenchRuntimeData() throws QueryException {
+    public WorkbenchRuntimeData getWorkbenchRuntimeData() throws MiddlewareQueryException {
         try {
             WorkbenchRuntimeDataDAO dao = new WorkbenchRuntimeDataDAO();
             dao.setSession(getCurrentSession());
             List<WorkbenchRuntimeData> list = dao.getAll(0, 1);
-            
+
             return list.size() > 0 ? list.get(0) : null;
-        }
-        catch (Exception e) {
-            throw new QueryException("Error encountered while getting WorkbenchRuntimeData: " + e.getMessage(), e);
+        } catch (Exception e) {
+            throw new MiddlewareQueryException(
+                    "Error encountered while getting WorkbenchRuntimeData: WorkbenchDataManager.getWorkbenchRuntimeData(): "
+                            + e.getMessage(), e);
         }
     }
 }

@@ -39,24 +39,23 @@ public class TestGenotypicDataManagerImpl{
 
     private static ManagerFactory factory;
     private static GenotypicDataManager manager;
-    
+
     @BeforeClass
     public static void setUp() throws Exception {
-        DatabaseConnectionParameters local = new DatabaseConnectionParameters("testDatabaseConfig.properties", "local"); 
+        DatabaseConnectionParameters local = new DatabaseConnectionParameters("testDatabaseConfig.properties", "local");
         DatabaseConnectionParameters central = new DatabaseConnectionParameters("testDatabaseConfig.properties", "central");
         factory = new ManagerFactory(local, central);
         manager = factory.getGenotypicDataManager();
     }
-    
+
     @Test
     public void testGetNameIdsByGermplasmIds() throws Exception {
         List<Integer> germplasmIds = new ArrayList<Integer>();
         germplasmIds.add(Integer.valueOf(-3787));
         germplasmIds.add(Integer.valueOf(-6785));
         germplasmIds.add(Integer.valueOf(-4070));
-        
         List<Integer> results = manager.getNameIdsByGermplasmIds(germplasmIds);
-        System.out.println("RESULTS (testGetNameIdsByGermplasmIds):" + results);
+        System.out.println("testGetNameIdsByGermplasmIds(" + germplasmIds + ") RESULTS: " + results);
     }
 
     @Test
@@ -65,80 +64,76 @@ public class TestGenotypicDataManagerImpl{
         nameIds.add(Integer.valueOf(-1));
         nameIds.add(Integer.valueOf(-2));
         nameIds.add(Integer.valueOf(-3));
-        
         List<Name> results = manager.getNamesByNameIds(nameIds);
-        System.out.println("RESULTS (testGetNamesByNameIds):" + results);
+        System.out.println("testGetNamesByNameIds(" + nameIds + ") RESULTS: " + results);
     }
-    
+
     @Test
     public void testGetNameByNameId() throws Exception {
-        Name name = manager.getNameByNameId(-1);
-        System.out.println("RESULTS (testGetNameByNameId): " + name);
+        Integer nameId = -1;
+        Name name = manager.getNameByNameId(nameId);
+        System.out.println("testGetNameByNameId(nameId=" + nameId + ") RESULTS: " + name);
     }
-    
+
     @Test
     public void testGetFirstFiveMaps() throws Exception {
         List<Map> maps = manager.getAllMaps(0, 5, Database.LOCAL);
         System.out.println("RESULTS (testGetFirstFiveMaps): " + maps);
     }
-    
-    
+
     @Test
     public void testGetMapInfoByMapName() throws Exception {
         String mapName = ""; //TODO: test with a given map name
         List<MapInfo> results = manager.getMapInfoByMapName(mapName, Database.LOCAL);
-        System.out.println("RESULTS (testGetMapInfoByMapName): " + results);
+        System.out.println("testGetMapInfoByMapName(mapName=" + mapName + ") RESULTS: " + results);
     }
-    
 
     @Test
     public void testCountDatasetNames() throws Exception {
-        int results = manager.countDatasetNames(Database.LOCAL);
-        System.out.println("RESULTS (testCountDatasetNames): " + results);
+        long results = manager.countDatasetNames(Database.LOCAL);
+        System.out.println("testCountDatasetNames(Database.LOCAL) RESULTS: " + results);
     }
 
-    
     @Test
     public void testGetDatasetNames() throws Exception {
         List<String> results = manager.getDatasetNames(0, 5, Database.LOCAL);
-        System.out.println("RESULTS (testGetDatasetNames): " + results);
+        System.out.println("testGetDatasetNames(0,5,Database.Local) RESULTS: " + results);
     }
-    
 
     @Test
     public void testGetDatasetDetailsByDatasetName() throws Exception {
         String datasetName = "MARS";
         List<DatasetElement> results = manager.getDatasetDetailsByDatasetName(datasetName, Database.LOCAL);
-        System.out.println("RESULTS (testGetDatasetDetailsByDatasetName): " + results);
+        System.out.println("testGetDatasetDetailsByDatasetName(" + datasetName + ",LOCAL) RESULTS: " + results);
     }
-    
+
     @Test
     public void testGetMarkerIdsByMarkerNames() throws Exception {
         List<String> markerNames = new ArrayList<String>();
         markerNames.add("1_0085");
         markerNames.add("1_0319");
         markerNames.add("1_0312");
-        
+
         /* Expected results are: [1, 2, 3, 174, 199, 201]
          * This is based on the sample input data templates uploaded to GDMS */
         List<Integer> markerIds = manager.getMarkerIdsByMarkerNames(markerNames, 0, 100, Database.LOCAL);
-        System.out.println("getMarkerIdsByMarkerNames: " + markerIds);
+        System.out.println("getMarkerIdsByMarkerNames (" + markerNames + ") RESULTS: " + markerIds);
     }
 
     @Test
     public void testGetMarkerIdsByDatasetId() throws Exception {
         Integer datasetId = Integer.valueOf(2);
         List<Integer> results = manager.getMarkerIdsByDatasetId(datasetId);
-        System.out.println("RESULTS (testGetMarkerIdByDatasetId): " + results);
+        System.out.println("testGetMarkerIdByDatasetId(" + datasetId + ") RESULTS: " + results);
     }
-    
+
     @Test
     public void testGetParentsByDatasetId() throws Exception {
         Integer datasetId = Integer.valueOf(2);
         List<ParentElement> results = manager.getParentsByDatasetId(datasetId);
-        System.out.println("RESULTS (testGetParentsByDatasetId): " + results);
+        System.out.println("testGetParentsByDatasetId(" + datasetId + ") RESULTS: " + results);
     }
-    
+
     @Test
     public void testGetMarkerTypesByMarkerIds() throws Exception {
         List<Integer> markerIds = new ArrayList<Integer>();
@@ -147,50 +142,50 @@ public class TestGenotypicDataManagerImpl{
         markerIds.add(Integer.valueOf(3));
         markerIds.add(Integer.valueOf(4));
         markerIds.add(Integer.valueOf(5));
-        
+
         List<String> results = manager.getMarkerTypesByMarkerIds(markerIds);
-        System.out.println("RESULTS (testGetMarkerTypeByMarkerIds): " + results);
+        System.out.println("testGetMarkerTypeByMarkerIds(" + markerIds + ") RESULTS: " + results);
     }
-    
+
     @Test
     public void testGetMarkerNamesByGIds() throws Exception {
         List<Integer> gIds = new ArrayList<Integer>();
         gIds.add(Integer.valueOf(-4072));
         gIds.add(Integer.valueOf(-4070));
         gIds.add(Integer.valueOf(-4069));
-        
+
         List<MarkerNameElement> results = manager.getMarkerNamesByGIds(gIds);
-        System.out.println("RESULTS (testGetMarkerNamesByGIds): " + results);
+        System.out.println("testGetMarkerNamesByGIds(" + gIds + ") RESULTS: " + results);
     }
-     
-    
+
     @Test
     public void testGetGermplasmNamesByMarkerNames() throws Exception {
         List<String> markerNames = new ArrayList<String>();
         markerNames.add("1_0001");
         markerNames.add("1_0007");
         markerNames.add("1_0013");
-        
-        List<GermplasmMarkerElement> results = (List<GermplasmMarkerElement>) manager.getGermplasmNamesByMarkerNames(markerNames, Database.LOCAL);
-        System.out.println("RESULTS (testGetGermplasmNamesByMarkerNames): " + results);
+
+        List<GermplasmMarkerElement> results = (List<GermplasmMarkerElement>) manager.getGermplasmNamesByMarkerNames(markerNames,
+                Database.LOCAL);
+        System.out.println("testGetGermplasmNamesByMarkerNames(" + markerNames + ")  RESULTS: " + results);
     }
-    
+
     @Test
     public void testGetMappingValuesByGidsAndMarkerNames() throws Exception {
-        List<String> markerNames = new ArrayList<String>();
-        markerNames.add("1_0085");
-        markerNames.add("1_0319");
-        markerNames.add("1_0312");
         List<Integer> gids = new ArrayList<Integer>();
         gids.add(-3785);
         gids.add(-3786);
         gids.add(-3787);
+        List<String> markerNames = new ArrayList<String>();
+        markerNames.add("1_0085");
+        markerNames.add("1_0319");
+        markerNames.add("1_0312");
         /* Expected results are: [datasetId=2, mappingType=allelic, parentAGid=-6785, parentBGid=-6786, markerType=S]
          * This is based on the sample input data templates uploaded to GDMS */
         List<MappingValueElement> mappingValues = manager.getMappingValuesByGidsAndMarkerNames(gids, markerNames, 0, 100);
-        System.out.println("getMappingValuesByGidsAndMarkerNames: " + mappingValues);
+        System.out.println("testGetMappingValuesByGidsAndMarkerNames(" + gids + ", " + markerNames + ") RESULTS: " + mappingValues);
     }
-    
+
     @Test
     public void testGetAllelicValuesByGidsAndMarkerNames() throws Exception {
         List<String> markerNames = new ArrayList<String>();
@@ -216,33 +211,32 @@ public class TestGenotypicDataManagerImpl{
         /* Results will vary depending on the database connected to.
          * As of the moment, we have no data that contains test values in all 3 source tables */
         List<AllelicValueElement> allelicValues = manager.getAllelicValuesByGidsAndMarkerNames(gids, markerNames);
-        System.out.println("getAllelicValuesByGidsAndMarkerNames: " + allelicValues);
-    }
-    
-    @Test
-    public void testGetAllelicValuesFromCharValuesByDatasetId() throws Exception {        
-        Integer datasetId = Integer.valueOf(2);
-        int count = manager.countAllelicValuesFromCharValuesByDatasetId(datasetId);
-        List<AllelicValueWithMarkerIdElement> allelicValues = manager.getAllelicValuesFromCharValuesByDatasetId(datasetId, 0, count);
-        System.out.println("RESULTS (testGetAllelicValuesFromCharValuesByDatasetId): " + allelicValues);
+        System.out.println("testGetAllelicValuesByGidsAndMarkerNames(" + gids + ", " + markerNames + ") RESULTS: " + allelicValues);
     }
 
     @Test
-    public void testGetAllelicValuesFromAlleleValuesByDatasetId() throws Exception {        
+    public void testGetAllelicValuesFromCharValuesByDatasetId() throws Exception {
         Integer datasetId = Integer.valueOf(2);
-        int count = manager.countAllelicValuesFromCharValuesByDatasetId(datasetId);
-        List<AllelicValueWithMarkerIdElement> allelicValues = manager.getAllelicValuesFromAlleleValuesByDatasetId(datasetId, 0, count);
-        System.out.println("RESULTS (testGetAllelicValuesFromAlleleValuesByDatasetId): " + allelicValues);
+        long count = manager.countAllelicValuesFromCharValuesByDatasetId(datasetId);
+        List<AllelicValueWithMarkerIdElement> allelicValues = manager.getAllelicValuesFromCharValuesByDatasetId(datasetId, 0, (int) count);
+        System.out.println("testGetAllelicValuesFromCharValuesByDatasetId(" + datasetId + ") RESULTS: " + allelicValues);
     }
 
     @Test
-    public void testGetAllelicValuesFromMappingPopValuesByDatasetId() throws Exception {        
+    public void testGetAllelicValuesFromAlleleValuesByDatasetId() throws Exception {
         Integer datasetId = Integer.valueOf(2);
-        int count = manager.countAllelicValuesFromCharValuesByDatasetId(datasetId);
-        List<AllelicValueWithMarkerIdElement> allelicValues = manager.getAllelicValuesFromMappingPopValuesByDatasetId(datasetId, 0, count);
-        System.out.println("RESULTS (testGetAllelicValuesFromMappingPopValuesByDatasetId): " + allelicValues);
+        long count = manager.countAllelicValuesFromCharValuesByDatasetId(datasetId);
+        List<AllelicValueWithMarkerIdElement> allelicValues = manager.getAllelicValuesFromAlleleValuesByDatasetId(datasetId, 0, (int) count);
+        System.out.println("testGetAllelicValuesFromAlleleValuesByDatasetId(" + datasetId + ") RESULTS: " + allelicValues);
     }
-    
+
+    @Test
+    public void testGetAllelicValuesFromMappingPopValuesByDatasetId() throws Exception {
+        Integer datasetId = Integer.valueOf(2);
+        long count = manager.countAllelicValuesFromCharValuesByDatasetId(datasetId);
+        List<AllelicValueWithMarkerIdElement> allelicValues = manager.getAllelicValuesFromMappingPopValuesByDatasetId(datasetId, 0, (int) count);
+        System.out.println("testGetAllelicValuesFromMappingPopValuesByDatasetId(" + datasetId + ") RESULTS: " + allelicValues);
+    }
 
     @Test
     public void testGetMarkerNamesByMarkerIds() throws Exception {
@@ -252,129 +246,142 @@ public class TestGenotypicDataManagerImpl{
         markerIds.add(-3);
         markerIds.add(-4);
         markerIds.add(-5);
-        
+
         List<MarkerIdMarkerNameElement> markerNames = manager.getMarkerNamesByMarkerIds(markerIds);
-        System.out.println("testGetMarkerNamesByMarkerIds: ");
-        for(MarkerIdMarkerNameElement e : markerNames) {
+        System.out.println("testGetMarkerNamesByMarkerIds(" + markerIds + ") RESULTS: ");
+        for (MarkerIdMarkerNameElement e : markerNames) {
             System.out.println(e.getMarkerId() + " : " + e.getMarkerName());
-        }        
+        }
     }
-    
+
     @Test
     public void testGetAllMarkerTypes() throws Exception {
         List<String> markerTypes = manager.getAllMarkerTypes(0, 10);
-        System.out.println("testGetAllMarkerTypes: " + markerTypes);
-    }
-    
-    @Test
-    public void testCountAllMarkerTypes() throws Exception {
-        long result = manager.countAllMarkerTypes(Database.LOCAL);
-        System.out.println("testCountAllMarkerTypes: " + result);
-    }
-    
-    @Test 
-    public void testGetMarkerNamesByMarkerType() throws Exception {
-        List<String> markerNames = manager.getMarkerNamesByMarkerType("asdf", 1, 10);
-        System.out.println("testGetMarkerNamesByMarkerType: " + markerNames);
-    }
-    
-    @Test
-    public void testCountMarkerNamesByMarkerType() throws Exception {
-        long result = manager.countMarkerNamesByMarkerType("asdf");
-        System.out.println("testCountMarkerNamesByMarkerType: " + result);
-    }
-    
-    @Test
-    public void testGetMarkerInfoByMarkerName() throws Exception {        
-        String markerName = "1_0437";
-        int count = manager.countMarkerInfoByMarkerName(markerName);
-        System.out.println("RESULT (countMarkerInfoByMarkerName) = " + count);
-        List<MarkerInfo> results = manager.getMarkerInfoByMarkerName(markerName, 0, count);
-        System.out.println("RESULTS (getMarkerInfoByMarkerName): " + results);
-    }
-    
-    @Test
-    public void testGetMarkerInfoByGenotype() throws Exception {        
-        String genotype = "";
-        int count = manager.countMarkerInfoByGenotype(genotype);
-        System.out.println("RESULT (countMarkerInfoByGenotype) = " + count);
-        List<MarkerInfo> results = manager.getMarkerInfoByGenotype(genotype, 0, count);
-        System.out.println("RESULTS (getMarkerInfoByGenotype): " + results);
-    }
-    
-    
-    @Test
-    public void testGetMarkerInfoByDbAccessionId() throws Exception {        
-        String dbAccessionId = "";
-        int count = manager.countMarkerInfoByDbAccessionId(dbAccessionId);
-        System.out.println("RESULT (countMarkerInfoByDbAccessionId) = " + count);
-        List<MarkerInfo> results = manager.getMarkerInfoByDbAccessionId(dbAccessionId, 0, count);
-        System.out.println("RESULTS (getMarkerInfoByDbAccessionId): " + results);
+        System.out.println("testGetAllMarkerTypes(0,10) RESULTS: " + markerTypes);
     }
 
-    @Test 
-    public void testGetGidsFromCharValuesByMarkerId() throws Exception {
-        List<Integer> gids = manager.getGIDsFromCharValuesByMarkerId(1, 1, 10);
-        System.out.println("testGetGidsFromCharValuesByMarkerId: " + gids);
+    @Test
+    public void testCountAllMarkerTypesLocal() throws Exception {
+        long result = manager.countAllMarkerTypes(Database.LOCAL);
+        System.out.println("testCountAllMarkerTypes(Database.LOCAL) RESULTS: " + result);
     }
-    
+
+    @Test
+    public void testCountAllMarkerTypesCentral() throws Exception {
+        long result = manager.countAllMarkerTypes(Database.CENTRAL);
+        System.out.println("testCountAllMarkerTypes(Database.CENTRAL) RESULTS: " + result);
+    }
+
+    @Test
+    public void testGetMarkerNamesByMarkerType() throws Exception {
+        String markerType = "asdf";
+        List<String> markerNames = manager.getMarkerNamesByMarkerType(markerType, 1, 10);
+        System.out.println("testGetMarkerNamesByMarkerType(" + markerType + ") RESULTS: " + markerNames);
+    }
+
+    @Test
+    public void testCountMarkerNamesByMarkerType() throws Exception {
+        String markerType = "asdf";
+        long result = manager.countMarkerNamesByMarkerType(markerType);
+        System.out.println("testCountMarkerNamesByMarkerType(" + markerType + ") RESULTS: " + result);
+    }
+
+    @Test
+    public void testGetMarkerInfoByMarkerName() throws Exception {
+        String markerName = "1_0437";
+        long count = manager.countMarkerInfoByMarkerName(markerName);
+        System.out.println("countMarkerInfoByMarkerName(" + markerName + ")  RESULTS: " + count);
+        List<MarkerInfo> results = manager.getMarkerInfoByMarkerName(markerName, 0, (int) count);
+        System.out.println("testGetMarkerInfoByMarkerName(" + markerName + ") RESULTS: " + results);
+    }
+
+    @Test
+    public void testGetMarkerInfoByGenotype() throws Exception {
+        String genotype = "";
+        long count = manager.countMarkerInfoByGenotype(genotype);
+        System.out.println("countMarkerInfoByGenotype(" + genotype + ") RESULTS: " + count);
+        List<MarkerInfo> results = manager.getMarkerInfoByGenotype(genotype, 0, (int) count);
+        System.out.println("testGetMarkerInfoByGenotype(" + genotype + ") RESULTS: " + results);
+    }
+
+    @Test
+    public void testGetMarkerInfoByDbAccessionId() throws Exception {
+        String dbAccessionId = "";
+        long count = manager.countMarkerInfoByDbAccessionId(dbAccessionId);
+        System.out.println("countMarkerInfoByDbAccessionId(" + dbAccessionId + ")  RESULTS: " + count);
+        List<MarkerInfo> results = manager.getMarkerInfoByDbAccessionId(dbAccessionId, 0, (int) count);
+        System.out.println("testGetMarkerInfoByDbAccessionId(" + dbAccessionId + ")  RESULTS: " + results);
+    }
+
+    @Test
+    public void testGetGidsFromCharValuesByMarkerId() throws Exception {
+        Integer markerId = 1;
+        List<Integer> gids = manager.getGIDsFromCharValuesByMarkerId(markerId, 1, 10);
+        System.out.println("testGetGidsFromCharValuesByMarkerId(" + markerId + ") RESULTS: " + gids);
+    }
+
     @Test
     public void testCountGidsFromCharValuesByMarkerId() throws Exception {
-        Long result = manager.countGIDsFromCharValuesByMarkerId(1);
-        System.out.println("testCountGidsFromCharValuesByMarkerId: " + result);
+        Integer markerId = 1;
+        long result = manager.countGIDsFromCharValuesByMarkerId(markerId);
+        System.out.println("testCountGidsFromCharValuesByMarkerId(" + markerId + ") RESULTS: " + result);
     }
-    
-    @Test 
+
+    @Test
     public void testGetGidsFromAlleleValuesByMarkerId() throws Exception {
-        List<Integer> gids = manager.getGIDsFromCharValuesByMarkerId(1, 1, 10);
-        System.out.println("testGetGidsFromAlleleValuesByMarkerId: " + gids);
+        Integer markerId = 1;
+        List<Integer> gids = manager.getGIDsFromCharValuesByMarkerId(markerId, 1, 10);
+        System.out.println("testGetGidsFromAlleleValuesByMarkerId(" + markerId + ") RESULTS: " + gids);
     }
-    
+
     @Test
     public void testCountGidsFromAlleleValuesByMarkerId() throws Exception {
-        Long result = manager.countGIDsFromCharValuesByMarkerId(1);
-        System.out.println("testCountGidsFromAlleleValuesByMarkerId: " + result);
+        Integer markerId = 1;
+        long result = manager.countGIDsFromCharValuesByMarkerId(markerId);
+        System.out.println("testCountGidsFromAlleleValuesByMarkerId(" + markerId + ") RESULTS: " + result);
     }
-    
-    @Test 
+
+    @Test
     public void testGetGidsFromMappingPopValuesByMarkerId() throws Exception {
-        List<Integer> gids = manager.getGIDsFromMappingPopValuesByMarkerId(1, 1, 10);
-        System.out.println("testGetGidsFromMappingPopValuesByMarkerId: " + gids);
+        Integer markerId = 1;
+        List<Integer> gids = manager.getGIDsFromMappingPopValuesByMarkerId(markerId, 1, 10);
+        System.out.println("testGetGidsFromMappingPopValuesByMarkerId(" + markerId + ") RESULTS: " + gids);
     }
-    
+
     @Test
     public void testCountGidsFromMappingPopValuesByMarkerId() throws Exception {
-        Long result = manager.countGIDsFromMappingPopValuesByMarkerId(1);
-        System.out.println("testCountGidsFromMappingPopValuesByMarkerId: " + result);
+        Integer markerId = 1;
+        long result = manager.countGIDsFromMappingPopValuesByMarkerId(markerId);
+        System.out.println("testCountGidsFromMappingPopValuesByMarkerId(" + markerId + ") RESULTS: " + result);
     }
-    
+
     @Test
     public void testGetAllDbAccessionIdsFromMarker() throws Exception {
         List<String> dbAccessionIds = manager.getAllDbAccessionIdsFromMarker(1, 10);
-        System.out.println("testGetAllDbAccessionIdsFromMarker: " + dbAccessionIds);
+        System.out.println("testGetAllDbAccessionIdsFromMarker(1,10) RESULTS: " + dbAccessionIds);
     }
-    
-    @Test 
+
+    @Test
     public void testCountAllDbAccessionIdsFromMarker() throws Exception {
-        Long result = manager.countAllDbAccessionIdsFromMarker();
-        System.out.println("testCountAllDbAccessionIdsFromMarker: " + result);
+        long result = manager.countAllDbAccessionIdsFromMarker();
+        System.out.println("testCountAllDbAccessionIdsFromMarker() RESULTS: " + result);
     }
-    
+
     @Test
     public void testGetNidsFromAccMetadatasetByDatasetIds() throws Exception {
         List<Integer> datasetIds = new ArrayList<Integer>();
         datasetIds.add(-1);
         datasetIds.add(-2);
         datasetIds.add(-3);
-        
+
         List<Integer> gids = new ArrayList<Integer>();
         gids.add(-2);
-        
+
         List<Integer> nids = manager.getNidsFromAccMetadatasetByDatasetIds(datasetIds, 0, 10);
         List<Integer> nidsWithGidFilter = manager.getNidsFromAccMetadatasetByDatasetIds(datasetIds, gids, 0, 10);
-        
-        System.out.println("testGetNidsFromAccMetadatasetByDatasetIds: " + nids);
-        System.out.println("testGetNidsFromAccMetadatasetByDatasetIds with gid filter: " + nidsWithGidFilter);
+
+        System.out.println("testGetNidsFromAccMetadatasetByDatasetIds RESULTS: " + nids);
+        System.out.println("testGetNidsFromAccMetadatasetByDatasetIds with gid filter RESULTS: " + nidsWithGidFilter);
     }
 
     @AfterClass

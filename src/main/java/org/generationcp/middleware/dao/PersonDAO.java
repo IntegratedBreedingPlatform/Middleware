@@ -14,23 +14,29 @@ package org.generationcp.middleware.dao;
 
 import java.math.BigInteger;
 
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Person;
+import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 
 public class PersonDAO extends GenericDAO<Person, Integer>{
 
-    public boolean isPersonExists(String firstName, String lastName) {
-        StringBuilder sql = new StringBuilder();
-        sql.append("SELECT COUNT(1) FROM PERSONS p ")
-           .append("WHERE UPPER(p.fname) = :firstName ")
-           .append("AND UPPER(p.lname) = :lastName");
-        
-        SQLQuery query = getSession().createSQLQuery(sql.toString());
-        query.setParameter("firstName", firstName);
-        query.setParameter("lastName", lastName);
+    public boolean isPersonExists(String firstName, String lastName) throws MiddlewareQueryException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT COUNT(1) FROM PERSONS p ").append("WHERE UPPER(p.fname) = :firstName ")
+                    .append("AND UPPER(p.lname) = :lastName");
 
-        BigInteger count =  (BigInteger) query.uniqueResult();
-        
-        return count.longValue() > 0;
+            SQLQuery query = getSession().createSQLQuery(sql.toString());
+            query.setParameter("firstName", firstName);
+            query.setParameter("lastName", lastName);
+
+            BigInteger count = (BigInteger) query.uniqueResult();
+
+            return count.longValue() > 0;
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with isPersonExists(firstName=" + firstName + ", lastName=" + lastName
+                    + ") query from Person: " + e.getMessage(), e);
+        }
     }
 }

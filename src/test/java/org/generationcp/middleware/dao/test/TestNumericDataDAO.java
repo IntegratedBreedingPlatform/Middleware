@@ -38,15 +38,23 @@ public class TestNumericDataDAO{
 
     @Test
     public void testGetObservationUnitIdsByTraitScaleMethodAndValueCombinations() throws Exception {
+        Integer traitId = Integer.valueOf(1003);
+        Integer scaleId = Integer.valueOf(9);
+        Integer methodId = Integer.valueOf(30);
         NumericRange range = new NumericRange(new Double(2000), new Double(3000));
-        TraitCombinationFilter combination = new TraitCombinationFilter(Integer.valueOf(1003), Integer.valueOf(9), Integer.valueOf(30), range);
+        TraitCombinationFilter combination = new TraitCombinationFilter(traitId, scaleId, methodId, range);
         List<TraitCombinationFilter> filters = new ArrayList<TraitCombinationFilter>();
         filters.add(combination);
 
         List<Integer> results = dao.getObservationUnitIdsByTraitScaleMethodAndValueCombinations(filters, 0, 10);
-        System.out.println("RESULTS:");
+        System.out.println("testGetObservationUnitIdsByTraitScaleMethodAndValueCombinations RESULTS:");
+        System.out.println("  filters: traitId = " + traitId + 
+                                    ", scaleId = " + scaleId + 
+                                    ", methodId = " + methodId + 
+                                    ", range start = " + range.getStart() + 
+                                    ", range end = " + range.getEnd());
         for (Integer result : results){
-            System.out.println(result);
+            System.out.println("  " + result);
         }
     }
 

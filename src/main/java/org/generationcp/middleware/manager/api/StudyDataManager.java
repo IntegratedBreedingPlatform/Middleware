@@ -14,7 +14,7 @@ package org.generationcp.middleware.manager.api;
 
 import java.util.List;
 
-import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.CharacterDataElement;
@@ -59,10 +59,10 @@ public interface StudyDataManager{
      *            - the database instance to connect to: Database.CENTRAL,
      *            Database.LOCAL
      * @return
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
     public List<Integer> getGIDSByPhenotypicData(List<TraitCombinationFilter> filters, int start, int numOfRows, Database instance)
-            throws QueryException;
+            throws MiddlewareQueryException;
 
     /**
      * Returns the study records matching the given name
@@ -83,9 +83,9 @@ public interface StudyDataManager{
      * @param instance
      *            - can be CENTRAL or LOCAL
      * @return List of Study POJOs
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<Study> findStudyByName(String name, int start, int numOfRows, Operation op, Database instance) throws QueryException;
+    public List<Study> getStudyByName(String name, int start, int numOfRows, Operation op, Database instance) throws MiddlewareQueryException;
 
     /**
      * Returns the study records matching the given name
@@ -101,18 +101,18 @@ public interface StudyDataManager{
      * @param instance
      *            - can be CENTRAL or LOCAL
      * @return number of Study records matching the given criteria
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public int countStudyByName(String name, Operation op, Database instance) throws QueryException;
+    public long countStudyByName(String name, Operation op, Database instance) throws MiddlewareQueryException;
 
     /**
      * Retrieves a Study record of the given id
      * 
      * @param id
      * @return A Study POJO
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public Study getStudyByID(Integer id) throws QueryException;
+    public Study getStudyByID(Integer id) throws MiddlewareQueryException;
 
     /**
      * Returns a List of {@code Study} objects that are top-level studies, or
@@ -126,16 +126,16 @@ public interface StudyDataManager{
      * @param instance
      *            - can be Database.LOCAL or Database.CENTRAL
      * @return The list of all the top-level studies
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<Study> getAllTopLevelStudies(int start, int numOfRows, Database instance) throws QueryException;
+    public List<Study> getAllTopLevelStudies(int start, int numOfRows, Database instance) throws MiddlewareQueryException;
 
     /**
      * Returns the total number of top level studies.
      *
      * @return the int
      */
-    public Long countAllTopLevelStudies(Database instance) throws QueryException;
+    public long countAllTopLevelStudies(Database instance) throws MiddlewareQueryException;
     
     /**
      * Returns the total number of studies belong to a study parent folder.
@@ -143,7 +143,7 @@ public interface StudyDataManager{
      * @return the int
      */
     
-    public Long countAllStudyByParentFolderID(Integer parentFolderId,Database instance) throws QueryException;
+    public long countAllStudyByParentFolderID(Integer parentFolderId,Database instance) throws MiddlewareQueryException;
     
     
     /**
@@ -160,9 +160,9 @@ public interface StudyDataManager{
      * @return The list of all the studies belonging to the specified parent
      *         folder. Returns an empty list if there are no connections
      *         detected for both local and central instances.
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<Study> getStudiesByParentFolderID(Integer parentFolderId, int start, int numOfRows) throws QueryException;
+    public List<Study> getStudiesByParentFolderID(Integer parentFolderId, int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Returns all Factor records which belong to the Study identified by the
@@ -172,7 +172,7 @@ public interface StudyDataManager{
      *            - id of the Study
      * @return List of Factor POJOs
      */
-    public List<Factor> getFactorsByStudyID(Integer studyId) throws QueryException;
+    public List<Factor> getFactorsByStudyID(Integer studyId) throws MiddlewareQueryException;
 
     /**
      * Returns all Variate records which belong to the Study identified by the
@@ -182,7 +182,7 @@ public interface StudyDataManager{
      *            - id of the Study
      * @return List of Variate POJOs
      */
-    public List<Variate> getVariatesByStudyID(Integer studyId) throws QueryException;
+    public List<Variate> getVariatesByStudyID(Integer studyId) throws MiddlewareQueryException;
 
     /**
      * Returns all the Effect records which belong to the Study identified by
@@ -192,7 +192,7 @@ public interface StudyDataManager{
      *            - id of the Study
      * @return List of StudyEffect POJOs
      */
-    public List<StudyEffect> getEffectsByStudyID(Integer studyId) throws QueryException;
+    public List<StudyEffect> getEffectsByStudyID(Integer studyId) throws MiddlewareQueryException;
 
     /**
      * Returns all the Representation records with the given effectId.
@@ -200,7 +200,7 @@ public interface StudyDataManager{
      * @param effectId
      * @return List of Representation POJOs
      */
-    public List<Representation> getRepresentationByEffectID(Integer effectId) throws QueryException;
+    public List<Representation> getRepresentationByEffectID(Integer effectId) throws MiddlewareQueryException;
 
     /**
      * Returns all the Representation records with the given studyId.
@@ -208,7 +208,7 @@ public interface StudyDataManager{
      * @param studyId
      * @return List of Representation POJOs
      */
-    public List<Representation> getRepresentationByStudyID(Integer studyId) throws QueryException;
+    public List<Representation> getRepresentationByStudyID(Integer studyId) throws MiddlewareQueryException;
 
     /**
      * Returns a List of {@code Factor} objects that belong to the specified
@@ -219,9 +219,9 @@ public interface StudyDataManager{
      * @return The list of all the factors belonging to the specified
      *         Representation. Returns an empty list if there are no connections
      *         detected for both local and central instances.
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<Factor> getFactorsByRepresentationId(Integer representationId) throws QueryException;
+    public List<Factor> getFactorsByRepresentationId(Integer representationId) throws MiddlewareQueryException;
 
     /**
      * Returns the number of OunitIDs that are associated to the specified
@@ -232,9 +232,9 @@ public interface StudyDataManager{
      * @return The number of all the OunitIDs associated to the specified
      *         Representation. Returns 0 if there are no connections detected
      *         for both local and central instances.
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public Long countOunitIDsByRepresentationId(Integer representationId) throws QueryException;
+    public long countOunitIDsByRepresentationId(Integer representationId) throws MiddlewareQueryException;
 
     /**
      * Returns a List of OunitIDs that are associated to the specified
@@ -250,9 +250,9 @@ public interface StudyDataManager{
      * @return The list of all the OunitIDs associated to the specified
      *         Representation. Returns an empty list if there are no connections
      *         detected for both local and central instances.
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<Integer> getOunitIDsByRepresentationId(Integer representationId, int start, int numOfRows) throws QueryException;
+    public List<Integer> getOunitIDsByRepresentationId(Integer representationId, int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Returns a List of {@code Variate} objects that belong to the specified
@@ -263,9 +263,9 @@ public interface StudyDataManager{
      * @return The list of all the variates belonging to the specified
      *         Representation. Returns an empty list if there are no connections
      *         detected for both local and central instances.
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<Variate> getVariatesByRepresentationId(Integer representationId) throws QueryException;
+    public List<Variate> getVariatesByRepresentationId(Integer representationId) throws MiddlewareQueryException;
 
     /**
      * Returns a list of NumericDataElements that represents the column values
@@ -277,9 +277,9 @@ public interface StudyDataManager{
      *            Local DB.
      * @return The list of column values / NumericDataElements for the specified
      *         ounitIDs
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<NumericDataElement> getNumericDataValuesByOunitIdList(List<Integer> ounitIdList) throws QueryException;
+    public List<NumericDataElement> getNumericDataValuesByOunitIdList(List<Integer> ounitIdList) throws MiddlewareQueryException;
 
     /**
      * Returns a list of CharacterDataElements that represents the column values
@@ -291,9 +291,9 @@ public interface StudyDataManager{
      *            Local DB.
      * @return The list of column values / CharacterDataElements for the
      *         specified ounitIDs
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<CharacterDataElement> getCharacterDataValuesByOunitIdList(List<Integer> ounitIdList) throws QueryException;
+    public List<CharacterDataElement> getCharacterDataValuesByOunitIdList(List<Integer> ounitIdList) throws MiddlewareQueryException;
 
     /**
      * Returns a list of NumericLevelElements that represents the column values
@@ -305,9 +305,9 @@ public interface StudyDataManager{
      *            Local DB.
      * @return The list of column values / NumericLevelElements for the
      *         specified ounitIDs
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<NumericLevelElement> getNumericLevelValuesByOunitIdList(List<Integer> ounitIdList) throws QueryException;
+    public List<NumericLevelElement> getNumericLevelValuesByOunitIdList(List<Integer> ounitIdList) throws MiddlewareQueryException;
 
     /**
      * Returns a list of CharacterLevelElements that represents the column
@@ -319,9 +319,9 @@ public interface StudyDataManager{
      *            Local DB.
      * @return The list of column values / CharacterLevelElements for the
      *         specified ounitIDs
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<CharacterLevelElement> getCharacterLevelValuesByOunitIdList(List<Integer> ounitIdList) throws QueryException;
+    public List<CharacterLevelElement> getCharacterLevelValuesByOunitIdList(List<Integer> ounitIdList) throws MiddlewareQueryException;
 
     /**
      * Returns a list of DatasetCondition objects representing the Factors 
@@ -330,18 +330,18 @@ public interface StudyDataManager{
      * 
      * @param representationId
      * @return
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<DatasetCondition> getConditionsByRepresentationId(Integer representationId) throws QueryException;
+    public List<DatasetCondition> getConditionsByRepresentationId(Integer representationId) throws MiddlewareQueryException;
     
     /**
      * Returns the main label given a value of the factorid column of a factor record.
      * 
      * @param factorid
      * @return
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public String getMainLabelOfFactorByFactorId(Integer factorid) throws QueryException;
+    public String getMainLabelOfFactorByFactorId(Integer factorid) throws MiddlewareQueryException;
     
     /**
      * Returns the number of studies where the Germplasm, identified
@@ -349,9 +349,9 @@ public interface StudyDataManager{
      * 
      * @param gid
      * @return
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public long countStudyInformationByGID(Long gid) throws QueryException;
+    public long countStudyInformationByGID(Long gid) throws MiddlewareQueryException;
     
     /**
      * Returns a list of StudyInfo objects for the studies where the Germplasm, 
@@ -359,7 +359,7 @@ public interface StudyDataManager{
      *  
      * @param gid
      * @return
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<StudyInfo> getStudyInformationByGID(Long gid) throws QueryException;
+    public List<StudyInfo> getStudyInformationByGID(Long gid) throws MiddlewareQueryException;
 }

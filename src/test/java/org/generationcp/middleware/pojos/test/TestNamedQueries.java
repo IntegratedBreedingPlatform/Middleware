@@ -35,40 +35,41 @@ public class TestNamedQueries{
     }
 
     @Test
-    public void testFindGermplasmByPrefName() {
+    public void testGetGermplasmByPrefName() {
+        String name = "IR 64";
         Session session = hibernateUtil.getCurrentSession();
         long start = System.currentTimeMillis();
-        Query query = session.getNamedQuery(Germplasm.FIND_BY_PREF_NAME);
-        query.setParameter("name", "IR 64");
+        Query query = session.getNamedQuery(Germplasm.GET_BY_PREF_NAME);
+        query.setParameter("name", name);
         query.setMaxResults(5);
         List results = query.list();
         long end = System.currentTimeMillis();
-        System.out.println("QUERY TIME: " + (end - start) + " ms");
-        System.out.println("SEARCH RESULTS:");
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
+        System.out.println("testGetGermplasmByPrefName(name=" + name + ") SEARCH RESULTS:");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof Germplasm);
             Assert.assertTrue(obj != null);
             Germplasm holder = (Germplasm) obj;
-            System.out.println(holder);
+            System.out.println("  " + holder);
         }
     }
 
     @Test
-    public void testFindAllGermplasm() {
+    public void testGetAllGermplasm() {
         Session session = hibernateUtil.getCurrentSession();
         long start = System.currentTimeMillis();
-        Query query = session.getNamedQuery(Germplasm.FIND_ALL);
+        Query query = session.getNamedQuery(Germplasm.GET_ALL);
         query.setMaxResults(5);
         List results = query.list();
         long end = System.currentTimeMillis();
-        System.out.println("QUERY TIME: " + (end - start) + " ms");
-        System.out.println("SEARCH RESULTS:");
+        System.out.println("testGetAllGermplasm() SEARCH RESULTS:");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof Germplasm);
             Assert.assertTrue(obj != null);
             Germplasm holder = (Germplasm) obj;
-            System.out.println(holder);
+            System.out.println("  " + holder);
         }
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
     }
 
     @Test
@@ -78,24 +79,23 @@ public class TestNamedQueries{
         Query query = session.getNamedQuery(Germplasm.COUNT_ALL);
         Long result = (Long) query.uniqueResult();
         long end = System.currentTimeMillis();
-        System.out.println("QUERY TIME: " + (end - start) + " ms");
-
         Assert.assertTrue(result != null);
-        System.out.println(result);
+        System.out.println("testCountAllGermplasm(): " + result);
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
     }
 
     @Test
     public void testCountGermplasmByPrefName() {
+        String name = "IR 64";
         Session session = hibernateUtil.getCurrentSession();
         long start = System.currentTimeMillis();
         Query query = session.createSQLQuery(Germplasm.COUNT_BY_PREF_NAME);
-        query.setString("name", "IR 64");
+        query.setString("name", name);
         BigInteger result = (BigInteger) query.uniqueResult();
         long end = System.currentTimeMillis();
-        System.out.println("QUERY TIME: " + (end - start) + " ms");
-
         Assert.assertTrue(result != null);
-        System.out.println(result);
+        System.out.println("testCountGermplasmByPrefName(name=" + name + "): " + result);
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
     }
 
     @After

@@ -14,7 +14,7 @@ package org.generationcp.middleware.dao;
 
 import java.util.List;
 
-import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -23,71 +23,32 @@ import org.hibernate.criterion.Restrictions;
 
 public class ProjectDAO extends GenericDAO<Project, Long>{
 
-    /**
-     * Get the list of {@link Project}s.
-     * 
-     * @return
-     */
-    public List<Project> findAll() throws QueryException{
-        return findAll(null, null);
-    }
-
-    /**
-     * Get the list of {@link Project}s.
-     * 
-     * @param start
-     *            the index of the first result to return. This parameter is
-     *            ignored if null.
-     * @param numOfRows
-     *            the number of rows to return. This parameter is ignored if
-     *            null.
-     * @return
-     */
-    public List<Project> findAll(Integer start, Integer numOfRows) throws QueryException{
+    public Project getById(Long projectId) throws MiddlewareQueryException {
         try {
-            Criteria criteria = getSession().createCriteria(Project.class);
-            if (start != null) {
-                criteria.setFirstResult(start);
-            }
-            if (numOfRows != null) {
-                criteria.setMaxResults(numOfRows);
-            }
-            @SuppressWarnings("unchecked")
-            List<Project> projects = criteria.list();
-
-            return projects;
-        } catch (HibernateException e) {
-            throw new QueryException(e.getMessage(), e);
-        }
-    }
-    
-    public Project getById(Long projectId) throws QueryException{        
-        try {
-            Criteria criteria = getSession().createCriteria(Project.class)
-                    .add(Restrictions.eq("projectId", projectId)).setMaxResults(1);
+            Criteria criteria = getSession().createCriteria(Project.class).add(Restrictions.eq("projectId", projectId)).setMaxResults(1);
             return (Project) criteria.uniqueResult();
         } catch (HibernateException e) {
-            throw new QueryException("Error with get project by id: " + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error with getById(projectId=" + projectId + ") query from Project: " + e.getMessage(), e);
         }
     }
-    
-    public Project getLastOpenedProject(Integer userId) throws QueryException {
+
+    public Project getLastOpenedProject(Integer userId) throws MiddlewareQueryException {
         try {
             StringBuilder sb = new StringBuilder();
-            sb.append("SELECT {w.*} FROM workbench_project w ")
-              .append("WHERE w.last_open_date = (SELECT MAX(last_open_date) ")
-              .append("FROM workbench_project WHERE user_id = :userId) ");
-            
+            sb.append("SELECT {w.*} FROM workbench_project w ").append("WHERE w.last_open_date = (SELECT MAX(last_open_date) ")
+                    .append("FROM workbench_project WHERE user_id = :userId) ");
+
             SQLQuery query = getSession().createSQLQuery(sb.toString());
             query.addEntity("w", Project.class);
             query.setParameter("userId", userId);
-            
+
             @SuppressWarnings("unchecked")
             List<Project> projectList = query.list();
-            
+
             return projectList.size() > 0 ? projectList.get(0) : null;
         } catch (HibernateException e) {
-            throw new QueryException(e.toString(), e);
+            throw new MiddlewareQueryException("Error with getLastOpenedProject(userId=" + userId + ") query from Project "
+                    + e.getMessage(), e);
         }
     }
 }

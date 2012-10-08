@@ -3,7 +3,7 @@ package org.generationcp.middleware.manager.test;
 
 import junit.framework.Assert;
 
-import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionPerThreadProvider;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DefaultManagerFactoryProvider;
@@ -48,7 +48,7 @@ public class TestManagerFactoryProvider{
             factory = provider.getManagerFactoryForProject(project);
             Assert.assertNotNull(factory);
 
-        } catch (QueryException e) {
+        } catch (MiddlewareQueryException e) {
             System.out.println("Error in testManagerFactoryByCropType(): " + e.getMessage());
             e.printStackTrace();
         }

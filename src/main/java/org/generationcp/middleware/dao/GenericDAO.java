@@ -46,7 +46,7 @@ public abstract class GenericDAO<T, ID extends Serializable> {
     }
 
     @SuppressWarnings("unchecked")
-    public T findById(ID id, boolean lock) {
+    public T getById(ID id, boolean lock) {
         T entity;
 
         if (lock) {
@@ -59,7 +59,7 @@ public abstract class GenericDAO<T, ID extends Serializable> {
     }
 
     @SuppressWarnings("unchecked")
-    protected List<T> findByCriteria(List<Criterion> criterion) {
+    protected List<T> getByCriteria(List<Criterion> criterion) {
         Criteria crit = getSession().createCriteria(getPersistentClass());
         for (Criterion c : criterion) {
             crit.add(c);
@@ -68,7 +68,7 @@ public abstract class GenericDAO<T, ID extends Serializable> {
         return crit.list();
     }
 
-    protected Criteria findByCriteriaWithAliases(List<Criterion> criterion, Map<String, String> aliases) {
+    protected Criteria getByCriteriaWithAliases(List<Criterion> criterion, Map<String, String> aliases) {
         Criteria crit = getSession().createCriteria(getPersistentClass());
 
         for (String field : aliases.keySet()) {
@@ -97,10 +97,10 @@ public abstract class GenericDAO<T, ID extends Serializable> {
         return criteria.list();
     }
 
-    public Long countAll() {
+    public long countAll() {
         Criteria criteria = getSession().createCriteria(getPersistentClass());
         criteria.setProjection(Projections.rowCount());
-        return (Long) criteria.uniqueResult();
+        return ((Long) criteria.uniqueResult()).longValue();
     }
 
     public T saveOrUpdate(T entity) {

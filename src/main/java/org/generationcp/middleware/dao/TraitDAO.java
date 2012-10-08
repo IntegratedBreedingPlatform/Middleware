@@ -14,23 +14,29 @@ package org.generationcp.middleware.dao;
 
 import java.util.List;
 
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Trait;
 import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
 import org.hibernate.criterion.Restrictions;
 
 public class TraitDAO extends GenericDAO<Trait, Integer>{
 
     @SuppressWarnings("rawtypes")
-    public Trait getByTraitId(Integer id) {
-        Criteria crit = getSession().createCriteria(Trait.class);
-        crit.add(Restrictions.eq("traitId", id));
-        crit.add(Restrictions.eq("nameStatus", Integer.valueOf(1)));
-        List results = crit.list();
+    public Trait getByTraitId(Integer id) throws MiddlewareQueryException {
+        try {
+            Criteria crit = getSession().createCriteria(Trait.class);
+            crit.add(Restrictions.eq("traitId", id));
+            crit.add(Restrictions.eq("nameStatus", Integer.valueOf(1)));
+            List results = crit.list();
 
-        if (results.isEmpty()) {
-            return null;
-        } else {
-            return (Trait) results.get(0);
+            if (results.isEmpty()) {
+                return null;
+            } else {
+                return (Trait) results.get(0);
+            }
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getByTraitId(id=" + id + ") query from Trait: " + e.getMessage(), e);
         }
     }
 }

@@ -38,12 +38,13 @@ public class TestOindexDAO{
     
     @Test
     public void testGetFactorIdAndLevelNoOfConditionsByRepresentationId() throws Exception {
-        List<Object[]> results = dao.getFactorIdAndLevelNoOfConditionsByRepresentationId(Integer.valueOf(2));
-        System.out.println("Results:");
+        Integer representationId = Integer.valueOf(2);
+        List<Object[]> results = dao.getFactorIdAndLevelNoOfConditionsByRepresentationId(representationId);
+        System.out.println("testGetFactorIdAndLevelNoOfConditionsByRepresentationId(representationId=" + representationId + ") RESULTS:");
         for(Object[] result : results) {
             Integer factorid = (Integer) result[0];
             Integer levelno = (Integer) result[1];
-            System.out.println("factorid: " + factorid + " AND " + "levelno: " + levelno);
+            System.out.println("  factorid: " + factorid + " AND " + "levelno: " + levelno);
         }
     }
 

@@ -25,10 +25,8 @@ import org.generationcp.middleware.pojos.Variate;
 import org.generationcp.middleware.util.HibernateUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -49,11 +47,12 @@ public class DMSPojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testNumericData() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof NumericData);
             Assert.assertTrue(obj != null);
             NumericData holder = (NumericData) obj;
-            System.out.println(holder);
+            System.out.println("  " + holder);
         }
     }
 
@@ -64,11 +63,12 @@ public class DMSPojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testCharacterData() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof CharacterData);
             Assert.assertTrue(obj != null);
             CharacterData holder = (CharacterData) obj;
-            System.out.println(holder);
+            System.out.println("  " + holder);
         }
     }
 
@@ -79,11 +79,12 @@ public class DMSPojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testVariate() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof Variate);
             Assert.assertTrue(obj != null);
             Variate holder = (Variate) obj;
-            System.out.println(holder);
+            System.out.println("  " + holder);
         }
     }
 
@@ -94,11 +95,12 @@ public class DMSPojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testFactor() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof Factor);
             Assert.assertTrue(obj != null);
             Factor holder = (Factor) obj;
-            System.out.println(holder);
+            System.out.println("  " + holder);
         }
     }
 
@@ -109,11 +111,12 @@ public class DMSPojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testOindex() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof Oindex);
             Assert.assertTrue(obj != null);
             Oindex holder = (Oindex) obj;
-            System.out.println(holder);
+            System.out.println("  " + holder);
         }
     }
 
@@ -124,11 +127,12 @@ public class DMSPojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testStudyEffect() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof StudyEffect);
             Assert.assertTrue(obj != null);
             StudyEffect holder = (StudyEffect) obj;
-            System.out.println(holder);
+            System.out.println("  " + holder);
         }
     }
 
@@ -139,11 +143,12 @@ public class DMSPojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testStudy() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof Study);
             Assert.assertTrue(obj != null);
             Study holder = (Study) obj;
-            System.out.println(holder);
+            System.out.println("  " + holder);
         }
     }
 
@@ -154,11 +159,12 @@ public class DMSPojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testRepresentation() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof Representation);
             Assert.assertTrue(obj != null);
             Representation holder = (Representation) obj;
-            System.out.println(holder);
+            System.out.println("  " + holder);
         }
     }
 

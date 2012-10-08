@@ -15,10 +15,10 @@ package org.generationcp.middleware.manager.test;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
-import org.generationcp.middleware.manager.FindGermplasmByNameModes;
+import org.generationcp.middleware.manager.GetGermplasmByNameModes;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.Operation;
@@ -46,356 +46,378 @@ public class TestGermplasmDataManagerImpl{
         factory = new ManagerFactory(local, central);
         manager = factory.getGermplasmDataManager();
     }
-    
+
     @Test
     public void testGetAllLocations() throws Exception {
         long start = System.currentTimeMillis();
         List<Location> locationList = manager.getAllLocations(5, 10);
         Assert.assertTrue(locationList != null);
 
-        System.out.println("SEARCH RESULTS");
+        System.out.println("testGetAllLocations(5,10) RESULTS: ");
         for (Location l : locationList) {
-            System.out.println(l);
+            System.out.println("  " + l);
         }
         long end = System.currentTimeMillis();
-        System.out.println("QUERY TIME: " + (end - start) + " ms");
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
     }
 
     @Test
     public void testCountAllLocations() throws Exception {
         long start = System.currentTimeMillis();
-        int count = manager.countAllLocations();
-        System.out.println(count);
+        long count = manager.countAllLocations();
+        System.out.println("testCountAllLocations(): " + count);
         long end = System.currentTimeMillis();
-        System.out.println("QUERY TIME: " + (end - start) + " ms");
-    }     
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
+    }
 
     @Test
-    public void testFindLocationByName() throws Exception {
+    public void testGetLocationByName() throws Exception {
+        String name = "AFGHANISTAN";
         long start = System.currentTimeMillis();
-        List<Location> locationList = manager.findLocationByName("AFGHANISTAN", 0, 5, Operation.EQUAL);
+        List<Location> locationList = manager.getLocationByName(name, 0, 5, Operation.EQUAL);
         Assert.assertTrue(locationList != null);
-
-        System.out.println("SEARCH RESULTS");
+        System.out.println("testGetLocationByName(" + name + ") RESULTS: ");
         for (Location l : locationList) {
-            System.out.println(l);
+            System.out.println("  " + l);
         }
         long end = System.currentTimeMillis();
-        System.out.println("QUERY TIME: " + (end - start) + " ms");
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
     }
 
     @Test
     public void testCountLocationByName() throws Exception {
+        String name = "AFGHANISTAN";
         long start = System.currentTimeMillis();
-        int count = manager.countLocationByName("AFGHANISTAN", Operation.EQUAL);
-        System.out.println(count);
+        long count = manager.countLocationByName(name, Operation.EQUAL);
+        System.out.println("testCountLocationByName(" + name + "): " + count);
         long end = System.currentTimeMillis();
-        System.out.println("QUERY TIME: " + (end - start) + " ms");
-    }       
-    
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
+    }
+
     @Test
-    public void testFindGermplasmByName() throws Exception {
+    public void testGetGermplasmByName() throws Exception {
+        String name = "IR 10";
         long start = System.currentTimeMillis();
-        List<Germplasm> germplasmList = manager.findGermplasmByName("IR 10", 0, 5, FindGermplasmByNameModes.NORMAL, Operation.EQUAL, null,
-                null, Database.CENTRAL);
+        List<Germplasm> germplasmList = manager.getGermplasmByName(name, 0, 5, GetGermplasmByNameModes.NORMAL, Operation.EQUAL, null, null,
+                Database.CENTRAL);
         Assert.assertTrue(germplasmList != null);
 
-        System.out.println("SEARCH RESULTS");
+        System.out.println("testGetGermplasmByName(" + name + ") RESULTS: ");
         for (Germplasm g : germplasmList) {
-            System.out.println(g);
+            System.out.println("  " + g);
         }
         long end = System.currentTimeMillis();
-        System.out.println("QUERY TIME: " + (end - start) + " ms");
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
     }
 
     @Test
     public void testCountGermplasmByName() throws Exception {
+        String name = "IR 10";
         long start = System.currentTimeMillis();
-        int count = manager.countGermplasmByName("IR 10", FindGermplasmByNameModes.NORMAL, Operation.EQUAL, null, null, Database.CENTRAL);
-        System.out.println(count);
+        long count = manager.countGermplasmByName(name, GetGermplasmByNameModes.NORMAL, Operation.EQUAL, null, null, Database.CENTRAL);
+        System.out.println("testCountGermplasmByName(" + name + ") RESULTS: " + count);
         long end = System.currentTimeMillis();
-        System.out.println("QUERY TIME: " + (end - start) + " ms");
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
     }
 
     @Test
-    public void testFindGermplasmByNameUsingLike() throws Exception {
+    public void testGetGermplasmByNameUsingLike() throws Exception {
+        String name = "IR%";
         long start = System.currentTimeMillis();
-        List<Germplasm> germplasmList = manager.findGermplasmByName("IR%", 0, 5, FindGermplasmByNameModes.NORMAL, Operation.LIKE, null,
-                null, Database.CENTRAL);
+        List<Germplasm> germplasmList = manager.getGermplasmByName(name, 0, 5, GetGermplasmByNameModes.NORMAL, Operation.LIKE, null, null,
+                Database.CENTRAL);
         Assert.assertTrue(germplasmList != null);
 
-        System.out.println("SEARCH RESULTS");
+        System.out.println("testGetGermplasmByNameUsingLike(" + name + ") RESULTS: ");
         for (Germplasm g : germplasmList) {
-            System.out.println(g);
+            System.out.println("  " + g);
         }
         long end = System.currentTimeMillis();
-        System.out.println("QUERY TIME: " + (end - start) + " ms");
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
     }
 
     @Test
     public void testCountGermplasmByNameUsingLike() throws Exception {
+        String name = "IR%";
         long start = System.currentTimeMillis();
-        int count = manager.countGermplasmByName("IR%", FindGermplasmByNameModes.NORMAL, Operation.LIKE, null, null, Database.CENTRAL);
-        System.out.println(count);
+        long count = manager.countGermplasmByName(name, GetGermplasmByNameModes.NORMAL, Operation.LIKE, null, null, Database.CENTRAL);
+        System.out.println("testCountGermplasmByNameUsingLike(" + name + ") RESULTS:" + count);
         long end = System.currentTimeMillis();
-        System.out.println("QUERY TIME: " + (end - start) + " ms");
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
     }
 
     @Test
-    public void testFindGermplasmByNameWithStatus() throws Exception {
+    public void testGetGermplasmByNameWithStatus() throws Exception {
+        String name = "IR 64";
         long start = System.currentTimeMillis();
-        List<Germplasm> germplasmList = manager.findGermplasmByName("IR 64", 0, 5, FindGermplasmByNameModes.NORMAL, Operation.EQUAL,
+        List<Germplasm> germplasmList = manager.getGermplasmByName(name, 0, 5, GetGermplasmByNameModes.NORMAL, Operation.EQUAL,
                 new Integer(1), null, Database.CENTRAL);
         Assert.assertTrue(germplasmList != null);
 
-        System.out.println("SEARCH RESULTS");
+        System.out.println("testGetGermplasmByNameWithStatus(" + name + ") RESULTS: ");
         for (Germplasm g : germplasmList) {
-            System.out.println(g);
+            System.out.println("  " + g);
         }
         long end = System.currentTimeMillis();
-        System.out.println("QUERY TIME: " + (end - start) + " ms");
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
     }
 
     @Test
     public void testCountGermplasmByNameWithStatus() throws Exception {
+        String name = "IR 64";
         long start = System.currentTimeMillis();
-        int count = manager.countGermplasmByName("IR 64", FindGermplasmByNameModes.NORMAL, Operation.EQUAL, new Integer(1), null,
+        long count = manager.countGermplasmByName(name, GetGermplasmByNameModes.NORMAL, Operation.EQUAL, new Integer(1), null,
                 Database.CENTRAL);
-        System.out.println(count);
+        System.out.println("testCountGermplasmByNameWithStatus(" + name + ") RESULTS: " + count);
         long end = System.currentTimeMillis();
-        System.out.println("QUERY TIME: " + (end - start) + " ms");
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
     }
 
     @Test
-    public void testFindGermplasmByNameWithStatusAndType() throws Exception {
+    public void testGetGermplasmByNameWithStatusAndType() throws Exception {
+        String name = "IR 64";
         long start = System.currentTimeMillis();
-        List<Germplasm> germplasmList = manager.findGermplasmByName("IR 64", 0, 5, FindGermplasmByNameModes.NORMAL, Operation.EQUAL,
+        List<Germplasm> germplasmList = manager.getGermplasmByName(name, 0, 5, GetGermplasmByNameModes.NORMAL, Operation.EQUAL,
                 new Integer(1), GermplasmNameType.RELEASE_NAME, Database.CENTRAL);
         Assert.assertTrue(germplasmList != null);
 
-        System.out.println("SEARCH RESULTS");
+        System.out.println("testGetGermplasmByNameWithStatusAndType(" + name + ") RESULTS: ");
         for (Germplasm g : germplasmList) {
-            System.out.println(g);
+            System.out.println("  " + g);
         }
         long end = System.currentTimeMillis();
-        System.out.println("QUERY TIME: " + (end - start) + " ms");
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
     }
 
     @Test
     public void testCountGermplasmByNameWithStatusAndType() throws Exception {
+        String name = "IR 64";
         long start = System.currentTimeMillis();
-        int count = manager.countGermplasmByName("IR 64", FindGermplasmByNameModes.NORMAL, Operation.EQUAL, new Integer(1),
+        long count = manager.countGermplasmByName(name, GetGermplasmByNameModes.NORMAL, Operation.EQUAL, new Integer(1),
                 GermplasmNameType.RELEASE_NAME, Database.CENTRAL);
-        System.out.println(count);
+        System.out.println("testCountGermplasmByNameWithStatusAndType(" + name + ") RESULTS: " + count);
         long end = System.currentTimeMillis();
-        System.out.println("QUERY TIME: " + (end - start) + " ms");
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
     }
 
     @Test
-    public void testFindGermplasmByNameWithStatusUsingLike() throws Exception {
+    public void testGetGermplasmByNameWithStatusUsingLike() throws Exception {
+        String name = "IR%";
         long start = System.currentTimeMillis();
-        List<Germplasm> germplasmList = manager.findGermplasmByName("IR%", 0, 5, FindGermplasmByNameModes.NORMAL, Operation.LIKE,
-                new Integer(1), null, Database.CENTRAL);
+        List<Germplasm> germplasmList = manager.getGermplasmByName(name, 0, 5, GetGermplasmByNameModes.NORMAL, Operation.LIKE, new Integer(
+                1), null, Database.CENTRAL);
         Assert.assertTrue(germplasmList != null);
 
-        System.out.println("SEARCH RESULTS");
+        System.out.println("testGetGermplasmByNameWithStatusUsingLike(" + name + ") RESULTS: ");
         for (Germplasm g : germplasmList) {
-            System.out.println(g);
+            System.out.println("  " + g);
         }
         long end = System.currentTimeMillis();
-        System.out.println("QUERY TIME: " + (end - start) + " ms");
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
     }
 
     @Test
-    public void testFindGermplasmByNameWithStatusAndTypeUsingLike() throws Exception {
+    public void testGetGermplasmByNameWithStatusAndTypeUsingLike() throws Exception {
+        String name = "IR%";
         long start = System.currentTimeMillis();
-        List<Germplasm> germplasmList = manager.findGermplasmByName("IR%", 0, 5, FindGermplasmByNameModes.NORMAL, Operation.LIKE,
-                new Integer(1), GermplasmNameType.RELEASE_NAME, Database.CENTRAL);
+        List<Germplasm> germplasmList = manager.getGermplasmByName(name, 0, 5, GetGermplasmByNameModes.NORMAL, Operation.LIKE, new Integer(
+                1), GermplasmNameType.RELEASE_NAME, Database.CENTRAL);
         Assert.assertTrue(germplasmList != null);
 
-        System.out.println("SEARCH RESULTS");
+        System.out.println("testGetGermplasmByNameWithStatusAndTypeUsingLike(" + name + ") RESULTS: ");
         for (Germplasm g : germplasmList) {
-            System.out.println(g);
+            System.out.println("  " + g);
         }
         long end = System.currentTimeMillis();
-        System.out.println("QUERY TIME: " + (end - start) + " ms");
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
     }
 
     @Test
-    public void testFindGermplasmByLocationNameUsingEqual() throws Exception {
+    public void testGetGermplasmByLocationNameUsingEqual() throws Exception {
+        String name = "Philippines";
         long start = System.currentTimeMillis();
-        List<Germplasm> germplasmList = manager.findGermplasmByLocationName("Philippines", 0, 5, Operation.EQUAL, Database.CENTRAL);
+        List<Germplasm> germplasmList = manager.getGermplasmByLocationName(name, 0, 5, Operation.EQUAL, Database.CENTRAL);
 
-        System.out.println("SEARCH RESULTS");
+        System.out.println("testGetGermplasmByLocationNameUsingEqual(" + name + ") RESULTS: ");
         for (Germplasm g : germplasmList) {
-            System.out.println(g);
+            System.out.println("  " + g);
         }
         long end = System.currentTimeMillis();
-        System.out.println("QUERY TIME: " + (end - start) + " ms");
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
     }
 
     @Test
     public void testCountGermplasmByLocationNameUsingEqual() throws Exception {
+        String name = "Philippines";
         long start = System.currentTimeMillis();
-        int count = manager.countGermplasmByLocationName("Philippines", Operation.EQUAL, Database.CENTRAL);
-        System.out.println("COUNT = " + count);
+        long count = manager.countGermplasmByLocationName(name, Operation.EQUAL, Database.CENTRAL);
+        System.out.println("testCountGermplasmByLocationNameUsingEqual(" + name + ") RESULTS: " + count);
         long end = System.currentTimeMillis();
-        System.out.println("QUERY TIME: " + (end - start) + " ms");
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
     }
 
     @Test
-    public void testFindGermplasmByLocationNameUsingLike() throws Exception {
+    public void testGetGermplasmByLocationNameUsingLike() throws Exception {
+        String name = "International%";
         long start = System.currentTimeMillis();
-        List<Germplasm> germplasmList = manager.findGermplasmByLocationName("International%", 0, 5, Operation.LIKE, Database.CENTRAL);
+        List<Germplasm> germplasmList = manager.getGermplasmByLocationName(name, 0, 5, Operation.LIKE, Database.CENTRAL);
         Assert.assertTrue(germplasmList != null);
 
-        System.out.println("SEARCH RESULTS");
+        System.out.println("testGetGermplasmByLocationNameUsingLike(" + name + ") RESULTS: ");
         for (Germplasm g : germplasmList) {
-            System.out.println(g);
+            System.out.println("  " + g);
         }
         long end = System.currentTimeMillis();
-        System.out.println("QUERY TIME: " + (end - start) + " ms");
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
     }
 
     @Test
     public void testCountGermplasmByLocationNameUsingLike() throws Exception {
+        String name = "International%";
         long start = System.currentTimeMillis();
-        int count = manager.countGermplasmByLocationName("International%", Operation.LIKE, Database.CENTRAL);
-        System.out.println("COUNT = " + count);
+        long count = manager.countGermplasmByLocationName(name, Operation.LIKE, Database.CENTRAL);
+        System.out.println("testCountGermplasmByLocationNameUsingLike(" + name + ") RESULTS: " + count);
         long end = System.currentTimeMillis();
-        System.out.println("QUERY TIME: " + (end - start) + " ms");
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
     }
 
     @Test
-    public void testFindGermplasmByMethodNameUsingEqual() throws Exception {
+    public void testGetGermplasmByMethodNameUsingEqual() throws Exception {
+        String name = "SINGLE CROSS";
         long start = System.currentTimeMillis();
-        List<Germplasm> germplasmList = manager.findGermplasmByMethodName("SINGLE CROSS", 0, 5, Operation.EQUAL, Database.CENTRAL);
+        List<Germplasm> germplasmList = manager.getGermplasmByMethodName(name, 0, 5, Operation.EQUAL, Database.CENTRAL);
         Assert.assertTrue(germplasmList != null);
 
-        System.out.println("SEARCH RESULTS");
+        System.out.println("testGetGermplasmByMethodNameUsingEqual(" + name + ") RESULTS: ");
         for (Germplasm g : germplasmList) {
-            System.out.println(g);
+            System.out.println("  " + g);
         }
         long end = System.currentTimeMillis();
-        System.out.println("QUERY TIME: " + (end - start) + " ms");
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
     }
 
     @Test
     public void testCountGermplasmByMethodNameUsingEqual() throws Exception {
+        String name = "SINGLE CROSS";
         long start = System.currentTimeMillis();
-        int count = manager.countGermplasmByMethodName("SINGLE CROSS", Operation.EQUAL, Database.CENTRAL);
-        System.out.println("COUNT = " + count);
+        long count = manager.countGermplasmByMethodName(name, Operation.EQUAL, Database.CENTRAL);
+        System.out.println("testCountGermplasmByMethodNameUsingEqual(" + name + ") RESULTS: " + count);
         long end = System.currentTimeMillis();
-        System.out.println("QUERY TIME: " + (end - start) + " ms");
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
     }
 
     @Test
-    public void testFindGermplasmByMethodNameUsingLike() throws Exception {
+    public void testGetGermplasmByMethodNameUsingLike() throws Exception {
+        String name = "%CROSS%";
         long start = System.currentTimeMillis();
-        List<Germplasm> germplasmList = manager.findGermplasmByMethodName("%CROSS%", 0, 5, Operation.LIKE, Database.CENTRAL);
+        List<Germplasm> germplasmList = manager.getGermplasmByMethodName(name, 0, 5, Operation.LIKE, Database.CENTRAL);
         Assert.assertTrue(germplasmList != null);
 
-        System.out.println("SEARCH RESULTS");
+        System.out.println("testGetGermplasmByMethodNameUsingLike(" + name + ") RESULTS: ");
         for (Germplasm g : germplasmList) {
-            System.out.println(g);
+            System.out.println("  " + g);
         }
         long end = System.currentTimeMillis();
-        System.out.println("QUERY TIME: " + (end - start) + " ms");
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
     }
 
     @Test
     public void testCountGermplasmByMethodNameUsingLike() throws Exception {
+        String name = "%CROSS%";
         long start = System.currentTimeMillis();
-        int count = manager.countGermplasmByMethodName("%CROSS%", Operation.LIKE, Database.CENTRAL);
-        System.out.println("COUNT = " + count);
+        long count = manager.countGermplasmByMethodName(name, Operation.LIKE, Database.CENTRAL);
+        System.out.println("testCountGermplasmByMethodNameUsingLike(" + name + ") RESULTS: " + count);
         long end = System.currentTimeMillis();
-        System.out.println("QUERY TIME: " + (end - start) + " ms");
     }
 
     @Test
     public void testGetGermplasmByGID() throws Exception {
-        Germplasm germplasm = manager.getGermplasmByGID(new Integer(50533));
-        System.out.println(germplasm);
+        Integer gid = Integer.valueOf(50533);
+        Germplasm germplasm = manager.getGermplasmByGID(gid);
+        System.out.println("testGetGermplasmByGID(" + gid + "): " + germplasm);
     }
 
     @Test
     public void testGetGermplasmWithPrefName() throws Exception {
-        Germplasm germplasm = manager.getGermplasmWithPrefName(new Integer(50533));
+        Integer gid = Integer.valueOf(50533);
+        Germplasm germplasm = manager.getGermplasmWithPrefName(gid);
 
-        System.out.println(germplasm);
+        System.out.println("testGetGermplasmWithPrefName(" + gid + ") RESULTS: " + germplasm);
         if (germplasm != null) {
-            System.out.println(germplasm.getPreferredName());
+            System.out.println("  preferredName = " + germplasm.getPreferredName());
         }
     }
 
     @Test
     public void testGetGermplasmWithPrefAbbrev() throws Exception {
-        Germplasm germplasm = manager.getGermplasmWithPrefAbbrev(new Integer(151));
+        Integer gid = Integer.valueOf(151);
+        Germplasm germplasm = manager.getGermplasmWithPrefAbbrev(gid);
 
-        System.out.println(germplasm);
-        System.out.println(germplasm.getPreferredName());
-        System.out.println(germplasm.getPreferredAbbreviation());
+        System.out.println("testGetGermplasmWithPrefAbbrev(" + gid + ") RESULTS: " + germplasm);
+        System.out.println("  preferredName = " + germplasm.getPreferredName());
+        System.out.println("  preferredAbbreviation = " + germplasm.getPreferredAbbreviation());
     }
 
     @Test
     public void testGetGermplasmNameByID() throws Exception {
-        Name name = manager.getGermplasmNameByID(new Integer(42268));
-        System.out.println(name);
+        Integer gid = Integer.valueOf(42268);
+        Name name = manager.getGermplasmNameByID(gid);
+        System.out.println("testGetGermplasmNameByID(" + gid + ") RESULTS: " + name);
     }
 
     @Test
     public void testGetNamesByGID() throws Exception {
-        List<Name> names = manager.getNamesByGID(new Integer(50533), null, null);
-
-        for (Name name : names) {
-            System.out.println(name);
-        }
+        Integer gid = Integer.valueOf(50533);
+        List<Name> names = manager.getNamesByGID(gid, null, null);
+        System.out.println("testGetNamesByGID(" + gid + ") RESULTS: " + names);
     }
 
     @Test
     public void testGetPreferredNameByGID() throws Exception {
-        System.out.println(manager.getPreferredNameByGID(1));
+        Integer gid = Integer.valueOf(1);
+        System.out.println("testGetPreferredNameByGID(" + gid + ") RESULTS: " + manager.getPreferredNameByGID(gid));
     }
 
     @Test
     public void testGetPreferredAbbrevByGID() throws Exception {
-        System.out.println(manager.getPreferredAbbrevByGID(1));
+        Integer gid = Integer.valueOf(1);
+        System.out.println("testGetPreferredAbbrevByGID(" + gid + ") RESULTS: " + manager.getPreferredAbbrevByGID(gid));
     }
 
     @Test
     public void testGetNameByGIDAndNval() throws Exception {
-        System.out.println(manager.getNameByGIDAndNval(1, "GCP-TEST"));
+        Integer gid = Integer.valueOf(1);
+        String nVal = "GCP-TEST";
+        System.out.println("testGetNameByGIDAndNval(" + gid + ", " + nVal + ") RESULTS: " + manager.getNameByGIDAndNval(gid, nVal));
     }
 
     @Test
     public void testGetNamesByGIDWithStatus() throws Exception {
-        List<Name> names = manager.getNamesByGID(new Integer(50533), new Integer(1), null);
-
-        for (Name name : names) {
-            System.out.println(name);
-        }
+        Integer gid = Integer.valueOf(50533);
+        Integer status = Integer.valueOf(1);
+        GermplasmNameType type = null;
+        List<Name> names = manager.getNamesByGID(gid, status, type);
+        System.out.println("testGetNamesByGIDWithStatus(gid=" + gid + ", status" + status + ", type=" + type + ") RESULTS: " + names);
     }
 
     @Test
     public void testGetNamesByGIDWithStatusAndType() throws Exception {
-        List<Name> names = manager.getNamesByGID(new Integer(50533), new Integer(8), GermplasmNameType.INTERNATIONAL_TESTING_NUMBER);
-
-        for (Name name : names) {
-            System.out.println(name);
-        }
+        Integer gid = Integer.valueOf(50533);
+        Integer status = Integer.valueOf(8);
+        GermplasmNameType type = GermplasmNameType.INTERNATIONAL_TESTING_NUMBER;
+        List<Name> names = manager.getNamesByGID(gid, status, type);
+        System.out.println("testGetNamesByGIDWithStatusAndType(gid=" + gid + ", status" + status + ", type=" + type + ") RESULTS: " + names);
     }
 
     @Test
     public void testGetAttributesByGID() throws Exception {
-        List<Attribute> attributes = manager.getAttributesByGID(new Integer(50533));
-
-        for (Attribute attribute : attributes) {
-            System.out.println(attribute);
-        }
+        Integer gid = Integer.valueOf(50533);
+        List<Attribute> attributes = manager.getAttributesByGID(gid);
+        System.out.println("testGetAttributesByGID(" + gid + ") RESULTS: " + attributes);
     }
-    
+
     @Test
-    public void testAddMethod() throws QueryException {
+    public void testAddMethod() throws MiddlewareQueryException {
         Method method = new Method();
         method.setMid(-1);
         method.setMname("yesno");
@@ -410,114 +432,120 @@ public class TestGermplasmDataManagerImpl{
         method.setMprgn(0);
         method.setReference(0);
         method.setUser(0);
-        
+
         method.setMtype("GEN");
-        
+
         // add the method
         manager.addMethod(method);
-        
+
         method = manager.getMethodByID(-1);
-        
+        System.out.println("testAddMethod(" + method + ") RESULTS: " + method);
+
         // delete the method
         manager.deleteMethod(method);
     }
-    
+
     @Test
-    public void testAddMethods() throws QueryException {
+    public void testAddMethods() throws MiddlewareQueryException {
         List<Method> methods = new ArrayList<Method>();
-        methods.add( new Method(-1, "GEN", "S", "UGM", "yesno", "description 1", Integer.valueOf(0), Integer.valueOf(0),
-                Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2), Integer.valueOf(19980610)));
-        methods.add( new Method(-2, "GEN", "S", "UGM", "yesno", "description 2", Integer.valueOf(0), Integer.valueOf(0),
-                Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2), Integer.valueOf(19980610)));
-        methods.add( new Method(-3, "GEN", "S", "UGM", "yesno", "description 3", Integer.valueOf(0), Integer.valueOf(0),
-                Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2), Integer.valueOf(19980610)));
-        
+        methods.add(new Method(-1, "GEN", "S", "UGM", "yesno", "description 1", Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0),
+                Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2), Integer.valueOf(19980610)));
+        methods.add(new Method(-2, "GEN", "S", "UGM", "yesno", "description 2", Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0),
+                Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2), Integer.valueOf(19980610)));
+        methods.add(new Method(-3, "GEN", "S", "UGM", "yesno", "description 3", Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0),
+                Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2), Integer.valueOf(19980610)));
+
         // add the methods
         int methodsAdded = manager.addMethod(methods);
-        
-        System.out.println("Methods added: " + methodsAdded);
-        
-        for (int i=1; i <= methodsAdded; i++){
+
+        System.out.println("testAddMethods() Methods added: " + methodsAdded);
+
+        for (int i = 1; i <= methodsAdded; i++) {
             Method method = manager.getMethodByID(-i);
-            System.out.println("Method[" + i + "]: " +  method);
+            System.out.println("  " + method);
             // delete the method
             manager.deleteMethod(method);
         }
-        
-    }
-    
-    @Test
-    public void testAddLocation() throws QueryException {
-    	
-    	Location location = new Location();
-    	location.setLocid(-1);
-    	location.setCntryid(1);
-    	location.setLabbr("");
-    	location.setLname("");
-    	location.setLrplce(1);
-    	location.setLtype(1);
-    	location.setNllp(1);
-    	location.setSnl1id(1);
-    	location.setSnl2id(1);
-    	location.setSnl3id(1);
-        
-        // add the method
-        manager.addLocation(location);
-        
-        location = manager.getLocationByID(-1);
-        
-    }
-    
-    @Test
-    public void testAddLocations() throws QueryException {
-    	
-    	List<Location> locations = new ArrayList<Location>();
-    	
-    	Location location1 = new Location();
-    	location1.setLocid(-2);
-    	location1.setCntryid(1);
-    	location1.setLabbr("");
-    	location1.setLname("");
-    	location1.setLrplce(1);
-    	location1.setLtype(1);
-    	location1.setNllp(1);
-    	location1.setSnl1id(1);
-    	location1.setSnl2id(1);
-    	location1.setSnl3id(1);
-    	
-    	Location location2 = new Location();
-    	location2.setLocid(-3);
-    	location2.setCntryid(1);
-    	location2.setLabbr("");
-    	location2.setLname("");
-    	location2.setLrplce(1);
-    	location2.setLtype(1);
-    	location2.setNllp(1);
-    	location2.setSnl1id(1);
-    	location2.setSnl2id(1);
-    	location2.setSnl3id(1);
-    	
-    	locations.add(location1);
-    	locations.add(location2);
-        
-        // add the method
-        manager.addLocation(locations);
-        
-        location2 = manager.getLocationByID(-3);
-        
+
     }
 
     @Test
-    public void testGetGidAndNidByGermplasmNames() throws Exception {        
+    public void testAddLocation() throws MiddlewareQueryException {
+        Location location = new Location();
+        location.setLocid(-1);
+        location.setCntryid(1);
+        location.setLabbr("");
+        location.setLname("TEST-LOCATION-1");
+        location.setLrplce(1);
+        location.setLtype(1);
+        location.setNllp(1);
+        location.setSnl1id(1);
+        location.setSnl2id(1);
+        location.setSnl3id(1);
+
+        // add the location
+        manager.addLocation(location);
+        System.out.println("testAddLocation(" + location + ") RESULTS: \n  " + manager.getLocationByName("TEST-LOCATION-1", 0, 5, Operation.EQUAL));
+
+        // cleanup
+        manager.deleteLocation(manager.getLocationByName("TEST-LOCATION-1", 0, 5, Operation.EQUAL).get(0));
+    }
+
+    @Test
+    public void testAddLocations() throws MiddlewareQueryException {
+
+        List<Location> locations = new ArrayList<Location>();
+
+        Location location1 = new Location();
+        location1.setLocid(-2);
+        location1.setCntryid(1);
+        location1.setLabbr("");
+        location1.setLname("TEST-LOCATION-2");
+        location1.setLrplce(1);
+        location1.setLtype(1);
+        location1.setNllp(1);
+        location1.setSnl1id(1);
+        location1.setSnl2id(1);
+        location1.setSnl3id(1);
+
+        Location location2 = new Location();
+        location2.setLocid(-3);
+        location2.setCntryid(1);
+        location2.setLabbr("");
+        location2.setLname("TEST-LOCATION-3");
+        location2.setLrplce(1);
+        location2.setLtype(1);
+        location2.setNllp(1);
+        location2.setSnl1id(1);
+        location2.setSnl2id(1);
+        location2.setSnl3id(1);
+
+        locations.add(location1);
+        locations.add(location2);
+
+        // add the location
+        int locationsAdded = manager.addLocation(locations);
+
+        System.out.println("testAddLocations() Locations added: " + locationsAdded);
+        System.out.println("  " + manager.getLocationByName("TEST-LOCATION-2", 0, 5, Operation.EQUAL));
+        System.out.println("  " + manager.getLocationByName("TEST-LOCATION-3", 0, 5, Operation.EQUAL));
+
+        // cleanup
+        manager.deleteLocation(manager.getLocationByName("TEST-LOCATION-2", 0, 5, Operation.EQUAL).get(0));
+        manager.deleteLocation(manager.getLocationByName("TEST-LOCATION-3", 0, 5, Operation.EQUAL).get(0));
+    }
+
+    @Test
+    public void testGetGidAndNidByGermplasmNames() throws Exception {
         List<String> germplasmNames = new ArrayList<String>();
         germplasmNames.add("UCR2010001");
         germplasmNames.add("UCR2010002");
         germplasmNames.add("UCR2010003");
 
         List<GidNidElement> results = manager.getGidAndNidByGermplasmNames(germplasmNames);
-        System.out.println("RESULTS (getGidAndNidByGermplasmNames): " + results);
+        System.out.println("testGetGidAndNidByGermplasmNames(" + germplasmNames + ") RESULTS: " + results);
     }
-    
+
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();

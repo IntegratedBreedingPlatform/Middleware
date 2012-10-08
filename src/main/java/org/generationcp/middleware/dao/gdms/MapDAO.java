@@ -11,13 +11,9 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao.gdms;
 
-import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.pojos.gdms.Map;
-import org.generationcp.middleware.exceptions.QueryException;
-import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
 
 /**
  * <b>Description</b>: DAO for Map table
@@ -31,30 +27,5 @@ import org.hibernate.HibernateException;
  */
 public class MapDAO extends GenericDAO<Map, Integer>{
     
-    /**
-     * Returns all Map records.
-     *
-     * @param start the start
-     * @param numOfRows the num of rows
-     * @return the list
-     */
-    @SuppressWarnings("unchecked")
-    public List<Map> findAll(Integer start, Integer numOfRows) throws QueryException{
-        try {
-            Criteria criteria = getSession().createCriteria(Map.class);
-            if (start != null) {
-                criteria.setFirstResult(start);
-            }
-            if (numOfRows != null) {
-                criteria.setMaxResults(numOfRows);
-            }
-            
-            List<Map> templates = criteria.list();
-
-            return templates;
-        } catch (HibernateException e) {
-            throw new QueryException("Error with finding all maps: " + e.getMessage(), e);
-        }
-    }
     
 }

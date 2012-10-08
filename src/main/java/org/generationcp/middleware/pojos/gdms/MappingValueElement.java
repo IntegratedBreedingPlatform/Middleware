@@ -35,7 +35,7 @@ public class MappingValueElement implements Serializable{
     private Integer datasetId;
     
     /** The Mapping Type. */
-    private String mappingType;
+    private String mappingPopType;
     
     /** The Parent A GID. */
     private Integer parentAGid;
@@ -62,7 +62,7 @@ public class MappingValueElement implements Serializable{
                                 String markerType) {
         
         this.datasetId = datasetId;
-        this.mappingType = mappingType;
+        this.mappingPopType = mappingType;
         this.parentAGid = parentAGid;
         this.parentBGid = parentBGid;
         this.markerType = markerType;
@@ -95,7 +95,7 @@ public class MappingValueElement implements Serializable{
      * @return the mappingType
      */
     public String getMappingType() {
-        return mappingType;
+        return mappingPopType;
     }
 
     
@@ -105,7 +105,7 @@ public class MappingValueElement implements Serializable{
      * @param mappingType the mappingType to set
      */
     public void setMappingType(String mappingType) {
-        this.mappingType = mappingType;
+        this.mappingPopType = mappingType;
     }
 
     
@@ -174,7 +174,7 @@ public class MappingValueElement implements Serializable{
     @Override
     public String toString() {
         return "MappingValueElement [datasetId=" + datasetId +
-                            ", mappingType=" + mappingType + 
+                            ", mappingType=" + mappingPopType + 
                             ", parentAGid=" + parentAGid +
                             ", parentBGid=" + parentBGid + 
                             ", markerType=" + markerType + "]";
@@ -197,7 +197,7 @@ public class MappingValueElement implements Serializable{
 
         MappingValueElement rhs = (MappingValueElement) obj;
         return new EqualsBuilder().appendSuper(super.equals(obj)).append(datasetId, rhs.datasetId)
-                .append(mappingType, rhs.mappingType)
+                .append(mappingPopType, rhs.mappingPopType)
                 .append(parentAGid, rhs.parentAGid)
                 .append(parentBGid, rhs.parentBGid)
                 .append(markerType, rhs.markerType).isEquals();
@@ -209,7 +209,7 @@ public class MappingValueElement implements Serializable{
     @Override
     public int hashCode() {
         return new HashCodeBuilder(77, 177).append(datasetId)
-                .append(mappingType)
+                .append(mappingPopType)
                 .append(parentAGid)
                 .append(parentBGid)
                 .append(markerType).toHashCode();

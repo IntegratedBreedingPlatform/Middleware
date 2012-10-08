@@ -16,7 +16,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectMethod;
@@ -31,7 +31,6 @@ import org.hibernate.SQLQuery;
  */
 public class ProjectMethodDAO extends GenericDAO<ProjectMethod, Integer>{
 
-
     /**
      * Returns a list of {@link Method} records by project id.
      *
@@ -39,16 +38,15 @@ public class ProjectMethodDAO extends GenericDAO<ProjectMethod, Integer>{
      * @param start the first row to retrieve
      * @param numOfRows the number of rows to retrieve
      * @return the list of {@link Method}s
-     * @throws QueryException the query exception
+     * @throws MiddlewareQueryException the MiddlewareQueryException
      */
     @SuppressWarnings("unchecked")
-    public List<Integer> getByProjectId(Long projectId, int start, int numOfRows) 
-        throws QueryException {
-        
-        if (projectId == null){
+    public List<Integer> getByProjectId(Long projectId, int start, int numOfRows) throws MiddlewareQueryException {
+
+        if (projectId == null) {
             return new ArrayList<Integer>();
         }
-        
+
         try {
             SQLQuery query = getSession().createSQLQuery(ProjectMethod.GET_METHODS_BY_PROJECT_ID);
             query.setParameter("projectId", projectId.intValue());
@@ -56,57 +54,59 @@ public class ProjectMethodDAO extends GenericDAO<ProjectMethod, Integer>{
             query.setMaxResults(numOfRows);
             return (List<Integer>) query.list();
         } catch (HibernateException e) {
-            throw new QueryException("Error with getByProjectId query: " + e.getMessage(), e);
-        } 
+            throw new MiddlewareQueryException("Error with getByProjectId(projectId=" + projectId + ") query from ProjectMethod: "
+                    + e.getMessage(), e);
+        }
     }
-    
+
     /**
      * Returns the number of {@link Method} records by project id.
      *
      * @param projectId the project id
      * @return the number of {@link Method} records
-     * @throws QueryException the query exception
+     * @throws MiddlewareQueryException the MiddlewareQueryException
      */
-    public Long countByProjectId(Long projectId) throws QueryException {
+    public long countByProjectId(Long projectId) throws MiddlewareQueryException {
         try {
             SQLQuery query = getSession().createSQLQuery(ProjectMethod.COUNT_METHODS_BY_PROJECT_ID);
             query.setParameter("projectId", projectId.intValue());
             BigInteger result = (BigInteger) query.uniqueResult();
-            return Long.valueOf(result.longValue());
+            return result.longValue();
         } catch (HibernateException e) {
-            throw new QueryException("Error with countByProjectId query: " + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error with countByProjectId(projectId=" + projectId + ") query from ProjectMethod: "
+                    + e.getMessage(), e);
         }
     }
-    
-    @SuppressWarnings("rawtypes")
-    public List<ProjectMethod> getProjectMethodByProject(Project project, int start, int numOfRows) 
-            throws QueryException {
-            
-            if (project == null || project.getProjectId() == null){
-                return new ArrayList<ProjectMethod>();
-            }
 
-            try {
-                SQLQuery query = getSession().createSQLQuery(ProjectMethod.GET_PROJECT_METHODS_BY_PROJECT_ID);
-                query.setParameter("projectId", project.getProjectId().intValue());
-                query.setFirstResult(start);
-                query.setMaxResults(numOfRows);
-                List results = query.list();
-                List<ProjectMethod> toReturn = new ArrayList<ProjectMethod>();
-                for (Object o : results) {
-                    Object[] result = (Object[]) o;
-                    if (result != null) {
-                        Long projectMethodId = Long.valueOf((Integer)result[0]);
-                        Integer methodId = (Integer) result[2];
-                        ProjectMethod projectMethod = new ProjectMethod(projectMethodId, project, methodId);
-                        toReturn.add(projectMethod);
-                    }
-                }
-                return toReturn;
-                
-            } catch (HibernateException e) {
-                throw new QueryException("Error with getProjectMethodByProjectId query: " + e.getMessage(), e);
-            } 
+    @SuppressWarnings("rawtypes")
+    public List<ProjectMethod> getProjectMethodByProject(Project project, int start, int numOfRows) throws MiddlewareQueryException {
+
+        if (project == null || project.getProjectId() == null) {
+            return new ArrayList<ProjectMethod>();
         }
+
+        try {
+            SQLQuery query = getSession().createSQLQuery(ProjectMethod.GET_PROJECT_METHODS_BY_PROJECT_ID);
+            query.setParameter("projectId", project.getProjectId().intValue());
+            query.setFirstResult(start);
+            query.setMaxResults(numOfRows);
+            List results = query.list();
+            List<ProjectMethod> toReturn = new ArrayList<ProjectMethod>();
+            for (Object o : results) {
+                Object[] result = (Object[]) o;
+                if (result != null) {
+                    Long projectMethodId = Long.valueOf((Integer) result[0]);
+                    Integer methodId = (Integer) result[2];
+                    ProjectMethod projectMethod = new ProjectMethod(projectMethodId, project, methodId);
+                    toReturn.add(projectMethod);
+                }
+            }
+            return toReturn;
+
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getProjectMethodByProjectId(project=" + project
+                    + ") query from ProjectMethod: " + e.getMessage(), e);
+        }
+    }
 
 }

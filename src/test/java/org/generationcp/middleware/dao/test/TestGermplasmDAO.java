@@ -36,17 +36,17 @@ public class TestGermplasmDAO{
     }
 
     /**
-     * @Test public void testFindAll() throws Exception { List<Germplasm>
-     *       germplsmList = dao.findAll(0, 5); Assert.assertTrue(germplsmList !=
+     * @Test public void testGetAll() throws Exception { List<Germplasm>
+     *       germplsmList = dao.getAll(0, 5); Assert.assertTrue(germplsmList !=
      *       null); Assert.assertTrue(germplsmList.size() >= 5);
      * 
      *       System.out.println("SEARCH RESULTS:"); for(Germplasm g :
      *       germplsmList) { System.out.println(g); } }
-     * @Test public void testCountAll() throws Exception { Long count =
+     * @Test public void testCountAll() throws Exception { long count =
      *       dao.countAll(); Assert.assertTrue(count != null);
      *       System.out.println("COUNT = " + count); }
-     * @Test public void testFindByPrefName() throws Exception { List<Germplasm>
-     *       germplsmList = dao.findByPrefName("IR 64", 0, 5);
+     * @Test public void testGetByPrefName() throws Exception { List<Germplasm>
+     *       germplsmList = dao.getByPrefName("IR 64", 0, 5);
      *       Assert.assertTrue(germplsmList != null);
      *       Assert.assertTrue(germplsmList.size() >= 5);
      * 
@@ -65,11 +65,12 @@ public class TestGermplasmDAO{
 
     @Test
     public void testGetDerivativeChildren() throws Exception {
-        List<Germplasm> results = dao.getDerivativeChildren(Integer.valueOf(1));
+        Integer gid = Integer.valueOf(1);
+        List<Germplasm> results = dao.getDerivativeChildren(gid);
         Assert.assertTrue(results.size() > 0);
-        System.out.println("RESULTS:");
+        System.out.println("testGetDerivativeChildren(GId=" + gid + ") RESULTS:");
         for (Germplasm g : results) {
-            System.out.println(g.getGid() + " : " + g.getPreferredName().getNval());
+            System.out.println("  " + g.getGid() + " : " + g.getPreferredName().getNval());
         }
     }
 

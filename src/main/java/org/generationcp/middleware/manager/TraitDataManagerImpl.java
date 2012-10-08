@@ -20,7 +20,7 @@ import org.generationcp.middleware.dao.ScaleDAO;
 import org.generationcp.middleware.dao.ScaleDiscreteDAO;
 import org.generationcp.middleware.dao.TraitDAO;
 import org.generationcp.middleware.dao.TraitMethodDAO;
-import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.TraitDataManager;
 import org.generationcp.middleware.pojos.Scale;
@@ -56,11 +56,11 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
             return null;
         }
 
-        return (Scale) dao.findById(id, false);
+        return (Scale) dao.getById(id, false);
     }
 
     @Override
-    public List<Scale> getAllScales(int start, int numOfRows, Database instance) throws QueryException {
+    public List<Scale> getAllScales(int start, int numOfRows, Database instance) throws MiddlewareQueryException {
         ScaleDAO dao = new ScaleDAO();
         Session session = getSession(instance);
 
@@ -74,22 +74,22 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
     }
 
     @Override
-    public int countAllScales() {
-        int count = 0;
-        
+    public long countAllScales() {
+        long count = 0;
+
         Session sessionForCentral = getCurrentSessionForCentral();
         Session sessionForLocal = getCurrentSessionForLocal();
 
         if (sessionForLocal != null) {
             ScaleDAO dao = new ScaleDAO();
             dao.setSession(sessionForLocal);
-            count = count + dao.countAll().intValue();
+            count = count + dao.countAll();
         }
 
         if (sessionForCentral != null) {
             ScaleDAO centralDao = new ScaleDAO();
             centralDao.setSession(sessionForCentral);
-            count = count + centralDao.countAll().intValue();
+            count = count + centralDao.countAll();
         }
 
         return count;
@@ -110,7 +110,7 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
         id.setScaleId(scaleId);
         id.setValue(value);
 
-        ScaleDiscrete sd = dao.findById(id, false);
+        ScaleDiscrete sd = dao.getById(id, false);
 
         if (sd != null) {
             return sd.getValueDescription();
@@ -120,7 +120,7 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
     }
 
     @Override
-    public List<ScaleDiscrete> getDiscreteValuesOfScale(Integer scaleId) throws QueryException {
+    public List<ScaleDiscrete> getDiscreteValuesOfScale(Integer scaleId) throws MiddlewareQueryException {
         ScaleDiscreteDAO dao = new ScaleDiscreteDAO();
         Session session = getSession(scaleId);
 
@@ -144,11 +144,11 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
             return null;
         }
 
-        return dao.findById(scaleId, false);
+        return dao.getById(scaleId, false);
     }
 
     @Override
-    public Trait getTraitById(Integer id) {
+    public Trait getTraitById(Integer id) throws MiddlewareQueryException {
         TraitDAO dao = new TraitDAO();
         Session session = getSession(id);
 
@@ -162,7 +162,7 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
     }
 
     @Override
-    public List<Trait> getAllTraits(int start, int numOfRows, Database instance) throws QueryException {
+    public List<Trait> getAllTraits(int start, int numOfRows, Database instance) throws MiddlewareQueryException {
         TraitDAO dao = new TraitDAO();
         Session session = getSession(instance);
 
@@ -175,22 +175,22 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
     }
 
     @Override
-    public int countAllTraits() {
-        int count = 0;
-        
+    public long countAllTraits() {
+        long count = 0;
+
         Session sessionForCentral = getCurrentSessionForCentral();
         Session sessionForLocal = getCurrentSessionForLocal();
 
         if (sessionForLocal != null) {
             TraitDAO dao = new TraitDAO();
             dao.setSession(sessionForLocal);
-            count = count + dao.countAll().intValue();
+            count = count + dao.countAll();
         }
 
         if (sessionForCentral != null) {
             TraitDAO centralDao = new TraitDAO();
             centralDao.setSession(sessionForCentral);
-            count = count + centralDao.countAll().intValue();
+            count = count + centralDao.countAll();
         }
 
         return count;
@@ -207,11 +207,11 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
             return null;
         }
 
-        return dao.findById(id, false);
+        return dao.getById(id, false);
     }
 
     @Override
-    public List<TraitMethod> getAllTraitMethods(int start, int numOfRows, Database instance) throws QueryException {
+    public List<TraitMethod> getAllTraitMethods(int start, int numOfRows, Database instance) throws MiddlewareQueryException {
         TraitMethodDAO dao = new TraitMethodDAO();
         Session session = getSession(instance);
 
@@ -225,29 +225,29 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
     }
 
     @Override
-    public int countAllTraitMethods() {
-        int count = 0;
-        
+    public long countAllTraitMethods() {
+        long count = 0;
+
         Session sessionForCentral = getCurrentSessionForCentral();
         Session sessionForLocal = getCurrentSessionForLocal();
 
         if (sessionForLocal != null) {
             TraitMethodDAO dao = new TraitMethodDAO();
             dao.setSession(sessionForLocal);
-            count = count + dao.countAll().intValue();
+            count = count + dao.countAll();
         }
 
         if (sessionForCentral != null) {
             TraitMethodDAO centralDao = new TraitMethodDAO();
             centralDao.setSession(sessionForCentral);
-            count = count + centralDao.countAll().intValue();
+            count = count + centralDao.countAll();
         }
 
         return count;
     }
 
     @Override
-    public List<TraitMethod> getTraitMethodsByTraitId(Integer traitId) {
+    public List<TraitMethod> getTraitMethodsByTraitId(Integer traitId) throws MiddlewareQueryException {
         TraitMethodDAO dao = new TraitMethodDAO();
         Session session = getSession(traitId);
 
@@ -261,7 +261,7 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
     }
 
     @Override
-    public List<Scale> getScalesByTraitId(Integer traitId) {
+    public List<Scale> getScalesByTraitId(Integer traitId) throws MiddlewareQueryException {
         ScaleDAO dao = new ScaleDAO();
         Session session = getSession(traitId);
 
@@ -275,56 +275,59 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
     }
 
     @Override
-    public void addTraitMethod(TraitMethod traitMethod) throws QueryException {
+    public void addTraitMethod(TraitMethod traitMethod) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
-        
+
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
-        
+
         try {
             // begin save transaction
             trans = session.beginTransaction();
-            
+
             TraitMethodDAO dao = new TraitMethodDAO();
             dao.setSession(session);
-            
+
             dao.saveOrUpdate(traitMethod);
-            
+
             trans.commit();
-        } catch (Exception ex) {
+        } catch (Exception e) {
             // rollback transaction in case of errors
             if (trans != null) {
                 trans.rollback();
             }
-            throw new QueryException("Error encountered while saving TraitMethod: " + ex.getMessage(), ex);
+            throw new MiddlewareQueryException("Error encountered while saving TraitMethod: TraitDataManager.addTraitMethod(traitMethod="
+                    + traitMethod + "): " + e.getMessage(), e);
         } finally {
             session.flush();
         }
     }
 
     @Override
-    public void deleteTraitMethod(TraitMethod traitMethod) throws QueryException {
+    public void deleteTraitMethod(TraitMethod traitMethod) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
-        
+
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
-        
+
         try {
             // begin save transaction
             trans = session.beginTransaction();
-            
+
             TraitMethodDAO dao = new TraitMethodDAO();
             dao.setSession(session);
-            
+
             dao.makeTransient(traitMethod);
-            
+
             trans.commit();
-        } catch (Exception ex) {
+        } catch (Exception e) {
             // rollback transaction in case of errors
             if (trans != null) {
                 trans.rollback();
             }
-            throw new QueryException("Error encountered while saving TraitMethod: " + ex.getMessage(), ex);
+            throw new MiddlewareQueryException(
+                    "Error encountered while saving TraitMethod: TraitDataManager.deleteTraitMethod(traitMethod=" + traitMethod + "): "
+                            + e.getMessage(), e);
         } finally {
             session.flush();
         }

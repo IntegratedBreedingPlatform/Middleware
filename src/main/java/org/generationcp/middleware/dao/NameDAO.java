@@ -15,7 +15,7 @@ package org.generationcp.middleware.dao;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.pojos.GidNidElement;
 import org.generationcp.middleware.pojos.Name;
@@ -27,7 +27,7 @@ import org.hibernate.criterion.Restrictions;
 public class NameDAO extends GenericDAO<Name, Integer>{
 
     @SuppressWarnings("unchecked")
-    public List<Name> getByGIDWithFilters(Integer gid, Integer status, GermplasmNameType type) throws QueryException {
+    public List<Name> getByGIDWithFilters(Integer gid, Integer status, GermplasmNameType type) throws MiddlewareQueryException {
         try {
             StringBuilder queryString = new StringBuilder();
             queryString.append("SELECT {n.*} from NAMES n WHERE n.gid = :gid ");
@@ -67,77 +67,89 @@ public class NameDAO extends GenericDAO<Name, Integer>{
              * Criterion typeCriterion = Restrictions.eq("type.fldno", typeid);
              * criterions.add(typeCriterion); }
              * 
-             * List<Name> results = findByCriteria(criterions); return results;
+             * List<Name> results = getByCriteria(criterions); return results;
              **/
-        } catch (HibernateException ex) {
-            throw new QueryException("Error with get Names by GID query: " + ex.getMessage(), ex);
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getByGIDWithFilters(gid=" + gid + ", status=" + status + ", type=" + type
+                    + ") query from Name " + e.getMessage(), e);
         }
     }
 
     @SuppressWarnings("unchecked")
-    public Name getByGIDAndNval(Integer gid, String nval) throws QueryException {
-        Criteria crit = getSession().createCriteria(Name.class);
-        crit.add(Restrictions.eq("germplasmId", gid));
-        crit.add(Restrictions.eq("nval", nval));
-        List<Name> names = crit.list();
-        if (names.isEmpty()) {
-            // return null if no Name objects match
-            return null;
-        } else {
-            // return first result in the case of multiple matches
-            return names.get(0);
+    public Name getByGIDAndNval(Integer gid, String nval) throws MiddlewareQueryException {
+        try {
+            Criteria crit = getSession().createCriteria(Name.class);
+            crit.add(Restrictions.eq("germplasmId", gid));
+            crit.add(Restrictions.eq("nval", nval));
+            List<Name> names = crit.list();
+            if (names.isEmpty()) {
+                // return null if no Name objects match
+                return null;
+            } else {
+                // return first result in the case of multiple matches
+                return names.get(0);
+            }
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getByGIDAndNval(gid=" + gid + ", nval=" + nval + ") query from Name "
+                    + e.getMessage(), e);
         }
     }
 
-    public void validateId(Name name) throws QueryException {
+    public void validateId(Name name) throws MiddlewareQueryException {
         // Check if not a local record (has negative ID)
         Integer id = name.getNid();
         if (id != null && id.intValue() > 0) {
-            throw new QueryException("Cannot update a Central Database record. "
+            throw new MiddlewareQueryException("Error with validateId(name=" + name + "): Cannot update a Central Database record. "
                     + "Name object to update must be a Local Record (ID must be negative)");
         }
     }
-    
+
     @SuppressWarnings("unchecked")
-    public List<Name> getNamesByNameIds(List<Integer> nIds){
-        
-        if (nIds == null || nIds.isEmpty()){
-            return new ArrayList<Name>();
-        }
+    public List<Name> getNamesByNameIds(List<Integer> nIds) throws MiddlewareQueryException {
+        try {
 
-        Criteria crit = getSession().createCriteria(Name.class);
-        crit.add(Restrictions.in("nid", nIds));
-        List<Name> names = crit.list();
-        if (names.isEmpty()) {
-            return null;
-        }
-        return names;
-    }
-    
-    public Name getNameByNameId(Integer nId) {
-        Criteria crit = getSession().createCriteria(Name.class);
-        crit.add(Restrictions.eq("nid", nId));
-        
-        Name name = (Name) crit.uniqueResult();
-        
-        return name;
-    }
-    
+            if (nIds == null || nIds.isEmpty()) {
+                return new ArrayList<Name>();
+            }
 
-    
+            Criteria crit = getSession().createCriteria(Name.class);
+            crit.add(Restrictions.in("nid", nIds));
+            List<Name> names = crit.list();
+            if (names.isEmpty()) {
+                return null;
+            }
+            return names;
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getNamesByNameIds(nIds=" + nIds + ") query from Name " + e.getMessage(), e);
+        }
+    }
+
+    public Name getNameByNameId(Integer nId) throws MiddlewareQueryException {
+        try {
+            Criteria crit = getSession().createCriteria(Name.class);
+            crit.add(Restrictions.eq("nid", nId));
+
+            Name name = (Name) crit.uniqueResult();
+
+            return name;
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getNameByNameId(nId=" + nId + ") query from Name " + e.getMessage(), e);
+        }
+    }
+
     /**
      * Retrieves the gId and nId pairs for the given germplasm names
      * 
      * @param germplasmNames the list of germplasm names
      * @return the list of GidNidElement (gId and nId pairs)
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
     @SuppressWarnings("rawtypes")
-    public List<GidNidElement> getGidAndNidByGermplasmNames(List<String> germplasmNames)throws QueryException{
+    public List<GidNidElement> getGidAndNidByGermplasmNames(List<String> germplasmNames) throws MiddlewareQueryException {
 
         List<GidNidElement> toReturn = new ArrayList<GidNidElement>();
 
-        if (germplasmNames == null || germplasmNames.isEmpty()){
+        if (germplasmNames == null || germplasmNames.isEmpty()) {
             return toReturn;
         }
 
@@ -145,7 +157,7 @@ public class NameDAO extends GenericDAO<Name, Integer>{
             SQLQuery query = getSession().createSQLQuery(Name.GET_GID_AND_NID_BY_GERMPLASM_NAME);
             query.setParameterList("germplasmNameList", germplasmNames);
             List results = query.list();
-            
+
             for (Object o : results) {
                 Object[] result = (Object[]) o;
                 if (result != null) {
@@ -156,11 +168,11 @@ public class NameDAO extends GenericDAO<Name, Integer>{
                 }
             }
 
-            return toReturn;            
+            return toReturn;
         } catch (HibernateException e) {
-            throw new QueryException("Error with get gid and nid by germplasm names query: " + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error with getGidAndNidByGermplasmNames(germplasmNames=" + germplasmNames
+                    + ") query from Name " + e.getMessage(), e);
         }
     }
 
-    
 }

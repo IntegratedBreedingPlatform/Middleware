@@ -12,7 +12,7 @@
 
 package org.generationcp.middleware.manager;
 
-import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.hibernate.Session;
 
@@ -118,15 +118,15 @@ public abstract class DataManager {
      * 
      * @param instance
      * @return
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      *             if a {@link Session} for the specified database instance is
      *             not available
      */
-    protected Session getSession(Database instance) throws QueryException {
+    protected Session getSession(Database instance) throws MiddlewareQueryException {
         if (instance == Database.CENTRAL) {
             Session session = getCurrentSessionForCentral();
             if (session == null) {
-                throw new QueryException("The central instance was specified "
+                throw new MiddlewareQueryException("Error in getSession(Database.CENTRAL): The central instance was specified "
                     + "but there is no database connection for central provided.");
             }
             
@@ -135,7 +135,7 @@ public abstract class DataManager {
         else if (instance == Database.LOCAL) {
             Session session = getCurrentSessionForLocal();
             if (session == null) {
-                throw new QueryException("The local instance was specified " 
+                throw new MiddlewareQueryException("Error in getSession(Database.LOCAL): The local instance was specified " 
                     + "but there is no database connection for local provided.");
             }
             
@@ -153,21 +153,21 @@ public abstract class DataManager {
      * @return the {@link Session} for the central database if the specified
      *         <code>id</code> is positive or equal to zero, otherwise, this
      *         method returns <code>null</code>.
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
     protected Session getSession(int id) {
         return id >= 0 ? getCurrentSessionForCentral() : getCurrentSessionForLocal();
     }
     
-    protected void requireLocalDatabaseInstance() throws QueryException {
+    protected void requireLocalDatabaseInstance() throws MiddlewareQueryException {
         if (getCurrentSessionForLocal() == null) {
-            throw new QueryException(NO_LOCAL_INSTANCE_MSG);
+            throw new MiddlewareQueryException(NO_LOCAL_INSTANCE_MSG);
         }
     }
     
-    protected void requireCentralDatabaseInstance() throws QueryException {
+    protected void requireCentralDatabaseInstance() throws MiddlewareQueryException {
         if (getCurrentSessionForCentral() == null) {
-            throw new QueryException(NO_CENTRAL_INSTANCE_MSG);
+            throw new MiddlewareQueryException(NO_CENTRAL_INSTANCE_MSG);
         }
     }
 }

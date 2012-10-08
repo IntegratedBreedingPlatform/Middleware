@@ -14,7 +14,7 @@ package org.generationcp.middleware.manager.api;
 
 import java.util.List;
 
-import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.GermplasmList;
@@ -33,7 +33,7 @@ public interface GermplasmListManager{
      * 
      * @param id
      * @return GermplasmList POJO
-     * @throws QueryException 
+     * @throws MiddlewareQueryException 
      */
     public GermplasmList getGermplasmListById(Integer id);
 
@@ -49,16 +49,16 @@ public interface GermplasmListManager{
      *            - can either be Database.CENTRAL or Database.LOCAL
      * 
      * @return List of GermplasmList POJOs
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<GermplasmList> getAllGermplasmLists(int start, int numOfRows, Database instance) throws QueryException;
+    public List<GermplasmList> getAllGermplasmLists(int start, int numOfRows, Database instance) throws MiddlewareQueryException;
 
     /**
      * Returns the total number of Germplasm Lists.
      * 
      * @return
      */
-    public int countAllGermplasmLists();
+    public long countAllGermplasmLists();
 
     /**
      * Returns all the Germplasm List records with names matching the given
@@ -75,10 +75,10 @@ public interface GermplasmListManager{
      * @param instance
      *            - can either be Database.CENTRAL or Database.LOCAL
      * @return List of GermplasmList POJOs
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<GermplasmList> findGermplasmListByName(String name, int start, int numOfRows, Operation operation, Database instance)
-            throws QueryException;
+    public List<GermplasmList> getGermplasmListByName(String name, int start, int numOfRows, Operation operation, Database instance)
+            throws MiddlewareQueryException;
 
     /**
      * Returns the number of Germplasm List records with names matching the
@@ -88,7 +88,7 @@ public interface GermplasmListManager{
      * @param operation
      * @return
      */
-    public int countGermplasmListByName(String name, Operation operation);
+    public long countGermplasmListByName(String name, Operation operation) throws MiddlewareQueryException;
 
     /**
      * Returns all the Germplasm List records that have the given status.
@@ -103,9 +103,9 @@ public interface GermplasmListManager{
      *            - can either be Database.CENTRAL or Database.LOCAL
      * 
      * @return List of Germplasm POJOs
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<GermplasmList> findGermplasmListByStatus(Integer status, int start, int numOfRows, Database instance) throws QueryException;
+    public List<GermplasmList> getGermplasmListByStatus(Integer status, int start, int numOfRows, Database instance) throws MiddlewareQueryException;
 
     /**
      * Returns the number of Germplasm List records that have the given status.
@@ -113,7 +113,7 @@ public interface GermplasmListManager{
      * @param status
      * @return
      */
-    public int countGermplasmListByStatus(Integer status);
+    public long countGermplasmListByStatus(Integer status)  throws MiddlewareQueryException;
 
     /**
      * Returns the germplasm list entries that belong to the list identified by
@@ -128,7 +128,7 @@ public interface GermplasmListManager{
      * 
      * @return List of GermplasmListData POJOs
      */
-    public List<GermplasmListData> getGermplasmListDataByListId(Integer id, int start, int numOfRows);
+    public List<GermplasmListData> getGermplasmListDataByListId(Integer id, int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Returns the number of germplasm list entries that belong to the list
@@ -137,7 +137,7 @@ public interface GermplasmListManager{
      * @param id
      * @return
      */
-    public int countGermplasmListDataByListId(Integer id);
+    public long countGermplasmListDataByListId(Integer id) throws MiddlewareQueryException;
 
     /**
      * Returns the germplasm list entries that belong to the list identified by
@@ -147,7 +147,7 @@ public interface GermplasmListManager{
      * @param gid
      * @return List of GermplasmListData POJOs
      */
-    public List<GermplasmListData> getGermplasmListDataByListIdAndGID(Integer listId, Integer gid);
+    public List<GermplasmListData> getGermplasmListDataByListIdAndGID(Integer listId, Integer gid) throws MiddlewareQueryException;
 
     /**
      * Returns the germplasm list entry which is identified by the given
@@ -157,7 +157,7 @@ public interface GermplasmListManager{
      * @param entryId
      * @return List of GermplasmListData POJOs
      */
-    public GermplasmListData getGermplasmListDataByListIdAndEntryId(Integer listId, Integer entryId);
+    public GermplasmListData getGermplasmListDataByListIdAndEntryId(Integer listId, Integer entryId) throws MiddlewareQueryException;
 
     /**
      * Returns the germplasm list entries associated with the Germplasm
@@ -171,9 +171,9 @@ public interface GermplasmListManager{
      *            to be returned
      * 
      * @return List of GermplasmListData POJOs
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<GermplasmListData> getGermplasmListDataByGID(Integer gid, int start, int numOfRows) throws QueryException;
+    public List<GermplasmListData> getGermplasmListDataByGID(Integer gid, int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Returns the number of germplasm list entries associated with the
@@ -182,7 +182,7 @@ public interface GermplasmListManager{
      * @param gid
      * @return
      */
-    public int countGermplasmListDataByGID(Integer gid);
+    public long countGermplasmListDataByGID(Integer gid) throws MiddlewareQueryException;
 
     /**
      * Returns the Top Level Germplasm List Folders present in the specified database.
@@ -195,9 +195,9 @@ public interface GermplasmListManager{
      * @param instance
      *            - can either be Database.CENTRAL or Database.LOCAL
      * @return - List of GermplasmList POJOs
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<GermplasmList> getAllTopLevelLists(int start, int numOfRows, Database instance) throws QueryException;
+    public List<GermplasmList> getAllTopLevelLists(int start, int numOfRows, Database instance) throws MiddlewareQueryException;
     
     /**
      * Returns the Top Level Germplasm List Folders present in the specified database.
@@ -210,9 +210,9 @@ public interface GermplasmListManager{
      * @param instance
      *            - can either be Database.CENTRAL or Database.LOCAL
      * @return - List of GermplasmList POJOs
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<GermplasmList> getAllTopLevelListsBatched(int batchSize, Database instance) throws QueryException;
+    public List<GermplasmList> getAllTopLevelListsBatched(int batchSize, Database instance) throws MiddlewareQueryException;
     
     /**
      * Returns the number of Top Level Germplasm List Folders in the specified database.
@@ -220,9 +220,9 @@ public interface GermplasmListManager{
      * @param instance
      *            - can either be Database.CENTRAL or Database.LOCAL
      * @return
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public int countAllTopLevelLists(Database instance) throws QueryException;
+    public long countAllTopLevelLists(Database instance) throws MiddlewareQueryException;
 
     /**
      * Inserts a single {@code GermplasmList} object into the database.
@@ -230,10 +230,10 @@ public interface GermplasmListManager{
      * @param germplasmList
      *            - The {@code GermplasmList} object to be persisted to the
      *            database. Must be a valid {@code GermplasmList} object.
-     * @return Returns the list of GermplasmList ids that were assigned to the new GermplasmLists
-     * @throws QueryException
+     * @return Returns the GermplasmList id that was assigned to the new GermplasmLists
+     * @throws MiddlewareQueryException
      */
-    public Integer addGermplasmList(GermplasmList germplasmList) throws QueryException;
+    public Integer addGermplasmList(GermplasmList germplasmList) throws MiddlewareQueryException;
 
     /**
      * Inserts a list of multiple {@code GermplasmList} objects into the
@@ -243,9 +243,9 @@ public interface GermplasmListManager{
      *            - A list of {@code GermplasmList} objects to be persisted to
      *            the database. {@code GermplasmList} objects must be valid.
      * @return Returns the list of GermplasmList ids that were assigned to the new GermplasmLists
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<Integer> addGermplasmList(List<GermplasmList> germplasmLists) throws QueryException;
+    public List<Integer> addGermplasmList(List<GermplasmList> germplasmLists) throws MiddlewareQueryException;
 
     /**
      * Updates the database with the {@code GermplasmList} object specified.
@@ -254,9 +254,9 @@ public interface GermplasmListManager{
      *            - The {@code GermplasmList} object to be updated in the
      *            database. Must be a valid {@code GermplasmList} object.
      * @return Returns the list of GermplasmList ids that were updated in the database.
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public Integer updateGermplasmList(GermplasmList germplasmList) throws QueryException;
+    public Integer updateGermplasmList(GermplasmList germplasmList) throws MiddlewareQueryException;
 
     /**
      * Updates the database with multiple {@code GermplasmList} objects
@@ -266,9 +266,9 @@ public interface GermplasmListManager{
      *            - A list of {@code GermplasmList} objects to be updated in the
      *            database. {@code GermplasmList} objects must be valid.
      * @return Returns the list of GermplasmList ids that were updated in the database.
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<Integer> updateGermplasmList(List<GermplasmList> germplasmLists) throws QueryException;
+    public List<Integer> updateGermplasmList(List<GermplasmList> germplasmLists) throws MiddlewareQueryException;
 
     /**
      * Removes the specified {@code GermplasmList} object from the database.
@@ -278,9 +278,9 @@ public interface GermplasmListManager{
      *            database. Must be a valid {@code GermplasmList} object.
      * @return Returns the number of {@code GermplasmList} objects deleted from
      *         the database.
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public int deleteGermplasmList(GermplasmList germplasmList) throws QueryException;
+    public int deleteGermplasmList(GermplasmList germplasmList) throws MiddlewareQueryException;
 
     /**
      * Removes the specified {@code GermplasmList} objects from the database.
@@ -290,9 +290,9 @@ public interface GermplasmListManager{
      *            the database. {@code GermplasmList} objects must be valid.
      * @return Returns the number of {@code GermplasmList} objects deleted from
      *         the database.
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public int deleteGermplasmList(List<GermplasmList> germplasmLists) throws QueryException;
+    public int deleteGermplasmList(List<GermplasmList> germplasmLists) throws MiddlewareQueryException;
 
     /**
      * Removes the corresponding {@code GermplasmList} record and all related
@@ -303,9 +303,9 @@ public interface GermplasmListManager{
      *            deleted.
      * @return Returns the number of {@code GermplasmList} records deleted from
      *         the database.
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public int deleteGermplasmListByListId(Integer listId) throws QueryException;
+    public int deleteGermplasmListByListId(Integer listId) throws MiddlewareQueryException;
 
     /**
      * Inserts a {@code GermplasmListData} object into the database.
@@ -315,9 +315,9 @@ public interface GermplasmListManager{
      *            database. Must be a valid {@code GermplasmListData} object.
      * @return Returns the number of {@code GermplasmListData} records inserted
      *         in the database.
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public int addGermplasmListData(GermplasmListData germplasmListData) throws QueryException;
+    public int addGermplasmListData(GermplasmListData germplasmListData) throws MiddlewareQueryException;
 
     /**
      * Inserts a list of multiple {@code GermplasmListData} objects into the
@@ -329,9 +329,9 @@ public interface GermplasmListManager{
      *            valid.
      * @return Returns the number of {@code GermplasmListData} records inserted
      *         in the database.
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public int addGermplasmListData(List<GermplasmListData> germplasmListDatas) throws QueryException;
+    public int addGermplasmListData(List<GermplasmListData> germplasmListDatas) throws MiddlewareQueryException;
 
     /**
      * Updates the database with the {@code GermplasmListData} object specified.
@@ -341,9 +341,9 @@ public interface GermplasmListManager{
      *            database. Must be a valid {@code GermplasmListData} object.
      * @return Returns the number of {@code GermplasmListData} records updated
      *         in the database.
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public int updateGermplasmListData(GermplasmListData germplasmListData) throws QueryException;
+    public int updateGermplasmListData(GermplasmListData germplasmListData) throws MiddlewareQueryException;
 
     /**
      * Updates the database with the {@code GermplasmListData} objects
@@ -354,9 +354,9 @@ public interface GermplasmListManager{
      *            the database. Must be valid {@code GermplasmListData} objects.
      * @return Returns the number of {@code GermplasmListData} records updated
      *         in the database.
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public int updateGermplasmListData(List<GermplasmListData> germplasmListDatas) throws QueryException;
+    public int updateGermplasmListData(List<GermplasmListData> germplasmListDatas) throws MiddlewareQueryException;
 
     /**
      * Removes the corresponding {@code GermplasmListData} record from the
@@ -370,9 +370,9 @@ public interface GermplasmListManager{
      *            Data to be deleted.
      * @return Returns the number of {@code GermplasmListData} records deleted
      *         from the database.
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public int deleteGermplasmListDataByListIdEntryId(Integer listId, Integer entryId) throws QueryException;
+    public int deleteGermplasmListDataByListIdEntryId(Integer listId, Integer entryId) throws MiddlewareQueryException;
 
     /**
      * Removes the corresponding {@code GermplasmListData} records from the
@@ -383,9 +383,9 @@ public interface GermplasmListManager{
      *            to be deleted.
      * @return Returns the number of {@code GermplasmListData} records deleted
      *         from the database.
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public int deleteGermplasmListDataByListId(Integer listId) throws QueryException;
+    public int deleteGermplasmListDataByListId(Integer listId) throws MiddlewareQueryException;
 
     /**
      * Removes the specified {@code GermplasmListData} object from the database.
@@ -395,9 +395,9 @@ public interface GermplasmListManager{
      *            database. Must be a valid {@code GermplasmListData} object.
      * @return Returns the number of {@code GermplasmListData} objects deleted
      *         from the database.
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public int deleteGermplasmListData(GermplasmListData germplasmListData) throws QueryException;
+    public int deleteGermplasmListData(GermplasmListData germplasmListData) throws MiddlewareQueryException;
 
     /**
      * Removes the specified {@code GermplasmListData} objects from the
@@ -409,9 +409,9 @@ public interface GermplasmListManager{
      *            valid.
      * @return Returns the number of {@code GermplasmListData} records deleted
      *         from the database.
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public int deleteGermplasmListData(List<GermplasmListData> germplasmListDatas) throws QueryException;
+    public int deleteGermplasmListData(List<GermplasmListData> germplasmListDatas) throws MiddlewareQueryException;
 
     /**
      * Returns a list of {@code GermplasmList} child records given a parent id.
@@ -420,9 +420,9 @@ public interface GermplasmListManager{
      * @param start - the starting point to retrieve the results
      * @param numOfRows - the number of rows from the starting point to be retrieved
      * @return Returns a List of GermplasmList POJOs for the child lists
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<GermplasmList> getGermplasmListByParentFolderId(Integer parentId, int start, int numOfRows) throws QueryException;
+    public List<GermplasmList> getGermplasmListByParentFolderId(Integer parentId, int start, int numOfRows) throws MiddlewareQueryException;
     
     /**
      * Returns a list of {@code GermplasmList} child records given a parent id.
@@ -434,16 +434,16 @@ public interface GermplasmListManager{
      * @param batchSize
      *            - the number of records to be retrieved per iteration
      * @return Returns a List of GermplasmList POJOs for the child lists
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<GermplasmList> getGermplasmListByParentFolderIdBatched(Integer parentId, int batchSize) throws QueryException;
+    public List<GermplasmList> getGermplasmListByParentFolderIdBatched(Integer parentId, int batchSize) throws MiddlewareQueryException;
     
     /**
      * Returns the number of {@code GermplasmList} child records given a parent id.
      *
      * @param parentId the parent id
      * @return number of germplasm list child records of a parent record
-     * @throws QueryException the query exception
+     * @throws MiddlewareQueryException the MiddlewareQueryException
      */
-    public Long countGermplasmListByParentFolderId(Integer parentId) throws QueryException;
+    public long countGermplasmListByParentFolderId(Integer parentId) throws MiddlewareQueryException;
 }

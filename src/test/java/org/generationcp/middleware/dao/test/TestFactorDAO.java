@@ -48,10 +48,10 @@ public class TestFactorDAO{
         ounitIds.add(11201);
         ounitIds.add(11362);
 
-        Set<Integer> gids = dao.getGIDSGivenObservationUnitIds(ounitIds, 0, 10);
-        System.out.println("RESULTS");
+        Set<Integer> gids = dao.getGIDSByObservationUnitIds(ounitIds, 0, 10);
+        System.out.println("testGetGIDSGivenObservationUnitIds("+ ounitIds +") RESULTS: ");
         for (Integer gid : gids){
-            System.out.println(gid);
+            System.out.println("  " + gid);
         }
     }
 

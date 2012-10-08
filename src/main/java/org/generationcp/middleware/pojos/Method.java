@@ -18,8 +18,6 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -28,9 +26,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
 
 /**
  * POJO for methods table
@@ -278,7 +273,7 @@ public class Method implements Serializable{
 
     @Override
     public String toString() {
-        return "Methods [mid=" + mid + ", mtype=" + mtype + ", mgrp=" + mgrp + ", mcode=" + mcode + ", mname=" + mname + ", mdesc=" + mdesc
+        return "Method [mid=" + mid + ", mtype=" + mtype + ", mgrp=" + mgrp + ", mcode=" + mcode + ", mname=" + mname + ", mdesc=" + mdesc
                 + ", mprgn=" + mprgn + ", mfprg=" + mfprg + ", mattr=" + mattr + ", geneq=" + geneq + ", lmid=" + lmid + ", mdate=" + mdate
                 + "]";
     }

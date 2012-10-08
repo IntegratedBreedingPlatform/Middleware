@@ -9,6 +9,7 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
+
 package org.generationcp.middleware.dao.gdms;
 
 import java.math.BigInteger;
@@ -16,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
-import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.MarkerInfo;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -29,8 +30,7 @@ import org.hibernate.SQLQuery;
  */
 @SuppressWarnings("unchecked")
 public class MarkerInfoDAO extends GenericDAO<MarkerInfo, Integer>{
-    
-    
+
     /**
      * Gets the list of marker info objects corresponding to the given marker name.
      *
@@ -38,21 +38,21 @@ public class MarkerInfoDAO extends GenericDAO<MarkerInfo, Integer>{
      * @param start the start row
      * @param numOfRows the number of rows to retrieve
      * @return the list of MarkerInfo objects by marker name
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<MarkerInfo> getByMarkerName(String markerName, int start, int numOfRows) throws QueryException{
-        
-        if (markerName == null){
+    public List<MarkerInfo> getByMarkerName(String markerName, int start, int numOfRows) throws MiddlewareQueryException {
+
+        if (markerName == null) {
             return new ArrayList<MarkerInfo>();
         }
-        
-        try{
+
+        try {
             SQLQuery query = getSession().createSQLQuery(MarkerInfo.GET_BY_MARKER_NAME);
             query.setParameter("markerName", markerName);
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
             List<MarkerInfo> results = query.list();
-            
+
             ArrayList<MarkerInfo> toReturn = new ArrayList<MarkerInfo>();
             for (Object o : results) {
                 Object[] result = (Object[]) o;
@@ -66,18 +66,19 @@ public class MarkerInfoDAO extends GenericDAO<MarkerInfo, Integer>{
                     String genotype = (String) result[6];
                     String ploidy = (String) result[7];
                     String principalInvestigator = (String) result[8];
-                    String contact = (String) result[9]; 
+                    String contact = (String) result[9];
                     String institute = (String) result[10];
                     BigInteger genotypesCount = (BigInteger) result[11];
-                    MarkerInfo markerInfo = new MarkerInfo(markerId, markerType, markerName2, species, accessionId, reference,
-                            genotype, ploidy, principalInvestigator, contact, institute, genotypesCount);
+                    MarkerInfo markerInfo = new MarkerInfo(markerId, markerType, markerName2, species, accessionId, reference, genotype,
+                            ploidy, principalInvestigator, contact, institute, genotypesCount);
                     toReturn.add(markerInfo);
                 }
             }
             return toReturn;
-            
-        } catch(HibernateException e){
-            throw new QueryException("Error with get marker info by marker name query: " + e.getMessage(), e);
+
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getByMarkerName(markerName=" + markerName
+                    + ") query from MarkerInfo: " + e.getMessage(), e);
         }
     }
 
@@ -86,24 +87,26 @@ public class MarkerInfoDAO extends GenericDAO<MarkerInfo, Integer>{
      *
      * @param markerName the marker name
      * @return the count
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public int countByMarkerName(String markerName) throws QueryException{
-        
+    public long countByMarkerName(String markerName) throws MiddlewareQueryException {
+
         if (markerName == null) {
             return 0;
         }
-        
-        try{
+
+        try {
             SQLQuery query = getSession().createSQLQuery(MarkerInfo.COUNT_BY_MARKER_NAME);
             query.setParameter("markerName", markerName);
-            BigInteger count = (BigInteger) query.uniqueResult();
-            return count.intValue();
-        } catch(HibernateException e){
-            throw new QueryException("Error with count marker info by marker name query: " + e.getMessage(), e);
+            BigInteger result = (BigInteger) query.uniqueResult();
+            if (result != null) {
+                return result.longValue();
+            }
+            return 0;
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with countByMarkerName(markerName=" + markerName + ") query from MarkerInfo: " + e.getMessage(), e);
         }
     }
-
 
     /**
      * Gets the list of marker info objects corresponding to the given genotype.
@@ -112,16 +115,16 @@ public class MarkerInfoDAO extends GenericDAO<MarkerInfo, Integer>{
      * @param start the start row
      * @param numOfRows the number of rows to retrieve
      * @return the list of MarkerInfo objects by genotype
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
     @SuppressWarnings("rawtypes")
-    public List<MarkerInfo> getByGenotype(String genotype, int start, int numOfRows) throws QueryException{
-        
-        if (genotype == null){
+    public List<MarkerInfo> getByGenotype(String genotype, int start, int numOfRows) throws MiddlewareQueryException {
+
+        if (genotype == null) {
             return new ArrayList<MarkerInfo>();
         }
-        
-        try{
+
+        try {
             SQLQuery query = getSession().createSQLQuery(MarkerInfo.GET_BY_GENOTYPE);
             query.setParameter("genotype", genotype);
             query.setFirstResult(start);
@@ -141,17 +144,18 @@ public class MarkerInfoDAO extends GenericDAO<MarkerInfo, Integer>{
                     String genotype2 = (String) result[6];
                     String ploidy = (String) result[7];
                     String principalInvestigator = (String) result[8];
-                    String contact = (String) result[9]; 
+                    String contact = (String) result[9];
                     String institute = (String) result[10];
                     BigInteger genotypesCount = (BigInteger) result[11];
-                    MarkerInfo markerInfo = new MarkerInfo(markerId, markerType, markerName, species, accessionId, reference,
-                            genotype2, ploidy, principalInvestigator, contact, institute, genotypesCount);
+                    MarkerInfo markerInfo = new MarkerInfo(markerId, markerType, markerName, species, accessionId, reference, genotype2,
+                            ploidy, principalInvestigator, contact, institute, genotypesCount);
                     toReturn.add(markerInfo);
                 }
             }
             return toReturn;
-            } catch(HibernateException e){
-            throw new QueryException("Error with get marker info by genotype query: " + e.getMessage(), e);
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getByGenotype(genotype=" + genotype + ") query from MarkerInfo: "
+                    + e.getMessage(), e);
         }
     }
 
@@ -160,21 +164,25 @@ public class MarkerInfoDAO extends GenericDAO<MarkerInfo, Integer>{
      *
      * @param genotype the genotype
      * @return the count
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public int countByGenotype(String genotype) throws QueryException{
-        
+    public long countByGenotype(String genotype) throws MiddlewareQueryException {
+
         if (genotype == null) {
             return 0;
         }
-        
-        try{
+
+        try {
             SQLQuery query = getSession().createSQLQuery(MarkerInfo.COUNT_BY_GENOTYPE);
             query.setParameter("genotype", genotype);
-            BigInteger count = (BigInteger) query.uniqueResult();
-            return count.intValue();
-        } catch(HibernateException e){
-            throw new QueryException("Error with count marker info by genotype query: " + e.getMessage(), e);
+            BigInteger result = (BigInteger) query.uniqueResult();
+            if (result != null) {
+                return result.longValue();
+            }
+            return 0;
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with countByGenotype(genotype=" + genotype
+                    + ") query from MarkerInfo: " + e.getMessage(), e);
         }
     }
 
@@ -185,16 +193,16 @@ public class MarkerInfoDAO extends GenericDAO<MarkerInfo, Integer>{
      * @param start the start row
      * @param numOfRows the number of rows to retrieve
      * @return the list of MarkerInfo objects by db accession id
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
     @SuppressWarnings("rawtypes")
-    public List<MarkerInfo> getByDbAccessionId(String dbAccessionId, int start, int numOfRows) throws QueryException{
-        
-        if (dbAccessionId == null){
+    public List<MarkerInfo> getByDbAccessionId(String dbAccessionId, int start, int numOfRows) throws MiddlewareQueryException {
+
+        if (dbAccessionId == null) {
             return new ArrayList<MarkerInfo>();
         }
-        
-        try{
+
+        try {
             SQLQuery query = getSession().createSQLQuery(MarkerInfo.GET_BY_DB_ACCESSION_ID);
             query.setParameter("dbAccessionId", dbAccessionId);
             query.setFirstResult(start);
@@ -214,17 +222,18 @@ public class MarkerInfoDAO extends GenericDAO<MarkerInfo, Integer>{
                     String genotype = (String) result[6];
                     String ploidy = (String) result[7];
                     String principalInvestigator = (String) result[8];
-                    String contact = (String) result[9]; 
+                    String contact = (String) result[9];
                     String institute = (String) result[10];
                     BigInteger genotypesCount = (BigInteger) result[11];
-                    MarkerInfo markerInfo = new MarkerInfo(markerId, markerType, markerName, species, accessionId, reference,
-                            genotype, ploidy, principalInvestigator, contact, institute, genotypesCount);
+                    MarkerInfo markerInfo = new MarkerInfo(markerId, markerType, markerName, species, accessionId, reference, genotype,
+                            ploidy, principalInvestigator, contact, institute, genotypesCount);
                     toReturn.add(markerInfo);
                 }
             }
             return toReturn;
-            } catch(HibernateException e){
-            throw new QueryException("Error with get marker info by db accession id query: " + e.getMessage(), e);
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getByDbAccessionId(dbAccessionId=" + dbAccessionId
+                    + ") query from MarkerInfo: " + e.getMessage(), e);
         }
     }
 
@@ -233,21 +242,25 @@ public class MarkerInfoDAO extends GenericDAO<MarkerInfo, Integer>{
      *
      * @param dbAccessionId the db accession id
      * @return the count
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public int countByDbAccessionId(String dbAccessionId) throws QueryException{
-        
+    public long countByDbAccessionId(String dbAccessionId) throws MiddlewareQueryException {
+
         if (dbAccessionId == null) {
             return 0;
         }
-        
-        try{
+
+        try {
             SQLQuery query = getSession().createSQLQuery(MarkerInfo.COUNT_BY_DB_ACCESSION_ID);
             query.setParameter("dbAccessionId", dbAccessionId);
-            BigInteger count = (BigInteger) query.uniqueResult();
-            return count.intValue();
-        } catch(HibernateException e){
-            throw new QueryException("Error with count marker info by db accession id query: " + e.getMessage(), e);
+            BigInteger result = (BigInteger) query.uniqueResult();
+            if (result != null) {
+                return result.longValue();
+            }
+            return 0;
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with countByDbAccessionId(" + dbAccessionId
+                    + ") query from MarkerInfo: " + e.getMessage(), e);
         }
     }
 }

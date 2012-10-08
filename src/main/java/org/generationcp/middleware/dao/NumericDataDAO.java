@@ -15,7 +15,7 @@ package org.generationcp.middleware.dao;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.NumericData;
 import org.generationcp.middleware.pojos.NumericDataElement;
 import org.generationcp.middleware.pojos.NumericDataPK;
@@ -31,60 +31,64 @@ public class NumericDataDAO extends GenericDAO<NumericData, NumericDataPK>{
 
     @SuppressWarnings("unchecked")
     public List<Integer> getObservationUnitIdsByTraitScaleMethodAndValueCombinations(List<TraitCombinationFilter> filters, int start,
-            int numOfRows) {
-        
-        if (filters == null || filters.isEmpty()){
-            return new ArrayList<Integer>();
-        }
-
-        Criteria crit = getSession().createCriteria(NumericData.class);
-        crit.createAlias("variate", "variate");
-        crit.setProjection(Projections.distinct(Projections.property("id.observationUnitId")));
-
-        // keeps track if at least one filter was added
-        boolean filterAdded = false;
-
-        for (TraitCombinationFilter combination : filters) {
-            Object value = combination.getValue();
-
-            // accept only Double objects
-            if (value instanceof Double || value instanceof NumericRange) {
-                crit.add(Restrictions.eq("variate.traitId", combination.getTraitId()));
-                crit.add(Restrictions.eq("variate.scaleId", combination.getScaleId()));
-                crit.add(Restrictions.eq("variate.methodId", combination.getMethodId()));
-
-                if (value instanceof NumericRange) {
-                    NumericRange range = (NumericRange) value;
-                    if (range.getStart() != null) {
-                        crit.add(Restrictions.gt("value", range.getStart()));
-                    }
-
-                    if (range.getEnd() != null) {
-                        crit.add(Restrictions.lt("value", range.getEnd()));
-                    }
-                } else {
-                    crit.add(Restrictions.eq("value", combination.getValue()));
-                }
-
-                filterAdded = true;
+            int numOfRows) throws MiddlewareQueryException {
+        try {
+            if (filters == null || filters.isEmpty()) {
+                return new ArrayList<Integer>();
             }
-        }
 
-        if (filterAdded) {
-            // if there is at least one filter, execute query and return results
-            crit.setFirstResult(start);
-            crit.setMaxResults(numOfRows);
-            return crit.list();
-        } else {
-            // return empty list if no filter was added
-            return new ArrayList<Integer>();
+            Criteria criteria = getSession().createCriteria(NumericData.class);
+            criteria.createAlias("variate", "variate");
+            criteria.setProjection(Projections.distinct(Projections.property("id.observationUnitId")));
+
+            // keeps track if at least one filter was added
+            boolean filterAdded = false;
+
+            for (TraitCombinationFilter combination : filters) {
+                Object value = combination.getValue();
+
+                // accept only Double objects
+                if (value instanceof Double || value instanceof NumericRange) {
+                    criteria.add(Restrictions.eq("variate.traitId", combination.getTraitId()));
+                    criteria.add(Restrictions.eq("variate.scaleId", combination.getScaleId()));
+                    criteria.add(Restrictions.eq("variate.methodId", combination.getMethodId()));
+
+                    if (value instanceof NumericRange) {
+                        NumericRange range = (NumericRange) value;
+                        if (range.getStart() != null) {
+                            criteria.add(Restrictions.gt("value", range.getStart()));
+                        }
+
+                        if (range.getEnd() != null) {
+                            criteria.add(Restrictions.lt("value", range.getEnd()));
+                        }
+                    } else {
+                        criteria.add(Restrictions.eq("value", combination.getValue()));
+                    }
+
+                    filterAdded = true;
+                }
+            }
+
+            if (filterAdded) {
+                // if there is at least one filter, execute query and return results
+                criteria.setFirstResult(start);
+                criteria.setMaxResults((numOfRows));
+                return criteria.list();
+            } else {
+                // return empty list if no filter was added
+                return new ArrayList<Integer>();
+            }
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with get getObservationUnitIdsByTraitScaleMethodAndValueCombinations(filters="
+                    + filters + ") query from NumericData: " + e.getMessage(), e);
         }
     }
 
     @SuppressWarnings("rawtypes")
-    public List<NumericDataElement> getValuesByOunitIDList(List<Integer> ounitIdList) throws QueryException {
+    public List<NumericDataElement> getValuesByOunitIDList(List<Integer> ounitIdList) throws MiddlewareQueryException {
 
-        if (ounitIdList == null || ounitIdList.isEmpty()){
+        if (ounitIdList == null || ounitIdList.isEmpty()) {
             return new ArrayList<NumericDataElement>();
         }
 
@@ -110,8 +114,9 @@ public class NumericDataDAO extends GenericDAO<NumericData, NumericDataPK>{
             }
 
             return dataValues;
-        } catch (HibernateException ex) {
-            throw new QueryException("Error with get Numeric Data Values by list of Observation Unit IDs query: " + ex.getMessage(), ex);
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getValuesByOunitIDList(ounitIdList=" + ounitIdList
+                    + ") query from NumericData: " + e.getMessage(), e);
         }
     }
 }

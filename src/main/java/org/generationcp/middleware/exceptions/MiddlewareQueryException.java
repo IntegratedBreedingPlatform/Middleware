@@ -10,14 +10,17 @@
  * 
  *******************************************************************************/
 
-package org.generationcp.middleware.manager;
+package org.generationcp.middleware.exceptions;
 
-/**
- * Used to specify the different modes for searching germplasms by name.
- * 
- * @author Kevin Manansala
- * 
- */
-public enum FindGermplasmByNameModes {
-    NORMAL, SPACES_REMOVED, STANDARDIZED
+public class MiddlewareQueryException extends Exception{
+
+    private static final long serialVersionUID = 1L;
+
+    public MiddlewareQueryException(String message) {
+        super(message);
+    }
+
+    public MiddlewareQueryException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

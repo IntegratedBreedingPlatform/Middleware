@@ -38,14 +38,14 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * 
  * @author Kevin Manansala, Mark Agarrado
  */
-@NamedQueries({ @NamedQuery(name = "findAllGermplasm", query = "FROM Germplasm"),
+@NamedQueries({ @NamedQuery(name = "getAllGermplasm", query = "FROM Germplasm"),
         @NamedQuery(name = "countAllGermplasm", query = "SELECT COUNT(g) FROM Germplasm g"),
         // @NamedQuery
         // (
-        // name = "findGermplasmByMethodNameUsingEqual",
+        // name = "getGermplasmByMethodNameUsingEqual",
         // query = "FROM Germplasm g WHERE g.method.mname = :name"
         // ),
-        @NamedQuery(name = "findGermplasmByMethodNameUsingEqual",
+        @NamedQuery(name = "getGermplasmByMethodNameUsingEqual",
                 query = "SELECT g FROM Germplasm g, Method m WHERE g.methodId = m.mid AND m.mname = :name"),
         // @NamedQuery
         // (
@@ -57,10 +57,10 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
                 query = "SELECT COUNT(g) FROM Germplasm g, Method m WHERE g.methodId = m.mid AND m.mname = :name"),
         // @NamedQuery
         // (
-        // name = "findGermplasmByMethodNameUsingLike",
+        // name = "getGermplasmByMethodNameUsingLike",
         // query = "FROM Germplasm g WHERE g.method.mname like :name"
         // ),
-        @NamedQuery(name = "findGermplasmByMethodNameUsingLike",
+        @NamedQuery(name = "getGermplasmByMethodNameUsingLike",
                 query = "SELECT g FROM Germplasm g, Method m WHERE g.methodId = m.mid AND m.mname like :name"),
         // @NamedQuery
         // (
@@ -72,10 +72,10 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
                 query = "SELECT COUNT(g) FROM Germplasm g, Method m WHERE g.methodId = m.mid AND m.mname like :name"),
         // @NamedQuery
         // (
-        // name = "findGermplasmByLocationNameUsingEqual",
+        // name = "getGermplasmByLocationNameUsingEqual",
         // query = "FROM Germplasm g WHERE g.location.lname = :name"
         // ),
-        @NamedQuery(name = "findGermplasmByLocationNameUsingEqual",
+        @NamedQuery(name = "getGermplasmByLocationNameUsingEqual",
                 query = "SELECT g FROM Germplasm g, Location l WHERE g.locationId = l.locid AND l.lname = :name"),
         // @NamedQuery
         // (
@@ -87,10 +87,10 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
                 query = "SELECT COUNT(g) FROM Germplasm g, Location l WHERE g.locationId = l.locid AND l.lname = :name"),
         // @NamedQuery
         // (
-        // name = "findGermplasmByLocationNameUsingLike",
+        // name = "getGermplasmByLocationNameUsingLike",
         // query = "FROM Germplasm g WHERE g.location.lname like :name"
         // ),
-        @NamedQuery(name = "findGermplasmByLocationNameUsingLike",
+        @NamedQuery(name = "getGermplasmByLocationNameUsingLike",
                 query = "SELECT g FROM Germplasm g, Location l WHERE g.locationId = l.locid AND l.lname like :name"),
         // @NamedQuery
         // (
@@ -151,7 +151,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
         @NamedNativeQuery(name = "getGermplasmDescendants",
                 query = "SELECT DISTINCT g.* FROM germplsm g LEFT JOIN progntrs p ON g.gid = p.gid "
                         + "WHERE g.gpid1=:gid OR g.gpid2=:gid OR p.pid=:gid", resultClass = Germplasm.class),
-        @NamedNativeQuery(name = "findGermplasmByPrefName", query = "SELECT g.* FROM germplsm g LEFT JOIN names n ON g.gid = n.gid "
+        @NamedNativeQuery(name = "getGermplasmByPrefName", query = "SELECT g.* FROM germplsm g LEFT JOIN names n ON g.gid = n.gid "
                 + "AND n.nstat = 1 " + "WHERE n.nval = :name", resultClass = Germplasm.class),
         @NamedNativeQuery(name = "getProgenitor1",
                 query = "SELECT * FROM germplsm g1 WHERE g1.gid = (SELECT g.gpid1 FROM germplsm g LEFT JOIN progntrs p ON g.gid = p.gid "
@@ -177,20 +177,20 @@ public class Germplasm implements Serializable{
     private static final long serialVersionUID = 1L;
 
     // string contants for name of queries
-    public static final String FIND_ALL = "findAllGermplasm";
+    public static final String GET_ALL = "getAllGermplasm";
     public static final String COUNT_ALL = "countAllGermplasm";
-    public static final String FIND_BY_PREF_NAME = "findGermplasmByPrefName";
+    public static final String GET_BY_PREF_NAME = "getGermplasmByPrefName";
     public static final String COUNT_BY_PREF_NAME = 
             "SELECT COUNT(g.gid) " +
             "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 " +
             "WHERE n.nval = :name";
-    public static final String FIND_BY_METHOD_NAME_USING_EQUAL = "findGermplasmByMethodNameUsingEqual";
+    public static final String GET_BY_METHOD_NAME_USING_EQUAL = "getGermplasmByMethodNameUsingEqual";
     public static final String COUNT_BY_METHOD_NAME_USING_EQUAL = "countGermplasmByMethodNameUsingEqual";
-    public static final String FIND_BY_METHOD_NAME_USING_LIKE = "findGermplasmByMethodNameUsingLike";
+    public static final String GET_BY_METHOD_NAME_USING_LIKE = "getGermplasmByMethodNameUsingLike";
     public static final String COUNT_BY_METHOD_NAME_USING_LIKE = "countGermplasmByMethodNameUsingLike";
-    public static final String FIND_BY_LOCATION_NAME_USING_EQUAL = "findGermplasmByLocationNameUsingEqual";
+    public static final String GET_BY_LOCATION_NAME_USING_EQUAL = "getGermplasmByLocationNameUsingEqual";
     public static final String COUNT_BY_LOCATION_NAME_USING_EQUAL = "countGermplasmByLocationNameUsingEqual";
-    public static final String FIND_BY_LOCATION_NAME_USING_LIKE = "findGermplasmByLocationNameUsingLike";
+    public static final String GET_BY_LOCATION_NAME_USING_LIKE = "getGermplasmByLocationNameUsingLike";
     public static final String COUNT_BY_LOCATION_NAME_USING_LIKE = "countGermplasmByLocationNameUsingLike";
     // public static final String GET_BY_GID_WITH_PREF_NAME =
     // "getGermplasmByGIDWithPrefName";
@@ -205,16 +205,16 @@ public class Germplasm implements Serializable{
             "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 " +
                             "LEFT JOIN names abbrev ON g.gid = abbrev.gid AND abbrev.nstat = 2 " +
             "WHERE g.gid = :gid";
-    public static final String FIND_DESCENDANTS = "getGermplasmDescendants";
+    public static final String GET_DESCENDANTS = "getGermplasmDescendants";
     // public static final String COUNT_DESCENDANTS =
     // "countGermplasmDescendants";
     public static final String COUNT_DESCENDANTS = 
             "SELECT COUNT(DISTINCT g.gid) " +
             "FROM germplsm g LEFT JOIN progntrs p ON g.gid = p.gid " +
             "WHERE g.gpid1 = :gid OR g.gpid2 = :gid OR p.pid=:gid";
-    public static final String FIND_PROGENITOR1 = "getProgenitor1";
-    public static final String FIND_PROGENITOR2 = "getProgenitor2";
-    public static final String FIND_PROGENITOR = "getProgenitor";
+    public static final String GET_PROGENITOR1 = "getProgenitor1";
+    public static final String GET_PROGENITOR2 = "getProgenitor2";
+    public static final String GET_PROGENITOR = "getProgenitor";
     // public static final String GET_PROGENITORS_BY_GID_WITH_PREF_NAME =
     // "getProgenitorsByGIDWithPrefName";
     public static final String GET_PROGENITORS_BY_GID_WITH_PREF_NAME = 

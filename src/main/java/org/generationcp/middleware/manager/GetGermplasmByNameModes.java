@@ -10,17 +10,14 @@
  * 
  *******************************************************************************/
 
-package org.generationcp.middleware.exceptions;
+package org.generationcp.middleware.manager;
 
-public class QueryException extends Exception{
-
-    private static final long serialVersionUID = 1L;
-
-    public QueryException(String message) {
-        super(message);
-    }
-
-    public QueryException(String message, Throwable cause) {
-        super(message, cause);
-    }
+/**
+ * Used to specify the different modes for searching germplasms by name.
+ * 
+ * @author Kevin Manansala
+ * 
+ */
+public enum GetGermplasmByNameModes {
+    NORMAL, SPACES_REMOVED, STANDARDIZED
 }

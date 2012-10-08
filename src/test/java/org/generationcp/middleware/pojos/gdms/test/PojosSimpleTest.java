@@ -50,11 +50,12 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testAccMetadataSet() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof AccMetadataSet);
             Assert.assertTrue(obj != null);
             AccMetadataSet element = (AccMetadataSet) obj;
-            System.out.println(element);
+            System.out.println("  " + element);
         }
     }
 
@@ -65,11 +66,12 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testAlleleValues() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof AlleleValues);
             Assert.assertTrue(obj != null);
             AlleleValues element = (AlleleValues) obj;
-            System.out.println(element);
+            System.out.println("  " + element);
         }
     }
 
@@ -80,11 +82,12 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testCharValues() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof CharValues);
             Assert.assertTrue(obj != null);
             CharValues element = (CharValues) obj;
-            System.out.println(element);
+            System.out.println("  " + element);
         }
     }
 
@@ -95,14 +98,15 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testDataset() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof Dataset);
             Assert.assertTrue(obj != null);
             Dataset element = (Dataset) obj;
-            System.out.println(element);
+            System.out.println("  " + element);
         }
     }
-    
+
     @Test
     public void testMap() {
         Session session = hibernateUtil.getCurrentSession();
@@ -110,11 +114,12 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testMap() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof Map);
             Assert.assertTrue(obj != null);
             Map element = (Map) obj;
-            System.out.println(element);
+            System.out.println("  " + element);
         }
     }
 
@@ -125,11 +130,12 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testMappingData() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof MappingData);
             Assert.assertTrue(obj != null);
             MappingData element = (MappingData) obj;
-            System.out.println(element);
+            System.out.println("  " + element);
         }
     }
 
@@ -140,11 +146,12 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testMappingPop() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof MappingPop);
             Assert.assertTrue(obj != null);
             MappingPop element = (MappingPop) obj;
-            System.out.println(element);
+            System.out.println("  " + element);
         }
     }
 
@@ -155,11 +162,12 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testMappingPopValues() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof MappingPopValues);
             Assert.assertTrue(obj != null);
             MappingPopValues element = (MappingPopValues) obj;
-            System.out.println(element);
+            System.out.println("  " + element);
         }
     }
 
@@ -170,11 +178,12 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testMarker() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof Marker);
             Assert.assertTrue(obj != null);
             Marker element = (Marker) obj;
-            System.out.println(element);
+            System.out.println("  " + element);
         }
     }
 
@@ -185,11 +194,12 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testMarkerMetadataSet() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof MarkerMetadataSet);
             Assert.assertTrue(obj != null);
             MarkerMetadataSet element = (MarkerMetadataSet) obj;
-            System.out.println(element);
+            System.out.println("  " + element);
         }
     }
 

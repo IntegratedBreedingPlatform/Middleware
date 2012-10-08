@@ -9,13 +9,16 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
+
 package org.generationcp.middleware.dao.gdms;
 
 import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.generationcp.middleware.pojos.gdms.MappingData;
+import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 
 /**
@@ -25,7 +28,7 @@ import org.hibernate.SQLQuery;
  * 
  */
 public class MappingDataDAO extends GenericDAO<MappingData, Integer>{
-    
+
     /**
      * Gets the map info by map name.
      *
@@ -33,10 +36,15 @@ public class MappingDataDAO extends GenericDAO<MappingData, Integer>{
      * @return the map info by map name
      */
     @SuppressWarnings("unchecked")
-    public List<MapInfo> getMapInfoByMapName(String mapName) {
-        SQLQuery query = getSession().createSQLQuery(MappingData.GET_MAP_INFO_BY_MAP_NAME);        
-        query.setParameter("mapName", mapName);
-        return (List<MapInfo>) query.list(); // return map info        
+    public List<MapInfo> getMapInfoByMapName(String mapName) throws MiddlewareQueryException {
+        try {
+            SQLQuery query = getSession().createSQLQuery(MappingData.GET_MAP_INFO_BY_MAP_NAME);
+            query.setParameter("mapName", mapName);
+            return (List<MapInfo>) query.list(); // return map info     
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getMapInfoByMapName(mapName=" + mapName + ") query from MappingData: " + e.getMessage(), e);
+        }
+
     }
 
 }

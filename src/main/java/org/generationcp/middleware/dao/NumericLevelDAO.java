@@ -16,7 +16,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.DatasetCondition;
 import org.generationcp.middleware.pojos.NumericLevel;
 import org.generationcp.middleware.pojos.NumericLevelElement;
@@ -29,11 +29,11 @@ import org.hibernate.SQLQuery;
 public class NumericLevelDAO extends GenericDAO<NumericLevel, NumericLevelPK>{
 
     @SuppressWarnings("rawtypes")
-    public List<NumericLevelElement> getValuesByOunitIDList(List<Integer> ounitIdList) throws QueryException {
-        
+    public List<NumericLevelElement> getValuesByOunitIDList(List<Integer> ounitIdList) throws MiddlewareQueryException {
+
         List<NumericLevelElement> levelValues = new ArrayList<NumericLevelElement>();
 
-        if (ounitIdList == null || ounitIdList.isEmpty()){
+        if (ounitIdList == null || ounitIdList.isEmpty()) {
             return levelValues;
         }
 
@@ -57,22 +57,24 @@ public class NumericLevelDAO extends GenericDAO<NumericLevel, NumericLevelPK>{
             }
 
             return levelValues;
-        } catch (HibernateException ex) {
-            throw new QueryException("Error with get Numeric Level Values by list of Observation Unit IDs query: " + ex.getMessage(), ex);
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getValuesByOunitIDList(ounitIdList=" + ounitIdList
+                    + ") query from NumericLevel " + e.getMessage(), e);
         }
     }
-    
+
     @SuppressWarnings("rawtypes")
-    public List<DatasetCondition> getConditionAndValueByFactorIdAndLevelNo(Integer factorId, Integer levelNo) throws QueryException {
+    public List<DatasetCondition> getConditionAndValueByFactorIdAndLevelNo(Integer factorId, Integer levelNo)
+            throws MiddlewareQueryException {
         try {
             List<DatasetCondition> toreturn = new ArrayList<DatasetCondition>();
-            
+
             SQLQuery query = getSession().createSQLQuery(NumericLevel.GET_CONDITION_AND_VALUE);
             query.setParameter("factorid", factorId);
             query.setParameter("levelno", levelNo);
-            
+
             List results = query.list();
-            for(Object o : results) {
+            for (Object o : results) {
                 Object[] result = (Object[]) o;
                 String name = (String) result[0];
                 Double value = (Double) result[1];
@@ -80,57 +82,56 @@ public class NumericLevelDAO extends GenericDAO<NumericLevel, NumericLevelPK>{
                 Integer scaleid = (Integer) result[3];
                 Integer methodid = (Integer) result[4];
                 String type = (String) result[5];
-                
+
                 DatasetCondition condition = new DatasetCondition(factorId, name, value, traitid, scaleid, methodid, type);
                 toreturn.add(condition);
             }
-            
+
             return toreturn;
-        } catch (Exception ex) {
-            throw new QueryException("Error with get Condition and value by factorid and levelno query, " +
-            		"given factorid = " + factorId + " and levelno = " + levelNo +
-            		": " + ex.getMessage(), ex);
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getConditionAndValueByFactorIdAndLevelNo(factorId=" + factorId + ", levelNo="
+                    + levelNo + ") query: " + e.getMessage(), e);
         }
     }
-    
-    public long countStudyInformationByGID(Long gid) throws QueryException {
+
+    public long countStudyInformationByGID(Long gid) throws MiddlewareQueryException {
         try {
             Query query = getSession().createSQLQuery(NumericLevel.COUNT_STUDIES_BY_GID);
             query.setParameter("gid", gid);
-            
+
             BigInteger count = (BigInteger) query.uniqueResult();
             return count.longValue();
         } catch (Exception ex) {
-            throw new QueryException("Error with count study information by GID query: " +
-                    ex.getMessage(), ex);
+            throw new MiddlewareQueryException("Error with countStudyInformationByGID(gid=" + gid + ") query from NumericLevel "
+                    + ex.getMessage(), ex);
         }
     }
-    
+
     @SuppressWarnings("rawtypes")
-    public List<StudyInfo> getStudyInformationByGID(Long gid) throws QueryException {
+    public List<StudyInfo> getStudyInformationByGID(Long gid) throws MiddlewareQueryException {
         try {
             List<StudyInfo> toreturn = new ArrayList<StudyInfo>();
             Query query = getSession().createSQLQuery(NumericLevel.GET_STUDIES_BY_GID);
             query.setParameter("gid", gid);
-            
+
             List results = query.list();
-            for(Object o : results) {
+            for (Object o : results) {
                 Object[] result = (Object[]) o;
                 Integer studyid = (Integer) result[0];
                 String name = (String) result[1];
                 String title = (String) result[2];
                 String objective = (String) result[3];
                 BigInteger rowCount = (BigInteger) result[4];
-                
+
                 StudyInfo info = new StudyInfo(studyid, name.trim(), title.trim(), objective.trim(), rowCount.intValue());
                 toreturn.add(info);
             }
-            
+
             return toreturn;
-            
+
         } catch (Exception ex) {
-            throw new QueryException("Error with get study information by GID query: " +
-                    ex.getMessage(), ex);
+            throw new MiddlewareQueryException("Error with getStudyInformationByGID(gid=" + gid + ") query from NumericLevel "
+                    + ex.getMessage(), ex);
         }
     }
 }

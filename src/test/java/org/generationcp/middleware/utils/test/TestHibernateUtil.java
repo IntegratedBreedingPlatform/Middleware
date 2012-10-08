@@ -24,17 +24,24 @@ public class TestHibernateUtil{
 
     @Test
     public void testHibernateUtil() throws Exception {
-        // HibernateUtil util = new HibernateUtil("localhost", "3306",
-        // "iris_myisam_20100330", "root", "lich27king");
-        HibernateUtil util = new HibernateUtil("localhost", "3306", "ibdbv1_rice_central", "ibdb_user", "ibdb_password");
+        String host = "localhost";
+        String port = "3306";
+        String dbName = "ibdb_cowpea_central";
+        String userName = "ibdb_user";
+        String password = "ibdb_password";
+        // HibernateUtil util = new HibernateUtil("localhost", "3306",  "iris_myisam_20100330", "root", "lich27king");
+        HibernateUtil util = new HibernateUtil(host, port, dbName, userName, password);
         Session session = util.getCurrentSession();
         Query query = session.createQuery("FROM Germplasm");
         query.setFirstResult(0);
         query.setMaxResults(5);
         List<Germplasm> results = query.list();
 
+        System.out.println("testHibernateUtil(host=" + host + ", port=" + port + ", dbName=" + dbName + ", userName=" + userName
+                + ", password=" + password + ") GERMPLASMS: ");
+
         for (Germplasm g : results) {
-            System.out.println(g);
+            System.out.println("  " + g);
         }
     }
 }

@@ -42,7 +42,7 @@ public class TestCharacterDataDAO{
         filters.add(combination);
 
         List<Integer> results = dao.getObservationUnitIdsByTraitScaleMethodAndValueCombinations(filters, 0, 10);
-        System.out.println("RESULTS:");
+        System.out.println("testGetObservationUnitIdsByTraitScaleMethodAndValueCombinations RESULTS:");
         for (Integer result : results){
             System.out.println(result);
         }

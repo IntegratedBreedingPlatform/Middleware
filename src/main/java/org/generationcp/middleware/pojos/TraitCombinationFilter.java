@@ -63,4 +63,11 @@ public class TraitCombinationFilter implements Serializable{
         this.value = value;
     }
 
+    @Override
+    public String toString() {
+        return "TraitCombinationFilter [traitId=" + traitId + ", scaleId=" + scaleId + ", methodId=" + methodId + ", value=" + value + "]";
+    }
+
+    
+    
 }

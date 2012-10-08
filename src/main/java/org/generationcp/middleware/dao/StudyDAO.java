@@ -14,7 +14,7 @@ package org.generationcp.middleware.dao;
 
 import java.util.List;
 
-import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Study;
 import org.hibernate.Criteria;
@@ -26,34 +26,32 @@ import org.hibernate.criterion.Restrictions;
 public class StudyDAO extends GenericDAO<Study, Integer>{
 
     @SuppressWarnings("unchecked")
-    public List<Study> findByNameUsingEqual(String name, int start, int numOfRows) throws QueryException {
+    public List<Study> getByNameUsingEqual(String name, int start, int numOfRows) throws MiddlewareQueryException {
         try {
-            Query query = getSession().getNamedQuery(Study.FIND_BY_NAME_USING_EQUAL);
+            Query query = getSession().getNamedQuery(Study.GET_BY_NAME_USING_EQUAL);
             query.setParameter("name", name);
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
-
             return (List<Study>) query.list();
-        } catch (HibernateException ex) {
-            throw new QueryException("Error with find by  name query using equal for Study: " + ex.getMessage(), ex);
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getByNameUsingEqual(name=" + name + ") query from Study: " + e.getMessage(), e);
         }
     }
 
     @SuppressWarnings("unchecked")
-    public List<Study> findByNameUsingLike(String name, int start, int numOfRows) throws QueryException {
+    public List<Study> getByNameUsingLike(String name, int start, int numOfRows) throws MiddlewareQueryException {
         try {
-            Query query = getSession().getNamedQuery(Study.FIND_BY_NAME_USING_LIKE);
+            Query query = getSession().getNamedQuery(Study.GET_BY_NAME_USING_LIKE);
             query.setParameter("name", name);
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
-
             return (List<Study>) query.list();
-        } catch (HibernateException ex) {
-            throw new QueryException("Error with find by  name query using like for Study: " + ex.getMessage(), ex);
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getByNameUsingLike(name=" + name + ") query from Study: " + e.getMessage(), e);
         }
     }
 
-    public int countByName(String name, Operation operation) throws QueryException {
+    public long countByName(String name, Operation operation) throws MiddlewareQueryException {
 
         try {
             // if operation == null or operation = Operation.EQUAL
@@ -62,65 +60,66 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
                 query = getSession().getNamedQuery(Study.COUNT_BY_NAME_USING_LIKE);
             }
             query.setParameter("name", name);
-            return ((Long) query.uniqueResult()).intValue();
+            return ((Long) query.uniqueResult()).longValue();
 
-        } catch (HibernateException ex) {
-            throw new QueryException("Error with count by name for Study: " + ex.getMessage(), ex);
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with countByName(name=" + name + ", operation=" + operation + ") query from Study: "
+                    + e.getMessage(), e);
         }
 
     }
 
     @SuppressWarnings("unchecked")
-    public List<Study> getTopLevelStudies(int start, int numOfRows) throws QueryException {
+    public List<Study> getTopLevelStudies(int start, int numOfRows) throws MiddlewareQueryException {
         try {
-            Criteria crit = getSession().createCriteria(Study.class);
+            Criteria criteria = getSession().createCriteria(Study.class);
             // top level studies are studies without parent folders (shierarchy = 0)
-            crit.add(Restrictions.eq("hierarchy", Integer.valueOf(0)));
-            crit.setFirstResult(start);
-            crit.setMaxResults(numOfRows);
-            return (List<Study>) crit.list();
-        } catch (HibernateException ex) {
-            throw new QueryException("Error with retrieving top level Studies: " + ex.getMessage(), ex);
+            criteria.add(Restrictions.eq("hierarchy", Integer.valueOf(0)));
+            criteria.setFirstResult(start);
+            criteria.setMaxResults(numOfRows);
+            return (List<Study>) criteria.list();
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getTopLevelStudies() query from Study: " + e.getMessage(), e);
         }
     }
-    
-    public Long countAllTopLevelStudies() throws QueryException {
+
+    public long countAllTopLevelStudies() throws MiddlewareQueryException {
         try {
-            Criteria crit = getSession().createCriteria(Study.class);
+            Criteria criteria = getSession().createCriteria(Study.class);
             // top level studies are studies without parent folders (shierarchy = 0)
-            crit.add(Restrictions.eq("hierarchy", Integer.valueOf(0)));
-            crit.setProjection(Projections.countDistinct("id"));
-            return  (Long) crit.uniqueResult();
-        } catch (HibernateException ex) {
-            throw new QueryException("Error with retrieving top level Studies: " + ex.getMessage(), ex);
+            criteria.add(Restrictions.eq("hierarchy", Integer.valueOf(0)));
+            criteria.setProjection(Projections.countDistinct("id"));
+            return ((Long) criteria.uniqueResult()).longValue();
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with countAllTopLevelStudies() query from Study: " + e.getMessage(), e);
         }
     }
-    
-    public Long countAllStudyByParentFolderID(Integer parentFolderId) throws QueryException {
+
+    public long countAllStudyByParentFolderID(Integer parentFolderId) throws MiddlewareQueryException {
         try {
-            Criteria crit = getSession().createCriteria(Study.class);
+            Criteria criteria = getSession().createCriteria(Study.class);
             // top level studies are studies without parent folders (shierarchy = 0)
-            crit.add(Restrictions.eq("hierarchy", parentFolderId));
-            crit.setProjection(Projections.countDistinct("id"));
-            return  (Long) crit.uniqueResult();
-        } catch (HibernateException ex) {
-            throw new QueryException("Error with retrieving top level Studies: " + ex.getMessage(), ex);
+            criteria.add(Restrictions.eq("hierarchy", parentFolderId));
+            criteria.setProjection(Projections.countDistinct("id"));
+            return ((Long) criteria.uniqueResult()).longValue();
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with countAllStudyByParentFolderID(parentFolderId=" + parentFolderId
+                    + ") query from Study: " + e.getMessage(), e);
         }
     }
-    
-    
 
     @SuppressWarnings("unchecked")
-    public List<Study> getByParentFolderID(Integer parentFolderId, int start, int numOfRows) throws QueryException {
+    public List<Study> getByParentFolderID(Integer parentFolderId, int start, int numOfRows) throws MiddlewareQueryException {
         try {
-            Criteria crit = getSession().createCriteria(Study.class);
+            Criteria criteria = getSession().createCriteria(Study.class);
             // studies with parent folder = parentFolderId
-            crit.add(Restrictions.eq("hierarchy", parentFolderId));
-            crit.setFirstResult(start);
-            crit.setMaxResults(numOfRows);
-            return (List<Study>) crit.list();
-        } catch (HibernateException ex) {
-            throw new QueryException("Error with retrieving Studies by parent folder id: " + ex.getMessage(), ex);
+            criteria.add(Restrictions.eq("hierarchy", parentFolderId));
+            criteria.setFirstResult(start);
+            criteria.setMaxResults(numOfRows);
+            return (List<Study>) criteria.list();
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getByParentFolderID(parentFolderId=" + parentFolderId + ") query from Study: "
+                    + e.getMessage(), e);
         }
     }
 

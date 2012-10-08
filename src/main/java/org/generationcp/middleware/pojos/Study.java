@@ -25,8 +25,8 @@ import javax.persistence.Table;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-@NamedQueries({ @NamedQuery(name = "findStudyByNameUsingEqual", query = "SELECT s FROM Study s WHERE s.name = :name"),
-        @NamedQuery(name = "findStudyByNameUsingLike", query = "SELECT s FROM Study s WHERE s.name LIKE :name"),
+@NamedQueries({ @NamedQuery(name = "getStudyByNameUsingEqual", query = "SELECT s FROM Study s WHERE s.name = :name"),
+        @NamedQuery(name = "getStudyByNameUsingLike", query = "SELECT s FROM Study s WHERE s.name LIKE :name"),
         @NamedQuery(name = "countStudyByNameUsingEqual", query = "SELECT COUNT(s) FROM Study s WHERE s.name = :name"),
         @NamedQuery(name = "countStudyByNameUsingLike", query = "SELECT COUNT(s) FROM Study s WHERE s.name LIKE :name")
 
@@ -37,8 +37,8 @@ public class Study implements Serializable{
 
     private static final long serialVersionUID = -8809692556025457504L;
 
-    public static final String FIND_BY_NAME_USING_EQUAL = "findStudyByNameUsingEqual";
-    public static final String FIND_BY_NAME_USING_LIKE = "findStudyByNameUsingLike";
+    public static final String GET_BY_NAME_USING_EQUAL = "getStudyByNameUsingEqual";
+    public static final String GET_BY_NAME_USING_LIKE = "getStudyByNameUsingLike";
     public static final String COUNT_BY_NAME_USING_EQUAL = "countStudyByNameUsingEqual";
     public static final String COUNT_BY_NAME_USING_LIKE = "countStudyByNameUsingLike";
 

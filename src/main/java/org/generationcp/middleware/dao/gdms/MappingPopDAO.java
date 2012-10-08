@@ -9,13 +9,14 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
+
 package org.generationcp.middleware.dao.gdms;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
-import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.MappingPop;
 import org.generationcp.middleware.pojos.gdms.MappingValueElement;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
@@ -29,63 +30,65 @@ import org.hibernate.SQLQuery;
  * 
  */
 public class MappingPopDAO extends GenericDAO<MappingPop, Integer>{
-    
+
     @SuppressWarnings("rawtypes")
-    public List<ParentElement> getParentsByDatasetId(Integer datasetId) throws QueryException{
-        SQLQuery query = getSession().createSQLQuery(MappingPop.GET_PARENTS_BY_DATASET_ID); 
+    public List<ParentElement> getParentsByDatasetId(Integer datasetId) throws MiddlewareQueryException {
+        SQLQuery query = getSession().createSQLQuery(MappingPop.GET_PARENTS_BY_DATASET_ID);
         query.setParameter("datasetId", datasetId);
-        
-        
+
         List<ParentElement> dataValues = new ArrayList<ParentElement>();
-        try{
+        try {
             List results = query.list();
-        
+
             for (Object o : results) {
                 Object[] result = (Object[]) o;
                 if (result != null) {
                     Integer parentAGId = (Integer) result[0];
                     Integer parentBGId = (Integer) result[1];
-                    String mappingType = (String) result[2];
-                    ParentElement parentElement = new ParentElement(parentAGId, parentBGId, mappingType);
+                    String mappingPopType = (String) result[2];
+                    ParentElement parentElement = new ParentElement(parentAGId, parentBGId, mappingPopType);
                     dataValues.add(parentElement);
                 }
             }
-            return dataValues;        
-        } catch (HibernateException ex) {
-            throw new QueryException("Error with get parents by dataset id: " + ex.getMessage(), ex);
+            return dataValues;
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getParentsByDatasetId(datasetId=" + datasetId + ") query from MappingPop: " + e.getMessage(), e);
         }
     }
-    
+
     @SuppressWarnings("rawtypes")
-    public List<MappingValueElement> getMappingValuesByGidAndMarkerIds(List<Integer> gids, List<Integer> markerIds) throws QueryException {
+    public List<MappingValueElement> getMappingValuesByGidAndMarkerIds(List<Integer> gids, List<Integer> markerIds)
+            throws MiddlewareQueryException {
         List<MappingValueElement> mappingValues = new ArrayList<MappingValueElement>();
-        
-        if (gids == null || gids.isEmpty() || markerIds == null || markerIds.isEmpty()){
+
+        if (gids == null || gids.isEmpty() || markerIds == null || markerIds.isEmpty()) {
             return mappingValues;
         }
-        
+
         SQLQuery query = getSession().createSQLQuery(MappingPop.GET_MAPPING_VALUES_BY_GIDS_AND_MARKER_IDS);
         query.setParameterList("markerIdList", markerIds);
         query.setParameterList("gidList", gids);
-        
-        try{
+
+        try {
             List results = query.list();
-        
+
             for (Object o : results) {
                 Object[] result = (Object[]) o;
                 if (result != null) {
                     Integer datasetId = (Integer) result[0];
-                    String mappingType = (String) result[1];
+                    String mappingPopType = (String) result[1];
                     Integer parentAGid = (Integer) result[2];
                     Integer parentBGid = (Integer) result[3];
                     String markerType = (String) result[4];
-                    MappingValueElement mappingValueElement = new MappingValueElement(datasetId, mappingType, parentAGid, parentBGid, markerType);
+                    MappingValueElement mappingValueElement = new MappingValueElement(datasetId, mappingPopType, parentAGid, parentBGid,
+                            markerType);
                     mappingValues.add(mappingValueElement);
                 }
             }
-            return mappingValues;        
-        } catch (HibernateException ex) {
-            throw new QueryException("Error with get mapping values by GIDs and Marker Ids: " + ex.getMessage(), ex);
+            return mappingValues;
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getMappingValuesByGidAndMarkerIds(gids=" + gids + ", markerIds=" + markerIds
+                    + ") query from MappingPop: " + e.getMessage(), e);
         }
     }
 

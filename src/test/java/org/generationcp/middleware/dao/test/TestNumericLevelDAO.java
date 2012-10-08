@@ -17,7 +17,6 @@ package org.generationcp.middleware.dao.test;
 import java.util.List;
 
 import org.generationcp.middleware.dao.NumericLevelDAO;
-import org.generationcp.middleware.pojos.DatasetCondition;
 import org.generationcp.middleware.pojos.StudyInfo;
 import org.generationcp.middleware.util.HibernateUtil;
 import org.junit.AfterClass;
@@ -41,7 +40,7 @@ public class TestNumericLevelDAO{
     @Test
     public void testGetConditionAndValueByFactorIdAndLevelNo() throws Exception {
         List<DatasetCondition> results = dao.getConditionAndValueByFactorIdAndLevelNo(Integer.valueOf(1031), Integer.valueOf(146919));
-        System.out.println("RESULTS:");
+        System.out.println("testGetConditionAndValueByFactorIdAndLevelNo RESULTS:");
         for(DatasetCondition c : results) {
             System.out.println(c);
         }
@@ -54,10 +53,11 @@ public class TestNumericLevelDAO{
     **/
     @Test
     public void testGetStudyInformationByGID() throws Exception {
-        List<StudyInfo> results = dao.getStudyInformationByGID(Long.valueOf(50533));
-        System.out.println("RESULTS:");
+        Long gid = Long.valueOf(50533);
+        List<StudyInfo> results = dao.getStudyInformationByGID(gid);
+        System.out.println("testGetStudyInformationByGID(GId=" + gid + ") RESULTS:");
         for(StudyInfo info : results) {
-            System.out.println(info);
+            System.out.println("  " + info);
         }
     }
     

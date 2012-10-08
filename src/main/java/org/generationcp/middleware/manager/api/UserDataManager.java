@@ -13,7 +13,7 @@ package org.generationcp.middleware.manager.api;
 
 import java.util.List;
 
-import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.Installation;
 import org.generationcp.middleware.pojos.Person;
@@ -36,15 +36,15 @@ public interface UserDataManager {
      *
      * @return the number of all Users
      */   
-    public int countAllUsers();
+    public long countAllUsers();
     
     /**
      * Adds the user.
      *
      * @param user the user
-     * @throws QueryException the query exception
+     * @throws MiddlewareQueryException the MiddlewareQueryException
      */
-    public void addUser(User user) throws QueryException;
+    public void addUser(User user) throws MiddlewareQueryException;
     
     /**
      * Gets the user by id.
@@ -58,32 +58,32 @@ public interface UserDataManager {
      * Delete user.
      *
      * @param user the user
-     * @throws QueryException the query exception
+     * @throws MiddlewareQueryException the MiddlewareQueryException
      */
-    public void deleteUser(User user) throws QueryException;
+    public void deleteUser(User user) throws MiddlewareQueryException;
     
     /**
      * Returns all Persons.
      *
      * @return gets all Persons
      */   
-    public List<Person> getAllPersons();
+    public List<Person> getAllPersons() throws MiddlewareQueryException;
     
     /**
      * Returns number of all Persons.
      *
      * @return the number of all Persons
      */   
-    public int countAllPersons();
+    public long countAllPersons() throws MiddlewareQueryException;
     
     
     /**
      * Adds the person.
      *
      * @param person the person
-     * @throws QueryException the query exception
+     * @throws MiddlewareQueryException the MiddlewareQueryException
      */
-    public void addPerson(Person person) throws QueryException;
+    public void addPerson(Person person) throws MiddlewareQueryException;
     
     /**
      * Gets the person by id.
@@ -91,15 +91,15 @@ public interface UserDataManager {
      * @param id the id
      * @return the person by id
      */
-    public Person getPersonById(int id);
+    public Person getPersonById(int id) throws MiddlewareQueryException;
     
     /**
      * Delete person.
      *
      * @param person the person
-     * @throws QueryException the query exception
+     * @throws MiddlewareQueryException the MiddlewareQueryException
      */
-    public void deletePerson(Person person) throws QueryException; 
+    public void deletePerson(Person person) throws MiddlewareQueryException; 
     
     /**
      * Checks if is valid user login.
@@ -107,9 +107,9 @@ public interface UserDataManager {
      * @param username the username
      * @param password the password
      * @return true, if is valid user login
-     * @throws QueryException the query exception
+     * @throws MiddlewareQueryException the MiddlewareQueryException
      */
-    public boolean isValidUserLogin(String username, String password) throws QueryException;
+    public boolean isValidUserLogin(String username, String password) throws MiddlewareQueryException;
     
     /**
      * Checks if is person exists.
@@ -117,18 +117,18 @@ public interface UserDataManager {
      * @param firstName the first name
      * @param lastName the last name
      * @return true, if is person exists
-     * @throws QueryException the query exception
+     * @throws MiddlewareQueryException the MiddlewareQueryException
      */
-    public boolean isPersonExists(String firstName, String lastName) throws QueryException;
+    public boolean isPersonExists(String firstName, String lastName) throws MiddlewareQueryException;
     
     /**
      * Checks if is username exists.
      *
      * @param userName the user name
      * @return true, if is username exists
-     * @throws QueryException the query exception
+     * @throws MiddlewareQueryException the MiddlewareQueryException
      */
-    public boolean isUsernameExists(String userName) throws QueryException;
+    public boolean isUsernameExists(String userName) throws MiddlewareQueryException;
     
     /**
      * Returns all the installation records
@@ -141,35 +141,35 @@ public interface UserDataManager {
      * @param instance - to specify the instace from where the records will be retrieved
      *          either from the central or local
      * @return
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
     public List<Installation> getAllInstallationRecords(int start, int numOfRows, Database instance) 
-        throws QueryException; 
+        throws MiddlewareQueryException; 
     
     /**
      * Return the installation record identified by the given id.
      * 
      * @param id 
      * @return
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public Installation getInstallationRecordById(Long id) throws QueryException;
+    public Installation getInstallationRecordById(Long id) throws MiddlewareQueryException;
     
     /**
      * Get the installation records with the admin id equal to the given id.
      * 
      * @param id
      * @return
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public List<Installation> getInstallationRecordsByAdminId(Long id) throws QueryException;
+    public List<Installation> getInstallationRecordsByAdminId(Long id) throws MiddlewareQueryException;
     
     /**
      * Returns the installation record which have been added last to the database.
      * 
      * @param instance
      * @return
-     * @throws QueryException
+     * @throws MiddlewareQueryException
      */
-    public Installation getLatestInstallationRecord(Database instance) throws QueryException;
+    public Installation getLatestInstallationRecord(Database instance) throws MiddlewareQueryException;
 }

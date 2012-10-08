@@ -44,11 +44,12 @@ public class TMSPojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testScale() RESULTS:");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof Scale);
             Assert.assertTrue(obj != null);
             Scale holder = (Scale) obj;
-            System.out.println(holder);
+            System.out.println("  " + holder);
         }
     }
 
@@ -59,11 +60,12 @@ public class TMSPojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testScaleContinuous() RESULTS:");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof ScaleContinuous);
             Assert.assertTrue(obj != null);
             ScaleContinuous holder = (ScaleContinuous) obj;
-            System.out.println(holder);
+            System.out.println("  " + holder);
         }
     }
 
@@ -74,11 +76,12 @@ public class TMSPojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testScaleDiscrete() RESULTS:");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof ScaleDiscrete);
             Assert.assertTrue(obj != null);
             ScaleDiscrete holder = (ScaleDiscrete) obj;
-            System.out.println(holder);
+            System.out.println("  " + holder);
         }
     }
 
@@ -89,11 +92,12 @@ public class TMSPojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testTraitMethod() RESULTS:");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof TraitMethod);
             Assert.assertTrue(obj != null);
             TraitMethod holder = (TraitMethod) obj;
-            System.out.println(holder);
+            System.out.println("  " + holder);
         }
     }
 
@@ -104,11 +108,12 @@ public class TMSPojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
+        System.out.println("testTrait() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof Trait);
             Assert.assertTrue(obj != null);
             Trait holder = (Trait) obj;
-            System.out.println(holder);
+            System.out.println("  " + holder);
         }
     }
 

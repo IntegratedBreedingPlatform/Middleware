@@ -16,7 +16,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.exceptions.QueryException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.hibernate.Criteria;
@@ -32,7 +32,6 @@ import org.hibernate.criterion.Restrictions;
  */
 public class ProjectActivityDAO extends GenericDAO<ProjectActivity, Integer>{
 
-
     /**
      * Returns a list of {@link ProjectActivity} records by project id.
      *
@@ -40,16 +39,15 @@ public class ProjectActivityDAO extends GenericDAO<ProjectActivity, Integer>{
      * @param start the first row to retrieve
      * @param numOfRows the number of rows to retrieve
      * @return the list of {@link ProjectActivity} records
-     * @throws QueryException the query exception
+     * @throws MiddlewareQueryException the MiddlewareQueryException
      */
     @SuppressWarnings("unchecked")
-    public List<ProjectActivity> getByProjectId(Long projectId, int start, int numOfRows) 
-        throws QueryException {
-        
-        if (projectId == null){
+    public List<ProjectActivity> getByProjectId(Long projectId, int start, int numOfRows) throws MiddlewareQueryException {
+
+        if (projectId == null) {
             return new ArrayList<ProjectActivity>();
         }
-        
+
         try {
             Criteria criteria = getSession().createCriteria(ProjectActivity.class);
             Project p = new Project();
@@ -59,27 +57,27 @@ public class ProjectActivityDAO extends GenericDAO<ProjectActivity, Integer>{
             criteria.setMaxResults(numOfRows);
             return (List<ProjectActivity>) criteria.list();
         } catch (HibernateException e) {
-            throw new QueryException("Error with getByProjectId query: " + e.getMessage(), e);
-        } 
+            throw new MiddlewareQueryException("Error with getByProjectId(projectId=" + projectId + ") query from ProjectActivity "
+                    + e.getMessage(), e);
+        }
     }
-    
 
-    
     /**
      * Returns the number of {@link ProjectActivity} records by project id.
      *
      * @param projectId the project id
      * @return the number of {@link ProjectActivity} records
-     * @throws QueryException the query exception
+     * @throws MiddlewareQueryException the MiddlewareQueryException
      */
-    public Long countByProjectId(Long projectId) throws QueryException {
+    public long countByProjectId(Long projectId) throws MiddlewareQueryException {
         try {
             SQLQuery query = getSession().createSQLQuery(ProjectActivity.COUNT_ACTIVITIES_BY_PROJECT_ID);
             query.setParameter("projectId", projectId.intValue());
             BigInteger result = (BigInteger) query.uniqueResult();
-            return Long.valueOf(result.longValue());
+            return result.longValue();
         } catch (HibernateException e) {
-            throw new QueryException("Error with countByProjectId query: " + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error with countByProjectId(projectId=" + projectId + ") query from ProjectActivity "
+                    + e.getMessage(), e);
         }
     }
 }
