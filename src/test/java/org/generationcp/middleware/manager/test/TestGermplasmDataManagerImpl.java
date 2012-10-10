@@ -470,6 +470,27 @@ public class TestGermplasmDataManagerImpl{
     }
 
     @Test
+    public void testGetMethodsByType() throws MiddlewareQueryException {
+        String type = "GEN";  // Tested with rice and cowpea
+        List<Method> methods = manager.getMethodsByType(type);
+        System.out.println("testGetMethodsByType(type=" + type + "): " + methods.size());
+        for (Method method : methods) {
+            System.out.println("  " + method);
+        }
+    }
+
+    @Test
+    public void testGetMethodsByGroup() throws MiddlewareQueryException {
+        String group = "S"; // Tested with rice and cowpea
+        List<Method> methods = manager.getMethodsByGroup(group);
+        System.out.println("testGetMethodsByGroup(group=" + group + "): " + methods.size());
+        for (Method method : methods) {
+            System.out.println("  " + method);
+        }
+    }
+    
+
+    @Test
     public void testAddLocation() throws MiddlewareQueryException {
         Location location = new Location();
         location.setLocid(-1);

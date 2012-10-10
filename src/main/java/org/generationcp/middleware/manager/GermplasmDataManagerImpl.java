@@ -754,6 +754,52 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     }
 
+
+    @Override
+    public List<Method> getMethodsByType(String type) throws MiddlewareQueryException {
+        List<Method> methods = new ArrayList<Method>();
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        if (sessionForLocal != null) {
+            MethodDAO dao = new MethodDAO();
+            dao.setSession(sessionForLocal);
+            methods.addAll(dao.getByType(type));
+        }
+
+        if (sessionForCentral != null) {
+            MethodDAO centralDao = new MethodDAO();
+            centralDao.setSession(sessionForCentral);
+            methods.addAll(centralDao.getByType(type));
+        }
+        
+        return methods;
+    }
+    
+    @Override
+    public List<Method> getMethodsByGroup(String group) throws MiddlewareQueryException {
+        List<Method> methods = new ArrayList<Method>();
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        if (sessionForLocal != null) {
+            MethodDAO dao = new MethodDAO();
+            dao.setSession(sessionForLocal);
+            methods.addAll(dao.getByGroup(group));
+        }
+
+        if (sessionForCentral != null) {
+            MethodDAO centralDao = new MethodDAO();
+            centralDao.setSession(sessionForCentral);
+            methods.addAll(centralDao.getByGroup(group));
+        }
+        
+        return methods;
+    }
+    
+
     @Override
     public int addMethod(Method method) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();

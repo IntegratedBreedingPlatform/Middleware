@@ -426,6 +426,25 @@ public interface GermplasmDataManager {
      * @throws MiddlewareQueryException
      */
     public List<Method> getAllMethods() throws MiddlewareQueryException;
+    
+    /**
+     * Returns all the method records matching the given type.
+     * 
+     * @param type the type of the method
+     * @return List of Method POJOs
+     * @throws MiddlewareQueryException
+     */
+    public List<Method> getMethodsByType(String type) throws MiddlewareQueryException;
+
+    
+    /**
+     * Returns all the method records matching the given group.
+     * 
+     * @param group the group of the method
+     * @return List of Method POJOs
+     * @throws MiddlewareQueryException
+     */
+    public List<Method> getMethodsByGroup(String group) throws MiddlewareQueryException;
 
     /**
      * Returns the udfld record identified by the given id.
