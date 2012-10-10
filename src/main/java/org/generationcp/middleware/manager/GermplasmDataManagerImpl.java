@@ -66,6 +66,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         super(sessionForLocal, sessionForCentral);
     }
 
+    @Override
     public List<Location> getAllLocations(int start, int numOfRows) throws MiddlewareQueryException {
         LocationDAO dao = new LocationDAO();
 
@@ -139,6 +140,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         return locations;
     }
 
+    @Override
     public long countAllLocations() throws MiddlewareQueryException {
 
         long count = 0;
@@ -161,35 +163,84 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         return count;
     }
 
-    public List<Location> getLocationByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException {
+    @Override
+    public List<Location> getLocationsByName(String name, Operation op) throws MiddlewareQueryException {
 
         LocationDAO dao = new LocationDAO();
+        List<Location> locations = new ArrayList<Location>();
 
         Session sessionForCentral = getCurrentSessionForCentral();
         Session sessionForLocal = getCurrentSessionForLocal();
 
         if (sessionForLocal != null) {
             dao.setSession(sessionForLocal);
+            locations.addAll(dao.getByName(name, op));
         }
-        List<Location> locations = dao.getByName(name, start, numOfRows, op);
 
         // get the list of Location from the central instance
         if (sessionForCentral != null) {
             dao.setSession(sessionForCentral);
+            locations.addAll(dao.getByName(name, op));
         }
-
-        List<Location> centralLocations = dao.getByName(name, start, numOfRows, op);
-
-        locations.addAll(centralLocations);
 
         return locations;
 
     }
+    
+    @Override
+    public List<Location> getLocationsByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException {
+        LocationDAO dao = new LocationDAO();
+        List<Location> locations = new ArrayList<Location>();
 
-    public long countLocationByName(String name, Operation op) throws MiddlewareQueryException {
+        long centralCount = 0;
+        long localCount = 0;
+        long relativeLimit = 0;
 
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            centralCount = dao.countByName(name, op);
+
+            if (centralCount > start) {
+                locations.addAll(dao.getByName(name, start, numOfRows, op));
+                relativeLimit = numOfRows - (centralCount - start);
+                if (relativeLimit > 0) {
+                    if (sessionForLocal != null) {
+                        dao.setSession(sessionForLocal);
+                        localCount = dao.countByName(name, op);
+                        if (localCount > 0) {
+                            locations.addAll(dao.getByName(name, 0, (int) relativeLimit, op));
+                        }
+                    }
+                }
+
+            } else {
+                relativeLimit = start - centralCount;
+                if (sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countByName(name, op);
+                    if (localCount > relativeLimit) {
+                        locations.addAll(dao.getByName(name, (int) relativeLimit, numOfRows, op));
+                    }
+                }
+            }
+
+        } else if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            localCount = dao.countByName(name, op);
+            if (localCount > start) {
+                locations.addAll(dao.getByName(name, start, numOfRows, op));
+            }
+        }
+
+        return locations;
+    }
+    
+    @Override
+    public long countLocationsByName(String name, Operation op) throws MiddlewareQueryException {
         long count = 0;
-
         LocationDAO dao = new LocationDAO();
 
         Session sessionForCentral = getCurrentSessionForCentral();
@@ -197,19 +248,205 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
         if (sessionForLocal != null) {
             dao.setSession(sessionForLocal);
+            count = count + dao.countByName(name, op);
         }
-        count = dao.countByName(name, op);
 
         // get the list of Location from the central instance
         if (sessionForCentral != null) {
             dao.setSession(sessionForCentral);
+            count = count + dao.countByName(name, op);
         }
 
-        count = count + dao.countByName(name, op);
+        return count;
+    }
+    
+    
+    @Override
+    public List<Location> getLocationsByCountry(Country country) throws MiddlewareQueryException {
+        LocationDAO dao = new LocationDAO();
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        List<Location> locations = new ArrayList<Location>();
+
+        if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            locations.addAll(dao.getByCountry(country));
+        }
+
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            locations.addAll(dao.getByCountry(country));
+        }
+
+        return locations;
+    }
+    
+    @Override
+    public List<Location> getLocationsByCountry(Country country, int start, int numOfRows) throws MiddlewareQueryException {
+        LocationDAO dao = new LocationDAO();
+        List<Location> locations = new ArrayList<Location>();
+
+        long centralCount = 0;
+        long localCount = 0;
+        long relativeLimit = 0;
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            centralCount = dao.countByCountry(country);
+
+            if (centralCount > start) {
+                locations.addAll(dao.getByCountry(country, start, numOfRows));
+                relativeLimit = numOfRows - (centralCount - start);
+                if (relativeLimit > 0) {
+                    if (sessionForLocal != null) {
+                        dao.setSession(sessionForLocal);
+                        localCount = dao.countByCountry(country);
+                        if (localCount > 0) {
+                            locations.addAll(dao.getByCountry(country, 0, (int) relativeLimit));
+                        }
+                    }
+                }
+
+            } else {
+                relativeLimit = start - centralCount;
+                if (sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countByCountry(country);
+                    if (localCount > relativeLimit) {
+                        locations.addAll(dao.getByCountry(country, (int) relativeLimit, numOfRows));
+                    }
+                }
+            }
+
+        } else if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            localCount = dao.countByCountry(country);
+            if (localCount > start) {
+                locations.addAll(dao.getByCountry(country, start, numOfRows));
+            }
+        }
+
+        return locations;
+    }
+    
+    @Override
+    public long countLocationsByCountry(Country country) throws MiddlewareQueryException {
+        long count = 0;
+        LocationDAO dao = new LocationDAO();
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            count = count + dao.countByCountry(country);
+        }
+
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            count = count + dao.countByCountry(country);
+        }
 
         return count;
-
     }
+    
+    @Override
+    public List<Location> getLocationsByType(Integer type) throws MiddlewareQueryException {
+        LocationDAO dao = new LocationDAO();
+        List<Location> locations = new ArrayList<Location>();
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            locations.addAll(dao.getByType(type));
+        }
+
+        // get the list of Location from the central instance
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            locations.addAll(dao.getByType(type));
+        }
+
+        return locations;
+    }
+    
+    @Override
+    public List<Location> getLocationsByType(Integer type, int start, int numOfRows) throws MiddlewareQueryException {
+        LocationDAO dao = new LocationDAO();
+        List<Location> locations = new ArrayList<Location>();
+
+        long centralCount = 0;
+        long localCount = 0;
+        long relativeLimit = 0;
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            centralCount = dao.countByType(type);
+
+            if (centralCount > start) {
+                locations.addAll(dao.getByType(type, start, numOfRows));
+                relativeLimit = numOfRows - (centralCount - start);
+                if (relativeLimit > 0) {
+                    if (sessionForLocal != null) {
+                        dao.setSession(sessionForLocal);
+                        localCount = dao.countByType(type);
+                        if (localCount > 0) {
+                            locations.addAll(dao.getByType(type, 0, (int) relativeLimit));
+                        }
+                    }
+                }
+
+            } else {
+                relativeLimit = start - centralCount;
+                if (sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countByType(type);
+                    if (localCount > relativeLimit) {
+                        locations.addAll(dao.getByType(type, (int) relativeLimit, numOfRows));
+                    }
+                }
+            }
+
+        } else if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            localCount = dao.countByType(type);
+            if (localCount > start) {
+                locations.addAll(dao.getByType(type, start, numOfRows));
+            }
+        }
+
+        return locations;
+    }
+    
+    @Override
+    public long countLocationsByType(Integer type) throws MiddlewareQueryException {
+        long count = 0;
+        LocationDAO dao = new LocationDAO();
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            count = count + dao.countByType(type);
+        }
+
+        // get the list of Location from the central instance
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            count = count + dao.countByType(type);
+        }
+
+        return count;
+    }
+    
 
     public List<Germplasm> getAllGermplasm(int start, int numOfRows, Database instance) throws MiddlewareQueryException {
         GermplasmDAO dao = new GermplasmDAO();
@@ -757,48 +994,193 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public List<Method> getMethodsByType(String type) throws MiddlewareQueryException {
+        MethodDAO dao = new MethodDAO();
         List<Method> methods = new ArrayList<Method>();
 
         Session sessionForCentral = getCurrentSessionForCentral();
         Session sessionForLocal = getCurrentSessionForLocal();
 
         if (sessionForLocal != null) {
-            MethodDAO dao = new MethodDAO();
             dao.setSession(sessionForLocal);
             methods.addAll(dao.getByType(type));
         }
 
         if (sessionForCentral != null) {
-            MethodDAO centralDao = new MethodDAO();
-            centralDao.setSession(sessionForCentral);
-            methods.addAll(centralDao.getByType(type));
+            dao.setSession(sessionForCentral);
+            methods.addAll(dao.getByType(type));
         }
         
         return methods;
     }
     
     @Override
+    public List<Method> getMethodsByType(String type, int start, int numOfRows) throws MiddlewareQueryException {
+        MethodDAO dao = new MethodDAO();
+        List<Method> methods = new ArrayList<Method>();
+
+        long centralCount = 0;
+        long localCount = 0;
+        long relativeLimit = 0;
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            centralCount = dao.countByType(type);
+
+            if (centralCount > start) {
+                methods.addAll(dao.getByType(type, start, numOfRows));
+                relativeLimit = numOfRows - (centralCount - start);
+                if (relativeLimit > 0) {
+                    if (sessionForLocal != null) {
+                        dao.setSession(sessionForLocal);
+                        localCount = dao.countByType(type);
+                        if (localCount > 0) {
+                            methods.addAll(dao.getByType(type, 0, (int) relativeLimit));
+                        }
+                    }
+                }
+
+            } else {
+                relativeLimit = start - centralCount;
+                if (sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countByType(type);
+                    if (localCount > relativeLimit) {
+                        methods.addAll(dao.getByType(type, (int) relativeLimit, numOfRows));
+                    }
+                }
+            }
+
+        } else if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            localCount = dao.countByType(type);
+            if (localCount > start) {
+                methods.addAll(dao.getByType(type, start, numOfRows));
+            }
+        }
+
+        return methods;
+    }
+    
+    @Override
+    public long countMethodsByType(String type) throws MiddlewareQueryException{
+        MethodDAO dao = new MethodDAO();
+        long numberOfMethods = 0L;
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            numberOfMethods += dao.countByType(type);
+        }
+
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            numberOfMethods += dao.countByType(type);
+        }
+
+        return numberOfMethods;        
+    }
+
+    
+    @Override
     public List<Method> getMethodsByGroup(String group) throws MiddlewareQueryException {
+        MethodDAO dao = new MethodDAO();
         List<Method> methods = new ArrayList<Method>();
 
         Session sessionForCentral = getCurrentSessionForCentral();
         Session sessionForLocal = getCurrentSessionForLocal();
 
         if (sessionForLocal != null) {
-            MethodDAO dao = new MethodDAO();
             dao.setSession(sessionForLocal);
             methods.addAll(dao.getByGroup(group));
         }
 
         if (sessionForCentral != null) {
-            MethodDAO centralDao = new MethodDAO();
-            centralDao.setSession(sessionForCentral);
-            methods.addAll(centralDao.getByGroup(group));
+            dao.setSession(sessionForCentral);
+            methods.addAll(dao.getByGroup(group));
         }
         
         return methods;
     }
     
+
+    @Override
+    public List<Method> getMethodsByGroup(String group, int start, int numOfRows) throws MiddlewareQueryException {
+        MethodDAO dao = new MethodDAO();
+        List<Method> methods = new ArrayList<Method>();
+
+        long centralCount = 0;
+        long localCount = 0;
+        long relativeLimit = 0;
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            centralCount = dao.countByGroup(group);
+
+            if (centralCount > start) {
+                methods.addAll(dao.getByGroup(group, start, numOfRows));
+                relativeLimit = numOfRows - (centralCount - start);
+                if (relativeLimit > 0) {
+                    if (sessionForLocal != null) {
+                        dao.setSession(sessionForLocal);
+                        localCount = dao.countByGroup(group);
+                        if (localCount > 0) {
+                            methods.addAll(dao.getByGroup(group, 0, (int) relativeLimit));
+                        }
+                    }
+                }
+
+            } else {
+                relativeLimit = start - centralCount;
+                if (sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countByGroup(group);
+                    if (localCount > relativeLimit) {
+                        methods.addAll(dao.getByGroup(group, (int) relativeLimit, numOfRows));
+                    }
+                }
+            }
+
+        } else if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            localCount = dao.countByGroup(group);
+            if (localCount > start) {
+                methods.addAll(dao.getByGroup(group, start, numOfRows));
+            }
+        }
+
+        return methods;
+    }
+    
+    @Override
+    public long countMethodsByGroup(String group) throws MiddlewareQueryException{
+        long numberOfMethods = 0L;
+        MethodDAO dao = new MethodDAO();
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            numberOfMethods += dao.countByGroup(group);
+        }
+
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            numberOfMethods += dao.countByGroup(group);
+        }
+
+        return numberOfMethods;
+        
+    }
+
 
     @Override
     public int addMethod(Method method) throws MiddlewareQueryException {

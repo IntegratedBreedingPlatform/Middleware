@@ -147,38 +147,6 @@ public interface GermplasmDataManager {
      */    
     public long countGermplasmByLocationName(String name, Operation op, Database instance) throws MiddlewareQueryException;
 
-
-    /**
-     * Returns the Location records that were created at the locations with
-     * names matching the given parameter.
-     * 
-     * @param name
-     *            - search string for the name of the locations
-     * @param start
-     *            - the starting index of the sublist of results to be returned
-     * @param numOfRows
-     *            - the number of rows to be included in the sublist of results
-     *            to be returned
-     * @param op
-     *            - can be EQUAL like LIKE
-     * @return List of Location POJOs
-     * @throws MiddlewareQueryException
-     */
-    public List<Location> getLocationByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException;
-    
-    /**
-     * Returns the number of Locations with
-     * names matching the given parameter.
-     * 
-     * @param name
-     *            - search string for the name of the locations
-     * @param op
-     *            - can be EQUAL like LIKE
-     * @return Number of Locations
-     * @throws MiddlewareQueryException
-     */
-    public long countLocationByName(String name, Operation op) throws MiddlewareQueryException;
-    
     /**
      * Returns all Locations
      * 
@@ -196,6 +164,131 @@ public interface GermplasmDataManager {
      * @return the number of all Locations
      */   
     public long countAllLocations() throws MiddlewareQueryException;
+
+    /**
+     * Returns the Location records that were created at the locations with
+     * names matching the given parameter.
+     * 
+     * @param name
+     *            - search string for the name of the locations
+     * @param op
+     *            - can be EQUAL like LIKE
+     * @return List of Location POJOs
+     * @throws MiddlewareQueryException
+     */
+    public List<Location> getLocationsByName(String name, Operation op) throws MiddlewareQueryException;
+    
+
+    /**
+     * Returns the Location records that were created at the locations with
+     * names matching the given parameter.
+     * 
+     * @param name
+     *            - search string for the name of the locations
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
+     * @param op
+     *            - can be EQUAL like LIKE
+     * @return List of Location POJOs
+     * @throws MiddlewareQueryException
+     */
+    public List<Location> getLocationsByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException;
+    
+    /**
+     * Returns the number of Locations with
+     * names matching the given parameter.
+     * 
+     * @param name
+     *            - search string for the name of the locations
+     * @param op
+     *            - can be EQUAL like LIKE
+     * @return Number of Locations
+     * @throws MiddlewareQueryException
+     */
+    public long countLocationsByName(String name, Operation op) throws MiddlewareQueryException;
+
+
+    /**
+     * Returns all the Location records that were created at the locations with
+     * country matching the given parameter. The data is retrieved from both local and central databases.
+     * 
+     * @param country
+     *            - search string for the country of the locations
+     * @return List of Location POJOs
+     * @throws MiddlewareQueryException
+     */
+    public List<Location> getLocationsByCountry(Country country) throws MiddlewareQueryException;
+
+
+    /**
+     * Returns the Location records that were created at the locations with
+     * country matching the given parameter. The data is retrieved from both local and central databases.
+     * 
+     * @param country
+     *            - search string for the country of the locations
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
+     * @return List of Location POJOs
+     * @throws MiddlewareQueryException
+     */
+    public List<Location> getLocationsByCountry(Country country, int start, int numOfRows) throws MiddlewareQueryException;
+    
+    /**
+     * Returns the number of Locations with
+     * countries matching the given parameter. The data is retrieved from both local and central databases.
+     * 
+     * @param country
+     *            - search string for the country of the locations
+     * @return Number of Locations
+     * @throws MiddlewareQueryException
+     */
+    public long countLocationsByCountry(Country country) throws MiddlewareQueryException;
+    
+
+
+    /**
+     * Returns the Location records that were created at the locations with
+     * type matching the given parameter. The data is retrieved from both local and central databases.
+     * 
+     * @param type
+     *            - search string for the type of the locations
+     * @return List of Location POJOs
+     * @throws MiddlewareQueryException
+     */
+    public List<Location> getLocationsByType(Integer type) throws MiddlewareQueryException;
+
+    /**
+     * Returns the Location records that were created at the locations with
+     * type matching the given parameter. The data is retrieved from both local and central databases.
+     * 
+     * @param type
+     *            - search string for the type of the locations
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
+     * @return List of Location POJOs
+     * @throws MiddlewareQueryException
+     */
+    public List<Location> getLocationsByType(Integer type, int start, int numOfRows) throws MiddlewareQueryException;
+    
+    /**
+     * Returns the number of Locations with
+     * types matching the given parameter. The data is retrieved from both local and central databases.
+     * 
+     * @param type
+     *            - search string for the type of the locations
+     * @return Number of Locations
+     * @throws MiddlewareQueryException
+     */
+    public long countLocationsByType(Integer type) throws MiddlewareQueryException;
     
     /**
      * Returns the germplasm records that were created by the methods with names
@@ -429,6 +522,7 @@ public interface GermplasmDataManager {
     
     /**
      * Returns all the method records matching the given type.
+     * Retrieves from both local and central databases.
      * 
      * @param type the type of the method
      * @return List of Method POJOs
@@ -436,15 +530,72 @@ public interface GermplasmDataManager {
      */
     public List<Method> getMethodsByType(String type) throws MiddlewareQueryException;
 
+
     
     /**
+     * Returns all the method records matching the given type.
+     * Retrieves from both local and central databases.
+     * 
+     * @param type the type of the method
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
+     * @return List of Method POJOs
+     * @throws MiddlewareQueryException
+     */
+    public List<Method> getMethodsByType(String type, int start, int numOfRows) throws MiddlewareQueryException;
+
+    /**
+     * Returns the number of Methods with
+     * type matching the given parameter.
+     * Retrieves from both local and central databases.
+     * 
+     * @param type
+     *            - search string for the methods
+     * @return Number of Methods matching the given type
+     * @throws MiddlewareQueryException
+     */
+    public long countMethodsByType(String type) throws MiddlewareQueryException;
+
+    /**
      * Returns all the method records matching the given group.
+     * Retrieves from both local and central databases.
      * 
      * @param group the group of the method
      * @return List of Method POJOs
      * @throws MiddlewareQueryException
      */
     public List<Method> getMethodsByGroup(String group) throws MiddlewareQueryException;
+
+
+    /**
+     * Returns all the method records matching the given group.
+     * Retrieves from both local and central databases.
+     * 
+     * @param type the group of the method
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
+     * @return List of Method POJOs
+     * @throws MiddlewareQueryException
+     */
+    public List<Method> getMethodsByGroup(String group, int start, int numOfRows) throws MiddlewareQueryException;
+
+    /**
+     * Returns the number of Methods with
+     * group matching the given parameter. 
+     * Retrieves from both local and central databases.
+     * 
+     * @param group
+     *            - search string for the methods
+     * @return Number of Methods matching the given group
+     * @throws MiddlewareQueryException
+     */
+    public long countMethodsByGroup(String group) throws MiddlewareQueryException;
 
     /**
      * Returns the udfld record identified by the given id.

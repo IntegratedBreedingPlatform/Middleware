@@ -230,8 +230,10 @@ public class Location implements Serializable{
 
     @Override
     public String toString() {
-        return "Location [locid=" + locid + ", nllp=" + nllp + ", lname=" + lname + ", labbr=" + labbr + ", snl3id=" + snl3id + ", snl2id="
-                + snl2id + ", snl1id=" + snl1id + ", lrplce=" + lrplce + "]";
+        return "Location [locid=" + locid + ", ltype=" + ltype + ", nllp=" + nllp + ", lname=" + lname + ", labbr=" + labbr + ", snl3id="
+                + snl3id + ", snl2id=" + snl2id + ", snl1id=" + snl1id + ", cntryid=" + cntryid + ", lrplce=" + lrplce + "]";
     }
 
+    
+    
 }

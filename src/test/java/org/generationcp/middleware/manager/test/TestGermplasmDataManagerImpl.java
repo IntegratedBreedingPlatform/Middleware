@@ -24,6 +24,7 @@ import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Attribute;
+import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GidNidElement;
 import org.generationcp.middleware.pojos.Location;
@@ -71,27 +72,94 @@ public class TestGermplasmDataManagerImpl{
     }
 
     @Test
-    public void testGetLocationByName() throws Exception {
+    public void testGetLocationsByName() throws Exception {
         String name = "AFGHANISTAN";
-        long start = System.currentTimeMillis();
-        List<Location> locationList = manager.getLocationByName(name, 0, 5, Operation.EQUAL);
+        int start = 0;
+        int numOfRows = 5;
+
+        long startTime = System.currentTimeMillis();
+        List<Location> locationList = manager.getLocationsByName(name, Operation.EQUAL);
         Assert.assertTrue(locationList != null);
-        System.out.println("testGetLocationByName(" + name + ") RESULTS: ");
+        System.out.println("testGetLocationsByName(" + name + ") RESULTS: " + locationList.size());
         for (Location l : locationList) {
             System.out.println("  " + l);
         }
+        long end = System.currentTimeMillis();
+        System.out.println("  QUERY TIME: " + (end - startTime) + " ms");
+
+        List<Location> locationList2 = manager.getLocationsByName(name, start, numOfRows, Operation.EQUAL);
+        System.out.println("testGetLocationsByName(" + name + ", start=" + start + ", numOfRows=" + numOfRows + ") RESULTS: ");
+        for (Location l : locationList2) {
+            System.out.println("  " + l);
+        }
+
+    }
+
+    @Test
+    public void testCountLocationsByName() throws Exception {
+        String name = "AFGHANISTAN";
+        long start = System.currentTimeMillis();
+        long count = manager.countLocationsByName(name, Operation.EQUAL);
+        System.out.println("testCountLocationByName(" + name + "): " + count);
         long end = System.currentTimeMillis();
         System.out.println("  QUERY TIME: " + (end - start) + " ms");
     }
 
     @Test
-    public void testCountLocationByName() throws Exception {
-        String name = "AFGHANISTAN";
-        long start = System.currentTimeMillis();
-        long count = manager.countLocationByName(name, Operation.EQUAL);
-        System.out.println("testCountLocationByName(" + name + "): " + count);
-        long end = System.currentTimeMillis();
-        System.out.println("  QUERY TIME: " + (end - start) + " ms");
+    public void testGetLocationsByCountry() throws MiddlewareQueryException {
+        Integer id = 171; // Tested in rice db. 171 = Philippines
+        Country country = manager.getCountryById(id);
+        int start = 0;
+        int numOfRows = 5;
+
+        List<Location> locations = manager.getLocationsByCountry(country);
+        System.out.println("testGetLocationByCountry(country=" + country + "): " + locations.size());
+        for (Location location : locations) {
+            System.out.println("  " + location);
+        }
+
+        List<Location> locationList = manager.getLocationsByCountry(country, start, numOfRows);
+        System.out.println("testGetLocationByCountry(country=" + country + ", start=" + start + ", numOfRows=" + numOfRows + "): "
+                + locationList.size());
+        for (Location location : locationList) {
+            System.out.println("  " + location);
+        }
+    }
+
+    @Test
+    public void testCountLocationsByCountry() throws Exception {
+        Integer id = 171; // Tested in rice db. 171 = Philippines
+        Country country = manager.getCountryById(id);
+        long count = manager.countLocationsByCountry(country);
+        System.out.println("testCountLocationByCountry(country=" + country + "): " + count);
+    }
+
+    @Test
+    public void testGetLocationsByType() throws MiddlewareQueryException {
+        Integer type = 405; // Tested in rice db
+        int start = 0;
+        int numOfRows = 5;
+
+        List<Location> locations = manager.getLocationsByType(type);
+        System.out.println("testGetLocationByType(type=" + type + "): " + locations.size());
+        for (Location location : locations) {
+            System.out.println("  " + location);
+        }
+
+        List<Location> locationList = manager.getLocationsByType(type, start, numOfRows);
+        System.out.println("testGetLocationByType(type=" + type + ", start=" + start + ", numOfRows=" + numOfRows + "): "
+                + locationList.size());
+        for (Location location : locationList) {
+            System.out.println("  " + location);
+        }
+
+    }
+
+    @Test
+    public void testCountLocationsByType() throws Exception {
+        Integer type = 405; // Tested in rice db
+        long count = manager.countLocationsByType(type);
+        System.out.println("testCountLocationByType(type=" + type + "): " + count);
     }
 
     @Test
@@ -328,6 +396,7 @@ public class TestGermplasmDataManagerImpl{
         long count = manager.countGermplasmByMethodName(name, Operation.LIKE, Database.CENTRAL);
         System.out.println("testCountGermplasmByMethodNameUsingLike(" + name + ") RESULTS: " + count);
         long end = System.currentTimeMillis();
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
     }
 
     @Test
@@ -406,7 +475,8 @@ public class TestGermplasmDataManagerImpl{
         Integer status = Integer.valueOf(8);
         GermplasmNameType type = GermplasmNameType.INTERNATIONAL_TESTING_NUMBER;
         List<Name> names = manager.getNamesByGID(gid, status, type);
-        System.out.println("testGetNamesByGIDWithStatusAndType(gid=" + gid + ", status" + status + ", type=" + type + ") RESULTS: " + names);
+        System.out
+                .println("testGetNamesByGIDWithStatusAndType(gid=" + gid + ", status" + status + ", type=" + type + ") RESULTS: " + names);
     }
 
     @Test
@@ -471,24 +541,56 @@ public class TestGermplasmDataManagerImpl{
 
     @Test
     public void testGetMethodsByType() throws MiddlewareQueryException {
-        String type = "GEN";  // Tested with rice and cowpea
+        String type = "GEN"; // Tested with rice and cowpea
+        int start = 0;
+        int numOfRows = 5;
+
         List<Method> methods = manager.getMethodsByType(type);
         System.out.println("testGetMethodsByType(type=" + type + "): " + methods.size());
         for (Method method : methods) {
             System.out.println("  " + method);
         }
+        List<Method> methodList = manager.getMethodsByType(type, start, numOfRows);
+        System.out.println("testGetMethodsByType(type=" + type + ", start=" + start + ", numOfRows=" + numOfRows + "): " + methodList.size());
+        for (Method method : methodList) {
+            System.out.println("  " + method);
+        }
+
+    }
+
+    @Test
+    public void testCountMethodsByType() throws Exception {
+        String type = "GEN"; // Tested with rice and cowpea
+        long count = manager.countMethodsByType(type);
+        System.out.println("testCountMethodsByType(type=" + type + "): " + count);
     }
 
     @Test
     public void testGetMethodsByGroup() throws MiddlewareQueryException {
         String group = "S"; // Tested with rice and cowpea
+        int start = 0;
+        int numOfRows = 5;
+
         List<Method> methods = manager.getMethodsByGroup(group);
         System.out.println("testGetMethodsByGroup(group=" + group + "): " + methods.size());
         for (Method method : methods) {
             System.out.println("  " + method);
         }
+
+        List<Method> methodList = manager.getMethodsByGroup(group, start, numOfRows);
+        System.out.println("testGetMethodsByGroup(group=" + group + ", start=" + start + ", numOfRows=" + numOfRows + "): " + methodList.size());
+        for (Method method : methodList) {
+            System.out.println("  " + method);
+        }
+
     }
-    
+
+    @Test
+    public void testCountMethodsByGroup() throws Exception {
+        String group = "S"; // Tested with rice and cowpea
+        long count = manager.countMethodsByGroup(group);
+        System.out.println("testCountMethodsByGroup(group=" + group + "): " + count);
+    }
 
     @Test
     public void testAddLocation() throws MiddlewareQueryException {
@@ -506,10 +608,11 @@ public class TestGermplasmDataManagerImpl{
 
         // add the location
         manager.addLocation(location);
-        System.out.println("testAddLocation(" + location + ") RESULTS: \n  " + manager.getLocationByName("TEST-LOCATION-1", 0, 5, Operation.EQUAL));
+        System.out.println("testAddLocation(" + location + ") RESULTS: \n  "
+                + manager.getLocationsByName("TEST-LOCATION-1", 0, 5, Operation.EQUAL));
 
         // cleanup
-        manager.deleteLocation(manager.getLocationByName("TEST-LOCATION-1", 0, 5, Operation.EQUAL).get(0));
+        manager.deleteLocation(manager.getLocationsByName("TEST-LOCATION-1", 0, 5, Operation.EQUAL).get(0));
     }
 
     @Test
@@ -548,12 +651,12 @@ public class TestGermplasmDataManagerImpl{
         int locationsAdded = manager.addLocation(locations);
 
         System.out.println("testAddLocations() Locations added: " + locationsAdded);
-        System.out.println("  " + manager.getLocationByName("TEST-LOCATION-2", 0, 5, Operation.EQUAL));
-        System.out.println("  " + manager.getLocationByName("TEST-LOCATION-3", 0, 5, Operation.EQUAL));
+        System.out.println("  " + manager.getLocationsByName("TEST-LOCATION-2", 0, 5, Operation.EQUAL));
+        System.out.println("  " + manager.getLocationsByName("TEST-LOCATION-3", 0, 5, Operation.EQUAL));
 
         // cleanup
-        manager.deleteLocation(manager.getLocationByName("TEST-LOCATION-2", 0, 5, Operation.EQUAL).get(0));
-        manager.deleteLocation(manager.getLocationByName("TEST-LOCATION-3", 0, 5, Operation.EQUAL).get(0));
+        manager.deleteLocation(manager.getLocationsByName("TEST-LOCATION-2", 0, 5, Operation.EQUAL).get(0));
+        manager.deleteLocation(manager.getLocationsByName("TEST-LOCATION-3", 0, 5, Operation.EQUAL).get(0));
     }
 
     @Test
