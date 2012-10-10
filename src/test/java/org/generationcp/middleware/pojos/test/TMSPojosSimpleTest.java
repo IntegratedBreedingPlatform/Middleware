@@ -22,9 +22,9 @@ import org.generationcp.middleware.pojos.TraitMethod;
 import org.generationcp.middleware.util.HibernateUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class TMSPojosSimpleTest{
@@ -32,7 +32,7 @@ public class TMSPojosSimpleTest{
     private static final String CONFIG = "test-hibernate.cfg.xml";
     private HibernateUtil hibernateUtil;
 
-    @Before
+    @BeforeClass
     public void setUp() throws Exception {
         hibernateUtil = new HibernateUtil(CONFIG);
     }
@@ -117,7 +117,7 @@ public class TMSPojosSimpleTest{
         }
     }
 
-    @After
+    @AfterClass
     public void tearDown() throws Exception {
         hibernateUtil.shutdown();
     }
