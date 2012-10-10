@@ -50,8 +50,8 @@ public class Project implements Serializable{
     private String projectName = "";
 
     @Basic(optional = false)
-    @Column(name = "target_due_date")
-    private Date targetDueDate;
+    @Column(name = "start_date")
+    private Date startDate;
     
     @Basic(optional = false)
     @Column(name = "user_id")
@@ -117,12 +117,12 @@ public class Project implements Serializable{
         this.projectName = projectName;
     }
 
-    public Date getTargetDueDate() {
-        return targetDueDate;
+    public Date getStartDate() {
+        return startDate;
     }
 
-    public void setTargetDueDate(Date targetDueDate) {
-        this.targetDueDate = targetDueDate;
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
     }
 
     public WorkflowTemplate getTemplate() {
@@ -241,7 +241,7 @@ public class Project implements Serializable{
         sb.append("Project [");
         sb.append("projectId=").append(projectId);
         sb.append(", projectName=").append(projectName);
-        sb.append(", targetDueDate=").append(targetDueDate);
+        sb.append(", startDate=").append(startDate);
         sb.append(", template=").append(template);
         sb.append(", cropType=").append(cropType);
         sb.append(", templateModified=").append(templateModified);

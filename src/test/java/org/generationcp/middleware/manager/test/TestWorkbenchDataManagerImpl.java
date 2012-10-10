@@ -60,13 +60,13 @@ public class TestWorkbenchDataManagerImpl{
         project1.setProjectName("Test Project 1");
         project1.setUserId(1);
         project1.setCropType(manager.getCropTypeByName(CropType.CHICKPEA));
-        project1.setTargetDueDate(new GregorianCalendar().getTime());
+        project1.setStartDate(new GregorianCalendar().getTime());
         project1.setLastOpenDate(new GregorianCalendar().getTime());
 
         Project project2 = new Project();
         project2.setProjectName("Test Project 2");
         project2.setCropType(manager.getCropTypeByName(CropType.CHICKPEA));
-        project2.setTargetDueDate(new GregorianCalendar().getTime());
+        project2.setStartDate(new GregorianCalendar().getTime());
         project2.setLastOpenDate(new GregorianCalendar().getTime());
 
         WorkflowTemplate marsTemplate = new WorkflowTemplate();
