@@ -143,6 +143,8 @@ public class TestWorkbenchDataManagerImpl{
         // cleanup
         deleteProject(project1);
         deleteProject(project2);
+        
+//        deleteAllProjects();
 
     }
 

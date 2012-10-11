@@ -52,7 +52,7 @@ public class Project implements Serializable{
     @Basic(optional = false)
     @Column(name = "start_date")
     private Date startDate;
-    
+
     @Basic(optional = false)
     @Column(name = "user_id")
     private int userId;
@@ -60,28 +60,34 @@ public class Project implements Serializable{
     @OneToOne
     @JoinColumn(name = "template_id")
     private WorkflowTemplate template;
-    
+
     @OneToOne
     @JoinColumn(name = "crop_type", referencedColumnName = "crop_name")
     private CropType cropType;
 
+    @Column(name = "local_db_name")
+    private String localDbName;
+
+    @Column(name = "central_db_name")
+    private String centralDbName;
+
     @Basic(optional = false)
     @Column(name = "template_modified")
     private boolean templateModified;
-    
+
     @Basic(optional = true)
     @Column(name = "last_open_date")
     private Date lastOpenDate;
 
     @Transient
     private List<ProjectWorkflowStep> steps;
-    
+
     @Transient
     private Set<User> members;
-    
+
     @Transient
     private Set<Method> methods;
-    
+
     @Transient
     private Set<Location> locations;
 
@@ -100,7 +106,7 @@ public class Project implements Serializable{
     public void setProjectId(Long projectId) {
         this.projectId = projectId;
     }
-    
+
     public int getUserId() {
         return userId;
     }
@@ -139,6 +145,22 @@ public class Project implements Serializable{
 
     public void setCropType(CropType cropType) {
         this.cropType = cropType;
+    }
+
+    public String getLocalDbName() {
+        return localDbName;
+    }
+
+    public void setLocalDbName(String localDbName) {
+        this.localDbName = localDbName;
+    }
+
+    public String getCentralDbName() {
+        return centralDbName;
+    }
+
+    public void setCentralDbName(String centralDbName) {
+        this.centralDbName = centralDbName;
     }
 
     public boolean isTemplateModified() {
@@ -244,10 +266,14 @@ public class Project implements Serializable{
         sb.append(", startDate=").append(startDate);
         sb.append(", template=").append(template);
         sb.append(", cropType=").append(cropType);
+        sb.append(", locaDbName=").append(centralDbName);
+        sb.append(", centralDbName=").append(localDbName);
         sb.append(", templateModified=").append(templateModified);
         sb.append(", lastOpenDate=").append(lastOpenDate);
         sb.append("]");
         return sb.toString();
     }
+    
+    
 
 }

@@ -9,6 +9,7 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
+
 package org.generationcp.middleware.pojos.workbench;
 
 import java.io.Serializable;
@@ -19,8 +20,8 @@ import javax.persistence.Table;
 import javax.persistence.Id;
 
 @Entity
-@Table(name = "workbench_crops")
-public class CropType  implements Serializable{
+@Table(name = "workbench_crop")
+public class CropType implements Serializable{
 
     private static final long serialVersionUID = 1L;
 
@@ -31,10 +32,13 @@ public class CropType  implements Serializable{
     public final static String RICE = "Rice";
     public final static String WHEAT = "Wheat";
     public final static String CASSAVA = "Cassava";
-    
+
     @Id
     @Column(name = "crop_name")
     private String cropName;
+
+    @Column(name = "central_db_name")
+    private String centralDbName;
 
     public CropType() {
     }
@@ -46,9 +50,17 @@ public class CropType  implements Serializable{
     public String getCropName() {
         return cropName;
     }
-    
+
     public void setCropName(String cropName) {
         this.cropName = cropName;
+    }
+
+    public String getCentralDbName() {
+        return centralDbName;
+    }
+
+    public void setCentralDbName(String centralDbName) {
+        this.centralDbName = centralDbName;
     }
 
     @Override
@@ -78,9 +90,7 @@ public class CropType  implements Serializable{
 
     @Override
     public String toString() {
-        return "CropType [cropName=" + cropName + "]";
+        return "CropType [cropName=" + cropName + ", centralDbName=" + centralDbName + "]";
     }
-    
-    
-    
+
 }
