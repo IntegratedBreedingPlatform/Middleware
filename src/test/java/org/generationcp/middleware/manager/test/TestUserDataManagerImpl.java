@@ -29,7 +29,7 @@ public class TestUserDataManagerImpl{
     }
 
     @Test
-    public void testGetAllUsers() {
+    public void testGetAllUsers() throws Exception {
         List<User> users = manager.getAllUsers();
 
         System.out.println("testGetAllUsers() RESULTS: " + users.size());
@@ -39,7 +39,7 @@ public class TestUserDataManagerImpl{
     }
 
     @Test
-    public void testCountAllUsers() {
+    public void testCountAllUsers() throws Exception {
         long count = manager.countAllUsers();
         System.out.println("testCountAllUsers(): " + count);
     }

@@ -166,7 +166,7 @@ public interface GermplasmDataManager {
     public long countAllLocations() throws MiddlewareQueryException;
 
     /**
-     * Returns the Location records that were created at the locations with
+     * Returns the Location records with
      * names matching the given parameter.
      * 
      * @param name
@@ -180,7 +180,7 @@ public interface GermplasmDataManager {
     
 
     /**
-     * Returns the Location records that were created at the locations with
+     * Returns the Location records with
      * names matching the given parameter.
      * 
      * @param name
@@ -212,7 +212,7 @@ public interface GermplasmDataManager {
 
 
     /**
-     * Returns all the Location records that were created at the locations with
+     * Returns all the Location records with
      * country matching the given parameter. The data is retrieved from both local and central databases.
      * 
      * @param country
@@ -224,7 +224,7 @@ public interface GermplasmDataManager {
 
 
     /**
-     * Returns the Location records that were created at the locations with
+     * Returns the Location records with
      * country matching the given parameter. The data is retrieved from both local and central databases.
      * 
      * @param country
@@ -253,7 +253,7 @@ public interface GermplasmDataManager {
 
 
     /**
-     * Returns the Location records that were created at the locations with
+     * Returns the Location records with
      * type matching the given parameter. The data is retrieved from both local and central databases.
      * 
      * @param type
@@ -264,7 +264,7 @@ public interface GermplasmDataManager {
     public List<Location> getLocationsByType(Integer type) throws MiddlewareQueryException;
 
     /**
-     * Returns the Location records that were created at the locations with
+     * Returns the Location records with
      * type matching the given parameter. The data is retrieved from both local and central databases.
      * 
      * @param type

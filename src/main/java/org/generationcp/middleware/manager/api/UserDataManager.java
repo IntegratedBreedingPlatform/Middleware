@@ -29,14 +29,14 @@ public interface UserDataManager {
      *
      * @return gets all Persons
      */   	
-    public List<User> getAllUsers();
+    public List<User> getAllUsers() throws MiddlewareQueryException;
     
     /**
      * Returns number of all Users.
      *
      * @return the number of all Users
      */   
-    public long countAllUsers();
+    public long countAllUsers() throws MiddlewareQueryException;
     
     /**
      * Adds the user.
