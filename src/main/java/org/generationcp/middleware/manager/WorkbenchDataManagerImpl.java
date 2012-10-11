@@ -23,6 +23,7 @@ import org.generationcp.middleware.dao.ProjectDAO;
 import org.generationcp.middleware.dao.ProjectLocationMapDAO;
 import org.generationcp.middleware.dao.ProjectMethodDAO;
 import org.generationcp.middleware.dao.ProjectUserDAO;
+import org.generationcp.middleware.dao.RoleDAO;
 import org.generationcp.middleware.dao.ToolConfigurationDAO;
 import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.dao.UserDAO;
@@ -41,6 +42,7 @@ import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectLocationMap;
 import org.generationcp.middleware.pojos.workbench.ProjectMethod;
 import org.generationcp.middleware.pojos.workbench.ProjectUser;
+import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
 import org.generationcp.middleware.pojos.workbench.ToolType;
@@ -138,6 +140,13 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         WorkflowTemplateDAO workflowTemplateDAO = new WorkflowTemplateDAO();
         workflowTemplateDAO.setSession(getCurrentSession());
         return workflowTemplateDAO.getAll();
+    }
+    
+    @Override
+    public List<WorkflowTemplate> getWorkflowTemplateByName(String name) throws MiddlewareQueryException {
+        WorkflowTemplateDAO workflowTemplateDAO = new WorkflowTemplateDAO();
+        workflowTemplateDAO.setSession(getCurrentSession());
+        return workflowTemplateDAO.getByName(name);
     }
 
     @Override
@@ -700,6 +709,18 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         }
         return null;
     }
+    
+    @Override
+    public List<ProjectUser> getProjectUsersByProject(Project project) throws MiddlewareQueryException{
+        ProjectUserDAO dao = new ProjectUserDAO();
+        Session session = getCurrentSession();
+        if (session != null) {
+            dao.setSession(session);
+            return dao.getByProject(project);
+        }
+        return null;
+    }
+    
 
     @Override
     public ProjectUser getProjectUserByProjectAndUser(Project project, User user) throws MiddlewareQueryException {
@@ -1313,4 +1334,62 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
                             + e.getMessage(), e);
         }
     }
+
+    @Override
+    public Role getRoleById(Integer id) throws MiddlewareQueryException {
+        try {
+            RoleDAO dao = new RoleDAO();
+            dao.setSession(getCurrentSession());
+            return dao.getById(id);
+        } catch (Exception e) {
+            throw new MiddlewareQueryException("Error encountered while getting role by id: WorkbenchDataManager.getRoleById(id=" + id
+                    + "): " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public Role getRoleByNameAndWorkflowTemplate(String name, WorkflowTemplate workflowTemplate) throws MiddlewareQueryException {
+        try {
+            RoleDAO dao = new RoleDAO();
+            dao.setSession(getCurrentSession());
+            return dao.getByNameAndWorkflowTemplate(name, workflowTemplate);
+        } catch (Exception e) {
+            throw new MiddlewareQueryException(
+                    "Error encountered while getting role by name and workflow template: WorkbenchDataManager.getRoleByNameAndWorkflowTemplate(name="
+                            + name + ", workflowTemplate=" + workflowTemplate + "): " + e.getMessage(), e);
+        }
+
+    }
+
+    @Override
+    public List<Role> getRolesByWorkflowTemplate(WorkflowTemplate workflowTemplate) throws MiddlewareQueryException {
+        try {
+            RoleDAO dao = new RoleDAO();
+            dao.setSession(getCurrentSession());
+            return dao.getByWorkflowTemplate(workflowTemplate);
+        } catch (Exception e) {
+            throw new MiddlewareQueryException(
+                    "Error encountered while getting roles by workflow template: WorkbenchDataManager.getRolesByWorkflowTemplate(workflowTemplate="
+                            + workflowTemplate + "): " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public WorkflowTemplate getWorkflowTemplateByRole(Role role) throws MiddlewareQueryException {
+        return role.getWorkflowTemplate();
+    }
+
+    @Override
+    public Role getRoleByProjectAndUser(Project project, User user) throws MiddlewareQueryException {
+        try {
+            ProjectUserDAO dao = new ProjectUserDAO();
+            dao.setSession(getCurrentSession());
+            return dao.getRoleByProjectAndUser(project, user);
+        } catch (Exception e) {
+            throw new MiddlewareQueryException(
+                    "Error encountered while getting role given project and user: WorkbenchDataManager.getRoleByProjectAndUser(project="
+                            + project + ", user=" + user + "): " + e.getMessage(), e);
+        }
+    }
+
 }

@@ -32,6 +32,7 @@ import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectLocationMap;
 import org.generationcp.middleware.pojos.workbench.ProjectMethod;
 import org.generationcp.middleware.pojos.workbench.ProjectUser;
+import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
@@ -383,8 +384,10 @@ public class TestWorkbenchDataManagerImpl{
         Project project1 = manager.getProjectById(projectId);
         User user1 = manager.getUserById(1);
         User user2 = manager.getUserById(2);
-        projectUsers.add(new ProjectUser(project1, user1));
-        projectUsers.add(new ProjectUser(project1, user2));
+        Role role = manager.getRolesByWorkflowTemplate(project1.getTemplate()).get(0);
+
+        projectUsers.add(new ProjectUser(project1, user1, role));
+        projectUsers.add(new ProjectUser(project1, user2, role));
 
         // add the projectUsers
         int projectUsersAdded = manager.addProjectUsers(projectUsers);
@@ -491,14 +494,6 @@ public class TestWorkbenchDataManagerImpl{
     @Test
     public void testDeleteToolConfiguration() throws MiddlewareQueryException {
         Long toolId = 1L;
-        //        ToolConfiguration toolConfig = new ToolConfiguration();
-        //        Tool tool = new Tool();
-        //        tool.setToolId(toolId);
-        //
-        //        toolConfig.setTool(tool);
-        //        toolConfig.setConfigId(1L);
-        //        toolConfig.setConfigKey("test test");
-        //        toolConfig.setConfigValue("test value");
         ToolConfiguration toolConfig = manager.getToolConfigurationByToolIdAndConfigKey(toolId, "5th key");
 
         manager.deleteToolConfiguration(toolConfig);
@@ -561,6 +556,57 @@ public class TestWorkbenchDataManagerImpl{
         Integer localIbdbUserId = manager.getLocalIbdbUserId(workbenchUserId, projectId);
         System.out.println("testGetLocalIbdbUserId(workbenchUserId=" + workbenchUserId + ", projectId=" + projectId + "): "
                 + localIbdbUserId);
+    }
+
+    @Test
+    public void testGetRoleById() throws MiddlewareQueryException {
+        Integer id = Integer.valueOf(1); // Assumption: there is a role with id 1
+        Role role = manager.getRoleById(id);
+        System.out.println("testGetRoleById(id=" + id + "): \n  " + role);
+    }
+
+    @Test
+    public void testGetRoleByNameAndWorkflowTemplate() throws MiddlewareQueryException {
+        String templateName = "MARS";
+        String roleName = "MARS Breeder";
+        WorkflowTemplate workflowTemplate = manager.getWorkflowTemplateByName(templateName).get(0);
+        Role role = manager.getRoleByNameAndWorkflowTemplate(roleName, workflowTemplate);
+        System.out.println("testGetRoleByNameAndWorkflowTemplate(name=" + roleName + ", workflowTemplate=" + workflowTemplate.getName()
+                + "): \n  " + role);
+    }
+
+    @Test
+    public void testGetRolesByWorkflowTemplate() throws MiddlewareQueryException {
+        WorkflowTemplate workflowTemplate = manager.getWorkflowTemplates().get(0); // get the first template in the db
+        List<Role> roles = manager.getRolesByWorkflowTemplate(workflowTemplate);
+        System.out.println("testGetRolesByWorkflowTemplate(workflowTemplate=" + workflowTemplate.getName() + "): " + roles.size());
+        for (Role role: roles){
+            System.out.println("  "+role);
+        }
+    }
+
+    @Test
+    public void testGetWorkflowTemplateByRole() throws MiddlewareQueryException {
+        Integer id = 1; // role with id = 1
+        Role role = manager.getRoleById(id);
+        WorkflowTemplate template = manager.getWorkflowTemplateByRole(role);
+        System.out.println("testGetWorkflowTemplateByRole(role=" + role.getName() + "): \n  " + template);
+    }
+
+    @Test
+    public void testGetRoleByProjectAndUser() throws MiddlewareQueryException {
+        // Assumption: first project stored in the db has associated project users with role
+        Project project = manager.getProjects().get(0); // get first project
+        List<ProjectUser> projectUsers = manager.getProjectUserByProject(project); // get project users
+        
+        if (projectUsers.size()>0){
+            ProjectUser projectUser = manager.getProjectUserByProject(project).get(0); // get the first user of the project
+            User user = manager.getUserById(projectUser.getUserId());   
+            Role role = manager.getRoleByProjectAndUser(project, user); // get the role
+            System.out.println("testGetRoleByProjectAndUser(project=" + project.getProjectName() + ", user=" + user.getName() + "): \n  " + role);
+        } else {
+            System.out.println("testGetRoleByProjectAndUser(project=" + project.getProjectName() + "): Error in data - Project has no users. ");
+        }
     }
 
     @AfterClass

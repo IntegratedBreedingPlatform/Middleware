@@ -67,19 +67,26 @@ public class ProjectUser implements Serializable{
     @Column(name = "user_id")
     private Integer userId;
 
+    /** The role. */
+    @OneToOne(optional = false)
+    @JoinColumn(name = "role_id")
+    private Role role;
+
     
     public ProjectUser() {
     }
 
-    public ProjectUser(Long projectUserId, Project project, Integer userId) {
+    public ProjectUser(Long projectUserId, Project project, Integer userId, Role role) {
         this.projectUserId = projectUserId;
         this.project = project;
         this.userId = userId;
+        this.role = role;
     }
 
-    public ProjectUser(Project project, User user) {
+    public ProjectUser(Project project, User user, Role role) {
         this.project = project;
         this.userId = user.getUserid();
+        this.role = role;
     }
 
     public Long getProjectUserId() {
@@ -104,6 +111,14 @@ public class ProjectUser implements Serializable{
     
     public void setUserId(Integer userId) {
         this.userId = userId;
+    }
+    
+    public Role getRole() {
+        return role;
+    }
+    
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     /* (non-Javadoc)
@@ -138,6 +153,7 @@ public class ProjectUser implements Serializable{
     public String toString() {
         return "ProjectUser [projectUserId=" + projectUserId +
                 ", project=" + project +
+                ", role=" + role +
                 ", userId=" + userId + "]";
     }
 

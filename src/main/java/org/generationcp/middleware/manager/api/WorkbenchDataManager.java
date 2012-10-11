@@ -26,6 +26,7 @@ import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectLocationMap;
 import org.generationcp.middleware.pojos.workbench.ProjectMethod;
 import org.generationcp.middleware.pojos.workbench.ProjectUser;
+import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
 import org.generationcp.middleware.pojos.workbench.ToolType;
@@ -92,6 +93,16 @@ public interface WorkbenchDataManager{
      * @throws MiddlewareQueryException
      */
     public List<WorkflowTemplate> getWorkflowTemplates(int start, int numOfRows) throws MiddlewareQueryException;
+
+    /**
+     * Gets the workflow templates based on the given name.
+     *
+     * @param name - the name of the workflow template
+     * @return the workflow templates
+     * @throws MiddlewareQueryException
+     */
+    public List<WorkflowTemplate> getWorkflowTemplateByName(String name) throws MiddlewareQueryException;
+
 
     /**
      * Gets the tool with the given name.
@@ -490,6 +501,16 @@ public interface WorkbenchDataManager{
     public ProjectUser getProjectUserById(Integer id) throws MiddlewareQueryException;
     
     /**
+     * Retrieves the project user records based on the given project.
+     *
+     * @param project - the Project to match
+     * @return the associated list of ProjectUser
+     * @throws MiddlewareQueryException
+     */
+    public List<ProjectUser> getProjectUsersByProject(Project project) throws MiddlewareQueryException;
+    
+    
+    /**
      * Retrieves project user by project and user.
      *
      * @param project - the project
@@ -667,4 +688,51 @@ public interface WorkbenchDataManager{
      * @throws MiddlewareQueryException
      */
     public WorkbenchRuntimeData getWorkbenchRuntimeData() throws MiddlewareQueryException;
+    
+    /**
+     * Gets the role by id.
+     *
+     * @param id - the role id to match
+     * @return the role matching the given id
+     */
+    public Role getRoleById(Integer id) throws MiddlewareQueryException;
+
+    /**
+     * Gets the role by name and workflow template.
+     *
+     * @param name - the role name to match
+     * @param workflowTemplate - the workflow template to match
+     * @return the role matching the given name and workflow template
+     */
+    public Role getRoleByNameAndWorkflowTemplate(String name, WorkflowTemplate workflowTemplate) throws MiddlewareQueryException;
+
+    /**
+     * Gets the roles by workflow template.
+     *
+     * @param workflowTemplate - the workflow template to match
+     * @return the role matching the given workflow template
+     */
+    public List<Role> getRolesByWorkflowTemplate(WorkflowTemplate workflowTemplate) throws MiddlewareQueryException;
+
+    /**
+     * Gets the workflow template of the given role.
+     *
+     * @param role - the role to match
+     * @return the workflow template matching the given role
+     */
+    public WorkflowTemplate getWorkflowTemplateByRole(Role role) throws MiddlewareQueryException;
+    
+    /**
+     * Gets the role given the project and user.
+     *
+     * @param project - the project to match
+     * @param user - the user to match
+     * @return the role matching the given workflow template
+     */
+    public Role getRoleByProjectAndUser(Project project, User user) throws MiddlewareQueryException;
+
+    
+    
+    
+    
 }
