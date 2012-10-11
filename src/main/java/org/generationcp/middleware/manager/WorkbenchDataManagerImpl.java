@@ -323,7 +323,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     }
 
     @Override
-    public List<User> getAllUsers() {
+    public List<User> getAllUsers() throws MiddlewareQueryException {
         UserDAO dao = new UserDAO();
 
         List<User> users = new ArrayList<User>();
@@ -337,7 +337,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         return users;
     }
 
-    public long countAllUsers() {
+    public long countAllUsers() throws MiddlewareQueryException {
         long count = 0;
         UserDAO dao = new UserDAO();
         Session session = getCurrentSession();
@@ -349,7 +349,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     }
 
     @Override
-    public User getUserById(int id) {
+    public User getUserById(int id) throws MiddlewareQueryException {
         UserDAO dao = new UserDAO();
 
         Session session = getCurrentSession();
@@ -412,7 +412,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     }
 
     @Override
-    public List<Person> getAllPersons() {
+    public List<Person> getAllPersons() throws MiddlewareQueryException {
         PersonDAO dao = new PersonDAO();
 
         List<Person> persons = new ArrayList<Person>();
@@ -427,7 +427,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         return persons;
     }
 
-    public long countAllPersons() {
+    public long countAllPersons() throws MiddlewareQueryException {
         long count = 0;
         PersonDAO dao = new PersonDAO();
         Session session = getCurrentSession();
@@ -440,7 +440,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     }
 
     @Override
-    public Person getPersonById(int id) {
+    public Person getPersonById(int id) throws MiddlewareQueryException {
         PersonDAO dao = new PersonDAO();
 
         Session session = getCurrentSession();

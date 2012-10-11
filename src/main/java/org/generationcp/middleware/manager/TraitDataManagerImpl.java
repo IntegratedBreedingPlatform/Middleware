@@ -46,7 +46,7 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
     }
 
     @Override
-    public Scale getScaleByID(Integer id) {
+    public Scale getScaleByID(Integer id) throws MiddlewareQueryException {
         ScaleDAO dao = new ScaleDAO();
         Session session = getSession(id);
 
@@ -74,7 +74,7 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
     }
 
     @Override
-    public long countAllScales() {
+    public long countAllScales() throws MiddlewareQueryException {
         long count = 0;
 
         Session sessionForCentral = getCurrentSessionForCentral();
@@ -96,7 +96,7 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
     }
 
     @Override
-    public String getScaleDiscreteDescription(Integer scaleId, String value) {
+    public String getScaleDiscreteDescription(Integer scaleId, String value) throws MiddlewareQueryException {
         ScaleDiscreteDAO dao = new ScaleDiscreteDAO();
         Session session = getSession(scaleId);
 
@@ -134,7 +134,7 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
     }
 
     @Override
-    public ScaleContinuous getRangeOfContinuousScale(Integer scaleId) {
+    public ScaleContinuous getRangeOfContinuousScale(Integer scaleId) throws MiddlewareQueryException {
         ScaleContinuousDAO dao = new ScaleContinuousDAO();
         Session session = getSession(scaleId);
 
@@ -175,7 +175,7 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
     }
 
     @Override
-    public long countAllTraits() {
+    public long countAllTraits() throws MiddlewareQueryException {
         long count = 0;
 
         Session sessionForCentral = getCurrentSessionForCentral();
@@ -197,7 +197,7 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
     }
 
     @Override
-    public TraitMethod getTraitMethodById(Integer id) {
+    public TraitMethod getTraitMethodById(Integer id) throws MiddlewareQueryException {
         TraitMethodDAO dao = new TraitMethodDAO();
         Session session = getSession(id);
 
@@ -225,7 +225,7 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
     }
 
     @Override
-    public long countAllTraitMethods() {
+    public long countAllTraitMethods() throws MiddlewareQueryException {
         long count = 0;
 
         Session sessionForCentral = getCurrentSessionForCentral();

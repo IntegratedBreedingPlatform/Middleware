@@ -37,7 +37,7 @@ public interface TraitDataManager{
      * @param id the id
      * @return the scale by id
      */
-    public Scale getScaleByID(Integer id);
+    public Scale getScaleByID(Integer id) throws MiddlewareQueryException;
 
     /**
      * Returns all the Scale records.
@@ -56,7 +56,7 @@ public interface TraitDataManager{
      *
      * @return the count
      */
-    public long countAllScales();
+    public long countAllScales() throws MiddlewareQueryException;
 
     /**
      * Returns the description of a given discrete value of a scale identified

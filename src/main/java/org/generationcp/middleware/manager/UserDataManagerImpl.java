@@ -31,7 +31,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
     }
 
     @Override
-    public List<User> getAllUsers() {
+    public List<User> getAllUsers() throws MiddlewareQueryException {
         Session sessionForCentral = getCurrentSessionForCentral();
         Session sessionForLocal = getCurrentSessionForLocal();
 
@@ -54,7 +54,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
         return users;
     }
 
-    public long countAllUsers() {
+    public long countAllUsers() throws MiddlewareQueryException {
         Session sessionForCentral = getCurrentSessionForCentral();
         Session sessionForLocal = getCurrentSessionForLocal();
 
@@ -109,7 +109,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
     }
 
     @Override
-    public User getUserById(int id) {
+    public User getUserById(int id) throws MiddlewareQueryException {
         UserDAO dao = new UserDAO();
         Session session = getSession(id);
 

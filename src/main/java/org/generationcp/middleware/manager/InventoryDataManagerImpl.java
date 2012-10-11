@@ -272,14 +272,14 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
     }
 
     @Override
-    public org.generationcp.middleware.pojos.Transaction getTransactionById(Integer id) {
+    public org.generationcp.middleware.pojos.Transaction getTransactionById(Integer id) throws MiddlewareQueryException {
         TransactionDAO dao = new TransactionDAO();
         dao.setSession(getCurrentSessionForLocal());
         return dao.getById(id, false);
     }
 
     @Override
-    public Set<org.generationcp.middleware.pojos.Transaction> getTransactionsByLotId(Integer id) {
+    public Set<org.generationcp.middleware.pojos.Transaction> getTransactionsByLotId(Integer id) throws MiddlewareQueryException {
         LotDAO dao = new LotDAO();
         dao.setSession(getCurrentSessionForLocal());
         Lot lot = dao.getById(id, false);

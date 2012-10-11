@@ -197,14 +197,14 @@ public interface WorkbenchDataManager{
      *
      * @return all Persons
      */   	
-    public List<User> getAllUsers();
+    public List<User> getAllUsers() throws MiddlewareQueryException;
     
     /**
      * Returns number of all Users.
      *
      * @return the number of all Users
      */   
-    public long countAllUsers();
+    public long countAllUsers() throws MiddlewareQueryException;
     
     /**
      * Gets the user by id.
@@ -212,7 +212,7 @@ public interface WorkbenchDataManager{
      * @param id - the user id to match
      * @return the user matching the given id
      */
-    public User getUserById(int id);
+    public User getUserById(int id) throws MiddlewareQueryException;
     
     /**
      * Gets the user by name.
@@ -239,14 +239,14 @@ public interface WorkbenchDataManager{
      *
      * @return all Persons
      */   
-    public List<Person> getAllPersons();
+    public List<Person> getAllPersons() throws MiddlewareQueryException;
     
     /**
      * Returns number of all Persons.
      *
      * @return the number of all Persons
      */   
-    public long countAllPersons();
+    public long countAllPersons() throws MiddlewareQueryException;
     
     /**
      * Gets the person by id.
@@ -254,7 +254,7 @@ public interface WorkbenchDataManager{
      * @param id - the id to match
      * @return the person matching the given id
      */
-    public Person getPersonById(int id);
+    public Person getPersonById(int id) throws MiddlewareQueryException;
     
     /**
      * Deletes a person.

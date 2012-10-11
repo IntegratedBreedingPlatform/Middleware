@@ -52,7 +52,7 @@ public interface UserDataManager {
      * @param id the id
      * @return the user by id
      */
-    public User getUserById(int id);
+    public User getUserById(int id) throws MiddlewareQueryException;
     
     /**
      * Delete user.
