@@ -40,10 +40,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The {@link ManagerFactory} gives access to the different Manager implementation
- * classes. This class takes care of opening and closing the connection to the
- * databases.
+ * <p>
+ * The {@link ManagerFactory} is a convenience class intended to provide methods
+ * to get instances of the Manager implementations provided by the Middleware.
+ * </p>
  * 
+ * @author Kevin Manansala
+ * @author Glenn Marintes
  */
 public class ManagerFactory implements Serializable {
     private static final long serialVersionUID = -2846462010022009403L;
@@ -52,6 +55,8 @@ public class ManagerFactory implements Serializable {
 
     private static final String MIDDLEWARE_INTERNAL_HIBERNATE_CFG = "ibpmidware_hib.cfg.xml";
 
+    private String hibernateConfigurationFilename = MIDDLEWARE_INTERNAL_HIBERNATE_CFG;
+    
     private SessionFactory sessionFactoryForLocal;
     private SessionFactory sessionFactoryForCentral;
     private HibernateSessionProvider sessionProviderForLocal;
@@ -109,6 +114,11 @@ public class ManagerFactory implements Serializable {
 
     }
     
+    public ManagerFactory(DatabaseConnectionParameters paramsForLocal, DatabaseConnectionParameters paramsForCentral)
+        throws ConfigException {
+        this(MIDDLEWARE_INTERNAL_HIBERNATE_CFG, paramsForLocal, paramsForCentral);
+    }
+    
     /**
      * This constructor accepts two DatabaseConnectionParameters objects as
      * parameters. The first is used to connect to a local instance of IBDB and
@@ -143,9 +153,13 @@ public class ManagerFactory implements Serializable {
      * @param paramsForCentral
      * @throws ConfigException
      */
-    public ManagerFactory(DatabaseConnectionParameters paramsForLocal, DatabaseConnectionParameters paramsForCentral)
+    public ManagerFactory(String hibernateConfigurationFilename, DatabaseConnectionParameters paramsForLocal, DatabaseConnectionParameters paramsForCentral)
             throws ConfigException {
         LOG.trace("Created ManagerFactory instance");
+        
+        if (hibernateConfigurationFilename != null) {
+            this.hibernateConfigurationFilename = hibernateConfigurationFilename;
+        }
         
          try {
             openSessionFactory(paramsForLocal, paramsForCentral);
@@ -155,6 +169,14 @@ public class ManagerFactory implements Serializable {
         }
     }
     
+    public String getHibernateConfigurationFilename() {
+        return hibernateConfigurationFilename;
+    }
+
+    public void setHibernateConfigurationFilename(String hibernateConfigurationFile) {
+        this.hibernateConfigurationFilename = hibernateConfigurationFile;
+    }
+
     public SessionFactory getSessionFactoryForLocal() {
         return sessionFactoryForLocal;
     }
@@ -196,7 +218,7 @@ public class ManagerFactory implements Serializable {
                                                                         , paramsForLocal.getDbName()
                                                                         );
             
-            URL urlOfCfgFile = ResourceFinder.locateFile(MIDDLEWARE_INTERNAL_HIBERNATE_CFG);
+            URL urlOfCfgFile = ResourceFinder.locateFile(hibernateConfigurationFilename);
 
             AnnotationConfiguration cfg = new AnnotationConfiguration().configure(urlOfCfgFile);
             cfg.setProperty("hibernate.connection.url", connectionUrl);
@@ -215,7 +237,7 @@ public class ManagerFactory implements Serializable {
                                                  , paramsForCentral.getDbName()
                                                  );
 
-            URL urlOfCfgFile = ResourceFinder.locateFile(MIDDLEWARE_INTERNAL_HIBERNATE_CFG);
+            URL urlOfCfgFile = ResourceFinder.locateFile(hibernateConfigurationFilename);
 
             AnnotationConfiguration cfg = new AnnotationConfiguration().configure(urlOfCfgFile);
             cfg.setProperty("hibernate.connection.url", connectionUrl);
