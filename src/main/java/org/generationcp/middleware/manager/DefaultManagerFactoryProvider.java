@@ -101,8 +101,8 @@ public class DefaultManagerFactoryProvider implements ManagerFactoryProvider, Ht
         }
         
         SessionFactory centralSessionFactory = centralSessionFactories.get(project.getCropType());
-        if (centralSessionFactory == null) {
-            String centralDbName = String.format("ibdb_%s_central", project.getCropType().getCropName().toLowerCase());
+        if (centralSessionFactory == null && project.getCropType().getCentralDatabaseName() != null) {
+            String centralDbName = project.getCropType().getCentralDatabaseName();
             
             DatabaseConnectionParameters params = new DatabaseConnectionParameters(centralHost, String.valueOf(centralPort), centralDbName, centralUsername, centralPassword);
             
@@ -118,13 +118,13 @@ public class DefaultManagerFactoryProvider implements ManagerFactoryProvider, Ht
         // get or create the HibernateSessionProvider for the current request
         HttpServletRequest request = CURRENT_REQUEST.get();
         HibernateSessionProvider localSessionProvider = localSessionProviders.get(request);
-        if (localSessionProvider == null) {
+        if (localSessionProvider == null && localSessionFactory != null) {
             localSessionProvider = new HibernateSessionPerRequestProvider(localSessionFactory);
             localSessionProviders.put(request, localSessionProvider);
         }
         
         HibernateSessionProvider centralSessionProvider = centralSessionProviders.get(request);
-        if (centralSessionProvider == null) {
+        if (centralSessionProvider == null && centralSessionFactory != null) {
             centralSessionProvider = new HibernateSessionPerRequestProvider(centralSessionFactory);
             centralSessionProviders.put(request, centralSessionProvider);
         }
@@ -141,10 +141,13 @@ public class DefaultManagerFactoryProvider implements ManagerFactoryProvider, Ht
     
     @Override
     public synchronized ManagerFactory getManagerFactoryForCropType(CropType cropType) {
+        String centralDbName = cropType.getCentralDatabaseName();
+        if (centralDbName == null) {
+            return null;
+        }
+        
         SessionFactory centralSessionFactory = centralSessionFactories.get(cropType);
         if (centralSessionFactory == null) {
-            String centralDbName = String.format("ibdb_%s_central", cropType.getCropName().toLowerCase());
-            
             DatabaseConnectionParameters params = new DatabaseConnectionParameters(centralHost, String.valueOf(centralPort), centralDbName, centralUsername, centralPassword);
             
             try {
@@ -160,7 +163,7 @@ public class DefaultManagerFactoryProvider implements ManagerFactoryProvider, Ht
         HttpServletRequest request = CURRENT_REQUEST.get();
         
         HibernateSessionProvider centralSessionProvider = centralSessionProviders.get(request);
-        if (centralSessionProvider == null) {
+        if (centralSessionProvider == null && centralSessionFactory != null) {
             centralSessionProvider = new HibernateSessionPerRequestProvider(centralSessionFactory);
             centralSessionProviders.put(request, centralSessionProvider);
         }
