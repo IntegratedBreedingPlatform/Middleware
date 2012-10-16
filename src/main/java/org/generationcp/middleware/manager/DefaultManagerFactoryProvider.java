@@ -101,8 +101,8 @@ public class DefaultManagerFactoryProvider implements ManagerFactoryProvider, Ht
         }
         
         SessionFactory centralSessionFactory = centralSessionFactories.get(project.getCropType());
-        if (centralSessionFactory == null && project.getCropType().getCentralDatabaseName() != null) {
-            String centralDbName = project.getCropType().getCentralDatabaseName();
+        if (centralSessionFactory == null && project.getCropType().getCentralDbName() != null) {
+            String centralDbName = project.getCropType().getCentralDbName();
             
             DatabaseConnectionParameters params = new DatabaseConnectionParameters(centralHost, String.valueOf(centralPort), centralDbName, centralUsername, centralPassword);
             
@@ -141,7 +141,7 @@ public class DefaultManagerFactoryProvider implements ManagerFactoryProvider, Ht
     
     @Override
     public synchronized ManagerFactory getManagerFactoryForCropType(CropType cropType) {
-        String centralDbName = cropType.getCentralDatabaseName();
+        String centralDbName = cropType.getCentralDbName();
         if (centralDbName == null) {
             return null;
         }
