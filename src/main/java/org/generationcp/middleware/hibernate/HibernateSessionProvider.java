@@ -3,7 +3,7 @@ package org.generationcp.middleware.hibernate;
 import org.hibernate.Session;
 
 /**
- * Implementations of this interface allows you to get or open a Hibernate
+ * Implementations of this interface allows you to get a Hibernate
  * {@link Session}.
  * 
  * @author Glenn Marintes

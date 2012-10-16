@@ -4,15 +4,18 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
 /**
- * A {@link HibernateSessionProvider} implementation that is intended to be used
- * as a request scope Spring bean to achieve the Session-Per-Request model.<br>
- * <br>
+ * <p>
+ * A {@link HibernateSessionProvider} implementation that is aimed to achieve
+ * the Session-Per-Request model.
+ * </p>
+ * <p>
  * {@link HibernateSessionProvider#getSession()} is implemented to open a new
- * session if no session has been previously created.<br>
- * <br>
+ * session if no session has been previously created.
+ * </p>
+ * <p>
  * When this {@link HibernateSessionProvider} is closed, the associated
  * {@link Session} is also closed.
- * 
+ * </p>
  * 
  * @author Glenn Marintes
  */

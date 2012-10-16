@@ -4,15 +4,19 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
 /**
+ * <p>
  * A {@link HibernateSessionProvider} implementation that follows the
- * Session-Per-Thread model.<br>
- * <br>
+ * Session-Per-Thread model.
+ * </p>
+ * <p>
  * {@link HibernateSessionProvider#getSession()} is implemented to open a new
- * session if no session has been previously created for the current thread.<br>
- * <br>
+ * session if no session has been previously created for the current thread.
+ * </p>
+ * <p>
  * Users of this {@link HibernateSessionProvider} must call the
  * {@link HibernateSessionPerThreadProvider#close()} to close the
- * {@link Session} before the calling {@link Thread} ends.<br>
+ * {@link Session} before the calling {@link Thread} ends.
+ * </p>
  * 
  * @author Glenn Marintes
  */
@@ -49,11 +53,20 @@ public class HibernateSessionPerThreadProvider implements HibernateSessionProvid
     }
     
     /**
+     * <p>
      * This implementation will close the {@link Session} for the calling
-     * {@link Thread} only.<br>
+     * {@link Thread} only.
+     * </p>
+     * <p>
      * Users of {@link HibernateSessionPerThreadProvider} must be careful that
      * they are calling {@link HibernateSessionPerThreadProvider#close()} from
      * the right thread.
+     * </p>
+     * <p>
+     * IMPORTANT: Calling this method WILL NOT CLOSE all open sessions. To avoid
+     * leaking Sessions, always call this method for each thread that has called
+     * {@link HibernateSessionPerThreadProvider#getSession()}.
+     * </p>
      */
     @Override
     public void close() {
