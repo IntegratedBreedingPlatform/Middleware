@@ -723,13 +723,13 @@ public interface WorkbenchDataManager{
     public WorkflowTemplate getWorkflowTemplateByRole(Role role) throws MiddlewareQueryException;
     
     /**
-     * Gets the role given the project and user.
+     * Gets the roles given the project and user.
      *
      * @param project - the project to match
      * @param user - the user to match
-     * @return the role matching the given workflow template
+     * @return the list of roles matching the given workflow template
      */
-    public Role getRoleByProjectAndUser(Project project, User user) throws MiddlewareQueryException;
+    public List<Role> getRolesByProjectAndUser(Project project, User user) throws MiddlewareQueryException;
 
     
     

@@ -21,6 +21,7 @@ import org.generationcp.middleware.dao.ToolConfigurationDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionPerThreadProvider;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -50,7 +51,9 @@ public class TestWorkbenchDataManagerImpl{
     @BeforeClass
     public static void setUp() throws Exception {
 
-        hibernateUtil = new HibernateUtil("localhost", "13306", "workbench", "root", "");
+        DatabaseConnectionParameters workbenchDb = new DatabaseConnectionParameters("testDatabaseConfig.properties", "workbench");
+        hibernateUtil = new HibernateUtil(workbenchDb.getHost(), workbenchDb.getPort(), workbenchDb.getDbName(), 
+                                workbenchDb.getUsername(), workbenchDb.getPassword());
         HibernateSessionProvider sessionProvider = new HibernateSessionPerThreadProvider(hibernateUtil.getSessionFactory());
         manager = new WorkbenchDataManagerImpl(sessionProvider);
     }
@@ -604,8 +607,8 @@ public class TestWorkbenchDataManagerImpl{
         if (projectUsers.size()>0){
             ProjectUser projectUser = manager.getProjectUserByProject(project).get(0); // get the first user of the project
             User user = manager.getUserById(projectUser.getUserId());   
-            Role role = manager.getRoleByProjectAndUser(project, user); // get the role
-            System.out.println("testGetRoleByProjectAndUser(project=" + project.getProjectName() + ", user=" + user.getName() + "): \n  " + role);
+            List<Role> roles = manager.getRolesByProjectAndUser(project, user); // get the role
+            System.out.println("testGetRoleByProjectAndUser(project=" + project.getProjectName() + ", user=" + user.getName() + "): \n  " + roles);
         } else {
             System.out.println("testGetRoleByProjectAndUser(project=" + project.getProjectName() + "): Error in data - Project has no users. ");
         }

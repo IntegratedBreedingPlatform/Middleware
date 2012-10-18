@@ -1380,11 +1380,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     }
 
     @Override
-    public Role getRoleByProjectAndUser(Project project, User user) throws MiddlewareQueryException {
+    public List<Role> getRolesByProjectAndUser(Project project, User user) throws MiddlewareQueryException {
         try {
             ProjectUserDAO dao = new ProjectUserDAO();
             dao.setSession(getCurrentSession());
-            return dao.getRoleByProjectAndUser(project, user);
+            return dao.getRolesByProjectAndUser(project, user);
         } catch (Exception e) {
             throw new MiddlewareQueryException(
                     "Error encountered while getting role given project and user: WorkbenchDataManager.getRoleByProjectAndUser(project="
