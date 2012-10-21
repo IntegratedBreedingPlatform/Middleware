@@ -584,6 +584,18 @@ public class TestGermplasmDataManagerImpl{
         }
 
     }
+    
+    @Test
+    public void testGetMethodsByGroupAndType() throws MiddlewareQueryException {
+        String group = "O"; // Tested with rice and cowpea
+        String type= "GEN"; // Tested with rice and cowpea
+
+        List<Method> methods = manager.getMethodsByGroupAndType(group, type);
+        System.out.println("testGetMethodsByGroupAndType(group=" + group +"and "+type + "): " + methods.size());
+        for (Method method : methods) {
+            System.out.println("  " + method);
+        }
+    }
 
     @Test
     public void testCountMethodsByGroup() throws Exception {

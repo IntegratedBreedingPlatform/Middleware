@@ -1160,6 +1160,28 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
     
     @Override
+	public List<Method> getMethodsByGroupAndType(String group, String type)
+			throws MiddlewareQueryException {
+    	 MethodDAO dao = new MethodDAO();
+         List<Method> methods = new ArrayList<Method>();
+
+         Session sessionForCentral = getCurrentSessionForCentral();
+         Session sessionForLocal = getCurrentSessionForLocal();
+
+         if (sessionForLocal != null) {
+             dao.setSession(sessionForLocal);
+             methods.addAll(dao.getByGroupAndType(group,type));
+         }
+
+         if (sessionForCentral != null) {
+             dao.setSession(sessionForCentral);
+             methods.addAll(dao.getByGroupAndType(group,type));
+         }
+         
+         return methods;
+	}
+
+	@Override
     public long countMethodsByGroup(String group) throws MiddlewareQueryException{
         long numberOfMethods = 0L;
         MethodDAO dao = new MethodDAO();

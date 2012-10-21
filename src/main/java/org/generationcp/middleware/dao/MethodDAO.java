@@ -19,6 +19,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -40,6 +41,7 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
         try {
             Criteria criteria = getSession().createCriteria(Method.class);
             criteria.add(Restrictions.eq("mtype", type));
+            criteria.addOrder(Order.asc("mname"));
             return criteria.list();
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error with getMethodsByType(type=" + type + ") query from Method: " + e.getMessage(), e);
@@ -52,6 +54,7 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
         try {
             Criteria criteria = getSession().createCriteria(Method.class);
             criteria.add(Restrictions.eq("mtype", type));
+            criteria.addOrder(Order.asc("mname"));
             criteria.setFirstResult(start);
             criteria.setMaxResults(numOfRows);            
             return criteria.list();
@@ -76,6 +79,7 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
         try {
             Criteria criteria = getSession().createCriteria(Method.class);
             criteria.add(Restrictions.eq("mgrp", group));
+            criteria.addOrder(Order.asc("mname"));
             return criteria.list();
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error with getMethodsByGroup(group=" + group + ") query from Method: " + e.getMessage(), e);
@@ -88,11 +92,25 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
         try {
             Criteria criteria = getSession().createCriteria(Method.class);
             criteria.add(Restrictions.eq("mgrp", group));
+            criteria.addOrder(Order.asc("mname"));
             criteria.setFirstResult(start);
             criteria.setMaxResults(numOfRows);            
             return criteria.list();
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error with getMethodsByGroup(group=" + group + ") query from Method: " + e.getMessage(), e);
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<Method> getByGroupAndType(String group,String type) throws MiddlewareQueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(Method.class);
+            criteria.add(Restrictions.eq("mgrp", group));
+            criteria.add(Restrictions.eq("mtype", type));
+            criteria.addOrder(Order.asc("mname"));
+            return criteria.list();
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getMethodsByGroupAndType(group=" + group + " and "+type+") query from Method: " + e.getMessage(), e);
         }
     }
     
