@@ -22,7 +22,7 @@ import org.generationcp.middleware.dao.ProjectActivityDAO;
 import org.generationcp.middleware.dao.ProjectDAO;
 import org.generationcp.middleware.dao.ProjectLocationMapDAO;
 import org.generationcp.middleware.dao.ProjectMethodDAO;
-import org.generationcp.middleware.dao.ProjectUserDAO;
+import org.generationcp.middleware.dao.ProjectUserRoleDAO;
 import org.generationcp.middleware.dao.RoleDAO;
 import org.generationcp.middleware.dao.ToolConfigurationDAO;
 import org.generationcp.middleware.dao.ToolDAO;
@@ -41,7 +41,7 @@ import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectLocationMap;
 import org.generationcp.middleware.pojos.workbench.ProjectMethod;
-import org.generationcp.middleware.pojos.workbench.ProjectUser;
+import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
@@ -621,15 +621,16 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     }
 
     @Override
-    public int addProjectUser(Project project, User user) throws MiddlewareQueryException {
-        ProjectUser projectUser = new ProjectUser();
-        projectUser.setProject(project);
-        projectUser.setUserId(user.getUserid());
-        return addProjectUser(projectUser);
+    public int addProjectUserRole(Project project, User user, Role role) throws MiddlewareQueryException {
+        ProjectUserRole projectUserRole = new ProjectUserRole();
+        projectUserRole.setProject(project);
+        projectUserRole.setUserId(user.getUserid());
+        projectUserRole.setRole(role);
+        return addProjectUserRole(projectUserRole);
     }
 
     @Override
-    public int addProjectUser(ProjectUser projectUser) throws MiddlewareQueryException {
+    public int addProjectUserRole(ProjectUserRole projectUserRole) throws MiddlewareQueryException {
         Session session = getCurrentSession();
         if (session == null) {
             return 0;
@@ -641,10 +642,10 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         try {
             // begin save transaction
             trans = session.beginTransaction();
-            ProjectUserDAO dao = new ProjectUserDAO();
+            ProjectUserRoleDAO dao = new ProjectUserRoleDAO();
             dao.setSession(session);
 
-            dao.saveOrUpdate(projectUser);
+            dao.saveOrUpdate(projectUserRole);
             recordsSaved++;
 
             trans.commit();
@@ -656,7 +657,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
                 trans.rollback();
             }
             throw new MiddlewareQueryException(
-                    "Error encountered while saving ProjectUser: WorkbenchDataManager.addProjectUser(projectUser=" + projectUser + "): "
+                    "Error encountered while saving ProjectUserRole: WorkbenchDataManager.addProjectUserRole(projectUserRole=" + projectUserRole + "): "
                             + e.getMessage(), e);
         }
 
@@ -664,7 +665,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     }
 
     @Override
-    public int addProjectUsers(List<ProjectUser> projectUsers) throws MiddlewareQueryException {
+    public int addProjectUserRoles(List<ProjectUserRole> projectUserRoles) throws MiddlewareQueryException {
         Session session = getCurrentSession();
         if (session == null) {
             return 0;
@@ -675,24 +676,24 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         try {
             // begin save transaction
             trans = session.beginTransaction();
-            ProjectUserDAO dao = new ProjectUserDAO();
+            ProjectUserRoleDAO dao = new ProjectUserRoleDAO();
             dao.setSession(session);
 
-            for (ProjectUser projectUser : projectUsers) {
+            for (ProjectUserRole projectUser : projectUserRoles) {
                 dao.saveOrUpdate(projectUser);
                 recordsSaved++;
             }
 
             trans.commit();
         } catch (Exception e) {
-            LOG.error("Error in addProjectUsers: " + e.getMessage() + "\n" + e.getStackTrace());
+            LOG.error("Error in addProjectUserRoles: " + e.getMessage() + "\n" + e.getStackTrace());
             e.printStackTrace();
             // rollback transaction in case of errors
             if (trans != null) {
                 trans.rollback();
             }
             throw new MiddlewareQueryException(
-                    "Error encountered while saving ProjectUsers: WorkbenchDataManager.addProjectUsers(projectUsers=" + projectUsers
+                    "Error encountered while saving ProjectUserRoles: WorkbenchDataManager.addProjectUserRoles(projectUserRoles=" + projectUserRoles
                             + "): " + e.getMessage(), e);
         }
 
@@ -700,8 +701,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     }
 
     @Override
-    public ProjectUser getProjectUserById(Integer id) throws MiddlewareQueryException {
-        ProjectUserDAO dao = new ProjectUserDAO();
+    public ProjectUserRole getProjectUserRoleById(Integer id) throws MiddlewareQueryException {
+        ProjectUserRoleDAO dao = new ProjectUserRoleDAO();
         Session session = getCurrentSession();
         if (session != null) {
             dao.setSession(session);
@@ -711,8 +712,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     }
     
     @Override
-    public List<ProjectUser> getProjectUsersByProject(Project project) throws MiddlewareQueryException{
-        ProjectUserDAO dao = new ProjectUserDAO();
+    public List<ProjectUserRole> getProjectUserRolesByProject(Project project) throws MiddlewareQueryException{
+        ProjectUserRoleDAO dao = new ProjectUserRoleDAO();
         Session session = getCurrentSession();
         if (session != null) {
             dao.setSession(session);
@@ -721,31 +722,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         return null;
     }
     
-
     @Override
-    public ProjectUser getProjectUserByProjectAndUser(Project project, User user) throws MiddlewareQueryException {
-        ProjectUserDAO dao = new ProjectUserDAO();
-        Session session = getCurrentSession();
-        if (session != null) {
-            dao.setSession(session);
-            return dao.getByProjectAndUser(project, user);
-        }
-        return null;
-    }
-
-    @Override
-    public List<ProjectUser> getProjectUserByProject(Project project) throws MiddlewareQueryException {
-        ProjectUserDAO dao = new ProjectUserDAO();
-        Session session = getCurrentSession();
-        if (session != null) {
-            dao.setSession(session);
-            return dao.getByProject(project);
-        }
-        return null;
-    }
-
-    @Override
-    public void deleteProjectUser(ProjectUser projectUser) throws MiddlewareQueryException {
+    public void deleteProjectUserRole(ProjectUserRole projectUserRole) throws MiddlewareQueryException {
         Session session = getCurrentSession();
         if (session == null) {
             return;
@@ -757,10 +735,10 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
             // begin save transaction
             trans = session.beginTransaction();
 
-            ProjectUserDAO dao = new ProjectUserDAO();
+            ProjectUserRoleDAO dao = new ProjectUserRoleDAO();
             dao.setSession(session);
 
-            dao.makeTransient(projectUser);
+            dao.makeTransient(projectUserRole);
 
             trans.commit();
         } catch (Exception e) {
@@ -769,7 +747,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
                 trans.rollback();
             }
             throw new MiddlewareQueryException(
-                    "Error encountered while deleting ProjectUser: WorkbenchDataManager.deleteProjectUser(projectUser=" + projectUser
+                    "Error encountered while deleting ProjectUser: WorkbenchDataManager.deleteProjectUser(projectUser=" + projectUserRole
                             + "): " + e.getMessage(), e);
         }
     }
@@ -778,7 +756,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     public List<User> getUsersByProjectId(Long projectId) throws MiddlewareQueryException {
         Session session = getCurrentSession();
 
-        ProjectUserDAO dao = new ProjectUserDAO();
+        ProjectUserRoleDAO dao = new ProjectUserRoleDAO();
         List<User> users;
         if (session != null) {
             dao.setSession(session);
@@ -792,7 +770,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 
     @Override
     public long countUsersByProjectId(Long projectId) throws MiddlewareQueryException {
-        ProjectUserDAO dao = new ProjectUserDAO();
+        ProjectUserRoleDAO dao = new ProjectUserRoleDAO();
         long count = 0;
 
         Session session = getCurrentSession();
@@ -1382,7 +1360,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     @Override
     public List<Role> getRolesByProjectAndUser(Project project, User user) throws MiddlewareQueryException {
         try {
-            ProjectUserDAO dao = new ProjectUserDAO();
+            ProjectUserRoleDAO dao = new ProjectUserRoleDAO();
             dao.setSession(getCurrentSession());
             return dao.getRolesByProjectAndUser(project, user);
         } catch (Exception e) {
@@ -1392,4 +1370,15 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         }
     }
 
+    @Override
+    public List<Role> getAllRoles() throws MiddlewareQueryException {
+        try {
+            RoleDAO dao = new RoleDAO();
+            dao.setSession(getCurrentSession());
+            return dao.getAll();
+        } catch (Exception e) {
+            throw new MiddlewareQueryException(
+                    "Error encountered while getting all roles: " + e.getMessage(), e);
+        }
+    }
 }

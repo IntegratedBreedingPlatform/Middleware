@@ -25,7 +25,7 @@ import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectLocationMap;
 import org.generationcp.middleware.pojos.workbench.ProjectMethod;
-import org.generationcp.middleware.pojos.workbench.ProjectUser;
+import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
@@ -368,32 +368,33 @@ public interface WorkbenchDataManager{
     
     
     /**
-     * Adds a single project user given a Project object and a User object.
+     * Adds a single project user given a Project object, a User object, and a Role object
      *
      * @param project the project
      * @param user the user
+     * @param role the role of the user in the project
      * @return the number of records inserted
      * @throws MiddlewareQueryException
      */
-    public int addProjectUser(Project project, User user) throws MiddlewareQueryException;
+    public int addProjectUserRole(Project project, User user, Role role) throws MiddlewareQueryException;
 
     /**
-     * Adds a single project user.
+     * Adds a single workbench_project_user_role record.
      *
-     * @param projectUser - the ProjectUser to save
+     * @param projectUserRole - the ProjectUserRole to save
      * @return the number of records inserted
      * @throws MiddlewareQueryException
      */
-    public int addProjectUser(ProjectUser projectUser) throws MiddlewareQueryException;
+    public int addProjectUserRole(ProjectUserRole projectUserRole) throws MiddlewareQueryException;
 
     /**
-     * Adds multiple project users.
+     * Adds multiple workbench_project_user_role records.
      *
-     * @param projectUsers - the project users to add
+     * @param projectUserRoles - the records to add
      * @return the number of records inserted
      * @throws MiddlewareQueryException
      */
-    public int addProjectUsers(List<ProjectUser> projectUsers) throws MiddlewareQueryException;
+    public int addProjectUserRoles(List<ProjectUserRole> projectUserRoles) throws MiddlewareQueryException;
 
     /**
      * Adds a project location.
@@ -492,51 +493,30 @@ public interface WorkbenchDataManager{
     public int addProjectActivity(List<ProjectActivity> projectActivityList) throws MiddlewareQueryException;
     
     /**
-     * Retrieves a project user by id.
+     * Retrieves a workbench_project_user_role record by id.
      *
-     * @param id - the ProjectUser id
+     * @param id - the ProjectUserRole id
      * @return the associated ProjectUser
      * @throws MiddlewareQueryException
      */
-    public ProjectUser getProjectUserById(Integer id) throws MiddlewareQueryException;
+    public ProjectUserRole getProjectUserRoleById(Integer id) throws MiddlewareQueryException;
     
     /**
-     * Retrieves the project user records based on the given project.
+     * Retrieves the workbench_project_user_role records based on the given project.
      *
      * @param project - the Project to match
      * @return the associated list of ProjectUser
      * @throws MiddlewareQueryException
      */
-    public List<ProjectUser> getProjectUsersByProject(Project project) throws MiddlewareQueryException;
-    
-    
-    /**
-     * Retrieves project user by project and user.
-     *
-     * @param project - the project
-     * @param user - the user
-     * @return the associated ProjectUser
-     * @throws MiddlewareQueryException
-     */
-    public ProjectUser getProjectUserByProjectAndUser(Project project, User user) throws MiddlewareQueryException;
+    public List<ProjectUserRole> getProjectUserRolesByProject(Project project) throws MiddlewareQueryException;
     
     /**
-     * Retrieves project users by project.
+     * Deletes the given ProjectUserRole.
      *
-     * @param project - the project
-     * @param user - the user
-     * @return the associated ProjectUser
+     * @param projectUserRole - the ProjectUserRole to delete
      * @throws MiddlewareQueryException
      */
-    public List<ProjectUser> getProjectUserByProject(Project project) throws MiddlewareQueryException;
-
-    /**
-     * Deletes the given ProjectUser.
-     *
-     * @param projectUser - the ProjectUser to delete
-     * @throws MiddlewareQueryException
-     */
-    public void deleteProjectUser(ProjectUser projectUser) throws MiddlewareQueryException;
+    public void deleteProjectUserRole(ProjectUserRole projectUserRole) throws MiddlewareQueryException;
     
     /**
      * Return a List of {@link User} records associated with a {@link Project}.
@@ -731,8 +711,11 @@ public interface WorkbenchDataManager{
      */
     public List<Role> getRolesByProjectAndUser(Project project, User user) throws MiddlewareQueryException;
 
-    
-    
-    
-    
+    /**
+     * Returns all records from the workbench_role table,
+     * 
+     * @return List of Role objects
+     * @throws MiddlewareQueryException
+     */
+    public List<Role> getAllRoles() throws MiddlewareQueryException;
 }

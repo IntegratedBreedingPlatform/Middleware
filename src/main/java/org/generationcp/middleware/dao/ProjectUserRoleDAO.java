@@ -12,19 +12,19 @@
 
 package org.generationcp.middleware.dao;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.Project;
-import org.generationcp.middleware.pojos.workbench.ProjectUser;
+import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -33,7 +33,7 @@ import org.hibernate.criterion.Restrictions;
  * @author Joyce Avestro
  * 
  */
-public class ProjectUserDAO extends GenericDAO<ProjectUser, Integer>{
+public class ProjectUserRoleDAO extends GenericDAO<ProjectUserRole, Integer>{
 
     /* (non-Javadoc)
      * @see org.generationcp.middleware.dao.GenericDAO#saveOrUpdate(java.lang.Object)
@@ -44,7 +44,7 @@ public class ProjectUserDAO extends GenericDAO<ProjectUser, Integer>{
      * @param projectUser the project user
      * @return the project user
      */
-    public ProjectUser saveOrUpdate(ProjectUser projectUser) {
+    public ProjectUserRole saveOrUpdate(ProjectUserRole projectUser) {
 
         if (projectUser.getProject() == null || projectUser.getProject().getProjectId() == null) {
             throw new IllegalArgumentException("Project cannot be null");
@@ -62,7 +62,7 @@ public class ProjectUserDAO extends GenericDAO<ProjectUser, Integer>{
      * @param id the ProjectUser id
      * @return the associated ProjectUser
      */
-    public ProjectUser getById(Integer id) {
+    public ProjectUserRole getById(Integer id) {
         return super.getById(id, false);
     }
 
@@ -74,13 +74,13 @@ public class ProjectUserDAO extends GenericDAO<ProjectUser, Integer>{
      * @return the ProjectUser associated to the given project and user
      */
     @SuppressWarnings("rawtypes")
-    public ProjectUser getByProjectAndUser(Project project, User user) throws MiddlewareQueryException {
+    public ProjectUserRole getByProjectAndUser(Project project, User user) throws MiddlewareQueryException {
         try {
             List<Criterion> criteria = new ArrayList<Criterion>();
             criteria.add(Restrictions.eq("project", project));
             criteria.add(Restrictions.eq("userId", user.getUserid()));
             List results = super.getByCriteria(criteria);
-            return (ProjectUser) results.get(0);
+            return (ProjectUserRole) results.get(0);
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error in getByProjectAndUser(project=" + project + ", user=" + user
                     + ") query from ProjectUser: " + e.getMessage(), e);
@@ -95,12 +95,12 @@ public class ProjectUserDAO extends GenericDAO<ProjectUser, Integer>{
      * @return the ProjectUser associated to the given project and user
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public List<ProjectUser> getByProject(Project project) throws MiddlewareQueryException {
+    public List<ProjectUserRole> getByProject(Project project) throws MiddlewareQueryException {
         try {
             List<Criterion> criteria = new ArrayList<Criterion>();
             criteria.add(Restrictions.eq("project", project));
             List results = super.getByCriteria(criteria);
-            return (List<ProjectUser>) results;
+            return (List<ProjectUserRole>) results;
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error in getByProject(project=" + project + ") query from ProjectUser: " + e.getMessage(),
                     e);
@@ -118,7 +118,7 @@ public class ProjectUserDAO extends GenericDAO<ProjectUser, Integer>{
     public List<User> getUsersByProjectId(Long projectId) throws MiddlewareQueryException {
         try {
 
-            SQLQuery query = getSession().createSQLQuery(ProjectUser.GET_USERS_BY_PROJECT_ID);
+            SQLQuery query = getSession().createSQLQuery(ProjectUserRole.GET_USERS_BY_PROJECT_ID);
             query.setParameter("projectId", projectId);
             List<User> users = new ArrayList<User>();
 
@@ -155,31 +155,25 @@ public class ProjectUserDAO extends GenericDAO<ProjectUser, Integer>{
      */
     public long countUsersByProjectId(Long projectId) throws MiddlewareQueryException {
         try {
-            Criteria criteria = getSession().createCriteria(ProjectUser.class);
-            Project p = new Project();
-            p.setProjectId(projectId);
-            criteria.add(Restrictions.eq("project", p));
-            criteria.setProjection(Projections.rowCount());
-            return ((Long) criteria.uniqueResult()).longValue();
+            SQLQuery query = getSession().createSQLQuery(ProjectUserRole.COUNT_USERS_BY_PROJECT_ID);
+            query.setParameter("projectId", projectId);
+            return ((BigInteger) query.uniqueResult()).longValue();
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error in countUsersByProjectId(projectId=" + projectId + ") query from ProjectUser: "
                     + e.getMessage(), e);
         }
     }
-
-
-
     
     @SuppressWarnings("unchecked")
     public List<Role> getRolesByProjectAndUser(Project project, User user) throws MiddlewareQueryException{
         try{
-            Criteria criteria = getSession().createCriteria(ProjectUser.class);
+            Criteria criteria = getSession().createCriteria(ProjectUserRole.class);
             criteria.add(Restrictions.eq("project", project));
             criteria.add(Restrictions.eq("userId", user.getUserid()));
-            List<ProjectUser> projectUsers = criteria.list();
+            List<ProjectUserRole> projectUsers = criteria.list();
             
             List<Role> roles = new ArrayList<Role>();
-            for (ProjectUser projectUser : projectUsers){
+            for (ProjectUserRole projectUser : projectUsers){
                 roles.add(projectUser.getRole());
             }
             return roles;

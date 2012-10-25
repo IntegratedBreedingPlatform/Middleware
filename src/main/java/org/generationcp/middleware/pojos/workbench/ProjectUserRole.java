@@ -34,23 +34,22 @@ import org.generationcp.middleware.pojos.User;
  *  
  */
 @Entity
-@Table(name = "workbench_project_user")
-public class ProjectUser implements Serializable{
+@Table(name = "workbench_project_user_role")
+public class ProjectUserRole implements Serializable{
 
     private static final long serialVersionUID = 1L;
-
-    
     
     public static final String GET_USERS_BY_PROJECT_ID = 
             "SELECT users.userid, users.instalid, users.ustatus, users.uaccess, users.utype, " +
             "users.uname, users.upswd, users.personid, users.adate, users.cdate " + 
-            "FROM users JOIN workbench_project_user pu ON users.userid = pu.user_id " +
-            "WHERE pu.project_id = :projectId";
+            "FROM users JOIN workbench_project_user_role pu ON users.userid = pu.user_id " +
+            "WHERE pu.project_id = :projectId " +
+            "GROUP BY users.userid";
     
-    public static final String COUNT_METHODS_BY_PROJECT_ID = 
-            "SELECT COUNT(users.userid) " + 
-            "FROM users JOIN workbench_project_user pu ON users.userid = pu.user_id " +
-            "WHERE pu.project_id = :projectId";
+    public static final String COUNT_USERS_BY_PROJECT_ID = 
+            "SELECT COUNT(DISTINCT user_id) " + 
+            "FROM workbench_project_user_role " +
+            "WHERE project_id = :projectId";
     
     @Id
     @Basic(optional = false)
@@ -73,17 +72,17 @@ public class ProjectUser implements Serializable{
     private Role role;
 
     
-    public ProjectUser() {
+    public ProjectUserRole() {
     }
 
-    public ProjectUser(Long projectUserId, Project project, Integer userId, Role role) {
+    public ProjectUserRole(Long projectUserId, Project project, Integer userId, Role role) {
         this.projectUserId = projectUserId;
         this.project = project;
         this.userId = userId;
         this.role = role;
     }
 
-    public ProjectUser(Project project, User user, Role role) {
+    public ProjectUserRole(Project project, User user, Role role) {
         this.project = project;
         this.userId = user.getUserid();
         this.role = role;
@@ -140,11 +139,11 @@ public class ProjectUser implements Serializable{
         if (obj == this) {
             return true;
         }
-        if (!ProjectUser.class.isInstance(obj)) {
+        if (!ProjectUserRole.class.isInstance(obj)) {
             return false;
         }
 
-        ProjectUser otherObj = (ProjectUser) obj;
+        ProjectUserRole otherObj = (ProjectUserRole) obj;
 
         return new EqualsBuilder().append(projectUserId, otherObj.projectUserId).isEquals();
     }

@@ -32,7 +32,7 @@ import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectLocationMap;
 import org.generationcp.middleware.pojos.workbench.ProjectMethod;
-import org.generationcp.middleware.pojos.workbench.ProjectUser;
+import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
@@ -57,7 +57,7 @@ public class TestWorkbenchDataManagerImpl{
         HibernateSessionProvider sessionProvider = new HibernateSessionPerThreadProvider(hibernateUtil.getSessionFactory());
         manager = new WorkbenchDataManagerImpl(sessionProvider);
     }
-
+    
     @Test
     public void testSaveProject() throws MiddlewareQueryException {
         Project project1 = new Project();
@@ -169,9 +169,9 @@ public class TestWorkbenchDataManagerImpl{
                 manager.deleteProjectMethod(projectMethod);
             }
 
-            List<ProjectUser> projectUsers = manager.getProjectUserByProject(project);
-            for (ProjectUser projectUser : projectUsers) {
-                manager.deleteProjectUser(projectUser);
+            List<ProjectUserRole> projectUsers = manager.getProjectUserRolesByProject(project);
+            for (ProjectUserRole projectUser : projectUsers) {
+                manager.deleteProjectUserRole(projectUser);
             }
 
             List<WorkbenchDataset> datasets = manager.getWorkbenchDatasetByProjectId(projectId, 0,
@@ -379,33 +379,34 @@ public class TestWorkbenchDataManagerImpl{
         long result = manager.countMethodIdsByProjectId(projectId);
         System.out.println("testCountMethodsByProjectId(" + projectId + "): " + result);
     }
-
+    
     @Test
-    public void testAddProjectUsers() throws MiddlewareQueryException {
+    public void testAddProjectUserRoles() throws MiddlewareQueryException {
         Long projectId = manager.getProjects().get(0).getProjectId(); // First project found in db
-        List<ProjectUser> projectUsers = new ArrayList<ProjectUser>();
+        List<ProjectUserRole> projectUsers = new ArrayList<ProjectUserRole>();
 
-        // Assumptions: Project with id=1, and Users with id=1 and id=2 exist in the database
+        // Assumptions: Project with id=1, and Users with id=1 
         Project project1 = manager.getProjectById(projectId);
         User user1 = manager.getUserById(1);
-        User user2 = manager.getUserById(2);
-        Role role = manager.getRolesByWorkflowTemplate(project1.getTemplate()).get(0);
+        Role role1 = manager.getRoleById(Integer.valueOf(1));
+        Role role2 = manager.getRoleById(Integer.valueOf(2));
+        
+        ProjectUserRole newRecord1 = new ProjectUserRole(project1, user1, role1);
+        ProjectUserRole newRecord2 = new ProjectUserRole(project1, user1, role2);  
 
-        projectUsers.add(new ProjectUser(project1, user1, role));
-        projectUsers.add(new ProjectUser(project1, user2, role));
+        projectUsers.add(newRecord1);
+        projectUsers.add(newRecord2);
 
         // add the projectUsers
-        int projectUsersAdded = manager.addProjectUsers(projectUsers);
+        int projectUsersAdded = manager.addProjectUserRoles(projectUsers);
 
         System.out.println("testAddProjectUsers(projectId=" + projectId + ") ADDED: " + projectUsersAdded);
-        System.out.println("  " + manager.getProjectUserByProjectAndUser(project1, user1));
-        System.out.println("  " + manager.getProjectUserByProjectAndUser(project1, user2));
-
+        
         // clean up
-        manager.deleteProjectUser(manager.getProjectUserByProjectAndUser(project1, user1));
-        manager.deleteProjectUser(manager.getProjectUserByProjectAndUser(project1, user2));
+        //manager.deleteProjectUserRole(newRecord1);
+        //manager.deleteProjectUserRole(newRecord2);
     }
-
+    
     @Test
     public void testGetUsersByProjectId() throws MiddlewareQueryException {
         Long projectId = 1L;
@@ -427,7 +428,7 @@ public class TestWorkbenchDataManagerImpl{
         long result = manager.countUsersByProjectId(projectId);
         System.out.println("testCountUsersByProjectId(" + projectId + "): " + result);
     }
-
+    
     @Test
     public void testGetActivitiesByProjectId() throws MiddlewareQueryException {
         Long projectId = 20L;
@@ -597,23 +598,32 @@ public class TestWorkbenchDataManagerImpl{
         WorkflowTemplate template = manager.getWorkflowTemplateByRole(role);
         System.out.println("testGetWorkflowTemplateByRole(role=" + role.getName() + "): \n  " + template);
     }
-
+    
     @Test
     public void testGetRoleByProjectAndUser() throws MiddlewareQueryException {
         // Assumption: first project stored in the db has associated project users with role
         Project project = manager.getProjects().get(0); // get first project
-        List<ProjectUser> projectUsers = manager.getProjectUserByProject(project); // get project users
+        List<ProjectUserRole> projectUsers = manager.getProjectUserRolesByProject(project); // get project users
         
         if (projectUsers.size()>0){
-            ProjectUser projectUser = manager.getProjectUserByProject(project).get(0); // get the first user of the project
+            ProjectUserRole projectUser = projectUsers.get(0); // get the first user of the project
             User user = manager.getUserById(projectUser.getUserId());   
-            List<Role> roles = manager.getRolesByProjectAndUser(project, user); // get the role
+            List<Role> roles = manager.getRolesByProjectAndUser(project, user); // get the roles
             System.out.println("testGetRoleByProjectAndUser(project=" + project.getProjectName() + ", user=" + user.getName() + "): \n  " + roles);
         } else {
             System.out.println("testGetRoleByProjectAndUser(project=" + project.getProjectName() + "): Error in data - Project has no users. ");
         }
     }
-
+    
+    @Test
+    public void testGetAllRoles() throws MiddlewareQueryException {
+        List<Role> roles = manager.getAllRoles();
+        System.out.println("RESULTS:");
+        for(Role role : roles) {
+            System.out.println(role);
+        }
+    }
+    
     @AfterClass
     public static void tearDown() throws Exception {
         hibernateUtil.shutdown();
