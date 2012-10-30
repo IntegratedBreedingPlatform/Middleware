@@ -28,10 +28,10 @@ import org.junit.Test;
 public class IMSPojosSimpleTest{
 
     private static final String CONFIG = "test-hibernate.cfg.xml";
-    private HibernateUtil hibernateUtil;
+    private static HibernateUtil hibernateUtil;
 
     @BeforeClass
-    public void setUp() throws Exception {
+    public static void setUp() throws Exception {
         hibernateUtil = new HibernateUtil(CONFIG);
     }
 
@@ -84,7 +84,7 @@ public class IMSPojosSimpleTest{
     }
 
     @AfterClass
-    public void tearDown() throws Exception {
+    public static void tearDown() throws Exception {
         hibernateUtil.shutdown();
     }
 
