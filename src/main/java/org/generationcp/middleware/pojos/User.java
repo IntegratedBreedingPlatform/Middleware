@@ -23,6 +23,9 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 @NamedQueries({ @NamedQuery(name = "getUserByNameUsingEqual", query = "SELECT s FROM User s WHERE s.name = :name"),
     @NamedQuery(name = "getUserByNameUsingLike", query = "SELECT s FROM User s WHERE s.name LIKE :name"),
     @NamedQuery(name = "countUserByNameUsingEqual", query = "SELECT COUNT(s) FROM User s WHERE s.name = :name"),
@@ -204,6 +207,28 @@ public class User implements Serializable {
 
     public void setPerson(Person person) {
         this.person = person;
+    }
+    
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(userid).hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (!User.class.isInstance(obj)) {
+            return false;
+        }
+
+        User otherObj = (User) obj;
+
+        return new EqualsBuilder().append(userid, otherObj.userid).isEquals();
     }
 
     @Override
