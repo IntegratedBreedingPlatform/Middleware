@@ -32,6 +32,8 @@ import org.generationcp.middleware.pojos.User;
 public class Role implements Serializable{
 
     private static final long serialVersionUID = 1L;
+    
+    public final static int MANAGER_ROLE_ID = 1;
 
     @Id
     @Basic(optional = false)
