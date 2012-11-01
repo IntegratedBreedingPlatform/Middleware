@@ -13,13 +13,19 @@ version: 1.0.0</br>
 </code>
 </br>
 Take note of the version.  Use of the latest version is recommended.</br>
-The latest version as of August 21, 2012: 1.2.0
+The latest version as of November 1, 2012: 1.4.0
 </p>
 <p>
-Right now, the Middleware is not yet deployed to any online Maven repository.  Users have to checkout
-the project from the maven repository and manually install the project's jar into the local
-maven repository.  This is done by simply running "mvn clean install" command while on the
-home directory of the project.  To skip JUnit tests, use this command: "mvn -DskipTests=true clean install".
+The Middleware is deployed at the Maven Repository hosted on gcp.efficio.us.com. To use the repository, add the following to your POM file:</br>
+</br>
+<code>
+&lt;repositories&gt;</br>
+	&lt;repository&gt;</br>
+		&lt;id&gt;gcp-efficio-repo&lt;/id&gt;</br>
+		&lt;url&gt;http://gcp.efficio.us.com:8081/nexus/content/repositories/thirdparty/&lt;/url&gt;</br>
+	&lt;/repository&gt;</br>
+&lt;/repositories&gt;</br>
+</code>
 </p>
 <p>
 If you do not want to use Maven, you can get a jar of the Middleware project by sending a request to Kevin
@@ -105,8 +111,7 @@ a problem with the connection passed to them.
 
 <p>
 1. To run the JUnit tests in the project, you need: Java, Maven, and an IBDB database you can connect 
-to.  The current schema tested right now is the ICIS 5.5 schema, in the future versions of
-the IBDB schema will be tested.</br>
+to.  The current schema tested right now is the IBDB version 1.</br>
 </br>
 2. Create a file named "testDatabaseConfig.properties" in the src/test/resources folder of the project.
 The content of the file should be like this:</br>
@@ -122,6 +127,12 @@ central.port = 3306</br>
 central.dbname = dbname</br>
 central.username = user</br>
 central.password = password</br>
+</br>
+workbench.host = localhost</br>
+workbench.port = 3306</br>
+workbench.dbname = workbench</br>
+workbench.username = user</br>
+workbench.password = password</br>
 </br>
 Set the correct values for your set-up of the databases.</br>
 </br>
