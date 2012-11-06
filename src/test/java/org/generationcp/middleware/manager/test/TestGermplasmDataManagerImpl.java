@@ -13,6 +13,7 @@
 package org.generationcp.middleware.manager.test;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -526,12 +527,12 @@ public class TestGermplasmDataManagerImpl{
                 Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2), Integer.valueOf(19980610)));
 
         // add the methods
-        int methodsAdded = manager.addMethod(methods);
+        List<Integer> methodsAdded = manager.addMethod(methods);
 
-        System.out.println("testAddMethods() Methods added: " + methodsAdded);
+        System.out.println("testAddMethods() Methods added: " + methodsAdded.size());
 
-        for (int i = 1; i <= methodsAdded; i++) {
-            Method method = manager.getMethodByID(-i);
+        for (Integer id: methodsAdded ) {
+            Method method = manager.getMethodByID(id);
             System.out.println("  " + method);
             // delete the method
             manager.deleteMethod(method);
@@ -619,8 +620,8 @@ public class TestGermplasmDataManagerImpl{
         location.setSnl3id(1);
 
         // add the location
-        manager.addLocation(location);
-        System.out.println("testAddLocation(" + location + ") RESULTS: \n  "
+        Integer id = manager.addLocation(location);
+        System.out.println("testAddLocation(" + location + ") RESULTS: " + id + "  \n  " 
                 + manager.getLocationsByName("TEST-LOCATION-1", 0, 5, Operation.EQUAL));
 
         // cleanup
@@ -660,9 +661,9 @@ public class TestGermplasmDataManagerImpl{
         locations.add(location2);
 
         // add the location
-        int locationsAdded = manager.addLocation(locations);
+        List<Integer> locationsAdded = manager.addLocation(locations);
 
-        System.out.println("testAddLocations() Locations added: " + locationsAdded);
+        System.out.println("testAddLocations() Locations added: " + locationsAdded.size());
         System.out.println("  " + manager.getLocationsByName("TEST-LOCATION-2", 0, 5, Operation.EQUAL));
         System.out.println("  " + manager.getLocationsByName("TEST-LOCATION-3", 0, 5, Operation.EQUAL));
 
@@ -682,6 +683,56 @@ public class TestGermplasmDataManagerImpl{
         System.out.println("testGetGidAndNidByGermplasmNames(" + germplasmNames + ") RESULTS: " + results);
     }
 
+    @Test
+    public void testUpdateGermplasmName() throws Exception {
+        Integer nameId = -1; //Assumption: id=-1 exists
+        Name name = manager.getGermplasmNameByID(nameId); 
+        String nameBefore = name.toString();
+        name.setLocationId(manager.getLocationByID(1).getLocid()); //Assumption: location with id=1 exists
+        manager.updateGermplasmName(name);
+        System.out.println("testUpdateGermplasmName(" + nameId + ") RESULTS: " 
+                + "\n\tBEFORE: " + nameBefore
+                + "\n\tAFTER: " + name.toString());
+    }
+
+    @Test
+    public void testAddGermplasmAttribute() throws Exception {
+        Integer gid = Integer.valueOf(50533);        
+        Attribute attribute = new Attribute();
+        attribute.setAdate(0);
+        attribute.setAval("aval");
+        attribute.setGermplasmId(gid);
+        attribute.setLocationId(0);
+        attribute.setUserId(0);
+        attribute.setReferenceId(0);
+        attribute.setTypeId(0);
+        Integer id = manager.addGermplasmAttribute(attribute);
+        System.out.println("testAddGermplasmAttribute(" + gid + ") RESULTS: " + id + " = " + attribute);
+    }
+
+
+    @Test
+    public void testUpdateGermplasmAttribute() throws Exception {        
+        Integer attributeId = -1; //Assumption: attribute with id = -1 exists
+        
+        Attribute attribute = manager.getAttributeById(attributeId);
+        String attributeString = "";
+            attributeString = attribute.toString();
+            attribute.setAdate(0);
+            attribute.setLocationId(0);
+            attribute.setUserId(0);
+            attribute.setReferenceId(0);
+            attribute.setTypeId(0);
+            Integer id = manager.updateGermplasmAttribute(attribute);
+
+        if (attribute  != null){
+            System.out.println("testUpdateGermplasmAttribute(" + attributeId + ") RESULTS: "
+                    + "\ntBEFORE: " + attributeString
+                    + "\ntAFTER: " + attribute);
+        }
+    }
+        
+    
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();

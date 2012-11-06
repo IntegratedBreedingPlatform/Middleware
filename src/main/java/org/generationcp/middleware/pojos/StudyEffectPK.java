@@ -61,7 +61,13 @@ public class StudyEffectPK implements Serializable{
 
     @Override
     public String toString() {
-        return "StudyEffectPK [effectId=" + effectId + ", studyId=" + studyId + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("StudyEffectPK [effectId=");
+        builder.append(effectId);
+        builder.append(", studyId=");
+        builder.append(studyId);
+        builder.append("]");
+        return builder.toString();
     }
 
     @Override

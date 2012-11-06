@@ -99,12 +99,17 @@ public class ParentElement implements Serializable{
                 .append(mappingPopType, rhs.mappingPopType).isEquals();
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
-        return "ParentElement [parentAGId=" + parentAGId + ", parentBGId=" + parentBGId +  ", mappingType=" + mappingPopType + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("ParentElement [parentAGId=");
+        builder.append(parentAGId);
+        builder.append(", parentBGId=");
+        builder.append(parentBGId);
+        builder.append(", mappingPopType=");
+        builder.append(mappingPopType);
+        builder.append("]");
+        return builder.toString();
     }
     
 }

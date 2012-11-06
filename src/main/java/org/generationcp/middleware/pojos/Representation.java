@@ -88,7 +88,15 @@ public class Representation implements Serializable{
 
     @Override
     public String toString() {
-        return "Representation [id=" + id + ", effectId=" + effectId + ", name=" + name + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("Representation [id=");
+        builder.append(id);
+        builder.append(", effectId=");
+        builder.append(effectId);
+        builder.append(", name=");
+        builder.append(name);
+        builder.append("]");
+        return builder.toString();
     }
 
     @Override

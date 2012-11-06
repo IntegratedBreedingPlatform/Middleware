@@ -233,8 +233,31 @@ public class User implements Serializable {
 
     @Override
     public String toString() {
-        return "User [userid=" + userid + ", instalid=" + instalid + ", status=" + status + ", access=" + access + ", type=" + type + ", name=" + name + ", password=" + password + ", personid="
-               + personid + ", adate=" + adate + ", cdate=" + cdate + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("User [userid=");
+        builder.append(userid);
+        builder.append(", instalid=");
+        builder.append(instalid);
+        builder.append(", status=");
+        builder.append(status);
+        builder.append(", access=");
+        builder.append(access);
+        builder.append(", type=");
+        builder.append(type);
+        builder.append(", name=");
+        builder.append(name);
+        builder.append(", password=");
+        builder.append(password);
+        builder.append(", personid=");
+        builder.append(personid);
+        builder.append(", adate=");
+        builder.append(adate);
+        builder.append(", cdate=");
+        builder.append(cdate);
+        builder.append(", person=");
+        builder.append(person);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

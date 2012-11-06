@@ -42,9 +42,10 @@ public interface UserDataManager {
      * Adds the user.
      *
      * @param user the user
+     * @return Returns the id of the {@code User} record added
      * @throws MiddlewareQueryException the MiddlewareQueryException
      */
-    public void addUser(User user) throws MiddlewareQueryException;
+    public Integer addUser(User user) throws MiddlewareQueryException;
     
     /**
      * Gets the user by id.
@@ -81,9 +82,10 @@ public interface UserDataManager {
      * Adds the person.
      *
      * @param person the person
+     * @return Returns the id of the {@code Person} record added
      * @throws MiddlewareQueryException the MiddlewareQueryException
      */
-    public void addPerson(Person person) throws MiddlewareQueryException;
+    public Integer addPerson(Person person) throws MiddlewareQueryException;
     
     /**
      * Gets the person by id.

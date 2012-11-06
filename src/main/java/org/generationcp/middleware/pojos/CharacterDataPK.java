@@ -96,7 +96,13 @@ public class CharacterDataPK implements Serializable{
 
     @Override
     public String toString() {
-        return "CharacterDataPK [observationUnitId=" + observationUnitId + ", variateId=" + variateId + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("CharacterDataPK [observationUnitId=");
+        builder.append(observationUnitId);
+        builder.append(", variateId=");
+        builder.append(variateId);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

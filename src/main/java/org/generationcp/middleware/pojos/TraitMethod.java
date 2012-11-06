@@ -134,8 +134,19 @@ public class TraitMethod implements Serializable{
 
     @Override
     public String toString() {
-        return "TraitMethod [id=" + id + ", name=" + name + ", traitId=" + traitId + ", abbreviation=" + abbreviation + ", description="
-                + description + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("TraitMethod [id=");
+        builder.append(id);
+        builder.append(", name=");
+        builder.append(name);
+        builder.append(", traitId=");
+        builder.append(traitId);
+        builder.append(", abbreviation=");
+        builder.append(abbreviation);
+        builder.append(", description=");
+        builder.append(description);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

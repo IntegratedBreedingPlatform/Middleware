@@ -101,16 +101,25 @@ public class WorkflowStep implements Serializable{
     
     @Override
     public String toString() {
-        StringBuffer toolsString = new StringBuffer();
+
+        StringBuilder toolsString = new StringBuilder();
         toolsString.append("[");
         for (Tool tool : tools){
             toolsString.append(tool + " | ");
         }
         toolsString.append("]");
-        
-        return "WorkflowStep [stepId=" + stepId +
-                ", name=" + name +
-                ", tools=" + toolsString + "]";
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("WorkflowStep [stepId=");
+        builder.append(stepId);
+        builder.append(", name=");
+        builder.append(name);
+        builder.append(", tools=");
+        builder.append(toolsString);
+        builder.append("]");
+        return builder.toString();
     }
 
+    
+    
 }

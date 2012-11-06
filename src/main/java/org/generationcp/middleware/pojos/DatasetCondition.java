@@ -116,8 +116,23 @@ public class DatasetCondition implements Serializable{
 
     @Override
     public String toString() {
-        return "DatasetCondition [factorId=" + factorId + ", name=" + name + ", value=" + value + ", traitId=" + traitId + ", scaleId="
-                + scaleId + ", methodId=" + methodId + ", type=" + type + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("DatasetCondition [factorId=");
+        builder.append(factorId);
+        builder.append(", name=");
+        builder.append(name);
+        builder.append(", value=");
+        builder.append(value);
+        builder.append(", traitId=");
+        builder.append(traitId);
+        builder.append(", scaleId=");
+        builder.append(scaleId);
+        builder.append(", methodId=");
+        builder.append(methodId);
+        builder.append(", type=");
+        builder.append(type);
+        builder.append("]");
+        return builder.toString();
     }
     
 }

@@ -103,8 +103,23 @@ public class TransactionReportRow implements Serializable{
 
     @Override
     public String toString() {
-        return "TransactionReportRow [date=" + date + ", quantity=" + quantity + ", scaleOfLot=" + scaleOfLot + ", locationOfLot="
-                + locationOfLot + ", commentOfLot=" + commentOfLot + ", entityIdOfLot=" + entityIdOfLot + ", person=" + person + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("TransactionReportRow [date=");
+        builder.append(date);
+        builder.append(", quantity=");
+        builder.append(quantity);
+        builder.append(", scaleOfLot=");
+        builder.append(scaleOfLot);
+        builder.append(", locationOfLot=");
+        builder.append(locationOfLot);
+        builder.append(", commentOfLot=");
+        builder.append(commentOfLot);
+        builder.append(", entityIdOfLot=");
+        builder.append(entityIdOfLot);
+        builder.append(", person=");
+        builder.append(person);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

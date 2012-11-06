@@ -145,12 +145,21 @@ public class MappingData implements Serializable{
 
     @Override
     public String toString() {
-        return "MappingData [markerId=" + markerId + ", " + 
-                "linkageGroup=" + linkageGroup + ", " + 
-                "startPosition=" + startPosition + ", " + 
-                "mapUnit=" + mapUnit + ", " + 
-                "mapName=" + mapName + ", " + 
-                "markerName=" + markerName + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("MappingData [markerId=");
+        builder.append(markerId);
+        builder.append(", linkageGroup=");
+        builder.append(linkageGroup);
+        builder.append(", startPosition=");
+        builder.append(startPosition);
+        builder.append(", mapUnit=");
+        builder.append(mapUnit);
+        builder.append(", mapName=");
+        builder.append(mapName);
+        builder.append(", markerName=");
+        builder.append(markerName);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

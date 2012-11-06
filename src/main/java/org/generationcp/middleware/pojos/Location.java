@@ -230,8 +230,29 @@ public class Location implements Serializable{
 
     @Override
     public String toString() {
-        return "Location [locid=" + locid + ", ltype=" + ltype + ", nllp=" + nllp + ", lname=" + lname + ", labbr=" + labbr + ", snl3id="
-                + snl3id + ", snl2id=" + snl2id + ", snl1id=" + snl1id + ", cntryid=" + cntryid + ", lrplce=" + lrplce + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("Location [locid=");
+        builder.append(locid);
+        builder.append(", ltype=");
+        builder.append(ltype);
+        builder.append(", nllp=");
+        builder.append(nllp);
+        builder.append(", lname=");
+        builder.append(lname);
+        builder.append(", labbr=");
+        builder.append(labbr);
+        builder.append(", snl3id=");
+        builder.append(snl3id);
+        builder.append(", snl2id=");
+        builder.append(snl2id);
+        builder.append(", snl1id=");
+        builder.append(snl1id);
+        builder.append(", cntryid=");
+        builder.append(cntryid);
+        builder.append(", lrplce=");
+        builder.append(lrplce);
+        builder.append("]");
+        return builder.toString();
     }
 
     

@@ -80,7 +80,15 @@ public class ScaleContinuous implements Serializable{
 
     @Override
     public String toString() {
-        return "ScaleContinuous [scaleId=" + scaleId + ", start=" + start + ", end=" + end + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("ScaleContinuous [scaleId=");
+        builder.append(scaleId);
+        builder.append(", start=");
+        builder.append(start);
+        builder.append(", end=");
+        builder.append(end);
+        builder.append("]");
+        return builder.toString();
     }
 
     @Override

@@ -273,9 +273,37 @@ public class Method implements Serializable{
 
     @Override
     public String toString() {
-        return "Method [mid=" + mid + ", mtype=" + mtype + ", mgrp=" + mgrp + ", mcode=" + mcode + ", mname=" + mname + ", mdesc=" + mdesc
-                + ", mprgn=" + mprgn + ", mfprg=" + mfprg + ", mattr=" + mattr + ", geneq=" + geneq + ", lmid=" + lmid + ", mdate=" + mdate
-                + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("Method [mid=");
+        builder.append(mid);
+        builder.append(", mtype=");
+        builder.append(mtype);
+        builder.append(", mgrp=");
+        builder.append(mgrp);
+        builder.append(", mcode=");
+        builder.append(mcode);
+        builder.append(", mname=");
+        builder.append(mname);
+        builder.append(", mdesc=");
+        builder.append(mdesc);
+        builder.append(", mref=");
+        builder.append(mref);
+        builder.append(", mprgn=");
+        builder.append(mprgn);
+        builder.append(", mfprg=");
+        builder.append(mfprg);
+        builder.append(", mattr=");
+        builder.append(mattr);
+        builder.append(", geneq=");
+        builder.append(geneq);
+        builder.append(", muid=");
+        builder.append(muid);
+        builder.append(", lmid=");
+        builder.append(lmid);
+        builder.append(", mdate=");
+        builder.append(mdate);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

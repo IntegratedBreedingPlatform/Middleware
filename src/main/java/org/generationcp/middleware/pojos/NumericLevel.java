@@ -110,7 +110,13 @@ public class NumericLevel implements Serializable{
 
     @Override
     public String toString() {
-        return "NumericLevel [id=" + id + ", value=" + value + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("NumericLevel [id=");
+        builder.append(id);
+        builder.append(", value=");
+        builder.append(value);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

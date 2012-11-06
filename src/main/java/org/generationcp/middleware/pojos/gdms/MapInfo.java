@@ -131,14 +131,17 @@ public class MapInfo implements Serializable{
                 .append(linkageGroup, rhs.linkageGroup).append(startPosition, rhs.startPosition).isEquals();
     }
     
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
-        return  "MapInfo [markerName=" + markerName + ", " +
-                "linkageGroup=" + linkageGroup + ", " +
-                "startPosition=" + startPosition + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("MapInfo [markerName=");
+        builder.append(markerName);
+        builder.append(", linkageGroup=");
+        builder.append(linkageGroup);
+        builder.append(", startPosition=");
+        builder.append(startPosition);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

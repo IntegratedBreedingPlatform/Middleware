@@ -128,35 +128,38 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
     }
 
     @Override
-    public int addLot(Lot lot) throws MiddlewareQueryException {
+    public Integer addLot(Lot lot) throws MiddlewareQueryException {
         List<Lot> lots = new ArrayList<Lot>();
         lots.add(lot);
+        List<Integer> ids = addOrUpdateLot(lots, Operation.ADD);
+        return ids.size() > 0 ? ids.get(0) : null;
+    }
+
+    @Override
+    public List<Integer> addLot(List<Lot> lots) throws MiddlewareQueryException {
         return addOrUpdateLot(lots, Operation.ADD);
     }
 
     @Override
-    public int addLot(List<Lot> lots) throws MiddlewareQueryException {
-        return addOrUpdateLot(lots, Operation.ADD);
-    }
-
-    @Override
-    public int updateLot(Lot lot) throws MiddlewareQueryException {
+    public Integer updateLot(Lot lot) throws MiddlewareQueryException {
         List<Lot> lots = new ArrayList<Lot>();
         lots.add(lot);
-        return addOrUpdateLot(lots, Operation.UPDATE);
+        List<Integer> ids = addOrUpdateLot(lots, Operation.UPDATE);
+        return ids.size() > 0 ? ids.get(0) : null;
     }
 
     @Override
-    public int updateLot(List<Lot> lots) throws MiddlewareQueryException {
+    public List<Integer> updateLot(List<Lot> lots) throws MiddlewareQueryException {
         return addOrUpdateLot(lots, Operation.UPDATE);
     }
 
-    private int addOrUpdateLot(List<Lot> lots, Operation operation) throws MiddlewareQueryException {
+    private List<Integer> addOrUpdateLot(List<Lot> lots, Operation operation) throws MiddlewareQueryException {
         // initialize session & transaction
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
         int lotsSaved = 0;
+        List<Integer> idLotsSaved = new ArrayList<Integer>();
         try {
             // begin save transaction
             trans = session.beginTransaction();
@@ -174,7 +177,8 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
                     // Lot is a central DB record.
                     dao.validateId(lot);
                 }
-                dao.saveOrUpdate(lot);
+                Lot recordSaved = dao.saveOrUpdate(lot);
+                idLotsSaved.add(recordSaved.getId());
                 lotsSaved++;
                 if (lotsSaved % JDBC_BATCH_SIZE == 0) {
                     // flush a batch of inserts and release memory
@@ -195,40 +199,44 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
             session.flush();
         }
 
-        return lotsSaved;
+        return idLotsSaved;
     }
 
     @Override
-    public int addTransaction(org.generationcp.middleware.pojos.Transaction transaction) throws MiddlewareQueryException {
+    public Integer addTransaction(org.generationcp.middleware.pojos.Transaction transaction) throws MiddlewareQueryException {
         List<org.generationcp.middleware.pojos.Transaction> transactions = new ArrayList<org.generationcp.middleware.pojos.Transaction>();
         transactions.add(transaction);
-        return addTransaction(transactions);
+        List<Integer> ids = addTransaction(transactions);
+        return ids.size()>0 ? ids.get(0) : null;
     }
 
     @Override
-    public int addTransaction(List<org.generationcp.middleware.pojos.Transaction> transactions) throws MiddlewareQueryException {
+    public List<Integer> addTransaction(List<org.generationcp.middleware.pojos.Transaction> transactions) throws MiddlewareQueryException {
         return addOrUpdateTransaction(transactions, Operation.ADD);
     }
 
     @Override
-    public int updateTransaction(org.generationcp.middleware.pojos.Transaction transaction) throws MiddlewareQueryException {
+    public Integer updateTransaction(org.generationcp.middleware.pojos.Transaction transaction) throws MiddlewareQueryException {
         List<org.generationcp.middleware.pojos.Transaction> transactions = new ArrayList<org.generationcp.middleware.pojos.Transaction>();
         transactions.add(transaction);
-        return addOrUpdateTransaction(transactions, Operation.UPDATE);
+        List<Integer> ids = addOrUpdateTransaction(transactions, Operation.UPDATE);
+        return ids.size()>0 ? ids.get(0) : null;
     }
 
     @Override
-    public int updateTransaction(List<org.generationcp.middleware.pojos.Transaction> transactions) throws MiddlewareQueryException {
+    public List<Integer> updateTransaction(List<org.generationcp.middleware.pojos.Transaction> transactions)
+            throws MiddlewareQueryException {
         return addOrUpdateTransaction(transactions, Operation.UPDATE);
     }
 
-    private int addOrUpdateTransaction(List<org.generationcp.middleware.pojos.Transaction> transactions, Operation operation)
+    private List<Integer> addOrUpdateTransaction(List<org.generationcp.middleware.pojos.Transaction> transactions, Operation operation)
             throws MiddlewareQueryException {
         // initialize session & transaction
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
         int transactionsSaved = 0;
+        List<Integer> idTransactionsSaved = new ArrayList<Integer>();
         try {
             // begin save transaction
             trans = session.beginTransaction();
@@ -246,7 +254,8 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
                     // Lot is a central DB record.
                     dao.validateId(transaction);
                 }
-                dao.saveOrUpdate(transaction);
+                org.generationcp.middleware.pojos.Transaction recordSaved = dao.saveOrUpdate(transaction);
+                idTransactionsSaved.add(recordSaved.getId());
                 transactionsSaved++;
                 if (transactionsSaved % JDBC_BATCH_SIZE == 0) {
                     // flush a batch of inserts and release memory
@@ -268,7 +277,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
             session.flush();
         }
 
-        return transactionsSaved;
+        return idTransactionsSaved;
     }
 
     @Override

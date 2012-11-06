@@ -129,7 +129,17 @@ public class Map implements Serializable{
 
     @Override
     public String toString() {
-        return "Map [mapId=" + mapId + ", mapName=" + mapName + ", mapType=" + mapType + ", mpId=" + mpId + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("Map [mapId=");
+        builder.append(mapId);
+        builder.append(", mapName=");
+        builder.append(mapName);
+        builder.append(", mapType=");
+        builder.append(mapType);
+        builder.append(", mpId=");
+        builder.append(mpId);
+        builder.append("]");
+        return builder.toString();
     }
     
 }

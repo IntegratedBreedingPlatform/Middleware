@@ -78,8 +78,21 @@ public class LotReportRow implements Serializable{
 
     @Override
     public String toString() {
-        return "LotReportRow [lotId=" + lotId + ", entityIdOfLot=" + entityIdOfLot + ", actualLotBalance=" + actualLotBalance
-                + ", locationOfLot=" + locationOfLot + ", scaleOfLot=" + scaleOfLot + ", commentOfLot=" + commentOfLot + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("LotReportRow [lotId=");
+        builder.append(lotId);
+        builder.append(", entityIdOfLot=");
+        builder.append(entityIdOfLot);
+        builder.append(", actualLotBalance=");
+        builder.append(actualLotBalance);
+        builder.append(", locationOfLot=");
+        builder.append(locationOfLot);
+        builder.append(", scaleOfLot=");
+        builder.append(scaleOfLot);
+        builder.append(", commentOfLot=");
+        builder.append(commentOfLot);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

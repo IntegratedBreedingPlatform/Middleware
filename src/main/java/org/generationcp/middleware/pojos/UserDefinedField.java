@@ -228,8 +228,31 @@ public class UserDefinedField implements Serializable{
 
     @Override
     public String toString() {
-        return "Udflds [fldno=" + fldno + ", ftable=" + ftable + ", ftype=" + ftype + ", fcode=" + fcode + ", fname=" + fname + ", ffmt="
-                + ffmt + ", fdesc=" + fdesc + ", lfldno=" + lfldno + ", " + "fdate=" + fdate + ", scaleid=" + scaleid + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("UserDefinedField [fldno=");
+        builder.append(fldno);
+        builder.append(", ftable=");
+        builder.append(ftable);
+        builder.append(", ftype=");
+        builder.append(ftype);
+        builder.append(", fcode=");
+        builder.append(fcode);
+        builder.append(", fname=");
+        builder.append(fname);
+        builder.append(", ffmt=");
+        builder.append(ffmt);
+        builder.append(", fdesc=");
+        builder.append(fdesc);
+        builder.append(", lfldno=");
+        builder.append(lfldno);
+        builder.append(", user=");
+        builder.append(user);
+        builder.append(", fdate=");
+        builder.append(fdate);
+        builder.append(", scaleid=");
+        builder.append(scaleid);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

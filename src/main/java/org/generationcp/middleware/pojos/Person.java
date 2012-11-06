@@ -244,9 +244,37 @@ public class Person implements Serializable{
 
     @Override
     public String toString() {
-        return "Person [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", middleName=" + middleName + ", instituteId="
-                + instituteId + ", title=" + title + ", positionName=" + positionName + ", language=" + language + ", phone=" + phone
-                + ", extension=" + extension + ", fax=" + fax + ", email=" + email + ", notes=" + notes + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("Person [id=");
+        builder.append(id);
+        builder.append(", firstName=");
+        builder.append(firstName);
+        builder.append(", lastName=");
+        builder.append(lastName);
+        builder.append(", middleName=");
+        builder.append(middleName);
+        builder.append(", instituteId=");
+        builder.append(instituteId);
+        builder.append(", title=");
+        builder.append(title);
+        builder.append(", positionName=");
+        builder.append(positionName);
+        builder.append(", language=");
+        builder.append(language);
+        builder.append(", phone=");
+        builder.append(phone);
+        builder.append(", extension=");
+        builder.append(extension);
+        builder.append(", fax=");
+        builder.append(fax);
+        builder.append(", email=");
+        builder.append(email);
+        builder.append(", notes=");
+        builder.append(notes);
+        builder.append(", contact=");
+        builder.append(contact);
+        builder.append("]");
+        return builder.toString();
     }
 
     @Override

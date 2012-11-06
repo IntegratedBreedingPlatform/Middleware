@@ -333,20 +333,25 @@ public class MappingPop implements Serializable{
                                         .append(mapId).toHashCode();   
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
-        return "MappingPop [datasetId=" + datasetId + 
-                        ", mappingType=" + parent.getMappingType() +
-                        ", parentAGId=" + parent.getParentAGId() +
-                        ", parentBGId=" + parent.getParentBGId() +
-                        ", populationSize=" + populationSize +
-                        ", populationType=" + populationType +
-                        ", mapDataDescription=" + mapDataDescription +
-                        ", scoringScheme=" + scoringScheme +
-                        ", mapId=" + mapId + "]";    
+        StringBuilder builder = new StringBuilder();
+        builder.append("MappingPop [datasetId=");
+        builder.append(datasetId);
+        builder.append(", parent=");
+        builder.append(parent);
+        builder.append(", populationSize=");
+        builder.append(populationSize);
+        builder.append(", populationType=");
+        builder.append(populationType);
+        builder.append(", mapDataDescription=");
+        builder.append(mapDataDescription);
+        builder.append(", scoringScheme=");
+        builder.append(scoringScheme);
+        builder.append(", mapId=");
+        builder.append(mapId);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

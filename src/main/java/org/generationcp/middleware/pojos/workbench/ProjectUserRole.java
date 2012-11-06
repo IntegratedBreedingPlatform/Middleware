@@ -55,7 +55,7 @@ public class ProjectUserRole implements Serializable{
     @Basic(optional = false)
     @GeneratedValue
     @Column(name = "project_user_id")
-    private Long projectUserId;
+    private Integer projectUserId;
 
     /** The project. */
     @OneToOne(optional = false)
@@ -75,7 +75,7 @@ public class ProjectUserRole implements Serializable{
     public ProjectUserRole() {
     }
 
-    public ProjectUserRole(Long projectUserId, Project project, Integer userId, Role role) {
+    public ProjectUserRole(Integer projectUserId, Project project, Integer userId, Role role) {
         this.projectUserId = projectUserId;
         this.project = project;
         this.userId = userId;
@@ -88,11 +88,11 @@ public class ProjectUserRole implements Serializable{
         this.role = role;
     }
 
-    public Long getProjectUserId() {
+    public Integer getProjectUserId() {
         return projectUserId;
     }
     
-    public void setProjectUserId(Long projectUserId) {
+    public void setProjectUserId(Integer projectUserId) {
         this.projectUserId = projectUserId;
     }
     
@@ -150,10 +150,17 @@ public class ProjectUserRole implements Serializable{
     
     @Override
     public String toString() {
-        return "ProjectUser [projectUserId=" + projectUserId +
-                ", project=" + project +
-                ", role=" + role +
-                ", userId=" + userId + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("ProjectUserRole [projectUserId=");
+        builder.append(projectUserId);
+        builder.append(", project=");
+        builder.append(project);
+        builder.append(", userId=");
+        builder.append(userId);
+        builder.append(", role=");
+        builder.append(role);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

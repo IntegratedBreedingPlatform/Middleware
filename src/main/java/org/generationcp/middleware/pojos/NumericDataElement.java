@@ -72,8 +72,17 @@ public class NumericDataElement implements Serializable{
 
     @Override
     public String toString() {
-        return "NumericDataElement [ounitId=" + ounitId + ", variateId=" + variateId + ", variateName=" + variateName + ", value=" + value
-                + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("NumericDataElement [ounitId=");
+        builder.append(ounitId);
+        builder.append(", variateId=");
+        builder.append(variateId);
+        builder.append(", variateName=");
+        builder.append(variateName);
+        builder.append(", value=");
+        builder.append(value);
+        builder.append("]");
+        return builder.toString();
     }
 
     @Override

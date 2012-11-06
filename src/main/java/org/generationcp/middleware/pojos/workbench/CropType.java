@@ -90,7 +90,13 @@ public class CropType implements Serializable{
 
     @Override
     public String toString() {
-        return "CropType [cropName=" + cropName + ", centralDbName=" + centralDbName + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("CropType [cropName=");
+        builder.append(cropName);
+        builder.append(", centralDbName=");
+        builder.append(centralDbName);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

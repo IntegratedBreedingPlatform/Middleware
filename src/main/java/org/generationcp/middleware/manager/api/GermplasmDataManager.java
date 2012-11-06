@@ -430,9 +430,10 @@ public interface GermplasmDataManager {
      *            - id of the Germplasm to be updated
      * @param newPrefName
      *            - new name to set as the preferred name
+     * @return Returns the id of the updated {@code Germplasm} record
      * @throws MiddlewareQueryException
      */
-    public void updateGermplasmPrefName(Integer gid, String newPrefName) throws MiddlewareQueryException;
+    public Integer updateGermplasmPrefName(Integer gid, String newPrefName) throws MiddlewareQueryException;
 
     /**
      * Sets the specified Abbreviation as the specified Germplasm's new
@@ -442,9 +443,10 @@ public interface GermplasmDataManager {
      *            - id of the Germplasm to be updated
      * @param newPrefAbbrev
      *            - new abbreviation to set as the preferred abbreviation
+     * @return Returns the id of the updated {@code Germplasm} record
      * @throws MiddlewareQueryException
      */
-    public void updateGermplasmPrefAbbrev(Integer gid, String newPrefAbbrev) throws MiddlewareQueryException;
+    public Integer updateGermplasmPrefAbbrev(Integer gid, String newPrefAbbrev) throws MiddlewareQueryException;
 
     /**
      * Inserts a single {@code Name} object into the database.
@@ -452,11 +454,10 @@ public interface GermplasmDataManager {
      * @param location
      *            - The {@code Name} object to be persisted to the database.
      *            Must be a valid {@code Name} object.
-     * @return Returns the number of Germplasm Name records inserted in the
-     *         database.
+     * @return Returns the id of the newly-added Germplasm {@code Name}.
      * @throws MiddlewareQueryException
      */
-    public int addGermplasmName(Name name) throws MiddlewareQueryException;
+    public Integer addGermplasmName(Name name) throws MiddlewareQueryException;
 
     /**
      * Inserts a list of multiple {@code Name} objects into the database.
@@ -464,11 +465,10 @@ public interface GermplasmDataManager {
      * @param names
      *            - A list of {@code Name} objects to be persisted to the
      *            database. {@code Name} objects must be valid.
-     * @return Returns the number of {@code Name} records inserted in the
-     *         database.
+     * @return Returns the id of the newly-added Germplasm {@code Name}s.
      * @throws MiddlewareQueryException
      */
-    public int addGermplasmName(List<Name> names) throws MiddlewareQueryException;
+    public List<Integer> addGermplasmName(List<Name> names) throws MiddlewareQueryException;
 
     /**
      * Updates a single {@code Name} object in the database.
@@ -476,11 +476,10 @@ public interface GermplasmDataManager {
      * @param location
      *            - The {@code Name} object to be updated in the database. Must
      *            be a valid {@code Name} object.
-     * @return Returns the number of Germplasm Name records updated in the
-     *         database.
+     * @return Returns the id of the updated Germplasm {@code Name}.
      * @throws MiddlewareQueryException
      */
-    public int updateGermplasmName(Name name) throws MiddlewareQueryException;
+    public Integer updateGermplasmName(Name name) throws MiddlewareQueryException;
 
     /**
      * Updates the database with multiple {@code Name} objects specified.
@@ -488,11 +487,10 @@ public interface GermplasmDataManager {
      * @param names
      *            - A list of {@code Name} objects to be updated in the
      *            database. {@code Name} objects must be valid.
-     * @return Returns the number of {@code Name} records updated in the
-     *         database.
+     * @return Returns the id of the updated Germplasm {@code Name}s.
      * @throws MiddlewareQueryException
      */
-    public int updateGermplasmName(List<Name> names) throws MiddlewareQueryException;
+    public List<Integer> updateGermplasmName(List<Name> names) throws MiddlewareQueryException;
 
     /**
      * Returns all the attributes of the Germplasm identified by the given id.
@@ -640,11 +638,12 @@ public interface GermplasmDataManager {
      * @param location
      *            - The {@code Location} object to be persisted to the database.
      *            Must be a valid {@code Location} object.
-     * @return Returns the number of {@code Location} records inserted in the
+     * @return Returns the id of the {@code Location} record inserted in the
      *         database.
+     *         Returns the id of the newly-added Germplasm {@code Name}s.
      * @throws MiddlewareQueryException
      */
-    public int addLocation(Location location) throws MiddlewareQueryException;
+    public Integer addLocation(Location location) throws MiddlewareQueryException;
     
     /**
      * Inserts a single {@code Location} object into the database.
@@ -652,11 +651,11 @@ public interface GermplasmDataManager {
      * @param locations
      *            - The {@code Location} object to be persisted to the database.
      *            Must be a valid {@code Location} object.
-     * @return Returns the number of {@code Location} records inserted in the
+     * @return Returns the ids of the {@code Location} records inserted in the
      *         database.
      * @throws MiddlewareQueryException
      */
-    public int addLocation(List<Location> locations) throws MiddlewareQueryException;
+    public List<Integer> addLocation(List<Location> locations) throws MiddlewareQueryException;
     
     /**
      * Deletes a single {@code Location} object into the database.
@@ -674,11 +673,11 @@ public interface GermplasmDataManager {
      * @param method
      *            - The {@code Method} object to be persisted to the database.
      *            Must be a valid {@code Method} object.
-     * @return Returns the number of {@code Method} records inserted in the
+     * @return Returns the id of the {@code Method} record inserted in the
      *         database.
      * @throws MiddlewareQueryException
      */
-    public int addMethod(Method method) throws MiddlewareQueryException;
+    public Integer addMethod(Method method) throws MiddlewareQueryException;
     
     /**
      * Inserts a list of {@code Method} objects into the database.
@@ -686,11 +685,11 @@ public interface GermplasmDataManager {
      * @param methods
      *            - The list of {@code Method} objects to be persisted to the database.
      *            Must be valid {@code Method} objects.
-     * @return Returns the number of {@code Method} records inserted in the
+     * @return Returns the ids of the {@code Method} records inserted in the
      *         database.
      * @throws MiddlewareQueryException
      */
-    public int addMethod(List<Method> methods) throws MiddlewareQueryException;
+    public List<Integer> addMethod(List<Method> methods) throws MiddlewareQueryException;
     
     /**
      * Deletes a single {@code Method} object into the database.
@@ -718,11 +717,11 @@ public interface GermplasmDataManager {
      * @param location
      *            - The {@code Bibref} object to be persisted to the database.
      *            Must be a valid {@code Bibref} object.
-     * @return Returns the number of {@code Bibref} records inserted in the
+     * @return Returns the id of the {@code Bibref} record inserted in the
      *         database.
      * @throws MiddlewareQueryException
      */
-    public int addBibliographicReference(Bibref bibref) throws MiddlewareQueryException;
+    public Integer addBibliographicReference(Bibref bibref) throws MiddlewareQueryException;
 
     /**
      * Returns the Germplasm representing the parent of the child Germplasm
@@ -898,10 +897,10 @@ public interface GermplasmDataManager {
      * Stores in the database the given valid Attribute object.
      * 
      * @param attribute
-     * @return the number of Attribute records stored in the database
+     * @return the id of {@code Attribute} records stored in the database
      * @throws MiddlewareQueryException
      */
-    public int addGermplasmAttribute(Attribute attribute) throws MiddlewareQueryException;
+    public Integer addGermplasmAttribute(Attribute attribute) throws MiddlewareQueryException;
 
     /**
      * Stores in the database all the given valid Attributes object contained in
@@ -909,20 +908,20 @@ public interface GermplasmDataManager {
      * 
      * @param attributes
      *            - List of Attribute objects
-     * @return the number of Attribute records stored in the database
+     * @return the ids of the Attribute records stored in the database
      * @throws MiddlewareQueryException
      */
-    public int addGermplasmAttribute(List<Attribute> attributes) throws MiddlewareQueryException;
+    public List<Integer> addGermplasmAttribute(List<Attribute> attributes) throws MiddlewareQueryException;
 
     /**
      * Given a valid Attribute object, update the corresponding record in the
      * database.
      * 
      * @param attribute
-     * @return the number of Attribute records updated
+     * @return Returns the id of the updated Germplasm {@code Attribute} record
      * @throws MiddlewareQueryException
      */
-    public int updateGermplasmAttribute(Attribute attribute) throws MiddlewareQueryException;
+    public Integer updateGermplasmAttribute(Attribute attribute) throws MiddlewareQueryException;
 
     /**
      * Given a List of valid Attribute objects, update their corresponding
@@ -930,10 +929,10 @@ public interface GermplasmDataManager {
      * 
      * @param attributes
      *            - List of Attribute objects
-     * @return the number of Attribute records updated
+     * @return Returns the ids of the updated Germplasm {@code Attribute} record
      * @throws MiddlewareQueryException
      */
-    public int updateGermplasmAttribute(List<Attribute> attributes) throws MiddlewareQueryException;
+    public List<Integer> updateGermplasmAttribute(List<Attribute> attributes) throws MiddlewareQueryException;
 
     /**
      * Returns the attribute record identified by the given id.
@@ -956,30 +955,30 @@ public interface GermplasmDataManager {
      * @param gid
      * @param progenitorId
      * @param progenitorNumber
-     * @return true if the operation was successful
+     * @return Returns the id of the updated Progenitor
      * @throws MiddlewareQueryException
      */
-    public boolean updateProgenitor(Integer gid, Integer progenitorId, Integer progenitorNumber) throws MiddlewareQueryException;
+    public Integer updateProgenitor(Integer gid, Integer progenitorId, Integer progenitorNumber) throws MiddlewareQueryException;
 
     /**
      * Given a valid Germplasm object, update the corresponding record in the
      * database.
      * 
      * @param germplasm
-     * @return the number of Germplasm records updated
+     * @return Returns the id of the updated {@code Germplasm} record
      * @throws MiddlewareQueryException
      */
-    public int updateGermplasm(Germplasm germplasm) throws MiddlewareQueryException;
+    public Integer updateGermplasm(Germplasm germplasm) throws MiddlewareQueryException;
 
     /**
      * Given a List of valid Germplasm objects, update the corresponding records
      * in the database.
      * 
      * @param germplasms
-     * @return the number of Germplasm records updated
+     * @return Returns the ids of the updated {@code Germplasm} records
      * @throws MiddlewareQueryException
      */
-    public int updateGermplasm(List<Germplasm> germplasms) throws MiddlewareQueryException;
+    public List<Integer> updateGermplasm(List<Germplasm> germplasms) throws MiddlewareQueryException;
 
     /**
      * Given a valid Germplasm object with a matching valid Name object to be
@@ -988,10 +987,10 @@ public interface GermplasmDataManager {
      * 
      * @param germplasm
      * @param preferredName
-     * @return the number of Germplasm records added
+     * @return the id of the {@code Germplasm} record added
      * @throws MiddlewareQueryException
      */
-    public int addGermplasm(Germplasm germplasm, Name preferredName) throws MiddlewareQueryException;
+    public Integer addGermplasm(Germplasm germplasm, Name preferredName) throws MiddlewareQueryException;
 
     /**
      * Given a map of valid Germplasm and Name objects, add new records for the
@@ -1005,10 +1004,10 @@ public interface GermplasmDataManager {
      * these temp ids with the correct ones for storing in the database.
      * 
      * @param germplasmNameMap
-     * @return the number of Germplasm records added
+     * @return the ids of the {@code Germplasm} records added
      * @throws MiddlewareQueryException
      */
-    public int addGermplasm(Map<Germplasm, Name> germplasmNameMap) throws MiddlewareQueryException;
+    public List<Integer> addGermplasm(Map<Germplasm, Name> germplasmNameMap) throws MiddlewareQueryException;
     
     /**
      * Gets the germplasm Id and name Id from the names table with the given germplasm name

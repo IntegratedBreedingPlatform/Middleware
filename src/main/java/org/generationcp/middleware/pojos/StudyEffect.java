@@ -100,7 +100,17 @@ public class StudyEffect implements Serializable{
 
     @Override
     public String toString() {
-        return "StudyEffect [id=" + id + ", name=" + name + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("StudyEffect [id=");
+        builder.append(id);
+        builder.append(", name=");
+        builder.append(name);
+        builder.append(", effectId=");
+        builder.append(effectId);
+        builder.append(", studyId=");
+        builder.append(studyId);
+        builder.append("]");
+        return builder.toString();
     }
 
     @Override

@@ -81,7 +81,19 @@ public class StudyInfo implements Serializable{
 
     @Override
     public String toString() {
-        return "StudyInfo [id=" + id + ", name=" + name + ", title=" + title + ", objective=" + objective + ", rowCount=" + rowCount + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("StudyInfo [id=");
+        builder.append(id);
+        builder.append(", name=");
+        builder.append(name);
+        builder.append(", title=");
+        builder.append(title);
+        builder.append(", objective=");
+        builder.append(objective);
+        builder.append(", rowCount=");
+        builder.append(rowCount);
+        builder.append("]");
+        return builder.toString();
     }
     
 }

@@ -216,9 +216,35 @@ public class Study implements Serializable{
 
     @Override
     public String toString() {
-        return "Study [id=" + id + ", name=" + name + ", projectKey=" + projectKey + ", title=" + title + ", objective=" + objective
-                + ", primaryInvestigator=" + primaryInvestigator + ", type=" + type + ", startDate=" + startDate + ", endDate=" + endDate
-                + ", user=" + user + ", status=" + status + ", hierarchy=" + hierarchy + ", creationDate=" + creationDate + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("Study [id=");
+        builder.append(id);
+        builder.append(", name=");
+        builder.append(name);
+        builder.append(", projectKey=");
+        builder.append(projectKey);
+        builder.append(", title=");
+        builder.append(title);
+        builder.append(", objective=");
+        builder.append(objective);
+        builder.append(", primaryInvestigator=");
+        builder.append(primaryInvestigator);
+        builder.append(", type=");
+        builder.append(type);
+        builder.append(", startDate=");
+        builder.append(startDate);
+        builder.append(", endDate=");
+        builder.append(endDate);
+        builder.append(", user=");
+        builder.append(user);
+        builder.append(", status=");
+        builder.append(status);
+        builder.append(", hierarchy=");
+        builder.append(hierarchy);
+        builder.append(", creationDate=");
+        builder.append(creationDate);
+        builder.append("]");
+        return builder.toString();
     }
 
     @Override

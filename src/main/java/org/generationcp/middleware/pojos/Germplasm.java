@@ -576,15 +576,12 @@ public class Germplasm implements Serializable{
 
     @Override
     public String toString() {
-        return "Germplsm [gid=" + gid + ", gnpgs=" + gnpgs + ", gpid1=" + gpid1 + ", gpid2=" + gpid2 + ", " + "lgid=" + lgid + ", gdate="
-                + gdate + ", grplce=" + grplce + ", mgid=" + mgid /*
-                                                                   * + ", cid="
-                                                                   * + cid +
-                                                                   * ", sid=" +
-                                                                   * sid +
-                                                                   * ", gchange="
-                                                                   * + gchange
-                                                                   */+ "]";
+        return "Germplasm [gid=" + gid + ", methodId=" + methodId + ", gnpgs=" + gnpgs + ", gpid1=" + gpid1 + ", gpid2=" + gpid2
+                + ", userId=" + userId + ", lgid=" + lgid + ", locationId=" + locationId + ", gdate=" + gdate + ", referenceId="
+                + referenceId + ", grplce=" + grplce + ", mgid=" + mgid + ", preferredName=" + preferredName + ", preferredAbbreviation="
+                + preferredAbbreviation + "]";
     }
+    
+    
 
 }

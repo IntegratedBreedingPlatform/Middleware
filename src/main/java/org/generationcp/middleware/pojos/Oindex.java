@@ -111,8 +111,19 @@ public class Oindex implements Serializable{
 
     @Override
     public String toString() {
-        return "Oindex [id=" + id + ", observationUnitId=" + observationUnitId + ", factorId=" + factorId + ", levelNumber=" + levelNumber
-                + ", representationNumber=" + representationNumber + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("Oindex [id=");
+        builder.append(id);
+        builder.append(", observationUnitId=");
+        builder.append(observationUnitId);
+        builder.append(", factorId=");
+        builder.append(factorId);
+        builder.append(", levelNumber=");
+        builder.append(levelNumber);
+        builder.append(", representationNumber=");
+        builder.append(representationNumber);
+        builder.append("]");
+        return builder.toString();
     }
 
     @Override

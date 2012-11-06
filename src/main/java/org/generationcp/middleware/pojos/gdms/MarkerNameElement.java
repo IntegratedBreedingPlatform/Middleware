@@ -127,12 +127,15 @@ public class MarkerNameElement implements Serializable{
                 .append(markerName, rhs.markerName).isEquals();
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
-        return "MarkerNameElement [gId=" + gId + ", markerName=" + markerName + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("MarkerNameElement [gId=");
+        builder.append(gId);
+        builder.append(", markerName=");
+        builder.append(markerName);
+        builder.append("]");
+        return builder.toString();
     }
     
 }

@@ -112,12 +112,13 @@ public class AccMetadataSet implements Serializable{
         return new HashCodeBuilder(17, 37).append(id).toHashCode();
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
-        return "AccMetaDataSet [id=" + id + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("AccMetadataSet [id=");
+        builder.append(id);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

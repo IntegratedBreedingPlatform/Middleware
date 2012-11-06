@@ -75,8 +75,13 @@ public class DatasetElement implements Serializable{
 
     @Override
     public String toString() {
-        return "Dataset [datasetId=" + datasetId + ", " + 
-        "datasetType=" + datasetType + "}";
+        StringBuilder builder = new StringBuilder();
+        builder.append("DatasetElement [datasetId=");
+        builder.append(datasetId);
+        builder.append(", datasetType=");
+        builder.append(datasetType);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

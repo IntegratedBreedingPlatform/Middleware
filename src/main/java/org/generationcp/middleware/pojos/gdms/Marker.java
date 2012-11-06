@@ -582,28 +582,45 @@ public class Marker implements Serializable{
         return new HashCodeBuilder(61, 131).append(markerId).toHashCode();
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
-        return "Marker [markerId=" + markerId +
-                        ", markerType=" + markerType +
-                        ", markerName=" + markerName +
-                        ", species=" + species +
-                        ", dbAccessionId=" + dbAccessionId +
-                        ", reference=" + reference +
-                        ", genotype=" + genotype +
-                        ", ploidy=" + ploidy +
-                        ", primerId=" + primerId +
-                        ", remarks=" + remarks +
-                        ", assayType=" + assayType +
-                        ", motif=" + motif +
-                        ", forwardPrimer=" + forwardPrimer +
-                        ", reversePrimer=" + reversePrimer +
-                        ", productSize=" + productSize +
-                        ", annealingTemp=" + annealingTemp +
-                        ", amplification=" + amplification +"]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("Marker [markerId=");
+        builder.append(markerId);
+        builder.append(", markerType=");
+        builder.append(markerType);
+        builder.append(", markerName=");
+        builder.append(markerName);
+        builder.append(", species=");
+        builder.append(species);
+        builder.append(", dbAccessionId=");
+        builder.append(dbAccessionId);
+        builder.append(", reference=");
+        builder.append(reference);
+        builder.append(", genotype=");
+        builder.append(genotype);
+        builder.append(", ploidy=");
+        builder.append(ploidy);
+        builder.append(", primerId=");
+        builder.append(primerId);
+        builder.append(", remarks=");
+        builder.append(remarks);
+        builder.append(", assayType=");
+        builder.append(assayType);
+        builder.append(", motif=");
+        builder.append(motif);
+        builder.append(", forwardPrimer=");
+        builder.append(forwardPrimer);
+        builder.append(", reversePrimer=");
+        builder.append(reversePrimer);
+        builder.append(", productSize=");
+        builder.append(productSize);
+        builder.append(", annealingTemp=");
+        builder.append(annealingTemp);
+        builder.append(", amplification=");
+        builder.append(amplification);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

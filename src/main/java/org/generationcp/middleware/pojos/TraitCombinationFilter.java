@@ -65,7 +65,17 @@ public class TraitCombinationFilter implements Serializable{
 
     @Override
     public String toString() {
-        return "TraitCombinationFilter [traitId=" + traitId + ", scaleId=" + scaleId + ", methodId=" + methodId + ", value=" + value + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("TraitCombinationFilter [traitId=");
+        builder.append(traitId);
+        builder.append(", scaleId=");
+        builder.append(scaleId);
+        builder.append(", methodId=");
+        builder.append(methodId);
+        builder.append(", value=");
+        builder.append(value);
+        builder.append("]");
+        return builder.toString();
     }
 
     

@@ -289,24 +289,35 @@ public class MarkerInfo implements Serializable{
         return new EqualsBuilder().appendSuper(super.equals(obj)).append(markerId, rhs.markerId).isEquals();
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
-        return "MarkerInfo " +
-                    "[markerId=" + markerId + 
-                    ", markerType=" + markerType + 
-                    ", markerName=" + markerName + 
-                    ", species=" + species + 
-                    ", accessionId=" + accessionId + 
-                    ", reference=" + reference + 
-                    ", genotype=" + genotype + 
-                    ", ploidy=" + ploidy + 
-                    ", principalInvestigator=" + principalInvestigator + 
-                    ", contact=" + contact + 
-                    ", institute=" + institute + 
-                    ", genotypesCount=" + genotypesCount + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("MarkerInfo [markerId=");
+        builder.append(markerId);
+        builder.append(", markerType=");
+        builder.append(markerType);
+        builder.append(", markerName=");
+        builder.append(markerName);
+        builder.append(", species=");
+        builder.append(species);
+        builder.append(", accessionId=");
+        builder.append(accessionId);
+        builder.append(", reference=");
+        builder.append(reference);
+        builder.append(", genotype=");
+        builder.append(genotype);
+        builder.append(", ploidy=");
+        builder.append(ploidy);
+        builder.append(", principalInvestigator=");
+        builder.append(principalInvestigator);
+        builder.append(", contact=");
+        builder.append(contact);
+        builder.append(", institute=");
+        builder.append(institute);
+        builder.append(", genotypesCount=");
+        builder.append(genotypesCount);
+        builder.append("]");
+        return builder.toString();
     }
     
 }

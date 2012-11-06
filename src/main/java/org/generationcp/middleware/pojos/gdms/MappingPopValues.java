@@ -284,16 +284,21 @@ public class MappingPopValues implements Serializable{
         return new HashCodeBuilder(17, 37).append(markerId).toHashCode();
     }
     
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
-        return "MappingPopValues [mpId=" + mpId +
-                        ", mapCharValue=" + mapCharValue +
-                        ", datasetId=" + datasetId +
-                        ", gid=" + gid +
-                        ", markerId=" + markerId +"]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("MappingPopValues [mpId=");
+        builder.append(mpId);
+        builder.append(", mapCharValue=");
+        builder.append(mapCharValue);
+        builder.append(", datasetId=");
+        builder.append(datasetId);
+        builder.append(", gid=");
+        builder.append(gid);
+        builder.append(", markerId=");
+        builder.append(markerId);
+        builder.append("]");
+        return builder.toString();
     }
     
 }

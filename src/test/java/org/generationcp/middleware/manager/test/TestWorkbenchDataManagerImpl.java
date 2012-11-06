@@ -388,8 +388,8 @@ public class TestWorkbenchDataManagerImpl{
         // Assumptions: Project with id=1, and Users with id=1 
         Project project1 = manager.getProjectById(projectId);
         User user1 = manager.getUserById(1);
-        Role role1 = manager.getRoleById(Integer.valueOf(1));
-        Role role2 = manager.getRoleById(Integer.valueOf(2));
+        Role role1 = manager.getAllRoles().get(0);
+        Role role2 = manager.getAllRoles().get(1);
         
         ProjectUserRole newRecord1 = new ProjectUserRole(project1, user1, role1);
         ProjectUserRole newRecord2 = new ProjectUserRole(project1, user1, role2);  
@@ -398,13 +398,13 @@ public class TestWorkbenchDataManagerImpl{
         projectUsers.add(newRecord2);
 
         // add the projectUsers
-        int projectUsersAdded = manager.addProjectUserRoles(projectUsers);
+        List<Integer> projectUsersAdded = manager.addProjectUserRole(projectUsers);
 
-        System.out.println("testAddProjectUsers(projectId=" + projectId + ") ADDED: " + projectUsersAdded);
+        System.out.println("testAddProjectUsers(projectId=" + projectId + ") ADDED: " + projectUsersAdded.size());
         
         // clean up
-        //manager.deleteProjectUserRole(newRecord1);
-        //manager.deleteProjectUserRole(newRecord2);
+        manager.deleteProjectUserRole(newRecord1);
+        manager.deleteProjectUserRole(newRecord2);
     }
     
     @Test
@@ -474,27 +474,24 @@ public class TestWorkbenchDataManagerImpl{
     @Test
     public void testUpdateToolConfiguration() throws MiddlewareQueryException {
         Long toolId = 1L;
-        //        ToolConfiguration toolConfig = new ToolConfiguration();
-        //        Tool tool = new Tool();
-        //        tool.setToolId(toolId);
-        //
-        //        toolConfig.setConfigId(1L);
-        //        toolConfig.setTool(tool);
-        //        toolConfig.setConfigKey("test test");
-        //        toolConfig.setConfigValue("test value");
         ToolConfiguration toolConfig = manager.getToolConfigurationByToolIdAndConfigKey(toolId, "5th key");
-        String oldToolConfigValue = toolConfig.toString();
-        toolConfig.setConfigValue("test test");
-
-        manager.updateToolConfiguration(toolConfig);
-
-        ToolConfigurationDAO dao = new ToolConfigurationDAO();
-        dao.setSession(hibernateUtil.getCurrentSession());
-        ToolConfiguration result = dao.getById(toolId, false);
-
-        System.out.println("testUpdateToolConfiguration(toolId=" + toolId + "): ");
-        System.out.println("  FROM: " + oldToolConfigValue);
-        System.out.println("    TO: " + result);
+        
+        if (toolConfig != null){
+            String oldToolConfigValue = toolConfig.toString();
+            toolConfig.setConfigValue("test test");
+    
+            manager.updateToolConfiguration(toolConfig);
+    
+            ToolConfigurationDAO dao = new ToolConfigurationDAO();
+            dao.setSession(hibernateUtil.getCurrentSession());
+            ToolConfiguration result = dao.getById(toolId, false);
+    
+            System.out.println("testUpdateToolConfiguration(toolId=" + toolId + "): ");
+            System.out.println("  FROM: " + oldToolConfigValue);
+            System.out.println("    TO: " + result);
+        } else {
+            System.out.println("testUpdateToolConfiguration(toolId=" + toolId + "): Tool configuration not found.");
+        }
     }
 
     @Test
@@ -502,13 +499,17 @@ public class TestWorkbenchDataManagerImpl{
         Long toolId = 1L;
         ToolConfiguration toolConfig = manager.getToolConfigurationByToolIdAndConfigKey(toolId, "5th key");
 
-        manager.deleteToolConfiguration(toolConfig);
+        if (toolConfig != null){
+            manager.deleteToolConfiguration(toolConfig);
+            ToolConfigurationDAO dao = new ToolConfigurationDAO();
+            dao.setSession(hibernateUtil.getCurrentSession());
+            ToolConfiguration result = dao.getById(toolId, false);
 
-        ToolConfigurationDAO dao = new ToolConfigurationDAO();
-        dao.setSession(hibernateUtil.getCurrentSession());
-        ToolConfiguration result = dao.getById(toolId, false);
+            System.out.println("testDeleteToolConfiguration(toolId=" + toolId + "): " + result);
+        } else {
+            System.out.println("testDeleteToolConfiguration(toolId=" + toolId + "): Tool Configuration not found");
+        }
 
-        System.out.println("testDeleteToolConfiguration(toolId=" + toolId + "): " + result);
     }
 
     @Test
@@ -550,9 +551,19 @@ public class TestWorkbenchDataManagerImpl{
 
     @Test
     public void testAddCropType() throws MiddlewareQueryException {
+        
         CropType cropType = new CropType("Coconut");
-        int added = manager.addCropType(cropType);
-        System.out.println("testAddCropType(" + cropType + "): records added = " + added);
+        try{
+            String added = manager.addCropType(cropType);
+            System.out.println("testAddCropType(" + cropType + "): records added = " + added);
+        }catch(MiddlewareQueryException e){
+            if (e.getMessage().equals("Crop type already exists.")){
+                System.out.println(e.getMessage());
+            } else {
+                throw e;
+            }            
+        }
+        
     }
 
     @Test
@@ -623,6 +634,10 @@ public class TestWorkbenchDataManagerImpl{
             System.out.println(role);
         }
     }
+    
+    //TODO testAddIbdbUserMap()
+    
+    //TODO testUpdateWorkbenchRuntimeData()
     
     @AfterClass
     public static void tearDown() throws Exception {

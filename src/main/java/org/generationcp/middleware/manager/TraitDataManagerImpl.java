@@ -275,12 +275,13 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
     }
 
     @Override
-    public void addTraitMethod(TraitMethod traitMethod) throws MiddlewareQueryException {
+    public Integer addTraitMethod(TraitMethod traitMethod) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
 
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
+        Integer idTraitMethodSaved; 
         try {
             // begin save transaction
             trans = session.beginTransaction();
@@ -288,7 +289,8 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
             TraitMethodDAO dao = new TraitMethodDAO();
             dao.setSession(session);
 
-            dao.saveOrUpdate(traitMethod);
+            TraitMethod recordSaved = dao.saveOrUpdate(traitMethod);
+            idTraitMethodSaved = recordSaved.getId();
 
             trans.commit();
         } catch (Exception e) {
@@ -301,6 +303,7 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
         } finally {
             session.flush();
         }
+        return idTraitMethodSaved;
     }
 
     @Override

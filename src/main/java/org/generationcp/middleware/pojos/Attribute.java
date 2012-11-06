@@ -153,8 +153,25 @@ public class Attribute implements Serializable{
 
     @Override
     public String toString() {
-        return "Attribute [aid=" + aid + ", germplasmId=" + germplasmId + ", typeId=" + typeId + ", userId=" + userId + ", aval=" + aval
-                + ", locationId=" + locationId + ", referenceId=" + referenceId + ", adate=" + adate + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("Attribute [aid=");
+        builder.append(aid);
+        builder.append(", germplasmId=");
+        builder.append(germplasmId);
+        builder.append(", typeId=");
+        builder.append(typeId);
+        builder.append(", userId=");
+        builder.append(userId);
+        builder.append(", aval=");
+        builder.append(aval);
+        builder.append(", locationId=");
+        builder.append(locationId);
+        builder.append(", referenceId=");
+        builder.append(referenceId);
+        builder.append(", adate=");
+        builder.append(adate);
+        builder.append("]");
+        return builder.toString();
     }
 
     @Override

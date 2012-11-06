@@ -217,16 +217,29 @@ public class Dataset implements Serializable{
 
     @Override
     public String toString() {
-        return "Dataset [datasetId=" + datasetId + 
-                ", datasetName=" + datasetName +  
-                ", datasetDesc=" + datasetDesc +  
-                ", datasetType=" + datasetType +  
-                ", genus=" + genus + 
-                ", species=" + species +  
-                ", uploadTemplateDate=" + uploadTemplateDate +  
-                ", remarks=" + remarks + 
-                ", dataType=" + dataType +  
-                ", missingData=" + missingData + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("Dataset [datasetId=");
+        builder.append(datasetId);
+        builder.append(", datasetName=");
+        builder.append(datasetName);
+        builder.append(", datasetDesc=");
+        builder.append(datasetDesc);
+        builder.append(", datasetType=");
+        builder.append(datasetType);
+        builder.append(", genus=");
+        builder.append(genus);
+        builder.append(", species=");
+        builder.append(species);
+        builder.append(", uploadTemplateDate=");
+        builder.append(uploadTemplateDate);
+        builder.append(", remarks=");
+        builder.append(remarks);
+        builder.append(", dataType=");
+        builder.append(dataType);
+        builder.append(", missingData=");
+        builder.append(missingData);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

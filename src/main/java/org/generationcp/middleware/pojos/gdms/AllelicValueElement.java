@@ -113,13 +113,17 @@ public class AllelicValueElement implements Serializable{
         this.markerName = markerName;
     }
     
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
+    @Override
     public String toString() {
-        return "AllelicValueElement [gid=" + gid + 
-                ", data=" + data +
-                ", markerName=" + markerName + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("AllelicValueElement [gid=");
+        builder.append(gid);
+        builder.append(", data=");
+        builder.append(data);
+        builder.append(", markerName=");
+        builder.append(markerName);
+        builder.append("]");
+        return builder.toString();
     }
     
     /* (non-Javadoc)

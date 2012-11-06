@@ -97,7 +97,15 @@ public class CharacterLevelPK implements Serializable{
 
     @Override
     public String toString() {
-        return "CharacterLevelPK [labelId=" + labelId + ", factorId=" + factorId + ", levelNumber=" + levelNumber + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("CharacterLevelPK [labelId=");
+        builder.append(labelId);
+        builder.append(", factorId=");
+        builder.append(factorId);
+        builder.append(", levelNumber=");
+        builder.append(levelNumber);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

@@ -127,7 +127,19 @@ public class Georef implements Serializable{
 
     @Override
     public String toString() {
-        return "Georef [locid=" + locid + ", llpn=" + llpn + ", lat=" + lat + ", lon=" + lon + ", alt=" + alt + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("Georef [locid=");
+        builder.append(locid);
+        builder.append(", llpn=");
+        builder.append(llpn);
+        builder.append(", lat=");
+        builder.append(lat);
+        builder.append(", lon=");
+        builder.append(lon);
+        builder.append(", alt=");
+        builder.append(alt);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

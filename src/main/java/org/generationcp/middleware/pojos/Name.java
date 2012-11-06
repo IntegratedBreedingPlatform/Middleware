@@ -190,8 +190,27 @@ public class Name implements Serializable{
 
     @Override
     public String toString() {
-        return "Names [nid=" + nid + ", germplasmId=" + germplasmId + ", typeId=" + typeId + ", nstat=" + nstat + ", nuid=" + userId
-                + ", nval=" + nval + ", locationId=" + locationId + ", referenceId=" + referenceId + ", ndate=" + ndate + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("Name [nid=");
+        builder.append(nid);
+        builder.append(", germplasmId=");
+        builder.append(germplasmId);
+        builder.append(", typeId=");
+        builder.append(typeId);
+        builder.append(", nstat=");
+        builder.append(nstat);
+        builder.append(", userId=");
+        builder.append(userId);
+        builder.append(", nval=");
+        builder.append(nval);
+        builder.append(", locationId=");
+        builder.append(locationId);
+        builder.append(", ndate=");
+        builder.append(ndate);
+        builder.append(", referenceId=");
+        builder.append(referenceId);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

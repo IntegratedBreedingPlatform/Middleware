@@ -95,7 +95,13 @@ public class ScaleDiscrete implements Serializable{
 
     @Override
     public String toString() {
-        return "ScaleDiscrete [id=" + id + ", valueDescription=" + valueDescription + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("ScaleDiscrete [id=");
+        builder.append(id);
+        builder.append(", valueDescription=");
+        builder.append(valueDescription);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

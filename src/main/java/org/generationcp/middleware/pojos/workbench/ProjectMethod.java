@@ -63,7 +63,7 @@ public class ProjectMethod implements Serializable{
     @Basic(optional = false)
     @GeneratedValue
     @Column(name = "project_method_id")
-    private Long projectMethodId;
+    private Integer projectMethodId;
 
     /** The project. */
     @OneToOne(optional = false)
@@ -79,7 +79,7 @@ public class ProjectMethod implements Serializable{
         super();
     }
     
-    public ProjectMethod(Long projectMethodId, Project project, Integer methodId) {
+    public ProjectMethod(Integer projectMethodId, Project project, Integer methodId) {
         super();
         this.projectMethodId = projectMethodId;
         this.project = project;
@@ -91,7 +91,7 @@ public class ProjectMethod implements Serializable{
      *
      * @return the project method id
      */
-    public Long getProjectMethodId() {
+    public Integer getProjectMethodId() {
         return projectMethodId;
     }
     
@@ -100,7 +100,7 @@ public class ProjectMethod implements Serializable{
      *
      * @param projectMethodId the new project method id
      */
-    public void setProjectMethodId(Long projectMethodId) {
+    public void setProjectMethodId(Integer projectMethodId) {
         this.projectMethodId = projectMethodId;
     }
     
@@ -170,9 +170,15 @@ public class ProjectMethod implements Serializable{
     
     @Override
     public String toString() {
-        return "ProjectMethod [projectMethodId=" + projectMethodId +
-                ", project=" + project +
-                ", methodId=" + methodId + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("ProjectMethod [projectMethodId=");
+        builder.append(projectMethodId);
+        builder.append(", project=");
+        builder.append(project);
+        builder.append(", methodId=");
+        builder.append(methodId);
+        builder.append("]");
+        return builder.toString();
     }
 
 

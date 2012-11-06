@@ -277,9 +277,37 @@ public class Bibref implements Serializable{
 
     @Override
     public String toString() {
-        return "Bibrefs [refid=" + refid + ", pubdate=" + pubdate + ", authors=" + authors + ", editors=" + editors + ", analyt=" + analyt
-                + ", monogr=" + monogr + ", series=" + series + ", volume=" + volume + ", issue=" + issue + ", pagecol=" + pagecol
-                + ", publish=" + publish + ", pucity=" + pucity + ", pucntry=" + pucntry + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("Bibref [refid=");
+        builder.append(refid);
+        builder.append(", type=");
+        builder.append(type);
+        builder.append(", pubdate=");
+        builder.append(pubdate);
+        builder.append(", authors=");
+        builder.append(authors);
+        builder.append(", editors=");
+        builder.append(editors);
+        builder.append(", analyt=");
+        builder.append(analyt);
+        builder.append(", monogr=");
+        builder.append(monogr);
+        builder.append(", series=");
+        builder.append(series);
+        builder.append(", volume=");
+        builder.append(volume);
+        builder.append(", issue=");
+        builder.append(issue);
+        builder.append(", pagecol=");
+        builder.append(pagecol);
+        builder.append(", publish=");
+        builder.append(publish);
+        builder.append(", pucity=");
+        builder.append(pucity);
+        builder.append(", pucntry=");
+        builder.append(pucntry);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

@@ -109,7 +109,13 @@ public class CharacterLevel implements Serializable{
 
     @Override
     public String toString() {
-        return "CharacterLevel [id=" + id + ", value=" + value + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("CharacterLevel [id=");
+        builder.append(id);
+        builder.append(", value=");
+        builder.append(value);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

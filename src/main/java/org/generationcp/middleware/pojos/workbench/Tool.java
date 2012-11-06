@@ -85,7 +85,17 @@ public class Tool implements Serializable{
     
     @Override
     public String toString() {
-        return "Tool [toolId=" + toolId + ", toolName=" + toolName + ", toolType=" + toolType + ", path=" + path + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("Tool [toolId=");
+        builder.append(toolId);
+        builder.append(", toolName=");
+        builder.append(toolName);
+        builder.append(", toolType=");
+        builder.append(toolType);
+        builder.append(", path=");
+        builder.append(path);
+        builder.append("]");
+        return builder.toString();
     }
 
     @Override

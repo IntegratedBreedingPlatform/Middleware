@@ -205,8 +205,22 @@ public class GermplasmList implements Serializable{
 
     @Override
     public String toString() {
-        return "GermplasmList [id=" + id + ", name=" + name + ", date=" + date + ", type=" + type + ", description=" + description
-                + ", status=" + status + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("GermplasmList [");
+        builder.append(", name=");
+        builder.append(name);
+        builder.append(", date=");
+        builder.append(date);
+        builder.append(", type=");
+        builder.append(type);
+        builder.append(", userId=");
+        builder.append(userId);
+        builder.append(", description=");
+        builder.append(description);
+        builder.append(", status=");
+        builder.append(status);
+        builder.append("]");
+        return builder.toString();
     }
 
     @Override

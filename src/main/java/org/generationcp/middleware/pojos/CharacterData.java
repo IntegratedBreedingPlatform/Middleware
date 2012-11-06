@@ -107,7 +107,15 @@ public class CharacterData implements Serializable{
 
     @Override
     public String toString() {
-        return "CharacterData [id=" + id + ", value=" + value + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("CharacterData [id=");
+        builder.append(id);
+        builder.append(", value=");
+        builder.append(value);
+        builder.append(", variate=");
+        builder.append(variate);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

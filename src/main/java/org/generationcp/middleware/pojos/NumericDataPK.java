@@ -96,7 +96,13 @@ public class NumericDataPK implements Serializable{
 
     @Override
     public String toString() {
-        return "NumericDataPK [observationUnitId=" + observationUnitId + ", variateId=" + variateId + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("NumericDataPK [observationUnitId=");
+        builder.append(observationUnitId);
+        builder.append(", variateId=");
+        builder.append(variateId);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

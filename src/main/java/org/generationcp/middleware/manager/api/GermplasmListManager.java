@@ -313,11 +313,11 @@ public interface GermplasmListManager{
      * @param germplasmListData
      *            - The {@code GermplasmListData} object to be persisted to the
      *            database. Must be a valid {@code GermplasmListData} object.
-     * @return Returns the number of {@code GermplasmListData} records inserted
+     * @return Returns the id of {@code GermplasmListData} record inserted
      *         in the database.
      * @throws MiddlewareQueryException
      */
-    public int addGermplasmListData(GermplasmListData germplasmListData) throws MiddlewareQueryException;
+    public Integer addGermplasmListData(GermplasmListData germplasmListData) throws MiddlewareQueryException;
 
     /**
      * Inserts a list of multiple {@code GermplasmListData} objects into the
@@ -327,11 +327,11 @@ public interface GermplasmListManager{
      *            - A list of {@code GermplasmListData} objects to be persisted
      *            to the database. {@code GermplasmListData} objects must be
      *            valid.
-     * @return Returns the number of {@code GermplasmListData} records inserted
+     * @return Returns the ids of the {@code GermplasmListData} records inserted
      *         in the database.
      * @throws MiddlewareQueryException
      */
-    public int addGermplasmListData(List<GermplasmListData> germplasmListDatas) throws MiddlewareQueryException;
+    public List<Integer> addGermplasmListData(List<GermplasmListData> germplasmListDatas) throws MiddlewareQueryException;
 
     /**
      * Updates the database with the {@code GermplasmListData} object specified.
@@ -341,9 +341,10 @@ public interface GermplasmListManager{
      *            database. Must be a valid {@code GermplasmListData} object.
      * @return Returns the number of {@code GermplasmListData} records updated
      *         in the database.
+     * @return Returns the id of the updated {@code GermplasmListData} record
      * @throws MiddlewareQueryException
      */
-    public int updateGermplasmListData(GermplasmListData germplasmListData) throws MiddlewareQueryException;
+    public Integer updateGermplasmListData(GermplasmListData germplasmListData) throws MiddlewareQueryException;
 
     /**
      * Updates the database with the {@code GermplasmListData} objects
@@ -352,11 +353,10 @@ public interface GermplasmListManager{
      * @param germplasmListDatas
      *            - A list of {@code GermplasmListData} objects to be updated in
      *            the database. Must be valid {@code GermplasmListData} objects.
-     * @return Returns the number of {@code GermplasmListData} records updated
-     *         in the database.
+     * @return Returns the ids of the updated {@code GermplasmListData} records
      * @throws MiddlewareQueryException
      */
-    public int updateGermplasmListData(List<GermplasmListData> germplasmListDatas) throws MiddlewareQueryException;
+    public List<Integer> updateGermplasmListData(List<GermplasmListData> germplasmListDatas) throws MiddlewareQueryException;
 
     /**
      * Removes the corresponding {@code GermplasmListData} record from the

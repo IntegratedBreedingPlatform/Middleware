@@ -149,12 +149,17 @@ public class AccMetadataSetPK implements Serializable{
                 .append(nameId, rhs.nameId).isEquals();
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
-        return "AccMetadataSetPK [datasetId=" + datasetId + ", germplasmId=" + germplasmId +  ", nameId=" + nameId + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("AccMetadataSetPK [datasetId=");
+        builder.append(datasetId);
+        builder.append(", germplasmId=");
+        builder.append(germplasmId);
+        builder.append(", nameId=");
+        builder.append(nameId);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

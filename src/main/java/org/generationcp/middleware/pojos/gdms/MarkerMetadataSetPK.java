@@ -122,12 +122,15 @@ public class MarkerMetadataSetPK implements Serializable{
         return new HashCodeBuilder(37, 83).append(datasetId).append(markerId).toHashCode();
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
-        return "MarkerMetadataSetPK [datasetId=" + datasetId + ", markerId=" + markerId + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("MarkerMetadataSetPK [datasetId=");
+        builder.append(datasetId);
+        builder.append(", markerId=");
+        builder.append(markerId);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

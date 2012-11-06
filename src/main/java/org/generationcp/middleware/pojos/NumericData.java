@@ -107,7 +107,15 @@ public class NumericData implements Serializable{
 
     @Override
     public String toString() {
-        return "NumericData [id=" + id + ", value=" + value + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("NumericData [id=");
+        builder.append(id);
+        builder.append(", value=");
+        builder.append(value);
+        builder.append(", variate=");
+        builder.append(variate);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

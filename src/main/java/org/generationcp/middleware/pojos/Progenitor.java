@@ -99,7 +99,13 @@ public class Progenitor implements Serializable{
 
     @Override
     public String toString() {
-        return "Progntrs [progntrsPK=" + progntrsPK + ", pid=" + pid + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("Progenitor [progntrsPK=");
+        builder.append(progntrsPK);
+        builder.append(", pid=");
+        builder.append(pid);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

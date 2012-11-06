@@ -115,13 +115,17 @@ public class AllelicValueWithMarkerIdElement implements Serializable{
         this.markerId = markerId;
     }
     
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
+    @Override
     public String toString() {
-        return "AllelicValueWithMarkerIdElement [gid=" + gid + 
-                ", data=" + data +
-                ", markerId=" + markerId + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("AllelicValueWithMarkerIdElement [gid=");
+        builder.append(gid);
+        builder.append(", data=");
+        builder.append(data);
+        builder.append(", markerId=");
+        builder.append(markerId);
+        builder.append("]");
+        return builder.toString();
     }
     
     /* (non-Javadoc)

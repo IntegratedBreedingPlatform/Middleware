@@ -85,13 +85,23 @@ public class WorkFlowActivity implements Serializable{
     
     @Override
     public String toString() {
-        return "WorkflowActivity [activityId=" + activityId +
-                ", title=" + title +
-                ", owner=" + owner +
-                ", date=" + date +
-                ", dueDate=" + dueDate +
-                ", project=" + project +
-                ", status=" + status + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("WorkFlowActivity [activityId=");
+        builder.append(activityId);
+        builder.append(", title=");
+        builder.append(title);
+        builder.append(", owner=");
+        builder.append(owner);
+        builder.append(", date=");
+        builder.append(date);
+        builder.append(", dueDate=");
+        builder.append(dueDate);
+        builder.append(", project=");
+        builder.append(project);
+        builder.append(", status=");
+        builder.append(status);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

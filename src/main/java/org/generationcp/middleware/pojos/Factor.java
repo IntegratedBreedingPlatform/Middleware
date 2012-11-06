@@ -217,8 +217,27 @@ public class Factor implements Serializable{
 
     @Override
     public String toString() {
-        return "Factor [id=" + id + ", factorId=" + factorId + ", studyId=" + studyId + ", name=" + name + ", traitId=" + traitId
-                + ", scaleId=" + scaleId + ", methodId=" + methodId + ", dataType=" + dataType + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("Factor [id=");
+        builder.append(id);
+        builder.append(", factorId=");
+        builder.append(factorId);
+        builder.append(", studyId=");
+        builder.append(studyId);
+        builder.append(", name=");
+        builder.append(name);
+        builder.append(", traitId=");
+        builder.append(traitId);
+        builder.append(", scaleId=");
+        builder.append(scaleId);
+        builder.append(", methodId=");
+        builder.append(methodId);
+        builder.append(", dataType=");
+        builder.append(dataType);
+        builder.append(", tid=");
+        builder.append(tid);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

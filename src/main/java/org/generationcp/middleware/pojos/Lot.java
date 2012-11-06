@@ -187,8 +187,26 @@ public class Lot implements Serializable{
 
     @Override
     public String toString() {
-        return "Lot [id=" + id + ", userId=" + userId + ", entityType=" + entityType + ", entityId=" + entityId + ", locationId="
-                + locationId + ", scaleId=" + scaleId + ", status=" + status + ", comments=" + comments + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("Lot [");
+        builder.append(", userId=");
+        builder.append(userId);
+        builder.append(", entityType=");
+        builder.append(entityType);
+        builder.append(", entityId=");
+        builder.append(entityId);
+        builder.append(", locationId=");
+        builder.append(locationId);
+        builder.append(", scaleId=");
+        builder.append(scaleId);
+        builder.append(", status=");
+        builder.append(status);
+        builder.append(", source=");
+        builder.append(source);
+        builder.append(", comments=");
+        builder.append(comments);
+        builder.append("]");
+        return builder.toString();
     }
 
     @Override

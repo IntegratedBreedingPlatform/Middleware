@@ -84,7 +84,15 @@ public class Role implements Serializable{
 
     @Override
     public String toString() {
-        return "Role [roleId=" + roleId + ", name=" + name + ", workflowTemplate=" + workflowTemplate + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("Role [roleId=");
+        builder.append(roleId);
+        builder.append(", name=");
+        builder.append(name);
+        builder.append(", workflowTemplate=");
+        builder.append(workflowTemplate);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

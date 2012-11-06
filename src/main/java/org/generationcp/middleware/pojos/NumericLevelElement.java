@@ -68,8 +68,17 @@ public class NumericLevelElement implements Serializable{
 
     @Override
     public String toString() {
-        return "NumericLevelElement [ounitId=" + ounitId + ", factorId=" + factorId + ", factorName=" + factorName + ", value=" + value
-                + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("NumericLevelElement [ounitId=");
+        builder.append(ounitId);
+        builder.append(", factorId=");
+        builder.append(factorId);
+        builder.append(", factorName=");
+        builder.append(factorName);
+        builder.append(", value=");
+        builder.append(value);
+        builder.append("]");
+        return builder.toString();
     }
 
     @Override

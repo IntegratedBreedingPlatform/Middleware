@@ -168,16 +168,21 @@ public class MappingValueElement implements Serializable{
         this.markerType = markerType;
     }
     
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
-        return "MappingValueElement [datasetId=" + datasetId +
-                            ", mappingType=" + mappingPopType + 
-                            ", parentAGid=" + parentAGid +
-                            ", parentBGid=" + parentBGid + 
-                            ", markerType=" + markerType + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("MappingValueElement [datasetId=");
+        builder.append(datasetId);
+        builder.append(", mappingPopType=");
+        builder.append(mappingPopType);
+        builder.append(", parentAGid=");
+        builder.append(parentAGid);
+        builder.append(", parentBGid=");
+        builder.append(parentBGid);
+        builder.append(", markerType=");
+        builder.append(markerType);
+        builder.append("]");
+        return builder.toString();
     }
     
     /* (non-Javadoc)

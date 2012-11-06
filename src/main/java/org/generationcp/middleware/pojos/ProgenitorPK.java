@@ -86,7 +86,13 @@ public class ProgenitorPK implements Serializable{
 
     @Override
     public String toString() {
-        return "ProgntrsPK [gid=" + gid + ", pno=" + pno + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("ProgenitorPK [gid=");
+        builder.append(gid);
+        builder.append(", pno=");
+        builder.append(pno);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

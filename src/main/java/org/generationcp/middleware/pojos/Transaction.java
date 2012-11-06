@@ -207,9 +207,31 @@ public class Transaction implements Serializable{
 
     @Override
     public String toString() {
-        return "Transaction [id=" + id + ", userId=" + userId + ", lot=" + lot + ", date=" + date + ", status=" + status + ", quantity="
-                + quantity + ", comments=" + comments + ", sourceType=" + sourceType + ", sourceId=" + sourceId + ", sourceRecordId="
-                + sourceRecordId + ", previousAmount=" + previousAmount + ", personId=" + personId + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("Transaction [id=");
+        builder.append(id);
+        builder.append(", userId=");
+        builder.append(userId);
+        builder.append(", date=");
+        builder.append(date);
+        builder.append(", status=");
+        builder.append(status);
+        builder.append(", quantity=");
+        builder.append(quantity);
+        builder.append(", comments=");
+        builder.append(comments);
+        builder.append(", sourceType=");
+        builder.append(sourceType);
+        builder.append(", sourceId=");
+        builder.append(sourceId);
+        builder.append(", sourceRecordId=");
+        builder.append(sourceRecordId);
+        builder.append(", previousAmount=");
+        builder.append(previousAmount);
+        builder.append(", personId=");
+        builder.append(personId);
+        builder.append("]");
+        return builder.toString();
     }
 
     @Override

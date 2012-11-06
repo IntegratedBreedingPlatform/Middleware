@@ -42,7 +42,7 @@ public class WorkbenchDataset implements Serializable{
     @Basic(optional = false)
     @GeneratedValue
     @Column(name = "dataset_id")
-    private Long datasetId;
+    private Integer datasetId;
 
     /** The dataset name. */
     @Basic(optional = false)
@@ -84,7 +84,7 @@ public class WorkbenchDataset implements Serializable{
      * @param project the project
      * @param datasetType the dataset type
      */
-    public WorkbenchDataset(Long datasetId, String datasetName, String description, Date creationDate, Project project, DatasetType datasetType) {
+    public WorkbenchDataset(Integer datasetId, String datasetName, String description, Date creationDate, Project project, DatasetType datasetType) {
         this.datasetId = datasetId;
         this.name = datasetName;
         this.description = description;
@@ -105,7 +105,7 @@ public class WorkbenchDataset implements Serializable{
      *
      * @return the dataset id
      */
-    public Long getDatasetId() {
+    public Integer getDatasetId() {
         return datasetId;
     }
     
@@ -114,7 +114,7 @@ public class WorkbenchDataset implements Serializable{
      *
      * @param datasetId the new dataset id
      */
-    public void setDatasetId(Long datasetId) {
+    public void setDatasetId(Integer datasetId) {
         this.datasetId = datasetId;
     }
     
@@ -236,19 +236,22 @@ public class WorkbenchDataset implements Serializable{
         return new EqualsBuilder().append(datasetId, otherObj.datasetId).isEquals();
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Dataset [datasetId=").append(datasetId);
-        sb.append(", datasetName=").append(name);
-        sb.append(", description=").append(description);
-        sb.append(", creationDate=").append(creationDate);
-        sb.append(", project=").append(project);
-        sb.append(", datasetType=").append(datasetType);
-        sb.append("]");
-        return sb.toString();
+        StringBuilder builder = new StringBuilder();
+        builder.append("WorkbenchDataset [datasetId=");
+        builder.append(datasetId);
+        builder.append(", name=");
+        builder.append(name);
+        builder.append(", description=");
+        builder.append(description);
+        builder.append(", creationDate=");
+        builder.append(creationDate);
+        builder.append(", project=");
+        builder.append(project);
+        builder.append(", datasetType=");
+        builder.append(datasetType);
+        builder.append("]");
+        return builder.toString();
     }
 }

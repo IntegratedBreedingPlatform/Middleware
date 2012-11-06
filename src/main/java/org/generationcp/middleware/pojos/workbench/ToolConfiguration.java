@@ -42,7 +42,7 @@ public class ToolConfiguration implements Serializable{
     @GeneratedValue
     @Basic(optional = false)
     @Column(name = "config_id")
-    private Long configId;
+    private Integer configId;
     
     @OneToOne(optional = false)
     @JoinColumn(name = "tool_id")
@@ -56,11 +56,11 @@ public class ToolConfiguration implements Serializable{
     @Column(name = "config_value")
     private String configValue;
 
-    public Long getConfigId() {
+    public Integer getConfigId() {
         return configId;
     }
 
-    public void setConfigId(Long configId) {
+    public void setConfigId(Integer configId) {
         this.configId = configId;
     }
     
@@ -90,18 +90,17 @@ public class ToolConfiguration implements Serializable{
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("ToolConfiguration [configId=")
-          .append(configId)
-          .append(", tool=")
-          .append(tool)
-          .append(", configKey=")
-          .append(configKey)
-          .append(", configValue=")
-          .append(configValue)
-          .append("]");
-        
-        return sb.toString();
+        StringBuilder builder = new StringBuilder();
+        builder.append("ToolConfiguration [configId=");
+        builder.append(configId);
+        builder.append(", tool=");
+        builder.append(tool);
+        builder.append(", configKey=");
+        builder.append(configKey);
+        builder.append(", configValue=");
+        builder.append(configValue);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

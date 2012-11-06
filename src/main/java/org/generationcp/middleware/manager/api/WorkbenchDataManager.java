@@ -155,17 +155,19 @@ public interface WorkbenchDataManager{
      * Adds the person.
      *
      * @param person - the Person to add
+     * @return Returns the id of the {@code Person} record added
      * @throws MiddlewareQueryException
      */
-    public void addPerson(Person person) throws MiddlewareQueryException;
+    public Integer addPerson(Person person) throws MiddlewareQueryException;
     
     /**
      * Adds a user.
      *
      * @param user - the user to add
+     * @return Returns the id of the {@code User} record added
      * @throws MiddlewareQueryException
      */
-    public void addUser(User user) throws MiddlewareQueryException;
+    public Integer addUser(User user) throws MiddlewareQueryException;
     
     /**
      * Gets a project by id.
@@ -180,10 +182,10 @@ public interface WorkbenchDataManager{
      * Registers a workbench dataset.
      *
      * @param dataset - the workbench dataset to save
-     * @return the number of records saved (0 or 1)
+     * @return Returns the id of the {@code WorkbenchDataset} record added
      * @throws MiddlewareQueryException
      */
-    public int addWorkbenchDataset(WorkbenchDataset dataset) throws MiddlewareQueryException;
+    public Integer addWorkbenchDataset(WorkbenchDataset dataset) throws MiddlewareQueryException;
     
     /**
      * Gets the workbench dataset by id.
@@ -373,48 +375,47 @@ public interface WorkbenchDataManager{
      * @param project the project
      * @param user the user
      * @param role the role of the user in the project
-     * @return the number of records inserted
+     * @return Returns the id of the {@code ProjectUserRole} record added
      * @throws MiddlewareQueryException
      */
-    public int addProjectUserRole(Project project, User user, Role role) throws MiddlewareQueryException;
+    public Integer addProjectUserRole(Project project, User user, Role role) throws MiddlewareQueryException;
 
     /**
      * Adds a single workbench_project_user_role record.
      *
      * @param projectUserRole - the ProjectUserRole to save
-     * @return the number of records inserted
+     * @return Returns the id of the {@code ProjectUserRole} record added
      * @throws MiddlewareQueryException
      */
-    public int addProjectUserRole(ProjectUserRole projectUserRole) throws MiddlewareQueryException;
+    public Integer addProjectUserRole(ProjectUserRole projectUserRole) throws MiddlewareQueryException;
 
     /**
      * Adds multiple workbench_project_user_role records.
      *
      * @param projectUserRoles - the records to add
-     * @return the number of records inserted
+     * @return Returns the ids of the {@code ProjectUserRole} records added
      * @throws MiddlewareQueryException
      */
-    public int addProjectUserRoles(List<ProjectUserRole> projectUserRoles) throws MiddlewareQueryException;
+    public List<Integer> addProjectUserRole(List<ProjectUserRole> projectUserRoles) throws MiddlewareQueryException;
 
     /**
      * Adds a project location.
      *
      * @param projectLocationMap - the project location map
-     * @return the number of {@code ProjectLocationMap} records inserted
+     * @return the id of the {@code ProjectLocationMap} record inserted
      * in the database.
      * @throws MiddlewareQueryException
      */
-    public int addProjectLocationMap(ProjectLocationMap projectLocationMap) throws MiddlewareQueryException;
+    public Integer addProjectLocationMap(ProjectLocationMap projectLocationMap) throws MiddlewareQueryException;
     
     /**
      * Adds project locations.
      *
      * @param projectLocationMapList - the project location map list
-     * @return the number of {@code ProjectLocationMap} records inserted
-     * in the database.
+     * @return Returns the ids of the {@code ProjectLocationMap} record added
      * @throws MiddlewareQueryException
      */
-    public int addProjectLocationMap(List<ProjectLocationMap> projectLocationMapList) throws MiddlewareQueryException;
+    public List<Integer> addProjectLocationMap(List<ProjectLocationMap> projectLocationMapList) throws MiddlewareQueryException;
     
     
     /**
@@ -435,21 +436,19 @@ public interface WorkbenchDataManager{
      * Adds project method.
      *
      * @param projectMethod - the project method
-     * @return the number of {@code ProjectMethod} records inserted
-     * in the database.
+     * @return Returns the id of the {@code ProjectMethod} record added
      * @throws MiddlewareQueryException
      */
-    public int addProjectMethod(ProjectMethod projectMethod) throws MiddlewareQueryException;
+    public Integer addProjectMethod(ProjectMethod projectMethod) throws MiddlewareQueryException;
     
     /**
      * Adds project methods.
      *
      * @param projectMethodList - the project method list
-     * @return the number of {@code ProjectMethods} records inserted
-     * in the database.
+     * @return Returns the ids of the {@code ProjectUserRole} records added
      * @throws MiddlewareQueryException
      */
-    public int addProjectMethod(List<ProjectMethod> projectMethodList) throws MiddlewareQueryException;
+    public List<Integer> addProjectMethod(List<ProjectMethod> projectMethodList) throws MiddlewareQueryException;
 
     
     /**
@@ -476,21 +475,19 @@ public interface WorkbenchDataManager{
      * Adds a project activity.
      *
      * @param projectActivity - the project activity
-     * @return the number of {@code ProjectActivity} records inserted
-     * in the database.
+     * @return Returns the id of the {@code ProjectActivity} record added
      * @throws MiddlewareQueryException
      */
-    public int addProjectActivity(ProjectActivity projectActivity) throws MiddlewareQueryException;
+    public Integer addProjectActivity(ProjectActivity projectActivity) throws MiddlewareQueryException;
     
     /**
      * Adds project activities.
      *
      * @param projectActivityList - the project activity list
-     * @return the number of {@code ProjectActivity} records inserted
-     * in the database.
+     * @return Returns the ids of the {@code ProjectActivity} records added
      * @throws MiddlewareQueryException
      */
-    public int addProjectActivity(List<ProjectActivity> projectActivityList) throws MiddlewareQueryException;
+    public List<Integer> addProjectActivity(List<ProjectActivity> projectActivityList) throws MiddlewareQueryException;
     
     /**
      * Retrieves a workbench_project_user_role record by id.
@@ -557,10 +554,10 @@ public interface WorkbenchDataManager{
      * Add a crop type to the database.
      *
      * @param cropType - the crop type to add
-     * @return the number of records added
+     * @return Returns the id of the {@code CropType} record added
      * @throws MiddlewareQueryException
      */
-    public int addCropType(CropType cropType) throws MiddlewareQueryException;
+    public String addCropType(CropType cropType) throws MiddlewareQueryException;
 
     /**
      * Return a List of {@link ProjectActivity} records associated with a {@link Project}.
@@ -594,17 +591,19 @@ public interface WorkbenchDataManager{
      * Adds the tool configuration.
      *
      * @param toolConfig - the tool config to add
+     * @return Returns the id of the {@code ToolConfiguration} record added
      * @throws MiddlewareQueryException
      */
-    public void addToolConfiguration(ToolConfiguration toolConfig) throws MiddlewareQueryException;
+    public Integer addToolConfiguration(ToolConfiguration toolConfig) throws MiddlewareQueryException;
     
     /**
      * Update tool configuration.
      *
      * @param toolConfig - the tool config to update
+     * @return Returns the id of the updated {@code ToolConfiguration} record
      * @throws MiddlewareQueryException
      */
-    public void updateToolConfiguration(ToolConfiguration toolConfig) throws MiddlewareQueryException;
+    public Integer updateToolConfiguration(ToolConfiguration toolConfig) throws MiddlewareQueryException;
     
     /**
      * Delete tool configuration.
@@ -637,10 +636,10 @@ public interface WorkbenchDataManager{
      * Add a Workbench User and IBDB local database User mapping.
      *
      * @param userMap the user map
-     * @return the ibdb user map
+     * @return Returns the id of the {@code IbdbUserMap} record added
      * @throws MiddlewareQueryException
      */
-    public IbdbUserMap addIbdbUserMap(IbdbUserMap userMap) throws MiddlewareQueryException;
+    public Integer addIbdbUserMap(IbdbUserMap userMap) throws MiddlewareQueryException;
     
     /**
      * Returns the Local IBDB User ID given a combination of a Workbench User ID and a Project ID.
@@ -657,10 +656,10 @@ public interface WorkbenchDataManager{
      * Save or update the specified {@link WorkbenchRuntimeData}.
      * 
      * @param workbenchRuntimeData
-     * @return
+     * @return Returns the id of the updated {@code WorkbenchRuntimeData} record
      * @throws MiddlewareQueryException
      */
-    public WorkbenchRuntimeData updateWorkbenchRuntimeData(WorkbenchRuntimeData workbenchRuntimeData) throws MiddlewareQueryException;
+    public Integer updateWorkbenchRuntimeData(WorkbenchRuntimeData workbenchRuntimeData) throws MiddlewareQueryException;
     
     /**
      * 

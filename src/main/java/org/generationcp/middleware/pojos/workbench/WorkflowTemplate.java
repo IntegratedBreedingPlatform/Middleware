@@ -121,10 +121,11 @@ public class WorkflowTemplate implements Serializable{
 
         return new EqualsBuilder().append(templateId, otherObj.templateId).isEquals();
     }
-    
+
     @Override
     public String toString() {
-        StringBuffer stepsString = new StringBuffer();
+        
+        StringBuilder stepsString = new StringBuilder();
         stepsString.append("[");
         
         if (steps == null){
@@ -135,11 +136,19 @@ public class WorkflowTemplate implements Serializable{
             stepsString.append(step + " | ");
         }
         stepsString.append("]");
+
         
-        return "WorkflowTemplate [templateId=" + templateId +
-                ", name=" + name +
-                ", userDefined=" + userDefined +
-                ", steps=" + stepsString + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("WorkflowTemplate [templateId=");
+        builder.append(templateId);
+        builder.append(", name=");
+        builder.append(name);
+        builder.append(", userDefined=");
+        builder.append(userDefined);
+        builder.append(", steps=");
+        builder.append(stepsString);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

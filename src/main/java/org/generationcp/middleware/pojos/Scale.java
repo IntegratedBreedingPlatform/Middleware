@@ -94,7 +94,17 @@ public class Scale implements Serializable{
 
     @Override
     public String toString() {
-        return "Scale [id=" + id + ", name=" + name + ", traitId=" + traitId + ", type=" + type + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("Scale [id=");
+        builder.append(id);
+        builder.append(", name=");
+        builder.append(name);
+        builder.append(", traitId=");
+        builder.append(traitId);
+        builder.append(", type=");
+        builder.append(type);
+        builder.append("]");
+        return builder.toString();
     }
 
     @Override

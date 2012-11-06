@@ -115,25 +115,30 @@ public class GermplasmMarkerElement {
                 .append(markerNames, rhs.markerNames).isEquals();
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
-        StringBuffer markerNameBuf = new StringBuffer("[");
+        StringBuilder markerNamesBuf = new StringBuilder("[");
         for (String mName : markerNames){
             if (markerNames.indexOf(mName) != markerNames.size() - 1) {         // if not the last element on the list
-                markerNameBuf.append(mName).append(", ");
+                markerNamesBuf.append(mName).append(", ");
             } else {
-                markerNameBuf.append(mName).append("]");
+                markerNamesBuf.append(mName).append("]");
             }
         }
         if (markerNames.size() == 0) {  // if empty markerNames
-            markerNameBuf.append("]");
+            markerNamesBuf.append("]");
         }
-        
-        
-        return "GermplasmMarkerElement [germplasmName=" + germplasmName + ", markerNames=" + markerNameBuf.toString() + "]";
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("GermplasmMarkerElement [germplasmName=");
+        builder.append(germplasmName);
+        builder.append(", markerNames=");
+        builder.append(markerNamesBuf);
+        builder.append("]");
+        return builder.toString();
     }
+    
+    
+    
     
 }

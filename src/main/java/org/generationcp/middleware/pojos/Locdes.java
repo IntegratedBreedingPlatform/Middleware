@@ -161,7 +161,23 @@ public class Locdes implements Serializable{
 
     @Override
     public String toString() {
-        return "Locdes [ldid=" + ldid + ", dval=" + dval + ", ddate=" + ddate + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("Locdes [ldid=");
+        builder.append(ldid);
+        builder.append(", location=");
+        builder.append(location);
+        builder.append(", type=");
+        builder.append(type);
+        builder.append(", user=");
+        builder.append(user);
+        builder.append(", dval=");
+        builder.append(dval);
+        builder.append(", ddate=");
+        builder.append(ddate);
+        builder.append(", reference=");
+        builder.append(reference);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

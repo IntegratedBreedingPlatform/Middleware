@@ -145,13 +145,49 @@ public class TestInventoryDataManagerImpl{
         lot.setStatus(new Integer(0));
         lot.setUserId(new Integer(1));
 
-        int added = manager.addLot(lot);
-        Assert.assertTrue(added == 1);
+        Integer id = manager.addLot(lot);
+
+        if (lot.getId() != null) {
+            System.out.println("testAddLot() Added: " + id + "\n\t" + lot);
+        }
+        
+        //TODO: delete lot
+    }
+
+    @Test
+    public void testAddLots() throws Exception {
+        
+        List<Lot> lots = new ArrayList<Lot>();
+        
+        Lot lot = new Lot();
+        lot.setComments("sample added lot 1");
+        lot.setEntityId(new Integer(50533));
+        lot.setEntityType("GERMPLSM");
+        lot.setLocationId(new Integer(9001));
+        lot.setScaleId(new Integer(1538));
+        lot.setSource(null);
+        lot.setStatus(new Integer(0));
+        lot.setUserId(new Integer(1));        
+        lots.add(lot);
+
+        lot = new Lot();
+        lot.setComments("sample added lot 2");
+        lot.setEntityId(new Integer(50533));
+        lot.setEntityType("GERMPLSM");
+        lot.setLocationId(new Integer(9001));
+        lot.setScaleId(new Integer(1538));
+        lot.setSource(null);
+        lot.setStatus(new Integer(0));
+        lot.setUserId(new Integer(1));
+        lots.add(lot);
+
+        List<Integer> idList = manager.addLot(lots);
 
         if (lot.getId() != null) {
             System.out.println("testAddLot() Added: " + lot);
         }
 
+        //TODO: delete lots
     }
 
     @Test
@@ -160,9 +196,8 @@ public class TestInventoryDataManagerImpl{
         Lot lot = manager.getLotsByEntityType("GERMPLSM", 0, 5).get(0);
         String oldComment = lot.getComments();
         lot.setComments("update comment");
-        int update = manager.updateLot(lot);
-        Assert.assertTrue(update == 1);
-        System.out.println("testUpdateLot() RESULTS: " + "\n  Old comment: " + oldComment + "\n  New comment: " + lot.getComments());
+        Integer id = manager.updateLot(lot);
+        System.out.println("testUpdateLot() RESULTS: " + id + "\n  Old comment: " + oldComment + "\n  New comment: " + lot.getComments());
     }
 
     @Test
@@ -182,13 +217,60 @@ public class TestInventoryDataManagerImpl{
         transaction.setStatus(new Integer(1));
         transaction.setUserId(new Integer(1));
 
-        int added = manager.addTransaction(transaction);
-        Assert.assertTrue(added == 1);
+        manager.addTransaction(transaction);
 
         if (transaction.getId() != null) {
             System.out.println("testAddTransaction() Added: " + transaction);
         }
+        //TODO Delete transactions
+        
     }
+    
+    @Test
+    public void testAddTransactions() throws Exception {
+        // this test assumes there are existing lot records with entity type = GERMPLSM
+        
+        List<Transaction> transactions = new ArrayList<Transaction>();
+        Transaction transaction = new Transaction();
+        transaction.setComments("sample added transaction 1");
+        transaction.setDate(new Integer(20120413));
+        Lot lot = manager.getLotsByEntityType("GERMPLSM", 0, 5).get(0);
+        transaction.setLot(lot);
+        transaction.setPersonId(new Integer(1));
+        transaction.setPreviousAmount(null);
+        transaction.setQuantity(new Integer(100));
+        transaction.setSourceId(null);
+        transaction.setSourceRecordId(null);
+        transaction.setSourceType(null);
+        transaction.setStatus(new Integer(1));
+        transaction.setUserId(new Integer(1));
+        transactions.add(transaction);
+
+        transaction = new Transaction();
+        transaction.setComments("sample added transaction 2");
+        transaction.setDate(new Integer(20120413));
+        lot = manager.getLotsByEntityType("GERMPLSM", 0, 5).get(0);
+        transaction.setLot(lot);
+        transaction.setPersonId(new Integer(1));
+        transaction.setPreviousAmount(null);
+        transaction.setQuantity(new Integer(100));
+        transaction.setSourceId(null);
+        transaction.setSourceRecordId(null);
+        transaction.setSourceType(null);
+        transaction.setStatus(new Integer(1));
+        transaction.setUserId(new Integer(1));
+        transactions.add(transaction);
+
+        manager.addTransaction(transactions);
+
+        if (transactions.size() > 0 && transactions.get(0).getId() != null) {
+            System.out.println("testAddTransaction() Added: " + transaction);
+        }
+        
+        //TODO Delete transactions
+        
+    }
+
 
     @Test
     public void testUpdateTransaction() throws Exception {
@@ -199,11 +281,11 @@ public class TestInventoryDataManagerImpl{
         t.setComments("updated comment again");
         t.setStatus(new Integer(0));
 
-        int updated = manager.updateTransaction(t);
-        Assert.assertTrue(updated == 1);
+        manager.updateTransaction(t);
         System.out.println("testUpdateTransaction() RESULTS: " + "\n" + oldValues + "\n  New comment: " + t.getComments()
                 + ", new status: " + t.getStatus());
     }
+    
 
     @Test
     public void testGetTransactionsByLotId() throws Exception {

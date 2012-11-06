@@ -175,12 +175,31 @@ public class Contact implements Serializable{
     
     @Override
     public String toString() {
-        return "Contact [contactId=" + contactId +
-                ", title=" + title +
-                ", firstName=" + firstName +
-                ", lastName=" + lastName +
-                ", email=" + email +
-                ", phoneNumber=" + phoneNumber + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("Contact [contactId=");
+        builder.append(contactId);
+        builder.append(", title=");
+        builder.append(title);
+        builder.append(", firstName=");
+        builder.append(firstName);
+        builder.append(", lastName=");
+        builder.append(lastName);
+        builder.append(", email=");
+        builder.append(email);
+        builder.append(", phoneNumber=");
+        builder.append(phoneNumber);
+        builder.append(", institution=");
+        builder.append(institution);
+        builder.append(", address1=");
+        builder.append(address1);
+        builder.append(", address2=");
+        builder.append(address2);
+        builder.append(", skypeId=");
+        builder.append(skypeId);
+        builder.append(", description=");
+        builder.append(description);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

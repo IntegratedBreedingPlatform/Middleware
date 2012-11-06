@@ -162,9 +162,10 @@ public interface TraitDataManager{
      * Adds the trait method.
      *
      * @param traitmethod the traitmethod
+     * @return Returns the id of the {@code TraitMethod} record added
      * @throws MiddlewareQueryException the MiddlewareQueryException
      */
-    public void addTraitMethod(TraitMethod traitmethod) throws MiddlewareQueryException;
+    public Integer addTraitMethod(TraitMethod traitmethod) throws MiddlewareQueryException;
     
     /**
      * Delete trait method.

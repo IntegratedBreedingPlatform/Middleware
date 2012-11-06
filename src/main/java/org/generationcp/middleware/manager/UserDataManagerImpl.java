@@ -77,12 +77,13 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
     }
 
     @Override
-    public void addUser(User user) throws MiddlewareQueryException {
+    public Integer addUser(User user) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
 
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
+        Integer idUserSaved;
         try {
             // begin save transaction
             trans = session.beginTransaction();
@@ -93,7 +94,8 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
             Integer userId = dao.getNegativeId("userid");
             user.setUserid(userId);
 
-            dao.saveOrUpdate(user);
+            User recordSaved = dao.saveOrUpdate(user);
+            idUserSaved = recordSaved.getUserid();
 
             trans.commit();
         } catch (Exception e) {
@@ -106,6 +108,8 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
         } finally {
             session.flush();
         }
+        
+        return idUserSaved;
     }
 
     @Override
@@ -198,7 +202,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
     }
 
     @Override
-    public void addPerson(Person person) throws MiddlewareQueryException {
+    public Integer addPerson(Person person) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
 
         Session sessionForLocal = getCurrentSessionForLocal();
@@ -206,6 +210,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
         Session session = sessionForLocal;
         Transaction trans = null;
 
+        Integer idPersonSaved;
         try {
             // begin save transaction
             trans = session.beginTransaction();
@@ -216,7 +221,8 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
             Integer personId = dao.getNegativeId("id");
             person.setId(personId);
 
-            dao.saveOrUpdate(person);
+            Person recordSaved = dao.saveOrUpdate(person);
+            idPersonSaved = recordSaved.getId();
 
             trans.commit();
         } catch (Exception e) {
@@ -229,6 +235,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
         } finally {
             sessionForLocal.flush();
         }
+        return idPersonSaved;
     }
 
     @Override

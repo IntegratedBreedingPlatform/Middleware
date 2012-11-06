@@ -233,9 +233,35 @@ public class Country implements Serializable{
 
     @Override
     public String toString() {
-        return "Cntry [cntryid=" + cntryid + ", isonum=" + isonum + ", isotwo=" + isotwo + ", isothree=" + isothree + ", faothree="
-                + faothree + ", fips=" + fips + ", wb=" + wb + ", isofull=" + isofull + ", isoabbr=" + isoabbr + ", cont=" + cont
-                + ", scntry=" + scntry + ", ecntry=" + ecntry + ", cchange=" + cchange + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("Country [cntryid=");
+        builder.append(cntryid);
+        builder.append(", isonum=");
+        builder.append(isonum);
+        builder.append(", isotwo=");
+        builder.append(isotwo);
+        builder.append(", isothree=");
+        builder.append(isothree);
+        builder.append(", faothree=");
+        builder.append(faothree);
+        builder.append(", fips=");
+        builder.append(fips);
+        builder.append(", wb=");
+        builder.append(wb);
+        builder.append(", isofull=");
+        builder.append(isofull);
+        builder.append(", isoabbr=");
+        builder.append(isoabbr);
+        builder.append(", cont=");
+        builder.append(cont);
+        builder.append(", scntry=");
+        builder.append(scntry);
+        builder.append(", ecntry=");
+        builder.append(ecntry);
+        builder.append(", cchange=");
+        builder.append(cchange);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

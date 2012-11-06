@@ -162,10 +162,10 @@ public interface InventoryDataManager{
      * database.
      * 
      * @param lot
-     * @return number of Lot records added
+     * @return Returns the id of the {@code Lot} record added
      * @throws MiddlewareQueryException
      */
-    public int addLot(Lot lot) throws MiddlewareQueryException;
+    public Integer addLot(Lot lot) throws MiddlewareQueryException;
 
     /**
      * Given a List of valid Lot objects, add them as new records to the
@@ -173,20 +173,20 @@ public interface InventoryDataManager{
      * already present in the database.
      * 
      * @param lots
-     * @return number of Lot records added
+     * @return Returns the ids of the {@code Lot} records added
      * @throws MiddlewareQueryException
      */
-    public int addLot(List<Lot> lots) throws MiddlewareQueryException;
+    public List<Integer> addLot(List<Lot> lots) throws MiddlewareQueryException;
 
     /**
      * Given a valid Lot object which represents an existing record in the
      * database, update the record to the changes contained in the given object.
      * 
      * @param lot
-     * @return number of Lot records updated
+     * @return Returns the id of the updated {@code Lot} record
      * @throws MiddlewareQueryException
      */
-    public int updateLot(Lot lot) throws MiddlewareQueryException;
+    public Integer updateLot(Lot lot) throws MiddlewareQueryException;
 
     /**
      * Given a List of valid Lot objects, each of them representing an existing
@@ -194,39 +194,39 @@ public interface InventoryDataManager{
      * the given objects.
      * 
      * @param lots
-     * @return number of Lot records updated
+     * @return Returns the ids of the updated {@code Lot} records
      * @throws MiddlewareQueryException
      */
-    public int updateLot(List<Lot> lots) throws MiddlewareQueryException;
+    public List<Integer> updateLot(List<Lot> lots) throws MiddlewareQueryException;
 
     /**
      * Given a valid Transaction record, add it as a new record to the database.
      * 
      * @param transaction
-     * @return the number of Transaction records added
+     * @return Returns the id of the {@code Transaction} record added
      * @throws MiddlewareQueryException
      */
-    public int addTransaction(Transaction transaction) throws MiddlewareQueryException;
+    public Integer addTransaction(Transaction transaction) throws MiddlewareQueryException;
 
     /**
      * Given a List of valid Transaction records, add them as new records to the
      * database.
      * 
      * @param transactions
-     * @return the number of Transaction records added
+     * @return Returns the ids of the {@code Transaction} records added
      * @throws MiddlewareQueryException
      */
-    public int addTransaction(List<Transaction> transactions) throws MiddlewareQueryException;
+    public List<Integer> addTransaction(List<Transaction> transactions) throws MiddlewareQueryException;
 
     /**
      * Given a valid Transaction record, update the database to the changes from
      * the object. Note that the Lot can not be changed.
      * 
      * @param transaction
-     * @return the number of Transaction records updated
+     * @return Returns the id of the updated {@code Transaction} record
      * @throws MiddlewareQueryException
      */
-    public int updateTransaction(Transaction transaction) throws MiddlewareQueryException;
+    public Integer updateTransaction(Transaction transaction) throws MiddlewareQueryException;
 
     /**
      * Givan a List of valid Transaction objects, update their corresponding
@@ -234,10 +234,10 @@ public interface InventoryDataManager{
      * changed.
      * 
      * @param transactions
-     * @return the number of Transaction records updated
+     * @return Returns the ids of the updated {@code Transaction} records
      * @throws MiddlewareQueryException
      */
-    public int updateTransaction(List<Transaction> transactions) throws MiddlewareQueryException;
+    public List<Integer> updateTransaction(List<Transaction> transactions) throws MiddlewareQueryException;
 
     /**
      * Returns the Transaction object which represents the record identified by

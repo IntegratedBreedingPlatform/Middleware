@@ -256,16 +256,21 @@ public class CharValues implements Serializable{
         return new EqualsBuilder().appendSuper(super.equals(obj)).append(acId, rhs.acId).isEquals();
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
-        return "CharValues [acId=" + acId 
-                        + ", datasetId=" + datasetId 
-                        + ", markerId=" + markerId 
-                        + ", gId=" + gId 
-                        + ", charValue=" + charValue + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("CharValues [acId=");
+        builder.append(acId);
+        builder.append(", datasetId=");
+        builder.append(datasetId);
+        builder.append(", markerId=");
+        builder.append(markerId);
+        builder.append(", gId=");
+        builder.append(gId);
+        builder.append(", charValue=");
+        builder.append(charValue);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

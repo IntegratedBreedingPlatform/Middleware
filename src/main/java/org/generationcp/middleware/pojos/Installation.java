@@ -289,13 +289,43 @@ public class Installation implements Serializable{
 
     @Override
     public String toString() {
-        return "Installation [id=" + id + ", adminId=" + adminId + ", lastUpdateDate=" + lastUpdateDate + ", lastGermplasmUpdated="
-                + lastGermplasmUpdated + ", lastLocationUpdated=" + lastLocationUpdated + ", lastChangeRecordUpdated="
-                + lastChangeRecordUpdated + ", lastNameUpdated=" + lastNameUpdated + ", lastAttributeUpdated=" + lastAttributeUpdated
-                + ", lastLocationDescriptorUpdated=" + lastLocationDescriptorUpdated + ", lastMethodUpdated=" + lastMethodUpdated
-                + ", lastUserFieldUpdated=" + lastUserFieldUpdated + ", lastReferenceUpdated=" + lastReferenceUpdated
-                + ", lastPersonUpdated=" + lastPersonUpdated + ", lastListUpdated=" + lastListUpdated + ", description=" + description
-                + ", dmsStatus=" + dmsStatus + ", lastLrecUpdated=" + lastLrecUpdated + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("Installation [id=");
+        builder.append(id);
+        builder.append(", adminId=");
+        builder.append(adminId);
+        builder.append(", lastUpdateDate=");
+        builder.append(lastUpdateDate);
+        builder.append(", lastGermplasmUpdated=");
+        builder.append(lastGermplasmUpdated);
+        builder.append(", lastLocationUpdated=");
+        builder.append(lastLocationUpdated);
+        builder.append(", lastChangeRecordUpdated=");
+        builder.append(lastChangeRecordUpdated);
+        builder.append(", lastNameUpdated=");
+        builder.append(lastNameUpdated);
+        builder.append(", lastAttributeUpdated=");
+        builder.append(lastAttributeUpdated);
+        builder.append(", lastLocationDescriptorUpdated=");
+        builder.append(lastLocationDescriptorUpdated);
+        builder.append(", lastMethodUpdated=");
+        builder.append(lastMethodUpdated);
+        builder.append(", lastUserFieldUpdated=");
+        builder.append(lastUserFieldUpdated);
+        builder.append(", lastReferenceUpdated=");
+        builder.append(lastReferenceUpdated);
+        builder.append(", lastPersonUpdated=");
+        builder.append(lastPersonUpdated);
+        builder.append(", lastListUpdated=");
+        builder.append(lastListUpdated);
+        builder.append(", description=");
+        builder.append(description);
+        builder.append(", dmsStatus=");
+        builder.append(dmsStatus);
+        builder.append(", lastLrecUpdated=");
+        builder.append(lastLrecUpdated);
+        builder.append("]");
+        return builder.toString();
     }
     
     @Override

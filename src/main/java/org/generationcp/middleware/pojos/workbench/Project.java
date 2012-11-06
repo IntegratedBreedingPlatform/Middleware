@@ -259,19 +259,43 @@ public class Project implements Serializable{
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Project [");
-        sb.append("projectId=").append(projectId);
-        sb.append(", projectName=").append(projectName);
-        sb.append(", startDate=").append(startDate);
-        sb.append(", template=").append(template);
-        sb.append(", cropType=").append(cropType);
-        sb.append(", locaDbName=").append(centralDbName);
-        sb.append(", centralDbName=").append(localDbName);
-        sb.append(", templateModified=").append(templateModified);
-        sb.append(", lastOpenDate=").append(lastOpenDate);
-        sb.append("]");
-        return sb.toString();
+        StringBuilder builder = new StringBuilder();
+        builder.append("Project [projectId=");
+        builder.append(projectId);
+        builder.append(", projectName=");
+        builder.append(projectName);
+        builder.append(", startDate=");
+        builder.append(startDate);
+        builder.append(", userId=");
+        builder.append(userId);
+        builder.append(", template=");
+        builder.append(template);
+        builder.append(", cropType=");
+        builder.append(cropType);
+        builder.append(", localDbName=");
+        builder.append(localDbName);
+        builder.append(", centralDbName=");
+        builder.append(centralDbName);
+        builder.append(", templateModified=");
+        builder.append(templateModified);
+        builder.append(", lastOpenDate=");
+        builder.append(lastOpenDate);
+        builder.append(", steps=");
+        builder.append(steps);
+        builder.append(", members=");
+        builder.append(members);
+        builder.append(", methods=");
+        builder.append(methods);
+        builder.append(", locations=");
+        builder.append(locations);
+        builder.append(", action=");
+        builder.append(action);
+        builder.append(", status=");
+        builder.append(status);
+        builder.append(", owner=");
+        builder.append(owner);
+        builder.append("]");
+        return builder.toString();
     }
     
     

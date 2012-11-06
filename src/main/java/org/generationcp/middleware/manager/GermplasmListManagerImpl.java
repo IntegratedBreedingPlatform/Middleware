@@ -371,7 +371,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
         List<GermplasmList> list = new ArrayList<GermplasmList>();
         list.add(germplasmList);
         List<Integer> idList = addGermplasmList(list);
-        return idList.get(0);
+        return idList.size() > 0 ? idList.get(0) : null;
     }
 
     @Override
@@ -384,7 +384,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
         List<GermplasmList> list = new ArrayList<GermplasmList>();
         list.add(germplasmList);
         List<Integer> idList = updateGermplasmList(list);
-        return idList.get(0);
+        return idList.size() > 0 ? idList.get(0) : null;
     }
 
     @Override
@@ -504,30 +504,32 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     }
 
     @Override
-    public int addGermplasmListData(GermplasmListData germplasmListData) throws MiddlewareQueryException {
+    public Integer addGermplasmListData(GermplasmListData germplasmListData) throws MiddlewareQueryException {
         List<GermplasmListData> list = new ArrayList<GermplasmListData>();
         list.add(germplasmListData);
-        return addGermplasmListData(list);
+        List<Integer> ids = addGermplasmListData(list);
+        return ids.size() > 0 ? ids.get(0) : null;
     }
 
     @Override
-    public int addGermplasmListData(List<GermplasmListData> germplasmListDatas) throws MiddlewareQueryException {
+    public List<Integer> addGermplasmListData(List<GermplasmListData> germplasmListDatas) throws MiddlewareQueryException {
         return addOrUpdateGermplasmListData(germplasmListDatas, Operation.ADD);
     }
 
     @Override
-    public int updateGermplasmListData(GermplasmListData germplasmListData) throws MiddlewareQueryException {
+    public Integer updateGermplasmListData(GermplasmListData germplasmListData) throws MiddlewareQueryException {
         List<GermplasmListData> list = new ArrayList<GermplasmListData>();
         list.add(germplasmListData);
-        return updateGermplasmListData(list);
+        List<Integer> ids = updateGermplasmListData(list);
+        return ids.size() > 0 ? ids.get(0) : null;
     }
 
     @Override
-    public int updateGermplasmListData(List<GermplasmListData> germplasmListDatas) throws MiddlewareQueryException {
+    public List<Integer> updateGermplasmListData(List<GermplasmListData> germplasmListDatas) throws MiddlewareQueryException {
         return addOrUpdateGermplasmListData(germplasmListDatas, Operation.UPDATE);
     }
 
-    private int addOrUpdateGermplasmListData(List<GermplasmListData> germplasmListDatas, Operation operation)
+    private List<Integer> addOrUpdateGermplasmListData(List<GermplasmListData> germplasmListDatas, Operation operation)
             throws MiddlewareQueryException {
         Session sessionForLocal = getCurrentSessionForLocal();
 
@@ -540,6 +542,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
         Transaction trans = null;
 
         int germplasmListDataSaved = 0;
+        List<Integer> idGermplasmListDataSaved = new ArrayList<Integer>();
         try {
             // begin save transaction
             trans = session.beginTransaction();
@@ -557,7 +560,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
                     // exception if GermplasmList is a central DB record.
                     dao.validateId(germplasmListData);
                 }
-                dao.saveOrUpdate(germplasmListData);
+                GermplasmListData recordSaved = dao.saveOrUpdate(germplasmListData);
+                idGermplasmListDataSaved.add(recordSaved.getId());
                 germplasmListDataSaved++;
                 if (germplasmListDataSaved % JDBC_BATCH_SIZE == 0) {
                     // flush a batch of inserts and release memory
@@ -579,7 +583,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
             sessionForLocal.flush();
         }
 
-        return germplasmListDataSaved;
+        return idGermplasmListDataSaved;
     }
 
     @Override

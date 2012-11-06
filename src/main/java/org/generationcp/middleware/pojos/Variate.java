@@ -205,8 +205,27 @@ public class Variate implements Serializable{
 
     @Override
     public String toString() {
-        return "Variate [id=" + id + ", studyId=" + studyId + ", name=" + name + ", traitId=" + traitId + ", scaleId=" + scaleId
-                + ", methodId=" + methodId + ", dataType=" + dataType + ", type=" + type + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("Variate [id=");
+        builder.append(id);
+        builder.append(", studyId=");
+        builder.append(studyId);
+        builder.append(", name=");
+        builder.append(name);
+        builder.append(", traitId=");
+        builder.append(traitId);
+        builder.append(", scaleId=");
+        builder.append(scaleId);
+        builder.append(", methodId=");
+        builder.append(methodId);
+        builder.append(", dataType=");
+        builder.append(dataType);
+        builder.append(", type=");
+        builder.append(type);
+        builder.append(", tid=");
+        builder.append(tid);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

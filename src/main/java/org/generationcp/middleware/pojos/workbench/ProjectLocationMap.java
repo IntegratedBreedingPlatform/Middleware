@@ -42,7 +42,7 @@ public class ProjectLocationMap implements Serializable{
     @Basic(optional = false)
     @GeneratedValue
     @Column(name = "id")
-    private Long id;
+    private Integer id;
 
     @OneToOne(optional = false)
     @JoinColumn(name = "project_id")
@@ -52,11 +52,11 @@ public class ProjectLocationMap implements Serializable{
     @Column(name = "location_id")
     private Long locationId;
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
     
@@ -78,6 +78,14 @@ public class ProjectLocationMap implements Serializable{
 
     @Override
     public String toString() {
-        return "ProjectLocationMap [id=" + id + ", project=" + project + ", locationId=" + locationId + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("ProjectLocationMap [id=");
+        builder.append(id);
+        builder.append(", project=");
+        builder.append(project);
+        builder.append(", locationId=");
+        builder.append(locationId);
+        builder.append("]");
+        return builder.toString();
     }
 }

@@ -95,7 +95,7 @@ public class ProjectMethodDAO extends GenericDAO<ProjectMethod, Integer>{
             for (Object o : results) {
                 Object[] result = (Object[]) o;
                 if (result != null) {
-                    Long projectMethodId = Long.valueOf((Integer) result[0]);
+                    Integer projectMethodId = (Integer) result[0];
                     Integer methodId = (Integer) result[2];
                     ProjectMethod projectMethod = new ProjectMethod(projectMethodId, project, methodId);
                     toReturn.add(projectMethod);

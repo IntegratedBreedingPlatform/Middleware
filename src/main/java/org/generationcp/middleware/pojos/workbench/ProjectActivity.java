@@ -167,13 +167,21 @@ public class ProjectActivity implements Serializable{
     
     @Override
     public String toString() {
-        return "ProjectActivity [" +
-        		"projectActivityId=" + projectActivityId + 
-        		", project=" + project + 
-        		", name=" + name + 
-        		", description=" + description + 
-        		", user=" + user + 
-        		", date=" + date + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("ProjectActivity [projectActivityId=");
+        builder.append(projectActivityId);
+        builder.append(", project=");
+        builder.append(project);
+        builder.append(", name=");
+        builder.append(name);
+        builder.append(", description=");
+        builder.append(description);
+        builder.append(", user=");
+        builder.append(user);
+        builder.append(", date=");
+        builder.append(date);
+        builder.append("]");
+        return builder.toString();
     }
     
     

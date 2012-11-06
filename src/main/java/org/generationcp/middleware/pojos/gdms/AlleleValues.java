@@ -271,18 +271,23 @@ public class AlleleValues implements Serializable{
         return new EqualsBuilder().appendSuper(super.equals(obj)).append(anId, rhs.anId).isEquals();
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
-        return "AlleleValues " +
-        		"[anId=" + anId + 
-        		", datasetId=" + datasetId + 
-        		", gId=" + gId + 
-        		", markerId=" + markerId + 
-        		", alleleBinValue=" + alleleBinValue + 
-        		", alleleRawValue=" + alleleRawValue + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("AlleleValues [anId=");
+        builder.append(anId);
+        builder.append(", datasetId=");
+        builder.append(datasetId);
+        builder.append(", gId=");
+        builder.append(gId);
+        builder.append(", markerId=");
+        builder.append(markerId);
+        builder.append(", alleleBinValue=");
+        builder.append(alleleBinValue);
+        builder.append(", alleleRawValue=");
+        builder.append(alleleRawValue);
+        builder.append("]");
+        return builder.toString();
     }
     
 }

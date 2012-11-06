@@ -96,7 +96,15 @@ public class NumericLevelPK implements Serializable{
 
     @Override
     public String toString() {
-        return "NumericLevelPK [labelId=" + labelId + ", factorId=" + factorId + ", levelNumber=" + levelNumber + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("NumericLevelPK [labelId=");
+        builder.append(labelId);
+        builder.append(", factorId=");
+        builder.append(factorId);
+        builder.append(", levelNumber=");
+        builder.append(levelNumber);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

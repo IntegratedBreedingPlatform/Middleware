@@ -21,17 +21,17 @@ public class WorkbenchRuntimeData implements Serializable {
     @Basic(optional = false)
     @GeneratedValue
     @Column(name = "id")
-    private Long id;
+    private Integer id;
     
     @Basic(optional = true)
     @Column(name = "user_id")
     private Integer userId;
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long runtimeDataId) {
+    public void setId(Integer runtimeDataId) {
         this.id = runtimeDataId;
     }
 
@@ -67,7 +67,13 @@ public class WorkbenchRuntimeData implements Serializable {
 
     @Override
     public String toString() {
-        return "WorkbenchRuntimeData [id=" + id + ", userId=" + userId + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("WorkbenchRuntimeData [id=");
+        builder.append(id);
+        builder.append(", userId=");
+        builder.append(userId);
+        builder.append("]");
+        return builder.toString();
     }
     
     

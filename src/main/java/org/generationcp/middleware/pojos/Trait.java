@@ -183,8 +183,25 @@ public class Trait implements Serializable{
 
     @Override
     public String toString() {
-        return "Trait [id=" + id + ", traitId=" + traitId + ", name=" + name + ", abbreviation=" + abbreviation + ", descripton="
-                + descripton + ", mainScale=" + standardScale + ", mainMethod=" + standardMethod + ", status=" + nameStatus + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("Trait [id=");
+        builder.append(id);
+        builder.append(", traitId=");
+        builder.append(traitId);
+        builder.append(", name=");
+        builder.append(name);
+        builder.append(", abbreviation=");
+        builder.append(abbreviation);
+        builder.append(", descripton=");
+        builder.append(descripton);
+        builder.append(", standardScale=");
+        builder.append(standardScale);
+        builder.append(", standardMethod=");
+        builder.append(standardMethod);
+        builder.append(", nameStatus=");
+        builder.append(nameStatus);
+        builder.append("]");
+        return builder.toString();
     }
 
 }
