@@ -219,6 +219,47 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
+    public List<Study> getStudyByCountry(String country, int start, int numOfRows, Operation op, Database instance)
+            throws MiddlewareQueryException {
+
+        StudyDAO dao = new StudyDAO();
+        Session session = getSession(instance);
+
+        if (session != null) {
+            dao.setSession(session);
+        } else {
+            return new ArrayList<Study>();
+        }
+
+        List<Study> studyList = null;
+        if (op == Operation.EQUAL) {
+            studyList = dao.getByCountryUsingEqual(country, start, numOfRows);
+        } else if (op == Operation.LIKE) {
+            studyList = dao.getByCountryUsingLike(country, start, numOfRows);
+        }
+
+        return studyList;
+
+    }
+
+
+    @Override
+    public long countStudyByCountry(String country, Operation op, Database instance) throws MiddlewareQueryException {
+
+        StudyDAO dao = new StudyDAO();
+        Session session = getSession(instance);
+
+        if (session != null) {
+            dao.setSession(session);
+        } else {
+            return 0;
+        }
+
+        return dao.countByCountry(country, op);
+
+    }
+    
+    @Override
     public Study getStudyByID(Integer id) throws MiddlewareQueryException {
         StudyDAO dao = new StudyDAO();
         Session session = getSession(id);

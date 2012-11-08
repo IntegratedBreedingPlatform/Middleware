@@ -105,6 +105,48 @@ public interface StudyDataManager{
      */
     public long countStudyByName(String name, Operation op, Database instance) throws MiddlewareQueryException;
 
+
+    /**
+     * Returns the study records matching the given country
+     * 
+     * @param country
+     *            - search string (pattern or exact match) for the country of the
+     *            study
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
+     * @param op
+     *            - can be EQUAL like LIKE For LIKE operation, the parameter
+     *            name may include the following: "%" - to indicate 0 or more
+     *            characters in the pattern "_" - to indicate any single
+     *            character in the pattern
+     * @param instance
+     *            - can be CENTRAL or LOCAL
+     * @return List of Study POJOs
+     * @throws MiddlewareQueryException
+     */
+    public List<Study> getStudyByCountry(String country, int start, int numOfRows, Operation op, Database instance) throws MiddlewareQueryException;
+
+    /**
+     * Returns the count of the study records of the given country
+     * 
+     * @param name
+     *            - search string (pattern or exact match) for the country of the
+     *            study
+     * @param op
+     *            - can be EQUAL like LIKE For LIKE operation, the parameter
+     *            name may include the following: "%" - to indicate 0 or more
+     *            characters in the pattern "_" - to indicate any single
+     *            character in the pattern
+     * @param instance
+     *            - can be CENTRAL or LOCAL
+     * @return number of Study records matching the given criteria
+     * @throws MiddlewareQueryException
+     */
+    public long countStudyByCountry(String name, Operation op, Database instance) throws MiddlewareQueryException;
+
     /**
      * Returns the study records matching the given sdate
      * 

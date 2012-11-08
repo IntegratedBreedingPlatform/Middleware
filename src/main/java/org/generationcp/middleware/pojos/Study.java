@@ -25,7 +25,8 @@ import javax.persistence.Table;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-@NamedQueries({ @NamedQuery(name = "getStudyByNameUsingEqual", query = "SELECT s FROM Study s WHERE s.name = :name"),
+@NamedQueries({ 
+        @NamedQuery(name = "getStudyByNameUsingEqual", query = "SELECT s FROM Study s WHERE s.name = :name"),
         @NamedQuery(name = "getStudyBySDateUsingEqual", query = "SELECT s FROM Study s WHERE s.startDate = :startDate"),
         @NamedQuery(name = "getStudyByEDateUsingEqual", query = "SELECT s FROM Study s WHERE s.endDate = :endDate"),
         @NamedQuery(name = "getStudyByNameUsingLike", query = "SELECT s FROM Study s WHERE s.name LIKE :name"),
@@ -33,7 +34,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
         @NamedQuery(name = "countStudyBySDateUsingEqual", query = "SELECT COUNT(s) FROM Study s WHERE s.startDate = :startDate"),
         @NamedQuery(name = "countStudyByEDateUsingEqual", query = "SELECT COUNT(s) FROM Study s WHERE s.endDate = :endDate"),
         @NamedQuery(name = "countStudyByNameUsingLike", query = "SELECT COUNT(s) FROM Study s WHERE s.name LIKE :name")
-
 })
 @Entity
 @Table(name = "study")
@@ -49,6 +49,30 @@ public class Study implements Serializable{
     public static final String COUNT_BY_NAME_USING_LIKE = "countStudyByNameUsingLike";
     public static final String COUNT_BY_SDATE_USING_EQUAL = "countStudyBySDateUsingEqual";
     public static final String COUNT_BY_EDATE_USING_EQUAL = "countStudyByEDateUsingEqual";
+
+    public static final String GET_BY_COUNTRY_USING_EQUAL = 
+            "SELECT DISTINCT {s.*} FROM Study s JOIN Locdes ld ON s.userid = ld.duid " +
+            "                       JOIN Location l ON ld.locid = l.locid " +
+            "                       JOIN Cntry c on l.cntryid = c.cntryid " +
+            "WHERE c.isofull = :country";
+    
+    public static final String GET_BY_COUNTRY_USING_LIKE = 
+            "SELECT DISTINCT {s.*} FROM Study s JOIN Locdes ld ON s.userid = ld.duid " +
+            "                       JOIN Location l ON ld.locid = l.locid " +
+            "                       JOIN Cntry c on l.cntryid = c.cntryid " +
+            "WHERE c.isofull LIKE :country";
+    
+    public static final String COUNT_BY_COUNTRY_USING_EQUAL = 
+            "SELECT COUNT(DISTINCT s.studyid) FROM Study s JOIN Locdes ld ON s.userid = ld.duid " +
+            "                       JOIN Location l ON ld.locid = l.locid " +
+            "                       JOIN Cntry c on l.cntryid = c.cntryid " +
+            "WHERE c.isofull = :country";
+    
+    public static final String COUNT_BY_COUNTRY_USING_LIKE = 
+            "SELECT COUNT(DISTINCT s.studyid) FROM Study s JOIN Locdes ld ON s.userid = ld.duid " +
+            "                       JOIN Location l ON ld.locid = l.locid " +
+            "                       JOIN Cntry c on l.cntryid = c.cntryid " +
+            "WHERE c.isofull LIKE :country";
 
     @Id
     @Basic(optional = false)

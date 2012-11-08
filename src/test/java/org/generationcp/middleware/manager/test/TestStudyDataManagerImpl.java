@@ -134,6 +134,35 @@ public class TestStudyDataManagerImpl{
         }
     }
 
+    
+
+    @Test
+    public void testGetStudyByCountryUsingLike() throws Exception {
+        String country = "Arme%";
+        List<Study> studyList = manager.getStudyByCountry(country, 0, 5, Operation.LIKE, Database.CENTRAL);
+        System.out.println("testGetStudyByCountryUsingLike(" + country + ") RESULTS: ");
+        for (Study study : studyList) {
+            System.out.println("  " + study);
+        }
+    }
+
+    @Test
+    public void testGetStudyByCountryUsingEqual() throws Exception {
+        String country = "Armenia";
+        List<Study> studyList = manager.getStudyByCountry(country, 0, 5, Operation.EQUAL, Database.CENTRAL);
+        System.out.println("testGetStudyByCountryUsingEqual(" + country + ") RESULTS: ");
+        for (Study study : studyList) {
+            System.out.println("  " + study);
+        }
+    }
+
+    @Test
+    public void testCountStudyByCountry() throws Exception {
+        String country = "Arme%";
+        long count = manager.countStudyByCountry(country, Operation.LIKE, Database.CENTRAL);
+        System.out.println("testCountStudyByCountry(" + country + "): " + count);
+    }
+
     @Test
     public void testCountStudyByEDate() throws Exception {
         Integer edate = 2004;

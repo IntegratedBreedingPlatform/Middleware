@@ -12,14 +12,17 @@
 
 package org.generationcp.middleware.dao;
 
+import java.math.BigInteger;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Study;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -91,6 +94,55 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
 
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error with countByName(name=" + name + ", operation=" + operation + ") query from Study: "
+                    + e.getMessage(), e);
+        }
+
+    }    
+
+    @SuppressWarnings("unchecked")
+    public List<Study> getByCountryUsingEqual(String country, int start, int numOfRows) throws MiddlewareQueryException {
+        try {
+            SQLQuery query = getSession().createSQLQuery(Study.GET_BY_COUNTRY_USING_EQUAL);
+            query.setParameter("country", country);
+            query.addEntity("s", Study.class);
+            query.setFirstResult(start);
+            query.setMaxResults(numOfRows);
+
+            return query.list();
+
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getByCountryUsingEqual(country=" + country + ") query from Study: " + e.getMessage(), e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Study> getByCountryUsingLike(String country, int start, int numOfRows) throws MiddlewareQueryException {
+        try {
+            SQLQuery query = getSession().createSQLQuery(Study.GET_BY_COUNTRY_USING_LIKE);
+            query.setParameter("country", country);
+            query.addEntity("s", Study.class);
+            query.setFirstResult(start);
+            query.setMaxResults(numOfRows);
+
+            return query.list();
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getByCountryUsingLike(country=" + country + ") query from Study: " + e.getMessage(), e);
+        }
+    }
+
+    public long countByCountry(String country, Operation operation) throws MiddlewareQueryException {
+
+        try {
+            // if operation == null or operation = Operation.EQUAL
+            Query query = getSession().createSQLQuery(Study.COUNT_BY_COUNTRY_USING_EQUAL);
+            if (operation == Operation.LIKE) {
+                query = getSession().createSQLQuery(Study.COUNT_BY_COUNTRY_USING_LIKE);
+            }
+            query.setParameter("country", country);
+            return ((BigInteger) query.uniqueResult()).longValue();
+
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with countByCountry(country=" + country + ", operation=" + operation + ") query from Study: "
                     + e.getMessage(), e);
         }
 
