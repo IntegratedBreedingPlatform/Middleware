@@ -90,32 +90,38 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 
             return query.list();
 
-            /**
-             * Criteria criteria = getSession().createCriteria(Germplasm.class);
-             * Criteria nameCriteria = criteria.createCriteria("names");
-             * 
-             * if(operation == null || operation == Operation.EQUAL)
-             * nameCriteria.add(Restrictions.eq("nval", name)); else if(operation ==
-             * Operation.LIKE) nameCriteria.add(Restrictions.like("nval", name));
-             * 
-             * if(status != null && status != 0)
-             * nameCriteria.add(Restrictions.eq("nstat", status));
-             * 
-             * if(type != null) { Criteria typeCriteria =
-             * nameCriteria.createCriteria("type"); Integer typeid =
-             * type.getUserDefinedFieldID();
-             * typeCriteria.add(Restrictions.eq("fldno", typeid)); }
-             * 
-             * criteria.setFirstResult(start); criteria.setMaxResults(numOfRows);
-             * return criteria.list();
-             **/
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error with getByName(name=" + name + ") query from Germplasm: " + e.getMessage(), e);
         }
 
     }
 
-    public BigInteger countByName(String name, Operation operation, Integer status, GermplasmNameType type) throws MiddlewareQueryException {
+    @SuppressWarnings("unchecked")    
+    public List<Germplasm> getByName(List<String> names, int start, int numOfRows) throws MiddlewareQueryException {
+        try {            
+            String originalName = names.get(0);
+            String standardizedName = names.get(1);
+            String noSpaceName = names.get(2);
+
+            SQLQuery query = getSession().createSQLQuery(Germplasm.GET_BY_NAME_ALL_MODES);
+            query.setParameter("name", originalName);
+            query.setParameter("noSpaceName", noSpaceName);
+            query.setParameter("standardizedName", standardizedName);
+            query.addEntity("g", Germplasm.class);
+
+            query.setFirstResult(start);
+            query.setMaxResults(numOfRows);
+
+            return query.list();
+
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getByName(names=" + names + ") query from Germplasm: "
+                    + e.getMessage(), e);
+        }
+    }
+
+
+    public long countByName(String name, Operation operation, Integer status, GermplasmNameType type) throws MiddlewareQueryException {
         try {
             StringBuilder queryString = new StringBuilder();
             queryString.append("SELECT COUNT(DISTINCT g.gid) FROM germplsm g JOIN names n ON g.gid = n.gid WHERE ");
@@ -145,29 +151,30 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
                 query.setParameter("ntype", Integer.valueOf(type.getUserDefinedFieldID()));
             }
 
-            return (BigInteger) query.uniqueResult();
-
-            /**
-             * Criteria criteria = getSession().createCriteria(Germplasm.class);
-             * criteria.setProjection(Projections.rowCount()); Criteria nameCriteria
-             * = criteria.createCriteria("names");
-             * 
-             * if(operation == null || operation == Operation.EQUAL)
-             * nameCriteria.add(Restrictions.eq("nval", name)); else if(operation ==
-             * Operation.LIKE) nameCriteria.add(Restrictions.like("nval", name));
-             * 
-             * if(status != null && status != 0)
-             * nameCriteria.add(Restrictions.eq("nstat", status));
-             * 
-             * if(type != null) { Criteria typeCriteria =
-             * nameCriteria.createCriteria("type"); Integer typeid =
-             * type.getUserDefinedFieldID();
-             * typeCriteria.add(Restrictions.eq("fldno", typeid)); }
-             * 
-             * return ((Long) criteria.uniqueResult()).longValue();
-             **/
+            return ((BigInteger) query.uniqueResult()).longValue();
+            
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error with countByName(name=" + name + ") query from Germplasm: " + e.getMessage(), e);
+        }
+    }
+    
+    public long countByName(List<String> names) throws MiddlewareQueryException {
+        try {
+            
+            String originalName = names.get(0);
+            String standardizedName = names.get(1);
+            String noSpaceName = names.get(2);
+
+            SQLQuery query = getSession().createSQLQuery(Germplasm.COUNT_BY_NAME_ALL_MODES);
+            query.setParameter("name", originalName);
+            query.setParameter("noSpaceName", noSpaceName);
+            query.setParameter("standardizedName", standardizedName);
+
+            return ((BigInteger) query.uniqueResult()).longValue();
+
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with countByName(names=" + names + ") query from Germplasm: "
+                    + e.getMessage(), e);
         }
     }
 

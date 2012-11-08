@@ -526,19 +526,74 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         if (mode == GetGermplasmByNameModes.NORMAL) {
             nameToUse = name;
         } else if (mode == GetGermplasmByNameModes.SPACES_REMOVED) {
-            StringTokenizer tokenizer = new StringTokenizer(name);
-            StringBuffer nameWithSpacesRemoved = new StringBuffer();
-            while (tokenizer.hasMoreTokens()) {
-                nameWithSpacesRemoved.append(tokenizer.nextToken());
-            }
+            String nameWithSpacesRemoved = GermplasmDataManagerImpl.removeSpaces(name);
             nameToUse = nameWithSpacesRemoved.toString();
         } else if (mode == GetGermplasmByNameModes.STANDARDIZED) {
-            String standardizedName = GermplasmDataManagerImpl.standardaizeName(name);
+            String standardizedName = GermplasmDataManagerImpl.standardizeName(name);
             nameToUse = standardizedName;
         }
 
         germplasms = dao.getByName(nameToUse, start, numOfRows, op, status, type);
         return germplasms;
+    }
+
+    
+    @Override
+    public List<Germplasm> getGermplasmByName(String name, int start, int numOfRows) throws MiddlewareQueryException {
+
+        List<String> names = new ArrayList<String>();
+        names.add(name);
+        names.add(GermplasmDataManagerImpl.standardizeName(name));
+        names.add(GermplasmDataManagerImpl.removeSpaces(name));
+
+        GermplasmDAO dao = new GermplasmDAO();
+        List<Germplasm> germplasms = new ArrayList<Germplasm>();
+
+        long centralCount = 0;
+        long localCount = 0;
+        long relativeLimit = 0;
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            centralCount = dao.countByName(names);
+
+            if (centralCount > start) {
+                germplasms.addAll(dao.getByName(names, start, numOfRows));
+                relativeLimit = numOfRows - (centralCount - start);
+                if (relativeLimit > 0) {
+                    if (sessionForLocal != null) {
+                        dao.setSession(sessionForLocal);
+                        localCount = dao.countByName(names);
+                        if (localCount > 0) {
+                            germplasms.addAll(dao.getByName(names, 0, (int) relativeLimit));
+                        }
+                    }
+                }
+
+            } else {
+                relativeLimit = start - centralCount;
+                if (sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countByName(names);
+                    if (localCount > relativeLimit) {
+                        germplasms.addAll(dao.getByName(names, (int) relativeLimit, numOfRows));
+                    }
+                }
+            }
+
+        } else if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            localCount = dao.countByName(names);
+            if (localCount > start) {
+                germplasms.addAll(dao.getByName(names, start, numOfRows));
+            }
+        }
+
+        return germplasms;
+
     }
 
     @Override
@@ -550,14 +605,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         if (mode == GetGermplasmByNameModes.NORMAL) {
             nameToUse = name;
         } else if (mode == GetGermplasmByNameModes.SPACES_REMOVED) {
-            StringTokenizer tokenizer = new StringTokenizer(name);
-            StringBuffer nameWithSpacesRemoved = new StringBuffer();
-            while (tokenizer.hasMoreTokens()) {
-                nameWithSpacesRemoved.append(tokenizer.nextToken());
-            }
+            String nameWithSpacesRemoved = GermplasmDataManagerImpl.removeSpaces(name);
             nameToUse = nameWithSpacesRemoved.toString();
         } else if (mode == GetGermplasmByNameModes.STANDARDIZED) {
-            String standardizedName = GermplasmDataManagerImpl.standardaizeName(name);
+            String standardizedName = GermplasmDataManagerImpl.standardizeName(name);
             nameToUse = standardizedName;
         }
 
@@ -572,7 +623,34 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             return 0;
         }
 
-        count = dao.countByName(nameToUse, op, status, type).intValue();
+        count = dao.countByName(nameToUse, op, status, type);
+        return count;
+    }
+
+    @Override
+    public long countGermplasmByName(String name) throws MiddlewareQueryException {
+
+        List<String> names = new ArrayList<String>();
+        names.add(name);
+        names.add(GermplasmDataManagerImpl.standardizeName(name));
+        names.add(GermplasmDataManagerImpl.removeSpaces(name));
+        
+        GermplasmDAO dao = new GermplasmDAO();
+        long count = 0L;
+        
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            count += dao.countByName(names);
+        }
+
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            count += dao.countByName(names);
+        }
+
         return count;
     }
 
@@ -1560,7 +1638,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
      * @param name
      * @return the standardized germplasm name
      */
-    public static String standardaizeName(String name) {
+    public static String standardizeName(String name) {
         String toreturn = name.trim();
 
         // a) Capitalize all letters
@@ -1781,6 +1859,18 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         return toreturn;
     }
 
+    
+    private static String removeSpaces(String string){
+        StringTokenizer tokenizer = new StringTokenizer(string);
+        StringBuffer withSpacesRemoved = new StringBuffer();
+        while (tokenizer.hasMoreTokens()) {
+            withSpacesRemoved.append(tokenizer.nextToken());
+        }
+        return withSpacesRemoved.toString();
+   }
+
+
+    
     /**
      * Returns true if the given char is considered a special character based on
      * ICIS Germplasm Name standardization rules. Returns false otherwise.

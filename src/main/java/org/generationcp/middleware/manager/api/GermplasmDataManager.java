@@ -79,6 +79,23 @@ public interface GermplasmDataManager {
             Integer status, GermplasmNameType type, Database instance) throws MiddlewareQueryException;
 
     /**
+     * Searches for all germplasm records which matches the given name. 
+     * It will match records having the following names: (1) the given name as it is, 
+     * (2) the name with standardization performed on it, and (3) name with spaces removed.
+     * 
+     * @param name
+     *            - search string for the name of the germplasm
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
+     * @return List of Germplasm POJOs
+     * @throws MiddlewareQueryException
+     */
+    public List<Germplasm> getGermplasmByName(String name, int start, int numOfRows) throws MiddlewareQueryException;
+
+    /**
      * Returns the number of germplasm records with any name matching the given
      * parameter. Search modes can also be specified like in using the
      * getGermplasmByName() method.
@@ -111,6 +128,20 @@ public interface GermplasmDataManager {
     public long countGermplasmByName(String name, GetGermplasmByNameModes mode, Operation op, Integer status, GermplasmNameType type,
             Database instance) throws MiddlewareQueryException;
 
+    /**
+     * Returns the number of germplasm records with any name matching the given
+     * parameter. 
+     * It will count records having the following names: (1) the given name as it is, 
+     * (2) the name with standardization performed on it, and (3) name with spaces removed.
+     * 
+     * @param name
+     *            - search string for the name of the germplasm
+     *            
+     * @return number of germplasm records
+     * @throws MiddlewareQueryException
+     */
+    public long countGermplasmByName(String name) throws MiddlewareQueryException;
+    
     /**
      * Returns the germplasm records that were created at the locations with
      * names matching the given parameter.

@@ -23,7 +23,7 @@ public class TestGermplasmNameStandardization{
         String parameter = "I-1RT  /  P 001 A-23 / ";
         String expectedResult = "I-1RT/P 1 A-23/";
 
-        String result = GermplasmDataManagerImpl.standardaizeName(parameter);
+        String result = GermplasmDataManagerImpl.standardizeName(parameter);
         System.out.println("testNameStandardization(" + parameter + ") RESULTS: " + result);
         Assert.assertTrue(result.equals(expectedResult));
     }

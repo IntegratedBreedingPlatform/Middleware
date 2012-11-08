@@ -13,7 +13,6 @@
 package org.generationcp.middleware.manager.test;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -180,6 +179,17 @@ public class TestGermplasmDataManagerImpl{
     }
 
     @Test
+    public void testGetGermplasmByNameOriginalStandardizedAndNoSpace() throws Exception {
+        String name = "IR  65";
+        List<Germplasm> germplasmList = manager.getGermplasmByName(name, 0, new Long(manager.countGermplasmByName(name)).intValue());
+
+        System.out.println("testGetGermplasmByNameOriginalStandardizedAndNoSpace(" + name + ") RESULTS: " + germplasmList.size());
+        for (Germplasm g : germplasmList) {
+            System.out.println("  " + g);
+        }
+    }
+
+    @Test
     public void testCountGermplasmByName() throws Exception {
         String name = "IR 10";
         long start = System.currentTimeMillis();
@@ -187,6 +197,13 @@ public class TestGermplasmDataManagerImpl{
         System.out.println("testCountGermplasmByName(" + name + ") RESULTS: " + count);
         long end = System.currentTimeMillis();
         System.out.println("  QUERY TIME: " + (end - start) + " ms");
+    }
+
+    @Test
+    public void testCountGermplasmByNameOriginalStandardizedAndNoSpace() throws Exception {
+        String name = "IR  65";
+        long count = manager.countGermplasmByName(name);
+        System.out.println("testCountGermplasmByNameOriginalStandardizedAndNoSpace(" + name + ") RESULTS: " + count);
     }
 
     @Test
