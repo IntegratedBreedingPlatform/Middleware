@@ -19,6 +19,7 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -88,8 +89,11 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
     @SuppressWarnings("unchecked")
     public List<GermplasmList> getAllTopLevelLists(int start, int numOfRows) throws MiddlewareQueryException {
         try {
+            Criterion topFolder = Restrictions.eq("parent.id", 0);
+            Criterion nullFolder = Restrictions.isNull("parent");
+            
             Criteria criteria = getSession().createCriteria(GermplasmList.class);
-            criteria.add(Restrictions.eq("parent.id", 0));
+            criteria.add(Restrictions.or(topFolder, nullFolder));
             criteria.setFirstResult(start);
             criteria.setMaxResults(numOfRows);
             return criteria.list();
