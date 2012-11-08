@@ -103,7 +103,47 @@ public class TestStudyDataManagerImpl{
         System.out.println("testCountStudyByName(" + name + "): " + count);
         System.out.println("  QUERY TIME: " + (end - start) + " ms");
     }
+    
+    @Test
+    public void testGetStudyBySDateUsingEqual() throws Exception {
+        Integer sdate = 20050119;
+        List<Study> studyList = manager.getStudyBySDate(sdate, 0, 2, Operation.EQUAL, Database.CENTRAL);
+        System.out.println("testGetStudyBySDateUsingEqual(" + sdate + ") RESULTS: ");
+        for (Study study : studyList) {
+            System.out.println("  " + study);
+        }
+    }
 
+    @Test
+    public void testCountStudyBySDate() throws Exception {
+        Integer sdate = 20050119;
+        long start = System.currentTimeMillis();
+        long count = manager.countStudyBySDate(sdate, Operation.LIKE, Database.CENTRAL);
+        long end = System.currentTimeMillis();
+        System.out.println("testCountStudyBySDate(" + sdate + "): " + count);
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
+    }
+
+    @Test
+    public void testGetStudyByEDateUsingEqual() throws Exception {
+        Integer edate = 2004;
+        List<Study> studyList = manager.getStudyByEDate(edate, 0, 2, Operation.EQUAL, Database.CENTRAL);
+        System.out.println("testGetStudyByEDateUsingEqual(" + edate + ") RESULTS: ");
+        for (Study study : studyList) {
+            System.out.println("  " + study);
+        }
+    }
+
+    @Test
+    public void testCountStudyByEDate() throws Exception {
+        Integer edate = 2004;
+        long start = System.currentTimeMillis();
+        long count = manager.countStudyByEDate(edate, Operation.LIKE, Database.CENTRAL);
+        long end = System.currentTimeMillis();
+        System.out.println("testCountStudyByEDate(" + edate + "): " + count);
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
+    }
+    
     @Test
     public void testGetStudyByID() throws Exception {
         Integer id = Integer.valueOf(714);

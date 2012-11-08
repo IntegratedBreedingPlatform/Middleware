@@ -26,8 +26,12 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @NamedQueries({ @NamedQuery(name = "getStudyByNameUsingEqual", query = "SELECT s FROM Study s WHERE s.name = :name"),
+        @NamedQuery(name = "getStudyBySDateUsingEqual", query = "SELECT s FROM Study s WHERE s.startDate = :startDate"),
+        @NamedQuery(name = "getStudyByEDateUsingEqual", query = "SELECT s FROM Study s WHERE s.endDate = :endDate"),
         @NamedQuery(name = "getStudyByNameUsingLike", query = "SELECT s FROM Study s WHERE s.name LIKE :name"),
         @NamedQuery(name = "countStudyByNameUsingEqual", query = "SELECT COUNT(s) FROM Study s WHERE s.name = :name"),
+        @NamedQuery(name = "countStudyBySDateUsingEqual", query = "SELECT COUNT(s) FROM Study s WHERE s.startDate = :startDate"),
+        @NamedQuery(name = "countStudyByEDateUsingEqual", query = "SELECT COUNT(s) FROM Study s WHERE s.endDate = :endDate"),
         @NamedQuery(name = "countStudyByNameUsingLike", query = "SELECT COUNT(s) FROM Study s WHERE s.name LIKE :name")
 
 })
@@ -38,9 +42,13 @@ public class Study implements Serializable{
     private static final long serialVersionUID = -8809692556025457504L;
 
     public static final String GET_BY_NAME_USING_EQUAL = "getStudyByNameUsingEqual";
+    public static final String GET_BY_SDATE_USING_EQUAL = "getStudyBySDateUsingEqual";
+    public static final String GET_BY_EDATE_USING_EQUAL = "getStudyByEDateUsingEqual";
     public static final String GET_BY_NAME_USING_LIKE = "getStudyByNameUsingLike";
     public static final String COUNT_BY_NAME_USING_EQUAL = "countStudyByNameUsingEqual";
     public static final String COUNT_BY_NAME_USING_LIKE = "countStudyByNameUsingLike";
+    public static final String COUNT_BY_SDATE_USING_EQUAL = "countStudyBySDateUsingEqual";
+    public static final String COUNT_BY_EDATE_USING_EQUAL = "countStudyByEDateUsingEqual";
 
     @Id
     @Basic(optional = false)

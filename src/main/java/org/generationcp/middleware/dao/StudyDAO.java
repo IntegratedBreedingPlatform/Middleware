@@ -37,6 +37,33 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
             throw new MiddlewareQueryException("Error with getByNameUsingEqual(name=" + name + ") query from Study: " + e.getMessage(), e);
         }
     }
+    
+    @SuppressWarnings("unchecked")
+    public List<Study> getBySDateUsingEqual(Integer sdate, int start, int numOfRows) throws MiddlewareQueryException {
+        try {
+            Query query = getSession().getNamedQuery(Study.GET_BY_SDATE_USING_EQUAL);
+            query.setParameter("startDate", sdate);
+            query.setFirstResult(start);
+            query.setMaxResults(numOfRows);
+            return (List<Study>) query.list();
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getBySDateUsingEqual(sdate=" + sdate + ") query from Study: " + e.getMessage(), e);
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<Study> getByEDateUsingEqual(Integer edate, int start, int numOfRows) throws MiddlewareQueryException {
+        try {
+            Query query = getSession().getNamedQuery(Study.GET_BY_EDATE_USING_EQUAL);
+            query.setParameter("endDate", edate);
+            query.setFirstResult(start);
+            query.setMaxResults(numOfRows);
+            return (List<Study>) query.list();
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getByEDateUsingEqual(sdate=" + edate + ") query from Study: " + e.getMessage(), e);
+        }
+    }
+    
 
     @SuppressWarnings("unchecked")
     public List<Study> getByNameUsingLike(String name, int start, int numOfRows) throws MiddlewareQueryException {
@@ -64,6 +91,38 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
 
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error with countByName(name=" + name + ", operation=" + operation + ") query from Study: "
+                    + e.getMessage(), e);
+        }
+
+    }
+    
+    public long countBySDate(Integer sdate, Operation operation) throws MiddlewareQueryException {
+
+        try {
+            // if operation == null or operation = Operation.EQUAL
+            Query query = getSession().getNamedQuery(Study.COUNT_BY_SDATE_USING_EQUAL);
+
+            query.setParameter("startDate", sdate);
+            return ((Long) query.uniqueResult()).longValue();
+
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with countBySDate(sdate=" + sdate + ", operation=" + operation + ") query from Study: "
+                    + e.getMessage(), e);
+        }
+
+    }
+    
+    public long countByEDate(Integer edate, Operation operation) throws MiddlewareQueryException {
+
+        try {
+            // if operation == null or operation = Operation.EQUAL
+            Query query = getSession().getNamedQuery(Study.COUNT_BY_EDATE_USING_EQUAL);
+
+            query.setParameter("endDate", edate);
+            return ((Long) query.uniqueResult()).longValue();
+
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with countByEDate(edate=" + edate + ", operation=" + operation + ") query from Study: "
                     + e.getMessage(), e);
         }
 

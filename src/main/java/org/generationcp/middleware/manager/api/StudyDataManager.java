@@ -106,6 +106,76 @@ public interface StudyDataManager{
     public long countStudyByName(String name, Operation op, Database instance) throws MiddlewareQueryException;
 
     /**
+     * Returns the study records matching the given sdate
+     * 
+     * @param sdate
+     *            - search string (exact match) for the sdate of the
+     *            study
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
+     * @param op
+     *            - can be EQUAL
+     * @param instance
+     *            - can be CENTRAL or LOCAL
+     * @return List of Study POJOs
+     * @throws MiddlewareQueryException
+     */
+    public List<Study> getStudyBySDate(Integer sdate, int start, int numOfRows, Operation op, Database instance) throws MiddlewareQueryException;
+
+    /**
+     * Returns the study records matching the given sdate
+     * 
+     * @param sdate
+     *            - search string (exact match) for the sdate of the
+     *            study
+     * @param op
+     *            - can be EQUAL
+     * @param instance
+     *            - can be CENTRAL or LOCAL
+     * @return number of Study records matching the given criteria
+     * @throws MiddlewareQueryException
+     */
+    public long countStudyBySDate(Integer sdate, Operation op, Database instance) throws MiddlewareQueryException;
+    
+    /**
+     * Returns the study records matching the given sdate
+     * 
+     * @param sdate
+     *            - search string (exact match) for the sdate of the
+     *            study
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
+     * @param op
+     *            - can be EQUAL
+     * @param instance
+     *            - can be CENTRAL or LOCAL
+     * @return List of Study POJOs
+     * @throws MiddlewareQueryException
+     */
+    public List<Study> getStudyByEDate(Integer edate, int start, int numOfRows, Operation op, Database instance) throws MiddlewareQueryException;
+
+    /**
+     * Returns the study records matching the given edate
+     * 
+     * @param edate
+     *            - search string (exact match) for the edate of the
+     *            study
+     * @param op
+     *            - can be EQUAL
+     * @param instance
+     *            - can be CENTRAL or LOCAL
+     * @return number of Study records matching the given criteria
+     * @throws MiddlewareQueryException
+     */
+    public long countStudyByEDate(Integer edate, Operation op, Database instance) throws MiddlewareQueryException;
+    
+    /**
      * Retrieves a Study record of the given id
      * 
      * @param id

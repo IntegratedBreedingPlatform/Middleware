@@ -140,6 +140,83 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         return dao.countByName(name, op);
 
     }
+    
+    @Override
+    public List<Study> getStudyBySDate(Integer sdate, int start, int numOfRows, Operation op, Database instance)
+            throws MiddlewareQueryException {
+
+        StudyDAO dao = new StudyDAO();
+        Session session = getSession(instance);
+
+        if (session != null) {
+            dao.setSession(session);
+        } else {
+            return new ArrayList<Study>();
+        }
+
+        List<Study> studyList = null;
+        if (op == Operation.EQUAL) {
+            studyList = dao.getBySDateUsingEqual(sdate, start, numOfRows);
+        }
+
+        return studyList;
+
+    }
+
+    @Override
+    public long countStudyBySDate(Integer sdate, Operation op, Database instance) throws MiddlewareQueryException {
+
+        StudyDAO dao = new StudyDAO();
+        Session session = getSession(instance);
+
+        if (session != null) {
+            dao.setSession(session);
+        } else {
+            return 0;
+        }
+
+        return dao.countBySDate(sdate, op);
+
+    }
+    
+    
+    @Override
+    public List<Study> getStudyByEDate(Integer edate, int start, int numOfRows, Operation op, Database instance)
+            throws MiddlewareQueryException {
+
+        StudyDAO dao = new StudyDAO();
+        Session session = getSession(instance);
+
+        if (session != null) {
+            dao.setSession(session);
+        } else {
+            return new ArrayList<Study>();
+        }
+
+        List<Study> studyList = null;
+        if (op == Operation.EQUAL) {
+            studyList = dao.getByEDateUsingEqual(edate, start, numOfRows);
+        }
+
+        return studyList;
+
+    }
+
+    @Override
+    public long countStudyByEDate(Integer edate, Operation op, Database instance) throws MiddlewareQueryException {
+
+        StudyDAO dao = new StudyDAO();
+        Session session = getSession(instance);
+
+        if (session != null) {
+            dao.setSession(session);
+        } else {
+            return 0;
+        }
+
+        return dao.countByEDate(edate, op);
+
+    }
 
     @Override
     public Study getStudyByID(Integer id) throws MiddlewareQueryException {
