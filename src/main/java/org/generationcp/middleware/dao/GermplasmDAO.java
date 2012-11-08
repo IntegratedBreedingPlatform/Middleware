@@ -433,14 +433,30 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
                     "Error with getManagementNeighbors(gid=" + gid + ") query from Germplasm: " + e.getMessage(), e);
         }
     }
+    
+    public long countGroupRelatives(Integer gid) throws MiddlewareQueryException {
+        try {
+            SQLQuery query = getSession().createSQLQuery(Germplasm.COUNT_GROUP_RELATIVES);
+            query.setParameter("gid", gid);
+            
+            BigInteger count = (BigInteger) query.uniqueResult();
+            return count.longValue();
+        }
+        catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with countGroupRelatives(gid=" + gid + ") query from Germplasm: " + e.getMessage(), e);
+        }
+    }
 
-    public List<Germplasm> getGroupRelatives(Integer gid) throws MiddlewareQueryException {
+    public List<Germplasm> getGroupRelatives(Integer gid, int start, int numRows) throws MiddlewareQueryException {
         try {
             List<Germplasm> toreturn = new ArrayList<Germplasm>();
             SQLQuery query = getSession().createSQLQuery(Germplasm.GET_GROUP_RELATIVES);
             query.addEntity("g", Germplasm.class);
             query.addEntity("n", Name.class);
             query.setParameter("gid", gid);
+            
+            query.setFirstResult(start);
+            query.setMaxResults(numRows);
 
             for (Object resultObject : query.list()) {
                 Object[] result = (Object[]) resultObject;

@@ -142,7 +142,9 @@ public class TestGermplasmPedigreeQueries{
     @Test
     public void testGetGroupRelatives() throws Exception {
         Integer gid = Integer.valueOf(1);
-        List<Germplasm> neighbors = manager.getGroupRelatives(gid);
+        
+        long count = manager.countGroupRelatives(gid);
+        List<Germplasm> neighbors = manager.getGroupRelatives(gid, 0, (int) count);
 
         System.out.println("testGetGroupRelatives(" + gid + ") RESULTS:");
         for (Germplasm g : neighbors) {

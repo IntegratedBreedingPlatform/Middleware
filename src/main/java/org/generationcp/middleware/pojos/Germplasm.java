@@ -235,6 +235,11 @@ public class Germplasm implements Serializable{
             "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 " +
                                     "JOIN germplsm g2 ON g.gpid1 = g2.gpid1 " +
             "WHERE g.gnpgs = -1 AND g.gid <> :gid AND g2.gid = :gid";
+    public static final String COUNT_GROUP_RELATIVES = 
+        "SELECT COUNT(g.gid) " +
+        "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 " +
+                                "JOIN germplsm g2 ON g.gpid1 = g2.gpid1 " +
+        "WHERE g.gnpgs = -1 AND g.gid <> :gid AND g2.gid = :gid";
     // public static final String GET_DERIVATIVE_CHILDREN =
     // "getGermplasmDerivativeChildren";
     public static final String GET_DERIVATIVE_CHILDREN = 

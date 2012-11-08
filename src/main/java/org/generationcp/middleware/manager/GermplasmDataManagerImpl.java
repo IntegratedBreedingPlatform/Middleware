@@ -2075,7 +2075,22 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     @Override
-    public List<Germplasm> getGroupRelatives(Integer gid) throws MiddlewareQueryException {
+    public long countGroupRelatives(Integer gid) throws MiddlewareQueryException {
+        GermplasmDAO dao = new GermplasmDAO();
+
+        Session session = getSession(gid);
+
+        if (session != null) {
+            dao.setSession(session);
+        } else {
+            return 0;
+        }
+        
+        return dao.countGroupRelatives(gid);
+    }
+    
+    @Override
+    public List<Germplasm> getGroupRelatives(Integer gid, int start, int numRows) throws MiddlewareQueryException {
         GermplasmDAO dao = new GermplasmDAO();
 
         Session session = getSession(gid);
@@ -2086,7 +2101,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             return new ArrayList<Germplasm>();
         }
 
-        List<Germplasm> relatives = dao.getGroupRelatives(gid);
+        List<Germplasm> relatives = dao.getGroupRelatives(gid, start, numRows);
         return relatives;
     }
 

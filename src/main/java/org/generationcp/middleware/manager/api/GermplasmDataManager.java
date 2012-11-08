@@ -843,6 +843,15 @@ public interface GermplasmDataManager {
     public List<Germplasm> getManagementNeighbors(Integer gid) throws MiddlewareQueryException;
 
     /**
+     * Returns the number of group relatives a Germplasm has.
+     * 
+     * @param gid
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    public long countGroupRelatives(Integer gid) throws MiddlewareQueryException;
+                                             
+    /**
      * Returns the Germplasm which are group relatives of the Germplasm
      * identified by the given GID. The Germplasm POJOs included in the results
      * come with their preferred names which can be accessed by calling
@@ -852,7 +861,7 @@ public interface GermplasmDataManager {
      * @return List of Germplasm POJOs
      * @throws MiddlewareQueryException
      */
-    public List<Germplasm> getGroupRelatives(Integer gid) throws MiddlewareQueryException;
+    public List<Germplasm> getGroupRelatives(Integer gid, int start, int numRows) throws MiddlewareQueryException;
 
     /**
      * Returns the generation history of the Germplasm identified by the given
