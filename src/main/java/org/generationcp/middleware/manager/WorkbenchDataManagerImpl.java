@@ -82,6 +82,13 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         projectDao.setSession(getCurrentSession());
         return projectDao.getAll(start, numOfRows);
     }
+    
+    @Override
+    public List<Project> getProjectsByUser(User user) throws MiddlewareQueryException {
+        ProjectUserRoleDAO dao = new ProjectUserRoleDAO();
+        dao.setSession(getCurrentSession());
+        return dao.getProjectsByUser(user);
+    }
 
     @Override
     public Project saveOrUpdateProject(Project project) throws MiddlewareQueryException {

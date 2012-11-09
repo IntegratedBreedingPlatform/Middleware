@@ -58,6 +58,15 @@ public interface WorkbenchDataManager{
      * @throws MiddlewareQueryException
      */
     public List<Project> getProjects(int start, int numOfRows)  throws MiddlewareQueryException;
+    
+    /**
+     * Gets the list of Projects that the specified User is associated with.
+     *
+     * @param user - the User associated with the projects to be retrieved
+     * @return the projects which the specified user is involved
+     * @throws MiddlewareQueryException
+     */
+    public List<Project> getProjectsByUser(User user)  throws MiddlewareQueryException;
 
     /**
      * Save or update project.

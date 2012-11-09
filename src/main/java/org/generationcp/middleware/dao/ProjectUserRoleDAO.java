@@ -25,6 +25,7 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -182,5 +183,18 @@ public class ProjectUserRoleDAO extends GenericDAO<ProjectUserRole, Integer>{
                 + ") query from Role: " + e.getMessage(), e);
         }
 
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<Project> getProjectsByUser(User user) throws MiddlewareQueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(ProjectUserRole.class);
+            criteria.add(Restrictions.eq("userId", user.getUserid()));
+            criteria.setProjection(Projections.distinct(Projections.property("project")));
+            return criteria.list();
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error in getProjectsByUser(user=" + user
+                + ") query from Project: " + e.getMessage(), e);
+        }
     }
 }
