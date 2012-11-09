@@ -837,11 +837,27 @@ public interface GermplasmDataManager {
      * Germplasm.getPreferredName().
      * 
      * @param gid
+     *            - gid of the Germplasm
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
      * @return List of Germplasm POJOs
      * @throws MiddlewareQueryException
      */
-    public List<Germplasm> getManagementNeighbors(Integer gid) throws MiddlewareQueryException;
-
+    public List<Germplasm> getManagementNeighbors(Integer gid, int start, int numOfRows) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Returns the number of management neighbors of the Germplasm with the given id.
+     * 
+     * @param gid - the Germplasm id
+     * @return the number of management neighbors
+     * @throws MiddlewareQueryException
+     */
+    public long countManagementNeighbors(Integer gid) throws MiddlewareQueryException;
+    
     /**
      * Returns the number of group relatives a Germplasm has.
      * 

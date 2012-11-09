@@ -2050,28 +2050,69 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     @Override
-    public List<Germplasm> getManagementNeighbors(Integer gid) throws MiddlewareQueryException {
+    public List<Germplasm> getManagementNeighbors(Integer gid, int start, int numOfRows) throws MiddlewareQueryException {
+        GermplasmDAO dao = new GermplasmDAO();
+        List<Germplasm> germplasms = new ArrayList<Germplasm>();
+
+        long centralCount = 0;
+        long localCount = 0;
+        long relativeLimit = 0;
+
         Session sessionForCentral = getCurrentSessionForCentral();
         Session sessionForLocal = getCurrentSessionForLocal();
 
-        List<Germplasm> neighbors = new ArrayList<Germplasm>();
-        GermplasmDAO dao = new GermplasmDAO();
-        if (gid < 0 && sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
-            neighbors = dao.getManagementNeighbors(gid);
-            return neighbors;
-        } else if (gid > 0 && sessionForCentral != null) {
+        if (sessionForCentral != null) {
             dao.setSession(sessionForCentral);
-            neighbors = dao.getManagementNeighbors(gid);
+            centralCount = dao.countManagementNeighbors(gid);
 
-            if (sessionForLocal != null) {
-                GermplasmDAO localDao = new GermplasmDAO();
-                localDao.setSession(sessionForLocal);
-                neighbors.addAll(localDao.getManagementNeighbors(gid));
+            if (centralCount > start) {
+                germplasms.addAll(dao.getManagementNeighbors(gid, start, numOfRows));
+                relativeLimit = numOfRows - (centralCount - start);
+                if (relativeLimit > 0) {
+                    if (sessionForLocal != null) {
+                        dao.setSession(sessionForLocal);
+                        localCount = dao.countManagementNeighbors(gid);
+                        if (localCount > 0) {
+                            germplasms.addAll(dao.getManagementNeighbors(gid, 0, (int) relativeLimit));
+                        }
+                    }
+                }
+
+            } else {
+                relativeLimit = start - centralCount;
+                if (sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countManagementNeighbors(gid);
+                    if (localCount > relativeLimit) {
+                        germplasms.addAll(dao.getManagementNeighbors(gid, (int) relativeLimit, numOfRows));
+                    }
+                }
+            }
+
+        } else if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            localCount = dao.countManagementNeighbors(gid);
+            if (localCount > start) {
+                germplasms.addAll(dao.getManagementNeighbors(gid, start, numOfRows));
             }
         }
 
-        return neighbors;
+        return germplasms;
+    }
+
+    
+    public long countManagementNeighbors(Integer gid) throws MiddlewareQueryException{
+        GermplasmDAO dao = new GermplasmDAO();
+
+        Session session = getSession(gid);
+
+        if (session != null) {
+            dao.setSession(session);
+        } else {
+            return 0;
+        }
+        
+        return dao.countManagementNeighbors(gid);
     }
 
     @Override

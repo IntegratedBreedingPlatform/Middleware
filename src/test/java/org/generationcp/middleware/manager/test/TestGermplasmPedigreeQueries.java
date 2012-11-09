@@ -130,9 +130,10 @@ public class TestGermplasmPedigreeQueries{
     @Test
     public void testGetManagementNeighbors() throws Exception {
         Integer gid = Integer.valueOf(625);
-        List<Germplasm> neighbors = manager.getManagementNeighbors(gid);
+        int count = (int) manager.countManagementNeighbors(gid);
+        List<Germplasm> neighbors = manager.getManagementNeighbors(gid, 0, count);
 
-        System.out.println("testGetManagementNeighbors(" + gid + ") RESULTS:");
+        System.out.println("testGetManagementNeighbors(" + gid + ") RESULTS: " + count);
         for (Germplasm g : neighbors) {
             String name = g.getPreferredName() != null ? g.getPreferredName().getNval() : null;
             System.out.println("  " + g.getGid() + " : " + name);

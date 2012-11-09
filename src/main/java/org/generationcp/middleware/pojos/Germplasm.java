@@ -230,6 +230,10 @@ public class Germplasm implements Serializable{
             "WHERE g.mgid = :gid";
     // public static final String GET_GROUP_RELATIVES =
     // "getGermplasmGroupRelatives";
+    public static final String COUNT_MANAGEMENT_NEIGHBORS = 
+            "SELECT COUNT(g.gid) " +
+            "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 " +
+            "WHERE g.mgid = :gid";
     public static final String GET_GROUP_RELATIVES = 
             "SELECT {g.*}, {n.*} " +
             "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 " +
