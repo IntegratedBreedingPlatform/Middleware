@@ -142,6 +142,38 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
     
     @Override
+    public List<Study> getStudyBySeason(Season season, int start, int numOfRows, Database instance) throws MiddlewareQueryException{
+        
+        StudyDAO dao = new StudyDAO();
+        Session session = getSession(instance);
+
+        if (session != null) {
+            dao.setSession(session);
+        } else {
+            return new ArrayList<Study>();
+        }
+
+        return dao.getBySeason(season, start, numOfRows);
+
+    }
+
+    @Override
+    public long countStudyBySeason(Season season, Database instance) throws MiddlewareQueryException{
+
+        StudyDAO dao = new StudyDAO();
+        Session session = getSession(instance);
+
+        if (session != null) {
+            dao.setSession(session);
+        } else {
+            return 0;
+        }
+
+        return dao.countBySeason(season);
+
+    }
+
+    @Override
     public List<Study> getStudyBySDate(Integer sdate, int start, int numOfRows, Operation op, Database instance)
             throws MiddlewareQueryException {
 

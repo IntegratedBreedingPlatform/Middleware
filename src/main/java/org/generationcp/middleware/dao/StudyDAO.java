@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Study;
 import org.hibernate.Criteria;
@@ -40,7 +41,7 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
             throw new MiddlewareQueryException("Error with getByNameUsingEqual(name=" + name + ") query from Study: " + e.getMessage(), e);
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     public List<Study> getBySDateUsingEqual(Integer sdate, int start, int numOfRows) throws MiddlewareQueryException {
         try {
@@ -50,10 +51,11 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
             query.setMaxResults(numOfRows);
             return (List<Study>) query.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getBySDateUsingEqual(sdate=" + sdate + ") query from Study: " + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error with getBySDateUsingEqual(sdate=" + sdate + ") query from Study: " + e.getMessage(),
+                    e);
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     public List<Study> getByEDateUsingEqual(Integer edate, int start, int numOfRows) throws MiddlewareQueryException {
         try {
@@ -63,10 +65,10 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
             query.setMaxResults(numOfRows);
             return (List<Study>) query.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByEDateUsingEqual(sdate=" + edate + ") query from Study: " + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error with getByEDateUsingEqual(sdate=" + edate + ") query from Study: " + e.getMessage(),
+                    e);
         }
     }
-    
 
     @SuppressWarnings("unchecked")
     public List<Study> getByNameUsingLike(String name, int start, int numOfRows) throws MiddlewareQueryException {
@@ -97,7 +99,7 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
                     + e.getMessage(), e);
         }
 
-    }    
+    }
 
     @SuppressWarnings("unchecked")
     public List<Study> getByCountryUsingEqual(String country, int start, int numOfRows) throws MiddlewareQueryException {
@@ -111,7 +113,8 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
             return query.list();
 
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByCountryUsingEqual(country=" + country + ") query from Study: " + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error with getByCountryUsingEqual(country=" + country + ") query from Study: "
+                    + e.getMessage(), e);
         }
     }
 
@@ -126,7 +129,8 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
 
             return query.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByCountryUsingLike(country=" + country + ") query from Study: " + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error with getByCountryUsingLike(country=" + country + ") query from Study: "
+                    + e.getMessage(), e);
         }
     }
 
@@ -142,12 +146,51 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
             return ((BigInteger) query.uniqueResult()).longValue();
 
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countByCountry(country=" + country + ", operation=" + operation + ") query from Study: "
-                    + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error with countByCountry(country=" + country + ", operation=" + operation
+                    + ") query from Study: " + e.getMessage(), e);
         }
 
     }
-    
+
+    @SuppressWarnings("unchecked")
+    public List<Study> getBySeason(Season season, int start, int numOfRows) throws MiddlewareQueryException {
+        try {
+            SQLQuery query = getSession().createSQLQuery(Study.GET_BY_SEASON);
+            
+            if (season == Season.DRY){
+                query = getSession().createSQLQuery(Study.GET_BY_SEASON + Study.DRY_SEASON_CONDITION);
+            } else if (season == Season.WET){
+                query = getSession().createSQLQuery(Study.GET_BY_SEASON + Study.WET_SEASON_CONDITION);
+            }  
+            query.addEntity("s", Study.class);
+            query.setFirstResult(start);
+            query.setMaxResults(numOfRows);
+
+            return query.list();
+            
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getBySeason(season=" + season + ") query from Study: " + e.getMessage(), e);
+        }
+    }
+
+    public long countBySeason(Season season) throws MiddlewareQueryException {
+        try {
+            SQLQuery query = getSession().createSQLQuery(Study.COUNT_BY_SEASON);
+            
+            if (season == Season.DRY){
+                query = getSession().createSQLQuery(Study.COUNT_BY_SEASON + Study.DRY_SEASON_CONDITION);
+            } else if (season == Season.WET){
+                query = getSession().createSQLQuery(Study.COUNT_BY_SEASON + Study.WET_SEASON_CONDITION);
+            }  
+
+            return ((BigInteger) query.uniqueResult()).longValue();
+
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with countBySeason(season=" + season + ") query from Study: " + e.getMessage(), e);
+        }
+
+    }
+
     public long countBySDate(Integer sdate, Operation operation) throws MiddlewareQueryException {
 
         try {
@@ -158,12 +201,12 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
             return ((Long) query.uniqueResult()).longValue();
 
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countBySDate(sdate=" + sdate + ", operation=" + operation + ") query from Study: "
-                    + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error with countBySDate(sdate=" + sdate + ", operation=" + operation
+                    + ") query from Study: " + e.getMessage(), e);
         }
 
     }
-    
+
     public long countByEDate(Integer edate, Operation operation) throws MiddlewareQueryException {
 
         try {
@@ -174,8 +217,8 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
             return ((Long) query.uniqueResult()).longValue();
 
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countByEDate(edate=" + edate + ", operation=" + operation + ") query from Study: "
-                    + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error with countByEDate(edate=" + edate + ", operation=" + operation
+                    + ") query from Study: " + e.getMessage(), e);
         }
 
     }

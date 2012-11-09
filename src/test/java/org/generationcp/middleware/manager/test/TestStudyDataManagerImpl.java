@@ -19,6 +19,7 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.CharacterDataElement;
 import org.generationcp.middleware.pojos.CharacterLevelElement;
@@ -103,6 +104,25 @@ public class TestStudyDataManagerImpl{
         System.out.println("testCountStudyByName(" + name + "): " + count);
         System.out.println("  QUERY TIME: " + (end - start) + " ms");
     }
+    
+
+    @Test
+    public void testGetStudyBySeason() throws Exception {
+        Season season = Season.DRY;
+        List<Study> studyList = manager.getStudyBySeason(season, 0, (int) manager.countStudyBySeason(season, Database.CENTRAL), Database.CENTRAL);
+        System.out.println("testGetStudyBySeason(" + season + ") RESULTS: " + studyList.size());
+        for (Study study : studyList) {
+            System.out.println("  " + study);
+        }
+    }
+
+    @Test
+    public void testCountStudyBySeason() throws Exception {
+        Season season = Season.DRY;
+        long count =  manager.countStudyBySeason(season, Database.CENTRAL);
+        System.out.println("testCountStudyBySeason(" + season + "): " + count);
+    }
+    
     
     @Test
     public void testGetStudyBySDateUsingEqual() throws Exception {

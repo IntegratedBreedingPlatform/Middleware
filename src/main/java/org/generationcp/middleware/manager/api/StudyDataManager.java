@@ -17,6 +17,7 @@ import java.util.List;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.pojos.CharacterDataElement;
 import org.generationcp.middleware.pojos.CharacterLevelElement;
 import org.generationcp.middleware.pojos.DatasetCondition;
@@ -146,6 +147,38 @@ public interface StudyDataManager{
      * @throws MiddlewareQueryException
      */
     public long countStudyByCountry(String name, Operation op, Database instance) throws MiddlewareQueryException;
+
+    
+
+
+    /**
+     * Returns the study records matching the given season
+     * 
+     * @param season
+     *            - the season to match
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
+     * @param instance
+     *            - can be CENTRAL or LOCAL
+     * @return List of Study POJOs
+     * @throws MiddlewareQueryException
+     */
+    public List<Study> getStudyBySeason(Season season, int start, int numOfRows, Database instance) throws MiddlewareQueryException;
+
+    /**
+     * Returns the count of the study records of the given season
+     * 
+     * @param season
+     *            - the season to match
+     * @param instance
+     *            - can be CENTRAL or LOCAL
+     * @return number of Study records matching the given criteria
+     * @throws MiddlewareQueryException
+     */
+    public long countStudyBySeason(Season season, Database instance) throws MiddlewareQueryException;
 
     /**
      * Returns the study records matching the given sdate
@@ -474,4 +507,5 @@ public interface StudyDataManager{
      * @throws MiddlewareQueryException
      */
     public List<StudyInfo> getStudyInformationByGID(Long gid) throws MiddlewareQueryException;
+
 }

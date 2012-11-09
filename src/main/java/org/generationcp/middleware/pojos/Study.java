@@ -51,29 +51,48 @@ public class Study implements Serializable{
     public static final String COUNT_BY_EDATE_USING_EQUAL = "countStudyByEDateUsingEqual";
 
     public static final String GET_BY_COUNTRY_USING_EQUAL = 
-            "SELECT DISTINCT {s.*} FROM Study s JOIN Locdes ld ON s.userid = ld.duid " +
-            "                       JOIN Location l ON ld.locid = l.locid " +
-            "                       JOIN Cntry c on l.cntryid = c.cntryid " +
-            "WHERE c.isofull = :country";
+            "SELECT DISTINCT {s.*} FROM Study s JOIN Locdes ld ON s.userid = ld.duid " 
+            + "                       JOIN Location l ON ld.locid = l.locid " 
+            + "                       JOIN Cntry c on l.cntryid = c.cntryid " 
+            + "WHERE c.isofull = :country";
     
     public static final String GET_BY_COUNTRY_USING_LIKE = 
-            "SELECT DISTINCT {s.*} FROM Study s JOIN Locdes ld ON s.userid = ld.duid " +
-            "                       JOIN Location l ON ld.locid = l.locid " +
-            "                       JOIN Cntry c on l.cntryid = c.cntryid " +
-            "WHERE c.isofull LIKE :country";
+            "SELECT DISTINCT {s.*} FROM Study s JOIN Locdes ld ON s.userid = ld.duid " 
+            + "                       JOIN Location l ON ld.locid = l.locid " 
+            + "                       JOIN Cntry c on l.cntryid = c.cntryid " 
+            + "WHERE c.isofull LIKE :country";
     
     public static final String COUNT_BY_COUNTRY_USING_EQUAL = 
-            "SELECT COUNT(DISTINCT s.studyid) FROM Study s JOIN Locdes ld ON s.userid = ld.duid " +
-            "                       JOIN Location l ON ld.locid = l.locid " +
-            "                       JOIN Cntry c on l.cntryid = c.cntryid " +
-            "WHERE c.isofull = :country";
+            "SELECT COUNT(DISTINCT s.studyid) FROM Study s JOIN Locdes ld ON s.userid = ld.duid " 
+            + "                       JOIN Location l ON ld.locid = l.locid " 
+            + "                       JOIN Cntry c on l.cntryid = c.cntryid " 
+            + "WHERE c.isofull = :country";
     
     public static final String COUNT_BY_COUNTRY_USING_LIKE = 
-            "SELECT COUNT(DISTINCT s.studyid) FROM Study s JOIN Locdes ld ON s.userid = ld.duid " +
-            "                       JOIN Location l ON ld.locid = l.locid " +
-            "                       JOIN Cntry c on l.cntryid = c.cntryid " +
-            "WHERE c.isofull LIKE :country";
+            "SELECT COUNT(DISTINCT s.studyid) FROM Study s JOIN Locdes ld ON s.userid = ld.duid " 
+            + "                       JOIN Location l ON ld.locid = l.locid " 
+            + "                       JOIN Cntry c on l.cntryid = c.cntryid " 
+            + "WHERE c.isofull LIKE :country";
+    
+    private static final String BY_SEASON_FROM_CLAUSE =
+            "FROM Study s INNER JOIN Factor f ON f.studyid = s.studyid "
+            + "              INNER JOIN trait t ON t.traitid = f.traitid AND t.trname = 'CROP SEASON' " 
+            + "              LEFT JOIN level_n ln ON ln.labelid = f.labelid " 
+            + "              LEFT JOIN scaledis scd ON scd.value = ln.lvalue AND scd.scaleid = f.scaleid "
+            ;
+   
+    public static final String GET_BY_SEASON = 
+            "SELECT DISTINCT {s.*} " + BY_SEASON_FROM_CLAUSE; 
+            
+    public static final String COUNT_BY_SEASON = 
+            "SELECT COUNT(DISTINCT s.studyid) " + BY_SEASON_FROM_CLAUSE; 
+    
+    public static final String DRY_SEASON_CONDITION = 
+            " WHERE scd.valdesc = 'Dry' OR scd.valdesc = 'Dry' OR ln.lvalue = 0";
 
+    public static final String WET_SEASON_CONDITION =    
+            " WHERE scd.valdesc = 'Wet' OR scd.valdesc = 'Wet' OR ln.lvalue = 1";
+    
     @Id
     @Basic(optional = false)
     @Column(name = "studyid")
