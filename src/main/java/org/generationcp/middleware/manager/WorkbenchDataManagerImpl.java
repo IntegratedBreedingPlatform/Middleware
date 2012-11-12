@@ -162,6 +162,13 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         workflowTemplateDAO.setSession(getCurrentSession());
         return workflowTemplateDAO.getAll(start, numOfRows);
     }
+    
+    @Override
+    public List<Tool> getAllTools() throws MiddlewareQueryException {
+        ToolDAO toolDAO = new ToolDAO();
+        toolDAO.setSession(getCurrentSession());
+        return toolDAO.getAll();
+    }
 
     @Override
     public Tool getToolWithName(String toolId) throws MiddlewareQueryException {

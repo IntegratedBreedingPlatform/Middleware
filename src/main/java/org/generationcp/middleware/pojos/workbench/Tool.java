@@ -41,6 +41,14 @@ public class Tool implements Serializable{
     @Basic(optional = false)
     @Column(name = "name")
     private String toolName;
+    
+    @Basic(optional = false)
+    @Column(name = "title")
+    private String title;
+    
+    @Basic(optional = false)
+    @Column(name = "version")
+    private String version;
 
     @Basic(optional = false)
     @Column(name = "tool_type")
@@ -65,6 +73,22 @@ public class Tool implements Serializable{
 
     public void setToolName(String toolName) {
         this.toolName = toolName;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     public ToolType getToolType() {

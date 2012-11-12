@@ -112,6 +112,13 @@ public interface WorkbenchDataManager{
      */
     public List<WorkflowTemplate> getWorkflowTemplateByName(String name) throws MiddlewareQueryException;
 
+    /**
+     * Get all tools.
+     * 
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    public List<Tool> getAllTools() throws MiddlewareQueryException;
 
     /**
      * Gets the tool with the given name.
