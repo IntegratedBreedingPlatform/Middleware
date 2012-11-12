@@ -27,7 +27,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * @author Joyce Avestro
  */
 @Entity
-@Table(name = "marker_metadataset")
+@Table(name = "gdms_marker_metadataset")
 public class MarkerMetadataSet implements Serializable{
 
     /** The Constant serialVersionUID. */
@@ -36,7 +36,7 @@ public class MarkerMetadataSet implements Serializable{
     /** The Constant GET_MARKER_ID_BY_DATASET_ID. */
     public static final String GET_MARKER_ID_BY_DATASET_ID = 
             "SELECT marker_id " +
-            "FROM marker_metadataset " +
+            "FROM gdms_marker_metadataset " +
             "WHERE dataset_id = :datasetId " +
             "ORDER BY marker_id;";
 

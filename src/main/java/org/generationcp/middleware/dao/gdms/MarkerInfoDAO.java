@@ -28,7 +28,6 @@ import org.hibernate.SQLQuery;
  * @author Joyce Avestro
  * 
  */
-@SuppressWarnings("unchecked")
 public class MarkerInfoDAO extends GenericDAO<MarkerInfo, Integer>{
 
     /**
@@ -40,6 +39,7 @@ public class MarkerInfoDAO extends GenericDAO<MarkerInfo, Integer>{
      * @return the list of MarkerInfo objects by marker name
      * @throws MiddlewareQueryException
      */
+    @SuppressWarnings("rawtypes")
     public List<MarkerInfo> getByMarkerName(String markerName, int start, int numOfRows) throws MiddlewareQueryException {
 
         if (markerName == null) {
@@ -51,7 +51,7 @@ public class MarkerInfoDAO extends GenericDAO<MarkerInfo, Integer>{
             query.setParameter("markerName", markerName);
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
-            List<MarkerInfo> results = query.list();
+            List results = query.list();
 
             ArrayList<MarkerInfo> toReturn = new ArrayList<MarkerInfo>();
             for (Object o : results) {

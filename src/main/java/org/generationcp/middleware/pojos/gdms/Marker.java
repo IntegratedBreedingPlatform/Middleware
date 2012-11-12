@@ -33,7 +33,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * <b>File Created</b>: Jul 10, 2012
  */
 @Entity
-@Table(name = "marker")
+@Table(name = "gdms_marker")
 public class Marker implements Serializable{
 
     /** The Constant serialVersionUID. */
@@ -41,73 +41,73 @@ public class Marker implements Serializable{
 
     public static final String GET_MARKER_TYPE_BY_MARKER_IDS = 
             "SELECT DISTINCT CONCAT(marker_type, '') " +
-            "FROM marker " +
+            "FROM gdms_marker " +
             "WHERE marker_id IN (:markerIdList)";
 
     public static final String GET_IDS_BY_NAMES = 
             "SELECT marker_id " +
-            "FROM marker " +
+            "FROM gdms_marker " +
             "WHERE marker_name IN (:markerNameList)";
     
     public static final String GET_ID_AND_NAME_BY_NAMES = 
             "SELECT marker_id, marker_name " +
-            "FROM marker " +
+            "FROM gdms_marker " +
             "WHERE marker_name IN (:markerNameList)";
     
     public static final String GET_NAMES_BY_IDS = 
             "SELECT marker_id, CONCAT(marker_name, '') AS marker_name " +
-            "FROM marker " +
+            "FROM gdms_marker " +
             "WHERE marker_id IN (:markerIdList) " +
             "ORDER BY marker_id asc";
     
     public static final String GET_ALL_MARKER_TYPES = 
             "SELECT DISTINCT CONCAT(marker_type, '') " +
-            "FROM marker " +
+            "FROM gdms_marker " +
             "WHERE UPPER(marker_type) != 'UA'";
     
     public static final String GET_NAMES_BY_TYPE = 
             "SELECT DISTINCT CONCAT(marker_name, '') " +
-            "FROM marker " +
+            "FROM gdms_marker " +
             "WHERE UPPER(marker_type) = UPPER(:markerType)";
     
     public static final String COUNT_ALL_MARKER_TYPES = 
             "SELECT COUNT(DISTINCT marker_type) " +
-            "FROM marker " +
+            "FROM gdms_marker " +
             "WHERE UPPER(marker_type) != 'UA'";
     
     public static final String COUNT_MARKER_NAMES_BY_MARKER_TYPE = 
             "SELECT COUNT(DISTINCT marker_name) " +
-            "FROM marker " +
+            "FROM gdms_marker " +
             "WHERE UPPER(marker_type) = UPPER(:markerType)";
     
     // For getMarkerNamesByGIds()
     public static final String GET_ALLELE_MARKER_NAMES_BY_GID = 
-            "SELECT DISTINCT allele_values.gid, CONCAT(marker.marker_name,'') " +
-            "FROM allele_values JOIN marker ON allele_values.marker_id = marker.marker_id " +
-            "WHERE allele_values.gid IN (:gIdList) " +
+            "SELECT DISTINCT gdms_allele_values.gid, CONCAT(gdms_marker.marker_name,'') " +
+            "FROM gdms_allele_values JOIN gdms_marker ON gdms_allele_values.marker_id = gdms_marker.marker_id " +
+            "WHERE gdms_allele_values.gid IN (:gIdList) " +
             "ORDER BY gid, marker_name";
 
     public static final String GET_CHAR_MARKER_NAMES_BY_GID =         
-            "SELECT DISTINCT char_values.gid, CONCAT(marker.marker_name,'') " +
-            "FROM char_values JOIN marker ON char_values.marker_id = marker.marker_id " +
-            "WHERE char_values.gid IN (:gIdList) " +
+            "SELECT DISTINCT gdms_char_values.gid, CONCAT(gdms_marker.marker_name,'') " +
+            "FROM gdms_char_values JOIN gdms_marker ON gdms_char_values.marker_id = gdms_marker.marker_id " +
+            "WHERE gdms_char_values.gid IN (:gIdList) " +
             "ORDER BY gid, marker_name";
 
     public static final String GET_MAPPING_MARKER_NAMES_BY_GID = 
-            "SELECT DISTINCT mapping_pop_values.gid, CONCAT(marker.marker_name,'') " + 
-            "FROM mapping_pop_values JOIN marker ON mapping_pop_values.marker_id = marker.marker_id " +
-            "WHERE mapping_pop_values.gid IN (:gIdList) " +
+            "SELECT DISTINCT gdms_mapping_pop_values.gid, CONCAT(gdms_marker.marker_name,'') " + 
+            "FROM gdms_mapping_pop_values JOIN gdms_marker ON gdms_mapping_pop_values.marker_id = gdms_marker.marker_id " +
+            "WHERE gdms_mapping_pop_values.gid IN (:gIdList) " +
             "ORDER BY gid, marker_name";
     
     public static final String GET_ALL_DB_ACCESSION_IDS = 
             "SELECT DISTINCT (db_accession_id) " +
-            "FROM marker " +
+            "FROM gdms_marker " +
             "WHERE db_accession_id is not null " +
             "OR db_accession_id != ''";
     
     public static final String COUNT_ALL_DB_ACCESSION_IDS = 
             "SELECT COUNT(DISTINCT db_accession_id) " +
-            "FROM marker " +
+            "FROM gdms_marker " +
             "WHERE db_accession_id is not null " +
             "OR db_accession_id != ''";
     

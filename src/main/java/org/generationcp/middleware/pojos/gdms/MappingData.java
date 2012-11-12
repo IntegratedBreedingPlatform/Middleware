@@ -27,14 +27,14 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * 
  */
 @Entity
-@Table(name = "mapping_data")
+@Table(name = "gdms_mapping_data")
 public class MappingData implements Serializable{
 
     private static final long serialVersionUID = 1L;
     
     public static final String GET_MAP_INFO_BY_MAP_NAME = 
             "SELECT marker_name, linkage_group, start_position " +
-            "FROM mapping_data " +
+            "FROM gdms_mapping_data " +
             "WHERE map_name = :mapName " +
             "ORDER BY linkage_group, start_position, marker_name";
             

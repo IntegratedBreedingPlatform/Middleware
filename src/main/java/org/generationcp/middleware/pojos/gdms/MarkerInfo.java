@@ -29,7 +29,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * @author Joyce Avestro
  */
 @Entity
-@Table(name = "marker_retrieval_info")
+@Table(name = "gdms_marker_retrieval_info")
 public class MarkerInfo implements Serializable{
 
     /** The Constant serialVersionUID. */
@@ -41,7 +41,7 @@ public class MarkerInfo implements Serializable{
                     ", CONCAT(marker_type, '') " + 
                     ", CONCAT(marker_name, '')  " +
                     ", CONCAT(species, '')  " +
-                    ", accession_id " +
+                    ", db_accession_id " +
                     ", reference " +
                     ", CONCAT(genotype, '') " + 
                     ", ploidy " +
@@ -49,14 +49,14 @@ public class MarkerInfo implements Serializable{
                     ", contact " +
                     ", institute " +
                     ", genotypes_count " +
-            "FROM marker_retrieval_info " +
+            "FROM gdms_marker_retrieval_info " +
             "WHERE LOWER(marker_name) LIKE LOWER(:markerName)";
 
 
     /* Used by MarkerInfoDAO.countByMarkerName() */
     public static final String COUNT_BY_MARKER_NAME = 
             "SELECT COUNT(*) " +
-            "FROM marker_retrieval_info " +
+            "FROM gdms_marker_retrieval_info " +
             "WHERE LOWER(marker_name) LIKE LOWER(:markerName)";
 
     /* Used by MarkerInfoDAO.getByGenotype() */
@@ -65,7 +65,7 @@ public class MarkerInfo implements Serializable{
                     ", CONCAT(marker_type, '') " + 
                     ", CONCAT(marker_name, '')  " +
                     ", CONCAT(species, '')  " +
-                    ", accession_id " +
+                    ", db_accession_id " +
                     ", reference " +
                     ", CONCAT(genotype, '') " + 
                     ", ploidy " +
@@ -73,13 +73,13 @@ public class MarkerInfo implements Serializable{
                     ", contact " +
                     ", institute " +
                     ", genotypes_count " +
-            "FROM marker_retrieval_info " +
+            "FROM gdms_marker_retrieval_info " +
             "WHERE LOWER(genotype) LIKE LOWER(:genotype)";
     
     /* Used by MarkerInfoDAO.countByGenotype() */
     public static final String COUNT_BY_GENOTYPE = 
             "SELECT COUNT(*) " +
-            "FROM marker_retrieval_info " +
+            "FROM gdms_marker_retrieval_info " +
             "WHERE LOWER(genotype) LIKE LOWER(:genotype)";
 
     /* Used by MarkerInfoDAO.getByDbAccessionId() */
@@ -88,7 +88,7 @@ public class MarkerInfo implements Serializable{
                     ", CONCAT(marker_type, '') " + 
                     ", CONCAT(marker_name, '')  " +
                     ", CONCAT(species, '')  " +
-                    ", accession_id " +
+                    ", db_accession_id " +
                     ", reference " +
                     ", CONCAT(genotype, '') " + 
                     ", ploidy " +
@@ -96,14 +96,14 @@ public class MarkerInfo implements Serializable{
                     ", contact " +
                     ", institute " +
                     ", genotypes_count " +
-            "FROM marker_retrieval_info " +
-            "WHERE LOWER(accession_id) LIKE LOWER(:dbAccessionId)";
+            "FROM gdms_marker_retrieval_info " +
+            "WHERE LOWER(db_accession_id) LIKE LOWER(:dbAccessionId)";
     
     /* Used by MarkerInfoDAO.countByDbAccessionId() */
     public static final String COUNT_BY_DB_ACCESSION_ID = 
             "SELECT COUNT(*) " +
-            "FROM marker_retrieval_info " +
-            "WHERE LOWER(accession_id) LIKE LOWER(:dbAccessionId)";
+            "FROM gdms_marker_retrieval_info " +
+            "WHERE LOWER(db_accession_id) LIKE LOWER(:dbAccessionId)";
 
     
     @Id

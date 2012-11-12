@@ -29,34 +29,34 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * @author Joyce Avestro
  */
 @Entity
-@Table(name = "mapping_pop")
+@Table(name = "gdms_mapping_pop")
 public class MappingPop implements Serializable{
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
     
     public static final String GET_PARENTS_BY_DATASET_ID =
-            "SELECT parent_a_gid, parent_b_gid, mapping_pop_type " +
-            "FROM mapping_pop " +
+            "SELECT parent_a_gid, parent_b_gid, mapping_type " +
+            "FROM gdms_mapping_pop " +
             "WHERE dataset_id = :datasetId";
     
     public static final String GET_MAPPING_VALUES_BY_GIDS_AND_MARKER_IDS =
             "SELECT DISTINCT" +
-                " mapping_pop_values.dataset_id" +
-                ", mapping_pop.mapping_pop_type" +
-                ", mapping_pop.parent_a_gid" +
-                ", mapping_pop.parent_b_gid" +
-                ", CONCAT(marker.marker_type, '')" +
-            " FROM mapping_pop_values" +
-                ", mapping_pop" +
-                ", marker" +
-            " WHERE mapping_pop_values.dataset_id = mapping_pop.dataset_id" +
-                " and mapping_pop_values.marker_id = marker.marker_id" +
-                " and mapping_pop_values.marker_id IN (:markerIdList)" +
-                " and mapping_pop_values.gid IN (:gidList)" +
+                " gdms_mapping_pop_values.dataset_id" +
+                ", gdms_mapping_pop.mapping_type" +
+                ", gdms_mapping_pop.parent_a_gid" +
+                ", gdms_mapping_pop.parent_b_gid" +
+                ", CONCAT(gdms_marker.marker_type, '')" +
+            " FROM gdms_mapping_pop_values" +
+                ", gdms_mapping_pop" +
+                ", gdms_marker" +
+            " WHERE gdms_mapping_pop_values.dataset_id = gdms_mapping_pop.dataset_id" +
+                " and gdms_mapping_pop_values.marker_id = gdms_marker.marker_id" +
+                " and gdms_mapping_pop_values.marker_id IN (:markerIdList)" +
+                " and gdms_mapping_pop_values.gid IN (:gidList)" +
             " ORDER BY" +
-                " mapping_pop_values.gid DESC" +
-                ", marker.marker_name";
+                " gdms_mapping_pop_values.gid DESC" +
+                ", gdms_marker.marker_name";
     
     /** The dataset id. */
     @Id

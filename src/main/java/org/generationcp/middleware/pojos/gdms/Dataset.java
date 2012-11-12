@@ -31,24 +31,24 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * 
  */
 @Entity
-@Table(name = "dataset")
+@Table(name = "gdms_dataset")
 public class Dataset implements Serializable{
 
     private static final long serialVersionUID = 1L;
 
     public static final String COUNT_BY_NAME = 
             "SELECT COUNT(dataset_name) " +
-            "FROM dataset " +
+            "FROM gdms_dataset " +
             "WHERE dataset_type !='QTL'";
 
     public static final String GET_DATASET_NAMES_NOT_QTL = 
             "SELECT CONCAT(dataset_name, '') " +
-            "FROM dataset " +
+            "FROM gdms_dataset " +
             "WHERE dataset_type !='QTL'";
 
     public static final String GET_DETAILS_BY_NAME = 
             "SELECT dataset_id, CONCAT(dataset_type, '') " +
-            "FROM dataset " +
+            "FROM gdms_dataset " +
             "WHERE dataset_name = :datasetName";
     
     /** The dataset id. */

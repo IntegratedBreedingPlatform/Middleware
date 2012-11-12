@@ -28,7 +28,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  *  
  */
 @Entity
-@Table(name = "acc_metadataset")
+@Table(name = "gdms_acc_metadataset")
 public class AccMetadataSet implements Serializable{
 
     /** The Constant serialVersionUID. */
@@ -37,12 +37,12 @@ public class AccMetadataSet implements Serializable{
     /** The Constant GET_NAME_IDS_BY_GERMPLASM_IDS. */
     public static final String GET_NAME_IDS_BY_GERMPLASM_IDS = 
             "SELECT nid " +
-            "FROM acc_metadataset " +
+            "FROM gdms_acc_metadataset " +
             "WHERE gid IN (:gIdList)";
     
     public static final String GET_NIDS_BY_DATASET_IDS = 
             "SELECT DISTINCT(nid) " +
-            "FROM acc_metadataset " +
+            "FROM gdms_acc_metadataset " +
             "WHERE dataset_id IN (:datasetId) ";
     
     public static final String GET_NIDS_BY_DATASET_IDS_FILTER_BY_GIDS = 

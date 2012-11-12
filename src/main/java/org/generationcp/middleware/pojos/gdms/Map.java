@@ -31,7 +31,7 @@ import javax.persistence.Table;
  * <b>File Created</b>: Jul 9, 2012
  */
 @Entity
-@Table(name = "map")
+@Table(name = "gdms_map")
 public class Map implements Serializable{
 
     private static final long serialVersionUID = 1803546446290398372L;

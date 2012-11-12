@@ -29,7 +29,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * @author Joyce Avestro
  */
 @Entity
-@Table(name = "char_values")
+@Table(name = "gdms_char_values")
 public class CharValues implements Serializable{
 
     /** The Constant serialVersionUID. */
@@ -38,56 +38,56 @@ public class CharValues implements Serializable{
     // For getMarkerNamesByGIds()
     public static final String GET_CHAR_COUNT_BY_GID = 
             "SELECT COUNT(*) " +
-            "FROM char_values " +
+            "FROM gdms_char_values " +
             "WHERE gid IN (:gIdList)";
 
     // For getGermplasmNamesByMarkerNames()
     public static final String GET_CHAR_COUNT_BY_MARKER_ID = 
             "SELECT COUNT(*) " +
-            "FROM char_values " +
+            "FROM gdms_char_values " +
             "WHERE marker_id IN (:markerIdList)";
     
     // For getGermplasmNamesByMarkerNames()
     public static final String GET_CHAR_GERMPLASM_NAME_AND_MARKER_NAME_BY_MARKER_NAMES = 
             "SELECT n.nval, CONCAT(m.marker_name, '') " +  
-            "FROM names n JOIN char_values c ON n.gid = c.gid " +  
-            "           JOIN marker m ON c.marker_id = m.marker_id " +
+            "FROM names n JOIN gdms_char_values c ON n.gid = c.gid " +  
+            "           JOIN gdms_marker m ON c.marker_id = m.marker_id " +
             "WHERE marker_name IN (:markerNameList) AND n.nstat = 1 " +
             "ORDER BY n.nval, m.marker_name";
     
     // For getAllelicValues by gid and marker names
     public static final String GET_ALLELIC_VALUES_BY_GIDS_AND_MARKER_NAMES =
             "SELECT DISTINCT " +
-                "char_values.gid, " +
-                "CONCAT(char_values.char_value, ''), " +
-                "CONCAT(marker.marker_name, '') " +
-            "FROM char_values, " +
-                "marker " +
-            "WHERE char_values.marker_id = marker.marker_id " +
-                "AND char_values.gid IN (:gidList) " +
-                "AND char_values.marker_id IN (:markerIdList) " +
-            "ORDER BY char_values.gid DESC, marker.marker_name";
+                "gdms_char_values.gid, " +
+                "CONCAT(gdms_char_values.char_value, ''), " +
+                "CONCAT(gdms_marker.marker_name, '') " +
+            "FROM gdms_char_values, " +
+                "gdms_marker " +
+            "WHERE gdms_char_values.marker_id = gdms_marker.marker_id " +
+                "AND gdms_char_values.gid IN (:gidList) " +
+                "AND gdms_char_values.marker_id IN (:markerIdList) " +
+            "ORDER BY gdms_char_values.gid DESC, gdms_marker.marker_name";
     
     // For getAllelicValues by datasetId
     public static final String GET_ALLELIC_VALUES_BY_DATASET_ID = 
             "SELECT gid, marker_id,  CONCAT(char_value, '') " +
-            "FROM char_values " +
+            "FROM gdms_char_values " +
             "WHERE dataset_id = :datasetId " +
             "ORDER BY gid DESC, marker_id ASC";
 
     public static final String COUNT_BY_DATASET_ID = 
             "SELECT COUNT(*) " +
-            "FROM char_values " +
+            "FROM gdms_char_values " +
             "WHERE dataset_id = :datasetId";
     
     public static final String GET_GIDS_BY_MARKER_ID = 
             "SELECT DISTINCT gid " +
-            "FROM char_values " +
+            "FROM gdms_char_values " +
             "WHERE marker_id = :markerId";
     
     public static final String COUNT_GIDS_BY_MARKER_ID = 
             "SELECT COUNT(distinct gid) " +
-            "FROM char_values " +
+            "FROM gdms_char_values " +
             "WHERE marker_id = :markerId";
 
     /** The ac id. */
