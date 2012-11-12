@@ -30,6 +30,7 @@ import org.generationcp.middleware.pojos.GidNidElement;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -57,6 +58,20 @@ public class TestGermplasmDataManagerImpl{
         System.out.println("testGetAllLocations(5,10) RESULTS: ");
         for (Location l : locationList) {
             System.out.println("  " + l);
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
+    }
+    
+    @Test
+    public void testGetAllCountry() throws Exception {
+        long start = System.currentTimeMillis();
+        List<Country> countryList = manager.getAllCountry();
+        Assert.assertTrue(countryList != null);
+
+        System.out.println("testGetAllCountry RESULTS: ");
+        for (Country c : countryList) {
+            System.out.println("  " + c);
         }
         long end = System.currentTimeMillis();
         System.out.println("  QUERY TIME: " + (end - start) + " ms");
@@ -125,6 +140,21 @@ public class TestGermplasmDataManagerImpl{
             System.out.println("  " + location);
         }
     }
+    
+    @Test
+    public void testGetLocationsByCountryAndType() throws MiddlewareQueryException {
+        Integer id = 1; // Tested in rice db. 171 = Philippines
+        Country country = manager.getCountryById(id);
+        int type=405;
+
+        List<Location> locations = manager.getLocationsByCountryAndType(country, type);
+        System.out.println("testGetLocationByCountryAndType(country=" + country + "): type= "+type+ ":"+ locations.size());
+        for (Location location : locations) {
+            System.out.println("  " + location);
+        }
+
+    }
+
 
     @Test
     public void testCountLocationsByCountry() throws Exception {
@@ -747,6 +777,18 @@ public class TestGermplasmDataManagerImpl{
                     + "\ntBEFORE: " + attributeString
                     + "\ntAFTER: " + attribute);
         }
+    }
+    
+    @Test
+    public void testGetUserDefinedFieldByFieldTable() throws MiddlewareQueryException {
+    	String tableName="LOCATION";
+    	String fieldType="LTYPE";
+        List<UserDefinedField> userDefineField = manager.getUserDefinedFieldByFieldTableNameAndType(tableName, fieldType);
+        System.out.println("testGetUserDefineFieldByTableNameAndType(type=" + tableName + "): " + userDefineField.size());
+        for (UserDefinedField u : userDefineField) {
+            System.out.println("  " + u);
+        }
+
     }
         
     

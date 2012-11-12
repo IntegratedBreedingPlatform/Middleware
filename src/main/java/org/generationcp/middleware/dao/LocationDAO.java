@@ -20,6 +20,7 @@ import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -86,6 +87,22 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
         try {
             Criteria criteria = getSession().createCriteria(Location.class);
             criteria.add(Restrictions.eq("cntryid", countryId));
+            criteria.addOrder(Order.asc("lname"));
+            return criteria.list();
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getByCountry(country=" + country + ") query from Location: "
+                    + e.getMessage(), e);
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<Location> getByCountryAndType(Country country,Integer type) throws MiddlewareQueryException {
+        Integer countryId = country.getCntryid();
+        try {
+            Criteria criteria = getSession().createCriteria(Location.class);
+            criteria.add(Restrictions.eq("cntryid", countryId));
+            criteria.add(Restrictions.eq("ltype", type));
+            criteria.addOrder(Order.asc("lname"));
             return criteria.list();
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error with getByCountry(country=" + country + ") query from Location: "
@@ -127,6 +144,7 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
         try {
             Criteria criteria = getSession().createCriteria(Location.class);
             criteria.add(Restrictions.eq("ltype", type));
+            criteria.addOrder(Order.asc("lname"));
             return criteria.list();
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error with getByType(type=" + type + ") query from Location: "

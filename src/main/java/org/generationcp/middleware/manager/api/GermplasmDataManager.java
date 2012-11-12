@@ -229,6 +229,13 @@ public interface GermplasmDataManager {
     public List<Location> getLocationsByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException;
     
     /**
+     * Returns the Location distinct country
+     * @return List of Location POJOs
+     * @throws MiddlewareQueryException
+     */
+    public List<Country> getAllCountry() throws MiddlewareQueryException;
+    
+    /**
      * Returns the number of Locations with
      * names matching the given parameter.
      * 
@@ -252,6 +259,20 @@ public interface GermplasmDataManager {
      * @throws MiddlewareQueryException
      */
     public List<Location> getLocationsByCountry(Country country) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Returns all the Location records with
+     * country and location type  matching  the given parameter. The data is retrieved from both local and central databases.
+     * 
+     * @param country
+     *            - search string for the country of the locations
+     * @param type
+     *            - search string for the locations type
+     * @return List of Location POJOs
+     * @throws MiddlewareQueryException
+     */
+    public List<Location> getLocationsByCountryAndType(Country country,Integer type) throws MiddlewareQueryException;
 
 
     /**
@@ -644,6 +665,19 @@ public interface GermplasmDataManager {
      * @return the Udflds POJO representing the record
      */
     public UserDefinedField getUserDefinedFieldByID(Integer id);
+    
+    
+    
+    /**
+     * Returns the udfld records identified by the given tablename.
+     * 
+     * @param tableName
+     *            - the value of the ftable record
+     @param fieldType
+     *            - the value of the ftype record
+     * @return the Udflds POJO representing the record
+     */
+    public List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(String tableName,String fieldType) throws MiddlewareQueryException;
 
     /**
      * Returns the country record identified by the given id.

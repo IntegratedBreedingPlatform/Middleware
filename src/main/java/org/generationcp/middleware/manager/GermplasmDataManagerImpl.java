@@ -2661,4 +2661,71 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         return results;
     }
 
+	@Override
+	public List<Country> getAllCountry() throws MiddlewareQueryException {
+		
+	        List<Country> country = new ArrayList<Country>();
+
+	        Session sessionForCentral = getCurrentSessionForCentral();
+	        Session sessionForLocal = getCurrentSessionForLocal();
+
+	        if (sessionForLocal != null) {
+	            CountryDAO dao = new CountryDAO();
+	            dao.setSession(sessionForLocal);
+	            country.addAll(dao.getAllCountry());
+	        }
+
+	        if (sessionForCentral != null) {
+	        	CountryDAO centralDao = new CountryDAO();
+	            centralDao.setSession(sessionForCentral);
+	            country.addAll(centralDao.getAllCountry());
+	        }
+
+	        return country;
+
+	    }
+
+	@Override
+	public List<Location> getLocationsByCountryAndType(Country country,
+			Integer type) throws MiddlewareQueryException {
+        LocationDAO dao = new LocationDAO();
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        List<Location> locations = new ArrayList<Location>();
+
+        if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            locations.addAll(dao.getByCountryAndType(country,type));
+        }
+
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            locations.addAll(dao.getByCountryAndType(country,type));
+        }
+
+        return locations;
+	}
+
+	@Override
+	public List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(String tableName,String fieldType) throws MiddlewareQueryException {
+        UserDefinedFieldDAO dao = new UserDefinedFieldDAO();
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        List<UserDefinedField> userDefineField = new ArrayList<UserDefinedField>();
+
+        if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            userDefineField.addAll(dao.getByFieldTableNameAndType(tableName,fieldType));
+        }
+
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            userDefineField.addAll(dao.getByFieldTableNameAndType(tableName,fieldType));
+        }
+
+        return userDefineField;
+	}
+	
 }
