@@ -2102,17 +2102,24 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     
     public long countManagementNeighbors(Integer gid) throws MiddlewareQueryException{
+        long count = 0;
+
         GermplasmDAO dao = new GermplasmDAO();
 
-        Session session = getSession(gid);
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
 
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return 0;
+        if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            count = count + dao.countManagementNeighbors(gid);
         }
-        
-        return dao.countManagementNeighbors(gid);
+
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            count = count + dao.countManagementNeighbors(gid);
+        }
+
+        return count;
     }
 
     @Override
