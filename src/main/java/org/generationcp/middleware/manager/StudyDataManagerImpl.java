@@ -26,6 +26,7 @@ import org.generationcp.middleware.dao.OindexDAO;
 import org.generationcp.middleware.dao.RepresentationDAO;
 import org.generationcp.middleware.dao.StudyDAO;
 import org.generationcp.middleware.dao.StudyEffectDAO;
+import org.generationcp.middleware.dao.TraitDAO;
 import org.generationcp.middleware.dao.VariateDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -40,6 +41,7 @@ import org.generationcp.middleware.pojos.Representation;
 import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.pojos.StudyEffect;
 import org.generationcp.middleware.pojos.StudyInfo;
+import org.generationcp.middleware.pojos.Trait;
 import org.generationcp.middleware.pojos.TraitCombinationFilter;
 import org.generationcp.middleware.pojos.Variate;
 import org.hibernate.Session;
@@ -703,6 +705,55 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         } catch (Exception e) {
             throw new MiddlewareQueryException("Error in get study information by GID: StudyDataManager.getStudyInformationByGID(gid="
                     + gid + "): " + e.getMessage(), e);
+        }
+    }
+    
+    @Override
+    public Trait getReplicationTrait() throws MiddlewareQueryException {
+        try {
+            TraitDAO dao = new TraitDAO();
+            
+            //the REPLICATION trait should be in the central IBDB
+            requireCentralDatabaseInstance();
+            
+            dao.setSession(getCurrentSessionForCentral());
+            return dao.getReplicationTrait();
+        } catch (Exception e) {
+            throw new MiddlewareQueryException("Error in getting REPLICATION trait: " + e.getMessage(), e);
+        }
+    }
+    
+    @Override
+    public Trait getBlockTrait() throws MiddlewareQueryException {
+        try {
+            TraitDAO dao = new TraitDAO();
+            
+            //the BLOCK trait should be in the central IBDB
+            requireCentralDatabaseInstance();
+            
+            dao.setSession(getCurrentSessionForCentral());
+            return dao.getBlockTrait();
+        } catch (Exception e) {
+            throw new MiddlewareQueryException("Error in getting BLOCK trait: " + e.getMessage(), e);
+        }
+    }
+    
+    @Override
+    public Factor getFactorOfDatasetByTid(Integer representationId, Integer tid) throws MiddlewareQueryException {
+        try {
+            FactorDAO dao = new FactorDAO();
+            //if the representation id is positive the dataset should be from central IBDB
+            //otherwise the dataset is from local IBDB
+            Session session = getSession(representationId);
+            
+            if(session != null){
+                dao.setSession(session);
+                return dao.getFactorOfDatasetGivenTid(representationId, tid);
+            } else{
+                throw new MiddlewareQueryException("Error in getting factor of dataset by tid: Cannot get Session to use.");
+            }
+        } catch (Exception e) {
+            throw new MiddlewareQueryException("Error in getting factor of dataset by tid: " + e.getMessage(), e);
         }
     }
 }

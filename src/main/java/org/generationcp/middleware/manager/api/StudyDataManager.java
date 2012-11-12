@@ -28,6 +28,7 @@ import org.generationcp.middleware.pojos.Representation;
 import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.pojos.StudyEffect;
 import org.generationcp.middleware.pojos.StudyInfo;
+import org.generationcp.middleware.pojos.Trait;
 import org.generationcp.middleware.pojos.TraitCombinationFilter;
 import org.generationcp.middleware.pojos.Variate;
 
@@ -508,4 +509,30 @@ public interface StudyDataManager{
      */
     public List<StudyInfo> getStudyInformationByGID(Long gid) throws MiddlewareQueryException;
 
+    /**
+     * Returns the Trait object representing the record for the REPLICATION trait.
+     * 
+     * @return Trait
+     * @throws MiddlewareQueryException
+     */
+    public Trait getReplicationTrait() throws MiddlewareQueryException;
+    
+    /**
+     * Returns the Trait object representing the record for the BLOCK trait.
+     * 
+     * @return Trait
+     * @throws MiddlewareQueryException
+     */
+    public Trait getBlockTrait() throws MiddlewareQueryException;
+    
+    /**
+     * Returns the Factor with the trait identified by the given tid. This Factor belongs to the dataset
+     * identified by the given representationId.
+     * 
+     * @param representationId
+     * @param tid
+     * @return Factor
+     * @throws MiddlewareQueryException
+     */
+    public Factor getFactorOfDatasetByTid(Integer representationId, Integer tid) throws MiddlewareQueryException;
 }

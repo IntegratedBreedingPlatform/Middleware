@@ -32,6 +32,7 @@ import org.generationcp.middleware.pojos.Representation;
 import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.pojos.StudyEffect;
 import org.generationcp.middleware.pojos.StudyInfo;
+import org.generationcp.middleware.pojos.Trait;
 import org.generationcp.middleware.pojos.TraitCombinationFilter;
 import org.generationcp.middleware.pojos.Variate;
 import org.junit.AfterClass;
@@ -416,6 +417,27 @@ public class TestStudyDataManagerImpl{
         }
     }
 
+    @Test
+    public void testGetReplicationTrait() throws Exception {
+        Trait trait = manager.getReplicationTrait();
+        System.out.println(trait);
+    }
+    
+    @Test
+    public void testGetBlockTrait() throws Exception {
+        Trait trait = manager.getBlockTrait();
+        System.out.println(trait);
+    }
+    
+    @Test
+    public void testGetFactorOfDatasetByTid() throws Exception {
+        Trait trait = manager.getReplicationTrait();
+        if(trait != null){
+            Factor factor = manager.getFactorOfDatasetByTid(Integer.valueOf(1245), trait.getId());
+            System.out.println(factor);
+        }
+    }
+    
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();

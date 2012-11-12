@@ -229,7 +229,7 @@ public interface GermplasmDataManager {
     public List<Location> getLocationsByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException;
     
     /**
-     * Returns the Location distinct country
+     * Returns all country records
      * @return List of Location POJOs
      * @throws MiddlewareQueryException
      */

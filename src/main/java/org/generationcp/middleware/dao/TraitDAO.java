@@ -39,4 +39,38 @@ public class TraitDAO extends GenericDAO<Trait, Integer>{
             throw new MiddlewareQueryException("Error with getByTraitId(id=" + id + ") query from Trait: " + e.getMessage(), e);
         }
     }
+    
+    @SuppressWarnings("rawtypes")
+    public Trait getReplicationTrait() throws MiddlewareQueryException {
+        try {
+            Criteria crit = getSession().createCriteria(Trait.class);
+            crit.add(Restrictions.eq("name", "replication"));
+            List results = crit.list();
+            
+            if(results.isEmpty()) {
+                return null;
+            } else {
+                return (Trait) results.get(0);
+            }
+        } catch(HibernateException e) {
+            throw new MiddlewareQueryException("Error with getReplicationTrait() query: " + e.getMessage(), e);
+        }
+    }
+    
+    @SuppressWarnings("rawtypes")
+    public Trait getBlockTrait() throws MiddlewareQueryException {
+        try {
+            Criteria crit = getSession().createCriteria(Trait.class);
+            crit.add(Restrictions.eq("abbreviation", "blk"));
+            List results = crit.list();
+            
+            if(results.isEmpty()) {
+                return null;
+            } else {
+                return (Trait) results.get(0);
+            }
+        } catch(HibernateException e) {
+            throw new MiddlewareQueryException("Error with getBlockTrait() query: " + e.getMessage(), e);
+        }
+    }
 }

@@ -2688,44 +2688,44 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public List<Location> getLocationsByCountryAndType(Country country,
 			Integer type) throws MiddlewareQueryException {
-        LocationDAO dao = new LocationDAO();
-
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        List<Location> locations = new ArrayList<Location>();
-
-        if (sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
-            locations.addAll(dao.getByCountryAndType(country,type));
-        }
-
-        if (sessionForCentral != null) {
-            dao.setSession(sessionForCentral);
-            locations.addAll(dao.getByCountryAndType(country,type));
-        }
-
-        return locations;
+            LocationDAO dao = new LocationDAO();
+    
+            Session sessionForCentral = getCurrentSessionForCentral();
+            Session sessionForLocal = getCurrentSessionForLocal();
+            List<Location> locations = new ArrayList<Location>();
+    
+            if (sessionForLocal != null) {
+                dao.setSession(sessionForLocal);
+                locations.addAll(dao.getByCountryAndType(country,type));
+            }
+    
+            if (sessionForCentral != null) {
+                dao.setSession(sessionForCentral);
+                locations.addAll(dao.getByCountryAndType(country,type));
+            }
+    
+            return locations;
 	}
 
 	@Override
 	public List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(String tableName,String fieldType) throws MiddlewareQueryException {
-        UserDefinedFieldDAO dao = new UserDefinedFieldDAO();
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-
-        List<UserDefinedField> userDefineField = new ArrayList<UserDefinedField>();
-
-        if (sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
-            userDefineField.addAll(dao.getByFieldTableNameAndType(tableName,fieldType));
-        }
-
-        if (sessionForCentral != null) {
-            dao.setSession(sessionForCentral);
-            userDefineField.addAll(dao.getByFieldTableNameAndType(tableName,fieldType));
-        }
-
-        return userDefineField;
+            UserDefinedFieldDAO dao = new UserDefinedFieldDAO();
+            Session sessionForCentral = getCurrentSessionForCentral();
+            Session sessionForLocal = getCurrentSessionForLocal();
+    
+            List<UserDefinedField> userDefineField = new ArrayList<UserDefinedField>();
+    
+            if (sessionForLocal != null) {
+                dao.setSession(sessionForLocal);
+                userDefineField.addAll(dao.getByFieldTableNameAndType(tableName,fieldType));
+            }
+    
+            if (sessionForCentral != null) {
+                dao.setSession(sessionForCentral);
+                userDefineField.addAll(dao.getByFieldTableNameAndType(tableName,fieldType));
+            }
+    
+            return userDefineField;
 	}
 	
 }
