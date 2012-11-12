@@ -15,7 +15,7 @@ package org.generationcp.middleware.manager;
 /**
  * Used to specify the different seasons
  * 
- * @author Kevin Manansala
+ * @author Joyce Avestro
  * 
  */
 public enum Season {
