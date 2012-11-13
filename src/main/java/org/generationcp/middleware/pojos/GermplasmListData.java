@@ -61,6 +61,7 @@ public class GermplasmListData implements Serializable{
     @Column(name = "entryid")
     private Integer entryId;
 
+    @Basic(optional = false)
     @Column(name = "entrycd")
     private String entryCode;
 
