@@ -1052,6 +1052,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public List<Method> getAllMethods() throws MiddlewareQueryException {
+        
         List<Method> methods = new ArrayList<Method>();
 
         Session sessionForCentral = getCurrentSessionForCentral();
@@ -1071,6 +1072,29 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
         return methods;
 
+    }
+    
+    @Override
+    public long countAllMethods() throws MiddlewareQueryException {
+
+        long count = 0;
+
+        MethodDAO dao = new MethodDAO();
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            count = count + dao.countAll();
+        }
+
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            count = count + dao.countAll();
+        }
+
+        return count;
     }
 
     @Override

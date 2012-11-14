@@ -571,6 +571,14 @@ public interface GermplasmDataManager {
     public List<Method> getAllMethods() throws MiddlewareQueryException;
     
     /**
+     * Returns count of all the method records.
+     * 
+     * @return count of methods
+     * @throws MiddlewareQueryException
+     */
+    public long countAllMethods() throws MiddlewareQueryException;
+    
+    /**
      * Returns all the method records matching the given type.
      * Retrieves from both local and central databases.
      * 
