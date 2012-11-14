@@ -18,6 +18,8 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.NamedNativeQueries;
+import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -32,6 +34,13 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
     @NamedQuery(name = "countUserByNameUsingLike", query = "SELECT COUNT(s) FROM User s WHERE s.name LIKE :name")
 
 })
+
+@NamedNativeQueries({
+    @NamedNativeQuery(name = "getAllUsersSorted",
+        query = "SELECT u.* FROM users u, persons p " +
+        	"WHERE u.personid = p.personid ORDER BY fname, lname", resultClass = User.class)
+})
+
 @Entity
 @Table(name = "users")
 public class User implements Serializable {
@@ -42,6 +51,7 @@ public class User implements Serializable {
     public static final String GET_BY_NAME_USING_LIKE = "getUserByNameUsingLike";
     public static final String COUNT_BY_NAME_USING_EQUAL = "countUserByNameUsingEqual";
     public static final String COUNT_BY_NAME_USING_LIKE = "countUserByNameUsingLike";
+    public static final String GET_ALL_USERS_SORTED = "getAllUsersSorted";
 
     @Id
     @Basic(optional = false)

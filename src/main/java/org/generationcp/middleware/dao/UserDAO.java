@@ -14,8 +14,8 @@ package org.generationcp.middleware.dao;
 
 import java.util.List;
 
-import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.User;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -77,6 +77,17 @@ public class UserDAO extends GenericDAO<User, Integer>{
             return (List<User>) query.list();
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error with getByNameUsingLike(name="+name+") query from User: " + e.getMessage(), e);
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<User> getAllUsersSorted() throws MiddlewareQueryException {
+        try {
+            Query query = getSession().getNamedQuery(User.GET_ALL_USERS_SORTED);
+            return query.list();
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getAllUsersSorted() query from User: "
+                    + e.getMessage(), e);
         }
     }
     

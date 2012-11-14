@@ -370,6 +370,21 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 
         return users;
     }
+    
+    @Override
+    public List<User> getAllUsersSorted() throws MiddlewareQueryException {
+        UserDAO dao = new UserDAO();
+
+        List<User> users = new ArrayList<User>();
+
+        Session session = getCurrentSession();
+        if (session != null) {
+            dao.setSession(session);
+            users.addAll(dao.getAllUsersSorted());
+        }
+
+        return users;
+    }
 
     public long countAllUsers() throws MiddlewareQueryException {
         long count = 0;

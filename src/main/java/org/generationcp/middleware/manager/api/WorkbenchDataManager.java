@@ -222,11 +222,20 @@ public interface WorkbenchDataManager{
 
 
     /**
-     * Returns all Persons.
+     * Returns all the Workbench users.
      *
-     * @return all Persons
+     * @return A {@code List} of all the {@code User}s in the Workbench database.
+     * @throws MiddlewareQueryException
      */   	
     public List<User> getAllUsers() throws MiddlewareQueryException;
+    
+    /**
+     * Returns all the Workbench users ordered by First Name then Last Name.
+     * 
+     * @return A {@code List} of all the {@code User}s in the Workbench database.
+     * @throws MiddlewareQueryException
+     */
+    public List<User> getAllUsersSorted() throws MiddlewareQueryException;
     
     /**
      * Returns number of all Users.
