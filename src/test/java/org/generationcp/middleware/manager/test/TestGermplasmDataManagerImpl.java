@@ -634,6 +634,19 @@ public class TestGermplasmDataManagerImpl{
     }
     
     @Test
+    public void testGetMethodsByGroupIncludesGgroup() throws MiddlewareQueryException {
+        String group = "O"; // Tested with rice and cowpea
+
+        List<Method> methods = manager.getMethodsByGroupIncludesGgroup(group);
+        System.out.println("testGetMethodsByGroup(group=" + group + "): " + methods.size());
+        for (Method method : methods) {
+            System.out.println("  " + method);
+        }
+
+
+    }
+    
+    @Test
     public void testGetMethodsByGroupAndType() throws MiddlewareQueryException {
         String group = "O"; // Tested with rice and cowpea
         String type= "GEN"; // Tested with rice and cowpea

@@ -588,6 +588,15 @@ public interface GermplasmDataManager {
      */
     public List<Method> getMethodsByType(String type) throws MiddlewareQueryException;
 
+    /**
+     * Returns all the method records matching the given group and the methods having the 'G' group.
+     * Retrieves from both local and central databases.
+     * 
+     * @param group the group of the method
+     * @return List of Method POJOs
+     * @throws MiddlewareQueryException
+     */
+    public List<Method> getMethodsByGroupIncludesGgroup(String group) throws MiddlewareQueryException;
 
     
     /**
@@ -604,6 +613,7 @@ public interface GermplasmDataManager {
      * @throws MiddlewareQueryException
      */
     public List<Method> getMethodsByType(String type, int start, int numOfRows) throws MiddlewareQueryException;
+    
 
     /**
      * Returns the number of Methods with

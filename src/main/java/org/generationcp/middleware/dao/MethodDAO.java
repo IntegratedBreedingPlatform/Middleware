@@ -19,6 +19,8 @@ import org.generationcp.middleware.pojos.Method;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.LogicalExpression;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -86,6 +88,21 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
         }
     }
     
+    
+    @SuppressWarnings("unchecked")
+    public List<Method> getByGroupIncludesGgroup(String group) throws MiddlewareQueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(Method.class);
+            Criterion group1=Restrictions.eq("mgrp", group);
+            Criterion group2=Restrictions.eq("mgrp", "G");
+            LogicalExpression orExp=Restrictions.or(group1, group2);
+            criteria.add(orExp);
+            criteria.addOrder(Order.asc("mname"));
+            return criteria.list();
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getMethodsByGroup(group=" + group + ") query from Method: " + e.getMessage(), e);
+        }
+    }
 
     @SuppressWarnings("unchecked")
     public List<Method> getByGroup(String group, int start, int numOfRows) throws MiddlewareQueryException {
@@ -101,12 +118,19 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
         }
     }
     
+    
     @SuppressWarnings("unchecked")
     public List<Method> getByGroupAndType(String group,String type) throws MiddlewareQueryException {
         try {
+           
             Criteria criteria = getSession().createCriteria(Method.class);
-            criteria.add(Restrictions.eq("mgrp", group));
-            criteria.add(Restrictions.eq("mtype", type));
+            Criterion group1=Restrictions.eq("mgrp", group);
+            Criterion group2=Restrictions.eq("mgrp", "G");
+            LogicalExpression orExp=Restrictions.or(group1, group2);
+            Criterion filterType=Restrictions.eq("mtype", type);
+            LogicalExpression andExp=Restrictions.and(orExp,filterType );
+            
+            criteria.add(andExp);
             criteria.addOrder(Order.asc("mname"));
             return criteria.list();
         } catch (HibernateException e) {

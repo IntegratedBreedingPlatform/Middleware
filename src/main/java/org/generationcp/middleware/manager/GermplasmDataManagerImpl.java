@@ -2759,4 +2759,24 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             return userDefineField;
 	}
 	
+	@Override
+	public List<Method> getMethodsByGroupIncludesGgroup(String group)throws MiddlewareQueryException {
+		 MethodDAO dao = new MethodDAO();
+	        List<Method> methods = new ArrayList<Method>();
+
+	        Session sessionForCentral = getCurrentSessionForCentral();
+	        Session sessionForLocal = getCurrentSessionForLocal();
+
+	        if (sessionForLocal != null) {
+	            dao.setSession(sessionForLocal);
+	            methods.addAll(dao.getByGroupIncludesGgroup(group));
+	        }
+
+	        if (sessionForCentral != null) {
+	            dao.setSession(sessionForCentral);
+	            methods.addAll(dao.getByGroupIncludesGgroup(group));
+	        }
+
+	        return methods;
+	}
 }
