@@ -51,7 +51,7 @@ public class TestStudyDataManagerImpl{
         factory = new ManagerFactory(local, central);
         manager = factory.getStudyDataManager();
     }
-
+    /**
     @Test
     public void testGetGIDSByPhenotypicData() throws Exception {
         Integer traitId = Integer.valueOf(1003);
@@ -416,7 +416,7 @@ public class TestStudyDataManagerImpl{
             System.out.println("  " + info);
         }
     }
-
+    **/
     @Test
     public void testGetReplicationTrait() throws Exception {
         Trait trait = manager.getReplicationTrait();
@@ -430,10 +430,10 @@ public class TestStudyDataManagerImpl{
     }
     
     @Test
-    public void testGetFactorOfDatasetByTid() throws Exception {
+    public void testGetFactorOfDatasetByTraitid() throws Exception {
         Trait trait = manager.getReplicationTrait();
         if(trait != null){
-            Factor factor = manager.getFactorOfDatasetByTid(Integer.valueOf(1245), trait.getId());
+            Factor factor = manager.getFactorOfDatasetByTraitid(Integer.valueOf(1245), trait.getTraitId());
             System.out.println(factor);
         }
     }

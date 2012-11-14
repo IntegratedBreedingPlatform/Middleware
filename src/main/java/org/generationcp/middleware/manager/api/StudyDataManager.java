@@ -534,5 +534,5 @@ public interface StudyDataManager{
      * @return Factor
      * @throws MiddlewareQueryException
      */
-    public Factor getFactorOfDatasetByTid(Integer representationId, Integer tid) throws MiddlewareQueryException;
+    public Factor getFactorOfDatasetByTraitid(Integer representationId, Integer traitid) throws MiddlewareQueryException;
 }

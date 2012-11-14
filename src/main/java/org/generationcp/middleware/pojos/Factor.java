@@ -55,10 +55,10 @@ public class Factor implements Serializable{
                                                     "AND ou.levelno = lc.levelno " +
             "WHERE f.traitid = 251 AND f.fname = 'GID'";
     
-    public static final String GET_FACTOR_OF_DATASET_GIVEN_TID =
+    public static final String GET_FACTOR_OF_DATASET_GIVEN_TRAITID =
             "SELECT {f.*} "
             + "FROM factor f JOIN effect e ON f.factorid = e.factorid " 
-            + "WHERE f.tid = :tid AND e.represno = :representationId";
+            + "WHERE f.traitid = :traitid AND e.represno = :representationId";
     
     @Id
     @Basic(optional = false)

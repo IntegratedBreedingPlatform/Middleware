@@ -61,7 +61,7 @@ public class TraitDAO extends GenericDAO<Trait, Integer>{
     public Trait getBlockTrait() throws MiddlewareQueryException {
         try {
             Criteria crit = getSession().createCriteria(Trait.class);
-            crit.add(Restrictions.eq("abbreviation", "blk"));
+            crit.add(Restrictions.eq("name", "block"));
             List results = crit.list();
             
             if(results.isEmpty()) {

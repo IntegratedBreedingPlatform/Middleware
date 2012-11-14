@@ -739,7 +739,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
     
     @Override
-    public Factor getFactorOfDatasetByTid(Integer representationId, Integer tid) throws MiddlewareQueryException {
+    public Factor getFactorOfDatasetByTraitid(Integer representationId, Integer traitid) throws MiddlewareQueryException {
         try {
             FactorDAO dao = new FactorDAO();
             //if the representation id is positive the dataset should be from central IBDB
@@ -748,12 +748,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             
             if(session != null){
                 dao.setSession(session);
-                return dao.getFactorOfDatasetGivenTid(representationId, tid);
+                return dao.getFactorOfDatasetGivenTraitid(representationId, traitid);
             } else{
-                throw new MiddlewareQueryException("Error in getting factor of dataset by tid: Cannot get Session to use.");
+                throw new MiddlewareQueryException("Error in getting factor of dataset by traitid: Cannot get Session to use.");
             }
         } catch (Exception e) {
-            throw new MiddlewareQueryException("Error in getting factor of dataset by tid: " + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error in getting factor of dataset by traitid: " + e.getMessage(), e);
         }
     }
 }

@@ -106,11 +106,12 @@ public class FactorDAO extends GenericDAO<Factor, Integer>{
         }
     }
     
-    public Factor getFactorOfDatasetGivenTid(Integer representationId, Integer tid) throws MiddlewareQueryException {
+    @SuppressWarnings("unchecked")
+    public Factor getFactorOfDatasetGivenTraitid(Integer representationId, Integer traitid) throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(Factor.GET_FACTOR_OF_DATASET_GIVEN_TID);
+            SQLQuery query = getSession().createSQLQuery(Factor.GET_FACTOR_OF_DATASET_GIVEN_TRAITID);
             query.setParameter("representationId", representationId);
-            query.setParameter("tid", tid);
+            query.setParameter("traitid", traitid);
             query.addEntity("f", Factor.class);
             
             List<Factor> results = query.list();
@@ -122,7 +123,7 @@ public class FactorDAO extends GenericDAO<Factor, Integer>{
             return null;
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error with getFactorOfDatasetGivenTid(representationId=" + representationId
-                    + ", tid = " + tid + ") query from Factor: " + e.getMessage(), e);
+                    + ", traitid = " + traitid + ") query from Factor: " + e.getMessage(), e);
         }
     }
 }
