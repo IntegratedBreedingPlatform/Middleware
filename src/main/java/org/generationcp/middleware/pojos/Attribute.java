@@ -27,7 +27,7 @@ import javax.persistence.Table;
  * 
  * @author klmanansala
  */
-@NamedQueries({ @NamedQuery(name = "getAttributesByGID", query = "FROM Attribute a WHERE a.germplasmId = :gid AND a.typeId <> 9999") })
+@NamedQueries({ @NamedQuery(name = "getAttributesByGID", query = "FROM Attribute a WHERE a.germplasmId = :gid AND a.typeId <> 9999 AND a.typeId <> 999") })
 @Entity
 @Table(name = "atributs")
 public class Attribute implements Serializable{
