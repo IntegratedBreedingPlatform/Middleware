@@ -289,15 +289,22 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             query.addEntity("g", Germplasm.class);
             query.addEntity("n", Name.class);
             query.setParameter("gid", gid);
-            Object[] result = (Object[]) query.uniqueResult();
-            if (result != null) {
-                Germplasm germplasm = (Germplasm) result[0];
-                Name prefName = (Name) result[1];
-                germplasm.setPreferredName(prefName);
-                return germplasm;
-            } else {
+            List results = query.list();
+            
+            if(results.size() > 0){
+                Object[] result = (Object[]) results.get(0);
+                if (result != null) {
+                    Germplasm germplasm = (Germplasm) result[0];
+                    Name prefName = (Name) result[1];
+                    germplasm.setPreferredName(prefName);
+                    return germplasm;
+                } else {
+                    return null;
+                } 
+            } else{
                 return null;
             }
+            
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error with getByGIDWithPrefName(gid=" + gid + ") from Germplasm: " + e.getMessage(), e);
         }
@@ -310,17 +317,23 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             query.addEntity("n", Name.class);
             query.addEntity("abbrev", Name.class);
             query.setParameter("gid", gid);
-            Object[] result = (Object[]) query.uniqueResult();
-            if (result != null) {
-                Germplasm germplasm = (Germplasm) result[0];
-                Name prefName = (Name) result[1];
-                Name prefAbbrev = (Name) result[2];
-                germplasm.setPreferredName(prefName);
-                if (prefAbbrev != null) {
-                    germplasm.setPreferredAbbreviation(prefAbbrev.getNval());
+            List results = query.list();
+            
+            if(results.size() > 0){
+                Object[] result = (Object[]) results.get(0);
+                if (result != null) {
+                    Germplasm germplasm = (Germplasm) result[0];
+                    Name prefName = (Name) result[1];
+                    Name prefAbbrev = (Name) result[2];
+                    germplasm.setPreferredName(prefName);
+                    if (prefAbbrev != null) {
+                        germplasm.setPreferredAbbreviation(prefAbbrev.getNval());
+                    }
+                    return germplasm;
+                } else {
+                    return null;
                 }
-                return germplasm;
-            } else {
+            } else{
                 return null;
             }
         } catch (HibernateException e) {

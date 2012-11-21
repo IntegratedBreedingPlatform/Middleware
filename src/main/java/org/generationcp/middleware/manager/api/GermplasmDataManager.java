@@ -1130,4 +1130,5 @@ public interface GermplasmDataManager {
      */
     public List<GidNidElement> getGidAndNidByGermplasmNames(List<String> germplasmNames) throws MiddlewareQueryException;
 
+    public String getCrossExpansion(Integer gid, int level) throws MiddlewareQueryException;
 }

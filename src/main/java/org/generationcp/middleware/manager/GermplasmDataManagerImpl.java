@@ -43,6 +43,9 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.ProgenitorPK;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.germplasm.GermplasmCross;
+import org.generationcp.middleware.pojos.germplasm.GermplasmCrossElement;
+import org.generationcp.middleware.pojos.germplasm.SingleGermplasmCrossElement;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -2691,9 +2694,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
         return results;
     }
-
-	@Override
-	public List<Country> getAllCountry() throws MiddlewareQueryException {
+    
+    @Override
+    public List<Country> getAllCountry() throws MiddlewareQueryException {
 		
 	        List<Country> country = new ArrayList<Country>();
 
@@ -2779,4 +2782,240 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	        return methods;
 	}
+	
+    public String getCrossExpansion(Integer gid, int level) throws MiddlewareQueryException {
+        Germplasm germplasm = getGermplasmWithPrefName(gid);
+        if(germplasm != null){
+            SingleGermplasmCrossElement startElement = new SingleGermplasmCrossElement();
+            startElement.setGermplasm(germplasm);
+            GermplasmCrossElement cross = expandGermplasmCross(startElement, level);
+            return cross.toString();
+        } else{
+            return null;
+        }
+    }
+    
+    private GermplasmCrossElement expandGermplasmCross(GermplasmCrossElement element, int level) throws MiddlewareQueryException {
+        if(level == 0){
+            //if the level is zero then there is no need to expand and the element
+            //should be returned as is
+            return element;
+        } else{
+            if(element instanceof SingleGermplasmCrossElement){
+                SingleGermplasmCrossElement singleGermplasm = (SingleGermplasmCrossElement) element;
+                Germplasm germplasmToExpand = singleGermplasm.getGermplasm();
+                
+                if(germplasmToExpand.getGnpgs() < 0){
+                    //for germplasms created via a derivative or maintenance method
+                    //skip and then expand on the gpid1 parent
+                    if(germplasmToExpand.getGpid1() != 0 && germplasmToExpand.getGpid1() != null){
+                        SingleGermplasmCrossElement nextElement = new SingleGermplasmCrossElement();
+                        nextElement.setGermplasm(getGermplasmWithPrefName(germplasmToExpand.getGpid1()));
+                        return expandGermplasmCross(nextElement, level);
+                    } else{
+                        return element;
+                    }
+                } else{
+                    GermplasmCross cross = new GermplasmCross();
+                    
+                    Method method = getMethodByID(germplasmToExpand.getMethodId());
+                    if(method != null){
+                        String methodName = method.getMname();
+                        if(methodName != null){
+                            methodName = methodName.toLowerCase();
+                        } else{
+                            methodName = "";
+                        }
+                        
+                        if(methodName.contains("single cross")){
+                            //get the immediate parents
+                            Germplasm firstParent = getGermplasmWithPrefName(germplasmToExpand.getGpid1());
+                            checkIfGermplasmIsNull(firstParent, germplasmToExpand.getGpid1());
+                            Germplasm secondParent = getGermplasmWithPrefName(germplasmToExpand.getGpid2());
+                            checkIfGermplasmIsNull(secondParent, germplasmToExpand.getGpid2());
+                            SingleGermplasmCrossElement firstParentElem = new SingleGermplasmCrossElement();
+                            firstParentElem.setGermplasm(firstParent);
+                            SingleGermplasmCrossElement secondParentElem = new SingleGermplasmCrossElement();
+                            secondParentElem.setGermplasm(secondParent);
+                            
+                            //expand the parents as needed, depends on the level
+                            GermplasmCrossElement expandedFirstParent = expandGermplasmCross(firstParentElem, level-1);
+                            GermplasmCrossElement expandedSecondParent = expandGermplasmCross(secondParentElem, level-1);
+                            
+                            //get the number of crosses in the first parent
+                            int numOfCrosses = 0;
+                            if(expandedFirstParent instanceof GermplasmCross){
+                                numOfCrosses = ((GermplasmCross) expandedFirstParent).getNumberOfCrossesBefore() + 1;
+                            }
+                            
+                            cross.setFirstParent(expandedFirstParent);
+                            cross.setSecondParent(expandedSecondParent);
+                            cross.setNumberOfCrossesBefore(numOfCrosses);
+                            
+                        } else if(methodName.contains("double cross")){
+                            //get the grandparents on both sides
+                            Germplasm firstParent = getGermplasmByGID(germplasmToExpand.getGpid1());
+                            checkIfGermplasmIsNull(firstParent, germplasmToExpand.getGpid1());
+                            Germplasm secondParent = getGermplasmByGID(germplasmToExpand.getGpid2());
+                            checkIfGermplasmIsNull(secondParent, germplasmToExpand.getGpid2());
+                            
+                            Germplasm firstGrandParent = getGermplasmWithPrefName(firstParent.getGpid1());
+                            checkIfGermplasmIsNull(firstGrandParent, firstParent.getGpid1());
+                            SingleGermplasmCrossElement firstGrandParentElem = new SingleGermplasmCrossElement();
+                            firstGrandParentElem.setGermplasm(firstGrandParent);
+                            Germplasm secondGrandParent = getGermplasmWithPrefName(firstParent.getGpid2());
+                            checkIfGermplasmIsNull(secondGrandParent, secondParent.getGpid2());
+                            SingleGermplasmCrossElement secondGrandParentElem = new SingleGermplasmCrossElement();
+                            secondGrandParentElem.setGermplasm(secondGrandParent);
+                            
+                            Germplasm thirdGrandParent = getGermplasmWithPrefName(secondParent.getGpid1());
+                            checkIfGermplasmIsNull(thirdGrandParent, secondParent.getGpid1());
+                            SingleGermplasmCrossElement thirdGrandParentElem = new SingleGermplasmCrossElement();
+                            thirdGrandParentElem.setGermplasm(thirdGrandParent);
+                            Germplasm fourthGrandParent = getGermplasmWithPrefName(secondParent.getGpid2());
+                            checkIfGermplasmIsNull(fourthGrandParent, secondParent.getGpid2());
+                            SingleGermplasmCrossElement fourthGrandParentElem = new SingleGermplasmCrossElement();
+                            fourthGrandParentElem.setGermplasm(fourthGrandParent);
+                            
+                            //expand the grand parents as needed, depends on the level
+                            GermplasmCrossElement expandedFirstGrandParent = expandGermplasmCross(firstGrandParentElem, level-1);
+                            GermplasmCrossElement expandedSecondGrandParent = expandGermplasmCross(secondGrandParentElem, level-1);
+                            GermplasmCrossElement expandedThirdGrandParent = expandGermplasmCross(thirdGrandParentElem, level-1);
+                            GermplasmCrossElement expandedFourthGrandParent = expandGermplasmCross(fourthGrandParentElem, level-1);
+                            
+                            //create the cross object for the first pair of grand parents
+                            GermplasmCross firstCross = new GermplasmCross();
+                            firstCross.setFirstParent(expandedFirstGrandParent);
+                            firstCross.setSecondParent(expandedSecondGrandParent);
+                            //compute the number of crosses before this cross
+                            int numOfCrossesForFirst = 0;
+                            if(expandedFirstGrandParent instanceof GermplasmCross){
+                                numOfCrossesForFirst = ((GermplasmCross) expandedFirstGrandParent).getNumberOfCrossesBefore() + 1;
+                            }
+                            firstCross.setNumberOfCrossesBefore(numOfCrossesForFirst);
+                            
+                            //create the cross object for the second pair of grand parents
+                            GermplasmCross secondCross = new GermplasmCross();
+                            secondCross.setFirstParent(expandedThirdGrandParent);
+                            secondCross.setSecondParent(expandedFourthGrandParent);
+                            //compute the number of crosses before this cross
+                            int numOfCrossesForSecond = 0;
+                            if(expandedThirdGrandParent instanceof GermplasmCross){
+                                numOfCrossesForSecond = ((GermplasmCross) expandedThirdGrandParent).getNumberOfCrossesBefore() + 1;
+                            }
+                            
+                            //create the cross of the two sets of grandparents, this will be returned
+                            cross.setFirstParent(firstCross);
+                            cross.setSecondParent(secondCross);
+                            //compute the number of crosses before the cross to be returned
+                            int numOfCrosses = numOfCrossesForFirst + 1;
+                            if(expandedSecondGrandParent instanceof GermplasmCross){
+                                numOfCrosses = numOfCrosses 
+                                    + ((GermplasmCross) expandedSecondGrandParent).getNumberOfCrossesBefore() + 1; 
+                            }
+                            cross.setNumberOfCrossesBefore(numOfCrosses);
+                            
+                        } else if(methodName.contains("three-way cross")){
+                            //get the two parents first
+                            Germplasm firstParent = getGermplasmByGID(germplasmToExpand.getGpid1());
+                            checkIfGermplasmIsNull(firstParent, germplasmToExpand.getGpid1());
+                            Germplasm secondParent = getGermplasmByGID(germplasmToExpand.getGpid2());
+                            checkIfGermplasmIsNull(secondParent, germplasmToExpand.getGpid2());
+                            
+                            //check for the parent generated by a cross, the other one should be a derived germplasm
+                            if(firstParent.getGnpgs() > 0){
+                                // the first parent is the one created by a cross
+                                Germplasm firstGrandParent = getGermplasmWithPrefName(firstParent.getGpid1());
+                                checkIfGermplasmIsNull(firstGrandParent, firstParent.getGpid1());
+                                SingleGermplasmCrossElement firstGrandParentElem = new SingleGermplasmCrossElement();
+                                firstGrandParentElem.setGermplasm(firstGrandParent);
+                                
+                                Germplasm secondGrandParent = getGermplasmWithPrefName(firstParent.getGpid2());
+                                checkIfGermplasmIsNull(secondGrandParent, firstParent.getGpid2());
+                                SingleGermplasmCrossElement secondGrandParentElem = new SingleGermplasmCrossElement();
+                                secondGrandParentElem.setGermplasm(secondGrandParent);
+                                
+                                //expand the grand parents as needed, depends on the level
+                                GermplasmCrossElement expandedFirstGrandParent = expandGermplasmCross(firstGrandParentElem, level-1);
+                                GermplasmCrossElement expandedSecondGrandParent = expandGermplasmCross(secondGrandParentElem, level-1);
+                                
+                                //make the cross object for the grand parents
+                                GermplasmCross crossForGrandParents = new GermplasmCross();
+                                crossForGrandParents.setFirstParent(expandedFirstGrandParent);
+                                crossForGrandParents.setSecondParent(expandedSecondGrandParent);
+                                //compute the number of crosses before this one
+                                int numOfCrossesForGrandParents = 0;
+                                if(expandedFirstGrandParent instanceof GermplasmCross){
+                                    numOfCrossesForGrandParents = ((GermplasmCross) expandedFirstGrandParent).getNumberOfCrossesBefore() + 1;
+                                }
+                                crossForGrandParents.setNumberOfCrossesBefore(numOfCrossesForGrandParents);
+                                
+                                //make the element for the second parent
+                                secondParent = getGermplasmWithPrefName(germplasmToExpand.getGpid2());
+                                checkIfGermplasmIsNull(secondParent, germplasmToExpand.getGpid2());
+                                SingleGermplasmCrossElement secondParentElem = new SingleGermplasmCrossElement();
+                                secondParentElem.setGermplasm(secondParent);
+                                
+                                // create the cross to return
+                                cross.setFirstParent(crossForGrandParents);
+                                cross.setSecondParent(secondParentElem);
+                                //compute the number of crosses before this cross
+                                cross.setNumberOfCrossesBefore(numOfCrossesForGrandParents + 1);
+                            } else{
+                                // the second parent is the one created by a cross
+                                Germplasm firstGrandParent = getGermplasmWithPrefName(secondParent.getGpid1());
+                                checkIfGermplasmIsNull(firstGrandParent, secondParent.getGpid1());
+                                SingleGermplasmCrossElement firstGrandParentElem = new SingleGermplasmCrossElement();
+                                firstGrandParentElem.setGermplasm(firstGrandParent);
+                                
+                                Germplasm secondGrandParent = getGermplasmWithPrefName(secondParent.getGpid2());
+                                checkIfGermplasmIsNull(secondGrandParent, secondParent.getGpid2());
+                                SingleGermplasmCrossElement secondGrandParentElem = new SingleGermplasmCrossElement();
+                                secondGrandParentElem.setGermplasm(secondGrandParent);
+                                
+                                //expand the grand parents as needed, depends on the level
+                                GermplasmCrossElement expandedFirstGrandParent = expandGermplasmCross(firstGrandParentElem, level-1);
+                                GermplasmCrossElement expandedSecondGrandParent = expandGermplasmCross(secondGrandParentElem, level-1);
+                                
+                                //make the cross object for the grand parents
+                                GermplasmCross crossForGrandParents = new GermplasmCross();
+                                crossForGrandParents.setFirstParent(expandedFirstGrandParent);
+                                crossForGrandParents.setSecondParent(expandedSecondGrandParent);
+                                //compute the number of crosses before this one
+                                int numOfCrossesForGrandParents = 0;
+                                if(expandedFirstGrandParent instanceof GermplasmCross){
+                                    numOfCrossesForGrandParents = ((GermplasmCross) expandedFirstGrandParent).getNumberOfCrossesBefore() + 1;
+                                }
+                                crossForGrandParents.setNumberOfCrossesBefore(numOfCrossesForGrandParents);
+                                
+                                //make the element for the first parent
+                                firstParent = getGermplasmWithPrefName(germplasmToExpand.getGpid1());
+                                checkIfGermplasmIsNull(firstParent, germplasmToExpand.getGpid1());
+                                SingleGermplasmCrossElement firstParentElem = new SingleGermplasmCrossElement();
+                                firstParentElem.setGermplasm(firstParent);
+                                
+                                //create the cross to return
+                                cross.setFirstParent(crossForGrandParents);
+                                cross.setSecondParent(firstParentElem);
+                                cross.setNumberOfCrossesBefore(numOfCrossesForGrandParents + 1);
+                            }
+                            
+                        }
+                        
+                        return cross;
+                    } else{
+                        throw new MiddlewareQueryException("Error with expanding cross, can not find method with id: " + germplasmToExpand.getMethodId());
+                    }
+                }
+            } else{
+                throw new MiddlewareQueryException("expandGermplasmCross was incorrectly called");
+            }
+        }
+    }
+    
+    private void checkIfGermplasmIsNull(Germplasm germplasm, Integer gid) throws MiddlewareQueryException{
+        if(germplasm == null){
+            throw new MiddlewareQueryException("There is no germplasm with id: " + gid);
+        }
+    }
 }
