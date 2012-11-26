@@ -104,8 +104,10 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
 
     public long countAllTopLevelLists() throws MiddlewareQueryException {
         try {
+            Criterion topFolder = Restrictions.eq("parent.id", 0);
+            Criterion nullFolder = Restrictions.isNull("parent");
             Criteria criteria = getSession().createCriteria(GermplasmList.class);
-            criteria.add(Restrictions.eq("parent.id", 0));
+            criteria.add(Restrictions.or(topFolder, nullFolder));
             criteria.setProjection(Projections.rowCount());
             return ((Long) criteria.uniqueResult()).longValue();
         } catch (HibernateException e) {
