@@ -45,6 +45,12 @@ public class MarkerInfo implements Serializable{
                     ", reference " +
                     ", CONCAT(genotype, '') " + 
                     ", ploidy " +
+                    ", motif " +
+                    ", forward_primer " +
+                    ", reverse_primer " +
+                    ", product_size " +
+                    ", annealing_temp " +
+                    ", amplification " +
                     ", CONCAT(principal_investigator, '') " + 
                     ", contact " +
                     ", institute " +
@@ -69,6 +75,12 @@ public class MarkerInfo implements Serializable{
                     ", reference " +
                     ", CONCAT(genotype, '') " + 
                     ", ploidy " +
+                    ", motif " +
+                    ", forward_primer " +
+                    ", reverse_primer " +
+                    ", product_size " +
+                    ", annealing_temp " +
+                    ", amplification " +
                     ", CONCAT(principal_investigator, '') " + 
                     ", contact " +
                     ", institute " +
@@ -92,6 +104,12 @@ public class MarkerInfo implements Serializable{
                     ", reference " +
                     ", CONCAT(genotype, '') " + 
                     ", ploidy " +
+                    ", motif " +
+                    ", forward_primer " +
+                    ", reverse_primer " +
+                    ", product_size " +
+                    ", annealing_temp " +
+                    ", amplification " +
                     ", CONCAT(principal_investigator, '') " + 
                     ", contact " +
                     ", institute " +
@@ -119,7 +137,7 @@ public class MarkerInfo implements Serializable{
     @Column(name = "species")
     private String species;
 
-    @Column(name = "accession_id")
+    @Column(name = "db_accession_id")
     private String accessionId;
     
     @Column(name = "reference")
@@ -131,6 +149,24 @@ public class MarkerInfo implements Serializable{
     @Column(name = "ploidy")
     private String ploidy;
 
+    @Column(name = "motif")
+    private String motif;
+    
+    @Column(name = "forward_primer")
+    private String forwardPrimer;
+    
+    @Column(name = "reverse_primer")
+    private String reversePrimer;
+    
+    @Column(name = "product_size")
+    private String productSize;
+    
+    @Column(name = "annealing_temp")
+    private Float annealingTemp;
+    
+    @Column(name = "amplification")
+    private String amplification; 
+    
     @Column(name = "principal_investigator")
     private String principalInvestigator;
 
@@ -150,7 +186,8 @@ public class MarkerInfo implements Serializable{
     }
 
     public MarkerInfo(Integer markerId, String markerType, String markerName, String species, String accessionId, String reference,
-            String genotype, String ploidy, String principalInvestigator, String contact, String institute, BigInteger genotypesCount) {
+            String genotype, String ploidy, String motif, String forwardPrimer, String reversePrimer, String productSize,
+            Float annealingTemp, String amplification, String principalInvestigator, String contact, String institute, BigInteger genotypesCount) {
         super();
         this.markerId = markerId;
         this.markerType = markerType;
@@ -160,6 +197,12 @@ public class MarkerInfo implements Serializable{
         this.reference = reference;
         this.genotype = genotype;
         this.ploidy = ploidy;
+        this.motif = motif;
+        this.forwardPrimer = forwardPrimer;
+        this.reversePrimer = reversePrimer;
+        this.productSize = productSize;
+        this.annealingTemp = annealingTemp;
+        this.amplification = amplification;
         this.principalInvestigator = principalInvestigator;
         this.contact = contact;
         this.institute = institute;
@@ -230,6 +273,54 @@ public class MarkerInfo implements Serializable{
         this.ploidy = ploidy;
     }
     
+    public String getMotif() {
+        return motif;
+    }
+    
+    public void setMotif(String motif) {
+        this.motif = motif;
+    }
+    
+    public String getForwardPrimer() {
+        return forwardPrimer;
+    }
+    
+    public void setForwardPrimer(String forwardPrimer) {
+        this.forwardPrimer = forwardPrimer;
+    }
+    
+    public String getReversePrimer() {
+        return reversePrimer;
+    }
+    
+    public void setReversePrimer(String reversePrimer) {
+        this.reversePrimer = reversePrimer;
+    }
+    
+    public String getProductSize() {
+        return productSize;
+    }
+    
+    public void setProductSize(String productSize) {
+        this.productSize = productSize;
+    }
+    
+    public Float getAnnealingTemp() {
+        return annealingTemp;
+    }
+    
+    public void setAnnealingTemp(Float annealingTemp) {
+        this.annealingTemp = annealingTemp;
+    }
+    
+    public String getAmplification() {
+        return amplification;
+    }
+    
+    public void setAmplification(String amplification) {
+        this.amplification = amplification;
+    }
+
     public String getPrincipalInvestigator() {
         return principalInvestigator;
     }
@@ -308,6 +399,18 @@ public class MarkerInfo implements Serializable{
         builder.append(genotype);
         builder.append(", ploidy=");
         builder.append(ploidy);
+        builder.append(", motif=");
+        builder.append(motif);
+        builder.append(", forwardPrimer=");
+        builder.append(forwardPrimer);
+        builder.append(", reversePrimer=");
+        builder.append(reversePrimer);
+        builder.append(", productSize=");
+        builder.append(productSize);
+        builder.append(", annealing_temp=");
+        builder.append(annealingTemp);
+        builder.append(", amplification=");
+        builder.append(amplification);
         builder.append(", principalInvestigator=");
         builder.append(principalInvestigator);
         builder.append(", contact=");

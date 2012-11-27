@@ -88,6 +88,12 @@ public class Dataset implements Serializable{
     @Column(name = "missing_data")
     private String missingData;
     
+    @Column(name = "method")
+    private String method;
+    
+    @Column(name = "score")
+    private String score;
+    
     public Dataset() {
     }
 
@@ -100,7 +106,9 @@ public class Dataset implements Serializable{
             Date uploadTemplateDate, 
             String remarks, 
             String dataType, 
-            String missingData) {
+            String missingData,
+            String method,
+            String score) {
         
         this.datasetId = datasetId;
         this.datasetName = datasetName;
@@ -112,6 +120,8 @@ public class Dataset implements Serializable{
         this.remarks = remarks;
         this.dataType = dataType;
         this.missingData = missingData;
+        this.method = method;
+        this.score = score;
     }
 
     public Integer getDatasetId() {
@@ -193,6 +203,22 @@ public class Dataset implements Serializable{
     public void setMissingData(String missingData) {
         this.missingData = missingData;
     }
+    
+    public String getMethod() {
+        return method;
+    }
+    
+    public void setMethod(String method) {
+        this.method = method;
+    }
+    
+    public String getScore() {
+        return score;
+    }
+    
+    public void setScore(String score) {
+        this.score = score;
+    }
 
     @Override
     public boolean equals(Object obj) {
@@ -238,6 +264,10 @@ public class Dataset implements Serializable{
         builder.append(dataType);
         builder.append(", missingData=");
         builder.append(missingData);
+        builder.append(", method=");
+        builder.append(method);
+        builder.append(", score=");
+        builder.append(score);
         builder.append("]");
         return builder.toString();
     }

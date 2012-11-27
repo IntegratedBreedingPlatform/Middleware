@@ -57,17 +57,21 @@ public class MappingData implements Serializable{
     @Column(name = "marker_name")
     private String markerName;
     
+    @Column(name = "map_id")
+    private Integer mapId;
+    
     public MappingData() {
     }
 
     public MappingData(Integer markerId, String linkageGroup, Float startPosition, 
-            String mapUnit, String mapName, String markerName) {
+            String mapUnit, String mapName, String markerName, Integer mapId) {
         this.markerId = markerId;
         this.linkageGroup = linkageGroup;
         this.startPosition = startPosition;
         this.mapUnit = mapUnit;
         this.mapName = mapName;
         this.markerName = markerName;
+        this.mapId = mapId;
     }
         
     public Integer getMarkerId() {
@@ -117,6 +121,14 @@ public class MappingData implements Serializable{
     public void setMarkerName(String markerName) {
         this.markerName = markerName;
     }
+    
+    public Integer getMapId() {
+        return mapId;
+    }
+    
+    public void setMapId(Integer mapId) {
+        this.mapId = mapId;
+    }
 
     @Override
     public boolean equals(Object obj) {
@@ -158,6 +170,8 @@ public class MappingData implements Serializable{
         builder.append(mapName);
         builder.append(", markerName=");
         builder.append(markerName);
+        builder.append(", mapId=");
+        builder.append(mapId);
         builder.append("]");
         return builder.toString();
     }

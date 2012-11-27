@@ -65,12 +65,18 @@ public class MarkerInfoDAO extends GenericDAO<MarkerInfo, Integer>{
                     String reference = (String) result[5];
                     String genotype = (String) result[6];
                     String ploidy = (String) result[7];
-                    String principalInvestigator = (String) result[8];
-                    String contact = (String) result[9];
-                    String institute = (String) result[10];
-                    BigInteger genotypesCount = (BigInteger) result[11];
+                    String motif = (String) result[8];
+                    String forwardPrimer = (String) result[9];
+                    String reversePrimer = (String) result[10];
+                    String productSize = (String) result[11];
+                    Float annealingTemp = (Float) result[12];
+                    String amplification = (String) result[13];
+                    String principalInvestigator = (String) result[14];
+                    String contact = (String) result[15];
+                    String institute = (String) result[16];
+                    BigInteger genotypesCount = (BigInteger) result[17];
                     MarkerInfo markerInfo = new MarkerInfo(markerId, markerType, markerName2, species, accessionId, reference, genotype,
-                            ploidy, principalInvestigator, contact, institute, genotypesCount);
+                            ploidy, motif, forwardPrimer, reversePrimer, productSize, annealingTemp, amplification, principalInvestigator, contact, institute, genotypesCount);
                     toReturn.add(markerInfo);
                 }
             }
@@ -143,12 +149,18 @@ public class MarkerInfoDAO extends GenericDAO<MarkerInfo, Integer>{
                     String reference = (String) result[5];
                     String genotype2 = (String) result[6];
                     String ploidy = (String) result[7];
-                    String principalInvestigator = (String) result[8];
-                    String contact = (String) result[9];
-                    String institute = (String) result[10];
-                    BigInteger genotypesCount = (BigInteger) result[11];
+                    String motif = (String) result[8];
+                    String forwardPrimer = (String) result[9];
+                    String reversePrimer = (String) result[10];
+                    String productSize = (String) result[11];
+                    Float annealingTemp = (Float) result[12];
+                    String amplification = (String) result[13];
+                    String principalInvestigator = (String) result[14];
+                    String contact = (String) result[15];
+                    String institute = (String) result[16];
+                    BigInteger genotypesCount = (BigInteger) result[17];
                     MarkerInfo markerInfo = new MarkerInfo(markerId, markerType, markerName, species, accessionId, reference, genotype2,
-                            ploidy, principalInvestigator, contact, institute, genotypesCount);
+                            ploidy, motif, forwardPrimer, reversePrimer, productSize, annealingTemp, amplification, principalInvestigator, contact, institute, genotypesCount);
                     toReturn.add(markerInfo);
                 }
             }
@@ -221,12 +233,18 @@ public class MarkerInfoDAO extends GenericDAO<MarkerInfo, Integer>{
                     String reference = (String) result[5];
                     String genotype = (String) result[6];
                     String ploidy = (String) result[7];
-                    String principalInvestigator = (String) result[8];
-                    String contact = (String) result[9];
-                    String institute = (String) result[10];
-                    BigInteger genotypesCount = (BigInteger) result[11];
+                    String motif = (String) result[8];
+                    String forwardPrimer = (String) result[9];
+                    String reversePrimer = (String) result[10];
+                    String productSize = (String) result[11];
+                    Float annealingTemp = (Float) result[12];
+                    String amplification = (String) result[13];
+                    String principalInvestigator = (String) result[14];
+                    String contact = (String) result[15];
+                    String institute = (String) result[16];
+                    BigInteger genotypesCount = (BigInteger) result[17];
                     MarkerInfo markerInfo = new MarkerInfo(markerId, markerType, markerName, species, accessionId, reference, genotype,
-                            ploidy, principalInvestigator, contact, institute, genotypesCount);
+                            ploidy, motif, forwardPrimer, reversePrimer, productSize, annealingTemp, amplification, principalInvestigator, contact, institute, genotypesCount);
                     toReturn.add(markerInfo);
                 }
             }
