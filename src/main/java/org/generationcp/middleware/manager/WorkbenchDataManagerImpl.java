@@ -1439,4 +1439,17 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
                     "Error encountered while getting all roles: " + e.getMessage(), e);
         }
     }
+    
+    @Override
+    public List<Role> getAllRolesDesc() throws MiddlewareQueryException {
+        try {
+            RoleDAO dao = new RoleDAO();
+            dao.setSession(getCurrentSession());
+            return dao.getAllRolesDesc();
+        } catch (Exception e) {
+            throw new MiddlewareQueryException(
+                    "Error encountered while getting all roles (sorted): " + e.getMessage(), e);
+        }
+    }
+    
 }

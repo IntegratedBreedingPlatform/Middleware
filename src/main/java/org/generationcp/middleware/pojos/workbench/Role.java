@@ -19,13 +19,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
-
-import org.generationcp.middleware.pojos.User;
 
 @Entity
 @Table(name = "workbench_role")
@@ -34,6 +29,12 @@ public class Role implements Serializable{
     private static final long serialVersionUID = 1L;
     
     public final static int MANAGER_ROLE_ID = 1;
+    
+    public final static String MANAGER_ROLE_NAME = "Manager";
+    public final static String MARS_ROLE_NAME = "MARS Breeder";
+    public final static String MAS_ROLE_NAME = "MAS Breeder";
+    public final static String MABC_ROLE_NAME = "MABC Breeder";
+    public final static String CB_ROLE_NAME = "CB Breeder";
 
     @Id
     @Basic(optional = false)

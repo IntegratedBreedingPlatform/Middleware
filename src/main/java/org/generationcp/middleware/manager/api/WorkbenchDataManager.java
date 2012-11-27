@@ -742,4 +742,12 @@ public interface WorkbenchDataManager{
      * @throws MiddlewareQueryException
      */
     public List<Role> getAllRoles() throws MiddlewareQueryException;
+    
+    /**
+     * Returns all records from the workbench_role table, ordered by descending role_id
+     * 
+     * @return List of Role objects
+     * @throws MiddlewareQueryException
+     */
+    public List<Role> getAllRolesDesc() throws MiddlewareQueryException;
 }
