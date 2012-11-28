@@ -32,6 +32,7 @@ import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
+import org.generationcp.middleware.pojos.workbench.WorkbenchSetting;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 
 /**
@@ -750,4 +751,12 @@ public interface WorkbenchDataManager{
      * @throws MiddlewareQueryException
      */
     public List<Role> getAllRolesDesc() throws MiddlewareQueryException;
+    
+    /**
+     * Get the workbench setting object.
+     * 
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    public WorkbenchSetting getWorkbenchSetting() throws MiddlewareQueryException;
 }

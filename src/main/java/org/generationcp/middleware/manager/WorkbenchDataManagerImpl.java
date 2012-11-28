@@ -29,6 +29,7 @@ import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.WorkbenchDatasetDAO;
 import org.generationcp.middleware.dao.WorkbenchRuntimeDataDAO;
+import org.generationcp.middleware.dao.WorkbenchSettingDAO;
 import org.generationcp.middleware.dao.WorkflowTemplateDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -48,6 +49,7 @@ import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
+import org.generationcp.middleware.pojos.workbench.WorkbenchSetting;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -1452,4 +1454,16 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         }
     }
     
+    @Override
+    public WorkbenchSetting getWorkbenchSetting() throws MiddlewareQueryException {
+        try {
+            WorkbenchSettingDAO dao = new WorkbenchSettingDAO();
+            dao.setSession(getCurrentSession());
+            List<WorkbenchSetting> list = dao.getAll();
+            return list.isEmpty() ? null : list.get(0);
+        } catch (Exception e) {
+            throw new MiddlewareQueryException(
+                                               "Error encountered while workbench setting: " + e.getMessage(), e);
+        }
+    }
 }
