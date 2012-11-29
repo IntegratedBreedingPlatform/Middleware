@@ -36,6 +36,13 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 public class WorkflowTemplate implements Serializable{
 
     private static final long serialVersionUID = 1L;
+    
+    public final static String MANAGER_NAME = "Manager";
+    public final static String MARS_NAME = "MARS";
+    public final static String MAS_NAME = "MAS";
+    public final static String MABC_NAME = "MABC";
+    public final static String CB_NAME = "CB";
+
 
     @Id
     @Basic(optional = false)
