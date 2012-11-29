@@ -49,6 +49,10 @@ public class Role implements Serializable{
     @JoinColumn(name = "workflow_template_id")
     private WorkflowTemplate workflowTemplate;
 
+    @Basic(optional = false)
+    @Column(name = "role_label")
+    private String label;
+    
     public Role() {
     }
 
@@ -83,6 +87,14 @@ public class Role implements Serializable{
         this.workflowTemplate = workflowTemplate;
     }
 
+    public String getLabel() {
+      return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+    
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
