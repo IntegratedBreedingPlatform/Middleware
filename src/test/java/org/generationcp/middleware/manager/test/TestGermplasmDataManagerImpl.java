@@ -211,12 +211,23 @@ public class TestGermplasmDataManagerImpl{
     @Test
     public void testGetGermplasmByNameOriginalStandardizedAndNoSpace() throws Exception {
         String name = "IR  65";
-        List<Germplasm> germplasmList = manager.getGermplasmByName(name, 0, new Long(manager.countGermplasmByName(name)).intValue());
+        List<Germplasm> germplasmList = manager.getGermplasmByName(name, 0, new Long(manager.countGermplasmByName(name, Operation.EQUAL)).intValue(), Operation.EQUAL);
 
         System.out.println("testGetGermplasmByNameOriginalStandardizedAndNoSpace(" + name + ") RESULTS: " + germplasmList.size());
         for (Germplasm g : germplasmList) {
             System.out.println("  " + g);
         }
+        
+        name = "IR 65%";
+        germplasmList = manager.getGermplasmByName(name, 0, new Long(manager.countGermplasmByName(name, Operation.EQUAL)).intValue(), Operation.LIKE);
+
+        System.out.println("testGetGermplasmByNameOriginalStandardizedAndNoSpace(" + name + ") RESULTS: " + germplasmList.size());
+        for (Germplasm g : germplasmList) {
+            System.out.println("  " + g);
+        }
+        
+                
+        
     }
 
     @Test
@@ -232,7 +243,7 @@ public class TestGermplasmDataManagerImpl{
     @Test
     public void testCountGermplasmByNameOriginalStandardizedAndNoSpace() throws Exception {
         String name = "IR  65";
-        long count = manager.countGermplasmByName(name);
+        long count = manager.countGermplasmByName(name, Operation.EQUAL);
         System.out.println("testCountGermplasmByNameOriginalStandardizedAndNoSpace(" + name + ") RESULTS: " + count);
     }
 

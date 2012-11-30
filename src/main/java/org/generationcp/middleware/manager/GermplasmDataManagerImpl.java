@@ -542,7 +542,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     
     @Override
-    public List<Germplasm> getGermplasmByName(String name, int start, int numOfRows) throws MiddlewareQueryException {
+    public List<Germplasm> getGermplasmByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException {
 
         List<String> names = new ArrayList<String>();
         names.add(name);
@@ -561,17 +561,17 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
         if (sessionForCentral != null) {
             dao.setSession(sessionForCentral);
-            centralCount = dao.countByName(names);
+            centralCount = dao.countByName(names, op);
 
             if (centralCount > start) {
-                germplasms.addAll(dao.getByName(names, start, numOfRows));
+                germplasms.addAll(dao.getByName(names, start, numOfRows, op));
                 relativeLimit = numOfRows - (centralCount - start);
                 if (relativeLimit > 0) {
                     if (sessionForLocal != null) {
                         dao.setSession(sessionForLocal);
-                        localCount = dao.countByName(names);
+                        localCount = dao.countByName(names, op);
                         if (localCount > 0) {
-                            germplasms.addAll(dao.getByName(names, 0, (int) relativeLimit));
+                            germplasms.addAll(dao.getByName(names, 0, (int) relativeLimit, op));
                         }
                     }
                 }
@@ -580,18 +580,18 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                 relativeLimit = start - centralCount;
                 if (sessionForLocal != null) {
                     dao.setSession(sessionForLocal);
-                    localCount = dao.countByName(names);
+                    localCount = dao.countByName(names, op);
                     if (localCount > relativeLimit) {
-                        germplasms.addAll(dao.getByName(names, (int) relativeLimit, numOfRows));
+                        germplasms.addAll(dao.getByName(names, (int) relativeLimit, numOfRows, op));
                     }
                 }
             }
 
         } else if (sessionForLocal != null) {
             dao.setSession(sessionForLocal);
-            localCount = dao.countByName(names);
+            localCount = dao.countByName(names, op);
             if (localCount > start) {
-                germplasms.addAll(dao.getByName(names, start, numOfRows));
+                germplasms.addAll(dao.getByName(names, start, numOfRows, op));
             }
         }
 
@@ -631,7 +631,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     @Override
-    public long countGermplasmByName(String name) throws MiddlewareQueryException {
+    public long countGermplasmByName(String name, Operation operation) throws MiddlewareQueryException {
 
         List<String> names = new ArrayList<String>();
         names.add(name);
@@ -646,12 +646,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
         if (sessionForLocal != null) {
             dao.setSession(sessionForLocal);
-            count += dao.countByName(names);
+            count += dao.countByName(names, operation);
         }
 
         if (sessionForCentral != null) {
             dao.setSession(sessionForCentral);
-            count += dao.countByName(names);
+            count += dao.countByName(names, operation);
         }
 
         return count;

@@ -90,10 +90,12 @@ public interface GermplasmDataManager {
      * @param numOfRows
      *            - the number of rows to be included in the sublist of results
      *            to be returned
+     * @param op
+     *            - can be EQUAL OR LIKE
      * @return List of Germplasm POJOs
      * @throws MiddlewareQueryException
      */
-    public List<Germplasm> getGermplasmByName(String name, int start, int numOfRows) throws MiddlewareQueryException;
+    public List<Germplasm> getGermplasmByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException;
 
     /**
      * Returns the number of germplasm records with any name matching the given
@@ -136,11 +138,13 @@ public interface GermplasmDataManager {
      * 
      * @param name
      *            - search string for the name of the germplasm
+     * @param op
+     *            - can be EQUAL OR LIKE
      *            
      * @return number of germplasm records
      * @throws MiddlewareQueryException
      */
-    public long countGermplasmByName(String name) throws MiddlewareQueryException;
+    public long countGermplasmByName(String name, Operation op) throws MiddlewareQueryException;
     
     /**
      * Returns the germplasm records that were created at the locations with
