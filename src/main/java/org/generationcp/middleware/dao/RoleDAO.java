@@ -64,4 +64,16 @@ public class RoleDAO extends GenericDAO<Role, Integer>{
             throw new MiddlewareQueryException("Error in getAllRolesSorted() query from Role: " + e.getMessage(), e);
         } 
     }
+    
+    @SuppressWarnings("unchecked")
+    public List<Role> getAllRolesOrderedByLabel() throws MiddlewareQueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(Role.class);
+            criteria.addOrder(Order.asc("labelOrder"));
+            return criteria.list();
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error in getAllRolesSorted() query from Role: " + e.getMessage(), e);
+        } 
+    }
+
 }

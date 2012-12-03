@@ -753,6 +753,14 @@ public interface WorkbenchDataManager{
     public List<Role> getAllRolesDesc() throws MiddlewareQueryException;
     
     /**
+     * Returns all records from the workbench_role table, ordered by ascending label_order
+     * 
+     * @return List of Role objects
+     * @throws MiddlewareQueryException
+     */
+    public List<Role> getAllRolesOrderedByLabel() throws MiddlewareQueryException;
+
+    /**
      * Get the workbench setting object.
      * 
      * @return

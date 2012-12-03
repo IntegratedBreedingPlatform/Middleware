@@ -53,6 +53,10 @@ public class Role implements Serializable{
     @Column(name = "role_label")
     private String label;
     
+    @Basic(optional = false)
+    @Column(name = "label_order")
+    private String labelOrder;
+    
     public Role() {
     }
 
