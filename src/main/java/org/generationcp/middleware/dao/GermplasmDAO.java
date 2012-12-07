@@ -106,14 +106,13 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             // Search using = by default
             SQLQuery query = getSession().createSQLQuery(Germplasm.GET_BY_NAME_ALL_MODES_USING_EQUAL);
             
-            if (operation == null || operation == Operation.EQUAL) {
-                query.setParameter("noSpaceName", noSpaceName);
-                query.setParameter("standardizedName", standardizedName);
-            } else if (operation == Operation.LIKE) {
-                query = getSession().createSQLQuery(Germplasm.GET_BY_NAME_USING_LIKE);
+            if (operation == Operation.LIKE) {
+                query = getSession().createSQLQuery(Germplasm.GET_BY_NAME_ALL_MODES_USING_LIKE);
             }
             
             query.setParameter("name", originalName);
+            query.setParameter("noSpaceName", noSpaceName);
+            query.setParameter("standardizedName", standardizedName);
             query.addEntity("g", Germplasm.class);
 
             query.setFirstResult(start);
@@ -175,14 +174,13 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             // Count using = by default
             SQLQuery query = getSession().createSQLQuery(Germplasm.COUNT_BY_NAME_ALL_MODES_USING_EQUAL);
             
-            if (operation == null || operation == Operation.EQUAL) {
-                query.setParameter("noSpaceName", noSpaceName);
-                query.setParameter("standardizedName", standardizedName);
-            } else if (operation == Operation.LIKE) {
-                query = getSession().createSQLQuery(Germplasm.COUNT_BY_NAME_USING_LIKE);
+            if (operation == Operation.LIKE) {
+                query = getSession().createSQLQuery(Germplasm.COUNT_BY_NAME_ALL_MODES_USING_LIKE);
             }
 
             query.setParameter("name", originalName);
+            query.setParameter("noSpaceName", noSpaceName);
+            query.setParameter("standardizedName", standardizedName);
 
             return ((BigInteger) query.uniqueResult()).longValue();
             

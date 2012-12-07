@@ -259,13 +259,13 @@ public class Germplasm implements Serializable{
             "SELECT COUNT(DISTINCT g.gid) FROM germplsm g JOIN names n ON g.gid = n.gid WHERE "
             + "nval = :name OR nval = :noSpaceName OR nval = :standardizedName ";       
 
-    public static final String GET_BY_NAME_USING_LIKE =
+    public static final String GET_BY_NAME_ALL_MODES_USING_LIKE =
             "SELECT DISTINCT {g.*} FROM germplsm g JOIN names n ON g.gid = n.gid WHERE "
-          + "nval LIKE :name ";
+                    + "nval LIKE :name OR nval LIKE :noSpaceName OR nval LIKE :standardizedName ";       
     
-    public static final String COUNT_BY_NAME_USING_LIKE =
+    public static final String COUNT_BY_NAME_ALL_MODES_USING_LIKE =
             "SELECT COUNT(DISTINCT g.gid) FROM germplsm g JOIN names n ON g.gid = n.gid WHERE "
-            + "nval LIKE :name ";       
+                    + "nval LIKE :name OR nval LIKE :noSpaceName OR nval LIKE :standardizedName ";       
     
     @Id
     @Basic(optional = false)
