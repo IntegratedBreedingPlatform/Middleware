@@ -57,7 +57,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             throws MiddlewareQueryException {
         try {
             StringBuilder queryString = new StringBuilder();
-            queryString.append("SELECT {g.*} FROM germplsm g JOIN names n ON g.gid = n.gid WHERE ");
+            queryString.append("SELECT DISTINCT {g.*} FROM germplsm g JOIN names n ON g.gid = n.gid WHERE ");
 
             if (operation == null || operation == Operation.EQUAL) {
                 queryString.append("n.nval = :name ");
