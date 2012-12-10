@@ -32,6 +32,7 @@ import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectLocationMap;
 import org.generationcp.middleware.pojos.workbench.ProjectMethod;
+import org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount;
 import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.Tool;
@@ -633,6 +634,61 @@ public class TestWorkbenchDataManagerImpl{
         for(Role role : roles) {
             System.out.println(role);
         }
+    }
+    
+    @Test
+    public void testAddProjectUserMysqlAccount() throws MiddlewareQueryException {
+        //This test assumes that there is an existing project record and users record with id = 1
+        Project project = manager.getProjects().get(0);
+        User user = manager.getUserById(1);
+        
+        ProjectUserMysqlAccount recordToSave = new ProjectUserMysqlAccount();
+        recordToSave.setProject(project);
+        recordToSave.setUser(user);
+        recordToSave.setMysqlUsername("sample");
+        recordToSave.setMysqlPassword("sample");
+        
+        Integer idSaved = manager.addProjectUserMysqlAccount(recordToSave);
+        System.out.println("Id of record saved: " + idSaved);
+    }
+    
+    @Test
+    public void testAddProjectUserMysqlAccounts() throws MiddlewareQueryException {
+        //This test assumes that there are two project records and users records with id = 1 and 2
+        Project project1 = manager.getProjects().get(0);
+        Project project2 = manager.getProjects().get(1);
+        User user1 = manager.getUserById(1);
+        User user2 = manager.getUserById(2);
+        
+        ProjectUserMysqlAccount recordToSave1 = new ProjectUserMysqlAccount();
+        recordToSave1.setProject(project1);
+        recordToSave1.setUser(user2);
+        recordToSave1.setMysqlUsername("sample");
+        recordToSave1.setMysqlPassword("sample");
+        
+        ProjectUserMysqlAccount recordToSave2 = new ProjectUserMysqlAccount();
+        recordToSave2.setProject(project2);
+        recordToSave2.setUser(user1);
+        recordToSave2.setMysqlUsername("sample");
+        recordToSave2.setMysqlPassword("sample");
+        
+        List<ProjectUserMysqlAccount> records = new ArrayList<ProjectUserMysqlAccount>();
+        records.add(recordToSave1);
+        records.add(recordToSave2);
+        List<Integer> idsSaved = manager.addProjectUserMysqlAccounts(records);
+        
+        System.out.println("Ids of records saved:");
+        for(Integer id : idsSaved){
+            System.out.println(id);
+        }
+    }
+    
+    @Test
+    public void testGetProjectUserMysqlAccountByProjectIdAndUserId() throws MiddlewareQueryException {
+        //This test assumes that there is a record in workbench_project_user_mysql_account
+        //with project id = 1 and user id = 1
+        ProjectUserMysqlAccount record = manager.getProjectUserMysqlAccountByProjectIdAndUserId(Integer.valueOf(1), Integer.valueOf(1));
+        System.out.println(record);
     }
     
     //TODO testAddIbdbUserMap()

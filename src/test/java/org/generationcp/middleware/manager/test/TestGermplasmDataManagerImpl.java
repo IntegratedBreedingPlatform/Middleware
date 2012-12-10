@@ -48,7 +48,7 @@ public class TestGermplasmDataManagerImpl{
         factory = new ManagerFactory(local, central);
         manager = factory.getGermplasmDataManager();
     }
-
+    
     @Test
     public void testGetAllLocations() throws Exception {
         long start = System.currentTimeMillis();
@@ -814,7 +814,11 @@ public class TestGermplasmDataManagerImpl{
         }
 
     }
-        
+    
+    @Test
+    public void testGetCrossExpansion() throws Exception {
+        System.out.println(manager.getCrossExpansion(Integer.valueOf(75), 2));
+    }
     
     @AfterClass
     public static void tearDown() throws Exception {

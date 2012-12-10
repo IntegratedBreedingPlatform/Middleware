@@ -77,7 +77,7 @@
   <mapping class="org.generationcp.middleware.pojos.workbench.WorkflowTemplate"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.ProjectLocationMap"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.ToolConfiguration"/>
-  
+  <mapping class="org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount"/>
   
  </session-factory>
 </hibernate-configuration>

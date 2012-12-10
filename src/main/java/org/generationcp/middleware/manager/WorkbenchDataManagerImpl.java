@@ -22,6 +22,7 @@ import org.generationcp.middleware.dao.ProjectActivityDAO;
 import org.generationcp.middleware.dao.ProjectDAO;
 import org.generationcp.middleware.dao.ProjectLocationMapDAO;
 import org.generationcp.middleware.dao.ProjectMethodDAO;
+import org.generationcp.middleware.dao.ProjectUserMysqlAccountDAO;
 import org.generationcp.middleware.dao.ProjectUserRoleDAO;
 import org.generationcp.middleware.dao.RoleDAO;
 import org.generationcp.middleware.dao.ToolConfigurationDAO;
@@ -42,6 +43,7 @@ import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectLocationMap;
 import org.generationcp.middleware.pojos.workbench.ProjectMethod;
+import org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount;
 import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.Tool;
@@ -1477,5 +1479,75 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
             throw new MiddlewareQueryException(
                                                "Error encountered while workbench setting: " + e.getMessage(), e);
         }
+    }
+    
+    @Override
+    public ProjectUserMysqlAccount getProjectUserMysqlAccountByProjectIdAndUserId(Integer projectId, Integer userId)
+            throws MiddlewareQueryException {
+        ProjectUserMysqlAccountDAO dao = new ProjectUserMysqlAccountDAO();
+        dao.setSession(getCurrentSession());
+        return dao.getByProjectIdAndUserId(projectId, userId);
+    }
+    
+    @Override
+    public Integer addProjectUserMysqlAccount(ProjectUserMysqlAccount record) throws MiddlewareQueryException {
+        List<ProjectUserMysqlAccount> tosave = new ArrayList<ProjectUserMysqlAccount>();
+        tosave.add(record);
+        List<Integer> idsOfRecordsSaved = addProjectUserMysqlAccount(tosave);
+        if(!idsOfRecordsSaved.isEmpty()){
+            return idsOfRecordsSaved.get(0);
+        } else{
+            return null;
+        }
+    }
+    
+    @Override
+    public List<Integer> addProjectUserMysqlAccounts(List<ProjectUserMysqlAccount> records) throws MiddlewareQueryException {
+        return addProjectUserMysqlAccount(records);
+    }
+    
+    private List<Integer> addProjectUserMysqlAccount(List<ProjectUserMysqlAccount> records) throws MiddlewareQueryException {
+        Session session = getCurrentSession();
+        if (session == null) {
+            return new ArrayList<Integer>();
+        }
+
+        Transaction trans = null;
+
+        List<Integer> idsSaved = new ArrayList<Integer>();
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
+
+            ProjectUserMysqlAccountDAO dao = new ProjectUserMysqlAccountDAO();
+            dao.setSession(session);
+
+            for(ProjectUserMysqlAccount record : records) {
+                ProjectUserMysqlAccount recordSaved = dao.saveOrUpdate(record);
+                idsSaved.add(recordSaved.getId());
+            }
+            
+            // end transaction, commit to database
+            trans.commit();
+
+            // remove ProjectUserMysqlAccount data from session cache
+            for(ProjectUserMysqlAccount record : records) {
+                session.evict(record);
+            }
+            session.evict(records);
+            
+        } catch (Exception e) {
+            LOG.error("Error in addProjectUserMysqlAccount: " + e.getMessage() + "\n" + e.getStackTrace());
+            e.printStackTrace();
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new MiddlewareQueryException(
+                    "Error encountered while adding ProjectUserMysqlAccount: WorkbenchDataManager.addProjectUserMysqlAccount(records="
+                            + records + "): " + e.getMessage(), e);
+        }
+
+        return idsSaved;
     }
 }

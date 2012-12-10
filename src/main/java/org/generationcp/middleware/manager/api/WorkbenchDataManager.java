@@ -25,6 +25,7 @@ import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectLocationMap;
 import org.generationcp.middleware.pojos.workbench.ProjectMethod;
+import org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount;
 import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.Tool;
@@ -767,4 +768,32 @@ public interface WorkbenchDataManager{
      * @throws MiddlewareQueryException
      */
     public WorkbenchSetting getWorkbenchSetting() throws MiddlewareQueryException;
+    
+    /**
+     * Returns the ProjectUserMysqlAccount record identified by the given project id and user id.
+     * 
+     * @param projectId
+     * @param userId
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    public ProjectUserMysqlAccount getProjectUserMysqlAccountByProjectIdAndUserId(Integer projectId, Integer userId) throws MiddlewareQueryException;
+    
+    /**
+     * Stores a list of ProjectUserMysqlAccount records in the database.
+     * 
+     * @param records
+     * @return List of ids of the records saved
+     * @throws MiddlewareQueryException
+     */
+    public List<Integer> addProjectUserMysqlAccounts(List<ProjectUserMysqlAccount> records) throws MiddlewareQueryException;
+    
+    /**
+     * Stores a ProjectUserMysqlAccount record in the database.
+     * 
+     * @param record
+     * @return id of the record saved
+     * @throws MiddlewareQueryException
+     */
+    public Integer addProjectUserMysqlAccount(ProjectUserMysqlAccount record) throws MiddlewareQueryException;
 }
