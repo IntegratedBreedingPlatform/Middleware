@@ -219,7 +219,7 @@ public class TestGermplasmDataManagerImpl{
         }
         
         name = "IR 65%";
-        germplasmList = manager.getGermplasmByName(name, 0, new Long(manager.countGermplasmByName(name, Operation.EQUAL)).intValue(), Operation.LIKE);
+        germplasmList = manager.getGermplasmByName(name, 0, new Long(manager.countGermplasmByName(name, Operation.LIKE)).intValue(), Operation.LIKE);
 
         System.out.println("testGetGermplasmByNameOriginalStandardizedAndNoSpace(" + name + ") RESULTS: " + germplasmList.size());
         for (Germplasm g : germplasmList) {

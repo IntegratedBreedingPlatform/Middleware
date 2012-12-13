@@ -105,16 +105,18 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             
             // Search using = by default
             SQLQuery query = getSession().createSQLQuery(Germplasm.GET_BY_NAME_ALL_MODES_USING_EQUAL);
-            
             if (operation == Operation.LIKE) {
-                query = getSession().createSQLQuery(Germplasm.GET_BY_NAME_ALL_MODES_USING_LIKE);
+                query = getSession().createSQLQuery(Germplasm.GET_BY_NAME_USING_LIKE);
+            }  
+            
+            // Set the parameters
+            query.setParameter("name", originalName);
+            if (operation == Operation.EQUAL) {
+                query.setParameter("noSpaceName", noSpaceName);
+                query.setParameter("standardizedName", standardizedName);
             }
             
-            query.setParameter("name", originalName);
-            query.setParameter("noSpaceName", noSpaceName);
-            query.setParameter("standardizedName", standardizedName);
             query.addEntity("g", Germplasm.class);
-
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
 
@@ -172,15 +174,17 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             String noSpaceName = names.get(2);
 
             // Count using = by default
-            SQLQuery query = getSession().createSQLQuery(Germplasm.COUNT_BY_NAME_ALL_MODES_USING_EQUAL);
-            
+            SQLQuery query = getSession().createSQLQuery(Germplasm.COUNT_BY_NAME_ALL_MODES_USING_EQUAL);            
             if (operation == Operation.LIKE) {
-                query = getSession().createSQLQuery(Germplasm.COUNT_BY_NAME_ALL_MODES_USING_LIKE);
-            }
+                query = getSession().createSQLQuery(Germplasm.COUNT_BY_NAME_USING_LIKE);
+            } 
 
+            // Set the parameters
             query.setParameter("name", originalName);
-            query.setParameter("noSpaceName", noSpaceName);
-            query.setParameter("standardizedName", standardizedName);
+            if (operation == Operation.EQUAL){
+                query.setParameter("noSpaceName", noSpaceName);
+                query.setParameter("standardizedName", standardizedName);
+            }
 
             return ((BigInteger) query.uniqueResult()).longValue();
             

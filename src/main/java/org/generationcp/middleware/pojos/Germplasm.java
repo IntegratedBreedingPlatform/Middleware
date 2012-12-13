@@ -251,6 +251,22 @@ public class Germplasm implements Serializable{
             "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 " +
             "WHERE g.gnpgs = -1 AND g.gpid2 = :gid";
 
+    public static final String GET_BY_NAME_USING_EQUAL =
+            "SELECT DISTINCT {g.*} FROM germplsm g JOIN names n ON g.gid = n.gid WHERE "
+          + "nval = :name ";
+    
+    public static final String COUNT_BY_NAME_USING_EQUAL =
+            "SELECT COUNT(DISTINCT g.gid) FROM germplsm g JOIN names n ON g.gid = n.gid WHERE "
+            + "nval = :name ";       
+
+    public static final String GET_BY_NAME_USING_LIKE =
+            "SELECT DISTINCT {g.*} FROM germplsm g JOIN names n ON g.gid = n.gid WHERE "
+                    + "nval LIKE :name ";       
+    
+    public static final String COUNT_BY_NAME_USING_LIKE =
+            "SELECT COUNT(DISTINCT g.gid) FROM germplsm g JOIN names n ON g.gid = n.gid WHERE "
+                    + "nval LIKE :name ";       
+    
     public static final String GET_BY_NAME_ALL_MODES_USING_EQUAL =
             "SELECT DISTINCT {g.*} FROM germplsm g JOIN names n ON g.gid = n.gid WHERE "
           + "nval = :name OR nval = :noSpaceName OR nval = :standardizedName ";
@@ -266,8 +282,7 @@ public class Germplasm implements Serializable{
     public static final String COUNT_BY_NAME_ALL_MODES_USING_LIKE =
             "SELECT COUNT(DISTINCT g.gid) FROM germplsm g JOIN names n ON g.gid = n.gid WHERE "
                     + "nval LIKE :name OR nval LIKE :noSpaceName OR nval LIKE :standardizedName ";       
-    
-    @Id
+        @Id
     @Basic(optional = false)
     @Column(name = "gid")
     @XmlElement(name = "gid")
