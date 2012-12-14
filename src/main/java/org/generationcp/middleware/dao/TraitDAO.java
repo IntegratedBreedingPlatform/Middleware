@@ -73,4 +73,46 @@ public class TraitDAO extends GenericDAO<Trait, Integer>{
             throw new MiddlewareQueryException("Error with getBlockTrait() query: " + e.getMessage(), e);
         }
     }
+    
+    @SuppressWarnings("rawtypes")
+    public Trait getEnvironmentTrait() throws MiddlewareQueryException {
+        try {
+            Criteria crit = getSession().createCriteria(Trait.class);
+            crit.add(Restrictions.disjunction()
+                    .add(Restrictions.eq("name", "environment name"))
+                    .add(Restrictions.eq("name", "envname")));
+            
+            List results = crit.list();
+            
+            if(results.isEmpty()) {
+                return null;
+            } else {
+                return (Trait) results.get(0);
+            }
+        } catch(HibernateException e) {
+            throw new MiddlewareQueryException("Error with getEnvironmentTrait() query: " + e.getMessage(), e);
+        }
+    }
+    
+    @SuppressWarnings("rawtypes")
+    public Trait getDesignTrait() throws MiddlewareQueryException {
+        try {
+            Criteria crit = getSession().createCriteria(Trait.class);
+            crit.add(Restrictions.disjunction()
+                    .add(Restrictions.eq("name", "experimental design"))
+                    .add(Restrictions.eq("name", "EXPERIMENTAL DESIGN"))
+                    .add(Restrictions.eq("name", "design")));
+            
+            List results = crit.list();
+            
+            if(results.isEmpty()) {
+                return null;
+            } else {
+                return (Trait) results.get(0);
+            }
+        } catch(HibernateException e) {
+            throw new MiddlewareQueryException("Error with getDesignTrait() query: " + e.getMessage(), e);
+        }
+    }    
+    
 }

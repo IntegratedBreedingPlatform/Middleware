@@ -739,6 +739,36 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
     
     @Override
+    public Trait getEnvironmentTrait() throws MiddlewareQueryException {
+        try {
+            TraitDAO dao = new TraitDAO();
+            
+            //the ENVIRONMENT trait should be in the central IBDB
+            requireCentralDatabaseInstance();
+            
+            dao.setSession(getCurrentSessionForCentral());
+            return dao.getEnvironmentTrait();
+        } catch (Exception e) {
+            throw new MiddlewareQueryException("Error in getting ENVIRONMENT trait: " + e.getMessage(), e);
+        }
+    }
+    
+    @Override
+    public Trait getDesignTrait() throws MiddlewareQueryException {
+        try {
+            TraitDAO dao = new TraitDAO();
+            
+            //the DESIGN trait should be in the central IBDB
+            requireCentralDatabaseInstance();
+            
+            dao.setSession(getCurrentSessionForCentral());
+            return dao.getDesignTrait();
+        } catch (Exception e) {
+            throw new MiddlewareQueryException("Error in getting DESIGN trait: " + e.getMessage(), e);
+        }
+    }    
+    
+    @Override
     public Factor getFactorOfDatasetByTraitid(Integer representationId, Integer traitid) throws MiddlewareQueryException {
         try {
             FactorDAO dao = new FactorDAO();

@@ -526,6 +526,22 @@ public interface StudyDataManager{
     public Trait getBlockTrait() throws MiddlewareQueryException;
     
     /**
+     * Returns the Trait object representing the record for the ENVIRONMENT trait.
+     * 
+     * @return Trait
+     * @throws MiddlewareQueryException
+     */
+    public Trait getEnvironmentTrait() throws MiddlewareQueryException;
+    
+    /**
+     * Returns the Trait object representing the record for the DESIGN trait.
+     * 
+     * @return Trait
+     * @throws MiddlewareQueryException
+     */
+    public Trait getDesignTrait() throws MiddlewareQueryException;
+    
+    /**
      * Returns the Factor with the trait identified by the given tid. This Factor belongs to the dataset
      * identified by the given representationId.
      * 
