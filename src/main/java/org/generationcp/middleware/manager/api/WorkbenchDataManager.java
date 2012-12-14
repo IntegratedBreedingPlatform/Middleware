@@ -28,6 +28,7 @@ import org.generationcp.middleware.pojos.workbench.ProjectMethod;
 import org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount;
 import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
 import org.generationcp.middleware.pojos.workbench.Role;
+import org.generationcp.middleware.pojos.workbench.SecurityQuestion;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
 import org.generationcp.middleware.pojos.workbench.ToolType;
@@ -768,6 +769,23 @@ public interface WorkbenchDataManager{
      * @throws MiddlewareQueryException
      */
     public WorkbenchSetting getWorkbenchSetting() throws MiddlewareQueryException;
+
+    /**
+     * Saves the specified SecurityQuestion object.
+     * 
+     * @param securityQuestion - the Security Question object to be saved.
+     * @throws MiddlewareQueryException
+     */
+    public void addSecurityQuestion(SecurityQuestion securityQuestion) throws MiddlewareQueryException;
+
+    /**
+     * Gets all the Security Questions associated with the specified User ID.
+     * 
+     * @param userId - User ID of the user to get security questions.
+     * @return -  a {@code List} of {@code SecurityQuestion} objects associated with the given User.
+     * @throws MiddlewareQueryException
+     */
+    public List<SecurityQuestion> getQuestionsByUserId(Integer userId) throws MiddlewareQueryException;
     
     /**
      * Returns the ProjectUserMysqlAccount record identified by the given project id and user id.

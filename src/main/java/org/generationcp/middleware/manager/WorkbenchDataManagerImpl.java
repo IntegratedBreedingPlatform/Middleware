@@ -25,6 +25,7 @@ import org.generationcp.middleware.dao.ProjectMethodDAO;
 import org.generationcp.middleware.dao.ProjectUserMysqlAccountDAO;
 import org.generationcp.middleware.dao.ProjectUserRoleDAO;
 import org.generationcp.middleware.dao.RoleDAO;
+import org.generationcp.middleware.dao.SecurityQuestionDAO;
 import org.generationcp.middleware.dao.ToolConfigurationDAO;
 import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.dao.UserDAO;
@@ -46,6 +47,7 @@ import org.generationcp.middleware.pojos.workbench.ProjectMethod;
 import org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount;
 import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
 import org.generationcp.middleware.pojos.workbench.Role;
+import org.generationcp.middleware.pojos.workbench.SecurityQuestion;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
 import org.generationcp.middleware.pojos.workbench.ToolType;
@@ -430,7 +432,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         }
 
         if (op == Operation.EQUAL) {
-            users.add(dao.getByNameUsingEqual(name, start, numOfRows));
+            users = dao.getByNameUsingEqual(name, start, numOfRows);
         } else if (op == Operation.LIKE) {
             users = dao.getByNameUsingLike(name, start, numOfRows);
         }
@@ -1478,6 +1480,41 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         } catch (Exception e) {
             throw new MiddlewareQueryException(
                                                "Error encountered while workbench setting: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void addSecurityQuestion(SecurityQuestion securityQuestion) throws MiddlewareQueryException {
+        Session session = getCurrentSession();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+
+            SecurityQuestionDAO dao = new SecurityQuestionDAO();
+            dao.setSession(session);
+            dao.saveOrUpdate(securityQuestion);
+
+            trans.commit();
+        } catch (Exception e) {
+            if (trans != null) {
+                trans.rollback();
+            }
+
+            throw new MiddlewareQueryException("Error encountered while adding Security Question: " +
+            		"WorkbenchDataManager.addSecurityQuestion(securityQuestion=" + securityQuestion + "): " + e.getMessage(), e);
+        }
+    }
+    
+    @Override
+    public List<SecurityQuestion> getQuestionsByUserId(Integer userId) throws MiddlewareQueryException {
+        try {
+            SecurityQuestionDAO dao = new SecurityQuestionDAO();
+            dao.setSession(getCurrentSession());
+            return dao.getByUserId(userId);
+        } catch (Exception e) {
+            throw new MiddlewareQueryException("Error encountered while getting Security Questions: " +
+                    "WorkbenchDataManager.getQuestionsByUserId(userId=" + userId + "): " + e.getMessage(), e);
         }
     }
     

@@ -53,14 +53,15 @@ public class UserDAO extends GenericDAO<User, Integer>{
         }
     }
 	
-    public User getByNameUsingEqual(String name, int start, int numOfRows) throws MiddlewareQueryException {
+    @SuppressWarnings("unchecked")
+    public List<User> getByNameUsingEqual(String name, int start, int numOfRows) throws MiddlewareQueryException {
         try {
             Query query = getSession().getNamedQuery(User.GET_BY_NAME_USING_EQUAL);
             query.setParameter("name", name);
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
 
-            return (User) query.list().get(0);
+            return (List<User>) query.list();
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error with getByNameUsingEqual(name="+name+") query from User: " + e.getMessage(), e);
         }
