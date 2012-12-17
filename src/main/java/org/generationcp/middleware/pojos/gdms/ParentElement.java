@@ -34,7 +34,7 @@ public class ParentElement implements Serializable{
     private Integer parentBGId;
 
     /** The mapping type. */
-    @Column(name = "mapping_pop_type")
+    @Column(name = "mapping_type")
     private String mappingPopType;
 
 
