@@ -32,6 +32,10 @@ public class CropType implements Serializable{
     public final static String RICE = "Rice";
     public final static String WHEAT = "Wheat";
     public final static String CASSAVA = "Cassava";
+    public final static String GROUNDNUT = "Groundnut";
+    public final static String SORGHUM = "Sorghum";
+    public final static String PHASELEOUS = "Phaseleous";
+    
 
     @Id
     @Column(name = "crop_name")
