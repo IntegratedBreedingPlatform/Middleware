@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.DatasetCondition;
+import org.generationcp.middleware.pojos.Factor;
 import org.generationcp.middleware.pojos.NumericLevel;
 import org.generationcp.middleware.pojos.NumericLevelElement;
 import org.generationcp.middleware.pojos.NumericLevelPK;
@@ -132,6 +133,23 @@ public class NumericLevelDAO extends GenericDAO<NumericLevel, NumericLevelPK>{
         } catch (Exception ex) {
             throw new MiddlewareQueryException("Error with getStudyInformationByGID(gid=" + gid + ") query from NumericLevel "
                     + ex.getMessage(), ex);
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<NumericLevel> getByFactorAndDatasetID(Factor factor, Integer datasetId) throws MiddlewareQueryException {
+        try {
+            SQLQuery query = getSession().createSQLQuery(NumericLevel.GET_BY_FACTOR_AND_REPRESNO);
+            query.setParameter("factorid", factor.getFactorId());
+            query.setParameter("labelid", factor.getId());
+            query.setParameter("represno", datasetId);
+            
+            query.addEntity("ln", NumericLevel.class);
+            
+            return query.list();
+        } catch(HibernateException e) {
+            throw new MiddlewareQueryException("Error with getByFactorAndDatasetID(factor=" + factor + ", datasetId=" + datasetId 
+                    + ") query from NumericLevel: " + e.getMessage(), e);
         }
     }
 }

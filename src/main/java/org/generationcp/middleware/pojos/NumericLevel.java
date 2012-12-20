@@ -55,6 +55,11 @@ public class NumericLevel implements Serializable{
                 + "JOIN study s ON f.studyid = s.studyid "
         + "WHERE f.fname = 'GID' AND ln.lvalue = :gid "
         + "GROUP BY s.studyid";
+    
+    public static final String GET_BY_FACTOR_AND_REPRESNO =
+        "SELECT DISTINCT {ln.*} FROM level_n ln JOIN oindex oi ON ln.factorid = oi.factorid " 
+        + "AND ln.levelno = oi.levelno "
+        + "WHERE ln.factorid = :factorid AND ln.labelid = :labelid AND oi.represno = :represno";
 
     @EmbeddedId
     protected NumericLevelPK id;

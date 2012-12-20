@@ -22,10 +22,12 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.CharacterDataElement;
+import org.generationcp.middleware.pojos.CharacterLevel;
 import org.generationcp.middleware.pojos.CharacterLevelElement;
 import org.generationcp.middleware.pojos.DatasetCondition;
 import org.generationcp.middleware.pojos.Factor;
 import org.generationcp.middleware.pojos.NumericDataElement;
+import org.generationcp.middleware.pojos.NumericLevel;
 import org.generationcp.middleware.pojos.NumericLevelElement;
 import org.generationcp.middleware.pojos.NumericRange;
 import org.generationcp.middleware.pojos.Representation;
@@ -51,7 +53,7 @@ public class TestStudyDataManagerImpl{
         factory = new ManagerFactory(local, central);
         manager = factory.getStudyDataManager();
     }
-    /**
+    
     @Test
     public void testGetGIDSByPhenotypicData() throws Exception {
         Integer traitId = Integer.valueOf(1003);
@@ -416,7 +418,7 @@ public class TestStudyDataManagerImpl{
             System.out.println("  " + info);
         }
     }
-    **/
+    
     @Test
     public void testGetReplicationTrait() throws Exception {
         Trait trait = manager.getReplicationTrait();
@@ -435,6 +437,30 @@ public class TestStudyDataManagerImpl{
         if(trait != null){
             Factor factor = manager.getFactorOfDatasetByTraitid(Integer.valueOf(1245), trait.getTraitId());
             System.out.println(factor);
+        }
+    }
+    
+    @Test
+    public void testGetCharacterLevelsByFactorAndDatasetId() throws Exception {
+        Factor factor = new Factor();
+        factor.setId(Integer.valueOf(1031));
+        factor.setFactorId(Integer.valueOf(1031));
+        List<CharacterLevel> results = manager.getCharacterLevelsByFactorAndDatasetId(factor, Integer.valueOf(2));
+        System.out.println("RESULTS:");
+        for(CharacterLevel level : results){
+            System.out.println(level);
+        }
+    }
+    
+    @Test
+    public void testGetNumericLevelsByFactorAndDatasetId() throws Exception {
+        Factor factor = new Factor();
+        factor.setId(Integer.valueOf(2));
+        factor.setFactorId(Integer.valueOf(1031));
+        List<NumericLevel> results = manager.getNumericLevelsByFactorAndDatasetId(factor, Integer.valueOf(2));
+        System.out.println("RESULTS:");
+        for(NumericLevel level : results){
+            System.out.println(level);
         }
     }
     

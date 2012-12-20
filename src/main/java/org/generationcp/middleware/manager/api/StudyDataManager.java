@@ -19,10 +19,12 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.pojos.CharacterDataElement;
+import org.generationcp.middleware.pojos.CharacterLevel;
 import org.generationcp.middleware.pojos.CharacterLevelElement;
 import org.generationcp.middleware.pojos.DatasetCondition;
 import org.generationcp.middleware.pojos.Factor;
 import org.generationcp.middleware.pojos.NumericDataElement;
+import org.generationcp.middleware.pojos.NumericLevel;
 import org.generationcp.middleware.pojos.NumericLevelElement;
 import org.generationcp.middleware.pojos.Representation;
 import org.generationcp.middleware.pojos.Study;
@@ -551,4 +553,22 @@ public interface StudyDataManager{
      * @throws MiddlewareQueryException
      */
     public Factor getFactorOfDatasetByTraitid(Integer representationId, Integer traitid) throws MiddlewareQueryException;
+    
+    /**
+     * Returns the list of Character Levels for the given Factor on the dataset identified by the given id.
+     * @param factor
+     * @param datasetId
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    public List<CharacterLevel> getCharacterLevelsByFactorAndDatasetId(Factor factor, Integer datasetId) throws MiddlewareQueryException;
+    
+    /**
+     * Returns the list of Numeric Levels for the given Factor on the dataset identified by the given id.
+     * @param factor
+     * @param datasetId
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    public List<NumericLevel> getNumericLevelsByFactorAndDatasetId(Factor factor, Integer datasetId) throws MiddlewareQueryException;
 }

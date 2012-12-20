@@ -41,6 +41,10 @@
   <mapping class="org.generationcp.middleware.pojos.NumericDataPK"/>
   <mapping class="org.generationcp.middleware.pojos.CharacterData"/>
   <mapping class="org.generationcp.middleware.pojos.CharacterDataPK"/>
+  <mapping class="org.generationcp.middleware.pojos.NumericLevel"/>
+  <mapping class="org.generationcp.middleware.pojos.NumericLevelPK"/>
+  <mapping class="org.generationcp.middleware.pojos.CharacterLevel"/>
+  <mapping class="org.generationcp.middleware.pojos.CharacterLevelPK"/>
   <mapping class="org.generationcp.middleware.pojos.Variate"/>
   <mapping class="org.generationcp.middleware.pojos.Factor"/>
   <mapping class="org.generationcp.middleware.pojos.Oindex"/>

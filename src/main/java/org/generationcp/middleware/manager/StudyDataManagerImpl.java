@@ -32,10 +32,12 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.CharacterDataElement;
+import org.generationcp.middleware.pojos.CharacterLevel;
 import org.generationcp.middleware.pojos.CharacterLevelElement;
 import org.generationcp.middleware.pojos.DatasetCondition;
 import org.generationcp.middleware.pojos.Factor;
 import org.generationcp.middleware.pojos.NumericDataElement;
+import org.generationcp.middleware.pojos.NumericLevel;
 import org.generationcp.middleware.pojos.NumericLevelElement;
 import org.generationcp.middleware.pojos.Representation;
 import org.generationcp.middleware.pojos.Study;
@@ -784,6 +786,40 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             }
         } catch (Exception e) {
             throw new MiddlewareQueryException("Error in getting factor of dataset by traitid: " + e.getMessage(), e);
+        }
+    }
+    
+    @Override
+    public List<CharacterLevel> getCharacterLevelsByFactorAndDatasetId(Factor factor, Integer datasetId) throws MiddlewareQueryException {
+        try{
+            CharacterLevelDAO dao = new CharacterLevelDAO();
+            Session session = getSession(datasetId);
+            
+            if(session != null){
+                dao.setSession(session);
+                return dao.getByFactorAndDatasetID(factor, datasetId);
+            } else{
+                throw new MiddlewareQueryException("Error in getting character levels by factor and dataset id: Cannot get Session to use.");
+            }
+        } catch(Exception ex){
+            throw new MiddlewareQueryException("Error in getting character levels by factor and dataset id: " + ex.getMessage(), ex);
+        }
+    }
+    
+    @Override
+    public List<NumericLevel> getNumericLevelsByFactorAndDatasetId(Factor factor, Integer datasetId) throws MiddlewareQueryException {
+        try{
+            NumericLevelDAO dao = new NumericLevelDAO();
+            Session session = getSession(datasetId);
+            
+            if(session != null){
+                dao.setSession(session);
+                return dao.getByFactorAndDatasetID(factor, datasetId);
+            } else{
+                throw new MiddlewareQueryException("Error in getting character levels by factor and dataset id: Cannot get Session to use.");
+            }
+        } catch(Exception ex){
+            throw new MiddlewareQueryException("Error in getting character levels by factor and dataset id: " + ex.getMessage(), ex);
         }
     }
 }

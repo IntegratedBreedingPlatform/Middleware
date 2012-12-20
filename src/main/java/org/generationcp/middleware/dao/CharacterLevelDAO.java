@@ -21,6 +21,7 @@ import org.generationcp.middleware.pojos.CharacterLevel;
 import org.generationcp.middleware.pojos.CharacterLevelElement;
 import org.generationcp.middleware.pojos.CharacterLevelPK;
 import org.generationcp.middleware.pojos.DatasetCondition;
+import org.generationcp.middleware.pojos.Factor;
 import org.generationcp.middleware.pojos.StudyInfo;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -130,6 +131,23 @@ public class CharacterLevelDAO extends GenericDAO<CharacterLevel, CharacterLevel
 
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error with getStudyInformationByGID(gid=" + gid + ") query from CharacterLevel: " + e.getMessage(), e);
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<CharacterLevel> getByFactorAndDatasetID(Factor factor, Integer datasetId) throws MiddlewareQueryException {
+        try {
+            SQLQuery query = getSession().createSQLQuery(CharacterLevel.GET_BY_FACTOR_AND_REPRESNO);
+            query.setParameter("factorid", factor.getFactorId());
+            query.setParameter("labelid", factor.getId());
+            query.setParameter("represno", datasetId);
+            
+            query.addEntity("lc", CharacterLevel.class);
+            
+            return query.list();
+        } catch(HibernateException e) {
+            throw new MiddlewareQueryException("Error with getByFactorAndDatasetID(factor=" + factor + ", datasetId=" + datasetId 
+                    + ") query from CharacterLevel: " + e.getMessage(), e);
         }
     }
 }

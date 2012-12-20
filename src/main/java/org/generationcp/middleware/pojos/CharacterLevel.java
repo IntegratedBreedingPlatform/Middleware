@@ -54,6 +54,11 @@ public class CharacterLevel implements Serializable{
                 + "JOIN study s ON f.studyid = s.studyid "
         + "WHERE f.fname = 'GID' AND lc.lvalue = :gid "
         + "GROUP BY s.studyid";
+    
+    public static final String GET_BY_FACTOR_AND_REPRESNO =
+        "SELECT DISTINCT {lc.*} FROM level_c lc JOIN oindex oi ON lc.factorid = oi.factorid " 
+        + "AND lc.levelno = oi.levelno "
+        + "WHERE lc.factorid = :factorid AND lc.labelid = :labelid AND oi.represno = :represno";
 
     @EmbeddedId
     protected CharacterLevelPK id;
