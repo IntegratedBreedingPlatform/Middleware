@@ -106,7 +106,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 
             ProjectDAO projectDao = new ProjectDAO();
             projectDao.setSession(session);
-            projectDao.saveOrUpdate(project);
+            projectDao.merge(project);
 
             // TODO: copy the workbench template created by the project into the
             // project_workflow_step table
@@ -122,6 +122,52 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
                     + e.getMessage(), e);
         }
 
+        return project;
+    }
+    
+    public Project addProject(Project project) throws MiddlewareQueryException {
+        Session session = getCurrentSession();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+
+            ProjectDAO projectDao = new ProjectDAO();
+            projectDao.setSession(session);
+            projectDao.save(project);
+
+            trans.commit();
+        } catch (Exception e) {
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new MiddlewareQueryException("Cannot save Project: WorkbenchDataManager.addProject(project=" + project + "): "
+                + e.getMessage(), e);
+        }
+        
+        return project;
+    }
+    
+    public Project mergeProject(Project project) throws MiddlewareQueryException {
+        Session session = getCurrentSession();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+
+            ProjectDAO projectDao = new ProjectDAO();
+            projectDao.setSession(session);
+            projectDao.merge(project);
+
+            trans.commit();
+        } catch (Exception e) {
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new MiddlewareQueryException("Cannot save Project: WorkbenchDataManager.updateProject(project=" + project + "): "
+                + e.getMessage(), e);
+        }
+        
         return project;
     }
 

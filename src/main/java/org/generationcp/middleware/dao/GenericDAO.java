@@ -102,9 +102,24 @@ public abstract class GenericDAO<T, ID extends Serializable> {
         criteria.setProjection(Projections.rowCount());
         return ((Long) criteria.uniqueResult()).longValue();
     }
+    
+    public T save(T entity) {
+        getSession().save(entity);
+        return entity;
+    }
+    
+    public T update(T entity) {
+        getSession().update(entity);
+        return entity;
+    }
 
     public T saveOrUpdate(T entity) {
         getSession().saveOrUpdate(entity);
+        return entity;
+    }
+    
+    public T merge(T entity) {
+        getSession().merge(entity);
         return entity;
     }
 

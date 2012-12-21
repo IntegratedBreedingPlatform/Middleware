@@ -81,6 +81,24 @@ public interface WorkbenchDataManager{
     public Project saveOrUpdateProject(Project project) throws MiddlewareQueryException;
 
     /**
+     * Save a project.
+     * 
+     * @param project
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    public Project addProject(Project project) throws MiddlewareQueryException;
+    
+    /**
+     * Update a project using Hibernate's Session.merge() method.
+     * 
+     * @param project
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    public Project mergeProject(Project project) throws MiddlewareQueryException;
+    
+    /**
      * Delete project.
      *
      * @param project - the project to delete
