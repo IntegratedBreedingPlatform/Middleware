@@ -13,6 +13,7 @@
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -151,6 +152,29 @@ public class Person implements Serializable{
 
     public void setMiddleName(String middleName) {
         this.middleName = middleName;
+    }
+    
+    public String getInitials() {
+        StringBuilder initials = new StringBuilder();
+        if(!StringUtil.isEmpty(firstName)){
+            initials.append(firstName.trim().charAt(0));
+        }
+        if(!StringUtil.isEmpty(middleName)) {
+            initials.append(middleName.trim().charAt(0));
+        }
+        if(!StringUtil.isEmpty(lastName)) {
+            initials.append(lastName.trim().charAt(0));
+        }
+        
+        return initials.toString().toLowerCase();
+    }
+    
+    public String getInitialsWithTimestamp() {
+        long currentTime = System.currentTimeMillis();
+        SimpleDateFormat timestampFormat = new SimpleDateFormat("yyMMddHHmmssSS");
+        String timestamp = timestampFormat.format(currentTime);
+        
+        return getInitials() + timestamp;
     }
     
     public String getDisplayName() {
