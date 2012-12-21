@@ -156,13 +156,13 @@ public class Person implements Serializable{
     
     public String getInitials() {
         StringBuilder initials = new StringBuilder();
-        if(!StringUtil.isEmpty(firstName)){
+        if(!StringUtil.isEmptyOrWhitespaceOnly(firstName)){
             initials.append(firstName.trim().charAt(0));
         }
-        if(!StringUtil.isEmpty(middleName)) {
+        if(!StringUtil.isEmptyOrWhitespaceOnly(middleName)) {
             initials.append(middleName.trim().charAt(0));
         }
-        if(!StringUtil.isEmpty(lastName)) {
+        if(!StringUtil.isEmptyOrWhitespaceOnly(lastName)) {
             initials.append(lastName.trim().charAt(0));
         }
         
