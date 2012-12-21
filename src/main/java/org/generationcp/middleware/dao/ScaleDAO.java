@@ -16,18 +16,18 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Scale;
-import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.SQLQuery;
 
 public class ScaleDAO extends GenericDAO<Scale, Integer>{
 
     @SuppressWarnings("unchecked")
     public List<Scale> getByTraitId(Integer traitId) throws MiddlewareQueryException {
         try {
-            Criteria crit = getSession().createCriteria(Scale.class);
-            crit.add(Restrictions.eq("traitId", traitId));
-            return crit.list();
+            SQLQuery query = getSession().createSQLQuery(Scale.GET_BY_TRAIT_ID);
+            query.addEntity("s", Scale.class);
+            query.setParameter("traitid", traitId);
+            return query.list();
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error with getByTraitId(traitId=" + traitId + ") query from Scale: " + e.getMessage(), e);
         }

@@ -16,18 +16,18 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.TraitMethod;
-import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.SQLQuery;
 
 public class TraitMethodDAO extends GenericDAO<TraitMethod, Integer>{
 
     @SuppressWarnings("unchecked")
     public List<TraitMethod> getByTraitId(Integer traitId) throws MiddlewareQueryException {
         try {
-            Criteria crit = getSession().createCriteria(TraitMethod.class);
-            crit.add(Restrictions.eq("traitId", traitId));
-            return crit.list();
+            SQLQuery query = getSession().createSQLQuery(TraitMethod.GET_BY_TRAIT_ID);
+            query.addEntity("m", TraitMethod.class);
+            query.setParameter("traitid", traitId);
+            return query.list();
         } catch (HibernateException e) {
             throw new MiddlewareQueryException(
                     "Error with getByTraitId(traitId=" + traitId + ") query from TraitMethod: " + e.getMessage(), e);

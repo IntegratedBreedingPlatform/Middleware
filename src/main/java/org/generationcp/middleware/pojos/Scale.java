@@ -21,10 +21,13 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "scale")
+@Table(name = "tmsscales")
 public class Scale implements Serializable{
 
     private static final long serialVersionUID = 1L;
+    
+    public static final String GET_BY_TRAIT_ID = "SELECT DISTINCT {s.*} FROM tmsscales s JOIN tmsmeasuredin mi "
+        + "ON s.scaleid = mi.scaleid WHERE mi.traitid = :traitid";
 
     @Id
     @Basic(optional = false)
@@ -34,10 +37,6 @@ public class Scale implements Serializable{
     @Basic(optional = false)
     @Column(name = "scname")
     private String name;
-
-    @Basic(optional = false)
-    @Column(name = "traitid")
-    private Integer traitId;
 
     @Basic(optional = false)
     @Column(name = "sctype")
@@ -56,7 +55,6 @@ public class Scale implements Serializable{
         super();
         this.id = id;
         this.name = name;
-        this.traitId = traitId;
         this.type = type;
     }
 
@@ -76,14 +74,6 @@ public class Scale implements Serializable{
         this.name = name;
     }
 
-    public Integer getTraitId() {
-        return traitId;
-    }
-
-    public void setTraitId(Integer traitId) {
-        this.traitId = traitId;
-    }
-
     public String getType() {
         return type;
     }
@@ -100,7 +90,6 @@ public class Scale implements Serializable{
         builder.append(", name=");
         builder.append(name);
         builder.append(", traitId=");
-        builder.append(traitId);
         builder.append(", type=");
         builder.append(type);
         builder.append("]");

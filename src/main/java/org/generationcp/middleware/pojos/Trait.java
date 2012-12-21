@@ -18,15 +18,10 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
-
 @Entity
-@Table(name = "trait")
+@Table(name = "tmstraits")
 public class Trait implements Serializable{
 
     private static final long serialVersionUID = 1L;
@@ -52,16 +47,6 @@ public class Trait implements Serializable{
     @Column(name = "trdesc")
     private String descripton;
 
-    @OneToOne
-    @JoinColumn(name = "scaleid", nullable = true)
-    @NotFound(action = NotFoundAction.IGNORE)
-    private Scale standardScale;
-
-    @OneToOne
-    @JoinColumn(name = "tmethid", nullable = true)
-    @NotFound(action = NotFoundAction.IGNORE)
-    private TraitMethod standardMethod;
-
     @Basic(optional = false)
     @Column(name = "tnstat")
     private Integer nameStatus;
@@ -82,8 +67,6 @@ public class Trait implements Serializable{
         this.name = name;
         this.abbreviation = abbreviation;
         this.descripton = descripton;
-        this.standardScale = mainScale;
-        this.standardMethod = mainMethod;
         this.nameStatus = status;
     }
 
@@ -125,22 +108,6 @@ public class Trait implements Serializable{
 
     public void setDescripton(String descripton) {
         this.descripton = descripton;
-    }
-
-    public Scale getStandardScale() {
-        return standardScale;
-    }
-
-    public void setStandardScale(Scale standardScale) {
-        this.standardScale = standardScale;
-    }
-
-    public TraitMethod getStandardMethod() {
-        return standardMethod;
-    }
-
-    public void setStandardMethod(TraitMethod standardMethod) {
-        this.standardMethod = standardMethod;
     }
 
     public Integer getNameStatus() {
@@ -195,9 +162,6 @@ public class Trait implements Serializable{
         builder.append(", descripton=");
         builder.append(descripton);
         builder.append(", standardScale=");
-        builder.append(standardScale);
-        builder.append(", standardMethod=");
-        builder.append(standardMethod);
         builder.append(", nameStatus=");
         builder.append(nameStatus);
         builder.append("]");

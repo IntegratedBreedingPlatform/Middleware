@@ -160,8 +160,7 @@ public class TestTraitDataManagerImpl{
         traitMethod.setAbbreviation("abrev");
         traitMethod.setDescription("desc");
         traitMethod.setName("Hoarding Method");
-        traitMethod.setTraitId(-1);
-
+        
         // add the person
         manager.addTraitMethod(traitMethod);
 
@@ -172,7 +171,7 @@ public class TestTraitDataManagerImpl{
         // cleanup: delete the trait method
         manager.deleteTraitMethod(traitMethod);
     }
-
+   
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();

@@ -21,10 +21,13 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "tmethod")
+@Table(name = "tmsmethod")
 public class TraitMethod implements Serializable{
 
     private static final long serialVersionUID = 1L;
+    
+    public static final String GET_BY_TRAIT_ID = "SELECT DISTINCT {m.*} FROM tmsmethod m JOIN tmsmeasuredin mi "
+        + "ON m.tmethid = mi.tmethid WHERE mi.traitid = :traitid";
 
     @Id
     @Basic(optional = false)
@@ -34,10 +37,6 @@ public class TraitMethod implements Serializable{
     @Basic(optional = false)
     @Column(name = "tmname")
     private String name;
-
-    @Basic(optional = false)
-    @Column(name = "traitid")
-    private Integer traitId;
 
     @Column(name = "tmabbr")
     private String abbreviation;
@@ -57,7 +56,6 @@ public class TraitMethod implements Serializable{
         super();
         this.id = id;
         this.name = name;
-        this.traitId = traitId;
         this.abbreviation = abbreviation;
         this.description = description;
     }
@@ -76,14 +74,6 @@ public class TraitMethod implements Serializable{
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Integer getTraitId() {
-        return traitId;
-    }
-
-    public void setTraitId(Integer traitId) {
-        this.traitId = traitId;
     }
 
     public String getAbbreviation() {
@@ -140,7 +130,6 @@ public class TraitMethod implements Serializable{
         builder.append(", name=");
         builder.append(name);
         builder.append(", traitId=");
-        builder.append(traitId);
         builder.append(", abbreviation=");
         builder.append(abbreviation);
         builder.append(", description=");
