@@ -327,6 +327,6 @@ public abstract class StringUtil{
     }
     
     public static boolean isEmptyOrWhitespaceOnly(String s) {
-        return isEmpty(s) || s.matches("\\s+");
+        return isEmpty(s) || s.matches("\\A\\s*\\z");
     }
 }
