@@ -173,6 +173,7 @@ public class Person implements Serializable{
         long currentTime = System.currentTimeMillis();
         SimpleDateFormat timestampFormat = new SimpleDateFormat("yyMMddHHmmssSS");
         String timestamp = timestampFormat.format(currentTime);
+        timestamp = timestamp.substring(0, 13);
         
         return getInitials() + timestamp;
     }
