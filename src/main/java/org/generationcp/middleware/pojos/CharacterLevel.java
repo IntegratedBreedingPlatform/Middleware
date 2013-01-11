@@ -30,8 +30,7 @@ public class CharacterLevel implements Serializable{
 
     public static final String GET_BY_OUNIT_ID_LIST = 
             "SELECT oi.ounitid, oi.factorid, f.fname, lc.lvalue " + 
-            "FROM oindex oi JOIN obsunit ou ON oi.ounitid = ou.ounitid " +
-                            "JOIN level_c lc ON lc.factorid = oi.factorid AND lc.levelno = oi.levelno " + 
+            "FROM oindex oi JOIN level_c lc ON lc.factorid = oi.factorid AND lc.levelno = oi.levelno " + 
                             "JOIN factor f ON f.labelid = lc.labelid " +
             "WHERE oi.ounitid IN (:ounitIdList)";
     

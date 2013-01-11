@@ -30,8 +30,7 @@ public class NumericLevel implements Serializable{
 
     public static final String GET_BY_OUNIT_ID_LIST = 
             "SELECT oi.ounitid, oi.factorid, f.fname, ln.lvalue " +
-            "FROM oindex oi JOIN obsunit ou ON oi.ounitid = ou.ounitid " +
-                            "JOIN level_n ln ON ln.factorid = oi.factorid " +
+            "FROM oindex oi JOIN level_n ln ON ln.factorid = oi.factorid " +
                                             "AND ln.levelno = oi.levelno " + 
                             "JOIN factor f ON f.labelid = ln.labelid " +
             "WHERE oi.ounitid IN (:ounitIdList)";
