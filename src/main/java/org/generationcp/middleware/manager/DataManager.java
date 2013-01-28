@@ -152,7 +152,7 @@ public abstract class DataManager {
      * @param id
      * @return the {@link Session} for the central database if the specified
      *         <code>id</code> is positive or equal to zero, otherwise, this
-     *         method returns <code>null</code>.
+     *         method returns the {@link Session} for the local database.
      * @throws MiddlewareQueryException
      */
     protected Session getSession(int id) {
