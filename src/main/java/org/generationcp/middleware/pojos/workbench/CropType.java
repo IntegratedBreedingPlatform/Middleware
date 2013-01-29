@@ -34,7 +34,7 @@ public class CropType implements Serializable{
     public final static String CASSAVA = "Cassava";
     public final static String GROUNDNUT = "Groundnut";
     public final static String SORGHUM = "Sorghum";
-    public final static String PHASELEOUS = "Phaseleous";
+    public final static String PHASEOLUS = "Phaseolus";
     
 
     @Id
