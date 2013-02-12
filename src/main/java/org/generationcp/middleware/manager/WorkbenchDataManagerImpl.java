@@ -348,6 +348,13 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         projectDao.setSession(getCurrentSession());
         return projectDao.getById(projectId);
     }
+    
+    public Project getProjectByName(String projectName) throws MiddlewareQueryException{
+        ProjectDAO projectDao = new ProjectDAO();
+        projectDao.setSession(getCurrentSession());
+        return projectDao.getByName(projectName);
+    }
+
 
     public Integer addWorkbenchDataset(WorkbenchDataset dataset) throws MiddlewareQueryException {
         Session session = getCurrentSession();

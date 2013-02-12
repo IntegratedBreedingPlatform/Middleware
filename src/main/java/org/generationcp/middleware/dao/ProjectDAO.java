@@ -32,6 +32,15 @@ public class ProjectDAO extends GenericDAO<Project, Long>{
         }
     }
 
+    public Project getByName(String projectName) throws MiddlewareQueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(Project.class).add(Restrictions.eq("projectName", projectName)).setMaxResults(1);
+            return (Project) criteria.uniqueResult();
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getByName(projectName=" + projectName + ") query from Project: " + e.getMessage(), e);
+        }
+    }
+
     public Project getLastOpenedProject(Integer userId) throws MiddlewareQueryException {
         try {
             StringBuilder sb = new StringBuilder();

@@ -278,6 +278,13 @@ public class TestWorkbenchDataManagerImpl{
     }
 
     @Test
+    public void testGetProjectByName() throws MiddlewareQueryException {
+        String name = "Test Cowpea 1";// "Replace with project name to search";
+        Project project = manager.getProjectByName(name);
+        System.out.println("testGetProjectByName(" + name + "): " + project);
+    }
+
+    @Test
     public void testGetUserByName() throws MiddlewareQueryException {
         String name = "test";
         User user = (User) manager.getUserByName(name, 0, 1, Operation.EQUAL).get(0);

@@ -216,6 +216,15 @@ public interface WorkbenchDataManager{
     public Project getProjectById(Long projectId) throws MiddlewareQueryException;
     
     /**
+     * Gets a project by name. Should return only one value.
+     *
+     * @param projectName - the project name to match
+     * @return the project matching the given name
+     * @throws MiddlewareQueryException
+     */
+    public Project getProjectByName(String projectName) throws MiddlewareQueryException;
+
+    /**
      * Registers a workbench dataset.
      *
      * @param dataset - the workbench dataset to save
