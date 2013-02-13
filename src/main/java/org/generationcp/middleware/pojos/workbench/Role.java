@@ -28,8 +28,6 @@ public class Role implements Serializable{
 
     private static final long serialVersionUID = 1L;
     
-    public final static int MANAGER_ROLE_ID = 1;
-    
     public final static String MANAGER_ROLE_NAME = "Manager";
     public final static String MARS_ROLE_NAME = "MARS Breeder";
     public final static String MAS_ROLE_NAME = "MAS Breeder";
