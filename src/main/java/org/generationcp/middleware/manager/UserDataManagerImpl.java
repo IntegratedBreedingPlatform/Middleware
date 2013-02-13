@@ -113,6 +113,34 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
     }
 
     @Override
+    public Integer updateUser(User user) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
+            UserDAO dao = new UserDAO();
+            dao.setSession(session);
+            dao.saveOrUpdate(user);
+            trans.commit();
+        } catch (Exception e) {
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new MiddlewareQueryException("Error encountered while saving User: UserDataManager.addUser(user=" + user + "): "
+                    + e.getMessage(), e);
+        } finally {
+            session.flush();
+        }
+        
+        return user.getUserid();
+    }
+
+    @Override
     public User getUserById(int id) throws MiddlewareQueryException {
         UserDAO dao = new UserDAO();
         Session session = getSession(id);

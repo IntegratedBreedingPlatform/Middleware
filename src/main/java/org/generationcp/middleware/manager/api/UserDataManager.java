@@ -48,6 +48,15 @@ public interface UserDataManager {
     public Integer addUser(User user) throws MiddlewareQueryException;
     
     /**
+     * Updates the user
+     *
+     * @param user the user to update
+     * @return Returns the id of the {@code User} record updated
+     * @throws MiddlewareQueryException the MiddlewareQueryException
+     */
+    public Integer updateUser(User user) throws MiddlewareQueryException;
+    
+    /**
      * Gets the user by id.
      *
      * @param id the id
