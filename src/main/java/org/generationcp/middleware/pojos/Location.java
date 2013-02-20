@@ -13,6 +13,7 @@
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
+import java.util.Comparator;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -36,7 +37,7 @@ import javax.xml.bind.annotation.XmlType;
 /**
  * POJO for location table
  * 
- * @author Kevin Manansala, Mark Agarrado
+ * @author Kevin Manansala, Mark Agarrado, Joyce Avestro
  */
 @Entity
 @Table(name = "location")
@@ -44,7 +45,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "location")
 @XmlType(propOrder = { "locid", "lname", "typeFname", "labbr", "countryIsofull" })
 @XmlAccessorType(XmlAccessType.NONE)
-public class Location implements Serializable{
+public class Location implements Serializable, Comparable<Location>{
 
     private static final long serialVersionUID = 1L;
     
@@ -255,6 +256,34 @@ public class Location implements Serializable{
         return builder.toString();
     }
 
+
     
+    public int compareTo(Location compareLocation) {
+ 
+        String compareName = ((Location) compareLocation).getLname(); 
+ 
+        //ascending order
+        return this.lname.compareTo(compareName);
+ 
+        //descending order
+        //return compareName.compareTo(this.lname);
+ 
+    }
+ 
+    public static Comparator<Location> LocationNameComparator 
+                          = new Comparator<Location>() {
+        @Override
+        public int compare(Location location1, Location location2) {
+            String locationName1 = location1.getLname().toUpperCase();
+            String locationName2 = location2.getLname().toUpperCase();
+   
+            //ascending order
+            return locationName1.compareTo(locationName2);
+   
+            //descending order
+            //return locationName2.compareTo(locationName1);
+        }
+ 
+    };
     
 }
