@@ -39,12 +39,37 @@ public class Dataset implements Serializable{
     public static final String COUNT_BY_NAME = 
             "SELECT COUNT(dataset_name) " +
             "FROM gdms_dataset " +
-            "WHERE dataset_type !='QTL'";
+            "WHERE dataset_type != 'QTL' ";
 
     public static final String GET_DATASET_NAMES_NOT_QTL = 
             "SELECT CONCAT(dataset_name, '') " +
             "FROM gdms_dataset " +
-            "WHERE dataset_type !='QTL'";
+            "WHERE dataset_type != 'QTL' ";
+
+    public static final String GET_DATASET_ID_NOT_MAPPING_AND_NOT_QTL = 
+            "SELECT dataset_id " +
+            "FROM gdms_dataset " +
+            "WHERE dataset_type != 'mapping' " +
+            "AND dataset_type != 'QTL' ";
+
+    public static final String COUNT_DATASET_ID_NOT_MAPPING_AND_NOT_QTL = 
+            "SELECT COUNT(dataset_id) " +
+            "FROM gdms_dataset " +
+            "WHERE dataset_type != 'mapping' " +
+            "AND dataset_type != 'QTL' ";
+
+    public static final String GET_DATASET_ID_BY_MAPPING_AND_NOT_QTL = 
+            "SELECT dataset_id " +
+            "FROM gdms_dataset " +
+            "WHERE dataset_type = 'mapping' " +
+            "AND dataset_type != 'QTL' ";
+    
+
+    public static final String COUNT_DATASET_ID_BY_MAPPING_AND_NOT_QTL = 
+            "SELECT COUNT(dataset_id) " +
+            "FROM gdms_dataset " +
+            "WHERE dataset_type = 'mapping' " +
+            "AND dataset_type != 'QTL' ";
 
     public static final String GET_DETAILS_BY_NAME = 
             "SELECT dataset_id, CONCAT(dataset_type, '') " +

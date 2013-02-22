@@ -614,4 +614,52 @@ public interface GenotypicDataManager{
     public List<Integer> getNidsFromAccMetadatasetByDatasetIds(List<Integer> datasetIds, List<Integer> gids, int start, int numOfRows)
             throws MiddlewareQueryException;
 
+    /**
+     * Gets all the dataset Ids for Fingerprinting.
+     * Retrieves data from both central and local database instances.
+     *
+     * @param start 
+     *          - the starting index of the sublist of results to be returned
+     * @param numOfRows 
+     *          - the number of rows to be included in the sublist of results 
+     *          to be returned
+     * @return List of all dataset Ids where type is not equal to 'mapping' or 'QTL'
+     * @throws MiddlewareQueryException
+     */
+    public List<Integer> getDatasetIdsForFingerPrinting(int start, int numOfRows) throws MiddlewareQueryException;
+    
+    /**
+     * Count the dataset Ids for Fingerprinting. 
+     * Counts occurrences on both central and local database instances.
+     *
+     * @return the number of dataset Ids where type is not equal to 'mapping' or 'QTL'
+     * @throws MiddlewareQueryException
+     */
+    public long countDatasetIdsForFingerPrinting() throws MiddlewareQueryException;
+
+
+    /**
+     * Gets all the dataset Ids for Mapping.
+     * Retrieves data from both central and local database instances.
+     *
+     * @param start 
+     *          - the starting index of the sublist of results to be returned
+     * @param numOfRows 
+     *          - the number of rows to be included in the sublist of results 
+     *          to be returned
+     * @return List of all dataset Ids where type is equal to 'mapping' and not equal to 'QTL'
+     * @throws MiddlewareQueryException
+     */
+    public List<Integer> getDatasetIdsForMapping(int start, int numOfRows) throws MiddlewareQueryException;
+    
+    /**
+     * Count the dataset Ids for Mapping.
+     * Counts occurrences on both central and local database instances.
+     *
+     * @return the number of dataset Ids where type is equal to 'mapping' and not equal to 'QTL'
+     * @throws MiddlewareQueryException
+     */
+    public long countDatasetIdsForMapping() throws MiddlewareQueryException;
+
+
 }

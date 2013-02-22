@@ -980,4 +980,144 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return nids;
     }
 
+    @Override
+    public List<Integer> getDatasetIdsForFingerPrinting(int start, int numOfRows) throws MiddlewareQueryException{
+        DatasetDAO dao = new DatasetDAO();
+        List<Integer> datasetIds = new ArrayList<Integer>();
+        long centralCount = 0;
+        long localCount = 0;
+        long relativeLimit = 0;
+        
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if(sessionForCentral != null) {
+            
+            dao.setSession(sessionForCentral);
+            centralCount = dao.countDatasetIdsForFingerPrinting();
+            
+            if(centralCount > start) {
+                datasetIds.addAll(dao.getDatasetIdsForFingerPrinting(start, numOfRows));
+                relativeLimit = numOfRows - datasetIds.size();
+                if(relativeLimit > 0 && sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countDatasetIdsForFingerPrinting();
+                    if(localCount > 0) {
+                        datasetIds.addAll(dao.getDatasetIdsForFingerPrinting(0, (int) relativeLimit));
+                    }
+                }
+            } else {
+                relativeLimit = start - centralCount;
+                if (sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countDatasetIdsForFingerPrinting();
+                    if (localCount > relativeLimit) {
+                        datasetIds.addAll(dao.getDatasetIdsForFingerPrinting((int) relativeLimit, numOfRows));
+                    }
+                }
+            }
+        } else if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            localCount = dao.countDatasetIdsForFingerPrinting();
+            if (localCount > start) {
+                datasetIds.addAll(dao.getDatasetIdsForFingerPrinting(start, numOfRows));
+            }
+        }
+        
+        return datasetIds;
+        
+    }
+    
+    @Override
+    public long countDatasetIdsForFingerPrinting() throws MiddlewareQueryException{
+        DatasetDAO dao = new DatasetDAO();
+        long result = 0;
+        
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if(sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            result = dao.countDatasetIdsForFingerPrinting();
+        }
+        
+        if(sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            result += dao.countDatasetIdsForFingerPrinting();
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<Integer> getDatasetIdsForMapping(int start, int numOfRows) throws MiddlewareQueryException{
+        DatasetDAO dao = new DatasetDAO();
+        List<Integer> datasetIds = new ArrayList<Integer>();
+        long centralCount = 0;
+        long localCount = 0;
+        long relativeLimit = 0;
+        
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if(sessionForCentral != null) {
+            
+            dao.setSession(sessionForCentral);
+            centralCount = dao.countDatasetIdsForMapping();
+            
+            if(centralCount > start) {
+                datasetIds.addAll(dao.getDatasetIdsForMapping(start, numOfRows));
+                relativeLimit = numOfRows - datasetIds.size();
+                if(relativeLimit > 0 && sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countDatasetIdsForMapping();
+                    if(localCount > 0) {
+                        datasetIds.addAll(dao.getDatasetIdsForMapping(0, (int) relativeLimit));
+                    }
+                }
+            } else {
+                relativeLimit = start - centralCount;
+                if (sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countDatasetIdsForMapping();
+                    if (localCount > relativeLimit) {
+                        datasetIds.addAll(dao.getDatasetIdsForMapping((int) relativeLimit, numOfRows));
+                    }
+                }
+            }
+        } else if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            localCount = dao.countDatasetIdsForMapping();
+            if (localCount > start) {
+                datasetIds.addAll(dao.getDatasetIdsForMapping(start, numOfRows));
+            }
+        }
+        
+        return datasetIds;
+        
+        
+    }
+    
+    @Override
+    public long countDatasetIdsForMapping() throws MiddlewareQueryException{
+        DatasetDAO dao = new DatasetDAO();
+        long result = 0;
+        
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if(sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            result = dao.countDatasetIdsForMapping();
+        }
+        
+        if(sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            result += dao.countDatasetIdsForMapping();
+        }
+        
+        return result;
+    }
+
+
 }

@@ -383,6 +383,32 @@ public class TestGenotypicDataManagerImpl{
         System.out.println("testGetNidsFromAccMetadatasetByDatasetIds RESULTS: " + nids);
         System.out.println("testGetNidsFromAccMetadatasetByDatasetIds with gid filter RESULTS: " + nidsWithGidFilter);
     }
+    
+
+    @Test
+    public void testGetDatasetIdsForFingerPrinting() throws Exception {
+        List<Integer> datasetIds = manager.getDatasetIdsForFingerPrinting(0, (int) manager.countDatasetIdsForFingerPrinting());
+        System.out.println("testGetDatasetIdsForFingerPrinting() RESULTS: " + datasetIds);
+    }
+
+    @Test
+    public void testCountDatasetIdsForFingerPrinting() throws Exception {
+        long count = manager.countDatasetIdsForFingerPrinting();
+        System.out.println("testCountDatasetIdsForFingerPrinting() RESULTS: " + count);
+    }
+
+    @Test
+    public void testGetDatasetIdsForMapping() throws Exception {
+        List<Integer> datasetIds = manager.getDatasetIdsForMapping(0, (int) manager.countDatasetIdsForMapping());
+        System.out.println("testGetDatasetIdsForMapping() RESULTS: " + datasetIds);
+    }
+
+    @Test
+    public void testCountDatasetIdsForMapping() throws Exception {
+        long count = manager.countDatasetIdsForMapping();
+        System.out.println("testCountDatasetIdsForMapping() RESULTS: " + count);
+    }
+
 
     @AfterClass
     public static void tearDown() throws Exception {

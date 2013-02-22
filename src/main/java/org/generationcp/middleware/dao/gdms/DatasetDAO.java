@@ -36,7 +36,7 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer>{
     /**
      * Gets the count by dataset name.
      *
-     * @return the int
+     * @return the count
      */
     public long countByName() throws MiddlewareQueryException {
         Query query = getSession().createSQLQuery(Dataset.COUNT_BY_NAME);
@@ -98,4 +98,69 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer>{
         }
     }
 
+    /**
+     * Gets the dataset ids for finger printing.
+     *
+     * @param start the start
+     * @param numOfRows the number of rows
+     * @return the dataset ids
+     * @throws MiddlewareQueryException the MiddlewareQueryException
+     */
+    public List<Integer> getDatasetIdsForFingerPrinting(int start, int numOfRows) throws MiddlewareQueryException {
+        try {
+            SQLQuery query = getSession().createSQLQuery(Dataset.GET_DATASET_ID_NOT_MAPPING_AND_NOT_QTL);
+            query.setFirstResult(start);
+            query.setMaxResults(numOfRows);
+            return (List<Integer>) query.list();
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getDatasetIdsForFingerPrinting() query from Dataset: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Gets the count by dataset id for finger printing.
+     *
+     * @return the count
+     */
+    public long countDatasetIdsForFingerPrinting() throws MiddlewareQueryException {
+        Query query = getSession().createSQLQuery(Dataset.COUNT_DATASET_ID_NOT_MAPPING_AND_NOT_QTL);
+        BigInteger result = (BigInteger) query.uniqueResult();
+        if (result != null) {
+            return result.longValue();
+        }
+        return 0;
+    }
+
+    /**
+     * Gets the dataset ids for mapping.
+     *
+     * @param start the start
+     * @param numOfRows the number of rows
+     * @return the dataset ids
+     * @throws MiddlewareQueryException the MiddlewareQueryException
+     */
+    public List<Integer> getDatasetIdsForMapping(int start, int numOfRows) throws MiddlewareQueryException {
+        try {
+            SQLQuery query = getSession().createSQLQuery(Dataset.GET_DATASET_ID_BY_MAPPING_AND_NOT_QTL);
+            query.setFirstResult(start);
+            query.setMaxResults(numOfRows);
+            return (List<Integer>) query.list();
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getDatasetIdsForMapping() query from Dataset: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Gets the count by dataset id for mapping.
+     *
+     * @return the count
+     */
+    public long countDatasetIdsForMapping() throws MiddlewareQueryException {
+        Query query = getSession().createSQLQuery(Dataset.COUNT_DATASET_ID_BY_MAPPING_AND_NOT_QTL);
+        BigInteger result = (BigInteger) query.uniqueResult();
+        if (result != null) {
+            return result.longValue();
+        }
+        return 0;
+    }
 }
