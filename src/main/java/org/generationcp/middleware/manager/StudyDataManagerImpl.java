@@ -822,4 +822,135 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             throw new MiddlewareQueryException("Error in getting character levels by factor and dataset id: " + ex.getMessage(), ex);
         }
     }
+
+    @Override
+    public boolean hasValuesByNumVariateAndDataset(int variateId,
+            int datasetId) throws MiddlewareQueryException {
+        
+        RepresentationDAO representationDao = new RepresentationDAO();
+        Session session = getSession(datasetId);
+
+        if (session != null) {
+            representationDao.setSession(session);
+        } else {
+            return false;
+        }
+
+        return representationDao.hasValuesByNumVariateAndDataset(variateId, datasetId);
+    }
+
+    @Override
+    public boolean hasValuesByCharVariateAndDataset(int variateId,
+            int datasetId) throws MiddlewareQueryException {
+
+        RepresentationDAO representationDao = new RepresentationDAO();
+        Session session = getSession(datasetId);
+
+        if (session != null) {
+            representationDao.setSession(session);
+        } else {
+            return false;
+        }
+
+        return representationDao.hasValuesByCharVariateAndDataset(variateId, datasetId);
+    }
+
+    @Override
+    public boolean hasValuesByNumLabelAndLabelValueAndNumVariateAndDataset(
+            int labelId, double value, int variateId, int datasetId)
+            throws MiddlewareQueryException {
+        
+        RepresentationDAO representationDao = new RepresentationDAO();
+        Session session = getSession(datasetId);
+
+        if (session != null) {
+            representationDao.setSession(session);
+        } else {
+            return false;
+        }
+
+        return representationDao.hasValuesByNumLabelAndLabelValueAndNumVariateAndDataset(labelId, value, variateId, datasetId);
+    }
+
+    @Override
+    public boolean hasValuesByCharLabelAndLabelValueAndNumVariateAndDataset(
+            int labelId, String value, int variateId, int datasetId)
+            throws MiddlewareQueryException {
+        
+        RepresentationDAO representationDao = new RepresentationDAO();
+        Session session = getSession(datasetId);
+
+        if (session != null) {
+            representationDao.setSession(session);
+        } else {
+            return false;
+        }
+
+        return representationDao.hasValuesByCharLabelAndLabelValueAndNumVariateAndDataset(labelId, value, variateId, datasetId);
+    }
+
+    @Override
+    public boolean hasValuesByNumLabelAndLabelValueAndCharVariateAndDataset(
+            int labelId, double value, int variateId, int datasetId)
+            throws MiddlewareQueryException {
+        
+        RepresentationDAO representationDao = new RepresentationDAO();
+        Session session = getSession(datasetId);
+
+        if (session != null) {
+            representationDao.setSession(session);
+        } else {
+            return false;
+        }
+
+        return representationDao.hasValuesByNumLabelAndLabelValueAndCharVariateAndDataset(labelId, value, variateId, datasetId);
+    }
+
+    @Override
+    public boolean hasValuesByCharLabelAndLabelValueAndCharVariateAndDataset(
+            int labelId, String value, int variateId, int datasetId)
+            throws MiddlewareQueryException {
+        
+        RepresentationDAO representationDao = new RepresentationDAO();
+        Session session = getSession(datasetId);
+
+        if (session != null) {
+            representationDao.setSession(session);
+        } else {
+            return false;
+        }
+
+        return representationDao.hasValuesByCharLabelAndLabelValueAndCharVariateAndDataset(labelId, value, variateId, datasetId);
+    }
+
+    @Override
+    public boolean isLabelNumeric(int labelId) throws MiddlewareQueryException {
+
+        FactorDAO factorDAO = new FactorDAO();
+        Session session = getSession(labelId);
+
+        if (session != null) {
+            factorDAO.setSession(session);
+        } else {
+            return false;
+        }
+
+        return factorDAO.isLabelNumeric(labelId);
+    }
+
+    @Override
+    public boolean isVariateNumeric(int variateId)
+            throws MiddlewareQueryException {
+
+        VariateDAO variateDAO = new VariateDAO();
+        Session session = getSession(variateId);
+
+        if (session != null) {
+            variateDAO.setSession(session);
+        } else {
+            return false;
+        }
+
+        return variateDAO.isVariateNumeric(variateId);
+    }
 }

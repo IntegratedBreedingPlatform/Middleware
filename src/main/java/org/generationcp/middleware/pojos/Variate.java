@@ -42,6 +42,10 @@ public class Variate implements Serializable{
             "FROM variate v JOIN data_c dn ON v.variatid = dn.variatid " + 
                     "JOIN oindex oi ON oi.ounitid = dn.ounitid " +
             "WHERE oi.represno = :representationId";
+    
+    public static final String GET_VARIATE_ID_DATATYPE = "SELECT dtype " +
+        "FROM variate " + 
+        "WHERE variatid = :variatid";
 
     @Id
     @Basic(optional = false)

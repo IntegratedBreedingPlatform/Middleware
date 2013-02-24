@@ -21,6 +21,9 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 
 public class VariateDAO extends GenericDAO<Variate, Integer>{
+    
+    public static final String NUMERIC_DATATYPE = "N";
+    public static final String CHARACTER_DATATYPE = "C";
 
     @SuppressWarnings("unchecked")
     public List<Variate> getByStudyID(Integer studyId) throws MiddlewareQueryException {
@@ -47,5 +50,22 @@ public class VariateDAO extends GenericDAO<Variate, Integer>{
                     + ") query from Variate: " + e.getMessage(), e);
         }
     }
-
+    
+    public boolean isVariateNumeric(int variateId) throws MiddlewareQueryException {
+        try {
+            Query query = getSession().createSQLQuery(Variate.GET_VARIATE_ID_DATATYPE);
+            query.setParameter("variatid", variateId);
+            String result = (String) query.list().get(0);
+            
+            if (result.equals(NUMERIC_DATATYPE)) 
+                return true;
+            else if (result.equals(CHARACTER_DATATYPE))
+               return false;
+            else
+                throw new HibernateException("Database Error: No Datatype assigned on the variate id: " + variateId);
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with isVariateNumeric: " + e.getMessage(),
+                    e);
+        }
+    }
 }

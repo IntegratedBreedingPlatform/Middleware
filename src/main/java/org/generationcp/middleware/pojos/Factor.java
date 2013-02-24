@@ -60,6 +60,10 @@ public class Factor implements Serializable{
             + "FROM factor f JOIN effect e ON f.factorid = e.factorid " 
             + "WHERE f.traitid = :traitid AND e.represno = :representationId";
     
+    public static final String GET_LABEL_ID_DATATYPE = "SELECT ltype " +
+        "FROM factor " + 
+        "WHERE labelid = :labelid";
+    
     @Id
     @Basic(optional = false)
     @Column(name = "labelid")

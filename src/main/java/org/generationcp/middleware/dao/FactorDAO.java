@@ -25,6 +25,9 @@ import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
 
 public class FactorDAO extends GenericDAO<Factor, Integer>{
+    
+    public static final String NUMERIC_DATATYPE = "N";
+    public static final String CHARACTER_DATATYPE = "C";
 
     @SuppressWarnings("unchecked")
     public Set<Integer> getGIDSByObservationUnitIds(Set<Integer> ounitIds, int start, int numOfRows) throws MiddlewareQueryException {
@@ -124,6 +127,24 @@ public class FactorDAO extends GenericDAO<Factor, Integer>{
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error with getFactorOfDatasetGivenTid(representationId=" + representationId
                     + ", traitid = " + traitid + ") query from Factor: " + e.getMessage(), e);
+        }
+    }
+    
+    public boolean isLabelNumeric(int labelId) throws MiddlewareQueryException {
+        try {
+            Query query = getSession().createSQLQuery(Factor.GET_LABEL_ID_DATATYPE);
+            query.setParameter("labelid", labelId);
+            String result = (String) query.list().get(0);
+            
+            if (result.equals(NUMERIC_DATATYPE)) 
+                return true;
+            else if (result.equals(CHARACTER_DATATYPE))
+               return false;
+            else
+                throw new HibernateException("Database Error: No Datatype assigned on the label id: " + labelId);
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with isLabelNumeric: " + e.getMessage(),
+                    e);
         }
     }
 }

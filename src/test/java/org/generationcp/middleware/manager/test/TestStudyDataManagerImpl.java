@@ -464,6 +464,100 @@ public class TestStudyDataManagerImpl{
         }
     }
     
+    @Test
+    public void testHasValuesByNumericVariateandDataset() throws Exception {
+        int variateId = 35;
+        int datasetId = 4;
+        long start = System.currentTimeMillis();
+        boolean value = manager.hasValuesByNumVariateAndDataset(variateId, datasetId);
+        long end = System.currentTimeMillis();
+        System.out.println("hasValuesByNumericVariateandDataset(" + variateId + ", " + datasetId + "): " + value);
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
+    }
+    
+    @Test
+    public void TestHasValuesByCharacterVariateandDataset() throws Exception {
+        int variateId = 42;
+        int datasetId = 4;
+        long start = System.currentTimeMillis();
+        boolean value = manager.hasValuesByCharVariateAndDataset(variateId, datasetId);
+        long end = System.currentTimeMillis();
+        System.out.println("hasValuesByCharacterVariateandDataset(" + variateId + ", " + datasetId + "): " + value);
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
+    }
+    
+    @Test
+    public void TestHasValuesByNumLabelAndLabelValueAndNumVariateAndDataset() throws Exception {
+        int labelId = 76;
+        double value = 1d;
+        int variateId = 304;
+        int datasetId = 20;
+        long start = System.currentTimeMillis();
+        boolean result = manager.hasValuesByNumLabelAndLabelValueAndNumVariateAndDataset(labelId, value, variateId, datasetId);
+        long end = System.currentTimeMillis();
+        System.out.println("TestHasValuesByNumLabelAndLabelValueAndNumVariateAndDataset(" + labelId + ", " + value + ", " + variateId + ", " + datasetId + "): " + result);
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
+    }
+    
+    @Test
+    public void TestHasValuesByCharLabelAndLabelValueAndNumVariateAndDataset() throws Exception {
+        int labelId = 73;
+        String value = "HB";
+        int variateId = 304;
+        int datasetId = 20;
+        long start = System.currentTimeMillis();
+        boolean result = manager.hasValuesByCharLabelAndLabelValueAndNumVariateAndDataset(labelId, value, variateId, datasetId);
+        long end = System.currentTimeMillis();
+        System.out.println("TestHasValuesByCharLabelAndLabelValueAndNumVariateAndDataset(" + labelId + ", " + value + ", " + variateId + ", " + datasetId + "): " + result);
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
+    }
+    
+    @Test
+    public void TestHasValuesByNumLabelAndLabelValueAndCharVariateAndDataset() throws Exception {
+        int labelId = 80;
+        double value = 309784d;
+        int variateId = 287;
+        int datasetId = 20;
+        long start = System.currentTimeMillis();
+        boolean result = manager.hasValuesByNumLabelAndLabelValueAndCharVariateAndDataset(labelId, value, variateId, datasetId);
+        long end = System.currentTimeMillis();
+        System.out.println("TestHasValuesByNumLabelAndLabelValueAndCharVariateAndDataset(" + labelId + ", " + value + ", " + variateId + ", " + datasetId + "): " + result);
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
+    }
+    
+    @Test
+    public void TestHasValuesByCharLabelAndLabelValueAndCharVariateAndDataset() throws Exception {
+        int labelId = 77;
+        String value = "HB0128";
+        int variateId = 287;
+        int datasetId = 20;
+        long start = System.currentTimeMillis();
+        boolean result = manager.hasValuesByCharLabelAndLabelValueAndCharVariateAndDataset(labelId, value, variateId, datasetId);
+        long end = System.currentTimeMillis();
+        System.out.println("TestHasValuesByCharLabelAndLabelValueAndCharVariateAndDataset(" + labelId + ", " + value + ", " + variateId + ", " + datasetId + "): " + result);
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
+    }
+    
+    @Test
+    public void TestIsLabelNumeric() throws Exception {
+        int labelId = 80;
+        long start = System.currentTimeMillis();
+        boolean result = manager.isLabelNumeric(labelId);
+        long end = System.currentTimeMillis();
+        System.out.println("TestIsLabelNumeric(" + labelId + "): " + result);
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
+    }
+    
+    @Test
+    public void TestIsVariateNumeric() throws Exception {
+        int variateId = 304;
+        long start = System.currentTimeMillis();
+        boolean result = manager.isVariateNumeric(variateId);
+        long end = System.currentTimeMillis();
+        System.out.println("TestIsVariateNumeric(" + variateId + "): " + result);
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
+    }
+    
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();

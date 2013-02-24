@@ -571,4 +571,114 @@ public interface StudyDataManager{
      * @throws MiddlewareQueryException
      */
     public List<NumericLevel> getNumericLevelsByFactorAndDatasetId(Factor factor, Integer datasetId) throws MiddlewareQueryException;
+    
+    /**
+     * Returns a boolean value given a numeric variate id and a dataset id
+     * 
+     * @param variateId
+     *            - selected numeric variate
+     * @param datasetId
+     *            - selected dataset
+     * @return boolean
+     * @throws MiddlewareQueryException
+     */
+    public boolean hasValuesByNumVariateAndDataset(int variateId, int datasetId) throws MiddlewareQueryException;
+    
+    /**
+     * Returns a boolean value given a character variate id and a dataset id
+     * 
+     * @param variateId
+     *            - selected character variate
+     * @param datasetId
+     *            - selected dataset
+     * @return boolean
+     * @throws MiddlewareQueryException
+     */
+    public boolean hasValuesByCharVariateAndDataset(int variateId, int datasetId) throws MiddlewareQueryException;
+    
+    /**
+     * Returns a boolean value given a character label id, label value, variate id and a dataset id
+     * 
+     * @param labelId
+     *            - selected numeric label
+     * @param value
+     *            - selected label value
+     * @param variateId
+     *            - selected numeric variate
+     * @param datasetId
+     *            - selected dataset                 
+     * @return boolean
+     * @throws MiddlewareQueryException
+     */
+    public boolean hasValuesByNumLabelAndLabelValueAndNumVariateAndDataset(int labelId, double value, int variateId, int datasetId) throws MiddlewareQueryException;
+    
+    /**
+     * Returns a boolean value given a character label id, label value, variate id and a dataset id
+     * 
+     * @param labelId
+     *            - selected character label
+     * @param value
+     *            - selected label value
+     * @param variateId
+     *            - selected numeric variate
+     * @param datasetId
+     *            - selected dataset                 
+     * @return boolean
+     * @throws MiddlewareQueryException
+     */
+    public boolean hasValuesByCharLabelAndLabelValueAndNumVariateAndDataset(int labelId, String value, int variateId, int datasetId) throws MiddlewareQueryException;
+    
+    /**
+     * Returns a boolean value given a character label id, label value, variate id and a dataset id
+     * 
+     * @param labelId
+     *            - selected numeric label
+     * @param value
+     *            - selected label value
+     * @param variateId
+     *            - selected character variate
+     * @param datasetId
+     *            - selected dataset                 
+     * @return boolean
+     * @throws MiddlewareQueryException
+     */
+    public boolean hasValuesByNumLabelAndLabelValueAndCharVariateAndDataset(int labelId, double value, int variateId, int datasetId) throws MiddlewareQueryException;
+    
+    /**
+     * Returns a boolean value given a character label id, label value, variate id and a dataset id
+     * 
+     * @param labelId
+     *            - selected character label
+     * @param value
+     *            - selected label value
+     * @param variateId
+     *            - selected character variate
+     * @param datasetId
+     *            - selected dataset                 
+     * @return boolean
+     * @throws MiddlewareQueryException
+     */
+    public boolean hasValuesByCharLabelAndLabelValueAndCharVariateAndDataset(int labelId, String value, int variateId, int datasetId) throws MiddlewareQueryException;
+    
+    /**
+     * Returns a boolean value given a label id
+     * 
+     * @param labelId
+     *            - selected character label              
+     * @return boolean
+     * @throws MiddlewareQueryException
+     */
+    public boolean isLabelNumeric(int labelId) throws MiddlewareQueryException;
+    
+    /**
+     * Returns a datatype value given a variate id
+     * 
+     * @param labelId
+     *          - selected character variate              
+     * @return boolean
+     * @throws MiddlewareQueryException
+     */
+    public boolean isVariateNumeric(int variateId) throws MiddlewareQueryException;
+    
+    
 }
