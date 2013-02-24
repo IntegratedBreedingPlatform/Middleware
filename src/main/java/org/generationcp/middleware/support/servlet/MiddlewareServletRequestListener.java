@@ -72,7 +72,7 @@ public class MiddlewareServletRequestListener implements ServletRequestListener 
      * @param request
      * @return
      */
-    public GermplasmDataManager getGermplasmDataManagerForRequest(ServletRequest request) {
+    public static GermplasmDataManager getGermplasmDataManagerForRequest(ServletRequest request) {
         return getManagerFactoryForRequest(request).getGermplasmDataManager();
     }
     
@@ -83,7 +83,7 @@ public class MiddlewareServletRequestListener implements ServletRequestListener 
      * @param request
      * @return
      */
-    public GermplasmListManager getGermplasmListManagerForRequest(ServletRequest request) {
+    public static GermplasmListManager getGermplasmListManagerForRequest(ServletRequest request) {
         return getManagerFactoryForRequest(request).getGermplasmListManager();
     }
 
@@ -94,7 +94,7 @@ public class MiddlewareServletRequestListener implements ServletRequestListener 
      * @param request
      * @return
      */
-    public TraitDataManager getTraitDataManagerForRequest(ServletRequest request) {
+    public static TraitDataManager getTraitDataManagerForRequest(ServletRequest request) {
         return getManagerFactoryForRequest(request).getTraitDataManager();
     }
 
@@ -106,7 +106,7 @@ public class MiddlewareServletRequestListener implements ServletRequestListener 
      * @return
      * @throws ConfigException
      */
-    public StudyDataManager getStudyDataManagerForRequest(ServletRequest request) throws ConfigException {
+    public static StudyDataManager getStudyDataManagerForRequest(ServletRequest request) throws ConfigException {
         return getManagerFactoryForRequest(request).getStudyDataManager();
     }
 
@@ -118,7 +118,7 @@ public class MiddlewareServletRequestListener implements ServletRequestListener 
      * @return
      * @throws ConfigException
      */
-    public InventoryDataManager getInventoryDataManagerForRequest(ServletRequest request) throws ConfigException {
+    public static InventoryDataManager getInventoryDataManagerForRequest(ServletRequest request) throws ConfigException {
         return getManagerFactoryForRequest(request).getInventoryDataManager();
     }
     
@@ -130,7 +130,7 @@ public class MiddlewareServletRequestListener implements ServletRequestListener 
      * @return
      * @throws ConfigException
      */
-    public GenotypicDataManager getGenotypicDataManagerForRequest(ServletRequest request) throws ConfigException {
+    public static GenotypicDataManager getGenotypicDataManagerForRequest(ServletRequest request) throws ConfigException {
         return getManagerFactoryForRequest(request).getGenotypicDataManager();
     }
     
@@ -142,7 +142,7 @@ public class MiddlewareServletRequestListener implements ServletRequestListener 
      * @return
      * @throws ConfigException
      */
-    public UserDataManager getUserDataManagerForRequest(ServletRequest request) {
+    public static UserDataManager getUserDataManagerForRequest(ServletRequest request) {
         return getManagerFactoryForRequest(request).getUserDataManager();
     }
     
