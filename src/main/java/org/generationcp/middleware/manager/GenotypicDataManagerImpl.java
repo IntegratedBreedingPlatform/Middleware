@@ -1130,39 +1130,49 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
         Session sessionForCentral = getCurrentSessionForCentral();
         Session sessionForLocal = getCurrentSessionForLocal();
+        
+        List<Integer> positiveGids = new ArrayList<Integer>();
+        List<Integer> negativeGids = new ArrayList<Integer>();
+        for (Integer gid : gids){
+            if (gid < 0) {
+                negativeGids.add(gid);
+            } else {
+                positiveGids.add(gid);
+            }
+        }
 
         List<AccMetadataSetPK> accMetadataSets = new ArrayList<AccMetadataSetPK>();
 
         if(sessionForCentral != null) {
             
             dao.setSession(sessionForCentral);
-            centralCount = dao.countAccMetadataSetByGids(gids);
+            centralCount = dao.countAccMetadataSetByGids(positiveGids);
             
             if(centralCount > start) {
-                accMetadataSets.addAll(dao.getAccMetadasetByGids(gids, start, numOfRows));
+                accMetadataSets.addAll(dao.getAccMetadasetByGids(positiveGids, start, numOfRows));
                 relativeLimit = numOfRows - accMetadataSets.size();
                 if(relativeLimit > 0 && sessionForLocal != null) {
                     dao.setSession(sessionForLocal);
-                    localCount = dao.countAccMetadataSetByGids(gids);
+                    localCount = dao.countAccMetadataSetByGids(negativeGids);
                     if(localCount > 0) {
-                        accMetadataSets.addAll(dao.getAccMetadasetByGids(gids, 0, (int) relativeLimit));
+                        accMetadataSets.addAll(dao.getAccMetadasetByGids(negativeGids, 0, (int) relativeLimit));
                     }
                 }
             } else {
                 relativeLimit = start - centralCount;
                 if (sessionForLocal != null) {
                     dao.setSession(sessionForLocal);
-                    localCount = dao.countAccMetadataSetByGids(gids);
+                    localCount = dao.countAccMetadataSetByGids(negativeGids);
                     if (localCount > relativeLimit) {
-                        accMetadataSets.addAll(dao.getAccMetadasetByGids(gids, (int) relativeLimit, numOfRows));
+                        accMetadataSets.addAll(dao.getAccMetadasetByGids(negativeGids, (int) relativeLimit, numOfRows));
                     }
                 }
             }
         } else if (sessionForLocal != null) {
             dao.setSession(sessionForLocal);
-            localCount = dao.countAccMetadataSetByGids(gids);
+            localCount = dao.countAccMetadataSetByGids(negativeGids);
             if (localCount > start) {
-                accMetadataSets.addAll(dao.getAccMetadasetByGids(gids, start, numOfRows));
+                accMetadataSets.addAll(dao.getAccMetadasetByGids(negativeGids, start, numOfRows));
             }
         }
         
@@ -1178,18 +1188,28 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         Session sessionForCentral = getCurrentSessionForCentral();
         Session sessionForLocal = getCurrentSessionForLocal();
 
+        List<Integer> positiveGids = new ArrayList<Integer>();
+        List<Integer> negativeGids = new ArrayList<Integer>();
+        for (Integer gid : gids){
+            if (gid < 0) {
+                negativeGids.add(gid);
+            } else {
+                positiveGids.add(gid);
+            }
+        }
+
         long result = 0;
 
         // Count from local
         if (sessionForLocal != null) {
             dao.setSession(sessionForLocal);
-            result += dao.countAccMetadataSetByGids(gids);
+            result += dao.countAccMetadataSetByGids(negativeGids);
         }
 
         // Count from central
         if (sessionForCentral != null) {
             dao.setSession(sessionForCentral);
-            result += dao.countAccMetadataSetByGids(gids);
+            result += dao.countAccMetadataSetByGids(positiveGids);
         }
 
         return result;
