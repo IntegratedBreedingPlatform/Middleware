@@ -17,6 +17,7 @@ import java.util.List;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.gdms.AccMetadataSetPK;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
@@ -661,5 +662,67 @@ public interface GenotypicDataManager{
      */
     public long countDatasetIdsForMapping() throws MiddlewareQueryException;
 
+
+    /**
+     * Gets the details of gdms_acc_metadataset given a set of Germplasm IDs.
+     * Retrieves from either local (negative gid) or both local and central (positive gid).
+     * Discards duplicates.
+     *
+     * @param gids
+     *          - list of GIDs to match
+     * @param start 
+     *          - the starting index of the sublist of results to be returned
+     * @param numOfRows 
+     *          - the number of rows to be included in the sublist of results 
+     *          to be returned
+     * @return List of the corresponding details of entries in gdms_acc_metadataset given a set of GIDs
+     * @throws MiddlewareQueryException
+     */
+    public List<AccMetadataSetPK> getGdmsAccMetadatasetByGid(List<Integer> gids, int start, int numOfRows) throws MiddlewareQueryException;
+    
+    /**
+     * Count the entries in gdms_acc_metadataset given a set of Germplasm IDs.
+     * Counts from either local (negative gid) or both local and central (positive gid).
+     * Includes duplicates in the count.
+     *
+     * @return the number of entries in gdms_acc_metadataset given a set of Germplasm IDs
+     * @throws MiddlewareQueryException
+     */
+    public long countGdmsAccMetadatasetByGid(List<Integer> gids) throws MiddlewareQueryException;
+
+    /**
+     * Gets the marker ids matching the given GID and Dataset Ids
+     * Retrieves data from both central and local database instances.
+     *
+     * @param gid
+     *          - the GID to match
+     * @param datasetIds 
+     *          - the datasetIds to match
+     * @param start 
+     *          - the starting index of the sublist of results to be returned
+     * @param numOfRows 
+     *          - the number of rows to be included in the sublist of results 
+     *          to be returned
+     * @return List of marker ids matching the given GID and dataset ids
+     * @throws MiddlewareQueryException
+     */
+    public List<Integer> getMarkersByGidAndDatasetIds(Integer gid, List<Integer> datasetIds, int start, int numOfRows) throws MiddlewareQueryException;
+    
+    /**
+     * Gets the number of marker ids matching the given GID and Dataset Ids
+     * Counts occurrences on both central and local database instances.
+     *
+     * @param gid
+     *          - the GID to match
+     * @param datasetIds 
+     *          - the datasetIds to match
+     * @return the number of marker ids matching the given GID and dataset ids
+     * @throws MiddlewareQueryException
+     */
+    public long countMarkersByGidAndDatasetIds(Integer gid, List<Integer> datasetIds) throws MiddlewareQueryException;
+
+    
+        
+    
 
 }

@@ -20,6 +20,7 @@ import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.gdms.AccMetadataSetPK;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
@@ -226,7 +227,8 @@ public class TestGenotypicDataManagerImpl{
     public void testGetAllelicValuesFromAlleleValuesByDatasetId() throws Exception {
         Integer datasetId = Integer.valueOf(2);
         long count = manager.countAllelicValuesFromCharValuesByDatasetId(datasetId);
-        List<AllelicValueWithMarkerIdElement> allelicValues = manager.getAllelicValuesFromAlleleValuesByDatasetId(datasetId, 0, (int) count);
+        List<AllelicValueWithMarkerIdElement> allelicValues = manager
+                .getAllelicValuesFromAlleleValuesByDatasetId(datasetId, 0, (int) count);
         System.out.println("testGetAllelicValuesFromAlleleValuesByDatasetId(" + datasetId + ") RESULTS: " + allelicValues);
     }
 
@@ -234,7 +236,8 @@ public class TestGenotypicDataManagerImpl{
     public void testGetAllelicValuesFromMappingPopValuesByDatasetId() throws Exception {
         Integer datasetId = Integer.valueOf(2);
         long count = manager.countAllelicValuesFromCharValuesByDatasetId(datasetId);
-        List<AllelicValueWithMarkerIdElement> allelicValues = manager.getAllelicValuesFromMappingPopValuesByDatasetId(datasetId, 0, (int) count);
+        List<AllelicValueWithMarkerIdElement> allelicValues = manager.getAllelicValuesFromMappingPopValuesByDatasetId(datasetId, 0,
+                (int) count);
         System.out.println("testGetAllelicValuesFromMappingPopValuesByDatasetId(" + datasetId + ") RESULTS: " + allelicValues);
     }
 
@@ -383,7 +386,6 @@ public class TestGenotypicDataManagerImpl{
         System.out.println("testGetNidsFromAccMetadatasetByDatasetIds RESULTS: " + nids);
         System.out.println("testGetNidsFromAccMetadatasetByDatasetIds with gid filter RESULTS: " + nidsWithGidFilter);
     }
-    
 
     @Test
     public void testGetDatasetIdsForFingerPrinting() throws Exception {
@@ -409,7 +411,58 @@ public class TestGenotypicDataManagerImpl{
         System.out.println("testCountDatasetIdsForMapping() RESULTS: " + count);
     }
 
+    @Test
+    public void testGetGdmsAccMetadatasetByGid() throws Exception {
+        List<Integer> germplasmIds = new ArrayList<Integer>();
+        germplasmIds.add(Integer.valueOf(956)); // Crop Tested: Groundnut
+        germplasmIds.add(Integer.valueOf(1042));
+        germplasmIds.add(Integer.valueOf(-2213));
+        germplasmIds.add(Integer.valueOf(-2215));
+        List<AccMetadataSetPK> accMetadataSets = manager.getGdmsAccMetadatasetByGid(germplasmIds, 0, 
+                (int) manager.countGdmsAccMetadatasetByGid(germplasmIds));
+        System.out.println("testGetGdmsAccMetadatasetByGid() RESULTS: ");
+        for (AccMetadataSetPK accMetadataSet : accMetadataSets) {
+            System.out.println(accMetadataSet.toString());
+        }
 
+    }
+
+    @Test
+    public void testCountGdmsAccMetadatasetByGid() throws Exception { 
+        List<Integer> germplasmIds = new ArrayList<Integer>(); 
+        germplasmIds.add(Integer.valueOf(956)); // Crop Tested: Groundnut
+        germplasmIds.add(Integer.valueOf(1042));
+        germplasmIds.add(Integer.valueOf(-2213));
+        germplasmIds.add(Integer.valueOf(-2215));
+        long count = manager.countGdmsAccMetadatasetByGid(germplasmIds);
+        System.out.println("testCountGdmsAccMetadatasetByGid() RESULTS: " + count);
+    }
+
+    @Test
+    public void testGetMarkersByGidAndDatasetIds() throws Exception {
+        Integer gid = Integer.valueOf(-2215);    // Crop Tested: Groundnut
+
+        List<Integer> datasetIds = new ArrayList<Integer>();
+        datasetIds.add(Integer.valueOf(1));
+        datasetIds.add(Integer.valueOf(2));
+
+        List<Integer> markerIds = manager.getMarkersByGidAndDatasetIds(gid, datasetIds, 0, 
+                (int) manager.countMarkersByGidAndDatasetIds(gid, datasetIds));
+        System.out.println("testGetMarkersByGidAndDatasetIds() RESULTS: " + markerIds);
+    }
+
+    @Test
+    public void testCountMarkersByGidAndDatasetIds() throws Exception { 
+        Integer gid = Integer.valueOf(-2215);    // Crop Tested: Groundnut
+
+        List<Integer> datasetIds = new ArrayList<Integer>();
+        datasetIds.add(Integer.valueOf(1));
+        datasetIds.add(Integer.valueOf(2));
+
+        long count = manager.countMarkersByGidAndDatasetIds(gid, datasetIds);
+        System.out.println("testCountGdmsAccMetadatasetByGid() RESULTS: " + count);
+    }
+    
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();

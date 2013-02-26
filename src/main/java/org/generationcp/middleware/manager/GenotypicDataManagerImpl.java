@@ -31,6 +31,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.gdms.AccMetadataSetPK;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
@@ -1095,7 +1096,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         
         return datasetIds;
         
-        
     }
     
     @Override
@@ -1119,5 +1119,151 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return result;
     }
 
+    @Override
+    public List<AccMetadataSetPK> getGdmsAccMetadatasetByGid(List<Integer> gids, int start, int numOfRows) throws MiddlewareQueryException{
+       
+        AccMetadataSetDAO dao = new AccMetadataSetDAO();
+
+        long centralCount = 0;
+        long localCount = 0;
+        long relativeLimit = 0;
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        List<AccMetadataSetPK> accMetadataSets = new ArrayList<AccMetadataSetPK>();
+
+        if(sessionForCentral != null) {
+            
+            dao.setSession(sessionForCentral);
+            centralCount = dao.countAccMetadataSetByGids(gids);
+            
+            if(centralCount > start) {
+                accMetadataSets.addAll(dao.getAccMetadasetByGids(gids, start, numOfRows));
+                relativeLimit = numOfRows - accMetadataSets.size();
+                if(relativeLimit > 0 && sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countAccMetadataSetByGids(gids);
+                    if(localCount > 0) {
+                        accMetadataSets.addAll(dao.getAccMetadasetByGids(gids, 0, (int) relativeLimit));
+                    }
+                }
+            } else {
+                relativeLimit = start - centralCount;
+                if (sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countAccMetadataSetByGids(gids);
+                    if (localCount > relativeLimit) {
+                        accMetadataSets.addAll(dao.getAccMetadasetByGids(gids, (int) relativeLimit, numOfRows));
+                    }
+                }
+            }
+        } else if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            localCount = dao.countAccMetadataSetByGids(gids);
+            if (localCount > start) {
+                accMetadataSets.addAll(dao.getAccMetadasetByGids(gids, start, numOfRows));
+            }
+        }
+        
+        return accMetadataSets;
+
+    }
+    
+    @Override
+    public long countGdmsAccMetadatasetByGid(List<Integer> gids) throws MiddlewareQueryException{
+        
+        AccMetadataSetDAO dao = new AccMetadataSetDAO();
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        long result = 0;
+
+        // Count from local
+        if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            result += dao.countAccMetadataSetByGids(gids);
+        }
+
+        // Count from central
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            result += dao.countAccMetadataSetByGids(gids);
+        }
+
+        return result;
+
+    }
+
+    @Override
+    public List<Integer> getMarkersByGidAndDatasetIds(Integer gid, List<Integer> datasetIds, int start, int numOfRows) throws MiddlewareQueryException{
+        MarkerMetadataSetDAO dao = new MarkerMetadataSetDAO();
+        List<Integer> markerIds = new ArrayList<Integer>();
+        long centralCount = 0;
+        long localCount = 0;
+        long relativeLimit = 0;
+        
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if(sessionForCentral != null) {
+            
+            dao.setSession(sessionForCentral);
+            centralCount = dao.countMarkersByGidAndDatasetIds(gid, datasetIds);
+            
+            if(centralCount > start) {
+                markerIds.addAll(dao.getMarkersByGidAndDatasetIds(gid, datasetIds, start, numOfRows));
+                relativeLimit = numOfRows - markerIds.size();
+                if(relativeLimit > 0 && sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countMarkersByGidAndDatasetIds(gid, datasetIds);
+                    if(localCount > 0) {
+                        markerIds.addAll(dao.getMarkersByGidAndDatasetIds(gid, datasetIds, 0, (int) relativeLimit));
+                    }
+                }
+            } else {
+                relativeLimit = start - centralCount;
+                if (sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countMarkersByGidAndDatasetIds(gid, datasetIds);
+                    if (localCount > relativeLimit) {
+                        markerIds.addAll(dao.getMarkersByGidAndDatasetIds(gid, datasetIds, (int) relativeLimit, numOfRows));
+                    }
+                }
+            }
+        } else if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            localCount = dao.countMarkersByGidAndDatasetIds(gid, datasetIds);
+            if (localCount > start) {
+                markerIds.addAll(dao.getMarkersByGidAndDatasetIds(gid, datasetIds, start, numOfRows));
+            }
+        }
+        
+        return markerIds;
+    }
+
+    @Override
+    public long countMarkersByGidAndDatasetIds(Integer gid, List<Integer> datasetIds) throws MiddlewareQueryException{
+        MarkerMetadataSetDAO dao = new MarkerMetadataSetDAO();
+        long result = 0;
+        
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if(sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            result = dao.countMarkersByGidAndDatasetIds(gid, datasetIds);
+        }
+        
+        if(sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            result += dao.countMarkersByGidAndDatasetIds(gid, datasetIds);
+        }
+        
+        return result;
+
+        
+    }
 
 }

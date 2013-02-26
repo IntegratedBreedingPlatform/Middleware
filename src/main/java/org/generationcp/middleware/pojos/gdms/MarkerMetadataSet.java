@@ -40,6 +40,22 @@ public class MarkerMetadataSet implements Serializable{
             "WHERE dataset_id = :datasetId " +
             "ORDER BY marker_id;";
 
+    public static final String GET_MARKERS_BY_GID_AND_DATASETS = 
+            "SELECT DISTINCT marker_id " + 
+            "FROM gdms_marker_metadataset JOIN gdms_acc_metadataset " +
+            "        ON gdms_marker_metadataset.dataset_id = gdms_acc_metadataset.dataset_id " + 
+            "WHERE gdms_marker_metadataset.dataset_id in (:datasetids)  " +
+            "    AND gdms_acc_metadataset.gid = :gid " + 
+            "ORDER BY gdms_marker_metadataset.marker_id ";
+    
+    public static final String COUNT_MARKERS_BY_GID_AND_DATASETS = 
+            "SELECT COUNT(DISTINCT marker_id) " + 
+            "FROM gdms_marker_metadataset JOIN gdms_acc_metadataset " +
+            "        ON gdms_marker_metadataset.dataset_id = gdms_acc_metadataset.dataset_id " + 
+            "WHERE gdms_marker_metadataset.dataset_id in (:datasetids)  " +
+            "    AND gdms_acc_metadataset.gid = :gid " + 
+            "ORDER BY gdms_marker_metadataset.marker_id ";
+
     /** The id. */
     @EmbeddedId
     protected MarkerMetadataSetPK id;

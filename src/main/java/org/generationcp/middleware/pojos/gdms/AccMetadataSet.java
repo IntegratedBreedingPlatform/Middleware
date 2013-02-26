@@ -48,6 +48,16 @@ public class AccMetadataSet implements Serializable{
     public static final String GET_NIDS_BY_DATASET_IDS_FILTER_BY_GIDS = 
             "AND gid NOT IN (:gids)";
 
+    public static final String GET_ACC_METADATASETS_BY_GIDS = 
+            "SELECT gid, nid, dataset_id " +
+            "FROM gdms_acc_metadataset " +
+            "WHERE gid IN (:gids) ";
+    
+    public static final String COUNT_ACC_METADATASETS_BY_GIDS = 
+            "SELECT COUNT(*) " +
+            "FROM gdms_acc_metadataset " +
+            "WHERE gid in (:gids) ";
+
     /** The id. */
     @EmbeddedId
     protected AccMetadataSetPK id;
