@@ -13,6 +13,7 @@
 package org.generationcp.middleware.manager.api;
 
 import java.util.List;
+import java.util.Set;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
@@ -789,6 +790,78 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException
      */
     public long countCharAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException;
+
+    
+    /**
+     * Gets the list og nids by dataset ids and marker ids and not by gids.
+     *
+     * @param datasetIds 
+     *          - the dataset ids to match
+     * @param markerIds 
+     *          - the marker ids to match
+     * @param gids 
+     *          - the gids not to match          
+     * @param start 
+     *          - the starting index of the sublist of results to be returned
+     * @param numOfRows 
+     *          - the number of rows to be included in the sublist of results 
+     *          to be returned
+     * @return Set of name ids based on the given list of dataset ids, list of marker ids and a list of germplasm ids
+     * @throws MiddlewareQueryException
+     */
+    List<Integer> getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(
+        List<Integer> datasetIds, List<Integer> gIds,
+        List<Integer> markerIds, int start, int numOfRows)
+        throws MiddlewareQueryException;
+
+    /**
+     * Gets the list of nids by dataset ids and marker ids.
+     *
+     * @param datasetIds 
+     *          - the dataset ids to match
+     * @param markerIds 
+     *          - the marker ids to match       
+     * @param start 
+     *          - the starting index of the sublist of results to be returned
+     * @param numOfRows 
+     *          - the number of rows to be included in the sublist of results 
+     *          to be returned
+     * @return Set of name ids based on the given list of dataset ids, list of marker ids
+     * @throws MiddlewareQueryException
+     */
+    List<Integer> getNIdsByMarkerIdsAndDatasetIds(List<Integer> datasetIds,
+        List<Integer> markerIds, int start, int numOfRows)
+        throws MiddlewareQueryException;
+
+    /**
+     * Gets the count of nids by dataset ids and marker ids and not by gids.
+     *
+     * @param datasetIds 
+     *          - the dataset ids to match
+     * @param markerIds 
+     *          - the marker ids to match
+     * @param gids 
+     *          - the gids not to match          
+     * @return count of name ids based on the given list of dataset ids, list of marker ids and a list of germplasm ids
+     * @throws MiddlewareQueryException
+     */
+    int countNIdsByMarkerIdsAndDatasetIdsAndNotGIds(List<Integer> datasetIds,
+        List<Integer> markerIds, List<Integer> gIds)
+        throws MiddlewareQueryException;
+    
+    /**
+     * Gets the count of nids by dataset ids and marker ids.
+     *
+     * @param datasetIds 
+     *          - the dataset ids to match
+     * @param markerIds 
+     *          - the marker ids to match       
+     * @return count of name ids based on the given list of dataset ids, list of marker ids
+     * @throws MiddlewareQueryException
+     */
+    int countNIdsByMarkerIdsAndDatasetIds(List<Integer> datasetIds,
+        List<Integer> markerIds)
+        throws MiddlewareQueryException;
 
     
 

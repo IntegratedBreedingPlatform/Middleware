@@ -14,6 +14,8 @@ package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.gdms.AccMetadataSetDAO;
@@ -979,6 +981,112 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         }
         
         return nids;
+    }
+    
+    @Override
+    public List<Integer> getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(List<Integer> datasetIds, 
+        List<Integer> markerIds, List<Integer> gIds,
+        int start, int numOfRows) throws MiddlewareQueryException {
+        
+        Set<Integer> nidSet = new TreeSet<Integer>();
+        
+        AccMetadataSetDAO dao = new AccMetadataSetDAO();
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if(sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            nidSet.addAll(dao.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds));
+        }
+        
+        if(sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            nidSet.addAll(dao.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds));
+        }
+        
+        List<Integer> nidList = new ArrayList<Integer>(nidSet);
+        
+        return nidList.subList(start, start+numOfRows);
+    }
+    
+    @Override
+    public int countNIdsByMarkerIdsAndDatasetIdsAndNotGIds(List<Integer> datasetIds, 
+        List<Integer> markerIds, List<Integer> gIds) throws MiddlewareQueryException {
+        
+        Set<Integer> nidSet = new TreeSet<Integer>();
+        
+        AccMetadataSetDAO dao = new AccMetadataSetDAO();
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if(sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            nidSet.addAll(dao.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds));
+        }
+        
+        if(sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            nidSet.addAll(dao.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds));
+        }
+        
+        List<Integer> nidList = new ArrayList<Integer>(nidSet);
+        
+        return nidList.size();
+    }
+    
+    @Override
+    public int countNIdsByMarkerIdsAndDatasetIds(List<Integer> datasetIds, 
+        List<Integer> markerIds) throws MiddlewareQueryException {
+        
+        Set<Integer> nidSet = new TreeSet<Integer>();
+        
+        AccMetadataSetDAO dao = new AccMetadataSetDAO();
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if(sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            nidSet.addAll(dao.getNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds));
+        }
+        
+        if(sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            nidSet.addAll(dao.getNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds));
+        }
+        
+        List<Integer> nidList = new ArrayList<Integer>(nidSet);
+        
+        return nidList.size();
+    }
+    
+    @Override
+    public List<Integer> getNIdsByMarkerIdsAndDatasetIds(List<Integer> datasetIds, 
+        List<Integer> markerIds,
+        int start, int numOfRows) throws MiddlewareQueryException {
+        
+        Set<Integer> nidSet = new TreeSet<Integer>();
+        
+        AccMetadataSetDAO dao = new AccMetadataSetDAO();
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if(sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            nidSet.addAll(dao.getNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds));
+        }
+        
+        if(sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            nidSet.addAll(dao.getNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds));
+        }
+        
+        List<Integer> nidList = new ArrayList<Integer>(nidSet);
+        
+        return nidList.subList(start, start+numOfRows);
     }
 
     @Override

@@ -57,6 +57,22 @@ public class AccMetadataSet implements Serializable{
             "SELECT COUNT(*) " +
             "FROM gdms_acc_metadataset " +
             "WHERE gid in (:gids) ";
+    
+    public static final String GET_NIDS_BY_DATASET_IDS_AND_MARKER_IDS_AND_NOT_GIDS = 
+        "SELECT DISTINCT nid from gdms_acc_metadataset gam "+
+        "INNER JOIN gdms_marker_metadataset gmm on gmm.dataset_id = gam.dataset_id " + 
+        "WHERE gam.dataset_id IN(:represnos) " +
+        "AND gmm.marker_id IN(:markerids) " + 
+        "AND gam.gid NOT IN(:gids) " + 
+        "ORDER BY nid DESC";
+    
+    public static final String GET_NIDS_BY_DATASET_IDS_AND_MARKER_IDS = 
+            "SELECT DISTINCT nid from gdms_acc_metadataset gam "+
+            "INNER JOIN gdms_marker_metadataset gmm on gmm.dataset_id = gam.dataset_id " + 
+            "WHERE gam.dataset_id IN(:represnos) " +
+            "AND gmm.marker_id IN(:markerids) " + 
+            "ORDER BY nid DESC";
+
 
     /** The id. */
     @EmbeddedId

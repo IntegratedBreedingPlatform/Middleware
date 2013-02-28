@@ -14,7 +14,11 @@ package org.generationcp.middleware.dao.gdms;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -75,6 +79,50 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer>{
             return nids;
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error with getNIDsByDatasetIds(datasetIds=" + datasetIds + ", gids=" + gids + ") query from AccMetadataSet: "
+                    + e.getMessage(), e);
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    public Set<Integer> getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(List<Integer> datasetIds, List<Integer> markerIds, List<Integer> gIds)
+            throws MiddlewareQueryException {
+        try {
+            
+            SQLQuery query;
+
+            query = getSession().createSQLQuery(AccMetadataSet.GET_NIDS_BY_DATASET_IDS_AND_MARKER_IDS_AND_NOT_GIDS);
+            query.setParameterList("gids", gIds);
+            query.setParameterList("represnos", datasetIds);
+            query.setParameterList("markerids", markerIds);
+            //query.setFirstResult(start);
+            //query.setMaxResults(numOfRows);
+            Set<Integer> nidSet = new TreeSet<Integer>(query.list());
+
+            return nidSet;
+            
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getNIDsByDatasetIdsAndMarkerIdsAndNotGIDs(datasetIds=" + datasetIds + ", markerIds=" + markerIds + ", gIds=" + gIds + ") query from AccMetadataSet: "
+                    + e.getMessage(), e);
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    public Set<Integer> getNIdsByMarkerIdsAndDatasetIds(List<Integer> datasetIds, List<Integer> markerIds)
+            throws MiddlewareQueryException {
+        try {
+            
+            SQLQuery query;
+
+            query = getSession().createSQLQuery(AccMetadataSet.GET_NIDS_BY_DATASET_IDS_AND_MARKER_IDS);
+            query.setParameterList("represnos", datasetIds);
+            query.setParameterList("markerids", markerIds);
+            
+            Set<Integer> nidSet = new TreeSet<Integer>(query.list());
+
+            return nidSet;
+            
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getNIdsByMarkerIdsAndDatasetIds(datasetIds=" + datasetIds + ", markerIds=" + markerIds + ") query from AccMetadataSet: "
                     + e.getMessage(), e);
         }
     }

@@ -536,6 +536,66 @@ public class TestGenotypicDataManagerImpl{
         System.out.println("testCountCharAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: " + count);
     }    
     
+    @Test
+    public void testGetNIdsByDatasetIdsAndMarkerIdsAndNotGIds() throws Exception { 
+        List<Integer> gIds = new ArrayList<Integer>(); 
+        gIds.add(Integer.valueOf(29)); // Please replace the germplasm ids found in the target crop to be used in testing
+        gIds.add(Integer.valueOf(303));
+        gIds.add(Integer.valueOf(4950));
+        
+        List<Integer> datasetIds = new ArrayList<Integer>(); 
+        datasetIds.add(Integer.valueOf(2)); // Please replace the dataset ids found in the target crop to be used in testing
+        
+        List<Integer> markerIds = new ArrayList<Integer>(); 
+        markerIds.add(Integer.valueOf(6803)); // Please replace the marker ids found in the target crop to be used in testing
+
+        List<Integer> nIdList = manager.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds, 1, 5);
+        System.out.println("testGetNIdsByDatasetIdsAndMarkerIdsAndNotGIds() RESULTS: " + nIdList);
+    }  
+    
+    @Test
+    public void testcCountNIdsByDatasetIdsAndMarkerIdsAndNotGIds() throws Exception { 
+        List<Integer> gIds = new ArrayList<Integer>(); 
+        gIds.add(Integer.valueOf(29)); // Please replace the germplasm ids found in the target crop to be used in testing
+        gIds.add(Integer.valueOf(303));
+        gIds.add(Integer.valueOf(4950));
+        
+        List<Integer> datasetIds = new ArrayList<Integer>(); 
+        datasetIds.add(Integer.valueOf(2)); // Please replace the dataset ids found in the target crop to be used in testing
+        
+        List<Integer> markerIds = new ArrayList<Integer>(); 
+        markerIds.add(Integer.valueOf(6803)); // Please replace the marker ids found in the target crop to be used in testing
+
+        int count = manager.countNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds);
+        System.out.println("testcCountNIdsByDatasetIdsAndMarkerIdsAndNotGIds() RESULTS: " + count);
+    }  
+    
+    @Test
+    public void testGetNIdsByDatasetIdsAndMarkerIds() throws Exception { 
+        
+        List<Integer> datasetIds = new ArrayList<Integer>(); 
+        datasetIds.add(Integer.valueOf(2)); // Please replace the dataset ids found in the target crop to be used in testing
+        
+        List<Integer> markerIds = new ArrayList<Integer>(); 
+        markerIds.add(Integer.valueOf(6803)); // Please replace the marker ids found in the target crop to be used in testing
+
+        List<Integer> nIdList = manager.getNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds, 0, 5);
+        System.out.println("testGetNIdsByDatasetIdsAndMarkerIds() RESULTS: " + nIdList);
+    }  
+    
+    @Test
+    public void testCountNIdsByDatasetIdsAndMarkerIds() throws Exception { 
+        
+        List<Integer> datasetIds = new ArrayList<Integer>(); 
+        datasetIds.add(Integer.valueOf(2)); // Please replace the dataset ids found in the target crop to be used in testing
+        
+        List<Integer> markerIds = new ArrayList<Integer>(); 
+        markerIds.add(Integer.valueOf(6803)); // Please replace the marker ids found in the target crop to be used in testing
+
+        int count = manager.countNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds);
+        System.out.println("testCountNIdsByDatasetIdsAndMarkerIds() RESULTS: " + count);
+    }  
+    
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();
