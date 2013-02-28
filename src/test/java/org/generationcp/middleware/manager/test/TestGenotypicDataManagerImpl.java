@@ -486,6 +486,55 @@ public class TestGenotypicDataManagerImpl{
         System.out.println("testCountCharValuesByGids() RESULTS: " + count);
     }
     
+
+    @Test
+    public void testGetIntAlleleValuesForPolymorphicMarkersRetrieval() throws Exception {
+        List<Integer> germplasmIds = new ArrayList<Integer>(); 
+        germplasmIds.add(Integer.valueOf(956)); // Crop Tested: Groundnut
+        germplasmIds.add(Integer.valueOf(1042));
+        germplasmIds.add(Integer.valueOf(-2213));
+        germplasmIds.add(Integer.valueOf(-2215));
+
+        List<AllelicValueElement> results = manager.getIntAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds, 0, 
+                (int) manager.countIntAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds));
+        System.out.println("testGetIntAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: " + results);
+    }
+
+    @Test
+    public void testCountIntAlleleValuesForPolymorphicMarkersRetrieval() throws Exception { 
+        List<Integer> germplasmIds = new ArrayList<Integer>(); 
+        germplasmIds.add(Integer.valueOf(956)); // Crop Tested: Groundnut
+        germplasmIds.add(Integer.valueOf(1042));
+        germplasmIds.add(Integer.valueOf(-2213));
+        germplasmIds.add(Integer.valueOf(-2215));
+        long count = manager.countIntAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds);
+        System.out.println("testCountIntAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: " + count);
+    }    
+    
+    @Test
+    public void testGetCharAlleleValuesForPolymorphicMarkersRetrieval() throws Exception {
+        List<Integer> germplasmIds = new ArrayList<Integer>(); 
+        germplasmIds.add(Integer.valueOf(956)); // Please replace the gids found in the target crop to be used in testing
+        germplasmIds.add(Integer.valueOf(1042));
+        germplasmIds.add(Integer.valueOf(-2213));
+        germplasmIds.add(Integer.valueOf(-2215));
+
+        List<AllelicValueElement> results = manager.getCharAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds, 0, 
+                (int) manager.countCharAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds));
+        System.out.println("testGetCharAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: " + results);
+    }
+
+
+    @Test
+    public void testCountCharAlleleValuesForPolymorphicMarkersRetrieval() throws Exception { 
+        List<Integer> germplasmIds = new ArrayList<Integer>(); 
+        germplasmIds.add(Integer.valueOf(956)); // Please replace the gids found in the target crop to be used in testing
+        germplasmIds.add(Integer.valueOf(1042));
+        germplasmIds.add(Integer.valueOf(-2213));
+        germplasmIds.add(Integer.valueOf(-2215));
+        long count = manager.countCharAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds);
+        System.out.println("testCountCharAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: " + count);
+    }    
     
     @AfterClass
     public static void tearDown() throws Exception {

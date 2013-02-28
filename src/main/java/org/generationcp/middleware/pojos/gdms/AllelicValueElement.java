@@ -39,9 +39,29 @@ public class AllelicValueElement implements Serializable{
     
     /** The Marker Name. */
     private String markerName;
+    
+    private String datasetId;
+    
+    private String alleleBinValue;
 
     /**
-     * Instantiates a AllelicValueElement object.
+     * Instantiates a AllelicValueElement object with datasetId, gid, markerName and data(char_value for table char_values, 
+     * allele_bin_value for allele_values table and map_char_value for mapping_pop_values).
+     * 
+     * @param datasetId
+     * @param gid
+     * @param markerName
+     * @param data
+     */
+    public AllelicValueElement(Integer datasetId, Integer gid, String markerName, String data) {
+        this.gid = gid;
+        this.data = data;
+        this.markerName = markerName;
+    }
+
+    /**
+     * Instantiates a AllelicValueElement object with gid, data(char_value for table char_values, 
+     * allele_bin_value for allele_values table and map_char_value for mapping_pop_values), marker name.
      * 
      * @param gid
      * @param data
@@ -52,7 +72,6 @@ public class AllelicValueElement implements Serializable{
         this.data = data;
         this.markerName = markerName;
     }
-
     
     /**
      * Gets the Germplasm Id.
@@ -113,15 +132,39 @@ public class AllelicValueElement implements Serializable{
         this.markerName = markerName;
     }
     
+    
+    public String getDatasetId() {
+        return datasetId;
+    }
+
+    
+    public void setDatasetId(String datasetId) {
+        this.datasetId = datasetId;
+    }
+
+    
+    public String getAlleleBinValue() {
+        return alleleBinValue;
+    }
+
+    
+    public void setAlleleBinValue(String alleleBinValue) {
+        this.alleleBinValue = alleleBinValue;
+    }
+
+    
+    
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append("AllelicValueElement [gid=");
         builder.append(gid);
-        builder.append(", data=");
-        builder.append(data);
         builder.append(", markerName=");
         builder.append(markerName);
+        builder.append(", datasetId=");
+        builder.append(datasetId);
+        builder.append(", data=");
+        builder.append(data);
         builder.append("]");
         return builder.toString();
     }
@@ -144,6 +187,7 @@ public class AllelicValueElement implements Serializable{
         AllelicValueElement rhs = (AllelicValueElement) obj;
         return new EqualsBuilder().appendSuper(super.equals(obj)).append(gid, rhs.gid)
                 .append(data, rhs.data)
+                .append(datasetId, rhs.datasetId)
                 .append(markerName, rhs.markerName).isEquals();
     }
     
@@ -154,6 +198,7 @@ public class AllelicValueElement implements Serializable{
     public int hashCode() {
         return new HashCodeBuilder(17, 77).append(gid)
                 .append(data)
+                .append(datasetId)
                 .append(markerName).toHashCode();
     }
 }

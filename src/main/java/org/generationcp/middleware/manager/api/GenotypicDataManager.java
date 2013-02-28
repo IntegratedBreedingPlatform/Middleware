@@ -745,7 +745,51 @@ public interface GenotypicDataManager{
     public long countCharValuesByGids(List<Integer> gids) throws MiddlewareQueryException;
 
 
-        
+    /**
+     * Gets int alleleValues for polymorphic markers retrieval given a list of GIDs
+     * Retrieves data from both central and local database instances.
+     *
+     * @param gids
+     *          - the GIDs to match
+     * @return List of int alleleValues for polymorphic markers retrieval 
+     * @throws MiddlewareQueryException
+     */
+    public List<AllelicValueElement> getIntAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids, int start, int numOfRows) throws MiddlewareQueryException;
+
+    
+    /**
+     * Gets the number of int alleleValues for polymorphic markers retrieval given a list of GIDs
+     *
+     * @param gids
+     *          - the GIDs to match
+     * @return the number of int alleleValues for polymorphic markers retrieval 
+     * @throws MiddlewareQueryException
+     */
+    public long countIntAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException;
+
+
+    /**
+     * Gets char alleleValues for polymorphic markers retrieval given a list of GIDs
+     * Retrieves data from both central and local database instances.
+     *
+     * @param gids
+     *          - the GIDs to match
+     * @return List of char alleleValues for polymorphic markers retrieval 
+     * @throws MiddlewareQueryException
+     */
+    public List<AllelicValueElement> getCharAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids, int start, int numOfRows) throws MiddlewareQueryException;
+
+    
+    /**
+     * Gets the number of char alleleValues for polymorphic markers retrieval given a list of GIDs
+     *
+     * @param gids
+     *          - the GIDs to match
+     * @return the number of char alleleValues for polymorphic markers retrieval 
+     * @throws MiddlewareQueryException
+     */
+    public long countCharAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException;
+
     
 
 }

@@ -1338,6 +1338,195 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 
         
+
+    @Override
+    public List<AllelicValueElement> getIntAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids, int start, int numOfRows) throws MiddlewareQueryException{
+        AlleleValuesDAO dao = new AlleleValuesDAO();
+
+        long centralCount = 0;
+        long localCount = 0;
+        long relativeLimit = 0;
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        List<Integer> positiveGids = new ArrayList<Integer>();
+        List<Integer> negativeGids = new ArrayList<Integer>();
+        for (Integer gid : gids){
+            if (gid < 0) {
+                negativeGids.add(gid);
+            } else {
+                positiveGids.add(gid);
+            }
+        }
+
+        List<AllelicValueElement> allelicValueElements = new ArrayList<AllelicValueElement>();
+
+        if(sessionForCentral != null) {
+            
+            dao.setSession(sessionForCentral);
+            centralCount = dao.countIntAlleleValuesForPolymorphicMarkersRetrieval(positiveGids);
+            
+            if(centralCount > start) {
+                allelicValueElements.addAll(dao.getIntAlleleValuesForPolymorphicMarkersRetrieval(positiveGids, start, numOfRows));
+                relativeLimit = numOfRows - allelicValueElements.size();
+                if(relativeLimit > 0 && sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countIntAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
+                    if(localCount > 0) {
+                        allelicValueElements.addAll(dao.getIntAlleleValuesForPolymorphicMarkersRetrieval(negativeGids, 0, (int) relativeLimit));
+                    }
+                }
+            } else {
+                relativeLimit = start - centralCount;
+                if (sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countIntAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
+                    if (localCount > relativeLimit) {
+                        allelicValueElements.addAll(dao.getIntAlleleValuesForPolymorphicMarkersRetrieval(negativeGids, (int) relativeLimit, numOfRows));
+                    }
+                }
+            }
+        } else if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            localCount = dao.countIntAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
+            if (localCount > start) {
+                allelicValueElements.addAll(dao.getIntAlleleValuesForPolymorphicMarkersRetrieval(negativeGids, start, numOfRows));
+            }
+        }
+        
+        return allelicValueElements;
+    }
+
+    
+    @Override
+    public long countIntAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException{
+        AlleleValuesDAO dao = new AlleleValuesDAO();
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        List<Integer> positiveGids = new ArrayList<Integer>();
+        List<Integer> negativeGids = new ArrayList<Integer>();
+        for (Integer gid : gids){
+            if (gid < 0) {
+                negativeGids.add(gid);
+            } else {
+                positiveGids.add(gid);
+            }
+        }
+
+        long result = 0;
+
+        // Count from local
+        if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            result += dao.countIntAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
+        }
+
+        // Count from central
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            result += dao.countIntAlleleValuesForPolymorphicMarkersRetrieval(positiveGids);
+        }
+
+        return result;
+    }
+
+
+    @Override
+    public List<AllelicValueElement> getCharAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids, int start, int numOfRows) throws MiddlewareQueryException{
+        AlleleValuesDAO dao = new AlleleValuesDAO();
+
+        long centralCount = 0;
+        long localCount = 0;
+        long relativeLimit = 0;
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        List<Integer> positiveGids = new ArrayList<Integer>();
+        List<Integer> negativeGids = new ArrayList<Integer>();
+        for (Integer gid : gids){
+            if (gid < 0) {
+                negativeGids.add(gid);
+            } else {
+                positiveGids.add(gid);
+            }
+        }
+
+        List<AllelicValueElement> allelicValueElements = new ArrayList<AllelicValueElement>();
+
+        if(sessionForCentral != null) {
+            
+            dao.setSession(sessionForCentral);
+            centralCount = dao.countCharAlleleValuesForPolymorphicMarkersRetrieval(positiveGids);
+            
+            if(centralCount > start) {
+                allelicValueElements.addAll(dao.getCharAlleleValuesForPolymorphicMarkersRetrieval(positiveGids, start, numOfRows));
+                relativeLimit = numOfRows - allelicValueElements.size();
+                if(relativeLimit > 0 && sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countCharAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
+                    if(localCount > 0) {
+                        allelicValueElements.addAll(dao.getCharAlleleValuesForPolymorphicMarkersRetrieval(negativeGids, 0, (int) relativeLimit));
+                    }
+                }
+            } else {
+                relativeLimit = start - centralCount;
+                if (sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countCharAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
+                    if (localCount > relativeLimit) {
+                        allelicValueElements.addAll(dao.getCharAlleleValuesForPolymorphicMarkersRetrieval(negativeGids, (int) relativeLimit, numOfRows));
+                    }
+                }
+            }
+        } else if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            localCount = dao.countCharAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
+            if (localCount > start) {
+                allelicValueElements.addAll(dao.getCharAlleleValuesForPolymorphicMarkersRetrieval(negativeGids, start, numOfRows));
+            }
+        }
+        
+        return allelicValueElements;
+    }
+
+    @Override
+    public long countCharAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException{
+        AlleleValuesDAO dao = new AlleleValuesDAO();
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        List<Integer> positiveGids = new ArrayList<Integer>();
+        List<Integer> negativeGids = new ArrayList<Integer>();
+        for (Integer gid : gids){
+            if (gid < 0) {
+                negativeGids.add(gid);
+            } else {
+                positiveGids.add(gid);
+            }
+        }
+
+        long result = 0;
+
+        // Count from local
+        if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            result += dao.countCharAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
+        }
+
+        // Count from central
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            result += dao.countCharAlleleValuesForPolymorphicMarkersRetrieval(positiveGids);
+        }
+
+        return result;
+    }
+
     
 
 
