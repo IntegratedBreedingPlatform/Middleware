@@ -142,4 +142,18 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
         }
     }
 
+    public long countCharValuesByGids(List<Integer> gids) throws MiddlewareQueryException{
+        try {
+            SQLQuery query = getSession().createSQLQuery(CharValues.COUNT_CHAR_VALUES_BY_GIDS);
+            query.setParameterList("gids", gids);
+            BigInteger result = (BigInteger) query.uniqueResult();
+            if (result != null) {
+                return result.longValue();
+            }
+            return 0;
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with countCharValuesByGids(gids=" + gids + ") query from CharValues: " + e.getMessage(), e);
+        }
+    }
+
 }

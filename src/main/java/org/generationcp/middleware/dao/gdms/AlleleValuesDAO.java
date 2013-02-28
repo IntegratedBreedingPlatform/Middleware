@@ -143,4 +143,18 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer>{
         }
     }
 
+    public long countAlleleValuesByGids(List<Integer> gids) throws MiddlewareQueryException{
+        try {
+            SQLQuery query = getSession().createSQLQuery(AlleleValues.COUNT_ALLELE_VALUES_BY_GIDS);
+            query.setParameterList("gids", gids);
+            BigInteger result = (BigInteger) query.uniqueResult();
+            if (result != null) {
+                return result.longValue();
+            }
+            return 0;
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with countAlleleValuesByGids(gids=" + gids + ") query from AlleleValues: " + e.getMessage(), e);
+        }
+    }
+
 }

@@ -1282,8 +1282,63 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         }
         
         return result;
-
         
     }
+    
+    @Override
+    public long countAlleleValuesByGids(List<Integer> gids) throws MiddlewareQueryException{
+
+        AlleleValuesDAO dao = new AlleleValuesDAO();
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        long result = 0;
+
+        // Count from local
+        if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            result += dao.countAlleleValuesByGids(gids);
+        }
+
+        // Count from central
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            result += dao.countAlleleValuesByGids(gids);
+        }
+
+        return result;
+    }
+
+
+    @Override
+    public long countCharValuesByGids(List<Integer> gids) throws MiddlewareQueryException{
+
+        CharValuesDAO dao = new CharValuesDAO();
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        long result = 0;
+
+        // Count from local
+        if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            result += dao.countCharValuesByGids(gids);
+        }
+
+        // Count from central
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            result += dao.countCharValuesByGids(gids);
+        }
+
+        return result;
+    }
+
+
+        
+    
+
 
 }

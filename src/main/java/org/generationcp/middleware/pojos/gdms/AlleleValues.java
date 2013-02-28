@@ -92,6 +92,11 @@ public class AlleleValues implements Serializable{
             "FROM gdms_allele_values " +
             "WHERE marker_id = :markerId";
     
+    public static final String COUNT_ALLELE_VALUES_BY_GIDS = 
+            "SELECT COUNT(*) " +
+            "FROM gdms_allele_values " +
+            "WHERE gid in (:gids)";
+    
     @Id
     @Basic(optional = false)
     @Column(name = "an_id")

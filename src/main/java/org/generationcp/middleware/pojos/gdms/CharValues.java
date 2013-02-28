@@ -90,6 +90,12 @@ public class CharValues implements Serializable{
             "FROM gdms_char_values " +
             "WHERE marker_id = :markerId";
 
+    public static final String COUNT_CHAR_VALUES_BY_GIDS = 
+            "SELECT COUNT(*) " +
+            "FROM gdms_char_values " +
+            "WHERE gid in (:gids)";
+
+
     /** The ac id. */
     @Id
     @Basic(optional = false)

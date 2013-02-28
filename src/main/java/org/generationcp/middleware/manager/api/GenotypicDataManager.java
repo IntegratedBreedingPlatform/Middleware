@@ -721,7 +721,30 @@ public interface GenotypicDataManager{
      */
     public long countMarkersByGidAndDatasetIds(Integer gid, List<Integer> datasetIds) throws MiddlewareQueryException;
 
+
     
+    /**
+     * Gets the number of alleles given a set of GIDs
+     *
+     * @param gids
+     *          - the GIDs to match
+     * @return the number of alleles matching the given GIDs
+     * @throws MiddlewareQueryException
+     */
+    public long countAlleleValuesByGids(List<Integer> gids) throws MiddlewareQueryException;
+
+
+    /**
+     * Gets the number of char values given a set of GIDs
+     *
+     * @param gids
+     *          - the GIDs to match
+     * @return the number of char values matching the given GIDs
+     * @throws MiddlewareQueryException
+     */
+    public long countCharValuesByGids(List<Integer> gids) throws MiddlewareQueryException;
+
+
         
     
 

@@ -463,6 +463,30 @@ public class TestGenotypicDataManagerImpl{
         System.out.println("testCountGdmsAccMetadatasetByGid() RESULTS: " + count);
     }
     
+    @Test
+    public void testCountAlleleValuesByGids() throws Exception { 
+        List<Integer> germplasmIds = new ArrayList<Integer>(); 
+        germplasmIds.add(Integer.valueOf(956)); // Crop Tested: Groundnut
+        germplasmIds.add(Integer.valueOf(1042));
+        germplasmIds.add(Integer.valueOf(-2213));
+        germplasmIds.add(Integer.valueOf(-2215));
+        long count = manager.countAlleleValuesByGids(germplasmIds);
+        System.out.println("testCountAlleleValuesByGids() RESULTS: " + count);
+    }
+    
+
+    @Test
+    public void testCountCharValuesByGids() throws Exception { 
+        List<Integer> germplasmIds = new ArrayList<Integer>(); 
+        germplasmIds.add(Integer.valueOf(956)); // Please replace the gids found in the target crop to be used in testing
+        germplasmIds.add(Integer.valueOf(1042));
+        germplasmIds.add(Integer.valueOf(-2213));
+        germplasmIds.add(Integer.valueOf(-2215));
+        long count = manager.countCharValuesByGids(germplasmIds);
+        System.out.println("testCountCharValuesByGids() RESULTS: " + count);
+    }
+    
+    
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();
