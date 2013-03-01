@@ -1005,7 +1005,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             nidSet.addAll(dao.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds));
         }
         
-        List<Integer> nidList = new ArrayList<Integer>(nidSet);
+        List<Integer> nidList = new ArrayList<Integer>(((TreeSet<Integer>)nidSet).descendingSet());
         
         return nidList.subList(start, start+numOfRows);
     }
@@ -1084,7 +1084,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             nidSet.addAll(dao.getNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds));
         }
         
-        List<Integer> nidList = new ArrayList<Integer>(nidSet);
+        List<Integer> nidList = new ArrayList<Integer>(((TreeSet<Integer>)nidSet).descendingSet());
         
         return nidList.subList(start, start+numOfRows);
     }

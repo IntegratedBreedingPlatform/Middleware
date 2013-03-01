@@ -579,7 +579,7 @@ public class TestGenotypicDataManagerImpl{
         List<Integer> markerIds = new ArrayList<Integer>(); 
         markerIds.add(Integer.valueOf(6803)); // Please replace the marker ids found in the target crop to be used in testing
 
-        List<Integer> nIdList = manager.getNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds, 0, 5);
+        List<Integer> nIdList = manager.getNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds, 5, 7);
         System.out.println("testGetNIdsByDatasetIdsAndMarkerIds() RESULTS: " + nIdList);
     }  
     
