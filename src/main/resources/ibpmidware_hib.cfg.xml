@@ -66,6 +66,7 @@
   <mapping class="org.generationcp.middleware.pojos.gdms.MappingPopValues"/>
   <mapping class="org.generationcp.middleware.pojos.gdms.Marker"/>
   <mapping class="org.generationcp.middleware.pojos.gdms.MarkerMetadataSet"/>
+  <mapping class="org.generationcp.middleware.pojos.gdms.Qtl"/>
   
   <mapping class="org.generationcp.middleware.pojos.workbench.Contact"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.CropType"/>

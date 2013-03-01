@@ -121,6 +121,18 @@ public class AlleleValues implements Serializable{
                     + "FROM gdms_allele_values INNER JOIN gdms_marker ON gdms_marker.marker_id = gdms_allele_values.marker_id " 
                     + "WHERE gdms_allele_values.gid IN (:gids) ";
     
+    public static final String GET_MAPPING_ALLELE_VALUES_FOR_POLYMORPHIC_MARKERS_RETRIEVAL_BY_GIDS =     
+            "SELECT gdms_mapping_pop_values.dataset_id, gdms_mapping_pop_values.gid, " 
+                    + "CONCAT(gdms_marker.marker_name,''), CONCAT(gdms_mapping_pop_values.map_char_value,'') " 
+            + "FROM gdms_mapping_pop_values INNER JOIN gdms_marker ON gdms_marker.marker_id = gdms_mapping_pop_values.marker_id " 
+            + "WHERE gdms_mapping_pop_values.gid IN (:gids) "
+            + "ORDER BY gid, marker_name ";
+    
+    public static final String COUNT_MAPPING_ALLELE_VALUES_FOR_POLYMORPHIC_MARKERS_RETRIEVAL_BY_GIDS = 
+            "SELECT COUNT(*) " 
+            + "FROM gdms_mapping_pop_values INNER JOIN gdms_marker ON gdms_marker.marker_id = gdms_mapping_pop_values.marker_id " 
+            + "WHERE gdms_mapping_pop_values.gid IN (:gids) ";
+
     @Id
     @Basic(optional = false)
     @Column(name = "an_id")

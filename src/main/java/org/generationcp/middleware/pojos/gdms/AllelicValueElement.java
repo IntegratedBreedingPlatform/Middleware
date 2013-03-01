@@ -40,7 +40,7 @@ public class AllelicValueElement implements Serializable{
     /** The Marker Name. */
     private String markerName;
     
-    private String datasetId;
+    private Integer datasetId;
     
     private String alleleBinValue;
 
@@ -54,6 +54,7 @@ public class AllelicValueElement implements Serializable{
      * @param data
      */
     public AllelicValueElement(Integer datasetId, Integer gid, String markerName, String data) {
+        this.datasetId = datasetId;
         this.gid = gid;
         this.data = data;
         this.markerName = markerName;
@@ -133,12 +134,12 @@ public class AllelicValueElement implements Serializable{
     }
     
     
-    public String getDatasetId() {
+    public Integer getDatasetId() {
         return datasetId;
     }
 
     
-    public void setDatasetId(String datasetId) {
+    public void setDatasetId(Integer datasetId) {
         this.datasetId = datasetId;
     }
 

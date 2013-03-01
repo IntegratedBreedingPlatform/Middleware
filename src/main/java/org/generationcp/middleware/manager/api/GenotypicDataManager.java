@@ -13,7 +13,6 @@
 package org.generationcp.middleware.manager.api;
 
 import java.util.List;
-import java.util.Set;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
@@ -30,6 +29,7 @@ import org.generationcp.middleware.pojos.gdms.MarkerIdMarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerInfo;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
+import org.generationcp.middleware.pojos.gdms.Qtl;
 
 /**
  * This is the API for retrieving and storing genotypic data.
@@ -809,7 +809,7 @@ public interface GenotypicDataManager{
      * @return Set of name ids based on the given list of dataset ids, list of marker ids and a list of germplasm ids
      * @throws MiddlewareQueryException
      */
-    List<Integer> getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(
+    public List<Integer> getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(
         List<Integer> datasetIds, List<Integer> gIds,
         List<Integer> markerIds, int start, int numOfRows)
         throws MiddlewareQueryException;
@@ -829,7 +829,7 @@ public interface GenotypicDataManager{
      * @return Set of name ids based on the given list of dataset ids, list of marker ids
      * @throws MiddlewareQueryException
      */
-    List<Integer> getNIdsByMarkerIdsAndDatasetIds(List<Integer> datasetIds,
+    public List<Integer> getNIdsByMarkerIdsAndDatasetIds(List<Integer> datasetIds,
         List<Integer> markerIds, int start, int numOfRows)
         throws MiddlewareQueryException;
 
@@ -845,7 +845,7 @@ public interface GenotypicDataManager{
      * @return count of name ids based on the given list of dataset ids, list of marker ids and a list of germplasm ids
      * @throws MiddlewareQueryException
      */
-    int countNIdsByMarkerIdsAndDatasetIdsAndNotGIds(List<Integer> datasetIds,
+    public int countNIdsByMarkerIdsAndDatasetIdsAndNotGIds(List<Integer> datasetIds,
         List<Integer> markerIds, List<Integer> gIds)
         throws MiddlewareQueryException;
     
@@ -864,5 +864,45 @@ public interface GenotypicDataManager{
         throws MiddlewareQueryException;
 
     
+    /**
+     * Gets mapping alleleValues for polymorphic markers retrieval given a list of GIDs
+     * Retrieves data from both central and local database instances.
+     *
+     * @param gids
+     *          - the GIDs to match
+     * @return List of mapping alleleValues for polymorphic markers retrieval 
+     * @throws MiddlewareQueryException
+     */
+    public List<AllelicValueElement> getMappingAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids, int start, int numOfRows) throws MiddlewareQueryException;
+    
 
+    /**
+     * Gets the number of mapping alleleValues for polymorphic markers retrieval given a list of GIDs
+     *
+     * @param gids
+     *          - the GIDs to match
+     * @return the number of mapping alleleValues for polymorphic markers retrieval 
+     * @throws MiddlewareQueryException
+     */
+    public long countMappingAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException;
+
+    /**
+     * Retrieves all QTL entries from the gdms_qtl table
+     * 
+     * @return List of all QTL entries
+     * @throws MiddlewareQueryException
+     */
+    public List<Qtl> getAllQtl(int start, int numOfRows) throws MiddlewareQueryException;
+    
+
+    /**
+     * Returns the number of QTL entries from the gdms_qtl table
+     * 
+     * @return Count of QTL entries
+     * @throws MiddlewareQueryException
+     */
+    public long countAllQtl() throws MiddlewareQueryException;
+    
+    
+    
 }

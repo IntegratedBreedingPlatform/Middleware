@@ -32,6 +32,7 @@ import org.generationcp.middleware.pojos.gdms.MarkerIdMarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerInfo;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
+import org.generationcp.middleware.pojos.gdms.Qtl;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -596,6 +597,42 @@ public class TestGenotypicDataManagerImpl{
         System.out.println("testCountNIdsByDatasetIdsAndMarkerIds() RESULTS: " + count);
     }  
     
+    
+
+    @Test
+    public void testGetMappingAlleleValuesForPolymorphicMarkersRetrieval() throws Exception {
+        List<Integer> germplasmIds = new ArrayList<Integer>(); 
+        germplasmIds.add(Integer.valueOf(1434)); // Please replace the gids found in the target crop to be used in testing
+        germplasmIds.add(Integer.valueOf(1435));
+
+        List<AllelicValueElement> results = manager.getMappingAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds, 0, 
+                (int) manager.countMappingAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds));
+        System.out.println("testGetMappingAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: " + results);
+    }
+
+
+    @Test
+    public void testCountMappingAlleleValuesForPolymorphicMarkersRetrieval() throws Exception { 
+        List<Integer> germplasmIds = new ArrayList<Integer>(); 
+        germplasmIds.add(Integer.valueOf(1434)); // Please replace the gids found in the target crop to be used in testing
+        germplasmIds.add(Integer.valueOf(1435));
+        long count = manager.countMappingAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds);
+        System.out.println("testCountMappingAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: " + count);
+    }    
+    
+    @Test
+    public void testGetAllQtl() throws Exception {
+        List<Qtl> qtls = manager.getAllQtl(0, (int) manager.countAllQtl());
+        System.out.println("testGetAllQtl() RESULTS: " + qtls);
+    }
+
+    @Test
+    public void testCountAllQtl() throws Exception {
+        long result = manager.countAllQtl();
+        System.out.println("testCountAllQtl() RESULTS: " + result);
+    }
+
+
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();

@@ -29,6 +29,7 @@ import org.generationcp.middleware.dao.gdms.MappingPopValuesDAO;
 import org.generationcp.middleware.dao.gdms.MarkerDAO;
 import org.generationcp.middleware.dao.gdms.MarkerInfoDAO;
 import org.generationcp.middleware.dao.gdms.MarkerMetadataSetDAO;
+import org.generationcp.middleware.dao.gdms.QtlDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
@@ -45,6 +46,7 @@ import org.generationcp.middleware.pojos.gdms.MarkerIdMarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerInfo;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
+import org.generationcp.middleware.pojos.gdms.Qtl;
 import org.hibernate.Session;
 
 /**
@@ -1251,7 +1253,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
         List<AccMetadataSetPK> accMetadataSets = new ArrayList<AccMetadataSetPK>();
 
-        if(sessionForCentral != null) {
+        if ((sessionForCentral != null) && (positiveGids != null) && (!positiveGids.isEmpty())) {
             
             dao.setSession(sessionForCentral);
             centralCount = dao.countAccMetadataSetByGids(positiveGids);
@@ -1268,7 +1270,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                 }
             } else {
                 relativeLimit = start - centralCount;
-                if (sessionForLocal != null) {
+                if ((sessionForLocal != null) && (negativeGids != null) && (!negativeGids.isEmpty())){
                     dao.setSession(sessionForLocal);
                     localCount = dao.countAccMetadataSetByGids(negativeGids);
                     if (localCount > relativeLimit) {
@@ -1276,7 +1278,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                     }
                 }
             }
-        } else if (sessionForLocal != null) {
+        } else if ((sessionForLocal != null) && (negativeGids != null) && (!negativeGids.isEmpty())) {
             dao.setSession(sessionForLocal);
             localCount = dao.countAccMetadataSetByGids(negativeGids);
             if (localCount > start) {
@@ -1309,13 +1311,13 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         long result = 0;
 
         // Count from local
-        if (sessionForLocal != null) {
+        if ((sessionForLocal != null) && (negativeGids != null) && (!negativeGids.isEmpty())){
             dao.setSession(sessionForLocal);
             result += dao.countAccMetadataSetByGids(negativeGids);
         }
 
         // Count from central
-        if (sessionForCentral != null) {
+        if ((sessionForCentral != null) && (positiveGids != null) && (!positiveGids.isEmpty())) {
             dao.setSession(sessionForCentral);
             result += dao.countAccMetadataSetByGids(positiveGids);
         }
@@ -1470,7 +1472,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
         List<AllelicValueElement> allelicValueElements = new ArrayList<AllelicValueElement>();
 
-        if(sessionForCentral != null) {
+        if ((sessionForCentral != null) && (positiveGids != null) && (!positiveGids.isEmpty())) {
             
             dao.setSession(sessionForCentral);
             centralCount = dao.countIntAlleleValuesForPolymorphicMarkersRetrieval(positiveGids);
@@ -1487,7 +1489,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                 }
             } else {
                 relativeLimit = start - centralCount;
-                if (sessionForLocal != null) {
+                if ((sessionForLocal != null) && (negativeGids != null) && (!negativeGids.isEmpty())){
                     dao.setSession(sessionForLocal);
                     localCount = dao.countIntAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
                     if (localCount > relativeLimit) {
@@ -1495,7 +1497,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                     }
                 }
             }
-        } else if (sessionForLocal != null) {
+        } else if ((sessionForLocal != null) && (negativeGids != null) && (!negativeGids.isEmpty())) {
             dao.setSession(sessionForLocal);
             localCount = dao.countIntAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
             if (localCount > start) {
@@ -1527,13 +1529,13 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         long result = 0;
 
         // Count from local
-        if (sessionForLocal != null) {
+        if ((sessionForLocal != null) && (negativeGids != null) && (!negativeGids.isEmpty())){
             dao.setSession(sessionForLocal);
             result += dao.countIntAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
         }
 
         // Count from central
-        if (sessionForCentral != null) {
+        if ((sessionForCentral != null) && (positiveGids != null) && (!positiveGids.isEmpty())) {
             dao.setSession(sessionForCentral);
             result += dao.countIntAlleleValuesForPolymorphicMarkersRetrieval(positiveGids);
         }
@@ -1565,7 +1567,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
         List<AllelicValueElement> allelicValueElements = new ArrayList<AllelicValueElement>();
 
-        if(sessionForCentral != null) {
+        if ((sessionForCentral != null) && (positiveGids != null) && (!positiveGids.isEmpty())) {
             
             dao.setSession(sessionForCentral);
             centralCount = dao.countCharAlleleValuesForPolymorphicMarkersRetrieval(positiveGids);
@@ -1582,7 +1584,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                 }
             } else {
                 relativeLimit = start - centralCount;
-                if (sessionForLocal != null) {
+                if ((sessionForLocal != null) && (negativeGids != null) && (!negativeGids.isEmpty())){
                     dao.setSession(sessionForLocal);
                     localCount = dao.countCharAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
                     if (localCount > relativeLimit) {
@@ -1590,7 +1592,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                     }
                 }
             }
-        } else if (sessionForLocal != null) {
+        } else if ((sessionForLocal != null) && (negativeGids != null) && (!negativeGids.isEmpty())){
             dao.setSession(sessionForLocal);
             localCount = dao.countCharAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
             if (localCount > start) {
@@ -1621,13 +1623,13 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         long result = 0;
 
         // Count from local
-        if (sessionForLocal != null) {
+        if ((sessionForLocal != null) && (negativeGids != null) && (!negativeGids.isEmpty())){
             dao.setSession(sessionForLocal);
             result += dao.countCharAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
         }
 
         // Count from central
-        if (sessionForCentral != null) {
+        if ((sessionForCentral != null) && (positiveGids != null) && (!positiveGids.isEmpty())) {
             dao.setSession(sessionForCentral);
             result += dao.countCharAlleleValuesForPolymorphicMarkersRetrieval(positiveGids);
         }
@@ -1636,6 +1638,172 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
 
     
+    @Override
+    public List<AllelicValueElement> getMappingAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids, int start, int numOfRows) throws MiddlewareQueryException{
+        AlleleValuesDAO dao = new AlleleValuesDAO();
+
+        long centralCount = 0;
+        long localCount = 0;
+        long relativeLimit = 0;
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        List<Integer> positiveGids = new ArrayList<Integer>();
+        List<Integer> negativeGids = new ArrayList<Integer>();
+        for (Integer gid : gids){
+            if (gid < 0) {
+                negativeGids.add(gid);
+            } else {
+                positiveGids.add(gid);
+            }
+        }
+
+        List<AllelicValueElement> allelicValueElements = new ArrayList<AllelicValueElement>();
+
+        if ((sessionForCentral != null) && (positiveGids != null) && (!positiveGids.isEmpty())) {
+            
+            dao.setSession(sessionForCentral);
+            centralCount = dao.countMappingAlleleValuesForPolymorphicMarkersRetrieval(positiveGids);
+            
+            if(centralCount > start) {
+                allelicValueElements.addAll(dao.getMappingAlleleValuesForPolymorphicMarkersRetrieval(positiveGids, start, numOfRows));
+                relativeLimit = numOfRows - allelicValueElements.size();
+                if(relativeLimit > 0 && sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countMappingAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
+                    if(localCount > 0) {
+                        allelicValueElements.addAll(dao.getMappingAlleleValuesForPolymorphicMarkersRetrieval(negativeGids, 0, (int) relativeLimit));
+                    }
+                }
+            } else {
+                relativeLimit = start - centralCount;
+                if ((sessionForLocal != null) && (negativeGids != null) && (!negativeGids.isEmpty())){
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countMappingAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
+                    if (localCount > relativeLimit) {
+                        allelicValueElements.addAll(dao.getMappingAlleleValuesForPolymorphicMarkersRetrieval(negativeGids, (int) relativeLimit, numOfRows));
+                    }
+                }
+            }
+        } else if ((sessionForLocal != null) && (negativeGids != null) && (!negativeGids.isEmpty())){
+            dao.setSession(sessionForLocal);
+            localCount = dao.countMappingAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
+            if (localCount > start) {
+                allelicValueElements.addAll(dao.getMappingAlleleValuesForPolymorphicMarkersRetrieval(negativeGids, start, numOfRows));
+            }
+        }
+        
+        return allelicValueElements;
+    }
+
+    @Override
+    public long countMappingAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException{
+        AlleleValuesDAO dao = new AlleleValuesDAO();
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        List<Integer> positiveGids = new ArrayList<Integer>();
+        List<Integer> negativeGids = new ArrayList<Integer>();
+        for (Integer gid : gids){
+            if (gid < 0) {
+                negativeGids.add(gid);
+            } else {
+                positiveGids.add(gid);
+            }
+        }
+
+        long result = 0;
+
+        // Count from local
+        if ((sessionForLocal != null) && (negativeGids != null) && (!negativeGids.isEmpty())){
+            dao.setSession(sessionForLocal);
+            result += dao.countMappingAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
+        }
+
+        // Count from central
+        if ((sessionForCentral != null) && (positiveGids != null) && (!positiveGids.isEmpty())) {
+            dao.setSession(sessionForCentral);
+            result += dao.countMappingAlleleValuesForPolymorphicMarkersRetrieval(positiveGids);
+        }
+
+        return result;
+    }
+    
+    @Override
+    public List<Qtl> getAllQtl(int start, int numOfRows) throws MiddlewareQueryException{
+        QtlDAO dao = new QtlDAO();
+
+        long centralCount = 0;
+        long localCount = 0;
+        long relativeLimit = 0;
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        List<Qtl> qtl = new ArrayList<Qtl>();
+
+        if(sessionForCentral != null) {
+            
+            dao.setSession(sessionForCentral);
+            centralCount = dao.countAll();
+            
+            if(centralCount > start) {
+                qtl.addAll(dao.getAll(start, numOfRows));
+                relativeLimit = numOfRows - qtl.size();
+                if(relativeLimit > 0 && sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countAll();
+                    if(localCount > 0) {
+                        qtl.addAll(dao.getAll( 0, (int) relativeLimit));
+                    }
+                }
+            } else {
+                relativeLimit = start - centralCount;
+                if (sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countAll();
+                    if (localCount > relativeLimit) {
+                        qtl.addAll(dao.getAll((int) relativeLimit, numOfRows));
+                    }
+                }
+            }
+        } else if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            localCount = dao.countAll();
+            if (localCount > start) {
+                qtl.addAll(dao.getAll(start, numOfRows));
+            }
+        }
+        
+        return qtl;
+    }
+    
+    @Override
+    public long countAllQtl() throws MiddlewareQueryException{
+        QtlDAO dao = new QtlDAO();
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        long result = 0;
+
+        // Count from local
+        if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            result += dao.countAll();
+        }
+
+        // Count from central
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            result += dao.countAll();
+        }
+
+        return result;
+
+    }
 
 
 }
