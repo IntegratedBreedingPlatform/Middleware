@@ -31,6 +31,7 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -839,6 +840,28 @@ public class TestGermplasmDataManagerImpl{
         System.out.println("countAllParentsFromMappingPopulation()");
         System.out.println("Count: " + parentElementsCount);
     }
+    
+    @Test
+    public void getMapDetailsByName() throws Exception {
+    	String nameLike = "tag";
+    	int start = 0;
+    	int end = 10;
+        List<Map> maps = manager.getMapDetailsByName(nameLike, start, end);
+        System.out.println("getMapDetailsByName('"+nameLike+"'," + start + "," + end + ")");
+        for (Map map : maps) {
+            System.out.println("MarkerCount: " + map.getMarkerCount() + "  |  maxStartPosition: " + map.getMaxStartPosition() + "  |  linkageGroup: " + map.getLinkageGroup() + "  |  mapName: " + map.getMapName() + "  |  mapType:  " + map.getMapType());
+        }
+        
+    }    
+
+    @Test
+    public void countMapDetailsByName() throws Exception {
+    	String nameLike = "tag";
+        Long parentElementsCount = manager.countMapDetailsByName(nameLike);
+        System.out.println("countMapDetailsByName('"+nameLike+"')");
+        System.out.println("Count: " + parentElementsCount);
+    }
+    
     
     
     @AfterClass
