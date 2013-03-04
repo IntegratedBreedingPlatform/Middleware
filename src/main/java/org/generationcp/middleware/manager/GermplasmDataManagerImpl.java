@@ -27,6 +27,7 @@ import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
+import org.generationcp.middleware.dao.gdms.MapDAO;
 import org.generationcp.middleware.dao.gdms.MappingPopDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -50,6 +51,7 @@ import org.generationcp.middleware.pojos.germplasm.GermplasmCrossElement;
 import org.generationcp.middleware.pojos.germplasm.SingleGermplasmCrossElement;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 
 /**
  * Implementation of the GermplasmDataManager interface. To instantiate this
@@ -3031,7 +3033,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     	
         MappingPopDAO mappingPopDao = new MappingPopDAO();
        
-        List<ParentElement> allParentsFromMappingPopulation = mappingPopDao.getAllParentsFromMappingPopulation(start, numOfRows);
+        List<ParentElement> allParentsFromMappingPopulation = new ArrayList<ParentElement>();
    
         Session sessionForCentral = getCurrentSessionForCentral();
         Session sessionForLocal = getCurrentSessionForLocal();
@@ -3096,5 +3098,81 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         return totalCountParentsFromMappingPopulation;
     }
     
+
     
+    @Override
+    public List<org.generationcp.middleware.pojos.gdms.Map> getMapDetailsByName(
+            String nameLike, int start, int numOfRows) throws MiddlewareQueryException {
+
+        long centralCount = 0;
+        long localCount = 0;
+        long relativeLimit = 0;    	
+    	
+        MapDAO mapDao = new MapDAO();
+       
+        List<org.generationcp.middleware.pojos.gdms.Map> maps = new ArrayList<org.generationcp.middleware.pojos.gdms.Map>();
+   
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        if (sessionForCentral != null) {
+            mapDao.setSession(sessionForCentral);
+            centralCount = mapDao.countMapDetailsByName(nameLike);
+            
+            if (centralCount > start) {
+                maps.addAll(mapDao.getMapDetailsByName(nameLike, start, numOfRows));
+                relativeLimit = numOfRows - (centralCount - start);
+
+                if (relativeLimit > 0) {
+                	
+                    if (sessionForLocal != null) {
+                        mapDao.setSession(sessionForLocal);
+                        localCount = mapDao.countMapDetailsByName(nameLike);
+                        
+                        if (localCount > 0) {
+                            maps.addAll(mapDao.getMapDetailsByName(nameLike, 0, (int) relativeLimit));
+                        }
+                    }
+                }
+            } else {
+                relativeLimit = start - centralCount;
+                if (sessionForLocal != null) {
+                    mapDao.setSession(sessionForLocal);
+                    localCount = mapDao.countAll();
+                    if (localCount > relativeLimit) {
+                        maps.addAll(mapDao.getMapDetailsByName(nameLike, (int) relativeLimit, numOfRows));
+                    }
+                }
+            }
+        } else if (sessionForLocal != null) {
+            mapDao.setSession(sessionForLocal);
+            localCount = mapDao.countAll();
+            if (localCount > start) {
+                maps.addAll(mapDao.getMapDetailsByName(nameLike, start, numOfRows));
+            }
+        }
+     
+        return maps;
+    }
+
+    @Override
+    public Long countMapDetailsByName(String nameLike) throws MiddlewareQueryException {
+    	
+        MapDAO mapDao = new MapDAO();
+           
+        Database centralInstance = Database.CENTRAL;
+        Session centralSession = getSession(centralInstance);
+        mapDao.setSession(centralSession);
+        Long centralCount = mapDao.countMapDetailsByName(nameLike);
+        
+        Database localInstance = Database.LOCAL;
+        Session localSession = getSession(localInstance);
+        mapDao.setSession(localSession);
+        Long localCount = mapDao.countMapDetailsByName(nameLike);
+        
+        Long totalCount = centralCount + localCount;
+        
+        return totalCount;
+    }
+
 }

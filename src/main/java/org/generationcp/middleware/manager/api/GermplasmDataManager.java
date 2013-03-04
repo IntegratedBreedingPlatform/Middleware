@@ -1160,4 +1160,27 @@ public interface GermplasmDataManager {
      */
     public Long countAllParentsFromMappingPopulation() throws MiddlewareQueryException;
     
+    /**
+     * Returns map details given the name/part of the name of a map
+     * @param nameLike
+     *          - search query, name or part of name (non case-sensitive)
+     * @param start
+     *          - the starting index of the sublist of results to be returned 
+     * @param numOfRows
+     *          - the number of rows to be included in the sublist of results to be returned
+     * @return
+     *          - List of Maps
+     * @throws MiddlewareQueryException
+     */
+    public List<org.generationcp.middleware.pojos.gdms.Map> getMapDetailsByName(String nameLike, int start, int numOfRows) throws MiddlewareQueryException;
+    
+    /**
+     * Returns count of map details given the name/part of the name of a map
+     * @param nameLike
+     *          - search query, name or part of name (non case-sensitive)
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    public Long countMapDetailsByName(String nameLike) throws MiddlewareQueryException;
+    
 }

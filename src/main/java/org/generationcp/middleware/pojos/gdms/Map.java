@@ -52,7 +52,33 @@ public class Map implements Serializable{
     @Column(name = "mp_id")
     private Integer mpId;
     
+    private Long markerCount;
+    private Long maxStartPosition;
+    private String linkageGroup;
+    
     public Map() {}
+
+    public static final String GET_MAP_DETAILS_BY_NAME_LEFT = 
+        "SELECT COUNT(DISTINCT `gdms_mapping_data`.`marker_id`) AS `marker_count` " +
+    	"       ,MAX(`gdms_mapping_data`.`start_position`) AS `max` " +
+        "       , `gdms_mapping_data`.`linkage_group` AS Linkage_group " +
+    	"       ,`gdms_mapping_data`.`map_name` AS map " +
+        "       , gdms_map.map_type AS map_type " +
+    	"FROM `gdms_mapping_data` JOIN `gdms_map` ON gdms_mapping_data.map_id=gdms_map.map_id " +
+        "WHERE lower(gdms_mapping_data.map_name) LIKE ('";
+    
+    public static final String GET_MAP_DETAILS_BY_NAME_RIGHT = 
+    	"%') " +
+        "GROUP BY UCASE(`gdms_mapping_data`.`linkage_group`), UCASE(gdms_mapping_data.map_name) " +
+        "ORDER BY `gdms_mapping_data`.`map_name`, `gdms_mapping_data`.`linkage_group` ";
+       
+    public static final String COUNT_MAP_DETAILS_BY_NAME_LEFT = 
+        "SELECT COUNT(DISTINCT gdms_mapping_data.linkage_group, gdms_mapping_data.map_name) " +
+        "FROM `gdms_mapping_data` JOIN `gdms_map` ON gdms_mapping_data.map_id=gdms_map.map_id " +
+        "WHERE lower(gdms_mapping_data.map_name) LIKE ('";
+        
+    public static final String COUNT_MAP_DETAILS_BY_NAME_RIGHT = 
+        "%') ";
     
     public Map(Integer mapId, String mapName, String mapType, Integer mpId) {
         super();
@@ -65,6 +91,14 @@ public class Map implements Serializable{
 
     public Map(Integer mapId) {
         this.mapId = mapId;
+    }
+    
+    public Map(Long markerCount, Long maxStartPosition, String linkageGroup, String mapName, String mapType) {
+    	this.markerCount = markerCount;
+    	this.maxStartPosition = maxStartPosition;
+    	this.linkageGroup = linkageGroup;
+    	this.mapName = mapName;
+    	this.mapType = mapType;
     }
     
     public Integer getMapId() {
@@ -105,6 +139,30 @@ public class Map implements Serializable{
     public void setMpId(Integer mpId) {
         this.mpId = mpId;
     }
+
+    public Long getMarkerCount() {
+    	return markerCount;
+    }
+    
+    public void setMarkerCount(Long markerCount) {
+    	this.markerCount = markerCount; 
+    }
+    
+    public Long getMaxStartPosition() {
+    	return maxStartPosition;
+    }
+    
+    public void setMaxStartPosition(Long maxStartPosition) {
+    	this.maxStartPosition = maxStartPosition; 
+    }
+    
+    public String getLinkageGroup() {
+    	return linkageGroup;
+    }
+    
+    public void setLinkageGroup(String linkageGroup) {
+    	this.linkageGroup = linkageGroup; 
+    }    
     
     @Override
     public boolean equals(Object obj) {
