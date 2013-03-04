@@ -31,6 +31,7 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -819,6 +820,26 @@ public class TestGermplasmDataManagerImpl{
     public void testGetCrossExpansion() throws Exception {
         System.out.println(manager.getCrossExpansion(Integer.valueOf(75), 2));
     }
+    
+    @Test
+    public void getAllParentsFromMappingPopulation() throws Exception {
+    	int start = 0;
+    	int end = 10;
+        List<ParentElement> parentElements = manager.getAllParentsFromMappingPopulation(start, end);
+        System.out.println("getAllParentsFromMappingPopulation(" + start + "," + end + ")");
+        for (ParentElement parentElement : parentElements) {
+            System.out.println("Parent A GId: " + parentElement.getParentAGId() + "  |  Parent B GId: "+parentElement.getParentBGId());
+        }
+        
+    }    
+
+    @Test
+    public void countAllParentsFromMappingPopulation() throws Exception {
+        Long parentElementsCount = manager.countAllParentsFromMappingPopulation();
+        System.out.println("countAllParentsFromMappingPopulation()");
+        System.out.println("Count: " + parentElementsCount);
+    }
+    
     
     @AfterClass
     public static void tearDown() throws Exception {
