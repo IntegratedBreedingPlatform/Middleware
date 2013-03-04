@@ -30,6 +30,7 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.gdms.ParentElement;
 
 /**
  * This is the API for retrieving Germplasm information.
@@ -1135,4 +1136,28 @@ public interface GermplasmDataManager {
     public List<GidNidElement> getGidAndNidByGermplasmNames(List<String> germplasmNames) throws MiddlewareQueryException;
 
     public String getCrossExpansion(Integer gid, int level) throws MiddlewareQueryException;
+    
+    /**
+     * Returns all the parents from mapping population
+     * 
+     * @param start
+     *             	- the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *             	- the number of rows to be included in the sublist of results
+     *            to be returned
+     * @return List of parent_a_gid and parent_b_gid
+     * 				- List of Parent A GId and Parent B GId 
+     * @throws MiddlewareQueryException
+     */
+    public List<ParentElement> getAllParentsFromMappingPopulation(int start, int numOfRows) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Returns the number of parent GIds (a and b)
+     * 
+     * @return Long - number of parent GIds
+     * @throws MiddlewareQueryException
+     */
+    public Long countAllParentsFromMappingPopulation() throws MiddlewareQueryException;
+    
 }

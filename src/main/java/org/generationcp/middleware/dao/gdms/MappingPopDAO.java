@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.dao.gdms;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -92,4 +93,50 @@ public class MappingPopDAO extends GenericDAO<MappingPop, Integer>{
         }
     }
 
+    @SuppressWarnings("rawtypes")
+    public List<ParentElement> getAllParentsFromMappingPopulation(int start, int numOfRows)
+            throws MiddlewareQueryException {
+
+        SQLQuery query = getSession().createSQLQuery(MappingPop.GET_ALL_PARENTS_FROM_MAPPING_POPULATION);
+        query.setFirstResult(start);
+        query.setMaxResults(numOfRows);
+        
+        List<ParentElement> dataValues = new ArrayList<ParentElement>();
+        try {
+            List results = query.list();
+
+            for (Object o : results) {
+                Object[] result = (Object[]) o;
+                if (result != null) {
+                    Integer parentAGId = (Integer) result[0];
+                    Integer parentBGId = (Integer) result[1];
+                    String mappingPopType = null;
+                    ParentElement parentElement = new ParentElement(parentAGId, parentBGId, mappingPopType);
+                    dataValues.add(parentElement);
+                }
+            }
+            return dataValues;        
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getAllParentsFromMappingPopulation() query from MappingPop: " + e.getMessage(), e);
+        }
+    }
+
+    
+    public Long countAllParentsFromMappingPopulation()
+            throws MiddlewareQueryException {
+
+        SQLQuery query = getSession().createSQLQuery(MappingPop.COUNT_ALL_PARENTS_FROM_MAPPING_POPULATION);
+
+        try {
+            Long result = (Long) query.uniqueResult();
+            if (result != null) {
+                return result.longValue();
+            }
+        	return (long) 0;            
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with countAllParentsFromMappingPopulation() query from MappingPop: " + e.getMessage(), e);
+        }
+    }
+    
+        
 }

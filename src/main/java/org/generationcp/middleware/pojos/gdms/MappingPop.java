@@ -58,6 +58,16 @@ public class MappingPop implements Serializable{
                 " gdms_mapping_pop_values.gid DESC" +
                 ", gdms_marker.marker_name";
     
+    public static final String GET_ALL_PARENTS_FROM_MAPPING_POPULATION = 
+            "SELECT parent_a_gid, parent_b_gid " +
+            "FROM gdms_mapping_pop";
+        
+    public static final String COUNT_ALL_PARENTS_FROM_MAPPING_POPULATION = 
+            "SELECT count(parent_a_gid) " +
+            "FROM gdms_mapping_pop";
+
+    
+    
     /** The dataset id. */
     @Id
     @Basic(optional = false)

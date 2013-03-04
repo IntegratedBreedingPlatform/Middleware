@@ -27,6 +27,7 @@ import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
+import org.generationcp.middleware.dao.gdms.MappingPopDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -43,6 +44,7 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.ProgenitorPK;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.generationcp.middleware.pojos.germplasm.GermplasmCross;
 import org.generationcp.middleware.pojos.germplasm.GermplasmCrossElement;
 import org.generationcp.middleware.pojos.germplasm.SingleGermplasmCrossElement;
@@ -1659,7 +1661,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
      * KHAO-DAWK-MALI 105 becomes KHAO DAWK MALI 105 h) ^0N becomes ^N IRTP
      * 00123 becomes IRTP 123 i) ^^ becomes ^ j) REMOVE LEADING OR TRAILING ^ k)
      * ^) becomes ) and (^ becomes ( l) L-N becomes L^N when there is only one
-     * ÔÐÔ in the name and L is not preceded by a space m) ^/ becomes / and /^
+     * ï¿½ï¿½ï¿½ in the name and L is not preceded by a space m) ^/ becomes / and /^
      * becomes /
      * 
      * @param name
@@ -1798,7 +1800,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                 }
             } else if (currentChar == '-') {
                 if (ctr - 1 >= 0 && ctr + 1 < stringLength) {
-                    // L-N becomes L^N when there is only one ÔÐÔ in the name
+                    // L-N becomes L^N when there is only one ï¿½ï¿½ï¿½ in the name
                     // and L is not preceded by a space
                     char nextChar = toreturn.charAt(ctr + 1);
                     char previousChar = toreturn.charAt(ctr - 1);
@@ -3018,4 +3020,81 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             throw new MiddlewareQueryException("There is no germplasm with id: " + gid);
         }
     }
+    
+    @Override
+    public List<ParentElement> getAllParentsFromMappingPopulation(
+            int start, int numOfRows) throws MiddlewareQueryException {
+
+        long centralCount = 0;
+        long localCount = 0;
+        long relativeLimit = 0;    	
+    	
+        MappingPopDAO mappingPopDao = new MappingPopDAO();
+       
+        List<ParentElement> allParentsFromMappingPopulation = mappingPopDao.getAllParentsFromMappingPopulation(start, numOfRows);
+   
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        if (sessionForCentral != null) {
+            mappingPopDao.setSession(sessionForCentral);
+            centralCount = mappingPopDao.countAllParentsFromMappingPopulation();
+            
+            if (centralCount > start) {
+                allParentsFromMappingPopulation.addAll(mappingPopDao.getAllParentsFromMappingPopulation(start, numOfRows));
+                relativeLimit = numOfRows - (centralCount - start);
+
+                if (relativeLimit > 0) {
+                	
+                    if (sessionForLocal != null) {
+                        mappingPopDao.setSession(sessionForLocal);
+                        localCount = mappingPopDao.countAllParentsFromMappingPopulation();
+                        
+                        if (localCount > 0) {
+                            allParentsFromMappingPopulation.addAll(mappingPopDao.getAllParentsFromMappingPopulation(0, (int) relativeLimit));
+                        }
+                    }
+                }
+            } else {
+                relativeLimit = start - centralCount;
+                if (sessionForLocal != null) {
+                    mappingPopDao.setSession(sessionForLocal);
+                    localCount = mappingPopDao.countAll();
+                    if (localCount > relativeLimit) {
+                        allParentsFromMappingPopulation.addAll(mappingPopDao.getAllParentsFromMappingPopulation((int) relativeLimit, numOfRows));
+                    }
+                }
+            }
+        } else if (sessionForLocal != null) {
+            mappingPopDao.setSession(sessionForLocal);
+            localCount = mappingPopDao.countAll();
+            if (localCount > start) {
+                allParentsFromMappingPopulation.addAll(mappingPopDao.getAllParentsFromMappingPopulation(start, numOfRows));
+            }
+        }
+     
+        return allParentsFromMappingPopulation;
+    }
+
+    @Override
+    public Long countAllParentsFromMappingPopulation() throws MiddlewareQueryException {
+    	
+        MappingPopDAO mappingPopDao = new MappingPopDAO();
+           
+        Database centralInstance = Database.CENTRAL;
+        Session centralSession = getSession(centralInstance);
+        mappingPopDao.setSession(centralSession);
+        Long centralCountParentsFromMappingPopulation = mappingPopDao.countAllParentsFromMappingPopulation();
+        
+        Database localInstance = Database.LOCAL;
+        Session localSession = getSession(localInstance);
+        mappingPopDao.setSession(localSession);
+        Long localCountParentsFromMappingPopulation = mappingPopDao.countAllParentsFromMappingPopulation();
+        
+        Long totalCountParentsFromMappingPopulation = localCountParentsFromMappingPopulation + centralCountParentsFromMappingPopulation;
+        
+        return totalCountParentsFromMappingPopulation;
+    }
+    
+    
 }

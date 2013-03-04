@@ -95,7 +95,6 @@ public class MappingPopValues implements Serializable{
         "FROM gdms_mapping_pop_values " +
         "WHERE marker_id = :markerId";
     
-
     /**
      * The Mp Id.
      */
