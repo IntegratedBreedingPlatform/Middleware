@@ -33,6 +33,53 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @Table(name = "gdms_qtl")
 public class Qtl implements Serializable{
 
+    
+    public static final String GET_QTL_BY_NAME = 
+            "SELECT  CONCAT(gdms_qtl.qtl_name,'') " 
+                + ",CONCAT(gdms_map.map_name,'') "
+                + ",gdms_qtl_details.linkage_group " 
+                + ",gdms_qtl_details.min_position "
+                + ",gdms_qtl_details.max_position " 
+                + ",CONCAT(gdms_qtl_details.trait,'') "
+                + ",CONCAT(gdms_qtl_details.experiment,'') "
+                + ",gdms_qtl_details.left_flanking_marker "
+                + ",gdms_qtl_details.right_flanking_marker " 
+                + ",gdms_qtl_details.effect "
+                + ",gdms_qtl_details.score_value " 
+                + ",gdms_qtl_details.r_square "
+                + ",gdms_qtl_details.interactions " 
+                + ",tmstraits.trname "
+                + ",tmstraits.ontology "
+            + "FROM    gdms_qtl_details, gdms_qtl, gdms_map, tmstraits " 
+            + "WHERE   gdms_qtl.qtl_name LIKE LOWER(:qtlName) "
+               + "AND gdms_qtl.qtl_id = gdms_qtl_details.qtl_id "
+               + "AND gdms_qtl_details.map_id = gdms_map.map_id "
+               + "AND gdms_qtl_details.trait = tmstraits.trabbr "
+            + "ORDER BY gdms_qtl.qtl_id "
+            ;
+    
+    public static final String COUNT_QTL_BY_NAME = 
+            "SELECT  COUNT(*) " 
+            + "FROM    gdms_qtl_details, gdms_qtl, gdms_map, tmstraits " 
+            + "WHERE   gdms_qtl.qtl_name LIKE LOWER(:qtlName) "
+            + "AND gdms_qtl.qtl_id = gdms_qtl_details.qtl_id "
+            + "AND gdms_qtl_details.map_id = gdms_map.map_id "
+            + "AND gdms_qtl_details.trait = tmstraits.trabbr "
+            ;
+
+    public static final String GET_QTL_BY_TRAIT = 
+            "SELECT qtl_id " 
+            + "FROM gdms_qtl_details " 
+            + "WHERE trait LIKE :qtlTrait " 
+            + "ORDER BY qtl_id "
+            ;
+        
+    public static final String COUNT_QTL_BY_TRAIT = 
+            "SELECT COUNT(qtl_id) " 
+            + "FROM gdms_qtl_details " 
+            + "WHERE trait LIKE :qtlTrait " 
+            ;
+        
     private static final long serialVersionUID = 1L;
 
     @Id

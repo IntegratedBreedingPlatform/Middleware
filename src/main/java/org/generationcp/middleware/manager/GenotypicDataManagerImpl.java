@@ -47,6 +47,7 @@ import org.generationcp.middleware.pojos.gdms.MarkerInfo;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.generationcp.middleware.pojos.gdms.Qtl;
+import org.generationcp.middleware.pojos.gdms.QtlDetailElement;
 import org.hibernate.Session;
 
 /**
@@ -1805,5 +1806,167 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     }
 
+    @Override
+    public List<QtlDetailElement> getQtlByName(String name, int start, int numOfRows) throws MiddlewareQueryException{
+        
+        if ((name == null) || (name.isEmpty())){
+            return new ArrayList<QtlDetailElement>();
+        }
+        
+        QtlDAO dao = new QtlDAO();
+        String formattedName = name + "%";
+        
+        long centralCount = 0;
+        long localCount = 0;
+        long relativeLimit = 0;
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        List<QtlDetailElement> qtl = new ArrayList<QtlDetailElement>();
+
+        if(sessionForCentral != null) {
+            
+            dao.setSession(sessionForCentral);
+            centralCount = dao.countQtlDetailsByName(formattedName);
+            
+            if(centralCount > start) {
+                qtl.addAll(dao.getQtlDetailsByName(formattedName, start, numOfRows));
+                relativeLimit = numOfRows - qtl.size();
+                if(relativeLimit > 0 && sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countQtlDetailsByName(formattedName);
+                    if(localCount > 0) {
+                        qtl.addAll(dao.getQtlDetailsByName(formattedName, 0, (int) relativeLimit));
+                    }
+                }
+            } else {
+                relativeLimit = start - centralCount;
+                if (sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countQtlDetailsByName(formattedName);
+                    if (localCount > relativeLimit) {
+                        qtl.addAll(dao.getQtlDetailsByName(formattedName, (int) relativeLimit, numOfRows));
+                    }
+                }
+            }
+        } else if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            localCount = dao.countQtlDetailsByName(formattedName);
+            if (localCount > start) {
+                qtl.addAll(dao.getQtlDetailsByName(formattedName, start, numOfRows));
+            }
+        }
+        
+        return qtl;    
+    }
+    
+    @Override
+    public long countQtlByName(String name) throws MiddlewareQueryException{
+        
+        if ((name == null) || (name.isEmpty())){
+            return 0;
+        }
+                
+        QtlDAO dao = new QtlDAO();
+        String formattedName = name + "%";
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        long result = 0;
+
+        // Count from local
+        if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            result += dao.countQtlDetailsByName(formattedName);
+        }
+
+        // Count from central
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            result += dao.countQtlDetailsByName(formattedName);
+        }
+
+        return result;
+    }
+    
+    @Override
+    public List<Integer> getQtlByTrait(String trait, int start, int numOfRows) throws MiddlewareQueryException{
+        QtlDAO dao = new QtlDAO();
+        String formattedTrait = trait.toLowerCase() + "%";
+
+        long centralCount = 0;
+        long localCount = 0;
+        long relativeLimit = 0;
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        List<Integer> qtl = new ArrayList<Integer>();
+
+        if(sessionForCentral != null) {
+            
+            dao.setSession(sessionForCentral);
+            centralCount = dao.countQtlByTrait(formattedTrait);
+            
+            if(centralCount > start) {
+                qtl.addAll(dao.getQtlByTrait(formattedTrait, start, numOfRows));
+                relativeLimit = numOfRows - qtl.size();
+                if(relativeLimit > 0 && sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countQtlByTrait(formattedTrait);
+                    if(localCount > 0) {
+                        qtl.addAll(dao.getQtlByTrait(formattedTrait, 0, (int) relativeLimit));
+                    }
+                }
+            } else {
+                relativeLimit = start - centralCount;
+                if (sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countQtlByTrait(formattedTrait);
+                    if (localCount > relativeLimit) {
+                        qtl.addAll(dao.getQtlByTrait(formattedTrait, (int) relativeLimit, numOfRows));
+                    }
+                }
+            }
+        } else if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            localCount = dao.countQtlByTrait(formattedTrait);
+            if (localCount > start) {
+                qtl.addAll(dao.getQtlByTrait(formattedTrait, start, numOfRows));
+            }
+        }
+        
+        return qtl;    
+
+    }
+    
+    @Override
+    public long countQtlByTrait(String trait) throws MiddlewareQueryException{
+        QtlDAO dao = new QtlDAO();
+        
+        String formattedTrait = trait.toLowerCase() + "%";
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        long result = 0;
+
+        // Count from local
+        if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            result += dao.countQtlByTrait(formattedTrait);
+        }
+
+        // Count from central
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            result += dao.countQtlByTrait(formattedTrait);
+        }
+
+        return result;
+
+    }
 
 }

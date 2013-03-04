@@ -30,6 +30,7 @@ import org.generationcp.middleware.pojos.gdms.MarkerInfo;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.generationcp.middleware.pojos.gdms.Qtl;
+import org.generationcp.middleware.pojos.gdms.QtlDetailElement;
 
 /**
  * This is the API for retrieving and storing genotypic data.
@@ -870,6 +871,11 @@ public interface GenotypicDataManager{
      *
      * @param gids
      *          - the GIDs to match
+     * @param start 
+     *          - the starting index of the sublist of results to be returned
+     * @param numOfRows 
+     *          - the number of rows to be included in the sublist of results 
+     *          to be returned
      * @return List of mapping alleleValues for polymorphic markers retrieval 
      * @throws MiddlewareQueryException
      */
@@ -889,6 +895,12 @@ public interface GenotypicDataManager{
     /**
      * Retrieves all QTL entries from the gdms_qtl table
      * 
+     * @param start 
+     *          - the starting index of the sublist of results to be returned
+     * @param numOfRows 
+     *          - the number of rows to be included in the sublist of results 
+     *          to be returned
+     *          
      * @return List of all QTL entries
      * @throws MiddlewareQueryException
      */
@@ -903,6 +915,57 @@ public interface GenotypicDataManager{
      */
     public long countAllQtl() throws MiddlewareQueryException;
     
+    /**
+     * Retrieves QTL entries from the gdms_qtl table matching the given name
+     * 
+     * @param name 
+     *          - the name to match       
+     * @param start 
+     *          - the starting index of the sublist of results to be returned
+     * @param numOfRows 
+     *          - the number of rows to be included in the sublist of results 
+     *          to be returned
+
+     * @return List of QTL entries
+     * @throws MiddlewareQueryException
+     */
+    public List<QtlDetailElement> getQtlByName(String name, int start, int numOfRows) throws MiddlewareQueryException;
     
+    /**
+     * Returns the number of QTL entries from the gdms_qtl table matching the given name
+     * 
+     * @param name - name of QTL
+     * 
+     * @return Count of QTL entries
+     * @throws MiddlewareQueryException
+     */
+    public long countQtlByName(String name) throws MiddlewareQueryException;
+    
+
+    /**
+     * Retrieves QTL IDs from the gdms_qtl table matching the given trait
+     * 
+     * @param trait 
+     *          - the trait to match       
+     * @param start 
+     *          - the starting index of the sublist of results to be returned
+     * @param numOfRows 
+     *          - the number of rows to be included in the sublist of results 
+     *          to be returned
+
+     * @return List of QTL IDs
+     * @throws MiddlewareQueryException
+     */
+    public List<Integer> getQtlByTrait(String trait, int start, int numOfRows) throws MiddlewareQueryException;
+    
+    /**
+     * Returns the number of QTL entries from the gdms_qtl table matching the given trait
+     * 
+     * @param trait - trait of QTL
+     * 
+     * @return Count of QTL entries
+     * @throws MiddlewareQueryException
+     */
+    public long countQtlByTrait(String trait) throws MiddlewareQueryException;
     
 }
