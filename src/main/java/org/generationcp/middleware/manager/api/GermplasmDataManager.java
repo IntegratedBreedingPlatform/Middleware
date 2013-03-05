@@ -1163,7 +1163,7 @@ public interface GermplasmDataManager {
     /**
      * Returns map details given the name/part of the name of a map
      * @param nameLike
-     *          - search query, name or part of name (non case-sensitive)
+     *          - search query, name or part of name (non case-sensitive), add % for wildcard
      * @param start
      *          - the starting index of the sublist of results to be returned 
      * @param numOfRows
@@ -1177,7 +1177,7 @@ public interface GermplasmDataManager {
     /**
      * Returns count of map details given the name/part of the name of a map
      * @param nameLike
-     *          - search query, name or part of name (non case-sensitive)
+     *          - search query, name or part of name (non case-sensitive), add % for wildcard
      * @return
      * @throws MiddlewareQueryException
      */
