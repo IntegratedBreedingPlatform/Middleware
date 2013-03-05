@@ -64,13 +64,14 @@ public class Map implements Serializable{
         "       , `gdms_mapping_data`.`linkage_group` AS Linkage_group " +
     	"       ,`gdms_mapping_data`.`map_name` AS map " +
         "       , gdms_map.map_type AS map_type " +
-    	"FROM `gdms_mapping_data` JOIN `gdms_map` ON gdms_mapping_data.map_id=gdms_map.map_id " +
-        "WHERE lower(gdms_mapping_data.map_name) LIKE ('";
+    	"FROM FROM `gdms_mapping_data`, `gdms_map` " +
+        "WHERE gdms_mapping_data.map_id=gdms_map.map_id AND lower(gdms_mapping_data.map_name) LIKE ('";
+    
     
     public static final String GET_MAP_DETAILS_BY_NAME_RIGHT = 
-    	"%') " +
-        "GROUP BY UCASE(`gdms_mapping_data`.`linkage_group`), UCASE(gdms_mapping_data.map_name) " +
-        "ORDER BY `gdms_mapping_data`.`map_name`, `gdms_mapping_data`.`linkage_group` ";
+    	"') " +
+        "GROUP BY gdms_mapping_data.linkage_group, gdms_mapping_data.map_name " +
+        "ORDER BY gdms_mapping_data.map_name`, `gdms_mapping_data`.`linkage_group` ";
        
     public static final String COUNT_MAP_DETAILS_BY_NAME_LEFT = 
         "SELECT COUNT(DISTINCT gdms_mapping_data.linkage_group, gdms_mapping_data.map_name) " +
@@ -78,7 +79,7 @@ public class Map implements Serializable{
         "WHERE lower(gdms_mapping_data.map_name) LIKE ('";
         
     public static final String COUNT_MAP_DETAILS_BY_NAME_RIGHT = 
-        "%') ";
+        "') ";
     
     public Map(Integer mapId, String mapName, String mapType, Integer mpId) {
         super();
