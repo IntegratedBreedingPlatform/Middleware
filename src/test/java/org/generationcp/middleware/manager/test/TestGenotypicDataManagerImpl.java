@@ -636,7 +636,7 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testGetQtlByName() throws Exception {
-        String qtlName = "SLA";     // Crop tested: Groundnut
+        String qtlName = "SLA%";     // Crop tested: Groundnut
 
         List<QtlDetailElement> results = manager.getQtlByName(qtlName, 0, 
                 (int) manager.countQtlByName(qtlName));
@@ -646,7 +646,7 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testCountQtlByName() throws Exception { 
-        String qtlName = "SLA";     // Crop tested: Groundnut
+        String qtlName = "SLA%";     // Crop tested: Groundnut
         long count = manager.countQtlByName(qtlName);
         System.out.println("testCountQtlByName() RESULTS: " + count);
     }    
@@ -654,7 +654,7 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testGetQtlByTrait() throws Exception {
-        String qtlTrait = "SL";     // Crop tested: Groundnut
+        String qtlTrait = "SL%";     // Crop tested: Groundnut
 
         List<Integer> results = manager.getQtlByTrait(qtlTrait, 0, 
                 (int) manager.countQtlByTrait(qtlTrait));
@@ -664,7 +664,7 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testCountQtlByTrait() throws Exception { 
-        String qtlTrait = "SL";     // Crop tested: Groundnut
+        String qtlTrait = "SL%";     // Crop tested: Groundnut
         long count = manager.countQtlByTrait(qtlTrait);
         System.out.println("testCountQtlByTrait() RESULTS: " + count);
     }    

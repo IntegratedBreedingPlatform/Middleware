@@ -1814,7 +1814,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         }
         
         QtlDAO dao = new QtlDAO();
-        String formattedName = name + "%";
         
         long centralCount = 0;
         long localCount = 0;
@@ -1828,33 +1827,33 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         if(sessionForCentral != null) {
             
             dao.setSession(sessionForCentral);
-            centralCount = dao.countQtlDetailsByName(formattedName);
+            centralCount = dao.countQtlDetailsByName(name);
             
             if(centralCount > start) {
-                qtl.addAll(dao.getQtlDetailsByName(formattedName, start, numOfRows));
+                qtl.addAll(dao.getQtlDetailsByName(name, start, numOfRows));
                 relativeLimit = numOfRows - qtl.size();
                 if(relativeLimit > 0 && sessionForLocal != null) {
                     dao.setSession(sessionForLocal);
-                    localCount = dao.countQtlDetailsByName(formattedName);
+                    localCount = dao.countQtlDetailsByName(name);
                     if(localCount > 0) {
-                        qtl.addAll(dao.getQtlDetailsByName(formattedName, 0, (int) relativeLimit));
+                        qtl.addAll(dao.getQtlDetailsByName(name, 0, (int) relativeLimit));
                     }
                 }
             } else {
                 relativeLimit = start - centralCount;
                 if (sessionForLocal != null) {
                     dao.setSession(sessionForLocal);
-                    localCount = dao.countQtlDetailsByName(formattedName);
+                    localCount = dao.countQtlDetailsByName(name);
                     if (localCount > relativeLimit) {
-                        qtl.addAll(dao.getQtlDetailsByName(formattedName, (int) relativeLimit, numOfRows));
+                        qtl.addAll(dao.getQtlDetailsByName(name, (int) relativeLimit, numOfRows));
                     }
                 }
             }
         } else if (sessionForLocal != null) {
             dao.setSession(sessionForLocal);
-            localCount = dao.countQtlDetailsByName(formattedName);
+            localCount = dao.countQtlDetailsByName(name);
             if (localCount > start) {
-                qtl.addAll(dao.getQtlDetailsByName(formattedName, start, numOfRows));
+                qtl.addAll(dao.getQtlDetailsByName(name, start, numOfRows));
             }
         }
         
@@ -1869,7 +1868,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         }
                 
         QtlDAO dao = new QtlDAO();
-        String formattedName = name + "%";
 
         Session sessionForCentral = getCurrentSessionForCentral();
         Session sessionForLocal = getCurrentSessionForLocal();
@@ -1879,13 +1877,13 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         // Count from local
         if (sessionForLocal != null) {
             dao.setSession(sessionForLocal);
-            result += dao.countQtlDetailsByName(formattedName);
+            result += dao.countQtlDetailsByName(name);
         }
 
         // Count from central
         if (sessionForCentral != null) {
             dao.setSession(sessionForCentral);
-            result += dao.countQtlDetailsByName(formattedName);
+            result += dao.countQtlDetailsByName(name);
         }
 
         return result;
@@ -1894,7 +1892,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<Integer> getQtlByTrait(String trait, int start, int numOfRows) throws MiddlewareQueryException{
         QtlDAO dao = new QtlDAO();
-        String formattedTrait = trait.toLowerCase() + "%";
 
         long centralCount = 0;
         long localCount = 0;
@@ -1908,33 +1905,33 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         if(sessionForCentral != null) {
             
             dao.setSession(sessionForCentral);
-            centralCount = dao.countQtlByTrait(formattedTrait);
+            centralCount = dao.countQtlByTrait(trait);
             
             if(centralCount > start) {
-                qtl.addAll(dao.getQtlByTrait(formattedTrait, start, numOfRows));
+                qtl.addAll(dao.getQtlByTrait(trait, start, numOfRows));
                 relativeLimit = numOfRows - qtl.size();
                 if(relativeLimit > 0 && sessionForLocal != null) {
                     dao.setSession(sessionForLocal);
-                    localCount = dao.countQtlByTrait(formattedTrait);
+                    localCount = dao.countQtlByTrait(trait);
                     if(localCount > 0) {
-                        qtl.addAll(dao.getQtlByTrait(formattedTrait, 0, (int) relativeLimit));
+                        qtl.addAll(dao.getQtlByTrait(trait, 0, (int) relativeLimit));
                     }
                 }
             } else {
                 relativeLimit = start - centralCount;
                 if (sessionForLocal != null) {
                     dao.setSession(sessionForLocal);
-                    localCount = dao.countQtlByTrait(formattedTrait);
+                    localCount = dao.countQtlByTrait(trait);
                     if (localCount > relativeLimit) {
-                        qtl.addAll(dao.getQtlByTrait(formattedTrait, (int) relativeLimit, numOfRows));
+                        qtl.addAll(dao.getQtlByTrait(trait, (int) relativeLimit, numOfRows));
                     }
                 }
             }
         } else if (sessionForLocal != null) {
             dao.setSession(sessionForLocal);
-            localCount = dao.countQtlByTrait(formattedTrait);
+            localCount = dao.countQtlByTrait(trait);
             if (localCount > start) {
-                qtl.addAll(dao.getQtlByTrait(formattedTrait, start, numOfRows));
+                qtl.addAll(dao.getQtlByTrait(trait, start, numOfRows));
             }
         }
         
@@ -1946,8 +1943,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     public long countQtlByTrait(String trait) throws MiddlewareQueryException{
         QtlDAO dao = new QtlDAO();
         
-        String formattedTrait = trait.toLowerCase() + "%";
-
         Session sessionForCentral = getCurrentSessionForCentral();
         Session sessionForLocal = getCurrentSessionForLocal();
 
@@ -1956,13 +1951,13 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         // Count from local
         if (sessionForLocal != null) {
             dao.setSession(sessionForLocal);
-            result += dao.countQtlByTrait(formattedTrait);
+            result += dao.countQtlByTrait(trait);
         }
 
         // Count from central
         if (sessionForCentral != null) {
             dao.setSession(sessionForCentral);
-            result += dao.countQtlByTrait(formattedTrait);
+            result += dao.countQtlByTrait(trait);
         }
 
         return result;
