@@ -12,6 +12,7 @@
 package org.generationcp.middleware.pojos.gdms;
 
 import java.io.Serializable;
+import java.util.Comparator;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -202,4 +203,24 @@ public class AllelicValueElement implements Serializable{
                 .append(datasetId)
                 .append(markerName).toHashCode();
     }
+
+    public static Comparator<AllelicValueElement> AllelicValueElementComparator 
+                          = new Comparator<AllelicValueElement>() {
+        @Override
+        public int compare(AllelicValueElement element1, AllelicValueElement element2) {
+            Integer gid1 = element1.getGid();
+            Integer gid2 = element2.getGid();
+            
+            int gidComp = gid1.compareTo(gid2);
+            
+            if (gidComp != 0){
+                return gidComp;
+            } else {
+                String markerName1 = element1.getMarkerName();
+                String markerName2 = element2.getMarkerName();
+                return markerName1.compareToIgnoreCase(markerName2);
+            }
+        }
+ 
+    };
 }

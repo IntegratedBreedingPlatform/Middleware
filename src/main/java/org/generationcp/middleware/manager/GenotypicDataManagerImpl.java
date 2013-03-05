@@ -13,6 +13,7 @@
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -1506,6 +1507,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             }
         }
         
+        //Sort by gid, markerName
+        Collections.sort(allelicValueElements, AllelicValueElement.AllelicValueElementComparator);
+
         return allelicValueElements;
     }
 
@@ -1601,6 +1605,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             }
         }
         
+        //Sort by gid, markerName
+        Collections.sort(allelicValueElements, AllelicValueElement.AllelicValueElementComparator);
+
         return allelicValueElements;
     }
 
@@ -1695,6 +1702,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             }
         }
         
+        //Sort by gid, markerName
+        Collections.sort(allelicValueElements, AllelicValueElement.AllelicValueElementComparator);
+
         return allelicValueElements;
     }
 
