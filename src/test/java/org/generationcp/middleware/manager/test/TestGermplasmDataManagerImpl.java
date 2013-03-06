@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.manager.test;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,6 +52,7 @@ public class TestGermplasmDataManagerImpl{
         manager = factory.getGermplasmDataManager();
     }
     
+    /***
     @Test
     public void testGetAllLocations() throws Exception {
         long start = System.currentTimeMillis();
@@ -814,13 +816,13 @@ public class TestGermplasmDataManagerImpl{
         for (UserDefinedField u : userDefineField) {
             System.out.println("  " + u);
         }
-
     }
     
     @Test
     public void testGetCrossExpansion() throws Exception {
         System.out.println(manager.getCrossExpansion(Integer.valueOf(75), 2));
     }
+    ***/
     
     @Test
     public void getAllParentsFromMappingPopulation() throws Exception {
@@ -836,14 +838,14 @@ public class TestGermplasmDataManagerImpl{
 
     @Test
     public void countAllParentsFromMappingPopulation() throws Exception {
-        Long parentElementsCount = manager.countAllParentsFromMappingPopulation();
+        long parentElementsCount = manager.countAllParentsFromMappingPopulation();
         System.out.println("countAllParentsFromMappingPopulation()");
         System.out.println("Count: " + parentElementsCount);
     }
     
     @Test
     public void getMapDetailsByName() throws Exception {
-    	String nameLike = "tag";
+    	String nameLike = "tag%";
     	int start = 0;
     	int end = 10;
         List<Map> maps = manager.getMapDetailsByName(nameLike, start, end);
@@ -856,7 +858,7 @@ public class TestGermplasmDataManagerImpl{
 
     @Test
     public void countMapDetailsByName() throws Exception {
-    	String nameLike = "tag";
+    	String nameLike = "tag%";
         Long parentElementsCount = manager.countMapDetailsByName(nameLike);
         System.out.println("countMapDetailsByName('"+nameLike+"')");
         System.out.println("Count: " + parentElementsCount);
