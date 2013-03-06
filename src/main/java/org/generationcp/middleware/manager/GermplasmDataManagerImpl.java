@@ -3035,7 +3035,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         MappingPopDAO mappingPopDao = new MappingPopDAO();
        
         List<ParentElement> allParentsFromMappingPopulation = new ArrayList<ParentElement>();
-   /**
+   
         Session sessionForCentral = getCurrentSessionForCentral();
         Session sessionForLocal = getCurrentSessionForLocal();
 
@@ -3045,7 +3045,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             
             if (centralCount > start) {
                 allParentsFromMappingPopulation.addAll(mappingPopDao.getAllParentsFromMappingPopulation(start, numOfRows));
-                relativeLimit = numOfRows - start;
+                relativeLimit = numOfRows - (centralCount.intValue() - start);
 
                 if (relativeLimit > 0) {
                 	
@@ -3054,7 +3054,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                         localCount = mappingPopDao.countAllParentsFromMappingPopulation();
                         
                         if (localCount > 0) {
-                            //allParentsFromMappingPopulation.addAll(mappingPopDao.getAllParentsFromMappingPopulation(0, relativeLimit.intValue()));
+                            allParentsFromMappingPopulation.addAll(mappingPopDao.getAllParentsFromMappingPopulation(0, relativeLimit));
                         }
                     }
                 }
@@ -3064,7 +3064,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                     mappingPopDao.setSession(sessionForLocal);
                     localCount = mappingPopDao.countAllParentsFromMappingPopulation();
                     if (localCount > relativeLimit) {
-                        //allParentsFromMappingPopulation.addAll(mappingPopDao.getAllParentsFromMappingPopulation(relativeLimit.intValue(), numOfRows));
+                        allParentsFromMappingPopulation.addAll(mappingPopDao.getAllParentsFromMappingPopulation(relativeLimit, numOfRows));
                     }
                 }
             }
@@ -3075,7 +3075,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                 allParentsFromMappingPopulation.addAll(mappingPopDao.getAllParentsFromMappingPopulation(start, numOfRows));
             }
         }
-     **/
+   
         return allParentsFromMappingPopulation;
     }
 
