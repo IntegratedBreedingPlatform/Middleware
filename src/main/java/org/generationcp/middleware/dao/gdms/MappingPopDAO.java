@@ -108,8 +108,8 @@ public class MappingPopDAO extends GenericDAO<MappingPop, Integer>{
             for (Object o : results) {
                 Object[] result = (Object[]) o;
                 if (result != null) {
-                    Integer parentAGId = (Integer) result[0];
-                    Integer parentBGId = (Integer) result[1];
+                    int parentAGId = (Integer) result[0];
+                    int parentBGId = (Integer) result[1];
                     String mappingPopType = null;
                     ParentElement parentElement = new ParentElement(parentAGId, parentBGId, mappingPopType);
                     dataValues.add(parentElement);
@@ -128,11 +128,8 @@ public class MappingPopDAO extends GenericDAO<MappingPop, Integer>{
         SQLQuery query = getSession().createSQLQuery(MappingPop.COUNT_ALL_PARENTS_FROM_MAPPING_POPULATION);
 
         try {
-            Long result = (Long) query.uniqueResult();
-            if (result != null) {
-                return result.longValue();
-            }
-        	return (long) 0;            
+            BigInteger result = (BigInteger) query.uniqueResult();
+            return result.longValue();
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error with countAllParentsFromMappingPopulation() query from MappingPop: " + e.getMessage(), e);
         }

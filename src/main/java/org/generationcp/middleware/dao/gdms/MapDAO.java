@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao.gdms;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,49 +37,53 @@ public class MapDAO extends GenericDAO<Map, Integer>{
     public List<Map> getMapDetailsByName(String nameLike, int start, int numOfRows) throws MiddlewareQueryException {
     	
     	nameLike = nameLike.toLowerCase();
-    	nameLike = nameLike.replaceAll("'", "");
+    	//nameLike = nameLike.replaceAll("'", "");
     	
-        SQLQuery query = getSession().createSQLQuery(Map.GET_MAP_DETAILS_BY_NAME_LEFT + nameLike + Map.GET_MAP_DETAILS_BY_NAME_RIGHT);
+        SQLQuery query = getSession().createSQLQuery(Map.GET_MAP_DETAILS_BY_NAME);
+        query.setString("nameLike", nameLike);
         query.setFirstResult(start);
         query.setMaxResults(numOfRows);
-        
+
         List<Map> maps = new ArrayList<Map>();
+        
         try {
+
             List results = query.list();
 
             for (Object o : results) {
                 Object[] result = (Object[]) o;
                 if (result != null) {
-                    Long markerCount = (Long) result[0];
-                    Long maxStartPosition = (Long) result[1];
+                    int markerCount = ((BigInteger) result[0]).intValue();
+                    Float maxStartPosition = (Float) result[1];
                     String linkageGroup = (String) result[2];
-                    String mapName = (String) result[3];
-                    String mapType = (String) result[4];
+                    String mapName = (String) result[3].toString();
+                    String mapType = (String) result[4].toString();
                     
                     Map map = new Map(markerCount, maxStartPosition, linkageGroup, mapName, mapType);
                     maps.add(map);
                 }
             }
-            return maps;        
+            
+            return maps;
+                    
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error with getMapDetailsByName() query from Map: " + e.getMessage(), e);
         }	
+        
     }
 
     
     public Long countMapDetailsByName(String nameLike) throws MiddlewareQueryException {
 
     	nameLike = nameLike.toLowerCase();
-    	nameLike = nameLike.replaceAll("'", "");
+    	//nameLike = nameLike.replaceAll("'", "");
     	
-        SQLQuery query = getSession().createSQLQuery(Map.COUNT_MAP_DETAILS_BY_NAME_LEFT + nameLike + Map.COUNT_MAP_DETAILS_BY_NAME_RIGHT);
-
+        SQLQuery query = getSession().createSQLQuery(Map.COUNT_MAP_DETAILS_BY_NAME);
+        query.setString("nameLike", nameLike);
+        
         try {
-            Long result = (Long) query.uniqueResult();
-            if (result != null) {
-                return result.longValue();
-            }
-        	return (long) 0;            
+            BigInteger result = (BigInteger) query.uniqueResult();
+            return result.longValue();
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error with countMapDetailsByName() query from Map: " + e.getMessage(), e);
         }

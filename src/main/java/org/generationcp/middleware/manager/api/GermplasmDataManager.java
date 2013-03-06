@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.manager.api;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
@@ -1155,7 +1156,7 @@ public interface GermplasmDataManager {
     /**
      * Returns the number of parent GIds (a and b)
      * 
-     * @return Long - number of parent GIds
+     * @return BigInteger - number of parent GIds
      * @throws MiddlewareQueryException
      */
     public Long countAllParentsFromMappingPopulation() throws MiddlewareQueryException;
@@ -1179,6 +1180,7 @@ public interface GermplasmDataManager {
      * @param nameLike
      *          - search query, name or part of name (non case-sensitive), add % for wildcard
      * @return
+     *          - count of map details
      * @throws MiddlewareQueryException
      */
     public Long countMapDetailsByName(String nameLike) throws MiddlewareQueryException;

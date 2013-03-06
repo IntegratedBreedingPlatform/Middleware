@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.manager;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -3027,14 +3028,14 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public List<ParentElement> getAllParentsFromMappingPopulation(
             int start, int numOfRows) throws MiddlewareQueryException {
 
-        long centralCount = 0;
-        long localCount = 0;
-        long relativeLimit = 0;    	
+        Long centralCount = Long.valueOf(0);
+        Long localCount = Long.valueOf(0);
+        int relativeLimit = 0;    	
     	
         MappingPopDAO mappingPopDao = new MappingPopDAO();
        
         List<ParentElement> allParentsFromMappingPopulation = new ArrayList<ParentElement>();
-   
+   /**
         Session sessionForCentral = getCurrentSessionForCentral();
         Session sessionForLocal = getCurrentSessionForLocal();
 
@@ -3044,7 +3045,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             
             if (centralCount > start) {
                 allParentsFromMappingPopulation.addAll(mappingPopDao.getAllParentsFromMappingPopulation(start, numOfRows));
-                relativeLimit = numOfRows - (centralCount - start);
+                relativeLimit = numOfRows - start;
 
                 if (relativeLimit > 0) {
                 	
@@ -3053,28 +3054,28 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                         localCount = mappingPopDao.countAllParentsFromMappingPopulation();
                         
                         if (localCount > 0) {
-                            allParentsFromMappingPopulation.addAll(mappingPopDao.getAllParentsFromMappingPopulation(0, (int) relativeLimit));
+                            //allParentsFromMappingPopulation.addAll(mappingPopDao.getAllParentsFromMappingPopulation(0, relativeLimit.intValue()));
                         }
                     }
                 }
             } else {
-                relativeLimit = start - centralCount;
+                relativeLimit = start - centralCount.intValue();
                 if (sessionForLocal != null) {
                     mappingPopDao.setSession(sessionForLocal);
-                    localCount = mappingPopDao.countAll();
+                    localCount = mappingPopDao.countAllParentsFromMappingPopulation();
                     if (localCount > relativeLimit) {
-                        allParentsFromMappingPopulation.addAll(mappingPopDao.getAllParentsFromMappingPopulation((int) relativeLimit, numOfRows));
+                        //allParentsFromMappingPopulation.addAll(mappingPopDao.getAllParentsFromMappingPopulation(relativeLimit.intValue(), numOfRows));
                     }
                 }
             }
         } else if (sessionForLocal != null) {
             mappingPopDao.setSession(sessionForLocal);
-            localCount = mappingPopDao.countAll();
+            localCount = mappingPopDao.countAllParentsFromMappingPopulation();
             if (localCount > start) {
                 allParentsFromMappingPopulation.addAll(mappingPopDao.getAllParentsFromMappingPopulation(start, numOfRows));
             }
         }
-     
+     **/
         return allParentsFromMappingPopulation;
     }
 
@@ -3104,9 +3105,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public List<org.generationcp.middleware.pojos.gdms.Map> getMapDetailsByName(
             String nameLike, int start, int numOfRows) throws MiddlewareQueryException {
 
-        long centralCount = 0;
-        long localCount = 0;
-        long relativeLimit = 0;    	
+        Long centralCount = Long.valueOf(0);
+        Long localCount = Long.valueOf(0);
+        Long relativeLimit = Long.valueOf(0);    	
     	
         MapDAO mapDao = new MapDAO();
        
@@ -3130,7 +3131,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                         localCount = mapDao.countMapDetailsByName(nameLike);
                         
                         if (localCount > 0) {
-                            maps.addAll(mapDao.getMapDetailsByName(nameLike, 0, (int) relativeLimit));
+                            maps.addAll(mapDao.getMapDetailsByName(nameLike, 0, relativeLimit.intValue()));
                         }
                     }
                 }
@@ -3138,15 +3139,15 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                 relativeLimit = start - centralCount;
                 if (sessionForLocal != null) {
                     mapDao.setSession(sessionForLocal);
-                    localCount = mapDao.countAll();
+                    localCount = mapDao.countMapDetailsByName(nameLike);
                     if (localCount > relativeLimit) {
-                        maps.addAll(mapDao.getMapDetailsByName(nameLike, (int) relativeLimit, numOfRows));
+                        maps.addAll(mapDao.getMapDetailsByName(nameLike, relativeLimit.intValue(), numOfRows));
                     }
                 }
             }
         } else if (sessionForLocal != null) {
             mapDao.setSession(sessionForLocal);
-            localCount = mapDao.countAll();
+            localCount = mapDao.countMapDetailsByName(nameLike);
             if (localCount > start) {
                 maps.addAll(mapDao.getMapDetailsByName(nameLike, start, numOfRows));
             }

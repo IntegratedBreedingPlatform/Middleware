@@ -12,6 +12,7 @@
 package org.generationcp.middleware.pojos.gdms;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -52,34 +53,27 @@ public class Map implements Serializable{
     @Column(name = "mp_id")
     private Integer mpId;
     
-    private Long markerCount;
-    private Long maxStartPosition;
+    private int markerCount;
+    private Float maxStartPosition;
     private String linkageGroup;
     
     public Map() {}
 
-    public static final String GET_MAP_DETAILS_BY_NAME_LEFT = 
-        "SELECT COUNT(DISTINCT `gdms_mapping_data`.`marker_id`) AS `marker_count` " +
-    	"       ,MAX(`gdms_mapping_data`.`start_position`) AS `max` " +
-        "       , `gdms_mapping_data`.`linkage_group` AS Linkage_group " +
-    	"       ,`gdms_mapping_data`.`map_name` AS map " +
+    public static final String GET_MAP_DETAILS_BY_NAME = 
+        "SELECT COUNT(DISTINCT gdms_mapping_data.marker_id) AS marker_count " +
+    	"       , MAX(gdms_mapping_data.start_position) AS max " +
+        "       , gdms_mapping_data.linkage_group AS Linkage_group " +
+    	"       , gdms_mapping_data.map_name AS map " +
         "       , gdms_map.map_type AS map_type " +
-    	"FROM FROM `gdms_mapping_data`, `gdms_map` " +
-        "WHERE gdms_mapping_data.map_id=gdms_map.map_id AND lower(gdms_mapping_data.map_name) LIKE ('";
-    
-    
-    public static final String GET_MAP_DETAILS_BY_NAME_RIGHT = 
-    	"') " +
+    	"FROM gdms_mapping_data, gdms_map " +
+        "WHERE gdms_mapping_data.map_id=gdms_map.map_id AND lower(gdms_mapping_data.map_name) LIKE (:nameLike) " +
         "GROUP BY gdms_mapping_data.linkage_group, gdms_mapping_data.map_name " +
-        "ORDER BY gdms_mapping_data.map_name`, `gdms_mapping_data`.`linkage_group` ";
+        "ORDER BY gdms_mapping_data.map_name, gdms_mapping_data.linkage_group ";
        
-    public static final String COUNT_MAP_DETAILS_BY_NAME_LEFT = 
+    public static final String COUNT_MAP_DETAILS_BY_NAME = 
         "SELECT COUNT(DISTINCT gdms_mapping_data.linkage_group, gdms_mapping_data.map_name) " +
         "FROM `gdms_mapping_data` JOIN `gdms_map` ON gdms_mapping_data.map_id=gdms_map.map_id " +
-        "WHERE lower(gdms_mapping_data.map_name) LIKE ('";
-        
-    public static final String COUNT_MAP_DETAILS_BY_NAME_RIGHT = 
-        "') ";
+        "WHERE lower(gdms_mapping_data.map_name) LIKE (:nameLike) ";
     
     public Map(Integer mapId, String mapName, String mapType, Integer mpId) {
         super();
@@ -94,7 +88,7 @@ public class Map implements Serializable{
         this.mapId = mapId;
     }
     
-    public Map(Long markerCount, Long maxStartPosition, String linkageGroup, String mapName, String mapType) {
+    public Map(int markerCount, Float maxStartPosition, String linkageGroup, String mapName, String mapType) {
     	this.markerCount = markerCount;
     	this.maxStartPosition = maxStartPosition;
     	this.linkageGroup = linkageGroup;
@@ -141,19 +135,19 @@ public class Map implements Serializable{
         this.mpId = mpId;
     }
 
-    public Long getMarkerCount() {
+    public int getMarkerCount() {
     	return markerCount;
     }
     
-    public void setMarkerCount(Long markerCount) {
+    public void setMarkerCount(int markerCount) {
     	this.markerCount = markerCount; 
     }
     
-    public Long getMaxStartPosition() {
+    public Float getMaxStartPosition() {
     	return maxStartPosition;
     }
     
-    public void setMaxStartPosition(Long maxStartPosition) {
+    public void setMaxStartPosition(Float maxStartPosition) {
     	this.maxStartPosition = maxStartPosition; 
     }
     
