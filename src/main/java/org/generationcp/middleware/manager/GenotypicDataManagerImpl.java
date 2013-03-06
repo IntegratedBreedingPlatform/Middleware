@@ -1973,5 +1973,158 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return result;
 
     }
+    @Override
+    public List<ParentElement> getAllParentsFromMappingPopulation(
+            int start, int numOfRows) throws MiddlewareQueryException {
 
+        Long centralCount = Long.valueOf(0);
+        Long localCount = Long.valueOf(0);
+        int relativeLimit = 0;    	
+    	
+        MappingPopDAO mappingPopDao = new MappingPopDAO();
+       
+        List<ParentElement> allParentsFromMappingPopulation = new ArrayList<ParentElement>();
+   
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        if (sessionForCentral != null) {
+            mappingPopDao.setSession(sessionForCentral);
+            centralCount = mappingPopDao.countAllParentsFromMappingPopulation();
+            
+            if (centralCount > start) {
+                allParentsFromMappingPopulation.addAll(mappingPopDao.getAllParentsFromMappingPopulation(start, numOfRows));
+                relativeLimit = numOfRows - (centralCount.intValue() - start);
+
+                if (relativeLimit > 0) {
+                	
+                    if (sessionForLocal != null) {
+                        mappingPopDao.setSession(sessionForLocal);
+                        localCount = mappingPopDao.countAllParentsFromMappingPopulation();
+                        
+                        if (localCount > 0) {
+                            allParentsFromMappingPopulation.addAll(mappingPopDao.getAllParentsFromMappingPopulation(0, relativeLimit));
+                        }
+                    }
+                }
+            } else {
+                relativeLimit = start - centralCount.intValue();
+                if (sessionForLocal != null) {
+                    mappingPopDao.setSession(sessionForLocal);
+                    localCount = mappingPopDao.countAllParentsFromMappingPopulation();
+                    if (localCount > relativeLimit) {
+                        allParentsFromMappingPopulation.addAll(mappingPopDao.getAllParentsFromMappingPopulation(relativeLimit, numOfRows));
+                    }
+                }
+            }
+        } else if (sessionForLocal != null) {
+            mappingPopDao.setSession(sessionForLocal);
+            localCount = mappingPopDao.countAllParentsFromMappingPopulation();
+            if (localCount > start) {
+                allParentsFromMappingPopulation.addAll(mappingPopDao.getAllParentsFromMappingPopulation(start, numOfRows));
+            }
+        }
+   
+        return allParentsFromMappingPopulation;
+    }
+
+    @Override
+    public Long countAllParentsFromMappingPopulation() throws MiddlewareQueryException {
+    	
+        MappingPopDAO mappingPopDao = new MappingPopDAO();
+           
+        Database centralInstance = Database.CENTRAL;
+        Session centralSession = getSession(centralInstance);
+        mappingPopDao.setSession(centralSession);
+        Long centralCountParentsFromMappingPopulation = mappingPopDao.countAllParentsFromMappingPopulation();
+        
+        Database localInstance = Database.LOCAL;
+        Session localSession = getSession(localInstance);
+        mappingPopDao.setSession(localSession);
+        Long localCountParentsFromMappingPopulation = mappingPopDao.countAllParentsFromMappingPopulation();
+        
+        Long totalCountParentsFromMappingPopulation = localCountParentsFromMappingPopulation + centralCountParentsFromMappingPopulation;
+        
+        return totalCountParentsFromMappingPopulation;
+    }
+    
+
+    
+    @Override
+    public List<org.generationcp.middleware.pojos.gdms.Map> getMapDetailsByName(
+            String nameLike, int start, int numOfRows) throws MiddlewareQueryException {
+
+        Long centralCount = Long.valueOf(0);
+        Long localCount = Long.valueOf(0);
+        Long relativeLimit = Long.valueOf(0);    	
+    	
+        MapDAO mapDao = new MapDAO();
+       
+        List<org.generationcp.middleware.pojos.gdms.Map> maps = new ArrayList<org.generationcp.middleware.pojos.gdms.Map>();
+   
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        if (sessionForCentral != null) {
+            mapDao.setSession(sessionForCentral);
+            centralCount = mapDao.countMapDetailsByName(nameLike);
+            
+            if (centralCount > start) {
+                maps.addAll(mapDao.getMapDetailsByName(nameLike, start, numOfRows));
+                relativeLimit = numOfRows - (centralCount - start);
+
+                if (relativeLimit > 0) {
+                	
+                    if (sessionForLocal != null) {
+                        mapDao.setSession(sessionForLocal);
+                        localCount = mapDao.countMapDetailsByName(nameLike);
+                        
+                        if (localCount > 0) {
+                            maps.addAll(mapDao.getMapDetailsByName(nameLike, 0, relativeLimit.intValue()));
+                        }
+                    }
+                }
+            } else {
+                relativeLimit = start - centralCount;
+                if (sessionForLocal != null) {
+                    mapDao.setSession(sessionForLocal);
+                    localCount = mapDao.countMapDetailsByName(nameLike);
+                    if (localCount > relativeLimit) {
+                        maps.addAll(mapDao.getMapDetailsByName(nameLike, relativeLimit.intValue(), numOfRows));
+                    }
+                }
+            }
+        } else if (sessionForLocal != null) {
+            mapDao.setSession(sessionForLocal);
+            localCount = mapDao.countMapDetailsByName(nameLike);
+            if (localCount > start) {
+                maps.addAll(mapDao.getMapDetailsByName(nameLike, start, numOfRows));
+            }
+        }
+     
+        return maps;
+    }
+
+    @Override
+    public Long countMapDetailsByName(String nameLike) throws MiddlewareQueryException {
+    	
+        MapDAO mapDao = new MapDAO();
+           
+        Database centralInstance = Database.CENTRAL;
+        Session centralSession = getSession(centralInstance);
+        mapDao.setSession(centralSession);
+        Long centralCount = mapDao.countMapDetailsByName(nameLike);
+        
+        Database localInstance = Database.LOCAL;
+        Session localSession = getSession(localInstance);
+        mapDao.setSession(localSession);
+        Long localCount = mapDao.countMapDetailsByName(nameLike);
+        
+        Long totalCount = centralCount + localCount;
+        
+        return totalCount;
+    }
+
+    
+    
 }
