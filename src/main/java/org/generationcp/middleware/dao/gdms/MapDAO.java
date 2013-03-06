@@ -18,6 +18,7 @@ import java.util.List;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.Map;
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 
@@ -43,7 +44,7 @@ public class MapDAO extends GenericDAO<Map, Integer>{
         query.setString("nameLike", nameLike);
         query.setFirstResult(start);
         query.setMaxResults(numOfRows);
-
+        
         List<Map> maps = new ArrayList<Map>();
         
         try {
@@ -56,8 +57,8 @@ public class MapDAO extends GenericDAO<Map, Integer>{
                     int markerCount = ((BigInteger) result[0]).intValue();
                     Float maxStartPosition = (Float) result[1];
                     String linkageGroup = (String) result[2];
-                    String mapName = (String) result[3].toString();
-                    String mapType = (String) result[4].toString();
+                    String mapName = (String) result[3];
+                    String mapType = (String) result[4];
                     
                     Map map = new Map(markerCount, maxStartPosition, linkageGroup, mapName, mapType);
                     maps.add(map);

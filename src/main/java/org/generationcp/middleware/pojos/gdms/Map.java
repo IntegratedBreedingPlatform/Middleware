@@ -63,8 +63,8 @@ public class Map implements Serializable{
         "SELECT COUNT(DISTINCT gdms_mapping_data.marker_id) AS marker_count " +
     	"       , MAX(gdms_mapping_data.start_position) AS max " +
         "       , gdms_mapping_data.linkage_group AS Linkage_group " +
-    	"       , gdms_mapping_data.map_name AS map " +
-        "       , gdms_map.map_type AS map_type " +
+    	"       , concat(gdms_mapping_data.map_name,'') AS map " +
+        "       , concat(gdms_map.map_type,'') AS map_type " +
     	"FROM gdms_mapping_data, gdms_map " +
         "WHERE gdms_mapping_data.map_id=gdms_map.map_id AND lower(gdms_mapping_data.map_name) LIKE (:nameLike) " +
         "GROUP BY gdms_mapping_data.linkage_group, gdms_mapping_data.map_name " +
