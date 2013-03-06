@@ -822,48 +822,6 @@ public class TestGermplasmDataManagerImpl{
         System.out.println(manager.getCrossExpansion(Integer.valueOf(75), 2));
     }
     
-    @Test
-    public void getAllParentsFromMappingPopulation() throws Exception {
-    	int start = 0;
-    	int end = 10;
-        List<ParentElement> parentElements = manager.getAllParentsFromMappingPopulation(start, end);
-        System.out.println("getAllParentsFromMappingPopulation(" + start + "," + end + ")");
-        for (ParentElement parentElement : parentElements) {
-            System.out.println("Parent A GId: " + parentElement.getParentAGId() + "  |  Parent B GId: "+parentElement.getParentBGId());
-        }
-        
-    }    
-
-    @Test
-    public void countAllParentsFromMappingPopulation() throws Exception {
-        long parentElementsCount = manager.countAllParentsFromMappingPopulation();
-        System.out.println("countAllParentsFromMappingPopulation()");
-        System.out.println("Count: " + parentElementsCount);
-    }
-    
-    @Test
-    public void getMapDetailsByName() throws Exception {
-    	String nameLike = "tag%";
-    	int start = 0;
-    	int end = 10;
-        List<Map> maps = manager.getMapDetailsByName(nameLike, start, end);
-        System.out.println("getMapDetailsByName('"+nameLike+"'," + start + "," + end + ")");
-        for (Map map : maps) {
-            System.out.println("MarkerCount: " + map.getMarkerCount() + "  |  maxStartPosition: " + map.getMaxStartPosition() + "  |  linkageGroup: " + map.getLinkageGroup() + "  |  mapName: " + map.getMapName() + "  |  mapType:  " + map.getMapType());
-        }
-        
-    }    
-
-    @Test
-    public void countMapDetailsByName() throws Exception {
-    	String nameLike = "tag%";
-        Long parentElementsCount = manager.countMapDetailsByName(nameLike);
-        System.out.println("countMapDetailsByName('"+nameLike+"')");
-        System.out.println("Count: " + parentElementsCount);
-    }
-    
-    
-    
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();
