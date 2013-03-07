@@ -28,6 +28,7 @@ import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.generationcp.middleware.pojos.gdms.MappingValueElement;
 import org.generationcp.middleware.pojos.gdms.Marker;
+import org.generationcp.middleware.pojos.gdms.MarkerAlias;
 import org.generationcp.middleware.pojos.gdms.MarkerDetails;
 import org.generationcp.middleware.pojos.gdms.MarkerIdMarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerInfo;
@@ -1135,4 +1136,12 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException
      */
     public Integer addGDMSMarker(Marker marker) throws MiddlewareQueryException;
+    
+    /**
+     * Adds a GDMS marker alias given a gdms_alias
+     * @param markerAlias
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    public Integer addGDMSMarkerAlias(MarkerAlias markerAlias) throws MiddlewareQueryException;
 }

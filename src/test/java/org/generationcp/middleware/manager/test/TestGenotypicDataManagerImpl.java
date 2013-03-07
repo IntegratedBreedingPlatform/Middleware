@@ -32,6 +32,7 @@ import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.generationcp.middleware.pojos.gdms.MappingValueElement;
 import org.generationcp.middleware.pojos.gdms.Marker;
+import org.generationcp.middleware.pojos.gdms.MarkerAlias;
 import org.generationcp.middleware.pojos.gdms.MarkerDetails;
 import org.generationcp.middleware.pojos.gdms.MarkerIdMarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerInfo;
@@ -841,56 +842,67 @@ public class TestGenotypicDataManagerImpl{
 //        System.out.println("testAddMarkerMetadataSet() Added: " + (idAdded != null ? markerMetadataSet : null));
 //    }
 //
-    @Test
-    public void testAddDataset() throws Exception {
-        Integer datasetId = null;       // Crop tested: Groundnut
-        String datasetName = " QTL_ ICGS 44 X ICGS 78";
-        String datasetDesc = "ICGS 44 X ICGS 78";
-        String datasetType = "QTL";
-        String genus = "Groundnut"; 
-        String species = ""; 
-        Date uploadTemplateDate = new Date(System.currentTimeMillis()); 
-        String remarks = ""; 
-        String dataType = "int"; 
-        String missingData = null;
-        String method = null;
-        String score = null;
-        
-        Dataset dataset = new Dataset(datasetId, datasetName, datasetDesc, datasetType, genus, species, uploadTemplateDate, remarks,
-                dataType, missingData, method, score);
-        
-        Integer idAdded = manager.addDataset(dataset);
-        System.out.println("testAddDataset() Added: " + (idAdded != null ? dataset : null));
-    }
+//    @Test
+//    public void testAddDataset() throws Exception {
+//        Integer datasetId = null;       // Crop tested: Groundnut
+//        String datasetName = " QTL_ ICGS 44 X ICGS 78";
+//        String datasetDesc = "ICGS 44 X ICGS 78";
+//        String datasetType = "QTL";
+//        String genus = "Groundnut"; 
+//        String species = ""; 
+//        Date uploadTemplateDate = new Date(System.currentTimeMillis()); 
+//        String remarks = ""; 
+//        String dataType = "int"; 
+//        String missingData = null;
+//        String method = null;
+//        String score = null;
+//        
+//        Dataset dataset = new Dataset(datasetId, datasetName, datasetDesc, datasetType, genus, species, uploadTemplateDate, remarks,
+//                dataType, missingData, method, score);
+//        
+//        Integer idAdded = manager.addDataset(dataset);
+//        System.out.println("testAddDataset() Added: " + (idAdded != null ? dataset : null));
+//    }
+//
+//
+//    @Test
+//    public void testAddGDMSMarker() throws Exception {
+//    	
+//    	Integer markerId = 0;
+//        String markerType = "SSR";
+//        String markerName = "SeqTEST";
+//        String species = "Groundnut";
+//        String dbAccessionId = null;
+//        String reference = null;
+//        String genotype = null;
+//        String ploidy = null; 
+//        String primerId = null;
+//        String remarks = null;
+//        String assayType = null;
+//        String motif = null;
+//        String forwardPrimer = null;
+//        String reversePrimer = null;
+//        String productSize = null;
+//        Float annealingTemp = Float.valueOf(0);
+//        String amplification = null;
+//        
+//        Marker marker = new Marker(markerId, markerType, markerName, species, dbAccessionId, reference, genotype, ploidy, primerId, remarks, assayType, motif, forwardPrimer, reversePrimer, productSize, annealingTemp, amplification);
+//        
+//        Integer idAdded = manager.addGDMSMarker(marker);
+//        System.out.println("testAddGDMSMarker() Added: " + (idAdded != null ? marker : null));
+//    }
 
-
-    @Test
-    public void testAddGDMSMarker() throws Exception {
-    	
-    	Integer markerId = 0;
-        String markerType = "SSR";
-        String markerName = "SeqTEST";
-        String species = "Groundnut";
-        String dbAccessionId = null;
-        String reference = null;
-        String genotype = null;
-        String ploidy = null; 
-        String primerId = null;
-        String remarks = null;
-        String assayType = null;
-        String motif = null;
-        String forwardPrimer = null;
-        String reversePrimer = null;
-        String productSize = null;
-        Float annealingTemp = Float.valueOf(0);
-        String amplification = null;
-        
-        Marker marker = new Marker(markerId, markerType, markerName, species, dbAccessionId, reference, genotype, ploidy, primerId, remarks, assayType, motif, forwardPrimer, reversePrimer, productSize, annealingTemp, amplification);
-        
-        Integer idAdded = manager.addGDMSMarker(marker);
-        System.out.println("testAddGDMSMarker() Added: " + (idAdded != null ? marker : null));
-    }
-
+  @Test
+  public void testAddGDMSMarkerAlias() throws Exception {
+  	
+      Integer markerId = 0;
+      String alias = "testalias";
+      
+      MarkerAlias markerAlias = new MarkerAlias(markerId, alias);
+      
+      Integer idAdded = manager.addGDMSMarkerAlias(markerAlias);
+      System.out.println("testAddGDMSMarkerAlias() Added: " + (idAdded != null ? markerAlias : null));
+  }
     
     
     @AfterClass

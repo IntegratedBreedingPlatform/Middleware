@@ -28,6 +28,7 @@ import org.generationcp.middleware.dao.gdms.MapDAO;
 import org.generationcp.middleware.dao.gdms.MappingDataDAO;
 import org.generationcp.middleware.dao.gdms.MappingPopDAO;
 import org.generationcp.middleware.dao.gdms.MappingPopValuesDAO;
+import org.generationcp.middleware.dao.gdms.MarkerAliasDAO;
 import org.generationcp.middleware.dao.gdms.MarkerDAO;
 import org.generationcp.middleware.dao.gdms.MarkerDetailsDAO;
 import org.generationcp.middleware.dao.gdms.MarkerInfoDAO;
@@ -51,6 +52,7 @@ import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.generationcp.middleware.pojos.gdms.MappingValueElement;
 import org.generationcp.middleware.pojos.gdms.Marker;
+import org.generationcp.middleware.pojos.gdms.MarkerAlias;
 import org.generationcp.middleware.pojos.gdms.MarkerDetails;
 import org.generationcp.middleware.pojos.gdms.MarkerIdMarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerInfo;
@@ -2555,5 +2557,39 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return idGDMSMarkerSaved;
     }
     
-    
+    @Override
+    public Integer addGDMSMarkerAlias(MarkerAlias markerAlias) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        Integer idGDMSMarkerAliasSaved;
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
+
+            MarkerAliasDAO dao = new MarkerAliasDAO();
+            dao.setSession(session);
+
+            //Integer markerAliasId = dao.getNegativeId("marker_id");
+            //markerAlias.setMarkerId(markerAliasId);
+
+            MarkerAlias recordSaved = dao.saveOrUpdate(markerAlias);
+            idGDMSMarkerAliasSaved = recordSaved.getMarkerId();
+
+            trans.commit();
+        } catch (Exception e) {
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new MiddlewareQueryException("Error encountered while saving Marker: addGDMSMarkerAlias(): "
+                    + e.getMessage(), e);
+        } finally {
+            session.flush();
+        }
+        
+        return idGDMSMarkerAliasSaved;
+    }    
 }
