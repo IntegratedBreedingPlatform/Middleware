@@ -28,8 +28,10 @@ import org.generationcp.middleware.dao.gdms.MappingDataDAO;
 import org.generationcp.middleware.dao.gdms.MappingPopDAO;
 import org.generationcp.middleware.dao.gdms.MappingPopValuesDAO;
 import org.generationcp.middleware.dao.gdms.MarkerDAO;
+import org.generationcp.middleware.dao.gdms.MarkerDetailsDAO;
 import org.generationcp.middleware.dao.gdms.MarkerInfoDAO;
 import org.generationcp.middleware.dao.gdms.MarkerMetadataSetDAO;
+import org.generationcp.middleware.dao.gdms.MarkerUserInfoDAO;
 import org.generationcp.middleware.dao.gdms.QtlDAO;
 import org.generationcp.middleware.dao.gdms.QtlDetailsDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -45,9 +47,11 @@ import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.generationcp.middleware.pojos.gdms.MappingValueElement;
 import org.generationcp.middleware.pojos.gdms.Marker;
+import org.generationcp.middleware.pojos.gdms.MarkerDetails;
 import org.generationcp.middleware.pojos.gdms.MarkerIdMarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerInfo;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
+import org.generationcp.middleware.pojos.gdms.MarkerUserInfo;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.generationcp.middleware.pojos.gdms.Qtl;
 import org.generationcp.middleware.pojos.gdms.QtlDetailElement;
@@ -2329,6 +2333,76 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         }
         return savedId;
 
+    }
+
+    @Override
+    public Integer addMarkerDetails(MarkerDetails markerDetails) throws MiddlewareQueryException {
+
+        requireLocalDatabaseInstance();
+        
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        Integer savedId;
+        
+        try {
+            trans = session.beginTransaction();
+            MarkerDetailsDAO dao = new MarkerDetailsDAO();
+            dao.setSession(session);
+
+            // No need to auto-assign negative id. It should come from an existing entry in Marker.
+            
+            MarkerDetails recordSaved = dao.save(markerDetails);
+            savedId = recordSaved.getMarkerId();
+            
+            trans.commit();
+
+        } catch (Exception e) {
+            // Rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new MiddlewareQueryException("Error encountered while saving Marker Details: GenotypicDataManager.addMarkerDetails(markerDetails="
+                    + markerDetails + "): " + e.getMessage(), e);
+        } finally {
+            session.flush();
+        }
+        return savedId;    
+    }
+
+    @Override
+    public Integer addMarkerUserInfo(MarkerUserInfo markerUserInfo) throws MiddlewareQueryException {
+
+        requireLocalDatabaseInstance();
+        
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        Integer savedId;
+        
+        try {
+            trans = session.beginTransaction();
+            MarkerUserInfoDAO dao = new MarkerUserInfoDAO();
+            dao.setSession(session);
+
+            // No need to auto-assign negative id. It should come from an existing entry in Marker.
+            
+            MarkerUserInfo recordSaved = dao.save(markerUserInfo);
+            savedId = recordSaved.getMarkerId();
+            
+            trans.commit();
+
+        } catch (Exception e) {
+            // Rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new MiddlewareQueryException("Error encountered while saving Marker Details: GenotypicDataManager.addMarkerUserInfo(markerUserInfo="
+                    + markerUserInfo + "): " + e.getMessage(), e);
+        } finally {
+            session.flush();
+        }
+        return savedId;    
     }
 
 }

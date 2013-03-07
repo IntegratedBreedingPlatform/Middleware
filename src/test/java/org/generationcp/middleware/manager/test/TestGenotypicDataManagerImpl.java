@@ -29,9 +29,11 @@ import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.generationcp.middleware.pojos.gdms.MappingValueElement;
 import org.generationcp.middleware.pojos.gdms.Marker;
+import org.generationcp.middleware.pojos.gdms.MarkerDetails;
 import org.generationcp.middleware.pojos.gdms.MarkerIdMarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerInfo;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
+import org.generationcp.middleware.pojos.gdms.MarkerUserInfo;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.generationcp.middleware.pojos.gdms.Qtl;
 import org.generationcp.middleware.pojos.gdms.QtlDetailElement;
@@ -738,7 +740,7 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testAddQtlDetails() throws Exception {
-        Integer qtlId = 4;          // Crop tested: Ground nut
+        Integer qtlId = 4;          // Crop tested: Groundnut
         Integer mapId = 1; 
         Float minPosition = 0f; 
         Float maxPosition = 8f; 
@@ -765,6 +767,50 @@ public class TestGenotypicDataManagerImpl{
         
         QtlDetailsPK idAdded = manager.addQtlDetails(qtlDetails);
         System.out.println("testAddQtlDetails() Added: " + (idAdded != null ? qtlDetails : null));
+    }
+
+
+    @Test
+    public void testAddMarkerDetails() throws Exception {
+        Integer markerId = 1;           // Replace with desired values
+        Integer noOfRepeats = 0; 
+        String motifType = ""; 
+        String sequence = ""; 
+        Integer sequenceLength = 0;
+        Integer minAllele = 0; 
+        Integer maxAllele = 0; 
+        Integer ssrNr = 0; 
+        Float forwardPrimerTemp = 0f; 
+        Float reversePrimerTemp = 0f; 
+        Float elongationTemp = 0f;
+        Integer fragmentSizeExpected = 0; 
+        Integer fragmentSizeObserved = 0; 
+        Integer expectedProductSize = 0; 
+        Integer positionOnReferenceSequence = 0;
+        String restrictionEnzymeForAssay = null;
+        
+        MarkerDetails markerDetails = new MarkerDetails(markerId, noOfRepeats, motifType, sequence, sequenceLength,
+                minAllele, maxAllele, ssrNr, forwardPrimerTemp, reversePrimerTemp, elongationTemp,
+                fragmentSizeExpected, fragmentSizeObserved, expectedProductSize, positionOnReferenceSequence,
+                restrictionEnzymeForAssay);
+        
+        Integer idAdded = manager.addMarkerDetails(markerDetails);
+        System.out.println("testAddMarkerDetails() Added: " + (idAdded != null ? markerDetails : null));
+    }
+
+
+    @Test
+    public void testAddMarkerUserInfo() throws Exception {
+        Integer markerId = 1;           // Replace with desired values
+        String principalInvestigator = "Juan Dela Cruz";
+        String contact = "juan@irri.com.ph";
+        String institute = "IRRI";
+        
+        MarkerUserInfo markerUserInfo = new MarkerUserInfo(markerId, principalInvestigator, contact, institute);
+        
+        Integer idAdded = manager.addMarkerUserInfo(markerUserInfo);
+        System.out.println("testAddMarkerUserInfo() Added: " + (idAdded != null ? markerUserInfo : null));
+
     }
 
     @AfterClass

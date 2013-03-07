@@ -26,9 +26,11 @@ import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.generationcp.middleware.pojos.gdms.MappingValueElement;
 import org.generationcp.middleware.pojos.gdms.Marker;
+import org.generationcp.middleware.pojos.gdms.MarkerDetails;
 import org.generationcp.middleware.pojos.gdms.MarkerIdMarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerInfo;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
+import org.generationcp.middleware.pojos.gdms.MarkerUserInfo;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.generationcp.middleware.pojos.gdms.Qtl;
 import org.generationcp.middleware.pojos.gdms.QtlDetailElement;
@@ -1060,7 +1062,6 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException
      */
     public long countMarkersByQtl(String qtlName, String chromosome, int min, int max) throws MiddlewareQueryException;
-
     
     /**
      * Adds a QtlDetails entry to the database
@@ -1072,4 +1073,24 @@ public interface GenotypicDataManager{
      */
     public QtlDetailsPK addQtlDetails(QtlDetails qtlDetails) throws MiddlewareQueryException;
     
+
+    /**
+     * Adds a MarkerDetails entry to the database
+     * 
+     * @param markerDetails - the object to add
+     * 
+     * @return the id of the item added
+     * @throws MiddlewareQueryException
+     */
+    public Integer addMarkerDetails(MarkerDetails markerDetails) throws MiddlewareQueryException;
+    
+    /**
+     * Adds a MarkerUserInfo entry to the database
+     * 
+     * @param markerUserInfo - the object to add
+     * 
+     * @return the id of the item added
+     * @throws MiddlewareQueryException
+     */
+    public Integer addMarkerUserInfo(MarkerUserInfo markerUserInfo) throws MiddlewareQueryException;
 }
