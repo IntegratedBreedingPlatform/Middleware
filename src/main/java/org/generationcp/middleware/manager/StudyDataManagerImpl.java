@@ -822,6 +822,33 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             throw new MiddlewareQueryException("Error in getting character levels by factor and dataset id: " + ex.getMessage(), ex);
         }
     }
+    
+    @Override
+    public boolean hasValuesByVariateAndDataset(int variateId, int datasetId) 
+        throws MiddlewareQueryException {
+        
+        boolean hasValues = false;
+        
+        RepresentationDAO representationDao = new RepresentationDAO();
+        Session session = getSession(datasetId);
+        
+        if (session != null) {
+            representationDao.setSession(session);
+        } else {
+            return false;
+        }
+        
+        if (isVariateNumeric(variateId)) {
+            hasValues = representationDao.hasValuesByNumVariateAndDataset(variateId, datasetId);
+        } else if (!isVariateNumeric(variateId)) {
+            hasValues = representationDao.hasValuesByNumVariateAndDataset(variateId, datasetId);
+        } else {
+            throw new MiddlewareQueryException("Database Error: the variate selected has no datatype specified in the database.");
+        }
+
+        return hasValues;
+        
+    }
 
     @Override
     public boolean hasValuesByNumVariateAndDataset(int variateId,
@@ -853,6 +880,38 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         }
 
         return representationDao.hasValuesByCharVariateAndDataset(variateId, datasetId);
+    }
+    
+    @Override
+    public boolean hasValuesByLabelAndLabelValueAndVariateAndDataset(
+        int labelId, String value, int variateId, int datasetId) 
+        throws MiddlewareQueryException {
+        
+        boolean hasValues = false;
+        
+        RepresentationDAO representationDao = new RepresentationDAO();
+        Session session = getSession(datasetId);
+        
+        if (session != null) {
+            representationDao.setSession(session);
+        } else {
+            return false;
+        }
+        
+        if (isVariateNumeric(variateId) && isLabelNumeric(labelId)) {
+            hasValues = representationDao.hasValuesByNumLabelAndLabelValueAndNumVariateAndDataset(labelId, Double.parseDouble(value), variateId, datasetId);
+        } else if (isVariateNumeric(variateId) && !isLabelNumeric(labelId)) {
+            hasValues = representationDao.hasValuesByCharLabelAndLabelValueAndNumVariateAndDataset(labelId, value, variateId, datasetId);
+        } else if (!isVariateNumeric(variateId) && isLabelNumeric(labelId)) {
+            hasValues = representationDao.hasValuesByNumLabelAndLabelValueAndCharVariateAndDataset(labelId, Double.parseDouble(value), variateId, datasetId);
+        } else if (!isVariateNumeric(variateId) && !isLabelNumeric(labelId)) {
+            hasValues = representationDao.hasValuesByCharLabelAndLabelValueAndCharVariateAndDataset(labelId, value, variateId, datasetId);
+        } else {
+            throw new MiddlewareQueryException("Database Error: either the variate or label selected have no datatypes specified in the database.");
+        }
+
+        return hasValues;
+        
     }
 
     @Override

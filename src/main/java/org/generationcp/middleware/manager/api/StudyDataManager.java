@@ -573,6 +573,18 @@ public interface StudyDataManager{
     public List<NumericLevel> getNumericLevelsByFactorAndDatasetId(Factor factor, Integer datasetId) throws MiddlewareQueryException;
     
     /**
+     * Returns a boolean value given a variate id and a dataset id
+     * 
+     * @param variateId
+     *            - selected variate
+     * @param datasetId
+     *            - selected dataset
+     * @return boolean
+     * @throws MiddlewareQueryException
+     */
+    public boolean hasValuesByVariateAndDataset(int variateId, int datasetId) throws MiddlewareQueryException;
+    
+    /**
      * Returns a boolean value given a numeric variate id and a dataset id
      * 
      * @param variateId
@@ -595,6 +607,22 @@ public interface StudyDataManager{
      * @throws MiddlewareQueryException
      */
     public boolean hasValuesByCharVariateAndDataset(int variateId, int datasetId) throws MiddlewareQueryException;
+    
+    /**
+     * Returns a boolean value given a label id, label value, variate id and a dataset id
+     * 
+     * @param labelId
+     *            - selected label
+     * @param value
+     *            - selected label value
+     * @param variateId
+     *            - selected variate
+     * @param datasetId
+     *            - selected dataset                 
+     * @return boolean
+     * @throws MiddlewareQueryException
+     */
+    public boolean hasValuesByLabelAndLabelValueAndVariateAndDataset(int labelId, String value, int variateId, int datasetId) throws MiddlewareQueryException;
     
     /**
      * Returns a boolean value given a character label id, label value, variate id and a dataset id
@@ -679,6 +707,5 @@ public interface StudyDataManager{
      * @throws MiddlewareQueryException
      */
     public boolean isVariateNumeric(int variateId) throws MiddlewareQueryException;
-    
     
 }

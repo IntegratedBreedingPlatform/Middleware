@@ -55,7 +55,14 @@ public class VariateDAO extends GenericDAO<Variate, Integer>{
         try {
             Query query = getSession().createSQLQuery(Variate.GET_VARIATE_ID_DATATYPE);
             query.setParameter("variatid", variateId);
-            String result = (String) query.list().get(0);
+            
+            String result = "";
+            
+            if (!query.list().isEmpty()) 
+                result = (String) query.list().get(0);
+            else 
+                throw new HibernateException("Database Error: No Datatype assigned on the variate id: " + variateId);
+            
             
             if (result.equals(NUMERIC_DATATYPE)) 
                 return true;

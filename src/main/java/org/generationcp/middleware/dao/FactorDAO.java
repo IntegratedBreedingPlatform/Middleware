@@ -134,7 +134,13 @@ public class FactorDAO extends GenericDAO<Factor, Integer>{
         try {
             Query query = getSession().createSQLQuery(Factor.GET_LABEL_ID_DATATYPE);
             query.setParameter("labelid", labelId);
-            String result = (String) query.list().get(0);
+            
+            String result = "";
+            
+            if (!query.list().isEmpty()) 
+                result = (String) query.list().get(0);
+            else 
+                throw new HibernateException("Database Error: No Datatype assigned on the label id: " + labelId);
             
             if (result.equals(NUMERIC_DATATYPE)) 
                 return true;
