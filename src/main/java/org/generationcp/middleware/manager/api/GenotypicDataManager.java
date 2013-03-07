@@ -21,6 +21,7 @@ import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSetPK;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
+import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
 import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.Map;
@@ -30,6 +31,8 @@ import org.generationcp.middleware.pojos.gdms.Marker;
 import org.generationcp.middleware.pojos.gdms.MarkerDetails;
 import org.generationcp.middleware.pojos.gdms.MarkerIdMarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerInfo;
+import org.generationcp.middleware.pojos.gdms.MarkerMetadataSet;
+import org.generationcp.middleware.pojos.gdms.MarkerMetadataSetPK;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerUserInfo;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
@@ -1098,11 +1101,31 @@ public interface GenotypicDataManager{
     /**
      * Adds a AccMetadataSet entry to the database
      * 
-     * @param markerUserInfo - the object to add
+     * @param accMetadataSet - the object to add
      * 
      * @return the id of the item added
      * @throws MiddlewareQueryException
      */
     public AccMetadataSetPK addAccMetadataSet(AccMetadataSet accMetadataSet) throws MiddlewareQueryException;
+
+    /**
+     * Adds a MarkerMetadataSet entry to the database
+     * 
+     * @param markerMetadataSet - the object to add
+     * 
+     * @return the id of the item added
+     * @throws MiddlewareQueryException
+     */
+    public MarkerMetadataSetPK addMarkerMetadataSet(MarkerMetadataSet markerMetadataSet) throws MiddlewareQueryException;
+
+    /**
+     * Adds a Dataset entry to the database
+     * 
+     * @param dataset - the object to add
+     * 
+     * @return the id of the item added
+     * @throws MiddlewareQueryException
+     */
+    public Integer addDataset(Dataset dataset) throws MiddlewareQueryException;
 
 }

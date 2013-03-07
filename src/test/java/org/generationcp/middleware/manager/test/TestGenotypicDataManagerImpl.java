@@ -13,6 +13,7 @@
 package org.generationcp.middleware.manager.test;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.generationcp.middleware.manager.Database;
@@ -24,6 +25,7 @@ import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSetPK;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
+import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
 import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.Map;
@@ -33,6 +35,8 @@ import org.generationcp.middleware.pojos.gdms.Marker;
 import org.generationcp.middleware.pojos.gdms.MarkerDetails;
 import org.generationcp.middleware.pojos.gdms.MarkerIdMarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerInfo;
+import org.generationcp.middleware.pojos.gdms.MarkerMetadataSet;
+import org.generationcp.middleware.pojos.gdms.MarkerMetadataSetPK;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerUserInfo;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
@@ -814,7 +818,7 @@ public class TestGenotypicDataManagerImpl{
     }
     
     @Test
-    public void testAccMetadataSet() throws Exception {
+    public void testAddAccMetadataSet() throws Exception {
         Integer datasetId = 4;  // Crop tested: Groundnut
         Integer germplasmId = 1; 
         Integer nameId = 1;
@@ -823,6 +827,39 @@ public class TestGenotypicDataManagerImpl{
         
         AccMetadataSetPK idAdded = manager.addAccMetadataSet(accMetadataSet);
         System.out.println("testAccMetadataSet() Added: " + (idAdded != null ? accMetadataSet : null));
+    }
+
+    @Test
+    public void testAddMarkerMetadataSet() throws Exception {
+        Integer datasetId = 4;  // Crop tested: Groundnut
+        Integer markerId = 1; 
+        
+        MarkerMetadataSet markerMetadataSet = new MarkerMetadataSet(datasetId, markerId);
+        
+        MarkerMetadataSetPK idAdded = manager.addMarkerMetadataSet(markerMetadataSet);
+        System.out.println("testAddMarkerMetadataSet() Added: " + (idAdded != null ? markerMetadataSet : null));
+    }
+
+    @Test
+    public void testAddDataset() throws Exception {
+        Integer datasetId = null;       // Crop tested: Groundnut
+        String datasetName = " QTL_ ICGS 44 X ICGS 78";
+        String datasetDesc = "ICGS 44 X ICGS 78";
+        String datasetType = "QTL";
+        String genus = "Groundnut"; 
+        String species = ""; 
+        Date uploadTemplateDate = new Date(System.currentTimeMillis()); 
+        String remarks = ""; 
+        String dataType = "int"; 
+        String missingData = null;
+        String method = null;
+        String score = null;
+        
+        Dataset dataset = new Dataset(datasetId, datasetName, datasetDesc, datasetType, genus, species, uploadTemplateDate, remarks,
+                dataType, missingData, method, score);
+        
+        Integer idAdded = manager.addDataset(dataset);
+        System.out.println("testAddDataset() Added: " + (idAdded != null ? dataset : null));
     }
 
 

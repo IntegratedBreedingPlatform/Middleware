@@ -42,6 +42,7 @@ import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSetPK;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
+import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
 import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.Map;
@@ -51,6 +52,8 @@ import org.generationcp.middleware.pojos.gdms.Marker;
 import org.generationcp.middleware.pojos.gdms.MarkerDetails;
 import org.generationcp.middleware.pojos.gdms.MarkerIdMarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerInfo;
+import org.generationcp.middleware.pojos.gdms.MarkerMetadataSet;
+import org.generationcp.middleware.pojos.gdms.MarkerMetadataSetPK;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerUserInfo;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
@@ -2441,4 +2444,78 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         }
         return savedId;
     }
+    
+    @Override
+    public MarkerMetadataSetPK addMarkerMetadataSet(MarkerMetadataSet markerMetadataSet) throws MiddlewareQueryException{
+
+        requireLocalDatabaseInstance();
+        
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        MarkerMetadataSetPK savedId = new MarkerMetadataSetPK();
+        
+        try {
+            trans = session.beginTransaction();
+            MarkerMetadataSetDAO dao = new MarkerMetadataSetDAO();
+            dao.setSession(session);
+
+            // No need to auto-assign negative IDs for new local DB records
+            // datasetId and markerId are foreign keys
+            
+            MarkerMetadataSet recordSaved = dao.save(markerMetadataSet);
+            savedId = recordSaved.getId();
+            
+            trans.commit();
+
+        } catch (Exception e) {
+            // Rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new MiddlewareQueryException("Error encountered with addMarkerMetadataSet(markerMetadataSet="
+                    + markerMetadataSet + "): " + e.getMessage(), e);
+        } finally {
+            session.flush();
+        }
+        return savedId;
+    }
+
+    @Override
+    public Integer addDataset(Dataset dataset) throws MiddlewareQueryException{
+
+        requireLocalDatabaseInstance();
+        
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        Integer savedId;
+        
+        try {
+            trans = session.beginTransaction();
+            DatasetDAO dao = new DatasetDAO();
+            dao.setSession(session);
+
+            Integer generatedId = dao.getNegativeId("datasetId");
+            dataset.setDatasetId(generatedId);
+            
+            Dataset recordSaved = dao.save(dataset);
+            savedId = recordSaved.getDatasetId();
+            
+            trans.commit();
+
+        } catch (Exception e) {
+            // Rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new MiddlewareQueryException("Error encountered with addDataset(dataset="
+                    + dataset + "): " + e.getMessage(), e);
+        } finally {
+            session.flush();
+        }
+        return savedId;   
+    }
+    
+    
 }

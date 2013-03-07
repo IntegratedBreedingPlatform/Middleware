@@ -30,6 +30,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @Table(name = "gdms_marker_metadataset")
 public class MarkerMetadataSet implements Serializable{
 
+    
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
@@ -60,21 +61,27 @@ public class MarkerMetadataSet implements Serializable{
     @EmbeddedId
     protected MarkerMetadataSetPK id;
 
-    /**
-     * Instantiates a new MarkerMetadataSet
-     */
     public MarkerMetadataSet() {
     }
 
-    /**
-     * Instantiates a new MarkerMetadataSet
-     *
-     * @param id the id
-     */
     public MarkerMetadataSet(MarkerMetadataSetPK id) {
         this.id = id;
     }
         
+    public MarkerMetadataSet(Integer datasetId, Integer markerId) {
+        this.id = new MarkerMetadataSetPK(datasetId, markerId);
+    }
+
+    
+    public MarkerMetadataSetPK getId() {
+        return id;
+    }
+
+    
+    public void setId(MarkerMetadataSetPK id) {
+        this.id = id;
+    }
+
     /**
      * Gets the dataset id.
      *
