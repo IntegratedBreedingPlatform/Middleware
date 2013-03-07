@@ -1128,4 +1128,11 @@ public interface GenotypicDataManager{
      */
     public Integer addDataset(Dataset dataset) throws MiddlewareQueryException;
 
+    /**
+     * Adds a GDMS marker given a marker
+     * @param marker
+     * @return markerId
+     * @throws MiddlewareQueryException
+     */
+    public Integer addGDMSMarker(Marker marker) throws MiddlewareQueryException;
 }

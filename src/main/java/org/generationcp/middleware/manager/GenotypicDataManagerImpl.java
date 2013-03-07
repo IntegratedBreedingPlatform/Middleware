@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.generationcp.middleware.dao.NameDAO;
+import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.gdms.AccMetadataSetDAO;
 import org.generationcp.middleware.dao.gdms.AlleleValuesDAO;
 import org.generationcp.middleware.dao.gdms.CharValuesDAO;
@@ -38,6 +39,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSetPK;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
@@ -2515,6 +2517,42 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             session.flush();
         }
         return savedId;   
+    }
+   
+    @Override
+    public Integer addGDMSMarker(Marker marker) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        Integer idGDMSMarkerSaved;
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
+
+            MarkerDAO dao = new MarkerDAO();
+            dao.setSession(session);
+
+            Integer markerId = dao.getNegativeId("markerId");
+            marker.setMarkerId(markerId);
+
+            Marker recordSaved = dao.saveOrUpdate(marker);
+            idGDMSMarkerSaved = recordSaved.getMarkerId();
+
+            trans.commit();
+        } catch (Exception e) {
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new MiddlewareQueryException("Error encountered while saving Marker: addGDMSMarker(): "
+                    + e.getMessage(), e);
+        } finally {
+            session.flush();
+        }
+        
+        return idGDMSMarkerSaved;
     }
     
     
