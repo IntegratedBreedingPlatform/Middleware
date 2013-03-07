@@ -24,7 +24,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
- * POJO for dataset table
+ * POJO for gdms_qtl table
  * 
  * @author Joyce Avestro
  * 

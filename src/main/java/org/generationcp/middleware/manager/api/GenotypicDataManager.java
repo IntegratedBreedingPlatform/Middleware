@@ -25,12 +25,15 @@ import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.generationcp.middleware.pojos.gdms.MappingValueElement;
+import org.generationcp.middleware.pojos.gdms.Marker;
 import org.generationcp.middleware.pojos.gdms.MarkerIdMarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerInfo;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.generationcp.middleware.pojos.gdms.Qtl;
 import org.generationcp.middleware.pojos.gdms.QtlDetailElement;
+import org.generationcp.middleware.pojos.gdms.QtlDetails;
+import org.generationcp.middleware.pojos.gdms.QtlDetailsPK;
 
 /**
  * This is the API for retrieving and storing genotypic data.
@@ -1015,5 +1018,58 @@ public interface GenotypicDataManager{
      */
     public Long countMapDetailsByName(String nameLike) throws MiddlewareQueryException;
     
+    
+    /**
+     * Returns the markers matching the given QTL name, chromosome, min start position and max start position values 
+     * 
+     * @param qtlName
+     *          - the name of the QTL to match       
+     * @param chromosome
+     *          - the value to match the linkage group of markers_onmap
+     * @param min
+     *          - the minimum start position 
+     * @param max
+     *          - the maximum start position 
+     * @param start 
+     *          - the starting index of the sublist of results to be returned
+     * @param numOfRows 
+     *          - the number of rows to be included in the sublist of results 
+     *          to be returned
+     * @return the markers matching the given parameters
+     * @throws MiddlewareQueryException
+     */
+    public List<Marker> getMarkersByQtl(String qtlName, String chromosome, int min, int max, int start, int numOfRows) throws MiddlewareQueryException;
+
+    /**
+     * Returns the number of markers matching the given QTL name, chromosome, min start position and max start position values 
+     * 
+     * @param qtlName
+     *          - the name of the QTL to match       
+     * @param chromosome
+     *          - the value to match the linkage group of markers_onmap
+     * @param min
+     *          - the minimum start position 
+     * @param max
+     *          - the maximum start position 
+     * @param start 
+     *          - the starting index of the sublist of results to be returned
+     * @param numOfRows 
+     *          - the number of rows to be included in the sublist of results 
+     *          to be returned
+     * @return Count of marker entries
+     * @throws MiddlewareQueryException
+     */
+    public long countMarkersByQtl(String qtlName, String chromosome, int min, int max) throws MiddlewareQueryException;
+
+    
+    /**
+     * Adds a QtlDetails entry to the database
+     * 
+     * @param qtlDetails - the object to add
+     * 
+     * @return the id of the item added
+     * @throws MiddlewareQueryException
+     */
+    public QtlDetailsPK addQtlDetails(QtlDetails qtlDetails) throws MiddlewareQueryException;
     
 }

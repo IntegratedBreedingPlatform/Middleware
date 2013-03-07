@@ -546,4 +546,68 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
             throw new MiddlewareQueryException("Error with countAllDbAccessionIds() query from Marker: " + e.getMessage(), e);
         }
     }
+
+    @SuppressWarnings("rawtypes")
+    public List<Marker> getMarkersByIds(List<Integer> markerIds, int start, int numOfRows) throws MiddlewareQueryException{
+        if ((markerIds == null) || (markerIds.isEmpty())){
+            return new ArrayList<Marker>();
+        }
+
+        try {
+            SQLQuery query = getSession().createSQLQuery(Marker.GET_MARKERS_BY_IDS);
+            query.setParameterList("markerIdList", markerIds);
+            query.setFirstResult(start);
+            query.setMaxResults(numOfRows);
+            List results = query.list();
+            
+            List<Marker> dataValues = new ArrayList<Marker>();
+            for (Object o : results) {
+                Object[] result = (Object[]) o;
+                if (result != null) {
+                    Integer markerId = (Integer) result[0];
+                    String markerType = (String) result[1];
+                    String markerName = (String) result[2];
+                    String species = (String) result[3];
+                    String dbAccessionId = (String) result[4];
+                    String reference = (String) result[5];
+                    String genotype = (String) result[6];
+                    String ploidy = (String) result[7];
+                    String primerId = (String) result[8];
+                    String remarks = (String) result[9];
+                    String assayType = (String) result[10];
+                    String motif = (String) result[11];
+                    String forwardPrimer = (String) result[12];
+                    String reversePrimer = (String) result[13];
+                    String productSize = (String) result[14];
+                    Float annealingTemp = (Float) result[15];
+                    String amplification = (String) result[16];
+                    Marker element = new Marker(markerId, markerType, markerName, species, dbAccessionId, reference, genotype, ploidy,
+                            primerId, remarks, assayType, motif, forwardPrimer, reversePrimer, productSize, annealingTemp, amplification);
+                    dataValues.add(element);
+                }
+            }
+            return dataValues;
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getMarkersByIds() query from Marker: " + e.getMessage(), e);    
+        }
+    }
+
+    public long countMarkersByIds(List<Integer> markerIds) throws MiddlewareQueryException{
+        if ((markerIds == null) || (markerIds.isEmpty())){
+            return 0;
+        }
+        try {
+            SQLQuery query = getSession().createSQLQuery(Marker.COUNT_MARKERS_BY_IDS);
+            query.setParameterList("markerIdList", markerIds);
+            BigInteger result = (BigInteger) query.uniqueResult();
+            if (result != null) {
+                return result.longValue();
+            } else {
+                return 0L;
+            }
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with countMarkersByIds() query from Marker: " + e.getMessage(), e);
+        }
+    }
+
 }

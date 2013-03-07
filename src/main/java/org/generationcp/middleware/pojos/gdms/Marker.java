@@ -13,6 +13,7 @@
 package org.generationcp.middleware.pojos.gdms;
 
 import java.io.Serializable;
+import java.util.Comparator;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -110,6 +111,34 @@ public class Marker implements Serializable{
             "FROM gdms_marker " +
             "WHERE db_accession_id is not null " +
             "OR db_accession_id != ''";
+
+    public static final String GET_MARKERS_BY_IDS = 
+            "SELECT marker_id  "
+                    + ", CONCAT(marker_type, '') "
+                    + ", CONCAT(marker_name, '') "
+                    + ", CONCAT(species, '') "
+                    + ", db_accession_id "
+                    + ", reference "
+                    + ", CONCAT(genotype, '') "
+                    + ", ploidy  "
+                    + ", primer_id  "
+                    + ", remarks  "
+                    + ", assay_type " 
+                    + ", motif  "
+                    + ", forward_primer  "
+                    + ", reverse_primer  "
+                    + ", product_size  "
+                    + ", annealing_temp " 
+                    + ", amplification " 
+            + "FROM gdms_marker "
+            + "WHERE marker_id IN (:markerIdList) " 
+            ;
+
+    public static final String COUNT_MARKERS_BY_IDS = 
+            "SELECT COUNT(marker_id)  "
+            + "FROM gdms_marker "
+            + "WHERE marker_id IN (:markerIdList) " 
+            ;
     
     /** The marker id. */
     @Id
@@ -622,5 +651,16 @@ public class Marker implements Serializable{
         builder.append("]");
         return builder.toString();
     }
+
+    public static Comparator<Marker> MarkerComparator = new Comparator<Marker>() {
+
+        @Override
+        public int compare(Marker element1, Marker element2) {
+            String markerName1 = element1.getMarkerName();
+            String markerName2 = element2.getMarkerName();
+            return markerName1.compareToIgnoreCase(markerName2);
+        }
+
+};
 
 }

@@ -28,12 +28,15 @@ import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.generationcp.middleware.pojos.gdms.MappingValueElement;
+import org.generationcp.middleware.pojos.gdms.Marker;
 import org.generationcp.middleware.pojos.gdms.MarkerIdMarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerInfo;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.generationcp.middleware.pojos.gdms.Qtl;
 import org.generationcp.middleware.pojos.gdms.QtlDetailElement;
+import org.generationcp.middleware.pojos.gdms.QtlDetails;
+import org.generationcp.middleware.pojos.gdms.QtlDetailsPK;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -670,6 +673,28 @@ public class TestGenotypicDataManagerImpl{
         long count = manager.countQtlByTrait(qtlTrait);
         System.out.println("testCountQtlByTrait() RESULTS: " + count);
     }    
+    
+    @Test
+    public void testGetMarkersByQtl() throws Exception { 
+        String qtlName = "HI Control 08_AhI";     // Crop tested: Groundnut
+        String chromosome = "LG01";
+        int min = 0;
+        int max = 10;
+        List<Marker> results = manager.getMarkersByQtl(qtlName, chromosome, min, max, 0, (int) manager.countMarkersByQtl(qtlName, chromosome, min, max));
+        System.out.println("testGetMarkersByQtl() RESULTS: " + results);
+    }
+
+    @Test
+    public void testCountMarkersByQtl() throws Exception { 
+        String qtlName = "HI Control 08_AhI";     // Crop tested: Groundnut
+        String chromosome = "LG01";
+        int min = 0;
+        int max = 10;
+        long count = manager.countMarkersByQtl(qtlName, chromosome, min, max);
+        System.out.println("testCountMarkersByQtl() RESULTS: " + count);
+
+    }
+
 
     @Test
     public void getAllParentsFromMappingPopulation() throws Exception {
@@ -705,10 +730,41 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void countMapDetailsByName() throws Exception {
-    	String nameLike = "tag%";
+        String nameLike = "tag%";
         Long parentElementsCount = manager.countMapDetailsByName(nameLike);
         System.out.println("countMapDetailsByName('"+nameLike+"')");
         System.out.println("Count: " + parentElementsCount);
+    }
+
+    @Test
+    public void testAddQtlDetails() throws Exception {
+        Integer qtlId = 4;          // Crop tested: Ground nut
+        Integer mapId = 1; 
+        Float minPosition = 0f; 
+        Float maxPosition = 8f; 
+        String trait = "HI"; 
+        String experiment = ""; 
+        Float effect =0f;
+        Float scoreValue = 2.5f;
+        Float rSquare = 10f; 
+        String linkageGroup = "LG06"; 
+        String interactions = ""; 
+        String leftFlankingMarker = "Ah4-101";
+        String rightFlankingMarker = "GM2536"; 
+        Float position = 34.71f; 
+        Float clen = 0f; 
+        String seAdditive = null; 
+        String hvParent = null; 
+        String hvAllele = null; 
+        String lvParent = null;
+        String lvAllele = null;
+                
+        QtlDetails qtlDetails = new QtlDetails(qtlId, mapId, minPosition, maxPosition, trait, experiment, effect,
+                scoreValue, rSquare, linkageGroup, interactions, leftFlankingMarker,
+                rightFlankingMarker, position, clen, seAdditive, hvParent, hvAllele, lvParent, lvAllele);
+        
+        QtlDetailsPK idAdded = manager.addQtlDetails(qtlDetails);
+        System.out.println("testAddQtlDetails() Added: " + (idAdded != null ? qtlDetails : null));
     }
 
     @AfterClass
