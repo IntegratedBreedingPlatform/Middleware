@@ -24,6 +24,7 @@ import org.generationcp.middleware.dao.gdms.AccMetadataSetDAO;
 import org.generationcp.middleware.dao.gdms.AlleleValuesDAO;
 import org.generationcp.middleware.dao.gdms.CharValuesDAO;
 import org.generationcp.middleware.dao.gdms.DatasetDAO;
+import org.generationcp.middleware.dao.gdms.DatasetUsersDAO;
 import org.generationcp.middleware.dao.gdms.MapDAO;
 import org.generationcp.middleware.dao.gdms.MappingDataDAO;
 import org.generationcp.middleware.dao.gdms.MappingPopDAO;
@@ -47,6 +48,7 @@ import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
 import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
+import org.generationcp.middleware.pojos.gdms.DatasetUsers;
 import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
@@ -2575,7 +2577,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             //Integer markerAliasId = dao.getNegativeId("marker_id");
             //markerAlias.setMarkerId(markerAliasId);
 
-            MarkerAlias recordSaved = dao.saveOrUpdate(markerAlias);
+            MarkerAlias recordSaved = dao.save(markerAlias);
             idGDMSMarkerAliasSaved = recordSaved.getMarkerId();
 
             trans.commit();
@@ -2591,5 +2593,39 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         }
         
         return idGDMSMarkerAliasSaved;
+    }    
+    
+    
+    @Override
+    public Integer addDatasetUser(DatasetUsers datasetUser) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        Integer idDatasetUserSaved;
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
+
+            DatasetUsersDAO dao = new DatasetUsersDAO();
+            dao.setSession(session);
+
+            DatasetUsers recordSaved = dao.save(datasetUser);
+            idDatasetUserSaved = recordSaved.getUserId();
+
+            trans.commit();
+        } catch (Exception e) {
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new MiddlewareQueryException("Error encountered while saving Marker: addDatasetUser(): "
+                    + e.getMessage(), e);
+        } finally {
+            session.flush();
+        }
+        
+        return idDatasetUserSaved;
     }    
 }

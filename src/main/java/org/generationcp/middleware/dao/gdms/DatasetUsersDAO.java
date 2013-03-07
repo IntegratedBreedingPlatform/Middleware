@@ -12,9 +12,10 @@
 
 package org.generationcp.middleware.dao.gdms;
 
-import org.generationcp.middleware.dao.GenericDAO;
-import org.generationcp.middleware.pojos.gdms.MarkerAlias;
 
+import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.pojos.gdms.DatasetUsers;
+import org.generationcp.middleware.pojos.gdms.MarkerAlias;
 
 /**
  * <b>Description</b>: DAO for Marker Alias object.
@@ -27,7 +28,7 @@ import org.generationcp.middleware.pojos.gdms.MarkerAlias;
  */
 
 @SuppressWarnings("unchecked")
-public class MarkerAliasDAO extends GenericDAO<MarkerAlias, Integer>{
+public class DatasetUsersDAO extends GenericDAO<DatasetUsers, Integer>{
 
 
 }

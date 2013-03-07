@@ -34,43 +34,42 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * <b>File Created</b>: March 7, 2013
  */
 @Entity
-@Table(name = "gdms_marker_alias")
+@Table(name = "gdms_dataset_users")
 
-public class MarkerAlias implements Serializable{
+public class DatasetUsers implements Serializable{
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
     
-    /** The marker id. */
+    /** The dataset id. */
     @Id
     @Basic(optional = false)
-    @Column(name = "marker_id")
-    private Integer markerId;
+    @Column(name = "dataset_id")
+    private Integer datasetId;
 
     /** The marker type. */
     @Basic(optional = false)
-    @Column(name = "alias")
-    private String alias;
+    @Column(name = "user_id")
+    private Integer userId;
 
-    
     
     /**
      * Instantiates a new marker alias.
      */
-    public MarkerAlias() {
+    public DatasetUsers() {
     }
 
     /**
      * Instantiates a new marker alias.
      *
      * @param markerId the marker id
-     * @param alias the markeralias
+     * @param userId the user id
      */
-    public MarkerAlias(Integer markerId,
-                    String alias) {
+    public DatasetUsers(Integer datasetId,
+                    Integer userId) {
         
-        this.markerId = markerId;
-        this.alias = alias;
+        this.datasetId = datasetId;
+        this.userId = userId;
     }
     
     /**
@@ -78,8 +77,8 @@ public class MarkerAlias implements Serializable{
      *
      * @return the marker id
      */
-    public Integer getMarkerId() {
-        return markerId;
+    public Integer getDatasetId() {
+        return datasetId;
     }
     
     /**
@@ -87,26 +86,26 @@ public class MarkerAlias implements Serializable{
      *
      * @param markerId the new marker id
      */
-    public void setMarkerId(Integer markerId) {
-        this.markerId = markerId;
+    public void setDatasetId(Integer datasetId) {
+        this.datasetId = datasetId;
     }
 
     /**
-     * Gets the alias.
+     * Gets the user ID.
      *
-     * @return the alias
+     * @return the user ID
      */
-    public String getAlias() {
-        return alias;
+    public Integer getUserId() {
+        return userId;
     }
 
     /**
-     * Sets the alias.
+     * Sets the user ID.
      *
-     * @param alias the new alias
+     * @param userId the user ID
      */
-    public void setAlias(String alias) {
-        this.alias = alias;
+    public void setAlias(Integer userId) {
+        this.userId = userId;
     }
 
     /* (non-Javadoc)
@@ -120,12 +119,12 @@ public class MarkerAlias implements Serializable{
         if (obj == this) {
             return true;
         }
-        if (!(obj instanceof MarkerAlias)) {
+        if (!(obj instanceof DatasetUsers)) {
             return false;
         }
 
-        MarkerAlias rhs = (MarkerAlias) obj;
-        return new EqualsBuilder().append(markerId, rhs.markerId).isEquals();
+        DatasetUsers rhs = (DatasetUsers) obj;
+        return new EqualsBuilder().append(datasetId, rhs.datasetId).isEquals();
     }
 
     /* (non-Javadoc)
@@ -133,16 +132,16 @@ public class MarkerAlias implements Serializable{
      */
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(61, 131).append(markerId).toHashCode();
+        return new HashCodeBuilder(61, 131).append(datasetId).toHashCode();
     }
 
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("MarkerAlias [markerId=");
-        builder.append(markerId);
-        builder.append(", alias=");
-        builder.append(alias);
+        builder.append("DatasetUser [datasetId=");
+        builder.append(datasetId);
+        builder.append(", userId=");
+        builder.append(userId);
         builder.append("]");
         return builder.toString();
     }

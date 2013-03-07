@@ -27,6 +27,7 @@ import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
 import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
+import org.generationcp.middleware.pojos.gdms.DatasetUsers;
 import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
@@ -891,20 +892,31 @@ public class TestGenotypicDataManagerImpl{
 //        Integer idAdded = manager.addGDMSMarker(marker);
 //        System.out.println("testAddGDMSMarker() Added: " + (idAdded != null ? marker : null));
 //    }
-
-  @Test
-  public void testAddGDMSMarkerAlias() throws Exception {
+//
+//    @Test
+//    public void testAddGDMSMarkerAlias() throws Exception {
+//  	
+//        Integer markerId = 0;
+//        String alias = "testalias";
+//      
+//        MarkerAlias markerAlias = new MarkerAlias(markerId, alias);
+//      
+//        Integer idAdded = manager.addGDMSMarkerAlias(markerAlias);
+//        System.out.println("testAddGDMSMarkerAlias() Added: " + (idAdded != null ? markerAlias : null));
+//    }
+    
+    @Test
+    public void testAddDatasetUser() throws Exception {
   	
-      Integer markerId = 0;
-      String alias = "testalias";
+        Integer datasetId = 7;
+        Integer userId = 123;
       
-      MarkerAlias markerAlias = new MarkerAlias(markerId, alias);
+        DatasetUsers datasetUser = new DatasetUsers(datasetId, userId);
       
-      Integer idAdded = manager.addGDMSMarkerAlias(markerAlias);
-      System.out.println("testAddGDMSMarkerAlias() Added: " + (idAdded != null ? markerAlias : null));
-  }
-    
-    
+        Integer idAdded = manager.addDatasetUser(datasetUser);
+        System.out.println("testAddDatasetUser() Added: " + (idAdded != null ? datasetUser : null));
+    }  
+  
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();

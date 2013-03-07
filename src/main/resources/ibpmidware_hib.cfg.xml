@@ -60,6 +60,7 @@
   <mapping class="org.generationcp.middleware.pojos.gdms.AlleleValues"/>
   <mapping class="org.generationcp.middleware.pojos.gdms.CharValues"/>
   <mapping class="org.generationcp.middleware.pojos.gdms.Dataset"/>
+  <mapping class="org.generationcp.middleware.pojos.gdms.DatasetUsers"/>
   <mapping class="org.generationcp.middleware.pojos.gdms.Map"/>
   <mapping class="org.generationcp.middleware.pojos.gdms.MappingData"/>
   <mapping class="org.generationcp.middleware.pojos.gdms.MappingPop"/>

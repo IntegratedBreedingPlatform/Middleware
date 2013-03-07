@@ -23,6 +23,7 @@ import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
 import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
+import org.generationcp.middleware.pojos.gdms.DatasetUsers;
 import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
@@ -1144,4 +1145,12 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException
      */
     public Integer addGDMSMarkerAlias(MarkerAlias markerAlias) throws MiddlewareQueryException;
+    
+    /**
+     * Adds a dataset user given a dataset_user
+     * @param datasetUser
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    public Integer addDatasetUser(DatasetUsers datasetUser) throws MiddlewareQueryException;
 }
