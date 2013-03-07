@@ -20,6 +20,7 @@ import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSetPK;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
@@ -810,8 +811,21 @@ public class TestGenotypicDataManagerImpl{
         
         Integer idAdded = manager.addMarkerUserInfo(markerUserInfo);
         System.out.println("testAddMarkerUserInfo() Added: " + (idAdded != null ? markerUserInfo : null));
-
     }
+    
+    @Test
+    public void testAccMetadataSet() throws Exception {
+        Integer datasetId = 4;  // Crop tested: Groundnut
+        Integer germplasmId = 1; 
+        Integer nameId = 1;
+        
+        AccMetadataSet accMetadataSet = new AccMetadataSet(datasetId, germplasmId, nameId);
+        
+        AccMetadataSetPK idAdded = manager.addAccMetadataSet(accMetadataSet);
+        System.out.println("testAccMetadataSet() Added: " + (idAdded != null ? accMetadataSet : null));
+    }
+
+
 
     @AfterClass
     public static void tearDown() throws Exception {

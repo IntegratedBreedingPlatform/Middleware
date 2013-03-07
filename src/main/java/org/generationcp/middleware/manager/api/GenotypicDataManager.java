@@ -17,6 +17,7 @@ import java.util.List;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSetPK;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
@@ -1093,4 +1094,15 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException
      */
     public Integer addMarkerUserInfo(MarkerUserInfo markerUserInfo) throws MiddlewareQueryException;
+    
+    /**
+     * Adds a AccMetadataSet entry to the database
+     * 
+     * @param markerUserInfo - the object to add
+     * 
+     * @return the id of the item added
+     * @throws MiddlewareQueryException
+     */
+    public AccMetadataSetPK addAccMetadataSet(AccMetadataSet accMetadataSet) throws MiddlewareQueryException;
+
 }

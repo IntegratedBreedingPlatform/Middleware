@@ -78,21 +78,17 @@ public class AccMetadataSet implements Serializable{
     @EmbeddedId
     protected AccMetadataSetPK id;
 
-    /**
-     * Instantiates a new acc metadata set.
-     */
     public AccMetadataSet() {
     }
 
-    /**
-     * Instantiates a new acc metadata set.
-     *
-     * @param id the id
-     */
     public AccMetadataSet(AccMetadataSetPK id) {
         this.id = id;
     }
         
+    public AccMetadataSet(Integer datasetId, Integer germplasmId, Integer nameId) {
+        this.id = new AccMetadataSetPK(datasetId, germplasmId, nameId);
+    }
+
     /**
      * Gets the id.
      *

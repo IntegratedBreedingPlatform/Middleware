@@ -38,6 +38,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSetPK;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
@@ -2405,4 +2406,39 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return savedId;    
     }
 
+    @Override
+    public AccMetadataSetPK addAccMetadataSet(AccMetadataSet accMetadataSet) throws MiddlewareQueryException{
+        
+        requireLocalDatabaseInstance();
+        
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        AccMetadataSetPK savedId = new AccMetadataSetPK();
+        
+        try {
+            trans = session.beginTransaction();
+            AccMetadataSetDAO dao = new AccMetadataSetDAO();
+            dao.setSession(session);
+
+            // No need to auto-assign negative IDs for new local DB records
+            // datasetId, germplasmId and nameId are foreign keys
+            
+            AccMetadataSet recordSaved = dao.save(accMetadataSet);
+            savedId = recordSaved.getId();
+            
+            trans.commit();
+
+        } catch (Exception e) {
+            // Rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new MiddlewareQueryException("Error encountered with addAccMetadataSet(accMetadataSet="
+                    + accMetadataSet + "): " + e.getMessage(), e);
+        } finally {
+            session.flush();
+        }
+        return savedId;
+    }
 }
