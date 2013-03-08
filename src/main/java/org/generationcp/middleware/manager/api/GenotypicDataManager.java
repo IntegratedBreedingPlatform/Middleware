@@ -1211,5 +1211,13 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException
      */
     public Integer addDartValue(DartValues dartValue) throws MiddlewareQueryException;    
+    
+    /**
+     * Adds a Qtl given a Qtl
+     * @param qtl 
+     * @return qtlId - qltId of the inserted record
+     * @throws MiddlewareQueryException
+     */
+    public Integer addQtl(Qtl qtl) throws MiddlewareQueryException;
 
 }

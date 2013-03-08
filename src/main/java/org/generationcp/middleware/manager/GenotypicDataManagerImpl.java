@@ -2850,4 +2850,43 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return idSaved;
     }    
     
+    
+
+    @Override
+    public Integer addQtl(Qtl qtl) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        Integer idSaved;
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
+
+            QtlDAO dao = new QtlDAO();
+            dao.setSession(session);
+
+            Integer qtlId = dao.getNegativeId("qtlId");
+            qtl.setQtlId(qtlId);
+            
+            Qtl recordSaved = dao.saveOrUpdate(qtl);
+            idSaved = recordSaved.getQtlId();
+
+            trans.commit();
+        } catch (Exception e) {
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new MiddlewareQueryException("Error encountered while saving Marker: addDartValue(): "
+                    + e.getMessage(), e);
+        } finally {
+            session.flush();
+        }
+        
+        return idSaved;
+    }    
+    
+    
 }

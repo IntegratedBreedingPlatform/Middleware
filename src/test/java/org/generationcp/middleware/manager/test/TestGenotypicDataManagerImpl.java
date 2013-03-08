@@ -1021,6 +1021,20 @@ public class TestGenotypicDataManagerImpl{
         System.out.println("testAddDartValue() Added: " + (idAdded != null ? dartValue : null));
     }    
     
+    @Test
+    public void testAddQtl() throws Exception {
+  	
+    	Integer qtlId = null;
+    	String qtlName = "TestQTL";
+    	Integer datasetId = -6;
+    	
+        Qtl qtl = new Qtl(qtlId, qtlName, datasetId);
+      
+        Integer idAdded = manager.addQtl(qtl);
+        System.out.println("testAddQtl() Added: " + (idAdded != null ? qtl : null));
+    }    
+
+    
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();
