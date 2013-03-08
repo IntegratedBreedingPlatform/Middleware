@@ -28,6 +28,7 @@ import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.generationcp.middleware.pojos.gdms.MappingPop;
+import org.generationcp.middleware.pojos.gdms.MappingPopValues;
 import org.generationcp.middleware.pojos.gdms.MappingValueElement;
 import org.generationcp.middleware.pojos.gdms.Marker;
 import org.generationcp.middleware.pojos.gdms.MarkerAlias;
@@ -1132,7 +1133,7 @@ public interface GenotypicDataManager{
     public Integer addDataset(Dataset dataset) throws MiddlewareQueryException;
 
     /**
-     * Adds a GDMS marker given a marker
+     * Adds a GDMS marker given a Marker
      * @param Marker
      * @return markerId - markerId of the inserted record
      * @throws MiddlewareQueryException
@@ -1140,7 +1141,7 @@ public interface GenotypicDataManager{
     public Integer addGDMSMarker(Marker marker) throws MiddlewareQueryException;
     
     /**
-     * Adds a GDMS marker alias given a gdms_alias
+     * Adds a GDMS marker alias given a MarkerAlias
      * @param MarkerAlias
      * @return markerId - markerId of the inserted record
      * @throws MiddlewareQueryException
@@ -1148,7 +1149,7 @@ public interface GenotypicDataManager{
     public Integer addGDMSMarkerAlias(MarkerAlias markerAlias) throws MiddlewareQueryException;
     
     /**
-     * Adds a dataset user given a dataset_user
+     * Adds a dataset user given a DatasetUser
      * @param DatasetUser
      * @return userId - userId of the inserted record
      * @throws MiddlewareQueryException
@@ -1156,10 +1157,18 @@ public interface GenotypicDataManager{
     public Integer addDatasetUser(DatasetUsers datasetUser) throws MiddlewareQueryException;
 
     /**
-     * Adds a mapping pop given a mapping_pop
+     * Adds a mapping pop given a MappingPop
      * @param MappingPop
      * @return DatasetId - datasetId of the inserted record
      * @throws MiddlewareQueryException
      */
     public Integer addMappingPop(MappingPop mappingPop) throws MiddlewareQueryException;
+    
+    /**
+     * Adds a mapping pop given a MappingPopValue
+     * @param MappingPopValue
+     * @return mpId - mpId of the inserted record
+     * @throws MiddlewareQueryException
+     */
+    public Integer addMappingPopValue(MappingPopValues mappingPopValue) throws MiddlewareQueryException;    
 }

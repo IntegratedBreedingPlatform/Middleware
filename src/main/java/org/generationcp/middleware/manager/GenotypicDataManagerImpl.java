@@ -53,6 +53,7 @@ import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.generationcp.middleware.pojos.gdms.MappingPop;
+import org.generationcp.middleware.pojos.gdms.MappingPopValues;
 import org.generationcp.middleware.pojos.gdms.MappingValueElement;
 import org.generationcp.middleware.pojos.gdms.Marker;
 import org.generationcp.middleware.pojos.gdms.MarkerAlias;
@@ -2663,5 +2664,42 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         
         return idSaved;
     }    
+
+    @Override
+    public Integer addMappingPopValue(MappingPopValues mappingPopValue) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        Integer idSaved;
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
+
+            MappingPopValuesDAO dao = new MappingPopValuesDAO();
+            dao.setSession(session);
+
+            Integer mpId = dao.getNegativeId("mpId");
+            mappingPopValue.setMpId(mpId);
+            
+            MappingPopValues recordSaved = dao.saveOrUpdate(mappingPopValue);
+            idSaved = recordSaved.getDatasetId();
+
+            trans.commit();
+        } catch (Exception e) {
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new MiddlewareQueryException("Error encountered while saving Marker: addMappingPopValue(): "
+                    + e.getMessage(), e);
+        } finally {
+            session.flush();
+        }
+        
+        return idSaved;
+    }    
+    
     
 }

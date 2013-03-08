@@ -32,6 +32,7 @@ import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.generationcp.middleware.pojos.gdms.MappingPop;
+import org.generationcp.middleware.pojos.gdms.MappingPopValues;
 import org.generationcp.middleware.pojos.gdms.MappingValueElement;
 import org.generationcp.middleware.pojos.gdms.Marker;
 import org.generationcp.middleware.pojos.gdms.MarkerAlias;
@@ -936,6 +937,22 @@ public class TestGenotypicDataManagerImpl{
         Integer idAdded = manager.addMappingPop(mappingPop);
         System.out.println("testAddMappingPop() Added: " + (idAdded != null ? mappingPop : null));
     }    
+    
+    @Test
+    public void testAddMappingPopValue() throws Exception {
+  	
+    	Integer mpId = null;
+        String mapCharValue = "X";
+        Integer datasetId = 2;
+        Integer gid = 1434;
+        Integer markerId = 2537;
+      
+        MappingPopValues mappingPopValue = new MappingPopValues(mpId, mapCharValue, datasetId, gid, markerId);
+      
+        Integer idAdded = manager.addMappingPopValue(mappingPopValue);
+        System.out.println("testAddMappingPopValue() Added: " + (idAdded != null ? mappingPopValue : null));
+    }    
+
     
     @AfterClass
     public static void tearDown() throws Exception {
