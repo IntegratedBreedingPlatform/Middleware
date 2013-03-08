@@ -2907,6 +2907,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
             Integer markerId = markerDao.getNegativeId("markerId");
             marker.setMarkerId(markerId);
+            
+            marker.setMarkerType("SSR");
 
             Marker markerRecordSaved = markerDao.saveOrUpdate(marker);
             Integer idGDMSMarkerSaved = markerRecordSaved.getMarkerId();
@@ -2935,8 +2937,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             
             MarkerUserInfoDAO dao = new MarkerUserInfoDAO();
             dao.setSession(session);
-
-            // No need to auto-assign negative id. It should come from an existing entry in Marker.
             
             MarkerUserInfo markerUserInfoRecordSaved = dao.save(markerUserInfo);
             Integer markerUserInfoSavedId = markerUserInfoRecordSaved.getMarkerId();
@@ -2962,6 +2962,81 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         
         return transactionStatus;
     }    
+    
+    @Override
+    public Boolean setSNPMarkers(Marker marker, MarkerAlias markerAlias, MarkerDetails markerDetails, MarkerUserInfo markerUserInfo) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+        Boolean transactionStatus = true;
+
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
+
+            // Add GDMS Marker
+            MarkerDAO markerDao = new MarkerDAO();
+            markerDao.setSession(session);
+
+            Integer markerId = markerDao.getNegativeId("markerId");
+            marker.setMarkerId(markerId);
+            
+            marker.setMarkerType("SNP");
+
+            Marker markerRecordSaved = markerDao.saveOrUpdate(marker);
+            Integer idGDMSMarkerSaved = markerRecordSaved.getMarkerId();
+            if(idGDMSMarkerSaved == null)
+            	transactionStatus = false;
+
+            // Add GDMS Marker Alias
+            MarkerAliasDAO markerAliasDao = new MarkerAliasDAO();
+            markerAliasDao.setSession(session);
+
+            MarkerAlias markerAliasRecordSaved = markerAliasDao.save(markerAlias);
+            Integer markerAliasRecordSavedMarkerId = markerAliasRecordSaved.getMarkerId();
+            if(markerAliasRecordSavedMarkerId == null)
+            	transactionStatus = false;
+           
+            // Add Marker Details
+            MarkerDetailsDAO markerDetailsDao = new MarkerDetailsDAO();
+            markerDetailsDao.setSession(session);
+
+            MarkerDetails markerDetailsRecordSaved = markerDetailsDao.save(markerDetails);
+            Integer markerDetailsSavedMarkerId = markerDetailsRecordSaved.getMarkerId();
+            if(markerDetailsSavedMarkerId == null)
+            	transactionStatus = false;
+            
+            // Add marker user info
+            
+            MarkerUserInfoDAO dao = new MarkerUserInfoDAO();
+            dao.setSession(session);
+            
+            MarkerUserInfo markerUserInfoRecordSaved = dao.save(markerUserInfo);
+            Integer markerUserInfoSavedId = markerUserInfoRecordSaved.getMarkerId();
+            if(markerUserInfoSavedId == null)
+            	transactionStatus = false;
+            
+            if(transactionStatus == true)
+                trans.commit();
+            else
+            	trans.rollback();
+            
+        } catch (Exception e) {
+            // rollback transaction in case of errors
+        	transactionStatus = false;
+            if (trans != null) {            	
+                trans.rollback();
+            }
+            throw new MiddlewareQueryException("Error encountered while saving Marker: setSNPMarkers(): "
+                    + e.getMessage(), e);
+        } finally {
+            session.flush();
+        }
+        
+        return transactionStatus;
+    }    
+
     
     
 }

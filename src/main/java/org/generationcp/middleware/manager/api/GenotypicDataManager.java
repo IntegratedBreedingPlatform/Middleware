@@ -1230,4 +1230,15 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException
      */
     public Boolean setSSRMarkers(Marker marker, MarkerAlias markerAlias, MarkerDetails markerDetails, MarkerUserInfo markerUserInfo) throws MiddlewareQueryException;
+    
+    /**
+     * Sets SNP Markers
+     * @param marker (Marker)
+     * @param markerAlias (MarkerAlias)
+     * @param markerDetails (MarkerDetails)
+     * @param markerUserInfo (MarkerUserInfo)
+     * @return (boolean) - true if successful, exception or false if failed
+     * @throws MiddlewareQueryException
+     */
+    public Boolean setSNPMarkers(Marker marker, MarkerAlias markerAlias, MarkerDetails markerDetails, MarkerUserInfo markerUserInfo) throws MiddlewareQueryException;    
 }
