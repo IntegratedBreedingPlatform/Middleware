@@ -1140,6 +1140,59 @@ public class TestGenotypicDataManagerImpl{
         System.out.println("testAddQtl() Added: " + (addStatus != null ? marker : null) + (addStatus != null ? markerAlias : null) + (addStatus != null ? markerDetails : null) + (addStatus != null ? markerUserInfo : null));
     }
 
+    @Test
+    public void testSetCAPMarkers() throws Exception {
+
+    	Integer markerId = 0;
+        String markerType = null; //Will be set/overridden by the function
+        String markerName = "SeqTEST";
+        String species = "Groundnut";
+        String dbAccessionId = null;
+        String reference = null;
+        String genotype = null;
+        String ploidy = null; 
+        String primerId = null;
+        String remarks = null;
+        String assayType = null;
+        String motif = null;
+        String forwardPrimer = null;
+        String reversePrimer = null;
+        String productSize = null;
+        Float annealingTemp = Float.valueOf(0);
+        String amplification = null;
+
+        String alias = "testalias";
+        Integer noOfRepeats = 0; 
+        String motifType = ""; 
+        String sequence = ""; 
+        Integer sequenceLength = 0;
+        Integer minAllele = 0; 
+        Integer maxAllele = 0; 
+        Integer ssrNr = 0; 
+        Float forwardPrimerTemp = 0f; 
+        Float reversePrimerTemp = 0f; 
+        Float elongationTemp = 0f;
+        Integer fragmentSizeExpected = 0; 
+        Integer fragmentSizeObserved = 0; 
+        Integer expectedProductSize = 0; 
+        Integer positionOnReferenceSequence = 0;
+        String restrictionEnzymeForAssay = null;
+        String principalInvestigator = "Juan Dela Cruz";
+        String contact = "juan@irri.com.ph";
+        String institute = "IRRI";
+        
+        Marker marker = new Marker(markerId, markerType, markerName, species, dbAccessionId, reference, genotype, ploidy, primerId, remarks, assayType, motif, forwardPrimer, reversePrimer, productSize, annealingTemp, amplification);
+        MarkerAlias markerAlias = new MarkerAlias(markerId, alias);
+        MarkerDetails markerDetails = new MarkerDetails(markerId, noOfRepeats, motifType, sequence, sequenceLength,
+                minAllele, maxAllele, ssrNr, forwardPrimerTemp, reversePrimerTemp, elongationTemp,
+                fragmentSizeExpected, fragmentSizeObserved, expectedProductSize, positionOnReferenceSequence,
+                restrictionEnzymeForAssay);
+        MarkerUserInfo markerUserInfo = new MarkerUserInfo(markerId, principalInvestigator, contact, institute);
+        
+        Boolean addStatus = manager.setSSRMarkers(marker, markerAlias, markerDetails, markerUserInfo);
+        System.out.println("testAddQtl() Added: " + (addStatus != null ? marker : null) + (addStatus != null ? markerAlias : null) + (addStatus != null ? markerDetails : null) + (addStatus != null ? markerUserInfo : null));
+    }
+
     
     
     @AfterClass
