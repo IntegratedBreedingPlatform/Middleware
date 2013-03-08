@@ -1222,7 +1222,7 @@ public interface GenotypicDataManager{
 
     /**
      * Sets SSR Markers
-     * @param marker (Marker)
+     * @param marker (Marker) marker_type will be set to/overridden by "SSR"
      * @param markerAlias (MarkerAlias)
      * @param markerDetails (MarkerDetails)
      * @param markerUserInfo (MarkerUserInfo)
@@ -1233,7 +1233,7 @@ public interface GenotypicDataManager{
     
     /**
      * Sets SNP Markers
-     * @param marker (Marker)
+     * @param marker (Marker) marker_type will be set to/overridden by "SNP"
      * @param markerAlias (MarkerAlias)
      * @param markerDetails (MarkerDetails)
      * @param markerUserInfo (MarkerUserInfo)
@@ -1244,7 +1244,7 @@ public interface GenotypicDataManager{
     
     /**
      * Sets CAP Markers
-     * @param marker (Marker)
+     * @param marker (Marker) marker_type will be set to/overridden by "CAP"
      * @param markerAlias (MarkerAlias)
      * @param markerDetails (MarkerDetails)
      * @param markerUserInfo (MarkerUserInfo)
@@ -1253,4 +1253,15 @@ public interface GenotypicDataManager{
      */
     public Boolean setCAPMarkers(Marker marker, MarkerAlias markerAlias, MarkerDetails markerDetails, MarkerUserInfo markerUserInfo) throws MiddlewareQueryException;
     
+    /**
+     * Sets CISR Markers
+     * @param marker (Marker) marker_type will be set to/overridden by "CISR"
+     * @param markerAlias (MarkerAlias)
+     * @param markerDetails (MarkerDetails)
+     * @param markerUserInfo (MarkerUserInfo)
+     * @return (boolean) - true if successful, exception or false if failed
+     * @throws MiddlewareQueryException
+     */
+    public Boolean setCISRMarkers(Marker marker, MarkerAlias markerAlias, MarkerDetails markerDetails, MarkerUserInfo markerUserInfo) throws MiddlewareQueryException;
+        
 }
