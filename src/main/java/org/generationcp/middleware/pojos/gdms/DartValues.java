@@ -13,7 +13,6 @@
 package org.generationcp.middleware.pojos.gdms;
 
 import java.io.Serializable;
-import java.math.BigInteger;
 
 import javax.persistence.Column;
 import javax.persistence.Id;

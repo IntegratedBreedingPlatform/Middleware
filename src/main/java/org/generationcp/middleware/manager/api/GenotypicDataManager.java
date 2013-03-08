@@ -1220,4 +1220,14 @@ public interface GenotypicDataManager{
      */
     public Integer addQtl(Qtl qtl) throws MiddlewareQueryException;
 
+    /**
+     * Sets SSR Markers
+     * @param marker (Marker)
+     * @param markerAlias (MarkerAlias)
+     * @param markerDetails (MarkerDetails)
+     * @param markerUserInfo (MarkerUserInfo)
+     * @return (boolean) - true if successful, exception or false if failed
+     * @throws MiddlewareQueryException
+     */
+    public Boolean setSSRMarkers(Marker marker, MarkerAlias markerAlias, MarkerDetails markerDetails, MarkerUserInfo markerUserInfo) throws MiddlewareQueryException;
 }
