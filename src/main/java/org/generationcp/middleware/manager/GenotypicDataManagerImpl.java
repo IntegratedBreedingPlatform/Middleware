@@ -34,6 +34,7 @@ import org.generationcp.middleware.dao.gdms.MarkerDAO;
 import org.generationcp.middleware.dao.gdms.MarkerDetailsDAO;
 import org.generationcp.middleware.dao.gdms.MarkerInfoDAO;
 import org.generationcp.middleware.dao.gdms.MarkerMetadataSetDAO;
+import org.generationcp.middleware.dao.gdms.MarkerOnMapDAO;
 import org.generationcp.middleware.dao.gdms.MarkerUserInfoDAO;
 import org.generationcp.middleware.dao.gdms.QtlDAO;
 import org.generationcp.middleware.dao.gdms.QtlDetailsDAO;
@@ -63,6 +64,7 @@ import org.generationcp.middleware.pojos.gdms.MarkerInfo;
 import org.generationcp.middleware.pojos.gdms.MarkerMetadataSet;
 import org.generationcp.middleware.pojos.gdms.MarkerMetadataSetPK;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
+import org.generationcp.middleware.pojos.gdms.MarkerOnMap;
 import org.generationcp.middleware.pojos.gdms.MarkerUserInfo;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.generationcp.middleware.pojos.gdms.Qtl;
@@ -2701,5 +2703,40 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return idSaved;
     }    
     
+    @Override
+    public Integer addMarkerOnMap(MarkerOnMap markerOnMap) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        Integer idSaved;
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
+
+            MarkerOnMapDAO dao = new MarkerOnMapDAO();
+            dao.setSession(session);
+
+            //Integer mapId = dao.getNegativeId("mapId");
+            //mappingPopValue.setMpId(mpId);
+            
+            MarkerOnMap recordSaved = dao.save(markerOnMap);
+            idSaved = recordSaved.getMapId();
+
+            trans.commit();
+        } catch (Exception e) {
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new MiddlewareQueryException("Error encountered while saving Marker: addMarkerOnMap(): "
+                    + e.getMessage(), e);
+        } finally {
+            session.flush();
+        }
+        
+        return idSaved;
+    }
     
 }

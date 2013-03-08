@@ -70,6 +70,7 @@
   <mapping class="org.generationcp.middleware.pojos.gdms.MarkerDetails"/>
   <mapping class="org.generationcp.middleware.pojos.gdms.MarkerUserInfo"/>
   <mapping class="org.generationcp.middleware.pojos.gdms.MarkerMetadataSet"/>
+  <mapping class="org.generationcp.middleware.pojos.gdms.MarkerOnMap"/>
   <mapping class="org.generationcp.middleware.pojos.gdms.Qtl"/>
   <mapping class="org.generationcp.middleware.pojos.gdms.QtlDetails"/>
   

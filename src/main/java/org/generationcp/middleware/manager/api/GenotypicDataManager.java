@@ -38,6 +38,7 @@ import org.generationcp.middleware.pojos.gdms.MarkerInfo;
 import org.generationcp.middleware.pojos.gdms.MarkerMetadataSet;
 import org.generationcp.middleware.pojos.gdms.MarkerMetadataSetPK;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
+import org.generationcp.middleware.pojos.gdms.MarkerOnMap;
 import org.generationcp.middleware.pojos.gdms.MarkerUserInfo;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.generationcp.middleware.pojos.gdms.Qtl;
@@ -1171,4 +1172,12 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException
      */
     public Integer addMappingPopValue(MappingPopValues mappingPopValue) throws MiddlewareQueryException;    
+    
+    /**
+     * Adds a marker on map given a MarkerOnMap
+     * @param MarkerOnMap
+     * @return mapId - mapId of the inserted record
+     * @throws MiddlewareQueryException
+     */
+    public Integer addMarkerOnMap(MarkerOnMap markerOnMap) throws MiddlewareQueryException;    
 }
