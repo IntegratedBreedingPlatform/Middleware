@@ -25,6 +25,7 @@ import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSetPK;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
+import org.generationcp.middleware.pojos.gdms.DartValues;
 import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
 import org.generationcp.middleware.pojos.gdms.DatasetUsers;
@@ -42,6 +43,7 @@ import org.generationcp.middleware.pojos.gdms.MarkerInfo;
 import org.generationcp.middleware.pojos.gdms.MarkerMetadataSet;
 import org.generationcp.middleware.pojos.gdms.MarkerMetadataSetPK;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
+import org.generationcp.middleware.pojos.gdms.MarkerOnMap;
 import org.generationcp.middleware.pojos.gdms.MarkerUserInfo;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.generationcp.middleware.pojos.gdms.Qtl;
@@ -953,6 +955,40 @@ public class TestGenotypicDataManagerImpl{
         System.out.println("testAddMappingPopValue() Added: " + (idAdded != null ? mappingPopValue : null));
     }    
 
+    
+    @Test
+    public void testAddMarkerOnMap() throws Exception {
+  	
+    	Integer mapId = 1;
+    	Integer markerId = 260;
+    	Float startPosition = Float.valueOf("123.4");
+    	Float endPosition = Float.valueOf("567.8");
+    	String mapUnit = "TS";
+    	String linkageGroup = "Test";
+      
+        MarkerOnMap markerOnMap = new MarkerOnMap(mapId, markerId, startPosition, endPosition, mapUnit, linkageGroup);
+      
+        Integer idAdded = manager.addMarkerOnMap(markerOnMap);
+        System.out.println("testAddMarkerOnMap() Added: " + (idAdded != null ? markerOnMap : null));
+    }    
+    
+    @Test
+    public void testAddDartValue() throws Exception {
+  	
+    	Integer adId = null;
+    	Integer datasetId = -6;
+    	Integer cloneId = -1;
+    	Float qValue = Float.valueOf("123.45");
+    	Float reproducibility = Float.valueOf("543.21");
+    	Float callRate = Float.valueOf("12.3");
+    	Float picValue = Float.valueOf("543.2");
+    	Float discordance = Float.valueOf("1.2");
+    	
+        DartValues dartValue = new DartValues(adId, datasetId, cloneId, qValue, reproducibility, callRate, picValue, discordance);
+      
+        Integer idAdded = manager.addDartValue(dartValue);
+        System.out.println("testAddDartValue() Added: " + (idAdded != null ? dartValue : null));
+    }    
     
     @AfterClass
     public static void tearDown() throws Exception {

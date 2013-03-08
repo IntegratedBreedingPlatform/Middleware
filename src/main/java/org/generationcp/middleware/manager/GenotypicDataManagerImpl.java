@@ -23,6 +23,7 @@ import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.gdms.AccMetadataSetDAO;
 import org.generationcp.middleware.dao.gdms.AlleleValuesDAO;
 import org.generationcp.middleware.dao.gdms.CharValuesDAO;
+import org.generationcp.middleware.dao.gdms.DartValuesDAO;
 import org.generationcp.middleware.dao.gdms.DatasetDAO;
 import org.generationcp.middleware.dao.gdms.DatasetUsersDAO;
 import org.generationcp.middleware.dao.gdms.MapDAO;
@@ -47,6 +48,7 @@ import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSetPK;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
+import org.generationcp.middleware.pojos.gdms.DartValues;
 import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
 import org.generationcp.middleware.pojos.gdms.DatasetUsers;
@@ -2738,5 +2740,41 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         
         return idSaved;
     }
+    
+    @Override
+    public Integer addDartValue(DartValues dartValue) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        Integer idSaved;
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
+
+            DartValuesDAO dao = new DartValuesDAO();
+            dao.setSession(session);
+
+            Integer adId = dao.getNegativeId("adId");
+            dartValue.setAdId(adId);
+            
+            DartValues recordSaved = dao.save(dartValue);
+            idSaved = recordSaved.getAdId();
+
+            trans.commit();
+        } catch (Exception e) {
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new MiddlewareQueryException("Error encountered while saving Marker: addDartValue(): "
+                    + e.getMessage(), e);
+        } finally {
+            session.flush();
+        }
+        
+        return idSaved;
+    }    
     
 }

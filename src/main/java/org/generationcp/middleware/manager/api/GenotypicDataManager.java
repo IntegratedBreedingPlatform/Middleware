@@ -21,6 +21,7 @@ import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSetPK;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
+import org.generationcp.middleware.pojos.gdms.DartValues;
 import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
 import org.generationcp.middleware.pojos.gdms.DatasetUsers;
@@ -1179,5 +1180,13 @@ public interface GenotypicDataManager{
      * @return mapId - mapId of the inserted record
      * @throws MiddlewareQueryException
      */
-    public Integer addMarkerOnMap(MarkerOnMap markerOnMap) throws MiddlewareQueryException;    
+    public Integer addMarkerOnMap(MarkerOnMap markerOnMap) throws MiddlewareQueryException;
+    
+    /**
+     * Adds a dart value given a DartValue
+     * @param DartValue
+     * @return adId - adId of the inserted record
+     * @throws MiddlewareQueryException
+     */
+    public Integer addDartValue(DartValues dartValue) throws MiddlewareQueryException;    
 }
