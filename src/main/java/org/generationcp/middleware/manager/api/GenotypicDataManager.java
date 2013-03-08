@@ -27,6 +27,7 @@ import org.generationcp.middleware.pojos.gdms.DatasetUsers;
 import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
+import org.generationcp.middleware.pojos.gdms.MappingPop;
 import org.generationcp.middleware.pojos.gdms.MappingValueElement;
 import org.generationcp.middleware.pojos.gdms.Marker;
 import org.generationcp.middleware.pojos.gdms.MarkerAlias;
@@ -1132,25 +1133,33 @@ public interface GenotypicDataManager{
 
     /**
      * Adds a GDMS marker given a marker
-     * @param marker
-     * @return markerId
+     * @param Marker
+     * @return markerId - markerId of the inserted record
      * @throws MiddlewareQueryException
      */
     public Integer addGDMSMarker(Marker marker) throws MiddlewareQueryException;
     
     /**
      * Adds a GDMS marker alias given a gdms_alias
-     * @param markerAlias
-     * @return
+     * @param MarkerAlias
+     * @return markerId - markerId of the inserted record
      * @throws MiddlewareQueryException
      */
     public Integer addGDMSMarkerAlias(MarkerAlias markerAlias) throws MiddlewareQueryException;
     
     /**
      * Adds a dataset user given a dataset_user
-     * @param datasetUser
-     * @return
+     * @param DatasetUser
+     * @return userId - userId of the inserted record
      * @throws MiddlewareQueryException
      */
     public Integer addDatasetUser(DatasetUsers datasetUser) throws MiddlewareQueryException;
+
+    /**
+     * Adds a mapping pop given a mapping_pop
+     * @param MappingPop
+     * @return DatasetId - datasetId of the inserted record
+     * @throws MiddlewareQueryException
+     */
+    public Integer addMappingPop(MappingPop mappingPop) throws MiddlewareQueryException;
 }
