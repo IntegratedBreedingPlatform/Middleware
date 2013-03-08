@@ -23,8 +23,10 @@ import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSetPK;
+import org.generationcp.middleware.pojos.gdms.AlleleValues;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
+import org.generationcp.middleware.pojos.gdms.CharValues;
 import org.generationcp.middleware.pojos.gdms.DartValues;
 import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
@@ -919,6 +921,35 @@ public class TestGenotypicDataManagerImpl{
       
         Integer idAdded = manager.addDatasetUser(datasetUser);
         System.out.println("testAddDatasetUser() Added: " + (idAdded != null ? datasetUser : null));
+    }  
+
+    @Test
+    public void testAddAlleleValues() throws Exception {
+        Integer anId = null;                // Crop tested: Groundnut
+        Integer datasetId = 1; 
+        Integer gId = 1920; 
+        Integer markerId = 1037; 
+        String alleleBinValue = "alleleBinValue"; 
+        String alleleRawValue = "alleleRawValue";
+      
+        AlleleValues alleleValues = new AlleleValues(anId, datasetId, gId, markerId, alleleBinValue, alleleRawValue);
+      
+        Integer idAdded = manager.addAlleleValues(alleleValues);
+        System.out.println("testAddAlleleValues() Added: " + (idAdded != null ? alleleValues : null));
+    }  
+  
+    @Test
+    public void testAddCharValues() throws Exception {
+        Integer acId = null;            // Crop tested: Groundnut
+        Integer datasetId = 1; 
+        Integer gId = 1920; 
+        Integer markerId = 1037; 
+        String charValue = "CV"; 
+      
+        CharValues charValues = new CharValues(acId, datasetId, gId, markerId, charValue);
+      
+        Integer idAdded = manager.addCharValues(charValues);
+        System.out.println("testAddCharValues() Added: " + (idAdded != null ? charValues : null));
     }  
 
     @Test

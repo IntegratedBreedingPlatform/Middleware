@@ -19,7 +19,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.generationcp.middleware.dao.NameDAO;
-import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.gdms.AccMetadataSetDAO;
 import org.generationcp.middleware.dao.gdms.AlleleValuesDAO;
 import org.generationcp.middleware.dao.gdms.CharValuesDAO;
@@ -43,11 +42,12 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSetPK;
+import org.generationcp.middleware.pojos.gdms.AlleleValues;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
+import org.generationcp.middleware.pojos.gdms.CharValues;
 import org.generationcp.middleware.pojos.gdms.DartValues;
 import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
@@ -2634,6 +2634,79 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         
         return idDatasetUserSaved;
     }    
+
+    @Override
+    public Integer addAlleleValues(AlleleValues alleleValues) throws MiddlewareQueryException{
+
+        requireLocalDatabaseInstance();
+        
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        Integer savedId;
+        
+        try {
+            trans = session.beginTransaction();
+            AlleleValuesDAO dao = new AlleleValuesDAO();
+            dao.setSession(session);
+
+            Integer generatedId = dao.getNegativeId("anId");
+            alleleValues.setAnId(generatedId);
+            
+            AlleleValues recordSaved = dao.save(alleleValues);
+            savedId = recordSaved.getDatasetId();
+            
+            trans.commit();
+
+        } catch (Exception e) {
+            // Rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new MiddlewareQueryException("Error encountered with addAlleleValues(alleleValues="
+                    + alleleValues + "): " + e.getMessage(), e);
+        } finally {
+            session.flush();
+        }
+        return savedId;   
+    }
+    
+
+    @Override
+    public Integer addCharValues(CharValues charValues) throws MiddlewareQueryException{
+
+        requireLocalDatabaseInstance();
+        
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        Integer savedId;
+        
+        try {
+            trans = session.beginTransaction();
+            CharValuesDAO dao = new CharValuesDAO();
+            dao.setSession(session);
+
+            Integer generatedId = dao.getNegativeId("acId");
+            charValues.setAcId(generatedId);
+            
+            CharValues recordSaved = dao.save(charValues);
+            savedId = recordSaved.getDatasetId();
+            
+            trans.commit();
+
+        } catch (Exception e) {
+            // Rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new MiddlewareQueryException("Error encountered with addCharValues(charValues="
+                    + charValues + "): " + e.getMessage(), e);
+        } finally {
+            session.flush();
+        }
+        return savedId;   
+    }
     
     
     @Override

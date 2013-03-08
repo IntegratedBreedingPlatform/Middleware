@@ -19,8 +19,10 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSetPK;
+import org.generationcp.middleware.pojos.gdms.AlleleValues;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
+import org.generationcp.middleware.pojos.gdms.CharValues;
 import org.generationcp.middleware.pojos.gdms.DartValues;
 import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
@@ -1156,7 +1158,27 @@ public interface GenotypicDataManager{
      * @return userId - userId of the inserted record
      * @throws MiddlewareQueryException
      */
-    public Integer addDatasetUser(DatasetUsers datasetUser) throws MiddlewareQueryException;
+    public Integer addDatasetUser(DatasetUsers datasetUser) throws MiddlewareQueryException;    
+    /**
+     * Adds an AlleleValues entry to the database
+     * 
+     * @param alleleValues - the object to add
+     * 
+     * @return the id of the item added
+     * @throws MiddlewareQueryException
+     */
+    public Integer addAlleleValues(AlleleValues alleleValues) throws MiddlewareQueryException;
+
+    
+    /**
+     * Adds an CharValues entry to the database
+     * 
+     * @param charValues - the object to add
+     * 
+     * @return the id of the item added
+     * @throws MiddlewareQueryException
+     */
+    public Integer addCharValues(CharValues charValues) throws MiddlewareQueryException;
 
     /**
      * Adds a mapping pop given a MappingPop
@@ -1189,4 +1211,5 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException
      */
     public Integer addDartValue(DartValues dartValue) throws MiddlewareQueryException;    
+
 }
