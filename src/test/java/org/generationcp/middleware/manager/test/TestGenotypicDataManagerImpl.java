@@ -946,7 +946,7 @@ public class TestGenotypicDataManagerImpl{
         Integer markerId = 1037; 
         String charValue = "CV"; 
       
-        CharValues charValues = new CharValues(acId, datasetId, gId, markerId, charValue);
+        CharValues charValues = new CharValues(acId, datasetId, markerId, gId, charValue);
       
         Integer idAdded = manager.addCharValues(charValues);
         System.out.println("testAddCharValues() Added: " + (idAdded != null ? charValues : null));
