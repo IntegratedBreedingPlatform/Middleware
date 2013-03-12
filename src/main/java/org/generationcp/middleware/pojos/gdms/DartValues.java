@@ -66,10 +66,11 @@ public class DartValues implements Serializable{
         super();
     }
 
-    public DartValues(Integer adId, Integer datasetId, Integer cloneId, Float qValue, Float reproducibility, Float callRate, Float picValue, Float discordance) {
+    public DartValues(Integer adId, Integer datasetId, Integer markerId, Integer cloneId, Float qValue, Float reproducibility, Float callRate, Float picValue, Float discordance) {
         super();
         this.adId = adId;
         this.datasetId = datasetId;
+        this.markerId = markerId;
         this.cloneId = cloneId;
         this.qValue = qValue;
         this.reproducibility = reproducibility;

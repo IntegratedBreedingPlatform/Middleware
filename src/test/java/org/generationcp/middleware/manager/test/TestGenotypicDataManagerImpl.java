@@ -1008,6 +1008,7 @@ public class TestGenotypicDataManagerImpl{
   	
     	Integer adId = null;
     	Integer datasetId = -6;
+    	Integer markerId = -1;
     	Integer cloneId = -1;
     	Float qValue = Float.valueOf("123.45");
     	Float reproducibility = Float.valueOf("543.21");
@@ -1015,7 +1016,7 @@ public class TestGenotypicDataManagerImpl{
     	Float picValue = Float.valueOf("543.2");
     	Float discordance = Float.valueOf("1.2");
     	
-        DartValues dartValue = new DartValues(adId, datasetId, cloneId, qValue, reproducibility, callRate, picValue, discordance);
+        DartValues dartValue = new DartValues(adId, datasetId, markerId, cloneId, qValue, reproducibility, callRate, picValue, discordance);
       
         Integer idAdded = manager.addDartValue(dartValue);
         System.out.println("testAddDartValue() Added: " + (idAdded != null ? dartValue : null));
