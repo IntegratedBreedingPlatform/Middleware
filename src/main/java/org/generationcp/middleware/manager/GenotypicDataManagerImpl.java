@@ -3185,5 +3185,89 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return transactionStatus;
     }    
     
+
+
+    @Override
+    public Boolean setQTL(DatasetUsers datasetUser, Dataset dataset, QtlDetails qtlDetails, Qtl qtl) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+        Boolean transactionStatus = true;
+
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
+
+            // Add Dataset User
+            DatasetUsersDAO datasetUserDao = new DatasetUsersDAO();
+            datasetUserDao.setSession(session);
+
+            DatasetUsers recordSaved = datasetUserDao.save(datasetUser);
+            Integer idDatasetUserSaved = recordSaved.getUserId();    
+
+            if(idDatasetUserSaved == null)
+            	transactionStatus = false;
+            
+            // Add Dataset
+            DatasetDAO datasetDao = new DatasetDAO();
+            datasetDao.setSession(session);
+
+            Integer generatedId = datasetDao.getNegativeId("datasetId");
+            dataset.setDatasetId(generatedId);
+            
+            dataset.setDatasetType("QTL");
+            
+            Dataset datasetRecordSaved = datasetDao.save(dataset);
+            Integer datasetSavedId = recordSaved.getDatasetId();            
+
+            if(datasetSavedId == null)
+            	transactionStatus = false;            
+
+            // Add QtlDetails
+            QtlDetailsDAO qtlDetailsDao = new QtlDetailsDAO();
+            qtlDetailsDao.setSession(session);
+
+            QtlDetails qtlDetailsRecordSaved = qtlDetailsDao.save(qtlDetails);
+            QtlDetailsPK qtlDetailsSavedId = qtlDetailsRecordSaved.getId();
+
+            if(qtlDetailsSavedId == null)
+            	transactionStatus = false;            
+            
+            // Add Qtl
+            
+            QtlDAO qtlDao = new QtlDAO();
+            qtlDao.setSession(session);
+
+            Integer qtlId = qtlDao.getNegativeId("qtlId");
+            qtl.setQtlId(qtlId);
+            
+            Qtl qtlRecordSaved = qtlDao.saveOrUpdate(qtl);
+            Integer qtlIdSaved = qtlRecordSaved.getQtlId();            
+            
+            if(qtlIdSaved == null)
+            	transactionStatus = false;            
+            
+            if(transactionStatus == true)
+                trans.commit();
+            else
+            	trans.rollback();
+            
+        } catch (Exception e) {
+            // rollback transaction in case of errors
+        	transactionStatus = false;
+            if (trans != null) {            	
+                trans.rollback();
+            }
+            throw new MiddlewareQueryException("Error encountered while saving Marker: setQTL(): "
+                    + e.getMessage(), e);
+        } finally {
+            session.flush();
+        }
+        
+        return transactionStatus;
+    }    
+
+    
     
 }

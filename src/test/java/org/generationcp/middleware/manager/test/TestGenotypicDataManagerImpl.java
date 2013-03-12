@@ -1247,6 +1247,60 @@ public class TestGenotypicDataManagerImpl{
         System.out.println("testSetCISRMarkers() Added: " + (addStatus != null ? marker : null) + (addStatus != null ? markerAlias : null) + (addStatus != null ? markerDetails : null) + (addStatus != null ? markerUserInfo : null));
     }
     
+    @Test
+    public void testSetQTL() throws Exception {
+        Integer datasetId = 7;
+        Integer userId = 123;
+
+        String datasetName = " QTL_ ICGS 44 X ICGS 78";
+        String datasetDesc = "ICGS 44 X ICGS 78";
+        String datasetType = "QTL";
+        String genus = "Groundnut"; 
+        String species = ""; 
+        Date uploadTemplateDate = new Date(System.currentTimeMillis()); 
+        String remarks = ""; 
+        String dataType = "int"; 
+        String missingData = null;
+        String method = null;
+        String score = null;
+        
+        Integer qtlId = 4;          // Crop tested: Groundnut
+        Integer mapId = 1; 
+        Float minPosition = 0f; 
+        Float maxPosition = 8f; 
+        String trait = "HI"; 
+        String experiment = ""; 
+        Float effect =0f;
+        Float scoreValue = 2.5f;
+        Float rSquare = 10f; 
+        String linkageGroup = "LG06"; 
+        String interactions = ""; 
+        String leftFlankingMarker = "Ah4-101";
+        String rightFlankingMarker = "GM2536"; 
+        Float position = 34.71f; 
+        Float clen = 0f; 
+        String seAdditive = null; 
+        String hvParent = null; 
+        String hvAllele = null; 
+        String lvParent = null;
+        String lvAllele = null;
+                
+    	String qtlName = "TestQTL";
+    	        
+        DatasetUsers datasetUser = new DatasetUsers(datasetId, userId);
+        
+        Dataset dataset = new Dataset(datasetId, datasetName, datasetDesc, datasetType, genus, species, uploadTemplateDate, remarks,
+                dataType, missingData, method, score);        
+        
+        QtlDetails qtlDetails = new QtlDetails(qtlId, mapId, minPosition, maxPosition, trait, experiment, effect,
+                scoreValue, rSquare, linkageGroup, interactions, leftFlankingMarker,
+                rightFlankingMarker, position, clen, seAdditive, hvParent, hvAllele, lvParent, lvAllele);        
+
+        Qtl qtl = new Qtl(qtlId, qtlName, datasetId);
+        
+        Boolean addStatus = manager.setQTL(datasetUser, dataset, qtlDetails, qtl);
+        System.out.println("testSetQTL() Added: " + (addStatus != null ? datasetUser : null) + (addStatus != null ? dataset : null) + (addStatus != null ? qtlDetails : null) + (addStatus != null ? qtl : null));
+    }
     
     @AfterClass
     public static void tearDown() throws Exception {

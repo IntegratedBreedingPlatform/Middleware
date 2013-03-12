@@ -1263,5 +1263,16 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException
      */
     public Boolean setCISRMarkers(Marker marker, MarkerAlias markerAlias, MarkerDetails markerDetails, MarkerUserInfo markerUserInfo) throws MiddlewareQueryException;
-        
+
+    /**
+     * Sets QTL
+     * @param datasetUser - (DatasetUser)
+     * @param dataset - (Dataset) dataset_type will be set to/overridden by "QTL"
+     * @param qtlDetails - (QtlDetails)
+     * @param qtl - (Qtl)
+     * @return (boolean) - true if successful, exception or false if failed
+     * @throws MiddlewareQueryException
+     */
+    public Boolean setQTL(DatasetUsers datasetUser, Dataset dataset, QtlDetails qtlDetails, Qtl qtl) throws MiddlewareQueryException;
+
 }
