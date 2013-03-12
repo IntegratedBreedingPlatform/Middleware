@@ -1053,7 +1053,7 @@ public class TestGenotypicDataManagerImpl{
     @Test
     public void testSetSSRMarkers() throws Exception {
 
-    	Integer markerId = 0;
+    	Integer markerId = null; //Will be set/overridden by the function
         String markerType = null; //Will be set/overridden by the function
         String markerName = "SeqTEST";
         String species = "Groundnut";
@@ -1106,7 +1106,7 @@ public class TestGenotypicDataManagerImpl{
     @Test
     public void testSetSNPMarkers() throws Exception {
 
-    	Integer markerId = 0;
+    	Integer markerId = null; //Will be set/overridden by the function
         String markerType = null; //Will be set/overridden by the function
         String markerName = "SeqTEST";
         String species = "Groundnut";
@@ -1159,7 +1159,7 @@ public class TestGenotypicDataManagerImpl{
     @Test
     public void testSetCAPMarkers() throws Exception {
 
-    	Integer markerId = 0;
+    	Integer markerId = null; //Will be set/overridden by the function
         String markerType = null; //Will be set/overridden by the function
         String markerName = "SeqTEST";
         String species = "Groundnut";
@@ -1212,7 +1212,7 @@ public class TestGenotypicDataManagerImpl{
     @Test
     public void testSetCISRMarkers() throws Exception {
 
-    	Integer markerId = 0;
+    	Integer markerId = null; //Will be set/overridden by the function
         String markerType = null; //Will be set/overridden by the function
         String markerName = "SeqTEST";
         String species = "Groundnut";
@@ -1264,7 +1264,7 @@ public class TestGenotypicDataManagerImpl{
     
     @Test
     public void testSetQTL() throws Exception {
-        Integer datasetId = 7;
+        Integer datasetId = null; //Will be set/overridden by the function
         Integer userId = 123;
 
         String datasetName = " QTL_ ICGS 44 X ICGS 78";
@@ -1279,7 +1279,7 @@ public class TestGenotypicDataManagerImpl{
         String method = null;
         String score = null;
         
-        Integer qtlId = 4;          // Crop tested: Groundnut
+        Integer qtlId = null; //Will be set/overridden by the function
         Integer mapId = 1; 
         Float minPosition = 0f; 
         Float maxPosition = 8f; 

@@ -2896,8 +2896,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             // Add GDMS Marker Alias
             MarkerAliasDAO markerAliasDao = new MarkerAliasDAO();
             markerAliasDao.setSession(session);
+            markerAlias.setMarkerId(idGDMSMarkerSaved);
 
-            MarkerAlias markerAliasRecordSaved = markerAliasDao.save(markerAlias);
+            MarkerAlias markerAliasRecordSaved = markerAliasDao.saveOrUpdate(markerAlias);
             Integer markerAliasRecordSavedMarkerId = markerAliasRecordSaved.getMarkerId();
             if(markerAliasRecordSavedMarkerId == null)
             	transactionStatus = false;
@@ -2905,18 +2906,19 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             // Add Marker Details
             MarkerDetailsDAO markerDetailsDao = new MarkerDetailsDAO();
             markerDetailsDao.setSession(session);
+            markerDetails.setMarkerId(idGDMSMarkerSaved);
 
-            MarkerDetails markerDetailsRecordSaved = markerDetailsDao.save(markerDetails);
+            MarkerDetails markerDetailsRecordSaved = markerDetailsDao.saveOrUpdate(markerDetails);
             Integer markerDetailsSavedMarkerId = markerDetailsRecordSaved.getMarkerId();
             if(markerDetailsSavedMarkerId == null)
             	transactionStatus = false;
             
             // Add marker user info
-            
             MarkerUserInfoDAO dao = new MarkerUserInfoDAO();
             dao.setSession(session);
+            markerUserInfo.setMarkerId(idGDMSMarkerSaved);
             
-            MarkerUserInfo markerUserInfoRecordSaved = dao.save(markerUserInfo);
+            MarkerUserInfo markerUserInfoRecordSaved = dao.saveOrUpdate(markerUserInfo);
             Integer markerUserInfoSavedId = markerUserInfoRecordSaved.getMarkerId();
             if(markerUserInfoSavedId == null)
             	transactionStatus = false;
@@ -2970,6 +2972,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             // Add GDMS Marker Alias
             MarkerAliasDAO markerAliasDao = new MarkerAliasDAO();
             markerAliasDao.setSession(session);
+            markerAlias.setMarkerId(idGDMSMarkerSaved);
 
             MarkerAlias markerAliasRecordSaved = markerAliasDao.save(markerAlias);
             Integer markerAliasRecordSavedMarkerId = markerAliasRecordSaved.getMarkerId();
@@ -2979,6 +2982,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             // Add Marker Details
             MarkerDetailsDAO markerDetailsDao = new MarkerDetailsDAO();
             markerDetailsDao.setSession(session);
+            markerDetails.setMarkerId(idGDMSMarkerSaved);
 
             MarkerDetails markerDetailsRecordSaved = markerDetailsDao.save(markerDetails);
             Integer markerDetailsSavedMarkerId = markerDetailsRecordSaved.getMarkerId();
@@ -2986,9 +2990,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             	transactionStatus = false;
             
             // Add marker user info
-            
             MarkerUserInfoDAO dao = new MarkerUserInfoDAO();
             dao.setSession(session);
+            markerUserInfo.setMarkerId(idGDMSMarkerSaved);
             
             MarkerUserInfo markerUserInfoRecordSaved = dao.save(markerUserInfo);
             Integer markerUserInfoSavedId = markerUserInfoRecordSaved.getMarkerId();
@@ -3044,6 +3048,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             // Add GDMS Marker Alias
             MarkerAliasDAO markerAliasDao = new MarkerAliasDAO();
             markerAliasDao.setSession(session);
+            markerAlias.setMarkerId(idGDMSMarkerSaved);
 
             MarkerAlias markerAliasRecordSaved = markerAliasDao.save(markerAlias);
             Integer markerAliasRecordSavedMarkerId = markerAliasRecordSaved.getMarkerId();
@@ -3053,6 +3058,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             // Add Marker Details
             MarkerDetailsDAO markerDetailsDao = new MarkerDetailsDAO();
             markerDetailsDao.setSession(session);
+            markerDetails.setMarkerId(idGDMSMarkerSaved);
 
             MarkerDetails markerDetailsRecordSaved = markerDetailsDao.save(markerDetails);
             Integer markerDetailsSavedMarkerId = markerDetailsRecordSaved.getMarkerId();
@@ -3060,9 +3066,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             	transactionStatus = false;
             
             // Add marker user info
-            
             MarkerUserInfoDAO dao = new MarkerUserInfoDAO();
             dao.setSession(session);
+            markerUserInfo.setMarkerId(idGDMSMarkerSaved);
             
             MarkerUserInfo markerUserInfoRecordSaved = dao.save(markerUserInfo);
             Integer markerUserInfoSavedId = markerUserInfoRecordSaved.getMarkerId();
@@ -3118,6 +3124,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             // Add GDMS Marker Alias
             MarkerAliasDAO markerAliasDao = new MarkerAliasDAO();
             markerAliasDao.setSession(session);
+            markerAlias.setMarkerId(idGDMSMarkerSaved);
 
             MarkerAlias markerAliasRecordSaved = markerAliasDao.save(markerAlias);
             Integer markerAliasRecordSavedMarkerId = markerAliasRecordSaved.getMarkerId();
@@ -3127,6 +3134,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             // Add Marker Details
             MarkerDetailsDAO markerDetailsDao = new MarkerDetailsDAO();
             markerDetailsDao.setSession(session);
+            markerDetails.setMarkerId(idGDMSMarkerSaved);
+
 
             MarkerDetails markerDetailsRecordSaved = markerDetailsDao.save(markerDetails);
             Integer markerDetailsSavedMarkerId = markerDetailsRecordSaved.getMarkerId();
@@ -3137,6 +3146,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             
             MarkerUserInfoDAO dao = new MarkerUserInfoDAO();
             dao.setSession(session);
+            markerUserInfo.setMarkerId(idGDMSMarkerSaved);
             
             MarkerUserInfo markerUserInfoRecordSaved = dao.save(markerUserInfo);
             Integer markerUserInfoSavedId = markerUserInfoRecordSaved.getMarkerId();
@@ -3177,16 +3187,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             // begin save transaction
             trans = session.beginTransaction();
 
-            // Add Dataset User
-            DatasetUsersDAO datasetUserDao = new DatasetUsersDAO();
-            datasetUserDao.setSession(session);
-
-            DatasetUsers recordSaved = datasetUserDao.save(datasetUser);
-            Integer idDatasetUserSaved = recordSaved.getUserId();    
-
-            if(idDatasetUserSaved == null)
-            	transactionStatus = false;
-            
             // Add Dataset
             DatasetDAO datasetDao = new DatasetDAO();
             datasetDao.setSession(session);
@@ -3196,35 +3196,51 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             
             dataset.setDatasetType("QTL");
             
-            Dataset datasetRecordSaved = datasetDao.save(dataset);
-            Integer datasetSavedId = recordSaved.getDatasetId();            
+            Dataset datasetRecordSaved = datasetDao.saveOrUpdate(dataset);
+            Integer datasetSavedId = datasetRecordSaved.getDatasetId();            
 
             if(datasetSavedId == null)
             	transactionStatus = false;            
+            
+            // Add Dataset User
+            DatasetUsersDAO datasetUserDao = new DatasetUsersDAO();
+            datasetUserDao.setSession(session);
+            datasetUser.setDatasetId(datasetSavedId);
 
-            // Add QtlDetails
-            QtlDetailsDAO qtlDetailsDao = new QtlDetailsDAO();
-            qtlDetailsDao.setSession(session);
+            DatasetUsers recordSaved = datasetUserDao.saveOrUpdate(datasetUser);
+            Integer idDatasetUserSaved = recordSaved.getUserId();    
 
-            QtlDetails qtlDetailsRecordSaved = qtlDetailsDao.save(qtlDetails);
-            QtlDetailsPK qtlDetailsSavedId = qtlDetailsRecordSaved.getId();
-
-            if(qtlDetailsSavedId == null)
+            if(idDatasetUserSaved == null)
             	transactionStatus = false;            
-            
-            // Add Qtl
-            
+
+            // Add Qtl            
             QtlDAO qtlDao = new QtlDAO();
             qtlDao.setSession(session);
 
             Integer qtlId = qtlDao.getNegativeId("qtlId");
             qtl.setQtlId(qtlId);
+            qtl.setDatasetId(datasetSavedId);
             
             Qtl qtlRecordSaved = qtlDao.saveOrUpdate(qtl);
             Integer qtlIdSaved = qtlRecordSaved.getQtlId();            
             
             if(qtlIdSaved == null)
             	transactionStatus = false;            
+            
+            // Add QtlDetails
+            QtlDetailsDAO qtlDetailsDao = new QtlDetailsDAO();
+            qtlDetailsDao.setSession(session);
+            
+            QtlDetailsPK qtlDetailsPK = new QtlDetailsPK(qtlIdSaved, qtlDetails.getId().getMapId());
+            
+            qtlDetails.setQtlId(qtlDetailsPK);
+
+            QtlDetails qtlDetailsRecordSaved = qtlDetailsDao.saveOrUpdate(qtlDetails);
+            QtlDetailsPK qtlDetailsSavedId = qtlDetailsRecordSaved.getId();
+
+            if(qtlDetailsSavedId == null)
+            	transactionStatus = false;                        
+  
             
             if(transactionStatus == true)
                 trans.commit();

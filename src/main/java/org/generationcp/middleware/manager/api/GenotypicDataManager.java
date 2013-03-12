@@ -1267,9 +1267,9 @@ public interface GenotypicDataManager{
     /**
      * Sets SSR Markers
      * @param marker (Marker) marker_type will be set to/overridden by "SSR"
-     * @param markerAlias (MarkerAlias)
-     * @param markerDetails (MarkerDetails)
-     * @param markerUserInfo (MarkerUserInfo)
+     * @param markerAlias (MarkerAlias) (marker_id will automatically be set to inserted marker's ID)
+     * @param markerDetails (MarkerDetails) (marker_id will automatically be set to inserted marker's ID)
+     * @param markerUserInfo (MarkerUserInfo) (marker_id will automatically be set to inserted marker's ID)
      * @return (boolean) - true if successful, exception or false if failed
      * @throws MiddlewareQueryException
      */
@@ -1278,9 +1278,9 @@ public interface GenotypicDataManager{
     /**
      * Sets SNP Markers
      * @param marker (Marker) marker_type will be set to/overridden by "SNP"
-     * @param markerAlias (MarkerAlias)
-     * @param markerDetails (MarkerDetails)
-     * @param markerUserInfo (MarkerUserInfo)
+     * @param markerAlias (MarkerAlias) (marker_id will automatically be set to inserted marker's ID)
+     * @param markerDetails (MarkerDetails) (marker_id will automatically be set to inserted marker's ID)
+     * @param markerUserInfo (MarkerUserInfo) (marker_id will automatically be set to inserted marker's ID)
      * @return (boolean) - true if successful, exception or false if failed
      * @throws MiddlewareQueryException
      */
@@ -1289,9 +1289,9 @@ public interface GenotypicDataManager{
     /**
      * Sets CAP Markers
      * @param marker (Marker) marker_type will be set to/overridden by "CAP"
-     * @param markerAlias (MarkerAlias)
-     * @param markerDetails (MarkerDetails)
-     * @param markerUserInfo (MarkerUserInfo)
+     * @param markerAlias (MarkerAlias) (marker_id will automatically be set to inserted marker's ID)
+     * @param markerDetails (MarkerDetails) (marker_id will automatically be set to inserted marker's ID)
+     * @param markerUserInfo (MarkerUserInfo) (marker_id will automatically be set to inserted marker's ID)
      * @return (boolean) - true if successful, exception or false if failed
      * @throws MiddlewareQueryException
      */
@@ -1300,9 +1300,9 @@ public interface GenotypicDataManager{
     /**
      * Sets CISR Markers
      * @param marker (Marker) marker_type will be set to/overridden by "CISR"
-     * @param markerAlias (MarkerAlias)
-     * @param markerDetails (MarkerDetails)
-     * @param markerUserInfo (MarkerUserInfo)
+     * @param markerAlias (MarkerAlias) (marker_id will automatically be set to inserted marker's ID)
+     * @param markerDetails (MarkerDetails) (marker_id will automatically be set to inserted marker's ID)
+     * @param markerUserInfo (MarkerUserInfo) (marker_id will automatically be set to inserted marker's ID)
      * @return (boolean) - true if successful, exception or false if failed
      * @throws MiddlewareQueryException
      */
@@ -1312,8 +1312,8 @@ public interface GenotypicDataManager{
      * Sets QTL
      * @param datasetUser - (DatasetUser)
      * @param dataset - (Dataset) dataset_type will be set to/overridden by "QTL"
-     * @param qtlDetails - (QtlDetails)
-     * @param qtl - (Qtl)
+     * @param qtlDetails - (QtlDetails) (qtl_id will be automatically set to inserted Qtl's ID)
+     * @param qtl - (Qtl) (dataset_id will be automatically set to inserted dataset's ID) 
      * @return (boolean) - true if successful, exception or false if failed
      * @throws MiddlewareQueryException
      */
