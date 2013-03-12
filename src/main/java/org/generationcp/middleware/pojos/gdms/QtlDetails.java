@@ -40,6 +40,7 @@ public class QtlDetails implements Serializable{
             + "        AND gdms_markers_onmap.start_position between :min AND :max "
             ;
 
+    
     public static final String COUNT_MARKER_IDS_BY_QTL = 
             "SELECT COUNT(marker_id)  "
             + "FROM gdms_markers_onmap, gdms_qtl_details, gdms_qtl "
@@ -49,6 +50,46 @@ public class QtlDetails implements Serializable{
             + "        AND gdms_markers_onmap.linkage_group = :chromosome " 
             + "        AND gdms_markers_onmap.start_position between :min AND :max "
             ;
+
+    public static final String GET_MAP_IDS_BY_QTL = 
+            "SELECT DISTINCT map_id " 
+            + "FROM gdms_qtl_details "
+            + "WHERE qtl_id = (SELECT qtl_id FROM gdms_qtl WHERE qtl_name = :qtlName) " ;
+
+    public static final String COUNT_MAP_IDS_BY_QTL = 
+            "SELECT COUNT(DISTINCT map_id) " 
+            + "FROM gdms_qtl_details "
+            + "WHERE qtl_id = (SELECT qtl_id FROM gdms_qtl WHERE qtl_name = :qtlName) " ;
+
+    public static final String GET_MARKER_IDS_BY_QTL_AND_MAP_ID = 
+          "SELECT DISTINCT gm.marker_id " 
+          + "FROM gdms_marker gm "
+          + "    INNER JOIN gdms_markers_onmap gmo ON gm.marker_id = gmo.marker_id " 
+          + "    INNER JOIN gdms_qtl_details gqd ON gqd.map_id = gmo.map_id " 
+          + "    INNER JOIN gdms_qtl gq ON gq.qtl_id = gqd.qtl_id " 
+          + "    WHERE gmo.linkage_group = :chromosome "
+          + "         AND gmo.start_position BETWEEN :min AND :max " 
+          + "         AND gmo.map_id = :mapId "
+          + "         AND gq.qtl_name like :qtlName "
+          ;
+
+    public static final String COUNT_MARKER_IDS_BY_QTL_AND_MAP_ID = 
+            "SELECT COUNT(DISTINCT gm.marker_id) " 
+            + "FROM gdms_marker gm "
+            + "    INNER JOIN gdms_markers_onmap gmo ON gm.marker_id = gmo.marker_id " 
+            + "    INNER JOIN gdms_qtl_details gqd ON gqd.map_id = gmo.map_id " 
+            + "    INNER JOIN gdms_qtl gq ON gq.qtl_id = gqd.qtl_id " 
+            + "    WHERE gmo.linkage_group = :chromosome "
+            + "         AND gmo.start_position BETWEEN :min AND :max " 
+            + "         AND gmo.map_id = :mapId "
+            + "         AND gq.qtl_name like :qtlName "
+            ;
+
+    public static final String GET_MAP_ID_BY_QTL =
+            "SELECT DISTINCT map_id " 
+            + "FROM gdms_qtl_details "
+            + "WHERE qtl_id = (SELECT qtl_id FROM gdms_qtl WHERE qtl_name = :qtlName) " ;
+;
 
     /** The id. */
     @EmbeddedId

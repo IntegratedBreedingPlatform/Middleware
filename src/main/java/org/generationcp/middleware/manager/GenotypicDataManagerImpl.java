@@ -2150,147 +2150,90 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     
     @Override
-    public List<Marker> getMarkersByQtl(String qtlName, String chromosome, int min, int max, int start, int numOfRows)
-            throws MiddlewareQueryException {
-        
-        MarkerDAO markerDao = new MarkerDAO();
-        QtlDetailsDAO qtlDetailsDao = new QtlDetailsDAO();
+    public List<Integer> getMapIdsByQtlName(String qtlName, int start, int numOfRows) throws MiddlewareQueryException{
+        QtlDetailsDAO dao = new QtlDetailsDAO();
 
         long centralCount = 0;
-        long negativeLocalCount = 0;
-        long positiveLocalCount = 0;
+        long localCount = 0;
         long relativeLimit = 0;
 
         Session sessionForCentral = getCurrentSessionForCentral();
         Session sessionForLocal = getCurrentSessionForLocal();
-
-        List<Marker> markers = new ArrayList<Marker>();        
         
-        // Get from Central
-        if (sessionForCentral != null){
-            
-            // Get the markerIds
-            qtlDetailsDao.setSession(sessionForCentral);
-            List<Integer> markerIds = qtlDetailsDao.getMarkerIdsByQtl(qtlName, chromosome, min, max);
-            centralCount = qtlDetailsDao.countMarkerIdsByQtl(qtlName, chromosome, min, max);
+        List<Integer> mapIds = new ArrayList<Integer>();
 
-            markerDao.setSession(sessionForCentral);
+        if(sessionForCentral != null) {
+            
+            dao.setSession(sessionForCentral);
+            centralCount = dao.countMapIdsByQtlName(qtlName);
             
             if(centralCount > start) {
-                markers.addAll(markerDao.getMarkersByIds(markerIds, start, numOfRows));
-                relativeLimit = numOfRows - markers.size();
+                mapIds.addAll(dao.getMapIdsByQtlName(qtlName, start, numOfRows));
+                relativeLimit = numOfRows - mapIds.size();
                 if(relativeLimit > 0 && sessionForLocal != null) {
-
-                    // Get the markerIds and separate the negative from positive ids
-                    qtlDetailsDao.setSession(sessionForLocal);
-                    List<Integer> localMarkerIds = qtlDetailsDao.getMarkerIdsByQtl(qtlName, chromosome, min, max);
-                    
-                    List<Integer> positiveMarkerIds = new ArrayList<Integer>();
-                    List<Integer> negativeMarkerIds = new ArrayList<Integer>();
-                    
-                    for (Integer markerId : localMarkerIds){
-                        if (markerId < 0) {
-                            negativeMarkerIds.add(markerId);
-                        } else {
-                            positiveMarkerIds.add(markerId);
-                        }
-                    }
-                    
-                    // Get the markers corresponding to the negative marker ids from local database
-                    markerDao.setSession(sessionForLocal);
-                    //negativeLocalCount = markerDao.countMarkersByIds(negativeMarkerIds); 
-                    negativeLocalCount = negativeMarkerIds.size();
-                    if (negativeLocalCount > 0){
-                        markers.addAll(markerDao.getMarkersByIds(negativeMarkerIds, 0, (int) relativeLimit));
-                        relativeLimit = numOfRows - markers.size();
-                        if (relativeLimit > 0) {
-                            // Get the markers corresponding to the positive marker ids from central database
-                            markerDao.setSession(sessionForCentral);
-                            //positiveLocalCount = markerDao.countMarkersByIds(positiveMarkerIds);
-                            positiveLocalCount = positiveMarkerIds.size();
-                            if (positiveLocalCount > 0){
-                                markers.addAll(markerDao.getMarkersByIds(positiveMarkerIds, 0, (int) relativeLimit));
-                            }
-                        }
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countMapIdsByQtlName(qtlName);
+                    if(localCount > 0) {
+                        mapIds.addAll(dao.getMapIdsByQtlName(qtlName, 0, (int) relativeLimit));
                     }
                 }
             } else {
                 relativeLimit = start - centralCount;
-
-                // Get the markerIds and separate the negative from positive ids
-                qtlDetailsDao.setSession(sessionForLocal);
-                List<Integer> localMarkerIds = qtlDetailsDao.getMarkerIdsByQtl(qtlName, chromosome, min, max);
-                
-                List<Integer> positiveMarkerIds = new ArrayList<Integer>();
-                List<Integer> negativeMarkerIds = new ArrayList<Integer>();
-                
-                for (Integer markerId : localMarkerIds){
-                    if (markerId < 0) {
-                        negativeMarkerIds.add(markerId);
-                    } else {
-                        positiveMarkerIds.add(markerId);
-                    }
-                }
-                
-                // Get the markers corresponding to the negative marker ids from local database
-                markerDao.setSession(sessionForLocal);
-                negativeLocalCount = negativeMarkerIds.size();
-                if (negativeLocalCount > 0){
-                    markers.addAll(markerDao.getMarkersByIds(negativeMarkerIds, 0, (int) relativeLimit));
-                    relativeLimit = numOfRows - markers.size();
-                    if (relativeLimit > 0) {
-                        // Get the markers corresponding to the positive marker ids from central database
-                        markerDao.setSession(sessionForCentral);
-                        positiveLocalCount = positiveMarkerIds.size();
-                        if (positiveLocalCount > 0){
-                            markers.addAll(markerDao.getMarkersByIds(positiveMarkerIds, 0, (int) relativeLimit));
-                        }
+                if (sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countMapIdsByQtlName(qtlName);
+                    if (localCount > relativeLimit) {
+                        mapIds.addAll(dao.getMapIdsByQtlName(qtlName, (int) relativeLimit, numOfRows));
                     }
                 }
             }
-            
-        } else if (sessionForLocal != null){  // Get from Local
-            
-            // Get the markerIds
-            qtlDetailsDao.setSession(sessionForLocal);
-            List<Integer> markerIds = qtlDetailsDao.getMarkerIdsByQtl(qtlName, chromosome, min, max);
-            
-            List<Integer> positiveMarkerIds = new ArrayList<Integer>();
-            List<Integer> negativeMarkerIds = new ArrayList<Integer>();
-            
-            for (Integer markerId : markerIds){
-                if (markerId < 0) {
-                    negativeMarkerIds.add(markerId);
-                } else {
-                    positiveMarkerIds.add(markerId);
-                }
+        } else if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            localCount = dao.countMapIdsByQtlName(qtlName);
+            if (localCount > start) {
+                mapIds.addAll(dao.getMapIdsByQtlName(qtlName, start, numOfRows));
             }
-            
-
-            // Get the markers corresponding to the negative marker ids from local database
-            markerDao.setSession(sessionForLocal);
-            negativeLocalCount = negativeMarkerIds.size();
-            if (negativeLocalCount > 0){
-                markers.addAll(markerDao.getMarkersByIds(negativeMarkerIds, start, numOfRows));
-                relativeLimit = numOfRows - markers.size();
-                if (relativeLimit > 0) {
-                    // Get the markers corresponding to the positive marker ids from central database
-                    markerDao.setSession(sessionForCentral);
-                    positiveLocalCount = positiveMarkerIds.size();
-                    if (positiveLocalCount > 0){
-                        markers.addAll(markerDao.getMarkersByIds(positiveMarkerIds, 0, (int) relativeLimit));
-                    }
-                }
-            }
-            
         }
-
-        return markers;
-
+        
+        return mapIds;    
     }
 
+
+
     @Override
-    public long countMarkersByQtl(String qtlName, String chromosome, int min, int max) throws MiddlewareQueryException {
+    public long countMapIdsByQtlName(String qtlName) throws MiddlewareQueryException {
+        QtlDetailsDAO qtlDetailsDao = new QtlDetailsDAO();
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        long count = 0;        
+
+        // Count from Central
+        if (sessionForCentral != null) {
+            qtlDetailsDao.setSession(sessionForLocal);
+            count += qtlDetailsDao.countMapIdsByQtlName(qtlName);
+        }
+
+        // Count from Local
+        if (sessionForLocal != null) {
+            qtlDetailsDao.setSession(sessionForLocal);
+            count += qtlDetailsDao.countMapIdsByQtlName(qtlName);
+        }
+        
+        return count;
+    }
+    
+    @Override
+    public List<Integer> getMarkerIdsByQtl(String qtlName, String chromosome, int min, int max, int start, int numOfRows)
+            throws MiddlewareQueryException {
+        //TODO
+        return null;
+
+    }
+    
+    @Override
+    public long countMarkerIdsByQtl(String qtlName, String chromosome, int min, int max) throws MiddlewareQueryException {
         QtlDetailsDAO qtlDetailsDao = new QtlDetailsDAO();
 
         Session sessionForCentral = getCurrentSessionForCentral();
@@ -2313,6 +2256,41 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return count;
     }
     
+    
+    public List<Marker> getMarkersByIds(List<Integer> markerIds, int start, int numOfRows) throws MiddlewareQueryException{
+
+        MarkerDAO dao = new MarkerDAO();
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        List<Integer> positiveGids = new ArrayList<Integer>();
+        List<Integer> negativeGids = new ArrayList<Integer>();
+        for (Integer markerId : markerIds){
+            if (markerId < 0) {
+                negativeGids.add(markerId);
+            } else {
+                positiveGids.add(markerId);
+            }
+        }
+
+        List<Marker> markers = new ArrayList<Marker>();
+        
+        // Count from local
+        if ((sessionForLocal != null) && (negativeGids != null) && (!negativeGids.isEmpty())){
+            dao.setSession(sessionForLocal);
+            markers.addAll(dao.getMarkersByIds(negativeGids, start, numOfRows));
+        }
+
+        // Count from central
+        if ((sessionForCentral != null) && (positiveGids != null) && (!positiveGids.isEmpty())) {
+            dao.setSession(sessionForCentral);
+            markers.addAll(dao.getMarkersByIds(positiveGids, start, numOfRows));
+        }
+
+        return markers;
+    }
+
+
     
     @Override
     public QtlDetailsPK addQtlDetails(QtlDetails qtlDetails) throws MiddlewareQueryException {
@@ -3183,7 +3161,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         }
         
         return transactionStatus;
-    }    
+    }
     
 
 

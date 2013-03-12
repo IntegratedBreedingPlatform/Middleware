@@ -691,12 +691,27 @@ public class TestGenotypicDataManagerImpl{
     }    
     
     @Test
+    public void testGetMapIdsByQtlName() throws Exception { 
+        String qtlName = "HI Control 08_AhI";     // Crop tested: Groundnut
+        List<Integer> results = manager.getMapIdsByQtlName(qtlName, 0, (int) manager.countMapIdsByQtlName(qtlName));
+        System.out.println("testGetMapIdsByQtlName() RESULTS: " + results);
+    }
+
+    @Test
+    public void testCountMapIdsByQtlName() throws Exception { 
+        String qtlName = "HI Control 08_AhI";     // Crop tested: Groundnut
+        long count = manager.countMapIdsByQtlName(qtlName);
+        System.out.println("testCountMapIdsByQtlName() RESULTS: " + count);
+    }
+
+
+    @Test
     public void testGetMarkersByQtl() throws Exception { 
         String qtlName = "HI Control 08_AhI";     // Crop tested: Groundnut
         String chromosome = "LG01";
         int min = 0;
         int max = 10;
-        List<Marker> results = manager.getMarkersByQtl(qtlName, chromosome, min, max, 0, (int) manager.countMarkersByQtl(qtlName, chromosome, min, max));
+        List<Integer> results = manager.getMarkerIdsByQtl(qtlName, chromosome, min, max, 0, (int) manager.countMarkerIdsByQtl(qtlName, chromosome, min, max));
         System.out.println("testGetMarkersByQtl() RESULTS: " + results);
     }
 
@@ -706,7 +721,7 @@ public class TestGenotypicDataManagerImpl{
         String chromosome = "LG01";
         int min = 0;
         int max = 10;
-        long count = manager.countMarkersByQtl(qtlName, chromosome, min, max);
+        long count = manager.countMarkerIdsByQtl(qtlName, chromosome, min, max);
         System.out.println("testCountMarkersByQtl() RESULTS: " + count);
 
     }

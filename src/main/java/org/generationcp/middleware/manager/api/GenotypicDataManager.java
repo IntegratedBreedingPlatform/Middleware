@@ -1034,28 +1034,35 @@ public interface GenotypicDataManager{
     
     
     /**
-     * Returns the markers matching the given QTL name, chromosome, min start position and max start position values 
+     * Returns the map ids matching the given QTL name 
      * 
      * @param qtlName
      *          - the name of the QTL to match       
-     * @param chromosome
-     *          - the value to match the linkage group of markers_onmap
-     * @param min
-     *          - the minimum start position 
-     * @param max
-     *          - the maximum start position 
      * @param start 
      *          - the starting index of the sublist of results to be returned
      * @param numOfRows 
      *          - the number of rows to be included in the sublist of results 
      *          to be returned
-     * @return the markers matching the given parameters
+     * @return the map ids matching the given parameters
      * @throws MiddlewareQueryException
      */
-    public List<Marker> getMarkersByQtl(String qtlName, String chromosome, int min, int max, int start, int numOfRows) throws MiddlewareQueryException;
+    public List<Integer> getMapIdsByQtlName(String qtlName, int start, int numOfRows) throws MiddlewareQueryException;
+    
 
     /**
-     * Returns the number of markers matching the given QTL name, chromosome, min start position and max start position values 
+     * Returns count of map ids given the qtl name
+     * @param qtlName
+     *          - name of the qtl to match
+     * @return
+     *          - count of map ids
+     * @throws MiddlewareQueryException
+     */
+    public long countMapIdsByQtlName(String qtlName) throws MiddlewareQueryException;
+    
+
+    
+    /**
+     * Returns the marker ids matching the given QTL name, chromosome, min start position and max start position values 
      * 
      * @param qtlName
      *          - the name of the QTL to match       
@@ -1070,11 +1077,48 @@ public interface GenotypicDataManager{
      * @param numOfRows 
      *          - the number of rows to be included in the sublist of results 
      *          to be returned
-     * @return Count of marker entries
+     * @return the marker ids matching the given parameters
      * @throws MiddlewareQueryException
      */
-    public long countMarkersByQtl(String qtlName, String chromosome, int min, int max) throws MiddlewareQueryException;
+    public List<Integer> getMarkerIdsByQtl(String qtlName, String chromosome, int min, int max, int start, int numOfRows) throws MiddlewareQueryException;
+
+    /**
+     * Returns the number of marker ids matching the given QTL name, chromosome, min start position and max start position values 
+     * 
+     * @param qtlName
+     *          - the name of the QTL to match       
+     * @param chromosome
+     *          - the value to match the linkage group of markers_onmap
+     * @param min
+     *          - the minimum start position 
+     * @param max
+     *          - the maximum start position 
+     * @param start 
+     *          - the starting index of the sublist of results to be returned
+     * @param numOfRows 
+     *          - the number of rows to be included in the sublist of results 
+     *          to be returned
+     * @return Count of marker id entries
+     * @throws MiddlewareQueryException
+     */
+    public long countMarkerIdsByQtl(String qtlName, String chromosome, int min, int max) throws MiddlewareQueryException;
     
+
+    /**
+     * Returns the markers matching the given marker ids 
+     * 
+     * @param markerIds
+     *          - the Ids of the markers to retrieve
+     * @param start 
+     *          - the starting index of the sublist of results to be returned
+     * @param numOfRows 
+     *          - the number of rows to be included in the sublist of results 
+     *          to be returned
+     * @return the markers matching the given ids
+     * @throws MiddlewareQueryException
+     */
+    public List<Marker> getMarkersByIds(List<Integer> markerIds, int start, int numOfRows) throws MiddlewareQueryException;
+
     /**
      * Adds a QtlDetails entry to the database
      * 
