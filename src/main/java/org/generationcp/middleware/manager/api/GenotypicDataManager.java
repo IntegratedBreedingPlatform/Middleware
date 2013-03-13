@@ -29,6 +29,7 @@ import org.generationcp.middleware.pojos.gdms.DatasetElement;
 import org.generationcp.middleware.pojos.gdms.DatasetUsers;
 import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.Map;
+import org.generationcp.middleware.pojos.gdms.MapDetailElement;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.generationcp.middleware.pojos.gdms.MappingPop;
 import org.generationcp.middleware.pojos.gdms.MappingPopValues;
@@ -1020,7 +1021,7 @@ public interface GenotypicDataManager{
      *          - List of Maps
      * @throws MiddlewareQueryException
      */
-    public List<org.generationcp.middleware.pojos.gdms.Map> getMapDetailsByName(String nameLike, int start, int numOfRows) throws MiddlewareQueryException;
+    public List<MapDetailElement> getMapDetailsByName(String nameLike, int start, int numOfRows) throws MiddlewareQueryException;
     
     /**
      * Returns count of map details given the name/part of the name of a map
@@ -1031,6 +1032,29 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException
      */
     public Long countMapDetailsByName(String nameLike) throws MiddlewareQueryException;
+    
+
+    /**
+     * Gets all the Map details.
+     *
+     * @param start 
+     *          - the starting index of the sublist of results to be returned
+     * @param numOfRows 
+     *          - the number of rows to be included in the sublist of results 
+     *          to be returned
+     * @return List of all the map details
+     * @throws MiddlewareQueryException
+     */
+    public List<MapDetailElement> getAllMapDetails(int start, int numOfRows) throws MiddlewareQueryException;
+       
+
+    /**
+     * Retrieves the number of map details.
+     *
+     * @return Count of the map details
+     * @throws MiddlewareQueryException
+     */
+    public long countAllMapDetails() throws MiddlewareQueryException;
     
     
     /**
@@ -1264,6 +1288,17 @@ public interface GenotypicDataManager{
      */
     public Integer addQtl(Qtl qtl) throws MiddlewareQueryException;
 
+    /**
+     * Adds a Map entry to the database
+     * 
+     * @param map - the object to add
+     * 
+     * @return the id of the item added
+     * @throws MiddlewareQueryException
+     */
+    public Integer addMap(Map map) throws MiddlewareQueryException;
+
+    
     /**
      * Sets SSR Markers
      * @param marker (Marker) marker_type will be set to/overridden by "SSR"

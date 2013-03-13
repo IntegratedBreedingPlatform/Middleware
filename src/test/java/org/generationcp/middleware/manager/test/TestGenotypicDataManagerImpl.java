@@ -33,6 +33,7 @@ import org.generationcp.middleware.pojos.gdms.DatasetElement;
 import org.generationcp.middleware.pojos.gdms.DatasetUsers;
 import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.Map;
+import org.generationcp.middleware.pojos.gdms.MapDetailElement;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.generationcp.middleware.pojos.gdms.MappingPop;
 import org.generationcp.middleware.pojos.gdms.MappingPopValues;
@@ -748,13 +749,13 @@ public class TestGenotypicDataManagerImpl{
     
     @Test
     public void getMapDetailsByName() throws Exception {
-    	String nameLike = "tag%";
-    	int start = 0;
-    	int end = 10;
-        List<Map> maps = manager.getMapDetailsByName(nameLike, start, end);
+        String nameLike = "tag%";
+        int start = 0;
+        int end = 10;
+        List<MapDetailElement> maps = manager.getMapDetailsByName(nameLike, start, end);
         System.out.println("getMapDetailsByName('"+nameLike+"'," + start + "," + end + ")");
-        for (Map map : maps) {
-            System.out.println("MarkerCount: " + map.getMarkerCount() + "  |  maxStartPosition: " + map.getMaxStartPosition() + "  |  linkageGroup: " + map.getLinkageGroup() + "  |  mapName: " + map.getMapName() + "  |  mapType:  " + map.getMapType());
+        for (MapDetailElement map : maps) {
+            System.out.println("Map: " + map.getMarkerCount() + "  |  maxStartPosition: " + map.getMaxStartPosition() + "  |  linkageGroup: " + map.getLinkageGroup() + "  |  mapName: " + map.getMapName() + "  |  mapType:  " + map.getMapType());
         }
         
     }    
@@ -765,6 +766,23 @@ public class TestGenotypicDataManagerImpl{
         Long parentElementsCount = manager.countMapDetailsByName(nameLike);
         System.out.println("countMapDetailsByName('"+nameLike+"')");
         System.out.println("Count: " + parentElementsCount);
+    }
+
+    @Test
+    public void testGetAllMapDetails() throws Exception {
+        int start = 0;
+        int end = (int) manager.countAllMapDetails();
+        List<MapDetailElement> maps = manager.getAllMapDetails(start, end);
+        System.out.println("testGetAllMapDetails(" + start + "," + end + ")");
+        for (MapDetailElement map : maps) {
+            System.out.println(map);
+        }
+        
+    }    
+
+    @Test
+    public void testCountAllMapDetails() throws Exception {
+        System.out.println("testCountAllMapDetails(): " + manager.countAllMapDetails());
     }
 
     @Test
@@ -1039,15 +1057,28 @@ public class TestGenotypicDataManagerImpl{
     
     @Test
     public void testAddQtl() throws Exception {
-  	
-    	Integer qtlId = null;
-    	String qtlName = "TestQTL";
-    	Integer datasetId = -6;
-    	
+    
+        Integer qtlId = null;
+        String qtlName = "TestQTL";
+        Integer datasetId = -6;
+        
         Qtl qtl = new Qtl(qtlId, qtlName, datasetId);
       
         Integer idAdded = manager.addQtl(qtl);
         System.out.println("testAddQtl() Added: " + (idAdded != null ? qtl : null));
+    }    
+
+    @Test
+    public void testAddMap() throws Exception {
+        Integer mapId = null;
+        String mapName = "ICGS 44 X ICGS 76";
+        String mapType = "genetic";
+        Integer mpId = 0;
+        
+        Map map = new Map(mapId, mapName, mapType, mpId);
+      
+        Integer idAdded = manager.addMap(map);
+        System.out.println("testAddMap() Added: " + (idAdded != null ? map : null));
     }    
 
     @Test

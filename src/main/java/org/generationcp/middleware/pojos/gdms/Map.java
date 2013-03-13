@@ -12,7 +12,6 @@
 package org.generationcp.middleware.pojos.gdms;
 
 import java.io.Serializable;
-import java.math.BigInteger;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -53,28 +52,41 @@ public class Map implements Serializable{
     @Column(name = "mp_id")
     private Integer mpId;
     
-    private int markerCount;
-    private Float maxStartPosition;
-    private String linkageGroup;
-    
-    public Map() {}
+    private static final String GET_MAP_DETAILS_SELECT = 
+            "SELECT COUNT(DISTINCT gdms_mapping_data.marker_id) AS marker_count " +
+            "       , MAX(gdms_mapping_data.start_position) AS max " +
+            "       , gdms_mapping_data.linkage_group AS Linkage_group " +
+            "       , concat(gdms_mapping_data.map_name,'') AS map " +
+            "       , concat(gdms_map.map_type,'') AS map_type " +
+            "FROM gdms_mapping_data, gdms_map " +
+            "WHERE gdms_mapping_data.map_id=gdms_map.map_id " 
+            ;
 
-    public static final String GET_MAP_DETAILS_BY_NAME = 
-        "SELECT COUNT(DISTINCT gdms_mapping_data.marker_id) AS marker_count " +
-    	"       , MAX(gdms_mapping_data.start_position) AS max " +
-        "       , gdms_mapping_data.linkage_group AS Linkage_group " +
-    	"       , concat(gdms_mapping_data.map_name,'') AS map " +
-        "       , concat(gdms_map.map_type,'') AS map_type " +
-    	"FROM gdms_mapping_data, gdms_map " +
-        "WHERE gdms_mapping_data.map_id=gdms_map.map_id AND lower(gdms_mapping_data.map_name) LIKE (:nameLike) " +
-        "GROUP BY gdms_mapping_data.linkage_group, gdms_mapping_data.map_name " +
-        "ORDER BY gdms_mapping_data.map_name, gdms_mapping_data.linkage_group ";
-       
-    public static final String COUNT_MAP_DETAILS_BY_NAME = 
-        "SELECT COUNT(DISTINCT gdms_mapping_data.linkage_group, gdms_mapping_data.map_name) " +
-        "FROM `gdms_mapping_data` JOIN `gdms_map` ON gdms_mapping_data.map_id=gdms_map.map_id " +
-        "WHERE lower(gdms_mapping_data.map_name) LIKE (:nameLike) ";
+    private static final String GET_MAP_DETAILS_WHERE = 
+            "       AND lower(gdms_mapping_data.map_name) LIKE (:nameLike) " ;
+
+    private static final String GET_MAP_DETAILS_GROUP_ORDER = 
+            "GROUP BY gdms_mapping_data.linkage_group, gdms_mapping_data.map_name " +
+                    "ORDER BY gdms_mapping_data.map_name, gdms_mapping_data.linkage_group "
+                    ;
+
+    public static final String GET_MAP_DETAILS = 
+            GET_MAP_DETAILS_SELECT + GET_MAP_DETAILS_GROUP_ORDER;
     
+    public static final String GET_MAP_DETAILS_BY_NAME = 
+            GET_MAP_DETAILS_SELECT + GET_MAP_DETAILS_WHERE + GET_MAP_DETAILS_GROUP_ORDER;
+
+    public static final String COUNT_MAP_DETAILS = 
+            "SELECT COUNT(DISTINCT gdms_mapping_data.linkage_group, gdms_mapping_data.map_name) " +
+            "FROM `gdms_mapping_data` JOIN `gdms_map` ON gdms_mapping_data.map_id=gdms_map.map_id "
+            ;
+
+    public static final String COUNT_MAP_DETAILS_BY_NAME = 
+            COUNT_MAP_DETAILS + "WHERE lower(gdms_mapping_data.map_name) LIKE (:nameLike) ";
+
+    public Map() {        
+    }
+
     public Map(Integer mapId, String mapName, String mapType, Integer mpId) {
         super();
         this.mapId = mapId;
@@ -86,14 +98,6 @@ public class Map implements Serializable{
 
     public Map(Integer mapId) {
         this.mapId = mapId;
-    }
-    
-    public Map(int markerCount, Float maxStartPosition, String linkageGroup, String mapName, String mapType) {
-    	this.markerCount = markerCount;
-    	this.maxStartPosition = maxStartPosition;
-    	this.linkageGroup = linkageGroup;
-    	this.mapName = mapName;
-    	this.mapType = mapType;
     }
     
     public Integer getMapId() {
@@ -134,30 +138,6 @@ public class Map implements Serializable{
     public void setMpId(Integer mpId) {
         this.mpId = mpId;
     }
-
-    public int getMarkerCount() {
-    	return markerCount;
-    }
-    
-    public void setMarkerCount(int markerCount) {
-    	this.markerCount = markerCount; 
-    }
-    
-    public Float getMaxStartPosition() {
-    	return maxStartPosition;
-    }
-    
-    public void setMaxStartPosition(Float maxStartPosition) {
-    	this.maxStartPosition = maxStartPosition; 
-    }
-    
-    public String getLinkageGroup() {
-    	return linkageGroup;
-    }
-    
-    public void setLinkageGroup(String linkageGroup) {
-    	this.linkageGroup = linkageGroup; 
-    }    
     
     @Override
     public boolean equals(Object obj) {

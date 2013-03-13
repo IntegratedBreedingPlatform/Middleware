@@ -54,6 +54,7 @@ import org.generationcp.middleware.pojos.gdms.DatasetElement;
 import org.generationcp.middleware.pojos.gdms.DatasetUsers;
 import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.Map;
+import org.generationcp.middleware.pojos.gdms.MapDetailElement;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.generationcp.middleware.pojos.gdms.MappingPop;
 import org.generationcp.middleware.pojos.gdms.MappingPopValues;
@@ -2074,7 +2075,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
     
     @Override
-    public List<org.generationcp.middleware.pojos.gdms.Map> getMapDetailsByName(
+    public List<MapDetailElement> getMapDetailsByName(
             String nameLike, int start, int numOfRows) throws MiddlewareQueryException {
 
         Long centralCount = Long.valueOf(0);
@@ -2083,7 +2084,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     	
         MapDAO mapDao = new MapDAO();
        
-        List<org.generationcp.middleware.pojos.gdms.Map> maps = new ArrayList<org.generationcp.middleware.pojos.gdms.Map>();
+        List<MapDetailElement> maps = new ArrayList<MapDetailElement>();
    
         Session sessionForCentral = getCurrentSessionForCentral();
         Session sessionForLocal = getCurrentSessionForLocal();
@@ -2148,6 +2149,83 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return totalCount;
     }
 
+
+    public List<MapDetailElement> getAllMapDetails(int start, int numOfRows) throws MiddlewareQueryException{
+
+        Long centralCount = Long.valueOf(0);
+        Long localCount = Long.valueOf(0);
+        Long relativeLimit = Long.valueOf(0);       
+        
+        MapDAO mapDao = new MapDAO();
+       
+        List<MapDetailElement> maps = new ArrayList<MapDetailElement>();
+   
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        if (sessionForCentral != null) {
+            mapDao.setSession(sessionForCentral);
+            centralCount = mapDao.countAllMapDetails();
+            
+            if (centralCount > start) {
+                maps.addAll(mapDao.getAllMapDetails(start, numOfRows));
+                relativeLimit = numOfRows - (centralCount - start);
+
+                if (relativeLimit > 0) {
+                    
+                    if (sessionForLocal != null) {
+                        mapDao.setSession(sessionForLocal);
+                        localCount = mapDao.countAllMapDetails();
+                        
+                        if (localCount > 0) {
+                            maps.addAll(mapDao.getAllMapDetails(0, relativeLimit.intValue()));
+                        }
+                    }
+                }
+            } else {
+                relativeLimit = start - centralCount;
+                if (sessionForLocal != null) {
+                    mapDao.setSession(sessionForLocal);
+                    localCount = mapDao.countAllMapDetails();
+                    if (localCount > relativeLimit) {
+                        maps.addAll(mapDao.getAllMapDetails(relativeLimit.intValue(), numOfRows));
+                    }
+                }
+            }
+        } else if (sessionForLocal != null) {
+            mapDao.setSession(sessionForLocal);
+            localCount = mapDao.countAllMapDetails();
+            if (localCount > start) {
+                maps.addAll(mapDao.getAllMapDetails(start, numOfRows));
+            }
+        }
+     
+        return maps;        
+    }
+    
+    public long countAllMapDetails() throws MiddlewareQueryException{
+
+        MapDAO mapDao = new MapDAO();
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        long count = 0;        
+
+        // Count from Central
+        if (sessionForCentral != null) {
+            mapDao.setSession(sessionForLocal);
+            count += mapDao.countAllMapDetails();
+        }
+
+        // Count from Local
+        if (sessionForLocal != null) {
+            mapDao.setSession(sessionForLocal);
+            count += mapDao.countAllMapDetails();
+        }
+        
+        return count;
+    }
     
     @Override
     public List<Integer> getMapIdsByQtlName(String qtlName, int start, int numOfRows) throws MiddlewareQueryException{
@@ -2857,7 +2935,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             if (trans != null) {
                 trans.rollback();
             }
-            throw new MiddlewareQueryException("Error encountered while saving Marker: addDartValue(): "
+            throw new MiddlewareQueryException("Error encountered while saving Qtl: addQtl(): "
                     + e.getMessage(), e);
         } finally {
             session.flush();
@@ -2866,6 +2944,43 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return idSaved;
     }    
     
+
+
+    @Override
+    public Integer addMap(Map map) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        Integer idSaved;
+        try {
+            // begin save transaction
+            trans = session.beginTransaction();
+
+            MapDAO dao = new MapDAO();
+            dao.setSession(session);
+
+            Integer mapId = dao.getNegativeId("mapId");
+            map.setMapId(mapId);
+            
+            Map recordSaved = dao.saveOrUpdate(map);
+            idSaved = recordSaved.getMapId();
+
+            trans.commit();
+        } catch (Exception e) {
+            // rollback transaction in case of errors
+            if (trans != null) {
+                trans.rollback();
+            }
+            throw new MiddlewareQueryException("Error encountered while saving Map: addMap(): "
+                    + e.getMessage(), e);
+        } finally {
+            session.flush();
+        }
+        
+        return idSaved;
+    } 
 
     @Override
     public Boolean setSSRMarkers(Marker marker, MarkerAlias markerAlias, MarkerDetails markerDetails, MarkerUserInfo markerUserInfo) throws MiddlewareQueryException {
@@ -3262,6 +3377,5 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return transactionStatus;
     }    
 
-    
     
 }
