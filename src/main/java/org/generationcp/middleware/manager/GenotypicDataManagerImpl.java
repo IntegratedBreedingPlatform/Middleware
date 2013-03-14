@@ -3506,5 +3506,230 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return transactionStatus;
     }
 
+	@Override
+	public Boolean setSSR(AccMetadataSet accMetadataSet,MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser,
+			AlleleValues alleleValues, Dataset dataset)throws MiddlewareQueryException {
+		
+		requireLocalDatabaseInstance();
+
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+        Boolean transactionStatus = true;
+
+        try {
+            // Begin save transaction
+            trans = session.beginTransaction();
+
+            // Add Dataset
+            DatasetDAO datasetDao = new DatasetDAO();
+            datasetDao.setSession(session);
+
+            Integer datasetGeneratedId = datasetDao.getNegativeId("datasetId");
+            dataset.setDatasetId(datasetGeneratedId);
+            
+            dataset.setDatasetType("SSR");
+            dataset.setDatasetType("int");
+
+            Dataset datasetRecordSaved = datasetDao.saveOrUpdate(dataset);
+            Integer datasetId = datasetRecordSaved.getDatasetId();            
+
+            if(datasetId == null){
+                throw new Exception();  // To immediately roll back and to avoid executing the other insert functions
+            }
+
+            // Add AccMetadataSet
+            AccMetadataSetDAO accMetadataSetDao = new AccMetadataSetDAO();
+            accMetadataSetDao.setSession(session);
+            
+            accMetadataSet.setDatasetId(datasetId);
+
+            // No need to generate id, AccMetadataSetPK(datasetId, gId, nId) are foreign keys
+            
+            AccMetadataSet accMetadataSetRecordSaved = accMetadataSetDao.saveOrUpdate(accMetadataSet);
+            AccMetadataSetPK accMetadatasetSavedId = accMetadataSetRecordSaved.getId();            
+
+            if(accMetadatasetSavedId == null){
+                throw new Exception(); 
+            }
+            
+            // Add MarkerMetadataSet
+            MarkerMetadataSetDAO markerMetadataSetDao = new MarkerMetadataSetDAO();
+            markerMetadataSetDao.setSession(session);
+
+            markerMetadataSet.setDatasetId(datasetId);
+
+            // No need to generate id, MarkerMetadataSetPK(datasetId, markerId) are foreign keys
+
+            MarkerMetadataSet markerMetadataSetRecordSaved = markerMetadataSetDao.saveOrUpdate(markerMetadataSet);
+            MarkerMetadataSetPK markerMetadataSetSavedId = markerMetadataSetRecordSaved.getId();            
+
+            if(markerMetadataSetSavedId == null){
+                throw new Exception();
+            }
+            
+            // Add DatasetUser
+            
+            DatasetUsersDAO datasetUserDao = new DatasetUsersDAO();
+            datasetUserDao.setSession(session);
+            
+            datasetUser.setDatasetId(datasetId);
+
+            DatasetUsers datasetUserSaved = datasetUserDao.saveOrUpdate(datasetUser);
+            Integer datasetUserSavedId = datasetUserSaved.getUserId();    
+
+            if(datasetUserSavedId == null){
+                throw new Exception();
+            }
+
+            // Add AlleleValues
+            AlleleValuesDAO alleleValuesDao = new AlleleValuesDAO();
+            alleleValuesDao.setSession(session);
+            
+            alleleValues.setDatasetId(datasetId);
+
+            Integer alleleValuesGeneratedId = alleleValuesDao.getNegativeId("anId");
+            alleleValues.setAnId(alleleValuesGeneratedId);
+            
+            AlleleValues alleleValuesRecordSaved = alleleValuesDao.save(alleleValues);
+            Integer alleleValuesSavedId = alleleValuesRecordSaved.getDatasetId();
+
+            if(alleleValuesSavedId == null){
+                throw new Exception();
+            }
+
+
+            if(transactionStatus == true){
+                trans.commit();
+            } else {
+                throw new Exception(); 
+            }
+            
+        } catch (Exception e) {
+            // rollback transaction in case of errors
+            transactionStatus = false;
+            if (trans != null) {                
+                trans.rollback();
+            }
+            throw new MiddlewareQueryException("Error encountered while setting SSR: setSSR(): "
+                    + e.getMessage(), e);
+        } finally {
+            session.flush();
+        }
+        
+        return transactionStatus;
+	}
+
+	@Override
+	public Boolean setSNP(AccMetadataSet accMetadataSet,MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser,
+			CharValues charValues, Dataset dataset)throws MiddlewareQueryException {
+		
+		requireLocalDatabaseInstance();
+
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+        Boolean transactionStatus = true;
+
+        try {
+            // Begin save transaction
+            trans = session.beginTransaction();
+
+            // Add Dataset
+            DatasetDAO datasetDao = new DatasetDAO();
+            datasetDao.setSession(session);
+
+            Integer datasetGeneratedId = datasetDao.getNegativeId("datasetId");
+            dataset.setDatasetId(datasetGeneratedId);
+            
+            dataset.setDatasetType("SNP");
+            dataset.setDatasetType("int");
+
+            Dataset datasetRecordSaved = datasetDao.saveOrUpdate(dataset);
+            Integer datasetId = datasetRecordSaved.getDatasetId();            
+
+            if(datasetId == null){
+                throw new Exception();  // To immediately roll back and to avoid executing the other insert functions
+            }
+
+            // Add AccMetadataSet
+            AccMetadataSetDAO accMetadataSetDao = new AccMetadataSetDAO();
+            accMetadataSetDao.setSession(session);
+            
+            accMetadataSet.setDatasetId(datasetId);
+
+            // No need to generate id, AccMetadataSetPK(datasetId, gId, nId) are foreign keys
+            
+            AccMetadataSet accMetadataSetRecordSaved = accMetadataSetDao.saveOrUpdate(accMetadataSet);
+            AccMetadataSetPK accMetadatasetSavedId = accMetadataSetRecordSaved.getId();            
+
+            if(accMetadatasetSavedId == null){
+                throw new Exception(); 
+            }
+            
+            // Add MarkerMetadataSet
+            MarkerMetadataSetDAO markerMetadataSetDao = new MarkerMetadataSetDAO();
+            markerMetadataSetDao.setSession(session);
+
+            markerMetadataSet.setDatasetId(datasetId);
+
+            // No need to generate id, MarkerMetadataSetPK(datasetId, markerId) are foreign keys
+
+            MarkerMetadataSet markerMetadataSetRecordSaved = markerMetadataSetDao.saveOrUpdate(markerMetadataSet);
+            MarkerMetadataSetPK markerMetadataSetSavedId = markerMetadataSetRecordSaved.getId();            
+
+            if(markerMetadataSetSavedId == null){
+                throw new Exception();
+            }
+            
+            // Add DatasetUser
+            
+            DatasetUsersDAO datasetUserDao = new DatasetUsersDAO();
+            datasetUserDao.setSession(session);
+            
+            datasetUser.setDatasetId(datasetId);
+
+            DatasetUsers datasetUserSaved = datasetUserDao.saveOrUpdate(datasetUser);
+            Integer datasetUserSavedId = datasetUserSaved.getUserId();    
+
+            if(datasetUserSavedId == null){
+                throw new Exception();
+            }
+
+
+            //Add CharValues
+            
+            CharValuesDAO charValuesDao= new CharValuesDAO();
+            charValuesDao.setSession(session);
+            
+            Integer generatedId = charValuesDao.getNegativeId("acId");
+            charValues.setAcId(generatedId);
+            
+            CharValues charValuesRecordSaved = charValuesDao.saveOrUpdate(charValues);
+            Integer charValuesSavedId = charValuesRecordSaved.getDatasetId();
+            
+            if(charValuesSavedId == null){
+              throw new Exception();
+          }
+
+            if(transactionStatus == true){
+                trans.commit();
+            } else {
+                throw new Exception(); 
+            }
+            
+        } catch (Exception e) {
+            // rollback transaction in case of errors
+            transactionStatus = false;
+            if (trans != null) {                
+                trans.rollback();
+            }
+            throw new MiddlewareQueryException("Error encountered while setting SNP: setSNP(): "
+                    + e.getMessage(), e);
+        } finally {
+            session.flush();
+        }
+        
+        return transactionStatus;
+	}
+
     
 }

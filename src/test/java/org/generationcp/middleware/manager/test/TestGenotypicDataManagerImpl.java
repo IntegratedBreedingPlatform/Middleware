@@ -1411,6 +1411,112 @@ public class TestGenotypicDataManagerImpl{
                     + " | " + (addStatus != null ? dartValues : null));
     }
     
+    @Test
+    public void testSetSSR() throws Exception {
+        
+        // DatasetUser Fields
+        Integer datasetId = null; //Will be set/overridden by the function
+        Integer userId = 123;
+
+        // Dataset Fields
+        String datasetName = " QTL_ ICGS 44 X ICGS 78";
+        String datasetDesc = "ICGS 44 X ICGS 78";
+        String datasetType = "QTL";
+        String genus = "Groundnut"; 
+        String species = ""; 
+        Date uploadTemplateDate = new Date(System.currentTimeMillis()); 
+        String remarks = ""; 
+        String dataType = "int"; 
+        String missingData = null;
+        String method = null;
+        String score = null;
+        
+        // AccMetadataSet Additional Fields
+        Integer gId = 1; 
+        Integer nameId = 1;
+
+        // MarkerMetadataSet Additional Field
+        Integer markerId = 1;
+
+        // AlleleValues Additional Fields
+        Integer anId = null;     //Will be set/overridden by the function
+        String alleleBinValue = "238:238";
+        String alleleRawValue = "0.0:0.0";
+        
+        Dataset dataset = new Dataset(datasetId, datasetName, datasetDesc, datasetType, genus, species, uploadTemplateDate, remarks,
+                dataType, missingData, method, score);        
+        
+        AccMetadataSet accMetadataSet = new AccMetadataSet(datasetId, gId, nameId);
+        
+        MarkerMetadataSet markerMetadataSet = new MarkerMetadataSet(datasetId, markerId);
+        
+        DatasetUsers datasetUser = new DatasetUsers(datasetId, userId);
+        
+        AlleleValues alleleValues = new AlleleValues(anId, datasetId, gId, markerId, alleleBinValue, alleleRawValue);
+        
+        Boolean addStatus = manager.setSSR(accMetadataSet, markerMetadataSet, datasetUser, alleleValues, dataset);
+        System.out.println("testSetSSR() Added: " + (addStatus != null ? accMetadataSet : null) 
+                    + " | " + (addStatus != null ? markerMetadataSet : null) 
+                    + " | " + (addStatus != null ? datasetUser : null) 
+                    + " | " + (addStatus != null ? alleleValues : null)  
+                    + " | " + (addStatus != null ? dataset : null)); 
+    }
+    
+    
+    @Test
+    public void testSetSNP() throws Exception {
+        
+        // DatasetUser Fields
+        Integer datasetId = null; //Will be set/overridden by the function
+        Integer userId = 123;
+
+        // Dataset Fields
+        String datasetName = " QTL_ ICGS 44 X ICGS 78";
+        String datasetDesc = "ICGS 44 X ICGS 78";
+        String datasetType = "QTL";
+        String genus = "Groundnut"; 
+        String species = ""; 
+        Date uploadTemplateDate = new Date(System.currentTimeMillis()); 
+        String remarks = ""; 
+        String dataType = "int"; 
+        String missingData = null;
+        String method = null;
+        String score = null;
+        
+        // AccMetadataSet Additional Fields
+        Integer gId = 1; 
+        Integer nameId = 1;
+
+        // MarkerMetadataSet Additional Field
+        Integer markerId = 1;
+
+        // AlleleValues Additional Fields
+        Integer anId = null;     //Will be set/overridden by the function
+        String alleleBinValue = "238:238";
+        String alleleRawValue = "0.0:0.0";
+        
+     // charValues Additional Fields
+        Integer acId = null;            // Crop tested: Groundnut
+        String charValue = "CV"; 
+       
+        Dataset dataset = new Dataset(datasetId, datasetName, datasetDesc, datasetType, genus, species, uploadTemplateDate, remarks,
+                dataType, missingData, method, score);        
+        
+        AccMetadataSet accMetadataSet = new AccMetadataSet(datasetId, gId, nameId);
+        
+        MarkerMetadataSet markerMetadataSet = new MarkerMetadataSet(datasetId, markerId);
+        
+        DatasetUsers datasetUser = new DatasetUsers(datasetId, userId);
+        CharValues charValues = new CharValues(acId, datasetId, markerId, gId, charValue);
+     
+        Boolean addStatus = manager.setSNP(accMetadataSet, markerMetadataSet, datasetUser, charValues, dataset);
+        System.out.println("testSetDArT() Added: " + (addStatus != null ? accMetadataSet : null) 
+                    + " | " + (addStatus != null ? markerMetadataSet : null) 
+                    + " | " + (addStatus != null ? datasetUser : null) 
+                    + " | " + (addStatus != null ? charValues : null) 
+                    + " | " + (addStatus != null ? dataset : null));
+    }
+    
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();

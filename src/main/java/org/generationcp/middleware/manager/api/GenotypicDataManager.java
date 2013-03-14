@@ -1367,5 +1367,34 @@ public interface GenotypicDataManager{
      */
     public Boolean setDart(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser, 
             AlleleValues alleleValues, Dataset dataset, DartValues dartValues) throws MiddlewareQueryException;
+    
+    /**
+     * Sets SSR
+     * @param accMetadataSet - (AccMetadataSet)
+     * @param markerMetadataSet - (MarkerMetadataSet)
+     * @param datasetUser - (DatasetUser)
+     * @param alleleValues - (AlleleValues)
+     * @param dataset - (Dataset) dataset_type = "SSR", datatype = "int" 
+     * @return (boolean) - true if successful, exception or false if failed
+     * @throws MiddlewareQueryException
+     */
 
+    public Boolean setSSR(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser, 
+            AlleleValues alleleValues, Dataset dataset) throws MiddlewareQueryException;
+
+    
+    /**
+     * Sets SNP
+     * @param accMetadataSet - (AccMetadataSet)
+     * @param markerMetadataSet - (MarkerMetadataSet)
+     * @param datasetUser - (DatasetUser)
+     * @param charValues - (CharValues)
+     * @param dataset - (Dataset) dataset_type = "SNP", datatype = "int" 
+     * @return (boolean) - true if successful, exception or false if failed
+     * @throws MiddlewareQueryException
+     */
+    
+
+    public Boolean setSNP(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser, 
+            CharValues charValues, Dataset dataset) throws MiddlewareQueryException;
 }
