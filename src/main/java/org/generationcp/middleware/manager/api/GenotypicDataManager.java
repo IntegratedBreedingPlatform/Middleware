@@ -1354,4 +1354,18 @@ public interface GenotypicDataManager{
      */
     public Boolean setQTL(DatasetUsers datasetUser, Dataset dataset, QtlDetails qtlDetails, Qtl qtl) throws MiddlewareQueryException;
 
+    /**
+     * Sets DArT
+     * @param accMetadataSet - (AccMetadataSet)
+     * @param markerMetadataSet - (MarkerMetadataSet)
+     * @param datasetUser - (DatasetUser)
+     * @param alleleValues - (AlleleValues)
+     * @param dataset - (Dataset) dataset_type = "DArT", datatype = "int" 
+     * @param dartValues - (DartValues)
+     * @return (boolean) - true if successful, exception or false if failed
+     * @throws MiddlewareQueryException
+     */
+    public Boolean setDart(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser, 
+            AlleleValues alleleValues, Dataset dataset, DartValues dartValues) throws MiddlewareQueryException;
+
 }

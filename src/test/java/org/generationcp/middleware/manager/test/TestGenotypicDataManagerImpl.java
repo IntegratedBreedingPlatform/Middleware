@@ -1348,6 +1348,69 @@ public class TestGenotypicDataManagerImpl{
         System.out.println("testSetQTL() Added: " + (addStatus != null ? datasetUser : null) + (addStatus != null ? dataset : null) + (addStatus != null ? qtlDetails : null) + (addStatus != null ? qtl : null));
     }
     
+    @Test
+    public void testSetDart() throws Exception {
+        
+        // DatasetUser Fields
+        Integer datasetId = null; //Will be set/overridden by the function
+        Integer userId = 123;
+
+        // Dataset Fields
+        String datasetName = " QTL_ ICGS 44 X ICGS 78";
+        String datasetDesc = "ICGS 44 X ICGS 78";
+        String datasetType = "QTL";
+        String genus = "Groundnut"; 
+        String species = ""; 
+        Date uploadTemplateDate = new Date(System.currentTimeMillis()); 
+        String remarks = ""; 
+        String dataType = "int"; 
+        String missingData = null;
+        String method = null;
+        String score = null;
+        
+        // AccMetadataSet Additional Fields
+        Integer gId = 1; 
+        Integer nameId = 1;
+
+        // MarkerMetadataSet Additional Field
+        Integer markerId = 1;
+
+        // AlleleValues Additional Fields
+        Integer anId = null;     //Will be set/overridden by the function
+        String alleleBinValue = "238:238";
+        String alleleRawValue = "0.0:0.0";
+        
+        // DartValues Additional Fields
+        Integer adId = null;  //Will be set/overridden by the function
+        Integer cloneId = 1;
+        Float qValue = 0f; 
+        Float reproducibility = 0f;
+        Float callRate = 0f; 
+        Float picValue = 0f; 
+        Float discordance = 0f;
+        
+        Dataset dataset = new Dataset(datasetId, datasetName, datasetDesc, datasetType, genus, species, uploadTemplateDate, remarks,
+                dataType, missingData, method, score);        
+        
+        AccMetadataSet accMetadataSet = new AccMetadataSet(datasetId, gId, nameId);
+        
+        MarkerMetadataSet markerMetadataSet = new MarkerMetadataSet(datasetId, markerId);
+        
+        DatasetUsers datasetUser = new DatasetUsers(datasetId, userId);
+        
+        AlleleValues alleleValues = new AlleleValues(anId, datasetId, gId, markerId, alleleBinValue, alleleRawValue);
+        
+        DartValues dartValues = new DartValues(adId, datasetId, markerId, cloneId, qValue, reproducibility, callRate, picValue, discordance);
+        
+        Boolean addStatus = manager.setDart(accMetadataSet, markerMetadataSet, datasetUser, alleleValues, dataset, dartValues);
+        System.out.println("testSetDArT() Added: " + (addStatus != null ? accMetadataSet : null) 
+                    + " | " + (addStatus != null ? markerMetadataSet : null) 
+                    + " | " + (addStatus != null ? datasetUser : null) 
+                    + " | " + (addStatus != null ? alleleValues : null)  
+                    + " | " + (addStatus != null ? dataset : null) 
+                    + " | " + (addStatus != null ? dartValues : null));
+    }
+    
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();

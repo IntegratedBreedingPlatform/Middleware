@@ -91,6 +91,10 @@ public class DartValues implements Serializable{
         return adId;
     }
     
+    public void setDatasetId(Integer datasetId) {
+        this.datasetId = datasetId;
+    }
+    
     public void setCloneId(Integer cloneId) {
         this.cloneId = cloneId;
     }    
