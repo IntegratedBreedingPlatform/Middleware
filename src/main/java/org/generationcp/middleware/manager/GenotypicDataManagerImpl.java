@@ -2214,7 +2214,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
         // Count from Central
         if (sessionForCentral != null) {
-            mapDao.setSession(sessionForLocal);
+            mapDao.setSession(sessionForCentral);
             count += mapDao.countAllMapDetails();
         }
 
