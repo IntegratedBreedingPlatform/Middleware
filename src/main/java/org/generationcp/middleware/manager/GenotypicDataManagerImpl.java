@@ -3398,7 +3398,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             dataset.setDatasetId(datasetGeneratedId);
             
             dataset.setDatasetType("DArT");
-            dataset.setDatasetType("int");
+            dataset.setDataType("int");
 
             Dataset datasetRecordSaved = datasetDao.saveOrUpdate(dataset);
             Integer datasetId = datasetRecordSaved.getDatasetId();            
@@ -3528,7 +3528,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             dataset.setDatasetId(datasetGeneratedId);
             
             dataset.setDatasetType("SSR");
-            dataset.setDatasetType("int");
+            dataset.setDataType("int");
 
             Dataset datasetRecordSaved = datasetDao.saveOrUpdate(dataset);
             Integer datasetId = datasetRecordSaved.getDatasetId();            
@@ -3641,7 +3641,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             dataset.setDatasetId(datasetGeneratedId);
             
             dataset.setDatasetType("SNP");
-            dataset.setDatasetType("int");
+            dataset.setDataType("int");
 
             Dataset datasetRecordSaved = datasetDao.saveOrUpdate(dataset);
             Integer datasetId = datasetRecordSaved.getDatasetId();            
