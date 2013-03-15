@@ -2710,7 +2710,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             alleleValues.setAnId(generatedId);
             
             AlleleValues recordSaved = dao.save(alleleValues);
-            savedId = recordSaved.getDatasetId();
+            savedId = recordSaved.getAnId();
             
             trans.commit();
 
@@ -2747,7 +2747,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             charValues.setAcId(generatedId);
             
             CharValues recordSaved = dao.save(charValues);
-            savedId = recordSaved.getDatasetId();
+            savedId = recordSaved.getAcId();
             
             trans.commit();
 
@@ -2817,7 +2817,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             mappingPopValue.setMpId(mpId);
             
             MappingPopValues recordSaved = dao.saveOrUpdate(mappingPopValue);
-            idSaved = recordSaved.getDatasetId();
+            idSaved = recordSaved.getMpId();
 
             trans.commit();
         } catch (Exception e) {
@@ -3704,7 +3704,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             charValues.setAcId(generatedId);
             
             CharValues charValuesRecordSaved = charValuesDao.saveOrUpdate(charValues);
-            Integer charValuesSavedId = charValuesRecordSaved.getDatasetId();
+            Integer charValuesSavedId = charValuesRecordSaved.getAcId();
             
             if(charValuesSavedId == null){
               throw new Exception();
