@@ -3461,7 +3461,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             alleleValues.setAnId(alleleValuesGeneratedId);
             
             AlleleValues alleleValuesRecordSaved = alleleValuesDao.save(alleleValues);
-            Integer alleleValuesSavedId = alleleValuesRecordSaved.getDatasetId();
+            Integer alleleValuesSavedId = alleleValuesRecordSaved.getAnId();
 
             if(alleleValuesSavedId == null){
                 throw new Exception();
@@ -3591,7 +3591,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             alleleValues.setAnId(alleleValuesGeneratedId);
             
             AlleleValues alleleValuesRecordSaved = alleleValuesDao.save(alleleValues);
-            Integer alleleValuesSavedId = alleleValuesRecordSaved.getDatasetId();
+            Integer alleleValuesSavedId = alleleValuesRecordSaved.getAnId();
 
             if(alleleValuesSavedId == null){
                 throw new Exception();
