@@ -19,6 +19,66 @@ import org.hibernate.SQLQuery;
 public class QtlDAO  extends GenericDAO<Qtl, Integer>{
 
     @SuppressWarnings("rawtypes")
+    public List<QtlDetailElement> getQtlDetailsByQTLIDs(List<Integer> qtlIDs, int start, int numOfRows) throws MiddlewareQueryException{
+        List<QtlDetailElement> toReturn = new ArrayList<QtlDetailElement>();
+
+        try {
+            SQLQuery query = getSession().createSQLQuery(Qtl.GET_QTL_BY_QTL_IDS);
+            query.setParameterList("qtl_id_list", qtlIDs);
+            query.setFirstResult(start);
+            query.setMaxResults(numOfRows);
+            List results = query.list();
+
+            for (Object o : results) {
+                Object[] result = (Object[]) o;
+                if (result != null) {
+                    String qtlName = (String) result[0];
+                    String mapName = (String) result[1];
+                    String chromosome = (String) result[2];
+                    Float minPosition = (Float) result[3];
+                    Float maxPosition = (Float) result[4];
+                    String trait = (String) result[5];
+                    String experiment = (String) result[6];
+                    String leftFlankingMarker = (String) result[7];
+                    String rightFlankingMarker = (String) result[8];
+                    Integer effect = (Integer) result[9];
+                    Float scoreValue = (Float) result[10];
+                    Float rSquare = (Float) result[11];
+                    String interactions = (String) result[12];
+                    String tRName = (String) result[13];
+                    String ontology = (String) result[14];
+                    
+                    
+                    QtlDetailElement element = new QtlDetailElement(qtlName, mapName, chromosome, minPosition, maxPosition, trait,
+                            experiment, leftFlankingMarker, rightFlankingMarker, effect, scoreValue, rSquare,
+                            interactions, tRName, ontology);
+                    toReturn.add(element);
+                }
+            }
+
+            return toReturn;
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getQtlDetailsByQTLIDs(qtl ids=" + qtlIDs + ") query from gdms_qtl_details: " + e.getMessage(), e);
+        }
+    }
+
+    public long countQtlDetailsByQTLIDs(List<Integer> qtlIDs) throws MiddlewareQueryException {
+        try {
+            Query query = getSession().createSQLQuery(Qtl.COUNT_QTL_BY_QTL_IDS);
+            query.setParameterList("qtl_id_list", qtlIDs);
+            BigInteger result = (BigInteger) query.uniqueResult();
+            if (result != null) {
+                return result.longValue();
+            } else {
+                return 0;
+            }
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with countQtlDetailsByQTLIDs(qtl ids=" + qtlIDs + ") query from gdms_qtl_details: "
+                    + e.getMessage(), e);
+        }
+    }
+    
+    @SuppressWarnings("rawtypes")
     public List<QtlDetailElement> getQtlDetailsByName(String name, int start, int numOfRows) throws MiddlewareQueryException{
         List<QtlDetailElement> toReturn = new ArrayList<QtlDetailElement>();
 

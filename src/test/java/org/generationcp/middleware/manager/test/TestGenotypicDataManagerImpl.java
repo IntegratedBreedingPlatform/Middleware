@@ -655,8 +655,6 @@ public class TestGenotypicDataManagerImpl{
     }
 
 
-    
-
     @Test
     public void testGetQtlByName() throws Exception {
         String qtlName = "SLA%";     // Crop tested: Groundnut
@@ -1606,5 +1604,27 @@ public class TestGenotypicDataManagerImpl{
         long end = System.currentTimeMillis();
         System.out.println("  QUERY TIME: " + (end - start) + " ms");
     }
+    
+    @Test
+    public void testGetQTLByQTLIDs() throws Exception {
+        List<Integer> qtlIDs = new ArrayList<Integer>();
+        qtlIDs.add(1);
+      
+
+        List<QtlDetailElement> results = manager.getQTLByQTLIDs(qtlIDs, 0, 
+                (int) manager.countQTLByQTLIDs(qtlIDs));
+        System.out.println("testGetQtlByQTLIDs() RESULTS: " + results);
+    }
+
+
+    @Test
+    public void testCountQTLByQTLIDs() throws Exception { 
+        List<Integer> qtlIDs = new ArrayList<Integer>();
+        qtlIDs.add(1);
+        qtlIDs.add(2);
+        qtlIDs.add(3);
+        long count = manager.countQTLByQTLIDs(qtlIDs);
+        System.out.println("testCountQtlByQTLIDs() RESULTS: " + count);
+    }   
 
 }

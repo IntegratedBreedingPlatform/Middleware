@@ -1464,4 +1464,31 @@ public interface GenotypicDataManager{
      */
     long countMarkersByMarkerIDs(List<Integer> markerIDs)
             throws MiddlewareQueryException;
+
+    /**
+     * Retrieves QTL entries from the gdms_qtl table matching the given list of qtl ids
+     * 
+     * @param qtls 
+     *          - the list of qtl ids to match       
+     * @param start 
+     *          - the starting index of the sublist of results to be returned
+     * @param numOfRows 
+     *          - the number of rows to be included in the sublist of results 
+     *          to be returned
+
+     * @return List of QTL entries
+     * @throws MiddlewareQueryException
+     */
+    List<QtlDetailElement> getQTLByQTLIDs(List<Integer> qtls, int start,
+            int numOfRows) throws MiddlewareQueryException;
+
+    /**
+     * Returns the number of QTL entries from the gdms_qtl table matching the given list of qtl ids
+     * 
+     * @param qtls - list of QTL IDs
+     * 
+     * @return Count of QTL entries
+     * @throws MiddlewareQueryException
+     */
+    long countQTLByQTLIDs(List<Integer> qtls) throws MiddlewareQueryException;
 }

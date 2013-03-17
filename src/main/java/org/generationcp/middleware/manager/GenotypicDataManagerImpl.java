@@ -2109,6 +2109,89 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
     
     @Override
+    public List<QtlDetailElement> getQTLByQTLIDs(List<Integer> qtlIDs, int start, int numOfRows) throws MiddlewareQueryException{
+        
+        if ((qtlIDs == null) || (qtlIDs.isEmpty())){
+            return new ArrayList<QtlDetailElement>();
+        }
+        
+        QtlDAO dao = new QtlDAO();
+        
+        long centralCount = 0;
+        long localCount = 0;
+        long relativeLimit = 0;
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        List<QtlDetailElement> qtl = new ArrayList<QtlDetailElement>();
+
+        if(sessionForCentral != null) {
+            
+            dao.setSession(sessionForCentral);
+            centralCount = dao.countQtlDetailsByQTLIDs(qtlIDs);
+            
+            if(centralCount > start) {
+                qtl.addAll(dao.getQtlDetailsByQTLIDs(qtlIDs, start, numOfRows));
+                relativeLimit = numOfRows - qtl.size();
+                if(relativeLimit > 0 && sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countQtlDetailsByQTLIDs(qtlIDs);
+                    if(localCount > 0) {
+                        qtl.addAll(dao.getQtlDetailsByQTLIDs(qtlIDs, 0, (int) relativeLimit));
+                    }
+                }
+            } else {
+                relativeLimit = start - centralCount;
+                if (sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countQtlDetailsByQTLIDs(qtlIDs);
+                    if (localCount > relativeLimit) {
+                        qtl.addAll(dao.getQtlDetailsByQTLIDs(qtlIDs, (int) relativeLimit, numOfRows));
+                    }
+                }
+            }
+        } else if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            localCount = dao.countQtlDetailsByQTLIDs(qtlIDs);
+            if (localCount > start) {
+                qtl.addAll(dao.getQtlDetailsByQTLIDs(qtlIDs, start, numOfRows));
+            }
+        }
+        
+        return qtl;    
+    }
+    
+    @Override
+    public long countQTLByQTLIDs(List<Integer> qtlIDs) throws MiddlewareQueryException{
+        
+        if ((qtlIDs == null) || (qtlIDs.isEmpty())){
+            return 0;
+        }
+                
+        QtlDAO dao = new QtlDAO();
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        long result = 0;
+
+        // Count from local
+        if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            result += dao.countQtlDetailsByQTLIDs(qtlIDs);
+        }
+
+        // Count from central
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            result += dao.countQtlDetailsByQTLIDs(qtlIDs);
+        }
+
+        return result;
+    }
+    
+    @Override
     public List<Integer> getQtlByTrait(String trait, int start, int numOfRows) throws MiddlewareQueryException{
         QtlDAO dao = new QtlDAO();
 
