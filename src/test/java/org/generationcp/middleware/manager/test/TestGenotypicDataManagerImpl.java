@@ -15,6 +15,7 @@ package org.generationcp.middleware.manager.test;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
@@ -1517,9 +1518,93 @@ public class TestGenotypicDataManagerImpl{
                     + " | " + (addStatus != null ? dataset : null));
     }
     
-    @AfterClass
-    public static void tearDown() throws Exception {
-        factory.close();
+    @Test
+    public void TestGetMapIDsByQTLName() throws Exception {
+        String qtlName = "HI Control 08_AhI";
+        long start = System.currentTimeMillis();
+        List<Integer> mapIDs = manager.getMapIDsByQTLName(qtlName, 0, 2);
+
+        for (Integer mapID : mapIDs) {
+            System.out.println("Map ID: " + mapID);
+        }
+        
+        long end = System.currentTimeMillis();
+        System.out.println("TestGetMapIDsByQTLName(" + qtlName + ")");
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
+    }
+    
+    @Test
+    public void TestCountMapIDsByQTLName() throws Exception {
+        String qtlName = "HI Control 08_AhI";
+        long start = System.currentTimeMillis();
+        long count = manager.countMapIDsByQTLName(qtlName);
+
+        System.out.println("Count of Map IDs: " + count);
+        
+        long end = System.currentTimeMillis();
+        System.out.println("TestCountMapIDsByQTLName(" + qtlName + ")");
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
+    }
+    
+    @Test
+    public void testGetMarkerIDsByMapIDAndLinkageBetweenStartPosition() throws Exception {
+        int mapID = 1;
+        String linkage = "LG01";
+        int startPos = 0;
+        int endPos = 2;
+        long start = System.currentTimeMillis();
+        Set<Integer> markerIDs = manager.getMarkerIDsByMapIDAndLinkageBetweenStartPosition(mapID, linkage, startPos, endPos, 0, 1);
+
+        for (Integer markerID : markerIDs) {
+            System.out.println("Marker ID: " + markerID);
+        }
+        
+        long end = System.currentTimeMillis();
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
+    }
+    
+    @Test
+    public void testCountMarkerIDsByMapIDAndLinkageBetweenStartPosition() throws Exception {
+        int mapID = 1;
+        String linkage = "LG01";
+        int startPos = 0;
+        int endPos = 2;
+        long start = System.currentTimeMillis();
+        long count = manager.countMarkerIDsByMapIDAndLinkageBetweenStartPosition(mapID, linkage, startPos, endPos);
+
+        System.out.println("Count of Marker IDs: " + count);
+        
+        long end = System.currentTimeMillis();
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
+    }
+    
+    @Test
+    public void testGetMarkersByMarkerIDs() throws Exception {
+        List<Integer> markerIDs = new ArrayList<Integer>();
+        markerIDs.add(1317);
+        
+        long start = System.currentTimeMillis();
+        List<Marker> markerList = manager.getMarkersByMarkerIDs(markerIDs, 0, 5);
+
+        for (Marker marker : markerList) {
+            System.out.println("Marker: " + marker);
+        }
+        
+        long end = System.currentTimeMillis();
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
+    }
+    
+    @Test
+    public void testCountMarkersByMarkerIDs() throws Exception {
+        List<Integer> markerIDs = new ArrayList<Integer>();
+        markerIDs.add(1317);
+        long start = System.currentTimeMillis();
+        long count = manager.countMarkersByMarkerIDs(markerIDs);
+
+        System.out.println("Count of Markers: " + count);
+        
+        long end = System.currentTimeMillis();
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
     }
 
 }

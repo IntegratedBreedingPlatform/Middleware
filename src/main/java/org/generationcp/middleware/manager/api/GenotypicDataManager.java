@@ -13,6 +13,7 @@
 package org.generationcp.middleware.manager.api;
 
 import java.util.List;
+import java.util.Set;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
@@ -1393,8 +1394,74 @@ public interface GenotypicDataManager{
      * @return (boolean) - true if successful, exception or false if failed
      * @throws MiddlewareQueryException
      */
-    
-
     public Boolean setSNP(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser, 
             CharValues charValues, Dataset dataset) throws MiddlewareQueryException;
+
+    /**
+     * Gets Map ID from QTL Name
+     * @param qtlName - name of qtl
+     * @param start - starting record to retrieve
+     * @param numRows - number of records to retrieve from start record
+     * @return (List<Integer>) list of Map IDs
+     * @throws MiddlewareQueryException
+     */
+    List<Integer> getMapIDsByQTLName(String qtlName, int start, int numOfRows)
+            throws MiddlewareQueryException;
+    
+    /**
+     * Counts Map ID from QTL Name
+     * @param qtlName - name of qtl
+     * @return (long)count of Map IDs
+     * @throws MiddlewareQueryException
+     */
+    long countMapIDsByQTLName(String qtlName)
+            throws MiddlewareQueryException;
+    
+    /**
+     * Gets Marker IDs from Map ID, Linkage Group and Between start position values
+     * @param mapID - ID of map
+     * @param linkageFroup - chromosome 
+     * @param startPos - map starting position value
+     * @param endPos - map ending position value
+     * @param start - starting record to retrieve
+     * @param numRows - number of records to retrieve from start record
+     * @return (Set<Integer>) set of Marker IDs
+     * @throws MiddlewareQueryException
+     */
+    Set<Integer> getMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapID,
+        String linkageGroup, int startPos, int endPos, int start,
+        int numOfRows) throws MiddlewareQueryException;
+
+    /**
+     * Counts Marker IDs from Map ID, Linkage Group and Between start position values
+     * @param mapID - ID of map
+     * @param linkageFroup - chromosome 
+     * @param startPos - map starting position value
+     * @param endPos - map ending position value
+     * @return (long) count of Marker IDs
+     * @throws MiddlewareQueryException
+     */
+    long countMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapID,
+        String linkageGroup, int startPos, int endPos)
+        throws MiddlewareQueryException;
+
+    /**
+     * Gets Markers by Marker IDs
+     * @param markerIDs - IDs of markers
+     * @param start - starting record to retrieve
+     * @param numRows - number of records to retrieve from start record
+     * @return (List<Marker>) List of Markers
+     * @throws MiddlewareQueryException
+     */
+    List<Marker> getMarkersByMarkerIDs(List<Integer> markerIDs, int start,
+            int numOfRows) throws MiddlewareQueryException;
+
+    /**
+     * Counts Markers by Marker IDs
+     * @param markerIDs - IDs of markers
+     * @return Count of Markers
+     * @throws MiddlewareQueryException
+     */
+    long countMarkersByMarkerIDs(List<Integer> markerIDs)
+            throws MiddlewareQueryException;
 }

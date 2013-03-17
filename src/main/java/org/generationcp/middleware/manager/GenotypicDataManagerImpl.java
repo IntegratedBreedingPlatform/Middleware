@@ -94,6 +94,84 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     public GenotypicDataManagerImpl(Session sessionForLocal, Session sessionForCentral) {
         super(sessionForLocal, sessionForCentral);
     }
+    
+    
+    @Override
+    public List<Integer> getMapIDsByQTLName(String qtlName, int start, int numOfRows) throws MiddlewareQueryException {
+        
+        if ((qtlName == null) || (qtlName.isEmpty())){
+            return new ArrayList<Integer>();
+        }
+        
+        QtlDAO dao = new QtlDAO();
+        
+        long centralCount = 0;
+        long localCount = 0;
+        long relativeLimit = 0;
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        List<Integer> qtl = new ArrayList<Integer>();
+
+        if(sessionForCentral != null) {
+            
+            dao.setSession(sessionForCentral);
+            centralCount = dao.countMapIDsByQTLName(qtlName);
+            
+            if(centralCount > start) {
+                qtl.addAll(dao.getMapIDsByQTLName(qtlName, start, numOfRows));
+                relativeLimit = numOfRows - (centralCount - start);
+                if(relativeLimit > 0 && sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countMapIDsByQTLName(qtlName);
+                    if(localCount > 0) {
+                        qtl.addAll(dao.getMapIDsByQTLName(qtlName, 0, (int) relativeLimit));
+                    }
+                }
+            } else {
+                relativeLimit = start - centralCount;
+                if (sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countMapIDsByQTLName(qtlName);
+                    if (localCount > relativeLimit) {
+                        qtl.addAll(dao.getMapIDsByQTLName(qtlName, (int) relativeLimit, numOfRows));
+                    }
+                }
+            }
+        } else if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            localCount = dao.countMapIDsByQTLName(qtlName);
+            if (localCount > start) {
+                qtl.addAll(dao.getMapIDsByQTLName(qtlName, start, numOfRows));
+            }
+        }
+        
+        return qtl;    
+    }   
+    
+    @Override
+    public long countMapIDsByQTLName(String qtlName) throws MiddlewareQueryException {
+
+        long count = 0;
+
+        QtlDAO dao = new QtlDAO();
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            count = count + dao.countMapIDsByQTLName(qtlName);
+        }
+
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            count = count + dao.countMapIDsByQTLName(qtlName);
+        }
+
+        return count;
+    }
 
     @Override
     public List<Integer> getNameIdsByGermplasmIds(List<Integer> gIds) throws MiddlewareQueryException{
@@ -236,6 +314,42 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         List<Integer> markerIds = dao.getIdsByNames(markerNames, start, numOfRows);
         
         return markerIds;
+    }
+    
+    @Override
+    public Set<Integer> getMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapID, String linkageGroup, int startPos, int endPos, int start, int numOfRows) 
+            throws MiddlewareQueryException {
+        
+        MarkerDAO dao = new MarkerDAO();
+        Session session = getSession(mapID);
+        
+        if (session != null) {
+            dao.setSession(session);
+        } else {
+            return new TreeSet<Integer> ();
+        }
+        
+        Set<Integer> markerIds = dao.getMarkerIDsByMapIDAndLinkageBetweenStartPosition(mapID, linkageGroup, startPos, endPos, start, numOfRows);
+        
+        return markerIds;
+    }
+    
+    @Override
+    public long countMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapID, String linkageGroup, int startPos, int endPos) 
+            throws MiddlewareQueryException {
+        
+        MarkerDAO dao = new MarkerDAO();
+        Session session = getSession(mapID);
+        
+        if (session != null) {
+            dao.setSession(session);
+        } else {
+            return 0l;
+        }
+        
+        long count = dao.countMarkerIDsByMapIDAndLinkageBetweenStartPosition(mapID, linkageGroup, startPos, endPos);
+        
+        return count;
     }
 
     @Override
@@ -1422,6 +1536,75 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return result;
         
     }
+    
+    @Override
+    public List<Marker> getMarkersByMarkerIDs(List<Integer> markerIDs, int start, int numOfRows) throws MiddlewareQueryException{
+        MarkerDAO dao = new MarkerDAO();
+        List<Marker> markerIds = new ArrayList<Marker>();
+        long centralCount = 0;
+        long localCount = 0;
+        long relativeLimit = 0;
+        
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if(sessionForCentral != null) {
+            
+            dao.setSession(sessionForCentral);
+            centralCount = dao.countMarkersByIds(markerIDs);
+            
+            if(centralCount > start) {
+                markerIds.addAll(dao.getMarkersByIds(markerIDs, start, numOfRows));
+                relativeLimit = numOfRows - (centralCount -start);
+                if(relativeLimit > 0 && sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countMarkersByIds(markerIDs);
+                    if(localCount > 0) {
+                        markerIds.addAll(dao.getMarkersByIds(markerIDs, 0, (int) relativeLimit));
+                    }
+                }
+            } else {
+                relativeLimit = start - centralCount;
+                if (sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countMarkersByIds(markerIDs);
+                    if (localCount > relativeLimit) {
+                        markerIds.addAll(dao.getMarkersByIds(markerIDs, (int) relativeLimit, numOfRows));
+                    }
+                }
+            }
+        } else if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            localCount = dao.countMarkersByIds(markerIDs);
+            if (localCount > start) {
+                markerIds.addAll(dao.getMarkersByIds(markerIDs, start, numOfRows));
+            }
+        }
+        
+        return markerIds;
+    }
+
+    @Override
+    public long countMarkersByMarkerIDs(List<Integer> markerIDs) throws MiddlewareQueryException{
+        MarkerDAO dao = new MarkerDAO();
+        long result = 0;
+        
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        if(sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            result = dao.countMarkersByIds(markerIDs);
+        }
+        
+        if(sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            result += dao.countMarkersByIds(markerIDs);
+        }
+        
+        return result;
+        
+    }    
     
     @Override
     public long countAlleleValuesByGids(List<Integer> gids) throws MiddlewareQueryException{

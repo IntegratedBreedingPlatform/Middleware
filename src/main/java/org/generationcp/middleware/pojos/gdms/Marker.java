@@ -40,6 +40,26 @@ public class Marker implements Serializable{
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
+    
+    public static final String GET_MARKER_IDS_BY_MAP_ID_AND_LINKAGE_BETWEEN_START_POSITION = 
+        "SELECT marker_id "
+        + "FROM gdms_markers_onmap "
+        + "WHERE map_id = :map_id "
+        + "AND linkage_group = :linkage_group "
+        + "AND start_position "
+        + "BETWEEN :start_position "
+        + "AND :end_position " 
+        + "ORDER BY marker_id";
+    
+    public static final String COUNT_MARKER_IDS_BY_MAP_ID_AND_LINKAGE_BETWEEN_START_POSITION = 
+        "SELECT COUNT(marker_id) "
+        + "FROM gdms_markers_onmap "
+        + "WHERE map_id = :map_id "
+        + "AND linkage_group = :linkage_group "
+        + "AND start_position "
+        + "BETWEEN :start_position "
+        + "AND :end_position";
+            
     public static final String GET_MARKER_TYPE_BY_MARKER_IDS = 
             "SELECT DISTINCT CONCAT(marker_type, '') " +
             "FROM gdms_marker " +

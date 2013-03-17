@@ -3,9 +3,12 @@ package org.generationcp.middleware.dao.gdms;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.generationcp.middleware.pojos.gdms.Qtl;
 import org.generationcp.middleware.pojos.gdms.QtlDetailElement;
 import org.hibernate.HibernateException;
@@ -71,6 +74,47 @@ public class QtlDAO  extends GenericDAO<Qtl, Integer>{
             }
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error with countQtlDetailsByName(name=" + name + ") query from gdms_qtl_details: "
+                    + e.getMessage(), e);
+        }
+    }
+    
+    @SuppressWarnings("rawtypes")
+    public Set<Integer> getMapIDsByQTLName(String qtlName, int start, int numOfRows) throws MiddlewareQueryException{
+        try {
+            
+            SQLQuery query;
+
+            query = getSession().createSQLQuery(Qtl.GET_MAP_IDS_BY_QTL_NAME);
+            query.setParameter("qtl_name", qtlName);
+            query.setFirstResult(start);
+            query.setMaxResults(numOfRows);
+            Set<Integer> mapIDSet = new TreeSet<Integer>(query.list());
+
+            return mapIDSet;
+            
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getMapIDsByQTLName(qtlName=" + qtlName + ", start=" + start + ", numOfRows=" + numOfRows + ") query from QTL: "
+                    + e.getMessage(), e);
+        }
+    }
+    
+    @SuppressWarnings("rawtypes")
+    public long countMapIDsByQTLName(String qtlName) throws MiddlewareQueryException{
+        try {
+            
+            SQLQuery query;
+
+            query = getSession().createSQLQuery(Qtl.COUNT_MAP_IDS_BY_QTL_NAME);
+            query.setParameter("qtl_name", qtlName);
+            BigInteger result = (BigInteger) query.uniqueResult();
+            if (result != null) {
+                return result.longValue();
+            } else {
+                return 0;
+            }
+            
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with countMapIDsByQTLName(qtlName=" + qtlName + ") query from QTL: "
                     + e.getMessage(), e);
         }
     }

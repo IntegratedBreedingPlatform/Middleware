@@ -33,6 +33,19 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @Table(name = "gdms_qtl")
 public class Qtl implements Serializable{
 
+   
+    public static final String GET_MAP_IDS_BY_QTL_NAME = 
+        "SELECT map_id "
+        + "FROM gdms_qtl gq "
+        + "INNER JOIN gdms_qtl_details gqd on gq.qtl_id = gqd.qtl_id "
+        + "WHERE gq.qtl_name=:qtl_name " 
+        + "ORDER BY gq.qtl_id";
+    
+    public static final String COUNT_MAP_IDS_BY_QTL_NAME = 
+        "SELECT COUNT(map_id) "
+        + "FROM gdms_qtl gq "
+        + "INNER JOIN gdms_qtl_details gqd on gq.qtl_id = gqd.qtl_id "
+        + "WHERE gq.qtl_name=:qtl_name";
     
     public static final String GET_QTL_BY_NAME = 
             "SELECT  CONCAT(gdms_qtl.qtl_name,'') " 

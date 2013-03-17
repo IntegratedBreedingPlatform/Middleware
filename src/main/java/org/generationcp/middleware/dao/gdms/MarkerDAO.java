@@ -15,6 +15,8 @@ package org.generationcp.middleware.dao.gdms;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -26,6 +28,7 @@ import org.generationcp.middleware.pojos.gdms.MappingPopValues;
 import org.generationcp.middleware.pojos.gdms.Marker;
 import org.generationcp.middleware.pojos.gdms.MarkerIdMarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
+import org.generationcp.middleware.pojos.gdms.Qtl;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 
@@ -609,5 +612,93 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
             throw new MiddlewareQueryException("Error with countMarkersByIds() query from Marker: " + e.getMessage(), e);
         }
     }
+    
+    @SuppressWarnings("rawtypes")
+    public Set<Integer> getMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapID, String linkageGroup, int startPos, int endPos, int start, int numOfRows) throws MiddlewareQueryException{
+        try {
+            
+            SQLQuery query;
+
+            query = getSession().createSQLQuery(Marker.GET_MARKER_IDS_BY_MAP_ID_AND_LINKAGE_BETWEEN_START_POSITION);
+            query.setParameter("map_id", mapID);
+            query.setParameter("linkage_group", linkageGroup);
+            query.setParameter("start_position", startPos);
+            query.setParameter("end_position", endPos);
+            query.setFirstResult(start);
+            query.setMaxResults(numOfRows);
+            Set<Integer> markerIDSet = new TreeSet<Integer>(query.list());
+
+            return markerIDSet;
+            
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getMarkerIdsByMapIDAndLinkageBetweenStartPosition(mapID=" + mapID + ", linkageGroup=" + linkageGroup + ", start=" + start + ", numOfRows=" + numOfRows + ") query from Marker: "
+                    + e.getMessage(), e);
+        }
+    }
+    
+    @SuppressWarnings("rawtypes")
+    public long countMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapID, String linkageGroup, int startPos, int endPos) throws MiddlewareQueryException{
+        try {
+            
+            SQLQuery query;
+
+            query = getSession().createSQLQuery(Marker.COUNT_MARKER_IDS_BY_MAP_ID_AND_LINKAGE_BETWEEN_START_POSITION);
+            query.setParameter("map_id", mapID);
+            query.setParameter("linkage_group", linkageGroup);
+            query.setParameter("start_position", startPos);
+            query.setParameter("end_position", endPos);
+            BigInteger result = (BigInteger) query.uniqueResult();
+            if (result != null) {
+                return result.longValue();
+            } else {
+                return 0;
+            }
+            
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with countMarkerIdsByMapIDAndLinkageBetweenStartPosition(mapID=" + mapID + ", linkageGroup=" + linkageGroup + ") query from Marker: "
+                    + e.getMessage(), e);
+        }
+    }
+    
+/*    @SuppressWarnings("rawtypes")
+    public Set<Integer> getMarkersByMarkerIDs(List<Integer> markerIDs, int start, int numOfRows) throws MiddlewareQueryException{
+        try {
+            
+            SQLQuery query;
+
+            query = getSession().createSQLQuery(Marker.GET_MARKERS_BY_MARKER_IDS);
+            query.setParameterList("map_id", markerIDs);
+            query.setFirstResult(start);
+            query.setMaxResults(numOfRows);
+            Set<Integer> markerIDSet = new TreeSet<Integer>(query.list());
+
+            return markerIDSet;
+            
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getMarkersByMarkerIDs(mapID=" + markerIDs + ", start=" + start + ", numOfRows=" + numOfRows + ") query from Marker: "
+                    + e.getMessage(), e);
+        }
+    }
+    
+    @SuppressWarnings("rawtypes")
+    public long countMarkersByMarkerIDs(List<Integer> markerIDs) throws MiddlewareQueryException{
+        try {
+            
+            SQLQuery query;
+
+            query = getSession().createSQLQuery(Marker.COUNT_MARKERS_BY_MARKER_IDS);
+            query.setParameterList("map_id", markerIDs);
+            BigInteger result = (BigInteger) query.uniqueResult();
+            if (result != null) {
+                return result.longValue();
+            } else {
+                return 0;
+            }
+            
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with countMarkersByMarkerIDs(mapID=" + markerIDs + ") query from Marker: "
+                    + e.getMessage(), e);
+        }
+    }*/
 
 }
