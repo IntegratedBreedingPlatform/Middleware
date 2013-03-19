@@ -935,6 +935,26 @@ public interface GenotypicDataManager{
     public long countAllQtl() throws MiddlewareQueryException;
     
     /**
+     * Retrieves QTL Ids from the gdms_qtl table matching the given name
+     * 
+     * @param name - the QTL name to match 
+     * @param start - the starting index of the sublist of results to be returned
+     * @param numOfRows - the number of rows to be included in the sublist of results to be returned
+     * @return List of QTL Ids
+     * @throws MiddlewareQueryException
+     */
+    public List<Integer> getQtlIdByName(String name, int start, int numOfRows) throws MiddlewareQueryException;
+
+    /**
+     * Returns the number of QTL Ids from the gdms_qtl table matching the given name
+     * 
+     * @param name - the QTL name to match
+     * @return Count of QTL Ids
+     * @throws MiddlewareQueryException
+     */
+    public long countQtlIdByName(String name) throws MiddlewareQueryException;
+    
+    /**
      * Retrieves QTL entries from the gdms_qtl table matching the given name
      * 
      * @param name 
@@ -1396,6 +1416,32 @@ public interface GenotypicDataManager{
      */
     public Boolean setSNP(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser, 
             CharValues charValues, Dataset dataset) throws MiddlewareQueryException;
+    
+    /**
+     * Sets Mapping Data.
+     * 
+     * @param accMetadataSet - Accession Metadataset
+     * @param markerMetadataSet - Marker Metadataset
+     * @param datasetUser - Dataset Users
+     * @param mappingPop - Mapping Population
+     * @param mappingPopValues - Mapping population Values
+     * @param dataset - Dataset
+     * @return true if values were successfully saved in the database, false otherwise
+     * @throws MiddlewareQueryException
+     */
+    public Boolean setMappingData(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser,
+            MappingPop mappingPop, MappingPopValues mappingPopValues, Dataset dataset) throws MiddlewareQueryException;
+    
+    /**
+     * Sets Maps/
+     * 
+     * @param marker - GDMS Marker
+     * @param markerOnMap - GDMS Marker On Map
+     * @param map - GDMS Map
+     * @return true if values were successfully saved in the database, false otherwise
+     * @throws MiddlewareQueryException
+     */
+    public Boolean setMaps(Marker marker, MarkerOnMap markerOnMap, Map map) throws MiddlewareQueryException;
 
     /**
      * Gets Map ID from QTL Name
@@ -1491,4 +1537,5 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException
      */
     long countQTLByQTLIDs(List<Integer> qtls) throws MiddlewareQueryException;
+
 }

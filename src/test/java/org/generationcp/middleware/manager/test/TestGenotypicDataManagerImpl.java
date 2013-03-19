@@ -653,8 +653,23 @@ public class TestGenotypicDataManagerImpl{
         long result = manager.countAllQtl();
         System.out.println("testCountAllQtl() RESULTS: " + result);
     }
+    
+    @Test
+    public void testCountQtlIdByName() throws Exception { 
+        String qtlName = "SLA%";     // Crop tested: Groundnut
+        long count = manager.countQtlIdByName(qtlName);
+        System.out.println("testCountQtlIdByName() RESULTS: " + count);
+    }
 
+    @Test
+    public void testGetQtlIdByName() throws Exception {
+        String qtlName = "SLA%";     // Crop tested: Groundnut
 
+        List<Integer> results = manager.getQtlIdByName(qtlName, 0, 
+                (int) manager.countQtlIdByName(qtlName));
+        System.out.println("testGetQtlIdByName() RESULTS: " + results);
+    }
+    
     @Test
     public void testGetQtlByName() throws Exception {
         String qtlName = "SLA%";     // Crop tested: Groundnut
@@ -1514,6 +1529,108 @@ public class TestGenotypicDataManagerImpl{
                     + " | " + (addStatus != null ? datasetUser : null) 
                     + " | " + (addStatus != null ? charValues : null) 
                     + " | " + (addStatus != null ? dataset : null));
+    }
+    
+    @Test
+    public void testSetMappingData() throws Exception {
+        // Tested on Groundnut DB
+
+        // DatasetUser Fields
+        Integer datasetId = null; //Will be set/overridden by the function
+        Integer userId = 123;
+
+        // Dataset Fields
+        String datasetName = "Map_Pop GCP-832 Test";
+        String datasetDesc = "Map_Pop GCP-832 Test Description";
+        String datasetType = "mapping";
+        String genus = "Groundnut"; 
+        String species = "Groundnut"; 
+        Date uploadTemplateDate = new Date(System.currentTimeMillis()); 
+        String remarks = ""; 
+        String dataType = "map"; 
+        String missingData = null;
+        String method = null;
+        String score = null;
+        
+        // AccMetadataSet Additional Fields
+        Integer gId = 1; 
+        Integer nameId = 1;
+
+        // MarkerMetadataSet Additional Field
+        Integer markerId = 1;
+
+        // MappingPop Additional Fields
+        String mappingType = "abh";
+        Integer parentAGId = 1035;
+        Integer parentBGId = 1036;
+        Integer populationSize = 999;
+        String populationType = "";
+        String mapDataDescription = "Flood resistant";
+        String scoringScheme = "";
+        Integer mapId = 1;
+        
+        // MappingPopValues Additional Fields
+        Integer mpId = null;  //Will be set/overridden by the function
+        String mapCharValue = "-";
+        
+        Dataset dataset = new Dataset(datasetId, datasetName, datasetDesc, datasetType, genus, species, uploadTemplateDate, remarks,
+                dataType, missingData, method, score);        
+        
+        AccMetadataSet accMetadataSet = new AccMetadataSet(datasetId, gId, nameId);
+        
+        MarkerMetadataSet markerMetadataSet = new MarkerMetadataSet(datasetId, markerId);
+        
+        DatasetUsers datasetUser = new DatasetUsers(datasetId, userId);
+        
+        MappingPop mappingPop = new MappingPop(datasetId, mappingType, parentAGId, parentBGId, populationSize, populationType, mapDataDescription, scoringScheme, mapId);
+        
+        MappingPopValues mappingPopValues = new MappingPopValues(mpId, mapCharValue, datasetId, gId, markerId);
+        
+        Boolean addStatus = manager.setMappingData(accMetadataSet, markerMetadataSet, datasetUser, mappingPop, mappingPopValues, dataset);
+        System.out.println("testSetMappingData() Added: " + (addStatus != null ? accMetadataSet : null) 
+                    + " | " + (addStatus != null ? markerMetadataSet : null) 
+                    + " | " + (addStatus != null ? datasetUser : null) 
+                    + " | " + (addStatus != null ? mappingPop : null)
+                    + " | " + (addStatus != null ? mappingPopValues : null)
+                    + " | " + (addStatus != null ? dataset : null));
+    }
+    
+    @Test
+    public void testSetMaps() throws Exception {
+        
+        // Marker Fields
+        Integer markerId = null; // Value will be set/overriden by the function 
+        String markerType = "UA";
+        String markerName = "GCP-833TestMarker";
+        String species = "Groundnut";
+        
+        Marker marker = new Marker();
+        marker.setMarkerId(markerId);
+        marker.setMarkerType(markerType);
+        marker.setMarkerName(markerName);
+        marker.setSpecies(species);
+        marker.setAnnealingTemp(new Float(0));
+        
+        // Map Fields
+        Integer mapId = null; // Value will be set/overriden by the function
+        String mapName = "GCP-833TestMap";
+        String mapType = "genetic";
+        Integer mpId = 0;
+        
+        Map map = new Map(mapId, mapName, mapType, mpId);
+        
+        // MarkerOnMap Fields
+        Float startPosition = new Float(0);
+        Float endPosition = new Float(0);
+        String mapUnit = "CM";
+        String linkageGroup = "LG23";
+        
+        MarkerOnMap markerOnMap = new MarkerOnMap(mapId, markerId, startPosition, endPosition, mapUnit, linkageGroup);
+        
+        Boolean addStatus = manager.setMaps(marker, markerOnMap, map);
+        System.out.println("testSetMaps() Added: " + (addStatus != null ? marker : null) 
+                    + " | " + (addStatus != null ? markerOnMap : null) 
+                    + " | " + (addStatus != null ? map : null));
     }
     
     @Test

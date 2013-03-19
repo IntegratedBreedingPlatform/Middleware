@@ -16,7 +16,38 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 
 
-public class QtlDAO  extends GenericDAO<Qtl, Integer>{
+public class QtlDAO  extends GenericDAO<Qtl, Integer>{    
+    
+    public long countQtlIdByName(String name) throws MiddlewareQueryException {
+        try {
+            Query query = getSession().createSQLQuery(Qtl.COUNT_QTL_ID_BY_NAME);
+            query.setParameter("qtlName", name);
+            BigInteger result = (BigInteger) query.uniqueResult();
+            if (result != null) {
+                return result.longValue();
+            } else {
+                return 0;
+            }
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with countQtlIdByName(name=" + name + ") query from gdms_qtl: "
+                    + e.getMessage(), e);
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<Integer> getQtlIdByName(String name, int start, int numOfRows) throws MiddlewareQueryException {
+        try {
+            SQLQuery query = getSession().createSQLQuery(Qtl.GET_QTL_ID_BY_NAME);
+            query.setParameter("qtlName", name);
+            query.setFirstResult(start);
+            query.setMaxResults(numOfRows);
+            List<Integer> qtlIds = query.list();
+            return qtlIds;
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getQtlIdByName(name=" + name + ") query from gdms_qtl: "
+                    + e.getMessage(), e);
+        }
+    }
 
     @SuppressWarnings("rawtypes")
     public List<QtlDetailElement> getQtlDetailsByQTLIDs(List<Integer> qtlIDs, int start, int numOfRows) throws MiddlewareQueryException{

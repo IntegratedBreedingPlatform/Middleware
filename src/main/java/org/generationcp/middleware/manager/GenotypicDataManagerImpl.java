@@ -2024,6 +2024,92 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return result;
 
     }
+    
+    @Override
+    public List<Integer> getQtlIdByName(String name, int start, int numOfRows) throws MiddlewareQueryException {
+        
+        if ((name == null) || (name.isEmpty())){
+            return new ArrayList<Integer>();
+        }
+        
+        QtlDAO dao = new QtlDAO();
+        
+        long centralCount = 0;
+        long localCount = 0;
+        long relativeLimit = 0;
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+        
+        List<Integer> qtlIds = new ArrayList<Integer>();
+        
+        if(sessionForCentral != null) {
+            
+            dao.setSession(sessionForCentral);
+            centralCount = dao.countQtlIdByName(name);
+            
+            if(centralCount > start) {
+                qtlIds.addAll(dao.getQtlIdByName(name, start, numOfRows));
+                relativeLimit = numOfRows - qtlIds.size();
+                if(relativeLimit > 0 && sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countQtlIdByName(name);
+                    if(localCount > 0) {
+                        List<Integer> qtlIdList = dao.getQtlIdByName(name, 0, (int) relativeLimit);
+                        qtlIds.addAll(qtlIdList);
+                    }
+                }
+            } else {
+                relativeLimit = start - centralCount;
+                if (sessionForLocal != null) {
+                    dao.setSession(sessionForLocal);
+                    localCount = dao.countQtlIdByName(name);
+                    if (localCount > relativeLimit) {
+                        List<Integer> qtlIdList = dao.getQtlIdByName(name, (int) relativeLimit, numOfRows);
+                        qtlIds.addAll(qtlIdList);
+                    }
+                }
+            }
+        } else if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            localCount = dao.countQtlIdByName(name);
+            if (localCount > start) {
+                List<Integer> qtlIdList = dao.getQtlIdByName(name, start, numOfRows);
+                qtlIds.addAll(qtlIdList);
+            }
+        }
+        
+        return qtlIds;
+    }
+    
+    @Override
+    public long countQtlIdByName(String name) throws MiddlewareQueryException{
+        
+        if ((name == null) || (name.isEmpty())){
+            return 0;
+        }
+                
+        QtlDAO dao = new QtlDAO();
+
+        Session sessionForCentral = getCurrentSessionForCentral();
+        Session sessionForLocal = getCurrentSessionForLocal();
+
+        long result = 0;
+
+        // Count from local
+        if (sessionForLocal != null) {
+            dao.setSession(sessionForLocal);
+            result += dao.countQtlIdByName(name);
+        }
+
+        // Count from central
+        if (sessionForCentral != null) {
+            dao.setSession(sessionForCentral);
+            result += dao.countQtlIdByName(name);
+        }
+
+        return result;
+    }
 
     @Override
     public List<QtlDetailElement> getQtlByName(String name, int start, int numOfRows) throws MiddlewareQueryException{
@@ -3997,5 +4083,207 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return transactionStatus;
 	}
 
+    @Override
+    public Boolean setMappingData(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser,
+            MappingPop mappingPop, MappingPopValues mappingPopValues, Dataset dataset) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+        
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+        Boolean transactionStatus = true;
+
+        try {
+            // Begin save transaction
+            trans = session.beginTransaction();
+
+            // Add Dataset
+            DatasetDAO datasetDao = new DatasetDAO();
+            datasetDao.setSession(session);
+            
+            Integer datasetGeneratedId = datasetDao.getNegativeId("datasetId");
+            dataset.setDatasetId(datasetGeneratedId);
+
+            dataset.setDatasetType("mapping");
+            dataset.setDataType("map");
+
+            Dataset datasetRecordSaved = datasetDao.saveOrUpdate(dataset);
+            Integer datasetId = datasetRecordSaved.getDatasetId();            
+
+            if (datasetId == null) {
+                throw new Exception();  // To immediately roll back and to avoid executing the other insert functions
+            }
+
+            // Add AccMetadataSet
+            AccMetadataSetDAO accMetadataSetDao = new AccMetadataSetDAO();
+            accMetadataSetDao.setSession(session);
+	            
+            accMetadataSet.setDatasetId(datasetId);
+
+            // No need to generate id, AccMetadataSetPK(datasetId, gId, nId) are foreign keys
+            AccMetadataSet accMetadataSetRecordSaved = accMetadataSetDao.saveOrUpdate(accMetadataSet);
+            AccMetadataSetPK accMetadatasetSavedId = accMetadataSetRecordSaved.getId();            
+
+            if (accMetadatasetSavedId == null) {
+                throw new Exception(); 
+            }
+	            
+            // Add MarkerMetadataSet
+            MarkerMetadataSetDAO markerMetadataSetDao = new MarkerMetadataSetDAO();
+            markerMetadataSetDao.setSession(session);
+
+            markerMetadataSet.setDatasetId(datasetId);
+
+            // No need to generate id, MarkerMetadataSetPK(datasetId, markerId) are foreign keys
+            MarkerMetadataSet markerMetadataSetRecordSaved = markerMetadataSetDao.saveOrUpdate(markerMetadataSet);
+            MarkerMetadataSetPK markerMetadataSetSavedId = markerMetadataSetRecordSaved.getId();            
+
+            if (markerMetadataSetSavedId == null) {
+                throw new Exception();
+            }
+	            
+            // Add DatasetUser
+            DatasetUsersDAO datasetUserDao = new DatasetUsersDAO();
+            datasetUserDao.setSession(session);
+
+            datasetUser.setDatasetId(datasetId);
+            
+            DatasetUsers datasetUserSaved = datasetUserDao.saveOrUpdate(datasetUser);
+            Integer datasetUserSavedId = datasetUserSaved.getUserId();    
+
+            if (datasetUserSavedId == null) {
+                throw new Exception();
+            }
+
+            // Add Mapping Population
+            MappingPopDAO mappingPopDao = new MappingPopDAO();
+            mappingPopDao.setSession(session);
+            
+            mappingPop.setDatasetId(datasetId);
+            
+            // Mapping Pop has DatasetID as PK in Hibernate, but not in SQL
+            // Integer mappingPopGeneratedId = mappingPopDao.getNegativeId("datasetId");
+            // mappingPop.setDatasetIdId(mappingPopGeneratedId);
+            
+            MappingPop mappingPopRecordSaved = mappingPopDao.save(mappingPop);
+            Integer mappingPopSavedId = mappingPopRecordSaved.getDatasetId();
+            
+            if (mappingPopSavedId == null) {
+                throw new Exception();
+            }
+            
+            // Add Mapping Population Values
+            
+            MappingPopValuesDAO mappingPopValuesDao = new MappingPopValuesDAO();
+            mappingPopValuesDao.setSession(session);
+            
+            mappingPopValues.setDatasetId(datasetId);
+            
+            Integer mpId = mappingPopValuesDao.getNegativeId("mpId");
+            mappingPopValues.setMpId(mpId);
+            
+            MappingPopValues mappingPopValuesRecordSaved = mappingPopValuesDao.save(mappingPopValues);
+            Integer mappingPopValuesSavedId = mappingPopValuesRecordSaved.getMpId();
+            
+            if (mappingPopValuesSavedId == null) {
+                throw new Exception();
+            }
+            
+            if (transactionStatus == true) {
+                trans.commit();
+            } else {
+                throw new Exception(); 
+            }
+	            
+        } catch (Exception e) {
+            // rollback transaction in case of errors
+            transactionStatus = false;
+            if (trans != null) {                
+                trans.rollback();
+            }
+            throw new MiddlewareQueryException("Error encountered while setting Mapping Data: setMappingData(): "
+                    + e.getMessage(), e);
+        } finally {
+            session.flush();
+        }
+	        
+        return transactionStatus;
+    }
     
+    @Override
+    public Boolean setMaps(Marker marker, MarkerOnMap markerOnMap, Map map) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+        
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+        Boolean transactionStatus = true;
+
+        try {
+            // Begin save transaction
+            trans = session.beginTransaction();
+
+            // Add GDMS Marker
+            MarkerDAO markerDao = new MarkerDAO();
+            markerDao.setSession(session);
+            
+            Integer markerGeneratedId = markerDao.getNegativeId("markerId");
+            marker.setMarkerId(markerGeneratedId);
+            
+            marker.setMarkerType("UA");
+
+            Marker markerRecordSaved = markerDao.saveOrUpdate(marker);
+            Integer markerSavedId = markerRecordSaved.getMarkerId();            
+
+            if (markerSavedId == null) {
+                throw new Exception();  // To immediately roll back and to avoid executing the other insert functions
+            }
+            
+            // Add Map
+            MapDAO mapDao = new MapDAO();
+            mapDao.setSession(session);
+            
+            Integer mapGeneratedId = mapDao.getNegativeId("mapId");
+            map.setMapId(mapGeneratedId);
+
+            Map mapRecordSaved = mapDao.saveOrUpdate(map);
+            Integer mapSavedId = mapRecordSaved.getMapId();            
+
+            if (mapSavedId == null) {
+                throw new Exception();  // To immediately roll back and to avoid executing the other insert functions
+            }
+
+            // Add Marker on Map
+            MarkerOnMapDAO markerOnMapDao = new MarkerOnMapDAO();
+            markerOnMapDao.setSession(session);
+            
+            // No need to generate id, MarkerOnMap(markerId, mapId) are foreign keys
+            markerOnMap.setMarkerId(markerSavedId);
+            markerOnMap.setMapId(mapSavedId);
+            
+            MarkerOnMap markerOnMapRecordSaved = markerOnMapDao.saveOrUpdate(markerOnMap);
+            Integer markerOnMapSavedId = markerOnMapRecordSaved.getMapId();
+
+            if (markerOnMapSavedId == null) {
+                throw new Exception(); 
+            }
+            
+            if (transactionStatus == true) {
+                trans.commit();
+            } else {
+                throw new Exception(); 
+            }
+                    
+        } catch (Exception e) {
+            // rollback transaction in case of errors
+            transactionStatus = false;
+            if (trans != null) {                
+                trans.rollback();
+            }
+            throw new MiddlewareQueryException("Error encountered while setting Maps: setMaps(): "
+                    + e.getMessage(), e);
+        } finally {
+            session.flush();
+        }
+                
+        return transactionStatus;
+    }
 }

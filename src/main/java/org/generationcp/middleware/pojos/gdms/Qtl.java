@@ -35,48 +35,48 @@ public class Qtl implements Serializable{
 
    
     public static final String GET_MAP_IDS_BY_QTL_NAME = 
-        "SELECT map_id "
-        + "FROM gdms_qtl gq "
-        + "INNER JOIN gdms_qtl_details gqd on gq.qtl_id = gqd.qtl_id "
-        + "WHERE gq.qtl_name=:qtl_name " 
-        + "ORDER BY gq.qtl_id";
-    
-    public static final String COUNT_MAP_IDS_BY_QTL_NAME = 
-        "SELECT COUNT(map_id) "
-        + "FROM gdms_qtl gq "
-        + "INNER JOIN gdms_qtl_details gqd on gq.qtl_id = gqd.qtl_id "
-        + "WHERE gq.qtl_name=:qtl_name";
-    
-    public static final String GET_QTL_BY_QTL_IDS = 
-        "SELECT CONCAT(gq.qtl_name,'') "
-            + ",CONCAT(gm.map_name,'') "
-            + ",gqd.linkage_group "
-            + ",gqd.min_position "
-            + ",gqd.max_position "
-            + ",CONCAT(gqd.trait,'') " 
-            + ",CONCAT(gqd.experiment,'') " 
-            + ",gqd.left_flanking_marker "
-            + ",gqd.right_flanking_marker "
-            + ",gqd.effect "
-            + ",gqd.score_value " 
-            + ",gqd.r_square "
-            + ",gqd.interactions " 
-            + ",trt.trname "
-            + ",trt.ontology "
-        + "FROM gdms_qtl_details gqd "
-            + "INNER JOIN gdms_qtl gq ON gq.qtl_id = gqd.qtl_id "
-            + "INNER JOIN gdms_map gm ON gm.map_id = gqd.map_id "
-            + "INNER JOIN tmstraits trt ON gqd.trait = trt.trabbr "
-        + "WHERE gq.qtl_id in(:qtl_id_list) "
-        + "ORDER BY gq.qtl_id";
-    
-    public static final String COUNT_QTL_BY_QTL_IDS = 
-        "SELECT COUNT(*) " 
-        + "FROM gdms_qtl_details gqd "
-            + "INNER JOIN gdms_qtl gq ON gq.qtl_id = gqd.qtl_id "
-            + "INNER JOIN gdms_map gm ON gm.map_id = gqd.map_id "
-            + "INNER JOIN tmstraits trt ON gqd.trait = trt.trabbr "
-        + "WHERE gq.qtl_id in(:qtl_id_list)"; 
+            "SELECT map_id "
+            + "FROM gdms_qtl gq "
+            + "INNER JOIN gdms_qtl_details gqd on gq.qtl_id = gqd.qtl_id "
+            + "WHERE gq.qtl_name=:qtl_name " 
+            + "ORDER BY gq.qtl_id";
+        
+        public static final String COUNT_MAP_IDS_BY_QTL_NAME = 
+            "SELECT COUNT(map_id) "
+            + "FROM gdms_qtl gq "
+            + "INNER JOIN gdms_qtl_details gqd on gq.qtl_id = gqd.qtl_id "
+            + "WHERE gq.qtl_name=:qtl_name";
+        
+        public static final String GET_QTL_BY_QTL_IDS = 
+            "SELECT CONCAT(gq.qtl_name,'') "
+                + ",CONCAT(gm.map_name,'') "
+                + ",gqd.linkage_group "
+                + ",gqd.min_position "
+                + ",gqd.max_position "
+                + ",CONCAT(gqd.trait,'') " 
+                + ",CONCAT(gqd.experiment,'') " 
+                + ",gqd.left_flanking_marker "
+                + ",gqd.right_flanking_marker "
+                + ",gqd.effect "
+                + ",gqd.score_value " 
+                + ",gqd.r_square "
+                + ",gqd.interactions " 
+                + ",trt.trname "
+                + ",trt.ontology "
+            + "FROM gdms_qtl_details gqd "
+                + "INNER JOIN gdms_qtl gq ON gq.qtl_id = gqd.qtl_id "
+                + "INNER JOIN gdms_map gm ON gm.map_id = gqd.map_id "
+                + "INNER JOIN tmstraits trt ON gqd.trait = trt.trabbr "
+            + "WHERE gq.qtl_id in(:qtl_id_list) "
+            + "ORDER BY gq.qtl_id";
+        
+        public static final String COUNT_QTL_BY_QTL_IDS = 
+            "SELECT COUNT(*) " 
+            + "FROM gdms_qtl_details gqd "
+                + "INNER JOIN gdms_qtl gq ON gq.qtl_id = gqd.qtl_id "
+                + "INNER JOIN gdms_map gm ON gm.map_id = gqd.map_id "
+                + "INNER JOIN tmstraits trt ON gqd.trait = trt.trabbr "
+            + "WHERE gq.qtl_id in(:qtl_id_list)"; 
     
     public static final String GET_QTL_BY_NAME = 
             "SELECT  CONCAT(gdms_qtl.qtl_name,'') " 
@@ -110,7 +110,18 @@ public class Qtl implements Serializable{
             + "AND gdms_qtl_details.map_id = gdms_map.map_id "
             + "AND gdms_qtl_details.trait = tmstraits.trabbr "
             ;
-
+    
+    public static final String GET_QTL_ID_BY_NAME = 
+            "SELECT qtl_id "
+            + "FROM gdms_qtl "
+            + "WHERE qtl_name LIKE LOWER(:qtlName) "
+            + "ORDER BY qtl_id";
+    
+    public static final String COUNT_QTL_ID_BY_NAME = 
+            "SELECT COUNT(*) "
+            + "FROM gdms_qtl "
+            + "WHERE qtl_name LIKE LOWER(:qtlName) ";
+    		
     public static final String GET_QTL_BY_TRAIT = 
             "SELECT qtl_id " 
             + "FROM gdms_qtl_details " 
