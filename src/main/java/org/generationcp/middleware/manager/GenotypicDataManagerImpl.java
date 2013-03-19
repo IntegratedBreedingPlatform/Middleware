@@ -4054,6 +4054,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             
             Integer generatedId = charValuesDao.getNegativeId("acId");
             charValues.setAcId(generatedId);
+            charValues.setDatasetId(datasetId);
             
             CharValues charValuesRecordSaved = charValuesDao.saveOrUpdate(charValues);
             Integer charValuesSavedId = charValuesRecordSaved.getAcId();

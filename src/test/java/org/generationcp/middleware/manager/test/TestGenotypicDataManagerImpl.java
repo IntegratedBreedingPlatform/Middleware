@@ -1504,11 +1504,6 @@ public class TestGenotypicDataManagerImpl{
         // MarkerMetadataSet Additional Field
         Integer markerId = 1;
 
-        // AlleleValues Additional Fields
-        Integer anId = null;     //Will be set/overridden by the function
-        String alleleBinValue = "238:238";
-        String alleleRawValue = "0.0:0.0";
-        
      // charValues Additional Fields
         Integer acId = null;            // Crop tested: Groundnut
         String charValue = "CV"; 
