@@ -63,11 +63,11 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
         } else {
             return new ArrayList<GermplasmList>();
         }
-        return dao.getAll(start, numOfRows);
+        return dao.getAllExceptDeleted(start, numOfRows);
     }
 
     @Override
-    public long countAllGermplasmLists() {
+    public long countAllGermplasmLists() throws MiddlewareQueryException {
         long count = 0;
 
         Session sessionForCentral = getCurrentSessionForCentral();
@@ -76,13 +76,13 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
         if (sessionForLocal != null) {
             GermplasmListDAO dao = new GermplasmListDAO();
             dao.setSession(sessionForLocal);
-            count = count + dao.countAll();
+            count = count + dao.countAllExceptDeleted();
         }
 
         if (sessionForCentral != null) {
             GermplasmListDAO centralDao = new GermplasmListDAO();
             centralDao.setSession(sessionForCentral);
-            count = count + centralDao.countAll();
+            count = count + centralDao.countAllExceptDeleted();
         }
 
         return count;
@@ -683,13 +683,11 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
         GermplasmListDAO dao = new GermplasmListDAO();
         Session session = getSession(parentId);
-        List<GermplasmList> childLists;
+        List<GermplasmList> childLists = new ArrayList<GermplasmList>();
 
         if (session != null) {
             dao.setSession(session);
             childLists = dao.getByParentFolderId(parentId, start, numOfRows);
-        } else {
-            childLists = new ArrayList<GermplasmList>();
         }
 
         return childLists;

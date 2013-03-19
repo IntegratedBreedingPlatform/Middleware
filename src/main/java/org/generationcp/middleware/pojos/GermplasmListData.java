@@ -203,8 +203,6 @@ public class GermplasmListData implements Serializable{
         StringBuilder builder = new StringBuilder();
         builder.append("GermplasmListData [id=");
         builder.append(id);
-        builder.append(", list=");
-        builder.append(list);
         builder.append(", gid=");
         builder.append(gid);
         builder.append(", entryId=");

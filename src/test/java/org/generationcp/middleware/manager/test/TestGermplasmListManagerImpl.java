@@ -48,32 +48,38 @@ public class TestGermplasmListManagerImpl{
 
     @Test
     public void testGetAllGermplasmLists() throws Exception {
-        List<GermplasmList> lists = manager.getAllGermplasmLists(0, 5, Database.CENTRAL);
-        System.out.println("testGetAllGermplasmLists RESULTS: ");
+        int count = (int) manager.countAllGermplasmLists();
+        List<GermplasmList> lists = manager.getAllGermplasmLists(0, count, Database.CENTRAL);
+        System.out.println("testGetAllGermplasmLists RESULTS: " + count);
         for (GermplasmList list : lists) {
             System.out.println("  " + list);
         }
+        // Verify using: select * from listnms where liststatus <> 9;
+
     }
 
     @Test
     public void testCountAllGermplasmLists() throws Exception {
         System.out.println("testCountAllGermplasmLists() RESULTS: " + manager.countAllGermplasmLists());
+        // Verify using: select count(*) from listnms where liststatus <> 9;
     }
 
     @Test
     public void testGetGermplasmListByName() throws Exception {
-        String name = "2002%";
+        String name = "2002%";     // Crop tested: Rice
         List<GermplasmList> lists = manager.getGermplasmListByName(name, 0, 5, Operation.LIKE, Database.CENTRAL);
-        System.out.println("testGetGermplasmListByName(" + name + ") RESULTS:");
+        System.out.println("testGetGermplasmListByName(" + name + ") RESULTS: ");
         for (GermplasmList list : lists) {
             System.out.println("  " + list);
         }
+        // Verify using: select * from listnms where liststatus <> 9 and listname like '2002%';
     }
 
     @Test
     public void testCountGermplasmListByName() throws Exception {
-        String name = "2002%";
+        String name = "2002%";     // Crop tested: Rice
         System.out.println("testCountGermplasmListByName(" + name + ") RESULTS: " + manager.countGermplasmListByName(name, Operation.LIKE));
+        // Verify using: select count(*) from listnms where liststatus <> 9 and listname like '2002%';
     }
 
     @Test
@@ -85,17 +91,19 @@ public class TestGermplasmListManagerImpl{
         for (GermplasmList list : lists) {
             System.out.println("  " + list);
         }
+        // Verify using: select * from listnms where liststatus <> 9 and liststatus = 1;
     }
 
     @Test
     public void testCountGermplasmListByStatus() throws Exception {
         Integer status = Integer.valueOf(1);
         System.out.println("testCountGermplasmListByStatus(status=" + status + ") RESULTS: " + manager.countGermplasmListByStatus(status));
+        // Verify using: select count(*) from listnms where liststatus <> 9 and liststatus = 1;
     }
 
     @Test
     public void testGetGermplasmListDataByListId() throws Exception {
-        Integer listId = Integer.valueOf(1);
+        Integer listId = Integer.valueOf(28781);       // Crop tested: Rice
         List<GermplasmListData> results = manager.getGermplasmListDataByListId(listId, 0, 5);
 
         System.out.println("testGetGermplasmListDataByListId(" + listId + ") RESULTS: ");
@@ -106,7 +114,7 @@ public class TestGermplasmListManagerImpl{
 
     @Test
     public void testCountGermplasmListDataByListId() throws Exception {
-        Integer listId = Integer.valueOf(1);
+        Integer listId = Integer.valueOf(28781);       // Crop tested: Rice
         System.out.println("testCountGermplasmListDataByListId(" + listId + ") RESULTS: " + manager.countGermplasmListDataByListId(listId));
     }
 
@@ -326,31 +334,40 @@ public class TestGermplasmListManagerImpl{
 
     @Test
     public void testGetTopLevelLists() throws Exception {
-        List<GermplasmList> topLevelFolders = manager.getAllTopLevelLists(0, 100, Database.LOCAL);
-        System.out.println("testGetTopLevelLists(0, 100, Database.Local) RESULTS: " + topLevelFolders);
+        int count = (int) manager.countAllTopLevelLists(Database.CENTRAL);
+        List<GermplasmList> topLevelFolders = manager.getAllTopLevelLists(0, count, Database.CENTRAL);
+        System.out.println("testGetTopLevelLists(0, 100, Database.CENTRAL) RESULTS: " + count);
+        for (GermplasmList listItem : topLevelFolders) {
+            System.out.println("  " + listItem);
+        }
+        // Verify using: select * from listnms where liststatus <> 9 and lhierarchy = null or lhierarchy = 0
     }
 
     @Test
     public void testCountTopLevelLists() throws Exception {
-        long count = manager.countAllTopLevelLists(Database.LOCAL);
-        System.out.println("testCountTopLevelLists(Database.LOCAL) RESULTS: " + count);
+        long count = manager.countAllTopLevelLists(Database.CENTRAL);
+        System.out.println("testCountTopLevelLists(Database.CENTRAL) RESULTS: " + count);
+        // Verify using: select count(*) from listnms where liststatus <> 9 and lhierarchy = null or lhierarchy = 0
     }
 
     @Test
-    public void testGetGermplasmListChildren() throws Exception {
-        Integer parentFolderId = Integer.valueOf(-1);
-        List<GermplasmList> children = manager.getGermplasmListByParentFolderId(parentFolderId, 0, 10);
-        System.out.println("testGetGermplasmListChildren(" + parentFolderId + ") RESULTS: ");
+    public void testGermplasmListByParentFolderId() throws Exception {
+        Integer parentFolderId = Integer.valueOf(56);   // Crop tested: Rice
+        int count = (int) manager.countGermplasmListByParentFolderId(parentFolderId);
+        List<GermplasmList> children = manager.getGermplasmListByParentFolderId(parentFolderId, 0, count);
+        System.out.println("testGermplasmListByParentFolderId(" + parentFolderId + ") RESULTS: " + count);
         for (GermplasmList child : children) {
-            System.out.println("  " + child.getId() + ": " + child.getName());
+            System.out.println("  " + child);
         }
+        // Verify using:  select * from listnms where liststatus <> 9 and lhierarchy = 56;
     }
 
     @Test
-    public void testCountGermplasmListChildren() throws Exception {
-        Integer parentFolderId = Integer.valueOf(-1);
+    public void testCountGermplasmListByParentFolderId() throws Exception {
+        Integer parentFolderId = Integer.valueOf(56);   // Crop tested: Rice
         Long result = manager.countGermplasmListByParentFolderId(parentFolderId);
-        System.out.println("testCountGermplasmListChildren(" + parentFolderId + ") RESULTS: " + result);
+        System.out.println("testCountGermplasmListByParentFolderId(" + parentFolderId + ") RESULTS: " + result);
+        // Verify using:  select count(*) from listnms where liststatus <> 9 and lhierarchy = 56;
     }
 
     @AfterClass

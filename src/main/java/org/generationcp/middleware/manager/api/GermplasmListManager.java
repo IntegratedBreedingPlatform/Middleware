@@ -57,8 +57,9 @@ public interface GermplasmListManager{
      * Returns the total number of Germplasm Lists.
      * 
      * @return
+     * @throws MiddlewareQueryException 
      */
-    public long countAllGermplasmLists();
+    public long countAllGermplasmLists() throws MiddlewareQueryException;
 
     /**
      * Returns all the Germplasm List records with names matching the given

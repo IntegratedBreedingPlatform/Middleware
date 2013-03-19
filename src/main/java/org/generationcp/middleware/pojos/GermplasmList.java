@@ -206,7 +206,8 @@ public class GermplasmList implements Serializable{
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("GermplasmList [");
+        builder.append("GermplasmList [id=");
+        builder.append(id);
         builder.append(", name=");
         builder.append(name);
         builder.append(", date=");

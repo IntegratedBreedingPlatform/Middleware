@@ -25,6 +25,32 @@ import org.hibernate.criterion.Restrictions;
 
 public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
 
+    private static final Integer STATUS_DELETED = 9;
+
+    @SuppressWarnings("unchecked")
+    public List<GermplasmList> getAllExceptDeleted(int start, int numOfRows) throws MiddlewareQueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(GermplasmList.class);
+            criteria.add(Restrictions.ne("status", STATUS_DELETED));
+            criteria.setFirstResult(start);
+            criteria.setMaxResults(numOfRows);
+            return criteria.list();
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with getAllExceptDeleted() query from GermplasmList: " + e.getMessage(), e);
+        }
+    }
+
+    public long countAllExceptDeleted() throws MiddlewareQueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(GermplasmList.class);
+            criteria.add(Restrictions.ne("status", STATUS_DELETED));
+            criteria.setProjection(Projections.rowCount());
+            return ((Long) criteria.uniqueResult()).longValue(); // count
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error with countAllExceptDeleted() query from GermplasmList: " + e.getMessage(), e);
+        }
+    }
+
     @SuppressWarnings("unchecked")
     public List<GermplasmList> getByName(String name, int start, int numOfRows, Operation operation) throws MiddlewareQueryException {
         try {
@@ -36,6 +62,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
                 criteria.add(Restrictions.like("name", name));
             }
 
+            criteria.add(Restrictions.ne("status", STATUS_DELETED));
             criteria.setFirstResult(start);
             criteria.setMaxResults(numOfRows);
             return criteria.list();
@@ -47,6 +74,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
     public long countByName(String name, Operation operation) throws MiddlewareQueryException {
         try {
             Criteria criteria = getSession().createCriteria(GermplasmList.class);
+            criteria.add(Restrictions.ne("status", STATUS_DELETED));
             criteria.setProjection(Projections.rowCount());
 
             if (operation == null || operation == Operation.EQUAL) {
@@ -65,6 +93,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
         try {
             Criteria criteria = getSession().createCriteria(GermplasmList.class);
             criteria.add(Restrictions.eq("status", status));
+            criteria.add(Restrictions.ne("status", STATUS_DELETED));
             criteria.setFirstResult(start);
             criteria.setMaxResults(numOfRows);
             return criteria.list();
@@ -78,6 +107,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
         try {
             Criteria criteria = getSession().createCriteria(GermplasmList.class);
             criteria.add(Restrictions.eq("status", status));
+            criteria.add(Restrictions.ne("status", STATUS_DELETED));
             criteria.setProjection(Projections.rowCount());
             return ((Long) criteria.uniqueResult()).longValue(); // count
         } catch (HibernateException e) {
@@ -94,6 +124,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
             
             Criteria criteria = getSession().createCriteria(GermplasmList.class);
             criteria.add(Restrictions.or(topFolder, nullFolder));
+            criteria.add(Restrictions.ne("status", STATUS_DELETED));
             criteria.setFirstResult(start);
             criteria.setMaxResults(numOfRows);
             return criteria.list();
@@ -108,6 +139,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
             Criterion nullFolder = Restrictions.isNull("parent");
             Criteria criteria = getSession().createCriteria(GermplasmList.class);
             criteria.add(Restrictions.or(topFolder, nullFolder));
+            criteria.add(Restrictions.ne("status", STATUS_DELETED));
             criteria.setProjection(Projections.rowCount());
             return ((Long) criteria.uniqueResult()).longValue();
         } catch (HibernateException e) {
@@ -139,6 +171,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
         try {
             Criteria criteria = getSession().createCriteria(GermplasmList.class);
             criteria.add(Restrictions.eq("parent", new GermplasmList(parentId)));
+            criteria.add(Restrictions.ne("status", STATUS_DELETED));
             criteria.setFirstResult(start);
             criteria.setMaxResults(numOfRows);
             return criteria.list();
@@ -159,6 +192,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
         try {
             Criteria criteria = getSession().createCriteria(GermplasmList.class);
             criteria.add(Restrictions.eq("parent", new GermplasmList(parentId)));
+            criteria.add(Restrictions.ne("status", STATUS_DELETED));
             criteria.setProjection(Projections.rowCount());
             return ((Long) criteria.uniqueResult()).longValue(); // count
         } catch (HibernateException e) {
