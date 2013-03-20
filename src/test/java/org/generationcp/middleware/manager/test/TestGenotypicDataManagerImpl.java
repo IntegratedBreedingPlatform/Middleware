@@ -1519,7 +1519,7 @@ public class TestGenotypicDataManagerImpl{
         CharValues charValues = new CharValues(acId, datasetId, markerId, gId, charValue);
      
         Boolean addStatus = manager.setSNP(accMetadataSet, markerMetadataSet, datasetUser, charValues, dataset);
-        System.out.println("testSetDArT() Added: " + (addStatus != null ? accMetadataSet : null) 
+        System.out.println("testSetSNP() Added: " + (addStatus != null ? accMetadataSet : null) 
                     + " | " + (addStatus != null ? markerMetadataSet : null) 
                     + " | " + (addStatus != null ? datasetUser : null) 
                     + " | " + (addStatus != null ? charValues : null) 
