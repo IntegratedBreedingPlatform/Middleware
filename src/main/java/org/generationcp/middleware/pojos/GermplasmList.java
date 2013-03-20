@@ -29,6 +29,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
+import org.hibernate.annotations.SQLDelete;
 
 /**
  * POJO for listnms table
@@ -39,6 +40,7 @@ import org.hibernate.annotations.NotFoundAction;
 
 @Entity
 @Table(name = "listnms")
+@SQLDelete(sql="UPDATE listnms SET liststatus = 9 WHERE listid = ?")
 public class GermplasmList implements Serializable{
 
     private static final long serialVersionUID = 1L;

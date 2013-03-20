@@ -481,11 +481,25 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
             GermplasmListDAO dao = new GermplasmListDAO();
             dao.setSession(session);
+            
+            GermplasmListDataDAO dataDao = new GermplasmListDataDAO();
+            dataDao.setSession(session);
 
+            List<GermplasmListData> listDataList;
             for (GermplasmList germplasmList : germplasmLists) {
+            	
+            	//fetch list data for cascade delete
+            	int count = (int) dataDao.countByListId(germplasmList.getId());
+            	if (count > 0) {
+	            	listDataList = dataDao.getByListId(germplasmList.getId(), 0, count);
+	            	germplasmList.setListData(listDataList);
+            	}
+            	
+            	//delete GermplasmList
                 dao.makeTransient(germplasmList);
                 germplasmListsDeleted++;
             }
+            
             // end transaction, commit to database
             trans.commit();
         } catch (Exception e) {
