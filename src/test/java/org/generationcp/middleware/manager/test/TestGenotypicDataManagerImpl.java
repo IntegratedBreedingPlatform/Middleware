@@ -1660,8 +1660,8 @@ public class TestGenotypicDataManagerImpl{
     public void testGetMarkerIDsByMapIDAndLinkageBetweenStartPosition() throws Exception {
         int mapID = 1;
         String linkage = "LG01";
-        int startPos = 0;
-        int endPos = 2;
+        double startPos = 0;
+        double endPos = 2.2;
         long start = System.currentTimeMillis();
         Set<Integer> markerIDs = manager.getMarkerIDsByMapIDAndLinkageBetweenStartPosition(mapID, linkage, startPos, endPos, 0, 1);
 
@@ -1677,8 +1677,8 @@ public class TestGenotypicDataManagerImpl{
     public void testCountMarkerIDsByMapIDAndLinkageBetweenStartPosition() throws Exception {
         int mapID = 1;
         String linkage = "LG01";
-        int startPos = 0;
-        int endPos = 2;
+        double startPos = 0;
+        double endPos = 2.2;
         long start = System.currentTimeMillis();
         long count = manager.countMarkerIDsByMapIDAndLinkageBetweenStartPosition(mapID, linkage, startPos, endPos);
 

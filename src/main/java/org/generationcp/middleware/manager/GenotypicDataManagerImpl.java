@@ -317,7 +317,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
     
     @Override
-    public Set<Integer> getMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapID, String linkageGroup, int startPos, int endPos, int start, int numOfRows) 
+    public Set<Integer> getMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapID, String linkageGroup, double startPos, double endPos, int start, int numOfRows) 
             throws MiddlewareQueryException {
         
         MarkerDAO dao = new MarkerDAO();
@@ -335,7 +335,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
     
     @Override
-    public long countMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapID, String linkageGroup, int startPos, int endPos) 
+    public long countMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapID, String linkageGroup, double startPos, double endPos) 
             throws MiddlewareQueryException {
         
         MarkerDAO dao = new MarkerDAO();

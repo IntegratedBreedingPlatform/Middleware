@@ -1475,7 +1475,7 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException
      */
     Set<Integer> getMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapID,
-        String linkageGroup, int startPos, int endPos, int start,
+        String linkageGroup, double startPos, double endPos, int start,
         int numOfRows) throws MiddlewareQueryException;
 
     /**
@@ -1488,7 +1488,7 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException
      */
     long countMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapID,
-        String linkageGroup, int startPos, int endPos)
+        String linkageGroup, double startPos, double endPos)
         throws MiddlewareQueryException;
 
     /**

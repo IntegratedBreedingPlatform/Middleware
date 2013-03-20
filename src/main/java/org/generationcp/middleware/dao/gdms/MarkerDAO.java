@@ -614,7 +614,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
     }
     
     @SuppressWarnings("rawtypes")
-    public Set<Integer> getMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapID, String linkageGroup, int startPos, int endPos, int start, int numOfRows) throws MiddlewareQueryException{
+    public Set<Integer> getMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapID, String linkageGroup, double startPos, double endPos, int start, int numOfRows) throws MiddlewareQueryException{
         try {
             
             SQLQuery query;
@@ -637,7 +637,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
     }
     
     @SuppressWarnings("rawtypes")
-    public long countMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapID, String linkageGroup, int startPos, int endPos) throws MiddlewareQueryException{
+    public long countMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapID, String linkageGroup, double startPos, double endPos) throws MiddlewareQueryException{
         try {
             
             SQLQuery query;
