@@ -1738,5 +1738,10 @@ public class TestGenotypicDataManagerImpl{
         long count = manager.countQTLByQTLIDs(qtlIDs);
         System.out.println("testCountQtlByQTLIDs() RESULTS: " + count);
     }   
+    
+    @AfterClass
+    public static void tearDown() throws Exception {
+        factory.close();
+    }
 
 }
