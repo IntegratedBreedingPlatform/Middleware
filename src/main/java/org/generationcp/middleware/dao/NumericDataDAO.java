@@ -75,29 +75,25 @@ public class NumericDataDAO extends GenericDAO<NumericData, NumericDataPK>{
                 criteria.setFirstResult(start);
                 criteria.setMaxResults((numOfRows));
                 return criteria.list();
-            } else {
-                // return empty list if no filter was added
-                return new ArrayList<Integer>();
             }
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with get getObservationUnitIdsByTraitScaleMethodAndValueCombinations(filters="
+            logAndThrowException("Error with get getObservationUnitIdsByTraitScaleMethodAndValueCombinations(filters="
                     + filters + ") query from NumericData: " + e.getMessage(), e);
         }
+        return new ArrayList<Integer>();
     }
 
     @SuppressWarnings("rawtypes")
     public List<NumericDataElement> getValuesByOunitIDList(List<Integer> ounitIdList) throws MiddlewareQueryException {
+        List<NumericDataElement> dataValues = new ArrayList<NumericDataElement>();
 
         if (ounitIdList == null || ounitIdList.isEmpty()) {
-            return new ArrayList<NumericDataElement>();
+            return dataValues;
         }
 
         try {
             SQLQuery query = getSession().createSQLQuery(NumericData.GET_BY_OUNIT_ID_LIST);
             query.setParameterList("ounitIdList", ounitIdList);
-
-            List<NumericDataElement> dataValues = new ArrayList<NumericDataElement>();
-
             List results = query.list();
             for (Object o : results) {
                 Object[] result = (Object[]) o;
@@ -108,15 +104,13 @@ public class NumericDataDAO extends GenericDAO<NumericData, NumericDataPK>{
                     Double value = (Double) result[3];
 
                     NumericDataElement dataElement = new NumericDataElement(ounitId, variateId, variateName, value);
-
                     dataValues.add(dataElement);
                 }
             }
-
-            return dataValues;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getValuesByOunitIDList(ounitIdList=" + ounitIdList
+            logAndThrowException("Error with getValuesByOunitIDList(ounitIdList=" + ounitIdList
                     + ") query from NumericData: " + e.getMessage(), e);
         }
+        return dataValues;
     }
 }

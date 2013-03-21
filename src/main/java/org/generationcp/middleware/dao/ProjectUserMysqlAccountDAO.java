@@ -18,8 +18,9 @@ public class ProjectUserMysqlAccountDAO extends GenericDAO<ProjectUserMysqlAccou
             
             return (ProjectUserMysqlAccount) criteria.uniqueResult();
         } catch(HibernateException ex){
-            throw new MiddlewareQueryException("Error in getByProjectIdAndUserId(projectId = " + projectId
+            logAndThrowException("Error in getByProjectIdAndUserId(projectId = " + projectId
                     + ", userId = " + userId + "):" + ex.getMessage(), ex);
         }
+        return null;
     }
 }

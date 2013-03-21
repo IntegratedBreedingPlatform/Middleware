@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -34,8 +35,9 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
 
             return (List<Method>) query.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getAllMethod() query from Method: " + e.getMessage(), e);
+            logAndThrowException("Error with getAllMethod() query from Method: " + e.getMessage(), e);
         }
+        return new ArrayList<Method>();
     }
 
     @SuppressWarnings("unchecked")
@@ -46,8 +48,9 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
             criteria.addOrder(Order.asc("mname"));
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getMethodsByType(type=" + type + ") query from Method: " + e.getMessage(), e);
+            logAndThrowException("Error with getMethodsByType(type=" + type + ") query from Method: " + e.getMessage(), e);
         }
+        return new ArrayList<Method>();
     }
 
 
@@ -61,8 +64,9 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
             criteria.setMaxResults(numOfRows);            
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getMethodsByType(type=" + type + ") query from Method: " + e.getMessage(), e);
+            logAndThrowException("Error with getMethodsByType(type=" + type + ") query from Method: " + e.getMessage(), e);
         }
+        return new ArrayList<Method>();
     }
 
     public long countByType(String type) throws MiddlewareQueryException {
@@ -72,8 +76,9 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
             criteria.setProjection(Projections.rowCount());
             return ((Long) criteria.uniqueResult()).longValue(); // count
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countMethodsByType(type=" + type + ") query from Method: " + e.getMessage(), e);
+            logAndThrowException("Error with countMethodsByType(type=" + type + ") query from Method: " + e.getMessage(), e);
         }
+        return 0;
     }
 
     @SuppressWarnings("unchecked")
@@ -84,8 +89,9 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
             criteria.addOrder(Order.asc("mname"));
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getMethodsByGroup(group=" + group + ") query from Method: " + e.getMessage(), e);
+            logAndThrowException("Error with getMethodsByGroup(group=" + group + ") query from Method: " + e.getMessage(), e);
         }
+        return new ArrayList<Method>();
     }
     
     
@@ -100,8 +106,9 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
             criteria.addOrder(Order.asc("mname"));
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getMethodsByGroup(group=" + group + ") query from Method: " + e.getMessage(), e);
+            logAndThrowException("Error with getMethodsByGroup(group=" + group + ") query from Method: " + e.getMessage(), e);
         }
+        return new ArrayList<Method>();
     }
 
     @SuppressWarnings("unchecked")
@@ -114,8 +121,9 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
             criteria.setMaxResults(numOfRows);            
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getMethodsByGroup(group=" + group + ") query from Method: " + e.getMessage(), e);
+            logAndThrowException("Error with getMethodsByGroup(group=" + group + ") query from Method: " + e.getMessage(), e);
         }
+        return new ArrayList<Method>();
     }
     
     
@@ -134,8 +142,9 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
             criteria.addOrder(Order.asc("mname"));
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getMethodsByGroupAndType(group=" + group + " and "+type+") query from Method: " + e.getMessage(), e);
+            logAndThrowException("Error with getMethodsByGroupAndType(group=" + group + " and "+type+") query from Method: " + e.getMessage(), e);
         }
+        return new ArrayList<Method>();
     }
     
     public long countByGroup(String group) throws MiddlewareQueryException {
@@ -145,7 +154,8 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
             criteria.setProjection(Projections.rowCount());
             return ((Long) criteria.uniqueResult()).longValue(); // count
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countMethodsByGroup(group=" + group + ") query from Method: " + e.getMessage(), e);
+            logAndThrowException("Error with countMethodsByGroup(group=" + group + ") query from Method: " + e.getMessage(), e);
         }
+        return 0;
     }    
 }

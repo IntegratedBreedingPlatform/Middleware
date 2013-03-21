@@ -70,9 +70,10 @@ public class NameDAO extends GenericDAO<Name, Integer>{
              * List<Name> results = getByCriteria(criterions); return results;
              **/
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByGIDWithFilters(gid=" + gid + ", status=" + status + ", type=" + type
+            logAndThrowException("Error with getByGIDWithFilters(gid=" + gid + ", status=" + status + ", type=" + type
                     + ") query from Name " + e.getMessage(), e);
         }
+        return new ArrayList<Name>();
     }
 
     @SuppressWarnings("unchecked")
@@ -90,16 +91,17 @@ public class NameDAO extends GenericDAO<Name, Integer>{
                 return names.get(0);
             }
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByGIDAndNval(gid=" + gid + ", nval=" + nval + ") query from Name "
+            logAndThrowException("Error with getByGIDAndNval(gid=" + gid + ", nval=" + nval + ") query from Name "
                     + e.getMessage(), e);
         }
+        return null;
     }
 
     public void validateId(Name name) throws MiddlewareQueryException {
         // Check if not a local record (has negative ID)
         Integer id = name.getNid();
         if (id != null && id.intValue() > 0) {
-            throw new MiddlewareQueryException("Error with validateId(name=" + name + "): Cannot update a Central Database record. "
+            logAndThrowException("Error with validateId(name=" + name + "): Cannot update a Central Database record. "
                     + "Name object to update must be a Local Record (ID must be negative)");
         }
     }
@@ -120,8 +122,9 @@ public class NameDAO extends GenericDAO<Name, Integer>{
             }
             return names;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getNamesByNameIds(nIds=" + nIds + ") query from Name " + e.getMessage(), e);
+            logAndThrowException("Error with getNamesByNameIds(nIds=" + nIds + ") query from Name " + e.getMessage(), e);
         }
+        return new ArrayList<Name>();
     }
 
     public Name getNameByNameId(Integer nId) throws MiddlewareQueryException {
@@ -133,8 +136,9 @@ public class NameDAO extends GenericDAO<Name, Integer>{
 
             return name;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getNameByNameId(nId=" + nId + ") query from Name " + e.getMessage(), e);
+            logAndThrowException("Error with getNameByNameId(nId=" + nId + ") query from Name " + e.getMessage(), e);
         }
+        return null;
     }
 
     /**
@@ -167,12 +171,11 @@ public class NameDAO extends GenericDAO<Name, Integer>{
                     toReturn.add(element);
                 }
             }
-
-            return toReturn;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getGidAndNidByGermplasmNames(germplasmNames=" + germplasmNames
+            logAndThrowException("Error with getGidAndNidByGermplasmNames(germplasmNames=" + germplasmNames
                     + ") query from Name " + e.getMessage(), e);
         }
+        return toReturn;
     }
 
 }

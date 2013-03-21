@@ -44,8 +44,9 @@ public class ProjectUserRoleDAO extends GenericDAO<ProjectUserRole, Integer>{
      *
      * @param projectUser the project user
      * @return the project user
+     * @throws MiddlewareQueryException 
      */
-    public ProjectUserRole saveOrUpdate(ProjectUserRole projectUser) {
+    public ProjectUserRole saveOrUpdate(ProjectUserRole projectUser) throws MiddlewareQueryException {
 
         if (projectUser.getProject() == null || projectUser.getProject().getProjectId() == null) {
             throw new IllegalArgumentException("Project cannot be null");
@@ -62,8 +63,9 @@ public class ProjectUserRoleDAO extends GenericDAO<ProjectUserRole, Integer>{
      *
      * @param id the ProjectUser id
      * @return the associated ProjectUser
+     * @throws MiddlewareQueryException 
      */
-    public ProjectUserRole getById(Integer id) {
+    public ProjectUserRole getById(Integer id) throws MiddlewareQueryException {
         return super.getById(id, false);
     }
 

@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -32,9 +33,10 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer>{
             criteria.addOrder(Order.asc("fname"));
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByFieldTableNameAndType(name=" + tableName+" type= "+fieldType+ " ) query from Location: "
+            logAndThrowException("Error with getByFieldTableNameAndType(name=" + tableName+" type= "+fieldType+ " ) query from Location: "
                     + e.getMessage(), e);
         }
+        return new ArrayList<UserDefinedField>();
     }
 
 }

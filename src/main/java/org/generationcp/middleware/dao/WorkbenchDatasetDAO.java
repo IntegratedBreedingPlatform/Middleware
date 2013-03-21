@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -32,8 +33,9 @@ public class WorkbenchDatasetDAO extends GenericDAO<WorkbenchDataset, Long>{
                     .add(Restrictions.eq("datasetId", datasetId)).setMaxResults(1);
             return (WorkbenchDataset) criteria.uniqueResult();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error getById(datasetId="+datasetId+") query from WorkbenchDataset: " + e.getMessage(), e);
+            logAndThrowException("Error getById(datasetId="+datasetId+") query from WorkbenchDataset: " + e.getMessage(), e);
         }
+        return null;
     }
     
     /**
@@ -59,8 +61,9 @@ public class WorkbenchDatasetDAO extends GenericDAO<WorkbenchDataset, Long>{
             criteria.setMaxResults(numOfRows);            
             return (List<WorkbenchDataset>) criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByWorkbenchProjectId(projectId="+projectId+") query from WorkbenchDataset: " + e.getMessage(), e);
+            logAndThrowException("Error with getByWorkbenchProjectId(projectId="+projectId+") query from WorkbenchDataset: " + e.getMessage(), e);
         } 
+        return new ArrayList<WorkbenchDataset>();
     }
     
     /**
@@ -81,8 +84,9 @@ public class WorkbenchDatasetDAO extends GenericDAO<WorkbenchDataset, Long>{
             
             return ((Long) criteria.uniqueResult()).longValue();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countByWorkbenchProjectId(projectId="+projectId+") query from WorkbenchDataset: " + e.getMessage(), e);
+            logAndThrowException("Error with countByWorkbenchProjectId(projectId="+projectId+") query from WorkbenchDataset: " + e.getMessage(), e);
         }
+        return 0;
     }
     
     /**
@@ -107,15 +111,16 @@ public class WorkbenchDatasetDAO extends GenericDAO<WorkbenchDataset, Long>{
             } else if (Operation.LIKE.equals(op)) {
                 criteria.add(Restrictions.like("name", name, MatchMode.ANYWHERE));
             } else {
-                throw new MiddlewareQueryException("Error in getByName(name="+name+"): Operation " + op.toString() + " not supported.");
+                logAndThrowException("Error in getByName(name="+name+"): Operation " + op.toString() + " not supported.");
             }
            
             criteria.setFirstResult(start);
             criteria.setMaxResults(numOfRows);
             return (List<WorkbenchDataset>) criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByName(name=" + name + ") query from WorkbenchDataset: " + e.getMessage(), e);
+            logAndThrowException("Error with getByName(name=" + name + ") query from WorkbenchDataset: " + e.getMessage(), e);
         }
+        return new ArrayList<WorkbenchDataset>();
     }
     
     /**
@@ -135,14 +140,15 @@ public class WorkbenchDatasetDAO extends GenericDAO<WorkbenchDataset, Long>{
             } else if (Operation.LIKE.equals(op)) {
                 criteria.add(Restrictions.like("name", name, MatchMode.ANYWHERE));
             } else {
-                throw new MiddlewareQueryException("Error in countByName(name="+name+"): Operation " + op.toString() + " not supported.");
+                logAndThrowException("Error in countByName(name="+name+"): Operation " + op.toString() + " not supported.");
             }
             
             criteria.setProjection(Projections.rowCount());
             
             return ((Long) criteria.uniqueResult()).longValue();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countByName(name="+name+") query from WorkbenchDataset: " + e.getMessage(), e);
+            logAndThrowException("Error with countByName(name="+name+") query from WorkbenchDataset: " + e.getMessage(), e);
         }
+        return 0;
     }
 }

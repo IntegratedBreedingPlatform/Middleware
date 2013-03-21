@@ -31,8 +31,18 @@ import org.generationcp.middleware.pojos.Trait;
 import org.generationcp.middleware.pojos.TraitMethod;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TraitDataManagerImpl extends DataManager implements TraitDataManager{
+
+    private static final Logger LOG = LoggerFactory.getLogger(TraitDataManagerImpl.class);
+
+    private ScaleContinuousDAO scaleContinuousDao;
+    private ScaleDAO scaleDao;
+    private ScaleDiscreteDAO scaleDiscreteDao;
+    private TraitDAO traitDao;
+    private TraitMethodDAO traitMethodDao;
 
     public TraitDataManagerImpl() {
     }
@@ -44,262 +54,174 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
     public TraitDataManagerImpl(Session sessionForLocal, Session sessionForCentral) {
         super(sessionForLocal, sessionForCentral);
     }
+    
+    private ScaleContinuousDAO getScaleContinuousDao() {
+        if (scaleContinuousDao == null){
+            scaleContinuousDao = new ScaleContinuousDAO();
+        }
+        scaleContinuousDao.setSession(getActiveSession());
+        return scaleContinuousDao;
+    }
+    
+    private ScaleDAO getScaleDao() {
+        if (scaleDao == null){
+            scaleDao = new ScaleDAO();
+        }
+        scaleDao.setSession(getActiveSession());
+        return scaleDao;
+    }
+
+    private ScaleDiscreteDAO getScaleDiscreteDao() {
+        if (scaleDiscreteDao == null){
+            scaleDiscreteDao = new ScaleDiscreteDAO();
+        }
+        scaleDiscreteDao.setSession(getActiveSession());
+        return scaleDiscreteDao;
+    }
+    
+    private TraitDAO getTraitDao() {
+        if (traitDao == null){
+            traitDao = new TraitDAO();
+        }
+        traitDao.setSession(getActiveSession());
+        return traitDao;
+    }
+
+    private TraitMethodDAO getTraitMethodDao() {
+        if (traitMethodDao == null){
+            traitMethodDao = new TraitMethodDAO();
+        }
+        traitMethodDao.setSession(getActiveSession());
+        return traitMethodDao;
+    }
 
     @Override
     public Scale getScaleByID(Integer id) throws MiddlewareQueryException {
-        ScaleDAO dao = new ScaleDAO();
-        Session session = getSession(id);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return null;
+        if (setWorkingDatabase(id)){
+            return (Scale) getScaleDao().getById(id, false);
         }
-
-        return (Scale) dao.getById(id, false);
+        return null;
     }
 
     @Override
     public List<Scale> getAllScales(int start, int numOfRows, Database instance) throws MiddlewareQueryException {
-        ScaleDAO dao = new ScaleDAO();
-        Session session = getSession(instance);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<Scale>();
+        if (setWorkingDatabase(instance)){
+            return getScaleDao().getAll(start, numOfRows);
         }
-        return dao.getAll(start, numOfRows);
-
+        return new ArrayList<Scale>();
     }
 
     @Override
     public long countAllScales() throws MiddlewareQueryException {
-        long count = 0;
-
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-
-        if (sessionForLocal != null) {
-            ScaleDAO dao = new ScaleDAO();
-            dao.setSession(sessionForLocal);
-            count = count + dao.countAll();
-        }
-
-        if (sessionForCentral != null) {
-            ScaleDAO centralDao = new ScaleDAO();
-            centralDao.setSession(sessionForCentral);
-            count = count + centralDao.countAll();
-        }
-
-        return count;
+        return countAllFromCentralAndLocal(getScaleDao());
     }
 
     @Override
     public String getScaleDiscreteDescription(Integer scaleId, String value) throws MiddlewareQueryException {
-        ScaleDiscreteDAO dao = new ScaleDiscreteDAO();
-        Session session = getSession(scaleId);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return null;
+        if (setWorkingDatabase(scaleId)){
+            ScaleDiscretePK id = new ScaleDiscretePK();
+            id.setScaleId(scaleId);
+            id.setValue(value);
+            ScaleDiscrete sd = getScaleDiscreteDao().getById(id, false);
+            if (sd != null) {
+                return sd.getValueDescription();
+            } 
         }
-
-        ScaleDiscretePK id = new ScaleDiscretePK();
-        id.setScaleId(scaleId);
-        id.setValue(value);
-
-        ScaleDiscrete sd = dao.getById(id, false);
-
-        if (sd != null) {
-            return sd.getValueDescription();
-        } else {
-            return null;
-        }
+        return null;
     }
 
     @Override
     public List<ScaleDiscrete> getDiscreteValuesOfScale(Integer scaleId) throws MiddlewareQueryException {
-        ScaleDiscreteDAO dao = new ScaleDiscreteDAO();
-        Session session = getSession(scaleId);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<ScaleDiscrete>();
+        if (setWorkingDatabase(scaleId)){
+            return getScaleDiscreteDao().getByScaleId(scaleId);
         }
-
-        return dao.getByScaleId(scaleId);
+        return new ArrayList<ScaleDiscrete>();
     }
 
     @Override
     public ScaleContinuous getRangeOfContinuousScale(Integer scaleId) throws MiddlewareQueryException {
-        ScaleContinuousDAO dao = new ScaleContinuousDAO();
-        Session session = getSession(scaleId);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return null;
+        if (setWorkingDatabase(scaleId)){
+            return getScaleContinuousDao().getById(scaleId, false);
         }
-
-        return dao.getById(scaleId, false);
+        return null;
     }
 
     @Override
     public Trait getTraitById(Integer id) throws MiddlewareQueryException {
-        TraitDAO dao = new TraitDAO();
-        Session session = getSession(id);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return null;
+        if (setWorkingDatabase(id)){
+            return getTraitDao().getByTraitId(id);
         }
-
-        return dao.getByTraitId(id);
+        return null;
     }
 
     @Override
     public List<Trait> getAllTraits(int start, int numOfRows, Database instance) throws MiddlewareQueryException {
-        TraitDAO dao = new TraitDAO();
-        Session session = getSession(instance);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<Trait>();
+        if (setWorkingDatabase(instance)){
+            return getTraitDao().getAll(start, numOfRows);
         }
-        return dao.getAll(start, numOfRows);
+        return new ArrayList<Trait>();
     }
 
     @Override
     public long countAllTraits() throws MiddlewareQueryException {
-        long count = 0;
-
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-
-        if (sessionForLocal != null) {
-            TraitDAO dao = new TraitDAO();
-            dao.setSession(sessionForLocal);
-            count = count + dao.countAll();
-        }
-
-        if (sessionForCentral != null) {
-            TraitDAO centralDao = new TraitDAO();
-            centralDao.setSession(sessionForCentral);
-            count = count + centralDao.countAll();
-        }
-
-        return count;
+        return countAllFromCentralAndLocal(getTraitDao());
     }
 
     @Override
     public TraitMethod getTraitMethodById(Integer id) throws MiddlewareQueryException {
-        TraitMethodDAO dao = new TraitMethodDAO();
-        Session session = getSession(id);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return null;
+        if (setWorkingDatabase(id)){
+            return getTraitMethodDao().getById(id, false);
         }
-
-        return dao.getById(id, false);
+        return null;
     }
 
     @Override
     public List<TraitMethod> getAllTraitMethods(int start, int numOfRows, Database instance) throws MiddlewareQueryException {
-        TraitMethodDAO dao = new TraitMethodDAO();
-        Session session = getSession(instance);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<TraitMethod>();
+        if (setWorkingDatabase(instance)){
+            return getTraitMethodDao().getAll(start, numOfRows);
         }
-
-        return dao.getAll(start, numOfRows);
+        return new ArrayList<TraitMethod>();
     }
 
     @Override
     public long countAllTraitMethods() throws MiddlewareQueryException {
-        long count = 0;
-
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-
-        if (sessionForLocal != null) {
-            TraitMethodDAO dao = new TraitMethodDAO();
-            dao.setSession(sessionForLocal);
-            count = count + dao.countAll();
-        }
-
-        if (sessionForCentral != null) {
-            TraitMethodDAO centralDao = new TraitMethodDAO();
-            centralDao.setSession(sessionForCentral);
-            count = count + centralDao.countAll();
-        }
-
-        return count;
+        return countAllFromCentralAndLocal(getTraitMethodDao());
     }
 
     @Override
     public List<TraitMethod> getTraitMethodsByTraitId(Integer traitId) throws MiddlewareQueryException {
-        TraitMethodDAO dao = new TraitMethodDAO();
-        Session session = getSession(traitId);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<TraitMethod>();
+        if (setWorkingDatabase(traitId)){
+            return getTraitMethodDao().getByTraitId(traitId);
         }
-
-        return dao.getByTraitId(traitId);
+        return new ArrayList<TraitMethod>();
     }
 
     @Override
     public List<Scale> getScalesByTraitId(Integer traitId) throws MiddlewareQueryException {
-        ScaleDAO dao = new ScaleDAO();
-        Session session = getSession(traitId);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<Scale>();
+        if (setWorkingDatabase(traitId)){
+            return getScaleDao().getByTraitId(traitId);
         }
-
-        return dao.getByTraitId(traitId);
+        return new ArrayList<Scale>();
     }
 
     @Override
     public Integer addTraitMethod(TraitMethod traitMethod) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
-
-        Session session = getCurrentSessionForLocal();
+        Session session = getActiveSession();
         Transaction trans = null;
 
-        Integer idTraitMethodSaved; 
+        Integer idTraitMethodSaved = null; 
         try {
-            // begin save transaction
             trans = session.beginTransaction();
 
-            TraitMethodDAO dao = new TraitMethodDAO();
-            dao.setSession(session);
-
-            TraitMethod recordSaved = dao.saveOrUpdate(traitMethod);
+            TraitMethod recordSaved = getTraitMethodDao().saveOrUpdate(traitMethod);
             idTraitMethodSaved = recordSaved.getId();
 
             trans.commit();
         } catch (Exception e) {
-            // rollback transaction in case of errors
-            if (trans != null) {
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException("Error encountered while saving TraitMethod: TraitDataManager.addTraitMethod(traitMethod="
-                    + traitMethod + "): " + e.getMessage(), e);
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while saving TraitMethod: TraitDataManager.addTraitMethod(traitMethod="
+                    + traitMethod + "): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
@@ -309,31 +231,22 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
     @Override
     public void deleteTraitMethod(TraitMethod traitMethod) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
-
-        Session session = getCurrentSessionForLocal();
+        Session session = getActiveSession();
         Transaction trans = null;
 
         try {
-            // begin save transaction
             trans = session.beginTransaction();
-
-            TraitMethodDAO dao = new TraitMethodDAO();
-            dao.setSession(session);
-
-            dao.makeTransient(traitMethod);
-
+            getTraitMethodDao().makeTransient(traitMethod);
             trans.commit();
         } catch (Exception e) {
-            // rollback transaction in case of errors
-            if (trans != null) {
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException(
+            rollbackTransaction(trans);
+            logAndThrowException(
                     "Error encountered while saving TraitMethod: TraitDataManager.deleteTraitMethod(traitMethod=" + traitMethod + "): "
-                            + e.getMessage(), e);
+                            + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
+
     }
 
 }

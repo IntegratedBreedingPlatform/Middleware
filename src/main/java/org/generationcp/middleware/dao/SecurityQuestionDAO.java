@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -36,8 +37,9 @@ public class SecurityQuestionDAO extends GenericDAO<SecurityQuestion, Integer> {
             criteria.add(Restrictions.eq("userId", userId));
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByUserId(userId=" + userId + ") query from SecurityQuestion: " + e.getMessage(), e);
+            logAndThrowException("Error with getByUserId(userId=" + userId + ") query from SecurityQuestion: " + e.getMessage(), e);
         }
+        return new ArrayList<SecurityQuestion>();
     }
     
 }

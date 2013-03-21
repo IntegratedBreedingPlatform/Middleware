@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -28,7 +29,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
         // Check if not a local record (has negative ID)
         Integer id = transaction.getId();
         if (id != null && id.intValue() > 0) {
-            throw new MiddlewareQueryException("Error with validateId(transaction=" + transaction
+            logAndThrowException("Error with validateId(transaction=" + transaction
                     + "): Cannot update a Central Database record. "
                     + "Transaction object to update must be a Local Record (ID must be negative)");
         }
@@ -44,8 +45,9 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
             criteria.setMaxResults(numOfRows);
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getAllReserve() query from Transaction: " + e.getMessage(), e);
+            logAndThrowException("Error with getAllReserve() query from Transaction: " + e.getMessage(), e);
         }
+        return new ArrayList<Transaction>();
     }
 
     public long countAllReserve() throws MiddlewareQueryException {
@@ -56,8 +58,9 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
             criteria.add(Restrictions.lt("quantity", Integer.valueOf(0)));
             return ((Long) criteria.uniqueResult()).longValue(); //count
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countAllReserve() query from Transaction: " + e.getMessage(), e);
+            logAndThrowException("Error with countAllReserve() query from Transaction: " + e.getMessage(), e);
         }
+        return 0;
     }
 
     @SuppressWarnings("unchecked")
@@ -70,8 +73,9 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
             criteria.setMaxResults(numOfRows);
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getAllDeposit() query from Transaction: " + e.getMessage(), e);
+            logAndThrowException("Error with getAllDeposit() query from Transaction: " + e.getMessage(), e);
         }
+        return new ArrayList<Transaction>();
     }
 
     public long countAllDeposit() throws MiddlewareQueryException {
@@ -82,8 +86,9 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
             criteria.add(Restrictions.gt("quantity", Integer.valueOf(0)));
             return ((Long) criteria.uniqueResult()).longValue(); //count
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countAllDeposit() query from Transaction: " + e.getMessage(), e);
+            logAndThrowException("Error with countAllDeposit() query from Transaction: " + e.getMessage(), e);
         }
+        return 0;
     }
 
     @SuppressWarnings("unchecked")
@@ -97,9 +102,10 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
             criteria.setMaxResults(numOfRows);
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getAllReserveByRequestor(personId=" + personId + ") query from Transaction: "
+            logAndThrowException("Error with getAllReserveByRequestor(personId=" + personId + ") query from Transaction: "
                     + e.getMessage(), e);
         }
+        return new ArrayList<Transaction>();
     }
 
     public long countAllReserveByRequestor(Integer personId) throws MiddlewareQueryException {
@@ -111,9 +117,10 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
             criteria.add(Restrictions.eq("personId", personId));
             return ((Long) criteria.uniqueResult()).longValue(); //count
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countAllReserveByRequestor(personId=" + personId + ") query from Transaction: "
+            logAndThrowException("Error with countAllReserveByRequestor(personId=" + personId + ") query from Transaction: "
                     + e.getMessage(), e);
         }
+        return 0;
     }
 
     @SuppressWarnings("unchecked")
@@ -127,9 +134,10 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
             criteria.setMaxResults(numOfRows);
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getAllDepositByDonor(personId=" + personId + ") query from Transaction: "
+            logAndThrowException("Error with getAllDepositByDonor(personId=" + personId + ") query from Transaction: "
                     + e.getMessage(), e);
         }
+        return new ArrayList<Transaction>();
     }
 
     public long countAllDepositByDonor(Integer personId) throws MiddlewareQueryException {
@@ -141,9 +149,10 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
             criteria.add(Restrictions.eq("personId", personId));
             return ((Long) criteria.uniqueResult()).longValue(); //count
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countAllDepositByDonor(personId=" + personId + ") query from Transaction: "
+            logAndThrowException("Error with countAllDepositByDonor(personId=" + personId + ") query from Transaction: "
                     + e.getMessage(), e);
         }
+        return 0;
     }
 
     @SuppressWarnings("unchecked")
@@ -155,8 +164,9 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
             criteria.setMaxResults(numOfRows);
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getAllUncommitted() query from Transaction: " + e.getMessage(), e);
+            logAndThrowException("Error with getAllUncommitted() query from Transaction: " + e.getMessage(), e);
         }
+        return new ArrayList<Transaction>();
     }
 
     public long countAllUncommitted() throws MiddlewareQueryException {
@@ -166,8 +176,9 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
             criteria.add(Restrictions.eq("status", Integer.valueOf(0)));
             return ((Long) criteria.uniqueResult()).longValue(); //count
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countAllUncommitted() query from Transaction: " + e.getMessage(), e);
+            logAndThrowException("Error with countAllUncommitted() query from Transaction: " + e.getMessage(), e);
         }
+        return 0;
     }
 
     @SuppressWarnings("unchecked")
@@ -179,8 +190,9 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
             criteria.setMaxResults(numOfRows);
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getAllWithdrawals() query from Transaction: " + e.getMessage(), e);
+            logAndThrowException("Error with getAllWithdrawals() query from Transaction: " + e.getMessage(), e);
         }
+        return new ArrayList<Transaction>();
     }
 
     public long countAllWithdrawals() throws MiddlewareQueryException {
@@ -190,8 +202,9 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
             criteria.add(Restrictions.lt("quantity", Integer.valueOf(0)));
             return ((Long) criteria.uniqueResult()).longValue(); //count
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countAllWithdrawals() query from Transaction: " + e.getMessage(), e);
+            logAndThrowException("Error with countAllWithdrawals() query from Transaction: " + e.getMessage(), e);
         }
+        return 0;
     }
 
     @SuppressWarnings("unchecked")
@@ -202,8 +215,9 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
             query.setMaxResults(numOfRows);
             return (List<Transaction>) query.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getEmptyLot() query from Transaction: " + e.getMessage(), e);
+            logAndThrowException("Error with getEmptyLot() query from Transaction: " + e.getMessage(), e);
         }
+        return new ArrayList<Transaction>();
     }
 
     @SuppressWarnings("unchecked")
@@ -215,8 +229,9 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
             query.setParameter("minAmount", minAmount);
             return (List<Transaction>) query.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getLotWithMinimumAmount(minAmount=" + minAmount + ") query from Transaction: "
+            logAndThrowException("Error with getLotWithMinimumAmount(minAmount=" + minAmount + ") query from Transaction: "
                     + e.getMessage(), e);
         }
+        return new ArrayList<Transaction>();
     }
 }

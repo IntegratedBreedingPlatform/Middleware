@@ -15,9 +15,10 @@ public class IbdbUserMapDAO extends GenericDAO<IbdbUserMap, Long>{
             query.setParameter("projectId", projectId);
             return (Integer) query.uniqueResult();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getLocalIbdbUserId(workbenchUserId=" + workbenchUserId + ", projectId="
+            logAndThrowException("Error with getLocalIbdbUserId(workbenchUserId=" + workbenchUserId + ", projectId="
                     + projectId + ") query from IbdbUserMap: " + e.getMessage(), e);
         }
+        return null;
     }
 
 }

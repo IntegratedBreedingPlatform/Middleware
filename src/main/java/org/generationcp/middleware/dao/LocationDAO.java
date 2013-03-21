@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -38,13 +39,14 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
             }
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByName(name=" + name + ", operation=" + operation + ") query from Location: "
+            logAndThrowException("Error with getByName(name=" + name + ", operation=" + operation + ") query from Location: "
                     + e.getMessage(), e);
         }
+        return new ArrayList<Location>();
     }
 
     @SuppressWarnings("unchecked")
-    public List<Location> getByName(String name, int start, int numOfRows, Operation operation) throws MiddlewareQueryException {
+    public List<Location> getByName(String name, Operation operation, int start, int numOfRows) throws MiddlewareQueryException {
         try {
             Criteria criteria = getSession().createCriteria(Location.class);
 
@@ -58,9 +60,10 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
             criteria.setMaxResults(numOfRows);
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByName(name=" + name + ", operation=" + operation + ") query from Location: "
+            logAndThrowException("Error with getByName(name=" + name + ", operation=" + operation + ") query from Location: "
                     + e.getMessage(), e);
         }
+        return new ArrayList<Location>();
     }
 
     public long countByName(String name, Operation operation) throws MiddlewareQueryException {
@@ -76,9 +79,10 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
 
             return ((Long) criteria.uniqueResult()).longValue(); //count
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countByName(name=" + name + ", operation=" + operation
+            logAndThrowException("Error with countByName(name=" + name + ", operation=" + operation
                     + ") query from Location: " + e.getMessage(), e);
         }
+        return 0;
     }
 
     @SuppressWarnings("unchecked")
@@ -90,9 +94,10 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
             criteria.addOrder(Order.asc("lname"));
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByCountry(country=" + country + ") query from Location: "
+            logAndThrowException("Error with getByCountry(country=" + country + ") query from Location: "
                     + e.getMessage(), e);
         }
+        return new ArrayList<Location>();
     }
     
     @SuppressWarnings("unchecked")
@@ -105,9 +110,10 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
             criteria.addOrder(Order.asc("lname"));
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByCountry(country=" + country + ") query from Location: "
+            logAndThrowException("Error with getByCountry(country=" + country + ") query from Location: "
                     + e.getMessage(), e);
         }
+        return new ArrayList<Location>();
     }
 
     @SuppressWarnings("unchecked")
@@ -120,9 +126,10 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
             criteria.setMaxResults(numOfRows);
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByCountry(country=" + country + ") query from Location: "
+            logAndThrowException("Error with getByCountry(country=" + country + ") query from Location: "
                     + e.getMessage(), e);
         }
+        return new ArrayList<Location>();
     }
 
     public long countByCountry(Country country) throws MiddlewareQueryException {
@@ -133,9 +140,10 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
             criteria.setProjection(Projections.rowCount());
             return ((Long) criteria.uniqueResult()).longValue(); //count
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countByCountry(country=" + country 
+            logAndThrowException("Error with countByCountry(country=" + country 
                     + ") query from Location: " + e.getMessage(), e);
         }
+        return 0;
     }
 
 
@@ -147,9 +155,10 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
             criteria.addOrder(Order.asc("lname"));
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByType(type=" + type + ") query from Location: "
+            logAndThrowException("Error with getByType(type=" + type + ") query from Location: "
                     + e.getMessage(), e);
         }
+        return new ArrayList<Location>();
     }
     
 
@@ -163,9 +172,10 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
             criteria.setMaxResults(numOfRows);
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByType(type=" + type + ") query from Location: "
+            logAndThrowException("Error with getByType(type=" + type + ") query from Location: "
                     + e.getMessage(), e);
         }
+        return new ArrayList<Location>();
     }
 
     public long countByType(Integer type) throws MiddlewareQueryException {
@@ -175,8 +185,9 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
             criteria.setProjection(Projections.rowCount());
             return ((Long) criteria.uniqueResult()).longValue(); //count
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countBytype(type=" + type 
+            logAndThrowException("Error with countBytype(type=" + type 
                     + ") query from Location: " + e.getMessage(), e);
         }
+        return 0;
     }
 }

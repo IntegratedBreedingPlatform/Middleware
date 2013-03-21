@@ -35,8 +35,9 @@ public class PersonDAO extends GenericDAO<Person, Integer>{
 
             return count.longValue() > 0;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with isPersonExists(firstName=" + firstName + ", lastName=" + lastName
+            logAndThrowException("Error with isPersonExists(firstName=" + firstName + ", lastName=" + lastName
                     + ") query from Person: " + e.getMessage(), e);
         }
+        return false;
     }
 }

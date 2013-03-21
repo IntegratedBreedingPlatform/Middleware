@@ -99,7 +99,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
             throws MiddlewareQueryException {
         
     	if (setWorkingDatabase(instance)) {
-    		return getGermplasmListDAO().getByName(name, start, numOfRows, operation);
+    		return getGermplasmListDAO().getByName(name, operation, start, numOfRows);
     	}
     	
     	return new ArrayList<GermplasmList>();

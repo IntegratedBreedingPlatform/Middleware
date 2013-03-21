@@ -63,18 +63,18 @@ public class CharacterDataDAO extends GenericDAO<CharacterData, CharacterDataPK>
                 return new ArrayList<Integer>();
             }
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getObservationUnitIdsByTraitScaleMethodAndValueCombinations(filters=" + filters
+            logAndThrowException("Error with getObservationUnitIdsByTraitScaleMethodAndValueCombinations(filters=" + filters
                     + ") query from CharacterData: " + e.getMessage(), e);
         }
+        return new ArrayList<Integer>();
     }
 
     @SuppressWarnings("rawtypes")
     public List<CharacterDataElement> getValuesByOunitIDList(List<Integer> ounitIdList) throws MiddlewareQueryException {
+        List<CharacterDataElement> dataValues = new ArrayList<CharacterDataElement>();
         try {
             SQLQuery query = getSession().createSQLQuery(CharacterData.GET_BY_OUNIT_ID_LIST);
             query.setParameterList("ounitIdList", ounitIdList);
-
-            List<CharacterDataElement> dataValues = new ArrayList<CharacterDataElement>();
 
             List results = query.list();
             for (Object o : results) {
@@ -86,15 +86,13 @@ public class CharacterDataDAO extends GenericDAO<CharacterData, CharacterDataPK>
                     String value = (String) result[3];
 
                     CharacterDataElement dataElement = new CharacterDataElement(ounitId, variateId, variateName, value);
-
                     dataValues.add(dataElement);
                 }
             }
-
-            return dataValues;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getValuesByOunitIDList(ounitIdList=" + ounitIdList + ") query from CharacterData: "
+            logAndThrowException("Error with getValuesByOunitIDList(ounitIdList=" + ounitIdList + ") query from CharacterData: "
                     + e.getMessage(), e);
         }
+        return dataValues;
     }
 }

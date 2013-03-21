@@ -645,7 +645,10 @@ public class TestGenotypicDataManagerImpl{
     @Test
     public void testGetAllQtl() throws Exception {
         List<Qtl> qtls = manager.getAllQtl(0, (int) manager.countAllQtl());
-        System.out.println("testGetAllQtl() RESULTS: " + qtls);
+        System.out.println("testGetAllQtl() RESULTS: " + qtls.size());
+        for (Qtl qtl : qtls){
+            System.out.println("    " + qtl);
+        }
     }
 
     @Test
@@ -1370,7 +1373,7 @@ public class TestGenotypicDataManagerImpl{
         Integer userId = 123;
 
         // Dataset Fields
-        String datasetName = " QTL_ ICGS 44 X ICGS 78";
+        String datasetName = "QTL_ ICGS 44 X ICGS 78";
         String datasetDesc = "ICGS 44 X ICGS 78";
         String datasetType = "QTL";
         String genus = "Groundnut"; 

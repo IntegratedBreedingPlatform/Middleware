@@ -13,6 +13,7 @@
 package org.generationcp.middleware.dao;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -30,8 +31,9 @@ public class WorkflowTemplateDAO extends GenericDAO<WorkflowTemplate, Long>{
             criteria.add(Restrictions.eq("name", name));
             return (List<WorkflowTemplate>) criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error in getByName(name=" + name 
+            logAndThrowException("Error in getByName(name=" + name 
                 + ") query from WorkflowTemplate: " + e.getMessage(), e);
         }
+        return new ArrayList<WorkflowTemplate>();
     }
 }

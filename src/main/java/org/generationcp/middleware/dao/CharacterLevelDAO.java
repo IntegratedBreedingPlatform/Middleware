@@ -31,7 +31,6 @@ public class CharacterLevelDAO extends GenericDAO<CharacterLevel, CharacterLevel
 
     @SuppressWarnings("rawtypes")
     public List<CharacterLevelElement> getValuesByOunitIDList(List<Integer> ounitIdList) throws MiddlewareQueryException {
-
         List<CharacterLevelElement> levelValues = new ArrayList<CharacterLevelElement>();
 
         if (ounitIdList == null || ounitIdList.isEmpty()) {
@@ -56,20 +55,18 @@ public class CharacterLevelDAO extends GenericDAO<CharacterLevel, CharacterLevel
                     levelValues.add(levelElement);
                 }
             }
-
-            return levelValues;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getValuesByOunitIDList(ounitIdList=" + ounitIdList
+            logAndThrowException("Error with getValuesByOunitIDList(ounitIdList=" + ounitIdList
                     + ") [get Character Level Values] query: " + e.getMessage(), e);
         }
+        return levelValues;
     }
 
     @SuppressWarnings("rawtypes")
     public List<DatasetCondition> getConditionAndValueByFactorIdAndLevelNo(Integer factorId, Integer levelNo)
             throws MiddlewareQueryException {
+        List<DatasetCondition> toreturn = new ArrayList<DatasetCondition>();
         try {
-            List<DatasetCondition> toreturn = new ArrayList<DatasetCondition>();
-
             SQLQuery query = getSession().createSQLQuery(CharacterLevel.GET_CONDITION_AND_VALUE);
             query.setParameter("factorid", factorId);
             query.setParameter("levelno", levelNo);
@@ -87,12 +84,11 @@ public class CharacterLevelDAO extends GenericDAO<CharacterLevel, CharacterLevel
                 DatasetCondition condition = new DatasetCondition(factorId, name, value, traitid, scaleid, methodid, type);
                 toreturn.add(condition);
             }
-
-            return toreturn;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getConditionAndValueByFactorIdAndLevelNo(factorId=" + factorId + ", levelNo="
+            logAndThrowException("Error with getConditionAndValueByFactorIdAndLevelNo(factorId=" + factorId + ", levelNo="
                     + levelNo + ") query from CharacterLevel: " + e.getMessage(), e);
         }
+        return toreturn;
     }
 
     public long countStudyInformationByGID(Long gid) throws MiddlewareQueryException {
@@ -103,14 +99,15 @@ public class CharacterLevelDAO extends GenericDAO<CharacterLevel, CharacterLevel
             BigInteger count = (BigInteger) query.uniqueResult();
             return count.longValue();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countStudyInformationByGID(gid=" + gid + ") query from CharacterLevel: " + e.getMessage(), e);
+            logAndThrowException("Error with countStudyInformationByGID(gid=" + gid + ") query from CharacterLevel: " + e.getMessage(), e);
         }
+        return 0;
     }
 
     @SuppressWarnings("rawtypes")
     public List<StudyInfo> getStudyInformationByGID(Long gid) throws MiddlewareQueryException {
+        List<StudyInfo> toreturn = new ArrayList<StudyInfo>();
         try {
-            List<StudyInfo> toreturn = new ArrayList<StudyInfo>();
             Query query = getSession().createSQLQuery(CharacterLevel.GET_STUDIES_BY_GID);
             query.setParameter("gid", gid);
 
@@ -126,12 +123,10 @@ public class CharacterLevelDAO extends GenericDAO<CharacterLevel, CharacterLevel
                 StudyInfo info = new StudyInfo(studyid, name.trim(), title.trim(), objective.trim(), rowCount.intValue());
                 toreturn.add(info);
             }
-
-            return toreturn;
-
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getStudyInformationByGID(gid=" + gid + ") query from CharacterLevel: " + e.getMessage(), e);
+            logAndThrowException("Error with getStudyInformationByGID(gid=" + gid + ") query from CharacterLevel: " + e.getMessage(), e);
         }
+        return toreturn;
     }
     
     @SuppressWarnings("unchecked")
@@ -146,8 +141,9 @@ public class CharacterLevelDAO extends GenericDAO<CharacterLevel, CharacterLevel
             
             return query.list();
         } catch(HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByFactorAndDatasetID(factor=" + factor + ", datasetId=" + datasetId 
+            logAndThrowException("Error with getByFactorAndDatasetID(factor=" + factor + ", datasetId=" + datasetId 
                     + ") query from CharacterLevel: " + e.getMessage(), e);
         }
+        return new ArrayList<CharacterLevel>();
     }
 }

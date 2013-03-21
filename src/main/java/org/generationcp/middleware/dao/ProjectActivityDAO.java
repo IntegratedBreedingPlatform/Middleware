@@ -43,9 +43,9 @@ public class ProjectActivityDAO extends GenericDAO<ProjectActivity, Integer>{
      */
     @SuppressWarnings("unchecked")
     public List<ProjectActivity> getByProjectId(Long projectId, int start, int numOfRows) throws MiddlewareQueryException {
-
+        List<ProjectActivity> toReturn = new ArrayList<ProjectActivity>();
         if (projectId == null) {
-            return new ArrayList<ProjectActivity>();
+            return toReturn;
         }
 
         try {
@@ -55,11 +55,12 @@ public class ProjectActivityDAO extends GenericDAO<ProjectActivity, Integer>{
             criteria.add(Restrictions.eq("project", p));
             criteria.setFirstResult(start);
             criteria.setMaxResults(numOfRows);
-            return (List<ProjectActivity>) criteria.list();
+            toReturn = (List<ProjectActivity>) criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByProjectId(projectId=" + projectId + ") query from ProjectActivity "
+            logAndThrowException("Error with getByProjectId(projectId=" + projectId + ") query from ProjectActivity "
                     + e.getMessage(), e);
         }
+        return toReturn;
     }
 
     /**
@@ -76,8 +77,9 @@ public class ProjectActivityDAO extends GenericDAO<ProjectActivity, Integer>{
             BigInteger result = (BigInteger) query.uniqueResult();
             return result.longValue();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countByProjectId(projectId=" + projectId + ") query from ProjectActivity "
+            logAndThrowException("Error with countByProjectId(projectId=" + projectId + ") query from ProjectActivity "
                     + e.getMessage(), e);
         }
+        return 0;
     }
 }

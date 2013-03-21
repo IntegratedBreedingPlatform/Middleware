@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -36,8 +37,9 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
             criteria.setMaxResults(numOfRows);
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getAllExceptDeleted() query from GermplasmList: " + e.getMessage(), e);
+            logAndThrowException("Error with getAllExceptDeleted() query from GermplasmList: " + e.getMessage(), e);
         }
+        return new ArrayList<GermplasmList>();
     }
 
     public long countAllExceptDeleted() throws MiddlewareQueryException {
@@ -47,12 +49,13 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
             criteria.setProjection(Projections.rowCount());
             return ((Long) criteria.uniqueResult()).longValue(); // count
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countAllExceptDeleted() query from GermplasmList: " + e.getMessage(), e);
+            logAndThrowException("Error with countAllExceptDeleted() query from GermplasmList: " + e.getMessage(), e);
         }
+        return 0;
     }
 
     @SuppressWarnings("unchecked")
-    public List<GermplasmList> getByName(String name, int start, int numOfRows, Operation operation) throws MiddlewareQueryException {
+    public List<GermplasmList> getByName(String name, Operation operation, int start, int numOfRows) throws MiddlewareQueryException {
         try {
             Criteria criteria = getSession().createCriteria(GermplasmList.class);
 
@@ -67,8 +70,9 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
             criteria.setMaxResults(numOfRows);
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByName(name=" + name + ") query from GermplasmList: " + e.getMessage(), e);
+            logAndThrowException("Error with getByName(name=" + name + ") query from GermplasmList: " + e.getMessage(), e);
         }
+        return new ArrayList<GermplasmList>();
     }
 
     public long countByName(String name, Operation operation) throws MiddlewareQueryException {
@@ -84,8 +88,9 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
             }
             return ((Long) criteria.uniqueResult()).longValue(); // count
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countByName(name=" + name + ") query from GermplasmList: " + e.getMessage(), e);
+            logAndThrowException("Error with countByName(name=" + name + ") query from GermplasmList: " + e.getMessage(), e);
         }
+        return 0;
     }
 
     @SuppressWarnings("unchecked")
@@ -98,9 +103,10 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
             criteria.setMaxResults(numOfRows);
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByStatus(status=" + status + ") query from GermplasmList: " + e.getMessage(),
+            logAndThrowException("Error with getByStatus(status=" + status + ") query from GermplasmList: " + e.getMessage(),
                     e);
         }
+        return new ArrayList<GermplasmList>();
     }
 
     public long countByStatus(Integer status) throws MiddlewareQueryException {
@@ -111,9 +117,10 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
             criteria.setProjection(Projections.rowCount());
             return ((Long) criteria.uniqueResult()).longValue(); // count
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countByStatus(status=" + status + ") query from GermplasmList: "
+            logAndThrowException("Error with countByStatus(status=" + status + ") query from GermplasmList: "
                     + e.getMessage(), e);
         }
+        return 0;
     }
 
     @SuppressWarnings("unchecked")
@@ -129,8 +136,9 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
             criteria.setMaxResults(numOfRows);
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getAllTopLevelLists() query from GermplasmList: " + e.getMessage(), e);
+            logAndThrowException("Error with getAllTopLevelLists() query from GermplasmList: " + e.getMessage(), e);
         }
+        return new ArrayList<GermplasmList>();
     }
 
     public long countAllTopLevelLists() throws MiddlewareQueryException {
@@ -143,15 +151,16 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
             criteria.setProjection(Projections.rowCount());
             return ((Long) criteria.uniqueResult()).longValue();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countAllTopLevelLists() query from GermplasmList: " + e.getMessage(), e);
+            logAndThrowException("Error with countAllTopLevelLists() query from GermplasmList: " + e.getMessage(), e);
         }
+        return 0;
     }
 
     public void validateId(GermplasmList germplasmList) throws MiddlewareQueryException {
         // Check if not a local record (has negative ID)
         Integer id = germplasmList.getId();
         if (id != null && id.intValue() > 0) {
-            throw new MiddlewareQueryException("Error with validateId(germplasmList=" + germplasmList
+            logAndThrowException("Error with validateId(germplasmList=" + germplasmList
                     + "): Cannot update a Central Database record. "
                     + "GermplasmList object to update must be a Local Record (ID must be negative)");
         }
@@ -176,9 +185,10 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
             criteria.setMaxResults(numOfRows);
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByParentFolderId(parentId=" + parentId + ") query from GermplasmList: "
+            logAndThrowException("Error with getByParentFolderId(parentId=" + parentId + ") query from GermplasmList: "
                     + e.getMessage(), e);
         }
+        return new ArrayList<GermplasmList>();
     }
 
     /**
@@ -196,8 +206,9 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
             criteria.setProjection(Projections.rowCount());
             return ((Long) criteria.uniqueResult()).longValue(); // count
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countByParentFolderId(parentId=" + parentId + ") query from GermplasmList: "
+            logAndThrowException("Error with countByParentFolderId(parentId=" + parentId + ") query from GermplasmList: "
                     + e.getMessage(), e);
         }
+        return 0;
     }
 }

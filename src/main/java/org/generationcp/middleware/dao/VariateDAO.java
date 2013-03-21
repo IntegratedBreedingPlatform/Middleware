@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -33,8 +34,9 @@ public class VariateDAO extends GenericDAO<Variate, Integer>{
 
             return (List<Variate>) query.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByStudyID(studyId=" + studyId + ") query from Variate: " + e.getMessage(), e);
+            logAndThrowException("Error with getByStudyID(studyId=" + studyId + ") query from Variate: " + e.getMessage(), e);
         }
+        return new ArrayList<Variate>();
     }
 
     @SuppressWarnings("unchecked")
@@ -46,9 +48,10 @@ public class VariateDAO extends GenericDAO<Variate, Integer>{
 
             return (List<Variate>) query.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByRepresentationId(representationId=" + representationId
+            logAndThrowException("Error with getByRepresentationId(representationId=" + representationId
                     + ") query from Variate: " + e.getMessage(), e);
         }
+        return new ArrayList<Variate>();
     }
     
     public boolean isVariateNumeric(int variateId) throws MiddlewareQueryException {
@@ -58,21 +61,23 @@ public class VariateDAO extends GenericDAO<Variate, Integer>{
             
             String result = "";
             
-            if (!query.list().isEmpty()) 
+            if (!query.list().isEmpty()){ 
                 result = (String) query.list().get(0);
-            else 
+            }else{ 
                 throw new HibernateException("Database Error: No Datatype assigned on the variate id: " + variateId);
+            }
             
-            
-            if (result.equals(NUMERIC_DATATYPE)) 
+            if (result.equals(NUMERIC_DATATYPE)) {
                 return true;
-            else if (result.equals(CHARACTER_DATATYPE))
+            }else if (result.equals(CHARACTER_DATATYPE)) {
                return false;
-            else
+            }else{
                 throw new HibernateException("Database Error: No Datatype assigned on the variate id: " + variateId);
+            }
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with isVariateNumeric: " + e.getMessage(),
+            logAndThrowException("Error with isVariateNumeric: " + e.getMessage(),
                     e);
         }
+        return false;
     }
 }

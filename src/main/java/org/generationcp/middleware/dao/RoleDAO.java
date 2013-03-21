@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -24,7 +25,7 @@ import org.hibernate.criterion.Restrictions;
 
 public class RoleDAO extends GenericDAO<Role, Integer>{
 
-    public Role getById(Integer id) {
+    public Role getById(Integer id) throws MiddlewareQueryException {
         return super.getById(id, false);
     }
     
@@ -37,9 +38,10 @@ public class RoleDAO extends GenericDAO<Role, Integer>{
             List<Role> roles = criteria.list();
             return roles.size() > 0 ? roles.get(0) : null;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error in getByNameAndWorkflowTemplate(name=" + name + ", workflowTemplate=" + workflowTemplate
+            logAndThrowException("Error in getByNameAndWorkflowTemplate(name=" + name + ", workflowTemplate=" + workflowTemplate
                 + ") query from Role: " + e.getMessage(), e);
         }
+        return null;
     }
     
     @SuppressWarnings("unchecked")
@@ -49,9 +51,10 @@ public class RoleDAO extends GenericDAO<Role, Integer>{
             criteria.add(Restrictions.eq("workflowTemplate", workflowTemplate));
             return (List<Role>) criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error in getByWorkflowTemplate(workflowTemplate=" + workflowTemplate
+            logAndThrowException("Error in getByWorkflowTemplate(workflowTemplate=" + workflowTemplate
                 + ") query from Role: " + e.getMessage(), e);
         }
+        return new ArrayList<Role>();
     }
     
     @SuppressWarnings("unchecked")
@@ -61,8 +64,9 @@ public class RoleDAO extends GenericDAO<Role, Integer>{
             criteria.addOrder(Order.desc("roleId"));
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error in getAllRolesSorted() query from Role: " + e.getMessage(), e);
+            logAndThrowException("Error in getAllRolesSorted() query from Role: " + e.getMessage(), e);
         } 
+        return new ArrayList<Role>();
     }
     
     @SuppressWarnings("unchecked")
@@ -72,8 +76,9 @@ public class RoleDAO extends GenericDAO<Role, Integer>{
             criteria.addOrder(Order.asc("labelOrder"));
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error in getAllRolesSorted() query from Role: " + e.getMessage(), e);
+            logAndThrowException("Error in getAllRolesSorted() query from Role: " + e.getMessage(), e);
         } 
+        return new ArrayList<Role>();
     }
 
 }

@@ -47,8 +47,24 @@ import org.generationcp.middleware.pojos.Trait;
 import org.generationcp.middleware.pojos.TraitCombinationFilter;
 import org.generationcp.middleware.pojos.Variate;
 import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager{
+
+    private static final Logger LOG = LoggerFactory.getLogger(StudyDataManagerImpl.class);
+
+    private CharacterDataDAO characterDataDao;
+    private CharacterLevelDAO characterLevelDao;
+    private FactorDAO factorDao;
+    private NumericDataDAO numericDataDao;
+    private NumericLevelDAO numericLevelDao;
+    private OindexDAO oIndexDao;
+    private RepresentationDAO representationDao;
+    private StudyDAO studyDao;
+    private StudyEffectDAO studyEffectDao;
+    private TraitDAO traitDao;
+    private VariateDAO variateDao;
 
     public StudyDataManagerImpl() {
     }
@@ -61,955 +77,640 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         super(sessionForLocal, sessionForCentral);
     }
 
+    private CharacterDataDAO getCharacterDataDao() {
+        if (characterDataDao == null) {
+            characterDataDao = new CharacterDataDAO();
+        }
+        characterDataDao.setSession(getActiveSession());
+        return characterDataDao;
+    }
+
+    private CharacterLevelDAO getCharacterLevelDao() {
+        if (characterLevelDao == null) {
+            characterLevelDao = new CharacterLevelDAO();
+        }
+        characterLevelDao.setSession(getActiveSession());
+        return characterLevelDao;
+    }
+
+    private FactorDAO getFactorDao() {
+        if (factorDao == null) {
+            factorDao = new FactorDAO();
+        }
+        factorDao.setSession(getActiveSession());
+        return factorDao;
+    }
+
+    private NumericDataDAO getNumericDataDao() {
+        if (numericDataDao == null) {
+            numericDataDao = new NumericDataDAO();
+        }
+        numericDataDao.setSession(getActiveSession());
+        return numericDataDao;
+    }
+
+    private NumericLevelDAO getNumericLevelDao() {
+        if (numericLevelDao == null) {
+            numericLevelDao = new NumericLevelDAO();
+        }
+        numericLevelDao.setSession(getActiveSession());
+        return numericLevelDao;
+    }
+
+    private OindexDAO getOindexDao() {
+        if (oIndexDao == null) {
+            oIndexDao = new OindexDAO();
+        }
+        oIndexDao.setSession(getActiveSession());
+        return oIndexDao;
+    }
+
+    private RepresentationDAO getRepresentationDao() {
+        if (representationDao == null) {
+            representationDao = new RepresentationDAO();
+        }
+        representationDao.setSession(getActiveSession());
+        return representationDao;
+    }
+
+    private StudyDAO getStudyDao() {
+        if (studyDao == null) {
+            studyDao = new StudyDAO();
+        }
+        studyDao.setSession(getActiveSession());
+        return studyDao;
+    }
+
+    private StudyEffectDAO getStudyEffectDao() {
+        if (studyEffectDao == null) {
+            studyEffectDao = new StudyEffectDAO();
+        }
+        studyEffectDao.setSession(getActiveSession());
+        return studyEffectDao;
+    }
+
+    private TraitDAO getTraitDao() {
+        if (traitDao == null) {
+            traitDao = new TraitDAO();
+        }
+        traitDao.setSession(getActiveSession());
+        return traitDao;
+    }
+
+    private VariateDAO getVariateDao() {
+        if (variateDao == null) {
+            variateDao = new VariateDAO();
+        }
+        variateDao.setSession(getActiveSession());
+        return variateDao;
+    }
+
     @Override
     public List<Integer> getGIDSByPhenotypicData(List<TraitCombinationFilter> filters, int start, int numOfRows, Database instance)
             throws MiddlewareQueryException {
         // TODO Local-Central: Verify if existing implementation for CENTRAL is  also applicable to LOCAL
-        Session session = getSession(instance);
+        List<Integer> toReturn = new ArrayList<Integer>();
 
-        if (session != null) {
-
-            NumericDataDAO dataNDao = new NumericDataDAO();
-            dataNDao.setSession(session);
-
-            CharacterDataDAO dataCDao = new CharacterDataDAO();
-            dataCDao.setSession(session);
-
+        if (setWorkingDatabase(instance)) {
+            NumericDataDAO dataNDao = getNumericDataDao();
+            CharacterDataDAO dataCDao = getCharacterDataDao();
             Set<Integer> ounitIds = new HashSet<Integer>();
 
-            // first get the observation unit ids for the rows in datasets which
-            // has the data specified in the filter
+            // first get the observation unit ids for the rows in datasets which has the data specified in the filter
             // check numeric data
             ounitIds.addAll(dataNDao.getObservationUnitIdsByTraitScaleMethodAndValueCombinations(filters, start, numOfRows));
             // check character data
             ounitIds.addAll(dataCDao.getObservationUnitIdsByTraitScaleMethodAndValueCombinations(filters, start, numOfRows));
 
             // use the retrieved observation unit ids to get the GIDs being
-            // observed in the rows in datasets identified by the
-            // observation unit ids
+            // observed in the rows in datasets identified by the observation unit ids
             if (!ounitIds.isEmpty()) {
-                FactorDAO factorDao = new FactorDAO();
-                factorDao.setSession(session);
-
+                FactorDAO factorDao = getFactorDao();
                 Set<Integer> gids = factorDao.getGIDSByObservationUnitIds(ounitIds, start, numOfRows * 2);
-                List<Integer> toreturn = new ArrayList<Integer>();
-                toreturn.addAll(gids);
-                return toreturn;
-            } else {
-                return new ArrayList<Integer>();
+                toReturn.addAll(gids);
             }
-
-        } else {
-            return new ArrayList<Integer>();
         }
-
+        return toReturn;
     }
 
     @Override
     public List<Study> getStudyByName(String name, int start, int numOfRows, Operation op, Database instance)
             throws MiddlewareQueryException {
 
-        StudyDAO dao = new StudyDAO();
-        Session session = getSession(instance);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<Study>();
+        List<Study> studyList = new ArrayList<Study>();
+        try {
+            if (setWorkingDatabase(instance)) {
+                StudyDAO dao = getStudyDao();
+                if (op == Operation.EQUAL) {
+                    studyList = dao.getByNameUsingEqual(name, start, numOfRows);
+                } else if (op == Operation.LIKE) {
+                    studyList = dao.getByNameUsingLike(name, start, numOfRows);
+                }
+            }
+        } catch (Exception e) {
+            logAndThrowException("Error in getStudyByName(name = " + name + ")", e, LOG);
         }
-
-        List<Study> studyList = null;
-        if (op == Operation.EQUAL) {
-            studyList = dao.getByNameUsingEqual(name, start, numOfRows);
-        } else if (op == Operation.LIKE) {
-            studyList = dao.getByNameUsingLike(name, start, numOfRows);
-        }
-
         return studyList;
-
     }
 
     @Override
     public long countStudyByName(String name, Operation op, Database instance) throws MiddlewareQueryException {
-
-        StudyDAO dao = new StudyDAO();
-        Session session = getSession(instance);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return 0;
+        if (setWorkingDatabase(instance)) {
+            return getStudyDao().countByName(name, op);
         }
-
-        return dao.countByName(name, op);
-
-    }
-    
-    @Override
-    public List<Study> getStudyBySeason(Season season, int start, int numOfRows, Database instance) throws MiddlewareQueryException{
-        
-        StudyDAO dao = new StudyDAO();
-        Session session = getSession(instance);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<Study>();
-        }
-
-        return dao.getBySeason(season, start, numOfRows);
-
+        return 0;
     }
 
     @Override
-    public long countStudyBySeason(Season season, Database instance) throws MiddlewareQueryException{
-
-        StudyDAO dao = new StudyDAO();
-        Session session = getSession(instance);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return 0;
+    public List<Study> getStudyBySeason(Season season, int start, int numOfRows, Database instance) throws MiddlewareQueryException {
+        if (setWorkingDatabase(instance)) {
+            return getStudyDao().getBySeason(season, start, numOfRows);
         }
+        return new ArrayList<Study>();
+    }
 
-        return dao.countBySeason(season);
-
+    @Override
+    public long countStudyBySeason(Season season, Database instance) throws MiddlewareQueryException {
+        if (setWorkingDatabase(instance)) {
+            return getStudyDao().countBySeason(season);
+        }
+        return 0;
     }
 
     @Override
     public List<Study> getStudyBySDate(Integer sdate, int start, int numOfRows, Operation op, Database instance)
             throws MiddlewareQueryException {
-
-        StudyDAO dao = new StudyDAO();
-        Session session = getSession(instance);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<Study>();
+        List<Study> studyList = new ArrayList<Study>();
+        if (setWorkingDatabase(instance)) {
+            if (op == Operation.EQUAL) {
+                studyList = getStudyDao().getBySDateUsingEqual(sdate, start, numOfRows);
+            }
         }
-
-        List<Study> studyList = null;
-        if (op == Operation.EQUAL) {
-            studyList = dao.getBySDateUsingEqual(sdate, start, numOfRows);
-        }
-
         return studyList;
 
     }
 
     @Override
     public long countStudyBySDate(Integer sdate, Operation op, Database instance) throws MiddlewareQueryException {
-
-        StudyDAO dao = new StudyDAO();
-        Session session = getSession(instance);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return 0;
+        if (setWorkingDatabase(instance)) {
+            return getStudyDao().countBySDate(sdate, op);
         }
-
-        return dao.countBySDate(sdate, op);
-
+        return 0;
     }
-    
-    
+
     @Override
     public List<Study> getStudyByEDate(Integer edate, int start, int numOfRows, Operation op, Database instance)
             throws MiddlewareQueryException {
-
-        StudyDAO dao = new StudyDAO();
-        Session session = getSession(instance);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<Study>();
+        List<Study> studyList = new ArrayList<Study>();
+        if (setWorkingDatabase(instance)) {
+            if (op == Operation.EQUAL) {
+                studyList = getStudyDao().getByEDateUsingEqual(edate, start, numOfRows);
+            }
         }
-
-        List<Study> studyList = null;
-        if (op == Operation.EQUAL) {
-            studyList = dao.getByEDateUsingEqual(edate, start, numOfRows);
-        }
-
         return studyList;
-
     }
 
     @Override
     public long countStudyByEDate(Integer edate, Operation op, Database instance) throws MiddlewareQueryException {
-
-        StudyDAO dao = new StudyDAO();
-        Session session = getSession(instance);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return 0;
+        if (setWorkingDatabase(instance)) {
+            return getStudyDao().countByEDate(edate, op);
         }
-
-        return dao.countByEDate(edate, op);
-
+        return 0;
     }
 
     @Override
     public List<Study> getStudyByCountry(String country, int start, int numOfRows, Operation op, Database instance)
             throws MiddlewareQueryException {
-
-        StudyDAO dao = new StudyDAO();
-        Session session = getSession(instance);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<Study>();
+        List<Study> studyList = new ArrayList<Study>();
+        if (setWorkingDatabase(instance)) {
+            StudyDAO dao = getStudyDao();
+            if (op == Operation.EQUAL) {
+                studyList = dao.getByCountryUsingEqual(country, start, numOfRows);
+            } else if (op == Operation.LIKE) {
+                studyList = dao.getByCountryUsingLike(country, start, numOfRows);
+            }
         }
-
-        List<Study> studyList = null;
-        if (op == Operation.EQUAL) {
-            studyList = dao.getByCountryUsingEqual(country, start, numOfRows);
-        } else if (op == Operation.LIKE) {
-            studyList = dao.getByCountryUsingLike(country, start, numOfRows);
-        }
-
         return studyList;
-
     }
-
 
     @Override
     public long countStudyByCountry(String country, Operation op, Database instance) throws MiddlewareQueryException {
-
-        StudyDAO dao = new StudyDAO();
-        Session session = getSession(instance);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return 0;
+        if (setWorkingDatabase(instance)) {
+            return getStudyDao().countByCountry(country, op);
         }
-
-        return dao.countByCountry(country, op);
-
+        return 0;
     }
-    
+
     @Override
     public Study getStudyByID(Integer id) throws MiddlewareQueryException {
-        StudyDAO dao = new StudyDAO();
-        Session session = getSession(id);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return null;
+        if (setWorkingDatabase(id)) {
+            return (Study) getStudyDao().getById(id, false);
         }
-
-        return (Study) dao.getById(id, false);
+        return null;
     }
 
     @Override
     public List<Study> getAllTopLevelStudies(int start, int numOfRows, Database instance) throws MiddlewareQueryException {
-        StudyDAO dao = new StudyDAO();
-
-        Session session = getSession(instance);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<Study>();
+        List<Study> topLevelStudies = new ArrayList<Study>();
+        if (setWorkingDatabase(instance)) {
+            topLevelStudies = getStudyDao().getTopLevelStudies(start, numOfRows);
         }
-
-        List<Study> topLevelStudies = dao.getTopLevelStudies(start, numOfRows);
-
         return topLevelStudies;
     }
 
     public long countAllTopLevelStudies(Database instance) throws MiddlewareQueryException {
-        StudyDAO dao = new StudyDAO();
-        Session session = getSession(instance);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return 0;
+        if (setWorkingDatabase(instance)) {
+            return getStudyDao().countAllTopLevelStudies();
         }
-
-        return dao.countAllTopLevelStudies();
+        return 0;
     }
 
     @Override
     public long countAllStudyByParentFolderID(Integer parentFolderId, Database instance) throws MiddlewareQueryException {
-        StudyDAO dao = new StudyDAO();
-        Session session = getSession(instance);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return 0;
+        if (setWorkingDatabase(instance)) {
+            return getStudyDao().countAllStudyByParentFolderID(parentFolderId);
         }
-
-        return dao.countAllStudyByParentFolderID(parentFolderId);
-
+        return 0;
     }
 
     @Override
     public List<Study> getStudiesByParentFolderID(Integer parentFolderId, int start, int numOfRows) throws MiddlewareQueryException {
-        StudyDAO dao = new StudyDAO();
-
-        Session session = getSession(parentFolderId);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<Study>();
+        List<Study> studies = new ArrayList<Study>();
+        if (setWorkingDatabase(parentFolderId)) {
+            studies = getStudyDao().getByParentFolderID(parentFolderId, start, numOfRows);
         }
-
-        List<Study> studies = dao.getByParentFolderID(parentFolderId, start, numOfRows);
-
         return studies;
     }
 
     @Override
     public List<Variate> getVariatesByStudyID(Integer studyId) throws MiddlewareQueryException {
-        VariateDAO variateDao = new VariateDAO();
-        Session session = getSession(studyId);
+        List<Variate> variates = new ArrayList<Variate>();
 
-        if (session != null) {
-            variateDao.setSession(session);
-        } else {
-            return new ArrayList<Variate>();
+        if (setWorkingDatabase(studyId)) {
+            variates = getVariateDao().getByStudyID(studyId);
         }
-
-        return (List<Variate>) variateDao.getByStudyID(studyId);
+        return variates;
     }
 
     @Override
     public List<StudyEffect> getEffectsByStudyID(Integer studyId) throws MiddlewareQueryException {
-        StudyEffectDAO studyEffectDao = new StudyEffectDAO();
-        Session session = getSession(studyId);
-
-        if (session != null) {
-            studyEffectDao.setSession(session);
-        } else {
-            return new ArrayList<StudyEffect>();
+        List<StudyEffect> studyEffects = new ArrayList<StudyEffect>();
+        if (setWorkingDatabase(studyId)) {
+            studyEffects = getStudyEffectDao().getByStudyID(studyId);
         }
-
-        return (List<StudyEffect>) studyEffectDao.getByStudyID(studyId);
+        return studyEffects;
     }
 
     @Override
     public List<Factor> getFactorsByStudyID(Integer studyId) throws MiddlewareQueryException {
-        FactorDAO factorDao = new FactorDAO();
-        Session session = getSession(studyId);
-
-        if (session != null) {
-            factorDao.setSession(session);
-        } else {
-            return new ArrayList<Factor>();
+        List<Factor> factors = new ArrayList<Factor>();
+        if (setWorkingDatabase(studyId)) {
+            factors = getFactorDao().getByStudyID(studyId);
         }
-
-        return (List<Factor>) factorDao.getByStudyID(studyId);
+        return factors;
     }
 
     @Override
     public List<Representation> getRepresentationByEffectID(Integer effectId) throws MiddlewareQueryException {
-        RepresentationDAO representationDao = new RepresentationDAO();
-        Session session = getSession(effectId);
-
-        if (session != null) {
-            representationDao.setSession(session);
-        } else {
-            return new ArrayList<Representation>();
+        List<Representation> representations = new ArrayList<Representation>();
+        if (setWorkingDatabase(effectId)) {
+            representations = getRepresentationDao().getRepresentationByEffectID(effectId);
         }
-
-        return (List<Representation>) representationDao.getRepresentationByEffectID(effectId);
+        return representations;
     }
 
     @Override
     public List<Representation> getRepresentationByStudyID(Integer studyId) throws MiddlewareQueryException {
-        RepresentationDAO representationDao = new RepresentationDAO();
-        Session session = getSession(studyId);
-
-        if (session != null) {
-            representationDao.setSession(session);
-        } else {
-            return new ArrayList<Representation>();
+        List<Representation> representations = new ArrayList<Representation>();
+        if (setWorkingDatabase(studyId)) {
+            representations = getRepresentationDao().getRepresentationByStudyID(studyId);
         }
-
-        List<Representation> representations = representationDao.getRepresentationByStudyID(studyId);
         return representations;
     }
 
     @Override
     public List<Factor> getFactorsByRepresentationId(Integer representationId) throws MiddlewareQueryException {
-        FactorDAO dao = new FactorDAO();
-
-        Session session = getSession(representationId);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<Factor>();
+        List<Factor> factors = new ArrayList<Factor>();
+        if (setWorkingDatabase(representationId)) {
+            factors = getFactorDao().getByRepresentationID(representationId);
         }
-
-        List<Factor> factors = dao.getByRepresentationID(representationId);
-
         return factors;
     }
 
     @Override
     public long countOunitIDsByRepresentationId(Integer representationId) throws MiddlewareQueryException {
-        OindexDAO dao = new OindexDAO();
-
-        Session session = getSession(representationId);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return 0;
+        if (setWorkingDatabase(representationId)) {
+            return getOindexDao().countOunitIDsByRepresentationId(representationId);
         }
-
-        return dao.countOunitIDsByRepresentationId(representationId);
+        return 0;
     }
 
     @Override
     public List<Integer> getOunitIDsByRepresentationId(Integer representationId, int start, int numOfRows) throws MiddlewareQueryException {
-        OindexDAO dao = new OindexDAO();
-
-        Session session = getSession(representationId);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<Integer>();
+        List<Integer> ounitIDs = new ArrayList<Integer>();
+        if (setWorkingDatabase(representationId)) {
+            ounitIDs = getOindexDao().getOunitIDsByRepresentationId(representationId, start, numOfRows);
         }
-
-        List<Integer> ounitIDs = dao.getOunitIDsByRepresentationId(representationId, start, numOfRows);
-
         return ounitIDs;
     }
 
     @Override
     public List<Variate> getVariatesByRepresentationId(Integer representationId) throws MiddlewareQueryException {
-        VariateDAO dao = new VariateDAO();
-
-        Session session = getSession(representationId);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<Variate>();
+        List<Variate> variates = new ArrayList<Variate>();
+        if (setWorkingDatabase(representationId)) {
+            variates = getVariateDao().getByRepresentationId(representationId);
         }
-
-        List<Variate> variates = dao.getByRepresentationId(representationId);
-
         return variates;
     }
 
     @Override
     public List<NumericDataElement> getNumericDataValuesByOunitIdList(List<Integer> ounitIdList) throws MiddlewareQueryException {
-        NumericDataDAO dao = new NumericDataDAO();
-
-        // get 1st element from list to check whether the list is for the
-        // Central instance or the Local instance
+        // Get 1st element from list to check whether the list is for the Central instance or the Local instance
         Integer sampleId = ounitIdList.get(0);
-        Session session = getSession(sampleId);
 
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<NumericDataElement>();
+        List<NumericDataElement> numDataValues = new ArrayList<NumericDataElement>();
+        if (setWorkingDatabase(sampleId)) {
+            numDataValues = getNumericDataDao().getValuesByOunitIDList(ounitIdList);
         }
-
-        List<NumericDataElement> numDataValues = dao.getValuesByOunitIDList(ounitIdList);
-
         return numDataValues;
     }
 
     @Override
     public List<CharacterDataElement> getCharacterDataValuesByOunitIdList(List<Integer> ounitIdList) throws MiddlewareQueryException {
-        CharacterDataDAO dao = new CharacterDataDAO();
-
-        // get 1st element from list to check whether the list is for the
-        // Central instance or the Local instance
+        // Get 1st element from list to check whether the list is for the Central instance or the Local instance
         Integer sampleId = ounitIdList.get(0);
-        Session session = getSession(sampleId);
 
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<CharacterDataElement>();
+        List<CharacterDataElement> charDataValues = new ArrayList<CharacterDataElement>();
+        if (setWorkingDatabase(sampleId)) {
+            charDataValues = getCharacterDataDao().getValuesByOunitIDList(ounitIdList);
         }
-
-        List<CharacterDataElement> charDataValues = dao.getValuesByOunitIDList(ounitIdList);
-
         return charDataValues;
     }
 
     @Override
     public List<NumericLevelElement> getNumericLevelValuesByOunitIdList(List<Integer> ounitIdList) throws MiddlewareQueryException {
-        NumericLevelDAO dao = new NumericLevelDAO();
-
-        // get 1st element from list to check whether the list is for the
-        // Central instance or the Local instance
+        // Get 1st element from list to check whether the list is for the Central instance or the Local instance
         Integer sampleId = ounitIdList.get(0);
-        Session session = getSession(sampleId);
 
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<NumericLevelElement>();
+        List<NumericLevelElement> numLevelValues = new ArrayList<NumericLevelElement>();
+        if (setWorkingDatabase(sampleId)) {
+            numLevelValues = getNumericLevelDao().getValuesByOunitIDList(ounitIdList);
         }
-
-        List<NumericLevelElement> numLevelValues = dao.getValuesByOunitIDList(ounitIdList);
-
         return numLevelValues;
     }
 
     @Override
     public List<CharacterLevelElement> getCharacterLevelValuesByOunitIdList(List<Integer> ounitIdList) throws MiddlewareQueryException {
-        CharacterLevelDAO dao = new CharacterLevelDAO();
-
-        // get 1st element from list to check whether the list is for the
-        // Central instance or the Local instance
+        // Get 1st element from list to check whether the list is for the Central instance or the Local instance
         Integer sampleId = ounitIdList.get(0);
-        Session session = getSession(sampleId);
 
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<CharacterLevelElement>();
+        List<CharacterLevelElement> charLevelValues = new ArrayList<CharacterLevelElement>();
+        if (setWorkingDatabase(sampleId)) {
+            charLevelValues = getCharacterLevelDao().getValuesByOunitIDList(ounitIdList);
         }
-
-        List<CharacterLevelElement> charLevelValues = dao.getValuesByOunitIDList(ounitIdList);
-
         return charLevelValues;
     }
 
     @Override
     public List<DatasetCondition> getConditionsByRepresentationId(Integer representationId) throws MiddlewareQueryException {
+
         List<DatasetCondition> toreturn = new ArrayList<DatasetCondition>();
-
-        OindexDAO oindexDao = new OindexDAO();
-        NumericLevelDAO numericLevelDao = new NumericLevelDAO();
-        CharacterLevelDAO characterLevelDao = new CharacterLevelDAO();
-        Session session = getSession(representationId);
-
-        if (session != null) {
-            oindexDao.setSession(session);
-            numericLevelDao.setSession(session);
-            characterLevelDao.setSession(session);
-
+        if (setWorkingDatabase(representationId)) {
+            OindexDAO oindexDao = getOindexDao();
+            NumericLevelDAO numericLevelDao = getNumericLevelDao();
+            CharacterLevelDAO characterLevelDao = getCharacterLevelDao();
             List<Object[]> factorIdsAndLevelNos = oindexDao.getFactorIdAndLevelNoOfConditionsByRepresentationId(representationId);
             for (Object[] ids : factorIdsAndLevelNos) {
                 Integer factorid = (Integer) ids[0];
                 Integer levelno = (Integer) ids[1];
-
                 toreturn.addAll(numericLevelDao.getConditionAndValueByFactorIdAndLevelNo(factorid, levelno));
                 toreturn.addAll(characterLevelDao.getConditionAndValueByFactorIdAndLevelNo(factorid, levelno));
             }
         }
-
         return toreturn;
     }
 
     @Override
     public String getMainLabelOfFactorByFactorId(Integer factorid) throws MiddlewareQueryException {
-        FactorDAO dao = new FactorDAO();
-        Session session = getSession(factorid);
-
-        if (session != null) {
-            dao.setSession(session);
-
-            return dao.getMainLabel(factorid);
+        if (setWorkingDatabase(factorid)) {
+            return getFactorDao().getMainLabel(factorid);
         }
-
         return null;
     }
 
     @Override
     public long countStudyInformationByGID(Long gid) throws MiddlewareQueryException {
-        try {
-            CharacterLevelDAO characterLevelDao = new CharacterLevelDAO();
-            NumericLevelDAO numericLevelDao = new NumericLevelDAO();
-
-            if (gid < 0) {
-                requireLocalDatabaseInstance();
-
-                characterLevelDao.setSession(getCurrentSessionForLocal());
-                numericLevelDao.setSession(getCurrentSessionForLocal());
-
-                long count = characterLevelDao.countStudyInformationByGID(gid) + numericLevelDao.countStudyInformationByGID(gid);
-
-                return count;
-            } else {
-                long count = 0;
-
-                if (this.getCurrentSessionForLocal() != null) {
-                    characterLevelDao.setSession(getCurrentSessionForLocal());
-                    numericLevelDao.setSession(getCurrentSessionForLocal());
-
-                    count = characterLevelDao.countStudyInformationByGID(gid) + numericLevelDao.countStudyInformationByGID(gid);
-                }
-
-                if (this.getCurrentSessionForCentral() != null) {
-                    characterLevelDao.setSession(getCurrentSessionForCentral());
-                    numericLevelDao.setSession(getCurrentSessionForCentral());
-
-                    count = count + characterLevelDao.countStudyInformationByGID(gid) + numericLevelDao.countStudyInformationByGID(gid);
-                }
-
-                return count;
+        long count = 0;
+        if (gid < 0) {
+            requireLocalDatabaseInstance();
+            if (setWorkingDatabase(getCurrentSessionForLocal())) {
+                count = getCharacterLevelDao().countStudyInformationByGID(gid) + getNumericLevelDao().countStudyInformationByGID(gid);
             }
-        } catch (Exception e) {
-            throw new MiddlewareQueryException("Error in count study information by GID: StudyDataManager.countStudyInformationByGID(gid="
-                    + gid + "): " + e.getMessage(), e);
+        } else {
+            if (setWorkingDatabase(getCurrentSessionForLocal())) {
+                count = getCharacterLevelDao().countStudyInformationByGID(gid) + getNumericLevelDao().countStudyInformationByGID(gid);
+            }
+            if (setWorkingDatabase(getCurrentSessionForCentral())) {
+                count = count + getCharacterLevelDao().countStudyInformationByGID(gid)
+                        + getNumericLevelDao().countStudyInformationByGID(gid);
+            }
         }
+        return count;
     }
 
     @Override
     public List<StudyInfo> getStudyInformationByGID(Long gid) throws MiddlewareQueryException {
-        try {
-            List<StudyInfo> toreturn = new ArrayList<StudyInfo>();
-
-            CharacterLevelDAO characterLevelDao = new CharacterLevelDAO();
-            NumericLevelDAO numericLevelDao = new NumericLevelDAO();
-
-            if (gid < 0) {
-                requireLocalDatabaseInstance();
-
-                characterLevelDao.setSession(getCurrentSessionForLocal());
-                numericLevelDao.setSession(getCurrentSessionForLocal());
-
-                toreturn.addAll(characterLevelDao.getStudyInformationByGID(gid));
-                toreturn.addAll(numericLevelDao.getStudyInformationByGID(gid));
-            } else {
-                if (this.getCurrentSessionForLocal() != null) {
-                    characterLevelDao.setSession(getCurrentSessionForLocal());
-                    numericLevelDao.setSession(getCurrentSessionForLocal());
-
-                    toreturn.addAll(characterLevelDao.getStudyInformationByGID(gid));
-                    toreturn.addAll(numericLevelDao.getStudyInformationByGID(gid));
-                }
-
-                if (this.getCurrentSessionForCentral() != null) {
-                    characterLevelDao.setSession(getCurrentSessionForCentral());
-                    numericLevelDao.setSession(getCurrentSessionForCentral());
-
-                    toreturn.addAll(characterLevelDao.getStudyInformationByGID(gid));
-                    toreturn.addAll(numericLevelDao.getStudyInformationByGID(gid));
-                }
+        List<StudyInfo> toreturn = new ArrayList<StudyInfo>();
+        if (gid < 0) {
+            requireLocalDatabaseInstance();
+            if (setWorkingDatabase(getCurrentSessionForLocal())) {
+                toreturn.addAll(getCharacterLevelDao().getStudyInformationByGID(gid));
+                toreturn.addAll(getNumericLevelDao().getStudyInformationByGID(gid));
             }
-
-            return toreturn;
-        } catch (Exception e) {
-            throw new MiddlewareQueryException("Error in get study information by GID: StudyDataManager.getStudyInformationByGID(gid="
-                    + gid + "): " + e.getMessage(), e);
+        } else {
+            if (setWorkingDatabase(getCurrentSessionForLocal())) {
+                toreturn.addAll(getCharacterLevelDao().getStudyInformationByGID(gid));
+                toreturn.addAll(getNumericLevelDao().getStudyInformationByGID(gid));
+            }
+            if (setWorkingDatabase(getCurrentSessionForCentral())) {
+                toreturn.addAll(getCharacterLevelDao().getStudyInformationByGID(gid));
+                toreturn.addAll(getNumericLevelDao().getStudyInformationByGID(gid));
+            }
         }
+        return toreturn;
     }
-    
+
     @Override
     public Trait getReplicationTrait() throws MiddlewareQueryException {
-        try {
-            TraitDAO dao = new TraitDAO();
-            
-            //the REPLICATION trait should be in the central IBDB
-            requireCentralDatabaseInstance();
-            
-            dao.setSession(getCurrentSessionForCentral());
-            return dao.getReplicationTrait();
-        } catch (Exception e) {
-            throw new MiddlewareQueryException("Error in getting REPLICATION trait: " + e.getMessage(), e);
-        }
+        //the REPLICATION trait should be in the central IBDB
+        requireCentralDatabaseInstance();
+        return getTraitDao().getReplicationTrait();
     }
-    
+
     @Override
     public Trait getBlockTrait() throws MiddlewareQueryException {
-        try {
-            TraitDAO dao = new TraitDAO();
-            
-            //the BLOCK trait should be in the central IBDB
-            requireCentralDatabaseInstance();
-            
-            dao.setSession(getCurrentSessionForCentral());
-            return dao.getBlockTrait();
-        } catch (Exception e) {
-            throw new MiddlewareQueryException("Error in getting BLOCK trait: " + e.getMessage(), e);
-        }
+        //the BLOCK trait should be in the central IBDB
+        requireCentralDatabaseInstance();
+        return getTraitDao().getBlockTrait();
     }
-    
+
     @Override
     public Trait getEnvironmentTrait() throws MiddlewareQueryException {
-        try {
-            TraitDAO dao = new TraitDAO();
-            
-            //the ENVIRONMENT trait should be in the central IBDB
-            requireCentralDatabaseInstance();
-            
-            dao.setSession(getCurrentSessionForCentral());
-            return dao.getEnvironmentTrait();
-        } catch (Exception e) {
-            throw new MiddlewareQueryException("Error in getting ENVIRONMENT trait: " + e.getMessage(), e);
-        }
+        //the ENVIRONMENT trait should be in the central IBDB
+        requireCentralDatabaseInstance();
+        return getTraitDao().getEnvironmentTrait();
     }
-    
+
     @Override
     public Trait getDesignTrait() throws MiddlewareQueryException {
-        try {
-            TraitDAO dao = new TraitDAO();
-            
-            //the DESIGN trait should be in the central IBDB
-            requireCentralDatabaseInstance();
-            
-            dao.setSession(getCurrentSessionForCentral());
-            return dao.getDesignTrait();
-        } catch (Exception e) {
-            throw new MiddlewareQueryException("Error in getting DESIGN trait: " + e.getMessage(), e);
-        }
-    }    
-    
+        //the DESIGN trait should be in the central IBDB
+        requireCentralDatabaseInstance();
+        return getTraitDao().getDesignTrait();
+    }
+
     @Override
     public Factor getFactorOfDatasetByTraitid(Integer representationId, Integer traitid) throws MiddlewareQueryException {
-        try {
-            FactorDAO dao = new FactorDAO();
-            //if the representation id is positive the dataset should be from central IBDB
-            //otherwise the dataset is from local IBDB
-            Session session = getSession(representationId);
-            
-            if(session != null){
-                dao.setSession(session);
-                return dao.getFactorOfDatasetGivenTraitid(representationId, traitid);
-            } else{
-                throw new MiddlewareQueryException("Error in getting factor of dataset by traitid: Cannot get Session to use.");
-            }
-        } catch (Exception e) {
-            throw new MiddlewareQueryException("Error in getting factor of dataset by traitid: " + e.getMessage(), e);
+        if (setWorkingDatabase(representationId)) {
+            return getFactorDao().getFactorOfDatasetGivenTraitid(representationId, traitid);
         }
+        return null;
     }
-    
+
     @Override
     public List<CharacterLevel> getCharacterLevelsByFactorAndDatasetId(Factor factor, Integer datasetId) throws MiddlewareQueryException {
-        try{
-            CharacterLevelDAO dao = new CharacterLevelDAO();
-            Session session = getSession(datasetId);
-            
-            if(session != null){
-                dao.setSession(session);
-                return dao.getByFactorAndDatasetID(factor, datasetId);
-            } else{
-                throw new MiddlewareQueryException("Error in getting character levels by factor and dataset id: Cannot get Session to use.");
-            }
-        } catch(Exception ex){
-            throw new MiddlewareQueryException("Error in getting character levels by factor and dataset id: " + ex.getMessage(), ex);
+        List<CharacterLevel> charLevelValues = new ArrayList<CharacterLevel>();
+        if (setWorkingDatabase(datasetId)) {
+            charLevelValues = getCharacterLevelDao().getByFactorAndDatasetID(factor, datasetId);
         }
+        return charLevelValues;
     }
-    
+
     @Override
     public List<NumericLevel> getNumericLevelsByFactorAndDatasetId(Factor factor, Integer datasetId) throws MiddlewareQueryException {
-        try{
-            NumericLevelDAO dao = new NumericLevelDAO();
-            Session session = getSession(datasetId);
-            
-            if(session != null){
-                dao.setSession(session);
-                return dao.getByFactorAndDatasetID(factor, datasetId);
-            } else{
-                throw new MiddlewareQueryException("Error in getting character levels by factor and dataset id: Cannot get Session to use.");
+        List<NumericLevel> numLevelValues = new ArrayList<NumericLevel>();
+        if (setWorkingDatabase(datasetId)) {
+            numLevelValues = getNumericLevelDao().getByFactorAndDatasetID(factor, datasetId);
+        }
+        return numLevelValues;
+    }
+
+    @Override
+    public boolean hasValuesByVariateAndDataset(int variateId, int datasetId) throws MiddlewareQueryException {
+        boolean hasValues = false;
+        if (setWorkingDatabase(datasetId)) {
+            RepresentationDAO dao = getRepresentationDao();
+            if (isVariateNumeric(variateId)) {
+                hasValues = dao.hasValuesByNumVariateAndDataset(variateId, datasetId);
+            } else if (!isVariateNumeric(variateId)) {
+                hasValues = dao.hasValuesByNumVariateAndDataset(variateId, datasetId);
+            } else {
+                logAndThrowException("Database Error: the variate selected has no datatype specified in the database.", LOG);
             }
-        } catch(Exception ex){
-            throw new MiddlewareQueryException("Error in getting character levels by factor and dataset id: " + ex.getMessage(), ex);
         }
-    }
-    
-    @Override
-    public boolean hasValuesByVariateAndDataset(int variateId, int datasetId) 
-        throws MiddlewareQueryException {
-        
-        boolean hasValues = false;
-        
-        RepresentationDAO representationDao = new RepresentationDAO();
-        Session session = getSession(datasetId);
-        
-        if (session != null) {
-            representationDao.setSession(session);
-        } else {
-            return false;
-        }
-        
-        if (isVariateNumeric(variateId)) {
-            hasValues = representationDao.hasValuesByNumVariateAndDataset(variateId, datasetId);
-        } else if (!isVariateNumeric(variateId)) {
-            hasValues = representationDao.hasValuesByNumVariateAndDataset(variateId, datasetId);
-        } else {
-            throw new MiddlewareQueryException("Database Error: the variate selected has no datatype specified in the database.");
-        }
-
         return hasValues;
-        
     }
 
     @Override
-    public boolean hasValuesByNumVariateAndDataset(int variateId,
-            int datasetId) throws MiddlewareQueryException {
-        
-        RepresentationDAO representationDao = new RepresentationDAO();
-        Session session = getSession(datasetId);
-
-        if (session != null) {
-            representationDao.setSession(session);
-        } else {
-            return false;
-        }
-
-        return representationDao.hasValuesByNumVariateAndDataset(variateId, datasetId);
-    }
-
-    @Override
-    public boolean hasValuesByCharVariateAndDataset(int variateId,
-            int datasetId) throws MiddlewareQueryException {
-
-        RepresentationDAO representationDao = new RepresentationDAO();
-        Session session = getSession(datasetId);
-
-        if (session != null) {
-            representationDao.setSession(session);
-        } else {
-            return false;
-        }
-
-        return representationDao.hasValuesByCharVariateAndDataset(variateId, datasetId);
-    }
-    
-    @Override
-    public boolean hasValuesByLabelAndLabelValueAndVariateAndDataset(
-        int labelId, String value, int variateId, int datasetId) 
-        throws MiddlewareQueryException {
-        
+    public boolean hasValuesByNumVariateAndDataset(int variateId, int datasetId) throws MiddlewareQueryException {
         boolean hasValues = false;
-        
-        RepresentationDAO representationDao = new RepresentationDAO();
-        Session session = getSession(datasetId);
-        
-        if (session != null) {
-            representationDao.setSession(session);
-        } else {
-            return false;
+        if (setWorkingDatabase(datasetId)) {
+            hasValues = getRepresentationDao().hasValuesByNumVariateAndDataset(variateId, datasetId);
         }
-        
-        if (isVariateNumeric(variateId) && isLabelNumeric(labelId)) {
-            hasValues = representationDao.hasValuesByNumLabelAndLabelValueAndNumVariateAndDataset(labelId, Double.parseDouble(value), variateId, datasetId);
-        } else if (isVariateNumeric(variateId) && !isLabelNumeric(labelId)) {
-            hasValues = representationDao.hasValuesByCharLabelAndLabelValueAndNumVariateAndDataset(labelId, value, variateId, datasetId);
-        } else if (!isVariateNumeric(variateId) && isLabelNumeric(labelId)) {
-            hasValues = representationDao.hasValuesByNumLabelAndLabelValueAndCharVariateAndDataset(labelId, Double.parseDouble(value), variateId, datasetId);
-        } else if (!isVariateNumeric(variateId) && !isLabelNumeric(labelId)) {
-            hasValues = representationDao.hasValuesByCharLabelAndLabelValueAndCharVariateAndDataset(labelId, value, variateId, datasetId);
-        } else {
-            throw new MiddlewareQueryException("Database Error: either the variate or label selected have no datatypes specified in the database.");
-        }
-
         return hasValues;
-        
     }
 
     @Override
-    public boolean hasValuesByNumLabelAndLabelValueAndNumVariateAndDataset(
-            int labelId, double value, int variateId, int datasetId)
-            throws MiddlewareQueryException {
-        
-        RepresentationDAO representationDao = new RepresentationDAO();
-        Session session = getSession(datasetId);
-
-        if (session != null) {
-            representationDao.setSession(session);
-        } else {
-            return false;
+    public boolean hasValuesByCharVariateAndDataset(int variateId, int datasetId) throws MiddlewareQueryException {
+        boolean hasValues = false;
+        if (setWorkingDatabase(datasetId)) {
+            hasValues = getRepresentationDao().hasValuesByCharVariateAndDataset(variateId, datasetId);
         }
-
-        return representationDao.hasValuesByNumLabelAndLabelValueAndNumVariateAndDataset(labelId, value, variateId, datasetId);
+        return hasValues;
     }
 
     @Override
-    public boolean hasValuesByCharLabelAndLabelValueAndNumVariateAndDataset(
-            int labelId, String value, int variateId, int datasetId)
+    public boolean hasValuesByLabelAndLabelValueAndVariateAndDataset(int labelId, String value, int variateId, int datasetId)
             throws MiddlewareQueryException {
-        
-        RepresentationDAO representationDao = new RepresentationDAO();
-        Session session = getSession(datasetId);
 
-        if (session != null) {
-            representationDao.setSession(session);
-        } else {
-            return false;
+        boolean hasValues = false;
+
+        if (setWorkingDatabase(datasetId)) {
+            RepresentationDAO dao = getRepresentationDao();
+            if (isVariateNumeric(variateId) && isLabelNumeric(labelId)) {
+                hasValues = dao.hasValuesByNumLabelAndLabelValueAndNumVariateAndDataset(labelId, Double.parseDouble(value), variateId,
+                        datasetId);
+            } else if (isVariateNumeric(variateId) && !isLabelNumeric(labelId)) {
+                hasValues = dao.hasValuesByCharLabelAndLabelValueAndNumVariateAndDataset(labelId, value, variateId, datasetId);
+            } else if (!isVariateNumeric(variateId) && isLabelNumeric(labelId)) {
+                hasValues = dao.hasValuesByNumLabelAndLabelValueAndCharVariateAndDataset(labelId, Double.parseDouble(value), variateId,
+                        datasetId);
+            } else if (!isVariateNumeric(variateId) && !isLabelNumeric(labelId)) {
+                hasValues = dao.hasValuesByCharLabelAndLabelValueAndCharVariateAndDataset(labelId, value, variateId, datasetId);
+            } else {
+                logAndThrowException(
+                        "Database Error: either the variate or label selected have no datatypes specified in the database.", LOG);
+            }
         }
-
-        return representationDao.hasValuesByCharLabelAndLabelValueAndNumVariateAndDataset(labelId, value, variateId, datasetId);
+        return hasValues;
     }
 
     @Override
-    public boolean hasValuesByNumLabelAndLabelValueAndCharVariateAndDataset(
-            int labelId, double value, int variateId, int datasetId)
+    public boolean hasValuesByNumLabelAndLabelValueAndNumVariateAndDataset(int labelId, double value, int variateId, int datasetId)
             throws MiddlewareQueryException {
-        
-        RepresentationDAO representationDao = new RepresentationDAO();
-        Session session = getSession(datasetId);
-
-        if (session != null) {
-            representationDao.setSession(session);
-        } else {
-            return false;
+        boolean hasValues = false;
+        if (setWorkingDatabase(datasetId)) {
+            hasValues = getRepresentationDao()
+                    .hasValuesByNumLabelAndLabelValueAndNumVariateAndDataset(labelId, value, variateId, datasetId);
         }
-
-        return representationDao.hasValuesByNumLabelAndLabelValueAndCharVariateAndDataset(labelId, value, variateId, datasetId);
+        return hasValues;
     }
 
     @Override
-    public boolean hasValuesByCharLabelAndLabelValueAndCharVariateAndDataset(
-            int labelId, String value, int variateId, int datasetId)
+    public boolean hasValuesByCharLabelAndLabelValueAndNumVariateAndDataset(int labelId, String value, int variateId, int datasetId)
             throws MiddlewareQueryException {
-        
-        RepresentationDAO representationDao = new RepresentationDAO();
-        Session session = getSession(datasetId);
-
-        if (session != null) {
-            representationDao.setSession(session);
-        } else {
-            return false;
+        boolean hasValues = false;
+        if (setWorkingDatabase(datasetId)) {
+            hasValues = getRepresentationDao().hasValuesByCharLabelAndLabelValueAndNumVariateAndDataset(labelId, value, variateId,
+                    datasetId);
         }
+        return hasValues;
+    }
 
-        return representationDao.hasValuesByCharLabelAndLabelValueAndCharVariateAndDataset(labelId, value, variateId, datasetId);
+    @Override
+    public boolean hasValuesByNumLabelAndLabelValueAndCharVariateAndDataset(int labelId, double value, int variateId, int datasetId)
+            throws MiddlewareQueryException {
+        boolean hasValues = false;
+        if (setWorkingDatabase(datasetId)) {
+            hasValues = getRepresentationDao().hasValuesByNumLabelAndLabelValueAndCharVariateAndDataset(labelId, value, variateId,
+                    datasetId);
+        }
+        return hasValues;
+    }
+
+    @Override
+    public boolean hasValuesByCharLabelAndLabelValueAndCharVariateAndDataset(int labelId, String value, int variateId, int datasetId)
+            throws MiddlewareQueryException {
+        boolean hasValues = false;
+        if (setWorkingDatabase(datasetId)) {
+            hasValues = getRepresentationDao().hasValuesByCharLabelAndLabelValueAndCharVariateAndDataset(labelId, value, variateId,
+                    datasetId);
+        }
+        return hasValues;
     }
 
     @Override
     public boolean isLabelNumeric(int labelId) throws MiddlewareQueryException {
-
-        FactorDAO factorDAO = new FactorDAO();
-        Session session = getSession(labelId);
-
-        if (session != null) {
-            factorDAO.setSession(session);
-        } else {
-            return false;
+        if (setWorkingDatabase(labelId)) {
+            return getFactorDao().isLabelNumeric(labelId);
         }
-
-        return factorDAO.isLabelNumeric(labelId);
+        return false;
     }
 
     @Override
-    public boolean isVariateNumeric(int variateId)
-            throws MiddlewareQueryException {
-
-        VariateDAO variateDAO = new VariateDAO();
-        Session session = getSession(variateId);
-
-        if (session != null) {
-            variateDAO.setSession(session);
-        } else {
-            return false;
+    public boolean isVariateNumeric(int variateId) throws MiddlewareQueryException {
+        if (setWorkingDatabase(variateId)) {
+            return getVariateDao().isVariateNumeric(variateId);
         }
-
-        return variateDAO.isVariateNumeric(variateId);
+        return false;
     }
 }

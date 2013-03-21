@@ -12,7 +12,6 @@
 
 package org.generationcp.middleware.manager.api;
 
-import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +30,6 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.pojos.gdms.ParentElement;
 
 /**
  * This is the API for retrieving Germplasm information.
@@ -390,8 +388,9 @@ public interface GermplasmDataManager {
      * @param gid
      *            - id of the germplasm record to be retrieved
      * @return the Germplasm POJO representing the record
+     * @throws MiddlewareQueryException 
      */
-    public Germplasm getGermplasmByGID(Integer gid);
+    public Germplasm getGermplasmByGID(Integer gid) throws MiddlewareQueryException;
 
     /**
      * Given a gid, return the Germplasm POJO representing the record identified
@@ -419,8 +418,9 @@ public interface GermplasmDataManager {
      * @param id
      *            - id of the name record
      * @return the Name POJO representing the record
+     * @throws MiddlewareQueryException 
      */
-    public Name getGermplasmNameByID(Integer id);
+    public Name getGermplasmNameByID(Integer id) throws MiddlewareQueryException;
 
     /**
      * Returns all the names of the Germplasm identified by the gid parameter.
@@ -565,8 +565,9 @@ public interface GermplasmDataManager {
      * @param id
      *            - id of the method record
      * @return the Method POJO representing the record
+     * @throws MiddlewareQueryException 
      */
-    public Method getMethodByID(Integer id);
+    public Method getMethodByID(Integer id) throws MiddlewareQueryException;
 
     /**
      * Returns all the method records.
@@ -687,8 +688,9 @@ public interface GermplasmDataManager {
      * @param id
      *            - the id of the udfld record
      * @return the Udflds POJO representing the record
+     * @throws MiddlewareQueryException 
      */
-    public UserDefinedField getUserDefinedFieldByID(Integer id);
+    public UserDefinedField getUserDefinedFieldByID(Integer id) throws MiddlewareQueryException;
     
     
     
@@ -709,8 +711,9 @@ public interface GermplasmDataManager {
      * @param id
      *            - id of the country record
      * @return the Country POJO representing the record
+     * @throws MiddlewareQueryException 
      */
-    public Country getCountryById(Integer id);
+    public Country getCountryById(Integer id) throws MiddlewareQueryException;
 
     /**
      * Returns the location record identified by the given id.
@@ -718,8 +721,9 @@ public interface GermplasmDataManager {
      * @param id
      *            - id of the location record
      * @return the Location POJO representing the record
+     * @throws MiddlewareQueryException 
      */
-    public Location getLocationByID(Integer id);
+    public Location getLocationByID(Integer id) throws MiddlewareQueryException;
 
     /**
      * Inserts a single {@code Location} object into the database.
@@ -796,8 +800,9 @@ public interface GermplasmDataManager {
      * @param id
      *            - id of the bibref record
      * @return the Bibref POJO representing the record
+     * @throws MiddlewareQueryException 
      */
-    public Bibref getBibliographicReferenceByID(Integer id);
+    public Bibref getBibliographicReferenceByID(Integer id) throws MiddlewareQueryException;
 
     /**
      * Inserts a single {@code Bibref} (Bibliographic Reference) object into the
@@ -1053,8 +1058,9 @@ public interface GermplasmDataManager {
      * 
      * @param id
      * @return
+     * @throws MiddlewareQueryException 
      */
-    public Attribute getAttributeById(Integer id);
+    public Attribute getAttributeById(Integer id) throws MiddlewareQueryException;
 
     /**
      * Given the gid of the child germplasm, the gid of the parent germplasm and

@@ -35,7 +35,7 @@ public interface GermplasmListManager{
      * @return GermplasmList POJO
      * @throws MiddlewareQueryException 
      */
-    public GermplasmList getGermplasmListById(Integer id);
+    public GermplasmList getGermplasmListById(Integer id) throws MiddlewareQueryException;
 
     /**
      * Returns all Germplasm list records.

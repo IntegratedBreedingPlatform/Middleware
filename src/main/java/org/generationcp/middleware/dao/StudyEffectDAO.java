@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -28,9 +29,9 @@ public class StudyEffectDAO extends GenericDAO<StudyEffect, Integer>{
             query.setParameter("studyId", studyId);
             return (List<StudyEffect>) query.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException(
-                    "Error with getByStudyID(studyId=" + studyId + ") query from StudyEffect: " + e.getMessage(), e);
+            logAndThrowException("Error with getByStudyID(studyId=" + studyId + ") query from StudyEffect: " + e.getMessage(), e);
         }
+        return new ArrayList<StudyEffect>();
     }
 
 }

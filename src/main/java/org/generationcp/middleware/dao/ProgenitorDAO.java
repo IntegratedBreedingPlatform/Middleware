@@ -32,13 +32,11 @@ public class ProgenitorDAO extends GenericDAO<Progenitor, ProgenitorPK>{
             List<Progenitor> progenitors = getByCriteria(criterions);
             if (!progenitors.isEmpty()) {
                 return progenitors.get(0);
-            } else {
-                return null;
             }
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByGIDAndPID(gid=" + gid + ", pid=" + pid + ") query from Progenitor: "
+            logAndThrowException("Error with getByGIDAndPID(gid=" + gid + ", pid=" + pid + ") query from Progenitor: "
                     + e.getMessage(), e);
         }
-
+        return null;
     }
 }

@@ -15,8 +15,16 @@ import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UserDataManagerImpl extends DataManager implements UserDataManager{
+
+    private static final Logger LOG = LoggerFactory.getLogger(UserDataManagerImpl.class);
+
+    private InstallationDAO installationDao;
+    private PersonDAO personDao;
+    private UserDAO userDao;
 
     public UserDataManagerImpl() {
         super();
@@ -30,66 +38,50 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
         super(sessionForLocal, sessionForCentral);
     }
 
+    private InstallationDAO getInstallationDao() {
+        if (installationDao == null) {
+            installationDao = new InstallationDAO();
+        }
+        installationDao.setSession(getActiveSession());
+        return installationDao;
+    }
+
+    private PersonDAO getPersonDao() {
+        if (personDao == null) {
+            personDao = new PersonDAO();
+        }
+        personDao.setSession(getActiveSession());
+        return personDao;
+    }
+
+    private UserDAO getUserDao() {
+        if (userDao == null) {
+            userDao = new UserDAO();
+        }
+        userDao.setSession(getActiveSession());
+        return userDao;
+    }
+
+    @SuppressWarnings("unchecked")
     @Override
     public List<User> getAllUsers() throws MiddlewareQueryException {
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-
-        UserDAO dao = new UserDAO();
-
-        List<User> users = new ArrayList<User>();
-
-        // get the list of Users from the local instance
-        if (sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
-            users.addAll(dao.getAll());
-        }
-
-        // get the list of Users from the central instance
-        if (sessionForCentral != null) {
-            dao.setSession(sessionForCentral);
-            users.addAll(dao.getAll());
-        }
-
-        return users;
+        return (List<User>) getAllFromCentralAndLocal(getUserDao());
     }
 
     public long countAllUsers() throws MiddlewareQueryException {
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-
-        long count = 0;
-
-        UserDAO dao = new UserDAO();
-
-        if (sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
-            count = count + dao.countAll();
-        }
-
-        // get the list of Users from the central instance
-        if (sessionForCentral != null) {
-            dao.setSession(sessionForCentral);
-            count = count + dao.countAll();
-        }
-
-        return count;
+        return countAllFromCentralAndLocal(getUserDao());
     }
 
     @Override
     public Integer addUser(User user) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
-
-        Session session = getCurrentSessionForLocal();
+        Session session = getActiveSession();
         Transaction trans = null;
 
-        Integer idUserSaved;
+        Integer idUserSaved = null;
         try {
-            // begin save transaction
             trans = session.beginTransaction();
-
-            UserDAO dao = new UserDAO();
-            dao.setSession(session);
+            UserDAO dao = getUserDao();
 
             Integer userId = dao.getNegativeId("userid");
             user.setUserid(userId);
@@ -99,152 +91,84 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
 
             trans.commit();
         } catch (Exception e) {
-            // rollback transaction in case of errors
-            if (trans != null) {
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException("Error encountered while saving User: UserDataManager.addUser(user=" + user + "): "
-                    + e.getMessage(), e);
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while saving User: UserDataManager.addUser(user=" + user + "): " + e.getMessage(), e,
+                    LOG);
         } finally {
             session.flush();
         }
-        
+
         return idUserSaved;
     }
 
     @Override
     public Integer updateUser(User user) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
-
-        Session session = getCurrentSessionForLocal();
+        Session session = getActiveSession();
         Transaction trans = null;
 
         try {
-            // begin save transaction
             trans = session.beginTransaction();
-            UserDAO dao = new UserDAO();
-            dao.setSession(session);
-            dao.saveOrUpdate(user);
+            getUserDao().saveOrUpdate(user);
             trans.commit();
         } catch (Exception e) {
-            // rollback transaction in case of errors
-            if (trans != null) {
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException("Error encountered while saving User: UserDataManager.addUser(user=" + user + "): "
-                    + e.getMessage(), e);
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while saving User: UserDataManager.addUser(user=" + user + "): " + e.getMessage(), e,
+                    LOG);
         } finally {
             session.flush();
         }
-        
+
         return user.getUserid();
     }
 
     @Override
     public User getUserById(int id) throws MiddlewareQueryException {
-        UserDAO dao = new UserDAO();
-        Session session = getSession(id);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return null;
+        if (setWorkingDatabase(id)) {
+            return getUserDao().getById(id, false);
         }
-
-        return dao.getById(id, false);
+        return null;
     }
 
     @Override
     public void deleteUser(User user) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
-
-        Session session = getCurrentSessionForLocal();
+        Session session = getActiveSession();
         Transaction trans = null;
 
         try {
-            // begin save transaction
             trans = session.beginTransaction();
-
-            UserDAO dao = new UserDAO();
-            dao.setSession(session);
-
-            dao.makeTransient(user);
-
+            getUserDao().makeTransient(user);
             trans.commit();
         } catch (Exception e) {
-            // rollback transaction in case of errors
-            if (trans != null) {
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException("Error encountered while deleting User: UserDataManager.deleteUser(user=" + user + "): "
-                    + e.getMessage(), e);
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while deleting User: UserDataManager.deleteUser(user=" + user + "): " + e.getMessage(),
+                    e, LOG);
         } finally {
             session.flush();
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<Person> getAllPersons() throws MiddlewareQueryException {
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-
-        PersonDAO dao = new PersonDAO();
-
-        List<Person> persons = new ArrayList<Person>();
-
-        // get the list of Persons from the local instance
-        if (sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
-            persons.addAll(dao.getAll());
-        }
-
-        // get the list of Persons from the central instance
-        if (sessionForCentral != null) {
-            dao.setSession(sessionForCentral);
-            persons.addAll(dao.getAll());
-        }
-
-        return persons;
+        return (List<Person>) getAllFromCentralAndLocal(getPersonDao());
     }
 
     public long countAllPersons() throws MiddlewareQueryException {
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-
-        long count = 0;
-
-        PersonDAO dao = new PersonDAO();
-
-        if (sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
-            count = count + dao.countAll();
-        }
-
-        // get the list of Users from the central instance
-        if (sessionForCentral != null) {
-            dao.setSession(sessionForCentral);
-            count = count + dao.countAll();
-        }
-
-        return count;
+        return countAllFromCentralAndLocal(getPersonDao());
     }
 
     @Override
     public Integer addPerson(Person person) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
-
-        Session sessionForLocal = getCurrentSessionForLocal();
-
-        Session session = sessionForLocal;
+        Session session = getActiveSession();
         Transaction trans = null;
 
-        Integer idPersonSaved;
+        Integer idPersonSaved = null;
         try {
-            // begin save transaction
             trans = session.beginTransaction();
-
-            PersonDAO dao = new PersonDAO();
-            dao.setSession(session);
+            PersonDAO dao = getPersonDao();
 
             Integer personId = dao.getNegativeId("id");
             person.setId(personId);
@@ -254,196 +178,115 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
 
             trans.commit();
         } catch (Exception e) {
-            // rollback transaction in case of errors
-            if (trans != null) {
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException("Error encountered while saving Person: UserDataManager.addPerson(person=" + person + "): "
-                    + e.getMessage(), e);
+            rollbackTransaction(trans);
+            logAndThrowException(
+                    "Error encountered while saving Person: UserDataManager.addPerson(person=" + person + "): " + e.getMessage(), e, LOG);
         } finally {
-            sessionForLocal.flush();
+            session.flush();
         }
         return idPersonSaved;
     }
 
     @Override
     public Person getPersonById(int id) throws MiddlewareQueryException {
-        PersonDAO dao = new PersonDAO();
-        Session session = getSession(id);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return null;
+        if (setWorkingDatabase(id)) {
+            return getPersonDao().getById(id, false);
         }
-
-        return dao.getById(id, false);
+        return null;
     }
 
     @Override
     public void deletePerson(Person person) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
-
-        Session session = getCurrentSessionForLocal();
+        Session session = getActiveSession();
         Transaction trans = null;
 
         try {
-            // begin save transaction
             trans = session.beginTransaction();
-
-            PersonDAO dao = new PersonDAO();
-            dao.setSession(session);
-
-            dao.makeTransient(person);
-
+            getPersonDao().makeTransient(person);
             trans.commit();
         } catch (Exception e) {
-            // rollback transaction in case of errors
-            if (trans != null) {
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException("Error encountered while deleting Person: UserDataManager.deletePerson(person=" + person
-                    + "): " + e.getMessage(), e);
+            rollbackTransaction(trans);
+            logAndThrowException(
+                    "Error encountered while deleting Person: UserDataManager.deletePerson(person=" + person + "): " + e.getMessage(), e,
+                    LOG);
         } finally {
             session.flush();
         }
     }
 
-    private List<Session> getSessions() {
-        List<Session> sessions = new ArrayList<Session>();
-
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-
-        if (sessionForLocal != null) {
-            sessions.add(sessionForLocal);
-        }
-
-        if (sessionForCentral != null) {
-            sessions.add(sessionForCentral);
-        }
-
-        if (sessions.isEmpty()) {
-            return null;
-        } else {
-            return sessions;
-        }
-
-    }
-
     @Override
     public boolean isValidUserLogin(String username, String password) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
+        if ((getUserDao().getByUsernameAndPassword(username, password)) != null) {
+            return true;
+        }
 
-        for (Session session : getSessions()) {
-            UserDAO dao = new UserDAO();
-            dao.setSession(session);
-            User user = dao.getByUsernameAndPassword(username, password);
-            if (user != null) {
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            if ((getUserDao().getByUsernameAndPassword(username, password)) != null) {
                 return true;
             }
         }
-
         return false;
     }
 
     @Override
     public boolean isPersonExists(String firstName, String lastName) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
-
-        PersonDAO dao = new PersonDAO();
-        for (Session session : getSessions()) {
-            dao.setSession(session);
-            if (dao.isPersonExists(firstName, lastName)) {
+        if (getPersonDao().isPersonExists(firstName, lastName)) {
+            return true;
+        }
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            if (getPersonDao().isPersonExists(firstName, lastName)) {
                 return true;
             }
-            dao.clear();
         }
-
         return false;
     }
 
     @Override
     public boolean isUsernameExists(String userName) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
-
-        UserDAO dao = new UserDAO();
-        for (Session session : getSessions()) {
-            dao.setSession(session);
-            if (dao.isUsernameExists(userName)) {
+        if (getUserDao().isUsernameExists(userName)) {
+            return true;
+        }
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            if (getUserDao().isUsernameExists(userName)) {
                 return true;
             }
-            dao.clear();
         }
-
         return false;
     }
 
     @Override
     public List<Installation> getAllInstallationRecords(int start, int numOfRows, Database instance) throws MiddlewareQueryException {
-        try {
-            InstallationDAO dao = new InstallationDAO();
-            Session session = getSession(instance);
-            dao.setSession(session);
-
-            return dao.getAll(start, numOfRows);
-        } catch (Exception e) {
-            throw new MiddlewareQueryException(
-                    "Error with getting all installation records: UserDataManager.getAllInstallationRecords(database=" + instance + "): "
-                            + e.getMessage(), e);
+        if (setWorkingDatabase(instance)) {
+            return getInstallationDao().getAll(start, numOfRows);
         }
+        return new ArrayList<Installation>();
     }
 
     @Override
     public Installation getInstallationRecordById(Long id) throws MiddlewareQueryException {
-        try {
-            InstallationDAO dao = new InstallationDAO();
-
-            if (id < 0) {
-                dao.setSession(getCurrentSessionForLocal());
-            } else if (id > 0) {
-                dao.setSession(getCurrentSessionForCentral());
-            }
-
-            return dao.getById(id, false);
-        } catch (Exception e) {
-            throw new MiddlewareQueryException(
-                    "Error with getting installation record by id: UserDataManager.getInstallationRecordById(id=" + id + "): "
-                            + e.getMessage(), e);
+        if (setWorkingDatabase(id.intValue())) {
+            return getInstallationDao().getById(id, false);
         }
+        return null;
     }
 
     @Override
     public List<Installation> getInstallationRecordsByAdminId(Long id) throws MiddlewareQueryException {
-        try {
-            InstallationDAO dao = new InstallationDAO();
-
-            if (id < 0) {
-                dao.setSession(getCurrentSessionForLocal());
-            } else if (id > 0) {
-                dao.setSession(getCurrentSessionForCentral());
-            }
-
-            return dao.getByAdminId(id);
-        } catch (Exception e) {
-            throw new MiddlewareQueryException(
-                    "Error with getting installation record by admin id: UserDataManager.getInstallationRecordsByAdminId(id=" + id + "): "
-                            + e.getMessage(), e);
+        if (setWorkingDatabase(id.intValue())) {
+            return getInstallationDao().getByAdminId(id);
         }
+        return null;
     }
 
     @Override
     public Installation getLatestInstallationRecord(Database instance) throws MiddlewareQueryException {
-        try {
-            InstallationDAO dao = new InstallationDAO();
-            Session session = getSession(instance);
-            dao.setSession(session);
-
-            return dao.getLatest(instance);
-        } catch (Exception e) {
-            throw new MiddlewareQueryException(
-                    "Error with getting latest installation record: UserDataManager.getLatestInstallationRecord(database=" + instance
-                            + "): " + e.getMessage(), e);
+        if (setWorkingDatabase(instance)) {
+            return getInstallationDao().getLatest(instance);
         }
+        return null;
     }
 }

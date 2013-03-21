@@ -37,9 +37,10 @@ public class OindexDAO extends GenericDAO<OindexDAO, Integer>{
 
             return ounitIdCount;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countOunitIDsByRepresentationId(representationId=" + representationId
+            logAndThrowException("Error with countOunitIDsByRepresentationId(representationId=" + representationId
                     + ") query from Oindex: " + e.getMessage(), e);
         }
+        return 0;
     }
 
     @SuppressWarnings("unchecked")
@@ -56,9 +57,10 @@ public class OindexDAO extends GenericDAO<OindexDAO, Integer>{
 
             return ounitIDs;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getOunitIDsByRepresentationId(representationId=" + representationId
+            logAndThrowException("Error with getOunitIDsByRepresentationId(representationId=" + representationId
                     + ")query from Oindex: " + e.getMessage(), e);
         }
+        return new ArrayList<Integer>();
     }
 
     /**
@@ -71,9 +73,8 @@ public class OindexDAO extends GenericDAO<OindexDAO, Integer>{
      */
     @SuppressWarnings("unchecked")
     public List<Object[]> getFactorIdAndLevelNoOfConditionsByRepresentationId(Integer representationId) throws MiddlewareQueryException {
+        List<Object[]> toreturn = new ArrayList<Object[]>();
         try {
-            List<Object[]> toreturn = new ArrayList<Object[]>();
-
             //first get the number of rows in the dataset
             long numOfRows = countOunitIDsByRepresentationId(representationId);
 
@@ -82,10 +83,10 @@ public class OindexDAO extends GenericDAO<OindexDAO, Integer>{
             query.setParameter("count", Long.valueOf(numOfRows));
 
             toreturn = query.list();
-            return toreturn;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getFactorIdAndLevelNoOfConditionsByRepresentationId(representationId="
+            logAndThrowException("Error with getFactorIdAndLevelNoOfConditionsByRepresentationId(representationId="
                     + representationId + ") query from Oindex: " + e.getMessage(), e);
         }
+        return toreturn;        
     }
 }

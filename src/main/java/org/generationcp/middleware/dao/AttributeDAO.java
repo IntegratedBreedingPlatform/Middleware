@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -28,8 +29,9 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer>{
             query.setParameter("gid", gid);
             return (List<Attribute>) query.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByGID(gid=" + gid + ") query from Attributes: " + e.getMessage(), e);
+            logAndThrowException("Error with getByGID(gid=" + gid + ") query from Attributes: " + e.getMessage(), e);
         }
+        return new ArrayList<Attribute>();
     }
 
     public void validateId(Attribute attribute) throws MiddlewareQueryException {

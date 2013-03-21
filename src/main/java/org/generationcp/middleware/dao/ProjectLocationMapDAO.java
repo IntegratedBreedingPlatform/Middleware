@@ -58,9 +58,10 @@ public class ProjectLocationMapDAO extends GenericDAO<ProjectLocationMap, Long>{
             criteria.setMaxResults(numOfRows);
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getLocationIdsByProjectId(projectId=" + projectId
+            logAndThrowException("Error with getLocationIdsByProjectId(projectId=" + projectId
                     + ") query from ProjectLocationMap: " + e.getMessage(), e);
         }
+        return new ArrayList<Long>();
     }
 
     /**
@@ -80,9 +81,10 @@ public class ProjectLocationMapDAO extends GenericDAO<ProjectLocationMap, Long>{
 
             return ((Long) criteria.uniqueResult()).longValue();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countLocationIdsByProjectId(projectId=" + projectId
+            logAndThrowException("Error with countLocationIdsByProjectId(projectId=" + projectId
                     + ") query from ProjectLocationMap: " + e.getMessage(), e);
         }
+        return 0;
     }
 
     @SuppressWarnings("unchecked")
@@ -101,8 +103,9 @@ public class ProjectLocationMapDAO extends GenericDAO<ProjectLocationMap, Long>{
             criteria.setMaxResults(numOfRows);
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getProjectLocationMapByProjectId(projectId=" + projectId
+            logAndThrowException("Error with getProjectLocationMapByProjectId(projectId=" + projectId
                     + ") query from ProjectLocationMap: " + e.getMessage(), e);
         }
+        return new ArrayList<ProjectLocationMap>();
     }
 }

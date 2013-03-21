@@ -39,10 +39,10 @@ public class CropTypeDAO extends GenericDAO<CropType, Long>{
             criteria.add(Restrictions.eq("cropName", cropName));
             return (CropType) criteria.uniqueResult();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByName(cropName=" + cropName + ") query from CropType: "
+            logAndThrowException("Error with getByName(cropName=" + cropName + ") query from CropType: "
                     + e.getMessage(), e);
         }
-
+        return null;
     }
 
 }

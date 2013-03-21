@@ -16,18 +16,16 @@ public class InstallationDAO extends GenericDAO<Installation, Long>{
 
     @SuppressWarnings("unchecked")
     public List<Installation> getByAdminId(Long id) throws MiddlewareQueryException {
+        List<Installation> toreturn = new ArrayList<Installation>();
         try {
-            List<Installation> toreturn = new ArrayList<Installation>();
-
             Criteria criteria = getSession().createCriteria(Installation.class);
             criteria.add(Restrictions.eq("adminId", id));
 
             toreturn.addAll(criteria.list());
-
-            return toreturn;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByAdminId(id="+id+") query from Installation: " + e.getMessage(), e);
+            logAndThrowException("Error with getByAdminId(id="+id+") query from Installation: " + e.getMessage(), e);
         }
+        return toreturn;
     }
 
     public Installation getLatest(Database instance) throws MiddlewareQueryException {
@@ -45,12 +43,11 @@ public class InstallationDAO extends GenericDAO<Installation, Long>{
 
             if (id != null) {
                 return getById(id, false);
-            } else {
-                return null;
             }
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getLatest(databaseInstance="+instance+") query from Installation: " + e.getMessage(), e);
+            logAndThrowException("Error with getLatest(databaseInstance="+instance+") query from Installation: " + e.getMessage(), e);
         }
+        return null;
     }
 
 }

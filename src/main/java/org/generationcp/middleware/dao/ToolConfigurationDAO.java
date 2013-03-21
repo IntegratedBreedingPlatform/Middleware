@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -46,9 +47,10 @@ public class ToolConfigurationDAO extends GenericDAO<ToolConfiguration, Long>{
             return criteria.list();
 
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getListOfToolConfigurationsByToolId(toolId=" + toolId + ") query from Tool: "
+            logAndThrowException("Error with getListOfToolConfigurationsByToolId(toolId=" + toolId + ") query from Tool: "
                     + e.getMessage(), e);
         }
+        return new ArrayList<ToolConfiguration>();
     }
 
     public ToolConfiguration getToolConfigurationByToolIdAndConfigKey(Long toolId, String configKey) throws MiddlewareQueryException {
@@ -64,9 +66,10 @@ public class ToolConfigurationDAO extends GenericDAO<ToolConfiguration, Long>{
             return (ToolConfiguration) criteria.uniqueResult();
 
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getToolConfigurationByToolIdAndConfigKey(toolId=" + toolId + ", configKey="
+            logAndThrowException("Error with getToolConfigurationByToolIdAndConfigKey(toolId=" + toolId + ", configKey="
                     + configKey + ") query from Tool: " + e.getMessage(), e);
         }
+        return null;
     }
 
 }

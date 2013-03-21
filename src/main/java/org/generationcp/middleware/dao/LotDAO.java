@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -33,8 +34,9 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
             criteria.setMaxResults(numOfRows);
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByEntityType(type=" + type + ") query from Lot: " + e.getMessage(), e);
+            logAndThrowException("Error with getByEntityType(type=" + type + ") query from Lot: " + e.getMessage(), e);
         }
+        return new ArrayList<Lot>();
     }
 
     public long countByEntityType(String type) throws MiddlewareQueryException {
@@ -44,8 +46,9 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
             criteria.add(Restrictions.eq("entityType", type));
             return ((Long) criteria.uniqueResult()).longValue(); //count
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countByEntityType(type=" + type + ") query from Lot: " + e.getMessage(), e);
+            logAndThrowException("Error with countByEntityType(type=" + type + ") query from Lot: " + e.getMessage(), e);
         }
+        return 0;
     }
 
     @SuppressWarnings("unchecked")
@@ -58,9 +61,10 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
             criteria.setMaxResults(numOfRows);
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByEntityTypeAndEntityId(type=" + type + ", entityId=" + entityId
+            logAndThrowException("Error with getByEntityTypeAndEntityId(type=" + type + ", entityId=" + entityId
                     + ") query from Lot: " + e.getMessage(), e);
         }
+        return new ArrayList<Lot>();
     }
 
     public long countByEntityTypeAndEntityId(String type, Integer entityId) throws MiddlewareQueryException {
@@ -71,9 +75,10 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
             criteria.add(Restrictions.eq("entityId", entityId));
             return ((Long) criteria.uniqueResult()).longValue(); //count
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countByEntityTypeAndEntityId(type=" + type + ", entityId=" + entityId
+            logAndThrowException("Error with countByEntityTypeAndEntityId(type=" + type + ", entityId=" + entityId
                     + ") query from Lot: " + e.getMessage(), e);
         }
+        return 0;
     }
 
     @SuppressWarnings("unchecked")
@@ -87,9 +92,10 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
             criteria.setMaxResults(numOfRows);
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByEntityTypeAndLocationId(type=" + type + ", locationId=" + locationId
+            logAndThrowException("Error with getByEntityTypeAndLocationId(type=" + type + ", locationId=" + locationId
                     + ") query from Lot: " + e.getMessage(), e);
         }
+        return new ArrayList<Lot>();
     }
 
     public long countByEntityTypeAndLocationId(String type, Integer locationId) throws MiddlewareQueryException {
@@ -100,9 +106,10 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
             criteria.add(Restrictions.eq("locationId", locationId));
             return ((Long) criteria.uniqueResult()).longValue(); // count
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countByEntityTypeAndLocationId(type=" + type + ", locationId=" + locationId
+            logAndThrowException("Error with countByEntityTypeAndLocationId(type=" + type + ", locationId=" + locationId
                     + ") query from Lot: " + e.getMessage(), e);
         }
+        return 0;
     }
 
     @SuppressWarnings("unchecked")
@@ -117,9 +124,10 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
             criteria.setMaxResults(numOfRows);
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByEntityTypeAndEntityIdAndLocationId(type=" + type + ", entityId=" + entityId
+            logAndThrowException("Error with getByEntityTypeAndEntityIdAndLocationId(type=" + type + ", entityId=" + entityId
                     + ", locationId=" + locationId + ") query from Lot: " + e.getMessage(), e);
         }
+        return new ArrayList<Lot>();
     }
 
     public long countByEntityTypeAndEntityIdAndLocationId(String type, Integer entityId, Integer locationId)
@@ -132,9 +140,10 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
             criteria.add(Restrictions.eq("locationId", locationId));
             return ((Long) criteria.uniqueResult()).longValue(); //count
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countByEntityTypeAndEntityIdAndLocationId(type=" + type + ", entityId="
+            logAndThrowException("Error with countByEntityTypeAndEntityIdAndLocationId(type=" + type + ", entityId="
                     + entityId + ", locationId=" + locationId + ") query from Lot: " + e.getMessage(), e);
         }
+        return 0;
     }
 
     public Long getActualLotBalance(Integer lotId) throws MiddlewareQueryException {
@@ -147,8 +156,9 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
             criteria.add(Restrictions.eq("status", 1));
             return (Long) criteria.uniqueResult();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getActualLotBalance(lotId=" + lotId + ") query from Lot: " + e.getMessage(), e);
+            logAndThrowException("Error with getActualLotBalance(lotId=" + lotId + ") query from Lot: " + e.getMessage(), e);
         }
+        return 0L;
     }
 
     public Long getAvailableLotBalance(Integer lotId) throws MiddlewareQueryException {
@@ -161,16 +171,17 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
             criteria.add(Restrictions.ne("status", 9));
             return (Long) criteria.uniqueResult();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getAvailableLotBalance(lotId=" + lotId + ") query from Lot: " + e.getMessage(),
+            logAndThrowException("Error with getAvailableLotBalance(lotId=" + lotId + ") query from Lot: " + e.getMessage(),
                     e);
         }
+        return 0L;
     }
 
     public void validateId(Lot lot) throws MiddlewareQueryException {
         // Check if not a local record (has negative ID)
         Integer id = lot.getId();
         if (id != null && id.intValue() > 0) {
-            throw new MiddlewareQueryException("Error with validateId(lot=" + lot + "): Cannot update a Central Database record. "
+            logAndThrowException("Error with validateId(lot=" + lot + "): Cannot update a Central Database record. "
                     + "Attribute object to update must be a Local Record (ID must be negative)");
         }
     }

@@ -28,8 +28,9 @@ public class ProjectDAO extends GenericDAO<Project, Long>{
             Criteria criteria = getSession().createCriteria(Project.class).add(Restrictions.eq("projectId", projectId)).setMaxResults(1);
             return (Project) criteria.uniqueResult();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getById(projectId=" + projectId + ") query from Project: " + e.getMessage(), e);
+            logAndThrowException("Error with getById(projectId=" + projectId + ") query from Project: " + e.getMessage(), e);
         }
+        return null;
     }
 
     public Project getByName(String projectName) throws MiddlewareQueryException {
@@ -37,8 +38,9 @@ public class ProjectDAO extends GenericDAO<Project, Long>{
             Criteria criteria = getSession().createCriteria(Project.class).add(Restrictions.eq("projectName", projectName)).setMaxResults(1);
             return (Project) criteria.uniqueResult();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByName(projectName=" + projectName + ") query from Project: " + e.getMessage(), e);
+            logAndThrowException("Error with getByName(projectName=" + projectName + ") query from Project: " + e.getMessage(), e);
         }
+        return null;
     }
 
     public Project getLastOpenedProject(Integer userId) throws MiddlewareQueryException {
@@ -56,8 +58,9 @@ public class ProjectDAO extends GenericDAO<Project, Long>{
 
             return projectList.size() > 0 ? projectList.get(0) : null;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getLastOpenedProject(userId=" + userId + ") query from Project "
+            logAndThrowException("Error with getLastOpenedProject(userId=" + userId + ") query from Project "
                     + e.getMessage(), e);
         }
+        return null;
     }
 }

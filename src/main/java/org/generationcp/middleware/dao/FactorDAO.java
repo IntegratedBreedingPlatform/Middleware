@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.dao;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -53,11 +54,11 @@ public class FactorDAO extends GenericDAO<Factor, Integer>{
                 results.add(Integer.parseInt(gid));
             }
 
-            return results;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException(
+            logAndThrowException(
                     "Error with getGIDSByObservationUnitIds(ounitIds=" + ounitIds + ") query from Factor: " + e.getMessage(), e);
         }
+        return results;
     }
 
     @SuppressWarnings("unchecked")
@@ -69,9 +70,10 @@ public class FactorDAO extends GenericDAO<Factor, Integer>{
             List<Factor> results = query.list();
             return results;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByStudyID(studyId=" + studyId + ") query from Factor: "
+            logAndThrowException("Error with getByStudyID(studyId=" + studyId + ") query from Factor: "
                     + e.getMessage(), e);
         }
+        return new ArrayList<Factor>();
     }
 
     @SuppressWarnings("unchecked")
@@ -84,9 +86,10 @@ public class FactorDAO extends GenericDAO<Factor, Integer>{
             List<Factor> results = query.list();
             return results;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByRepresentationID(representationId=" + representationId
+            logAndThrowException("Error with getByRepresentationID(representationId=" + representationId
                     + ") query from Factor: " + e.getMessage(), e);
         }
+        return new ArrayList<Factor>();
     }
 
     @SuppressWarnings("unchecked")
@@ -101,12 +104,11 @@ public class FactorDAO extends GenericDAO<Factor, Integer>{
                 Factor factor = results.get(0);
                 return factor.getName();
             }
-
-            return null;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getMainLabel(factorId=" + factorid + ") query from Factor: "
+            logAndThrowException("Error with getMainLabel(factorId=" + factorid + ") query from Factor: "
                     + e.getMessage(), e);
         }
+        return null;
     }
     
     @SuppressWarnings("unchecked")
@@ -122,12 +124,11 @@ public class FactorDAO extends GenericDAO<Factor, Integer>{
                 Factor factor = results.get(0);
                 return factor;
             }
-            
-            return null;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getFactorOfDatasetGivenTid(representationId=" + representationId
+            logAndThrowException("Error with getFactorOfDatasetGivenTid(representationId=" + representationId
                     + ", traitid = " + traitid + ") query from Factor: " + e.getMessage(), e);
         }
+        return null;
     }
     
     public boolean isLabelNumeric(int labelId) throws MiddlewareQueryException {
@@ -149,8 +150,9 @@ public class FactorDAO extends GenericDAO<Factor, Integer>{
             else
                 throw new HibernateException("Database Error: No Datatype assigned on the label id: " + labelId);
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with isLabelNumeric: " + e.getMessage(),
+            logAndThrowException("Error with isLabelNumeric: " + e.getMessage(),
                     e);
         }
+        return false;
     }
 }

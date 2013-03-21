@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -30,7 +31,8 @@ public class ScaleDiscreteDAO extends GenericDAO<ScaleDiscrete, ScaleDiscretePK>
             crit.add(Restrictions.eq("id.scaleId", id));
             return crit.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error in getByScaleId(id=" + id + ") query from ScaleDiscrete: " + e.getMessage(), e);
+            logAndThrowException("Error in getByScaleId(id=" + id + ") query from ScaleDiscrete: " + e.getMessage(), e);
         }
+        return new ArrayList<ScaleDiscrete>();
     }
 }

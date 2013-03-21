@@ -17,13 +17,19 @@ import java.lang.reflect.ParameterizedType;
 import java.util.List;
 import java.util.Map;
 
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
 import org.hibernate.LockOptions;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class GenericDAO<T, ID extends Serializable> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(GenericDAO.class);
 
     private Class<T> persistentClass;
     private Session session;
@@ -44,104 +50,160 @@ public abstract class GenericDAO<T, ID extends Serializable> {
     public Class<T> getPersistentClass() {
         return this.persistentClass;
     }
+    
+    protected void logAndThrowException(String message, Throwable e) throws MiddlewareQueryException{
+        LOG.error(message);
+        throw new MiddlewareQueryException(message, e);
+    }
 
-    @SuppressWarnings("unchecked")
-    public T getById(ID id, boolean lock) {
-        T entity;
-
-        if (lock) {
-            entity = (T) getSession().get(getPersistentClass(), id, LockOptions.UPGRADE);
-        } else {
-            entity = (T) getSession().get(getPersistentClass(), id);
-        }
-
-        return entity;
+    protected void logAndThrowException(String message) throws MiddlewareQueryException{
+        LOG.error(message);
+        throw new MiddlewareQueryException(message);
     }
 
     @SuppressWarnings("unchecked")
-    protected List<T> getByCriteria(List<Criterion> criterion) {
-        Criteria crit = getSession().createCriteria(getPersistentClass());
-        for (Criterion c : criterion) {
-            crit.add(c);
-        }
-
-        return crit.list();
-    }
-
-    protected Criteria getByCriteriaWithAliases(List<Criterion> criterion, Map<String, String> aliases) {
-        Criteria crit = getSession().createCriteria(getPersistentClass());
-
-        for (String field : aliases.keySet()) {
-            String alias = aliases.get(field);
-            crit.createAlias(field, alias);
-        }
-
-        for (Criterion c : criterion) {
-            crit.add(c);
-        }
-
-        return crit;
-    }
-    
-    @SuppressWarnings("unchecked")
-    public List<T> getAll() {
-        Criteria criteria = getSession().createCriteria(getPersistentClass());
-        return criteria.list();
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<T> getAll(int start, int numOfRows) {
-        Criteria criteria = getSession().createCriteria(getPersistentClass());
-        criteria.setFirstResult(start);
-        criteria.setMaxResults(numOfRows);
-        return criteria.list();
-    }
-
-    public long countAll() {
-        Criteria criteria = getSession().createCriteria(getPersistentClass());
-        criteria.setProjection(Projections.rowCount());
-        return ((Long) criteria.uniqueResult()).longValue();
-    }
-    
-    public T save(T entity) {
-        getSession().save(entity);
-        return entity;
-    }
-    
-    public T update(T entity) {
-        getSession().update(entity);
-        return entity;
-    }
-
-    public T saveOrUpdate(T entity) {
-        getSession().saveOrUpdate(entity);
-        return entity;
-    }
-    
-    public T merge(T entity) {
-        getSession().merge(entity);
-        return entity;
-    }
-
-    public void makeTransient(T entity) {
-        getSession().delete(entity);
-    }
-
-    public Integer getNegativeId(String idName) {
-        Criteria crit = getSession().createCriteria(getPersistentClass());
-        crit.setProjection(Projections.min(idName));
-        Integer minId = (Integer) crit.uniqueResult();
-        if (minId != null) {
-            if (minId.intValue() >= 0) {
-                minId = Integer.valueOf(-1);
+    public T getById(ID id, boolean lock) throws MiddlewareQueryException {
+        try {
+            T entity;
+            if (lock) {
+                entity = (T) getSession().get(getPersistentClass(), id, LockOptions.UPGRADE);
             } else {
-                minId = Integer.valueOf(minId.intValue() - 1);
+                entity = (T) getSession().get(getPersistentClass(), id);
             }
-        } else {
-            minId = Integer.valueOf(-1);
+            return entity;
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error in getById(id=" + id + "): " + e.getMessage(), e);
         }
+    }
 
-        return minId;
+    @SuppressWarnings("unchecked")
+    protected List<T> getByCriteria(List<Criterion> criterion) throws MiddlewareQueryException {
+        try {
+            Criteria crit = getSession().createCriteria(getPersistentClass());
+            for (Criterion c : criterion) {
+                crit.add(c);
+            }
+
+            return crit.list();
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error in getByCriteria(" + criterion + "): " + e.getMessage(), e);
+        }
+    }
+
+    protected Criteria getByCriteriaWithAliases(List<Criterion> criterion, Map<String, String> aliases) throws MiddlewareQueryException {
+        try {
+            Criteria crit = getSession().createCriteria(getPersistentClass());
+
+            for (String field : aliases.keySet()) {
+                String alias = aliases.get(field);
+                crit.createAlias(field, alias);
+            }
+
+            for (Criterion c : criterion) {
+                crit.add(c);
+            }
+
+            return crit;
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error in getByCriteriaWithAliases(criterion=" + criterion + ", aliases=" + aliases + "): " + e.getMessage(), e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<T> getAll() throws MiddlewareQueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(getPersistentClass());
+            return criteria.list();
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error in getAll(): " + e.getMessage(), e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<T> getAll(int start, int numOfRows) throws MiddlewareQueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(getPersistentClass());
+            criteria.setFirstResult(start);
+            criteria.setMaxResults(numOfRows);
+            return criteria.list();
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error in getAll(start=" + start + ", numOfRows=" + numOfRows + "): " + e.getMessage(), e);
+        }
+    }
+
+    public long countAll() throws MiddlewareQueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(getPersistentClass());
+            criteria.setProjection(Projections.rowCount());
+            return ((Long) criteria.uniqueResult()).longValue();
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error in countAll(): " + e.getMessage(), e);
+        }
+    }
+
+    public T save(T entity) throws MiddlewareQueryException {
+        try {
+            getSession().save(entity);
+            return entity;
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error in save(" + entity + "): " + e.getMessage(), e);
+        }
+    }
+
+    public T update(T entity) throws MiddlewareQueryException {
+        try {
+            getSession().update(entity);
+            return entity;
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error in update(entity): " + e.getMessage(), e);
+        }
+    }
+
+    public T saveOrUpdate(T entity) throws MiddlewareQueryException {
+        try {
+            getSession().saveOrUpdate(entity);
+            return entity;
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error in saveOrUpdate(entity): " + e.getMessage(), e);
+        }
+    }
+
+    public T merge(T entity) throws MiddlewareQueryException {
+        try {
+            getSession().merge(entity);
+            return entity;
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error in merge(entity): " + e.getMessage(), e);
+        }
+    }
+
+    public void makeTransient(T entity) throws MiddlewareQueryException {
+        try {
+            getSession().delete(entity);
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error in makeTransient(" + entity + "): " + e.getMessage(), e);
+        }
+    }
+
+    public Integer getNegativeId(String idName) throws MiddlewareQueryException {
+        try {
+            Criteria crit = getSession().createCriteria(getPersistentClass());
+            crit.setProjection(Projections.min(idName));
+            Integer minId = (Integer) crit.uniqueResult();
+            if (minId != null) {
+                if (minId.intValue() >= 0) {
+                    minId = Integer.valueOf(-1);
+                } else {
+                    minId = Integer.valueOf(minId.intValue() - 1);
+                }
+            } else {
+                minId = Integer.valueOf(-1);
+            }
+
+            return minId;
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error in getNegativeId(idName=" + idName + "): " + e.getMessage(), e);
+        }
     }
 
     public void flush() {

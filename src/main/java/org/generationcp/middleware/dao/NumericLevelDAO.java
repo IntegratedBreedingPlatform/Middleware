@@ -52,24 +52,21 @@ public class NumericLevelDAO extends GenericDAO<NumericLevel, NumericLevelPK>{
                     Double value = (Double) result[3];
 
                     NumericLevelElement levelElement = new NumericLevelElement(ounitId, factorId, factorName, value);
-
                     levelValues.add(levelElement);
                 }
             }
-
-            return levelValues;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getValuesByOunitIDList(ounitIdList=" + ounitIdList
+            logAndThrowException("Error with getValuesByOunitIDList(ounitIdList=" + ounitIdList
                     + ") query from NumericLevel " + e.getMessage(), e);
         }
+        return levelValues;
     }
 
     @SuppressWarnings("rawtypes")
     public List<DatasetCondition> getConditionAndValueByFactorIdAndLevelNo(Integer factorId, Integer levelNo)
             throws MiddlewareQueryException {
+        List<DatasetCondition> toreturn = new ArrayList<DatasetCondition>();
         try {
-            List<DatasetCondition> toreturn = new ArrayList<DatasetCondition>();
-
             SQLQuery query = getSession().createSQLQuery(NumericLevel.GET_CONDITION_AND_VALUE);
             query.setParameter("factorid", factorId);
             query.setParameter("levelno", levelNo);
@@ -87,12 +84,11 @@ public class NumericLevelDAO extends GenericDAO<NumericLevel, NumericLevelPK>{
                 DatasetCondition condition = new DatasetCondition(factorId, name, value, traitid, scaleid, methodid, type);
                 toreturn.add(condition);
             }
-
-            return toreturn;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getConditionAndValueByFactorIdAndLevelNo(factorId=" + factorId + ", levelNo="
+            logAndThrowException("Error with getConditionAndValueByFactorIdAndLevelNo(factorId=" + factorId + ", levelNo="
                     + levelNo + ") query: " + e.getMessage(), e);
         }
+        return toreturn;
     }
 
     public long countStudyInformationByGID(Long gid) throws MiddlewareQueryException {
@@ -103,15 +99,16 @@ public class NumericLevelDAO extends GenericDAO<NumericLevel, NumericLevelPK>{
             BigInteger count = (BigInteger) query.uniqueResult();
             return count.longValue();
         } catch (Exception ex) {
-            throw new MiddlewareQueryException("Error with countStudyInformationByGID(gid=" + gid + ") query from NumericLevel "
+            logAndThrowException("Error with countStudyInformationByGID(gid=" + gid + ") query from NumericLevel "
                     + ex.getMessage(), ex);
         }
+        return 0;
     }
 
     @SuppressWarnings("rawtypes")
     public List<StudyInfo> getStudyInformationByGID(Long gid) throws MiddlewareQueryException {
+        List<StudyInfo> toreturn = new ArrayList<StudyInfo>();
         try {
-            List<StudyInfo> toreturn = new ArrayList<StudyInfo>();
             Query query = getSession().createSQLQuery(NumericLevel.GET_STUDIES_BY_GID);
             query.setParameter("gid", gid);
 
@@ -127,13 +124,11 @@ public class NumericLevelDAO extends GenericDAO<NumericLevel, NumericLevelPK>{
                 StudyInfo info = new StudyInfo(studyid, name.trim(), title.trim(), objective.trim(), rowCount.intValue());
                 toreturn.add(info);
             }
-
-            return toreturn;
-
         } catch (Exception ex) {
-            throw new MiddlewareQueryException("Error with getStudyInformationByGID(gid=" + gid + ") query from NumericLevel "
+            logAndThrowException("Error with getStudyInformationByGID(gid=" + gid + ") query from NumericLevel "
                     + ex.getMessage(), ex);
         }
+        return toreturn;
     }
     
     @SuppressWarnings("unchecked")
@@ -148,8 +143,9 @@ public class NumericLevelDAO extends GenericDAO<NumericLevel, NumericLevelPK>{
             
             return query.list();
         } catch(HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByFactorAndDatasetID(factor=" + factor + ", datasetId=" + datasetId 
+            logAndThrowException("Error with getByFactorAndDatasetID(factor=" + factor + ", datasetId=" + datasetId 
                     + ") query from NumericLevel: " + e.getMessage(), e);
         }
+        return new ArrayList<NumericLevel>();
     }
 }

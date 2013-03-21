@@ -13,12 +13,12 @@
 package org.generationcp.middleware.dao;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.Season;
-import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Study;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -38,8 +38,9 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
             query.setMaxResults(numOfRows);
             return (List<Study>) query.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByNameUsingEqual(name=" + name + ") query from Study: " + e.getMessage(), e);
+            logAndThrowException("Error with getByNameUsingEqual(name=" + name + ") query from Study: " + e.getMessage(), e);
         }
+        return new ArrayList<Study>();
     }
 
     @SuppressWarnings("unchecked")
@@ -51,9 +52,10 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
             query.setMaxResults(numOfRows);
             return (List<Study>) query.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getBySDateUsingEqual(sdate=" + sdate + ") query from Study: " + e.getMessage(),
+            logAndThrowException("Error with getBySDateUsingEqual(sdate=" + sdate + ") query from Study: " + e.getMessage(),
                     e);
         }
+        return new ArrayList<Study>();
     }
 
     @SuppressWarnings("unchecked")
@@ -65,9 +67,10 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
             query.setMaxResults(numOfRows);
             return (List<Study>) query.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByEDateUsingEqual(sdate=" + edate + ") query from Study: " + e.getMessage(),
+            logAndThrowException("Error with getByEDateUsingEqual(sdate=" + edate + ") query from Study: " + e.getMessage(),
                     e);
         }
+        return new ArrayList<Study>();
     }
 
     @SuppressWarnings("unchecked")
@@ -79,8 +82,9 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
             query.setMaxResults(numOfRows);
             return (List<Study>) query.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByNameUsingLike(name=" + name + ") query from Study: " + e.getMessage(), e);
+            logAndThrowException("Error with getByNameUsingLike(name=" + name + ") query from Study: " + e.getMessage(), e);
         }
+        return new ArrayList<Study>();
     }
 
     public long countByName(String name, Operation operation) throws MiddlewareQueryException {
@@ -95,10 +99,10 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
             return ((Long) query.uniqueResult()).longValue();
 
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countByName(name=" + name + ", operation=" + operation + ") query from Study: "
+            logAndThrowException("Error with countByName(name=" + name + ", operation=" + operation + ") query from Study: "
                     + e.getMessage(), e);
         }
-
+        return 0;
     }
 
     @SuppressWarnings("unchecked")
@@ -113,9 +117,10 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
             return query.list();
 
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByCountryUsingEqual(country=" + country + ") query from Study: "
+            logAndThrowException("Error with getByCountryUsingEqual(country=" + country + ") query from Study: "
                     + e.getMessage(), e);
         }
+        return new ArrayList<Study>();
     }
 
     @SuppressWarnings("unchecked")
@@ -129,9 +134,10 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
 
             return query.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByCountryUsingLike(country=" + country + ") query from Study: "
+            logAndThrowException("Error with getByCountryUsingLike(country=" + country + ") query from Study: "
                     + e.getMessage(), e);
         }
+        return new ArrayList<Study>();
     }
 
     public long countByCountry(String country, Operation operation) throws MiddlewareQueryException {
@@ -146,10 +152,10 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
             return ((BigInteger) query.uniqueResult()).longValue();
 
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countByCountry(country=" + country + ", operation=" + operation
+            logAndThrowException("Error with countByCountry(country=" + country + ", operation=" + operation
                     + ") query from Study: " + e.getMessage(), e);
         }
-
+        return 0;
     }
 
     @SuppressWarnings("unchecked")
@@ -169,8 +175,9 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
             return query.list();
             
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getBySeason(season=" + season + ") query from Study: " + e.getMessage(), e);
+            logAndThrowException("Error with getBySeason(season=" + season + ") query from Study: " + e.getMessage(), e);
         }
+        return new ArrayList<Study>();
     }
 
     public long countBySeason(Season season) throws MiddlewareQueryException {
@@ -186,9 +193,9 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
             return ((BigInteger) query.uniqueResult()).longValue();
 
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countBySeason(season=" + season + ") query from Study: " + e.getMessage(), e);
+            logAndThrowException("Error with countBySeason(season=" + season + ") query from Study: " + e.getMessage(), e);
         }
-
+        return 0;
     }
 
     public long countBySDate(Integer sdate, Operation operation) throws MiddlewareQueryException {
@@ -201,10 +208,10 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
             return ((Long) query.uniqueResult()).longValue();
 
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countBySDate(sdate=" + sdate + ", operation=" + operation
+            logAndThrowException("Error with countBySDate(sdate=" + sdate + ", operation=" + operation
                     + ") query from Study: " + e.getMessage(), e);
         }
-
+        return 0;
     }
 
     public long countByEDate(Integer edate, Operation operation) throws MiddlewareQueryException {
@@ -217,10 +224,10 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
             return ((Long) query.uniqueResult()).longValue();
 
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countByEDate(edate=" + edate + ", operation=" + operation
+            logAndThrowException("Error with countByEDate(edate=" + edate + ", operation=" + operation
                     + ") query from Study: " + e.getMessage(), e);
         }
-
+        return 0;
     }
 
     @SuppressWarnings("unchecked")
@@ -233,8 +240,9 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
             criteria.setMaxResults(numOfRows);
             return (List<Study>) criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getTopLevelStudies() query from Study: " + e.getMessage(), e);
+            logAndThrowException("Error with getTopLevelStudies() query from Study: " + e.getMessage(), e);
         }
+        return new ArrayList<Study>();
     }
 
     public long countAllTopLevelStudies() throws MiddlewareQueryException {
@@ -245,8 +253,9 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
             criteria.setProjection(Projections.countDistinct("id"));
             return ((Long) criteria.uniqueResult()).longValue();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countAllTopLevelStudies() query from Study: " + e.getMessage(), e);
+            logAndThrowException("Error with countAllTopLevelStudies() query from Study: " + e.getMessage(), e);
         }
+        return 0;
     }
 
     public long countAllStudyByParentFolderID(Integer parentFolderId) throws MiddlewareQueryException {
@@ -257,9 +266,10 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
             criteria.setProjection(Projections.countDistinct("id"));
             return ((Long) criteria.uniqueResult()).longValue();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countAllStudyByParentFolderID(parentFolderId=" + parentFolderId
+            logAndThrowException("Error with countAllStudyByParentFolderID(parentFolderId=" + parentFolderId
                     + ") query from Study: " + e.getMessage(), e);
         }
+        return 0;
     }
 
     @SuppressWarnings("unchecked")
@@ -272,9 +282,10 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
             criteria.setMaxResults(numOfRows);
             return (List<Study>) criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByParentFolderID(parentFolderId=" + parentFolderId + ") query from Study: "
+            logAndThrowException("Error with getByParentFolderID(parentFolderId=" + parentFolderId + ") query from Study: "
                     + e.getMessage(), e);
         }
+        return new ArrayList<Study>();
     }
 
 }

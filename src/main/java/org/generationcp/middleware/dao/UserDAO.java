@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -34,8 +35,9 @@ public class UserDAO extends GenericDAO<User, Integer>{
             
             return users.size() > 0 ? users.get(0) : null;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByUsernameAndPassword(username="+username+") query from User: " + e.getMessage(), e);
+            logAndThrowException("Error with getByUsernameAndPassword(username="+username+") query from User: " + e.getMessage(), e);
         }
+        return null;
     }
     
     public boolean isUsernameExists(String userName) throws MiddlewareQueryException {
@@ -49,8 +51,9 @@ public class UserDAO extends GenericDAO<User, Integer>{
         
         return !users.isEmpty();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with isUsernameExists(username="+userName+") query from User: " + e.getMessage(), e);
+            logAndThrowException("Error with isUsernameExists(username="+userName+") query from User: " + e.getMessage(), e);
         }
+        return false;
     }
 	
     @SuppressWarnings("unchecked")
@@ -63,8 +66,9 @@ public class UserDAO extends GenericDAO<User, Integer>{
 
             return (List<User>) query.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByNameUsingEqual(name="+name+") query from User: " + e.getMessage(), e);
+            logAndThrowException("Error with getByNameUsingEqual(name="+name+") query from User: " + e.getMessage(), e);
         }
+        return new ArrayList<User>();
     }
 
     @SuppressWarnings("unchecked")
@@ -77,8 +81,9 @@ public class UserDAO extends GenericDAO<User, Integer>{
 
             return (List<User>) query.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByNameUsingLike(name="+name+") query from User: " + e.getMessage(), e);
+            logAndThrowException("Error with getByNameUsingLike(name="+name+") query from User: " + e.getMessage(), e);
         }
+        return new ArrayList<User>();
     }
     
     @SuppressWarnings("unchecked")
@@ -87,9 +92,10 @@ public class UserDAO extends GenericDAO<User, Integer>{
             Query query = getSession().getNamedQuery(User.GET_ALL_USERS_SORTED);
             return query.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getAllUsersSorted() query from User: "
+            logAndThrowException("Error with getAllUsersSorted() query from User: "
                     + e.getMessage(), e);
         }
+        return new ArrayList<User>();
     }
     
 }

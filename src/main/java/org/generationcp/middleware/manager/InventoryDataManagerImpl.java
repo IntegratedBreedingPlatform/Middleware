@@ -31,6 +31,8 @@ import org.generationcp.middleware.pojos.report.TransactionReportRow;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Most of the functions in this class only use the connection to the local
@@ -41,6 +43,12 @@ import org.hibernate.Transaction;
  * 
  */
 public class InventoryDataManagerImpl extends DataManager implements InventoryDataManager{
+
+    private static final Logger LOG = LoggerFactory.getLogger(InventoryDataManagerImpl.class);
+
+    private LotDAO lotDao;
+    private PersonDAO personDao;
+    private TransactionDAO transactionDao;
 
     public InventoryDataManagerImpl() {
     }
@@ -53,78 +61,113 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
         super(sessionForLocal, sessionForCentral);
     }
 
+    private LotDAO getLotDao() {
+        if (lotDao == null) {
+            lotDao = new LotDAO();
+        }
+        lotDao.setSession(getActiveSession());
+        return lotDao;
+    }
+
+    private PersonDAO getPersonDao() {
+        if (personDao == null) {
+            personDao = new PersonDAO();
+        }
+        personDao.setSession(getActiveSession());
+        return personDao;
+    }
+
+    private TransactionDAO getTransactionDao() {
+        if (transactionDao == null) {
+            transactionDao = new TransactionDAO();
+        }
+        transactionDao.setSession(getActiveSession());
+        return transactionDao;
+    }
+
     @Override
     public List<Lot> getLotsByEntityType(String type, int start, int numOfRows) throws MiddlewareQueryException {
-        LotDAO dao = new LotDAO();
-        dao.setSession(getCurrentSessionForLocal());
-        return dao.getByEntityType(type, start, numOfRows);
+        List<Lot> toReturn = new ArrayList<Lot>();
+        if (setWorkingDatabase(Database.LOCAL)) {
+            toReturn = getLotDao().getByEntityType(type, start, numOfRows);
+        }
+        return toReturn;
     }
 
     @Override
     public long countLotsByEntityType(String type) throws MiddlewareQueryException {
-        LotDAO dao = new LotDAO();
-        dao.setSession(getCurrentSessionForLocal());
-        return dao.countByEntityType(type);
+        if (setWorkingDatabase(Database.LOCAL)) {
+            return getLotDao().countByEntityType(type);
+        }
+        return 0;
     }
 
     @Override
     public List<Lot> getLotsByEntityTypeAndEntityId(String type, Integer entityId, int start, int numOfRows)
             throws MiddlewareQueryException {
-        LotDAO dao = new LotDAO();
-        dao.setSession(getCurrentSessionForLocal());
-        return dao.getByEntityTypeAndEntityId(type, entityId, start, numOfRows);
+        if (setWorkingDatabase(Database.LOCAL)) {
+            return getLotDao().getByEntityTypeAndEntityId(type, entityId, start, numOfRows);
+        }
+        return new ArrayList<Lot>();
     }
 
     @Override
     public long countLotsByEntityTypeAndEntityId(String type, Integer entityId) throws MiddlewareQueryException {
-        LotDAO dao = new LotDAO();
-        dao.setSession(getCurrentSessionForLocal());
-        return dao.countByEntityTypeAndEntityId(type, entityId);
+        if (setWorkingDatabase(Database.LOCAL)) {
+            return getLotDao().countByEntityTypeAndEntityId(type, entityId);
+        }
+        return 0;
     }
 
     @Override
     public List<Lot> getLotsByEntityTypeAndLocationId(String type, Integer locationId, int start, int numOfRows)
             throws MiddlewareQueryException {
-        LotDAO dao = new LotDAO();
-        dao.setSession(getCurrentSessionForLocal());
-        return dao.getByEntityTypeAndLocationId(type, locationId, start, numOfRows);
+        if (setWorkingDatabase(Database.LOCAL)) {
+            return getLotDao().getByEntityTypeAndLocationId(type, locationId, start, numOfRows);
+        }
+        return new ArrayList<Lot>();
     }
 
     @Override
     public long countLotsByEntityTypeAndLocationId(String type, Integer locationId) throws MiddlewareQueryException {
-        LotDAO dao = new LotDAO();
-        dao.setSession(getCurrentSessionForLocal());
-        return dao.countByEntityTypeAndLocationId(type, locationId);
+        if (setWorkingDatabase(Database.LOCAL)) {
+            return getLotDao().countByEntityTypeAndLocationId(type, locationId);
+        }
+        return 0;
     }
 
     @Override
     public List<Lot> getLotsByEntityTypeAndEntityIdAndLocationId(String type, Integer entityId, Integer locationId, int start, int numOfRows)
             throws MiddlewareQueryException {
-        LotDAO dao = new LotDAO();
-        dao.setSession(getCurrentSessionForLocal());
-        return dao.getByEntityTypeAndEntityIdAndLocationId(type, entityId, locationId, start, numOfRows);
+        if (setWorkingDatabase(Database.LOCAL)) {
+            return getLotDao().getByEntityTypeAndEntityIdAndLocationId(type, entityId, locationId, start, numOfRows);
+        }
+        return new ArrayList<Lot>();
     }
 
     @Override
     public long countLotsByEntityTypeAndEntityIdAndLocationId(String type, Integer entityId, Integer locationId)
             throws MiddlewareQueryException {
-        LotDAO dao = new LotDAO();
-        dao.setSession(getCurrentSessionForLocal());
-        return dao.countByEntityTypeAndEntityIdAndLocationId(type, entityId, locationId);
+        if (setWorkingDatabase(Database.LOCAL)) {
+            return getLotDao().countByEntityTypeAndEntityIdAndLocationId(type, entityId, locationId);
+        }
+        return 0;
     }
 
     @Override
     public Long getActualLotBalance(Integer lotId) throws MiddlewareQueryException {
-        LotDAO dao = new LotDAO();
-        dao.setSession(getCurrentSessionForLocal());
-        return dao.getActualLotBalance(lotId);
+        if (setWorkingDatabase(Database.LOCAL)) {
+            return getLotDao().getActualLotBalance(lotId);
+        }
+        return Long.valueOf(0);
     }
 
     @Override
     public Long getAvailableLotBalance(Integer lotId) throws MiddlewareQueryException {
-        LotDAO dao = new LotDAO();
-        dao.setSession(getCurrentSessionForLocal());
-        return dao.getAvailableLotBalance(lotId);
+        if (setWorkingDatabase(Database.LOCAL)) {
+            return getLotDao().getAvailableLotBalance(lotId);
+        }
+        return Long.valueOf(0);
     }
 
     @Override
@@ -154,7 +197,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
     }
 
     private List<Integer> addOrUpdateLot(List<Lot> lots, Operation operation) throws MiddlewareQueryException {
-        // initialize session & transaction
+        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -163,9 +206,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
         try {
             // begin save transaction
             trans = session.beginTransaction();
-
-            LotDAO dao = new LotDAO();
-            dao.setSession(session);
+            LotDAO dao = getLotDao();
 
             for (Lot lot : lots) {
                 if (operation == Operation.ADD) {
@@ -189,12 +230,9 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
             // end transaction, commit to database
             trans.commit();
         } catch (Exception e) {
-            // rollback transaction in case of errors
-            if (trans != null) {
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException("Error encountered while saving Lot: InventoryDataManager.addOrUpdateLot(lots=" + lots
-                    + ", operation=" + operation + "): " + e.getMessage(), e);
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while saving Lot: InventoryDataManager.addOrUpdateLot(lots=" + lots + ", operation="
+                    + operation + "): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
@@ -207,7 +245,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
         List<org.generationcp.middleware.pojos.Transaction> transactions = new ArrayList<org.generationcp.middleware.pojos.Transaction>();
         transactions.add(transaction);
         List<Integer> ids = addTransaction(transactions);
-        return ids.size()>0 ? ids.get(0) : null;
+        return ids.size() > 0 ? ids.get(0) : null;
     }
 
     @Override
@@ -220,7 +258,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
         List<org.generationcp.middleware.pojos.Transaction> transactions = new ArrayList<org.generationcp.middleware.pojos.Transaction>();
         transactions.add(transaction);
         List<Integer> ids = addOrUpdateTransaction(transactions, Operation.UPDATE);
-        return ids.size()>0 ? ids.get(0) : null;
+        return ids.size() > 0 ? ids.get(0) : null;
     }
 
     @Override
@@ -231,7 +269,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
     private List<Integer> addOrUpdateTransaction(List<org.generationcp.middleware.pojos.Transaction> transactions, Operation operation)
             throws MiddlewareQueryException {
-        // initialize session & transaction
+        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
@@ -240,9 +278,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
         try {
             // begin save transaction
             trans = session.beginTransaction();
-
-            TransactionDAO dao = new TransactionDAO();
-            dao.setSession(session);
+            TransactionDAO dao = getTransactionDao();
 
             for (org.generationcp.middleware.pojos.Transaction transaction : transactions) {
                 if (operation == Operation.ADD) {
@@ -266,13 +302,9 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
             // end transaction, commit to database
             trans.commit();
         } catch (Exception e) {
-            // rollback transaction in case of errors
-            if (trans != null) {
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException(
-                    "Error encountered while saving Transaction: InventoryDataManager.addOrUpdateTransaction(transactions=" + transactions
-                            + ", operation=" + operation + "): " + e.getMessage(), e);
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while saving Transaction: InventoryDataManager.addOrUpdateTransaction(transactions="
+                    + transactions + ", operation=" + operation + "): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
@@ -282,115 +314,126 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
     @Override
     public org.generationcp.middleware.pojos.Transaction getTransactionById(Integer id) throws MiddlewareQueryException {
-        TransactionDAO dao = new TransactionDAO();
-        dao.setSession(getCurrentSessionForLocal());
-        return dao.getById(id, false);
+        if (setWorkingDatabase(Database.LOCAL)) {
+            return getTransactionDao().getById(id, false);
+        }
+        return null;
     }
 
     @Override
     public Set<org.generationcp.middleware.pojos.Transaction> getTransactionsByLotId(Integer id) throws MiddlewareQueryException {
-        LotDAO dao = new LotDAO();
-        dao.setSession(getCurrentSessionForLocal());
-        Lot lot = dao.getById(id, false);
-        return lot.getTransactions();
+        if (setWorkingDatabase(Database.LOCAL)) {
+            Lot lot = getLotDao().getById(id, false);
+            return lot.getTransactions();
+        }
+        return null;
     }
 
     @Override
     public List<org.generationcp.middleware.pojos.Transaction> getAllReserveTransactions(int start, int numOfRows)
             throws MiddlewareQueryException {
-        TransactionDAO dao = new TransactionDAO();
-        dao.setSession(getCurrentSessionForLocal());
-        return dao.getAllReserve(start, numOfRows);
+        if (setWorkingDatabase(Database.LOCAL)) {
+            return getTransactionDao().getAllReserve(start, numOfRows);
+        }
+        return new ArrayList<org.generationcp.middleware.pojos.Transaction>();
     }
 
     @Override
     public long countAllReserveTransactions() throws MiddlewareQueryException {
-        TransactionDAO dao = new TransactionDAO();
-        dao.setSession(getCurrentSessionForLocal());
-        return dao.countAllReserve();
+        if (setWorkingDatabase(Database.LOCAL)) {
+            return getTransactionDao().countAllReserve();
+        }
+        return 0;
     }
 
     @Override
     public List<org.generationcp.middleware.pojos.Transaction> getAllDepositTransactions(int start, int numOfRows)
             throws MiddlewareQueryException {
-        TransactionDAO dao = new TransactionDAO();
-        dao.setSession(getCurrentSessionForLocal());
-        return dao.getAllDeposit(start, numOfRows);
+        if (setWorkingDatabase(Database.LOCAL)) {
+            return getTransactionDao().getAllDeposit(start, numOfRows);
+        }
+        return null;
     }
 
     @Override
     public long countAllDepositTransactions() throws MiddlewareQueryException {
-        TransactionDAO dao = new TransactionDAO();
-        dao.setSession(getCurrentSessionForLocal());
-        return dao.countAllDeposit();
+        if (setWorkingDatabase(Database.LOCAL)) {
+            return getTransactionDao().countAllDeposit();
+        }
+        return 0;
     }
 
     @Override
     public List<org.generationcp.middleware.pojos.Transaction> getAllReserveTransactionsByRequestor(Integer personId, int start,
             int numOfRows) throws MiddlewareQueryException {
-        TransactionDAO dao = new TransactionDAO();
-        dao.setSession(getCurrentSessionForLocal());
-        return dao.getAllReserveByRequestor(personId, start, numOfRows);
+        if (setWorkingDatabase(Database.LOCAL)) {
+            return getTransactionDao().getAllReserveByRequestor(personId, start, numOfRows);
+        }
+        return null;
     }
 
     @Override
     public long countAllReserveTransactionsByRequestor(Integer personId) throws MiddlewareQueryException {
-        TransactionDAO dao = new TransactionDAO();
-        dao.setSession(getCurrentSessionForLocal());
-        return dao.countAllReserveByRequestor(personId);
+        if (setWorkingDatabase(Database.LOCAL)) {
+            return getTransactionDao().countAllReserveByRequestor(personId);
+        }
+        return 0;
     }
 
     @Override
     public List<org.generationcp.middleware.pojos.Transaction> getAllDepositTransactionsByDonor(Integer personId, int start, int numOfRows)
             throws MiddlewareQueryException {
-        TransactionDAO dao = new TransactionDAO();
-        dao.setSession(getCurrentSessionForLocal());
-        return dao.getAllDepositByDonor(personId, start, numOfRows);
+        if (setWorkingDatabase(Database.LOCAL)) {
+            return getTransactionDao().getAllDepositByDonor(personId, start, numOfRows);
+        }
+        return null;
     }
 
     @Override
     public long countAllDepositTransactionsByDonor(Integer personId) throws MiddlewareQueryException {
-        TransactionDAO dao = new TransactionDAO();
-        dao.setSession(getCurrentSessionForLocal());
-        return dao.countAllDepositByDonor(personId);
+        if (setWorkingDatabase(Database.LOCAL)) {
+            return getTransactionDao().countAllDepositByDonor(personId);
+        }
+        return 0;
     }
 
     @Override
     public List<TransactionReportRow> generateReportOnAllUncommittedTransactions(int start, int numOfRows) throws MiddlewareQueryException {
+        List<TransactionReportRow> report = new ArrayList<TransactionReportRow>();
+
         Session sessionForCentral = getCurrentSessionForCentral();
         Session sessionForLocal = getCurrentSessionForLocal();
-
-        List<TransactionReportRow> report = new ArrayList<TransactionReportRow>();
         GermplasmDataManagerImpl germplasmManager = new GermplasmDataManagerImpl(sessionForLocal, sessionForCentral);
         TraitDataManagerImpl traitManager = new TraitDataManagerImpl(sessionForLocal, sessionForCentral);
 
-        TransactionDAO dao = new TransactionDAO();
-        dao.setSession(sessionForLocal);
-        List<org.generationcp.middleware.pojos.Transaction> transactions = dao.getAllUncommitted(start, numOfRows);
+        if (setWorkingDatabase(Database.LOCAL)) {
+            List<org.generationcp.middleware.pojos.Transaction> transactions = getTransactionDao().getAllUncommitted(start, numOfRows);
 
-        for (org.generationcp.middleware.pojos.Transaction t : transactions) {
-            TransactionReportRow row = new TransactionReportRow();
-            row.setDate(t.getDate());
-            row.setQuantity(t.getQuantity());
-            row.setCommentOfLot(t.getLot().getComments());
+            for (org.generationcp.middleware.pojos.Transaction t : transactions) {
+                TransactionReportRow row = new TransactionReportRow();
+                row.setDate(t.getDate());
+                row.setQuantity(t.getQuantity());
+                row.setCommentOfLot(t.getLot().getComments());
 
-            Scale scale = traitManager.getScaleByID(t.getLot().getScaleId());
-            row.setScaleOfLot(scale);
+                Scale scale = traitManager.getScaleByID(t.getLot().getScaleId());
+                row.setScaleOfLot(scale);
 
-            Location location = germplasmManager.getLocationByID(t.getLot().getLocationId());
-            row.setLocationOfLot(location);
+                Location location = germplasmManager.getLocationByID(t.getLot().getLocationId());
+                row.setLocationOfLot(location);
 
-            report.add(row);
+                report.add(row);
+            }
+
         }
-
         return report;
     }
 
     @Override
     public long countAllUncommittedTransactions() throws MiddlewareQueryException {
-        TransactionDAO dao = new TransactionDAO();
-        dao.setSession(getCurrentSessionForLocal());
-        return dao.countAllUncommitted();
+        if (setWorkingDatabase(Database.LOCAL)) {
+            return getTransactionDao().countAllUncommitted();
+        }
+        return 0;
     }
 
     @Override
@@ -424,70 +467,66 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
     @Override
     public long countAllWithdrawalTransactions() throws MiddlewareQueryException {
-        TransactionDAO dao = new TransactionDAO();
-        dao.setSession(getCurrentSessionForLocal());
-        return dao.countAllWithdrawals();
+        if (setWorkingDatabase(Database.LOCAL)) {
+            return getTransactionDao().countAllWithdrawals();
+        }
+        return 0;
     }
 
     @Override
     public List<TransactionReportRow> generateReportOnAllWithdrawalTransactions(int start, int numOfRows) throws MiddlewareQueryException {
+        List<TransactionReportRow> report = new ArrayList<TransactionReportRow>();
+
         Session sessionForCentral = getCurrentSessionForCentral();
         Session sessionForLocal = getCurrentSessionForLocal();
-
-        List<TransactionReportRow> report = new ArrayList<TransactionReportRow>();
         GermplasmDataManagerImpl germplasmManager = new GermplasmDataManagerImpl(sessionForLocal, sessionForCentral);
         TraitDataManagerImpl traitManager = new TraitDataManagerImpl(sessionForLocal, sessionForCentral);
-        TransactionDAO dao = new TransactionDAO();
-        dao.setSession(sessionForLocal);
 
-        List<org.generationcp.middleware.pojos.Transaction> transactions = dao.getAllWithdrawals(start, numOfRows);
-        for (org.generationcp.middleware.pojos.Transaction t : transactions) {
-            TransactionReportRow row = new TransactionReportRow();
-            row.setDate(t.getDate());
-            row.setQuantity(t.getQuantity());
-            row.setCommentOfLot(t.getLot().getComments());
-            row.setEntityIdOfLot(t.getLot().getEntityId());
+        if (setWorkingDatabase(Database.LOCAL)) {
+            List<org.generationcp.middleware.pojos.Transaction> transactions = getTransactionDao().getAllWithdrawals(start, numOfRows);
+            for (org.generationcp.middleware.pojos.Transaction t : transactions) {
+                TransactionReportRow row = new TransactionReportRow();
+                row.setDate(t.getDate());
+                row.setQuantity(t.getQuantity());
+                row.setCommentOfLot(t.getLot().getComments());
+                row.setEntityIdOfLot(t.getLot().getEntityId());
 
-            Scale scale = traitManager.getScaleByID(t.getLot().getScaleId());
-            row.setScaleOfLot(scale);
+                Scale scale = traitManager.getScaleByID(t.getLot().getScaleId());
+                row.setScaleOfLot(scale);
 
-            Location location = germplasmManager.getLocationByID(t.getLot().getLocationId());
-            row.setLocationOfLot(location);
+                Location location = germplasmManager.getLocationByID(t.getLot().getLocationId());
+                row.setLocationOfLot(location);
 
-            Person person = getPersonById(t.getPersonId());
-            row.setPerson(person);
+                Person person = getPersonById(t.getPersonId());
+                row.setPerson(person);
 
-            report.add(row);
+                report.add(row);
+            }
         }
-
         return report;
     }
 
     public Person getPersonById(Integer id) throws MiddlewareQueryException {
-        PersonDAO dao = new PersonDAO();
-        Session session = getSession(id);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return null;
+        if (setWorkingDatabase(id)) {
+            return getPersonDao().getById(id, false);
         }
-
-        return dao.getById(id, false);
+        return null;
     }
 
     @Override
     public List<Lot> getAllLots(int start, int numOfRows) throws MiddlewareQueryException {
-        LotDAO dao = new LotDAO();
-        dao.setSession(getCurrentSessionForLocal());
-        return dao.getAll(start, numOfRows);
+        if (setWorkingDatabase(Database.LOCAL)) {
+            return getLotDao().getAll(start, numOfRows);
+        }
+        return new ArrayList<Lot>();
     }
 
     @Override
     public long countAllLots() throws MiddlewareQueryException {
-        LotDAO dao = new LotDAO();
-        dao.setSession(getCurrentSessionForLocal());
-        return dao.countAll();
+        if (setWorkingDatabase(Database.LOCAL)) {
+            return getLotDao().countAll();
+        }
+        return 0;
     }
 
     @Override
@@ -536,12 +575,11 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
     @Override
     public List<LotReportRow> generateReportOnEmptyLots(int start, int numOfRows) throws MiddlewareQueryException {
-        TransactionDAO dao = new TransactionDAO();
-        dao.setSession(getCurrentSessionForLocal());
         List<Lot> emptyLots = new ArrayList<Lot>();
-
-        for (org.generationcp.middleware.pojos.Transaction t : dao.getEmptyLot(start, numOfRows)) {
-            emptyLots.add(t.getLot());
+        if (setWorkingDatabase(Database.LOCAL)) {
+            for (org.generationcp.middleware.pojos.Transaction t : getTransactionDao().getEmptyLot(start, numOfRows)) {
+                emptyLots.add(t.getLot());
+            }
         }
         return generateLotReportRows(emptyLots);
     }
@@ -549,12 +587,11 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
     @Override
     public List<LotReportRow> generateReportOnLotsWithMinimumAmount(long minAmount, int start, int numOfRows)
             throws MiddlewareQueryException {
-        TransactionDAO dao = new TransactionDAO();
-        dao.setSession(getCurrentSessionForLocal());
-
         List<Lot> lotsWithMinimunAmount = new ArrayList<Lot>();
-        for (org.generationcp.middleware.pojos.Transaction t : dao.getLotWithMinimumAmount(minAmount, start, numOfRows)) {
-            lotsWithMinimunAmount.add(t.getLot());
+        if (setWorkingDatabase(Database.LOCAL)) {
+            for (org.generationcp.middleware.pojos.Transaction t : getTransactionDao().getLotWithMinimumAmount(minAmount, start, numOfRows)) {
+                lotsWithMinimunAmount.add(t.getLot());
+            }
         }
         return generateLotReportRows(lotsWithMinimunAmount);
     }

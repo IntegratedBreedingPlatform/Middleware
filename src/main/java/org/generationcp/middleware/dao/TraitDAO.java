@@ -36,8 +36,9 @@ public class TraitDAO extends GenericDAO<Trait, Integer>{
                 return (Trait) results.get(0);
             }
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByTraitId(id=" + id + ") query from Trait: " + e.getMessage(), e);
+            logAndThrowException("Error with getByTraitId(id=" + id + ") query from Trait: " + e.getMessage(), e);
         }
+        return null;
     }
     
     @SuppressWarnings("rawtypes")
@@ -53,8 +54,9 @@ public class TraitDAO extends GenericDAO<Trait, Integer>{
                 return (Trait) results.get(0);
             }
         } catch(HibernateException e) {
-            throw new MiddlewareQueryException("Error with getReplicationTrait() query: " + e.getMessage(), e);
+            logAndThrowException("Error with getReplicationTrait() query: " + e.getMessage(), e);
         }
+        return null;
     }
     
     @SuppressWarnings("rawtypes")
@@ -70,8 +72,9 @@ public class TraitDAO extends GenericDAO<Trait, Integer>{
                 return (Trait) results.get(0);
             }
         } catch(HibernateException e) {
-            throw new MiddlewareQueryException("Error with getBlockTrait() query: " + e.getMessage(), e);
+            logAndThrowException("Error with getBlockTrait() query: " + e.getMessage(), e);
         }
+        return null;
     }
     
     @SuppressWarnings("rawtypes")
@@ -90,8 +93,9 @@ public class TraitDAO extends GenericDAO<Trait, Integer>{
                 return (Trait) results.get(0);
             }
         } catch(HibernateException e) {
-            throw new MiddlewareQueryException("Error with getEnvironmentTrait() query: " + e.getMessage(), e);
+            logAndThrowException("Error with getEnvironmentTrait() query: " + e.getMessage(), e);
         }
+        return null;
     }
     
     @SuppressWarnings("rawtypes")
@@ -111,8 +115,9 @@ public class TraitDAO extends GenericDAO<Trait, Integer>{
                 return (Trait) results.get(0);
             }
         } catch(HibernateException e) {
-            throw new MiddlewareQueryException("Error with getDesignTrait() query: " + e.getMessage(), e);
+            logAndThrowException("Error with getDesignTrait() query: " + e.getMessage(), e);
         }
+        return null;
     }    
     
 }

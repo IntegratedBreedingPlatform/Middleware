@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -29,8 +30,9 @@ public class ToolDAO extends GenericDAO<Tool, Long>{
 
             return (Tool) criteria.uniqueResult();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByToolName(toolName=" + toolName + ") query from Tool: " + e.getMessage(), e);
+            logAndThrowException("Error with getByToolName(toolName=" + toolName + ") query from Tool: " + e.getMessage(), e);
         }
+        return null;
     }
 
     public Tool getByToolId(Long toolId) throws MiddlewareQueryException {
@@ -39,8 +41,9 @@ public class ToolDAO extends GenericDAO<Tool, Long>{
 
             return (Tool) criteria.uniqueResult();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error withgetByToolId(toolId=" + toolId + ") query from Tool: " + e.getMessage(), e);
+            logAndThrowException("Error withgetByToolId(toolId=" + toolId + ") query from Tool: " + e.getMessage(), e);
         }
+        return null;
     }
 
     @SuppressWarnings("unchecked")
@@ -50,8 +53,9 @@ public class ToolDAO extends GenericDAO<Tool, Long>{
 
             return criteria.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getToolsByToolType(toolType=" + toolType + ") query from Tool: "
+            logAndThrowException("Error with getToolsByToolType(toolType=" + toolType + ") query from Tool: "
                     + e.getMessage(), e);
         }
+        return new ArrayList<Tool>();
     }
 }

@@ -76,6 +76,8 @@ import org.generationcp.middleware.pojos.gdms.QtlDetails;
 import org.generationcp.middleware.pojos.gdms.QtlDetailsPK;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of GenotypicDataManager
@@ -84,1736 +86,1336 @@ import org.hibernate.Transaction;
  */
 public class GenotypicDataManagerImpl extends DataManager implements GenotypicDataManager{
 
+    private static final Logger LOG = LoggerFactory.getLogger(GenotypicDataManagerImpl.class);
+
+    private NameDAO nameDao;
+    private AccMetadataSetDAO accMetadataSetDao;
+    private AlleleValuesDAO alleleValuesDao;
+    private CharValuesDAO charValuesDao;
+    private DartValuesDAO dartValuesDao;
+    private DatasetDAO datasetDao;
+    private DatasetUsersDAO datasetUsersDao;
+    private MapDAO mapDao;
+    private MappingDataDAO mappingDataDao;
+    private MappingPopDAO mappingPopDao;
+    private MappingPopValuesDAO mappingPopValuesDao;
+    private MarkerAliasDAO markerAliasDao;
+    private MarkerDAO markerDao;
+    private MarkerDetailsDAO markerDetailsDao;
+    private MarkerInfoDAO markerInfoDao;
+    private MarkerMetadataSetDAO markerMetadataSetDao;
+    private MarkerOnMapDAO markerOnMapDao;
+    private MarkerUserInfoDAO markerUserInfoDao;
+    private QtlDAO qtlDao;
+    private QtlDetailsDAO qtlDetailsDao;
+
     public GenotypicDataManagerImpl() {
     }
-    
+
     public GenotypicDataManagerImpl(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
         super(sessionProviderForLocal, sessionProviderForCentral);
     }
-    
+
     public GenotypicDataManagerImpl(Session sessionForLocal, Session sessionForCentral) {
         super(sessionForLocal, sessionForCentral);
     }
-    
-    
+
+    private NameDAO getNameDao() {
+        if (nameDao == null) {
+            nameDao = new NameDAO();
+        }
+        nameDao.setSession(getActiveSession());
+        return nameDao;
+    }
+
+    private AccMetadataSetDAO getAccMetadataSetDao() {
+        if (accMetadataSetDao == null) {
+            accMetadataSetDao = new AccMetadataSetDAO();
+        }
+        accMetadataSetDao.setSession(getActiveSession());
+        return accMetadataSetDao;
+    }
+
+    private AlleleValuesDAO getAlleleValuesDao() {
+        if (alleleValuesDao == null) {
+            alleleValuesDao = new AlleleValuesDAO();
+        }
+        alleleValuesDao.setSession(getActiveSession());
+        return alleleValuesDao;
+    }
+
+    private CharValuesDAO getCharValuesDao() {
+        if (charValuesDao == null) {
+            charValuesDao = new CharValuesDAO();
+        }
+        charValuesDao.setSession(getActiveSession());
+        return charValuesDao;
+    }
+
+    private DartValuesDAO getDartValuesDao() {
+        if (dartValuesDao == null) {
+            dartValuesDao = new DartValuesDAO();
+        }
+        dartValuesDao.setSession(getActiveSession());
+        return dartValuesDao;
+    }
+
+    private DatasetDAO getDatasetDao() {
+        if (datasetDao == null) {
+            datasetDao = new DatasetDAO();
+        }
+        datasetDao.setSession(getActiveSession());
+        return datasetDao;
+    }
+
+    private DatasetUsersDAO getDatasetUsersDao() {
+        if (datasetUsersDao == null) {
+            datasetUsersDao = new DatasetUsersDAO();
+        }
+        datasetUsersDao.setSession(getActiveSession());
+        return datasetUsersDao;
+    }
+
+    private MapDAO getMapDao() {
+        if (mapDao == null) {
+            mapDao = new MapDAO();
+        }
+        mapDao.setSession(getActiveSession());
+        return mapDao;
+    }
+
+    private MappingDataDAO getMappingDataDao() {
+        if (mappingDataDao == null) {
+            mappingDataDao = new MappingDataDAO();
+        }
+        mappingDataDao.setSession(getActiveSession());
+        return mappingDataDao;
+    }
+
+    private MappingPopDAO getMappingPopDao() {
+        if (mappingPopDao == null) {
+            mappingPopDao = new MappingPopDAO();
+        }
+        mappingPopDao.setSession(getActiveSession());
+        return mappingPopDao;
+    }
+
+    private MappingPopValuesDAO getMappingPopValuesDao() {
+        if (mappingPopValuesDao == null) {
+            mappingPopValuesDao = new MappingPopValuesDAO();
+        }
+        mappingPopValuesDao.setSession(getActiveSession());
+        return mappingPopValuesDao;
+    }
+
+    private MarkerAliasDAO getMarkerAliasDao() {
+        if (markerAliasDao == null) {
+            markerAliasDao = new MarkerAliasDAO();
+        }
+        markerAliasDao.setSession(getActiveSession());
+        return markerAliasDao;
+    }
+
+    private MarkerDAO getMarkerDao() {
+        if (markerDao == null) {
+            markerDao = new MarkerDAO();
+        }
+        markerDao.setSession(getActiveSession());
+        return markerDao;
+    }
+
+    private MarkerDetailsDAO getMarkerDetailsDao() {
+        if (markerDetailsDao == null) {
+            markerDetailsDao = new MarkerDetailsDAO();
+        }
+        markerDetailsDao.setSession(getActiveSession());
+        return markerDetailsDao;
+    }
+
+    private MarkerInfoDAO getMarkerInfoDao() {
+        if (markerInfoDao == null) {
+            markerInfoDao = new MarkerInfoDAO();
+        }
+        markerInfoDao.setSession(getActiveSession());
+        return markerInfoDao;
+    }
+
+    private MarkerMetadataSetDAO getMarkerMetadataSetDao() {
+        if (markerMetadataSetDao == null) {
+            markerMetadataSetDao = new MarkerMetadataSetDAO();
+        }
+        markerMetadataSetDao.setSession(getActiveSession());
+        return markerMetadataSetDao;
+    }
+
+    private MarkerOnMapDAO getMarkerOnMapDao() {
+        if (markerOnMapDao == null) {
+            markerOnMapDao = new MarkerOnMapDAO();
+        }
+        markerOnMapDao.setSession(getActiveSession());
+        return markerOnMapDao;
+    }
+
+    private MarkerUserInfoDAO getMarkerUserInfoDao() {
+        if (markerUserInfoDao == null) {
+            markerUserInfoDao = new MarkerUserInfoDAO();
+        }
+        markerUserInfoDao.setSession(getActiveSession());
+        return markerUserInfoDao;
+    }
+
+    private QtlDAO getQtlDao() {
+        if (qtlDao == null) {
+            qtlDao = new QtlDAO();
+        }
+        qtlDao.setSession(getActiveSession());
+        return qtlDao;
+    }
+
+    private QtlDetailsDAO getQtlDetailsDao() {
+        if (qtlDetailsDao == null) {
+            qtlDetailsDao = new QtlDetailsDAO();
+        }
+        qtlDetailsDao.setSession(getActiveSession());
+        return qtlDetailsDao;
+    }
+
     @Override
     public List<Integer> getMapIDsByQTLName(String qtlName, int start, int numOfRows) throws MiddlewareQueryException {
-        
-        if ((qtlName == null) || (qtlName.isEmpty())){
+        if ((qtlName == null) || (qtlName.isEmpty())) {
             return new ArrayList<Integer>();
         }
-        
-        QtlDAO dao = new QtlDAO();
-        
+
         long centralCount = 0;
         long localCount = 0;
         long relativeLimit = 0;
 
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        
         List<Integer> qtl = new ArrayList<Integer>();
 
-        if(sessionForCentral != null) {
-            
-            dao.setSession(sessionForCentral);
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            QtlDAO dao = getQtlDao();
             centralCount = dao.countMapIDsByQTLName(qtlName);
-            
-            if(centralCount > start) {
+
+            if (centralCount > start) {
                 qtl.addAll(dao.getMapIDsByQTLName(qtlName, start, numOfRows));
                 relativeLimit = numOfRows - (centralCount - start);
-                if(relativeLimit > 0 && sessionForLocal != null) {
-                    dao.setSession(sessionForLocal);
+                if (relativeLimit > 0 && setWorkingDatabase(Database.LOCAL)) {
+                    dao = getQtlDao();
                     localCount = dao.countMapIDsByQTLName(qtlName);
-                    if(localCount > 0) {
+                    if (localCount > 0) {
                         qtl.addAll(dao.getMapIDsByQTLName(qtlName, 0, (int) relativeLimit));
                     }
                 }
             } else {
                 relativeLimit = start - centralCount;
-                if (sessionForLocal != null) {
-                    dao.setSession(sessionForLocal);
+                if (setWorkingDatabase(Database.LOCAL)) {
+                    dao = getQtlDao();
                     localCount = dao.countMapIDsByQTLName(qtlName);
                     if (localCount > relativeLimit) {
                         qtl.addAll(dao.getMapIDsByQTLName(qtlName, (int) relativeLimit, numOfRows));
                     }
                 }
             }
-        } else if (sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
+        } else if (setWorkingDatabase(Database.LOCAL)) {
+            QtlDAO dao = getQtlDao();
             localCount = dao.countMapIDsByQTLName(qtlName);
             if (localCount > start) {
                 qtl.addAll(dao.getMapIDsByQTLName(qtlName, start, numOfRows));
             }
         }
-        
-        return qtl;    
-    }   
-    
+        return qtl;
+    }
+
     @Override
     public long countMapIDsByQTLName(String qtlName) throws MiddlewareQueryException {
-
         long count = 0;
-
-        QtlDAO dao = new QtlDAO();
-
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-
-        if (sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
-            count = count + dao.countMapIDsByQTLName(qtlName);
+        if (setWorkingDatabase(Database.LOCAL)) {
+            count = count + getQtlDao().countMapIDsByQTLName(qtlName);
         }
-
-        if (sessionForCentral != null) {
-            dao.setSession(sessionForCentral);
-            count = count + dao.countMapIDsByQTLName(qtlName);
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            count = count + getQtlDao().countMapIDsByQTLName(qtlName);
         }
-
         return count;
     }
 
     @Override
-    public List<Integer> getNameIdsByGermplasmIds(List<Integer> gIds) throws MiddlewareQueryException{
-        AccMetadataSetDAO dao = new AccMetadataSetDAO();
-        Session session = getSession(gIds.get(0));
-        
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<Integer>();
+    public List<Integer> getNameIdsByGermplasmIds(List<Integer> gIds) throws MiddlewareQueryException {
+        if (setWorkingDatabase(gIds.get(0))) {
+            return (List<Integer>) getAccMetadataSetDao().getNameIdsByGermplasmIds(gIds);
         }
-
-        return (List<Integer>) dao.getNameIdsByGermplasmIds(gIds);
+        return new ArrayList<Integer>();
     }
 
     @Override
     public List<Name> getNamesByNameIds(List<Integer> nIds) throws MiddlewareQueryException {
-        NameDAO nameDao = new NameDAO();
-        Session session = getSession(nIds.get(0));
-
-        if (session != null) {
-            nameDao.setSession(session);
-        } else {
-            return new ArrayList<Name>();
+        if (setWorkingDatabase(nIds.get(0))) {
+            return (List<Name>) getNameDao().getNamesByNameIds(nIds);
         }
-
-        return (List<Name>) nameDao.getNamesByNameIds(nIds);
+        return new ArrayList<Name>();
     }
 
     @Override
     public Name getNameByNameId(Integer nId) throws MiddlewareQueryException {
-        NameDAO dao = new NameDAO();
-        Session session = getSession(nId);
-        
-        if(session != null) {
-            dao.setSession(session);
-        } else {
-            return null;
+        if (setWorkingDatabase(nId)) {
+            return getNameDao().getNameByNameId(nId);
         }
-        
-        return dao.getNameByNameId(nId);
+        return null;
     }
 
     @Override
     public long countAllMaps(Database instance) throws MiddlewareQueryException {
-        MapDAO dao = new MapDAO();
-        Session session = getSession(instance);
-        
-        if(session != null) {
-            dao.setSession(session);
-        } else {
-            return 0;
+        if (setWorkingDatabase(instance)) {
+            return getMapDao().countAll();
         }
-        
-        return dao.countAll();
+        return 0;
     }
 
     @Override
     public List<Map> getAllMaps(int start, int numOfRows, Database instance) throws MiddlewareQueryException {
-        MapDAO dao = new MapDAO();
-        Session session = getSession(instance);
-        
-        if(session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<Map>();
+        if (setWorkingDatabase(instance)) {
+            return getMapDao().getAll(start, numOfRows);
         }
-        
-        return dao.getAll(start, numOfRows);
+        return new ArrayList<Map>();
     }
-    
+
     @Override
-    public List<MapInfo> getMapInfoByMapName(String mapName, Database instance) throws MiddlewareQueryException{
-        MappingDataDAO dao = new MappingDataDAO();
-        Session session = getSession(instance);
-        
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<MapInfo>();
+    public List<MapInfo> getMapInfoByMapName(String mapName, Database instance) throws MiddlewareQueryException {
+        if (setWorkingDatabase(instance)) {
+            return (List<MapInfo>) getMappingDataDao().getMapInfoByMapName(mapName);
         }
-        return (List<MapInfo>) dao.getMapInfoByMapName(mapName);
+        return new ArrayList<MapInfo>();
     }
-    
+
     @Override
-    public long countDatasetNames(Database instance) throws MiddlewareQueryException{
-        DatasetDAO dao = new DatasetDAO();
-        Session session = getSession(instance);  
-        
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return 0;
+    public long countDatasetNames(Database instance) throws MiddlewareQueryException {
+        if (setWorkingDatabase(instance)) {
+            return getDatasetDao().countByName();
         }
-        return dao.countByName();
+        return 0;
     }
-    
+
     @Override
-    public List<String> getDatasetNames(int start, int numOfRows, Database instance) throws MiddlewareQueryException{
-        DatasetDAO dao = new DatasetDAO();
-        Session session = getSession(instance);  
-        
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<String>();
+    public List<String> getDatasetNames(int start, int numOfRows, Database instance) throws MiddlewareQueryException {
+        if (setWorkingDatabase(instance)) {
+            return (List<String>) getDatasetDao().getDatasetNames(start, numOfRows);
         }
-        return (List<String>) dao.getDatasetNames(start, numOfRows);
+        return new ArrayList<String>();
     }
-    
-    
-    /* (non-Javadoc)
-     * @see org.generationcp.middleware.manager.api.GenotypicDataManager#getDatasetDetailsByDatasetName(java.lang.String)
-     */
+
     @Override
-    public List<DatasetElement> getDatasetDetailsByDatasetName(String datasetName, Database instance) throws MiddlewareQueryException{
-        DatasetDAO dao = new DatasetDAO();
-        Session session = getSession(instance);  
-        
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<DatasetElement>();
+    public List<DatasetElement> getDatasetDetailsByDatasetName(String datasetName, Database instance) throws MiddlewareQueryException {
+        if (setWorkingDatabase(instance)) {
+            return (List<DatasetElement>) getDatasetDao().getDetailsByName(datasetName);
         }
-        return (List<DatasetElement>) dao.getDetailsByName(datasetName);
+        return new ArrayList<DatasetElement>();
     }
-    
-    
+
     @Override
-    public List<Integer> getMarkerIdsByMarkerNames(List<String> markerNames, int start, int numOfRows, Database instance) throws MiddlewareQueryException {
-        MarkerDAO dao = new MarkerDAO();
-        Session session = getSession(instance);
-        
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<Integer> ();
-        }
-        
-        List<Integer> markerIds = dao.getIdsByNames(markerNames, start, numOfRows);
-        
-        return markerIds;
-    }
-    
-    @Override
-    public Set<Integer> getMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapID, String linkageGroup, double startPos, double endPos, int start, int numOfRows) 
+    public List<Integer> getMarkerIdsByMarkerNames(List<String> markerNames, int start, int numOfRows, Database instance)
             throws MiddlewareQueryException {
-        
-        MarkerDAO dao = new MarkerDAO();
-        Session session = getSession(mapID);
-        
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new TreeSet<Integer> ();
+        if (setWorkingDatabase(instance)) {
+            return getMarkerDao().getIdsByNames(markerNames, start, numOfRows);
         }
-        
-        Set<Integer> markerIds = dao.getMarkerIDsByMapIDAndLinkageBetweenStartPosition(mapID, linkageGroup, startPos, endPos, start, numOfRows);
-        
-        return markerIds;
+        return new ArrayList<Integer>();
     }
-    
+
     @Override
-    public long countMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapID, String linkageGroup, double startPos, double endPos) 
+    public Set<Integer> getMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapId, String linkageGroup, double startPos, double endPos, int start, int numOfRows) 
             throws MiddlewareQueryException {
-        
-        MarkerDAO dao = new MarkerDAO();
-        Session session = getSession(mapID);
-        
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return 0l;
+        if (setWorkingDatabase(mapId)) {
+            return getMarkerDao().getMarkerIDsByMapIDAndLinkageBetweenStartPosition(mapId, linkageGroup, startPos, endPos, start, numOfRows);
         }
-        
-        long count = dao.countMarkerIDsByMapIDAndLinkageBetweenStartPosition(mapID, linkageGroup, startPos, endPos);
-        
-        return count;
+        return new TreeSet<Integer>();
     }
 
     @Override
-    public List<Integer> getMarkerIdsByDatasetId(Integer datasetId) throws MiddlewareQueryException{
-        MarkerMetadataSetDAO dao = new MarkerMetadataSetDAO();
-        Session session = getSession(datasetId);
-        
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<Integer>();
+    public long countMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapId, String linkageGroup, double startPos, double endPos) 
+            throws MiddlewareQueryException {
+        if (setWorkingDatabase(mapId)) {
+            return getMarkerDao().countMarkerIDsByMapIDAndLinkageBetweenStartPosition(mapId, linkageGroup, startPos, endPos);
         }
-        return (List<Integer>) dao.getMarkerIdByDatasetId(datasetId);
-    }
-    
-    
-    @Override
-    public List<ParentElement> getParentsByDatasetId(Integer datasetId) throws MiddlewareQueryException{
-        MappingPopDAO dao = new MappingPopDAO();
-        Session session = getSession(datasetId);  
-        
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<ParentElement>();
-        }
-        return (List<ParentElement>) dao.getParentsByDatasetId(datasetId);
-    }
-    
-    @Override
-    public List<String> getMarkerTypesByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException{
-        MarkerDAO dao = new MarkerDAO();
-        Session session = getSession(markerIds.get(0));
-        
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<String>();
-        }
-        return (List<String>) dao.getMarkerTypeByMarkerIds(markerIds);
-    }
-    
-    @Override
-    public List<MarkerNameElement> getMarkerNamesByGIds(List<Integer> gIds) throws MiddlewareQueryException{
-        MarkerDAO dao = new MarkerDAO();
-        Session session = getSession(gIds.get(0));  
-        
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<MarkerNameElement>();
-        }
-        return (List<MarkerNameElement>) dao.getMarkerNamesByGIds(gIds);
-    }
-    
-    @Override
-    public List<GermplasmMarkerElement>  getGermplasmNamesByMarkerNames(List<String> markerNames, Database instance) throws MiddlewareQueryException{
-        MarkerDAO dao = new MarkerDAO();
-        Session session = getSession(instance);  
-        
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<GermplasmMarkerElement>();
-        }
-        return (List<GermplasmMarkerElement>) dao.getGermplasmNamesByMarkerNames(markerNames);
-    }
-    
-
-    @Override
-    public List<MappingValueElement> getMappingValuesByGidsAndMarkerNames(
-            List<Integer> gids, List<String> markerNames, int start, int numOfRows) throws MiddlewareQueryException {
-        MarkerDAO markerDao = new MarkerDAO();
-        MappingPopDAO mappingPopDao = new MappingPopDAO();
-        
-        //get db connection based on the GIDs provided
-        Database instance;
-        if (gids.get(0) < 0) {
-            instance = Database.LOCAL;
-        } else {
-            instance = Database.CENTRAL;
-        }
-        Session session = getSession(instance);
-        
-        if (session != null) {
-            markerDao.setSession(session);
-            mappingPopDao.setSession(session);
-        } else {
-            return new ArrayList<MappingValueElement>();
-        }
-        
-        List<Integer> markerIds = markerDao.getIdsByNames(markerNames, start, numOfRows);
-        
-        List<MappingValueElement> mappingValues = mappingPopDao.getMappingValuesByGidAndMarkerIds(gids, markerIds);
-        
-        return mappingValues;
-    }
-    
-    @Override
-    public List<AllelicValueElement> getAllelicValuesByGidsAndMarkerNames(
-            List<Integer> gids, List<String> markerNames) throws MiddlewareQueryException {
-        MarkerDAO markerDao = new MarkerDAO();
-        
-        //get db connection based on the GIDs provided
-        Database instance;
-        if (gids.get(0) < 0) {
-            instance = Database.LOCAL;
-        } else {
-            instance = Database.CENTRAL;
-        }
-        Session session = getSession(instance);
-        
-        if (session != null) {
-            markerDao.setSession(session);
-        } else {
-            return new ArrayList<AllelicValueElement>();
-        }
-        
-        List<AllelicValueElement> allelicValues = markerDao.getAllelicValuesByGidsAndMarkerNames(gids, markerNames);
-        
-        return allelicValues;
+        return 0l;
     }
 
     @Override
-    public List<AllelicValueWithMarkerIdElement> getAllelicValuesFromCharValuesByDatasetId(
-            Integer datasetId, int start, int numOfRows) throws MiddlewareQueryException{
-        CharValuesDAO dao = new CharValuesDAO();
-        Session session = getSession(datasetId);
-        if (session == null) {
-            return new ArrayList<AllelicValueWithMarkerIdElement>();
+    public List<Integer> getMarkerIdsByDatasetId(Integer datasetId) throws MiddlewareQueryException {
+        if (setWorkingDatabase(datasetId)) {
+            return (List<Integer>) getMarkerMetadataSetDao().getMarkerIdByDatasetId(datasetId);
         }
-        dao.setSession(session);        
-        return dao.getAllelicValuesByDatasetId(datasetId, start, numOfRows);
-    }
-    
-    @Override
-    public long countAllelicValuesFromCharValuesByDatasetId(Integer datasetId) throws MiddlewareQueryException{
-        CharValuesDAO dao = new CharValuesDAO();
-        Session session = getSession(datasetId);
-        if (session == null) {
-            return 0;
-        }
-        dao.setSession(session);
-        return dao.countByDatasetId(datasetId);
+        return new ArrayList<Integer>();
     }
 
     @Override
-    public List<AllelicValueWithMarkerIdElement> getAllelicValuesFromAlleleValuesByDatasetId(
-            Integer datasetId, int start, int numOfRows) throws MiddlewareQueryException{
-        AlleleValuesDAO dao = new AlleleValuesDAO();
-        Session session = getSession(datasetId);
-
-        if (session == null) {
-            return new ArrayList<AllelicValueWithMarkerIdElement>();
+    public List<ParentElement> getParentsByDatasetId(Integer datasetId) throws MiddlewareQueryException {
+        if (setWorkingDatabase(datasetId)) {
+            return (List<ParentElement>) getMappingPopDao().getParentsByDatasetId(datasetId);
         }
-        dao.setSession(session);
-        return dao.getAllelicValuesByDatasetId(datasetId, start, numOfRows);
-    }
-    
-    
-    @Override
-    public long countAllelicValuesFromAlleleValuesByDatasetId(Integer datasetId) throws MiddlewareQueryException{
-        AlleleValuesDAO dao = new AlleleValuesDAO();
-        Session session = getSession(datasetId);
-        if (session == null) {
-            return 0;
-        }
-        dao.setSession(session);
-        return dao.countByDatasetId(datasetId);
+        return new ArrayList<ParentElement>();
     }
 
     @Override
-    public List<AllelicValueWithMarkerIdElement> getAllelicValuesFromMappingPopValuesByDatasetId(
-            Integer datasetId, int start, int numOfRows) throws MiddlewareQueryException{
-        MappingPopValuesDAO dao = new MappingPopValuesDAO();
-        Session session = getSession(datasetId);
-        if (session == null) {
-            return  new ArrayList<AllelicValueWithMarkerIdElement>();
+    public List<String> getMarkerTypesByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException {
+        if (setWorkingDatabase(markerIds.get(0))) {
+            return (List<String>) getMarkerDao().getMarkerTypeByMarkerIds(markerIds);
         }
-        dao.setSession(session);
-        return dao.getAllelicValuesByDatasetId(datasetId, start, numOfRows);
+        return new ArrayList<String>();
     }
-    
-    @Override
-    public long countAllelicValuesFromMappingPopValuesByDatasetId(Integer datasetId) throws MiddlewareQueryException{
-        MappingPopValuesDAO dao = new MappingPopValuesDAO();
-        Session session = getSession(datasetId);
-        if (session == null) {
-            return 0;
-        }
-        dao.setSession(session);
-        return dao.countByDatasetId(datasetId);
-    }
-    @Override
-    public List<MarkerInfo> getMarkerInfoByMarkerName(String markerName, int start, int numOfRows) throws MiddlewareQueryException{
 
-        MarkerInfoDAO dao = new MarkerInfoDAO();
+    @Override
+    public List<MarkerNameElement> getMarkerNamesByGIds(List<Integer> gIds) throws MiddlewareQueryException {
+        if (setWorkingDatabase(gIds.get(0))) {
+            return (List<MarkerNameElement>) getMarkerDao().getMarkerNamesByGIds(gIds);
+        }
+        return new ArrayList<MarkerNameElement>();
+    }
+
+    @Override
+    public List<GermplasmMarkerElement> getGermplasmNamesByMarkerNames(List<String> markerNames, Database instance)
+            throws MiddlewareQueryException {
+        if (setWorkingDatabase(instance)) {
+            return (List<GermplasmMarkerElement>) getMarkerDao().getGermplasmNamesByMarkerNames(markerNames);
+        }
+        return new ArrayList<GermplasmMarkerElement>();
+    }
+
+    @Override
+    public List<MappingValueElement> getMappingValuesByGidsAndMarkerNames(List<Integer> gids, List<String> markerNames, int start,
+            int numOfRows) throws MiddlewareQueryException {
+        if (setWorkingDatabase(gids.get(0))) {
+            List<Integer> markerIds = getMarkerDao().getIdsByNames(markerNames, start, numOfRows);
+            List<MappingValueElement> mappingValues = getMappingPopDao().getMappingValuesByGidAndMarkerIds(gids, markerIds);
+            return mappingValues;
+        }
+        return new ArrayList<MappingValueElement>();
+    }
+
+    @Override
+    public List<AllelicValueElement> getAllelicValuesByGidsAndMarkerNames(List<Integer> gids, List<String> markerNames)
+            throws MiddlewareQueryException {
+        if (setWorkingDatabase(gids.get(0))) {
+            return getMarkerDao().getAllelicValuesByGidsAndMarkerNames(gids, markerNames);
+        }
+        return new ArrayList<AllelicValueElement>();
+    }
+
+    @Override
+    public List<AllelicValueWithMarkerIdElement> getAllelicValuesFromCharValuesByDatasetId(Integer datasetId, int start, int numOfRows)
+            throws MiddlewareQueryException {
+        if (setWorkingDatabase(datasetId)) {
+            return getCharValuesDao().getAllelicValuesByDatasetId(datasetId, start, numOfRows);
+        }
+        return new ArrayList<AllelicValueWithMarkerIdElement>();
+    }
+
+    @Override
+    public long countAllelicValuesFromCharValuesByDatasetId(Integer datasetId) throws MiddlewareQueryException {
+        if (setWorkingDatabase(datasetId)) {
+            return getCharValuesDao().countByDatasetId(datasetId);
+        }
+        return 0;
+    }
+
+    @Override
+    public List<AllelicValueWithMarkerIdElement> getAllelicValuesFromAlleleValuesByDatasetId(Integer datasetId, int start, int numOfRows)
+            throws MiddlewareQueryException {
+        if (setWorkingDatabase(datasetId)) {
+            return getAlleleValuesDao().getAllelicValuesByDatasetId(datasetId, start, numOfRows);
+        }
+        return new ArrayList<AllelicValueWithMarkerIdElement>();
+    }
+
+    @Override
+    public long countAllelicValuesFromAlleleValuesByDatasetId(Integer datasetId) throws MiddlewareQueryException {
+        if (setWorkingDatabase(datasetId)) {
+            return getAlleleValuesDao().countByDatasetId(datasetId);
+        }
+        return 0;
+    }
+
+    @Override
+    public List<AllelicValueWithMarkerIdElement> getAllelicValuesFromMappingPopValuesByDatasetId(Integer datasetId, int start, int numOfRows)
+            throws MiddlewareQueryException {
+        if (setWorkingDatabase(datasetId)) {
+            return getMappingPopValuesDao().getAllelicValuesByDatasetId(datasetId, start, numOfRows);
+        }
+        return new ArrayList<AllelicValueWithMarkerIdElement>();
+    }
+
+    @Override
+    public long countAllelicValuesFromMappingPopValuesByDatasetId(Integer datasetId) throws MiddlewareQueryException {
+        if (setWorkingDatabase(datasetId)) {
+            return getMappingPopValuesDao().countByDatasetId(datasetId);
+        }
+        return 0;
+    }
+
+    @Override
+    public List<MarkerInfo> getMarkerInfoByMarkerName(String markerName, int start, int numOfRows) throws MiddlewareQueryException {
         List<MarkerInfo> markerInfoList = new ArrayList<MarkerInfo>();
-        
+
         long centralCount = 0;
         long localCount = 0;
         long relativeLimit = 0;
-        
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        
-        if (sessionForCentral != null) {
-                
-            dao.setSession(sessionForCentral);
+
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            MarkerInfoDAO dao = getMarkerInfoDao();
             centralCount = dao.countByMarkerName(markerName);
-            
-            if (centralCount > start) {  
-                
+
+            if (centralCount > start) {
+
                 markerInfoList.addAll((List<MarkerInfo>) dao.getByMarkerName(markerName, start, numOfRows));
                 relativeLimit = numOfRows - (centralCount - start);
-                
+
                 if (relativeLimit > 0) {
-                        if (sessionForLocal != null) {                                
-                            dao.setSession(sessionForLocal);
-                            localCount = dao.countByMarkerName(markerName);
-                            
-                            if (localCount > 0) {
-                                markerInfoList.addAll((List<MarkerInfo>) dao.getByMarkerName(markerName, 0, (int) relativeLimit));
-                            }  
+                    if (setWorkingDatabase(Database.LOCAL)) {
+                        dao = getMarkerInfoDao();
+                        localCount = dao.countByMarkerName(markerName);
+                        if (localCount > 0) {
+                            markerInfoList.addAll((List<MarkerInfo>) dao.getByMarkerName(markerName, 0, (int) relativeLimit));
                         }
+                    }
                 }
-                
             } else {
-                
                 relativeLimit = start - centralCount;
-                
-                if (sessionForLocal != null) {
-                        
-                    dao.setSession(sessionForLocal);
+                if (setWorkingDatabase(Database.LOCAL)) {
+                    dao = getMarkerInfoDao();
                     localCount = dao.countByMarkerName(markerName);
-                    
                     if (localCount > relativeLimit) {
                         markerInfoList.addAll((List<MarkerInfo>) dao.getByMarkerName(markerName, (int) relativeLimit, numOfRows));
-                    }  
+                    }
                 }
             }
-            
-        } else if (sessionForLocal != null) {
-                
-            dao.setSession(sessionForLocal);
+        } else if (setWorkingDatabase(Database.LOCAL)) {
+            MarkerInfoDAO dao = getMarkerInfoDao();
             localCount = dao.countByMarkerName(markerName);
-
             if (localCount > start) {
                 markerInfoList.addAll((List<MarkerInfo>) dao.getByMarkerName(markerName, start, numOfRows));
             }
         }
-        
         return markerInfoList;
     }
-    
+
     @Override
-    public long countMarkerInfoByMarkerName(String markerName) throws MiddlewareQueryException{
-        long count = 0;        
-        MarkerInfoDAO dao = new MarkerInfoDAO();
-        
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        
-        if (sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
-            count = count + dao.countByMarkerName(markerName);
+    public long countMarkerInfoByMarkerName(String markerName) throws MiddlewareQueryException {
+        long count = 0;
+        if (setWorkingDatabase(Database.LOCAL)) {
+            count = count + getMarkerInfoDao().countByMarkerName(markerName);
         }
-        
-        if (sessionForCentral != null) {
-            dao.setSession(sessionForCentral);
-            count = count + dao.countByMarkerName(markerName);
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            count = count + getMarkerInfoDao().countByMarkerName(markerName);
         }
-        
         return count;
     }
-    
-    @Override
-   public List<MarkerInfo> getMarkerInfoByGenotype(String genotype, int start, int numOfRows) throws MiddlewareQueryException{
 
-        MarkerInfoDAO dao = new MarkerInfoDAO();
+    @Override
+    public List<MarkerInfo> getMarkerInfoByGenotype(String genotype, int start, int numOfRows) throws MiddlewareQueryException {
         List<MarkerInfo> markerInfoList = new ArrayList<MarkerInfo>();
-        
+
         long centralCount = 0;
         long localCount = 0;
         long relativeLimit = 0;
-        
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        
-        if (sessionForCentral != null) {
-                
-            dao.setSession(sessionForCentral);
+
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            MarkerInfoDAO dao = getMarkerInfoDao();
             centralCount = dao.countByGenotype(genotype);
-            
-            if (centralCount > start) {  
-                
+            if (centralCount > start) {
                 markerInfoList.addAll((List<MarkerInfo>) dao.getByGenotype(genotype, start, numOfRows));
                 relativeLimit = numOfRows - (centralCount - start);
-                
                 if (relativeLimit > 0) {
-                        if (sessionForLocal != null) {                                
-                            dao.setSession(sessionForLocal);
-                            localCount = dao.countByGenotype(genotype);
-                            
-                            if (localCount > 0) {
-                                markerInfoList.addAll((List<MarkerInfo>) dao.getByGenotype(genotype, 0, (int) relativeLimit));
-                            }  
+                    if (setWorkingDatabase(Database.LOCAL)) {
+                        dao = getMarkerInfoDao();
+                        localCount = dao.countByGenotype(genotype);
+                        if (localCount > 0) {
+                            markerInfoList.addAll((List<MarkerInfo>) dao.getByGenotype(genotype, 0, (int) relativeLimit));
                         }
+                    }
                 }
-                
             } else {
-                
                 relativeLimit = start - centralCount;
-                
-                if (sessionForLocal != null) {
-                        
-                    dao.setSession(sessionForLocal);
+                if (setWorkingDatabase(Database.LOCAL)) {
+                    dao = getMarkerInfoDao();
                     localCount = dao.countByGenotype(genotype);
-                    
+
                     if (localCount > relativeLimit) {
                         markerInfoList.addAll((List<MarkerInfo>) dao.getByGenotype(genotype, (int) relativeLimit, numOfRows));
-                    }  
+                    }
                 }
             }
-            
-        } else if (sessionForLocal != null) {
-                
-            dao.setSession(sessionForLocal);
+        } else if (setWorkingDatabase(Database.LOCAL)) {
+            MarkerInfoDAO dao = getMarkerInfoDao();
             localCount = dao.countByGenotype(genotype);
-
             if (localCount > start) {
                 markerInfoList.addAll((List<MarkerInfo>) dao.getByGenotype(genotype, start, numOfRows));
             }
         }
-        
         return markerInfoList;
     }
-    
+
     @Override
-    public long countMarkerInfoByGenotype(String genotype) throws MiddlewareQueryException{
-        long count = 0;        
-        MarkerInfoDAO dao = new MarkerInfoDAO();
-        
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        
-        if (sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
-            count = count + dao.countByGenotype(genotype);
+    public long countMarkerInfoByGenotype(String genotype) throws MiddlewareQueryException {
+        long count = 0;
+        if (setWorkingDatabase(Database.LOCAL)) {
+            count = count + getMarkerInfoDao().countByGenotype(genotype);
         }
-        
-        if (sessionForCentral != null) {
-            dao.setSession(sessionForCentral);
-            count = count + dao.countByGenotype(genotype);
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            count = count + getMarkerInfoDao().countByGenotype(genotype);
         }
-        
         return count;
     }
 
     @Override
-   public List<MarkerInfo> getMarkerInfoByDbAccessionId(String dbAccessionId, int start, int numOfRows) throws MiddlewareQueryException{
-
-        MarkerInfoDAO dao = new MarkerInfoDAO();
+    public List<MarkerInfo> getMarkerInfoByDbAccessionId(String dbAccessionId, int start, int numOfRows) throws MiddlewareQueryException {
         List<MarkerInfo> markerInfoList = new ArrayList<MarkerInfo>();
-        
+
         long centralCount = 0;
         long localCount = 0;
         long relativeLimit = 0;
-        
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        
-        if (sessionForCentral != null) {
-                
-            dao.setSession(sessionForCentral);
+
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            MarkerInfoDAO dao = getMarkerInfoDao();
             centralCount = dao.countByDbAccessionId(dbAccessionId);
-            
-            if (centralCount > start) {  
-                
+            if (centralCount > start) {
                 markerInfoList.addAll((List<MarkerInfo>) dao.getByDbAccessionId(dbAccessionId, start, numOfRows));
                 relativeLimit = numOfRows - (centralCount - start);
-                
                 if (relativeLimit > 0) {
-                        if (sessionForLocal != null) {                                
-                            dao.setSession(sessionForLocal);
-                            localCount = dao.countByDbAccessionId(dbAccessionId);
-                            
-                            if (localCount > 0) {
-                                markerInfoList.addAll((List<MarkerInfo>) dao.getByDbAccessionId(dbAccessionId, 0, (int) relativeLimit));
-                            }  
+                    if (setWorkingDatabase(Database.LOCAL)) {
+                        dao = getMarkerInfoDao();
+                        localCount = dao.countByDbAccessionId(dbAccessionId);
+                        if (localCount > 0) {
+                            markerInfoList.addAll((List<MarkerInfo>) dao.getByDbAccessionId(dbAccessionId, 0, (int) relativeLimit));
                         }
+                    }
                 }
-                
             } else {
-                
                 relativeLimit = start - centralCount;
-                
-                if (sessionForLocal != null) {
-                        
-                    dao.setSession(sessionForLocal);
+                if (setWorkingDatabase(Database.LOCAL)) {
+                    dao = getMarkerInfoDao();
                     localCount = dao.countByDbAccessionId(dbAccessionId);
-                    
                     if (localCount > relativeLimit) {
                         markerInfoList.addAll((List<MarkerInfo>) dao.getByDbAccessionId(dbAccessionId, (int) relativeLimit, numOfRows));
-                    }  
+                    }
                 }
             }
-            
-        } else if (sessionForLocal != null) {
-                
-            dao.setSession(sessionForLocal);
+        } else if (setWorkingDatabase(Database.LOCAL)) {
+            MarkerInfoDAO dao = getMarkerInfoDao();
             localCount = dao.countByDbAccessionId(dbAccessionId);
-
             if (localCount > start) {
                 markerInfoList.addAll((List<MarkerInfo>) dao.getByDbAccessionId(dbAccessionId, start, numOfRows));
             }
         }
-        
         return markerInfoList;
     }
-    
+
     @Override
-    public long countMarkerInfoByDbAccessionId(String dbAccessionId) throws MiddlewareQueryException{
-        long count = 0;        
-        MarkerInfoDAO dao = new MarkerInfoDAO();
-        
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        
-        if (sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
-            count = count + dao.countByDbAccessionId(dbAccessionId);
+    public long countMarkerInfoByDbAccessionId(String dbAccessionId) throws MiddlewareQueryException {
+        long count = 0;
+        if (setWorkingDatabase(Database.LOCAL)) {
+            count = count + getMarkerInfoDao().countByDbAccessionId(dbAccessionId);
         }
-        
-        if (sessionForCentral != null) {
-            dao.setSession(sessionForCentral);
-            count = count + dao.countByDbAccessionId(dbAccessionId);
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            count = count + getMarkerInfoDao().countByDbAccessionId(dbAccessionId);
         }
-        
         return count;
     }
 
-    
     @Override
-    public List<MarkerIdMarkerNameElement> getMarkerNamesByMarkerIds(List<Integer> markerIds)
-            throws MiddlewareQueryException {
-        MarkerDAO dao = new MarkerDAO();
-        Session session = getSession(markerIds.get(0));
-        
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<MarkerIdMarkerNameElement>();
+    public List<MarkerIdMarkerNameElement> getMarkerNamesByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException {
+        if (setWorkingDatabase(markerIds.get(0))) {
+            return getMarkerDao().getNamesByIds(markerIds);
         }
-        
-        List<MarkerIdMarkerNameElement> dataValues = dao.getNamesByIds(markerIds);
-        return dataValues;
+        return new ArrayList<MarkerIdMarkerNameElement>();
+
     }
 
-    @Override
-    public List<String> getAllMarkerTypes(int start, int numOfRows) throws MiddlewareQueryException {
-        MarkerDAO dao = new MarkerDAO();
+        @Override
+        public List<String> getAllMarkerTypes(int start, int numOfRows) throws MiddlewareQueryException {
         List<String> markerTypes = new ArrayList<String>();
         long centralCount = 0;
         long localCount = 0;
         long relativeLimit = 0;
-        
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        
-        if(sessionForCentral != null) {
-            
-            dao.setSession(sessionForCentral);
+
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            MarkerDAO dao = getMarkerDao();
             centralCount = countAllMarkerTypes(Database.CENTRAL);
-            
-            if(centralCount > start) {
+
+            if (centralCount > start) {
                 markerTypes.addAll(dao.getAllMarkerTypes(start, numOfRows));
                 relativeLimit = numOfRows - markerTypes.size();
-                if(relativeLimit > 0 && sessionForLocal != null) {
-                    dao.setSession(sessionForLocal);
+                if (relativeLimit > 0 && (setWorkingDatabase(Database.LOCAL))) {
+                    dao = getMarkerDao();
                     localCount = countAllMarkerTypes(Database.LOCAL);
-                    if(localCount > 0) {
+                    if (localCount > 0) {
                         markerTypes.addAll(dao.getAllMarkerTypes(0, (int) relativeLimit));
                     }
                 }
             } else {
                 relativeLimit = start - centralCount;
-                if (sessionForLocal != null) {
-                    dao.setSession(sessionForLocal);
+                if (setWorkingDatabase(Database.LOCAL)) {
+                    dao = getMarkerDao();
                     localCount = countAllMarkerTypes(Database.LOCAL);
                     if (localCount > relativeLimit) {
                         markerTypes.addAll(dao.getAllMarkerTypes((int) relativeLimit, numOfRows));
                     }
                 }
             }
-        } else if (sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
+        } else if (setWorkingDatabase(Database.LOCAL)) {
+            MarkerDAO dao = getMarkerDao();
             localCount = countAllMarkerTypes(Database.LOCAL);
             if (localCount > start) {
                 markerTypes.addAll(dao.getAllMarkerTypes(start, numOfRows));
             }
         }
-        
         return markerTypes;
     }
 
     @Override
     public long countAllMarkerTypes(Database instance) throws MiddlewareQueryException {
-        MarkerDAO dao = new MarkerDAO();
-        Session session = getSession(instance);
-        long result = 0;
-        
-        if(session != null) {
-            dao.setSession(session);
-            result = dao.countAllMarkerTypes();
+        if (setWorkingDatabase(instance)) {
+            return getMarkerDao().countAllMarkerTypes();
         }
-        
-        return result;
+        return 0;
     }
 
     @Override
     public List<String> getMarkerNamesByMarkerType(String markerType, int start, int numOfRows) throws MiddlewareQueryException {
-        MarkerDAO dao = new MarkerDAO();
-        
         List<String> markerNames = new ArrayList<String>();
-        
+
         long centralCount = 0;
         long localCount = 0;
         long relativeLimit = 0;
-        
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        
-        if(sessionForCentral != null) {
-            
-            dao.setSession(sessionForCentral);
+
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            MarkerDAO dao = getMarkerDao();
             centralCount = dao.countMarkerNamesByMarkerType(markerType);
-            
-            if(centralCount > start) {
+
+            if (centralCount > start) {
                 markerNames.addAll(dao.getMarkerNamesByMarkerType(markerType, start, numOfRows));
                 relativeLimit = numOfRows - markerNames.size();
-                if(relativeLimit > 0 && sessionForLocal != null) {
-                    dao.setSession(sessionForLocal);
+                if (relativeLimit > 0 && setWorkingDatabase(Database.LOCAL)) {
+                    dao = getMarkerDao();
                     localCount = dao.countMarkerNamesByMarkerType(markerType);
-                    if(localCount > 0) {
+                    if (localCount > 0) {
                         markerNames.addAll(dao.getMarkerNamesByMarkerType(markerType, 0, (int) relativeLimit));
                     }
                 }
             } else {
                 relativeLimit = start - centralCount;
-                if (sessionForLocal != null) {
-                    dao.setSession(sessionForLocal);
+                if (setWorkingDatabase(Database.LOCAL)) {
+                    dao = getMarkerDao();
                     localCount = dao.countMarkerNamesByMarkerType(markerType);
                     if (localCount > relativeLimit) {
                         markerNames.addAll(dao.getMarkerNamesByMarkerType(markerType, (int) relativeLimit, numOfRows));
                     }
                 }
             }
-        } else if (sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
+        } else if (setWorkingDatabase(Database.LOCAL)) {
+            MarkerDAO dao = getMarkerDao();
             localCount = dao.countMarkerNamesByMarkerType(markerType);
             if (localCount > start) {
                 markerNames.addAll(dao.getMarkerNamesByMarkerType(markerType, start, numOfRows));
             }
         }
-        
         return markerNames;
     }
 
     @Override
-    public long countMarkerNamesByMarkerType(String markerType) 
-        throws MiddlewareQueryException {
-
-        MarkerDAO dao = new MarkerDAO();
+    public long countMarkerNamesByMarkerType(String markerType) throws MiddlewareQueryException {
         long result = 0;
-        
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        
-        if(sessionForCentral != null) {
-            dao.setSession(sessionForCentral);
-            result = dao.countMarkerNamesByMarkerType(markerType);
+        if (setWorkingDatabase(Database.LOCAL)) {
+            result = getMarkerDao().countMarkerNamesByMarkerType(markerType);
         }
-        
-        if(sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
-            result += dao.countMarkerNamesByMarkerType(markerType);
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            result += getMarkerDao().countMarkerNamesByMarkerType(markerType);
         }
-        
         return result;
     }
 
     @Override
-    public List<Integer> getGIDsFromCharValuesByMarkerId(Integer markerId, int start, int numOfRows)
-        throws MiddlewareQueryException {
-        
-        CharValuesDAO dao = new CharValuesDAO();
-        Session session = getSession(markerId);
-        List<Integer> gids;
-        
-        if(session != null) {
-            dao.setSession(session);
-            gids = dao.getGIDsByMarkerId(markerId, start, numOfRows);
-        } else {
-            gids = new ArrayList<Integer>();
+    public List<Integer> getGIDsFromCharValuesByMarkerId(Integer markerId, int start, int numOfRows) throws MiddlewareQueryException {
+        if (setWorkingDatabase(markerId)) {
+            return getCharValuesDao().getGIDsByMarkerId(markerId, start, numOfRows);
         }
-        
-        return gids;
+        return new ArrayList<Integer>();
     }
 
     @Override
     public long countGIDsFromCharValuesByMarkerId(Integer markerId) throws MiddlewareQueryException {
-        CharValuesDAO dao = new CharValuesDAO();
-        Session session = getSession(markerId);
-        long result = 0;
-        
-        if(session != null) {
-            dao.setSession(session);
-            result = dao.countGIDsByMarkerId(markerId);
-        } 
-        
-        return result;
+        if (setWorkingDatabase(markerId)) {
+            return getCharValuesDao().countGIDsByMarkerId(markerId);
+        }
+        return 0;
     }
 
     @Override
     public List<Integer> getGIDsFromAlleleValuesByMarkerId(Integer markerId, int start, int numOfRows) throws MiddlewareQueryException {
-        AlleleValuesDAO dao = new AlleleValuesDAO();
-        Session session = getSession(markerId);
-        List<Integer> gids;
-        
-        if(session != null) {
-            dao.setSession(session);
-            gids = dao.getGIDsByMarkerId(markerId, start, numOfRows);
-        } else {
-            gids = new ArrayList<Integer>();
+        if (setWorkingDatabase(markerId)) {
+            return getAlleleValuesDao().getGIDsByMarkerId(markerId, start, numOfRows);
         }
-        
-        return gids;
+        return new ArrayList<Integer>();
     }
 
     @Override
     public long countGIDsFromAlleleValuesByMarkerId(Integer markerId) throws MiddlewareQueryException {
-        AlleleValuesDAO dao = new AlleleValuesDAO();
-        Session session = getSession(markerId);
-        long result = 0;
-        
-        if(session != null) {
-            dao.setSession(session);
-            result = dao.countGIDsByMarkerId(markerId);
-        } 
-        
-        return result;
+        if (setWorkingDatabase(markerId)) {
+            return getAlleleValuesDao().countGIDsByMarkerId(markerId);
+        }
+        return 0;
     }
-    
+
     @Override
     public List<Integer> getGIDsFromMappingPopValuesByMarkerId(Integer markerId, int start, int numOfRows) throws MiddlewareQueryException {
-        MappingPopValuesDAO dao = new MappingPopValuesDAO();
-        Session session = getSession(markerId);
-        List<Integer> gids;
-        
-        if(session != null) {
-            dao.setSession(session);
-            gids = dao.getGIDsByMarkerId(markerId, start, numOfRows);
-        } else {
-            gids = new ArrayList<Integer>();
+        if (setWorkingDatabase(markerId)) {
+            return getMappingPopValuesDao().getGIDsByMarkerId(markerId, start, numOfRows);
         }
-        
-        return gids;
+        return new ArrayList<Integer>();
     }
 
     @Override
     public long countGIDsFromMappingPopValuesByMarkerId(Integer markerId) throws MiddlewareQueryException {
-        MappingPopValuesDAO dao = new MappingPopValuesDAO();
-        Session session = getSession(markerId);
-        long result = 0;
-        
-        if(session != null) {
-            dao.setSession(session);
-            result = dao.countGIDsByMarkerId(markerId);
-        } 
-        
-        return result;
+        if (setWorkingDatabase(markerId)) {
+            return getMappingPopValuesDao().countGIDsByMarkerId(markerId);
+        }
+        return 0;
     }
 
     @Override
     public List<String> getAllDbAccessionIdsFromMarker(int start, int numOfRows) throws MiddlewareQueryException {
-        MarkerDAO dao = new MarkerDAO();
         List<String> dbAccessionIds = new ArrayList<String>();
         long centralCount = 0;
         long localCount = 0;
         long relativeLimit = 0;
-        
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        
-        if(sessionForCentral != null) {
-            
-            dao.setSession(sessionForCentral);
+
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            MarkerDAO dao = getMarkerDao();
             centralCount = dao.countAllDbAccessionIds();
-            
-            if(centralCount > start) {
+
+            if (centralCount > start) {
                 dbAccessionIds.addAll(dao.getAllDbAccessionIds(start, numOfRows));
                 relativeLimit = numOfRows - dbAccessionIds.size();
-                if(relativeLimit > 0 && sessionForLocal != null) {
-                    dao.setSession(sessionForLocal);
+                if (relativeLimit > 0 && setWorkingDatabase(Database.LOCAL)) {
+                    dao = getMarkerDao();
                     localCount = dao.countAllDbAccessionIds();
-                    if(localCount > 0) {
+                    if (localCount > 0) {
                         dbAccessionIds.addAll(dao.getAllDbAccessionIds(0, (int) relativeLimit));
                     }
                 }
             } else {
                 relativeLimit = start - centralCount;
-                if (sessionForLocal != null) {
-                    dao.setSession(sessionForLocal);
+                if (setWorkingDatabase(Database.LOCAL)) {
+                    dao = getMarkerDao();
                     localCount = dao.countAllDbAccessionIds();
                     if (localCount > relativeLimit) {
                         dbAccessionIds.addAll(dao.getAllDbAccessionIds((int) relativeLimit, numOfRows));
                     }
                 }
             }
-        } else if (sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
+        } else if (setWorkingDatabase(Database.LOCAL)) {
+            MarkerDAO dao = getMarkerDao();
             localCount = dao.countAllDbAccessionIds();
             if (localCount > start) {
                 dbAccessionIds.addAll(dao.getAllDbAccessionIds(start, numOfRows));
             }
         }
-        
         return dbAccessionIds;
     }
 
     @Override
     public long countAllDbAccessionIdsFromMarker() throws MiddlewareQueryException {
-        MarkerDAO dao = new MarkerDAO();
         long result = 0;
-        
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        
-        if(sessionForCentral != null) {
-            dao.setSession(sessionForCentral);
-            result = dao.countAllDbAccessionIds();
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            result += getMarkerDao().countAllDbAccessionIds();
         }
-        
-        if(sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
-            result += dao.countAllDbAccessionIds();
+        if (setWorkingDatabase(Database.LOCAL)) {
+            result += getMarkerDao().countAllDbAccessionIds();
         }
-        
         return result;
     }
 
     @Override
-    public List<Integer> getNidsFromAccMetadatasetByDatasetIds(List<Integer> datasetIds, 
-                                                               int start, int numOfRows) throws MiddlewareQueryException {
+    public List<Integer> getNidsFromAccMetadatasetByDatasetIds(List<Integer> datasetIds, int start, int numOfRows)
+            throws MiddlewareQueryException {
         return getNidsFromAccMetadatasetByDatasetIds(datasetIds, null, start, numOfRows);
     }
 
     @Override
-    public List<Integer> getNidsFromAccMetadatasetByDatasetIds(List<Integer> datasetIds, 
-                                                               List<Integer> gids, 
-                                                               int start, int numOfRows) throws MiddlewareQueryException {
-        
-        AccMetadataSetDAO dao = new AccMetadataSetDAO();
-        Session session = getSession(datasetIds.get(0));
-        List<Integer> nids;
-        
-        if(session != null) {
-            dao.setSession(session);
-            nids = dao.getNIDsByDatasetIds(datasetIds, gids, start, numOfRows);
-        } else {
-            nids = new ArrayList<Integer>();
+    public List<Integer> getNidsFromAccMetadatasetByDatasetIds(List<Integer> datasetIds, List<Integer> gids, int start, int numOfRows)
+            throws MiddlewareQueryException {
+        if (setWorkingDatabase(datasetIds.get(0))) {
+            return getAccMetadataSetDao().getNIDsByDatasetIds(datasetIds, gids, start, numOfRows);
         }
-        
-        return nids;
+        return new ArrayList<Integer>();
     }
-    
-    @Override
-    public List<Integer> getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(List<Integer> datasetIds, 
-        List<Integer> markerIds, List<Integer> gIds,
-        int start, int numOfRows) throws MiddlewareQueryException {
-        
-        Set<Integer> nidSet = new TreeSet<Integer>();
-        
-        AccMetadataSetDAO dao = new AccMetadataSetDAO();
 
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        
-        if(sessionForCentral != null) {
-            dao.setSession(sessionForCentral);
-            nidSet.addAll(dao.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds));
+    @Override
+    public List<Integer> getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(List<Integer> datasetIds, List<Integer> markerIds, List<Integer> gIds,
+            int start, int numOfRows) throws MiddlewareQueryException {
+        // TODO NO start and numOfRows?
+        Set<Integer> nidSet = new TreeSet<Integer>();
+
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            nidSet.addAll(getAccMetadataSetDao().getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds));
         }
-        
-        if(sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
-            nidSet.addAll(dao.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds));
+        if (setWorkingDatabase(Database.LOCAL)) {
+            nidSet.addAll(getAccMetadataSetDao().getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds));
         }
-        
-        List<Integer> nidList = new ArrayList<Integer>(((TreeSet<Integer>)nidSet).descendingSet());
-        
-        return nidList.subList(start, start+numOfRows);
+        List<Integer> nidList = new ArrayList<Integer>(((TreeSet<Integer>) nidSet).descendingSet());
+        return nidList.subList(start, start + numOfRows);
     }
-    
-    @Override
-    public int countNIdsByMarkerIdsAndDatasetIdsAndNotGIds(List<Integer> datasetIds, 
-        List<Integer> markerIds, List<Integer> gIds) throws MiddlewareQueryException {
-        
-        Set<Integer> nidSet = new TreeSet<Integer>();
-        
-        AccMetadataSetDAO dao = new AccMetadataSetDAO();
 
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        
-        if(sessionForCentral != null) {
-            dao.setSession(sessionForCentral);
-            nidSet.addAll(dao.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds));
+    @Override
+    public int countNIdsByMarkerIdsAndDatasetIdsAndNotGIds(List<Integer> datasetIds, List<Integer> markerIds, List<Integer> gIds)
+            throws MiddlewareQueryException {
+        Set<Integer> nidSet = new TreeSet<Integer>();
+
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            nidSet.addAll(getAccMetadataSetDao().getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds));
         }
-        
-        if(sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
-            nidSet.addAll(dao.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds));
+        if (setWorkingDatabase(Database.LOCAL)) {
+            nidSet.addAll(getAccMetadataSetDao().getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds));
         }
-        
         List<Integer> nidList = new ArrayList<Integer>(nidSet);
-        
         return nidList.size();
     }
-    
-    @Override
-    public int countNIdsByMarkerIdsAndDatasetIds(List<Integer> datasetIds, 
-        List<Integer> markerIds) throws MiddlewareQueryException {
-        
-        Set<Integer> nidSet = new TreeSet<Integer>();
-        
-        AccMetadataSetDAO dao = new AccMetadataSetDAO();
 
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        
-        if(sessionForCentral != null) {
-            dao.setSession(sessionForCentral);
-            nidSet.addAll(dao.getNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds));
+    @Override
+    public int countNIdsByMarkerIdsAndDatasetIds(List<Integer> datasetIds, List<Integer> markerIds) throws MiddlewareQueryException {
+        Set<Integer> nidSet = new TreeSet<Integer>();
+
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            nidSet.addAll(getAccMetadataSetDao().getNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds));
         }
-        
-        if(sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
-            nidSet.addAll(dao.getNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds));
+        if (setWorkingDatabase(Database.LOCAL)) {
+            nidSet.addAll(getAccMetadataSetDao().getNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds));
         }
-        
         List<Integer> nidList = new ArrayList<Integer>(nidSet);
-        
         return nidList.size();
     }
-    
-    @Override
-    public List<Integer> getNIdsByMarkerIdsAndDatasetIds(List<Integer> datasetIds, 
-        List<Integer> markerIds,
-        int start, int numOfRows) throws MiddlewareQueryException {
-        
-        Set<Integer> nidSet = new TreeSet<Integer>();
-        
-        AccMetadataSetDAO dao = new AccMetadataSetDAO();
 
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        
-        if(sessionForCentral != null) {
-            dao.setSession(sessionForCentral);
-            nidSet.addAll(dao.getNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds));
+    @Override
+    public List<Integer> getNIdsByMarkerIdsAndDatasetIds(List<Integer> datasetIds, List<Integer> markerIds, int start, int numOfRows)
+            throws MiddlewareQueryException {
+        // TODO NO start and numOfRows?
+        Set<Integer> nidSet = new TreeSet<Integer>();
+
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            nidSet.addAll(getAccMetadataSetDao().getNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds));
         }
-        
-        if(sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
-            nidSet.addAll(dao.getNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds));
+        if (setWorkingDatabase(Database.LOCAL)) {
+            nidSet.addAll(getAccMetadataSetDao().getNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds));
         }
-        
-        List<Integer> nidList = new ArrayList<Integer>(((TreeSet<Integer>)nidSet).descendingSet());
-        
-        return nidList.subList(start, start+numOfRows);
+        List<Integer> nidList = new ArrayList<Integer>(((TreeSet<Integer>) nidSet).descendingSet());
+        return nidList.subList(start, start + numOfRows);
     }
 
     @Override
-    public List<Integer> getDatasetIdsForFingerPrinting(int start, int numOfRows) throws MiddlewareQueryException{
-        DatasetDAO dao = new DatasetDAO();
+    public List<Integer> getDatasetIdsForFingerPrinting(int start, int numOfRows) throws MiddlewareQueryException {
         List<Integer> datasetIds = new ArrayList<Integer>();
         long centralCount = 0;
         long localCount = 0;
         long relativeLimit = 0;
-        
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        
-        if(sessionForCentral != null) {
-            
-            dao.setSession(sessionForCentral);
+
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            DatasetDAO dao = getDatasetDao();
             centralCount = dao.countDatasetIdsForFingerPrinting();
-            
-            if(centralCount > start) {
+            if (centralCount > start) {
                 datasetIds.addAll(dao.getDatasetIdsForFingerPrinting(start, numOfRows));
                 relativeLimit = numOfRows - datasetIds.size();
-                if(relativeLimit > 0 && sessionForLocal != null) {
-                    dao.setSession(sessionForLocal);
+                if (relativeLimit > 0 && setWorkingDatabase(Database.LOCAL)) {
+                    dao = getDatasetDao();
                     localCount = dao.countDatasetIdsForFingerPrinting();
-                    if(localCount > 0) {
+                    if (localCount > 0) {
                         datasetIds.addAll(dao.getDatasetIdsForFingerPrinting(0, (int) relativeLimit));
                     }
                 }
             } else {
                 relativeLimit = start - centralCount;
-                if (sessionForLocal != null) {
-                    dao.setSession(sessionForLocal);
+                if (setWorkingDatabase(Database.LOCAL)) {
+                    dao = getDatasetDao();
                     localCount = dao.countDatasetIdsForFingerPrinting();
                     if (localCount > relativeLimit) {
                         datasetIds.addAll(dao.getDatasetIdsForFingerPrinting((int) relativeLimit, numOfRows));
                     }
                 }
             }
-        } else if (sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
+        } else if (setWorkingDatabase(Database.LOCAL)) {
+            DatasetDAO dao = getDatasetDao();
             localCount = dao.countDatasetIdsForFingerPrinting();
             if (localCount > start) {
                 datasetIds.addAll(dao.getDatasetIdsForFingerPrinting(start, numOfRows));
             }
         }
-        
         return datasetIds;
-        
     }
-    
+
     @Override
-    public long countDatasetIdsForFingerPrinting() throws MiddlewareQueryException{
-        DatasetDAO dao = new DatasetDAO();
+    public long countDatasetIdsForFingerPrinting() throws MiddlewareQueryException {
         long result = 0;
-        
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        
-        if(sessionForCentral != null) {
-            dao.setSession(sessionForCentral);
-            result = dao.countDatasetIdsForFingerPrinting();
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            result = getDatasetDao().countDatasetIdsForFingerPrinting();
         }
-        
-        if(sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
-            result += dao.countDatasetIdsForFingerPrinting();
+        if (setWorkingDatabase(Database.LOCAL)) {
+            result += getDatasetDao().countDatasetIdsForFingerPrinting();
         }
-        
         return result;
     }
 
     @Override
-    public List<Integer> getDatasetIdsForMapping(int start, int numOfRows) throws MiddlewareQueryException{
-        DatasetDAO dao = new DatasetDAO();
+    public List<Integer> getDatasetIdsForMapping(int start, int numOfRows) throws MiddlewareQueryException {
         List<Integer> datasetIds = new ArrayList<Integer>();
         long centralCount = 0;
         long localCount = 0;
         long relativeLimit = 0;
-        
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        
-        if(sessionForCentral != null) {
-            
-            dao.setSession(sessionForCentral);
+
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            DatasetDAO dao = getDatasetDao();
             centralCount = dao.countDatasetIdsForMapping();
-            
-            if(centralCount > start) {
+            if (centralCount > start) {
                 datasetIds.addAll(dao.getDatasetIdsForMapping(start, numOfRows));
                 relativeLimit = numOfRows - datasetIds.size();
-                if(relativeLimit > 0 && sessionForLocal != null) {
-                    dao.setSession(sessionForLocal);
+                if (relativeLimit > 0 && setWorkingDatabase(Database.LOCAL)) {
+                    dao = getDatasetDao();
                     localCount = dao.countDatasetIdsForMapping();
-                    if(localCount > 0) {
+                    if (localCount > 0) {
                         datasetIds.addAll(dao.getDatasetIdsForMapping(0, (int) relativeLimit));
                     }
                 }
             } else {
                 relativeLimit = start - centralCount;
-                if (sessionForLocal != null) {
-                    dao.setSession(sessionForLocal);
+                if (setWorkingDatabase(Database.LOCAL)) {
+                    dao = getDatasetDao();
                     localCount = dao.countDatasetIdsForMapping();
                     if (localCount > relativeLimit) {
                         datasetIds.addAll(dao.getDatasetIdsForMapping((int) relativeLimit, numOfRows));
                     }
                 }
             }
-        } else if (sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
+        } else if (setWorkingDatabase(Database.LOCAL)) {
+            DatasetDAO dao = getDatasetDao();
             localCount = dao.countDatasetIdsForMapping();
             if (localCount > start) {
                 datasetIds.addAll(dao.getDatasetIdsForMapping(start, numOfRows));
             }
         }
-        
         return datasetIds;
-        
     }
-    
+
     @Override
-    public long countDatasetIdsForMapping() throws MiddlewareQueryException{
-        DatasetDAO dao = new DatasetDAO();
+    public long countDatasetIdsForMapping() throws MiddlewareQueryException {
         long result = 0;
-        
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        
-        if(sessionForCentral != null) {
-            dao.setSession(sessionForCentral);
-            result = dao.countDatasetIdsForMapping();
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            result = getDatasetDao().countDatasetIdsForMapping();
         }
-        
-        if(sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
-            result += dao.countDatasetIdsForMapping();
+        if (setWorkingDatabase(Database.LOCAL)) {
+            result += getDatasetDao().countDatasetIdsForMapping();
         }
-        
         return result;
     }
 
     @Override
-    public List<AccMetadataSetPK> getGdmsAccMetadatasetByGid(List<Integer> gids, int start, int numOfRows) throws MiddlewareQueryException{
-       
-        AccMetadataSetDAO dao = new AccMetadataSetDAO();
-
+    public List<AccMetadataSetPK> getGdmsAccMetadatasetByGid(List<Integer> gids, int start, int numOfRows) throws MiddlewareQueryException {
+        List<AccMetadataSetPK> accMetadataSets = new ArrayList<AccMetadataSetPK>();
         long centralCount = 0;
         long localCount = 0;
         long relativeLimit = 0;
 
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        
-        List<Integer> positiveGids = new ArrayList<Integer>();
-        List<Integer> negativeGids = new ArrayList<Integer>();
-        for (Integer gid : gids){
-            if (gid < 0) {
-                negativeGids.add(gid);
-            } else {
-                positiveGids.add(gid);
-            }
-        }
+        List<Integer> positiveGids = GenotypicDataManagerUtil.getPositiveIds(gids);
+        List<Integer> negativeGids = GenotypicDataManagerUtil.getNegativeIds(gids);
 
-        List<AccMetadataSetPK> accMetadataSets = new ArrayList<AccMetadataSetPK>();
-
-        if ((sessionForCentral != null) && (positiveGids != null) && (!positiveGids.isEmpty())) {
-            
-            dao.setSession(sessionForCentral);
+        if (setWorkingDatabase(Database.CENTRAL) && (positiveGids != null) && (!positiveGids.isEmpty())) {
+            AccMetadataSetDAO dao = getAccMetadataSetDao();
             centralCount = dao.countAccMetadataSetByGids(positiveGids);
-            
-            if(centralCount > start) {
+
+            if (centralCount > start) {
                 accMetadataSets.addAll(dao.getAccMetadasetByGids(positiveGids, start, numOfRows));
                 relativeLimit = numOfRows - accMetadataSets.size();
-                if(relativeLimit > 0 && sessionForLocal != null) {
-                    dao.setSession(sessionForLocal);
+                if (relativeLimit > 0 && setWorkingDatabase(Database.LOCAL)) {
+                    dao = getAccMetadataSetDao();
                     localCount = dao.countAccMetadataSetByGids(negativeGids);
-                    if(localCount > 0) {
+                    if (localCount > 0) {
                         accMetadataSets.addAll(dao.getAccMetadasetByGids(negativeGids, 0, (int) relativeLimit));
                     }
                 }
             } else {
                 relativeLimit = start - centralCount;
-                if ((sessionForLocal != null) && (negativeGids != null) && (!negativeGids.isEmpty())){
-                    dao.setSession(sessionForLocal);
+                if (setWorkingDatabase(Database.LOCAL) && (negativeGids != null) && (!negativeGids.isEmpty())) {
+                    dao = getAccMetadataSetDao();
                     localCount = dao.countAccMetadataSetByGids(negativeGids);
                     if (localCount > relativeLimit) {
                         accMetadataSets.addAll(dao.getAccMetadasetByGids(negativeGids, (int) relativeLimit, numOfRows));
                     }
                 }
             }
-        } else if ((sessionForLocal != null) && (negativeGids != null) && (!negativeGids.isEmpty())) {
-            dao.setSession(sessionForLocal);
+        } else if (setWorkingDatabase(Database.LOCAL) && (negativeGids != null) && (!negativeGids.isEmpty())) {
+            AccMetadataSetDAO dao = getAccMetadataSetDao();
             localCount = dao.countAccMetadataSetByGids(negativeGids);
             if (localCount > start) {
                 accMetadataSets.addAll(dao.getAccMetadasetByGids(negativeGids, start, numOfRows));
             }
         }
-        
         return accMetadataSets;
-
     }
-    
+
     @Override
-    public long countGdmsAccMetadatasetByGid(List<Integer> gids) throws MiddlewareQueryException{
-        
-        AccMetadataSetDAO dao = new AccMetadataSetDAO();
-
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-
-        List<Integer> positiveGids = new ArrayList<Integer>();
-        List<Integer> negativeGids = new ArrayList<Integer>();
-        for (Integer gid : gids){
-            if (gid < 0) {
-                negativeGids.add(gid);
-            } else {
-                positiveGids.add(gid);
-            }
-        }
+    public long countGdmsAccMetadatasetByGid(List<Integer> gids) throws MiddlewareQueryException {
+        List<Integer> positiveGids = GenotypicDataManagerUtil.getPositiveIds(gids);
+        List<Integer> negativeGids = GenotypicDataManagerUtil.getNegativeIds(gids);
 
         long result = 0;
-
         // Count from local
-        if ((sessionForLocal != null) && (negativeGids != null) && (!negativeGids.isEmpty())){
-            dao.setSession(sessionForLocal);
-            result += dao.countAccMetadataSetByGids(negativeGids);
+        if (setWorkingDatabase(Database.LOCAL) && (negativeGids != null) && (!negativeGids.isEmpty())) {
+            result += getAccMetadataSetDao().countAccMetadataSetByGids(negativeGids);
         }
-
         // Count from central
-        if ((sessionForCentral != null) && (positiveGids != null) && (!positiveGids.isEmpty())) {
-            dao.setSession(sessionForCentral);
-            result += dao.countAccMetadataSetByGids(positiveGids);
+        if (setWorkingDatabase(Database.CENTRAL) && (positiveGids != null) && (!positiveGids.isEmpty())) {
+            result += getAccMetadataSetDao().countAccMetadataSetByGids(positiveGids);
         }
 
         return result;
-
     }
 
     @Override
-    public List<Integer> getMarkersByGidAndDatasetIds(Integer gid, List<Integer> datasetIds, int start, int numOfRows) throws MiddlewareQueryException{
-        MarkerMetadataSetDAO dao = new MarkerMetadataSetDAO();
+    public List<Integer> getMarkersByGidAndDatasetIds(Integer gid, List<Integer> datasetIds, int start, int numOfRows)
+            throws MiddlewareQueryException {
         List<Integer> markerIds = new ArrayList<Integer>();
         long centralCount = 0;
         long localCount = 0;
         long relativeLimit = 0;
-        
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        
-        if(sessionForCentral != null) {
-            
-            dao.setSession(sessionForCentral);
+
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            MarkerMetadataSetDAO dao = getMarkerMetadataSetDao();
             centralCount = dao.countMarkersByGidAndDatasetIds(gid, datasetIds);
-            
-            if(centralCount > start) {
+
+            if (centralCount > start) {
                 markerIds.addAll(dao.getMarkersByGidAndDatasetIds(gid, datasetIds, start, numOfRows));
                 relativeLimit = numOfRows - markerIds.size();
-                if(relativeLimit > 0 && sessionForLocal != null) {
-                    dao.setSession(sessionForLocal);
+                if (relativeLimit > 0 && setWorkingDatabase(Database.LOCAL)) {
+                    dao = getMarkerMetadataSetDao();
                     localCount = dao.countMarkersByGidAndDatasetIds(gid, datasetIds);
-                    if(localCount > 0) {
+                    if (localCount > 0) {
                         markerIds.addAll(dao.getMarkersByGidAndDatasetIds(gid, datasetIds, 0, (int) relativeLimit));
                     }
                 }
             } else {
                 relativeLimit = start - centralCount;
-                if (sessionForLocal != null) {
-                    dao.setSession(sessionForLocal);
+                if (setWorkingDatabase(Database.LOCAL)) {
+                    dao = getMarkerMetadataSetDao();
                     localCount = dao.countMarkersByGidAndDatasetIds(gid, datasetIds);
                     if (localCount > relativeLimit) {
                         markerIds.addAll(dao.getMarkersByGidAndDatasetIds(gid, datasetIds, (int) relativeLimit, numOfRows));
                     }
                 }
             }
-        } else if (sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
+        } else if (setWorkingDatabase(Database.LOCAL)) {
+            MarkerMetadataSetDAO dao = getMarkerMetadataSetDao();
             localCount = dao.countMarkersByGidAndDatasetIds(gid, datasetIds);
             if (localCount > start) {
                 markerIds.addAll(dao.getMarkersByGidAndDatasetIds(gid, datasetIds, start, numOfRows));
             }
         }
-        
         return markerIds;
     }
 
     @Override
-    public long countMarkersByGidAndDatasetIds(Integer gid, List<Integer> datasetIds) throws MiddlewareQueryException{
-        MarkerMetadataSetDAO dao = new MarkerMetadataSetDAO();
+    public long countMarkersByGidAndDatasetIds(Integer gid, List<Integer> datasetIds) throws MiddlewareQueryException {
         long result = 0;
-        
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        
-        if(sessionForCentral != null) {
-            dao.setSession(sessionForCentral);
-            result = dao.countMarkersByGidAndDatasetIds(gid, datasetIds);
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            result = getMarkerMetadataSetDao().countMarkersByGidAndDatasetIds(gid, datasetIds);
         }
-        
-        if(sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
-            result += dao.countMarkersByGidAndDatasetIds(gid, datasetIds);
+        if (setWorkingDatabase(Database.LOCAL)) {
+            result += getMarkerMetadataSetDao().countMarkersByGidAndDatasetIds(gid, datasetIds);
         }
-        
         return result;
-        
     }
-    
+
     @Override
-    public List<Marker> getMarkersByMarkerIDs(List<Integer> markerIDs, int start, int numOfRows) throws MiddlewareQueryException{
-        MarkerDAO dao = new MarkerDAO();
+    public List<Marker> getMarkersByMarkerIDs(List<Integer> markerIDs, int start, int numOfRows) throws MiddlewareQueryException {
         List<Marker> markerIds = new ArrayList<Marker>();
         long centralCount = 0;
         long localCount = 0;
         long relativeLimit = 0;
-        
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        
-        if(sessionForCentral != null) {
-            
-            dao.setSession(sessionForCentral);
+
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            MarkerDAO dao = getMarkerDao();
             centralCount = dao.countMarkersByIds(markerIDs);
-            
-            if(centralCount > start) {
+
+            if (centralCount > start) {
                 markerIds.addAll(dao.getMarkersByIds(markerIDs, start, numOfRows));
-                relativeLimit = numOfRows - (centralCount -start);
-                if(relativeLimit > 0 && sessionForLocal != null) {
-                    dao.setSession(sessionForLocal);
+                relativeLimit = numOfRows - (centralCount - start);
+                if (relativeLimit > 0 && setWorkingDatabase(Database.LOCAL)) {
+                    dao = getMarkerDao();
                     localCount = dao.countMarkersByIds(markerIDs);
-                    if(localCount > 0) {
+                    if (localCount > 0) {
                         markerIds.addAll(dao.getMarkersByIds(markerIDs, 0, (int) relativeLimit));
                     }
                 }
             } else {
                 relativeLimit = start - centralCount;
-                if (sessionForLocal != null) {
-                    dao.setSession(sessionForLocal);
+                if (setWorkingDatabase(Database.LOCAL)) {
+                    dao = getMarkerDao();
                     localCount = dao.countMarkersByIds(markerIDs);
                     if (localCount > relativeLimit) {
                         markerIds.addAll(dao.getMarkersByIds(markerIDs, (int) relativeLimit, numOfRows));
                     }
                 }
             }
-        } else if (sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
+        } else if (setWorkingDatabase(Database.LOCAL)) {
+            MarkerDAO dao = getMarkerDao();
             localCount = dao.countMarkersByIds(markerIDs);
             if (localCount > start) {
                 markerIds.addAll(dao.getMarkersByIds(markerIDs, start, numOfRows));
             }
         }
-        
         return markerIds;
     }
 
     @Override
-    public long countMarkersByMarkerIDs(List<Integer> markerIDs) throws MiddlewareQueryException{
-        MarkerDAO dao = new MarkerDAO();
+    public long countMarkersByMarkerIDs(List<Integer> markerIDs) throws MiddlewareQueryException {
         long result = 0;
-        
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        
-        if(sessionForCentral != null) {
-            dao.setSession(sessionForCentral);
-            result = dao.countMarkersByIds(markerIDs);
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            result = getMarkerDao().countMarkersByIds(markerIDs);
         }
-        
-        if(sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
-            result += dao.countMarkersByIds(markerIDs);
+        if (setWorkingDatabase(Database.LOCAL)) {
+            result += getMarkerDao().countMarkersByIds(markerIDs);
         }
-        
         return result;
-        
-    }    
-    
+
+    }
+
     @Override
-    public long countAlleleValuesByGids(List<Integer> gids) throws MiddlewareQueryException{
-
-        AlleleValuesDAO dao = new AlleleValuesDAO();
-
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-
+    public long countAlleleValuesByGids(List<Integer> gids) throws MiddlewareQueryException {
         long result = 0;
-
-        // Count from local
-        if (sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
-            result += dao.countAlleleValuesByGids(gids);
+        if (setWorkingDatabase(Database.LOCAL)) {
+            result += getAlleleValuesDao().countAlleleValuesByGids(gids);
         }
-
-        // Count from central
-        if (sessionForCentral != null) {
-            dao.setSession(sessionForCentral);
-            result += dao.countAlleleValuesByGids(gids);
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            result += getAlleleValuesDao().countAlleleValuesByGids(gids);
         }
-
         return result;
     }
 
-
     @Override
-    public long countCharValuesByGids(List<Integer> gids) throws MiddlewareQueryException{
-
-        CharValuesDAO dao = new CharValuesDAO();
-
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-
+    public long countCharValuesByGids(List<Integer> gids) throws MiddlewareQueryException {
         long result = 0;
-
-        // Count from local
-        if (sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
-            result += dao.countCharValuesByGids(gids);
+        if (setWorkingDatabase(Database.LOCAL)) {
+            result += getCharValuesDao().countCharValuesByGids(gids);
         }
-
-        // Count from central
-        if (sessionForCentral != null) {
-            dao.setSession(sessionForCentral);
-            result += dao.countCharValuesByGids(gids);
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            result += getCharValuesDao().countCharValuesByGids(gids);
         }
-
         return result;
     }
 
-
-        
-
     @Override
-    public List<AllelicValueElement> getIntAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids, int start, int numOfRows) throws MiddlewareQueryException{
-        AlleleValuesDAO dao = new AlleleValuesDAO();
-
+    public List<AllelicValueElement> getIntAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids, int start, int numOfRows)
+            throws MiddlewareQueryException {
+        List<AllelicValueElement> allelicValueElements = new ArrayList<AllelicValueElement>();
         long centralCount = 0;
         long localCount = 0;
         long relativeLimit = 0;
 
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        
-        List<Integer> positiveGids = new ArrayList<Integer>();
-        List<Integer> negativeGids = new ArrayList<Integer>();
-        for (Integer gid : gids){
-            if (gid < 0) {
-                negativeGids.add(gid);
-            } else {
-                positiveGids.add(gid);
-            }
-        }
+        List<Integer> positiveGids = GenotypicDataManagerUtil.getPositiveIds(gids);
+        List<Integer> negativeGids = GenotypicDataManagerUtil.getNegativeIds(gids);
 
-        List<AllelicValueElement> allelicValueElements = new ArrayList<AllelicValueElement>();
-
-        if ((sessionForCentral != null) && (positiveGids != null) && (!positiveGids.isEmpty())) {
-            
-            dao.setSession(sessionForCentral);
+        if (setWorkingDatabase(Database.CENTRAL) && (positiveGids != null) && (!positiveGids.isEmpty())) {
+            AlleleValuesDAO dao = getAlleleValuesDao();
             centralCount = dao.countIntAlleleValuesForPolymorphicMarkersRetrieval(positiveGids);
-            
-            if(centralCount > start) {
+
+            if (centralCount > start) {
                 allelicValueElements.addAll(dao.getIntAlleleValuesForPolymorphicMarkersRetrieval(positiveGids, start, numOfRows));
                 relativeLimit = numOfRows - allelicValueElements.size();
-                if(relativeLimit > 0 && sessionForLocal != null) {
-                    dao.setSession(sessionForLocal);
+                if (relativeLimit > 0 && setWorkingDatabase(Database.LOCAL)) {
+                    dao = getAlleleValuesDao();
                     localCount = dao.countIntAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
-                    if(localCount > 0) {
-                        allelicValueElements.addAll(dao.getIntAlleleValuesForPolymorphicMarkersRetrieval(negativeGids, 0, (int) relativeLimit));
+                    if (localCount > 0) {
+                        allelicValueElements.addAll(dao.getIntAlleleValuesForPolymorphicMarkersRetrieval(negativeGids, 0,
+                                (int) relativeLimit));
                     }
                 }
             } else {
                 relativeLimit = start - centralCount;
-                if ((sessionForLocal != null) && (negativeGids != null) && (!negativeGids.isEmpty())){
-                    dao.setSession(sessionForLocal);
+                if (setWorkingDatabase(Database.LOCAL) && (negativeGids != null) && (!negativeGids.isEmpty())) {
+                    dao = getAlleleValuesDao();
                     localCount = dao.countIntAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
                     if (localCount > relativeLimit) {
-                        allelicValueElements.addAll(dao.getIntAlleleValuesForPolymorphicMarkersRetrieval(negativeGids, (int) relativeLimit, numOfRows));
+                        allelicValueElements.addAll(dao.getIntAlleleValuesForPolymorphicMarkersRetrieval(negativeGids, (int) relativeLimit,
+                                numOfRows));
                     }
                 }
             }
-        } else if ((sessionForLocal != null) && (negativeGids != null) && (!negativeGids.isEmpty())) {
-            dao.setSession(sessionForLocal);
+        } else if (setWorkingDatabase(Database.LOCAL) && (negativeGids != null) && (!negativeGids.isEmpty())) {
+            AlleleValuesDAO dao = getAlleleValuesDao();
             localCount = dao.countIntAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
             if (localCount > start) {
                 allelicValueElements.addAll(dao.getIntAlleleValuesForPolymorphicMarkersRetrieval(negativeGids, start, numOfRows));
             }
         }
-        
         //Sort by gid, markerName
         Collections.sort(allelicValueElements, AllelicValueElement.AllelicValueElementComparator);
 
         return allelicValueElements;
     }
 
-    
     @Override
-    public long countIntAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException{
-        AlleleValuesDAO dao = new AlleleValuesDAO();
-
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-
-        List<Integer> positiveGids = new ArrayList<Integer>();
-        List<Integer> negativeGids = new ArrayList<Integer>();
-        for (Integer gid : gids){
-            if (gid < 0) {
-                negativeGids.add(gid);
-            } else {
-                positiveGids.add(gid);
-            }
-        }
-
+    public long countIntAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException {
+        List<Integer> positiveGids = GenotypicDataManagerUtil.getPositiveIds(gids);
+        List<Integer> negativeGids = GenotypicDataManagerUtil.getNegativeIds(gids);
         long result = 0;
-
-        // Count from local
-        if ((sessionForLocal != null) && (negativeGids != null) && (!negativeGids.isEmpty())){
-            dao.setSession(sessionForLocal);
-            result += dao.countIntAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
+        if (setWorkingDatabase(Database.LOCAL) && (negativeGids != null) && (!negativeGids.isEmpty())) {
+            result += getAlleleValuesDao().countIntAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
         }
-
-        // Count from central
-        if ((sessionForCentral != null) && (positiveGids != null) && (!positiveGids.isEmpty())) {
-            dao.setSession(sessionForCentral);
-            result += dao.countIntAlleleValuesForPolymorphicMarkersRetrieval(positiveGids);
+        if (setWorkingDatabase(Database.CENTRAL) && (positiveGids != null) && (!positiveGids.isEmpty())) {
+            result += getAlleleValuesDao().countIntAlleleValuesForPolymorphicMarkersRetrieval(positiveGids);
         }
-
         return result;
     }
 
-
     @Override
-    public List<AllelicValueElement> getCharAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids, int start, int numOfRows) throws MiddlewareQueryException{
-        AlleleValuesDAO dao = new AlleleValuesDAO();
+    public List<AllelicValueElement> getCharAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids, int start, int numOfRows)
+            throws MiddlewareQueryException {
 
         long centralCount = 0;
         long localCount = 0;
         long relativeLimit = 0;
 
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        
-        List<Integer> positiveGids = new ArrayList<Integer>();
-        List<Integer> negativeGids = new ArrayList<Integer>();
-        for (Integer gid : gids){
-            if (gid < 0) {
-                negativeGids.add(gid);
-            } else {
-                positiveGids.add(gid);
-            }
-        }
+        List<Integer> positiveGids = GenotypicDataManagerUtil.getPositiveIds(gids);
+        List<Integer> negativeGids = GenotypicDataManagerUtil.getNegativeIds(gids);
 
         List<AllelicValueElement> allelicValueElements = new ArrayList<AllelicValueElement>();
 
-        if ((sessionForCentral != null) && (positiveGids != null) && (!positiveGids.isEmpty())) {
-            
-            dao.setSession(sessionForCentral);
+        if (setWorkingDatabase(Database.CENTRAL) && (positiveGids != null) && (!positiveGids.isEmpty())) {
+            AlleleValuesDAO dao = getAlleleValuesDao();
             centralCount = dao.countCharAlleleValuesForPolymorphicMarkersRetrieval(positiveGids);
-            
-            if(centralCount > start) {
+
+            if (centralCount > start) {
                 allelicValueElements.addAll(dao.getCharAlleleValuesForPolymorphicMarkersRetrieval(positiveGids, start, numOfRows));
                 relativeLimit = numOfRows - allelicValueElements.size();
-                if(relativeLimit > 0 && sessionForLocal != null) {
-                    dao.setSession(sessionForLocal);
+                if (relativeLimit > 0 && setWorkingDatabase(Database.LOCAL)) {
+                    dao = getAlleleValuesDao();
                     localCount = dao.countCharAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
-                    if(localCount > 0) {
-                        allelicValueElements.addAll(dao.getCharAlleleValuesForPolymorphicMarkersRetrieval(negativeGids, 0, (int) relativeLimit));
+                    if (localCount > 0) {
+                        allelicValueElements.addAll(dao.getCharAlleleValuesForPolymorphicMarkersRetrieval(negativeGids, 0,
+                                (int) relativeLimit));
                     }
                 }
             } else {
                 relativeLimit = start - centralCount;
-                if ((sessionForLocal != null) && (negativeGids != null) && (!negativeGids.isEmpty())){
-                    dao.setSession(sessionForLocal);
+                if ((setWorkingDatabase(Database.LOCAL)) && (negativeGids != null) && (!negativeGids.isEmpty())) {
+                    dao = getAlleleValuesDao();
                     localCount = dao.countCharAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
                     if (localCount > relativeLimit) {
-                        allelicValueElements.addAll(dao.getCharAlleleValuesForPolymorphicMarkersRetrieval(negativeGids, (int) relativeLimit, numOfRows));
+                        allelicValueElements.addAll(dao.getCharAlleleValuesForPolymorphicMarkersRetrieval(negativeGids,
+                                (int) relativeLimit, numOfRows));
                     }
                 }
             }
-        } else if ((sessionForLocal != null) && (negativeGids != null) && (!negativeGids.isEmpty())){
-            dao.setSession(sessionForLocal);
+        } else if ((setWorkingDatabase(Database.LOCAL)) && (negativeGids != null) && (!negativeGids.isEmpty())) {
+            AlleleValuesDAO dao = getAlleleValuesDao();
             localCount = dao.countCharAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
             if (localCount > start) {
                 allelicValueElements.addAll(dao.getCharAlleleValuesForPolymorphicMarkersRetrieval(negativeGids, start, numOfRows));
             }
         }
-        
+
         //Sort by gid, markerName
         Collections.sort(allelicValueElements, AllelicValueElement.AllelicValueElementComparator);
 
@@ -1821,96 +1423,65 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
 
     @Override
-    public long countCharAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException{
-        AlleleValuesDAO dao = new AlleleValuesDAO();
-
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-
-        List<Integer> positiveGids = new ArrayList<Integer>();
-        List<Integer> negativeGids = new ArrayList<Integer>();
-        for (Integer gid : gids){
-            if (gid < 0) {
-                negativeGids.add(gid);
-            } else {
-                positiveGids.add(gid);
-            }
-        }
+    public long countCharAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException {
+        List<Integer> positiveGids = GenotypicDataManagerUtil.getPositiveIds(gids);
+        List<Integer> negativeGids = GenotypicDataManagerUtil.getNegativeIds(gids);
 
         long result = 0;
-
-        // Count from local
-        if ((sessionForLocal != null) && (negativeGids != null) && (!negativeGids.isEmpty())){
-            dao.setSession(sessionForLocal);
-            result += dao.countCharAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
+        if ((setWorkingDatabase(Database.LOCAL)) && (negativeGids != null) && (!negativeGids.isEmpty())) {
+            result += getAlleleValuesDao().countCharAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
         }
-
-        // Count from central
-        if ((sessionForCentral != null) && (positiveGids != null) && (!positiveGids.isEmpty())) {
-            dao.setSession(sessionForCentral);
-            result += dao.countCharAlleleValuesForPolymorphicMarkersRetrieval(positiveGids);
+        if ((setWorkingDatabase(Database.CENTRAL)) && (positiveGids != null) && (!positiveGids.isEmpty())) {
+            result += getAlleleValuesDao().countCharAlleleValuesForPolymorphicMarkersRetrieval(positiveGids);
         }
-
         return result;
     }
 
-    
     @Override
-    public List<AllelicValueElement> getMappingAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids, int start, int numOfRows) throws MiddlewareQueryException{
-        AlleleValuesDAO dao = new AlleleValuesDAO();
-
+    public List<AllelicValueElement> getMappingAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids, int start, int numOfRows)
+            throws MiddlewareQueryException {
+        List<AllelicValueElement> allelicValueElements = new ArrayList<AllelicValueElement>();
         long centralCount = 0;
         long localCount = 0;
         long relativeLimit = 0;
 
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        
-        List<Integer> positiveGids = new ArrayList<Integer>();
-        List<Integer> negativeGids = new ArrayList<Integer>();
-        for (Integer gid : gids){
-            if (gid < 0) {
-                negativeGids.add(gid);
-            } else {
-                positiveGids.add(gid);
-            }
-        }
+        List<Integer> positiveGids = GenotypicDataManagerUtil.getPositiveIds(gids);
+        List<Integer> negativeGids = GenotypicDataManagerUtil.getNegativeIds(gids);
 
-        List<AllelicValueElement> allelicValueElements = new ArrayList<AllelicValueElement>();
-
-        if ((sessionForCentral != null) && (positiveGids != null) && (!positiveGids.isEmpty())) {
-            
-            dao.setSession(sessionForCentral);
+        if ((setWorkingDatabase(Database.CENTRAL)) && (positiveGids != null) && (!positiveGids.isEmpty())) {
+            AlleleValuesDAO dao = getAlleleValuesDao();
             centralCount = dao.countMappingAlleleValuesForPolymorphicMarkersRetrieval(positiveGids);
-            
-            if(centralCount > start) {
+
+            if (centralCount > start) {
                 allelicValueElements.addAll(dao.getMappingAlleleValuesForPolymorphicMarkersRetrieval(positiveGids, start, numOfRows));
                 relativeLimit = numOfRows - allelicValueElements.size();
-                if(relativeLimit > 0 && sessionForLocal != null) {
-                    dao.setSession(sessionForLocal);
+                if (relativeLimit > 0 && setWorkingDatabase(Database.LOCAL)) {
+                    dao = getAlleleValuesDao();
                     localCount = dao.countMappingAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
-                    if(localCount > 0) {
-                        allelicValueElements.addAll(dao.getMappingAlleleValuesForPolymorphicMarkersRetrieval(negativeGids, 0, (int) relativeLimit));
+                    if (localCount > 0) {
+                        allelicValueElements.addAll(dao.getMappingAlleleValuesForPolymorphicMarkersRetrieval(negativeGids, 0,
+                                (int) relativeLimit));
                     }
                 }
             } else {
                 relativeLimit = start - centralCount;
-                if ((sessionForLocal != null) && (negativeGids != null) && (!negativeGids.isEmpty())){
-                    dao.setSession(sessionForLocal);
+                if ((setWorkingDatabase(Database.LOCAL)) && (negativeGids != null) && (!negativeGids.isEmpty())) {
+                    dao = getAlleleValuesDao();
                     localCount = dao.countMappingAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
                     if (localCount > relativeLimit) {
-                        allelicValueElements.addAll(dao.getMappingAlleleValuesForPolymorphicMarkersRetrieval(negativeGids, (int) relativeLimit, numOfRows));
+                        allelicValueElements.addAll(dao.getMappingAlleleValuesForPolymorphicMarkersRetrieval(negativeGids,
+                                (int) relativeLimit, numOfRows));
                     }
                 }
             }
-        } else if ((sessionForLocal != null) && (negativeGids != null) && (!negativeGids.isEmpty())){
-            dao.setSession(sessionForLocal);
+        } else if ((setWorkingDatabase(Database.LOCAL)) && (negativeGids != null) && (!negativeGids.isEmpty())) {
+            AlleleValuesDAO dao = getAlleleValuesDao();
             localCount = dao.countMappingAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
             if (localCount > start) {
                 allelicValueElements.addAll(dao.getMappingAlleleValuesForPolymorphicMarkersRetrieval(negativeGids, start, numOfRows));
             }
         }
-        
+
         //Sort by gid, markerName
         Collections.sort(allelicValueElements, AllelicValueElement.AllelicValueElementComparator);
 
@@ -1918,151 +1489,61 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
 
     @Override
-    public long countMappingAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException{
-        AlleleValuesDAO dao = new AlleleValuesDAO();
-
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-
-        List<Integer> positiveGids = new ArrayList<Integer>();
-        List<Integer> negativeGids = new ArrayList<Integer>();
-        for (Integer gid : gids){
-            if (gid < 0) {
-                negativeGids.add(gid);
-            } else {
-                positiveGids.add(gid);
-            }
-        }
+    public long countMappingAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException {
+        List<Integer> positiveGids = GenotypicDataManagerUtil.getPositiveIds(gids);
+        List<Integer> negativeGids = GenotypicDataManagerUtil.getNegativeIds(gids);
 
         long result = 0;
-
-        // Count from local
-        if ((sessionForLocal != null) && (negativeGids != null) && (!negativeGids.isEmpty())){
-            dao.setSession(sessionForLocal);
-            result += dao.countMappingAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
+        if (setWorkingDatabase(Database.LOCAL) && (negativeGids != null) && (!negativeGids.isEmpty())) {
+            result += getAlleleValuesDao().countMappingAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
         }
-
-        // Count from central
-        if ((sessionForCentral != null) && (positiveGids != null) && (!positiveGids.isEmpty())) {
-            dao.setSession(sessionForCentral);
-            result += dao.countMappingAlleleValuesForPolymorphicMarkersRetrieval(positiveGids);
+        if (setWorkingDatabase(Database.CENTRAL) && (positiveGids != null) && (!positiveGids.isEmpty())) {
+            result += getAlleleValuesDao().countMappingAlleleValuesForPolymorphicMarkersRetrieval(positiveGids);
         }
-
         return result;
     }
-    
+
+    @SuppressWarnings("unchecked")
     @Override
-    public List<Qtl> getAllQtl(int start, int numOfRows) throws MiddlewareQueryException{
-        QtlDAO dao = new QtlDAO();
-
-        long centralCount = 0;
-        long localCount = 0;
-        long relativeLimit = 0;
-
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        
-        List<Qtl> qtl = new ArrayList<Qtl>();
-
-        if(sessionForCentral != null) {
-            
-            dao.setSession(sessionForCentral);
-            centralCount = dao.countAll();
-            
-            if(centralCount > start) {
-                qtl.addAll(dao.getAll(start, numOfRows));
-                relativeLimit = numOfRows - qtl.size();
-                if(relativeLimit > 0 && sessionForLocal != null) {
-                    dao.setSession(sessionForLocal);
-                    localCount = dao.countAll();
-                    if(localCount > 0) {
-                        qtl.addAll(dao.getAll( 0, (int) relativeLimit));
-                    }
-                }
-            } else {
-                relativeLimit = start - centralCount;
-                if (sessionForLocal != null) {
-                    dao.setSession(sessionForLocal);
-                    localCount = dao.countAll();
-                    if (localCount > relativeLimit) {
-                        qtl.addAll(dao.getAll((int) relativeLimit, numOfRows));
-                    }
-                }
-            }
-        } else if (sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
-            localCount = dao.countAll();
-            if (localCount > start) {
-                qtl.addAll(dao.getAll(start, numOfRows));
-            }
-        }
-        
-        return qtl;
+    public List<Qtl> getAllQtl(int start, int numOfRows) throws MiddlewareQueryException {
+        return (List<Qtl>) getAllFromCentralAndLocal(getQtlDao(), start, numOfRows);
     }
-    
+
     @Override
-    public long countAllQtl() throws MiddlewareQueryException{
-        QtlDAO dao = new QtlDAO();
-
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-
-        long result = 0;
-
-        // Count from local
-        if (sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
-            result += dao.countAll();
-        }
-
-        // Count from central
-        if (sessionForCentral != null) {
-            dao.setSession(sessionForCentral);
-            result += dao.countAll();
-        }
-
-        return result;
-
+    public long countAllQtl() throws MiddlewareQueryException {
+        return countAllFromCentralAndLocal(getQtlDao());
     }
-    
+
     @Override
     public List<Integer> getQtlIdByName(String name, int start, int numOfRows) throws MiddlewareQueryException {
-        
-        if ((name == null) || (name.isEmpty())){
+        if ((name == null) || (name.isEmpty())) {
             return new ArrayList<Integer>();
         }
-        
-        QtlDAO dao = new QtlDAO();
-        
+
+        List<Integer> qtlIds = new ArrayList<Integer>();
         long centralCount = 0;
         long localCount = 0;
         long relativeLimit = 0;
 
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        
-        List<Integer> qtlIds = new ArrayList<Integer>();
-        
-        if(sessionForCentral != null) {
-            
-            dao.setSession(sessionForCentral);
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            QtlDAO dao = getQtlDao();
             centralCount = dao.countQtlIdByName(name);
-            
-            if(centralCount > start) {
+
+            if (centralCount > start) {
                 qtlIds.addAll(dao.getQtlIdByName(name, start, numOfRows));
                 relativeLimit = numOfRows - qtlIds.size();
-                if(relativeLimit > 0 && sessionForLocal != null) {
-                    dao.setSession(sessionForLocal);
+                if (relativeLimit > 0 && setWorkingDatabase(Database.LOCAL)) {
+                    dao = getQtlDao();
                     localCount = dao.countQtlIdByName(name);
-                    if(localCount > 0) {
+                    if (localCount > 0) {
                         List<Integer> qtlIdList = dao.getQtlIdByName(name, 0, (int) relativeLimit);
                         qtlIds.addAll(qtlIdList);
                     }
                 }
             } else {
                 relativeLimit = start - centralCount;
-                if (sessionForLocal != null) {
-                    dao.setSession(sessionForLocal);
+                if (setWorkingDatabase(Database.LOCAL)) {
+                    dao = getQtlDao();
                     localCount = dao.countQtlIdByName(name);
                     if (localCount > relativeLimit) {
                         List<Integer> qtlIdList = dao.getQtlIdByName(name, (int) relativeLimit, numOfRows);
@@ -2070,316 +1551,229 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                     }
                 }
             }
-        } else if (sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
+        } else if (setWorkingDatabase(Database.LOCAL)) {
+            QtlDAO dao = getQtlDao();
             localCount = dao.countQtlIdByName(name);
             if (localCount > start) {
                 List<Integer> qtlIdList = dao.getQtlIdByName(name, start, numOfRows);
                 qtlIds.addAll(qtlIdList);
             }
         }
-        
         return qtlIds;
     }
-    
+
     @Override
-    public long countQtlIdByName(String name) throws MiddlewareQueryException{
-        
-        if ((name == null) || (name.isEmpty())){
+    public long countQtlIdByName(String name) throws MiddlewareQueryException {
+        if ((name == null) || (name.isEmpty())) {
             return 0;
         }
-                
-        QtlDAO dao = new QtlDAO();
-
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-
         long result = 0;
-
-        // Count from local
-        if (sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
-            result += dao.countQtlIdByName(name);
+        if (setWorkingDatabase(Database.LOCAL)) {
+            result += getQtlDao().countQtlIdByName(name);
         }
-
-        // Count from central
-        if (sessionForCentral != null) {
-            dao.setSession(sessionForCentral);
-            result += dao.countQtlIdByName(name);
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            result += getQtlDao().countQtlIdByName(name);
         }
-
         return result;
     }
 
     @Override
-    public List<QtlDetailElement> getQtlByName(String name, int start, int numOfRows) throws MiddlewareQueryException{
-        
-        if ((name == null) || (name.isEmpty())){
+    public List<QtlDetailElement> getQtlByName(String name, int start, int numOfRows) throws MiddlewareQueryException {
+        if ((name == null) || (name.isEmpty())) {
             return new ArrayList<QtlDetailElement>();
         }
-        
-        QtlDAO dao = new QtlDAO();
-        
+        List<QtlDetailElement> qtl = new ArrayList<QtlDetailElement>();
         long centralCount = 0;
         long localCount = 0;
         long relativeLimit = 0;
 
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        
-        List<QtlDetailElement> qtl = new ArrayList<QtlDetailElement>();
-
-        if(sessionForCentral != null) {
-            
-            dao.setSession(sessionForCentral);
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            QtlDAO dao = getQtlDao();
             centralCount = dao.countQtlDetailsByName(name);
-            
-            if(centralCount > start) {
+
+            if (centralCount > start) {
                 qtl.addAll(dao.getQtlDetailsByName(name, start, numOfRows));
                 relativeLimit = numOfRows - qtl.size();
-                if(relativeLimit > 0 && sessionForLocal != null) {
-                    dao.setSession(sessionForLocal);
+                if (relativeLimit > 0 && setWorkingDatabase(Database.LOCAL)) {
+                    dao = getQtlDao();
                     localCount = dao.countQtlDetailsByName(name);
-                    if(localCount > 0) {
+                    if (localCount > 0) {
                         qtl.addAll(dao.getQtlDetailsByName(name, 0, (int) relativeLimit));
                     }
                 }
             } else {
                 relativeLimit = start - centralCount;
-                if (sessionForLocal != null) {
-                    dao.setSession(sessionForLocal);
+                if (setWorkingDatabase(Database.LOCAL)) {
+                    dao = getQtlDao();
                     localCount = dao.countQtlDetailsByName(name);
                     if (localCount > relativeLimit) {
                         qtl.addAll(dao.getQtlDetailsByName(name, (int) relativeLimit, numOfRows));
                     }
                 }
             }
-        } else if (sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
+        } else if (setWorkingDatabase(Database.LOCAL)) {
+            QtlDAO dao = getQtlDao();
             localCount = dao.countQtlDetailsByName(name);
             if (localCount > start) {
                 qtl.addAll(dao.getQtlDetailsByName(name, start, numOfRows));
             }
         }
-        
-        return qtl;    
+        return qtl;
     }
-    
+
     @Override
-    public long countQtlByName(String name) throws MiddlewareQueryException{
-        
-        if ((name == null) || (name.isEmpty())){
+    public long countQtlByName(String name) throws MiddlewareQueryException {
+        if ((name == null) || (name.isEmpty())) {
             return 0;
         }
-                
-        QtlDAO dao = new QtlDAO();
-
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
 
         long result = 0;
-
-        // Count from local
-        if (sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
-            result += dao.countQtlDetailsByName(name);
+        if (setWorkingDatabase(Database.LOCAL)) {
+            result += getQtlDao().countQtlDetailsByName(name);
         }
-
-        // Count from central
-        if (sessionForCentral != null) {
-            dao.setSession(sessionForCentral);
-            result += dao.countQtlDetailsByName(name);
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            result += getQtlDao().countQtlDetailsByName(name);
         }
-
         return result;
     }
-    
+
     @Override
-    public List<QtlDetailElement> getQTLByQTLIDs(List<Integer> qtlIDs, int start, int numOfRows) throws MiddlewareQueryException{
-        
-        if ((qtlIDs == null) || (qtlIDs.isEmpty())){
+    public List<QtlDetailElement> getQTLByQTLIDs(List<Integer> qtlIDs, int start, int numOfRows) throws MiddlewareQueryException {
+        if ((qtlIDs == null) || (qtlIDs.isEmpty())) {
             return new ArrayList<QtlDetailElement>();
         }
-        
-        QtlDAO dao = new QtlDAO();
-        
+
+        List<QtlDetailElement> qtl = new ArrayList<QtlDetailElement>();
         long centralCount = 0;
         long localCount = 0;
         long relativeLimit = 0;
 
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        
-        List<QtlDetailElement> qtl = new ArrayList<QtlDetailElement>();
-
-        if(sessionForCentral != null) {
-            
-            dao.setSession(sessionForCentral);
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            QtlDAO dao = getQtlDao();
             centralCount = dao.countQtlDetailsByQTLIDs(qtlIDs);
-            
-            if(centralCount > start) {
+
+            if (centralCount > start) {
                 qtl.addAll(dao.getQtlDetailsByQTLIDs(qtlIDs, start, numOfRows));
                 relativeLimit = numOfRows - qtl.size();
-                if(relativeLimit > 0 && sessionForLocal != null) {
-                    dao.setSession(sessionForLocal);
+                if (relativeLimit > 0 && setWorkingDatabase(Database.LOCAL)) {
+                    dao = getQtlDao();
                     localCount = dao.countQtlDetailsByQTLIDs(qtlIDs);
-                    if(localCount > 0) {
+                    if (localCount > 0) {
                         qtl.addAll(dao.getQtlDetailsByQTLIDs(qtlIDs, 0, (int) relativeLimit));
                     }
                 }
             } else {
                 relativeLimit = start - centralCount;
-                if (sessionForLocal != null) {
-                    dao.setSession(sessionForLocal);
+                if (setWorkingDatabase(Database.LOCAL)) {
+                    dao = getQtlDao();
                     localCount = dao.countQtlDetailsByQTLIDs(qtlIDs);
                     if (localCount > relativeLimit) {
                         qtl.addAll(dao.getQtlDetailsByQTLIDs(qtlIDs, (int) relativeLimit, numOfRows));
                     }
                 }
             }
-        } else if (sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
+        } else if (setWorkingDatabase(Database.LOCAL)) {
+            QtlDAO dao = getQtlDao();
             localCount = dao.countQtlDetailsByQTLIDs(qtlIDs);
             if (localCount > start) {
                 qtl.addAll(dao.getQtlDetailsByQTLIDs(qtlIDs, start, numOfRows));
             }
         }
-        
-        return qtl;    
+        return qtl;
     }
-    
+
     @Override
-    public long countQTLByQTLIDs(List<Integer> qtlIDs) throws MiddlewareQueryException{
-        
-        if ((qtlIDs == null) || (qtlIDs.isEmpty())){
+    public long countQTLByQTLIDs(List<Integer> qtlIDs) throws MiddlewareQueryException {
+        if ((qtlIDs == null) || (qtlIDs.isEmpty())) {
             return 0;
         }
-                
-        QtlDAO dao = new QtlDAO();
-
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
 
         long result = 0;
-
-        // Count from local
-        if (sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
-            result += dao.countQtlDetailsByQTLIDs(qtlIDs);
+        if (setWorkingDatabase(Database.LOCAL)) {
+            result += getQtlDao().countQtlDetailsByQTLIDs(qtlIDs);
         }
-
-        // Count from central
-        if (sessionForCentral != null) {
-            dao.setSession(sessionForCentral);
-            result += dao.countQtlDetailsByQTLIDs(qtlIDs);
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            result += getQtlDao().countQtlDetailsByQTLIDs(qtlIDs);
         }
-
         return result;
     }
-    
-    @Override
-    public List<Integer> getQtlByTrait(String trait, int start, int numOfRows) throws MiddlewareQueryException{
-        QtlDAO dao = new QtlDAO();
 
+    @Override
+    public List<Integer> getQtlByTrait(String trait, int start, int numOfRows) throws MiddlewareQueryException {
+
+        List<Integer> qtl = new ArrayList<Integer>();
         long centralCount = 0;
         long localCount = 0;
         long relativeLimit = 0;
 
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        
-        List<Integer> qtl = new ArrayList<Integer>();
-
-        if(sessionForCentral != null) {
-            
-            dao.setSession(sessionForCentral);
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            QtlDAO dao = getQtlDao();
             centralCount = dao.countQtlByTrait(trait);
-            
-            if(centralCount > start) {
+
+            if (centralCount > start) {
                 qtl.addAll(dao.getQtlByTrait(trait, start, numOfRows));
                 relativeLimit = numOfRows - qtl.size();
-                if(relativeLimit > 0 && sessionForLocal != null) {
-                    dao.setSession(sessionForLocal);
+                if (relativeLimit > 0 && setWorkingDatabase(Database.LOCAL)) {
+                    dao = getQtlDao();
                     localCount = dao.countQtlByTrait(trait);
-                    if(localCount > 0) {
+                    if (localCount > 0) {
                         qtl.addAll(dao.getQtlByTrait(trait, 0, (int) relativeLimit));
                     }
                 }
             } else {
                 relativeLimit = start - centralCount;
-                if (sessionForLocal != null) {
-                    dao.setSession(sessionForLocal);
+                if (setWorkingDatabase(Database.LOCAL)) {
+                    dao = getQtlDao();
                     localCount = dao.countQtlByTrait(trait);
                     if (localCount > relativeLimit) {
                         qtl.addAll(dao.getQtlByTrait(trait, (int) relativeLimit, numOfRows));
                     }
                 }
             }
-        } else if (sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
+        } else if (setWorkingDatabase(Database.LOCAL)) {
+            QtlDAO dao = getQtlDao();
             localCount = dao.countQtlByTrait(trait);
             if (localCount > start) {
                 qtl.addAll(dao.getQtlByTrait(trait, start, numOfRows));
             }
         }
-        
-        return qtl;    
+
+        return qtl;
 
     }
-    
-    @Override
-    public long countQtlByTrait(String trait) throws MiddlewareQueryException{
-        QtlDAO dao = new QtlDAO();
-        
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
 
+    @Override
+    public long countQtlByTrait(String trait) throws MiddlewareQueryException {
         long result = 0;
-
-        // Count from local
-        if (sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
-            result += dao.countQtlByTrait(trait);
+        if (setWorkingDatabase(Database.LOCAL)) {
+            result += getQtlDao().countQtlByTrait(trait);
         }
-
-        // Count from central
-        if (sessionForCentral != null) {
-            dao.setSession(sessionForCentral);
-            result += dao.countQtlByTrait(trait);
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            result += getQtlDao().countQtlByTrait(trait);
         }
-
         return result;
-
     }
-    @Override
-    public List<ParentElement> getAllParentsFromMappingPopulation(
-            int start, int numOfRows) throws MiddlewareQueryException {
 
+        @Override
+        public List<ParentElement> getAllParentsFromMappingPopulation(int start, int numOfRows) throws MiddlewareQueryException {
+        List<ParentElement> allParentsFromMappingPopulation = new ArrayList<ParentElement>();
         Long centralCount = Long.valueOf(0);
         Long localCount = Long.valueOf(0);
-        int relativeLimit = 0;    	
-    	
-        MappingPopDAO mappingPopDao = new MappingPopDAO();
-       
-        List<ParentElement> allParentsFromMappingPopulation = new ArrayList<ParentElement>();
-   
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
+        int relativeLimit = 0;
 
-        if (sessionForCentral != null) {
-            mappingPopDao.setSession(sessionForCentral);
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            MappingPopDAO mappingPopDao = getMappingPopDao();
             centralCount = mappingPopDao.countAllParentsFromMappingPopulation();
-            
             if (centralCount > start) {
                 allParentsFromMappingPopulation.addAll(mappingPopDao.getAllParentsFromMappingPopulation(start, numOfRows));
                 relativeLimit = numOfRows - (centralCount.intValue() - start);
 
                 if (relativeLimit > 0) {
-                	
-                    if (sessionForLocal != null) {
-                        mappingPopDao.setSession(sessionForLocal);
+
+                    if (setWorkingDatabase(Database.LOCAL)) {
+                        mappingPopDao = getMappingPopDao();
                         localCount = mappingPopDao.countAllParentsFromMappingPopulation();
-                        
+
                         if (localCount > 0) {
                             allParentsFromMappingPopulation.addAll(mappingPopDao.getAllParentsFromMappingPopulation(0, relativeLimit));
                         }
@@ -2387,74 +1781,54 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                 }
             } else {
                 relativeLimit = start - centralCount.intValue();
-                if (sessionForLocal != null) {
-                    mappingPopDao.setSession(sessionForLocal);
+                if (setWorkingDatabase(Database.LOCAL)) {
+                    mappingPopDao = getMappingPopDao();
                     localCount = mappingPopDao.countAllParentsFromMappingPopulation();
                     if (localCount > relativeLimit) {
                         allParentsFromMappingPopulation.addAll(mappingPopDao.getAllParentsFromMappingPopulation(relativeLimit, numOfRows));
                     }
                 }
             }
-        } else if (sessionForLocal != null) {
-            mappingPopDao.setSession(sessionForLocal);
+        } else if (setWorkingDatabase(Database.LOCAL)) {
+            MappingPopDAO mappingPopDao = getMappingPopDao();
             localCount = mappingPopDao.countAllParentsFromMappingPopulation();
             if (localCount > start) {
                 allParentsFromMappingPopulation.addAll(mappingPopDao.getAllParentsFromMappingPopulation(start, numOfRows));
             }
         }
-   
+
         return allParentsFromMappingPopulation;
     }
 
     @Override
     public Long countAllParentsFromMappingPopulation() throws MiddlewareQueryException {
-    	
-        MappingPopDAO mappingPopDao = new MappingPopDAO();
-           
-        Database centralInstance = Database.CENTRAL;
-        Session centralSession = getSession(centralInstance);
-        mappingPopDao.setSession(centralSession);
-        Long centralCountParentsFromMappingPopulation = mappingPopDao.countAllParentsFromMappingPopulation();
-        
-        Database localInstance = Database.LOCAL;
-        Session localSession = getSession(localInstance);
-        mappingPopDao.setSession(localSession);
-        Long localCountParentsFromMappingPopulation = mappingPopDao.countAllParentsFromMappingPopulation();
-        
-        Long totalCountParentsFromMappingPopulation = localCountParentsFromMappingPopulation + centralCountParentsFromMappingPopulation;
-        
-        return totalCountParentsFromMappingPopulation;
+        long count = 0;
+        if (setWorkingDatabase(Database.CENTRAL)){
+            count += getMappingPopDao().countAllParentsFromMappingPopulation();
+        }
+        if (setWorkingDatabase(Database.LOCAL)){
+            count += getMappingPopDao().countAllParentsFromMappingPopulation();
+        }
+        return count;
     }
-    
-    @Override
-    public List<MapDetailElement> getMapDetailsByName(
-            String nameLike, int start, int numOfRows) throws MiddlewareQueryException {
 
+    @Override
+    public List<MapDetailElement> getMapDetailsByName(String nameLike, int start, int numOfRows) throws MiddlewareQueryException {
+        List<MapDetailElement> maps = new ArrayList<MapDetailElement>();
         Long centralCount = Long.valueOf(0);
         Long localCount = Long.valueOf(0);
-        Long relativeLimit = Long.valueOf(0);    	
-    	
-        MapDAO mapDao = new MapDAO();
-       
-        List<MapDetailElement> maps = new ArrayList<MapDetailElement>();
-   
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
+        Long relativeLimit = Long.valueOf(0);
 
-        if (sessionForCentral != null) {
-            mapDao.setSession(sessionForCentral);
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            MapDAO mapDao = getMapDao();
             centralCount = mapDao.countMapDetailsByName(nameLike);
-            
             if (centralCount > start) {
                 maps.addAll(mapDao.getMapDetailsByName(nameLike, start, numOfRows));
                 relativeLimit = numOfRows - (centralCount - start);
-
                 if (relativeLimit > 0) {
-                	
-                    if (sessionForLocal != null) {
-                        mapDao.setSession(sessionForLocal);
+                    if (setWorkingDatabase(Database.LOCAL)) {
+                        mapDao = getMapDao();
                         localCount = mapDao.countMapDetailsByName(nameLike);
-                        
                         if (localCount > 0) {
                             maps.addAll(mapDao.getMapDetailsByName(nameLike, 0, relativeLimit.intValue()));
                         }
@@ -2462,73 +1836,56 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                 }
             } else {
                 relativeLimit = start - centralCount;
-                if (sessionForLocal != null) {
-                    mapDao.setSession(sessionForLocal);
+                if (setWorkingDatabase(Database.LOCAL)) {
+                    mapDao = getMapDao();
                     localCount = mapDao.countMapDetailsByName(nameLike);
                     if (localCount > relativeLimit) {
                         maps.addAll(mapDao.getMapDetailsByName(nameLike, relativeLimit.intValue(), numOfRows));
                     }
                 }
             }
-        } else if (sessionForLocal != null) {
-            mapDao.setSession(sessionForLocal);
+        } else if (setWorkingDatabase(Database.LOCAL)) {
+            MapDAO mapDao = getMapDao();
             localCount = mapDao.countMapDetailsByName(nameLike);
             if (localCount > start) {
                 maps.addAll(mapDao.getMapDetailsByName(nameLike, start, numOfRows));
             }
         }
-     
         return maps;
     }
 
     @Override
     public Long countMapDetailsByName(String nameLike) throws MiddlewareQueryException {
-    	
-        MapDAO mapDao = new MapDAO();
-           
-        Database centralInstance = Database.CENTRAL;
-        Session centralSession = getSession(centralInstance);
-        mapDao.setSession(centralSession);
-        Long centralCount = mapDao.countMapDetailsByName(nameLike);
-        
-        Database localInstance = Database.LOCAL;
-        Session localSession = getSession(localInstance);
-        mapDao.setSession(localSession);
-        Long localCount = mapDao.countMapDetailsByName(nameLike);
-        
-        Long totalCount = centralCount + localCount;
-        
-        return totalCount;
+        long count = 0;
+        if (setWorkingDatabase(Database.CENTRAL)){
+            count += getMapDao().countMapDetailsByName(nameLike);
+        }
+        if (setWorkingDatabase(Database.LOCAL)){
+            count += getMapDao().countMapDetailsByName(nameLike);
+        }
+        return count;
     }
 
-
-    public List<MapDetailElement> getAllMapDetails(int start, int numOfRows) throws MiddlewareQueryException{
-
+    public List<MapDetailElement> getAllMapDetails(int start, int numOfRows) throws MiddlewareQueryException {
+        List<MapDetailElement> maps = new ArrayList<MapDetailElement>();
         Long centralCount = Long.valueOf(0);
         Long localCount = Long.valueOf(0);
-        Long relativeLimit = Long.valueOf(0);       
-        
-        MapDAO mapDao = new MapDAO();
-       
-        List<MapDetailElement> maps = new ArrayList<MapDetailElement>();
-   
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
+        Long relativeLimit = Long.valueOf(0);
 
-        if (sessionForCentral != null) {
-            mapDao.setSession(sessionForCentral);
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            MapDAO mapDao = getMapDao();
             centralCount = mapDao.countAllMapDetails();
-            
+
             if (centralCount > start) {
                 maps.addAll(mapDao.getAllMapDetails(start, numOfRows));
                 relativeLimit = numOfRows - (centralCount - start);
 
                 if (relativeLimit > 0) {
-                    
-                    if (sessionForLocal != null) {
-                        mapDao.setSession(sessionForLocal);
+
+                    if (setWorkingDatabase(Database.LOCAL)) {
+                        mapDao = getMapDao();
                         localCount = mapDao.countAllMapDetails();
-                        
+
                         if (localCount > 0) {
                             maps.addAll(mapDao.getAllMapDetails(0, relativeLimit.intValue()));
                         }
@@ -2536,124 +1893,89 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                 }
             } else {
                 relativeLimit = start - centralCount;
-                if (sessionForLocal != null) {
-                    mapDao.setSession(sessionForLocal);
+                if (setWorkingDatabase(Database.LOCAL)) {
+                    mapDao = getMapDao();
                     localCount = mapDao.countAllMapDetails();
                     if (localCount > relativeLimit) {
                         maps.addAll(mapDao.getAllMapDetails(relativeLimit.intValue(), numOfRows));
                     }
                 }
             }
-        } else if (sessionForLocal != null) {
-            mapDao.setSession(sessionForLocal);
+        } else if (setWorkingDatabase(Database.LOCAL)) {
+            MapDAO mapDao = getMapDao();
             localCount = mapDao.countAllMapDetails();
             if (localCount > start) {
                 maps.addAll(mapDao.getAllMapDetails(start, numOfRows));
             }
         }
-     
-        return maps;        
+
+        return maps;
     }
-    
-    public long countAllMapDetails() throws MiddlewareQueryException{
 
-        MapDAO mapDao = new MapDAO();
-
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-
-        long count = 0;        
-
-        // Count from Central
-        if (sessionForCentral != null) {
-            mapDao.setSession(sessionForCentral);
-            count += mapDao.countAllMapDetails();
+    public long countAllMapDetails() throws MiddlewareQueryException {
+        long count = 0;
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            count += getMapDao().countAllMapDetails();
         }
-
-        // Count from Local
-        if (sessionForLocal != null) {
-            mapDao.setSession(sessionForLocal);
-            count += mapDao.countAllMapDetails();
+        if (setWorkingDatabase(Database.LOCAL)) {
+            count += getMapDao().countAllMapDetails();
         }
-        
         return count;
     }
-    
-    @Override
-    public List<Integer> getMapIdsByQtlName(String qtlName, int start, int numOfRows) throws MiddlewareQueryException{
-        QtlDetailsDAO dao = new QtlDetailsDAO();
 
+    @Override
+    public List<Integer> getMapIdsByQtlName(String qtlName, int start, int numOfRows) throws MiddlewareQueryException {
+        List<Integer> mapIds = new ArrayList<Integer>();
         long centralCount = 0;
         long localCount = 0;
         long relativeLimit = 0;
-
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-        
-        List<Integer> mapIds = new ArrayList<Integer>();
-
-        if(sessionForCentral != null) {
-            
-            dao.setSession(sessionForCentral);
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            QtlDetailsDAO dao = getQtlDetailsDao();
             centralCount = dao.countMapIdsByQtlName(qtlName);
-            
-            if(centralCount > start) {
+
+            if (centralCount > start) {
                 mapIds.addAll(dao.getMapIdsByQtlName(qtlName, start, numOfRows));
                 relativeLimit = numOfRows - mapIds.size();
-                if(relativeLimit > 0 && sessionForLocal != null) {
-                    dao.setSession(sessionForLocal);
+                if (relativeLimit > 0 && setWorkingDatabase(Database.LOCAL)) {
+                     dao = getQtlDetailsDao();
                     localCount = dao.countMapIdsByQtlName(qtlName);
-                    if(localCount > 0) {
+                    if (localCount > 0) {
                         mapIds.addAll(dao.getMapIdsByQtlName(qtlName, 0, (int) relativeLimit));
                     }
                 }
             } else {
                 relativeLimit = start - centralCount;
-                if (sessionForLocal != null) {
-                    dao.setSession(sessionForLocal);
+                if (setWorkingDatabase(Database.LOCAL)) {
+                     dao = getQtlDetailsDao();
                     localCount = dao.countMapIdsByQtlName(qtlName);
                     if (localCount > relativeLimit) {
                         mapIds.addAll(dao.getMapIdsByQtlName(qtlName, (int) relativeLimit, numOfRows));
                     }
                 }
             }
-        } else if (sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
+        } else if (setWorkingDatabase(Database.LOCAL)) {
+            QtlDetailsDAO dao = getQtlDetailsDao();
             localCount = dao.countMapIdsByQtlName(qtlName);
             if (localCount > start) {
                 mapIds.addAll(dao.getMapIdsByQtlName(qtlName, start, numOfRows));
             }
         }
-        
-        return mapIds;    
+
+        return mapIds;
     }
-
-
 
     @Override
     public long countMapIdsByQtlName(String qtlName) throws MiddlewareQueryException {
-        QtlDetailsDAO qtlDetailsDao = new QtlDetailsDAO();
-
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-
-        long count = 0;        
-
-        // Count from Central
-        if (sessionForCentral != null) {
-            qtlDetailsDao.setSession(sessionForLocal);
-            count += qtlDetailsDao.countMapIdsByQtlName(qtlName);
+        long count = 0;
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            count += getQtlDetailsDao().countMapIdsByQtlName(qtlName);
         }
-
-        // Count from Local
-        if (sessionForLocal != null) {
-            qtlDetailsDao.setSession(sessionForLocal);
-            count += qtlDetailsDao.countMapIdsByQtlName(qtlName);
+        if (setWorkingDatabase(Database.LOCAL)) {
+            count += getQtlDetailsDao().countMapIdsByQtlName(qtlName);
         }
-        
         return count;
     }
-    
+
     @Override
     public List<Integer> getMarkerIdsByQtl(String qtlName, String chromosome, int min, int max, int start, int numOfRows)
             throws MiddlewareQueryException {
@@ -2661,97 +1983,54 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return null;
 
     }
-    
+
     @Override
     public long countMarkerIdsByQtl(String qtlName, String chromosome, int min, int max) throws MiddlewareQueryException {
-        QtlDetailsDAO qtlDetailsDao = new QtlDetailsDAO();
-
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-
-        long count = 0;        
-
-        // Count from Central
-        if (sessionForCentral != null) {
-            qtlDetailsDao.setSession(sessionForLocal);
-            count += qtlDetailsDao.countMarkerIdsByQtl(qtlName, chromosome, min, max);
+        long count = 0;
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            count += getQtlDetailsDao().countMarkerIdsByQtl(qtlName, chromosome, min, max);
         }
-
-        // Count from Local
-        if (sessionForLocal != null) {
-            qtlDetailsDao.setSession(sessionForLocal);
-            count += qtlDetailsDao.countMarkerIdsByQtl(qtlName, chromosome, min, max);
+        if (setWorkingDatabase(Database.LOCAL)) {
+            count += getQtlDetailsDao().countMarkerIdsByQtl(qtlName, chromosome, min, max);
         }
-        
         return count;
     }
-    
-    
-    public List<Marker> getMarkersByIds(List<Integer> markerIds, int start, int numOfRows) throws MiddlewareQueryException{
 
-        MarkerDAO dao = new MarkerDAO();
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-
-        List<Integer> positiveGids = new ArrayList<Integer>();
-        List<Integer> negativeGids = new ArrayList<Integer>();
-        for (Integer markerId : markerIds){
-            if (markerId < 0) {
-                negativeGids.add(markerId);
-            } else {
-                positiveGids.add(markerId);
-            }
-        }
-
+    public List<Marker> getMarkersByIds(List<Integer> markerIds, int start, int numOfRows) throws MiddlewareQueryException {
         List<Marker> markers = new ArrayList<Marker>();
-        
-        // Count from local
-        if ((sessionForLocal != null) && (negativeGids != null) && (!negativeGids.isEmpty())){
-            dao.setSession(sessionForLocal);
-            markers.addAll(dao.getMarkersByIds(negativeGids, start, numOfRows));
-        }
+        List<Integer> positiveGids = GenotypicDataManagerUtil.getPositiveIds(markerIds);
+        List<Integer> negativeGids = GenotypicDataManagerUtil.getNegativeIds(markerIds);
 
-        // Count from central
-        if ((sessionForCentral != null) && (positiveGids != null) && (!positiveGids.isEmpty())) {
-            dao.setSession(sessionForCentral);
-            markers.addAll(dao.getMarkersByIds(positiveGids, start, numOfRows));
+        if ((setWorkingDatabase(Database.LOCAL)) && (negativeGids != null) && (!negativeGids.isEmpty())) {
+            markers.addAll(getMarkerDao().getMarkersByIds(negativeGids, start, numOfRows));
         }
-
+        if ((setWorkingDatabase(Database.CENTRAL)) && (positiveGids != null) && (!positiveGids.isEmpty())) {
+            markers.addAll(getMarkerDao().getMarkersByIds(positiveGids, start, numOfRows));
+        }
         return markers;
     }
 
-
-    
     @Override
     public QtlDetailsPK addQtlDetails(QtlDetails qtlDetails) throws MiddlewareQueryException {
-
         requireLocalDatabaseInstance();
-        
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
         QtlDetailsPK savedId = new QtlDetailsPK();
-        
         try {
             trans = session.beginTransaction();
-            QtlDetailsDAO dao = new QtlDetailsDAO();
-            dao.setSession(session);
-
+            
             // No need to auto-assign negative IDs for new local DB records
             // qtlId and mapId are foreign keys
-            
-            QtlDetails recordSaved = dao.save(qtlDetails);
-            savedId = recordSaved.getId();
-            
-            trans.commit();
 
+            QtlDetails recordSaved = getQtlDetailsDao().save(qtlDetails);
+            savedId = recordSaved.getId();
+
+            trans.commit();
         } catch (Exception e) {
-            // Rollback transaction in case of errors
-            if (trans != null) {
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException("Error encountered while saving Qtl Details: GenotypicDataManager.addQtlDetails(qtlDetails="
-                    + qtlDetails + "): " + e.getMessage(), e);
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while saving Qtl Details: GenotypicDataManager.addQtlDetails(qtlDetails=" + qtlDetails
+                    + "): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
@@ -2761,140 +2040,106 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public Integer addMarkerDetails(MarkerDetails markerDetails) throws MiddlewareQueryException {
-
         requireLocalDatabaseInstance();
-        
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
-        Integer savedId;
-        
+        Integer savedId = null;
         try {
             trans = session.beginTransaction();
-            MarkerDetailsDAO dao = new MarkerDetailsDAO();
-            dao.setSession(session);
 
             // No need to auto-assign negative id. It should come from an existing entry in Marker.
-            
-            MarkerDetails recordSaved = dao.save(markerDetails);
-            savedId = recordSaved.getMarkerId();
-            
-            trans.commit();
 
+            MarkerDetails recordSaved = getMarkerDetailsDao().save(markerDetails);
+            savedId = recordSaved.getMarkerId();
+
+            trans.commit();
         } catch (Exception e) {
-            // Rollback transaction in case of errors
-            if (trans != null) {
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException("Error encountered while saving Marker Details: GenotypicDataManager.addMarkerDetails(markerDetails="
-                    + markerDetails + "): " + e.getMessage(), e);
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while saving Marker Details: GenotypicDataManager.addMarkerDetails(markerDetails="
+                    + markerDetails + "): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
-        return savedId;    
+        return savedId;
     }
 
     @Override
     public Integer addMarkerUserInfo(MarkerUserInfo markerUserInfo) throws MiddlewareQueryException {
-
         requireLocalDatabaseInstance();
-        
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
-        Integer savedId;
-        
+        Integer savedId = null;
+
         try {
             trans = session.beginTransaction();
-            MarkerUserInfoDAO dao = new MarkerUserInfoDAO();
-            dao.setSession(session);
 
             // No need to auto-assign negative id. It should come from an existing entry in Marker.
-            
-            MarkerUserInfo recordSaved = dao.save(markerUserInfo);
-            savedId = recordSaved.getMarkerId();
-            
-            trans.commit();
 
+            MarkerUserInfo recordSaved = getMarkerUserInfoDao().save(markerUserInfo);
+            savedId = recordSaved.getMarkerId();
+
+            trans.commit();
         } catch (Exception e) {
-            // Rollback transaction in case of errors
-            if (trans != null) {
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException("Error encountered while saving Marker Details: GenotypicDataManager.addMarkerUserInfo(markerUserInfo="
-                    + markerUserInfo + "): " + e.getMessage(), e);
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while saving Marker Details: GenotypicDataManager.addMarkerUserInfo(markerUserInfo="
+                    + markerUserInfo + "): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
-        return savedId;    
+        return savedId;
     }
 
     @Override
-    public AccMetadataSetPK addAccMetadataSet(AccMetadataSet accMetadataSet) throws MiddlewareQueryException{
-        
+    public AccMetadataSetPK addAccMetadataSet(AccMetadataSet accMetadataSet) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
-        
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
         AccMetadataSetPK savedId = new AccMetadataSetPK();
-        
         try {
             trans = session.beginTransaction();
-            AccMetadataSetDAO dao = new AccMetadataSetDAO();
-            dao.setSession(session);
 
             // No need to auto-assign negative IDs for new local DB records
             // datasetId, germplasmId and nameId are foreign keys
-            
-            AccMetadataSet recordSaved = dao.save(accMetadataSet);
-            savedId = recordSaved.getId();
-            
-            trans.commit();
 
+            AccMetadataSet recordSaved = getAccMetadataSetDao().save(accMetadataSet);
+            savedId = recordSaved.getId();
+
+            trans.commit();
         } catch (Exception e) {
-            // Rollback transaction in case of errors
-            if (trans != null) {
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException("Error encountered with addAccMetadataSet(accMetadataSet="
-                    + accMetadataSet + "): " + e.getMessage(), e);
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered with addAccMetadataSet(accMetadataSet=" + accMetadataSet + "): " + e.getMessage(), e,
+                    LOG);
         } finally {
             session.flush();
         }
         return savedId;
     }
-    
-    @Override
-    public MarkerMetadataSetPK addMarkerMetadataSet(MarkerMetadataSet markerMetadataSet) throws MiddlewareQueryException{
 
+    @Override
+    public MarkerMetadataSetPK addMarkerMetadataSet(MarkerMetadataSet markerMetadataSet) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
-        
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
         MarkerMetadataSetPK savedId = new MarkerMetadataSetPK();
-        
+
         try {
             trans = session.beginTransaction();
-            MarkerMetadataSetDAO dao = new MarkerMetadataSetDAO();
-            dao.setSession(session);
 
             // No need to auto-assign negative IDs for new local DB records
             // datasetId and markerId are foreign keys
-            
-            MarkerMetadataSet recordSaved = dao.save(markerMetadataSet);
-            savedId = recordSaved.getId();
-            
-            trans.commit();
 
+            MarkerMetadataSet recordSaved = getMarkerMetadataSetDao().save(markerMetadataSet);
+            savedId = recordSaved.getId();
+
+            trans.commit();
         } catch (Exception e) {
-            // Rollback transaction in case of errors
-            if (trans != null) {
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException("Error encountered with addMarkerMetadataSet(markerMetadataSet="
-                    + markerMetadataSet + "): " + e.getMessage(), e);
+            rollbackTransaction(trans);
+            logAndThrowException(
+                    "Error encountered with addMarkerMetadataSet(markerMetadataSet=" + markerMetadataSet + "): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
@@ -2902,55 +2147,42 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
 
     @Override
-    public Integer addDataset(Dataset dataset) throws MiddlewareQueryException{
-
+    public Integer addDataset(Dataset dataset) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
-        
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
-        Integer savedId;
-        
+        Integer savedId = null;
         try {
             trans = session.beginTransaction();
-            DatasetDAO dao = new DatasetDAO();
-            dao.setSession(session);
+            DatasetDAO dao = getDatasetDao();
 
             Integer generatedId = dao.getNegativeId("datasetId");
             dataset.setDatasetId(generatedId);
-            
+
             Dataset recordSaved = dao.save(dataset);
             savedId = recordSaved.getDatasetId();
-            
-            trans.commit();
 
+            trans.commit();
         } catch (Exception e) {
-            // Rollback transaction in case of errors
-            if (trans != null) {
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException("Error encountered with addDataset(dataset="
-                    + dataset + "): " + e.getMessage(), e);
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered with addDataset(dataset=" + dataset + "): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
-        return savedId;   
+        return savedId;
     }
-   
+
     @Override
     public Integer addGDMSMarker(Marker marker) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
-
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
-        Integer idGDMSMarkerSaved;
+        Integer idGDMSMarkerSaved = null;
         try {
-            // begin save transaction
             trans = session.beginTransaction();
-
-            MarkerDAO dao = new MarkerDAO();
-            dao.setSession(session);
+            MarkerDAO dao = getMarkerDao();
 
             Integer markerId = dao.getNegativeId("markerId");
             marker.setMarkerId(markerId);
@@ -2960,395 +2192,294 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
             trans.commit();
         } catch (Exception e) {
-            // rollback transaction in case of errors
-            if (trans != null) {
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException("Error encountered while saving Marker: addGDMSMarker(): "
-                    + e.getMessage(), e);
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while saving Marker: addGDMSMarker(): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
-        
         return idGDMSMarkerSaved;
     }
-    
+
     @Override
     public Integer addGDMSMarkerAlias(MarkerAlias markerAlias) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
-
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
-        Integer idGDMSMarkerAliasSaved;
+        Integer idGDMSMarkerAliasSaved = null;
         try {
-            // begin save transaction
             trans = session.beginTransaction();
-
-            MarkerAliasDAO dao = new MarkerAliasDAO();
-            dao.setSession(session);
 
             //Integer markerAliasId = dao.getNegativeId("marker_id");
             //markerAlias.setMarkerId(markerAliasId);
 
-            MarkerAlias recordSaved = dao.save(markerAlias);
+            MarkerAlias recordSaved = getMarkerAliasDao().save(markerAlias);
             idGDMSMarkerAliasSaved = recordSaved.getMarkerId();
 
             trans.commit();
         } catch (Exception e) {
-            // rollback transaction in case of errors
-            if (trans != null) {
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException("Error encountered while saving Marker: addGDMSMarkerAlias(): "
-                    + e.getMessage(), e);
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while saving Marker: addGDMSMarkerAlias(): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
-        
         return idGDMSMarkerAliasSaved;
-    }    
-    
-    
+    }
+
     @Override
     public Integer addDatasetUser(DatasetUsers datasetUser) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
-
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
-        Integer idDatasetUserSaved;
+        Integer idDatasetUserSaved = null;
         try {
-            // begin save transaction
             trans = session.beginTransaction();
 
-            DatasetUsersDAO dao = new DatasetUsersDAO();
-            dao.setSession(session);
-
-            DatasetUsers recordSaved = dao.save(datasetUser);
+            DatasetUsers recordSaved = getDatasetUsersDao().save(datasetUser);
             idDatasetUserSaved = recordSaved.getUserId();
 
             trans.commit();
         } catch (Exception e) {
-            // rollback transaction in case of errors
-            if (trans != null) {
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException("Error encountered while saving Marker: addDatasetUser(): "
-                    + e.getMessage(), e);
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while saving Marker: addDatasetUser(): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
-        
         return idDatasetUserSaved;
-    }    
+    }
 
     @Override
-    public Integer addAlleleValues(AlleleValues alleleValues) throws MiddlewareQueryException{
-
+    public Integer addAlleleValues(AlleleValues alleleValues) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
-        
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
-        Integer savedId;
-        
+        Integer savedId = null;
+
         try {
             trans = session.beginTransaction();
-            AlleleValuesDAO dao = new AlleleValuesDAO();
-            dao.setSession(session);
+            AlleleValuesDAO dao = getAlleleValuesDao();
 
             Integer generatedId = dao.getNegativeId("anId");
             alleleValues.setAnId(generatedId);
-            
+
             AlleleValues recordSaved = dao.save(alleleValues);
             savedId = recordSaved.getAnId();
-            
-            trans.commit();
 
+            trans.commit();
         } catch (Exception e) {
-            // Rollback transaction in case of errors
-            if (trans != null) {
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException("Error encountered with addAlleleValues(alleleValues="
-                    + alleleValues + "): " + e.getMessage(), e);
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered with addAlleleValues(alleleValues=" + alleleValues + "): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
-        return savedId;   
+        return savedId;
     }
-    
 
     @Override
-    public Integer addCharValues(CharValues charValues) throws MiddlewareQueryException{
-
+    public Integer addCharValues(CharValues charValues) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
-        
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
-        Integer savedId;
-        
+        Integer savedId = null;
+
         try {
             trans = session.beginTransaction();
-            CharValuesDAO dao = new CharValuesDAO();
-            dao.setSession(session);
+            CharValuesDAO dao = getCharValuesDao();
 
             Integer generatedId = dao.getNegativeId("acId");
             charValues.setAcId(generatedId);
-            
+
             CharValues recordSaved = dao.save(charValues);
             savedId = recordSaved.getAcId();
-            
-            trans.commit();
 
+            trans.commit();
         } catch (Exception e) {
-            // Rollback transaction in case of errors
-            if (trans != null) {
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException("Error encountered with addCharValues(charValues="
-                    + charValues + "): " + e.getMessage(), e);
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered with addCharValues(charValues=" + charValues + "): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
-        return savedId;   
+        return savedId;
     }
-    
-    
+
     @Override
     public Integer addMappingPop(MappingPop mappingPop) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
-
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
-        Integer idSaved;
+        Integer idSaved = null;
         try {
-            // begin save transaction
             trans = session.beginTransaction();
 
-            MappingPopDAO dao = new MappingPopDAO();
-            dao.setSession(session);
-
-            MappingPop recordSaved = dao.save(mappingPop);
+            MappingPop recordSaved = getMappingPopDao().save(mappingPop);
             idSaved = recordSaved.getDatasetId();
 
             trans.commit();
         } catch (Exception e) {
-            // rollback transaction in case of errors
-            if (trans != null) {
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException("Error encountered while saving Marker: addMappingPop(): "
-                    + e.getMessage(), e);
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while saving Marker: addMappingPop(): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
-        
         return idSaved;
-    }    
+    }
 
     @Override
     public Integer addMappingPopValue(MappingPopValues mappingPopValue) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
-
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
-        Integer idSaved;
+        Integer idSaved = null;
         try {
-            // begin save transaction
             trans = session.beginTransaction();
-
-            MappingPopValuesDAO dao = new MappingPopValuesDAO();
-            dao.setSession(session);
+            MappingPopValuesDAO dao = getMappingPopValuesDao();
 
             Integer mpId = dao.getNegativeId("mpId");
             mappingPopValue.setMpId(mpId);
-            
+
             MappingPopValues recordSaved = dao.saveOrUpdate(mappingPopValue);
             idSaved = recordSaved.getMpId();
 
             trans.commit();
         } catch (Exception e) {
-            // rollback transaction in case of errors
-            if (trans != null) {
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException("Error encountered while saving Marker: addMappingPopValue(): "
-                    + e.getMessage(), e);
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while saving Marker: addMappingPopValue(): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
-        
         return idSaved;
-    }    
-    
+    }
+
     @Override
     public Integer addMarkerOnMap(MarkerOnMap markerOnMap) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
-
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
-        Integer idSaved;
+        Integer idSaved = null;
         try {
-            // begin save transaction
             trans = session.beginTransaction();
-
-            MarkerOnMapDAO dao = new MarkerOnMapDAO();
-            dao.setSession(session);
+            MarkerOnMapDAO dao = getMarkerOnMapDao();
 
             //Integer mapId = dao.getNegativeId("mapId");
             //mappingPopValue.setMpId(mpId);
-            
+
             MarkerOnMap recordSaved = dao.save(markerOnMap);
             idSaved = recordSaved.getMapId();
 
             trans.commit();
         } catch (Exception e) {
-            // rollback transaction in case of errors
-            if (trans != null) {
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException("Error encountered while saving Marker: addMarkerOnMap(): "
-                    + e.getMessage(), e);
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while saving Marker: addMarkerOnMap(): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
-        
+
         return idSaved;
     }
-    
+
     @Override
     public Integer addDartValue(DartValues dartValue) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
-
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
-        Integer idSaved;
+        Integer idSaved = null;
         try {
-            // begin save transaction
             trans = session.beginTransaction();
-
-            DartValuesDAO dao = new DartValuesDAO();
-            dao.setSession(session);
+            DartValuesDAO dao = getDartValuesDao();
 
             Integer adId = dao.getNegativeId("adId");
             dartValue.setAdId(adId);
-            
+
             DartValues recordSaved = dao.save(dartValue);
             idSaved = recordSaved.getAdId();
 
             trans.commit();
         } catch (Exception e) {
-            // rollback transaction in case of errors
-            if (trans != null) {
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException("Error encountered while saving Marker: addDartValue(): "
-                    + e.getMessage(), e);
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while saving Marker: addDartValue(): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
-        
+
         return idSaved;
-    }    
-    
-    
+    }
 
     @Override
     public Integer addQtl(Qtl qtl) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
-
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
-        Integer idSaved;
+        Integer idSaved = null;
         try {
-            // begin save transaction
             trans = session.beginTransaction();
-
-            QtlDAO dao = new QtlDAO();
-            dao.setSession(session);
+            QtlDAO dao = getQtlDao();
 
             Integer qtlId = dao.getNegativeId("qtlId");
             qtl.setQtlId(qtlId);
-            
+
             Qtl recordSaved = dao.saveOrUpdate(qtl);
             idSaved = recordSaved.getQtlId();
 
             trans.commit();
         } catch (Exception e) {
-            // rollback transaction in case of errors
-            if (trans != null) {
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException("Error encountered while saving Qtl: addQtl(): "
-                    + e.getMessage(), e);
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while saving Qtl: addQtl(): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
-        
-        return idSaved;
-    }    
-    
 
+        return idSaved;
+    }
 
     @Override
     public Integer addMap(Map map) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
-
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
-        Integer idSaved;
+        Integer idSaved = null;
         try {
-            // begin save transaction
             trans = session.beginTransaction();
-
-            MapDAO dao = new MapDAO();
-            dao.setSession(session);
+            MapDAO dao = getMapDao();
 
             Integer mapId = dao.getNegativeId("mapId");
             map.setMapId(mapId);
-            
+
             Map recordSaved = dao.saveOrUpdate(map);
             idSaved = recordSaved.getMapId();
 
             trans.commit();
         } catch (Exception e) {
-            // rollback transaction in case of errors
-            if (trans != null) {
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException("Error encountered while saving Map: addMap(): "
-                    + e.getMessage(), e);
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while saving Map: addMap(): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
-        
+
         return idSaved;
-    } 
+    }
 
     @Override
-    public Boolean setSSRMarkers(Marker marker, MarkerAlias markerAlias, MarkerDetails markerDetails, MarkerUserInfo markerUserInfo) throws MiddlewareQueryException {
+    public Boolean setSSRMarkers(Marker marker, MarkerAlias markerAlias, MarkerDetails markerDetails, MarkerUserInfo markerUserInfo)
+            throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
-
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
-        Boolean transactionStatus = true;
 
+        Boolean transactionStatus = true;
         try {
-            // begin save transaction
             trans = session.beginTransaction();
 
             // Add GDMS Marker
-            MarkerDAO markerDao = new MarkerDAO();
-            markerDao.setSession(session);
+            MarkerDAO markerDao = getMarkerDao();
 
             Integer markerId = markerDao.getNegativeId("markerId");
             marker.setMarkerId(markerId);
@@ -3357,750 +2488,659 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
             Marker markerRecordSaved = markerDao.saveOrUpdate(marker);
             Integer idGDMSMarkerSaved = markerRecordSaved.getMarkerId();
-            if(idGDMSMarkerSaved == null)
-            	transactionStatus = false;
+            if (idGDMSMarkerSaved == null)
+                transactionStatus = false;
 
             // Add GDMS Marker Alias
-            MarkerAliasDAO markerAliasDao = new MarkerAliasDAO();
-            markerAliasDao.setSession(session);
+            MarkerAliasDAO markerAliasDao = getMarkerAliasDao();
             markerAlias.setMarkerId(idGDMSMarkerSaved);
 
             MarkerAlias markerAliasRecordSaved = markerAliasDao.saveOrUpdate(markerAlias);
             Integer markerAliasRecordSavedMarkerId = markerAliasRecordSaved.getMarkerId();
-            if(markerAliasRecordSavedMarkerId == null)
-            	transactionStatus = false;
-           
+            if (markerAliasRecordSavedMarkerId == null)
+                transactionStatus = false;
+
             // Add Marker Details
-            MarkerDetailsDAO markerDetailsDao = new MarkerDetailsDAO();
-            markerDetailsDao.setSession(session);
+            MarkerDetailsDAO markerDetailsDao = getMarkerDetailsDao();
             markerDetails.setMarkerId(idGDMSMarkerSaved);
 
             MarkerDetails markerDetailsRecordSaved = markerDetailsDao.saveOrUpdate(markerDetails);
             Integer markerDetailsSavedMarkerId = markerDetailsRecordSaved.getMarkerId();
-            if(markerDetailsSavedMarkerId == null)
-            	transactionStatus = false;
-            
+            if (markerDetailsSavedMarkerId == null)
+                transactionStatus = false;
+
             // Add marker user info
-            MarkerUserInfoDAO dao = new MarkerUserInfoDAO();
-            dao.setSession(session);
+            MarkerUserInfoDAO dao = getMarkerUserInfoDao();
             markerUserInfo.setMarkerId(idGDMSMarkerSaved);
-            
+
             MarkerUserInfo markerUserInfoRecordSaved = dao.saveOrUpdate(markerUserInfo);
             Integer markerUserInfoSavedId = markerUserInfoRecordSaved.getMarkerId();
-            if(markerUserInfoSavedId == null)
-            	transactionStatus = false;
-            
-            if(transactionStatus == true)
+            if (markerUserInfoSavedId == null)
+                transactionStatus = false;
+
+            if (transactionStatus == true) {
                 trans.commit();
-            else
-            	trans.rollback();
-            
-        } catch (Exception e) {
-            // rollback transaction in case of errors
-        	transactionStatus = false;
-            if (trans != null) {            	
-                trans.rollback();
+            } else {
+                rollbackTransaction(trans);
             }
-            throw new MiddlewareQueryException("Error encountered while saving Marker: setSSRMarkers(): "
-                    + e.getMessage(), e);
+        } catch (Exception e) {
+            transactionStatus = false;
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while saving Marker: setSSRMarkers(): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
-        
-        return transactionStatus;
-    }    
-    
-    @Override
-    public Boolean setSNPMarkers(Marker marker, MarkerAlias markerAlias, MarkerDetails markerDetails, MarkerUserInfo markerUserInfo) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
 
+        return transactionStatus;
+    }
+
+    @Override
+    public Boolean setSNPMarkers(Marker marker, MarkerAlias markerAlias, MarkerDetails markerDetails, MarkerUserInfo markerUserInfo)
+            throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
+        
         Boolean transactionStatus = true;
-
         try {
-            // begin save transaction
             trans = session.beginTransaction();
 
             // Add GDMS Marker
-            MarkerDAO markerDao = new MarkerDAO();
-            markerDao.setSession(session);
+            MarkerDAO markerDao = getMarkerDao();
 
             Integer markerId = markerDao.getNegativeId("markerId");
             marker.setMarkerId(markerId);
-            
+
             marker.setMarkerType("SNP");
 
             Marker markerRecordSaved = markerDao.saveOrUpdate(marker);
             Integer idGDMSMarkerSaved = markerRecordSaved.getMarkerId();
-            if(idGDMSMarkerSaved == null)
-            	transactionStatus = false;
+            if (idGDMSMarkerSaved == null)
+                transactionStatus = false;
 
             // Add GDMS Marker Alias
-            MarkerAliasDAO markerAliasDao = new MarkerAliasDAO();
-            markerAliasDao.setSession(session);
+            MarkerAliasDAO markerAliasDao = getMarkerAliasDao();
             markerAlias.setMarkerId(idGDMSMarkerSaved);
 
             MarkerAlias markerAliasRecordSaved = markerAliasDao.save(markerAlias);
             Integer markerAliasRecordSavedMarkerId = markerAliasRecordSaved.getMarkerId();
-            if(markerAliasRecordSavedMarkerId == null)
-            	transactionStatus = false;
-           
+            if (markerAliasRecordSavedMarkerId == null)
+                transactionStatus = false;
+
             // Add Marker Details
-            MarkerDetailsDAO markerDetailsDao = new MarkerDetailsDAO();
-            markerDetailsDao.setSession(session);
+            MarkerDetailsDAO markerDetailsDao = getMarkerDetailsDao();
             markerDetails.setMarkerId(idGDMSMarkerSaved);
 
             MarkerDetails markerDetailsRecordSaved = markerDetailsDao.save(markerDetails);
             Integer markerDetailsSavedMarkerId = markerDetailsRecordSaved.getMarkerId();
-            if(markerDetailsSavedMarkerId == null)
-            	transactionStatus = false;
-            
+            if (markerDetailsSavedMarkerId == null)
+                transactionStatus = false;
+
             // Add marker user info
-            MarkerUserInfoDAO dao = new MarkerUserInfoDAO();
-            dao.setSession(session);
+            MarkerUserInfoDAO dao = getMarkerUserInfoDao();
             markerUserInfo.setMarkerId(idGDMSMarkerSaved);
-            
+
             MarkerUserInfo markerUserInfoRecordSaved = dao.save(markerUserInfo);
             Integer markerUserInfoSavedId = markerUserInfoRecordSaved.getMarkerId();
-            if(markerUserInfoSavedId == null)
-            	transactionStatus = false;
-            
-            if(transactionStatus == true)
+            if (markerUserInfoSavedId == null)
+                transactionStatus = false;
+
+            if (transactionStatus == true) {
                 trans.commit();
-            else
-            	trans.rollback();
-            
-        } catch (Exception e) {
-            // rollback transaction in case of errors
-        	transactionStatus = false;
-            if (trans != null) {            	
+            } else {
                 trans.rollback();
             }
-            throw new MiddlewareQueryException("Error encountered while saving Marker: setSNPMarkers(): "
-                    + e.getMessage(), e);
+        } catch (Exception e) {
+            transactionStatus = false;
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while saving Marker: setSNPMarkers(): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
-        
         return transactionStatus;
-    }    
+    }
 
     @Override
-    public Boolean setCAPMarkers(Marker marker, MarkerAlias markerAlias, MarkerDetails markerDetails, MarkerUserInfo markerUserInfo) throws MiddlewareQueryException {
+    public Boolean setCAPMarkers(Marker marker, MarkerAlias markerAlias, MarkerDetails markerDetails, MarkerUserInfo markerUserInfo)
+            throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
-
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
+        
         Boolean transactionStatus = true;
-
         try {
-            // begin save transaction
             trans = session.beginTransaction();
 
             // Add GDMS Marker
-            MarkerDAO markerDao = new MarkerDAO();
-            markerDao.setSession(session);
+            MarkerDAO markerDao = getMarkerDao();
 
             Integer markerId = markerDao.getNegativeId("markerId");
             marker.setMarkerId(markerId);
-            
+
             marker.setMarkerType("CAP");
 
             Marker markerRecordSaved = markerDao.saveOrUpdate(marker);
             Integer idGDMSMarkerSaved = markerRecordSaved.getMarkerId();
-            if(idGDMSMarkerSaved == null)
-            	transactionStatus = false;
+            if (idGDMSMarkerSaved == null)
+                transactionStatus = false;
 
             // Add GDMS Marker Alias
-            MarkerAliasDAO markerAliasDao = new MarkerAliasDAO();
-            markerAliasDao.setSession(session);
+            MarkerAliasDAO markerAliasDao = getMarkerAliasDao();
             markerAlias.setMarkerId(idGDMSMarkerSaved);
 
             MarkerAlias markerAliasRecordSaved = markerAliasDao.save(markerAlias);
             Integer markerAliasRecordSavedMarkerId = markerAliasRecordSaved.getMarkerId();
-            if(markerAliasRecordSavedMarkerId == null)
-            	transactionStatus = false;
-           
+            if (markerAliasRecordSavedMarkerId == null)
+                transactionStatus = false;
+
             // Add Marker Details
-            MarkerDetailsDAO markerDetailsDao = new MarkerDetailsDAO();
-            markerDetailsDao.setSession(session);
+            MarkerDetailsDAO markerDetailsDao = getMarkerDetailsDao();
             markerDetails.setMarkerId(idGDMSMarkerSaved);
 
             MarkerDetails markerDetailsRecordSaved = markerDetailsDao.save(markerDetails);
             Integer markerDetailsSavedMarkerId = markerDetailsRecordSaved.getMarkerId();
-            if(markerDetailsSavedMarkerId == null)
-            	transactionStatus = false;
-            
+            if (markerDetailsSavedMarkerId == null)
+                transactionStatus = false;
+
             // Add marker user info
-            MarkerUserInfoDAO dao = new MarkerUserInfoDAO();
-            dao.setSession(session);
+            MarkerUserInfoDAO dao = getMarkerUserInfoDao();
             markerUserInfo.setMarkerId(idGDMSMarkerSaved);
-            
+
             MarkerUserInfo markerUserInfoRecordSaved = dao.save(markerUserInfo);
             Integer markerUserInfoSavedId = markerUserInfoRecordSaved.getMarkerId();
-            if(markerUserInfoSavedId == null)
-            	transactionStatus = false;
-            
-            if(transactionStatus == true)
+            if (markerUserInfoSavedId == null)
+                transactionStatus = false;
+
+            if (transactionStatus == true) {
                 trans.commit();
-            else
-            	trans.rollback();
-            
-        } catch (Exception e) {
-            // rollback transaction in case of errors
-        	transactionStatus = false;
-            if (trans != null) {            	
+            } else {
                 trans.rollback();
             }
-            throw new MiddlewareQueryException("Error encountered while saving Marker: setSNPMarkers(): "
-                    + e.getMessage(), e);
+        } catch (Exception e) {
+            transactionStatus = false;
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while saving Marker: setSNPMarkers(): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
-        
+
         return transactionStatus;
-    }    
+    }
 
     @Override
-    public Boolean setCISRMarkers(Marker marker, MarkerAlias markerAlias, MarkerDetails markerDetails, MarkerUserInfo markerUserInfo) throws MiddlewareQueryException {
+    public Boolean setCISRMarkers(Marker marker, MarkerAlias markerAlias, MarkerDetails markerDetails, MarkerUserInfo markerUserInfo)
+            throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
-
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
+        
         Boolean transactionStatus = true;
-
         try {
             // begin save transaction
             trans = session.beginTransaction();
 
             // Add GDMS Marker
-            MarkerDAO markerDao = new MarkerDAO();
-            markerDao.setSession(session);
+            MarkerDAO markerDao = getMarkerDao();
 
             Integer markerId = markerDao.getNegativeId("markerId");
             marker.setMarkerId(markerId);
-            
+
             marker.setMarkerType("CISR");
 
             Marker markerRecordSaved = markerDao.saveOrUpdate(marker);
             Integer idGDMSMarkerSaved = markerRecordSaved.getMarkerId();
-            if(idGDMSMarkerSaved == null)
-            	transactionStatus = false;
+            if (idGDMSMarkerSaved == null)
+                transactionStatus = false;
 
             // Add GDMS Marker Alias
-            MarkerAliasDAO markerAliasDao = new MarkerAliasDAO();
-            markerAliasDao.setSession(session);
+            MarkerAliasDAO markerAliasDao = getMarkerAliasDao();
             markerAlias.setMarkerId(idGDMSMarkerSaved);
 
             MarkerAlias markerAliasRecordSaved = markerAliasDao.save(markerAlias);
             Integer markerAliasRecordSavedMarkerId = markerAliasRecordSaved.getMarkerId();
-            if(markerAliasRecordSavedMarkerId == null)
-            	transactionStatus = false;
-           
-            // Add Marker Details
-            MarkerDetailsDAO markerDetailsDao = new MarkerDetailsDAO();
-            markerDetailsDao.setSession(session);
-            markerDetails.setMarkerId(idGDMSMarkerSaved);
+            if (markerAliasRecordSavedMarkerId == null)
+                transactionStatus = false;
 
+            // Add Marker Details
+            MarkerDetailsDAO markerDetailsDao = getMarkerDetailsDao();
+            markerDetails.setMarkerId(idGDMSMarkerSaved);
 
             MarkerDetails markerDetailsRecordSaved = markerDetailsDao.save(markerDetails);
             Integer markerDetailsSavedMarkerId = markerDetailsRecordSaved.getMarkerId();
-            if(markerDetailsSavedMarkerId == null)
-            	transactionStatus = false;
-            
+            if (markerDetailsSavedMarkerId == null)
+                transactionStatus = false;
+
             // Add marker user info
-            
-            MarkerUserInfoDAO dao = new MarkerUserInfoDAO();
-            dao.setSession(session);
+
+            MarkerUserInfoDAO dao = getMarkerUserInfoDao();
             markerUserInfo.setMarkerId(idGDMSMarkerSaved);
-            
+
             MarkerUserInfo markerUserInfoRecordSaved = dao.save(markerUserInfo);
             Integer markerUserInfoSavedId = markerUserInfoRecordSaved.getMarkerId();
-            if(markerUserInfoSavedId == null)
-            	transactionStatus = false;
-            
-            if(transactionStatus == true)
+            if (markerUserInfoSavedId == null)
+                transactionStatus = false;
+
+            if (transactionStatus == true) {
                 trans.commit();
-            else
-            	trans.rollback();
-            
-        } catch (Exception e) {
-            // rollback transaction in case of errors
-        	transactionStatus = false;
-            if (trans != null) {            	
+            } else {
                 trans.rollback();
             }
-            throw new MiddlewareQueryException("Error encountered while saving Marker: setSNPMarkers(): "
-                    + e.getMessage(), e);
+        } catch (Exception e) {
+            transactionStatus = false;
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while saving Marker: setSNPMarkers(): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
-        
+
         return transactionStatus;
     }
-    
-
 
     @Override
     public Boolean setQTL(DatasetUsers datasetUser, Dataset dataset, QtlDetails qtlDetails, Qtl qtl) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
-
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
+        
         Boolean transactionStatus = true;
-
         try {
             // begin save transaction
             trans = session.beginTransaction();
 
             // Add Dataset
-            DatasetDAO datasetDao = new DatasetDAO();
-            datasetDao.setSession(session);
+            DatasetDAO datasetDao = getDatasetDao();
 
             Integer generatedId = datasetDao.getNegativeId("datasetId");
             dataset.setDatasetId(generatedId);
-            
-            dataset.setDatasetType("QTL");
-            
-            Dataset datasetRecordSaved = datasetDao.saveOrUpdate(dataset);
-            Integer datasetSavedId = datasetRecordSaved.getDatasetId();            
 
-            if(datasetSavedId == null)
-            	transactionStatus = false;            
-            
+            dataset.setDatasetType("QTL");
+
+            Dataset datasetRecordSaved = datasetDao.saveOrUpdate(dataset);
+            Integer datasetSavedId = datasetRecordSaved.getDatasetId();
+
+            if (datasetSavedId == null)
+                transactionStatus = false;
+
             // Add Dataset User
-            DatasetUsersDAO datasetUserDao = new DatasetUsersDAO();
-            datasetUserDao.setSession(session);
+            DatasetUsersDAO datasetUserDao = getDatasetUsersDao();
             datasetUser.setDatasetId(datasetSavedId);
 
             DatasetUsers recordSaved = datasetUserDao.saveOrUpdate(datasetUser);
-            Integer idDatasetUserSaved = recordSaved.getUserId();    
+            Integer idDatasetUserSaved = recordSaved.getUserId();
 
-            if(idDatasetUserSaved == null)
-            	transactionStatus = false;            
+            if (idDatasetUserSaved == null)
+                transactionStatus = false;
 
             // Add Qtl            
-            QtlDAO qtlDao = new QtlDAO();
-            qtlDao.setSession(session);
+            QtlDAO qtlDao = getQtlDao();
 
             Integer qtlId = qtlDao.getNegativeId("qtlId");
             qtl.setQtlId(qtlId);
             qtl.setDatasetId(datasetSavedId);
-            
+
             Qtl qtlRecordSaved = qtlDao.saveOrUpdate(qtl);
-            Integer qtlIdSaved = qtlRecordSaved.getQtlId();            
-            
-            if(qtlIdSaved == null)
-            	transactionStatus = false;            
-            
+            Integer qtlIdSaved = qtlRecordSaved.getQtlId();
+
+            if (qtlIdSaved == null)
+                transactionStatus = false;
+
             // Add QtlDetails
-            QtlDetailsDAO qtlDetailsDao = new QtlDetailsDAO();
-            qtlDetailsDao.setSession(session);
-            
+            QtlDetailsDAO qtlDetailsDao = getQtlDetailsDao();
+
             QtlDetailsPK qtlDetailsPK = new QtlDetailsPK(qtlIdSaved, qtlDetails.getId().getMapId());
-            
+
             qtlDetails.setQtlId(qtlDetailsPK);
 
             QtlDetails qtlDetailsRecordSaved = qtlDetailsDao.saveOrUpdate(qtlDetails);
             QtlDetailsPK qtlDetailsSavedId = qtlDetailsRecordSaved.getId();
 
-            if(qtlDetailsSavedId == null)
-            	transactionStatus = false;                        
-  
-            
-            if(transactionStatus == true)
+            if (qtlDetailsSavedId == null)
+                transactionStatus = false;
+
+            if (transactionStatus == true) {
                 trans.commit();
-            else
-            	trans.rollback();
-            
-        } catch (Exception e) {
-            // rollback transaction in case of errors
-        	transactionStatus = false;
-            if (trans != null) {            	
+            } else {
                 trans.rollback();
             }
-            throw new MiddlewareQueryException("Error encountered while saving Marker: setQTL(): "
-                    + e.getMessage(), e);
+        } catch (Exception e) {
+            transactionStatus = false;
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while saving Marker: setQTL(): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
-        
+
         return transactionStatus;
-    }    
+    }
 
-    public Boolean setDart(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser, 
-            AlleleValues alleleValues, Dataset dataset, DartValues dartValues) throws MiddlewareQueryException{
-        
+    public Boolean setDart(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser,
+            AlleleValues alleleValues, Dataset dataset, DartValues dartValues) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
-
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
+        
         Boolean transactionStatus = true;
-
         try {
             // Begin save transaction
             trans = session.beginTransaction();
 
             // Add Dataset
-            DatasetDAO datasetDao = new DatasetDAO();
-            datasetDao.setSession(session);
+            DatasetDAO datasetDao = getDatasetDao();
 
             Integer datasetGeneratedId = datasetDao.getNegativeId("datasetId");
             dataset.setDatasetId(datasetGeneratedId);
-            
+
             dataset.setDatasetType("DArT");
             dataset.setDataType("int");
 
             Dataset datasetRecordSaved = datasetDao.saveOrUpdate(dataset);
-            Integer datasetId = datasetRecordSaved.getDatasetId();            
+            Integer datasetId = datasetRecordSaved.getDatasetId();
 
-            if(datasetId == null){
-                throw new Exception();  // To immediately roll back and to avoid executing the other insert functions
+            if (datasetId == null) {
+                throw new Exception(); // To immediately roll back and to avoid executing the other insert functions
             }
 
             // Add AccMetadataSet
-            AccMetadataSetDAO accMetadataSetDao = new AccMetadataSetDAO();
-            accMetadataSetDao.setSession(session);
-            
+            AccMetadataSetDAO accMetadataSetDao = getAccMetadataSetDao();
+
             accMetadataSet.setDatasetId(datasetId);
 
             // No need to generate id, AccMetadataSetPK(datasetId, gId, nId) are foreign keys
-            
-            AccMetadataSet accMetadataSetRecordSaved = accMetadataSetDao.saveOrUpdate(accMetadataSet);
-            AccMetadataSetPK accMetadatasetSavedId = accMetadataSetRecordSaved.getId();            
 
-            if(accMetadatasetSavedId == null){
-                throw new Exception(); 
+            AccMetadataSet accMetadataSetRecordSaved = accMetadataSetDao.saveOrUpdate(accMetadataSet);
+            AccMetadataSetPK accMetadatasetSavedId = accMetadataSetRecordSaved.getId();
+
+            if (accMetadatasetSavedId == null) {
+                throw new Exception();
             }
-            
+
             // Add MarkerMetadataSet
-            MarkerMetadataSetDAO markerMetadataSetDao = new MarkerMetadataSetDAO();
-            markerMetadataSetDao.setSession(session);
+            MarkerMetadataSetDAO markerMetadataSetDao = getMarkerMetadataSetDao();
 
             markerMetadataSet.setDatasetId(datasetId);
 
             // No need to generate id, MarkerMetadataSetPK(datasetId, markerId) are foreign keys
 
             MarkerMetadataSet markerMetadataSetRecordSaved = markerMetadataSetDao.saveOrUpdate(markerMetadataSet);
-            MarkerMetadataSetPK markerMetadataSetSavedId = markerMetadataSetRecordSaved.getId();            
+            MarkerMetadataSetPK markerMetadataSetSavedId = markerMetadataSetRecordSaved.getId();
 
-            if(markerMetadataSetSavedId == null){
+            if (markerMetadataSetSavedId == null) {
                 throw new Exception();
             }
-            
+
             // Add DatasetUser
-            
-            DatasetUsersDAO datasetUserDao = new DatasetUsersDAO();
-            datasetUserDao.setSession(session);
+            DatasetUsersDAO datasetUserDao = getDatasetUsersDao();
             
             datasetUser.setDatasetId(datasetId);
 
             DatasetUsers datasetUserSaved = datasetUserDao.saveOrUpdate(datasetUser);
-            Integer datasetUserSavedId = datasetUserSaved.getUserId();    
+            Integer datasetUserSavedId = datasetUserSaved.getUserId();
 
-            if(datasetUserSavedId == null){
+            if (datasetUserSavedId == null) {
                 throw new Exception();
             }
 
             // Add AlleleValues
-            AlleleValuesDAO alleleValuesDao = new AlleleValuesDAO();
-            alleleValuesDao.setSession(session);
+            AlleleValuesDAO alleleValuesDao = getAlleleValuesDao();
             
             alleleValues.setDatasetId(datasetId);
 
             Integer alleleValuesGeneratedId = alleleValuesDao.getNegativeId("anId");
             alleleValues.setAnId(alleleValuesGeneratedId);
-            
+
             AlleleValues alleleValuesRecordSaved = alleleValuesDao.save(alleleValues);
             Integer alleleValuesSavedId = alleleValuesRecordSaved.getAnId();
 
-            if(alleleValuesSavedId == null){
+            if (alleleValuesSavedId == null) {
                 throw new Exception();
             }
 
             // Add DArT Values
-            
-            DartValuesDAO dartValuesDao = new DartValuesDAO();
-            dartValuesDao.setSession(session);
+
+            DartValuesDAO dartValuesDao = getDartValuesDao();
             
             dartValues.setDatasetId(datasetId);
 
             Integer adId = dartValuesDao.getNegativeId("adId");
             dartValues.setAdId(adId);
-            
+
             DartValues dartValuesRecordSaved = dartValuesDao.save(dartValues);
             Integer dartValuesSavedId = dartValuesRecordSaved.getAdId();
 
-            if(dartValuesSavedId == null){
+            if (dartValuesSavedId == null) {
                 //transactionStatus = false;
                 throw new Exception();
             }
 
-            if(transactionStatus == true){
+            if (transactionStatus == true) {
                 trans.commit();
             } else {
-                throw new Exception(); 
+                throw new Exception();
             }
-            
         } catch (Exception e) {
-            // rollback transaction in case of errors
             transactionStatus = false;
-            if (trans != null) {                
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException("Error encountered while setting DArT: setDArT(): "
-                    + e.getMessage(), e);
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while setting DArT: setDArT(): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
-        
+
         return transactionStatus;
     }
 
-	@Override
-	public Boolean setSSR(AccMetadataSet accMetadataSet,MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser,
-			AlleleValues alleleValues, Dataset dataset)throws MiddlewareQueryException {
-		
-		requireLocalDatabaseInstance();
-
+    @Override
+    public Boolean setSSR(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser,
+            AlleleValues alleleValues, Dataset dataset) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
+        
         Boolean transactionStatus = true;
-
         try {
             // Begin save transaction
             trans = session.beginTransaction();
 
             // Add Dataset
-            DatasetDAO datasetDao = new DatasetDAO();
-            datasetDao.setSession(session);
+            DatasetDAO datasetDao = getDatasetDao();
 
             Integer datasetGeneratedId = datasetDao.getNegativeId("datasetId");
             dataset.setDatasetId(datasetGeneratedId);
-            
+
             dataset.setDatasetType("SSR");
             dataset.setDataType("int");
 
             Dataset datasetRecordSaved = datasetDao.saveOrUpdate(dataset);
-            Integer datasetId = datasetRecordSaved.getDatasetId();            
+            Integer datasetId = datasetRecordSaved.getDatasetId();
 
-            if(datasetId == null){
-                throw new Exception();  // To immediately roll back and to avoid executing the other insert functions
+            if (datasetId == null) {
+                throw new Exception(); // To immediately roll back and to avoid executing the other insert functions
             }
 
             // Add AccMetadataSet
-            AccMetadataSetDAO accMetadataSetDao = new AccMetadataSetDAO();
-            accMetadataSetDao.setSession(session);
-            
+            AccMetadataSetDAO accMetadataSetDao = getAccMetadataSetDao();
+
             accMetadataSet.setDatasetId(datasetId);
 
             // No need to generate id, AccMetadataSetPK(datasetId, gId, nId) are foreign keys
-            
-            AccMetadataSet accMetadataSetRecordSaved = accMetadataSetDao.saveOrUpdate(accMetadataSet);
-            AccMetadataSetPK accMetadatasetSavedId = accMetadataSetRecordSaved.getId();            
 
-            if(accMetadatasetSavedId == null){
-                throw new Exception(); 
+            AccMetadataSet accMetadataSetRecordSaved = accMetadataSetDao.saveOrUpdate(accMetadataSet);
+            AccMetadataSetPK accMetadatasetSavedId = accMetadataSetRecordSaved.getId();
+
+            if (accMetadatasetSavedId == null) {
+                throw new Exception();
             }
-            
+
             // Add MarkerMetadataSet
-            MarkerMetadataSetDAO markerMetadataSetDao = new MarkerMetadataSetDAO();
-            markerMetadataSetDao.setSession(session);
+            MarkerMetadataSetDAO markerMetadataSetDao = getMarkerMetadataSetDao();
 
             markerMetadataSet.setDatasetId(datasetId);
 
             // No need to generate id, MarkerMetadataSetPK(datasetId, markerId) are foreign keys
 
             MarkerMetadataSet markerMetadataSetRecordSaved = markerMetadataSetDao.saveOrUpdate(markerMetadataSet);
-            MarkerMetadataSetPK markerMetadataSetSavedId = markerMetadataSetRecordSaved.getId();            
+            MarkerMetadataSetPK markerMetadataSetSavedId = markerMetadataSetRecordSaved.getId();
 
-            if(markerMetadataSetSavedId == null){
+            if (markerMetadataSetSavedId == null) {
                 throw new Exception();
             }
-            
+
             // Add DatasetUser
-            
-            DatasetUsersDAO datasetUserDao = new DatasetUsersDAO();
-            datasetUserDao.setSession(session);
-            
+
+            DatasetUsersDAO datasetUserDao = getDatasetUsersDao();
+
             datasetUser.setDatasetId(datasetId);
 
             DatasetUsers datasetUserSaved = datasetUserDao.saveOrUpdate(datasetUser);
-            Integer datasetUserSavedId = datasetUserSaved.getUserId();    
+            Integer datasetUserSavedId = datasetUserSaved.getUserId();
 
-            if(datasetUserSavedId == null){
+            if (datasetUserSavedId == null) {
                 throw new Exception();
             }
 
             // Add AlleleValues
-            AlleleValuesDAO alleleValuesDao = new AlleleValuesDAO();
-            alleleValuesDao.setSession(session);
-            
+            AlleleValuesDAO alleleValuesDao = getAlleleValuesDao();
+
             alleleValues.setDatasetId(datasetId);
 
             Integer alleleValuesGeneratedId = alleleValuesDao.getNegativeId("anId");
             alleleValues.setAnId(alleleValuesGeneratedId);
-            
+
             AlleleValues alleleValuesRecordSaved = alleleValuesDao.save(alleleValues);
             Integer alleleValuesSavedId = alleleValuesRecordSaved.getAnId();
 
-            if(alleleValuesSavedId == null){
+            if (alleleValuesSavedId == null) {
                 throw new Exception();
             }
 
-
-            if(transactionStatus == true){
+            if (transactionStatus == true) {
                 trans.commit();
             } else {
-                throw new Exception(); 
+                throw new Exception();
             }
-            
         } catch (Exception e) {
-            // rollback transaction in case of errors
             transactionStatus = false;
-            if (trans != null) {                
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException("Error encountered while setting SSR: setSSR(): "
-                    + e.getMessage(), e);
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while setting SSR: setSSR(): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
-        
         return transactionStatus;
-	}
+    }
 
-	@Override
-	public Boolean setSNP(AccMetadataSet accMetadataSet,MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser,
-			CharValues charValues, Dataset dataset)throws MiddlewareQueryException {
-		
-		requireLocalDatabaseInstance();
-
+    @Override
+    public Boolean setSNP(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser,
+            CharValues charValues, Dataset dataset) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
+        
         Boolean transactionStatus = true;
-
         try {
             // Begin save transaction
             trans = session.beginTransaction();
 
             // Add Dataset
-            DatasetDAO datasetDao = new DatasetDAO();
-            datasetDao.setSession(session);
+            DatasetDAO datasetDao = getDatasetDao();
 
             Integer datasetGeneratedId = datasetDao.getNegativeId("datasetId");
             dataset.setDatasetId(datasetGeneratedId);
-            
+
             dataset.setDatasetType("SNP");
             dataset.setDataType("int");
 
             Dataset datasetRecordSaved = datasetDao.saveOrUpdate(dataset);
-            Integer datasetId = datasetRecordSaved.getDatasetId();            
+            Integer datasetId = datasetRecordSaved.getDatasetId();
 
-            if(datasetId == null){
-                throw new Exception();  // To immediately roll back and to avoid executing the other insert functions
+            if (datasetId == null) {
+                throw new Exception(); // To immediately roll back and to avoid executing the other insert functions
             }
 
             // Add AccMetadataSet
-            AccMetadataSetDAO accMetadataSetDao = new AccMetadataSetDAO();
-            accMetadataSetDao.setSession(session);
-            
+            AccMetadataSetDAO accMetadataSetDao = getAccMetadataSetDao();
+
             accMetadataSet.setDatasetId(datasetId);
 
             // No need to generate id, AccMetadataSetPK(datasetId, gId, nId) are foreign keys
-            
-            AccMetadataSet accMetadataSetRecordSaved = accMetadataSetDao.saveOrUpdate(accMetadataSet);
-            AccMetadataSetPK accMetadatasetSavedId = accMetadataSetRecordSaved.getId();            
 
-            if(accMetadatasetSavedId == null){
-                throw new Exception(); 
+            AccMetadataSet accMetadataSetRecordSaved = accMetadataSetDao.saveOrUpdate(accMetadataSet);
+            AccMetadataSetPK accMetadatasetSavedId = accMetadataSetRecordSaved.getId();
+
+            if (accMetadatasetSavedId == null) {
+                throw new Exception();
             }
-            
+
             // Add MarkerMetadataSet
-            MarkerMetadataSetDAO markerMetadataSetDao = new MarkerMetadataSetDAO();
-            markerMetadataSetDao.setSession(session);
+            MarkerMetadataSetDAO markerMetadataSetDao = getMarkerMetadataSetDao();
 
             markerMetadataSet.setDatasetId(datasetId);
 
             // No need to generate id, MarkerMetadataSetPK(datasetId, markerId) are foreign keys
 
             MarkerMetadataSet markerMetadataSetRecordSaved = markerMetadataSetDao.saveOrUpdate(markerMetadataSet);
-            MarkerMetadataSetPK markerMetadataSetSavedId = markerMetadataSetRecordSaved.getId();            
+            MarkerMetadataSetPK markerMetadataSetSavedId = markerMetadataSetRecordSaved.getId();
 
-            if(markerMetadataSetSavedId == null){
+            if (markerMetadataSetSavedId == null) {
                 throw new Exception();
             }
-            
+
             // Add DatasetUser
-            
-            DatasetUsersDAO datasetUserDao = new DatasetUsersDAO();
-            datasetUserDao.setSession(session);
-            
+            DatasetUsersDAO datasetUserDao = getDatasetUsersDao();
+
             datasetUser.setDatasetId(datasetId);
 
             DatasetUsers datasetUserSaved = datasetUserDao.saveOrUpdate(datasetUser);
-            Integer datasetUserSavedId = datasetUserSaved.getUserId();    
+            Integer datasetUserSavedId = datasetUserSaved.getUserId();
 
-            if(datasetUserSavedId == null){
+            if (datasetUserSavedId == null) {
                 throw new Exception();
             }
 
-
             //Add CharValues
-            
-            CharValuesDAO charValuesDao= new CharValuesDAO();
-            charValuesDao.setSession(session);
-            
+            CharValuesDAO charValuesDao = getCharValuesDao();
+
             Integer generatedId = charValuesDao.getNegativeId("acId");
             charValues.setAcId(generatedId);
             charValues.setDatasetId(datasetId);
-            
+
             CharValues charValuesRecordSaved = charValuesDao.saveOrUpdate(charValues);
             Integer charValuesSavedId = charValuesRecordSaved.getAcId();
-            
-            if(charValuesSavedId == null){
-              throw new Exception();
-          }
 
-            if(transactionStatus == true){
+            if (charValuesSavedId == null) {
+                throw new Exception();
+            }
+
+            if (transactionStatus == true) {
                 trans.commit();
             } else {
-                throw new Exception(); 
+                throw new Exception();
             }
-            
+
         } catch (Exception e) {
-            // rollback transaction in case of errors
             transactionStatus = false;
-            if (trans != null) {                
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException("Error encountered while setting SNP: setSNP(): "
-                    + e.getMessage(), e);
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while setting SNP: setSNP(): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
-        
+
         return transactionStatus;
-	}
+    }
 
     @Override
     public Boolean setMappingData(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser,
             MappingPop mappingPop, MappingPopValues mappingPopValues, Dataset dataset) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
-        
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
+        
         Boolean transactionStatus = true;
-
         try {
             // Begin save transaction
             trans = session.beginTransaction();
 
             // Add Dataset
-            DatasetDAO datasetDao = new DatasetDAO();
-            datasetDao.setSession(session);
-            
+            DatasetDAO datasetDao = getDatasetDao();
+
             Integer datasetGeneratedId = datasetDao.getNegativeId("datasetId");
             dataset.setDatasetId(datasetGeneratedId);
 
@@ -4108,183 +3148,160 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             dataset.setDataType("map");
 
             Dataset datasetRecordSaved = datasetDao.saveOrUpdate(dataset);
-            Integer datasetId = datasetRecordSaved.getDatasetId();            
+            Integer datasetId = datasetRecordSaved.getDatasetId();
 
             if (datasetId == null) {
-                throw new Exception();  // To immediately roll back and to avoid executing the other insert functions
+                throw new Exception(); // To immediately roll back and to avoid executing the other insert functions
             }
 
             // Add AccMetadataSet
-            AccMetadataSetDAO accMetadataSetDao = new AccMetadataSetDAO();
-            accMetadataSetDao.setSession(session);
-	            
+            AccMetadataSetDAO accMetadataSetDao = getAccMetadataSetDao();
             accMetadataSet.setDatasetId(datasetId);
 
             // No need to generate id, AccMetadataSetPK(datasetId, gId, nId) are foreign keys
             AccMetadataSet accMetadataSetRecordSaved = accMetadataSetDao.saveOrUpdate(accMetadataSet);
-            AccMetadataSetPK accMetadatasetSavedId = accMetadataSetRecordSaved.getId();            
+            AccMetadataSetPK accMetadatasetSavedId = accMetadataSetRecordSaved.getId();
 
             if (accMetadatasetSavedId == null) {
-                throw new Exception(); 
+                throw new Exception();
             }
-	            
-            // Add MarkerMetadataSet
-            MarkerMetadataSetDAO markerMetadataSetDao = new MarkerMetadataSetDAO();
-            markerMetadataSetDao.setSession(session);
 
+            // Add MarkerMetadataSet
+            MarkerMetadataSetDAO markerMetadataSetDao = getMarkerMetadataSetDao();
             markerMetadataSet.setDatasetId(datasetId);
 
             // No need to generate id, MarkerMetadataSetPK(datasetId, markerId) are foreign keys
             MarkerMetadataSet markerMetadataSetRecordSaved = markerMetadataSetDao.saveOrUpdate(markerMetadataSet);
-            MarkerMetadataSetPK markerMetadataSetSavedId = markerMetadataSetRecordSaved.getId();            
+            MarkerMetadataSetPK markerMetadataSetSavedId = markerMetadataSetRecordSaved.getId();
 
             if (markerMetadataSetSavedId == null) {
                 throw new Exception();
             }
-	            
-            // Add DatasetUser
-            DatasetUsersDAO datasetUserDao = new DatasetUsersDAO();
-            datasetUserDao.setSession(session);
 
+            // Add DatasetUser
+            DatasetUsersDAO datasetUserDao = getDatasetUsersDao();
             datasetUser.setDatasetId(datasetId);
-            
+
             DatasetUsers datasetUserSaved = datasetUserDao.saveOrUpdate(datasetUser);
-            Integer datasetUserSavedId = datasetUserSaved.getUserId();    
+            Integer datasetUserSavedId = datasetUserSaved.getUserId();
 
             if (datasetUserSavedId == null) {
                 throw new Exception();
             }
 
             // Add Mapping Population
-            MappingPopDAO mappingPopDao = new MappingPopDAO();
-            mappingPopDao.setSession(session);
-            
+            MappingPopDAO mappingPopDao = getMappingPopDao();
             mappingPop.setDatasetId(datasetId);
-            
+
             // Mapping Pop has DatasetID as PK in Hibernate, but not in SQL
             // Integer mappingPopGeneratedId = mappingPopDao.getNegativeId("datasetId");
             // mappingPop.setDatasetIdId(mappingPopGeneratedId);
-            
+
             MappingPop mappingPopRecordSaved = mappingPopDao.save(mappingPop);
             Integer mappingPopSavedId = mappingPopRecordSaved.getDatasetId();
-            
+
             if (mappingPopSavedId == null) {
                 throw new Exception();
             }
-            
+
             // Add Mapping Population Values
-            
-            MappingPopValuesDAO mappingPopValuesDao = new MappingPopValuesDAO();
-            mappingPopValuesDao.setSession(session);
-            
+            MappingPopValuesDAO mappingPopValuesDao = getMappingPopValuesDao();
             mappingPopValues.setDatasetId(datasetId);
-            
+
             Integer mpId = mappingPopValuesDao.getNegativeId("mpId");
             mappingPopValues.setMpId(mpId);
-            
+
             MappingPopValues mappingPopValuesRecordSaved = mappingPopValuesDao.save(mappingPopValues);
             Integer mappingPopValuesSavedId = mappingPopValuesRecordSaved.getMpId();
-            
+
             if (mappingPopValuesSavedId == null) {
                 throw new Exception();
             }
-            
+
             if (transactionStatus == true) {
                 trans.commit();
             } else {
-                throw new Exception(); 
+                throw new Exception();
             }
-	            
+
         } catch (Exception e) {
-            // rollback transaction in case of errors
             transactionStatus = false;
-            if (trans != null) {                
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException("Error encountered while setting Mapping Data: setMappingData(): "
-                    + e.getMessage(), e);
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while setting Mapping Data: setMappingData(): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
-	        
+
         return transactionStatus;
     }
-    
+
     @Override
     public Boolean setMaps(Marker marker, MarkerOnMap markerOnMap, Map map) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
-        
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
+        
         Boolean transactionStatus = true;
-
         try {
             // Begin save transaction
             trans = session.beginTransaction();
 
             // Add GDMS Marker
-            MarkerDAO markerDao = new MarkerDAO();
-            markerDao.setSession(session);
-            
+            MarkerDAO markerDao = getMarkerDao();
+
             Integer markerGeneratedId = markerDao.getNegativeId("markerId");
             marker.setMarkerId(markerGeneratedId);
-            
+
             marker.setMarkerType("UA");
 
             Marker markerRecordSaved = markerDao.saveOrUpdate(marker);
-            Integer markerSavedId = markerRecordSaved.getMarkerId();            
+            Integer markerSavedId = markerRecordSaved.getMarkerId();
 
             if (markerSavedId == null) {
-                throw new Exception();  // To immediately roll back and to avoid executing the other insert functions
+                throw new Exception(); // To immediately roll back and to avoid executing the other insert functions
             }
-            
+
             // Add Map
-            MapDAO mapDao = new MapDAO();
-            mapDao.setSession(session);
-            
+            MapDAO mapDao = getMapDao();
+
             Integer mapGeneratedId = mapDao.getNegativeId("mapId");
             map.setMapId(mapGeneratedId);
 
             Map mapRecordSaved = mapDao.saveOrUpdate(map);
-            Integer mapSavedId = mapRecordSaved.getMapId();            
+            Integer mapSavedId = mapRecordSaved.getMapId();
 
             if (mapSavedId == null) {
-                throw new Exception();  // To immediately roll back and to avoid executing the other insert functions
+                throw new Exception(); // To immediately roll back and to avoid executing the other insert functions
             }
 
             // Add Marker on Map
-            MarkerOnMapDAO markerOnMapDao = new MarkerOnMapDAO();
-            markerOnMapDao.setSession(session);
-            
+            MarkerOnMapDAO markerOnMapDao = getMarkerOnMapDao();
+
             // No need to generate id, MarkerOnMap(markerId, mapId) are foreign keys
             markerOnMap.setMarkerId(markerSavedId);
             markerOnMap.setMapId(mapSavedId);
-            
+
             MarkerOnMap markerOnMapRecordSaved = markerOnMapDao.saveOrUpdate(markerOnMap);
             Integer markerOnMapSavedId = markerOnMapRecordSaved.getMapId();
 
             if (markerOnMapSavedId == null) {
-                throw new Exception(); 
+                throw new Exception();
             }
-            
+
             if (transactionStatus == true) {
                 trans.commit();
             } else {
-                throw new Exception(); 
+                throw new Exception();
             }
-                    
+
         } catch (Exception e) {
-            // rollback transaction in case of errors
             transactionStatus = false;
-            if (trans != null) {                
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException("Error encountered while setting Maps: setMaps(): "
-                    + e.getMessage(), e);
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while setting Maps: setMaps(): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
-                
+
         return transactionStatus;
     }
 }

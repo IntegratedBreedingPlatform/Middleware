@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -28,8 +29,9 @@ public class CountryDAO extends GenericDAO<Country, Integer>{
 
             return (List<Country>) query.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getAllCountry() query from Country: " + e.getMessage(), e);
+            logAndThrowException("Error with getAllCountry() query from Country: " + e.getMessage(), e);
         }
+        return new ArrayList<Country>();
     }
 
 }

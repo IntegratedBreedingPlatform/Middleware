@@ -54,9 +54,10 @@ public class ProjectMethodDAO extends GenericDAO<ProjectMethod, Integer>{
             query.setMaxResults(numOfRows);
             return (List<Integer>) query.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByProjectId(projectId=" + projectId + ") query from ProjectMethod: "
+            logAndThrowException("Error with getByProjectId(projectId=" + projectId + ") query from ProjectMethod: "
                     + e.getMessage(), e);
         }
+        return new ArrayList<Integer>();
     }
 
     /**
@@ -73,16 +74,17 @@ public class ProjectMethodDAO extends GenericDAO<ProjectMethod, Integer>{
             BigInteger result = (BigInteger) query.uniqueResult();
             return result.longValue();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countByProjectId(projectId=" + projectId + ") query from ProjectMethod: "
+            logAndThrowException("Error with countByProjectId(projectId=" + projectId + ") query from ProjectMethod: "
                     + e.getMessage(), e);
         }
+        return 0;
     }
 
     @SuppressWarnings("rawtypes")
     public List<ProjectMethod> getProjectMethodByProject(Project project, int start, int numOfRows) throws MiddlewareQueryException {
-
+        List<ProjectMethod> toReturn = new ArrayList<ProjectMethod>();
         if (project == null || project.getProjectId() == null) {
-            return new ArrayList<ProjectMethod>();
+            return toReturn;
         }
 
         try {
@@ -91,7 +93,6 @@ public class ProjectMethodDAO extends GenericDAO<ProjectMethod, Integer>{
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
             List results = query.list();
-            List<ProjectMethod> toReturn = new ArrayList<ProjectMethod>();
             for (Object o : results) {
                 Object[] result = (Object[]) o;
                 if (result != null) {
@@ -101,12 +102,11 @@ public class ProjectMethodDAO extends GenericDAO<ProjectMethod, Integer>{
                     toReturn.add(projectMethod);
                 }
             }
-            return toReturn;
-
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getProjectMethodByProjectId(project=" + project
+            logAndThrowException("Error with getProjectMethodByProjectId(project=" + project
                     + ") query from ProjectMethod: " + e.getMessage(), e);
         }
+        return toReturn;
     }
 
 }
