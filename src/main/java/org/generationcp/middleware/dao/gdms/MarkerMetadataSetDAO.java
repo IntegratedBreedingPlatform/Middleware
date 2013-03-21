@@ -60,7 +60,7 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
                 return new ArrayList<Integer>();
             }
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getMarkersByGidAndDatasetIds(gid=" + gid + ", datasetIds=" + datasetIds + ") query from MarkerMetadataSet: "
+        	logAndThrowException("Error with getMarkersByGidAndDatasetIds(gid=" + gid + ", datasetIds=" + datasetIds + ") query from MarkerMetadataSet: "
                     + e.getMessage(), e);
         }
         return markerIds;
@@ -79,7 +79,7 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
                 }
             }
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countMarkersByGidAndDatasetIds(gid=" + gid + ", datasetIds=" + datasetIds + ") query from MarkerMetadataSet: "
+        	logAndThrowException("Error with countMarkersByGidAndDatasetIds(gid=" + gid + ", datasetIds=" + datasetIds + ") query from MarkerMetadataSet: "
                     + e.getMessage(), e);
         }
         return count;

@@ -8,7 +8,6 @@ import java.util.TreeSet;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.generationcp.middleware.pojos.gdms.Qtl;
 import org.generationcp.middleware.pojos.gdms.QtlDetailElement;
 import org.hibernate.HibernateException;
@@ -29,9 +28,10 @@ public class QtlDAO  extends GenericDAO<Qtl, Integer>{
                 return 0;
             }
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countQtlIdByName(name=" + name + ") query from gdms_qtl: "
+        	logAndThrowException("Error with countQtlIdByName(name=" + name + ") query from gdms_qtl: "
                     + e.getMessage(), e);
         }
+        return 0;
     }
     
     @SuppressWarnings("unchecked")
@@ -44,9 +44,10 @@ public class QtlDAO  extends GenericDAO<Qtl, Integer>{
             List<Integer> qtlIds = query.list();
             return qtlIds;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getQtlIdByName(name=" + name + ") query from gdms_qtl: "
+        	logAndThrowException("Error with getQtlIdByName(name=" + name + ") query from gdms_qtl: "
                     + e.getMessage(), e);
         }
+        return new ArrayList<Integer>();
     }
 
     @SuppressWarnings("rawtypes")
@@ -89,8 +90,9 @@ public class QtlDAO  extends GenericDAO<Qtl, Integer>{
 
             return toReturn;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getQtlDetailsByQTLIDs(qtl ids=" + qtlIDs + ") query from gdms_qtl_details: " + e.getMessage(), e);
+        	logAndThrowException("Error with getQtlDetailsByQTLIDs(qtl ids=" + qtlIDs + ") query from gdms_qtl_details: " + e.getMessage(), e);
         }
+        return new ArrayList<QtlDetailElement>();
     }
 
     public long countQtlDetailsByQTLIDs(List<Integer> qtlIDs) throws MiddlewareQueryException {
@@ -104,9 +106,10 @@ public class QtlDAO  extends GenericDAO<Qtl, Integer>{
                 return 0;
             }
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countQtlDetailsByQTLIDs(qtl ids=" + qtlIDs + ") query from gdms_qtl_details: "
+        	logAndThrowException("Error with countQtlDetailsByQTLIDs(qtl ids=" + qtlIDs + ") query from gdms_qtl_details: "
                     + e.getMessage(), e);
         }
+        return 0;
     }
     
     @SuppressWarnings("rawtypes")
@@ -149,8 +152,9 @@ public class QtlDAO  extends GenericDAO<Qtl, Integer>{
 
             return toReturn;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getQtlDetailsByName(name=" + name + ") query from gdms_qtl_details: " + e.getMessage(), e);
+        	logAndThrowException("Error with getQtlDetailsByName(name=" + name + ") query from gdms_qtl_details: " + e.getMessage(), e);
         }
+        return toReturn;
     }
 
     public long countQtlDetailsByName(String name) throws MiddlewareQueryException {
@@ -164,9 +168,10 @@ public class QtlDAO  extends GenericDAO<Qtl, Integer>{
                 return 0;
             }
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countQtlDetailsByName(name=" + name + ") query from gdms_qtl_details: "
+        	logAndThrowException("Error with countQtlDetailsByName(name=" + name + ") query from gdms_qtl_details: "
                     + e.getMessage(), e);
         }
+        return 0L;
     }
     
     @SuppressWarnings("rawtypes")
@@ -184,9 +189,10 @@ public class QtlDAO  extends GenericDAO<Qtl, Integer>{
             return mapIDSet;
             
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getMapIDsByQTLName(qtlName=" + qtlName + ", start=" + start + ", numOfRows=" + numOfRows + ") query from QTL: "
+        	logAndThrowException("Error with getMapIDsByQTLName(qtlName=" + qtlName + ", start=" + start + ", numOfRows=" + numOfRows + ") query from QTL: "
                     + e.getMessage(), e);
         }
+        return new TreeSet<Integer>();
     }
     
     @SuppressWarnings("rawtypes")
@@ -205,9 +211,10 @@ public class QtlDAO  extends GenericDAO<Qtl, Integer>{
             }
             
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countMapIDsByQTLName(qtlName=" + qtlName + ") query from QTL: "
+        	logAndThrowException("Error with countMapIDsByQTLName(qtlName=" + qtlName + ") query from QTL: "
                     + e.getMessage(), e);
         }
+        return 0L;
     }
 
     @SuppressWarnings("unchecked")
@@ -219,9 +226,10 @@ public class QtlDAO  extends GenericDAO<Qtl, Integer>{
             query.setMaxResults(numOfRows);
             return (List<Integer>) query.list();        
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getQtlByTrait(trait=" + trait + ") query from gdms_qtl_details: "
+        	logAndThrowException("Error with getQtlByTrait(trait=" + trait + ") query from gdms_qtl_details: "
                     + e.getMessage(), e);
         }
+        return new ArrayList<Integer>();
     }
 
     public long countQtlByTrait(String trait) throws MiddlewareQueryException {
@@ -235,9 +243,10 @@ public class QtlDAO  extends GenericDAO<Qtl, Integer>{
                 return 0;
             }
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countQtlByTrait(trait=" + trait + ") query from gdms_qtl_details: "
+        	logAndThrowException("Error with countQtlByTrait(trait=" + trait + ") query from gdms_qtl_details: "
                     + e.getMessage(), e);
         }
+        return 0L;
     }
 
 

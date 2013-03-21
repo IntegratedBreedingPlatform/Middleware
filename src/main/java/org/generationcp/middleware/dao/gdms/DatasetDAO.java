@@ -62,8 +62,9 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer>{
             query.setMaxResults(numOfRows);
             return (List<String>) query.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getDatasetNames() query from Dataset: " + e.getMessage(), e);
+            logAndThrowException("Error with getDatasetNames() query from Dataset: " + e.getMessage(), e);
         }
+        return new ArrayList<String>();
     }
 
     /**
@@ -93,9 +94,10 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer>{
             }
             return dataValues;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getDetailsByName(datasetName=" + name + ") query from Dataset: " + e.getMessage(),
+            logAndThrowException("Error with getDetailsByName(datasetName=" + name + ") query from Dataset: " + e.getMessage(),
                     e);
         }
+        return dataValues;
     }
 
     /**
@@ -113,8 +115,9 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer>{
             query.setMaxResults(numOfRows);
             return (List<Integer>) query.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getDatasetIdsForFingerPrinting() query from Dataset: " + e.getMessage(), e);
+            logAndThrowException("Error with getDatasetIdsForFingerPrinting() query from Dataset: " + e.getMessage(), e);
         }
+        return new ArrayList<Integer>();
     }
     
     /**
@@ -146,8 +149,9 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer>{
             query.setMaxResults(numOfRows);
             return (List<Integer>) query.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getDatasetIdsForMapping() query from Dataset: " + e.getMessage(), e);
+        	logAndThrowException("Error with getDatasetIdsForMapping() query from Dataset: " + e.getMessage(), e);
         }
+        return new ArrayList<Integer>();
     }
     
     /**

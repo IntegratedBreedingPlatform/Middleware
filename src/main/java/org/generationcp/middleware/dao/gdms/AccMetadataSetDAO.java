@@ -14,8 +14,6 @@ package org.generationcp.middleware.dao.gdms;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -52,8 +50,9 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer>{
             query.setParameterList("gIdList", gIds);
             return (List<Integer>) query.list();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getNameIdsByGermplasmIds(" + gIds + ") query from AccMetadataSet: " + e.getMessage(), e);
+        	logAndThrowException("Error with getNameIdsByGermplasmIds(" + gIds + ") query from AccMetadataSet: " + e.getMessage(), e);
         }
+        return new ArrayList<Integer>();
     }
 
     @SuppressWarnings("unchecked")
@@ -78,9 +77,10 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer>{
 
             return nids;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getNIDsByDatasetIds(datasetIds=" + datasetIds + ", gids=" + gids + ") query from AccMetadataSet: "
+            logAndThrowException("Error with getNIDsByDatasetIds(datasetIds=" + datasetIds + ", gids=" + gids + ") query from AccMetadataSet: "
                     + e.getMessage(), e);
         }
+        return new ArrayList<Integer>();
     }
     
     @SuppressWarnings("unchecked")
@@ -101,9 +101,10 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer>{
             return nidSet;
             
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getNIDsByDatasetIdsAndMarkerIdsAndNotGIDs(datasetIds=" + datasetIds + ", markerIds=" + markerIds + ", gIds=" + gIds + ") query from AccMetadataSet: "
+        	logAndThrowException("Error with getNIDsByDatasetIdsAndMarkerIdsAndNotGIDs(datasetIds=" + datasetIds + ", markerIds=" + markerIds + ", gIds=" + gIds + ") query from AccMetadataSet: "
                     + e.getMessage(), e);
         }
+        return new TreeSet<Integer>();
     }
     
     @SuppressWarnings("unchecked")
@@ -122,17 +123,18 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer>{
             return nidSet;
             
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getNIdsByMarkerIdsAndDatasetIds(datasetIds=" + datasetIds + ", markerIds=" + markerIds + ") query from AccMetadataSet: "
+        	logAndThrowException("Error with getNIdsByMarkerIdsAndDatasetIds(datasetIds=" + datasetIds + ", markerIds=" + markerIds + ") query from AccMetadataSet: "
                     + e.getMessage(), e);
         }
+        return new TreeSet<Integer>();
     }
 
     @SuppressWarnings("rawtypes")
     public List<AccMetadataSetPK> getAccMetadasetByGids(List<Integer> gids, int start, int numOfRows) throws MiddlewareQueryException {
 
+        List<AccMetadataSetPK> dataValues = new ArrayList<AccMetadataSetPK>();
         try {
 
-            List<AccMetadataSetPK> dataValues = new ArrayList<AccMetadataSetPK>();
 
             if (gids != null && !gids.isEmpty()) {
                 
@@ -156,11 +158,11 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer>{
                     }
                 }
             }
-            return dataValues;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getAccMetadasetByGids(gids=" + gids + ") query from AccMetadataSet: "
+        	logAndThrowException("Error with getAccMetadasetByGids(gids=" + gids + ") query from AccMetadataSet: "
                     + e.getMessage(), e);
         }
+        return dataValues;
     }
 
     public long countAccMetadataSetByGids(List<Integer> gids) throws MiddlewareQueryException {
@@ -175,7 +177,7 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer>{
                 }
             }
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countAccMetadataSetByGids(gids=" + gids + ") query from AccMetadataSet: "
+        	logAndThrowException("Error with countAccMetadataSetByGids(gids=" + gids + ") query from AccMetadataSet: "
                     + e.getMessage(), e);
         }
         return count;

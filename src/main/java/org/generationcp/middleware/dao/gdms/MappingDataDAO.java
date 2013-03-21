@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.dao.gdms;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
@@ -42,9 +43,9 @@ public class MappingDataDAO extends GenericDAO<MappingData, Integer>{
             query.setParameter("mapName", mapName);
             return (List<MapInfo>) query.list(); // return map info     
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getMapInfoByMapName(mapName=" + mapName + ") query from MappingData: " + e.getMessage(), e);
+            logAndThrowException("Error with getMapInfoByMapName(mapName=" + mapName + ") query from MappingData: " + e.getMessage(), e);
         }
-
+        return new ArrayList<MapInfo>();
     }
 
 }

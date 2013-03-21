@@ -83,9 +83,10 @@ public class MarkerInfoDAO extends GenericDAO<MarkerInfo, Integer>{
             return toReturn;
 
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByMarkerName(markerName=" + markerName
+        	logAndThrowException("Error with getByMarkerName(markerName=" + markerName
                     + ") query from MarkerInfo: " + e.getMessage(), e);
         }
+        return new ArrayList<MarkerInfo>();
     }
 
     /**
@@ -110,8 +111,9 @@ public class MarkerInfoDAO extends GenericDAO<MarkerInfo, Integer>{
             }
             return 0;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countByMarkerName(markerName=" + markerName + ") query from MarkerInfo: " + e.getMessage(), e);
+        	logAndThrowException("Error with countByMarkerName(markerName=" + markerName + ") query from MarkerInfo: " + e.getMessage(), e);
         }
+        return 0;
     }
 
     /**
@@ -166,9 +168,10 @@ public class MarkerInfoDAO extends GenericDAO<MarkerInfo, Integer>{
             }
             return toReturn;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByGenotype(genotype=" + genotype + ") query from MarkerInfo: "
+        	logAndThrowException("Error with getByGenotype(genotype=" + genotype + ") query from MarkerInfo: "
                     + e.getMessage(), e);
         }
+        return new ArrayList<MarkerInfo>();
     }
 
     /**
@@ -193,9 +196,10 @@ public class MarkerInfoDAO extends GenericDAO<MarkerInfo, Integer>{
             }
             return 0;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countByGenotype(genotype=" + genotype
+        	logAndThrowException("Error with countByGenotype(genotype=" + genotype
                     + ") query from MarkerInfo: " + e.getMessage(), e);
         }
+        return 0L;
     }
 
     /**
@@ -250,9 +254,10 @@ public class MarkerInfoDAO extends GenericDAO<MarkerInfo, Integer>{
             }
             return toReturn;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getByDbAccessionId(dbAccessionId=" + dbAccessionId
+        	logAndThrowException("Error with getByDbAccessionId(dbAccessionId=" + dbAccessionId
                     + ") query from MarkerInfo: " + e.getMessage(), e);
         }
+        return new ArrayList<MarkerInfo>();
     }
 
     /**
@@ -277,8 +282,9 @@ public class MarkerInfoDAO extends GenericDAO<MarkerInfo, Integer>{
             }
             return 0;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countByDbAccessionId(" + dbAccessionId
+        	logAndThrowException("Error with countByDbAccessionId(" + dbAccessionId
                     + ") query from MarkerInfo: " + e.getMessage(), e);
         }
+        return 0;
     }
 }

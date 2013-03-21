@@ -69,9 +69,10 @@ public class MappingPopValuesDAO extends GenericDAO<MappingPopValues, Integer>{
 
             return toReturn;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getAllelicValuesByDatasetId(datasetId=" + datasetId
+        	logAndThrowException("Error with getAllelicValuesByDatasetId(datasetId=" + datasetId
                     + ") query from MappingPopValues: " + e.getMessage(), e);
         }
+        return toReturn;
 
     }
 
@@ -92,9 +93,10 @@ public class MappingPopValuesDAO extends GenericDAO<MappingPopValues, Integer>{
             }
             return 0;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countByDatasetId(datasetId=" + datasetId + ") query from MappingPopValues: "
+        	logAndThrowException("Error with countByDatasetId(datasetId=" + datasetId + ") query from MappingPopValues: "
                     + e.getMessage(), e);
         }
+        return 0;
     }
 
     /**
@@ -118,8 +120,9 @@ public class MappingPopValuesDAO extends GenericDAO<MappingPopValues, Integer>{
             List<Integer> gids = query.list();
             return gids;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getGIDsByMarkerId(markerId=" + markerId + ") query from MappingPopValues: " + e.getMessage(), e);
+        	logAndThrowException("Error with getGIDsByMarkerId(markerId=" + markerId + ") query from MappingPopValues: " + e.getMessage(), e);
         }
+        return new ArrayList<Integer>();
     }
 
     /**
@@ -139,7 +142,8 @@ public class MappingPopValuesDAO extends GenericDAO<MappingPopValues, Integer>{
             }
             return 0;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countGIDsByMarkerId(markerId=" + markerId + ") query from MappingPopValues: " + e.getMessage(), e);
+        	logAndThrowException("Error with countGIDsByMarkerId(markerId=" + markerId + ") query from MappingPopValues: " + e.getMessage(), e);
         }
+        return 0;
     }
 }

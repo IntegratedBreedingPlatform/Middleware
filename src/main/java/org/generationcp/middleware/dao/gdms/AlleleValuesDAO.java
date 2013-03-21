@@ -70,11 +70,11 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer>{
                 }
             }
 
-            return toReturn;
+            
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getAllelicValuesByDatasetId(datasetId=" + datasetId + ") query from AlleleValues: " + e.getMessage(), e);
+            logAndThrowException("Error with getAllelicValuesByDatasetId(datasetId=" + datasetId + ") query from AlleleValues: " + e.getMessage(), e);
         }
-
+        return toReturn;
     }
 
     /**
@@ -95,9 +95,10 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer>{
                 return 0;
             }
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countByDatasetId(datasetId=" + datasetId + ") query from AlleleValues: "
+            logAndThrowException("Error with countByDatasetId(datasetId=" + datasetId + ") query from AlleleValues: "
                     + e.getMessage(), e);
         }
+        return 0L;
     }
 
     /**
@@ -119,8 +120,9 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer>{
             List<Integer> gids = query.list();
             return gids;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getGIDsByMarkerId(markerId=" + markerId + ") query from AlleleValues: " + e.getMessage(), e);
+            logAndThrowException("Error with getGIDsByMarkerId(markerId=" + markerId + ") query from AlleleValues: " + e.getMessage(), e);
         }
+        return new ArrayList<Integer>();
     }
 
     /**
@@ -140,8 +142,9 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer>{
             }
             return 0;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countGIDsByMarkerId(markerId=" + markerId + ") query from AlleleValues: " + e.getMessage(), e);
+            logAndThrowException("Error with countGIDsByMarkerId(markerId=" + markerId + ") query from AlleleValues: " + e.getMessage(), e);
         }
+        return 0;
     }
 
     public long countAlleleValuesByGids(List<Integer> gids) throws MiddlewareQueryException{
@@ -154,8 +157,9 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer>{
             }
             return 0;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countAlleleValuesByGids(gids=" + gids + ") query from AlleleValues: " + e.getMessage(), e);
+            logAndThrowException("Error with countAlleleValuesByGids(gids=" + gids + ") query from AlleleValues: " + e.getMessage(), e);
         }
+        return 0;
     }
 
 
@@ -185,8 +189,10 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer>{
 
             return values;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getCharAlleleValuesForPolymorphicMarkersRetrieval(gids=" + gids + ") query from AlleleValues: " + e.getMessage(), e);
-        }    }
+            logAndThrowException("Error with getCharAlleleValuesForPolymorphicMarkersRetrieval(gids=" + gids + ") query from AlleleValues: " + e.getMessage(), e);
+        }    
+        return new ArrayList<AllelicValueElement>();
+    }
 
     public long countIntAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException {
         try {
@@ -198,8 +204,9 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer>{
             }
             return 0;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countCharAlleleValuesForPolymorphicMarkersRetrieval(gids=" + gids + ") query from AlleleValues: " + e.getMessage(), e);
+        	logAndThrowException("Error with countCharAlleleValuesForPolymorphicMarkersRetrieval(gids=" + gids + ") query from AlleleValues: " + e.getMessage(), e);
         }
+        return 0;
     }
 
     @SuppressWarnings("rawtypes")
@@ -228,8 +235,9 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer>{
 
             return values;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getCharAlleleValuesForPolymorphicMarkersRetrieval(gids=" + gids + ") query from AlleleValues: " + e.getMessage(), e);
+            logAndThrowException("Error with getCharAlleleValuesForPolymorphicMarkersRetrieval(gids=" + gids + ") query from AlleleValues: " + e.getMessage(), e);
         }
+        return new ArrayList<AllelicValueElement>();
     }
 
     public long countCharAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException {
@@ -242,8 +250,9 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer>{
             }
             return 0;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countCharAlleleValuesForPolymorphicMarkersRetrieval(gids=" + gids + ") query from AlleleValues: " + e.getMessage(), e);
+            logAndThrowException("Error with countCharAlleleValuesForPolymorphicMarkersRetrieval(gids=" + gids + ") query from AlleleValues: " + e.getMessage(), e);
         }
+        return 0;
     }
 
     @SuppressWarnings("rawtypes")
@@ -272,8 +281,9 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer>{
 
             return values;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getMappingAlleleValuesForPolymorphicMarkersRetrieval(gids=" + gids + ") query from AlleleValues: " + e.getMessage(), e);
+            logAndThrowException("Error with getMappingAlleleValuesForPolymorphicMarkersRetrieval(gids=" + gids + ") query from AlleleValues: " + e.getMessage(), e);
         }
+        return new ArrayList<AllelicValueElement>();
     }
 
     public long countMappingAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException {
@@ -286,8 +296,9 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer>{
             }
             return 0;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countMappingAlleleValuesForPolymorphicMarkersRetrieval(gids=" + gids + ") query from AlleleValues: " + e.getMessage(), e);
+            logAndThrowException("Error with countMappingAlleleValuesForPolymorphicMarkersRetrieval(gids=" + gids + ") query from AlleleValues: " + e.getMessage(), e);
         }
+        return 0;
     }
 
 }

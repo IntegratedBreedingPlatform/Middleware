@@ -24,9 +24,32 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GermplasmListManagerImpl extends DataManager implements GermplasmListManager{
 
+    private static final Logger LOG = LoggerFactory.getLogger(GermplasmListManagerImpl.class);
+
+    private GermplasmListDAO germplasmListDao;
+	private GermplasmListDataDAO germplasmListDataDao;
+	
+	private GermplasmListDAO getGermplasmListDAO() {
+		if (germplasmListDao == null) {
+			germplasmListDao = new GermplasmListDAO();
+		}
+		germplasmListDao.setSession(getActiveSession());
+		return germplasmListDao;
+	}
+	
+	private GermplasmListDataDAO getGermplasmListDataDAO() {
+		if (germplasmListDataDao == null) {
+			germplasmListDataDao = new GermplasmListDataDAO();
+		}
+		germplasmListDataDao.setSession(getActiveSession());
+		return germplasmListDataDao;
+	}
+	
     public GermplasmListManagerImpl() {
     }
 
@@ -39,87 +62,58 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     }
 
     @Override
-    public GermplasmList getGermplasmListById(Integer id) {
-        GermplasmListDAO dao = new GermplasmListDAO();
-        Session session = getSession(id);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return null;
+    public GermplasmList getGermplasmListById(Integer id) throws MiddlewareQueryException {
+        if (setWorkingDatabase(id)) {
+            return getGermplasmListDAO().getById(id, false);
         }
-
-        GermplasmList list = dao.getById(id, false);
-        return list;
+        
+        return null;
     }
 
     @Override
     public List<GermplasmList> getAllGermplasmLists(int start, int numOfRows, Database instance) throws MiddlewareQueryException {
-        GermplasmListDAO dao = new GermplasmListDAO();
-        Session session = getSession(instance);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<GermplasmList>();
+        if (setWorkingDatabase(instance)) {
+        	return getGermplasmListDAO().getAllExceptDeleted(start, numOfRows);
         }
-        return dao.getAllExceptDeleted(start, numOfRows);
+        
+        return new ArrayList<GermplasmList>();
     }
 
     @Override
     public long countAllGermplasmLists() throws MiddlewareQueryException {
         long count = 0;
 
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-
-        if (sessionForLocal != null) {
-            GermplasmListDAO dao = new GermplasmListDAO();
-            dao.setSession(sessionForLocal);
-            count = count + dao.countAllExceptDeleted();
+        if (setWorkingDatabase(Database.LOCAL)) {
+        	count = count + getGermplasmListDAO().countAllExceptDeleted();
         }
-
-        if (sessionForCentral != null) {
-            GermplasmListDAO centralDao = new GermplasmListDAO();
-            centralDao.setSession(sessionForCentral);
-            count = count + centralDao.countAllExceptDeleted();
+        
+        if (setWorkingDatabase(Database.CENTRAL)) {
+        	count = count + getGermplasmListDAO().countAllExceptDeleted();
         }
-
+        
         return count;
     }
 
     @Override
     public List<GermplasmList> getGermplasmListByName(String name, int start, int numOfRows, Operation operation, Database instance)
             throws MiddlewareQueryException {
-        GermplasmListDAO dao = new GermplasmListDAO();
-        Session session = getSession(instance);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<GermplasmList>();
-        }
-        return dao.getByName(name, start, numOfRows, operation);
-
+        
+    	if (setWorkingDatabase(instance)) {
+    		return getGermplasmListDAO().getByName(name, start, numOfRows, operation);
+    	}
+    	
+    	return new ArrayList<GermplasmList>();
     }
 
     @Override
     public long countGermplasmListByName(String name, Operation operation) throws MiddlewareQueryException {
         long count = 0;
 
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-
-        if (sessionForLocal != null) {
-            GermplasmListDAO dao = new GermplasmListDAO();
-            dao.setSession(sessionForLocal);
-            count = count + dao.countByName(name, operation);
+        if (setWorkingDatabase(Database.LOCAL)) {
+        	count = count + getGermplasmListDAO().countByName(name, operation);
         }
-
-        if (sessionForCentral != null) {
-            GermplasmListDAO centralDao = new GermplasmListDAO();
-            centralDao.setSession(sessionForCentral);
-            count = count + centralDao.countByName(name, operation);
+        if (setWorkingDatabase(Database.CENTRAL)) {
+        	count = count + getGermplasmListDAO().countByName(name, operation);
         }
 
         return count;
@@ -128,36 +122,22 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     @Override
     public List<GermplasmList> getGermplasmListByStatus(Integer status, int start, int numOfRows, Database instance)
             throws MiddlewareQueryException {
-        GermplasmListDAO dao = new GermplasmListDAO();
-
-        Session session = getSession(instance);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<GermplasmList>();
-        }
-        return dao.getByStatus(status, start, numOfRows);
-
+        
+    	if (setWorkingDatabase(instance)) {
+    		return getGermplasmListDAO().getByStatus(status, start, numOfRows);
+    	}
+    	return new ArrayList<GermplasmList>();
     }
 
     @Override
     public long countGermplasmListByStatus(Integer status) throws MiddlewareQueryException {
         long count = 0;
 
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-
-        if (sessionForLocal != null) {
-            GermplasmListDAO dao = new GermplasmListDAO();
-            dao.setSession(sessionForLocal);
-            count = count + dao.countByStatus(status);
+        if (setWorkingDatabase(Database.LOCAL)) {
+        	count = count + getGermplasmListDAO().countByStatus(status);
         }
-
-        if (sessionForCentral != null) {
-            GermplasmListDAO centralDao = new GermplasmListDAO();
-            centralDao.setSession(sessionForCentral);
-            count = count + centralDao.countByStatus(status);
+        if (setWorkingDatabase(Database.CENTRAL)) {
+        	count = count + getGermplasmListDAO().countByStatus(status);
         }
 
         return count;
@@ -165,109 +145,82 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public List<GermplasmListData> getGermplasmListDataByListId(Integer id, int start, int numOfRows) throws MiddlewareQueryException {
-        GermplasmListDataDAO dao = new GermplasmListDataDAO();
-        Session session = getSession(id);
 
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<GermplasmListData>();
+    	if (setWorkingDatabase(id)) {
+        	return getGermplasmListDataDAO().getByListId(id, start, numOfRows);
         }
-
-        return dao.getByListId(id, start, numOfRows);
+        
+        return new ArrayList<GermplasmListData>();
     }
 
     @Override
     public long countGermplasmListDataByListId(Integer id) throws MiddlewareQueryException {
-        GermplasmListDataDAO dao = new GermplasmListDataDAO();
-        Session session = getSession(id);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return 0;
+        
+        if (setWorkingDatabase(id)) {
+            return getGermplasmListDataDAO().countByListId(id);
         }
-
-        return dao.countByListId(id);
+        
+        return 0;
     }
 
     @Override
     public List<GermplasmListData> getGermplasmListDataByListIdAndGID(Integer listId, Integer gid) throws MiddlewareQueryException {
-        GermplasmListDataDAO dao = new GermplasmListDataDAO();
-        Session session = getSession(listId);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<GermplasmListData>();
+        if (setWorkingDatabase(listId)) {
+        	return getGermplasmListDataDAO().getByListIdAndGID(listId, gid);
         }
-
-        return dao.getByListIdAndGID(listId, gid);
+        
+        return new ArrayList<GermplasmListData>();
     }
 
     @Override
     public GermplasmListData getGermplasmListDataByListIdAndEntryId(Integer listId, Integer entryId) throws MiddlewareQueryException {
-        GermplasmListDataDAO dao = new GermplasmListDataDAO();
-        Session session = getSession(listId);
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return null;
+        if (setWorkingDatabase(listId)) {
+            return getGermplasmListDataDAO().getByListIdAndEntryId(listId, entryId);
         }
-
-        return dao.getByListIdAndEntryId(listId, entryId);
+        
+        return null;
     }
 
     @Override
     public List<GermplasmListData> getGermplasmListDataByGID(Integer gid, int start, int numOfRows) throws MiddlewareQueryException {
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-
-        GermplasmListDataDAO dao = new GermplasmListDataDAO();
-
         List<GermplasmListData> toreturn = new ArrayList<GermplasmListData>();
 
         long centralCount = 0;
         long localCount = 0;
         long relativeLimit = 0;
 
-        if (sessionForCentral != null) {
-            dao.setSession(sessionForCentral);
-            centralCount = dao.countByGID(gid);
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            centralCount = getGermplasmListDataDAO().countByGID(gid);
 
             if (centralCount > start) {
-                toreturn.addAll(dao.getByGID(gid, start, numOfRows));
+                toreturn.addAll(getGermplasmListDataDAO().getByGID(gid, start, numOfRows));
                 relativeLimit = numOfRows - (centralCount - start);
 
                 if (relativeLimit > 0) {
-                    if (sessionForLocal != null) {
-                        dao.setSession(sessionForLocal);
-                        localCount = dao.countByGID(gid);
+                    if (setWorkingDatabase(Database.LOCAL)) {
+                        localCount = getGermplasmListDataDAO().countByGID(gid);
 
                         if (localCount > 0) {
-                            toreturn.addAll(dao.getByGID(gid, 0, (int) relativeLimit));
+                            toreturn.addAll(getGermplasmListDataDAO().getByGID(gid, 0, (int) relativeLimit));
                         }
                     }
                 }
             } else {
                 relativeLimit = start - centralCount;
 
-                if (sessionForLocal != null) {
-                    dao.setSession(sessionForLocal);
-                    localCount = dao.countByGID(gid);
+                if (setWorkingDatabase(Database.LOCAL)) {
+                    localCount = getGermplasmListDataDAO().countByGID(gid);
 
                     if (localCount > relativeLimit) {
-                        toreturn.addAll(dao.getByGID(gid, (int) relativeLimit, numOfRows));
+                        toreturn.addAll(getGermplasmListDataDAO().getByGID(gid, (int) relativeLimit, numOfRows));
                     }
                 }
             }
-        } else if (sessionForLocal != null) {
-            dao.setSession(sessionForLocal);
-            localCount = dao.countByGID(gid);
+        } else if (setWorkingDatabase(Database.LOCAL)) {
+            localCount = getGermplasmListDataDAO().countByGID(gid);
 
             if (localCount > start) {
-                toreturn.addAll(dao.getByGID(gid, start, numOfRows));
+                toreturn.addAll(getGermplasmListDataDAO().getByGID(gid, start, numOfRows));
             }
         }
 
@@ -276,21 +229,14 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public long countGermplasmListDataByGID(Integer gid) throws MiddlewareQueryException {
-        Session sessionForCentral = getCurrentSessionForCentral();
-        Session sessionForLocal = getCurrentSessionForLocal();
-
         long count = 0;
 
-        if (sessionForLocal != null) {
-            GermplasmListDataDAO dao = new GermplasmListDataDAO();
-            dao.setSession(sessionForLocal);
-            count = count + dao.countByGID(gid);
+        if (setWorkingDatabase(Database.LOCAL)) {
+            count = count + getGermplasmListDataDAO().countByGID(gid);
         }
 
-        if (sessionForCentral != null) {
-            GermplasmListDataDAO centralDao = new GermplasmListDataDAO();
-            centralDao.setSession(sessionForCentral);
-            count = count + centralDao.countByGID(gid);
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            count = count + getGermplasmListDataDAO().countByGID(gid);
         }
 
         return count;
@@ -298,59 +244,26 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public List<GermplasmList> getAllTopLevelLists(int start, int numOfRows, Database instance) throws MiddlewareQueryException {
-        GermplasmListDAO dao = new GermplasmListDAO();
-        Session session = getSession(instance);
-
-        List<GermplasmList> topLevelFolders = new ArrayList<GermplasmList>();
-
-        if (session != null) {
-            dao.setSession(session);
-        } else {
-            return new ArrayList<GermplasmList>();
+        if (setWorkingDatabase(instance)) {
+            return getGermplasmListDAO().getAllTopLevelLists(start, numOfRows);
         }
 
-        topLevelFolders = dao.getAllTopLevelLists(start, numOfRows);
-
-        return topLevelFolders;
+        return new ArrayList<GermplasmList>();
     }
 
     @Override
     public List<GermplasmList> getAllTopLevelListsBatched(int batchSize, Database instance) throws MiddlewareQueryException {
         List<GermplasmList> topLevelFolders = new ArrayList<GermplasmList>();
-        Session session = getSession(instance);
-        if (session == null) {
-            return topLevelFolders;
-        }
 
-        // initialize session & transaction
-        Transaction trans = null;
-
-        try {
-            // begin transaction
-            trans = session.beginTransaction();
-
-            GermplasmListDAO dao = new GermplasmListDAO();
-            dao.setSession(session);
-
-            long topLevelCount = dao.countAllTopLevelLists();
-            int start = 0;
+        if (setWorkingDatabase(instance)) {
+        	long topLevelCount = getGermplasmListDAO().countAllTopLevelLists();
+        	int start = 0;
             while (start < topLevelCount) {
-                topLevelFolders.addAll(dao.getAllTopLevelLists(start, batchSize));
+                topLevelFolders.addAll(getGermplasmListDAO().getAllTopLevelLists(start, batchSize));
                 start += batchSize;
             }
-
-            // end transaction, commit to database
-            trans.commit();
-        } catch (Exception e) {
-            // rollback transaction in case of errors
-            if (trans != null) {
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException(
-                    "Error encountered while retrieving top level folders: GermplasmListManager.getAllTopLevelListsBatched(batchSize="
-                            + batchSize + ", database=" + instance + "): " + e.getMessage(), e);
         }
-
+        
         return topLevelFolders;
     }
 
@@ -358,11 +271,9 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     public long countAllTopLevelLists(Database instance) throws MiddlewareQueryException {
         long count = 0;
 
-        GermplasmListDAO dao = new GermplasmListDAO();
-        Session session = getSession(instance);
-        dao.setSession(session);
-        count = dao.countAllTopLevelLists();
-
+        if (setWorkingDatabase(instance)) {
+        	count = getGermplasmListDAO().countAllTopLevelLists();
+        }
         return count;
     }
 
@@ -393,11 +304,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     }
 
     private List<Integer> addOrUpdateGermplasmList(List<GermplasmList> germplasmLists, Operation operation) throws MiddlewareQueryException {
-        Session sessionForLocal = getCurrentSessionForLocal();
-
-        if (sessionForLocal == null) {
-            throw new MiddlewareQueryException(NO_LOCAL_INSTANCE_MSG);
-        }
+    	requireLocalDatabaseInstance();
+    	Session sessionForLocal = getCurrentSessionForLocal();
 
         // initialize session & transaction
         Session session = sessionForLocal;
@@ -409,39 +317,33 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
             // begin save transaction
             trans = session.beginTransaction();
 
-            GermplasmListDAO dao = new GermplasmListDAO();
-            dao.setSession(session);
-
             for (GermplasmList germplasmList : germplasmLists) {
                 if (operation == Operation.ADD) {
                     // Auto-assign negative IDs for new local DB records
-                    Integer negativeId = dao.getNegativeId("id");
+                    Integer negativeId = getGermplasmListDAO().getNegativeId("id");
                     germplasmListIds.add(negativeId);
                     germplasmList.setId(negativeId);
                 } else if (operation == Operation.UPDATE) {
                     // Check if GermplasmList is a local DB record. Throws
                     // exception if GermplasmList is a central DB record.
-                    dao.validateId(germplasmList);
+                    getGermplasmListDAO().validateId(germplasmList);
                     germplasmListIds.add(germplasmList.getId());
                 }
-                dao.saveOrUpdate(germplasmList);
+                getGermplasmListDAO().saveOrUpdate(germplasmList);
                 germplasmListsSaved++;
                 if (germplasmListsSaved % JDBC_BATCH_SIZE == 0) {
                     // flush a batch of inserts and release memory
-                    dao.flush();
-                    dao.clear();
+                    getGermplasmListDAO().flush();
+                    getGermplasmListDAO().clear();
                 }
             }
             // end transaction, commit to database
             trans.commit();
         } catch (Exception e) {
-            // rollback transaction in case of errors
-            if (trans != null) {
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException(
+        	rollbackTransaction(trans);
+        	logAndThrowException(
                     "Error encountered while saving Germplasm List: GermplasmListManager.addOrUpdateGermplasmList(germplasmLists="
-                            + germplasmLists + ", operation-" + operation + "): " + e.getMessage(), e);
+                            + germplasmLists + ", operation-" + operation + "): " + e.getMessage(), e, LOG);
         } finally {
             sessionForLocal.flush();
         }
@@ -464,11 +366,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public int deleteGermplasmList(List<GermplasmList> germplasmLists) throws MiddlewareQueryException {
+    	requireLocalDatabaseInstance();
         Session sessionForLocal = getCurrentSessionForLocal();
-
-        if (sessionForLocal == null) {
-            throw new MiddlewareQueryException(NO_LOCAL_INSTANCE_MSG);
-        }
 
         // initialize session & transaction
         Session session = sessionForLocal;
@@ -479,37 +378,28 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
             // begin delete transaction
             trans = session.beginTransaction();
 
-            GermplasmListDAO dao = new GermplasmListDAO();
-            dao.setSession(session);
-            
-            GermplasmListDataDAO dataDao = new GermplasmListDataDAO();
-            dataDao.setSession(session);
-
             List<GermplasmListData> listDataList;
             for (GermplasmList germplasmList : germplasmLists) {
             	
             	//fetch list data for cascade delete
-            	int count = (int) dataDao.countByListId(germplasmList.getId());
+            	int count = (int) getGermplasmListDataDAO().countByListId(germplasmList.getId());
             	if (count > 0) {
-	            	listDataList = dataDao.getByListId(germplasmList.getId(), 0, count);
+	            	listDataList = getGermplasmListDataDAO().getByListId(germplasmList.getId(), 0, count);
 	            	germplasmList.setListData(listDataList);
             	}
             	
             	//delete GermplasmList
-                dao.makeTransient(germplasmList);
+                getGermplasmListDAO().makeTransient(germplasmList);
                 germplasmListsDeleted++;
             }
             
             // end transaction, commit to database
             trans.commit();
         } catch (Exception e) {
-            // rollback transaction in case of errors
-            if (trans != null) {
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException(
+            rollbackTransaction(trans);
+            logAndThrowException(
                     "Error encountered while deleting Germplasm List: GermplasmListManager.deleteGermplasmList(germplasmLists="
-                            + germplasmLists + "): " + e.getMessage(), e);
+                            + germplasmLists + "): " + e.getMessage(), e, LOG);
         } finally {
             sessionForLocal.flush();
         }
@@ -545,11 +435,9 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     private List<Integer> addOrUpdateGermplasmListData(List<GermplasmListData> germplasmListDatas, Operation operation)
             throws MiddlewareQueryException {
+        
+    	requireLocalDatabaseInstance();
         Session sessionForLocal = getCurrentSessionForLocal();
-
-        if (sessionForLocal == null) {
-            throw new MiddlewareQueryException(NO_LOCAL_INSTANCE_MSG);
-        }
 
         // initialize session & transaction
         Session session = sessionForLocal;
@@ -567,32 +455,29 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
             for (GermplasmListData germplasmListData : germplasmListDatas) {
                 if (operation == Operation.ADD) {
                     // Auto-assign negative IDs for new local DB records
-                    Integer negativeListId = dao.getNegativeId("id");
+                    Integer negativeListId = getGermplasmListDataDAO().getNegativeId("id");
                     germplasmListData.setId(negativeListId);
                 } else if (operation == Operation.UPDATE) {
                     // Check if GermplasmList is a local DB record. Throws
                     // exception if GermplasmList is a central DB record.
-                    dao.validateId(germplasmListData);
+                    getGermplasmListDataDAO().validateId(germplasmListData);
                 }
-                GermplasmListData recordSaved = dao.saveOrUpdate(germplasmListData);
+                GermplasmListData recordSaved = getGermplasmListDataDAO().saveOrUpdate(germplasmListData);
                 idGermplasmListDataSaved.add(recordSaved.getId());
                 germplasmListDataSaved++;
                 if (germplasmListDataSaved % JDBC_BATCH_SIZE == 0) {
                     // flush a batch of inserts and release memory
-                    dao.flush();
-                    dao.clear();
+                	getGermplasmListDataDAO().flush();
+                	getGermplasmListDataDAO().clear();
                 }
             }
             // end transaction, commit to database
             trans.commit();
         } catch (Exception e) {
-            // rollback transaction in case of errors
-            if (trans != null) {
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException(
+            rollbackTransaction(trans);
+            logAndThrowException(
                     "Error encountered while saving Germplasm List Data: GermplasmListManager.addOrUpdateGermplasmListData(germplasmListDatas="
-                            + germplasmListDatas + ", operation=" + operation + "): " + e.getMessage(), e);
+                            + germplasmListDatas + ", operation=" + operation + "): " + e.getMessage(), e, LOG);
         } finally {
             sessionForLocal.flush();
         }
@@ -602,11 +487,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public int deleteGermplasmListDataByListId(Integer listId) throws MiddlewareQueryException {
+    	requireLocalDatabaseInstance();
         Session sessionForLocal = getCurrentSessionForLocal();
-
-        if (sessionForLocal == null) {
-            throw new MiddlewareQueryException(NO_LOCAL_INSTANCE_MSG);
-        }
 
         // initialize session & transaction
         Session session = sessionForLocal;
@@ -617,20 +499,14 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
             // begin delete transaction
             trans = session.beginTransaction();
 
-            GermplasmListDataDAO dao = new GermplasmListDataDAO();
-            dao.setSession(session);
-
-            germplasmListDataDeleted = dao.deleteByListId(listId);
+            germplasmListDataDeleted = getGermplasmListDataDAO().deleteByListId(listId);
             // end transaction, commit to database
             trans.commit();
         } catch (Exception e) {
-            // rollback transaction in case of errors
-            if (trans != null) {
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException(
+            rollbackTransaction(trans);
+            logAndThrowException(
                     "Error encountered while deleting Germplasm List Data: GermplasmListManager.deleteGermplasmListDataByListId(listId="
-                            + listId + "): " + e.getMessage(), e);
+                            + listId + "): " + e.getMessage(), e, LOG);
         } finally {
             sessionForLocal.flush();
         }
@@ -653,11 +529,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public int deleteGermplasmListData(List<GermplasmListData> germplasmListDatas) throws MiddlewareQueryException {
+    	requireLocalDatabaseInstance();
         Session sessionForLocal = getCurrentSessionForLocal();
-
-        if (sessionForLocal == null) {
-            throw new MiddlewareQueryException(NO_LOCAL_INSTANCE_MSG);
-        }
 
         // initialize session & transaction
         Session session = sessionForLocal;
@@ -668,23 +541,17 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
             // begin delete transaction
             trans = session.beginTransaction();
 
-            GermplasmListDataDAO dao = new GermplasmListDataDAO();
-            dao.setSession(session);
-
             for (GermplasmListData germplasmListData : germplasmListDatas) {
-                dao.makeTransient(germplasmListData);
+                getGermplasmListDataDAO().makeTransient(germplasmListData);
                 germplasmListDataDeleted++;
             }
             // end transaction, commit to database
             trans.commit();
         } catch (Exception e) {
-            // rollback transaction in case of errors
-            if (trans != null) {
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException(
+            rollbackTransaction(trans);
+            logAndThrowException(
                     "Error encountered while deleting Germplasm List Data: GermplasmListManager.deleteGermplasmListData(germplasmListDatas="
-                            + germplasmListDatas + "): " + e.getMessage(), e);
+                            + germplasmListDatas + "): " + e.getMessage(), e, LOG);
         } finally {
             sessionForLocal.flush();
         }
@@ -695,13 +562,10 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     @Override
     public List<GermplasmList> getGermplasmListByParentFolderId(Integer parentId, int start, int numOfRows) throws MiddlewareQueryException {
 
-        GermplasmListDAO dao = new GermplasmListDAO();
-        Session session = getSession(parentId);
         List<GermplasmList> childLists = new ArrayList<GermplasmList>();
 
-        if (session != null) {
-            dao.setSession(session);
-            childLists = dao.getByParentFolderId(parentId, start, numOfRows);
+        if (setWorkingDatabase(parentId)) {
+            childLists = getGermplasmListDAO().getByParentFolderId(parentId, start, numOfRows);
         }
 
         return childLists;
@@ -709,7 +573,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public List<GermplasmList> getGermplasmListByParentFolderIdBatched(Integer parentId, int batchSize) throws MiddlewareQueryException {
-        List<GermplasmList> childLists = new ArrayList<GermplasmList>();
+    	List<GermplasmList> childLists = new ArrayList<GermplasmList>();
+    	setWorkingDatabase(parentId);
         Session session = getSession(parentId);
         if (session == null) {
             return childLists;
@@ -722,23 +587,17 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
             // begin transaction
             trans = session.beginTransaction();
 
-            GermplasmListDAO dao = new GermplasmListDAO();
-            dao.setSession(session);
-
             int start = 0;
-            long childListCount = dao.countByParentFolderId(parentId);
+            long childListCount = getGermplasmListDAO().countByParentFolderId(parentId);
             while (start < childListCount) {
-                childLists.addAll(dao.getByParentFolderId(parentId, start, batchSize));
+                childLists.addAll(getGermplasmListDAO().getByParentFolderId(parentId, start, batchSize));
                 start += batchSize;
             }
         } catch (Exception e) {
-            // rollback transaction in case of errors
-            if (trans != null) {
-                trans.rollback();
-            }
-            throw new MiddlewareQueryException(
+            rollbackTransaction(trans);
+            logAndThrowException(
                     "Error encountered while retrieving germplasm sub-lists: GermplasmListManager.getGermplasmListByParentFolderIdBatched(parentId="
-                            + parentId + ", batchSize=" + batchSize + "): " + e.getMessage(), e);
+                            + parentId + ", batchSize=" + batchSize + "): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
@@ -748,13 +607,10 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public long countGermplasmListByParentFolderId(Integer parentId) throws MiddlewareQueryException {
-        GermplasmListDAO dao = new GermplasmListDAO();
-        Session session = getSession(parentId);
         long result = 0;
 
-        if (session != null) {
-            dao.setSession(session);
-            result = dao.countByParentFolderId(parentId);
+        if (setWorkingDatabase(parentId)) {
+            result = getGermplasmListDAO().countByParentFolderId(parentId);
         }
 
         return result;

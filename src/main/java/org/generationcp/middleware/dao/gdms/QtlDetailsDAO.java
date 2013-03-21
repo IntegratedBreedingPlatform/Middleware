@@ -12,6 +12,7 @@
 package org.generationcp.middleware.dao.gdms;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
@@ -39,8 +40,9 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
             return query.list();
             
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getMarkerIDsByQtl() query from QtlDetails: " + e.getMessage(), e);    
+        	logAndThrowException("Error with getMarkerIDsByQtl() query from QtlDetails: " + e.getMessage(), e);    
         }
+        return new ArrayList<Integer>();
     }
     
     public long countMarkerIdsByQtl(String qtlName, String chromosome, int min, int max) throws MiddlewareQueryException{
@@ -58,8 +60,9 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
             }
             
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countMarkerIdsByQtl() query from QtlDetails: " + e.getMessage(), e);    
+        	logAndThrowException("Error with countMarkerIdsByQtl() query from QtlDetails: " + e.getMessage(), e);    
         }
+        return 0L;
         
     }
 
@@ -70,8 +73,9 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
       return (Integer) query.uniqueResult();
       
   } catch (HibernateException e) {
-      throw new MiddlewareQueryException("Error with getMapIdByQtlName() query from QtlDetails: " + e.getMessage(), e);    
+	  logAndThrowException("Error with getMapIdByQtlName() query from QtlDetails: " + e.getMessage(), e);    
   }
+  return 0;
 }
 
 
@@ -84,8 +88,9 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
             return query.list();
             
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getMapIdsByQtlName() query from QtlDetails: " + e.getMessage(), e);    
+        	logAndThrowException("Error with getMapIdsByQtlName() query from QtlDetails: " + e.getMessage(), e);    
         }
+        return new ArrayList<Integer>();
     }
 
     public long countMapIdsByQtlName(String qtlName) throws MiddlewareQueryException{
@@ -99,8 +104,9 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
                 return 0L;
             }
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countMapIdsByQtlName() query from QtlDetails: " + e.getMessage(), e);    
+        	logAndThrowException("Error with countMapIdsByQtlName() query from QtlDetails: " + e.getMessage(), e);    
         }
+        return 0L;
     }
 
     public List<Integer> getMarkerIdsByQtl(Integer mapId, String qtlName, String chromosome, int min,
@@ -115,8 +121,9 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
             return query.list();
             
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getMarkerIDsByQtl() query from QtlDetails: " + e.getMessage(), e);    
+        	logAndThrowException("Error with getMarkerIDsByQtl() query from QtlDetails: " + e.getMessage(), e);    
         }
+        return new ArrayList<Integer>();
     }
 
     public long countMarkerIdsByQtl(Integer mapId, String qtlName, String chromosome, int min, int max)  throws MiddlewareQueryException{
@@ -135,8 +142,9 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
             }
             
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countMarkerIdsByQtl() query from QtlDetails: " + e.getMessage(), e);    
+        	logAndThrowException("Error with countMarkerIdsByQtl() query from QtlDetails: " + e.getMessage(), e);    
         }
+        return 0L;
     }
 
 }

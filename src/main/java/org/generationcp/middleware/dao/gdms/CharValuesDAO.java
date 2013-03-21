@@ -67,11 +67,12 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
                 }
             }
 
-            return toReturn;
+            
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getAllelicValuesByDatasetId(datasetId=" + datasetId
+            logAndThrowException("Error with getAllelicValuesByDatasetId(datasetId=" + datasetId
                     + ") queryfrom char_values : " + e.getMessage(), e);
         }
+        return toReturn;
     }
 
     /**
@@ -91,9 +92,10 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
             }
             return 0;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countByDatasetId(datasetId=" + datasetId + ") query from char_values: "
+            logAndThrowException("Error with countByDatasetId(datasetId=" + datasetId + ") query from char_values: "
                     + e.getMessage(), e);
         }
+        return 0;
     }
 
     /**
@@ -117,8 +119,9 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
             List<Integer> gids = query.list();
             return gids;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getGIDsByMarkerId(markerId=" + markerId + ") query from CharValues: " + e.getMessage(), e);
+            logAndThrowException("Error with getGIDsByMarkerId(markerId=" + markerId + ") query from CharValues: " + e.getMessage(), e);
         }
+        return new ArrayList<Integer>();
     }
 
     /**
@@ -138,8 +141,9 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
             }
             return 0;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countGIDsByMarkerId(markerId=" + markerId + ") query from CharValues: " + e.getMessage(), e);
+            logAndThrowException("Error with countGIDsByMarkerId(markerId=" + markerId + ") query from CharValues: " + e.getMessage(), e);
         }
+        return 0;
     }
 
     public long countCharValuesByGids(List<Integer> gids) throws MiddlewareQueryException{
@@ -152,8 +156,9 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
             }
             return 0;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countCharValuesByGids(gids=" + gids + ") query from CharValues: " + e.getMessage(), e);
+            logAndThrowException("Error with countCharValuesByGids(gids=" + gids + ") query from CharValues: " + e.getMessage(), e);
         }
+        return 0;
     }
 
 }

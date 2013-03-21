@@ -69,9 +69,9 @@ public class MapDAO extends GenericDAO<Map, Integer>{
             return maps;
                     
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getMapDetailsByName() query from Map: " + e.getMessage(), e);
+        	logAndThrowException("Error with getMapDetailsByName() query from Map: " + e.getMessage(), e);
         }	
-        
+        return maps;
     }
 
     
@@ -87,19 +87,20 @@ public class MapDAO extends GenericDAO<Map, Integer>{
             BigInteger result = (BigInteger) query.uniqueResult();
             return result.longValue();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countMapDetailsByName() query from Map: " + e.getMessage(), e);
+        	logAndThrowException("Error with countMapDetailsByName() query from Map: " + e.getMessage(), e);
         }
+        return 0L;
     }    
     
     @SuppressWarnings("rawtypes")
     public List<MapDetailElement> getAllMapDetails(int start, int numOfRows) throws MiddlewareQueryException {
+        List<MapDetailElement> values = new ArrayList<MapDetailElement>();
+
         try {
             SQLQuery query = getSession().createSQLQuery(Map.GET_MAP_DETAILS);
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
             List results = query.list();
-
-            List<MapDetailElement> values = new ArrayList<MapDetailElement>();
 
             for (Object o : results) {
                 Object[] result = (Object[]) o;
@@ -116,8 +117,9 @@ public class MapDAO extends GenericDAO<Map, Integer>{
 
             return values;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getAllMapDetails() query from Map & Mapping Data: " + e.getMessage(), e);
+        	logAndThrowException("Error with getAllMapDetails() query from Map & Mapping Data: " + e.getMessage(), e);
         }
+        return values;
     }
     
     public long countAllMapDetails() throws MiddlewareQueryException {
@@ -129,9 +131,9 @@ public class MapDAO extends GenericDAO<Map, Integer>{
             }
             return 0;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countAllMapDetails() query from Map & Mapping Data: " + e.getMessage(), e);
+        	logAndThrowException("Error with countAllMapDetails() query from Map & Mapping Data: " + e.getMessage(), e);
         }
-
+        return 0;
     }
     
     

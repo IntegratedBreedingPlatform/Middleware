@@ -53,8 +53,9 @@ public class MappingPopDAO extends GenericDAO<MappingPop, Integer>{
             }
             return dataValues;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getParentsByDatasetId(datasetId=" + datasetId + ") query from MappingPop: " + e.getMessage(), e);
+        	logAndThrowException("Error with getParentsByDatasetId(datasetId=" + datasetId + ") query from MappingPop: " + e.getMessage(), e);
         }
+        return dataValues;
     }
 
     @SuppressWarnings("rawtypes")
@@ -88,9 +89,10 @@ public class MappingPopDAO extends GenericDAO<MappingPop, Integer>{
             }
             return mappingValues;
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getMappingValuesByGidAndMarkerIds(gids=" + gids + ", markerIds=" + markerIds
+        	logAndThrowException("Error with getMappingValuesByGidAndMarkerIds(gids=" + gids + ", markerIds=" + markerIds
                     + ") query from MappingPop: " + e.getMessage(), e);
         }
+        return mappingValues;
     }
 
     @SuppressWarnings("rawtypes")
@@ -117,8 +119,9 @@ public class MappingPopDAO extends GenericDAO<MappingPop, Integer>{
             }
             return dataValues;        
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with getAllParentsFromMappingPopulation() query from MappingPop: " + e.getMessage(), e);
+        	logAndThrowException("Error with getAllParentsFromMappingPopulation() query from MappingPop: " + e.getMessage(), e);
         }
+        return dataValues;
     }
 
     
@@ -131,8 +134,9 @@ public class MappingPopDAO extends GenericDAO<MappingPop, Integer>{
             BigInteger result = (BigInteger) query.uniqueResult();
             return result.longValue();
         } catch (HibernateException e) {
-            throw new MiddlewareQueryException("Error with countAllParentsFromMappingPopulation() query from MappingPop: " + e.getMessage(), e);
+        	logAndThrowException("Error with countAllParentsFromMappingPopulation() query from MappingPop: " + e.getMessage(), e);
         }
+        return 0L;
     }
     
         
