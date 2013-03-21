@@ -1153,41 +1153,48 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     public Integer addProjectActivity(ProjectActivity projectActivity) throws MiddlewareQueryException {
         List<ProjectActivity> list = new ArrayList<ProjectActivity>();
         list.add(projectActivity);
+        
         List<Integer> ids = addProjectActivity(list);
+        
         return ids.size() > 0 ? ids.get(0) : null;
     }
 
     @Override
     public List<Integer> addProjectActivity(List<ProjectActivity> projectActivityList) throws MiddlewareQueryException {
-        return addOrUpdateProjectActivityData(projectActivityList, Operation.ADD);
+    	
+    	return addOrUpdateProjectActivityData(projectActivityList, Operation.ADD);
     }
 
     private List<Integer> addOrUpdateProjectActivityData(List<ProjectActivity> projectActivityList, Operation operation)
             throws MiddlewareQueryException {
-        Session session = getCurrentSession();
+    	
+    	Session session = getCurrentSession();
         if (session == null) {
             return new ArrayList<Integer>();
         }
 
         Transaction trans = null;
-
+        
         int recordsSaved = 0;
         List<Integer> idsSaved = new ArrayList<Integer>();
         try {
             // begin save transaction
+        
             trans = session.beginTransaction();
 
             ProjectActivityDAO dao = new ProjectActivityDAO();
             dao.setSession(session);
-
+           
             for (ProjectActivity projectActivityListData : projectActivityList) {
-                ProjectActivity recordSaved = dao.saveOrUpdate(projectActivityListData);
+            	ProjectActivity recordSaved = dao.save(projectActivityListData);
                 idsSaved.add(recordSaved.getProjectActivityId());
                 recordsSaved++;
 
             }
+          
             // end transaction, commit to database
             trans.commit();
+            
         } catch (Exception e) {
             LOG.error("Error in addProjectActivity: " + e.getMessage() + "\n" + e.getStackTrace());
             e.printStackTrace();
