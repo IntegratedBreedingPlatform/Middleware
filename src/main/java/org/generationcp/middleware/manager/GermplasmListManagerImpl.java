@@ -13,6 +13,7 @@
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.generationcp.middleware.dao.GermplasmListDAO;
@@ -81,17 +82,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public long countAllGermplasmLists() throws MiddlewareQueryException {
-        long count = 0;
-
-        if (setWorkingDatabase(Database.LOCAL)) {
-        	count = count + getGermplasmListDAO().countAllExceptDeleted();
-        }
-        
-        if (setWorkingDatabase(Database.CENTRAL)) {
-        	count = count + getGermplasmListDAO().countAllExceptDeleted();
-        }
-        
-        return count;
+    	
+    	return countByMethod(getGermplasmListDAO(), "countAllExceptDeleted", new Object[] {});
     }
 
     @Override
@@ -107,16 +99,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public long countGermplasmListByName(String name, Operation operation) throws MiddlewareQueryException {
-        long count = 0;
-
-        if (setWorkingDatabase(Database.LOCAL)) {
-        	count = count + getGermplasmListDAO().countByName(name, operation);
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-        	count = count + getGermplasmListDAO().countByName(name, operation);
-        }
-
-        return count;
+    	
+    	return countByMethod(getGermplasmListDAO(), "countByName", new Object[] {name, operation});
     }
 
     @Override
@@ -131,16 +115,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public long countGermplasmListByStatus(Integer status) throws MiddlewareQueryException {
-        long count = 0;
-
-        if (setWorkingDatabase(Database.LOCAL)) {
-        	count = count + getGermplasmListDAO().countByStatus(status);
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-        	count = count + getGermplasmListDAO().countByStatus(status);
-        }
-
-        return count;
+    	
+    	return countByMethod(getGermplasmListDAO(), "countByStatus", new Object[] {status});
     }
 
     @Override
@@ -183,63 +159,15 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public List<GermplasmListData> getGermplasmListDataByGID(Integer gid, int start, int numOfRows) throws MiddlewareQueryException {
-        List<GermplasmListData> toreturn = new ArrayList<GermplasmListData>();
-
-        long centralCount = 0;
-        long localCount = 0;
-        long relativeLimit = 0;
-
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            centralCount = getGermplasmListDataDAO().countByGID(gid);
-
-            if (centralCount > start) {
-                toreturn.addAll(getGermplasmListDataDAO().getByGID(gid, start, numOfRows));
-                relativeLimit = numOfRows - (centralCount - start);
-
-                if (relativeLimit > 0) {
-                    if (setWorkingDatabase(Database.LOCAL)) {
-                        localCount = getGermplasmListDataDAO().countByGID(gid);
-
-                        if (localCount > 0) {
-                            toreturn.addAll(getGermplasmListDataDAO().getByGID(gid, 0, (int) relativeLimit));
-                        }
-                    }
-                }
-            } else {
-                relativeLimit = start - centralCount;
-
-                if (setWorkingDatabase(Database.LOCAL)) {
-                    localCount = getGermplasmListDataDAO().countByGID(gid);
-
-                    if (localCount > relativeLimit) {
-                        toreturn.addAll(getGermplasmListDataDAO().getByGID(gid, (int) relativeLimit, numOfRows));
-                    }
-                }
-            }
-        } else if (setWorkingDatabase(Database.LOCAL)) {
-            localCount = getGermplasmListDataDAO().countByGID(gid);
-
-            if (localCount > start) {
-                toreturn.addAll(getGermplasmListDataDAO().getByGID(gid, start, numOfRows));
-            }
-        }
-
-        return toreturn;
+    	
+    	List<String> methodNames = Arrays.asList("countByGID", "getByGID");
+    	return getAllFromCentralAndLocalByMethod(getGermplasmListDataDAO(), methodNames, start, numOfRows, new Object[] {gid});
     }
 
     @Override
     public long countGermplasmListDataByGID(Integer gid) throws MiddlewareQueryException {
-        long count = 0;
-
-        if (setWorkingDatabase(Database.LOCAL)) {
-            count = count + getGermplasmListDataDAO().countByGID(gid);
-        }
-
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            count = count + getGermplasmListDataDAO().countByGID(gid);
-        }
-
-        return count;
+    	
+    	return countByMethod(getGermplasmListDataDAO(), "countByGID", new Object[] {gid});
     }
 
     @Override
@@ -574,32 +502,13 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     @Override
     public List<GermplasmList> getGermplasmListByParentFolderIdBatched(Integer parentId, int batchSize) throws MiddlewareQueryException {
     	List<GermplasmList> childLists = new ArrayList<GermplasmList>();
-    	setWorkingDatabase(parentId);
-        Session session = getSession(parentId);
-        if (session == null) {
-            return childLists;
-        }
-
-        // initialize session & transaction
-        Transaction trans = null;
-
-        try {
-            // begin transaction
-            trans = session.beginTransaction();
-
+    	if (setWorkingDatabase(parentId)) {
             int start = 0;
             long childListCount = getGermplasmListDAO().countByParentFolderId(parentId);
             while (start < childListCount) {
                 childLists.addAll(getGermplasmListDAO().getByParentFolderId(parentId, start, batchSize));
                 start += batchSize;
             }
-        } catch (Exception e) {
-            rollbackTransaction(trans);
-            logAndThrowException(
-                    "Error encountered while retrieving germplasm sub-lists: GermplasmListManager.getGermplasmListByParentFolderIdBatched(parentId="
-                            + parentId + ", batchSize=" + batchSize + "): " + e.getMessage(), e, LOG);
-        } finally {
-            session.flush();
         }
 
         return childLists;
