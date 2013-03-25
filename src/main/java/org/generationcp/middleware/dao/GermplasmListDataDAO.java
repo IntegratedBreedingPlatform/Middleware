@@ -20,6 +20,7 @@ import org.generationcp.middleware.pojos.GermplasmListData;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -36,6 +37,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
             criteria.add(Restrictions.ne("status", STATUS_DELETED));
             criteria.setFirstResult(start);
             criteria.setMaxResults(numOfRows);
+            criteria.addOrder(Order.asc("entryId"));
             return criteria.list();
         } catch (HibernateException e) {
             logAndThrowException("Error with getByListId(id=" + id + ") query from GermplasmListData " + e.getMessage(), e);
@@ -65,6 +67,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
             criteria.add(Restrictions.eq("l.id", listId));
             criteria.add(Restrictions.eq("gid", gid));
             criteria.add(Restrictions.ne("status", STATUS_DELETED));
+            criteria.addOrder(Order.asc("entryId"));
             return criteria.list();
         } catch (HibernateException e) {
             logAndThrowException("Error with getByListIdAndGID(listId=" + listId + ", gid=" + gid
@@ -80,6 +83,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
             criteria.add(Restrictions.eq("l.id", listId));
             criteria.add(Restrictions.eq("entryId", entryId));
             criteria.add(Restrictions.ne("status", STATUS_DELETED));
+            criteria.addOrder(Order.asc("entryId"));
             return (GermplasmListData) criteria.uniqueResult();
         } catch (HibernateException e) {
             logAndThrowException("Error with getByListIdAndEntryId(listId=" + listId + ", entryId=" + entryId
@@ -96,6 +100,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
             criteria.add(Restrictions.ne("status", STATUS_DELETED));
             criteria.setFirstResult(start);
             criteria.setMaxResults(numOfRows);
+            criteria.addOrder(Order.asc("entryId"));
             return criteria.list();
         } catch (HibernateException e) {
             logAndThrowException("Error with getByGID(gid=" + gid + ") query from GermplasmListData " + e.getMessage(), e);
