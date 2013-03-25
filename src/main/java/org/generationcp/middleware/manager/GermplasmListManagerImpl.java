@@ -83,7 +83,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     @Override
     public long countAllGermplasmLists() throws MiddlewareQueryException {
     	
-    	return countByMethod(getGermplasmListDAO(), "countAllExceptDeleted", new Object[] {});
+    	return countAllFromCentralAndLocalByMethod(getGermplasmListDAO(), "countAllExceptDeleted", new Object[] {});
     }
 
     @Override
@@ -100,7 +100,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     @Override
     public long countGermplasmListByName(String name, Operation operation) throws MiddlewareQueryException {
     	
-    	return countByMethod(getGermplasmListDAO(), "countByName", new Object[] {name, operation});
+    	return countAllFromCentralAndLocalByMethod(getGermplasmListDAO(), "countByName", new Object[] {name, operation});
     }
 
     @Override
@@ -116,7 +116,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     @Override
     public long countGermplasmListByStatus(Integer status) throws MiddlewareQueryException {
     	
-    	return countByMethod(getGermplasmListDAO(), "countByStatus", new Object[] {status});
+    	return countAllFromCentralAndLocalByMethod(getGermplasmListDAO(), "countByStatus", new Object[] {status});
     }
 
     @Override
@@ -161,13 +161,13 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     public List<GermplasmListData> getGermplasmListDataByGID(Integer gid, int start, int numOfRows) throws MiddlewareQueryException {
     	
     	List<String> methodNames = Arrays.asList("countByGID", "getByGID");
-    	return getAllFromCentralAndLocalByMethod(getGermplasmListDataDAO(), methodNames, start, numOfRows, new Object[] {gid});
+    	return getFromCentralAndLocalByMethod(getGermplasmListDataDAO(), methodNames, start, numOfRows, new Object[] {gid});
     }
 
     @Override
     public long countGermplasmListDataByGID(Integer gid) throws MiddlewareQueryException {
     	
-    	return countByMethod(getGermplasmListDataDAO(), "countByGID", new Object[] {gid});
+    	return countAllFromCentralAndLocalByMethod(getGermplasmListDataDAO(), "countByGID", new Object[] {gid});
     }
 
     @Override

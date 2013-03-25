@@ -1506,7 +1506,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @SuppressWarnings("unchecked")
     @Override
     public List<Qtl> getAllQtl(int start, int numOfRows) throws MiddlewareQueryException {
-        return (List<Qtl>) getAllFromCentralAndLocal(getQtlDao(), start, numOfRows);
+        return (List<Qtl>) getFromCentralAndLocal(getQtlDao(), start, numOfRows);
     }
 
     @Override

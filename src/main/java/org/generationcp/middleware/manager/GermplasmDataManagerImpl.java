@@ -158,7 +158,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @SuppressWarnings("unchecked")
     @Override
     public List<Location> getAllLocations(int start, int numOfRows) throws MiddlewareQueryException {
-        return (List<Location>) getAllFromCentralAndLocal(getLocationDao(), start, numOfRows);
+        return (List<Location>) getFromCentralAndLocal(getLocationDao(), start, numOfRows);
     }
 
     @Override
@@ -183,7 +183,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public List<Location> getLocationsByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException {
         List<String> methods = Arrays.asList("countByName", "getByName");
-        return (List<Location>) getAllFromCentralAndLocalByMethod(getLocationDao(), methods, start, numOfRows, new Object[]{name, op});
+        return (List<Location>) getFromCentralAndLocalByMethod(getLocationDao(), methods, start, numOfRows, new Object[]{name, op});
     }
 /*        
     @Override
@@ -235,26 +235,21 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public long countLocationsByName(String name, Operation op) throws MiddlewareQueryException {
-        long count = 0;
-        if (setWorkingDatabase(Database.LOCAL)) {
-            count = count + getLocationDao().countByName(name, op);
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            count = count + getLocationDao().countByName(name, op);
-        }
-        return count;
+        return countAllFromCentralAndLocalByMethod(getLocationDao(), "countByName", new Object[]{name, op});
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<Location> getLocationsByCountry(Country country) throws MiddlewareQueryException {
-        List<Location> locations = new ArrayList<Location>();
-        if (setWorkingDatabase(Database.LOCAL)) {
-            locations.addAll(getLocationDao().getByCountry(country));
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            locations.addAll(getLocationDao().getByCountry(country));
-        }
-        return locations;
+        return (List<Location>) super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getByCountry", new Object[]{country});
+//        List<Location> locations = new ArrayList<Location>();
+//        if (setWorkingDatabase(Database.LOCAL)) {
+//            locations.addAll(getLocationDao().getByCountry(country));
+//        }
+//        if (setWorkingDatabase(Database.CENTRAL)) {
+//            locations.addAll(getLocationDao().getByCountry(country));
+//        }
+//        return locations;
     }
 
     //TODO Optimize similar methods
@@ -262,7 +257,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public List<Location> getLocationsByCountry(Country country, int start, int numOfRows) throws MiddlewareQueryException {
         List<String> methods = Arrays.asList("countByCountry", "getByCountry");
-        return (List<Location>) getAllFromCentralAndLocalByMethod(getLocationDao(), methods, start, numOfRows, new Object[]{country});
+        return (List<Location>) getFromCentralAndLocalByMethod(getLocationDao(), methods, start, numOfRows, new Object[]{country});
     }
 /*    
     @Override
@@ -315,7 +310,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     //TODO Optimize similar methods        
     @Override
     public long countLocationsByCountry(Country country) throws MiddlewareQueryException {
-        return countByMethod(getLocationDao(), "countByCountry", new Object[]{country});
+        return countAllFromCentralAndLocalByMethod(getLocationDao(), "countByCountry", new Object[]{country});
     }
 /*
     @Override
@@ -335,7 +330,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @SuppressWarnings("unchecked")
     @Override
     public List<Location> getLocationsByType(Integer type) throws MiddlewareQueryException {
-        return (List<Location>) getListByMethod(getLocationDao(), "getByType", new Object[]{type});
+        return (List<Location>) getAllFromCentralAndLocalByMethod(getLocationDao(), "getByType", new Object[]{type});
     }
 /*
     @Override

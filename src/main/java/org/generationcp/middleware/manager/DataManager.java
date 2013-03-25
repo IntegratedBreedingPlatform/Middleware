@@ -290,81 +290,6 @@ public abstract class DataManager{
     }
 
     /**
-     * Returns all the entities from both central and local databases based on the given DAO.
-     * 
-     * @param 
-     * @return
-     * @throws MiddlewareQueryException
-     */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    protected List getAllFromCentralAndLocal(GenericDAO dao) throws MiddlewareQueryException {
-        List toReturn = new ArrayList();
-        if (setDaoSession(dao, getCurrentSessionForLocal())) {
-            toReturn.addAll(dao.getAll());
-        }
-        if (setDaoSession(dao, getCurrentSessionForCentral())) {
-            toReturn.addAll(dao.getAll());
-        }
-        return toReturn;
-    }
-
-    /**
-     * A generic implementation of the getAllXXX(int start, int numOfRows) that calls getAll() of GenericDAO.
-     * This gets all the records returned by the corresponding DAO.getAll() method for the given DAO.
-     * Retrieves from both local and central.
-     * 
-     * Sample usage:
-     * 
-     *      public List<Location> getAllLocations(int start, int numOfRows) throws MiddlewareQueryException {
-     *          return (List<Location>) getAllFromCentralAndLocal(getLocationDao(), start, numOfRows);
-     *      }
-     * 
-     * @param dao - the DAO to call the method from
-     * @param start - the start row
-     * @param numOfRows - number of rows to retrieve
-     * @return List of all records
-     * @throws MiddlewareQueryException
-     */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public List getAllFromCentralAndLocal(GenericDAO dao, int start, int numOfRows) throws MiddlewareQueryException {
-        List toReturn = new ArrayList();
-
-        long centralCount = 0;
-        long localCount = 0;
-        long relativeLimit = 0;
-
-        if (setWorkingDatabase(Database.CENTRAL, dao)) {
-            centralCount = dao.countAll();
-            if (centralCount > start) {
-                toReturn.addAll(dao.getAll(start, numOfRows));
-                relativeLimit = numOfRows - (centralCount - start);
-                if (relativeLimit > 0) {
-                    if (setWorkingDatabase(Database.LOCAL, dao)) {
-                        localCount = dao.countAll();
-                        if (localCount > 0) {
-                            toReturn.addAll(dao.getAll(0, (int) relativeLimit));
-                        }
-                    }
-                }
-            } else {
-                relativeLimit = start - centralCount;
-                if (setWorkingDatabase(Database.LOCAL, dao)) {
-                    localCount = dao.countAll();
-                    if (localCount > relativeLimit) {
-                        toReturn.addAll(dao.getAll((int) relativeLimit, numOfRows));
-                    }
-                }
-            }
-        } else if (setWorkingDatabase(Database.LOCAL, dao)) {
-            localCount = dao.countAll();
-            if (localCount > start) {
-                toReturn.addAll(dao.getAll(start, numOfRows));
-            }
-        }
-        return toReturn;
-    }
-
-    /**
      * Gets the parameter types of given parameters
      * 
      * @param parameters
@@ -405,7 +330,81 @@ public abstract class DataManager{
         return parameterTypes;
     }
 
-    
+    /**
+     * Returns all the entities from both central and local databases based on the given DAO.
+     * 
+     * @param 
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    protected List getAllFromCentralAndLocal(GenericDAO dao) throws MiddlewareQueryException {
+        List toReturn = new ArrayList();
+        if (setDaoSession(dao, getCurrentSessionForLocal())) {
+            toReturn.addAll(dao.getAll());
+        }
+        if (setDaoSession(dao, getCurrentSessionForCentral())) {
+            toReturn.addAll(dao.getAll());
+        }
+        return toReturn;
+    }
+
+    /**
+     * A generic implementation of the getAllXXX(int start, int numOfRows) that calls getAll() of GenericDAO.
+     * This gets all the records returned by the corresponding DAO.getAll() method for the given DAO.
+     * Retrieves from both local and central.
+     * 
+     * Sample usage:
+     * 
+     *      public List<Location> getAllLocations(int start, int numOfRows) throws MiddlewareQueryException {
+     *          return (List<Location>) getFromCentralAndLocal(getLocationDao(), start, numOfRows);
+     *      }
+     * 
+     * @param dao - the DAO to call the method from
+     * @param start - the start row
+     * @param numOfRows - number of rows to retrieve
+     * @return List of all records
+     * @throws MiddlewareQueryException
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public List getFromCentralAndLocal(GenericDAO dao, int start, int numOfRows) throws MiddlewareQueryException {
+        List toReturn = new ArrayList();
+
+        long centralCount = 0;
+        long localCount = 0;
+        long relativeLimit = 0;
+
+        if (setWorkingDatabase(Database.CENTRAL, dao)) {
+            centralCount = dao.countAll();
+            if (centralCount > start) {
+                toReturn.addAll(dao.getAll(start, numOfRows));
+                relativeLimit = numOfRows - (centralCount - start);
+                if (relativeLimit > 0) {
+                    if (setWorkingDatabase(Database.LOCAL, dao)) {
+                        localCount = dao.countAll();
+                        if (localCount > 0) {
+                            toReturn.addAll(dao.getAll(0, (int) relativeLimit));
+                        }
+                    }
+                }
+            } else {
+                relativeLimit = start - centralCount;
+                if (setWorkingDatabase(Database.LOCAL, dao)) {
+                    localCount = dao.countAll();
+                    if (localCount > relativeLimit) {
+                        toReturn.addAll(dao.getAll((int) relativeLimit, numOfRows));
+                    }
+                }
+            }
+        } else if (setWorkingDatabase(Database.LOCAL, dao)) {
+            localCount = dao.countAll();
+            if (localCount > start) {
+                toReturn.addAll(dao.getAll(start, numOfRows));
+            }
+        }
+        return toReturn;
+    }
+
     /**
      * A generic implementation of the getXXX(Object parameter, int start, int numOfRows).
      * Calls the corresponding getXXX method as specified in the second value in the list of methods parameter.
@@ -414,7 +413,7 @@ public abstract class DataManager{
      * 
      *      public List<Location> getLocationsByCountry(Country country, int start, int numOfRows) throws MiddlewareQueryException {
      *          List<String> methods = Arrays.asList("countByCountry", "getByCountry");
-     *          return (List<Location>) getAllFromCentralAndLocalByMethod(getLocationDao(), methods, start, numOfRows, new Object[]{country});
+     *          return (List<Location>) getFromCentralAndLocalByMethod(getLocationDao(), methods, start, numOfRows, new Object[]{country});
      *      }
      * 
      * @param dao - the DAO to call the methods from
@@ -426,7 +425,7 @@ public abstract class DataManager{
      * @throws MiddlewareQueryException
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public List getAllFromCentralAndLocalByMethod(GenericDAO dao, List<String> methods, int start, int numOfRows, Object[] parameters)
+    public List getFromCentralAndLocalByMethod(GenericDAO dao, List<String> methods, int start, int numOfRows, Object[] parameters)
             throws MiddlewareQueryException {
         List toReturn = new ArrayList();
         long centralCount = 0;
@@ -498,6 +497,43 @@ public abstract class DataManager{
     }
 
     /**
+     * A generic implementation of the getXXXByXXXX() method that calls a specific get method from a DAO.
+     * Calls the corresponding method that returns list type as specified in the parameter methodName.
+     * 
+     * Sample usage: 
+     *  
+     *      public List<Location> getLocationsByType(Integer type) throws MiddlewareQueryException {
+     *          return (List<Location>) getAllListFromCentralAndLocalByMethod(getLocationDao(), "getByType", new Object[]{type});
+     *      }
+     * 
+     * @param dao - the DAO to call the method from
+     * @param methodName - the method to call
+     * @param parameterTypes - the types of the parameters to be passed to the method
+     * @param parameters - the parameters to be passed to the method
+     * @return the List result
+     * @throws MiddlewareQueryException
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public List getAllFromCentralAndLocalByMethod(GenericDAO dao, String methodName, Object[] parameters)
+            throws MiddlewareQueryException {
+        List toReturn = new ArrayList();
+        Class[] parameterTypes = getParameterTypes(parameters);
+        try {
+            java.lang.reflect.Method method = dao.getClass().getMethod(methodName, parameterTypes);
+    
+            if (setWorkingDatabase(Database.LOCAL, dao)) {
+                toReturn.addAll((List) method.invoke(dao, parameters));
+            }
+            if (setWorkingDatabase(Database.CENTRAL, dao)) {
+                toReturn.addAll((List) method.invoke(dao, parameters));
+            }
+        } catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException
+            logAndThrowException("Error in calling " + methodName + "(): " + e.getMessage(), e);
+        }
+        return toReturn;
+    }
+
+    /**
      * A generic implementation of the countAllXXX() method that calls countAll() from Generic DAO.
      * Returns the count of entities from both central and local databases based on the given DAO.
      * 
@@ -531,7 +567,7 @@ public abstract class DataManager{
      * Sample usage:
      *  
      *  public long countLocationsByCountry(Country country) throws MiddlewareQueryException {
-     *      return countByMethod(getLocationDao(), "countByCountry", new Object[]{country});
+     *      return countAllFromCentralAndLocalByMethod(getLocationDao(), "countByCountry", new Object[]{country});
      *  }
      * 
      * @param dao - the DAO to call the method from
@@ -542,7 +578,7 @@ public abstract class DataManager{
      * @throws MiddlewareQueryException
      */
     @SuppressWarnings("rawtypes")
-    public long countByMethod(GenericDAO dao, String methodName, Object[] parameters)
+    public long countAllFromCentralAndLocalByMethod(GenericDAO dao, String methodName, Object[] parameters)
             throws MiddlewareQueryException {
         long count = 0;
         Class[] parameterTypes = getParameterTypes(parameters);
@@ -559,43 +595,6 @@ public abstract class DataManager{
             logAndThrowException("Error in counting: " + e.getMessage(), e);
         }
         return count;
-    }
-
-    /**
-     * A generic implementation of the getXXXByXXXX() method that calls a specific get method from a DAO.
-     * Calls the corresponding method that returns list type as specified in the parameter methodName.
-     * 
-     * Sample usage: 
-     *  
-     *      public List<Location> getLocationsByType(Integer type) throws MiddlewareQueryException {
-     *          return (List<Location>) getListByMethod(getLocationDao(), "getByType", new Object[]{type});
-     *      }
-     * 
-     * @param dao - the DAO to call the method from
-     * @param methodName - the method to call
-     * @param parameterTypes - the types of the parameters to be passed to the method
-     * @param parameters - the parameters to be passed to the method
-     * @return the List result
-     * @throws MiddlewareQueryException
-     */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    public List getListByMethod(GenericDAO dao, String methodName, Object[] parameters)
-            throws MiddlewareQueryException {
-        List toReturn = new ArrayList();
-        Class[] parameterTypes = getParameterTypes(parameters);
-        try {
-            java.lang.reflect.Method method = dao.getClass().getMethod(methodName, parameterTypes);
-
-            if (setWorkingDatabase(Database.LOCAL, dao)) {
-                toReturn.addAll((List) method.invoke(dao, parameters));
-            }
-            if (setWorkingDatabase(Database.CENTRAL, dao)) {
-                toReturn.addAll((List) method.invoke(dao, parameters));
-            }
-        } catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException
-            logAndThrowException("Error in calling " + methodName + "(): " + e.getMessage(), e);
-        }
-        return toReturn;
     }
 
     /**
