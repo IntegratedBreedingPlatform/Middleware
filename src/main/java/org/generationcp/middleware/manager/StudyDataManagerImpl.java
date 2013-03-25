@@ -507,13 +507,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
                 count = getCharacterLevelDao().countStudyInformationByGID(gid) + getNumericLevelDao().countStudyInformationByGID(gid);
             }
         } else {
-            if (setWorkingDatabase(getCurrentSessionForLocal())) {
-                count = getCharacterLevelDao().countStudyInformationByGID(gid) + getNumericLevelDao().countStudyInformationByGID(gid);
-            }
-            if (setWorkingDatabase(getCurrentSessionForCentral())) {
-                count = count + getCharacterLevelDao().countStudyInformationByGID(gid)
-                        + getNumericLevelDao().countStudyInformationByGID(gid);
-            }
+        	
+        	return countAllFromCentralAndLocalByMethod(getCharacterLevelDao(), "countStudyInformationByGID", new Object[] {gid}, new Class[] {Long.class});
         }
         return count;
     }
