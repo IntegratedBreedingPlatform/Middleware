@@ -534,6 +534,34 @@ public abstract class DataManager{
     }
 
     /**
+     * A generic implementation of the countAllXXX(Database instance) method that calls countAll() from Generic DAO.
+     * Returns the count of entities from both central and local databases based on the given DAO.
+     * 
+     * Sample usage:
+     *      
+     * @param dao - the DAO to call the method from
+     * @param instance - the database instance to query from
+     * @return the number of entities from both central and local instances
+     * @throws MiddlewareQueryException
+     */
+    @SuppressWarnings("rawtypes")
+    protected long countAllFromInstance(GenericDAO dao, Database instance) throws MiddlewareQueryException {
+        long count = 0;
+        Session session = null;
+        
+        if (instance == Database.CENTRAL){
+            session =  getCurrentSessionForCentral();
+        } else if (instance == Database.LOCAL){
+            session =  getCurrentSessionForLocal();
+        }
+        
+        if (setDaoSession(dao, session)) {
+            count = count + dao.countAll();
+        }
+        return count;
+    }
+    
+    /**
      * A generic implementation of the countAllXXX() method that calls countAll() from Generic DAO.
      * Returns the count of entities from both central and local databases based on the given DAO.
      * 
@@ -589,6 +617,38 @@ public abstract class DataManager{
                 count = count + ((Long) countMethod.invoke(dao, parameters)).intValue();
             }
             if (setWorkingDatabase(Database.CENTRAL, dao)) {
+                count = count + ((Long) countMethod.invoke(dao, parameters)).intValue();
+            }
+        } catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException
+            logAndThrowException("Error in counting: " + e.getMessage(), e);
+        }
+        return count;
+    }
+
+    /**
+     * A generic implementation of the countByXXXX(Database instance) method that calls a specific count method from a DAO.
+     * Calls the corresponding count method as specified in the parameter methodName. 
+     * Retrieves data from the specified database instance
+     * 
+     * Sample usage:
+     *  
+     * 
+     * @param dao - the DAO to call the method from
+     * @param methodName - the method to call
+     * @param parameterTypes - the types of the parameters to be passed to the method
+     * @param parameters - the parameters to be passed to the method
+     * @return the count
+     * @throws MiddlewareQueryException
+     */
+    @SuppressWarnings("rawtypes")
+    public long countAllFromInstanceByMethod(GenericDAO dao, Database instance, String methodName, Object[] parameters)
+            throws MiddlewareQueryException {
+        long count = 0;
+        Class[] parameterTypes = getParameterTypes(parameters);
+        try {
+            java.lang.reflect.Method countMethod = dao.getClass().getMethod(methodName, parameterTypes);
+
+            if (setWorkingDatabase(instance, dao)) {
                 count = count + ((Long) countMethod.invoke(dao, parameters)).intValue();
             }
         } catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException
