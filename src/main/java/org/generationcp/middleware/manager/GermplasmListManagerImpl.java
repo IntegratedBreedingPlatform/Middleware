@@ -83,7 +83,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     @Override
     public long countAllGermplasmLists() throws MiddlewareQueryException {
     	
-    	return countAllFromCentralAndLocalByMethod(getGermplasmListDAO(), "countAllExceptDeleted", new Object[] {});
+    	return countAllFromCentralAndLocalByMethod(getGermplasmListDAO(), "countAllExceptDeleted", new Object[] {}, new Class[]{});
     }
 
     @Override
@@ -99,8 +99,9 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public long countGermplasmListByName(String name, Operation operation) throws MiddlewareQueryException {
-    	
-    	return countAllFromCentralAndLocalByMethod(getGermplasmListDAO(), "countByName", new Object[] {name, operation});
+
+        return countAllFromCentralAndLocalByMethod(getGermplasmListDAO(), "countByName", new Object[] { name, operation },
+                new Class[] { String.class, Operation.class });
     }
 
     @Override
@@ -116,7 +117,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     @Override
     public long countGermplasmListByStatus(Integer status) throws MiddlewareQueryException {
     	
-    	return countAllFromCentralAndLocalByMethod(getGermplasmListDAO(), "countByStatus", new Object[] {status});
+    	return countAllFromCentralAndLocalByMethod(getGermplasmListDAO(), "countByStatus", new Object[] {status},
+    	        new Class[]{Integer.class});
     }
 
     @Override
@@ -157,17 +159,20 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<GermplasmListData> getGermplasmListDataByGID(Integer gid, int start, int numOfRows) throws MiddlewareQueryException {
     	
     	List<String> methodNames = Arrays.asList("countByGID", "getByGID");
-    	return getFromCentralAndLocalByMethod(getGermplasmListDataDAO(), methodNames, start, numOfRows, new Object[] {gid});
+    	return getFromCentralAndLocalByMethod(getGermplasmListDataDAO(), methodNames, start, numOfRows, new Object[] {gid}, 
+    	        new Class[]{Integer.class});
     }
 
     @Override
     public long countGermplasmListDataByGID(Integer gid) throws MiddlewareQueryException {
     	
-    	return countAllFromCentralAndLocalByMethod(getGermplasmListDataDAO(), "countByGID", new Object[] {gid});
+    	return countAllFromCentralAndLocalByMethod(getGermplasmListDataDAO(), "countByGID", new Object[] {gid}, 
+    	        new Class[]{Integer.class});
     }
 
     @Override

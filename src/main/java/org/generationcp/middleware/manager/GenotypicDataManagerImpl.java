@@ -13,6 +13,7 @@
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -84,6 +85,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Joyce Avestro
  */
+@SuppressWarnings("unchecked")
 public class GenotypicDataManagerImpl extends DataManager implements GenotypicDataManager{
 
     private static final Logger LOG = LoggerFactory.getLogger(GenotypicDataManagerImpl.class);
@@ -285,57 +287,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         if ((qtlName == null) || (qtlName.isEmpty())) {
             return new ArrayList<Integer>();
         }
-
-        long centralCount = 0;
-        long localCount = 0;
-        long relativeLimit = 0;
-
-        List<Integer> qtl = new ArrayList<Integer>();
-
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            QtlDAO dao = getQtlDao();
-            centralCount = dao.countMapIDsByQTLName(qtlName);
-
-            if (centralCount > start) {
-                qtl.addAll(dao.getMapIDsByQTLName(qtlName, start, numOfRows));
-                relativeLimit = numOfRows - (centralCount - start);
-                if (relativeLimit > 0 && setWorkingDatabase(Database.LOCAL)) {
-                    dao = getQtlDao();
-                    localCount = dao.countMapIDsByQTLName(qtlName);
-                    if (localCount > 0) {
-                        qtl.addAll(dao.getMapIDsByQTLName(qtlName, 0, (int) relativeLimit));
-                    }
-                }
-            } else {
-                relativeLimit = start - centralCount;
-                if (setWorkingDatabase(Database.LOCAL)) {
-                    dao = getQtlDao();
-                    localCount = dao.countMapIDsByQTLName(qtlName);
-                    if (localCount > relativeLimit) {
-                        qtl.addAll(dao.getMapIDsByQTLName(qtlName, (int) relativeLimit, numOfRows));
-                    }
-                }
-            }
-        } else if (setWorkingDatabase(Database.LOCAL)) {
-            QtlDAO dao = getQtlDao();
-            localCount = dao.countMapIDsByQTLName(qtlName);
-            if (localCount > start) {
-                qtl.addAll(dao.getMapIDsByQTLName(qtlName, start, numOfRows));
-            }
-        }
-        return qtl;
+        
+        List<String> methods = Arrays.asList("countMapIDsByQTLName", "getMapIDsByQTLName");
+        return (List<Integer>) super.getFromCentralAndLocalByMethod(getQtlDao(), methods, start, numOfRows, new Object[]{qtlName}, new Class[]{String.class});
     }
 
     @Override
     public long countMapIDsByQTLName(String qtlName) throws MiddlewareQueryException {
-        long count = 0;
-        if (setWorkingDatabase(Database.LOCAL)) {
-            count = count + getQtlDao().countMapIDsByQTLName(qtlName);
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            count = count + getQtlDao().countMapIDsByQTLName(qtlName);
-        }
-        return count;
+        return super.countAllFromCentralAndLocalByMethod(getQtlDao(), "countMapIDsByQTLName", new Object[]{qtlName}, new Class[]{String.class});
     }
 
     @Override
@@ -364,26 +323,17 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public long countAllMaps(Database instance) throws MiddlewareQueryException {
-        if (setWorkingDatabase(instance)) {
-            return getMapDao().countAll();
-        }
-        return 0;
+        return super.countAllFromInstance(getMapDao(), instance);
     }
 
     @Override
     public List<Map> getAllMaps(int start, int numOfRows, Database instance) throws MiddlewareQueryException {
-        if (setWorkingDatabase(instance)) {
-            return getMapDao().getAll(start, numOfRows);
-        }
-        return new ArrayList<Map>();
+        return (List<Map>) super.getFromInstanceByMethod(getMapDao(), instance, "getAll", new Object[]{start, numOfRows}, new Class[]{Integer.TYPE, Integer.TYPE});
     }
 
     @Override
     public List<MapInfo> getMapInfoByMapName(String mapName, Database instance) throws MiddlewareQueryException {
-        if (setWorkingDatabase(instance)) {
-            return (List<MapInfo>) getMappingDataDao().getMapInfoByMapName(mapName);
-        }
-        return new ArrayList<MapInfo>();
+        return (List<MapInfo>) super.getFromInstanceByMethod(getMappingDataDao(), instance, "getMapInfoByMapName", new Object[]{mapName}, new Class[]{String.class});
     }
 
     @Override
@@ -1503,7 +1453,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return result;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<Qtl> getAllQtl(int start, int numOfRows) throws MiddlewareQueryException {
         return (List<Qtl>) getFromCentralAndLocal(getQtlDao(), start, numOfRows);

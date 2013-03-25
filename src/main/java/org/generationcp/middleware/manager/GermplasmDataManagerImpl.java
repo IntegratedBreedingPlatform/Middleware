@@ -58,6 +58,7 @@ import org.slf4j.LoggerFactory;
  * @author Kevin Manansala, Lord Hendrix Barboza
  * 
  */
+@SuppressWarnings("unchecked")
 public class GermplasmDataManagerImpl extends DataManager implements GermplasmDataManager{
 
     private static final Logger LOG = LoggerFactory.getLogger(GermplasmDataManagerImpl.class);
@@ -155,7 +156,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         return userDefinedFieldDao;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<Location> getAllLocations(int start, int numOfRows) throws MiddlewareQueryException {
         return (List<Location>) getFromCentralAndLocal(getLocationDao(), start, numOfRows);
@@ -178,233 +178,56 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         return locations;
     }
 
-    //TODO Optimize similar methods
-    @SuppressWarnings("unchecked")
     @Override
     public List<Location> getLocationsByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException {
         List<String> methods = Arrays.asList("countByName", "getByName");
-        return (List<Location>) getFromCentralAndLocalByMethod(getLocationDao(), methods, start, numOfRows, new Object[]{name, op});
+        return (List<Location>) getFromCentralAndLocalByMethod(getLocationDao(), methods, start, numOfRows, new Object[] { name, op },
+                new Class[] { String.class, Operation.class });
     }
-/*        
-    @Override
-    public List<Location> getLocationsByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException {
-        List<Location> locations = new ArrayList<Location>();
 
-        long centralCount = 0;
-        long localCount = 0;
-        long relativeLimit = 0;
 
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            LocationDAO dao = getLocationDao();
-            centralCount = dao.countByName(name, op);
-
-            if (centralCount > start) {
-                locations.addAll(dao.getByName(name, start, numOfRows, op));
-                relativeLimit = numOfRows - (centralCount - start);
-                if (relativeLimit > 0) {
-                    if (setWorkingDatabase(Database.LOCAL)) {
-                        dao = getLocationDao();
-                        localCount = dao.countByName(name, op);
-                        if (localCount > 0) {
-                            locations.addAll(dao.getByName(name, 0, (int) relativeLimit, op));
-                        }
-                    }
-                }
-
-            } else {
-                relativeLimit = start - centralCount;
-                if (setWorkingDatabase(Database.LOCAL)) {
-                    dao = getLocationDao();
-                    localCount = dao.countByName(name, op);
-                    if (localCount > relativeLimit) {
-                        locations.addAll(dao.getByName(name, (int) relativeLimit, numOfRows, op));
-                    }
-                }
-            }
-
-        } else if (setWorkingDatabase(Database.LOCAL)) {
-            LocationDAO dao = getLocationDao();
-            localCount = dao.countByName(name, op);
-            if (localCount > start) {
-                locations.addAll(dao.getByName(name, start, numOfRows, op));
-            }
-        }
-        return locations;
-    }
-*/
 
     @Override
     public long countLocationsByName(String name, Operation op) throws MiddlewareQueryException {
-        return countAllFromCentralAndLocalByMethod(getLocationDao(), "countByName", new Object[]{name, op});
+        return countAllFromCentralAndLocalByMethod(getLocationDao(), "countByName", new Object[] { name, op }, new Class[] { String.class,
+                Operation.class });
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<Location> getLocationsByCountry(Country country) throws MiddlewareQueryException {
-        return (List<Location>) super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getByCountry", new Object[]{country});
-//        List<Location> locations = new ArrayList<Location>();
-//        if (setWorkingDatabase(Database.LOCAL)) {
-//            locations.addAll(getLocationDao().getByCountry(country));
-//        }
-//        if (setWorkingDatabase(Database.CENTRAL)) {
-//            locations.addAll(getLocationDao().getByCountry(country));
-//        }
-//        return locations;
+        return (List<Location>) super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getByCountry", new Object[] { country },
+                new Class[] { Country.class });
     }
 
-    //TODO Optimize similar methods
-    @SuppressWarnings("unchecked")
     @Override
     public List<Location> getLocationsByCountry(Country country, int start, int numOfRows) throws MiddlewareQueryException {
         List<String> methods = Arrays.asList("countByCountry", "getByCountry");
-        return (List<Location>) getFromCentralAndLocalByMethod(getLocationDao(), methods, start, numOfRows, new Object[]{country});
+        return (List<Location>) getFromCentralAndLocalByMethod(getLocationDao(), methods, start, numOfRows, new Object[] { country },
+                new Class[] { Country.class });
     }
-/*    
-    @Override
-    public List<Location> getLocationsByCountry(Country country, int start, int numOfRows) throws MiddlewareQueryException {
-        List<Location> locations = new ArrayList<Location>();
-
-        long centralCount = 0;
-        long localCount = 0;
-        long relativeLimit = 0;
-
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            LocationDAO dao = getLocationDao();
-            centralCount = dao.countByCountry(country);
-
-            if (centralCount > start) {
-                locations.addAll(dao.getByCountry(country, start, numOfRows));
-                relativeLimit = numOfRows - (centralCount - start);
-                if (relativeLimit > 0) {
-                    if (setWorkingDatabase(Database.LOCAL)) {
-                        dao = getLocationDao();
-                        localCount = dao.countByCountry(country);
-                        if (localCount > 0) {
-                            locations.addAll(dao.getByCountry(country, 0, (int) relativeLimit));
-                        }
-                    }
-                }
-
-            } else {
-                relativeLimit = start - centralCount;
-                if (setWorkingDatabase(Database.LOCAL)) {
-                    dao = getLocationDao();
-                    localCount = dao.countByCountry(country);
-                    if (localCount > relativeLimit) {
-                        locations.addAll(dao.getByCountry(country, (int) relativeLimit, numOfRows));
-                    }
-                }
-            }
-
-        } else if (setWorkingDatabase(Database.LOCAL)) {
-            LocationDAO dao = getLocationDao();
-            localCount = dao.countByCountry(country);
-            if (localCount > start) {
-                locations.addAll(dao.getByCountry(country, start, numOfRows));
-            }
-        }
-        return locations;
-    }
-*/
-
-    //TODO Optimize similar methods        
+        
     @Override
     public long countLocationsByCountry(Country country) throws MiddlewareQueryException {
-        return countAllFromCentralAndLocalByMethod(getLocationDao(), "countByCountry", new Object[]{country});
+        return countAllFromCentralAndLocalByMethod(getLocationDao(), "countByCountry", new Object[] { country },
+                new Class[] { Country.class });
     }
-/*
-    @Override
-    public long countLocationsByCountry(Country country) throws MiddlewareQueryException {
-        long count = 0;
-        if (setWorkingDatabase(Database.LOCAL)) {
-            count = count + getLocationDao().countByCountry(country);
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            count = count + getLocationDao().countByCountry(country);
-        }
-        return count;
-    }
-*/
-    
-    //TODO Optimize similar methods
-    @SuppressWarnings("unchecked")
+
     @Override
     public List<Location> getLocationsByType(Integer type) throws MiddlewareQueryException {
-        return (List<Location>) getAllFromCentralAndLocalByMethod(getLocationDao(), "getByType", new Object[]{type});
+        return (List<Location>) getAllFromCentralAndLocalByMethod(getLocationDao(), "getByType", new Object[] { type },
+                new Class[] { Integer.class });
     }
-/*
-    @Override
-    public List<Location> getLocationsByType(Integer type) throws MiddlewareQueryException {
-        List<Location> locations = new ArrayList<Location>();
-
-        if (setWorkingDatabase(Database.LOCAL)) {
-            locations.addAll(getLocationDao().getByType(type));
-        }
-
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            locations.addAll(getLocationDao().getByType(type));
-        }
-
-        return locations;
-    }
-*/
 
     @Override
     public List<Location> getLocationsByType(Integer type, int start, int numOfRows) throws MiddlewareQueryException {
-        List<Location> locations = new ArrayList<Location>();
-
-        long centralCount = 0;
-        long localCount = 0;
-        long relativeLimit = 0;
-
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            LocationDAO dao = getLocationDao();
-            centralCount = dao.countByType(type);
-
-            if (centralCount > start) {
-                locations.addAll(dao.getByType(type, start, numOfRows));
-                relativeLimit = numOfRows - (centralCount - start);
-                if (relativeLimit > 0) {
-                    if (setWorkingDatabase(Database.LOCAL)) {
-                        dao = getLocationDao();
-                        localCount = dao.countByType(type);
-                        if (localCount > 0) {
-                            locations.addAll(dao.getByType(type, 0, (int) relativeLimit));
-                        }
-                    }
-                }
-
-            } else {
-                relativeLimit = start - centralCount;
-                if (setWorkingDatabase(Database.LOCAL)) {
-                    dao = getLocationDao();
-                    localCount = dao.countByType(type);
-                    if (localCount > relativeLimit) {
-                        locations.addAll(dao.getByType(type, (int) relativeLimit, numOfRows));
-                    }
-                }
-            }
-
-        } else if (setWorkingDatabase(Database.LOCAL)) {
-            LocationDAO dao = getLocationDao();
-            localCount = dao.countByType(type);
-            if (localCount > start) {
-                locations.addAll(dao.getByType(type, start, numOfRows));
-            }
-        }
-        return locations;
+        List<String> methods = Arrays.asList("countByType", "getByType");
+        return (List<Location>) getFromCentralAndLocalByMethod(getLocationDao(), methods, start, numOfRows, new Object[] { type },
+                new Class[] { Integer.class });
     }
 
     @Override
     public long countLocationsByType(Integer type) throws MiddlewareQueryException {
-        long count = 0;
-        if (setWorkingDatabase(Database.LOCAL)) {
-            count = count + getLocationDao().countByType(type);
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            count = count + getLocationDao().countByType(type);
-        }
-        return count;
+        return countAllFromCentralAndLocalByMethod(getLocationDao(), "countByType", new Object[] { type }, new Class[] { Integer.class });
     }
 
     public List<Germplasm> getAllGermplasm(int start, int numOfRows, Database instance) throws MiddlewareQueryException {
@@ -415,111 +238,49 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     public long countAllGermplasm(Database instance) throws MiddlewareQueryException {
-        if (setWorkingDatabase(instance)) {
-            return getGermplasmDao().countAll();
-        }
-        return 0;
+        return super.countAllFromInstance(getGermplasmDao(), instance);
     }
 
     public List<Germplasm> getGermplasmByPrefName(String name, int start, int numOfRows, Database instance) throws MiddlewareQueryException {
-        if (setWorkingDatabase(instance)) {
-            return (List<Germplasm>) getGermplasmDao().getByPrefName(name, start, numOfRows);
-        }
-        return new ArrayList<Germplasm>();
+        return (List<Germplasm>) getFromInstanceByMethod(getGermplasmDao(), instance, "getByPrefName", new Object[] { name, start,
+                numOfRows }, new Class[] { String.class, Integer.TYPE, Integer.TYPE });
     }
 
     public long countGermplasmByPrefName(String name) throws MiddlewareQueryException {
-        long count = 0;
-        if (setWorkingDatabase(Database.LOCAL)) {
-            count = count + getGermplasmDao().countByPrefName(name).intValue();
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            count = count + getGermplasmDao().countByPrefName(name).intValue();
-        }
-        return count;
+        return super.countAllFromCentralAndLocalByMethod(getGermplasmDao(), "countByPrefName", new Object[] { name },
+                new Class[] { String.class });
     }
 
     @Override
     public List<Germplasm> getGermplasmByName(String name, int start, int numOfRows, GetGermplasmByNameModes mode, Operation op,
             Integer status, GermplasmNameType type, Database instance) throws MiddlewareQueryException {
-
-        List<Germplasm> germplasms = new ArrayList<Germplasm>();
         String nameToUse = GermplasmDataManagerUtil.getNameToUseByMode(name, mode);
-        if (setWorkingDatabase(instance)) {
-            germplasms = getGermplasmDao().getByName(nameToUse, op, status, type, start, numOfRows);
-        }
-        return germplasms;
+        return (List<Germplasm>) super.getFromInstanceByMethod(getGermplasmDao(), instance, "getByName", new Object[] { nameToUse, op,
+                status, type, start, numOfRows }, new Class[] { String.class, Operation.class, Integer.class, GermplasmNameType.class,
+                Integer.TYPE, Integer.TYPE });
     }
 
     @Override
     public List<Germplasm> getGermplasmByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException {
         List<String> names = GermplasmDataManagerUtil.createNamePermutations(name);
-        List<Germplasm> germplasms = new ArrayList<Germplasm>();
-
-        long centralCount = 0;
-        long localCount = 0;
-        long relativeLimit = 0;
-
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            GermplasmDAO dao = getGermplasmDao();
-            centralCount = dao.countByName(names, op);
-
-            if (centralCount > start) {
-                germplasms.addAll(dao.getByName(names, op, start, numOfRows));
-                relativeLimit = numOfRows - (centralCount - start);
-                if (relativeLimit > 0) {
-                    if (setWorkingDatabase(Database.LOCAL)) {
-                        dao = getGermplasmDao();
-                        localCount = dao.countByName(names, op);
-                        if (localCount > 0) {
-                            germplasms.addAll(dao.getByName(names, op, 0, (int) relativeLimit));
-                        }
-                    }
-                }
-
-            } else {
-                relativeLimit = start - centralCount;
-                if (setWorkingDatabase(Database.LOCAL)) {
-                    dao = getGermplasmDao();
-                    localCount = dao.countByName(names, op);
-                    if (localCount > relativeLimit) {
-                        germplasms.addAll(dao.getByName(names, op, (int) relativeLimit, numOfRows));
-                    }
-                }
-            }
-
-        } else if (setWorkingDatabase(Database.LOCAL)) {
-            GermplasmDAO dao = getGermplasmDao();
-            localCount = dao.countByName(names, op);
-            if (localCount > start) {
-                germplasms.addAll(dao.getByName(names, op, start, numOfRows));
-            }
-        }
-        return germplasms;
+        List<String> methods = Arrays.asList("countByName", "getByName");
+        return (List<Germplasm>) getFromCentralAndLocalByMethod(getGermplasmDao(), methods, start, numOfRows, new Object[] { names, op },
+                new Class[] { List.class, Operation.class });
     }
 
     @Override
     public long countGermplasmByName(String name, GetGermplasmByNameModes mode, Operation op, Integer status, GermplasmNameType type,
             Database instance) throws MiddlewareQueryException {
-        long count = 0;
         String nameToUse = GermplasmDataManagerUtil.getNameToUseByMode(name, mode);
-        if (setWorkingDatabase(instance)) {
-            count = getGermplasmDao().countByName(nameToUse, op, status, type);
-        }
-        return count;
+        return super.countAllFromInstanceByMethod(getGermplasmDao(), instance, "countByName", new Object[] { nameToUse, op, status, type },
+                new Class[] { String.class, Operation.class, Integer.class, GermplasmNameType.class });
     }
 
     @Override
     public long countGermplasmByName(String name, Operation operation) throws MiddlewareQueryException {
         List<String> names = GermplasmDataManagerUtil.createNamePermutations(name);
-        long count = 0;
-        if (setWorkingDatabase(Database.LOCAL)) {
-            count += getGermplasmDao().countByName(names, operation);
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            count += getGermplasmDao().countByName(names, operation);
-        }
-        return count;
+        return super.countAllFromCentralAndLocalByMethod(getGermplasmDao(), "countByName", new Object[] { names, operation }, new Class[] {
+                List.class, Operation.class });
     }
 
     @Override
@@ -805,14 +566,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public List<Method> getAllMethods() throws MiddlewareQueryException {
-        List<Method> methods = new ArrayList<Method>();
-        if (setWorkingDatabase(Database.LOCAL)) {
-            methods.addAll(getMethodDao().getAllMethod());
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            methods.addAll(getMethodDao().getAllMethod());
-        }
-        return methods;
+        return (List<Method>) getAllFromCentralAndLocalByMethod(getMethodDao(), "getAllMethod", new Object[] {}, new Class[] {});
     }
 
     @Override
@@ -822,157 +576,46 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public List<Method> getMethodsByType(String type) throws MiddlewareQueryException {
-        List<Method> methods = new ArrayList<Method>();
-
-        if (setWorkingDatabase(Database.LOCAL)) {
-            methods.addAll(getMethodDao().getByType(type));
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            methods.addAll(getMethodDao().getByType(type));
-        }
-        return methods;
+        return (List<Method>) super.getAllFromCentralAndLocalByMethod(getMethodDao(), "getByType", new Object[] { type },
+                new Class[] { String.class });
     }
 
     @Override
     public List<Method> getMethodsByType(String type, int start, int numOfRows) throws MiddlewareQueryException {
-        List<Method> methods = new ArrayList<Method>();
-
-        long centralCount = 0;
-        long localCount = 0;
-        long relativeLimit = 0;
-
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            MethodDAO dao = getMethodDao();
-            centralCount = dao.countByType(type);
-
-            if (centralCount > start) {
-                methods.addAll(dao.getByType(type, start, numOfRows));
-                relativeLimit = numOfRows - (centralCount - start);
-                if (relativeLimit > 0) {
-                    if (setWorkingDatabase(Database.LOCAL)) {
-                        dao = getMethodDao();
-                        localCount = dao.countByType(type);
-                        if (localCount > 0) {
-                            methods.addAll(dao.getByType(type, 0, (int) relativeLimit));
-                        }
-                    }
-                }
-
-            } else {
-                relativeLimit = start - centralCount;
-                if (setWorkingDatabase(Database.LOCAL)) {
-                    dao = getMethodDao();
-                    localCount = dao.countByType(type);
-                    if (localCount > relativeLimit) {
-                        methods.addAll(dao.getByType(type, (int) relativeLimit, numOfRows));
-                    }
-                }
-            }
-
-        } else if (setWorkingDatabase(Database.LOCAL)) {
-            MethodDAO dao = getMethodDao();
-            localCount = dao.countByType(type);
-            if (localCount > start) {
-                methods.addAll(dao.getByType(type, start, numOfRows));
-            }
-        }
-
-        return methods;
+        List<String> methods = Arrays.asList("countByType", "getByType");
+        return (List<Method>) super.getFromCentralAndLocalByMethod(getMethodDao(), methods, start, numOfRows, new Object[] { type },
+                new Class[] { String.class });
     }
 
     @Override
     public long countMethodsByType(String type) throws MiddlewareQueryException {
-        long numberOfMethods = 0L;
-        if (setWorkingDatabase(Database.LOCAL)) {
-            numberOfMethods += getMethodDao().countByType(type);
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            numberOfMethods += getMethodDao().countByType(type);
-        }
-        return numberOfMethods;
+        return super
+                .countAllFromCentralAndLocalByMethod(getMethodDao(), "countByType", new Object[] { type }, new Class[] { String.class });
     }
 
     @Override
     public List<Method> getMethodsByGroup(String group) throws MiddlewareQueryException {
-        List<Method> methods = new ArrayList<Method>();
-        if (setWorkingDatabase(Database.LOCAL)) {
-            methods.addAll(getMethodDao().getByGroup(group));
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            methods.addAll(getMethodDao().getByGroup(group));
-        }
-        return methods;
+        return (List<Method>) super.getAllFromCentralAndLocalByMethod(getMethodDao(), "getByGroup", new Object[] { group },
+                new Class[] { String.class });
     }
 
     @Override
     public List<Method> getMethodsByGroup(String group, int start, int numOfRows) throws MiddlewareQueryException {
-        List<Method> methods = new ArrayList<Method>();
-
-        long centralCount = 0;
-        long localCount = 0;
-        long relativeLimit = 0;
-
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            MethodDAO dao = getMethodDao();
-            centralCount = dao.countByGroup(group);
-
-            if (centralCount > start) {
-                methods.addAll(dao.getByGroup(group, start, numOfRows));
-                relativeLimit = numOfRows - (centralCount - start);
-                if (relativeLimit > 0) {
-                    if (setWorkingDatabase(Database.LOCAL)) {
-                        dao = getMethodDao();
-                        localCount = dao.countByGroup(group);
-                        if (localCount > 0) {
-                            methods.addAll(dao.getByGroup(group, 0, (int) relativeLimit));
-                        }
-                    }
-                }
-
-            } else {
-                relativeLimit = start - centralCount;
-                if (setWorkingDatabase(Database.LOCAL)) {
-                    dao = getMethodDao();
-                    localCount = dao.countByGroup(group);
-                    if (localCount > relativeLimit) {
-                        methods.addAll(dao.getByGroup(group, (int) relativeLimit, numOfRows));
-                    }
-                }
-            }
-
-        } else if (setWorkingDatabase(Database.LOCAL)) {
-            MethodDAO dao = getMethodDao();
-            localCount = dao.countByGroup(group);
-            if (localCount > start) {
-                methods.addAll(dao.getByGroup(group, start, numOfRows));
-            }
-        }
-        return methods;
+        List<String> methods = Arrays.asList("countByGroup", "getByGroup");
+        return (List<Method>) super.getFromCentralAndLocalByMethod(getMethodDao(), methods, start, numOfRows, new Object[] { group },
+                new Class[] { String.class });
     }
 
     @Override
     public List<Method> getMethodsByGroupAndType(String group, String type) throws MiddlewareQueryException {
-        List<Method> methods = new ArrayList<Method>();
-
-        if (setWorkingDatabase(Database.LOCAL)) {
-            methods.addAll(getMethodDao().getByGroupAndType(group, type));
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            methods.addAll(getMethodDao().getByGroupAndType(group, type));
-        }
-        return methods;
+        return (List<Method>) super.getAllFromCentralAndLocalByMethod(getMethodDao(), "getByGroupAndType", new Object[] { group, type },
+                new Class[] { String.class, String.class });
     }
 
     @Override
     public long countMethodsByGroup(String group) throws MiddlewareQueryException {
-        long numberOfMethods = 0L;
-        if (setWorkingDatabase(Database.LOCAL)) {
-            numberOfMethods += getMethodDao().countByGroup(group);
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            numberOfMethods += getMethodDao().countByGroup(group);
-        }
-        return numberOfMethods;
+        return super.countAllFromCentralAndLocalByMethod(getMethodDao(), "countByGroup", new Object[] { group },
+                new Class[] { String.class });
     }
 
     @Override
@@ -1321,60 +964,14 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public List<Germplasm> getManagementNeighbors(Integer gid, int start, int numOfRows) throws MiddlewareQueryException {
-        List<Germplasm> germplasms = new ArrayList<Germplasm>();
-
-        long centralCount = 0;
-        long localCount = 0;
-        long relativeLimit = 0;
-
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            GermplasmDAO dao = getGermplasmDao();
-            centralCount = dao.countManagementNeighbors(gid);
-
-            if (centralCount > start) {
-                germplasms.addAll(dao.getManagementNeighbors(gid, start, numOfRows));
-                relativeLimit = numOfRows - (centralCount - start);
-                if (relativeLimit > 0) {
-                    if (setWorkingDatabase(Database.LOCAL)) {
-                        dao = getGermplasmDao();
-                        localCount = dao.countManagementNeighbors(gid);
-                        if (localCount > 0) {
-                            germplasms.addAll(dao.getManagementNeighbors(gid, 0, (int) relativeLimit));
-                        }
-                    }
-                }
-
-            } else {
-                relativeLimit = start - centralCount;
-                if (setWorkingDatabase(Database.LOCAL)) {
-                    dao = getGermplasmDao();
-                    localCount = dao.countManagementNeighbors(gid);
-                    if (localCount > relativeLimit) {
-                        germplasms.addAll(dao.getManagementNeighbors(gid, (int) relativeLimit, numOfRows));
-                    }
-                }
-            }
-
-        } else if (setWorkingDatabase(Database.LOCAL)) {
-            GermplasmDAO dao = getGermplasmDao();
-            localCount = dao.countManagementNeighbors(gid);
-            if (localCount > start) {
-                germplasms.addAll(dao.getManagementNeighbors(gid, start, numOfRows));
-            }
-        }
-
-        return germplasms;
+        List<String> methods = Arrays.asList("countManagementNeighbors", "getManagementNeighbors");
+        return (List<Germplasm>) super.getFromCentralAndLocalByMethod(getGermplasmDao(), methods, start, numOfRows, new Object[] { gid },
+                new Class[] { Integer.class });
     }
 
     public long countManagementNeighbors(Integer gid) throws MiddlewareQueryException {
-        long count = 0;
-        if (setWorkingDatabase(Database.LOCAL)) {
-            count = count + getGermplasmDao().countManagementNeighbors(gid);
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            count = count + getGermplasmDao().countManagementNeighbors(gid);
-        }
-        return count;
+        return super.countAllFromCentralAndLocalByMethod(getGermplasmDao(), "countManagementNeighbors", new Object[] { gid },
+                new Class[] { Integer.class });
     }
 
     @Override
@@ -1793,67 +1390,31 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public List<GidNidElement> getGidAndNidByGermplasmNames(List<String> germplasmNames) throws MiddlewareQueryException {
-        List<GidNidElement> results = new ArrayList<GidNidElement>();
-
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            results.addAll(getNameDao().getGidAndNidByGermplasmNames(germplasmNames));
-        }
-        if (setWorkingDatabase(Database.LOCAL)) {
-            results.addAll(getNameDao().getGidAndNidByGermplasmNames(germplasmNames));
-        }
-        return results;
+        return (List<GidNidElement>) super.getAllFromCentralAndLocalByMethod(getNameDao(), "getGidAndNidByGermplasmNames",
+                new Object[] { germplasmNames }, new Class[]{List.class});
     }
 
     @Override
     public List<Country> getAllCountry() throws MiddlewareQueryException {
-        List<Country> country = new ArrayList<Country>();
-        if (setWorkingDatabase(Database.LOCAL)) {
-            country.addAll(getCountryDao().getAllCountry());
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            country.addAll(getCountryDao().getAllCountry());
-        }
-        return country;
+        return (List<Country>) super.getAllFromCentralAndLocalByMethod(getCountryDao(), "getAllCountry", new Object[] {}, new Class[] {});
     }
 
     @Override
     public List<Location> getLocationsByCountryAndType(Country country, Integer type) throws MiddlewareQueryException {
-        List<Location> locations = new ArrayList<Location>();
-
-        if (setWorkingDatabase(Database.LOCAL)) {
-            locations.addAll(getLocationDao().getByCountryAndType(country, type));
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            locations.addAll(getLocationDao().getByCountryAndType(country, type));
-        }
-        return locations;
+        return (List<Location>) super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getByCountryAndType", new Object[] { country,
+                type}, new Class[]{Country.class, Integer.class});
     }
 
     @Override
     public List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(String tableName, String fieldType)
             throws MiddlewareQueryException {
-        List<UserDefinedField> userDefineField = new ArrayList<UserDefinedField>();
-
-        if (setWorkingDatabase(Database.LOCAL)) {
-            userDefineField.addAll(getUserDefinedFieldDao().getByFieldTableNameAndType(tableName, fieldType));
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            userDefineField.addAll(getUserDefinedFieldDao().getByFieldTableNameAndType(tableName, fieldType));
-        }
-        return userDefineField;
+        return (List<UserDefinedField>) super.getAllFromCentralAndLocalByMethod(getUserDefinedFieldDao(), "getByFieldTableNameAndType",
+                new Object[] { tableName, fieldType }, new Class[] { String.class, String.class });
     }
 
     @Override
     public List<Method> getMethodsByGroupIncludesGgroup(String group) throws MiddlewareQueryException {
-        List<Method> methods = new ArrayList<Method>();
-
-        if (setWorkingDatabase(Database.LOCAL)) {
-            methods.addAll(getMethodDao().getByGroupIncludesGgroup(group));
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            methods.addAll(getMethodDao().getByGroupIncludesGgroup(group));
-        }
-        return methods;
+        return (List<Method>) super.getAllFromCentralAndLocalByMethod(getMethodDao(), "getByGroupIncludesGgroup", new Object[] { group }, new Class[]{String.class});
     }
 
     public String getCrossExpansion(Integer gid, int level) throws MiddlewareQueryException {

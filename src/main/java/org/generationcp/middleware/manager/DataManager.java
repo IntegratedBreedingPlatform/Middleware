@@ -329,7 +329,7 @@ public abstract class DataManager{
         }
         return parameterTypes;
     }
-
+    
     /**
      * Returns all the entities from both central and local databases based on the given DAO.
      * 
@@ -413,7 +413,8 @@ public abstract class DataManager{
      * 
      *      public List<Location> getLocationsByCountry(Country country, int start, int numOfRows) throws MiddlewareQueryException {
      *          List<String> methods = Arrays.asList("countByCountry", "getByCountry");
-     *          return (List<Location>) getFromCentralAndLocalByMethod(getLocationDao(), methods, start, numOfRows, new Object[]{country});
+     *          return (List<Location>) getFromCentralAndLocalByMethod(getLocationDao(), methods, start, numOfRows, new Object[]{country},
+     *                                      new Class[]{Country.class});
      *      }
      * 
      * @param dao - the DAO to call the methods from
@@ -421,11 +422,12 @@ public abstract class DataManager{
      * @param start - the start row
      * @param numOfRows - number of rows to retrieve
      * @param parameters - the parameters to be passed to the methods
+     * @param parameterTypes - the types of the parameters to be passed to the method
      * @return List of all records satisfying the given parameters
      * @throws MiddlewareQueryException
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public List getFromCentralAndLocalByMethod(GenericDAO dao, List<String> methods, int start, int numOfRows, Object[] parameters)
+    public List getFromCentralAndLocalByMethod(GenericDAO dao, List<String> methods, int start, int numOfRows, Object[] parameters, Class[] parameterTypes)
             throws MiddlewareQueryException {
         List toReturn = new ArrayList();
         long centralCount = 0;
@@ -433,7 +435,7 @@ public abstract class DataManager{
         long relativeLimit = 0;
 
         // Get count method parameter types and parameters
-        Class[] countMethodParameterTypes = getParameterTypes(parameters);
+        Class[] countMethodParameterTypes = parameterTypes;
         Object[] countMethodParameters = parameters;
 
         // Get get method parameter types and parameters
@@ -442,7 +444,7 @@ public abstract class DataManager{
 
         int i = 0;
         for (i = 0; i < parameters.length; i++) {
-            getMethodParameterTypes[i] = parameters[i].getClass();
+            getMethodParameterTypes[i] = parameterTypes[i];
             getMethodParameters[i] = parameters[i];
         }
         getMethodParameterTypes[i] = Integer.TYPE;
@@ -503,21 +505,21 @@ public abstract class DataManager{
      * Sample usage: 
      *  
      *      public List<Location> getLocationsByType(Integer type) throws MiddlewareQueryException {
-     *          return (List<Location>) getAllListFromCentralAndLocalByMethod(getLocationDao(), "getByType", new Object[]{type});
+     *          return (List<Location>) getAllListFromCentralAndLocalByMethod(getLocationDao(), "getByType", new Object[]{type},
+     *                      new Class[]{Integer.class});
      *      }
      * 
      * @param dao - the DAO to call the method from
      * @param methodName - the method to call
-     * @param parameterTypes - the types of the parameters to be passed to the method
      * @param parameters - the parameters to be passed to the method
+     * @param parameterTypes - the types of the parameters to be passed to the method
      * @return the List result
      * @throws MiddlewareQueryException
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public List getAllFromCentralAndLocalByMethod(GenericDAO dao, String methodName, Object[] parameters)
+    public List getAllFromCentralAndLocalByMethod(GenericDAO dao, String methodName, Object[] parameters, Class[] parameterTypes)
             throws MiddlewareQueryException {
         List toReturn = new ArrayList();
-        Class[] parameterTypes = getParameterTypes(parameters);
         try {
             java.lang.reflect.Method method = dao.getClass().getMethod(methodName, parameterTypes);
     
@@ -534,33 +536,40 @@ public abstract class DataManager{
     }
 
     /**
-     * A generic implementation of the countAllXXX(Database instance) method that calls countAll() from Generic DAO.
-     * Returns the count of entities from both central and local databases based on the given DAO.
+     * A generic implementation of the getXXXByXXXX(Database instance) method that calls a specific get method from a DAO.
+     * Calls the corresponding method that returns list type as specified in the parameter methodName.
      * 
-     * Sample usage:
-     *      
+     * Sample usage: 
+     *      public List<Germplasm> getGermplasmByPrefName(String name, int start, int numOfRows, Database instance) throws MiddlewareQueryException {
+     *        return (List<Germplasm>) getFromInstanceByMethod(getGermplasmDao(), instance, "getByPrefName", new Object[]{name, start, numOfRows}, 
+     *              new Class[]{String.class, Integer.TYPE, Integer.TYPE});
+     *    }
+     * 
      * @param dao - the DAO to call the method from
-     * @param instance - the database instance to query from
-     * @return the number of entities from both central and local instances
+     * @param methodName - the method to call
+     * @param parameters - the parameters to be passed to the method. If the referenced DAO method has parameters start and numOfRows, you may add them to this
+     * @param parameterTypes - the types of the parameters passed to the methods
+     * @return the List result
      * @throws MiddlewareQueryException
      */
-    @SuppressWarnings("rawtypes")
-    protected long countAllFromInstance(GenericDAO dao, Database instance) throws MiddlewareQueryException {
-        long count = 0;
-        Session session = null;
-        
-        if (instance == Database.CENTRAL){
-            session =  getCurrentSessionForCentral();
-        } else if (instance == Database.LOCAL){
-            session =  getCurrentSessionForLocal();
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public List getFromInstanceByMethod(GenericDAO dao, Database instance, String methodName, Object[] parameters, Class[] parameterTypes)
+            throws MiddlewareQueryException {
+        List toReturn = new ArrayList();
+        try {
+            java.lang.reflect.Method method = dao.getClass().getMethod(methodName, parameterTypes);
+
+            if (setWorkingDatabase(instance)) {
+                toReturn.addAll((List) method.invoke(dao, parameters));
+            }
+        } catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException
+            e.printStackTrace();
+            logAndThrowException("Error in calling " + methodName + "(): " + e.getMessage(), e);
         }
-        
-        if (setDaoSession(dao, session)) {
-            count = count + dao.countAll();
-        }
-        return count;
+        return toReturn;
     }
-    
+
+
     /**
      * A generic implementation of the countAllXXX() method that calls countAll() from Generic DAO.
      * Returns the count of entities from both central and local databases based on the given DAO.
@@ -595,21 +604,20 @@ public abstract class DataManager{
      * Sample usage:
      *  
      *  public long countLocationsByCountry(Country country) throws MiddlewareQueryException {
-     *      return countAllFromCentralAndLocalByMethod(getLocationDao(), "countByCountry", new Object[]{country});
+     *      return countAllFromCentralAndLocalByMethod(getLocationDao(), "countByCountry", new Object[]{country}, new Class[]{Country.class});
      *  }
      * 
      * @param dao - the DAO to call the method from
      * @param methodName - the method to call
-     * @param parameterTypes - the types of the parameters to be passed to the method
      * @param parameters - the parameters to be passed to the method
+     * @param parameterTypes - the types of the parameters to be passed to the method
      * @return the count
      * @throws MiddlewareQueryException
      */
     @SuppressWarnings("rawtypes")
-    public long countAllFromCentralAndLocalByMethod(GenericDAO dao, String methodName, Object[] parameters)
+    public long countAllFromCentralAndLocalByMethod(GenericDAO dao, String methodName, Object[] parameters, Class[] parameterTypes)
             throws MiddlewareQueryException {
         long count = 0;
-        Class[] parameterTypes = getParameterTypes(parameters);
         try {
             java.lang.reflect.Method countMethod = dao.getClass().getMethod(methodName, parameterTypes);
 
@@ -620,7 +628,36 @@ public abstract class DataManager{
                 count = count + ((Long) countMethod.invoke(dao, parameters)).intValue();
             }
         } catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException
+            e.printStackTrace();
             logAndThrowException("Error in counting: " + e.getMessage(), e);
+        }
+        return count;
+    }
+
+    /**
+     * A generic implementation of the countAllXXX(Database instance) method that calls countAll() from Generic DAO.
+     * Returns the count of entities from both central and local databases based on the given DAO.
+     * 
+     * Sample usage:
+     *      
+     * @param dao - the DAO to call the method from
+     * @param instance - the database instance to query from
+     * @return the number of entities from both central and local instances
+     * @throws MiddlewareQueryException
+     */
+    @SuppressWarnings("rawtypes")
+    protected long countAllFromInstance(GenericDAO dao, Database instance) throws MiddlewareQueryException {
+        long count = 0;
+        Session session = null;
+        
+        if (instance == Database.CENTRAL){
+            session =  getCurrentSessionForCentral();
+        } else if (instance == Database.LOCAL){
+            session =  getCurrentSessionForLocal();
+        }
+        
+        if (setDaoSession(dao, session)) {
+            count = count + dao.countAll();
         }
         return count;
     }
@@ -632,19 +669,24 @@ public abstract class DataManager{
      * 
      * Sample usage:
      *  
+     *      public long countGermplasmByName(String name, GetGermplasmByNameModes mode, Operation op, Integer status, GermplasmNameType type,
+     *            Database instance) throws MiddlewareQueryException {
+     *        String nameToUse = GermplasmDataManagerUtil.getNameToUseByMode(name, mode);
+     *        return super.countAllFromInstanceByMethod(getGermplasmDao(), instance, "countByName", new Object[] { nameToUse, op, status, type },
+     *                new Class[] { String.class, Operation.class, Integer.class, GermplasmNameType.class });
+     *    }
      * 
      * @param dao - the DAO to call the method from
      * @param methodName - the method to call
-     * @param parameterTypes - the types of the parameters to be passed to the method
      * @param parameters - the parameters to be passed to the method
+     * @param parameterTypes - the types of the parameters to be passed to the method
      * @return the count
      * @throws MiddlewareQueryException
      */
     @SuppressWarnings("rawtypes")
-    public long countAllFromInstanceByMethod(GenericDAO dao, Database instance, String methodName, Object[] parameters)
+    public long countAllFromInstanceByMethod(GenericDAO dao, Database instance, String methodName, Object[] parameters, Class[] parameterTypes)
             throws MiddlewareQueryException {
         long count = 0;
-        Class[] parameterTypes = getParameterTypes(parameters);
         try {
             java.lang.reflect.Method countMethod = dao.getClass().getMethod(methodName, parameterTypes);
 
@@ -666,6 +708,7 @@ public abstract class DataManager{
      */
     protected void logAndThrowException(String message, Throwable e) throws MiddlewareQueryException {
         LOG.error(message);
+        e.printStackTrace();
         throw new MiddlewareQueryException(message);
     }
 
