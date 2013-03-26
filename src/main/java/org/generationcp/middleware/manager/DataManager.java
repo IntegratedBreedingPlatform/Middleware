@@ -137,14 +137,12 @@ public abstract class DataManager{
     }
 
     /**
-     * Utility method that returns the appropriate {@link Session} based on the
-     * given database instance.
+     * Utility method that returns the appropriate {@link Session} based on the given database instance.
      * 
      * @param instance
      * @return
      * @throws MiddlewareQueryException
-     *             if a {@link Session} for the specified database instance is
-     *             not available
+     *             if a {@link Session} for the specified database instance is not available
      */
     protected Session getSession(Database instance) throws MiddlewareQueryException {
         if (instance == Database.CENTRAL) {
@@ -169,8 +167,7 @@ public abstract class DataManager{
     }
 
     /**
-     * Utility method that returns the appropriate {@link Session} based on the
-     * specified <code>id</code>.
+     * Utility method that returns the appropriate {@link Session} based on the specified <code>id</code>.
      * 
      * @param id
      * @return the {@link Session} for the central database if the specified
@@ -224,19 +221,28 @@ public abstract class DataManager{
         return false;
     }
 
+    /** 
+     * Retrieves the current active session - either local or central database connection.
+     * 
+     * @return
+     */
     protected Session getActiveSession() {
         return activeSession;
     }
 
+    /**
+     * Sets the current active session - either local or central.
+     * @param session
+     */
     protected void setActiveSession(Session session) {
         this.activeSession = session;
     }
 
     /**
-     * Sets the active session based on the given instance. 
-     * Returns true if the active session is not null.
+     * Sets the active session based on the given instance. <br/>
+     * Returns true if the active session is not null.      <br/>
      * @param instance 
-     *          - The database instance - either Database.LOCAL or Database.CENTRAL
+     *          The database instance - either Database.LOCAL or Database.CENTRAL
      */
     protected boolean setWorkingDatabase(Database instance) {
         if (instance == Database.LOCAL) {
@@ -251,10 +257,11 @@ public abstract class DataManager{
     }
 
     /**
-     * Sets the active session based on the given ID.
-     * If the id is positive, the central connection is assigned as the active session. 
-     * If the id is negative, the local connection is assigned as the active session. 
-     * Returns true if the active session is not null.
+     * Sets the active session based on the given ID.   <br/>
+     * If the id is positive, the central connection is assigned as the active session. <br/> 
+     * If the id is negative, the local connection is assigned as the active session.  <br/>
+     * Returns true if the active session is not null. <br/>
+     * 
      * @param id
      */
     protected boolean setWorkingDatabase(Integer id) {
@@ -266,8 +273,9 @@ public abstract class DataManager{
     }
 
     /**
-     * Sets the active session based on the session.
-     * Returns true if the active session is not null.
+     * Sets the active session based on the session.     <br/>
+     * Returns true if the active session is not null.   <br/>
+     * 
      * @param session The session to assign
      */
     protected boolean setWorkingDatabase(Session session) {
@@ -279,11 +287,10 @@ public abstract class DataManager{
     }
 
     /**
-     * Sets the active session based on the given instance. 
-     * Returns true if the active session is not null.
-     * @param instance 
-     *          - The database instance - either Database.LOCAL or Database.CENTRAL
-     * @param dao - The DAO to set the active session into
+     * Sets the active session based on the given instance.     <br/>
+     * Returns true if the active session is not null.          <br/>
+     * @param instance  The database instance - either Database.LOCAL or Database.CENTRAL
+     * @param dao   The DAO to set the active session into
      */
     @SuppressWarnings("rawtypes")
     protected boolean setWorkingDatabase(Database instance, GenericDAO dao) {
@@ -299,12 +306,13 @@ public abstract class DataManager{
     }
 
     /**
-     * Sets the active session based on the given instance. 
-     * Returns true if the active session is not null.
+     * Sets the active session based on the given instance.         <br/>
+     * Returns true if the active session is not null.              <br/>
      * @param id
-     *          - If the given id is positive, the session is set to Central
-     *            If the given id is negative, the session is set to Local
-     * @param dao - The DAO to set the active session into
+     *          If the given id is positive, the session is set to Central.
+     *          If the given id is negative, the session is set to Local.
+     * @param dao 
+     *          The DAO to set the active session into
      */
     @SuppressWarnings("rawtypes")
     protected boolean setWorkingDatabase(Integer id, GenericDAO dao) {
@@ -320,36 +328,36 @@ public abstract class DataManager{
     }
 
     /**
-     * Gets the parameter types of given parameters
+     * Gets the parameter types of given parameters.        <br/>
      * 
      * @param parameters
      * @return Class[] of parameter types
      */
     @SuppressWarnings({ "unused", "rawtypes" })
-    private Class[] getParameterTypes(Object[] parameters){
+    private Class[] getParameterTypes(Object[] parameters) {
         Class[] parameterTypes = new Class[parameters.length];
         if (parameters == null) {
             parameters = new Object[] {};
         }
         for (int i = 0; i < parameters.length; i++) {
             Class parameterClass = parameters[i].getClass();
-            if (parameterClass.isPrimitive()){
-                String parameterClassName = parameterClass.getName(); 
-                if (parameterClassName.equals("boolean")){
+            if (parameterClass.isPrimitive()) {
+                String parameterClassName = parameterClass.getName();
+                if (parameterClassName.equals("boolean")) {
                     parameterTypes[i] = Boolean.TYPE;
-                } else if (parameterClassName.equals("byte")){
+                } else if (parameterClassName.equals("byte")) {
                     parameterTypes[i] = Byte.TYPE;
-                } else if (parameterClassName.equals("char")){
+                } else if (parameterClassName.equals("char")) {
                     parameterTypes[i] = Character.TYPE;
-                } else if (parameterClassName.equals("double")){
+                } else if (parameterClassName.equals("double")) {
                     parameterTypes[i] = Double.TYPE;
-                } else if (parameterClassName.equals("float")){
+                } else if (parameterClassName.equals("float")) {
                     parameterTypes[i] = Float.TYPE;
-                } else if (parameterClassName.equals("int")){
+                } else if (parameterClassName.equals("int")) {
                     parameterTypes[i] = Integer.TYPE;
-                } else if (parameterClassName.equals("long")){
+                } else if (parameterClassName.equals("long")) {
                     parameterTypes[i] = Long.TYPE;
-                } else if (parameterClassName.equals("short")){
+                } else if (parameterClassName.equals("short")) {
                     parameterTypes[i] = Short.TYPE;
                 }
                 // void?
@@ -359,16 +367,16 @@ public abstract class DataManager{
         }
         return parameterTypes;
     }
-    
+
     /**
-     * Returns all the entities from both central and local databases based on the given DAO.
+     * Returns all the entities from both central and local databases based on the given DAO.   <br/>
      * 
-     * @param 
+     * @param dao 
      * @return
      * @throws MiddlewareQueryException
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    protected List getAllFromCentralAndLocal(GenericDAO dao) throws MiddlewareQueryException {
+    public List getAllFromCentralAndLocal(GenericDAO dao) throws MiddlewareQueryException {
         List toReturn = new ArrayList();
         if (setDaoSession(dao, getCurrentSessionForLocal())) {
             toReturn.addAll(dao.getAll());
@@ -380,24 +388,25 @@ public abstract class DataManager{
     }
 
     /**
-     * A generic implementation of the getAllXXX(int start, int numOfRows) that calls getAll() of GenericDAO.
-     * This gets all the records returned by the corresponding DAO.getAll() method for the given DAO.
-     * Retrieves from both local and central.
-     * 
-     * Sample usage:
-     * 
+     * A generic implementation of the getAllXXX(int start, int numOfRows) that calls getAll() of GenericDAO.   <br/>
+     * This gets all the records returned by the corresponding DAO.getAll() method for the given DAO.           <br/>
+     * Retrieves from both local and central.                                                                   <br/>
+     * <br/>
+     * Sample usage:<br/>
+     * <pre><code>
      *      public List<Location> getAllLocations(int start, int numOfRows) throws MiddlewareQueryException {
      *          return (List<Location>) getFromCentralAndLocal(getLocationDao(), start, numOfRows);
      *      }
-     * 
-     * @param dao - the DAO to call the method from
-     * @param start - the start row
-     * @param numOfRows - number of rows to retrieve
+     * </code></pre>
+     * @param dao   The DAO to call the method from
+     * @param start     The start row
+     * @param numOfRows     The number of rows to retrieve
      * @return List of all records
      * @throws MiddlewareQueryException
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public List getFromCentralAndLocal(GenericDAO dao, int start, int numOfRows) throws MiddlewareQueryException {
+        
         List toReturn = new ArrayList();
 
         long centralCount = 0;
@@ -436,29 +445,30 @@ public abstract class DataManager{
     }
 
     /**
-     * A generic implementation of the getXXX(Object parameter, int start, int numOfRows).
-     * Calls the corresponding getXXX method as specified in the second value in the list of methods parameter.
-     * 
-     * Sample usage: 
-     * 
+     * A generic implementation of the getXXX(Object parameter, int start, int numOfRows).      <br/>
+     * Calls the corresponding getXXX method as specified in the second value in the list of methods parameter.     <br/>
+     * <br/>
+     * Sample usage:<br/> 
+     * <pre><code>
      *      public List<Location> getLocationsByCountry(Country country, int start, int numOfRows) throws MiddlewareQueryException {
      *          List<String> methods = Arrays.asList("countByCountry", "getByCountry");
      *          return (List<Location>) getFromCentralAndLocalByMethod(getLocationDao(), methods, start, numOfRows, new Object[]{country},
      *                                      new Class[]{Country.class});
      *      }
-     * 
-     * @param dao - the DAO to call the methods from
-     * @param methods - the methods to call (countXXX and its corresponding getXXX)
-     * @param start - the start row
-     * @param numOfRows - number of rows to retrieve
-     * @param parameters - the parameters to be passed to the methods
-     * @param parameterTypes - the types of the parameters to be passed to the method
+     * </code></pre>
+     * @param dao   The DAO to call the methods from
+     * @param methods   The methods to call (countXXX and its corresponding getXXX)
+     * @param start     The start row
+     * @param numOfRows     The number of rows to retrieve
+     * @param parameters    The parameters to be passed to the methods
+     * @param parameterTypes    The types of the parameters to be passed to the method
      * @return List of all records satisfying the given parameters
      * @throws MiddlewareQueryException
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public List getFromCentralAndLocalByMethod(GenericDAO dao, List<String> methods, int start, int numOfRows, Object[] parameters, Class[] parameterTypes)
-            throws MiddlewareQueryException {
+    public List getFromCentralAndLocalByMethod(GenericDAO dao, List<String> methods, int start, int numOfRows, Object[] parameters,
+            Class[] parameterTypes) throws MiddlewareQueryException {
+        
         List toReturn = new ArrayList();
         long centralCount = 0;
         long localCount = 0;
@@ -527,40 +537,44 @@ public abstract class DataManager{
         return toReturn;
 
     }
-    
+
     /**
-     * A generic implementation of the getXXX(Object parameter, int start, int numOfRows).
-     * Calls the corresponding getXXX method as specified in the second value in the list of methods parameter.
-     * Separates the positive from negative ids and retrieves from central and local databases respectively.
-     * The ids are stored in the first index of the "parameters" parameter
-     * 
-     * Sample usage: 
-     *
+     * A generic implementation of the getXXX(Object parameter, int start, int numOfRows).      <br/>
+     * Calls the corresponding getXXX method as specified in the second value in the list of methods parameter.      <br/>
+     * Separates the positive from negative ids and retrieves from central and local databases respectively.       <br/>
+     * The ids are stored in the first index of the "parameters" parameter.       <br/>
+     *      <br/>
+     * Sample usage:     <br/>    
+     * <pre><code>
+     *      public List<AccMetadataSetPK> getGdmsAccMetadatasetByGid(List<Integer> gids, int start, int numOfRows) throws MiddlewareQueryException {
+     *          List<String> methods = Arrays.asList("countAccMetadataSetByGids", "getAccMetadasetByGids");
+     *          return (List<AccMetadataSetPK>) super.getFromCentralAndLocalBySignedIdAndMethod(getAccMetadataSetDao(), methods, start, numOfRows,
+     *                    new Object[] { gids }, new Class[] { List.class });
      *      }
-     * 
-     * @param dao - the DAO to call the methods from
-     * @param methods - the methods to call (countXXX and its corresponding getXXX)
-     * @param start - the start row
-     * @param numOfRows - number of rows to retrieve
-     * @param parameters - the parameters to be passed to the methods
-     * @param parameterTypes - the types of the parameters to be passed to the method
+     * </code></pre>
+     * @param dao   The DAO to call the methods from
+     * @param methods   The methods to call (countXXX and its corresponding getXXX)
+     * @param start     The start row
+     * @param numOfRows The number of rows to retrieve
+     * @param parameters    The parameters to be passed to the methods
+     * @param parameterTypes    The types of the parameters to be passed to the method
      * @return List of all records satisfying the given parameters
      * @throws MiddlewareQueryException
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public List getFromCentralAndLocalBySignedIdAndMethod(GenericDAO dao, List<String> methods, int start, int numOfRows, Object[] parameters, Class[] parameterTypes)
-            throws MiddlewareQueryException {
+    public List getFromCentralAndLocalBySignedIdAndMethod(GenericDAO dao, List<String> methods, int start, int numOfRows,
+            Object[] parameters, Class[] parameterTypes) throws MiddlewareQueryException {
         List toReturn = new ArrayList();
         long centralCount = 0;
         long localCount = 0;
         long relativeLimit = 0;
 
         //Separate the positive ids from the negative ids
-        
+
         List<Integer> ids = (List<Integer>) parameters[0];
         List<Integer> positiveIds = getPositiveIds(ids);
         List<Integer> negativeIds = getNegativeIds(ids);
-        
+
         // Get count method parameter types and parameters
         Class[] countMethodParameterTypes = parameterTypes;
         Object[] countMethodParameters = parameters;
@@ -634,30 +648,32 @@ public abstract class DataManager{
     }
 
     /**
-     * A generic implementation of the getXXXByXXXX() method that calls a specific get method from a DAO.
-     * Calls the corresponding method that returns list type as specified in the parameter methodName.
-     * 
-     * Sample usage: 
-     *  
+     * A generic implementation of the getXXXByXXXX() method that calls a specific get method from a DAO.     <br/> 
+     * Calls the corresponding method that returns list type as specified in the parameter methodName.         <br/>
+     *      <br/>
+     * Sample usage:     <br/> 
+     *  <pre><code>
      *      public List<Location> getLocationsByType(Integer type) throws MiddlewareQueryException {
      *          return (List<Location>) getAllListFromCentralAndLocalByMethod(getLocationDao(), "getByType", new Object[]{type},
      *                      new Class[]{Integer.class});
      *      }
-     * 
-     * @param dao - the DAO to call the method from
-     * @param methodName - the method to call
-     * @param parameters - the parameters to be passed to the method
-     * @param parameterTypes - the types of the parameters to be passed to the method
+     *  </code></pre>
+     *  
+     * @param dao   The DAO to call the method from
+     * @param methodName    The method to call
+     * @param parameters    The parameters to be passed to the method
+     * @param parameterTypes    The types of the parameters to be passed to the method
      * @return the List result
      * @throws MiddlewareQueryException
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public List getAllFromCentralAndLocalByMethod(GenericDAO dao, String methodName, Object[] parameters, Class[] parameterTypes)
             throws MiddlewareQueryException {
+        
         List toReturn = new ArrayList();
         try {
             java.lang.reflect.Method method = dao.getClass().getMethod(methodName, parameterTypes);
-    
+
             if (setWorkingDatabase(Database.LOCAL, dao)) {
                 toReturn.addAll((List) method.invoke(dao, parameters));
             }
@@ -671,19 +687,20 @@ public abstract class DataManager{
     }
 
     /**
-     * A generic implementation of the getXXXByXXXX(Database instance) method that calls a specific get method from a DAO.
-     * Calls the corresponding method that returns list type as specified in the parameter methodName.
-     * 
-     * Sample usage: 
+     * A generic implementation of the getXXXByXXXX(Database instance) method that calls a specific get method from a DAO.     <br/>
+     * Calls the corresponding method that returns list type as specified in the parameter methodName.     <br/>
+     *      <br/>
+     * Sample usage:     <br/>  
+     * <pre><code>
      *      public List<Germplasm> getGermplasmByPrefName(String name, int start, int numOfRows, Database instance) throws MiddlewareQueryException {
      *        return (List<Germplasm>) getFromInstanceByMethod(getGermplasmDao(), instance, "getByPrefName", new Object[]{name, start, numOfRows}, 
      *              new Class[]{String.class, Integer.TYPE, Integer.TYPE});
      *    }
-     * 
-     * @param dao - the DAO to call the method from
-     * @param methodName - the method to call
-     * @param parameters - the parameters to be passed to the method. If the referenced DAO method has parameters start and numOfRows, you may add them to this
-     * @param parameterTypes - the types of the parameters passed to the methods
+     * </code></pre>
+     * @param dao   The DAO to call the method from
+     * @param methodName    The method to call
+     * @param parameters    The parameters to be passed to the method. If the referenced DAO method has parameters start and numOfRows, you may add them to this
+     * @param parameterTypes    The types of the parameters passed to the methods
      * @return the List result
      * @throws MiddlewareQueryException
      */
@@ -702,24 +719,25 @@ public abstract class DataManager{
         }
         return toReturn;
     }
-    
+
     /**
-     * A generic implementation of the getXXXByXXXX(Integer id, ...) method that calls a specific get method from a DAO. 
-     * This connects to the database corresponding to the value of the id (Local for negative id, Central for positive)
-     * Calls the corresponding method that returns list type as specified in the parameter methodName.
-     * 
-     * Sample usage: 
+     * A generic implementation of the getXXXByXXXX(Integer id, ...) method that calls a specific get method from a DAO.     <br/>  
+     * This connects to the database corresponding to the value of the id (Local for negative id, Central for positive).     <br/>   
+     * Calls the corresponding method that returns list type as specified in the parameter methodName.     <br/>  
+     *       <br/>
+     * Sample usage:     <br/> 
+     * <pre><code>
      *     public List<Integer> getMarkerIdsByDatasetId(Integer datasetId) throws MiddlewareQueryException {
      *        return (List<Integer>) super.getFromInstanceByIdAndMethod(getMarkerMetadataSetDao(), datasetId, "getMarkerIdByDatasetId", 
      *                new Object[]{datasetId}, new Class[]{Integer.class});
      *
      *    }
-     * 
-     * @param dao - the DAO to call the method from
-     * @param id - the id used to get the instance to connect to
-     * @param methodName - the method to call
-     * @param parameters - the parameters to be passed to the method. If the referenced DAO method has parameters start and numOfRows, you may add them to this
-     * @param parameterTypes - the types of the parameters passed to the methods
+     * <code></pre>
+     * @param dao   The DAO to call the method from
+     * @param id    The id used to get the instance to connect to
+     * @param methodName    The method to call
+     * @param parameters    The parameters to be passed to the method. If the referenced DAO method has parameters start and numOfRows, you may add them to this
+     * @param parameterTypes    The types of the parameters passed to the methods
      * @return the List result
      * @throws MiddlewareQueryException
      */
@@ -739,23 +757,22 @@ public abstract class DataManager{
         return toReturn;
     }
 
-
     /**
-     * A generic implementation of the countAllXXX() method that calls countAll() from Generic DAO.
-     * Returns the count of entities from both central and local databases based on the given DAO.
-     * 
-     * Sample usage:
-     * 
+     * A generic implementation of the countAllXXX() method that calls countAll() from Generic DAO.     <br/>
+     * Returns the count of entities from both central and local databases based on the given DAO.     <br/> 
+     *      <br/>
+     * Sample usage:     <br/>
+     * <pre><code>
      *     public long countAllLocations() throws MiddlewareQueryException {
      *          return countAllFromCentralAndLocal(getLocationDao());
      *     }
-     *     
-     * @param dao - the DAO to call the method from
-     * @return the number of entities from both central and local instances
+     * <code></pre>
+     * @param dao   The DAO to call the method from
+     * @return The number of entities from both central and local instances
      * @throws MiddlewareQueryException
      */
     @SuppressWarnings("rawtypes")
-    protected long countAllFromCentralAndLocal(GenericDAO dao) throws MiddlewareQueryException {
+    public long countAllFromCentralAndLocal(GenericDAO dao) throws MiddlewareQueryException {
         long count = 0;
         if (setDaoSession(dao, getCurrentSessionForLocal())) {
             count = count + dao.countAll();
@@ -767,20 +784,20 @@ public abstract class DataManager{
     }
 
     /**
-     * A generic implementation of the countByXXXX() method that calls a specific count method from a DAO.
-     * Calls the corresponding count method as specified in the parameter methodName. 
-     * Retrieves data from both local and central databases.
-     * 
-     * Sample usage:
-     *  
-     *  public long countLocationsByCountry(Country country) throws MiddlewareQueryException {
-     *      return countAllFromCentralAndLocalByMethod(getLocationDao(), "countByCountry", new Object[]{country}, new Class[]{Country.class});
+     * A generic implementation of the countByXXXX() method that calls a specific count method from a DAO.     <br/>  
+     * Calls the corresponding count method as specified in the parameter methodName.     <br/>                       
+     * Retrieves data from both local and central databases.      <br/>             
+     *      <br/> 
+     * Sample usage:     <br/>
+     *  <pre><code>
+     *  public long countLocationsByCountry(Country country) throws MiddlewareQueryException { 
+     *      return countAllFromCentralAndLocalByMethod(getLocationDao(), "countByCountry", new Object[]{country}, new Class[]{Country.class}); 
      *  }
-     * 
-     * @param dao - the DAO to call the method from
-     * @param methodName - the method to call
-     * @param parameters - the parameters to be passed to the method
-     * @param parameterTypes - the types of the parameters to be passed to the method
+     *  </code></pre>
+     * @param dao   The DAO to call the method from
+     * @param methodName    The method to call
+     * @param parameters    The parameters to be passed to the method
+     * @param parameterTypes    The types of the parameters to be passed to the method
      * @return the count
      * @throws MiddlewareQueryException
      */
@@ -802,35 +819,36 @@ public abstract class DataManager{
         }
         return count;
     }
-    
+
     /**
-     * A generic implementation of the countByXXXX() method that calls a specific count method from a DAO.
-     * Calls the corresponding count method as specified in the parameter methodName. 
-     * Retrieves data from both local and central databases.
-     * Separates the negative ids from positive ids and passes to local and central instances respectively.
-     * The ids are stored in the first index of the "parameters" parameter
-     * 
-     * Sample usage:
+     * A generic implementation of the countByXXXX() method that calls a specific count method from a DAO.     <br/>  
+     * Calls the corresponding count method as specified in the parameter methodName.      <br/>
+     * Retrieves data from both local and central databases.                             <br/>                        
+     * Separates the negative ids from positive ids and passes to local and central instances respectively.      <br/>
+     * The ids are stored in the first index of the "parameters" parameter.     <br/>                                  
+     *      <br/>
+     * Sample usage:     <br/>
+     * <pre><code>
      *      public long countGdmsAccMetadatasetByGid(List<Integer> gids) throws MiddlewareQueryException {
      *        return super.countAllFromCentralAndLocalBySignedIdAndMethod(getAccMetadataSetDao(), "countAccMetadataSetByGids",
      *                new Object[] { gids }, new Class[] { List.class });
      *      }
-     * 
-     * @param dao - the DAO to call the method from
-     * @param methodName - the method to call
-     * @param parameters - the parameters to be passed to the method
-     * @param parameterTypes - the types of the parameters to be passed to the method
+     * </code></pre>
+     * @param dao   The DAO to call the method from
+     * @param methodName    The method to call
+     * @param parameters    The parameters to be passed to the method
+     * @param parameterTypes    The types of the parameters to be passed to the method
      * @return the count
      * @throws MiddlewareQueryException
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public long countAllFromCentralAndLocalBySignedIdAndMethod(GenericDAO dao, String methodName, Object[] parameters, Class[] parameterTypes)
-            throws MiddlewareQueryException {
-        
+    public long countAllFromCentralAndLocalBySignedIdAndMethod(GenericDAO dao, String methodName, Object[] parameters,
+            Class[] parameterTypes) throws MiddlewareQueryException {
+
         List<Integer> ids = (List<Integer>) parameters[0];
         List<Integer> positiveIds = getPositiveIds(ids);
         List<Integer> negativeIds = getNegativeIds(ids);
-        
+
         long count = 0;
         try {
             java.lang.reflect.Method countMethod = dao.getClass().getMethod(methodName, parameterTypes);
@@ -839,7 +857,7 @@ public abstract class DataManager{
                 parameters[0] = negativeIds;
                 count = count + ((Long) countMethod.invoke(dao, parameters)).intValue();
             }
-            if (setWorkingDatabase(Database.CENTRAL, dao)&& (positiveIds != null) && (!positiveIds.isEmpty())) {
+            if (setWorkingDatabase(Database.CENTRAL, dao) && (positiveIds != null) && (!positiveIds.isEmpty())) {
                 parameters[0] = positiveIds;
                 count = count + ((Long) countMethod.invoke(dao, parameters)).intValue();
             }
@@ -849,32 +867,32 @@ public abstract class DataManager{
         return count;
     }
 
-
     /**
-     * A generic implementation of the countAllXXX(Database instance) method that calls countAll() from Generic DAO.
-     * Returns the count of entities from both central and local databases based on the given DAO.
-     * 
-     * Sample usage:
+     * A generic implementation of the countAllXXX(Database instance) method that calls countAll() from Generic DAO.     <br/>
+     * Returns the count of entities from both central and local databases based on the given DAO.     <br/>
+     *      <br/>
+     * Sample usage:     <br/>
+     * <pre><code>
      *     public long countAllGermplasm(Database instance) throws MiddlewareQueryException {
      *        return super.countFromInstance(getGermplasmDao(), instance);
      *    }
-     *      
-     * @param dao - the DAO to call the method from
-     * @param instance - the database instance to query from
-     * @return the number of entities from both central and local instances
+     * </code></pre>
+     * @param dao The DAO to call the method from
+     * @param instance The database instance to query from
+     * @return The number of entities from both central and local instances
      * @throws MiddlewareQueryException
      */
     @SuppressWarnings("rawtypes")
-    protected long countFromInstance(GenericDAO dao, Database instance) throws MiddlewareQueryException {
+    public long countFromInstance(GenericDAO dao, Database instance) throws MiddlewareQueryException {
         long count = 0;
         Session session = null;
-        
-        if (instance == Database.CENTRAL){
-            session =  getCurrentSessionForCentral();
-        } else if (instance == Database.LOCAL){
-            session =  getCurrentSessionForLocal();
+
+        if (instance == Database.CENTRAL) {
+            session = getCurrentSessionForCentral();
+        } else if (instance == Database.LOCAL) {
+            session = getCurrentSessionForLocal();
         }
-        
+
         if (setDaoSession(dao, session)) {
             count = count + dao.countAll();
         }
@@ -882,25 +900,25 @@ public abstract class DataManager{
     }
 
     /**
-     * A generic implementation of the countByXXXX(Database instance) method that calls a specific count method from a DAO.
-     * Calls the corresponding count method as specified in the parameter methodName. 
-     * Retrieves data from the specified database instance
-     * 
-     * Sample usage:
-     *  
+     * A generic implementation of the countByXXXX(Database instance) method that calls a specific count method from a DAO.     <br/>
+     * Calls the corresponding count method as specified in the parameter methodName.      <br/>
+     * Retrieves data from the specified database instance     <br/>
+     *      <br/>
+     * Sample usage:     <br/>
+     * <pre><code>
      *      public long countGermplasmByName(String name, GetGermplasmByNameModes mode, Operation op, Integer status, GermplasmNameType type,
      *            Database instance) throws MiddlewareQueryException {
      *        String nameToUse = GermplasmDataManagerUtil.getNameToUseByMode(name, mode);
      *        return super.countFromInstanceByMethod(getGermplasmDao(), instance, "countByName", new Object[] { nameToUse, op, status, type },
      *                new Class[] { String.class, Operation.class, Integer.class, GermplasmNameType.class });
      *    }
-     * 
-     * @param dao - the DAO to call the method from
-     * @param instance - the database instance to connect to
-     * @param methodName - the method to call
-     * @param parameters - the parameters to be passed to the method
-     * @param parameterTypes - the types of the parameters to be passed to the method
-     * @return the count
+     * </code></pre>
+     * @param dao The DAO to call the method from
+     * @param instance The database instance to connect to
+     * @param methodName The method to call
+     * @param parameters The parameters to be passed to the method
+     * @param parameterTypes The types of the parameters to be passed to the method
+     * @return The count
      * @throws MiddlewareQueryException
      */
     @SuppressWarnings("rawtypes")
@@ -920,23 +938,24 @@ public abstract class DataManager{
     }
 
     /**
-     * A generic implementation of the countByXXXX(Integer id, ...) method that calls a specific count method from a DAO.
-     * Calls the corresponding count method as specified in the parameter methodName. 
-     * Retrieves data from the corresponding database. If the given id is positive, it connects to Central, otherwise it connects to Local
-     * 
-     * Sample usage:
+     * A generic implementation of the countByXXXX(Integer id, ...) method that calls a specific count method from a DAO.     <br/>
+     * Calls the corresponding count method as specified in the parameter methodName.      <br/>
+     * Retrieves data from the corresponding database. If the given id is positive, it connects to Central, otherwise it connects to Local.     <br/>
+     *      <br/>
+     * Sample usage:     <br/>
+     * <pre><code>
      *      public long countMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapId, String linkageGroup, double startPos, double endPos)
      *            throws MiddlewareQueryException {
      *        return super.countFromInstanceByIdAndMethod(getMarkerDao(), mapId, "countMarkerIDsByMapIDAndLinkageBetweenStartPosition", 
      *                new Object[]{mapId, linkageGroup, startPos, endPos}, new Class[]{Integer.TYPE, String.class, Double.TYPE, Double.TYPE});
      *    }
-     * 
-     * @param dao - the DAO to call the method from
-     * @param id - the id used to know the database instance to connect to
-     * @param methodName - the method to call
-     * @param parameters - the parameters to be passed to the method
-     * @param parameterTypes - the types of the parameters to be passed to the method
-     * @return the count
+     * </code></pre>
+     * @param dao   The DAO to call the method from
+     * @param id    The id used to know the database instance to connect to
+     * @param methodName    The method to call
+     * @param parameters    The parameters to be passed to the method
+     * @param parameterTypes    The types of the parameters to be passed to the method
+     * @return The count
      * @throws MiddlewareQueryException
      */
     @SuppressWarnings("rawtypes")
@@ -958,8 +977,8 @@ public abstract class DataManager{
     /**
      * Logs an error based on the given message using the given Logger parameter.
      * 
-     * @param message - The message to log and to set on the exception
-     * @param e - The origin of the exception
+     * @param message   The message to log and to set on the exception
+     * @param e     The origin of the exception
      * @throws MiddlewareQueryException
      */
     protected void logAndThrowException(String message, Throwable e) throws MiddlewareQueryException {
@@ -971,8 +990,8 @@ public abstract class DataManager{
     /**
      * Logs an error based on the given message using the given Logger parameter.
      * 
-     * @param message - The message to log and to set on the exception
-     * @param log - The Logger to use
+     * @param message   The message to log and to set on the exception
+     * @param log   The Logger to use
      * @throws MiddlewareQueryException
      */
     protected void logAndThrowException(String message, Logger log) throws MiddlewareQueryException {
@@ -981,12 +1000,12 @@ public abstract class DataManager{
     }
 
     /**
-     * Logs an error based on the given message using the given Logger parameter. 
-     * Throws a MiddlewarewareQueryException that wraps the origin of the exception.
+     * Logs an error based on the given message using the given Logger parameter.     <br/> 
+     * Throws a MiddlewarewareQueryException that wraps the origin of the exception.     <br/>
      * 
-     * @param message - The message to log and to set on the exception
-     * @param e - The origin of the exception
-     * @param log - The Logger to use
+     * @param message   The message to log and to set on the exception
+     * @param e     The origin of the exception
+     * @param log   The Logger to use
      * @throws MiddlewareQueryException
      */
     protected void logAndThrowException(String message, Throwable e, Logger log) throws MiddlewareQueryException {
@@ -996,6 +1015,7 @@ public abstract class DataManager{
 
     /**
      * Rolls back a given transaction
+     * 
      * @param trans
      */
     protected void rollbackTransaction(Transaction trans) {
@@ -1003,8 +1023,14 @@ public abstract class DataManager{
             trans.rollback();
         }
     }
-    
-    protected List<Integer> getPositiveIds(List<Integer> ids){
+
+    /**
+     * Retrieves the positive ids from the given list of ids
+     * 
+     * @param ids   The positive list of ids
+     * @return
+     */
+    protected List<Integer> getPositiveIds(List<Integer> ids) {
         List<Integer> positiveIds = new ArrayList<Integer>();
         for (Integer id : ids) {
             if (id >= 0) {
@@ -1013,9 +1039,14 @@ public abstract class DataManager{
         }
         return positiveIds;
     }
-    
 
-    protected List<Integer> getNegativeIds(List<Integer> ids){
+    /**
+     * Retrieves the negative ids from the given list of ids
+     * 
+     * @param ids   The negative list of ids
+     * @return
+     */
+    protected List<Integer> getNegativeIds(List<Integer> ids) {
         List<Integer> negativeIds = new ArrayList<Integer>();
         for (Integer id : ids) {
             if (id < 0) {
