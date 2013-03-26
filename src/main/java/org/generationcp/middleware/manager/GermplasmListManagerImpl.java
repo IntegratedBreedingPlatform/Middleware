@@ -120,8 +120,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     @Override
     public List<GermplasmListData> getGermplasmListDataByListId(Integer id, int start, int numOfRows) throws MiddlewareQueryException {
 
-    	Database instance = id >= 0 ? Database.CENTRAL : Database.LOCAL;
-    	return getFromInstanceByMethod(getGermplasmListDataDAO(), instance, "getByListId", 
+    	return getFromInstanceByIdAndMethod(getGermplasmListDataDAO(), id, "getByListId", 
     				new Object[] {id, start, numOfRows},
     				new Class[] {Integer.class, Integer.TYPE, Integer.TYPE});
     }
@@ -129,16 +128,14 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     @Override
     public long countGermplasmListDataByListId(Integer id) throws MiddlewareQueryException {
         
-    	Database instance = id >= 0 ? Database.CENTRAL : Database.LOCAL;
-    	return countFromInstanceByMethod(getGermplasmListDataDAO(), instance, "countByListId", 
+    	return countFromInstanceByIdAndMethod(getGermplasmListDataDAO(), id, "countByListId", 
     				new Object[] {id}, new Class[] {Integer.class});
     }
 
     @Override
     public List<GermplasmListData> getGermplasmListDataByListIdAndGID(Integer listId, Integer gid) throws MiddlewareQueryException {
         
-    	Database instance = listId >= 0 ? Database.CENTRAL : Database.LOCAL;
-    	return getFromInstanceByMethod(getGermplasmListDataDAO(), instance, "getByListIdAndGID", 
+    	return getFromInstanceByIdAndMethod(getGermplasmListDataDAO(), listId, "getByListIdAndGID", 
 				new Object[] {listId, gid},
 				new Class[] {Integer.class, Integer.class});
     }
