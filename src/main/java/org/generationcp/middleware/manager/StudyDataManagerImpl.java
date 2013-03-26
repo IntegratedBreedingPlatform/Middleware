@@ -215,26 +215,22 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
     @Override
     public long countStudyByName(String name, Operation op, Database instance) throws MiddlewareQueryException {
-        if (setWorkingDatabase(instance)) {
-            return getStudyDao().countByName(name, op);
-        }
-        return 0;
+    	
+    	return countFromInstanceByMethod(getStudyDao(), instance, "countByName", 
+    				new Object[] {name, op}, new Class[] {String.class, Operation.class});
     }
 
     @Override
     public List<Study> getStudyBySeason(Season season, int start, int numOfRows, Database instance) throws MiddlewareQueryException {
-        if (setWorkingDatabase(instance)) {
-            return getStudyDao().getBySeason(season, start, numOfRows);
-        }
-        return new ArrayList<Study>();
+    	
+    	return getFromInstanceByMethod(getStudyDao(), instance, "getBySeason", 
+    				new Object[] {season,  start, numOfRows}, new Class[] {Season.class, Integer.TYPE, Integer.TYPE});
     }
 
     @Override
     public long countStudyBySeason(Season season, Database instance) throws MiddlewareQueryException {
-        if (setWorkingDatabase(instance)) {
-            return getStudyDao().countBySeason(season);
-        }
-        return 0;
+    	
+    	return countFromInstanceByMethod(getStudyDao(), instance, "countBySeason", new Object[] {season}, new Class[] {Season.class});
     }
 
     @Override
@@ -252,10 +248,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
     @Override
     public long countStudyBySDate(Integer sdate, Operation op, Database instance) throws MiddlewareQueryException {
-        if (setWorkingDatabase(instance)) {
-            return getStudyDao().countBySDate(sdate, op);
-        }
-        return 0;
+    	
+    	return countFromInstanceByMethod(getStudyDao(), instance, "countBySDate", 
+    				new Object[] {sdate, op}, new Class[] {Integer.class, Operation.class});
     }
 
     @Override
@@ -272,16 +267,20 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
     @Override
     public long countStudyByEDate(Integer edate, Operation op, Database instance) throws MiddlewareQueryException {
-        if (setWorkingDatabase(instance)) {
-            return getStudyDao().countByEDate(edate, op);
-        }
-        return 0;
+    	
+    	return countFromInstanceByMethod(getStudyDao(), instance, "countByEDate", 
+    				new Object[] {edate,  op}, new Class[] {Integer.class, Operation.class});
     }
 
     @Override
     public List<Study> getStudyByCountry(String country, int start, int numOfRows, Operation op, Database instance)
             throws MiddlewareQueryException {
-        List<Study> studyList = new ArrayList<Study>();
+    	
+    	String methodName = op == Operation.LIKE ? "getByCountryUsingLike" : "getByCountryUsingEqual";
+    	return getFromInstanceByMethod(getStudyDao(), instance, methodName, 
+    				new Object[] {country, start, numOfRows}, new Class[] {String.class, Integer.TYPE, Integer.TYPE});
+    	
+        /*List<Study> studyList = new ArrayList<Study>();
         if (setWorkingDatabase(instance)) {
             StudyDAO dao = getStudyDao();
             if (op == Operation.EQUAL) {
@@ -290,15 +289,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
                 studyList = dao.getByCountryUsingLike(country, start, numOfRows);
             }
         }
-        return studyList;
+        return studyList;*/
     }
 
     @Override
     public long countStudyByCountry(String country, Operation op, Database instance) throws MiddlewareQueryException {
-        if (setWorkingDatabase(instance)) {
-            return getStudyDao().countByCountry(country, op);
-        }
-        return 0;
+    	
+    	return countFromInstanceByMethod(getStudyDao(), instance, "countByCountry", 
+    				new Object[] {country,  op}, new Class[] {String.class, Operation.class});
     }
 
     @Override
@@ -311,116 +309,90 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
     @Override
     public List<Study> getAllTopLevelStudies(int start, int numOfRows, Database instance) throws MiddlewareQueryException {
-        List<Study> topLevelStudies = new ArrayList<Study>();
-        if (setWorkingDatabase(instance)) {
-            topLevelStudies = getStudyDao().getTopLevelStudies(start, numOfRows);
-        }
-        return topLevelStudies;
+
+    	return getFromInstanceByMethod(getStudyDao(), instance, "getTopLevelStudies", 
+    				new Object[] {start, numOfRows}, new Class[] {Integer.TYPE, Integer.TYPE});
     }
 
     public long countAllTopLevelStudies(Database instance) throws MiddlewareQueryException {
-        if (setWorkingDatabase(instance)) {
-            return getStudyDao().countAllTopLevelStudies();
-        }
-        return 0;
+
+    	return countFromInstanceByMethod(getStudyDao(), instance, "countAllTopLevelStudies", null, null);
     }
 
     @Override
     public long countAllStudyByParentFolderID(Integer parentFolderId, Database instance) throws MiddlewareQueryException {
-        if (setWorkingDatabase(instance)) {
-            return getStudyDao().countAllStudyByParentFolderID(parentFolderId);
-        }
-        return 0;
+
+    	return countFromInstanceByMethod(getStudyDao(), instance, "countAllStudyByParentFolderID", 
+    				new Object[] {parentFolderId}, new Class[] {Integer.class});
     }
 
     @Override
     public List<Study> getStudiesByParentFolderID(Integer parentFolderId, int start, int numOfRows) throws MiddlewareQueryException {
-        List<Study> studies = new ArrayList<Study>();
-        if (setWorkingDatabase(parentFolderId)) {
-            studies = getStudyDao().getByParentFolderID(parentFolderId, start, numOfRows);
-        }
-        return studies;
+
+    	return getFromInstanceByIdAndMethod(getStudyDao(), parentFolderId, "getByParentFolderID", 
+    				new Object[] {parentFolderId, start, numOfRows}, 
+    				new Class[] {Integer.class, Integer.TYPE, Integer.TYPE});
     }
 
     @Override
     public List<Variate> getVariatesByStudyID(Integer studyId) throws MiddlewareQueryException {
-        List<Variate> variates = new ArrayList<Variate>();
-
-        if (setWorkingDatabase(studyId)) {
-            variates = getVariateDao().getByStudyID(studyId);
-        }
-        return variates;
+    	
+    	return getFromInstanceByIdAndMethod(getVariateDao(), studyId, "getByStudyID", new Object[] {studyId}, new Class[] {Integer.class});
     }
 
     @Override
     public List<StudyEffect> getEffectsByStudyID(Integer studyId) throws MiddlewareQueryException {
-        List<StudyEffect> studyEffects = new ArrayList<StudyEffect>();
-        if (setWorkingDatabase(studyId)) {
-            studyEffects = getStudyEffectDao().getByStudyID(studyId);
-        }
-        return studyEffects;
+
+    	return getFromInstanceByIdAndMethod(getStudyEffectDao(), studyId, "getByStudyID", new Object[] {studyId}, new Class[] {Integer.class});
     }
 
     @Override
     public List<Factor> getFactorsByStudyID(Integer studyId) throws MiddlewareQueryException {
-        List<Factor> factors = new ArrayList<Factor>();
-        if (setWorkingDatabase(studyId)) {
-            factors = getFactorDao().getByStudyID(studyId);
-        }
-        return factors;
+    	
+    	return getFromInstanceByIdAndMethod(getFactorDao(), studyId, "getByStudyID", new Object[] {studyId}, new Class[] {Integer.class});
     }
 
     @Override
     public List<Representation> getRepresentationByEffectID(Integer effectId) throws MiddlewareQueryException {
-        List<Representation> representations = new ArrayList<Representation>();
-        if (setWorkingDatabase(effectId)) {
-            representations = getRepresentationDao().getRepresentationByEffectID(effectId);
-        }
-        return representations;
+    	
+    	return getFromInstanceByIdAndMethod(getRepresentationDao(), effectId, "getRepresentationByEffectID", 
+    				new Object[] {effectId}, new Class[] {Integer.class});
     }
 
     @Override
     public List<Representation> getRepresentationByStudyID(Integer studyId) throws MiddlewareQueryException {
-        List<Representation> representations = new ArrayList<Representation>();
-        if (setWorkingDatabase(studyId)) {
-            representations = getRepresentationDao().getRepresentationByStudyID(studyId);
-        }
-        return representations;
+    	
+    	return getFromInstanceByIdAndMethod(getRepresentationDao(), studyId, "getRepresentationByStudyID", 
+    				new Object[] {studyId}, new Class[] {Integer.class});
     }
 
     @Override
     public List<Factor> getFactorsByRepresentationId(Integer representationId) throws MiddlewareQueryException {
-        List<Factor> factors = new ArrayList<Factor>();
-        if (setWorkingDatabase(representationId)) {
-            factors = getFactorDao().getByRepresentationID(representationId);
-        }
-        return factors;
+
+    	return getFromInstanceByIdAndMethod(getFactorDao(), representationId, "getByRepresentationID", 
+    				new Object[] {representationId}, new Class[] {Integer.class});
     }
 
     @Override
     public long countOunitIDsByRepresentationId(Integer representationId) throws MiddlewareQueryException {
-        if (setWorkingDatabase(representationId)) {
-            return getOindexDao().countOunitIDsByRepresentationId(representationId);
-        }
-        return 0;
+    	
+    	return countFromInstanceByIdAndMethod(getOindexDao(), representationId, "countOunitIDsByRepresentationId", 
+    				new Object[] {representationId}, new Class[] {Integer.class});
     }
 
     @Override
     public List<Integer> getOunitIDsByRepresentationId(Integer representationId, int start, int numOfRows) throws MiddlewareQueryException {
-        List<Integer> ounitIDs = new ArrayList<Integer>();
-        if (setWorkingDatabase(representationId)) {
-            ounitIDs = getOindexDao().getOunitIDsByRepresentationId(representationId, start, numOfRows);
-        }
-        return ounitIDs;
+    	
+    	return getFromInstanceByIdAndMethod(getOindexDao(), representationId, "getOunitIDsByRepresentationId", 
+    				new Object[] {representationId, start, numOfRows},
+    				new Class[] {Integer.class, Integer.TYPE, Integer.TYPE});
     }
 
     @Override
     public List<Variate> getVariatesByRepresentationId(Integer representationId) throws MiddlewareQueryException {
-        List<Variate> variates = new ArrayList<Variate>();
-        if (setWorkingDatabase(representationId)) {
-            variates = getVariateDao().getByRepresentationId(representationId);
-        }
-        return variates;
+
+    	return getFromInstanceByIdAndMethod(getVariateDao(), representationId, "getByRepresentationId", 
+    				new Object[] {representationId}, new Class[] {Integer.class});
     }
 
     @Override
@@ -428,11 +400,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         // Get 1st element from list to check whether the list is for the Central instance or the Local instance
         Integer sampleId = ounitIdList.get(0);
 
-        List<NumericDataElement> numDataValues = new ArrayList<NumericDataElement>();
-        if (setWorkingDatabase(sampleId)) {
-            numDataValues = getNumericDataDao().getValuesByOunitIDList(ounitIdList);
-        }
-        return numDataValues;
+        return getFromInstanceByIdAndMethod(getNumericDataDao(), sampleId, "getValuesByOunitIDList", 
+        			new Object[] {ounitIdList}, new Class[] {List.class});
     }
 
     @Override
@@ -440,11 +409,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         // Get 1st element from list to check whether the list is for the Central instance or the Local instance
         Integer sampleId = ounitIdList.get(0);
 
-        List<CharacterDataElement> charDataValues = new ArrayList<CharacterDataElement>();
-        if (setWorkingDatabase(sampleId)) {
-            charDataValues = getCharacterDataDao().getValuesByOunitIDList(ounitIdList);
-        }
-        return charDataValues;
+        return getFromInstanceByIdAndMethod(getCharacterDataDao(), sampleId, "getValuesByOunitIDList", 
+        			new Object[] {ounitIdList}, new Class[] {List.class});
     }
 
     @Override
@@ -452,23 +418,17 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         // Get 1st element from list to check whether the list is for the Central instance or the Local instance
         Integer sampleId = ounitIdList.get(0);
 
-        List<NumericLevelElement> numLevelValues = new ArrayList<NumericLevelElement>();
-        if (setWorkingDatabase(sampleId)) {
-            numLevelValues = getNumericLevelDao().getValuesByOunitIDList(ounitIdList);
-        }
-        return numLevelValues;
+        return getFromInstanceByIdAndMethod(getNumericLevelDao(), sampleId, "getValuesByOunitIDList", 
+        			new Object[] {ounitIdList}, new Class[] {List.class});
     }
 
     @Override
     public List<CharacterLevelElement> getCharacterLevelValuesByOunitIdList(List<Integer> ounitIdList) throws MiddlewareQueryException {
         // Get 1st element from list to check whether the list is for the Central instance or the Local instance
         Integer sampleId = ounitIdList.get(0);
-
-        List<CharacterLevelElement> charLevelValues = new ArrayList<CharacterLevelElement>();
-        if (setWorkingDatabase(sampleId)) {
-            charLevelValues = getCharacterLevelDao().getValuesByOunitIDList(ounitIdList);
-        }
-        return charLevelValues;
+        
+        return getFromInstanceByIdAndMethod(getCharacterLevelDao(), sampleId, "getValuesByOunitIDList", 
+        			new Object[] {ounitIdList}, new Class[] {List.class});
     }
 
     @Override
@@ -573,20 +533,16 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
     @Override
     public List<CharacterLevel> getCharacterLevelsByFactorAndDatasetId(Factor factor, Integer datasetId) throws MiddlewareQueryException {
-        List<CharacterLevel> charLevelValues = new ArrayList<CharacterLevel>();
-        if (setWorkingDatabase(datasetId)) {
-            charLevelValues = getCharacterLevelDao().getByFactorAndDatasetID(factor, datasetId);
-        }
-        return charLevelValues;
+
+    	return getFromInstanceByIdAndMethod(getCharacterLevelDao(), datasetId, "getByFactorAndDatasetID", 
+    				new Object[] {factor,  datasetId}, new Class[] {Factor.class, Integer.class});
     }
 
     @Override
     public List<NumericLevel> getNumericLevelsByFactorAndDatasetId(Factor factor, Integer datasetId) throws MiddlewareQueryException {
-        List<NumericLevel> numLevelValues = new ArrayList<NumericLevel>();
-        if (setWorkingDatabase(datasetId)) {
-            numLevelValues = getNumericLevelDao().getByFactorAndDatasetID(factor, datasetId);
-        }
-        return numLevelValues;
+        
+    	return getFromInstanceByIdAndMethod(getNumericLevelDao(), datasetId, "getByFactorAndDatasetID", 
+    				new Object[] {factor,  datasetId}, new Class[] {Factor.class, Integer.class});
     }
 
     @Override
