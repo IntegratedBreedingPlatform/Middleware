@@ -287,30 +287,28 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         if ((qtlName == null) || (qtlName.isEmpty())) {
             return new ArrayList<Integer>();
         }
-        
+
         List<String> methods = Arrays.asList("countMapIDsByQTLName", "getMapIDsByQTLName");
-        return (List<Integer>) super.getFromCentralAndLocalByMethod(getQtlDao(), methods, start, numOfRows, new Object[]{qtlName}, new Class[]{String.class});
+        return (List<Integer>) super.getFromCentralAndLocalByMethod(getQtlDao(), methods, start, numOfRows, new Object[] { qtlName },
+                new Class[] { String.class });
     }
 
     @Override
     public long countMapIDsByQTLName(String qtlName) throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(getQtlDao(), "countMapIDsByQTLName", new Object[]{qtlName}, new Class[]{String.class});
+        return super.countAllFromCentralAndLocalByMethod(getQtlDao(), "countMapIDsByQTLName", new Object[] { qtlName },
+                new Class[] { String.class });
     }
 
     @Override
     public List<Integer> getNameIdsByGermplasmIds(List<Integer> gIds) throws MiddlewareQueryException {
-        if (setWorkingDatabase(gIds.get(0))) {
-            return (List<Integer>) getAccMetadataSetDao().getNameIdsByGermplasmIds(gIds);
-        }
-        return new ArrayList<Integer>();
+        return (List<Integer>) super.getFromInstanceByIdAndMethod(getAccMetadataSetDao(), gIds.get(0), "getNameIdsByGermplasmIds",
+                new Object[] { gIds }, new Class[] { List.class });
     }
 
     @Override
     public List<Name> getNamesByNameIds(List<Integer> nIds) throws MiddlewareQueryException {
-        if (setWorkingDatabase(nIds.get(0))) {
-            return (List<Name>) getNameDao().getNamesByNameIds(nIds);
-        }
-        return new ArrayList<Name>();
+        return (List<Name>) super.getFromInstanceByIdAndMethod(getNameDao(), nIds.get(0), "getNamesByNameIds", new Object[] { nIds },
+                new Class[] { List.class });
     }
 
     @Override
@@ -323,562 +321,259 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public long countAllMaps(Database instance) throws MiddlewareQueryException {
-        return super.countAllFromInstance(getMapDao(), instance);
+        return super.countFromInstance(getMapDao(), instance);
     }
 
     @Override
     public List<Map> getAllMaps(int start, int numOfRows, Database instance) throws MiddlewareQueryException {
-        return (List<Map>) super.getFromInstanceByMethod(getMapDao(), instance, "getAll", new Object[]{start, numOfRows}, new Class[]{Integer.TYPE, Integer.TYPE});
+        return (List<Map>) super.getFromInstanceByMethod(getMapDao(), instance, "getAll", new Object[] { start, numOfRows }, new Class[] {
+                Integer.TYPE, Integer.TYPE });
     }
 
     @Override
     public List<MapInfo> getMapInfoByMapName(String mapName, Database instance) throws MiddlewareQueryException {
-        return (List<MapInfo>) super.getFromInstanceByMethod(getMappingDataDao(), instance, "getMapInfoByMapName", new Object[]{mapName}, new Class[]{String.class});
+        return (List<MapInfo>) super.getFromInstanceByMethod(getMappingDataDao(), instance, "getMapInfoByMapName",
+                new Object[] { mapName }, new Class[] { String.class });
     }
 
     @Override
     public long countDatasetNames(Database instance) throws MiddlewareQueryException {
-        if (setWorkingDatabase(instance)) {
-            return getDatasetDao().countByName();
-        }
-        return 0;
+        return super.countFromInstanceByMethod(getDatasetDao(), instance, "countByName", new Object[] {}, new Class[] {});
     }
 
     @Override
     public List<String> getDatasetNames(int start, int numOfRows, Database instance) throws MiddlewareQueryException {
-        if (setWorkingDatabase(instance)) {
-            return (List<String>) getDatasetDao().getDatasetNames(start, numOfRows);
-        }
-        return new ArrayList<String>();
+        return (List<String>) super.getFromInstanceByMethod(getDatasetDao(), instance, "getDatasetNames",
+                new Object[] { start, numOfRows }, new Class[] { Integer.TYPE, Integer.TYPE });
     }
 
     @Override
     public List<DatasetElement> getDatasetDetailsByDatasetName(String datasetName, Database instance) throws MiddlewareQueryException {
-        if (setWorkingDatabase(instance)) {
-            return (List<DatasetElement>) getDatasetDao().getDetailsByName(datasetName);
-        }
-        return new ArrayList<DatasetElement>();
+        return (List<DatasetElement>) super.getFromInstanceByMethod(getDatasetDao(), instance, "getDetailsByName",
+                new Object[] { datasetName }, new Class[] { String.class });
     }
 
     @Override
     public List<Integer> getMarkerIdsByMarkerNames(List<String> markerNames, int start, int numOfRows, Database instance)
             throws MiddlewareQueryException {
-        if (setWorkingDatabase(instance)) {
-            return getMarkerDao().getIdsByNames(markerNames, start, numOfRows);
-        }
-        return new ArrayList<Integer>();
+        return (List<Integer>) super.getFromInstanceByMethod(getMarkerDao(), instance, "getIdsByNames", new Object[] { markerNames, start, numOfRows },
+                new Class[] { List.class, Integer.TYPE, Integer.TYPE });
     }
 
     @Override
-    public Set<Integer> getMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapId, String linkageGroup, double startPos, double endPos, int start, int numOfRows) 
-            throws MiddlewareQueryException {
+    public Set<Integer> getMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapId, String linkageGroup, double startPos, double endPos,
+            int start, int numOfRows) throws MiddlewareQueryException {
         if (setWorkingDatabase(mapId)) {
-            return getMarkerDao().getMarkerIDsByMapIDAndLinkageBetweenStartPosition(mapId, linkageGroup, startPos, endPos, start, numOfRows);
+            return getMarkerDao()
+                    .getMarkerIDsByMapIDAndLinkageBetweenStartPosition(mapId, linkageGroup, startPos, endPos, start, numOfRows);
         }
         return new TreeSet<Integer>();
     }
 
     @Override
-    public long countMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapId, String linkageGroup, double startPos, double endPos) 
+    public long countMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapId, String linkageGroup, double startPos, double endPos)
             throws MiddlewareQueryException {
-        if (setWorkingDatabase(mapId)) {
-            return getMarkerDao().countMarkerIDsByMapIDAndLinkageBetweenStartPosition(mapId, linkageGroup, startPos, endPos);
-        }
-        return 0l;
+        return super.countFromInstanceByIdAndMethod(getMarkerDao(), mapId, "countMarkerIDsByMapIDAndLinkageBetweenStartPosition", 
+                new Object[]{mapId, linkageGroup, startPos, endPos}, new Class[]{Integer.TYPE, String.class, Double.TYPE, Double.TYPE});
     }
 
     @Override
     public List<Integer> getMarkerIdsByDatasetId(Integer datasetId) throws MiddlewareQueryException {
-        if (setWorkingDatabase(datasetId)) {
-            return (List<Integer>) getMarkerMetadataSetDao().getMarkerIdByDatasetId(datasetId);
-        }
-        return new ArrayList<Integer>();
+        return (List<Integer>) super.getFromInstanceByIdAndMethod(getMarkerMetadataSetDao(), datasetId, "getMarkerIdByDatasetId", 
+                new Object[]{datasetId}, new Class[]{Integer.class});
     }
 
     @Override
     public List<ParentElement> getParentsByDatasetId(Integer datasetId) throws MiddlewareQueryException {
-        if (setWorkingDatabase(datasetId)) {
-            return (List<ParentElement>) getMappingPopDao().getParentsByDatasetId(datasetId);
-        }
-        return new ArrayList<ParentElement>();
+        return (List<ParentElement>) super.getFromInstanceByIdAndMethod(getMappingPopDao(), datasetId, "getParentsByDatasetId", 
+                new Object[]{datasetId}, new Class[]{Integer.class});
     }
 
     @Override
     public List<String> getMarkerTypesByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException {
-        if (setWorkingDatabase(markerIds.get(0))) {
-            return (List<String>) getMarkerDao().getMarkerTypeByMarkerIds(markerIds);
-        }
-        return new ArrayList<String>();
+        return (List<String>) super.getFromInstanceByIdAndMethod(getMarkerDao(), markerIds.get(0), "getMarkerTypeByMarkerIds",
+                new Object[] { markerIds }, new Class[] { List.class });
     }
 
     @Override
     public List<MarkerNameElement> getMarkerNamesByGIds(List<Integer> gIds) throws MiddlewareQueryException {
-        if (setWorkingDatabase(gIds.get(0))) {
-            return (List<MarkerNameElement>) getMarkerDao().getMarkerNamesByGIds(gIds);
-        }
-        return new ArrayList<MarkerNameElement>();
+        return (List<MarkerNameElement>) super.getFromInstanceByIdAndMethod(getMarkerDao(), gIds.get(0), "getMarkerNamesByGIds", 
+                new Object[]{gIds}, new Class[]{List.class});
     }
 
     @Override
     public List<GermplasmMarkerElement> getGermplasmNamesByMarkerNames(List<String> markerNames, Database instance)
             throws MiddlewareQueryException {
-        if (setWorkingDatabase(instance)) {
-            return (List<GermplasmMarkerElement>) getMarkerDao().getGermplasmNamesByMarkerNames(markerNames);
-        }
-        return new ArrayList<GermplasmMarkerElement>();
+        return (List<GermplasmMarkerElement>) super.getFromInstanceByMethod(getMarkerDao(), instance, 
+                "getGermplasmNamesByMarkerNames", new Object[]{markerNames}, new Class[]{List.class});
     }
 
     @Override
     public List<MappingValueElement> getMappingValuesByGidsAndMarkerNames(List<Integer> gids, List<String> markerNames, int start,
             int numOfRows) throws MiddlewareQueryException {
-        if (setWorkingDatabase(gids.get(0))) {
-            List<Integer> markerIds = getMarkerDao().getIdsByNames(markerNames, start, numOfRows);
-            List<MappingValueElement> mappingValues = getMappingPopDao().getMappingValuesByGidAndMarkerIds(gids, markerIds);
-            return mappingValues;
-        }
-        return new ArrayList<MappingValueElement>();
+        List<Integer> markerIds = getMarkerDao().getIdsByNames(markerNames, start, numOfRows);
+        return (List<MappingValueElement>) super.getFromInstanceByIdAndMethod(getMappingPopDao(), gids.get(0), 
+                "getMappingValuesByGidAndMarkerIds", new Object[]{gids, markerIds}, new Class[]{List.class, List.class});
     }
 
     @Override
     public List<AllelicValueElement> getAllelicValuesByGidsAndMarkerNames(List<Integer> gids, List<String> markerNames)
             throws MiddlewareQueryException {
-        if (setWorkingDatabase(gids.get(0))) {
-            return getMarkerDao().getAllelicValuesByGidsAndMarkerNames(gids, markerNames);
-        }
-        return new ArrayList<AllelicValueElement>();
+        return super.getFromInstanceByIdAndMethod(getMarkerDao(), gids.get(0), 
+                "getAllelicValuesByGidsAndMarkerNames", new Object[]{gids, markerNames}, new Class[]{List.class, List.class});
     }
 
     @Override
     public List<AllelicValueWithMarkerIdElement> getAllelicValuesFromCharValuesByDatasetId(Integer datasetId, int start, int numOfRows)
             throws MiddlewareQueryException {
-        if (setWorkingDatabase(datasetId)) {
-            return getCharValuesDao().getAllelicValuesByDatasetId(datasetId, start, numOfRows);
-        }
-        return new ArrayList<AllelicValueWithMarkerIdElement>();
+        return (List<AllelicValueWithMarkerIdElement>) super.getFromInstanceByIdAndMethod(getCharValuesDao(), datasetId, 
+                "getAllelicValuesByDatasetId", new Object[]{datasetId, start, numOfRows}, 
+                new Class[]{Integer.class, Integer.TYPE, Integer.TYPE});
     }
 
     @Override
     public long countAllelicValuesFromCharValuesByDatasetId(Integer datasetId) throws MiddlewareQueryException {
-        if (setWorkingDatabase(datasetId)) {
-            return getCharValuesDao().countByDatasetId(datasetId);
-        }
-        return 0;
+        return super.countFromInstanceByIdAndMethod(getCharValuesDao(), datasetId, "countByDatasetId", 
+                new Object[]{datasetId}, new Class[]{Integer.class});
     }
 
     @Override
     public List<AllelicValueWithMarkerIdElement> getAllelicValuesFromAlleleValuesByDatasetId(Integer datasetId, int start, int numOfRows)
             throws MiddlewareQueryException {
-        if (setWorkingDatabase(datasetId)) {
-            return getAlleleValuesDao().getAllelicValuesByDatasetId(datasetId, start, numOfRows);
-        }
-        return new ArrayList<AllelicValueWithMarkerIdElement>();
+        return (List<AllelicValueWithMarkerIdElement>) super.getFromInstanceByIdAndMethod(getAlleleValuesDao(), datasetId, 
+                "getAllelicValuesByDatasetId", new Object[]{datasetId, start, numOfRows}, 
+                new Class[]{Integer.class, Integer.TYPE, Integer.TYPE});
     }
 
     @Override
     public long countAllelicValuesFromAlleleValuesByDatasetId(Integer datasetId) throws MiddlewareQueryException {
-        if (setWorkingDatabase(datasetId)) {
-            return getAlleleValuesDao().countByDatasetId(datasetId);
-        }
-        return 0;
+        return super.countFromInstanceByIdAndMethod(getAlleleValuesDao(), datasetId, "countByDatasetId", 
+                new Object[]{datasetId}, new Class[]{Integer.class});
     }
 
     @Override
     public List<AllelicValueWithMarkerIdElement> getAllelicValuesFromMappingPopValuesByDatasetId(Integer datasetId, int start, int numOfRows)
             throws MiddlewareQueryException {
-        if (setWorkingDatabase(datasetId)) {
-            return getMappingPopValuesDao().getAllelicValuesByDatasetId(datasetId, start, numOfRows);
-        }
-        return new ArrayList<AllelicValueWithMarkerIdElement>();
+        return (List<AllelicValueWithMarkerIdElement>) super.getFromInstanceByIdAndMethod(getMappingPopValuesDao(), datasetId, 
+                "getAllelicValuesByDatasetId", new Object[]{datasetId, start, numOfRows}, 
+                new Class[]{Integer.class, Integer.TYPE, Integer.TYPE});
     }
 
     @Override
     public long countAllelicValuesFromMappingPopValuesByDatasetId(Integer datasetId) throws MiddlewareQueryException {
-        if (setWorkingDatabase(datasetId)) {
-            return getMappingPopValuesDao().countByDatasetId(datasetId);
-        }
-        return 0;
+        return super.countFromInstanceByIdAndMethod(getMappingPopValuesDao(), datasetId, "countByDatasetId", 
+                new Object[]{datasetId}, new Class[]{Integer.class});
     }
 
     @Override
     public List<MarkerInfo> getMarkerInfoByMarkerName(String markerName, int start, int numOfRows) throws MiddlewareQueryException {
-        List<MarkerInfo> markerInfoList = new ArrayList<MarkerInfo>();
-
-        long centralCount = 0;
-        long localCount = 0;
-        long relativeLimit = 0;
-
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            MarkerInfoDAO dao = getMarkerInfoDao();
-            centralCount = dao.countByMarkerName(markerName);
-
-            if (centralCount > start) {
-
-                markerInfoList.addAll((List<MarkerInfo>) dao.getByMarkerName(markerName, start, numOfRows));
-                relativeLimit = numOfRows - (centralCount - start);
-
-                if (relativeLimit > 0) {
-                    if (setWorkingDatabase(Database.LOCAL)) {
-                        dao = getMarkerInfoDao();
-                        localCount = dao.countByMarkerName(markerName);
-                        if (localCount > 0) {
-                            markerInfoList.addAll((List<MarkerInfo>) dao.getByMarkerName(markerName, 0, (int) relativeLimit));
-                        }
-                    }
-                }
-            } else {
-                relativeLimit = start - centralCount;
-                if (setWorkingDatabase(Database.LOCAL)) {
-                    dao = getMarkerInfoDao();
-                    localCount = dao.countByMarkerName(markerName);
-                    if (localCount > relativeLimit) {
-                        markerInfoList.addAll((List<MarkerInfo>) dao.getByMarkerName(markerName, (int) relativeLimit, numOfRows));
-                    }
-                }
-            }
-        } else if (setWorkingDatabase(Database.LOCAL)) {
-            MarkerInfoDAO dao = getMarkerInfoDao();
-            localCount = dao.countByMarkerName(markerName);
-            if (localCount > start) {
-                markerInfoList.addAll((List<MarkerInfo>) dao.getByMarkerName(markerName, start, numOfRows));
-            }
-        }
-        return markerInfoList;
+        List<String> methods = Arrays.asList("countByMarkerName", "getByMarkerName");
+        return (List<MarkerInfo>) super.getFromCentralAndLocalByMethod(getMarkerInfoDao(), methods, start, numOfRows,
+                new Object[] { markerName }, new Class[] { String.class });
     }
 
     @Override
     public long countMarkerInfoByMarkerName(String markerName) throws MiddlewareQueryException {
-        long count = 0;
-        if (setWorkingDatabase(Database.LOCAL)) {
-            count = count + getMarkerInfoDao().countByMarkerName(markerName);
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            count = count + getMarkerInfoDao().countByMarkerName(markerName);
-        }
-        return count;
+        return super.countAllFromCentralAndLocalByMethod(getMarkerInfoDao(), "countByMarkerName", new Object[] { markerName },
+                new Class[] { String.class });
     }
 
     @Override
     public List<MarkerInfo> getMarkerInfoByGenotype(String genotype, int start, int numOfRows) throws MiddlewareQueryException {
-        List<MarkerInfo> markerInfoList = new ArrayList<MarkerInfo>();
-
-        long centralCount = 0;
-        long localCount = 0;
-        long relativeLimit = 0;
-
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            MarkerInfoDAO dao = getMarkerInfoDao();
-            centralCount = dao.countByGenotype(genotype);
-            if (centralCount > start) {
-                markerInfoList.addAll((List<MarkerInfo>) dao.getByGenotype(genotype, start, numOfRows));
-                relativeLimit = numOfRows - (centralCount - start);
-                if (relativeLimit > 0) {
-                    if (setWorkingDatabase(Database.LOCAL)) {
-                        dao = getMarkerInfoDao();
-                        localCount = dao.countByGenotype(genotype);
-                        if (localCount > 0) {
-                            markerInfoList.addAll((List<MarkerInfo>) dao.getByGenotype(genotype, 0, (int) relativeLimit));
-                        }
-                    }
-                }
-            } else {
-                relativeLimit = start - centralCount;
-                if (setWorkingDatabase(Database.LOCAL)) {
-                    dao = getMarkerInfoDao();
-                    localCount = dao.countByGenotype(genotype);
-
-                    if (localCount > relativeLimit) {
-                        markerInfoList.addAll((List<MarkerInfo>) dao.getByGenotype(genotype, (int) relativeLimit, numOfRows));
-                    }
-                }
-            }
-        } else if (setWorkingDatabase(Database.LOCAL)) {
-            MarkerInfoDAO dao = getMarkerInfoDao();
-            localCount = dao.countByGenotype(genotype);
-            if (localCount > start) {
-                markerInfoList.addAll((List<MarkerInfo>) dao.getByGenotype(genotype, start, numOfRows));
-            }
-        }
-        return markerInfoList;
+        List<String> methods = Arrays.asList("countByGenotype", "getByGenotype");
+        return (List<MarkerInfo>) super.getFromCentralAndLocalByMethod(getMarkerInfoDao(), methods, start, numOfRows,
+                new Object[] { genotype }, new Class[] { String.class });
     }
 
     @Override
     public long countMarkerInfoByGenotype(String genotype) throws MiddlewareQueryException {
-        long count = 0;
-        if (setWorkingDatabase(Database.LOCAL)) {
-            count = count + getMarkerInfoDao().countByGenotype(genotype);
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            count = count + getMarkerInfoDao().countByGenotype(genotype);
-        }
-        return count;
+        return super.countAllFromCentralAndLocalByMethod(getMarkerInfoDao(), "countByGenotype", new Object[]{genotype}, new Class[]{String.class});
     }
-
+    
     @Override
     public List<MarkerInfo> getMarkerInfoByDbAccessionId(String dbAccessionId, int start, int numOfRows) throws MiddlewareQueryException {
-        List<MarkerInfo> markerInfoList = new ArrayList<MarkerInfo>();
-
-        long centralCount = 0;
-        long localCount = 0;
-        long relativeLimit = 0;
-
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            MarkerInfoDAO dao = getMarkerInfoDao();
-            centralCount = dao.countByDbAccessionId(dbAccessionId);
-            if (centralCount > start) {
-                markerInfoList.addAll((List<MarkerInfo>) dao.getByDbAccessionId(dbAccessionId, start, numOfRows));
-                relativeLimit = numOfRows - (centralCount - start);
-                if (relativeLimit > 0) {
-                    if (setWorkingDatabase(Database.LOCAL)) {
-                        dao = getMarkerInfoDao();
-                        localCount = dao.countByDbAccessionId(dbAccessionId);
-                        if (localCount > 0) {
-                            markerInfoList.addAll((List<MarkerInfo>) dao.getByDbAccessionId(dbAccessionId, 0, (int) relativeLimit));
-                        }
-                    }
-                }
-            } else {
-                relativeLimit = start - centralCount;
-                if (setWorkingDatabase(Database.LOCAL)) {
-                    dao = getMarkerInfoDao();
-                    localCount = dao.countByDbAccessionId(dbAccessionId);
-                    if (localCount > relativeLimit) {
-                        markerInfoList.addAll((List<MarkerInfo>) dao.getByDbAccessionId(dbAccessionId, (int) relativeLimit, numOfRows));
-                    }
-                }
-            }
-        } else if (setWorkingDatabase(Database.LOCAL)) {
-            MarkerInfoDAO dao = getMarkerInfoDao();
-            localCount = dao.countByDbAccessionId(dbAccessionId);
-            if (localCount > start) {
-                markerInfoList.addAll((List<MarkerInfo>) dao.getByDbAccessionId(dbAccessionId, start, numOfRows));
-            }
-        }
-        return markerInfoList;
+        List<String> methods = Arrays.asList("countByDbAccessionId", "getByDbAccessionId");
+        return (List<MarkerInfo>) super.getFromCentralAndLocalByMethod(getMarkerInfoDao(), methods, start, numOfRows, new Object[]{dbAccessionId}, new Class[]{String.class});
     }
 
     @Override
     public long countMarkerInfoByDbAccessionId(String dbAccessionId) throws MiddlewareQueryException {
-        long count = 0;
-        if (setWorkingDatabase(Database.LOCAL)) {
-            count = count + getMarkerInfoDao().countByDbAccessionId(dbAccessionId);
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            count = count + getMarkerInfoDao().countByDbAccessionId(dbAccessionId);
-        }
-        return count;
+        return super.countAllFromCentralAndLocalByMethod(getMarkerInfoDao(), "countByDbAccessionId", new Object[]{dbAccessionId}, new Class[]{String.class});
     }
 
     @Override
     public List<MarkerIdMarkerNameElement> getMarkerNamesByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException {
-        if (setWorkingDatabase(markerIds.get(0))) {
-            return getMarkerDao().getNamesByIds(markerIds);
-        }
-        return new ArrayList<MarkerIdMarkerNameElement>();
-
+        return (List<MarkerIdMarkerNameElement>) super.getFromInstanceByIdAndMethod(getMarkerDao(), markerIds.get(0), "getNamesByIds", 
+                new Object[]{markerIds}, new Class[]{List.class});
     }
 
-        @Override
-        public List<String> getAllMarkerTypes(int start, int numOfRows) throws MiddlewareQueryException {
-        List<String> markerTypes = new ArrayList<String>();
-        long centralCount = 0;
-        long localCount = 0;
-        long relativeLimit = 0;
-
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            MarkerDAO dao = getMarkerDao();
-            centralCount = countAllMarkerTypes(Database.CENTRAL);
-
-            if (centralCount > start) {
-                markerTypes.addAll(dao.getAllMarkerTypes(start, numOfRows));
-                relativeLimit = numOfRows - markerTypes.size();
-                if (relativeLimit > 0 && (setWorkingDatabase(Database.LOCAL))) {
-                    dao = getMarkerDao();
-                    localCount = countAllMarkerTypes(Database.LOCAL);
-                    if (localCount > 0) {
-                        markerTypes.addAll(dao.getAllMarkerTypes(0, (int) relativeLimit));
-                    }
-                }
-            } else {
-                relativeLimit = start - centralCount;
-                if (setWorkingDatabase(Database.LOCAL)) {
-                    dao = getMarkerDao();
-                    localCount = countAllMarkerTypes(Database.LOCAL);
-                    if (localCount > relativeLimit) {
-                        markerTypes.addAll(dao.getAllMarkerTypes((int) relativeLimit, numOfRows));
-                    }
-                }
-            }
-        } else if (setWorkingDatabase(Database.LOCAL)) {
-            MarkerDAO dao = getMarkerDao();
-            localCount = countAllMarkerTypes(Database.LOCAL);
-            if (localCount > start) {
-                markerTypes.addAll(dao.getAllMarkerTypes(start, numOfRows));
-            }
-        }
-        return markerTypes;
+    @Override
+    public List<String> getAllMarkerTypes(int start, int numOfRows) throws MiddlewareQueryException {
+        List<String> methods = Arrays.asList("countAllMarkerTypes", "getAllMarkerTypes");
+        return (List<String>) super.getFromCentralAndLocalByMethod(getMarkerDao(), methods, start, numOfRows, new Object[]{}, new Class[]{});
     }
 
     @Override
     public long countAllMarkerTypes(Database instance) throws MiddlewareQueryException {
-        if (setWorkingDatabase(instance)) {
-            return getMarkerDao().countAllMarkerTypes();
-        }
-        return 0;
+        return super.countFromInstanceByMethod(getMarkerDao(), instance, "countAllMarkerTypes", new Object[]{}, new Class[]{});
     }
 
     @Override
     public List<String> getMarkerNamesByMarkerType(String markerType, int start, int numOfRows) throws MiddlewareQueryException {
-        List<String> markerNames = new ArrayList<String>();
-
-        long centralCount = 0;
-        long localCount = 0;
-        long relativeLimit = 0;
-
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            MarkerDAO dao = getMarkerDao();
-            centralCount = dao.countMarkerNamesByMarkerType(markerType);
-
-            if (centralCount > start) {
-                markerNames.addAll(dao.getMarkerNamesByMarkerType(markerType, start, numOfRows));
-                relativeLimit = numOfRows - markerNames.size();
-                if (relativeLimit > 0 && setWorkingDatabase(Database.LOCAL)) {
-                    dao = getMarkerDao();
-                    localCount = dao.countMarkerNamesByMarkerType(markerType);
-                    if (localCount > 0) {
-                        markerNames.addAll(dao.getMarkerNamesByMarkerType(markerType, 0, (int) relativeLimit));
-                    }
-                }
-            } else {
-                relativeLimit = start - centralCount;
-                if (setWorkingDatabase(Database.LOCAL)) {
-                    dao = getMarkerDao();
-                    localCount = dao.countMarkerNamesByMarkerType(markerType);
-                    if (localCount > relativeLimit) {
-                        markerNames.addAll(dao.getMarkerNamesByMarkerType(markerType, (int) relativeLimit, numOfRows));
-                    }
-                }
-            }
-        } else if (setWorkingDatabase(Database.LOCAL)) {
-            MarkerDAO dao = getMarkerDao();
-            localCount = dao.countMarkerNamesByMarkerType(markerType);
-            if (localCount > start) {
-                markerNames.addAll(dao.getMarkerNamesByMarkerType(markerType, start, numOfRows));
-            }
-        }
-        return markerNames;
+        List<String> methods = Arrays.asList("countMarkerNamesByMarkerType", "getMarkerNamesByMarkerType");
+        return (List<String>) super.getFromCentralAndLocalByMethod(getMarkerDao(), methods, start, numOfRows, new Object[]{markerType}, new Class[]{String.class});
     }
-
+    
     @Override
     public long countMarkerNamesByMarkerType(String markerType) throws MiddlewareQueryException {
-        long result = 0;
-        if (setWorkingDatabase(Database.LOCAL)) {
-            result = getMarkerDao().countMarkerNamesByMarkerType(markerType);
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            result += getMarkerDao().countMarkerNamesByMarkerType(markerType);
-        }
-        return result;
+        return super.countAllFromCentralAndLocalByMethod(getMarkerDao(), "countMarkerNamesByMarkerType", new Object[]{markerType}, new Class[]{String.class});
     }
 
     @Override
     public List<Integer> getGIDsFromCharValuesByMarkerId(Integer markerId, int start, int numOfRows) throws MiddlewareQueryException {
-        if (setWorkingDatabase(markerId)) {
-            return getCharValuesDao().getGIDsByMarkerId(markerId, start, numOfRows);
-        }
-        return new ArrayList<Integer>();
+        return (List<Integer>) super.getFromInstanceByIdAndMethod(getCharValuesDao(), markerId, "getGIDsByMarkerId", 
+                new Object[]{markerId, start, numOfRows}, new Class[]{Integer.class, Integer.TYPE, Integer.TYPE});
     }
 
     @Override
     public long countGIDsFromCharValuesByMarkerId(Integer markerId) throws MiddlewareQueryException {
-        if (setWorkingDatabase(markerId)) {
-            return getCharValuesDao().countGIDsByMarkerId(markerId);
-        }
-        return 0;
+        return super.countFromInstanceByIdAndMethod(getCharValuesDao(), markerId, "countGIDsByMarkerId", new Object[] { markerId },
+                new Class[] { Integer.class });
     }
 
     @Override
     public List<Integer> getGIDsFromAlleleValuesByMarkerId(Integer markerId, int start, int numOfRows) throws MiddlewareQueryException {
-        if (setWorkingDatabase(markerId)) {
-            return getAlleleValuesDao().getGIDsByMarkerId(markerId, start, numOfRows);
-        }
-        return new ArrayList<Integer>();
+        return (List<Integer>) super.getFromInstanceByIdAndMethod(getAlleleValuesDao(), markerId, "getGIDsByMarkerId", new Object[] {
+                markerId, start, numOfRows }, new Class[] { Integer.class, Integer.TYPE, Integer.TYPE });
     }
 
     @Override
     public long countGIDsFromAlleleValuesByMarkerId(Integer markerId) throws MiddlewareQueryException {
-        if (setWorkingDatabase(markerId)) {
-            return getAlleleValuesDao().countGIDsByMarkerId(markerId);
-        }
-        return 0;
+        return super.countFromInstanceByIdAndMethod(getAlleleValuesDao(), markerId, "countGIDsByMarkerId", new Object[] { markerId },
+                new Class[] { Integer.class });
     }
 
     @Override
     public List<Integer> getGIDsFromMappingPopValuesByMarkerId(Integer markerId, int start, int numOfRows) throws MiddlewareQueryException {
-        if (setWorkingDatabase(markerId)) {
-            return getMappingPopValuesDao().getGIDsByMarkerId(markerId, start, numOfRows);
-        }
-        return new ArrayList<Integer>();
+        return (List<Integer>) super.getFromInstanceByIdAndMethod(getMappingPopValuesDao(), markerId, "getGIDsByMarkerId", new Object[] {
+            markerId, start, numOfRows }, new Class[] { Integer.class, Integer.TYPE, Integer.TYPE });
     }
 
     @Override
     public long countGIDsFromMappingPopValuesByMarkerId(Integer markerId) throws MiddlewareQueryException {
-        if (setWorkingDatabase(markerId)) {
-            return getMappingPopValuesDao().countGIDsByMarkerId(markerId);
-        }
-        return 0;
+        return super.countFromInstanceByIdAndMethod(getMappingPopValuesDao(), markerId, "countGIDsByMarkerId", new Object[] { markerId },
+                new Class[] { Integer.class });
     }
 
     @Override
     public List<String> getAllDbAccessionIdsFromMarker(int start, int numOfRows) throws MiddlewareQueryException {
-        List<String> dbAccessionIds = new ArrayList<String>();
-        long centralCount = 0;
-        long localCount = 0;
-        long relativeLimit = 0;
-
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            MarkerDAO dao = getMarkerDao();
-            centralCount = dao.countAllDbAccessionIds();
-
-            if (centralCount > start) {
-                dbAccessionIds.addAll(dao.getAllDbAccessionIds(start, numOfRows));
-                relativeLimit = numOfRows - dbAccessionIds.size();
-                if (relativeLimit > 0 && setWorkingDatabase(Database.LOCAL)) {
-                    dao = getMarkerDao();
-                    localCount = dao.countAllDbAccessionIds();
-                    if (localCount > 0) {
-                        dbAccessionIds.addAll(dao.getAllDbAccessionIds(0, (int) relativeLimit));
-                    }
-                }
-            } else {
-                relativeLimit = start - centralCount;
-                if (setWorkingDatabase(Database.LOCAL)) {
-                    dao = getMarkerDao();
-                    localCount = dao.countAllDbAccessionIds();
-                    if (localCount > relativeLimit) {
-                        dbAccessionIds.addAll(dao.getAllDbAccessionIds((int) relativeLimit, numOfRows));
-                    }
-                }
-            }
-        } else if (setWorkingDatabase(Database.LOCAL)) {
-            MarkerDAO dao = getMarkerDao();
-            localCount = dao.countAllDbAccessionIds();
-            if (localCount > start) {
-                dbAccessionIds.addAll(dao.getAllDbAccessionIds(start, numOfRows));
-            }
-        }
-        return dbAccessionIds;
+        List<String> methods = Arrays.asList("countAllDbAccessionIds", "getAllDbAccessionIds");
+        return (List<String>) super.getFromCentralAndLocalByMethod(getMarkerDao(), methods, start, numOfRows, new Object[]{}, new Class[]{});
     }
 
     @Override
     public long countAllDbAccessionIdsFromMarker() throws MiddlewareQueryException {
-        long result = 0;
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            result += getMarkerDao().countAllDbAccessionIds();
-        }
-        if (setWorkingDatabase(Database.LOCAL)) {
-            result += getMarkerDao().countAllDbAccessionIds();
-        }
-        return result;
+        return super.countAllFromCentralAndLocalByMethod(getMarkerDao(), "countAllDbAccessionIds", new Object[]{}, new Class[]{});
     }
 
     @Override
@@ -890,415 +585,145 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<Integer> getNidsFromAccMetadatasetByDatasetIds(List<Integer> datasetIds, List<Integer> gids, int start, int numOfRows)
             throws MiddlewareQueryException {
-        if (setWorkingDatabase(datasetIds.get(0))) {
-            return getAccMetadataSetDao().getNIDsByDatasetIds(datasetIds, gids, start, numOfRows);
-        }
-        return new ArrayList<Integer>();
+        return (List<Integer>) super.getFromInstanceByIdAndMethod(getAccMetadataSetDao(), datasetIds.get(0), "getNIDsByDatasetIds", 
+                new Object[]{datasetIds, gids, start, numOfRows}, new Class[]{List.class, List.class, Integer.TYPE, Integer.TYPE});
     }
 
+    
+    private List<Integer> getNIdsByMarkerIdsAndDatasetIdsAndNotGIdsFromDB(List<Integer> datasetIds, List<Integer> markerIds,
+            List<Integer> gIds) throws MiddlewareQueryException {
+        Set<Integer> nidSet = new TreeSet<Integer>();
+        
+        if (setWorkingDatabase(Database.CENTRAL)){
+            nidSet.addAll(getAccMetadataSetDao().getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds));
+        }
+        if (setWorkingDatabase(Database.LOCAL)){
+            nidSet.addAll(getAccMetadataSetDao().getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds));
+        }
+
+        return new ArrayList<Integer>(((TreeSet<Integer>)nidSet).descendingSet());
+    }
+    
     @Override
     public List<Integer> getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(List<Integer> datasetIds, List<Integer> markerIds, List<Integer> gIds,
             int start, int numOfRows) throws MiddlewareQueryException {
-        // TODO NO start and numOfRows?
-        Set<Integer> nidSet = new TreeSet<Integer>();
-
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            nidSet.addAll(getAccMetadataSetDao().getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds));
-        }
-        if (setWorkingDatabase(Database.LOCAL)) {
-            nidSet.addAll(getAccMetadataSetDao().getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds));
-        }
-        List<Integer> nidList = new ArrayList<Integer>(((TreeSet<Integer>) nidSet).descendingSet());
-        return nidList.subList(start, start + numOfRows);
+        List<Integer> nidList = getNIdsByMarkerIdsAndDatasetIdsAndNotGIdsFromDB(datasetIds, markerIds, gIds);
+        return nidList.subList(start, start+numOfRows);
     }
 
     @Override
     public int countNIdsByMarkerIdsAndDatasetIdsAndNotGIds(List<Integer> datasetIds, List<Integer> markerIds, List<Integer> gIds)
             throws MiddlewareQueryException {
-        Set<Integer> nidSet = new TreeSet<Integer>();
-
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            nidSet.addAll(getAccMetadataSetDao().getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds));
-        }
-        if (setWorkingDatabase(Database.LOCAL)) {
-            nidSet.addAll(getAccMetadataSetDao().getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds));
-        }
-        List<Integer> nidList = new ArrayList<Integer>(nidSet);
+        List<Integer> nidList = getNIdsByMarkerIdsAndDatasetIdsAndNotGIdsFromDB(datasetIds, markerIds, gIds);
         return nidList.size();
     }
 
-    @Override
-    public int countNIdsByMarkerIdsAndDatasetIds(List<Integer> datasetIds, List<Integer> markerIds) throws MiddlewareQueryException {
+    private List<Integer> getNIdsByMarkerIdsAndDatasetIds(List<Integer> datasetIds, List<Integer> markerIds) throws MiddlewareQueryException {
         Set<Integer> nidSet = new TreeSet<Integer>();
+        
+        if (setWorkingDatabase(Database.CENTRAL)){
+            nidSet.addAll(getAccMetadataSetDao().getNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds));            
+        }
+        
+        if (setWorkingDatabase(Database.LOCAL)){
+            nidSet.addAll(getAccMetadataSetDao().getNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds));            
+        }
+        
+        return new ArrayList<Integer>(((TreeSet<Integer>)nidSet).descendingSet());
 
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            nidSet.addAll(getAccMetadataSetDao().getNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds));
-        }
-        if (setWorkingDatabase(Database.LOCAL)) {
-            nidSet.addAll(getAccMetadataSetDao().getNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds));
-        }
-        List<Integer> nidList = new ArrayList<Integer>(nidSet);
-        return nidList.size();
     }
 
     @Override
     public List<Integer> getNIdsByMarkerIdsAndDatasetIds(List<Integer> datasetIds, List<Integer> markerIds, int start, int numOfRows)
             throws MiddlewareQueryException {
-        // TODO NO start and numOfRows?
-        Set<Integer> nidSet = new TreeSet<Integer>();
+        List<Integer> nidList = getNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds);
+        return nidList.subList(start, start+numOfRows);
+    }
 
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            nidSet.addAll(getAccMetadataSetDao().getNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds));
-        }
-        if (setWorkingDatabase(Database.LOCAL)) {
-            nidSet.addAll(getAccMetadataSetDao().getNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds));
-        }
-        List<Integer> nidList = new ArrayList<Integer>(((TreeSet<Integer>) nidSet).descendingSet());
-        return nidList.subList(start, start + numOfRows);
+    @Override
+    public int countNIdsByMarkerIdsAndDatasetIds(List<Integer> datasetIds, List<Integer> markerIds) throws MiddlewareQueryException {
+        List<Integer> nidList = getNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds);
+        return nidList.size();
     }
 
     @Override
     public List<Integer> getDatasetIdsForFingerPrinting(int start, int numOfRows) throws MiddlewareQueryException {
-        List<Integer> datasetIds = new ArrayList<Integer>();
-        long centralCount = 0;
-        long localCount = 0;
-        long relativeLimit = 0;
-
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            DatasetDAO dao = getDatasetDao();
-            centralCount = dao.countDatasetIdsForFingerPrinting();
-            if (centralCount > start) {
-                datasetIds.addAll(dao.getDatasetIdsForFingerPrinting(start, numOfRows));
-                relativeLimit = numOfRows - datasetIds.size();
-                if (relativeLimit > 0 && setWorkingDatabase(Database.LOCAL)) {
-                    dao = getDatasetDao();
-                    localCount = dao.countDatasetIdsForFingerPrinting();
-                    if (localCount > 0) {
-                        datasetIds.addAll(dao.getDatasetIdsForFingerPrinting(0, (int) relativeLimit));
-                    }
-                }
-            } else {
-                relativeLimit = start - centralCount;
-                if (setWorkingDatabase(Database.LOCAL)) {
-                    dao = getDatasetDao();
-                    localCount = dao.countDatasetIdsForFingerPrinting();
-                    if (localCount > relativeLimit) {
-                        datasetIds.addAll(dao.getDatasetIdsForFingerPrinting((int) relativeLimit, numOfRows));
-                    }
-                }
-            }
-        } else if (setWorkingDatabase(Database.LOCAL)) {
-            DatasetDAO dao = getDatasetDao();
-            localCount = dao.countDatasetIdsForFingerPrinting();
-            if (localCount > start) {
-                datasetIds.addAll(dao.getDatasetIdsForFingerPrinting(start, numOfRows));
-            }
-        }
-        return datasetIds;
+        List<String> methods = Arrays.asList("countDatasetIdsForFingerPrinting", "getDatasetIdsForFingerPrinting");
+        return (List<Integer>) super.getFromCentralAndLocalByMethod(getDatasetDao(), methods, start, numOfRows, new Object[]{}, new Class[]{});
     }
 
     @Override
     public long countDatasetIdsForFingerPrinting() throws MiddlewareQueryException {
-        long result = 0;
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            result = getDatasetDao().countDatasetIdsForFingerPrinting();
-        }
-        if (setWorkingDatabase(Database.LOCAL)) {
-            result += getDatasetDao().countDatasetIdsForFingerPrinting();
-        }
-        return result;
+        return super.countAllFromCentralAndLocalByMethod(getDatasetDao(), "countDatasetIdsForFingerPrinting", new Object[]{}, new Class[]{});
     }
 
     @Override
     public List<Integer> getDatasetIdsForMapping(int start, int numOfRows) throws MiddlewareQueryException {
-        List<Integer> datasetIds = new ArrayList<Integer>();
-        long centralCount = 0;
-        long localCount = 0;
-        long relativeLimit = 0;
-
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            DatasetDAO dao = getDatasetDao();
-            centralCount = dao.countDatasetIdsForMapping();
-            if (centralCount > start) {
-                datasetIds.addAll(dao.getDatasetIdsForMapping(start, numOfRows));
-                relativeLimit = numOfRows - datasetIds.size();
-                if (relativeLimit > 0 && setWorkingDatabase(Database.LOCAL)) {
-                    dao = getDatasetDao();
-                    localCount = dao.countDatasetIdsForMapping();
-                    if (localCount > 0) {
-                        datasetIds.addAll(dao.getDatasetIdsForMapping(0, (int) relativeLimit));
-                    }
-                }
-            } else {
-                relativeLimit = start - centralCount;
-                if (setWorkingDatabase(Database.LOCAL)) {
-                    dao = getDatasetDao();
-                    localCount = dao.countDatasetIdsForMapping();
-                    if (localCount > relativeLimit) {
-                        datasetIds.addAll(dao.getDatasetIdsForMapping((int) relativeLimit, numOfRows));
-                    }
-                }
-            }
-        } else if (setWorkingDatabase(Database.LOCAL)) {
-            DatasetDAO dao = getDatasetDao();
-            localCount = dao.countDatasetIdsForMapping();
-            if (localCount > start) {
-                datasetIds.addAll(dao.getDatasetIdsForMapping(start, numOfRows));
-            }
-        }
-        return datasetIds;
+        List<String> methods = Arrays.asList("countDatasetIdsForMapping", "getDatasetIdsForMapping");
+        return (List<Integer>) super.getFromCentralAndLocalByMethod(getDatasetDao(), methods, start, numOfRows, new Object[]{}, new Class[]{});
     }
 
     @Override
     public long countDatasetIdsForMapping() throws MiddlewareQueryException {
-        long result = 0;
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            result = getDatasetDao().countDatasetIdsForMapping();
-        }
-        if (setWorkingDatabase(Database.LOCAL)) {
-            result += getDatasetDao().countDatasetIdsForMapping();
-        }
-        return result;
+        return super.countAllFromCentralAndLocalByMethod(getDatasetDao(), "countDatasetIdsForMapping", new Object[]{}, new Class[]{});
     }
 
     @Override
     public List<AccMetadataSetPK> getGdmsAccMetadatasetByGid(List<Integer> gids, int start, int numOfRows) throws MiddlewareQueryException {
-        List<AccMetadataSetPK> accMetadataSets = new ArrayList<AccMetadataSetPK>();
-        long centralCount = 0;
-        long localCount = 0;
-        long relativeLimit = 0;
-
-        List<Integer> positiveGids = GenotypicDataManagerUtil.getPositiveIds(gids);
-        List<Integer> negativeGids = GenotypicDataManagerUtil.getNegativeIds(gids);
-
-        if (setWorkingDatabase(Database.CENTRAL) && (positiveGids != null) && (!positiveGids.isEmpty())) {
-            AccMetadataSetDAO dao = getAccMetadataSetDao();
-            centralCount = dao.countAccMetadataSetByGids(positiveGids);
-
-            if (centralCount > start) {
-                accMetadataSets.addAll(dao.getAccMetadasetByGids(positiveGids, start, numOfRows));
-                relativeLimit = numOfRows - accMetadataSets.size();
-                if (relativeLimit > 0 && setWorkingDatabase(Database.LOCAL)) {
-                    dao = getAccMetadataSetDao();
-                    localCount = dao.countAccMetadataSetByGids(negativeGids);
-                    if (localCount > 0) {
-                        accMetadataSets.addAll(dao.getAccMetadasetByGids(negativeGids, 0, (int) relativeLimit));
-                    }
-                }
-            } else {
-                relativeLimit = start - centralCount;
-                if (setWorkingDatabase(Database.LOCAL) && (negativeGids != null) && (!negativeGids.isEmpty())) {
-                    dao = getAccMetadataSetDao();
-                    localCount = dao.countAccMetadataSetByGids(negativeGids);
-                    if (localCount > relativeLimit) {
-                        accMetadataSets.addAll(dao.getAccMetadasetByGids(negativeGids, (int) relativeLimit, numOfRows));
-                    }
-                }
-            }
-        } else if (setWorkingDatabase(Database.LOCAL) && (negativeGids != null) && (!negativeGids.isEmpty())) {
-            AccMetadataSetDAO dao = getAccMetadataSetDao();
-            localCount = dao.countAccMetadataSetByGids(negativeGids);
-            if (localCount > start) {
-                accMetadataSets.addAll(dao.getAccMetadasetByGids(negativeGids, start, numOfRows));
-            }
-        }
-        return accMetadataSets;
+        List<String> methods = Arrays.asList("countAccMetadataSetByGids", "getAccMetadasetByGids");
+        return (List<AccMetadataSetPK>) super.getFromCentralAndLocalBySignedIdAndMethod(getAccMetadataSetDao(), methods, start, numOfRows,
+                new Object[] { gids }, new Class[] { List.class });
     }
 
     @Override
     public long countGdmsAccMetadatasetByGid(List<Integer> gids) throws MiddlewareQueryException {
-        List<Integer> positiveGids = GenotypicDataManagerUtil.getPositiveIds(gids);
-        List<Integer> negativeGids = GenotypicDataManagerUtil.getNegativeIds(gids);
-
-        long result = 0;
-        // Count from local
-        if (setWorkingDatabase(Database.LOCAL) && (negativeGids != null) && (!negativeGids.isEmpty())) {
-            result += getAccMetadataSetDao().countAccMetadataSetByGids(negativeGids);
-        }
-        // Count from central
-        if (setWorkingDatabase(Database.CENTRAL) && (positiveGids != null) && (!positiveGids.isEmpty())) {
-            result += getAccMetadataSetDao().countAccMetadataSetByGids(positiveGids);
-        }
-
-        return result;
+        return super.countAllFromCentralAndLocalBySignedIdAndMethod(getAccMetadataSetDao(), "countAccMetadataSetByGids",
+                new Object[] { gids }, new Class[] { List.class });
     }
 
     @Override
     public List<Integer> getMarkersByGidAndDatasetIds(Integer gid, List<Integer> datasetIds, int start, int numOfRows)
             throws MiddlewareQueryException {
-        List<Integer> markerIds = new ArrayList<Integer>();
-        long centralCount = 0;
-        long localCount = 0;
-        long relativeLimit = 0;
-
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            MarkerMetadataSetDAO dao = getMarkerMetadataSetDao();
-            centralCount = dao.countMarkersByGidAndDatasetIds(gid, datasetIds);
-
-            if (centralCount > start) {
-                markerIds.addAll(dao.getMarkersByGidAndDatasetIds(gid, datasetIds, start, numOfRows));
-                relativeLimit = numOfRows - markerIds.size();
-                if (relativeLimit > 0 && setWorkingDatabase(Database.LOCAL)) {
-                    dao = getMarkerMetadataSetDao();
-                    localCount = dao.countMarkersByGidAndDatasetIds(gid, datasetIds);
-                    if (localCount > 0) {
-                        markerIds.addAll(dao.getMarkersByGidAndDatasetIds(gid, datasetIds, 0, (int) relativeLimit));
-                    }
-                }
-            } else {
-                relativeLimit = start - centralCount;
-                if (setWorkingDatabase(Database.LOCAL)) {
-                    dao = getMarkerMetadataSetDao();
-                    localCount = dao.countMarkersByGidAndDatasetIds(gid, datasetIds);
-                    if (localCount > relativeLimit) {
-                        markerIds.addAll(dao.getMarkersByGidAndDatasetIds(gid, datasetIds, (int) relativeLimit, numOfRows));
-                    }
-                }
-            }
-        } else if (setWorkingDatabase(Database.LOCAL)) {
-            MarkerMetadataSetDAO dao = getMarkerMetadataSetDao();
-            localCount = dao.countMarkersByGidAndDatasetIds(gid, datasetIds);
-            if (localCount > start) {
-                markerIds.addAll(dao.getMarkersByGidAndDatasetIds(gid, datasetIds, start, numOfRows));
-            }
-        }
-        return markerIds;
+        List<String> methods = Arrays.asList("countMarkersByGidAndDatasetIds", "getMarkersByGidAndDatasetIds");
+        return (List<Integer>) super.getFromCentralAndLocalByMethod(getMarkerMetadataSetDao(), methods, start, numOfRows, 
+                new Object[]{gid, datasetIds}, new Class[]{Integer.class, List.class});
     }
 
     @Override
     public long countMarkersByGidAndDatasetIds(Integer gid, List<Integer> datasetIds) throws MiddlewareQueryException {
-        long result = 0;
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            result = getMarkerMetadataSetDao().countMarkersByGidAndDatasetIds(gid, datasetIds);
-        }
-        if (setWorkingDatabase(Database.LOCAL)) {
-            result += getMarkerMetadataSetDao().countMarkersByGidAndDatasetIds(gid, datasetIds);
-        }
-        return result;
+        return super.countAllFromCentralAndLocalByMethod(getMarkerMetadataSetDao(), "countMarkersByGidAndDatasetIds", 
+                new Object[]{gid, datasetIds}, new Class[]{Integer.class, List.class});
     }
 
     @Override
-    public List<Marker> getMarkersByMarkerIDs(List<Integer> markerIDs, int start, int numOfRows) throws MiddlewareQueryException {
-        List<Marker> markerIds = new ArrayList<Marker>();
-        long centralCount = 0;
-        long localCount = 0;
-        long relativeLimit = 0;
-
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            MarkerDAO dao = getMarkerDao();
-            centralCount = dao.countMarkersByIds(markerIDs);
-
-            if (centralCount > start) {
-                markerIds.addAll(dao.getMarkersByIds(markerIDs, start, numOfRows));
-                relativeLimit = numOfRows - (centralCount - start);
-                if (relativeLimit > 0 && setWorkingDatabase(Database.LOCAL)) {
-                    dao = getMarkerDao();
-                    localCount = dao.countMarkersByIds(markerIDs);
-                    if (localCount > 0) {
-                        markerIds.addAll(dao.getMarkersByIds(markerIDs, 0, (int) relativeLimit));
-                    }
-                }
-            } else {
-                relativeLimit = start - centralCount;
-                if (setWorkingDatabase(Database.LOCAL)) {
-                    dao = getMarkerDao();
-                    localCount = dao.countMarkersByIds(markerIDs);
-                    if (localCount > relativeLimit) {
-                        markerIds.addAll(dao.getMarkersByIds(markerIDs, (int) relativeLimit, numOfRows));
-                    }
-                }
-            }
-        } else if (setWorkingDatabase(Database.LOCAL)) {
-            MarkerDAO dao = getMarkerDao();
-            localCount = dao.countMarkersByIds(markerIDs);
-            if (localCount > start) {
-                markerIds.addAll(dao.getMarkersByIds(markerIDs, start, numOfRows));
-            }
-        }
-        return markerIds;
+    public List<Marker> getMarkersByMarkerIds(List<Integer> markerIds, int start, int numOfRows) throws MiddlewareQueryException {
+        List<String> methods = Arrays.asList("countMarkersByIds", "getMarkersByIds");
+        return (List<Marker>) super.getFromCentralAndLocalByMethod(getMarkerDao(), methods, start, numOfRows, new Object[]{markerIds}, new Class[]{List.class});
     }
 
     @Override
-    public long countMarkersByMarkerIDs(List<Integer> markerIDs) throws MiddlewareQueryException {
-        long result = 0;
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            result = getMarkerDao().countMarkersByIds(markerIDs);
-        }
-        if (setWorkingDatabase(Database.LOCAL)) {
-            result += getMarkerDao().countMarkersByIds(markerIDs);
-        }
-        return result;
-
+    public long countMarkersByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException {
+        return super.countAllFromCentralAndLocalByMethod(getMarkerDao(), "countMarkersByIds", new Object[]{markerIds}, new Class[]{List.class});
     }
 
     @Override
     public long countAlleleValuesByGids(List<Integer> gids) throws MiddlewareQueryException {
-        long result = 0;
-        if (setWorkingDatabase(Database.LOCAL)) {
-            result += getAlleleValuesDao().countAlleleValuesByGids(gids);
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            result += getAlleleValuesDao().countAlleleValuesByGids(gids);
-        }
-        return result;
+        return super.countAllFromCentralAndLocalByMethod(getAlleleValuesDao(), "countAlleleValuesByGids", new Object[]{gids}, new Class[]{List.class});
     }
 
     @Override
     public long countCharValuesByGids(List<Integer> gids) throws MiddlewareQueryException {
-        long result = 0;
-        if (setWorkingDatabase(Database.LOCAL)) {
-            result += getCharValuesDao().countCharValuesByGids(gids);
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            result += getCharValuesDao().countCharValuesByGids(gids);
-        }
-        return result;
+        return super.countAllFromCentralAndLocalByMethod(getCharValuesDao(), "countCharValuesByGids", new Object[]{gids}, new Class[]{List.class});
     }
 
     @Override
     public List<AllelicValueElement> getIntAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids, int start, int numOfRows)
             throws MiddlewareQueryException {
-        List<AllelicValueElement> allelicValueElements = new ArrayList<AllelicValueElement>();
-        long centralCount = 0;
-        long localCount = 0;
-        long relativeLimit = 0;
-
-        List<Integer> positiveGids = GenotypicDataManagerUtil.getPositiveIds(gids);
-        List<Integer> negativeGids = GenotypicDataManagerUtil.getNegativeIds(gids);
-
-        if (setWorkingDatabase(Database.CENTRAL) && (positiveGids != null) && (!positiveGids.isEmpty())) {
-            AlleleValuesDAO dao = getAlleleValuesDao();
-            centralCount = dao.countIntAlleleValuesForPolymorphicMarkersRetrieval(positiveGids);
-
-            if (centralCount > start) {
-                allelicValueElements.addAll(dao.getIntAlleleValuesForPolymorphicMarkersRetrieval(positiveGids, start, numOfRows));
-                relativeLimit = numOfRows - allelicValueElements.size();
-                if (relativeLimit > 0 && setWorkingDatabase(Database.LOCAL)) {
-                    dao = getAlleleValuesDao();
-                    localCount = dao.countIntAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
-                    if (localCount > 0) {
-                        allelicValueElements.addAll(dao.getIntAlleleValuesForPolymorphicMarkersRetrieval(negativeGids, 0,
-                                (int) relativeLimit));
-                    }
-                }
-            } else {
-                relativeLimit = start - centralCount;
-                if (setWorkingDatabase(Database.LOCAL) && (negativeGids != null) && (!negativeGids.isEmpty())) {
-                    dao = getAlleleValuesDao();
-                    localCount = dao.countIntAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
-                    if (localCount > relativeLimit) {
-                        allelicValueElements.addAll(dao.getIntAlleleValuesForPolymorphicMarkersRetrieval(negativeGids, (int) relativeLimit,
-                                numOfRows));
-                    }
-                }
-            }
-        } else if (setWorkingDatabase(Database.LOCAL) && (negativeGids != null) && (!negativeGids.isEmpty())) {
-            AlleleValuesDAO dao = getAlleleValuesDao();
-            localCount = dao.countIntAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
-            if (localCount > start) {
-                allelicValueElements.addAll(dao.getIntAlleleValuesForPolymorphicMarkersRetrieval(negativeGids, start, numOfRows));
-            }
-        }
+        List<String> methods = Arrays.asList("countIntAlleleValuesForPolymorphicMarkersRetrieval",
+                "getIntAlleleValuesForPolymorphicMarkersRetrieval");
+        List<AllelicValueElement> allelicValueElements = (List<AllelicValueElement>) super.getFromCentralAndLocalBySignedIdAndMethod(
+                getAlleleValuesDao(), methods, start, numOfRows, new Object[] { gids }, new Class[] { List.class });
+        
         //Sort by gid, markerName
         Collections.sort(allelicValueElements, AllelicValueElement.AllelicValueElementComparator);
 
@@ -1307,64 +732,17 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public long countIntAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException {
-        List<Integer> positiveGids = GenotypicDataManagerUtil.getPositiveIds(gids);
-        List<Integer> negativeGids = GenotypicDataManagerUtil.getNegativeIds(gids);
-        long result = 0;
-        if (setWorkingDatabase(Database.LOCAL) && (negativeGids != null) && (!negativeGids.isEmpty())) {
-            result += getAlleleValuesDao().countIntAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
-        }
-        if (setWorkingDatabase(Database.CENTRAL) && (positiveGids != null) && (!positiveGids.isEmpty())) {
-            result += getAlleleValuesDao().countIntAlleleValuesForPolymorphicMarkersRetrieval(positiveGids);
-        }
-        return result;
+        return super.countAllFromCentralAndLocalBySignedIdAndMethod(getAlleleValuesDao(),
+                "countIntAlleleValuesForPolymorphicMarkersRetrieval", new Object[] { gids }, new Class[] { List.class });
     }
 
     @Override
     public List<AllelicValueElement> getCharAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids, int start, int numOfRows)
             throws MiddlewareQueryException {
-
-        long centralCount = 0;
-        long localCount = 0;
-        long relativeLimit = 0;
-
-        List<Integer> positiveGids = GenotypicDataManagerUtil.getPositiveIds(gids);
-        List<Integer> negativeGids = GenotypicDataManagerUtil.getNegativeIds(gids);
-
-        List<AllelicValueElement> allelicValueElements = new ArrayList<AllelicValueElement>();
-
-        if (setWorkingDatabase(Database.CENTRAL) && (positiveGids != null) && (!positiveGids.isEmpty())) {
-            AlleleValuesDAO dao = getAlleleValuesDao();
-            centralCount = dao.countCharAlleleValuesForPolymorphicMarkersRetrieval(positiveGids);
-
-            if (centralCount > start) {
-                allelicValueElements.addAll(dao.getCharAlleleValuesForPolymorphicMarkersRetrieval(positiveGids, start, numOfRows));
-                relativeLimit = numOfRows - allelicValueElements.size();
-                if (relativeLimit > 0 && setWorkingDatabase(Database.LOCAL)) {
-                    dao = getAlleleValuesDao();
-                    localCount = dao.countCharAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
-                    if (localCount > 0) {
-                        allelicValueElements.addAll(dao.getCharAlleleValuesForPolymorphicMarkersRetrieval(negativeGids, 0,
-                                (int) relativeLimit));
-                    }
-                }
-            } else {
-                relativeLimit = start - centralCount;
-                if ((setWorkingDatabase(Database.LOCAL)) && (negativeGids != null) && (!negativeGids.isEmpty())) {
-                    dao = getAlleleValuesDao();
-                    localCount = dao.countCharAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
-                    if (localCount > relativeLimit) {
-                        allelicValueElements.addAll(dao.getCharAlleleValuesForPolymorphicMarkersRetrieval(negativeGids,
-                                (int) relativeLimit, numOfRows));
-                    }
-                }
-            }
-        } else if ((setWorkingDatabase(Database.LOCAL)) && (negativeGids != null) && (!negativeGids.isEmpty())) {
-            AlleleValuesDAO dao = getAlleleValuesDao();
-            localCount = dao.countCharAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
-            if (localCount > start) {
-                allelicValueElements.addAll(dao.getCharAlleleValuesForPolymorphicMarkersRetrieval(negativeGids, start, numOfRows));
-            }
-        }
+        List<String> methods = Arrays.asList("countCharAlleleValuesForPolymorphicMarkersRetrieval",
+                "getCharAlleleValuesForPolymorphicMarkersRetrieval");
+        List<AllelicValueElement> allelicValueElements = (List<AllelicValueElement>) super.getFromCentralAndLocalBySignedIdAndMethod(
+                getAlleleValuesDao(), methods, start, numOfRows, new Object[] { gids }, new Class[] { List.class });
 
         //Sort by gid, markerName
         Collections.sort(allelicValueElements, AllelicValueElement.AllelicValueElementComparator);
@@ -1374,64 +752,18 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public long countCharAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException {
-        List<Integer> positiveGids = GenotypicDataManagerUtil.getPositiveIds(gids);
-        List<Integer> negativeGids = GenotypicDataManagerUtil.getNegativeIds(gids);
-
-        long result = 0;
-        if ((setWorkingDatabase(Database.LOCAL)) && (negativeGids != null) && (!negativeGids.isEmpty())) {
-            result += getAlleleValuesDao().countCharAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
-        }
-        if ((setWorkingDatabase(Database.CENTRAL)) && (positiveGids != null) && (!positiveGids.isEmpty())) {
-            result += getAlleleValuesDao().countCharAlleleValuesForPolymorphicMarkersRetrieval(positiveGids);
-        }
-        return result;
+        return super.countAllFromCentralAndLocalBySignedIdAndMethod(getAlleleValuesDao(), 
+                "countCharAlleleValuesForPolymorphicMarkersRetrieval", new Object[]{gids}, new Class[]{List.class});
     }
 
     @Override
     public List<AllelicValueElement> getMappingAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids, int start, int numOfRows)
             throws MiddlewareQueryException {
-        List<AllelicValueElement> allelicValueElements = new ArrayList<AllelicValueElement>();
-        long centralCount = 0;
-        long localCount = 0;
-        long relativeLimit = 0;
-
-        List<Integer> positiveGids = GenotypicDataManagerUtil.getPositiveIds(gids);
-        List<Integer> negativeGids = GenotypicDataManagerUtil.getNegativeIds(gids);
-
-        if ((setWorkingDatabase(Database.CENTRAL)) && (positiveGids != null) && (!positiveGids.isEmpty())) {
-            AlleleValuesDAO dao = getAlleleValuesDao();
-            centralCount = dao.countMappingAlleleValuesForPolymorphicMarkersRetrieval(positiveGids);
-
-            if (centralCount > start) {
-                allelicValueElements.addAll(dao.getMappingAlleleValuesForPolymorphicMarkersRetrieval(positiveGids, start, numOfRows));
-                relativeLimit = numOfRows - allelicValueElements.size();
-                if (relativeLimit > 0 && setWorkingDatabase(Database.LOCAL)) {
-                    dao = getAlleleValuesDao();
-                    localCount = dao.countMappingAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
-                    if (localCount > 0) {
-                        allelicValueElements.addAll(dao.getMappingAlleleValuesForPolymorphicMarkersRetrieval(negativeGids, 0,
-                                (int) relativeLimit));
-                    }
-                }
-            } else {
-                relativeLimit = start - centralCount;
-                if ((setWorkingDatabase(Database.LOCAL)) && (negativeGids != null) && (!negativeGids.isEmpty())) {
-                    dao = getAlleleValuesDao();
-                    localCount = dao.countMappingAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
-                    if (localCount > relativeLimit) {
-                        allelicValueElements.addAll(dao.getMappingAlleleValuesForPolymorphicMarkersRetrieval(negativeGids,
-                                (int) relativeLimit, numOfRows));
-                    }
-                }
-            }
-        } else if ((setWorkingDatabase(Database.LOCAL)) && (negativeGids != null) && (!negativeGids.isEmpty())) {
-            AlleleValuesDAO dao = getAlleleValuesDao();
-            localCount = dao.countMappingAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
-            if (localCount > start) {
-                allelicValueElements.addAll(dao.getMappingAlleleValuesForPolymorphicMarkersRetrieval(negativeGids, start, numOfRows));
-            }
-        }
-
+        List<String> methods = Arrays.asList("countMappingAlleleValuesForPolymorphicMarkersRetrieval",
+                "getMappingAlleleValuesForPolymorphicMarkersRetrieval");
+        List<AllelicValueElement> allelicValueElements = (List<AllelicValueElement>) super.getFromCentralAndLocalBySignedIdAndMethod(
+                getAlleleValuesDao(), methods, start, numOfRows, new Object[] { gids }, new Class[] { List.class });
+        
         //Sort by gid, markerName
         Collections.sort(allelicValueElements, AllelicValueElement.AllelicValueElementComparator);
 
@@ -1440,17 +772,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public long countMappingAlleleValuesForPolymorphicMarkersRetrieval(List<Integer> gids) throws MiddlewareQueryException {
-        List<Integer> positiveGids = GenotypicDataManagerUtil.getPositiveIds(gids);
-        List<Integer> negativeGids = GenotypicDataManagerUtil.getNegativeIds(gids);
-
-        long result = 0;
-        if (setWorkingDatabase(Database.LOCAL) && (negativeGids != null) && (!negativeGids.isEmpty())) {
-            result += getAlleleValuesDao().countMappingAlleleValuesForPolymorphicMarkersRetrieval(negativeGids);
-        }
-        if (setWorkingDatabase(Database.CENTRAL) && (positiveGids != null) && (!positiveGids.isEmpty())) {
-            result += getAlleleValuesDao().countMappingAlleleValuesForPolymorphicMarkersRetrieval(positiveGids);
-        }
-        return result;
+        return super.countAllFromCentralAndLocalBySignedIdAndMethod(getAlleleValuesDao(), 
+                "countMappingAlleleValuesForPolymorphicMarkersRetrieval", new Object[]{gids}, new Class[]{List.class});
     }
 
     @Override
@@ -1469,46 +792,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             return new ArrayList<Integer>();
         }
 
-        List<Integer> qtlIds = new ArrayList<Integer>();
-        long centralCount = 0;
-        long localCount = 0;
-        long relativeLimit = 0;
-
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            QtlDAO dao = getQtlDao();
-            centralCount = dao.countQtlIdByName(name);
-
-            if (centralCount > start) {
-                qtlIds.addAll(dao.getQtlIdByName(name, start, numOfRows));
-                relativeLimit = numOfRows - qtlIds.size();
-                if (relativeLimit > 0 && setWorkingDatabase(Database.LOCAL)) {
-                    dao = getQtlDao();
-                    localCount = dao.countQtlIdByName(name);
-                    if (localCount > 0) {
-                        List<Integer> qtlIdList = dao.getQtlIdByName(name, 0, (int) relativeLimit);
-                        qtlIds.addAll(qtlIdList);
-                    }
-                }
-            } else {
-                relativeLimit = start - centralCount;
-                if (setWorkingDatabase(Database.LOCAL)) {
-                    dao = getQtlDao();
-                    localCount = dao.countQtlIdByName(name);
-                    if (localCount > relativeLimit) {
-                        List<Integer> qtlIdList = dao.getQtlIdByName(name, (int) relativeLimit, numOfRows);
-                        qtlIds.addAll(qtlIdList);
-                    }
-                }
-            }
-        } else if (setWorkingDatabase(Database.LOCAL)) {
-            QtlDAO dao = getQtlDao();
-            localCount = dao.countQtlIdByName(name);
-            if (localCount > start) {
-                List<Integer> qtlIdList = dao.getQtlIdByName(name, start, numOfRows);
-                qtlIds.addAll(qtlIdList);
-            }
-        }
-        return qtlIds;
+        List<String> methods = Arrays.asList("countQtlIdByName", "getQtlIdByName");
+        return (List<Integer>) super.getFromCentralAndLocalByMethod(getQtlDao(), methods, start, numOfRows, 
+                new Object[]{name}, new Class[]{String.class});
     }
 
     @Override
@@ -1516,14 +802,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         if ((name == null) || (name.isEmpty())) {
             return 0;
         }
-        long result = 0;
-        if (setWorkingDatabase(Database.LOCAL)) {
-            result += getQtlDao().countQtlIdByName(name);
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            result += getQtlDao().countQtlIdByName(name);
-        }
-        return result;
+        return super.countAllFromCentralAndLocalByMethod(getQtlDao(), "countQtlIdByName", new Object[]{name}, new Class[]{String.class});
     }
 
     @Override
@@ -1531,43 +810,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         if ((name == null) || (name.isEmpty())) {
             return new ArrayList<QtlDetailElement>();
         }
-        List<QtlDetailElement> qtl = new ArrayList<QtlDetailElement>();
-        long centralCount = 0;
-        long localCount = 0;
-        long relativeLimit = 0;
 
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            QtlDAO dao = getQtlDao();
-            centralCount = dao.countQtlDetailsByName(name);
-
-            if (centralCount > start) {
-                qtl.addAll(dao.getQtlDetailsByName(name, start, numOfRows));
-                relativeLimit = numOfRows - qtl.size();
-                if (relativeLimit > 0 && setWorkingDatabase(Database.LOCAL)) {
-                    dao = getQtlDao();
-                    localCount = dao.countQtlDetailsByName(name);
-                    if (localCount > 0) {
-                        qtl.addAll(dao.getQtlDetailsByName(name, 0, (int) relativeLimit));
-                    }
-                }
-            } else {
-                relativeLimit = start - centralCount;
-                if (setWorkingDatabase(Database.LOCAL)) {
-                    dao = getQtlDao();
-                    localCount = dao.countQtlDetailsByName(name);
-                    if (localCount > relativeLimit) {
-                        qtl.addAll(dao.getQtlDetailsByName(name, (int) relativeLimit, numOfRows));
-                    }
-                }
-            }
-        } else if (setWorkingDatabase(Database.LOCAL)) {
-            QtlDAO dao = getQtlDao();
-            localCount = dao.countQtlDetailsByName(name);
-            if (localCount > start) {
-                qtl.addAll(dao.getQtlDetailsByName(name, start, numOfRows));
-            }
-        }
-        return qtl;
+        List<String> methods = Arrays.asList("countQtlDetailsByName", "getQtlDetailsByName");
+        return (List<QtlDetailElement>) super.getFromCentralAndLocalByMethod(getQtlDao(), methods, start, numOfRows, 
+                new Object[]{name}, new Class[]{String.class});
     }
 
     @Override
@@ -1575,354 +821,84 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         if ((name == null) || (name.isEmpty())) {
             return 0;
         }
-
-        long result = 0;
-        if (setWorkingDatabase(Database.LOCAL)) {
-            result += getQtlDao().countQtlDetailsByName(name);
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            result += getQtlDao().countQtlDetailsByName(name);
-        }
-        return result;
+        return super.countAllFromCentralAndLocalByMethod(getQtlDao(), "countQtlDetailsByName", new Object[]{name}, new Class[]{String.class});
     }
 
     @Override
-    public List<QtlDetailElement> getQTLByQTLIDs(List<Integer> qtlIDs, int start, int numOfRows) throws MiddlewareQueryException {
-        if ((qtlIDs == null) || (qtlIDs.isEmpty())) {
+    public List<QtlDetailElement> getQtlByQtlIds(List<Integer> qtlIds, int start, int numOfRows) throws MiddlewareQueryException {
+        if ((qtlIds == null) || (qtlIds.isEmpty())) {
             return new ArrayList<QtlDetailElement>();
         }
-
-        List<QtlDetailElement> qtl = new ArrayList<QtlDetailElement>();
-        long centralCount = 0;
-        long localCount = 0;
-        long relativeLimit = 0;
-
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            QtlDAO dao = getQtlDao();
-            centralCount = dao.countQtlDetailsByQTLIDs(qtlIDs);
-
-            if (centralCount > start) {
-                qtl.addAll(dao.getQtlDetailsByQTLIDs(qtlIDs, start, numOfRows));
-                relativeLimit = numOfRows - qtl.size();
-                if (relativeLimit > 0 && setWorkingDatabase(Database.LOCAL)) {
-                    dao = getQtlDao();
-                    localCount = dao.countQtlDetailsByQTLIDs(qtlIDs);
-                    if (localCount > 0) {
-                        qtl.addAll(dao.getQtlDetailsByQTLIDs(qtlIDs, 0, (int) relativeLimit));
-                    }
-                }
-            } else {
-                relativeLimit = start - centralCount;
-                if (setWorkingDatabase(Database.LOCAL)) {
-                    dao = getQtlDao();
-                    localCount = dao.countQtlDetailsByQTLIDs(qtlIDs);
-                    if (localCount > relativeLimit) {
-                        qtl.addAll(dao.getQtlDetailsByQTLIDs(qtlIDs, (int) relativeLimit, numOfRows));
-                    }
-                }
-            }
-        } else if (setWorkingDatabase(Database.LOCAL)) {
-            QtlDAO dao = getQtlDao();
-            localCount = dao.countQtlDetailsByQTLIDs(qtlIDs);
-            if (localCount > start) {
-                qtl.addAll(dao.getQtlDetailsByQTLIDs(qtlIDs, start, numOfRows));
-            }
-        }
-        return qtl;
+        
+        List<String> methods = Arrays.asList("countQtlDetailsByQTLIDs", "getQtlDetailsByQTLIDs");
+        return (List<QtlDetailElement>) super.getFromCentralAndLocalByMethod(getQtlDao(), methods, start, numOfRows, 
+                new Object[]{qtlIds}, new Class[]{List.class});
     }
 
     @Override
-    public long countQTLByQTLIDs(List<Integer> qtlIDs) throws MiddlewareQueryException {
-        if ((qtlIDs == null) || (qtlIDs.isEmpty())) {
+    public long countQtlByQtlIds(List<Integer> qtlIds) throws MiddlewareQueryException {
+        if ((qtlIds == null) || (qtlIds.isEmpty())) {
             return 0;
         }
-
-        long result = 0;
-        if (setWorkingDatabase(Database.LOCAL)) {
-            result += getQtlDao().countQtlDetailsByQTLIDs(qtlIDs);
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            result += getQtlDao().countQtlDetailsByQTLIDs(qtlIDs);
-        }
-        return result;
+        return super.countAllFromCentralAndLocalByMethod(getQtlDao(), "countQtlDetailsByQTLIDs", new Object[]{qtlIds}, new Class[]{List.class});
     }
 
     @Override
     public List<Integer> getQtlByTrait(String trait, int start, int numOfRows) throws MiddlewareQueryException {
-
-        List<Integer> qtl = new ArrayList<Integer>();
-        long centralCount = 0;
-        long localCount = 0;
-        long relativeLimit = 0;
-
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            QtlDAO dao = getQtlDao();
-            centralCount = dao.countQtlByTrait(trait);
-
-            if (centralCount > start) {
-                qtl.addAll(dao.getQtlByTrait(trait, start, numOfRows));
-                relativeLimit = numOfRows - qtl.size();
-                if (relativeLimit > 0 && setWorkingDatabase(Database.LOCAL)) {
-                    dao = getQtlDao();
-                    localCount = dao.countQtlByTrait(trait);
-                    if (localCount > 0) {
-                        qtl.addAll(dao.getQtlByTrait(trait, 0, (int) relativeLimit));
-                    }
-                }
-            } else {
-                relativeLimit = start - centralCount;
-                if (setWorkingDatabase(Database.LOCAL)) {
-                    dao = getQtlDao();
-                    localCount = dao.countQtlByTrait(trait);
-                    if (localCount > relativeLimit) {
-                        qtl.addAll(dao.getQtlByTrait(trait, (int) relativeLimit, numOfRows));
-                    }
-                }
-            }
-        } else if (setWorkingDatabase(Database.LOCAL)) {
-            QtlDAO dao = getQtlDao();
-            localCount = dao.countQtlByTrait(trait);
-            if (localCount > start) {
-                qtl.addAll(dao.getQtlByTrait(trait, start, numOfRows));
-            }
-        }
-
-        return qtl;
-
+        List<String> methods = Arrays.asList("countQtlByTrait", "getQtlByTrait");
+        return (List<Integer>) super.getFromCentralAndLocalByMethod(getQtlDao(), methods, start, numOfRows, 
+                new Object[]{trait}, new Class[]{String.class});
     }
 
     @Override
     public long countQtlByTrait(String trait) throws MiddlewareQueryException {
-        long result = 0;
-        if (setWorkingDatabase(Database.LOCAL)) {
-            result += getQtlDao().countQtlByTrait(trait);
-        }
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            result += getQtlDao().countQtlByTrait(trait);
-        }
-        return result;
+        return super.countAllFromCentralAndLocalByMethod(getQtlDao(), "countQtlByTrait", new Object[]{trait}, new Class[]{String.class});
     }
 
-        @Override
-        public List<ParentElement> getAllParentsFromMappingPopulation(int start, int numOfRows) throws MiddlewareQueryException {
-        List<ParentElement> allParentsFromMappingPopulation = new ArrayList<ParentElement>();
-        Long centralCount = Long.valueOf(0);
-        Long localCount = Long.valueOf(0);
-        int relativeLimit = 0;
-
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            MappingPopDAO mappingPopDao = getMappingPopDao();
-            centralCount = mappingPopDao.countAllParentsFromMappingPopulation();
-            if (centralCount > start) {
-                allParentsFromMappingPopulation.addAll(mappingPopDao.getAllParentsFromMappingPopulation(start, numOfRows));
-                relativeLimit = numOfRows - (centralCount.intValue() - start);
-
-                if (relativeLimit > 0) {
-
-                    if (setWorkingDatabase(Database.LOCAL)) {
-                        mappingPopDao = getMappingPopDao();
-                        localCount = mappingPopDao.countAllParentsFromMappingPopulation();
-
-                        if (localCount > 0) {
-                            allParentsFromMappingPopulation.addAll(mappingPopDao.getAllParentsFromMappingPopulation(0, relativeLimit));
-                        }
-                    }
-                }
-            } else {
-                relativeLimit = start - centralCount.intValue();
-                if (setWorkingDatabase(Database.LOCAL)) {
-                    mappingPopDao = getMappingPopDao();
-                    localCount = mappingPopDao.countAllParentsFromMappingPopulation();
-                    if (localCount > relativeLimit) {
-                        allParentsFromMappingPopulation.addAll(mappingPopDao.getAllParentsFromMappingPopulation(relativeLimit, numOfRows));
-                    }
-                }
-            }
-        } else if (setWorkingDatabase(Database.LOCAL)) {
-            MappingPopDAO mappingPopDao = getMappingPopDao();
-            localCount = mappingPopDao.countAllParentsFromMappingPopulation();
-            if (localCount > start) {
-                allParentsFromMappingPopulation.addAll(mappingPopDao.getAllParentsFromMappingPopulation(start, numOfRows));
-            }
-        }
-
-        return allParentsFromMappingPopulation;
+    @Override
+    public List<ParentElement> getAllParentsFromMappingPopulation(int start, int numOfRows) throws MiddlewareQueryException {
+        List<String> methods = Arrays.asList("countAllParentsFromMappingPopulation", "getAllParentsFromMappingPopulation");
+        return (List<ParentElement>) super.getFromCentralAndLocalByMethod(getMappingPopDao(), methods, start, numOfRows, 
+                new Object[]{}, new Class[]{});
     }
 
     @Override
     public Long countAllParentsFromMappingPopulation() throws MiddlewareQueryException {
-        long count = 0;
-        if (setWorkingDatabase(Database.CENTRAL)){
-            count += getMappingPopDao().countAllParentsFromMappingPopulation();
-        }
-        if (setWorkingDatabase(Database.LOCAL)){
-            count += getMappingPopDao().countAllParentsFromMappingPopulation();
-        }
-        return count;
+        return super.countAllFromCentralAndLocalByMethod(getMappingPopDao(), "countAllParentsFromMappingPopulation", new Object[]{}, new Class[]{});
     }
 
     @Override
     public List<MapDetailElement> getMapDetailsByName(String nameLike, int start, int numOfRows) throws MiddlewareQueryException {
-        List<MapDetailElement> maps = new ArrayList<MapDetailElement>();
-        Long centralCount = Long.valueOf(0);
-        Long localCount = Long.valueOf(0);
-        Long relativeLimit = Long.valueOf(0);
-
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            MapDAO mapDao = getMapDao();
-            centralCount = mapDao.countMapDetailsByName(nameLike);
-            if (centralCount > start) {
-                maps.addAll(mapDao.getMapDetailsByName(nameLike, start, numOfRows));
-                relativeLimit = numOfRows - (centralCount - start);
-                if (relativeLimit > 0) {
-                    if (setWorkingDatabase(Database.LOCAL)) {
-                        mapDao = getMapDao();
-                        localCount = mapDao.countMapDetailsByName(nameLike);
-                        if (localCount > 0) {
-                            maps.addAll(mapDao.getMapDetailsByName(nameLike, 0, relativeLimit.intValue()));
-                        }
-                    }
-                }
-            } else {
-                relativeLimit = start - centralCount;
-                if (setWorkingDatabase(Database.LOCAL)) {
-                    mapDao = getMapDao();
-                    localCount = mapDao.countMapDetailsByName(nameLike);
-                    if (localCount > relativeLimit) {
-                        maps.addAll(mapDao.getMapDetailsByName(nameLike, relativeLimit.intValue(), numOfRows));
-                    }
-                }
-            }
-        } else if (setWorkingDatabase(Database.LOCAL)) {
-            MapDAO mapDao = getMapDao();
-            localCount = mapDao.countMapDetailsByName(nameLike);
-            if (localCount > start) {
-                maps.addAll(mapDao.getMapDetailsByName(nameLike, start, numOfRows));
-            }
-        }
-        return maps;
+        List<String> methods = Arrays.asList("countMapDetailsByName", "getMapDetailsByName");
+        return (List<MapDetailElement>) super.getFromCentralAndLocalByMethod(getMapDao(), methods, start, numOfRows, 
+                new Object[]{nameLike}, new Class[]{String.class});
     }
 
     @Override
     public Long countMapDetailsByName(String nameLike) throws MiddlewareQueryException {
-        long count = 0;
-        if (setWorkingDatabase(Database.CENTRAL)){
-            count += getMapDao().countMapDetailsByName(nameLike);
-        }
-        if (setWorkingDatabase(Database.LOCAL)){
-            count += getMapDao().countMapDetailsByName(nameLike);
-        }
-        return count;
+        return super.countAllFromCentralAndLocalByMethod(getMapDao(), "countMapDetailsByName", new Object[]{nameLike}, new Class[]{String.class});
     }
 
     public List<MapDetailElement> getAllMapDetails(int start, int numOfRows) throws MiddlewareQueryException {
-        List<MapDetailElement> maps = new ArrayList<MapDetailElement>();
-        Long centralCount = Long.valueOf(0);
-        Long localCount = Long.valueOf(0);
-        Long relativeLimit = Long.valueOf(0);
-
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            MapDAO mapDao = getMapDao();
-            centralCount = mapDao.countAllMapDetails();
-
-            if (centralCount > start) {
-                maps.addAll(mapDao.getAllMapDetails(start, numOfRows));
-                relativeLimit = numOfRows - (centralCount - start);
-
-                if (relativeLimit > 0) {
-
-                    if (setWorkingDatabase(Database.LOCAL)) {
-                        mapDao = getMapDao();
-                        localCount = mapDao.countAllMapDetails();
-
-                        if (localCount > 0) {
-                            maps.addAll(mapDao.getAllMapDetails(0, relativeLimit.intValue()));
-                        }
-                    }
-                }
-            } else {
-                relativeLimit = start - centralCount;
-                if (setWorkingDatabase(Database.LOCAL)) {
-                    mapDao = getMapDao();
-                    localCount = mapDao.countAllMapDetails();
-                    if (localCount > relativeLimit) {
-                        maps.addAll(mapDao.getAllMapDetails(relativeLimit.intValue(), numOfRows));
-                    }
-                }
-            }
-        } else if (setWorkingDatabase(Database.LOCAL)) {
-            MapDAO mapDao = getMapDao();
-            localCount = mapDao.countAllMapDetails();
-            if (localCount > start) {
-                maps.addAll(mapDao.getAllMapDetails(start, numOfRows));
-            }
-        }
-
-        return maps;
+        List<String> methods = Arrays.asList("countAllMapDetails", "getAllMapDetails");
+        return (List<MapDetailElement>) super.getFromCentralAndLocalByMethod(getMapDao(), methods, start, numOfRows, 
+                new Object[]{}, new Class[]{});
     }
 
     public long countAllMapDetails() throws MiddlewareQueryException {
-        long count = 0;
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            count += getMapDao().countAllMapDetails();
-        }
-        if (setWorkingDatabase(Database.LOCAL)) {
-            count += getMapDao().countAllMapDetails();
-        }
-        return count;
+        return super.countAllFromCentralAndLocalByMethod(getMapDao(), "countAllMapDetails", new Object[]{}, new Class[]{});
     }
 
     @Override
     public List<Integer> getMapIdsByQtlName(String qtlName, int start, int numOfRows) throws MiddlewareQueryException {
-        List<Integer> mapIds = new ArrayList<Integer>();
-        long centralCount = 0;
-        long localCount = 0;
-        long relativeLimit = 0;
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            QtlDetailsDAO dao = getQtlDetailsDao();
-            centralCount = dao.countMapIdsByQtlName(qtlName);
-
-            if (centralCount > start) {
-                mapIds.addAll(dao.getMapIdsByQtlName(qtlName, start, numOfRows));
-                relativeLimit = numOfRows - mapIds.size();
-                if (relativeLimit > 0 && setWorkingDatabase(Database.LOCAL)) {
-                     dao = getQtlDetailsDao();
-                    localCount = dao.countMapIdsByQtlName(qtlName);
-                    if (localCount > 0) {
-                        mapIds.addAll(dao.getMapIdsByQtlName(qtlName, 0, (int) relativeLimit));
-                    }
-                }
-            } else {
-                relativeLimit = start - centralCount;
-                if (setWorkingDatabase(Database.LOCAL)) {
-                     dao = getQtlDetailsDao();
-                    localCount = dao.countMapIdsByQtlName(qtlName);
-                    if (localCount > relativeLimit) {
-                        mapIds.addAll(dao.getMapIdsByQtlName(qtlName, (int) relativeLimit, numOfRows));
-                    }
-                }
-            }
-        } else if (setWorkingDatabase(Database.LOCAL)) {
-            QtlDetailsDAO dao = getQtlDetailsDao();
-            localCount = dao.countMapIdsByQtlName(qtlName);
-            if (localCount > start) {
-                mapIds.addAll(dao.getMapIdsByQtlName(qtlName, start, numOfRows));
-            }
-        }
-
-        return mapIds;
+        List<String> methods = Arrays.asList("countMapIdsByQtlName", "getMapIdsByQtlName");
+        return (List<Integer>) super.getFromCentralAndLocalByMethod(getQtlDetailsDao(), methods, start, numOfRows, 
+                new Object[]{qtlName}, new Class[]{String.class});
     }
 
     @Override
     public long countMapIdsByQtlName(String qtlName) throws MiddlewareQueryException {
-        long count = 0;
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            count += getQtlDetailsDao().countMapIdsByQtlName(qtlName);
-        }
-        if (setWorkingDatabase(Database.LOCAL)) {
-            count += getQtlDetailsDao().countMapIdsByQtlName(qtlName);
-        }
-        return count;
+        return super.countAllFromCentralAndLocalByMethod(getQtlDetailsDao(), "countMapIdsByQtlName", new Object[]{qtlName}, new Class[]{String.class});
     }
 
     @Override
@@ -1935,20 +911,15 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public long countMarkerIdsByQtl(String qtlName, String chromosome, int min, int max) throws MiddlewareQueryException {
-        long count = 0;
-        if (setWorkingDatabase(Database.CENTRAL)) {
-            count += getQtlDetailsDao().countMarkerIdsByQtl(qtlName, chromosome, min, max);
-        }
-        if (setWorkingDatabase(Database.LOCAL)) {
-            count += getQtlDetailsDao().countMarkerIdsByQtl(qtlName, chromosome, min, max);
-        }
-        return count;
+        return super.countAllFromCentralAndLocalByMethod(getQtlDetailsDao(), "countMarkerIdsByQtl", 
+                new Object[]{qtlName, chromosome, min, max}, new Class[]{String.class, String.class, Integer.TYPE, Integer.TYPE});
     }
 
+    @Override
     public List<Marker> getMarkersByIds(List<Integer> markerIds, int start, int numOfRows) throws MiddlewareQueryException {
         List<Marker> markers = new ArrayList<Marker>();
-        List<Integer> positiveGids = GenotypicDataManagerUtil.getPositiveIds(markerIds);
-        List<Integer> negativeGids = GenotypicDataManagerUtil.getNegativeIds(markerIds);
+        List<Integer> positiveGids = getPositiveIds(markerIds);
+        List<Integer> negativeGids = getNegativeIds(markerIds);
 
         if ((setWorkingDatabase(Database.LOCAL)) && (negativeGids != null) && (!negativeGids.isEmpty())) {
             markers.addAll(getMarkerDao().getMarkersByIds(negativeGids, start, numOfRows));
@@ -1968,7 +939,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         QtlDetailsPK savedId = new QtlDetailsPK();
         try {
             trans = session.beginTransaction();
-            
+
             // No need to auto-assign negative IDs for new local DB records
             // qtlId and mapId are foreign keys
 
@@ -2432,7 +1403,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
             Integer markerId = markerDao.getNegativeId("markerId");
             marker.setMarkerId(markerId);
-            
+
             marker.setMarkerType("SSR");
 
             Marker markerRecordSaved = markerDao.saveOrUpdate(marker);
@@ -2489,7 +1460,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
-        
+
         Boolean transactionStatus = true;
         try {
             trans = session.beginTransaction();
@@ -2555,7 +1526,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
-        
+
         Boolean transactionStatus = true;
         try {
             trans = session.beginTransaction();
@@ -2622,7 +1593,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
-        
+
         Boolean transactionStatus = true;
         try {
             // begin save transaction
@@ -2690,7 +1661,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
-        
+
         Boolean transactionStatus = true;
         try {
             // begin save transaction
@@ -2762,12 +1733,13 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return transactionStatus;
     }
 
+    @Override
     public Boolean setDart(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser,
             AlleleValues alleleValues, Dataset dataset, DartValues dartValues) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
-        
+
         Boolean transactionStatus = true;
         try {
             // Begin save transaction
@@ -2819,7 +1791,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
             // Add DatasetUser
             DatasetUsersDAO datasetUserDao = getDatasetUsersDao();
-            
+
             datasetUser.setDatasetId(datasetId);
 
             DatasetUsers datasetUserSaved = datasetUserDao.saveOrUpdate(datasetUser);
@@ -2831,7 +1803,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
             // Add AlleleValues
             AlleleValuesDAO alleleValuesDao = getAlleleValuesDao();
-            
+
             alleleValues.setDatasetId(datasetId);
 
             Integer alleleValuesGeneratedId = alleleValuesDao.getNegativeId("anId");
@@ -2847,7 +1819,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             // Add DArT Values
 
             DartValuesDAO dartValuesDao = getDartValuesDao();
-            
+
             dartValues.setDatasetId(datasetId);
 
             Integer adId = dartValuesDao.getNegativeId("adId");
@@ -2883,7 +1855,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
-        
+
         Boolean transactionStatus = true;
         try {
             // Begin save transaction
@@ -2982,7 +1954,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
-        
+
         Boolean transactionStatus = true;
         try {
             // Begin save transaction
@@ -3081,7 +2053,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
-        
+
         Boolean transactionStatus = true;
         try {
             // Begin save transaction
@@ -3189,7 +2161,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
-        
+
         Boolean transactionStatus = true;
         try {
             // Begin save transaction

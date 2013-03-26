@@ -151,7 +151,7 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer>{
                         Integer nid = (Integer) result[1];
                         Integer datasetId = (Integer) result[2];
 
-                        AccMetadataSetPK dataElement = new AccMetadataSetPK(gid, nid, datasetId);
+                        AccMetadataSetPK dataElement = new AccMetadataSetPK(datasetId, gid, nid);
 
                         dataValues.add(dataElement);
                         

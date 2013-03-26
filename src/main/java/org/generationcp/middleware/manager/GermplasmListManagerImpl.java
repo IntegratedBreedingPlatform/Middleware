@@ -28,6 +28,7 @@ import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings("unchecked")
 public class GermplasmListManagerImpl extends DataManager implements GermplasmListManager{
 
     private static final Logger LOG = LoggerFactory.getLogger(GermplasmListManagerImpl.class);
@@ -129,7 +130,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     public long countGermplasmListDataByListId(Integer id) throws MiddlewareQueryException {
         
     	Database instance = id >= 0 ? Database.CENTRAL : Database.LOCAL;
-    	return countAllFromInstanceByMethod(getGermplasmListDataDAO(), instance, "countByListId", 
+    	return countFromInstanceByMethod(getGermplasmListDataDAO(), instance, "countByListId", 
     				new Object[] {id}, new Class[] {Integer.class});
     }
 
@@ -152,7 +153,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
         return null;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<GermplasmListData> getGermplasmListDataByGID(Integer gid, int start, int numOfRows) throws MiddlewareQueryException {
     	
@@ -193,8 +193,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     @Override
     public long countAllTopLevelLists(Database instance) throws MiddlewareQueryException {
-    	
-    	return countAllFromInstanceByMethod(getGermplasmListDAO(), instance, "countAllTopLevelLists", null, null);
+    	return countFromInstanceByMethod(getGermplasmListDAO(), instance, "countAllTopLevelLists", null, null);
     }
 
     @Override
@@ -507,7 +506,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     public long countGermplasmListByParentFolderId(Integer parentId) throws MiddlewareQueryException {
     	
     	Database instance = parentId >= 0 ? Database.CENTRAL : Database.LOCAL;
-    	return countAllFromInstanceByMethod(getGermplasmListDAO(), instance, "countByParentFolderId", 
+    	return countFromInstanceByMethod(getGermplasmListDAO(), instance, "countByParentFolderId", 
     				new Object[] {parentId}, new Class[] {Integer.class});
     }
 

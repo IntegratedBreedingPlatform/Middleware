@@ -118,7 +118,7 @@ public class NameDAO extends GenericDAO<Name, Integer>{
             crit.add(Restrictions.in("nid", nIds));
             List<Name> names = crit.list();
             if (names.isEmpty()) {
-                return null;
+                return new ArrayList<Name>();
             }
             return names;
         } catch (HibernateException e) {

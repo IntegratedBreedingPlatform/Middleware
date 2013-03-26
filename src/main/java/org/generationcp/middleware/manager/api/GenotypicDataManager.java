@@ -1499,7 +1499,7 @@ public interface GenotypicDataManager{
      * @return (List<Marker>) List of Markers
      * @throws MiddlewareQueryException
      */
-    List<Marker> getMarkersByMarkerIDs(List<Integer> markerIDs, int start,
+    List<Marker> getMarkersByMarkerIds(List<Integer> markerIDs, int start,
             int numOfRows) throws MiddlewareQueryException;
 
     /**
@@ -1508,7 +1508,7 @@ public interface GenotypicDataManager{
      * @return Count of Markers
      * @throws MiddlewareQueryException
      */
-    long countMarkersByMarkerIDs(List<Integer> markerIDs)
+    long countMarkersByMarkerIds(List<Integer> markerIDs)
             throws MiddlewareQueryException;
 
     /**
@@ -1525,7 +1525,7 @@ public interface GenotypicDataManager{
      * @return List of QTL entries
      * @throws MiddlewareQueryException
      */
-    List<QtlDetailElement> getQTLByQTLIDs(List<Integer> qtls, int start,
+    List<QtlDetailElement> getQtlByQtlIds(List<Integer> qtls, int start,
             int numOfRows) throws MiddlewareQueryException;
 
     /**
@@ -1536,6 +1536,6 @@ public interface GenotypicDataManager{
      * @return Count of QTL entries
      * @throws MiddlewareQueryException
      */
-    long countQTLByQTLIDs(List<Integer> qtls) throws MiddlewareQueryException;
+    long countQtlByQtlIds(List<Integer> qtls) throws MiddlewareQueryException;
 
 }

@@ -520,7 +520,7 @@ public class TestGenotypicDataManagerImpl{
 
         List<AllelicValueElement> results = manager.getIntAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds, 0, 
                 (int) manager.countIntAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds));
-        System.out.println("testGetIntAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: " + results);
+        System.out.println("testGetIntAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: " + results.size() + "\n" + results);
     }
 
     @Test
@@ -544,7 +544,7 @@ public class TestGenotypicDataManagerImpl{
 
         List<AllelicValueElement> results = manager.getCharAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds, 0, 
                 (int) manager.countCharAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds));
-        System.out.println("testGetCharAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: " + results);
+        System.out.println("testGetCharAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: " + results.size() + "\n" + results);
     }
 
 
@@ -572,7 +572,8 @@ public class TestGenotypicDataManagerImpl{
         List<Integer> markerIds = new ArrayList<Integer>(); 
         markerIds.add(Integer.valueOf(6803)); // Please replace the marker ids found in the target crop to be used in testing
 
-        List<Integer> nIdList = manager.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds, 1, 5);
+        List<Integer> nIdList = manager.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds, 
+                0, manager.countNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds));
         System.out.println("testGetNIdsByDatasetIdsAndMarkerIdsAndNotGIds() RESULTS: " + nIdList);
     }  
     
@@ -602,7 +603,8 @@ public class TestGenotypicDataManagerImpl{
         List<Integer> markerIds = new ArrayList<Integer>(); 
         markerIds.add(Integer.valueOf(6803)); // Please replace the marker ids found in the target crop to be used in testing
 
-        List<Integer> nIdList = manager.getNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds, 5, 7);
+        List<Integer> nIdList = manager.getNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds, 0, 
+                manager.countNIdsByMarkerIdsAndDatasetIds(datasetIds, markerIds));
         System.out.println("testGetNIdsByDatasetIdsAndMarkerIds() RESULTS: " + nIdList);
     }  
     
@@ -629,7 +631,7 @@ public class TestGenotypicDataManagerImpl{
 
         List<AllelicValueElement> results = manager.getMappingAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds, 0, 
                 (int) manager.countMappingAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds));
-        System.out.println("testGetMappingAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: " + results);
+        System.out.println("testGetMappingAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: " + results.size() + "\n" + results);
     }
 
 
@@ -1697,7 +1699,7 @@ public class TestGenotypicDataManagerImpl{
         markerIDs.add(1317);
         
         long start = System.currentTimeMillis();
-        List<Marker> markerList = manager.getMarkersByMarkerIDs(markerIDs, 0, 5);
+        List<Marker> markerList = manager.getMarkersByMarkerIds(markerIDs, 0, 5);
 
         for (Marker marker : markerList) {
             System.out.println("Marker: " + marker);
@@ -1712,7 +1714,7 @@ public class TestGenotypicDataManagerImpl{
         List<Integer> markerIDs = new ArrayList<Integer>();
         markerIDs.add(1317);
         long start = System.currentTimeMillis();
-        long count = manager.countMarkersByMarkerIDs(markerIDs);
+        long count = manager.countMarkersByMarkerIds(markerIDs);
 
         System.out.println("Count of Markers: " + count);
         
@@ -1726,8 +1728,8 @@ public class TestGenotypicDataManagerImpl{
         qtlIDs.add(1);
       
 
-        List<QtlDetailElement> results = manager.getQTLByQTLIDs(qtlIDs, 0, 
-                (int) manager.countQTLByQTLIDs(qtlIDs));
+        List<QtlDetailElement> results = manager.getQtlByQtlIds(qtlIDs, 0, 
+                (int) manager.countQtlByQtlIds(qtlIDs));
         System.out.println("testGetQtlByQTLIDs() RESULTS: " + results);
     }
 
@@ -1738,7 +1740,7 @@ public class TestGenotypicDataManagerImpl{
         qtlIDs.add(1);
         qtlIDs.add(2);
         qtlIDs.add(3);
-        long count = manager.countQTLByQTLIDs(qtlIDs);
+        long count = manager.countQtlByQtlIds(qtlIDs);
         System.out.println("testCountQtlByQTLIDs() RESULTS: " + count);
     }   
     

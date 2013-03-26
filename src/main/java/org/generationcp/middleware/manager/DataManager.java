@@ -215,6 +215,15 @@ public abstract class DataManager{
         return false;
     }
 
+    @SuppressWarnings("rawtypes")
+    private boolean setDaoSession(GenericDAO dao, Integer id) {
+        if (setWorkingDatabase(id)) {
+            dao.setSession(activeSession);
+            return true;
+        }
+        return false;
+    }
+
     protected Session getActiveSession() {
         return activeSession;
     }
@@ -281,6 +290,27 @@ public abstract class DataManager{
         if (instance == Database.LOCAL) {
             activeSession = getCurrentSessionForLocal();
         } else if (instance == Database.CENTRAL) {
+            activeSession = getCurrentSessionForCentral();
+        }
+        if (activeSession != null) {
+            return setDaoSession(dao, activeSession);
+        }
+        return false;
+    }
+
+    /**
+     * Sets the active session based on the given instance. 
+     * Returns true if the active session is not null.
+     * @param id
+     *          - If the given id is positive, the session is set to Central
+     *            If the given id is negative, the session is set to Local
+     * @param dao - The DAO to set the active session into
+     */
+    @SuppressWarnings("rawtypes")
+    protected boolean setWorkingDatabase(Integer id, GenericDAO dao) {
+        if (id < 0) {
+            activeSession = getCurrentSessionForLocal();
+        } else if (id >= 0) {
             activeSession = getCurrentSessionForCentral();
         }
         if (activeSession != null) {
@@ -497,6 +527,111 @@ public abstract class DataManager{
         return toReturn;
 
     }
+    
+    /**
+     * A generic implementation of the getXXX(Object parameter, int start, int numOfRows).
+     * Calls the corresponding getXXX method as specified in the second value in the list of methods parameter.
+     * Separates the positive from negative ids and retrieves from central and local databases respectively.
+     * The ids are stored in the first index of the "parameters" parameter
+     * 
+     * Sample usage: 
+     *
+     *      }
+     * 
+     * @param dao - the DAO to call the methods from
+     * @param methods - the methods to call (countXXX and its corresponding getXXX)
+     * @param start - the start row
+     * @param numOfRows - number of rows to retrieve
+     * @param parameters - the parameters to be passed to the methods
+     * @param parameterTypes - the types of the parameters to be passed to the method
+     * @return List of all records satisfying the given parameters
+     * @throws MiddlewareQueryException
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public List getFromCentralAndLocalBySignedIdAndMethod(GenericDAO dao, List<String> methods, int start, int numOfRows, Object[] parameters, Class[] parameterTypes)
+            throws MiddlewareQueryException {
+        List toReturn = new ArrayList();
+        long centralCount = 0;
+        long localCount = 0;
+        long relativeLimit = 0;
+
+        //Separate the positive ids from the negative ids
+        
+        List<Integer> ids = (List<Integer>) parameters[0];
+        List<Integer> positiveIds = getPositiveIds(ids);
+        List<Integer> negativeIds = getNegativeIds(ids);
+        
+        // Get count method parameter types and parameters
+        Class[] countMethodParameterTypes = parameterTypes;
+        Object[] countMethodParameters = parameters;
+
+        // Get get method parameter types and parameters
+        Class[] getMethodParameterTypes = new Class[parameters.length + 2];
+        Object[] getMethodParameters = new Object[parameters.length + 2];
+
+        int i = 0;
+        for (i = 0; i < parameters.length; i++) {
+            getMethodParameterTypes[i] = parameterTypes[i];
+            getMethodParameters[i] = parameters[i];
+        }
+        getMethodParameterTypes[i] = Integer.TYPE;
+        getMethodParameterTypes[i + 1] = Integer.TYPE;
+        getMethodParameters[i] = start;
+        getMethodParameters[i + 1] = numOfRows;
+
+        String countMethodName = methods.get(0);
+        String getMethodName = methods.get(1);
+        try {
+            // Get the methods from the dao
+            java.lang.reflect.Method countMethod = dao.getClass().getMethod(countMethodName, countMethodParameterTypes);
+            java.lang.reflect.Method getMethod = dao.getClass().getMethod(getMethodName, getMethodParameterTypes);
+
+            if (setWorkingDatabase(Database.CENTRAL, dao) && (positiveIds != null) && (!positiveIds.isEmpty())) {
+                countMethodParameters[0] = positiveIds;
+                getMethodParameters[0] = positiveIds;
+                centralCount = (Long) countMethod.invoke(dao, countMethodParameters);
+                if (centralCount > start) {
+                    toReturn.addAll((Collection) getMethod.invoke(dao, getMethodParameters)); // start, numRows
+                    relativeLimit = numOfRows - (centralCount - start);
+                    if (relativeLimit > 0) {
+                        if (setWorkingDatabase(Database.LOCAL, dao) && (negativeIds != null) && (!negativeIds.isEmpty())) {
+                            countMethodParameters[0] = negativeIds;
+                            getMethodParameters[0] = negativeIds;
+                            localCount = (Long) countMethod.invoke(dao, countMethodParameters);
+                            if (localCount > 0) {
+                                getMethodParameters[getMethodParameters.length - 2] = 0;
+                                getMethodParameters[getMethodParameters.length - 1] = (int) relativeLimit;
+                                toReturn.addAll((Collection) getMethod.invoke(dao, getMethodParameters)); //0, (int) relativeLimit
+                            }
+                        }
+                    }
+                } else {
+                    relativeLimit = start - centralCount;
+                    if (setWorkingDatabase(Database.LOCAL, dao) && (negativeIds != null) && (!negativeIds.isEmpty())) {
+                        countMethodParameters[0] = negativeIds;
+                        getMethodParameters[0] = negativeIds;
+                        localCount = (Long) countMethod.invoke(dao, countMethodParameters);
+                        if (localCount > relativeLimit) {
+                            getMethodParameters[getMethodParameters.length - 2] = (int) relativeLimit;
+                            getMethodParameters[getMethodParameters.length - 1] = numOfRows;
+                            toReturn.addAll((Collection) getMethod.invoke(dao, getMethodParameters)); // (int) relativeLimit, numOfRows
+                        }
+                    }
+                }
+            } else if (setWorkingDatabase(Database.LOCAL, dao) && (negativeIds != null) && (!negativeIds.isEmpty())) {
+                countMethodParameters[0] = negativeIds;
+                getMethodParameters[0] = negativeIds;
+                localCount = (Long) countMethod.invoke(dao, countMethodParameters);
+                if (localCount > start) {
+                    toReturn.addAll((Collection) getMethod.invoke(dao, getMethodParameters)); //start, numOfRows
+                }
+            }
+        } catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException
+            logAndThrowException("Error in gettting all from central and local using " + getMethodName + ": " + e.getMessage(), e);
+        }
+        return toReturn;
+
+    }
 
     /**
      * A generic implementation of the getXXXByXXXX() method that calls a specific get method from a DAO.
@@ -563,7 +698,42 @@ public abstract class DataManager{
                 toReturn.addAll((List) method.invoke(dao, parameters));
             }
         } catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException
-            e.printStackTrace();
+            logAndThrowException("Error in calling " + methodName + "(): " + e.getMessage(), e);
+        }
+        return toReturn;
+    }
+    
+    /**
+     * A generic implementation of the getXXXByXXXX(Integer id, ...) method that calls a specific get method from a DAO. 
+     * This connects to the database corresponding to the value of the id (Local for negative id, Central for positive)
+     * Calls the corresponding method that returns list type as specified in the parameter methodName.
+     * 
+     * Sample usage: 
+     *     public List<Integer> getMarkerIdsByDatasetId(Integer datasetId) throws MiddlewareQueryException {
+     *        return (List<Integer>) super.getFromInstanceByIdAndMethod(getMarkerMetadataSetDao(), datasetId, "getMarkerIdByDatasetId", 
+     *                new Object[]{datasetId}, new Class[]{Integer.class});
+     *
+     *    }
+     * 
+     * @param dao - the DAO to call the method from
+     * @param id - the id used to get the instance to connect to
+     * @param methodName - the method to call
+     * @param parameters - the parameters to be passed to the method. If the referenced DAO method has parameters start and numOfRows, you may add them to this
+     * @param parameterTypes - the types of the parameters passed to the methods
+     * @return the List result
+     * @throws MiddlewareQueryException
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public List getFromInstanceByIdAndMethod(GenericDAO dao, Integer id, String methodName, Object[] parameters, Class[] parameterTypes)
+            throws MiddlewareQueryException {
+        List toReturn = new ArrayList();
+        try {
+            java.lang.reflect.Method method = dao.getClass().getMethod(methodName, parameterTypes);
+
+            if (setDaoSession(dao, id)) {
+                toReturn.addAll((List) method.invoke(dao, parameters));
+            }
+        } catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException
             logAndThrowException("Error in calling " + methodName + "(): " + e.getMessage(), e);
         }
         return toReturn;
@@ -628,17 +798,66 @@ public abstract class DataManager{
                 count = count + ((Long) countMethod.invoke(dao, parameters)).intValue();
             }
         } catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException
-            e.printStackTrace();
             logAndThrowException("Error in counting: " + e.getMessage(), e);
         }
         return count;
     }
+    
+    /**
+     * A generic implementation of the countByXXXX() method that calls a specific count method from a DAO.
+     * Calls the corresponding count method as specified in the parameter methodName. 
+     * Retrieves data from both local and central databases.
+     * Separates the negative ids from positive ids and passes to local and central instances respectively.
+     * The ids are stored in the first index of the "parameters" parameter
+     * 
+     * Sample usage:
+     *      public long countGdmsAccMetadatasetByGid(List<Integer> gids) throws MiddlewareQueryException {
+     *        return super.countAllFromCentralAndLocalBySignedIdAndMethod(getAccMetadataSetDao(), "countAccMetadataSetByGids",
+     *                new Object[] { gids }, new Class[] { List.class });
+     *      }
+     * 
+     * @param dao - the DAO to call the method from
+     * @param methodName - the method to call
+     * @param parameters - the parameters to be passed to the method
+     * @param parameterTypes - the types of the parameters to be passed to the method
+     * @return the count
+     * @throws MiddlewareQueryException
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public long countAllFromCentralAndLocalBySignedIdAndMethod(GenericDAO dao, String methodName, Object[] parameters, Class[] parameterTypes)
+            throws MiddlewareQueryException {
+        
+        List<Integer> ids = (List<Integer>) parameters[0];
+        List<Integer> positiveIds = getPositiveIds(ids);
+        List<Integer> negativeIds = getNegativeIds(ids);
+        
+        long count = 0;
+        try {
+            java.lang.reflect.Method countMethod = dao.getClass().getMethod(methodName, parameterTypes);
+
+            if (setWorkingDatabase(Database.LOCAL, dao) && (negativeIds != null) && (!negativeIds.isEmpty())) {
+                parameters[0] = negativeIds;
+                count = count + ((Long) countMethod.invoke(dao, parameters)).intValue();
+            }
+            if (setWorkingDatabase(Database.CENTRAL, dao)&& (positiveIds != null) && (!positiveIds.isEmpty())) {
+                parameters[0] = positiveIds;
+                count = count + ((Long) countMethod.invoke(dao, parameters)).intValue();
+            }
+        } catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException
+            logAndThrowException("Error in counting: " + e.getMessage(), e);
+        }
+        return count;
+    }
+
 
     /**
      * A generic implementation of the countAllXXX(Database instance) method that calls countAll() from Generic DAO.
      * Returns the count of entities from both central and local databases based on the given DAO.
      * 
      * Sample usage:
+     *     public long countAllGermplasm(Database instance) throws MiddlewareQueryException {
+     *        return super.countFromInstance(getGermplasmDao(), instance);
+     *    }
      *      
      * @param dao - the DAO to call the method from
      * @param instance - the database instance to query from
@@ -646,7 +865,7 @@ public abstract class DataManager{
      * @throws MiddlewareQueryException
      */
     @SuppressWarnings("rawtypes")
-    protected long countAllFromInstance(GenericDAO dao, Database instance) throws MiddlewareQueryException {
+    protected long countFromInstance(GenericDAO dao, Database instance) throws MiddlewareQueryException {
         long count = 0;
         Session session = null;
         
@@ -672,11 +891,12 @@ public abstract class DataManager{
      *      public long countGermplasmByName(String name, GetGermplasmByNameModes mode, Operation op, Integer status, GermplasmNameType type,
      *            Database instance) throws MiddlewareQueryException {
      *        String nameToUse = GermplasmDataManagerUtil.getNameToUseByMode(name, mode);
-     *        return super.countAllFromInstanceByMethod(getGermplasmDao(), instance, "countByName", new Object[] { nameToUse, op, status, type },
+     *        return super.countFromInstanceByMethod(getGermplasmDao(), instance, "countByName", new Object[] { nameToUse, op, status, type },
      *                new Class[] { String.class, Operation.class, Integer.class, GermplasmNameType.class });
      *    }
      * 
      * @param dao - the DAO to call the method from
+     * @param instance - the database instance to connect to
      * @param methodName - the method to call
      * @param parameters - the parameters to be passed to the method
      * @param parameterTypes - the types of the parameters to be passed to the method
@@ -684,13 +904,49 @@ public abstract class DataManager{
      * @throws MiddlewareQueryException
      */
     @SuppressWarnings("rawtypes")
-    public long countAllFromInstanceByMethod(GenericDAO dao, Database instance, String methodName, Object[] parameters, Class[] parameterTypes)
+    public long countFromInstanceByMethod(GenericDAO dao, Database instance, String methodName, Object[] parameters, Class[] parameterTypes)
             throws MiddlewareQueryException {
         long count = 0;
         try {
             java.lang.reflect.Method countMethod = dao.getClass().getMethod(methodName, parameterTypes);
 
             if (setWorkingDatabase(instance, dao)) {
+                count = count + ((Long) countMethod.invoke(dao, parameters)).intValue();
+            }
+        } catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException
+            logAndThrowException("Error in counting: " + e.getMessage(), e);
+        }
+        return count;
+    }
+
+    /**
+     * A generic implementation of the countByXXXX(Integer id, ...) method that calls a specific count method from a DAO.
+     * Calls the corresponding count method as specified in the parameter methodName. 
+     * Retrieves data from the corresponding database. If the given id is positive, it connects to Central, otherwise it connects to Local
+     * 
+     * Sample usage:
+     *      public long countMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapId, String linkageGroup, double startPos, double endPos)
+     *            throws MiddlewareQueryException {
+     *        return super.countFromInstanceByIdAndMethod(getMarkerDao(), mapId, "countMarkerIDsByMapIDAndLinkageBetweenStartPosition", 
+     *                new Object[]{mapId, linkageGroup, startPos, endPos}, new Class[]{Integer.TYPE, String.class, Double.TYPE, Double.TYPE});
+     *    }
+     * 
+     * @param dao - the DAO to call the method from
+     * @param id - the id used to know the database instance to connect to
+     * @param methodName - the method to call
+     * @param parameters - the parameters to be passed to the method
+     * @param parameterTypes - the types of the parameters to be passed to the method
+     * @return the count
+     * @throws MiddlewareQueryException
+     */
+    @SuppressWarnings("rawtypes")
+    public long countFromInstanceByIdAndMethod(GenericDAO dao, Integer id, String methodName, Object[] parameters, Class[] parameterTypes)
+            throws MiddlewareQueryException {
+        long count = 0;
+        try {
+            java.lang.reflect.Method countMethod = dao.getClass().getMethod(methodName, parameterTypes);
+
+            if (setWorkingDatabase(id, dao)) {
                 count = count + ((Long) countMethod.invoke(dao, parameters)).intValue();
             }
         } catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException
@@ -746,6 +1002,27 @@ public abstract class DataManager{
         if (trans != null) {
             trans.rollback();
         }
+    }
+    
+    protected List<Integer> getPositiveIds(List<Integer> ids){
+        List<Integer> positiveIds = new ArrayList<Integer>();
+        for (Integer id : ids) {
+            if (id >= 0) {
+                positiveIds.add(id);
+            }
+        }
+        return positiveIds;
+    }
+    
+
+    protected List<Integer> getNegativeIds(List<Integer> ids){
+        List<Integer> negativeIds = new ArrayList<Integer>();
+        for (Integer id : ids) {
+            if (id < 0) {
+                negativeIds.add(id);
+            }
+        }
+        return negativeIds;
     }
 
 }

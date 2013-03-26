@@ -231,14 +231,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     public List<Germplasm> getAllGermplasm(int start, int numOfRows, Database instance) throws MiddlewareQueryException {
-        if (setWorkingDatabase(instance)) {
-            return (List<Germplasm>) getGermplasmDao().getAll(start, numOfRows);
-        }
-        return new ArrayList<Germplasm>();
+        return (List<Germplasm>) super.getFromInstanceByMethod(getGermplasmDao(), instance, "getAll", 
+                new Object[]{start, numOfRows}, new Class[]{Integer.TYPE, Integer.TYPE});
     }
 
     public long countAllGermplasm(Database instance) throws MiddlewareQueryException {
-        return super.countAllFromInstance(getGermplasmDao(), instance);
+        return super.countFromInstance(getGermplasmDao(), instance);
     }
 
     public List<Germplasm> getGermplasmByPrefName(String name, int start, int numOfRows, Database instance) throws MiddlewareQueryException {
@@ -272,7 +270,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public long countGermplasmByName(String name, GetGermplasmByNameModes mode, Operation op, Integer status, GermplasmNameType type,
             Database instance) throws MiddlewareQueryException {
         String nameToUse = GermplasmDataManagerUtil.getNameToUseByMode(name, mode);
-        return super.countAllFromInstanceByMethod(getGermplasmDao(), instance, "countByName", new Object[] { nameToUse, op, status, type },
+        return super.countFromInstanceByMethod(getGermplasmDao(), instance, "countByName", new Object[] { nameToUse, op, status, type },
                 new Class[] { String.class, Operation.class, Integer.class, GermplasmNameType.class });
     }
 
@@ -376,10 +374,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public List<Name> getNamesByGID(Integer gid, Integer status, GermplasmNameType type) throws MiddlewareQueryException {
-        if (setWorkingDatabase(gid)) {
-            return (List<Name>) getNameDao().getByGIDWithFilters(gid, status, type); //names
-        }
-        return new ArrayList<Name>();
+        return (List<Name>) super.getFromInstanceByIdAndMethod(getNameDao(), gid, "getByGIDWithFilters", 
+                new Object[]{gid, status, type}, new Class[]{Integer.class, Integer.class, GermplasmNameType.class});
     }
 
     @Override
@@ -550,10 +546,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public List<Attribute> getAttributesByGID(Integer gid) throws MiddlewareQueryException {
-        if (setWorkingDatabase(gid)) {
-            return (List<Attribute>) getAttributeDao().getByGID(gid); //attributes
-        }
-        return new ArrayList<Attribute>();
+        return (List<Attribute>) super.getFromInstanceByIdAndMethod(getAttributeDao(), gid, "getByGID", 
+                new Object[]{gid}, new Class[]{Integer.class});
     }
 
     @Override
@@ -877,10 +871,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public long countDescendants(Integer gid) throws MiddlewareQueryException {
-        if (setWorkingDatabase(gid)) {
-            return getGermplasmDao().countGermplasmDescendantByGID(gid);
-        }
-        return 0;
+        return super.countFromInstanceByIdAndMethod(getGermplasmDao(), gid, "countGermplasmDescendantByGID", new Object[] { gid },
+                new Class[] { Integer.class });
     }
 
     @Override
@@ -969,6 +961,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                 new Class[] { Integer.class });
     }
 
+    @Override
     public long countManagementNeighbors(Integer gid) throws MiddlewareQueryException {
         return super.countAllFromCentralAndLocalByMethod(getGermplasmDao(), "countManagementNeighbors", new Object[] { gid },
                 new Class[] { Integer.class });
@@ -976,19 +969,14 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public long countGroupRelatives(Integer gid) throws MiddlewareQueryException {
-        if (setWorkingDatabase(gid)) {
-            return getGermplasmDao().countGroupRelatives(gid);
-        }
-        return 0;
-
+        return super.countFromInstanceByIdAndMethod(getGermplasmDao(), gid, "countGroupRelatives", new Object[] { gid },
+                new Class[] { Integer.class });
     }
 
     @Override
     public List<Germplasm> getGroupRelatives(Integer gid, int start, int numRows) throws MiddlewareQueryException {
-        if (setWorkingDatabase(gid)) {
-            return (List<Germplasm>) getGermplasmDao().getGroupRelatives(gid, start, numRows);
-        }
-        return new ArrayList<Germplasm>();
+        return (List<Germplasm>) super.getFromInstanceByIdAndMethod(getGermplasmDao(), gid, "getGroupRelatives", 
+                new Object[]{gid, start, numRows}, new Class[]{Integer.class, Integer.TYPE, Integer.TYPE});
     }
 
     @Override
@@ -1417,6 +1405,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         return (List<Method>) super.getAllFromCentralAndLocalByMethod(getMethodDao(), "getByGroupIncludesGgroup", new Object[] { group }, new Class[]{String.class});
     }
 
+    @Override
     public String getCrossExpansion(Integer gid, int level) throws MiddlewareQueryException {
         Germplasm germplasm = getGermplasmWithPrefName(gid);
         if (germplasm != null) {
