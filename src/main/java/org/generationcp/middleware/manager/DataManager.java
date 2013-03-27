@@ -372,7 +372,7 @@ public abstract class DataManager{
      * Returns all the entities from both central and local databases based on the given DAO.   <br/>
      * 
      * @param dao 
-     * @return
+     * @return All entities from both local and central
      * @throws MiddlewareQueryException
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })

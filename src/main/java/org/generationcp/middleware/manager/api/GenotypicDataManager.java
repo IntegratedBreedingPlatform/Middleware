@@ -450,9 +450,6 @@ public interface GenotypicDataManager{
      * @param numOfRows 
      *          - the number of rows to be included in the sublist of results 
      *          to be returned
-     * @param instance 
-     *          - specifies whether the data should be retrieved 
-     *          from either the Central or the Local IBDB instance
      * @return List of MarkerInfo based on the specified marker name
      * @throws MiddlewareQueryException
      */
@@ -819,7 +816,7 @@ public interface GenotypicDataManager{
      *          - the dataset ids to match
      * @param markerIds 
      *          - the marker ids to match
-     * @param gids 
+     * @param gIds 
      *          - the gids not to match          
      * @param start 
      *          - the starting index of the sublist of results to be returned
@@ -860,7 +857,7 @@ public interface GenotypicDataManager{
      *          - the dataset ids to match
      * @param markerIds 
      *          - the marker ids to match
-     * @param gids 
+     * @param gIds 
      *          - the gids not to match          
      * @return count of name ids based on the given list of dataset ids, list of marker ids and a list of germplasm ids
      * @throws MiddlewareQueryException
@@ -1138,11 +1135,6 @@ public interface GenotypicDataManager{
      *          - the minimum start position 
      * @param max
      *          - the maximum start position 
-     * @param start 
-     *          - the starting index of the sublist of results to be returned
-     * @param numOfRows 
-     *          - the number of rows to be included in the sublist of results 
-     *          to be returned
      * @return Count of marker id entries
      * @throws MiddlewareQueryException
      */
@@ -1227,7 +1219,7 @@ public interface GenotypicDataManager{
 
     /**
      * Adds a GDMS marker given a Marker
-     * @param Marker
+     * @param marker
      * @return markerId - markerId of the inserted record
      * @throws MiddlewareQueryException
      */
@@ -1235,7 +1227,7 @@ public interface GenotypicDataManager{
     
     /**
      * Adds a GDMS marker alias given a MarkerAlias
-     * @param MarkerAlias
+     * @param markerAlias
      * @return markerId - markerId of the inserted record
      * @throws MiddlewareQueryException
      */
@@ -1243,7 +1235,7 @@ public interface GenotypicDataManager{
     
     /**
      * Adds a dataset user given a DatasetUser
-     * @param DatasetUser
+     * @param datasetUser
      * @return userId - userId of the inserted record
      * @throws MiddlewareQueryException
      */
@@ -1271,7 +1263,7 @@ public interface GenotypicDataManager{
 
     /**
      * Adds a mapping pop given a MappingPop
-     * @param MappingPop
+     * @param mappingPop
      * @return DatasetId - datasetId of the inserted record
      * @throws MiddlewareQueryException
      */
@@ -1279,7 +1271,7 @@ public interface GenotypicDataManager{
     
     /**
      * Adds a mapping pop given a MappingPopValue
-     * @param MappingPopValue
+     * @param mappingPopValue
      * @return mpId - mpId of the inserted record
      * @throws MiddlewareQueryException
      */
@@ -1287,7 +1279,7 @@ public interface GenotypicDataManager{
     
     /**
      * Adds a marker on map given a MarkerOnMap
-     * @param MarkerOnMap
+     * @param markerOnMap
      * @return mapId - mapId of the inserted record
      * @throws MiddlewareQueryException
      */
@@ -1295,7 +1287,7 @@ public interface GenotypicDataManager{
     
     /**
      * Adds a dart value given a DartValue
-     * @param DartValue
+     * @param dartValue
      * @return adId - adId of the inserted record
      * @throws MiddlewareQueryException
      */
@@ -1447,7 +1439,7 @@ public interface GenotypicDataManager{
      * Gets Map ID from QTL Name
      * @param qtlName - name of qtl
      * @param start - starting record to retrieve
-     * @param numRows - number of records to retrieve from start record
+     * @param numOfRows - number of records to retrieve from start record
      * @return (List<Integer>) list of Map IDs
      * @throws MiddlewareQueryException
      */
@@ -1466,11 +1458,11 @@ public interface GenotypicDataManager{
     /**
      * Gets Marker IDs from Map ID, Linkage Group and Between start position values
      * @param mapID - ID of map
-     * @param linkageFroup - chromosome 
+     * @param linkageGroup - chromosome 
      * @param startPos - map starting position value
      * @param endPos - map ending position value
      * @param start - starting record to retrieve
-     * @param numRows - number of records to retrieve from start record
+     * @param numOfRows - number of records to retrieve from start record
      * @return (Set<Integer>) set of Marker IDs
      * @throws MiddlewareQueryException
      */
@@ -1480,26 +1472,26 @@ public interface GenotypicDataManager{
 
     /**
      * Counts Marker IDs from Map ID, Linkage Group and Between start position values
-     * @param mapID - ID of map
-     * @param linkageFroup - chromosome 
+     * @param mapId - ID of map
+     * @param linkageGroup - chromosome 
      * @param startPos - map starting position value
      * @param endPos - map ending position value
      * @return (long) count of Marker IDs
      * @throws MiddlewareQueryException
      */
-    long countMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapID,
+    long countMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapId,
         String linkageGroup, double startPos, double endPos)
         throws MiddlewareQueryException;
 
     /**
      * Gets Markers by Marker IDs
-     * @param markerIDs - IDs of markers
+     * @param markerIds - IDs of markers
      * @param start - starting record to retrieve
-     * @param numRows - number of records to retrieve from start record
+     * @param numOfRows - number of records to retrieve from start record
      * @return (List<Marker>) List of Markers
      * @throws MiddlewareQueryException
      */
-    List<Marker> getMarkersByMarkerIds(List<Integer> markerIDs, int start,
+    List<Marker> getMarkersByMarkerIds(List<Integer> markerIds, int start,
             int numOfRows) throws MiddlewareQueryException;
 
     /**

@@ -17,7 +17,7 @@ public interface ManagerFactoryProvider {
      * databases needed by the specified {@link Project}.
      * 
      * @param project
-     * @return
+     * @return The ManagerFactory for the given project.
      */
     public ManagerFactory getManagerFactoryForProject(Project project);
     
@@ -26,7 +26,7 @@ public interface ManagerFactoryProvider {
      * specified {@link CropType} but has no connection to a local database.
      * 
      * @param cropType
-     * @return
+     * @return The ManagerFactory for the given crop type.
      */
     public ManagerFactory getManagerFactoryForCropType(CropType cropType);
     

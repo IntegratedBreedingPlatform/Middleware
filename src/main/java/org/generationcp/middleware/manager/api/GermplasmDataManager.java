@@ -185,11 +185,12 @@ public interface GermplasmDataManager {
     /**
      * Returns all Locations
      * 
-     * @param name
-     *            - search string for the name or the locations
-     * @param op
-     *            - can be EQUAL or LIKE
-     * @return gets all Locations
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
+     * @return All Locations based on the given start and numOfRows
      */   
     public List<Location> getAllLocations(int start, int numOfRows) throws MiddlewareQueryException;
     
@@ -345,6 +346,63 @@ public interface GermplasmDataManager {
      * @throws MiddlewareQueryException
      */
     public long countLocationsByType(Integer type) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Retrieves all the Germplasm entries from the given database instance.
+     * 
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
+     * @param instance
+     *            - can be Database.CENTRAL or Database.LOCAL
+     * @return All the germplasms from the database instance satisfying the start and numOfRows parameters
+     * @throws MiddlewareQueryException
+     */
+    public List<Germplasm> getAllGermplasm(int start, int numOfRows, Database instance) throws MiddlewareQueryException;
+
+    
+    /**
+     * Counts all the Germplasm entries from the given database instance.
+     * 
+     * @param instance
+     *            - can be Database.CENTRAL or Database.LOCAL
+     * @return The number of germplasms from the given database instance
+     * @throws MiddlewareQueryException
+     */
+    public long countAllGermplasm(Database instance) throws MiddlewareQueryException;
+
+    
+    /**
+     * Retrieves all the Germplasm entries from the given database instance matching the given preferred name.
+     * 
+     * @param name
+     *            - the preferred name to match
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
+     * @param instance
+     *            - can be Database.CENTRAL or Database.LOCAL
+     * @return All the germplasms from the database instance satisfying the given preferred name
+     * @throws MiddlewareQueryException
+     */
+    public List<Germplasm> getGermplasmByPrefName(String name, int start, int numOfRows, Database instance) throws MiddlewareQueryException;
+
+
+    /**
+     * Counts all the Germplasm entries from central and local database instances matching the given preferred name.
+     * 
+     * @param name
+     *            - the preferred name to match
+     * @return The number of germplasms from the satisfying the given preferred name
+     * @throws MiddlewareQueryException
+     */
+    public long countGermplasmByPrefName(String name) throws MiddlewareQueryException;
+
     
     /**
      * Returns the germplasm records that were created by the methods with names
@@ -509,7 +567,7 @@ public interface GermplasmDataManager {
     /**
      * Inserts a single {@code Name} object into the database.
      * 
-     * @param location
+     * @param name
      *            - The {@code Name} object to be persisted to the database.
      *            Must be a valid {@code Name} object.
      * @return Returns the id of the newly-added Germplasm {@code Name}.
@@ -531,7 +589,7 @@ public interface GermplasmDataManager {
     /**
      * Updates a single {@code Name} object in the database.
      * 
-     * @param location
+     * @param name
      *            - The {@code Name} object to be updated in the database. Must
      *            be a valid {@code Name} object.
      * @return Returns the id of the updated Germplasm {@code Name}.
@@ -649,7 +707,7 @@ public interface GermplasmDataManager {
      * Returns all the method records matching the given group.
      * Retrieves from both local and central databases.
      * 
-     * @param type the group of the method
+     * @param group the group of the method
      * @param start
      *            - the starting index of the sublist of results to be returned
      * @param numOfRows
@@ -808,7 +866,7 @@ public interface GermplasmDataManager {
      * Inserts a single {@code Bibref} (Bibliographic Reference) object into the
      * database.
      * 
-     * @param location
+     * @param bibref
      *            - The {@code Bibref} object to be persisted to the database.
      *            Must be a valid {@code Bibref} object.
      * @return Returns the id of the {@code Bibref} record inserted in the
@@ -925,7 +983,7 @@ public interface GermplasmDataManager {
      * Returns the number of group relatives a Germplasm has.
      * 
      * @param gid
-     * @return
+     * @return The number of group relatives of a Germplasm
      * @throws MiddlewareQueryException
      */
     public long countGroupRelatives(Integer gid) throws MiddlewareQueryException;
@@ -1057,7 +1115,7 @@ public interface GermplasmDataManager {
      * Returns the attribute record identified by the given id.
      * 
      * @param id
-     * @return
+     * @return The attribute record corresponding to the given id.
      * @throws MiddlewareQueryException 
      */
     public Attribute getAttributeById(Integer id) throws MiddlewareQueryException;
@@ -1130,18 +1188,21 @@ public interface GermplasmDataManager {
     public List<Integer> addGermplasm(Map<Germplasm, Name> germplasmNameMap) throws MiddlewareQueryException;
     
     /**
-     * Gets the germplasm Id and name Id from the names table with the given germplasm name
+     * Gets the germplasm Id and name Id from the names table with the given germplasm names
      *
-     * @param germplasmName the germplasm name
-     * @param start
-     *            - the starting index of the sublist of results to be returned
-     * @param numOfRows
-     *            - the number of rows to be included in the sublist of results to be returned
+     * @param germplasmNames the germplasm names
      * @return List of GidNidElement based on the specified list of germplasm names 
      * @throws MiddlewareQueryException
      */
     public List<GidNidElement> getGidAndNidByGermplasmNames(List<String> germplasmNames) throws MiddlewareQueryException;
 
+    /**
+     * 
+     * @param gid
+     * @param level
+     * @return The cross expansion based on the given gid and level
+     * @throws MiddlewareQueryException
+     */
     public String getCrossExpansion(Integer gid, int level) throws MiddlewareQueryException;
     
 }

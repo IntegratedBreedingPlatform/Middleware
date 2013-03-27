@@ -62,7 +62,7 @@ public interface StudyDataManager{
      * @param instance
      *            - the database instance to connect to: Database.CENTRAL,
      *            Database.LOCAL
-     * @return
+     * @return The list of GIDs by Phenotypic Data
      * @throws MiddlewareQueryException
      */
     public List<Integer> getGIDSByPhenotypicData(List<TraitCombinationFilter> filters, int start, int numOfRows, Database instance)
@@ -477,7 +477,7 @@ public interface StudyDataManager{
      * representation ID.
      * 
      * @param representationId
-     * @return
+     * @return The list of DatasetCondition based on the given representation ID
      * @throws MiddlewareQueryException
      */
     public List<DatasetCondition> getConditionsByRepresentationId(Integer representationId) throws MiddlewareQueryException;
@@ -486,7 +486,7 @@ public interface StudyDataManager{
      * Returns the main label given a value of the factorid column of a factor record.
      * 
      * @param factorid
-     * @return
+     * @return The main label of factor given a factor ID
      * @throws MiddlewareQueryException
      */
     public String getMainLabelOfFactorByFactorId(Integer factorid) throws MiddlewareQueryException;
@@ -496,7 +496,7 @@ public interface StudyDataManager{
      * by the given gid, is involved with. 
      * 
      * @param gid
-     * @return
+     * @return The count of Study information based on the given GID
      * @throws MiddlewareQueryException
      */
     public long countStudyInformationByGID(Long gid) throws MiddlewareQueryException;
@@ -506,7 +506,7 @@ public interface StudyDataManager{
      * identified by the given gid, is involved with.
      *  
      * @param gid
-     * @return
+     * @return The list of Study information based on the given GID
      * @throws MiddlewareQueryException
      */
     public List<StudyInfo> getStudyInformationByGID(Long gid) throws MiddlewareQueryException;
@@ -558,7 +558,7 @@ public interface StudyDataManager{
      * Returns the list of Character Levels for the given Factor on the dataset identified by the given id.
      * @param factor
      * @param datasetId
-     * @return
+     * @return  The list of character levels based on the given factor and dataset id
      * @throws MiddlewareQueryException
      */
     public List<CharacterLevel> getCharacterLevelsByFactorAndDatasetId(Factor factor, Integer datasetId) throws MiddlewareQueryException;
@@ -567,7 +567,7 @@ public interface StudyDataManager{
      * Returns the list of Numeric Levels for the given Factor on the dataset identified by the given id.
      * @param factor
      * @param datasetId
-     * @return
+     * @return The numeric levels by factor and dataset ID
      * @throws MiddlewareQueryException
      */
     public List<NumericLevel> getNumericLevelsByFactorAndDatasetId(Factor factor, Integer datasetId) throws MiddlewareQueryException;

@@ -230,20 +230,24 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         return countAllFromCentralAndLocalByMethod(getLocationDao(), "countByType", new Object[] { type }, new Class[] { Integer.class });
     }
 
+    @Override
     public List<Germplasm> getAllGermplasm(int start, int numOfRows, Database instance) throws MiddlewareQueryException {
         return (List<Germplasm>) super.getFromInstanceByMethod(getGermplasmDao(), instance, "getAll", 
                 new Object[]{start, numOfRows}, new Class[]{Integer.TYPE, Integer.TYPE});
     }
 
+    @Override
     public long countAllGermplasm(Database instance) throws MiddlewareQueryException {
         return super.countFromInstance(getGermplasmDao(), instance);
     }
 
+    @Override
     public List<Germplasm> getGermplasmByPrefName(String name, int start, int numOfRows, Database instance) throws MiddlewareQueryException {
         return (List<Germplasm>) getFromInstanceByMethod(getGermplasmDao(), instance, "getByPrefName", new Object[] { name, start,
                 numOfRows }, new Class[] { String.class, Integer.TYPE, Integer.TYPE });
     }
 
+    @Override
     public long countGermplasmByPrefName(String name) throws MiddlewareQueryException {
         return super.countAllFromCentralAndLocalByMethod(getGermplasmDao(), "countByPrefName", new Object[] { name },
                 new Class[] { String.class });

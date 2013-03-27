@@ -151,7 +151,7 @@ public interface UserDataManager {
      *            to be returned
      * @param instance - to specify the instace from where the records will be retrieved
      *          either from the central or local
-     * @return
+     * @return The list of all Installation records from the given database instance.
      * @throws MiddlewareQueryException
      */
     public List<Installation> getAllInstallationRecords(int start, int numOfRows, Database instance) 
@@ -161,7 +161,7 @@ public interface UserDataManager {
      * Return the installation record identified by the given id.
      * 
      * @param id 
-     * @return
+     * @return The Installation record corresponding to the given ID.
      * @throws MiddlewareQueryException
      */
     public Installation getInstallationRecordById(Long id) throws MiddlewareQueryException;
@@ -170,7 +170,7 @@ public interface UserDataManager {
      * Get the installation records with the admin id equal to the given id.
      * 
      * @param id
-     * @return
+     * @return The List of Installation records based on the given Admin ID.
      * @throws MiddlewareQueryException
      */
     public List<Installation> getInstallationRecordsByAdminId(Long id) throws MiddlewareQueryException;
@@ -179,7 +179,7 @@ public interface UserDataManager {
      * Returns the installation record which have been added last to the database.
      * 
      * @param instance
-     * @return
+     * @return The latest Installation record from the given database instance.
      * @throws MiddlewareQueryException
      */
     public Installation getLatestInstallationRecord(Database instance) throws MiddlewareQueryException;

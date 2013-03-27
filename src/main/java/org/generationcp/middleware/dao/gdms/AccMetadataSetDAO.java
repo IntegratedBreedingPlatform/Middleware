@@ -130,7 +130,7 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer>{
     }
 
     @SuppressWarnings("rawtypes")
-    public List<AccMetadataSetPK> getAccMetadasetByGids(List<Integer> gids, int start, int numOfRows) throws MiddlewareQueryException {
+    public List<AccMetadataSetPK> getAccMetadataSetByGids(List<Integer> gids, int start, int numOfRows) throws MiddlewareQueryException {
 
         List<AccMetadataSetPK> dataValues = new ArrayList<AccMetadataSetPK>();
         try {
@@ -159,7 +159,7 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer>{
                 }
             }
         } catch (HibernateException e) {
-        	logAndThrowException("Error with getAccMetadasetByGids(gids=" + gids + ") query from AccMetadataSet: "
+        	logAndThrowException("Error with getAccMetadataSetByGids(gids=" + gids + ") query from AccMetadataSet: "
                     + e.getMessage(), e);
         }
         return dataValues;

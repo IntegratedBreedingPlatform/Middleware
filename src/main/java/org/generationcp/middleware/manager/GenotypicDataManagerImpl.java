@@ -670,7 +670,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public List<AccMetadataSetPK> getGdmsAccMetadatasetByGid(List<Integer> gids, int start, int numOfRows) throws MiddlewareQueryException {
-        List<String> methods = Arrays.asList("countAccMetadataSetByGids", "getAccMetadasetByGids");
+        List<String> methods = Arrays.asList("countAccMetadataSetByGids", "getAccMetadataSetByGids");
         return (List<AccMetadataSetPK>) super.getFromCentralAndLocalBySignedIdAndMethod(getAccMetadataSetDao(), methods, start, numOfRows,
                 new Object[] { gids }, new Class[] { List.class });
     }

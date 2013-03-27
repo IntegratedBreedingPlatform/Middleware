@@ -56,7 +56,7 @@ public interface GermplasmListManager{
     /**
      * Returns the total number of Germplasm Lists.
      * 
-     * @return
+     * @return The count of all germplasm lists.
      * @throws MiddlewareQueryException 
      */
     public long countAllGermplasmLists() throws MiddlewareQueryException;
@@ -82,12 +82,11 @@ public interface GermplasmListManager{
             throws MiddlewareQueryException;
 
     /**
-     * Returns the number of Germplasm List records with names matching the
-     * given parameter.
+     * Returns the number of Germplasm List records with names matching the given parameter.
      * 
      * @param name
-     * @param operation
-     * @return
+     * @param operation can be Operation.EQUAL or Operation.LIKE
+     * @return The count of Germplasm lists based on the given name and operation
      */
     public long countGermplasmListByName(String name, Operation operation) throws MiddlewareQueryException;
 
@@ -112,7 +111,7 @@ public interface GermplasmListManager{
      * Returns the number of Germplasm List records that have the given status.
      * 
      * @param status
-     * @return
+     * @return The count of Germplasm lists based on the given status.
      */
     public long countGermplasmListByStatus(Integer status)  throws MiddlewareQueryException;
 
@@ -136,7 +135,7 @@ public interface GermplasmListManager{
      * identified by the given id.
      * 
      * @param id
-     * @return
+     * @return The count of Germplasm list data based on the given list ID
      */
     public long countGermplasmListDataByListId(Integer id) throws MiddlewareQueryException;
 
@@ -181,7 +180,7 @@ public interface GermplasmListManager{
      * Germplasm identified by the given gid.
      * 
      * @param gid
-     * @return
+     * @return The count of Germplasm List data based on the given GID
      */
     public long countGermplasmListDataByGID(Integer gid) throws MiddlewareQueryException;
 
@@ -220,7 +219,7 @@ public interface GermplasmListManager{
      * 
      * @param instance
      *            - can either be Database.CENTRAL or Database.LOCAL
-     * @return
+     * @return The count of all top level lists on the specified instance.
      * @throws MiddlewareQueryException
      */
     public long countAllTopLevelLists(Database instance) throws MiddlewareQueryException;

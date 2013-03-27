@@ -84,7 +84,7 @@ public interface WorkbenchDataManager{
      * Save a project.
      * 
      * @param project
-     * @return
+     * @return The Project added
      * @throws MiddlewareQueryException
      */
     public Project addProject(Project project) throws MiddlewareQueryException;
@@ -93,7 +93,7 @@ public interface WorkbenchDataManager{
      * Update a project using Hibernate's Session.merge() method.
      * 
      * @param project
-     * @return
+     * @return The merged Project.
      * @throws MiddlewareQueryException
      */
     public Project mergeProject(Project project) throws MiddlewareQueryException;
@@ -136,7 +136,7 @@ public interface WorkbenchDataManager{
     /**
      * Get all tools.
      * 
-     * @return
+     * @return The list of all tools.
      * @throws MiddlewareQueryException
      */
     public List<Tool> getAllTools() throws MiddlewareQueryException;
@@ -718,7 +718,7 @@ public interface WorkbenchDataManager{
     
     /**
      * 
-     * @return
+     * @return The WorkbenchRuntimeData
      * @throws MiddlewareQueryException
      */
     public WorkbenchRuntimeData getWorkbenchRuntimeData() throws MiddlewareQueryException;
@@ -792,7 +792,7 @@ public interface WorkbenchDataManager{
     /**
      * Get the workbench setting object.
      * 
-     * @return
+     * @return The WorkbenchSetting
      * @throws MiddlewareQueryException
      */
     public WorkbenchSetting getWorkbenchSetting() throws MiddlewareQueryException;
@@ -819,7 +819,7 @@ public interface WorkbenchDataManager{
      * 
      * @param projectId
      * @param userId
-     * @return
+     * @return The ProjectUserMysqlAccount of the given project id and user id.
      * @throws MiddlewareQueryException
      */
     public ProjectUserMysqlAccount getProjectUserMysqlAccountByProjectIdAndUserId(Integer projectId, Integer userId) throws MiddlewareQueryException;
