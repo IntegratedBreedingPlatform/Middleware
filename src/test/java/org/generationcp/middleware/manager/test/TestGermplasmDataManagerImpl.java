@@ -505,6 +505,12 @@ public class TestGermplasmDataManagerImpl{
         Integer gid = Integer.valueOf(1);
         System.out.println("testGetPreferredNameByGID(" + gid + ") RESULTS: " + manager.getPreferredNameByGID(gid));
     }
+    
+    @Test
+    public void testGetPreferredNameValueByGID() throws Exception {
+        Integer gid = Integer.valueOf(1);
+        System.out.println("testGetPreferredNameValueByGID(" + gid + ") RESULTS: " + manager.getPreferredNameValueByGID(gid));
+    }
 
     @Test
     public void testGetPreferredAbbrevByGID() throws Exception {

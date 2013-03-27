@@ -523,6 +523,20 @@ public interface GermplasmDataManager {
      * @throws MiddlewareQueryException
      */
     public Name getPreferredAbbrevByGID(Integer gid) throws MiddlewareQueryException;
+    
+
+    /**
+     * Returns the value (NVAL field) of preferred name of the Germplasm identified by the gid
+     * parameter.
+     * 
+     * @param gid
+     *            - id of the Germplasm
+     * @return Germplasm's preferred name as string. Returns
+     *         {@code null} when no preferred name is found.
+     * @throws MiddlewareQueryException
+     */
+    public String getPreferredNameValueByGID(Integer gid) throws MiddlewareQueryException;
+
 
     /**
      * Returns the matching {@code Name} object given a Germplasm ID and a Name
