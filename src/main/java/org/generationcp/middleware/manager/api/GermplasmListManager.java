@@ -86,9 +86,11 @@ public interface GermplasmListManager{
      * 
      * @param name
      * @param operation can be Operation.EQUAL or Operation.LIKE
+     * @param instance
+     *            - can either be Database.CENTRAL or Database.LOCAL
      * @return The count of Germplasm lists based on the given name and operation
      */
-    public long countGermplasmListByName(String name, Operation operation) throws MiddlewareQueryException;
+    public long countGermplasmListByName(String name, Operation operation, Database database) throws MiddlewareQueryException;
 
     /**
      * Returns all the Germplasm List records that have the given status.
@@ -111,9 +113,11 @@ public interface GermplasmListManager{
      * Returns the number of Germplasm List records that have the given status.
      * 
      * @param status
+     * @param instance
+     *            - can either be Database.CENTRAL or Database.LOCAL
      * @return The count of Germplasm lists based on the given status.
      */
-    public long countGermplasmListByStatus(Integer status)  throws MiddlewareQueryException;
+    public long countGermplasmListByStatus(Integer status, Database instance)  throws MiddlewareQueryException;
 
     /**
      * Returns the germplasm list entries that belong to the list identified by

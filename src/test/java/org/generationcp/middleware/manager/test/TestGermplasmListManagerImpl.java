@@ -86,7 +86,7 @@ public class TestGermplasmListManagerImpl{
     @Test
     public void testCountGermplasmListByName() throws Exception {
         String name = "2002%";     // Crop tested: Rice
-        System.out.println("testCountGermplasmListByName(" + name + ") RESULTS: " + manager.countGermplasmListByName(name, Operation.LIKE));
+        System.out.println("testCountGermplasmListByName(" + name + ") RESULTS: " + manager.countGermplasmListByName(name, Operation.LIKE, Database.CENTRAL));
         // Verify using: select count(*) from listnms where liststatus <> 9 and listname like '2002%';
     }
 
@@ -105,7 +105,7 @@ public class TestGermplasmListManagerImpl{
     @Test
     public void testCountGermplasmListByStatus() throws Exception {
         Integer status = Integer.valueOf(1);
-        System.out.println("testCountGermplasmListByStatus(status=" + status + ") RESULTS: " + manager.countGermplasmListByStatus(status));
+        System.out.println("testCountGermplasmListByStatus(status=" + status + ") RESULTS: " + manager.countGermplasmListByStatus(status, Database.CENTRAL));
         // Verify using: select count(*) from listnms where liststatus <> 9 and liststatus = 1;
     }
 
