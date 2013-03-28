@@ -17,8 +17,8 @@ import java.util.Map;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
-import org.generationcp.middleware.manager.GetGermplasmByNameModes;
 import org.generationcp.middleware.manager.GermplasmNameType;
+import org.generationcp.middleware.manager.GetGermplasmByNameModes;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
@@ -38,7 +38,7 @@ import org.generationcp.middleware.pojos.UserDefinedField;
  * 
  */
 public interface GermplasmDataManager {
-
+	
     /**
      * Searches for all germplasm records which matches the given name. Three
      * searching modes are available; normal search, the spaces on the name will
@@ -1057,6 +1057,36 @@ public interface GermplasmDataManager {
      * @return GermplasmPedigreeTree representing the neighborhood
      */
     public GermplasmPedigreeTree getDerivativeNeighborhood(Integer gid, int numberOfStepsBackward, int numberOfStepsForward)
+            throws MiddlewareQueryException;
+
+    /**
+     * Returns the GermplasmPedigreeTree object which represents the maintenance
+     * neighborhood for the germplasm identified by the given gid. The
+     * maintenance neighborhood is created by tracing back the source parents
+     * from the given germplasm until the given number of steps backward is
+     * reached or the first source germplasm created by a generative method is
+     * reached, whichever comes first. The last source parent reached by tracing
+     * back becomes the root of the GermplasmPedigreeTree object. From the root,
+     * all immediate derived lines (created by the maintenance method) are retrieved and added to the tree. And then
+     * from each of those derived germplasms, all immediate derived lines are
+     * retrieved and added to the tree, and so on and so forth. The number of
+     * levels of the tree is the sum of the actual number of steps backward made
+     * to reach the root and the given number of steps forward plus 1 (for the
+     * level which the given germplasm belongs).
+     * 
+     * The Germplasm POJOs included in the tree have their preferred names
+     * pre-loaded.
+     * 
+     * @param gid
+     * @param numberOfStepsBackward
+     *            - number of steps backward from the germplasm identified by
+     *            the given gid
+     * @param numberOfStepsForward
+     *            - number of steps forward from the germplasm identified by the
+     *            given gid
+     * @return GermplasmPedigreeTree representing the neighborhood
+     */
+    public GermplasmPedigreeTree getMaintenanceNeighborhood(Integer gid, int numberOfStepsBackward, int numberOfStepsForward)
             throws MiddlewareQueryException;
 
 //    /**

@@ -251,6 +251,12 @@ public class Germplasm implements Serializable{
             "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 " +
             "WHERE g.gnpgs = -1 AND g.gpid2 = :gid";
 
+    public static final String GET_MAINTENANCE_CHILDREN = 
+            "SELECT {g.*}, {n.*} " +
+            "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 " +
+            "JOIN methods m ON g.methn = m.mid AND m.mtype = 'MAN' " +
+            "WHERE g.gnpgs = -1 AND g.gpid2 = :gid";
+
     public static final String GET_BY_NAME_USING_EQUAL =
             "SELECT DISTINCT {g.*} FROM germplsm g JOIN names n ON g.gid = n.gid WHERE "
           + "nval = :name ";

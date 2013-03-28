@@ -17,19 +17,19 @@ import java.util.List;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.util.HibernateUtil;
-import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class TestGermplasmDAO{
 
     private static final String CONFIG = "test-hibernate.cfg.xml";
-    private HibernateUtil hibernateUtil;
-    private GermplasmDAO dao;
+    private static HibernateUtil hibernateUtil;
+    private static GermplasmDAO dao;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeClass
+    public static void setUp() throws Exception {
         hibernateUtil = new HibernateUtil(CONFIG);
         dao = new GermplasmDAO();
         dao.setSession(hibernateUtil.getCurrentSession());
@@ -66,16 +66,28 @@ public class TestGermplasmDAO{
     @Test
     public void testGetDerivativeChildren() throws Exception {
         Integer gid = Integer.valueOf(1);
-        List<Germplasm> results = dao.getDerivativeChildren(gid);
+        //List<Germplasm> results = dao.getDerivativeChildren(gid);
+        List<Germplasm> results = dao.getChildren(gid, 'D');
         Assert.assertTrue(results.size() > 0);
         System.out.println("testGetDerivativeChildren(GId=" + gid + ") RESULTS:");
         for (Germplasm g : results) {
             System.out.println("  " + g.getGid() + " : " + g.getPreferredName().getNval());
         }
     }
+    
+    @Test
+    public void testGetMaintenanceChildren() throws Exception {
+    	Integer gid = Integer.valueOf(2590);
+        List<Germplasm> results = dao.getChildren(gid, 'M');
+        Assert.assertTrue(results.size() > 0);
+        System.out.println("testGetMaintenanceChildren(GId=" + gid + ") RESULTS:");
+        for (Germplasm g : results) {
+            System.out.println("  " + g.getGid() + " : " + g.getPreferredName().getNval());
+        }
+    }
 
-    @After
-    public void tearDown() throws Exception {
+    @AfterClass
+    public static void tearDown() throws Exception {
         dao.setSession(null);
         dao = null;
         hibernateUtil.shutdown();

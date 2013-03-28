@@ -21,9 +21,11 @@ import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Restrictions;
 
 public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 
@@ -524,7 +526,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         return toreturn;
     }
 
-    public List<Germplasm> getDerivativeChildren(Integer gid) throws MiddlewareQueryException {
+/*    public List<Germplasm> getDerivativeChildren(Integer gid) throws MiddlewareQueryException {
         List<Germplasm> toreturn = new ArrayList<Germplasm>();
         try {
             SQLQuery query = getSession().createSQLQuery(Germplasm.GET_DERIVATIVE_CHILDREN);
@@ -545,6 +547,31 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
                     e);
         }
         return toreturn;
+    }
+ */   
+    public List<Germplasm> getChildren(Integer gid, char methodType) throws MiddlewareQueryException {
+        List<Germplasm> toreturn = new ArrayList<Germplasm>();
+        try {
+        	String queryString = methodType == 'D' ? Germplasm.GET_DERIVATIVE_CHILDREN : Germplasm.GET_MAINTENANCE_CHILDREN;
+            SQLQuery query = getSession().createSQLQuery(queryString);
+            query.addEntity("g", Germplasm.class);
+            query.addEntity("n", Name.class);
+            query.setParameter("gid", gid);
+
+            for (Object resultObject : query.list()) {
+                Object[] result = (Object[]) resultObject;
+                Germplasm germplasm = (Germplasm) result[0];
+                Name prefName = (Name) result[1];
+                germplasm.setPreferredName(prefName);
+                toreturn.add(germplasm);
+            }
+
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getDerivativeChildren(gid=" + gid + ") query from Germplasm: " + e.getMessage(),
+                    e);
+        }
+        return toreturn;
+    	
     }
 
     public void validateId(Germplasm germplasm) throws MiddlewareQueryException {

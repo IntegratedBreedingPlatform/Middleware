@@ -83,7 +83,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public GermplasmDataManagerImpl(Session sessionForLocal, Session sessionForCentral) {
         super(sessionForLocal, sessionForCentral);
     }
-
+    
     private AttributeDAO getAttributeDao() {
         if (attributeDao == null) {
             attributeDao = new AttributeDAO();
@@ -1017,13 +1017,13 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         return toreturn;
     }
 
-    @Override
-    public GermplasmPedigreeTree getDerivativeNeighborhood(Integer gid, int numberOfStepsBackward, int numberOfStepsForward)
-            throws MiddlewareQueryException {
-        GermplasmPedigreeTree derivativeNeighborhood = new GermplasmPedigreeTree();
+
+    private GermplasmPedigreeTree getNeighborhood(Integer gid, int numberOfStepsBackward, int numberOfStepsForward, char methodType)
+    		throws MiddlewareQueryException {
+        GermplasmPedigreeTree neighborhood = new GermplasmPedigreeTree();
 
         // get the root of the neighborhood
-        Object[] traceResult = traceDerivativeRoot(gid, numberOfStepsBackward);
+        Object[] traceResult = traceRoot(gid, numberOfStepsBackward, methodType);
 
         if (traceResult != null) {
             Germplasm root = (Germplasm) traceResult[0];
@@ -1034,14 +1034,28 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
             // get the derived lines from the root until the whole neighborhood is created
             int treeLevel = numberOfStepsBackward - stepsLeft + numberOfStepsForward;
-            rootNode = getDerivedLines(rootNode, treeLevel);
+            rootNode = getDerivedLines(rootNode, treeLevel, methodType);
 
-            derivativeNeighborhood.setRoot(rootNode);
+            neighborhood.setRoot(rootNode);
 
-            return derivativeNeighborhood;
+            return neighborhood;
         } else {
             return null;
         }
+    }
+
+    @Override
+    public GermplasmPedigreeTree getMaintenanceNeighborhood(Integer gid, int numberOfStepsBackward, int numberOfStepsForward)
+    		throws MiddlewareQueryException {
+        
+    	return getNeighborhood(gid, numberOfStepsBackward, numberOfStepsForward, 'M');
+    }
+    
+    @Override
+    public GermplasmPedigreeTree getDerivativeNeighborhood(Integer gid, int numberOfStepsBackward, int numberOfStepsForward)
+            throws MiddlewareQueryException {
+    	
+    	return getNeighborhood(gid, numberOfStepsBackward, numberOfStepsForward, 'D');
     }
 
     /**
@@ -1056,15 +1070,30 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
      *         Integer which is the number of steps left to take
      * @throws MiddlewareQueryException
      */
-    private Object[] traceDerivativeRoot(Integer gid, int steps) throws MiddlewareQueryException {
+    private Object[] traceRoot(Integer gid, int steps, char methodType) throws MiddlewareQueryException {
         Germplasm germplasm = getGermplasmWithPrefName(gid);
-
+        
         if (germplasm == null) {
             return null;
         } else if (steps == 0 || germplasm.getGnpgs() != -1) {
             return new Object[] { germplasm, Integer.valueOf(steps) };
         } else {
-            Object[] returned = traceDerivativeRoot(germplasm.getGpid2(), steps - 1);
+        	int nextStep = steps;
+        	
+        	//for MAN neighborhood, move the step count only if the ancestor is a MAN.
+        	//otherwise, skip through the ancestor without changing the step count
+        	if (methodType == 'M') {
+        		Method method = getMethodDao().getById(germplasm.getMethodId(), false);
+        		if (method != null && "MAN".equals(method.getMtype())) {
+        			nextStep--;
+        		}
+        	
+        	//for DER neighborhood, always move the step count
+        	} else {
+        		nextStep--;
+        	}
+        	
+            Object[] returned = traceRoot(germplasm.getGpid2(), nextStep, methodType);
             if (returned != null) {
                 return returned;
             } else {
@@ -1082,7 +1111,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
      * @return
      * @throws MiddlewareQueryException
      */
-    private GermplasmPedigreeTreeNode getDerivedLines(GermplasmPedigreeTreeNode node, int steps) throws MiddlewareQueryException {
+    private GermplasmPedigreeTreeNode getDerivedLines(GermplasmPedigreeTreeNode node, int steps, char methodType) throws MiddlewareQueryException {
         if (steps <= 0) {
             return node;
         } else {
@@ -1090,19 +1119,19 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             Integer gid = node.getGermplasm().getGid();
 
             if (gid < 0 && setWorkingDatabase(Database.LOCAL)) {
-                derivedGermplasms = getGermplasmDao().getDerivativeChildren(gid);
+                derivedGermplasms = getGermplasmDao().getChildren(gid, methodType);
             } else if (gid > 0 && setWorkingDatabase(Database.CENTRAL)) {
-                derivedGermplasms = getGermplasmDao().getDerivativeChildren(gid);
+                derivedGermplasms = getGermplasmDao().getChildren(gid, methodType);
 
                 if (setWorkingDatabase(Database.LOCAL)) {
-                    derivedGermplasms.addAll(getGermplasmDao().getDerivativeChildren(gid));
+                    derivedGermplasms.addAll(getGermplasmDao().getChildren(gid, methodType));
                 }
             }
 
             for (Germplasm g : derivedGermplasms) {
                 GermplasmPedigreeTreeNode derivedNode = new GermplasmPedigreeTreeNode();
                 derivedNode.setGermplasm(g);
-                node.getLinkedNodes().add(getDerivedLines(derivedNode, steps - 1));
+                node.getLinkedNodes().add(getDerivedLines(derivedNode, steps - 1, methodType));
             }
 
             return node;
