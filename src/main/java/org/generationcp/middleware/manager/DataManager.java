@@ -711,7 +711,7 @@ public abstract class DataManager{
         try {
             java.lang.reflect.Method method = dao.getClass().getMethod(methodName, parameterTypes);
 
-            if (setWorkingDatabase(instance)) {
+            if (setWorkingDatabase(instance, dao)) {
                 toReturn.addAll((List) method.invoke(dao, parameters));
             }
         } catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException
