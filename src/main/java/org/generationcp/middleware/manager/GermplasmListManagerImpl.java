@@ -116,6 +116,21 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     	return countFromInstanceByMethod(getGermplasmListDAO(), instance, "countByStatus", new Object[] {status},
     	        new Class[]{Integer.class});
     }
+    
+    @Override
+    public List<GermplasmList> getGermplasmListByGID(Integer gid, int start, int numOfRows) throws MiddlewareQueryException {
+    	
+    	List<String> methodNames = Arrays.asList("countByGID", "getByGID");
+    	return getFromCentralAndLocalByMethod(getGermplasmListDAO(), methodNames, start, numOfRows, new Object[] {gid}, 
+    	        new Class[]{Integer.class});
+    }
+
+    @Override
+    public long countGermplasmListByGID(Integer gid) throws MiddlewareQueryException {
+    	
+    	return countAllFromCentralAndLocalByMethod(getGermplasmListDAO(), "countByGID", new Object[] {gid}, 
+    	        new Class[]{Integer.class});
+    }
 
     @Override
     public List<GermplasmListData> getGermplasmListDataByListId(Integer id, int start, int numOfRows) throws MiddlewareQueryException {

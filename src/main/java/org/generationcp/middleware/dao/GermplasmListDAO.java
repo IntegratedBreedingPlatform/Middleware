@@ -18,9 +18,11 @@ import java.util.List;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.pojos.GermplasmListData;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -50,6 +52,39 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
             return ((Long) criteria.uniqueResult()).longValue(); // count
         } catch (HibernateException e) {
             logAndThrowException("Error with countAllExceptDeleted() query from GermplasmList: " + e.getMessage(), e);
+        }
+        return 0;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<GermplasmList> getByGID(Integer gid, int start, int numOfRows) throws MiddlewareQueryException {
+	try {
+	    Criteria criteria = getSession().createCriteria(GermplasmListData.class);
+            criteria.createAlias("list", "l");
+            criteria.setProjection(Projections.distinct(Projections.property("list")));
+            criteria.add(Restrictions.eq("gid", gid));
+            criteria.add(Restrictions.ne("l.status", STATUS_DELETED));
+            criteria.setFirstResult(start);
+            criteria.setMaxResults(numOfRows);
+            criteria.addOrder(Order.asc("l.id"));
+            criteria.addOrder(Order.asc("entryId"));
+            return criteria.list();
+	} catch (HibernateException e) {
+	    logAndThrowException("Error with getByGid(gid=" + gid + ") query from GermplasmList: " + e.getMessage(), e);
+	}
+	return new ArrayList<GermplasmList>();
+    }
+    
+    public long countByGID(Integer gid) throws MiddlewareQueryException {
+	try {
+	    Criteria criteria = getSession().createCriteria(GermplasmListData.class);
+	    criteria.createAlias("list", "l");
+	    criteria.add(Restrictions.eq("gid", gid));
+            criteria.add(Restrictions.ne("l.status", STATUS_DELETED));
+            criteria.setProjection(Projections.countDistinct("l.id"));
+            return ((Long) criteria.uniqueResult()).longValue(); //count
+        } catch (HibernateException e) {
+            logAndThrowException("Error with countByGID(gid=" + gid + ") query from GermplasmList " + e.getMessage(), e);
         }
         return 0;
     }

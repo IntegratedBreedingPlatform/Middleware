@@ -96,10 +96,12 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
     public List<GermplasmListData> getByGID(Integer gid, int start, int numOfRows) throws MiddlewareQueryException {
         try {
             Criteria criteria = getSession().createCriteria(GermplasmListData.class);
+            criteria.createAlias("list", "l");
             criteria.add(Restrictions.eq("gid", gid));
             criteria.add(Restrictions.ne("status", STATUS_DELETED));
             criteria.setFirstResult(start);
             criteria.setMaxResults(numOfRows);
+            criteria.addOrder(Order.asc("l.id"));
             criteria.addOrder(Order.asc("entryId"));
             return criteria.list();
         } catch (HibernateException e) {

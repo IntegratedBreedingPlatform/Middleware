@@ -118,6 +118,31 @@ public interface GermplasmListManager{
      * @return The count of Germplasm lists based on the given status.
      */
     public long countGermplasmListByStatus(Integer status, Database instance)  throws MiddlewareQueryException;
+    
+    /**
+     * Returns the germplasm lists that are associated with the specified GID.
+     * 
+     * @param gid
+     * 	          - the Germplasm ID associated with the Germplasm Lists to be returned.
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
+     * @return List of GermplasmList POJOs
+     * @throws MiddlewareQueryException
+     */
+    public List<GermplasmList> getGermplasmListByGID(Integer gid, int start, int numOfRows) throws MiddlewareQueryException;
+    
+    /**
+     * Returns the number of germplasm lists that are associated with the specified GID.
+     * 
+     * @param gid
+     * 	          - the Germplasm ID associated with the Germplasm Lists to be returned.
+     * @return The count of Germplasm Lists associated with the given Germplasm ID/
+     * @throws MiddlewareQueryException
+     */
+    public long countGermplasmListByGID(Integer gid) throws MiddlewareQueryException;
 
     /**
      * Returns the germplasm list entries that belong to the list identified by
@@ -450,4 +475,5 @@ public interface GermplasmListManager{
      * @throws MiddlewareQueryException the MiddlewareQueryException
      */
     public long countGermplasmListByParentFolderId(Integer parentId) throws MiddlewareQueryException;
+
 }

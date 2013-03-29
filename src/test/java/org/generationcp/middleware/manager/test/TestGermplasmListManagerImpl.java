@@ -108,6 +108,23 @@ public class TestGermplasmListManagerImpl{
         System.out.println("testCountGermplasmListByStatus(status=" + status + ") RESULTS: " + manager.countGermplasmListByStatus(status, Database.CENTRAL));
         // Verify using: select count(*) from listnms where liststatus <> 9 and liststatus = 1;
     }
+    
+    @Test
+    public void testGetGermplasmListByGID() throws Exception {
+	Integer gid = Integer.valueOf(2827287);
+        List<GermplasmList> results = manager.getGermplasmListByGID(gid, 0, 200);
+
+        System.out.println("testGetGermplasmListByGID(" + gid + ") RESULTS:");
+        for (GermplasmList list : results) {
+            System.out.println(list);
+        }
+    }
+  
+    @Test
+    public void testCountGermplasmListByGID() throws Exception {
+	Integer gid = Integer.valueOf(2827287);
+        System.out.println("testCountGermplasmListByGID(gid=" + gid + ") RESULTS: " + manager.countGermplasmListByGID(gid));
+    }
 
     @Test
     public void testGetGermplasmListDataByListId() throws Exception {
