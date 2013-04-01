@@ -88,18 +88,30 @@ public class DartValues implements Serializable{
     }
 
     public Integer getDatasetId() {
-        return adId;
+        return datasetId;
     }
     
     public void setDatasetId(Integer datasetId) {
         this.datasetId = datasetId;
     }
     
+    public Integer getMarkerId() {
+        return markerId;
+    }
+    
+    public void setMarkerId(Integer markerId) {
+        this.markerId = markerId;
+    }
+    
+    public Integer getCloneId() {
+        return cloneId;
+    } 
+    
     public void setCloneId(Integer cloneId) {
         this.cloneId = cloneId;
     }    
 
-    public Float getQValueId() {
+    public Float getQValue() {
         return qValue;
     }
     
@@ -169,25 +181,11 @@ public class DartValues implements Serializable{
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("DartValues [adId=");
-        builder.append(adId);
-        builder.append(", datesetId=");
-        builder.append(datasetId);
-        builder.append(", cloneId=");
-        builder.append(cloneId);
-        builder.append(", qValue=");
-        builder.append(qValue);
-        builder.append(", reproducibility=");
-        builder.append(reproducibility);
-        builder.append(", callRate=");
-        builder.append(callRate);
-        builder.append(", picValue=");
-        builder.append(picValue);
-        builder.append(", discordance=");
-        builder.append(discordance);
-        builder.append("]");
-        return builder.toString();
+        return "DartValues [adId=" + adId + ", datasetId=" + datasetId
+                + ", markerId=" + markerId + ", cloneId=" + cloneId
+                + ", qValue=" + qValue + ", reproducibility=" + reproducibility
+                + ", callRate=" + callRate + ", picValue=" + picValue
+                + ", discordance=" + discordance + "]";
     }
-    
+
 }
