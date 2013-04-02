@@ -15,6 +15,8 @@ package org.generationcp.middleware.pojos.test;
 import java.util.List;
 
 import org.generationcp.middleware.pojos.dms.CV;
+import org.generationcp.middleware.pojos.dms.CVTerm;
+import org.generationcp.middleware.pojos.dms.CVTermRelationship;
 import org.generationcp.middleware.pojos.CharacterData;
 import org.generationcp.middleware.pojos.Factor;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -198,6 +200,38 @@ public class DMSPojosSimpleTest{
             Assert.assertTrue(obj instanceof CV);
             Assert.assertTrue(obj != null);
             CV holder = (CV) obj;
+            System.out.println("  " + holder);
+        }
+    }
+
+    @Test
+    public void testCVTerm() {
+        Session session = hibernateUtil.getCurrentSession();
+        Query query = session.createQuery("FROM CVTerm");
+        query.setMaxResults(10);
+        List results = query.list();
+
+        System.out.println("testCVTerm() RESULTS: ");
+        for (Object obj : results) {
+            Assert.assertTrue(obj instanceof CVTerm);
+            Assert.assertTrue(obj != null);
+            CVTerm holder = (CVTerm) obj;
+            System.out.println("  " + holder);
+        }
+    }
+
+    @Test
+    public void testCVTermRelationship() {
+        Session session = hibernateUtil.getCurrentSession();
+        Query query = session.createQuery("FROM CVTermRelationship");
+        query.setMaxResults(10);
+        List results = query.list();
+
+        System.out.println("testCVTermRelationship() RESULTS: ");
+        for (Object obj : results) {
+            Assert.assertTrue(obj instanceof CVTermRelationship);
+            Assert.assertTrue(obj != null);
+            CVTermRelationship holder = (CVTermRelationship) obj;
             System.out.println("  " + holder);
         }
     }
