@@ -1,3 +1,15 @@
+/*******************************************************************************
+ * Copyright (c) 2012, All Rights Reserved.
+ * 
+ * Generation Challenge Programme (GCP)
+ * 
+ * 
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * 
+ *******************************************************************************/
+
 package org.generationcp.middleware.pojos.dms;
 
 import java.io.Serializable;
@@ -27,7 +39,7 @@ public class Geolocation implements Serializable {
     @GeneratedValue
     @Basic(optional = false)
     @Column(name = "nd_geolocation_id")
-	private Integer id;
+	private Long locationId;
 	
     @Column(name = "description")
 	private String description;
@@ -48,17 +60,17 @@ public class Geolocation implements Serializable {
     	
     }
     
-    public Geolocation(Integer id){
+    public Geolocation(Long id){
     	super();
-    	this.id = id;
+    	this.locationId = id;
     }
 
-	public Integer getId() {
-		return id;
+	public Long getLocationId() {
+		return locationId;
 	}
 
-	public void setId(Integer id) {
-		this.id = id;
+	public void setLocationId(Long id) {
+		this.locationId = id;
 	}
 
 	public String getDescription() {
@@ -101,27 +113,12 @@ public class Geolocation implements Serializable {
 		this.altitude = altitude;
 	}
     
-        
-    
-    @Override
-    public String toString() {
-    	StringBuilder sb = new StringBuilder();
-    	sb.append("Geolocation [id=" + id);
-    	sb.append(", description=" + description);
-    	sb.append(", latitude=" + latitude);
-    	sb.append(", longitude=" + longitude);
-    	sb.append(", geodeticDatum=" + geodeticDatum);
-    	sb.append(", altitude=" + altitude);
-    	sb.append("]");
-    	
-    	return sb.toString();
-    }
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((locationId == null) ? 0 : locationId.hashCode());
 		return result;
 	}
 
@@ -135,16 +132,33 @@ public class Geolocation implements Serializable {
 			return false;
 		
 		Geolocation other = (Geolocation) obj;
-		if (id == null) {
-			if (other.id != null)
+		if (locationId == null) {
+			if (other.locationId != null)
 				return false;
-		} else if (!id.equals(other.id))
+		} else if (!locationId.equals(other.locationId))
 			return false;
 		return true;
 	}
 
-	   
-	
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Geolocation [locationId=");
+		builder.append(locationId);
+		builder.append(", description=");
+		builder.append(description);
+		builder.append(", latitude=");
+		builder.append(latitude);
+		builder.append(", longitude=");
+		builder.append(longitude);
+		builder.append(", geodeticDatum=");
+		builder.append(geodeticDatum);
+		builder.append(", altitude=");
+		builder.append(altitude);
+		builder.append("]");
+		return builder.toString();
+	}
+
 	
 
 }

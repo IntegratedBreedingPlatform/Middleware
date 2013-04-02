@@ -1,3 +1,15 @@
+/*******************************************************************************
+ * Copyright (c) 2012, All Rights Reserved.
+ * 
+ * Generation Challenge Programme (GCP)
+ * 
+ * 
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * 
+ *******************************************************************************/
+
 package org.generationcp.middleware.pojos.dms;
 
 import java.io.Serializable;
@@ -35,7 +47,7 @@ public class CVTermSynonym implements Serializable {
 	@GeneratedValue
 	@Basic(optional = false)
 	@Column(name = "cvtermsynonym_id")
-	private Integer id;
+	private Long cvTermSynonymId;
 	
 	
 	/**
@@ -63,16 +75,16 @@ public class CVTermSynonym implements Serializable {
 		
 	}
 	
-	public CVTermSynonym(Integer id){
-		this.id = id;
+	public CVTermSynonym(Long id){
+		this.cvTermSynonymId = id;
 	}
 
-	public Integer getId() {
-		return id;
+	public Long getCvTermSynonymId() {
+		return cvTermSynonymId;
 	}
 
-	public void setId(Integer id) {
-		this.id = id;
+	public void setCvTermSynonymId(Long id) {
+		this.cvTermSynonymId = id;
 	}
 
 	public CVTerm getCvTerm() {
@@ -103,7 +115,7 @@ public class CVTermSynonym implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((cvTermSynonymId == null) ? 0 : cvTermSynonymId.hashCode());
 		return result;
 	}
 
@@ -117,10 +129,10 @@ public class CVTermSynonym implements Serializable {
 			return false;
 		
 		CVTermSynonym other = (CVTermSynonym) obj;
-		if (id == null) {
-			if (other.id != null)
+		if (cvTermSynonymId == null) {
+			if (other.cvTermSynonymId != null)
 				return false;
-		} else if (!id.equals(other.id))
+		} else if (!cvTermSynonymId.equals(other.cvTermSynonymId))
 			return false;
 		
 		return true;
@@ -129,8 +141,8 @@ public class CVTermSynonym implements Serializable {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("CVTermSynonym [id=");
-		builder.append(id);
+		builder.append("CVTermSynonym [cvTermSynonymId=");
+		builder.append(cvTermSynonymId);
 		builder.append(", cvTerm=");
 		builder.append(cvTerm);
 		builder.append(", synonym=");
@@ -140,7 +152,6 @@ public class CVTermSynonym implements Serializable {
 		builder.append("]");
 		return builder.toString();
 	}
-	
 	
 
 }

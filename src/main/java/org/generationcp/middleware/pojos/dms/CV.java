@@ -1,3 +1,15 @@
+/*******************************************************************************
+ * Copyright (c) 2012, All Rights Reserved.
+ * 
+ * Generation Challenge Programme (GCP)
+ * 
+ * 
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * 
+ *******************************************************************************/
+
 package org.generationcp.middleware.pojos.dms;
 
 import java.io.Serializable;
@@ -31,7 +43,7 @@ public class CV implements Serializable {
 	@GeneratedValue
 	@Basic(optional = false)
 	@Column(name = "cv_id")	
-	private Integer id;
+	private Long cvId;
 	
 	/**
 	 * The name of the ontology. 
@@ -51,16 +63,16 @@ public class CV implements Serializable {
 		
 	}
 	
-	public CV(Integer id){
-		this.id = id;
+	public CV(Long id){
+		this.cvId = id;
 	}
 
-	public Integer getId() {
-		return id;
+	public Long getCvId() {
+		return cvId;
 	}
 
-	public void setId(Integer id) {
-		this.id = id;
+	public void setCvId(Long id) {
+		this.cvId = id;
 	}
 
 	public String getName() {
@@ -80,22 +92,24 @@ public class CV implements Serializable {
 	}
 	
 	
-    @Override
-    public String toString() {
-    	StringBuilder sb = new StringBuilder();
-    	sb.append("CV [id=" + id);
-    	sb.append(", name=" + name);
-    	sb.append(", definition=" + definition);
-    	sb.append("]");
-    	
-    	return sb.toString();
-    }
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("CV [cvId=");
+		builder.append(cvId);
+		builder.append(", name=");
+		builder.append(name);
+		builder.append(", definition=");
+		builder.append(definition);
+		builder.append("]");
+		return builder.toString();
+	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((cvId == null) ? 0 : cvId.hashCode());
 		
 		return result;
 	}
@@ -110,10 +124,10 @@ public class CV implements Serializable {
 			return false;
 		
 		CV other = (CV) obj;
-		if (id == null) {
-			if (other.id != null)
+		if (cvId == null) {
+			if (other.cvId != null)
 				return false;
-		} else if (!id.equals(other.id))
+		} else if (!cvId.equals(other.cvId))
 			return false;
 		
 		return true;
