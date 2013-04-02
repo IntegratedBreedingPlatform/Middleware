@@ -96,6 +96,7 @@
   <mapping class="org.generationcp.middleware.pojos.dms.CV"/>
   <mapping class="org.generationcp.middleware.pojos.dms.CVTerm"/>
   <mapping class="org.generationcp.middleware.pojos.dms.CVTermRelationship"/>
+  <mapping class="org.generationcp.middleware.pojos.dms.CVTermSynonym"/>
   
  </session-factory>
 </hibernate-configuration>

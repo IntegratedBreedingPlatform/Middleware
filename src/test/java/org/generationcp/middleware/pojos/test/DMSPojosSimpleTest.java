@@ -17,6 +17,7 @@ import java.util.List;
 import org.generationcp.middleware.pojos.dms.CV;
 import org.generationcp.middleware.pojos.dms.CVTerm;
 import org.generationcp.middleware.pojos.dms.CVTermRelationship;
+import org.generationcp.middleware.pojos.dms.CVTermSynonym;
 import org.generationcp.middleware.pojos.CharacterData;
 import org.generationcp.middleware.pojos.Factor;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -232,6 +233,22 @@ public class DMSPojosSimpleTest{
             Assert.assertTrue(obj instanceof CVTermRelationship);
             Assert.assertTrue(obj != null);
             CVTermRelationship holder = (CVTermRelationship) obj;
+            System.out.println("  " + holder);
+        }
+    }
+
+    @Test
+    public void testCVTermSynonym() {
+        Session session = hibernateUtil.getCurrentSession();
+        Query query = session.createQuery("FROM CVTermSynonym");
+        query.setMaxResults(10);
+        List results = query.list();
+
+        System.out.println("testCVTermSynonym() RESULTS: ");
+        for (Object obj : results) {
+            Assert.assertTrue(obj instanceof CVTermSynonym);
+            Assert.assertTrue(obj != null);
+            CVTermSynonym holder = (CVTermSynonym) obj;
             System.out.println("  " + holder);
         }
     }
