@@ -27,6 +27,7 @@ import org.generationcp.middleware.pojos.dms.CVTerm;
 import org.generationcp.middleware.pojos.dms.CVTermRelationship;
 import org.generationcp.middleware.pojos.dms.CVTermSynonym;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.Experiment;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.util.HibernateUtil;
@@ -278,6 +279,20 @@ public class DMSPojosSimpleTest{
     	System.out.println("testProjectProperty() RESULTS: ");
     	for (Object obj : query.list()) {
     		Assert.assertTrue(obj instanceof ProjectProperty);
+    		Assert.assertTrue(obj != null);
+    		System.out.println(" " + obj);
+    	}
+    }
+
+    @Test
+    public void testExperiment() {
+    	Session session = hibernateUtil.getCurrentSession();
+    	Query query = session.createQuery("FROM Experiment");
+    	query.setMaxResults(5);
+    	
+    	System.out.println("testExperiment() RESULTS: ");
+    	for (Object obj : query.list()) {
+    		Assert.assertTrue(obj instanceof Experiment);
     		Assert.assertTrue(obj != null);
     		System.out.println(" " + obj);
     	}
