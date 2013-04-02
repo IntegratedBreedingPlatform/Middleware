@@ -17,14 +17,15 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.hibernate.Criteria;
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
@@ -34,9 +35,6 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
 
     private static final Integer STATUS_DELETED = 9;
     
-    private WorkbenchDataManager workbenchDataManager;
-
-
     @SuppressWarnings("unchecked")
     public List<GermplasmList> getAllExceptDeleted(int start, int numOfRows) throws MiddlewareQueryException {
         try {
@@ -255,6 +253,8 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
     }
     
     /**
+     * Get Germplasm List Types
+     * 
      * Return a List of UserDefinedField POJOs representing records from 
      * the udflds table of IBDB which are the types of germplasm lists.
      * 
@@ -262,39 +262,23 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
      * @throws MiddlewareQueryException
      */
     
-    public List<UserDefinedField> getGermplasmListTypes() throws MiddlewareQueryException {
-        List<UserDefinedField> toReturn = new ArrayList<UserDefinedField>();
-
+    
+    public List getGermplasmListTypes() throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(GermplasmList.GET_GERMPLASM_LIST_TYPES);
+        	Session session = getSession();
+        	SQLQuery query = session.createSQLQuery(GermplasmList.GET_GERMPLASM_LIST_TYPES); 
             List results = query.list();
+            return results;
 
-            for (Object o : results) {
-                Object[] result = (Object[]) o;
-                if (result != null) {
-            		Integer fldno = (Integer) result[0];
-                    String ftable = (String) result[1];
-                    String ftype = (String) result[2];
-                    String fcode = (String) result[3];
-                    String fname = (String) result[4];
-                    String ffmt = (String) result[5];
-                    String fdesc = (String) result[6];
-                    Integer lfldno = (Integer) result[7];
-                    User user = workbenchDataManager.getUserById((Integer) result[8]);
-                    Integer fdate = (Integer) result[9];
-                    Integer scaleid = (Integer) result[10];
-                    
-                    UserDefinedField userDefinedField = new UserDefinedField(fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, user, fdate, scaleid);
-                    toReturn.add(userDefinedField);
-                }
-            }
         } catch (HibernateException e) {
             logAndThrowException("Error with getGermplasmListTypes() query from GermplasmList: " + e.getMessage(), e);
+            return null;
         }
-        return toReturn;
     }
     
     /**
+     * Get Germplasm Name Types
+     * 
      * Return a List of UserDefinedField POJOs representing records from 
      * the udflds table of IBDB which are the types of germplasm names.
      * 
@@ -302,35 +286,16 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
      * @throws MiddlewareQueryException
      */
     
-    public List<UserDefinedField> getGermplasmNameTypes() throws MiddlewareQueryException {
-        List<UserDefinedField> toReturn = new ArrayList<UserDefinedField>();
-
+    public List getGermplasmNameTypes() throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(GermplasmList.GET_GERMPLASM_NAME_TYPES);
+        	Session session = getSession();
+        	SQLQuery query = session.createSQLQuery(GermplasmList.GET_GERMPLASM_NAME_TYPES); 
             List results = query.list();
+            return results;
 
-            for (Object o : results) {
-                Object[] result = (Object[]) o;
-                if (result != null) {
-            		Integer fldno = (Integer) result[0];
-                    String ftable = (String) result[1];
-                    String ftype = (String) result[2];
-                    String fcode = (String) result[3];
-                    String fname = (String) result[4];
-                    String ffmt = (String) result[5];
-                    String fdesc = (String) result[6];
-                    Integer lfldno = (Integer) result[7];
-                    User user = workbenchDataManager.getUserById((Integer) result[8]);
-                    Integer fdate = (Integer) result[9];
-                    Integer scaleid = (Integer) result[10];
-                    
-                    UserDefinedField userDefinedField = new UserDefinedField(fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, user, fdate, scaleid);
-                    toReturn.add(userDefinedField);
-                }
-            }
         } catch (HibernateException e) {
-            logAndThrowException("Error with getGermplasmNameTypes() query from GermplasmList: " + e.getMessage(), e);
-        }
-        return toReturn;
+            logAndThrowException("Error with getGermplasmListTypes() query from GermplasmList: " + e.getMessage(), e);
+            return null;
+        }    	
     }    
 }

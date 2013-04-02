@@ -21,13 +21,16 @@ import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @SuppressWarnings("unchecked")
 public class GermplasmListManagerImpl extends DataManager implements GermplasmListManager{
@@ -36,6 +39,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     private GermplasmListDAO germplasmListDao;
 	private GermplasmListDataDAO germplasmListDataDao;
+	
+	private WorkbenchDataManager workbenchDataManager;
 	
 	private GermplasmListDAO getGermplasmListDAO() {
 		if (germplasmListDao == null) {
@@ -525,6 +530,63 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     
     public List<UserDefinedField> getGermplasmListTypes() throws MiddlewareQueryException {
-    	return germplasmListDao.getGermplasmListTypes();
+    	List<UserDefinedField> toReturn = new ArrayList<UserDefinedField>();
+    	
+    	Database instance = Database.CENTRAL;    	
+    	List results = getFromInstanceByMethod(getGermplasmListDAO(), instance, "getGermplasmListTypes", 
+				new Object[] {}, new Class[] {});
+    	
+        for (Object o : results) {
+            Object[] result = (Object[]) o;
+            if (result != null) {
+        		Integer fldno = (Integer) result[0];
+                String ftable = (String) result[1];
+                String ftype = (String) result[2];
+                String fcode = (String) result[3];
+                String fname = (String) result[4];
+                String ffmt = (String) result[5];
+                String fdesc = (String) result[6];
+                Integer lfldno = (Integer) result[7];
+                User user = null;
+                if(workbenchDataManager!=null)
+                	user = workbenchDataManager.getUserById((Integer) result[8]);
+                Integer fdate = (Integer) result[9];
+                Integer scaleid = (Integer) result[10];
+                
+                UserDefinedField userDefinedField = new UserDefinedField(fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, user, fdate, scaleid);
+                toReturn.add(userDefinedField);
+            }
+        }
+    	return toReturn;    }
+    
+    public List<UserDefinedField> getGermplasmNameTypes() throws MiddlewareQueryException {
+    	List<UserDefinedField> toReturn = new ArrayList<UserDefinedField>();
+    	
+    	Database instance = Database.CENTRAL;    	
+    	List results = getFromInstanceByMethod(getGermplasmListDAO(), instance, "getGermplasmNameTypes", 
+				new Object[] {}, new Class[] {});
+    	
+        for (Object o : results) {
+            Object[] result = (Object[]) o;
+            if (result != null) {
+        		Integer fldno = (Integer) result[0];
+                String ftable = (String) result[1];
+                String ftype = (String) result[2];
+                String fcode = (String) result[3];
+                String fname = (String) result[4];
+                String ffmt = (String) result[5];
+                String fdesc = (String) result[6];
+                Integer lfldno = (Integer) result[7];
+                User user = null;
+                if(workbenchDataManager!=null)
+                	user = workbenchDataManager.getUserById((Integer) result[8]);
+                Integer fdate = (Integer) result[9];
+                Integer scaleid = (Integer) result[10];
+                
+                UserDefinedField userDefinedField = new UserDefinedField(fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, user, fdate, scaleid);
+                toReturn.add(userDefinedField);
+            }
+        }
+    	return toReturn;
     }
 }

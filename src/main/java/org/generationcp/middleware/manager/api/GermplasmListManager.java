@@ -488,4 +488,16 @@ public interface GermplasmListManager{
     
     public List<UserDefinedField> getGermplasmListTypes() throws MiddlewareQueryException;    
 
+    
+    /**
+     * Return a List of UserDefinedField POJOs representing records from 
+     * the udflds table of IBDB which are the types of germplasm names.
+     * 
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    
+    public List<UserDefinedField> getGermplasmNameTypes() throws MiddlewareQueryException;    
+    
+    
 }

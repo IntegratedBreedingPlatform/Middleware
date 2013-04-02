@@ -462,8 +462,16 @@ public class TestGermplasmListManagerImpl{
     @Test
     public void testGetGermplasmListTypes() throws Exception {
     	List<UserDefinedField> userDefinedFields = new ArrayList<UserDefinedField>();
+    	userDefinedFields = manager.getGermplasmListTypes();
         System.out.println("testGetGermplasmListTypes() RESULTS:" + userDefinedFields);
     }
+
+    @Test
+    public void testGetGermplasmNameTypes() throws Exception {
+    	List<UserDefinedField> userDefinedFields = new ArrayList<UserDefinedField>();
+    	userDefinedFields = manager.getGermplasmNameTypes();
+        System.out.println("testGetGermplasmNameTypes() RESULTS:" + userDefinedFields);
+    }    
     
     @AfterClass
     public static void tearDown() throws Exception {

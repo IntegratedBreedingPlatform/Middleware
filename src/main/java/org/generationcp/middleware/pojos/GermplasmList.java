@@ -77,6 +77,7 @@ public class GermplasmList implements Serializable{
     private List<GermplasmListData> listData = new ArrayList<GermplasmListData>();
 
     public static String GET_GERMPLASM_LIST_TYPES = "SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid FROM udflds WHERE ftable = 'LISTNMS' AND ftype = 'LISTTYPE'";
+    public static String GET_GERMPLASM_NAME_TYPES = "SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid FROM udflds WHERE ftable = 'NAMES' AND ftype = 'NAME'";
     
     public GermplasmList() {
 
