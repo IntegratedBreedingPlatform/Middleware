@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
+import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
@@ -31,6 +32,7 @@ import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 
 @SuppressWarnings("unchecked")
 public class GermplasmListManagerImpl extends DataManager implements GermplasmListManager{
@@ -39,8 +41,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     private GermplasmListDAO germplasmListDao;
 	private GermplasmListDataDAO germplasmListDataDao;
-	
-	private WorkbenchDataManager workbenchDataManager;
+	private UserDAO userDao = new UserDAO();
 	
 	private GermplasmListDAO getGermplasmListDAO() {
 		if (germplasmListDao == null) {
@@ -57,6 +58,14 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		germplasmListDataDao.setSession(getActiveSession());
 		return germplasmListDataDao;
 	}
+
+    private UserDAO getUserDao() {
+        if (userDao == null) {
+            userDao = new UserDAO();
+        }
+        userDao.setSession(getActiveSession());
+        return userDao;
+    }	
 	
     public GermplasmListManagerImpl() {
     }
@@ -547,9 +556,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
                 String ffmt = (String) result[5];
                 String fdesc = (String) result[6];
                 Integer lfldno = (Integer) result[7];
-                User user = null;
-                if(workbenchDataManager!=null)
-                	user = workbenchDataManager.getUserById((Integer) result[8]);
+                User user = getUserDao().getById((Integer) result[8], false);
                 Integer fdate = (Integer) result[9];
                 Integer scaleid = (Integer) result[10];
                 
@@ -577,9 +584,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
                 String ffmt = (String) result[5];
                 String fdesc = (String) result[6];
                 Integer lfldno = (Integer) result[7];
-                User user = null;
-                if(workbenchDataManager!=null)
-                	user = workbenchDataManager.getUserById((Integer) result[8]);
+                User user = getUserDao().getById((Integer) result[8], false);
                 Integer fdate = (Integer) result[9];
                 Integer scaleid = (Integer) result[10];
                 
@@ -589,4 +594,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
         }
     	return toReturn;
     }
+    
+
 }
