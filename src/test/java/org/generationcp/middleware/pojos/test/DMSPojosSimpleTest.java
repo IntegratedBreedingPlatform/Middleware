@@ -28,6 +28,8 @@ import org.generationcp.middleware.pojos.dms.CVTermRelationship;
 import org.generationcp.middleware.pojos.dms.CVTermSynonym;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Experiment;
+import org.generationcp.middleware.pojos.dms.ExperimentPhenotype;
+import org.generationcp.middleware.pojos.dms.ExperimentProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.Phenotype;
@@ -297,6 +299,34 @@ public class DMSPojosSimpleTest{
     	System.out.println("testExperiment() RESULTS: ");
     	for (Object obj : query.list()) {
     		Assert.assertTrue(obj instanceof Experiment);
+    		Assert.assertTrue(obj != null);
+    		System.out.println(" " + obj);
+    	}
+    }
+    
+    @Test
+    public void testExperimentProject() {
+    	Session session = hibernateUtil.getCurrentSession();
+    	Query query = session.createQuery("FROM ExperimentProject");
+    	query.setMaxResults(5);
+    	
+    	System.out.println("testExperimentProject() RESULTS: ");
+    	for (Object obj : query.list()) {
+    		Assert.assertTrue(obj instanceof ExperimentProject);
+    		Assert.assertTrue(obj != null);
+    		System.out.println(" " + obj);
+    	}
+    }
+    
+    @Test
+    public void testExperimentPhenotype() {
+    	Session session = hibernateUtil.getCurrentSession();
+    	Query query = session.createQuery("FROM ExperimentPhenotype");
+    	query.setMaxResults(5);
+    	
+    	System.out.println("testExperimentPhenotype() RESULTS: ");
+    	for (Object obj : query.list()) {
+    		Assert.assertTrue(obj instanceof ExperimentPhenotype);
     		Assert.assertTrue(obj != null);
     		System.out.println(" " + obj);
     	}
