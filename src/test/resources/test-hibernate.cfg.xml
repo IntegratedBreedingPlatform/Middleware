@@ -45,8 +45,6 @@
   <mapping class="org.generationcp.middleware.pojos.ScaleDiscretePK"/>
   <mapping class="org.generationcp.middleware.pojos.TraitMethod"/>
   <mapping class="org.generationcp.middleware.pojos.Trait"/>
-  <mapping class="org.generationcp.middleware.pojos.NumericData"/>
-  <mapping class="org.generationcp.middleware.pojos.NumericDataPK"/>
   <mapping class="org.generationcp.middleware.pojos.Variate"/>
   <mapping class="org.generationcp.middleware.pojos.Factor"/>
   <mapping class="org.generationcp.middleware.pojos.Oindex"/>

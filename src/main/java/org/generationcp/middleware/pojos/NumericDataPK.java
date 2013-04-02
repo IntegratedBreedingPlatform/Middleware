@@ -14,21 +14,12 @@ package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-
-@Embeddable
 public class NumericDataPK implements Serializable{
 
     private static final long serialVersionUID = 1L;
 
-    @Basic(optional = false)
-    @Column(name = "ounitid")
     private Integer observationUnitId;
 
-    @Basic(optional = false)
-    @Column(name = "variatid")
     private Integer variateId;
 
     public NumericDataPK() {

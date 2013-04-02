@@ -92,7 +92,7 @@ public class NumericDataDAO extends GenericDAO<NumericData, NumericDataPK>{
         }
 
         try {
-            SQLQuery query = getSession().createSQLQuery(NumericData.GET_BY_OUNIT_ID_LIST);
+            SQLQuery query = getSession().createSQLQuery(/*NumericData.GET_BY_OUNIT_ID_LIST*/"");
             query.setParameterList("ounitIdList", ounitIdList);
             List results = query.list();
             for (Object o : results) {

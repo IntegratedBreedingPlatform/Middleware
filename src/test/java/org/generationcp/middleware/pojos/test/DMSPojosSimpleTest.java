@@ -15,7 +15,6 @@ package org.generationcp.middleware.pojos.test;
 import java.util.List;
 
 import org.generationcp.middleware.pojos.Factor;
-import org.generationcp.middleware.pojos.NumericData;
 import org.generationcp.middleware.pojos.Oindex;
 import org.generationcp.middleware.pojos.Representation;
 import org.generationcp.middleware.pojos.Study;
@@ -53,22 +52,6 @@ public class DMSPojosSimpleTest{
     @BeforeClass
     public static void setUp() throws Exception {
         hibernateUtil = new HibernateUtil(CONFIG);
-    }
-
-    @Test
-    public void testNumericData() {
-        Session session = hibernateUtil.getCurrentSession();
-        Query query = session.createQuery("FROM NumericData");
-        query.setMaxResults(5);
-        List results = query.list();
-
-        System.out.println("testNumericData() RESULTS: ");
-        for (Object obj : results) {
-            Assert.assertTrue(obj instanceof NumericData);
-            Assert.assertTrue(obj != null);
-            NumericData holder = (NumericData) obj;
-            System.out.println("  " + holder);
-        }
     }
 
     @Test
