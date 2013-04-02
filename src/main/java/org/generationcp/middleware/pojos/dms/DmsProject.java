@@ -1,18 +1,26 @@
 package org.generationcp.middleware.pojos.dms;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
+/**
+ * http://gmod.org/wiki/Chado_Tables#Table:_project
+ * 
+ * A Study is captured using the Project table. 
+ * Information stored at this level describes properties relevant for all field trials in a Project (Study). 
+ * Since it is important both that local breeders are free to use their nomenclature and that these local terms are mapped to a central ontology, 
+ * the properties table maps all terms to the Ontology at the project level.
+ * 
+ * @author tippsgo
+ *
+ */
 @Entity()
 @Table(name="project", uniqueConstraints = {@UniqueConstraint(columnNames = {"name"})})
 public class DmsProject implements Serializable {
@@ -21,23 +29,30 @@ public class DmsProject implements Serializable {
 
 	@Id
 	@Basic(optional = false)
+	@GeneratedValue
 	@Column(name = "project_id")
-	private Integer id;
+	private Long dmsProjectId;
 	
+	/**
+	 * The name of the project.
+	 */
 	@Basic(optional = false)
 	@Column(name = "name")
 	private String name;
 	
+	/**
+	 * The description of the project.
+	 */
 	@Basic(optional = false)
 	@Column(name = "description")
 	private String description;
 
-	public Integer getId() {
-		return id;
+	public Long getDmsProjectId() {
+		return dmsProjectId;
 	}
 
-	public void setId(Integer id) {
-		this.id = id;
+	public void setDmsProjectId(Long dmsProjectId) {
+		this.dmsProjectId = dmsProjectId;
 	}
 
 	public String getName() {
@@ -57,45 +72,35 @@ public class DmsProject implements Serializable {
 	}
 
 	@Override
-	public String toString() {
-		StringBuffer out = new StringBuffer();
-		
-		out.append("[" + this.getClass().getName() + " ");
-		try {
-			for (Field field : this.getClass().getDeclaredFields()) {
-				if (field.getAnnotation(Column.class) != null) {
-					out.append("[" + field.getName() + "=" + field.get(this) + "]");
-				}
-			}
-		} catch (Exception e) {
-			//do nothing
-		}
-		out.append("]");
-		
-		return out.toString();
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((dmsProjectId == null) ? 0 : dmsProjectId.hashCode());
+		return result;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null) {
-			return false;
-		}
-		if (obj == this) {
+		if (this == obj)
 			return true;
-		}
-		if (obj.getClass() != this.getClass()) {
+		if (obj == null)
 			return false;
-		}
-		DmsProject rhs = (DmsProject) obj;
-		return new EqualsBuilder()
-					.appendSuper(super.equals(obj))
-					.append(this.id, rhs.id)
-					.isEquals();
+		if (getClass() != obj.getClass())
+			return false;
+		DmsProject other = (DmsProject) obj;
+		if (dmsProjectId == null) {
+			if (other.dmsProjectId != null)
+				return false;
+		} else if (!dmsProjectId.equals(other.dmsProjectId))
+			return false;
+		return true;
 	}
-	
+
 	@Override
-	public int hashCode() {
-		return new HashCodeBuilder().append(id).toHashCode();
+	public String toString() {
+		return "DmsProject [dmsProjectId=" + dmsProjectId + ", name=" + name
+				+ ", description=" + description + "]";
 	}
-	
+
 }
