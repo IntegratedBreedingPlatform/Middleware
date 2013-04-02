@@ -73,6 +73,18 @@ public class CVTermRelationship implements Serializable{
     @JoinColumn(name="object_id", referencedColumnName="cvterm_id")
     private CVTerm object;
     
+	public CVTermRelationship() {
+	}
+
+	public CVTermRelationship(Long cvTermRelationshipId, CVTerm type,
+			CVTerm subject, CVTerm object) {
+		super();
+		this.cvTermRelationshipId = cvTermRelationshipId;
+		this.type = type;
+		this.subject = subject;
+		this.object = object;
+	}
+
 	public Long getCvTermRelationshipId() {
 		return cvTermRelationshipId;
 	}

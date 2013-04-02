@@ -89,6 +89,7 @@
   
   <!-- Mapping classes for new schema --> 
   <mapping class="org.generationcp.middleware.pojos.dms.Geolocation"/>
+  <mapping class="org.generationcp.middleware.pojos.dms.GeolocationProperty"/>
   <mapping class="org.generationcp.middleware.pojos.dms.CV"/>
   <mapping class="org.generationcp.middleware.pojos.dms.CVTerm"/>
   <mapping class="org.generationcp.middleware.pojos.dms.CVTermRelationship"/>
@@ -97,7 +98,7 @@
   <mapping class="org.generationcp.middleware.pojos.dms.ProjectProperty"/>
   <mapping class="org.generationcp.middleware.pojos.dms.Experiment"/>
   <mapping class="org.generationcp.middleware.pojos.dms.Stock"/>
-  <mapping class="org.generationcp.middleware.pojos.dms.StockProperties"/>
+  <mapping class="org.generationcp.middleware.pojos.dms.StockProperty"/>
   <mapping class="org.generationcp.middleware.pojos.dms.Phenotype"/>
 
   

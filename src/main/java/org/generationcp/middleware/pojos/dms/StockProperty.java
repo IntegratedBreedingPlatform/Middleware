@@ -41,7 +41,7 @@ import javax.persistence.UniqueConstraint;
 		uniqueConstraints = {
 			@UniqueConstraint(columnNames = { "stock_id", "type_id", "rank" })
 		})
-public class StockProperties implements Serializable {
+public class StockProperty implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -141,7 +141,7 @@ public class StockProperties implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		StockProperties other = (StockProperties) obj;
+		StockProperty other = (StockProperty) obj;
 		if (rank == null) {
 			if (other.rank != null)
 				return false;

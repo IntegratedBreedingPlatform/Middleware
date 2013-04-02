@@ -95,6 +95,22 @@ public class CVTerm implements Serializable {
 	 */
 	@Column(name = "is_relationshiptype")
 	private Long isRelationshipType;
+	
+	
+	public CVTerm() {
+	}
+
+	public CVTerm(Long cvTermId, CV cv, String name, String definition,
+			Long dbxRefId, Long isObsolete, Long isRelationshipType) {
+		super();
+		this.cvTermId = cvTermId;
+		this.cv = cv;
+		this.name = name;
+		this.definition = definition;
+		this.dbxRefId = dbxRefId;
+		this.isObsolete = isObsolete;
+		this.isRelationshipType = isRelationshipType;
+	}
 
 	public Long getCvTermId() {
 		return cvTermId;

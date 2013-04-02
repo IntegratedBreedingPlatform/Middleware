@@ -73,6 +73,25 @@ public class Phenotype implements Serializable {
     @JoinColumn(name="assay_id", referencedColumnName="cvterm_id")
 	private CVTerm assay;
 
+	public Phenotype() {
+	}
+
+
+	public Phenotype(Long phenotypeId, String uniqueName, String name,
+			CVTerm observable, CVTerm attribute, String value, CVTerm cValue,
+			CVTerm assay) {
+		super();
+		this.phenotypeId = phenotypeId;
+		this.uniqueName = uniqueName;
+		this.name = name;
+		this.observable = observable;
+		this.attribute = attribute;
+		this.value = value;
+		this.cValue = cValue;
+		this.assay = assay;
+	}
+
+
 	public Long getPhenotypeId() {
 		return phenotypeId;
 	}
@@ -136,6 +155,7 @@ public class Phenotype implements Serializable {
 	public void setAssay(CVTerm assay) {
 		this.assay = assay;
 	}
+	
 
 	@Override
 	public int hashCode() {

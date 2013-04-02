@@ -58,6 +58,16 @@ public class Experiment implements Serializable {
     @JoinColumn(name="type_id", referencedColumnName="cvterm_id")
     private CVTerm type;
 
+	public Experiment() {
+	}
+
+	public Experiment(Long ndExperimentId, Geolocation geoLocation, CVTerm type) {
+		super();
+		this.ndExperimentId = ndExperimentId;
+		this.geoLocation = geoLocation;
+		this.type = type;
+	}
+
 	public Long getNdExperimentId() {
 		return ndExperimentId;
 	}
