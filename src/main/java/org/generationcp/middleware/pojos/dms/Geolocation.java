@@ -8,6 +8,14 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+/**
+ * 
+ * The Geolocation table maps to the Location module of the logical data model. 
+ * Information in this table corresponds to actual physical locations where Field Trials are conducted. 
+ *  
+ * @author Darla Ani
+ *
+ */
 @Entity
 @Table(name = "nd_geolocation")
 public class Geolocation implements Serializable {
