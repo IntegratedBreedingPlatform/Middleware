@@ -4,10 +4,10 @@
 <hibernate-configuration>
  <session-factory>
   <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
-  <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/ibdb_rice_20120405</property>
+  <property name="hibernate.connection.url">jdbc:mysql://localhost:13306/ibdbv2</property>
   <property name="hibernate.connection.username">root</property>
-  <property name="hibernate.connection.password">lich27king</property>
-  <property name="hibernate.default_schema">ibdb_rice_20120405</property>
+  <property name="hibernate.connection.password"></property>
+  <property name="hibernate.default_schema">ibdbv2</property>
   <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
   <!--   
   <property name="hibernate.show_sql">true</property>
@@ -86,6 +86,10 @@
   <mapping class="org.generationcp.middleware.pojos.workbench.ProjectLocationMap"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.ToolConfiguration"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount"/>
+  
+  <!-- Mapping classes for new schema --> 
+  <mapping class="org.generationcp.middleware.pojos.dms.Geolocation"/>
+  <mapping class="org.generationcp.middleware.pojos.dms.CV"/>
   
  </session-factory>
 </hibernate-configuration>

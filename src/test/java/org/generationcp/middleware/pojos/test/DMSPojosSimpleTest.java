@@ -14,8 +14,10 @@ package org.generationcp.middleware.pojos.test;
 
 import java.util.List;
 
+import org.generationcp.middleware.pojos.dms.CV;
 import org.generationcp.middleware.pojos.CharacterData;
 import org.generationcp.middleware.pojos.Factor;
+import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.NumericData;
 import org.generationcp.middleware.pojos.Oindex;
 import org.generationcp.middleware.pojos.Representation;
@@ -164,6 +166,38 @@ public class DMSPojosSimpleTest{
             Assert.assertTrue(obj instanceof Representation);
             Assert.assertTrue(obj != null);
             Representation holder = (Representation) obj;
+            System.out.println("  " + holder);
+        }
+    }
+    
+    @Test
+    public void testGeolocation() {
+        Session session = hibernateUtil.getCurrentSession();
+        Query query = session.createQuery("FROM Geolocation");
+        query.setMaxResults(5);
+        List results = query.list();
+
+        System.out.println("testGeolocation() RESULTS: ");
+        for (Object obj : results) {
+            Assert.assertTrue(obj instanceof Geolocation);
+            Assert.assertTrue(obj != null);
+            Geolocation holder = (Geolocation) obj;
+            System.out.println("  " + holder);
+        }
+    }
+    
+    @Test
+    public void testCV() {
+        Session session = hibernateUtil.getCurrentSession();
+        Query query = session.createQuery("FROM CV");
+        query.setMaxResults(10);
+        List results = query.list();
+
+        System.out.println("testCV() RESULTS: ");
+        for (Object obj : results) {
+            Assert.assertTrue(obj instanceof CV);
+            Assert.assertTrue(obj != null);
+            CV holder = (CV) obj;
             System.out.println("  " + holder);
         }
     }
