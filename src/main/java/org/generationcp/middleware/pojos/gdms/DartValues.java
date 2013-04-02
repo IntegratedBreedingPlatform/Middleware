@@ -111,11 +111,11 @@ public class DartValues implements Serializable{
         this.cloneId = cloneId;
     }    
 
-    public Float getQValue() {
+    public Float getqValue() {
         return qValue;
     }
     
-    public void setQValue(Float qValue) {
+    public void setqValue(Float qValue) {
         this.qValue = qValue;
     }    
     
