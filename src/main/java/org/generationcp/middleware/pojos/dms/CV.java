@@ -7,9 +7,21 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
+/**
+ * http://gmod.org/wiki/Chado_Tables#Table:_cv
+ * 
+ * A term, class, universal or type within an ontology or controlled vocabulary. 
+ * This table is also used for relations and properties. 
+ * cvterms constitute nodes in the graph defined by the collection of cvterms and cvterm_relationships.
+ * 
+ * @author Joyce Avestro
+ *
+ */
 @Entity
-@Table(name = "cv")
+@Table(name = "cv", uniqueConstraints = {
+		@UniqueConstraint(columnNames = { "name" }) })
 public class CV implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -19,10 +31,17 @@ public class CV implements Serializable {
 	@Column(name = "cv_id")	
 	private Integer id;
 	
+	/**
+	 * The name of the ontology. 
+	 * In OBO file format, the cv.name is known as the namespace.
+	 */
 	@Basic(optional = false)
-	@Column(name = "name")
+	@Column(name = "name", unique = true)
 	private String name;
 	
+	/**
+	 * A text description of the criteria for membership of this ontology.
+	 */
 	@Column(name = "definition")
 	private String definition;
 	
