@@ -60,7 +60,7 @@ public class ProjectProperty implements Serializable {
 	 * Used for grouping compound properties.
 	 */
 	@Column(name = "rank")
-	private Integer rank;
+	private Long rank;
 
 	public Long getProjectPropertyId() {
 		return projectPropertyId;
@@ -94,11 +94,11 @@ public class ProjectProperty implements Serializable {
 		this.value = value;
 	}
 
-	public Integer getRank() {
+	public Long getRank() {
 		return rank;
 	}
 
-	public void setRank(Integer rank) {
+	public void setRank(Long rank) {
 		this.rank = rank;
 	}
 
