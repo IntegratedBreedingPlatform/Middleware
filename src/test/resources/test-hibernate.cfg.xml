@@ -97,6 +97,8 @@
   <mapping class="org.generationcp.middleware.pojos.dms.ProjectProperty"/>
   <mapping class="org.generationcp.middleware.pojos.dms.Experiment"/>
   <mapping class="org.generationcp.middleware.pojos.dms.Stock"/>
+  <mapping class="org.generationcp.middleware.pojos.dms.StockProperties"/>
+  <mapping class="org.generationcp.middleware.pojos.dms.Phenotype"/>
 
   
  </session-factory>

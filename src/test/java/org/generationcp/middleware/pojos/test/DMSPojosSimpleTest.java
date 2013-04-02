@@ -29,8 +29,10 @@ import org.generationcp.middleware.pojos.dms.CVTermSynonym;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Experiment;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.Stock;
+import org.generationcp.middleware.pojos.dms.StockProperties;
 import org.generationcp.middleware.util.HibernateUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -308,6 +310,35 @@ public class DMSPojosSimpleTest{
     	System.out.println("testStock() RESULTS: ");
     	for (Object obj : query.list()) {
     		Assert.assertTrue(obj instanceof Stock);
+    		Assert.assertTrue(obj != null);
+    		System.out.println(" " + obj);
+    	}
+    }
+
+    @Test
+    public void testStockProperties() {
+    	Session session = hibernateUtil.getCurrentSession();
+    	Query query = session.createQuery("FROM StockProperties");
+    	query.setMaxResults(5);
+    	
+    	System.out.println("testStockProperties() RESULTS: ");
+    	for (Object obj : query.list()) {
+    		Assert.assertTrue(obj instanceof StockProperties);
+    		Assert.assertTrue(obj != null);
+    		System.out.println(" " + obj);
+    	}
+    }
+
+
+    @Test
+    public void testPhenotype() {
+    	Session session = hibernateUtil.getCurrentSession();
+    	Query query = session.createQuery("FROM Phenotype");
+    	query.setMaxResults(5);
+    	
+    	System.out.println("testPhenotype() RESULTS: ");
+    	for (Object obj : query.list()) {
+    		Assert.assertTrue(obj instanceof Phenotype);
     		Assert.assertTrue(obj != null);
     		System.out.println(" " + obj);
     	}
