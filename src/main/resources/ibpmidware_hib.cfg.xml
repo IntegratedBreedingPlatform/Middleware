@@ -91,5 +91,9 @@
   <mapping class="org.generationcp.middleware.pojos.workbench.ToolConfiguration"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount"/>
   
+  <!-- Mapping classes for new schema --> 
+  <mapping class="org.generationcp.middleware.pojos.dms.Geolocation"/>
+  <mapping class="org.generationcp.middleware.pojos.dms.CV"/>
+  
  </session-factory>
 </hibernate-configuration>
