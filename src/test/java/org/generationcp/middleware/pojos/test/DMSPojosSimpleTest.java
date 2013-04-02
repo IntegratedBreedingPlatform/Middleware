@@ -31,6 +31,7 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Experiment;
 import org.generationcp.middleware.pojos.dms.ExperimentPhenotype;
 import org.generationcp.middleware.pojos.dms.ExperimentProject;
+import org.generationcp.middleware.pojos.dms.ExperimentStock;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.Phenotype;
@@ -392,6 +393,20 @@ public class DMSPojosSimpleTest{
     	}
     }
 
+    @Test
+    public void testExperimentStock() {
+    	Session session = hibernateUtil.getCurrentSession();
+    	Query query = session.createQuery("FROM ExperimentStock");
+    	query.setMaxResults(5);
+    	
+    	System.out.println("testExperimentStock() RESULTS: ");
+    	for (Object obj : query.list()) {
+    		Assert.assertTrue(obj instanceof ExperimentStock);
+    		Assert.assertTrue(obj != null);
+    		System.out.println(" " + obj);
+    	}
+    }
+    
     @Test
     public void testGeolocationProperty() {
     	Session session = hibernateUtil.getCurrentSession();
