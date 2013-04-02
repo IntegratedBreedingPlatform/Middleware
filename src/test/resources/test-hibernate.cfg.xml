@@ -103,7 +103,7 @@
   <mapping class="org.generationcp.middleware.pojos.dms.Phenotype"/>
   <mapping class="org.generationcp.middleware.pojos.dms.ExperimentPhenotype"/>
   <mapping class="org.generationcp.middleware.pojos.dms.ExperimentProject"/>
-
+  <mapping class="org.generationcp.middleware.pojos.dms.ExperimentStock"/>
   
  </session-factory>
 </hibernate-configuration>
