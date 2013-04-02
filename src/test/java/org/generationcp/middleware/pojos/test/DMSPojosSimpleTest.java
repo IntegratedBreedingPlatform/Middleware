@@ -14,6 +14,7 @@ package org.generationcp.middleware.pojos.test;
 
 import java.util.List;
 
+import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.CharacterData;
 import org.generationcp.middleware.pojos.Factor;
 import org.generationcp.middleware.pojos.NumericData;
@@ -242,6 +243,22 @@ public class DMSPojosSimpleTest{
             Assert.assertTrue(obj instanceof CVTermRelationship);
             Assert.assertTrue(obj != null);
             CVTermRelationship holder = (CVTermRelationship) obj;
+            System.out.println("  " + holder);
+        }
+    }
+    
+    @Test
+    public void testExperimentProperty() {
+        Session session = hibernateUtil.getCurrentSession();
+        Query query = session.createQuery("FROM ExperimentProperty");
+        query.setMaxResults(10);
+        List results = query.list();
+
+        System.out.println("testExperimentProperty() RESULTS: ");
+        for (Object obj : results) {
+            Assert.assertTrue(obj instanceof ExperimentProperty);
+            Assert.assertTrue(obj != null);
+            ExperimentProperty holder = (ExperimentProperty) obj;
             System.out.println("  " + holder);
         }
     }

@@ -97,6 +97,7 @@
   <mapping class="org.generationcp.middleware.pojos.dms.CV"/>
   <mapping class="org.generationcp.middleware.pojos.dms.CVTerm"/>
   <mapping class="org.generationcp.middleware.pojos.dms.CVTermRelationship"/>
+  <mapping class="org.generationcp.middleware.pojos.dms.ExperimentProperty"/>
   <mapping class="org.generationcp.middleware.pojos.dms.CVTermSynonym"/>
   <mapping class="org.generationcp.middleware.pojos.dms.DmsProject"/>
   <mapping class="org.generationcp.middleware.pojos.dms.ProjectProperty"/>
