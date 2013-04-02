@@ -29,13 +29,11 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
 
     private static final Integer STATUS_DELETED = 9;
     
-    @Autowired
     private WorkbenchDataManager workbenchDataManager;
 
 
@@ -295,4 +293,44 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
         }
         return toReturn;
     }
+    
+    /**
+     * Return a List of UserDefinedField POJOs representing records from 
+     * the udflds table of IBDB which are the types of germplasm names.
+     * 
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    
+    public List<UserDefinedField> getGermplasmNameTypes() throws MiddlewareQueryException {
+        List<UserDefinedField> toReturn = new ArrayList<UserDefinedField>();
+
+        try {
+            SQLQuery query = getSession().createSQLQuery(GermplasmList.GET_GERMPLASM_NAME_TYPES);
+            List results = query.list();
+
+            for (Object o : results) {
+                Object[] result = (Object[]) o;
+                if (result != null) {
+            		Integer fldno = (Integer) result[0];
+                    String ftable = (String) result[1];
+                    String ftype = (String) result[2];
+                    String fcode = (String) result[3];
+                    String fname = (String) result[4];
+                    String ffmt = (String) result[5];
+                    String fdesc = (String) result[6];
+                    Integer lfldno = (Integer) result[7];
+                    User user = workbenchDataManager.getUserById((Integer) result[8]);
+                    Integer fdate = (Integer) result[9];
+                    Integer scaleid = (Integer) result[10];
+                    
+                    UserDefinedField userDefinedField = new UserDefinedField(fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, user, fdate, scaleid);
+                    toReturn.add(userDefinedField);
+                }
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getGermplasmNameTypes() query from GermplasmList: " + e.getMessage(), e);
+        }
+        return toReturn;
+    }    
 }
