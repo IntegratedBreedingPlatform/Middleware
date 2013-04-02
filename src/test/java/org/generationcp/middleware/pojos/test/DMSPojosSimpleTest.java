@@ -14,8 +14,6 @@ package org.generationcp.middleware.pojos.test;
 
 import java.util.List;
 
-import org.generationcp.middleware.pojos.dms.ExperimentProperty;
-import org.generationcp.middleware.pojos.CharacterData;
 import org.generationcp.middleware.pojos.Factor;
 import org.generationcp.middleware.pojos.NumericData;
 import org.generationcp.middleware.pojos.Oindex;
@@ -31,6 +29,7 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Experiment;
 import org.generationcp.middleware.pojos.dms.ExperimentPhenotype;
 import org.generationcp.middleware.pojos.dms.ExperimentProject;
+import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.ExperimentStock;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
@@ -68,22 +67,6 @@ public class DMSPojosSimpleTest{
             Assert.assertTrue(obj instanceof NumericData);
             Assert.assertTrue(obj != null);
             NumericData holder = (NumericData) obj;
-            System.out.println("  " + holder);
-        }
-    }
-
-    @Test
-    public void testCharacterData() {
-        Session session = hibernateUtil.getCurrentSession();
-        Query query = session.createQuery("FROM CharacterData");
-        query.setMaxResults(5);
-        List results = query.list();
-
-        System.out.println("testCharacterData() RESULTS: ");
-        for (Object obj : results) {
-            Assert.assertTrue(obj instanceof CharacterData);
-            Assert.assertTrue(obj != null);
-            CharacterData holder = (CharacterData) obj;
             System.out.println("  " + holder);
         }
     }
