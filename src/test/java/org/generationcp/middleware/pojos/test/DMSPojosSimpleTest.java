@@ -30,6 +30,7 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Experiment;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.pojos.dms.Stock;
 import org.generationcp.middleware.util.HibernateUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -293,6 +294,20 @@ public class DMSPojosSimpleTest{
     	System.out.println("testExperiment() RESULTS: ");
     	for (Object obj : query.list()) {
     		Assert.assertTrue(obj instanceof Experiment);
+    		Assert.assertTrue(obj != null);
+    		System.out.println(" " + obj);
+    	}
+    }
+
+    @Test
+    public void testStock() {
+    	Session session = hibernateUtil.getCurrentSession();
+    	Query query = session.createQuery("FROM Stock");
+    	query.setMaxResults(5);
+    	
+    	System.out.println("testStock() RESULTS: ");
+    	for (Object obj : query.list()) {
+    		Assert.assertTrue(obj instanceof Stock);
     		Assert.assertTrue(obj != null);
     		System.out.println(" " + obj);
     	}
