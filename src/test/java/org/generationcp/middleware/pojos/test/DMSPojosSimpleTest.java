@@ -14,19 +14,21 @@ package org.generationcp.middleware.pojos.test;
 
 import java.util.List;
 
-import org.generationcp.middleware.pojos.dms.CV;
-import org.generationcp.middleware.pojos.dms.CVTerm;
-import org.generationcp.middleware.pojos.dms.CVTermRelationship;
-import org.generationcp.middleware.pojos.dms.CVTermSynonym;
 import org.generationcp.middleware.pojos.CharacterData;
 import org.generationcp.middleware.pojos.Factor;
-import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.NumericData;
 import org.generationcp.middleware.pojos.Oindex;
 import org.generationcp.middleware.pojos.Representation;
 import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.pojos.StudyEffect;
 import org.generationcp.middleware.pojos.Variate;
+import org.generationcp.middleware.pojos.dms.CV;
+import org.generationcp.middleware.pojos.dms.CVTerm;
+import org.generationcp.middleware.pojos.dms.CVTermRelationship;
+import org.generationcp.middleware.pojos.dms.CVTermSynonym;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.util.HibernateUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -251,6 +253,34 @@ public class DMSPojosSimpleTest{
             CVTermSynonym holder = (CVTermSynonym) obj;
             System.out.println("  " + holder);
         }
+    }
+
+    @Test
+    public void testDmsProject() {
+    	Session session = hibernateUtil.getCurrentSession();
+    	Query query = session.createQuery("FROM DmsProject");
+    	query.setMaxResults(5);
+    	
+    	System.out.println("testDmsProject() RESULTS: ");
+    	for (Object obj : query.list()) {
+    		Assert.assertTrue(obj instanceof DmsProject);
+    		Assert.assertTrue(obj != null);
+    		System.out.println(" " + obj);
+    	}
+    }
+
+    @Test
+    public void testProjectProperty() {
+    	Session session = hibernateUtil.getCurrentSession();
+    	Query query = session.createQuery("FROM ProjectProperty");
+    	query.setMaxResults(5);
+    	
+    	System.out.println("testProjectProperty() RESULTS: ");
+    	for (Object obj : query.list()) {
+    		Assert.assertTrue(obj instanceof ProjectProperty);
+    		Assert.assertTrue(obj != null);
+    		System.out.println(" " + obj);
+    	}
     }
 
     @AfterClass

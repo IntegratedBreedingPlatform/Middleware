@@ -97,6 +97,8 @@
   <mapping class="org.generationcp.middleware.pojos.dms.CVTerm"/>
   <mapping class="org.generationcp.middleware.pojos.dms.CVTermRelationship"/>
   <mapping class="org.generationcp.middleware.pojos.dms.CVTermSynonym"/>
+  <mapping class="org.generationcp.middleware.pojos.dms.DmsProject"/>
+  <mapping class="org.generationcp.middleware.pojos.dms.ProjectProperty"/>
   
  </session-factory>
 </hibernate-configuration>
