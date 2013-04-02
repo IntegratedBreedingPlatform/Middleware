@@ -272,8 +272,11 @@ public class TestGermplasmListManagerImpl{
         List<GermplasmListData> germplasmListDatas = new ArrayList<GermplasmListData>();
 
         GermplasmList germList = manager.getGermplasmListByName("Test List #4", 0, 1, Operation.EQUAL, Database.LOCAL).get(0);
-        GermplasmListData germplasmListData = new GermplasmListData(null, germList, new Integer(2), 2, "EntryCode", "SeedSource",
+        GermplasmListData germplasmListData = new GermplasmListData(null, germList, new Integer(2), /*entryId=*/ 2, "EntryCode", "SeedSource",
                 "Germplasm Name 4", "GroupName", 0, 99993);
+        germplasmListDatas.add(germplasmListData);
+        germplasmListData = new GermplasmListData(null, germList, new Integer(2), /*entryId=*/ 1, "EntryCode", "SeedSource",
+                "Germplasm Name 6", "GroupName", 0, 99996);
         germplasmListDatas.add(germplasmListData);
 
         germList = manager.getGermplasmListByName("Test List #1", 0, 1, Operation.EQUAL, Database.LOCAL).get(0);
@@ -290,7 +293,18 @@ public class TestGermplasmListManagerImpl{
                 "Germplasm Name 5", "GroupName", 0, 99995);
         germplasmListDatas.add(germplasmListData);
 
-        System.out.println("testAddGermplasmListDatas() records added: " + manager.addGermplasmListData(germplasmListDatas));
+        germList = manager.getGermplasmListByName("Test List #3", 0, 1, Operation.EQUAL, Database.LOCAL).get(0);
+        germplasmListData = new GermplasmListData(null, germList, new Integer(4), 1, "EntryCode", "SeedSource",
+                "Germplasm Name 7", "GroupName", 0, 99997);
+        germplasmListDatas.add(germplasmListData);
+        germplasmListData = new GermplasmListData(null, germList, new Integer(4), 2, "EntryCode", "SeedSource",
+                "Germplasm Name 8", "GroupName", 0, 99998);
+        germplasmListDatas.add(germplasmListData);
+        germplasmListData = new GermplasmListData(null, germList, new Integer(4), 3, "EntryCode", "SeedSource",
+                "Germplasm Name 9", "GroupName", 0, 99999);
+        germplasmListDatas.add(germplasmListData);
+
+       System.out.println("testAddGermplasmListDatas() records added: " + manager.addGermplasmListData(germplasmListDatas));
         System.out.println("testAddGermplasmListDatas() RESULTS: ");
         for (GermplasmListData listData : germplasmListDatas) {
             if (listData.getId() != null) {
@@ -328,18 +342,32 @@ public class TestGermplasmListManagerImpl{
     }
 
     @Test
-    public void testDeleteGermplasmListData() throws Exception {        
+    public void testDeleteGermplasmListData() throws Exception {
         List<GermplasmListData> listData = new ArrayList<GermplasmListData>();
-        
-        // Get GermplasmList with name Test List #4
+
+        System.out.println("Test Case #1: test deleteGermplasmListDataByListId");
         GermplasmList germplasmList = manager.getGermplasmListByName("Test List #1", 0, 1, Operation.EQUAL, Database.LOCAL).get(0);
         listData.addAll(manager.getGermplasmListDataByListId(germplasmList.getId(), 0, 10));
         manager.deleteGermplasmListDataByListId(germplasmList.getId());
-        
-        // Get GermplasmList with name Test List #4
+
+        System.out.println("Test Case #2: test deleteGermplasmListDataByListIdEntryId");
         germplasmList = manager.getGermplasmListByName("Test List #4", 0, 1, Operation.EQUAL, Database.LOCAL).get(0);
-        listData.addAll(manager.getGermplasmListDataByListId(germplasmList.getId(), 0, 10));
-        manager.deleteGermplasmListDataByListId(germplasmList.getId());
+        listData.add(manager.getGermplasmListDataByListIdAndEntryId(germplasmList.getId(), /*entryId=*/ 2));
+        manager.deleteGermplasmListDataByListIdEntryId(germplasmList.getId(), 2);
+        
+        System.out.println("Test Case #3: test deleteGermplasmListData(data)");
+        germplasmList = manager.getGermplasmListByName("Test List #4", 0, 1, Operation.EQUAL, Database.LOCAL).get(0);
+        GermplasmListData data = manager.getGermplasmListDataByListIdAndEntryId(germplasmList.getId(), /*entryId=*/ 1);
+        listData.add(data);
+        manager.deleteGermplasmListData(data);
+       
+        System.out.println("Test Case #4: test deleteGermplasmListData(list of data)");
+        germplasmList = manager.getGermplasmListByName("Test List #3", 0, 1, Operation.EQUAL, Database.LOCAL).get(0);
+        List<GermplasmListData> toBeDeleted = new ArrayList<GermplasmListData>();
+        toBeDeleted.addAll(manager.getGermplasmListDataByListId(germplasmList.getId(), 0, 10));
+        listData.addAll(toBeDeleted);
+        manager.deleteGermplasmListData(toBeDeleted);
+        
         
         System.out.println("testDeleteGermplasmListData() records to delete: " + listData.size());        
         System.out.println("testDeleteGermplasmListData() deleted records: " + listData);
@@ -353,18 +381,32 @@ public class TestGermplasmListManagerImpl{
     @Test
     public void testDeleteGermplasmList() throws Exception {
         List<GermplasmList> germplasmLists = new ArrayList<GermplasmList>();
+        List<GermplasmListData> listDataList = new ArrayList<GermplasmListData>();
 
+        System.out.println("Test Case #1: test deleteGermplasmListByListId");
         GermplasmList germplasmList = manager.getGermplasmListByName("Test List #1", 0, 1, Operation.EQUAL, Database.LOCAL).get(0);
         germplasmLists.add(germplasmList);
+        listDataList.addAll(germplasmList.getListData());
+        System.out.println("\tremoved " + manager.deleteGermplasmListByListId(germplasmList.getId()) + " record(s)");
 
+        System.out.println("Test Case #2: test deleteGermplasmList(data)");
         germplasmList = manager.getGermplasmListByName("Test List #4", 0, 1, Operation.EQUAL, Database.LOCAL).get(0);
         germplasmLists.add(germplasmList);
+        listDataList.addAll(germplasmList.getListData());
+        System.out.println("\tremoved " + manager.deleteGermplasmList(germplasmList) + " record(s)");
 
+        System.out.println("Test Case #3: test deleteGermplasmList(list of data) - with cascade delete");
         germplasmList = manager.getGermplasmListByName("Test List #2", 0, 1, Operation.EQUAL, Database.LOCAL).get(0);
-        germplasmLists.add(germplasmList);
-        List<GermplasmListData> listDataList = manager.getGermplasmListDataByListId(germplasmList.getId(), 0, 10);
+        List<GermplasmList> toBeDeleted = new ArrayList<GermplasmList>();
+        toBeDeleted.add(germplasmList);
+        listDataList.addAll(germplasmList.getListData());
+        germplasmList = manager.getGermplasmListByName("Test List #3", 0, 1, Operation.EQUAL, Database.LOCAL).get(0);
+        toBeDeleted.add(germplasmList);
+        listDataList.addAll(germplasmList.getListData());
+        germplasmLists.addAll(toBeDeleted);
+        System.out.println("\tremoved " + manager.deleteGermplasmList(toBeDeleted));
 
-        System.out.println("testDeleteGermplasmList() records to delete: " + manager.deleteGermplasmList(germplasmLists));
+        System.out.println("testDeleteGermplasmList() records to delete: " + germplasmLists.size());
         System.out.println("testDeleteGermplasmList() deleted list records: ");
         for (GermplasmList listItem : germplasmLists) {
             System.out.println("  " + listItem);
