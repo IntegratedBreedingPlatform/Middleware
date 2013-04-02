@@ -12,11 +12,11 @@ import javax.persistence.UniqueConstraint;
 /**
  * http://gmod.org/wiki/Chado_Tables#Table:_cv
  * 
- * A term, class, universal or type within an ontology or controlled vocabulary. 
- * This table is also used for relations and properties. 
- * cvterms constitute nodes in the graph defined by the collection of cvterms and cvterm_relationships.
+ * A controlled vocabulary or ontology. A cv is composed of cvterms 
+ * (AKA terms, classes, types, universals - relations and properties 
+ * are also stored in cvterm) and the relationships between them.
  * 
- * @author Joyce Avestro
+ * @author Darla Ani
  *
  */
 @Entity
