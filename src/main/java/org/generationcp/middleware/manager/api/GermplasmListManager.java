@@ -19,6 +19,7 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.UserDefinedField;
 
 /**
  * This is the API for retrieving information about Germplasm Lists.
@@ -475,5 +476,16 @@ public interface GermplasmListManager{
      * @throws MiddlewareQueryException the MiddlewareQueryException
      */
     public long countGermplasmListByParentFolderId(Integer parentId) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Return a List of UserDefinedField POJOs representing records from 
+     * the udflds table of IBDB which are the types of germplasm lists.
+     * 
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    
+    public List<UserDefinedField> getGermplasmListTypes() throws MiddlewareQueryException;    
 
 }

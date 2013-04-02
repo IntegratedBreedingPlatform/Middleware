@@ -23,6 +23,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -522,4 +523,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     				new Object[] {parentId}, new Class[] {Integer.class});
     }
 
+    
+    public List<UserDefinedField> getGermplasmListTypes() throws MiddlewareQueryException {
+    	return germplasmListDao.getGermplasmListTypes();
+    }
 }

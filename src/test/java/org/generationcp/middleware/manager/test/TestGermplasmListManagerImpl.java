@@ -25,6 +25,7 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.junit.AfterClass;
@@ -458,6 +459,12 @@ public class TestGermplasmListManagerImpl{
         // Verify using:  select count(*) from listnms where liststatus <> 9 and lhierarchy = 56;
     }
 
+    @Test
+    public void testGetGermplasmListTypes() throws Exception {
+    	List<UserDefinedField> userDefinedFields = new ArrayList<UserDefinedField>();
+        System.out.println("testGetGermplasmListTypes() RESULTS:" + userDefinedFields);
+    }
+    
     @AfterClass
     public static void tearDown() throws Exception {
     	removeTestData();
