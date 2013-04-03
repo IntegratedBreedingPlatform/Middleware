@@ -14,21 +14,12 @@ package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-
-@Embeddable
 public class ScaleDiscretePK implements Serializable{
 
     private static final long serialVersionUID = 1L;
 
-    @Basic(optional = false)
-    @Column(name = "scaleid")
     private Integer scaleId;
 
-    @Basic(optional = false)
-    @Column(name = "value")
     private String value;
 
     public ScaleDiscretePK() {

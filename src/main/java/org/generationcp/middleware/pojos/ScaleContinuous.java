@@ -14,29 +14,14 @@ package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
-@Entity
-@Table(name = "scalecon")
 public class ScaleContinuous implements Serializable{
 
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @Basic(optional = false)
-    @Column(name = "scaleid")
     private Integer scaleId;
 
-    @Basic(optional = false)
-    @Column(name = "slevel")
     private Double start;
 
-    @Basic(optional = false)
-    @Column(name = "elevel")
     private Double end;
 
     public ScaleContinuous() {
