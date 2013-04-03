@@ -55,22 +55,6 @@ public class DMSPojosSimpleTest{
     }
 
     @Test
-    public void testVariate() {
-        Session session = hibernateUtil.getCurrentSession();
-        Query query = session.createQuery("FROM Variate");
-        query.setMaxResults(5);
-        List results = query.list();
-
-        System.out.println("testVariate() RESULTS: ");
-        for (Object obj : results) {
-            Assert.assertTrue(obj instanceof Variate);
-            Assert.assertTrue(obj != null);
-            Variate holder = (Variate) obj;
-            System.out.println("  " + holder);
-        }
-    }
-
-    @Test
     public void testFactor() {
         Session session = hibernateUtil.getCurrentSession();
         Query query = session.createQuery("FROM Factor");
@@ -82,22 +66,6 @@ public class DMSPojosSimpleTest{
             Assert.assertTrue(obj instanceof Factor);
             Assert.assertTrue(obj != null);
             Factor holder = (Factor) obj;
-            System.out.println("  " + holder);
-        }
-    }
-
-    @Test
-    public void testStudyEffect() {
-        Session session = hibernateUtil.getCurrentSession();
-        Query query = session.createQuery("FROM StudyEffect");
-        query.setMaxResults(5);
-        List results = query.list();
-
-        System.out.println("testStudyEffect() RESULTS: ");
-        for (Object obj : results) {
-            Assert.assertTrue(obj instanceof StudyEffect);
-            Assert.assertTrue(obj != null);
-            StudyEffect holder = (StudyEffect) obj;
             System.out.println("  " + holder);
         }
     }
