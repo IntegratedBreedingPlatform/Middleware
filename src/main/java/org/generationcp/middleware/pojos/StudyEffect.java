@@ -14,14 +14,6 @@ package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -37,8 +29,11 @@ public class StudyEffect implements Serializable{
  */
 
     private StudyEffectPK id;
+    
     private String name;
+    
     private Integer effectId;
+    
     private Integer studyId;
 
     public StudyEffect() {

@@ -14,17 +14,15 @@ package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class StudyEffectPK implements Serializable{
 
     private static final long serialVersionUID = -2102480538369140848L;
+    
     private Integer effectId;
+    
     private Integer studyId;
 
     public StudyEffectPK() {

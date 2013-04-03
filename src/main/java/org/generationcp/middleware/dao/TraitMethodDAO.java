@@ -25,7 +25,7 @@ public class TraitMethodDAO extends GenericDAO<TraitMethod, Integer>{
     @SuppressWarnings("unchecked")
     public List<TraitMethod> getByTraitId(Integer traitId) throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(TraitMethod.GET_BY_TRAIT_ID);
+            SQLQuery query = getSession().createSQLQuery(/*TraitMethod.GET_BY_TRAIT_ID*/"");
             query.addEntity("m", TraitMethod.class);
             query.setParameter("traitid", traitId);
             return query.list();
