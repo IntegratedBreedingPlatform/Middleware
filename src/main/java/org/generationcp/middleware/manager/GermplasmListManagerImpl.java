@@ -534,7 +534,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     				new Object[] {parentId}, new Class[] {Integer.class});
     }
 
-    
+    @Override
     public List<UserDefinedField> getGermplasmListTypes() throws MiddlewareQueryException {
     	List<UserDefinedField> toReturn = new ArrayList<UserDefinedField>();
     	
@@ -561,8 +561,11 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
                 toReturn.add(userDefinedField);
             }
         }
-    	return toReturn;    }
+    	return toReturn;
+    }
     
+    
+    @Override
     public List<UserDefinedField> getGermplasmNameTypes() throws MiddlewareQueryException {
     	List<UserDefinedField> toReturn = new ArrayList<UserDefinedField>();
     	
@@ -592,5 +595,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     	return toReturn;
     }
     
-
+ 
+    
 }

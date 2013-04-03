@@ -72,7 +72,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     private NameDAO nameDao;
     private ProgenitorDAO progenitorDao;
     private UserDefinedFieldDAO userDefinedFieldDao;
-
+	
+	
+    
     public GermplasmDataManagerImpl() {
     }
 
@@ -156,6 +158,14 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         return userDefinedFieldDao;
     }
 
+	private LocationDAO getLocationDAO() {
+		if (locationDao == null) {
+			locationDao = new LocationDAO();
+		}
+		locationDao.setSession(getActiveSession());
+		return locationDao;
+	}    
+    
     @Override
     public List<Location> getAllLocations(int start, int numOfRows) throws MiddlewareQueryException {
         return (List<Location>) getFromCentralAndLocal(getLocationDao(), start, numOfRows);
@@ -1681,4 +1691,22 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         return element;
     }
 
+    
+    @Override
+    public List<Location> getAllBreedingLocations() throws MiddlewareQueryException {
+    	Database centralInstance = Database.CENTRAL;
+    	Database localInstance = Database.LOCAL;
+    	
+    	List<Location> allLocations = getFromInstanceByMethod(getLocationDAO(), centralInstance, "getAllBreedingLocations", new Object[] {}, new Class[] {});
+    	allLocations.addAll(getFromInstanceByMethod(getLocationDAO(), localInstance, "getAllBreedingLocations", new Object[] {}, new Class[] {}));
+    	
+    	return allLocations;
+    }
+    
+    
+    @Override
+    public Long countAllBreedingLocations() throws MiddlewareQueryException {
+    	return countAllFromCentralAndLocalByMethod(getLocationDAO(), "countAllBreedingLocations", new Object[] {}, new Class[] {});
+    }       
+    
 }

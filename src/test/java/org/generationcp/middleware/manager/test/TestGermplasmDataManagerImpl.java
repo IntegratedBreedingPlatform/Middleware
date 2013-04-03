@@ -929,6 +929,18 @@ public class TestGermplasmDataManagerImpl{
     	MockDataUtil.cleanupMockMaintenanceTestData(manager);
     }
     
+    @Test
+    public void testGetAllBreedingLocations() throws MiddlewareQueryException {
+        List<Location> locations = manager.getAllBreedingLocations();
+        System.out.println("getAllBreedingLocations()  " + locations);
+    }    
+    
+    @Test
+    public void testCountAllBreedingLocations() throws MiddlewareQueryException {
+        Long locationCount = (Long) manager.countAllBreedingLocations();
+        System.out.println("countAllBreedingLocations() - Total Count = " + locationCount);
+    }        
+    
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();

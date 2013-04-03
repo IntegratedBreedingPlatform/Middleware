@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.dao;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +21,10 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
 import org.hibernate.Criteria;
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
+import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -189,5 +193,49 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
                     + ") query from Location: " + e.getMessage(), e);
         }
         return 0;
+    }
+    
+    public List<Location> getAllBreedingLocations() throws MiddlewareQueryException {
+    	List<Location> locationList = new ArrayList<Location>();
+        try {
+        	Session session = getSession();
+        	SQLQuery query = session.createSQLQuery(Location.GET_ALL_BREEDING_LOCATIONS);
+        	List results = query.list();
+        	
+            for (Object o : results) {
+                Object[] result = (Object[]) o;
+                if (result != null) {
+            		Integer locid = (Integer) result[0];
+            		Integer ltype = (Integer) result[1];
+            		Integer nllp = (Integer) result[2];
+            		String lname =  (String) result[3];
+            		String labbr = (String) result[4];
+            		Integer snl3id = (Integer) result[5];
+            		Integer snl2id = (Integer) result[6];
+                    Integer snl1id = (Integer) result[7];
+                    Integer cntryid = (Integer) result[8];
+                    Integer lrplce = (Integer) result[9];
+                    
+                    Location location = new Location(locid, ltype, nllp, lname, labbr, snl3id, snl2id, snl1id, cntryid, lrplce);
+                    locationList.add(location);
+                }
+            }
+            return locationList;
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getAllBreedingLocations() query from GermplasmDataManager: " + e.getMessage(), e);
+            return null;
+        }
+    }
+    
+    public Long countAllBreedingLocations() throws MiddlewareQueryException, HibernateException {
+        try {
+        	Session session = getSession();
+        	SQLQuery query = session.createSQLQuery(Location.COUNT_ALL_BREEDING_LOCATIONS);
+        	Long total = (Long) query.addScalar("count",Hibernate.LONG).uniqueResult();
+        	return total;
+        } catch (HibernateException e) {
+            logAndThrowException("Error with countAllBredingLocations() query from Location: "+ e.getMessage(), e);
+        }
+        return Long.valueOf(0);
     }
 }

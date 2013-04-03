@@ -1249,4 +1249,24 @@ public interface GermplasmDataManager {
      */
     public String getCrossExpansion(Integer gid, int level) throws MiddlewareQueryException;
     
+    /**
+     * Get all breeding locations
+     * 
+     * Return a List of Locations which represent the breeding locations stored in the location table of IBDB. 
+     * 
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    public List<Location> getAllBreedingLocations() throws MiddlewareQueryException;
+    
+    /**
+     * Count all breeding locations
+     * 
+     * Return the total count of Locations which represent the breeding locations stored in the location table of IBDB. 
+     * 
+     * @return
+     * @throws MiddlewareQueryException
+     */    
+    public Long countAllBreedingLocations() throws MiddlewareQueryException;
+
 }

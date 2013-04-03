@@ -95,6 +95,9 @@ public class Location implements Serializable, Comparable<Location>{
     @Column(name = "lrplce")
     private Integer lrplce;
 
+    public static String GET_ALL_BREEDING_LOCATIONS = "SELECT locid, ltype, nllp, lname, labbr, snl3id, snl2id, snl1id, cntryid, lrplce, nnpid FROM location WHERE ltype IN (409, 410, 411, 412) ORDER BY lname";
+    public static String COUNT_ALL_BREEDING_LOCATIONS = "SELECT count(*) AS count FROM location WHERE ltype IN (409, 410, 411, 412)";
+    
 /*    @OneToMany(mappedBy = "location")
     private Set<Locdes> descriptions = new HashSet<Locdes>();*/
 
