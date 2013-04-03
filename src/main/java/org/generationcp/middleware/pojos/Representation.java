@@ -18,8 +18,6 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.NamedNativeQueries;
-import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -29,9 +27,9 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @NamedQueries({
         // SELECT * FROM represtn WHERE effectid = 1176
-        @NamedQuery(name = "getRepresentationByEffectId", query = "SELECT r FROM Representation r WHERE r.effectId = :effectId"),
+        @NamedQuery(name = "getRepresentationByEffectId", query = "SELECT r FROM Representation r WHERE r.effectId = :effectId")/*,
         @NamedQuery(name = "getRepresentationByStudyId",
-                query = "SELECT r FROM Representation r, StudyEffect se WHERE r.effectId = se.effectId AND se.studyId = :studyId") })
+                query = "SELECT r FROM Representation r, StudyEffect se WHERE r.effectId = se.effectId AND se.studyId = :studyId")*/ })
 
 /*@NamedNativeQueries({
     @NamedNativeQuery(name = "hasValuesByNumericVariateandDataset",
