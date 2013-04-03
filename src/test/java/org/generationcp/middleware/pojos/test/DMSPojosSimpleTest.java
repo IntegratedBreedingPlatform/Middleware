@@ -87,22 +87,6 @@ public class DMSPojosSimpleTest{
     }
 
     @Test
-    public void testOindex() {
-        Session session = hibernateUtil.getCurrentSession();
-        Query query = session.createQuery("FROM Oindex");
-        query.setMaxResults(5);
-        List results = query.list();
-
-        System.out.println("testOindex() RESULTS: ");
-        for (Object obj : results) {
-            Assert.assertTrue(obj instanceof Oindex);
-            Assert.assertTrue(obj != null);
-            Oindex holder = (Oindex) obj;
-            System.out.println("  " + holder);
-        }
-    }
-
-    @Test
     public void testStudyEffect() {
         Session session = hibernateUtil.getCurrentSession();
         Query query = session.createQuery("FROM StudyEffect");
@@ -118,21 +102,6 @@ public class DMSPojosSimpleTest{
         }
     }
 
-    @Test
-    public void testStudy() {
-        Session session = hibernateUtil.getCurrentSession();
-        Query query = session.createQuery("FROM Study");
-        query.setMaxResults(5);
-        List results = query.list();
-
-        System.out.println("testStudy() RESULTS: ");
-        for (Object obj : results) {
-            Assert.assertTrue(obj instanceof Study);
-            Assert.assertTrue(obj != null);
-            Study holder = (Study) obj;
-            System.out.println("  " + holder);
-        }
-    }
 
     @Test
     public void testRepresentation() {

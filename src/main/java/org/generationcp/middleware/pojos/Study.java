@@ -14,17 +14,9 @@ package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-
+/*
 @NamedQueries({ 
         @NamedQuery(name = "getStudyByNameUsingEqual", query = "SELECT s FROM Study s WHERE s.name = :name"),
         @NamedQuery(name = "getStudyBySDateUsingEqual", query = "SELECT s FROM Study s WHERE s.startDate = :startDate"),
@@ -34,13 +26,11 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
         @NamedQuery(name = "countStudyBySDateUsingEqual", query = "SELECT COUNT(s) FROM Study s WHERE s.startDate = :startDate"),
         @NamedQuery(name = "countStudyByEDateUsingEqual", query = "SELECT COUNT(s) FROM Study s WHERE s.endDate = :endDate"),
         @NamedQuery(name = "countStudyByNameUsingLike", query = "SELECT COUNT(s) FROM Study s WHERE s.name LIKE :name")
-})
-@Entity
-@Table(name = "study")
+})*/
 public class Study implements Serializable{
 
     private static final long serialVersionUID = -8809692556025457504L;
-
+    /*
     public static final String GET_BY_NAME_USING_EQUAL = "getStudyByNameUsingEqual";
     public static final String GET_BY_SDATE_USING_EQUAL = "getStudyBySDateUsingEqual";
     public static final String GET_BY_EDATE_USING_EQUAL = "getStudyByEDateUsingEqual";
@@ -92,52 +82,31 @@ public class Study implements Serializable{
 
     public static final String WET_SEASON_CONDITION =    
             " WHERE scd.valdesc = 'Wet' OR scd.valdesc = 'Wet' OR ln.lvalue = 1";
-    
-    @Id
-    @Basic(optional = false)
-    @Column(name = "studyid")
+    */
     private Integer id;
 
-    @Basic(optional = false)
-    @Column(name = "sname")
     private String name;
 
-    @Basic(optional = false)
-    @Column(name = "pmkey")
     private Integer projectKey;
 
-    @Basic(optional = false)
-    @Column(name = "title")
     private String title;
 
-    @Column(name = "objectiv")
     private String objective;
 
-    @Basic(optional = false)
-    @Column(name = "investid")
     private Integer primaryInvestigator;
 
-    @Column(name = "stype")
     private String type;
 
-    @Column(name = "sdate")
     private Integer startDate;
 
-    @Column(name = "edate")
     private Integer endDate;
 
-    @Column(name = "userid")
     private Integer user;
 
-    @Basic(optional = false)
-    @Column(name = "sstatus")
     private Integer status;
 
-    @Basic(optional = false)
-    @Column(name = "shierarchy")
     private Integer hierarchy;
 
-    @Column(name = "studydate")
     private Integer creationDate;
 
     public Study() {
