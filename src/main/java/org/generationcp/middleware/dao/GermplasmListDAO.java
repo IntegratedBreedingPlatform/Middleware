@@ -19,10 +19,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.User;
-import org.generationcp.middleware.pojos.UserDefinedField;
 import org.hibernate.Criteria;
-import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -263,7 +260,8 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
      */
     
     
-    public List getGermplasmListTypes() throws MiddlewareQueryException {
+    @SuppressWarnings("rawtypes")
+	public List getGermplasmListTypes() throws MiddlewareQueryException {
         try {
         	Session session = getSession();
         	SQLQuery query = session.createSQLQuery(GermplasmList.GET_GERMPLASM_LIST_TYPES); 
@@ -286,7 +284,8 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
      * @throws MiddlewareQueryException
      */
     
-    public List getGermplasmNameTypes() throws MiddlewareQueryException {
+    @SuppressWarnings("rawtypes")
+	public List getGermplasmNameTypes() throws MiddlewareQueryException {
         try {
         	Session session = getSession();
         	SQLQuery query = session.createSQLQuery(GermplasmList.GET_GERMPLASM_NAME_TYPES); 
