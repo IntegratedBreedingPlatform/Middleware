@@ -25,21 +25,19 @@ import javax.persistence.Table;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-@NamedQueries({ @NamedQuery(name = "getStudyEffectsByStudyID", query = "FROM StudyEffect se WHERE se.studyId = :studyId") })
-@Entity
-@Table(name = "steffect")
+/*
+ * @NamedQueries({ @NamedQuery(name = "getStudyEffectsByStudyID", query = "FROM StudyEffect se WHERE se.studyId = :studyId") })
+ */
+
 public class StudyEffect implements Serializable{
 
     private static final long serialVersionUID = 1L;
-    public static final String GET_STUDY_EFFECTS_BY_STUDYID = "getStudyEffectsByStudyID";
+/*
+ *     public static final String GET_STUDY_EFFECTS_BY_STUDYID = "getStudyEffectsByStudyID";
+ */
 
-    @EmbeddedId
     private StudyEffectPK id;
-
-    @Basic(optional = false)
-    @Column(name = "effectname")
     private String name;
-
     private Integer effectId;
     private Integer studyId;
 

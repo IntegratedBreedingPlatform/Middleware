@@ -21,17 +21,10 @@ import javax.persistence.Embeddable;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-@Embeddable
 public class StudyEffectPK implements Serializable{
 
     private static final long serialVersionUID = -2102480538369140848L;
-
-    @Basic(optional = false)
-    @Column(name = "effectid")
     private Integer effectId;
-
-    @Basic(optional = false)
-    @Column(name = "studyid")
     private Integer studyId;
 
     public StudyEffectPK() {
