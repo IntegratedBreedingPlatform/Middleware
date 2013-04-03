@@ -14,32 +14,23 @@ package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
 
-@Entity
-@Table(name = "tmsscales")
 public class Scale implements Serializable{
 
     private static final long serialVersionUID = 1L;
     
+    
     public static final String GET_BY_TRAIT_ID = "SELECT DISTINCT {s.*} FROM tmsscales s JOIN tmsmeasuredin mi "
-        + "ON s.scaleid = mi.scaleid WHERE mi.traitid = :traitid";
+    + "ON s.scaleid = mi.scaleid WHERE mi.traitid = :traitid";
+    
 
-    @Id
-    @Basic(optional = false)
-    @Column(name = "scaleid")
+
     private Integer id;
 
-    @Basic(optional = false)
-    @Column(name = "scname")
+
     private String name;
 
-    @Basic(optional = false)
-    @Column(name = "sctype")
+
     private String type;
 
     public Scale() {
