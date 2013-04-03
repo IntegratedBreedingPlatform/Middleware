@@ -40,9 +40,7 @@
   <mapping class="org.generationcp.middleware.pojos.GermplasmList"/>
   <mapping class="org.generationcp.middleware.pojos.GermplasmListData"/>
   <mapping class="org.generationcp.middleware.pojos.Scale"/>
-  <mapping class="org.generationcp.middleware.pojos.ScaleContinuous"/>
   <mapping class="org.generationcp.middleware.pojos.ScaleDiscrete"/>
-  <mapping class="org.generationcp.middleware.pojos.ScaleDiscretePK"/>
   <mapping class="org.generationcp.middleware.pojos.TraitMethod"/>
   <mapping class="org.generationcp.middleware.pojos.Trait"/>
   <mapping class="org.generationcp.middleware.pojos.Variate"/>
