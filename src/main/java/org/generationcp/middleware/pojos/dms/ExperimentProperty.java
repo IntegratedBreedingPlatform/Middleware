@@ -10,6 +10,9 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 /**
+ * http://gmod.org/wiki/Chado_Natural_Diversity_Module#Table:_nd_experimentprop
+ * 
+ * Tag-value properties - follows standard chado model.
  * 
  * @author Aldrin Batac
  *
@@ -89,32 +92,32 @@ public class ExperimentProperty implements Serializable {
 	}
 
 
-	public Integer getNd_experimentprop_id() {
+	public Integer getNdExperimentpropId() {
 		return ndExperimentpropId;
 	}
 
 
-	public void setNd_experimentprop_id(Integer nd_experimentprop_id) {
+	public void setNdExperimentpropId(Integer nd_experimentprop_id) {
 		this.ndExperimentpropId = nd_experimentprop_id;
 	}
 
 
-	public Integer getNd_experiment_id() {
+	public Integer getNdExperimentId() {
 		return ndExperimentId;
 	}
 
 
-	public void setNd_experiment_id(Integer nd_experiment_id) {
+	public void setNdExperimentId(Integer nd_experiment_id) {
 		this.ndExperimentId = nd_experiment_id;
 	}
 
 
-	public Integer getType_id() {
+	public Integer getTypeId() {
 		return typeId;
 	}
 
 
-	public void setType_id(Integer type_id) {
+	public void setTypeId(Integer type_id) {
 		this.typeId = type_id;
 	}
 
