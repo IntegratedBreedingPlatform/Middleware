@@ -26,7 +26,7 @@ public class RepresentationDAO extends GenericDAO<Representation, Integer>{
     @SuppressWarnings("unchecked")
     public List<Representation> getRepresentationByEffectID(Integer effectId) throws MiddlewareQueryException {
         try {
-            Query query = getSession().getNamedQuery(Representation.GET_REPRESENTATION_BY_EFFECT_ID);
+            Query query = getSession().getNamedQuery(/*Representation.GET_REPRESENTATION_BY_EFFECT_ID*/"");
             query.setParameter("effectId", effectId);
 
             return (List<Representation>) query.list();
@@ -40,7 +40,7 @@ public class RepresentationDAO extends GenericDAO<Representation, Integer>{
     @SuppressWarnings("unchecked")
     public List<Representation> getRepresentationByStudyID(Integer studyId) throws MiddlewareQueryException {
         try {
-            Query query = getSession().getNamedQuery(Representation.GET_REPRESENTATION_BY_STUDY_ID);
+            Query query = getSession().getNamedQuery(/*Representation.GET_REPRESENTATION_BY_STUDY_ID*/"");
             query.setParameter("studyId", studyId);
 
             return (List<Representation>) query.list();
@@ -53,7 +53,7 @@ public class RepresentationDAO extends GenericDAO<Representation, Integer>{
 
     public boolean hasValuesByNumVariateAndDataset(int variateId, int datasetId) throws MiddlewareQueryException {
         try {
-            Query query = getSession().createSQLQuery(Representation.HAS_VALUES_BY_NUM_VARIATE_ID_AND_DATASET_ID);
+            Query query = getSession().createSQLQuery(/*Representation.HAS_VALUES_BY_NUM_VARIATE_ID_AND_DATASET_ID*/"");
             query.setParameter("variatid", variateId);
             query.setParameter("represno", datasetId);
             BigInteger count = (BigInteger) query.uniqueResult();
@@ -69,7 +69,7 @@ public class RepresentationDAO extends GenericDAO<Representation, Integer>{
 
     public boolean hasValuesByCharVariateAndDataset(int variateId, int datasetId) throws MiddlewareQueryException {
         try {
-            Query query = getSession().createSQLQuery(Representation.HAS_VALUES_BY_CHAR_VARIATE_ID_AND_DATASET_ID);
+            Query query = getSession().createSQLQuery(/*Representation.HAS_VALUES_BY_CHAR_VARIATE_ID_AND_DATASET_ID*/"");
             query.setParameter("variatid", variateId);
             query.setParameter("represno", datasetId);
             BigInteger count = (BigInteger) query.uniqueResult();
@@ -87,7 +87,7 @@ public class RepresentationDAO extends GenericDAO<Representation, Integer>{
             throws MiddlewareQueryException {
         try {
             Query query = getSession().createSQLQuery(
-                    Representation.HAS_VALUES_BY_NUM_LABEL_ID_AND_LABEL_VALUE_AND_NUM_VARIATE_ID_AND_DATASET_ID);
+                    /*Representation.HAS_VALUES_BY_NUM_LABEL_ID_AND_LABEL_VALUE_AND_NUM_VARIATE_ID_AND_DATASET_ID*/"");
             query.setParameter("labelid", labelId);
             query.setParameter("value", value);
             query.setParameter("variatid", variateId);
@@ -107,7 +107,7 @@ public class RepresentationDAO extends GenericDAO<Representation, Integer>{
             throws MiddlewareQueryException {
         try {
             Query query = getSession().createSQLQuery(
-                    Representation.HAS_VALUES_BY_CHAR_LABEL_ID_AND_LABEL_VALUE_AND_NUM_VARIATE_ID_AND_DATASET_ID);
+                    /*Representation.HAS_VALUES_BY_CHAR_LABEL_ID_AND_LABEL_VALUE_AND_NUM_VARIATE_ID_AND_DATASET_ID*/"");
             query.setParameter("labelid", labelId);
             query.setParameter("value", value);
             query.setParameter("variatid", variateId);
@@ -127,7 +127,7 @@ public class RepresentationDAO extends GenericDAO<Representation, Integer>{
             throws MiddlewareQueryException {
         try {
             Query query = getSession().createSQLQuery(
-                    Representation.HAS_VALUES_BY_NUM_LABEL_ID_AND_LABEL_VALUE_AND_CHAR_VARIATE_ID_AND_DATASET_ID);
+                    /*Representation.HAS_VALUES_BY_NUM_LABEL_ID_AND_LABEL_VALUE_AND_CHAR_VARIATE_ID_AND_DATASET_ID*/"");
             query.setParameter("labelid", labelId);
             query.setParameter("value", value);
             query.setParameter("variatid", variateId);
@@ -147,7 +147,7 @@ public class RepresentationDAO extends GenericDAO<Representation, Integer>{
             throws MiddlewareQueryException {
         try {
             Query query = getSession().createSQLQuery(
-                    Representation.HAS_VALUES_BY_CHAR_LABEL_ID_AND_LABEL_VALUE_AND_CHAR_VARIATE_ID_AND_DATASET_ID);
+                    /*Representation.HAS_VALUES_BY_CHAR_LABEL_ID_AND_LABEL_VALUE_AND_CHAR_VARIATE_ID_AND_DATASET_ID*/"");
             query.setParameter("labelid", labelId);
             query.setParameter("value", value);
             query.setParameter("variatid", variateId);

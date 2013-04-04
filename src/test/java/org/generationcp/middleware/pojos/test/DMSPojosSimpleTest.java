@@ -14,12 +14,6 @@ package org.generationcp.middleware.pojos.test;
 
 import java.util.List;
 
-import org.generationcp.middleware.pojos.Factor;
-import org.generationcp.middleware.pojos.Oindex;
-import org.generationcp.middleware.pojos.Representation;
-import org.generationcp.middleware.pojos.Study;
-import org.generationcp.middleware.pojos.StudyEffect;
-import org.generationcp.middleware.pojos.Variate;
 import org.generationcp.middleware.pojos.dms.CV;
 import org.generationcp.middleware.pojos.dms.CVTerm;
 import org.generationcp.middleware.pojos.dms.CVTermRelationship;
@@ -52,39 +46,6 @@ public class DMSPojosSimpleTest{
     @BeforeClass
     public static void setUp() throws Exception {
         hibernateUtil = new HibernateUtil(CONFIG);
-    }
-
-    @Test
-    public void testFactor() {
-        Session session = hibernateUtil.getCurrentSession();
-        Query query = session.createQuery("FROM Factor");
-        query.setMaxResults(5);
-        List results = query.list();
-
-        System.out.println("testFactor() RESULTS: ");
-        for (Object obj : results) {
-            Assert.assertTrue(obj instanceof Factor);
-            Assert.assertTrue(obj != null);
-            Factor holder = (Factor) obj;
-            System.out.println("  " + holder);
-        }
-    }
-
-
-    @Test
-    public void testRepresentation() {
-        Session session = hibernateUtil.getCurrentSession();
-        Query query = session.createQuery("FROM Representation");
-        query.setMaxResults(5);
-        List results = query.list();
-
-        System.out.println("testRepresentation() RESULTS: ");
-        for (Object obj : results) {
-            Assert.assertTrue(obj instanceof Representation);
-            Assert.assertTrue(obj != null);
-            Representation holder = (Representation) obj;
-            System.out.println("  " + holder);
-        }
     }
     
     @Test

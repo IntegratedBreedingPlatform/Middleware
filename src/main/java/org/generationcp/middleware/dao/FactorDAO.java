@@ -34,7 +34,7 @@ public class FactorDAO extends GenericDAO<Factor, Integer>{
     public Set<Integer> getGIDSByObservationUnitIds(Set<Integer> ounitIds, int start, int numOfRows) throws MiddlewareQueryException {
         Set<Integer> results = new HashSet<Integer>();
         try {
-            SQLQuery levelNQuery = getSession().createSQLQuery(Factor.GET_GID_FROM_NUMERIC_LEVELS_GIVEN_OBSERVATION_UNIT_IDS);
+            SQLQuery levelNQuery = getSession().createSQLQuery(/*Factor.GET_GID_FROM_NUMERIC_LEVELS_GIVEN_OBSERVATION_UNIT_IDS*/"");
             levelNQuery.setParameterList("ounitids", ounitIds);
             levelNQuery.setFirstResult(start);
             levelNQuery.setMaxResults(numOfRows);
@@ -44,7 +44,7 @@ public class FactorDAO extends GenericDAO<Factor, Integer>{
                 results.add(gid.intValue());
             }
 
-            SQLQuery levelCQuery = getSession().createSQLQuery(Factor.GET_GID_FROM_CHARACTER_LEVELS_GIVEN_OBSERVATION_UNIT_IDS);
+            SQLQuery levelCQuery = getSession().createSQLQuery(/*Factor.GET_GID_FROM_CHARACTER_LEVELS_GIVEN_OBSERVATION_UNIT_IDS*/"");
             levelCQuery.setParameterList("ounitids", ounitIds);
             levelCQuery.setFirstResult(start);
             levelCQuery.setMaxResults(numOfRows);
@@ -64,7 +64,7 @@ public class FactorDAO extends GenericDAO<Factor, Integer>{
     @SuppressWarnings("unchecked")
     public List<Factor> getByStudyID(Integer studyId) throws MiddlewareQueryException {
         try {
-            Query query = getSession().getNamedQuery(Factor.GET_FACTORS_BY_STUDYID);
+            Query query = getSession().getNamedQuery(/*Factor.GET_FACTORS_BY_STUDYID*/"");
             query.setParameter("studyId", studyId);
 
             List<Factor> results = query.list();
@@ -79,7 +79,7 @@ public class FactorDAO extends GenericDAO<Factor, Integer>{
     @SuppressWarnings("unchecked")
     public List<Factor> getByRepresentationID(Integer representationId) throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(Factor.GET_BY_REPRESENTATION_ID);
+            SQLQuery query = getSession().createSQLQuery(/*Factor.GET_BY_REPRESENTATION_ID*/"");
             query.setParameter("representationId", representationId);
             query.addEntity("f", Factor.class);
 
@@ -114,7 +114,7 @@ public class FactorDAO extends GenericDAO<Factor, Integer>{
     @SuppressWarnings("unchecked")
     public Factor getFactorOfDatasetGivenTraitid(Integer representationId, Integer traitid) throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(Factor.GET_FACTOR_OF_DATASET_GIVEN_TRAITID);
+            SQLQuery query = getSession().createSQLQuery(/*Factor.GET_FACTOR_OF_DATASET_GIVEN_TRAITID*/"");
             query.setParameter("representationId", representationId);
             query.setParameter("traitid", traitid);
             query.addEntity("f", Factor.class);
@@ -133,7 +133,7 @@ public class FactorDAO extends GenericDAO<Factor, Integer>{
     
     public boolean isLabelNumeric(int labelId) throws MiddlewareQueryException {
         try {
-            Query query = getSession().createSQLQuery(Factor.GET_LABEL_ID_DATATYPE);
+            Query query = getSession().createSQLQuery(/*Factor.GET_LABEL_ID_DATATYPE*/"");
             query.setParameter("labelid", labelId);
             
             String result = "";

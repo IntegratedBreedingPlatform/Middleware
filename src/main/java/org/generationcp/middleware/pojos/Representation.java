@@ -14,43 +14,13 @@ package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-@NamedQueries({
-        // SELECT * FROM represtn WHERE effectid = 1176
-        @NamedQuery(name = "getRepresentationByEffectId", query = "SELECT r FROM Representation r WHERE r.effectId = :effectId")/*,
-        @NamedQuery(name = "getRepresentationByStudyId",
-                query = "SELECT r FROM Representation r, StudyEffect se WHERE r.effectId = se.effectId AND se.studyId = :studyId")*/ })
-
-/*@NamedNativeQueries({
-    @NamedNativeQuery(name = "hasValuesByNumericVariateandDataset",
-            query = "SELECT count(distinct dn.ounitid) " +
-            		"FROM oindex ou " +
-            		"INNER JOIN data_n dn on dn.ounitid = ou.ounitid " +
-            		"WHERE dn.variatid = :variatid and ou.represno = :represno", resultClass = Integer.class),
-    @NamedNativeQuery(name = "hasValuesByCharacterVariateandDataset", 
-            query = "SELECT count(distinct dc.ounitid) " +
-            		"FROM oindex ou " +
-            		"INNER JOIN data_c dc on dc.ounitid = ou.ounitid " +
-            		"WHERE dc.variatid = :variatid and ou.represno = :represno", resultClass = Integer.class)
-
-})*/
-
-@Entity
-@Table(name = "represtn")
 public class Representation implements Serializable{
 
     private static final long serialVersionUID = 3521757463492775303L;
-
+/*
     public static final String GET_REPRESENTATION_BY_EFFECT_ID = "getRepresentationByEffectId";
     public static final String GET_REPRESENTATION_BY_STUDY_ID = "getRepresentationByStudyId";
     public static final String HAS_VALUES_BY_NUM_VARIATE_ID_AND_DATASET_ID = "SELECT count(distinct dn.ounitid) " +
@@ -98,18 +68,11 @@ public class Representation implements Serializable{
             "WHERE lc.labelid = :labelid and lc.lvalue = :value and ou.represno = :represno) as x " +
         "INNER JOIN data_c dc on dc.ounitid = x.ounitid " +
         "WHERE dc.variatid = :variatid and x.represno = :represno";
-
-    @Id
-    @Basic(optional = false)
-    @Column(name = "represno")
+*/
     private Integer id;
 
-    @Basic(optional = false)
-    @Column(name = "effectid")
     private Integer effectId;
 
-    @Basic(optional = false)
-    @Column(name = "represname")
     private String name;
 
     public Representation() {

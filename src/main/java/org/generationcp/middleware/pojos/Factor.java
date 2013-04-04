@@ -14,21 +14,11 @@ package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
-
-@NamedQueries({ @NamedQuery(name = "getFactorsByStudyID", query = "FROM Factor f WHERE f.studyId = :studyId") })
-@Entity
-@Table(name = "factor")
+//@NamedQueries({ @NamedQuery(name = "getFactorsByStudyID", query = "FROM Factor f WHERE f.studyId = :studyId") })
 public class Factor implements Serializable{
 
     private static final long serialVersionUID = 1L;
-
+/*
     // string contants for name of queries
     public static final String GET_FACTORS_BY_STUDYID = "getFactorsByStudyID";
 
@@ -63,42 +53,23 @@ public class Factor implements Serializable{
     public static final String GET_LABEL_ID_DATATYPE = "SELECT ltype " +
         "FROM factor " + 
         "WHERE labelid = :labelid";
-    
-    @Id
-    @Basic(optional = false)
-    @Column(name = "labelid")
+  */  
     private Integer id;
 
-    @Basic(optional = false)
-    @Column(name = "factorid")
     private Integer factorId;
 
-    @Basic(optional = false)
-    @Column(name = "studyid")
     private Integer studyId;
 
-    @Basic(optional = false)
-    @Column(name = "fname")
     private String name;
 
-    @Basic(optional = false)
-    @Column(name = "traitid")
     private Integer traitId;
 
-    @Basic(optional = false)
-    @Column(name = "scaleid")
     private Integer scaleId;
 
-    @Basic(optional = false)
-    @Column(name = "tmethid")
     private Integer methodId;
 
-    @Basic(optional = false)
-    @Column(name = "ltype")
     private String dataType;
 
-    @Basic(optional = false)
-    @Column(name = "tid")
     private Integer tid;
 
     public Factor() {
