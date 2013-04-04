@@ -931,6 +931,7 @@ public interface GermplasmDataManager {
      */
     public long countDescendants(Integer gid) throws MiddlewareQueryException;
 
+    
     /**
      * Creates a pedigree tree for the Germplasm identified by the given gid.
      * The tree contains all generative progenitors down to the specified level.
@@ -963,7 +964,43 @@ public interface GermplasmDataManager {
      * @throws MiddlewareQueryException
      */
     public GermplasmPedigreeTree generatePedigreeTree(Integer gid, int level) throws MiddlewareQueryException;
+    
+    /**
+     * Creates a pedigree tree for the Germplasm identified by the given gid.
+     * The tree contains all generative progenitors down to the specified level.
+     * The Germplasm POJOs included in the tree have their preferred names
+     * pre-loaded. The root of the tree is the Germplasm identified by the given
+     * gid parameter. The nodes down the tree are the ancestors of the nodes
+     * above them.
+     * 
+     * Example tree:
+     * 
+     * Result of calling: generatePedigreeTree(new Integer(306436), 4, true);
+     * 
+     * 306436 : TOX 494 (root node) 33208 : 63-83 (child node of root,
+     * representing parent of Germplasm 306436) 2269311 : 63-83 310357 : IRAT 2
+     * 96783 : IGUAPE CATETO (child node of root, representing parent of
+     * Germplasm 306436) 312744 : RPCB-2B-849 (child node of root, representing
+     * parent of Germplasm 306436) 2268822 : RPCB-2B-849 3160 : IR 1416-131
+     * (child node of root, representing parent of Germplasm 306436) 2231 : IR
+     * 1416 1163 : IR 400-28-4-5 (child node containing Germplasm 2231,
+     * representing parent of Germplasm 2231) 2229 : TE TEP (child node
+     * containing Germplasm 2231, representing parent of Germplasm 2231) 312646
+     * : LITA 506 (child node of root, representing parent of Germplasm 306436)
+     * 
+     * 
+     * @param gid
+     *            - GID of a Germplasm
+     * @param level
+     *            - level of the tree to be created
+     * @param includeDerivativeLines
+     * 			  - option to include derivative lines on result
+     * @return GermplasmPedigreeTree representing the pedigree tree
+     * @throws MiddlewareQueryException
+     */
+    public GermplasmPedigreeTree generatePedigreeTree(Integer gid, int level, Boolean includeDerivativeLines) throws MiddlewareQueryException;
 
+    
     /**
      * Returns the Germplasm which are management group neighbors of the
      * Germplasm identified by the given GID. The given Germplasm is assumed to

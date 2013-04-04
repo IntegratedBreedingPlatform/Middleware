@@ -902,6 +902,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public GermplasmPedigreeTree generatePedigreeTree(Integer gid, int level) throws MiddlewareQueryException {
+        return generatePedigreeTree(gid, level, true);
+    }
+    
+    @Override
+    public GermplasmPedigreeTree generatePedigreeTree(Integer gid, int level, Boolean includeDerivativeLines) throws MiddlewareQueryException {
         GermplasmPedigreeTree tree = new GermplasmPedigreeTree();
         // set root node
         Germplasm root = getGermplasmWithPrefName(gid);
@@ -910,14 +915,18 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             GermplasmPedigreeTreeNode rootNode = new GermplasmPedigreeTreeNode();
             rootNode.setGermplasm(root);
             if (level > 1) {
-                rootNode = addParents(rootNode, level);
+            	if(includeDerivativeLines == true)
+                    rootNode = addParents(rootNode, level);
+            	else
+            		rootNode = addParentsExcludeDerivativeLines(rootNode, level);
             }
             tree.setRoot(rootNode);
             return tree;
         }
         return null;
     }
-
+   
+    
     /**
      * Given a GermplasmPedigreeTreeNode and the level of the desired tree, add parents 
      * to the node recursively until the specified level of the tree is reached.
@@ -978,6 +987,120 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             return node;
         }
     }
+    
+
+    /**
+     * Given a GermplasmPedigreeTreeNode and the level of the desired tree, add parents 
+     * to the node recursively excluding derivative lines until the specified level of 
+     * the tree is reached.
+     * 
+     * @param node
+     * @param level
+     * @return the given GermplasmPedigreeTreeNode with its parents added to it
+     * @throws MiddlewareQueryException
+     */
+    private GermplasmPedigreeTreeNode addParentsExcludeDerivativeLines(GermplasmPedigreeTreeNode node, int level) throws MiddlewareQueryException {
+        if (level == 1) {
+            return node;
+        } else {
+            // get parents of node
+            Germplasm germplasmOfNode = node.getGermplasm();
+            
+            if(germplasmOfNode.getGid() <0)
+            	setWorkingDatabase(Database.LOCAL);
+            else
+            	setWorkingDatabase(Database.CENTRAL);
+            
+            if (germplasmOfNode.getGnpgs() == -1) {
+                // get and add the source germplasm
+            	
+                if(germplasmOfNode.getGpid1() <0)
+                	setWorkingDatabase(Database.LOCAL);
+                else
+                	setWorkingDatabase(Database.CENTRAL);
+                
+                Germplasm parent = getGermplasmWithPrefName(germplasmOfNode.getGpid1());
+                
+                if (parent != null) {
+
+                    if(parent.getGpid1() <0)
+                    	setWorkingDatabase(Database.LOCAL);
+                    else
+                    	setWorkingDatabase(Database.CENTRAL);
+                	
+                	Germplasm grandParent1 = getGermplasmWithPrefName(parent.getGpid1());	
+                	if(grandParent1 != null){
+                		GermplasmPedigreeTreeNode nodeForGrandParent1 = new GermplasmPedigreeTreeNode();
+                		nodeForGrandParent1.setGermplasm(grandParent1);
+                		node.getLinkedNodes().add(addParentsExcludeDerivativeLines(nodeForGrandParent1, level - 1));
+                	}
+                	
+                    if(parent.getGpid2() <0)
+                    	setWorkingDatabase(Database.LOCAL);
+                    else
+                    	setWorkingDatabase(Database.CENTRAL);
+                	
+                	Germplasm grandParent2 = getGermplasmWithPrefName(parent.getGpid2());	
+                	if(grandParent2 != null){
+                		GermplasmPedigreeTreeNode nodeForGrandParent2 = new GermplasmPedigreeTreeNode();
+                		nodeForGrandParent2.setGermplasm(grandParent2);
+                		node.getLinkedNodes().add(addParentsExcludeDerivativeLines(nodeForGrandParent2, level - 1));
+                	}
+                    	
+                }
+            } else if (germplasmOfNode.getGnpgs() >= 2) {
+                // get and add the source germplasm
+            	
+                if(germplasmOfNode.getGpid1() <0)
+                	setWorkingDatabase(Database.LOCAL);
+                else
+                	setWorkingDatabase(Database.CENTRAL);
+            	
+                Germplasm parent = getGermplasmWithPrefName(germplasmOfNode.getGpid1());
+                if (parent != null) {
+                	
+                    if(parent.getGpid1() <0)
+                    	setWorkingDatabase(Database.LOCAL);
+                    else
+                    	setWorkingDatabase(Database.CENTRAL);
+                	
+                    Germplasm grandParent = getGermplasmWithPrefName(parent.getGpid1());
+                    if(grandParent != null){
+
+                        if(grandParent.getGpid1() <0)
+                        	setWorkingDatabase(Database.LOCAL);
+                        else
+                        	setWorkingDatabase(Database.CENTRAL);
+                    	
+                    	Germplasm greatGrandParent1 = getGermplasmWithPrefName(grandParent.getGpid1());	
+                    	if(greatGrandParent1 != null){
+                    		GermplasmPedigreeTreeNode nodeForGreatGrandParent1 = new GermplasmPedigreeTreeNode();
+                    		nodeForGreatGrandParent1.setGermplasm(greatGrandParent1);
+                    		node.getLinkedNodes().add(addParentsExcludeDerivativeLines(nodeForGreatGrandParent1, level - 1));
+                    	}
+                    	
+                        if(grandParent.getGpid2() <0)
+                        	setWorkingDatabase(Database.LOCAL);
+                        else
+                        	setWorkingDatabase(Database.CENTRAL);
+                    	
+                    	Germplasm greatGrandParent2 = getGermplasmWithPrefName(grandParent.getGpid2());	
+                    	if(greatGrandParent2 != null){
+                    		GermplasmPedigreeTreeNode nodeForGreatGrandParent2 = new GermplasmPedigreeTreeNode();
+                    		nodeForGreatGrandParent2.setGermplasm(greatGrandParent2);
+                    		node.getLinkedNodes().add(addParentsExcludeDerivativeLines(nodeForGreatGrandParent2, level - 1));
+                    	}
+                    	
+                    }                    
+                }            	
+            	
+                
+            }
+            return node;
+        }
+    }
+    
+    
 
     @Override
     public List<Germplasm> getManagementNeighbors(Integer gid, int start, int numOfRows) throws MiddlewareQueryException {
