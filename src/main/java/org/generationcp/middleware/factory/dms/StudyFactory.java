@@ -28,6 +28,12 @@ public class StudyFactory {
 	private static final String CVT_STUDY_TYPE = "STUDY - ASSIGNED (TYPE)";
 	private static final String CVT_STATUS = "STUDY IP STATUS - ASSIGNED (TYPE)";
 
+	private static final StudyFactory instance = new StudyFactory();
+	
+	public static StudyFactory getInstance() {
+		return instance;
+	}
+	
 	/**
 	 * Creates a Study POJO from a list of ProjectProperty POJOs.
 	 * If there are more than one DmsProject associated with the ProjectProperty parameter,
@@ -37,7 +43,7 @@ public class StudyFactory {
 	 * @param properties
 	 * @return
 	 */
-	public static Study createStudy(Collection<ProjectProperty> properties) { 
+	public Study createStudy(Collection<ProjectProperty> properties) { 
 		
 		List<Study> studies = createStudies(properties);
 		
@@ -51,7 +57,7 @@ public class StudyFactory {
 	 * @param properties
 	 * @return
 	 */
-	public static List<Study> createStudies(Collection<ProjectProperty> properties) {
+	public List<Study> createStudies(Collection<ProjectProperty> properties) {
 		//map of <studyId, study>
 		//this map contains the collection of studies created as we map them field by field.
 		Map<Long, Study> studyMap = new HashMap<Long, Study>(); 

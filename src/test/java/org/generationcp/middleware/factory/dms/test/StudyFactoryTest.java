@@ -1,9 +1,7 @@
 package org.generationcp.middleware.factory.dms.test;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import junit.framework.Assert;
 
@@ -34,12 +32,9 @@ public class StudyFactoryTest {
 	private static List<ProjectProperty> propertyData3 = new ArrayList<ProjectProperty>();
 	private static List<ProjectProperty> propertyData4 = new ArrayList<ProjectProperty>();
 
-	private static Map<String, Study> expectedResults = new HashMap<String, Study>();
-	
 	@BeforeClass
 	public static void initialize() {
 		createTestData();
-		createTestResults();
 	}
 	
 	/**
@@ -48,10 +43,10 @@ public class StudyFactoryTest {
 	 */
 	@Test
 	public void testCase1() {
-		Study study = StudyFactory.createStudy(propertyData1);
+		Study study = StudyFactory.getInstance().createStudy(propertyData1);
 		
 		Assert.assertNotNull(study);
-		Assert.assertEquals(expectedResults.get("PD-1").toString(), study.toString());
+		assertResult(study, propertyData1);
 	}
 
 	/**
@@ -60,7 +55,7 @@ public class StudyFactoryTest {
 	 */
 	@Test
 	public void testCase2() {
-		Study study = StudyFactory.createStudy(null);
+		Study study = StudyFactory.getInstance().createStudy(null);
 		
 		Assert.assertNull(study);
 	}
@@ -71,10 +66,10 @@ public class StudyFactoryTest {
 	 */
 	@Test
 	public void testCase3() {
-		Study study = StudyFactory.createStudy(propertyData2);
+		Study study = StudyFactory.getInstance().createStudy(propertyData2);
 		
 		Assert.assertNotNull(study);
-		Assert.assertEquals(expectedResults.get("PD-2").toString(), study.toString());
+		assertResult(study, propertyData2);
 	}
 	
 	/**
@@ -83,7 +78,7 @@ public class StudyFactoryTest {
 	 */
 	@Test(expected = NumberFormatException.class)
 	public void testCase4() {
-		StudyFactory.createStudy(propertyData4);
+		StudyFactory.getInstance().createStudy(propertyData4);
 	}
 
 	/**
@@ -96,12 +91,12 @@ public class StudyFactoryTest {
 		propertyDataList.addAll(propertyData1);
 		propertyDataList.addAll(propertyData3);
 		
-		List<Study> studies = StudyFactory.createStudies(propertyDataList);
+		List<Study> studies = StudyFactory.getInstance().createStudies(propertyDataList);
 		
 		Assert.assertNotNull(studies);
 		Assert.assertEquals(2, studies.size());
-		Assert.assertEquals(expectedResults.get("PD-1").toString(), studies.get(0).toString());
-		Assert.assertEquals(expectedResults.get("PD-3").toString(), studies.get(1).toString());
+		assertResult(studies.get(0), propertyData1);
+		assertResult(studies.get(1), propertyData3);
 	}
 	
 	/**
@@ -110,7 +105,7 @@ public class StudyFactoryTest {
 	 */
 	@Test
 	public void testCase6() {
-		List<Study> studies = StudyFactory.createStudies(null);
+		List<Study> studies = StudyFactory.getInstance().createStudies(null);
 		
 		Assert.assertNotNull(studies);
 		Assert.assertEquals(0, studies.size());
@@ -124,7 +119,7 @@ public class StudyFactoryTest {
 	public void testCase7() {
 		List<ProjectProperty> propertyDataList = new ArrayList<ProjectProperty>();
 		
-		List<Study> studies = StudyFactory.createStudies(propertyDataList);
+		List<Study> studies = StudyFactory.getInstance().createStudies(propertyDataList);
 		
 		Assert.assertNotNull(studies);
 		Assert.assertEquals(0, studies.size());
@@ -168,19 +163,48 @@ public class StudyFactoryTest {
 		
 	}
 	
-	//=========================  Test Results creation =====================================
+	//======================  Assertion Util =======================================
+	
+	private void assertResult(Study study, List<ProjectProperty> properties) {
+		if (properties != null && properties.size() > 0) {
+			Assert.assertNotNull(properties.get(0).getProject().getDmsProjectId());
+			Assert.assertEquals(study.getId(), Integer.valueOf(properties.get(0).getProject().getDmsProjectId().toString()));
+			Assert.assertEquals(study.getName(), getProperty(properties, "STUDY - CONDUCTED (DBCV)"));
+			Assert.assertEquals(study.getProjectKey(), getIntegerProperty(properties, "PROJECT MANAGEMENT KEY - ASSIGNED (TEXT)"));
+			Assert.assertEquals(study.getTitle(), getProperty(properties, "TITLE - ASSIGNED (TEXT)"));
+			Assert.assertEquals(study.getObjective(), getProperty(properties, "OBJECTIVE - DESCRIBED (TEXT)"));
+			Assert.assertEquals(study.getPrimaryInvestigator(), getIntegerProperty(properties, "PRINCIPAL INVESTIGATOR - ASSIGNED (DBID)"));
+			Assert.assertEquals(study.getType(), getProperty(properties, "STUDY - ASSIGNED (TYPE)"));
+			Assert.assertEquals(study.getStartDate(), getIntegerProperty(properties, "START DATE - ASSIGNED (DATE)"));
+			Assert.assertEquals(study.getEndDate(), getIntegerProperty(properties, "END DATE - ASSIGNED (DATE)"));
+			Assert.assertEquals(study.getStatus(), getIntegerProperty(properties, "STUDY IP STATUS - ASSIGNED (TYPE)"));
+		}
+	}
+	
+	private String getProperty(List<ProjectProperty> properties, String type) {
+		if (properties != null) {
+			for (ProjectProperty property : properties) {
+				if (property.getType() != null && type.equals(property.getType().getName())) {
+					return property.getValue();
+				}
+			}
+		}
+		return null;
+	}
 
-	private static void createTestResults() {
-		/* Study(Integer id, String name, Integer projectKey, String title, String objective, Integer primaryInvestigator, String type,
-	            Integer startDate, Integer endDate, Integer user, Integer status, Integer hierarchy, Integer creationDate) */
-
-		expectedResults.put("PD-1", new Study(1, "STUDY-P1", 10001, "TITLE-P1", "OBJECTIVE-P1", 10002, "TYPE-P1", 
-												20130101, 20130201, null, 10003, null, null));
-		
-		expectedResults.put("PD-2", new Study(2, null, null, null, null, null, null, null, null, null, null, null, null));
-		
-		expectedResults.put("PD-3", new Study(3, "NAME-P3", 30001, "TITLE-P3", null, null, null, 20130301, null, null, null, null, null));
-		
+	private Integer getIntegerProperty(List<ProjectProperty> properties, String type) {
+		if (properties != null) {
+			String value;
+			for (ProjectProperty property : properties) {
+				if (property.getType() != null && type.equals(property.getType().getName())) {
+					value = property.getValue();
+					if (value != null) {
+						return Integer.valueOf(property.getValue());
+					}
+				}
+			}
+		}
+		return null;
 	}
 
 }
