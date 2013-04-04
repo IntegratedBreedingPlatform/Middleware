@@ -902,7 +902,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     @Override
     public GermplasmPedigreeTree generatePedigreeTree(Integer gid, int level) throws MiddlewareQueryException {
-        return generatePedigreeTree(gid, level, true);
+        return generatePedigreeTree(gid, level, false);
     }
     
     @Override
