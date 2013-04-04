@@ -153,7 +153,7 @@ public class CVTerm implements Serializable {
 	}
 
 	public Boolean isObsolete() {
-		return isObsolete == 1 ? true : false;
+		return isObsolete > 0 ? true : false;
 	}
 
 	public void setIsObsolete(Boolean isObsolete) {
@@ -162,7 +162,7 @@ public class CVTerm implements Serializable {
 	}
 
 	public Boolean isRelationshipType() {
-		return isRelationshipType == 1 ? true : false;
+		return isRelationshipType > 0 ? true : false;
 	}
 
 	public void setIsRelationshipType(Boolean isRelationshipType) {
