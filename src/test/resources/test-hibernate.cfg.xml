@@ -87,6 +87,8 @@
   <mapping class="org.generationcp.middleware.pojos.dms.ExperimentPhenotype"/>
   <mapping class="org.generationcp.middleware.pojos.dms.ExperimentProject"/>
   <mapping class="org.generationcp.middleware.pojos.dms.ExperimentStock"/>
+  <mapping class="org.generationcp.middleware.pojos.dms.ProjectRelationship"/>
+  <mapping class="org.generationcp.middleware.pojos.dms.CVTermProperty"/>
   
  </session-factory>
 </hibernate-configuration>

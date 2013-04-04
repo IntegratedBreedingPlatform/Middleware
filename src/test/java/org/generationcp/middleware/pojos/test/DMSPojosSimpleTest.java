@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.generationcp.middleware.pojos.dms.CV;
 import org.generationcp.middleware.pojos.dms.CVTerm;
+import org.generationcp.middleware.pojos.dms.CVTermProperty;
 import org.generationcp.middleware.pojos.dms.CVTermRelationship;
 import org.generationcp.middleware.pojos.dms.CVTermSynonym;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -28,6 +29,7 @@ import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.pojos.dms.ProjectRelationship;
 import org.generationcp.middleware.pojos.dms.Stock;
 import org.generationcp.middleware.pojos.dms.StockProperty;
 import org.generationcp.middleware.util.HibernateUtil;
@@ -280,6 +282,34 @@ public class DMSPojosSimpleTest{
     	System.out.println("testGeolocationProperty() RESULTS: ");
     	for (Object obj : query.list()) {
     		Assert.assertTrue(obj instanceof GeolocationProperty);
+    		Assert.assertTrue(obj != null);
+    		System.out.println(" " + obj);
+    	}
+    }
+
+    @Test
+    public void testProjectRelationship() {
+    	Session session = hibernateUtil.getCurrentSession();
+    	Query query = session.createQuery("FROM ProjectRelationship");
+    	query.setMaxResults(5);
+    	
+    	System.out.println("testProjectRelationship() RESULTS: ");
+    	for (Object obj : query.list()) {
+    		Assert.assertTrue(obj instanceof ProjectRelationship);
+    		Assert.assertTrue(obj != null);
+    		System.out.println(" " + obj);
+    	}
+    }
+
+    @Test
+    public void testCVTermProperty() {
+    	Session session = hibernateUtil.getCurrentSession();
+    	Query query = session.createQuery("FROM CVTermProperty");
+    	query.setMaxResults(5);
+    	
+    	System.out.println("testCVTermProperty() RESULTS: ");
+    	for (Object obj : query.list()) {
+    		Assert.assertTrue(obj instanceof CVTermProperty);
     		Assert.assertTrue(obj != null);
     		System.out.println(" " + obj);
     	}
