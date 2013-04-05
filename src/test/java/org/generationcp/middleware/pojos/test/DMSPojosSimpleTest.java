@@ -21,6 +21,7 @@ import org.generationcp.middleware.pojos.NumericData;
 import org.generationcp.middleware.pojos.NumericLevel;
 import org.generationcp.middleware.pojos.Oindex;
 import org.generationcp.middleware.pojos.Representation;
+import org.generationcp.middleware.pojos.ScaleContinuous;
 import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.pojos.StudyEffect;
 import org.generationcp.middleware.pojos.Trait;
@@ -219,6 +220,23 @@ public class DMSPojosSimpleTest{
             Assert.assertTrue(obj instanceof TraitMethod);
             Assert.assertTrue(obj != null);
             TraitMethod holder = (TraitMethod) obj;
+            System.out.println("  " + holder);
+        }
+    }
+
+
+    @Test
+    public void testScaleContinuous() {
+        Session session = hibernateUtil.getCurrentSession();
+        Query query = session.createQuery("FROM ScaleContinuous");
+        query.setMaxResults(5);
+        List results = query.list();
+
+        System.out.println("testScaleContinuous() RESULTS: ");
+        for (Object obj : results) {
+            Assert.assertTrue(obj instanceof ScaleContinuous);
+            Assert.assertTrue(obj != null);
+            ScaleContinuous holder = (ScaleContinuous) obj;
             System.out.println("  " + holder);
         }
     }

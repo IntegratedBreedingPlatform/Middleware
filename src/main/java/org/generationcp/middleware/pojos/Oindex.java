@@ -14,28 +14,47 @@ package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
 
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+@Entity
+@Table(name = "oindex")
 public class Oindex implements Serializable{
 
     private static final long serialVersionUID = -6609291577310766245L;
-    /*
+    
     public static final String GET_FACTORID_AND_LEVELNO_OF_CONDITIONS_BY_REPRESNO = 
                 "SELECT factorid, levelno " +
     		"FROM oindex " +
     		"WHERE represno = :represno " +
     		"GROUP BY factorid, levelno " +
     		"HAVING COUNT(DISTINCT ounitid) = :count";
-    */
+    
+    @Id
+    @Basic(optional = false)
+    @Column(name = "oindexid")
     private Integer id;
 
+    @Basic(optional = false)
+    @Column(name = "ounitid")
     private Integer observationUnitId;
 
+    @Basic(optional = false)
+    @Column(name = "factorid")
     private Integer factorId;
 
+    @Basic(optional = false)
+    @Column(name = "levelno")
     private Integer levelNumber;
 
+    @Basic(optional = false)
+    @Column(name = "represno")
     private Integer representationNumber;
 
     public Oindex() {
