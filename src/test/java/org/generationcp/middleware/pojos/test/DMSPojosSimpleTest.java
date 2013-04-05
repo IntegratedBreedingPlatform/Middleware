@@ -22,6 +22,7 @@ import org.generationcp.middleware.pojos.NumericLevel;
 import org.generationcp.middleware.pojos.Oindex;
 import org.generationcp.middleware.pojos.Representation;
 import org.generationcp.middleware.pojos.ScaleContinuous;
+import org.generationcp.middleware.pojos.ScaleDiscrete;
 import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.pojos.StudyEffect;
 import org.generationcp.middleware.pojos.Trait;
@@ -224,6 +225,23 @@ public class DMSPojosSimpleTest{
         }
     }
 
+
+
+    @Test
+    public void testScaleDiscrete() {
+        Session session = hibernateUtil.getCurrentSession();
+        Query query = session.createQuery("FROM ScaleDiscrete");
+        query.setMaxResults(5);
+        List results = query.list();
+
+        System.out.println("testScaleDiscrete() RESULTS: ");
+        for (Object obj : results) {
+            Assert.assertTrue(obj instanceof ScaleDiscrete);
+            Assert.assertTrue(obj != null);
+            ScaleDiscrete holder = (ScaleDiscrete) obj;
+            System.out.println("  " + holder);
+        }
+    }
 
     @Test
     public void testScaleContinuous() {
