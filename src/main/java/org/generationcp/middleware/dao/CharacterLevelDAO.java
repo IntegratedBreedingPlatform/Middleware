@@ -38,7 +38,7 @@ public class CharacterLevelDAO extends GenericDAO<CharacterLevel, CharacterLevel
         }
 
         try {
-            SQLQuery query = getSession().createSQLQuery(/*CharacterLevel.GET_BY_OUNIT_ID_LIST*/"");
+            SQLQuery query = getSession().createSQLQuery(CharacterLevel.GET_BY_OUNIT_ID_LIST);
             query.setParameterList("ounitIdList", ounitIdList);
 
             List results = query.list();
@@ -67,7 +67,7 @@ public class CharacterLevelDAO extends GenericDAO<CharacterLevel, CharacterLevel
             throws MiddlewareQueryException {
         List<DatasetCondition> toreturn = new ArrayList<DatasetCondition>();
         try {
-            SQLQuery query = getSession().createSQLQuery(/*CharacterLevel.GET_CONDITION_AND_VALUE*/"");
+            SQLQuery query = getSession().createSQLQuery(CharacterLevel.GET_CONDITION_AND_VALUE);
             query.setParameter("factorid", factorId);
             query.setParameter("levelno", levelNo);
 
@@ -93,7 +93,7 @@ public class CharacterLevelDAO extends GenericDAO<CharacterLevel, CharacterLevel
 
     public long countStudyInformationByGID(Long gid) throws MiddlewareQueryException {
         try {
-            Query query = getSession().createSQLQuery(/*CharacterLevel.COUNT_STUDIES_BY_GID*/"");
+            Query query = getSession().createSQLQuery(CharacterLevel.COUNT_STUDIES_BY_GID);
             query.setParameter("gid", gid);
 
             BigInteger count = (BigInteger) query.uniqueResult();
@@ -108,7 +108,7 @@ public class CharacterLevelDAO extends GenericDAO<CharacterLevel, CharacterLevel
     public List<StudyInfo> getStudyInformationByGID(Long gid) throws MiddlewareQueryException {
         List<StudyInfo> toreturn = new ArrayList<StudyInfo>();
         try {
-            Query query = getSession().createSQLQuery(/*CharacterLevel.GET_STUDIES_BY_GID*/"");
+            Query query = getSession().createSQLQuery(CharacterLevel.GET_STUDIES_BY_GID);
             query.setParameter("gid", gid);
 
             List results = query.list();
@@ -132,7 +132,7 @@ public class CharacterLevelDAO extends GenericDAO<CharacterLevel, CharacterLevel
     @SuppressWarnings("unchecked")
     public List<CharacterLevel> getByFactorAndDatasetID(Factor factor, Integer datasetId) throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(/*CharacterLevel.GET_BY_FACTOR_AND_REPRESNO*/"");
+            SQLQuery query = getSession().createSQLQuery(CharacterLevel.GET_BY_FACTOR_AND_REPRESNO);
             query.setParameter("factorid", factor.getFactorId());
             query.setParameter("labelid", factor.getId());
             query.setParameter("represno", datasetId);

@@ -39,7 +39,7 @@ public class NumericLevelDAO extends GenericDAO<NumericLevel, NumericLevelPK>{
         }
 
         try {
-            SQLQuery query = getSession().createSQLQuery(/*NumericLevel.GET_BY_OUNIT_ID_LIST*/"");
+            SQLQuery query = getSession().createSQLQuery(NumericLevel.GET_BY_OUNIT_ID_LIST);
             query.setParameterList("ounitIdList", ounitIdList);
 
             List results = query.list();
@@ -67,7 +67,7 @@ public class NumericLevelDAO extends GenericDAO<NumericLevel, NumericLevelPK>{
             throws MiddlewareQueryException {
         List<DatasetCondition> toreturn = new ArrayList<DatasetCondition>();
         try {
-            SQLQuery query = getSession().createSQLQuery(/*NumericLevel.GET_CONDITION_AND_VALUE)*/"");
+            SQLQuery query = getSession().createSQLQuery(NumericLevel.GET_CONDITION_AND_VALUE);
             query.setParameter("factorid", factorId);
             query.setParameter("levelno", levelNo);
 
@@ -93,7 +93,7 @@ public class NumericLevelDAO extends GenericDAO<NumericLevel, NumericLevelPK>{
 
     public long countStudyInformationByGID(Long gid) throws MiddlewareQueryException {
         try {
-            Query query = getSession().createSQLQuery(/*NumericLevel.COUNT_STUDIES_BY_GID*/"");
+            Query query = getSession().createSQLQuery(NumericLevel.COUNT_STUDIES_BY_GID);
             query.setParameter("gid", gid);
 
             BigInteger count = (BigInteger) query.uniqueResult();
@@ -109,7 +109,7 @@ public class NumericLevelDAO extends GenericDAO<NumericLevel, NumericLevelPK>{
     public List<StudyInfo> getStudyInformationByGID(Long gid) throws MiddlewareQueryException {
         List<StudyInfo> toreturn = new ArrayList<StudyInfo>();
         try {
-            Query query = getSession().createSQLQuery(/*NumericLevel.GET_STUDIES_BY_GID*/"");
+            Query query = getSession().createSQLQuery(NumericLevel.GET_STUDIES_BY_GID);
             query.setParameter("gid", gid);
 
             List results = query.list();
@@ -134,7 +134,7 @@ public class NumericLevelDAO extends GenericDAO<NumericLevel, NumericLevelPK>{
     @SuppressWarnings("unchecked")
     public List<NumericLevel> getByFactorAndDatasetID(Factor factor, Integer datasetId) throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(/*NumericLevel.GET_BY_FACTOR_AND_REPRESNO*/"");
+            SQLQuery query = getSession().createSQLQuery(NumericLevel.GET_BY_FACTOR_AND_REPRESNO);
             query.setParameter("factorid", factor.getFactorId());
             query.setParameter("labelid", factor.getId());
             query.setParameter("represno", datasetId);

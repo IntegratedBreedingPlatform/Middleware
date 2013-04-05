@@ -73,7 +73,7 @@ public class CharacterDataDAO extends GenericDAO<CharacterData, CharacterDataPK>
     public List<CharacterDataElement> getValuesByOunitIDList(List<Integer> ounitIdList) throws MiddlewareQueryException {
         List<CharacterDataElement> dataValues = new ArrayList<CharacterDataElement>();
         try {
-            SQLQuery query = getSession().createSQLQuery(/*CharacterData.GET_BY_OUNIT_ID_LIST*/"");
+            SQLQuery query = getSession().createSQLQuery(CharacterData.GET_BY_OUNIT_ID_LIST);
             query.setParameterList("ounitIdList", ounitIdList);
 
             List results = query.list();
