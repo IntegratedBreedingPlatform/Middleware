@@ -225,6 +225,16 @@ public interface WorkbenchDataManager{
     public Project getProjectByName(String projectName) throws MiddlewareQueryException;
 
     /**
+     * Updates all the project roles for a project.
+     *
+     * @param project - the project to use
+     * @param newRoles - the new roles to add
+     * @return void
+     * @throws MiddlewareQueryException
+     */
+    public void updateProjectsRolesForProject(Project project, List<ProjectUserRole> newRoles) throws MiddlewareQueryException;
+    
+    /**
      * Registers a workbench dataset.
      *
      * @param dataset - the workbench dataset to save
