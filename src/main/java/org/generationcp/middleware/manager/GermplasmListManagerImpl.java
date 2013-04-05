@@ -334,12 +334,20 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
             	}
             	
             	//delete GermplasmList
-                getGermplasmListDAO().makeTransient(germplasmList);
+            	
+            	//getting a hibernate NonUniqueObjectException when the one below is used GCP-880
+                //getGermplasmListDAO().makeTransient(germplasmList);
+            	
+            	germplasmList.setStatus(9);
+            	updateGermplasmList(germplasmList);
+            	
                 germplasmListsDeleted++;
             }
             
             // end transaction, commit to database
-            trans.commit();
+            if(!trans.wasCommitted())
+              trans.commit();
+            
         } catch (Exception e) {
             rollbackTransaction(trans);
             logAndThrowException(
