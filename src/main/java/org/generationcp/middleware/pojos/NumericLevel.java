@@ -14,14 +14,21 @@ package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+@Entity
+@Table(name = "level_n")
 public class NumericLevel implements Serializable{
 
     private static final long serialVersionUID = 2864832968167403818L;
 
-/*    public static final String GET_BY_OUNIT_ID_LIST = 
+    public static final String GET_BY_OUNIT_ID_LIST = 
             "SELECT oi.ounitid, oi.factorid, f.fname, ln.lvalue " +
             "FROM oindex oi JOIN level_n ln ON ln.factorid = oi.factorid " +
                                             "AND ln.levelno = oi.levelno " + 
@@ -52,10 +59,11 @@ public class NumericLevel implements Serializable{
         "SELECT DISTINCT {ln.*} FROM level_n ln JOIN oindex oi ON ln.factorid = oi.factorid " 
         + "AND ln.levelno = oi.levelno "
         + "WHERE ln.factorid = :factorid AND ln.labelid = :labelid AND oi.represno = :represno";
-*/
-    
+
+    @EmbeddedId
     protected NumericLevelPK id;
 
+    @Column(name = "lvalue")
     private Double value;
 
     public NumericLevel() {
