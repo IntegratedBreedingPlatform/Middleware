@@ -14,20 +14,32 @@ package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "data_n")
 public class NumericData implements Serializable{
 
     private static final long serialVersionUID = 1L;
 
-/*    public static final String GET_BY_OUNIT_ID_LIST = 
+    public static final String GET_BY_OUNIT_ID_LIST = 
             "SELECT dn.ounitid, dn.variatid, v.vname, dn.dvalue " +
             "FROM data_n dn JOIN variate v ON dn.variatid = v.variatid " + 
             "WHERE dn.ounitid IN (:ounitIdList)";
-*/
 
+    @EmbeddedId
     protected NumericDataPK id;
 
+    @Column(name = "dvalue")
     private Double value;
 
+    @ManyToOne(targetEntity = Variate.class)
+    @JoinColumn(name = "variatid", nullable = false, insertable = false, updatable = false)
     private Variate variate;
 
     public NumericData() {
