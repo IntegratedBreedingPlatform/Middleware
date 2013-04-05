@@ -29,7 +29,7 @@ public class VariateDAO extends GenericDAO<Variate, Integer>{
     @SuppressWarnings("unchecked")
     public List<Variate> getByStudyID(Integer studyId) throws MiddlewareQueryException {
         try {
-            Query query = getSession().getNamedQuery(/*Variate.GET_VARIATES_BY_STUDYID*/"");
+            Query query = getSession().getNamedQuery(Variate.GET_VARIATES_BY_STUDYID);
             query.setParameter("studyId", studyId);
 
             return (List<Variate>) query.list();
@@ -42,7 +42,7 @@ public class VariateDAO extends GenericDAO<Variate, Integer>{
     @SuppressWarnings("unchecked")
     public List<Variate> getByRepresentationId(Integer representationId) throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(/*Variate.GET_BY_REPRESENTATION_ID*/"");
+            SQLQuery query = getSession().createSQLQuery(Variate.GET_BY_REPRESENTATION_ID);
             query.setParameter("representationId", representationId);
             query.addEntity("v", Variate.class);
 
@@ -56,7 +56,7 @@ public class VariateDAO extends GenericDAO<Variate, Integer>{
     
     public boolean isVariateNumeric(int variateId) throws MiddlewareQueryException {
         try {
-            Query query = getSession().createSQLQuery(/*Variate.GET_VARIATE_ID_DATATYPE*/"");
+            Query query = getSession().createSQLQuery(Variate.GET_VARIATE_ID_DATATYPE);
             query.setParameter("variatid", variateId);
             
             String result = "";
