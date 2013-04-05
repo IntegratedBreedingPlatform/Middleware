@@ -100,5 +100,11 @@
   <mapping class="org.generationcp.middleware.pojos.dms.ProjectRelationship"/>
   <mapping class="org.generationcp.middleware.pojos.dms.CVTermProperty"/>
 
+  <!-- Old Schema (will be removed in the future) -->
+  <mapping class="org.generationcp.middleware.pojos.CharacterLevel"/>
+  <mapping class="org.generationcp.middleware.pojos.CharacterLevelPK"/>
+  <mapping class="org.generationcp.middleware.pojos.NumericLevel"/>
+  <mapping class="org.generationcp.middleware.pojos.NumericLevelPK"/>
+
  </session-factory>
 </hibernate-configuration>

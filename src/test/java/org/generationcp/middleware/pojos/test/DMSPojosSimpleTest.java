@@ -15,8 +15,10 @@ package org.generationcp.middleware.pojos.test;
 import java.util.List;
 
 import org.generationcp.middleware.pojos.CharacterData;
+import org.generationcp.middleware.pojos.CharacterLevel;
 import org.generationcp.middleware.pojos.Factor;
 import org.generationcp.middleware.pojos.NumericData;
+import org.generationcp.middleware.pojos.NumericLevel;
 import org.generationcp.middleware.pojos.Oindex;
 import org.generationcp.middleware.pojos.Representation;
 import org.generationcp.middleware.pojos.Study;
@@ -483,6 +485,35 @@ public class DMSPojosSimpleTest{
     	System.out.println("testCVTermProperty() RESULTS: ");
     	for (Object obj : query.list()) {
     		Assert.assertTrue(obj instanceof CVTermProperty);
+    		Assert.assertTrue(obj != null);
+    		System.out.println(" " + obj);
+    	}
+    }
+    
+    //====================   OLD SCHEMA (will be removed in the future ) ======================
+    @Test
+    public void testCharacterLevel() {
+    	Session session = hibernateUtil.getCurrentSession();
+    	Query query = session.createQuery("FROM CharacterLevel");
+    	query.setMaxResults(5);
+    	
+    	System.out.println("testCharacterLevel() RESULTS: ");
+    	for (Object obj : query.list()) {
+    		Assert.assertTrue(obj instanceof CharacterLevel);
+    		Assert.assertTrue(obj != null);
+    		System.out.println(" " + obj);
+    	}
+    }
+
+    @Test
+    public void testNumericLevel() {
+    	Session session = hibernateUtil.getCurrentSession();
+    	Query query = session.createQuery("FROM NumericLevel");
+    	query.setMaxResults(5);
+    	
+    	System.out.println("testNumericLevel() RESULTS: ");
+    	for (Object obj : query.list()) {
+    		Assert.assertTrue(obj instanceof NumericLevel);
     		Assert.assertTrue(obj != null);
     		System.out.println(" " + obj);
     	}
