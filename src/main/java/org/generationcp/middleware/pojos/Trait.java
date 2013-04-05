@@ -14,20 +14,41 @@ package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
 
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "tmstraits")
 public class Trait implements Serializable{
 
     private static final long serialVersionUID = 1L;
 
+    @Id
+    @Basic(optional = false)
+    @Column(name = "tid")
     private Integer id;
 
+    @Basic(optional = false)
+    @Column(name = "traitid")
     private Integer traitId;
 
+    @Basic(optional = false)
+    @Column(name = "trname")
     private String name;
 
+    @Basic(optional = false)
+    @Column(name = "trabbr")
     private String abbreviation;
 
+    @Basic(optional = false)
+    @Column(name = "trdesc")
     private String descripton;
 
+    @Basic(optional = false)
+    @Column(name = "tnstat")
     private Integer nameStatus;
 
     public Trait() {

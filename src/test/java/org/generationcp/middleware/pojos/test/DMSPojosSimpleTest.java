@@ -21,6 +21,8 @@ import org.generationcp.middleware.pojos.Oindex;
 import org.generationcp.middleware.pojos.Representation;
 import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.pojos.StudyEffect;
+import org.generationcp.middleware.pojos.Trait;
+import org.generationcp.middleware.pojos.TraitMethod;
 import org.generationcp.middleware.pojos.Variate;
 import org.generationcp.middleware.pojos.dms.CV;
 import org.generationcp.middleware.pojos.dms.CVTerm;
@@ -186,6 +188,40 @@ public class DMSPojosSimpleTest{
             System.out.println("  " + holder);
         }
     }
+    
+    @Test
+    public void testTrait() {
+        Session session = hibernateUtil.getCurrentSession();
+        Query query = session.createQuery("FROM Trait");
+        query.setMaxResults(5);
+        List results = query.list();
+
+        System.out.println("testTrait() RESULTS: ");
+        for (Object obj : results) {
+            Assert.assertTrue(obj instanceof Trait);
+            Assert.assertTrue(obj != null);
+            Trait holder = (Trait) obj;
+            System.out.println("  " + holder);
+        }
+    }
+
+    @Test
+    public void testTraitMethod() {
+        Session session = hibernateUtil.getCurrentSession();
+        Query query = session.createQuery("FROM TraitMethod");
+        query.setMaxResults(5);
+        List results = query.list();
+
+        System.out.println("testTraitMethod() RESULTS: ");
+        for (Object obj : results) {
+            Assert.assertTrue(obj instanceof TraitMethod);
+            Assert.assertTrue(obj != null);
+            TraitMethod holder = (TraitMethod) obj;
+            System.out.println("  " + holder);
+        }
+    }
+
+
 
     @Test
     public void testGeolocation() {

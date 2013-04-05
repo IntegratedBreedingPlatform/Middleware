@@ -14,12 +14,21 @@ package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
 
-//@NamedQueries({ @NamedQuery(name = "getVariatesByStudyID", query = "FROM Variate v WHERE v.studyId = :studyId") })
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+
+@NamedQueries({ @NamedQuery(name = "getVariatesByStudyID", query = "FROM Variate v WHERE v.studyId = :studyId") })
+@Entity
+@Table(name = "variate")
 public class Variate implements Serializable{
 
     private static final long serialVersionUID = 1L;
 
-/*
     // string contants for name of queries
     public static final String GET_VARIATES_BY_STUDYID = "getVariatesByStudyID";
 
@@ -37,24 +46,42 @@ public class Variate implements Serializable{
     public static final String GET_VARIATE_ID_DATATYPE = "SELECT dtype " +
         "FROM variate " + 
         "WHERE variatid = :variatid";
-*/
-    
+
+    @Id
+    @Basic(optional = false)
+    @Column(name = "variatid")
     private Integer id;
 
+    @Basic(optional = false)
+    @Column(name = "studyid")
     private Integer studyId;
 
+    @Basic(optional = false)
+    @Column(name = "vname")
     private String name;
 
+    @Basic(optional = false)
+    @Column(name = "traitid")
     private Integer traitId;
 
+    @Basic(optional = false)
+    @Column(name = "scaleid")
     private Integer scaleId;
 
+    @Basic(optional = false)
+    @Column(name = "tmethid")
     private Integer methodId;
 
+    @Basic(optional = false)
+    @Column(name = "dtype")
     private String dataType;
 
+    @Basic(optional = false)
+    @Column(name = "vtype")
     private String type;
 
+    @Basic(optional = false)
+    @Column(name = "tid")
     private Integer tid;
 
     public Variate() {

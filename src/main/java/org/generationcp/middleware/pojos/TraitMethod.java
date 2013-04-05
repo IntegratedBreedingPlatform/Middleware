@@ -14,20 +14,34 @@ package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
 
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "tmsmethod")
 public class TraitMethod implements Serializable{
 
     private static final long serialVersionUID = 1L;
     
-/*
-      public static final String GET_BY_TRAIT_ID = "SELECT DISTINCT {m.*} FROM tmsmethod m JOIN tmsmeasuredin mi " 
+    public static final String GET_BY_TRAIT_ID = "SELECT DISTINCT {m.*} FROM tmsmethod m JOIN tmsmeasuredin mi "
         + "ON m.tmethid = mi.tmethid WHERE mi.traitid = :traitid";
-*/
+
+    @Id
+    @Basic(optional = false)
+    @Column(name = "tmethid")
     private Integer id;
 
+    @Basic(optional = false)
+    @Column(name = "tmname")
     private String name;
 
+    @Column(name = "tmabbr")
     private String abbreviation;
 
+    @Column(name = "tmdesc")
     private String description;
 
     public TraitMethod() {
