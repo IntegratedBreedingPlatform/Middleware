@@ -4,10 +4,10 @@
 <hibernate-configuration>
  <session-factory>
   <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
-  <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/ibdbv2</property>
+  <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/gcp_rice_central</property>
   <property name="hibernate.connection.username">root</property>
   <property name="hibernate.connection.password"></property>
-  <property name="hibernate.default_schema">ibdbv2</property>
+  <property name="hibernate.default_schema">gcp_rice_central</property>
   <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
   <!--   
   <property name="hibernate.show_sql">true</property>
@@ -110,6 +110,8 @@
   <!-- Old Schema (will be removed in the future) -->
   <mapping class="org.generationcp.middleware.pojos.CharacterLevel"/>
   <mapping class="org.generationcp.middleware.pojos.CharacterLevelPK"/>
+  <mapping class="org.generationcp.middleware.pojos.NumericLevel"/>
+  <mapping class="org.generationcp.middleware.pojos.NumericLevelPK"/>
 
 
  </session-factory>
