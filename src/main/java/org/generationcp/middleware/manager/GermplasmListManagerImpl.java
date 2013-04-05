@@ -266,13 +266,15 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
                     Integer negativeId = getGermplasmListDAO().getNegativeId("id");
                     germplasmListIds.add(negativeId);
                     germplasmList.setId(negativeId);
+                    getGermplasmListDAO().saveOrUpdate(germplasmList);
                 } else if (operation == Operation.UPDATE) {
                     // Check if GermplasmList is a local DB record. Throws
                     // exception if GermplasmList is a central DB record.
                     getGermplasmListDAO().validateId(germplasmList);
                     germplasmListIds.add(germplasmList.getId());
+                    getGermplasmListDAO().merge(germplasmList);
                 }
-                getGermplasmListDAO().saveOrUpdate(germplasmList);
+                
                 germplasmListsSaved++;
                 if (germplasmListsSaved % JDBC_BATCH_SIZE == 0) {
                     // flush a batch of inserts and release memory
