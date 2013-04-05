@@ -14,14 +14,21 @@ package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+@Entity
+@Table(name = "level_c")
 public class CharacterLevel implements Serializable{
 
     private static final long serialVersionUID = -7870779107873158520L;
 
-/*    public static final String GET_BY_OUNIT_ID_LIST = 
+    public static final String GET_BY_OUNIT_ID_LIST = 
             "SELECT oi.ounitid, oi.factorid, f.fname, lc.lvalue " + 
             "FROM oindex oi JOIN level_c lc ON lc.factorid = oi.factorid AND lc.levelno = oi.levelno " + 
                             "JOIN factor f ON f.labelid = lc.labelid " +
@@ -51,10 +58,11 @@ public class CharacterLevel implements Serializable{
         "SELECT DISTINCT {lc.*} FROM level_c lc JOIN oindex oi ON lc.factorid = oi.factorid " 
         + "AND lc.levelno = oi.levelno "
         + "WHERE lc.factorid = :factorid AND lc.labelid = :labelid AND oi.represno = :represno";
-*/
-    
+
+    @EmbeddedId
     protected CharacterLevelPK id;
 
+    @Column(name = "lvalue")
     private String value;
 
     public CharacterLevel() {
