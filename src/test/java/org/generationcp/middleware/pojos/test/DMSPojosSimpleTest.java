@@ -14,6 +14,7 @@ package org.generationcp.middleware.pojos.test;
 
 import java.util.List;
 
+import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.pojos.dms.CV;
 import org.generationcp.middleware.pojos.dms.CVTerm;
 import org.generationcp.middleware.pojos.dms.CVTermProperty;
@@ -48,6 +49,22 @@ public class DMSPojosSimpleTest{
     @BeforeClass
     public static void setUp() throws Exception {
         hibernateUtil = new HibernateUtil(CONFIG);
+    }
+    
+    @Test
+    public void testStudy() {
+        Session session = hibernateUtil.getCurrentSession();
+        Query query = session.createQuery("FROM Study");
+        query.setMaxResults(5);
+        List results = query.list();
+
+        System.out.println("testStudy() RESULTS: ");
+        for (Object obj : results) {
+            Assert.assertTrue(obj instanceof Study);
+            Assert.assertTrue(obj != null);
+            Study holder = (Study) obj;
+            System.out.println("  " + holder);
+        }
     }
     
     @Test

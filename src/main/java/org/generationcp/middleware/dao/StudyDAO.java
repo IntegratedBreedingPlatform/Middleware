@@ -32,7 +32,7 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
     @SuppressWarnings("unchecked")
     public List<Study> getByNameUsingEqual(String name, int start, int numOfRows) throws MiddlewareQueryException {
         try {
-            Query query = getSession().getNamedQuery(/*Study.GET_BY_NAME_USING_EQUAL""*/"");
+            Query query = getSession().getNamedQuery(Study.GET_BY_NAME_USING_EQUAL);
             query.setParameter("name", name);
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
@@ -46,7 +46,7 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
     @SuppressWarnings("unchecked")
     public List<Study> getBySDateUsingEqual(Integer sdate, int start, int numOfRows) throws MiddlewareQueryException {
         try {
-            Query query = getSession().getNamedQuery(/*Study.GET_BY_SDATE_USING_EQUAL*/"");
+            Query query = getSession().getNamedQuery(Study.GET_BY_SDATE_USING_EQUAL);
             query.setParameter("startDate", sdate);
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
@@ -61,7 +61,7 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
     @SuppressWarnings("unchecked")
     public List<Study> getByEDateUsingEqual(Integer edate, int start, int numOfRows) throws MiddlewareQueryException {
         try {
-            Query query = getSession().getNamedQuery(/*Study.GET_BY_EDATE_USING_EQUAL*/"");
+            Query query = getSession().getNamedQuery(Study.GET_BY_EDATE_USING_EQUAL);
             query.setParameter("endDate", edate);
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
@@ -76,7 +76,7 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
     @SuppressWarnings("unchecked")
     public List<Study> getByNameUsingLike(String name, int start, int numOfRows) throws MiddlewareQueryException {
         try {
-            Query query = getSession().getNamedQuery(/*Study.GET_BY_NAME_USING_LIKE*/"");
+            Query query = getSession().getNamedQuery(Study.GET_BY_NAME_USING_LIKE);
             query.setParameter("name", name);
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
@@ -91,9 +91,9 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
 
         try {
             // if operation == null or operation = Operation.EQUAL
-            Query query = getSession().getNamedQuery(/*Study.COUNT_BY_NAME_USING_EQUAL*/"");
+            Query query = getSession().getNamedQuery(Study.COUNT_BY_NAME_USING_EQUAL);
             if (operation == Operation.LIKE) {
-                query = getSession().getNamedQuery(/*Study.COUNT_BY_NAME_USING_LIKE*/"");
+                query = getSession().getNamedQuery(Study.COUNT_BY_NAME_USING_LIKE);
             }
             query.setParameter("name", name);
             return ((Long) query.uniqueResult()).longValue();
@@ -108,7 +108,7 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
     @SuppressWarnings("unchecked")
     public List<Study> getByCountryUsingEqual(String country, int start, int numOfRows) throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(/*Study.GET_BY_COUNTRY_USING_EQUAL*/"");
+            SQLQuery query = getSession().createSQLQuery(Study.GET_BY_COUNTRY_USING_EQUAL);
             query.setParameter("country", country);
             query.addEntity("s", Study.class);
             query.setFirstResult(start);
@@ -126,7 +126,7 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
     @SuppressWarnings("unchecked")
     public List<Study> getByCountryUsingLike(String country, int start, int numOfRows) throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(/*Study.GET_BY_COUNTRY_USING_LIKE*/"");
+            SQLQuery query = getSession().createSQLQuery(Study.GET_BY_COUNTRY_USING_LIKE);
             query.setParameter("country", country);
             query.addEntity("s", Study.class);
             query.setFirstResult(start);
@@ -144,9 +144,9 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
 
         try {
             // if operation == null or operation = Operation.EQUAL
-            Query query = getSession().createSQLQuery(/*Study.COUNT_BY_COUNTRY_USING_EQUAL*/"");
+            Query query = getSession().createSQLQuery(Study.COUNT_BY_COUNTRY_USING_EQUAL);
             if (operation == Operation.LIKE) {
-                query = getSession().createSQLQuery(/*Study.COUNT_BY_COUNTRY_USING_LIKE*/"");
+                query = getSession().createSQLQuery(Study.COUNT_BY_COUNTRY_USING_LIKE);
             }
             query.setParameter("country", country);
             return ((BigInteger) query.uniqueResult()).longValue();
@@ -161,12 +161,12 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
     @SuppressWarnings("unchecked")
     public List<Study> getBySeason(Season season, int start, int numOfRows) throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(/*Study.GET_BY_SEASON*/"");
+            SQLQuery query = getSession().createSQLQuery(Study.GET_BY_SEASON);
             
             if (season == Season.DRY){
-                query = getSession().createSQLQuery(/*Study.GET_BY_SEASON + Study.DRY_SEASON_CONDITION*/"");
+                query = getSession().createSQLQuery(Study.GET_BY_SEASON + Study.DRY_SEASON_CONDITION);
             } else if (season == Season.WET){
-                query = getSession().createSQLQuery(/*Study.GET_BY_SEASON + Study.WET_SEASON_CONDITION*/"");
+                query = getSession().createSQLQuery(Study.GET_BY_SEASON + Study.WET_SEASON_CONDITION);
             }  
             query.addEntity("s", Study.class);
             query.setFirstResult(start);
@@ -182,12 +182,12 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
 
     public long countBySeason(Season season) throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(/*Study.COUNT_BY_SEASON*/"");
+            SQLQuery query = getSession().createSQLQuery(Study.COUNT_BY_SEASON);
             
             if (season == Season.DRY){
-                query = getSession().createSQLQuery(/*Study.COUNT_BY_SEASON + Study.DRY_SEASON_CONDITION*/"");
+                query = getSession().createSQLQuery(Study.COUNT_BY_SEASON + Study.DRY_SEASON_CONDITION);
             } else if (season == Season.WET){
-                query = getSession().createSQLQuery(/*Study.COUNT_BY_SEASON + Study.WET_SEASON_CONDITION*/"");
+                query = getSession().createSQLQuery(Study.COUNT_BY_SEASON + Study.WET_SEASON_CONDITION);
             }  
 
             return ((BigInteger) query.uniqueResult()).longValue();
@@ -202,7 +202,7 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
 
         try {
             // if operation == null or operation = Operation.EQUAL
-            Query query = getSession().getNamedQuery(/*Study.COUNT_BY_SDATE_USING_EQUAL*/"");
+            Query query = getSession().getNamedQuery(Study.COUNT_BY_SDATE_USING_EQUAL);
 
             query.setParameter("startDate", sdate);
             return ((Long) query.uniqueResult()).longValue();
@@ -218,7 +218,7 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
 
         try {
             // if operation == null or operation = Operation.EQUAL
-            Query query = getSession().getNamedQuery(/*Study.COUNT_BY_EDATE_USING_EQUAL*/"");
+            Query query = getSession().getNamedQuery(Study.COUNT_BY_EDATE_USING_EQUAL);
 
             query.setParameter("endDate", edate);
             return ((Long) query.uniqueResult()).longValue();
