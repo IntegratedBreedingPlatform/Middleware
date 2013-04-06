@@ -46,14 +46,12 @@ public class ProjectProperty implements Serializable {
 	/**
 	 * The type defined in CV term.
 	 */
-	@ManyToOne(targetEntity = CVTerm.class)
-	@JoinColumn(name = "type_id", nullable = false)
-	private CVTerm type;
+	private Long typeId;
 	
 	/**
 	 * The value of the property.
 	 */
-	@Column(name = "`value`")
+	@Column(name = "value")
 	private String value;
 	
 	/**
@@ -78,12 +76,12 @@ public class ProjectProperty implements Serializable {
 		this.project = project;
 	}
 
-	public CVTerm getType() {
-		return type;
+	public Long getTypeId() {
+		return typeId;
 	}
 
-	public void setType(CVTerm type) {
-		this.type = type;
+	public void setTypeId(Long type) {
+		this.typeId = type;
 	}
 
 	public String getValue() {
@@ -133,7 +131,7 @@ public class ProjectProperty implements Serializable {
 	@Override
 	public String toString() {
 		return "ProjectProperty [projectPropertyId=" + projectPropertyId
-				+ ", project=" + project + ", type=" + type + ", value="
+				+ ", project=" + project + ", typeId=" + typeId + ", value="
 				+ value + ", rank=" + rank + "]";
 	}
 	

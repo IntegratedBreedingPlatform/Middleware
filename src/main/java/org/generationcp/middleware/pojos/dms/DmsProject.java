@@ -1,12 +1,16 @@
 package org.generationcp.middleware.pojos.dms;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -46,7 +50,28 @@ public class DmsProject implements Serializable {
 	@Basic(optional = false)
 	@Column(name = "description")
 	private String description;
-
+	
+	/**
+	 * Relates a study project to its parent folder project
+	 * Relates a dataset project to its study project
+	 * @return
+	 */
+	/*@ManyToOne(cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
+	@JoinTable(name = "project_relationship", 
+				joinColumns = {@JoinColumn(name = "subject_project_id")},
+				inverseJoinColumns = {@JoinColumn(name = "object_project_id")})
+	@WhereJoinTable(clause = "type_id IN (select CvTermId from CvTern where name IN ('has parent folder', 'belongs to study'))")
+	private DmsProject parent;
+	*/
+	
+	/**
+	 * List of Project Properties
+	 * @return
+	 */
+	@OneToMany(mappedBy = "project", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+	private List<ProjectProperty> properties;
+	
+	
 	public Long getDmsProjectId() {
 		return dmsProjectId;
 	}
@@ -100,7 +125,9 @@ public class DmsProject implements Serializable {
 	@Override
 	public String toString() {
 		return "DmsProject [dmsProjectId=" + dmsProjectId + ", name=" + name
-				+ ", description=" + description + "]";
+				+ ", description=" + description 
+				//+ ", parent=" + (parent != null ? parent.getDmsProjectId() : "null")
+				;
 	}
 
 }
