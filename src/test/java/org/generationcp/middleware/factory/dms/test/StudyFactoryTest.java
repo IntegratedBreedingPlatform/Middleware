@@ -7,7 +7,7 @@ import junit.framework.Assert;
 
 import org.generationcp.middleware.factory.dms.StudyFactory;
 import org.generationcp.middleware.pojos.Study;
-import org.generationcp.middleware.pojos.dms.CvTermId;
+import org.generationcp.middleware.pojos.dms.CVTermId;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.junit.Test;
@@ -41,6 +41,10 @@ public class StudyFactoryTest {
 		
 		Assert.assertNotNull(study);
 		assertResult(s1, study);
+		
+		System.out.println("\n\nTEST CASE #1");
+		System.out.println("INPUT: \n\tPROJECT = " + p1 + "\n\tPARENT = " + p0 + "\n\tPROPERTIES = " + properties);
+		System.out.println("OUTPUT: " + study);
 	}
 
 	/**
@@ -53,6 +57,10 @@ public class StudyFactoryTest {
 		Study study = StudyFactory.getInstance().createStudy(null, null, null);
 		
 		Assert.assertNull(study);
+		
+		System.out.println("\n\nTEST CASE #2");
+		System.out.println("INPUT: \n\tPROJECT = NULL\n\tPARENT = NULL\n\tPROPERTIES = NULL");
+		System.out.println("OUTPUT: STUDY IS NULL");
 	}
 
 	/**
@@ -69,6 +77,10 @@ public class StudyFactoryTest {
 		
 		Assert.assertNotNull(study);
 		assertResult(s2, study);
+
+		System.out.println("\n\nTEST CASE #3");
+		System.out.println("INPUT: \n\tPROJECT = " + p2 + "\n\tPARENT = NULL\n\tPROPERTIES = " + properties);
+		System.out.println("OUTPUT: " + study);
 	}
 	
 	/**
@@ -78,7 +90,11 @@ public class StudyFactoryTest {
 	@Test(expected = NumberFormatException.class)
 	public void testCase4() {
 		List<ProjectProperty> properties = new ArrayList<ProjectProperty>();
-		addPropertySetToList(properties, CvTermId.START_DATE, "ABCDEF", 7L);
+		addPropertySetToList(properties, CVTermId.START_DATE, "ABCDEF", 7L);
+		
+		System.out.println("\n\nTEST CASE #4");
+		System.out.println("INPUT: \n\tPROJECT = " + p3 + "\n\tPARENT = " + p2 + "\n\tPROPERTIES = " + properties);
+		
 		StudyFactory.getInstance().createStudy(p3, p2, properties);
 	}
 	
@@ -87,17 +103,17 @@ public class StudyFactoryTest {
 	private List<ProjectProperty> createProjectPropertiesFromStudy(Study study) {
 		List<ProjectProperty> properties = new ArrayList<ProjectProperty>();
 		
-		addPropertySetToList(properties, CvTermId.STUDY_NAME, study.getName(), 111L);
-		addPropertySetToList(properties, CvTermId.PM_KEY, getString(study.getProjectKey()), 2L);
-		addPropertySetToList(properties, CvTermId.STUDY_TITLE, study.getTitle(), 3L);
-		addPropertySetToList(properties, CvTermId.STUDY_OBJECTIVE, study.getObjective(), 4L);
-		addPropertySetToList(properties, CvTermId.PI_ID, getString(study.getPrimaryInvestigator()), 5L);
-		addPropertySetToList(properties, CvTermId.STUDY_TYPE, study.getType(), 6L);
-		addPropertySetToList(properties, CvTermId.START_DATE, getString(study.getStartDate()), 7L);
-		addPropertySetToList(properties, CvTermId.END_DATE, getString(study.getEndDate()), 8L);
-		addPropertySetToList(properties, CvTermId.STUDY_UID, getString(study.getUser()), 9L);
-		addPropertySetToList(properties, CvTermId.STUDY_IP, getString(study.getStatus()), 10L);
-		addPropertySetToList(properties, CvTermId.RELEASE_DATE, getString(study.getCreationDate()), 11L);
+		addPropertySetToList(properties, CVTermId.STUDY_NAME, study.getName(), 111L);
+		addPropertySetToList(properties, CVTermId.PM_KEY, getString(study.getProjectKey()), 2L);
+		addPropertySetToList(properties, CVTermId.STUDY_TITLE, study.getTitle(), 3L);
+		addPropertySetToList(properties, CVTermId.STUDY_OBJECTIVE, study.getObjective(), 4L);
+		addPropertySetToList(properties, CVTermId.PI_ID, getString(study.getPrimaryInvestigator()), 5L);
+		addPropertySetToList(properties, CVTermId.STUDY_TYPE, study.getType(), 6L);
+		addPropertySetToList(properties, CVTermId.START_DATE, getString(study.getStartDate()), 7L);
+		addPropertySetToList(properties, CVTermId.END_DATE, getString(study.getEndDate()), 8L);
+		addPropertySetToList(properties, CVTermId.STUDY_UID, getString(study.getUser()), 9L);
+		addPropertySetToList(properties, CVTermId.STUDY_IP, getString(study.getStatus()), 10L);
+		addPropertySetToList(properties, CVTermId.RELEASE_DATE, getString(study.getCreationDate()), 11L);
 		
 		return properties;
 	}
@@ -106,15 +122,15 @@ public class StudyFactoryTest {
 		return value != null ? value.toString() : null;
 	}
 	
-	private void addPropertySetToList(List<ProjectProperty> properties, CvTermId term, String value, Long rank) {
+	private void addPropertySetToList(List<ProjectProperty> properties, CVTermId term, String value, Long rank) {
 		long startId = properties.size() > 0 ? properties.get(properties.size()-1).getProjectPropertyId() + 1L : 1L;
 		properties.add(createProjectProperty(startId, term, value, rank));
-		properties.add(createProjectProperty(startId + 1, CvTermId.STUDY_INFORMATION, "study info", rank));
-		properties.add(createProjectProperty(startId + 2, CvTermId.VARIABLE_DESCRIPTION, "some description", rank));
-		properties.add(createProjectProperty(startId + 3, CvTermId.STANDARD_VARIABLE, term.getId().toString(), rank));
+		properties.add(createProjectProperty(startId + 1, CVTermId.STUDY_INFORMATION, "study info", rank));
+		properties.add(createProjectProperty(startId + 2, CVTermId.VARIABLE_DESCRIPTION, "some description", rank));
+		properties.add(createProjectProperty(startId + 3, CVTermId.STANDARD_VARIABLE, term.getId().toString(), rank));
 	}
 	
-	private ProjectProperty createProjectProperty(Long id, CvTermId type, String value, Long rank) {
+	private ProjectProperty createProjectProperty(Long id, CVTermId type, String value, Long rank) {
 		ProjectProperty property = new ProjectProperty();
 		property.setProjectPropertyId(id);
 		property.setTypeId(type.getId());

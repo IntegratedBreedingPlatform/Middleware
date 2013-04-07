@@ -1,6 +1,6 @@
 package org.generationcp.middleware.pojos.dms;
 
-public enum CvTermId {
+public enum CVTermId {
 
 	//Standard Variable
 	STANDARD_VARIABLE(1070L)
@@ -23,7 +23,7 @@ public enum CvTermId {
 	
 	private final Long id;
 	
-	private CvTermId(Long id) {
+	private CVTermId(Long id) {
 		this.id = id;
 	}
 	
@@ -31,14 +31,4 @@ public enum CvTermId {
 		return this.id;
 	}
 	
-		
-	public static CvTermId toCVTermId(Long id) {
-		
-		for (CvTermId field : CvTermId.values()) {
-			if (field.getId().equals(id)) {
-				return field;
-			}
-		}
-		return null;
-	}
 }

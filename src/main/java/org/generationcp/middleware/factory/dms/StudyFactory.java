@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.generationcp.middleware.helper.dms.ProjectPropertiesHelper;
 import org.generationcp.middleware.pojos.Study;
-import org.generationcp.middleware.pojos.dms.CvTermId;
+import org.generationcp.middleware.pojos.dms.CVTermId;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 
@@ -53,17 +53,17 @@ public class StudyFactory {
 		
 		ProjectPropertiesHelper helper = new ProjectPropertiesHelper(properties);
 		
-		study.setName(helper.getString(CvTermId.STUDY_NAME));
-		study.setProjectKey(helper.getInteger(CvTermId.PM_KEY));
-		study.setTitle(helper.getString(CvTermId.STUDY_TITLE));
-		study.setObjective(helper.getString(CvTermId.STUDY_OBJECTIVE));
-		study.setPrimaryInvestigator(helper.getInteger(CvTermId.PI_ID));
-		study.setType(helper.getString(CvTermId.STUDY_TYPE));
-		study.setStartDate(helper.getInteger(CvTermId.START_DATE));
-		study.setEndDate(helper.getInteger(CvTermId.END_DATE));
-		study.setUser(helper.getInteger(CvTermId.STUDY_UID));
-		study.setStatus(helper.getInteger(CvTermId.STUDY_IP));
-		study.setCreationDate(helper.getInteger(CvTermId.RELEASE_DATE));
+		study.setName(helper.getString(CVTermId.STUDY_NAME));
+		study.setProjectKey(helper.getInteger(CVTermId.PM_KEY));
+		study.setTitle(helper.getString(CVTermId.STUDY_TITLE));
+		study.setObjective(helper.getString(CVTermId.STUDY_OBJECTIVE));
+		study.setPrimaryInvestigator(helper.getInteger(CVTermId.PI_ID));
+		study.setType(helper.getString(CVTermId.STUDY_TYPE));
+		study.setStartDate(helper.getInteger(CVTermId.START_DATE));
+		study.setEndDate(helper.getInteger(CVTermId.END_DATE));
+		study.setUser(helper.getInteger(CVTermId.STUDY_UID));
+		study.setStatus(helper.getInteger(CVTermId.STUDY_IP));
+		study.setCreationDate(helper.getInteger(CVTermId.RELEASE_DATE));
 		
 	}
 	
