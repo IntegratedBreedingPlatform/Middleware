@@ -12,10 +12,7 @@
 
 package org.generationcp.middleware.manager.test;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
+import java.util.*;
 
 import org.generationcp.middleware.dao.ToolConfigurationDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -39,6 +36,7 @@ import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
+import org.generationcp.middleware.pojos.workbench.ProjectBackup;
 import org.generationcp.middleware.util.HibernateUtil;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -696,6 +694,30 @@ public class TestWorkbenchDataManagerImpl{
         //with project id = 1 and user id = 1
         ProjectUserMysqlAccount record = manager.getProjectUserMysqlAccountByProjectIdAndUserId(Integer.valueOf(1), Integer.valueOf(1));
         System.out.println(record);
+    }
+
+    @Test
+    public void testGetProjectBackups() throws MiddlewareQueryException {
+        List<ProjectBackup> projectBackups = manager.getProjectBackups();
+
+        System.out.println("testGetProjectBackups(): ");
+        for (ProjectBackup project : projectBackups) {
+            System.out.println("  " + project);
+        }
+    }
+
+    @Test
+    public void testAddProjectBackup() throws MiddlewareQueryException {
+        ProjectBackup projectBackup = new ProjectBackup();
+        projectBackup.setProjectId(12347);
+        projectBackup.setBackupPath("target/resource");
+        projectBackup.setBackupTime(Calendar.getInstance().getTime());
+        // add user
+        manager.saveOrUpdateProjectBackup(projectBackup);
+        System.out.println("testAddProjectBackup(): " + projectBackup);
+
+        // cleanup
+        manager.deleteProjectBackup(projectBackup);
     }
     
     //TODO testAddIbdbUserMap()
