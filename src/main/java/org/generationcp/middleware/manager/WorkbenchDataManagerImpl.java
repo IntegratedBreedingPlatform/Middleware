@@ -15,24 +15,7 @@ package org.generationcp.middleware.manager;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.dao.CropTypeDAO;
-import org.generationcp.middleware.dao.IbdbUserMapDAO;
-import org.generationcp.middleware.dao.PersonDAO;
-import org.generationcp.middleware.dao.ProjectActivityDAO;
-import org.generationcp.middleware.dao.ProjectDAO;
-import org.generationcp.middleware.dao.ProjectLocationMapDAO;
-import org.generationcp.middleware.dao.ProjectMethodDAO;
-import org.generationcp.middleware.dao.ProjectUserMysqlAccountDAO;
-import org.generationcp.middleware.dao.ProjectUserRoleDAO;
-import org.generationcp.middleware.dao.RoleDAO;
-import org.generationcp.middleware.dao.SecurityQuestionDAO;
-import org.generationcp.middleware.dao.ToolConfigurationDAO;
-import org.generationcp.middleware.dao.ToolDAO;
-import org.generationcp.middleware.dao.UserDAO;
-import org.generationcp.middleware.dao.WorkbenchDatasetDAO;
-import org.generationcp.middleware.dao.WorkbenchRuntimeDataDAO;
-import org.generationcp.middleware.dao.WorkbenchSettingDAO;
-import org.generationcp.middleware.dao.WorkflowTemplateDAO;
+import org.generationcp.middleware.dao.*;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -55,6 +38,7 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSetting;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
+import org.generationcp.middleware.pojos.workbench.ProjectBackup;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -85,6 +69,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     private WorkbenchRuntimeDataDAO workbenchRuntimeDataDao;
     private WorkbenchSettingDAO workbenchSettingDao;
     private WorkflowTemplateDAO workflowTemplateDao;
+    private ProjectBackupDAO projectBackupDao;
 
     public WorkbenchDataManagerImpl(HibernateSessionProvider sessionProvider) {
         this.sessionProvider = sessionProvider;
@@ -252,6 +237,14 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         }
         workflowTemplateDao.setSession(getCurrentSession());
         return workflowTemplateDao;
+    }
+
+    private ProjectBackupDAO getProjectBackupDao() {
+        if (projectBackupDao == null){
+            projectBackupDao = new ProjectBackupDAO();
+        }
+        projectBackupDao.setSession(getCurrentSession());
+        return projectBackupDao;
     }
 
     private void rollbackTransaction(Transaction trans){
@@ -1272,5 +1265,45 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         }
 
         return idsSaved;
+    }
+
+    @Override
+    public List<ProjectBackup> getProjectBackups() throws MiddlewareQueryException {
+        return getProjectBackupDao().getAllProjectBackups();
+    }
+
+    @Override
+    public ProjectBackup saveOrUpdateProjectBackup(ProjectBackup projectBackup) throws MiddlewareQueryException {
+        Transaction trans = null;
+        Session session = getCurrentSession();
+
+        try {
+            trans = session.beginTransaction();
+            projectBackup = getProjectBackupDao().saveOrUpdate(projectBackup);
+
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Cannot save ProjectBackup: WorkbenchDataManager.saveOrUpdateProjectBackup(projectBackup=" + projectBackup + "): "
+                    + e.getMessage(), e);
+        }
+
+        return projectBackup;
+    }
+
+    @Override
+    public void deleteProjectBackup(ProjectBackup projectBackup) throws MiddlewareQueryException {
+        Transaction trans = null;
+        Session session = getCurrentSession();
+
+        try {
+            trans = session.beginTransaction();
+            getProjectBackupDao().makeTransient(projectBackup);
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Cannot delete Project: WorkbenchDataManager.deleteProjectBackup(projectBackup=" + projectBackup + "): "
+                    + e.getMessage(), e);
+        }
     }
 }
