@@ -65,7 +65,8 @@
   <mapping class="org.generationcp.middleware.pojos.workbench.ProjectLocationMap"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.ToolConfiguration"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount"/>
-  
+  <mapping class="org.generationcp.middleware.pojos.workbench.ProjectBackup"/>
+
   <!-- Mapping classes for new DMS schema --> 
   <mapping class="org.generationcp.middleware.pojos.dms.Geolocation"/>
   <mapping class="org.generationcp.middleware.pojos.dms.GeolocationProperty"/>
