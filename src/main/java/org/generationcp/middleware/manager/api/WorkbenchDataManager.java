@@ -36,6 +36,7 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSetting;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
+import org.generationcp.middleware.pojos.workbench.ProjectBackup;
 
 /**
  * This is the API used by the Workbench to retrieve Workbench project
@@ -851,4 +852,29 @@ public interface WorkbenchDataManager{
      * @throws MiddlewareQueryException
      */
     public Integer addProjectUserMysqlAccount(ProjectUserMysqlAccount record) throws MiddlewareQueryException;
+
+    /**
+     * Gets the backup projects.
+     *
+     * @return the backup projects
+     * @throws MiddlewareQueryException
+     */
+    public List<ProjectBackup> getProjectBackups()  throws MiddlewareQueryException;
+
+    /**
+     * Save or update backup project.
+     *
+     * @param projectBackup - the project backup to save
+     * @return the project backup saved
+     * @throws MiddlewareQueryException
+     */
+    public ProjectBackup saveOrUpdateProjectBackup(ProjectBackup projectBackup) throws MiddlewareQueryException;
+
+    /**
+     * remove backup project.
+     *
+     * @param projectBackup - the project backup to be deleted
+     * @throws MiddlewareQueryException
+     */
+    public void deleteProjectBackup(ProjectBackup projectBackup) throws MiddlewareQueryException;
 }
