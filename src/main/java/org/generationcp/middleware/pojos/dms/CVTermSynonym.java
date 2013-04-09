@@ -19,8 +19,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -53,9 +51,9 @@ public class CVTermSynonym implements Serializable {
 	/**
 	 * Related CVTerm entity.
 	 */
-	@OneToOne
-	@JoinColumn(name = "cvterm_id")
-	private CVTerm cvTerm;
+	@Basic(optional = false)
+	@Column(name = "cvterm_id")
+	private Long cvTerm;
 	
 	/**
 	 * Alias or synonym for related CV Term
@@ -67,9 +65,8 @@ public class CVTermSynonym implements Serializable {
 	/**
 	 * Related CVTerm type. A synonym can be exact, narrower, or broader than.
 	 */
-	@OneToOne
-	@JoinColumn(name = "type_id")
-	private CVTerm type;
+	@Column(name = "type_id")
+	private Long type;
 	
 	public CVTermSynonym(){
 		
@@ -87,11 +84,11 @@ public class CVTermSynonym implements Serializable {
 		this.cvTermSynonymId = id;
 	}
 
-	public CVTerm getCvTerm() {
+	public Long getCvTerm() {
 		return cvTerm;
 	}
 
-	public void setCvTerm(CVTerm cvTerm) {
+	public void setCvTerm(Long cvTerm) {
 		this.cvTerm = cvTerm;
 	}
 
@@ -103,11 +100,11 @@ public class CVTermSynonym implements Serializable {
 		this.synonym = synonym;
 	}
 
-	public CVTerm getType() {
+	public Long getType() {
 		return type;
 	}
 
-	public void setType(CVTerm type) {
+	public void setType(Long type) {
 		this.type = type;
 	}
 
