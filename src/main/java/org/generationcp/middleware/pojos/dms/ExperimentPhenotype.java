@@ -19,8 +19,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -53,17 +51,16 @@ public class ExperimentPhenotype implements Serializable {
 	/**
 	 * The related Experiment entity
 	 */
-	@OneToOne
-    @JoinColumn(name = "nd_experiment_id")
-	private Experiment experiment;
+    @Basic(optional = false)
+    @Column(name = "nd_experiment_id")
+	private Long experiment;
 
 	/**
 	 * The related Phenotype entity
 	 */
-	
-	@OneToOne
-	@JoinColumn(name = "phenotype_id")
-	private Phenotype phenotype;
+	@Basic(optional = false)
+    @Column(name = "phenotype_id")
+	private Long phenotype;
 	
 	
 	public ExperimentPhenotype(){
@@ -82,19 +79,19 @@ public class ExperimentPhenotype implements Serializable {
 		this.experimentPhenotypeId = id;
 	}
 
-	public Experiment getExperiment() {
+	public Long getExperiment() {
 		return experiment;
 	}
 
-	public void setExperiment(Experiment experiment) {
+	public void setExperiment(Long experiment) {
 		this.experiment = experiment;
 	}
 
-	public Phenotype getPhenotype() {
+	public Long getPhenotype() {
 		return phenotype;
 	}
 
-	public void setPhenotype(Phenotype phenotype) {
+	public void setPhenotype(Long phenotype) {
 		this.phenotype = phenotype;
 	}
 
