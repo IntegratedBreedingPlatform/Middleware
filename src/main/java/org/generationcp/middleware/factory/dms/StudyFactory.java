@@ -26,13 +26,13 @@ public class StudyFactory {
 		return instance;
 	}
 	
-	public Study createStudy(DmsProject project, DmsProject parent, List<ProjectProperty> properties) { 
+	public Study createStudy(DmsProject project, Long parentId, List<ProjectProperty> properties) { 
 		Study study = null;
 
 		if (project != null) {
 			study = new Study();
 			mapProjectToStudy(project, study);
-			mapParentToStudy(parent, study);
+			mapParentToStudy(parentId, study);
 			mapPropertiesToStudy(properties, study);
 		}
 		
@@ -41,11 +41,13 @@ public class StudyFactory {
 	
 	private void mapProjectToStudy(DmsProject project, Study study) {
 		study.setId(Integer.valueOf(project.getDmsProjectId().intValue()));
+		study.setName(project.getName());
+		study.setTitle(project.getDescription());
 	}
 	
-	private void mapParentToStudy(DmsProject parent, Study study) {
-		if (parent != null) {
-			study.setHierarchy(Integer.valueOf(parent.getDmsProjectId().toString()));
+	private void mapParentToStudy(Long parentId, Study study) {
+		if (parentId != null) {
+			study.setHierarchy(parentId.intValue());
 		}
 	}
 	
@@ -53,9 +55,9 @@ public class StudyFactory {
 		
 		ProjectPropertiesHelper helper = new ProjectPropertiesHelper(properties);
 		
-		study.setName(helper.getString(CVTermId.STUDY_NAME));
+		//study.setName(helper.getString(CVTermId.STUDY_NAME));
 		study.setProjectKey(helper.getInteger(CVTermId.PM_KEY));
-		study.setTitle(helper.getString(CVTermId.STUDY_TITLE));
+		//study.setTitle(helper.getString(CVTermId.STUDY_TITLE));
 		study.setObjective(helper.getString(CVTermId.STUDY_OBJECTIVE));
 		study.setPrimaryInvestigator(helper.getInteger(CVTermId.PI_ID));
 		study.setType(helper.getString(CVTermId.STUDY_TYPE));

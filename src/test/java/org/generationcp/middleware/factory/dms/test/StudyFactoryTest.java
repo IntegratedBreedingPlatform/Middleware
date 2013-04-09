@@ -23,7 +23,7 @@ public class StudyFactoryTest {
 
 	private static DmsProject p0 = createProject(1000L, "Root", "Description for Root Parent");
 	private static DmsProject p1 = createProject(1L, "Project 1", "Description for Project 1");
-	private static DmsProject p2 = createProject(2L, "Project 2", "Description for Project 2");
+	private static DmsProject p2 = createProject(2L, null, null);
 	private static DmsProject p3 = createProject(3L, "Project 3", "Description for Project 3");
 //	private static DmsProject p4 = createProject(4L, "Project 4", "Description for Project 4");
 
@@ -33,11 +33,11 @@ public class StudyFactoryTest {
 	 */
 	@Test
 	public void testCase1() {
-		Study s1 = new Study(1, "STUDY-P1", 10001, "TITLE-P1", "OBJECTIVE-P1", 10002, "TYPE-P1", 
+		Study s1 = new Study(1, p1.getName(), 10001, p1.getDescription(), "OBJECTIVE-P1", 10002, "TYPE-P1", 
 							20130101, 20130201, 10004, 10003, p0.getDmsProjectId().intValue(), 20130401);
 		List<ProjectProperty> properties = createProjectPropertiesFromStudy(s1);
 		
-		Study study = StudyFactory.getInstance().createStudy(p1, p0, properties);
+		Study study = StudyFactory.getInstance().createStudy(p1, p0.getDmsProjectId(), properties);
 		
 		Assert.assertNotNull(study);
 		assertResult(s1, study);
@@ -95,7 +95,7 @@ public class StudyFactoryTest {
 		System.out.println("\n\nTEST CASE #4");
 		System.out.println("INPUT: \n\tPROJECT = " + p3 + "\n\tPARENT = " + p2 + "\n\tPROPERTIES = " + properties);
 		
-		StudyFactory.getInstance().createStudy(p3, p2, properties);
+		StudyFactory.getInstance().createStudy(p3, p2.getDmsProjectId(), properties);
 	}
 	
 	//=========================  Test Data creation =====================================
@@ -103,9 +103,9 @@ public class StudyFactoryTest {
 	private List<ProjectProperty> createProjectPropertiesFromStudy(Study study) {
 		List<ProjectProperty> properties = new ArrayList<ProjectProperty>();
 		
-		addPropertySetToList(properties, CVTermId.STUDY_NAME, study.getName(), 111L);
+		//addPropertySetToList(properties, CVTermId.STUDY_NAME, study.getName(), 111L);
 		addPropertySetToList(properties, CVTermId.PM_KEY, getString(study.getProjectKey()), 2L);
-		addPropertySetToList(properties, CVTermId.STUDY_TITLE, study.getTitle(), 3L);
+		//addPropertySetToList(properties, CVTermId.STUDY_TITLE, study.getTitle(), 3L);
 		addPropertySetToList(properties, CVTermId.STUDY_OBJECTIVE, study.getObjective(), 4L);
 		addPropertySetToList(properties, CVTermId.PI_ID, getString(study.getPrimaryInvestigator()), 5L);
 		addPropertySetToList(properties, CVTermId.STUDY_TYPE, study.getType(), 6L);
