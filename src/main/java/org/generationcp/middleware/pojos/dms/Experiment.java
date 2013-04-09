@@ -19,8 +19,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 /**
@@ -50,22 +48,22 @@ public class Experiment implements Serializable {
 	@Column(name = "nd_experiment_id")
 	private Long ndExperimentId;
 
-	@OneToOne
-	@JoinColumn(name = "nd_geolocation_id")
-	private Geolocation geoLocation;
+	// References Geolocation
+	@Column(name = "nd_geolocation_id")
+	private Long geoLocationId;
 
-    @OneToOne
-    @JoinColumn(name="type_id", referencedColumnName="cvterm_id")
-    private CVTerm type;
+    // References cvterm
+    @Column(name="type_id")
+    private Long typeId;
 
 	public Experiment() {
 	}
 
-	public Experiment(Long ndExperimentId, Geolocation geoLocation, CVTerm type) {
+	public Experiment(Long ndExperimentId, Long geoLocationId, Long typeId) {
 		super();
 		this.ndExperimentId = ndExperimentId;
-		this.geoLocation = geoLocation;
-		this.type = type;
+		this.geoLocationId = geoLocationId;
+		this.typeId = typeId;
 	}
 
 	public Long getNdExperimentId() {
@@ -76,20 +74,20 @@ public class Experiment implements Serializable {
 		this.ndExperimentId = ndExperimentId;
 	}
 
-	public Geolocation getGeoLocation() {
-		return geoLocation;
+	public Long getGeoLocationId() {
+		return geoLocationId;
 	}
 
-	public void setGeoLocation(Geolocation geoLocation) {
-		this.geoLocation = geoLocation;
+	public void setGeoLocationId(Long geoLocationId) {
+		this.geoLocationId = geoLocationId;
 	}
 
-	public CVTerm getType() {
-		return type;
+	public Long getTypeId() {
+		return typeId;
 	}
 
-	public void setType(CVTerm type) {
-		this.type = type;
+	public void setTypeId(Long typeId) {
+		this.typeId = typeId;
 	}
 
 	@Override
@@ -97,10 +95,10 @@ public class Experiment implements Serializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
-				+ ((geoLocation == null) ? 0 : geoLocation.hashCode());
+				+ ((geoLocationId == null) ? 0 : geoLocationId.hashCode());
 		result = prime * result
 				+ ((ndExperimentId == null) ? 0 : ndExperimentId.hashCode());
-		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		result = prime * result + ((typeId == null) ? 0 : typeId.hashCode());
 		return result;
 	}
 
@@ -113,20 +111,20 @@ public class Experiment implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Experiment other = (Experiment) obj;
-		if (geoLocation == null) {
-			if (other.geoLocation != null)
+		if (geoLocationId == null) {
+			if (other.geoLocationId != null)
 				return false;
-		} else if (!geoLocation.equals(other.geoLocation))
+		} else if (!geoLocationId.equals(other.geoLocationId))
 			return false;
 		if (ndExperimentId == null) {
 			if (other.ndExperimentId != null)
 				return false;
 		} else if (!ndExperimentId.equals(other.ndExperimentId))
 			return false;
-		if (type == null) {
-			if (other.type != null)
+		if (typeId == null) {
+			if (other.typeId != null)
 				return false;
-		} else if (!type.equals(other.type))
+		} else if (!typeId.equals(other.typeId))
 			return false;
 		return true;
 	}
@@ -136,10 +134,10 @@ public class Experiment implements Serializable {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Experiment [ndExperimentId=");
 		builder.append(ndExperimentId);
-		builder.append(", geoLocation=");
-		builder.append(geoLocation);
-		builder.append(", type=");
-		builder.append(type);
+		builder.append(", geoLocationId=");
+		builder.append(geoLocationId);
+		builder.append(", typeId=");
+		builder.append(typeId);
 		builder.append("]");
 		return builder.toString();
 	}

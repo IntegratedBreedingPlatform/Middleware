@@ -19,7 +19,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -52,9 +51,8 @@ public class CVTerm implements Serializable {
 	/**
 	 * The cv or ontology or namespace to which this cvterm belongs.
 	 */
-	@OneToOne
-	@JoinColumn(name = "cv_id")
-	private CV cv;
+	@Column(name = "cv_id")
+	private Long cvId;
 
 	/**
 	 * A concise human-readable name or label for the cvterm. Uniquely
@@ -100,11 +98,11 @@ public class CVTerm implements Serializable {
 	public CVTerm() {
 	}
 
-	public CVTerm(Long cvTermId, CV cv, String name, String definition,
+	public CVTerm(Long cvTermId, Long cv, String name, String definition,
 			Long dbxRefId, Long isObsolete, Long isRelationshipType) {
 		super();
 		this.cvTermId = cvTermId;
-		this.cv = cv;
+		this.cvId = cv;
 		this.name = name;
 		this.definition = definition;
 		this.dbxRefId = dbxRefId;
@@ -120,12 +118,12 @@ public class CVTerm implements Serializable {
 		this.cvTermId = cvTermId;
 	}
 
-	public CV getCv() {
-		return cv;
+	public Long getCv() {
+		return cvId;
 	}
 
-	public void setCv(CV cv) {
-		this.cv = cv;
+	public void setCv(Long cv) {
+		this.cvId = cv;
 	}
 
 	public String getName() {
@@ -173,7 +171,7 @@ public class CVTerm implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((cv == null) ? 0 : cv.hashCode());
+		result = prime * result + ((cvId == null) ? 0 : cvId.hashCode());
 		result = prime * result
 				+ ((cvTermId == null) ? 0 : cvTermId.hashCode());
 		result = prime * result
@@ -199,10 +197,10 @@ public class CVTerm implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		CVTerm other = (CVTerm) obj;
-		if (cv == null) {
-			if (other.cv != null)
+		if (cvId == null) {
+			if (other.cvId != null)
 				return false;
-		} else if (!cv.equals(other.cv))
+		} else if (!cvId.equals(other.cvId))
 			return false;
 		if (cvTermId == null) {
 			if (other.cvTermId != null)
@@ -242,8 +240,8 @@ public class CVTerm implements Serializable {
 		StringBuilder builder = new StringBuilder();
 		builder.append("CVTerm [cvTermId=");
 		builder.append(cvTermId);
-		builder.append(", cv=");
-		builder.append(cv);
+		builder.append(", cvId=");
+		builder.append(cvId);
 		builder.append(", name=");
 		builder.append(name);
 		builder.append(", definition=");

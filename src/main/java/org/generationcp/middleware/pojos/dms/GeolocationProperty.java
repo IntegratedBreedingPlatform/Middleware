@@ -20,7 +20,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -49,8 +49,8 @@ public class GeolocationProperty implements Serializable {
     @Column(name = "nd_geolocationprop_id")
 	private Long geolocationPropertyId;
 
-    @OneToOne
-    @JoinColumn(name = "nd_geolocation_id")
+    @ManyToOne(targetEntity = Geolocation.class)
+    @JoinColumn(name = "nd_geolocation_id", nullable = false)
 	private Geolocation geolocation;
 
     @Column(name = "value")
@@ -60,21 +60,21 @@ public class GeolocationProperty implements Serializable {
     @Column(name = "rank")
 	private Long rank;
 	
-    @OneToOne
-    @JoinColumn(name="type_id", referencedColumnName="cvterm_id")
-    private CVTerm type;
+    // References cvterm
+    @Column(name="type_id")
+    private Long typeId;
     
 	public GeolocationProperty() {
 	}
 
 	public GeolocationProperty(Long geolocationPropertyId,
-			Geolocation geolocation, String value, Long rank, CVTerm type) {
+			Geolocation geolocation, String value, Long rank, Long typeId) {
 		super();
 		this.geolocationPropertyId = geolocationPropertyId;
 		this.geolocation = geolocation;
 		this.value = value;
 		this.rank = rank;
-		this.type = type;
+		this.typeId = typeId;
 	}
 
 	public Long getGeolocationPropertyId() {
@@ -109,12 +109,12 @@ public class GeolocationProperty implements Serializable {
 		this.rank = rank;
 	}
 
-	public CVTerm getType() {
-		return type;
+	public Long getTypeId() {
+		return typeId;
 	}
 
-	public void setType(CVTerm type) {
-		this.type = type;
+	public void setType(Long typeId) {
+		this.typeId = typeId;
 	}
 
 	@Override
@@ -128,7 +128,7 @@ public class GeolocationProperty implements Serializable {
 				+ ((geolocationPropertyId == null) ? 0 : geolocationPropertyId
 						.hashCode());
 		result = prime * result + ((rank == null) ? 0 : rank.hashCode());
-		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		result = prime * result + ((typeId == null) ? 0 : typeId.hashCode());
 		result = prime * result + ((value == null) ? 0 : value.hashCode());
 		return result;
 	}
@@ -157,10 +157,10 @@ public class GeolocationProperty implements Serializable {
 				return false;
 		} else if (!rank.equals(other.rank))
 			return false;
-		if (type == null) {
-			if (other.type != null)
+		if (typeId == null) {
+			if (other.typeId != null)
 				return false;
-		} else if (!type.equals(other.type))
+		} else if (!typeId.equals(other.typeId))
 			return false;
 		if (value == null) {
 			if (other.value != null)
@@ -182,7 +182,7 @@ public class GeolocationProperty implements Serializable {
 		builder.append(", rank=");
 		builder.append(rank);
 		builder.append(", type=");
-		builder.append(type);
+		builder.append(typeId);
 		builder.append("]");
 		return builder.toString();
 	}

@@ -19,8 +19,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -54,41 +52,40 @@ public class Phenotype implements Serializable {
 	@Column(name = "name")
 	private String name;
 
-    @OneToOne
-    @JoinColumn(name="observable_id", referencedColumnName="cvterm_id")
-	private CVTerm observable;
+	// References cvterm
+    @Column(name="observable_id")
+	private Long observableId;
 
-    @OneToOne
-    @JoinColumn(name="attr_id", referencedColumnName="cvterm_id")
-	private CVTerm attribute;
+    // References cvterm
+    @Column(name="attr_id")
+	private Long attributeId;
 	
 	@Column(name = "value")
 	private String value;
 	
-    @OneToOne
-    @JoinColumn(name="cvalue_id", referencedColumnName="cvterm_id")
-	private CVTerm cValue;
+	// References cvterm
+    @Column(name="cvalue_id")
+	private Long cValueId;
 	
-    @OneToOne
-    @JoinColumn(name="assay_id", referencedColumnName="cvterm_id")
-	private CVTerm assay;
+	// References cvterm
+    @Column(name="assay_id")
+	private Long assayId;
 
 	public Phenotype() {
 	}
 
 
 	public Phenotype(Long phenotypeId, String uniqueName, String name,
-			CVTerm observable, CVTerm attribute, String value, CVTerm cValue,
-			CVTerm assay) {
-		super();
+			Long observableId, Long attributeId, String value, Long cValueId,
+			Long assayId) {
 		this.phenotypeId = phenotypeId;
 		this.uniqueName = uniqueName;
 		this.name = name;
-		this.observable = observable;
-		this.attribute = attribute;
+		this.observableId = observableId;
+		this.attributeId = attributeId;
 		this.value = value;
-		this.cValue = cValue;
-		this.assay = assay;
+		this.cValueId = cValueId;
+		this.assayId = assayId;
 	}
 
 
@@ -116,20 +113,20 @@ public class Phenotype implements Serializable {
 		this.name = name;
 	}
 
-	public CVTerm getObservable() {
-		return observable;
+	public Long getObservableId() {
+		return observableId;
 	}
 
-	public void setObservable(CVTerm observable) {
-		this.observable = observable;
+	public void setObservableId(Long observableId) {
+		this.observableId = observableId;
 	}
 
-	public CVTerm getAttribute() {
-		return attribute;
+	public Long getAttributeId() {
+		return attributeId;
 	}
 
-	public void setAttribute(CVTerm attribute) {
-		this.attribute = attribute;
+	public void setAttributeId(Long attributeId) {
+		this.attributeId = attributeId;
 	}
 
 	public String getValue() {
@@ -140,20 +137,20 @@ public class Phenotype implements Serializable {
 		this.value = value;
 	}
 
-	public CVTerm getcValue() {
-		return cValue;
+	public Long getcValueId() {
+		return cValueId;
 	}
 
-	public void setcValue(CVTerm cValue) {
-		this.cValue = cValue;
+	public void setcValue(Long cValueId) {
+		this.cValueId = cValueId;
 	}
 
-	public CVTerm getAssay() {
-		return assay;
+	public Long getAssayId() {
+		return assayId;
 	}
 
-	public void setAssay(CVTerm assay) {
-		this.assay = assay;
+	public void setAssayId(Long assayId) {
+		this.assayId = assayId;
 	}
 	
 
@@ -161,13 +158,13 @@ public class Phenotype implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((assay == null) ? 0 : assay.hashCode());
+		result = prime * result + ((assayId == null) ? 0 : assayId.hashCode());
 		result = prime * result
-				+ ((attribute == null) ? 0 : attribute.hashCode());
-		result = prime * result + ((cValue == null) ? 0 : cValue.hashCode());
+				+ ((attributeId == null) ? 0 : attributeId.hashCode());
+		result = prime * result + ((cValueId == null) ? 0 : cValueId.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result
-				+ ((observable == null) ? 0 : observable.hashCode());
+				+ ((observableId == null) ? 0 : observableId.hashCode());
 		result = prime * result
 				+ ((phenotypeId == null) ? 0 : phenotypeId.hashCode());
 		result = prime * result
@@ -185,30 +182,30 @@ public class Phenotype implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Phenotype other = (Phenotype) obj;
-		if (assay == null) {
-			if (other.assay != null)
+		if (assayId == null) {
+			if (other.assayId != null)
 				return false;
-		} else if (!assay.equals(other.assay))
+		} else if (!assayId.equals(other.assayId))
 			return false;
-		if (attribute == null) {
-			if (other.attribute != null)
+		if (attributeId == null) {
+			if (other.attributeId != null)
 				return false;
-		} else if (!attribute.equals(other.attribute))
+		} else if (!attributeId.equals(other.attributeId))
 			return false;
-		if (cValue == null) {
-			if (other.cValue != null)
+		if (cValueId == null) {
+			if (other.cValueId != null)
 				return false;
-		} else if (!cValue.equals(other.cValue))
+		} else if (!cValueId.equals(other.cValueId))
 			return false;
 		if (name == null) {
 			if (other.name != null)
 				return false;
 		} else if (!name.equals(other.name))
 			return false;
-		if (observable == null) {
-			if (other.observable != null)
+		if (observableId == null) {
+			if (other.observableId != null)
 				return false;
-		} else if (!observable.equals(other.observable))
+		} else if (!observableId.equals(other.observableId))
 			return false;
 		if (phenotypeId == null) {
 			if (other.phenotypeId != null)
@@ -237,16 +234,16 @@ public class Phenotype implements Serializable {
 		builder.append(uniqueName);
 		builder.append(", name=");
 		builder.append(name);
-		builder.append(", observable=");
-		builder.append(observable);
-		builder.append(", attribute=");
-		builder.append(attribute);
+		builder.append(", observableId=");
+		builder.append(observableId);
+		builder.append(", attributeId=");
+		builder.append(attributeId);
 		builder.append(", value=");
 		builder.append(value);
 		builder.append(", cValue=");
-		builder.append(cValue);
-		builder.append(", assay=");
-		builder.append(assay);
+		builder.append(cValueId);
+		builder.append(", assayId=");
+		builder.append(assayId);
 		builder.append("]");
 		return builder.toString();
 	}

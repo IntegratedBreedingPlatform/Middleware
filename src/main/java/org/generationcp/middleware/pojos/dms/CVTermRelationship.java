@@ -19,8 +19,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 /**
@@ -52,37 +50,37 @@ public class CVTermRelationship implements Serializable{
      * The nature of the relationship between subject and object. 
      * Note that relations are also housed in the cvterm table, typically from the OBO relationship ontology, 
      * although other relationship types are allowed.
+     * References cvterm
      */
-    @OneToOne
-    @JoinColumn(name="type_id", referencedColumnName="cvterm_id")
-    private CVTerm type;
+    @Column(name="type_id")
+    private Long typeId;
     
     /**
      * The subject of the subj-predicate-obj sentence. The cvterm_relationship is about the subject. 
      * In a graph, this typically corresponds to the child node.
+     * References cvterm
      */
-    @OneToOne
-    @JoinColumn(name="subject_id", referencedColumnName="cvterm_id")
-    private CVTerm subject;
+    @Column(name="subject_id")
+    private Long subjectId;
     
     /**
      * The object of the subj-predicate-obj sentence. The cvterm_relationship refers to the object. 
      * In a graph, this typically corresponds to the parent node.
+     * References cvterm
      */
-    @OneToOne
-    @JoinColumn(name="object_id", referencedColumnName="cvterm_id")
-    private CVTerm object;
+    @Column(name="object_id")
+    private Long objectId;
     
 	public CVTermRelationship() {
 	}
 
-	public CVTermRelationship(Long cvTermRelationshipId, CVTerm type,
-			CVTerm subject, CVTerm object) {
+	public CVTermRelationship(Long cvTermRelationshipId, Long typeId,
+			Long subjectId, Long objectId) {
 		super();
 		this.cvTermRelationshipId = cvTermRelationshipId;
-		this.type = type;
-		this.subject = subject;
-		this.object = object;
+		this.typeId = typeId;
+		this.subjectId = subjectId;
+		this.objectId = objectId;
 	}
 
 	public Long getCvTermRelationshipId() {
@@ -93,28 +91,28 @@ public class CVTermRelationship implements Serializable{
 		this.cvTermRelationshipId = cvTermRelationshipId;
 	}
 
-	public CVTerm getType() {
-		return type;
+	public Long getTypeId() {
+		return typeId;
 	}
 
-	public void setType(CVTerm type) {
-		this.type = type;
+	public void setTypeId(Long typeId) {
+		this.typeId = typeId;
 	}
 
-	public CVTerm getSubject() {
-		return subject;
+	public Long getSubjectId() {
+		return subjectId;
 	}
 
-	public void setSubject(CVTerm subject) {
-		this.subject = subject;
+	public void setSubjectId(Long subjectId) {
+		this.subjectId = subjectId;
 	}
 
-	public CVTerm getObject() {
-		return object;
+	public Long getObjectId() {
+		return objectId;
 	}
 
-	public void setObject(CVTerm object) {
-		this.object = object;
+	public void setObjectId(Long objectId) {
+		this.objectId = objectId;
 	}
 
 	@Override
@@ -125,9 +123,9 @@ public class CVTermRelationship implements Serializable{
 				* result
 				+ ((cvTermRelationshipId == null) ? 0 : cvTermRelationshipId
 						.hashCode());
-		result = prime * result + ((object == null) ? 0 : object.hashCode());
-		result = prime * result + ((subject == null) ? 0 : subject.hashCode());
-		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		result = prime * result + ((objectId == null) ? 0 : objectId.hashCode());
+		result = prime * result + ((subjectId == null) ? 0 : subjectId.hashCode());
+		result = prime * result + ((typeId == null) ? 0 : typeId.hashCode());
 		return result;
 	}
 
@@ -145,20 +143,20 @@ public class CVTermRelationship implements Serializable{
 				return false;
 		} else if (!cvTermRelationshipId.equals(other.cvTermRelationshipId))
 			return false;
-		if (object == null) {
-			if (other.object != null)
+		if (objectId == null) {
+			if (other.objectId != null)
 				return false;
-		} else if (!object.equals(other.object))
+		} else if (!objectId.equals(other.objectId))
 			return false;
-		if (subject == null) {
-			if (other.subject != null)
+		if (subjectId == null) {
+			if (other.subjectId != null)
 				return false;
-		} else if (!subject.equals(other.subject))
+		} else if (!subjectId.equals(other.subjectId))
 			return false;
-		if (type == null) {
-			if (other.type != null)
+		if (typeId == null) {
+			if (other.typeId != null)
 				return false;
-		} else if (!type.equals(other.type))
+		} else if (!typeId.equals(other.typeId))
 			return false;
 		return true;
 	}
@@ -168,12 +166,12 @@ public class CVTermRelationship implements Serializable{
 		StringBuilder builder = new StringBuilder();
 		builder.append("CVTermRelationship [cvTermRelationshipId=");
 		builder.append(cvTermRelationshipId);
-		builder.append(", type=");
-		builder.append(type);
-		builder.append(", subject=");
-		builder.append(subject);
-		builder.append(", object=");
-		builder.append(object);
+		builder.append(", typeId=");
+		builder.append(typeId);
+		builder.append(", subjectId=");
+		builder.append(subjectId);
+		builder.append(", objectId=");
+		builder.append(objectId);
 		builder.append("]");
 		return builder.toString();
 	}

@@ -20,7 +20,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -51,14 +51,13 @@ public class StockProperty implements Serializable {
 	@Column(name =  "stockprop_id")
 	private Long stockPropId;
 	
-    @OneToOne
-    @JoinColumn(name = "stock_id")
+    @ManyToOne(targetEntity = Stock.class)
+    @JoinColumn(name = "stock_id", nullable = false)
 	private Stock stock;
 
-    
-    @OneToOne
-    @JoinColumn(name="type_id", referencedColumnName="cvterm_id")
-    private CVTerm type;
+    // References cvterm
+    @Column(name="type_id")
+    private Long typeId;
 
 	@Column(name = "value")
 	private String value;
@@ -89,13 +88,13 @@ public class StockProperty implements Serializable {
 	}
 
 
-	public CVTerm getType() {
-		return type;
+	public Long getTypeId() {
+		return typeId;
 	}
 
 
-	public void setType(CVTerm type) {
-		this.type = type;
+	public void setTypeId(Long typeId) {
+		this.typeId = typeId;
 	}
 
 
@@ -127,7 +126,7 @@ public class StockProperty implements Serializable {
 		result = prime * result + ((stock == null) ? 0 : stock.hashCode());
 		result = prime * result
 				+ ((stockPropId == null) ? 0 : stockPropId.hashCode());
-		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		result = prime * result + ((typeId == null) ? 0 : typeId.hashCode());
 		result = prime * result + ((value == null) ? 0 : value.hashCode());
 		return result;
 	}
@@ -157,10 +156,10 @@ public class StockProperty implements Serializable {
 				return false;
 		} else if (!stockPropId.equals(other.stockPropId))
 			return false;
-		if (type == null) {
-			if (other.type != null)
+		if (typeId == null) {
+			if (other.typeId != null)
 				return false;
-		} else if (!type.equals(other.type))
+		} else if (!typeId.equals(other.typeId))
 			return false;
 		if (value == null) {
 			if (other.value != null)
@@ -178,8 +177,8 @@ public class StockProperty implements Serializable {
 		builder.append(stockPropId);
 		builder.append(", stock=");
 		builder.append(stock);
-		builder.append(", type=");
-		builder.append(type);
+		builder.append(", typeId=");
+		builder.append(typeId);
 		builder.append(", value=");
 		builder.append(value);
 		builder.append(", rank=");

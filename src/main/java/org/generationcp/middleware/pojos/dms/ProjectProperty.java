@@ -46,6 +46,7 @@ public class ProjectProperty implements Serializable {
 	/**
 	 * The type defined in CV term.
 	 */
+	@Column(name = "type_id")
 	private Long typeId;
 	
 	/**

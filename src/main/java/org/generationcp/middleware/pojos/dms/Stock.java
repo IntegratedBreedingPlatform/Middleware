@@ -19,8 +19,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -85,10 +83,10 @@ public class Stock implements Serializable {
 	 * The type_id foreign key links to a controlled vocabulary of stock types. 
 	 * The would include living stock, genomic DNA, preserved specimen. 
 	 * Secondary cvterms for stocks would go in stock_cvterm.
+	 * References cvterm
 	 */
-    @OneToOne
-    @JoinColumn(name="type_id", referencedColumnName="cvterm_id")
-    private CVTerm type;
+    @Column(name="type_id")
+    private Long typeId;
 
 	@Basic(optional = false)
     @Column(name="is_obsolete")
@@ -150,12 +148,12 @@ public class Stock implements Serializable {
 		this.description = description;
 	}
 
-	public CVTerm getType() {
-		return type;
+	public Long getTypeId() {
+		return typeId;
 	}
 
-	public void setType(CVTerm type) {
-		this.type = type;
+	public void setTypeId(Long typeId) {
+		this.typeId = typeId;
 	}
 
 	public Boolean getIsObsolete() {
@@ -180,7 +178,7 @@ public class Stock implements Serializable {
 		result = prime * result
 				+ ((organismId == null) ? 0 : organismId.hashCode());
 		result = prime * result + ((stockId == null) ? 0 : stockId.hashCode());
-		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		result = prime * result + ((typeId == null) ? 0 : typeId.hashCode());
 		result = prime * result
 				+ ((uniqueName == null) ? 0 : uniqueName.hashCode());
 		result = prime * result + ((value == null) ? 0 : value.hashCode());
@@ -226,10 +224,10 @@ public class Stock implements Serializable {
 				return false;
 		} else if (!stockId.equals(other.stockId))
 			return false;
-		if (type == null) {
-			if (other.type != null)
+		if (typeId == null) {
+			if (other.typeId != null)
 				return false;
-		} else if (!type.equals(other.type))
+		} else if (!typeId.equals(other.typeId))
 			return false;
 		if (uniqueName == null) {
 			if (other.uniqueName != null)
@@ -261,8 +259,8 @@ public class Stock implements Serializable {
 		builder.append(value);
 		builder.append(", description=");
 		builder.append(description);
-		builder.append(", type=");
-		builder.append(type);
+		builder.append(", typeId=");
+		builder.append(typeId);
 		builder.append(", isObsolete=");
 		builder.append(isObsolete);
 		builder.append("]");

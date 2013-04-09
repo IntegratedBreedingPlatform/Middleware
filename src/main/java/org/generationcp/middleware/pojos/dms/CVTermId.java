@@ -31,6 +31,12 @@ public enum CVTermId {
 	, STUDY_UID(8020L)
 	, STUDY_IP(8120L)
 	, RELEASE_DATE(8130L)
+	
+	// Numeric Data Fields
+	, NUMERIC_VARIABLE(1110L)
+	, DATE_VARIABLE(1117L)
+	, NUMERIC_DBID_VARIABLE(1118L)
+	, CHARACTER_DBID_VARIABLE(1128L)	
 	;
 	
 	private final Long id;
