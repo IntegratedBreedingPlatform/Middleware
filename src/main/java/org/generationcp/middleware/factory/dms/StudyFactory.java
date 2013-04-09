@@ -55,9 +55,7 @@ public class StudyFactory {
 		
 		ProjectPropertiesHelper helper = new ProjectPropertiesHelper(properties);
 		
-		//study.setName(helper.getString(CVTermId.STUDY_NAME));
 		study.setProjectKey(helper.getInteger(CVTermId.PM_KEY));
-		//study.setTitle(helper.getString(CVTermId.STUDY_TITLE));
 		study.setObjective(helper.getString(CVTermId.STUDY_OBJECTIVE));
 		study.setPrimaryInvestigator(helper.getInteger(CVTermId.PI_ID));
 		study.setType(helper.getString(CVTermId.STUDY_TYPE));

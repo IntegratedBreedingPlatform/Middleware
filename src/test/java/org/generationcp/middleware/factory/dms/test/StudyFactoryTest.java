@@ -103,9 +103,7 @@ public class StudyFactoryTest {
 	private List<ProjectProperty> createProjectPropertiesFromStudy(Study study) {
 		List<ProjectProperty> properties = new ArrayList<ProjectProperty>();
 		
-		//addPropertySetToList(properties, CVTermId.STUDY_NAME, study.getName(), 111L);
 		addPropertySetToList(properties, CVTermId.PM_KEY, getString(study.getProjectKey()), 2L);
-		//addPropertySetToList(properties, CVTermId.STUDY_TITLE, study.getTitle(), 3L);
 		addPropertySetToList(properties, CVTermId.STUDY_OBJECTIVE, study.getObjective(), 4L);
 		addPropertySetToList(properties, CVTermId.PI_ID, getString(study.getPrimaryInvestigator()), 5L);
 		addPropertySetToList(properties, CVTermId.STUDY_TYPE, study.getType(), 6L);
