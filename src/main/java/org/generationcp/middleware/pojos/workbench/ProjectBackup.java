@@ -33,8 +33,8 @@ public class ProjectBackup implements Serializable{
     public static final String GET_ALL_DISTINCT_PROJECT_BACKUP =
         "select project_backup_id, project_id, backup_time, backup_path from workbench_project_backup group by project_id";
 
-    public ProjectBackup(Integer projectBackupId, Long projectId, Date backupTime, String backupPath) {
-        this.projectBackupId = projectBackupId;
+    public ProjectBackup(Long projectBackupId2, Long projectId, Date backupTime, String backupPath) {
+        this.projectBackupId = projectBackupId2;
         this.projectId = projectId;
         this.backupTime = backupTime;
         this.backupPath = backupPath;
@@ -47,7 +47,7 @@ public class ProjectBackup implements Serializable{
     @Basic(optional = false)
     @GeneratedValue
     @Column(name = "project_backup_id")
-    private Integer projectBackupId;
+    private Long projectBackupId;
 
     @Basic(optional = false)
     @Column(name = "project_id")
@@ -61,11 +61,11 @@ public class ProjectBackup implements Serializable{
     @Column(name = "backup_path")
     private String backupPath;
 
-    public Integer getProjectBackupId() {
+    public Long getProjectBackupId() {
         return projectBackupId;
     }
 
-    public void setProjectBackupId(Integer projectBackupId) {
+    public void setProjectBackupId(Long projectBackupId) {
         this.projectBackupId = projectBackupId;
     }
 
