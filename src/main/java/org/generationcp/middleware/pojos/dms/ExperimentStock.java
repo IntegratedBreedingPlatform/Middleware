@@ -7,8 +7,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -34,23 +32,23 @@ public class ExperimentStock implements Serializable {
 	/**
 	 * The Experiment object.
 	 */
-	@ManyToOne(targetEntity = Experiment.class)
-	@JoinColumn(name = "nd_experiment_id", nullable = false)
-	private Experiment experiment;
+	@Basic(optional = false)
+	@Column(name = "nd_experiment_id")
+	private Long experimentId;
 	
 	/**
 	 * Stock used in the extraction or the corresponding stock for the clone.
 	 */
-	@ManyToOne(targetEntity = Stock.class)
-	@JoinColumn(name = "stock_id", nullable = false)
-	private Stock stock;
+	@Basic(optional = false)
+	@Column(name = "stock_id")
+	private Long stockId;
 	
 	/**
 	 * The Type object.
 	 */
-	@ManyToOne(targetEntity = CVTerm.class)
-	@JoinColumn(name = "type_id", nullable = false)
-	private CVTerm type;
+	@Basic(optional = false)
+	@Column(name = "type_id")
+	private Long typeId;
 
 	public Long getExperimentStockId() {
 		return experimentStockId;
@@ -60,28 +58,28 @@ public class ExperimentStock implements Serializable {
 		this.experimentStockId = experimentStockId;
 	}
 
-	public Experiment getExperiment() {
-		return experiment;
+	Long getExperimentId() {
+		return experimentId;
 	}
 
-	public void setExperiment(Experiment experiment) {
-		this.experiment = experiment;
+	void setExperimentId(Long experimentId) {
+		this.experimentId = experimentId;
 	}
 
-	public Stock getStock() {
-		return stock;
+	Long getStockId() {
+		return stockId;
 	}
 
-	public void setStock(Stock stock) {
-		this.stock = stock;
+	void setStockId(Long stockId) {
+		this.stockId = stockId;
 	}
 
-	public CVTerm getType() {
-		return type;
+	Long getTypeId() {
+		return typeId;
 	}
 
-	public void setType(CVTerm type) {
-		this.type = type;
+	void setTypeId(Long typeId) {
+		this.typeId = typeId;
 	}
 
 	@Override
@@ -115,8 +113,8 @@ public class ExperimentStock implements Serializable {
 	@Override
 	public String toString() {
 		return "ExperimentStock [experimentStockId=" + experimentStockId
-				+ ", experiment=" + experiment + ", stock=" + stock + ", type="
-				+ type + "]";
-	}	
+				+ ", experimentId=" + experimentId + ", stockId=" + stockId
+				+ ", typeId=" + typeId + "]";
+	}
 
 }
