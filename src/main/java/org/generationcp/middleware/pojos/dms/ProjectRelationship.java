@@ -7,8 +7,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -35,23 +33,23 @@ public class ProjectRelationship implements Serializable {
 	/**
 	 * The Subject of the Relationship.
 	 */
-	@ManyToOne(targetEntity = DmsProject.class)
-	@JoinColumn(name = "subject_project_id", nullable = false)
-	private DmsProject subjectProject;
+	@Basic(optional = false)
+	@Column(name = "subject_project_id")
+	private Long subjectProjectId;
 	
 	/**
 	 * The Object of the Relationship.
 	 */
-	@ManyToOne(targetEntity = DmsProject.class)
-	@JoinColumn(name = "object_project_id", nullable = false)
-	private DmsProject objectProject;
+	@Basic(optional = false)
+	@Column(name = "object_project_id")
+	private Long objectProjectId;
 	
 	/**
 	 * The Type of Relationship.
 	 */
-	@ManyToOne(targetEntity = CVTerm.class)
-	@JoinColumn(name = "type_id", nullable = false)
-	private CVTerm type;
+	@Basic(optional = false)
+	@Column(name = "type_id")
+	private Long typeId;
 
 	public Long getProjectRelationshipId() {
 		return projectRelationshipId;
@@ -61,28 +59,28 @@ public class ProjectRelationship implements Serializable {
 		this.projectRelationshipId = projectRelationshipId;
 	}
 
-	public DmsProject getSubjectProject() {
-		return subjectProject;
+	public Long getSubjectProjectId() {
+		return subjectProjectId;
 	}
 
-	public void setSubjectProject(DmsProject subjectProject) {
-		this.subjectProject = subjectProject;
+	public void setSubjectProjectId(Long subjectProjectId) {
+		this.subjectProjectId = subjectProjectId;
 	}
 
-	public DmsProject getObjectProject() {
-		return objectProject;
+	public Long getObjectProjectId() {
+		return objectProjectId;
 	}
 
-	public void setObjectProject(DmsProject objectProject) {
-		this.objectProject = objectProject;
+	public void setObjectProjectId(Long objectProjectId) {
+		this.objectProjectId = objectProjectId;
 	}
 
-	public CVTerm getType() {
-		return type;
+	public Long getTypeId() {
+		return typeId;
 	}
 
-	public void setType(CVTerm type) {
-		this.type = type;
+	public void setTypeId(Long typeId) {
+		this.typeId = typeId;
 	}
 
 	@Override
@@ -116,8 +114,9 @@ public class ProjectRelationship implements Serializable {
 	@Override
 	public String toString() {
 		return "ProjectRelationship [projectRelationshipId="
-				+ projectRelationshipId + ", subjectProject=" + subjectProject
-				+ ", objectProject=" + objectProject + ", type=" + type + "]";
+				+ projectRelationshipId + ", subjectProjectId="
+				+ subjectProjectId + ", objectProjectId=" + objectProjectId
+				+ ", typeId=" + typeId + "]";
 	}
-	
+
 }
