@@ -705,11 +705,23 @@ public class TestWorkbenchDataManagerImpl{
             System.out.println("  " + project);
         }
     }
+    
+    @Test
+    public void testGetProjectBackupsByProject() throws MiddlewareQueryException {
+        Project project = new Project();
+        project.setProjectId(1L);
+        List<ProjectBackup> projectBackups = manager.getProjectBackups(project);
 
+        System.out.println("testGetProjectBackupsByProject(): ");
+        for (ProjectBackup backup : projectBackups) {
+            System.out.println("  " + backup);
+        }
+    }
+    
     @Test
     public void testAddProjectBackup() throws MiddlewareQueryException {
         ProjectBackup projectBackup = new ProjectBackup();
-        projectBackup.setProjectId(12347);
+        projectBackup.setProjectId(12347L);
         projectBackup.setBackupPath("target/resource");
         projectBackup.setBackupTime(Calendar.getInstance().getTime());
         // add user

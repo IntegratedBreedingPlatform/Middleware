@@ -860,6 +860,14 @@ public interface WorkbenchDataManager{
      * @throws MiddlewareQueryException
      */
     public List<ProjectBackup> getProjectBackups()  throws MiddlewareQueryException;
+    
+    /**
+     * Gets the backup of the specified projects.
+     *
+     * @return the backup projects
+     * @throws MiddlewareQueryException
+     */
+    public List<ProjectBackup> getProjectBackups(Project project)  throws MiddlewareQueryException;
 
     /**
      * Save or update backup project.

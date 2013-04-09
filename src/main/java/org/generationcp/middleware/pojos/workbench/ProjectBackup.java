@@ -12,22 +12,17 @@ package org.generationcp.middleware.pojos.workbench;
  *
  *******************************************************************************/
 
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
-import java.util.Set;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
+
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 
 @Entity
@@ -38,7 +33,7 @@ public class ProjectBackup implements Serializable{
     public static final String GET_ALL_DISTINCT_PROJECT_BACKUP =
         "select project_backup_id, project_id, backup_time, backup_path from workbench_project_backup group by project_id";
 
-    public ProjectBackup(Integer projectBackupId, Integer projectId, Date backupTime, String backupPath) {
+    public ProjectBackup(Integer projectBackupId, Long projectId, Date backupTime, String backupPath) {
         this.projectBackupId = projectBackupId;
         this.projectId = projectId;
         this.backupTime = backupTime;
@@ -56,7 +51,7 @@ public class ProjectBackup implements Serializable{
 
     @Basic(optional = false)
     @Column(name = "project_id")
-    private Integer projectId;
+    private Long projectId;
 
     @Basic(optional = false)
     @Column(name = "backup_time")
@@ -74,11 +69,11 @@ public class ProjectBackup implements Serializable{
         this.projectBackupId = projectBackupId;
     }
 
-    public Integer getProjectId() {
+    public Long getProjectId() {
         return projectId;
     }
 
-    public void setProjectId(Integer projectId) {
+    public void setProjectId(Long projectId) {
         this.projectId = projectId;
     }
 
