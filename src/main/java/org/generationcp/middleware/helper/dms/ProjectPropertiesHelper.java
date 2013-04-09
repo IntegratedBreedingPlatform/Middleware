@@ -14,9 +14,8 @@ public class ProjectPropertiesHelper {
 
 	private static enum VariableType {STUDY, FACTOR, VARIATE}
 	
-	private static final List<Long> FACTOR_TYPES = Arrays.asList(
-			CVTermId.STUDY_INFORMATION.getId(), CVTermId.GERMPLASM_ENTRY.getId(), CVTermId.TRIAL_DESIGN_INFO.getId(), 
-			CVTermId.TRIAL_ENVIRONMENT_INFO.getId()
+	private static final List<Long> VARIATE_TYPES = Arrays.asList(
+			CVTermId.OBSERVATION_VARIATE.getId(), CVTermId.CATEGORICAL_VARIATE.getId()
 	);
 	
 	private List<Factor> factors;
@@ -63,16 +62,25 @@ public class ProjectPropertiesHelper {
 	}
 	
 	private void setPropertyToVariable(ProjectProperty property, Variable variable) {
-		if (CVTermId.STUDY_INFORMATION.getId().equals(property.getTypeId())) {
+		Long typeId = property.getTypeId();
+		
+		if (CVTermId.STUDY_INFORMATION.getId().equals(typeId)) {
 			variable.setType(VariableType.STUDY);
-		} else if (FACTOR_TYPES.contains(property.getTypeId()))	{
-			variable.setType(VariableType.FACTOR);
-		} else if (CVTermId.STANDARD_VARIABLE.getId().equals(property.getTypeId())) {
+			
+		} else if (CVTermId.STANDARD_VARIABLE.getId().equals(typeId)) {
 			variable.setVarId(Long.valueOf(property.getValue()));
-		} else if (CVTermId.VARIABLE_DESCRIPTION.getId().equals(property.getTypeId())) {
+			
+		} else if (CVTermId.VARIABLE_DESCRIPTION.getId().equals(typeId)) {
 			variable.setDescription(property.getValue());
+			
+		} else if (VARIATE_TYPES.contains(typeId)){
+			variable.setType(VariableType.VARIATE);
+			
 		} else {
-			variable.getUncategorized().put(property.getTypeId(), property.getValue());
+			variable.getUncategorized().put(typeId, property.getValue());
+			if (variable.getType() == null){
+				variable.setType(VariableType.FACTOR);
+			}
 		}
 	}
 	
