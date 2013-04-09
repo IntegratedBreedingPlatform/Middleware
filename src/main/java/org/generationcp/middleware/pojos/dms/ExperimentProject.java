@@ -19,8 +19,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 
@@ -49,16 +47,17 @@ public class ExperimentProject implements Serializable {
 	/**
 	 * Related Experiment entity
 	 */
-	@OneToOne
-	@JoinColumn(name = "nd_experiment_id")
-	private Experiment experiment;
+	@Basic(optional = false)
+	@Column(name = "nd_experiment_id")
+	private Long experiment;
 	
 	/**
 	 * Related Project entity
 	 */
-	@OneToOne
-	@JoinColumn(name = "project_id")
-	private DmsProject project;
+	@Basic(optional = false)
+	@Column(name = "project_id")
+	
+	private Long project;
 	
 	public ExperimentProject(){
 		
@@ -76,19 +75,19 @@ public class ExperimentProject implements Serializable {
 		this.experimentProjectId = experimentProjectId;
 	}
 
-	public Experiment getExperiment() {
+	public Long getExperiment() {
 		return experiment;
 	}
 
-	public void setExperiment(Experiment experiment) {
+	public void setExperiment(Long experiment) {
 		this.experiment = experiment;
 	}
 
-	public DmsProject getProject() {
+	public Long getProject() {
 		return project;
 	}
 
-	public void setProject(DmsProject project) {
+	public void setProject(Long project) {
 		this.project = project;
 	}
 
