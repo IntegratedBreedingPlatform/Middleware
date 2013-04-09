@@ -18,7 +18,7 @@ public class ProjectPropertiesHelper {
 			CVTermId.OBSERVATION_VARIATE.getId(), CVTermId.CATEGORICAL_VARIATE.getId()
 	);
 	
-	private List<Factor> factors;
+	private List<Factor> factors = new ArrayList<Factor>();
 	private Map<Long, String> propertyMap = new HashMap<Long, String>();
 	
 
@@ -66,6 +66,7 @@ public class ProjectPropertiesHelper {
 		
 		if (CVTermId.STUDY_INFORMATION.getId().equals(typeId)) {
 			variable.setType(VariableType.STUDY);
+			variable.setName(property.getValue());
 			
 		} else if (CVTermId.STANDARD_VARIABLE.getId().equals(typeId)) {
 			variable.setVarId(Long.valueOf(property.getValue()));
@@ -75,11 +76,13 @@ public class ProjectPropertiesHelper {
 			
 		} else if (VARIATE_TYPES.contains(typeId)){
 			variable.setType(VariableType.VARIATE);
+			variable.setName(property.getValue());
 			
 		} else {
-			variable.getUncategorized().put(typeId, property.getValue());
+			variable.setValue(property.getValue());
 			if (variable.getType() == null){
 				variable.setType(VariableType.FACTOR);
+				variable.setName(property.getValue());
 			}
 		}
 	}
@@ -89,8 +92,11 @@ public class ProjectPropertiesHelper {
 			for (Variable variable : variableList) {
 				if (variable.getType() == VariableType.STUDY) {
 					processStudy(variable);
+					processFactor(variable);
+					
 				} else if (variable.getType() == VariableType.FACTOR) {
 					processFactor(variable);
+					
 				} else if (variable.getType() == VariableType.VARIATE) {
 					
 				}
@@ -99,13 +105,15 @@ public class ProjectPropertiesHelper {
 	}
 	
 	private void processStudy(Variable variable) {
-		propertyMap.put(variable.getVarId(), variable.getUncategorized().get(variable.getVarId()));
+		propertyMap.put(variable.getVarId(), variable.getValue());
 	}
 	
 	private void processFactor(Variable variable) {
-		//TODO
-		//set the label id or factor id with the variable.varId
-		//set the factor.fname with cvterm.name
+		Factor factor = new Factor();
+		factor.setId(variable.getVarId().intValue());
+		factor.setFactorId(variable.getVarId().intValue());
+		factor.setName(variable.getName());
+		factors.add(factor);
 	}
 	
 	public String getString(CVTermId type) {
@@ -124,13 +132,11 @@ public class ProjectPropertiesHelper {
 	class Variable {
 		private VariableType type;
 		private Long varId;
+		private String name;
 		private String description;
-		Map<Long, String> uncategorized;
-		
-		Variable() {
-			this.uncategorized = new HashMap<Long, String>();
-		}
-		
+		private String value;
+				
+			
 		VariableType getType() {
 			return type;
 		}
@@ -147,6 +153,14 @@ public class ProjectPropertiesHelper {
 			this.varId = varId;
 		}
 
+		String getName() {
+			return name;
+		}
+
+		void setName(String name) {
+			this.name = name;
+		}
+
 		String getDescription() {
 			return description;
 		}
@@ -155,12 +169,13 @@ public class ProjectPropertiesHelper {
 			this.description = description;
 		}
 
-		Map<Long, String> getUncategorized() {
-			return uncategorized;
+		String getValue() {
+			return value;
 		}
 
-		void setUncategorized(Map<Long, String> uncategorized) {
-			this.uncategorized = uncategorized;
+		void setValue(String value) {
+			this.value = value;
 		}
+
 	}
 }
