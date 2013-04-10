@@ -33,8 +33,12 @@ public class ProjectBackupDAO extends GenericDAO<ProjectBackup, Long> {
 
             for (Object o : results) {
                 Object[] projectBackup = (Object[]) o;
-                Long projectBackupId = (Long) projectBackup[0];
-                Long projectId = (Long) projectBackup[1];
+
+                
+                
+                
+                Long projectBackupId = Integer.class.isInstance(projectBackup[0]) ? ((Integer)projectBackup[0]).longValue() : (Long)projectBackup[0];
+                Long projectId = Integer.class.isInstance(projectBackup[1]) ? ((Integer)projectBackup[1]).longValue() : (Long)projectBackup[1];
                 Date backupTime = (Date) projectBackup[2];
                 String backupPath = (String) projectBackup[3];
 
