@@ -13,12 +13,16 @@
 package org.generationcp.middleware.pojos.dms;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
@@ -55,6 +59,14 @@ public class Geolocation implements Serializable {
 	
     @Column(name = "altitude")
 	private Double altitude;
+    
+    /**
+	 * List of Geolocation Properties
+	 * @return
+	 */
+	@OneToMany(mappedBy = "geolocation", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+	private List<GeolocationProperty> properties;
+	
     
     public Geolocation(){
     	
@@ -113,6 +125,14 @@ public class Geolocation implements Serializable {
 		this.altitude = altitude;
 	}
     
+
+	public List<GeolocationProperty> getProperties() {
+		return properties;
+	}
+
+	public void setProperties(List<GeolocationProperty> properties) {
+		this.properties = properties;
+	}
 
 	@Override
 	public int hashCode() {
