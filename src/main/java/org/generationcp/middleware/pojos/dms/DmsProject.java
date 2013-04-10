@@ -83,6 +83,14 @@ public class DmsProject implements Serializable {
 		this.description = description;
 	}
 
+	public List<ProjectProperty> getProperties() {
+		return properties;
+	}
+
+	public void setProperties(List<ProjectProperty> properties) {
+		this.properties = properties;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
