@@ -24,7 +24,7 @@ public class CVTermRelationshipHelper {
 	);
 	
 	private List<Long> CHARACTER_FIELDS = Arrays.asList(
-			CVTermId.CHARACTER_DBID_VARIABLE.getId()
+			CVTermId.CHARACTER_DBID_VARIABLE.getId(), CVTermId.CHARACTER_VARIABLE.getId()
 	);
 	
 	public CVTermRelationshipHelper(List<CVTermRelationship> relationships) {
@@ -43,10 +43,10 @@ public class CVTermRelationshipHelper {
 				scaleMap.put(relationship.getSubjectId().intValue(), relationship.getObjectId().intValue());
 			
 			} else if (CVTermId.HAS_TYPE.getId().equals(relationship.getTypeId())) {
-				if (NUMERIC_FIELDS.contains(relationship.getTypeId())) {
+				if (NUMERIC_FIELDS.contains(relationship.getObjectId())) {
 					dataTypeMap.put(relationship.getSubjectId().intValue(), "N");
 				
-				} else if (CHARACTER_FIELDS.contains(relationship.getTypeId())) {
+				} else if (CHARACTER_FIELDS.contains(relationship.getObjectId())) {
 					dataTypeMap.put(relationship.getSubjectId().intValue(), "C");
 					
 				}
