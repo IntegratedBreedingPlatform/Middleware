@@ -123,14 +123,14 @@ public class TestWorkbenchDataManagerImpl{
         projectActivity1.setProject(projectNew1);
         projectActivity1.setName("Activity 1");
         projectActivity1.setDescription("Test Description for Activity 1");
-        projectActivity1.setDate(new Date(System.currentTimeMillis()));
+        projectActivity1.setCreatedAt(new Date(System.currentTimeMillis()));
         projectActivity1.setUser(manager.getUserById(new Integer(1)));
 
         ProjectActivity projectActivity2 = new ProjectActivity();
         projectActivity2.setProject(projectNew1);
         projectActivity2.setName("Activity 2");
         projectActivity2.setDescription("Test Description for Activity 2");
-        projectActivity2.setDate(new Date(System.currentTimeMillis()));
+        projectActivity2.setCreatedAt(new Date(System.currentTimeMillis()));
         projectActivity2.setUser(manager.getUserById(new Integer(1)));
 
         projectActivityList.add(projectActivity1);

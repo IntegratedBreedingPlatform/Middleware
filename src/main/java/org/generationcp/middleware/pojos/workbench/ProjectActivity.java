@@ -80,19 +80,19 @@ public class ProjectActivity implements Serializable{
     
     /** The date of this project activity. */
     @Column(name = "date")
-    private Date date;
+    private Date createdAt;
     
     public ProjectActivity() {
     }
 
-    public ProjectActivity(Integer projectActivityId, Project project, String name, String description, User user, Date date) {
+    public ProjectActivity(Integer projectActivityId, Project project, String name, String description, User user, Date createdAt) {
         super();
         this.projectActivityId = projectActivityId;
         this.project = project;
         this.name = name;
         this.description = description;
         this.user = user;
-        this.date = date;
+        this.createdAt = createdAt;
     }
     
     public Integer getProjectActivityId() {
@@ -135,12 +135,12 @@ public class ProjectActivity implements Serializable{
         this.user = user;
     }
     
-    public Date getDate() {
-        return date;
+    public Date getCreatedAt() {
+        return createdAt;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setCreatedAt(Date date) {
+        this.createdAt = date;
     }
 
     @Override
@@ -179,7 +179,7 @@ public class ProjectActivity implements Serializable{
         builder.append(", user=");
         builder.append(user);
         builder.append(", date=");
-        builder.append(date);
+        builder.append(createdAt);
         builder.append("]");
         return builder.toString();
     }

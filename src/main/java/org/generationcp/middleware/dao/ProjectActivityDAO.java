@@ -22,6 +22,7 @@ import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -55,6 +56,7 @@ public class ProjectActivityDAO extends GenericDAO<ProjectActivity, Integer>{
             criteria.add(Restrictions.eq("project", p));
             criteria.setFirstResult(start);
             criteria.setMaxResults(numOfRows);
+            criteria.addOrder(Order.desc("createdAt"));
             toReturn = (List<ProjectActivity>) criteria.list();
         } catch (HibernateException e) {
             logAndThrowException("Error with getByProjectId(projectId=" + projectId + ") query from ProjectActivity "
