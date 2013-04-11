@@ -78,7 +78,7 @@ public class OindexDAO extends GenericDAO<OindexDAO, Integer>{
             //first get the number of rows in the dataset
             long numOfRows = countOunitIDsByRepresentationId(representationId);
 
-            SQLQuery query = getSession().createSQLQuery(/*Oindex.GET_FACTORID_AND_LEVELNO_OF_CONDITIONS_BY_REPRESNO*/"");
+            SQLQuery query = getSession().createSQLQuery(Oindex.GET_FACTORID_AND_LEVELNO_OF_CONDITIONS_BY_REPRESNO);
             query.setParameter("represno", representationId);
             query.setParameter("count", Long.valueOf(numOfRows));
 
