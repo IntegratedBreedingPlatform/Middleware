@@ -524,6 +524,29 @@ public interface GermplasmDataManager {
      */
     public Name getPreferredAbbrevByGID(Integer gid) throws MiddlewareQueryException;
     
+    /**
+     * Returns the preferred ID of the Germplasm identified by the gid
+     * parameter.
+     * 
+     * @param gid
+     *            - id of the Germplasm
+     * @return {@code Name} POJO of the Germplasm's preferred ID.
+     *         Returns {@code null} when no preferred ID is found.
+     * @throws MiddlewareQueryException
+     */
+    public Name getPreferredIdByGID(Integer gid) throws MiddlewareQueryException;
+    
+    /**
+     * Returns a list of preferred IDs of the Germplasms associated with the
+     * Germplasm List identified by the listId parameter.
+     * 
+     * @param listId
+     *            - id of the Germplasm List
+     * @return {@code Name} A list of POJOs of the Germplasms' preferred IDs.
+     *         Returns an empty list when no preferred ID is found.
+     * @throws MiddlewareQueryException
+     */
+    public List<Name> getPreferredIdsByListId(Integer listId) throws MiddlewareQueryException;
 
     /**
      * Returns the value (NVAL field) of preferred name of the Germplasm identified by the gid

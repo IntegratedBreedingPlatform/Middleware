@@ -126,6 +126,24 @@ public class NameDAO extends GenericDAO<Name, Integer>{
         }
         return new ArrayList<Name>();
     }
+    
+    @SuppressWarnings("unchecked")
+    public List<Name> getPreferredIdsByListId(Integer listId) throws MiddlewareQueryException {
+       try {
+           SQLQuery query = getSession().createSQLQuery(Name.GET_PREFERRED_IDS_BY_LIST_ID);
+           query.setParameter("listId", listId);
+           query.addEntity("n", Name.class);
+           
+           List<Name> preferredIds = query.list();
+           if (preferredIds.isEmpty()) {
+               return new ArrayList<Name>();
+           }
+           return preferredIds;
+       } catch (HibernateException e) {
+           logAndThrowException("Error with getPreferredIdsByListId(listId=" + listId + ") query from Name " + e.getMessage(), e);
+       }
+       return new ArrayList<Name>();
+    }
 
     public Name getNameByNameId(Integer nId) throws MiddlewareQueryException {
         try {

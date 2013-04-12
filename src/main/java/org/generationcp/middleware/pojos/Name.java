@@ -37,6 +37,13 @@ public class Name implements Serializable{
             "FROM names " +
             "WHERE nval IN (:germplasmNameList)";
     
+    public static final String GET_PREFERRED_IDS_BY_LIST_ID =
+            "SELECT {n.*} " +
+            "FROM listdata ld " +
+            "JOIN names n " +
+            "ON ld.gid = n.gid " +
+            "WHERE n.nstat = 8 " +
+            "AND ld.listid = :listId";
 
     @Id
     @Basic(optional = false)

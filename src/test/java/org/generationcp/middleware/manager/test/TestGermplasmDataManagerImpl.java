@@ -520,6 +520,20 @@ public class TestGermplasmDataManagerImpl{
         Integer gid = Integer.valueOf(1);
         System.out.println("testGetPreferredAbbrevByGID(" + gid + ") RESULTS: " + manager.getPreferredAbbrevByGID(gid));
     }
+    
+    @Test
+    public void testGetPreferredIdByGID() throws Exception {
+        //tested using Rice DB
+        Integer gid = Integer.valueOf(986634);
+        System.out.println("testGetPreferredIdByGID(" + gid + ") RESULTS: " + manager.getPreferredIdByGID(gid));       
+    }
+    
+    @Test
+    public void testGetPreferredIdsByListId() throws Exception {
+        //tested using Rice DB
+        Integer listId = Integer.valueOf(2591);
+        System.out.println("testGetPreferredIdsByListId(" + listId + ") RESULTS: " + manager.getPreferredIdsByListId(listId));       
+    }
 
     @Test
     public void testGetNameByGIDAndNval() throws Exception {

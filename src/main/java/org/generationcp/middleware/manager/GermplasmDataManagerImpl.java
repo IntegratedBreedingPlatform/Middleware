@@ -424,6 +424,25 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         }
         return null;
     }
+    
+    @Override
+    public Name getPreferredIdByGID(Integer gid) throws MiddlewareQueryException {
+        if (setWorkingDatabase(gid)) {
+            List<Name> names = getNameDao().getByGIDWithFilters(gid, 8, null);
+            if (!names.isEmpty()) {
+                return names.get(0);
+            }
+        }
+        return null;
+    }
+    
+    @Override
+    public List<Name> getPreferredIdsByListId(Integer listId) throws MiddlewareQueryException {
+        if (setWorkingDatabase(listId)) {
+            return getNameDao().getPreferredIdsByListId(listId);
+        }
+        return null;
+    }
 
     @Override
     public Name getNameByGIDAndNval(Integer gid, String nval) throws MiddlewareQueryException {
