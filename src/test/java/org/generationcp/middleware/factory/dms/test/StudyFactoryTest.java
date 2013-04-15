@@ -5,7 +5,7 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-import org.generationcp.middleware.factory.dms.StudyFactory;
+import org.generationcp.middleware.v2.factory.StudyFactory;
 import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.v2.pojos.CVTermId;
 import org.generationcp.middleware.v2.pojos.DmsProject;
