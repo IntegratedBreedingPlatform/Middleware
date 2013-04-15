@@ -1,4 +1,4 @@
-package org.generationcp.middleware.pojos.dms;
+package org.generationcp.middleware.v2.pojos;
 
 public enum CVTermId {
 

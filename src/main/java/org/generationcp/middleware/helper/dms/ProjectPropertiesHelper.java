@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.generationcp.middleware.pojos.Factor;
-import org.generationcp.middleware.pojos.dms.CVTermId;
-import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.v2.pojos.CVTermId;
+import org.generationcp.middleware.v2.pojos.ProjectProperty;
 
 public class ProjectPropertiesHelper {
 

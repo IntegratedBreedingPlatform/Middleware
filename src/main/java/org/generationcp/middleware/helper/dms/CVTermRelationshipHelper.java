@@ -5,8 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.generationcp.middleware.pojos.dms.CVTermId;
-import org.generationcp.middleware.pojos.dms.CVTermRelationship;
+import org.generationcp.middleware.v2.pojos.CVTermId;
+import org.generationcp.middleware.v2.pojos.CVTermRelationship;
+
 
 public class CVTermRelationshipHelper {
 

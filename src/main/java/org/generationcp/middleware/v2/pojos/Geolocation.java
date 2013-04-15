@@ -10,7 +10,7 @@
  * 
  *******************************************************************************/
 
-package org.generationcp.middleware.pojos.dms;
+package org.generationcp.middleware.v2.pojos;
 
 import java.io.Serializable;
 import java.util.List;

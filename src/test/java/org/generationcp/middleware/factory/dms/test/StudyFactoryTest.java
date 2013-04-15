@@ -7,9 +7,9 @@ import junit.framework.Assert;
 
 import org.generationcp.middleware.factory.dms.StudyFactory;
 import org.generationcp.middleware.pojos.Study;
-import org.generationcp.middleware.pojos.dms.CVTermId;
-import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.v2.pojos.CVTermId;
+import org.generationcp.middleware.v2.pojos.DmsProject;
+import org.generationcp.middleware.v2.pojos.ProjectProperty;
 import org.junit.Test;
 
 

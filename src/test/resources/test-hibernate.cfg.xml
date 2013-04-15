@@ -75,24 +75,24 @@
   <mapping class="org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount"/>
   
   <!-- Mapping classes for new DMS schema --> 
-  <mapping class="org.generationcp.middleware.pojos.dms.Geolocation"/>
-  <mapping class="org.generationcp.middleware.pojos.dms.GeolocationProperty"/>
-  <mapping class="org.generationcp.middleware.pojos.dms.CV"/>
-  <mapping class="org.generationcp.middleware.pojos.dms.CVTerm"/>
-  <mapping class="org.generationcp.middleware.pojos.dms.CVTermRelationship"/>
-  <mapping class="org.generationcp.middleware.pojos.dms.ExperimentProperty"/>
-  <mapping class="org.generationcp.middleware.pojos.dms.CVTermSynonym"/>
-  <mapping class="org.generationcp.middleware.pojos.dms.DmsProject"/>
-  <mapping class="org.generationcp.middleware.pojos.dms.ProjectProperty"/>
-  <mapping class="org.generationcp.middleware.pojos.dms.Experiment"/>
-  <mapping class="org.generationcp.middleware.pojos.dms.Stock"/>
-  <mapping class="org.generationcp.middleware.pojos.dms.StockProperty"/>
-  <mapping class="org.generationcp.middleware.pojos.dms.Phenotype"/>
-  <mapping class="org.generationcp.middleware.pojos.dms.ExperimentPhenotype"/>
-  <mapping class="org.generationcp.middleware.pojos.dms.ExperimentProject"/>
-  <mapping class="org.generationcp.middleware.pojos.dms.ExperimentStock"/>
-  <mapping class="org.generationcp.middleware.pojos.dms.ProjectRelationship"/>
-  <mapping class="org.generationcp.middleware.pojos.dms.CVTermProperty"/>
+  <mapping class="org.generationcp.middleware.v2.pojos.Geolocation"/>
+  <mapping class="org.generationcp.middleware.v2.pojos.GeolocationProperty"/>
+  <mapping class="org.generationcp.middleware.v2.pojos.CV"/>
+  <mapping class="org.generationcp.middleware.v2.pojos.CVTerm"/>
+  <mapping class="org.generationcp.middleware.v2.pojos.CVTermRelationship"/>
+  <mapping class="org.generationcp.middleware.v2.pojos.ExperimentProperty"/>
+  <mapping class="org.generationcp.middleware.v2.pojos.CVTermSynonym"/>
+  <mapping class="org.generationcp.middleware.v2.pojos.DmsProject"/>
+  <mapping class="org.generationcp.middleware.v2.pojos.ProjectProperty"/>
+  <mapping class="org.generationcp.middleware.v2.pojos.Experiment"/>
+  <mapping class="org.generationcp.middleware.v2.pojos.Stock"/>
+  <mapping class="org.generationcp.middleware.v2.pojos.StockProperty"/>
+  <mapping class="org.generationcp.middleware.v2.pojos.Phenotype"/>
+  <mapping class="org.generationcp.middleware.v2.pojos.ExperimentPhenotype"/>
+  <mapping class="org.generationcp.middleware.v2.pojos.ExperimentProject"/>
+  <mapping class="org.generationcp.middleware.v2.pojos.ExperimentStock"/>
+  <mapping class="org.generationcp.middleware.v2.pojos.ProjectRelationship"/>
+  <mapping class="org.generationcp.middleware.v2.pojos.CVTermProperty"/>
   
   <!-- Old DMS Schema (will be removed in the future) -->
   <mapping class="org.generationcp.middleware.pojos.CharacterLevel"/>
