@@ -1,9 +1,9 @@
-package org.generationcp.middleware.factory.dms;
+package org.generationcp.middleware.v2.factory;
 
 import java.util.List;
 
-import org.generationcp.middleware.helper.dms.ProjectPropertiesHelper;
 import org.generationcp.middleware.pojos.Study;
+import org.generationcp.middleware.v2.helper.ProjectPropertiesHelper;
 import org.generationcp.middleware.v2.pojos.CVTermId;
 import org.generationcp.middleware.v2.pojos.DmsProject;
 import org.generationcp.middleware.v2.pojos.ProjectProperty;

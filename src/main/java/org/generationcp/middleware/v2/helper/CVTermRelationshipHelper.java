@@ -1,4 +1,4 @@
-package org.generationcp.middleware.helper.dms;
+package org.generationcp.middleware.v2.helper;
 
 import java.util.Arrays;
 import java.util.HashMap;
