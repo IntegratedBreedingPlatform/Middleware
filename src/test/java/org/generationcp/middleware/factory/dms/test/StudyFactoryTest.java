@@ -21,10 +21,10 @@ import org.junit.Test;
  */
 public class StudyFactoryTest {
 
-	private static DmsProject p0 = createProject(1000L, "Root", "Description for Root Parent");
-	private static DmsProject p1 = createProject(1L, "Project 1", "Description for Project 1");
-	private static DmsProject p2 = createProject(2L, null, null);
-	private static DmsProject p3 = createProject(3L, "Project 3", "Description for Project 3");
+	private static DmsProject p0 = createProject(1000, "Root", "Description for Root Parent");
+	private static DmsProject p1 = createProject(1, "Project 1", "Description for Project 1");
+	private static DmsProject p2 = createProject(2, null, null);
+	private static DmsProject p3 = createProject(3, "Project 3", "Description for Project 3");
 //	private static DmsProject p4 = createProject(4L, "Project 4", "Description for Project 4");
 
 	/**
@@ -34,10 +34,10 @@ public class StudyFactoryTest {
 	@Test
 	public void testCase1() {
 		Study s1 = new Study(1, p1.getName(), 10001, p1.getDescription(), "OBJECTIVE-P1", 10002, "TYPE-P1", 
-							20130101, 20130201, 10004, 10003, p0.getDmsProjectId().intValue(), 20130401);
+							20130101, 20130201, 10004, 10003, p0.getProjectId().intValue(), 20130401);
 		List<ProjectProperty> properties = createProjectPropertiesFromStudy(s1);
 		
-		Study study = StudyFactory.getInstance().createStudy(p1, p0.getDmsProjectId(), properties);
+		Study study = StudyFactory.getInstance().createStudy(p1, p0.getProjectId(), properties);
 		
 		Assert.assertNotNull(study);
 		assertResult(s1, study);
@@ -90,12 +90,12 @@ public class StudyFactoryTest {
 	@Test(expected = NumberFormatException.class)
 	public void testCase4() {
 		List<ProjectProperty> properties = new ArrayList<ProjectProperty>();
-		addPropertySetToList(properties, CVTermId.START_DATE, "ABCDEF", 7L);
+		addPropertySetToList(properties, CVTermId.START_DATE, "ABCDEF", 7);
 		
 		System.out.println("\n\nTEST CASE #4");
 		System.out.println("INPUT: \n\tPROJECT = " + p3 + "\n\tPARENT = " + p2 + "\n\tPROPERTIES = " + properties);
 		
-		StudyFactory.getInstance().createStudy(p3, p2.getDmsProjectId(), properties);
+		StudyFactory.getInstance().createStudy(p3, p2.getProjectId(), properties);
 	}
 	
 	//=========================  Test Data creation =====================================
@@ -103,15 +103,15 @@ public class StudyFactoryTest {
 	private List<ProjectProperty> createProjectPropertiesFromStudy(Study study) {
 		List<ProjectProperty> properties = new ArrayList<ProjectProperty>();
 		
-		addPropertySetToList(properties, CVTermId.PM_KEY, getString(study.getProjectKey()), 2L);
-		addPropertySetToList(properties, CVTermId.STUDY_OBJECTIVE, study.getObjective(), 4L);
-		addPropertySetToList(properties, CVTermId.PI_ID, getString(study.getPrimaryInvestigator()), 5L);
-		addPropertySetToList(properties, CVTermId.STUDY_TYPE, study.getType(), 6L);
-		addPropertySetToList(properties, CVTermId.START_DATE, getString(study.getStartDate()), 7L);
-		addPropertySetToList(properties, CVTermId.END_DATE, getString(study.getEndDate()), 8L);
-		addPropertySetToList(properties, CVTermId.STUDY_UID, getString(study.getUser()), 9L);
-		addPropertySetToList(properties, CVTermId.STUDY_IP, getString(study.getStatus()), 10L);
-		addPropertySetToList(properties, CVTermId.RELEASE_DATE, getString(study.getCreationDate()), 11L);
+		addPropertySetToList(properties, CVTermId.PM_KEY, getString(study.getProjectKey()), 2);
+		addPropertySetToList(properties, CVTermId.STUDY_OBJECTIVE, study.getObjective(), 4);
+		addPropertySetToList(properties, CVTermId.PI_ID, getString(study.getPrimaryInvestigator()), 5);
+		addPropertySetToList(properties, CVTermId.STUDY_TYPE, study.getType(), 6);
+		addPropertySetToList(properties, CVTermId.START_DATE, getString(study.getStartDate()), 7);
+		addPropertySetToList(properties, CVTermId.END_DATE, getString(study.getEndDate()), 8);
+		addPropertySetToList(properties, CVTermId.STUDY_UID, getString(study.getUser()), 9);
+		addPropertySetToList(properties, CVTermId.STUDY_IP, getString(study.getStatus()), 10);
+		addPropertySetToList(properties, CVTermId.RELEASE_DATE, getString(study.getCreationDate()), 11);
 		
 		return properties;
 	}
@@ -120,15 +120,15 @@ public class StudyFactoryTest {
 		return value != null ? value.toString() : null;
 	}
 	
-	private void addPropertySetToList(List<ProjectProperty> properties, CVTermId term, String value, Long rank) {
-		long startId = properties.size() > 0 ? properties.get(properties.size()-1).getProjectPropertyId() + 1L : 1L;
+	private void addPropertySetToList(List<ProjectProperty> properties, CVTermId term, String value, Integer rank) {
+		int startId = properties.size() > 0 ? properties.get(properties.size()-1).getProjectPropertyId() + 1 : 1;
 		properties.add(createProjectProperty(startId, term, value, rank));
 		properties.add(createProjectProperty(startId + 1, CVTermId.STUDY_INFORMATION, "study info", rank));
 		properties.add(createProjectProperty(startId + 2, CVTermId.VARIABLE_DESCRIPTION, "some description", rank));
 		properties.add(createProjectProperty(startId + 3, CVTermId.STANDARD_VARIABLE, term.getId().toString(), rank));
 	}
 	
-	private ProjectProperty createProjectProperty(Long id, CVTermId type, String value, Long rank) {
+	private ProjectProperty createProjectProperty(Integer id, CVTermId type, String value, Integer rank) {
 		ProjectProperty property = new ProjectProperty();
 		property.setProjectPropertyId(id);
 		property.setTypeId(type.getId());
@@ -137,9 +137,9 @@ public class StudyFactoryTest {
 		return property;
 	}
 	
-	private static DmsProject createProject(Long id, String name, String description) {
+	private static DmsProject createProject(Integer id, String name, String description) {
 		DmsProject project = new DmsProject();
-		project.setDmsProjectId(id);
+		project.setProjectId(id);
 		project.setName(name);
 		project.setDescription(description);
 		return project;

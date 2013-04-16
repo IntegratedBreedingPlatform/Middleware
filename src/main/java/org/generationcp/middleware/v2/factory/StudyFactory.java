@@ -7,6 +7,7 @@ import org.generationcp.middleware.v2.helper.ProjectPropertiesHelper;
 import org.generationcp.middleware.v2.pojos.CVTermId;
 import org.generationcp.middleware.v2.pojos.DmsProject;
 import org.generationcp.middleware.v2.pojos.ProjectProperty;
+import org.generationcp.middleware.v2.pojos.StudyDetails;
 
 /**
  * Factory class used for creating the Study POJOs.
@@ -26,7 +27,7 @@ public class StudyFactory {
 		return instance;
 	}
 	
-	public Study createStudy(DmsProject project, Long parentId, List<ProjectProperty> properties) { 
+	public Study createStudy(DmsProject project, Integer parentId, List<ProjectProperty> properties) { 
 		Study study = null;
 
 		if (project != null) {
@@ -40,12 +41,12 @@ public class StudyFactory {
 	}
 	
 	private void mapProjectToStudy(DmsProject project, Study study) {
-		study.setId(Integer.valueOf(project.getDmsProjectId().intValue()));
+		study.setId(Integer.valueOf(project.getProjectId().intValue()));
 		study.setName(project.getName());
 		study.setTitle(project.getDescription());
 	}
 	
-	private void mapParentToStudy(Long parentId, Study study) {
+	private void mapParentToStudy(Integer parentId, Study study) {
 		if (parentId != null) {
 			study.setHierarchy(parentId.intValue());
 		}
@@ -65,6 +66,24 @@ public class StudyFactory {
 		study.setStatus(helper.getInteger(CVTermId.STUDY_IP));
 		study.setCreationDate(helper.getInteger(CVTermId.RELEASE_DATE));
 		
+	}
+
+	public StudyDetails createStudyDetails(DmsProject project) {
+        ProjectPropertiesHelper helper = new ProjectPropertiesHelper(project.getProperties());
+		
+        StudyDetails studyDetails = new StudyDetails();
+        studyDetails.setId(project.getProjectId());
+        studyDetails.setName(project.getName());
+        studyDetails.setObjective(helper.getString(CVTermId.STUDY_OBJECTIVE));
+        studyDetails.setPrimaryInvestigator(helper.getInteger(CVTermId.PI_ID));
+        studyDetails.setType(helper.getString(CVTermId.STUDY_TYPE));
+        studyDetails.setStartDate(helper.getInteger(CVTermId.START_DATE));
+        studyDetails.setEndDate(helper.getInteger(CVTermId.END_DATE));
+        studyDetails.setUser(helper.getInteger(CVTermId.STUDY_UID));
+        studyDetails.setStatus(helper.getInteger(CVTermId.STUDY_IP));
+        studyDetails.setCreationDate(helper.getInteger(CVTermId.RELEASE_DATE));
+		
+		return studyDetails;
 	}
 	
 }

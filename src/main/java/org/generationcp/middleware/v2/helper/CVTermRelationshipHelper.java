@@ -20,11 +20,11 @@ public class CVTermRelationshipHelper {
 	//in Map<key, value> --> the <key> has a datatype of <value>
 	private Map<Integer, String> dataTypeMap = new HashMap<Integer, String>();
 	
-	private List<Long> NUMERIC_FIELDS = Arrays.asList(
+	private List<Integer> NUMERIC_FIELDS = Arrays.asList(
 			CVTermId.NUMERIC_VARIABLE.getId(), CVTermId.NUMERIC_DBID_VARIABLE.getId(), CVTermId.DATE_VARIABLE.getId()
 	);
 	
-	private List<Long> CHARACTER_FIELDS = Arrays.asList(
+	private List<Integer> CHARACTER_FIELDS = Arrays.asList(
 			CVTermId.CHARACTER_DBID_VARIABLE.getId(), CVTermId.CHARACTER_VARIABLE.getId()
 	);
 	

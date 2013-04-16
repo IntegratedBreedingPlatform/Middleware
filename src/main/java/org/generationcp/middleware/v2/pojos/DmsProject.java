@@ -35,7 +35,7 @@ public class DmsProject implements Serializable {
 	@Basic(optional = false)
 	@GeneratedValue
 	@Column(name = "project_id")
-	private Long dmsProjectId;
+	private Integer projectId;
 	
 	/**
 	 * The name of the project.
@@ -55,16 +55,16 @@ public class DmsProject implements Serializable {
 	 * List of Project Properties
 	 * @return
 	 */
-	@OneToMany(mappedBy = "project", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "project", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.EAGER)
 	private List<ProjectProperty> properties;
 	
 	
-	public Long getDmsProjectId() {
-		return dmsProjectId;
+	public Integer getProjectId() {
+		return projectId;
 	}
 
-	public void setDmsProjectId(Long dmsProjectId) {
-		this.dmsProjectId = dmsProjectId;
+	public void setProjectId(Integer projectId) {
+		this.projectId = projectId;
 	}
 
 	public String getName() {
@@ -96,7 +96,7 @@ public class DmsProject implements Serializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
-				+ ((dmsProjectId == null) ? 0 : dmsProjectId.hashCode());
+				+ ((projectId == null) ? 0 : projectId.hashCode());
 		return result;
 	}
 
@@ -109,17 +109,17 @@ public class DmsProject implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		DmsProject other = (DmsProject) obj;
-		if (dmsProjectId == null) {
-			if (other.dmsProjectId != null)
+		if (projectId == null) {
+			if (other.projectId != null)
 				return false;
-		} else if (!dmsProjectId.equals(other.dmsProjectId))
+		} else if (!projectId.equals(other.projectId))
 			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "DmsProject [dmsProjectId=" + dmsProjectId + ", name=" + name
+		return "DmsProject [projectId=" + projectId + ", name=" + name
 				+ ", description=" + description 
 				//+ ", parent=" + (parent != null ? parent.getDmsProjectId() : "null")
 				;

@@ -12,6 +12,9 @@
 
 package org.generationcp.middleware.v2.manager.api;
 
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.v2.pojos.StudyDetails;
+
 /**
  * This is the API for retrieving phenotypic data stored as Studies and
  * datasets from the CHADO schema.
@@ -20,4 +23,12 @@ package org.generationcp.middleware.v2.manager.api;
  */
 public interface StudyDataManager {
 
+	/**
+	 * Get the Study Details for a specific study.
+	 * 
+	 * @param studyId the study's unique id
+	 * @return the study details or null if not found
+	 * @throws MiddlewareQueryException 
+	 */
+	StudyDetails getStudyDetails(int studyId) throws MiddlewareQueryException;
 }

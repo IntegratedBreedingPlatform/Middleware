@@ -34,7 +34,7 @@ public class ProjectProperty implements Serializable {
 	@Basic(optional = false)
 	@GeneratedValue
 	@Column(name = "projectprop_id")
-	private Long projectPropertyId;
+	private Integer projectPropertyId;
 	
 	/**
 	 * The DMS Project associated with this property.
@@ -47,7 +47,7 @@ public class ProjectProperty implements Serializable {
 	 * The type defined in CV term.
 	 */
 	@Column(name = "type_id")
-	private Long typeId;
+	private Integer typeId;
 	
 	/**
 	 * The value of the property.
@@ -59,13 +59,13 @@ public class ProjectProperty implements Serializable {
 	 * Used for grouping compound properties.
 	 */
 	@Column(name = "rank")
-	private Long rank;
+	private Integer rank;
 
-	public Long getProjectPropertyId() {
+	public Integer getProjectPropertyId() {
 		return projectPropertyId;
 	}
 
-	public void setProjectPropertyId(Long id) {
+	public void setProjectPropertyId(Integer id) {
 		this.projectPropertyId = id;
 	}
 
@@ -77,11 +77,11 @@ public class ProjectProperty implements Serializable {
 		this.project = project;
 	}
 
-	public Long getTypeId() {
+	public Integer getTypeId() {
 		return typeId;
 	}
 
-	public void setTypeId(Long type) {
+	public void setTypeId(Integer type) {
 		this.typeId = type;
 	}
 
@@ -93,11 +93,11 @@ public class ProjectProperty implements Serializable {
 		this.value = value;
 	}
 
-	public Long getRank() {
+	public Integer getRank() {
 		return rank;
 	}
 
-	public void setRank(Long rank) {
+	public void setRank(Integer rank) {
 		this.rank = rank;
 	}
 

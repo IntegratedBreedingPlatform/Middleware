@@ -31,6 +31,7 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+//import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.TraitDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.hibernate.HibernateException;
@@ -274,6 +275,10 @@ public class ManagerFactory implements Serializable {
 
     public StudyDataManager getStudyDataManager() throws ConfigException {
         return new StudyDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    public org.generationcp.middleware.v2.manager.api.StudyDataManager getNewStudyDataManager() throws ConfigException {
+    	return new org.generationcp.middleware.v2.manager.StudyDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
     }
 
     public InventoryDataManager getInventoryDataManager() throws ConfigException {
