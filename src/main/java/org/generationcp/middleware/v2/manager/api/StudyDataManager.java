@@ -12,8 +12,12 @@
 
 package org.generationcp.middleware.v2.manager.api;
 
+import java.util.List;
+
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.v2.pojos.StudyDetails;
+import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.v2.pojos.Folder;
 
 /**
  * This is the API for retrieving phenotypic data stored as Studies and
@@ -31,4 +35,15 @@ public interface StudyDataManager {
 	 * @throws MiddlewareQueryException 
 	 */
 	StudyDetails getStudyDetails(int studyId) throws MiddlewareQueryException;
+	
+	/**
+	 * Returns list of root or top-level folders from specified database
+	 * 
+	 * @param instance
+	 *            - can be CENTRAL or LOCAL
+	 * @return List of Folder POJOs or null if none found
+	 * @throws MiddlewareQueryException 
+	 */
+	public List<Folder> getRootFolders(Database instance) throws MiddlewareQueryException;
+	
 }

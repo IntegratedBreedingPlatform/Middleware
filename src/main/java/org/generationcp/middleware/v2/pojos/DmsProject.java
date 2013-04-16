@@ -30,6 +30,15 @@ import javax.persistence.UniqueConstraint;
 public class DmsProject implements Serializable {
 
 	private static final long serialVersionUID = 464731947805951726L;
+	
+	public static final String GET_ROOT_FOLDERS = 
+		"SELECT DISTINCT p.project_id, p.name " +
+		"FROM Project p " +
+        "INNER JOIN project_relationship r ON r.object_project_id = p.project_id " +
+        "WHERE r.type_id = 1140 " +
+        "AND NOT EXISTS " +
+        "( SELECT 1 FROM project_relationship child " +
+        "  WHERE child.subject_project_id = p.project_id)";
 
 	@Id
 	@Basic(optional = false)

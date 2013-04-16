@@ -1,18 +1,23 @@
 package org.generationcp.middleware.v2.manager;
 
+import java.util.List;
+
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DataManager;
+import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.v2.dao.DmsProjectDao;
 import org.generationcp.middleware.v2.factory.StudyFactory;
 import org.generationcp.middleware.v2.manager.api.StudyDataManager;
 import org.generationcp.middleware.v2.pojos.DmsProject;
+import org.generationcp.middleware.v2.pojos.Folder;
 import org.generationcp.middleware.v2.pojos.StudyDetails;
 import org.hibernate.Session;
 
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
 
 	private DmsProjectDao dmsProjectDao;
+	
 
 	public StudyDataManagerImpl() { }
 
@@ -47,4 +52,15 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		}
 		return null;
 	}
+	
+	@Override
+	public List<Folder> getRootFolders(Database instance) throws MiddlewareQueryException{
+			
+		if (setWorkingDatabase(instance, getDmsProjectDao())){
+			return getDmsProjectDao().getRootFolders();
+		}
+		
+		return null;
+	}
+
 }
