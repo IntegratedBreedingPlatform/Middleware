@@ -11,14 +11,11 @@ import org.generationcp.middleware.v2.pojos.CVTermRelationship;
 
 public class CVTermRelationshipHelper {
 
-	//in Map<key, value> --> the <key> has a property of <value>
 	private Map<Integer, Integer> propertyMap = new HashMap<Integer, Integer>();
-	//in Map<key, value> --> the <key> has a method of <value>
 	private Map<Integer, Integer> methodMap = new HashMap<Integer, Integer>();
-	//in Map<key, value> --> the <key> has a scale of <value>
 	private Map<Integer, Integer> scaleMap = new HashMap<Integer, Integer>();
-	//in Map<key, value> --> the <key> has a datatype of <value>
 	private Map<Integer, String> dataTypeMap = new HashMap<Integer, String>();
+	private Map<Integer, Integer> storedInMap = new HashMap<Integer, Integer>();
 	
 	private List<Integer> NUMERIC_FIELDS = Arrays.asList(
 			CVTermId.NUMERIC_VARIABLE.getId(), CVTermId.NUMERIC_DBID_VARIABLE.getId(), CVTermId.DATE_VARIABLE.getId()
@@ -28,6 +25,10 @@ public class CVTermRelationshipHelper {
 			CVTermId.CHARACTER_DBID_VARIABLE.getId(), CVTermId.CHARACTER_VARIABLE.getId()
 	);
 	
+	private static final List<Integer> VARIATE_TYPES = Arrays.asList(
+			CVTermId.OBSERVATION_VARIATE.getId(), CVTermId.CATEGORICAL_VARIATE.getId()
+	);
+
 	public CVTermRelationshipHelper(List<CVTermRelationship> relationships) {
 		translateRelationshipsToMaps(relationships);
 	}
@@ -51,6 +52,9 @@ public class CVTermRelationshipHelper {
 					dataTypeMap.put(relationship.getSubjectId().intValue(), "C");
 					
 				}
+				
+			} else if (CVTermId.STORED_IN.getId().equals(relationship.getTypeId())) {
+				storedInMap.put(relationship.getSubjectId().intValue(), relationship.getObjectId().intValue());
 			}
 		}
 	}
@@ -69,6 +73,19 @@ public class CVTermRelationshipHelper {
 	
 	public String getDataType(Integer varId) {
 		return dataTypeMap.get(varId);
+	}
+	
+	public Integer getStoredIn(Integer varId) {
+		return storedInMap.get(varId);
+	}
+	
+	public boolean isFactor(Integer varId) {
+		return !isVariate(varId);
+	}
+	
+	public boolean isVariate(Integer varId) {
+		Integer storedInId = storedInMap.get(varId);
+		return (storedInId != null && VARIATE_TYPES.contains(storedInId));
 	}
 	
 }
