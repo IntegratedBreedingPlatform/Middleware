@@ -55,7 +55,31 @@ public class Tool implements Serializable{
     @Enumerated(value=EnumType.STRING)
     private ToolType toolType;
 
-    @Basic(optional = false)
+    @Basic(optional = true)
+    @Column(name = "parameter")
+    private String parameter;    
+    
+	@Basic(optional = false)
+    @Column(name = "user_tool")
+    private Boolean userTool;
+
+    public String getParameter() {
+		return parameter;
+	}
+
+	public void setParameter(String parameter) {
+		this.parameter = parameter;
+	}
+	
+    public Boolean getUserTool() {
+		return userTool;
+	}
+
+	public void setUserTool(Boolean userTool) {
+		this.userTool = userTool;
+	}
+
+	@Basic(optional = false)
     @Column(name = "path")
     private String path;
 
@@ -118,6 +142,10 @@ public class Tool implements Serializable{
         builder.append(toolType);
         builder.append(", path=");
         builder.append(path);
+        builder.append(", parameter=");
+        builder.append(parameter);
+        builder.append(", userTool=");
+        builder.append(userTool);
         builder.append("]");
         return builder.toString();
     }
