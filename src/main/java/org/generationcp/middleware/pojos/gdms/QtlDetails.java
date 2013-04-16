@@ -89,9 +89,24 @@ public class QtlDetails implements Serializable{
             "SELECT DISTINCT map_id " 
             + "FROM gdms_qtl_details "
             + "WHERE qtl_id = (SELECT qtl_id FROM gdms_qtl WHERE qtl_name = :qtlName) " ;
-;
+    		;
+    		
+    public static final String GET_QTL_TRAITS_BY_DATASET_ID = 
+    		"SELECT DISTINCT CONCAT(gqd.trait,'') " 
+    		+ "FROM gdms_qtl gq  "
+    		+ "INNER JOIN gdms_qtl_details gqd  " 
+    		+ "ON gq.qtl_id = gqd.qtl_id  "
+    		+ "WHERE gq.dataset_id = :datasetId  "
+    		;
 
-    /** The id. */
+    public static final String COUNT_QTL_TRAITS_BY_DATASET_ID = 
+    		"SELECT COUNT(DISTINCT CONCAT(gqd.trait,'')) " 
+    		+ "FROM gdms_qtl gq  "
+    		+ "INNER JOIN gdms_qtl_details gqd  " 
+    		+ "ON gq.qtl_id = gqd.qtl_id  "
+    		+ "WHERE gq.dataset_id = :datasetId  "
+    		;
+
     @EmbeddedId
     protected QtlDetailsPK id;
     

@@ -167,4 +167,36 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer>{
         }
         return 0;
     }
+    
+    public List<String> getDatasetNamesByQtlId(Integer qtlId, int start, int numOfRows) throws MiddlewareQueryException {
+        try {
+            SQLQuery query = getSession().createSQLQuery(Dataset.GET_DATASET_NAMES_BY_QTL_ID);
+            query.setParameter("qtlId", qtlId);
+            query.setFirstResult(start);
+            query.setMaxResults(numOfRows);
+            return (List<String>) query.list();
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getDatasetNamesByQtlId() query from Dataset: " + e.getMessage(), e);
+        }
+        return new ArrayList<String>();
+
+	}
+
+	public long countDatasetNamesByQtlId(Integer qtlId)
+			throws MiddlewareQueryException {
+		try {
+			Query query = getSession().createSQLQuery(Dataset.COUNT_DATASET_NAMES_BY_QTL_ID);
+			query.setParameter("qtlId", qtlId);
+			BigInteger result = (BigInteger) query.uniqueResult();
+			if (result != null) {
+				return result.longValue();
+			}
+		} catch (HibernateException e) {
+			logAndThrowException("Error with countDatasetNamesByQtlId() query from Dataset: " + e.getMessage(), e);
+		}
+		return 0;
+    }
+    
+    
+    
 }

@@ -348,6 +348,19 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
 
     @Override
+    public List<String> getDatasetNamesByQtlId(Integer qtlId, int start, int numOfRows) throws MiddlewareQueryException {
+        List<String> methods = Arrays.asList("countDatasetNamesByQtlId", "getDatasetNamesByQtlId");
+        return (List<String>) super.getFromCentralAndLocalByMethod(getDatasetDao(), methods, start, numOfRows,
+        		new Object[] { qtlId }, new Class[] { Integer.class });
+    }
+
+    @Override
+    public long countDatasetNamesByQtlId(Integer qtlId) throws MiddlewareQueryException {
+        return super.countAllFromCentralAndLocalByMethod(getDatasetDao(), "countDatasetNamesByQtlId", 
+        		new Object[] { qtlId }, new Class[] { Integer.class });
+    }
+
+    @Override
     public List<DatasetElement> getDatasetDetailsByDatasetName(String datasetName, Database instance) throws MiddlewareQueryException {
         return (List<DatasetElement>) super.getFromInstanceByMethod(getDatasetDao(), instance, "getDetailsByName",
                 new Object[] { datasetName }, new Class[] { String.class });
@@ -853,6 +866,18 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public long countQtlByTrait(String trait) throws MiddlewareQueryException {
         return super.countAllFromCentralAndLocalByMethod(getQtlDao(), "countQtlByTrait", new Object[]{trait}, new Class[]{String.class});
+    }
+
+    @Override
+    public List<String> getQtlTraitsByDatasetId(Integer datasetId, int start, int numOfRows) throws MiddlewareQueryException{
+        return (List<String>) super.getFromInstanceByIdAndMethod(getQtlDetailsDao(), datasetId, "getQtlTraitsByDatasetId", 
+        		new Object[]{datasetId, start, numOfRows}, new Class[]{Integer.class, Integer.TYPE, Integer.TYPE});
+    }
+
+    @Override
+    public long countQtlTraitsByDatasetId(Integer datasetId) throws MiddlewareQueryException{
+    	return super.countFromInstanceByIdAndMethod(getQtlDetailsDao(), datasetId, "countQtlTraitsByDatasetId", 
+    			new Object[]{datasetId}, new Class[]{Integer.class});
     }
 
     @Override

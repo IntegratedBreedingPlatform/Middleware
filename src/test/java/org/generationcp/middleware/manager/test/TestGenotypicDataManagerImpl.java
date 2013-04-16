@@ -125,6 +125,20 @@ public class TestGenotypicDataManagerImpl{
     }
 
     @Test
+    public void testGetDatasetNamesByQtlId() throws Exception {
+    	Integer qtlId = 1;    		// Crop tested: Groundnut
+        List<String> results = manager.getDatasetNamesByQtlId(qtlId, 0, 5);
+        System.out.println("testGetDatasetNamesByQtlId(0,5) RESULTS: " + results);
+    }
+
+    @Test
+    public void testCountDatasetNamesByQtlId() throws Exception {
+    	Integer qtlId = 1;   		// Crop tested: Groundnut 
+        long results = manager.countDatasetNamesByQtlId(qtlId);
+        System.out.println("testCountDatasetNamesByQtlId() RESULTS: " + results);
+    }
+
+    @Test
     public void testGetDatasetDetailsByDatasetName() throws Exception {
         String datasetName = "MARS";
         List<DatasetElement> results = manager.getDatasetDetailsByDatasetName(datasetName, Database.LOCAL);
@@ -708,6 +722,22 @@ public class TestGenotypicDataManagerImpl{
         String qtlTrait = "SL%";     // Crop tested: Groundnut
         long count = manager.countQtlByTrait(qtlTrait);
         System.out.println("testCountQtlByTrait() RESULTS: " + count);
+    }    
+    
+    @Test
+    public void testGetQtlTraitsByDatasetId() throws Exception {
+    	Integer datasetId = 7;		// Crop tested: Groundnut
+        List<String> results = manager.getQtlTraitsByDatasetId(datasetId, 0, 
+                (int) manager.countQtlTraitsByDatasetId(datasetId));
+        System.out.println("testGetQtlTraitsByDatasetId() RESULTS: " + results);
+    }
+
+
+    @Test
+    public void testCountQtlTraitsByDatasetId() throws Exception { 
+    	Integer datasetId = 7;		// Crop tested: Groundnut
+        long count = manager.countQtlTraitsByDatasetId(datasetId);
+        System.out.println("testCountQtlTraitsByDatasetId() RESULTS: " + count);
     }    
     
     @Test

@@ -156,6 +156,37 @@ public interface GenotypicDataManager{
      */
     public List<String> getDatasetNames(int start, int numOfRows, Database instance) throws MiddlewareQueryException;
 
+
+    /**
+     * Gets the dataset names from the dataset table based on the given qtl id. 
+     * Retrieves from both local and central database instances.
+     * 
+     * @param qtlId 
+     *          - the QTL ID to match
+     * @param start 
+     *          - the starting index of the sublist of results to be returned
+     * @param numOfRows 
+     *          - the number of rows to be included in the sublist of results 
+     *          to be returned
+     * @return List of the dataset names based on the given qtl Id 
+     *          from both local and central database instances
+     * @throws MiddlewareQueryException
+     */
+    public List<String> getDatasetNamesByQtlId(Integer qtlId, int start, int numOfRows) throws MiddlewareQueryException;
+
+
+    /**
+     * Counts the dataset names from the dataset table based on the given qtl id. 
+     * Counts from both local and central database instances.
+     * 
+     * @param qtlId 
+     *          - the QTL ID to match
+     * @return the number of dataset names based on the given qtl Id 
+     *          from both local and central database instances
+     * @throws MiddlewareQueryException
+     */
+    public long countDatasetNamesByQtlId(Integer qtlId) throws MiddlewareQueryException;
+
     /**
      * Gets the dataset details (dataset id, dataset type) 
      * from the dataset table by dataset name.
@@ -1003,6 +1034,34 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException
      */
     public long countQtlByTrait(String trait) throws MiddlewareQueryException;
+
+    /**
+     * Retrieves the QTL traits from gdms_qtl_details table matching the given the dataset ID.
+     * If the dataset ID is positive, the traits are retrieved from central, otherwise they are retrieved from local.
+     * 
+     * @param datasetId 
+     *          - the datasetId to match       
+     * @param start 
+     *          - the starting index of the sublist of results to be returned
+     * @param numOfRows 
+     *          - the number of rows to be included in the sublist of results 
+     *          to be returned
+
+     * @return List of QTL traits
+     * @throws MiddlewareQueryException
+     */
+    public List<String> getQtlTraitsByDatasetId(Integer datasetId, int start, int numOfRows) throws MiddlewareQueryException;
+    
+    /**
+     * Returns the number of QTL traits from the gdms_qtl_details table matching the given dataset ID
+     * 
+     * @param datasetId 
+     *          - the datasetId to match       
+     * 
+     * @return Count of QTL traits
+     * @throws MiddlewareQueryException
+     */
+    public long countQtlTraitsByDatasetId(Integer datasetId) throws MiddlewareQueryException;
 
     /**
      * Returns all the parents from mapping population

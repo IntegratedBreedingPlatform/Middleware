@@ -146,5 +146,37 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
         }
         return 0L;
     }
+    
+    
+    public List<String> getQtlTraitsByDatasetId(Integer datasetId, int start, int numOfRows) throws MiddlewareQueryException{
+        try {
+            SQLQuery query = getSession().createSQLQuery(QtlDetails.GET_QTL_TRAITS_BY_DATASET_ID);
+            query.setParameter("datasetId", datasetId);
+            query.setFirstResult(start);
+            query.setMaxResults(numOfRows);
+            return (List<String>) query.list();
+            
+        } catch (HibernateException e) {
+        	logAndThrowException("Error with getQtlTraitsByDatasetId() query from QtlDetails: " + e.getMessage(), e);    
+        }
+        return new ArrayList<String>();
+    }
+    
+    public long countQtlTraitsByDatasetId(Integer datasetId)  throws MiddlewareQueryException{
+        try {
+            SQLQuery query = getSession().createSQLQuery(QtlDetails.COUNT_QTL_TRAITS_BY_DATASET_ID);
+            query.setParameter("datasetId", datasetId);
+            BigInteger result = (BigInteger) query.uniqueResult();
+            if (result != null) {
+                return result.longValue();
+            } else {
+                return 0L;
+            }
+            
+        } catch (HibernateException e) {
+        	logAndThrowException("Error with countQtlTraitsByDatasetId() query from QtlDetails: " + e.getMessage(), e);    
+        }
+        return 0L;
+    }
 
 }
