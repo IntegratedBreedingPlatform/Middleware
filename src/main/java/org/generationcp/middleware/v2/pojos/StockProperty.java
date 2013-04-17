@@ -49,7 +49,7 @@ public class StockProperty implements Serializable {
 	@Basic(optional = false)
 	@GeneratedValue
 	@Column(name =  "stockprop_id")
-	private Long stockPropId;
+	private Integer stockPropId;
 	
     @ManyToOne(targetEntity = Stock.class)
     @JoinColumn(name = "stock_id", nullable = false)
@@ -57,7 +57,7 @@ public class StockProperty implements Serializable {
 
     // References cvterm
     @Column(name="type_id")
-    private Long typeId;
+    private Integer typeId;
 
 	@Column(name = "value")
 	private String value;
@@ -65,15 +65,15 @@ public class StockProperty implements Serializable {
 
 	@Basic(optional = false)
 	@Column(name = "rank")
-	private Long rank;
+	private Integer rank;
 
 
-	public Long getStockPropId() {
+	public Integer getStockPropId() {
 		return stockPropId;
 	}
 
 
-	public void setStockPropId(Long stockPropId) {
+	public void setStockPropId(Integer stockPropId) {
 		this.stockPropId = stockPropId;
 	}
 
@@ -88,12 +88,12 @@ public class StockProperty implements Serializable {
 	}
 
 
-	public Long getTypeId() {
+	public Integer getTypeId() {
 		return typeId;
 	}
 
 
-	public void setTypeId(Long typeId) {
+	public void setTypeId(Integer typeId) {
 		this.typeId = typeId;
 	}
 
@@ -108,12 +108,12 @@ public class StockProperty implements Serializable {
 	}
 
 
-	public Long getRank() {
+	public Integer getRank() {
 		return rank;
 	}
 
 
-	public void setRank(Long rank) {
+	public void setRank(Integer rank) {
 		this.rank = rank;
 	}
 

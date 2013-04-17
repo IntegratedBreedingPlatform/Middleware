@@ -19,7 +19,11 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.WhereJoinTable;
 
 /**
  * 
@@ -53,7 +57,7 @@ public class CVTermRelationship implements Serializable{
      * References cvterm
      */
     @Column(name="type_id")
-    private Long typeId;
+    private Integer typeId;
     
     /**
      * The subject of the subj-predicate-obj sentence. The cvterm_relationship is about the subject. 
@@ -61,26 +65,28 @@ public class CVTermRelationship implements Serializable{
      * References cvterm
      */
     @Column(name="subject_id")
-    private Long subjectId;
+    private Integer subjectId;
     
     /**
      * The object of the subj-predicate-obj sentence. The cvterm_relationship refers to the object. 
      * In a graph, this typically corresponds to the parent node.
      * References cvterm
      */
-    @Column(name="object_id")
-    private Long objectId;
+    @ManyToOne(targetEntity = CVTerm.class)
+	@JoinColumn(name = "object_id", nullable = false, referencedColumnName = "cvterm_id")
+    @WhereJoinTable(clause = "is_obsolete = 0")
+    private CVTerm object;
     
 	public CVTermRelationship() {
 	}
 
-	public CVTermRelationship(Long cvTermRelationshipId, Long typeId,
-			Long subjectId, Long objectId) {
+	public CVTermRelationship(Long cvTermRelationshipId, Integer typeId,
+			Integer subjectId, CVTerm object) {
 		super();
 		this.cvTermRelationshipId = cvTermRelationshipId;
 		this.typeId = typeId;
 		this.subjectId = subjectId;
-		this.objectId = objectId;
+		this.object = object;
 	}
 
 	public Long getCvTermRelationshipId() {
@@ -91,28 +97,28 @@ public class CVTermRelationship implements Serializable{
 		this.cvTermRelationshipId = cvTermRelationshipId;
 	}
 
-	public Long getTypeId() {
+	public Integer getTypeId() {
 		return typeId;
 	}
 
-	public void setTypeId(Long typeId) {
+	public void setTypeId(Integer typeId) {
 		this.typeId = typeId;
 	}
 
-	public Long getSubjectId() {
+	public Integer getSubjectId() {
 		return subjectId;
 	}
 
-	public void setSubjectId(Long subjectId) {
+	public void setSubjectId(Integer subjectId) {
 		this.subjectId = subjectId;
 	}
 
-	public Long getObjectId() {
-		return objectId;
+	public CVTerm getObject() {
+		return object;
 	}
 
-	public void setObjectId(Long objectId) {
-		this.objectId = objectId;
+	public void setObject(CVTerm object) {
+		this.object = object;
 	}
 
 	@Override
@@ -123,9 +129,6 @@ public class CVTermRelationship implements Serializable{
 				* result
 				+ ((cvTermRelationshipId == null) ? 0 : cvTermRelationshipId
 						.hashCode());
-		result = prime * result + ((objectId == null) ? 0 : objectId.hashCode());
-		result = prime * result + ((subjectId == null) ? 0 : subjectId.hashCode());
-		result = prime * result + ((typeId == null) ? 0 : typeId.hashCode());
 		return result;
 	}
 
@@ -143,39 +146,14 @@ public class CVTermRelationship implements Serializable{
 				return false;
 		} else if (!cvTermRelationshipId.equals(other.cvTermRelationshipId))
 			return false;
-		if (objectId == null) {
-			if (other.objectId != null)
-				return false;
-		} else if (!objectId.equals(other.objectId))
-			return false;
-		if (subjectId == null) {
-			if (other.subjectId != null)
-				return false;
-		} else if (!subjectId.equals(other.subjectId))
-			return false;
-		if (typeId == null) {
-			if (other.typeId != null)
-				return false;
-		} else if (!typeId.equals(other.typeId))
-			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("CVTermRelationship [cvTermRelationshipId=");
-		builder.append(cvTermRelationshipId);
-		builder.append(", typeId=");
-		builder.append(typeId);
-		builder.append(", subjectId=");
-		builder.append(subjectId);
-		builder.append(", objectId=");
-		builder.append(objectId);
-		builder.append("]");
-		return builder.toString();
+		return "CVTermRelationship [cvTermRelationshipId="
+				+ cvTermRelationshipId + ", typeId=" + typeId + ", subjectId="
+				+ subjectId + ", object=" + object + "]";
 	}
-
-
 
 }

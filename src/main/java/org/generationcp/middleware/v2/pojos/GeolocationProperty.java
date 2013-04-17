@@ -47,7 +47,7 @@ public class GeolocationProperty implements Serializable {
     @GeneratedValue
     @Basic(optional = false)
     @Column(name = "nd_geolocationprop_id")
-	private Long geolocationPropertyId;
+	private Integer geolocationPropertyId;
 
     @ManyToOne(targetEntity = Geolocation.class)
     @JoinColumn(name = "nd_geolocation_id", nullable = false)
@@ -58,17 +58,17 @@ public class GeolocationProperty implements Serializable {
 	
     @Basic(optional = false)
     @Column(name = "rank")
-	private Long rank;
+	private Integer rank;
 	
     // References cvterm
     @Column(name="type_id")
-    private Long typeId;
+    private Integer typeId;
     
 	public GeolocationProperty() {
 	}
 
-	public GeolocationProperty(Long geolocationPropertyId,
-			Geolocation geolocation, String value, Long rank, Long typeId) {
+	public GeolocationProperty(Integer geolocationPropertyId,
+			Geolocation geolocation, String value, Integer rank, Integer typeId) {
 		super();
 		this.geolocationPropertyId = geolocationPropertyId;
 		this.geolocation = geolocation;
@@ -77,11 +77,11 @@ public class GeolocationProperty implements Serializable {
 		this.typeId = typeId;
 	}
 
-	public Long getGeolocationPropertyId() {
+	public Integer getGeolocationPropertyId() {
 		return geolocationPropertyId;
 	}
 
-	public void setGeolocationPropertyId(Long geolocationPropertyId) {
+	public void setGeolocationPropertyId(Integer geolocationPropertyId) {
 		this.geolocationPropertyId = geolocationPropertyId;
 	}
 
@@ -101,19 +101,19 @@ public class GeolocationProperty implements Serializable {
 		this.value = value;
 	}
 
-	public Long getRank() {
+	public Integer getRank() {
 		return rank;
 	}
 
-	public void setRank(Long rank) {
+	public void setRank(Integer rank) {
 		this.rank = rank;
 	}
 
-	public Long getTypeId() {
+	public Integer getTypeId() {
 		return typeId;
 	}
 
-	public void setType(Long typeId) {
+	public void setType(Integer typeId) {
 		this.typeId = typeId;
 	}
 

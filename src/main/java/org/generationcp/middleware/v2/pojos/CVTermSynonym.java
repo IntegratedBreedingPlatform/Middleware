@@ -45,7 +45,7 @@ public class CVTermSynonym implements Serializable {
 	@GeneratedValue
 	@Basic(optional = false)
 	@Column(name = "cvtermsynonym_id")
-	private Long cvTermSynonymId;
+	private Integer cvTermSynonymId;
 	
 	
 	/**
@@ -53,7 +53,7 @@ public class CVTermSynonym implements Serializable {
 	 */
 	@Basic(optional = false)
 	@Column(name = "cvterm_id")
-	private Long cvTerm;
+	private Integer cvTerm;
 	
 	/**
 	 * Alias or synonym for related CV Term
@@ -66,29 +66,29 @@ public class CVTermSynonym implements Serializable {
 	 * Related CVTerm type. A synonym can be exact, narrower, or broader than.
 	 */
 	@Column(name = "type_id")
-	private Long type;
+	private Integer type;
 	
 	public CVTermSynonym(){
 		
 	}
 	
-	public CVTermSynonym(Long id){
+	public CVTermSynonym(Integer id){
 		this.cvTermSynonymId = id;
 	}
 
-	public Long getCvTermSynonymId() {
+	public Integer getCvTermSynonymId() {
 		return cvTermSynonymId;
 	}
 
-	public void setCvTermSynonymId(Long id) {
+	public void setCvTermSynonymId(Integer id) {
 		this.cvTermSynonymId = id;
 	}
 
-	public Long getCvTerm() {
+	public Integer getCvTerm() {
 		return cvTerm;
 	}
 
-	public void setCvTerm(Long cvTerm) {
+	public void setCvTerm(Integer cvTerm) {
 		this.cvTerm = cvTerm;
 	}
 
@@ -100,11 +100,11 @@ public class CVTermSynonym implements Serializable {
 		this.synonym = synonym;
 	}
 
-	public Long getType() {
+	public Integer getType() {
 		return type;
 	}
 
-	public void setType(Long type) {
+	public void setType(Integer type) {
 		this.type = type;
 	}
 

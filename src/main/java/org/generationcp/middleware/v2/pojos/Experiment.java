@@ -46,47 +46,47 @@ public class Experiment implements Serializable {
 	@Basic(optional = false)
 	@GeneratedValue
 	@Column(name = "nd_experiment_id")
-	private Long ndExperimentId;
+	private Integer ndExperimentId;
 
 	// References Geolocation
 	@Column(name = "nd_geolocation_id")
-	private Long geoLocationId;
+	private Integer geoLocationId;
 
     // References cvterm
     @Column(name="type_id")
-    private Long typeId;
+    private Integer typeId;
 
 	public Experiment() {
 	}
 
-	public Experiment(Long ndExperimentId, Long geoLocationId, Long typeId) {
+	public Experiment(Integer ndExperimentId, Integer geoLocationId, Integer typeId) {
 		super();
 		this.ndExperimentId = ndExperimentId;
 		this.geoLocationId = geoLocationId;
 		this.typeId = typeId;
 	}
 
-	public Long getNdExperimentId() {
+	public Integer getNdExperimentId() {
 		return ndExperimentId;
 	}
 
-	public void setNdExperimentId(Long ndExperimentId) {
+	public void setNdExperimentId(Integer ndExperimentId) {
 		this.ndExperimentId = ndExperimentId;
 	}
 
-	public Long getGeoLocationId() {
+	public Integer getGeoLocationId() {
 		return geoLocationId;
 	}
 
-	public void setGeoLocationId(Long geoLocationId) {
+	public void setGeoLocationId(Integer geoLocationId) {
 		this.geoLocationId = geoLocationId;
 	}
 
-	public Long getTypeId() {
+	public Integer getTypeId() {
 		return typeId;
 	}
 
-	public void setTypeId(Long typeId) {
+	public void setTypeId(Integer typeId) {
 		this.typeId = typeId;
 	}
 

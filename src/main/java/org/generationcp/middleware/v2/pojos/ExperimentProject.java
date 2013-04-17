@@ -42,14 +42,14 @@ public class ExperimentProject implements Serializable {
 	@GeneratedValue
 	@Basic(optional = false)
 	@Column(name = "nd_experiment_project_id")
-	private Long experimentProjectId;
+	private Integer experimentProjectId;
 	
 	/**
 	 * Related Experiment entity
 	 */
 	@Basic(optional = false)
 	@Column(name = "nd_experiment_id")
-	private Long experiment;
+	private Integer experiment;
 	
 	/**
 	 * Related Project entity
@@ -57,37 +57,37 @@ public class ExperimentProject implements Serializable {
 	@Basic(optional = false)
 	@Column(name = "project_id")
 	
-	private Long project;
+	private Integer project;
 	
 	public ExperimentProject(){
 		
 	}
 	
-	public ExperimentProject(Long id){
+	public ExperimentProject(Integer id){
 		this.experimentProjectId = id;
 	}
 
-	public Long getExperimentProjectId() {
+	public Integer getExperimentProjectId() {
 		return experimentProjectId;
 	}
 
-	public void setExperimentProjectId(Long experimentProjectId) {
+	public void setExperimentProjectId(Integer experimentProjectId) {
 		this.experimentProjectId = experimentProjectId;
 	}
 
-	public Long getExperiment() {
+	public Integer getExperiment() {
 		return experiment;
 	}
 
-	public void setExperiment(Long experiment) {
+	public void setExperiment(Integer experiment) {
 		this.experiment = experiment;
 	}
 
-	public Long getProject() {
+	public Integer getProject() {
 		return project;
 	}
 
-	public void setProject(Long project) {
+	public void setProject(Integer project) {
 		this.project = project;
 	}
 

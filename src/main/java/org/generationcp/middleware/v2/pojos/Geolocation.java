@@ -43,7 +43,7 @@ public class Geolocation implements Serializable {
     @GeneratedValue
     @Basic(optional = false)
     @Column(name = "nd_geolocation_id")
-	private Long locationId;
+	private Integer locationId;
 	
     @Column(name = "description")
 	private String description;
@@ -72,16 +72,16 @@ public class Geolocation implements Serializable {
     	
     }
     
-    public Geolocation(Long id){
+    public Geolocation(Integer id){
     	super();
     	this.locationId = id;
     }
 
-	public Long getLocationId() {
+	public Integer getLocationId() {
 		return locationId;
 	}
 
-	public void setLocationId(Long id) {
+	public void setLocationId(Integer id) {
 		this.locationId = id;
 	}
 

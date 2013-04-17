@@ -43,7 +43,7 @@ public class CV implements Serializable {
 	@GeneratedValue
 	@Basic(optional = false)
 	@Column(name = "cv_id")	
-	private Long cvId;
+	private Integer cvId;
 	
 	/**
 	 * The name of the ontology. 
@@ -63,15 +63,15 @@ public class CV implements Serializable {
 		
 	}
 	
-	public CV(Long id){
+	public CV(Integer id){
 		this.cvId = id;
 	}
 
-	public Long getCvId() {
+	public Integer getCvId() {
 		return cvId;
 	}
 
-	public void setCvId(Long id) {
+	public void setCvId(Integer id) {
 		this.cvId = id;
 	}
 

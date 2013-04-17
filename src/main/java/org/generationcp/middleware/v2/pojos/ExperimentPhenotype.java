@@ -46,52 +46,52 @@ public class ExperimentPhenotype implements Serializable {
 	@GeneratedValue
 	@Basic(optional = false)
 	@Column(name = "nd_experiment_phenotype_id")
-	private Long experimentPhenotypeId;
+	private Integer experimentPhenotypeId;
 
 	/**
 	 * The related Experiment entity
 	 */
     @Basic(optional = false)
     @Column(name = "nd_experiment_id")
-	private Long experiment;
+	private Integer experiment;
 
 	/**
 	 * The related Phenotype entity
 	 */
 	@Basic(optional = false)
     @Column(name = "phenotype_id")
-	private Long phenotype;
+	private Integer phenotype;
 	
 	
 	public ExperimentPhenotype(){
 		
 	}
 	
-	public ExperimentPhenotype(Long id){
+	public ExperimentPhenotype(Integer id){
 		this.experimentPhenotypeId = id;
 	}
 
-	public Long getExperimentPhenotypeId() {
+	public Integer getExperimentPhenotypeId() {
 		return experimentPhenotypeId;
 	}
 
-	public void setExperimentPhenotypeId(Long id) {
+	public void setExperimentPhenotypeId(Integer id) {
 		this.experimentPhenotypeId = id;
 	}
 
-	public Long getExperiment() {
+	public Integer getExperiment() {
 		return experiment;
 	}
 
-	public void setExperiment(Long experiment) {
+	public void setExperiment(Integer experiment) {
 		this.experiment = experiment;
 	}
 
-	public Long getPhenotype() {
+	public Integer getPhenotype() {
 		return phenotype;
 	}
 
-	public void setPhenotype(Long phenotype) {
+	public void setPhenotype(Integer phenotype) {
 		this.phenotype = phenotype;
 	}
 

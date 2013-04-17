@@ -27,58 +27,58 @@ public class ExperimentStock implements Serializable {
 	@Basic(optional = false)
 	@GeneratedValue
 	@Column(name = "nd_experiment_stock_id")
-	private Long experimentStockId;
+	private Integer experimentStockId;
 	
 	/**
 	 * The Experiment object.
 	 */
 	@Basic(optional = false)
 	@Column(name = "nd_experiment_id")
-	private Long experimentId;
+	private Integer experimentId;
 	
 	/**
 	 * Stock used in the extraction or the corresponding stock for the clone.
 	 */
 	@Basic(optional = false)
 	@Column(name = "stock_id")
-	private Long stockId;
+	private Integer stockId;
 	
 	/**
 	 * The Type object.
 	 */
 	@Basic(optional = false)
 	@Column(name = "type_id")
-	private Long typeId;
+	private Integer typeId;
 
-	public Long getExperimentStockId() {
+	public Integer getExperimentStockId() {
 		return experimentStockId;
 	}
 
-	public void setExperimentStockId(Long experimentStockId) {
+	public void setExperimentStockId(Integer experimentStockId) {
 		this.experimentStockId = experimentStockId;
 	}
 
-	Long getExperimentId() {
+	Integer getExperimentId() {
 		return experimentId;
 	}
 
-	void setExperimentId(Long experimentId) {
+	void setExperimentId(Integer experimentId) {
 		this.experimentId = experimentId;
 	}
 
-	Long getStockId() {
+	Integer getStockId() {
 		return stockId;
 	}
 
-	void setStockId(Long stockId) {
+	void setStockId(Integer stockId) {
 		this.stockId = stockId;
 	}
 
-	Long getTypeId() {
+	Integer getTypeId() {
 		return typeId;
 	}
 
-	void setTypeId(Long typeId) {
+	void setTypeId(Integer typeId) {
 		this.typeId = typeId;
 	}
 

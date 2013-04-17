@@ -29,7 +29,7 @@ public class CVTermProperty implements Serializable {
 	@Basic(optional = false)
 	@GeneratedValue
 	@Column(name = "cvtermprop_id")
-	private Long cvTermPropertyId;
+	private Integer cvTermPropertyId;
 	
 	/**
 	 * CVTerm that owns the property.
@@ -55,14 +55,14 @@ public class CVTermProperty implements Serializable {
 	 * Rank of the property.
 	 */
 	@Column(name = "rank")
-	private Long rank;
+	private Integer rank;
 
 	
-	public Long getCvTermPropertyId() {
+	public Integer getCvTermPropertyId() {
 		return cvTermPropertyId;
 	}
 
-	public void setCvTermPropertyId(Long cvTermPropertyId) {
+	public void setCvTermPropertyId(Integer cvTermPropertyId) {
 		this.cvTermPropertyId = cvTermPropertyId;
 	}
 
@@ -90,11 +90,11 @@ public class CVTermProperty implements Serializable {
 		this.value = value;
 	}
 
-	public Long getRank() {
+	public Integer getRank() {
 		return rank;
 	}
 
-	public void setRank(Long rank) {
+	public void setRank(Integer rank) {
 		this.rank = rank;
 	}
 

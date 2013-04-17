@@ -19,7 +19,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -46,13 +45,13 @@ public class CVTerm implements Serializable {
 	@Basic(optional = false)
 	@GeneratedValue
 	@Column(name = "cvterm_id")
-	private Long cvTermId;
+	private Integer cvTermId;
 
 	/**
 	 * The cv or ontology or namespace to which this cvterm belongs.
 	 */
 	@Column(name = "cv_id")
-	private Long cvId;
+	private Integer cvId;
 
 	/**
 	 * A concise human-readable name or label for the cvterm. Uniquely
@@ -73,7 +72,7 @@ public class CVTerm implements Serializable {
 	 */
 	// TODO Add join definition when dbxRef table becomes available, or ignore if the foreign key constraint is removed
 	@Column(name = "dbxref_id")
-	private Long dbxRefId;
+	private Integer dbxRefId;
 
 	/**
 	 * Boolean 0=false,1=true; see GO documentation for details of obsoletion.
@@ -82,7 +81,7 @@ public class CVTerm implements Serializable {
 	 * is_obsolete is an integer and can be incremented to fake uniqueness.
 	 */
 	@Column(name = "is_obsolete")
-	private Long isObsolete;
+	private Integer isObsolete;
 
 	/**
 	 * Boolean 0=false,1=true relations or relationship types (also known as
@@ -92,14 +91,14 @@ public class CVTerm implements Serializable {
 	 * Relations ontology, but are not exclusively drawn from there.
 	 */
 	@Column(name = "is_relationshiptype")
-	private Long isRelationshipType;
+	private Integer isRelationshipType;
 	
 	
 	public CVTerm() {
 	}
 
-	public CVTerm(Long cvTermId, Long cv, String name, String definition,
-			Long dbxRefId, Long isObsolete, Long isRelationshipType) {
+	public CVTerm(Integer cvTermId, Integer cv, String name, String definition,
+			Integer dbxRefId, Integer isObsolete, Integer isRelationshipType) {
 		super();
 		this.cvTermId = cvTermId;
 		this.cvId = cv;
@@ -110,19 +109,19 @@ public class CVTerm implements Serializable {
 		this.isRelationshipType = isRelationshipType;
 	}
 
-	public Long getCvTermId() {
+	public Integer getCvTermId() {
 		return cvTermId;
 	}
 
-	public void setCvTermId(Long cvTermId) {
+	public void setCvTermId(Integer cvTermId) {
 		this.cvTermId = cvTermId;
 	}
 
-	public Long getCv() {
+	public Integer getCv() {
 		return cvId;
 	}
 
-	public void setCv(Long cv) {
+	public void setCv(Integer cv) {
 		this.cvId = cv;
 	}
 
@@ -142,11 +141,11 @@ public class CVTerm implements Serializable {
 		this.definition = definition;
 	}
 
-	public Long getDbxRefId() {
+	public Integer getDbxRefId() {
 		return dbxRefId;
 	}
 
-	public void setDbxRefId(Long dbxRefId) {
+	public void setDbxRefId(Integer dbxRefId) {
 		this.dbxRefId = dbxRefId;
 	}
 
@@ -156,7 +155,7 @@ public class CVTerm implements Serializable {
 
 	public void setIsObsolete(Boolean isObsolete) {
 
-		this.isObsolete = (long) (isObsolete ? 1 : 0);
+		this.isObsolete = (int) (isObsolete ? 1 : 0);
 	}
 
 	public Boolean isRelationshipType() {
@@ -164,7 +163,7 @@ public class CVTerm implements Serializable {
 	}
 
 	public void setIsRelationshipType(Boolean isRelationshipType) {
-		this.isRelationshipType = (long) (isRelationshipType ? 1 : 0);
+		this.isRelationshipType = (int) (isRelationshipType ? 1 : 0);
 	}
 
 	@Override

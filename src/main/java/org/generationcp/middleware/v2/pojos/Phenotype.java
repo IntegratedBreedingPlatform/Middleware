@@ -43,7 +43,7 @@ public class Phenotype implements Serializable {
 	@Basic(optional = false)
 	@GeneratedValue
 	@Column(name = "phenotype_id")
-	private Long phenotypeId;
+	private Integer phenotypeId;
 
 	@Basic(optional = false)
 	@Column(name = "uniquename")
@@ -54,30 +54,30 @@ public class Phenotype implements Serializable {
 
 	// References cvterm
     @Column(name="observable_id")
-	private Long observableId;
+	private Integer observableId;
 
     // References cvterm
     @Column(name="attr_id")
-	private Long attributeId;
+	private Integer attributeId;
 	
 	@Column(name = "value")
 	private String value;
 	
 	// References cvterm
     @Column(name="cvalue_id")
-	private Long cValueId;
+	private Integer cValueId;
 	
 	// References cvterm
     @Column(name="assay_id")
-	private Long assayId;
+	private Integer assayId;
 
 	public Phenotype() {
 	}
 
 
-	public Phenotype(Long phenotypeId, String uniqueName, String name,
-			Long observableId, Long attributeId, String value, Long cValueId,
-			Long assayId) {
+	public Phenotype(Integer phenotypeId, String uniqueName, String name,
+			Integer observableId, Integer attributeId, String value, Integer cValueId,
+			Integer assayId) {
 		this.phenotypeId = phenotypeId;
 		this.uniqueName = uniqueName;
 		this.name = name;
@@ -89,11 +89,11 @@ public class Phenotype implements Serializable {
 	}
 
 
-	public Long getPhenotypeId() {
+	public Integer getPhenotypeId() {
 		return phenotypeId;
 	}
 
-	public void setPhenotypeId(Long phenotypeId) {
+	public void setPhenotypeId(Integer phenotypeId) {
 		this.phenotypeId = phenotypeId;
 	}
 
@@ -113,19 +113,19 @@ public class Phenotype implements Serializable {
 		this.name = name;
 	}
 
-	public Long getObservableId() {
+	public Integer getObservableId() {
 		return observableId;
 	}
 
-	public void setObservableId(Long observableId) {
+	public void setObservableId(Integer observableId) {
 		this.observableId = observableId;
 	}
 
-	public Long getAttributeId() {
+	public Integer getAttributeId() {
 		return attributeId;
 	}
 
-	public void setAttributeId(Long attributeId) {
+	public void setAttributeId(Integer attributeId) {
 		this.attributeId = attributeId;
 	}
 
@@ -137,19 +137,19 @@ public class Phenotype implements Serializable {
 		this.value = value;
 	}
 
-	public Long getcValueId() {
+	public Integer getcValueId() {
 		return cValueId;
 	}
 
-	public void setcValue(Long cValueId) {
+	public void setcValue(Integer cValueId) {
 		this.cValueId = cValueId;
 	}
 
-	public Long getAssayId() {
+	public Integer getAssayId() {
 		return assayId;
 	}
 
-	public void setAssayId(Long assayId) {
+	public void setAssayId(Integer assayId) {
 		this.assayId = assayId;
 	}
 	

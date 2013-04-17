@@ -45,20 +45,20 @@ public class Stock implements Serializable {
 	@Basic(optional = false)
 	@GeneratedValue
 	@Column(name = "stock_id")
-	private Long stockId;
+	private Integer stockId;
 
 	/**
 	 * The dbxref_id is an optional primary stable identifier for this stock. 
 	 * Secondary indentifiers and external dbxrefs go in table: stock_dbxref.
 	 */
 	@Column(name = "dbxref_id")
-	private Long dbxrefId;
+	private Integer dbxrefId;
 	
 	/**
 	 * The organism_id is the organism to which the stock belongs. This column is mandatory.
 	 */
 	@Column(name = "organism_id")
-	private Long organismId;
+	private Integer organismId;
 	
 	/**
 	 * The name is a human-readable local name for a stock.
@@ -86,33 +86,33 @@ public class Stock implements Serializable {
 	 * References cvterm
 	 */
     @Column(name="type_id")
-    private Long typeId;
+    private Integer typeId;
 
 	@Basic(optional = false)
     @Column(name="is_obsolete")
     private Boolean isObsolete;
 
-	public Long getStockId() {
+	public Integer getStockId() {
 		return stockId;
 	}
 
-	public void setStockId(Long stockId) {
+	public void setStockId(Integer stockId) {
 		this.stockId = stockId;
 	}
 
-	public Long getDbxrefId() {
+	public Integer getDbxrefId() {
 		return dbxrefId;
 	}
 
-	public void setDbxrefId(Long dbxrefId) {
+	public void setDbxrefId(Integer dbxrefId) {
 		this.dbxrefId = dbxrefId;
 	}
 
-	public Long getOrganismId() {
+	public Integer getOrganismId() {
 		return organismId;
 	}
 
-	public void setOrganismId(Long organismId) {
+	public void setOrganismId(Integer organismId) {
 		this.organismId = organismId;
 	}
 
@@ -148,11 +148,11 @@ public class Stock implements Serializable {
 		this.description = description;
 	}
 
-	public Long getTypeId() {
+	public Integer getTypeId() {
 		return typeId;
 	}
 
-	public void setTypeId(Long typeId) {
+	public void setTypeId(Integer typeId) {
 		this.typeId = typeId;
 	}
 

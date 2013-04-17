@@ -28,58 +28,58 @@ public class ProjectRelationship implements Serializable {
 	@Basic(optional = false)
 	@GeneratedValue
 	@Column(name = "project_relationship_id")
-	private Long projectRelationshipId;
+	private Integer projectRelationshipId;
 	
 	/**
 	 * The Subject of the Relationship.
 	 */
 	@Basic(optional = false)
 	@Column(name = "subject_project_id")
-	private Long subjectProjectId;
+	private Integer subjectProjectId;
 	
 	/**
 	 * The Object of the Relationship.
 	 */
 	@Basic(optional = false)
 	@Column(name = "object_project_id")
-	private Long objectProjectId;
+	private Integer objectProjectId;
 	
 	/**
 	 * The Type of Relationship.
 	 */
 	@Basic(optional = false)
 	@Column(name = "type_id")
-	private Long typeId;
+	private Integer typeId;
 
-	public Long getProjectRelationshipId() {
+	public Integer getProjectRelationshipId() {
 		return projectRelationshipId;
 	}
 
-	public void setProjectRelationshipId(Long projectRelationshipId) {
+	public void setProjectRelationshipId(Integer projectRelationshipId) {
 		this.projectRelationshipId = projectRelationshipId;
 	}
 
-	public Long getSubjectProjectId() {
+	public Integer getSubjectProjectId() {
 		return subjectProjectId;
 	}
 
-	public void setSubjectProjectId(Long subjectProjectId) {
+	public void setSubjectProjectId(Integer subjectProjectId) {
 		this.subjectProjectId = subjectProjectId;
 	}
 
-	public Long getObjectProjectId() {
+	public Integer getObjectProjectId() {
 		return objectProjectId;
 	}
 
-	public void setObjectProjectId(Long objectProjectId) {
+	public void setObjectProjectId(Integer objectProjectId) {
 		this.objectProjectId = objectProjectId;
 	}
 
-	public Long getTypeId() {
+	public Integer getTypeId() {
 		return typeId;
 	}
 
-	public void setTypeId(Long typeId) {
+	public void setTypeId(Integer typeId) {
 		this.typeId = typeId;
 	}
 
