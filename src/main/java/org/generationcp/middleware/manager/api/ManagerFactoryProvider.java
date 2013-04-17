@@ -14,7 +14,10 @@ public interface ManagerFactoryProvider {
     
     /**
      * Get a {@link ManagerFactory} setup to connect to central and local
-     * databases needed by the specified {@link Project}.
+     * databases needed by the specified {@link Project}. When done using the
+     * ManagerFactory, call
+     * {@link ManagerFactoryProvider#closeManagerFactory(ManagerFactory)} to
+     * close the database connections used by the {@link ManagerFactory}.
      * 
      * @param project
      * @return The ManagerFactory for the given project.
@@ -24,6 +27,9 @@ public interface ManagerFactoryProvider {
     /**
      * Get the {@link ManagerFactory} setup connected to the central of the
      * specified {@link CropType} but has no connection to a local database.
+     * When done using the ManagerFactory, call
+     * {@link ManagerFactoryProvider#closeManagerFactory(ManagerFactory)} to
+     * close the database connections used by the {@link ManagerFactory}.
      * 
      * @param cropType
      * @return The ManagerFactory for the given crop type.

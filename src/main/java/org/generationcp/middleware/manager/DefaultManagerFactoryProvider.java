@@ -2,6 +2,8 @@ package org.generationcp.middleware.manager;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -51,6 +53,9 @@ public class DefaultManagerFactoryProvider implements ManagerFactoryProvider, Ht
     private String centralUsername = "central";
 
     private String centralPassword = "central";
+    
+    private int maxCachedLocalSessionFactories = 10;
+    private List<Long> projectAccessList = new LinkedList<Long>();
 
     public void setLocalHost(String localHost) {
         this.localHost = localHost;
@@ -83,12 +88,40 @@ public class DefaultManagerFactoryProvider implements ManagerFactoryProvider, Ht
     public void setCentralPassword(String centralPassword) {
         this.centralPassword = centralPassword;
     }
+    
+    protected synchronized void closeExcessLocalSessionFactory() {
+        if (projectAccessList.size() - 1 > maxCachedLocalSessionFactories) {
+            return;
+        }
+        
+        for (int index = projectAccessList.size() - 1; index >= maxCachedLocalSessionFactories - 1; index--) {
+            Long projectId = projectAccessList.get(index);
+            
+            // close the session factory for the project
+            SessionFactory sessionFactory = localSessionFactories.get(projectId);
+            if (sessionFactory != null) {
+                sessionFactory.close();
+            }
+            
+            // remove the SessionFactory instance from our local session factory cache
+            localSessionFactories.remove(projectId);
+            projectAccessList.remove(index);
+        }
+    }
 
     @Override
     public synchronized ManagerFactory getManagerFactoryForProject(Project project) {
         SessionFactory localSessionFactory = localSessionFactories.get(project.getProjectId());
-        if (localSessionFactory == null) {
+        
+        if (localSessionFactory != null) {
+            projectAccessList.remove(project.getProjectId());
+        }
+        
+        if (localSessionFactory == null || localSessionFactory.isClosed()) {
             String localDbName = String.format("%s_%d_local", project.getCropType().getCropName().toLowerCase(), project.getProjectId().longValue());
+            
+            // close any excess cached session factory
+            closeExcessLocalSessionFactory();
             
             DatabaseConnectionParameters params = new DatabaseConnectionParameters(localHost, String.valueOf(localPort), localDbName, localUsername, localPassword);
             try {
@@ -100,8 +133,12 @@ public class DefaultManagerFactoryProvider implements ManagerFactoryProvider, Ht
             }
         }
         
+        // add this local session factory to the head of the access list
+        projectAccessList.add(0, project.getProjectId());
+        
+        // get or create a central session factory
         SessionFactory centralSessionFactory = centralSessionFactories.get(project.getCropType());
-        if (centralSessionFactory == null && project.getCropType().getCentralDbName() != null) {
+        if ((centralSessionFactory == null || centralSessionFactory.isClosed()) && project.getCropType().getCentralDbName() != null) {
             String centralDbName = project.getCropType().getCentralDbName();
             
             DatabaseConnectionParameters params = new DatabaseConnectionParameters(centralHost, String.valueOf(centralPort), centralDbName, centralUsername, centralPassword);
@@ -147,7 +184,7 @@ public class DefaultManagerFactoryProvider implements ManagerFactoryProvider, Ht
         }
         
         SessionFactory centralSessionFactory = centralSessionFactories.get(cropType);
-        if (centralSessionFactory == null) {
+        if (centralSessionFactory == null || centralSessionFactory.isClosed()) {
             DatabaseConnectionParameters params = new DatabaseConnectionParameters(centralHost, String.valueOf(centralPort), centralDbName, centralUsername, centralPassword);
             
             try {
