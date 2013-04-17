@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -64,7 +63,7 @@ public class DmsProject implements Serializable {
 	 * List of Project Properties
 	 * @return
 	 */
-	@OneToMany(mappedBy = "project", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "project", fetch = FetchType.EAGER)
 	private List<ProjectProperty> properties;
 	
 	
@@ -130,7 +129,6 @@ public class DmsProject implements Serializable {
 	public String toString() {
 		return "DmsProject [projectId=" + projectId + ", name=" + name
 				+ ", description=" + description 
-				//+ ", parent=" + (parent != null ? parent.getDmsProjectId() : "null")
 				;
 	}
 

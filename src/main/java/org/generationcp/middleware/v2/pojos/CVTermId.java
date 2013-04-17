@@ -17,7 +17,7 @@ public enum CVTermId {
 	, HAS_TYPE(1105)
 	, HAS_VALUE(1190)
 	, IS_A(1225)
-	, STORED_IN(1244)
+	, STORED_IN(1044)
 	
 	//Study Fields
 	, STUDY_NAME(8005)

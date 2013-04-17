@@ -15,9 +15,11 @@ package org.generationcp.middleware.v2.manager.api;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.v2.pojos.StudyDetails;
 import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.v2.pojos.FactorDetails;
 import org.generationcp.middleware.v2.pojos.Folder;
+import org.generationcp.middleware.v2.pojos.ObservationDetails;
+import org.generationcp.middleware.v2.pojos.StudyDetails;
 
 /**
  * This is the API for retrieving phenotypic data stored as Studies and
@@ -46,4 +48,21 @@ public interface StudyDataManager {
 	 */
 	public List<Folder> getRootFolders(Database instance) throws MiddlewareQueryException;
 	
+	/**
+	 * Returns the list of factor details for a specific study.
+	 * 
+	 * @param studyId
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	List<FactorDetails> getFactorDetails(int studyId) throws MiddlewareQueryException;
+
+	/**
+	 * Returns the list of observation details for a specific study.
+	 * 
+	 * @param studyId
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	List<ObservationDetails> getObservationDetails(int studyId) throws MiddlewareQueryException;
 }
