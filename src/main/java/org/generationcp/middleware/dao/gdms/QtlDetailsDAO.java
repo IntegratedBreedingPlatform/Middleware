@@ -17,6 +17,8 @@ import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.gdms.Qtl;
+import org.generationcp.middleware.pojos.gdms.QtlData;
 import org.generationcp.middleware.pojos.gdms.QtlDetails;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -178,5 +180,56 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
         }
         return 0L;
     }
+    
+    public List<QtlData> getQtlDataByQtlTraits(List<String> qtlTraits, int start, int numOfRows) throws MiddlewareQueryException{
+        List<QtlData> toReturn = new ArrayList<QtlData>();
+
+        if (qtlTraits == null || qtlTraits.size() == 0) {
+            return toReturn;
+        }
+
+        try {
+            SQLQuery query = getSession().createSQLQuery(QtlDetails.GET_QTL_DATA_BY_QTL_TRAITS);
+            query.setParameterList("qtlTraits", qtlTraits);
+            query.setFirstResult(start);
+            query.setMaxResults(numOfRows);
+            
+            @SuppressWarnings("rawtypes")
+			List results = query.list();
+
+            for (Object o : results) {
+                Object[] result = (Object[]) o;
+                if (result != null) {
+                	//TODO Get the fields for QtlData                	
+                    QtlData qtlData = new QtlData(new QtlDetails(), new Qtl());
+                    toReturn.add(qtlData);
+                }
+            }
+
+
+            
+        } catch (HibernateException e) {
+        	logAndThrowException("Error with getQtlDataByQtlTraits() query from QtlDetails: " + e.getMessage(), e);    
+        }
+        return toReturn;
+    }
+    
+    public long countQtlDataByQtlTraits(List<String> qtlTraits)  throws MiddlewareQueryException{
+        try {
+            SQLQuery query = getSession().createSQLQuery(QtlDetails.COUNT_QTL_DATA_BY_QTL_TRAITS);
+            query.setParameterList("qtlTraits", qtlTraits);
+            BigInteger result = (BigInteger) query.uniqueResult();
+            if (result != null) {
+                return result.longValue();
+            } else {
+                return 0L;
+            }
+            
+        } catch (HibernateException e) {
+        	logAndThrowException("Error with countQtlDataByQtlTraits() query from QtlDetails: " + e.getMessage(), e);    
+        }
+        return 0L;
+    }
+    
 
 }

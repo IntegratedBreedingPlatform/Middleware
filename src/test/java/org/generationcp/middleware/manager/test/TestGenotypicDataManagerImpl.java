@@ -51,6 +51,7 @@ import org.generationcp.middleware.pojos.gdms.MarkerOnMap;
 import org.generationcp.middleware.pojos.gdms.MarkerUserInfo;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.generationcp.middleware.pojos.gdms.Qtl;
+import org.generationcp.middleware.pojos.gdms.QtlData;
 import org.generationcp.middleware.pojos.gdms.QtlDetailElement;
 import org.generationcp.middleware.pojos.gdms.QtlDetails;
 import org.generationcp.middleware.pojos.gdms.QtlDetailsPK;
@@ -1773,6 +1774,25 @@ public class TestGenotypicDataManagerImpl{
         long count = manager.countQtlByQtlIds(qtlIDs);
         System.out.println("testCountQtlByQTLIDs() RESULTS: " + count);
     }   
+    
+    
+    @Test
+    public void testGetQtlDataByQtlTraits() throws Exception {
+        List<String> qtlTraits = new ArrayList<String>();   // Crop tested: Groundnut
+		qtlTraits.add("HI");     
+        List<QtlData> results = manager.getQtlDataByQtlTraits(qtlTraits, 0, (int) manager.countQtlDataByQtlTraits(qtlTraits)); 
+        System.out.println("testGetQtlByName() RESULTS: " + results);
+    }
+
+
+    @Test
+    public void testCountQtlDataByQtlTraits() throws Exception { 
+        List<String> qtlTraits = new ArrayList<String>();   // Crop tested: Groundnut
+		qtlTraits.add("HI");     
+        long count =  manager.countQtlDataByQtlTraits(qtlTraits); 
+        System.out.println("testCountQtlDataByQtlTraits() RESULTS: " + count);
+    }    
+
     
     @AfterClass
     public static void tearDown() throws Exception {

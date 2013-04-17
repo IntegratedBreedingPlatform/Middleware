@@ -72,6 +72,7 @@ import org.generationcp.middleware.pojos.gdms.MarkerOnMap;
 import org.generationcp.middleware.pojos.gdms.MarkerUserInfo;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.generationcp.middleware.pojos.gdms.Qtl;
+import org.generationcp.middleware.pojos.gdms.QtlData;
 import org.generationcp.middleware.pojos.gdms.QtlDetailElement;
 import org.generationcp.middleware.pojos.gdms.QtlDetails;
 import org.generationcp.middleware.pojos.gdms.QtlDetailsPK;
@@ -2249,5 +2250,21 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         }
 
         return transactionStatus;
+    }
+    
+    @Override
+    public List<QtlData> getQtlDataByQtlTraits(List<String> qtlTraits, int start, int numOfRows) throws MiddlewareQueryException{
+    	
+        List<String> methods = Arrays.asList("countQtlDataByQtlTraits", "getQtlDataByQtlTraits");
+        return (List<QtlData>) super.getFromCentralAndLocalByMethod(getQtlDetailsDao(), methods, start, numOfRows, new Object[] { qtlTraits },
+                new Class[] { List.class });
+
+    }
+
+    @Override
+    public long countQtlDataByQtlTraits(List<String> qtlTraits) throws MiddlewareQueryException{
+    	return super.countAllFromCentralAndLocalByMethod(getQtlDetailsDao(), "countQtlDataByQtlTraits", new Object[] { qtlTraits },
+                new Class[] { List.class });
+    	
     }
 }

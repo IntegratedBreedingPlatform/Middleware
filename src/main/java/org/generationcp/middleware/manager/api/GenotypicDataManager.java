@@ -47,6 +47,7 @@ import org.generationcp.middleware.pojos.gdms.MarkerOnMap;
 import org.generationcp.middleware.pojos.gdms.MarkerUserInfo;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.generationcp.middleware.pojos.gdms.Qtl;
+import org.generationcp.middleware.pojos.gdms.QtlData;
 import org.generationcp.middleware.pojos.gdms.QtlDetailElement;
 import org.generationcp.middleware.pojos.gdms.QtlDetails;
 import org.generationcp.middleware.pojos.gdms.QtlDetailsPK;
@@ -1502,8 +1503,7 @@ public interface GenotypicDataManager{
      * @return (List<Integer>) list of Map IDs
      * @throws MiddlewareQueryException
      */
-    List<Integer> getMapIDsByQTLName(String qtlName, int start, int numOfRows)
-            throws MiddlewareQueryException;
+    public List<Integer> getMapIDsByQTLName(String qtlName, int start, int numOfRows) throws MiddlewareQueryException;
     
     /**
      * Counts Map ID from QTL Name
@@ -1511,8 +1511,7 @@ public interface GenotypicDataManager{
      * @return (long)count of Map IDs
      * @throws MiddlewareQueryException
      */
-    long countMapIDsByQTLName(String qtlName)
-            throws MiddlewareQueryException;
+    public long countMapIDsByQTLName(String qtlName)  throws MiddlewareQueryException;
     
     /**
      * Gets Marker IDs from Map ID, Linkage Group and Between start position values
@@ -1525,7 +1524,7 @@ public interface GenotypicDataManager{
      * @return (Set<Integer>) set of Marker IDs
      * @throws MiddlewareQueryException
      */
-    Set<Integer> getMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapID,
+    public Set<Integer> getMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapID,
         String linkageGroup, double startPos, double endPos, int start,
         int numOfRows) throws MiddlewareQueryException;
 
@@ -1538,7 +1537,7 @@ public interface GenotypicDataManager{
      * @return (long) count of Marker IDs
      * @throws MiddlewareQueryException
      */
-    long countMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapId,
+    public long countMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapId,
         String linkageGroup, double startPos, double endPos)
         throws MiddlewareQueryException;
 
@@ -1550,8 +1549,7 @@ public interface GenotypicDataManager{
      * @return (List<Marker>) List of Markers
      * @throws MiddlewareQueryException
      */
-    List<Marker> getMarkersByMarkerIds(List<Integer> markerIds, int start,
-            int numOfRows) throws MiddlewareQueryException;
+    public List<Marker> getMarkersByMarkerIds(List<Integer> markerIds, int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Counts Markers by Marker IDs
@@ -1559,8 +1557,7 @@ public interface GenotypicDataManager{
      * @return Count of Markers
      * @throws MiddlewareQueryException
      */
-    long countMarkersByMarkerIds(List<Integer> markerIDs)
-            throws MiddlewareQueryException;
+    public long countMarkersByMarkerIds(List<Integer> markerIDs) throws MiddlewareQueryException;
 
     /**
      * Retrieves QTL entries from the gdms_qtl table matching the given list of qtl ids
@@ -1576,8 +1573,7 @@ public interface GenotypicDataManager{
      * @return List of QTL entries
      * @throws MiddlewareQueryException
      */
-    List<QtlDetailElement> getQtlByQtlIds(List<Integer> qtls, int start,
-            int numOfRows) throws MiddlewareQueryException;
+    public List<QtlDetailElement> getQtlByQtlIds(List<Integer> qtls, int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Returns the number of QTL entries from the gdms_qtl table matching the given list of qtl ids
@@ -1587,6 +1583,36 @@ public interface GenotypicDataManager{
      * @return Count of QTL entries
      * @throws MiddlewareQueryException
      */
-    long countQtlByQtlIds(List<Integer> qtls) throws MiddlewareQueryException;
+    public long countQtlByQtlIds(List<Integer> qtls) throws MiddlewareQueryException;
 
+    
+    /**
+     * Returns the QTL data entries from the gdms_qtl and gdms_qtl_details tables matching the given list of traits.
+     * Retrieves values from both local and central.
+     * 
+     * @param qtlTraits 
+     * 			- list of QTL traits to match
+     * @param start 
+     *          - the starting index of the sublist of results to be returned
+     * @param numOfRows 
+     *          - the number of rows to be included in the sublist of results 
+     *          to be returned
+     * 
+     * @return List of QTL data entries
+     * @throws MiddlewareQueryException
+     */
+    public List<QtlData> getQtlDataByQtlTraits(List<String> qtlTraits, int start, int numOfRows) throws MiddlewareQueryException;
+
+    /**
+     * Returns the number of QTL data entries from the gdms_qtl and gdms_qtl_details tables matching the given list of traits.
+     * Counts from both local and central instances.
+     * 
+     * @param qtlTraits - list of QTL traits to match
+     * 
+     * @return Count of QTL data entries
+     * @throws MiddlewareQueryException
+     */
+    public long countQtlDataByQtlTraits(List<String> qtlTraits) throws MiddlewareQueryException;
+
+    
 }

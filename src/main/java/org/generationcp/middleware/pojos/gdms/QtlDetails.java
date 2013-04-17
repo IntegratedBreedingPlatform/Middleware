@@ -106,6 +106,24 @@ public class QtlDetails implements Serializable{
     		+ "ON gq.qtl_id = gqd.qtl_id  "
     		+ "WHERE gq.dataset_id = :datasetId  "
     		;
+    
+    public static final String GET_QTL_DATA_BY_QTL_TRAITS =
+    		"SELECT * "		//TODO Specify only the required fields
+    		+ "FROM gdms_qtl_details gqd " 
+    		+ "INNER JOIN gdms_qtl gq "
+    		+ "ON gqd.qtl_id = gq.qtl_id " 
+    		+ "AND gqd.trait "
+    		+ "IN (:qtlTraits) " 
+    		;
+
+    public static final String COUNT_QTL_DATA_BY_QTL_TRAITS =
+    		"SELECT COUNT(*) "
+    		+ "FROM gdms_qtl_details gqd " 
+    		+ "INNER JOIN gdms_qtl gq "
+    		+ "ON gqd.qtl_id = gq.qtl_id " 
+    		+ "AND gqd.trait "
+    		+ "IN (:qtlTraits) " 
+    		;
 
     @EmbeddedId
     protected QtlDetailsPK id;
