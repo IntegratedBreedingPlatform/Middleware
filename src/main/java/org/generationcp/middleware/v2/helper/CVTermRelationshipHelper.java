@@ -11,9 +11,9 @@ import org.generationcp.middleware.v2.pojos.CVTermRelationship;
 
 public class CVTermRelationshipHelper {
 
-	private Map<Integer, Integer> propertyMap = new HashMap<Integer, Integer>();
-	private Map<Integer, Integer> methodMap = new HashMap<Integer, Integer>();
-	private Map<Integer, Integer> scaleMap = new HashMap<Integer, Integer>();
+	private Map<Integer, String> propertyMap = new HashMap<Integer, String>();
+	private Map<Integer, String> methodMap = new HashMap<Integer, String>();
+	private Map<Integer, String> scaleMap = new HashMap<Integer, String>();
 	private Map<Integer, String> dataTypeMap = new HashMap<Integer, String>();
 	private Map<Integer, Integer> storedInMap = new HashMap<Integer, Integer>();
 	
@@ -25,49 +25,47 @@ public class CVTermRelationshipHelper {
 			CVTermId.CHARACTER_DBID_VARIABLE.getId(), CVTermId.CHARACTER_VARIABLE.getId()
 	);
 	
-	private static final List<Integer> VARIATE_TYPES = Arrays.asList(
-			CVTermId.OBSERVATION_VARIATE.getId(), CVTermId.CATEGORICAL_VARIATE.getId()
-	);
-
 	public CVTermRelationshipHelper(List<CVTermRelationship> relationships) {
 		translateRelationshipsToMaps(relationships);
 	}
 	
 	private void translateRelationshipsToMaps(List<CVTermRelationship> relationships) {
-		for (CVTermRelationship relationship : relationships) {
-			if (CVTermId.HAS_PROPERTY.getId().equals(relationship.getTypeId())) {
-				propertyMap.put(relationship.getSubjectId().intValue(), relationship.getObjectId().intValue());
-				
-			} else if (CVTermId.HAS_METHOD.getId().equals(relationship.getTypeId())) {
-				methodMap.put(relationship.getSubjectId().intValue(), relationship.getObjectId().intValue());
-			
-			} else if (CVTermId.HAS_SCALE.getId().equals(relationship.getTypeId())) {
-				scaleMap.put(relationship.getSubjectId().intValue(), relationship.getObjectId().intValue());
-			
-			} else if (CVTermId.HAS_TYPE.getId().equals(relationship.getTypeId())) {
-				if (NUMERIC_FIELDS.contains(relationship.getObjectId())) {
-					dataTypeMap.put(relationship.getSubjectId().intValue(), "N");
-				
-				} else if (CHARACTER_FIELDS.contains(relationship.getObjectId())) {
-					dataTypeMap.put(relationship.getSubjectId().intValue(), "C");
+		if (relationships != null) {
+			for (CVTermRelationship relationship : relationships) {
+				if (CVTermId.HAS_PROPERTY.getId().equals(relationship.getTypeId())) {
+					propertyMap.put(relationship.getSubjectId().intValue(), relationship.getObject().getName());
 					
-				}
+				} else if (CVTermId.HAS_METHOD.getId().equals(relationship.getTypeId())) {
+					methodMap.put(relationship.getSubjectId().intValue(), relationship.getObject().getName());
 				
-			} else if (CVTermId.STORED_IN.getId().equals(relationship.getTypeId())) {
-				storedInMap.put(relationship.getSubjectId().intValue(), relationship.getObjectId().intValue());
+				} else if (CVTermId.HAS_SCALE.getId().equals(relationship.getTypeId())) {
+					scaleMap.put(relationship.getSubjectId().intValue(), relationship.getObject().getName());
+				
+				} else if (CVTermId.HAS_TYPE.getId().equals(relationship.getTypeId())) {
+					if (NUMERIC_FIELDS.contains(relationship.getObject().getCvTermId())) {
+						dataTypeMap.put(relationship.getSubjectId().intValue(), "N");
+					
+					} else if (CHARACTER_FIELDS.contains(relationship.getObject().getCvTermId())) {
+						dataTypeMap.put(relationship.getSubjectId().intValue(), "C");
+						
+					}
+					
+				} else if (CVTermId.STORED_IN.getId().equals(relationship.getTypeId())) {
+					storedInMap.put(relationship.getSubjectId().intValue(), relationship.getObject().getCvTermId().intValue());
+				}
 			}
 		}
 	}
 	
-	public Integer getProperty(Integer varId) {
+	public String getProperty(Integer varId) {
 		return propertyMap.get(varId);
 	}
 	
-	public Integer getMethod(Integer varId) {
+	public String getMethod(Integer varId) {
 		return methodMap.get(varId);
 	}
 	
-	public Integer getScale(Integer varId) {
+	public String getScale(Integer varId) {
 		return scaleMap.get(varId);
 	}
 	
@@ -77,15 +75,6 @@ public class CVTermRelationshipHelper {
 	
 	public Integer getStoredIn(Integer varId) {
 		return storedInMap.get(varId);
-	}
-	
-	public boolean isFactor(Integer varId) {
-		return !isVariate(varId);
-	}
-	
-	public boolean isVariate(Integer varId) {
-		Integer storedInId = storedInMap.get(varId);
-		return (storedInId != null && VARIATE_TYPES.contains(storedInId));
 	}
 	
 }
