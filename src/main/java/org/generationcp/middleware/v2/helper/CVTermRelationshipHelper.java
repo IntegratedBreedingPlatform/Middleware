@@ -31,27 +31,28 @@ public class CVTermRelationshipHelper {
 	
 	private void translateRelationshipsToMaps(List<CVTermRelationship> relationships) {
 		if (relationships != null) {
+			//TODO query cvterm for the names..
 			for (CVTermRelationship relationship : relationships) {
 				if (CVTermId.HAS_PROPERTY.getId().equals(relationship.getTypeId())) {
-					propertyMap.put(relationship.getSubjectId().intValue(), relationship.getObject().getName());
+					propertyMap.put(relationship.getSubjectId().intValue(), relationship.getObjectId().toString());
 					
 				} else if (CVTermId.HAS_METHOD.getId().equals(relationship.getTypeId())) {
-					methodMap.put(relationship.getSubjectId().intValue(), relationship.getObject().getName());
+					methodMap.put(relationship.getSubjectId().intValue(), relationship.getObjectId().toString());
 				
 				} else if (CVTermId.HAS_SCALE.getId().equals(relationship.getTypeId())) {
-					scaleMap.put(relationship.getSubjectId().intValue(), relationship.getObject().getName());
+					scaleMap.put(relationship.getSubjectId().intValue(), relationship.getObjectId().toString());
 				
 				} else if (CVTermId.HAS_TYPE.getId().equals(relationship.getTypeId())) {
-					if (NUMERIC_FIELDS.contains(relationship.getObject().getCvTermId())) {
+					if (NUMERIC_FIELDS.contains(relationship.getObjectId())) {
 						dataTypeMap.put(relationship.getSubjectId().intValue(), "N");
 					
-					} else if (CHARACTER_FIELDS.contains(relationship.getObject().getCvTermId())) {
+					} else if (CHARACTER_FIELDS.contains(relationship.getObjectId())) {
 						dataTypeMap.put(relationship.getSubjectId().intValue(), "C");
 						
 					}
 					
 				} else if (CVTermId.STORED_IN.getId().equals(relationship.getTypeId())) {
-					storedInMap.put(relationship.getSubjectId().intValue(), relationship.getObject().getCvTermId().intValue());
+					storedInMap.put(relationship.getSubjectId().intValue(), relationship.getObjectId());
 				}
 			}
 		}
