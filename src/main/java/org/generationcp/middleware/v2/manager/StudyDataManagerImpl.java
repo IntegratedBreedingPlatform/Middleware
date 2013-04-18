@@ -24,8 +24,6 @@ import org.generationcp.middleware.v2.pojos.FactorDetails;
 import org.generationcp.middleware.v2.pojos.Folder;
 import org.generationcp.middleware.v2.pojos.ObservationDetails;
 import org.generationcp.middleware.v2.pojos.StudyDetails;
-import org.generationcp.middleware.v2.pojos.StudyNode;
-import org.generationcp.middleware.v2.pojos.StudyQueryFilter;
 import org.generationcp.middleware.v2.pojos.VariableDetails;
 import org.generationcp.middleware.v2.util.CVTermRelationshipUtil;
 import org.generationcp.middleware.v2.util.ProjectPropertyUtil;
@@ -117,10 +115,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		return getDetails(studyId, getObservationDetailsFactory());
 	}
 
-	@Override
-	public List<StudyNode> searchStudies(StudyQueryFilter filter) throws MiddlewareQueryException {
-		return null;
-/*		Set<StudyNode> studies = new HashSet<StudyNode>();
+	//@Override
+	/*public List<StudyNode> searchStudies(StudyQueryFilter filter) throws MiddlewareQueryException {
+		Set<StudyNode> studies = new HashSet<StudyNode>();
 		
 		if (setWorkingDatabase(filter.getInstance())) {		
 			//search by start date - in projectprop
@@ -145,9 +142,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		
 		}
 		return new ArrayList<StudyNode>(studies);
-*/
-	}
 
+	}
+*/
 	
 	//===================================  HELPER METHODS ==============================================	
 	private <T extends VariableDetails> List<T> getDetails(Integer studyId, VariableDetailsFactory<T> factory) throws MiddlewareQueryException {
