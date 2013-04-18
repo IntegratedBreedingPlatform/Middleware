@@ -19,11 +19,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.WhereJoinTable;
 
 /**
  * 
@@ -48,7 +44,7 @@ public class CVTermRelationship implements Serializable{
     @Basic(optional = false)
     @GeneratedValue
     @Column(name = "cvterm_relationship_id")
-    private Long cvTermRelationshipId;
+    private Integer cvTermRelationshipId;
     
     /**
      * The nature of the relationship between subject and object. 
@@ -72,28 +68,26 @@ public class CVTermRelationship implements Serializable{
      * In a graph, this typically corresponds to the parent node.
      * References cvterm
      */
-    @ManyToOne(targetEntity = CVTerm.class)
-	@JoinColumn(name = "object_id", nullable = false, referencedColumnName = "cvterm_id")
-    @WhereJoinTable(clause = "is_obsolete = 0")
-    private CVTerm object;
+    @Column(name="object_id")
+    private Integer objectId;
     
 	public CVTermRelationship() {
 	}
 
-	public CVTermRelationship(Long cvTermRelationshipId, Integer typeId,
-			Integer subjectId, CVTerm object) {
+	public CVTermRelationship(Integer cvTermRelationshipId, Integer typeId,
+			Integer subjectId, Integer objectId) {
 		super();
 		this.cvTermRelationshipId = cvTermRelationshipId;
 		this.typeId = typeId;
 		this.subjectId = subjectId;
-		this.object = object;
+		this.objectId = objectId;
 	}
 
-	public Long getCvTermRelationshipId() {
+	public Integer getCvTermRelationshipId() {
 		return cvTermRelationshipId;
 	}
 
-	public void setCvTermRelationshipId(Long cvTermRelationshipId) {
+	public void setCvTermRelationshipId(Integer cvTermRelationshipId) {
 		this.cvTermRelationshipId = cvTermRelationshipId;
 	}
 
@@ -113,12 +107,12 @@ public class CVTermRelationship implements Serializable{
 		this.subjectId = subjectId;
 	}
 
-	public CVTerm getObject() {
-		return object;
+	public Integer getObjectId() {
+		return objectId;
 	}
 
-	public void setObject(CVTerm object) {
-		this.object = object;
+	public void setObject(Integer objectId) {
+		this.objectId = objectId;
 	}
 
 	@Override
@@ -153,7 +147,7 @@ public class CVTermRelationship implements Serializable{
 	public String toString() {
 		return "CVTermRelationship [cvTermRelationshipId="
 				+ cvTermRelationshipId + ", typeId=" + typeId + ", subjectId="
-				+ subjectId + ", object=" + object + "]";
+				+ subjectId + ", objectId=" + objectId + "]";
 	}
 
 }
