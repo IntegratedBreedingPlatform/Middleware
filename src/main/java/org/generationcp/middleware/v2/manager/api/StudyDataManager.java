@@ -20,6 +20,8 @@ import org.generationcp.middleware.v2.pojos.FactorDetails;
 import org.generationcp.middleware.v2.pojos.Folder;
 import org.generationcp.middleware.v2.pojos.ObservationDetails;
 import org.generationcp.middleware.v2.pojos.StudyDetails;
+import org.generationcp.middleware.v2.pojos.StudyNode;
+import org.generationcp.middleware.v2.pojos.StudyQueryFilter;
 
 /**
  * This is the API for retrieving phenotypic data stored as Studies and
@@ -55,7 +57,7 @@ public interface StudyDataManager {
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	List<FactorDetails> getFactorDetails(int studyId) throws MiddlewareQueryException;
+	List<FactorDetails> getFactorDetails(Integer studyId) throws MiddlewareQueryException;
 
 	/**
 	 * Returns the list of observation details for a specific study.
@@ -64,5 +66,14 @@ public interface StudyDataManager {
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	List<ObservationDetails> getObservationDetails(int studyId) throws MiddlewareQueryException;
+	List<ObservationDetails> getObservationDetails(Integer studyId) throws MiddlewareQueryException;
+	
+	/**
+	 * Returns the list of study nodes for a particular search filter.
+	 * 
+	 * @param filter
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	List<StudyNode> searchStudies(StudyQueryFilter filter) throws MiddlewareQueryException;
 }

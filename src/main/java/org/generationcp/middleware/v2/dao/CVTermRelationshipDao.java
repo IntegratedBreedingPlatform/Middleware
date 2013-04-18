@@ -1,5 +1,6 @@
 package org.generationcp.middleware.v2.dao;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -14,16 +15,22 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Long> 
 
 	@SuppressWarnings("unchecked")
 	public List<CVTermRelationship> getBySubjectIds(Collection<Integer> subjectIds) throws MiddlewareQueryException {
-		try {
-			Criteria criteria = getSession().createCriteria(getPersistentClass());
-			criteria.add(Restrictions.in("subjectId", subjectIds));
-
-			return criteria.list();
-			
-		} catch(HibernateException e) {
-			logAndThrowException("Error with getByCVTermIds=" + subjectIds + ") query from CVTermRelationship: "
-                    + e.getMessage(), e);
-			return null;
+		if (subjectIds != null && subjectIds.size() > 0) {
+			try {
+				Criteria criteria = getSession().createCriteria(getPersistentClass());
+				criteria.add(Restrictions.in("subjectId", subjectIds));
+	
+				List<CVTermRelationship> results = criteria.list();
+				if (results != null) {
+					return results;
+				}
+				
+			} catch(HibernateException e) {
+				logAndThrowException("Error with getByCVTermIds=" + subjectIds + ") query from CVTermRelationship: "
+	                    + e.getMessage(), e);
+				return null;
+			}
 		}
+		return new ArrayList<CVTermRelationship>();
 	}
 }

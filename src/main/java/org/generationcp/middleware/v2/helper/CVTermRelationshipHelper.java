@@ -1,10 +1,12 @@
 package org.generationcp.middleware.v2.helper;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.generationcp.middleware.v2.pojos.CVTerm;
 import org.generationcp.middleware.v2.pojos.CVTermId;
 import org.generationcp.middleware.v2.pojos.CVTermRelationship;
 
@@ -17,6 +19,8 @@ public class CVTermRelationshipHelper {
 	private Map<Integer, String> dataTypeMap = new HashMap<Integer, String>();
 	private Map<Integer, Integer> storedInMap = new HashMap<Integer, Integer>();
 	
+	private CVTermHelper termsHelper;
+	
 	private List<Integer> NUMERIC_FIELDS = Arrays.asList(
 			CVTermId.NUMERIC_VARIABLE.getId(), CVTermId.NUMERIC_DBID_VARIABLE.getId(), CVTermId.DATE_VARIABLE.getId()
 	);
@@ -25,34 +29,34 @@ public class CVTermRelationshipHelper {
 			CVTermId.CHARACTER_DBID_VARIABLE.getId(), CVTermId.CHARACTER_VARIABLE.getId()
 	);
 	
-	public CVTermRelationshipHelper(List<CVTermRelationship> relationships) {
+	public CVTermRelationshipHelper(Collection<CVTermRelationship> relationships, Collection<CVTerm> terms) {
+		termsHelper = new CVTermHelper(terms);
 		translateRelationshipsToMaps(relationships);
 	}
 	
-	private void translateRelationshipsToMaps(List<CVTermRelationship> relationships) {
+	private void translateRelationshipsToMaps(Collection<CVTermRelationship> relationships) {
 		if (relationships != null) {
-			//TODO query cvterm for the names..
 			for (CVTermRelationship relationship : relationships) {
 				if (CVTermId.HAS_PROPERTY.getId().equals(relationship.getTypeId())) {
-					propertyMap.put(relationship.getSubjectId().intValue(), relationship.getObjectId().toString());
+					propertyMap.put(relationship.getSubjectId(), termsHelper.getName(relationship.getObjectId()));
 					
 				} else if (CVTermId.HAS_METHOD.getId().equals(relationship.getTypeId())) {
-					methodMap.put(relationship.getSubjectId().intValue(), relationship.getObjectId().toString());
+					methodMap.put(relationship.getSubjectId(), termsHelper.getName(relationship.getObjectId()));
 				
 				} else if (CVTermId.HAS_SCALE.getId().equals(relationship.getTypeId())) {
-					scaleMap.put(relationship.getSubjectId().intValue(), relationship.getObjectId().toString());
+					scaleMap.put(relationship.getSubjectId(), termsHelper.getName(relationship.getObjectId()));
 				
 				} else if (CVTermId.HAS_TYPE.getId().equals(relationship.getTypeId())) {
 					if (NUMERIC_FIELDS.contains(relationship.getObjectId())) {
-						dataTypeMap.put(relationship.getSubjectId().intValue(), "N");
+						dataTypeMap.put(relationship.getSubjectId(), "N");
 					
 					} else if (CHARACTER_FIELDS.contains(relationship.getObjectId())) {
-						dataTypeMap.put(relationship.getSubjectId().intValue(), "C");
+						dataTypeMap.put(relationship.getSubjectId(), "C");
 						
 					}
 					
 				} else if (CVTermId.STORED_IN.getId().equals(relationship.getTypeId())) {
-					storedInMap.put(relationship.getSubjectId().intValue(), relationship.getObjectId());
+					storedInMap.put(relationship.getSubjectId(), relationship.getObjectId());
 				}
 			}
 		}

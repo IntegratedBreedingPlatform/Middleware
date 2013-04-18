@@ -570,7 +570,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             if (isVariateNumeric(variateId)) {
                 hasValues = dao.hasValuesByNumVariateAndDataset(variateId, datasetId);
             } else if (!isVariateNumeric(variateId)) {
-                hasValues = dao.hasValuesByNumVariateAndDataset(variateId, datasetId);
+                hasValues = dao.hasValuesByCharVariateAndDataset(variateId, datasetId);
             } else {
                 logAndThrowException("Database Error: the variate selected has no datatype specified in the database.", LOG);
             }

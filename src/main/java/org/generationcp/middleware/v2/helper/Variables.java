@@ -1,9 +1,11 @@
 package org.generationcp.middleware.v2.helper;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.generationcp.middleware.v2.pojos.CVTerm;
 import org.generationcp.middleware.v2.pojos.CVTermId;
 import org.generationcp.middleware.v2.pojos.CVTermRelationship;
 import org.generationcp.middleware.v2.pojos.ProjectProperty;
@@ -19,9 +21,9 @@ public class Variables {
 		return standardVariableIds;
 	}
 	
-	public Variables(List<ProjectProperty> properties, List<CVTermRelationship> relationships) {
+	public Variables(List<ProjectProperty> properties, Collection<CVTermRelationship> relationships, Collection<CVTerm> terms) {
 		standardVariableIds = ProjectPropertyUtil.extractStandardVariableIds(properties);
-		CVTermRelationshipHelper relationshipHelper = new CVTermRelationshipHelper(relationships);
+		CVTermRelationshipHelper relationshipHelper = new CVTermRelationshipHelper(relationships, terms);
 		
 		for (ProjectProperty property : properties) {
 			if (isNameField(property)) {
