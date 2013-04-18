@@ -17,11 +17,13 @@ import org.generationcp.middleware.v2.factory.ObservationDetailsFactory;
 import org.generationcp.middleware.v2.factory.StudyFactory;
 import org.generationcp.middleware.v2.factory.VariableDetailsFactory;
 import org.generationcp.middleware.v2.manager.api.StudyDataManager;
+import org.generationcp.middleware.v2.pojos.AbstractNode;
 import org.generationcp.middleware.v2.pojos.CVTerm;
 import org.generationcp.middleware.v2.pojos.CVTermRelationship;
+import org.generationcp.middleware.v2.pojos.DatasetNode;
 import org.generationcp.middleware.v2.pojos.DmsProject;
+import org.generationcp.middleware.v2.pojos.FolderNode;
 import org.generationcp.middleware.v2.pojos.FactorDetails;
-import org.generationcp.middleware.v2.pojos.Folder;
 import org.generationcp.middleware.v2.pojos.ObservationDetails;
 import org.generationcp.middleware.v2.pojos.StudyDetails;
 import org.generationcp.middleware.v2.pojos.VariableDetails;
@@ -37,7 +39,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	
 	private CVTermDao cvTermDao;
 
-	public StudyDataManagerImpl() { }
+	public StudyDataManagerImpl() { 		
+	}
 
 	public StudyDataManagerImpl(HibernateSessionProvider sessionProviderForLocal,
 			                    HibernateSessionProvider sessionProviderForCentral) {
@@ -96,14 +99,29 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 	
 	@Override
-	public List<Folder> getRootFolders(Database instance) throws MiddlewareQueryException{
-			
+	public List<FolderNode> getRootFolders(Database instance) throws MiddlewareQueryException{
 		if (setWorkingDatabase(instance, getDmsProjectDao())){
 			return getDmsProjectDao().getRootFolders();
 		}
-		
 		return null;
 	}
+	
+	@Override
+	public List<AbstractNode> getChildrenOfFolder(Integer folderId, Database instance) throws MiddlewareQueryException{
+		if (setWorkingDatabase(instance, getDmsProjectDao())){
+			return getDmsProjectDao().getChildrenOfFolder(folderId);
+		}
+		return null;
+	}
+	
+	@Override
+	public List<DatasetNode> getDatasetNodesByStudyId(Integer studyId, Database instance) throws MiddlewareQueryException{
+		if (setWorkingDatabase(instance, getDmsProjectDao())){
+			return getDmsProjectDao().getDatasetNodesByStudyId(studyId);
+		}
+		return null;
+	}
+
 
 	@Override
 	public List<FactorDetails> getFactorDetails(Integer studyId) throws MiddlewareQueryException {

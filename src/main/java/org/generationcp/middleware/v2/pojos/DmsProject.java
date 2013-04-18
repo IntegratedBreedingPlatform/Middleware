@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2012, All Rights Reserved.
+ * 
+ * Generation Challenge Programme (GCP)
+ * 
+ * 
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * 
+ *******************************************************************************/
 package org.generationcp.middleware.v2.pojos;
 
 import java.io.Serializable;
@@ -30,14 +41,9 @@ public class DmsProject implements Serializable {
 
 	private static final long serialVersionUID = 464731947805951726L;
 	
-	public static final String GET_ROOT_FOLDERS = 
-		"SELECT DISTINCT p.project_id, p.name " +
-		"FROM Project p " +
-        "INNER JOIN project_relationship r ON r.object_project_id = p.project_id " +
-        "WHERE r.type_id = 1140 " +
-        "AND NOT EXISTS " +
-        "( SELECT 1 FROM project_relationship child " +
-        "  WHERE child.subject_project_id = p.project_id)";
+	/** The project id of the SYSTEM root folder */
+	//TODO Pending confirmation. System folder project id = 1
+	public static final Integer SYSTEM_FOLDER_ID = 1;
 	
 	@Id
 	@Basic(optional = false)

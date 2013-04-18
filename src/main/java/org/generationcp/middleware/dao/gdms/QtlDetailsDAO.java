@@ -199,7 +199,7 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
             for (Object o : results) {
                 Object[] result = (Object[]) o;
                 if (result != null) {
-                	//Get the fields for QtlData          
+                	//Get the fields for QtlDataElement         
                 	String qtlName = (String) result[0];
                 	String linkageGroup = (String) result[1];
                 	Float position = (Float) result[2]; 
@@ -218,9 +218,6 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
                     toReturn.add(qtlData);
                 }
             }
-
-
-            
         } catch (HibernateException e) {
         	logAndThrowException("Error with getQtlDataByQtlTraits() query from QtlDetails: " + e.getMessage(), e);    
         }

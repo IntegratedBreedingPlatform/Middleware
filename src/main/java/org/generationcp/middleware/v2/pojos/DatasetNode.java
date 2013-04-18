@@ -13,21 +13,21 @@
 package org.generationcp.middleware.v2.pojos;
 
 /**
- * This class is used to display root or top-level folders of Studies
+ * This class is used to display Dataset nodes
  * 
- * @author Darla Ani
+ * @author Joyce Avestro
  *
  */
-public class Folder extends AbstractNode {
+public class DatasetNode extends AbstractNode {
 	
-	public Folder(Long id, String name){
+	public DatasetNode(Integer id, String name){
 		super.setId(id);
 		super.setName(name);
 	}
 
 	@Override
 	protected String getEntityName() {
-		return "Folder";
+		return "DatasetNode";
 	}
 
 }
