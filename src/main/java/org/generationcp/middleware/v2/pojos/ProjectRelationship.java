@@ -7,6 +7,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -33,16 +35,16 @@ public class ProjectRelationship implements Serializable {
 	/**
 	 * The Subject of the Relationship.
 	 */
-	@Basic(optional = false)
-	@Column(name = "subject_project_id")
-	private Integer subjectProjectId;
+	@ManyToOne(targetEntity = DmsProject.class)
+	@JoinColumn(name = "subject_project_id", nullable = false, referencedColumnName = "project_id")
+	private DmsProject subjectProject;
 	
 	/**
 	 * The Object of the Relationship.
 	 */
-	@Basic(optional = false)
-	@Column(name = "object_project_id")
-	private Integer objectProjectId;
+	@ManyToOne(targetEntity = DmsProject.class)
+	@JoinColumn(name = "object_project_id", nullable = false, referencedColumnName = "project_id")
+	private DmsProject objectProject;
 	
 	/**
 	 * The Type of Relationship.
@@ -51,6 +53,7 @@ public class ProjectRelationship implements Serializable {
 	@Column(name = "type_id")
 	private Integer typeId;
 
+	
 	public Integer getProjectRelationshipId() {
 		return projectRelationshipId;
 	}
@@ -59,20 +62,20 @@ public class ProjectRelationship implements Serializable {
 		this.projectRelationshipId = projectRelationshipId;
 	}
 
-	public Integer getSubjectProjectId() {
-		return subjectProjectId;
+	public DmsProject getSubjectProject() {
+		return subjectProject;
 	}
 
-	public void setSubjectProjectId(Integer subjectProjectId) {
-		this.subjectProjectId = subjectProjectId;
+	public void setSubjectProject(DmsProject subjectProject) {
+		this.subjectProject = subjectProject;
 	}
 
-	public Integer getObjectProjectId() {
-		return objectProjectId;
+	public DmsProject getObjectProject() {
+		return objectProject;
 	}
 
-	public void setObjectProjectId(Integer objectProjectId) {
-		this.objectProjectId = objectProjectId;
+	public void setObjectProject(DmsProject objectProject) {
+		this.objectProject = objectProject;
 	}
 
 	public Integer getTypeId() {
@@ -114,9 +117,9 @@ public class ProjectRelationship implements Serializable {
 	@Override
 	public String toString() {
 		return "ProjectRelationship [projectRelationshipId="
-				+ projectRelationshipId + ", subjectProjectId="
-				+ subjectProjectId + ", objectProjectId=" + objectProjectId
-				+ ", typeId=" + typeId + "]";
+				+ projectRelationshipId + ", subjectProject=" + subjectProject
+				+ ", objectProject=" + objectProject + ", typeId=" + typeId
+				+ "]";
 	}
 
 }
