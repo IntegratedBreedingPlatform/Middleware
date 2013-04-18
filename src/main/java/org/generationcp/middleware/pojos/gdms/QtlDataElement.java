@@ -170,7 +170,7 @@ public class QtlDataElement {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("QtlData [qtlName=");
+		builder.append("QtlDataElement [qtlName=");
 		builder.append(qtlName);
 		builder.append(", linkageGroup=");
 		builder.append(linkageGroup);

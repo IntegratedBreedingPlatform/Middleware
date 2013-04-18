@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.v2.dao;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,19 +42,21 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "		 AND r.objectProject.projectId = " + DmsProject.SYSTEM_FOLDER_ID + " " 
 			+ "ORDER BY name "
 			;
-
-	public static final String GET_CHILDREN_OF_FOLDER = 
-			"SELECT  DISTINCT subject.projectId, subject.name, COALESCE(isStudy.typeId, 0) AS isStudy "
-			+ "FROM    DmsProject subject "
-			+ "        JOIN subject.relatedTos parent "
-			+ "        LEFT JOIN subject.relatedTos isStudy "
-			+ "WHERE   	parent.typeId = " + CVTermId.HAS_PARENT_FOLDER.getId() + " "
-			+ "        	AND parent.objectProject.projectId = :folderId "
-			+ "        	AND isStudy.typeId = " + CVTermId.IS_STUDY.getId() + " " 
+	
+	public static final String GET_CHILDREN_OF_FOLDER =		
+			"SELECT  DISTINCT subject.project_id, subject.name, IFNULL(is_study.type_id, 0) AS is_study "
+			+ "FROM    project subject "
+			+ "        INNER JOIN project_relationship pr ON subject.project_id = pr.subject_project_id "
+			+ "        LEFT JOIN project_relationship is_study ON subject.project_id = is_study.subject_project_id "
+			+ "        					AND is_study.type_id = " + CVTermId.IS_STUDY.getId() + " "
+			+ "WHERE   pr.type_id = " + CVTermId.HAS_PARENT_FOLDER.getId() + " "
+			+ "        and pr.object_project_id = :folderId "
 			+ "ORDER BY name "
 			;
 
-	public static final String GET_DATASET_NODE_BY_STUDY = "SELECT DISTINCT p.projectId, p.name, pr.objectProject.projectId "
+
+	public static final String GET_DATASET_NODE_BY_STUDY = 
+			"SELECT DISTINCT p.projectId, p.name, pr.objectProject.projectId "
 			+ "FROM DmsProject p JOIN p.relatedTos pr "
 			+ "WHERE pr.typeId = " + CVTermId.BELONGS_TO_STUDY.getId() + " "
 			+ "      AND pr.objectProject.projectId = :studyId "
@@ -88,14 +91,14 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		List<AbstractNode> childrenNodes = new ArrayList<AbstractNode>();
 		
 		try {
-			Query query = getSession().createQuery(GET_CHILDREN_OF_FOLDER);
+			Query query = getSession().createSQLQuery(GET_CHILDREN_OF_FOLDER);
 			query.setParameter("folderId", folderId);
 			List<Object[]> list =  query.list();
 			
 			for (Object[] row : list){
 				Integer id = (Integer) row[0]; //project.id
 				String name = (String) row [1]; //project.name
-				Integer isStudy = (Integer) row[2]; //non-zero if a study, else a folder
+				Integer isStudy = ((BigInteger) row[2]).intValue(); //non-zero if a study, else a folder
 				
 				if (isStudy > 0){
 					childrenNodes.add(new StudyNode(id, name));
