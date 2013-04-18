@@ -35,7 +35,7 @@ import org.junit.Test;
 
 public class TestStudyDataManagerImpl {
 
-	private static final int STUDY_ID = 10010;
+	private static final Integer STUDY_ID = 10010;
 
 	private static ManagerFactory factory;
 	private static StudyDataManager manager;

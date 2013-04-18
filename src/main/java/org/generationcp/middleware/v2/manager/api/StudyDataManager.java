@@ -38,7 +38,7 @@ public interface StudyDataManager {
 	 * @return the study details or null if not found
 	 * @throws MiddlewareQueryException 
 	 */
-	StudyDetails getStudyDetails(int studyId) throws MiddlewareQueryException;
+	StudyDetails getStudyDetails(Integer studyId) throws MiddlewareQueryException;
 	
 	/**
 	 * Returns list of root or top-level folders from specified database
