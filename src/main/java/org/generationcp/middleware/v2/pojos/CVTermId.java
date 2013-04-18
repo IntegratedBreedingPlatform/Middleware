@@ -42,6 +42,12 @@ public enum CVTermId {
 	//Variate Types
 	, OBSERVATION_VARIATE(1043)
 	, CATEGORICAL_VARIATE(1048)
+	
+	//Folder, Study, Dataset Nodes
+	, HAS_PARENT_FOLDER(1140)
+	, BELONGS_TO_STUDY(1150) 
+	, IS_STUDY(1145) //TODO For confirmation
+	
 	;
 	
 	private final Integer id;
