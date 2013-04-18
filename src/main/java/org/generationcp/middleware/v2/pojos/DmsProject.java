@@ -38,7 +38,7 @@ public class DmsProject implements Serializable {
         "AND NOT EXISTS " +
         "( SELECT 1 FROM project_relationship child " +
         "  WHERE child.subject_project_id = p.project_id)";
-
+	
 	@Id
 	@Basic(optional = false)
 	@GeneratedValue
@@ -65,6 +65,12 @@ public class DmsProject implements Serializable {
 	 */
 	@OneToMany(mappedBy = "project", fetch = FetchType.EAGER)
 	private List<ProjectProperty> properties;
+	
+	@OneToMany(mappedBy = "subjectProject", fetch = FetchType.LAZY)
+	private List<ProjectRelationship> relatedTos;
+	
+	@OneToMany(mappedBy = "objectProject", fetch = FetchType.LAZY)
+	private List<ProjectRelationship> relatedBys;
 	
 	
 	public Integer getProjectId() {
@@ -97,6 +103,22 @@ public class DmsProject implements Serializable {
 
 	public void setProperties(List<ProjectProperty> properties) {
 		this.properties = properties;
+	}
+
+	public List<ProjectRelationship> getRelatedTos() {
+		return relatedTos;
+	}
+
+	public void setRelatedTos(List<ProjectRelationship> relatedTos) {
+		this.relatedTos = relatedTos;
+	}
+
+	public List<ProjectRelationship> getRelatedBys() {
+		return relatedBys;
+	}
+
+	public void setRelatedBys(List<ProjectRelationship> relatedBys) {
+		this.relatedBys = relatedBys;
 	}
 
 	@Override
