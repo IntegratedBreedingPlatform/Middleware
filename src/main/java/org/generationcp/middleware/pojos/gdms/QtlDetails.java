@@ -108,7 +108,18 @@ public class QtlDetails implements Serializable{
     		;
     
     public static final String GET_QTL_DATA_BY_QTL_TRAITS =
-    		"SELECT * "		//TODO Specify only the required fields
+    		"SELECT CONCAT(gq.qtl_name,'') " 
+			+ "		, gqd.linkage_group " 
+    		+ "		, gqd.position " 
+    		+ "		, gqd.min_position " 
+    		+ "		, gqd.max_position " 
+    		+ "		, CONCAT(gqd.trait,'') " 
+    		+ "		, CONCAT(gqd.experiment,'') " 
+    		+ "		, gqd.left_flanking_marker " 
+    		+ "		, gqd.right_flanking_marker " 
+    		+ "		, gqd.effect " 
+    		+ "		, gqd.score_value "
+    		+ "		, gqd.r_square "
     		+ "FROM gdms_qtl_details gqd " 
     		+ "INNER JOIN gdms_qtl gq "
     		+ "ON gqd.qtl_id = gq.qtl_id " 

@@ -17,8 +17,7 @@ import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.gdms.Qtl;
-import org.generationcp.middleware.pojos.gdms.QtlData;
+import org.generationcp.middleware.pojos.gdms.QtlDataElement;
 import org.generationcp.middleware.pojos.gdms.QtlDetails;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -181,8 +180,8 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
         return 0L;
     }
     
-    public List<QtlData> getQtlDataByQtlTraits(List<String> qtlTraits, int start, int numOfRows) throws MiddlewareQueryException{
-        List<QtlData> toReturn = new ArrayList<QtlData>();
+    public List<QtlDataElement> getQtlDataByQtlTraits(List<String> qtlTraits, int start, int numOfRows) throws MiddlewareQueryException{
+        List<QtlDataElement> toReturn = new ArrayList<QtlDataElement>();
 
         if (qtlTraits == null || qtlTraits.size() == 0) {
             return toReturn;
@@ -200,8 +199,22 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
             for (Object o : results) {
                 Object[] result = (Object[]) o;
                 if (result != null) {
-                	//TODO Get the fields for QtlData                	
-                    QtlData qtlData = new QtlData(new QtlDetails(), new Qtl());
+                	//Get the fields for QtlData          
+                	String qtlName = (String) result[0];
+                	String linkageGroup = (String) result[1];
+                	Float position = (Float) result[2]; 
+                	Float minPosition = (Float) result[3];
+                	Float maxPosition = (Float) result[4]; 
+                	String trait = (String) result[5]; 
+                	String experiment = (String) result[6]; 
+                	String leftFlankingMarker = (String) result[7]; 
+                	String rightFlankingMarker = (String) result[8]; 
+                	Integer effect = (Integer) result[9]; 
+                	Float scoreValue = (Float) result[10]; 
+                	Float rSquare = (Float) result[11];
+
+                    QtlDataElement qtlData = new QtlDataElement(qtlName, linkageGroup, position, minPosition, maxPosition, 
+                    		trait, experiment, leftFlankingMarker, rightFlankingMarker, effect, scoreValue, rSquare);
                     toReturn.add(qtlData);
                 }
             }

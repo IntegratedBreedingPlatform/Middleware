@@ -51,7 +51,7 @@ import org.generationcp.middleware.pojos.gdms.MarkerOnMap;
 import org.generationcp.middleware.pojos.gdms.MarkerUserInfo;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.generationcp.middleware.pojos.gdms.Qtl;
-import org.generationcp.middleware.pojos.gdms.QtlData;
+import org.generationcp.middleware.pojos.gdms.QtlDataElement;
 import org.generationcp.middleware.pojos.gdms.QtlDetailElement;
 import org.generationcp.middleware.pojos.gdms.QtlDetails;
 import org.generationcp.middleware.pojos.gdms.QtlDetailsPK;
@@ -1780,8 +1780,11 @@ public class TestGenotypicDataManagerImpl{
     public void testGetQtlDataByQtlTraits() throws Exception {
         List<String> qtlTraits = new ArrayList<String>();   // Crop tested: Groundnut
 		qtlTraits.add("HI");     
-        List<QtlData> results = manager.getQtlDataByQtlTraits(qtlTraits, 0, (int) manager.countQtlDataByQtlTraits(qtlTraits)); 
-        System.out.println("testGetQtlByName() RESULTS: " + results);
+        List<QtlDataElement> results = manager.getQtlDataByQtlTraits(qtlTraits, 0, (int) manager.countQtlDataByQtlTraits(qtlTraits)); 
+        System.out.println("testGetQtlByName() RESULTS: " + results.size());
+        for (QtlDataElement element : results){
+            System.out.println("    " + element);
+        }
     }
 
 
