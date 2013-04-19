@@ -221,6 +221,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			System.out.println("querying " + projectIds);
 			Criteria criteria = getSession().createCriteria(getPersistentClass());
 			criteria.add(Restrictions.in("projectId", projectIds));
+			criteria.createAlias("relatedTos", "pr");
+			criteria.add(Restrictions.eq("pr.typeId", CVTermId.IS_STUDY.getId()));
 			ProjectionList projectionList = Projections.projectionList();
 			projectionList.add(Projections.property("projectId"));
 			projectionList.add(Projections.property("name"));

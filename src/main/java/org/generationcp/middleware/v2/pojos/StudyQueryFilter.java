@@ -1,6 +1,5 @@
 package org.generationcp.middleware.v2.pojos;
 
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Season;
 
 public class StudyQueryFilter {
@@ -17,8 +16,6 @@ public class StudyQueryFilter {
 	
 	private int numOfRows;
 	
-	private Database instance;
-
 	public Integer getStartDate() {
 		return startDate;
 	}
@@ -67,19 +64,11 @@ public class StudyQueryFilter {
 		this.numOfRows = numOfRows;
 	}
 
-	public Database getInstance() {
-		return instance;
-	}
-
-	public void setInstance(Database instance) {
-		this.instance = instance;
-	}
-
 	@Override
 	public String toString() {
 		return "StudyQueryFilter [startDate=" + startDate + ", name=" + name
 				+ ", country=" + country + ", season=" + season + ", start="
-				+ start + ", numOfRows=" + numOfRows + ", instance=" + instance
+				+ start + ", numOfRows=" + numOfRows
 				+ "]";
 	}
 

@@ -85,16 +85,17 @@ public class TestStudyDataManagerImpl {
     public void testSearchStudies() throws Exception {
     	System.out.println("testSearchStudies");
     	StudyQueryFilter filter = new StudyQueryFilter();
-    	//filter.setInstance(Database.CENTRAL);
-       	//filter.setStartDate(20050119);
+       	filter.setStartDate(20050119);
        	//filter.setName("BULU"); //INVALID: Not a study, should not be returned
-       	//filter.setName("2002WS-CHA"); //VALID: is a study
-    	//filter.setCountry("Republic of the Philippines");
+       	filter.setName("2002WS-CHA"); //VALID: is a study
+    	filter.setCountry("Republic of the Philippines");
     	filter.setSeason(Season.DRY);
+    	//filter.setSeason(Season.GENERAL); //do nothing for GENERAL SEASON
+    	//filter.setSeason(Season.WET); //currently has no data
     	List<StudyNode> studies = manager.searchStudies(filter);
     	System.out.println("INPUT: " + filter);
     	for (StudyNode study : studies) {
-    		System.out.println(study.getId() + " - " + study.getName());
+    		System.out.println("\t" + study.getId() + " - " + study.getName());
     	}
     }
 

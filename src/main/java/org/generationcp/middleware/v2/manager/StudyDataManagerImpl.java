@@ -253,7 +253,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	}
 	
-	//===================================  HELPER METHODS ==============================================	
 	private <T extends VariableDetails> List<T> getDetails(Integer studyId, VariableDetailsFactory<T> factory) throws MiddlewareQueryException {
 		List<T> factors = new ArrayList<T>();
 		
@@ -374,7 +373,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	
 	@SuppressWarnings("unchecked")
 	private List<StudyNode> getBySeason(Season season) throws MiddlewareQueryException {
-		if (season != null) {
+		if (season != null && season != Season.GENERAL) {
 			List<Object[]> pairs = new ArrayList<Object[]>();
 			
 			//look for factors that has a property of "Season"
