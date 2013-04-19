@@ -254,25 +254,30 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 	
 	private <T extends VariableDetails> List<T> getDetails(Integer studyId, VariableDetailsFactory<T> factory) throws MiddlewareQueryException {
-		List<T> factors = new ArrayList<T>();
+		Set<T> variableSet = new HashSet<T>();
 		
 		if (setWorkingDatabase(studyId)) {
-			DmsProject project = getDmsProjectDao().getById(studyId);
+			List<DmsProject> projects = new ArrayList<DmsProject>();
+			DmsProject study = getDmsProjectDao().getById(studyId);
 			
-			//get all datasets in a project
-			
-			
-			Set<Integer> varIds = ProjectPropertyUtil.extractStandardVariableIds(project.getProperties());
-			List<CVTermRelationship> relationships = getRelationshipsFromLocalAndCentral(varIds);
-			
-			Set<Integer> localTermIds = CVTermRelationshipUtil.extractLocalObjectTermIds(relationships);
-			Set<Integer> centralTermIds = CVTermRelationshipUtil.extractCentralObjectTermIds(relationships);
-			List<CVTerm> terms = getTermsFromLocalAndCentral(localTermIds, centralTermIds);
-			
-			factors = factory.createDetails(project, relationships, terms);
+			if (study != null) {
+				projects.add(study);
+				projects.addAll(getDmsProjectDao().getDatasetsByStudy(studyId));
+				
+				for (DmsProject project : projects) {
+					Set<Integer> varIds = ProjectPropertyUtil.extractStandardVariableIds(project.getProperties());
+					List<CVTermRelationship> relationships = getRelationshipsFromLocalAndCentral(varIds);
+					
+					Set<Integer> localTermIds = CVTermRelationshipUtil.extractLocalObjectTermIds(relationships);
+					Set<Integer> centralTermIds = CVTermRelationshipUtil.extractCentralObjectTermIds(relationships);
+					List<CVTerm> terms = getTermsFromLocalAndCentral(localTermIds, centralTermIds);
+					
+					variableSet.addAll(factory.createDetails(project, relationships, terms));
+				}
+			}
 		}
 		
-		return factors;	
+		return new ArrayList<T>(variableSet);	
 	}
 
 	@SuppressWarnings("unchecked")

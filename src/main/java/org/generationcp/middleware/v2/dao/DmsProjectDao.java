@@ -151,20 +151,24 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	public List<StudyNode> getStudiesByName(String name) throws MiddlewareQueryException {
 		List<StudyNode> studyNodes = new ArrayList<StudyNode>();
 		
-		Criteria criteria = getSession().createCriteria(getPersistentClass());
-		criteria.add(Restrictions.eq("name", name));
-		criteria.createAlias("relatedTos", "pr");
-		criteria.add(Restrictions.eq("pr.typeId", CVTermId.IS_STUDY.getId()));
-		ProjectionList projectionList = Projections.projectionList();
-		projectionList.add(Projections.property("projectId"));
-		projectionList.add(Projections.property("name"));
-		criteria.setProjection(projectionList);
-		
-		List<Object[]> nodes = criteria.list();
-		if (nodes != null && nodes.size() > 0) {
-			for (Object[] node : nodes) {
-				studyNodes.add(new StudyNode((Integer) node[0], (String) node[1]));
+		try {
+			Criteria criteria = getSession().createCriteria(getPersistentClass());
+			criteria.add(Restrictions.eq("name", name));
+			criteria.createAlias("relatedTos", "pr");
+			criteria.add(Restrictions.eq("pr.typeId", CVTermId.IS_STUDY.getId()));
+			ProjectionList projectionList = Projections.projectionList();
+			projectionList.add(Projections.property("projectId"));
+			projectionList.add(Projections.property("name"));
+			criteria.setProjection(projectionList);
+			
+			List<Object[]> nodes = criteria.list();
+			if (nodes != null && nodes.size() > 0) {
+				for (Object[] node : nodes) {
+					studyNodes.add(new StudyNode((Integer) node[0], (String) node[1]));
+				}
 			}
+		} catch (HibernateException e) {
+			logAndThrowException("Error in getStudiesByName=" + name + " query on DmsProjectDao: " + e.getMessage(), e);
 		}
 		
 		return studyNodes;
@@ -236,9 +240,24 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				}
 			}
 		} catch (HibernateException e) {
-			e.printStackTrace();
 			logAndThrowException("Error in getStudiesByIds= " + projectIds + " query in DmsProjectDao: " + e.getMessage(), e);
 		}
 		return studyNodes;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<DmsProject> getDatasetsByStudy(Integer studyId) throws MiddlewareQueryException {
+		try {
+			Criteria criteria = getSession().createCriteria(getPersistentClass());
+			criteria.createAlias("relatedTos", "pr");
+			criteria.add(Restrictions.eq("pr.typeId", CVTermId.BELONGS_TO_STUDY.getId()));
+			criteria.add(Restrictions.eq("pr.objectProject.projectId", studyId));
+			criteria.setProjection(Projections.property("pr.subjectProject"));
+			return criteria.list();
+			
+		} catch (HibernateException e) {
+			logAndThrowException("Error in getDatasetsByStudy= " + studyId + " query in DmsProjectDao: " + e.getMessage(), e);
+		}
+		return new ArrayList<DmsProject>();
 	}
 }
