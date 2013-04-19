@@ -259,9 +259,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		if (setWorkingDatabase(studyId)) {
 			DmsProject project = getDmsProjectDao().getById(studyId);
 			
-			Set<Integer> localVarIds = ProjectPropertyUtil.extractLocalStandardVariableIds(project.getProperties());
-			Set<Integer> centralVarIds = ProjectPropertyUtil.extractCentralStandardVariableIds(project.getProperties());
-			List<CVTermRelationship> relationships = getRelationshipsFromLocalAndCentral(studyId, localVarIds, centralVarIds);
+			Set<Integer> varIds = ProjectPropertyUtil.extractStandardVariableIds(project.getProperties());
+			List<CVTermRelationship> relationships = getRelationshipsFromLocalAndCentral(varIds);
 			
 			Set<Integer> localTermIds = CVTermRelationshipUtil.extractLocalObjectTermIds(relationships);
 			Set<Integer> centralTermIds = CVTermRelationshipUtil.extractCentralObjectTermIds(relationships);
@@ -274,26 +273,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<CVTermRelationship> getRelationshipsFromLocalAndCentral(Integer studyId, Collection<Integer> localVarIds, Collection<Integer> centralVarIds)
+	private List<CVTermRelationship> getRelationshipsFromLocalAndCentral(Collection<Integer> varIds)
 	throws MiddlewareQueryException {
-		
-		List<CVTermRelationship> relationships = 
-				getFromInstanceByIdAndMethod(
-					getCVTermRelationshipDao(), 
-					studyId, 
-					"getBySubjectIds", 
-					new Object[] {localVarIds}, 
-					new Class[] {Collection.class});
-		
-		relationships.addAll( 
-				getFromInstanceByIdAndMethod(
-					getCVTermRelationshipDao(), 
-					studyId, 
-					"getBySubjectIds", 
-					new Object[] {centralVarIds}, 
-					new Class[] {Collection.class}));
-		
-		return relationships;
+
+		return getAllFromCentralAndLocalByMethod(
+						getCVTermRelationshipDao(), "getBySubjectIds", 
+						new Object[] {varIds}, new Class[] {Collection.class});
 	}
 	
 	@SuppressWarnings("unchecked")
