@@ -17,8 +17,10 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Country;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.criterion.Restrictions;
 
 public class CountryDAO extends GenericDAO<Country, Integer>{
 	
@@ -34,4 +36,17 @@ public class CountryDAO extends GenericDAO<Country, Integer>{
         return new ArrayList<Country>();
     }
 
+	
+	@SuppressWarnings("unchecked")
+	public List<Country> getByIsoFull(String isoFull) throws MiddlewareQueryException {
+		try {
+			Criteria criteria = getSession().createCriteria(getPersistentClass());
+			criteria.add(Restrictions.eq("isofull", isoFull));
+			
+			return criteria.list();
+		} catch (HibernateException e) {
+			logAndThrowException("Error calling getByIsoFull() query from Country: " + e.getMessage(), e);
+		}
+		return new ArrayList<Country>();
+	}
 }

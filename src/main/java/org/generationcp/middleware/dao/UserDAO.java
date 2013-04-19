@@ -13,13 +13,16 @@
 package org.generationcp.middleware.dao;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.User;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 public class UserDAO extends GenericDAO<User, Integer>{
@@ -96,6 +99,22 @@ public class UserDAO extends GenericDAO<User, Integer>{
                     + e.getMessage(), e);
         }
         return new ArrayList<User>();
+    }
+    
+    @SuppressWarnings("unchecked")
+	public List<Integer> getUserIdsByCountryIds(Collection<Integer> countryIds) throws MiddlewareQueryException {
+    	try {
+    		Criteria criteria = getSession().createCriteria(Locdes.class);
+    		criteria.createAlias("location", "l");
+    		criteria.add(Restrictions.in("l.cntryid", countryIds));
+    		criteria.setProjection(Projections.distinct(Projections.property("user.userid")));
+    		
+    		return criteria.list();
+    		
+    	} catch (HibernateException e) {
+    		logAndThrowException("Error with getUserIdsByCountryIds() query from User: " + e.getMessage(), e);
+    	}
+    	return new ArrayList<Integer>();
     }
     
 }

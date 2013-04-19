@@ -19,5 +19,18 @@ package org.generationcp.middleware.manager;
  * 
  */
 public enum Season {
-    DRY, WET, GENERAL
+    DRY ("Dry season"), WET ("Wet season"), GENERAL;
+    
+    private String definition;
+    
+    private Season() {
+    }
+    
+    private Season(String definition) {
+    	this.definition = definition;
+    }
+    
+    public String getDefinition() {
+    	return this.definition;
+    }
 }

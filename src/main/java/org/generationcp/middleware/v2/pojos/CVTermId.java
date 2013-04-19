@@ -48,6 +48,9 @@ public enum CVTermId {
 	, BELONGS_TO_STUDY(1150) 
 	, IS_STUDY(1145) //TODO For confirmation
 	
+	//Properties
+	, SEASON(2452)
+	
 	;
 	
 	private final Integer id;

@@ -9,6 +9,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.v2.pojos.CVTermRelationship;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Long> {
@@ -20,17 +21,47 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Long> 
 				Criteria criteria = getSession().createCriteria(getPersistentClass());
 				criteria.add(Restrictions.in("subjectId", subjectIds));
 	
-				List<CVTermRelationship> results = criteria.list();
-				if (results != null) {
-					return results;
-				}
-				
+				return criteria.list();
+
 			} catch(HibernateException e) {
-				logAndThrowException("Error with getByCVTermIds=" + subjectIds + ") query from CVTermRelationship: "
-	                    + e.getMessage(), e);
-				return null;
+				logAndThrowException("Error with getByCVTermIds=" + subjectIds + ") query from CVTermRelationship: " 
+						+ e.getMessage(), e);
 			}
 		}
 		return new ArrayList<CVTermRelationship>();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Integer> getSubjectIdsByTypeAndObject(Integer typeId, Integer objectId) throws MiddlewareQueryException {
+		try {
+			Criteria criteria = getSession().createCriteria(getPersistentClass());
+			criteria.add(Restrictions.eq("typeId", typeId));
+			criteria.add(Restrictions.eq("objectId", objectId));
+			criteria.setProjection(Projections.property("subjectId"));
+			
+			return criteria.list();
+			
+		} catch (HibernateException e) {
+			logAndThrowException("Error with getSubjectIdsByTypeAndObject=" + typeId + ", " + objectId 
+					+ ") query from CVTermRelationship: " + e.getMessage(), e);
+		}
+		return new ArrayList<Integer>();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Integer> getObjectIdByTypeAndSubject(Integer typeId, Integer subjectId) throws MiddlewareQueryException {
+		try {
+			Criteria criteria = getSession().createCriteria(getPersistentClass());
+			criteria.add(Restrictions.eq("typeId", typeId));
+			criteria.add(Restrictions.eq("subjectId", subjectId));
+			criteria.setProjection(Projections.property("objectId"));
+			
+			return criteria.list();
+			
+		} catch (HibernateException e) {
+			logAndThrowException("Error with getSubjectIdsByTypeAndObject=" + typeId + ", " + subjectId 
+					+ ") query from CVTermRelationship: " + e.getMessage(), e);
+		}
+		return new ArrayList<Integer>();
 	}
 }
