@@ -284,7 +284,16 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		studies.addAll(getByCountry(filter.getCountry()));
 		studies.addAll(getBySeason(filter.getSeason()));
 		
-		return new ArrayList<StudyNode>(studies);
+		int start = filter.getStart();
+		int end = filter.getStart() + filter.getNumOfRows();
+		if (end > studies.size()) {
+			end = studies.size();
+		}
+		if (start > studies.size()) {
+			return new ArrayList<StudyNode>();
+		}
+		
+		return new ArrayList<StudyNode>(studies).subList(start, end);
 
 	}
 	

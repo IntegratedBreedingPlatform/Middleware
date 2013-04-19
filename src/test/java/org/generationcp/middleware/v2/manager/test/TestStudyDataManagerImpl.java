@@ -97,6 +97,8 @@ public class TestStudyDataManagerImpl {
     	filter.setSeason(Season.DRY);
     	//filter.setSeason(Season.GENERAL); //do nothing for GENERAL SEASON
     	//filter.setSeason(Season.WET); //currently has no data
+    	filter.setStart(0);
+    	filter.setNumOfRows(10);
     	List<StudyNode> studies = manager.searchStudies(filter);
     	System.out.println("INPUT: " + filter);
     	for (StudyNode study : studies) {
