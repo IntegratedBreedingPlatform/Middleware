@@ -259,6 +259,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		if (setWorkingDatabase(studyId)) {
 			DmsProject project = getDmsProjectDao().getById(studyId);
 			
+			//get all datasets in a project
+			
+			
 			Set<Integer> varIds = ProjectPropertyUtil.extractStandardVariableIds(project.getProperties());
 			List<CVTermRelationship> relationships = getRelationshipsFromLocalAndCentral(varIds);
 			
@@ -356,16 +359,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		return new ArrayList<StudyNode>();
 	}
 	
-	@SuppressWarnings("unchecked")
 	private List<StudyNode> getBySeason(Season season) throws MiddlewareQueryException {
 		if (season != null && season != Season.GENERAL) {
 			List<Object[]> pairs = new ArrayList<Object[]>();
 			
-			//look for factors that has a property of "Season"
-			List<Integer> factorIds = getAllFromCentralAndLocalByMethod(
-					getCVTermRelationshipDao(), "getSubjectIdsByTypeAndObject", 
-					new Object[] {CVTermId.HAS_PROPERTY.getId(), CVTermId.SEASON.getId()}, 
-					new Class[] {Integer.class, Integer.class});
+			List<Integer> factorIds = getSeasonalFactors();
 			
 			if (factorIds != null && factorIds.size() > 0) {
 			
@@ -374,11 +372,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 					Integer cvId = getCvIdByName(factorId.toString());
 					CVTerm value = getCvTermByCvAndDefinition(cvId, season.getDefinition()); 
 					if (value != null && !"".equals(value)) {
+						//pairs of factorId and value of the given season
 						pairs.add(new Object[] {factorId, value.getCvTermId().toString()});
 					}
 				}
 			
-				//Using the pairs of factorId and value, 
 				Set<Integer> experimentIds = new HashSet<Integer>();
 				
 				for (Object[] pair : pairs) {
@@ -395,16 +393,20 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 					}
 				}
 				
-				//Using the experimentIds, return the projectIds
 				List<Integer> projectIds = getProjectIdsByExperiment(experimentIds);
 				
-				//Using the projectIds, get the StudyNodes
 				return getStudiesByProjectIds(projectIds);
-			
 			}
-				
 		}
 		return new ArrayList<StudyNode>();
+	}
+	
+	@SuppressWarnings("unchecked")
+	private List<Integer> getSeasonalFactors() throws MiddlewareQueryException {
+		return getAllFromCentralAndLocalByMethod(
+				getCVTermRelationshipDao(), "getSubjectIdsByTypeAndObject", 
+				new Object[] {CVTermId.HAS_PROPERTY.getId(), CVTermId.SEASON.getId()}, 
+				new Class[] {Integer.class, Integer.class});
 	}
 	
 	private Integer getCvIdByName(String name) throws MiddlewareQueryException {

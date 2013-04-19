@@ -218,23 +218,23 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	public List<StudyNode> getStudiesByIds(Collection<Integer> projectIds) throws MiddlewareQueryException {
 		List<StudyNode> studyNodes = new ArrayList<StudyNode>();
 		try {
-			System.out.println("querying " + projectIds);
-			Criteria criteria = getSession().createCriteria(getPersistentClass());
-			criteria.add(Restrictions.in("projectId", projectIds));
-			criteria.createAlias("relatedTos", "pr");
-			criteria.add(Restrictions.eq("pr.typeId", CVTermId.IS_STUDY.getId()));
-			ProjectionList projectionList = Projections.projectionList();
-			projectionList.add(Projections.property("projectId"));
-			projectionList.add(Projections.property("name"));
-			criteria.setProjection(projectionList);
-			
-			List<Object[]> nodes = criteria.list();
-			if (nodes != null && nodes.size() > 0) {
-				for (Object[] node : nodes) {
-					studyNodes.add(new StudyNode((Integer) node[0], (String) node[1]));
+			if (projectIds != null && projectIds.size() > 0) {
+				Criteria criteria = getSession().createCriteria(getPersistentClass());
+				criteria.add(Restrictions.in("projectId", projectIds));
+				criteria.createAlias("relatedTos", "pr");
+				criteria.add(Restrictions.eq("pr.typeId", CVTermId.IS_STUDY.getId()));
+				ProjectionList projectionList = Projections.projectionList();
+				projectionList.add(Projections.property("projectId"));
+				projectionList.add(Projections.property("name"));
+				criteria.setProjection(projectionList);
+				
+				List<Object[]> nodes = criteria.list();
+				if (nodes != null && nodes.size() > 0) {
+					for (Object[] node : nodes) {
+						studyNodes.add(new StudyNode((Integer) node[0], (String) node[1]));
+					}
 				}
 			}
-		
 		} catch (HibernateException e) {
 			e.printStackTrace();
 			logAndThrowException("Error in getStudiesByIds= " + projectIds + " query in DmsProjectDao: " + e.getMessage(), e);
