@@ -22,12 +22,17 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.Season;
+import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.v2.manager.api.StudyDataManager;
 import org.generationcp.middleware.v2.pojos.AbstractNode;
+import org.generationcp.middleware.v2.pojos.CVTermId;
 import org.generationcp.middleware.v2.pojos.DatasetNode;
+import org.generationcp.middleware.v2.pojos.DmsDataset;
 import org.generationcp.middleware.v2.pojos.FactorDetails;
 import org.generationcp.middleware.v2.pojos.FolderNode;
 import org.generationcp.middleware.v2.pojos.ObservationDetails;
+import org.generationcp.middleware.v2.pojos.ProjectProperty;
+import org.generationcp.middleware.v2.pojos.ProjectRelationship;
 import org.generationcp.middleware.v2.pojos.StudyDetails;
 import org.generationcp.middleware.v2.pojos.StudyNode;
 import org.generationcp.middleware.v2.pojos.StudyQueryFilter;
@@ -138,10 +143,6 @@ public class TestStudyDataManagerImpl {
 		}
 	}
 
-	@AfterClass
-	public static void tearDown() throws Exception {
-		factory.close();
-	}
 
 
    //================================  helper methods =============================
@@ -162,4 +163,50 @@ public class TestStudyDataManagerImpl {
 		   System.out.println("NO VARIABLE FOUND FOR STUDY " + studyId);
 	   }
    }
+   
+	@Test
+	public void testAddDmsDataset() throws Exception {
+		Integer datasetId = 0;
+		String name = "Test Dataset";
+		String description = "Test Description";
+		List<ProjectProperty> properties = null;
+		List<ProjectRelationship> relatedTos = null;
+		List<ProjectRelationship> relatedBys = null;
+
+		DmsDataset dataset = new DmsDataset(datasetId, name, description, properties, relatedTos, relatedBys);
+		dataset = manager.addDmsDataset(dataset);
+		
+		assert(dataset.getProjectId() < 0);
+		System.out.println("testAddDmsDataset(): " + dataset);
+	}
+
+	@Test
+	public void testAddStudy() throws Exception {
+		Integer studyId = 0;
+		String name = "Test Study";
+		Integer projectKey = 1; 
+		String title = "Test Study Title";
+		String objective = "Test Study Objective"; 
+		Integer primaryInvestigator = 1;
+		String type = CVTermId.STUDY_TYPE.getId().toString();
+        Integer startDate = (int) System.currentTimeMillis();; 
+        Integer endDate = (int) System.currentTimeMillis();; 
+        Integer user = 1; 
+        Integer status = 1; 
+        Integer hierarchy = 1000; // parent id 
+        Integer creationDate = (int) System.currentTimeMillis();
+		
+		Study study = new Study(studyId, name, projectKey, title, objective, primaryInvestigator, type, startDate, endDate, user, status, hierarchy, creationDate);		
+		study = manager.addStudy(study);
+
+		assert(study.getId() < 0);
+		System.out.println("testAddStudy(): " + study);
+	}
+
+	
+	@AfterClass
+	public static void tearDown() throws Exception {
+		factory.close();
+	}
+
 }

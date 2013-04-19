@@ -5,7 +5,6 @@ import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -28,7 +27,6 @@ public class ProjectRelationship implements Serializable {
 
 	@Id
 	@Basic(optional = false)
-	@GeneratedValue
 	@Column(name = "project_relationship_id")
 	private Integer projectRelationshipId;
 	
@@ -52,8 +50,18 @@ public class ProjectRelationship implements Serializable {
 	@Basic(optional = false)
 	@Column(name = "type_id")
 	private Integer typeId;
-
 	
+	public ProjectRelationship() {
+	}
+
+	public ProjectRelationship(Integer projectRelationshipId,
+			DmsProject subjectProject, DmsProject objectProject, Integer typeId) {
+		this.projectRelationshipId = projectRelationshipId;
+		this.subjectProject = subjectProject;
+		this.objectProject = objectProject;
+		this.typeId = typeId;
+	}
+
 	public Integer getProjectRelationshipId() {
 		return projectRelationshipId;
 	}

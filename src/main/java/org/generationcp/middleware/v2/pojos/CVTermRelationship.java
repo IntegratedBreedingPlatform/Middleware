@@ -17,7 +17,6 @@ import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -42,7 +41,6 @@ public class CVTermRelationship implements Serializable{
 
     @Id
     @Basic(optional = false)
-    @GeneratedValue
     @Column(name = "cvterm_relationship_id")
     private Integer cvTermRelationshipId;
     

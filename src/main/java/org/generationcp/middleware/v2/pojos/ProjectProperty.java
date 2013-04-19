@@ -5,7 +5,6 @@ import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -32,7 +31,6 @@ public class ProjectProperty implements Serializable {
 
 	@Id
 	@Basic(optional = false)
-	@GeneratedValue
 	@Column(name = "projectprop_id")
 	private Integer projectPropertyId;
 	
@@ -60,6 +58,19 @@ public class ProjectProperty implements Serializable {
 	 */
 	@Column(name = "rank")
 	private Integer rank;
+	
+	
+	public ProjectProperty() {
+	}
+
+	public ProjectProperty(Integer projectPropertyId, DmsProject project,
+			Integer typeId, String value, Integer rank) {
+		this.projectPropertyId = projectPropertyId;
+		this.project = project;
+		this.typeId = typeId;
+		this.value = value;
+		this.rank = rank;
+	}
 
 	public Integer getProjectPropertyId() {
 		return projectPropertyId;

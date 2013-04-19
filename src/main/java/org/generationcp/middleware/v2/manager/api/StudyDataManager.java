@@ -16,7 +16,9 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.v2.pojos.DatasetNode;
+import org.generationcp.middleware.v2.pojos.DmsDataset;
 import org.generationcp.middleware.v2.pojos.StudyDetails;
 import org.generationcp.middleware.v2.pojos.AbstractNode;
 import org.generationcp.middleware.v2.pojos.FolderNode;
@@ -102,4 +104,10 @@ public interface StudyDataManager {
 	 * @throws MiddlewareQueryException
 	 */
 	List<StudyNode> searchStudies(StudyQueryFilter filter) throws MiddlewareQueryException;
+	
+    public Study addStudy(Study study) throws MiddlewareQueryException;
+    
+    
+    public DmsDataset addDmsDataset(DmsDataset dataset) throws MiddlewareQueryException;
+
 }

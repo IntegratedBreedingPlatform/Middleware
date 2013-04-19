@@ -18,7 +18,6 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -47,7 +46,6 @@ public class DmsProject implements Serializable {
 	
 	@Id
 	@Basic(optional = false)
-	@GeneratedValue
 	@Column(name = "project_id")
 	private Integer projectId;
 	
@@ -67,7 +65,6 @@ public class DmsProject implements Serializable {
 	
 	/**
 	 * List of Project Properties
-	 * @return
 	 */
 	@OneToMany(mappedBy = "project", fetch = FetchType.EAGER)
 	private List<ProjectProperty> properties;
@@ -79,6 +76,32 @@ public class DmsProject implements Serializable {
 	private List<ProjectRelationship> relatedBys;
 	
 	
+	public DmsProject() {
+	}
+
+	public DmsProject(Integer projectId, String name, String description,
+			List<ProjectProperty> properties,
+			List<ProjectRelationship> relatedTos,
+			List<ProjectRelationship> relatedBys) {
+		super();
+		this.projectId = projectId;
+		this.name = name;
+		this.description = description;
+		this.properties = properties;
+		this.relatedTos = relatedTos;
+		this.relatedBys = relatedBys;
+	}
+
+	public DmsProject(DmsDataset dataset) {
+		super();
+		this.projectId = dataset.getProjectId();
+		this.name = dataset.getName();
+		this.description = dataset.getDescription();
+		this.properties = dataset.getProperties();
+		this.relatedTos = dataset.getRelatedTos();
+		this.relatedBys = dataset.getRelatedBys();
+	}
+
 	public Integer getProjectId() {
 		return projectId;
 	}
@@ -155,9 +178,13 @@ public class DmsProject implements Serializable {
 
 	@Override
 	public String toString() {
-		return "DmsProject [projectId=" + projectId + ", name=" + name
+		return getEntityName() + " [projectId=" + projectId + ", name=" + name
 				+ ", description=" + description 
 				;
+	}
+
+	public String getEntityName(){
+		return "DmsProject";
 	}
 
 }

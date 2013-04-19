@@ -13,12 +13,15 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DataManager;
 import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.v2.dao.CVDao;
 import org.generationcp.middleware.v2.dao.CVTermDao;
 import org.generationcp.middleware.v2.dao.CVTermRelationshipDao;
 import org.generationcp.middleware.v2.dao.DmsProjectDao;
+import org.generationcp.middleware.v2.dao.ProjectPropertyDao;
+import org.generationcp.middleware.v2.dao.ProjectRelationshipDao;
 import org.generationcp.middleware.v2.dao.ExperimentDao;
 import org.generationcp.middleware.v2.dao.ExperimentProjectDao;
 import org.generationcp.middleware.v2.dao.ExperimentPropertyDao;
@@ -27,6 +30,9 @@ import org.generationcp.middleware.v2.dao.GeolocationPropertyDao;
 import org.generationcp.middleware.v2.dao.StockPropertyDao;
 import org.generationcp.middleware.v2.factory.FactorDetailsFactory;
 import org.generationcp.middleware.v2.factory.ObservationDetailsFactory;
+import org.generationcp.middleware.v2.factory.ProjectFactory;
+import org.generationcp.middleware.v2.factory.ProjectPropertyFactory;
+import org.generationcp.middleware.v2.factory.ProjectRelationshipFactory;
 import org.generationcp.middleware.v2.factory.StudyFactory;
 import org.generationcp.middleware.v2.factory.VariableDetailsFactory;
 import org.generationcp.middleware.v2.manager.api.StudyDataManager;
@@ -35,10 +41,13 @@ import org.generationcp.middleware.v2.pojos.CVTerm;
 import org.generationcp.middleware.v2.pojos.CVTermId;
 import org.generationcp.middleware.v2.pojos.CVTermRelationship;
 import org.generationcp.middleware.v2.pojos.DatasetNode;
+import org.generationcp.middleware.v2.pojos.DmsDataset;
 import org.generationcp.middleware.v2.pojos.DmsProject;
 import org.generationcp.middleware.v2.pojos.FactorDetails;
 import org.generationcp.middleware.v2.pojos.FolderNode;
 import org.generationcp.middleware.v2.pojos.ObservationDetails;
+import org.generationcp.middleware.v2.pojos.ProjectProperty;
+import org.generationcp.middleware.v2.pojos.ProjectRelationship;
 import org.generationcp.middleware.v2.pojos.StudyDetails;
 import org.generationcp.middleware.v2.pojos.StudyNode;
 import org.generationcp.middleware.v2.pojos.StudyQueryFilter;
@@ -46,8 +55,13 @@ import org.generationcp.middleware.v2.pojos.VariableDetails;
 import org.generationcp.middleware.v2.util.CVTermRelationshipUtil;
 import org.generationcp.middleware.v2.util.ProjectPropertyUtil;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
+	
+    private static final Logger LOG = LoggerFactory.getLogger(StudyDataManagerImpl.class);
 
 	private DmsProjectDao dmsProjectDao;
 	
@@ -72,6 +86,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	private StockPropertyDao stockPropertyDao;
 	
 	private ExperimentPropertyDao experimentPropertyDao;
+	
+	private ProjectPropertyDao projectPropertyDao;
+	
+	private ProjectRelationshipDao projectRelationshipDao;
+
 	
 	public StudyDataManagerImpl() { 		
 	}
@@ -181,7 +200,23 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		return experimentPropertyDao;
 	}
 
+	private ProjectPropertyDao getProjectPropertyDao() {
+		if (projectPropertyDao == null) {
+			projectPropertyDao = new ProjectPropertyDao();
+		}
+		projectPropertyDao.setSession(getActiveSession());
+		return projectPropertyDao;
+	}
 	
+	
+	private ProjectRelationshipDao getProjectRelationshipDao() {
+		if (projectRelationshipDao == null) {
+			projectRelationshipDao = new ProjectRelationshipDao();
+		}
+		projectRelationshipDao.setSession(getActiveSession());
+		return projectRelationshipDao;
+	}
+
 	private StudyFactory getStudyFactory() {
 		return StudyFactory.getInstance();
 	}
@@ -515,4 +550,96 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 		return (determinants != null && determinants.size() > 0 ? determinants.get(0) : null);
 	}
+	
+	
+	@Override
+    public Study addStudy(Study study) throws MiddlewareQueryException{
+        requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+            
+            // Save project
+            DmsProjectDao projectDao = getDmsProjectDao();
+            DmsProject project = ProjectFactory.getInstance().createProject(study);
+
+            Integer generatedId = projectDao.getNegativeId("projectId");
+            project.setProjectId(generatedId);
+            DmsProject savedProject = projectDao.save(project);
+            
+            // Save project properties
+            List<ProjectProperty> properties = ProjectPropertyFactory.getInstance().
+            										createProjectProperties(study);
+            ProjectPropertyDao projectPropertyDao = getProjectPropertyDao();
+            
+            for (ProjectProperty property : properties){
+                generatedId = projectPropertyDao.getNegativeId("projectPropertyId");
+                property.setProjectPropertyId(generatedId);
+                projectPropertyDao.save(property);
+            }
+            
+            // Save project relationships
+            
+            // Get the parent from the study
+            DmsProject parent = projectDao.getById(study.getHierarchy()); 
+            List<ProjectRelationship> relationships = 
+            		ProjectRelationshipFactory.getInstance().
+            			createProjectRelationship(study, parent);
+            ProjectRelationshipDao projectRelationshipDao = getProjectRelationshipDao();
+            
+            for (ProjectRelationship relationship : relationships){
+                generatedId = projectRelationshipDao.getNegativeId("projectRelationshipId");
+                relationship.setProjectRelationshipId(generatedId);
+                projectRelationshipDao.save(relationship);
+            }
+            
+            study.setId( savedProject.getProjectId());
+
+            trans.commit();
+            
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered with addStudy(study=" + study + "): " + e.getMessage(), e, LOG);
+        }
+        return study;
+    	
+    }
+
+	@Override
+    public DmsDataset addDmsDataset(DmsDataset dataset) throws MiddlewareQueryException{
+        requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        try {
+        	
+        	// Save Project Entry
+            trans = session.beginTransaction();
+            DmsProjectDao dao = getDmsProjectDao();
+            DmsProject project = new DmsProject(dataset);
+
+            Integer generatedId = dao.getNegativeId("projectId");
+
+            project.setProjectId(generatedId);
+            DmsProject savedProject = dao.save(project);
+            
+            //TODO Save factors
+            
+            //TODO Save variates
+            
+            //TODO Save row data
+            
+            dataset.setProjectId(savedProject.getProjectId());
+
+            trans.commit();
+            
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered with addDmsDataset(dataset=" + dataset + "): " + e.getMessage(), e, LOG);
+        }
+        return dataset;
+    }
+
 }
