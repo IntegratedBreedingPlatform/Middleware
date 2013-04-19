@@ -74,6 +74,7 @@ public class StudyFactory {
         StudyDetails studyDetails = new StudyDetails();
         studyDetails.setId(project.getProjectId());
         studyDetails.setName(project.getName());
+        studyDetails.setTitle(project.getDescription());
         studyDetails.setObjective(helper.getString(CVTermId.STUDY_OBJECTIVE));
         studyDetails.setPrimaryInvestigator(helper.getInteger(CVTermId.PI_ID));
         studyDetails.setType(helper.getString(CVTermId.STUDY_TYPE));
