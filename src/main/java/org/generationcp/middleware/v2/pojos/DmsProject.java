@@ -15,6 +15,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -66,7 +67,7 @@ public class DmsProject implements Serializable {
 	/**
 	 * List of Project Properties
 	 */
-	@OneToMany(mappedBy = "project", fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private List<ProjectProperty> properties;
 	
 	@OneToMany(mappedBy = "subjectProject", fetch = FetchType.LAZY)

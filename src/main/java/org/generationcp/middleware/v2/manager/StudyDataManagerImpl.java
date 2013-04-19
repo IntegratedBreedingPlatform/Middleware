@@ -21,7 +21,6 @@ import org.generationcp.middleware.v2.dao.CVTermDao;
 import org.generationcp.middleware.v2.dao.CVTermRelationshipDao;
 import org.generationcp.middleware.v2.dao.DmsProjectDao;
 import org.generationcp.middleware.v2.dao.ProjectPropertyDao;
-import org.generationcp.middleware.v2.dao.ProjectRelationshipDao;
 import org.generationcp.middleware.v2.dao.ExperimentDao;
 import org.generationcp.middleware.v2.dao.ExperimentProjectDao;
 import org.generationcp.middleware.v2.dao.ExperimentPropertyDao;
@@ -89,8 +88,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	
 	private ProjectPropertyDao projectPropertyDao;
 	
-	private ProjectRelationshipDao projectRelationshipDao;
-
 	
 	public StudyDataManagerImpl() { 		
 	}
@@ -209,14 +206,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 	
 	
-	private ProjectRelationshipDao getProjectRelationshipDao() {
-		if (projectRelationshipDao == null) {
-			projectRelationshipDao = new ProjectRelationshipDao();
-		}
-		projectRelationshipDao.setSession(getActiveSession());
-		return projectRelationshipDao;
-	}
-
 	private StudyFactory getStudyFactory() {
 		return StudyFactory.getInstance();
 	}
@@ -576,23 +565,24 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
             Integer generatedId = projectDao.getNegativeId("projectId");
             project.setProjectId(generatedId);
-            DmsProject savedProject = projectDao.save(project);
             
             // Save project properties
             List<ProjectProperty> properties = ProjectPropertyFactory.getInstance().
-            										createProjectProperties(study);
+            										createProjectProperties(study, project);
             ProjectPropertyDao projectPropertyDao = getProjectPropertyDao();
             
+            generatedId = projectPropertyDao.getNegativeId("projectPropertyId") +1;
             for (ProjectProperty property : properties){
-                generatedId = projectPropertyDao.getNegativeId("projectPropertyId");
-                property.setProjectPropertyId(generatedId);
-                projectPropertyDao.save(property);
+                 property.setProjectPropertyId(generatedId--);
+ //               projectPropertyDao.save(property);
             }
-            
+            project.setProperties(properties);
+            DmsProject savedProject = projectDao.save(project);
+           
             // Save project relationships
             
             // Get the parent from the study
-            DmsProject parent = projectDao.getById(study.getHierarchy()); 
+ /*           DmsProject parent = projectDao.getById(study.getHierarchy()); 
             List<ProjectRelationship> relationships = 
             		ProjectRelationshipFactory.getInstance().
             			createProjectRelationship(study, parent);
@@ -603,7 +593,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
                 relationship.setProjectRelationshipId(generatedId);
                 projectRelationshipDao.save(relationship);
             }
-            
+ */           
             study.setId( savedProject.getProjectId());
 
             trans.commit();
