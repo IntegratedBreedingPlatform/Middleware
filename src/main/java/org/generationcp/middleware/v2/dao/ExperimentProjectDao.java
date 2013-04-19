@@ -20,7 +20,7 @@ public class ExperimentProjectDao extends GenericDAO<ExperimentProject, Integer>
 			if (experimentIds != null && experimentIds.size() > 0) {
 				Criteria criteria = getSession().createCriteria(getPersistentClass());
 				criteria.add(Restrictions.in("experiment", experimentIds));
-				criteria.setProjection(Projections.property("project"));
+				criteria.setProjection(Projections.distinct(Projections.property("project")));
 				
 				return criteria.list();
 			}
