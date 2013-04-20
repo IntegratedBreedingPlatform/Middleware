@@ -13,11 +13,16 @@
 package org.generationcp.middleware.v2.pojos;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -91,6 +96,10 @@ public class CVTerm implements Serializable {
 	@Column(name = "is_relationshiptype")
 	private Integer isRelationshipType;
 	
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name="cvterm_id") 
+	private List<CVTermProperty> properties;
+	
 	
 	public CVTerm() {
 	}
@@ -162,6 +171,14 @@ public class CVTerm implements Serializable {
 
 	public void setIsRelationshipType(Boolean isRelationshipType) {
 		this.isRelationshipType = (int) (isRelationshipType ? 1 : 0);
+	}
+
+	public List<CVTermProperty> getProperties() {
+		return properties;
+	}
+
+	public void setProperties(List<CVTermProperty> properties) {
+		this.properties = properties;
 	}
 
 	@Override

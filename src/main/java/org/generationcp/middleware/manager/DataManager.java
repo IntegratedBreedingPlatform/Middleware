@@ -19,6 +19,8 @@ import java.util.List;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.v2.domain.builder.DataSetBuilder;
+import org.generationcp.middleware.v2.domain.builder.StudyBuilder;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -1056,4 +1058,11 @@ public abstract class DataManager{
         return negativeIds;
     }
 
+    protected final StudyBuilder getStudyBuilder() {
+    	return new StudyBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    protected final DataSetBuilder getDataSetBuilder() {
+    	return new DataSetBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
 }

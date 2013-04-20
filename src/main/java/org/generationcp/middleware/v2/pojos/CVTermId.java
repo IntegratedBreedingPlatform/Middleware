@@ -51,6 +51,9 @@ public enum CVTermId {
 	//Properties
 	, SEASON(2452)
 	
+	// Other
+	, MIN_VALUE(1113)
+	, MAX_VALUE(1115)
 	;
 	
 	private final Integer id;

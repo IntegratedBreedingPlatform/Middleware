@@ -28,20 +28,12 @@ public class CVTermProperty implements Serializable {
 	@Basic(optional = false)
 	@Column(name = "cvtermprop_id")
 	private Integer cvTermPropertyId;
-	
-	/**
-	 * CVTerm that owns the property.
-	 */
-	@ManyToOne(targetEntity = CVTerm.class)
-	@JoinColumn(name = "cvterm_id", nullable = false)
-	private CVTerm cvTerm;
 
 	/**
 	 * Type of property.
 	 */
-	@ManyToOne(targetEntity = CVTerm.class)
-	@JoinColumn(name = "type_id", nullable = false)
-	private CVTerm type;
+	@Column(name = "type_id")
+	private Integer typeId;
 
 	/**
 	 * Value of the property.
@@ -64,20 +56,12 @@ public class CVTermProperty implements Serializable {
 		this.cvTermPropertyId = cvTermPropertyId;
 	}
 
-	public CVTerm getCvTerm() {
-		return cvTerm;
+	public Integer getTypeId() {
+		return typeId;
 	}
 
-	public void setCvTerm(CVTerm cvTerm) {
-		this.cvTerm = cvTerm;
-	}
-
-	public CVTerm getType() {
-		return type;
-	}
-
-	public void setType(CVTerm type) {
-		this.type = type;
+	public void setTypeId(Integer typeId) {
+		this.typeId = typeId;
 	}
 
 	public String getValue() {
@@ -126,7 +110,7 @@ public class CVTermProperty implements Serializable {
 	@Override
 	public String toString() {
 		return "CVTermProperty [cvTermPropertyId=" + cvTermPropertyId
-				+ ", cvTerm=" + cvTerm + ", type=" + type + ", value=" + value
+				+ ", typeId=" + typeId + ", value=" + value
 				+ ", rank=" + rank + "]";
 	}
 		

@@ -27,6 +27,7 @@ import org.generationcp.middleware.v2.dao.ExperimentPropertyDao;
 import org.generationcp.middleware.v2.dao.ExperimentStockDao;
 import org.generationcp.middleware.v2.dao.GeolocationPropertyDao;
 import org.generationcp.middleware.v2.dao.StockPropertyDao;
+import org.generationcp.middleware.v2.domain.DataSet;
 import org.generationcp.middleware.v2.factory.FactorDetailsFactory;
 import org.generationcp.middleware.v2.factory.ObservationDetailsFactory;
 import org.generationcp.middleware.v2.factory.ProjectFactory;
@@ -263,6 +264,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public List<ObservationDetails> getObservationDetails(Integer studyId) throws MiddlewareQueryException {
 		return getDetails(studyId, getObservationDetailsFactory());
 	}
+	
+	@Override
+	public DataSet getDataSet(int dataSetId) throws MiddlewareQueryException {
+		return getDataSetBuilder().build(dataSetId);
+	}
+
 
 	@Override
 	public List<StudyNode> searchStudies(StudyQueryFilter filter) throws MiddlewareQueryException {

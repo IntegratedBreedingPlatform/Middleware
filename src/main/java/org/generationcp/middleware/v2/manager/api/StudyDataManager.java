@@ -17,6 +17,7 @@ import java.util.List;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.Study;
+import org.generationcp.middleware.v2.domain.DataSet;
 import org.generationcp.middleware.v2.pojos.DatasetNode;
 import org.generationcp.middleware.v2.pojos.DmsDataset;
 import org.generationcp.middleware.v2.pojos.StudyDetails;
@@ -97,6 +98,13 @@ public interface StudyDataManager {
 	List<ObservationDetails> getObservationDetails(Integer studyId) throws MiddlewareQueryException;
 	
 	/**
+	 * @param dataSetId
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	DataSet getDataSet(int dataSetId) throws MiddlewareQueryException;
+	
+	/**
 	 * Returns the list of study nodes for a particular search filter.
 	 * 
 	 * @param filter
@@ -109,5 +117,7 @@ public interface StudyDataManager {
     
     
     public DmsDataset addDmsDataset(DmsDataset dataset) throws MiddlewareQueryException;
+
+	
 
 }

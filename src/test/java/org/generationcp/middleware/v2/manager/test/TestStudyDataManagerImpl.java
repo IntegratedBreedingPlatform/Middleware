@@ -23,6 +23,7 @@ import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.pojos.Study;
+import org.generationcp.middleware.v2.domain.DataSet;
 import org.generationcp.middleware.v2.manager.api.StudyDataManager;
 import org.generationcp.middleware.v2.pojos.AbstractNode;
 import org.generationcp.middleware.v2.pojos.CVTermId;
@@ -44,6 +45,7 @@ import org.junit.Test;
 public class TestStudyDataManagerImpl {
 
 	private static final Integer STUDY_ID = 10010;
+	private static final Integer DATASET_ID = 10015;
 
 	private static ManagerFactory factory;
 	private static StudyDataManager manager;
@@ -205,10 +207,16 @@ public class TestStudyDataManagerImpl {
 		System.out.println("testAddStudy(): " + study);
 	}
 
+	@Test
+	public void getDataSet() throws Exception {
+		DataSet dataSet = manager.getDataSet(DATASET_ID);
+		dataSet.getStudy().print(0);
+	}
 	
 	@AfterClass
 	public static void tearDown() throws Exception {
 		factory.close();
 	}
 
+	
 }
