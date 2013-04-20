@@ -7,10 +7,13 @@ public class FactorDetailsFactory extends VariableDetailsFactory<FactorDetails> 
 
 	private static final FactorDetailsFactory instance = new FactorDetailsFactory();
 	
+	private FactorDetailsFactory() {
+	}
+
 	public static FactorDetailsFactory getInstance() {
 		return instance;
 	}
-
+	
 	@Override
 	boolean isAccepted(Variable variable) {
 		return variable.isFactor();

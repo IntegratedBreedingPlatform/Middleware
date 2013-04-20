@@ -22,6 +22,9 @@ import org.generationcp.middleware.v2.pojos.StudyDetails;
 public class StudyFactory {
 	
 	private static final StudyFactory instance = new StudyFactory();
+
+	private StudyFactory() {
+	}
 	
 	public static StudyFactory getInstance() {
 		return instance;

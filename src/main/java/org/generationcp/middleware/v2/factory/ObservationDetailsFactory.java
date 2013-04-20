@@ -7,6 +7,9 @@ public class ObservationDetailsFactory extends VariableDetailsFactory<Observatio
 
 	private static final ObservationDetailsFactory instance = new ObservationDetailsFactory();
 	
+	private ObservationDetailsFactory() {
+	}
+	
 	public static ObservationDetailsFactory getInstance() {
 		return instance;
 	}
