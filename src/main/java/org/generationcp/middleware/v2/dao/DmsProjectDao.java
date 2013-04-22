@@ -14,7 +14,9 @@ package org.generationcp.middleware.v2.dao;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -259,5 +261,44 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			logAndThrowException("Error in getDatasetsByStudy= " + studyId + " query in DmsProjectDao: " + e.getMessage(), e);
 		}
 		return new ArrayList<DmsProject>();
+	}
+	
+	public DmsProject getParentStudyByDataset(Integer datasetId) throws MiddlewareQueryException {
+		try {
+			Criteria criteria = getSession().createCriteria(getPersistentClass());
+			criteria.createAlias("relatedTos", "pr");
+			criteria.add(Restrictions.eq("pr.typeId", CVTermId.BELONGS_TO_STUDY.getId()));
+			criteria.add(Restrictions.eq("pr.subjectProject.projectId", datasetId));
+			
+			criteria.setProjection(Projections.property("pr.objectProject"));
+
+			return (DmsProject) criteria.uniqueResult();
+			
+		} catch (HibernateException e) {
+			logAndThrowException("Error in getParentStudyByDataset= " + datasetId + " query in DmsProjectDao: " + e.getMessage(), e);
+		}
+		return null;
+	}
+	
+	public List<DmsProject> getStudyAndDatasetsById(Integer projectId) throws MiddlewareQueryException {
+		Set<DmsProject> projects = new HashSet<DmsProject>();
+		
+		DmsProject project = getById(projectId);
+		if (project != null) {
+			projects.add(project);
+			
+			DmsProject parent = getParentStudyByDataset(projectId);
+			if (parent != null) {
+				projects.add(parent);
+			
+			} else {
+				List<DmsProject> datasets = getDatasetsByStudy(projectId);
+				if (datasets != null && datasets.size() > 0) {
+					projects.addAll(datasets);
+				}
+			}
+		}
+		
+		return new ArrayList<DmsProject>(projects);
 	}
 }

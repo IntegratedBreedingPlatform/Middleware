@@ -13,47 +13,38 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DataManager;
 import org.generationcp.middleware.manager.Database;
-import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.pojos.Country;
+import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.v2.dao.CVDao;
 import org.generationcp.middleware.v2.dao.CVTermDao;
 import org.generationcp.middleware.v2.dao.CVTermRelationshipDao;
 import org.generationcp.middleware.v2.dao.DmsProjectDao;
-import org.generationcp.middleware.v2.dao.ProjectPropertyDao;
 import org.generationcp.middleware.v2.dao.ExperimentDao;
 import org.generationcp.middleware.v2.dao.ExperimentProjectDao;
 import org.generationcp.middleware.v2.dao.ExperimentPropertyDao;
 import org.generationcp.middleware.v2.dao.ExperimentStockDao;
 import org.generationcp.middleware.v2.dao.GeolocationPropertyDao;
+import org.generationcp.middleware.v2.dao.ProjectPropertyDao;
 import org.generationcp.middleware.v2.dao.StockPropertyDao;
 import org.generationcp.middleware.v2.domain.DataSet;
-import org.generationcp.middleware.v2.factory.FactorDetailsFactory;
-import org.generationcp.middleware.v2.factory.ObservationDetailsFactory;
+import org.generationcp.middleware.v2.domain.FactorDetails;
+import org.generationcp.middleware.v2.domain.ObservationDetails;
 import org.generationcp.middleware.v2.factory.ProjectFactory;
 import org.generationcp.middleware.v2.factory.ProjectPropertyFactory;
-import org.generationcp.middleware.v2.factory.ProjectRelationshipFactory;
 import org.generationcp.middleware.v2.factory.StudyFactory;
-import org.generationcp.middleware.v2.factory.VariableDetailsFactory;
 import org.generationcp.middleware.v2.manager.api.StudyDataManager;
 import org.generationcp.middleware.v2.pojos.AbstractNode;
 import org.generationcp.middleware.v2.pojos.CVTerm;
 import org.generationcp.middleware.v2.pojos.CVTermId;
-import org.generationcp.middleware.v2.pojos.CVTermRelationship;
 import org.generationcp.middleware.v2.pojos.DatasetNode;
 import org.generationcp.middleware.v2.pojos.DmsDataset;
 import org.generationcp.middleware.v2.pojos.DmsProject;
-import org.generationcp.middleware.v2.pojos.FactorDetails;
 import org.generationcp.middleware.v2.pojos.FolderNode;
-import org.generationcp.middleware.v2.pojos.ObservationDetails;
 import org.generationcp.middleware.v2.pojos.ProjectProperty;
-import org.generationcp.middleware.v2.pojos.ProjectRelationship;
 import org.generationcp.middleware.v2.pojos.StudyDetails;
 import org.generationcp.middleware.v2.pojos.StudyNode;
 import org.generationcp.middleware.v2.pojos.StudyQueryFilter;
-import org.generationcp.middleware.v2.pojos.VariableDetails;
-import org.generationcp.middleware.v2.util.CVTermRelationshipUtil;
-import org.generationcp.middleware.v2.util.ProjectPropertyUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -211,14 +202,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		return StudyFactory.getInstance();
 	}
 	
-	private FactorDetailsFactory getFactorDetailsFactory() {
-		return FactorDetailsFactory.getInstance();
-	}
-	
-	private ObservationDetailsFactory getObservationDetailsFactory() {
-		return ObservationDetailsFactory.getInstance();
-	}
-
 	@Override
 	public StudyDetails getStudyDetails(Integer studyId) throws MiddlewareQueryException {
 		if (setWorkingDatabase(studyId)) {
@@ -254,23 +237,21 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		return null;
 	}
 
-
-	@Override
-	public List<FactorDetails> getFactorDetails(Integer studyId) throws MiddlewareQueryException {
-		return getDetails(studyId, getFactorDetailsFactory());
-	}
-
-	@Override
-	public List<ObservationDetails> getObservationDetails(Integer studyId) throws MiddlewareQueryException {
-		return getDetails(studyId, getObservationDetailsFactory());
-	}
-	
 	@Override
 	public DataSet getDataSet(int dataSetId) throws MiddlewareQueryException {
 		return getDataSetBuilder().build(dataSetId);
 	}
 
-
+	@Override
+	public List<FactorDetails> getFactors(Integer projectId) throws MiddlewareQueryException {
+		return getFactorDetailsBuilder().build(projectId);
+	}
+	
+	@Override
+	public List<ObservationDetails> getObservations(Integer projectId) throws MiddlewareQueryException {
+		return getObservationDetailsBuilder().build(projectId);
+	}
+	
 	@Override
 	public List<StudyNode> searchStudies(StudyQueryFilter filter) throws MiddlewareQueryException {
 		Set<StudyNode> studies = new HashSet<StudyNode>();
@@ -293,65 +274,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	}
 	
-	private <T extends VariableDetails> List<T> getDetails(Integer studyId, VariableDetailsFactory<T> factory) throws MiddlewareQueryException {
-		Set<T> variableSet = new HashSet<T>();
-		
-		if (setWorkingDatabase(studyId)) {
-			List<DmsProject> projects = new ArrayList<DmsProject>();
-			DmsProject study = getDmsProjectDao().getById(studyId);
-			
-			if (study != null) {
-				projects.add(study);
-				projects.addAll(getDmsProjectDao().getDatasetsByStudy(studyId));
-				
-				for (DmsProject project : projects) {
-					Set<Integer> varIds = ProjectPropertyUtil.extractStandardVariableIds(project.getProperties());
-					List<CVTermRelationship> relationships = getRelationshipsFromLocalAndCentral(varIds);
-					
-					Set<Integer> localTermIds = CVTermRelationshipUtil.extractLocalObjectTermIds(relationships);
-					Set<Integer> centralTermIds = CVTermRelationshipUtil.extractCentralObjectTermIds(relationships);
-					List<CVTerm> terms = getTermsFromLocalAndCentral(localTermIds, centralTermIds);
-					
-					variableSet.addAll(factory.createDetails(project, relationships, terms));
-				}
-			}
-		}
-		
-		return new ArrayList<T>(variableSet);	
-	}
-
-	@SuppressWarnings("unchecked")
-	private List<CVTermRelationship> getRelationshipsFromLocalAndCentral(Collection<Integer> varIds)
-	throws MiddlewareQueryException {
-
-		return getAllFromCentralAndLocalByMethod(
-						getCVTermRelationshipDao(), "getBySubjectIds", 
-						new Object[] {varIds}, new Class[] {Collection.class});
-	}
-	
-	@SuppressWarnings("unchecked")
-	private List<CVTerm> getTermsFromLocalAndCentral(Collection<Integer> localTermIds, Collection<Integer> centralTermIds)
-	throws MiddlewareQueryException {
-		
-		List<CVTerm> terms = 
-				getFromInstanceByMethod(
-					getCVTermDao(), 
-					Database.LOCAL, 
-					"getByIds", 
-					new Object[] {localTermIds}, 
-					new Class[] {Collection.class});
-	
-		terms.addAll( 
-				getFromInstanceByMethod(
-					getCVTermDao(), 
-					Database.CENTRAL, 
-					"getByIds", 
-					new Object[] {centralTermIds}, 
-					new Class[] {Collection.class}) );
-		
-		return terms;
-	}
-
 	@SuppressWarnings("unchecked")
 	private List<StudyNode> getByStartDate(Integer startDate) throws MiddlewareQueryException {
 		if (startDate != null) {

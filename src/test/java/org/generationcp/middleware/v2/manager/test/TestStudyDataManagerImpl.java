@@ -24,20 +24,20 @@ import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.v2.domain.DataSet;
+import org.generationcp.middleware.v2.domain.FactorDetails;
+import org.generationcp.middleware.v2.domain.ObservationDetails;
+import org.generationcp.middleware.v2.domain.VariableDetails;
 import org.generationcp.middleware.v2.manager.api.StudyDataManager;
 import org.generationcp.middleware.v2.pojos.AbstractNode;
 import org.generationcp.middleware.v2.pojos.CVTermId;
 import org.generationcp.middleware.v2.pojos.DatasetNode;
 import org.generationcp.middleware.v2.pojos.DmsDataset;
-import org.generationcp.middleware.v2.pojos.FactorDetails;
 import org.generationcp.middleware.v2.pojos.FolderNode;
-import org.generationcp.middleware.v2.pojos.ObservationDetails;
 import org.generationcp.middleware.v2.pojos.ProjectProperty;
 import org.generationcp.middleware.v2.pojos.ProjectRelationship;
 import org.generationcp.middleware.v2.pojos.StudyDetails;
 import org.generationcp.middleware.v2.pojos.StudyNode;
 import org.generationcp.middleware.v2.pojos.StudyQueryFilter;
-import org.generationcp.middleware.v2.pojos.VariableDetails;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -72,7 +72,7 @@ public class TestStudyDataManagerImpl {
     public void testGetFactorDetails() throws Exception {
     	System.out.println("testGetFactorDetails");
     	int studyId = 10010;
-    	List<FactorDetails> factorDetails = manager.getFactorDetails(studyId);
+    	List<FactorDetails> factorDetails = manager.getFactors(studyId);
     	assertNotNull(factorDetails);
     	Assert.assertTrue(factorDetails.size() > 0);
     	printVariableDetails(studyId, factorDetails);
@@ -82,7 +82,7 @@ public class TestStudyDataManagerImpl {
     public void testGetObservationDetails() throws Exception {
     	System.out.println("testGetObservationDetails");
     	int studyId = 10010;
-    	List<ObservationDetails> observationDetails = manager.getObservationDetails(studyId);
+    	List<ObservationDetails> observationDetails = manager.getObservations(studyId);
     	assertNotNull(observationDetails);
     	Assert.assertTrue(observationDetails.size() > 0);
     	printVariableDetails(studyId, observationDetails);

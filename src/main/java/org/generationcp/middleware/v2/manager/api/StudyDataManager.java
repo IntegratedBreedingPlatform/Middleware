@@ -18,13 +18,13 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.v2.domain.DataSet;
+import org.generationcp.middleware.v2.domain.FactorDetails;
+import org.generationcp.middleware.v2.domain.ObservationDetails;
 import org.generationcp.middleware.v2.pojos.DatasetNode;
 import org.generationcp.middleware.v2.pojos.DmsDataset;
 import org.generationcp.middleware.v2.pojos.StudyDetails;
 import org.generationcp.middleware.v2.pojos.AbstractNode;
 import org.generationcp.middleware.v2.pojos.FolderNode;
-import org.generationcp.middleware.v2.pojos.FactorDetails;
-import org.generationcp.middleware.v2.pojos.ObservationDetails;
 import org.generationcp.middleware.v2.pojos.StudyNode;
 import org.generationcp.middleware.v2.pojos.StudyQueryFilter;
 
@@ -80,24 +80,6 @@ public interface StudyDataManager {
 	public List<DatasetNode> getDatasetNodesByStudyId(Integer studyId, Database instance) throws MiddlewareQueryException;
 	
 	/**
-	 * Returns the list of factor details for a specific study.
-	 * 
-	 * @param studyId
-	 * @return
-	 * @throws MiddlewareQueryException
-	 */
-	List<FactorDetails> getFactorDetails(Integer studyId) throws MiddlewareQueryException;
-
-	/**
-	 * Returns the list of observation details for a specific study.
-	 * 
-	 * @param studyId
-	 * @return
-	 * @throws MiddlewareQueryException
-	 */
-	List<ObservationDetails> getObservationDetails(Integer studyId) throws MiddlewareQueryException;
-	
-	/**
 	 * @param dataSetId
 	 * @return
 	 * @throws MiddlewareQueryException
@@ -112,6 +94,25 @@ public interface StudyDataManager {
 	 * @throws MiddlewareQueryException
 	 */
 	List<StudyNode> searchStudies(StudyQueryFilter filter) throws MiddlewareQueryException;
+	
+	/**
+	 * Returns the list of factor details for a specific study.
+	 * 
+	 * @param studyId
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	List<FactorDetails> getFactors(Integer projectId) throws MiddlewareQueryException;
+	
+	/**
+	 * Returns the list of observation details for a specific study.
+	 * 
+	 * @param studyId
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	List<ObservationDetails> getObservations(Integer projectId) throws MiddlewareQueryException;
+
 	
     public Study addStudy(Study study) throws MiddlewareQueryException;
     

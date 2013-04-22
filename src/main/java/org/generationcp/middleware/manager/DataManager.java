@@ -20,6 +20,8 @@ import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.v2.domain.builder.DataSetBuilder;
+import org.generationcp.middleware.v2.domain.builder.FactorDetailsBuilder;
+import org.generationcp.middleware.v2.domain.builder.ObservationDetailsBuilder;
 import org.generationcp.middleware.v2.domain.builder.StudyBuilder;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -1064,5 +1066,13 @@ public abstract class DataManager{
     
     protected final DataSetBuilder getDataSetBuilder() {
     	return new DataSetBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
+    protected final FactorDetailsBuilder getFactorDetailsBuilder() {
+    	return new FactorDetailsBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
+    protected final ObservationDetailsBuilder getObservationDetailsBuilder() {
+    	return new ObservationDetailsBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
 }
