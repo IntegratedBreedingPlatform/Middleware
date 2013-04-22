@@ -97,6 +97,8 @@ public class VariableType extends CvTerm {
 	}
 
 	public void print(int indent) {
+		Debug.println(indent, "Variable Type: ");
+		indent += 3;
 		super.print(indent);
 		Debug.println(indent, "localName: " + localName);
 		Debug.println(indent, "localDescription: "  + localDescription);
@@ -107,5 +109,12 @@ public class VariableType extends CvTerm {
 		if (this.constraints != null) {
 			this.constraints.print(indent);
 		}
+	}
+	
+	public boolean equals(Object obj) {
+		if (obj == null) return false;
+		if (!(obj instanceof VariableType)) return false;
+		VariableType other = (VariableType) obj;
+		return other.getId() == getId();
 	}
 }

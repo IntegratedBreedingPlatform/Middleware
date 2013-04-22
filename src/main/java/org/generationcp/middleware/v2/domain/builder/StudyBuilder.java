@@ -28,7 +28,8 @@ public class StudyBuilder extends Builder {
 		study.setId(project.getProjectId());
 		study.setName(project.getName());
 		study.setDescription(project.getDescription());
-		study.setConditions(getVariableBuilder().create(project.getProperties()));
+		study.setVariableTypes(getVariableTypeBuilder().create(project.getProperties()));
+		study.setConditions(getVariableBuilder().create(project.getProperties(), study.getVariableTypes()));
 		return study;
 	}
 

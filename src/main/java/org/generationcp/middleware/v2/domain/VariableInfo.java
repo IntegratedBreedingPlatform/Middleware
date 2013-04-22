@@ -35,8 +35,9 @@ public class VariableInfo {
 	}
 
 	public void print(int indent) {
-		Debug.println(indent, "stdVariableId: " + stdVariableId);
-		Debug.println(indent, "localName: " + localName);
-		Debug.println(indent, "localDescription: " + localDescription);
+		Debug.println(indent, "VariableInfo:" );
+		Debug.println(indent + 3, "stdVariableId: " + stdVariableId);
+		Debug.println(indent + 3, "localName: " + localName);
+		Debug.println(indent + 3, "localDescription: " + localDescription);
 	}
 }

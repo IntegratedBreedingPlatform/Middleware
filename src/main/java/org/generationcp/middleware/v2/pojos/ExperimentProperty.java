@@ -29,11 +29,6 @@ public class ExperimentProperty implements Serializable {
 	@Column(name = "nd_experimentprop_id")	
 	private Integer ndExperimentpropId;
 	
-	
-	@Basic(optional = false)
-	@Column(name = "nd_experiment_id")
-	private Integer ndExperimentId;
-	
 	@Basic(optional = false)
 	@Column(name = "type_id")
 	private Integer typeId;
@@ -54,7 +49,6 @@ public class ExperimentProperty implements Serializable {
     public String toString() {
     	StringBuilder sb = new StringBuilder();
     	sb.append("ExperimentProperties [nd_experimentprop_id=" + ndExperimentpropId);
-    	sb.append(", nd_experiment_id=" + ndExperimentId);
     	sb.append(", type_id=" + typeId);
     	sb.append(", value=" + value);
     	sb.append(", rank=" + rank);
@@ -99,16 +93,6 @@ public class ExperimentProperty implements Serializable {
 
 	public void setNdExperimentpropId(Integer nd_experimentprop_id) {
 		this.ndExperimentpropId = nd_experimentprop_id;
-	}
-
-
-	public Integer getNdExperimentId() {
-		return ndExperimentId;
-	}
-
-
-	public void setNdExperimentId(Integer nd_experiment_id) {
-		this.ndExperimentId = nd_experiment_id;
 	}
 
 

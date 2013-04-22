@@ -1,6 +1,8 @@
 package org.generationcp.middleware.v2.domain.builder;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -11,12 +13,23 @@ import org.generationcp.middleware.v2.pojos.CVTerm;
 import org.generationcp.middleware.v2.pojos.CVTermId;
 import org.generationcp.middleware.v2.pojos.CVTermProperty;
 import org.generationcp.middleware.v2.pojos.CVTermRelationship;
+import org.generationcp.middleware.v2.pojos.ProjectProperty;
 
 public class VariableTypeBuilder extends Builder {
 
 	public VariableTypeBuilder(HibernateSessionProvider sessionProviderForLocal,
 			                   HibernateSessionProvider sessionProviderForCentral) {
 		super(sessionProviderForLocal, sessionProviderForCentral);
+	}
+	
+	public Set<VariableType> create(List<ProjectProperty> properties) throws MiddlewareQueryException {
+		Set<VariableInfo> variableInfoList = getVariableInfoBuilder().create(properties);
+		
+		Set<VariableType> variableTypes = new HashSet<VariableType>();
+		for (VariableInfo variableInfo : variableInfoList) {
+			variableTypes.add(create(variableInfo));
+		}
+		return variableTypes;
 	}
 
 	public VariableType create(VariableInfo variableInfo) throws MiddlewareQueryException {

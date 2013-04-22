@@ -13,13 +13,18 @@
 package org.generationcp.middleware.v2.pojos;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.JoinColumn;
 
@@ -56,6 +61,10 @@ public class ExperimentModel implements Serializable {
     // References cvterm
     @Column(name="type_id")
     private Integer typeId;
+    
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name="nd_experiment_id") 
+	private Set<ExperimentProperty> properties;
     
     @ManyToOne
     @JoinTable(name="nd_experiment_project", 
@@ -95,6 +104,14 @@ public class ExperimentModel implements Serializable {
 
 	public void setTypeId(Integer typeId) {
 		this.typeId = typeId;
+	}
+
+	public Set<ExperimentProperty> getProperties() {
+		return properties;
+	}
+
+	public void setProperties(Set<ExperimentProperty> properties) {
+		this.properties = properties;
 	}
 
 	public DmsProject getProject() {

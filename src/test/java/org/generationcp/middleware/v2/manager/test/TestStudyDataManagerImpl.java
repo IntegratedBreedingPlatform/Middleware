@@ -215,7 +215,9 @@ public class TestStudyDataManagerImpl {
 	
 	@AfterClass
 	public static void tearDown() throws Exception {
-		factory.close();
+		if (factory != null) {
+			factory.close();
+		}
 	}
 
 	

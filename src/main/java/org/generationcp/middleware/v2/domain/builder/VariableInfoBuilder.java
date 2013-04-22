@@ -29,6 +29,7 @@ public class VariableInfoBuilder {
 		variableDef.setLocalName(localNameProperty == null ? null : localNameProperty.getValue());
 	    variableDef.setLocalDescription(localDescriptionProperty == null ? null : localDescriptionProperty.getValue());
 	    variableDef.setStdVariableId(Integer.parseInt(stdVariableProperty.getValue()));
+	    
 		return variableDef;
 	}
 
@@ -41,9 +42,12 @@ public class VariableInfoBuilder {
 		 return null;
 	}
 
-	private ProjectProperty findLocalNameProperty(String stdVariableId, Set<ProjectProperty> properties) {
+	private ProjectProperty findLocalNameProperty(String stdVariableIdStr, Set<ProjectProperty> properties) {
+		Integer stdVariableId = Integer.parseInt(stdVariableIdStr);
 		for (ProjectProperty property : properties) {
-			 if (isStudyInformationType(property)) return property;
+			 if (isStudyInformationType(property)) {
+				 return property;
+			 }
 			 
 			 if (!isLocalDescriptionType(property) && !isStandardVariableType(property)) {
 				 if (!stdVariableId.equals(property.getTypeId())) {

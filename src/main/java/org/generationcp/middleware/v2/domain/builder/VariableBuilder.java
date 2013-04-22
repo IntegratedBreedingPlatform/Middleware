@@ -8,6 +8,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.v2.domain.Variable;
 import org.generationcp.middleware.v2.domain.VariableInfo;
+import org.generationcp.middleware.v2.domain.VariableType;
 import org.generationcp.middleware.v2.pojos.ProjectProperty;
 import org.generationcp.middleware.v2.util.Debug;
 
@@ -18,22 +19,31 @@ public class VariableBuilder extends Builder {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 
-	public Set<Variable> create(List<ProjectProperty> properties) throws MiddlewareQueryException {
+	public Set<Variable> create(List<ProjectProperty> properties, Set<VariableType> variableTypes) throws MiddlewareQueryException {
 		Set<Variable> variables = new HashSet<Variable>();
 		
 		Set<VariableInfo> variableInfoList = getVariableInfoBuilder().create(properties);
 		for (VariableInfo variableInfo : variableInfoList) {
-			variables.add(createVariable(variableInfo, properties));
+			variables.add(createVariable(variableInfo, properties, variableTypes));
 		}
 		
 		return variables;
 	}
 
-	private Variable createVariable(VariableInfo variableInfo, List<ProjectProperty> properties) throws MiddlewareQueryException {
+	private Variable createVariable(VariableInfo variableInfo, List<ProjectProperty> properties, Set<VariableType> variableTypes) throws MiddlewareQueryException {
 		 Variable variable = new Variable();
-		 variable.setVariableType(getVariableTypeBuilder().create(variableInfo));
+		 variable.setVariableType(findVariableType(variableInfo.getStdVariableId(), variableTypes));
 		 variable.setValue(getValue(properties, variableInfo.getStdVariableId()));
 		 return variable;
+	}
+
+	private VariableType findVariableType(int stdVariableId, Set<VariableType> variableTypes) {
+		for (VariableType variableType : variableTypes) {
+			if (variableType.getId() == stdVariableId) {
+				return variableType;
+			}
+		}
+		return null;
 	}
 
 	private String getValue(List<ProjectProperty> properties, int stdVariableId) {

@@ -1,6 +1,9 @@
 package org.generationcp.middleware.v2.domain;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.generationcp.middleware.v2.util.Debug;
@@ -16,6 +19,8 @@ public class Study {
 	private Set<DataSet> dataSets = new HashSet<DataSet>();
 	
 	private Set<Variable> conditions;
+	
+	private Set<VariableType> variableTypes;
 
 	public int getId() {
 		return id;
@@ -49,6 +54,14 @@ public class Study {
 		this.dataSets = dataSets;
 	}
 
+	public Set<VariableType> getVariableTypes() {
+		return variableTypes;
+	}
+
+	public void setVariableTypes(Set<VariableType> variableTypes) {
+		this.variableTypes = variableTypes;
+	}
+
 	public Set<Variable> getConditions() {
 		return conditions;
 	}
@@ -63,12 +76,19 @@ public class Study {
 		Debug.println(indent + 3, "Name: " + getName());
 	    Debug.println(indent + 3, "Description: " + getDescription());
 	    
-	    for (Variable condition : conditions) {
-	    	condition.print(indent + 3);
+	    Debug.println(indent + 3, "Variable Types: ");
+	    for (VariableType variableType : variableTypes) {
+	    	variableType.print(indent + 6);
 	    }
 	    
+	    Debug.println(indent + 3, "Conditions: ");
+	    for (Variable condition : conditions) {
+	    	condition.print(indent + 6);
+	    }
+	    
+	    Debug.println(indent + 3, "Data Sets: ");
 	    for (DataSet dataSet : dataSets) {
-	    	dataSet.print(indent);
+	    	dataSet.print(indent + 6);
 	    }
 	}
 	

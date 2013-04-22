@@ -1,12 +1,17 @@
 package org.generationcp.middleware.v2.domain.builder;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.v2.domain.DataSet;
 import org.generationcp.middleware.v2.domain.Experiment;
 import org.generationcp.middleware.v2.domain.Study;
+import org.generationcp.middleware.v2.domain.VariableInfo;
+import org.generationcp.middleware.v2.domain.VariableType;
 import org.generationcp.middleware.v2.pojos.DmsProject;
 
 public class DataSetBuilder extends Builder {
@@ -33,8 +38,21 @@ public class DataSetBuilder extends Builder {
 		dataSet.setName(project.getName());
 		dataSet.setDescription(project.getDescription());
 		dataSet.setStudy(getStudy(project));
+		dataSet.setVariableTypes(getVariableTypes(dataSet.getStudy(), project));
 		dataSet.setExperiments(createExperiments(project));
 		return dataSet;
+	}
+
+	private Set<VariableType> getVariableTypes(Study study, DmsProject project) throws MiddlewareQueryException {
+		Set<VariableType> variableTypes = new HashSet<VariableType>();
+		variableTypes.addAll(study.getVariableTypes());
+		
+		Set<VariableInfo> variableInfoList = getVariableInfoBuilder().create(project.getProperties());
+		for (VariableInfo variableInfo : variableInfoList) {
+			variableTypes.add(getVariableTypeBuilder().create(variableInfo));
+		}
+		
+		return variableTypes;
 	}
 
 	private Study getStudy(DmsProject dataSet) throws MiddlewareQueryException {

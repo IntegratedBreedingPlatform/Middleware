@@ -26,7 +26,13 @@ public class Variable {
 
 	public void print(int indent) {
 		Debug.println(indent, "Variable: " );
-		variableType.print(indent + 3);
+		
+		if (variableType == null) {
+			Debug.println(indent + 3, "VariableType: null");
+		}
+		else {
+		    Debug.println(indent + 3, "VariableType: " + variableType.getId() + " [" + variableType.getLocalName() + "]");
+		}
 		Debug.println(indent + 3, "Value: " + value);
 	}
 }

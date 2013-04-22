@@ -1,5 +1,7 @@
 package org.generationcp.middleware.v2.domain;
 
+import java.util.Set;
+
 import org.generationcp.middleware.v2.util.Debug;
 
 public class Experiment {
@@ -7,6 +9,8 @@ public class Experiment {
 	private int id;
 	
 	private DataSet dataSet;
+	
+	private Set<Variable> variables;
 
 	public int getId() {
 		return id;
