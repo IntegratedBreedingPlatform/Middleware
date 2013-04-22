@@ -34,10 +34,10 @@ public abstract class CvTerm {
 		this.description = description;
 	}
 	
-	public void print(int index) {
-		Debug.println(index, "Id: " + getId());
-		Debug.println(index, "Name: " + getName());
-	    Debug.println(index, "Description: " + getDescription());
+	public void print(int indent) {
+		Debug.println(indent, "Id: " + getId());
+		Debug.println(indent, "Name: " + getName());
+	    Debug.println(indent, "Description: " + getDescription());
 	}
 	
 	public boolean equals(Object obj) {

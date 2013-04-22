@@ -35,7 +35,7 @@ import org.generationcp.middleware.v2.pojos.CVTermProperty;
 import org.generationcp.middleware.v2.pojos.CVTermRelationship;
 import org.generationcp.middleware.v2.pojos.CVTermSynonym;
 import org.generationcp.middleware.v2.pojos.DmsProject;
-import org.generationcp.middleware.v2.pojos.Experiment;
+import org.generationcp.middleware.v2.pojos.ExperimentModel;
 import org.generationcp.middleware.v2.pojos.ExperimentPhenotype;
 import org.generationcp.middleware.v2.pojos.ExperimentProject;
 import org.generationcp.middleware.v2.pojos.ExperimentProperty;
@@ -393,7 +393,7 @@ public class DMSPojosSimpleTest{
     	
     	System.out.println("testExperiment() RESULTS: ");
     	for (Object obj : query.list()) {
-    		Assert.assertTrue(obj instanceof Experiment);
+    		Assert.assertTrue(obj instanceof ExperimentModel);
     		Assert.assertTrue(obj != null);
     		System.out.println(" " + obj);
     	}

@@ -319,4 +319,8 @@ public abstract class Builder {
     protected final VariableTypeBuilder getVariableTypeBuilder() {
     	return new VariableTypeBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
+    
+    protected final ExperimentBuilder getExperimentBuilder() {
+    	return new ExperimentBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
 }

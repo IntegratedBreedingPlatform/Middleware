@@ -29,8 +29,8 @@ public class VariableConstraints {
 		this.maxValue = maxValue;
 	}
 
-	public void print(int index) {
-		Debug.println(index, "minValue: " + minValue);
-		Debug.println(index, "maxValue: " + maxValue);
+	public void print(int indent) {
+		Debug.println(indent, "minValue: " + minValue);
+		Debug.println(indent, "maxValue: " + maxValue);
 	}
 }

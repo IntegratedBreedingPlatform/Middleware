@@ -24,9 +24,9 @@ public class Variable {
 		this.value = value;
 	}
 
-	public void print(int index) {
-		Debug.println(index, "Variable: " );
-		variableType.print(index + 3);
-		Debug.println(index + 3, "Value: " + value);
+	public void print(int indent) {
+		Debug.println(indent, "Variable: " );
+		variableType.print(indent + 3);
+		Debug.println(indent + 3, "Value: " + value);
 	}
 }

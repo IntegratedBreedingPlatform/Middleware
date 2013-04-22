@@ -20,6 +20,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -75,6 +77,14 @@ public class DmsProject implements Serializable {
 	
 	@OneToMany(mappedBy = "objectProject", fetch = FetchType.LAZY)
 	private List<ProjectRelationship> relatedBys;
+	
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(
+            name="nd_experiment_project",
+            joinColumns = @JoinColumn( name="project_id"),
+            inverseJoinColumns = @JoinColumn( name="nd_experiment_id")
+    )
+	private List<ExperimentModel> experimentModels;
 	
 	
 	public DmsProject() {
@@ -149,6 +159,14 @@ public class DmsProject implements Serializable {
 
 	public void setRelatedBys(List<ProjectRelationship> relatedBys) {
 		this.relatedBys = relatedBys;
+	}
+
+	public List<ExperimentModel> getExperimentModels() {
+		return experimentModels;
+	}
+
+	public void setExperimentModels(List<ExperimentModel> experimentModels) {
+		this.experimentModels = experimentModels;
 	}
 
 	@Override

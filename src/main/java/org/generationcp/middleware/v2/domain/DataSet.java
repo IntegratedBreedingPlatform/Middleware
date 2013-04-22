@@ -59,11 +59,16 @@ public class DataSet {
 		this.experiments = experiments;
 	}
 	
-	public void print(int index) {
-		Debug.println(index, "DataSet: ");
-		Debug.println(index + 3, "Id: " + getId());
-		Debug.println(index + 3, "Name: " + getName());
-	    Debug.println(index + 3, "Description: " + getDescription());
+	public void print(int indent) {
+		Debug.println(indent, "DataSet: ");
+		Debug.println(indent + 3, "Id: " + getId());
+		Debug.println(indent + 3, "Name: " + getName());
+	    Debug.println(indent + 3, "Description: " + getDescription());
+	    
+	    Debug.println(indent + 3, "Experiments:" );
+	    for (Experiment experiment : experiments) {
+	    	experiment.print(indent + 6);
+	    }
 	}
 	
 	public boolean equals(Object obj) {

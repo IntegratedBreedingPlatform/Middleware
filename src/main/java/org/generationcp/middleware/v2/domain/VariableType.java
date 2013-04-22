@@ -96,16 +96,16 @@ public class VariableType extends CvTerm {
 		this.nameSynonyms = nameSynonyms;
 	}
 
-	public void print(int index) {
-		super.print(index);
-		Debug.println(index, "localName: " + localName);
-		Debug.println(index, "localDescription: "  + localDescription);
-		Debug.println(index, "propertyId: " + propertyId);
-		Debug.println(index, "methodId: " + methodId);
-		Debug.println(index, "scaleId: " + scaleId);
-		Debug.println(index, "storedInId: " + storedInId);
+	public void print(int indent) {
+		super.print(indent);
+		Debug.println(indent, "localName: " + localName);
+		Debug.println(indent, "localDescription: "  + localDescription);
+		Debug.println(indent, "propertyId: " + propertyId);
+		Debug.println(indent, "methodId: " + methodId);
+		Debug.println(indent, "scaleId: " + scaleId);
+		Debug.println(indent, "storedInId: " + storedInId);
 		if (this.constraints != null) {
-			this.constraints.print(index);
+			this.constraints.print(indent);
 		}
 	}
 }

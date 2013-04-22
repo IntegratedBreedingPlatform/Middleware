@@ -57,18 +57,18 @@ public class Study {
 		this.conditions = conditions;
 	}
 
-	public void print(int index) {
-		Debug.println(index, "Study: ");
-		Debug.println(index + 3, "Id: " + getId());
-		Debug.println(index + 3, "Name: " + getName());
-	    Debug.println(index + 3, "Description: " + getDescription());
+	public void print(int indent) {
+		Debug.println(indent, "Study: ");
+		Debug.println(indent + 3, "Id: " + getId());
+		Debug.println(indent + 3, "Name: " + getName());
+	    Debug.println(indent + 3, "Description: " + getDescription());
 	    
 	    for (Variable condition : conditions) {
-	    	condition.print(index + 3);
+	    	condition.print(indent + 3);
 	    }
 	    
 	    for (DataSet dataSet : dataSets) {
-	    	dataSet.print(index);
+	    	dataSet.print(indent);
 	    }
 	}
 	

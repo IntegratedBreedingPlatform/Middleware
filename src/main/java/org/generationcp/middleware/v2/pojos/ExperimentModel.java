@@ -18,7 +18,10 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.JoinColumn;
 
 /**
  * 
@@ -37,7 +40,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(	name = "nd_experiment")
-public class Experiment implements Serializable {
+public class ExperimentModel implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -53,11 +56,17 @@ public class Experiment implements Serializable {
     // References cvterm
     @Column(name="type_id")
     private Integer typeId;
+    
+    @ManyToOne
+    @JoinTable(name="nd_experiment_project", 
+        joinColumns={@JoinColumn(name="nd_experiment_id", insertable=false,updatable=false)},
+        inverseJoinColumns={@JoinColumn(name="project_id", insertable=false,updatable=false)})
+    private DmsProject project;
 
-	public Experiment() {
+	public ExperimentModel() {
 	}
 
-	public Experiment(Integer ndExperimentId, Integer geoLocationId, Integer typeId) {
+	public ExperimentModel(Integer ndExperimentId, Integer geoLocationId, Integer typeId) {
 		super();
 		this.ndExperimentId = ndExperimentId;
 		this.geoLocationId = geoLocationId;
@@ -88,6 +97,14 @@ public class Experiment implements Serializable {
 		this.typeId = typeId;
 	}
 
+	public DmsProject getProject() {
+		return project;
+	}
+
+	public void setProject(DmsProject project) {
+		this.project = project;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -108,7 +125,7 @@ public class Experiment implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Experiment other = (Experiment) obj;
+		ExperimentModel other = (ExperimentModel) obj;
 		if (geoLocationId == null) {
 			if (other.geoLocationId != null)
 				return false;

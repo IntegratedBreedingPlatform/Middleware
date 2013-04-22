@@ -34,9 +34,9 @@ public class VariableInfo {
 		this.stdVariableId = stdVariableId;
 	}
 
-	public void print(int index) {
-		Debug.println(index, "stdVariableId: " + stdVariableId);
-		Debug.println(index, "localName: " + localName);
-		Debug.println(index, "localDescription: " + localDescription);
+	public void print(int indent) {
+		Debug.println(indent, "stdVariableId: " + stdVariableId);
+		Debug.println(indent, "localName: " + localName);
+		Debug.println(indent, "localDescription: " + localDescription);
 	}
 }
