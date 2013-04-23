@@ -1,42 +1,23 @@
 package org.generationcp.middleware.v2.manager;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import org.generationcp.commons.util.StringUtil;
-import org.generationcp.middleware.dao.CountryDAO;
-import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DataManager;
 import org.generationcp.middleware.manager.Database;
-import org.generationcp.middleware.manager.Season;
-import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Study;
-import org.generationcp.middleware.v2.dao.CVDao;
-import org.generationcp.middleware.v2.dao.CVTermDao;
-import org.generationcp.middleware.v2.dao.CVTermRelationshipDao;
 import org.generationcp.middleware.v2.dao.DmsProjectDao;
-import org.generationcp.middleware.v2.dao.ExperimentDao;
-import org.generationcp.middleware.v2.dao.ExperimentProjectDao;
-import org.generationcp.middleware.v2.dao.ExperimentPropertyDao;
-import org.generationcp.middleware.v2.dao.ExperimentStockDao;
-import org.generationcp.middleware.v2.dao.GeolocationPropertyDao;
 import org.generationcp.middleware.v2.dao.ProjectPropertyDao;
-import org.generationcp.middleware.v2.dao.StockPropertyDao;
 import org.generationcp.middleware.v2.domain.DataSet;
 import org.generationcp.middleware.v2.domain.FactorDetails;
 import org.generationcp.middleware.v2.domain.ObservationDetails;
+import org.generationcp.middleware.v2.domain.StudyQueryFilter;
 import org.generationcp.middleware.v2.factory.ProjectFactory;
 import org.generationcp.middleware.v2.factory.ProjectPropertyFactory;
 import org.generationcp.middleware.v2.factory.StudyFactory;
 import org.generationcp.middleware.v2.manager.api.StudyDataManager;
 import org.generationcp.middleware.v2.pojos.AbstractNode;
-import org.generationcp.middleware.v2.pojos.CVTerm;
-import org.generationcp.middleware.v2.pojos.CVTermId;
 import org.generationcp.middleware.v2.pojos.DatasetNode;
 import org.generationcp.middleware.v2.pojos.DmsDataset;
 import org.generationcp.middleware.v2.pojos.DmsProject;
@@ -44,7 +25,6 @@ import org.generationcp.middleware.v2.pojos.FolderNode;
 import org.generationcp.middleware.v2.pojos.ProjectProperty;
 import org.generationcp.middleware.v2.pojos.StudyDetails;
 import org.generationcp.middleware.v2.pojos.StudyNode;
-import org.generationcp.middleware.v2.pojos.StudyQueryFilter;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -55,7 +35,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     private static final Logger LOG = LoggerFactory.getLogger(StudyDataManagerImpl.class);
 
 	private DmsProjectDao dmsProjectDao;
-	
+/*	
 	private CVTermRelationshipDao cvTermRelationshipDao;
 	
 	private CVTermDao cvTermDao;
@@ -77,7 +57,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	private StockPropertyDao stockPropertyDao;
 	
 	private ExperimentPropertyDao experimentPropertyDao;
-	
+*/	
 	private ProjectPropertyDao projectPropertyDao;
 	
 	
@@ -100,7 +80,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		dmsProjectDao.setSession(getActiveSession());
 		return dmsProjectDao;
 	}
-	
+/*	
 	private CVTermRelationshipDao getCVTermRelationshipDao() {
 		if (cvTermRelationshipDao == null) {
 			cvTermRelationshipDao = new CVTermRelationshipDao();
@@ -188,7 +168,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		experimentPropertyDao.setSession(getActiveSession());
 		return experimentPropertyDao;
 	}
-
+*/
 	private ProjectPropertyDao getProjectPropertyDao() {
 		if (projectPropertyDao == null) {
 			projectPropertyDao = new ProjectPropertyDao();
@@ -254,7 +234,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	
 	@Override
 	public List<StudyNode> searchStudies(StudyQueryFilter filter) throws MiddlewareQueryException {
-		Set<StudyNode> studies = new HashSet<StudyNode>();
+/*		Set<StudyNode> studies = new HashSet<StudyNode>();
 		
 		studies.addAll(getByStartDate(filter.getStartDate()));
 		studies.addAll(getByStudyName(filter.getName()));
@@ -271,9 +251,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		}
 		
 		return new ArrayList<StudyNode>(studies).subList(start, end);
+*/
+		return getStudyNodeBuilder().build(filter);
 
 	}
-	
+/*	
 	@SuppressWarnings("unchecked")
 	private List<StudyNode> getByStartDate(Integer startDate) throws MiddlewareQueryException {
 		if (startDate != null) {
@@ -477,7 +459,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 		return (determinants != null && determinants.size() > 0 ? determinants.get(0) : null);
 	}
-	
+*/	
 	
 	@Override
     public Study addStudy(Study study) throws MiddlewareQueryException{

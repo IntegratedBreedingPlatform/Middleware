@@ -1,4 +1,4 @@
-package org.generationcp.middleware.v2.pojos;
+package org.generationcp.middleware.v2.domain;
 
 import org.generationcp.middleware.manager.Season;
 

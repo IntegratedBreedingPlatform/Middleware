@@ -23,6 +23,7 @@ import org.generationcp.middleware.v2.domain.builder.DataSetBuilder;
 import org.generationcp.middleware.v2.domain.builder.FactorDetailsBuilder;
 import org.generationcp.middleware.v2.domain.builder.ObservationDetailsBuilder;
 import org.generationcp.middleware.v2.domain.builder.StudyBuilder;
+import org.generationcp.middleware.v2.domain.builder.StudyNodeBuilder;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -1074,5 +1075,9 @@ public abstract class DataManager{
 
     protected final ObservationDetailsBuilder getObservationDetailsBuilder() {
     	return new ObservationDetailsBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
+    protected final StudyNodeBuilder getStudyNodeBuilder() {
+    	return new StudyNodeBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
 }

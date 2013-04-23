@@ -12,13 +12,22 @@
 
 package org.generationcp.middleware.v2.domain.builder;
 
+import org.generationcp.middleware.dao.CountryDAO;
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.v2.dao.CVDao;
 import org.generationcp.middleware.v2.dao.CVTermDao;
 import org.generationcp.middleware.v2.dao.CVTermRelationshipDao;
 import org.generationcp.middleware.v2.dao.DmsProjectDao;
+import org.generationcp.middleware.v2.dao.ExperimentDao;
+import org.generationcp.middleware.v2.dao.ExperimentProjectDao;
+import org.generationcp.middleware.v2.dao.ExperimentPropertyDao;
+import org.generationcp.middleware.v2.dao.ExperimentStockDao;
+import org.generationcp.middleware.v2.dao.GeolocationPropertyDao;
+import org.generationcp.middleware.v2.dao.StockPropertyDao;
 import org.hibernate.Session;
 
 /**
@@ -304,6 +313,60 @@ public abstract class Builder {
 		return cvTermRelationshipDao;
 	}
     
+    protected final CountryDAO getCountryDao() {
+    	CountryDAO countryDao = new CountryDAO();
+    	countryDao.setSession(getActiveSession());
+    	return countryDao;
+    }
+    
+    protected final UserDAO getUserDao() {
+    	UserDAO userDao = new UserDAO();
+    	userDao.setSession(getActiveSession());
+    	return userDao;
+    }
+    
+    protected final CVDao getCvDao() {
+    	CVDao cvDao = new CVDao();
+    	cvDao.setSession(getActiveSession());
+    	return cvDao;
+    }
+    
+    protected final GeolocationPropertyDao getGeolocationPropertyDao() {
+    	GeolocationPropertyDao geolocationPropertyDao = new GeolocationPropertyDao();
+    	geolocationPropertyDao.setSession(getActiveSession());
+    	return geolocationPropertyDao;
+    }
+    
+    protected final ExperimentDao getExperimentDao() {
+    	ExperimentDao experimentDao = new ExperimentDao();
+    	experimentDao.setSession(getActiveSession());
+    	return experimentDao;
+    }
+    
+    protected final ExperimentPropertyDao getExperimentPropertyDao() {
+    	ExperimentPropertyDao experimentPropertyDao = new ExperimentPropertyDao();
+    	experimentPropertyDao.setSession(getActiveSession());
+    	return experimentPropertyDao;
+    }
+    
+    protected final StockPropertyDao getStockPropertyDao() {
+    	StockPropertyDao stockPropertyDao = new StockPropertyDao();
+    	stockPropertyDao.setSession(getActiveSession());
+    	return stockPropertyDao;
+    }
+
+    protected final ExperimentStockDao getExperimentStockDao() {
+    	ExperimentStockDao experimentStockDao = new ExperimentStockDao();
+    	experimentStockDao.setSession(getActiveSession());
+    	return experimentStockDao;
+    }
+    
+    protected final ExperimentProjectDao getExperimentProjectDao() {
+    	ExperimentProjectDao experimentProjectDao = new ExperimentProjectDao();
+    	experimentProjectDao.setSession(getActiveSession());
+    	return experimentProjectDao;
+    }
+    
     protected final StudyBuilder getStudyBuilder() {
     	return new StudyBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
@@ -323,4 +386,5 @@ public abstract class Builder {
     protected final ExperimentBuilder getExperimentBuilder() {
     	return new ExperimentBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
+
 }

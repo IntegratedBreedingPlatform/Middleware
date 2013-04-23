@@ -20,13 +20,13 @@ import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.v2.domain.DataSet;
 import org.generationcp.middleware.v2.domain.FactorDetails;
 import org.generationcp.middleware.v2.domain.ObservationDetails;
+import org.generationcp.middleware.v2.domain.StudyQueryFilter;
 import org.generationcp.middleware.v2.pojos.DatasetNode;
 import org.generationcp.middleware.v2.pojos.DmsDataset;
 import org.generationcp.middleware.v2.pojos.StudyDetails;
 import org.generationcp.middleware.v2.pojos.AbstractNode;
 import org.generationcp.middleware.v2.pojos.FolderNode;
 import org.generationcp.middleware.v2.pojos.StudyNode;
-import org.generationcp.middleware.v2.pojos.StudyQueryFilter;
 
 /**
  * This is the API for retrieving phenotypic data stored as Studies and

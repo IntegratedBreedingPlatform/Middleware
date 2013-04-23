@@ -26,6 +26,7 @@ import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.v2.domain.DataSet;
 import org.generationcp.middleware.v2.domain.FactorDetails;
 import org.generationcp.middleware.v2.domain.ObservationDetails;
+import org.generationcp.middleware.v2.domain.StudyQueryFilter;
 import org.generationcp.middleware.v2.domain.VariableDetails;
 import org.generationcp.middleware.v2.manager.api.StudyDataManager;
 import org.generationcp.middleware.v2.pojos.AbstractNode;
@@ -37,7 +38,6 @@ import org.generationcp.middleware.v2.pojos.ProjectProperty;
 import org.generationcp.middleware.v2.pojos.ProjectRelationship;
 import org.generationcp.middleware.v2.pojos.StudyDetails;
 import org.generationcp.middleware.v2.pojos.StudyNode;
-import org.generationcp.middleware.v2.pojos.StudyQueryFilter;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -92,10 +92,10 @@ public class TestStudyDataManagerImpl {
     public void testSearchStudies() throws Exception {
     	System.out.println("testSearchStudies");
     	StudyQueryFilter filter = new StudyQueryFilter();
-       	//filter.setStartDate(20050119);
+       	filter.setStartDate(20050119);
        	//filter.setName("BULU"); //INVALID: Not a study, should not be returned
-       	//filter.setName("2002WS-CHA"); //VALID: is a study
-    	//filter.setCountry("Republic of the Philippines");
+       	filter.setName("2002WS-CHA"); //VALID: is a study
+    	filter.setCountry("Republic of the Philippines");
     	filter.setSeason(Season.DRY);
     	//filter.setSeason(Season.GENERAL); //do nothing for GENERAL SEASON
     	//filter.setSeason(Season.WET); //currently has no data
