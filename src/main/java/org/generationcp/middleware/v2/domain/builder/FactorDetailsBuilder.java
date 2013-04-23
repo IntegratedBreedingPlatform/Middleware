@@ -4,7 +4,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.v2.domain.FactorDetails;
 import org.generationcp.middleware.v2.domain.VariableType;
 
-public class FactorDetailsBuilder extends AbstractDetailsBuilder<FactorDetails> {
+public class FactorDetailsBuilder extends AbstractVariableDetailsBuilder<FactorDetails> {
 
 	public FactorDetailsBuilder(
 			HibernateSessionProvider sessionProviderForLocal,

@@ -4,7 +4,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.v2.domain.ObservationDetails;
 import org.generationcp.middleware.v2.domain.VariableType;
 
-public class ObservationDetailsBuilder extends AbstractDetailsBuilder<ObservationDetails> {
+public class ObservationDetailsBuilder extends AbstractVariableDetailsBuilder<ObservationDetails> {
 
 	public ObservationDetailsBuilder(
 			HibernateSessionProvider sessionProviderForLocal,

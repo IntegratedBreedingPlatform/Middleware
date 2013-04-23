@@ -16,13 +16,13 @@ import org.generationcp.middleware.v2.pojos.CVTermId;
 import org.generationcp.middleware.v2.pojos.DmsProject;
 import org.generationcp.middleware.v2.pojos.ProjectProperty;
 
-public abstract class AbstractDetailsBuilder <T extends VariableDetails> extends Builder {
+public abstract class AbstractVariableDetailsBuilder <T extends VariableDetails> extends Builder {
 
 	protected static final List<Integer> OBSERVATION_TYPES = Arrays.asList(
 			CVTermId.OBSERVATION_VARIATE.getId(), CVTermId.CATEGORICAL_VARIATE.getId()
 	);
 
-	protected AbstractDetailsBuilder(
+	protected AbstractVariableDetailsBuilder(
 			HibernateSessionProvider sessionProviderForLocal,
 			HibernateSessionProvider sessionProviderForCentral) {
 		super(sessionProviderForLocal, sessionProviderForCentral);
@@ -64,8 +64,8 @@ public abstract class AbstractDetailsBuilder <T extends VariableDetails> extends
 		T details = createNewObject(variable);
 
 		details.setId(variable.getId());
-		details.setName(variable.getName());
-		details.setDescription(variable.getDescription());
+		details.setName(variable.getLocalName());
+		details.setDescription(variable.getLocalDescription());
 		details.setProperty(getTerm(variable.getPropertyId()));
 		details.setMethod(getTerm(variable.getMethodId()));
 		details.setScale(getTerm(variable.getScaleId()));
