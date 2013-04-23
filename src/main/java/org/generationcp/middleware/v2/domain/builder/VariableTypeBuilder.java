@@ -6,11 +6,11 @@ import java.util.Set;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.v2.domain.CVTermId;
 import org.generationcp.middleware.v2.domain.VariableConstraints;
 import org.generationcp.middleware.v2.domain.VariableInfo;
 import org.generationcp.middleware.v2.domain.VariableType;
 import org.generationcp.middleware.v2.pojos.CVTerm;
-import org.generationcp.middleware.v2.pojos.CVTermId;
 import org.generationcp.middleware.v2.pojos.CVTermProperty;
 import org.generationcp.middleware.v2.pojos.CVTermRelationship;
 import org.generationcp.middleware.v2.pojos.ProjectProperty;

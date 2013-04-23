@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.pojos.Study;
-import org.generationcp.middleware.v2.pojos.CVTermId;
+import org.generationcp.middleware.v2.domain.CVTermId;
+import org.generationcp.middleware.v2.domain.StudyPropertyConstants;
 import org.generationcp.middleware.v2.pojos.DmsProject;
 import org.generationcp.middleware.v2.pojos.ProjectProperty;
-import  org.generationcp.middleware.v2.pojos.StudyPropertyConstants;
 
-import static org.generationcp.middleware.v2.pojos.StudyPropertyConstants.*;
+import static org.generationcp.middleware.v2.domain.StudyPropertyConstants.*;
 
 public class ProjectPropertyFactory {
 	

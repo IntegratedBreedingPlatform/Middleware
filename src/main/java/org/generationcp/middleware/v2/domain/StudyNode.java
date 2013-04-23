@@ -10,7 +10,8 @@
  * 
  *******************************************************************************/
 
-package org.generationcp.middleware.v2.pojos;
+package org.generationcp.middleware.v2.domain;
+
 
 /**
  * This class is used to display Study nodes

@@ -20,12 +20,12 @@ import java.util.Set;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.v2.pojos.AbstractNode;
-import org.generationcp.middleware.v2.pojos.CVTermId;
-import org.generationcp.middleware.v2.pojos.DatasetNode;
+import org.generationcp.middleware.v2.domain.AbstractNode;
+import org.generationcp.middleware.v2.domain.CVTermId;
+import org.generationcp.middleware.v2.domain.DatasetNode;
+import org.generationcp.middleware.v2.domain.FolderNode;
+import org.generationcp.middleware.v2.domain.StudyNode;
 import org.generationcp.middleware.v2.pojos.DmsProject;
-import org.generationcp.middleware.v2.pojos.FolderNode;
-import org.generationcp.middleware.v2.pojos.StudyNode;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;

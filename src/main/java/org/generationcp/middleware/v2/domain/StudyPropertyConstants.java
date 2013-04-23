@@ -1,4 +1,5 @@
-package org.generationcp.middleware.v2.pojos;
+package org.generationcp.middleware.v2.domain;
+
 
 public enum StudyPropertyConstants {
 

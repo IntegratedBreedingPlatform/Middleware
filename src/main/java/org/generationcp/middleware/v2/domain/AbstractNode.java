@@ -10,7 +10,7 @@
  * 
  *******************************************************************************/
 
-package org.generationcp.middleware.v2.pojos;
+package org.generationcp.middleware.v2.domain;
 
 /**
  * Abstract POJO that stores ID and Name fields.

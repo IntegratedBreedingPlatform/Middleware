@@ -12,10 +12,10 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.pojos.Country;
+import org.generationcp.middleware.v2.domain.CVTermId;
+import org.generationcp.middleware.v2.domain.StudyNode;
 import org.generationcp.middleware.v2.domain.StudyQueryFilter;
 import org.generationcp.middleware.v2.pojos.CVTerm;
-import org.generationcp.middleware.v2.pojos.CVTermId;
-import org.generationcp.middleware.v2.pojos.StudyNode;
 
 public class StudyNodeBuilder extends Builder {
 

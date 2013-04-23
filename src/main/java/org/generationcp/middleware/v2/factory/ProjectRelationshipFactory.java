@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.pojos.Study;
-import org.generationcp.middleware.v2.pojos.CVTermId;
+import org.generationcp.middleware.v2.domain.CVTermId;
 import org.generationcp.middleware.v2.pojos.DmsProject;
 import org.generationcp.middleware.v2.pojos.ProjectRelationship;
 

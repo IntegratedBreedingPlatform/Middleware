@@ -4,8 +4,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.generationcp.middleware.v2.domain.CVTermId;
 import org.generationcp.middleware.v2.domain.VariableInfo;
-import org.generationcp.middleware.v2.pojos.CVTermId;
 import org.generationcp.middleware.v2.pojos.ProjectProperty;
 
 public class VariableInfoBuilder {

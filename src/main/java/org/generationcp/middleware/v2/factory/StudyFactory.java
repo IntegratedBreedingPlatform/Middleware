@@ -3,11 +3,11 @@ package org.generationcp.middleware.v2.factory;
 import java.util.List;
 
 import org.generationcp.middleware.pojos.Study;
+import org.generationcp.middleware.v2.domain.CVTermId;
+import org.generationcp.middleware.v2.domain.StudyDetails;
 import org.generationcp.middleware.v2.helper.ProjectPropertiesHelper;
-import org.generationcp.middleware.v2.pojos.CVTermId;
 import org.generationcp.middleware.v2.pojos.DmsProject;
 import org.generationcp.middleware.v2.pojos.ProjectProperty;
-import org.generationcp.middleware.v2.pojos.StudyDetails;
 
 /**
  * Factory class used for creating the Study POJOs.
