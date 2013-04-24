@@ -28,13 +28,6 @@ public class ExperimentStock implements Serializable {
 	private Integer experimentStockId;
 	
 	/**
-	 * The Experiment object.
-	 */
-	@Basic(optional = false)
-	@Column(name = "nd_experiment_id")
-	private Integer experimentId;
-	
-	/**
 	 * Stock used in the extraction or the corresponding stock for the clone.
 	 */
 	@Basic(optional = false)
@@ -56,27 +49,19 @@ public class ExperimentStock implements Serializable {
 		this.experimentStockId = experimentStockId;
 	}
 
-	Integer getExperimentId() {
-		return experimentId;
-	}
-
-	void setExperimentId(Integer experimentId) {
-		this.experimentId = experimentId;
-	}
-
-	Integer getStockId() {
+	public Integer getStockId() {
 		return stockId;
 	}
 
-	void setStockId(Integer stockId) {
+	public void setStockId(Integer stockId) {
 		this.stockId = stockId;
 	}
 
-	Integer getTypeId() {
+	public Integer getTypeId() {
 		return typeId;
 	}
 
-	void setTypeId(Integer typeId) {
+	public void setTypeId(Integer typeId) {
 		this.typeId = typeId;
 	}
 
@@ -111,7 +96,7 @@ public class ExperimentStock implements Serializable {
 	@Override
 	public String toString() {
 		return "ExperimentStock [experimentStockId=" + experimentStockId
-				+ ", experimentId=" + experimentId + ", stockId=" + stockId
+				+ "stockId=" + stockId
 				+ ", typeId=" + typeId + "]";
 	}
 

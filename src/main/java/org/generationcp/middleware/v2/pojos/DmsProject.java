@@ -26,6 +26,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import org.generationcp.middleware.v2.domain.CVTermId;
+
 /**
  * http://gmod.org/wiki/Chado_Tables#Table:_project
  * 
@@ -204,6 +206,17 @@ public class DmsProject implements Serializable {
 
 	public String getEntityName(){
 		return "DmsProject";
+	}
+
+	public ExperimentModel findExperimentByType(CVTermId typeId) {
+		if (experimentModels != null) {
+			for (ExperimentModel experiment : experimentModels) {
+				if (typeId.getId().equals(experiment.getTypeId())) {
+					return experiment;
+				}
+			}
+		}
+		return null;
 	}
 
 }

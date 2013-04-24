@@ -10,7 +10,9 @@ public class Experiment {
 	
 	private DataSet dataSet;
 	
-	private Set<Variable> variables;
+	private Set<Variable> factors;
+	
+	private Set<Variable> traits;
 
 	public int getId() {
 		return id;
@@ -28,7 +30,28 @@ public class Experiment {
 		this.dataSet = dataSet;
 	}
 	
+	public Set<Variable> getFactors() {
+		return factors;
+	}
+
+	public void setFactors(Set<Variable> factors) {
+		this.factors = factors;
+	}
+
+	public Set<Variable> getTraits() {
+		return traits;
+	}
+
+	public void setTraits(Set<Variable> traits) {
+		this.traits = traits;
+	}
+
 	public void print(int indent) {
 		Debug.println(indent, "Experiment: " + id);
+		if (factors != null) {
+			for (Variable variable : factors) {
+				variable.print(indent + 3);
+			}
+		}
 	}
 }

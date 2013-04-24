@@ -27,6 +27,7 @@ import org.generationcp.middleware.v2.dao.ExperimentProjectDao;
 import org.generationcp.middleware.v2.dao.ExperimentPropertyDao;
 import org.generationcp.middleware.v2.dao.ExperimentStockDao;
 import org.generationcp.middleware.v2.dao.GeolocationPropertyDao;
+import org.generationcp.middleware.v2.dao.StockDao;
 import org.generationcp.middleware.v2.dao.StockPropertyDao;
 import org.hibernate.Session;
 
@@ -68,6 +69,8 @@ public abstract class Builder {
      * Contains the current active session - either local or central.
      */
     private Session activeSession;
+    
+    private Database activeDatabase;
 
     /**
      * Instantiates a new data manager given session providers for local and central.
@@ -123,6 +126,7 @@ public abstract class Builder {
      */
     protected Session getSession(Database instance) throws MiddlewareQueryException {
         if (instance == Database.CENTRAL) {
+        	this.activeDatabase = instance;
             Session session = getCurrentSessionForCentral();
             if (session == null) {
                 throw new MiddlewareQueryException("Error in getSession(Database.CENTRAL): The central instance was specified "
@@ -131,6 +135,7 @@ public abstract class Builder {
 
             return session;
         } else if (instance == Database.LOCAL) {
+        	this.activeDatabase = instance;
             Session session = getCurrentSessionForLocal();
             if (session == null) {
                 throw new MiddlewareQueryException("Error in getSession(Database.LOCAL): The local instance was specified "
@@ -154,6 +159,10 @@ public abstract class Builder {
      */
     protected Session getSession(int id) {
         return id >= 0 ? getCurrentSessionForCentral() : getCurrentSessionForLocal();
+    }
+    
+    protected Database getActiveDatabase() {
+    	return activeDatabase;
     }
 
     /**
@@ -215,8 +224,10 @@ public abstract class Builder {
     protected boolean setWorkingDatabase(Database instance) {
         if (instance == Database.LOCAL) {
             activeSession = getCurrentSessionForLocal();
+            activeDatabase = instance;
         } else if (instance == Database.CENTRAL) {
             activeSession = getCurrentSessionForCentral();
+            activeDatabase = instance;
         }
         if (activeSession != null) {
             return true;
@@ -234,6 +245,7 @@ public abstract class Builder {
      */
     protected boolean setWorkingDatabase(Integer id) {
         activeSession = id >= 0 ? getCurrentSessionForCentral() : getCurrentSessionForLocal();
+        activeDatabase = id >= 0 ? Database.CENTRAL : Database.LOCAL;
         if (activeSession != null) {
             return true;
         }
@@ -248,6 +260,7 @@ public abstract class Builder {
      */
     protected boolean setWorkingDatabase(Session session) {
         activeSession = session;
+        activeDatabase = session == getCurrentSessionForCentral() ? Database.CENTRAL : Database.LOCAL;
         if (activeSession != null) {
             return true;
         }
@@ -264,8 +277,10 @@ public abstract class Builder {
     protected boolean setWorkingDatabase(Database instance, GenericDAO dao) {
         if (instance == Database.LOCAL) {
             activeSession = getCurrentSessionForLocal();
+            activeDatabase = instance;
         } else if (instance == Database.CENTRAL) {
             activeSession = getCurrentSessionForCentral();
+            activeDatabase = instance;
         }
         if (activeSession != null) {
             return setDaoSession(dao, activeSession);
@@ -286,8 +301,10 @@ public abstract class Builder {
     protected boolean setWorkingDatabase(Integer id, GenericDAO dao) {
         if (id < 0) {
             activeSession = getCurrentSessionForLocal();
+            activeDatabase = Database.LOCAL;
         } else if (id >= 0) {
             activeSession = getCurrentSessionForCentral();
+            activeDatabase = Database.CENTRAL;
         }
         if (activeSession != null) {
             return setDaoSession(dao, activeSession);
@@ -329,6 +346,12 @@ public abstract class Builder {
     	CVDao cvDao = new CVDao();
     	cvDao.setSession(getActiveSession());
     	return cvDao;
+    }
+    
+    protected final StockDao getStockDao() {
+    	StockDao stockDao = new StockDao();
+    	stockDao.setSession(getActiveSession());
+    	return stockDao;
     }
     
     protected final GeolocationPropertyDao getGeolocationPropertyDao() {
@@ -385,6 +408,10 @@ public abstract class Builder {
     
     protected final ExperimentBuilder getExperimentBuilder() {
     	return new ExperimentBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    protected final StockBuilder getStockBuilder() {
+    	return new StockBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
 
 }

@@ -13,11 +13,16 @@
 package org.generationcp.middleware.v2.pojos;
 
 import java.io.Serializable;
+import java.util.Set;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -89,6 +94,10 @@ public class Stock implements Serializable {
 	@Basic(optional = false)
     @Column(name="is_obsolete")
     private Boolean isObsolete;
+	
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name="stock_id") 
+	private Set<StockProperty> properties;
 
 	public Integer getStockId() {
 		return stockId;
@@ -160,6 +169,14 @@ public class Stock implements Serializable {
 
 	public void setIsObsolete(Boolean isObsolete) {
 		this.isObsolete = isObsolete;
+	}
+
+	public Set<StockProperty> getProperties() {
+		return properties;
+	}
+
+	public void setProperties(Set<StockProperty> properties) {
+		this.properties = properties;
 	}
 
 	@Override

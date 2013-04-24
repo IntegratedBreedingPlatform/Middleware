@@ -25,6 +25,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.JoinColumn;
 
@@ -54,9 +55,10 @@ public class ExperimentModel implements Serializable {
 	@Column(name = "nd_experiment_id")
 	private Integer ndExperimentId;
 
-	// References Geolocation
-	@Column(name = "nd_geolocation_id")
-	private Integer geoLocationId;
+	// Geolocation
+	@OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "nd_geolocation_id")
+	private Geolocation geoLocation;
 
     // References cvterm
     @Column(name="type_id")
@@ -71,14 +73,19 @@ public class ExperimentModel implements Serializable {
         joinColumns={@JoinColumn(name="nd_experiment_id", insertable=false,updatable=false)},
         inverseJoinColumns={@JoinColumn(name="project_id", insertable=false,updatable=false)})
     private DmsProject project;
+    
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name="nd_experiment_id")
+    private List<ExperimentStock> experimentStocks;
+    
 
 	public ExperimentModel() {
 	}
 
-	public ExperimentModel(Integer ndExperimentId, Integer geoLocationId, Integer typeId) {
+	public ExperimentModel(Integer ndExperimentId, Geolocation geoLocation, Integer typeId) {
 		super();
 		this.ndExperimentId = ndExperimentId;
-		this.geoLocationId = geoLocationId;
+		this.geoLocation = geoLocation;
 		this.typeId = typeId;
 	}
 
@@ -90,12 +97,12 @@ public class ExperimentModel implements Serializable {
 		this.ndExperimentId = ndExperimentId;
 	}
 
-	public Integer getGeoLocationId() {
-		return geoLocationId;
+	public Geolocation getGeoLocation() {
+		return geoLocation;
 	}
 
-	public void setGeoLocationId(Integer geoLocationId) {
-		this.geoLocationId = geoLocationId;
+	public void setGeoLocation(Geolocation geoLocation) {
+		this.geoLocation = geoLocation;
 	}
 
 	public Integer getTypeId() {
@@ -122,12 +129,22 @@ public class ExperimentModel implements Serializable {
 		this.project = project;
 	}
 
+	public List<ExperimentStock> getExperimentStocks() {
+		return experimentStocks;
+	}
+
+	public void setExperimentStocks(List<ExperimentStock> experimentStocks) {
+		this.experimentStocks = experimentStocks;
+	}
+
+	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
-				+ ((geoLocationId == null) ? 0 : geoLocationId.hashCode());
+				+ ((geoLocation == null) ? 0 : geoLocation.hashCode());
 		result = prime * result
 				+ ((ndExperimentId == null) ? 0 : ndExperimentId.hashCode());
 		result = prime * result + ((typeId == null) ? 0 : typeId.hashCode());
@@ -143,10 +160,10 @@ public class ExperimentModel implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		ExperimentModel other = (ExperimentModel) obj;
-		if (geoLocationId == null) {
-			if (other.geoLocationId != null)
+		if (geoLocation == null) {
+			if (other.geoLocation != null)
 				return false;
-		} else if (!geoLocationId.equals(other.geoLocationId))
+		} else if (!geoLocation.equals(other.geoLocation))
 			return false;
 		if (ndExperimentId == null) {
 			if (other.ndExperimentId != null)
@@ -167,7 +184,7 @@ public class ExperimentModel implements Serializable {
 		builder.append("Experiment [ndExperimentId=");
 		builder.append(ndExperimentId);
 		builder.append(", geoLocationId=");
-		builder.append(geoLocationId);
+		builder.append(geoLocation);
 		builder.append(", typeId=");
 		builder.append(typeId);
 		builder.append("]");

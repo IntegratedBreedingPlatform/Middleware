@@ -39,7 +39,6 @@ public class VariableTypeBuilder extends Builder {
 		variableType.setLocalDescription(variableInfo.getLocalDescription());
 		
 		if (setWorkingDatabase(variableInfo.getStdVariableId())) {
-			variableInfo.print(0);
 			CVTerm cvTerm = getCvTermDao().getById(variableInfo.getStdVariableId());
 			variableType.setName(cvTerm.getName());
 			variableType.setDescription(cvTerm.getDefinition());

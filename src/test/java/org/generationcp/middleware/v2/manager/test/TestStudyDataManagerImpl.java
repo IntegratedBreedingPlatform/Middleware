@@ -45,7 +45,7 @@ import org.junit.Test;
 public class TestStudyDataManagerImpl {
 
 	private static final Integer STUDY_ID = 10010;
-	private static final Integer DATASET_ID = 10015;
+	private static final Integer DATASET_ID = 10045;
 
 	private static ManagerFactory factory;
 	private static StudyDataManager manager;

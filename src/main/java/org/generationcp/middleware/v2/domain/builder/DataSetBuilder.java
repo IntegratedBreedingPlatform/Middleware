@@ -39,7 +39,7 @@ public class DataSetBuilder extends Builder {
 		dataSet.setDescription(project.getDescription());
 		dataSet.setStudy(getStudy(project));
 		dataSet.setVariableTypes(getVariableTypes(dataSet.getStudy(), project));
-		dataSet.setExperiments(createExperiments(project));
+		dataSet.setExperiments(createExperiments(project, dataSet.getVariableTypes()));
 		return dataSet;
 	}
 
@@ -65,8 +65,8 @@ public class DataSetBuilder extends Builder {
 		return study.getProjectId();
 	}
 	
-	private List<Experiment> createExperiments(DmsProject project) {
-		return getExperimentBuilder().create(project.getExperimentModels());
+	private List<Experiment> createExperiments(DmsProject project, Set<VariableType> variableTypes) throws MiddlewareQueryException {
+		return getExperimentBuilder().create(getActiveDatabase(), project.getExperimentModels(), variableTypes);
 	}
 	
 }

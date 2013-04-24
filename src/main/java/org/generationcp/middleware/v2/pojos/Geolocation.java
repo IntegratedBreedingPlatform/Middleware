@@ -62,7 +62,7 @@ public class Geolocation implements Serializable {
 	 * List of Geolocation Properties
 	 * @return
 	 */
-	@OneToMany(mappedBy = "geolocation", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "geolocation", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 	private List<GeolocationProperty> properties;
 	
     
