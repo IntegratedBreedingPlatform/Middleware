@@ -18,6 +18,7 @@ import org.generationcp.middleware.v2.pojos.ExperimentProperty;
 import org.generationcp.middleware.v2.pojos.ExperimentStock;
 import org.generationcp.middleware.v2.pojos.Geolocation;
 import org.generationcp.middleware.v2.pojos.GeolocationProperty;
+import org.generationcp.middleware.v2.pojos.Phenotype;
 import org.generationcp.middleware.v2.pojos.Stock;
 import org.generationcp.middleware.v2.pojos.StockProperty;
 
@@ -42,7 +43,17 @@ public class ExperimentBuilder extends Builder {
 		Experiment experiment = new Experiment();
 		experiment.setId(experimentModel.getNdExperimentId());
 		experiment.setFactors(getFactors(experimentModel, variableTypes));
+		experiment.setTraits(getTraits(experimentModel, variableTypes));
 		return experiment;
+	}
+
+	private Set<Variable> getTraits(ExperimentModel experimentModel, Set<VariableType> variableTypes) {
+		Set<Variable> traits = new HashSet<Variable>();
+		for (Phenotype phenotype : experimentModel.getPhenotypes()) {
+			VariableType variableType = findVariableType(phenotype.getObservableId(), variableTypes);
+			traits.add(new Variable(variableType, phenotype.getValue()));
+		}
+		return traits;
 	}
 
 	private Set<Variable> getFactors(ExperimentModel experimentModel, Set<VariableType> variableTypes) throws MiddlewareQueryException {

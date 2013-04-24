@@ -78,6 +78,14 @@ public class ExperimentModel implements Serializable {
     @JoinColumn(name="nd_experiment_id")
     private List<ExperimentStock> experimentStocks;
     
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name="nd_experiment_phenotype",
+            joinColumns = @JoinColumn( name="nd_experiment_id"),
+            inverseJoinColumns = @JoinColumn( name="phenotype_id")
+    )
+    private List<Phenotype> phenotypes;
+    
 
 	public ExperimentModel() {
 	}
@@ -137,7 +145,13 @@ public class ExperimentModel implements Serializable {
 		this.experimentStocks = experimentStocks;
 	}
 
-	
+	public List<Phenotype> getPhenotypes() {
+		return phenotypes;
+	}
+
+	public void setPhenotypes(List<Phenotype> phenotypes) {
+		this.phenotypes = phenotypes;
+	}
 
 	@Override
 	public int hashCode() {

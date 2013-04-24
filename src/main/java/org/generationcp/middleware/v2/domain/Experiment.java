@@ -48,9 +48,16 @@ public class Experiment {
 
 	public void print(int indent) {
 		Debug.println(indent, "Experiment: " + id);
+		Debug.println(indent + 3, "Factors:");
 		if (factors != null) {
 			for (Variable variable : factors) {
-				variable.print(indent + 3);
+				variable.print(indent + 6);
+			}
+		}
+		Debug.println(indent + 3, "Traits:");
+		if (factors != null) {
+			for (Variable trait : traits) {
+				trait.print(indent + 6);
 			}
 		}
 	}
