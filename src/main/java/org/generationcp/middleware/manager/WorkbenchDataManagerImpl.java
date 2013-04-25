@@ -164,17 +164,18 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     public void updateProjectsRolesForProject(Project project, List<ProjectUserRole> newRoles) throws MiddlewareQueryException
     {
         List<ProjectUserRole> deleteRoles = this.getProjectUserRolesByProject(project);
-        List<User> deleteUsers = this.getUsersByProjectId(project.getProjectId());
         
+        // remove all previous roles
         for(ProjectUserRole projectUserRole : deleteRoles){
-             this.deleteProjectUserRole(projectUserRole);
-            }
+            this.deleteProjectUserRole(projectUserRole);
+        }
         
+        // add the new roles
         for(ProjectUserRole projectUserRole : newRoles){
-             User user = new User();
-             user.setUserid(projectUserRole.getUserId());
-                this.addProjectUserRole(project, user, projectUserRole.getRole());
-           }
+            User user = new User();
+            user.setUserid(projectUserRole.getUserId());
+            this.addProjectUserRole(project, user, projectUserRole.getRole());
+        }
     }
     
     private ProjectUserRoleDAO getProjectUserRoleDao() {
