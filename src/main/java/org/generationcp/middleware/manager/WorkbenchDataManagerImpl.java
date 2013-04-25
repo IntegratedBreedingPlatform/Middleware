@@ -163,18 +163,18 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     
     public void updateProjectsRolesForProject(Project project, List<ProjectUserRole> newRoles) throws MiddlewareQueryException
     {
-    	List<ProjectUserRole> deleteRoles = this.getProjectUserRolesByProject(project);
+        List<ProjectUserRole> deleteRoles = this.getProjectUserRolesByProject(project);
         List<User> deleteUsers = this.getUsersByProjectId(project.getProjectId());
-		
-    	for(ProjectUserRole projectUserRole : deleteRoles){
-   	 	 this.deleteProjectUserRole(projectUserRole);
-   	 	}
-    	
-    	for(ProjectUserRole projectUserRole : newRoles){
-    		 User user = new User();
-    		 user.setUserid(projectUserRole.getUserId());
-      	 	 this.addProjectUserRole(project, user, projectUserRole.getRole());
-      	 }
+        
+        for(ProjectUserRole projectUserRole : deleteRoles){
+             this.deleteProjectUserRole(projectUserRole);
+            }
+        
+        for(ProjectUserRole projectUserRole : newRoles){
+             User user = new User();
+             user.setUserid(projectUserRole.getUserId());
+                this.addProjectUserRole(project, user, projectUserRole.getRole());
+           }
     }
     
     private ProjectUserRoleDAO getProjectUserRoleDao() {
@@ -950,14 +950,14 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 
     @Override
     public List<Integer> addProjectActivity(List<ProjectActivity> projectActivityList) throws MiddlewareQueryException {
-    	
-    	return addOrUpdateProjectActivityData(projectActivityList, Operation.ADD);
+        
+        return addOrUpdateProjectActivityData(projectActivityList, Operation.ADD);
     }
 
     private List<Integer> addOrUpdateProjectActivityData(List<ProjectActivity> projectActivityList, Operation operation)
             throws MiddlewareQueryException {
-    	
-    	Session session = getCurrentSession();
+        
+        Session session = getCurrentSession();
         if (session == null) {
             return new ArrayList<Integer>();
         }
@@ -971,7 +971,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
             ProjectActivityDAO dao = getProjectActivityDao();
            
             for (ProjectActivity projectActivityListData : projectActivityList) {
-            	ProjectActivity recordSaved = dao.save(projectActivityListData);
+                ProjectActivity recordSaved = dao.save(projectActivityListData);
                 idsSaved.add(recordSaved.getProjectActivityId());
             }
             trans.commit();
@@ -1208,7 +1208,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         } catch (Exception e) {
             rollbackTransaction(trans);
             logAndThrowException("Error encountered while adding Security Question: " +
-            		"WorkbenchDataManager.addSecurityQuestion(securityQuestion=" + securityQuestion + "): " + e.getMessage(), e);
+                    "WorkbenchDataManager.addSecurityQuestion(securityQuestion=" + securityQuestion + "): " + e.getMessage(), e);
         }
     }
     
