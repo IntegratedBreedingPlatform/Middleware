@@ -210,7 +210,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         return toolConfigurationDao;
     }
 
-    private ToolDAO getToolDao() {
+    @Override
+    public ToolDAO getToolDao() {
         if (toolDao == null){
             toolDao = new ToolDAO();
         }

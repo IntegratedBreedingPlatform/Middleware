@@ -14,6 +14,7 @@ package org.generationcp.middleware.manager.api;
 
 import java.util.List;
 
+import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Location;
@@ -43,7 +44,7 @@ import org.generationcp.middleware.pojos.workbench.ProjectBackup;
  * information.
  * 
  */
-public interface WorkbenchDataManager{
+public interface WorkbenchDataManager {
 
     /**
      * Gets the projects.
@@ -134,6 +135,17 @@ public interface WorkbenchDataManager{
      */
     public List<WorkflowTemplate> getWorkflowTemplateByName(String name) throws MiddlewareQueryException;
 
+    
+    /**
+     * Gets the tool DAO directly
+     *
+     * @param toolName - the tool name to match
+     * @return the tool with the given name
+     * @throws MiddlewareQueryException
+     */
+    public ToolDAO getToolDao();
+
+    
     /**
      * Get all tools.
      * 
