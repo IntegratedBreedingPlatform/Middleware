@@ -19,7 +19,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		try {
 			if (geolocationIds != null && geolocationIds.size() > 0) {
 				Criteria criteria = getSession().createCriteria(getPersistentClass());
-				criteria.add(Restrictions.in("geoLocationId", geolocationIds));
+				criteria.add(Restrictions.in("geoLocation.locationId", geolocationIds));
 				criteria.setProjection(Projections.property("ndExperimentId"));
 				
 				return criteria.list();

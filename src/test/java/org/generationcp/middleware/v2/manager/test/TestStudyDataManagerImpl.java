@@ -22,9 +22,7 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.Season;
-import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.v2.domain.AbstractNode;
-import org.generationcp.middleware.v2.domain.CVTermId;
 import org.generationcp.middleware.v2.domain.DataSet;
 import org.generationcp.middleware.v2.domain.DatasetNode;
 import org.generationcp.middleware.v2.domain.FactorDetails;
@@ -35,9 +33,6 @@ import org.generationcp.middleware.v2.domain.StudyNode;
 import org.generationcp.middleware.v2.domain.StudyQueryFilter;
 import org.generationcp.middleware.v2.domain.VariableDetails;
 import org.generationcp.middleware.v2.manager.api.StudyDataManager;
-import org.generationcp.middleware.v2.pojos.DmsDataset;
-import org.generationcp.middleware.v2.pojos.ProjectProperty;
-import org.generationcp.middleware.v2.pojos.ProjectRelationship;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -168,7 +163,7 @@ public class TestStudyDataManagerImpl {
 	   }
    }
    
-	@Test
+/*	@Test
 	public void testAddDmsDataset() throws Exception {
 		Integer datasetId = 0;
 		String name = "Test Dataset";
@@ -205,7 +200,7 @@ public class TestStudyDataManagerImpl {
 
 		assert(study.getId() < 0);
 		System.out.println("testAddStudy(): " + study);
-	}
+	}*/
 
 	@Test
 	public void getDataSet() throws Exception {
