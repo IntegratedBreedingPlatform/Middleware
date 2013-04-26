@@ -40,7 +40,7 @@ public class ProjectPropertyFactory {
 		properties.add(new ProjectProperty(0, project, CVTermId.END_DATE.getId(), study.getEndDate().toString(), 5));
 		createPropertiesFromStudyField(project, USER_ID, study.getUser().toString(), 6);
 		properties.add(new ProjectProperty(0, project, CVTermId.STUDY_IP.getId(), study.getStatus().toString(), 7));
-		properties.add(new ProjectProperty(0, project, CVTermId.RELEASE_DATE.getId(), study.getCreationDate().toString(), 8));
+		properties.add(new ProjectProperty(0, project, CVTermId.CREATION_DATE.getId(), study.getCreationDate().toString(), 8));
 		
 		return properties;
 		

@@ -111,7 +111,7 @@ public class StudyFactoryTest {
 		addPropertySetToList(properties, CVTermId.END_DATE, getString(study.getEndDate()), 8);
 		addPropertySetToList(properties, CVTermId.STUDY_UID, getString(study.getUser()), 9);
 		addPropertySetToList(properties, CVTermId.STUDY_IP, getString(study.getStatus()), 10);
-		addPropertySetToList(properties, CVTermId.RELEASE_DATE, getString(study.getCreationDate()), 11);
+		addPropertySetToList(properties, CVTermId.CREATION_DATE, getString(study.getCreationDate()), 11);
 		
 		return properties;
 	}

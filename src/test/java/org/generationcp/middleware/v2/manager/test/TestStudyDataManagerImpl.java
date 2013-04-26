@@ -61,6 +61,7 @@ public class TestStudyDataManagerImpl {
 		System.out.println("Name: " + studyDetails.getName());
 		System.out.println("Title:" + studyDetails.getTitle());
 		System.out.println("Start Date:" + studyDetails.getStartDate());
+		System.out.println("Creation Date: " + studyDetails.getCreationDate());
 	}
 
     @Test

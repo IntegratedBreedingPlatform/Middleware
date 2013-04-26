@@ -30,7 +30,7 @@ public enum CVTermId {
 	, END_DATE(8060)
 	, STUDY_UID(8020)
 	, STUDY_IP(8120)
-	, RELEASE_DATE(8130)
+	, CREATION_DATE(8048)
 	
 	// Numeric Data Fields
 	, NUMERIC_VARIABLE(1110)

@@ -67,7 +67,7 @@ public class StudyFactory {
 		study.setEndDate(helper.getInteger(CVTermId.END_DATE));
 		study.setUser(helper.getInteger(CVTermId.STUDY_UID));
 		study.setStatus(helper.getInteger(CVTermId.STUDY_IP));
-		study.setCreationDate(helper.getInteger(CVTermId.RELEASE_DATE));
+		study.setCreationDate(helper.getInteger(CVTermId.CREATION_DATE));
 		
 	}
 
@@ -85,7 +85,7 @@ public class StudyFactory {
         studyDetails.setEndDate(helper.getInteger(CVTermId.END_DATE));
         studyDetails.setUser(helper.getInteger(CVTermId.STUDY_UID));
         studyDetails.setStatus(helper.getInteger(CVTermId.STUDY_IP));
-        studyDetails.setCreationDate(helper.getInteger(CVTermId.RELEASE_DATE));
+        studyDetails.setCreationDate(helper.getInteger(CVTermId.CREATION_DATE));
 		
 		return studyDetails;
 	}
