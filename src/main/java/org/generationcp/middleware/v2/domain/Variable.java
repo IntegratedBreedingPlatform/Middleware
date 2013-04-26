@@ -58,6 +58,10 @@ public class Variable {
 		Debug.println(indent + 3, "Value: " + value);
 	}
 	
+	public int hashCode() {
+		return variableType.hashCode();
+	}
+	
 	public boolean equals(Object obj) {
 		if (obj == null) return false;
 		if (!(obj instanceof Variable)) return false;

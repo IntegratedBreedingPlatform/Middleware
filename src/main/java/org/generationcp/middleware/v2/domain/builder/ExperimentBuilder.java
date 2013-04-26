@@ -49,11 +49,54 @@ public class ExperimentBuilder extends Builder {
 
 	private Set<Variable> getTraits(ExperimentModel experimentModel, Set<VariableType> variableTypes) {
 		Set<Variable> traits = new HashSet<Variable>();
-		for (Phenotype phenotype : experimentModel.getPhenotypes()) {
+		
+		addPlotTraits(experimentModel, traits, variableTypes);
+		addDataSetTraits(experimentModel, traits, variableTypes);
+		addStudyTraits(experimentModel, traits, variableTypes);
+		
+		return traits;
+	}
+
+	private void addPlotTraits(ExperimentModel experimentModel, Set<Variable> traits, Set<VariableType> variableTypes) {
+		addTraits(experimentModel, traits, variableTypes);
+	}
+
+	private void addDataSetTraits(ExperimentModel experimentModel, Set<Variable> traits, Set<VariableType> variableTypes) {
+		List<ExperimentModel> dataSetExperiments = experimentModel.getProject().getExperimentModels();
+		if (dataSetExperiments != null) {
+			for (ExperimentModel experiment : dataSetExperiments) {
+			    if (experiment.getTypeId().equals(CVTermId.DATASET_EXPERIMENT.getId())) {
+			    	addTraits(experiment, traits, variableTypes);
+			    }
+			    else if (experiment.getTypeId().equals(CVTermId.TRIAL_ENVIRONMENT_EXPERIMENT) && experiment.getGeoLocation() != null && experiment.getGeoLocation().equals(experimentModel.getGeoLocation())) {
+				    addTraits(experiment, traits, variableTypes);
+			    }
+			}
+		}
+	}
+
+	private void addTraits(ExperimentModel experiment, Set<Variable> traits, Set<VariableType> variableTypes) {
+		for (Phenotype phenotype : experiment.getPhenotypes()) {
 			VariableType variableType = findVariableType(phenotype.getObservableId(), variableTypes);
 			traits.add(new Variable(variableType, phenotype.getValue()));
 		}
-		return traits;
+	}
+
+	private void addStudyTraits(ExperimentModel experimentModel, Set<Variable> traits, Set<VariableType> variableTypes) {
+		DmsProject dataSet = experimentModel.getProject();
+		if (dataSet != null) {
+			DmsProject study = dataSet.getRelatedTos().get(0).getObjectProject();
+			if (study != null) {
+				for (ExperimentModel experiment : study.getExperimentModels()) {
+				    if (experiment.getTypeId().equals(CVTermId.STUDY_EXPERIMENT.getId())) {
+				    	addTraits(experiment, traits, variableTypes);
+				    }
+				    else if (experiment.getTypeId().equals(CVTermId.TRIAL_ENVIRONMENT_EXPERIMENT) && experiment.getGeoLocation() != null && experiment.getGeoLocation().equals(experimentModel.getGeoLocation())) {
+					    addTraits(experiment, traits, variableTypes);
+				    }
+				}
+			}
+		}
 	}
 
 	private Set<Variable> getFactors(ExperimentModel experimentModel, Set<VariableType> variableTypes) throws MiddlewareQueryException {

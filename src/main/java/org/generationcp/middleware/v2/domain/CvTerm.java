@@ -2,7 +2,7 @@ package org.generationcp.middleware.v2.domain;
 
 import org.generationcp.middleware.v2.util.Debug;
 
-public abstract class CvTerm {
+public class CvTerm {
 
 	private int id;
 	
@@ -38,6 +38,11 @@ public abstract class CvTerm {
 		Debug.println(indent, "Id: " + getId());
 		Debug.println(indent, "Name: " + getName());
 	    Debug.println(indent, "Description: " + getDescription());
+	}
+	
+	@Override
+	public int hashCode() {
+		return getId();
 	}
 	
 	public boolean equals(Object obj) {
