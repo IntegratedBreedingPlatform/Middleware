@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.hibernate.Criteria;
@@ -72,5 +73,19 @@ public class ToolDAO extends GenericDAO<Tool, Long>{
         return new ArrayList<Tool>();
     }
 
-
+    /* (non-Javadoc)
+     * @see org.generationcp.middleware.dao.GenericDAO#saveOrUpdate(java.lang.Object)
+     */
+    /**
+     * Save or update.
+     *
+     * @param tool the project user
+     * @return the project user
+     * @throws MiddlewareQueryException 
+     */
+    public Tool saveOrUpdate(Tool tool) throws MiddlewareQueryException {
+        return super.saveOrUpdate(tool);
+    }
+    
+    
 }
