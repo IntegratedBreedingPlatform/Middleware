@@ -33,7 +33,8 @@ public interface GermplasmListManager{
      * Returns the GermplasmList identified by the given id.
      * 
      * @param id
-     * @return GermplasmList POJO
+     *          - the listid of the GermplasmList
+     * @return Returns the GermplasmList POJO, null if no GermplasmList was retrieved. 
      * @throws MiddlewareQueryException 
      */
     public GermplasmList getGermplasmListById(Integer id) throws MiddlewareQueryException;
