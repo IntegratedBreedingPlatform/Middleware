@@ -46,8 +46,8 @@ public class ProjectDAO extends GenericDAO<Project, Long>{
     public Project getLastOpenedProject(Integer userId) throws MiddlewareQueryException {
         try {
             StringBuilder sb = new StringBuilder();
-            sb.append("SELECT {w.*} FROM workbench_project w ").append("INNER JOIN workbench_project_user_role r ON w.project_id = r.project_id ")
-                    .append("WHERE r.user_id = :userId ORDER BY w.last_open_date DESC LIMIT 1 ;");
+            sb.append("SELECT {w.*} FROM workbench_project w ").append("INNER JOIN workbench_project_user_info r ON w.project_id = r.project_id ")
+                    .append("WHERE r.user_id = :userId ORDER BY r.last_open_date DESC LIMIT 1 ;");
 
             SQLQuery query = getSession().createSQLQuery(sb.toString());
             query.addEntity("w", Project.class);

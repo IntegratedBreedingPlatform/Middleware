@@ -4,10 +4,10 @@
 <hibernate-configuration>
  <session-factory>
   <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
-  <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/ibdb_rice_central</property>
+  <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/workbench</property>
   <property name="hibernate.connection.username">root</property>
-  <property name="hibernate.connection.password">admin</property>
-  <property name="hibernate.default_schema">ibdb_rice_central</property>
+  <property name="hibernate.connection.password"></property>
+  <property name="hibernate.default_schema">workbench</property>
   <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
   <!--   
   <property name="hibernate.show_sql">true</property>
@@ -65,6 +65,7 @@
   <mapping class="org.generationcp.middleware.pojos.workbench.ProjectActivity"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.ProjectMethod"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.ProjectUserRole"/>
+  <mapping class="org.generationcp.middleware.pojos.workbench.ProjectUserInfo"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.ProjectWorkflowStep"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.Role"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.Tool"/>

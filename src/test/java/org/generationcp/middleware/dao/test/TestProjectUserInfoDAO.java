@@ -12,36 +12,35 @@
 
 package org.generationcp.middleware.dao.test;
 
-import org.generationcp.middleware.dao.ProjectDAO;
+import org.generationcp.middleware.dao.ProjectUserInfoDAO;
 
-import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.util.HibernateUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TestProjectDAO{
+public class TestProjectUserInfoDAO{
 
     private static final String CONFIG = "test-hibernate.cfg.xml";
     private HibernateUtil hibernateUtil;
-    private ProjectDAO dao;
+    private ProjectUserInfoDAO dao;
 
     @Before
     public void setUp() throws Exception {
         hibernateUtil = new HibernateUtil(CONFIG);
-        dao = new ProjectDAO();
+        dao = new ProjectUserInfoDAO();
         dao.setSession(hibernateUtil.getCurrentSession());
     }
 
     @Test
-    public void testgetLastOpenedProject() throws Exception {
-       
-
-        Project result = dao.getLastOpenedProject(3);
+    public void testGetByProjectIdAndUserId() throws Exception {
+           	
+        ProjectUserInfo result = dao.getByProjectIdAndUserId(2, 1);
         if (result == null){
-        	System.out.println("testgetLastOpenedProject RESULTS: no result");
+        	System.out.println("testGetByProjectIdAndUserId RESULTS: no result");
         }else{
-        	System.out.println("testgetLastOpenedProject RESULTS:" + result.getProjectName());
+        	System.out.println("testGetByProjectIdAndUserId RESULTS:" + result.getProjectId());
         	System.out.println(result.toString());
         }
         

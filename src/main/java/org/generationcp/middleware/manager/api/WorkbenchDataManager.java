@@ -14,6 +14,7 @@ package org.generationcp.middleware.manager.api;
 
 import java.util.List;
 
+import org.generationcp.middleware.dao.ProjectUserInfoDAO;
 import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
@@ -26,6 +27,7 @@ import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectLocationMap;
 import org.generationcp.middleware.pojos.workbench.ProjectMethod;
+import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount;
 import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
 import org.generationcp.middleware.pojos.workbench.Role;
@@ -897,4 +899,20 @@ public interface WorkbenchDataManager {
      * @throws MiddlewareQueryException
      */
     public void deleteProjectBackup(ProjectBackup projectBackup) throws MiddlewareQueryException;
+    
+    /**
+     * Gets the ProjectUserInfoDAO
+     *
+     * @return ProjectUserInfoDAO
+     * @throws MiddlewareQueryException
+     */
+    public ProjectUserInfoDAO getProjectUserInfoDao() throws MiddlewareQueryException;
+    
+    /**
+     * Saves or updates the ProjectUserInfo
+     *
+     * @return ProjectUserInfo
+     * @throws MiddlewareQueryException
+     */
+    public ProjectUserInfo saveOrUpdateProjectUserInfo(ProjectUserInfo projectUserInfo) throws MiddlewareQueryException;
 }

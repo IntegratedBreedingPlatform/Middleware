@@ -25,6 +25,7 @@ import org.generationcp.middleware.dao.ProjectLocationMapDAO;
 import org.generationcp.middleware.dao.ProjectMethodDAO;
 import org.generationcp.middleware.dao.ProjectUserMysqlAccountDAO;
 import org.generationcp.middleware.dao.ProjectUserRoleDAO;
+import org.generationcp.middleware.dao.ProjectUserInfoDAO;
 import org.generationcp.middleware.dao.RoleDAO;
 import org.generationcp.middleware.dao.SecurityQuestionDAO;
 import org.generationcp.middleware.dao.ToolConfigurationDAO;
@@ -46,6 +47,7 @@ import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectBackup;
 import org.generationcp.middleware.pojos.workbench.ProjectLocationMap;
 import org.generationcp.middleware.pojos.workbench.ProjectMethod;
+import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount;
 import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
 import org.generationcp.middleware.pojos.workbench.Role;
@@ -78,6 +80,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     private ProjectMethodDAO projectMethodDao;
     private ProjectUserMysqlAccountDAO projectUserMysqlAccountDao;
     private ProjectUserRoleDAO projectUserRoleDao;
+    private ProjectUserInfoDAO projectUserInfoDao;
     private RoleDAO roleDao; 
     private SecurityQuestionDAO securityQuestionDao;
     private ToolConfigurationDAO toolConfigurationDao;
@@ -160,6 +163,17 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         projectUserMysqlAccountDao.setSession(getCurrentSession());
         return projectUserMysqlAccountDao;
     }
+    
+    @Override
+    public ProjectUserInfoDAO getProjectUserInfoDao() {
+        if (projectUserInfoDao == null){
+        	projectUserInfoDao = new ProjectUserInfoDAO();
+        }
+        projectUserInfoDao.setSession(getCurrentSession());
+        return projectUserInfoDao;
+    }
+    
+    
     
     public void updateProjectsRolesForProject(Project project, List<ProjectUserRole> newRoles) throws MiddlewareQueryException
     {
@@ -319,6 +333,28 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         }
 
         return project;
+    }
+    
+    @Override
+    public ProjectUserInfo saveOrUpdateProjectUserInfo(ProjectUserInfo projectUserInfo) throws MiddlewareQueryException {
+        Transaction trans = null;
+        Session session = getCurrentSession();
+        
+        try {
+            trans = session.beginTransaction();
+            getProjectUserInfoDao().merge(projectUserInfo);
+
+            // TODO: copy the workbench template created by the project into the
+            // project_workflow_step table
+
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Cannot save ProjectUserInfo: WorkbenchDataManager.saveOrUpdateProjectUserInfo(project=" + projectUserInfo + "): "
+                    + e.getMessage(), e);
+        }
+
+        return projectUserInfo;
     }
     
     public Project addProject(Project project) throws MiddlewareQueryException {
