@@ -21,6 +21,7 @@ import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
 public class ToolDAO extends GenericDAO<Tool, Long>{
@@ -73,19 +74,33 @@ public class ToolDAO extends GenericDAO<Tool, Long>{
         return new ArrayList<Tool>();
     }
 
-    /* (non-Javadoc)
-     * @see org.generationcp.middleware.dao.GenericDAO#saveOrUpdate(java.lang.Object)
-     */
-    /**
-     * Save or update.
-     *
-     * @param tool the project user
-     * @return the project user
-     * @throws MiddlewareQueryException 
-     */
-    public Tool saveOrUpdate(Tool tool) throws MiddlewareQueryException {
-        return super.saveOrUpdate(tool);
-    }
+	@Override
+	public Tool save(Tool entity) throws MiddlewareQueryException {
+		
+		Transaction tx = getSession().beginTransaction();
+		
+		try {	
+			Tool out = super.save(entity);
+			tx.commit();
+			return out;
+		} catch (MiddlewareQueryException e) {
+			tx.rollback();
+			throw new MiddlewareQueryException(e.getMessage());
+		}
+	}
     
-    
+	@Override
+	public Tool update(Tool entity) throws MiddlewareQueryException {
+		
+		Transaction tx = getSession().beginTransaction();
+		
+		try {	
+			Tool out = super.update(entity);
+			tx.commit();
+			return out;
+		} catch (MiddlewareQueryException e) {
+			tx.rollback();
+			throw new MiddlewareQueryException(e.getMessage());
+		}
+	}
 }
