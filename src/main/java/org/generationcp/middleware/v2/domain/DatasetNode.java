@@ -26,6 +26,12 @@ public class DatasetNode extends AbstractNode {
 		super.setName(name);
 	}
 
+	public DatasetNode(Integer id, String name, String description){
+		super.setId(id);
+		super.setName(name);
+		super.setDescription(description);
+	}
+
 	@Override
 	protected String getEntityName() {
 		return "DatasetNode";

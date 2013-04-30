@@ -23,6 +23,8 @@ public abstract class AbstractNode {
 	private Integer id;
 	
 	private String name;
+	
+	private String description;
 
 	public Integer getId() {
 		return id;
@@ -38,6 +40,14 @@ public abstract class AbstractNode {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	@Override
@@ -76,6 +86,8 @@ public abstract class AbstractNode {
 		builder.append(id);
 		builder.append(", name=");
 		builder.append(name);
+		builder.append(", description=");
+		builder.append(description);
 		builder.append("]");
 		return builder.toString();
 	}

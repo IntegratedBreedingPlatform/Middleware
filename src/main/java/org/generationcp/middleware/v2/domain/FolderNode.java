@@ -26,6 +26,12 @@ public class FolderNode extends AbstractNode {
 		super.setName(name);
 	}
 
+	public FolderNode(Integer id, String name, String description){
+		super.setId(id);
+		super.setName(name);
+		super.setDescription(description);
+	}
+
 	@Override
 	protected String getEntityName() {
 		return "FolderNode";
