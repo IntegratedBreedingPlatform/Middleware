@@ -120,6 +120,7 @@ public class MiddlewareServletContextListener implements ServletContextListener 
         if (sessionFactoryForLocal != null) {
             try {
                 sessionFactoryForLocal.close();
+                sessionFactoryForLocal = null;
             }
             finally {
             }
@@ -128,6 +129,7 @@ public class MiddlewareServletContextListener implements ServletContextListener 
         if (sessionFactoryForCentral != null) {
             try {
                 sessionFactoryForCentral.close();
+                sessionFactoryForCentral = null;
             }
             finally {
             }
