@@ -12,7 +12,6 @@ import org.generationcp.middleware.v2.domain.CVTermId;
 import org.generationcp.middleware.v2.domain.Experiment;
 import org.generationcp.middleware.v2.domain.Variable;
 import org.generationcp.middleware.v2.domain.VariableType;
-import org.generationcp.middleware.v2.pojos.DmsProject;
 import org.generationcp.middleware.v2.pojos.ExperimentModel;
 import org.generationcp.middleware.v2.pojos.ExperimentProperty;
 import org.generationcp.middleware.v2.pojos.ExperimentStock;
@@ -34,25 +33,27 @@ public class ExperimentBuilder extends Builder {
 		
 		List<Experiment> experiments = new ArrayList<Experiment>();
 		for (ExperimentModel experimentModel : experimentModels) {
-	        experiments.add(create(experimentModel, variableTypes));
+			if (experimentModel.getTypeId().equals(CVTermId.PLOT_EXPERIMENT.getId())) {
+	            experiments.add(create(experimentModel, experimentModels, variableTypes));
+			}
 		}
 		return experiments;
 	}
 
-	public Experiment create(ExperimentModel experimentModel, Set<VariableType> variableTypes) throws MiddlewareQueryException {
+	public Experiment create(ExperimentModel experimentModel, List<ExperimentModel> experimentModels, Set<VariableType> variableTypes) throws MiddlewareQueryException {
 		Experiment experiment = new Experiment();
 		experiment.setId(experimentModel.getNdExperimentId());
-		experiment.setFactors(getFactors(experimentModel, variableTypes));
-		experiment.setTraits(getTraits(experimentModel, variableTypes));
+		experiment.setFactors(getFactors(experimentModel, experimentModels, variableTypes));
+		experiment.setTraits(getTraits(experimentModel, experimentModels, variableTypes));
 		return experiment;
 	}
 
-	private Set<Variable> getTraits(ExperimentModel experimentModel, Set<VariableType> variableTypes) {
+	private Set<Variable> getTraits(ExperimentModel experimentModel, List<ExperimentModel> experimentModels, Set<VariableType> variableTypes) {
 		Set<Variable> traits = new HashSet<Variable>();
 		
 		addPlotTraits(experimentModel, traits, variableTypes);
-		addDataSetTraits(experimentModel, traits, variableTypes);
-		addStudyTraits(experimentModel, traits, variableTypes);
+		addDataSetTraits(experimentModels, traits, variableTypes);
+		addStudyTraits(experimentModels, traits, variableTypes);
 		
 		return traits;
 	}
@@ -61,16 +62,10 @@ public class ExperimentBuilder extends Builder {
 		addTraits(experimentModel, traits, variableTypes);
 	}
 
-	private void addDataSetTraits(ExperimentModel experimentModel, Set<Variable> traits, Set<VariableType> variableTypes) {
-		List<ExperimentModel> dataSetExperiments = experimentModel.getProject().getExperimentModels();
-		if (dataSetExperiments != null) {
-			for (ExperimentModel experiment : dataSetExperiments) {
-			    if (experiment.getTypeId().equals(CVTermId.DATASET_EXPERIMENT.getId())) {
-			    	addTraits(experiment, traits, variableTypes);
-			    }
-			    else if (experiment.getTypeId().equals(CVTermId.TRIAL_ENVIRONMENT_EXPERIMENT) && experiment.getGeoLocation() != null && experiment.getGeoLocation().equals(experimentModel.getGeoLocation())) {
-				    addTraits(experiment, traits, variableTypes);
-			    }
+	private void addDataSetTraits(List<ExperimentModel> experimentModels, Set<Variable> traits, Set<VariableType> variableTypes) {
+		for (ExperimentModel experiment : experimentModels) {
+			if (experiment.getTypeId().equals(CVTermId.DATASET_EXPERIMENT.getId())) {
+			    addTraits(experiment, traits, variableTypes);
 			}
 		}
 	}
@@ -82,29 +77,20 @@ public class ExperimentBuilder extends Builder {
 		}
 	}
 
-	private void addStudyTraits(ExperimentModel experimentModel, Set<Variable> traits, Set<VariableType> variableTypes) {
-		DmsProject dataSet = experimentModel.getProject();
-		if (dataSet != null) {
-			DmsProject study = dataSet.getRelatedTos().get(0).getObjectProject();
-			if (study != null) {
-				for (ExperimentModel experiment : study.getExperimentModels()) {
-				    if (experiment.getTypeId().equals(CVTermId.STUDY_EXPERIMENT.getId())) {
-				    	addTraits(experiment, traits, variableTypes);
-				    }
-				    else if (experiment.getTypeId().equals(CVTermId.TRIAL_ENVIRONMENT_EXPERIMENT) && experiment.getGeoLocation() != null && experiment.getGeoLocation().equals(experimentModel.getGeoLocation())) {
-					    addTraits(experiment, traits, variableTypes);
-				    }
-				}
+	private void addStudyTraits(List<ExperimentModel> experimentModels, Set<Variable> traits, Set<VariableType> variableTypes) {
+		for (ExperimentModel experiment : experimentModels) {
+			if (experiment.getTypeId().equals(CVTermId.STUDY_EXPERIMENT.getId())) {
+				addTraits(experiment, traits, variableTypes);
 			}
 		}
 	}
 
-	private Set<Variable> getFactors(ExperimentModel experimentModel, Set<VariableType> variableTypes) throws MiddlewareQueryException {
+	private Set<Variable> getFactors(ExperimentModel experimentModel, List<ExperimentModel> experimentModels, Set<VariableType> variableTypes) throws MiddlewareQueryException {
 		Set<Variable> factors = new HashSet<Variable>();
 		
 		addPlotExperimentFactors(factors, experimentModel, variableTypes);
-		addDataSetExperimentFactors(experimentModel, factors, variableTypes);
-		addStudyExperimentFactors(experimentModel, factors, variableTypes);
+		addDataSetExperimentFactors(experimentModels, factors, variableTypes);
+		addStudyExperimentFactors(experimentModels, factors, variableTypes);
 		
 		addLocationFactors(experimentModel, factors, variableTypes);
 		
@@ -180,37 +166,20 @@ public class ExperimentBuilder extends Builder {
 		addGermplasmFactors(variables, experimentModel, variableTypes);
 	}
 
-	private void addDataSetExperimentFactors(ExperimentModel experimentModel, Set<Variable> variables, Set<VariableType> variableTypes) throws MiddlewareQueryException {
-		List<ExperimentModel> dataSetExperiments = experimentModel.getProject().getExperimentModels();
-		if (dataSetExperiments != null) {
-			for (ExperimentModel experiment : dataSetExperiments) {
-			    if (experiment.getTypeId().equals(CVTermId.DATASET_EXPERIMENT.getId())) {
-			    	addExperimentFactors(variables, experiment, variableTypes);
-			    	addGermplasmFactors(variables, experiment, variableTypes);
-			    }
-			    else if (experiment.getTypeId().equals(CVTermId.TRIAL_ENVIRONMENT_EXPERIMENT) && experiment.getGeoLocation() != null && experiment.getGeoLocation().equals(experimentModel.getGeoLocation())) {
-				    addExperimentFactors(variables, experiment, variableTypes);
-				    addGermplasmFactors(variables, experiment, variableTypes);
-			    }
+	private void addDataSetExperimentFactors(List<ExperimentModel> experimentModels, Set<Variable> variables, Set<VariableType> variableTypes) throws MiddlewareQueryException {
+		for (ExperimentModel experiment : experimentModels) {
+			if (experiment.getTypeId().equals(CVTermId.DATASET_EXPERIMENT.getId())) {
+			    addExperimentFactors(variables, experiment, variableTypes);
+			    addGermplasmFactors(variables, experiment, variableTypes);
 			}
 		}
 	}
 
-	private void addStudyExperimentFactors(ExperimentModel experimentModel, Set<Variable> variables, Set<VariableType> variableTypes) throws MiddlewareQueryException {
-		DmsProject dataSet = experimentModel.getProject();
-		if (dataSet != null) {
-			DmsProject study = dataSet.getRelatedTos().get(0).getObjectProject();
-			if (study != null) {
-				for (ExperimentModel experiment : study.getExperimentModels()) {
-				    if (experiment.getTypeId().equals(CVTermId.STUDY_EXPERIMENT.getId())) {
-				    	addExperimentFactors(variables, experiment, variableTypes);
-				    	addGermplasmFactors(variables, experiment, variableTypes);
-				    }
-				    else if (experiment.getTypeId().equals(CVTermId.TRIAL_ENVIRONMENT_EXPERIMENT) && experiment.getGeoLocation() != null && experiment.getGeoLocation().equals(experimentModel.getGeoLocation())) {
-					    addExperimentFactors(variables, experiment, variableTypes);
-					    addGermplasmFactors(variables, experiment, variableTypes);
-				    }
-				}
+	private void addStudyExperimentFactors(List<ExperimentModel> experimentModels, Set<Variable> variables, Set<VariableType> variableTypes) throws MiddlewareQueryException {
+		for (ExperimentModel experiment : experimentModels) {
+			if (experiment.getTypeId().equals(CVTermId.STUDY_EXPERIMENT.getId())) {
+				addExperimentFactors(variables, experiment, variableTypes);
+				addGermplasmFactors(variables, experiment, variableTypes);
 			}
 		}
 	}
