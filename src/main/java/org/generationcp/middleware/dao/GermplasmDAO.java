@@ -15,7 +15,10 @@ package org.generationcp.middleware.dao;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.Operation;
@@ -580,6 +583,37 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
                     + "): Cannot update a Central Database record. "
                     + "Attribute object to update must be a Local Record (ID must be negative)");
         }
+    }
+    
+    public String getNextSequenceNumberForCrossName(String prefix) throws MiddlewareQueryException{
+    	String nextInSequence = "1";
+    	
+    	try {
+    		
+    		SQLQuery query = getSession().createSQLQuery(Germplasm.GET_MAX_IN_SEQUENCE_FOR_CROSS_NAME_PREFIX);
+    		query.setParameter("prefix", "^" + prefix + "[0-9]");
+    		
+    		String maxNameInSequence = (String) query.uniqueResult();
+    		
+    		//Gets the first number immediately after prefix and increment it by 1
+    		if (!StringUtils.isEmpty(maxNameInSequence)){
+    			maxNameInSequence = maxNameInSequence.replace(prefix, ""); // remove prefix
+    			Pattern pattern = Pattern.compile("\\D"); // split by non digit regexp
+    			String[] numberCharSequences = pattern.split(maxNameInSequence);
+    			for (String s : numberCharSequences){
+    				if (NumberUtils.isNumber(s)){
+    					nextInSequence = String.valueOf(Integer.parseInt(s) + 1);
+    					break;
+    				}
+    			}
+    		}
+		
+    	} catch (HibernateException e) {
+			logAndThrowException("Error with getNextSequenceNumberForCrossName(prefix=" + prefix + ") " +
+					"query : " + e.getMessage(), e);
+		}
+    	
+    	return nextInSequence;
     }
 
     /**

@@ -287,8 +287,12 @@ public class Germplasm implements Serializable{
     
     public static final String COUNT_BY_NAME_ALL_MODES_USING_LIKE =
             "SELECT COUNT(DISTINCT g.gid) FROM germplsm g JOIN names n ON g.gid = n.gid WHERE "
-                    + "nval LIKE :name OR nval LIKE :noSpaceName OR nval LIKE :standardizedName ";       
-        @Id
+                    + "nval LIKE :name OR nval LIKE :noSpaceName OR nval LIKE :standardizedName ";  
+    
+    public static final String GET_MAX_IN_SEQUENCE_FOR_CROSS_NAME_PREFIX =
+        "SELECT nval FROM names WHERE nval REGEXP :prefix ORDER BY nval DESC LIMIT 1";
+    
+    @Id
     @Basic(optional = false)
     @Column(name = "gid")
     @XmlElement(name = "gid")

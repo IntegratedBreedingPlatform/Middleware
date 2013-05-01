@@ -968,6 +968,21 @@ public class TestGermplasmDataManagerImpl{
     	System.out.println(renderNode(germplasmPedigreeTree.getRoot(),""));
     }
     
+    @Test
+    public void testGetNextSequenceNumberForCrossNameInDatabase() throws MiddlewareQueryException{
+    	String prefix = "ASDF";
+    	Database db = Database.CENTRAL;
+    	System.out.println("Next number in sequence for prefix (" + prefix + ") in " + db + " database: " + 
+    			manager.getNextSequenceNumberForCrossName(prefix, db));
+    }
+    
+    @Test
+    public void testGetNextSequenceNumberForCrossName() throws MiddlewareQueryException{
+    	String prefix = "C97-MNT-0";
+    	System.out.println("Next number in sequence for prefix (" + prefix + "): " + 
+    			manager.getNextSequenceNumberForCrossName(prefix));
+    }
+    
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();

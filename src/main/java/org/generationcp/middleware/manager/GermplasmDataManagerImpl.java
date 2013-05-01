@@ -1849,6 +1849,35 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public Long countAllBreedingLocations() throws MiddlewareQueryException {
     	return countAllFromCentralAndLocalByMethod(getLocationDAO(), "countAllBreedingLocations", new Object[] {}, new Class[] {});
-    }       
+    }
+
+	@Override
+	public String getNextSequenceNumberForCrossName(String prefix, Database instance)
+			throws MiddlewareQueryException {
+		String nextSequenceStr = "1";
+		
+		if (setWorkingDatabase(instance, getGermplasmDao())){
+			nextSequenceStr =  getGermplasmDao().getNextSequenceNumberForCrossName(prefix);
+			
+		}
+		
+		return nextSequenceStr;
+	}    
+	
+	@Override
+	public String getNextSequenceNumberForCrossName(String prefix)
+			throws MiddlewareQueryException {
+		String localNextSequenceStr = "1";
+		String centralNextSequenceStr = "1";
+		
+		centralNextSequenceStr = getNextSequenceNumberForCrossName(prefix, Database.CENTRAL);
+		localNextSequenceStr = getNextSequenceNumberForCrossName(prefix, Database.LOCAL);
+		
+		Integer centralNextSequenceInt = Integer.parseInt(centralNextSequenceStr);
+		Integer localNextSequenceInt = Integer.parseInt(localNextSequenceStr);
+		
+		return (centralNextSequenceInt > localNextSequenceInt) ? 
+				centralNextSequenceStr : localNextSequenceStr;
+	}       
     
 }
