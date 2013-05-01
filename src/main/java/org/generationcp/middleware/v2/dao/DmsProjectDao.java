@@ -30,6 +30,7 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -42,15 +43,6 @@ import org.hibernate.criterion.Restrictions;
 
 public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
-	public static final String GET_ROOT_FOLDERS = 
-			"SELECT DISTINCT p.projectId, p.name "
-			+ "FROM DmsProject p "
-			+ "		JOIN p.relatedTos r "
-			+ "WHERE r.typeId = " + CVTermId.HAS_PARENT_FOLDER.getId() + " "
-			+ "		 AND r.objectProject.projectId = " + DmsProject.SYSTEM_FOLDER_ID + " " 
-			+ "ORDER BY name "
-			;
-	
 	public static final String GET_CHILDREN_OF_FOLDER =		
 			"SELECT  DISTINCT subject.project_id, subject.name, IFNULL(is_study.type_id, 0) AS is_study "
 			+ "FROM    project subject "
@@ -62,32 +54,43 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "ORDER BY name "
 			;
 
-
-	public static final String GET_DATASET_NODE_BY_STUDY = 
-			"SELECT DISTINCT p.projectId, p.name, pr.objectProject.projectId "
-			+ "FROM DmsProject p JOIN p.relatedTos pr "
-			+ "WHERE pr.typeId = " + CVTermId.BELONGS_TO_STUDY.getId() + " "
-			+ "      AND pr.objectProject.projectId = :studyId "
-			+ "ORDER BY name "
-			;
-		
 	@SuppressWarnings("unchecked")
 	public List<FolderNode> getRootFolders() throws MiddlewareQueryException{
 		
 		List<FolderNode> folderList = new ArrayList<FolderNode>();
 		
+		/* SELECT DISTINCT p.projectId, p.name
+		 * 	FROM DmsProject p 
+		 * 		JOIN p.relatedTos pr 
+		 * WHERE pr.typeId = CVTermId.HAS_PARENT_FOLDER.getId() 
+		 * 		 AND pr.objectProject.projectId = " + DmsProject.SYSTEM_FOLDER_ID  
+		 * ORDER BY name 
+		 */
+		
 		try {
-			Query query = getSession().createQuery(GET_ROOT_FOLDERS);
-			List<Object[]> list =  query.list();
-			for (Object[] row : list){
-				Integer id = (Integer)row[0]; //project.id
-				String name = (String) row [1]; //project.name
-				folderList.add(new FolderNode(id, name));
-			}
+			Criteria criteria = getSession().createCriteria(getPersistentClass());
+			criteria.createAlias("relatedTos", "pr");
+			criteria.add(Restrictions.eq("pr.typeId", CVTermId.HAS_PARENT_FOLDER.getId()));
+			criteria.add(Restrictions.eq("pr.objectProject.projectId", DmsProject.SYSTEM_FOLDER_ID));
 			
+			ProjectionList projectionList = Projections.projectionList();
+			projectionList.add(Projections.property("projectId"));
+			projectionList.add(Projections.property("name"));
+			criteria.setProjection(projectionList);
+			
+			criteria.addOrder(Order.asc("projectId"));
+			
+			List<Object[]> list = criteria.list();
+			if (list != null && list.size() > 0) {
+				for (Object[] row : list){
+					Integer id = (Integer)row[0]; //project.id
+					String name = (String) row [1]; //project.name
+					folderList.add(new FolderNode(id, name));
+				}
+			}
 		} catch (HibernateException e) {
 			logAndThrowException("Error with getRootFolders query from Project: " + e.getMessage(), e);
-		}
+		}	
 		
 		return folderList;
 		
@@ -124,16 +127,35 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	}
 	
 	
-	
+
 	@SuppressWarnings("unchecked")
 	public List<DatasetNode> getDatasetNodesByStudyId(Integer studyId) throws MiddlewareQueryException{
 		
 		List<DatasetNode> datasetNodes = new ArrayList<DatasetNode>();
 		
 		try {
-			Query query = getSession().createQuery(GET_DATASET_NODE_BY_STUDY);
-			query.setParameter("studyId", studyId);
-			List<Object[]> list =  query.list();
+			/*
+			SELECT DISTINCT p.projectId, p.name, pr.objectProject.projectId 
+			FROM DmsProject p JOIN p.relatedTos pr 
+			WHERE pr.typeId = CVTermId.BELONGS_TO_STUDY.getId()
+			      AND pr.objectProject.projectId = :studyId 
+			ORDER BY name
+			*/ 
+
+			Criteria criteria = getSession().createCriteria(getPersistentClass());
+			criteria.createAlias("relatedTos", "pr");
+			criteria.add(Restrictions.eq("pr.typeId", CVTermId.BELONGS_TO_STUDY.getId()));
+			criteria.add(Restrictions.eq("pr.objectProject.projectId", studyId));
+			
+			ProjectionList projectionList = Projections.projectionList();
+			projectionList.add(Projections.property("projectId"));
+			projectionList.add(Projections.property("name"));
+			projectionList.add(Projections.property("pr.objectProject.projectId"));
+			criteria.setProjection(projectionList);
+			
+			criteria.addOrder(Order.asc("name"));
+
+			List<Object[]> list =  criteria.list();
 			
 			for (Object[] row : list){
 				Integer id = (Integer) row[0]; //project.id
