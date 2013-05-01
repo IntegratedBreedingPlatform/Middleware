@@ -22,6 +22,7 @@ import org.generationcp.middleware.pojos.User;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -36,12 +37,57 @@ public class UserDAO extends GenericDAO<User, Integer>{
             @SuppressWarnings("unchecked")
             List<User> users = criteria.list();
             
+            if(users.size() > 0)
+            {
+	            int ulogincount = (int)(users.get(0)).getUlogincount().intValue();
+	            ulogincount++;
+	            String queryString = "update users set ulogincount = "+ ulogincount + " where uname = '"+ username + "' and upswd = '" + password+"'";
+	            Session s = getSession();
+	            Query q = s.createSQLQuery(queryString);
+	            q.executeUpdate();
+	             
+            }
+            
             return users.size() > 0 ? users.get(0) : null;
         } catch (HibernateException e) {
             logAndThrowException("Error with getByUsernameAndPassword(username="+username+") query from User: " + e.getMessage(), e);
         }
         return null;
     }
+    
+    public boolean changePassword(String userName, String Password) throws MiddlewareQueryException {
+        try{
+        	String queryString = "update users set upswd = '"+ Password + "' where uname = '"+ userName + "'";
+	        Session s = getSession();
+	        Query q = s.createSQLQuery(queryString);
+	        int success = q.executeUpdate();
+        
+	        if(success > 0)
+	        	return true;
+	        else
+	        	return false;
+        }catch(Exception e)
+        {
+        	e.printStackTrace();
+        	return false;
+        }
+    }
+    
+    public User getUserDetailsByUsername(String username) throws MiddlewareQueryException{
+        try {
+            Criteria criteria = getSession().createCriteria(User.class)
+                                            .add(Restrictions.eq("name", username));
+            
+            @SuppressWarnings("unchecked")
+            List<User> users = criteria.list();
+            
+            return users.size() > 0 ? users.get(0) : null;
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getByUsernameAndPassword(username="+username+") query from User: " + e.getMessage(), e);
+        }
+        return null;
+    }
+    
     
     public boolean isUsernameExists(String userName) throws MiddlewareQueryException {
         try{

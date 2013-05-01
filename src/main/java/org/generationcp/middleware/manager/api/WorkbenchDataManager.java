@@ -185,6 +185,16 @@ public interface WorkbenchDataManager {
     public boolean isValidUserLogin(String username, String password) throws MiddlewareQueryException;
     
     /**
+     * Changes the password of the user.
+     *
+     * @param username - the username
+     * @param password - the new password
+     * @return true, if is user login is completed
+     * @throws MiddlewareQueryException
+     */
+    public boolean changeUserPassword(String username, String password) throws MiddlewareQueryException;
+    
+    /**
      * Checks if is person exists.
      *
      * @param firstName - the first name
@@ -202,6 +212,15 @@ public interface WorkbenchDataManager {
      * @throws MiddlewareQueryException
      */
     public boolean isUsernameExists(String userName) throws MiddlewareQueryException;
+    
+    /**
+     * Returns number of times user logged into the system.
+     *
+     * @param userName - the user name to check
+     * @return Integer of times the user logged in to the system
+     * @throws MiddlewareQueryException
+     */
+    public Integer getUserLogInCounter(String userName) throws MiddlewareQueryException;
     
     /**
      * Adds the person.

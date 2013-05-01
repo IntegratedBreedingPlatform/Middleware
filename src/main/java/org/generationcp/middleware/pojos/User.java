@@ -85,7 +85,18 @@ public class User implements Serializable {
     @Column(name = "cdate")
     private Integer cdate;
     
-    @Transient
+    @Column(name = "ulogincount")
+    private Integer ulogincount;
+    
+    public Integer getUlogincount() {
+		return ulogincount;
+	}
+
+	public void setUlogincount(Integer ulogincount) {
+		this.ulogincount = ulogincount;
+	}
+
+	@Transient
     private Person person;
 
     public User() {
@@ -96,7 +107,7 @@ public class User implements Serializable {
         this.userid = userid;
     }
 
-    public User(Integer userid, Integer instalid, Integer status, Integer access, Integer type, String name, String password, Integer personid, Integer adate, Integer cdate) {
+    public User(Integer userid, Integer instalid, Integer status, Integer access, Integer type, String name, String password, Integer personid, Integer adate, Integer cdate, Integer  ulogincount) {
         super();
         this.userid = userid;
         this.instalid = instalid;
@@ -108,6 +119,7 @@ public class User implements Serializable {
         this.personid = personid;
         this.adate = adate;
         this.cdate = cdate;
+        this.ulogincount = ulogincount;
     }
     
     /**
@@ -127,7 +139,7 @@ public class User implements Serializable {
         user.setPersonid(personid);
         user.setAdate(adate);
         user.setCdate(cdate);
-        
+        user.setUlogincount(ulogincount);
         return user;
     }
 
@@ -264,6 +276,8 @@ public class User implements Serializable {
         builder.append(adate);
         builder.append(", cdate=");
         builder.append(cdate);
+        builder.append(", ulogincount=");
+        builder.append(ulogincount);
         builder.append(", person=");
         builder.append(person);
         builder.append("]");

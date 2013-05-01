@@ -1369,4 +1369,21 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
                     + e.getMessage(), e);
         }
     }
+
+	@Override
+	public Integer getUserLogInCounter(String userName)
+			throws MiddlewareQueryException {
+		
+		User user = getUserDao().getUserDetailsByUsername(userName);
+		System.out.println("User is "+ user);
+		
+		return user.getUlogincount();
+	}
+
+	@Override
+	public boolean changeUserPassword(String username, String password)
+			throws MiddlewareQueryException {
+		// TODO Auto-generated method stub
+		return getUserDao().changePassword(username, password);
+	}
 }
