@@ -23,7 +23,9 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.Season;
+import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.v2.domain.AbstractNode;
+import org.generationcp.middleware.v2.domain.CVTermId;
 import org.generationcp.middleware.v2.domain.DataSet;
 import org.generationcp.middleware.v2.domain.DatasetNode;
 import org.generationcp.middleware.v2.domain.FactorDetails;
@@ -177,28 +179,36 @@ public class TestStudyDataManagerImpl {
 		   System.out.println("NO VARIABLE FOUND FOR STUDY " + studyId);
 	   }
    }
-   
-/*	@Test
-	public void testAddDmsDataset() throws Exception {
-		Integer datasetId = 0;
-		String name = "Test Dataset";
-		String description = "Test Description";
-		List<ProjectProperty> properties = null;
-		List<ProjectRelationship> relatedTos = null;
-		List<ProjectRelationship> relatedBys = null;
-
-		DmsDataset dataset = new DmsDataset(datasetId, name, description, properties, relatedTos, relatedBys);
-		dataset = manager.addDmsDataset(dataset);
-		
-		assert(dataset.getProjectId() < 0);
-		System.out.println("testAddDmsDataset(): " + dataset);
-	}
 
 	@Test
 	public void testAddStudy() throws Exception {
 		Integer studyId = 0;
-		String name = "Test Study";
+		String name = "Test Study 1";
 		Integer projectKey = 1; 
+		String title = "Test Study Title";
+		String objective = "Test Study Objective"; 
+		Integer primaryInvestigator = 1;
+		String type = CVTermId.STUDY_TYPE.getId().toString();
+       Integer startDate = (int) System.currentTimeMillis();; 
+       Integer endDate = (int) System.currentTimeMillis();; 
+       Integer user = 1; 
+       Integer status = 1; 
+       Integer hierarchy = 1000; // parent id 
+       Integer creationDate = (int) System.currentTimeMillis();
+		
+		Study study = new Study(studyId, name, projectKey, title, objective,
+				primaryInvestigator, type, startDate, endDate, user, status,
+				hierarchy, creationDate);
+		study = manager.addStudy(study);
+
+		assert(study.getId() < 0);
+		System.out.println("testAddStudy(): " + study);
+	}
+
+	@Test
+	public void testAddStudyDetails() throws Exception {
+		Integer studyId = 0;
+		String name = "Test Study 2";
 		String title = "Test Study Title";
 		String objective = "Test Study Objective"; 
 		Integer primaryInvestigator = 1;
@@ -207,15 +217,16 @@ public class TestStudyDataManagerImpl {
         Integer endDate = (int) System.currentTimeMillis();; 
         Integer user = 1; 
         Integer status = 1; 
-        Integer hierarchy = 1000; // parent id 
         Integer creationDate = (int) System.currentTimeMillis();
 		
-		Study study = new Study(studyId, name, projectKey, title, objective, primaryInvestigator, type, startDate, endDate, user, status, hierarchy, creationDate);		
-		study = manager.addStudy(study);
+		StudyDetails studyDetails = new StudyDetails(studyId, name,
+				title, objective, primaryInvestigator, type, startDate,
+				endDate, user, status, creationDate);
+		studyDetails = manager.addStudyDetails(studyDetails);
 
-		assert(study.getId() < 0);
-		System.out.println("testAddStudy(): " + study);
-	}*/
+		assert(studyDetails.getId() < 0);
+		System.out.println("testAddStudyDetails(): " + studyDetails);
+	}
 
 	@Test
 	public void getDataSet() throws Exception {

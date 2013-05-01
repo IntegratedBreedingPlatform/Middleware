@@ -11,6 +11,7 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.v2.dao.DmsProjectDao;
 import org.generationcp.middleware.v2.dao.ProjectPropertyDao;
+import org.generationcp.middleware.v2.dao.ProjectRelationshipDao;
 import org.generationcp.middleware.v2.domain.AbstractNode;
 import org.generationcp.middleware.v2.domain.CVTermId;
 import org.generationcp.middleware.v2.domain.DataSet;
@@ -23,11 +24,12 @@ import org.generationcp.middleware.v2.domain.StudyNode;
 import org.generationcp.middleware.v2.domain.StudyQueryFilter;
 import org.generationcp.middleware.v2.factory.ProjectFactory;
 import org.generationcp.middleware.v2.factory.ProjectPropertyFactory;
+import org.generationcp.middleware.v2.factory.ProjectRelationshipFactory;
 import org.generationcp.middleware.v2.factory.StudyFactory;
 import org.generationcp.middleware.v2.manager.api.StudyDataManager;
-import org.generationcp.middleware.v2.pojos.DmsDataset;
 import org.generationcp.middleware.v2.pojos.DmsProject;
 import org.generationcp.middleware.v2.pojos.ProjectProperty;
+import org.generationcp.middleware.v2.pojos.ProjectRelationship;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -41,6 +43,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	private ProjectPropertyDao projectPropertyDao;
 	
+	private ProjectRelationshipDao projectRelationshipDao;
 	
 	public StudyDataManagerImpl() { 		
 	}
@@ -68,6 +71,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		}
 		projectPropertyDao.setSession(getActiveSession());
 		return projectPropertyDao;
+	}
+	
+	private ProjectRelationshipDao getProjectRelationshipDao() {
+		if (projectRelationshipDao == null) {
+			projectRelationshipDao = new ProjectRelationshipDao();
+		}
+		projectRelationshipDao.setSession(getActiveSession());
+		return projectRelationshipDao;
 	}
 	
 	
@@ -144,8 +155,30 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
     public Study addStudy(Study study) throws MiddlewareQueryException{
         requireLocalDatabaseInstance();
+        DmsProject parent = getDmsProjectDao().getById(study.getHierarchy()); 
+		try {
+			study.setId(saveStudy(study, parent));
+        } catch (Exception e) {
+            logAndThrowException("Error encountered with addStudy(study=" + study + "): " + e.getMessage(), e, LOG);
+		}
+		return study;
+    }
+	
+	@Override
+    public StudyDetails addStudyDetails(StudyDetails studyDetails) throws MiddlewareQueryException{
+        requireLocalDatabaseInstance();
+		try {
+			studyDetails.setId(saveStudy(new Study(studyDetails), null));
+        } catch (Exception e) {
+          logAndThrowException("Error encountered with addStudyDetails(studyDetails=" + studyDetails + "): " + e.getMessage(), e, LOG);
+		}
+		return studyDetails;	
+    }
+	
+	private Integer saveStudy(Study study, DmsProject parent) throws Exception{
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
+        Integer id = null;
 
         try {
             trans = session.beginTransaction();
@@ -153,83 +186,50 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             // Save project
             DmsProjectDao projectDao = getDmsProjectDao();
             DmsProject project = ProjectFactory.getInstance().createProject(study);
-
             Integer generatedId = projectDao.getNegativeId("projectId");
             project.setProjectId(generatedId);
+            DmsProject savedProject = projectDao.save(project);
             
             // Save project properties
             List<ProjectProperty> properties = ProjectPropertyFactory.getInstance().
             										createProjectProperties(study, project);
             ProjectPropertyDao projectPropertyDao = getProjectPropertyDao();
             
-            generatedId = projectPropertyDao.getNegativeId("projectPropertyId") +1;
             for (ProjectProperty property : properties){
-                 property.setProjectPropertyId(generatedId--);
- //               projectPropertyDao.save(property);
+                generatedId = projectPropertyDao.getNegativeId("projectPropertyId");
+                property.setProjectPropertyId(generatedId);
+                 property.setProject(savedProject);
+                 projectPropertyDao.save(property);
             }
-            project.setProperties(properties);
-            DmsProject savedProject = projectDao.save(project);
+            savedProject.setProperties(properties);
            
-            // Save project relationships
-            
-            // Get the parent from the study
- /*           DmsProject parent = projectDao.getById(study.getHierarchy()); 
-            List<ProjectRelationship> relationships = 
-            		ProjectRelationshipFactory.getInstance().
-            			createProjectRelationship(study, parent);
+            // Save the relationship to parent and add relationship is_study
+            if (parent == null){
+            	parent = projectDao.getById(DmsProject.SYSTEM_FOLDER_ID); // Make the new study a root study 
+            }
+            List<ProjectRelationship> relationships = ProjectRelationshipFactory.getInstance().
+            											createProjectRelationship(study, parent);
             ProjectRelationshipDao projectRelationshipDao = getProjectRelationshipDao();
             
             for (ProjectRelationship relationship : relationships){
                 generatedId = projectRelationshipDao.getNegativeId("projectRelationshipId");
                 relationship.setProjectRelationshipId(generatedId);
+                relationship.setObjectProject(savedProject);
+                relationship.setSubjectProject(parent);
                 projectRelationshipDao.save(relationship);
             }
- */           
-            study.setId( savedProject.getProjectId());
+            savedProject.setRelatedTos(relationships);
+            
+            id = savedProject.getProjectId();
 
             trans.commit();
             
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Error encountered with addStudy(study=" + study + "): " + e.getMessage(), e, LOG);
+            throw e;
         }
-        return study;
-    	
-    }
-
-	@Override
-    public DmsDataset addDmsDataset(DmsDataset dataset) throws MiddlewareQueryException{
-        requireLocalDatabaseInstance();
-        Session session = getCurrentSessionForLocal();
-        Transaction trans = null;
-
-        try {
-        	
-        	// Save Project Entry
-            trans = session.beginTransaction();
-            DmsProjectDao dao = getDmsProjectDao();
-            DmsProject project = new DmsProject(dataset);
-
-            Integer generatedId = dao.getNegativeId("projectId");
-
-            project.setProjectId(generatedId);
-            DmsProject savedProject = dao.save(project);
-            
-            //TODO Save factors
-            
-            //TODO Save variates
-            
-            //TODO Save row data
-            
-            dataset.setProjectId(savedProject.getProjectId());
-
-            trans.commit();
-            
-        } catch (Exception e) {
-            rollbackTransaction(trans);
-            logAndThrowException("Error encountered with addDmsDataset(dataset=" + dataset + "): " + e.getMessage(), e, LOG);
-        }
-        return dataset;
-    }
+        return id;
+		
+	}
 
 }

@@ -46,7 +46,7 @@ public class DmsProject implements Serializable {
 	private static final long serialVersionUID = 464731947805951726L;
 	
 	/** The project id of the SYSTEM root folder */
-	//TODO Pending confirmation. System folder project id = 1
+	//TODO Pending confirmation. System folder project id = 1 for both local and central database
 	public static final Integer SYSTEM_FOLDER_ID = 1;
 	
 	@Id
@@ -104,17 +104,7 @@ public class DmsProject implements Serializable {
 		this.relatedTos = relatedTos;
 		this.relatedBys = relatedBys;
 	}
-
-	public DmsProject(DmsDataset dataset) {
-		super();
-		this.projectId = dataset.getProjectId();
-		this.name = dataset.getName();
-		this.description = dataset.getDescription();
-		this.properties = dataset.getProperties();
-		this.relatedTos = dataset.getRelatedTos();
-		this.relatedBys = dataset.getRelatedBys();
-	}
-
+	
 	public Integer getProjectId() {
 		return projectId;
 	}

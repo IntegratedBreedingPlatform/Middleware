@@ -23,6 +23,27 @@ public class StudyDetails {
 	private Integer status;
 
 	private Integer creationDate;
+	
+	public StudyDetails(){		
+	}
+
+	public StudyDetails(Integer id, String name, String title,
+			String objective, Integer primaryInvestigator, String type,
+			Integer startDate, Integer endDate, Integer user, Integer status,
+			Integer creationDate) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.title = title;
+		this.objective = objective;
+		this.primaryInvestigator = primaryInvestigator;
+		this.type = type;
+		this.startDate = startDate;
+		this.endDate = endDate;
+		this.user = user;
+		this.status = status;
+		this.creationDate = creationDate;
+	}
 
 	public Integer getId() {
 		return id;

@@ -27,7 +27,6 @@ import org.generationcp.middleware.v2.domain.ObservationDetails;
 import org.generationcp.middleware.v2.domain.StudyDetails;
 import org.generationcp.middleware.v2.domain.StudyNode;
 import org.generationcp.middleware.v2.domain.StudyQueryFilter;
-import org.generationcp.middleware.v2.pojos.DmsDataset;
 
 /**
  * This is the API for retrieving phenotypic data stored as Studies and
@@ -114,12 +113,6 @@ public interface StudyDataManager {
 	 */
 	List<ObservationDetails> getObservations(Integer projectId) throws MiddlewareQueryException;
 
-	
-    public Study addStudy(Study study) throws MiddlewareQueryException;
-    
-    
-    public DmsDataset addDmsDataset(DmsDataset dataset) throws MiddlewareQueryException;
-
     /**
      * Returns the list of study details by its GID value.
      * 
@@ -128,5 +121,28 @@ public interface StudyDataManager {
      * @throws MiddlewareQueryException
      */
     Set<StudyDetails> searchStudiesByGid(Integer gid) throws MiddlewareQueryException;
+
+    /**
+	 * Adds a study. Inserts into the tables project, projectprop and project_relationships. 
+	 * Sets the parent to the given id in the hierarchy field of the study. 
+	 * If no value is supplied, the new study is stored as a top-level study.
+	 * 
+	 * @param study The Study object to insert
+	 * @return the added object with the generated id
+	 * @throws MiddlewareQueryException
+	 */
+    public Study addStudy(Study study) throws MiddlewareQueryException;
+
+	/**
+	 * Adds a StudyDetails object. 
+	 * Inserts into the tables project, projectprop and project_relationships. 
+	 * The new study is stored as a top-level study.
+	 * 
+	 * @param study The StudyDetails object to insert
+	 * @return the added object with the generated id
+	 * @throws MiddlewareQueryException
+	 */
+    public StudyDetails addStudyDetails(StudyDetails studyDetails) throws MiddlewareQueryException;
+    
 
 }

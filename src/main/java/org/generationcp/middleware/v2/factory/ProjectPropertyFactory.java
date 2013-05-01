@@ -26,13 +26,13 @@ public class ProjectPropertyFactory {
 		}
 		return properties;
 	}
-	
+		
 	private ArrayList<ProjectProperty>  mapStudyToProperties(Study study, DmsProject project) {
 		ArrayList<ProjectProperty> properties = new ArrayList<ProjectProperty>();
 		
-		//DmsProject project = ProjectFactory.getInstance().createProject(study);
-       
-		properties.add(new ProjectProperty(0, project, CVTermId.PM_KEY.getId(), study.getProjectKey().toString(), 0));
+		if ( study.getProjectKey() != null){
+			properties.add(new ProjectProperty(0, project, CVTermId.PM_KEY.getId(), study.getProjectKey().toString(), 0));
+		}
 		properties.add(new ProjectProperty(0, project, CVTermId.STUDY_OBJECTIVE.getId(), study.getObjective(), 1));
 		properties.add(new ProjectProperty(0, project, CVTermId.PI_ID.getId(), study.getPrimaryInvestigator().toString(), 2));
 		properties.add(new ProjectProperty(0, project, CVTermId.STUDY_TYPE.getId(), study.getType(), 3));
