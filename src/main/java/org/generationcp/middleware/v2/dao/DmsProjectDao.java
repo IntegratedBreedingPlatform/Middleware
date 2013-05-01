@@ -27,6 +27,7 @@ import org.generationcp.middleware.v2.domain.FolderNode;
 import org.generationcp.middleware.v2.domain.StudyNode;
 import org.generationcp.middleware.v2.pojos.DmsProject;
 import org.hibernate.Criteria;
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.criterion.Criterion;
@@ -172,33 +173,24 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<StudyNode> getStudiesByName(String name) throws MiddlewareQueryException {
-		List<StudyNode> studyNodes = new ArrayList<StudyNode>();
-		
+	public List<DmsProject> getStudiesByName(String name) throws MiddlewareQueryException {
 		try {
 			Criteria criteria = getSession().createCriteria(getPersistentClass());
 			criteria.add(Restrictions.eq("name", name));
 			criteria.createAlias("relatedTos", "pr");
 			criteria.add(Restrictions.eq("pr.typeId", CVTermId.IS_STUDY.getId()));
-			ProjectionList projectionList = Projections.projectionList();
-			projectionList.add(Projections.property("projectId"));
-			projectionList.add(Projections.property("name"));
-			criteria.setProjection(projectionList);
+			criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 			
-			List<Object[]> nodes = criteria.list();
-			if (nodes != null && nodes.size() > 0) {
-				for (Object[] node : nodes) {
-					studyNodes.add(new StudyNode((Integer) node[0], (String) node[1]));
-				}
-			}
+			return criteria.list();
+			
 		} catch (HibernateException e) {
 			logAndThrowException("Error in getStudiesByName=" + name + " query on DmsProjectDao: " + e.getMessage(), e);
 		}
 		
-		return studyNodes;
+		return new ArrayList<DmsProject>();
 	}
 	
-	public List<StudyNode> getStudiesByUserIds(Collection<Integer> userIds) throws MiddlewareQueryException {
+	public List<DmsProject> getStudiesByUserIds(Collection<Integer> userIds) throws MiddlewareQueryException {
 		List<Object> userIdStrings = new ArrayList<Object>();
 		if (userIds != null && userIds.size() > 0) {
 			for (Integer userId : userIds) {
@@ -208,14 +200,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return getStudiesByStudyProperty(CVTermId.STUDY_UID.getId(), Restrictions.in("p.value", userIdStrings));
 	}
 	
-	public List<StudyNode> getStudiesByStartDate(Integer startDate) throws MiddlewareQueryException {
+	public List<DmsProject> getStudiesByStartDate(Integer startDate) throws MiddlewareQueryException {
 		return getStudiesByStudyProperty(CVTermId.START_DATE.getId(), Restrictions.eq("p.value", startDate.toString()));
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<StudyNode> getStudiesByStudyProperty(Integer studyPropertyId, Criterion valueExpression) throws MiddlewareQueryException {
-		List<StudyNode> studyNodes = new ArrayList<StudyNode>();
-		
+	private List<DmsProject> getStudiesByStudyProperty(Integer studyPropertyId, Criterion valueExpression) throws MiddlewareQueryException {
 		try {
 			Criteria criteria = getSession().createCriteria(getPersistentClass());
 			criteria.createAlias("properties", "p");
@@ -223,50 +213,34 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			criteria.add(valueExpression);
 			criteria.createAlias("relatedTos", "pr");
 			criteria.add(Restrictions.eq("pr.typeId", CVTermId.IS_STUDY.getId()));
-			ProjectionList projectionList = Projections.projectionList();
-			projectionList.add(Projections.property("projectId"));
-			projectionList.add(Projections.property("name"));
-			criteria.setProjection(projectionList);
+			criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 			
-			List<Object[]> nodes = criteria.list();
-			if (nodes != null && nodes.size() > 0) {
-				for (Object[] node : nodes) {
-					studyNodes.add(new StudyNode((Integer) node[0], (String) node[1]));
-				}
-			}
+			return criteria.list();
+			
 		} catch (HibernateException e) {
 			e.printStackTrace();
 			logAndThrowException("Error in getStudiesByStudyProperty with " + valueExpression + " for property " + studyPropertyId 
 					+ " in DmsProjectDao: " + e.getMessage(), e);
 		}
-		return studyNodes;
+		return new ArrayList<DmsProject>();
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<StudyNode> getStudiesByIds(Collection<Integer> projectIds) throws MiddlewareQueryException {
-		List<StudyNode> studyNodes = new ArrayList<StudyNode>();
+	public List<DmsProject> getStudiesByIds(Collection<Integer> projectIds) throws MiddlewareQueryException {
 		try {
 			if (projectIds != null && projectIds.size() > 0) {
 				Criteria criteria = getSession().createCriteria(getPersistentClass());
 				criteria.add(Restrictions.in("projectId", projectIds));
 				criteria.createAlias("relatedTos", "pr");
 				criteria.add(Restrictions.eq("pr.typeId", CVTermId.IS_STUDY.getId()));
-				ProjectionList projectionList = Projections.projectionList();
-				projectionList.add(Projections.property("projectId"));
-				projectionList.add(Projections.property("name"));
-				criteria.setProjection(projectionList);
+				criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 				
-				List<Object[]> nodes = criteria.list();
-				if (nodes != null && nodes.size() > 0) {
-					for (Object[] node : nodes) {
-						studyNodes.add(new StudyNode((Integer) node[0], (String) node[1]));
-					}
-				}
+				return criteria.list();
 			}
 		} catch (HibernateException e) {
 			logAndThrowException("Error in getStudiesByIds= " + projectIds + " query in DmsProjectDao: " + e.getMessage(), e);
 		}
-		return studyNodes;
+		return new ArrayList<DmsProject>();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -323,4 +297,44 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		
 		return new ArrayList<DmsProject>(projects);
 	}
+	
+	@SuppressWarnings("unchecked")
+	public List<DmsProject> getByFactor(Integer factorId) throws MiddlewareQueryException {
+		try {
+			Criteria criteria = getSession().createCriteria(getPersistentClass());
+			criteria.createAlias("properties", "p");
+			criteria.add(Restrictions.eq("p.typeId", CVTermId.STANDARD_VARIABLE.getId()));
+			criteria.add(Restrictions.eq("p.value", factorId.toString()));
+
+			List<DmsProject> results = criteria.list();
+			if (results != null && results.size() > 0) {
+				for (DmsProject project : results) {
+					Hibernate.initialize(project.getExperimentModels());
+				}
+			}
+			return results;
+		
+		} catch(HibernateException e) {
+			logAndThrowException("Error getByFactor=" + factorId + " at DmsProjectDao: " + e.getMessage());
+		}
+		return new ArrayList<DmsProject>();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<DmsProject> getByIds(Collection<Integer> projectIds) throws MiddlewareQueryException {
+		List<DmsProject> studyNodes = new ArrayList<DmsProject>();
+		try {
+			if (projectIds != null && projectIds.size() > 0) {
+				Criteria criteria = getSession().createCriteria(getPersistentClass());
+				criteria.add(Restrictions.in("projectId", projectIds));
+				criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+				
+				return criteria.list();
+			}
+		} catch (HibernateException e) {
+			logAndThrowException("Error in getByIds= " + projectIds + " query in DmsProjectDao: " + e.getMessage(), e);
+		}
+		return studyNodes;
+	}
+
 }

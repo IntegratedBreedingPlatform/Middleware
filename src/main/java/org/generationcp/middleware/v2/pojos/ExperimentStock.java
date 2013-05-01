@@ -35,6 +35,13 @@ public class ExperimentStock implements Serializable {
 	private Integer stockId;
 	
 	/**
+	 * The Experiment object.
+	 */
+	@Basic(optional = false)
+	@Column(name = "nd_experiment_id")
+	private Integer experimentId;
+
+	/**
 	 * The Type object.
 	 */
 	@Basic(optional = false)
@@ -63,6 +70,14 @@ public class ExperimentStock implements Serializable {
 
 	public void setTypeId(Integer typeId) {
 		this.typeId = typeId;
+	}
+
+	public Integer getExperimentId() {
+		return experimentId;
+	}
+
+	public void setExperimentId(Integer experimentId) {
+		this.experimentId = experimentId;
 	}
 
 	@Override

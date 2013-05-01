@@ -1,6 +1,8 @@
 package org.generationcp.middleware.v2.manager;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -10,6 +12,7 @@ import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.v2.dao.DmsProjectDao;
 import org.generationcp.middleware.v2.dao.ProjectPropertyDao;
 import org.generationcp.middleware.v2.domain.AbstractNode;
+import org.generationcp.middleware.v2.domain.CVTermId;
 import org.generationcp.middleware.v2.domain.DataSet;
 import org.generationcp.middleware.v2.domain.DatasetNode;
 import org.generationcp.middleware.v2.domain.FactorDetails;
@@ -124,7 +127,18 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	
 	@Override
 	public List<StudyNode> searchStudies(StudyQueryFilter filter) throws MiddlewareQueryException {
-		return getStudyNodeBuilder().build(filter);
+		List<DmsProject> projects = getProjectSearcher().searchByFilter(filter);
+		return getStudyNodeBuilder().build(projects);
+	}
+	
+	@Override
+	public Set<StudyDetails> searchStudiesByGid(Integer gid) throws MiddlewareQueryException {
+		Set<StudyDetails> studies = new HashSet<StudyDetails>();
+		List<DmsProject> projects = getProjectSearcher().searchStudiesByFactor(CVTermId.GID.getId(), gid.toString());
+		for (DmsProject project : projects)	 {
+			studies.add(getStudyFactory().createStudyDetails(project));
+		}
+		return studies;
 	}
 
 	@Override

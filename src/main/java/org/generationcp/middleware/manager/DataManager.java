@@ -24,6 +24,9 @@ import org.generationcp.middleware.v2.domain.builder.FactorDetailsBuilder;
 import org.generationcp.middleware.v2.domain.builder.ObservationDetailsBuilder;
 import org.generationcp.middleware.v2.domain.builder.StudyBuilder;
 import org.generationcp.middleware.v2.domain.builder.StudyNodeBuilder;
+import org.generationcp.middleware.v2.domain.builder.VariableInfoBuilder;
+import org.generationcp.middleware.v2.domain.builder.VariableTypeBuilder;
+import org.generationcp.middleware.v2.domain.searcher.ProjectSearcher;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -1080,4 +1083,17 @@ public abstract class DataManager{
     protected final StudyNodeBuilder getStudyNodeBuilder() {
     	return new StudyNodeBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
+
+    protected final VariableInfoBuilder getVariableInfoBuilder() {
+    	return new VariableInfoBuilder();
+    }
+
+    protected final VariableTypeBuilder getVariableTypeBuilder() {
+    	return new VariableTypeBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
+    protected final ProjectSearcher getProjectSearcher() {
+    	return new ProjectSearcher(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
 }

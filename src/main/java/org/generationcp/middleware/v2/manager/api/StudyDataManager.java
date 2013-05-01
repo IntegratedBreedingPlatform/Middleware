@@ -13,6 +13,7 @@
 package org.generationcp.middleware.v2.manager.api;
 
 import java.util.List;
+import java.util.Set;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
@@ -119,6 +120,13 @@ public interface StudyDataManager {
     
     public DmsDataset addDmsDataset(DmsDataset dataset) throws MiddlewareQueryException;
 
-	
+    /**
+     * Returns the list of study details by its GID value.
+     * 
+     * @param gid
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    Set<StudyDetails> searchStudiesByGid(Integer gid) throws MiddlewareQueryException;
 
 }

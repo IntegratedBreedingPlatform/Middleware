@@ -6,9 +6,6 @@ public enum CVTermId {
 	STANDARD_VARIABLE(1070)
 	, STUDY_INFORMATION(1010)
 	, VARIABLE_DESCRIPTION(1060)
-	, GERMPLASM_ENTRY(1040)
-	, TRIAL_DESIGN_INFO(1030)
-	, TRIAL_ENVIRONMENT_INFO(1020)
 	
 	//CV Term Relationship
 	, HAS_METHOD(1210)
@@ -50,6 +47,7 @@ public enum CVTermId {
 	
 	//Properties
 	, SEASON(2452)
+	, GID(8240)
 	
 	// Experiment Types
 	, STUDY_EXPERIMENT(1010)
@@ -72,6 +70,9 @@ public enum CVTermId {
     , ENTRY_DESIGNATION_STORAGE(1046)
     , ENTRY_CODE_STORAGE(1047)
 	
+    // Experiment storage
+    , TRIAL_DESIGN_INFO_STORAGE(1030)
+    	
 	// Other
 	, MIN_VALUE(1113)
 	, MAX_VALUE(1115)

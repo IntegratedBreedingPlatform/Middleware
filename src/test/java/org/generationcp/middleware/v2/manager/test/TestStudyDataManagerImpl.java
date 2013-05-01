@@ -15,6 +15,7 @@ package org.generationcp.middleware.v2.manager.test;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
+import java.util.Set;
 
 import junit.framework.Assert;
 
@@ -88,10 +89,10 @@ public class TestStudyDataManagerImpl {
     public void testSearchStudies() throws Exception {
     	System.out.println("testSearchStudies");
     	StudyQueryFilter filter = new StudyQueryFilter();
-       	filter.setStartDate(20050119);
+       	//filter.setStartDate(20050119);
        	//filter.setName("BULU"); //INVALID: Not a study, should not be returned
-       	filter.setName("2002WS-CHA"); //VALID: is a study
-    	filter.setCountry("Republic of the Philippines");
+       	//filter.setName("2002WS-CHA"); //VALID: is a study
+    	//filter.setCountry("Republic of the Philippines");
     	filter.setSeason(Season.DRY);
     	//filter.setSeason(Season.GENERAL); //do nothing for GENERAL SEASON
     	//filter.setSeason(Season.WET); //currently has no data
@@ -143,6 +144,19 @@ public class TestStudyDataManagerImpl {
 		}
 	}
 
+	@Test
+	public void testSearchStudiesByGid() throws Exception {
+		System.out.println("testSearchStudiesByGid");
+		Integer gid = 70125;
+		Set<StudyDetails> studies = manager.searchStudiesByGid(gid);
+		if (studies != null && studies.size() > 0) {
+			for (StudyDetails study : studies) {
+				System.out.println("Study- " + study.getId() + " - " + study.getName());
+			}
+		} else {
+			System.out.println("No Studies with GID " + gid + " found");
+		}
+	}
 
 
    //================================  helper methods =============================
