@@ -35,4 +35,6 @@ public enum StudyPropertyConstants {
 	public Integer getRank() {
 		return this.rank;
 	}
+	
+	
 }

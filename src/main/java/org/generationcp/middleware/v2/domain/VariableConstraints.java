@@ -33,4 +33,17 @@ public class VariableConstraints {
 		Debug.println(indent, "minValue: " + minValue);
 		Debug.println(indent, "maxValue: " + maxValue);
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("VariableConstraints [minValue=");
+		builder.append(minValue);
+		builder.append(", maxValue=");
+		builder.append(maxValue);
+		builder.append("]");
+		return builder.toString();
+	}
+	
+	
 }

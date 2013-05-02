@@ -40,4 +40,19 @@ public class VariableInfo {
 		Debug.println(indent + 3, "localName: " + localName);
 		Debug.println(indent + 3, "localDescription: " + localDescription);
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("VariableInfo [localName=");
+		builder.append(localName);
+		builder.append(", localDescription=");
+		builder.append(localDescription);
+		builder.append(", stdVariableId=");
+		builder.append(stdVariableId);
+		builder.append("]");
+		return builder.toString();
+	}
+	
+	
 }

@@ -134,4 +134,33 @@ public class VariableType extends CvTerm {
 		VariableType other = (VariableType) obj;
 		return other.getId() == getId();
 	}
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("VariableType [property=");
+		builder.append(property);
+		builder.append(", scale=");
+		builder.append(scale);
+		builder.append(", method=");
+		builder.append(method);
+		builder.append(", dataType=");
+		builder.append(dataType);
+		builder.append(", storedIn=");
+		builder.append(storedIn);
+		builder.append(", localName=");
+		builder.append(localName);
+		builder.append(", localDescription=");
+		builder.append(localDescription);
+		builder.append(", rank=");
+		builder.append(rank);
+		builder.append(", constraints=");
+		builder.append(constraints);
+		builder.append(", nameSynonyms=");
+		builder.append(nameSynonyms);
+		builder.append("]");
+		return builder.toString();
+	}
+	
+	
+	
 }

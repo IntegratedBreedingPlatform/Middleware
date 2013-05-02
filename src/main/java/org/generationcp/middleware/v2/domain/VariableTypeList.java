@@ -34,5 +34,15 @@ public class VariableTypeList {
 		this.variableTypes = variableTypes;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("VariableTypeList [variableTypes=");
+		builder.append(variableTypes);
+		builder.append("]");
+		return builder.toString();
+	}
+
+	
 	
 }

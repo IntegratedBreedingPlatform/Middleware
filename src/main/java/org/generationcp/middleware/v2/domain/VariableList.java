@@ -29,4 +29,16 @@ public class VariableList {
 	public void setVariables(List<Variable> variables) {
 		this.variables = variables;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("VariableList [variables=");
+		builder.append(variables);
+		builder.append("]");
+		return builder.toString();
+	}
+	
+	
+	
 }

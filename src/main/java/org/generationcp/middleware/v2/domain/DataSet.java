@@ -70,4 +70,23 @@ public class DataSet {
 		DataSet other = (DataSet) obj;
 		return getId() == other.getId();
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("DataSet [id=");
+		builder.append(id);
+		builder.append(", name=");
+		builder.append(name);
+		builder.append(", description=");
+		builder.append(description);
+		builder.append(", study=");
+		builder.append(study);
+		builder.append(", variableTypes=");
+		builder.append(variableTypes);
+		builder.append("]");
+		return builder.toString();
+	}
+
+	
 }

@@ -158,4 +158,33 @@ public class StudyDetails {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("StudyDetails [id=");
+		builder.append(id);
+		builder.append(", name=");
+		builder.append(name);
+		builder.append(", title=");
+		builder.append(title);
+		builder.append(", objective=");
+		builder.append(objective);
+		builder.append(", primaryInvestigator=");
+		builder.append(primaryInvestigator);
+		builder.append(", type=");
+		builder.append(type);
+		builder.append(", startDate=");
+		builder.append(startDate);
+		builder.append(", endDate=");
+		builder.append(endDate);
+		builder.append(", user=");
+		builder.append(user);
+		builder.append(", status=");
+		builder.append(status);
+		builder.append(", creationDate=");
+		builder.append(creationDate);
+		builder.append("]");
+		return builder.toString();
+	}
+
 }

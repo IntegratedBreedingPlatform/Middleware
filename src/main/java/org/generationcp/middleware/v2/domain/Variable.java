@@ -75,4 +75,17 @@ public class Variable {
 		if (s2 == null) return false;
 		return s1.equals(s2);
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Variable [variableType=");
+		builder.append(variableType);
+		builder.append(", value=");
+		builder.append(value);
+		builder.append("]");
+		return builder.toString();
+	}
+	
+	
 }

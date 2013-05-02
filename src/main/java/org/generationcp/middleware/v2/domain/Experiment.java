@@ -59,4 +59,21 @@ public class Experiment {
 			}
 		}
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Experiment [id=");
+		builder.append(id);
+		builder.append(", dataSet=");
+		builder.append(dataSet);
+		builder.append(", factors=");
+		builder.append(factors);
+		builder.append(", variates=");
+		builder.append(variates);
+		builder.append("]");
+		return builder.toString();
+	}
+	
+	
 }

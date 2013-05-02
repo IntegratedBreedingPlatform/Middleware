@@ -115,4 +115,27 @@ public class Study {
 	public void addDataSet(DataSet dataSet) {
 		dataSets.add(dataSet);
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Study [id=");
+		builder.append(id);
+		builder.append(", name=");
+		builder.append(name);
+		builder.append(", description=");
+		builder.append(description);
+		builder.append(", dataSets=");
+		builder.append(dataSets);
+		builder.append(", conditions=");
+		builder.append(conditions);
+		builder.append(", variableTypes=");
+		builder.append(variableTypes);
+		builder.append(", constants=");
+		builder.append(constants);
+		builder.append("]");
+		return builder.toString();
+	}
+	
+	
 }
