@@ -1,6 +1,5 @@
 package org.generationcp.middleware.v2.domain;
 
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.v2.util.Debug;
 
 public class Variable {

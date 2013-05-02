@@ -1,7 +1,5 @@
 package org.generationcp.middleware.v2.domain;
 
-import java.util.Set;
-
 import org.generationcp.middleware.v2.util.Debug;
 
 public class Experiment {
@@ -10,9 +8,9 @@ public class Experiment {
 	
 	private DataSet dataSet;
 	
-	private Set<Variable> factors;
+	private VariableList factors;
 	
-	private Set<Variable> traits;
+	private VariableList variates;
 
 	public int getId() {
 		return id;
@@ -29,34 +27,34 @@ public class Experiment {
 	public void setDataSet(DataSet dataSet) {
 		this.dataSet = dataSet;
 	}
-	
-	public Set<Variable> getFactors() {
+
+	public VariableList getFactors() {
 		return factors;
 	}
 
-	public void setFactors(Set<Variable> factors) {
+	public void setFactors(VariableList factors) {
 		this.factors = factors;
 	}
 
-	public Set<Variable> getTraits() {
-		return traits;
+	public VariableList getVariates() {
+		return variates;
 	}
 
-	public void setTraits(Set<Variable> traits) {
-		this.traits = traits;
+	public void setVariates(VariableList variates) {
+		this.variates = variates;
 	}
 
 	public void print(int indent) {
 		Debug.println(indent, "Experiment: " + id);
 		Debug.println(indent + 3, "Factors:");
 		if (factors != null) {
-			for (Variable variable : factors) {
+			for (Variable variable : factors.getVariables()) {
 				variable.print(indent + 6);
 			}
 		}
-		Debug.println(indent + 3, "Traits:");
+		Debug.println(indent + 3, "Variates:");
 		if (factors != null) {
-			for (Variable trait : traits) {
+			for (Variable trait : variates.getVariables()) {
 				trait.print(indent + 6);
 			}
 		}

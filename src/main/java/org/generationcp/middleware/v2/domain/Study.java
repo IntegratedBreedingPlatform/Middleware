@@ -1,9 +1,6 @@
 package org.generationcp.middleware.v2.domain;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.generationcp.middleware.v2.util.Debug;
@@ -18,7 +15,7 @@ public class Study {
 	
 	private Set<DataSet> dataSets = new HashSet<DataSet>();
 	
-	private Set<Variable> conditions;
+	private VariableList conditions;
 	
 	private Set<VariableType> variableTypes;
 
@@ -62,11 +59,11 @@ public class Study {
 		this.variableTypes = variableTypes;
 	}
 
-	public Set<Variable> getConditions() {
+	public VariableList getConditions() {
 		return conditions;
 	}
 
-	public void setConditions(Set<Variable> conditions) {
+	public void setConditions(VariableList conditions) {
 		this.conditions = conditions;
 	}
 
@@ -82,7 +79,7 @@ public class Study {
 	    }
 	    
 	    Debug.println(indent + 3, "Conditions: ");
-	    for (Variable condition : conditions) {
+	    for (Variable condition : conditions.getVariables()) {
 	    	condition.print(indent + 6);
 	    }
 	    

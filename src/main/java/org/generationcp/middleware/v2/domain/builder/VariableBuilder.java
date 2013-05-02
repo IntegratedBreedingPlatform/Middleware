@@ -1,6 +1,5 @@
 package org.generationcp.middleware.v2.domain.builder;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -8,9 +7,9 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.v2.domain.Variable;
 import org.generationcp.middleware.v2.domain.VariableInfo;
+import org.generationcp.middleware.v2.domain.VariableList;
 import org.generationcp.middleware.v2.domain.VariableType;
 import org.generationcp.middleware.v2.pojos.ProjectProperty;
-import org.generationcp.middleware.v2.util.Debug;
 
 public class VariableBuilder extends Builder {
 
@@ -19,8 +18,8 @@ public class VariableBuilder extends Builder {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 
-	public Set<Variable> create(List<ProjectProperty> properties, Set<VariableType> variableTypes) throws MiddlewareQueryException {
-		Set<Variable> variables = new HashSet<Variable>();
+	public VariableList create(List<ProjectProperty> properties, Set<VariableType> variableTypes) throws MiddlewareQueryException {
+		VariableList variables = new VariableList();
 		
 		Set<VariableInfo> variableInfoList = getVariableInfoBuilder().create(properties);
 		for (VariableInfo variableInfo : variableInfoList) {

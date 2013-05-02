@@ -1,7 +1,6 @@
 package org.generationcp.middleware.v2.domain.builder;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -11,6 +10,7 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.v2.domain.CVTermId;
 import org.generationcp.middleware.v2.domain.Experiment;
 import org.generationcp.middleware.v2.domain.Variable;
+import org.generationcp.middleware.v2.domain.VariableList;
 import org.generationcp.middleware.v2.domain.VariableType;
 import org.generationcp.middleware.v2.pojos.ExperimentModel;
 import org.generationcp.middleware.v2.pojos.ExperimentProperty;
@@ -44,49 +44,49 @@ public class ExperimentBuilder extends Builder {
 		Experiment experiment = new Experiment();
 		experiment.setId(experimentModel.getNdExperimentId());
 		experiment.setFactors(getFactors(experimentModel, experimentModels, variableTypes));
-		experiment.setTraits(getTraits(experimentModel, experimentModels, variableTypes));
+		experiment.setVariates(getVariates(experimentModel, experimentModels, variableTypes));
 		return experiment;
 	}
 
-	private Set<Variable> getTraits(ExperimentModel experimentModel, List<ExperimentModel> experimentModels, Set<VariableType> variableTypes) {
-		Set<Variable> traits = new HashSet<Variable>();
+	private VariableList getVariates(ExperimentModel experimentModel, List<ExperimentModel> experimentModels, Set<VariableType> variableTypes) {
+		VariableList variates = new VariableList();
 		
-		addPlotTraits(experimentModel, traits, variableTypes);
-		addDataSetTraits(experimentModels, traits, variableTypes);
-		addStudyTraits(experimentModels, traits, variableTypes);
+		addPlotVariates(experimentModel, variates, variableTypes);
+		addDataSetVariates(experimentModels, variates, variableTypes);
+		addStudyVariates(experimentModels, variates, variableTypes);
 		
-		return traits;
+		return variates;
 	}
 
-	private void addPlotTraits(ExperimentModel experimentModel, Set<Variable> traits, Set<VariableType> variableTypes) {
-		addTraits(experimentModel, traits, variableTypes);
+	private void addPlotVariates(ExperimentModel experimentModel, VariableList variates, Set<VariableType> variableTypes) {
+		addVariates(experimentModel, variates, variableTypes);
 	}
 
-	private void addDataSetTraits(List<ExperimentModel> experimentModels, Set<Variable> traits, Set<VariableType> variableTypes) {
+	private void addDataSetVariates(List<ExperimentModel> experimentModels, VariableList variates, Set<VariableType> variableTypes) {
 		for (ExperimentModel experiment : experimentModels) {
 			if (experiment.getTypeId().equals(CVTermId.DATASET_EXPERIMENT.getId())) {
-			    addTraits(experiment, traits, variableTypes);
+			    addVariates(experiment, variates, variableTypes);
 			}
 		}
 	}
 
-	private void addTraits(ExperimentModel experiment, Set<Variable> traits, Set<VariableType> variableTypes) {
+	private void addVariates(ExperimentModel experiment, VariableList variates, Set<VariableType> variableTypes) {
 		for (Phenotype phenotype : experiment.getPhenotypes()) {
 			VariableType variableType = findVariableType(phenotype.getObservableId(), variableTypes);
-			traits.add(new Variable(variableType, phenotype.getValue()));
+			variates.add(new Variable(variableType, phenotype.getValue()));
 		}
 	}
 
-	private void addStudyTraits(List<ExperimentModel> experimentModels, Set<Variable> traits, Set<VariableType> variableTypes) {
+	private void addStudyVariates(List<ExperimentModel> experimentModels, VariableList variates, Set<VariableType> variableTypes) {
 		for (ExperimentModel experiment : experimentModels) {
 			if (experiment.getTypeId().equals(CVTermId.STUDY_EXPERIMENT.getId())) {
-				addTraits(experiment, traits, variableTypes);
+				addVariates(experiment, variates, variableTypes);
 			}
 		}
 	}
 
-	private Set<Variable> getFactors(ExperimentModel experimentModel, List<ExperimentModel> experimentModels, Set<VariableType> variableTypes) throws MiddlewareQueryException {
-		Set<Variable> factors = new HashSet<Variable>();
+	private VariableList getFactors(ExperimentModel experimentModel, List<ExperimentModel> experimentModels, Set<VariableType> variableTypes) throws MiddlewareQueryException {
+		VariableList factors = new VariableList();
 		
 		addPlotExperimentFactors(factors, experimentModel, variableTypes);
 		addDataSetExperimentFactors(experimentModels, factors, variableTypes);
@@ -97,7 +97,7 @@ public class ExperimentBuilder extends Builder {
 		return factors;
 	}
 
-	private void addLocationFactors(ExperimentModel experimentModel, Set<Variable> factors, Set<VariableType> variableTypes) {
+	private void addLocationFactors(ExperimentModel experimentModel, VariableList factors, Set<VariableType> variableTypes) {
 		for (VariableType variableType : variableTypes) {
 			if (isLocationFactor(variableType)) {
 				factors.add(createLocationFactor(experimentModel.getGeoLocation(), variableType));
@@ -161,12 +161,12 @@ public class ExperimentBuilder extends Builder {
 		return null;
 	}
 
-	private void addPlotExperimentFactors(Set<Variable> variables, ExperimentModel experimentModel, Set<VariableType> variableTypes) throws MiddlewareQueryException {
+	private void addPlotExperimentFactors(VariableList variables, ExperimentModel experimentModel, Set<VariableType> variableTypes) throws MiddlewareQueryException {
 		addExperimentFactors(variables, experimentModel, variableTypes);
 		addGermplasmFactors(variables, experimentModel, variableTypes);
 	}
 
-	private void addDataSetExperimentFactors(List<ExperimentModel> experimentModels, Set<Variable> variables, Set<VariableType> variableTypes) throws MiddlewareQueryException {
+	private void addDataSetExperimentFactors(List<ExperimentModel> experimentModels, VariableList variables, Set<VariableType> variableTypes) throws MiddlewareQueryException {
 		for (ExperimentModel experiment : experimentModels) {
 			if (experiment.getTypeId().equals(CVTermId.DATASET_EXPERIMENT.getId())) {
 			    addExperimentFactors(variables, experiment, variableTypes);
@@ -175,7 +175,7 @@ public class ExperimentBuilder extends Builder {
 		}
 	}
 
-	private void addStudyExperimentFactors(List<ExperimentModel> experimentModels, Set<Variable> variables, Set<VariableType> variableTypes) throws MiddlewareQueryException {
+	private void addStudyExperimentFactors(List<ExperimentModel> experimentModels, VariableList variables, Set<VariableType> variableTypes) throws MiddlewareQueryException {
 		for (ExperimentModel experiment : experimentModels) {
 			if (experiment.getTypeId().equals(CVTermId.STUDY_EXPERIMENT.getId())) {
 				addExperimentFactors(variables, experiment, variableTypes);
@@ -184,7 +184,7 @@ public class ExperimentBuilder extends Builder {
 		}
 	}
 	
-	private void addGermplasmFactors(Set<Variable> factors, ExperimentModel experimentModel, Set<VariableType> variableTypes) throws MiddlewareQueryException {
+	private void addGermplasmFactors(VariableList factors, ExperimentModel experimentModel, Set<VariableType> variableTypes) throws MiddlewareQueryException {
 		List<ExperimentStock> experimentStocks = experimentModel.getExperimentStocks();
 		if (experimentStocks != null && experimentStocks.size() == 1) {
 			Stock stock = getStockBuilder().get(experimentStocks.get(0).getStockId());
@@ -245,7 +245,7 @@ public class ExperimentBuilder extends Builder {
 		return null;
 	}
 
-	private void addExperimentFactors(Set<Variable> variables, ExperimentModel experimentModel, Set<VariableType> variableTypes) {
+	private void addExperimentFactors(VariableList variables, ExperimentModel experimentModel, Set<VariableType> variableTypes) {
 		for (ExperimentProperty property : experimentModel.getProperties()) {
 			variables.add(createVariable(property, variableTypes));
 		}
