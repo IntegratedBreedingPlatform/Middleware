@@ -70,14 +70,15 @@ public interface StudyDataManager {
 	
 	
 	/**
-	 * Returns the list of dataset nodes for a specific study
+	 * Returns the list of dataset nodes for a specific study.
+	 * Retrieves from central if studyId is positive, otherwise retrieves from local.
 	 * 
 	 * @param studyId 
 	 * 			- the study id to match
 	 * @return List of DatasetNodes belonging to the study
 	 * @throws MiddlewareQueryException
 	 */
-	public List<DatasetNode> getDatasetNodesByStudyId(Integer studyId, Database instance) throws MiddlewareQueryException;
+	public List<DatasetNode> getDatasetNodesByStudyId(Integer studyId) throws MiddlewareQueryException;
 	
 	/**
 	 * @param dataSetId

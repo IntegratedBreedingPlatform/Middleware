@@ -136,7 +136,7 @@ public class TestStudyDataManagerImpl {
 	public void testGetDatasetNodesByStudyId() throws Exception {
 		Integer studyId = 10010;
 		List<DatasetNode> datasetNodes = manager.getDatasetNodesByStudyId(
-				studyId, Database.CENTRAL);
+				studyId);
 		assertNotNull(datasetNodes);
 		assert (datasetNodes.size() > 0);
 		System.out.println("testGetDatasetNodesByStudyId(): "

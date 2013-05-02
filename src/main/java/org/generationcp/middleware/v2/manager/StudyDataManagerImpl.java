@@ -74,8 +74,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 	
 	@Override
-	public List<DatasetNode> getDatasetNodesByStudyId(Integer studyId, Database instance) throws MiddlewareQueryException{
-		if (setWorkingDatabase(instance, getDmsProjectDao())){
+	public List<DatasetNode> getDatasetNodesByStudyId(Integer studyId) throws MiddlewareQueryException{
+		if (setWorkingDatabase(studyId, getDmsProjectDao())){
 			return getDmsProjectDao().getDatasetNodesByStudyId(studyId);
 		}
 		return null;
