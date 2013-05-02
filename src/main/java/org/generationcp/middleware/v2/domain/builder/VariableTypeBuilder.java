@@ -86,7 +86,7 @@ public class VariableTypeBuilder extends Builder {
 	private CvTerm getCvTerm(Integer id) throws MiddlewareQueryException {
 		setWorkingDatabase(Database.CENTRAL);
 		CVTerm term = getCvTermDao().getById(id);
-		if (term != null) {
+		if (term == null) {
 			setWorkingDatabase(Database.LOCAL);
 			term = getCvTermDao().getById(id);
 		}
