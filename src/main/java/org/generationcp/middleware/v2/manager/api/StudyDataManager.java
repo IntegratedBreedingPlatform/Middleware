@@ -144,5 +144,12 @@ public interface StudyDataManager {
 	 */
     public StudyDetails addStudyDetails(StudyDetails studyDetails) throws MiddlewareQueryException;
     
-
+    /**
+     * Adds a dataset, along with its variable and variable values.
+     * 
+     * @param dataset
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    public DataSet addDataSet(DataSet dataset) throws MiddlewareQueryException;
 }

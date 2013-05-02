@@ -137,4 +137,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 	
 
+	@Override
+	public DataSet addDataSet(DataSet dataset) throws MiddlewareQueryException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

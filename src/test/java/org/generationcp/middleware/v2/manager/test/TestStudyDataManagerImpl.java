@@ -234,6 +234,21 @@ public class TestStudyDataManagerImpl {
 		dataSet.getStudy().print(0);
 	}
 	
+	public void testAddDataSet() throws Exception {
+		//get a dataset test data from central
+		Integer datasetId = 10015;
+		DataSet dataset = manager.getDataSet(datasetId);
+		
+		//save the dataset to local (copied from central)
+		DataSet newDataset = manager.addDataSet(dataset);
+		
+		//assert that the old and new dataset are the same, except for their ids
+		System.out.println("ORIGINAL DATASET");
+		dataset.print(0);
+		System.out.println("NEWLY CREATED DATASET");
+		newDataset.print(0);
+	}
+	
 	@AfterClass
 	public static void tearDown() throws Exception {
 		if (factory != null) {
