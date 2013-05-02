@@ -30,7 +30,7 @@ import org.generationcp.middleware.v2.domain.DataSet;
 import org.generationcp.middleware.v2.domain.DatasetNode;
 import org.generationcp.middleware.v2.domain.FactorDetails;
 import org.generationcp.middleware.v2.domain.FolderNode;
-import org.generationcp.middleware.v2.domain.ObservationDetails;
+import org.generationcp.middleware.v2.domain.VariateDetails;
 import org.generationcp.middleware.v2.domain.StudyDetails;
 import org.generationcp.middleware.v2.domain.StudyNode;
 import org.generationcp.middleware.v2.domain.StudyQueryFilter;
@@ -78,13 +78,13 @@ public class TestStudyDataManagerImpl {
     }
 
     @Test
-    public void testGetObservationDetails() throws Exception {
-    	System.out.println("testGetObservationDetails");
+    public void testGetVariates() throws Exception {
+    	System.out.println("testGetVariates");
     	int studyId = 10010;
-    	List<ObservationDetails> observationDetails = manager.getObservations(studyId);
-    	assertNotNull(observationDetails);
-    	Assert.assertTrue(observationDetails.size() > 0);
-    	printVariableDetails(studyId, observationDetails);
+    	List<VariateDetails> variates = manager.getVariates(studyId);
+    	assertNotNull(variates);
+    	Assert.assertTrue(variates.size() > 0);
+    	printVariableDetails(studyId, variates);
     }
 
     @Test

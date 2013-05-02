@@ -1,12 +1,12 @@
 package org.generationcp.middleware.v2.domain.builder;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.v2.domain.ObservationDetails;
+import org.generationcp.middleware.v2.domain.VariateDetails;
 import org.generationcp.middleware.v2.domain.VariableType;
 
-public class ObservationDetailsBuilder extends AbstractVariableDetailsBuilder<ObservationDetails> {
+public class VariateDetailsBuilder extends AbstractVariableDetailsBuilder<VariateDetails> {
 
-	public ObservationDetailsBuilder(
+	public VariateDetailsBuilder(
 			HibernateSessionProvider sessionProviderForLocal,
 			HibernateSessionProvider sessionProviderForCentral) {
 		super(sessionProviderForLocal, sessionProviderForCentral);
@@ -15,12 +15,12 @@ public class ObservationDetailsBuilder extends AbstractVariableDetailsBuilder<Ob
 	@Override
 	public boolean isAccepted(VariableType variable) {
 		return (variable != null 
-				&& OBSERVATION_TYPES.contains(variable.getStoredIn().getId()));
+				&& VARIATE_TYPES.contains(variable.getStoredIn().getId()));
 	}
 
 	@Override
-	public ObservationDetails createNewObject(VariableType variable) {
-		return new ObservationDetails();
+	public VariateDetails createNewObject(VariableType variable) {
+		return new VariateDetails();
 	}
 
 }

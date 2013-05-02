@@ -17,7 +17,7 @@ import org.generationcp.middleware.v2.pojos.ProjectProperty;
 
 public abstract class AbstractVariableDetailsBuilder <T extends VariableDetails> extends Builder {
 
-	protected static final List<Integer> OBSERVATION_TYPES = Arrays.asList(
+	protected static final List<Integer> VARIATE_TYPES = Arrays.asList(
 			CVTermId.OBSERVATION_VARIATE.getId(), CVTermId.CATEGORICAL_VARIATE.getId()
 	);
 

@@ -54,8 +54,8 @@ public class Experiment {
 		}
 		Debug.println(indent + 3, "Variates:");
 		if (factors != null) {
-			for (Variable trait : variates.getVariables()) {
-				trait.print(indent + 6);
+			for (Variable variate : variates.getVariables()) {
+				variate.print(indent + 6);
 			}
 		}
 	}

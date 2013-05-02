@@ -23,7 +23,7 @@ import org.generationcp.middleware.v2.domain.DataSet;
 import org.generationcp.middleware.v2.domain.DatasetNode;
 import org.generationcp.middleware.v2.domain.FactorDetails;
 import org.generationcp.middleware.v2.domain.FolderNode;
-import org.generationcp.middleware.v2.domain.ObservationDetails;
+import org.generationcp.middleware.v2.domain.VariateDetails;
 import org.generationcp.middleware.v2.domain.StudyDetails;
 import org.generationcp.middleware.v2.domain.StudyNode;
 import org.generationcp.middleware.v2.domain.StudyQueryFilter;
@@ -112,7 +112,7 @@ public interface StudyDataManager {
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	List<ObservationDetails> getObservations(Integer projectId) throws MiddlewareQueryException;
+	List<VariateDetails> getVariates(Integer projectId) throws MiddlewareQueryException;
 
     /**
      * Returns the list of study details by its GID value.

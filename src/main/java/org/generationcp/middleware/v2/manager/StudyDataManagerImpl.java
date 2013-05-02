@@ -15,7 +15,7 @@ import org.generationcp.middleware.v2.domain.DataSet;
 import org.generationcp.middleware.v2.domain.DatasetNode;
 import org.generationcp.middleware.v2.domain.FactorDetails;
 import org.generationcp.middleware.v2.domain.FolderNode;
-import org.generationcp.middleware.v2.domain.ObservationDetails;
+import org.generationcp.middleware.v2.domain.VariateDetails;
 import org.generationcp.middleware.v2.domain.StudyDetails;
 import org.generationcp.middleware.v2.domain.StudyNode;
 import org.generationcp.middleware.v2.domain.StudyQueryFilter;
@@ -92,8 +92,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 	
 	@Override
-	public List<ObservationDetails> getObservations(Integer projectId) throws MiddlewareQueryException {
-		return getObservationDetailsBuilder().build(projectId);
+	public List<VariateDetails> getVariates(Integer projectId) throws MiddlewareQueryException {
+		return getVariateDetailsBuilder().build(projectId);
 	}
 	
 	@Override
