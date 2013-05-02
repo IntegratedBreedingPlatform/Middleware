@@ -20,7 +20,6 @@ import java.util.Map;
 
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.BibrefDAO;
-import org.generationcp.middleware.dao.CountryDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.MethodDAO;
@@ -65,7 +64,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     private AttributeDAO attributeDao;
     private BibrefDAO bibrefDao;
-    private CountryDAO countryDao;
     private GermplasmDAO germplasmDao;
     private LocationDAO locationDao;
     private MethodDAO methodDao;
@@ -100,14 +98,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         }
         bibrefDao.setSession(getActiveSession());
         return bibrefDao;
-    }
-
-    private CountryDAO getCountryDao() {
-        if (countryDao == null) {
-            countryDao = new CountryDAO();
-        }
-        countryDao.setSession(getActiveSession());
-        return countryDao;
     }
 
     private GermplasmDAO getGermplasmDao() {

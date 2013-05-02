@@ -24,7 +24,6 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
 
     private InstallationDAO installationDao;
     private PersonDAO personDao;
-    private UserDAO userDao;
 
     public UserDataManagerImpl() {
         super();
@@ -52,14 +51,6 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
         }
         personDao.setSession(getActiveSession());
         return personDao;
-    }
-
-    private UserDAO getUserDao() {
-        if (userDao == null) {
-            userDao = new UserDAO();
-        }
-        userDao.setSession(getActiveSession());
-        return userDao;
     }
 
     @SuppressWarnings("unchecked")

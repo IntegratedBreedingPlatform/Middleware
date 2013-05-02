@@ -18,7 +18,6 @@ import java.util.List;
 
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
-import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
@@ -38,7 +37,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
     private GermplasmListDAO germplasmListDao;
 	private GermplasmListDataDAO germplasmListDataDao;
-	private UserDAO userDao = new UserDAO();
 	
 	private GermplasmListDAO getGermplasmListDAO() {
 		if (germplasmListDao == null) {
@@ -56,14 +54,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		return germplasmListDataDao;
 	}
 
-    private UserDAO getUserDao() {
-        if (userDao == null) {
-            userDao = new UserDAO();
-        }
-        userDao.setSession(getActiveSession());
-        return userDao;
-    }	
-	
     public GermplasmListManagerImpl() {
     }
 

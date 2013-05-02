@@ -10,31 +10,27 @@
  * 
  *******************************************************************************/
 
-package org.generationcp.middleware.v2.domain.searcher;
+package org.generationcp.middleware.v2.domain.saver;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.v2.domain.DatabaseBroker;
 
 /**
- * Mainly used for local-central initially.
+ * The super class for all the Saver classes. 
  * 
- * @author Donald Barre
+ * @author Joyce Avestro
  */
-public abstract class Searcher extends DatabaseBroker{
+public abstract class Saver extends DatabaseBroker{
 
     /**
      * Instantiates a new data manager given session providers for local and central.
      */
-    protected Searcher(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
+    protected Saver(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
        super(sessionProviderForLocal, sessionProviderForCentral);
     }
     
-    protected final ExperimentSearcher getExperimentSearcher() {
-    	return new ExperimentSearcher(sessionProviderForLocal, sessionProviderForCentral);
-    }
-    
-    protected final ProjectSearcher getProjectSearcher() {
-    	return new ProjectSearcher(sessionProviderForLocal, sessionProviderForCentral);
+    protected final StudySaver getStudySaver() {
+    	return new StudySaver(sessionProviderForLocal, sessionProviderForCentral);
     }
 
 }

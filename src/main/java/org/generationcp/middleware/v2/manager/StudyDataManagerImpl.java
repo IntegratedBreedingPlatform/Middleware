@@ -9,9 +9,6 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DataManager;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.Study;
-import org.generationcp.middleware.v2.dao.DmsProjectDao;
-import org.generationcp.middleware.v2.dao.ProjectPropertyDao;
-import org.generationcp.middleware.v2.dao.ProjectRelationshipDao;
 import org.generationcp.middleware.v2.domain.AbstractNode;
 import org.generationcp.middleware.v2.domain.CVTermId;
 import org.generationcp.middleware.v2.domain.DataSet;
@@ -22,16 +19,10 @@ import org.generationcp.middleware.v2.domain.ObservationDetails;
 import org.generationcp.middleware.v2.domain.StudyDetails;
 import org.generationcp.middleware.v2.domain.StudyNode;
 import org.generationcp.middleware.v2.domain.StudyQueryFilter;
-import org.generationcp.middleware.v2.factory.ProjectFactory;
-import org.generationcp.middleware.v2.factory.ProjectPropertyFactory;
-import org.generationcp.middleware.v2.factory.ProjectRelationshipFactory;
 import org.generationcp.middleware.v2.factory.StudyFactory;
 import org.generationcp.middleware.v2.manager.api.StudyDataManager;
 import org.generationcp.middleware.v2.pojos.DmsProject;
-import org.generationcp.middleware.v2.pojos.ProjectProperty;
-import org.generationcp.middleware.v2.pojos.ProjectRelationship;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,12 +30,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	
     private static final Logger LOG = LoggerFactory.getLogger(StudyDataManagerImpl.class);
 
-	private DmsProjectDao dmsProjectDao;
-
-	private ProjectPropertyDao projectPropertyDao;
-	
-	private ProjectRelationshipDao projectRelationshipDao;
-	
 	public StudyDataManagerImpl() { 		
 	}
 
@@ -56,33 +41,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public StudyDataManagerImpl(Session sessionForLocal, Session sessionForCentral) {
 		super(sessionForLocal, sessionForCentral);
 	}
-
-	private DmsProjectDao getDmsProjectDao() {
-		if (dmsProjectDao == null) {
-			dmsProjectDao = new DmsProjectDao();
-		}
-		dmsProjectDao.setSession(getActiveSession());
-		return dmsProjectDao;
-	}
-
-	private ProjectPropertyDao getProjectPropertyDao() {
-		if (projectPropertyDao == null) {
-			projectPropertyDao = new ProjectPropertyDao();
-		}
-		projectPropertyDao.setSession(getActiveSession());
-		return projectPropertyDao;
-	}
 	
-	private ProjectRelationshipDao getProjectRelationshipDao() {
-		if (projectRelationshipDao == null) {
-			projectRelationshipDao = new ProjectRelationshipDao();
-		}
-		projectRelationshipDao.setSession(getActiveSession());
-		return projectRelationshipDao;
-	}
-	
-	
-	private StudyFactory getStudyFactory() {
+	public StudyFactory getStudyFactory() {
 		return StudyFactory.getInstance();
 	}
 	
@@ -157,8 +117,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         requireLocalDatabaseInstance();
         DmsProject parent = getDmsProjectDao().getById(study.getHierarchy()); 
 		try {
-			study.setId(saveStudy(study, parent));
+			study.setId(getStudySaver().saveStudy(study, parent));
         } catch (Exception e) {
+        	e.printStackTrace();
             logAndThrowException("Error encountered with addStudy(study=" + study + "): " + e.getMessage(), e, LOG);
 		}
 		return study;
@@ -168,68 +129,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     public StudyDetails addStudyDetails(StudyDetails studyDetails) throws MiddlewareQueryException{
         requireLocalDatabaseInstance();
 		try {
-			studyDetails.setId(saveStudy(new Study(studyDetails), null));
+			studyDetails.setId(getStudySaver().saveStudy(new Study(studyDetails), null));
         } catch (Exception e) {
           logAndThrowException("Error encountered with addStudyDetails(studyDetails=" + studyDetails + "): " + e.getMessage(), e, LOG);
 		}
 		return studyDetails;	
     }
 	
-	private Integer saveStudy(Study study, DmsProject parent) throws Exception{
-        Session session = getCurrentSessionForLocal();
-        Transaction trans = null;
-        Integer id = null;
-
-        try {
-            trans = session.beginTransaction();
-            
-            // Save project
-            DmsProjectDao projectDao = getDmsProjectDao();
-            DmsProject project = ProjectFactory.getInstance().createProject(study);
-            Integer generatedId = projectDao.getNegativeId("projectId");
-            project.setProjectId(generatedId);
-            DmsProject savedProject = projectDao.save(project);
-            
-            // Save project properties
-            List<ProjectProperty> properties = ProjectPropertyFactory.getInstance().
-            										createProjectProperties(study, project);
-            ProjectPropertyDao projectPropertyDao = getProjectPropertyDao();
-            
-            for (ProjectProperty property : properties){
-                generatedId = projectPropertyDao.getNegativeId("projectPropertyId");
-                property.setProjectPropertyId(generatedId);
-                 property.setProject(savedProject);
-                 projectPropertyDao.save(property);
-            }
-            savedProject.setProperties(properties);
-           
-            // Save the relationship to parent and add relationship is_study
-            if (parent == null){
-            	parent = projectDao.getById(DmsProject.SYSTEM_FOLDER_ID); // Make the new study a root study 
-            }
-            List<ProjectRelationship> relationships = ProjectRelationshipFactory.getInstance().
-            											createProjectRelationship(study, parent);
-            ProjectRelationshipDao projectRelationshipDao = getProjectRelationshipDao();
-            
-            for (ProjectRelationship relationship : relationships){
-                generatedId = projectRelationshipDao.getNegativeId("projectRelationshipId");
-                relationship.setProjectRelationshipId(generatedId);
-                relationship.setObjectProject(savedProject);
-                relationship.setSubjectProject(parent);
-                projectRelationshipDao.save(relationship);
-            }
-            savedProject.setRelatedTos(relationships);
-            
-            id = savedProject.getProjectId();
-
-            trans.commit();
-            
-        } catch (Exception e) {
-            rollbackTransaction(trans);
-            throw e;
-        }
-        return id;
-		
-	}
 
 }
