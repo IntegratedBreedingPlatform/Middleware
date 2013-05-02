@@ -6,62 +6,71 @@ import org.generationcp.middleware.v2.util.Debug;
 
 public class VariableType extends CvTerm {
 
-    private Integer propertyId;
+	// TODO to be removed once cvterm is no longer the parent class
+    public VariableType(int id, String name, String description) {
+		super(id, name, description);
+	}
+    public VariableType() {
+    }
+
+	private CvTerm property;
     
-    private Integer scaleId;
+    private CvTerm scale;
     
-    private Integer methodId;
+    private CvTerm method;
     
-    private Integer dataTypeId;
+    private CvTerm dataType;
     
-    private Integer storedInId;
+    private CvTerm storedIn;
     
     private String localName;
     
     private String localDescription;
     
+    private Integer rank;
+    
     private VariableConstraints constraints;  // may be null
     
     private Set<NameSynonym> nameSynonyms;
 
-	public Integer getPropertyId() {
-		return propertyId;
+	public CvTerm getProperty() {
+		return property;
 	}
 
-	public void setPropertyId(Integer propertyId) {
-		this.propertyId = propertyId;
+	public void setProperty(CvTerm property) {
+		this.property = property;
 	}
 
-	public Integer getScaleId() {
-		return scaleId;
+	public CvTerm getScale() {
+		return scale;
 	}
 
-	public void setScaleId(Integer scaleId) {
-		this.scaleId = scaleId;
+	public void setScale(CvTerm scale) {
+		this.scale = scale;
 	}
 
-	public Integer getMethodId() {
-		return methodId;
+	public CvTerm getMethod() {
+		return method;
 	}
 
-	public void setMethodId(Integer methodId) {
-		this.methodId = methodId;
+	public void setMethod(CvTerm method) {
+		this.method = method;
 	}
 
-	public Integer getDataTypeId() {
-		return dataTypeId;
+	public CvTerm getDataType() {
+		return dataType;
 	}
 
-	public void setDataTypeId(Integer dataTypeId) {
-		this.dataTypeId = dataTypeId;
+	public void setDataType(CvTerm dataType) {
+		this.dataType = dataType;
 	}
 
-	public Integer getStoredInId() {
-		return storedInId;
+	public CvTerm getStoredIn() {
+		return storedIn;
 	}
 
-	public void setStoredInId(Integer storedInId) {
-		this.storedInId = storedInId;
+	public void setStoredIn(CvTerm storedIn) {
+		this.storedIn = storedIn;
 	}
 
 	public String getLocalName() {
@@ -96,16 +105,24 @@ public class VariableType extends CvTerm {
 		this.nameSynonyms = nameSynonyms;
 	}
 
+	public Integer getRank() {
+		return rank;
+	}
+
+	public void setRank(Integer rank) {
+		this.rank = rank;
+	}
+
 	public void print(int indent) {
 		Debug.println(indent, "Variable Type: ");
 		indent += 3;
-		super.print(indent);
+		//super.print(indent);
 		Debug.println(indent, "localName: " + localName);
 		Debug.println(indent, "localDescription: "  + localDescription);
-		Debug.println(indent, "propertyId: " + propertyId);
-		Debug.println(indent, "methodId: " + methodId);
-		Debug.println(indent, "scaleId: " + scaleId);
-		Debug.println(indent, "storedInId: " + storedInId);
+		Debug.println(indent, "property: " + property);
+		Debug.println(indent, "method " + method);
+		Debug.println(indent, "scale: " + scale);
+		Debug.println(indent, "storedIn: " + storedIn);
 		if (this.constraints != null) {
 			this.constraints.print(indent);
 		}

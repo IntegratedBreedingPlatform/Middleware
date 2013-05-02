@@ -107,22 +107,22 @@ public class ExperimentBuilder extends Builder {
 	}
 
 	private boolean isLocationFactor(VariableType variableType) {
-		if (variableType.getStoredInId().equals(CVTermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId())) {
+		if (variableType.getStoredIn().getId() == CVTermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
 			return true;
 		}
-		if (variableType.getStoredInId().equals(CVTermId.TRIAL_INSTANCE_STORAGE.getId())) {
+		if (variableType.getStoredIn().getId() == CVTermId.TRIAL_INSTANCE_STORAGE.getId()) {
 			return true;
 		}
-	    if (variableType.getStoredInId().equals(CVTermId.LATITUDE_STORAGE.getId())) {
+	    if (variableType.getStoredIn().getId() == CVTermId.LATITUDE_STORAGE.getId()) {
 	    	return true;
 	    }
-		if (variableType.getStoredInId().equals(CVTermId.LONGITUDE_STORAGE.getId())) {
+		if (variableType.getStoredIn().getId() == CVTermId.LONGITUDE_STORAGE.getId()) {
 			return true;
 		}
-		if (variableType.getStoredInId().equals(CVTermId.DATUM_STORAGE.getId())) {
+		if (variableType.getStoredIn().getId() == CVTermId.DATUM_STORAGE.getId()) {
 			return true;
 		}
-		if (variableType.getStoredInId().equals(CVTermId.ALTITUDE_STORAGE.getId())) {
+		if (variableType.getStoredIn().getId() == CVTermId.ALTITUDE_STORAGE.getId()) {
 			return true;
 		}
 		
@@ -130,22 +130,22 @@ public class ExperimentBuilder extends Builder {
 	}
 
 	private Variable createLocationFactor(Geolocation geoLocation, VariableType variableType) {
-		if (variableType.getStoredInId().equals(CVTermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId())) {
+		if (variableType.getStoredIn().getId() == CVTermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
 			return new Variable(variableType, findLocationValue(variableType.getId(), geoLocation.getProperties()));
 		}
-		if (variableType.getStoredInId().equals(CVTermId.TRIAL_INSTANCE_STORAGE.getId())) {
+		if (variableType.getStoredIn().getId() == CVTermId.TRIAL_INSTANCE_STORAGE.getId()) {
 			return new Variable(variableType, geoLocation.getDescription());
 		}
-	    if (variableType.getStoredInId().equals(CVTermId.LATITUDE_STORAGE.getId())) {
+	    if (variableType.getStoredIn().getId() == CVTermId.LATITUDE_STORAGE.getId()) {
 	    	return new Variable(variableType, geoLocation.getLatitude());
 	    }
-		if (variableType.getStoredInId().equals(CVTermId.LONGITUDE_STORAGE.getId())) {
+		if (variableType.getStoredIn().getId() == CVTermId.LONGITUDE_STORAGE.getId()) {
 			return new Variable(variableType, geoLocation.getLongitude());
 		}
-		if (variableType.getStoredInId().equals(CVTermId.DATUM_STORAGE.getId())) {
+		if (variableType.getStoredIn().getId() == CVTermId.DATUM_STORAGE.getId()) {
 			return new Variable(variableType, geoLocation.getGeodeticDatum());
 		}
-		if (variableType.getStoredInId().equals(CVTermId.ALTITUDE_STORAGE.getId())) {
+		if (variableType.getStoredIn().getId() == CVTermId.ALTITUDE_STORAGE.getId()) {
 			return new Variable(variableType, geoLocation.getAltitude());
 		}
 		return null;
@@ -198,38 +198,38 @@ public class ExperimentBuilder extends Builder {
 	}
 
 	private boolean isGermplasmFactor(VariableType variableType) {
-		if (variableType.getStoredInId().equals(CVTermId.GERMPLASM_ENTRY_STORAGE.getId())) {
+		if (variableType.getStoredIn().getId() == CVTermId.GERMPLASM_ENTRY_STORAGE.getId()) {
 			return true;
 		}
-		if (variableType.getStoredInId().equals(CVTermId.ENTRY_NUMBER_STORAGE.getId())) {
+		if (variableType.getStoredIn().getId() == CVTermId.ENTRY_NUMBER_STORAGE.getId()) {
 			return true;
 		}
-		if (variableType.getStoredInId().equals(CVTermId.ENTRY_GID_STORAGE.getId())) {
+		if (variableType.getStoredIn().getId() == CVTermId.ENTRY_GID_STORAGE.getId()) {
 			return true;
 		}
-		if (variableType.getStoredInId().equals(CVTermId.ENTRY_DESIGNATION_STORAGE.getId())) {
+		if (variableType.getStoredIn().getId() == CVTermId.ENTRY_DESIGNATION_STORAGE.getId()) {
 			return true;
 		}
-		if (variableType.getStoredInId().equals(CVTermId.ENTRY_CODE_STORAGE.getId())) {
+		if (variableType.getStoredIn().getId() == CVTermId.ENTRY_CODE_STORAGE.getId()) {
 			return true;
 		}
 		return false;
 	}
 	
 	private Variable createGermplasmFactor(Stock stock, VariableType variableType) {
-		if (variableType.getStoredInId().equals(CVTermId.GERMPLASM_ENTRY_STORAGE.getId())) {
+		if (variableType.getStoredIn().getId() == CVTermId.GERMPLASM_ENTRY_STORAGE.getId()) {
 			return new Variable(variableType, findStockValue(variableType.getId(), stock.getProperties()));
 		}
-		if (variableType.getStoredInId().equals(CVTermId.ENTRY_NUMBER_STORAGE.getId())) {
+		if (variableType.getStoredIn().getId() == CVTermId.ENTRY_NUMBER_STORAGE.getId()) {
 			return new Variable(variableType, stock.getUniqueName());
 		}
-		if (variableType.getStoredInId().equals(CVTermId.ENTRY_GID_STORAGE.getId())) {
+		if (variableType.getStoredIn().getId() == CVTermId.ENTRY_GID_STORAGE.getId()) {
 			return new Variable(variableType, stock.getDbxrefId());
 		}
-		if (variableType.getStoredInId().equals(CVTermId.ENTRY_DESIGNATION_STORAGE.getId())) {
+		if (variableType.getStoredIn().getId() == CVTermId.ENTRY_DESIGNATION_STORAGE.getId()) {
 			return new Variable(variableType, stock.getName());
 		}
-		if (variableType.getStoredInId().equals(CVTermId.ENTRY_CODE_STORAGE.getId())) {
+		if (variableType.getStoredIn().getId() == CVTermId.ENTRY_CODE_STORAGE.getId()) {
 			return new Variable(variableType, stock.getValue());
 		}
 		return null;

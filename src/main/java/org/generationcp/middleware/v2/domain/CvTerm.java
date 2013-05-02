@@ -10,6 +10,15 @@ public class CvTerm {
 	
 	private String description;
 
+	public CvTerm() {
+	}
+	
+	public CvTerm(int id, String name, String description) {
+		this.id = id;
+		this.name = name;
+		this.description = description;
+	}
+
 	public int getId() {
 		return id;
 	}

@@ -15,7 +15,7 @@ public class FactorDetailsBuilder extends AbstractVariableDetailsBuilder<FactorD
 	@Override
 	public boolean isAccepted(VariableType variable) {
 		return (variable != null 
-				&& !OBSERVATION_TYPES.contains(variable.getStoredInId()));
+				&& !OBSERVATION_TYPES.contains(variable.getStoredIn().getId()));
 	}
 
 	@Override

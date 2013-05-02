@@ -12,7 +12,6 @@ import org.generationcp.middleware.v2.domain.CVTermId;
 import org.generationcp.middleware.v2.domain.VariableDetails;
 import org.generationcp.middleware.v2.domain.VariableInfo;
 import org.generationcp.middleware.v2.domain.VariableType;
-import org.generationcp.middleware.v2.pojos.CVTerm;
 import org.generationcp.middleware.v2.pojos.DmsProject;
 import org.generationcp.middleware.v2.pojos.ProjectProperty;
 
@@ -66,21 +65,13 @@ public abstract class AbstractVariableDetailsBuilder <T extends VariableDetails>
 		details.setId(variable.getId());
 		details.setName(variable.getLocalName());
 		details.setDescription(variable.getLocalDescription());
-		details.setProperty(getTerm(variable.getPropertyId()));
-		details.setMethod(getTerm(variable.getMethodId()));
-		details.setScale(getTerm(variable.getScaleId()));
-		details.setDataType(getDataType(variable.getDataTypeId()));
+		details.setProperty(variable.getProperty().getName());
+		details.setMethod(variable.getMethod().getName());
+		details.setScale(variable.getScale().getName());
+		details.setDataType(getDataType(variable.getDataType().getId()));
 		details.setStudyId(projectId);
 		
 		return details;
-	}
-	
-	private String getTerm(Integer termId) throws MiddlewareQueryException {
-		CVTerm term = getCvTermDao().getById(termId);
-		if (term != null) {
-			return term.getName();
-		}
-		return null;
 	}
 	
 	private String getDataType(Integer termId) {
