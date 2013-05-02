@@ -4,15 +4,10 @@ import java.util.Set;
 
 import org.generationcp.middleware.v2.util.Debug;
 
-public class VariableType extends CvTerm {
+public class VariableType {
 
-	// TODO to be removed once cvterm is no longer the parent class
-    public VariableType(int id, String name, String description) {
-		super(id, name, description);
-	}
-    public VariableType() {
-    }
-
+	private CvTerm term = new CvTerm();
+	
 	private CvTerm property;
     
     private CvTerm scale;
@@ -32,6 +27,30 @@ public class VariableType extends CvTerm {
     private VariableConstraints constraints;  // may be null
     
     private Set<NameSynonym> nameSynonyms;
+
+    public int getId() {
+    	return term.getId();
+    }
+    
+	public void setId(int id) {
+		term.setId(id);
+	}
+
+	public String getName() {
+		return term.getName();
+	}
+
+	public void setName(String name) {
+		term.setName(name);
+	}
+
+	public String getDescription() {
+		return term.getDescription();
+	}
+
+	public void setDescription(String description) {
+		term.setDescription(description);
+	}
 
 	public CvTerm getProperty() {
 		return property;
