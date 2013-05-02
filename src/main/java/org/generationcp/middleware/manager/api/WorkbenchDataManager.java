@@ -21,6 +21,7 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.UserDetails;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -221,6 +222,23 @@ public interface WorkbenchDataManager {
      * @throws MiddlewareQueryException
      */
     public Integer getUserLogInCounter(String userName) throws MiddlewareQueryException;
+    
+    /**
+     * increments the log in counter 
+     *
+     * @param userName - the user name to check
+     * @throws MiddlewareQueryException
+     */
+    public void incrementUserLogInCounter(String userName) throws MiddlewareQueryException;
+    
+    /**
+     * adds a new details record 
+     *
+     * @param userName - the user name to check
+     * @throws MiddlewareQueryException
+     */
+    public void addUserDetailsRecord(UserDetails userDetails) throws MiddlewareQueryException;
+    
     
     /**
      * Adds the person.

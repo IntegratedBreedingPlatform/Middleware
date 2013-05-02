@@ -138,8 +138,7 @@ public class ProjectUserRoleDAO extends GenericDAO<ProjectUserRole, Integer>{
                 Integer personId = (Integer) user[7];
                 Integer aDate = (Integer) user[8];
                 Integer cDate = (Integer) user[9];
-                Integer uLogincount = (Integer) user[10];
-                User u = new User(userId, instalId, uStatus, uAccess, uType, uName, upswd, personId, aDate, cDate,uLogincount);
+                User u = new User(userId, instalId, uStatus, uAccess, uType, uName, upswd, personId, aDate, cDate);
                 users.add(u);
             }
 

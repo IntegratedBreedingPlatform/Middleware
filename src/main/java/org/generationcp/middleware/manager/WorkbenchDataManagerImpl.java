@@ -23,14 +23,15 @@ import org.generationcp.middleware.dao.ProjectBackupDAO;
 import org.generationcp.middleware.dao.ProjectDAO;
 import org.generationcp.middleware.dao.ProjectLocationMapDAO;
 import org.generationcp.middleware.dao.ProjectMethodDAO;
+import org.generationcp.middleware.dao.ProjectUserInfoDAO;
 import org.generationcp.middleware.dao.ProjectUserMysqlAccountDAO;
 import org.generationcp.middleware.dao.ProjectUserRoleDAO;
-import org.generationcp.middleware.dao.ProjectUserInfoDAO;
 import org.generationcp.middleware.dao.RoleDAO;
 import org.generationcp.middleware.dao.SecurityQuestionDAO;
 import org.generationcp.middleware.dao.ToolConfigurationDAO;
 import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.dao.UserDAO;
+import org.generationcp.middleware.dao.UserDetailsDAO;
 import org.generationcp.middleware.dao.WorkbenchDatasetDAO;
 import org.generationcp.middleware.dao.WorkbenchRuntimeDataDAO;
 import org.generationcp.middleware.dao.WorkbenchSettingDAO;
@@ -40,6 +41,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.UserDetails;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -86,6 +88,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     private ToolConfigurationDAO toolConfigurationDao;
     private ToolDAO toolDao;
     private UserDAO userDao;
+    private UserDetailsDAO userDetailsDao;
     private WorkbenchDatasetDAO workbenchDatasetDao;
     private WorkbenchRuntimeDataDAO workbenchRuntimeDataDao;
     private WorkbenchSettingDAO workbenchSettingDao;
@@ -239,6 +242,14 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         }
         userDao.setSession(getCurrentSession());
         return userDao;
+    }
+    
+    private UserDetailsDAO getUserDetailsDao() {
+        if (userDetailsDao == null){
+        	userDetailsDao = new UserDetailsDAO();
+        }
+        userDetailsDao.setSession(getCurrentSession());
+        return userDetailsDao;
     }
 
     private WorkbenchDatasetDAO getWorkbenchDatasetDao() {
@@ -1374,11 +1385,31 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 	public Integer getUserLogInCounter(String userName)
 			throws MiddlewareQueryException {
 		
-		User user = getUserDao().getUserDetailsByUsername(userName);
-		System.out.println("User is "+ user);
+		UserDetails userdetails = getUserDetailsDao().getByUsername(userName);
+		System.out.println("UserDetails is "+ userdetails);
 		
-		return user.getUlogincount();
+		if(userdetails != null)
+			return userdetails.getUlogincnt();
+		else
+			return 0;
 	}
+	public void incrementUserLogInCounter(String userName) throws MiddlewareQueryException {
+		
+		UserDetails userdetails = getUserDetailsDao().getByUsername(userName);
+		if(userdetails != null)
+		{
+			getUserDetailsDao().updateLoginCounter(userdetails);
+		} 
+		else
+		{
+			System.out.println("incrementUserLogInCounter null");
+		}
+	}
+	public void addUserDetailsRecord(UserDetails userDetails) throws MiddlewareQueryException 
+	{
+		getUserDetailsDao().addUserDetails(userDetails);
+	}
+	
 
 	@Override
 	public boolean changeUserPassword(String username, String password)

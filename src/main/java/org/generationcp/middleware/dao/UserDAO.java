@@ -36,18 +36,6 @@ public class UserDAO extends GenericDAO<User, Integer>{
             
             @SuppressWarnings("unchecked")
             List<User> users = criteria.list();
-            
-            if(users.size() > 0)
-            {
-	            int ulogincount = (int)(users.get(0)).getUlogincount().intValue();
-	            ulogincount++;
-	            String queryString = "update users set ulogincount = "+ ulogincount + " where uname = '"+ username + "' and upswd = '" + password+"'";
-	            Session s = getSession();
-	            Query q = s.createSQLQuery(queryString);
-	            q.executeUpdate();
-	             
-            }
-            
             return users.size() > 0 ? users.get(0) : null;
         } catch (HibernateException e) {
             logAndThrowException("Error with getByUsernameAndPassword(username="+username+") query from User: " + e.getMessage(), e);
