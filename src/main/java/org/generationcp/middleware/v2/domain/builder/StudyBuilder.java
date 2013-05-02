@@ -29,7 +29,12 @@ public class StudyBuilder extends Builder {
 		study.setName(project.getName());
 		study.setDescription(project.getDescription());
 		study.setVariableTypes(getVariableTypeBuilder().create(project.getProperties()));
+		
+		//TODO get conditions only from project then assign to study
 		study.setConditions(getVariableBuilder().create(project.getProperties(), study.getVariableTypes()));
+		
+		study.setConstants(getVariableBuilder().create(project.getConstants(), study.getVariableTypes()));
+		
 		return study;
 	}
 

@@ -43,7 +43,7 @@ public enum CVTermId {
 	//Folder, Study, Dataset Nodes
 	, HAS_PARENT_FOLDER(1140)
 	, BELONGS_TO_STUDY(1150) 
-	, IS_STUDY(1145) //TODO For confirmation
+	, IS_STUDY(1145)
 	
 	//Properties
 	, SEASON(2452)

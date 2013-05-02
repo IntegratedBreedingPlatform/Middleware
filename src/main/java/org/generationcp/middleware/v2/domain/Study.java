@@ -18,6 +18,9 @@ public class Study {
 	private VariableList conditions;
 	
 	private VariableTypeList variableTypes;
+	
+	private VariableList constants;
+	
 
 	public int getId() {
 		return id;
@@ -67,6 +70,14 @@ public class Study {
 		this.conditions = conditions;
 	}
 
+	public VariableList getConstants() {
+		return constants;
+	}
+
+	public void setConstants(VariableList constants) {
+		this.constants = constants;
+	}
+	
 	public void print(int indent) {
 		Debug.println(indent, "Study: ");
 		Debug.println(indent + 3, "Id: " + getId());
@@ -81,6 +92,11 @@ public class Study {
 	    Debug.println(indent + 3, "Conditions: ");
 	    for (Variable condition : conditions.getVariables()) {
 	    	condition.print(indent + 6);
+	    }
+	    
+	    Debug.println(indent + 3, "Constants: ");
+	    for (Variable constant : constants.getVariables()) {
+	    	constant.print(indent + 6);
 	    }
 	    
 	    Debug.println(indent + 3, "Data Sets: ");

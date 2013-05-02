@@ -3,6 +3,7 @@ package org.generationcp.middleware.v2.factory;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.v2.domain.CVTermId;
 import org.generationcp.middleware.v2.pojos.DmsProject;
@@ -16,7 +17,7 @@ public class ProjectRelationshipFactory {
 		return instance;
 	}
 	
-	public List<ProjectRelationship> createProjectRelationship(Study study, DmsProject parent) {
+	public List<ProjectRelationship> createProjectRelationship(Study study, DmsProject parent) throws MiddlewareException {
 		ArrayList<ProjectRelationship> relationships = null;
 
 		if (study != null) {
@@ -25,7 +26,7 @@ public class ProjectRelationshipFactory {
 		return relationships;
 	}
 	
-	private ArrayList<ProjectRelationship>  mapStudyToRelationships(Study study, DmsProject parent) {
+	private ArrayList<ProjectRelationship>  mapStudyToRelationships(Study study, DmsProject parent) throws MiddlewareException {
 		ArrayList<ProjectRelationship> relationships = new ArrayList<ProjectRelationship>();
 		
 		DmsProject project = ProjectFactory.getInstance().createProject(study);

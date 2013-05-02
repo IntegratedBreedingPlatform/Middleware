@@ -12,6 +12,7 @@
 package org.generationcp.middleware.v2.pojos;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -160,6 +161,29 @@ public class DmsProject implements Serializable {
 	public void setExperimentModels(List<ExperimentModel> experimentModels) {
 		this.experimentModels = experimentModels;
 	}
+	
+	public List<ProjectProperty> getConditions(){
+		List<ProjectProperty> conditions = new ArrayList<ProjectProperty>();
+		
+		//TODO Get the conditions from properties
+		
+		return conditions;
+		
+	}
+
+	public List<ProjectProperty> getConstants(){
+		List<ProjectProperty> constants = new ArrayList<ProjectProperty>();
+		
+		for (ProjectProperty property : properties){
+			if (property.getTypeId() == (CVTermId.OBSERVATION_VARIATE.getId()) || 
+					property.getTypeId() == (CVTermId.CATEGORICAL_VARIATE.getId())){
+				constants.add(property);
+			}
+		}		
+		return constants;
+		
+	}
+
 
 	@Override
 	public int hashCode() {

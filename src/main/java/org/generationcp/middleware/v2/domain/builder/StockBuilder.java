@@ -2,8 +2,6 @@ package org.generationcp.middleware.v2.domain.builder;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.v2.domain.Study;
-import org.generationcp.middleware.v2.pojos.DmsProject;
 import org.generationcp.middleware.v2.pojos.Stock;
 
 public class StockBuilder extends Builder {

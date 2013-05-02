@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2012, All Rights Reserved.
+ * 
+ * Generation Challenge Programme (GCP)
+ * 
+ * 
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * 
+ *******************************************************************************/
 package org.generationcp.middleware.v2.domain.saver;
 
 import java.util.List;
@@ -5,19 +16,27 @@ import java.util.List;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.v2.dao.DmsProjectDao;
+import org.generationcp.middleware.v2.dao.ExperimentDao;
 import org.generationcp.middleware.v2.dao.ProjectPropertyDao;
 import org.generationcp.middleware.v2.dao.ProjectRelationshipDao;
 import org.generationcp.middleware.v2.factory.ProjectFactory;
 import org.generationcp.middleware.v2.factory.ProjectPropertyFactory;
 import org.generationcp.middleware.v2.factory.ProjectRelationshipFactory;
 import org.generationcp.middleware.v2.pojos.DmsProject;
+import org.generationcp.middleware.v2.pojos.ExperimentModel;
 import org.generationcp.middleware.v2.pojos.ProjectProperty;
 import org.generationcp.middleware.v2.pojos.ProjectRelationship;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+/**
+ * Saves a study (the corresponding Project, ProjectProperty,
+ * ProjectRelationship and Experiment entries) to the database.
+ * 
+ * @author Joyce Avestro
+ * 
+ */
 public class StudySaver extends Saver{
-
 	
 	public StudySaver(HibernateSessionProvider sessionProviderForLocal,
             HibernateSessionProvider sessionProviderForCentral) {
@@ -69,6 +88,14 @@ public class StudySaver extends Saver{
                 projectRelationshipDao.save(relationship);
             }
             savedProject.setRelatedTos(relationships);
+            
+            
+            //TODO Add an entry to nd_experiment
+            ExperimentDao experimentDao = getExperimentDao();
+            generatedId = experimentDao.getNegativeId("ndExperimentId");
+            ExperimentModel experiment = new ExperimentModel();
+            
+            
             
             id = savedProject.getProjectId();
 
