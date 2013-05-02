@@ -1,12 +1,10 @@
 package org.generationcp.middleware.v2.domain.builder;
 
-import java.util.List;
 import java.util.Set;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.v2.domain.DataSet;
-import org.generationcp.middleware.v2.domain.Experiment;
 import org.generationcp.middleware.v2.domain.Study;
 import org.generationcp.middleware.v2.domain.VariableInfo;
 import org.generationcp.middleware.v2.domain.VariableTypeList;
@@ -37,7 +35,6 @@ public class DataSetBuilder extends Builder {
 		dataSet.setDescription(project.getDescription());
 		dataSet.setStudy(getStudy(project));
 		dataSet.setVariableTypes(getVariableTypes(dataSet.getStudy(), project));
-		dataSet.setExperiments(createExperiments(project, dataSet.getVariableTypes()));
 		return dataSet;
 	}
 
@@ -61,10 +58,6 @@ public class DataSetBuilder extends Builder {
 	private int getStudyId(DmsProject project) {
 		DmsProject study = project.getRelatedTos().get(0).getObjectProject();
 		return study.getProjectId();
-	}
-	
-	private List<Experiment> createExperiments(DmsProject project, VariableTypeList variableTypes) throws MiddlewareQueryException {
-		return getExperimentBuilder().create(getActiveDatabase(), project.getExperimentModels(), variableTypes);
 	}
 	
 }

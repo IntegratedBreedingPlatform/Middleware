@@ -1,7 +1,5 @@
 package org.generationcp.middleware.v2.domain;
 
-import java.util.List;
-
 import org.generationcp.middleware.v2.util.Debug;
 
 public class DataSet {
@@ -13,8 +11,6 @@ public class DataSet {
 	private String description;
 	
 	private Study study;
-	
-	private List<Experiment> experiments;
 	
 	private VariableTypeList variableTypes;
 
@@ -61,29 +57,11 @@ public class DataSet {
 		this.variableTypes = variableTypes;
 	}
 
-	public List<Experiment> getExperiments() {
-		return experiments;
-	}
-
-	public void setExperiments(List<Experiment> experiments) {
-		this.experiments = experiments;
-		if (experiments != null) {
-			for (Experiment experiment : experiments) {
-				experiment.setDataSet(this);
-			}
-		}
-	}
-	
 	public void print(int indent) {
 		Debug.println(indent, "DataSet: ");
 		Debug.println(indent + 3, "Id: " + getId());
 		Debug.println(indent + 3, "Name: " + getName());
 	    Debug.println(indent + 3, "Description: " + getDescription());
-	    
-	    Debug.println(indent + 3, "Experiments:" );
-	    for (Experiment experiment : experiments) {
-	    	experiment.print(indent + 6);
-	    }
 	}
 	
 	public boolean equals(Object obj) {
