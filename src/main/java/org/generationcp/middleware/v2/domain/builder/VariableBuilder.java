@@ -8,7 +8,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.v2.domain.Variable;
 import org.generationcp.middleware.v2.domain.VariableInfo;
 import org.generationcp.middleware.v2.domain.VariableList;
-import org.generationcp.middleware.v2.domain.VariableType;
+import org.generationcp.middleware.v2.domain.VariableTypeList;
 import org.generationcp.middleware.v2.pojos.ProjectProperty;
 
 public class VariableBuilder extends Builder {
@@ -18,7 +18,7 @@ public class VariableBuilder extends Builder {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 
-	public VariableList create(List<ProjectProperty> properties, Set<VariableType> variableTypes) throws MiddlewareQueryException {
+	public VariableList create(List<ProjectProperty> properties, VariableTypeList variableTypes) throws MiddlewareQueryException {
 		VariableList variables = new VariableList();
 		
 		Set<VariableInfo> variableInfoList = getVariableInfoBuilder().create(properties);
@@ -29,20 +29,11 @@ public class VariableBuilder extends Builder {
 		return variables;
 	}
 
-	private Variable createVariable(VariableInfo variableInfo, List<ProjectProperty> properties, Set<VariableType> variableTypes) throws MiddlewareQueryException {
+	private Variable createVariable(VariableInfo variableInfo, List<ProjectProperty> properties, VariableTypeList variableTypes) throws MiddlewareQueryException {
 		 Variable variable = new Variable();
-		 variable.setVariableType(findVariableType(variableInfo.getStdVariableId(), variableTypes));
+		 variable.setVariableType(variableTypes.findById(variableInfo.getStdVariableId()));
 		 variable.setValue(getValue(properties, variableInfo.getStdVariableId()));
 		 return variable;
-	}
-
-	private VariableType findVariableType(int stdVariableId, Set<VariableType> variableTypes) {
-		for (VariableType variableType : variableTypes) {
-			if (variableType.getId() == stdVariableId) {
-				return variableType;
-			}
-		}
-		return null;
 	}
 
 	private String getValue(List<ProjectProperty> properties, int stdVariableId) {
@@ -52,11 +43,5 @@ public class VariableBuilder extends Builder {
 			}
 		}
 		return null;
-	}
-	
-	
-	
-	
-
-	
+	}	
 }

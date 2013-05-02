@@ -1,6 +1,5 @@
 package org.generationcp.middleware.v2.domain.builder;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -10,6 +9,7 @@ import org.generationcp.middleware.v2.domain.CVTermId;
 import org.generationcp.middleware.v2.domain.VariableConstraints;
 import org.generationcp.middleware.v2.domain.VariableInfo;
 import org.generationcp.middleware.v2.domain.VariableType;
+import org.generationcp.middleware.v2.domain.VariableTypeList;
 import org.generationcp.middleware.v2.pojos.CVTerm;
 import org.generationcp.middleware.v2.pojos.CVTermProperty;
 import org.generationcp.middleware.v2.pojos.CVTermRelationship;
@@ -22,10 +22,10 @@ public class VariableTypeBuilder extends Builder {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 	
-	public Set<VariableType> create(List<ProjectProperty> properties) throws MiddlewareQueryException {
+	public VariableTypeList create(List<ProjectProperty> properties) throws MiddlewareQueryException {
 		Set<VariableInfo> variableInfoList = getVariableInfoBuilder().create(properties);
 		
-		Set<VariableType> variableTypes = new HashSet<VariableType>();
+		VariableTypeList variableTypes = new VariableTypeList();
 		for (VariableInfo variableInfo : variableInfoList) {
 			variableTypes.add(create(variableInfo));
 		}

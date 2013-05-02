@@ -1,7 +1,6 @@
 package org.generationcp.middleware.v2.domain;
 
 import java.util.List;
-import java.util.Set;
 
 import org.generationcp.middleware.v2.util.Debug;
 
@@ -17,7 +16,7 @@ public class DataSet {
 	
 	private List<Experiment> experiments;
 	
-	private Set<VariableType> variableTypes;
+	private VariableTypeList variableTypes;
 
 	public int getId() {
 		return id;
@@ -54,11 +53,11 @@ public class DataSet {
 		}
 	}
 
-	public Set<VariableType> getVariableTypes() {
+	public VariableTypeList getVariableTypes() {
 		return variableTypes;
 	}
 
-	public void setVariableTypes(Set<VariableType> variableTypes) {
+	public void setVariableTypes(VariableTypeList variableTypes) {
 		this.variableTypes = variableTypes;
 	}
 

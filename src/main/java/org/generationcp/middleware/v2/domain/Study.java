@@ -17,7 +17,7 @@ public class Study {
 	
 	private VariableList conditions;
 	
-	private Set<VariableType> variableTypes;
+	private VariableTypeList variableTypes;
 
 	public int getId() {
 		return id;
@@ -51,11 +51,11 @@ public class Study {
 		this.dataSets = dataSets;
 	}
 
-	public Set<VariableType> getVariableTypes() {
+	public VariableTypeList getVariableTypes() {
 		return variableTypes;
 	}
 
-	public void setVariableTypes(Set<VariableType> variableTypes) {
+	public void setVariableTypes(VariableTypeList variableTypes) {
 		this.variableTypes = variableTypes;
 	}
 
@@ -74,7 +74,7 @@ public class Study {
 	    Debug.println(indent + 3, "Description: " + getDescription());
 	    
 	    Debug.println(indent + 3, "Variable Types: ");
-	    for (VariableType variableType : variableTypes) {
+	    for (VariableType variableType : variableTypes.getVariableTypes()) {
 	    	variableType.print(indent + 6);
 	    }
 	    
