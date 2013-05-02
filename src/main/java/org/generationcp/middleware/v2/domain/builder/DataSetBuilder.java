@@ -27,6 +27,20 @@ public class DataSetBuilder extends Builder {
 		}
 		return dataSet;
 	}
+	
+	public VariableTypeList getVariableTypes(int dataSetId) throws MiddlewareQueryException {
+		VariableTypeList variableTypeList = new VariableTypeList();
+		if (setWorkingDatabase(dataSetId)) {
+			DmsProject project = getDmsProjectDao().getById(dataSetId);
+			if (project != null) {
+				Set<VariableInfo> variableInfoList = getVariableInfoBuilder().create(project.getProperties());
+				for (VariableInfo variableInfo : variableInfoList) {
+					variableTypeList.add(getVariableTypeBuilder().create(variableInfo));
+				}
+			}
+		}
+		return variableTypeList;
+	}
 
 	private DataSet createDataSet(DmsProject project) throws MiddlewareQueryException {
 		DataSet dataSet = new DataSet();

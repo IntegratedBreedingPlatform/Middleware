@@ -28,6 +28,7 @@ import org.generationcp.middleware.v2.domain.AbstractNode;
 import org.generationcp.middleware.v2.domain.CVTermId;
 import org.generationcp.middleware.v2.domain.DataSet;
 import org.generationcp.middleware.v2.domain.DatasetNode;
+import org.generationcp.middleware.v2.domain.Experiment;
 import org.generationcp.middleware.v2.domain.FactorDetails;
 import org.generationcp.middleware.v2.domain.FolderNode;
 import org.generationcp.middleware.v2.domain.VariateDetails;
@@ -229,9 +230,24 @@ public class TestStudyDataManagerImpl {
 	}
 
 	@Test
-	public void getDataSet() throws Exception {
+	public void testGetDataSet() throws Exception {
 		DataSet dataSet = manager.getDataSet(DATASET_ID);
 		dataSet.getStudy().print(0);
+	}
+	
+	@Test
+	public void testCountExperiments() throws Exception {
+		System.out.println("Dataset Experiment Count: " +  manager.countExperiments(DATASET_ID));
+	}
+	
+	@Test
+	public void testGetExperiments() throws Exception {
+		for (int i = 0; i < 2; i++) {
+			List<Experiment> experiments = manager.getExperiments(DATASET_ID, 50 * i, 50);
+			for (Experiment experiment : experiments) {
+				experiment.print(0);
+			}
+		}
 	}
 	
 	public void testAddDataSet() throws Exception {

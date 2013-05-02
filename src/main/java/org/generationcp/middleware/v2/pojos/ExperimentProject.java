@@ -17,7 +17,10 @@ import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 
@@ -46,16 +49,16 @@ public class ExperimentProject implements Serializable {
 	 * Related Experiment entity
 	 */
 	@Basic(optional = false)
-	@Column(name = "nd_experiment_id")
-	private Integer experiment;
+	@OneToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "nd_experiment_id")
+	private ExperimentModel experiment;
 	
 	/**
 	 * Related Project entity
 	 */
 	@Basic(optional = false)
 	@Column(name = "project_id")
-	
-	private Integer project;
+	private Integer projectId;
 	
 	public ExperimentProject(){
 		
@@ -73,20 +76,20 @@ public class ExperimentProject implements Serializable {
 		this.experimentProjectId = experimentProjectId;
 	}
 
-	public Integer getExperiment() {
+	public ExperimentModel getExperiment() {
 		return experiment;
 	}
 
-	public void setExperiment(Integer experiment) {
+	public void setExperiment(ExperimentModel experiment) {
 		this.experiment = experiment;
 	}
 
-	public Integer getProject() {
-		return project;
+	public Integer getProjectId() {
+		return projectId;
 	}
 
-	public void setProject(Integer project) {
-		this.project = project;
+	public void setProjectId(Integer projectId) {
+		this.projectId = projectId;
 	}
 
 	@Override
@@ -126,8 +129,8 @@ public class ExperimentProject implements Serializable {
 		builder.append(experimentProjectId);
 		builder.append(", experiment=");
 		builder.append(experiment);
-		builder.append(", project=");
-		builder.append(project);
+		builder.append(", projectId=");
+		builder.append(projectId);
 		builder.append("]");
 		return builder.toString();
 	}

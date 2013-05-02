@@ -21,8 +21,10 @@ import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.v2.domain.AbstractNode;
 import org.generationcp.middleware.v2.domain.DataSet;
 import org.generationcp.middleware.v2.domain.DatasetNode;
+import org.generationcp.middleware.v2.domain.Experiment;
 import org.generationcp.middleware.v2.domain.FactorDetails;
 import org.generationcp.middleware.v2.domain.FolderNode;
+import org.generationcp.middleware.v2.domain.VariableTypeList;
 import org.generationcp.middleware.v2.domain.VariateDetails;
 import org.generationcp.middleware.v2.domain.StudyDetails;
 import org.generationcp.middleware.v2.domain.StudyNode;
@@ -86,6 +88,22 @@ public interface StudyDataManager {
 	 * @throws MiddlewareQueryException
 	 */
 	DataSet getDataSet(int dataSetId) throws MiddlewareQueryException;
+	
+	/**
+	 * Get experiments from a dataset.  Each experiment contains 
+	 * @param datasetId
+	 * @param startIndex
+	 * @param numRows
+	 * @return
+	 */
+	List<Experiment> getExperiments(int dataSetId, int startIndex, int numRows) throws MiddlewareQueryException;
+	
+	/**
+	 * Get the count of the number of experiments in a dataset.
+	 * @param dataSetId
+	 * @return
+	 */
+	int countExperiments(int dataSetId) throws MiddlewareQueryException;
 	
 	/**
 	 * Returns the list of study nodes for a particular search filter.

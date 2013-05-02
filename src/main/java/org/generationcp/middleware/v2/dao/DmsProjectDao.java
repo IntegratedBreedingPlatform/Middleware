@@ -307,11 +307,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			criteria.add(Restrictions.eq("p.value", factorId.toString()));
 
 			List<DmsProject> results = criteria.list();
-			if (results != null && results.size() > 0) {
-				for (DmsProject project : results) {
-					Hibernate.initialize(project.getExperimentModels());
-				}
-			}
+			
 			return results;
 		
 		} catch(HibernateException e) {

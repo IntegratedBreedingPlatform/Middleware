@@ -14,6 +14,7 @@ import org.generationcp.middleware.v2.domain.VariableList;
 import org.generationcp.middleware.v2.domain.VariableType;
 import org.generationcp.middleware.v2.domain.VariableTypeList;
 import org.generationcp.middleware.v2.pojos.ExperimentModel;
+import org.generationcp.middleware.v2.pojos.ExperimentProject;
 import org.generationcp.middleware.v2.pojos.ExperimentProperty;
 import org.generationcp.middleware.v2.pojos.ExperimentStock;
 import org.generationcp.middleware.v2.pojos.Geolocation;
@@ -28,47 +29,43 @@ public class ExperimentBuilder extends Builder {
 			                 HibernateSessionProvider sessionProviderForCentral) {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
+	
+	public int count(int dataSetId) throws MiddlewareQueryException {
+		if (setWorkingDatabase(dataSetId)) {
+			return (int) getExperimentProjectDao().count(dataSetId);
+		}
+		return 0;
+	}
 
-	public List<Experiment> create(Database database, List<ExperimentModel> experimentModels, VariableTypeList variableTypes) throws MiddlewareQueryException {
-		this.setWorkingDatabase(database);
-		
+	public List<Experiment> build(int dataSetId, int startIndex, int maxResults, VariableTypeList variableTypes) throws MiddlewareQueryException {
 		List<Experiment> experiments = new ArrayList<Experiment>();
-		for (ExperimentModel experimentModel : experimentModels) {
-			if (experimentModel.getTypeId().equals(CVTermId.PLOT_EXPERIMENT.getId())) {
-	            experiments.add(create(experimentModel, experimentModels, variableTypes));
+		if (setWorkingDatabase(dataSetId)) {
+			List<ExperimentProject> experimentProjects = getExperimentProjectDao().getExperimentProjects(dataSetId, startIndex, maxResults);
+			for (ExperimentProject experimentProject : experimentProjects) {
+				experiments.add(createExperiment(experimentProject.getExperiment(), variableTypes));
 			}
 		}
 		return experiments;
 	}
-
-	public Experiment create(ExperimentModel experimentModel, List<ExperimentModel> experimentModels, VariableTypeList variableTypes) throws MiddlewareQueryException {
+	
+	private Experiment createExperiment(ExperimentModel experimentModel, VariableTypeList variableTypes) throws MiddlewareQueryException {
 		Experiment experiment = new Experiment();
 		experiment.setId(experimentModel.getNdExperimentId());
-		experiment.setFactors(getFactors(experimentModel, experimentModels, variableTypes));
-		experiment.setVariates(getVariates(experimentModel, experimentModels, variableTypes));
+		experiment.setFactors(getFactors(experimentModel, variableTypes));
+		experiment.setVariates(getVariates(experimentModel, variableTypes));
 		return experiment;
 	}
 
-	private VariableList getVariates(ExperimentModel experimentModel, List<ExperimentModel> experimentModels, VariableTypeList variableTypes) {
+	private VariableList getVariates(ExperimentModel experimentModel, VariableTypeList variableTypes) {
 		VariableList variates = new VariableList();
 		
 		addPlotVariates(experimentModel, variates, variableTypes);
-		addDataSetVariates(experimentModels, variates, variableTypes);
-		addStudyVariates(experimentModels, variates, variableTypes);
 		
 		return variates;
 	}
 
 	private void addPlotVariates(ExperimentModel experimentModel, VariableList variates, VariableTypeList variableTypes) {
 		addVariates(experimentModel, variates, variableTypes);
-	}
-
-	private void addDataSetVariates(List<ExperimentModel> experimentModels, VariableList variates, VariableTypeList variableTypes) {
-		for (ExperimentModel experiment : experimentModels) {
-			if (experiment.getTypeId().equals(CVTermId.DATASET_EXPERIMENT.getId())) {
-			    addVariates(experiment, variates, variableTypes);
-			}
-		}
 	}
 
 	private void addVariates(ExperimentModel experiment, VariableList variates, VariableTypeList variableTypes) {
@@ -78,20 +75,10 @@ public class ExperimentBuilder extends Builder {
 		}
 	}
 
-	private void addStudyVariates(List<ExperimentModel> experimentModels, VariableList variates, VariableTypeList variableTypes) {
-		for (ExperimentModel experiment : experimentModels) {
-			if (experiment.getTypeId().equals(CVTermId.STUDY_EXPERIMENT.getId())) {
-				addVariates(experiment, variates, variableTypes);
-			}
-		}
-	}
-
-	private VariableList getFactors(ExperimentModel experimentModel, List<ExperimentModel> experimentModels, VariableTypeList variableTypes) throws MiddlewareQueryException {
+	private VariableList getFactors(ExperimentModel experimentModel, VariableTypeList variableTypes) throws MiddlewareQueryException {
 		VariableList factors = new VariableList();
 		
 		addPlotExperimentFactors(factors, experimentModel, variableTypes);
-		addDataSetExperimentFactors(experimentModels, factors, variableTypes);
-		addStudyExperimentFactors(experimentModels, factors, variableTypes);
 		
 		addLocationFactors(experimentModel, factors, variableTypes);
 		
@@ -165,24 +152,6 @@ public class ExperimentBuilder extends Builder {
 	private void addPlotExperimentFactors(VariableList variables, ExperimentModel experimentModel, VariableTypeList variableTypes) throws MiddlewareQueryException {
 		addExperimentFactors(variables, experimentModel, variableTypes);
 		addGermplasmFactors(variables, experimentModel, variableTypes);
-	}
-
-	private void addDataSetExperimentFactors(List<ExperimentModel> experimentModels, VariableList variables, VariableTypeList variableTypes) throws MiddlewareQueryException {
-		for (ExperimentModel experiment : experimentModels) {
-			if (experiment.getTypeId().equals(CVTermId.DATASET_EXPERIMENT.getId())) {
-			    addExperimentFactors(variables, experiment, variableTypes);
-			    addGermplasmFactors(variables, experiment, variableTypes);
-			}
-		}
-	}
-
-	private void addStudyExperimentFactors(List<ExperimentModel> experimentModels, VariableList variables, VariableTypeList variableTypes) throws MiddlewareQueryException {
-		for (ExperimentModel experiment : experimentModels) {
-			if (experiment.getTypeId().equals(CVTermId.STUDY_EXPERIMENT.getId())) {
-				addExperimentFactors(variables, experiment, variableTypes);
-				addGermplasmFactors(variables, experiment, variableTypes);
-			}
-		}
 	}
 	
 	private void addGermplasmFactors(VariableList factors, ExperimentModel experimentModel, VariableTypeList variableTypes) throws MiddlewareQueryException {

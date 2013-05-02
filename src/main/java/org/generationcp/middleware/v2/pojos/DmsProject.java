@@ -81,15 +81,6 @@ public class DmsProject implements Serializable {
 	@OneToMany(mappedBy = "objectProject", fetch = FetchType.LAZY)
 	private List<ProjectRelationship> relatedBys;
 	
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(
-            name="nd_experiment_project",
-            joinColumns = @JoinColumn( name="project_id"),
-            inverseJoinColumns = @JoinColumn( name="nd_experiment_id")
-    )
-	private List<ExperimentModel> experimentModels;
-	
-	
 	public DmsProject() {
 	}
 
@@ -153,14 +144,6 @@ public class DmsProject implements Serializable {
 	public void setRelatedBys(List<ProjectRelationship> relatedBys) {
 		this.relatedBys = relatedBys;
 	}
-
-	public List<ExperimentModel> getExperimentModels() {
-		return experimentModels;
-	}
-
-	public void setExperimentModels(List<ExperimentModel> experimentModels) {
-		this.experimentModels = experimentModels;
-	}
 	
 	public List<ProjectProperty> getConditions(){
 		List<ProjectProperty> conditions = new ArrayList<ProjectProperty>();
@@ -221,16 +204,4 @@ public class DmsProject implements Serializable {
 	public String getEntityName(){
 		return "DmsProject";
 	}
-
-	public ExperimentModel findExperimentByType(CVTermId typeId) {
-		if (experimentModels != null) {
-			for (ExperimentModel experiment : experimentModels) {
-				if (typeId.getId().equals(experiment.getTypeId())) {
-					return experiment;
-				}
-			}
-		}
-		return null;
-	}
-
 }

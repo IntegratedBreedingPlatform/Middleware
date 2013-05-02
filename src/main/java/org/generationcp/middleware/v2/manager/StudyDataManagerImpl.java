@@ -13,8 +13,10 @@ import org.generationcp.middleware.v2.domain.AbstractNode;
 import org.generationcp.middleware.v2.domain.CVTermId;
 import org.generationcp.middleware.v2.domain.DataSet;
 import org.generationcp.middleware.v2.domain.DatasetNode;
+import org.generationcp.middleware.v2.domain.Experiment;
 import org.generationcp.middleware.v2.domain.FactorDetails;
 import org.generationcp.middleware.v2.domain.FolderNode;
+import org.generationcp.middleware.v2.domain.VariableTypeList;
 import org.generationcp.middleware.v2.domain.VariateDetails;
 import org.generationcp.middleware.v2.domain.StudyDetails;
 import org.generationcp.middleware.v2.domain.StudyNode;
@@ -143,4 +145,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		return null;
 	}
 
+	@Override
+	public List<Experiment> getExperiments(int dataSetId, int startIndex, int numRows) throws MiddlewareQueryException {
+		VariableTypeList variableTypes = getDataSetBuilder().getVariableTypes(dataSetId);
+		return getExperimentBuilder().build(dataSetId, startIndex, numRows, variableTypes);
+	}
+
+	@Override
+	public int countExperiments(int dataSetId) throws MiddlewareQueryException {
+		return getExperimentBuilder().count(dataSetId);
+	}
 }
