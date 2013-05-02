@@ -281,6 +281,10 @@ public class ManagerFactory implements Serializable {
     	return new org.generationcp.middleware.v2.manager.StudyDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
     }
 
+    public org.generationcp.middleware.v2.manager.api.OntologyDataManager getNewOntologyDataManager() throws ConfigException {
+    	return new org.generationcp.middleware.v2.manager.OntologyDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
     public InventoryDataManager getInventoryDataManager() throws ConfigException {
         if (sessionProviderForLocal == null) {
             throw new ConfigException("The InventoryDataManager needs a connection to a local IBDB instance which is not provided.");

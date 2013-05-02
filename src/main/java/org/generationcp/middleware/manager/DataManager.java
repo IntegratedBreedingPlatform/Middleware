@@ -20,6 +20,7 @@ import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.v2.domain.DatabaseBroker;
+import org.generationcp.middleware.v2.domain.builder.CvTermBuilder;
 import org.generationcp.middleware.v2.domain.builder.DataSetBuilder;
 import org.generationcp.middleware.v2.domain.builder.FactorDetailsBuilder;
 import org.generationcp.middleware.v2.domain.builder.ObservationDetailsBuilder;
@@ -784,6 +785,10 @@ public abstract class DataManager extends DatabaseBroker{
             }
         }
         return negativeIds;
+    }
+
+    protected final CvTermBuilder getCvTermBuilder() {
+    	return new CvTermBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
 
     protected final StudyBuilder getStudyBuilder() {
