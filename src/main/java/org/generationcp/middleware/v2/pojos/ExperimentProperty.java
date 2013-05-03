@@ -42,7 +42,7 @@ public class ExperimentProperty implements Serializable {
 	@Column(name = "rank", columnDefinition = "default 0")
 	private Integer rank;
 	
-    @ManyToOne(targetEntity = Stock.class)
+    @ManyToOne
     @JoinColumn(name = "nd_experiment_id", nullable = false)
 	private ExperimentModel experiment;
     
