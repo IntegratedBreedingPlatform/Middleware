@@ -29,6 +29,7 @@ import org.generationcp.middleware.v2.domain.builder.StudyBuilder;
 import org.generationcp.middleware.v2.domain.builder.StudyNodeBuilder;
 import org.generationcp.middleware.v2.domain.builder.VariableInfoBuilder;
 import org.generationcp.middleware.v2.domain.builder.VariableTypeBuilder;
+import org.generationcp.middleware.v2.domain.saver.DatasetProjectSaver;
 import org.generationcp.middleware.v2.domain.saver.StudySaver;
 import org.generationcp.middleware.v2.domain.searcher.ProjectSearcher;
 import org.hibernate.Session;
@@ -830,6 +831,10 @@ public abstract class DataManager extends DatabaseBroker{
     
     protected final StudySaver getStudySaver() {
     	return new StudySaver(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    protected final DatasetProjectSaver getDatasetProjectSaver() {
+    	return new DatasetProjectSaver(sessionProviderForLocal, sessionProviderForCentral);
     }
     
 }

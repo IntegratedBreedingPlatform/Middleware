@@ -25,7 +25,9 @@ import org.generationcp.middleware.v2.dao.ExperimentDao;
 import org.generationcp.middleware.v2.dao.ExperimentProjectDao;
 import org.generationcp.middleware.v2.dao.ExperimentPropertyDao;
 import org.generationcp.middleware.v2.dao.ExperimentStockDao;
+import org.generationcp.middleware.v2.dao.GeolocationDao;
 import org.generationcp.middleware.v2.dao.GeolocationPropertyDao;
+import org.generationcp.middleware.v2.dao.PhenotypeDao;
 import org.generationcp.middleware.v2.dao.ProjectPropertyDao;
 import org.generationcp.middleware.v2.dao.ProjectRelationshipDao;
 import org.generationcp.middleware.v2.dao.StockDao;
@@ -445,5 +447,17 @@ public class DatabaseBroker {
 		projectRelationshipDao.setSession(getActiveSession());
 		return projectRelationshipDao;
 	}
+    
+    protected final GeolocationDao getGeolocationDao() {
+    	GeolocationDao geolocationDao = new GeolocationDao();
+    	geolocationDao.setSession(getActiveSession());
+    	return geolocationDao;
+    }
+
+    protected final PhenotypeDao getPhenotypeDao() {
+    	PhenotypeDao phenotypeDao = new PhenotypeDao();
+    	phenotypeDao.setSession(getActiveSession());
+    	return phenotypeDao;
+    }
 
 }

@@ -33,6 +33,15 @@ public abstract class Saver extends DatabaseBroker{
     	return new StudySaver(sessionProviderForLocal, sessionProviderForCentral);
     }
 
-    protected final ProjectPropertySaver getProjectPropertyBuilder() {
+    protected final ProjectPropertySaver getProjectPropertySaver() {
     	return new ProjectPropertySaver(sessionProviderForLocal, sessionProviderForCentral);
-    }}
+    }
+
+    protected final GeolocationSaver getGeolocationSaver() {
+    	return new GeolocationSaver(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    protected final StockSaver getStockSaver() {
+    	return new StockSaver(sessionProviderForLocal, sessionProviderForCentral);
+    }
+}

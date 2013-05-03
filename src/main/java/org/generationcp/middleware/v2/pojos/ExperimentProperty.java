@@ -6,6 +6,8 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -40,6 +42,12 @@ public class ExperimentProperty implements Serializable {
 	@Column(name = "rank", columnDefinition = "default 0")
 	private Integer rank;
 	
+    @ManyToOne(targetEntity = Stock.class)
+    @JoinColumn(name = "nd_experiment_id", nullable = false)
+	private ExperimentModel experiment;
+    
+	
+
 	public ExperimentProperty(){
 		
 	}
@@ -123,6 +131,14 @@ public class ExperimentProperty implements Serializable {
 
 	public void setRank(Integer rank) {
 		this.rank = rank;
+	}
+
+	public ExperimentModel getExperiment() {
+		return experiment;
+	}
+
+	public void setExperiment(ExperimentModel experiment) {
+		this.experiment = experiment;
 	}
 
 	

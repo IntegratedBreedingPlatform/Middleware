@@ -17,15 +17,16 @@ import org.generationcp.middleware.v2.domain.DatasetNode;
 import org.generationcp.middleware.v2.domain.Experiment;
 import org.generationcp.middleware.v2.domain.FactorDetails;
 import org.generationcp.middleware.v2.domain.FolderNode;
-import org.generationcp.middleware.v2.domain.VariableTypeList;
-import org.generationcp.middleware.v2.domain.VariateDetails;
 import org.generationcp.middleware.v2.domain.StudyDetails;
 import org.generationcp.middleware.v2.domain.StudyNode;
 import org.generationcp.middleware.v2.domain.StudyQueryFilter;
+import org.generationcp.middleware.v2.domain.VariableTypeList;
+import org.generationcp.middleware.v2.domain.VariateDetails;
 import org.generationcp.middleware.v2.factory.StudyFactory;
 import org.generationcp.middleware.v2.manager.api.StudyDataManager;
 import org.generationcp.middleware.v2.pojos.DmsProject;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -166,9 +167,20 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	
 
 	@Override
-	public DataSet addDataSet(DataSet dataset) throws MiddlewareQueryException {
-		// TODO Auto-generated method stub
-		return null;
+	public void addDataSet(DataSet dataset) throws MiddlewareQueryException {
+		requireLocalDatabaseInstance();
+		Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+ 
+        try {
+            trans = session.beginTransaction();
+			getDatasetProjectSaver().saveDataSet(dataset);
+	        trans.commit();
+	        
+	    } catch (Exception e) {
+	    	rollbackTransaction(trans);
+	        throw new MiddlewareQueryException("error in save " + e.getMessage(), e);
+	    }
 	}
 
 	@Override

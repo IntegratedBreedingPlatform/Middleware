@@ -2,6 +2,7 @@ package org.generationcp.middleware.v2.domain.saver;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.v2.domain.DataSet;
 import org.generationcp.middleware.v2.pojos.DmsProject;
 
@@ -13,8 +14,10 @@ public class DatasetProjectSaver extends Saver {
 	}
 
 	public void saveDataSet(DataSet dataset) throws MiddlewareQueryException {
-		DmsProject datasetProject = createDataSet(dataset);
-		datasetProject.setProperties(getProjectPropertyBuilder().create(datasetProject, dataset.getVariableTypes()));
+		setWorkingDatabase(Database.LOCAL);
+		
+  		DmsProject datasetProject = createDataSet(dataset);
+		datasetProject.setProperties(getProjectPropertySaver().create(datasetProject, dataset.getVariableTypes()));
 		
 		getDmsProjectDao().save(datasetProject);
 	}
