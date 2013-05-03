@@ -29,6 +29,9 @@ public class VariableInfoBuilder {
 		variableDef.setLocalName(localNameProperty == null ? null : localNameProperty.getValue());
 	    variableDef.setLocalDescription(localDescriptionProperty == null ? null : localDescriptionProperty.getValue());
 	    variableDef.setStdVariableId(Integer.parseInt(stdVariableProperty.getValue()));
+	    if (properties.iterator().hasNext()) {
+	    	variableDef.setRank(properties.iterator().next().getRank());
+	    }
 	    
 		return variableDef;
 	}

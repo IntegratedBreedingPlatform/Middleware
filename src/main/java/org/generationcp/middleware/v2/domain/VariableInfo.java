@@ -8,6 +8,8 @@ public class VariableInfo {
 	
 	private String localDescription;
 	
+	private int rank;
+	
 	private int stdVariableId;
 
 	public String getLocalName() {
@@ -32,6 +34,14 @@ public class VariableInfo {
 
 	public void setStdVariableId(int stdVariableId) {
 		this.stdVariableId = stdVariableId;
+	}
+
+	public int getRank() {
+		return rank;
+	}
+
+	public void setRank(int rank) {
+		this.rank = rank;
 	}
 
 	public void print(int indent) {

@@ -31,6 +31,8 @@ import org.generationcp.middleware.v2.domain.DatasetNode;
 import org.generationcp.middleware.v2.domain.Experiment;
 import org.generationcp.middleware.v2.domain.FactorDetails;
 import org.generationcp.middleware.v2.domain.FolderNode;
+import org.generationcp.middleware.v2.domain.VariableType;
+import org.generationcp.middleware.v2.domain.VariableTypeList;
 import org.generationcp.middleware.v2.domain.VariateDetails;
 import org.generationcp.middleware.v2.domain.StudyDetails;
 import org.generationcp.middleware.v2.domain.StudyNode;
@@ -270,19 +272,20 @@ public class TestStudyDataManagerImpl {
 		}
 	}
 	
+	@Test
 	public void testAddDataSet() throws Exception {
 		//get a dataset test data from central
 		Integer datasetId = 10015;
 		DataSet dataset = manager.getDataSet(datasetId);
 		
 		//save the dataset to local (copied from central)
-		DataSet newDataset = manager.addDataSet(dataset);
+		/*DataSet newDataset = */ manager.addDataSet(dataset);
 		
 		//assert that the old and new dataset are the same, except for their ids
-		System.out.println("ORIGINAL DATASET");
-		dataset.print(0);
-		System.out.println("NEWLY CREATED DATASET");
-		newDataset.print(0);
+		//System.out.println("ORIGINAL DATASET");
+		//dataset.print(0);
+		//System.out.println("NEWLY CREATED DATASET");
+		//newDataset.print(0);
 	}
 	
 	@AfterClass
@@ -291,6 +294,23 @@ public class TestStudyDataManagerImpl {
 			factory.close();
 		}
 	}
-
 	
+/*	private DataSet createDataSet() {
+		DataSet dataset = new DataSet();
+		dataset.setId(1);
+		dataset.setName("dataset 1");
+		dataset.setDescription("description 1");
+		dataset.setVariableTypes(new VariableTypeList());
+		dataset.getVariableTypes().add(createVariableType(CVTermId.));
+	}
+	
+	private VariableType createVariableType(int id, String name, String desc, String localName, String localDescription) {
+		VariableType varType = new VariableType();
+		varType.setId(id);
+		varType.setName(name);
+		varType.setDescription(desc);
+		varType.setLocalName(localName);
+		varType.setLocalDescription(localDescription);
+		return varType;
+	}*/
 }
