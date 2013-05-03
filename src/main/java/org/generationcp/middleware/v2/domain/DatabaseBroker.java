@@ -97,8 +97,16 @@ public class DatabaseBroker {
         return sessionProviderForLocal;
     }
     
+    public void setSessionProviderForLocal(HibernateSessionProvider sessionProviderForLocal){
+    	this.sessionProviderForLocal = sessionProviderForLocal;
+    }
+    
     public HibernateSessionProvider getSessionProviderForCentral() {
         return sessionProviderForCentral;
+    }
+
+    public void setSessionProviderForCentral(HibernateSessionProvider sessionProviderForCentral){
+    	this.sessionProviderForCentral = sessionProviderForCentral;
     }
 
     /**
