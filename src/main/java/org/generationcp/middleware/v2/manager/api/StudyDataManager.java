@@ -24,7 +24,6 @@ import org.generationcp.middleware.v2.domain.DatasetNode;
 import org.generationcp.middleware.v2.domain.Experiment;
 import org.generationcp.middleware.v2.domain.FactorDetails;
 import org.generationcp.middleware.v2.domain.FolderNode;
-import org.generationcp.middleware.v2.domain.VariableTypeList;
 import org.generationcp.middleware.v2.domain.VariateDetails;
 import org.generationcp.middleware.v2.domain.StudyDetails;
 import org.generationcp.middleware.v2.domain.StudyNode;
@@ -131,6 +130,29 @@ public interface StudyDataManager {
 	 * @throws MiddlewareQueryException
 	 */
 	List<VariateDetails> getVariates(Integer projectId) throws MiddlewareQueryException;
+	
+
+	/**
+	 * Retrieves the studies belonging to a given folder id. 
+	 * Assumption: that every study has a parent folder.
+	 * 
+	 * @param folderId
+	 * @param start - the first Study index 
+	 * @param numOfRows - maximum number of Studies to retrieve
+	 * @return the list of studies
+	 * @throws MiddlewareQueryException
+	 */
+	List<StudyDetails> getStudiesByFolder(Integer folderId, int start, int numOfRows) throws MiddlewareQueryException;
+	
+	/**
+	 * Returns the number of studies in the given folder id.
+	 * 
+	 * @param folderId
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	long countStudiesByFolder(Integer folderId) throws MiddlewareQueryException;
+
 
     /**
      * Returns the list of study details by its GID value.

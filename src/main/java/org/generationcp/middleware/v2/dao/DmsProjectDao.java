@@ -27,7 +27,6 @@ import org.generationcp.middleware.v2.domain.FolderNode;
 import org.generationcp.middleware.v2.domain.StudyNode;
 import org.generationcp.middleware.v2.pojos.DmsProject;
 import org.hibernate.Criteria;
-import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.criterion.Criterion;
@@ -44,7 +43,7 @@ import org.hibernate.criterion.Restrictions;
 
 public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
-	public static final String GET_CHILDREN_OF_FOLDER =		
+	private static final String GET_CHILDREN_OF_FOLDER =		
 			"SELECT  DISTINCT subject.project_id, subject.name, IFNULL(is_study.type_id, 0) AS is_study "
 			+ "FROM    project subject "
 			+ "        INNER JOIN project_relationship pr ON subject.project_id = pr.subject_project_id "
@@ -52,6 +51,17 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "        					AND is_study.type_id = " + CVTermId.IS_STUDY.getId() + " "
 			+ "WHERE   pr.type_id = " + CVTermId.HAS_PARENT_FOLDER.getId() + " "
 			+ "        and pr.object_project_id = :folderId "
+			+ "ORDER BY name "
+			;
+	
+	private static final String GET_STUDIES_OF_FOLDER =
+			"SELECT  DISTINCT subject.project_id "
+			+ "FROM    project subject "
+			+ "        INNER JOIN project_relationship pr ON subject.project_id = pr.subject_project_id  " 
+			+ "        LEFT JOIN project_relationship is_study ON subject.project_id = is_study.subject_project_id  " 
+			+ "WHERE   pr.type_id = "  + CVTermId.HAS_PARENT_FOLDER.getId() + " "
+			+ "        AND pr.object_project_id = :folderId "
+			+ "        AND is_study.type_id = " + CVTermId.IS_STUDY.getId() + " "
 			+ "ORDER BY name "
 			;
 
@@ -331,6 +341,51 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			logAndThrowException("Error in getByIds= " + projectIds + " query in DmsProjectDao: " + e.getMessage(), e);
 		}
 		return studyNodes;
+	}
+	
+	
+	@SuppressWarnings("unchecked")
+	public List<DmsProject> getProjectsByFolder(Integer folderId, int start, int numOfRows) throws MiddlewareQueryException{
+		List<DmsProject> projects = new ArrayList<DmsProject>();
+		if (folderId == null){
+			return projects;
+		}
+		
+		try {			
+			// Get projects by folder
+			Query query = getSession().createSQLQuery(DmsProjectDao.GET_STUDIES_OF_FOLDER);
+			query.setParameter("folderId", folderId);
+			query.setFirstResult(start);
+			query.setMaxResults(numOfRows);
+			List<Integer> projectIds =  (List<Integer>) query.list();
+			projects = getByIds(projectIds);
+			
+		} catch (HibernateException e) {
+			logAndThrowException("Error with getProjectsByFolder query from Project: " + e.getMessage(), e);
+		}
+		
+		return projects;
+	}
+
+	@SuppressWarnings("unchecked")
+	public long countProjectsByFolder(Integer folderId) throws MiddlewareQueryException{
+		long count = 0;
+		if (folderId == null) {
+			return count;
+		}
+		
+		try {
+			Query query = getSession().createSQLQuery(DmsProjectDao.GET_STUDIES_OF_FOLDER);
+			query.setParameter("folderId", folderId);
+			List<Object[]> list =  query.list();
+			count = list.size();
+		} catch (HibernateException e) {
+			logAndThrowException("Error in countProjectsByFolder(" + folderId + ") query in DmsProjectDao: " + e.getMessage(), e);
+		}
+		
+		
+		return count;
+
 	}
 
 }

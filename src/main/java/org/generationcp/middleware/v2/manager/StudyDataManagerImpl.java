@@ -1,5 +1,6 @@
 package org.generationcp.middleware.v2.manager;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -64,7 +65,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		if (setWorkingDatabase(instance, getDmsProjectDao())){
 			return getDmsProjectDao().getRootFolders();
 		}
-		return null;
+		return new ArrayList<FolderNode>();
 	}
 	
 	@Override
@@ -72,7 +73,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		if (setWorkingDatabase(instance, getDmsProjectDao())){
 			return getDmsProjectDao().getChildrenOfFolder(folderId);
 		}
-		return null;
+		return new ArrayList<AbstractNode>();
 	}
 	
 	@Override
@@ -80,7 +81,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		if (setWorkingDatabase(studyId, getDmsProjectDao())){
 			return getDmsProjectDao().getDatasetNodesByStudyId(studyId);
 		}
-		return null;
+		return new ArrayList<DatasetNode>();
 	}
 
 	@Override
@@ -98,6 +99,31 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		return getVariateDetailsBuilder().build(projectId);
 	}
 	
+	@Override
+	public List<StudyDetails> getStudiesByFolder(Integer folderId, int start, int numOfRows) throws MiddlewareQueryException{
+		List<StudyDetails> studyDetails = new ArrayList<StudyDetails>();
+		if (setWorkingDatabase(folderId, getDmsProjectDao())) {
+			List<DmsProject> projects = (List<DmsProject>) getDmsProjectDao()
+					.getProjectsByFolder(folderId, start, numOfRows);
+
+			for (DmsProject project : projects) {
+				studyDetails.add(getStudyFactory().createStudyDetails(project));
+			}
+		}
+		return studyDetails;
+	}
+	
+	@Override
+	public long countStudiesByFolder(Integer folderId) throws MiddlewareQueryException{
+		long count = 0;
+		if (setWorkingDatabase(folderId, getDmsProjectDao())) {
+			count = getDmsProjectDao().countProjectsByFolder(folderId);
+		}
+		return count;
+
+	}
+
+
 	@Override
 	public List<StudyNode> searchStudies(StudyQueryFilter filter) throws MiddlewareQueryException {
 		List<DmsProject> projects = getProjectSearcher().searchByFilter(filter);

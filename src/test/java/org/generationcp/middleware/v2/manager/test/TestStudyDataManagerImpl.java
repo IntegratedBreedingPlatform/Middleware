@@ -89,6 +89,26 @@ public class TestStudyDataManagerImpl {
     }
 
     @Test
+    public void testGetStudiesByFolder() throws Exception {
+    	int folderId = 1000;
+    	List<StudyDetails> studies = manager.getStudiesByFolder(folderId, 0, 5);
+    	assertNotNull(studies);
+		Assert.assertTrue(studies.size() > 0);
+		System.out.println("testGetStudiesByFolder(" + folderId + "): " + studies.size());
+    	for (StudyDetails study : studies){
+    		System.out.println(study);
+    	}
+    }
+
+    @Test
+    public void testCountStudiesByFolder() throws Exception {
+    	int folderId = 1000;
+    	long count = manager.countStudiesByFolder(folderId);
+    	Assert.assertTrue(count > 0);
+		System.out.println("testCountStudiesByFolder(" + folderId + "): " + count);
+    }
+
+    @Test
     public void testSearchStudies() throws Exception {
     	System.out.println("testSearchStudies");
     	StudyQueryFilter filter = new StudyQueryFilter();
