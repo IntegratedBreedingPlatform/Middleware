@@ -257,18 +257,24 @@ public class Method implements Serializable{
 
     @Override
     public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
         if (obj == null) {
             return false;
         }
-
-        if (obj instanceof Method) {
-            Method param = (Method) obj;
-            if (this.getMid() == param.getMid()) {
-                return true;
-            }
+        if (getClass() != obj.getClass()) {
+            return false;
         }
-
-        return false;
+        Method other = (Method) obj;
+        if (mid == null) {
+            if (other.getMid() != null) {
+                return false;
+            }
+        } else if (!mid.equals(other.getMid())) {
+            return false;
+        }
+        return true;
     }
 
     @Override
