@@ -20,11 +20,11 @@ import java.util.Set;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.v2.domain.AbstractNode;
+import org.generationcp.middleware.v2.domain.Reference;
 import org.generationcp.middleware.v2.domain.CVTermId;
-import org.generationcp.middleware.v2.domain.DatasetNode;
-import org.generationcp.middleware.v2.domain.FolderNode;
-import org.generationcp.middleware.v2.domain.StudyNode;
+import org.generationcp.middleware.v2.domain.DatasetReference;
+import org.generationcp.middleware.v2.domain.FolderReference;
+import org.generationcp.middleware.v2.domain.StudyReference;
 import org.generationcp.middleware.v2.pojos.DmsProject;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -66,9 +66,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			;
 
 	@SuppressWarnings("unchecked")
-	public List<FolderNode> getRootFolders() throws MiddlewareQueryException{
+	public List<FolderReference> getRootFolders() throws MiddlewareQueryException{
 		
-		List<FolderNode> folderList = new ArrayList<FolderNode>();
+		List<FolderReference> folderList = new ArrayList<FolderReference>();
 		
 		/* SELECT DISTINCT p.projectId, p.name
 		 * 	FROM DmsProject p 
@@ -96,7 +96,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				for (Object[] row : list){
 					Integer id = (Integer)row[0]; //project.id
 					String name = (String) row [1]; //project.name
-					folderList.add(new FolderNode(id, name));
+					folderList.add(new FolderReference(id, name));
 				}
 			}
 		} catch (HibernateException e) {
@@ -108,9 +108,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<AbstractNode> getChildrenOfFolder(Integer folderId) throws MiddlewareQueryException{
+	public List<Reference> getChildrenOfFolder(Integer folderId) throws MiddlewareQueryException{
 		
-		List<AbstractNode> childrenNodes = new ArrayList<AbstractNode>();
+		List<Reference> childrenNodes = new ArrayList<Reference>();
 		
 		try {
 			Query query = getSession().createSQLQuery(GET_CHILDREN_OF_FOLDER);
@@ -123,9 +123,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				Integer isStudy = ((BigInteger) row[2]).intValue(); //non-zero if a study, else a folder
 				
 				if (isStudy > 0){
-					childrenNodes.add(new StudyNode(id, name));
+					childrenNodes.add(new StudyReference(id, name));
 				} else {
-					childrenNodes.add(new FolderNode(id, name));
+					childrenNodes.add(new FolderReference(id, name));
 				}
 			}
 			
@@ -140,9 +140,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	
 
 	@SuppressWarnings("unchecked")
-	public List<DatasetNode> getDatasetNodesByStudyId(Integer studyId) throws MiddlewareQueryException{
+	public List<DatasetReference> getDatasetNodesByStudyId(Integer studyId) throws MiddlewareQueryException{
 		
-		List<DatasetNode> datasetNodes = new ArrayList<DatasetNode>();
+		List<DatasetReference> datasetReferences = new ArrayList<DatasetReference>();
 		
 		try {
 			/*
@@ -171,14 +171,14 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			for (Object[] row : list){
 				Integer id = (Integer) row[0]; //project.id
 				String name = (String) row [1]; //project.name
-				datasetNodes.add(new DatasetNode(id, name));
+				datasetReferences.add(new DatasetReference(id, name));
 			}
 			
 		} catch (HibernateException e) {
 			logAndThrowException("Error with getDatasetNodesByStudyId query from Project: " + e.getMessage(), e);
 		}
 		
-		return datasetNodes;
+		return datasetReferences;
 		
 	}
 	

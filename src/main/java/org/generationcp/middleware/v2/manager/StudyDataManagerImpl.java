@@ -10,15 +10,15 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DataManager;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.Study;
-import org.generationcp.middleware.v2.domain.AbstractNode;
+import org.generationcp.middleware.v2.domain.Reference;
 import org.generationcp.middleware.v2.domain.CVTermId;
 import org.generationcp.middleware.v2.domain.DataSet;
-import org.generationcp.middleware.v2.domain.DatasetNode;
+import org.generationcp.middleware.v2.domain.DatasetReference;
 import org.generationcp.middleware.v2.domain.Experiment;
 import org.generationcp.middleware.v2.domain.FactorDetails;
-import org.generationcp.middleware.v2.domain.FolderNode;
+import org.generationcp.middleware.v2.domain.FolderReference;
 import org.generationcp.middleware.v2.domain.StudyDetails;
-import org.generationcp.middleware.v2.domain.StudyNode;
+import org.generationcp.middleware.v2.domain.StudyReference;
 import org.generationcp.middleware.v2.domain.StudyQueryFilter;
 import org.generationcp.middleware.v2.domain.VariableTypeList;
 import org.generationcp.middleware.v2.domain.VariateDetails;
@@ -62,27 +62,27 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 	
 	@Override
-	public List<FolderNode> getRootFolders(Database instance) throws MiddlewareQueryException{
-		if (setWorkingDatabase(instance, getDmsProjectDao())){
+	public List<FolderReference> getRootFolders(Database instance) throws MiddlewareQueryException {
+		if (setWorkingDatabase(instance)) {
 			return getDmsProjectDao().getRootFolders();
 		}
-		return new ArrayList<FolderNode>();
+		return new ArrayList<FolderReference>();
 	}
 	
 	@Override
-	public List<AbstractNode> getChildrenOfFolder(Integer folderId, Database instance) throws MiddlewareQueryException{
-		if (setWorkingDatabase(instance, getDmsProjectDao())){
+	public List<Reference> getChildrenOfFolder(int folderId) throws MiddlewareQueryException {
+		if (setWorkingDatabase(folderId)) {
 			return getDmsProjectDao().getChildrenOfFolder(folderId);
 		}
-		return new ArrayList<AbstractNode>();
+		return new ArrayList<Reference>();
 	}
 	
 	@Override
-	public List<DatasetNode> getDatasetNodesByStudyId(Integer studyId) throws MiddlewareQueryException{
-		if (setWorkingDatabase(studyId, getDmsProjectDao())){
+	public List<DatasetReference> getDatasetReferences(int studyId) throws MiddlewareQueryException {
+		if (setWorkingDatabase(studyId)) {
 			return getDmsProjectDao().getDatasetNodesByStudyId(studyId);
 		}
-		return new ArrayList<DatasetNode>();
+		return new ArrayList<DatasetReference>();
 	}
 
 	@Override
@@ -126,7 +126,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 
 	@Override
-	public List<StudyNode> searchStudies(StudyQueryFilter filter) throws MiddlewareQueryException {
+	public List<StudyReference> searchStudies(StudyQueryFilter filter) throws MiddlewareQueryException {
 		List<DmsProject> projects = getProjectSearcher().searchByFilter(filter);
 		return getStudyNodeBuilder().build(projects);
 	}
@@ -142,7 +142,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-    public Study addStudy(Study study) throws MiddlewareQueryException{
+    public StudyReference addStudy(Study study) throws MiddlewareQueryException{
         requireLocalDatabaseInstance();
         DmsProject parent = getDmsProjectDao().getById(study.getHierarchy()); 
 		try {
@@ -151,7 +151,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         	e.printStackTrace();
             logAndThrowException("Error encountered with addStudy(study=" + study + "): " + e.getMessage(), e, LOG);
 		}
-		return study;
+		return new StudyReference(study.getId(), study.getName());
     }
 	
 	@Override
@@ -167,7 +167,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	
 
 	@Override
-	public void addDataSet(DataSet dataset) throws MiddlewareQueryException {
+	public DatasetReference addDataSet(DataSet dataset) throws MiddlewareQueryException {
 		requireLocalDatabaseInstance();
 		Session session = getCurrentSessionForLocal();
         Transaction trans = null;
@@ -176,6 +176,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             trans = session.beginTransaction();
 			getDatasetProjectSaver().saveDataSet(dataset);
 	        trans.commit();
+	        return new DatasetReference(dataset.getId(), dataset.getName(), dataset.getDescription());
 	        
 	    } catch (Exception e) {
 	    	rollbackTransaction(trans);

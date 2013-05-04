@@ -18,7 +18,7 @@ package org.generationcp.middleware.v2.domain;
  * @author Darla Ani
  *
  */
-public abstract class AbstractNode {
+public abstract class Reference {
 	
 	private Integer id;
 	
@@ -66,7 +66,7 @@ public abstract class AbstractNode {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		AbstractNode other = (AbstractNode) obj;
+		Reference other = (Reference) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;
@@ -74,9 +74,6 @@ public abstract class AbstractNode {
 			return false;
 		return true;
 	}
-	
-	
-	
 	
 	@Override
 	public String toString() {
@@ -98,7 +95,7 @@ public abstract class AbstractNode {
 	 * 
 	 * @return
 	 */
-	protected abstract String getEntityName();
-	
-
+	private String getEntityName() {
+		return this.getClass().getName();
+	}
 }

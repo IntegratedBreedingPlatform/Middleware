@@ -24,18 +24,16 @@ import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.pojos.Study;
-import org.generationcp.middleware.v2.domain.AbstractNode;
+import org.generationcp.middleware.v2.domain.Reference;
 import org.generationcp.middleware.v2.domain.CVTermId;
 import org.generationcp.middleware.v2.domain.DataSet;
-import org.generationcp.middleware.v2.domain.DatasetNode;
+import org.generationcp.middleware.v2.domain.DatasetReference;
 import org.generationcp.middleware.v2.domain.Experiment;
 import org.generationcp.middleware.v2.domain.FactorDetails;
-import org.generationcp.middleware.v2.domain.FolderNode;
-import org.generationcp.middleware.v2.domain.VariableType;
-import org.generationcp.middleware.v2.domain.VariableTypeList;
+import org.generationcp.middleware.v2.domain.FolderReference;
 import org.generationcp.middleware.v2.domain.VariateDetails;
 import org.generationcp.middleware.v2.domain.StudyDetails;
-import org.generationcp.middleware.v2.domain.StudyNode;
+import org.generationcp.middleware.v2.domain.StudyReference;
 import org.generationcp.middleware.v2.domain.StudyQueryFilter;
 import org.generationcp.middleware.v2.domain.VariableDetails;
 import org.generationcp.middleware.v2.manager.api.StudyDataManager;
@@ -123,20 +121,20 @@ public class TestStudyDataManagerImpl {
     	//filter.setSeason(Season.WET); //currently has no data
     	filter.setStart(0);
     	filter.setNumOfRows(10);
-    	List<StudyNode> studies = manager.searchStudies(filter);
+    	List<StudyReference> studies = manager.searchStudies(filter);
     	System.out.println("INPUT: " + filter);
-    	for (StudyNode study : studies) {
+    	for (StudyReference study : studies) {
     		System.out.println("\t" + study.getId() + " - " + study.getName());
     	}
     }
 
 	@Test
 	public void testGetRootFolders() throws Exception {
-		List<FolderNode> rootFolders = manager.getRootFolders(Database.CENTRAL);
+		List<FolderReference> rootFolders = manager.getRootFolders(Database.CENTRAL);
 		assertNotNull(rootFolders);
 		assert (rootFolders.size() > 0);
 		System.out.println("testGetRootFolders(): " + rootFolders.size());
-		for (FolderNode node : rootFolders) {
+		for (FolderReference node : rootFolders) {
 			System.out.println("   " + node);
 		}
 	}
@@ -144,13 +142,12 @@ public class TestStudyDataManagerImpl {
 	@Test
 	public void testGetChildrenOfFolder() throws Exception {
 		Integer folderId = 1000;
-		List<AbstractNode> childrenNodes = manager.getChildrenOfFolder(
-				folderId, Database.CENTRAL);
+		List<Reference> childrenNodes = manager.getChildrenOfFolder(folderId);
 		assertNotNull(childrenNodes);
 		assert (childrenNodes.size() > 0);
 		System.out
 				.println("testGetChildrenOfFolder(): " + childrenNodes.size());
-		for (AbstractNode node : childrenNodes) {
+		for (Reference node : childrenNodes) {
 			System.out.println("   " + node);
 		}
 	}
@@ -158,13 +155,12 @@ public class TestStudyDataManagerImpl {
 	@Test
 	public void testGetDatasetNodesByStudyId() throws Exception {
 		Integer studyId = 10010;
-		List<DatasetNode> datasetNodes = manager.getDatasetNodesByStudyId(
-				studyId);
-		assertNotNull(datasetNodes);
-		assert (datasetNodes.size() > 0);
+		List<DatasetReference> datasetReferences = manager.getDatasetReferences(studyId);
+		assertNotNull(datasetReferences);
+		assert (datasetReferences.size() > 0);
 		System.out.println("testGetDatasetNodesByStudyId(): "
-				+ datasetNodes.size());
-		for (DatasetNode node : datasetNodes) {
+				+ datasetReferences.size());
+		for (DatasetReference node : datasetReferences) {
 			System.out.println("   " + node);
 		}
 	}
@@ -222,9 +218,9 @@ public class TestStudyDataManagerImpl {
 		Study study = new Study(studyId, name, projectKey, title, objective,
 				primaryInvestigator, type, startDate, endDate, user, status,
 				hierarchy, creationDate);
-		study = manager.addStudy(study);
+		StudyReference studyRef = manager.addStudy(study);
 
-		assert(study.getId() < 0);
+		assert(studyRef.getId() < 0);
 		System.out.println("testAddStudy(): " + study);
 	}
 

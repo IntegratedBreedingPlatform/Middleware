@@ -14,27 +14,21 @@ package org.generationcp.middleware.v2.domain;
 
 
 /**
- * This class is used to display Study nodes
+ * This class is used to display root or top-level folders of Studies
  * 
- * @author Joyce Avestro
+ * @author Darla Ani
  *
  */
-public class StudyNode extends AbstractNode {
+public class FolderReference extends Reference {
 	
-	public StudyNode(Integer id, String name){
+	public FolderReference(Integer id, String name) {
 		super.setId(id);
 		super.setName(name);
 	}
 
-	public StudyNode(Integer id, String name, String description){
+	public FolderReference(Integer id, String name, String description) {
 		super.setId(id);
 		super.setName(name);
 		super.setDescription(description);
 	}
-
-	@Override
-	protected String getEntityName() {
-		return "StudyNode";
-	}
-
 }

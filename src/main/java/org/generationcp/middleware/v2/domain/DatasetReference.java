@@ -19,22 +19,16 @@ package org.generationcp.middleware.v2.domain;
  * @author Joyce Avestro
  *
  */
-public class DatasetNode extends AbstractNode {
+public class DatasetReference extends Reference {
 	
-	public DatasetNode(Integer id, String name){
+	public DatasetReference(Integer id, String name) {
 		super.setId(id);
 		super.setName(name);
 	}
 
-	public DatasetNode(Integer id, String name, String description){
+	public DatasetReference(Integer id, String name, String description) {
 		super.setId(id);
 		super.setName(name);
 		super.setDescription(description);
 	}
-
-	@Override
-	protected String getEntityName() {
-		return "DatasetNode";
-	}
-
 }

@@ -18,15 +18,15 @@ import java.util.Set;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.Study;
-import org.generationcp.middleware.v2.domain.AbstractNode;
+import org.generationcp.middleware.v2.domain.Reference;
 import org.generationcp.middleware.v2.domain.DataSet;
-import org.generationcp.middleware.v2.domain.DatasetNode;
+import org.generationcp.middleware.v2.domain.DatasetReference;
 import org.generationcp.middleware.v2.domain.Experiment;
 import org.generationcp.middleware.v2.domain.FactorDetails;
-import org.generationcp.middleware.v2.domain.FolderNode;
+import org.generationcp.middleware.v2.domain.FolderReference;
 import org.generationcp.middleware.v2.domain.VariateDetails;
 import org.generationcp.middleware.v2.domain.StudyDetails;
-import org.generationcp.middleware.v2.domain.StudyNode;
+import org.generationcp.middleware.v2.domain.StudyReference;
 import org.generationcp.middleware.v2.domain.StudyQueryFilter;
 
 /**
@@ -54,7 +54,7 @@ public interface StudyDataManager {
 	 * @return List of Folder POJOs or null if none found
 	 * @throws MiddlewareQueryException 
 	 */
-	public List<FolderNode> getRootFolders(Database instance) throws MiddlewareQueryException;
+	public List<FolderReference> getRootFolders(Database instance) throws MiddlewareQueryException;
 	
 	
 	/**
@@ -67,7 +67,7 @@ public interface StudyDataManager {
 	 * @return List of AbstractNode (FolderNode, StudyNode) POJOs or null if none found
 	 * @throws MiddlewareQueryException 
 	 */
-	public List<AbstractNode> getChildrenOfFolder(Integer folderId, Database instance) throws MiddlewareQueryException;
+	public List<Reference> getChildrenOfFolder(int folderId) throws MiddlewareQueryException;
 	
 	
 	/**
@@ -79,7 +79,7 @@ public interface StudyDataManager {
 	 * @return List of DatasetNodes belonging to the study
 	 * @throws MiddlewareQueryException
 	 */
-	public List<DatasetNode> getDatasetNodesByStudyId(Integer studyId) throws MiddlewareQueryException;
+	public List<DatasetReference> getDatasetReferences(int studyId) throws MiddlewareQueryException;
 	
 	/**
 	 * @param dataSetId
@@ -111,7 +111,7 @@ public interface StudyDataManager {
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	List<StudyNode> searchStudies(StudyQueryFilter filter) throws MiddlewareQueryException;
+	List<StudyReference> searchStudies(StudyQueryFilter filter) throws MiddlewareQueryException;
 	
 	/**
 	 * Returns the list of factor details for a specific study.
@@ -172,7 +172,7 @@ public interface StudyDataManager {
 	 * @return the added object with the generated id
 	 * @throws MiddlewareQueryException
 	 */
-    public Study addStudy(Study study) throws MiddlewareQueryException;
+    StudyReference addStudy(Study study) throws MiddlewareQueryException;
 
 	/**
 	 * Adds a StudyDetails object. 
@@ -192,5 +192,5 @@ public interface StudyDataManager {
      * @return
      * @throws MiddlewareQueryException
      */
-    void addDataSet(DataSet dataset) throws MiddlewareQueryException;
+    DatasetReference addDataSet(DataSet dataset) throws MiddlewareQueryException;
 }

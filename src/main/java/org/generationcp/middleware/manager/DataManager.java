@@ -26,7 +26,7 @@ import org.generationcp.middleware.v2.domain.builder.ExperimentBuilder;
 import org.generationcp.middleware.v2.domain.builder.FactorDetailsBuilder;
 import org.generationcp.middleware.v2.domain.builder.VariateDetailsBuilder;
 import org.generationcp.middleware.v2.domain.builder.StudyBuilder;
-import org.generationcp.middleware.v2.domain.builder.StudyNodeBuilder;
+import org.generationcp.middleware.v2.domain.builder.StudyReferenceBuilder;
 import org.generationcp.middleware.v2.domain.builder.VariableInfoBuilder;
 import org.generationcp.middleware.v2.domain.builder.VariableTypeBuilder;
 import org.generationcp.middleware.v2.domain.saver.DatasetProjectSaver;
@@ -814,8 +814,8 @@ public abstract class DataManager extends DatabaseBroker{
     	return new VariateDetailsBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
 
-    protected final StudyNodeBuilder getStudyNodeBuilder() {
-    	return new StudyNodeBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    protected final StudyReferenceBuilder getStudyNodeBuilder() {
+    	return new StudyReferenceBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
 
     protected final VariableInfoBuilder getVariableInfoBuilder() {
