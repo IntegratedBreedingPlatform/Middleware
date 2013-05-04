@@ -13,8 +13,6 @@ public class Study {
 	
 	private String description;
 	
-	private Set<DataSet> dataSets = new HashSet<DataSet>();
-	
 	private VariableList conditions;
 	
 	private VariableTypeList variableTypes;
@@ -46,14 +44,6 @@ public class Study {
 		this.description = description;
 	}
 	
-	public Set<DataSet> getDataSets() {
-		return dataSets;
-	}
-
-	public void setDataSets(Set<DataSet> dataSets) {
-		this.dataSets = dataSets;
-	}
-
 	public VariableTypeList getVariableTypes() {
 		return variableTypes;
 	}
@@ -98,11 +88,6 @@ public class Study {
 	    for (Variable constant : constants.getVariables()) {
 	    	constant.print(indent + 6);
 	    }
-	    
-	    Debug.println(indent + 3, "Data Sets: ");
-	    for (DataSet dataSet : dataSets) {
-	    	dataSet.print(indent + 6);
-	    }
 	}
 	
 	public boolean equals(Object obj) {
@@ -110,10 +95,6 @@ public class Study {
 		if (!(obj instanceof Study)) return false;
 		Study other = (Study) obj;
 		return getId() == other.getId();
-	}
-
-	public void addDataSet(DataSet dataSet) {
-		dataSets.add(dataSet);
 	}
 
 	@Override
@@ -125,8 +106,6 @@ public class Study {
 		builder.append(name);
 		builder.append(", description=");
 		builder.append(description);
-		builder.append(", dataSets=");
-		builder.append(dataSets);
 		builder.append(", conditions=");
 		builder.append(conditions);
 		builder.append(", variableTypes=");
@@ -136,6 +115,4 @@ public class Study {
 		builder.append("]");
 		return builder.toString();
 	}
-	
-	
 }
