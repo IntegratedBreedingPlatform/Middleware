@@ -164,6 +164,10 @@ public class VariableType {
 		}
 		return null;
 	}
+	
+	public boolean hasEnumerations() {
+		return (enumerations != null && enumerations.size() > 0);
+	}
 
 	public void print(int indent) {
 		Debug.println(indent, "Variable Type: ");
@@ -223,7 +227,4 @@ public class VariableType {
 		builder.append("]");
 		return builder.toString();
 	}
-	
-	
-	
 }

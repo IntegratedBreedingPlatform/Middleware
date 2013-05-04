@@ -44,6 +44,13 @@ public class Variable {
 	public void setValue(String value) {
 		this.value = value;
 	}
+	
+	public String getDisplayValue() {
+		if (variableType.hasEnumerations()) {
+			return variableType.findEnumerationById(Integer.parseInt(value)).getName();
+		}
+		return value;
+	}
 
 	public void print(int indent) {
 		Debug.println(indent, "Variable: " );
