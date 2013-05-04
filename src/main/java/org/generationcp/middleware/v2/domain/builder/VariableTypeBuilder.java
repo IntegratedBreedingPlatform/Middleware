@@ -1,6 +1,7 @@
 package org.generationcp.middleware.v2.domain.builder;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -74,12 +75,32 @@ public class VariableTypeBuilder extends Builder {
 					enumerations.add(createEnumeration(getCvTerm(id)));
 				}
 			}
+			Collections.sort(enumerations);
 			variableType.setEnumerations(enumerations);
 		}
 	}
 
 	private Enumeration createEnumeration(CVTerm cvTerm) {
-		return new Enumeration(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition());
+		return new Enumeration(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition(), getRank(cvTerm));
+	}
+
+	private int getRank(CVTerm cvTerm) {
+		CVTermProperty property = findProperty(cvTerm.getProperties(), CVTermId.ORDER);
+		if (property != null) {
+			return Integer.parseInt(property.getValue());
+		}
+		return 0;
+	}
+
+	private CVTermProperty findProperty(List<CVTermProperty> properties, CVTermId cvTermId) {
+		if (properties != null) {
+			for (CVTermProperty property : properties) {
+				if (property.getTypeId() == cvTermId.getId()) {
+					return property;
+				}
+			}
+		}
+		return null;
 	}
 
 	private boolean hasEnumerations(List<CVTermRelationship> cvTermRelationships) {

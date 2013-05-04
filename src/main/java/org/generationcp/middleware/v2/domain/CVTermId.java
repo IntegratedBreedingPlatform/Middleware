@@ -74,6 +74,7 @@ public enum CVTermId {
     , TRIAL_DESIGN_INFO_STORAGE(1030)
     	
 	// Other
+    , ORDER(1420)
 	, MIN_VALUE(1113)
 	, MAX_VALUE(1115)
 	;
