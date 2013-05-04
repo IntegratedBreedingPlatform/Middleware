@@ -3,9 +3,9 @@ package org.generationcp.middleware.v2.domain;
 
 public enum StudyPropertyConstants {
 
-	USER_ID (CVTermId.STUDY_UID.getId(), "USERID", "User ID", 1)
-	, STUDY_TYPE (CVTermId.STUDY_TYPE.getId(), "TYPE", "Study type", 2)
-	, START_DATE (CVTermId.START_DATE.getId(), "START", "Start date", 3)
+	USER_ID (TermId.STUDY_UID.getId(), "USERID", "User ID", 1)
+	, STUDY_TYPE (TermId.STUDY_TYPE.getId(), "TYPE", "Study type", 2)
+	, START_DATE (TermId.START_DATE.getId(), "START", "Start date", 3)
 	;
 	
 	private Integer cvTermId;

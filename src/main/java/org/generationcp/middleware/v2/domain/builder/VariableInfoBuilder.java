@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.generationcp.middleware.v2.domain.CVTermId;
+import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.VariableInfo;
 import org.generationcp.middleware.v2.pojos.ProjectProperty;
 
@@ -62,15 +62,15 @@ public class VariableInfoBuilder {
 	}
 	
 	private boolean isStudyInformationType(ProjectProperty property) {
-		return CVTermId.STUDY_INFORMATION.getId().equals(property.getTypeId());
+		return TermId.STUDY_INFORMATION.getId().equals(property.getTypeId());
 	}
 	
 	private boolean isLocalDescriptionType(ProjectProperty property) {
-		return CVTermId.VARIABLE_DESCRIPTION.getId().equals(property.getTypeId());
+		return TermId.VARIABLE_DESCRIPTION.getId().equals(property.getTypeId());
 	}
 
 	private boolean isStandardVariableType(ProjectProperty property) {
-		return CVTermId.STANDARD_VARIABLE.getId().equals(property.getTypeId());
+		return TermId.STANDARD_VARIABLE.getId().equals(property.getTypeId());
 	}
 
 	private Set<ProjectProperty> filterByRank(List<ProjectProperty> properties, int rank) {

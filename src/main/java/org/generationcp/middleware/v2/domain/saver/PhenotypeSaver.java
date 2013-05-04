@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.v2.domain.CVTermId;
+import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.Variable;
 import org.generationcp.middleware.v2.domain.VariableList;
 import org.generationcp.middleware.v2.pojos.ExperimentModel;
@@ -37,8 +37,8 @@ public class PhenotypeSaver extends Saver {
 	public Phenotype createPhenotype(Variable variable) throws MiddlewareQueryException {
 		Phenotype phenotype = null;
 		
-		if (CVTermId.OBSERVATION_VARIATE.getId().equals(variable.getVariableType().getId())
-			|| CVTermId.CATEGORICAL_VARIATE.getId().equals(variable.getVariableType().getId())) {
+		if (TermId.OBSERVATION_VARIATE.getId().equals(variable.getVariableType().getId())
+			|| TermId.CATEGORICAL_VARIATE.getId().equals(variable.getVariableType().getId())) {
 			
 			phenotype = getPhenotypeObject(phenotype);
 			phenotype.setValue(variable.getValue());

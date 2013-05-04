@@ -8,7 +8,7 @@ import java.util.Set;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.v2.domain.CVTermId;
+import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.VariableDetails;
 import org.generationcp.middleware.v2.domain.VariableInfo;
 import org.generationcp.middleware.v2.domain.VariableType;
@@ -18,7 +18,7 @@ import org.generationcp.middleware.v2.pojos.ProjectProperty;
 public abstract class AbstractVariableDetailsBuilder <T extends VariableDetails> extends Builder {
 
 	protected static final List<Integer> VARIATE_TYPES = Arrays.asList(
-			CVTermId.OBSERVATION_VARIATE.getId(), CVTermId.CATEGORICAL_VARIATE.getId()
+			TermId.OBSERVATION_VARIATE.getId(), TermId.CATEGORICAL_VARIATE.getId()
 	);
 
 	protected AbstractVariableDetailsBuilder(
@@ -75,8 +75,8 @@ public abstract class AbstractVariableDetailsBuilder <T extends VariableDetails>
 	}
 	
 	private String getDataType(Integer termId) {
-		return (CVTermId.CHARACTER_DBID_VARIABLE.getId().equals(termId)
-				|| CVTermId.CHARACTER_VARIABLE.getId().equals(termId) 
+		return (TermId.CHARACTER_DBID_VARIABLE.getId().equals(termId)
+				|| TermId.CHARACTER_VARIABLE.getId().equals(termId) 
 				? "C" : "N");
 	}
 }

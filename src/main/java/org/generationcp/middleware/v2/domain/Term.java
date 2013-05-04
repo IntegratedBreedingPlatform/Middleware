@@ -2,21 +2,20 @@ package org.generationcp.middleware.v2.domain;
 
 import org.generationcp.middleware.v2.util.Debug;
 
-public class CvTerm {
+public class Term {
 
 	private int id;
 	
 	private String name;
 	
-	private String description;
+	private String definition;
 
-	public CvTerm() {
-	}
+	public Term() { }
 	
-	public CvTerm(int id, String name, String description) {
+	public Term(int id, String name, String definition) {
 		this.id = id;
 		this.name = name;
-		this.description = description;
+		this.definition = definition;
 	}
 
 	public int getId() {
@@ -35,18 +34,18 @@ public class CvTerm {
 		this.name = name;
 	}
 
-	public String getDescription() {
-		return description;
+	public String getDefinition() {
+		return definition;
 	}
 
-	public void setDescription(String description) {
-		this.description = description;
+	public void setDefinition(String definition) {
+		this.definition = definition;
 	}
 	
 	public void print(int indent) {
 		Debug.println(indent, "Id: " + getId());
 		Debug.println(indent, "Name: " + getName());
-	    Debug.println(indent, "Description: " + getDescription());
+	    Debug.println(indent, "Definition: " + getDefinition());
 	}
 	
 	@Override
@@ -56,8 +55,8 @@ public class CvTerm {
 	
 	public boolean equals(Object obj) {
 		if (obj == null) return false;
-		if (!(obj instanceof CvTerm)) return false;
-		CvTerm other = (CvTerm) obj;
+		if (!(obj instanceof Term)) return false;
+		Term other = (Term) obj;
 		return getId() == other.getId();
 	}
 
@@ -68,12 +67,9 @@ public class CvTerm {
 		builder.append(id);
 		builder.append(", name=");
 		builder.append(name);
-		builder.append(", description=");
-		builder.append(description);
+		builder.append(", definition=");
+		builder.append(definition);
 		builder.append("]");
 		return builder.toString();
 	}
-	
-	
-	
 }

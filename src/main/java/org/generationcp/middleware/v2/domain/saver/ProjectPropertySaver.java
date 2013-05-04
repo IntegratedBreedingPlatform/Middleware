@@ -6,7 +6,7 @@ import java.util.List;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
-import org.generationcp.middleware.v2.domain.CVTermId;
+import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.VariableType;
 import org.generationcp.middleware.v2.domain.VariableTypeList;
 import org.generationcp.middleware.v2.pojos.DmsProject;
@@ -41,8 +41,8 @@ public class ProjectPropertySaver extends Saver {
 		List<ProjectProperty> properties = new ArrayList<ProjectProperty>();
 		
 		properties.add(new ProjectProperty(index--, project, variableType.getStandardVariable().getStoredIn().getId(), variableType.getLocalName(), variableType.getRank()));
-		properties.add(new ProjectProperty(index--, project, CVTermId.VARIABLE_DESCRIPTION.getId(), variableType.getLocalDescription(), variableType.getRank()));
-		properties.add(new ProjectProperty(index--, project, CVTermId.STANDARD_VARIABLE.getId(), String.valueOf(variableType.getId()), variableType.getRank()));
+		properties.add(new ProjectProperty(index--, project, TermId.VARIABLE_DESCRIPTION.getId(), variableType.getLocalDescription(), variableType.getRank()));
+		properties.add(new ProjectProperty(index--, project, TermId.STANDARD_VARIABLE.getId(), String.valueOf(variableType.getId()), variableType.getRank()));
 		
 		return properties;
 	}

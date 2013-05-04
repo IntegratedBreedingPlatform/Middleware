@@ -7,7 +7,7 @@ import java.util.List;
 import org.generationcp.commons.util.StringUtil;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.v2.domain.CVTermId;
+import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.Variable;
 import org.generationcp.middleware.v2.domain.VariableList;
 import org.generationcp.middleware.v2.pojos.ExperimentModel;
@@ -65,23 +65,23 @@ public class StockSaver extends Saver {
 		Integer variableId = variable.getVariableType().getId();
 		String value = variable.getValue();
 		
-		if (CVTermId.ENTRY_NUMBER_STORAGE.getId().equals(variableId)) {
+		if (TermId.ENTRY_NUMBER_STORAGE.getId().equals(variableId)) {
 			stock = getStockObject(stock);
 			stock.setUniqueName(value);
 			
-		} else if (CVTermId.ENTRY_GID_STORAGE.getId().equals(variableId)) {
+		} else if (TermId.ENTRY_GID_STORAGE.getId().equals(variableId)) {
 			stock = getStockObject(stock);
 			stock.setDbxrefId(StringUtil.isEmpty(value) ? null : Integer.valueOf(value));
 			
-		} else if (CVTermId.ENTRY_DESIGNATION_STORAGE.getId().equals(variableId)) {
+		} else if (TermId.ENTRY_DESIGNATION_STORAGE.getId().equals(variableId)) {
 			stock = getStockObject(stock);
 			stock.setName(value);
 			
-		} else if (CVTermId.ENTRY_CODE_STORAGE.getId().equals(variableId)) {
+		} else if (TermId.ENTRY_CODE_STORAGE.getId().equals(variableId)) {
 			stock = getStockObject(stock);
 			stock.setValue(value);
 			
-		} else if (CVTermId.GERMPLASM_ENTRY_STORAGE.getId().equals(variableId)) {
+		} else if (TermId.GERMPLASM_ENTRY_STORAGE.getId().equals(variableId)) {
 			stock = getStockObject(stock);
 			addProperty(stock, createProperty(variable));
 			

@@ -7,17 +7,17 @@ import org.generationcp.middleware.v2.util.Debug;
 
 public class StandardVariable {
 
-	private CvTerm term = new CvTerm();
+	private Term term = new Term();
 	
-	private CvTerm property;
+	private Term property;
     
-    private CvTerm scale;
+    private Term scale;
     
-    private CvTerm method;
+    private Term method;
     
-    private CvTerm dataType;
+    private Term dataType;
     
-    private CvTerm storedIn;
+    private Term storedIn;
     
     private VariableConstraints constraints;  // may be null
     
@@ -42,50 +42,50 @@ public class StandardVariable {
 	}
 
 	public String getDescription() {
-		return term.getDescription();
+		return term.getDefinition();
 	}
 
 	public void setDescription(String description) {
-		term.setDescription(description);
+		term.setDefinition(description);
 	}
 
-	public CvTerm getProperty() {
+	public Term getProperty() {
 		return property;
 	}
 
-	public void setProperty(CvTerm property) {
+	public void setProperty(Term property) {
 		this.property = property;
 	}
 
-	public CvTerm getScale() {
+	public Term getScale() {
 		return scale;
 	}
 
-	public void setScale(CvTerm scale) {
+	public void setScale(Term scale) {
 		this.scale = scale;
 	}
 
-	public CvTerm getMethod() {
+	public Term getMethod() {
 		return method;
 	}
 
-	public void setMethod(CvTerm method) {
+	public void setMethod(Term method) {
 		this.method = method;
 	}
 
-	public CvTerm getDataType() {
+	public Term getDataType() {
 		return dataType;
 	}
 
-	public void setDataType(CvTerm dataType) {
+	public void setDataType(Term dataType) {
 		this.dataType = dataType;
 	}
 
-	public CvTerm getStoredIn() {
+	public Term getStoredIn() {
 		return storedIn;
 	}
 
-	public void setStoredIn(CvTerm storedIn) {
+	public void setStoredIn(Term storedIn) {
 		this.storedIn = storedIn;
 	}
 

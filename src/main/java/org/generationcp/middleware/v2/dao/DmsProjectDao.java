@@ -21,7 +21,7 @@ import java.util.Set;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.v2.domain.Reference;
-import org.generationcp.middleware.v2.domain.CVTermId;
+import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.DatasetReference;
 import org.generationcp.middleware.v2.domain.FolderReference;
 import org.generationcp.middleware.v2.domain.StudyReference;
@@ -48,8 +48,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "FROM    project subject "
 			+ "        INNER JOIN project_relationship pr ON subject.project_id = pr.subject_project_id "
 			+ "        LEFT JOIN project_relationship is_study ON subject.project_id = is_study.subject_project_id "
-			+ "        					AND is_study.type_id = " + CVTermId.IS_STUDY.getId() + " "
-			+ "WHERE   pr.type_id = " + CVTermId.HAS_PARENT_FOLDER.getId() + " "
+			+ "        					AND is_study.type_id = " + TermId.IS_STUDY.getId() + " "
+			+ "WHERE   pr.type_id = " + TermId.HAS_PARENT_FOLDER.getId() + " "
 			+ "        and pr.object_project_id = :folderId "
 			+ "ORDER BY name "
 			;
@@ -59,9 +59,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "FROM    project subject "
 			+ "        INNER JOIN project_relationship pr ON subject.project_id = pr.subject_project_id  " 
 			+ "        LEFT JOIN project_relationship is_study ON subject.project_id = is_study.subject_project_id  " 
-			+ "WHERE   pr.type_id = "  + CVTermId.HAS_PARENT_FOLDER.getId() + " "
+			+ "WHERE   pr.type_id = "  + TermId.HAS_PARENT_FOLDER.getId() + " "
 			+ "        AND pr.object_project_id = :folderId "
-			+ "        AND is_study.type_id = " + CVTermId.IS_STUDY.getId() + " "
+			+ "        AND is_study.type_id = " + TermId.IS_STUDY.getId() + " "
 			+ "ORDER BY name "
 			;
 
@@ -81,7 +81,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		try {
 			Criteria criteria = getSession().createCriteria(getPersistentClass());
 			criteria.createAlias("relatedTos", "pr");
-			criteria.add(Restrictions.eq("pr.typeId", CVTermId.HAS_PARENT_FOLDER.getId()));
+			criteria.add(Restrictions.eq("pr.typeId", TermId.HAS_PARENT_FOLDER.getId()));
 			criteria.add(Restrictions.eq("pr.objectProject.projectId", DmsProject.SYSTEM_FOLDER_ID));
 			
 			ProjectionList projectionList = Projections.projectionList();
@@ -155,7 +155,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 			Criteria criteria = getSession().createCriteria(getPersistentClass());
 			criteria.createAlias("relatedTos", "pr");
-			criteria.add(Restrictions.eq("pr.typeId", CVTermId.BELONGS_TO_STUDY.getId()));
+			criteria.add(Restrictions.eq("pr.typeId", TermId.BELONGS_TO_STUDY.getId()));
 			criteria.add(Restrictions.eq("pr.objectProject.projectId", studyId));
 			
 			ProjectionList projectionList = Projections.projectionList();
@@ -188,7 +188,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			Criteria criteria = getSession().createCriteria(getPersistentClass());
 			criteria.add(Restrictions.eq("name", name));
 			criteria.createAlias("relatedTos", "pr");
-			criteria.add(Restrictions.eq("pr.typeId", CVTermId.IS_STUDY.getId()));
+			criteria.add(Restrictions.eq("pr.typeId", TermId.IS_STUDY.getId()));
 			criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 			
 			return criteria.list();
@@ -207,11 +207,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				userIdStrings.add(userId.toString());
 			}
 		}
-		return getStudiesByStudyProperty(CVTermId.STUDY_UID.getId(), Restrictions.in("p.value", userIdStrings));
+		return getStudiesByStudyProperty(TermId.STUDY_UID.getId(), Restrictions.in("p.value", userIdStrings));
 	}
 	
 	public List<DmsProject> getStudiesByStartDate(Integer startDate) throws MiddlewareQueryException {
-		return getStudiesByStudyProperty(CVTermId.START_DATE.getId(), Restrictions.eq("p.value", startDate.toString()));
+		return getStudiesByStudyProperty(TermId.START_DATE.getId(), Restrictions.eq("p.value", startDate.toString()));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -222,7 +222,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			criteria.add(Restrictions.eq("p.typeId", studyPropertyId));
 			criteria.add(valueExpression);
 			criteria.createAlias("relatedTos", "pr");
-			criteria.add(Restrictions.eq("pr.typeId", CVTermId.IS_STUDY.getId()));
+			criteria.add(Restrictions.eq("pr.typeId", TermId.IS_STUDY.getId()));
 			criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 			
 			return criteria.list();
@@ -242,7 +242,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				Criteria criteria = getSession().createCriteria(getPersistentClass());
 				criteria.add(Restrictions.in("projectId", projectIds));
 				criteria.createAlias("relatedTos", "pr");
-				criteria.add(Restrictions.eq("pr.typeId", CVTermId.IS_STUDY.getId()));
+				criteria.add(Restrictions.eq("pr.typeId", TermId.IS_STUDY.getId()));
 				criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 				
 				return criteria.list();
@@ -258,7 +258,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		try {
 			Criteria criteria = getSession().createCriteria(getPersistentClass());
 			criteria.createAlias("relatedTos", "pr");
-			criteria.add(Restrictions.eq("pr.typeId", CVTermId.BELONGS_TO_STUDY.getId()));
+			criteria.add(Restrictions.eq("pr.typeId", TermId.BELONGS_TO_STUDY.getId()));
 			criteria.add(Restrictions.eq("pr.objectProject.projectId", studyId));
 			criteria.setProjection(Projections.property("pr.subjectProject"));
 			return criteria.list();
@@ -273,7 +273,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		try {
 			Criteria criteria = getSession().createCriteria(getPersistentClass());
 			criteria.createAlias("relatedTos", "pr");
-			criteria.add(Restrictions.eq("pr.typeId", CVTermId.BELONGS_TO_STUDY.getId()));
+			criteria.add(Restrictions.eq("pr.typeId", TermId.BELONGS_TO_STUDY.getId()));
 			criteria.add(Restrictions.eq("pr.subjectProject.projectId", datasetId));
 			
 			criteria.setProjection(Projections.property("pr.objectProject"));
@@ -313,7 +313,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		try {
 			Criteria criteria = getSession().createCriteria(getPersistentClass());
 			criteria.createAlias("properties", "p");
-			criteria.add(Restrictions.eq("p.typeId", CVTermId.STANDARD_VARIABLE.getId()));
+			criteria.add(Restrictions.eq("p.typeId", TermId.STANDARD_VARIABLE.getId()));
 			criteria.add(Restrictions.eq("p.value", factorId.toString()));
 
 			List<DmsProject> results = criteria.list();

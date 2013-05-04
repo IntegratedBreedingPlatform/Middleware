@@ -12,7 +12,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.pojos.Country;
-import org.generationcp.middleware.v2.domain.CVTermId;
+import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.StudyQueryFilter;
 import org.generationcp.middleware.v2.pojos.CVTerm;
 import org.generationcp.middleware.v2.pojos.DmsProject;
@@ -122,10 +122,10 @@ public class ProjectSearcher extends Searcher {
 		
 		for (DmsProject project : projects) {
 			if (project.getRelatedTos() != null && project.getRelatedTos().size() > 0) {
-				if (CVTermId.IS_STUDY.getId().equals(project.getRelatedTos().get(0).getTypeId())) {
+				if (TermId.IS_STUDY.getId().equals(project.getRelatedTos().get(0).getTypeId())) {
 					studies.add(project);
 				
-				} else if (CVTermId.BELONGS_TO_STUDY.getId().equals(project.getRelatedTos().get(0).getTypeId())) {
+				} else if (TermId.BELONGS_TO_STUDY.getId().equals(project.getRelatedTos().get(0).getTypeId())) {
 					studies.add(project.getRelatedTos().get(0).getObjectProject());
 				}
 			}
@@ -141,7 +141,7 @@ public class ProjectSearcher extends Searcher {
 		
 		for (DmsProject project : projects) {
 			if (project.getRelatedTos() != null && project.getRelatedTos().size() > 0) {
-				if (CVTermId.BELONGS_TO_STUDY.getId().equals(project.getRelatedTos().get(0).getTypeId())) {
+				if (TermId.BELONGS_TO_STUDY.getId().equals(project.getRelatedTos().get(0).getTypeId())) {
 					datasets.add(project);
 				}
 			}
@@ -159,9 +159,9 @@ public class ProjectSearcher extends Searcher {
 	
 	private List<Integer> getSeasonalFactors() throws MiddlewareQueryException {
 		setWorkingDatabase(Database.CENTRAL);
-		List<Integer> factors = getCvTermRelationshipDao().getSubjectIdsByTypeAndObject(CVTermId.HAS_PROPERTY.getId(), CVTermId.SEASON.getId());
+		List<Integer> factors = getCvTermRelationshipDao().getSubjectIdsByTypeAndObject(TermId.HAS_PROPERTY.getId(), TermId.SEASON.getId());
 		setWorkingDatabase(Database.LOCAL);
-		factors.addAll(getCvTermRelationshipDao().getSubjectIdsByTypeAndObject(CVTermId.HAS_PROPERTY.getId(), CVTermId.SEASON.getId()));
+		factors.addAll(getCvTermRelationshipDao().getSubjectIdsByTypeAndObject(TermId.HAS_PROPERTY.getId(), TermId.SEASON.getId()));
 		
 		return factors;
 	}

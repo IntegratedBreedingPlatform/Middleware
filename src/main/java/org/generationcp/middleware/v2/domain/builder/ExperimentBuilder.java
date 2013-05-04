@@ -6,7 +6,7 @@ import java.util.Set;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.v2.domain.CVTermId;
+import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.Experiment;
 import org.generationcp.middleware.v2.domain.StandardVariable;
 import org.generationcp.middleware.v2.domain.Variable;
@@ -95,22 +95,22 @@ public class ExperimentBuilder extends Builder {
 
 	private boolean isLocationFactor(VariableType variableType) {
 		StandardVariable standardVariable = variableType.getStandardVariable();
-		if (standardVariable.getStoredIn().getId() == CVTermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
+		if (standardVariable.getStoredIn().getId() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
 			return true;
 		}
-		if (standardVariable.getStoredIn().getId() == CVTermId.TRIAL_INSTANCE_STORAGE.getId()) {
+		if (standardVariable.getStoredIn().getId() == TermId.TRIAL_INSTANCE_STORAGE.getId()) {
 			return true;
 		}
-	    if (standardVariable.getStoredIn().getId() == CVTermId.LATITUDE_STORAGE.getId()) {
+	    if (standardVariable.getStoredIn().getId() == TermId.LATITUDE_STORAGE.getId()) {
 	    	return true;
 	    }
-		if (standardVariable.getStoredIn().getId() == CVTermId.LONGITUDE_STORAGE.getId()) {
+		if (standardVariable.getStoredIn().getId() == TermId.LONGITUDE_STORAGE.getId()) {
 			return true;
 		}
-		if (standardVariable.getStoredIn().getId() == CVTermId.DATUM_STORAGE.getId()) {
+		if (standardVariable.getStoredIn().getId() == TermId.DATUM_STORAGE.getId()) {
 			return true;
 		}
-		if (standardVariable.getStoredIn().getId() == CVTermId.ALTITUDE_STORAGE.getId()) {
+		if (standardVariable.getStoredIn().getId() == TermId.ALTITUDE_STORAGE.getId()) {
 			return true;
 		}
 		
@@ -119,22 +119,22 @@ public class ExperimentBuilder extends Builder {
 
 	private Variable createLocationFactor(Geolocation geoLocation, VariableType variableType) {
 		StandardVariable standardVariable = variableType.getStandardVariable();
-		if (standardVariable.getStoredIn().getId() == CVTermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
+		if (standardVariable.getStoredIn().getId() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
 			return new Variable(variableType, findLocationValue(variableType.getId(), geoLocation.getProperties()));
 		}
-		if (standardVariable.getStoredIn().getId() == CVTermId.TRIAL_INSTANCE_STORAGE.getId()) {
+		if (standardVariable.getStoredIn().getId() == TermId.TRIAL_INSTANCE_STORAGE.getId()) {
 			return new Variable(variableType, geoLocation.getDescription());
 		}
-	    if (standardVariable.getStoredIn().getId() == CVTermId.LATITUDE_STORAGE.getId()) {
+	    if (standardVariable.getStoredIn().getId() == TermId.LATITUDE_STORAGE.getId()) {
 	    	return new Variable(variableType, geoLocation.getLatitude());
 	    }
-		if (standardVariable.getStoredIn().getId() == CVTermId.LONGITUDE_STORAGE.getId()) {
+		if (standardVariable.getStoredIn().getId() == TermId.LONGITUDE_STORAGE.getId()) {
 			return new Variable(variableType, geoLocation.getLongitude());
 		}
-		if (standardVariable.getStoredIn().getId() == CVTermId.DATUM_STORAGE.getId()) {
+		if (standardVariable.getStoredIn().getId() == TermId.DATUM_STORAGE.getId()) {
 			return new Variable(variableType, geoLocation.getGeodeticDatum());
 		}
-		if (standardVariable.getStoredIn().getId() == CVTermId.ALTITUDE_STORAGE.getId()) {
+		if (standardVariable.getStoredIn().getId() == TermId.ALTITUDE_STORAGE.getId()) {
 			return new Variable(variableType, geoLocation.getAltitude());
 		}
 		return null;
@@ -170,19 +170,19 @@ public class ExperimentBuilder extends Builder {
 
 	private boolean isGermplasmFactor(VariableType variableType) {
 		StandardVariable standardVariable = variableType.getStandardVariable();
-		if (standardVariable.getStoredIn().getId() == CVTermId.GERMPLASM_ENTRY_STORAGE.getId()) {
+		if (standardVariable.getStoredIn().getId() == TermId.GERMPLASM_ENTRY_STORAGE.getId()) {
 			return true;
 		}
-		if (standardVariable.getStoredIn().getId() == CVTermId.ENTRY_NUMBER_STORAGE.getId()) {
+		if (standardVariable.getStoredIn().getId() == TermId.ENTRY_NUMBER_STORAGE.getId()) {
 			return true;
 		}
-		if (standardVariable.getStoredIn().getId() == CVTermId.ENTRY_GID_STORAGE.getId()) {
+		if (standardVariable.getStoredIn().getId() == TermId.ENTRY_GID_STORAGE.getId()) {
 			return true;
 		}
-		if (standardVariable.getStoredIn().getId() == CVTermId.ENTRY_DESIGNATION_STORAGE.getId()) {
+		if (standardVariable.getStoredIn().getId() == TermId.ENTRY_DESIGNATION_STORAGE.getId()) {
 			return true;
 		}
-		if (standardVariable.getStoredIn().getId() == CVTermId.ENTRY_CODE_STORAGE.getId()) {
+		if (standardVariable.getStoredIn().getId() == TermId.ENTRY_CODE_STORAGE.getId()) {
 			return true;
 		}
 		return false;
@@ -190,19 +190,19 @@ public class ExperimentBuilder extends Builder {
 	
 	private Variable createGermplasmFactor(Stock stock, VariableType variableType) {
 		StandardVariable standardVariable = variableType.getStandardVariable();
-		if (standardVariable.getStoredIn().getId() == CVTermId.GERMPLASM_ENTRY_STORAGE.getId()) {
+		if (standardVariable.getStoredIn().getId() == TermId.GERMPLASM_ENTRY_STORAGE.getId()) {
 			return new Variable(variableType, findStockValue(variableType.getId(), stock.getProperties()));
 		}
-		if (standardVariable.getStoredIn().getId() == CVTermId.ENTRY_NUMBER_STORAGE.getId()) {
+		if (standardVariable.getStoredIn().getId() == TermId.ENTRY_NUMBER_STORAGE.getId()) {
 			return new Variable(variableType, stock.getUniqueName());
 		}
-		if (standardVariable.getStoredIn().getId() == CVTermId.ENTRY_GID_STORAGE.getId()) {
+		if (standardVariable.getStoredIn().getId() == TermId.ENTRY_GID_STORAGE.getId()) {
 			return new Variable(variableType, stock.getDbxrefId());
 		}
-		if (standardVariable.getStoredIn().getId() == CVTermId.ENTRY_DESIGNATION_STORAGE.getId()) {
+		if (standardVariable.getStoredIn().getId() == TermId.ENTRY_DESIGNATION_STORAGE.getId()) {
 			return new Variable(variableType, stock.getName());
 		}
-		if (standardVariable.getStoredIn().getId() == CVTermId.ENTRY_CODE_STORAGE.getId()) {
+		if (standardVariable.getStoredIn().getId() == TermId.ENTRY_CODE_STORAGE.getId()) {
 			return new Variable(variableType, stock.getValue());
 		}
 		return null;

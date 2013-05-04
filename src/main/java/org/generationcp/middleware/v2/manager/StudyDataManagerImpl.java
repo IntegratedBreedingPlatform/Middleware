@@ -11,7 +11,7 @@ import org.generationcp.middleware.manager.DataManager;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.v2.domain.Reference;
-import org.generationcp.middleware.v2.domain.CVTermId;
+import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.DataSet;
 import org.generationcp.middleware.v2.domain.DatasetReference;
 import org.generationcp.middleware.v2.domain.Experiment;
@@ -134,7 +134,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public Set<StudyDetails> searchStudiesByGid(Integer gid) throws MiddlewareQueryException {
 		Set<StudyDetails> studies = new HashSet<StudyDetails>();
-		List<DmsProject> projects = getProjectSearcher().searchStudiesByFactor(CVTermId.GID.getId(), gid.toString());
+		List<DmsProject> projects = getProjectSearcher().searchStudiesByFactor(TermId.GID.getId(), gid.toString());
 		for (DmsProject project : projects)	 {
 			studies.add(getStudyFactory().createStudyDetails(project));
 		}

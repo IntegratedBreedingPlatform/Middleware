@@ -3,7 +3,7 @@ package org.generationcp.middleware.v2.factory;
 import java.util.List;
 
 import org.generationcp.middleware.pojos.Study;
-import org.generationcp.middleware.v2.domain.CVTermId;
+import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.StudyDetails;
 import org.generationcp.middleware.v2.helper.ProjectPropertiesHelper;
 import org.generationcp.middleware.v2.pojos.DmsProject;
@@ -59,15 +59,15 @@ public class StudyFactory {
 		
 		ProjectPropertiesHelper helper = new ProjectPropertiesHelper(properties);
 		
-		study.setProjectKey(helper.getInteger(CVTermId.PM_KEY));
-		study.setObjective(helper.getString(CVTermId.STUDY_OBJECTIVE));
-		study.setPrimaryInvestigator(helper.getInteger(CVTermId.PI_ID));
-		study.setType(helper.getString(CVTermId.STUDY_TYPE));
-		study.setStartDate(helper.getInteger(CVTermId.START_DATE));
-		study.setEndDate(helper.getInteger(CVTermId.END_DATE));
-		study.setUser(helper.getInteger(CVTermId.STUDY_UID));
-		study.setStatus(helper.getInteger(CVTermId.STUDY_IP));
-		study.setCreationDate(helper.getInteger(CVTermId.CREATION_DATE));
+		study.setProjectKey(helper.getInteger(TermId.PM_KEY));
+		study.setObjective(helper.getString(TermId.STUDY_OBJECTIVE));
+		study.setPrimaryInvestigator(helper.getInteger(TermId.PI_ID));
+		study.setType(helper.getString(TermId.STUDY_TYPE));
+		study.setStartDate(helper.getInteger(TermId.START_DATE));
+		study.setEndDate(helper.getInteger(TermId.END_DATE));
+		study.setUser(helper.getInteger(TermId.STUDY_UID));
+		study.setStatus(helper.getInteger(TermId.STUDY_IP));
+		study.setCreationDate(helper.getInteger(TermId.CREATION_DATE));
 		
 	}
 
@@ -78,14 +78,14 @@ public class StudyFactory {
         studyDetails.setId(project.getProjectId());
         studyDetails.setName(project.getName());
         studyDetails.setTitle(project.getDescription());
-        studyDetails.setObjective(helper.getString(CVTermId.STUDY_OBJECTIVE));
-        studyDetails.setPrimaryInvestigator(helper.getInteger(CVTermId.PI_ID));
-        studyDetails.setType(helper.getString(CVTermId.STUDY_TYPE));
-        studyDetails.setStartDate(helper.getInteger(CVTermId.START_DATE));
-        studyDetails.setEndDate(helper.getInteger(CVTermId.END_DATE));
-        studyDetails.setUser(helper.getInteger(CVTermId.STUDY_UID));
-        studyDetails.setStatus(helper.getInteger(CVTermId.STUDY_IP));
-        studyDetails.setCreationDate(helper.getInteger(CVTermId.CREATION_DATE));
+        studyDetails.setObjective(helper.getString(TermId.STUDY_OBJECTIVE));
+        studyDetails.setPrimaryInvestigator(helper.getInteger(TermId.PI_ID));
+        studyDetails.setType(helper.getString(TermId.STUDY_TYPE));
+        studyDetails.setStartDate(helper.getInteger(TermId.START_DATE));
+        studyDetails.setEndDate(helper.getInteger(TermId.END_DATE));
+        studyDetails.setUser(helper.getInteger(TermId.STUDY_UID));
+        studyDetails.setStatus(helper.getInteger(TermId.STUDY_IP));
+        studyDetails.setCreationDate(helper.getInteger(TermId.CREATION_DATE));
 		
 		return studyDetails;
 	}

@@ -25,7 +25,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
-import org.generationcp.middleware.v2.domain.CVTermId;
+import org.generationcp.middleware.v2.domain.TermId;
 
 /**
  * http://gmod.org/wiki/Chado_Tables#Table:_project
@@ -156,8 +156,8 @@ public class DmsProject implements Serializable {
 		List<ProjectProperty> constants = new ArrayList<ProjectProperty>();
 		
 		for (ProjectProperty property : properties){
-			if (property.getTypeId() == (CVTermId.OBSERVATION_VARIATE.getId()) || 
-					property.getTypeId() == (CVTermId.CATEGORICAL_VARIATE.getId())){
+			if (property.getTypeId() == (TermId.OBSERVATION_VARIATE.getId()) || 
+					property.getTypeId() == (TermId.CATEGORICAL_VARIATE.getId())){
 				constants.add(property);
 			}
 		}		

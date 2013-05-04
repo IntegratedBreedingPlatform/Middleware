@@ -1,6 +1,6 @@
 package org.generationcp.middleware.v2.domain;
 
-public enum CVTermId {
+public enum TermId {
 
 	//Standard Variable
 	STANDARD_VARIABLE(1070)
@@ -81,7 +81,7 @@ public enum CVTermId {
 	
 	private final Integer id;
 	
-	private CVTermId(Integer id) {
+	private TermId(Integer id) {
 		this.id = id;
 	}
 	

@@ -16,7 +16,7 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.pojos.Study;
-import org.generationcp.middleware.v2.domain.CVTermId;
+import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.StudyPropertyConstants;
 import org.generationcp.middleware.v2.pojos.DmsProject;
 import org.generationcp.middleware.v2.pojos.ProjectProperty;
@@ -51,35 +51,35 @@ public class ProjectPropertyFactory {
 		String errorMessage = "";
 		
 		if ( study.getProjectKey() != null){
-			properties.add(new ProjectProperty(0, project, CVTermId.PM_KEY.getId(), study.getProjectKey().toString(), 0));
+			properties.add(new ProjectProperty(0, project, TermId.PM_KEY.getId(), study.getProjectKey().toString(), 0));
 		} else {
 			errorMessage += "\nprojectKey is null";
 		}
 
 		if ( study.getObjective() != null){
-			properties.add(new ProjectProperty(0, project, CVTermId.STUDY_OBJECTIVE.getId(), study.getObjective(), 1));
+			properties.add(new ProjectProperty(0, project, TermId.STUDY_OBJECTIVE.getId(), study.getObjective(), 1));
 		} else {
 			errorMessage += "\nobjective is null";
 		}
 
 		if ( study.getPrimaryInvestigator() != null){
-			properties.add(new ProjectProperty(0, project, CVTermId.PI_ID.getId(), study.getPrimaryInvestigator().toString(), 2));
+			properties.add(new ProjectProperty(0, project, TermId.PI_ID.getId(), study.getPrimaryInvestigator().toString(), 2));
 		}
 
 		if ( study.getType() != null){
-		properties.add(new ProjectProperty(0, project, CVTermId.STUDY_TYPE.getId(), study.getType(), 3));
+		properties.add(new ProjectProperty(0, project, TermId.STUDY_TYPE.getId(), study.getType(), 3));
 		} else {
 			errorMessage += "\ntype is null";
 		}
 
 		if ( study.getStartDate() != null){
-		properties.add(new ProjectProperty(0, project, CVTermId.START_DATE.getId(), study.getStartDate().toString(), 4));
+		properties.add(new ProjectProperty(0, project, TermId.START_DATE.getId(), study.getStartDate().toString(), 4));
 		} else {
 			errorMessage += "\nstartDate is null";
 		}
 
 		if ( study.getEndDate() != null){
-			properties.add(new ProjectProperty(0, project, CVTermId.END_DATE.getId(), study.getEndDate().toString(), 5));
+			properties.add(new ProjectProperty(0, project, TermId.END_DATE.getId(), study.getEndDate().toString(), 5));
 		} else {
 			errorMessage += "\nendDate is null";
 		}
@@ -89,11 +89,11 @@ public class ProjectPropertyFactory {
 		} 
 		
 		if ( study.getStatus() != null){
-			properties.add(new ProjectProperty(0, project, CVTermId.STUDY_IP.getId(), study.getStatus().toString(), 7));
+			properties.add(new ProjectProperty(0, project, TermId.STUDY_IP.getId(), study.getStatus().toString(), 7));
 		}
 		
 		if ( study.getCreationDate() != null){
-			properties.add(new ProjectProperty(0, project, CVTermId.CREATION_DATE.getId(), study.getCreationDate().toString(), 8));
+			properties.add(new ProjectProperty(0, project, TermId.CREATION_DATE.getId(), study.getCreationDate().toString(), 8));
 		} 
 		
 		if (!errorMessage.equals("")){
@@ -107,9 +107,9 @@ public class ProjectPropertyFactory {
 	private List<ProjectProperty> createPropertiesFromStudyField(DmsProject project, StudyPropertyConstants field, String value, int rank) {
 		List<ProjectProperty> properties = new ArrayList<ProjectProperty>();
 		
-		properties.add(new ProjectProperty(0, project, CVTermId.STUDY_INFORMATION.getId(), field.getName(), rank));
-		properties.add(new ProjectProperty(0, project, CVTermId.VARIABLE_DESCRIPTION.getId(), field.getDescription(), rank));
-		properties.add(new ProjectProperty(0, project, CVTermId.STANDARD_VARIABLE.getId(), field.getCvTermId().toString(), rank));
+		properties.add(new ProjectProperty(0, project, TermId.STUDY_INFORMATION.getId(), field.getName(), rank));
+		properties.add(new ProjectProperty(0, project, TermId.VARIABLE_DESCRIPTION.getId(), field.getDescription(), rank));
+		properties.add(new ProjectProperty(0, project, TermId.STANDARD_VARIABLE.getId(), field.getCvTermId().toString(), rank));
 		properties.add(new ProjectProperty(0, project, field.getCvTermId(), value, rank));
 		
 		return properties;

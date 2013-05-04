@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import org.generationcp.commons.util.StringUtil;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.v2.domain.CVTermId;
+import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.Variable;
 import org.generationcp.middleware.v2.domain.VariableList;
 import org.generationcp.middleware.v2.pojos.Geolocation;
@@ -28,27 +28,27 @@ public class GeolocationSaver extends Saver {
 				Integer variableId = variable.getVariableType().getId();
 				String value = variable.getValue();
 				
-				if (CVTermId.TRIAL_INSTANCE_STORAGE.getId().equals(variableId)) {
+				if (TermId.TRIAL_INSTANCE_STORAGE.getId().equals(variableId)) {
 					geolocation = getGeolocationObject(geolocation);
 					geolocation.setDescription(value);
 					
-				} else if (CVTermId.LATITUDE_STORAGE.getId().equals(variableId)) {
+				} else if (TermId.LATITUDE_STORAGE.getId().equals(variableId)) {
 					geolocation = getGeolocationObject(geolocation);
 					geolocation.setLatitude(StringUtil.isEmpty(value) ? null : Double.valueOf(value));
 					
-				} else if (CVTermId.LONGITUDE_STORAGE.getId().equals(variableId)) {
+				} else if (TermId.LONGITUDE_STORAGE.getId().equals(variableId)) {
 					geolocation = getGeolocationObject(geolocation);
 					geolocation.setLongitude(StringUtil.isEmpty(value) ? null : Double.valueOf(value));
 					
-				} else if (CVTermId.DATUM_STORAGE.getId().equals(variableId)) {
+				} else if (TermId.DATUM_STORAGE.getId().equals(variableId)) {
 					geolocation = getGeolocationObject(geolocation);
 					geolocation.setGeodeticDatum(value);
 					
-				} else if (CVTermId.ALTITUDE_STORAGE.getId().equals(variableId)) {
+				} else if (TermId.ALTITUDE_STORAGE.getId().equals(variableId)) {
 					geolocation = getGeolocationObject(geolocation);
 					geolocation.setAltitude(StringUtil.isEmpty(value) ? null : Double.valueOf(value));
 					
-				} else if (CVTermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId().equals(variableId)) {
+				} else if (TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId().equals(variableId)) {
 					geolocation = getGeolocationObject(geolocation);
 					addProperty(geolocation, createProperty(variable));
 					

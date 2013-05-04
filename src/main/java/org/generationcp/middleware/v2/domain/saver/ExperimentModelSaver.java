@@ -8,7 +8,7 @@ import java.util.Set;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.v2.domain.CVTermId;
+import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.Experiment;
 import org.generationcp.middleware.v2.domain.Study;
 import org.generationcp.middleware.v2.domain.Variable;
@@ -42,7 +42,7 @@ public class ExperimentModelSaver extends Saver {
 		List<ExperimentModel> experimentModels = new ArrayList<ExperimentModel>();
 		for (Experiment experiment : experiments) {
 			ExperimentModel experimentModel = create(project, experiment.getFactors(), experiment.getVariates());
-			experimentModel.setTypeId(CVTermId.PLOT_EXPERIMENT.getId());
+			experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 			experimentModels.add(experimentModel);
 		}
 		
@@ -51,7 +51,7 @@ public class ExperimentModelSaver extends Saver {
 
 	public ExperimentModel createForStudy(DmsProject project, Study study) throws MiddlewareQueryException {
 		ExperimentModel experimentModel = create(project, study.getConditions(), study.getConstants());
-		experimentModel.setTypeId(CVTermId.STUDY_EXPERIMENT.getId());
+		experimentModel.setTypeId(TermId.STUDY_EXPERIMENT.getId());
 		
 		return experimentModel;
 	}
@@ -76,7 +76,7 @@ public class ExperimentModelSaver extends Saver {
 				ExperimentProperty property = new ExperimentProperty();
 				property.setNdExperimentpropId(getExperimentPropertyDao().getNegativeId("ndExperimentpropId"));
 				
-				if (CVTermId.TRIAL_DESIGN_INFO_STORAGE.getId().equals(variable.getVariableType().getId())) {
+				if (TermId.TRIAL_DESIGN_INFO_STORAGE.getId().equals(variable.getVariableType().getId())) {
 					addProperty(experimentModel, property);
 				}
 			}

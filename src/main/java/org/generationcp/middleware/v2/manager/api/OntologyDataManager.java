@@ -14,7 +14,7 @@ package org.generationcp.middleware.v2.manager.api;
 
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.v2.domain.CvTerm;
+import org.generationcp.middleware.v2.domain.Term;
 
 /**
  * This is the API for retrieving ontology data from the CHADO schema.
@@ -24,13 +24,13 @@ import org.generationcp.middleware.v2.domain.CvTerm;
 public interface OntologyDataManager {
 
 	/**
-	 * Retrieves a CvTerm record given its id. 
+	 * Retrieves a Term record given its id. 
 	 * 
-	 * @param cvTermId
+	 * @param termId
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-    public CvTerm getCvTermById(int cvTermId) throws MiddlewareQueryException;
+    public Term getTermById(int termId) throws MiddlewareQueryException;
     
 
 }

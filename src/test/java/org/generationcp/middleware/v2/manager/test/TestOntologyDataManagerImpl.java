@@ -16,7 +16,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
-import org.generationcp.middleware.v2.domain.CvTerm;
+import org.generationcp.middleware.v2.domain.Term;
 import org.generationcp.middleware.v2.manager.api.OntologyDataManager;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -40,13 +40,13 @@ public class TestOntologyDataManagerImpl {
 
 	@Test
 	public void testGetCvTermById() throws Exception {
-		CvTerm cvTerm = manager.getCvTermById(CV_TERM_ID);
+		Term term = manager.getTermById(CV_TERM_ID);
 		
-		assertNotNull(cvTerm);
-		assert(cvTerm.getId() == CV_TERM_ID);
-		assert(cvTerm.getName().equals(CV_TERM_NAME));
+		assertNotNull(term);
+		assert(term.getId() == CV_TERM_ID);
+		assert(term.getName().equals(CV_TERM_NAME));
 		
-		System.out.println("testGetCvTermById(): " + cvTerm);
+		System.out.println("testGetCvTermById(): " + term);
 	}
 	
 	@AfterClass

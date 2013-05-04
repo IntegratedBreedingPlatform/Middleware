@@ -25,7 +25,7 @@ import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.v2.domain.Reference;
-import org.generationcp.middleware.v2.domain.CVTermId;
+import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.DataSet;
 import org.generationcp.middleware.v2.domain.DatasetReference;
 import org.generationcp.middleware.v2.domain.Experiment;
@@ -207,7 +207,7 @@ public class TestStudyDataManagerImpl {
 		String title = "Test Study Title";
 		String objective = "Test Study Objective"; 
 		Integer primaryInvestigator = 1;
-		String type = CVTermId.STUDY_TYPE.getId().toString();
+		String type = TermId.STUDY_TYPE.getId().toString();
        Integer startDate = (int) System.currentTimeMillis();; 
        Integer endDate = (int) System.currentTimeMillis();; 
        Integer user = 1; 
@@ -231,7 +231,7 @@ public class TestStudyDataManagerImpl {
 		String title = "Test Study Title";
 		String objective = "Test Study Objective"; 
 		Integer primaryInvestigator = 1;
-		String type = CVTermId.STUDY_TYPE.getId().toString();
+		String type = TermId.STUDY_TYPE.getId().toString();
         Integer startDate = (int) System.currentTimeMillis();; 
         Integer endDate = (int) System.currentTimeMillis();; 
         Integer user = 1; 

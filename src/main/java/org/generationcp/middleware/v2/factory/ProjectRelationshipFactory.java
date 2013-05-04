@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.pojos.Study;
-import org.generationcp.middleware.v2.domain.CVTermId;
+import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.pojos.DmsProject;
 import org.generationcp.middleware.v2.pojos.ProjectRelationship;
 
@@ -32,10 +32,10 @@ public class ProjectRelationshipFactory {
 		DmsProject project = ProjectFactory.getInstance().createProject(study);
 		
 		 // parent
-		 relationships.add(new ProjectRelationship(0, project, parent, CVTermId.HAS_PARENT_FOLDER.getId()));
+		 relationships.add(new ProjectRelationship(0, project, parent, TermId.HAS_PARENT_FOLDER.getId()));
 		 
 		 // is study
-		 relationships.add(new ProjectRelationship(0, project, parent, CVTermId.IS_STUDY.getId()));
+		 relationships.add(new ProjectRelationship(0, project, parent, TermId.IS_STUDY.getId()));
 
 		return relationships;
 		

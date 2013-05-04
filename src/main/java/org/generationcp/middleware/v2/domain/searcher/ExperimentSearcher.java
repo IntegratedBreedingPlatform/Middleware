@@ -9,7 +9,7 @@ import java.util.Set;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
-import org.generationcp.middleware.v2.domain.CVTermId;
+import org.generationcp.middleware.v2.domain.TermId;
 
 public class ExperimentSearcher extends Searcher {
 
@@ -23,25 +23,25 @@ public class ExperimentSearcher extends Searcher {
 	public List<Integer> searchExperimentsByFactor(Integer factorId, String value) throws MiddlewareQueryException {
 		Integer storedInId = getStoredInId(factorId);
 		
-		if (CVTermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId().equals(storedInId)) {
+		if (TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId().equals(storedInId)) {
 			return findExperimentsByGeolocationFactorValue(factorId, value);
 			
-		} else if (CVTermId.TRIAL_DESIGN_INFO_STORAGE.getId().equals(storedInId)) {
+		} else if (TermId.TRIAL_DESIGN_INFO_STORAGE.getId().equals(storedInId)) {
 			return findExperimentsByExperimentFactorValue(factorId, value);
 			
-		} else if (CVTermId.GERMPLASM_ENTRY_STORAGE.getId().equals(storedInId)) {
+		} else if (TermId.GERMPLASM_ENTRY_STORAGE.getId().equals(storedInId)) {
 			return findExperimentsByStockFactorValue(factorId, value);
 		
-		} else if (CVTermId.ENTRY_GID_STORAGE.getId().equals(storedInId)) {
+		} else if (TermId.ENTRY_GID_STORAGE.getId().equals(storedInId)) {
 			return findExperimentsByStock("dbxrefId", value);
 		
-		} else if (CVTermId.ENTRY_NUMBER_STORAGE.getId().equals(storedInId)) {
+		} else if (TermId.ENTRY_NUMBER_STORAGE.getId().equals(storedInId)) {
 			return findExperimentsByStock("uniqueName", value);
 			
-		} else if (CVTermId.ENTRY_DESIGNATION_STORAGE.getId().equals(storedInId)) {
+		} else if (TermId.ENTRY_DESIGNATION_STORAGE.getId().equals(storedInId)) {
 			return findExperimentsByStock("name", value);
 			
-		} else if (CVTermId.ENTRY_CODE_STORAGE.getId().equals(storedInId)) {
+		} else if (TermId.ENTRY_CODE_STORAGE.getId().equals(storedInId)) {
 			return findExperimentsByStock("value", value);
 		}
 		
@@ -51,10 +51,10 @@ public class ExperimentSearcher extends Searcher {
 
 	private Integer getStoredInId(Integer factorId) throws MiddlewareQueryException {
 		setWorkingDatabase(Database.CENTRAL);
-		List<Integer> termIds = getCvTermRelationshipDao().getObjectIdByTypeAndSubject(CVTermId.STORED_IN.getId(), factorId);
+		List<Integer> termIds = getCvTermRelationshipDao().getObjectIdByTypeAndSubject(TermId.STORED_IN.getId(), factorId);
 		if (termIds == null || termIds.size() == 0) {
 			setWorkingDatabase(Database.LOCAL);
-			termIds = getCvTermRelationshipDao().getObjectIdByTypeAndSubject(CVTermId.STORED_IN.getId(), factorId);
+			termIds = getCvTermRelationshipDao().getObjectIdByTypeAndSubject(TermId.STORED_IN.getId(), factorId);
 		}
 
 		return (termIds != null && termIds.size() > 0 ? termIds.get(0) : null);
