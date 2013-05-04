@@ -10,7 +10,7 @@ public class DataSet {
 	
 	private String description;
 	
-	private Study study;
+	private int studyId;
 	
 	private VariableTypeList variableTypes;
 
@@ -38,15 +38,12 @@ public class DataSet {
 		this.description = description;
 	}
 
-	public Study getStudy() {
-		return study;
+	public int getStudyId() {
+		return studyId;
 	}
 
-	public void setStudy(Study study) {
-		this.study = study;
-		if (study != null) {
-			study.addDataSet(this);
-		}
+	public void setStudyId(int studyId) {
+		this.studyId = studyId;
 	}
 
 	public VariableTypeList getVariableTypes() {
@@ -62,6 +59,8 @@ public class DataSet {
 		Debug.println(indent + 3, "Id: " + getId());
 		Debug.println(indent + 3, "Name: " + getName());
 	    Debug.println(indent + 3, "Description: " + getDescription());
+	    Debug.println(indent + 3, "Variable Types: ");
+	    variableTypes.print(indent + 6);
 	}
 	
 	public boolean equals(Object obj) {
@@ -80,8 +79,8 @@ public class DataSet {
 		builder.append(name);
 		builder.append(", description=");
 		builder.append(description);
-		builder.append(", study=");
-		builder.append(study);
+		builder.append(", studyId=");
+		builder.append(studyId);
 		builder.append(", variableTypes=");
 		builder.append(variableTypes);
 		builder.append("]");

@@ -276,11 +276,13 @@ public class DatabaseBroker {
      * @param id
      */
     protected boolean setWorkingDatabase(Integer id) {
-        activeSession = id >= 0 ? getCurrentSessionForCentral() : getCurrentSessionForLocal();
-        activeDatabase = id >= 0 ? Database.CENTRAL : Database.LOCAL;
-        if (activeSession != null) {
-            return true;
-        }
+    	if (id != null) {
+	        activeSession = id >= 0 ? getCurrentSessionForCentral() : getCurrentSessionForLocal();
+	        activeDatabase = id >= 0 ? Database.CENTRAL : Database.LOCAL;
+	        if (activeSession != null) {
+	            return true;
+	        }
+    	}
         return false;
     }
 

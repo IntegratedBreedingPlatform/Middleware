@@ -1,13 +1,14 @@
 package org.generationcp.middleware.v2.domain.builder;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.v2.domain.CVTermId;
 import org.generationcp.middleware.v2.domain.CvTerm;
+import org.generationcp.middleware.v2.domain.Enumeration;
 import org.generationcp.middleware.v2.domain.VariableConstraints;
 import org.generationcp.middleware.v2.domain.VariableInfo;
 import org.generationcp.middleware.v2.domain.VariableType;
@@ -41,29 +42,58 @@ public class VariableTypeBuilder extends Builder {
 		variableType.setLocalDescription(variableInfo.getLocalDescription());
 		variableType.setRank(variableInfo.getRank());
 		
-		if (setWorkingDatabase(variableInfo.getStdVariableId())) {
-			CVTerm cvTerm = getCvTermDao().getById(variableInfo.getStdVariableId());
+		CVTerm cvTerm = getCvTerm(variableInfo.getStdVariableId());
+		if (cvTerm != null) {
 			variableType.setName(cvTerm.getName());
 			variableType.setDescription(cvTerm.getDefinition());
 			
-			if (cvTerm.getProperties() != null && !cvTerm.getProperties().isEmpty()) {
-				Integer minValue = getPropertyValue(cvTerm.getProperties(), CVTermId.MIN_VALUE);
-				Integer maxValue = getPropertyValue(cvTerm.getProperties(), CVTermId.MAX_VALUE);
-				if (minValue != null || maxValue != null) {
-					variableType.setConstraints(new VariableConstraints(minValue, maxValue));
+			addConstraints(variableType, cvTerm);
+			addRelatedTerms(variableType, cvTerm);
+		}
+		return variableType;
+	}
+
+	private void addRelatedTerms(VariableType variableType, CVTerm cvTerm) throws MiddlewareQueryException {
+		if (setWorkingDatabase(variableType.getId())) {
+			List<CVTermRelationship> cvTermRelationships  = getCvTermRelationshipDao().getBySubject(variableType.getId());
+			variableType.setProperty(createTerm(cvTermRelationships, CVTermId.HAS_PROPERTY));
+			variableType.setMethod(createTerm(cvTermRelationships, CVTermId.HAS_METHOD));
+			variableType.setScale(createTerm(cvTermRelationships, CVTermId.HAS_SCALE));
+			variableType.setDataType(createTerm(cvTermRelationships, CVTermId.HAS_TYPE));
+			variableType.setStoredIn(createTerm(cvTermRelationships, CVTermId.STORED_IN));
+			addEnumerations(variableType, cvTermRelationships);
+		}
+	}
+
+	private void addEnumerations(VariableType variableType, List<CVTermRelationship> cvTermRelationships) throws MiddlewareQueryException {
+		if (hasEnumerations(cvTermRelationships)) {
+			List<Enumeration> enumerations = new ArrayList<Enumeration>();
+			for (CVTermRelationship cvTermRelationship : cvTermRelationships) {
+				if (cvTermRelationship.getTypeId().equals(CVTermId.HAS_VALUE.getId())) {
+					Integer id = cvTermRelationship.getObjectId();
+					enumerations.add(createEnumeration(getCvTerm(id)));
 				}
 			}
-			
-			List<CVTermRelationship> cvTermRelationships  = getCvTermRelationshipDao().getBySubject(variableType.getId());
-			variableType.setProperty(getObject(cvTermRelationships, CVTermId.HAS_PROPERTY));
-			variableType.setMethod(getObject(cvTermRelationships, CVTermId.HAS_METHOD));
-			variableType.setScale(getObject(cvTermRelationships, CVTermId.HAS_SCALE));
-			variableType.setDataType(getObject(cvTermRelationships, CVTermId.HAS_TYPE));
-			variableType.setStoredIn(getObject(cvTermRelationships, CVTermId.STORED_IN));
-			
+			variableType.setEnumerations(enumerations);
 		}
-		
-		return variableType;
+	}
+
+	private Enumeration createEnumeration(CVTerm cvTerm) {
+		return new Enumeration(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition());
+	}
+
+	private boolean hasEnumerations(List<CVTermRelationship> cvTermRelationships) {
+		return findTermId(cvTermRelationships, CVTermId.HAS_VALUE) != null;
+	}
+
+	private void addConstraints(VariableType variableType, CVTerm cvTerm) {
+		if (cvTerm.getProperties() != null && !cvTerm.getProperties().isEmpty()) {
+			Integer minValue = getPropertyValue(cvTerm.getProperties(), CVTermId.MIN_VALUE);
+			Integer maxValue = getPropertyValue(cvTerm.getProperties(), CVTermId.MAX_VALUE);
+			if (minValue != null || maxValue != null) {
+				variableType.setConstraints(new VariableConstraints(minValue, maxValue));
+			}
+		}
 	}
 
 	private Integer getPropertyValue(List<CVTermProperty> properties, CVTermId termId) {
@@ -74,23 +104,30 @@ public class VariableTypeBuilder extends Builder {
 		}
 		return null;
 	}
-
-	private CvTerm getObject(List<CVTermRelationship> cvTermRelationships, CVTermId relationship) throws MiddlewareQueryException {
+	
+	private Integer findTermId(List<CVTermRelationship> cvTermRelationships, CVTermId relationship) {
 		for (CVTermRelationship cvTermRelationship : cvTermRelationships) {
 			if (cvTermRelationship.getTypeId().equals(relationship.getId())) {
-				return getCvTerm(cvTermRelationship.getObjectId());
+				return cvTermRelationship.getObjectId();
 			}
 		}
 		return null;
 	}
 
-	private CvTerm getCvTerm(Integer id) throws MiddlewareQueryException {
-		setWorkingDatabase(Database.CENTRAL);
-		CVTerm term = getCvTermDao().getById(id);
-		if (term == null) {
-			setWorkingDatabase(Database.LOCAL);
-			term = getCvTermDao().getById(id);
+	private CvTerm createTerm(List<CVTermRelationship> cvTermRelationships, CVTermId relationship) throws MiddlewareQueryException {
+		Integer id = findTermId(cvTermRelationships, relationship);
+		return createTerm(id);
+	}
+
+	private CvTerm createTerm(Integer id) throws MiddlewareQueryException {
+		CVTerm cvTerm = getCvTerm(id);
+		return cvTerm != null ? new CvTerm(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition()) : null;
+	}
+	
+	private CVTerm getCvTerm(int id) throws MiddlewareQueryException {
+		if (setWorkingDatabase(id)) {
+		    return getCvTermDao().getById(id);
 		}
-		return term != null ? new CvTerm(term.getCvTermId(), term.getName(), term.getDefinition()) : null;
+		return null;
 	}
 }

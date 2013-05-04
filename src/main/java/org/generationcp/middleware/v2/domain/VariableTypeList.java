@@ -43,6 +43,14 @@ public class VariableTypeList {
 		return builder.toString();
 	}
 
+	public void print(int indent) {
+		if (variableTypes != null) {
+			for (VariableType variableType : variableTypes) {
+				variableType.print(indent);
+			}
+		}
+	}
+
 	
 	
 }

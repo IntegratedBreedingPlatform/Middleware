@@ -254,7 +254,7 @@ public class TestStudyDataManagerImpl {
 	@Test
 	public void testGetDataSet() throws Exception {
 		DataSet dataSet = manager.getDataSet(DATASET_ID);
-		dataSet.getStudy().print(0);
+		dataSet.print(0);
 	}
 	
 	@Test

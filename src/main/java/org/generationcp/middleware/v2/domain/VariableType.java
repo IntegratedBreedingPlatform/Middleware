@@ -1,5 +1,6 @@
 package org.generationcp.middleware.v2.domain;
 
+import java.util.List;
 import java.util.Set;
 
 import org.generationcp.middleware.v2.util.Debug;
@@ -27,6 +28,8 @@ public class VariableType {
     private VariableConstraints constraints;  // may be null
     
     private Set<NameSynonym> nameSynonyms;
+    
+    private List<Enumeration> enumerations;
 
     public int getId() {
     	return term.getId();
@@ -132,18 +135,51 @@ public class VariableType {
 		this.rank = rank;
 	}
 
+	public List<Enumeration> getEnumerations() {
+		return enumerations;
+	}
+
+	public void setEnumerations(List<Enumeration> enumerations) {
+		this.enumerations = enumerations;
+	}
+	
+	public Enumeration findEnumerationByName(String name) {
+		if (enumerations != null) {
+			for (Enumeration enumeration : enumerations) {
+				if (enumeration.getName().equals(name)) {
+					return enumeration;
+				}
+			}
+		}
+		return null;
+	}
+	
+	public Enumeration findEnumerationById(int id) {
+		if (enumerations != null) {
+			for (Enumeration enumeration : enumerations) {
+				if (enumeration.getId() == id) {
+					return enumeration;
+				}
+			}
+		}
+		return null;
+	}
+
 	public void print(int indent) {
 		Debug.println(indent, "Variable Type: ");
 		indent += 3;
-		//super.print(indent);
 		Debug.println(indent, "localName: " + localName);
 		Debug.println(indent, "localDescription: "  + localDescription);
+		Debug.println(indent, "term: " + term);
 		Debug.println(indent, "property: " + property);
 		Debug.println(indent, "method " + method);
 		Debug.println(indent, "scale: " + scale);
 		Debug.println(indent, "storedIn: " + storedIn);
 		if (this.constraints != null) {
 			this.constraints.print(indent);
+		}
+		if (enumerations != null) {
+			Debug.println(indent, "enumerations: " + enumerations);
 		}
 	}
 	
@@ -153,10 +189,14 @@ public class VariableType {
 		VariableType other = (VariableType) obj;
 		return other.getId() == getId();
 	}
+	
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("VariableType [property=");
+		builder.append("VariableType [");
+		builder.append("term=");
+		builder.append(term);
+		builder.append(", property=");
 		builder.append(property);
 		builder.append(", scale=");
 		builder.append(scale);
@@ -176,6 +216,10 @@ public class VariableType {
 		builder.append(constraints);
 		builder.append(", nameSynonyms=");
 		builder.append(nameSynonyms);
+		if (enumerations != null) {
+			builder.append(", enumerations=");
+		    builder.append(enumerations);
+		}
 		builder.append("]");
 		return builder.toString();
 	}

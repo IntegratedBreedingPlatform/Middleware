@@ -32,6 +32,7 @@ import org.generationcp.middleware.v2.domain.builder.VariableTypeBuilder;
 import org.generationcp.middleware.v2.domain.saver.DatasetProjectSaver;
 import org.generationcp.middleware.v2.domain.saver.StudySaver;
 import org.generationcp.middleware.v2.domain.searcher.ProjectSearcher;
+import org.generationcp.middleware.v2.factory.CvTermFactory;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -837,4 +838,7 @@ public abstract class DataManager extends DatabaseBroker{
     	return new DatasetProjectSaver(sessionProviderForLocal, sessionProviderForCentral);
     }
     
+    protected final CvTermFactory getCvTermFactory() {
+    	return new CvTermFactory();
+    }
 }
