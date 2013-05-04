@@ -63,7 +63,7 @@ public class Term {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("CvTerm [id=");
+		builder.append("Term [id=");
 		builder.append(id);
 		builder.append(", name=");
 		builder.append(name);

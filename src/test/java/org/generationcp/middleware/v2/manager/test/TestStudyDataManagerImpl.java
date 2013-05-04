@@ -249,8 +249,10 @@ public class TestStudyDataManagerImpl {
 
 	@Test
 	public void testGetDataSet() throws Exception {
-		DataSet dataSet = manager.getDataSet(DATASET_ID);
-		dataSet.print(0);
+		for (int i = 10015; i <= 10075; i += 10) {
+			DataSet dataSet = manager.getDataSet(i);
+			dataSet.print(0);
+		}
 	}
 	
 	@Test

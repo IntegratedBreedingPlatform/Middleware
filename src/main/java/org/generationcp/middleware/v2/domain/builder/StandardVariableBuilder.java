@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.v2.domain.NameSynonym;
+import org.generationcp.middleware.v2.domain.NameType;
 import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.Term;
 import org.generationcp.middleware.v2.domain.Enumeration;
@@ -32,6 +34,7 @@ public class StandardVariableBuilder extends Builder {
 			
 			addConstraints(standardVariable, cvTerm);
 			addRelatedTerms(standardVariable, cvTerm);
+			addNameSynonyms(standardVariable, cvTerm);
 		}
 		return standardVariable;
 	}
@@ -46,6 +49,17 @@ public class StandardVariableBuilder extends Builder {
 			standardVariable.setStoredIn(createTerm(cvTermRelationships, TermId.STORED_IN));
 			addEnumerations(standardVariable, cvTermRelationships);
 		}
+	}
+	
+	private void addNameSynonyms(StandardVariable standardVariable, CVTerm cvTerm) {
+		List<NameSynonym> nameSynonyms = new ArrayList<NameSynonym>();
+		for (NameType nameType : NameType.values()) {
+			CVTermProperty property = findProperty(cvTerm.getProperties(), nameType.getId());
+			if (property != null) {
+				nameSynonyms.add(new NameSynonym(property.getValue(), nameType));
+			}
+		}
+		standardVariable.setNameSynonyms(nameSynonyms);
 	}
 
 	private void addEnumerations(StandardVariable standardVariable, List<CVTermRelationship> cvTermRelationships) throws MiddlewareQueryException {
@@ -67,17 +81,17 @@ public class StandardVariableBuilder extends Builder {
 	}
 
 	private int getRank(CVTerm cvTerm) {
-		CVTermProperty property = findProperty(cvTerm.getProperties(), TermId.ORDER);
+		CVTermProperty property = findProperty(cvTerm.getProperties(), TermId.ORDER.getId());
 		if (property != null) {
 			return Integer.parseInt(property.getValue());
 		}
 		return 0;
 	}
 
-	private CVTermProperty findProperty(List<CVTermProperty> properties, TermId cvTermId) {
+	private CVTermProperty findProperty(List<CVTermProperty> properties, int typeId) {
 		if (properties != null) {
 			for (CVTermProperty property : properties) {
-				if (property.getTypeId() == cvTermId.getId()) {
+				if (property.getTypeId() == typeId) {
 					return property;
 				}
 			}

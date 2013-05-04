@@ -1,5 +1,6 @@
 package org.generationcp.middleware.v2.domain;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -21,7 +22,7 @@ public class StandardVariable {
     
     private VariableConstraints constraints;  // may be null
     
-    private Set<NameSynonym> nameSynonyms;
+    private List<NameSynonym> nameSynonyms = new ArrayList<NameSynonym>();
     
     private List<Enumeration> enumerations;
 
@@ -35,6 +36,28 @@ public class StandardVariable {
 
 	public String getName() {
 		return term.getName();
+	}
+
+	public String getName(NameType nameType) {
+		if (nameType == NameType.PREFERRED_ENGLISH) {
+			return getName();
+		}
+		NameSynonym nameSynonym = findNameSynonym(nameType);
+		if (nameSynonym == null) {
+			return getName();
+		}
+		return nameSynonym.getName();
+	}
+	
+	private NameSynonym findNameSynonym(NameType nameType) {
+		if (nameSynonyms != null) {
+			for (NameSynonym nameSynonym : nameSynonyms) {
+				if (nameSynonym.getType() == nameType) {
+					return nameSynonym;
+				}
+			}
+		}
+		return null;
 	}
 
 	public void setName(String name) {
@@ -97,11 +120,7 @@ public class StandardVariable {
 		this.constraints = constraints;
 	}
 
-	public Set<NameSynonym> getNameSynonyms() {
-		return nameSynonyms;
-	}
-
-	public void setNameSynonyms(Set<NameSynonym> nameSynonyms) {
+	public void setNameSynonyms(List<NameSynonym> nameSynonyms) {
 		this.nameSynonyms = nameSynonyms;
 	}
 
@@ -147,6 +166,10 @@ public class StandardVariable {
 		Debug.println(indent, "method " + method);
 		Debug.println(indent, "scale: " + scale);
 		Debug.println(indent, "storedIn: " + storedIn);
+		if (constraints != null) {
+			Debug.println(indent, "constraints: " + constraints);
+		}
+		Debug.println(indent, "nameSynonyms: " + nameSynonyms);
 		if (this.constraints != null) {
 			this.constraints.print(indent);
 		}
