@@ -5,8 +5,8 @@ import java.util.Set;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.v2.domain.DataSet;
-import org.generationcp.middleware.v2.domain.VariableInfo;
 import org.generationcp.middleware.v2.domain.VariableTypeList;
+import org.generationcp.middleware.v2.helper.VariableInfo;
 import org.generationcp.middleware.v2.pojos.DmsProject;
 
 public class DataSetBuilder extends Builder {

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.generationcp.middleware.v2.domain.TermId;
-import org.generationcp.middleware.v2.domain.VariableInfo;
+import org.generationcp.middleware.v2.helper.VariableInfo;
 import org.generationcp.middleware.v2.pojos.ProjectProperty;
 
 public class VariableInfoBuilder {
