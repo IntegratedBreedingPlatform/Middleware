@@ -46,8 +46,8 @@ public class Variable {
 	}
 	
 	public String getDisplayValue() {
-		if (variableType.hasEnumerations()) {
-			return variableType.findEnumerationById(Integer.parseInt(value)).getName();
+		if (variableType.getStandardVariable().hasEnumerations()) {
+			return variableType.getStandardVariable().findEnumerationById(Integer.parseInt(value)).getName();
 		}
 		return value;
 	}

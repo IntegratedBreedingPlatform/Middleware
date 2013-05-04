@@ -40,7 +40,7 @@ public class ProjectPropertySaver extends Saver {
 	private List<ProjectProperty> createVariableProperties(int index, DmsProject project, VariableType variableType) throws MiddlewareQueryException {
 		List<ProjectProperty> properties = new ArrayList<ProjectProperty>();
 		
-		properties.add(new ProjectProperty(index--, project, variableType.getStoredIn().getId(), variableType.getLocalName(), variableType.getRank()));
+		properties.add(new ProjectProperty(index--, project, variableType.getStandardVariable().getStoredIn().getId(), variableType.getLocalName(), variableType.getRank()));
 		properties.add(new ProjectProperty(index--, project, CVTermId.VARIABLE_DESCRIPTION.getId(), variableType.getLocalDescription(), variableType.getRank()));
 		properties.add(new ProjectProperty(index--, project, CVTermId.STANDARD_VARIABLE.getId(), String.valueOf(variableType.getId()), variableType.getRank()));
 		

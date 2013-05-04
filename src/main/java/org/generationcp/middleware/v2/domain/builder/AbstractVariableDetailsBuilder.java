@@ -65,10 +65,10 @@ public abstract class AbstractVariableDetailsBuilder <T extends VariableDetails>
 		details.setId(variable.getId());
 		details.setName(variable.getLocalName());
 		details.setDescription(variable.getLocalDescription());
-		details.setProperty(variable.getProperty().getName());
-		details.setMethod(variable.getMethod().getName());
-		details.setScale(variable.getScale().getName());
-		details.setDataType(getDataType(variable.getDataType().getId()));
+		details.setProperty(variable.getStandardVariable().getProperty().getName());
+		details.setMethod(variable.getStandardVariable().getMethod().getName());
+		details.setScale(variable.getStandardVariable().getScale().getName());
+		details.setDataType(getDataType(variable.getStandardVariable().getDataType().getId()));
 		details.setStudyId(projectId);
 		
 		return details;

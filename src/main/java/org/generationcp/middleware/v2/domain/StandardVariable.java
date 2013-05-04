@@ -1,0 +1,192 @@
+package org.generationcp.middleware.v2.domain;
+
+import java.util.List;
+import java.util.Set;
+
+import org.generationcp.middleware.v2.util.Debug;
+
+public class StandardVariable {
+
+	private CvTerm term = new CvTerm();
+	
+	private CvTerm property;
+    
+    private CvTerm scale;
+    
+    private CvTerm method;
+    
+    private CvTerm dataType;
+    
+    private CvTerm storedIn;
+    
+    private VariableConstraints constraints;  // may be null
+    
+    private Set<NameSynonym> nameSynonyms;
+    
+    private List<Enumeration> enumerations;
+
+    public int getId() {
+    	return term.getId();
+    }
+    
+	public void setId(int id) {
+		term.setId(id);
+	}
+
+	public String getName() {
+		return term.getName();
+	}
+
+	public void setName(String name) {
+		term.setName(name);
+	}
+
+	public String getDescription() {
+		return term.getDescription();
+	}
+
+	public void setDescription(String description) {
+		term.setDescription(description);
+	}
+
+	public CvTerm getProperty() {
+		return property;
+	}
+
+	public void setProperty(CvTerm property) {
+		this.property = property;
+	}
+
+	public CvTerm getScale() {
+		return scale;
+	}
+
+	public void setScale(CvTerm scale) {
+		this.scale = scale;
+	}
+
+	public CvTerm getMethod() {
+		return method;
+	}
+
+	public void setMethod(CvTerm method) {
+		this.method = method;
+	}
+
+	public CvTerm getDataType() {
+		return dataType;
+	}
+
+	public void setDataType(CvTerm dataType) {
+		this.dataType = dataType;
+	}
+
+	public CvTerm getStoredIn() {
+		return storedIn;
+	}
+
+	public void setStoredIn(CvTerm storedIn) {
+		this.storedIn = storedIn;
+	}
+
+	public VariableConstraints getConstraints() {
+		return constraints;
+	}
+
+	public void setConstraints(VariableConstraints constraints) {
+		this.constraints = constraints;
+	}
+
+	public Set<NameSynonym> getNameSynonyms() {
+		return nameSynonyms;
+	}
+
+	public void setNameSynonyms(Set<NameSynonym> nameSynonyms) {
+		this.nameSynonyms = nameSynonyms;
+	}
+
+	public List<Enumeration> getEnumerations() {
+		return enumerations;
+	}
+
+	public void setEnumerations(List<Enumeration> enumerations) {
+		this.enumerations = enumerations;
+	}
+	
+	public Enumeration findEnumerationByName(String name) {
+		if (enumerations != null) {
+			for (Enumeration enumeration : enumerations) {
+				if (enumeration.getName().equals(name)) {
+					return enumeration;
+				}
+			}
+		}
+		return null;
+	}
+	
+	public Enumeration findEnumerationById(int id) {
+		if (enumerations != null) {
+			for (Enumeration enumeration : enumerations) {
+				if (enumeration.getId() == id) {
+					return enumeration;
+				}
+			}
+		}
+		return null;
+	}
+	
+	public boolean hasEnumerations() {
+		return (enumerations != null && enumerations.size() > 0);
+	}
+
+	public void print(int indent) {
+		Debug.println(indent, "Standard Variable: ");
+		indent += 3;
+		Debug.println(indent, "term: " + term);
+		Debug.println(indent, "property: " + property);
+		Debug.println(indent, "method " + method);
+		Debug.println(indent, "scale: " + scale);
+		Debug.println(indent, "storedIn: " + storedIn);
+		if (this.constraints != null) {
+			this.constraints.print(indent);
+		}
+		if (enumerations != null) {
+			Debug.println(indent, "enumerations: " + enumerations);
+		}
+	}
+	
+	public boolean equals(Object obj) {
+		if (obj == null) return false;
+		if (!(obj instanceof StandardVariable)) return false;
+		StandardVariable other = (StandardVariable) obj;
+		return other.getId() == getId();
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("VariableType [");
+		builder.append("term=");
+		builder.append(term);
+		builder.append(", property=");
+		builder.append(property);
+		builder.append(", scale=");
+		builder.append(scale);
+		builder.append(", method=");
+		builder.append(method);
+		builder.append(", dataType=");
+		builder.append(dataType);
+		builder.append(", storedIn=");
+		builder.append(storedIn);
+		builder.append(", constraints=");
+		builder.append(constraints);
+		builder.append(", nameSynonyms=");
+		builder.append(nameSynonyms);
+		if (enumerations != null) {
+			builder.append(", enumerations=");
+		    builder.append(enumerations);
+		}
+		builder.append("]");
+		return builder.toString();
+	}
+}
