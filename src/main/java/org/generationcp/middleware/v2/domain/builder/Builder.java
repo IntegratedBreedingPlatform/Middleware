@@ -14,7 +14,7 @@ package org.generationcp.middleware.v2.domain.builder;
 
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.v2.domain.DatabaseBroker;
+import org.generationcp.middleware.v2.util.DatabaseBroker;
 
 /**
  * The Class Builder (stolen from DataManager).

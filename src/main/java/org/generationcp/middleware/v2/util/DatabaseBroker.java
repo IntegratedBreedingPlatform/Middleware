@@ -9,7 +9,7 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-package org.generationcp.middleware.v2.domain;
+package org.generationcp.middleware.v2.util;
 
 import org.generationcp.middleware.dao.CountryDAO;
 import org.generationcp.middleware.dao.GenericDAO;

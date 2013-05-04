@@ -13,7 +13,7 @@
 package org.generationcp.middleware.v2.domain.searcher;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.v2.domain.DatabaseBroker;
+import org.generationcp.middleware.v2.util.DatabaseBroker;
 
 /**
  * Mainly used for local-central initially.
