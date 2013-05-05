@@ -192,5 +192,5 @@ public interface StudyDataManager {
      * @return
      * @throws MiddlewareQueryException
      */
-    void addDataSet(DataSet dataset, List<Experiment> experiments) throws MiddlewareQueryException;
+    DatasetReference addDataSet(DataSet dataset, List<Experiment> experiments) throws MiddlewareQueryException;
 }

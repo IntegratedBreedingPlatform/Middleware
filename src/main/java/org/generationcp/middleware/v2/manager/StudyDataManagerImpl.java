@@ -167,7 +167,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	
 
 	@Override
-	public void addDataSet(DataSet dataset, List<Experiment> experiments) throws MiddlewareQueryException {
+	public DatasetReference addDataSet(DataSet dataset, List<Experiment> experiments) throws MiddlewareQueryException {
 		requireLocalDatabaseInstance();
 		Session session = getCurrentSessionForLocal();
         Transaction trans = null;
@@ -177,6 +177,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			DmsProject datasetProject = getDatasetProjectSaver().saveDataSet(dataset);
 			getExperimentModelSaver().saveForDataSet(datasetProject.getProjectId(), experiments);
 	        trans.commit();
+	        return new DatasetReference(datasetProject.getProjectId(), dataset.getName(), dataset.getDescription());
 	        
 	    } catch (Exception e) {
 	    	rollbackTransaction(trans);
