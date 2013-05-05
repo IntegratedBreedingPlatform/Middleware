@@ -23,6 +23,13 @@ public class VariableType {
 	public void setLocalName(String localName) {
 		this.localName = localName;
 	}
+	
+	public String getName(NameType nameType) {
+		if (nameType == NameType.LOCAL) {
+			return localName;
+		}
+		return standardVariable.getName(nameType);
+	}
 
 	public String getLocalDescription() {
 		return localDescription;
