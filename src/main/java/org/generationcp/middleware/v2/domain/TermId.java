@@ -6,6 +6,7 @@ public enum TermId {
 	STANDARD_VARIABLE(1070)
 	, STUDY_INFORMATION(1010)
 	, VARIABLE_DESCRIPTION(1060)
+	, IBDB_STRUCTURE(1000)
 	
 	//CV Term Relationship
 	, HAS_METHOD(1210)
@@ -77,6 +78,10 @@ public enum TermId {
     , ORDER(1420)
 	, MIN_VALUE(1113)
 	, MAX_VALUE(1115)
+
+	// Stock Type
+	, ENTRY_CODE(8300)
+	;
 	;
 	
 	private final Integer id;

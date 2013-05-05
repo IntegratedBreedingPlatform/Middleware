@@ -10,16 +10,16 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DataManager;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.Study;
-import org.generationcp.middleware.v2.domain.Reference;
-import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.DataSet;
 import org.generationcp.middleware.v2.domain.DatasetReference;
 import org.generationcp.middleware.v2.domain.Experiment;
 import org.generationcp.middleware.v2.domain.FactorDetails;
 import org.generationcp.middleware.v2.domain.FolderReference;
+import org.generationcp.middleware.v2.domain.Reference;
 import org.generationcp.middleware.v2.domain.StudyDetails;
-import org.generationcp.middleware.v2.domain.StudyReference;
 import org.generationcp.middleware.v2.domain.StudyQueryFilter;
+import org.generationcp.middleware.v2.domain.StudyReference;
+import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.VariableTypeList;
 import org.generationcp.middleware.v2.domain.VariateDetails;
 import org.generationcp.middleware.v2.factory.StudyFactory;
@@ -167,16 +167,16 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	
 
 	@Override
-	public DatasetReference addDataSet(DataSet dataset) throws MiddlewareQueryException {
+	public void addDataSet(DataSet dataset, List<Experiment> experiments) throws MiddlewareQueryException {
 		requireLocalDatabaseInstance();
 		Session session = getCurrentSessionForLocal();
         Transaction trans = null;
  
         try {
             trans = session.beginTransaction();
-			getDatasetProjectSaver().saveDataSet(dataset);
+			DmsProject datasetProject = getDatasetProjectSaver().saveDataSet(dataset);
+			getExperimentModelSaver().saveForDataSet(datasetProject.getProjectId(), experiments);
 	        trans.commit();
-	        return new DatasetReference(dataset.getId(), dataset.getName(), dataset.getDescription());
 	        
 	    } catch (Exception e) {
 	    	rollbackTransaction(trans);

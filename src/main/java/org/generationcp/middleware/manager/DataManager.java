@@ -23,12 +23,13 @@ import org.generationcp.middleware.v2.domain.builder.TermBuilder;
 import org.generationcp.middleware.v2.domain.builder.DataSetBuilder;
 import org.generationcp.middleware.v2.domain.builder.ExperimentBuilder;
 import org.generationcp.middleware.v2.domain.builder.FactorDetailsBuilder;
-import org.generationcp.middleware.v2.domain.builder.VariateDetailsBuilder;
 import org.generationcp.middleware.v2.domain.builder.StudyBuilder;
 import org.generationcp.middleware.v2.domain.builder.StudyReferenceBuilder;
 import org.generationcp.middleware.v2.domain.builder.VariableInfoBuilder;
 import org.generationcp.middleware.v2.domain.builder.VariableTypeBuilder;
+import org.generationcp.middleware.v2.domain.builder.VariateDetailsBuilder;
 import org.generationcp.middleware.v2.domain.saver.DatasetProjectSaver;
+import org.generationcp.middleware.v2.domain.saver.ExperimentModelSaver;
 import org.generationcp.middleware.v2.domain.saver.StudySaver;
 import org.generationcp.middleware.v2.domain.searcher.ProjectSearcher;
 import org.generationcp.middleware.v2.factory.TermFactory;
@@ -840,5 +841,9 @@ public abstract class DataManager extends DatabaseBroker{
     
     protected final TermFactory getTermFactory() {
     	return new TermFactory();
+    }
+    
+    protected final ExperimentModelSaver getExperimentModelSaver() {
+    	return new ExperimentModelSaver(sessionProviderForLocal, sessionProviderForCentral);
     }
 }

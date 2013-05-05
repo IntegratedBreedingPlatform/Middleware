@@ -13,13 +13,14 @@ public class DatasetProjectSaver extends Saver {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 
-	public void saveDataSet(DataSet dataset) throws MiddlewareQueryException {
+	public DmsProject saveDataSet(DataSet dataset) throws MiddlewareQueryException {
 		setWorkingDatabase(Database.LOCAL);
 		
   		DmsProject datasetProject = createDataSet(dataset);
 		datasetProject.setProperties(getProjectPropertySaver().create(datasetProject, dataset.getVariableTypes()));
 		
 		getDmsProjectDao().save(datasetProject);
+		return datasetProject;
 	}
 	
 	public DmsProject createDataSet(DataSet dataset) throws MiddlewareQueryException {

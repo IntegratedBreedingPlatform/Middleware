@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.generationcp.commons.util.StringUtil;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.Variable;
 import org.generationcp.middleware.v2.domain.VariableList;
@@ -18,42 +19,47 @@ public class GeolocationSaver extends Saver {
 			HibernateSessionProvider sessionProviderForCentral) {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
-
-	public Geolocation create(VariableList factors) throws MiddlewareQueryException {
+	
+	public Geolocation create(int projectId, VariableList factors) throws MiddlewareQueryException {
+		setWorkingDatabase(Database.LOCAL);
 		Geolocation geolocation = null;
 		
 		if (factors != null && factors.getVariables() != null && factors.getVariables().size() > 0) {
 			
 			for (Variable variable : factors.getVariables()) {
-				Integer variableId = variable.getVariableType().getId();
+				Integer storedInId = variable.getVariableType().getStandardVariable().getStoredIn().getId();
 				String value = variable.getValue();
 				
-				if (TermId.TRIAL_INSTANCE_STORAGE.getId().equals(variableId)) {
+				if (TermId.TRIAL_INSTANCE_STORAGE.getId().equals(storedInId)) {
 					geolocation = getGeolocationObject(geolocation);
 					geolocation.setDescription(value);
 					
-				} else if (TermId.LATITUDE_STORAGE.getId().equals(variableId)) {
+				} else if (TermId.LATITUDE_STORAGE.getId().equals(storedInId)) {
 					geolocation = getGeolocationObject(geolocation);
 					geolocation.setLatitude(StringUtil.isEmpty(value) ? null : Double.valueOf(value));
 					
-				} else if (TermId.LONGITUDE_STORAGE.getId().equals(variableId)) {
+				} else if (TermId.LONGITUDE_STORAGE.getId().equals(storedInId)) {
 					geolocation = getGeolocationObject(geolocation);
 					geolocation.setLongitude(StringUtil.isEmpty(value) ? null : Double.valueOf(value));
 					
-				} else if (TermId.DATUM_STORAGE.getId().equals(variableId)) {
+				} else if (TermId.DATUM_STORAGE.getId().equals(storedInId)) {
 					geolocation = getGeolocationObject(geolocation);
 					geolocation.setGeodeticDatum(value);
 					
-				} else if (TermId.ALTITUDE_STORAGE.getId().equals(variableId)) {
+				} else if (TermId.ALTITUDE_STORAGE.getId().equals(storedInId)) {
 					geolocation = getGeolocationObject(geolocation);
 					geolocation.setAltitude(StringUtil.isEmpty(value) ? null : Double.valueOf(value));
 					
-				} else if (TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId().equals(variableId)) {
+				} else if (TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId().equals(storedInId)) {
 					geolocation = getGeolocationObject(geolocation);
 					addProperty(geolocation, createProperty(variable));
 					
 				}
 			}
+		}
+		
+		if (geolocation == null) {
+			geolocation = getGeolocationDao().getParentGeolocation(projectId);
 		}
 		
 		return geolocation;

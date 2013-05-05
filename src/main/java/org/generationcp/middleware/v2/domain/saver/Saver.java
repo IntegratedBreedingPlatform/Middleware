@@ -44,4 +44,12 @@ public abstract class Saver extends DatabaseBroker{
     protected final StockSaver getStockSaver() {
     	return new StockSaver(sessionProviderForLocal, sessionProviderForCentral);
     }
+    
+    protected final PhenotypeSaver getPhenotypeSaver() {
+    	return new PhenotypeSaver(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    protected final ExperimentModelSaver getExperimentModelSaver() {
+    	return new ExperimentModelSaver(sessionProviderForLocal, sessionProviderForCentral);
+    }
 }

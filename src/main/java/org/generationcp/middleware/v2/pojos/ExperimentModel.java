@@ -56,7 +56,7 @@ public class ExperimentModel implements Serializable {
 	private Integer ndExperimentId;
 
 	// Geolocation
-	@OneToOne(fetch = FetchType.EAGER)
+	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "nd_geolocation_id")
 	private Geolocation geoLocation;
 
@@ -74,7 +74,7 @@ public class ExperimentModel implements Serializable {
         inverseJoinColumns={@JoinColumn(name="project_id", insertable=false,updatable=false)})
     private DmsProject project;
     
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name="nd_experiment_id")
     private List<ExperimentStock> experimentStocks;
     

@@ -24,18 +24,18 @@ import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.pojos.Study;
-import org.generationcp.middleware.v2.domain.Reference;
-import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.DataSet;
 import org.generationcp.middleware.v2.domain.DatasetReference;
 import org.generationcp.middleware.v2.domain.Experiment;
 import org.generationcp.middleware.v2.domain.FactorDetails;
 import org.generationcp.middleware.v2.domain.FolderReference;
-import org.generationcp.middleware.v2.domain.VariateDetails;
+import org.generationcp.middleware.v2.domain.Reference;
 import org.generationcp.middleware.v2.domain.StudyDetails;
-import org.generationcp.middleware.v2.domain.StudyReference;
 import org.generationcp.middleware.v2.domain.StudyQueryFilter;
+import org.generationcp.middleware.v2.domain.StudyReference;
+import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.VariableDetails;
+import org.generationcp.middleware.v2.domain.VariateDetails;
 import org.generationcp.middleware.v2.manager.api.StudyDataManager;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -275,15 +275,19 @@ public class TestStudyDataManagerImpl {
 		//get a dataset test data from central
 		Integer datasetId = 10015;
 		DataSet dataset = manager.getDataSet(datasetId);
+		List<Experiment> experiments = manager.getExperiments(datasetId, 0, /*1093*/1);
 		
 		//save the dataset to local (copied from central)
-		/*DataSet newDataset = */ manager.addDataSet(dataset);
+		manager.addDataSet(dataset, experiments);
 		
-		//assert that the old and new dataset are the same, except for their ids
-		//System.out.println("ORIGINAL DATASET");
-		//dataset.print(0);
-		//System.out.println("NEWLY CREATED DATASET");
-		//newDataset.print(0);
+		/* 
+		 * compare the ff tables in central and local.  they must be the same, except for primary keys/foreign keys
+		 *   >> project, projectprop, project_relationship, nd_experiment_project
+		 *   >> nd_experiment, nd_experimentprop
+		 *   >> nd_geolocation, nd_geolocationprop
+		 *   >> nd_experiment_stock, stock, stockprop
+		 *   >> nd_experiment_phenotype, phenotype		
+		 */
 	}
 	
 	@AfterClass
@@ -292,23 +296,5 @@ public class TestStudyDataManagerImpl {
 			factory.close();
 		}
 	}
-	
-/*	private DataSet createDataSet() {
-		DataSet dataset = new DataSet();
-		dataset.setId(1);
-		dataset.setName("dataset 1");
-		dataset.setDescription("description 1");
-		dataset.setVariableTypes(new VariableTypeList());
-		dataset.getVariableTypes().add(createVariableType(CVTermId.));
-	}
-	
-	private VariableType createVariableType(int id, String name, String desc, String localName, String localDescription) {
-		VariableType varType = new VariableType();
-		varType.setId(id);
-		varType.setName(name);
-		varType.setDescription(desc);
-		varType.setLocalName(localName);
-		varType.setLocalDescription(localDescription);
-		return varType;
-	}*/
+
 }

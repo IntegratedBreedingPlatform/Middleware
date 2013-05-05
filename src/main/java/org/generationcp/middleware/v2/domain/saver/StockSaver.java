@@ -7,6 +7,7 @@ import java.util.List;
 import org.generationcp.commons.util.StringUtil;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.Variable;
 import org.generationcp.middleware.v2.domain.VariableList;
@@ -23,65 +24,58 @@ public class StockSaver extends Saver {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 
+	//Business Rules dictates that only 1 experimentStock per Experiment row.
 	public List<ExperimentStock> createExperimentStocks(ExperimentModel experimentModel, VariableList factors) throws MiddlewareQueryException {
-		List<ExperimentStock> experimentStocks = null;
+		setWorkingDatabase(Database.LOCAL);
 		
 		if (factors != null && factors.getVariables() != null && factors.getVariables().size() > 0) {
+			Stock stock = null;
 			for (Variable variable : factors.getVariables()) {
-				
-				Integer stockId = saveStock(variable);
-				if (stockId != null) {
-					ExperimentStock experimentStock = new ExperimentStock();
-					experimentStock.setExperimentStockId(getExperimentStockDao().getNegativeId("experimentStockId"));
-					experimentStock.setTypeId(variable.getVariableType().getId());
-					experimentStock.setStockId(stockId);
-					getExperimentStockCollection(experimentStocks).add(experimentStock);
-				}
+				stock = createOrUpdateStock(stock, variable);
+			}
+			
+			if (stock != null) {
+				getStockDao().save(stock);
+				createExperimentStock(experimentModel, stock.getStockId());
 			}
 		}
 		
-		return experimentStocks;
+		return experimentModel.getExperimentStocks();
 	}
 	
-	private List<ExperimentStock> getExperimentStockCollection(List<ExperimentStock> experimentStocks) throws MiddlewareQueryException {
-		if (experimentStocks == null) {
-			experimentStocks = new ArrayList<ExperimentStock>();
-		}
-		return experimentStocks;
-	}
-	
-	private Integer saveStock(Variable variable) throws MiddlewareQueryException {
-		Stock stock = createStock(variable);
-		if (stock != null) {
-			getStockDao().save(stock);
-			return stock.getStockId(); 
-		}
-		return null;
-	}
-	
-	private Stock createStock(Variable variable) throws MiddlewareQueryException {
-		Stock stock = null;
+	private void createExperimentStock(ExperimentModel experimentModel, int stockId) throws MiddlewareQueryException {
+		ExperimentStock experimentStock = new ExperimentStock();
+		experimentStock.setExperimentStockId(getExperimentStockDao().getNegativeId("experimentStockId"));
+		experimentStock.setTypeId(TermId.IBDB_STRUCTURE.getId());
+		experimentStock.setStockId(stockId);
+		experimentStock.setExperimentId(experimentModel.getNdExperimentId());
 		
-		Integer variableId = variable.getVariableType().getId();
+		experimentModel.setExperimentStocks(new ArrayList<ExperimentStock>());
+		experimentModel.getExperimentStocks().add(experimentStock);
+	}
+	
+	private Stock createOrUpdateStock(Stock stock, Variable variable) 
+	throws MiddlewareQueryException {
+		Integer storedInId = variable.getVariableType().getStandardVariable().getStoredIn().getId();
 		String value = variable.getValue();
 		
-		if (TermId.ENTRY_NUMBER_STORAGE.getId().equals(variableId)) {
+		if (TermId.ENTRY_NUMBER_STORAGE.getId().equals(storedInId)) {
 			stock = getStockObject(stock);
 			stock.setUniqueName(value);
 			
-		} else if (TermId.ENTRY_GID_STORAGE.getId().equals(variableId)) {
+		} else if (TermId.ENTRY_GID_STORAGE.getId().equals(storedInId)) {
 			stock = getStockObject(stock);
 			stock.setDbxrefId(StringUtil.isEmpty(value) ? null : Integer.valueOf(value));
 			
-		} else if (TermId.ENTRY_DESIGNATION_STORAGE.getId().equals(variableId)) {
+		} else if (TermId.ENTRY_DESIGNATION_STORAGE.getId().equals(storedInId)) {
 			stock = getStockObject(stock);
 			stock.setName(value);
 			
-		} else if (TermId.ENTRY_CODE_STORAGE.getId().equals(variableId)) {
+		} else if (TermId.ENTRY_CODE_STORAGE.getId().equals(storedInId)) {
 			stock = getStockObject(stock);
 			stock.setValue(value);
 			
-		} else if (TermId.GERMPLASM_ENTRY_STORAGE.getId().equals(variableId)) {
+		} else if (TermId.GERMPLASM_ENTRY_STORAGE.getId().equals(storedInId)) {
 			stock = getStockObject(stock);
 			addProperty(stock, createProperty(variable));
 			
@@ -94,6 +88,9 @@ public class StockSaver extends Saver {
 		if (stock == null) {
 			stock = new Stock();
 			stock.setStockId(getStockDao().getNegativeId("stockId"));
+			stock.setIsObsolete(false);
+			stock.setUniqueName("");
+			stock.setTypeId(TermId.ENTRY_CODE.getId());
 		}
 		return stock;
 	}

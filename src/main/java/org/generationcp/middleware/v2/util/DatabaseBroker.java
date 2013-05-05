@@ -22,6 +22,7 @@ import org.generationcp.middleware.v2.dao.CVTermDao;
 import org.generationcp.middleware.v2.dao.CVTermRelationshipDao;
 import org.generationcp.middleware.v2.dao.DmsProjectDao;
 import org.generationcp.middleware.v2.dao.ExperimentDao;
+import org.generationcp.middleware.v2.dao.ExperimentPhenotypeDao;
 import org.generationcp.middleware.v2.dao.ExperimentProjectDao;
 import org.generationcp.middleware.v2.dao.ExperimentPropertyDao;
 import org.generationcp.middleware.v2.dao.ExperimentStockDao;
@@ -462,4 +463,9 @@ public class DatabaseBroker {
     	return phenotypeDao;
     }
 
+    protected final ExperimentPhenotypeDao getExperimentPhenotypeDao() {
+    	ExperimentPhenotypeDao experimentPhenotypeDao = new ExperimentPhenotypeDao();
+    	experimentPhenotypeDao.setSession(getActiveSession());
+    	return experimentPhenotypeDao;
+    }
 }
