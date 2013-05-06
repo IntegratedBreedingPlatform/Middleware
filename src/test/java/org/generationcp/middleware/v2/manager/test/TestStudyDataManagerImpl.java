@@ -336,6 +336,11 @@ public class TestStudyDataManagerImpl {
 		VariableList variableList = new VariableList();
 		manager.addLocation(variableList);
 	}
+	
+	public void testAddGermplasm() throws Exception {
+		VariableList variableList = new VariableList();
+		manager.addGermplasm(variableList);
+	}
 
 	@AfterClass
 	public static void tearDown() throws Exception {

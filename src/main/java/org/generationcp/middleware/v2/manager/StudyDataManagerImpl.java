@@ -218,4 +218,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public int addLocation(VariableList variableList) throws MiddlewareQueryException {
 		return getGeolocationSaver().saveGeolocation(variableList);		
 	}
+
+	@Override
+	public int addGermplasm(VariableList variableList) throws MiddlewareQueryException {
+		return getStockSaver().saveStock(variableList);
+	}
 }

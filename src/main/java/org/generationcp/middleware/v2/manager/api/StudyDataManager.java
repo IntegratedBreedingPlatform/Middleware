@@ -208,7 +208,21 @@ public interface StudyDataManager {
      */
     void addExperiment(int dataSetId, ExperimentValues experimentValues) throws MiddlewareQueryException;
     
-    
+    /**
+     * Adds Geolocation and GeolocationProp records.
+     * 
+     * @param variableList
+     * @return
+     * @throws MiddlewareQueryException
+     */
     int addLocation(VariableList variableList) throws MiddlewareQueryException;
+    
+    /**
+     * Adds Stock and StockProp records.
+     * @param variableList
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    int addGermplasm(VariableList variableList) throws MiddlewareQueryException;
     
 }

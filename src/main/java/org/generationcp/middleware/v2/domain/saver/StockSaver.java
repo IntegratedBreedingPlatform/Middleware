@@ -5,8 +5,10 @@ import java.util.HashSet;
 import org.generationcp.commons.util.StringUtil;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.Variable;
+import org.generationcp.middleware.v2.domain.VariableList;
 import org.generationcp.middleware.v2.pojos.Stock;
 import org.generationcp.middleware.v2.pojos.StockProperty;
 
@@ -18,30 +20,47 @@ public class StockSaver extends Saver {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 
-	private Stock createOrUpdateStock(Stock stock, Variable variable) throws MiddlewareQueryException {
-		Integer storedInId = variable.getVariableType().getStandardVariable().getStoredIn().getId();
-		String value = variable.getValue();
+	public Integer saveStock(VariableList variableList) throws MiddlewareQueryException {
+		setWorkingDatabase(Database.LOCAL);
 		
-		if (TermId.ENTRY_NUMBER_STORAGE.getId().equals(storedInId)) {
-			stock = getStockObject(stock);
-			stock.setUniqueName(value);
-			
-		} else if (TermId.ENTRY_GID_STORAGE.getId().equals(storedInId)) {
-			stock = getStockObject(stock);
-			stock.setDbxrefId(StringUtil.isEmpty(value) ? null : Integer.valueOf(value));
-			
-		} else if (TermId.ENTRY_DESIGNATION_STORAGE.getId().equals(storedInId)) {
-			stock = getStockObject(stock);
-			stock.setName(value);
-			
-		} else if (TermId.ENTRY_CODE_STORAGE.getId().equals(storedInId)) {
-			stock = getStockObject(stock);
-			stock.setValue(value);
-			
-		} else if (TermId.GERMPLASM_ENTRY_STORAGE.getId().equals(storedInId)) {
-			stock = getStockObject(stock);
-			addProperty(stock, createProperty(variable));
-			
+		Stock stock = createStock(variableList);
+		if (stock != null) {
+			getStockDao().save(stock);
+			return stock.getStockId();
+		}
+		
+		return null;
+	}
+	
+	private Stock createStock(VariableList variableList) throws MiddlewareQueryException {
+		Stock stock = null;
+		if (variableList != null && variableList.getVariables() != null && variableList.getVariables().size() > 0) {
+			for (Variable variable : variableList.getVariables()) {
+				Integer storedInId = variable.getVariableType().getStandardVariable().getStoredIn().getId();
+				String value = variable.getValue();
+				
+				if (TermId.ENTRY_NUMBER_STORAGE.getId().equals(storedInId)) {
+					stock = getStockObject(stock);
+					stock.setUniqueName(value);
+					
+				} else if (TermId.ENTRY_GID_STORAGE.getId().equals(storedInId)) {
+					stock = getStockObject(stock);
+					stock.setDbxrefId(StringUtil.isEmpty(value) ? null : Integer.valueOf(value));
+					
+				} else if (TermId.ENTRY_DESIGNATION_STORAGE.getId().equals(storedInId)) {
+					stock = getStockObject(stock);
+					stock.setName(value);
+					
+				} else if (TermId.ENTRY_CODE_STORAGE.getId().equals(storedInId)) {
+					stock = getStockObject(stock);
+					stock.setValue(value);
+					
+				} else if (TermId.GERMPLASM_ENTRY_STORAGE.getId().equals(storedInId)) {
+					stock = getStockObject(stock);
+					addProperty(stock, createProperty(variable));
+					
+				}
+			}
 		}
 		
 		return stock;
