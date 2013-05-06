@@ -1,9 +1,12 @@
 package org.generationcp.middleware.v2.domain.builder;
 
+import java.util.List;
+
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.v2.domain.Study;
 import org.generationcp.middleware.v2.pojos.DmsProject;
+import org.generationcp.middleware.v2.pojos.ProjectProperty;
 
 public class StudyBuilder extends Builder {
 
@@ -28,13 +31,14 @@ public class StudyBuilder extends Builder {
 		study.setId(project.getProjectId());
 		study.setName(project.getName());
 		study.setDescription(project.getDescription());
-		study.setVariableTypes(getVariableTypeBuilder().create(project.getProperties()));
 		
-		//TODO get conditions only from project then assign to study
-		study.setConditions(getVariableBuilder().create(project.getProperties(), study.getVariableTypes()));
+		List<ProjectProperty> conditions = project.getConditions();
+		study.setConditionVariableTypes(getVariableTypeBuilder().create(conditions));
+		study.setConditions(getVariableBuilder().create(conditions, study.getConditionVariableTypes()));
 		
-		study.setConstants(getVariableBuilder().create(project.getConstants(), study.getVariableTypes()));
-		
+		List<ProjectProperty> constants = project.getConstants();
+		study.setConstantVariableTypes(getVariableTypeBuilder().create(constants));
+		study.setConstants(getVariableBuilder().create(constants, study.getConstantVariableTypes()));		
 		return study;
 	}
 

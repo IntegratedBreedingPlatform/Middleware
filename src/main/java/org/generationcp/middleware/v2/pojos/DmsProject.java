@@ -142,19 +142,28 @@ public class DmsProject implements Serializable {
 	public void setRelatedBys(List<ProjectRelationship> relatedBys) {
 		this.relatedBys = relatedBys;
 	}
-	
+
+	/**
+	 * A project property is a condition if its type is neither Observation
+	 * Variate and Categorical Variate
+	 */
 	public List<ProjectProperty> getConditions(){
 		List<ProjectProperty> conditions = new ArrayList<ProjectProperty>();
-		
-		//TODO Get the conditions from properties
-		
+		for (ProjectProperty property : properties){
+			if (property.getTypeId() != (TermId.OBSERVATION_VARIATE.getId()) && 
+					property.getTypeId() != (TermId.CATEGORICAL_VARIATE.getId())){
+				conditions.add(property);
+			}
+		}				
 		return conditions;
-		
 	}
 
+	/**
+	 * A project property is a constant if its type is either Observation
+	 * Variate and Categorical Variate
+	 */
 	public List<ProjectProperty> getConstants(){
-		List<ProjectProperty> constants = new ArrayList<ProjectProperty>();
-		
+		List<ProjectProperty> constants = new ArrayList<ProjectProperty>();		
 		for (ProjectProperty property : properties){
 			if (property.getTypeId() == (TermId.OBSERVATION_VARIATE.getId()) || 
 					property.getTypeId() == (TermId.CATEGORICAL_VARIATE.getId())){
@@ -162,7 +171,6 @@ public class DmsProject implements Serializable {
 			}
 		}		
 		return constants;
-		
 	}
 
 
@@ -192,11 +200,24 @@ public class DmsProject implements Serializable {
 		return true;
 	}
 
+	
 	@Override
 	public String toString() {
-		return getEntityName() + " [projectId=" + projectId + ", name=" + name
-				+ ", description=" + description 
-				;
+		StringBuilder builder = new StringBuilder();
+		builder.append(getEntityName() + " [projectId=");
+		builder.append(projectId);
+		builder.append(", name=");
+		builder.append(name);
+		builder.append(", description=");
+		builder.append(description);
+		builder.append(", properties=");
+		builder.append(properties);
+		builder.append(", relatedTos=");
+		builder.append(relatedTos);
+		builder.append(", relatedBys=");
+		builder.append(relatedBys);
+		builder.append("]");
+		return builder.toString();
 	}
 
 	public String getEntityName(){
