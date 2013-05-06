@@ -1,5 +1,6 @@
 package org.generationcp.middleware.v2.domain.saver;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -7,14 +8,16 @@ import java.util.Set;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
-import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.Experiment;
 import org.generationcp.middleware.v2.domain.Study;
+import org.generationcp.middleware.v2.domain.TermId;
+import org.generationcp.middleware.v2.domain.Values;
 import org.generationcp.middleware.v2.domain.Variable;
 import org.generationcp.middleware.v2.domain.VariableList;
 import org.generationcp.middleware.v2.pojos.ExperimentModel;
 import org.generationcp.middleware.v2.pojos.ExperimentProject;
 import org.generationcp.middleware.v2.pojos.ExperimentProperty;
+import org.generationcp.middleware.v2.pojos.ExperimentStock;
 
 public class ExperimentModelSaver extends Saver {
 
@@ -24,37 +27,28 @@ public class ExperimentModelSaver extends Saver {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 	
-	public void saveForDataSet(int projectId, Collection<Experiment> experiments) throws MiddlewareQueryException {
-		for (Experiment experiment : experiments) {
-			saveExperiment(projectId, experiment.getFactors(), experiment.getVariates(), TermId.PLOT_EXPERIMENT);
-		}
-	}
-
-	public void saveForStudy(int projectId, Study study) throws MiddlewareQueryException {
+	public void addExperiment(int projectId, Values values, boolean isStudy) throws MiddlewareQueryException {
 		setWorkingDatabase(Database.LOCAL);
-		saveExperiment(projectId, study.getConditions(), study.getConstants(), TermId.STUDY_EXPERIMENT);
-	}
-	
-	private void saveExperiment(int projectId, VariableList factors, VariableList variates, TermId expType) 
-	throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
-		ExperimentModel experimentModel = create(projectId, factors, variates, expType);
+		TermId experimentType = isStudy ? TermId.STUDY_EXPERIMENT : TermId.PLOT_EXPERIMENT;
+		ExperimentModel experimentModel = create(projectId, values, experimentType);
 		getExperimentDao().save(experimentModel);
 
-		//save fk tables for those where cascade save can't be used
-		saveExperimentProject(experimentModel, projectId);
-		getPhenotypeSaver().savePhenotypes(experimentModel, variates);
+		addExperimentProject(experimentModel, projectId);
+		getPhenotypeSaver().savePhenotypes(experimentModel, values.getVariableList());
 	}
 	
-	private ExperimentModel create(int projectId, VariableList factors, VariableList variates, TermId expType) throws MiddlewareQueryException {
+	private ExperimentModel create(int projectId, Values values, TermId expType) throws MiddlewareQueryException {
 		ExperimentModel experimentModel = new ExperimentModel();
 		
 		experimentModel.setNdExperimentId(getExperimentDao().getNegativeId("ndExperimentId"));
 		experimentModel.setTypeId(expType.getId());
-		experimentModel.setProperties(createProperties(experimentModel, factors));
-		experimentModel.setGeoLocation(getGeolocationSaver().create(projectId, factors)); 
-		experimentModel.setExperimentStocks(getStockSaver().createExperimentStocks(experimentModel, factors));
-		
+		experimentModel.setProperties(createProperties(experimentModel, values.getVariableList()));
+		//TODO: what if values.locationId is null?
+		experimentModel.setGeoLocation(getGeolocationDao().getById(values.getLocationId())); 
+		if (values.getGermplasmId() != null) {
+			experimentModel.setExperimentStocks(new ArrayList<ExperimentStock>());
+			experimentModel.getExperimentStocks().add(createExperimentStock(experimentModel.getNdExperimentId(), values.getGermplasmId()));
+		}
 		return experimentModel;
 	}
 
@@ -86,7 +80,7 @@ public class ExperimentModelSaver extends Saver {
 		experimentModel.getProperties().add(property);
 	}
 	
-	private void saveExperimentProject(ExperimentModel experimentModel, int projectId) throws MiddlewareQueryException {
+	private void addExperimentProject(ExperimentModel experimentModel, int projectId) throws MiddlewareQueryException {
 		ExperimentProject exproj = new ExperimentProject();
 		
 		exproj.setExperimentProjectId(getExperimentProjectDao().getNegativeId("experimentProjectId"));
@@ -95,4 +89,15 @@ public class ExperimentModelSaver extends Saver {
 		
 		getExperimentProjectDao().save(exproj);
 	}
+	
+	private ExperimentStock createExperimentStock(int experimentModelId, int stockId) throws MiddlewareQueryException {
+		ExperimentStock experimentStock = new ExperimentStock();
+		experimentStock.setExperimentStockId(getExperimentStockDao().getNegativeId("experimentStockId"));
+		experimentStock.setTypeId(TermId.IBDB_STRUCTURE.getId());
+		experimentStock.setStockId(stockId);
+		experimentStock.setExperimentId(experimentModelId);
+		
+		return experimentStock;
+	}
+	
 }

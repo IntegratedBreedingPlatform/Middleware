@@ -18,16 +18,19 @@ import java.util.Set;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.Study;
-import org.generationcp.middleware.v2.domain.Reference;
 import org.generationcp.middleware.v2.domain.DataSet;
 import org.generationcp.middleware.v2.domain.DatasetReference;
+import org.generationcp.middleware.v2.domain.DatasetValues;
 import org.generationcp.middleware.v2.domain.Experiment;
+import org.generationcp.middleware.v2.domain.ExperimentValues;
 import org.generationcp.middleware.v2.domain.FactorDetails;
 import org.generationcp.middleware.v2.domain.FolderReference;
-import org.generationcp.middleware.v2.domain.VariateDetails;
+import org.generationcp.middleware.v2.domain.Reference;
 import org.generationcp.middleware.v2.domain.StudyDetails;
-import org.generationcp.middleware.v2.domain.StudyReference;
 import org.generationcp.middleware.v2.domain.StudyQueryFilter;
+import org.generationcp.middleware.v2.domain.StudyReference;
+import org.generationcp.middleware.v2.domain.VariableTypeList;
+import org.generationcp.middleware.v2.domain.VariateDetails;
 
 /**
  * This is the API for retrieving phenotypic data stored as Studies and
@@ -192,5 +195,8 @@ public interface StudyDataManager {
      * @return
      * @throws MiddlewareQueryException
      */
-    DatasetReference addDataSet(DataSet dataset, List<Experiment> experiments) throws MiddlewareQueryException;
+    //DatasetReference addDataSet(DataSet dataset, List<Experiment> experiments) throws MiddlewareQueryException;
+    DatasetReference addDataSet(int studyId, VariableTypeList variableTypeList, DatasetValues datasetValues) throws MiddlewareQueryException;
+    
+    void addExperiment(int dataSetId, ExperimentValues experimentValues) throws MiddlewareQueryException;
 }

@@ -14,6 +14,7 @@ package org.generationcp.middleware.v2.manager.test;
 
 import static org.junit.Assert.assertNotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -23,21 +24,24 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.Season;
-import org.generationcp.middleware.v2.domain.Study;
 import org.generationcp.middleware.v2.domain.DataSet;
 import org.generationcp.middleware.v2.domain.DatasetReference;
+import org.generationcp.middleware.v2.domain.DatasetValues;
 import org.generationcp.middleware.v2.domain.Experiment;
+import org.generationcp.middleware.v2.domain.ExperimentValues;
 import org.generationcp.middleware.v2.domain.FactorDetails;
 import org.generationcp.middleware.v2.domain.FolderReference;
 import org.generationcp.middleware.v2.domain.Reference;
-import org.generationcp.middleware.v2.domain.VariableList;
-import org.generationcp.middleware.v2.domain.VariableTypeList;
-import org.generationcp.middleware.v2.domain.VariateDetails;
+import org.generationcp.middleware.v2.domain.StandardVariable;
 import org.generationcp.middleware.v2.domain.StudyDetails;
 import org.generationcp.middleware.v2.domain.StudyQueryFilter;
 import org.generationcp.middleware.v2.domain.StudyReference;
 import org.generationcp.middleware.v2.domain.TermId;
+import org.generationcp.middleware.v2.domain.Variable;
 import org.generationcp.middleware.v2.domain.VariableDetails;
+import org.generationcp.middleware.v2.domain.VariableList;
+import org.generationcp.middleware.v2.domain.VariableType;
+import org.generationcp.middleware.v2.domain.VariateDetails;
 import org.generationcp.middleware.v2.manager.api.StudyDataManager;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -278,21 +282,53 @@ public class TestStudyDataManagerImpl {
 	public void testAddDataSet() throws Exception {
 		// get a dataset test data from central
 		Integer datasetId = 10015;
+		int parentStudyId = -1;
 		DataSet dataset = manager.getDataSet(datasetId);
-		List<Experiment> experiments = manager.getExperiments(datasetId, 0, /* 1093 */
-				1);
 
-		// save the dataset to local (copied from central)
-		manager.addDataSet(dataset, experiments);
+		StandardVariable var = new StandardVariable();
+		var.setId(TermId.DATASET_NAME.getId());
+		
+		VariableType type = new VariableType();
+		type.setStandardVariable(var);
+		type.setLocalDescription("Dataset Name");
+		type.setLocalName("DATASET_NAME");
+		type.setRank(1);
+		
+		VariableList variableList = new VariableList();
+		variableList.add(new Variable(type, "My Dataset Name"));
+		
+		var = new StandardVariable();
+		var.setId(TermId.DATASET_TITLE.getId());
+		
+		type = new VariableType();
+		type.setStandardVariable(var);
+		type.setLocalDescription("Dataset Description");
+		type.setLocalName("DATASET_DESC");
+		type.setRank(2);
+		
+		variableList.add(new Variable(type, "My Dataset Description"));
+		
+		DatasetValues datasetValues = new DatasetValues();
+		datasetValues.setVariableList(variableList);
 
-		/*
-		 * compare the ff tables in central and local. they must be the same,
-		 * except for primary keys/foreign keys >> project, projectprop,
-		 * project_relationship, nd_experiment_project >> nd_experiment,
-		 * nd_experimentprop >> nd_geolocation, nd_geolocationprop >>
-		 * nd_experiment_stock, stock, stockprop >> nd_experiment_phenotype,
-		 * phenotype
-		 */
+		DatasetReference datasetReference = manager.addDataSet(parentStudyId, dataset.getVariableTypes(), datasetValues);
+		
+	}
+	
+	@Test
+	public void testAddExperiment() throws Exception {
+		List<Experiment> experiments = manager.getExperiments(10015, 0, /* 1093 */1);
+		int dataSetId = -1;
+		ExperimentValues experimentValues = new ExperimentValues();
+		List<Variable> varList = new ArrayList<Variable>();
+		varList.addAll(experiments.get(0).getFactors().getVariables());
+		varList.addAll(experiments.get(0).getVariates().getVariables());
+		VariableList list = new VariableList();
+		list.setVariables(varList);
+		experimentValues.setVariableList(list);
+		experimentValues.setGermplasmId(-1);
+		experimentValues.setLocationId(-1);
+		manager.addExperiment(dataSetId, experimentValues);
 	}
 
 	@AfterClass

@@ -12,7 +12,9 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.v2.domain.DataSet;
 import org.generationcp.middleware.v2.domain.DatasetReference;
+import org.generationcp.middleware.v2.domain.DatasetValues;
 import org.generationcp.middleware.v2.domain.Experiment;
+import org.generationcp.middleware.v2.domain.ExperimentValues;
 import org.generationcp.middleware.v2.domain.FactorDetails;
 import org.generationcp.middleware.v2.domain.FolderReference;
 import org.generationcp.middleware.v2.domain.Reference;
@@ -165,23 +167,21 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		return studyDetails;	
     }
 	
-
 	@Override
-	public DatasetReference addDataSet(DataSet dataset, List<Experiment> experiments) throws MiddlewareQueryException {
+	public DatasetReference addDataSet(int studyId, VariableTypeList variableTypeList, DatasetValues datasetValues) throws MiddlewareQueryException {
 		requireLocalDatabaseInstance();
 		Session session = getCurrentSessionForLocal();
         Transaction trans = null;
  
         try {
             trans = session.beginTransaction();
-			DmsProject datasetProject = getDatasetProjectSaver().saveDataSet(dataset);
-			getExperimentModelSaver().saveForDataSet(datasetProject.getProjectId(), experiments);
-	        trans.commit();
-	        return new DatasetReference(datasetProject.getProjectId(), dataset.getName(), dataset.getDescription());
-	        
-	    } catch (Exception e) {
+			DmsProject datasetProject = getDatasetProjectSaver().addDataSet(studyId, variableTypeList, datasetValues);
+			trans.commit();
+			return new DatasetReference(datasetProject.getProjectId(), datasetProject.getName(), datasetProject.getDescription());
+
+        } catch (Exception e) {
 	    	rollbackTransaction(trans);
-	        throw new MiddlewareQueryException("error in save " + e.getMessage(), e);
+	        throw new MiddlewareQueryException("error in addDataSet " + e.getMessage(), e);
 	    }
 	}
 
@@ -194,5 +194,22 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public int countExperiments(int dataSetId) throws MiddlewareQueryException {
 		return getExperimentBuilder().count(dataSetId);
+	}
+
+	@Override
+	public void addExperiment(int dataSetId, ExperimentValues experimentValues) throws MiddlewareQueryException {
+		requireLocalDatabaseInstance();
+		Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+ 
+        try {
+            trans = session.beginTransaction();
+            getExperimentModelSaver().addExperiment(dataSetId, experimentValues, false);
+            trans.commit();
+            
+        } catch (Exception e) {
+	    	rollbackTransaction(trans);
+	        throw new MiddlewareQueryException("error in addExperiment " + e.getMessage(), e);
+	    }
 	}
 }

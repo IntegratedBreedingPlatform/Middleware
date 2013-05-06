@@ -30,6 +30,10 @@ public enum TermId {
 	, STUDY_IP(8120)
 	, CREATION_DATE(8048)
 	
+	// Dataset Fields
+	, DATASET_NAME(8150)
+	, DATASET_TITLE(8155)
+	
 	// Numeric Data Fields
 	, NUMERIC_VARIABLE(1110)
 	, DATE_VARIABLE(1117)

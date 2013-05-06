@@ -73,7 +73,7 @@ public class DmsProject implements Serializable {
 	@OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private List<ProjectProperty> properties;
 	
-	@OneToMany(mappedBy = "subjectProject", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "subjectProject", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<ProjectRelationship> relatedTos;
 	
 	@OneToMany(mappedBy = "objectProject", fetch = FetchType.LAZY)
