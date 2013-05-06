@@ -22,6 +22,7 @@ import org.generationcp.middleware.v2.domain.StudyDetails;
 import org.generationcp.middleware.v2.domain.StudyQueryFilter;
 import org.generationcp.middleware.v2.domain.StudyReference;
 import org.generationcp.middleware.v2.domain.TermId;
+import org.generationcp.middleware.v2.domain.VariableList;
 import org.generationcp.middleware.v2.domain.VariableTypeList;
 import org.generationcp.middleware.v2.domain.VariateDetails;
 import org.generationcp.middleware.v2.factory.StudyFactory;
@@ -211,5 +212,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	    	rollbackTransaction(trans);
 	        throw new MiddlewareQueryException("error in addExperiment " + e.getMessage(), e);
 	    }
+	}
+
+	@Override
+	public void addLocation(VariableList variableList) throws MiddlewareQueryException {
+				
 	}
 }

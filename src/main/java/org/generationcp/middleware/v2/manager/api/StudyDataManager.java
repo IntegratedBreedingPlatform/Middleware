@@ -29,6 +29,7 @@ import org.generationcp.middleware.v2.domain.Reference;
 import org.generationcp.middleware.v2.domain.StudyDetails;
 import org.generationcp.middleware.v2.domain.StudyQueryFilter;
 import org.generationcp.middleware.v2.domain.StudyReference;
+import org.generationcp.middleware.v2.domain.VariableList;
 import org.generationcp.middleware.v2.domain.VariableTypeList;
 import org.generationcp.middleware.v2.domain.VariateDetails;
 
@@ -189,7 +190,7 @@ public interface StudyDataManager {
     public StudyDetails addStudyDetails(StudyDetails studyDetails) throws MiddlewareQueryException;
     
     /**
-     * Adds a dataset, along with its variable and variable values.
+     * Adds a dataset, dataset labels (factors and variate labels), and parent study association.
      * 
      * @param dataset
      * @return
@@ -198,5 +199,16 @@ public interface StudyDataManager {
     //DatasetReference addDataSet(DataSet dataset, List<Experiment> experiments) throws MiddlewareQueryException;
     DatasetReference addDataSet(int studyId, VariableTypeList variableTypeList, DatasetValues datasetValues) throws MiddlewareQueryException;
     
+    /**
+     * Adds an experiment row to the dataset.
+     * 
+     * @param dataSetId
+     * @param experimentValues
+     * @throws MiddlewareQueryException
+     */
     void addExperiment(int dataSetId, ExperimentValues experimentValues) throws MiddlewareQueryException;
+    
+    
+    void addLocation(VariableList variableList) throws MiddlewareQueryException;
+    
 }

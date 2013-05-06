@@ -18,8 +18,7 @@ public class StockSaver extends Saver {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 
-	private Stock createOrUpdateStock(Stock stock, Variable variable) 
-	throws MiddlewareQueryException {
+	private Stock createOrUpdateStock(Stock stock, Variable variable) throws MiddlewareQueryException {
 		Integer storedInId = variable.getVariableType().getStandardVariable().getStoredIn().getId();
 		String value = variable.getValue();
 		

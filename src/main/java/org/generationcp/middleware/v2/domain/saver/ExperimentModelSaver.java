@@ -1,15 +1,12 @@
 package org.generationcp.middleware.v2.domain.saver;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
-import org.generationcp.middleware.v2.domain.Experiment;
-import org.generationcp.middleware.v2.domain.Study;
 import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.Values;
 import org.generationcp.middleware.v2.domain.Variable;
@@ -35,7 +32,9 @@ public class ExperimentModelSaver extends Saver {
 
 		addExperimentProject(experimentModel, projectId);
 		getPhenotypeSaver().savePhenotypes(experimentModel, values.getVariableList());
-		getProjectPropertySaver().saveProjectPropValues(values.getVariableList());
+		if (isStudy) {
+			getProjectPropertySaver().saveProjectPropValues(values.getVariableList());
+		}
 	}
 	
 	private ExperimentModel create(int projectId, Values values, TermId expType) throws MiddlewareQueryException {
@@ -45,7 +44,9 @@ public class ExperimentModelSaver extends Saver {
 		experimentModel.setTypeId(expType.getId());
 		experimentModel.setProperties(createProperties(experimentModel, values.getVariableList()));
 		//TODO: what if values.locationId is null?
-		experimentModel.setGeoLocation(getGeolocationDao().getById(values.getLocationId())); 
+		if (values.getLocationId() != null) {
+			experimentModel.setGeoLocation(getGeolocationDao().getById(values.getLocationId())); 
+		}
 		if (values.getGermplasmId() != null) {
 			experimentModel.setExperimentStocks(new ArrayList<ExperimentStock>());
 			experimentModel.getExperimentStocks().add(createExperimentStock(experimentModel.getNdExperimentId(), values.getGermplasmId()));

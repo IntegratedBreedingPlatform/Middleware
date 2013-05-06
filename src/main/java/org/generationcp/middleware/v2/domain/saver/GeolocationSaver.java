@@ -20,8 +20,16 @@ public class GeolocationSaver extends Saver {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 	
-	public Geolocation create(int projectId, VariableList factors) throws MiddlewareQueryException {
+	public void saveGeolocation(VariableList variableList) throws MiddlewareQueryException {
 		setWorkingDatabase(Database.LOCAL);
+		
+		Geolocation geolocation = create(variableList);
+		if (geolocation != null) {
+			getGeolocationDao().save(geolocation);
+		}
+	}
+	
+	private Geolocation create(/*int projectId,*/ VariableList factors) throws MiddlewareQueryException {
 		Geolocation geolocation = null;
 		
 		if (factors != null && factors.getVariables() != null && factors.getVariables().size() > 0) {
@@ -57,11 +65,11 @@ public class GeolocationSaver extends Saver {
 				}
 			}
 		}
-		
+/*		
 		if (geolocation == null) {
 			geolocation = getGeolocationDao().getParentGeolocation(projectId);
 		}
-		
+*/		
 		return geolocation;
 	}
 	
