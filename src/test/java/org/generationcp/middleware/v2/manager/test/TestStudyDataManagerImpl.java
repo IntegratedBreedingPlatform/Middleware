@@ -312,6 +312,7 @@ public class TestStudyDataManagerImpl {
 		datasetValues.setVariableList(variableList);
 
 		DatasetReference datasetReference = manager.addDataSet(parentStudyId, dataset.getVariableTypes(), datasetValues);
+		System.out.println("Dataset added : " + datasetReference);
 		
 	}
 	
@@ -329,6 +330,11 @@ public class TestStudyDataManagerImpl {
 		experimentValues.setGermplasmId(-1);
 		experimentValues.setLocationId(-1);
 		manager.addExperiment(dataSetId, experimentValues);
+	}
+	
+	public void testAddLocation() throws Exception {
+		VariableList variableList = new VariableList();
+		manager.addLocation(variableList);
 	}
 
 	@AfterClass

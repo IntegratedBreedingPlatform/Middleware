@@ -20,13 +20,15 @@ public class GeolocationSaver extends Saver {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 	
-	public void saveGeolocation(VariableList variableList) throws MiddlewareQueryException {
+	public Integer saveGeolocation(VariableList variableList) throws MiddlewareQueryException {
 		setWorkingDatabase(Database.LOCAL);
 		
 		Geolocation geolocation = create(variableList);
 		if (geolocation != null) {
 			getGeolocationDao().save(geolocation);
+			return geolocation.getLocationId();
 		}
+		return null;
 	}
 	
 	private Geolocation create(/*int projectId,*/ VariableList factors) throws MiddlewareQueryException {

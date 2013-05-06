@@ -215,7 +215,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public void addLocation(VariableList variableList) throws MiddlewareQueryException {
-				
+	public int addLocation(VariableList variableList) throws MiddlewareQueryException {
+		return getGeolocationSaver().saveGeolocation(variableList);		
 	}
 }

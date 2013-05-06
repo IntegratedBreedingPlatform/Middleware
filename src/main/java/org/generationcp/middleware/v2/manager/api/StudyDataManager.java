@@ -209,6 +209,6 @@ public interface StudyDataManager {
     void addExperiment(int dataSetId, ExperimentValues experimentValues) throws MiddlewareQueryException;
     
     
-    void addLocation(VariableList variableList) throws MiddlewareQueryException;
+    int addLocation(VariableList variableList) throws MiddlewareQueryException;
     
 }
