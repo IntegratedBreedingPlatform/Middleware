@@ -56,7 +56,7 @@ public enum TermId {
 	
 	// Experiment Types
 	, STUDY_EXPERIMENT(1010)
-	, DATASET_EXPERIMENT(1015)
+	, DATASET_EXPERIMENT(1050)
 	, TRIAL_ENVIRONMENT_EXPERIMENT(1020)
 	, PLOT_EXPERIMENT(1155)
 	
@@ -77,6 +77,10 @@ public enum TermId {
 	
     // Experiment storage
     , TRIAL_DESIGN_INFO_STORAGE(1030)
+    
+    // Study/DataSet storage
+    , STUDY_INFO_STORAGE(1010)
+    , DATASET_INFO_STORAGE(1015)
     	
 	// Other
     , ORDER(1420)
@@ -85,7 +89,6 @@ public enum TermId {
 
 	// Stock Type
 	, ENTRY_CODE(8300)
-	;
 	;
 	
 	private final Integer id;

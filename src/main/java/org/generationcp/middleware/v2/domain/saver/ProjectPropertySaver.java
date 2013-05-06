@@ -7,6 +7,8 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.v2.domain.TermId;
+import org.generationcp.middleware.v2.domain.Variable;
+import org.generationcp.middleware.v2.domain.VariableList;
 import org.generationcp.middleware.v2.domain.VariableType;
 import org.generationcp.middleware.v2.domain.VariableTypeList;
 import org.generationcp.middleware.v2.pojos.DmsProject;
@@ -45,6 +47,26 @@ public class ProjectPropertySaver extends Saver {
 		properties.add(new ProjectProperty(index--, project, TermId.STANDARD_VARIABLE.getId(), String.valueOf(variableType.getId()), variableType.getRank()));
 		
 		return properties;
+	}
+	
+	public void saveProjectPropValues(VariableList variableList) throws MiddlewareQueryException {
+		setWorkingDatabase(Database.LOCAL);
+		
+		if (variableList != null && variableList.getVariables() != null && variableList.getVariables().size() > 0) {
+			for (Variable variable : variableList.getVariables()) {
+				int storedInId = variable.getVariableType().getStandardVariable().getStoredIn().getId();
+				if (TermId.STUDY_INFO_STORAGE.getId().equals(storedInId)
+				|| TermId.DATASET_INFO_STORAGE.getId().equals(storedInId)) {
+					ProjectProperty property = new ProjectProperty();
+					property.setProjectPropertyId(getProjectPropertyDao().getNegativeId("projectPropertyId"));
+					property.setTypeId(variable.getVariableType().getStandardVariable().getId());
+					property.setValue(variable.getValue());
+					property.setRank(variable.getVariableType().getRank());
+					getProjectPropertyDao().save(property);
+				}
+			}
+		}
+		
 	}
 	
 }

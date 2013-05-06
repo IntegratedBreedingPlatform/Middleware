@@ -35,6 +35,7 @@ public class ExperimentModelSaver extends Saver {
 
 		addExperimentProject(experimentModel, projectId);
 		getPhenotypeSaver().savePhenotypes(experimentModel, values.getVariableList());
+		getProjectPropertySaver().saveProjectPropValues(values.getVariableList());
 	}
 	
 	private ExperimentModel create(int projectId, Values values, TermId expType) throws MiddlewareQueryException {
