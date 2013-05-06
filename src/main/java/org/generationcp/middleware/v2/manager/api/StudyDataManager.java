@@ -17,7 +17,6 @@ import java.util.Set;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
-import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.v2.domain.DataSet;
 import org.generationcp.middleware.v2.domain.DatasetReference;
 import org.generationcp.middleware.v2.domain.DatasetValues;
@@ -26,7 +25,7 @@ import org.generationcp.middleware.v2.domain.ExperimentValues;
 import org.generationcp.middleware.v2.domain.FactorDetails;
 import org.generationcp.middleware.v2.domain.FolderReference;
 import org.generationcp.middleware.v2.domain.Reference;
-import org.generationcp.middleware.v2.domain.StudyDetails;
+import org.generationcp.middleware.v2.domain.Study;
 import org.generationcp.middleware.v2.domain.StudyQueryFilter;
 import org.generationcp.middleware.v2.domain.StudyReference;
 import org.generationcp.middleware.v2.domain.VariableList;
@@ -42,13 +41,13 @@ import org.generationcp.middleware.v2.domain.VariateDetails;
 public interface StudyDataManager {
 
 	/**
-	 * Get the Study Details for a specific study.
+	 * Get the Study for a specific study.
 	 * 
 	 * @param studyId the study's unique id
-	 * @return the study details or null if not found
+	 * @return the study or null if not found
 	 * @throws MiddlewareQueryException 
 	 */
-	StudyDetails getStudyDetails(Integer studyId) throws MiddlewareQueryException;
+	Study getStudy(int studyId) throws MiddlewareQueryException;
 	
 	/**
 	 * Returns list of root or top-level folders from specified database
@@ -146,7 +145,7 @@ public interface StudyDataManager {
 	 * @return the list of studies
 	 * @throws MiddlewareQueryException
 	 */
-	List<StudyDetails> getStudiesByFolder(Integer folderId, int start, int numOfRows) throws MiddlewareQueryException;
+	List<Study> getStudiesByFolder(Integer folderId, int start, int numOfRows) throws MiddlewareQueryException;
 	
 	/**
 	 * Returns the number of studies in the given folder id.
@@ -165,7 +164,7 @@ public interface StudyDataManager {
      * @return
      * @throws MiddlewareQueryException
      */
-    Set<StudyDetails> searchStudiesByGid(Integer gid) throws MiddlewareQueryException;
+    Set<Study> searchStudiesByGid(Integer gid) throws MiddlewareQueryException;
 
     /**
 	 * Adds a study. Inserts into the tables project, projectprop and project_relationships. 
@@ -178,17 +177,6 @@ public interface StudyDataManager {
 	 */
     StudyReference addStudy(Study study) throws MiddlewareQueryException;
 
-	/**
-	 * Adds a StudyDetails object. 
-	 * Inserts into the tables project, projectprop and project_relationships. 
-	 * The new study is stored as a top-level study.
-	 * 
-	 * @param study The StudyDetails object to insert
-	 * @return the added object with the generated id
-	 * @throws MiddlewareQueryException
-	 */
-    public StudyDetails addStudyDetails(StudyDetails studyDetails) throws MiddlewareQueryException;
-    
     /**
      * Adds a dataset, dataset labels (factors and variate labels), and parent study association.
      * 

@@ -9,7 +9,6 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DataManager;
 import org.generationcp.middleware.manager.Database;
-import org.generationcp.middleware.pojos.Study;
 import org.generationcp.middleware.v2.domain.DataSet;
 import org.generationcp.middleware.v2.domain.DatasetReference;
 import org.generationcp.middleware.v2.domain.DatasetValues;
@@ -18,14 +17,13 @@ import org.generationcp.middleware.v2.domain.ExperimentValues;
 import org.generationcp.middleware.v2.domain.FactorDetails;
 import org.generationcp.middleware.v2.domain.FolderReference;
 import org.generationcp.middleware.v2.domain.Reference;
-import org.generationcp.middleware.v2.domain.StudyDetails;
+import org.generationcp.middleware.v2.domain.Study;
 import org.generationcp.middleware.v2.domain.StudyQueryFilter;
 import org.generationcp.middleware.v2.domain.StudyReference;
 import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.VariableList;
 import org.generationcp.middleware.v2.domain.VariableTypeList;
 import org.generationcp.middleware.v2.domain.VariateDetails;
-import org.generationcp.middleware.v2.factory.StudyFactory;
 import org.generationcp.middleware.v2.manager.api.StudyDataManager;
 import org.generationcp.middleware.v2.pojos.DmsProject;
 import org.hibernate.Session;
@@ -49,19 +47,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		super(sessionForLocal, sessionForCentral);
 	}
 	
-	public StudyFactory getStudyFactory() {
-		return StudyFactory.getInstance();
-	}
-	
 	@Override
-	public StudyDetails getStudyDetails(Integer studyId) throws MiddlewareQueryException {
-		if (setWorkingDatabase(studyId)) {
-			DmsProject project = getDmsProjectDao().getById(studyId);
-			if (project != null) {
-				return getStudyFactory().createStudyDetails(project);
-			}
-		}
-		return null;
+	public Study getStudy(int studyId) throws MiddlewareQueryException {
+	    return getStudyBuilder().createStudy(studyId);
 	}
 	
 	@Override
@@ -104,14 +92,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 	
 	@Override
-	public List<StudyDetails> getStudiesByFolder(Integer folderId, int start, int numOfRows) throws MiddlewareQueryException{
-		List<StudyDetails> studyDetails = new ArrayList<StudyDetails>();
+	public List<Study> getStudiesByFolder(Integer folderId, int start, int numOfRows) throws MiddlewareQueryException{
+		List<Study> studyDetails = new ArrayList<Study>();
 		if (setWorkingDatabase(folderId, getDmsProjectDao())) {
 			List<DmsProject> projects = (List<DmsProject>) getDmsProjectDao()
 					.getProjectsByFolder(folderId, start, numOfRows);
 
 			for (DmsProject project : projects) {
-				studyDetails.add(getStudyFactory().createStudyDetails(project));
+				studyDetails.add(getStudyBuilder().createStudy(project));
 			}
 		}
 		return studyDetails;
@@ -135,11 +123,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 	
 	@Override
-	public Set<StudyDetails> searchStudiesByGid(Integer gid) throws MiddlewareQueryException {
-		Set<StudyDetails> studies = new HashSet<StudyDetails>();
+	public Set<Study> searchStudiesByGid(Integer gid) throws MiddlewareQueryException {
+		Set<Study> studies = new HashSet<Study>();
 		List<DmsProject> projects = getProjectSearcher().searchStudiesByFactor(TermId.GID.getId(), gid.toString());
 		for (DmsProject project : projects)	 {
-			studies.add(getStudyFactory().createStudyDetails(project));
+			studies.add(getStudyBuilder().createStudy(project));
 		}
 		return studies;
 	}
@@ -147,25 +135,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
     public StudyReference addStudy(Study study) throws MiddlewareQueryException{
         requireLocalDatabaseInstance();
-        DmsProject parent = getDmsProjectDao().getById(study.getHierarchy()); 
+       // DmsProject parent = getDmsProjectDao().getById(study.getHierarchy()); 
 		try {
-			study.setId(getStudySaver().saveStudy(study, parent));
+			//study.setId(getStudySaver().saveStudy(study, parent));
         } catch (Exception e) {
         	e.printStackTrace();
             logAndThrowException("Error encountered with addStudy(study=" + study + "): " + e.getMessage(), e, LOG);
 		}
 		return new StudyReference(study.getId(), study.getName());
-    }
-	
-	@Override
-    public StudyDetails addStudyDetails(StudyDetails studyDetails) throws MiddlewareQueryException{
-        requireLocalDatabaseInstance();
-		try {
-			studyDetails.setId(getStudySaver().saveStudy(new Study(studyDetails), null));
-        } catch (Exception e) {
-          logAndThrowException("Error encountered with addStudyDetails(studyDetails=" + studyDetails + "): " + e.getMessage(), e, LOG);
-		}
-		return studyDetails;	
     }
 	
 	@Override

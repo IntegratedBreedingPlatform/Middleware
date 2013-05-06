@@ -15,7 +15,11 @@ public class VariableTypeList {
 		this.variableTypes.addAll(variableTypes.getVariableTypes());
 	}
 
-	public VariableType findById(int id) {
+	public VariableType findById(TermId termId) {
+		return findById(termId.getId());
+	}
+		
+    public VariableType findById(int id) {
 		if (variableTypes != null) {
 			for (VariableType variableType : variableTypes) {
 				if (variableType.getId() == id) {

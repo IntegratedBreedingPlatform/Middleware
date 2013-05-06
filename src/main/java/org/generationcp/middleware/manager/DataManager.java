@@ -796,7 +796,7 @@ public abstract class DataManager extends DatabaseBroker{
     protected final TermBuilder getTermBuilder() {
     	return new TermBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
-
+    
     protected final StudyBuilder getStudyBuilder() {
     	return new StudyBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }

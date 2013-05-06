@@ -24,7 +24,6 @@ import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.generationcp.middleware.v2.domain.StudyDetails;
 
 @NamedQueries({ 
         @NamedQuery(name = "getStudyByNameUsingEqual", query = "SELECT s FROM Study s WHERE s.name = :name"),
@@ -161,24 +160,6 @@ public class Study implements Serializable{
         this.hierarchy = hierarchy;
         this.creationDate = creationDate;
     }
-    
-    public Study(StudyDetails studyDetails) {
-        super();
-        this.id = studyDetails.getId();
-        this.name = studyDetails.getName();
-        this.projectKey = null;
-        this.title = studyDetails.getTitle();
-        this.objective = studyDetails.getObjective();
-        this.primaryInvestigator = studyDetails.getPrimaryInvestigator();
-        this.type = studyDetails.getType();
-        this.startDate = studyDetails.getStartDate();
-        this.endDate = studyDetails.getEndDate();
-        this.user = studyDetails.getUser();
-        this.status = studyDetails.getStatus();
-        this.hierarchy = null;
-        this.creationDate = studyDetails.getCreationDate();
-    }
-
 
     public Integer getId() {
         return id;

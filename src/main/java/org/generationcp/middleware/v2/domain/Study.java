@@ -6,33 +6,17 @@ public class Study {
 
     private int id;
 	
-	private String name;
-	
-	private String description;
-	
 	private VariableList conditions;
-	
-	private VariableTypeList conditionVariableTypes;
 
 	private VariableList constants;
-	
-	private VariableTypeList constantVariableTypes;
 	
 	public Study(){
 	}
 
-	public Study(int id, String name, String description, 
-			VariableList conditions,
-			VariableTypeList conditionVariableTypes, 
-			VariableList constants,
-			VariableTypeList constantVariableTypes) {
+	public Study(int id, VariableList conditions, VariableList constants) {
 		this.id = id;
-		this.name = name;
-		this.description = description;
 		this.conditions = conditions;
-		this.conditionVariableTypes = conditionVariableTypes;
 		this.constants = constants;
-		this.constantVariableTypes = constantVariableTypes;
 	}
 
 	public int getId() {
@@ -44,19 +28,64 @@ public class Study {
 	}
 
 	public String getName() {
-		return name;
+		return getDisplayValue(TermId.STUDY_NAME);
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public String getTitle() {
+		return getDisplayValue(TermId.STUDY_TITLE);
 	}
 
-	public String getDescription() {
-		return description;
+	public String getObjective() {
+		return getDisplayValue(TermId.STUDY_OBJECTIVE);
+	}
+	
+	public Integer getPrimaryInvestigator() {
+		return getDisplayValueAsInt(TermId.PI_ID);
 	}
 
-	public void setDescription(String description) {
-		this.description = description;
+	public String getType() {
+		return getDisplayValue(TermId.STUDY_TYPE);
+	}
+
+	public Integer getStartDate() {
+		return getDisplayValueAsInt(TermId.START_DATE);
+	}
+
+	public Integer getEndDate() {
+		return getDisplayValueAsInt(TermId.END_DATE);
+	}
+
+	public Integer getUser() {
+		return getDisplayValueAsInt(TermId.STUDY_UID);
+	}
+
+	public Integer getStatus() {
+		return getDisplayValueAsInt(TermId.STUDY_IP);
+	}
+
+	public Integer getCreationDate() {
+		return getDisplayValueAsInt(TermId.CREATION_DATE);
+	}
+	
+	public String getDisplayValue(TermId termId) {
+		String value = null;
+		Variable variable = conditions.findById(termId);
+		if (variable == null) {
+			variable = constants.findById(termId);
+		}
+		if (variable != null) {
+			value = variable.getDisplayValue();
+		}
+		return value;
+	}
+	
+	public Integer getDisplayValueAsInt(TermId termId) {
+		Integer value = null;
+		String strValue = getDisplayValue(termId);
+		if (strValue != null) {
+			value = Integer.parseInt(strValue);
+		}
+		return value;
 	}
 	
 	public VariableList getConditions() {
@@ -69,12 +98,9 @@ public class Study {
 
 
 	public VariableTypeList getConditionVariableTypes() {
-		return conditionVariableTypes;
+		return conditions.getVariableTypes();
 	}
 
-	public void setConditionVariableTypes(VariableTypeList conditionVariableTypes) {
-		this.conditionVariableTypes = conditionVariableTypes;
-	}
 	public VariableList getConstants() {
 		return constants;
 	}
@@ -84,39 +110,24 @@ public class Study {
 	}
 	
 	public VariableTypeList getConstantVariableTypes() {
-		return constantVariableTypes;
-	}
-
-	public void setConstantVariableTypes(VariableTypeList constantVariableTypes) {
-		this.constantVariableTypes = constantVariableTypes;
+		return constants.getVariableTypes();
 	}
 	
 	public void print(int indent) {
 		Debug.println(indent, "Study: ");
 		Debug.println(indent + 3, "Id: " + getId());
 		Debug.println(indent + 3, "Name: " + getName());
-	    Debug.println(indent + 3, "Description: " + getDescription());
+	    Debug.println(indent + 3, "Title: " + getTitle());
 	    
 	    Debug.println(indent + 3, "Conditions: ");
 	    for (Variable condition : conditions.getVariables()) {
 	    	condition.print(indent + 6);
-	    }
-	    
-	    Debug.println(indent + 3, "Condition Variable Types: ");
-	    for (VariableType variableType : conditionVariableTypes.getVariableTypes()) {
-	    	variableType.print(indent + 6);
 	    }
 
 	    Debug.println(indent + 3, "Constants: ");
 	    for (Variable constant : constants.getVariables()) {
 	    	constant.print(indent + 6);
 	    }
-	    
-	    Debug.println(indent + 3, "Constant Variable Types: ");
-	    for (VariableType variableType : constantVariableTypes.getVariableTypes()) {
-	    	variableType.print(indent + 6);
-	    }
-
 	}
 	
 	public boolean equals(Object obj) {
@@ -131,18 +142,10 @@ public class Study {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Study [id=");
 		builder.append(id);
-		builder.append(", name=");
-		builder.append(name);
-		builder.append(", description=");
-		builder.append(description);
 		builder.append(", conditions=");
 		builder.append(conditions);
-		builder.append(", conditionVariableTypes=");
-		builder.append(conditionVariableTypes);
 		builder.append(", constants=");
 		builder.append(constants);
-		builder.append(", constantVariableTypes=");
-		builder.append(constantVariableTypes);
 		builder.append("]");
 		return builder.toString();
 	}

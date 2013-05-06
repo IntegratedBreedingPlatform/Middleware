@@ -33,7 +33,7 @@ import org.generationcp.middleware.v2.domain.FactorDetails;
 import org.generationcp.middleware.v2.domain.FolderReference;
 import org.generationcp.middleware.v2.domain.Reference;
 import org.generationcp.middleware.v2.domain.StandardVariable;
-import org.generationcp.middleware.v2.domain.StudyDetails;
+import org.generationcp.middleware.v2.domain.Study;
 import org.generationcp.middleware.v2.domain.StudyQueryFilter;
 import org.generationcp.middleware.v2.domain.StudyReference;
 import org.generationcp.middleware.v2.domain.TermId;
@@ -67,13 +67,14 @@ public class TestStudyDataManagerImpl {
 
 	@Test
 	public void getGetStudyDetails() throws Exception {
-		StudyDetails studyDetails = manager.getStudyDetails(STUDY_ID);
-		assertNotNull(studyDetails);
-		System.out.println("ID: " + studyDetails.getId());
-		System.out.println("Name: " + studyDetails.getName());
-		System.out.println("Title:" + studyDetails.getTitle());
-		System.out.println("Start Date:" + studyDetails.getStartDate());
-		System.out.println("Creation Date: " + studyDetails.getCreationDate());
+		Study study = manager.getStudy(STUDY_ID);
+		assertNotNull(study);
+		System.out.println("ID: " + study.getId());
+		System.out.println("Name: " + study.getName());
+		System.out.println("Title:" + study.getTitle());
+		System.out.println("PI: " + study.getPrimaryInvestigator());
+		System.out.println("Start Date:" + study.getStartDate());
+		System.out.println("Creation Date: " + study.getCreationDate());
 	}
 
 	@Test
@@ -99,12 +100,12 @@ public class TestStudyDataManagerImpl {
 	@Test
 	public void testGetStudiesByFolder() throws Exception {
 		int folderId = 1000;
-		List<StudyDetails> studies = manager.getStudiesByFolder(folderId, 0, 5);
+		List<Study> studies = manager.getStudiesByFolder(folderId, 0, 5);
 		assertNotNull(studies);
 		Assert.assertTrue(studies.size() > 0);
 		System.out.println("testGetStudiesByFolder(" + folderId + "): "
 				+ studies.size());
-		for (StudyDetails study : studies) {
+		for (Study study : studies) {
 			System.out.println(study);
 		}
 	}
@@ -182,9 +183,9 @@ public class TestStudyDataManagerImpl {
 	public void testSearchStudiesByGid() throws Exception {
 		System.out.println("testSearchStudiesByGid");
 		Integer gid = 70125;
-		Set<StudyDetails> studies = manager.searchStudiesByGid(gid);
+		Set<Study> studies = manager.searchStudiesByGid(gid);
 		if (studies != null && studies.size() > 0) {
-			for (StudyDetails study : studies) {
+			for (Study study : studies) {
 				System.out.println("Study- " + study.getId() + " - "
 						+ study.getName());
 			}

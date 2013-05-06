@@ -13,7 +13,6 @@ package org.generationcp.middleware.v2.factory;
 
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.pojos.Study;
-import org.generationcp.middleware.v2.domain.StudyDetails;
 import org.generationcp.middleware.v2.pojos.DmsProject;
 
 /**
@@ -37,18 +36,6 @@ public class ProjectFactory {
 			project = new DmsProject();
 			mapStudytoProject(study.getId(), study.getName(), 
 					study.getTitle(), project);
-		}
-		
-		return project;
-	}
-	
-	public DmsProject createProject(StudyDetails studyDetails)  throws MiddlewareException{ 
-		DmsProject project = null;
-
-		if (studyDetails != null) {
-			project = new DmsProject();
-			mapStudytoProject(studyDetails.getId(), studyDetails.getName(), 
-					studyDetails.getTitle(), project);
 		}
 		
 		return project;
