@@ -211,7 +211,7 @@ public class TestStudyDataManagerImpl {
 			System.out.println("NO VARIABLE FOUND FOR STUDY " + studyId);
 		}
 	}
-
+/*
 	@Test
 	public void testAddStudy() throws Exception {
 		Integer studyId = 0;
@@ -247,6 +247,7 @@ public class TestStudyDataManagerImpl {
 		assert (studyRef.getId() < 0);
 		System.out.println("testAddStudy(): " + study);
 	}
+	*/
 
 	@Test
 	public void testGetDataSet() throws Exception {
