@@ -182,7 +182,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
  
         try {
             trans = session.beginTransaction();
-            getExperimentModelSaver().addExperiment(dataSetId, experimentValues, false);
+            getExperimentModelSaver().addExperiment(dataSetId, experimentValues);
             trans.commit();
             
         } catch (Exception e) {

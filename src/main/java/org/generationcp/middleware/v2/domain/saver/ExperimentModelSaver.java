@@ -7,6 +7,7 @@ import java.util.Set;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.v2.domain.StudyValues;
 import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.Values;
 import org.generationcp.middleware.v2.domain.Variable;
@@ -24,17 +25,20 @@ public class ExperimentModelSaver extends Saver {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 	
-	public void addExperiment(int projectId, Values values, boolean isStudy) throws MiddlewareQueryException {
+	public void addExperiment(int projectId, Values values) throws MiddlewareQueryException {
 		setWorkingDatabase(Database.LOCAL);
-		TermId experimentType = isStudy ? TermId.STUDY_EXPERIMENT : TermId.PLOT_EXPERIMENT;
+		TermId experimentType = null;
+		if (values instanceof StudyValues) {
+			experimentType = TermId.STUDY_EXPERIMENT;
+		} else {
+			experimentType = TermId.PLOT_EXPERIMENT;
+		}
 		ExperimentModel experimentModel = create(projectId, values, experimentType);
 		getExperimentDao().save(experimentModel);
 
 		addExperimentProject(experimentModel, projectId);
 		getPhenotypeSaver().savePhenotypes(experimentModel, values.getVariableList());
-		if (isStudy) {
-			getProjectPropertySaver().saveProjectPropValues(values.getVariableList());
-		}
+		getProjectPropertySaver().saveProjectPropValues(values.getVariableList());
 	}
 	
 	private ExperimentModel create(int projectId, Values values, TermId expType) throws MiddlewareQueryException {
