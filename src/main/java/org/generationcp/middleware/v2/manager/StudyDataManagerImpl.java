@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2012, All Rights Reserved.
+ * 
+ * Generation Challenge Programme (GCP)
+ * 
+ * 
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * 
+ *******************************************************************************/
 package org.generationcp.middleware.v2.manager;
 
 import java.util.ArrayList;
@@ -19,6 +30,7 @@ import org.generationcp.middleware.v2.domain.Reference;
 import org.generationcp.middleware.v2.domain.Study;
 import org.generationcp.middleware.v2.domain.StudyQueryFilter;
 import org.generationcp.middleware.v2.domain.StudyReference;
+import org.generationcp.middleware.v2.domain.StudyValues;
 import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.VariableList;
 import org.generationcp.middleware.v2.domain.VariableTypeList;
@@ -131,17 +143,35 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-    public StudyReference addStudy(Study study) throws MiddlewareQueryException{
+    public StudyReference addStudy(int parentFolderId, VariableTypeList variableTypeList, StudyValues studyValues) throws MiddlewareQueryException{
         requireLocalDatabaseInstance();
-       // DmsProject parent = getDmsProjectDao().getById(study.getHierarchy()); 
-		try {
-			//study.setId(getStudySaver().saveStudy(study, parent));
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+
+            DmsProject project = getProjectSaver().create(studyValues);
+            
+            // Save Study (Project, Properties, Relationships)
+            project.setProjectId(getStudySaver().saveStudy(parentFolderId, variableTypeList, studyValues, project));
+            
+            getExperimentModelSaver().addExperiment(project.getProjectId(), studyValues);
+
+			return new StudyReference(project.getProjectId(), project.getName(), project.getDescription());
+			
         } catch (Exception e) {
         	e.printStackTrace();
-            logAndThrowException("Error encountered with addStudy(study=" + study + "): " + e.getMessage(), e, LOG);
-		}
-		return new StudyReference(study.getId(), study.getName());
+        	rollbackTransaction(trans);
+			logAndThrowException("Error encountered with addStudy(folderId="
+					+ parentFolderId + ", variableTypeList=" + variableTypeList
+					+ ", studyValues=" + studyValues + "): " + e.getMessage(),
+					e, LOG);
+        }   
+
+        return null;
     }
+	
 	
 	@Override
 	public DatasetReference addDataSet(int studyId, VariableTypeList variableTypeList, DatasetValues datasetValues) throws MiddlewareQueryException {

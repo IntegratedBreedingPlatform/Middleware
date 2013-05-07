@@ -35,6 +35,7 @@ import org.generationcp.middleware.v2.domain.StandardVariable;
 import org.generationcp.middleware.v2.domain.Study;
 import org.generationcp.middleware.v2.domain.StudyQueryFilter;
 import org.generationcp.middleware.v2.domain.StudyReference;
+import org.generationcp.middleware.v2.domain.StudyValues;
 import org.generationcp.middleware.v2.domain.Term;
 import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.Variable;
@@ -194,10 +195,8 @@ public class TestStudyDataManagerImpl {
 		}
 	}
 
-	// ================================ helper methods
-	// =============================
-	private <T extends VariableDetails> void printVariableDetails(int studyId,
-			List<T> details) {
+	// ================================ helper methods =============================
+	private <T extends VariableDetails> void printVariableDetails(int studyId, List<T> details) {
 		if (details != null && details.size() > 0) {
 			System.out.println("NUMBER OF VARIABLES = " + details.size());
 			for (VariableDetails detail : details) {
@@ -216,43 +215,51 @@ public class TestStudyDataManagerImpl {
 			System.out.println("NO VARIABLE FOUND FOR STUDY " + studyId);
 		}
 	}
-/*
+
 	@Test
 	public void testAddStudy() throws Exception {
-		Integer studyId = 0;
-		String name = "Test Study 1";
-		String description = "Test Study Title";
-		Integer parentId = 1000; // parent id
-		Integer projectKey = 1;
-		String title = "Test Study Title";
-		String objective = "Test Study Objective";
-		Integer primaryInvestigator = 1;
-		String type = TermId.STUDY_TYPE.getId().toString();
-		Integer startDate = (int) System.currentTimeMillis();
-		Integer endDate = (int) System.currentTimeMillis();
-		Integer user = 1;
-		Integer status = 1;
-		Integer hierarchy = 1000; // parent id
-		Integer creationDate = (int) System.currentTimeMillis();
 
-		// TODO PROPERTIES ProjectKey, Objective, type =
-		// CVTermId.STUDY_TYPE.getId().toString(), startDate, endDate, user,
-		// status, creationDate
-		VariableTypeList variableTypes = new VariableTypeList();
-		VariableTypeList conditionVariableTypes = new VariableTypeList();
-		VariableTypeList constantVariableTypes = new VariableTypeList();
-		VariableList conditions = new VariableList();
-		VariableList constants = new VariableList();
+		// get a study test data from central
+		Integer studyId = 1000;
+		int parentStudyId = 1;
+		Study study = manager.getStudy(studyId);
 
-		Study study = new Study(studyId, name, description,
-				conditions, conditionVariableTypes, constants,
-				constantVariableTypes);
-		StudyReference studyRef = manager.addStudy(study);
+
+		VariableType type = new VariableType();
+
+		StandardVariable var = new StandardVariable();
+		var.setId(TermId.STUDY_NAME.getId());
+		type.setStandardVariable(var);
+		type.setLocalDescription("Study Name");
+		type.setLocalName("STUDY_NAME");
+		type.setRank(1);
+		
+		VariableList variableList = new VariableList();
+		variableList.add(new Variable(type, "My Study Name"));
+		
+		var = new StandardVariable();
+		var.setId(TermId.STUDY_TITLE.getId());		
+		type = new VariableType();
+		type.setStandardVariable(var);
+		type.setLocalDescription("Study Description");
+		type.setLocalName("STUDY_DESC");
+		type.setRank(2);
+		
+		variableList.add(new Variable(type, "My Study Description"));
+		
+		StudyValues studyValues = new StudyValues();
+		studyValues.setVariableList(variableList);
+		studyValues.setGermplasmId(-1);
+		studyValues.setLocationId(-1);
+
+		//TODO Set stored_in
+		
+		StudyReference studyRef = manager.addStudy(parentStudyId, study.getConditionVariableTypes(), studyValues);
 
 		assert (studyRef.getId() < 0);
-		System.out.println("testAddStudy(): " + study);
+		System.out.println("testAddStudy(): " + studyRef);
 	}
-	*/
+	
 
 	@Test
 	public void testGetDataSet() throws Exception {

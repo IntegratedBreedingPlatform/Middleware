@@ -23,12 +23,13 @@ import org.generationcp.middleware.v2.domain.DatasetValues;
 import org.generationcp.middleware.v2.domain.Experiment;
 import org.generationcp.middleware.v2.domain.ExperimentValues;
 import org.generationcp.middleware.v2.domain.FolderReference;
-import org.generationcp.middleware.v2.domain.Reference;
 import org.generationcp.middleware.v2.domain.Study;
+import org.generationcp.middleware.v2.domain.StudyValues;
+import org.generationcp.middleware.v2.domain.VariableTypeList;
+import org.generationcp.middleware.v2.domain.Reference;
 import org.generationcp.middleware.v2.domain.StudyQueryFilter;
 import org.generationcp.middleware.v2.domain.StudyReference;
 import org.generationcp.middleware.v2.domain.VariableList;
-import org.generationcp.middleware.v2.domain.VariableTypeList;
 
 /**
  * This is the API for retrieving phenotypic data stored as Studies and
@@ -39,14 +40,14 @@ import org.generationcp.middleware.v2.domain.VariableTypeList;
 public interface StudyDataManager {
 
 	/**
-	 * Get the Study for a specific study.
+	 * Get the Study for a specific study id.
 	 * 
 	 * @param studyId the study's unique id
 	 * @return the study or null if not found
 	 * @throws MiddlewareQueryException 
 	 */
 	Study getStudy(int studyId) throws MiddlewareQueryException;
-	
+
 	/**
 	 * Returns list of root or top-level folders from specified database
 	 * 
@@ -164,16 +165,18 @@ public interface StudyDataManager {
     Set<Study> searchStudiesByGid(int gid) throws MiddlewareQueryException;
 
     /**
-	 * Adds a study. Inserts into the tables project, projectprop and project_relationships. 
-	 * Sets the parent to the given id in the hierarchy field of the study. 
-	 * If no value is supplied, the new study is stored as a top-level study.
+	 * Adds a study. Adds an entry into Project, ProjectProperty, ProjectRelationships and Experiment 
+	 * Inserts constants and conditions listed in variableTypeList. 
+	 * Sets the parent to the given parentFolderId input parameter. 
 	 * 
-	 * @param study The Study object to insert
-	 * @return the added object with the generated id
+	 * @param parentFolderId The ID of the parent folder
+	 * @param variableTypeList The conditions and constants of the Study
+	 * @param studyValues The values for the variables to insert
+	 * @return StudyReference corresponding to the newly-created Study
 	 * @throws MiddlewareQueryException
 	 */
-    StudyReference addStudy(Study study) throws MiddlewareQueryException;
-
+    StudyReference addStudy(int parentFolderId, VariableTypeList variableTypeList, StudyValues studyValues) throws MiddlewareQueryException;
+    
     /**
      * Adds a dataset, dataset labels (factors and variate labels), and parent study association.
      * 

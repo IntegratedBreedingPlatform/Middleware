@@ -31,6 +31,7 @@ import org.generationcp.middleware.v2.domain.builder.StudyVariateBuilder;
 import org.generationcp.middleware.v2.domain.saver.DatasetProjectSaver;
 import org.generationcp.middleware.v2.domain.saver.ExperimentModelSaver;
 import org.generationcp.middleware.v2.domain.saver.GeolocationSaver;
+import org.generationcp.middleware.v2.domain.saver.ProjectSaver;
 import org.generationcp.middleware.v2.domain.saver.StockSaver;
 import org.generationcp.middleware.v2.domain.saver.StudySaver;
 import org.generationcp.middleware.v2.domain.searcher.ProjectSearcher;
@@ -851,6 +852,10 @@ public abstract class DataManager extends DatabaseBroker{
 
     protected final GeolocationSaver getGeolocationSaver() {
     	return new GeolocationSaver(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    protected final ProjectSaver getProjectSaver() {
+    	return new ProjectSaver(sessionProviderForLocal, sessionProviderForCentral);
     }
     
     protected final StockSaver getStockSaver() {
