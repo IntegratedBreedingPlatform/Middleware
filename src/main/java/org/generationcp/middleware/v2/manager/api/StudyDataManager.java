@@ -57,7 +57,7 @@ public interface StudyDataManager {
 	 * @return List of Folder POJOs or null if none found
 	 * @throws MiddlewareQueryException 
 	 */
-	public List<FolderReference> getRootFolders(Database instance) throws MiddlewareQueryException;
+	List<FolderReference> getRootFolders(Database instance) throws MiddlewareQueryException;
 	
 	
 	/**
@@ -70,7 +70,7 @@ public interface StudyDataManager {
 	 * @return List of AbstractNode (FolderNode, StudyNode) POJOs or null if none found
 	 * @throws MiddlewareQueryException 
 	 */
-	public List<Reference> getChildrenOfFolder(int folderId) throws MiddlewareQueryException;
+	List<Reference> getChildrenOfFolder(int folderId) throws MiddlewareQueryException;
 	
 	
 	/**
@@ -82,7 +82,7 @@ public interface StudyDataManager {
 	 * @return List of DatasetNodes belonging to the study
 	 * @throws MiddlewareQueryException
 	 */
-	public List<DatasetReference> getDatasetReferences(int studyId) throws MiddlewareQueryException;
+	List<DatasetReference> getDatasetReferences(int studyId) throws MiddlewareQueryException;
 	
 	/**
 	 * @param dataSetId
@@ -105,7 +105,7 @@ public interface StudyDataManager {
 	 * @param dataSetId
 	 * @return
 	 */
-	int countExperiments(int dataSetId) throws MiddlewareQueryException;
+	long countExperiments(int dataSetId) throws MiddlewareQueryException;
 	
 	/**
 	 * Returns the list of study nodes for a particular search filter.

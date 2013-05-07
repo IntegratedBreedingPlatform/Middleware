@@ -170,7 +170,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public int countExperiments(int dataSetId) throws MiddlewareQueryException {
+	public long countExperiments(int dataSetId) throws MiddlewareQueryException {
 		return getExperimentBuilder().count(dataSetId);
 	}
 

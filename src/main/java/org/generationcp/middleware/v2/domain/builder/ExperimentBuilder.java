@@ -30,9 +30,9 @@ public class ExperimentBuilder extends Builder {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 	
-	public int count(int dataSetId) throws MiddlewareQueryException {
+	public long count(int dataSetId) throws MiddlewareQueryException {
 		if (setWorkingDatabase(dataSetId)) {
-			return (int) getExperimentProjectDao().count(dataSetId);
+			return getExperimentProjectDao().count(dataSetId);
 		}
 		return 0;
 	}
