@@ -1386,7 +1386,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 			throws MiddlewareQueryException {
 		
 		UserDetails userdetails = getUserDetailsDao().getByUsername(userName);
-		System.out.println("UserDetails is "+ userdetails);
 		
 		if(userdetails != null)
 			return userdetails.getUlogincnt();
@@ -1400,10 +1399,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 		{
 			getUserDetailsDao().updateLoginCounter(userdetails);
 		} 
-		else
-		{
-			System.out.println("incrementUserLogInCounter null");
-		}
+		
 	}
 	public void addUserDetailsRecord(UserDetails userDetails) throws MiddlewareQueryException 
 	{

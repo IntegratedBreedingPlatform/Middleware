@@ -28,17 +28,22 @@ import javax.persistence.Transient;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-@NamedQueries({ @NamedQuery(name = "getUserByNameUsingEqual", query = "SELECT s FROM userdetails s WHERE s.name = :name"),
-    @NamedQuery(name = "getUserByNameUsingLike", query = "SELECT s FROM userdetails s WHERE s.name LIKE :name"),
-    @NamedQuery(name = "countUserByNameUsingEqual", query = "SELECT COUNT(s) FROM userdetails s WHERE s.name = :name"),
-    @NamedQuery(name = "countUserByNameUsingLike", query = "SELECT COUNT(s) FROM userdetails s WHERE s.name LIKE :name")
 
-})
+
+
+
+
+
+
+
 
 @Entity
 @Table(name = "userdetails")
 public class UserDetails implements Serializable {
 
+	
+
+	
     private static final long serialVersionUID = 1L;
     
     @Id
@@ -47,7 +52,7 @@ public class UserDetails implements Serializable {
     private Integer userdetailsid;
 
     @Column(name = "uname")
-    private String uname;
+    private String name;
 
     @Column(name = "ulogincnt")
     private Integer ulogincnt;
@@ -60,14 +65,14 @@ public class UserDetails implements Serializable {
 
     public UserDetails(String uname) {
         super();
-        this.uname = uname;
+        this.name = uname;
     }
 
     public UserDetails(Integer userdetailsid, String uname, Integer ulogincnt) {
         super();
         this.userdetailsid = userdetailsid;
         
-        this.uname = uname;
+        this.name = uname;
         this.ulogincnt = ulogincnt;
         
        
@@ -81,7 +86,7 @@ public class UserDetails implements Serializable {
      */
     public UserDetails copy() {
         UserDetails user = new UserDetails();
-        user.setUname(uname);
+        user.setName(name);
         user.setUlogincnt(ulogincnt);
         
         return user;
@@ -98,21 +103,14 @@ public class UserDetails implements Serializable {
 	}
 
 	public String getName() {
-		return uname;
+		return name;
 	}
 
 	public void setName(String uname) {
-		this.uname = uname;
+		this.name = uname;
 	}
 
-	public String getUname() {
-		return uname;
-	}
-
-	public void setUname(String uname) {
-		this.uname = uname;
-	}
-
+	
 	public Integer getUlogincnt() {
 		return ulogincnt;
 	}
@@ -148,12 +146,12 @@ public class UserDetails implements Serializable {
         StringBuilder builder = new StringBuilder();
         builder.append("User [userdetailsid=");
         builder.append(userdetailsid);
-        builder.append(", uname=");
-        builder.append(uname);
+        builder.append(", name=");
+        builder.append(name);
         builder.append(", ulogincnt=");
         builder.append(ulogincnt);
         builder.append("]");
         return builder.toString();
     }
-
+ 
 }

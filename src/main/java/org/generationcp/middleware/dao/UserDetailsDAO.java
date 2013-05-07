@@ -45,7 +45,7 @@ public class UserDetailsDAO extends GenericDAO<UserDetails, Integer>{
 	
 	public boolean addUserDetails(UserDetails usersdetails)
 	{
-		 String queryString = "insert into userdetails (ulogincnt,uname) values ("+usersdetails.getUlogincnt()+",'"+usersdetails.getUname()+"')";
+		 String queryString = "insert into userdetails (ulogincnt,uname) values ("+usersdetails.getUlogincnt()+",'"+usersdetails.getName()+"')";
          Session s = getSession();
          Query q = s.createSQLQuery(queryString);
          if(q.executeUpdate() > 0)
@@ -57,14 +57,11 @@ public class UserDetailsDAO extends GenericDAO<UserDetails, Integer>{
         try {
             
         	 Criteria criteria = getSession().createCriteria(UserDetails.class)
-                     .add(Restrictions.eq("uname", username));
-
-        	 	
+                     .add(Restrictions.eq("name", username));
+        	 
 				@SuppressWarnings("unchecked")
 				List<UserDetails> usersdetails = criteria.list();
-				
-				
-				
+				System.out.println(username +" : usersdetails size " + usersdetails.size());
 				
 				return usersdetails.size() > 0 ? usersdetails.get(0) : null;
 				
