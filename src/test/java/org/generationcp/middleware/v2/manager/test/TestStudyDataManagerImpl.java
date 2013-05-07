@@ -356,6 +356,12 @@ public class TestStudyDataManagerImpl {
 	@Test
 	public void testAddGermplasm() throws Exception {
 		VariableList variableList = new VariableList();
+		variableList.add(createVariable(1, "unique name", TermId.ENTRY_NUMBER_STORAGE));
+		variableList.add(createVariable(2, "1000", TermId.ENTRY_GID_STORAGE));
+		variableList.add(createVariable(3, "name", TermId.ENTRY_DESIGNATION_STORAGE));
+		variableList.add(createVariable(4, "2000", TermId.ENTRY_CODE_STORAGE));
+		variableList.add(createVariable(6, "prop1", TermId.GERMPLASM_ENTRY_STORAGE));
+		variableList.add(createVariable(7, "prop2", TermId.GERMPLASM_ENTRY_STORAGE));
 		manager.addStock(variableList);
 	}
 

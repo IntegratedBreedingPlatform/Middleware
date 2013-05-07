@@ -239,6 +239,19 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public int addStock(VariableList variableList) throws MiddlewareQueryException {
-		return getStockSaver().saveStock(variableList);
+		requireLocalDatabaseInstance();
+		Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+ 
+        try {
+            trans = session.beginTransaction();
+			int id = getStockSaver().saveStock(variableList);
+	        trans.commit();
+	        return id;
+        
+    } catch (Exception e) {
+    	rollbackTransaction(trans);
+        throw new MiddlewareQueryException("error in addExperiment " + e.getMessage(), e);
+    }
 	}
 }

@@ -35,8 +35,9 @@ public class StockSaver extends Saver {
 	private Stock createStock(VariableList variableList) throws MiddlewareQueryException {
 		Stock stock = null;
 		if (variableList != null && variableList.getVariables() != null && variableList.getVariables().size() > 0) {
+			int propertyIndex = getStockPropertyDao().getNegativeId("stockPropId");
 			for (Variable variable : variableList.getVariables()) {
-				Integer storedInId = variable.getVariableType().getStandardVariable().getStoredIn().getId();
+				int storedInId = variable.getVariableType().getStandardVariable().getStoredIn().getId();
 				String value = variable.getValue();
 				
 				if (TermId.ENTRY_NUMBER_STORAGE.getId() == storedInId) {
@@ -57,7 +58,7 @@ public class StockSaver extends Saver {
 					
 				} else if (TermId.GERMPLASM_ENTRY_STORAGE.getId() == storedInId) {
 					stock = getStockObject(stock);
-					addProperty(stock, createProperty(variable));
+					addProperty(stock, createProperty(propertyIndex--, variable));
 					
 				}
 			}
@@ -84,10 +85,10 @@ public class StockSaver extends Saver {
 		stock.getProperties().add(property);
 	}
 	
-	private StockProperty createProperty(Variable variable) throws MiddlewareQueryException {
+	private StockProperty createProperty(int index, Variable variable) throws MiddlewareQueryException {
 		StockProperty property = new StockProperty();
 		
-		property.setStockPropId(getStockPropertyDao().getNegativeId("stockPropId"));
+		property.setStockPropId(index);
 		property.setTypeId(variable.getVariableType().getId());
 		property.setValue(variable.getValue());
 		property.setRank(variable.getVariableType().getRank());
