@@ -190,12 +190,25 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public int addLocation(VariableList variableList) throws MiddlewareQueryException {
-		return getGeolocationSaver().saveGeolocation(variableList);		
+	public int addTrialEnvironment(VariableList variableList) throws MiddlewareQueryException {
+		requireLocalDatabaseInstance();
+		Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+ 
+        try {
+            trans = session.beginTransaction();
+			int id = getGeolocationSaver().saveGeolocation(variableList);		
+	        trans.commit();
+	        return id;
+	        
+	    } catch (Exception e) {
+	    	rollbackTransaction(trans);
+	        throw new MiddlewareQueryException("error in addExperiment " + e.getMessage(), e);
+	    }
 	}
 
 	@Override
-	public int addGermplasm(VariableList variableList) throws MiddlewareQueryException {
+	public int addStock(VariableList variableList) throws MiddlewareQueryException {
 		return getStockSaver().saveStock(variableList);
 	}
 }

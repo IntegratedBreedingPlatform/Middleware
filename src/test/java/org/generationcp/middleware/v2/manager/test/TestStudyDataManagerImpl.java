@@ -35,6 +35,7 @@ import org.generationcp.middleware.v2.domain.StandardVariable;
 import org.generationcp.middleware.v2.domain.Study;
 import org.generationcp.middleware.v2.domain.StudyQueryFilter;
 import org.generationcp.middleware.v2.domain.StudyReference;
+import org.generationcp.middleware.v2.domain.Term;
 import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.Variable;
 import org.generationcp.middleware.v2.domain.VariableDetails;
@@ -332,14 +333,23 @@ public class TestStudyDataManagerImpl {
 		manager.addExperiment(dataSetId, experimentValues);
 	}
 	
+	@Test
 	public void testAddLocation() throws Exception {
 		VariableList variableList = new VariableList();
-		manager.addLocation(variableList);
+		variableList.add(createVariable(1, "loc desc", TermId.TRIAL_INSTANCE_STORAGE));
+		variableList.add(createVariable(2, "1.1", TermId.LATITUDE_STORAGE));
+		variableList.add(createVariable(3, "2.2", TermId.LONGITUDE_STORAGE));
+		variableList.add(createVariable(4, "datum", TermId.DATUM_STORAGE));
+		variableList.add(createVariable(5, "3.3", TermId.ALTITUDE_STORAGE));
+		variableList.add(createVariable(6, "prop1", TermId.TRIAL_ENVIRONMENT_INFO_STORAGE));
+		variableList.add(createVariable(7, "prop2", TermId.TRIAL_ENVIRONMENT_INFO_STORAGE));
+		manager.addTrialEnvironment(variableList);
 	}
 	
+	@Test
 	public void testAddGermplasm() throws Exception {
 		VariableList variableList = new VariableList();
-		manager.addGermplasm(variableList);
+		manager.addStock(variableList);
 	}
 
 	@AfterClass
@@ -347,6 +357,20 @@ public class TestStudyDataManagerImpl {
 		if (factory != null) {
 			factory.close();
 		}
+	}
+	
+	
+	private Variable createVariable(int termId, String value, TermId storedInTerm) {
+		StandardVariable stVar = new StandardVariable();
+		stVar.setId(termId);
+		stVar.setStoredIn(new Term(storedInTerm.getId(), "", ""));
+		VariableType vtype = new VariableType();
+		vtype.setStandardVariable(stVar);
+		vtype.setRank(1);
+		Variable var = new Variable();
+		var.setValue(value);
+		var.setVariableType(vtype);
+		return var;
 	}
 
 }

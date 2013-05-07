@@ -181,7 +181,6 @@ public interface StudyDataManager {
      * @return
      * @throws MiddlewareQueryException
      */
-    //DatasetReference addDataSet(DataSet dataset, List<Experiment> experiments) throws MiddlewareQueryException;
     DatasetReference addDataSet(int studyId, VariableTypeList variableTypeList, DatasetValues datasetValues) throws MiddlewareQueryException;
     
     /**
@@ -194,20 +193,25 @@ public interface StudyDataManager {
     void addExperiment(int dataSetId, ExperimentValues experimentValues) throws MiddlewareQueryException;
     
     /**
-     * Adds Geolocation and GeolocationProp records.
+     * Accepts a variable list and sets up the trial environment data in the local database.
+     * It will throw an exception if the variable in the variable list passed is not recognized for trial environment.
+     * It will return the ID of the trial environment data created.
      * 
      * @param variableList
      * @return
      * @throws MiddlewareQueryException
      */
-    int addLocation(VariableList variableList) throws MiddlewareQueryException;
+    int addTrialEnvironment(VariableList variableList) throws MiddlewareQueryException;
     
     /**
-     * Adds Stock and StockProp records.
+     * Accepts a variable list and sets up the stock data in the local database.
+     * It will throw an exception if the variable in the variable list is not a stock variable.
+     * It will return the ID of the stock data created.
+     * 
      * @param variableList
      * @return
      * @throws MiddlewareQueryException
      */
-    int addGermplasm(VariableList variableList) throws MiddlewareQueryException;
+    int addStock(VariableList variableList) throws MiddlewareQueryException;
     
 }

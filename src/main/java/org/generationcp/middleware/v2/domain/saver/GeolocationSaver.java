@@ -31,10 +31,11 @@ public class GeolocationSaver extends Saver {
 		return null;
 	}
 	
-	private Geolocation create(/*int projectId,*/ VariableList factors) throws MiddlewareQueryException {
+	private Geolocation create(VariableList factors) throws MiddlewareQueryException {
 		Geolocation geolocation = null;
 		
 		if (factors != null && factors.getVariables() != null && factors.getVariables().size() > 0) {
+			int propertyIndex = getGeolocationPropertyDao().getNegativeId("geolocationPropertyId");
 			
 			for (Variable variable : factors.getVariables()) {
 				Integer storedInId = variable.getVariableType().getStandardVariable().getStoredIn().getId();
@@ -62,16 +63,14 @@ public class GeolocationSaver extends Saver {
 					
 				} else if (TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId() == storedInId) {
 					geolocation = getGeolocationObject(geolocation);
-					addProperty(geolocation, createProperty(variable));
+					addProperty(geolocation, createProperty(propertyIndex--, variable));
 					
+				} else {
+					throw new MiddlewareQueryException("Non-Trial Environment Variable was used in calling create location: " + variable.getVariableType().getId());
 				}
 			}
 		}
-/*		
-		if (geolocation == null) {
-			geolocation = getGeolocationDao().getParentGeolocation(projectId);
-		}
-*/		
+		
 		return geolocation;
 	}
 	
@@ -83,10 +82,10 @@ public class GeolocationSaver extends Saver {
 		return geolocation;
 	}
 	
-	private GeolocationProperty createProperty(Variable variable) throws MiddlewareQueryException {
+	private GeolocationProperty createProperty(int index, Variable variable) throws MiddlewareQueryException {
 		GeolocationProperty property = new GeolocationProperty();
 		
-		property.setGeolocationPropertyId(getGeolocationPropertyDao().getNegativeId("geolocationPropertyId"));
+		property.setGeolocationPropertyId(index);
 		property.setType(variable.getVariableType().getId());
 		property.setValue(variable.getValue());
 		property.setRank(variable.getVariableType().getRank());
