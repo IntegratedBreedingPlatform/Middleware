@@ -10,4 +10,5 @@ public enum ToolName {
     ,optimas
     ,breeding_manager
     ,breeding_view
+    ,list_manager
 }
