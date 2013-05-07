@@ -22,7 +22,6 @@ import org.generationcp.middleware.v2.domain.DatasetReference;
 import org.generationcp.middleware.v2.domain.DatasetValues;
 import org.generationcp.middleware.v2.domain.Experiment;
 import org.generationcp.middleware.v2.domain.ExperimentValues;
-import org.generationcp.middleware.v2.domain.FactorDetails;
 import org.generationcp.middleware.v2.domain.FolderReference;
 import org.generationcp.middleware.v2.domain.Reference;
 import org.generationcp.middleware.v2.domain.Study;
@@ -30,7 +29,6 @@ import org.generationcp.middleware.v2.domain.StudyQueryFilter;
 import org.generationcp.middleware.v2.domain.StudyReference;
 import org.generationcp.middleware.v2.domain.VariableList;
 import org.generationcp.middleware.v2.domain.VariableTypeList;
-import org.generationcp.middleware.v2.domain.VariateDetails;
 
 /**
  * This is the API for retrieving phenotypic data stored as Studies and
@@ -117,24 +115,23 @@ public interface StudyDataManager {
 	List<StudyReference> searchStudies(StudyQueryFilter filter) throws MiddlewareQueryException;
 	
 	/**
-	 * Returns the list of factor details for a specific study.
+	 * Returns the list of factors for a specific study.
 	 * 
 	 * @param studyId
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	List<FactorDetails> getFactors(int projectId) throws MiddlewareQueryException;
+	VariableTypeList getAllStudyFactors(int studyId) throws MiddlewareQueryException;
 	
 	/**
-	 * Returns the list of observation details for a specific study.
+	 * Returns the list of variates for a specific study.
 	 * 
 	 * @param studyId
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	List<VariateDetails> getVariates(int projectId) throws MiddlewareQueryException;
+	VariableTypeList getAllStudyVariates(int studyId) throws MiddlewareQueryException;
 	
-
 	/**
 	 * Retrieves the studies belonging to a given folder id. 
 	 * Assumption: that every study has a parent folder.

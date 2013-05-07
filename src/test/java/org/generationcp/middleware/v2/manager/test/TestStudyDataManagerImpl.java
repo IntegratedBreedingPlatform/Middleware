@@ -29,7 +29,6 @@ import org.generationcp.middleware.v2.domain.DatasetReference;
 import org.generationcp.middleware.v2.domain.DatasetValues;
 import org.generationcp.middleware.v2.domain.Experiment;
 import org.generationcp.middleware.v2.domain.ExperimentValues;
-import org.generationcp.middleware.v2.domain.FactorDetails;
 import org.generationcp.middleware.v2.domain.FolderReference;
 import org.generationcp.middleware.v2.domain.Reference;
 import org.generationcp.middleware.v2.domain.StandardVariable;
@@ -41,7 +40,7 @@ import org.generationcp.middleware.v2.domain.Variable;
 import org.generationcp.middleware.v2.domain.VariableDetails;
 import org.generationcp.middleware.v2.domain.VariableList;
 import org.generationcp.middleware.v2.domain.VariableType;
-import org.generationcp.middleware.v2.domain.VariateDetails;
+import org.generationcp.middleware.v2.domain.VariableTypeList;
 import org.generationcp.middleware.v2.manager.api.StudyDataManager;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -78,23 +77,23 @@ public class TestStudyDataManagerImpl {
 	}
 
 	@Test
-	public void testGetFactorDetails() throws Exception {
+	public void testGetAllStudyFactor() throws Exception {
 		System.out.println("testGetFactorDetails");
 		int studyId = 10010;
-		List<FactorDetails> factorDetails = manager.getFactors(studyId);
-		assertNotNull(factorDetails);
-		Assert.assertTrue(factorDetails.size() > 0);
-		printVariableDetails(studyId, factorDetails);
+		VariableTypeList factors = manager.getAllStudyFactors(studyId);
+		assertNotNull(factors);
+		Assert.assertTrue(factors.getVariableTypes().size() > 0);
+		factors.print(0);
 	}
 
 	@Test
-	public void testGetVariates() throws Exception {
+	public void testGetAllStudyVariates() throws Exception {
 		System.out.println("testGetVariates");
 		int studyId = 10010;
-		List<VariateDetails> variates = manager.getVariates(studyId);
+		VariableTypeList variates = manager.getAllStudyVariates(studyId);
 		assertNotNull(variates);
-		Assert.assertTrue(variates.size() > 0);
-		printVariableDetails(studyId, variates);
+		Assert.assertTrue(variates.getVariableTypes().size() > 0);
+		variates.print(0);
 	}
 
 	@Test

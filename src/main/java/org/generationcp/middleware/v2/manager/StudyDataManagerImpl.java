@@ -14,7 +14,6 @@ import org.generationcp.middleware.v2.domain.DatasetReference;
 import org.generationcp.middleware.v2.domain.DatasetValues;
 import org.generationcp.middleware.v2.domain.Experiment;
 import org.generationcp.middleware.v2.domain.ExperimentValues;
-import org.generationcp.middleware.v2.domain.FactorDetails;
 import org.generationcp.middleware.v2.domain.FolderReference;
 import org.generationcp.middleware.v2.domain.Reference;
 import org.generationcp.middleware.v2.domain.Study;
@@ -23,7 +22,6 @@ import org.generationcp.middleware.v2.domain.StudyReference;
 import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.VariableList;
 import org.generationcp.middleware.v2.domain.VariableTypeList;
-import org.generationcp.middleware.v2.domain.VariateDetails;
 import org.generationcp.middleware.v2.manager.api.StudyDataManager;
 import org.generationcp.middleware.v2.pojos.DmsProject;
 import org.hibernate.Session;
@@ -82,13 +80,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<FactorDetails> getFactors(int projectId) throws MiddlewareQueryException {
-		return getFactorDetailsBuilder().build(projectId);
+	public VariableTypeList getAllStudyFactors(int studyId) throws MiddlewareQueryException {
+		return getStudyFactorBuilder().build(studyId);
 	}
 	
 	@Override
-	public List<VariateDetails> getVariates(int projectId) throws MiddlewareQueryException {
-		return getVariateDetailsBuilder().build(projectId);
+	public VariableTypeList getAllStudyVariates(int studyId) throws MiddlewareQueryException {
+		return getStudyVariateBuilder().build(studyId);
 	}
 	
 	@Override

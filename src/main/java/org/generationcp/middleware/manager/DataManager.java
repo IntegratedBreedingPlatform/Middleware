@@ -21,13 +21,13 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.v2.domain.builder.DataSetBuilder;
 import org.generationcp.middleware.v2.domain.builder.ExperimentBuilder;
-import org.generationcp.middleware.v2.domain.builder.FactorDetailsBuilder;
+import org.generationcp.middleware.v2.domain.builder.StudyFactorBuilder;
 import org.generationcp.middleware.v2.domain.builder.StudyBuilder;
 import org.generationcp.middleware.v2.domain.builder.StudyReferenceBuilder;
 import org.generationcp.middleware.v2.domain.builder.TermBuilder;
 import org.generationcp.middleware.v2.domain.builder.VariableInfoBuilder;
 import org.generationcp.middleware.v2.domain.builder.VariableTypeBuilder;
-import org.generationcp.middleware.v2.domain.builder.VariateDetailsBuilder;
+import org.generationcp.middleware.v2.domain.builder.StudyVariateBuilder;
 import org.generationcp.middleware.v2.domain.saver.DatasetProjectSaver;
 import org.generationcp.middleware.v2.domain.saver.ExperimentModelSaver;
 import org.generationcp.middleware.v2.domain.saver.GeolocationSaver;
@@ -809,12 +809,12 @@ public abstract class DataManager extends DatabaseBroker{
     	return new ExperimentBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
 
-    protected final FactorDetailsBuilder getFactorDetailsBuilder() {
-    	return new FactorDetailsBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    protected final StudyFactorBuilder getStudyFactorBuilder() {
+    	return new StudyFactorBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
 
-    protected final VariateDetailsBuilder getVariateDetailsBuilder() {
-    	return new VariateDetailsBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    protected final StudyVariateBuilder getStudyVariateBuilder() {
+    	return new StudyVariateBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
 
     protected final StudyReferenceBuilder getStudyNodeBuilder() {

@@ -12,7 +12,11 @@ public class VariableTypeList {
 	}
 	
 	public void addAll(VariableTypeList variableTypes) {
-		this.variableTypes.addAll(variableTypes.getVariableTypes());
+		for (VariableType variableType : variableTypes.getVariableTypes()) {
+			if (findById(variableType.getId()) == null) {
+		        this.variableTypes.add(variableType);
+			}
+		}
 	}
 
 	public VariableType findById(TermId termId) {
