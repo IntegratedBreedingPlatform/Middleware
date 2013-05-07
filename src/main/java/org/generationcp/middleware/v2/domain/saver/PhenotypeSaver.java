@@ -37,8 +37,8 @@ public class PhenotypeSaver extends Saver {
 	private Phenotype createPhenotype(Variable variable) throws MiddlewareQueryException {
 		Phenotype phenotype = null;
 		
-		if (TermId.OBSERVATION_VARIATE.getId().equals(variable.getVariableType().getStandardVariable().getStoredIn().getId())
-			|| TermId.CATEGORICAL_VARIATE.getId().equals(variable.getVariableType().getStandardVariable().getStoredIn().getId())) {
+		if (TermId.OBSERVATION_VARIATE.getId() == variable.getVariableType().getStandardVariable().getStoredIn().getId()
+			|| TermId.CATEGORICAL_VARIATE.getId() == variable.getVariableType().getStandardVariable().getStoredIn().getId()) {
 			
 			phenotype = getPhenotypeObject(phenotype);
 			phenotype.setValue(variable.getValue());

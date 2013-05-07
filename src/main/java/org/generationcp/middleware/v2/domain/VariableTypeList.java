@@ -55,6 +55,33 @@ public class VariableTypeList {
 		}
 	}
 
-	
+	public VariableTypeList getFactors() {
+		VariableTypeList factors = new VariableTypeList();
+		if (variableTypes != null) {
+			for (VariableType variableType : variableTypes) {
+				if (!isVariate(variableType)) {
+					factors.add(variableType);
+				}
+			}
+		}
+		return factors;
+	}
+
+	public VariableTypeList getVariates() {
+		VariableTypeList variates = new VariableTypeList();
+		if (variableTypes != null) {
+			for (VariableType variableType : variableTypes) {
+				if (isVariate(variableType)) {
+					variates.add(variableType);
+				}
+			}
+		}
+		return variates;
+	}
+
+	private boolean isVariate(VariableType variableType) {
+		return variableType.getStandardVariable().getStoredIn().getId() == TermId.OBSERVATION_VARIATE.getId() ||
+			   variableType.getStandardVariable().getStoredIn().getId() == TermId.CATEGORICAL_VARIATE.getId();
+	}
 	
 }

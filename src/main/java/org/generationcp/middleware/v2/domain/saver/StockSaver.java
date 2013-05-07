@@ -39,23 +39,23 @@ public class StockSaver extends Saver {
 				Integer storedInId = variable.getVariableType().getStandardVariable().getStoredIn().getId();
 				String value = variable.getValue();
 				
-				if (TermId.ENTRY_NUMBER_STORAGE.getId().equals(storedInId)) {
+				if (TermId.ENTRY_NUMBER_STORAGE.getId() == storedInId) {
 					stock = getStockObject(stock);
 					stock.setUniqueName(value);
 					
-				} else if (TermId.ENTRY_GID_STORAGE.getId().equals(storedInId)) {
+				} else if (TermId.ENTRY_GID_STORAGE.getId() == storedInId) {
 					stock = getStockObject(stock);
 					stock.setDbxrefId(StringUtil.isEmpty(value) ? null : Integer.valueOf(value));
 					
-				} else if (TermId.ENTRY_DESIGNATION_STORAGE.getId().equals(storedInId)) {
+				} else if (TermId.ENTRY_DESIGNATION_STORAGE.getId() == storedInId) {
 					stock = getStockObject(stock);
 					stock.setName(value);
 					
-				} else if (TermId.ENTRY_CODE_STORAGE.getId().equals(storedInId)) {
+				} else if (TermId.ENTRY_CODE_STORAGE.getId() == storedInId) {
 					stock = getStockObject(stock);
 					stock.setValue(value);
 					
-				} else if (TermId.GERMPLASM_ENTRY_STORAGE.getId().equals(storedInId)) {
+				} else if (TermId.GERMPLASM_ENTRY_STORAGE.getId() == storedInId) {
 					stock = getStockObject(stock);
 					addProperty(stock, createProperty(variable));
 					

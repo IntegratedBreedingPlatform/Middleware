@@ -62,15 +62,15 @@ public class VariableInfoBuilder {
 	}
 	
 	private boolean isStudyInformationType(ProjectProperty property) {
-		return TermId.STUDY_INFORMATION.getId().equals(property.getTypeId());
+		return TermId.STUDY_INFORMATION.getId() == property.getTypeId();
 	}
 	
 	private boolean isLocalDescriptionType(ProjectProperty property) {
-		return TermId.VARIABLE_DESCRIPTION.getId().equals(property.getTypeId());
+		return TermId.VARIABLE_DESCRIPTION.getId() == property.getTypeId();
 	}
 
 	private boolean isStandardVariableType(ProjectProperty property) {
-		return TermId.STANDARD_VARIABLE.getId().equals(property.getTypeId());
+		return TermId.STANDARD_VARIABLE.getId() == property.getTypeId();
 	}
 
 	private Set<ProjectProperty> filterByRank(List<ProjectProperty> properties, int rank) {

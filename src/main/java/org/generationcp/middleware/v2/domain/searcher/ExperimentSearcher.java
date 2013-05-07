@@ -23,25 +23,25 @@ public class ExperimentSearcher extends Searcher {
 	public List<Integer> searchExperimentsByFactor(Integer factorId, String value) throws MiddlewareQueryException {
 		Integer storedInId = getStoredInId(factorId);
 		
-		if (TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId().equals(storedInId)) {
+		if (TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId() == storedInId) {
 			return findExperimentsByGeolocationFactorValue(factorId, value);
 			
-		} else if (TermId.TRIAL_DESIGN_INFO_STORAGE.getId().equals(storedInId)) {
+		} else if (TermId.TRIAL_DESIGN_INFO_STORAGE.getId() == storedInId) {
 			return findExperimentsByExperimentFactorValue(factorId, value);
 			
-		} else if (TermId.GERMPLASM_ENTRY_STORAGE.getId().equals(storedInId)) {
+		} else if (TermId.GERMPLASM_ENTRY_STORAGE.getId() == storedInId) {
 			return findExperimentsByStockFactorValue(factorId, value);
 		
-		} else if (TermId.ENTRY_GID_STORAGE.getId().equals(storedInId)) {
+		} else if (TermId.ENTRY_GID_STORAGE.getId() == storedInId) {
 			return findExperimentsByStock("dbxrefId", value);
 		
-		} else if (TermId.ENTRY_NUMBER_STORAGE.getId().equals(storedInId)) {
+		} else if (TermId.ENTRY_NUMBER_STORAGE.getId() == storedInId) {
 			return findExperimentsByStock("uniqueName", value);
 			
-		} else if (TermId.ENTRY_DESIGNATION_STORAGE.getId().equals(storedInId)) {
+		} else if (TermId.ENTRY_DESIGNATION_STORAGE.getId() == storedInId) {
 			return findExperimentsByStock("name", value);
 			
-		} else if (TermId.ENTRY_CODE_STORAGE.getId().equals(storedInId)) {
+		} else if (TermId.ENTRY_CODE_STORAGE.getId() == storedInId) {
 			return findExperimentsByStock("value", value);
 		}
 		

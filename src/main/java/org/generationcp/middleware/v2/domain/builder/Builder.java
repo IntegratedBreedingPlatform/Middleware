@@ -33,8 +33,8 @@ public abstract class Builder extends DatabaseBroker {
     	return new StudyBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
 	
-    protected final VariableBuilder getVariableBuilder() {
-    	return new VariableBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    protected final StudyVariableBuilder getStudyVariableBuilder() {
+    	return new StudyVariableBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
     
     protected final VariableInfoBuilder getVariableInfoBuilder() {

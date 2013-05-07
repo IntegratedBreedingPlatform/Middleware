@@ -55,8 +55,8 @@ public class ProjectPropertySaver extends Saver {
 		if (variableList != null && variableList.getVariables() != null && variableList.getVariables().size() > 0) {
 			for (Variable variable : variableList.getVariables()) {
 				int storedInId = variable.getVariableType().getStandardVariable().getStoredIn().getId();
-				if (TermId.STUDY_INFO_STORAGE.getId().equals(storedInId)
-				|| TermId.DATASET_INFO_STORAGE.getId().equals(storedInId)) {
+				if (TermId.STUDY_INFO_STORAGE.getId() == storedInId
+				|| TermId.DATASET_INFO_STORAGE.getId() == storedInId) {
 					ProjectProperty property = new ProjectProperty();
 					property.setProjectPropertyId(getProjectPropertyDao().getNegativeId("projectPropertyId"));
 					property.setTypeId(variable.getVariableType().getStandardVariable().getId());

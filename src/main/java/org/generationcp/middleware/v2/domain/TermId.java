@@ -79,6 +79,8 @@ public enum TermId {
     , TRIAL_DESIGN_INFO_STORAGE(1030)
     
     // Study/DataSet storage
+    , STUDY_NAME_STORAGE(1011)
+    , STUDY_TITLE_STORAGE(1012)
     , STUDY_INFO_STORAGE(1010)
     , DATASET_INFO_STORAGE(1015)
     	
@@ -91,14 +93,13 @@ public enum TermId {
 	, ENTRY_CODE(8300)
 	;
 	
-	private final Integer id;
+	private final int id;
 	
-	private TermId(Integer id) {
+	private TermId(int id) {
 		this.id = id;
 	}
 	
-	public Integer getId() {
+	public int getId() {
 		return this.id;
 	}
-	
 }

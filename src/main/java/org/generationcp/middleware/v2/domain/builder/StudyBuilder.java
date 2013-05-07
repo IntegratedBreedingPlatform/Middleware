@@ -4,8 +4,12 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.v2.domain.Experiment;
 import org.generationcp.middleware.v2.domain.Study;
+import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.VariableTypeList;
+import org.generationcp.middleware.v2.helper.ProjectValues;
+import org.generationcp.middleware.v2.helper.VariableInfo;
 import org.generationcp.middleware.v2.pojos.DmsProject;
 import org.generationcp.middleware.v2.pojos.ProjectProperty;
 
@@ -31,13 +35,14 @@ public class StudyBuilder extends Builder {
 		Study study = new Study();
 		study.setId(project.getProjectId());
 		
-		List<ProjectProperty> conditions = project.getConditions();
-		VariableTypeList conditionVariableTypes = getVariableTypeBuilder().create(conditions);
-		study.setConditions(getVariableBuilder().create(conditions, conditionVariableTypes));
+		VariableTypeList variableTypes = getVariableTypeBuilder().create(project.getProperties());
+		VariableTypeList conditionVariableTypes = variableTypes.getFactors();
+		VariableTypeList constantVariableTypes = variableTypes.getVariates();
 		
-		List<ProjectProperty> constants = project.getConstants();
-		VariableTypeList constantVariableTypes = getVariableTypeBuilder().create(constants);
-		study.setConstants(getVariableBuilder().create(constants, constantVariableTypes));
+		Experiment experiment = getExperimentBuilder().buildOne(project.getProjectId(), TermId.STUDY_EXPERIMENT, variableTypes);
+		
+		study.setConditions(getStudyVariableBuilder().create(project, experiment, conditionVariableTypes));
+		study.setConstants(getStudyVariableBuilder().create(project, experiment, constantVariableTypes));
 		
 		return study;
 	}

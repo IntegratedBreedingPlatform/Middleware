@@ -40,27 +40,27 @@ public class GeolocationSaver extends Saver {
 				Integer storedInId = variable.getVariableType().getStandardVariable().getStoredIn().getId();
 				String value = variable.getValue();
 				
-				if (TermId.TRIAL_INSTANCE_STORAGE.getId().equals(storedInId)) {
+				if (TermId.TRIAL_INSTANCE_STORAGE.getId() == storedInId) {
 					geolocation = getGeolocationObject(geolocation);
 					geolocation.setDescription(value);
 					
-				} else if (TermId.LATITUDE_STORAGE.getId().equals(storedInId)) {
+				} else if (TermId.LATITUDE_STORAGE.getId() == storedInId) {
 					geolocation = getGeolocationObject(geolocation);
 					geolocation.setLatitude(StringUtil.isEmpty(value) ? null : Double.valueOf(value));
 					
-				} else if (TermId.LONGITUDE_STORAGE.getId().equals(storedInId)) {
+				} else if (TermId.LONGITUDE_STORAGE.getId() == storedInId) {
 					geolocation = getGeolocationObject(geolocation);
 					geolocation.setLongitude(StringUtil.isEmpty(value) ? null : Double.valueOf(value));
 					
-				} else if (TermId.DATUM_STORAGE.getId().equals(storedInId)) {
+				} else if (TermId.DATUM_STORAGE.getId() == storedInId) {
 					geolocation = getGeolocationObject(geolocation);
 					geolocation.setGeodeticDatum(value);
 					
-				} else if (TermId.ALTITUDE_STORAGE.getId().equals(storedInId)) {
+				} else if (TermId.ALTITUDE_STORAGE.getId() == storedInId) {
 					geolocation = getGeolocationObject(geolocation);
 					geolocation.setAltitude(StringUtil.isEmpty(value) ? null : Double.valueOf(value));
 					
-				} else if (TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId().equals(storedInId)) {
+				} else if (TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId() == storedInId) {
 					geolocation = getGeolocationObject(geolocation);
 					addProperty(geolocation, createProperty(variable));
 					

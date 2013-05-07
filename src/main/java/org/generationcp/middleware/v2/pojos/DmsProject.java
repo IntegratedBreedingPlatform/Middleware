@@ -143,37 +143,6 @@ public class DmsProject implements Serializable {
 		this.relatedBys = relatedBys;
 	}
 
-	/**
-	 * A project property is a condition if its type is neither Observation
-	 * Variate and Categorical Variate
-	 */
-	public List<ProjectProperty> getConditions(){
-		List<ProjectProperty> conditions = new ArrayList<ProjectProperty>();
-		for (ProjectProperty property : properties){
-			if (property.getTypeId() != (TermId.OBSERVATION_VARIATE.getId()) && 
-					property.getTypeId() != (TermId.CATEGORICAL_VARIATE.getId())){
-				conditions.add(property);
-			}
-		}				
-		return conditions;
-	}
-
-	/**
-	 * A project property is a constant if its type is either Observation
-	 * Variate and Categorical Variate
-	 */
-	public List<ProjectProperty> getConstants(){
-		List<ProjectProperty> constants = new ArrayList<ProjectProperty>();		
-		for (ProjectProperty property : properties){
-			if (property.getTypeId() == (TermId.OBSERVATION_VARIATE.getId()) || 
-					property.getTypeId() == (TermId.CATEGORICAL_VARIATE.getId())){
-				constants.add(property);
-			}
-		}		
-		return constants;
-	}
-
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;

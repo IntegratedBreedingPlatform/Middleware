@@ -75,8 +75,8 @@ public abstract class AbstractVariableDetailsBuilder <T extends VariableDetails>
 	}
 	
 	private String getDataType(Integer termId) {
-		return (TermId.CHARACTER_DBID_VARIABLE.getId().equals(termId)
-				|| TermId.CHARACTER_VARIABLE.getId().equals(termId) 
+		return (TermId.CHARACTER_DBID_VARIABLE.getId() == termId
+				|| TermId.CHARACTER_VARIABLE.getId() == termId
 				? "C" : "N");
 	}
 }

@@ -6,7 +6,7 @@ public class Experiment {
 
 	private int id;
 	
-	private DataSet dataSet;
+	//private DataSet dataSet;
 	
 	private VariableList factors;
 	
@@ -20,13 +20,13 @@ public class Experiment {
 		this.id = id;
 	}
 
-	public DataSet getDataSet() {
-		return dataSet;
-	}
+	//public DataSet getDataSet() {
+	//	return dataSet;
+	//}
 
-	public void setDataSet(DataSet dataSet) {
-		this.dataSet = dataSet;
-	}
+	//public void setDataSet(DataSet dataSet) {
+	//	this.dataSet = dataSet;
+	//}
 
 	public VariableList getFactors() {
 		return factors;
@@ -65,8 +65,8 @@ public class Experiment {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Experiment [id=");
 		builder.append(id);
-		builder.append(", dataSet=");
-		builder.append(dataSet);
+		//builder.append(", dataSet=");
+		//builder.append(dataSet);
 		builder.append(", factors=");
 		builder.append(factors);
 		builder.append(", variates=");

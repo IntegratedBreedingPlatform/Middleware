@@ -58,7 +58,7 @@ public class ExperimentModelSaver extends Saver {
 		if (factors != null && factors.getVariables() != null && factors.getVariables().size() > 0) {
 						
 			for (Variable variable : factors.getVariables()) {
-				if (TermId.TRIAL_DESIGN_INFO_STORAGE.getId().equals(variable.getVariableType().getId())) {
+				if (TermId.TRIAL_DESIGN_INFO_STORAGE.getId() == variable.getVariableType().getId()) {
 					addProperty(experimentModel, variable);
 				}
 			}

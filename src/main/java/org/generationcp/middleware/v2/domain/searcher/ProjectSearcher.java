@@ -122,10 +122,10 @@ public class ProjectSearcher extends Searcher {
 		
 		for (DmsProject project : projects) {
 			if (project.getRelatedTos() != null && project.getRelatedTos().size() > 0) {
-				if (TermId.IS_STUDY.getId().equals(project.getRelatedTos().get(0).getTypeId())) {
+				if (TermId.IS_STUDY.getId() == project.getRelatedTos().get(0).getTypeId()) {
 					studies.add(project);
 				
-				} else if (TermId.BELONGS_TO_STUDY.getId().equals(project.getRelatedTos().get(0).getTypeId())) {
+				} else if (TermId.BELONGS_TO_STUDY.getId() == project.getRelatedTos().get(0).getTypeId()) {
 					studies.add(project.getRelatedTos().get(0).getObjectProject());
 				}
 			}
@@ -141,7 +141,7 @@ public class ProjectSearcher extends Searcher {
 		
 		for (DmsProject project : projects) {
 			if (project.getRelatedTos() != null && project.getRelatedTos().size() > 0) {
-				if (TermId.BELONGS_TO_STUDY.getId().equals(project.getRelatedTos().get(0).getTypeId())) {
+				if (TermId.BELONGS_TO_STUDY.getId() == project.getRelatedTos().get(0).getTypeId()) {
 					datasets.add(project);
 				}
 			}
