@@ -82,17 +82,17 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<FactorDetails> getFactors(Integer projectId) throws MiddlewareQueryException {
+	public List<FactorDetails> getFactors(int projectId) throws MiddlewareQueryException {
 		return getFactorDetailsBuilder().build(projectId);
 	}
 	
 	@Override
-	public List<VariateDetails> getVariates(Integer projectId) throws MiddlewareQueryException {
+	public List<VariateDetails> getVariates(int projectId) throws MiddlewareQueryException {
 		return getVariateDetailsBuilder().build(projectId);
 	}
 	
 	@Override
-	public List<Study> getStudiesByFolder(Integer folderId, int start, int numOfRows) throws MiddlewareQueryException{
+	public List<Study> getStudiesByFolder(int folderId, int start, int numOfRows) throws MiddlewareQueryException{
 		List<Study> studyDetails = new ArrayList<Study>();
 		if (setWorkingDatabase(folderId, getDmsProjectDao())) {
 			List<DmsProject> projects = (List<DmsProject>) getDmsProjectDao()
@@ -106,7 +106,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 	
 	@Override
-	public long countStudiesByFolder(Integer folderId) throws MiddlewareQueryException{
+	public long countStudiesByFolder(int folderId) throws MiddlewareQueryException{
 		long count = 0;
 		if (setWorkingDatabase(folderId, getDmsProjectDao())) {
 			count = getDmsProjectDao().countProjectsByFolder(folderId);
@@ -123,9 +123,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 	
 	@Override
-	public Set<Study> searchStudiesByGid(Integer gid) throws MiddlewareQueryException {
+	public Set<Study> searchStudiesByGid(int gid) throws MiddlewareQueryException {
 		Set<Study> studies = new HashSet<Study>();
-		List<DmsProject> projects = getProjectSearcher().searchStudiesByFactor(TermId.GID.getId(), gid.toString());
+		List<DmsProject> projects = getProjectSearcher().searchStudiesByFactor(TermId.GID.getId(), Integer.toString(gid));
 		for (DmsProject project : projects)	 {
 			studies.add(getStudyBuilder().createStudy(project));
 		}

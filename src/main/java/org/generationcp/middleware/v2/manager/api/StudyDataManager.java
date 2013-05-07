@@ -123,7 +123,7 @@ public interface StudyDataManager {
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	List<FactorDetails> getFactors(Integer projectId) throws MiddlewareQueryException;
+	List<FactorDetails> getFactors(int projectId) throws MiddlewareQueryException;
 	
 	/**
 	 * Returns the list of observation details for a specific study.
@@ -132,7 +132,7 @@ public interface StudyDataManager {
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	List<VariateDetails> getVariates(Integer projectId) throws MiddlewareQueryException;
+	List<VariateDetails> getVariates(int projectId) throws MiddlewareQueryException;
 	
 
 	/**
@@ -145,7 +145,7 @@ public interface StudyDataManager {
 	 * @return the list of studies
 	 * @throws MiddlewareQueryException
 	 */
-	List<Study> getStudiesByFolder(Integer folderId, int start, int numOfRows) throws MiddlewareQueryException;
+	List<Study> getStudiesByFolder(int folderId, int start, int numOfRows) throws MiddlewareQueryException;
 	
 	/**
 	 * Returns the number of studies in the given folder id.
@@ -154,7 +154,7 @@ public interface StudyDataManager {
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	long countStudiesByFolder(Integer folderId) throws MiddlewareQueryException;
+	long countStudiesByFolder(int folderId) throws MiddlewareQueryException;
 
 
     /**
@@ -164,7 +164,7 @@ public interface StudyDataManager {
      * @return
      * @throws MiddlewareQueryException
      */
-    Set<Study> searchStudiesByGid(Integer gid) throws MiddlewareQueryException;
+    Set<Study> searchStudiesByGid(int gid) throws MiddlewareQueryException;
 
     /**
 	 * Adds a study. Inserts into the tables project, projectprop and project_relationships. 
