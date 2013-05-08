@@ -146,6 +146,10 @@ public class StandardVariable {
 		this.constraints = constraints;
 	}
 
+	public List<NameSynonym> getNameSynonyms() {
+		return nameSynonyms;
+	}
+	
 	public void setNameSynonyms(List<NameSynonym> nameSynonyms) {
 		this.nameSynonyms = nameSynonyms;
 	}

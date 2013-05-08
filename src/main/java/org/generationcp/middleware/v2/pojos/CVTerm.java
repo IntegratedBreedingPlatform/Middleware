@@ -100,6 +100,9 @@ public class CVTerm implements Serializable {
 	@JoinColumn(name="cvterm_id") 
 	private List<CVTermProperty> properties;
 	
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JoinColumn(name="cvterm_id") 
+	private List<CVTermSynonym> synonyms;
 	
 	public CVTerm() {
 	}
@@ -179,6 +182,14 @@ public class CVTerm implements Serializable {
 
 	public void setProperties(List<CVTermProperty> properties) {
 		this.properties = properties;
+	}
+
+	public List<CVTermSynonym> getSynonyms() {
+		return synonyms;
+	}
+
+	public void setSynonyms(List<CVTermSynonym> synonyms) {
+		this.synonyms = synonyms;
 	}
 
 	@Override

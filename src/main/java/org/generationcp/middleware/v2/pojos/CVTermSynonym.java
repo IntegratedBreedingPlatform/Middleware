@@ -33,9 +33,7 @@ import javax.persistence.UniqueConstraint;
  *
  */
 @Entity
-@Table( name = "cvtermsynonym",
-		uniqueConstraints = {
-		@UniqueConstraint(columnNames = { "cvterm_id", "synonym" }) })
+@Table(name = "cvtermsynonym")
 public class CVTermSynonym implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -44,14 +42,6 @@ public class CVTermSynonym implements Serializable {
 	@Basic(optional = false)
 	@Column(name = "cvtermsynonym_id")
 	private Integer cvTermSynonymId;
-	
-	
-	/**
-	 * Related CVTerm entity.
-	 */
-	@Basic(optional = false)
-	@Column(name = "cvterm_id")
-	private Integer cvTerm;
 	
 	/**
 	 * Alias or synonym for related CV Term
@@ -64,7 +54,7 @@ public class CVTermSynonym implements Serializable {
 	 * Related CVTerm type. A synonym can be exact, narrower, or broader than.
 	 */
 	@Column(name = "type_id")
-	private Integer type;
+	private Integer typeId;
 	
 	public CVTermSynonym(){
 		
@@ -82,14 +72,6 @@ public class CVTermSynonym implements Serializable {
 		this.cvTermSynonymId = id;
 	}
 
-	public Integer getCvTerm() {
-		return cvTerm;
-	}
-
-	public void setCvTerm(Integer cvTerm) {
-		this.cvTerm = cvTerm;
-	}
-
 	public String getSynonym() {
 		return synonym;
 	}
@@ -98,12 +80,12 @@ public class CVTermSynonym implements Serializable {
 		this.synonym = synonym;
 	}
 
-	public Integer getType() {
-		return type;
+	public Integer getTypeId() {
+		return typeId;
 	}
 
-	public void setType(Integer type) {
-		this.type = type;
+	public void setTypeId(Integer typeId) {
+		this.typeId = typeId;
 	}
 
 	@Override
@@ -138,15 +120,11 @@ public class CVTermSynonym implements Serializable {
 		StringBuilder builder = new StringBuilder();
 		builder.append("CVTermSynonym [cvTermSynonymId=");
 		builder.append(cvTermSynonymId);
-		builder.append(", cvTerm=");
-		builder.append(cvTerm);
 		builder.append(", synonym=");
 		builder.append(synonym);
-		builder.append(", type=");
-		builder.append(type);
+		builder.append(", typeId=");
+		builder.append(typeId);
 		builder.append("]");
 		return builder.toString();
 	}
-	
-
 }

@@ -18,6 +18,7 @@ import org.generationcp.middleware.v2.domain.cache.StandardVariableCache;
 import org.generationcp.middleware.v2.pojos.CVTerm;
 import org.generationcp.middleware.v2.pojos.CVTermProperty;
 import org.generationcp.middleware.v2.pojos.CVTermRelationship;
+import org.generationcp.middleware.v2.pojos.CVTermSynonym;
 
 public class StandardVariableBuilder extends Builder {
 
@@ -46,7 +47,6 @@ public class StandardVariableBuilder extends Builder {
 			
 			addConstraints(standardVariable, cvTerm);
 			addRelatedTerms(standardVariable, cvTerm);
-			addNameSynonyms(standardVariable, cvTerm);
 		}
 		cache.put(standardVariable);
 		return standardVariable;
@@ -56,6 +56,10 @@ public class StandardVariableBuilder extends Builder {
 		if (setWorkingDatabase(standardVariable.getId())) {
 			List<CVTermRelationship> cvTermRelationships  = getCvTermRelationshipDao().getBySubject(standardVariable.getId());
 			standardVariable.setProperty(createTerm(cvTermRelationships, TermId.HAS_PROPERTY));
+			
+			CVTerm propCvTerm = getCvTerm(cvTermRelationships, TermId.HAS_PROPERTY);
+			addNameSynonyms(standardVariable, propCvTerm);
+			
 			standardVariable.setMethod(createTerm(cvTermRelationships, TermId.HAS_METHOD));
 			standardVariable.setScale(createTerm(cvTermRelationships, TermId.HAS_SCALE));
 			standardVariable.setDataType(createTerm(cvTermRelationships, TermId.HAS_TYPE));
@@ -64,13 +68,14 @@ public class StandardVariableBuilder extends Builder {
 			addEnumerations(standardVariable, cvTermRelationships);
 		}
 	}
-	
+
+
 	private void addNameSynonyms(StandardVariable standardVariable, CVTerm cvTerm) {
 		List<NameSynonym> nameSynonyms = new ArrayList<NameSynonym>();
 		for (NameType nameType : NameType.values()) {
-			CVTermProperty property = findProperty(cvTerm.getProperties(), nameType.getId());
-			if (property != null) {
-				nameSynonyms.add(new NameSynonym(property.getValue(), nameType));
+			CVTermSynonym synonym = findSynonym(cvTerm.getSynonyms(), nameType.getId());
+			if (synonym != null) {
+				nameSynonyms.add(new NameSynonym(synonym.getSynonym(), nameType));
 			}
 		}
 		standardVariable.setNameSynonyms(nameSynonyms);
@@ -107,6 +112,17 @@ public class StandardVariableBuilder extends Builder {
 			for (CVTermProperty property : properties) {
 				if (property.getTypeId() == typeId) {
 					return property;
+				}
+			}
+		}
+		return null;
+	}
+	
+	private CVTermSynonym findSynonym(List<CVTermSynonym> synonyms, int typeId) {
+		if (synonyms != null) {
+			for (CVTermSynonym synonym : synonyms) {
+				if (synonym.getTypeId() == typeId) {
+					return synonym;
 				}
 			}
 		}
@@ -160,6 +176,10 @@ public class StandardVariableBuilder extends Builder {
 		    return getCvTermDao().getById(id);
 		}
 		return null;
+	}
+	
+	private CVTerm getCvTerm(List<CVTermRelationship> cvTermRelationships, TermId termId) throws MiddlewareQueryException {
+		return getCvTerm(findTermId(cvTermRelationships, termId));
 	}
 	
 	private FactorType createFactorType(int storedInTerm) {

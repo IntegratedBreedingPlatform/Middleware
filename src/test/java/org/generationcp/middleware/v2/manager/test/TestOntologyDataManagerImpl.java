@@ -86,6 +86,11 @@ public class TestOntologyDataManagerImpl {
 		manager.getStandardVariable(STD_VARIABLE_ID);		// Second (and subsequent) calls will retrieve the value from the cache
 	}
 	
+	@Test
+	public void testNameSynonyms() throws Exception {
+		StandardVariable sv = manager.getStandardVariable(8383);
+		sv.print(0);
+	}
 	
 	@AfterClass
 	public static void tearDown() throws Exception {
@@ -93,6 +98,4 @@ public class TestOntologyDataManagerImpl {
 			factory.close();
 		}
 	}
-
-	
 }
