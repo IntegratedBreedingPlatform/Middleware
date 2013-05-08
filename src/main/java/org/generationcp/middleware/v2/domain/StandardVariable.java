@@ -26,8 +26,33 @@ public class StandardVariable {
     private List<NameSynonym> nameSynonyms = new ArrayList<NameSynonym>();
     
     private List<Enumeration> enumerations;
+    
+    public StandardVariable(){    	
+    }
+    
+    public StandardVariable(Term property, Term scale, Term method,
+			Term dataType, Term storedIn, FactorType factorType, VariableConstraints constraints,
+			List<Enumeration> enumerations) {
+		this.property = property;
+		this.scale = scale;
+		this.method = method;
+		this.dataType = dataType;
+		this.storedIn = storedIn;
+		this.factorType = factorType;
+		this.constraints = constraints;
+		this.enumerations = enumerations;
+	}
 
-    public int getId() {
+    /* Copy constructor. Used by the copy method */
+    private StandardVariable(StandardVariable stdVar) {
+    	this(stdVar.getProperty(), stdVar.getScale(), stdVar.getMethod(),
+			stdVar.getDataType(), stdVar.getStoredIn(), stdVar.getFactorType(), stdVar.getConstraints(),
+			stdVar.getEnumerations());
+    	this.setId(0);  //TODO Set to null
+    	this.setName(stdVar.getName());
+    	this.setDescription(stdVar.getDescription());
+	}
+	public int getId() {
     	return term.getId();
     }
     
@@ -166,6 +191,12 @@ public class StandardVariable {
 	public boolean hasEnumerations() {
 		return (enumerations != null && enumerations.size() > 0);
 	}
+	
+	public StandardVariable copy() {
+		return new StandardVariable(this);
+	}
+	
+	
 
 	public void print(int indent) {
 		Debug.println(indent, "Standard Variable: ");
@@ -198,7 +229,7 @@ public class StandardVariable {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("VariableType [");
+		builder.append("StandardVariable [");
 		builder.append("term=");
 		builder.append(term);
 		builder.append(", property=");

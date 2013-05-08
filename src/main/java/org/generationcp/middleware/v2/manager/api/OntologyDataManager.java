@@ -14,6 +14,7 @@ package org.generationcp.middleware.v2.manager.api;
 
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.v2.domain.StandardVariable;
 import org.generationcp.middleware.v2.domain.Term;
 
 /**
@@ -32,5 +33,13 @@ public interface OntologyDataManager {
 	 */
     public Term getTermById(int termId) throws MiddlewareQueryException;
     
+    /**
+     * Retrieves a StandardVariable given its id
+     * 
+     * @param stdVariableId
+     * @return
+     * @throws MiddlewareQueryException
+     */
+	public StandardVariable getStandardVariable(int stdVariableId) throws MiddlewareQueryException; 
 
 }
