@@ -16,6 +16,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import junit.framework.Assert;
@@ -39,7 +40,6 @@ import org.generationcp.middleware.v2.domain.StudyValues;
 import org.generationcp.middleware.v2.domain.Term;
 import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.Variable;
-import org.generationcp.middleware.v2.domain.VariableDetails;
 import org.generationcp.middleware.v2.domain.VariableList;
 import org.generationcp.middleware.v2.domain.VariableType;
 import org.generationcp.middleware.v2.domain.VariableTypeList;
@@ -195,27 +195,6 @@ public class TestStudyDataManagerImpl {
 		}
 	}
 
-	// ================================ helper methods =============================
-	private <T extends VariableDetails> void printVariableDetails(int studyId, List<T> details) {
-		if (details != null && details.size() > 0) {
-			System.out.println("NUMBER OF VARIABLES = " + details.size());
-			for (VariableDetails detail : details) {
-				System.out.println("\nFACTOR " + detail.getId() + " (study = "
-						+ detail.getStudyId() + ")");
-				System.out.println("\tNAME = " + detail.getName());
-				System.out
-						.println("\tDESCRIPTION = " + detail.getDescription());
-				System.out.println("\tPROPERTY = " + detail.getProperty());
-				System.out.println("\tMETHOD = " + detail.getMethod());
-				System.out.println("\tSCALE = " + detail.getScale());
-				System.out.println("\tDATA TYPE = " + detail.getDataType());
-			}
-
-		} else {
-			System.out.println("NO VARIABLE FOUND FOR STUDY " + studyId);
-		}
-	}
-
 	@Test
 	public void testAddStudy() throws Exception {
 
@@ -288,38 +267,28 @@ public class TestStudyDataManagerImpl {
 
 	@Test
 	public void testAddDataSet() throws Exception {
-		// get a dataset test data from central
-		Integer datasetId = 10015;
+		//Parent study, assign a parent study id value, if none exists in db, 
+		//you may create a dummy one. or you may run testAddStudy first to create
+		//the study
 		int parentStudyId = -1;
-		DataSet dataset = manager.getDataSet(datasetId);
-
-		StandardVariable var = new StandardVariable();
-		var.setId(TermId.DATASET_NAME.getId());
 		
-		VariableType type = new VariableType();
-		type.setStandardVariable(var);
-		type.setLocalDescription("Dataset Name");
-		type.setLocalName("DATASET_NAME");
-		type.setRank(1);
-		
+		VariableTypeList typeList = new VariableTypeList();
 		VariableList variableList = new VariableList();
-		variableList.add(new Variable(type, "My Dataset Name"));
+		Variable variable;
 		
-		var = new StandardVariable();
-		var.setId(TermId.DATASET_TITLE.getId());
+		//please make sure that the study name is unique and does not exist in the db.
+		variable = createVariable(TermId.DATASET_NAME.getId(), "My Dataset Name " + new Random().nextInt(10000), TermId.DATASET_INFO_STORAGE, 1);
+		typeList.add(variable.getVariableType());
+		variableList.add(variable);
 		
-		type = new VariableType();
-		type.setStandardVariable(var);
-		type.setLocalDescription("Dataset Description");
-		type.setLocalName("DATASET_DESC");
-		type.setRank(2);
-		
-		variableList.add(new Variable(type, "My Dataset Description"));
+		variable = createVariable(TermId.DATASET_TITLE.getId(), "My Dataset Description", TermId.DATASET_INFO_STORAGE, 2);
+		typeList.add(variable.getVariableType());
+		variableList.add(variable);
 		
 		DatasetValues datasetValues = new DatasetValues();
 		datasetValues.setVariableList(variableList);
 
-		DatasetReference datasetReference = manager.addDataSet(parentStudyId, dataset.getVariableTypes(), datasetValues);
+		DatasetReference datasetReference = manager.addDataSet(parentStudyId, typeList, datasetValues);
 		System.out.println("Dataset added : " + datasetReference);
 		
 	}
@@ -343,25 +312,25 @@ public class TestStudyDataManagerImpl {
 	@Test
 	public void testAddLocation() throws Exception {
 		VariableList variableList = new VariableList();
-		variableList.add(createVariable(1, "loc desc", TermId.TRIAL_INSTANCE_STORAGE));
-		variableList.add(createVariable(2, "1.1", TermId.LATITUDE_STORAGE));
-		variableList.add(createVariable(3, "2.2", TermId.LONGITUDE_STORAGE));
-		variableList.add(createVariable(4, "datum", TermId.DATUM_STORAGE));
-		variableList.add(createVariable(5, "3.3", TermId.ALTITUDE_STORAGE));
-		variableList.add(createVariable(6, "prop1", TermId.TRIAL_ENVIRONMENT_INFO_STORAGE));
-		variableList.add(createVariable(7, "prop2", TermId.TRIAL_ENVIRONMENT_INFO_STORAGE));
+		variableList.add(createVariable(1, "loc desc", TermId.TRIAL_INSTANCE_STORAGE, 1));
+		variableList.add(createVariable(2, "1.1", TermId.LATITUDE_STORAGE, 2));
+		variableList.add(createVariable(3, "2.2", TermId.LONGITUDE_STORAGE, 3));
+		variableList.add(createVariable(4, "datum", TermId.DATUM_STORAGE, 4));
+		variableList.add(createVariable(5, "3.3", TermId.ALTITUDE_STORAGE, 5));
+		variableList.add(createVariable(6, "prop1", TermId.TRIAL_ENVIRONMENT_INFO_STORAGE, 6));
+		variableList.add(createVariable(7, "prop2", TermId.TRIAL_ENVIRONMENT_INFO_STORAGE, 7));
 		manager.addTrialEnvironment(variableList);
 	}
 	
 	@Test
 	public void testAddGermplasm() throws Exception {
 		VariableList variableList = new VariableList();
-		variableList.add(createVariable(1, "unique name", TermId.ENTRY_NUMBER_STORAGE));
-		variableList.add(createVariable(2, "1000", TermId.ENTRY_GID_STORAGE));
-		variableList.add(createVariable(3, "name", TermId.ENTRY_DESIGNATION_STORAGE));
-		variableList.add(createVariable(4, "2000", TermId.ENTRY_CODE_STORAGE));
-		variableList.add(createVariable(6, "prop1", TermId.GERMPLASM_ENTRY_STORAGE));
-		variableList.add(createVariable(7, "prop2", TermId.GERMPLASM_ENTRY_STORAGE));
+		variableList.add(createVariable(1, "unique name", TermId.ENTRY_NUMBER_STORAGE, 1));
+		variableList.add(createVariable(2, "1000", TermId.ENTRY_GID_STORAGE, 2));
+		variableList.add(createVariable(3, "name", TermId.ENTRY_DESIGNATION_STORAGE, 3));
+		variableList.add(createVariable(4, "2000", TermId.ENTRY_CODE_STORAGE, 4));
+		variableList.add(createVariable(6, "prop1", TermId.GERMPLASM_ENTRY_STORAGE, 5));
+		variableList.add(createVariable(7, "prop2", TermId.GERMPLASM_ENTRY_STORAGE, 6));
 		manager.addStock(variableList);
 	}
 
@@ -373,13 +342,13 @@ public class TestStudyDataManagerImpl {
 	}
 	
 	
-	private Variable createVariable(int termId, String value, TermId storedInTerm) {
+	private Variable createVariable(int termId, String value, TermId storedInTerm, int rank) {
 		StandardVariable stVar = new StandardVariable();
 		stVar.setId(termId);
 		stVar.setStoredIn(new Term(storedInTerm.getId(), "", ""));
 		VariableType vtype = new VariableType();
 		vtype.setStandardVariable(stVar);
-		vtype.setRank(1);
+		vtype.setRank(rank);
 		Variable var = new Variable();
 		var.setValue(value);
 		var.setVariableType(vtype);
