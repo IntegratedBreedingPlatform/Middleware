@@ -310,7 +310,7 @@ public class TestStudyDataManagerImpl {
 	}
 	
 	@Test
-	public void testAddLocation() throws Exception {
+	public void testAddTrialEnvironment() throws Exception {
 		VariableList variableList = new VariableList();
 		variableList.add(createVariable(1, "loc desc", TermId.TRIAL_INSTANCE_STORAGE, 1));
 		variableList.add(createVariable(2, "1.1", TermId.LATITUDE_STORAGE, 2));
