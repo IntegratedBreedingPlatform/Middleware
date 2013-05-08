@@ -158,6 +158,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             
             getExperimentModelSaver().addExperiment(project.getProjectId(), studyValues);
 
+			trans.commit();
+
 			return new StudyReference(project.getProjectId(), project.getName(), project.getDescription());
 			
         } catch (Exception e) {

@@ -16,8 +16,6 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.v2.domain.StudyValues;
 import org.generationcp.middleware.v2.domain.VariableTypeList;
 import org.generationcp.middleware.v2.pojos.DmsProject;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 /**
  * Saves a study (the corresponding Project, ProjectProperty,
@@ -36,12 +34,8 @@ public class StudySaver extends Saver{
 	
 	public Integer saveStudy(int parentId, VariableTypeList variableTypeList, StudyValues studyValues, DmsProject project) throws Exception{
         requireLocalDatabaseInstance();
-        Session session = getCurrentSessionForLocal();
-        Transaction trans = null;
 
         try {
-            trans = session.beginTransaction();
-
             project = getProjectSaver().save(project);
             
             project.setProperties(getProjectPropertySaver().create(project, variableTypeList));
@@ -49,7 +43,6 @@ public class StudySaver extends Saver{
             getProjectRelationshipSaver().saveProjectParentRelationship(project, parentId);
             
         } catch (Exception e) {
-        	rollbackTransaction(trans);
             throw e;
         }
         return project.getProjectId();

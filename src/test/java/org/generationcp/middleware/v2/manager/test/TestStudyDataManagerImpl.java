@@ -202,36 +202,23 @@ public class TestStudyDataManagerImpl {
 		Integer studyId = 1000;
 		int parentStudyId = 1;
 		Study study = manager.getStudy(studyId);
-
-
-		VariableType type = new VariableType();
-
-		StandardVariable var = new StandardVariable();
-		var.setId(TermId.STUDY_NAME.getId());
-		type.setStandardVariable(var);
-		type.setLocalDescription("Study Name");
-		type.setLocalName("STUDY_NAME");
-		type.setRank(1);
+		
+		VariableTypeList typeList = new VariableTypeList();
 		
 		VariableList variableList = new VariableList();
-		variableList.add(new Variable(type, "My Study Name"));
+
+		Variable variable = createVariable(TermId.STUDY_NAME.getId(), "Study Name " + new Random().nextInt(10000), TermId.STUDY_NAME_STORAGE, 1);
+		typeList.add(variable.getVariableType());
+		variableList.add(variable);
 		
-		var = new StandardVariable();
-		var.setId(TermId.STUDY_TITLE.getId());		
-		type = new VariableType();
-		type.setStandardVariable(var);
-		type.setLocalDescription("Study Description");
-		type.setLocalName("STUDY_DESC");
-		type.setRank(2);
-		
-		variableList.add(new Variable(type, "My Study Description"));
+		variable = createVariable(TermId.STUDY_TITLE.getId(), "Study Description", TermId.STUDY_TITLE_STORAGE, 2);
+		typeList.add(variable.getVariableType());
+		variableList.add(variable);
 		
 		StudyValues studyValues = new StudyValues();
 		studyValues.setVariableList(variableList);
 		studyValues.setGermplasmId(-1);
 		studyValues.setLocationId(-1);
-
-		//TODO Set stored_in
 		
 		StudyReference studyRef = manager.addStudy(parentStudyId, study.getConditionVariableTypes(), studyValues);
 
