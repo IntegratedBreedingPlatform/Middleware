@@ -60,6 +60,8 @@ public class StockSaver extends Saver {
 					stock = getStockObject(stock);
 					addProperty(stock, createProperty(propertyIndex--, variable));
 					
+				} else {
+					throw new MiddlewareQueryException("Non-Stock Variable was used in calling create stock: " + variable.getVariableType().getId());
 				}
 			}
 		}
