@@ -14,19 +14,30 @@ import org.generationcp.middleware.v2.domain.StandardVariable;
 import org.generationcp.middleware.v2.domain.Term;
 import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.VariableConstraints;
+import org.generationcp.middleware.v2.domain.cache.StandardVariableCache;
 import org.generationcp.middleware.v2.pojos.CVTerm;
 import org.generationcp.middleware.v2.pojos.CVTermProperty;
 import org.generationcp.middleware.v2.pojos.CVTermRelationship;
 
 public class StandardVariableBuilder extends Builder {
 
+
 	public StandardVariableBuilder(HibernateSessionProvider sessionProviderForLocal,
 			                   HibernateSessionProvider sessionProviderForCentral) {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 	
+	
+	// If the standard variable is already in the cache, return. Else, create the variable, add to cache then return
 	public StandardVariable create(int standardVariableId) throws MiddlewareQueryException {
-		StandardVariable standardVariable = new StandardVariable();
+
+		StandardVariableCache cache = StandardVariableCache.getInstance();
+		StandardVariable standardVariable = cache.get(standardVariableId); 
+		if (standardVariable != null){
+			return standardVariable;
+		}
+		
+		standardVariable = new StandardVariable();
 		standardVariable.setId(standardVariableId);
 		CVTerm cvTerm = getCvTerm(standardVariableId);
 		if (cvTerm != null) {
@@ -37,6 +48,7 @@ public class StandardVariableBuilder extends Builder {
 			addRelatedTerms(standardVariable, cvTerm);
 			addNameSynonyms(standardVariable, cvTerm);
 		}
+		cache.put(standardVariable);
 		return standardVariable;
 	}
 

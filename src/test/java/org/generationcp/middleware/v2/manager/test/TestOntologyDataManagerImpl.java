@@ -78,6 +78,15 @@ public class TestOntologyDataManagerImpl {
 	    System.out.println("testCopyStandardVariable(): \n    " + stdVar + "\n    " + stdVar2);
 	}
 	
+	
+	@Test
+	public void testStandardVariableCache() throws Exception {
+		System.out.println("testStandardVariableCache(): ");
+		manager.getStandardVariable(STD_VARIABLE_ID); 		// First call to getStandardVariable() will put the value to the cache
+		manager.getStandardVariable(STD_VARIABLE_ID);		// Second (and subsequent) calls will retrieve the value from the cache
+	}
+	
+	
 	@AfterClass
 	public static void tearDown() throws Exception {
 		if (factory != null) {
