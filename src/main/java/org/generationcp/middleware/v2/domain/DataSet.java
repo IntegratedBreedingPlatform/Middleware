@@ -53,6 +53,21 @@ public class DataSet {
 	public void setVariableTypes(VariableTypeList variableTypes) {
 		this.variableTypes = variableTypes;
 	}
+	
+	public VariableTypeList getFactorsByProperty(int propertyId) {
+		VariableTypeList filteredFactors = new VariableTypeList();
+		
+		VariableTypeList factors = getVariableTypes() != null ? getVariableTypes().getFactors() : null;
+		if (factors != null) {
+			for (VariableType factor : factors.getVariableTypes()) {
+				if (factor.getStandardVariable().getProperty().getId() == propertyId) {
+					filteredFactors.add(factor);
+				}
+			}
+		}
+		
+		return filteredFactors;
+	}
 
 	public void print(int indent) {
 		Debug.println(indent, "DataSet: ");

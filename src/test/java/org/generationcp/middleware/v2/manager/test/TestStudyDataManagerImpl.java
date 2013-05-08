@@ -320,6 +320,22 @@ public class TestStudyDataManagerImpl {
 		variableList.add(createVariable(7, "prop2", TermId.GERMPLASM_ENTRY_STORAGE, 6));
 		manager.addStock(variableList);
 	}
+	
+	@Test
+	public void testGetFactorsByProperty() throws Exception {
+		int propertyId = 2205;
+		int datasetId = 10015;
+		System.out.println("testGetFactorsByProperty (dataset=" + datasetId + ", property=" + propertyId);
+		DataSet dataset = manager.getDataSet(datasetId);
+		VariableTypeList factors = dataset.getFactorsByProperty(propertyId);
+		if (factors != null && factors.getVariableTypes() != null && factors.getVariableTypes().size() > 0) {
+			for (VariableType factor : factors.getVariableTypes()) {
+				factor.print(0);
+			}
+		} else {
+			System.out.println("NO FACTORS FOUND FOR DATASET = " + datasetId + " WITH PROPERTY = " + propertyId);
+		}
+	}
 
 	@AfterClass
 	public static void tearDown() throws Exception {
