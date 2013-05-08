@@ -58,7 +58,7 @@ public class DataSet {
 		VariableTypeList filteredFactors = new VariableTypeList();
 		
 		VariableTypeList factors = getVariableTypes() != null ? getVariableTypes().getFactors() : null;
-		if (factors != null) {
+		if (factors != null && factors.getVariableTypes() != null) {
 			for (VariableType factor : factors.getVariableTypes()) {
 				if (factor.getStandardVariable().getProperty().getId() == propertyId) {
 					filteredFactors.add(factor);
