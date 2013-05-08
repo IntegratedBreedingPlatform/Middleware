@@ -61,6 +61,7 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSetting;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -1353,6 +1354,19 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 
         try {
             trans = session.beginTransaction();
+            
+            if (projectBackup.getBackupPath() != null) {
+            	Query query = session.createQuery("FROM ProjectBackup pb WHERE pb.backupPath = ?");
+                query.setParameter(0,projectBackup.getBackupPath());
+                query.setMaxResults(1);
+                List<ProjectBackup> result = query.list();
+                
+                if (result != null && result.size() > 0) {
+                	projectBackup.setProjectBackupId(result.get(0).getProjectBackupId());
+                }
+            
+            }
+            
             projectBackup = getProjectBackupDao().saveOrUpdate(projectBackup);
 
             trans.commit();
