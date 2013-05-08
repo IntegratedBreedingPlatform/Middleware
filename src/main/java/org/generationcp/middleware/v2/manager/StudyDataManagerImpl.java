@@ -235,7 +235,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	        
 	    } catch (Exception e) {
 	    	rollbackTransaction(trans);
-	        throw new MiddlewareQueryException("error in addExperiment " + e.getMessage(), e);
+	        throw new MiddlewareQueryException("error in addTrialEnvironment " + e.getMessage(), e);
 	    }
 	}
 
@@ -253,7 +253,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         
     } catch (Exception e) {
     	rollbackTransaction(trans);
-        throw new MiddlewareQueryException("error in addExperiment " + e.getMessage(), e);
+        throw new MiddlewareQueryException("error in addStock " + e.getMessage(), e);
     }
 	}
 }
