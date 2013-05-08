@@ -6,12 +6,13 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.v2.domain.Enumeration;
+import org.generationcp.middleware.v2.domain.FactorType;
 import org.generationcp.middleware.v2.domain.NameSynonym;
 import org.generationcp.middleware.v2.domain.NameType;
-import org.generationcp.middleware.v2.domain.TermId;
-import org.generationcp.middleware.v2.domain.Term;
-import org.generationcp.middleware.v2.domain.Enumeration;
 import org.generationcp.middleware.v2.domain.StandardVariable;
+import org.generationcp.middleware.v2.domain.Term;
+import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.VariableConstraints;
 import org.generationcp.middleware.v2.pojos.CVTerm;
 import org.generationcp.middleware.v2.pojos.CVTermProperty;
@@ -47,6 +48,7 @@ public class StandardVariableBuilder extends Builder {
 			standardVariable.setScale(createTerm(cvTermRelationships, TermId.HAS_SCALE));
 			standardVariable.setDataType(createTerm(cvTermRelationships, TermId.HAS_TYPE));
 			standardVariable.setStoredIn(createTerm(cvTermRelationships, TermId.STORED_IN));
+			standardVariable.setFactorType(createFactorType(standardVariable.getStoredIn().getId()));
 			addEnumerations(standardVariable, cvTermRelationships);
 		}
 	}
@@ -144,6 +146,15 @@ public class StandardVariableBuilder extends Builder {
 	private CVTerm getCvTerm(int id) throws MiddlewareQueryException {
 		if (setWorkingDatabase(id)) {
 		    return getCvTermDao().getById(id);
+		}
+		return null;
+	}
+	
+	private FactorType createFactorType(int storedInTerm) {
+		for (FactorType factorType : FactorType.values()) {
+			if (factorType.getFactorStorages().contains(storedInTerm)) {
+				return factorType;
+			}
 		}
 		return null;
 	}

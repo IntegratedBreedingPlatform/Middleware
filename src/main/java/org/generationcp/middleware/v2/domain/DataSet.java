@@ -68,6 +68,21 @@ public class DataSet {
 		
 		return filteredFactors;
 	}
+	
+	public VariableTypeList getFactorsByFactorType(FactorType factorType) {
+		VariableTypeList filteredFactors = new VariableTypeList();
+		
+		VariableTypeList factors = getVariableTypes() != null ? getVariableTypes().getFactors() : null;
+		if (factors != null && factors.getVariableTypes() != null) {
+			for (VariableType factor : factors.getVariableTypes()) {
+				if (factor.getStandardVariable().getFactorType() == factorType) {
+					filteredFactors.add(factor);
+				}
+			}
+		}
+		
+		return filteredFactors;
+	}
 
 	public void print(int indent) {
 		Debug.println(indent, "DataSet: ");

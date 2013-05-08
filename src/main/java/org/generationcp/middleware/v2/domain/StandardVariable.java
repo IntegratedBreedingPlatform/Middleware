@@ -2,7 +2,6 @@ package org.generationcp.middleware.v2.domain;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.generationcp.middleware.v2.util.Debug;
 
@@ -19,6 +18,8 @@ public class StandardVariable {
     private Term dataType;
     
     private Term storedIn;
+    
+    private FactorType factorType;
     
     private VariableConstraints constraints;  // may be null
     
@@ -132,6 +133,14 @@ public class StandardVariable {
 		this.enumerations = enumerations;
 	}
 	
+	public FactorType getFactorType() {
+		return factorType;
+	}
+
+	public void setFactorType(FactorType factorType) {
+		this.factorType = factorType;
+	}
+
 	public Enumeration findEnumerationByName(String name) {
 		if (enumerations != null) {
 			for (Enumeration enumeration : enumerations) {
@@ -166,6 +175,7 @@ public class StandardVariable {
 		Debug.println(indent, "method " + method);
 		Debug.println(indent, "scale: " + scale);
 		Debug.println(indent, "storedIn: " + storedIn);
+		Debug.println(indent, "factorType: " + factorType);
 		if (constraints != null) {
 			Debug.println(indent, "constraints: " + constraints);
 		}

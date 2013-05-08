@@ -30,6 +30,7 @@ import org.generationcp.middleware.v2.domain.DatasetReference;
 import org.generationcp.middleware.v2.domain.DatasetValues;
 import org.generationcp.middleware.v2.domain.Experiment;
 import org.generationcp.middleware.v2.domain.ExperimentValues;
+import org.generationcp.middleware.v2.domain.FactorType;
 import org.generationcp.middleware.v2.domain.FolderReference;
 import org.generationcp.middleware.v2.domain.Reference;
 import org.generationcp.middleware.v2.domain.StandardVariable;
@@ -334,6 +335,22 @@ public class TestStudyDataManagerImpl {
 			}
 		} else {
 			System.out.println("NO FACTORS FOUND FOR DATASET = " + datasetId + " WITH PROPERTY = " + propertyId);
+		}
+	}
+	
+	@Test
+	public void testGetFactorsByFactorType() throws Exception {
+		FactorType factorType = FactorType.GERMPLASM;
+		int datasetId = 10015;
+		System.out.println("testGetFactorsByFactorType (dataset=" + datasetId + ", factorType=" + factorType + ")");
+		DataSet dataset = manager.getDataSet(datasetId);
+		VariableTypeList factors = dataset.getFactorsByFactorType(factorType);
+		if (factors != null && factors.getVariableTypes() != null && factors.getVariableTypes().size() > 0) {
+			for (VariableType factor : factors.getVariableTypes()) {
+				factor.print(0);
+			}
+		} else {
+			System.out.println("NO FACTORS FOUND FOR DATASET = " + datasetId + " WITH FACTOR TYPE = " + factorType);
 		}
 	}
 
