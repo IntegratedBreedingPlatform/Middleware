@@ -1539,9 +1539,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                 name.setNstat(Integer.valueOf(1));
                 name.setGermplasmId(negativeId);
 
-                Germplasm germplasmSaved = dao.saveOrUpdate(germplasm);
+                Germplasm germplasmSaved = dao.save(germplasm);
                 idGermplasmsSaved.add(germplasmSaved.getGid());
-                nameDao.saveOrUpdate(name);
+                nameDao.save(name);
                 germplasmsSaved++;
 
                 if (germplasmsSaved % JDBC_BATCH_SIZE == 0) {
