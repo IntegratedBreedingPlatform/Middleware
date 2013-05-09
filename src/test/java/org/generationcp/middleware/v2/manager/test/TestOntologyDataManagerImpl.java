@@ -117,6 +117,8 @@ public class TestOntologyDataManagerImpl {
 		stdVariable.getEnumerations().add(new Enumeration(10002, "PN", "Pedigree nursery", 3));
 		
 		manager.addStandardVariable(stdVariable);
+		
+		System.out.println("Standard variable saved: " + stdVariable.getId());
 	}
 	
 	@AfterClass

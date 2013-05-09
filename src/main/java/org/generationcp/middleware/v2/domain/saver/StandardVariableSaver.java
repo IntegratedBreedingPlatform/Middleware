@@ -28,6 +28,7 @@ public class StandardVariableSaver extends Saver {
 	public void save(StandardVariable stdVar) throws MiddlewareQueryException {
 		setWorkingDatabase(Database.LOCAL);
 		int varId = saveCvTerm(stdVar);
+		stdVar.setId(varId);
 		
 		saveRelationship(varId, TermId.HAS_PROPERTY.getId(), stdVar.getProperty());
 		saveRelationship(varId, TermId.HAS_SCALE.getId(), stdVar.getScale());
