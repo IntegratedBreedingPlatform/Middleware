@@ -33,8 +33,8 @@ public abstract class Searcher extends DatabaseBroker{
     	return new ExperimentSearcher(sessionProviderForLocal, sessionProviderForCentral);
     }
     
-    protected final ProjectSearcher getProjectSearcher() {
-    	return new ProjectSearcher(sessionProviderForLocal, sessionProviderForCentral);
+    protected final StudySearcherByNameStartSeasonCountry getProjectSearcher() {
+    	return new StudySearcherByNameStartSeasonCountry(sessionProviderForLocal, sessionProviderForCentral);
     }
 
 }

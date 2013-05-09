@@ -35,7 +35,6 @@ import org.generationcp.middleware.v2.domain.FolderReference;
 import org.generationcp.middleware.v2.domain.Reference;
 import org.generationcp.middleware.v2.domain.StandardVariable;
 import org.generationcp.middleware.v2.domain.Study;
-import org.generationcp.middleware.v2.domain.StudyQueryFilter;
 import org.generationcp.middleware.v2.domain.StudyReference;
 import org.generationcp.middleware.v2.domain.StudyValues;
 import org.generationcp.middleware.v2.domain.Term;
@@ -45,6 +44,8 @@ import org.generationcp.middleware.v2.domain.VariableList;
 import org.generationcp.middleware.v2.domain.VariableType;
 import org.generationcp.middleware.v2.domain.VariableTypeList;
 import org.generationcp.middleware.v2.manager.api.StudyDataManager;
+import org.generationcp.middleware.v2.search.StudyResultSet;
+import org.generationcp.middleware.v2.search.filter.ParentFolderStudyQueryFilter;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -101,17 +102,18 @@ public class TestStudyDataManagerImpl {
 
 	@Test
 	public void testGetStudiesByFolder() throws Exception {
-		int folderId = 1000;
-		List<Study> studies = manager.getStudiesByFolder(folderId, 0, 5);
-		assertNotNull(studies);
-		Assert.assertTrue(studies.size() > 0);
-		System.out.println("testGetStudiesByFolder(" + folderId + "): "
-				+ studies.size());
-		for (Study study : studies) {
-			System.out.println(study);
+		int folderId = 2000;
+		StudyResultSet resultSet = manager.searchStudies(new ParentFolderStudyQueryFilter(folderId), 5);
+		Assert.assertNotNull(resultSet);
+		System.out.println("testGetStudiesByFolder(" + folderId + "): " + resultSet.size());
+		Assert.assertTrue(resultSet.size() > 0);
+		while (resultSet.hasMore()) {
+			StudyReference studyRef = resultSet.next();
+			System.out.println(studyRef);
 		}
 	}
 
+	/*
 	@Test
 	public void testCountStudiesByFolder() throws Exception {
 		int folderId = 1000;
@@ -120,7 +122,8 @@ public class TestStudyDataManagerImpl {
 		System.out.println("testCountStudiesByFolder(" + folderId + "): "
 				+ count);
 	}
-
+*/
+	/*
 	@Test
 	public void testSearchStudies() throws Exception {
 		System.out.println("testSearchStudies");
@@ -141,7 +144,7 @@ public class TestStudyDataManagerImpl {
 			System.out.println("\t" + study.getId() + " - " + study.getName());
 		}
 	}
-
+*/
 	@Test
 	public void testGetRootFolders() throws Exception {
 		List<FolderReference> rootFolders = manager
@@ -180,7 +183,7 @@ public class TestStudyDataManagerImpl {
 			System.out.println("   " + node);
 		}
 	}
-
+/*
 	@Test
 	public void testSearchStudiesByGid() throws Exception {
 		System.out.println("testSearchStudiesByGid");
@@ -195,7 +198,7 @@ public class TestStudyDataManagerImpl {
 			System.out.println("No Studies with GID " + gid + " found");
 		}
 	}
-
+*/
 	@Test
 	public void testAddStudy() throws Exception {
 

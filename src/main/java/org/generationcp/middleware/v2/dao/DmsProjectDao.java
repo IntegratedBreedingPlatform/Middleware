@@ -55,14 +55,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			;
 	
 	private static final String GET_STUDIES_OF_FOLDER =
-			"SELECT  DISTINCT subject.project_id "
-			+ "FROM    project subject "
-			+ "        INNER JOIN project_relationship pr ON subject.project_id = pr.subject_project_id  " 
-			+ "        LEFT JOIN project_relationship is_study ON subject.project_id = is_study.subject_project_id  " 
-			+ "WHERE   pr.type_id = "  + TermId.HAS_PARENT_FOLDER.getId() + " "
+			"SELECT  DISTINCT pr.subject_project_id "
+			+ "FROM    project_relationship pr, project p "
+			+ "WHERE   pr.type_id = "  + TermId.STUDY_HAS_FOLDER.getId() + " "
+			+ "        AND pr.subject_project_id = p.project_id "
 			+ "        AND pr.object_project_id = :folderId "
-			+ "        AND is_study.type_id = " + TermId.IS_STUDY.getId() + " "
-			+ "ORDER BY name "
+			+ "ORDER BY p.name "
 			;
 
 	@SuppressWarnings("unchecked")

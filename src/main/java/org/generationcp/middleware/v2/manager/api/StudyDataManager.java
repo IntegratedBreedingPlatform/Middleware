@@ -13,7 +13,6 @@
 package org.generationcp.middleware.v2.manager.api;
 
 import java.util.List;
-import java.util.Set;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
@@ -27,9 +26,10 @@ import org.generationcp.middleware.v2.domain.Study;
 import org.generationcp.middleware.v2.domain.StudyValues;
 import org.generationcp.middleware.v2.domain.VariableTypeList;
 import org.generationcp.middleware.v2.domain.Reference;
-import org.generationcp.middleware.v2.domain.StudyQueryFilter;
 import org.generationcp.middleware.v2.domain.StudyReference;
 import org.generationcp.middleware.v2.domain.VariableList;
+import org.generationcp.middleware.v2.search.StudyResultSet;
+import org.generationcp.middleware.v2.search.filter.StudyQueryFilter;
 
 /**
  * This is the API for retrieving phenotypic data stored as Studies and
@@ -107,13 +107,14 @@ public interface StudyDataManager {
 	long countExperiments(int dataSetId) throws MiddlewareQueryException;
 	
 	/**
-	 * Returns the list of study nodes for a particular search filter.
-	 * 
+	 * Returns the list of study references for a particular search filter.
+	 *
 	 * @param filter
+	 * @param numOfRows
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	List<StudyReference> searchStudies(StudyQueryFilter filter) throws MiddlewareQueryException;
+	StudyResultSet searchStudies(StudyQueryFilter filter, int numOfRows) throws MiddlewareQueryException;
 	
 	/**
 	 * Returns the list of factors for a specific study.
@@ -133,37 +134,6 @@ public interface StudyDataManager {
 	 */
 	VariableTypeList getAllStudyVariates(int studyId) throws MiddlewareQueryException;
 	
-	/**
-	 * Retrieves the studies belonging to a given folder id. 
-	 * Assumption: that every study has a parent folder.
-	 * 
-	 * @param folderId
-	 * @param start - the first Study index 
-	 * @param numOfRows - maximum number of Studies to retrieve
-	 * @return the list of studies
-	 * @throws MiddlewareQueryException
-	 */
-	List<Study> getStudiesByFolder(int folderId, int start, int numOfRows) throws MiddlewareQueryException;
-	
-	/**
-	 * Returns the number of studies in the given folder id.
-	 * 
-	 * @param folderId
-	 * @return
-	 * @throws MiddlewareQueryException
-	 */
-	long countStudiesByFolder(int folderId) throws MiddlewareQueryException;
-
-
-    /**
-     * Returns the list of study details by its GID value.
-     * 
-     * @param gid
-     * @return
-     * @throws MiddlewareQueryException
-     */
-    Set<Study> searchStudiesByGid(int gid) throws MiddlewareQueryException;
-
     /**
 	 * Adds a study. Adds an entry into Project, ProjectProperty, ProjectRelationships and Experiment 
 	 * Inserts constants and conditions listed in variableTypeList. 

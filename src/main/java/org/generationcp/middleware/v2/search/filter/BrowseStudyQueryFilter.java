@@ -1,8 +1,8 @@
-package org.generationcp.middleware.v2.domain;
+package org.generationcp.middleware.v2.search.filter;
 
 import org.generationcp.middleware.manager.Season;
 
-public class StudyQueryFilter {
+public class BrowseStudyQueryFilter implements StudyQueryFilter {
 
 	private Integer startDate;
 	
@@ -11,10 +11,6 @@ public class StudyQueryFilter {
 	private String country;
 	
 	private Season season;
-	
-	private int start;
-	
-	private int numOfRows;
 	
 	public Integer getStartDate() {
 		return startDate;
@@ -48,27 +44,10 @@ public class StudyQueryFilter {
 		this.season = season;
 	}
 
-	public int getStart() {
-		return start;
-	}
-
-	public void setStart(int start) {
-		this.start = start;
-	}
-
-	public int getNumOfRows() {
-		return numOfRows;
-	}
-
-	public void setNumOfRows(int numOfRows) {
-		this.numOfRows = numOfRows;
-	}
-
 	@Override
 	public String toString() {
 		return "StudyQueryFilter [startDate=" + startDate + ", name=" + name
-				+ ", country=" + country + ", season=" + season + ", start="
-				+ start + ", numOfRows=" + numOfRows
+				+ ", country=" + country + ", season=" + season
 				+ "]";
 	}
 

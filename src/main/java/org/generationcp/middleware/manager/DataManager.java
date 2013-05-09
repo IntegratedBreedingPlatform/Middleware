@@ -37,7 +37,7 @@ import org.generationcp.middleware.v2.domain.saver.StandardVariableSaver;
 import org.generationcp.middleware.v2.domain.saver.StockSaver;
 import org.generationcp.middleware.v2.domain.saver.StudySaver;
 import org.generationcp.middleware.v2.domain.saver.CvTermSaver;
-import org.generationcp.middleware.v2.domain.searcher.ProjectSearcher;
+import org.generationcp.middleware.v2.domain.searcher.StudySearcherByNameStartSeasonCountry;
 import org.generationcp.middleware.v2.factory.TermFactory;
 import org.generationcp.middleware.v2.util.DatabaseBroker;
 import org.hibernate.Session;
@@ -837,8 +837,8 @@ public abstract class DataManager extends DatabaseBroker{
     	return new VariableTypeBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
 
-    protected final ProjectSearcher getProjectSearcher() {
-    	return new ProjectSearcher(sessionProviderForLocal, sessionProviderForCentral);
+    protected final StudySearcherByNameStartSeasonCountry getProjectSearcher() {
+    	return new StudySearcherByNameStartSeasonCountry(sessionProviderForLocal, sessionProviderForCentral);
     }
     
     protected final StudySaver getStudySaver() {

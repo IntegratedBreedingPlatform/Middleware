@@ -28,7 +28,6 @@ import org.generationcp.middleware.v2.domain.ExperimentValues;
 import org.generationcp.middleware.v2.domain.FolderReference;
 import org.generationcp.middleware.v2.domain.Reference;
 import org.generationcp.middleware.v2.domain.Study;
-import org.generationcp.middleware.v2.domain.StudyQueryFilter;
 import org.generationcp.middleware.v2.domain.StudyReference;
 import org.generationcp.middleware.v2.domain.StudyValues;
 import org.generationcp.middleware.v2.domain.TermId;
@@ -36,6 +35,10 @@ import org.generationcp.middleware.v2.domain.VariableList;
 import org.generationcp.middleware.v2.domain.VariableTypeList;
 import org.generationcp.middleware.v2.manager.api.StudyDataManager;
 import org.generationcp.middleware.v2.pojos.DmsProject;
+import org.generationcp.middleware.v2.search.StudyResultSet;
+import org.generationcp.middleware.v2.search.StudyResultSetByParentFolder;
+import org.generationcp.middleware.v2.search.filter.ParentFolderStudyQueryFilter;
+import org.generationcp.middleware.v2.search.filter.StudyQueryFilter;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -101,6 +104,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		return getStudyVariateBuilder().build(studyId);
 	}
 	
+	
+	/*
 	@Override
 	public List<Study> getStudiesByFolder(int folderId, int start, int numOfRows) throws MiddlewareQueryException{
 		List<Study> studyDetails = new ArrayList<Study>();
@@ -125,13 +130,22 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	}
 
-
-	@Override
-	public List<StudyReference> searchStudies(StudyQueryFilter filter) throws MiddlewareQueryException {
-		List<DmsProject> projects = getProjectSearcher().searchByFilter(filter);
-		return getStudyNodeBuilder().build(projects);
-	}
+*/
 	
+	@Override
+	public StudyResultSet searchStudies(StudyQueryFilter filter, int numOfRows) throws MiddlewareQueryException {
+		if (filter instanceof ParentFolderStudyQueryFilter) {
+			return new StudyResultSetByParentFolder((ParentFolderStudyQueryFilter) filter, numOfRows, this.sessionProviderForLocal, this.sessionProviderForCentral);
+		}
+		return null;
+	}
+	/*
+	@Override
+	public long countStudies(StudyQueryFilter filter) throws MiddlewareQueryException {
+		
+	}
+	*/
+	/*
 	@Override
 	public Set<Study> searchStudiesByGid(int gid) throws MiddlewareQueryException {
 		Set<Study> studies = new HashSet<Study>();
@@ -141,7 +155,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		}
 		return studies;
 	}
-
+*/
 	@Override
     public StudyReference addStudy(int parentFolderId, VariableTypeList variableTypeList, StudyValues studyValues) throws MiddlewareQueryException{
         requireLocalDatabaseInstance();

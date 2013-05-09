@@ -47,6 +47,7 @@ public enum TermId {
 	
 	//Folder, Study, Dataset Nodes
 	, HAS_PARENT_FOLDER(1140)
+	, STUDY_HAS_FOLDER(1145)
 	, BELONGS_TO_STUDY(1150) 
 	, IS_STUDY(1145)
 	
