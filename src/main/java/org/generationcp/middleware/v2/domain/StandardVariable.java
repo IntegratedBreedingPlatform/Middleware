@@ -30,8 +30,9 @@ public class StandardVariable {
     public StandardVariable(){    	
     }
     
-    public StandardVariable(Term property, Term scale, Term method,
-			Term dataType, Term storedIn, FactorType factorType, VariableConstraints constraints,
+	public StandardVariable(Term property, Term scale, Term method,
+			Term dataType, Term storedIn, FactorType factorType,
+			VariableConstraints constraints, List<NameSynonym> nameSynonyms,
 			List<Enumeration> enumerations) {
 		this.property = property;
 		this.scale = scale;
@@ -40,15 +41,16 @@ public class StandardVariable {
 		this.storedIn = storedIn;
 		this.factorType = factorType;
 		this.constraints = constraints;
+		this.nameSynonyms = nameSynonyms;
 		this.enumerations = enumerations;
 	}
 
     /* Copy constructor. Used by the copy method */
     private StandardVariable(StandardVariable stdVar) {
     	this(stdVar.getProperty(), stdVar.getScale(), stdVar.getMethod(),
-			stdVar.getDataType(), stdVar.getStoredIn(), stdVar.getFactorType(), stdVar.getConstraints(),
+			stdVar.getDataType(), stdVar.getStoredIn(), stdVar.getFactorType(), stdVar.getConstraints(), stdVar.getNameSynonyms(),
 			stdVar.getEnumerations());
-    	this.setId(0);  //TODO Set to null
+    	this.setId(0);  
     	this.setName(stdVar.getName());
     	this.setDescription(stdVar.getDescription());
 	}
