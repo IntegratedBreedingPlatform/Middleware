@@ -33,6 +33,7 @@ import org.generationcp.middleware.v2.domain.saver.DatasetProjectSaver;
 import org.generationcp.middleware.v2.domain.saver.ExperimentModelSaver;
 import org.generationcp.middleware.v2.domain.saver.GeolocationSaver;
 import org.generationcp.middleware.v2.domain.saver.ProjectSaver;
+import org.generationcp.middleware.v2.domain.saver.StandardVariableSaver;
 import org.generationcp.middleware.v2.domain.saver.StockSaver;
 import org.generationcp.middleware.v2.domain.saver.StudySaver;
 import org.generationcp.middleware.v2.domain.searcher.ProjectSearcher;
@@ -865,6 +866,10 @@ public abstract class DataManager extends DatabaseBroker{
     
     protected final StockSaver getStockSaver() {
     	return new StockSaver(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    protected final StandardVariableSaver getStandardVariableSaver() {
+    	return new StandardVariableSaver(sessionProviderForLocal, sessionProviderForCentral);
     }
     
 }

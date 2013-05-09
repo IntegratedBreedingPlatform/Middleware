@@ -15,8 +15,14 @@ package org.generationcp.middleware.v2.manager.test;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
+import java.util.Random;
+
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
+import org.generationcp.middleware.v2.domain.Enumeration;
+import org.generationcp.middleware.v2.domain.NameSynonym;
+import org.generationcp.middleware.v2.domain.NameType;
 import org.generationcp.middleware.v2.domain.StandardVariable;
 import org.generationcp.middleware.v2.domain.Term;
 import org.generationcp.middleware.v2.manager.api.OntologyDataManager;
@@ -90,6 +96,27 @@ public class TestOntologyDataManagerImpl {
 	public void testNameSynonyms() throws Exception {
 		StandardVariable sv = manager.getStandardVariable(8383);
 		sv.print(0);
+	}
+	
+	@Test
+	public void testAddStandardVariable() throws Exception {
+		StandardVariable stdVariable = new StandardVariable();
+		stdVariable.setName("variable name " + new Random().nextInt(10000));
+		stdVariable.setDescription("variable description");
+		stdVariable.setProperty(new Term(2002, "User", "Database user"));
+		stdVariable.setMethod(new Term(4030, "Assigned", "Term, name or id assigned"));
+		stdVariable.setScale(new Term(6000, "DBCV", "Controlled vocabulary from a database"));
+		stdVariable.setStoredIn(new Term(1010, "Study information", "Study element"));
+		stdVariable.setDataType(new Term(1120, "Character variable", "variable with char values"));
+		stdVariable.setNameSynonyms(new ArrayList<NameSynonym>());
+		stdVariable.getNameSynonyms().add(new NameSynonym("Person", NameType.ALTERNATIVE_ENGLISH));
+		stdVariable.getNameSynonyms().add(new NameSynonym("Tiga-gamit", NameType.ALTERNATIVE_FRENCH));
+		stdVariable.setEnumerations(new ArrayList<Enumeration>());
+		stdVariable.getEnumerations().add(new Enumeration(10000, "N", "Nursery", 1));
+		stdVariable.getEnumerations().add(new Enumeration(10001, "HB", "Hybridization nursery", 2));
+		stdVariable.getEnumerations().add(new Enumeration(10002, "PN", "Pedigree nursery", 3));
+		
+		manager.addStandardVariable(stdVariable);
 	}
 	
 	@AfterClass

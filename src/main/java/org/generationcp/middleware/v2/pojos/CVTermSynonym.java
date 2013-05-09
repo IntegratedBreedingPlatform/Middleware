@@ -19,7 +19,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
 /**
  * http://gmod.org/wiki/Chado_Tables#Table:_cvtermsynonym
@@ -42,6 +41,9 @@ public class CVTermSynonym implements Serializable {
 	@Basic(optional = false)
 	@Column(name = "cvtermsynonym_id")
 	private Integer cvTermSynonymId;
+	
+	@Column(name = "cvterm_id")
+	private Integer cvTermId;
 	
 	/**
 	 * Alias or synonym for related CV Term
@@ -88,6 +90,14 @@ public class CVTermSynonym implements Serializable {
 		this.typeId = typeId;
 	}
 
+	public Integer getCvTermId() {
+		return cvTermId;
+	}
+
+	public void setCvTermId(Integer cvTermId) {
+		this.cvTermId = cvTermId;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -120,6 +130,8 @@ public class CVTermSynonym implements Serializable {
 		StringBuilder builder = new StringBuilder();
 		builder.append("CVTermSynonym [cvTermSynonymId=");
 		builder.append(cvTermSynonymId);
+		builder.append(", cvTermId=");
+		builder.append(cvTermId);
 		builder.append(", synonym=");
 		builder.append(synonym);
 		builder.append(", typeId=");

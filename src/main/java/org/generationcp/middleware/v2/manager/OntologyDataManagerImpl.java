@@ -7,6 +7,7 @@ import org.generationcp.middleware.v2.domain.StandardVariable;
 import org.generationcp.middleware.v2.domain.Term;
 import org.generationcp.middleware.v2.manager.api.OntologyDataManager;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 public class OntologyDataManagerImpl extends DataManager implements OntologyDataManager {
 	
@@ -30,5 +31,22 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	@Override
 	public StandardVariable getStandardVariable(int stdVariableId) throws MiddlewareQueryException {
 		return getStandardVariableBuilder().create(stdVariableId);
+	}
+
+	@Override
+	public void addStandardVariable(StandardVariable stdVariable) throws MiddlewareQueryException {
+		requireLocalDatabaseInstance();
+		Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+ 
+        try {
+            trans = session.beginTransaction();
+            getStandardVariableSaver().save(stdVariable);
+			trans.commit();
+			
+        } catch (Exception e) {
+	    	rollbackTransaction(trans);
+	        throw new MiddlewareQueryException("error in addStandardVariable " + e.getMessage(), e);
+	    }
 	} 
 }

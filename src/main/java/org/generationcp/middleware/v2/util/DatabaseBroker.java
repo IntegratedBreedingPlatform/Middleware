@@ -20,6 +20,8 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.v2.dao.CVDao;
 import org.generationcp.middleware.v2.dao.CVTermDao;
 import org.generationcp.middleware.v2.dao.CVTermRelationshipDao;
+import org.generationcp.middleware.v2.dao.CvTermPropertyDao;
+import org.generationcp.middleware.v2.dao.CvTermSynonymDao;
 import org.generationcp.middleware.v2.dao.DmsProjectDao;
 import org.generationcp.middleware.v2.dao.ExperimentDao;
 import org.generationcp.middleware.v2.dao.ExperimentPhenotypeDao;
@@ -467,5 +469,17 @@ public class DatabaseBroker {
     	ExperimentPhenotypeDao experimentPhenotypeDao = new ExperimentPhenotypeDao();
     	experimentPhenotypeDao.setSession(getActiveSession());
     	return experimentPhenotypeDao;
+    }
+
+    protected final CvTermPropertyDao getCvTermPropertyDao() {
+    	CvTermPropertyDao cvTermPropertyDao = new CvTermPropertyDao();
+    	cvTermPropertyDao.setSession(getActiveSession());
+    	return cvTermPropertyDao;
+    }
+
+    protected final CvTermSynonymDao getCvTermSynonymDao() {
+    	CvTermSynonymDao cvTermSynonymDao = new CvTermSynonymDao();
+    	cvTermSynonymDao.setSession(getActiveSession());
+    	return cvTermSynonymDao;
     }
 }
