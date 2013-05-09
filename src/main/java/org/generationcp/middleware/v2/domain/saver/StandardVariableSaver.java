@@ -37,8 +37,8 @@ public class StandardVariableSaver extends Saver {
 		saveRelationship(varId, TermId.STORED_IN.getId(), stdVar.getStoredIn());
 		
 		if (stdVar.getConstraints() != null) {
-			saveConstraint(TermId.MIN_VALUE.getId(), stdVar.getConstraints().getMinValue());
-			saveConstraint(TermId.MAX_VALUE.getId(), stdVar.getConstraints().getMaxValue());
+			saveConstraint(varId, TermId.MIN_VALUE.getId(), stdVar.getConstraints().getMinValue());
+			saveConstraint(varId, TermId.MAX_VALUE.getId(), stdVar.getConstraints().getMaxValue());
 		}
 		
 		saveSynonyms(varId, stdVar.getNameSynonyms());
@@ -80,13 +80,15 @@ public class StandardVariableSaver extends Saver {
 		getCvTermRelationshipDao().save(relationship);
 	}
 	
-	private void saveConstraint(int typeId, Integer constraintValue) throws MiddlewareQueryException {
+	private void saveConstraint(int varId, int typeId, Integer constraintValue) throws MiddlewareQueryException {
 		if (constraintValue != null) {
 			CVTermProperty property = new CVTermProperty();
 			
 			property.setCvTermPropertyId(getCvTermPropertyDao().getNegativeId("cvTermPropertyId"));
+			property.setCvTermId(varId);
 			property.setTypeId(typeId);
 			property.setValue(constraintValue.toString());
+			property.setRank(0);
 			
 			getCvTermPropertyDao().save(property);
 		}

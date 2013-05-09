@@ -44,6 +44,9 @@ public class CVTermProperty implements Serializable {
 	 */
 	@Column(name = "rank")
 	private Integer rank;
+	
+	@Column(name = "cvterm_id")
+	private Integer cvTermId;
 
 	
 	public Integer getCvTermPropertyId() {
@@ -76,6 +79,14 @@ public class CVTermProperty implements Serializable {
 
 	public void setRank(Integer rank) {
 		this.rank = rank;
+	}
+
+	public Integer getCvTermId() {
+		return cvTermId;
+	}
+
+	public void setCvTermId(Integer cvTermId) {
+		this.cvTermId = cvTermId;
 	}
 
 	@Override
