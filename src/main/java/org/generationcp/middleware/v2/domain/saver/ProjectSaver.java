@@ -51,28 +51,24 @@ public class ProjectSaver extends Saver {
 	}
 	
 	private void mapStudytoProject(Integer id, String name, String description, DmsProject project) throws MiddlewareException{
-		String errorMessage = "";
+		StringBuffer errorMessage = new StringBuffer("");
 
-//		if (id != null){
-			project.setProjectId(id);
-//		} else {
-//			errorMessage += "\nid is null";
-//		}
+		project.setProjectId(id);
 		
 		if (name != null && !name.equals("")){
 			project.setName(name);
 		} else {
-			errorMessage += "\nname is null";
+			errorMessage.append("\nname is null");
 		}
 			
 		if (description != null && !description.equals("")){
 			project.setDescription(description);
 		} else {
-			errorMessage += "\nprojectKey is null";
+			errorMessage.append("\nprojectKey is null");
 		}
 		
 		if (!errorMessage.equals("")){
-			throw new MiddlewareException(errorMessage);
+			throw new MiddlewareException(errorMessage.toString());
 		}
 
 	}

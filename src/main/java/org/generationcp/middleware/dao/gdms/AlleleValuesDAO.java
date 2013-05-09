@@ -189,7 +189,7 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer>{
 
             return values;
         } catch (HibernateException e) {
-            logAndThrowException("Error with getCharAlleleValuesForPolymorphicMarkersRetrieval(gids=" + gids + ") query from AlleleValues: " + e.getMessage(), e);
+            logAndThrowException("Error with getIntAlleleValuesForPolymorphicMarkersRetrieval(gids=" + gids + ") query from AlleleValues: " + e.getMessage(), e);
         }    
         return new ArrayList<AllelicValueElement>();
     }

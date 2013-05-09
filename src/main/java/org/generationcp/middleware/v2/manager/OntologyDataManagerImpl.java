@@ -49,4 +49,23 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	        throw new MiddlewareQueryException("error in addStandardVariable " + e.getMessage(), e);
 	    }
 	} 
+	
+	@Override
+	public Term addMethod(String name, String definition) throws MiddlewareQueryException{
+		requireLocalDatabaseInstance();
+		Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+ 
+        try {
+            trans = session.beginTransaction();
+			Term term = getTermSaver().save(name, definition);
+			trans.commit();
+	        return term;
+	    } catch (Exception e) {
+	    	rollbackTransaction(trans);
+	        throw new MiddlewareQueryException("error in addMethod " + e.getMessage(), e);
+	    }
+
+	}
+
 }

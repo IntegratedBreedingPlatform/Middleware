@@ -15,12 +15,12 @@ public class TermBuilder extends Builder {
 	public Term get(int termId) throws MiddlewareQueryException {
 		Term term = null;
 		if (setWorkingDatabase(termId)) {
-			term = mapCVTermToCvTerm(getCvTermDao().getById(termId));
+			term = mapCVTermToTerm(getCvTermDao().getById(termId));
 		}
 		return term;
 	}
 	
-	private Term mapCVTermToCvTerm(CVTerm cVTerm){
+	private Term mapCVTermToTerm(CVTerm cVTerm){
 		Term term = null;
 		
 		if (cVTerm != null){

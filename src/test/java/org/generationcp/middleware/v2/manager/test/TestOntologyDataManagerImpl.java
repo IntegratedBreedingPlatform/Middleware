@@ -123,6 +123,15 @@ public class TestOntologyDataManagerImpl {
 		System.out.println("Standard variable saved: " + stdVariable.getId());
 	}
 	
+	@Test
+	public void testAddMethod() throws Exception {
+		String name = "Test Method " + new Random().nextInt(10000);
+		String definition = "Test Definition";
+		Term term = manager.addMethod(name, definition);
+		assertTrue(term.getId() < 0);
+	    System.out.println("testAddMethod():  " + term);
+	}
+
 	@AfterClass
 	public static void tearDown() throws Exception {
 		if (factory != null) {

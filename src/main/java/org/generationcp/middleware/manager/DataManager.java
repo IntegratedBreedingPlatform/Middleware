@@ -36,6 +36,7 @@ import org.generationcp.middleware.v2.domain.saver.ProjectSaver;
 import org.generationcp.middleware.v2.domain.saver.StandardVariableSaver;
 import org.generationcp.middleware.v2.domain.saver.StockSaver;
 import org.generationcp.middleware.v2.domain.saver.StudySaver;
+import org.generationcp.middleware.v2.domain.saver.CvTermSaver;
 import org.generationcp.middleware.v2.domain.searcher.ProjectSearcher;
 import org.generationcp.middleware.v2.factory.TermFactory;
 import org.generationcp.middleware.v2.util.DatabaseBroker;
@@ -872,4 +873,8 @@ public abstract class DataManager extends DatabaseBroker{
     	return new StandardVariableSaver(sessionProviderForLocal, sessionProviderForCentral);
     }
     
+    protected final CvTermSaver getTermSaver() {
+    	return new CvTermSaver(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
 }

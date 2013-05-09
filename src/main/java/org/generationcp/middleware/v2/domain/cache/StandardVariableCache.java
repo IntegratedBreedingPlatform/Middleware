@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.generationcp.middleware.v2.domain.StandardVariable;
-import org.generationcp.middleware.v2.util.Debug;
 
 
 public class StandardVariableCache {
@@ -35,14 +34,12 @@ public class StandardVariableCache {
 	public StandardVariable get(int standardVariableId){
 		StandardVariable value = values.get(standardVariableId);
 		if (value != null) {
-		    Debug.println(4, "Standard Variable retrieved from cache: " + value); //TODO: Remove line after QA
 		    return value;
 		}
 		return null;
 	}
 	
 	public void put(StandardVariable standardVariable){
-		Debug.println(4, "Standard variable put to cache: " + standardVariable); //TODO: Remove line after QA
 		values.put(standardVariable.getId(), standardVariable);
 	}
 

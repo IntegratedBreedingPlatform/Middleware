@@ -41,7 +41,6 @@ public interface OntologyDataManager {
      * @throws MiddlewareQueryException
      */
 	public StandardVariable getStandardVariable(int stdVariableId) throws MiddlewareQueryException; 
-
 	/**
 	 * Adds a StandardVariable to the database.  
 	 * Must provide the property, method, scale, dataType, and storedIn info.
@@ -51,4 +50,20 @@ public interface OntologyDataManager {
 	 * @throws MiddlewareQueryException
 	 */
 	public void addStandardVariable(StandardVariable stdVariable) throws MiddlewareQueryException;
+
+	
+	/**
+	 * Adds a new Method to the database. 
+	 * Creates a new cvterm entry in the local database. 
+	 * Returns a negative id.
+	 * 
+	 * @param name
+	 * @param definition
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	public Term addMethod(String name, String definition) throws MiddlewareQueryException;
+	
+
+
 }
