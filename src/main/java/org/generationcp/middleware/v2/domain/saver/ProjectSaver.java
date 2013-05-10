@@ -67,7 +67,7 @@ public class ProjectSaver extends Saver {
 			errorMessage.append("\nprojectKey is null");
 		}
 		
-		if (!errorMessage.equals("")){
+		if (!errorMessage.toString().equals("")){
 			throw new MiddlewareException(errorMessage.toString());
 		}
 

@@ -25,7 +25,7 @@ import org.generationcp.middleware.v2.domain.Term;
 public interface OntologyDataManager {
 
 	/**
-	 * Retrieves a Term record given its id. 
+	 * Retrieves a Term record given its id. This can also be used to retrieve traits, methods and scales. 
 	 * 
 	 * @param termId
 	 * @return

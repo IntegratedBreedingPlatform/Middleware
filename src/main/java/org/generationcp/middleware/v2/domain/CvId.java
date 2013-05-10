@@ -3,7 +3,10 @@ package org.generationcp.middleware.v2.domain;
 public enum CvId {
 
 	//Ontology
-	METHODS(1020)
+	IBDB_TERMS(1000)
+	,PROPERTIES(1010)
+	,METHODS(1020)
+	,SCALES(1030)
 	,VARIABLES(1040)
 	;
 	
