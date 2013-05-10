@@ -31,21 +31,23 @@ public class StudySaver extends Saver{
 				super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 
-	
-	public Integer saveStudy(int parentId, VariableTypeList variableTypeList, StudyValues studyValues, DmsProject project) throws Exception{
+	/**
+	 * Saves a study. Creates an entry in project, projectprop,
+	 * project_relationship, nd_experiment and nd_experiment_project tables.
+	 */
+	public DmsProject saveStudy(int parentId, VariableTypeList variableTypeList, StudyValues studyValues) throws Exception{
         requireLocalDatabaseInstance();
-
+        DmsProject project = getProjectSaver().create(studyValues);
+        
         try {
             project = getProjectSaver().save(project);
-            
-            project.setProperties(getProjectPropertySaver().create(project, variableTypeList));
-
+            getProjectPropertySaver().saveProjectProperties(project, variableTypeList);
             getProjectRelationshipSaver().saveProjectParentRelationship(project, parentId);
-            
+            getExperimentModelSaver().addExperiment(project.getProjectId(), studyValues);            
         } catch (Exception e) {
             throw e;
         }
-        return project.getProjectId();
+        return project;
 
     }
 

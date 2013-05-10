@@ -17,14 +17,12 @@ import static org.junit.Assert.assertNotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 import junit.framework.Assert;
 
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
-import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.v2.domain.DataSet;
 import org.generationcp.middleware.v2.domain.DatasetReference;
 import org.generationcp.middleware.v2.domain.DatasetValues;
@@ -202,10 +200,7 @@ public class TestStudyDataManagerImpl {
 	@Test
 	public void testAddStudy() throws Exception {
 
-		// get a study test data from central
-		Integer studyId = 1000;
 		int parentStudyId = 1;
-		Study study = manager.getStudy(studyId);
 		
 		VariableTypeList typeList = new VariableTypeList();
 		
@@ -218,15 +213,15 @@ public class TestStudyDataManagerImpl {
 		variable = createVariable(TermId.STUDY_TITLE.getId(), "Study Description", TermId.STUDY_TITLE_STORAGE, 2);
 		typeList.add(variable.getVariableType());
 		variableList.add(variable);
-		
+
 		StudyValues studyValues = new StudyValues();
 		studyValues.setVariableList(variableList);
 		studyValues.setGermplasmId(-1);
 		studyValues.setLocationId(-1);
 		
-		StudyReference studyRef = manager.addStudy(parentStudyId, study.getConditionVariableTypes(), studyValues);
+		StudyReference studyRef = manager.addStudy(parentStudyId, typeList, studyValues);
 
-		assert (studyRef.getId() < 0);
+		Assert.assertTrue(studyRef.getId() < 0);
 		System.out.println("testAddStudy(): " + studyRef);
 	}
 	

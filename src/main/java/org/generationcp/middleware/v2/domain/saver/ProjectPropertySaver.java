@@ -6,6 +6,7 @@ import java.util.List;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.v2.dao.ProjectPropertyDao;
 import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.Variable;
 import org.generationcp.middleware.v2.domain.VariableList;
@@ -37,6 +38,22 @@ public class ProjectPropertySaver extends Saver {
 		}
 		
 		return properties;
+	}
+	
+	public void saveProjectProperties(DmsProject project, VariableTypeList variableTypeList) throws MiddlewareQueryException {
+		requireLocalDatabaseInstance();
+		List<ProjectProperty> properties = create(project, variableTypeList);
+		
+		Integer generatedId;
+		ProjectPropertyDao projectPropertyDao = getProjectPropertyDao();
+        for (ProjectProperty property : properties){
+            generatedId = projectPropertyDao.getNegativeId("projectPropertyId");
+            property.setProjectPropertyId(generatedId);
+             property.setProject(project);
+             projectPropertyDao.save(property);
+        }
+        
+		project.setProperties(properties);
 	}
 
 	private List<ProjectProperty> createVariableProperties(int index, DmsProject project, VariableType variableType) throws MiddlewareQueryException {

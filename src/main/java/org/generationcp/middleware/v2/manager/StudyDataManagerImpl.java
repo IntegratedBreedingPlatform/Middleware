@@ -164,16 +164,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
         try {
             trans = session.beginTransaction();
-
-            DmsProject project = getProjectSaver().create(studyValues);
-            
-            // Save Study (Project, Properties, Relationships)
-            project.setProjectId(getStudySaver().saveStudy(parentFolderId, variableTypeList, studyValues, project));
-            
-            getExperimentModelSaver().addExperiment(project.getProjectId(), studyValues);
-
+            DmsProject project = getStudySaver().saveStudy(parentFolderId, variableTypeList, studyValues);
 			trans.commit();
-
 			return new StudyReference(project.getProjectId(), project.getName(), project.getDescription());
 			
         } catch (Exception e) {
