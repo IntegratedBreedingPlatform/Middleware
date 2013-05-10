@@ -43,6 +43,7 @@ import org.generationcp.middleware.v2.domain.VariableType;
 import org.generationcp.middleware.v2.domain.VariableTypeList;
 import org.generationcp.middleware.v2.manager.api.StudyDataManager;
 import org.generationcp.middleware.v2.search.StudyResultSet;
+import org.generationcp.middleware.v2.search.filter.GidStudyQueryFilter;
 import org.generationcp.middleware.v2.search.filter.ParentFolderStudyQueryFilter;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -113,16 +114,6 @@ public class TestStudyDataManagerImpl {
 
 	/*
 	@Test
-	public void testCountStudiesByFolder() throws Exception {
-		int folderId = 1000;
-		long count = manager.countStudiesByFolder(folderId);
-		Assert.assertTrue(count > 0);
-		System.out.println("testCountStudiesByFolder(" + folderId + "): "
-				+ count);
-	}
-*/
-	/*
-	@Test
 	public void testSearchStudies() throws Exception {
 		System.out.println("testSearchStudies");
 		StudyQueryFilter filter = new StudyQueryFilter();
@@ -181,22 +172,21 @@ public class TestStudyDataManagerImpl {
 			System.out.println("   " + node);
 		}
 	}
-/*
+
 	@Test
 	public void testSearchStudiesByGid() throws Exception {
 		System.out.println("testSearchStudiesByGid");
 		Integer gid = 70125;
-		Set<Study> studies = manager.searchStudiesByGid(gid);
-		if (studies != null && studies.size() > 0) {
-			for (Study study : studies) {
-				System.out.println("Study- " + study.getId() + " - "
-						+ study.getName());
-			}
-		} else {
-			System.out.println("No Studies with GID " + gid + " found");
+		GidStudyQueryFilter filter = new GidStudyQueryFilter(gid);
+		StudyResultSet resultSet = manager.searchStudies(filter, 50);
+		Assert.assertNotNull(resultSet);
+		System.out.println("Study Count: " + resultSet.size());
+		while (resultSet.hasMore()) {
+			StudyReference studyRef = resultSet.next();
+			System.out.println(studyRef);
 		}
 	}
-*/
+
 	@Test
 	public void testAddStudy() throws Exception {
 

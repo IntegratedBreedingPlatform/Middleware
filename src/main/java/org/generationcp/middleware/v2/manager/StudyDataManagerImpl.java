@@ -36,7 +36,9 @@ import org.generationcp.middleware.v2.domain.VariableTypeList;
 import org.generationcp.middleware.v2.manager.api.StudyDataManager;
 import org.generationcp.middleware.v2.pojos.DmsProject;
 import org.generationcp.middleware.v2.search.StudyResultSet;
+import org.generationcp.middleware.v2.search.StudyResultSetByGid;
 import org.generationcp.middleware.v2.search.StudyResultSetByParentFolder;
+import org.generationcp.middleware.v2.search.filter.GidStudyQueryFilter;
 import org.generationcp.middleware.v2.search.filter.ParentFolderStudyQueryFilter;
 import org.generationcp.middleware.v2.search.filter.StudyQueryFilter;
 import org.hibernate.Session;
@@ -136,6 +138,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public StudyResultSet searchStudies(StudyQueryFilter filter, int numOfRows) throws MiddlewareQueryException {
 		if (filter instanceof ParentFolderStudyQueryFilter) {
 			return new StudyResultSetByParentFolder((ParentFolderStudyQueryFilter) filter, numOfRows, this.sessionProviderForLocal, this.sessionProviderForCentral);
+		}
+		else if (filter instanceof GidStudyQueryFilter) {
+			return new StudyResultSetByGid((GidStudyQueryFilter) filter, numOfRows, this.sessionProviderForLocal, this.sessionProviderForCentral);
 		}
 		return null;
 	}
