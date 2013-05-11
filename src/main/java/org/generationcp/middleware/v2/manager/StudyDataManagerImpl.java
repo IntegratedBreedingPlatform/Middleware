@@ -12,9 +12,7 @@
 package org.generationcp.middleware.v2.manager;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -37,7 +35,9 @@ import org.generationcp.middleware.v2.manager.api.StudyDataManager;
 import org.generationcp.middleware.v2.pojos.DmsProject;
 import org.generationcp.middleware.v2.search.StudyResultSet;
 import org.generationcp.middleware.v2.search.StudyResultSetByGid;
+import org.generationcp.middleware.v2.search.StudyResultSetByNameStartDateSeasonCountry;
 import org.generationcp.middleware.v2.search.StudyResultSetByParentFolder;
+import org.generationcp.middleware.v2.search.filter.BrowseStudyQueryFilter;
 import org.generationcp.middleware.v2.search.filter.GidStudyQueryFilter;
 import org.generationcp.middleware.v2.search.filter.ParentFolderStudyQueryFilter;
 import org.generationcp.middleware.v2.search.filter.StudyQueryFilter;
@@ -106,34 +106,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		return getStudyVariateBuilder().build(studyId);
 	}
 	
-	
-	/*
-	@Override
-	public List<Study> getStudiesByFolder(int folderId, int start, int numOfRows) throws MiddlewareQueryException{
-		List<Study> studyDetails = new ArrayList<Study>();
-		if (setWorkingDatabase(folderId, getDmsProjectDao())) {
-			List<DmsProject> projects = (List<DmsProject>) getDmsProjectDao()
-					.getProjectsByFolder(folderId, start, numOfRows);
-
-			for (DmsProject project : projects) {
-				studyDetails.add(getStudyBuilder().createStudy(project));
-			}
-		}
-		return studyDetails;
-	}
-	
-	@Override
-	public long countStudiesByFolder(int folderId) throws MiddlewareQueryException{
-		long count = 0;
-		if (setWorkingDatabase(folderId, getDmsProjectDao())) {
-			count = getDmsProjectDao().countProjectsByFolder(folderId);
-		}
-		return count;
-
-	}
-
-*/
-	
 	@Override
 	public StudyResultSet searchStudies(StudyQueryFilter filter, int numOfRows) throws MiddlewareQueryException {
 		if (filter instanceof ParentFolderStudyQueryFilter) {
@@ -142,25 +114,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		else if (filter instanceof GidStudyQueryFilter) {
 			return new StudyResultSetByGid((GidStudyQueryFilter) filter, numOfRows, this.sessionProviderForLocal, this.sessionProviderForCentral);
 		}
+		else if (filter instanceof BrowseStudyQueryFilter) {
+			return new StudyResultSetByNameStartDateSeasonCountry((BrowseStudyQueryFilter) filter, numOfRows, this.sessionProviderForLocal, this.sessionProviderForCentral);
+		}
 		return null;
 	}
-	/*
-	@Override
-	public long countStudies(StudyQueryFilter filter) throws MiddlewareQueryException {
-		
-	}
-	*/
-	/*
-	@Override
-	public Set<Study> searchStudiesByGid(int gid) throws MiddlewareQueryException {
-		Set<Study> studies = new HashSet<Study>();
-		List<DmsProject> projects = getProjectSearcher().searchStudiesByFactor(TermId.GID.getId(), Integer.toString(gid));
-		for (DmsProject project : projects)	 {
-			studies.add(getStudyBuilder().createStudy(project));
-		}
-		return studies;
-	}
-*/
+	
 	@Override
     public StudyReference addStudy(int parentFolderId, VariableTypeList variableTypeList, StudyValues studyValues) throws MiddlewareQueryException{
         requireLocalDatabaseInstance();

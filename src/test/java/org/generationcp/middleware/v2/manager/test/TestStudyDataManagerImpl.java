@@ -23,6 +23,7 @@ import junit.framework.Assert;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
+import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.v2.domain.DataSet;
 import org.generationcp.middleware.v2.domain.DatasetReference;
 import org.generationcp.middleware.v2.domain.DatasetValues;
@@ -43,6 +44,7 @@ import org.generationcp.middleware.v2.domain.VariableType;
 import org.generationcp.middleware.v2.domain.VariableTypeList;
 import org.generationcp.middleware.v2.manager.api.StudyDataManager;
 import org.generationcp.middleware.v2.search.StudyResultSet;
+import org.generationcp.middleware.v2.search.filter.BrowseStudyQueryFilter;
 import org.generationcp.middleware.v2.search.filter.GidStudyQueryFilter;
 import org.generationcp.middleware.v2.search.filter.ParentFolderStudyQueryFilter;
 import org.junit.AfterClass;
@@ -112,28 +114,26 @@ public class TestStudyDataManagerImpl {
 		}
 	}
 
-	/*
 	@Test
 	public void testSearchStudies() throws Exception {
 		System.out.println("testSearchStudies");
-		StudyQueryFilter filter = new StudyQueryFilter();
-		// filter.setStartDate(20050119);
-		// filter.setName("BULU"); //INVALID: Not a study, should not be
-		// returned
-		// filter.setName("2002WS-CHA"); //VALID: is a study
-		// filter.setCountry("Republic of the Philippines");
-		filter.setSeason(Season.DRY);
-		// filter.setSeason(Season.GENERAL); //do nothing for GENERAL SEASON
-		// filter.setSeason(Season.WET); //currently has no data
-		filter.setStart(0);
-		filter.setNumOfRows(10);
-		List<StudyReference> studies = manager.searchStudies(filter);
+		BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
+	    filter.setStartDate(20050119);
+		//filter.setName("BULU"); //INVALID: Not a study, should not be returned
+		filter.setName("RYT2000WS"); //VALID: is a study
+		filter.setCountry("Republic of the Philippines");
+		//filter.setSeason(Season.DRY);
+		//filter.setSeason(Season.GENERAL); //do nothing for GENERAL SEASON
+		filter.setSeason(Season.WET); //currently has no data
+		
+		StudyResultSet resultSet = manager.searchStudies(filter, 10);
 		System.out.println("INPUT: " + filter);
-		for (StudyReference study : studies) {
-			System.out.println("\t" + study.getId() + " - " + study.getName());
+		System.out.println("Size: " + resultSet.size());
+		while (resultSet.hasMore()) {
+			System.out.println("\t" + resultSet.next());
 		}
 	}
-*/
+
 	@Test
 	public void testGetRootFolders() throws Exception {
 		List<FolderReference> rootFolders = manager

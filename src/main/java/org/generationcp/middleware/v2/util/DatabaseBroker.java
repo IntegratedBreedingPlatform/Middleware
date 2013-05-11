@@ -30,11 +30,13 @@ import org.generationcp.middleware.v2.dao.ExperimentPropertyDao;
 import org.generationcp.middleware.v2.dao.ExperimentStockDao;
 import org.generationcp.middleware.v2.dao.GeolocationDao;
 import org.generationcp.middleware.v2.dao.GeolocationPropertyDao;
+import org.generationcp.middleware.v2.dao.LocationSearchDao;
 import org.generationcp.middleware.v2.dao.PhenotypeDao;
 import org.generationcp.middleware.v2.dao.ProjectPropertyDao;
 import org.generationcp.middleware.v2.dao.ProjectRelationshipDao;
 import org.generationcp.middleware.v2.dao.StockDao;
 import org.generationcp.middleware.v2.dao.StockPropertyDao;
+import org.generationcp.middleware.v2.dao.StudySearchDao;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -403,6 +405,18 @@ public class DatabaseBroker {
     	StockDao stockDao = new StockDao();
     	stockDao.setSession(getActiveSession());
     	return stockDao;
+    }
+    
+    protected final StudySearchDao getStudySearchDao() {
+    	StudySearchDao studySearchDao = new StudySearchDao();
+    	studySearchDao.setSession(getActiveSession());
+    	return studySearchDao;
+    }
+    
+    protected final LocationSearchDao getLocationSearchDao() {
+    	LocationSearchDao dao = new LocationSearchDao();
+    	dao.setSession(getActiveSession());
+    	return dao;
     }
     
     protected final GeolocationPropertyDao getGeolocationPropertyDao() {
