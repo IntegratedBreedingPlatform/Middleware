@@ -122,15 +122,17 @@ public class TestStudyDataManagerImpl {
 		//filter.setName("BULU"); //INVALID: Not a study, should not be returned
 		filter.setName("RYT2000WS"); //VALID: is a study
 		filter.setCountry("Republic of the Philippines");
+		filter.setCountry("Republic of India");
 		//filter.setSeason(Season.DRY);
 		//filter.setSeason(Season.GENERAL); //do nothing for GENERAL SEASON
-		filter.setSeason(Season.WET); //currently has no data
+		filter.setSeason(Season.WET);
 		
 		StudyResultSet resultSet = manager.searchStudies(filter, 10);
 		System.out.println("INPUT: " + filter);
 		System.out.println("Size: " + resultSet.size());
 		while (resultSet.hasMore()) {
 			System.out.println("\t" + resultSet.next());
+			System.out.flush();
 		}
 	}
 

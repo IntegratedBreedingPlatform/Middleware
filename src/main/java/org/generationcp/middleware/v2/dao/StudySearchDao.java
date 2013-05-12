@@ -126,21 +126,27 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 	
 	public long countStudiesBySeason(Season season) throws MiddlewareQueryException {
 		try {
-			SQLQuery query = getSession().createSQLQuery("select count(distinct p.project_id) " +
-		                                                 "from nd_geolocationprop gp, nd_experiment e, nd_experiment_project ep, project_relationship pr, project p " +
-					                                     "where gp.type_id = 8370 " +
-					                                     "  and gp.value = '" + season.getDefinition() + "'" +
-					                                     "  and gp.nd_geolocation_id = e.nd_geolocation_id " +
-					                                     "  and ((e.nd_experiment_id = ep.nd_experiment_id " + 
-					                                     "          and e.type_id = " + TermId.STUDY_EXPERIMENT.getId() + 
-					                                     "          and ep.project_id = p.project_id) " + 
-					                                     "       or " +
-					                                     "       (e.nd_experiment_id = ep.nd_experiment_id" +
-					                                     "          and e.type_id = " + TermId.PLOT_EXPERIMENT.getId() + 
-					                                     "          and ep.project_id = pr.subject_project_id" +
-					                                     "          and pr.object_project_id = p.project_id))");
+			int valueId = 0;
+			if (season == Season.DRY) valueId = 10290;
+			else if (season == Season.WET) valueId = 10300;
 			
-			return ((BigInteger) query.uniqueResult()).longValue();
+			if (valueId != 0) {
+				SQLQuery query = getSession().createSQLQuery("select count(distinct p.project_id) " +
+			                                                 "from nd_geolocationprop gp, nd_experiment e, nd_experiment_project ep, project_relationship pr, project p " +
+						                                     "where gp.type_id = 8371 " +
+						                                     "  and gp.value = '" + valueId + "'" +
+						                                     "  and gp.nd_geolocation_id = e.nd_geolocation_id " +
+						                                     "  and ((e.nd_experiment_id = ep.nd_experiment_id " + 
+						                                     "          and e.type_id = " + TermId.STUDY_EXPERIMENT.getId() + 
+						                                     "          and ep.project_id = p.project_id) " + 
+						                                     "       or " +
+						                                     "       (e.nd_experiment_id = ep.nd_experiment_id" +
+						                                     "          and e.type_id = " + TermId.PLOT_EXPERIMENT.getId() + 
+						                                     "          and ep.project_id = pr.subject_project_id" +
+						                                     "          and pr.object_project_id = p.project_id))");
+				
+				return ((BigInteger) query.uniqueResult()).longValue();
+			}
 			
 		} catch(HibernateException e) {
 			logAndThrowException("Error in countStudiesBySeason=" + season + " in StudyDao: " + e.getMessage(), e);
@@ -153,28 +159,34 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 		
 		List<StudyReference> studyReferences = new ArrayList<StudyReference>();
 		try {
-			SQLQuery query = getSession().createSQLQuery("select distinct p.project_id, p.name, p.description " +
-                                                         "from nd_geolocationprop gp, nd_experiment e, nd_experiment_project ep, project_relationship pr, project p" +
-                                                         "where gp.type_id = 8370 " +
-                                                         "  and gp.value = '" + season.getDefinition() + "'" +
-                                                         "  and gp.nd_geolocation_id = e.nd_geolocation_id " +
-                                                         "  and ((e.nd_experiment_id = ep.nd_experiment_id " + 
-                                                         "          and e.type_id = " + TermId.STUDY_EXPERIMENT.getId() + 
-                                                         "          and ep.project_id = p.project_id) or " +
-                                                         "       (e.nd_experiment_id = ep.nd_experiment_id" +
-                                                         "          and e.type_id = " + TermId.PLOT_EXPERIMENT.getId() + 
-                                                         "          and ep.project_id = pr.subject_project_id" +
-                                                         "          and pr.object_project_id = p.project_id))");
-					                                  
-			query.setFirstResult(start);
-			query.setMaxResults(numOfRows);
+			int valueId = 0;
+			if (season == Season.DRY) valueId = 10290;
+			else if (season == Season.WET) valueId = 10300;
 			
-			
-			List<Object[]> results = (List<Object[]>) query.list();
-			for (Object[] row : results) {
-				StudyReference sr = new StudyReference((Integer) row[0], (String) row[1], (String) row[2]);
-				//System.out.println(sr);
-				studyReferences.add(sr);
+			if (valueId != 0) {
+				SQLQuery query = getSession().createSQLQuery("select distinct p.project_id, p.name, p.description " +
+	                                                         "from nd_geolocationprop gp, nd_experiment e, nd_experiment_project ep, project_relationship pr, project p " +
+	                                                         "where gp.type_id = 8371 " +
+	                                                         "  and gp.value = '" + valueId + "'" +
+	                                                         "  and gp.nd_geolocation_id = e.nd_geolocation_id " +
+	                                                         "  and ((e.nd_experiment_id = ep.nd_experiment_id " + 
+	                                                         "          and e.type_id = " + TermId.STUDY_EXPERIMENT.getId() + 
+	                                                         "          and ep.project_id = p.project_id) or " +
+	                                                         "       (e.nd_experiment_id = ep.nd_experiment_id" +
+	                                                         "          and e.type_id = " + TermId.PLOT_EXPERIMENT.getId() + 
+	                                                         "          and ep.project_id = pr.subject_project_id" +
+	                                                         "          and pr.object_project_id = p.project_id))");
+						                                  
+				query.setFirstResult(start);
+				query.setMaxResults(numOfRows);
+				
+				
+				List<Object[]> results = (List<Object[]>) query.list();
+				for (Object[] row : results) {
+					StudyReference sr = new StudyReference((Integer) row[0], (String) row[1], (String) row[2]);
+					//System.out.println(sr);
+					studyReferences.add(sr);
+				}
 			}
 			
 		} catch(HibernateException e) {

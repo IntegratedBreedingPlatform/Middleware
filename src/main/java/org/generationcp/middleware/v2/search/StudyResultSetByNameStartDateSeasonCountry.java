@@ -77,34 +77,28 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 
 	private long countStudiesByName(Database database, String name) throws MiddlewareQueryException {
 		if (this.setWorkingDatabase(database) && name != null) {
-			long c =this.getStudySearchDao().countStudiesByName(name);
-			System.out.println("Study Name Count: " + c);
-			return c;
+			return this.getStudySearchDao().countStudiesByName(name);
 		}
 		return 0;
 	}
 
-	private long countStudiesByStartDate(Database database, int startDate) throws MiddlewareQueryException {
-		if (this.setWorkingDatabase(database) && startDate != 0) {
-			long c = this.getStudySearchDao().countStudiesByStartDate(startDate);
-			System.out.println("Study start date Count: " + c);
-			return c;
+	private long countStudiesByStartDate(Database database, Integer startDate) throws MiddlewareQueryException {
+		if (this.setWorkingDatabase(database) && startDate != null) {
+			return this.getStudySearchDao().countStudiesByStartDate(startDate);
 		}
 		return 0;
 	}
 	
 	private long countStudiesBySeason(Database database, Season season) throws MiddlewareQueryException {
 		if (this.setWorkingDatabase(database) && season != null) {
-			long c = this.getStudySearchDao().countStudiesBySeason(season);
-			System.out.println("Study season Count: " + c);
-			return c;
+			return this.getStudySearchDao().countStudiesBySeason(season);
 		}
 		return 0;
 	}
 	
 	private long countStudiesByCountry(Database database) throws MiddlewareQueryException {
 		if (this.setWorkingDatabase(database) && locationIds.size() > 0) {
-			//return this.getStudySearchDao().countStudiesByLocationIds(locationIds);
+			return this.getStudySearchDao().countStudiesByLocationIds(locationIds);
 		}
 		return 0;
 	}
@@ -157,7 +151,7 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 	              this.countOfLocalStudiesByStartDate + this.countOfCentralStudiesByStartDate +
 	              this.countOfLocalStudiesBySeason + this.countOfCentralStudiesBySeason) {
 			int start = currentRow - (int) this.countOfLocalStudiesByName - (int) this.countOfCentralStudiesByName -
-		                             (int) this.countOfLocalStudiesByStartDate + (int) this.countOfCentralStudiesByStartDate -
+		                             (int) this.countOfLocalStudiesByStartDate - (int) this.countOfCentralStudiesByStartDate -
 		                             (int) this.countOfLocalStudiesBySeason;
             fillBufferBySeason(Database.CENTRAL, start);
         }
@@ -172,9 +166,9 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
         }
 		else {
 			int start = currentRow - (int) this.countOfLocalStudiesByName - (int) this.countOfCentralStudiesByName -
-                    (int) this.countOfLocalStudiesByStartDate - (int) this.countOfCentralStudiesByStartDate -
-                    (int) this.countOfLocalStudiesBySeason - (int) this.countOfCentralStudiesBySeason -
-                    (int) this.countOfLocalStudiesByCountry;
+                                     (int) this.countOfLocalStudiesByStartDate - (int) this.countOfCentralStudiesByStartDate -
+                                     (int) this.countOfLocalStudiesBySeason - (int) this.countOfCentralStudiesBySeason -
+                                     (int) this.countOfLocalStudiesByCountry;
             fillBufferByCountry(Database.CENTRAL, start);
         }
 	}
@@ -190,7 +184,6 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 		if (this.setWorkingDatabase(database)) {
 			buffer = this.getStudySearchDao().getStudiesByStartDate(startDate, start, numOfRows);
 			bufIndex = 0;
-			//System.out.println("buffer size: " + buffer.size());
 		}
 	}
 	
