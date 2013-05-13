@@ -118,14 +118,14 @@ public class TestStudyDataManagerImpl {
 	public void testSearchStudies() throws Exception {
 		System.out.println("testSearchStudies");
 		BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
-	    filter.setStartDate(20050119);
+	    //filter.setStartDate(20050119);
 		//filter.setName("BULU"); //INVALID: Not a study, should not be returned
 		filter.setName("RYT2000WS"); //VALID: is a study
-		filter.setCountry("Republic of the Philippines");
-		filter.setCountry("Republic of India");
+		//filter.setCountry("Republic of the Philippines");
+		//filter.setCountry("Republic of India");
 		//filter.setSeason(Season.DRY);
 		//filter.setSeason(Season.GENERAL); //do nothing for GENERAL SEASON
-		filter.setSeason(Season.WET);
+		//filter.setSeason(Season.WET);
 		
 		StudyResultSet resultSet = manager.searchStudies(filter, 10);
 		System.out.println("INPUT: " + filter);

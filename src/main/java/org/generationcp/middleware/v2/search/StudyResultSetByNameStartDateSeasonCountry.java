@@ -68,9 +68,11 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 
 	private List<Integer> getLocationIds(String countryName) throws MiddlewareQueryException {
 		List<Integer> locationIds = new ArrayList<Integer>();
-		if (this.setWorkingDatabase(Database.CENTRAL)) {
-			List<Country> countries = getCountryDao().getByIsoFull(countryName);
-			locationIds = getLocationSearchDao().getLocationIds(countries);
+		if (countryName != null) {
+			if (this.setWorkingDatabase(Database.CENTRAL)) {
+				List<Country> countries = getCountryDao().getByIsoFull(countryName);
+				locationIds = getLocationSearchDao().getLocationIds(countries);
+			}
 		}
 		return locationIds;
 	}
@@ -97,7 +99,7 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 	}
 	
 	private long countStudiesByCountry(Database database) throws MiddlewareQueryException {
-		if (this.setWorkingDatabase(database) && locationIds.size() > 0) {
+		if (this.setWorkingDatabase(database) && locationIds != null && locationIds.size() > 0) {
 			return this.getStudySearchDao().countStudiesByLocationIds(locationIds);
 		}
 		return 0;
