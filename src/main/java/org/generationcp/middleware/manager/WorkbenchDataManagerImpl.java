@@ -1404,6 +1404,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 	public Integer getUserLogInCounter(String userName)
 			throws MiddlewareQueryException {
 		
+		if(!getUserDao().isPasswordSameAsUserName(userName))
+		{
+			return 1;
+		}
+		
 		UserDetails userdetails = getUserDetailsDao().getByUsername(userName);
 		
 		if(userdetails != null)
