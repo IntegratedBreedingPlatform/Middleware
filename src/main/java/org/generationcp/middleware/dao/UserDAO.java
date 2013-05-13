@@ -42,7 +42,20 @@ public class UserDAO extends GenericDAO<User, Integer>{
         }
         return null;
     }
-    
+    public boolean isPasswordSameAsUserName(String username) throws MiddlewareQueryException{
+        try {
+            Criteria criteria = getSession().createCriteria(User.class)
+                                            .add(Restrictions.eq("name", username))
+                                            .add(Restrictions.eq("password", username));
+            
+            @SuppressWarnings("unchecked")
+            List<User> users = criteria.list();
+            return users.size() > 0 ? true : false;
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getByUsernameAndPassword(username="+username+") query from User: " + e.getMessage(), e);
+        }
+        return false;
+    }
     public boolean changePassword(String userName, String Password) throws MiddlewareQueryException {
         try{
         	String queryString = "update users set upswd = '"+ Password + "' where uname = '"+ userName + "'";
