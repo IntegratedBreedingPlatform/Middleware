@@ -28,7 +28,6 @@ public class StandardVariableBuilder extends Builder {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 	
-	
 	// If the standard variable is already in the cache, return. Else, create the variable, add to cache then return
 	public StandardVariable create(int standardVariableId) throws MiddlewareQueryException {
 
@@ -55,11 +54,7 @@ public class StandardVariableBuilder extends Builder {
 	private void addRelatedTerms(StandardVariable standardVariable, CVTerm cvTerm) throws MiddlewareQueryException {
 		if (setWorkingDatabase(standardVariable.getId())) {
 			List<CVTermRelationship> cvTermRelationships  = getCvTermRelationshipDao().getBySubject(standardVariable.getId());
-			standardVariable.setProperty(createTerm(cvTermRelationships, TermId.HAS_PROPERTY));
-			
-			CVTerm propCvTerm = getCvTerm(cvTermRelationships, TermId.HAS_PROPERTY);
-			addNameSynonyms(standardVariable, propCvTerm);
-			
+			standardVariable.setProperty(createTerm(cvTermRelationships, TermId.HAS_PROPERTY));	
 			standardVariable.setMethod(createTerm(cvTermRelationships, TermId.HAS_METHOD));
 			standardVariable.setScale(createTerm(cvTermRelationships, TermId.HAS_SCALE));
 			standardVariable.setDataType(createTerm(cvTermRelationships, TermId.HAS_TYPE));
@@ -67,18 +62,6 @@ public class StandardVariableBuilder extends Builder {
 			standardVariable.setFactorType(createFactorType(standardVariable.getStoredIn().getId()));
 			addEnumerations(standardVariable, cvTermRelationships);
 		}
-	}
-
-
-	private void addNameSynonyms(StandardVariable standardVariable, CVTerm cvTerm) {
-		List<NameSynonym> nameSynonyms = new ArrayList<NameSynonym>();
-		for (NameType nameType : NameType.values()) {
-			CVTermSynonym synonym = findSynonym(cvTerm.getSynonyms(), nameType.getId());
-			if (synonym != null) {
-				nameSynonyms.add(new NameSynonym(synonym.getSynonym(), nameType));
-			}
-		}
-		standardVariable.setNameSynonyms(nameSynonyms);
 	}
 
 	private void addEnumerations(StandardVariable standardVariable, List<CVTermRelationship> cvTermRelationships) throws MiddlewareQueryException {
@@ -112,17 +95,6 @@ public class StandardVariableBuilder extends Builder {
 			for (CVTermProperty property : properties) {
 				if (property.getTypeId() == typeId) {
 					return property;
-				}
-			}
-		}
-		return null;
-	}
-	
-	private CVTermSynonym findSynonym(List<CVTermSynonym> synonyms, int typeId) {
-		if (synonyms != null) {
-			for (CVTermSynonym synonym : synonyms) {
-				if (synonym.getTypeId() == typeId) {
-					return synonym;
 				}
 			}
 		}
@@ -168,18 +140,25 @@ public class StandardVariableBuilder extends Builder {
 
 	private Term createTerm(Integer id) throws MiddlewareQueryException {
 		CVTerm cvTerm = getCvTerm(id);
-		return cvTerm != null ? new Term(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition()) : null;
+		return cvTerm != null ? new Term(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition(), createSynonyms(cvTerm.getSynonyms())) : null;
 	}
 	
+	private List<NameSynonym> createSynonyms(List<CVTermSynonym> synonyms) {
+		List<NameSynonym> nameSynonyms = null;
+		if (synonyms != null && synonyms.size() > 0) {
+			nameSynonyms = new ArrayList<NameSynonym>();
+			for (CVTermSynonym synonym : synonyms) {
+				nameSynonyms.add(new NameSynonym(synonym.getSynonym(), NameType.find(synonym.getTypeId())));
+			}
+		}
+		return nameSynonyms;
+	}
+
 	private CVTerm getCvTerm(int id) throws MiddlewareQueryException {
 		if (setWorkingDatabase(id)) {
 		    return getCvTermDao().getById(id);
 		}
 		return null;
-	}
-	
-	private CVTerm getCvTerm(List<CVTermRelationship> cvTermRelationships, TermId termId) throws MiddlewareQueryException {
-		return getCvTerm(findTermId(cvTermRelationships, termId));
 	}
 	
 	private FactorType createFactorType(int storedInTerm) {

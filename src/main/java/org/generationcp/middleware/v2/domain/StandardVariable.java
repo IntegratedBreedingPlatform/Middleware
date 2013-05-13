@@ -1,6 +1,5 @@
 package org.generationcp.middleware.v2.domain;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.v2.util.Debug;
@@ -23,16 +22,14 @@ public class StandardVariable {
     
     private VariableConstraints constraints;  // may be null
     
-    private List<NameSynonym> nameSynonyms = new ArrayList<NameSynonym>();
-    
     private List<Enumeration> enumerations;
     
-    public StandardVariable(){    	
+    public StandardVariable() {    	
     }
     
 	public StandardVariable(Term property, Term scale, Term method,
 			Term dataType, Term storedIn, FactorType factorType,
-			VariableConstraints constraints, List<NameSynonym> nameSynonyms,
+			VariableConstraints constraints,
 			List<Enumeration> enumerations) {
 		this.property = property;
 		this.scale = scale;
@@ -41,19 +38,19 @@ public class StandardVariable {
 		this.storedIn = storedIn;
 		this.factorType = factorType;
 		this.constraints = constraints;
-		this.nameSynonyms = nameSynonyms;
 		this.enumerations = enumerations;
 	}
 
     /* Copy constructor. Used by the copy method */
     private StandardVariable(StandardVariable stdVar) {
     	this(stdVar.getProperty(), stdVar.getScale(), stdVar.getMethod(),
-			stdVar.getDataType(), stdVar.getStoredIn(), stdVar.getFactorType(), stdVar.getConstraints(), stdVar.getNameSynonyms(),
+			stdVar.getDataType(), stdVar.getStoredIn(), stdVar.getFactorType(), stdVar.getConstraints(),
 			stdVar.getEnumerations());
     	this.setId(0);  
     	this.setName(stdVar.getName());
     	this.setDescription(stdVar.getDescription());
 	}
+    
 	public int getId() {
     	return term.getId();
     }
@@ -64,28 +61,6 @@ public class StandardVariable {
 
 	public String getName() {
 		return term.getName();
-	}
-
-	public String getName(NameType nameType) {
-		if (nameType == NameType.PREFERRED_ENGLISH) {
-			return getName();
-		}
-		NameSynonym nameSynonym = findNameSynonym(nameType);
-		if (nameSynonym == null) {
-			return getName();
-		}
-		return nameSynonym.getName();
-	}
-	
-	private NameSynonym findNameSynonym(NameType nameType) {
-		if (nameSynonyms != null) {
-			for (NameSynonym nameSynonym : nameSynonyms) {
-				if (nameSynonym.getType() == nameType) {
-					return nameSynonym;
-				}
-			}
-		}
-		return null;
 	}
 
 	public void setName(String name) {
@@ -148,14 +123,6 @@ public class StandardVariable {
 		this.constraints = constraints;
 	}
 
-	public List<NameSynonym> getNameSynonyms() {
-		return nameSynonyms;
-	}
-	
-	public void setNameSynonyms(List<NameSynonym> nameSynonyms) {
-		this.nameSynonyms = nameSynonyms;
-	}
-
 	public List<Enumeration> getEnumerations() {
 		return enumerations;
 	}
@@ -202,7 +169,13 @@ public class StandardVariable {
 		return new StandardVariable(this);
 	}
 	
+	public List<NameSynonym> getNameSynonyms() {
+		return term.getNameSynonyms();
+	}
 	
+	public void setNameSynonyms(List<NameSynonym> nameSynonyms) {
+		this.term.setNameSynonyms(nameSynonyms);
+	}
 
 	public void print(int indent) {
 		Debug.println(indent, "Standard Variable: ");
@@ -216,7 +189,6 @@ public class StandardVariable {
 		if (constraints != null) {
 			Debug.println(indent, "constraints: " + constraints);
 		}
-		Debug.println(indent, "nameSynonyms: " + nameSynonyms);
 		if (this.constraints != null) {
 			this.constraints.print(indent);
 		}
@@ -250,8 +222,6 @@ public class StandardVariable {
 		builder.append(storedIn);
 		builder.append(", constraints=");
 		builder.append(constraints);
-		builder.append(", nameSynonyms=");
-		builder.append(nameSynonyms);
 		if (enumerations != null) {
 			builder.append(", enumerations=");
 		    builder.append(enumerations);
