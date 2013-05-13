@@ -2,7 +2,7 @@ package org.generationcp.middleware.v2.domain;
 
 import org.generationcp.middleware.v2.util.Debug;
 
-public class VariableType {
+public class VariableType implements Comparable<VariableType>{
     
     private String localName;
     
@@ -87,4 +87,12 @@ public class VariableType {
 		builder.append("]");
 		return builder.toString();
 	}
+	
+	@Override
+	// Sort in ascending order by rank
+	public int compareTo(VariableType compareValue) { 
+        int compareRank = ((VariableType) compareValue).getRank(); 
+        return Integer.valueOf(this.rank).compareTo(compareRank);
+ 	}
+
 }

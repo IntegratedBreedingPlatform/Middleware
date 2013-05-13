@@ -26,7 +26,7 @@ public class StudyVariateBuilder extends Builder {
 				addVariates(dataSetReference.getId(), variates);
 			}
 		}
-		return variates;
+		return variates.sort();
 	}
 	
 	private void addVariates(int projectId, VariableTypeList variates) throws MiddlewareQueryException {

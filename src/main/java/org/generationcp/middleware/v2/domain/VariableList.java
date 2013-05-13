@@ -1,6 +1,7 @@
 package org.generationcp.middleware.v2.domain;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class VariableList {
@@ -42,7 +43,7 @@ public class VariableList {
 				variableTypes.add(variable.getVariableType());
 			}
 		}
-		return variableTypes;
+		return variableTypes.sort();
 	}
 
 	@Override
@@ -53,4 +54,13 @@ public class VariableList {
 		builder.append("]");
 		return builder.toString();
 	}	
+	
+	public VariableList sort(){
+		Collections.sort(variables);
+		if (variableTypes != null){
+			variableTypes.sort();
+		}
+		return this;
+	}
+
 }

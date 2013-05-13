@@ -38,7 +38,7 @@ public class DataSetBuilder extends Builder {
 				}
 			}
 		}
-		return variableTypeList;
+		return variableTypeList.sort();
 	}
 
 	private DataSet createDataSet(DmsProject project) throws MiddlewareQueryException {
@@ -58,8 +58,7 @@ public class DataSetBuilder extends Builder {
 		for (VariableInfo variableInfo : variableInfoList) {
 			variableTypes.add(getVariableTypeBuilder().create(variableInfo));
 		}
-		
-		return variableTypes;
+		return variableTypes.sort();
 	}
 
 	private int getStudyId(DmsProject project) {

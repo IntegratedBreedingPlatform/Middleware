@@ -12,7 +12,6 @@
 package org.generationcp.middleware.v2.pojos;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -24,8 +23,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-
-import org.generationcp.middleware.v2.domain.TermId;
 
 /**
  * http://gmod.org/wiki/Chado_Tables#Table:_project

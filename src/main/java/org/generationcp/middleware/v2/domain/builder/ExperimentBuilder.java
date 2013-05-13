@@ -69,7 +69,7 @@ public class ExperimentBuilder extends Builder {
 		
 		addPlotVariates(experimentModel, variates, variableTypes);
 		
-		return variates;
+		return variates.sort();
 	}
 
 	private void addPlotVariates(ExperimentModel experimentModel, VariableList variates, VariableTypeList variableTypes) {
@@ -90,7 +90,7 @@ public class ExperimentBuilder extends Builder {
 		
 		addLocationFactors(experimentModel, factors, variableTypes);
 		
-		return factors;
+		return factors.sort();
 	}
 
 	private void addLocationFactors(ExperimentModel experimentModel, VariableList factors, VariableTypeList variableTypes) {

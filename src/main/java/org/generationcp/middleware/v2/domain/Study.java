@@ -89,7 +89,7 @@ public class Study {
 	}
 	
 	public VariableList getConditions() {
-		return conditions;
+		return conditions.sort();
 	}
 
 	public void setConditions(VariableList conditions) {
@@ -98,11 +98,11 @@ public class Study {
 
 
 	public VariableTypeList getConditionVariableTypes() {
-		return conditions.getVariableTypes();
+		return conditions.getVariableTypes().sort();
 	}
 
 	public VariableList getConstants() {
-		return constants;
+		return constants.sort();
 	}
 
 	public void setConstants(VariableList constants) {
@@ -110,7 +110,7 @@ public class Study {
 	}
 	
 	public VariableTypeList getConstantVariableTypes() {
-		return constants.getVariableTypes();
+		return constants.getVariableTypes().sort();
 	}
 	
 	public void print(int indent) {

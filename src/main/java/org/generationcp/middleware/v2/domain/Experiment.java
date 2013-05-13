@@ -29,7 +29,7 @@ public class Experiment {
 	//}
 
 	public VariableList getFactors() {
-		return factors;
+		return factors.sort();
 	}
 
 	public void setFactors(VariableList factors) {
@@ -37,7 +37,7 @@ public class Experiment {
 	}
 
 	public VariableList getVariates() {
-		return variates;
+		return variates.sort();
 	}
 
 	public void setVariates(VariableList variates) {

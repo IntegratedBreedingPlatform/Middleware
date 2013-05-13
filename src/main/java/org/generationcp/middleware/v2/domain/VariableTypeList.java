@@ -1,6 +1,7 @@
 package org.generationcp.middleware.v2.domain;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class VariableTypeList {
@@ -68,7 +69,7 @@ public class VariableTypeList {
 				}
 			}
 		}
-		return factors;
+		return factors.sort();
 	}
 
 	public VariableTypeList getVariates() {
@@ -80,12 +81,17 @@ public class VariableTypeList {
 				}
 			}
 		}
-		return variates;
+		return variates.sort();
 	}
 
 	private boolean isVariate(VariableType variableType) {
 		return variableType.getStandardVariable().getStoredIn().getId() == TermId.OBSERVATION_VARIATE.getId() ||
 			   variableType.getStandardVariable().getStoredIn().getId() == TermId.CATEGORICAL_VARIATE.getId();
+	}
+	
+	public VariableTypeList sort(){
+		Collections.sort(variableTypes);
+		return this;
 	}
 	
 }

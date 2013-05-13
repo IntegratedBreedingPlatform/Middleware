@@ -47,7 +47,7 @@ public class DataSet {
 	}
 
 	public VariableTypeList getVariableTypes() {
-		return variableTypes;
+		return variableTypes.sort();
 	}
 
 	public void setVariableTypes(VariableTypeList variableTypes) {
@@ -66,7 +66,7 @@ public class DataSet {
 			}
 		}
 		
-		return filteredFactors;
+		return filteredFactors.sort();
 	}
 	
 	public VariableTypeList getFactorsByFactorType(FactorType factorType) {
@@ -80,8 +80,7 @@ public class DataSet {
 				}
 			}
 		}
-		
-		return filteredFactors;
+		return filteredFactors.sort();
 	}
 
 	public void print(int indent) {

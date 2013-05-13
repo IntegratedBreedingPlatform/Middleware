@@ -27,7 +27,7 @@ public class StudyVariableBuilder extends Builder {
 			variables.add(createVariable(variableType, project, experiment));
 		}
 		
-		return variables;
+		return variables.sort();
 	}
 
 	private Variable createVariable(VariableType variableType, DmsProject project, Experiment experiment) {

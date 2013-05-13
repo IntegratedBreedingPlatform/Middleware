@@ -1,6 +1,5 @@
 package org.generationcp.middleware.v2.domain.builder;
 
-import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -8,10 +7,7 @@ import org.generationcp.middleware.v2.domain.Experiment;
 import org.generationcp.middleware.v2.domain.Study;
 import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.VariableTypeList;
-import org.generationcp.middleware.v2.helper.ProjectValues;
-import org.generationcp.middleware.v2.helper.VariableInfo;
 import org.generationcp.middleware.v2.pojos.DmsProject;
-import org.generationcp.middleware.v2.pojos.ProjectProperty;
 
 public class StudyBuilder extends Builder {
 

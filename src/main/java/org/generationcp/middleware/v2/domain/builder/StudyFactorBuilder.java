@@ -26,7 +26,7 @@ public class StudyFactorBuilder extends Builder {
 				addFactors(dataSetReference.getId(), factors);
 			}
 		}
-		return factors;
+		return factors.sort();
 	}
 	
 	private void addFactors(int projectId, VariableTypeList factors) throws MiddlewareQueryException {

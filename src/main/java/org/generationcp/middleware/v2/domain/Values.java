@@ -23,7 +23,7 @@ public abstract class Values {
 	}
 
 	public VariableList getVariableList() {
-		return variableList;
+		return variableList.sort();
 	}
 
 	public void setVariableList(VariableList variableList) {

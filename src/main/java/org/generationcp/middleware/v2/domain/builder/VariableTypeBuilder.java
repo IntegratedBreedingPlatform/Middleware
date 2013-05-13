@@ -24,7 +24,7 @@ public class VariableTypeBuilder extends Builder {
 		for (VariableInfo variableInfo : variableInfoList) {
 			variableTypes.add(create(variableInfo));
 		}
-		return variableTypes;
+		return variableTypes.sort();
 	}
 
 	public VariableType create(VariableInfo variableInfo) throws MiddlewareQueryException {
