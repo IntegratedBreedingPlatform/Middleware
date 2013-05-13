@@ -19,6 +19,7 @@ import java.util.List;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.workbench.ProjectBackup;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
 
@@ -60,5 +61,13 @@ public class ProjectBackupDAO extends GenericDAO<ProjectBackup, Long> {
         return getSession().createCriteria(ProjectBackup.class)
                            .add(Restrictions.eq("projectId", projectId))
                            .list();
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<ProjectBackup> getProjectBackupByBackupPath(String backupPath) {
+    	Query query = getSession().createQuery("FROM ProjectBackup pb WHERE pb.backupPath = ?");
+        query.setParameter(0,backupPath);
+        query.setMaxResults(1);
+        return query.list();
     }
 }
