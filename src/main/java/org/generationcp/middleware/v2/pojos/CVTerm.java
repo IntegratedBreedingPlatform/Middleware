@@ -95,16 +95,9 @@ public class CVTerm implements Serializable {
 	@Column(name = "is_relationshiptype")
 	private Integer isRelationshipType;
 	
-//	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-//	@JoinColumn(name="cvterm_id", referencedColumnName="cvterm_id") 
 	@OneToMany(mappedBy = "cvTerm", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<CVTermProperty> properties;
 	
-//	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    @JoinTable(name="cvtermsynonym", 
-//    joinColumns={@JoinColumn(name="cvterm_id", insertable=false,updatable=false)},
-//    inverseJoinColumns={@JoinColumn(name="cvterm_id", insertable=false,updatable=false)})
-//	@JoinColumn(name="cvterm_id") 
 	@OneToMany(mappedBy = "cvTerm", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<CVTermSynonym> synonyms;
 	
