@@ -97,7 +97,7 @@ public interface StudyDataManager {
 	 * @param numRows
 	 * @return
 	 */
-	List<Experiment> getExperiments(int dataSetId, int startIndex, int numOfRows) throws MiddlewareQueryException;
+	List<Experiment> getExperiments(int dataSetId, int start, int numOfRows) throws MiddlewareQueryException;
 	
 	/**
 	 * Get the count of the number of experiments in a dataset.
