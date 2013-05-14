@@ -290,7 +290,10 @@ public class Germplasm implements Serializable{
                     + "nval LIKE :name OR nval LIKE :noSpaceName OR nval LIKE :standardizedName ";  
     
     public static final String GET_MAX_IN_SEQUENCE_FOR_CROSS_NAME_PREFIX =
-        "SELECT nval FROM names WHERE nval REGEXP :prefix ORDER BY nval DESC LIMIT 1";
+        "SELECT GETNUMBERINNAME(nVal, :prefix) AS lastNumber " +
+        "FROM names " +
+        "WHERE nVal REGEXP :prefixRegex " +
+        "ORDER BY lastNumber DESC LIMIT 1";
     
     @Id
     @Basic(optional = false)
