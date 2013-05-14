@@ -5,9 +5,12 @@ import java.util.Set;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.v2.domain.DataSet;
+import org.generationcp.middleware.v2.domain.DataSetType;
+import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.VariableTypeList;
 import org.generationcp.middleware.v2.helper.VariableInfo;
 import org.generationcp.middleware.v2.pojos.DmsProject;
+import org.generationcp.middleware.v2.pojos.ProjectProperty;
 
 public class DataSetBuilder extends Builder {
 
@@ -47,6 +50,7 @@ public class DataSetBuilder extends Builder {
 		dataSet.setName(project.getName());
 		dataSet.setDescription(project.getDescription());
 		dataSet.setStudyId(getStudyId(project));
+		dataSet.setDataSetType(getDataSetType(project));
 		dataSet.setVariableTypes(getVariableTypes(project));
 		return dataSet;
 	}
@@ -64,6 +68,15 @@ public class DataSetBuilder extends Builder {
 	private int getStudyId(DmsProject project) {
 		DmsProject study = project.getRelatedTos().get(0).getObjectProject();
 		return study.getProjectId();
+	}
+	
+	private DataSetType getDataSetType(DmsProject project) throws MiddlewareQueryException {
+		for (ProjectProperty property : project.getProperties()) {
+			if (TermId.DATASET_TYPE.getId() == property.getTypeId()) {
+				return DataSetType.findById(Integer.valueOf(property.getValue()));
+			}
+		}
+		return null;
 	}
 	
 }

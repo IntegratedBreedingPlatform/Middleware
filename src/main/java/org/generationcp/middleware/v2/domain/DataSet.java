@@ -12,6 +12,8 @@ public class DataSet {
 	
 	private int studyId;
 	
+	private DataSetType dataSetType;
+	
 	private VariableTypeList variableTypes;
 
 	public int getId() {
@@ -44,6 +46,14 @@ public class DataSet {
 
 	public void setStudyId(int studyId) {
 		this.studyId = studyId;
+	}
+
+	public DataSetType getDataSetType() {
+		return dataSetType;
+	}
+
+	public void setDataSetType(DataSetType dataSetType) {
+		this.dataSetType = dataSetType;
 	}
 
 	public VariableTypeList getVariableTypes() {

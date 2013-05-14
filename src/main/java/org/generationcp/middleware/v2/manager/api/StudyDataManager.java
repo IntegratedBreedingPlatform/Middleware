@@ -17,17 +17,18 @@ import java.util.List;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.v2.domain.DataSet;
+import org.generationcp.middleware.v2.domain.DataSetType;
 import org.generationcp.middleware.v2.domain.DatasetReference;
 import org.generationcp.middleware.v2.domain.DatasetValues;
 import org.generationcp.middleware.v2.domain.Experiment;
 import org.generationcp.middleware.v2.domain.ExperimentValues;
 import org.generationcp.middleware.v2.domain.FolderReference;
-import org.generationcp.middleware.v2.domain.Study;
-import org.generationcp.middleware.v2.domain.StudyValues;
-import org.generationcp.middleware.v2.domain.VariableTypeList;
 import org.generationcp.middleware.v2.domain.Reference;
+import org.generationcp.middleware.v2.domain.Study;
 import org.generationcp.middleware.v2.domain.StudyReference;
+import org.generationcp.middleware.v2.domain.StudyValues;
 import org.generationcp.middleware.v2.domain.VariableList;
+import org.generationcp.middleware.v2.domain.VariableTypeList;
 import org.generationcp.middleware.v2.search.StudyResultSet;
 import org.generationcp.middleware.v2.search.filter.StudyQueryFilter;
 
@@ -187,4 +188,11 @@ public interface StudyDataManager {
      */
     int addStock(VariableList variableList) throws MiddlewareQueryException;
     
+    /**
+     * 
+     * @param studyId
+     * @param dataSetType
+     * @return
+     */
+    List<DataSet> getDataSetsByType(int studyId, DataSetType dataSetType) throws MiddlewareQueryException; 
 }

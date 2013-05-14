@@ -66,7 +66,7 @@ public class ProjectPropertySaver extends Saver {
 		return properties;
 	}
 	
-	public void saveProjectPropValues(VariableList variableList) throws MiddlewareQueryException {
+	public void saveProjectPropValues(int projectId, VariableList variableList) throws MiddlewareQueryException {
 		setWorkingDatabase(Database.LOCAL);
 		
 		if (variableList != null && variableList.getVariables() != null && variableList.getVariables().size() > 0) {
@@ -79,6 +79,7 @@ public class ProjectPropertySaver extends Saver {
 					property.setTypeId(variable.getVariableType().getStandardVariable().getId());
 					property.setValue(variable.getValue());
 					property.setRank(variable.getVariableType().getRank());
+					property.setProject(getDmsProjectDao().getById(projectId));
 					getProjectPropertyDao().save(property);
 				}
 			}

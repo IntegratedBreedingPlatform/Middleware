@@ -19,6 +19,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DataManager;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.v2.domain.DataSet;
+import org.generationcp.middleware.v2.domain.DataSetType;
 import org.generationcp.middleware.v2.domain.DatasetReference;
 import org.generationcp.middleware.v2.domain.DatasetValues;
 import org.generationcp.middleware.v2.domain.Experiment;
@@ -221,9 +222,24 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	        trans.commit();
 	        return id;
         
-    } catch (Exception e) {
-    	rollbackTransaction(trans);
-        throw new MiddlewareQueryException("error in addStock " + e.getMessage(), e);
-    }
+	    } catch (Exception e) {
+	    	rollbackTransaction(trans);
+	        throw new MiddlewareQueryException("error in addStock " + e.getMessage(), e);
+	    }
+	}
+
+	@Override
+	public List<DataSet> getDataSetsByType(int studyId, DataSetType dataSetType) throws MiddlewareQueryException {
+		setWorkingDatabase(studyId);
+		
+		List<DmsProject> datasetProjects = getDmsProjectDao().getDataSetsByStudyAndProjectProperty(
+											studyId, TermId.DATASET_TYPE.getId(), String.valueOf(dataSetType.getId()));
+		List<DataSet> datasets = new ArrayList<DataSet>();
+		
+		for (DmsProject datasetProject : datasetProjects) {
+			datasets.add(getDataSetBuilder().build(datasetProject.getProjectId()));
+		}
+		
+		return datasets;
 	}
 }

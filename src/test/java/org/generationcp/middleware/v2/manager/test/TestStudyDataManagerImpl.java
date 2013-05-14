@@ -23,8 +23,8 @@ import junit.framework.Assert;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
-import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.v2.domain.DataSet;
+import org.generationcp.middleware.v2.domain.DataSetType;
 import org.generationcp.middleware.v2.domain.DatasetReference;
 import org.generationcp.middleware.v2.domain.DatasetValues;
 import org.generationcp.middleware.v2.domain.Experiment;
@@ -88,6 +88,7 @@ public class TestStudyDataManagerImpl {
 		VariableTypeList factors = manager.getAllStudyFactors(studyId);
 		assertNotNull(factors);
 		Assert.assertTrue(factors.getVariableTypes().size() > 0);
+		System.out.println("FACTORS RETRIEVED " + factors.getVariableTypes().size());
 		factors.print(0);
 	}
 
@@ -259,12 +260,19 @@ public class TestStudyDataManagerImpl {
 		Variable variable;
 		
 		//please make sure that the study name is unique and does not exist in the db.
-		variable = createVariable(TermId.DATASET_NAME.getId(), "My Dataset Name " + new Random().nextInt(10000), TermId.DATASET_INFO_STORAGE, 1);
+		variable = createVariable(TermId.DATASET_NAME.getId(), "My Dataset Name " + new Random().nextInt(10000), TermId.DATASET_NAME_STORAGE, 1);
 		typeList.add(variable.getVariableType());
+		updateVariableType(variable.getVariableType(), "DATASET_NAME", "Dataset name (local)");
 		variableList.add(variable);
 		
-		variable = createVariable(TermId.DATASET_TITLE.getId(), "My Dataset Description", TermId.DATASET_INFO_STORAGE, 2);
+		variable = createVariable(TermId.DATASET_TITLE.getId(), "My Dataset Description", TermId.DATASET_TITLE_STORAGE, 2);
 		typeList.add(variable.getVariableType());
+		updateVariableType(variable.getVariableType(), "DATASET_TITLE", "Dataset title (local)");
+		variableList.add(variable);
+		
+		variable = createVariable(TermId.DATASET_TYPE.getId(), "10070", TermId.DATASET_INFO_STORAGE, 3);
+		typeList.add(variable.getVariableType());
+		updateVariableType(variable.getVariableType(), "DATASET_TYPE", "Dataset type (local)");
 		variableList.add(variable);
 		
 		DatasetValues datasetValues = new DatasetValues();
@@ -334,6 +342,29 @@ public class TestStudyDataManagerImpl {
 			System.out.println("NO FACTORS FOUND FOR DATASET = " + datasetId + " WITH FACTOR TYPE = " + factorType);
 		}
 	}
+	
+	@Test
+	public void testGetDataSetsByType() throws Exception {
+		int studyId = 10010;
+		DataSetType dataSetType = DataSetType.MEANS_DATA;
+		System.out.println("testGetDataSetsByType(studyId = " + studyId + ", dataSetType = " + dataSetType + ")");
+		List<DataSet> datasets = manager.getDataSetsByType(studyId, dataSetType);
+		for (DataSet dataset : datasets) {
+			System.out.println("Dataset" + dataset.getId() + "-" + dataset.getName() + "-" + dataset.getDescription());
+		}
+		
+		studyId = 10080;
+		dataSetType = DataSetType.MEANS_DATA;
+		System.out.println("testGetDataSetsByType(studyId = " + studyId + ", dataSetType = " + dataSetType + ")");
+		datasets = manager.getDataSetsByType(studyId, dataSetType);
+		for (DataSet dataset : datasets) {
+			System.out.println("Dataset" + dataset.getId() + "-" + dataset.getName() + "-" + dataset.getDescription());
+		}
+		
+		System.out.println("Display data set type in getDataSet");
+		DataSet dataSet = manager.getDataSet(10087);
+		System.out.println("DataSet = " + dataSet.getId() + ", name = " + dataSet.getName() + ", description = " + dataSet.getDescription() + ", type = " + dataSet.getDataSetType()	);
+	}
 
 	@AfterClass
 	public static void tearDown() throws Exception {
@@ -354,6 +385,11 @@ public class TestStudyDataManagerImpl {
 		var.setValue(value);
 		var.setVariableType(vtype);
 		return var;
+	}
+	
+	private void updateVariableType(VariableType type, String name, String description) {
+		type.setLocalName(name);
+		type.setLocalDescription(description);
 	}
 
 	private VariableList createTrialEnvironment(String name, String latitude, String longitude, String data, String altitude, String property1, String property2){

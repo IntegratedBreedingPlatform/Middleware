@@ -385,5 +385,25 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return count;
 
 	}
+	
+	@SuppressWarnings("unchecked")
+	public List<DmsProject> getDataSetsByStudyAndProjectProperty(int studyId, int type, String value) throws MiddlewareQueryException {
+		try {
+			Criteria criteria = getSession().createCriteria(getPersistentClass());
+			criteria.createAlias("relatedTos", "pr");
+			criteria.add(Restrictions.eq("pr.typeId", TermId.BELONGS_TO_STUDY.getId()));
+			criteria.add(Restrictions.eq("pr.objectProject.projectId", studyId));
+			criteria.createAlias("properties", "prop");
+			criteria.add(Restrictions.eq("prop.typeId", type));
+			criteria.add(Restrictions.eq("prop.value", value));
+			criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+			
+			return criteria.list();
+			
+		} catch(HibernateException e) {
+			logAndThrowException("Error in getDataSetsByProjectProperty(" + type + ", " + value + ") query in DmsProjectDao: " + e.getMessage(), e);
+		}
+		return new ArrayList<DmsProject>();
+	}
 
 }
