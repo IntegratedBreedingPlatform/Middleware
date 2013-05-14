@@ -103,7 +103,7 @@ public class TestStudyDataManagerImpl {
 
 	@Test
 	public void testGetStudiesByFolder() throws Exception {
-		int folderId = 2000;
+		int folderId = 1000;
 		StudyResultSet resultSet = manager.searchStudies(new ParentFolderStudyQueryFilter(folderId), 5);
 		Assert.assertNotNull(resultSet);
 		System.out.println("testGetStudiesByFolder(" + folderId + "): " + resultSet.size());
@@ -208,9 +208,13 @@ public class TestStudyDataManagerImpl {
 
 		StudyValues studyValues = new StudyValues();
 		studyValues.setVariableList(variableList);
-		studyValues.setGermplasmId(-1);
-		studyValues.setLocationId(-1);
 		
+		VariableList locationVariableList = createTrialEnvironment("Description", "1.0", "2.0", "data", "3.0", "prop1", "prop2");
+		studyValues.setLocationId(manager.addTrialEnvironment(locationVariableList));
+		
+		VariableList germplasmVariableList = createGermplasm("unique name", "1000", "name", "2000", "prop1", "prop2");
+		studyValues.setGermplasmId(manager.addStock(germplasmVariableList));
+
 		StudyReference studyRef = manager.addStudy(parentStudyId, typeList, studyValues);
 
 		Assert.assertTrue(studyRef.getId() < 0);
@@ -289,26 +293,13 @@ public class TestStudyDataManagerImpl {
 	
 	@Test
 	public void testAddTrialEnvironment() throws Exception {
-		VariableList variableList = new VariableList();
-		variableList.add(createVariable(1, "loc desc", TermId.TRIAL_INSTANCE_STORAGE, 1));
-		variableList.add(createVariable(2, "1.1", TermId.LATITUDE_STORAGE, 2));
-		variableList.add(createVariable(3, "2.2", TermId.LONGITUDE_STORAGE, 3));
-		variableList.add(createVariable(4, "datum", TermId.DATUM_STORAGE, 4));
-		variableList.add(createVariable(5, "3.3", TermId.ALTITUDE_STORAGE, 5));
-		variableList.add(createVariable(6, "prop1", TermId.TRIAL_ENVIRONMENT_INFO_STORAGE, 6));
-		variableList.add(createVariable(7, "prop2", TermId.TRIAL_ENVIRONMENT_INFO_STORAGE, 7));
+		VariableList variableList = createTrialEnvironment("loc desc", "1.1", "2.2", "datum", "3.3", "prop1", "prop2");
 		manager.addTrialEnvironment(variableList);
 	}
 	
 	@Test
 	public void testAddGermplasm() throws Exception {
-		VariableList variableList = new VariableList();
-		variableList.add(createVariable(1, "unique name", TermId.ENTRY_NUMBER_STORAGE, 1));
-		variableList.add(createVariable(2, "1000", TermId.ENTRY_GID_STORAGE, 2));
-		variableList.add(createVariable(3, "name", TermId.ENTRY_DESIGNATION_STORAGE, 3));
-		variableList.add(createVariable(4, "2000", TermId.ENTRY_CODE_STORAGE, 4));
-		variableList.add(createVariable(6, "prop1", TermId.GERMPLASM_ENTRY_STORAGE, 5));
-		variableList.add(createVariable(7, "prop2", TermId.GERMPLASM_ENTRY_STORAGE, 6));
+		VariableList variableList = createGermplasm("unique name", "1000", "name", "2000", "prop1", "prop2");
 		manager.addStock(variableList);
 	}
 	
@@ -363,6 +354,30 @@ public class TestStudyDataManagerImpl {
 		var.setValue(value);
 		var.setVariableType(vtype);
 		return var;
+	}
+
+	private VariableList createTrialEnvironment(String name, String latitude, String longitude, String data, String altitude, String property1, String property2){
+		VariableList variableList = new VariableList();
+		variableList.add(createVariable(1, name, TermId.TRIAL_INSTANCE_STORAGE, 1));
+		variableList.add(createVariable(2, latitude, TermId.LATITUDE_STORAGE, 2));
+		variableList.add(createVariable(3, longitude, TermId.LONGITUDE_STORAGE, 3));
+		variableList.add(createVariable(4, data, TermId.DATUM_STORAGE, 4));
+		variableList.add(createVariable(5, altitude, TermId.ALTITUDE_STORAGE, 5));
+		variableList.add(createVariable(6, property1, TermId.TRIAL_ENVIRONMENT_INFO_STORAGE, 6));
+		variableList.add(createVariable(7, property2, TermId.TRIAL_ENVIRONMENT_INFO_STORAGE, 7));
+		return variableList;
+	}
+	
+	private VariableList createGermplasm(String name, String gid, String designation, String code, String property1, String property2){
+		VariableList variableList = new VariableList();
+		variableList.add(createVariable(1, name, TermId.ENTRY_NUMBER_STORAGE, 1));
+		variableList.add(createVariable(2, gid, TermId.ENTRY_GID_STORAGE, 2));
+		variableList.add(createVariable(3, designation, TermId.ENTRY_DESIGNATION_STORAGE, 3));
+		variableList.add(createVariable(4, code, TermId.ENTRY_CODE_STORAGE, 4));
+		variableList.add(createVariable(6, property1, TermId.GERMPLASM_ENTRY_STORAGE, 5));
+		variableList.add(createVariable(7, property2, TermId.GERMPLASM_ENTRY_STORAGE, 6));
+		return variableList;
+
 	}
 
 }
