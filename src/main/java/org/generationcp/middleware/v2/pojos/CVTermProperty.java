@@ -6,6 +6,8 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -45,8 +47,9 @@ public class CVTermProperty implements Serializable {
 	@Column(name = "rank")
 	private Integer rank;
 	
-	@Column(name = "cvterm_id")
-	private Integer cvTermId;
+	@ManyToOne(targetEntity = CVTerm.class)
+	@JoinColumn(name = "cvterm_id", nullable = false)
+	private CVTerm cvTerm;
 
 	
 	public Integer getCvTermPropertyId() {
@@ -81,12 +84,12 @@ public class CVTermProperty implements Serializable {
 		this.rank = rank;
 	}
 
-	public Integer getCvTermId() {
-		return cvTermId;
+	public CVTerm getCvTerm() {
+		return cvTerm;
 	}
 
-	public void setCvTermId(Integer cvTermId) {
-		this.cvTermId = cvTermId;
+	public void setCvTerm(CVTerm cvTerm) {
+		this.cvTerm = cvTerm;
 	}
 
 	@Override

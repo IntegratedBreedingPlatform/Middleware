@@ -33,6 +33,7 @@ public enum TermId {
 	// Dataset Fields
 	, DATASET_NAME(8150)
 	, DATASET_TITLE(8155)
+	, DATASET_TYPE(8160)
 	
 	// Numeric Data Fields
 	, NUMERIC_VARIABLE(1110)

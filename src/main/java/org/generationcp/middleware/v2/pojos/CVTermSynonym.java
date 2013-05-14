@@ -18,6 +18,8 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -42,9 +44,6 @@ public class CVTermSynonym implements Serializable {
 	@Column(name = "cvtermsynonym_id")
 	private Integer cvTermSynonymId;
 	
-	@Column(name = "cvterm_id")
-	private Integer cvTermId;
-	
 	/**
 	 * Alias or synonym for related CV Term
 	 */
@@ -57,6 +56,11 @@ public class CVTermSynonym implements Serializable {
 	 */
 	@Column(name = "type_id")
 	private Integer typeId;
+
+	@ManyToOne(targetEntity = CVTerm.class)
+	@JoinColumn(name = "cvterm_id", nullable = false)
+	private CVTerm cvTerm;
+	
 	
 	public CVTermSynonym(){
 		
@@ -90,12 +94,12 @@ public class CVTermSynonym implements Serializable {
 		this.typeId = typeId;
 	}
 
-	public Integer getCvTermId() {
-		return cvTermId;
+	public CVTerm getCvTerm() {
+		return cvTerm;
 	}
 
-	public void setCvTermId(Integer cvTermId) {
-		this.cvTermId = cvTermId;
+	public void setCvTerm(CVTerm cvTerm) {
+		this.cvTerm = cvTerm;
 	}
 
 	@Override
@@ -130,8 +134,6 @@ public class CVTermSynonym implements Serializable {
 		StringBuilder builder = new StringBuilder();
 		builder.append("CVTermSynonym [cvTermSynonymId=");
 		builder.append(cvTermSynonymId);
-		builder.append(", cvTermId=");
-		builder.append(cvTermId);
 		builder.append(", synonym=");
 		builder.append(synonym);
 		builder.append(", typeId=");

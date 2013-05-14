@@ -21,7 +21,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -96,12 +95,17 @@ public class CVTerm implements Serializable {
 	@Column(name = "is_relationshiptype")
 	private Integer isRelationshipType;
 	
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	@JoinColumn(name="cvterm_id") 
+//	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+//	@JoinColumn(name="cvterm_id", referencedColumnName="cvterm_id") 
+	@OneToMany(mappedBy = "cvTerm", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<CVTermProperty> properties;
 	
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinColumn(name="cvterm_id") 
+//	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    @JoinTable(name="cvtermsynonym", 
+//    joinColumns={@JoinColumn(name="cvterm_id", insertable=false,updatable=false)},
+//    inverseJoinColumns={@JoinColumn(name="cvterm_id", insertable=false,updatable=false)})
+//	@JoinColumn(name="cvterm_id") 
+	@OneToMany(mappedBy = "cvTerm", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<CVTermSynonym> synonyms;
 	
 	public CVTerm() {
