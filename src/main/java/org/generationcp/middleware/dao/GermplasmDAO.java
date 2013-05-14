@@ -15,10 +15,7 @@ package org.generationcp.middleware.dao;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.Operation;
@@ -591,21 +588,14 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
     	try {
     		
     		SQLQuery query = getSession().createSQLQuery(Germplasm.GET_MAX_IN_SEQUENCE_FOR_CROSS_NAME_PREFIX);
-    		query.setParameter("prefix", "^" + prefix + "[1-9]");
+    		query.setParameter("prefix", prefix);
+    		query.setParameter("prefixRegex", "^" + prefix + "[1-9]");
     		
-    		String maxNameInSequence = (String) query.uniqueResult();
+    		//gets last number used in sequence and increments by 1
+    		Integer maxNumberInSequence = (Integer) query.uniqueResult();
     		
-    		//Gets the first number immediately after prefix and increment it by 1
-    		if (!StringUtils.isEmpty(maxNameInSequence)){
-    			maxNameInSequence = maxNameInSequence.replace(prefix, ""); // remove prefix
-    			Pattern pattern = Pattern.compile("\\D"); // split by non digit regexp
-    			String[] numberCharSequences = pattern.split(maxNameInSequence);
-    			for (String s : numberCharSequences){
-    				if (NumberUtils.isNumber(s)){
-    					nextInSequence = String.valueOf(Integer.parseInt(s) + 1);
-    					break;
-    				}
-    			}
+    		if (maxNumberInSequence != null){
+    			nextInSequence = String.valueOf(maxNumberInSequence + 1);
     		}
 		
     	} catch (HibernateException e) {
