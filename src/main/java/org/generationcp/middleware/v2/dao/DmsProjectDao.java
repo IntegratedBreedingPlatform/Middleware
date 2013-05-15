@@ -11,7 +11,6 @@
  *******************************************************************************/
 package org.generationcp.middleware.v2.dao;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -44,20 +43,20 @@ import org.hibernate.criterion.Restrictions;
 public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	private static final String GET_CHILDREN_OF_FOLDER =		
-			"SELECT  DISTINCT subject.project_id, subject.name, IFNULL(is_study.type_id, 0) AS is_study "
-			+ "FROM    project subject "
-			+ "        INNER JOIN project_relationship pr ON subject.project_id = pr.subject_project_id "
-			+ "        LEFT JOIN project_relationship is_study ON subject.project_id = is_study.subject_project_id "
-			+ "        					AND is_study.type_id = " + TermId.IS_STUDY.getId() + " "
-			+ "WHERE   pr.type_id = " + TermId.HAS_PARENT_FOLDER.getId() + " "
-			+ "        and pr.object_project_id = :folderId "
+			"SELECT DISTINCT subject.project_id, subject.name,  subject.description " 
+			+ "		, (CASE WHEN (type_id = " + TermId.IS_STUDY.getId() + ") THEN 1 ELSE 0 END) AS is_study  "
+			+ "FROM project subject "
+			+ "		INNER JOIN project_relationship pr on subject.project_id = pr.subject_project_id  "
+			+ "WHERE (pr.type_id = " + TermId.HAS_PARENT_FOLDER.getId() + " or pr.type_id = " + TermId.IS_STUDY.getId() + ") " 
+			+ "		AND pr.object_project_id = :folderId "
 			+ "ORDER BY name "
 			;
+
 	
 	private static final String GET_STUDIES_OF_FOLDER =
 			"SELECT  DISTINCT pr.subject_project_id "
 			+ "FROM    project_relationship pr, project p "
-			+ "WHERE   pr.type_id = "  + TermId.STUDY_HAS_FOLDER.getId() + " "
+			+ "WHERE   pr.type_id = "  + TermId.IS_STUDY.getId() + " "
 			+ "        AND pr.subject_project_id = p.project_id "
 			+ "        AND pr.object_project_id = :folderId "
 			+ "ORDER BY p.name "
@@ -68,7 +67,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		
 		List<FolderReference> folderList = new ArrayList<FolderReference>();
 		
-		/* SELECT DISTINCT p.projectId, p.name
+		/* SELECT DISTINCT p.projectId, p.name, p.description
 		 * 	FROM DmsProject p 
 		 * 		JOIN p.relatedTos pr 
 		 * WHERE pr.typeId = CVTermId.HAS_PARENT_FOLDER.getId() 
@@ -85,6 +84,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			ProjectionList projectionList = Projections.projectionList();
 			projectionList.add(Projections.property("projectId"));
 			projectionList.add(Projections.property("name"));
+			projectionList.add(Projections.property("description"));
 			criteria.setProjection(projectionList);
 			
 			criteria.addOrder(Order.asc("projectId"));
@@ -94,7 +94,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				for (Object[] row : list){
 					Integer id = (Integer)row[0]; //project.id
 					String name = (String) row [1]; //project.name
-					folderList.add(new FolderReference(id, name));
+					String description = (String) row [2]; //project.description
+					folderList.add(new FolderReference(id, name, description));
 				}
 			}
 		} catch (HibernateException e) {
@@ -118,12 +119,13 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			for (Object[] row : list){
 				Integer id = (Integer) row[0]; //project.id
 				String name = (String) row [1]; //project.name
-				Integer isStudy = ((BigInteger) row[2]).intValue(); //non-zero if a study, else a folder
+				String description = (String) row[2]; //project.description
+				Integer isStudy = ((Integer) row[3]).intValue(); //non-zero if a study, else a folder
 				
 				if (isStudy > 0){
-					childrenNodes.add(new StudyReference(id, name));
+					childrenNodes.add(new StudyReference(id, name, description));
 				} else {
-					childrenNodes.add(new FolderReference(id, name));
+					childrenNodes.add(new FolderReference(id, name, description));
 				}
 			}
 			

@@ -15,6 +15,7 @@ package org.generationcp.middleware.v2.manager.test;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -106,7 +107,6 @@ public class TestStudyDataManagerImpl {
 	public void testGetStudiesByFolder() throws Exception {
 		int folderId = 1000;
 		StudyResultSet resultSet = manager.searchStudies(new ParentFolderStudyQueryFilter(folderId), 5);
-		Assert.assertNotNull(resultSet);
 		System.out.println("testGetStudiesByFolder(" + folderId + "): " + resultSet.size());
 		Assert.assertTrue(resultSet.size() > 0);
 		while (resultSet.hasMore()) {
@@ -151,15 +151,29 @@ public class TestStudyDataManagerImpl {
 
 	@Test
 	public void testGetChildrenOfFolder() throws Exception {
-		Integer folderId = 1000;
-		List<Reference> childrenNodes = manager.getChildrenOfFolder(folderId);
-		assertNotNull(childrenNodes);
-		assert (childrenNodes.size() > 0);
-		System.out
-				.println("testGetChildrenOfFolder(): " + childrenNodes.size());
-		for (Reference node : childrenNodes) {
-			System.out.println("   " + node);
+		List<Integer> folderIds = Arrays.asList(1000, 2000);
+		for (Integer folderId : folderIds){
+			List<Reference> childrenNodes = manager.getChildrenOfFolder(folderId);
+			assertNotNull(childrenNodes);
+			assert (childrenNodes.size() > 0);
+			System.out.println("testGetChildrenOfFolder(folderId="+folderId+"): " + childrenNodes.size());
+			for (Reference node : childrenNodes) {
+				System.out.println("   " + node);
+			} 
 		}
+		/* SQL SCRIPT TO VERIFY RESULTS
+		Set @TermId_IS_STUDY = 1145;
+		Set @TermId_HAS_PARENT_FOLDER = 1140;
+		Set @folderId = 1000; -- 2000
+		
+		SELECT DISTINCT subject.project_id, subject.name,  (CASE WHEN (type_id = @TermId_IS_STUDY) THEN 1 ELSE 0 END) AS is_study
+		FROM project subject
+		INNER JOIN project_relationship pr on subject.project_id = pr.subject_project_id
+		WHERE (pr.type_id = @TermId_HAS_PARENT_FOLDER or pr.type_id = @TermId_IS_STUDY) 
+		    AND pr.object_project_id = @folderId
+		ORDER BY name;
+		*/
+
 	}
 
 	@Test
