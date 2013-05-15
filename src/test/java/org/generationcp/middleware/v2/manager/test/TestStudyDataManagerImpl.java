@@ -161,19 +161,6 @@ public class TestStudyDataManagerImpl {
 				System.out.println("   " + node);
 			} 
 		}
-		/* SQL SCRIPT TO VERIFY RESULTS
-		Set @TermId_IS_STUDY = 1145;
-		Set @TermId_HAS_PARENT_FOLDER = 1140;
-		Set @folderId = 1000; -- 2000
-		
-		SELECT DISTINCT subject.project_id, subject.name,  (CASE WHEN (type_id = @TermId_IS_STUDY) THEN 1 ELSE 0 END) AS is_study
-		FROM project subject
-		INNER JOIN project_relationship pr on subject.project_id = pr.subject_project_id
-		WHERE (pr.type_id = @TermId_HAS_PARENT_FOLDER or pr.type_id = @TermId_IS_STUDY) 
-		    AND pr.object_project_id = @folderId
-		ORDER BY name;
-		*/
-
 	}
 
 	@Test
