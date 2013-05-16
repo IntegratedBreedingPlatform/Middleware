@@ -194,5 +194,12 @@ public interface StudyDataManager {
      * @param dataSetType
      * @return
      */
-    List<DataSet> getDataSetsByType(int studyId, DataSetType dataSetType) throws MiddlewareQueryException; 
+    List<DataSet> getDataSetsByType(int studyId, DataSetType dataSetType) throws MiddlewareQueryException;
+    
+    /**
+     * @param trialEnvironmentId
+     * @param variateVariableId
+     * @return
+     */
+    long countExperimentsByTrialEnvironmentAndVariate(int trialEnvironmentId, int variateVariableId) throws MiddlewareQueryException;
 }

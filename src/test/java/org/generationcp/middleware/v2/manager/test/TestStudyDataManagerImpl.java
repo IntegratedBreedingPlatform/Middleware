@@ -21,6 +21,7 @@ import java.util.Random;
 
 import junit.framework.Assert;
 
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
@@ -442,7 +443,13 @@ public class TestStudyDataManagerImpl {
 		DataSet dataSet = manager.getDataSet(10087);
 		System.out.println("DataSet = " + dataSet.getId() + ", name = " + dataSet.getName() + ", description = " + dataSet.getDescription() + ", type = " + dataSet.getDataSetType()	);
 	}
-
+	
+	@Test
+	public void testCountExperimentsByTrialEnvironmentAndVariate() throws Exception {
+		long count = manager.countExperimentsByTrialEnvironmentAndVariate(10070, 20870);
+		System.out.println("Count of Experiments By TE and Variate: " + count);
+	}
+	
 	@AfterClass
 	public static void tearDown() throws Exception {
 		if (factory != null) {

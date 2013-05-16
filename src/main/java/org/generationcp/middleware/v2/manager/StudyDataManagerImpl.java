@@ -243,4 +243,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		
 		return datasets;
 	}
+
+	@Override
+	public long countExperimentsByTrialEnvironmentAndVariate(int trialEnvironmentId, int variateVariableId) throws MiddlewareQueryException {
+		long count = 0;
+		if (this.setWorkingDatabase(trialEnvironmentId)) {
+			count = getExperimentDao().countByTrialEnvironmentAndVariate(trialEnvironmentId, variateVariableId);
+		}
+		return count;
+	}
 }
