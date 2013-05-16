@@ -48,6 +48,17 @@ public class ExperimentBuilder extends Builder {
 		return experiments;
 	}
 	
+	public List<Experiment> build(int projectId, List<TermId> types, int start, int numOfRows, VariableTypeList variableTypes) throws MiddlewareQueryException {
+		List<Experiment> experiments = new ArrayList<Experiment>();
+		if (setWorkingDatabase(projectId)) {
+			List<ExperimentProject> experimentProjects = getExperimentProjectDao().getExperimentProjects(projectId, types, start, numOfRows);
+			for (ExperimentProject experimentProject : experimentProjects) {
+				experiments.add(createExperiment(experimentProject.getExperiment(), variableTypes));
+			}
+		}
+		return experiments;
+	}
+	
 	public Experiment buildOne(int projectId, TermId type, VariableTypeList variableTypes) throws MiddlewareQueryException {
 		List<Experiment> experiments = build(projectId, type, 0, 1, variableTypes);
 		if (experiments != null && experiments.size() > 0) {

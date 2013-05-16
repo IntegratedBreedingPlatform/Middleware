@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.pojos.ExperimentProject;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -59,6 +60,31 @@ public class ExperimentProjectDao extends GenericDAO<ExperimentProject, Integer>
 			logAndThrowException("Error at getExperimentProjects=" + projectId + ", " + typeId + " query at ExperimentProjectDao: " + e.getMessage(), e);
 			return null;
 		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<ExperimentProject> getExperimentProjects(int projectId, List<TermId> types, int start, int numOfRows) throws MiddlewareQueryException {
+		try {
+			Criteria criteria = getSession().createCriteria(getPersistentClass());
+			criteria.add(Restrictions.eq("projectId", projectId));
+			criteria.createAlias("experiment", "experiment").add(Restrictions.in("experiment.typeId", getIds(types)));
+			criteria.setMaxResults(numOfRows);
+			criteria.setFirstResult(start);
+			return criteria.list();
+		} 
+		catch (HibernateException e) {
+			logAndThrowException("Error at getExperimentProjects=" + projectId + ", " + types + " query at ExperimentProjectDao: " + e.getMessage(), e);
+			return null;
+		}
+	}
+
+	private Integer[] getIds(List<TermId> types) {
+		Integer ids[] = new Integer[types.size()];
+		int i = 0;
+		for (TermId type : types) {
+			ids[i++] = type.getId();
+		}
+		return ids;
 	}
 
 	public long count(int dataSetId) throws MiddlewareQueryException {

@@ -28,6 +28,7 @@ import org.generationcp.middleware.v2.domain.DatasetReference;
 import org.generationcp.middleware.v2.domain.FolderReference;
 import org.generationcp.middleware.v2.domain.StudyReference;
 import org.generationcp.middleware.v2.pojos.DmsProject;
+import org.generationcp.middleware.v2.util.PlotUtil;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -141,7 +142,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 						                                     "          and ep.project_id = p.project_id) " + 
 						                                     "       or " +
 						                                     "       (e.nd_experiment_id = ep.nd_experiment_id" +
-						                                     "          and e.type_id = " + TermId.PLOT_EXPERIMENT.getId() + 
+						                                     "          and e.type_id in " + PlotUtil.getSqlTypeIds() + 
 						                                     "          and ep.project_id = pr.subject_project_id" +
 						                                     "          and pr.object_project_id = p.project_id))");
 				
@@ -173,7 +174,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 	                                                         "          and e.type_id = " + TermId.STUDY_EXPERIMENT.getId() + 
 	                                                         "          and ep.project_id = p.project_id) or " +
 	                                                         "       (e.nd_experiment_id = ep.nd_experiment_id" +
-	                                                         "          and e.type_id = " + TermId.PLOT_EXPERIMENT.getId() + 
+	                                                         "          and e.type_id in " + PlotUtil.getSqlTypeIds() + 
 	                                                         "          and ep.project_id = pr.subject_project_id" +
 	                                                         "          and pr.object_project_id = p.project_id))");
 						                                  
@@ -207,7 +208,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 					                                     "          and ep.project_id = p.project_id) " + 
 					                                     "       or " +
 					                                     "       (e.nd_experiment_id = ep.nd_experiment_id" +
-					                                     "          and e.type_id = " + TermId.PLOT_EXPERIMENT.getId() + 
+					                                     "          and e.type_id in " + PlotUtil.getSqlTypeIds() + 
 					                                     "          and ep.project_id = pr.subject_project_id" +
 					                                     "          and pr.object_project_id = p.project_id))");
 			
@@ -224,7 +225,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 		List<StudyReference> studyReferences = new ArrayList<StudyReference>();
 		try {
 			SQLQuery query = getSession().createSQLQuery("select distinct p.project_id, p.name, p.description " +
-                                                         "from nd_geolocationprop gp, nd_experiment e, nd_experiment_project ep, project_relationship pr, project p" +
+                                                         "from nd_geolocationprop gp, nd_experiment e, nd_experiment_project ep, project_relationship pr, project p " +
                                                          "where gp.type_id = 8190 " +
                                                          "  and gp.value in (" + stringify(locationIds) + ")" +
                                                          "  and gp.nd_geolocation_id = e.nd_geolocation_id " +
@@ -232,13 +233,13 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
                                                          "          and e.type_id = " + TermId.STUDY_EXPERIMENT.getId() + 
                                                          "          and ep.project_id = p.project_id) or " +
                                                          "       (e.nd_experiment_id = ep.nd_experiment_id" +
-                                                         "          and e.type_id = " + TermId.PLOT_EXPERIMENT.getId() + 
+                                                         "          and e.type_id in " + PlotUtil.getSqlTypeIds() + 
                                                          "          and ep.project_id = pr.subject_project_id" +
                                                          "          and pr.object_project_id = p.project_id))");
 					                                  
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
-			
+		
 			List<Object[]> results = (List<Object[]>) query.list();
 			for (Object[] row : results) {
 				studyReferences.add(new StudyReference((Integer) row[0], (String) row[1], (String) row[2]));

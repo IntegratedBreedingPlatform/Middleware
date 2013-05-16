@@ -42,6 +42,7 @@ import org.generationcp.middleware.v2.search.filter.BrowseStudyQueryFilter;
 import org.generationcp.middleware.v2.search.filter.GidStudyQueryFilter;
 import org.generationcp.middleware.v2.search.filter.ParentFolderStudyQueryFilter;
 import org.generationcp.middleware.v2.search.filter.StudyQueryFilter;
+import org.generationcp.middleware.v2.util.PlotUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -163,11 +164,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	        throw new MiddlewareQueryException("error in addDataSet " + e.getMessage(), e);
 	    }
 	}
-
+	
 	@Override
 	public List<Experiment> getExperiments(int dataSetId, int start, int numRows) throws MiddlewareQueryException {
 		VariableTypeList variableTypes = getDataSetBuilder().getVariableTypes(dataSetId);
-		return getExperimentBuilder().build(dataSetId, TermId.PLOT_EXPERIMENT, start, numRows, variableTypes);
+		return getExperimentBuilder().build(dataSetId, PlotUtil.getAllPlotTypes(), start, numRows, variableTypes);
 	}
 
 	@Override

@@ -24,6 +24,7 @@ import junit.framework.Assert;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
+import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.v2.domain.DataSet;
 import org.generationcp.middleware.v2.domain.DataSetType;
 import org.generationcp.middleware.v2.domain.DatasetReference;
@@ -105,7 +106,7 @@ public class TestStudyDataManagerImpl {
 
 	@Test
 	public void testGetStudiesByFolder() throws Exception {
-		int folderId = 1000;
+		int folderId = 1030;
 		StudyResultSet resultSet = manager.searchStudies(new ParentFolderStudyQueryFilter(folderId), 5);
 		System.out.println("testGetStudiesByFolder(" + folderId + "): " + resultSet.size());
 		Assert.assertTrue(resultSet.size() > 0);
@@ -114,19 +115,86 @@ public class TestStudyDataManagerImpl {
 			System.out.println(studyRef);
 		}
 	}
+	
+	@Test
+	public void testSearchStudiesForName() throws Exception {
+		System.out.println("testSearchStudiesForName");
+		BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
+	    
+		filter.setName("FooFoo"); //INVALID: Not a study, should not find any studies
+		StudyResultSet resultSet = manager.searchStudies(filter, 10);
+		Assert.assertTrue(resultSet.size() == 0);
+		
+		filter.setName("RYT2000WS"); //VALID: is a study
+		
+		resultSet = manager.searchStudies(filter, 10);
+		System.out.println("INPUT: " + filter);
+		System.out.println("Size: " + resultSet.size());
+		while (resultSet.hasMore()) {
+			System.out.println("\t" + resultSet.next());
+			System.out.flush();
+		}
+	}
+	
+	@Test
+	public void testSearchStudiesForStartDate() throws Exception {
+		System.out.println("testSearchStudiesForStartDate");
+		BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
+	    filter.setStartDate(20050119);
+		
+		StudyResultSet resultSet = manager.searchStudies(filter, 10);
+		System.out.println("INPUT: " + filter);
+		System.out.println("Size: " + resultSet.size());
+		while (resultSet.hasMore()) {
+			System.out.println("\t" + resultSet.next());
+			System.out.flush();
+		}
+	}
+	
+	@Test
+	public void testSearchStudiesForSeason() throws Exception {
+		Season seasons[] = { Season.GENERAL, Season.DRY, Season.WET };
+		
+		System.out.println("testSearchStudiesForSeason");
+		
+		for (Season season : seasons) {
+			
+		    System.out.println("Season: " + season);
+			BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
+			filter.setSeason(season);
+			StudyResultSet resultSet = manager.searchStudies(filter, 10);
+			System.out.println("Size: " + resultSet.size());
+			while (resultSet.hasMore()) {
+				System.out.println("\t" + resultSet.next());
+				System.out.flush();
+			}
+		}
+	}
 
 	@Test
-	public void testSearchStudies() throws Exception {
+	public void testSearchStudiesForCountry() throws Exception {
 		System.out.println("testSearchStudies");
 		BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
-	    //filter.setStartDate(20050119);
-		//filter.setName("BULU"); //INVALID: Not a study, should not be returned
+	    
+		filter.setCountry("Republic of the Philippines");
+		
+		StudyResultSet resultSet = manager.searchStudies(filter, 10);
+		System.out.println("INPUT: " + filter);
+		System.out.println("Size: " + resultSet.size());
+		while (resultSet.hasMore()) {
+			System.out.println("\t" + resultSet.next());
+			System.out.flush();
+		}
+	}
+	
+	@Test
+	public void testSearchStudiesForAll() throws Exception {
+		System.out.println("testSearchStudiesForAll");
+		BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
+	    filter.setStartDate(20050119);
 		filter.setName("RYT2000WS"); //VALID: is a study
-		//filter.setCountry("Republic of the Philippines");
-		//filter.setCountry("Republic of India");
-		//filter.setSeason(Season.DRY);
-		//filter.setSeason(Season.GENERAL); //do nothing for GENERAL SEASON
-		//filter.setSeason(Season.WET);
+		filter.setCountry("Republic of the Philippines");
+		filter.setSeason(Season.DRY);
 		
 		StudyResultSet resultSet = manager.searchStudies(filter, 10);
 		System.out.println("INPUT: " + filter);
@@ -246,6 +314,14 @@ public class TestStudyDataManagerImpl {
 			for (Experiment experiment : experiments) {
 				experiment.print(0);
 			}
+		}
+	}
+	
+	@Test
+	public void testGetExperimentsWithAverage() throws Exception {
+		List<Experiment> experiments = manager.getExperiments(5803, 0, 50);
+		for (Experiment experiment : experiments) {
+			experiment.print(0);
 		}
 	}
 
