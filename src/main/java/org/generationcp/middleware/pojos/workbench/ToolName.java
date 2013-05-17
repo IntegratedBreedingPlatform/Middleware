@@ -11,4 +11,5 @@ public enum ToolName {
     ,breeding_manager
     ,breeding_view
     ,list_manager
+    ,crossing_manager
 }
