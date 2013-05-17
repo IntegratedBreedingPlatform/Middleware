@@ -31,6 +31,7 @@ import org.generationcp.middleware.v2.domain.StudyReference;
 import org.generationcp.middleware.v2.domain.StudyValues;
 import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.VariableList;
+import org.generationcp.middleware.v2.domain.VariableType;
 import org.generationcp.middleware.v2.domain.VariableTypeList;
 import org.generationcp.middleware.v2.manager.api.StudyDataManager;
 import org.generationcp.middleware.v2.pojos.DmsProject;
@@ -251,5 +252,22 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			count = getExperimentDao().countByTrialEnvironmentAndVariate(trialEnvironmentId, variateVariableId);
 		}
 		return count;
+	}
+
+	@Override
+	public void addDataSetVariableType(int datasetId, VariableType variableType) throws MiddlewareQueryException {
+		requireLocalDatabaseInstance();
+		Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+ 
+        try {
+            trans = session.beginTransaction();
+            this.getDatasetProjectSaver().addDatasetVariableType(datasetId, variableType);
+			trans.commit();
+
+        } catch (Exception e) {
+	    	rollbackTransaction(trans);
+	        throw new MiddlewareQueryException("error in addDataSetVariableType " + e.getMessage(), e);
+	    }
 	}
 }

@@ -28,6 +28,7 @@ import org.generationcp.middleware.v2.domain.Study;
 import org.generationcp.middleware.v2.domain.StudyReference;
 import org.generationcp.middleware.v2.domain.StudyValues;
 import org.generationcp.middleware.v2.domain.VariableList;
+import org.generationcp.middleware.v2.domain.VariableType;
 import org.generationcp.middleware.v2.domain.VariableTypeList;
 import org.generationcp.middleware.v2.search.StudyResultSet;
 import org.generationcp.middleware.v2.search.filter.StudyQueryFilter;
@@ -156,6 +157,14 @@ public interface StudyDataManager {
      * @throws MiddlewareQueryException
      */
     DatasetReference addDataSet(int studyId, VariableTypeList variableTypeList, DatasetValues datasetValues) throws MiddlewareQueryException;
+    
+    /**
+     * Add a new variable/column to the dataset.
+     * @param datasetId
+     * @param variableType
+     * @throws MiddlewareQueryException 
+     */
+    void addDataSetVariableType(int datasetId, VariableType variableType) throws MiddlewareQueryException;
     
     /**
      * Adds an experiment row to the dataset.

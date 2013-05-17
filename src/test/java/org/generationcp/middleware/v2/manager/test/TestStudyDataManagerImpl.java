@@ -45,6 +45,7 @@ import org.generationcp.middleware.v2.domain.Variable;
 import org.generationcp.middleware.v2.domain.VariableList;
 import org.generationcp.middleware.v2.domain.VariableType;
 import org.generationcp.middleware.v2.domain.VariableTypeList;
+import org.generationcp.middleware.v2.manager.api.OntologyDataManager;
 import org.generationcp.middleware.v2.manager.api.StudyDataManager;
 import org.generationcp.middleware.v2.search.StudyResultSet;
 import org.generationcp.middleware.v2.search.filter.BrowseStudyQueryFilter;
@@ -61,6 +62,7 @@ public class TestStudyDataManagerImpl {
 
 	private static ManagerFactory factory;
 	private static StudyDataManager manager;
+	private static OntologyDataManager ontologyManager;
 
 	@BeforeClass
 	public static void setUp() throws Exception {
@@ -70,6 +72,7 @@ public class TestStudyDataManagerImpl {
 				"testDatabaseConfig.properties", "central");
 		factory = new ManagerFactory(local, central);
 		manager = factory.getNewStudyDataManager();
+		ontologyManager = factory.getNewOntologyDataManager();
 	}
 
 	@Test
@@ -358,6 +361,56 @@ public class TestStudyDataManagerImpl {
 
 		DatasetReference datasetReference = manager.addDataSet(parentStudyId, typeList, datasetValues);
 		System.out.println("Dataset added : " + datasetReference);
+		
+	}
+	
+	@Test
+	public void testAddDataSetVariableType() throws Exception {
+		//Parent study, assign a parent study id value, if none exists in db, 
+		//you may create a dummy one. or you may run testAddStudy first to create
+		//the study
+		int parentStudyId = -1;
+		
+		VariableTypeList typeList = new VariableTypeList();
+		VariableList variableList = new VariableList();
+		Variable variable;
+		
+		//please make sure that the study name is unique and does not exist in the db.
+		variable = createVariable(TermId.DATASET_NAME.getId(), "My Dataset Name " + new Random().nextInt(10000), TermId.DATASET_NAME_STORAGE, 1);
+		typeList.add(variable.getVariableType());
+		updateVariableType(variable.getVariableType(), "DATASET_NAME", "Dataset name (local)");
+		variableList.add(variable);
+		
+		variable = createVariable(TermId.DATASET_TITLE.getId(), "My Dataset Description", TermId.DATASET_TITLE_STORAGE, 2);
+		typeList.add(variable.getVariableType());
+		updateVariableType(variable.getVariableType(), "DATASET_TITLE", "Dataset title (local)");
+		variableList.add(variable);
+		
+		variable = createVariable(TermId.DATASET_TYPE.getId(), "10070", TermId.DATASET_INFO_STORAGE, 3);
+		typeList.add(variable.getVariableType());
+		updateVariableType(variable.getVariableType(), "DATASET_TYPE", "Dataset type (local)");
+		variableList.add(variable);
+		
+		DatasetValues datasetValues = new DatasetValues();
+		datasetValues.setVariableList(variableList);
+
+		DatasetReference datasetReference = manager.addDataSet(parentStudyId, typeList, datasetValues);
+		System.out.println("Dataset added : " + datasetReference);
+		
+		DataSet dataSet = manager.getDataSet(datasetReference.getId());
+		System.out.println("Original Dataset");
+		dataSet.print(3);
+		
+		VariableType variableType = new VariableType();
+		variableType.setLocalName("Dog");
+		variableType.setLocalDescription("Man's best friend");
+		variableType.setStandardVariable(ontologyManager.getStandardVariable(8240));
+		variableType.setRank(99);
+		manager.addDataSetVariableType(dataSet.getId(), variableType);
+		
+		dataSet = manager.getDataSet(datasetReference.getId());
+		System.out.println("Modified Dataset");
+		dataSet.print(3);
 		
 	}
 	

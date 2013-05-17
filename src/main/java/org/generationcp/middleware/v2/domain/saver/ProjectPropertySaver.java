@@ -84,7 +84,24 @@ public class ProjectPropertySaver extends Saver {
 				}
 			}
 		}
-		
+	}
+	
+	public void saveVariableType(DmsProject project, VariableType variableType) throws MiddlewareQueryException {
+		setWorkingDatabase(Database.LOCAL);
+		saveProjectProperty(project, variableType.getStandardVariable().getStoredIn().getId(), variableType.getLocalName(), variableType.getRank());
+		saveProjectProperty(project, TermId.VARIABLE_DESCRIPTION.getId(), variableType.getLocalDescription(), variableType.getRank());
+		saveProjectProperty(project, TermId.STANDARD_VARIABLE.getId(), Integer.toString(variableType.getStandardVariable().getId()), variableType.getRank());
+	}
+	
+	private void saveProjectProperty(DmsProject project, int typeId, String value, int rank) throws MiddlewareQueryException {
+		ProjectProperty property = new ProjectProperty();
+		property.setProjectPropertyId(getProjectPropertyDao().getNegativeId("projectPropertyId"));
+		property.setTypeId(typeId);
+		property.setValue(value);
+		property.setRank(rank);
+		property.setProject(project);
+		getProjectPropertyDao().save(property);
+		project.addProperty(property);
 	}
 	
 }

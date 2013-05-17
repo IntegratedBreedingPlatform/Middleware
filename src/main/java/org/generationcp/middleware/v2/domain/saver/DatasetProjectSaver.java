@@ -9,6 +9,7 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.v2.domain.DatasetValues;
 import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.Variable;
+import org.generationcp.middleware.v2.domain.VariableType;
 import org.generationcp.middleware.v2.domain.VariableTypeList;
 import org.generationcp.middleware.v2.pojos.DmsProject;
 import org.generationcp.middleware.v2.pojos.ProjectRelationship;
@@ -38,6 +39,15 @@ public class DatasetProjectSaver extends Saver {
 		getProjectPropertySaver().saveProjectPropValues(datasetProject.getProjectId(), datasetValues.getVariableList());
 		
 		return datasetProject;
+	}
+	
+	public void addDatasetVariableType(int datasetId, VariableType variableType) throws MiddlewareQueryException {
+		if (this.setWorkingDatabase(datasetId)) {
+			DmsProject project = getDmsProjectDao().getById(datasetId);
+			if (project != null) {
+				getProjectPropertySaver().saveVariableType(project, variableType);
+			}
+		}
 	}
 	
 	private String getStringValue(DatasetValues datasetValues, int termId) {

@@ -12,6 +12,7 @@
 package org.generationcp.middleware.v2.pojos;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -188,5 +189,12 @@ public class DmsProject implements Serializable {
 
 	public String getEntityName(){
 		return "DmsProject";
+	}
+
+	public void addProperty(ProjectProperty property) {
+		if (this.properties == null) {
+			this.properties = new ArrayList<ProjectProperty>();
+		}
+		this.properties.add(property);
 	}
 }

@@ -13,7 +13,9 @@ public class VariableInfoBuilder {
 	public Set<VariableInfo> create(List<ProjectProperty> properties) {
 		Set<VariableInfo> variableDefs = new HashSet<VariableInfo>();
 		for (ProjectProperty property : properties) {
+			System.out.println("Create VI: " + property.getTypeId() + ", " + property.getValue());
 			if (isStandardVariableType(property)) {
+				System.out.println("   -- it is a std var");
 				variableDefs.add(createVariableDef(property, filterByRank(properties, property.getRank())));
 			}
 		}

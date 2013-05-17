@@ -189,6 +189,14 @@ public abstract class GenericDAO<T, ID extends Serializable> {
         }
     }
 
+    public void refresh(T entity) throws MiddlewareQueryException {
+    	try {
+            getSession().refresh(entity);
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error in refresh(" + entity + "): " + e.getMessage(), e);
+        }
+    }
+    
     public Integer getNegativeId(String idName) throws MiddlewareQueryException {
         try {
             Criteria crit = getSession().createCriteria(getPersistentClass());

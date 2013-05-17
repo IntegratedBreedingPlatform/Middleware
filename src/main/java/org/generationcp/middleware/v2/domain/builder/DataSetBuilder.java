@@ -60,6 +60,7 @@ public class DataSetBuilder extends Builder {
 		
 		Set<VariableInfo> variableInfoList = getVariableInfoBuilder().create(project.getProperties());
 		for (VariableInfo variableInfo : variableInfoList) {
+			System.out.println("VariableInfo: " + variableInfo.getLocalName());
 			variableTypes.add(getVariableTypeBuilder().create(variableInfo));
 		}
 		return variableTypes.sort();
