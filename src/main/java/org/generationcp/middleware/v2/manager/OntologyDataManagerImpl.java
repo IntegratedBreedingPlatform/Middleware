@@ -68,4 +68,9 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	}
 
+	@Override
+	public StandardVariable getStandardVariableByAbbr(String abbreviation) throws MiddlewareQueryException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

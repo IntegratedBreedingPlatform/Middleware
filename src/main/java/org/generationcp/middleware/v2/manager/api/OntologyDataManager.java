@@ -41,6 +41,14 @@ public interface OntologyDataManager {
      * @throws MiddlewareQueryException
      */
 	public StandardVariable getStandardVariable(int stdVariableId) throws MiddlewareQueryException; 
+	
+	/**
+	 * @param abbreviation
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	StandardVariable getStandardVariableByAbbr(String abbreviation) throws MiddlewareQueryException;
+	
 	/**
 	 * Adds a StandardVariable to the database.  
 	 * Must provide the property, method, scale, dataType, and storedIn info.
