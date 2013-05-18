@@ -37,6 +37,7 @@ import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.pojos.GidNidElement;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
@@ -1577,6 +1578,14 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public List<Location> getLocationsByCountryAndType(Country country, Integer type) throws MiddlewareQueryException {
         return (List<Location>) super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getByCountryAndType", new Object[] { country,
                 type}, new Class[]{Country.class, Integer.class});
+    }
+    
+    @Override
+    public List<LocationDetails> getLocationDetailsByLocId(Integer locationId, int start, int numOfRows)
+            throws MiddlewareQueryException {
+    	return (List<LocationDetails>) super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getLocationDetails", new Object[] { locationId,
+    		start,numOfRows}, new Class[]{Integer.class,Integer.class,Integer.class});
+    	
     }
 
     @Override

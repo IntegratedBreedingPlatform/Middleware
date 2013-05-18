@@ -12,7 +12,6 @@
 
 package org.generationcp.middleware.dao;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +19,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.LocationDetails;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
@@ -237,5 +237,33 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
             logAndThrowException("Error with countAllBredingLocations() query from Location: "+ e.getMessage(), e);
         }
         return Long.valueOf(0);
+    }
+    
+    public List<LocationDetails> getLocationDetails(Integer locationId,Integer start, Integer numOfRows) throws MiddlewareQueryException {
+    	        try {
+    	            StringBuilder queryString = new StringBuilder();
+    	            queryString.append("select lname as location_name,locid,");
+    	            queryString.append(" c.isofull as country_full_name, labbr as location_abbreviation,"); 
+    	            queryString.append(" ud.fname as location_type,");
+    	            queryString.append(" ud.fdesc as location_description");
+    	            queryString.append(" from location l");
+    	            queryString.append(" inner join cntry c on l.cntryid = c.cntryid");
+    	            queryString.append(" inner join udflds ud on ud.fldno = l.ltype");
+    	            queryString.append(" where locid = :id");
+    	            
+    	            SQLQuery query = getSession().createSQLQuery(queryString.toString());
+    	            query.setParameter("id", locationId);
+    	            query.setFirstResult(start);
+    	            query.setMaxResults(numOfRows);
+    	            query.addEntity(LocationDetails.class);
+    	            	
+    	            List<LocationDetails> list = query.list();
+    	         
+    	            return list;
+
+    	        } catch (HibernateException e) {
+    	            logAndThrowException("Error with getLocationDetails(id=" + locationId + ") : " + e.getMessage(), e);
+    	        }
+    	        return null;
     }
 }

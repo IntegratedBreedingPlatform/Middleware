@@ -30,6 +30,7 @@ import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.pojos.GidNidElement;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -74,6 +75,20 @@ public class TestGermplasmDataManagerImpl{
 
         System.out.println("testGetAllCountry RESULTS: ");
         for (Country c : countryList) {
+            System.out.println("  " + c);
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
+    }
+    
+    @Test
+    public void testLocationDetails() throws Exception {
+        long start = System.currentTimeMillis();
+        List<LocationDetails> locationList = manager.getLocationDetailsByLocId(1, 1, 1);
+        Assert.assertTrue(locationList != null);
+
+        System.out.println("testLocationDetails RESULTS: ");
+        for (LocationDetails c : locationList) {
             System.out.println("  " + c);
         }
         long end = System.currentTimeMillis();

@@ -27,6 +27,7 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 import org.generationcp.middleware.pojos.GidNidElement;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -165,6 +166,23 @@ public interface GermplasmDataManager {
      * @throws MiddlewareQueryException
      */
     public List<Germplasm> getGermplasmByLocationName(String name, int start, int numOfRows, Operation op, Database instance)
+            throws MiddlewareQueryException;
+    
+    /**
+     * Returns the germplasm records that were created at the locations with
+     * names matching the given parameter.
+     * 
+     * @param locationId
+     *            - location id to search details from
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
+     * @return List of Germplasm POJOs
+     * @throws MiddlewareQueryException
+     */
+    public List<LocationDetails> getLocationDetailsByLocId(Integer locationId, int start, int numOfRows)
             throws MiddlewareQueryException;
 
     /**

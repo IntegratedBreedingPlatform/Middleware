@@ -9,10 +9,10 @@
   <property name="hibernate.connection.password"></property>
   <property name="hibernate.default_schema">workbench</property>
   <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
-  <!--   
+ 
   <property name="hibernate.show_sql">true</property>
   <property name="hibernate.format_sql">true</property>
-  -->	
+  
   
   <!-- Specify JDBC Batch Size for Batch Operations -->
   <property name="hibernate.jdbc.batch_size">50</property>
@@ -30,6 +30,7 @@
   <mapping class="org.generationcp.middleware.pojos.Georef"/>
   <mapping class="org.generationcp.middleware.pojos.Germplasm"/>
   <mapping class="org.generationcp.middleware.pojos.Location"/>
+  <mapping class="org.generationcp.middleware.pojos.LocationDetails"/>
   <mapping class="org.generationcp.middleware.pojos.Locdes"/>
   <mapping class="org.generationcp.middleware.pojos.Method"/>
   <mapping class="org.generationcp.middleware.pojos.Name"/>
