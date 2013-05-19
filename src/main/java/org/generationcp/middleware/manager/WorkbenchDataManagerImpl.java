@@ -31,7 +31,7 @@ import org.generationcp.middleware.dao.SecurityQuestionDAO;
 import org.generationcp.middleware.dao.ToolConfigurationDAO;
 import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.dao.UserDAO;
-import org.generationcp.middleware.dao.UserDetailsDAO;
+import org.generationcp.middleware.dao.UserInfoDAO;
 import org.generationcp.middleware.dao.WorkbenchDatasetDAO;
 import org.generationcp.middleware.dao.WorkbenchRuntimeDataDAO;
 import org.generationcp.middleware.dao.WorkbenchSettingDAO;
@@ -41,7 +41,6 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
-import org.generationcp.middleware.pojos.UserDetails;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -57,6 +56,7 @@ import org.generationcp.middleware.pojos.workbench.SecurityQuestion;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
 import org.generationcp.middleware.pojos.workbench.ToolType;
+import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSetting;
@@ -67,7 +67,7 @@ import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
+public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(WorkbenchDataManagerImpl.class);
 
@@ -88,7 +88,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
     private ToolConfigurationDAO toolConfigurationDao;
     private ToolDAO toolDao;
     private UserDAO userDao;
-    private UserDetailsDAO userDetailsDao;
+    private UserInfoDAO userInfoDao;
     private WorkbenchDatasetDAO workbenchDatasetDao;
     private WorkbenchRuntimeDataDAO workbenchRuntimeDataDao;
     private WorkbenchSettingDAO workbenchSettingDao;
@@ -244,12 +244,12 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
         return userDao;
     }
     
-    private UserDetailsDAO getUserDetailsDao() {
-        if (userDetailsDao == null){
-        	userDetailsDao = new UserDetailsDAO();
+    private UserInfoDAO getUserInfoDao() {
+        if (userInfoDao == null){
+        	userInfoDao = new UserInfoDAO();
         }
-        userDetailsDao.setSession(getCurrentSession());
-        return userDetailsDao;
+        userInfoDao.setSession(getCurrentSession());
+        return userInfoDao;
     }
 
     private WorkbenchDatasetDAO getWorkbenchDatasetDao() {
@@ -1383,7 +1383,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
 
         return projectBackup;
     }
-
+    
     @Override
     public void deleteProjectBackup(ProjectBackup projectBackup) throws MiddlewareQueryException {
         Transaction trans = null;
@@ -1399,42 +1399,52 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager{
                     + e.getMessage(), e);
         }
     }
+    
+    @Override
+    public UserInfo getUserInfo(int userId) throws MiddlewareQueryException {
+        try {
+            return getUserInfoDao().getUserInfoByUserId(userId);
+        }
+        catch (Exception e) {
+            logAndThrowException("Cannot increment login count for user_id =" + userId + "): " + e.getMessage(), e);
+        }
+        finally {
+        }
+        
+        return null;
+    }
 
-	@Override
-	public Integer getUserLogInCounter(String userName)
-			throws MiddlewareQueryException {
-		
-		if(!getUserDao().isPasswordSameAsUserName(userName))
-		{
-			return 1;
-		}
-		
-		UserDetails userdetails = getUserDetailsDao().getByUsername(userName);
-		
-		if(userdetails != null)
-			return userdetails.getUlogincnt();
-		else
-			return 0;
-	}
-	public void incrementUserLogInCounter(String userName) throws MiddlewareQueryException {
-		
-		UserDetails userdetails = getUserDetailsDao().getByUsername(userName);
-		if(userdetails != null)
-		{
-			getUserDetailsDao().updateLoginCounter(userdetails);
-		} 
-		
-	}
-	public void addUserDetailsRecord(UserDetails userDetails) throws MiddlewareQueryException 
-	{
-		getUserDetailsDao().addUserDetails(userDetails);
-	}
-	
+    @Override
+    public void incrementUserLogInCount(int userId) throws MiddlewareQueryException {
+        Transaction trans = null;
+        Session session = getCurrentSession();
+        
+        try {
+            trans = session.beginTransaction();
+            
+            UserInfo userdetails = getUserInfoDao().getUserInfoByUserId(userId);
+            if (userdetails != null) {
+                getUserInfoDao().updateLoginCounter(userdetails);
+            }
+            
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Cannot increment login count for user_id =" + userId + "): "
+                + e.getMessage(), e);
+        }
+        finally {
+            session.flush();
+        }
+    }
 
-	@Override
-	public boolean changeUserPassword(String username, String password)
-			throws MiddlewareQueryException {
-		// TODO Auto-generated method stub
-		return getUserDao().changePassword(username, password);
-	}
+    @Override
+    public void insertOrUpdateUserInfo(UserInfo userDetails) throws MiddlewareQueryException {
+        getUserInfoDao().insertOrUpdateUserInfo(userDetails);
+    }
+
+    @Override
+    public boolean changeUserPassword(String username, String password) throws MiddlewareQueryException {
+        return getUserDao().changePassword(username, password);
+    }
 }

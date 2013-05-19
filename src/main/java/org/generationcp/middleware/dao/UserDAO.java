@@ -56,21 +56,21 @@ public class UserDAO extends GenericDAO<User, Integer>{
         }
         return false;
     }
-    public boolean changePassword(String userName, String Password) throws MiddlewareQueryException {
+    
+    public boolean changePassword(String userName, String password) throws MiddlewareQueryException {
         try{
-        	String queryString = "update users set upswd = '"+ Password + "' where uname = '"+ userName + "'";
-	        Session s = getSession();
-	        Query q = s.createSQLQuery(queryString);
-	        int success = q.executeUpdate();
-        
-	        if(success > 0)
-	        	return true;
-	        else
-	        	return false;
+            String queryString = "UPDATES users SET upswd = :password WHERE uname LIKE :username";
+            Session s = getSession();
+            Query q = s.createSQLQuery(queryString);
+            q.setString("username", userName);
+            q.setString("password", password);
+            int success = q.executeUpdate();
+
+            return success > 0;
         }catch(Exception e)
         {
-        	e.printStackTrace();
-        	return false;
+            e.printStackTrace();
+            return false;
         }
     }
     

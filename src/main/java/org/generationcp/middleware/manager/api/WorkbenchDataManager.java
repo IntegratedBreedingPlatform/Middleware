@@ -21,11 +21,11 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
-import org.generationcp.middleware.pojos.UserDetails;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
+import org.generationcp.middleware.pojos.workbench.ProjectBackup;
 import org.generationcp.middleware.pojos.workbench.ProjectLocationMap;
 import org.generationcp.middleware.pojos.workbench.ProjectMethod;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
@@ -36,11 +36,11 @@ import org.generationcp.middleware.pojos.workbench.SecurityQuestion;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
 import org.generationcp.middleware.pojos.workbench.ToolType;
+import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSetting;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
-import org.generationcp.middleware.pojos.workbench.ProjectBackup;
 
 /**
  * This is the API used by the Workbench to retrieve Workbench project
@@ -215,30 +215,29 @@ public interface WorkbenchDataManager {
     public boolean isUsernameExists(String userName) throws MiddlewareQueryException;
     
     /**
-     * Returns number of times user logged into the system.
-     *
-     * @param userName - the user name to check
-     * @return Integer of times the user logged in to the system
+     * Get the user info record for the specified user.
+     * 
+     * @param userId
+     * @return
      * @throws MiddlewareQueryException
      */
-    public Integer getUserLogInCounter(String userName) throws MiddlewareQueryException;
+    public UserInfo getUserInfo(int userId) throws MiddlewareQueryException;
     
     /**
-     * increments the log in counter 
+     * Increments the log in count. 
      *
-     * @param userName - the user name to check
+     * @param userId
      * @throws MiddlewareQueryException
      */
-    public void incrementUserLogInCounter(String userName) throws MiddlewareQueryException;
+    public void incrementUserLogInCount(int userId) throws MiddlewareQueryException;
     
     /**
-     * adds a new details record 
+     * Insert or update the specified {@link UserInfo} record.
      *
-     * @param userName - the user name to check
+     * @param userDetails
      * @throws MiddlewareQueryException
      */
-    public void addUserDetailsRecord(UserDetails userDetails) throws MiddlewareQueryException;
-    
+    public void insertOrUpdateUserInfo(UserInfo userDetails) throws MiddlewareQueryException;
     
     /**
      * Adds the person.
