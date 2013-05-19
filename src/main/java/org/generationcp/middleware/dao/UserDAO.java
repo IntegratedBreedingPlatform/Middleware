@@ -59,7 +59,7 @@ public class UserDAO extends GenericDAO<User, Integer>{
     
     public boolean changePassword(String userName, String password) throws MiddlewareQueryException {
         try{
-            String queryString = "UPDATES users SET upswd = :password WHERE uname LIKE :username";
+            String queryString = "UPDATE users SET upswd = :password WHERE uname LIKE :username";
             Session s = getSession();
             Query q = s.createSQLQuery(queryString);
             q.setString("username", userName);
