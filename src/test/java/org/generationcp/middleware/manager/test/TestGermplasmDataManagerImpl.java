@@ -14,6 +14,7 @@ package org.generationcp.middleware.manager.test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
@@ -996,6 +997,22 @@ public class TestGermplasmDataManagerImpl{
     	String prefix = "C97-MNT-0";
     	System.out.println("Next number in sequence for prefix (" + prefix + "): " + 
     			manager.getNextSequenceNumberForCrossName(prefix));
+    }
+   
+    @Test
+    public void testGetPreferredIdsByGIDs() throws MiddlewareQueryException{
+        List<Integer> gids = new ArrayList<Integer>();
+        gids.add(Integer.valueOf(50533));
+        gids.add(Integer.valueOf(50532));
+        gids.add(Integer.valueOf(50531));
+        gids.add(Integer.valueOf(404865));
+        gids.add(Integer.valueOf(274017));
+        
+        Map<Integer, String> results = manager.getPrefferedIdsByGIDs(gids);
+        System.out.println("RESULTS:");
+        for(Integer gid : results.keySet()){
+            System.out.println(gid + " : " + results.get(gid));
+        }
     }
     
     @AfterClass

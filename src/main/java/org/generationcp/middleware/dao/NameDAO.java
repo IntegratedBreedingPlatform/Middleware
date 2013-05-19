@@ -13,7 +13,9 @@
 package org.generationcp.middleware.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmNameType;
@@ -196,4 +198,28 @@ public class NameDAO extends GenericDAO<Name, Integer>{
         return toReturn;
     }
 
+    @SuppressWarnings("unchecked")
+    public Map<Integer, String> getPrefferedIdsByGIDs(List<Integer> gids) throws MiddlewareQueryException {
+        Map<Integer, String> toreturn = new HashMap<Integer, String>();
+        for(Integer gid : gids){
+            toreturn.put(gid, null);
+        }
+        
+        try{
+            SQLQuery query = getSession().createSQLQuery(Name.GET_PREFFERED_IDS_BY_GIDS);
+            query.setParameterList("gids", gids);
+            
+            List<Object> results = query.list();
+            for(Object result : results){
+                Object resultArray[] = (Object[]) result;
+                Integer gid = (Integer) resultArray[0];
+                String preferredId = (String) resultArray[1];
+                toreturn.put(gid, preferredId);
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getPrefferedIdsByGIDs(gids=" + gids + ") query from Name " + e.getMessage(), e);
+        }
+        
+        return toreturn;
+    }
 }

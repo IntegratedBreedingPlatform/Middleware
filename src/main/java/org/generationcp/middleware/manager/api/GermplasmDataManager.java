@@ -1372,5 +1372,13 @@ public interface GermplasmDataManager {
      */
     public String getNextSequenceNumberForCrossName(String prefix) throws MiddlewareQueryException;
 
+    /**
+     * Returns a Map of GIDs to preferred ids given a list of GIDs.
+     * 
+     * @param gids
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    public Map<Integer, String> getPrefferedIdsByGIDs(List<Integer> gids) throws MiddlewareQueryException;
 
 }

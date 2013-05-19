@@ -1877,6 +1877,46 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		
 		return (centralNextSequenceInt > localNextSequenceInt) ? 
 				centralNextSequenceStr : localNextSequenceStr;
-	}       
+	}
+
+    @Override
+    public Map<Integer, String> getPrefferedIdsByGIDs(List<Integer> gids) throws MiddlewareQueryException {
+        Map<Integer, String> toreturn = new HashMap<Integer, String>();
+        
+        List<Integer> positiveGIDs = new ArrayList<Integer>();
+        List<Integer> negativeGIDs = new ArrayList<Integer>();
+        
+        for(Integer gid : gids){
+            if(gid > 0){
+                positiveGIDs.add(gid);
+            } else {
+                negativeGIDs.add(gid);
+            }
+        }
+        
+        if(!positiveGIDs.isEmpty()){
+            NameDAO dao = getNameDao();
+            requireCentralDatabaseInstance();
+            dao.setSession(getCurrentSessionForCentral());
+            Map<Integer, String> resultsFromCentral = dao.getPrefferedIdsByGIDs(positiveGIDs);
+            
+            for(Integer gid : resultsFromCentral.keySet()){
+                toreturn.put(gid, resultsFromCentral.get(gid));
+            }
+        }
+        
+        if(!negativeGIDs.isEmpty()){
+            NameDAO dao = getNameDao();
+            requireLocalDatabaseInstance();
+            dao.setSession(getCurrentSessionForLocal());
+            Map<Integer, String> resultsFromLocal = dao.getPrefferedIdsByGIDs(negativeGIDs);
+            
+            for(Integer gid : resultsFromLocal.keySet()){
+                toreturn.put(gid, resultsFromLocal.get(gid));
+            }
+        }
+        
+        return toreturn;
+    }       
     
 }
