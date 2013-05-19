@@ -1,0 +1,18 @@
+#IBPMiddleware hibernate configuration 
+local.host = localhost
+local.port = 3306
+local.dbname = ibdb_ichis
+local.username = root
+local.password = password
+
+central.host = localhost
+central.port = 3306
+central.dbname = ibdb_ichis
+central.username = root
+central.password = password
+
+workbench.host = localhost
+workbench.port = 3306
+workbench.dbname = workbench
+workbench.username = root
+workbench.password = password
