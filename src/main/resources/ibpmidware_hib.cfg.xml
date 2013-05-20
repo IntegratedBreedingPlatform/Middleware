@@ -31,7 +31,6 @@
   <mapping class="org.generationcp.middleware.pojos.Progenitor"/>
   <mapping class="org.generationcp.middleware.pojos.ProgenitorPK"/>
   <mapping class="org.generationcp.middleware.pojos.User"/>
-  <mapping class="org.generationcp.middleware.pojos.UserDetails"/>
   <mapping class="org.generationcp.middleware.pojos.UserDefinedField"/>
   <mapping class="org.generationcp.middleware.pojos.GermplasmList"/>
   <mapping class="org.generationcp.middleware.pojos.GermplasmListData"/>
@@ -71,6 +70,7 @@
   <mapping class="org.generationcp.middleware.pojos.workbench.ToolConfiguration"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.ProjectBackup"/>
+  <mapping class="org.generationcp.middleware.pojos.workbench.UserInfo"/>
 
   <!-- Mapping classes for new DMS schema --> 
   <mapping class="org.generationcp.middleware.v2.pojos.Geolocation"/>
