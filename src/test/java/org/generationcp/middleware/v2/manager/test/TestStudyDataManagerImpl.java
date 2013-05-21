@@ -460,8 +460,8 @@ public class TestStudyDataManagerImpl {
 	
 	@Test
 	public void testGetFactorsByFactorType() throws Exception {
-		FactorType factorType = FactorType.GERMPLASM;
-		int datasetId = 10015;
+		FactorType factorType = FactorType.DATASET;
+		int datasetId = 10087;
 		System.out.println("testGetFactorsByFactorType (dataset=" + datasetId + ", factorType=" + factorType + ")");
 		DataSet dataset = manager.getDataSet(datasetId);
 		VariableTypeList factors = dataset.getFactorsByFactorType(factorType);

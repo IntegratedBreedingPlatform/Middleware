@@ -6,7 +6,7 @@ import java.util.List;
 public enum FactorType {
 
 	STUDY (Arrays.asList(TermId.STUDY_NAME_STORAGE.getId(), TermId.STUDY_TITLE_STORAGE.getId(), TermId.STUDY_INFO_STORAGE.getId()))
-	, DATAEST (Arrays.asList(TermId.DATASET_NAME_STORAGE.getId(), TermId.DATASET_TITLE_STORAGE.getId(), TermId.DATASET_INFO_STORAGE.getId()))
+	, DATASET (Arrays.asList(TermId.DATASET_NAME_STORAGE.getId(), TermId.DATASET_TITLE_STORAGE.getId(), TermId.DATASET_INFO_STORAGE.getId()))
 	, TRIAL_ENVIRONMENT (Arrays.asList(TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId(), TermId.TRIAL_INSTANCE_STORAGE.getId(), 
 			TermId.LATITUDE_STORAGE.getId(), TermId.LONGITUDE_STORAGE.getId(), TermId.DATUM_STORAGE.getId(),
 			TermId.ALTITUDE_STORAGE.getId()))
