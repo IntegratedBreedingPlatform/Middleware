@@ -272,11 +272,11 @@ public class TestStudyDataManagerImpl {
 		
 		VariableList variableList = new VariableList();
 
-		Variable variable = createVariable(TermId.STUDY_NAME.getId(), "Study Name " + new Random().nextInt(10000), TermId.STUDY_NAME_STORAGE, 1);
+		Variable variable = createVariable(TermId.STUDY_NAME.getId(), "Study Name " + new Random().nextInt(10000), 1);
 		typeList.add(variable.getVariableType());
 		variableList.add(variable);
 		
-		variable = createVariable(TermId.STUDY_TITLE.getId(), "Study Description", TermId.STUDY_TITLE_STORAGE, 2);
+		variable = createVariable(TermId.STUDY_TITLE.getId(), "Study Description", 2);
 		typeList.add(variable.getVariableType());
 		variableList.add(variable);
 
@@ -341,17 +341,17 @@ public class TestStudyDataManagerImpl {
 		Variable variable;
 		
 		//please make sure that the study name is unique and does not exist in the db.
-		variable = createVariable(TermId.DATASET_NAME.getId(), "My Dataset Name " + new Random().nextInt(10000), TermId.DATASET_NAME_STORAGE, 1);
+		variable = createVariable(TermId.DATASET_NAME.getId(), "My Dataset Name " + new Random().nextInt(10000), 1);
 		typeList.add(variable.getVariableType());
 		updateVariableType(variable.getVariableType(), "DATASET_NAME", "Dataset name (local)");
 		variableList.add(variable);
 		
-		variable = createVariable(TermId.DATASET_TITLE.getId(), "My Dataset Description", TermId.DATASET_TITLE_STORAGE, 2);
+		variable = createVariable(TermId.DATASET_TITLE.getId(), "My Dataset Description", 2);
 		typeList.add(variable.getVariableType());
 		updateVariableType(variable.getVariableType(), "DATASET_TITLE", "Dataset title (local)");
 		variableList.add(variable);
 		
-		variable = createVariable(TermId.DATASET_TYPE.getId(), "10070", TermId.DATASET_INFO_STORAGE, 3);
+		variable = createVariable(TermId.DATASET_TYPE.getId(), "10070", 3);
 		typeList.add(variable.getVariableType());
 		updateVariableType(variable.getVariableType(), "DATASET_TYPE", "Dataset type (local)");
 		variableList.add(variable);
@@ -376,17 +376,17 @@ public class TestStudyDataManagerImpl {
 		Variable variable;
 		
 		//please make sure that the study name is unique and does not exist in the db.
-		variable = createVariable(TermId.DATASET_NAME.getId(), "My Dataset Name " + new Random().nextInt(10000), TermId.DATASET_NAME_STORAGE, 1);
+		variable = createVariable(TermId.DATASET_NAME.getId(), "My Dataset Name " + new Random().nextInt(10000), 1);
 		typeList.add(variable.getVariableType());
 		updateVariableType(variable.getVariableType(), "DATASET_NAME", "Dataset name (local)");
 		variableList.add(variable);
 		
-		variable = createVariable(TermId.DATASET_TITLE.getId(), "My Dataset Description", TermId.DATASET_TITLE_STORAGE, 2);
+		variable = createVariable(TermId.DATASET_TITLE.getId(), "My Dataset Description", 2);
 		typeList.add(variable.getVariableType());
 		updateVariableType(variable.getVariableType(), "DATASET_TITLE", "Dataset title (local)");
 		variableList.add(variable);
 		
-		variable = createVariable(TermId.DATASET_TYPE.getId(), "10070", TermId.DATASET_INFO_STORAGE, 3);
+		variable = createVariable(TermId.DATASET_TYPE.getId(), "10070", 3);
 		typeList.add(variable.getVariableType());
 		updateVariableType(variable.getVariableType(), "DATASET_TYPE", "Dataset type (local)");
 		variableList.add(variable);
@@ -430,6 +430,31 @@ public class TestStudyDataManagerImpl {
 		manager.addExperiment(dataSetId, experimentValues);
 	}
 	
+	@Test
+	public void testSetExperimentValue() throws Exception {
+		System.out.println("Test SetExperimentValue");
+		StudyReference studyRef = this.addTestStudy();
+		DatasetReference datasetRef = this.addTestDataset(studyRef.getId());
+		addTestExperiments(datasetRef.getId(), 4);
+		List<Experiment> experiments = manager.getExperiments(datasetRef.getId(), 0, 2);
+		
+		printExperiments("Original", datasetRef.getId());
+		for (Experiment experiment: experiments) {
+			manager.setExperimentValue(experiment.getId(), 18000, "666");
+			manager.setExperimentValue(experiment.getId(), 18050, "19010");
+			manager.setExperimentValue(experiment.getId(), 8200, "4");
+		}
+		printExperiments("Modified", datasetRef.getId());
+	}
+	
+	private void printExperiments(String title, int datasetId) throws Exception {
+		System.out.println(title);
+		List<Experiment> experiments = manager.getExperiments(datasetId, 0, 4);
+		for (Experiment experiment: experiments) {
+			experiment.print(3);
+		}
+	}
+
 	@Test
 	public void testAddTrialEnvironment() throws Exception {
 		VariableList variableList = createTrialEnvironment("loc desc", "1.1", "2.2", "datum", "3.3", "prop1", "prop2");
@@ -511,10 +536,9 @@ public class TestStudyDataManagerImpl {
 	}
 	
 	
-	private Variable createVariable(int termId, String value, TermId storedInTerm, int rank) {
-		StandardVariable stVar = new StandardVariable();
-		stVar.setId(termId);
-		stVar.setStoredIn(new Term(storedInTerm.getId(), "", ""));
+	private Variable createVariable(int termId, String value, int rank) throws Exception {
+		StandardVariable stVar = ontologyManager.getStandardVariable(termId);
+		
 		VariableType vtype = new VariableType();
 		vtype.setStandardVariable(stVar);
 		vtype.setRank(rank);
@@ -524,33 +548,131 @@ public class TestStudyDataManagerImpl {
 		return var;
 	}
 	
+	private VariableType createVariableType(int termId, String name, String description, int rank) throws Exception {
+		StandardVariable stdVar = ontologyManager.getStandardVariable(termId);
+		
+		VariableType vtype = new VariableType();
+		vtype.setLocalName(name);
+		vtype.setLocalDescription(description);
+		vtype.setRank(rank);
+		vtype.setStandardVariable(stdVar);
+		
+		return vtype;
+	}
+	
 	private void updateVariableType(VariableType type, String name, String description) {
 		type.setLocalName(name);
 		type.setLocalDescription(description);
 	}
 
-	private VariableList createTrialEnvironment(String name, String latitude, String longitude, String data, String altitude, String property1, String property2){
+	private VariableList createTrialEnvironment(String name, String latitude, String longitude, String data, String altitude, String property1, String property2) throws Exception{
 		VariableList variableList = new VariableList();
-		variableList.add(createVariable(1, name, TermId.TRIAL_INSTANCE_STORAGE, 1));
-		variableList.add(createVariable(2, latitude, TermId.LATITUDE_STORAGE, 2));
-		variableList.add(createVariable(3, longitude, TermId.LONGITUDE_STORAGE, 3));
-		variableList.add(createVariable(4, data, TermId.DATUM_STORAGE, 4));
-		variableList.add(createVariable(5, altitude, TermId.ALTITUDE_STORAGE, 5));
-		variableList.add(createVariable(6, property1, TermId.TRIAL_ENVIRONMENT_INFO_STORAGE, 6));
-		variableList.add(createVariable(7, property2, TermId.TRIAL_ENVIRONMENT_INFO_STORAGE, 7));
+		variableList.add(createVariable(8170, name, 0));
+		variableList.add(createVariable(8191, latitude, 0));
+		variableList.add(createVariable(8192, longitude, 0));
+		variableList.add(createVariable(8193, data, 0));
+		variableList.add(createVariable(8194, altitude, 0));
+		variableList.add(createVariable(8135, property1, 0));
+		variableList.add(createVariable(8180, property2, 0));
 		return variableList;
 	}
 	
-	private VariableList createGermplasm(String name, String gid, String designation, String code, String property1, String property2){
+	private VariableList createGermplasm(String name, String gid, String designation, String code, String property1, String property2) throws Exception{
 		VariableList variableList = new VariableList();
-		variableList.add(createVariable(1, name, TermId.ENTRY_NUMBER_STORAGE, 1));
-		variableList.add(createVariable(2, gid, TermId.ENTRY_GID_STORAGE, 2));
-		variableList.add(createVariable(3, designation, TermId.ENTRY_DESIGNATION_STORAGE, 3));
-		variableList.add(createVariable(4, code, TermId.ENTRY_CODE_STORAGE, 4));
-		variableList.add(createVariable(6, property1, TermId.GERMPLASM_ENTRY_STORAGE, 5));
-		variableList.add(createVariable(7, property2, TermId.GERMPLASM_ENTRY_STORAGE, 6));
+		variableList.add(createVariable(8230, name, 1));
+		variableList.add(createVariable(8240, gid, 2));
+		variableList.add(createVariable(8250, designation, 3));
+		variableList.add(createVariable(8300, code, 4));
+		variableList.add(createVariable(8255, property1, 5));
+		variableList.add(createVariable(8377, property2, 6));
 		return variableList;
+	}
+	
+	private StudyReference addTestStudy() throws Exception {
+        int parentStudyId = 1;
+		
+		VariableTypeList typeList = new VariableTypeList();
+		
+		VariableList variableList = new VariableList();
 
+		Variable variable = createVariable(TermId.STUDY_NAME.getId(), "Study Name " + new Random().nextInt(10000), 1);
+		typeList.add(variable.getVariableType());
+		variableList.add(variable);
+		
+		variable = createVariable(TermId.STUDY_TITLE.getId(), "Study Description", 2);
+		typeList.add(variable.getVariableType());
+		variableList.add(variable);
+
+		StudyValues studyValues = new StudyValues();
+		studyValues.setVariableList(variableList);
+		
+		VariableList locationVariableList = createTrialEnvironment("Description", "1.0", "2.0", "data", "3.0", "prop1", "prop2");
+		studyValues.setLocationId(manager.addTrialEnvironment(locationVariableList));
+		
+		VariableList germplasmVariableList = createGermplasm("unique name", "1000", "name", "2000", "prop1", "prop2");
+		studyValues.setGermplasmId(manager.addStock(germplasmVariableList));
+
+		return manager.addStudy(parentStudyId, typeList, studyValues);
 	}
 
+	private DatasetReference addTestDataset(int studyId) throws Exception {
+		//Parent study, assign a parent study id value, if none exists in db, 
+		
+		VariableTypeList typeList = new VariableTypeList();
+		VariableList variableList = new VariableList();
+		Variable variable;
+		
+		//please make sure that the study name is unique and does not exist in the db.
+		variable = createVariable(TermId.DATASET_NAME.getId(), "My Dataset Name " + new Random().nextInt(10000), 1);
+		typeList.add(variable.getVariableType());
+		updateVariableType(variable.getVariableType(), "DATASET_NAME", "Dataset name (local)");
+		variableList.add(variable);
+		
+		variable = createVariable(TermId.DATASET_TITLE.getId(), "My Dataset Description", 2);
+		typeList.add(variable.getVariableType());
+		updateVariableType(variable.getVariableType(), "DATASET_TITLE", "Dataset title (local)");
+		variableList.add(variable);
+		
+		variable = createVariable(TermId.DATASET_TYPE.getId(), "10070", 3);
+		typeList.add(variable.getVariableType());
+		updateVariableType(variable.getVariableType(), "DATASET_TYPE", "Dataset type (local)");
+		variableList.add(variable);
+		
+		VariableType variableType = createVariableType(18000, "Grain Yield", "whatever", 4);
+		typeList.add(variableType);
+		
+		variableType = createVariableType(18050, "Disease Pressure", "whatever", 5);
+		typeList.add(variableType);
+		
+		variableType = createVariableType(8200, "Plot No", "whatever", 6);
+		typeList.add(variableType);
+		
+		DatasetValues datasetValues = new DatasetValues();
+		datasetValues.setVariableList(variableList);
+
+		return manager.addDataSet(studyId, typeList, datasetValues);
+	}
+	
+	public void addTestExperiments(int datasetId, int numExperiments) throws Exception {
+		DataSet dataSet = manager.getDataSet(datasetId);
+		for (int i = 0; i < numExperiments; i++) {
+			ExperimentValues experimentValues = new ExperimentValues();
+			VariableList varList = new VariableList();
+			varList.add(createVariable(dataSet, 18000, "99"));
+			varList.add(createVariable(dataSet, 18050, "19000"));
+			varList.add(createVariable(dataSet, 8200, "3"));
+			
+			experimentValues.setVariableList(varList);
+			experimentValues.setGermplasmId(-1);
+			experimentValues.setLocationId(-1);
+			manager.addExperiment(datasetId, experimentValues);
+		}
+	}
+
+	private Variable createVariable(DataSet dataSet, int stdVarId, String value) {
+		Variable variable = new Variable();
+		variable.setValue(value);
+		variable.setVariableType(dataSet.getVariableTypes().findById(stdVarId));
+		return variable;
+	}
 }

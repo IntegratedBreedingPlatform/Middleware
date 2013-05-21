@@ -38,6 +38,7 @@ public class GeolocationSaver extends Saver {
 			int propertyIndex = getGeolocationPropertyDao().getNegativeId("geolocationPropertyId");
 			
 			for (Variable variable : factors.getVariables()) {
+
 				Integer storedInId = variable.getVariableType().getStandardVariable().getStoredIn().getId();
 				String value = variable.getValue();
 				

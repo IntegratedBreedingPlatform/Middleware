@@ -168,6 +168,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	
 	@Override
 	public List<Experiment> getExperiments(int dataSetId, int start, int numRows) throws MiddlewareQueryException {
+		clearSessions();
 		VariableTypeList variableTypes = getDataSetBuilder().getVariableTypes(dataSetId);
 		return getExperimentBuilder().build(dataSetId, PlotUtil.getAllPlotTypes(), start, numRows, variableTypes);
 	}
@@ -263,6 +264,23 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         try {
             trans = session.beginTransaction();
             this.getDatasetProjectSaver().addDatasetVariableType(datasetId, variableType);
+			trans.commit();
+
+        } catch (Exception e) {
+	    	rollbackTransaction(trans);
+	        throw new MiddlewareQueryException("error in addDataSetVariableType " + e.getMessage(), e);
+	    }
+	}
+
+	@Override
+	public void setExperimentValue(int experimentId, int variableId, String value) throws MiddlewareQueryException {
+		requireLocalDatabaseInstance();
+		Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+ 
+        try {
+            trans = session.beginTransaction();
+            this.getExperimentModelSaver().setExperimentValue(experimentId, variableId, value);
 			trans.commit();
 
         } catch (Exception e) {

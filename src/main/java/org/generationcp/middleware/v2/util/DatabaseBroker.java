@@ -496,4 +496,14 @@ public class DatabaseBroker {
     	cvTermSynonymDao.setSession(getActiveSession());
     	return cvTermSynonymDao;
     }
+    
+    protected final void clearSessions() {
+    	if (sessionForLocal != null) {
+    		this.sessionForLocal.clear();
+    	}
+    	
+    	if (sessionForCentral != null) {
+    		this.sessionForCentral.clear();
+    	}
+    }
 }

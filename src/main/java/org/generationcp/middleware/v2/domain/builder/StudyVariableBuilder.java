@@ -23,7 +23,6 @@ public class StudyVariableBuilder extends Builder {
 		VariableList variables = new VariableList();
 		
 		for (VariableType variableType : variableTypes.getVariableTypes()) {
-			System.out.println("DON: " + variableType.getId());
 			variables.add(createVariable(variableType, project, experiment));
 		}
 		
@@ -33,7 +32,7 @@ public class StudyVariableBuilder extends Builder {
 	private Variable createVariable(VariableType variableType, DmsProject project, Experiment experiment) {
 		Variable variable = new Variable();
 		variable.setVariableType(variableType);
-		System.out.println("Stored in: " + variableType.getStandardVariable().getStoredIn());
+
 		if (storedIn(variableType, TermId.STUDY_NAME_STORAGE)) {
 			variable.setValue(project.getName());
 		}

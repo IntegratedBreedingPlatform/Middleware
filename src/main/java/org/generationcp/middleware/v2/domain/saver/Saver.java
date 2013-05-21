@@ -13,6 +13,7 @@
 package org.generationcp.middleware.v2.domain.saver;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.v2.domain.builder.StandardVariableBuilder;
 import org.generationcp.middleware.v2.util.DatabaseBroker;
 
 /**
@@ -59,5 +60,9 @@ public abstract class Saver extends DatabaseBroker{
     
     protected final ExperimentModelSaver getExperimentModelSaver() {
     	return new ExperimentModelSaver(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    protected final StandardVariableBuilder getStandardVariableBuilder() {
+    	return new StandardVariableBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
 }

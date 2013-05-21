@@ -876,5 +876,4 @@ public abstract class DataManager extends DatabaseBroker{
     protected final CvTermSaver getTermSaver() {
     	return new CvTermSaver(sessionProviderForLocal, sessionProviderForCentral);
     }
-
 }

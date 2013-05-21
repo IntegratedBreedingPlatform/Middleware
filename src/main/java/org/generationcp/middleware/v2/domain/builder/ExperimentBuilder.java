@@ -75,7 +75,7 @@ public class ExperimentBuilder extends Builder {
 		return experiment;
 	}
 
-	private VariableList getVariates(ExperimentModel experimentModel, VariableTypeList variableTypes) {
+	private VariableList getVariates(ExperimentModel experimentModel, VariableTypeList variableTypes) throws MiddlewareQueryException {
 		VariableList variates = new VariableList();
 		
 		addPlotVariates(experimentModel, variates, variableTypes);
@@ -83,14 +83,22 @@ public class ExperimentBuilder extends Builder {
 		return variates.sort();
 	}
 
-	private void addPlotVariates(ExperimentModel experimentModel, VariableList variates, VariableTypeList variableTypes) {
+	private void addPlotVariates(ExperimentModel experimentModel, VariableList variates, VariableTypeList variableTypes) throws MiddlewareQueryException {
 		addVariates(experimentModel, variates, variableTypes);
 	}
 
-	private void addVariates(ExperimentModel experiment, VariableList variates, VariableTypeList variableTypes) {
-		for (Phenotype phenotype : experiment.getPhenotypes()) {
-			VariableType variableType = variableTypes.findById(phenotype.getObservableId());
-			variates.add(new Variable(variableType, phenotype.getValue()));
+	private void addVariates(ExperimentModel experiment, VariableList variates, VariableTypeList variableTypes) throws MiddlewareQueryException {
+		this.getExperimentDao().refresh(experiment);
+		if (experiment.getPhenotypes() != null) {
+			for (Phenotype phenotype : experiment.getPhenotypes()) {
+				VariableType variableType = variableTypes.findById(phenotype.getObservableId());
+				if (variableType.getStandardVariable().getStoredIn().getId() == TermId.OBSERVATION_VARIATE.getId()) {
+					variates.add(new Variable(variableType, phenotype.getValue()));
+				}
+				else {
+					variates.add(new Variable(variableType, phenotype.getcValueId()));
+				}
+			}
 		}
 	}
 
@@ -238,13 +246,13 @@ public class ExperimentBuilder extends Builder {
 		return null;
 	}
 
-	private void addExperimentFactors(VariableList variables, ExperimentModel experimentModel, VariableTypeList variableTypes) {
+	private void addExperimentFactors(VariableList variables, ExperimentModel experimentModel, VariableTypeList variableTypes) throws MiddlewareQueryException {
 		for (ExperimentProperty property : experimentModel.getProperties()) {
 			variables.add(createVariable(property, variableTypes));
 		}
 	}
 	
-	private Variable createVariable(ExperimentProperty property, VariableTypeList variableTypes) {
+	private Variable createVariable(ExperimentProperty property, VariableTypeList variableTypes) throws MiddlewareQueryException {
 		Variable variable = new Variable();
 		variable.setVariableType(variableTypes.findById(property.getTypeId()));
 		variable.setValue(property.getValue());
