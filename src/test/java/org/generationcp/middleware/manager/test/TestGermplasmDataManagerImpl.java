@@ -553,9 +553,14 @@ public class TestGermplasmDataManagerImpl{
 
     @Test
     public void testGetNameByGIDAndNval() throws Exception {
-        Integer gid = Integer.valueOf(1);
-        String nVal = "GCP-TEST";
-        System.out.println("testGetNameByGIDAndNval(" + gid + ", " + nVal + ") RESULTS: " + manager.getNameByGIDAndNval(gid, nVal));
+        Integer gid = Integer.valueOf(225266);
+        String nVal = "C 65-44";
+        System.out.println("testGetNameByGIDAndNval(" + gid + ", " + nVal + ", GetGermplasmByNameModes.NORMAL) RESULTS: " 
+        				+ manager.getNameByGIDAndNval(gid, nVal, GetGermplasmByNameModes.NORMAL));
+        System.out.println("testGetNameByGIDAndNval(" + gid + ", " + nVal + ", GetGermplasmByNameModes.SPACES_REMOVED) RESULTS: " 
+        				+ manager.getNameByGIDAndNval(gid, nVal, GetGermplasmByNameModes.SPACES_REMOVED));
+        System.out.println("testGetNameByGIDAndNval(" + gid + ", " + nVal + ", GetGermplasmByNameModes.STANDARDIZED) RESULTS: " 
+        				+ manager.getNameByGIDAndNval(gid, nVal, GetGermplasmByNameModes.STANDARDIZED));
     }
 
     @Test

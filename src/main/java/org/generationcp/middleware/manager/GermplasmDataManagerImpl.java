@@ -436,9 +436,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     @Override
-    public Name getNameByGIDAndNval(Integer gid, String nval) throws MiddlewareQueryException {
+    public Name getNameByGIDAndNval(Integer gid, String nval, GetGermplasmByNameModes mode) throws MiddlewareQueryException {
         if (setWorkingDatabase(gid)) {
-            return getNameDao().getByGIDAndNval(gid, nval);
+            return getNameDao().getByGIDAndNval(gid, GermplasmDataManagerUtil.getNameToUseByMode(nval, mode));
         }
         return null;
     }
@@ -466,7 +466,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             NameDAO dao = getNameDao();
 
             // check for a name record with germplasm = gid, and nval = newPrefName
-            Name newPref = getNameByGIDAndNval(gid, newPrefValue);
+            Name newPref = getNameByGIDAndNval(gid, newPrefValue, GetGermplasmByNameModes.NORMAL);
             // if a name record with the specified nval exists,
             if (newPref != null) {
                 // get germplasm's existing preferred name/abbreviation, set as

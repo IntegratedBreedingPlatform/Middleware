@@ -586,13 +586,15 @@ public interface GermplasmDataManager {
      * @param gid
      *            - id of the Germplasm
      * @param nval
-     *            - value of the Name to search
+     *            - value of the Name to search            
+     * @param mode
+     *            - can be normal, spaces removed, name standardized
      * @return {@code Name} POJO of the matching {@code Name} object. Returns
      *         {@code null} when no {@code Name} with the specified gid and nval
      *         is found.
      * @throws MiddlewareQueryException
      */
-    public Name getNameByGIDAndNval(Integer gid, String nval) throws MiddlewareQueryException;
+    public Name getNameByGIDAndNval(Integer gid, String nval, GetGermplasmByNameModes mode) throws MiddlewareQueryException;
 
     /**
      * Sets the specified Name as the specified Germplasm's new preferred Name.
