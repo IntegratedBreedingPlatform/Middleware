@@ -28,7 +28,7 @@ public class QtlDetailElement implements Serializable{
     private String chromosome;
     private Float minPosition;
     private Float maxPosition;
-    private String trait;
+    private Integer traitId;
     private String experiment;
     private String leftFlankingMarker;
     private String rightFlankingMarker;
@@ -43,7 +43,7 @@ public class QtlDetailElement implements Serializable{
     }
 
 
-    public QtlDetailElement(String qtlName, String mapName, String chromosome, float minPosition, Float maxPosition, String trait,
+    public QtlDetailElement(String qtlName, String mapName, String chromosome, float minPosition, Float maxPosition, Integer traitId,
             String experiment, String leftFlankingMarker, String rightFlankingMarker, Integer effect, Float scoreValue, Float rSquare,
             String interactions, String tRName, String ontology) {
         super();
@@ -52,7 +52,7 @@ public class QtlDetailElement implements Serializable{
         this.chromosome = chromosome;
         this.minPosition = minPosition;
         this.maxPosition = maxPosition;
-        this.trait = trait;
+        this.traitId = traitId;
         this.experiment = experiment;
         this.leftFlankingMarker = leftFlankingMarker;
         this.rightFlankingMarker = rightFlankingMarker;
@@ -104,12 +104,12 @@ public class QtlDetailElement implements Serializable{
         this.maxPosition = maxPosition;
     }
     
-    public String getTrait() {
-        return trait;
+    public Integer getTraitId() {
+        return traitId;
     }
     
-    public void setTrait(String trait) {
-        this.trait = trait;
+    public void setTraitId(Integer traitId) {
+        this.traitId = traitId;
     }
     
     public String getExperiment() {
@@ -265,10 +265,10 @@ public class QtlDetailElement implements Serializable{
                 return false;
         } else if (!tRName.equals(other.tRName))
             return false;
-        if (trait == null) {
-            if (other.trait != null)
+        if (traitId == null) {
+            if (other.traitId != null)
                 return false;
-        } else if (!trait.equals(other.trait))
+        } else if (!traitId.equals(other.traitId))
             return false;
         return true;
     }
@@ -291,7 +291,7 @@ public class QtlDetailElement implements Serializable{
         result = prime * result + ((rightFlankingMarker == null) ? 0 : rightFlankingMarker.hashCode());
         result = prime * result + ((scoreValue == null) ? 0 : scoreValue.hashCode());
         result = prime * result + ((tRName == null) ? 0 : tRName.hashCode());
-        result = prime * result + ((trait == null) ? 0 : trait.hashCode());
+        result = prime * result + ((traitId == null) ? 0 : traitId.hashCode());
         return result;
     }
 
@@ -310,8 +310,8 @@ public class QtlDetailElement implements Serializable{
         builder.append(minPosition);
         builder.append(", maxPosition=");
         builder.append(maxPosition);
-        builder.append(", trait=");
-        builder.append(trait);
+        builder.append(", traitId=");
+        builder.append(traitId);
         builder.append(", experiment=");
         builder.append(experiment);
         builder.append(", leftFlankingMarker=");

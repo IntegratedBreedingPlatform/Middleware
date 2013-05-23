@@ -320,7 +320,8 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
                 Integer gid = (Integer) result[0];
                 String data = (String) result[1];
                 String markerName = (String) result[2];
-                AllelicValueElement allelicValueElement = new AllelicValueElement(gid, data, markerName);
+                Integer peakHeight = (Integer) result[3];
+                AllelicValueElement allelicValueElement = new AllelicValueElement(gid, data, markerName, peakHeight);
                 values.add(allelicValueElement);
             }
         }
@@ -625,7 +626,6 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
         return 0L;
     }
     
-    @SuppressWarnings("rawtypes")
     public Set<Integer> getMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapID, String linkageGroup, double startPos, double endPos, int start, int numOfRows) throws MiddlewareQueryException{
         try {
             
@@ -649,7 +649,6 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
         return new TreeSet<Integer>();
     }
     
-    @SuppressWarnings("rawtypes")
     public long countMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapID, String linkageGroup, double startPos, double endPos) throws MiddlewareQueryException{
         try {
             

@@ -44,6 +44,8 @@ public class AllelicValueElement implements Serializable{
     private Integer datasetId;
     
     private String alleleBinValue;
+    
+    private Integer peakHeight;
 
     /**
      * Instantiates a AllelicValueElement object with datasetId, gid, markerName and data(char_value for table char_values, 
@@ -53,12 +55,14 @@ public class AllelicValueElement implements Serializable{
      * @param gid
      * @param markerName
      * @param data
+     * @param peakHeight
      */
-    public AllelicValueElement(Integer datasetId, Integer gid, String markerName, String data) {
+    public AllelicValueElement(Integer datasetId, Integer gid, String markerName, String data, Integer peakHeight) {
         this.datasetId = datasetId;
         this.gid = gid;
         this.data = data;
         this.markerName = markerName;
+        this.peakHeight = peakHeight;
     }
 
     /**
@@ -69,10 +73,11 @@ public class AllelicValueElement implements Serializable{
      * @param data
      * @param markerName
      */
-    public AllelicValueElement(Integer gid, String data, String markerName) {
+    public AllelicValueElement(Integer gid, String data, String markerName, Integer peakHeight) {
         this.gid = gid;
         this.data = data;
         this.markerName = markerName;
+        this.peakHeight = peakHeight;
     }
     
     /**
@@ -153,23 +158,33 @@ public class AllelicValueElement implements Serializable{
     public void setAlleleBinValue(String alleleBinValue) {
         this.alleleBinValue = alleleBinValue;
     }
+    
+    public Integer getPeakHeight() {
+		return peakHeight;
+	}
 
-    
-    
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("AllelicValueElement [gid=");
-        builder.append(gid);
-        builder.append(", markerName=");
-        builder.append(markerName);
-        builder.append(", datasetId=");
-        builder.append(datasetId);
-        builder.append(", data=");
-        builder.append(data);
-        builder.append("]");
-        return builder.toString();
-    }
+	public void setPeakHeight(Integer peakHeight) {
+		this.peakHeight = peakHeight;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("AllelicValueElement [gid=");
+		builder.append(gid);
+		builder.append(", data=");
+		builder.append(data);
+		builder.append(", markerName=");
+		builder.append(markerName);
+		builder.append(", datasetId=");
+		builder.append(datasetId);
+		builder.append(", alleleBinValue=");
+		builder.append(alleleBinValue);
+		builder.append(", peakHeight=");
+		builder.append(peakHeight);
+		builder.append("]");
+		return builder.toString();
+	}
     
     /* (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)

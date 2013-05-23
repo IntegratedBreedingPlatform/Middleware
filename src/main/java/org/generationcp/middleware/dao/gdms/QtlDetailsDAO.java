@@ -149,18 +149,18 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
     }
     
     
-    public List<String> getQtlTraitsByDatasetId(Integer datasetId, int start, int numOfRows) throws MiddlewareQueryException{
+    public List<Integer> getQtlTraitsByDatasetId(Integer datasetId, int start, int numOfRows) throws MiddlewareQueryException{
         try {
             SQLQuery query = getSession().createSQLQuery(QtlDetails.GET_QTL_TRAITS_BY_DATASET_ID);
             query.setParameter("datasetId", datasetId);
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
-            return (List<String>) query.list();
+            return (List<Integer>) query.list();
             
         } catch (HibernateException e) {
         	logAndThrowException("Error with getQtlTraitsByDatasetId() query from QtlDetails: " + e.getMessage(), e);    
         }
-        return new ArrayList<String>();
+        return new ArrayList<Integer>();
     }
     
     public long countQtlTraitsByDatasetId(Integer datasetId)  throws MiddlewareQueryException{
@@ -180,7 +180,7 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
         return 0L;
     }
     
-    public List<QtlDataElement> getQtlDataByQtlTraits(List<String> qtlTraits, int start, int numOfRows) throws MiddlewareQueryException{
+    public List<QtlDataElement> getQtlDataByQtlTraits(List<Integer> qtlTraits, int start, int numOfRows) throws MiddlewareQueryException{
         List<QtlDataElement> toReturn = new ArrayList<QtlDataElement>();
 
         if (qtlTraits == null || qtlTraits.size() == 0) {
@@ -205,7 +205,7 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
                 	Float position = (Float) result[2]; 
                 	Float minPosition = (Float) result[3];
                 	Float maxPosition = (Float) result[4]; 
-                	String trait = (String) result[5]; 
+                	Integer traitId = (Integer) result[5]; 
                 	String experiment = (String) result[6]; 
                 	String leftFlankingMarker = (String) result[7]; 
                 	String rightFlankingMarker = (String) result[8]; 
@@ -214,7 +214,7 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
                 	Float rSquare = (Float) result[11];
 
                     QtlDataElement qtlData = new QtlDataElement(qtlName, linkageGroup, position, minPosition, maxPosition, 
-                    		trait, experiment, leftFlankingMarker, rightFlankingMarker, effect, scoreValue, rSquare);
+                    		traitId, experiment, leftFlankingMarker, rightFlankingMarker, effect, scoreValue, rSquare);
                     toReturn.add(qtlData);
                 }
             }

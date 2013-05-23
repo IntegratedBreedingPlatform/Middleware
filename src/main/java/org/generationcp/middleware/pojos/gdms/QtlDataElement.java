@@ -13,7 +13,7 @@ public class QtlDataElement {
 	Float position; 
 	Float minPosition;
 	Float maxPosition; 
-	String trait; 
+	Integer traitId; 
 	String experiment; 
 	String leftFlankingMarker; 
 	String rightFlankingMarker; 
@@ -27,7 +27,7 @@ public class QtlDataElement {
 
 
 	public QtlDataElement(String qtlName, String linkageGroup, Float position,
-			Float minPosition, Float maxPosition, String trait,
+			Float minPosition, Float maxPosition, Integer traitId,
 			String experiment, String leftFlankingMarker,
 			String rightFlankingMarker, Integer effect, Float scoreValue,
 			Float rSquare) {
@@ -37,7 +37,7 @@ public class QtlDataElement {
 		this.position = position;
 		this.minPosition = minPosition;
 		this.maxPosition = maxPosition;
-		this.trait = trait;
+		this.traitId = traitId;
 		this.experiment = experiment;
 		this.leftFlankingMarker = leftFlankingMarker;
 		this.rightFlankingMarker = rightFlankingMarker;
@@ -97,13 +97,13 @@ public class QtlDataElement {
 	}
 
 
-	public String getTrait() {
-		return trait;
+	public Integer getTraitId() {
+		return traitId;
 	}
 
 
-	public void setTrait(String trait) {
-		this.trait = trait;
+	public void setTraitId(Integer traitId) {
+		this.traitId = traitId;
 	}
 
 
@@ -180,8 +180,8 @@ public class QtlDataElement {
 		builder.append(minPosition);
 		builder.append(", maxPosition=");
 		builder.append(maxPosition);
-		builder.append(", trait=");
-		builder.append(trait);
+		builder.append(", traitId=");
+		builder.append(traitId);
 		builder.append(", experiment=");
 		builder.append(experiment);
 		builder.append(", leftFlankingMarker=");

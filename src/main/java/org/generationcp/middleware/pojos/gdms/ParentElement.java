@@ -26,12 +26,12 @@ public class ParentElement implements Serializable{
     private static final long serialVersionUID = 1L;
 
     /** The parent A gid. */
-    @Column(name = "parent_a_gid")
-    private Integer parentAGId;
+    @Column(name = "parent_a_nid")
+    private Integer parentANId;
 
     /** The parent B gid. */
-    @Column(name = "parent_b_gid")
-    private Integer parentBGId;
+    @Column(name = "parent_b_nid")
+    private Integer parentBNId;
 
     /** The mapping type. */
     @Column(name = "mapping_type")
@@ -41,26 +41,26 @@ public class ParentElement implements Serializable{
     public ParentElement() {
     }
 
-    public ParentElement(Integer parentAGId, Integer parentBGId, String mappingType) {
-        this.parentAGId = parentAGId;
-        this.parentBGId = parentBGId;
+    public ParentElement(Integer parentANId, Integer parentBNId, String mappingType) {
+        this.parentANId = parentANId;
+        this.parentBNId = parentBNId;
         this.mappingPopType = mappingType;
     }
 
-    public Integer getParentAGId() {
-        return parentAGId;
+    public Integer getParentANId() {
+        return parentANId;
     }
     
-    public void setParentAGId(Integer parentAGId) {
-        this.parentAGId = parentAGId;
+    public void setParentANId(Integer parentAGId) {
+        this.parentANId = parentAGId;
     }
     
     public Integer getParentBGId() {
-        return parentBGId;
+        return parentBNId;
     }
     
     public void setParentBGId(Integer parentBGId) {
-        this.parentBGId = parentBGId;
+        this.parentBNId = parentBGId;
     }
     
     public String getMappingType() {
@@ -76,7 +76,7 @@ public class ParentElement implements Serializable{
      */
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 139).append(parentAGId).append(parentBGId).append(mappingPopType).toHashCode();
+        return new HashCodeBuilder(17, 139).append(parentANId).append(parentBNId).append(mappingPopType).toHashCode();
     }
 
     /* (non-Javadoc)
@@ -95,7 +95,7 @@ public class ParentElement implements Serializable{
         }
 
         ParentElement rhs = (ParentElement) obj;
-        return new EqualsBuilder().appendSuper(super.equals(obj)).append(parentAGId, rhs.parentAGId).append(parentBGId, rhs.parentBGId)
+        return new EqualsBuilder().appendSuper(super.equals(obj)).append(parentANId, rhs.parentANId).append(parentBNId, rhs.parentBNId)
                 .append(mappingPopType, rhs.mappingPopType).isEquals();
     }
 
@@ -103,9 +103,9 @@ public class ParentElement implements Serializable{
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append("ParentElement [parentAGId=");
-        builder.append(parentAGId);
+        builder.append(parentANId);
         builder.append(", parentBGId=");
-        builder.append(parentBGId);
+        builder.append(parentBNId);
         builder.append(", mappingPopType=");
         builder.append(mappingPopType);
         builder.append("]");

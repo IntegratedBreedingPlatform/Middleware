@@ -62,7 +62,8 @@ public class AlleleValues implements Serializable{
             "SELECT DISTINCT " +
                 "gdms_allele_values.gid, " +
                 "CONCAT(gdms_allele_values.allele_bin_value, ''), " +
-                "CONCAT(gdms_marker.marker_name, '') " +
+                "CONCAT(gdms_marker.marker_name, ''), " +
+                "gdms_allele_values.peak_height" +
             "FROM gdms_allele_values, " +
                 "gdms_marker " +
             "WHERE gdms_allele_values.marker_id = gdms_marker.marker_id " +
@@ -72,7 +73,7 @@ public class AlleleValues implements Serializable{
 
     // For getAllelicValues by datasetId
     public static final String GET_ALLELIC_VALUES_BY_DATASET_ID = 
-            "SELECT gid, marker_id, CONCAT(allele_bin_value, '') " +
+            "SELECT gid, marker_id, CONCAT(allele_bin_value, ''), peak_height " +
             "FROM gdms_allele_values " +
             "WHERE dataset_id = :datasetId " +
             "ORDER BY gid DESC, marker_id ASC";
@@ -98,8 +99,9 @@ public class AlleleValues implements Serializable{
             "WHERE gid in (:gids)";
 
     public static final String GET_CHAR_ALLELE_VALUES_FOR_POLYMORPHIC_MARKERS_RETRIEVAL_BY_GIDS =     
-            "SELECT DISTINCT gdms_char_values.dataset_id, gdms_char_values.gid, " 
-                    + "CONCAT(gdms_marker.marker_name,''), CONCAT(gdms_char_values.char_value,'') " 
+            "SELECT DISTINCT gdms_char_values.dataset_id, gdms_char_values.gid " 
+                    + ", CONCAT(gdms_marker.marker_name,''), CONCAT(gdms_char_values.char_value,'') " 
+            		+ ", gdms_allele_values.peak_height "	
             + "FROM gdms_char_values INNER JOIN gdms_marker ON gdms_marker.marker_id = gdms_char_values.marker_id " 
             + "WHERE gdms_char_values.gid IN (:gids) "
             + "ORDER BY gid, marker_name ";
@@ -110,8 +112,9 @@ public class AlleleValues implements Serializable{
             + "WHERE gdms_char_values.gid IN (:gids) ";
 
     public static final String GET_INT_ALLELE_VALUES_FOR_POLYMORPHIC_MARKERS_RETRIEVAL_BY_GIDS = 
-            "SELECT gdms_allele_values.dataset_id, gdms_allele_values.gid, " 
-                    + "CONCAT(gdms_marker.marker_name, ''), CONCAT(gdms_allele_values.allele_bin_value, '') "
+            "SELECT gdms_allele_values.dataset_id, gdms_allele_values.gid " 
+                    + ", CONCAT(gdms_marker.marker_name, ''), CONCAT(gdms_allele_values.allele_bin_value, '') "
+            		+ ", gdms_allele_values.peak_height "	
             + "FROM gdms_allele_values INNER JOIN gdms_marker ON gdms_marker.marker_id = gdms_allele_values.marker_id "
             + "WHERE gdms_allele_values.gid IN (:gids) "
             + "ORDER BY gid, marker_name ";
@@ -122,8 +125,9 @@ public class AlleleValues implements Serializable{
                     + "WHERE gdms_allele_values.gid IN (:gids) ";
     
     public static final String GET_MAPPING_ALLELE_VALUES_FOR_POLYMORPHIC_MARKERS_RETRIEVAL_BY_GIDS =     
-            "SELECT gdms_mapping_pop_values.dataset_id, gdms_mapping_pop_values.gid, " 
-                    + "CONCAT(gdms_marker.marker_name,''), CONCAT(gdms_mapping_pop_values.map_char_value,'') " 
+            "SELECT gdms_mapping_pop_values.dataset_id, gdms_mapping_pop_values.gid " 
+                    + ", CONCAT(gdms_marker.marker_name,''), CONCAT(gdms_mapping_pop_values.map_char_value,'') " 
+            		+ ", gdms_allele_values.peak_height "	
             + "FROM gdms_mapping_pop_values INNER JOIN gdms_marker ON gdms_marker.marker_id = gdms_mapping_pop_values.marker_id " 
             + "WHERE gdms_mapping_pop_values.gid IN (:gids) "
             + "ORDER BY gid, marker_name ";
@@ -138,17 +142,14 @@ public class AlleleValues implements Serializable{
     @Column(name = "an_id")
     private Integer anId;
 
-    /** The dataset id. */
     @Basic(optional = false)
     @Column(name = "dataset_id")
     private Integer datasetId;
 
-    /** The germplasm id. */
     @Basic(optional = false)
     @Column(name = "gid")
     private Integer gId;
     
-    /** The allele bin value. */
     @Basic(optional = false)
     @Column(name = "marker_id")
     private Integer markerId;
@@ -157,86 +158,48 @@ public class AlleleValues implements Serializable{
     @Column(name = "allele_bin_value")
     private String alleleBinValue;
 
-    /** The allele raw value. */
     @Basic(optional = false)
     @Column(name = "allele_raw_value")
     private String alleleRawValue;
     
-    /**
-     * Instantiates a new allele values.
-     */
+    @Column(name = "peak_height")
+    private Integer peakHeight;
+    
     public AlleleValues() {
     }
 
-    /**
-     * Instantiates a new allele values.
-     *
-     * @param anId the anId
-     * @param datasetId the dataset id
-     * @param gId the germplasm id
-     * @param alleleBinValue the allele bin value
-     * @param alleleRawValue the allele raw value
-     */
-    public AlleleValues(Integer anId, Integer datasetId, Integer gId, Integer markerId, String alleleBinValue, String alleleRawValue) {
-        super();
-        this.anId = anId;
-        this.datasetId = datasetId;
-        this.gId = gId;
-        this.markerId = markerId;
-        this.alleleBinValue = alleleBinValue;
-        this.alleleRawValue = alleleRawValue;
-    }
-    
-    /**
-     * Gets the anId.
-     *
-     * @return the anId
-     */
+    public AlleleValues(Integer anId, Integer datasetId, Integer gId,
+			Integer markerId, String alleleBinValue, String alleleRawValue,
+			Integer peakHeight) {
+		this.anId = anId;
+		this.datasetId = datasetId;
+		this.gId = gId;
+		this.markerId = markerId;
+		this.alleleBinValue = alleleBinValue;
+		this.alleleRawValue = alleleRawValue;
+		this.peakHeight = peakHeight;
+	}
+
     public Integer getAnId() {
         return anId;
     }
     
-    /**
-     * Sets the anId.
-     *
-     * @param anId the new anId
-     */
     public void setAnId(Integer anId) {
         this.anId = anId;
     }
     
-    /**
-     * Gets the dataset id.
-     *
-     * @return the dataset id
-     */
     public Integer getDatasetId() {
         return datasetId;
     }
     
-    /**
-     * Sets the dataset id.
-     *
-     * @param datasetId the new dataset id
-     */
     public void setDatasetId(Integer datasetId) {
         this.datasetId = datasetId;
     }
     
-    /**
-     * Gets the germplasm id.
-     *
-     * @return the germplasm id
-     */
     public Integer getgId() {
         return gId;
     }
     
-    /**
-     * Sets the germplasm id.
-     *
-     * @param gId the new germplasm id
-     */
     public void setgId(Integer gId) {
         this.gId = gId;
     }
@@ -249,53 +212,35 @@ public class AlleleValues implements Serializable{
         this.markerId = markerId;
     }
 
-    /**
-     * Gets the allele bin value.
-     *
-     * @return the allele bin value
-     */
     public String getAlleleBinValue() {
         return alleleBinValue;
     }
     
-    /**
-     * Sets the allele bin value.
-     *
-     * @param alleleBinValue the new allele bin value
-     */
     public void setAlleleBinValue(String alleleBinValue) {
         this.alleleBinValue = alleleBinValue;
     }
     
-    /**
-     * Gets the allele raw value.
-     *
-     * @return the allele raw value
-     */
     public String getAlleleRawValue() {
         return alleleRawValue;
     }
     
-    /**
-     * Sets the allele raw value.
-     *
-     * @param alleleRawValue the new allele raw value
-     */
     public void setAlleleRawValue(String alleleRawValue) {
         this.alleleRawValue = alleleRawValue;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
-    @Override
+    public Integer getPeakHeight() {
+		return peakHeight;
+	}
+
+	public void setPeakHeight(Integer peakHeight) {
+		this.peakHeight = peakHeight;
+	}
+
+	@Override
     public int hashCode() {
         return new HashCodeBuilder(37, 127).append(anId).toHashCode();
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -313,22 +258,24 @@ public class AlleleValues implements Serializable{
     }
 
     @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("AlleleValues [anId=");
-        builder.append(anId);
-        builder.append(", datasetId=");
-        builder.append(datasetId);
-        builder.append(", gId=");
-        builder.append(gId);
-        builder.append(", markerId=");
-        builder.append(markerId);
-        builder.append(", alleleBinValue=");
-        builder.append(alleleBinValue);
-        builder.append(", alleleRawValue=");
-        builder.append(alleleRawValue);
-        builder.append("]");
-        return builder.toString();
-    }
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("AlleleValues [anId=");
+		builder.append(anId);
+		builder.append(", datasetId=");
+		builder.append(datasetId);
+		builder.append(", gId=");
+		builder.append(gId);
+		builder.append(", markerId=");
+		builder.append(markerId);
+		builder.append(", alleleBinValue=");
+		builder.append(alleleBinValue);
+		builder.append(", alleleRawValue=");
+		builder.append(alleleRawValue);
+		builder.append(", peakHeight=");
+		builder.append(peakHeight);
+		builder.append("]");
+		return builder.toString();
+	}
     
 }

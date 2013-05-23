@@ -858,20 +858,20 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
 
     @Override
-    public List<Integer> getQtlByTrait(String trait, int start, int numOfRows) throws MiddlewareQueryException {
+    public List<Integer> getQtlByTrait(Integer trait, int start, int numOfRows) throws MiddlewareQueryException {
         List<String> methods = Arrays.asList("countQtlByTrait", "getQtlByTrait");
         return (List<Integer>) super.getFromCentralAndLocalByMethod(getQtlDao(), methods, start, numOfRows, 
-                new Object[]{trait}, new Class[]{String.class});
+                new Object[]{trait}, new Class[]{Integer.class});
     }
 
     @Override
-    public long countQtlByTrait(String trait) throws MiddlewareQueryException {
-        return super.countAllFromCentralAndLocalByMethod(getQtlDao(), "countQtlByTrait", new Object[]{trait}, new Class[]{String.class});
+    public long countQtlByTrait(Integer trait) throws MiddlewareQueryException {
+        return super.countAllFromCentralAndLocalByMethod(getQtlDao(), "countQtlByTrait", new Object[]{trait}, new Class[]{Integer.class});
     }
 
     @Override
-    public List<String> getQtlTraitsByDatasetId(Integer datasetId, int start, int numOfRows) throws MiddlewareQueryException{
-        return (List<String>) super.getFromInstanceByIdAndMethod(getQtlDetailsDao(), datasetId, "getQtlTraitsByDatasetId", 
+    public List<Integer> getQtlTraitsByDatasetId(Integer datasetId, int start, int numOfRows) throws MiddlewareQueryException{
+        return (List<Integer>) super.getFromInstanceByIdAndMethod(getQtlDetailsDao(), datasetId, "getQtlTraitsByDatasetId", 
         		new Object[]{datasetId, start, numOfRows}, new Class[]{Integer.class, Integer.TYPE, Integer.TYPE});
     }
 
@@ -2253,16 +2253,16 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
     
     @Override
-    public List<QtlDataElement> getQtlDataByQtlTraits(List<String> qtlTraits, int start, int numOfRows) throws MiddlewareQueryException{
+    public List<QtlDataElement> getQtlDataByQtlTraits(List<Integer> qtlTraitIds, int start, int numOfRows) throws MiddlewareQueryException{
     	
         List<String> methods = Arrays.asList("countQtlDataByQtlTraits", "getQtlDataByQtlTraits");
-        return (List<QtlDataElement>) super.getFromCentralAndLocalByMethod(getQtlDetailsDao(), methods, start, numOfRows, new Object[] { qtlTraits },
+        return (List<QtlDataElement>) super.getFromCentralAndLocalByMethod(getQtlDetailsDao(), methods, start, numOfRows, new Object[] { qtlTraitIds },
                 new Class[] { List.class });
 
     }
 
     @Override
-    public long countQtlDataByQtlTraits(List<String> qtlTraits) throws MiddlewareQueryException{
+    public long countQtlDataByQtlTraits(List<Integer> qtlTraits) throws MiddlewareQueryException{
     	return super.countAllFromCentralAndLocalByMethod(getQtlDetailsDao(), "countQtlDataByQtlTraits", new Object[] { qtlTraits },
                 new Class[] { List.class });
     	

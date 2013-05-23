@@ -27,25 +27,34 @@ public class MapDetailElement implements Serializable{
     
     private Integer markerCount;
     
-    private Float maxStartPosition;
+    private Double maxStartPosition;
     
     private String linkageGroup;
     
     private String mapName;
     
     private String mapType;
+    
+    private String mapDescription;
+    
+    private String mapUnit;
 
     public MapDetailElement() {
     }
 
-    public MapDetailElement(Integer markerCount, Float maxStartPosition, String linkageGroup, String mapName, String mapType) {
-        super();
-        this.markerCount = markerCount;
-        this.maxStartPosition = maxStartPosition;
-        this.linkageGroup = linkageGroup;
-        this.mapName = mapName;
-        this.mapType = mapType;
-    }
+    
+    public MapDetailElement(Integer markerCount, Double maxStartPosition,
+			String linkageGroup, String mapName, String mapType,
+			String mapDescription, String mapUnit) {
+		super();
+		this.markerCount = markerCount;
+		this.maxStartPosition = maxStartPosition;
+		this.linkageGroup = linkageGroup;
+		this.mapName = mapName;
+		this.mapType = mapType;
+		this.mapDescription = mapDescription;
+		this.mapUnit = mapUnit;
+	}
 
     
     public Integer getMarkerCount() {
@@ -58,12 +67,12 @@ public class MapDetailElement implements Serializable{
     }
 
     
-    public Float getMaxStartPosition() {
+    public Double getMaxStartPosition() {
         return maxStartPosition;
     }
 
     
-    public void setMaxStartPosition(Float maxStartPosition) {
+    public void setMaxStartPosition(Double maxStartPosition) {
         this.maxStartPosition = maxStartPosition;
     }
 
@@ -97,7 +106,27 @@ public class MapDetailElement implements Serializable{
         this.mapType = mapType;
     }
 
-    @Override
+    public String getMapDescription() {
+		return mapDescription;
+	}
+
+
+	public void setMapDescription(String mapDescription) {
+		this.mapDescription = mapDescription;
+	}
+
+
+	public String getMapUnit() {
+		return mapUnit;
+	}
+
+
+	public void setMapUnit(String mapUnit) {
+		this.mapUnit = mapUnit;
+	}
+
+
+	@Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
@@ -147,20 +176,24 @@ public class MapDetailElement implements Serializable{
     }
 
     @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("MappingValueElement [markerCount=");
-        builder.append(markerCount);
-        builder.append(", maxStartPosition=");
-        builder.append(maxStartPosition);
-        builder.append(", linkageGroup=");
-        builder.append(linkageGroup);
-        builder.append(", mapName=");
-        builder.append(mapName);
-        builder.append(", mapType=");
-        builder.append(mapType);
-        builder.append("]");
-        return builder.toString();
-    }
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("MapDetailElement [markerCount=");
+		builder.append(markerCount);
+		builder.append(", maxStartPosition=");
+		builder.append(maxStartPosition);
+		builder.append(", linkageGroup=");
+		builder.append(linkageGroup);
+		builder.append(", mapName=");
+		builder.append(mapName);
+		builder.append(", mapType=");
+		builder.append(mapType);
+		builder.append(", mapDescription=");
+		builder.append(mapDescription);
+		builder.append(", mapUnit=");
+		builder.append(mapUnit);
+		builder.append("]");
+		return builder.toString();
+	}
     
 }

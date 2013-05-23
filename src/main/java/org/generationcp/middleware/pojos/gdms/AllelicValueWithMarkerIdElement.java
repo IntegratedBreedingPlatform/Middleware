@@ -29,93 +29,65 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  */
 public class AllelicValueWithMarkerIdElement implements Serializable{
 
-    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
-    /** The Germplasm Id. */
     private Integer gid;
     
     /** The Data value (char_value for table char_values, 
      * allele_bin_value for allele_values table and map_char_value for mapping_pop_values) */
     private String data;
     
-    /** The Marker Id. */
     private Integer markerId;
+    
+    private Integer peakHeight;
 
-    /**
-     * Instantiates a AllelicValueWithMarkerIdElement object.
-     * 
-     * @param gid
-     * @param data
-     * @param markerId
-     */
     public AllelicValueWithMarkerIdElement(Integer gid, String data, Integer markerId) {
+        this(gid, data, markerId, null);
+    }
+
+    public AllelicValueWithMarkerIdElement(Integer gid, String data, Integer markerId, Integer peakHeight) {
         this.gid = gid;
         this.data = data;
         this.markerId = markerId;
+        this.peakHeight = peakHeight;
     }
 
-    
-    /**
-     * Gets the Germplasm Id.
-     * 
-     * @return the gid
-     */
     public Integer getGid() {
         return gid;
     }
 
-    
-    /**
-     * Sets the Germplasm Id.
-     * 
-     * @param gid the gid to set
-     */
     public void setGid(Integer gid) {
         this.gid = gid;
     }
 
-    
-    /**
-     * Gets the Data value.
-     * 
-     * @return the data
-     */
     public String getData() {
         return data;
     }
 
-    
-    /**
-     * Sets the Data value.
-     * 
-     * @param data the data to set
-     */
     public void setData(String data) {
         this.data = data;
     }
 
-    
-    /**
-     * Gets the Marker Name.
-     * 
-     * @return the markerId
-     */
     public Integer getMarkerId() {
         return markerId;
     }
 
-    
-    /**
-     * Sets the Marker Name.
-     * 
-     * @param markerId the markerId to set
-     */
     public void setmarkerId(Integer markerId) {
         this.markerId = markerId;
     }
+
+	public void setMarkerId(Integer markerId) {
+		this.markerId = markerId;
+	}
     
-    @Override
+    public Integer getPeakHeight() {
+		return peakHeight;
+	}
+
+	public void setPeakHeight(Integer peakHeight) {
+		this.peakHeight = peakHeight;
+	}
+	@Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append("AllelicValueWithMarkerIdElement [gid=");
@@ -124,14 +96,13 @@ public class AllelicValueWithMarkerIdElement implements Serializable{
         builder.append(data);
         builder.append(", markerId=");
         builder.append(markerId);
+        builder.append(", peakHeight=");
+        builder.append(peakHeight);
         builder.append("]");
         return builder.toString();
     }
-    
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    @Override
+
+	@Override
     public boolean equals(Object obj) {
         if (obj == null) {
             return false;
@@ -146,12 +117,11 @@ public class AllelicValueWithMarkerIdElement implements Serializable{
         AllelicValueWithMarkerIdElement rhs = (AllelicValueWithMarkerIdElement) obj;
         return new EqualsBuilder().appendSuper(super.equals(obj)).append(gid, rhs.gid)
                 .append(data, rhs.data)
-                .append(markerId, rhs.markerId).isEquals();
+                .append(markerId, rhs.markerId)
+                .append(peakHeight, rhs.peakHeight)
+                .isEquals();
     }
     
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 97).append(gid)

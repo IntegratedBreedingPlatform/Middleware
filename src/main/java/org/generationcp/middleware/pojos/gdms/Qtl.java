@@ -53,7 +53,7 @@ public class Qtl implements Serializable{
                 + ",gqd.linkage_group "
                 + ",gqd.min_position "
                 + ",gqd.max_position "
-                + ",CONCAT(gqd.trait,'') " 
+                + ",gqd.tid " 
                 + ",CONCAT(gqd.experiment,'') " 
                 + ",gqd.left_flanking_marker "
                 + ",gqd.right_flanking_marker "
@@ -66,7 +66,7 @@ public class Qtl implements Serializable{
             + "FROM gdms_qtl_details gqd "
                 + "INNER JOIN gdms_qtl gq ON gq.qtl_id = gqd.qtl_id "
                 + "INNER JOIN gdms_map gm ON gm.map_id = gqd.map_id "
-                + "INNER JOIN tmstraits trt ON gqd.trait = trt.trabbr "
+                + "INNER JOIN tmstraits trt ON gqd.tid = trt.tid "
             + "WHERE gq.qtl_id in(:qtl_id_list) "
             + "ORDER BY gq.qtl_id";
         
@@ -75,7 +75,7 @@ public class Qtl implements Serializable{
             + "FROM gdms_qtl_details gqd "
                 + "INNER JOIN gdms_qtl gq ON gq.qtl_id = gqd.qtl_id "
                 + "INNER JOIN gdms_map gm ON gm.map_id = gqd.map_id "
-                + "INNER JOIN tmstraits trt ON gqd.trait = trt.trabbr "
+                + "INNER JOIN tmstraits trt ON gqd.tid = trt.tid "
             + "WHERE gq.qtl_id in(:qtl_id_list)"; 
     
     public static final String GET_QTL_BY_NAME = 
@@ -84,7 +84,7 @@ public class Qtl implements Serializable{
                 + ",gdms_qtl_details.linkage_group " 
                 + ",gdms_qtl_details.min_position "
                 + ",gdms_qtl_details.max_position " 
-                + ",CONCAT(gdms_qtl_details.trait,'') "
+                + ",gdms_qtl_details.tid "
                 + ",CONCAT(gdms_qtl_details.experiment,'') "
                 + ",gdms_qtl_details.left_flanking_marker "
                 + ",gdms_qtl_details.right_flanking_marker " 
@@ -98,7 +98,7 @@ public class Qtl implements Serializable{
             + "WHERE   gdms_qtl.qtl_name LIKE LOWER(:qtlName) "
                + "AND gdms_qtl.qtl_id = gdms_qtl_details.qtl_id "
                + "AND gdms_qtl_details.map_id = gdms_map.map_id "
-               + "AND gdms_qtl_details.trait = tmstraits.trabbr "
+               + "AND gdms_qtl_details.tid = tmstraits.tid "
             + "ORDER BY gdms_qtl.qtl_id "
             ;
     
@@ -108,7 +108,7 @@ public class Qtl implements Serializable{
             + "WHERE   gdms_qtl.qtl_name LIKE LOWER(:qtlName) "
             + "AND gdms_qtl.qtl_id = gdms_qtl_details.qtl_id "
             + "AND gdms_qtl_details.map_id = gdms_map.map_id "
-            + "AND gdms_qtl_details.trait = tmstraits.trabbr "
+            + "AND gdms_qtl_details.tid = tmstraits.tid "
             ;
     
     public static final String GET_QTL_ID_BY_NAME = 
@@ -125,14 +125,14 @@ public class Qtl implements Serializable{
     public static final String GET_QTL_BY_TRAIT = 
             "SELECT qtl_id " 
             + "FROM gdms_qtl_details " 
-            + "WHERE trait LIKE :qtlTrait " 
+            + "WHERE tid = :qtlTrait " 
             + "ORDER BY qtl_id "
             ;
         
     public static final String COUNT_QTL_BY_TRAIT = 
             "SELECT COUNT(qtl_id) " 
             + "FROM gdms_qtl_details " 
-            + "WHERE trait LIKE :qtlTrait " 
+            + "WHERE tid = :qtlTrait " 
             ;
         
     private static final long serialVersionUID = 1L;

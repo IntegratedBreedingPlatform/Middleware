@@ -66,7 +66,6 @@ public class CvTermSaver extends Saver {
 		if (definition == null || definition.equals("")) {
 			errorMessage.append("\ndefinition is null or empty");
 		}
-		System.out.println(errorMessage);
 		if (!errorMessage.toString().equals("")){
 			throw new MiddlewareException(errorMessage.toString());
 		} 

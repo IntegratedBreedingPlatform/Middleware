@@ -710,25 +710,24 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testGetQtlByTrait() throws Exception {
-        String qtlTrait = "SL%";     // Crop tested: Groundnut
-
-        List<Integer> results = manager.getQtlByTrait(qtlTrait, 0, 
-                (int) manager.countQtlByTrait(qtlTrait));
+        Integer qtlTraitId = 1001; // "SL%";     // Crop tested: Groundnut
+        List<Integer> results = manager.getQtlByTrait(qtlTraitId, 0, 
+                (int) manager.countQtlByTrait(qtlTraitId));
         System.out.println("testGetQtlByTrait() RESULTS: " + results);
     }
 
 
     @Test
     public void testCountQtlByTrait() throws Exception { 
-        String qtlTrait = "SL%";     // Crop tested: Groundnut
-        long count = manager.countQtlByTrait(qtlTrait);
+        Integer qtlTraitId = 1001; // "SL%";     // Crop tested: Groundnut
+        long count = manager.countQtlByTrait(qtlTraitId);
         System.out.println("testCountQtlByTrait() RESULTS: " + count);
     }    
     
     @Test
     public void testGetQtlTraitsByDatasetId() throws Exception {
     	Integer datasetId = 7;		// Crop tested: Groundnut
-        List<String> results = manager.getQtlTraitsByDatasetId(datasetId, 0, 
+        List<Integer> results = manager.getQtlTraitsByDatasetId(datasetId, 0, 
                 (int) manager.countQtlTraitsByDatasetId(datasetId));
         System.out.println("testGetQtlTraitsByDatasetId() RESULTS: " + results);
     }
@@ -785,7 +784,7 @@ public class TestGenotypicDataManagerImpl{
         List<ParentElement> parentElements = manager.getAllParentsFromMappingPopulation(start, end);
         System.out.println("getAllParentsFromMappingPopulation(" + start + "," + end + ")");
         for (ParentElement parentElement : parentElements) {
-            System.out.println("Parent A GId: " + parentElement.getParentAGId() + "  |  Parent B GId: "+parentElement.getParentBGId());
+            System.out.println("Parent A NId: " + parentElement.getParentANId() + "  |  Parent B NId: "+parentElement.getParentBGId());
         }
         
     }    
@@ -837,11 +836,11 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testAddQtlDetails() throws Exception {
-        Integer qtlId = 4;          // Crop tested: Groundnut
+        Integer qtlId = -5;          // Crop tested: Groundnut
         Integer mapId = 1; 
         Float minPosition = 0f; 
         Float maxPosition = 8f; 
-        String trait = "HI"; 
+        Integer traitId = 1001; // "DE"; 
         String experiment = ""; 
         Float effect =0f;
         Float scoreValue = 2.5f;
@@ -858,7 +857,7 @@ public class TestGenotypicDataManagerImpl{
         String lvParent = null;
         String lvAllele = null;
                 
-        QtlDetails qtlDetails = new QtlDetails(qtlId, mapId, minPosition, maxPosition, trait, experiment, effect,
+        QtlDetails qtlDetails = new QtlDetails(qtlId, mapId, minPosition, maxPosition, traitId, experiment, effect,
                 scoreValue, rSquare, linkageGroup, interactions, leftFlankingMarker,
                 rightFlankingMarker, position, clen, seAdditive, hvParent, hvAllele, lvParent, lvAllele);
         
@@ -869,7 +868,7 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testAddMarkerDetails() throws Exception {
-        Integer markerId = 1;           // Replace with desired values
+        Integer markerId = -1;           // Replace with desired values
         Integer noOfRepeats = 0; 
         String motifType = ""; 
         String sequence = ""; 
@@ -898,7 +897,7 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testAddMarkerUserInfo() throws Exception {
-        Integer markerId = 1;           // Replace with desired values
+        Integer markerId = -1;           // Replace with desired values
         String principalInvestigator = "Juan Dela Cruz";
         String contact = "juan@irri.com.ph";
         String institute = "IRRI";
@@ -911,7 +910,7 @@ public class TestGenotypicDataManagerImpl{
     
     @Test
     public void testAddAccMetadataSet() throws Exception {
-        Integer datasetId = 4;  // Crop tested: Groundnut
+        Integer datasetId = -1;  // Crop tested: Groundnut
         Integer germplasmId = 1; 
         Integer nameId = 1;
         
@@ -923,8 +922,8 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testAddMarkerMetadataSet() throws Exception {
-        Integer datasetId = 4;  // Crop tested: Groundnut
-        Integer markerId = 1; 
+        Integer datasetId = -1;  // Crop tested: Groundnut
+        Integer markerId = -1; 
         
         MarkerMetadataSet markerMetadataSet = new MarkerMetadataSet(datasetId, markerId);
         
@@ -934,6 +933,12 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testAddDataset() throws Exception {
+    	Dataset dataset = createDataset();
+    	manager.addDataset(dataset);
+        System.out.println("testAddDataset() Added: " + (dataset.getDatasetId() != null ? dataset : null));
+    }
+    
+    private Dataset createDataset() throws Exception{
         Integer datasetId = null;       // Crop tested: Groundnut
         String datasetName = " QTL_ ICGS 44 X ICGS 78";
         String datasetDesc = "ICGS 44 X ICGS 78";
@@ -946,12 +951,13 @@ public class TestGenotypicDataManagerImpl{
         String missingData = null;
         String method = null;
         String score = null;
+        String institute = null;
+        String principalInvestigator = null;
+        String email = null;
+        String purposeOfStudy = null;
         
-        Dataset dataset = new Dataset(datasetId, datasetName, datasetDesc, datasetType, genus, species, uploadTemplateDate, remarks,
-                dataType, missingData, method, score);
-        
-        Integer idAdded = manager.addDataset(dataset);
-        System.out.println("testAddDataset() Added: " + (idAdded != null ? dataset : null));
+        return new Dataset(datasetId, datasetName, datasetDesc, datasetType, genus, species, uploadTemplateDate, remarks,
+                dataType, missingData, method, score, institute, principalInvestigator, email, purposeOfStudy);
     }
 
 
@@ -985,7 +991,7 @@ public class TestGenotypicDataManagerImpl{
     @Test
     public void testAddGDMSMarkerAlias() throws Exception {
   	
-        Integer markerId = 0;
+        Integer markerId = -1;
         String alias = "testalias";
       
         MarkerAlias markerAlias = new MarkerAlias(markerId, alias);
@@ -997,7 +1003,7 @@ public class TestGenotypicDataManagerImpl{
     @Test
     public void testAddDatasetUser() throws Exception {
   	
-        Integer datasetId = 7;
+        Integer datasetId = -1;
         Integer userId = 123;
       
         DatasetUsers datasetUser = new DatasetUsers(datasetId, userId);
@@ -1009,13 +1015,14 @@ public class TestGenotypicDataManagerImpl{
     @Test
     public void testAddAlleleValues() throws Exception {
         Integer anId = null;                // Crop tested: Groundnut
-        Integer datasetId = 1; 
+        Integer datasetId = -1; 
         Integer gId = 1920; 
         Integer markerId = 1037; 
         String alleleBinValue = "alleleBinValue"; 
         String alleleRawValue = "alleleRawValue";
+        Integer peakHeight = 10;
       
-        AlleleValues alleleValues = new AlleleValues(anId, datasetId, gId, markerId, alleleBinValue, alleleRawValue);
+        AlleleValues alleleValues = new AlleleValues(anId, datasetId, gId, markerId, alleleBinValue, alleleRawValue, peakHeight);
       
         Integer idAdded = manager.addAlleleValues(alleleValues);
         System.out.println("testAddAlleleValues() Added: " + (idAdded != null ? alleleValues : null));
@@ -1024,7 +1031,7 @@ public class TestGenotypicDataManagerImpl{
     @Test
     public void testAddCharValues() throws Exception {
         Integer acId = null;            // Crop tested: Groundnut
-        Integer datasetId = 1; 
+        Integer datasetId = -1; 
         Integer gId = 1920; 
         Integer markerId = 1037; 
         String charValue = "CV"; 
@@ -1038,7 +1045,7 @@ public class TestGenotypicDataManagerImpl{
     @Test
     public void testAddMappingPop() throws Exception {
   	
-    	Integer datasetId = 2;
+    	Integer datasetId = -1;
         String mappingType = "test";
         Integer parentAGId = 956;
         Integer parentBGId = 1042;
@@ -1059,7 +1066,7 @@ public class TestGenotypicDataManagerImpl{
   	
     	Integer mpId = null;
         String mapCharValue = "X";
-        Integer datasetId = 2;
+        Integer datasetId = -1;
         Integer gid = 1434;
         Integer markerId = 2537;
       
@@ -1073,14 +1080,14 @@ public class TestGenotypicDataManagerImpl{
     @Test
     public void testAddMarkerOnMap() throws Exception {
   	
-    	Integer mapId = 1;
-    	Integer markerId = 260;
+    	Integer mapId = -1;
+    	Integer markerId = -1;
     	Float startPosition = Float.valueOf("123.4");
     	Float endPosition = Float.valueOf("567.8");
-    	String mapUnit = "TS";
+//    	String mapUnit = "TS";
     	String linkageGroup = "Test";
       
-        MarkerOnMap markerOnMap = new MarkerOnMap(mapId, markerId, startPosition, endPosition, mapUnit, linkageGroup);
+        MarkerOnMap markerOnMap = new MarkerOnMap(mapId, markerId, startPosition, endPosition, linkageGroup);
       
         Integer idAdded = manager.addMarkerOnMap(markerOnMap);
         System.out.println("testAddMarkerOnMap() Added: " + (idAdded != null ? markerOnMap : null));
@@ -1124,8 +1131,10 @@ public class TestGenotypicDataManagerImpl{
         String mapName = "ICGS 44 X ICGS 76";
         String mapType = "genetic";
         Integer mpId = 0;
+        String mapDesc = null;
+        String mapUnit = null;        		
         
-        Map map = new Map(mapId, mapName, mapType, mpId);
+        Map map = new Map(mapId, mapName, mapType, mpId, mapDesc, mapUnit);
       
         Integer idAdded = manager.addMap(map);
         System.out.println("testAddMap() Added: " + (idAdded != null ? map : null));
@@ -1133,59 +1142,17 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testSetSSRMarkers() throws Exception {
-
-    	Integer markerId = null; //Will be set/overridden by the function
-        String markerType = null; //Will be set/overridden by the function
-        String markerName = "SeqTEST";
-        String species = "Groundnut";
-        String dbAccessionId = null;
-        String reference = null;
-        String genotype = null;
-        String ploidy = null; 
-        String primerId = null;
-        String remarks = null;
-        String assayType = null;
-        String motif = null;
-        String forwardPrimer = null;
-        String reversePrimer = null;
-        String productSize = null;
-        Float annealingTemp = Float.valueOf(0);
-        String amplification = null;
-
-        String alias = "testalias";
-        Integer noOfRepeats = 0; 
-        String motifType = ""; 
-        String sequence = ""; 
-        Integer sequenceLength = 0;
-        Integer minAllele = 0; 
-        Integer maxAllele = 0; 
-        Integer ssrNr = 0; 
-        Float forwardPrimerTemp = 0f; 
-        Float reversePrimerTemp = 0f; 
-        Float elongationTemp = 0f;
-        Integer fragmentSizeExpected = 0; 
-        Integer fragmentSizeObserved = 0; 
-        Integer expectedProductSize = 0; 
-        Integer positionOnReferenceSequence = 0;
-        String restrictionEnzymeForAssay = null;
-        String principalInvestigator = "Juan Dela Cruz";
-        String contact = "juan@irri.com.ph";
-        String institute = "IRRI";
-        
-        Marker marker = new Marker(markerId, markerType, markerName, species, dbAccessionId, reference, genotype, ploidy, primerId, remarks, assayType, motif, forwardPrimer, reversePrimer, productSize, annealingTemp, amplification);
-        MarkerAlias markerAlias = new MarkerAlias(markerId, alias);
-        MarkerDetails markerDetails = new MarkerDetails(markerId, noOfRepeats, motifType, sequence, sequenceLength,
-                minAllele, maxAllele, ssrNr, forwardPrimerTemp, reversePrimerTemp, elongationTemp,
-                fragmentSizeExpected, fragmentSizeObserved, expectedProductSize, positionOnReferenceSequence,
-                restrictionEnzymeForAssay);
-        MarkerUserInfo markerUserInfo = new MarkerUserInfo(markerId, principalInvestigator, contact, institute);
+    	List<Object> markerRecrods = createMarkerMarkeRecords();
+        Marker marker = (Marker) markerRecrods.get(0);
+        MarkerAlias markerAlias = (MarkerAlias) markerRecrods.get(1);
+        MarkerDetails markerDetails = (MarkerDetails) markerRecrods.get(2);
+        MarkerUserInfo markerUserInfo = (MarkerUserInfo) markerRecrods.get(3);
         
         Boolean addStatus = manager.setSSRMarkers(marker, markerAlias, markerDetails, markerUserInfo);
         System.out.println("testSetSSRMarkers() Added: " + (addStatus != null ? marker : null) + (addStatus != null ? markerAlias : null) + (addStatus != null ? markerDetails : null) + (addStatus != null ? markerUserInfo : null));
     }
     
-    @Test
-    public void testSetSNPMarkers() throws Exception {
+	private List<Object> createMarkerMarkeRecords() {
 
     	Integer markerId = null; //Will be set/overridden by the function
         String markerType = null; //Will be set/overridden by the function
@@ -1233,112 +1200,47 @@ public class TestGenotypicDataManagerImpl{
                 restrictionEnzymeForAssay);
         MarkerUserInfo markerUserInfo = new MarkerUserInfo(markerId, principalInvestigator, contact, institute);
         
+        List<Object> markerRecords = new ArrayList<Object>();
+        markerRecords.add(marker);
+        markerRecords.add(markerAlias);
+        markerRecords.add(markerDetails);
+        markerRecords.add(markerUserInfo);
+        return markerRecords;
+        
+    }
+    
+    @Test
+    public void testSetSNPMarkers() throws Exception {
+    	List<Object> markerRecrods = createMarkerMarkeRecords();
+        Marker marker = (Marker) markerRecrods.get(0);
+        MarkerAlias markerAlias = (MarkerAlias) markerRecrods.get(1);
+        MarkerDetails markerDetails = (MarkerDetails) markerRecrods.get(2);
+        MarkerUserInfo markerUserInfo = (MarkerUserInfo) markerRecrods.get(3);
+
         Boolean addStatus = manager.setSNPMarkers(marker, markerAlias, markerDetails, markerUserInfo);
         System.out.println("testSetSNPMarkers() Added: " + (addStatus != null ? marker : null) + (addStatus != null ? markerAlias : null) + (addStatus != null ? markerDetails : null) + (addStatus != null ? markerUserInfo : null));
     }
 
     @Test
     public void testSetCAPMarkers() throws Exception {
+    	List<Object> markerRecrods = createMarkerMarkeRecords();
+        Marker marker = (Marker) markerRecrods.get(0);
+        MarkerAlias markerAlias = (MarkerAlias) markerRecrods.get(1);
+        MarkerDetails markerDetails = (MarkerDetails) markerRecrods.get(2);
+        MarkerUserInfo markerUserInfo = (MarkerUserInfo) markerRecrods.get(3);
 
-    	Integer markerId = null; //Will be set/overridden by the function
-        String markerType = null; //Will be set/overridden by the function
-        String markerName = "SeqTEST";
-        String species = "Groundnut";
-        String dbAccessionId = null;
-        String reference = null;
-        String genotype = null;
-        String ploidy = null; 
-        String primerId = null;
-        String remarks = null;
-        String assayType = null;
-        String motif = null;
-        String forwardPrimer = null;
-        String reversePrimer = null;
-        String productSize = null;
-        Float annealingTemp = Float.valueOf(0);
-        String amplification = null;
-
-        String alias = "testalias";
-        Integer noOfRepeats = 0; 
-        String motifType = ""; 
-        String sequence = ""; 
-        Integer sequenceLength = 0;
-        Integer minAllele = 0; 
-        Integer maxAllele = 0; 
-        Integer ssrNr = 0; 
-        Float forwardPrimerTemp = 0f; 
-        Float reversePrimerTemp = 0f; 
-        Float elongationTemp = 0f;
-        Integer fragmentSizeExpected = 0; 
-        Integer fragmentSizeObserved = 0; 
-        Integer expectedProductSize = 0; 
-        Integer positionOnReferenceSequence = 0;
-        String restrictionEnzymeForAssay = null;
-        String principalInvestigator = "Juan Dela Cruz";
-        String contact = "juan@irri.com.ph";
-        String institute = "IRRI";
-        
-        Marker marker = new Marker(markerId, markerType, markerName, species, dbAccessionId, reference, genotype, ploidy, primerId, remarks, assayType, motif, forwardPrimer, reversePrimer, productSize, annealingTemp, amplification);
-        MarkerAlias markerAlias = new MarkerAlias(markerId, alias);
-        MarkerDetails markerDetails = new MarkerDetails(markerId, noOfRepeats, motifType, sequence, sequenceLength,
-                minAllele, maxAllele, ssrNr, forwardPrimerTemp, reversePrimerTemp, elongationTemp,
-                fragmentSizeExpected, fragmentSizeObserved, expectedProductSize, positionOnReferenceSequence,
-                restrictionEnzymeForAssay);
-        MarkerUserInfo markerUserInfo = new MarkerUserInfo(markerId, principalInvestigator, contact, institute);
-        
         Boolean addStatus = manager.setCAPMarkers(marker, markerAlias, markerDetails, markerUserInfo);
         System.out.println("testSetCAPMarkers() Added: " + (addStatus != null ? marker : null) + (addStatus != null ? markerAlias : null) + (addStatus != null ? markerDetails : null) + (addStatus != null ? markerUserInfo : null));
     }
 
     @Test
     public void testSetCISRMarkers() throws Exception {
+    	List<Object> markerRecrods = createMarkerMarkeRecords();
+        Marker marker = (Marker) markerRecrods.get(0);
+        MarkerAlias markerAlias = (MarkerAlias) markerRecrods.get(1);
+        MarkerDetails markerDetails = (MarkerDetails) markerRecrods.get(2);
+        MarkerUserInfo markerUserInfo = (MarkerUserInfo) markerRecrods.get(3);
 
-    	Integer markerId = null; //Will be set/overridden by the function
-        String markerType = null; //Will be set/overridden by the function
-        String markerName = "SeqTEST";
-        String species = "Groundnut";
-        String dbAccessionId = null;
-        String reference = null;
-        String genotype = null;
-        String ploidy = null; 
-        String primerId = null;
-        String remarks = null;
-        String assayType = null;
-        String motif = null;
-        String forwardPrimer = null;
-        String reversePrimer = null;
-        String productSize = null;
-        Float annealingTemp = Float.valueOf(0);
-        String amplification = null;
-
-        String alias = "testalias";
-        Integer noOfRepeats = 0; 
-        String motifType = ""; 
-        String sequence = ""; 
-        Integer sequenceLength = 0;
-        Integer minAllele = 0; 
-        Integer maxAllele = 0; 
-        Integer ssrNr = 0; 
-        Float forwardPrimerTemp = 0f; 
-        Float reversePrimerTemp = 0f; 
-        Float elongationTemp = 0f;
-        Integer fragmentSizeExpected = 0; 
-        Integer fragmentSizeObserved = 0; 
-        Integer expectedProductSize = 0; 
-        Integer positionOnReferenceSequence = 0;
-        String restrictionEnzymeForAssay = null;
-        String principalInvestigator = "Juan Dela Cruz";
-        String contact = "juan@irri.com.ph";
-        String institute = "IRRI";
-        
-        Marker marker = new Marker(markerId, markerType, markerName, species, dbAccessionId, reference, genotype, ploidy, primerId, remarks, assayType, motif, forwardPrimer, reversePrimer, productSize, annealingTemp, amplification);
-        MarkerAlias markerAlias = new MarkerAlias(markerId, alias);
-        MarkerDetails markerDetails = new MarkerDetails(markerId, noOfRepeats, motifType, sequence, sequenceLength,
-                minAllele, maxAllele, ssrNr, forwardPrimerTemp, reversePrimerTemp, elongationTemp,
-                fragmentSizeExpected, fragmentSizeObserved, expectedProductSize, positionOnReferenceSequence,
-                restrictionEnzymeForAssay);
-        MarkerUserInfo markerUserInfo = new MarkerUserInfo(markerId, principalInvestigator, contact, institute);
-        
         Boolean addStatus = manager.setCISRMarkers(marker, markerAlias, markerDetails, markerUserInfo);
         System.out.println("testSetCISRMarkers() Added: " + (addStatus != null ? marker : null) + (addStatus != null ? markerAlias : null) + (addStatus != null ? markerDetails : null) + (addStatus != null ? markerUserInfo : null));
     }
@@ -1347,24 +1249,12 @@ public class TestGenotypicDataManagerImpl{
     public void testSetQTL() throws Exception {
         Integer datasetId = null; //Will be set/overridden by the function
         Integer userId = 123;
-
-        String datasetName = " QTL_ ICGS 44 X ICGS 78";
-        String datasetDesc = "ICGS 44 X ICGS 78";
-        String datasetType = "QTL";
-        String genus = "Groundnut"; 
-        String species = ""; 
-        Date uploadTemplateDate = new Date(System.currentTimeMillis()); 
-        String remarks = ""; 
-        String dataType = "int"; 
-        String missingData = null;
-        String method = null;
-        String score = null;
         
         Integer qtlId = null; //Will be set/overridden by the function
         Integer mapId = 1; 
         Float minPosition = 0f; 
         Float maxPosition = 8f; 
-        String trait = "HI"; 
+        Integer traitId = 1001; //"DE"; 
         String experiment = ""; 
         Float effect =0f;
         Float scoreValue = 2.5f;
@@ -1385,10 +1275,9 @@ public class TestGenotypicDataManagerImpl{
     	        
         DatasetUsers datasetUser = new DatasetUsers(datasetId, userId);
         
-        Dataset dataset = new Dataset(datasetId, datasetName, datasetDesc, datasetType, genus, species, uploadTemplateDate, remarks,
-                dataType, missingData, method, score);        
+        Dataset dataset = createDataset();
         
-        QtlDetails qtlDetails = new QtlDetails(qtlId, mapId, minPosition, maxPosition, trait, experiment, effect,
+        QtlDetails qtlDetails = new QtlDetails(qtlId, mapId, minPosition, maxPosition, traitId, experiment, effect,
                 scoreValue, rSquare, linkageGroup, interactions, leftFlankingMarker,
                 rightFlankingMarker, position, clen, seAdditive, hvParent, hvAllele, lvParent, lvAllele);        
 
@@ -1405,19 +1294,6 @@ public class TestGenotypicDataManagerImpl{
         Integer datasetId = null; //Will be set/overridden by the function
         Integer userId = 123;
 
-        // Dataset Fields
-        String datasetName = "QTL_ ICGS 44 X ICGS 78";
-        String datasetDesc = "ICGS 44 X ICGS 78";
-        String datasetType = "QTL";
-        String genus = "Groundnut"; 
-        String species = ""; 
-        Date uploadTemplateDate = new Date(System.currentTimeMillis()); 
-        String remarks = ""; 
-        String dataType = "int"; 
-        String missingData = null;
-        String method = null;
-        String score = null;
-        
         // AccMetadataSet Additional Fields
         Integer gId = 1; 
         Integer nameId = 1;
@@ -1429,6 +1305,7 @@ public class TestGenotypicDataManagerImpl{
         Integer anId = null;     //Will be set/overridden by the function
         String alleleBinValue = "238:238";
         String alleleRawValue = "0.0:0.0";
+        Integer peakHeight = 10;
         
         // DartValues Additional Fields
         Integer adId = null;  //Will be set/overridden by the function
@@ -1439,8 +1316,7 @@ public class TestGenotypicDataManagerImpl{
         Float picValue = 0f; 
         Float discordance = 0f;
         
-        Dataset dataset = new Dataset(datasetId, datasetName, datasetDesc, datasetType, genus, species, uploadTemplateDate, remarks,
-                dataType, missingData, method, score);        
+        Dataset dataset = createDataset();
         
         AccMetadataSet accMetadataSet = new AccMetadataSet(datasetId, gId, nameId);
         
@@ -1448,7 +1324,7 @@ public class TestGenotypicDataManagerImpl{
         
         DatasetUsers datasetUser = new DatasetUsers(datasetId, userId);
         
-        AlleleValues alleleValues = new AlleleValues(anId, datasetId, gId, markerId, alleleBinValue, alleleRawValue);
+        AlleleValues alleleValues = new AlleleValues(anId, datasetId, gId, markerId, alleleBinValue, alleleRawValue, peakHeight);
         
         DartValues dartValues = new DartValues(adId, datasetId, markerId, cloneId, qValue, reproducibility, callRate, picValue, discordance);
         
@@ -1468,19 +1344,6 @@ public class TestGenotypicDataManagerImpl{
         Integer datasetId = null; //Will be set/overridden by the function
         Integer userId = 123;
 
-        // Dataset Fields
-        String datasetName = " QTL_ ICGS 44 X ICGS 78";
-        String datasetDesc = "ICGS 44 X ICGS 78";
-        String datasetType = "QTL";
-        String genus = "Groundnut"; 
-        String species = ""; 
-        Date uploadTemplateDate = new Date(System.currentTimeMillis()); 
-        String remarks = ""; 
-        String dataType = "int"; 
-        String missingData = null;
-        String method = null;
-        String score = null;
-        
         // AccMetadataSet Additional Fields
         Integer gId = 1; 
         Integer nameId = 1;
@@ -1492,9 +1355,9 @@ public class TestGenotypicDataManagerImpl{
         Integer anId = null;     //Will be set/overridden by the function
         String alleleBinValue = "238:238";
         String alleleRawValue = "0.0:0.0";
+        Integer peakHeight = 10;
         
-        Dataset dataset = new Dataset(datasetId, datasetName, datasetDesc, datasetType, genus, species, uploadTemplateDate, remarks,
-                dataType, missingData, method, score);        
+        Dataset dataset = createDataset();        
         
         AccMetadataSet accMetadataSet = new AccMetadataSet(datasetId, gId, nameId);
         
@@ -1502,7 +1365,7 @@ public class TestGenotypicDataManagerImpl{
         
         DatasetUsers datasetUser = new DatasetUsers(datasetId, userId);
         
-        AlleleValues alleleValues = new AlleleValues(anId, datasetId, gId, markerId, alleleBinValue, alleleRawValue);
+        AlleleValues alleleValues = new AlleleValues(anId, datasetId, gId, markerId, alleleBinValue, alleleRawValue, peakHeight);
         
         Boolean addStatus = manager.setSSR(accMetadataSet, markerMetadataSet, datasetUser, alleleValues, dataset);
         System.out.println("testSetSSR() Added: " + (addStatus != null ? accMetadataSet : null) 
@@ -1520,19 +1383,6 @@ public class TestGenotypicDataManagerImpl{
         Integer datasetId = null; //Will be set/overridden by the function
         Integer userId = 123;
 
-        // Dataset Fields
-        String datasetName = " QTL_ ICGS 44 X ICGS 78";
-        String datasetDesc = "ICGS 44 X ICGS 78";
-        String datasetType = "QTL";
-        String genus = "Groundnut"; 
-        String species = ""; 
-        Date uploadTemplateDate = new Date(System.currentTimeMillis()); 
-        String remarks = ""; 
-        String dataType = "int"; 
-        String missingData = null;
-        String method = null;
-        String score = null;
-        
         // AccMetadataSet Additional Fields
         Integer gId = 1; 
         Integer nameId = 1;
@@ -1544,8 +1394,7 @@ public class TestGenotypicDataManagerImpl{
         Integer acId = null;            // Crop tested: Groundnut
         String charValue = "CV"; 
        
-        Dataset dataset = new Dataset(datasetId, datasetName, datasetDesc, datasetType, genus, species, uploadTemplateDate, remarks,
-                dataType, missingData, method, score);        
+        Dataset dataset = createDataset();        
         
         AccMetadataSet accMetadataSet = new AccMetadataSet(datasetId, gId, nameId);
         
@@ -1574,15 +1423,10 @@ public class TestGenotypicDataManagerImpl{
         String datasetName = "Map_Pop GCP-832 Test";
         String datasetDesc = "Map_Pop GCP-832 Test Description";
         String datasetType = "mapping";
-        String genus = "Groundnut"; 
         String species = "Groundnut"; 
-        Date uploadTemplateDate = new Date(System.currentTimeMillis()); 
-        String remarks = ""; 
         String dataType = "map"; 
-        String missingData = null;
-        String method = null;
-        String score = null;
-        
+        String genus = "Groundnut"; 
+
         // AccMetadataSet Additional Fields
         Integer gId = 1; 
         Integer nameId = 1;
@@ -1604,8 +1448,15 @@ public class TestGenotypicDataManagerImpl{
         Integer mpId = null;  //Will be set/overridden by the function
         String mapCharValue = "-";
         
-        Dataset dataset = new Dataset(datasetId, datasetName, datasetDesc, datasetType, genus, species, uploadTemplateDate, remarks,
-                dataType, missingData, method, score);        
+        Dataset dataset = createDataset();
+        dataset.setDatasetName(datasetName);
+        dataset.setDatasetDesc(datasetDesc);
+        dataset.setDatasetType(datasetType);
+        dataset.setDatasetType(datasetType);
+        dataset.setSpecies(species);
+        dataset.setDataType(dataType);
+        dataset.setGenus(genus);
+        
         
         AccMetadataSet accMetadataSet = new AccMetadataSet(datasetId, gId, nameId);
         
@@ -1647,16 +1498,17 @@ public class TestGenotypicDataManagerImpl{
         String mapName = "GCP-833TestMap";
         String mapType = "genetic";
         Integer mpId = 0;
-        
-        Map map = new Map(mapId, mapName, mapType, mpId);
+        String mapDesc = null;
         
         // MarkerOnMap Fields
         Float startPosition = new Float(0);
         Float endPosition = new Float(0);
         String mapUnit = "CM";
         String linkageGroup = "LG23";
-        
-        MarkerOnMap markerOnMap = new MarkerOnMap(mapId, markerId, startPosition, endPosition, mapUnit, linkageGroup);
+
+        Map map = new Map(mapId, mapName, mapType, mpId, mapDesc, mapUnit);
+
+        MarkerOnMap markerOnMap = new MarkerOnMap(mapId, markerId, startPosition, endPosition, linkageGroup);
         
         Boolean addStatus = manager.setMaps(marker, markerOnMap, map);
         System.out.println("testSetMaps() Added: " + (addStatus != null ? marker : null) 
@@ -1778,10 +1630,10 @@ public class TestGenotypicDataManagerImpl{
     
     @Test
     public void testGetQtlDataByQtlTraits() throws Exception {
-        List<String> qtlTraits = new ArrayList<String>();   // Crop tested: Groundnut
-		qtlTraits.add("HI");     
+        List<Integer> qtlTraits = new ArrayList<Integer>();   // Crop tested: Groundnut
+		qtlTraits.add(1001);     // "DE"
         List<QtlDataElement> results = manager.getQtlDataByQtlTraits(qtlTraits, 0, (int) manager.countQtlDataByQtlTraits(qtlTraits)); 
-        System.out.println("testGetQtlByName() RESULTS: " + results.size());
+        System.out.println("testGetQtlDataByQtlTraits() RESULTS: " + results.size());
         for (QtlDataElement element : results){
             System.out.println("    " + element);
         }
@@ -1790,8 +1642,8 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testCountQtlDataByQtlTraits() throws Exception { 
-        List<String> qtlTraits = new ArrayList<String>();   // Crop tested: Groundnut
-		qtlTraits.add("HI");     
+        List<Integer> qtlTraits = new ArrayList<Integer>();   // Crop tested: Groundnut
+		qtlTraits.add(1001);     // "DE"
         long count =  manager.countQtlDataByQtlTraits(qtlTraits); 
         System.out.println("testCountQtlDataByQtlTraits() RESULTS: " + count);
     }    

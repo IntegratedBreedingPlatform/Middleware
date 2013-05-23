@@ -1011,10 +1011,10 @@ public interface GenotypicDataManager{
     
 
     /**
-     * Retrieves QTL IDs from the gdms_qtl table matching the given trait
+     * Retrieves QTL IDs from the gdms_qtl table matching the given trait id
      * 
      * @param trait 
-     *          - the trait to match       
+     *          - the trait id to match       
      * @param start 
      *          - the starting index of the sublist of results to be returned
      * @param numOfRows 
@@ -1024,20 +1024,20 @@ public interface GenotypicDataManager{
      * @return List of QTL IDs
      * @throws MiddlewareQueryException
      */
-    public List<Integer> getQtlByTrait(String trait, int start, int numOfRows) throws MiddlewareQueryException;
+    public List<Integer> getQtlByTrait(Integer trait, int start, int numOfRows) throws MiddlewareQueryException;
     
     /**
-     * Returns the number of QTL entries from the gdms_qtl table matching the given trait
+     * Returns the number of QTL entries from the gdms_qtl table matching the given trait id
      * 
-     * @param trait - trait of QTL
+     * @param trait - trait id of QTL
      * 
      * @return Count of QTL entries
      * @throws MiddlewareQueryException
      */
-    public long countQtlByTrait(String trait) throws MiddlewareQueryException;
+    public long countQtlByTrait(Integer trait) throws MiddlewareQueryException;
 
     /**
-     * Retrieves the QTL traits from gdms_qtl_details table matching the given the dataset ID.
+     * Retrieves the QTL trait ids from gdms_qtl_details table matching the given the dataset ID.
      * If the dataset ID is positive, the traits are retrieved from central, otherwise they are retrieved from local.
      * 
      * @param datasetId 
@@ -1048,10 +1048,10 @@ public interface GenotypicDataManager{
      *          - the number of rows to be included in the sublist of results 
      *          to be returned
 
-     * @return List of QTL traits
+     * @return List of QTL trait ids
      * @throws MiddlewareQueryException
      */
-    public List<String> getQtlTraitsByDatasetId(Integer datasetId, int start, int numOfRows) throws MiddlewareQueryException;
+    public List<Integer> getQtlTraitsByDatasetId(Integer datasetId, int start, int numOfRows) throws MiddlewareQueryException;
     
     /**
      * Returns the number of QTL traits from the gdms_qtl_details table matching the given dataset ID
@@ -1587,11 +1587,11 @@ public interface GenotypicDataManager{
 
     
     /**
-     * Returns the QTL data entries from the gdms_qtl and gdms_qtl_details tables matching the given list of traits.
+     * Returns the QTL data entries from the gdms_qtl and gdms_qtl_details tables matching the given list of trait ids.
      * Retrieves values from both local and central.
      * 
-     * @param qtlTraits 
-     * 			- list of QTL traits to match
+     * @param qtlTraitIds 
+     * 			- list of QTL trait ids to match
      * @param start 
      *          - the starting index of the sublist of results to be returned
      * @param numOfRows 
@@ -1601,18 +1601,18 @@ public interface GenotypicDataManager{
      * @return List of QTL data entries
      * @throws MiddlewareQueryException
      */
-    public List<QtlDataElement> getQtlDataByQtlTraits(List<String> qtlTraits, int start, int numOfRows) throws MiddlewareQueryException;
+    public List<QtlDataElement> getQtlDataByQtlTraits(List<Integer> qtlTraitIds, int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
-     * Returns the number of QTL data entries from the gdms_qtl and gdms_qtl_details tables matching the given list of traits.
+     * Returns the number of QTL data entries from the gdms_qtl and gdms_qtl_details tables matching the given list of trait ids.
      * Counts from both local and central instances.
      * 
-     * @param qtlTraits - list of QTL traits to match
+     * @param qtlTraitIds - list of QTL trait ids to match
      * 
      * @return Count of QTL data entries
      * @throws MiddlewareQueryException
      */
-    public long countQtlDataByQtlTraits(List<String> qtlTraits) throws MiddlewareQueryException;
+    public long countQtlDataByQtlTraits(List<Integer> qtlTraitIds) throws MiddlewareQueryException;
 
     
 }

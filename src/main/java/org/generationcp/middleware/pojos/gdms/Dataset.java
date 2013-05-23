@@ -21,9 +21,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 /**
  * POJO for dataset table
  * 
@@ -140,36 +137,46 @@ public class Dataset implements Serializable{
     @Column(name = "score")
     private String score;
     
+    @Column(name = "institute")
+    private String institute;
+    
+    @Column(name = "principal_investigator")
+    private String principalInvestigator;
+    
+    @Column(name = "email")
+    private String email;
+    
+    @Column(name = "purpose_of_study")
+    private String purposeOfStudy;
+
+
     public Dataset() {
     }
 
-    public Dataset(Integer datasetId,
-            String datasetName,
-            String datasetDesc,
-            String datasetType,
-            String genus, 
-            String species, 
-            Date uploadTemplateDate, 
-            String remarks, 
-            String dataType, 
-            String missingData,
-            String method,
-            String score) {
-        
-        this.datasetId = datasetId;
-        this.datasetName = datasetName;
-        this.datasetDesc = datasetDesc;
-        this.datasetType = datasetType;
-        this.genus = genus;
-        this.species = species;
-        this.uploadTemplateDate = uploadTemplateDate;
-        this.remarks = remarks;
-        this.dataType = dataType;
-        this.missingData = missingData;
-        this.method = method;
-        this.score = score;
-    }
-
+    public Dataset(Integer datasetId, String datasetName, String datasetDesc,
+			String datasetType, String genus, String species,
+			Date uploadTemplateDate, String remarks, String dataType,
+			String missingData, String method, String score, String institute,
+			String principalInvestigator, String email, String purposeOfStudy) {
+		super();
+		this.datasetId = datasetId;
+		this.datasetName = datasetName;
+		this.datasetDesc = datasetDesc;
+		this.datasetType = datasetType;
+		this.genus = genus;
+		this.species = species;
+		this.uploadTemplateDate = uploadTemplateDate;
+		this.remarks = remarks;
+		this.dataType = dataType;
+		this.missingData = missingData;
+		this.method = method;
+		this.score = score;
+		this.institute = institute;
+		this.principalInvestigator = principalInvestigator;
+		this.email = email;
+		this.purposeOfStudy = purposeOfStudy;
+	}
+    
     public Integer getDatasetId() {
         return datasetId;
     }
@@ -266,56 +273,204 @@ public class Dataset implements Serializable{
         this.score = score;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (obj == this) {
-            return true;
-        }
-        if (!(obj instanceof Dataset)) {
-            return false;
-        }
+    public String getInstitute() {
+		return institute;
+	}
 
-        Dataset rhs = (Dataset) obj;
-        return new EqualsBuilder().append(datasetId, rhs.datasetId).isEquals();
-    }
+	public void setInstitute(String institute) {
+		this.institute = institute;
+	}
+
+	public String getPrincipalInvestigator() {
+		return principalInvestigator;
+	}
+
+	public void setPrincipalInvestigator(String principalInvestigator) {
+		this.principalInvestigator = principalInvestigator;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getPurposeOfStudy() {
+		return purposeOfStudy;
+	}
+
+	public void setPurposeOfStudy(String purposeOfStudy) {
+		this.purposeOfStudy = purposeOfStudy;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Dataset other = (Dataset) obj;
+		if (dataType == null) {
+			if (other.dataType != null)
+				return false;
+		} else if (!dataType.equals(other.dataType))
+			return false;
+		if (datasetDesc == null) {
+			if (other.datasetDesc != null)
+				return false;
+		} else if (!datasetDesc.equals(other.datasetDesc))
+			return false;
+		if (datasetId == null) {
+			if (other.datasetId != null)
+				return false;
+		} else if (!datasetId.equals(other.datasetId))
+			return false;
+		if (datasetName == null) {
+			if (other.datasetName != null)
+				return false;
+		} else if (!datasetName.equals(other.datasetName))
+			return false;
+		if (datasetType == null) {
+			if (other.datasetType != null)
+				return false;
+		} else if (!datasetType.equals(other.datasetType))
+			return false;
+		if (email == null) {
+			if (other.email != null)
+				return false;
+		} else if (!email.equals(other.email))
+			return false;
+		if (genus == null) {
+			if (other.genus != null)
+				return false;
+		} else if (!genus.equals(other.genus))
+			return false;
+		if (institute == null) {
+			if (other.institute != null)
+				return false;
+		} else if (!institute.equals(other.institute))
+			return false;
+		if (method == null) {
+			if (other.method != null)
+				return false;
+		} else if (!method.equals(other.method))
+			return false;
+		if (missingData == null) {
+			if (other.missingData != null)
+				return false;
+		} else if (!missingData.equals(other.missingData))
+			return false;
+		if (principalInvestigator == null) {
+			if (other.principalInvestigator != null)
+				return false;
+		} else if (!principalInvestigator.equals(other.principalInvestigator))
+			return false;
+		if (purposeOfStudy == null) {
+			if (other.purposeOfStudy != null)
+				return false;
+		} else if (!purposeOfStudy.equals(other.purposeOfStudy))
+			return false;
+		if (remarks == null) {
+			if (other.remarks != null)
+				return false;
+		} else if (!remarks.equals(other.remarks))
+			return false;
+		if (score == null) {
+			if (other.score != null)
+				return false;
+		} else if (!score.equals(other.score))
+			return false;
+		if (species == null) {
+			if (other.species != null)
+				return false;
+		} else if (!species.equals(other.species))
+			return false;
+		if (uploadTemplateDate == null) {
+			if (other.uploadTemplateDate != null)
+				return false;
+		} else if (!uploadTemplateDate.equals(other.uploadTemplateDate))
+			return false;
+		return true;
+	}
 
     @Override
-    public int hashCode() {
-        return new HashCodeBuilder(37, 53).append(datasetId).toHashCode();
-    }
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((dataType == null) ? 0 : dataType.hashCode());
+		result = prime * result
+				+ ((datasetDesc == null) ? 0 : datasetDesc.hashCode());
+		result = prime * result
+				+ ((datasetId == null) ? 0 : datasetId.hashCode());
+		result = prime * result
+				+ ((datasetName == null) ? 0 : datasetName.hashCode());
+		result = prime * result
+				+ ((datasetType == null) ? 0 : datasetType.hashCode());
+		result = prime * result + ((email == null) ? 0 : email.hashCode());
+		result = prime * result + ((genus == null) ? 0 : genus.hashCode());
+		result = prime * result
+				+ ((institute == null) ? 0 : institute.hashCode());
+		result = prime * result + ((method == null) ? 0 : method.hashCode());
+		result = prime * result
+				+ ((missingData == null) ? 0 : missingData.hashCode());
+		result = prime
+				* result
+				+ ((principalInvestigator == null) ? 0 : principalInvestigator
+						.hashCode());
+		result = prime * result
+				+ ((purposeOfStudy == null) ? 0 : purposeOfStudy.hashCode());
+		result = prime * result + ((remarks == null) ? 0 : remarks.hashCode());
+		result = prime * result + ((score == null) ? 0 : score.hashCode());
+		result = prime * result + ((species == null) ? 0 : species.hashCode());
+		result = prime
+				* result
+				+ ((uploadTemplateDate == null) ? 0 : uploadTemplateDate
+						.hashCode());
+		return result;
+	}
 
     @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("Dataset [datasetId=");
-        builder.append(datasetId);
-        builder.append(", datasetName=");
-        builder.append(datasetName);
-        builder.append(", datasetDesc=");
-        builder.append(datasetDesc);
-        builder.append(", datasetType=");
-        builder.append(datasetType);
-        builder.append(", genus=");
-        builder.append(genus);
-        builder.append(", species=");
-        builder.append(species);
-        builder.append(", uploadTemplateDate=");
-        builder.append(uploadTemplateDate);
-        builder.append(", remarks=");
-        builder.append(remarks);
-        builder.append(", dataType=");
-        builder.append(dataType);
-        builder.append(", missingData=");
-        builder.append(missingData);
-        builder.append(", method=");
-        builder.append(method);
-        builder.append(", score=");
-        builder.append(score);
-        builder.append("]");
-        return builder.toString();
-    }
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Dataset [datasetId=");
+		builder.append(datasetId);
+		builder.append(", datasetName=");
+		builder.append(datasetName);
+		builder.append(", datasetDesc=");
+		builder.append(datasetDesc);
+		builder.append(", datasetType=");
+		builder.append(datasetType);
+		builder.append(", genus=");
+		builder.append(genus);
+		builder.append(", species=");
+		builder.append(species);
+		builder.append(", uploadTemplateDate=");
+		builder.append(uploadTemplateDate);
+		builder.append(", remarks=");
+		builder.append(remarks);
+		builder.append(", dataType=");
+		builder.append(dataType);
+		builder.append(", missingData=");
+		builder.append(missingData);
+		builder.append(", method=");
+		builder.append(method);
+		builder.append(", score=");
+		builder.append(score);
+		builder.append(", institute=");
+		builder.append(institute);
+		builder.append(", principalInvestigator=");
+		builder.append(principalInvestigator);
+		builder.append(", email=");
+		builder.append(email);
+		builder.append(", purposeOfStudy=");
+		builder.append(purposeOfStudy);
+		builder.append("]");
+		return builder.toString();
+	}
 
 }

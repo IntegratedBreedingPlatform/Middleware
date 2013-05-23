@@ -69,7 +69,7 @@ public class QtlDAO  extends GenericDAO<Qtl, Integer>{
                     String chromosome = (String) result[2];
                     Float minPosition = (Float) result[3];
                     Float maxPosition = (Float) result[4];
-                    String trait = (String) result[5];
+                    Integer traitId = (Integer) result[5];
                     String experiment = (String) result[6];
                     String leftFlankingMarker = (String) result[7];
                     String rightFlankingMarker = (String) result[8];
@@ -81,7 +81,7 @@ public class QtlDAO  extends GenericDAO<Qtl, Integer>{
                     String ontology = (String) result[14];
                     
                     
-                    QtlDetailElement element = new QtlDetailElement(qtlName, mapName, chromosome, minPosition, maxPosition, trait,
+                    QtlDetailElement element = new QtlDetailElement(qtlName, mapName, chromosome, minPosition, maxPosition, traitId,
                             experiment, leftFlankingMarker, rightFlankingMarker, effect, scoreValue, rSquare,
                             interactions, tRName, ontology);
                     toReturn.add(element);
@@ -131,7 +131,7 @@ public class QtlDAO  extends GenericDAO<Qtl, Integer>{
                     String chromosome = (String) result[2];
                     Float minPosition = (Float) result[3];
                     Float maxPosition = (Float) result[4];
-                    String trait = (String) result[5];
+                    Integer traitId = (Integer) result[5];
                     String experiment = (String) result[6];
                     String leftFlankingMarker = (String) result[7];
                     String rightFlankingMarker = (String) result[8];
@@ -143,7 +143,7 @@ public class QtlDAO  extends GenericDAO<Qtl, Integer>{
                     String ontology = (String) result[14];
                     
                     
-                    QtlDetailElement element = new QtlDetailElement(qtlName, mapName, chromosome, minPosition, maxPosition, trait,
+                    QtlDetailElement element = new QtlDetailElement(qtlName, mapName, chromosome, minPosition, maxPosition, traitId,
                             experiment, leftFlankingMarker, rightFlankingMarker, effect, scoreValue, rSquare,
                             interactions, tRName, ontology);
                     toReturn.add(element);
@@ -174,8 +174,8 @@ public class QtlDAO  extends GenericDAO<Qtl, Integer>{
         return 0L;
     }
     
-    @SuppressWarnings("rawtypes")
-    public Set<Integer> getMapIDsByQTLName(String qtlName, int start, int numOfRows) throws MiddlewareQueryException{
+    @SuppressWarnings("unchecked")
+	public Set<Integer> getMapIDsByQTLName(String qtlName, int start, int numOfRows) throws MiddlewareQueryException{
         try {
             
             SQLQuery query;
@@ -195,7 +195,6 @@ public class QtlDAO  extends GenericDAO<Qtl, Integer>{
         return new TreeSet<Integer>();
     }
     
-    @SuppressWarnings("rawtypes")
     public long countMapIDsByQTLName(String qtlName) throws MiddlewareQueryException{
         try {
             
@@ -218,24 +217,24 @@ public class QtlDAO  extends GenericDAO<Qtl, Integer>{
     }
 
     @SuppressWarnings("unchecked")
-    public List<Integer> getQtlByTrait(String trait, int start, int numOfRows) throws MiddlewareQueryException {
+    public List<Integer> getQtlByTrait(Integer traitId, int start, int numOfRows) throws MiddlewareQueryException {
         try {
             SQLQuery query = getSession().createSQLQuery(Qtl.GET_QTL_BY_TRAIT);
-            query.setParameter("qtlTrait", trait);
+            query.setParameter("qtlTrait", traitId);
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
             return (List<Integer>) query.list();        
         } catch (HibernateException e) {
-        	logAndThrowException("Error with getQtlByTrait(trait=" + trait + ") query from gdms_qtl_details: "
+        	logAndThrowException("Error with getQtlByTrait(traitId=" + traitId + ") query from gdms_qtl_details: "
                     + e.getMessage(), e);
         }
         return new ArrayList<Integer>();
     }
 
-    public long countQtlByTrait(String trait) throws MiddlewareQueryException {
+    public long countQtlByTrait(Integer traitId) throws MiddlewareQueryException {
         try {
             Query query = getSession().createSQLQuery(Qtl.COUNT_QTL_BY_TRAIT);
-            query.setParameter("qtlTrait", trait);
+            query.setParameter("qtlTrait", traitId);
             BigInteger result = (BigInteger) query.uniqueResult();
             if (result != null) {
                 return result.longValue();
@@ -243,7 +242,7 @@ public class QtlDAO  extends GenericDAO<Qtl, Integer>{
                 return 0;
             }
         } catch (HibernateException e) {
-        	logAndThrowException("Error with countQtlByTrait(trait=" + trait + ") query from gdms_qtl_details: "
+        	logAndThrowException("Error with countQtlByTrait(traitId=" + traitId + ") query from gdms_qtl_details: "
                     + e.getMessage(), e);
         }
         return 0L;

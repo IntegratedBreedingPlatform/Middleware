@@ -36,7 +36,7 @@ public class MappingPop implements Serializable{
     private static final long serialVersionUID = 1L;
     
     public static final String GET_PARENTS_BY_DATASET_ID =
-            "SELECT parent_a_gid, parent_b_gid, mapping_type " +
+            "SELECT parent_a_nid, parent_b_nid, mapping_type " +
             "FROM gdms_mapping_pop " +
             "WHERE dataset_id = :datasetId";
     
@@ -44,8 +44,8 @@ public class MappingPop implements Serializable{
             "SELECT DISTINCT" +
                 " gdms_mapping_pop_values.dataset_id" +
                 ", gdms_mapping_pop.mapping_type" +
-                ", gdms_mapping_pop.parent_a_gid" +
-                ", gdms_mapping_pop.parent_b_gid" +
+                ", gdms_mapping_pop.parent_a_nid" +
+                ", gdms_mapping_pop.parent_b_nid" +
                 ", CONCAT(gdms_marker.marker_type, '')" +
             " FROM gdms_mapping_pop_values" +
                 ", gdms_mapping_pop" +
@@ -59,16 +59,13 @@ public class MappingPop implements Serializable{
                 ", gdms_marker.marker_name";
     
     public static final String GET_ALL_PARENTS_FROM_MAPPING_POPULATION = 
-            "SELECT parent_a_gid, parent_b_gid " +
+            "SELECT parent_a_nid, parent_b_nid " +
             "FROM gdms_mapping_pop";
         
     public static final String COUNT_ALL_PARENTS_FROM_MAPPING_POPULATION = 
-            "SELECT count(parent_a_gid) " +
+            "SELECT count(parent_a_nid) " +
             "FROM gdms_mapping_pop";
 
-    
-    
-    /** The dataset id. */
     @Id
     @Basic(optional = false)
     @Column(name = "dataset_id")
@@ -76,56 +73,35 @@ public class MappingPop implements Serializable{
 
     private ParentElement parent;
 
-    /** The population size. */
     @Column(name = "population_size")
     private Integer populationSize;
 
-    /** The population type. */
     @Column(name = "population_type")
     private String populationType;
 
-    /** The map data description. */
     @Column(name = "mapdata_desc")
     private String mapDataDescription;
     
-    /** The scoring scheme. */
     @Column(name = "scoring_scheme")
     private String scoringScheme;
     
-    /** The map id. */
     @Column(name = "map_id")
     private Integer mapId;
 
-    /**
-     * Instantiates a new mapping pop.
-     */
     public MappingPop() {
     }
 
-    /**
-     * Instantiates a new mapping pop.
-     *
-     * @param datasetId the dataset id
-     * @param mappingType the mapping type
-     * @param parentAGId the parent ag id
-     * @param parentBGId the parent bg id
-     * @param populationSize the population size
-     * @param populationType the population type
-     * @param mapDataDescription the map data description
-     * @param scoringScheme the scoring scheme
-     * @param mapId the map id
-     */
     public MappingPop(Integer datasetId,
                     String mappingType,
-                    Integer parentAGId,
-                    Integer parentBGId,
+                    Integer parentANId,
+                    Integer parentBNId,
                     Integer populationSize,
                     String populationType,
                     String mapDataDescription,
                     String scoringScheme,
                     Integer mapId) {
         this.datasetId = datasetId;
-        this.parent = new ParentElement(parentAGId, parentBGId, mappingType);
+        this.parent = new ParentElement(parentANId, parentBNId, mappingType);
         this.populationSize = populationSize;
         this.populationType = populationType;
         this.mapDataDescription = mapDataDescription;
@@ -133,20 +109,10 @@ public class MappingPop implements Serializable{
         this.mapId = mapId;    
     }
 
-    /**
-     * Gets the dataset id.
-     *
-     * @return the dataset id
-     */
     public Integer getDatasetId() {
         return datasetId;
     }
     
-    /**
-     * Sets the dataset id.
-     *
-     * @param datasetId the new dataset id
-     */
     public void setDatasetId(Integer datasetId) {
         this.datasetId = datasetId;
     }
@@ -159,153 +125,70 @@ public class MappingPop implements Serializable{
         this.parent = parent;
     }
 
-    /**
-     * Gets the mapping type.
-     *
-     * @return the mapping type
-     */
     public String getMappingType() {
         return parent.getMappingType();
     }
     
-    /**
-     * Sets the mapping type.
-     *
-     * @param mappingType the new mapping type
-     */
     public void setMappingType(String mappingType) {
         parent.setMappingType(mappingType);
     }
     
-    /**
-     * Gets the parent ag id.
-     *
-     * @return the parent ag id
-     */
-    public Integer getParentAGId() {
-        return parent.getParentAGId();
+    public Integer getParentANId() {
+        return parent.getParentANId();
     }
     
-    /**
-     * Sets the parent ag id.
-     *
-     * @param parentAGId the new parent ag id
-     */
-    public void setParentAGId(Integer parentAGId) {
-        parent.setParentAGId(parentAGId);
+    public void setParentANId(Integer parentANId) {
+        parent.setParentANId(parentANId);
     }
     
-    /**
-     * Gets the parent bg id.
-     *
-     * @return the parent bg id
-     */
-    public Integer getParentBGId() {
+    public Integer getParentBNId() {
         return parent.getParentBGId();
-   }
+    }
     
-    /**
-     * Sets the parent bg id.
-     *
-     * @param parentBGId the new parent bg id
-     */
     public void setParentBGId(Integer parentBGId) {
         parent.setParentBGId(parentBGId);
     }
     
-    /**
-     * Gets the population size.
-     *
-     * @return the population size
-     */
     public Integer getPopulationSize() {
         return populationSize;
     }
     
-    /**
-     * Sets the population size.
-     *
-     * @param populationSize the new population size
-     */
     public void setPopulationSize(Integer populationSize) {
         this.populationSize = populationSize;
     }
     
-    /**
-     * Gets the population type.
-     *
-     * @return the population type
-     */
     public String getPopulationType() {
         return populationType;
     }
     
-    /**
-     * Sets the population type.
-     *
-     * @param populationType the new population type
-     */
     public void setPopulationType(String populationType) {
         this.populationType = populationType;
     }
     
-    /**
-     * Gets the map data description.
-     *
-     * @return the map data description
-     */
     public String getMapDataDescription() {
         return mapDataDescription;
     }
     
-    /**
-     * Sets the map data description.
-     *
-     * @param mapDataDescription the new map data description
-     */
     public void setMapDataDescription(String mapDataDescription) {
         this.mapDataDescription = mapDataDescription;
     }
     
-    /**
-     * Gets the scoring scheme.
-     *
-     * @return the scoring scheme
-     */
     public String getScoringScheme() {
         return scoringScheme;
     }
     
-    /**
-     * Sets the scoring scheme.
-     *
-     * @param scoringScheme the new scoring scheme
-     */
     public void setScoringScheme(String scoringScheme) {
         this.scoringScheme = scoringScheme;
     }
     
-    /**
-     * Gets the map id.
-     *
-     * @return the map id
-     */
     public Integer getMapId() {
         return mapId;
     }
     
-    /**
-     * Sets the map id.
-     *
-     * @param mapId the new map id
-     */
     public void setMapId(Integer mapId) {
         this.mapId = mapId;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -329,9 +212,6 @@ public class MappingPop implements Serializable{
                                     .append(mapId, rhs.mapId).isEquals();    
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         return new HashCodeBuilder(97, 311).append(datasetId)

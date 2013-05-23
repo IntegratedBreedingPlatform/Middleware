@@ -13,7 +13,6 @@
 package org.generationcp.middleware.pojos.gdms;
 
 import java.io.Serializable;
-import java.math.BigInteger;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
@@ -49,9 +48,6 @@ public class MarkerOnMap implements Serializable{
     @Column(name = "end_position")
     private Float endPosition;
 
-    @Column(name = "map_unit")
-    private String mapUnit;
-
     @Column(name = "linkage_group")
     private String linkageGroup;
     
@@ -59,13 +55,12 @@ public class MarkerOnMap implements Serializable{
         super();
     }
 
-    public MarkerOnMap(Integer mapId, Integer markerId, Float startPosition, Float endPosition, String mapUnit, String linkageGroup) {
+    public MarkerOnMap(Integer mapId, Integer markerId, Float startPosition, Float endPosition, String linkageGroup) {
         super();
         this.mapId = mapId;
         this.markerId = markerId;
         this.startPosition = startPosition;
         this.endPosition = endPosition;
-        this.mapUnit = mapUnit;
         this.linkageGroup = linkageGroup;
     }
     
@@ -99,14 +94,6 @@ public class MarkerOnMap implements Serializable{
     
     public void setEndPosition(Float endPosition) {
         this.startPosition = endPosition;
-    }
-
-    public String getMapUnit() {
-        return mapUnit;
-    }
-    
-    public void setMapUnit(String mapUnit) {
-        this.mapUnit = mapUnit;
     }
 
     public String getLinkageGroup() {
@@ -155,8 +142,6 @@ public class MarkerOnMap implements Serializable{
         builder.append(startPosition);
         builder.append(", endPosition=");
         builder.append(endPosition);
-        builder.append(", mapUnit=");
-        builder.append(mapUnit);
         builder.append(", linkageGroup=");
         builder.append(linkageGroup);
         builder.append("]");

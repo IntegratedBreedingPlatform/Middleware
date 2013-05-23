@@ -56,12 +56,15 @@ public class MapDAO extends GenericDAO<Map, Integer>{
                 Object[] result = (Object[]) o;
                 if (result != null) {
                     int markerCount = ((BigInteger) result[0]).intValue();
-                    Float maxStartPosition = (Float) result[1];
+                    Double maxStartPosition = (Double) result[1];
                     String linkageGroup = (String) result[2];
                     String mapName = (String) result[3];
                     String mapType = (String) result[4];
+                    String mapDesc = (String) result[5];
+                    String mapUnit = (String) result[6];
                     
-                    MapDetailElement map = new MapDetailElement(markerCount, maxStartPosition, linkageGroup, mapName, mapType);
+                    MapDetailElement map = new MapDetailElement(markerCount, maxStartPosition, 
+                    							linkageGroup, mapName, mapType, mapDesc, mapUnit);
                     maps.add(map);
                 }
             }
@@ -106,11 +109,15 @@ public class MapDAO extends GenericDAO<Map, Integer>{
                 Object[] result = (Object[]) o;
                 if (result != null) {
                     BigInteger markerCount = (BigInteger) result[0];
-                    Float max  = (Float) result[1];
+                    Double max  = (Double) result[1];
                     String linkageGroup = (String) result[2];
                     String mapName2 = (String) result[3];
                     String mapType = (String) result[4];
-                    MapDetailElement element = new MapDetailElement(markerCount.intValue(), max, linkageGroup, mapName2, mapType);
+                    String mapDesc = (String) result[5];
+                    String mapUnit = (String) result[6];
+                    
+                    MapDetailElement element = new MapDetailElement(markerCount.intValue(), max, 
+                    		linkageGroup, mapName2, mapType, mapDesc, mapUnit);
                     values.add(element);
                 }
             }

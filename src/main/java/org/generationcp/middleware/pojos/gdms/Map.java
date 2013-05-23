@@ -52,12 +52,20 @@ public class Map implements Serializable{
     @Column(name = "mp_id")
     private Integer mpId;
     
+    @Column(name = "map_desc")
+    private String mapDesc;
+    
+    @Column(name = "map_unit")
+    private String mapUnit;
+    
     private static final String GET_MAP_DETAILS_SELECT = 
             "SELECT COUNT(DISTINCT gdms_mapping_data.marker_id) AS marker_count " +
             "       , MAX(gdms_mapping_data.start_position) AS max " +
             "       , gdms_mapping_data.linkage_group AS Linkage_group " +
             "       , concat(gdms_mapping_data.map_name,'') AS map " +
             "       , concat(gdms_map.map_type,'') AS map_type " +
+            "       , gdms_map.map_desc AS map_desc " +
+            "       , gdms_map.map_unit AS map_unit " +
             "FROM gdms_mapping_data, gdms_map " +
             "WHERE gdms_mapping_data.map_id=gdms_map.map_id " 
             ;
@@ -87,14 +95,16 @@ public class Map implements Serializable{
     public Map() {        
     }
 
-    public Map(Integer mapId, String mapName, String mapType, Integer mpId) {
-        super();
-        this.mapId = mapId;
-        this.mapName = mapName;
-        this.mapType = mapType;
-        this.mpId = mpId;
-    }
-
+    public Map(Integer mapId, String mapName, String mapType, Integer mpId,
+			String mapDesc, String mapUnit) {
+		super();
+		this.mapId = mapId;
+		this.mapName = mapName;
+		this.mapType = mapType;
+		this.mpId = mpId;
+		this.mapDesc = mapDesc;
+		this.mapUnit = mapUnit;
+	}
 
     public Map(Integer mapId) {
         this.mapId = mapId;
@@ -139,7 +149,23 @@ public class Map implements Serializable{
         this.mpId = mpId;
     }
     
-    @Override
+    public String getMapDesc() {
+		return mapDesc;
+	}
+
+	public void setMapDesc(String mapDesc) {
+		this.mapDesc = mapDesc;
+	}
+
+	public String getMapUnit() {
+		return mapUnit;
+	}
+
+	public void setMapUnit(String mapUnit) {
+		this.mapUnit = mapUnit;
+	}
+
+	@Override
     public boolean equals(Object obj) {
         if (obj == null) {
             return false;
@@ -161,19 +187,23 @@ public class Map implements Serializable{
     }
 
     @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("Map [mapId=");
-        builder.append(mapId);
-        builder.append(", mapName=");
-        builder.append(mapName);
-        builder.append(", mapType=");
-        builder.append(mapType);
-        builder.append(", mpId=");
-        builder.append(mpId);
-        builder.append("]");
-        return builder.toString();
-    }
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Map [mapId=");
+		builder.append(mapId);
+		builder.append(", mapName=");
+		builder.append(mapName);
+		builder.append(", mapType=");
+		builder.append(mapType);
+		builder.append(", mpId=");
+		builder.append(mpId);
+		builder.append(", mapDesc=");
+		builder.append(mapDesc);
+		builder.append(", mapUnit=");
+		builder.append(mapUnit);
+		builder.append("]");
+		return builder.toString();
+	}
     
 }
 

@@ -92,7 +92,7 @@ public class QtlDetails implements Serializable{
     		;
     		
     public static final String GET_QTL_TRAITS_BY_DATASET_ID = 
-    		"SELECT DISTINCT CONCAT(gqd.trait,'') " 
+    		"SELECT DISTINCT gqd.tid " 
     		+ "FROM gdms_qtl gq  "
     		+ "INNER JOIN gdms_qtl_details gqd  " 
     		+ "ON gq.qtl_id = gqd.qtl_id  "
@@ -100,7 +100,7 @@ public class QtlDetails implements Serializable{
     		;
 
     public static final String COUNT_QTL_TRAITS_BY_DATASET_ID = 
-    		"SELECT COUNT(DISTINCT CONCAT(gqd.trait,'')) " 
+    		"SELECT COUNT(DISTINCT gqd.tid) " 
     		+ "FROM gdms_qtl gq  "
     		+ "INNER JOIN gdms_qtl_details gqd  " 
     		+ "ON gq.qtl_id = gqd.qtl_id  "
@@ -113,7 +113,7 @@ public class QtlDetails implements Serializable{
     		+ "		, gqd.position " 
     		+ "		, gqd.min_position " 
     		+ "		, gqd.max_position " 
-    		+ "		, CONCAT(gqd.trait,'') " 
+    		+ "		, gqd.tid " 
     		+ "		, CONCAT(gqd.experiment,'') " 
     		+ "		, gqd.left_flanking_marker " 
     		+ "		, gqd.right_flanking_marker " 
@@ -123,7 +123,7 @@ public class QtlDetails implements Serializable{
     		+ "FROM gdms_qtl_details gqd " 
     		+ "INNER JOIN gdms_qtl gq "
     		+ "ON gqd.qtl_id = gq.qtl_id " 
-    		+ "AND gqd.trait "
+    		+ "AND gqd.tid "
     		+ "IN (:qtlTraits) " 
     		;
 
@@ -132,7 +132,7 @@ public class QtlDetails implements Serializable{
     		+ "FROM gdms_qtl_details gqd " 
     		+ "INNER JOIN gdms_qtl gq "
     		+ "ON gqd.qtl_id = gq.qtl_id " 
-    		+ "AND gqd.trait "
+    		+ "AND gqd.tid "
     		+ "IN (:qtlTraits) " 
     		;
 
@@ -145,8 +145,8 @@ public class QtlDetails implements Serializable{
     @Column(name = "max_position")
     private Float maxPosition;
     
-    @Column(name = "trait")
-    private String trait;
+    @Column(name = "tid")
+    private Integer traitId;
     
     @Column(name = "experiment")
     private String experiment;
@@ -198,7 +198,7 @@ public class QtlDetails implements Serializable{
         
     }
 
-    public QtlDetails(Integer qtlId, Integer mapId, Float minPosition, Float maxPosition, String trait, String experiment, Float effect,
+    public QtlDetails(Integer qtlId, Integer mapId, Float minPosition, Float maxPosition, Integer traitId, String experiment, Float effect,
             Float scoreValue, Float rSquare, String linkageGroup, String interactions, String leftFlankingMarker,
             String rightFlankingMarker, Float position, Float clen, String seAdditive, String hvParent, String hvAllele, String lvParent,
             String lvAllele) {
@@ -206,7 +206,7 @@ public class QtlDetails implements Serializable{
         this.id = new QtlDetailsPK(qtlId, mapId);
         this.minPosition = minPosition;
         this.maxPosition = maxPosition;
-        this.trait = trait;
+        this.traitId = traitId;
         this.experiment = experiment;
         this.effect = effect;
         this.scoreValue = scoreValue;
@@ -255,13 +255,13 @@ public class QtlDetails implements Serializable{
     }
 
     
-    public String getTrait() {
-        return trait;
+    public Integer getTraitId() {
+        return traitId;
     }
 
     
-    public void setTrait(String trait) {
-        this.trait = trait;
+    public void setTraitId(Integer traitId) {
+        this.traitId = traitId;
     }
 
     
@@ -438,7 +438,7 @@ public class QtlDetails implements Serializable{
         result = prime * result + ((rightFlankingMarker == null) ? 0 : rightFlankingMarker.hashCode());
         result = prime * result + ((scoreValue == null) ? 0 : scoreValue.hashCode());
         result = prime * result + ((seAdditive == null) ? 0 : seAdditive.hashCode());
-        result = prime * result + ((trait == null) ? 0 : trait.hashCode());
+        result = prime * result + ((traitId == null) ? 0 : traitId.hashCode());
         return result;
     }
 
@@ -542,10 +542,10 @@ public class QtlDetails implements Serializable{
                 return false;
         } else if (!seAdditive.equals(other.seAdditive))
             return false;
-        if (trait == null) {
-            if (other.trait != null)
+        if (traitId == null) {
+            if (other.traitId != null)
                 return false;
-        } else if (!trait.equals(other.trait))
+        } else if (!traitId.equals(other.traitId))
             return false;
         return true;
     }
@@ -562,8 +562,8 @@ public class QtlDetails implements Serializable{
         builder.append(minPosition);
         builder.append(", maxPosition=");
         builder.append(maxPosition);
-        builder.append(", trait=");
-        builder.append(trait);
+        builder.append(", traitId=");
+        builder.append(traitId);
         builder.append(", experiment=");
         builder.append(experiment);
         builder.append(", effect=");
