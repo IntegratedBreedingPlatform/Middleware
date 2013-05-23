@@ -21,6 +21,7 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -111,6 +112,9 @@ public class Method implements Serializable{
     @Basic(optional = false)
     @Column(name = "mdate")
     private Integer mdate;
+    
+    @Transient
+    private Boolean isnew = false;
 
     public Method() {
     }
@@ -311,5 +315,13 @@ public class Method implements Serializable{
         builder.append("]");
         return builder.toString();
     }
+
+	public Boolean getIsnew() {
+		return isnew;
+	}
+
+	public void setIsnew(Boolean isnew) {
+		this.isnew = isnew;
+	}
 
 }
