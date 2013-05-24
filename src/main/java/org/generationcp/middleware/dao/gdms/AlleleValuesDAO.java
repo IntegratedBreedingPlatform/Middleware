@@ -232,8 +232,7 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer>{
                     Integer gid = (Integer) result[1];
                     String markerName = (String) result[2];
                     String charValue = (String) result[3];
-                    Integer peakHeight = (Integer) result[4];
-                    AllelicValueElement allelicValueElement = new AllelicValueElement(datasetId, gid, markerName, charValue, peakHeight);
+                    AllelicValueElement allelicValueElement = new AllelicValueElement(datasetId, gid, markerName, charValue);
                     values.add(allelicValueElement);
                 }
             }
@@ -279,9 +278,8 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer>{
                     Integer gid = (Integer) result[1];
                     String markerName = (String) result[2];
                     String data = (String) result[3];
-                    Integer peakHeight = (Integer) result[4];
                     AllelicValueElement allelicValueElement = 
-                    		new AllelicValueElement(datasetId, gid, markerName, data, peakHeight);
+                    		new AllelicValueElement(datasetId, gid, markerName, data);
                     values.add(allelicValueElement);
                 }
             }

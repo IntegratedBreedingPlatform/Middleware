@@ -64,6 +64,25 @@ public class AllelicValueElement implements Serializable{
         this.markerName = markerName;
         this.peakHeight = peakHeight;
     }
+    
+    /**
+     * Instantiates a AllelicValueElement object with datasetId, gid, markerName and data(char_value for table char_values, 
+     * allele_bin_value for allele_values table and map_char_value for mapping_pop_values).
+     * 
+     * @param datasetId
+     * @param gid
+     * @param markerName
+     * @param data
+     */
+    public AllelicValueElement(Integer datasetId, Integer gid, String markerName, String data) {
+        this.datasetId = datasetId;
+        this.gid = gid;
+        this.data = data;
+        this.markerName = markerName;
+        this.peakHeight = null;
+    }
+
+
 
     /**
      * Instantiates a AllelicValueElement object with gid, data(char_value for table char_values, 
