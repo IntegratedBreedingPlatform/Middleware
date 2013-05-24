@@ -34,6 +34,17 @@ public class VariableTypeList {
 		}
 		return null;
 	}
+    
+    public VariableType findByLocalName(String localName) {
+    	if (variableTypes != null) {
+			for (VariableType variableType : variableTypes) {
+				if (variableType.getLocalName().equals(localName)) {
+					return variableType;
+				}
+			}
+    	}
+    	return null;
+    }
 
 	public List<VariableType> getVariableTypes() {
 		return variableTypes;
