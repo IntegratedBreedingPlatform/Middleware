@@ -149,4 +149,17 @@ public class Study {
 		builder.append("]");
 		return builder.toString();
 	}
+
+	public VariableTypeList getVariableTypesByFactorType(FactorType factorType) {
+		VariableTypeList filteredFactors = new VariableTypeList();
+		VariableTypeList factors = getConditionVariableTypes();
+		if (factors != null && factors.getVariableTypes() != null) {
+			for (VariableType factor : factors.getVariableTypes()) {
+				if (factor.getStandardVariable().getFactorType() == factorType) {
+					filteredFactors.add(factor);
+				}
+			}
+		}
+		return filteredFactors.sort();
+	}
 }

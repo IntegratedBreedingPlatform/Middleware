@@ -63,4 +63,38 @@ public class VariableList {
 		return this;
 	}
 
+	public boolean containsValueByLocalName(String localName, String value) {
+		boolean found = false;
+		Variable variable = findByLocalName(localName);
+		if (variable != null) {
+			found = strEquals(variable.getValue(), value);
+		}
+		return found;
+	}
+	
+	private boolean strEquals(String s1, String s2) {
+		if (s1 == null && s2 == null) return true;
+		if (s1 == s2) return true;
+		if (s1 != null && s1.equals(s2)) return true;
+		return false;
+	}
+
+	public Variable findByLocalName(String localName) {
+		if (variables != null && localName != null) {
+			for (Variable variable : variables) {
+				if (localName.equals(variable.getVariableType().getLocalName())) {
+					return variable;
+				}
+			}
+		}
+		return null;
+	}
+
+	public void print(int indent) {
+		if (variables != null) {
+			for (Variable variable : variables) {
+				variable.print(indent);
+			}
+		}
+	}
 }

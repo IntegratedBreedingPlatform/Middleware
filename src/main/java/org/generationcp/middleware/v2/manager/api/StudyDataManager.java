@@ -27,6 +27,7 @@ import org.generationcp.middleware.v2.domain.Reference;
 import org.generationcp.middleware.v2.domain.Study;
 import org.generationcp.middleware.v2.domain.StudyReference;
 import org.generationcp.middleware.v2.domain.StudyValues;
+import org.generationcp.middleware.v2.domain.TrialEnvironments;
 import org.generationcp.middleware.v2.domain.VariableList;
 import org.generationcp.middleware.v2.domain.VariableType;
 import org.generationcp.middleware.v2.domain.VariableTypeList;
@@ -219,4 +220,6 @@ public interface StudyDataManager {
      * @return
      */
     long countExperimentsByTrialEnvironmentAndVariate(int trialEnvironmentId, int variateVariableId) throws MiddlewareQueryException;
+
+    TrialEnvironments getTrialEnvironmentsInDataset(int datasetId) throws MiddlewareQueryException;
 }

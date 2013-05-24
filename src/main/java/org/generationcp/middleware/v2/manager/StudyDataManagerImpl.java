@@ -30,6 +30,7 @@ import org.generationcp.middleware.v2.domain.Study;
 import org.generationcp.middleware.v2.domain.StudyReference;
 import org.generationcp.middleware.v2.domain.StudyValues;
 import org.generationcp.middleware.v2.domain.TermId;
+import org.generationcp.middleware.v2.domain.TrialEnvironments;
 import org.generationcp.middleware.v2.domain.VariableList;
 import org.generationcp.middleware.v2.domain.VariableType;
 import org.generationcp.middleware.v2.domain.VariableTypeList;
@@ -287,5 +288,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	    	rollbackTransaction(trans);
 	        throw new MiddlewareQueryException("error in addDataSetVariableType " + e.getMessage(), e);
 	    }
+	}
+
+	@Override
+	public TrialEnvironments getTrialEnvironmentsInDataset(int datasetId) throws MiddlewareQueryException {
+		return getTrialEnvironmentBuilder().getTrialEnvironmentsInDataset(datasetId);
 	}
 }

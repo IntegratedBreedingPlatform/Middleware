@@ -41,6 +41,7 @@ import org.generationcp.middleware.v2.domain.StudyReference;
 import org.generationcp.middleware.v2.domain.StudyValues;
 import org.generationcp.middleware.v2.domain.Term;
 import org.generationcp.middleware.v2.domain.TermId;
+import org.generationcp.middleware.v2.domain.TrialEnvironments;
 import org.generationcp.middleware.v2.domain.Variable;
 import org.generationcp.middleware.v2.domain.VariableList;
 import org.generationcp.middleware.v2.domain.VariableType;
@@ -445,6 +446,13 @@ public class TestStudyDataManagerImpl {
 			manager.setExperimentValue(experiment.getId(), 8200, "4");
 		}
 		printExperiments("Modified", datasetRef.getId());
+	}
+	
+	@Test
+	public void testGetTrialEnvironments() throws Exception {
+		System.out.println("Test getTrialEnvironments");
+		TrialEnvironments trialEnvironments = manager.getTrialEnvironmentsInDataset(10085);
+		trialEnvironments.print(0);
 	}
 	
 	private void printExperiments(String title, int datasetId) throws Exception {

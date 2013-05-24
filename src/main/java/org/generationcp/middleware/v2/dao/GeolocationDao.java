@@ -1,5 +1,9 @@
 package org.generationcp.middleware.v2.dao;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.v2.domain.TermId;
@@ -27,5 +31,27 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			logAndThrowException("Error at getParentGeolocation=" + projectId + " at GeolocationDao: " + e.getMessage(), e);
 		}
 		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	public Set<Geolocation> findInDataSet(int datasetId) throws MiddlewareQueryException {
+		Set<Geolocation> locations = new HashSet<Geolocation>();
+		try {
+			
+			String sql = "SELECT DISTINCT e.nd_geolocation_id"
+					+ " FROM nd_experiment e"
+					+ " INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id"
+					+ " WHERE ep.project_id = :projectId";
+			Query query = getSession().createSQLQuery(sql)
+								.setParameter("projectId", datasetId);
+			List<Integer> ids = query.list();
+			for (Integer id : ids) {
+				locations.add(getById(id));
+			}
+						
+		} catch(HibernateException e) {
+			logAndThrowException("Error at findInDataSet=" + datasetId + " at GeolocationDao: " + e.getMessage(), e);
+		}
+		return locations;
 	}
 }

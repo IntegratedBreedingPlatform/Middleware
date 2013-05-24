@@ -32,6 +32,10 @@ public abstract class Builder extends DatabaseBroker {
     protected final StudyBuilder getStudyBuilder() {
     	return new StudyBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
+    
+    protected final DataSetBuilder getDataSetBuilder() {
+    	return new DataSetBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
 	
     protected final StudyVariableBuilder getStudyVariableBuilder() {
     	return new StudyVariableBuilder(sessionProviderForLocal, sessionProviderForCentral);

@@ -26,6 +26,7 @@ import org.generationcp.middleware.v2.domain.builder.StudyFactorBuilder;
 import org.generationcp.middleware.v2.domain.builder.StudyBuilder;
 import org.generationcp.middleware.v2.domain.builder.StudyReferenceBuilder;
 import org.generationcp.middleware.v2.domain.builder.TermBuilder;
+import org.generationcp.middleware.v2.domain.builder.TrialEnvironmentBuilder;
 import org.generationcp.middleware.v2.domain.builder.VariableInfoBuilder;
 import org.generationcp.middleware.v2.domain.builder.VariableTypeBuilder;
 import org.generationcp.middleware.v2.domain.builder.StudyVariateBuilder;
@@ -832,6 +833,10 @@ public abstract class DataManager extends DatabaseBroker{
 
     protected final StudyReferenceBuilder getStudyNodeBuilder() {
     	return new StudyReferenceBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    protected final TrialEnvironmentBuilder getTrialEnvironmentBuilder() {
+    	return new TrialEnvironmentBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
 
     protected final VariableInfoBuilder getVariableInfoBuilder() {
