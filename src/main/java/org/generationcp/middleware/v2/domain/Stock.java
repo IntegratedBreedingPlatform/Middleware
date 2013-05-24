@@ -20,6 +20,10 @@ public class Stock {
 		return variables.containsValueByLocalName(localName, value);
 	}
 
+	public VariableList getVariables() {
+		return variables;
+	}
+
 	public void print(int indent) {
 		Debug.println(indent, "Stock " + id);
 		variables.print(indent + 3);
