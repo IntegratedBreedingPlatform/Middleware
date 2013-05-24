@@ -19,7 +19,11 @@ public class TrialEnvironment {
 	public boolean containsValueByLocalName(String localName, String value) {
 		return variables.containsValueByLocalName(localName, value);
 	}
-
+	
+	public VariableList getVariables() {
+		return variables;
+	}
+	
 	public void print(int indent) {
 		Debug.println(indent, "Trial Environment " + id);
 		variables.print(indent + 3);
