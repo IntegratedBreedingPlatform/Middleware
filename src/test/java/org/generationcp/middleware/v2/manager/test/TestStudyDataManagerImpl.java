@@ -31,6 +31,7 @@ import org.generationcp.middleware.v2.domain.DataSetType;
 import org.generationcp.middleware.v2.domain.DatasetReference;
 import org.generationcp.middleware.v2.domain.DatasetValues;
 import org.generationcp.middleware.v2.domain.Experiment;
+import org.generationcp.middleware.v2.domain.ExperimentType;
 import org.generationcp.middleware.v2.domain.ExperimentValues;
 import org.generationcp.middleware.v2.domain.FactorType;
 import org.generationcp.middleware.v2.domain.FolderReference;
@@ -429,7 +430,7 @@ public class TestStudyDataManagerImpl {
 		experimentValues.setVariableList(list);
 		experimentValues.setGermplasmId(-1);
 		experimentValues.setLocationId(-1);
-		manager.addExperiment(dataSetId, experimentValues);
+		manager.addExperiment(dataSetId, ExperimentType.PLOT, experimentValues);
 	}
 	
 	@Test
@@ -681,7 +682,7 @@ public class TestStudyDataManagerImpl {
 			experimentValues.setVariableList(varList);
 			experimentValues.setGermplasmId(-1);
 			experimentValues.setLocationId(-1);
-			manager.addExperiment(datasetId, experimentValues);
+			manager.addExperiment(datasetId, ExperimentType.PLOT, experimentValues);
 		}
 	}
 

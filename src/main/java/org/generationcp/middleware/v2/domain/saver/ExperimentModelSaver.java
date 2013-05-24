@@ -8,6 +8,7 @@ import java.util.Set;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.v2.domain.ExperimentType;
 import org.generationcp.middleware.v2.domain.StandardVariable;
 import org.generationcp.middleware.v2.domain.StudyValues;
 import org.generationcp.middleware.v2.domain.TermId;
@@ -29,15 +30,19 @@ public class ExperimentModelSaver extends Saver {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 	
-	public void addExperiment(int projectId, Values values) throws MiddlewareQueryException {
+	public void addExperiment(int projectId, StudyValues values) throws MiddlewareQueryException {
+		addExperiment(projectId, null, values);
+	}
+	
+	public void addExperiment(int projectId, ExperimentType experimentType, Values values) throws MiddlewareQueryException {
 		setWorkingDatabase(Database.LOCAL);
-		TermId experimentType = null;
+		TermId myExperimentType = null;
 		if (values instanceof StudyValues) {
-			experimentType = TermId.STUDY_EXPERIMENT;
+			myExperimentType = TermId.STUDY_EXPERIMENT;
 		} else {
-			experimentType = TermId.PLOT_EXPERIMENT;
+			myExperimentType = mapExperimentType(experimentType);
 		}
-		ExperimentModel experimentModel = create(projectId, values, experimentType);
+		ExperimentModel experimentModel = create(projectId, values, myExperimentType);
 		getExperimentDao().save(experimentModel);
 
 		addExperimentProject(experimentModel, projectId);
@@ -49,6 +54,16 @@ public class ExperimentModelSaver extends Saver {
 		}
 	}
 	
+	private TermId mapExperimentType(ExperimentType experimentType) {
+		switch (experimentType) {
+		case PLOT: return TermId.PLOT_EXPERIMENT;
+		case AVERAGE: return TermId.AVERAGE_EXPERIMENT;
+		case SUMMARY: return TermId.SUMMARY_EXPERIMENT;
+		case SAMPLE: return TermId.SAMPLE_EXPERIMENT;
+		}
+		return null;
+	}
+
 	private ExperimentModel create(int projectId, Values values, TermId expType) throws MiddlewareQueryException {
 		ExperimentModel experimentModel = new ExperimentModel();
 		

@@ -21,6 +21,7 @@ import org.generationcp.middleware.v2.domain.DataSetType;
 import org.generationcp.middleware.v2.domain.DatasetReference;
 import org.generationcp.middleware.v2.domain.DatasetValues;
 import org.generationcp.middleware.v2.domain.Experiment;
+import org.generationcp.middleware.v2.domain.ExperimentType;
 import org.generationcp.middleware.v2.domain.ExperimentValues;
 import org.generationcp.middleware.v2.domain.FolderReference;
 import org.generationcp.middleware.v2.domain.Reference;
@@ -183,7 +184,7 @@ public interface StudyDataManager {
      * @param experimentValues
      * @throws MiddlewareQueryException
      */
-    void addExperiment(int dataSetId, ExperimentValues experimentValues) throws MiddlewareQueryException;
+    void addExperiment(int dataSetId, ExperimentType experimentType, ExperimentValues experimentValues) throws MiddlewareQueryException;
     
     /**
      * Accepts a variable list and sets up the trial environment data in the local database.

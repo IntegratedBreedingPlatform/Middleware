@@ -23,6 +23,7 @@ import org.generationcp.middleware.v2.domain.DataSetType;
 import org.generationcp.middleware.v2.domain.DatasetReference;
 import org.generationcp.middleware.v2.domain.DatasetValues;
 import org.generationcp.middleware.v2.domain.Experiment;
+import org.generationcp.middleware.v2.domain.ExperimentType;
 import org.generationcp.middleware.v2.domain.ExperimentValues;
 import org.generationcp.middleware.v2.domain.FolderReference;
 import org.generationcp.middleware.v2.domain.Reference;
@@ -181,14 +182,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public void addExperiment(int dataSetId, ExperimentValues experimentValues) throws MiddlewareQueryException {
+	public void addExperiment(int dataSetId, ExperimentType experimentType, ExperimentValues experimentValues) throws MiddlewareQueryException {
 		requireLocalDatabaseInstance();
 		Session session = getCurrentSessionForLocal();
         Transaction trans = null;
  
         try {
             trans = session.beginTransaction();
-            getExperimentModelSaver().addExperiment(dataSetId, experimentValues);
+            getExperimentModelSaver().addExperiment(dataSetId, experimentType, experimentValues);
             trans.commit();
             
         } catch (Exception e) {
