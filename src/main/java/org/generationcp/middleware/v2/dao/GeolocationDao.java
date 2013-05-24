@@ -54,4 +54,23 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 		}
 		return locations;
 	}
+
+	public Geolocation findByDescription(String description) throws MiddlewareQueryException {
+		try {
+			
+			String sql = "SELECT DISTINCT loc.nd_geolocation_id"
+					+ " FROM nd_geolocation loc"
+					+ " WHERE loc.description = :description";
+			Query query = getSession().createSQLQuery(sql)
+								.setParameter("description", description);
+			List<Integer> ids = query.list();
+			if (ids.size() >= 1) {
+				return getById(ids.get(0));
+			}
+						
+		} catch(HibernateException e) {
+			logAndThrowException("Error at findByDescription=" + description + " at GeolocationDao: " + e.getMessage(), e);
+		}
+		return null;
+	}
 }

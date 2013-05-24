@@ -247,8 +247,10 @@ public class ExperimentBuilder extends Builder {
 	}
 
 	private void addExperimentFactors(VariableList variables, ExperimentModel experimentModel, VariableTypeList variableTypes) throws MiddlewareQueryException {
-		for (ExperimentProperty property : experimentModel.getProperties()) {
-			variables.add(createVariable(property, variableTypes));
+		if (experimentModel.getProperties() != null) {
+			for (ExperimentProperty property : experimentModel.getProperties()) {
+				variables.add(createVariable(property, variableTypes));
+			}
 		}
 	}
 	

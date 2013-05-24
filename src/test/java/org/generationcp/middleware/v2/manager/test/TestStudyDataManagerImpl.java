@@ -298,7 +298,40 @@ public class TestStudyDataManagerImpl {
 		System.out.println("testAddStudy(): " + studyRef);
 	}
 	
+	@Test
+	public void testAddStudyWithNoLocation() throws Exception {
 
+		int parentStudyId = 1;
+		
+		VariableTypeList typeList = new VariableTypeList();
+		
+		VariableList variableList = new VariableList();
+
+		Variable variable = createVariable(TermId.STUDY_NAME.getId(), "Study Name " + new Random().nextInt(10000), 1);
+		typeList.add(variable.getVariableType());
+		variableList.add(variable);
+		
+		variable = createVariable(TermId.STUDY_TITLE.getId(), "Study Description", 2);
+		typeList.add(variable.getVariableType());
+		variableList.add(variable);
+		
+		typeList.add(createVariableType(TermId.GID.getId(), "GID", "gid", 3));
+
+		StudyValues studyValues = new StudyValues();
+		studyValues.setVariableList(variableList);
+		
+		studyValues.setLocationId(null);
+		
+		VariableList germplasmVariableList = createGermplasm("unique name", "1000", "name", "2000", "prop1", "prop2");
+		studyValues.setGermplasmId(manager.addStock(germplasmVariableList));
+
+		StudyReference studyRef = manager.addStudy(parentStudyId, typeList, studyValues);
+
+		Assert.assertTrue(studyRef.getId() < 0);
+		Study study = manager.getStudy(studyRef.getId());
+		study.print(0);
+	}
+	
 	@Test
 	public void testGetDataSet() throws Exception {
 		for (int i = 10015; i <= 10075; i += 10) {

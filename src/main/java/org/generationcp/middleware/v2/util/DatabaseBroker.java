@@ -506,4 +506,14 @@ public class DatabaseBroker {
     		this.sessionForCentral.clear();
     	}
     }
+    
+    protected final void flushSessions() {
+    	if (sessionForLocal != null) {
+    		this.sessionForLocal.flush();
+    	}
+    	
+    	if (sessionForCentral != null) {
+    		this.sessionForCentral.flush();
+    	}
+    }
 }

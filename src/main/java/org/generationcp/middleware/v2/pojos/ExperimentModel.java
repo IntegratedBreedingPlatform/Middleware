@@ -56,7 +56,7 @@ public class ExperimentModel implements Serializable {
 	private Integer ndExperimentId;
 
 	// Geolocation
-	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "nd_geolocation_id")
 	private Geolocation geoLocation;
 

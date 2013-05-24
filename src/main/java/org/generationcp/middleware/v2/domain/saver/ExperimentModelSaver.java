@@ -20,9 +20,12 @@ import org.generationcp.middleware.v2.pojos.ExperimentPhenotype;
 import org.generationcp.middleware.v2.pojos.ExperimentProject;
 import org.generationcp.middleware.v2.pojos.ExperimentProperty;
 import org.generationcp.middleware.v2.pojos.ExperimentStock;
+import org.generationcp.middleware.v2.pojos.Geolocation;
 import org.generationcp.middleware.v2.pojos.Phenotype;
 
 public class ExperimentModelSaver extends Saver {
+	
+	private static final String DUMMY_DESCRIPTION = "DUMMY LOCATION - for null constraint";
 
 	public ExperimentModelSaver(
 			HibernateSessionProvider sessionProviderForLocal,
@@ -44,7 +47,7 @@ public class ExperimentModelSaver extends Saver {
 		}
 		ExperimentModel experimentModel = create(projectId, values, myExperimentType);
 		getExperimentDao().save(experimentModel);
-
+		
 		addExperimentProject(experimentModel, projectId);
 		getPhenotypeSaver().savePhenotypes(experimentModel, values.getVariableList());
 		
@@ -70,8 +73,12 @@ public class ExperimentModelSaver extends Saver {
 		experimentModel.setNdExperimentId(getExperimentDao().getNegativeId("ndExperimentId"));
 		experimentModel.setTypeId(expType.getId());
 		experimentModel.setProperties(createProperties(experimentModel, values.getVariableList()));
-		//TODO: what if values.locationId is null?
-		if (values.getLocationId() != null) {
+		
+		if (values.getLocationId() == null && values instanceof StudyValues) {
+			experimentModel.setGeoLocation(getDummyGeoLocation());
+			
+		}
+		else if (values.getLocationId() != null) {
 			experimentModel.setGeoLocation(getGeolocationDao().getById(values.getLocationId())); 
 		}
 		if (values.getGermplasmId() != null) {
@@ -79,6 +86,22 @@ public class ExperimentModelSaver extends Saver {
 			experimentModel.getExperimentStocks().add(createExperimentStock(experimentModel.getNdExperimentId(), values.getGermplasmId()));
 		}
 		return experimentModel;
+	}
+
+	private Geolocation getDummyGeoLocation() throws MiddlewareQueryException {
+		Geolocation location = getGeolocationDao().findByDescription(DUMMY_DESCRIPTION);
+		if (location == null) {
+			location = createDummyGeoLocation();
+		}
+		return location;
+	}
+
+	private Geolocation createDummyGeoLocation() throws MiddlewareQueryException {
+		Geolocation location = new Geolocation();
+		location.setLocationId(getGeolocationDao().getNegativeId("locationId"));
+		location.setDescription(DUMMY_DESCRIPTION);
+		getGeolocationDao().save(location);
+		return location;
 	}
 
 	private Set<ExperimentProperty> createProperties(ExperimentModel experimentModel, VariableList factors) throws MiddlewareQueryException {
