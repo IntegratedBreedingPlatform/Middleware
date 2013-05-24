@@ -36,6 +36,7 @@ import org.generationcp.middleware.v2.domain.FactorType;
 import org.generationcp.middleware.v2.domain.FolderReference;
 import org.generationcp.middleware.v2.domain.Reference;
 import org.generationcp.middleware.v2.domain.StandardVariable;
+import org.generationcp.middleware.v2.domain.Stocks;
 import org.generationcp.middleware.v2.domain.Study;
 import org.generationcp.middleware.v2.domain.StudyReference;
 import org.generationcp.middleware.v2.domain.StudyValues;
@@ -449,10 +450,17 @@ public class TestStudyDataManagerImpl {
 	}
 	
 	@Test
-	public void testGetTrialEnvironments() throws Exception {
-		System.out.println("Test getTrialEnvironments");
+	public void testGetTrialEnvironmentsInDataset() throws Exception {
+		System.out.println("Test getTrialEnvironmentsInDataset");
 		TrialEnvironments trialEnvironments = manager.getTrialEnvironmentsInDataset(10085);
 		trialEnvironments.print(0);
+	}
+	
+	@Test
+	public void testGetStocksInDataset() throws Exception {
+		System.out.println("Test getStocksInDataset");
+		Stocks stocks = manager.getStocksInDataset(10085);
+		stocks.print(0);
 	}
 	
 	private void printExperiments(String title, int datasetId) throws Exception {

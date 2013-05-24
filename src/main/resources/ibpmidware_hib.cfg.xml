@@ -91,7 +91,7 @@
   <mapping class="org.generationcp.middleware.v2.pojos.DmsProject"/>
   <mapping class="org.generationcp.middleware.v2.pojos.ProjectProperty"/>
   <mapping class="org.generationcp.middleware.v2.pojos.ExperimentModel"/>
-  <mapping class="org.generationcp.middleware.v2.pojos.Stock"/>
+  <mapping class="org.generationcp.middleware.v2.pojos.StockModel"/>
   <mapping class="org.generationcp.middleware.v2.pojos.StockProperty"/>
   <mapping class="org.generationcp.middleware.v2.pojos.Phenotype"/>
   <mapping class="org.generationcp.middleware.v2.pojos.ExperimentPhenotype"/>

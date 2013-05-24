@@ -41,7 +41,7 @@ import javax.persistence.UniqueConstraint;
 		uniqueConstraints = {
 			@UniqueConstraint(columnNames = { "organism_id", "uniquename", "type_id" })
 		})
-public class Stock implements Serializable {
+public class StockModel implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -208,7 +208,7 @@ public class Stock implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Stock other = (Stock) obj;
+		StockModel other = (StockModel) obj;
 		if (dbxrefId == null) {
 			if (other.dbxrefId != null)
 				return false;

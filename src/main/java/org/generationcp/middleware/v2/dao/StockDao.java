@@ -2,19 +2,23 @@ package org.generationcp.middleware.v2.dao;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.v2.domain.StudyReference;
-import org.generationcp.middleware.v2.pojos.Stock;
+import org.generationcp.middleware.v2.pojos.Geolocation;
+import org.generationcp.middleware.v2.pojos.StockModel;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
-public class StockDao extends GenericDAO<Stock, Integer> {
+public class StockDao extends GenericDAO<StockModel, Integer> {
 	
 	
 	@SuppressWarnings("unchecked")
@@ -125,5 +129,28 @@ public class StockDao extends GenericDAO<Stock, Integer> {
 			logAndThrowException("Error in countStudiesByGidViaPlot=" + gid + " in StockDao: " + e.getMessage(), e);
 		}
 		return studyReferences;
+	}
+    
+    @SuppressWarnings("unchecked")
+	public Set<StockModel> findInDataSet(int datasetId) throws MiddlewareQueryException {
+		Set<StockModel> stockModels = new HashSet<StockModel>();
+		try {
+			
+			String sql = "SELECT DISTINCT es.stock_id"
+					+ " FROM nd_experiment_stock es"
+					+ " INNER JOIN nd_experiment e ON e.nd_experiment_id = es.nd_experiment_id"
+					+ " INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id"
+					+ " WHERE ep.project_id = :projectId";
+			Query query = getSession().createSQLQuery(sql)
+								.setParameter("projectId", datasetId);
+			List<Integer> ids = query.list();
+			for (Integer id : ids) {
+				stockModels.add(getById(id));
+			}
+						
+		} catch(HibernateException e) {
+			logAndThrowException("Error at findInDataSet=" + datasetId + " at StockDao: " + e.getMessage(), e);
+		}
+		return stockModels;
 	}
 }

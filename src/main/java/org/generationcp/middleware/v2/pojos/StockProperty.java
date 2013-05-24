@@ -49,9 +49,9 @@ public class StockProperty implements Serializable {
 	@Column(name =  "stockprop_id")
 	private Integer stockPropId;
 	
-    @ManyToOne(targetEntity = Stock.class)
+    @ManyToOne(targetEntity = StockModel.class)
     @JoinColumn(name = "stock_id", nullable = false)
-	private Stock stock;
+	private StockModel stockModel;
 
     // References cvterm
     @Column(name="type_id")
@@ -76,13 +76,13 @@ public class StockProperty implements Serializable {
 	}
 
 
-	public Stock getStock() {
-		return stock;
+	public StockModel getStock() {
+		return stockModel;
 	}
 
 
-	public void setStock(Stock stock) {
-		this.stock = stock;
+	public void setStock(StockModel stockModel) {
+		this.stockModel = stockModel;
 	}
 
 
@@ -121,7 +121,7 @@ public class StockProperty implements Serializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((rank == null) ? 0 : rank.hashCode());
-		result = prime * result + ((stock == null) ? 0 : stock.hashCode());
+		result = prime * result + ((stockModel == null) ? 0 : stockModel.hashCode());
 		result = prime * result
 				+ ((stockPropId == null) ? 0 : stockPropId.hashCode());
 		result = prime * result + ((typeId == null) ? 0 : typeId.hashCode());
@@ -144,10 +144,10 @@ public class StockProperty implements Serializable {
 				return false;
 		} else if (!rank.equals(other.rank))
 			return false;
-		if (stock == null) {
-			if (other.stock != null)
+		if (stockModel == null) {
+			if (other.stockModel != null)
 				return false;
-		} else if (!stock.equals(other.stock))
+		} else if (!stockModel.equals(other.stockModel))
 			return false;
 		if (stockPropId == null) {
 			if (other.stockPropId != null)
@@ -174,7 +174,7 @@ public class StockProperty implements Serializable {
 		builder.append("StockProperties [stockPropId=");
 		builder.append(stockPropId);
 		builder.append(", stock=");
-		builder.append(stock);
+		builder.append(stockModel);
 		builder.append(", typeId=");
 		builder.append(typeId);
 		builder.append(", value=");

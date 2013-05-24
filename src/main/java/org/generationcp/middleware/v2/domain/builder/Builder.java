@@ -53,8 +53,8 @@ public abstract class Builder extends DatabaseBroker {
     	return new ExperimentBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
     
-    protected final StockBuilder getStockBuilder() {
-    	return new StockBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    protected final StockModelBuilder getStockBuilder() {
+    	return new StockModelBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
 
     protected final StandardVariableBuilder getStandardVariableBuilder() {

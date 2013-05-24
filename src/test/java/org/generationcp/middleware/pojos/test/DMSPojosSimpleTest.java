@@ -45,7 +45,7 @@ import org.generationcp.middleware.v2.pojos.GeolocationProperty;
 import org.generationcp.middleware.v2.pojos.Phenotype;
 import org.generationcp.middleware.v2.pojos.ProjectProperty;
 import org.generationcp.middleware.v2.pojos.ProjectRelationship;
-import org.generationcp.middleware.v2.pojos.Stock;
+import org.generationcp.middleware.v2.pojos.StockModel;
 import org.generationcp.middleware.v2.pojos.StockProperty;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -435,7 +435,7 @@ public class DMSPojosSimpleTest{
     	
     	System.out.println("testStock() RESULTS: ");
     	for (Object obj : query.list()) {
-    		Assert.assertTrue(obj instanceof Stock);
+    		Assert.assertTrue(obj instanceof StockModel);
     		Assert.assertTrue(obj != null);
     		System.out.println(" " + obj);
     	}

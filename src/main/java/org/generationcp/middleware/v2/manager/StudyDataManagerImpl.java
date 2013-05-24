@@ -26,6 +26,7 @@ import org.generationcp.middleware.v2.domain.Experiment;
 import org.generationcp.middleware.v2.domain.ExperimentValues;
 import org.generationcp.middleware.v2.domain.FolderReference;
 import org.generationcp.middleware.v2.domain.Reference;
+import org.generationcp.middleware.v2.domain.Stocks;
 import org.generationcp.middleware.v2.domain.Study;
 import org.generationcp.middleware.v2.domain.StudyReference;
 import org.generationcp.middleware.v2.domain.StudyValues;
@@ -293,5 +294,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public TrialEnvironments getTrialEnvironmentsInDataset(int datasetId) throws MiddlewareQueryException {
 		return getTrialEnvironmentBuilder().getTrialEnvironmentsInDataset(datasetId);
+	}
+
+	@Override
+	public Stocks getStocksInDataset(int datasetId) throws MiddlewareQueryException {
+		return getStockBuilder().getStocksInDataset(datasetId);
 	}
 }

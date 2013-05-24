@@ -20,7 +20,7 @@ import org.generationcp.middleware.v2.pojos.ExperimentStock;
 import org.generationcp.middleware.v2.pojos.Geolocation;
 import org.generationcp.middleware.v2.pojos.GeolocationProperty;
 import org.generationcp.middleware.v2.pojos.Phenotype;
-import org.generationcp.middleware.v2.pojos.Stock;
+import org.generationcp.middleware.v2.pojos.StockModel;
 import org.generationcp.middleware.v2.pojos.StockProperty;
 
 public class ExperimentBuilder extends Builder {
@@ -186,10 +186,10 @@ public class ExperimentBuilder extends Builder {
 	private void addGermplasmFactors(VariableList factors, ExperimentModel experimentModel, VariableTypeList variableTypes) throws MiddlewareQueryException {
 		List<ExperimentStock> experimentStocks = experimentModel.getExperimentStocks();
 		if (experimentStocks != null && experimentStocks.size() == 1) {
-			Stock stock = getStockBuilder().get(experimentStocks.get(0).getStockId());
+			StockModel stockModel = getStockBuilder().get(experimentStocks.get(0).getStockId());
 			for (VariableType variableType : variableTypes.getVariableTypes()) {
 				if (isGermplasmFactor(variableType)) {
-					factors.add(createGermplasmFactor(stock, variableType));
+					factors.add(createGermplasmFactor(stockModel, variableType));
 				}
 			}
 		}
@@ -215,22 +215,22 @@ public class ExperimentBuilder extends Builder {
 		return false;
 	}
 	
-	private Variable createGermplasmFactor(Stock stock, VariableType variableType) {
+	private Variable createGermplasmFactor(StockModel stockModel, VariableType variableType) {
 		StandardVariable standardVariable = variableType.getStandardVariable();
 		if (standardVariable.getStoredIn().getId() == TermId.GERMPLASM_ENTRY_STORAGE.getId()) {
-			return new Variable(variableType, findStockValue(variableType.getId(), stock.getProperties()));
+			return new Variable(variableType, findStockValue(variableType.getId(), stockModel.getProperties()));
 		}
 		if (standardVariable.getStoredIn().getId() == TermId.ENTRY_NUMBER_STORAGE.getId()) {
-			return new Variable(variableType, stock.getUniqueName());
+			return new Variable(variableType, stockModel.getUniqueName());
 		}
 		if (standardVariable.getStoredIn().getId() == TermId.ENTRY_GID_STORAGE.getId()) {
-			return new Variable(variableType, stock.getDbxrefId());
+			return new Variable(variableType, stockModel.getDbxrefId());
 		}
 		if (standardVariable.getStoredIn().getId() == TermId.ENTRY_DESIGNATION_STORAGE.getId()) {
-			return new Variable(variableType, stock.getName());
+			return new Variable(variableType, stockModel.getName());
 		}
 		if (standardVariable.getStoredIn().getId() == TermId.ENTRY_CODE_STORAGE.getId()) {
-			return new Variable(variableType, stock.getValue());
+			return new Variable(variableType, stockModel.getValue());
 		}
 		return null;
 	}

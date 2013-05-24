@@ -9,7 +9,7 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.Variable;
 import org.generationcp.middleware.v2.domain.VariableList;
-import org.generationcp.middleware.v2.pojos.Stock;
+import org.generationcp.middleware.v2.pojos.StockModel;
 import org.generationcp.middleware.v2.pojos.StockProperty;
 
 public class StockSaver extends Saver {
@@ -23,17 +23,17 @@ public class StockSaver extends Saver {
 	public Integer saveStock(VariableList variableList) throws MiddlewareQueryException {
 		setWorkingDatabase(Database.LOCAL);
 		
-		Stock stock = createStock(variableList);
-		if (stock != null) {
-			getStockDao().save(stock);
-			return stock.getStockId();
+		StockModel stockModel = createStock(variableList);
+		if (stockModel != null) {
+			getStockDao().save(stockModel);
+			return stockModel.getStockId();
 		}
 		
 		return null;
 	}
 	
-	private Stock createStock(VariableList variableList) throws MiddlewareQueryException {
-		Stock stock = null;
+	private StockModel createStock(VariableList variableList) throws MiddlewareQueryException {
+		StockModel stockModel = null;
 		if (variableList != null && variableList.getVariables() != null && variableList.getVariables().size() > 0) {
 			int propertyIndex = getStockPropertyDao().getNegativeId("stockPropId");
 			for (Variable variable : variableList.getVariables()) {
@@ -41,24 +41,24 @@ public class StockSaver extends Saver {
 				String value = variable.getValue();
 				
 				if (TermId.ENTRY_NUMBER_STORAGE.getId() == storedInId) {
-					stock = getStockObject(stock);
-					stock.setUniqueName(value);
+					stockModel = getStockObject(stockModel);
+					stockModel.setUniqueName(value);
 					
 				} else if (TermId.ENTRY_GID_STORAGE.getId() == storedInId) {
-					stock = getStockObject(stock);
-					stock.setDbxrefId(StringUtil.isEmpty(value) ? null : Integer.valueOf(value));
+					stockModel = getStockObject(stockModel);
+					stockModel.setDbxrefId(StringUtil.isEmpty(value) ? null : Integer.valueOf(value));
 					
 				} else if (TermId.ENTRY_DESIGNATION_STORAGE.getId() == storedInId) {
-					stock = getStockObject(stock);
-					stock.setName(value);
+					stockModel = getStockObject(stockModel);
+					stockModel.setName(value);
 					
 				} else if (TermId.ENTRY_CODE_STORAGE.getId() == storedInId) {
-					stock = getStockObject(stock);
-					stock.setValue(value);
+					stockModel = getStockObject(stockModel);
+					stockModel.setValue(value);
 					
 				} else if (TermId.GERMPLASM_ENTRY_STORAGE.getId() == storedInId) {
-					stock = getStockObject(stock);
-					addProperty(stock, createProperty(propertyIndex--, variable));
+					stockModel = getStockObject(stockModel);
+					addProperty(stockModel, createProperty(propertyIndex--, variable));
 					
 				} else {
 					throw new MiddlewareQueryException("Non-Stock Variable was used in calling create stock: " + variable.getVariableType().getId());
@@ -66,25 +66,25 @@ public class StockSaver extends Saver {
 			}
 		}
 		
-		return stock;
+		return stockModel;
 	}
 	
-	private Stock getStockObject(Stock stock) throws MiddlewareQueryException {
-		if (stock == null) {
-			stock = new Stock();
-			stock.setStockId(getStockDao().getNegativeId("stockId"));
-			stock.setIsObsolete(false);
-			stock.setTypeId(TermId.ENTRY_CODE.getId());
+	private StockModel getStockObject(StockModel stockModel) throws MiddlewareQueryException {
+		if (stockModel == null) {
+			stockModel = new StockModel();
+			stockModel.setStockId(getStockDao().getNegativeId("stockId"));
+			stockModel.setIsObsolete(false);
+			stockModel.setTypeId(TermId.ENTRY_CODE.getId());
 		}
-		return stock;
+		return stockModel;
 	}
 	
-	private void addProperty(Stock stock, StockProperty property) {
-		if (stock.getProperties() == null) {
-			stock.setProperties(new HashSet<StockProperty>());
+	private void addProperty(StockModel stockModel, StockProperty property) {
+		if (stockModel.getProperties() == null) {
+			stockModel.setProperties(new HashSet<StockProperty>());
 		}
-		property.setStock(stock);
-		stock.getProperties().add(property);
+		property.setStock(stockModel);
+		stockModel.getProperties().add(property);
 	}
 	
 	private StockProperty createProperty(int index, Variable variable) throws MiddlewareQueryException {

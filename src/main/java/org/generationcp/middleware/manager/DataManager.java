@@ -22,6 +22,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.v2.domain.builder.DataSetBuilder;
 import org.generationcp.middleware.v2.domain.builder.ExperimentBuilder;
 import org.generationcp.middleware.v2.domain.builder.StandardVariableBuilder;
+import org.generationcp.middleware.v2.domain.builder.StockBuilder;
 import org.generationcp.middleware.v2.domain.builder.StudyFactorBuilder;
 import org.generationcp.middleware.v2.domain.builder.StudyBuilder;
 import org.generationcp.middleware.v2.domain.builder.StudyReferenceBuilder;
@@ -837,6 +838,10 @@ public abstract class DataManager extends DatabaseBroker{
     
     protected final TrialEnvironmentBuilder getTrialEnvironmentBuilder() {
     	return new TrialEnvironmentBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    protected final StockBuilder getStockBuilder() {
+    	return new StockBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
 
     protected final VariableInfoBuilder getVariableInfoBuilder() {
