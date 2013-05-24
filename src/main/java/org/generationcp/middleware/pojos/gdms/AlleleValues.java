@@ -101,7 +101,6 @@ public class AlleleValues implements Serializable{
     public static final String GET_CHAR_ALLELE_VALUES_FOR_POLYMORPHIC_MARKERS_RETRIEVAL_BY_GIDS =     
             "SELECT DISTINCT gdms_char_values.dataset_id, gdms_char_values.gid " 
                     + ", CONCAT(gdms_marker.marker_name,''), CONCAT(gdms_char_values.char_value,'') " 
-            		+ ", gdms_allele_values.peak_height "	
             + "FROM gdms_char_values INNER JOIN gdms_marker ON gdms_marker.marker_id = gdms_char_values.marker_id " 
             + "WHERE gdms_char_values.gid IN (:gids) "
             + "ORDER BY gid, marker_name ";
