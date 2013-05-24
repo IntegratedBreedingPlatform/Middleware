@@ -12,6 +12,15 @@ public class VariableType implements Comparable<VariableType>{
     
     private StandardVariable standardVariable;
     
+    public VariableType() { } 
+    
+    public VariableType(String localName, String localDescription, StandardVariable standardVariable, int rank) {
+    	this.localName = localName;
+    	this.localDescription = localDescription;
+    	this.standardVariable = standardVariable;
+    	this.rank = rank;
+    }
+    
     public int getId() {
     	return standardVariable.getId();
     }

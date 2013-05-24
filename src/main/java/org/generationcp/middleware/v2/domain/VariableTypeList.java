@@ -105,4 +105,11 @@ public class VariableTypeList {
 		return this;
 	}
 	
+	public void makeRoom(int rank) {
+		for (VariableType vtype : variableTypes) {
+			if (vtype.getRank() >= rank) {
+				vtype.setRank(vtype.getRank() + 1);
+			}
+		}
+	}
 }

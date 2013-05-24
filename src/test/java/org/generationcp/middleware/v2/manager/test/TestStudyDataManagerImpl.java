@@ -360,11 +360,36 @@ public class TestStudyDataManagerImpl {
 		variableList.add(variable);
 		
 		DatasetValues datasetValues = new DatasetValues();
-		datasetValues.setVariableList(variableList);
+		datasetValues.setVariables(variableList);
 
 		DatasetReference datasetReference = manager.addDataSet(parentStudyId, typeList, datasetValues);
 		System.out.println("Dataset added : " + datasetReference);
 		
+	}
+	
+	@Test
+	public void testAddDatasetWithNoDataType() throws Exception {
+		System.out.println("Test addDatasetWithNoCoreValues");
+		StudyReference studyRef = this.addTestStudy();
+        VariableTypeList typeList = new VariableTypeList();
+		
+		DatasetValues datasetValues = new DatasetValues();
+		datasetValues.setName("No Datatype dataset" + new Random().nextInt(10000));
+		datasetValues.setDescription("whatever ds");
+		
+		VariableType variableType = createVariableType(18000, "Grain Yield", "whatever", 4);
+		typeList.add(variableType);
+		
+		variableType = createVariableType(18050, "Disease Pressure", "whatever", 5);
+		typeList.add(variableType);
+		
+		variableType = createVariableType(8200, "Plot No", "whatever", 6);
+		typeList.add(variableType);
+	
+		DatasetReference dataSetRef = manager.addDataSet(studyRef.getId(), typeList, datasetValues);
+		
+		DataSet dataSet = manager.getDataSet(dataSetRef.getId());
+		dataSet.print(0);
 	}
 	
 	@Test
@@ -395,7 +420,7 @@ public class TestStudyDataManagerImpl {
 		variableList.add(variable);
 		
 		DatasetValues datasetValues = new DatasetValues();
-		datasetValues.setVariableList(variableList);
+		datasetValues.setVariables(variableList);
 
 		DatasetReference datasetReference = manager.addDataSet(parentStudyId, typeList, datasetValues);
 		System.out.println("Dataset added : " + datasetReference);
@@ -636,24 +661,11 @@ public class TestStudyDataManagerImpl {
 		//Parent study, assign a parent study id value, if none exists in db, 
 		
 		VariableTypeList typeList = new VariableTypeList();
-		VariableList variableList = new VariableList();
-		Variable variable;
 		
-		//please make sure that the study name is unique and does not exist in the db.
-		variable = createVariable(TermId.DATASET_NAME.getId(), "My Dataset Name " + new Random().nextInt(10000), 1);
-		typeList.add(variable.getVariableType());
-		updateVariableType(variable.getVariableType(), "DATASET_NAME", "Dataset name (local)");
-		variableList.add(variable);
-		
-		variable = createVariable(TermId.DATASET_TITLE.getId(), "My Dataset Description", 2);
-		typeList.add(variable.getVariableType());
-		updateVariableType(variable.getVariableType(), "DATASET_TITLE", "Dataset title (local)");
-		variableList.add(variable);
-		
-		variable = createVariable(TermId.DATASET_TYPE.getId(), "10070", 3);
-		typeList.add(variable.getVariableType());
-		updateVariableType(variable.getVariableType(), "DATASET_TYPE", "Dataset type (local)");
-		variableList.add(variable);
+		DatasetValues datasetValues = new DatasetValues();
+		datasetValues.setName("My Dataset Name " + new Random().nextInt(10000));
+		datasetValues.setDescription("My Dataset Description");
+		datasetValues.setType(DataSetType.MEANS_DATA);
 		
 		VariableType variableType = createVariableType(18000, "Grain Yield", "whatever", 4);
 		typeList.add(variableType);
@@ -663,9 +675,6 @@ public class TestStudyDataManagerImpl {
 		
 		variableType = createVariableType(8200, "Plot No", "whatever", 6);
 		typeList.add(variableType);
-		
-		DatasetValues datasetValues = new DatasetValues();
-		datasetValues.setVariableList(variableList);
 
 		return manager.addDataSet(studyId, typeList, datasetValues);
 	}

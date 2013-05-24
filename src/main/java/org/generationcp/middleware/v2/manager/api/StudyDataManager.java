@@ -154,8 +154,10 @@ public interface StudyDataManager {
     
     /**
      * Adds a dataset, dataset labels (factors and variate labels), and parent study association.
-     * 
-     * @param dataset
+     *
+     * @param studyId
+     * @param variableTypeList
+     * @param datasetValues
      * @return
      * @throws MiddlewareQueryException
      */
