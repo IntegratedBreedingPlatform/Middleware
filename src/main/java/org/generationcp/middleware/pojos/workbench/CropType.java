@@ -66,6 +66,14 @@ public class CropType implements Serializable{
     public void setCentralDbName(String centralDbName) {
         this.centralDbName = centralDbName;
     }
+    
+    public String getLocalDatabaseNameWithProject(Project project) {
+        return getLocalDatabaseNameWithProjectId(project.getProjectId());
+    }
+    
+    public String getLocalDatabaseNameWithProjectId(Long projectId) {
+        return String.format("%s_%s_local", cropName.trim().toLowerCase().replaceAll("\\s+", "_"), projectId);
+    }
 
     @Override
     public int hashCode() {

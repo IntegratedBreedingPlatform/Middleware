@@ -118,7 +118,7 @@ public class DefaultManagerFactoryProvider implements ManagerFactoryProvider, Ht
         }
         
         if (localSessionFactory == null || localSessionFactory.isClosed()) {
-            String localDbName = String.format("%s_%d_local", project.getCropType().getCropName().toLowerCase(), project.getProjectId().longValue());
+            String localDbName = project.getCropType().getLocalDatabaseNameWithProject(project);
             
             // close any excess cached session factory
             closeExcessLocalSessionFactory();
