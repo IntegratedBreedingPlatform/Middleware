@@ -1059,52 +1059,38 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                     	
                 }
             } else if (germplasmOfNode.getGnpgs() >= 2) {
-                // get and add the source germplasm
-            	
-                if(germplasmOfNode.getGpid1() <0)
-                	setWorkingDatabase(Database.LOCAL);
-                else
-                	setWorkingDatabase(Database.CENTRAL);
-            	
-                Germplasm parent = getGermplasmWithPrefName(germplasmOfNode.getGpid1());
-                if (parent != null) {
-                	
-                    if(parent.getGpid1() <0)
-                    	setWorkingDatabase(Database.LOCAL);
-                    else
-                    	setWorkingDatabase(Database.CENTRAL);
-                	
-                    Germplasm grandParent = getGermplasmWithPrefName(parent.getGpid1());
-                    if(grandParent != null){
+                // get and add female parent
+                Germplasm femaleParent = getGermplasmWithPrefName(germplasmOfNode.getGpid1());
+                if (femaleParent != null) {
+                    GermplasmPedigreeTreeNode nodeForFemaleParent = new GermplasmPedigreeTreeNode();
+                    nodeForFemaleParent.setGermplasm(femaleParent);
+                    node.getLinkedNodes().add(addParents(nodeForFemaleParent, level - 1));
+                }
 
-                        if(grandParent.getGpid1() <0)
-                        	setWorkingDatabase(Database.LOCAL);
-                        else
-                        	setWorkingDatabase(Database.CENTRAL);
-                    	
-                    	Germplasm greatGrandParent1 = getGermplasmWithPrefName(grandParent.getGpid1());	
-                    	if(greatGrandParent1 != null){
-                    		GermplasmPedigreeTreeNode nodeForGreatGrandParent1 = new GermplasmPedigreeTreeNode();
-                    		nodeForGreatGrandParent1.setGermplasm(greatGrandParent1);
-                    		node.getLinkedNodes().add(addParentsExcludeDerivativeLines(nodeForGreatGrandParent1, level - 1));
-                    	}
-                    	
-                        if(grandParent.getGpid2() <0)
-                        	setWorkingDatabase(Database.LOCAL);
-                        else
-                        	setWorkingDatabase(Database.CENTRAL);
-                    	
-                    	Germplasm greatGrandParent2 = getGermplasmWithPrefName(grandParent.getGpid2());	
-                    	if(greatGrandParent2 != null){
-                    		GermplasmPedigreeTreeNode nodeForGreatGrandParent2 = new GermplasmPedigreeTreeNode();
-                    		nodeForGreatGrandParent2.setGermplasm(greatGrandParent2);
-                    		node.getLinkedNodes().add(addParentsExcludeDerivativeLines(nodeForGreatGrandParent2, level - 1));
-                    	}
-                    	
-                    }                    
-                }            	
-            	
-                
+                // get and add male parent
+                Germplasm maleParent = getGermplasmWithPrefName(germplasmOfNode.getGpid2());
+                if (maleParent != null) {
+                    GermplasmPedigreeTreeNode nodeForMaleParent = new GermplasmPedigreeTreeNode();
+                    nodeForMaleParent.setGermplasm(maleParent);
+                    node.getLinkedNodes().add(addParents(nodeForMaleParent, level - 1));
+                }
+
+                if (germplasmOfNode.getGnpgs() > 2) {
+                    // if there are more parents, get and add each of them
+                    List<Germplasm> otherParents = new ArrayList<Germplasm>();
+
+                    if (germplasmOfNode.getGid() < 0 && setWorkingDatabase(Database.LOCAL)) {
+                        otherParents = getGermplasmDao().getProgenitorsByGIDWithPrefName(germplasmOfNode.getGid());
+                    } else if (germplasmOfNode.getGid() > 0 && setWorkingDatabase(Database.CENTRAL)) {
+                        otherParents = getGermplasmDao().getProgenitorsByGIDWithPrefName(germplasmOfNode.getGid());
+                    }
+
+                    for (Germplasm otherParent : otherParents) {
+                        GermplasmPedigreeTreeNode nodeForOtherParent = new GermplasmPedigreeTreeNode();
+                        nodeForOtherParent.setGermplasm(otherParent);
+                        node.getLinkedNodes().add(addParents(nodeForOtherParent, level - 1));
+                    }
+                }        	
             }
             return node;
         }
