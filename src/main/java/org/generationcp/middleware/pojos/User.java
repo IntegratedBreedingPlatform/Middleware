@@ -85,7 +85,8 @@ public class User implements Serializable {
     @Column(name = "cdate")
     private Integer cdate;
     
-    
+    @Transient
+    private Boolean isnew = false;
 
 	@Transient
     private Person person;
@@ -130,6 +131,7 @@ public class User implements Serializable {
         user.setPersonid(personid);
         user.setAdate(adate);
         user.setCdate(cdate);
+        user.setIsNew(isnew);
         
         return user;
     }
@@ -222,6 +224,14 @@ public class User implements Serializable {
         this.person = person;
     }
     
+    public Boolean isNew() {
+        return isnew;
+    }
+
+    public void setIsNew(Boolean val) {
+        this.isnew = val;
+    }
+    
     @Override
     public int hashCode() {
         return new HashCodeBuilder().append(userid).hashCode();
@@ -268,7 +278,10 @@ public class User implements Serializable {
         builder.append(", cdate=");
         builder.append(cdate);
         builder.append(", person=");
-        builder.append(person);
+        builder.append(person); 
+        builder.append(", isnew=");
+        builder.append(isnew);
+        
         builder.append("]");
         return builder.toString();
     }
