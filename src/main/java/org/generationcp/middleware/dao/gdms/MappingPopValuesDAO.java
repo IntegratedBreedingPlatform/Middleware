@@ -45,29 +45,27 @@ public class MappingPopValuesDAO extends GenericDAO<MappingPopValues, Integer>{
     public List<AllelicValueWithMarkerIdElement> getAllelicValuesByDatasetId(Integer datasetId, int start, int numOfRows)
             throws MiddlewareQueryException {
         List<AllelicValueWithMarkerIdElement> toReturn = new ArrayList<AllelicValueWithMarkerIdElement>();
-        if (datasetId == null) {
-            return toReturn;
-        }
 
         try {
-            SQLQuery query = getSession().createSQLQuery(MappingPopValues.GET_ALLELIC_VALUES_BY_DATASET_ID);
-            query.setParameter("datasetId", datasetId);
-            query.setFirstResult(start);
-            query.setMaxResults(numOfRows);
-            List results = query.list();
-
-            for (Object o : results) {
-                Object[] result = (Object[]) o;
-                if (result != null) {
-                    Integer gid = (Integer) result[0];
-                    Integer markerId = (Integer) result[1];
-                    String data = (String) result[2];
-                    AllelicValueWithMarkerIdElement allelicValueElement = new AllelicValueWithMarkerIdElement(gid, data, markerId);
-                    toReturn.add(allelicValueElement);
-                }
-            }
-
-            return toReturn;
+        	if (datasetId != null){
+	            SQLQuery query = getSession().createSQLQuery(MappingPopValues.GET_ALLELIC_VALUES_BY_DATASET_ID);
+	            query.setParameter("datasetId", datasetId);
+	            query.setFirstResult(start);
+	            query.setMaxResults(numOfRows);
+	            List results = query.list();
+	
+	            for (Object o : results) {
+	                Object[] result = (Object[]) o;
+	                if (result != null) {
+	                    Integer gid = (Integer) result[0];
+	                    Integer markerId = (Integer) result[1];
+	                    String data = (String) result[2];
+	                    AllelicValueWithMarkerIdElement allelicValueElement = new AllelicValueWithMarkerIdElement(gid, data, markerId);
+	                    toReturn.add(allelicValueElement);
+	                }
+	            }
+	            return toReturn;
+        	}
         } catch (HibernateException e) {
         	logAndThrowException("Error with getAllelicValuesByDatasetId(datasetId=" + datasetId
                     + ") query from MappingPopValues: " + e.getMessage(), e);
@@ -85,14 +83,15 @@ public class MappingPopValuesDAO extends GenericDAO<MappingPopValues, Integer>{
      */
     public long countByDatasetId(Integer datasetId) throws MiddlewareQueryException {
         try {
-            Query query = getSession().createSQLQuery(MappingPopValues.COUNT_BY_DATASET_ID);
-            query.setParameter("datasetId", datasetId);
-            BigInteger result = (BigInteger) query.uniqueResult();
-            if (result != null) {
-                return result.longValue();
-            }
-            return 0;
-        } catch (HibernateException e) {
+        	if (datasetId != null){
+	            Query query = getSession().createSQLQuery(MappingPopValues.COUNT_BY_DATASET_ID);
+	            query.setParameter("datasetId", datasetId);
+	            BigInteger result = (BigInteger) query.uniqueResult();
+	            if (result != null) {
+	                return result.longValue();
+	            }
+        	}
+    	} catch (HibernateException e) {
         	logAndThrowException("Error with countByDatasetId(datasetId=" + datasetId + ") query from MappingPopValues: "
                     + e.getMessage(), e);
         }
@@ -112,13 +111,13 @@ public class MappingPopValuesDAO extends GenericDAO<MappingPopValues, Integer>{
     public List<Integer> getGIDsByMarkerId(Integer markerId, int start, int numOfRows) throws MiddlewareQueryException {
 
         try {
+        	if (markerId != null){
             SQLQuery query = getSession().createSQLQuery(MappingPopValues.GET_GIDS_BY_MARKER_ID);
             query.setParameter("markerId", markerId);
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
-
-            List<Integer> gids = query.list();
-            return gids;
+            return query.list();
+        	}
         } catch (HibernateException e) {
         	logAndThrowException("Error with getGIDsByMarkerId(markerId=" + markerId + ") query from MappingPopValues: " + e.getMessage(), e);
         }
@@ -134,14 +133,15 @@ public class MappingPopValuesDAO extends GenericDAO<MappingPopValues, Integer>{
      */
     public long countGIDsByMarkerId(Integer markerId) throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(MappingPopValues.COUNT_GIDS_BY_MARKER_ID);
-            query.setParameter("markerId", markerId);
-            BigInteger result = (BigInteger) query.uniqueResult();
-            if (result != null) {
-                return result.longValue();
-            }
-            return 0;
-        } catch (HibernateException e) {
+        	if (markerId != null){
+	            SQLQuery query = getSession().createSQLQuery(MappingPopValues.COUNT_GIDS_BY_MARKER_ID);
+	            query.setParameter("markerId", markerId);
+	            BigInteger result = (BigInteger) query.uniqueResult();
+	            if (result != null) {
+	                return result.longValue();
+	            }
+        	}
+    	} catch (HibernateException e) {
         	logAndThrowException("Error with countGIDsByMarkerId(markerId=" + markerId + ") query from MappingPopValues: " + e.getMessage(), e);
         }
         return 0;

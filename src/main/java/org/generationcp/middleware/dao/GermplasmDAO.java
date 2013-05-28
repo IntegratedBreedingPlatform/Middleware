@@ -42,16 +42,15 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         return new ArrayList<Germplasm>();
     }
 
-    public BigInteger countByPrefName(String name) throws MiddlewareQueryException {
+    public long countByPrefName(String name) throws MiddlewareQueryException {
         try {
             Query query = getSession().createSQLQuery(Germplasm.COUNT_BY_PREF_NAME);
             query.setParameter("name", name);
-            return (BigInteger) query.uniqueResult();
+            return ((BigInteger) query.uniqueResult()).longValue();
         } catch (HibernateException e) {
-            logAndThrowException("Error with countByPrefName(prefName=" + name + ") query from Germplasm: " + e.getMessage(),
-                    e);
+            logAndThrowException("Error with countByPrefName(prefName=" + name + ") query from Germplasm: " + e.getMessage(),e);
         }
-        return BigInteger.valueOf(0);
+        return 0;
     }
 
     @SuppressWarnings("unchecked")
@@ -101,29 +100,30 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
     @SuppressWarnings("unchecked")    
     public List<Germplasm> getByName(List<String> names, Operation operation, int start, int numOfRows) throws MiddlewareQueryException {
         try {            
-            String originalName = names.get(0);
-            String standardizedName = names.get(1);
-            String noSpaceName = names.get(2);
-            
-            // Search using = by default
-            SQLQuery query = getSession().createSQLQuery(Germplasm.GET_BY_NAME_ALL_MODES_USING_EQUAL);
-            if (operation == Operation.LIKE) {
-                query = getSession().createSQLQuery(Germplasm.GET_BY_NAME_USING_LIKE);
-            }  
-            
-            // Set the parameters
-            query.setParameter("name", originalName);
-            if (operation == Operation.EQUAL) {
-                query.setParameter("noSpaceName", noSpaceName);
-                query.setParameter("standardizedName", standardizedName);
-            }
-            
-            query.addEntity("g", Germplasm.class);
-            query.setFirstResult(start);
-            query.setMaxResults(numOfRows);
-
-            return query.list();
-
+        	if (names != null && names.size() > 0){
+	            String originalName = names.get(0);
+	            String standardizedName = names.get(1);
+	            String noSpaceName = names.get(2);
+	            
+	            // Search using = by default
+	            SQLQuery query = getSession().createSQLQuery(Germplasm.GET_BY_NAME_ALL_MODES_USING_EQUAL);
+	            if (operation == Operation.LIKE) {
+	                query = getSession().createSQLQuery(Germplasm.GET_BY_NAME_USING_LIKE);
+	            }  
+	            
+	            // Set the parameters
+	            query.setParameter("name", originalName);
+	            if (operation == Operation.EQUAL) {
+	                query.setParameter("noSpaceName", noSpaceName);
+	                query.setParameter("standardizedName", standardizedName);
+	            }
+	            
+	            query.addEntity("g", Germplasm.class);
+	            query.setFirstResult(start);
+	            query.setMaxResults(numOfRows);
+	
+	            return query.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByName(names=" + names + ") query from Germplasm: "
                     + e.getMessage(), e);
@@ -172,25 +172,26 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
     
     public long countByName(List<String> names, Operation operation) throws MiddlewareQueryException {
         try {
-            
-            String originalName = names.get(0);
-            String standardizedName = names.get(1);
-            String noSpaceName = names.get(2);
-
-            // Count using = by default
-            SQLQuery query = getSession().createSQLQuery(Germplasm.COUNT_BY_NAME_ALL_MODES_USING_EQUAL);            
-            if (operation == Operation.LIKE) {
-                query = getSession().createSQLQuery(Germplasm.COUNT_BY_NAME_USING_LIKE);
-            } 
-
-            // Set the parameters
-            query.setParameter("name", originalName);
-            if (operation == Operation.EQUAL){
-                query.setParameter("noSpaceName", noSpaceName);
-                query.setParameter("standardizedName", standardizedName);
+            if (names != null){
+	            String originalName = names.get(0);
+	            String standardizedName = names.get(1);
+	            String noSpaceName = names.get(2);
+	
+	            // Count using = by default
+	            SQLQuery query = getSession().createSQLQuery(Germplasm.COUNT_BY_NAME_ALL_MODES_USING_EQUAL);            
+	            if (operation == Operation.LIKE) {
+	                query = getSession().createSQLQuery(Germplasm.COUNT_BY_NAME_USING_LIKE);
+	            } 
+	
+	            // Set the parameters
+	            query.setParameter("name", originalName);
+	            if (operation == Operation.EQUAL){
+	                query.setParameter("noSpaceName", noSpaceName);
+	                query.setParameter("standardizedName", standardizedName);
+	            }
+	
+	            return ((BigInteger) query.uniqueResult()).longValue();
             }
-
-            return ((BigInteger) query.uniqueResult()).longValue();
             
         } catch (HibernateException e) {
             logAndThrowException("Error with countByName(names=" + names + ") query from Germplasm: "
@@ -314,22 +315,23 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
     @SuppressWarnings("rawtypes")
     public Germplasm getByGIDWithPrefName(Integer gid) throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(Germplasm.GET_BY_GID_WITH_PREF_NAME);
-            query.addEntity("g", Germplasm.class);
-            query.addEntity("n", Name.class);
-            query.setParameter("gid", gid);
-            List results = query.list();
-            
-            if(results.size() > 0){
-                Object[] result = (Object[]) results.get(0);
-                if (result != null) {
-                    Germplasm germplasm = (Germplasm) result[0];
-                    Name prefName = (Name) result[1];
-                    germplasm.setPreferredName(prefName);
-                    return germplasm;
-                } 
-            }
-            
+        	if (gid != null){
+	            SQLQuery query = getSession().createSQLQuery(Germplasm.GET_BY_GID_WITH_PREF_NAME);
+	            query.addEntity("g", Germplasm.class);
+	            query.addEntity("n", Name.class);
+	            query.setParameter("gid", gid);
+	            List results = query.list();
+	            
+	            if(results.size() > 0){
+	                Object[] result = (Object[]) results.get(0);
+	                if (result != null) {
+	                    Germplasm germplasm = (Germplasm) result[0];
+	                    Name prefName = (Name) result[1];
+	                    germplasm.setPreferredName(prefName);
+	                    return germplasm;
+	                } 
+	            }
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByGIDWithPrefName(gid=" + gid + ") from Germplasm: " + e.getMessage(), e);
         }
@@ -339,26 +341,28 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
     @SuppressWarnings("rawtypes")
     public Germplasm getByGIDWithPrefAbbrev(Integer gid) throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(Germplasm.GET_BY_GID_WITH_PREF_ABBREV);
-            query.addEntity("g", Germplasm.class);
-            query.addEntity("n", Name.class);
-            query.addEntity("abbrev", Name.class);
-            query.setParameter("gid", gid);
-            List results = query.list();
-            
-            if(results.size() > 0){
-                Object[] result = (Object[]) results.get(0);
-                if (result != null) {
-                    Germplasm germplasm = (Germplasm) result[0];
-                    Name prefName = (Name) result[1];
-                    Name prefAbbrev = (Name) result[2];
-                    germplasm.setPreferredName(prefName);
-                    if (prefAbbrev != null) {
-                        germplasm.setPreferredAbbreviation(prefAbbrev.getNval());
-                    }
-                    return germplasm;
-                }
-            }
+        	if (gid != null){
+	            SQLQuery query = getSession().createSQLQuery(Germplasm.GET_BY_GID_WITH_PREF_ABBREV);
+	            query.addEntity("g", Germplasm.class);
+	            query.addEntity("n", Name.class);
+	            query.addEntity("abbrev", Name.class);
+	            query.setParameter("gid", gid);
+	            List results = query.list();
+	            
+	            if(results.size() > 0){
+	                Object[] result = (Object[]) results.get(0);
+	                if (result != null) {
+	                    Germplasm germplasm = (Germplasm) result[0];
+	                    Name prefName = (Name) result[1];
+	                    Name prefAbbrev = (Name) result[2];
+	                    germplasm.setPreferredName(prefName);
+	                    if (prefAbbrev != null) {
+	                        germplasm.setPreferredAbbreviation(prefAbbrev.getNval());
+	                    }
+	                    return germplasm;
+	                }
+	            }
+        	}
         } catch (HibernateException e) {
             logAndThrowException(
                     "Error with getByGIDWithPrefAbbrev(gid=" + gid + ") query from Germplasm: " + e.getMessage(), e);
@@ -369,21 +373,23 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
     @SuppressWarnings("unchecked")
     public List<Germplasm> getProgenitorsByGIDWithPrefName(Integer gid) throws MiddlewareQueryException {
         try {
-            List<Germplasm> progenitors = new ArrayList<Germplasm>();
-
-            SQLQuery query = getSession().createSQLQuery(Germplasm.GET_PROGENITORS_BY_GID_WITH_PREF_NAME);
-            query.addEntity("g", Germplasm.class);
-            query.addEntity("n", Name.class);
-            query.setParameter("gid", gid);
-            List<Object[]> results = query.list();
-            for (Object[] result : results) {
-                Germplasm germplasm = (Germplasm) result[0];
-                Name prefName = (Name) result[1];
-                germplasm.setPreferredName(prefName);
-                progenitors.add(germplasm);
-            }
-
-            return progenitors;
+        	if (gid != null){
+	            List<Germplasm> progenitors = new ArrayList<Germplasm>();
+	
+	            SQLQuery query = getSession().createSQLQuery(Germplasm.GET_PROGENITORS_BY_GID_WITH_PREF_NAME);
+	            query.addEntity("g", Germplasm.class);
+	            query.addEntity("n", Name.class);
+	            query.setParameter("gid", gid);
+	            List<Object[]> results = query.list();
+	            for (Object[] result : results) {
+	                Germplasm germplasm = (Germplasm) result[0];
+	                Name prefName = (Name) result[1];
+	                germplasm.setPreferredName(prefName);
+	                progenitors.add(germplasm);
+	            }
+	
+	            return progenitors;
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getProgenitorsByGIDWithPrefName(gid=" + gid + ") query from Germplasm: "
                     + e.getMessage(), e);
@@ -394,11 +400,13 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
     @SuppressWarnings("unchecked")
     public List<Germplasm> getGermplasmDescendantByGID(Integer gid, int start, int numOfRows) throws MiddlewareQueryException {
         try {
-            Query query = getSession().getNamedQuery(Germplasm.GET_DESCENDANTS);
-            query.setParameter("gid", gid);
-            query.setFirstResult(start);
-            query.setMaxResults(numOfRows);
-            return query.list();
+        	if (gid != null){
+	            Query query = getSession().getNamedQuery(Germplasm.GET_DESCENDANTS);
+	            query.setParameter("gid", gid);
+	            query.setFirstResult(start);
+	            query.setMaxResults(numOfRows);
+	            return query.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getGermplasmDescendantByGID(gid=" + gid + ") query from Germplasm: "
                     + e.getMessage(), e);
@@ -408,24 +416,25 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 
     public Germplasm getProgenitorByGID(Integer gid, Integer pro_no) throws MiddlewareQueryException {
         try {
-
-            String progenitorQuery = "";
-            if (pro_no == 1) {
-                progenitorQuery = Germplasm.GET_PROGENITOR1;
-            } else if (pro_no == 2) {
-                progenitorQuery = Germplasm.GET_PROGENITOR2;
-            } else if (pro_no > 2) {
-                progenitorQuery = Germplasm.GET_PROGENITOR;
-            }
-
-            Query query = getSession().getNamedQuery(progenitorQuery);
-            query.setParameter("gid", gid);
-
-            if (pro_no > 2) {
-                query.setParameter("pno", pro_no);
-            }
-
-            return (Germplasm) query.uniqueResult();
+        	if (gid != null & pro_no != null){
+	            String progenitorQuery = "";
+	            if (pro_no == 1) {
+	                progenitorQuery = Germplasm.GET_PROGENITOR1;
+	            } else if (pro_no == 2) {
+	                progenitorQuery = Germplasm.GET_PROGENITOR2;
+	            } else if (pro_no > 2) {
+	                progenitorQuery = Germplasm.GET_PROGENITOR;
+	            }
+	
+	            Query query = getSession().getNamedQuery(progenitorQuery);
+	            query.setParameter("gid", gid);
+	
+	            if (pro_no > 2) {
+	                query.setParameter("pno", pro_no);
+	            }
+	
+	            return (Germplasm) query.uniqueResult();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getProgenitorByGID(gid=" + gid + ") query from Germplasm: " + e.getMessage(), e);
         }
@@ -434,11 +443,11 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 
     public long countGermplasmDescendantByGID(Integer gid) throws MiddlewareQueryException {
         try {
+        	if (gid != null){
             Query query = getSession().createSQLQuery(Germplasm.COUNT_DESCENDANTS);
             query.setParameter("gid", gid);
-
-            BigInteger count = (BigInteger) query.uniqueResult();
-            return count.intValue();
+            return ((BigInteger) query.uniqueResult()).longValue();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with countGermplasmDescendantByGID(gid=" + gid + ") query from Germplasm: "
                     + e.getMessage(), e);
@@ -449,21 +458,23 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
     public List<Germplasm> getManagementNeighbors(Integer gid, int start, int numOfRows) throws MiddlewareQueryException {
         List<Germplasm> toreturn = new ArrayList<Germplasm>();
         try {
-            SQLQuery query = getSession().createSQLQuery(Germplasm.GET_MANAGEMENT_NEIGHBORS);
-            query.addEntity("g", Germplasm.class);
-            query.addEntity("n", Name.class);
-            query.setParameter("gid", gid);
-
-            query.setFirstResult(start);
-            query.setMaxResults(numOfRows);
-
-            for (Object resultObject : query.list()) {
-                Object[] result = (Object[]) resultObject;
-                Germplasm germplasm = (Germplasm) result[0];
-                Name prefName = (Name) result[1];
-                germplasm.setPreferredName(prefName);
-                toreturn.add(germplasm);
-            }
+        	if (gid != null){
+	            SQLQuery query = getSession().createSQLQuery(Germplasm.GET_MANAGEMENT_NEIGHBORS);
+	            query.addEntity("g", Germplasm.class);
+	            query.addEntity("n", Name.class);
+	            query.setParameter("gid", gid);
+	
+	            query.setFirstResult(start);
+	            query.setMaxResults(numOfRows);
+	
+	            for (Object resultObject : query.list()) {
+	                Object[] result = (Object[]) resultObject;
+	                Germplasm germplasm = (Germplasm) result[0];
+	                Name prefName = (Name) result[1];
+	                germplasm.setPreferredName(prefName);
+	                toreturn.add(germplasm);
+	            }
+        	}
 
         } catch (HibernateException e) {
             logAndThrowException(
@@ -474,11 +485,12 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
     
     public long countManagementNeighbors(Integer gid) throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(Germplasm.COUNT_MANAGEMENT_NEIGHBORS);
-            query.setParameter("gid", gid);
-            
-            BigInteger count = (BigInteger) query.uniqueResult();
-            return count.longValue();
+        	if (gid != null){
+	            SQLQuery query = getSession().createSQLQuery(Germplasm.COUNT_MANAGEMENT_NEIGHBORS);
+	            query.setParameter("gid", gid);
+	            BigInteger count = (BigInteger) query.uniqueResult();
+	            return count.longValue();
+        	}
         }
         catch (HibernateException e) {
             logAndThrowException("Error with countManagementNeighbors(gid=" + gid + ") query from Germplasm: " + e.getMessage(), e);
@@ -488,11 +500,12 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 
     public long countGroupRelatives(Integer gid) throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(Germplasm.COUNT_GROUP_RELATIVES);
-            query.setParameter("gid", gid);
-            
-            BigInteger count = (BigInteger) query.uniqueResult();
-            return count.longValue();
+        	if (gid != null){
+	            SQLQuery query = getSession().createSQLQuery(Germplasm.COUNT_GROUP_RELATIVES);
+	            query.setParameter("gid", gid);
+	            BigInteger count = (BigInteger) query.uniqueResult();
+	            return count.longValue();
+        	}
         }
         catch (HibernateException e) {
             logAndThrowException("Error with countGroupRelatives(gid=" + gid + ") query from Germplasm: " + e.getMessage(), e);
@@ -503,21 +516,23 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
     public List<Germplasm> getGroupRelatives(Integer gid, int start, int numRows) throws MiddlewareQueryException {
         List<Germplasm> toreturn = new ArrayList<Germplasm>();
         try {
-            SQLQuery query = getSession().createSQLQuery(Germplasm.GET_GROUP_RELATIVES);
-            query.addEntity("g", Germplasm.class);
-            query.addEntity("n", Name.class);
-            query.setParameter("gid", gid);
-            
-            query.setFirstResult(start);
-            query.setMaxResults(numRows);
-
-            for (Object resultObject : query.list()) {
-                Object[] result = (Object[]) resultObject;
-                Germplasm germplasm = (Germplasm) result[0];
-                Name prefName = (Name) result[1];
-                germplasm.setPreferredName(prefName);
-                toreturn.add(germplasm);
-            }
+        	if (gid != null){
+	            SQLQuery query = getSession().createSQLQuery(Germplasm.GET_GROUP_RELATIVES);
+	            query.addEntity("g", Germplasm.class);
+	            query.addEntity("n", Name.class);
+	            query.setParameter("gid", gid);
+	            
+	            query.setFirstResult(start);
+	            query.setMaxResults(numRows);
+	
+	            for (Object resultObject : query.list()) {
+	                Object[] result = (Object[]) resultObject;
+	                Germplasm germplasm = (Germplasm) result[0];
+	                Name prefName = (Name) result[1];
+	                germplasm.setPreferredName(prefName);
+	                toreturn.add(germplasm);
+	            }
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getGroupRelatives(gid=" + gid + ") query from Germplasm: " + e.getMessage(), e);
         }
@@ -574,12 +589,17 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 
     public void validateId(Germplasm germplasm) throws MiddlewareQueryException {
         // Check if not a local record (has negative ID)
-        Integer id = germplasm.getGid();
-        if (id != null && id.intValue() > 0) {
-            logAndThrowException("Error with validateId(germplasm=" + germplasm
-                    + "): Cannot update a Central Database record. "
-                    + "Attribute object to update must be a Local Record (ID must be negative)");
-        }
+    	if (germplasm != null){
+	        Integer id = germplasm.getGid();
+	        if (id != null && id.intValue() > 0) {
+	            logAndThrowException("Error with validateId(germplasm=" + germplasm
+	                    + "): Cannot update a Central Database record. "
+	                    + "Attribute object to update must be a Local Record (ID must be negative)");
+	        }
+    	} else {
+	            logAndThrowException("Error with validateId(germplasm=" + germplasm
+	                    + "): germplasm is null. ");
+    	}
     }
     
     public String getNextSequenceNumberForCrossName(String prefix) throws MiddlewareQueryException{

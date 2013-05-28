@@ -37,15 +37,16 @@ public class ToolConfigurationDAO extends GenericDAO<ToolConfiguration, Long>{
     @SuppressWarnings("unchecked")
     public List<ToolConfiguration> getListOfToolConfigurationsByToolId(Long toolId) throws MiddlewareQueryException {
         try {
-            Criteria criteriaTool = getSession().createCriteria(Tool.class);
-            criteriaTool.add(Restrictions.eq("toolId", toolId));
-            Tool tool = (Tool) criteriaTool.uniqueResult();
-
-            Criteria criteria = getSession().createCriteria(ToolConfiguration.class);
-            criteria.add(Restrictions.eq("tool", tool));
-
-            return criteria.list();
-
+        	if (toolId != null){
+	            Criteria criteriaTool = getSession().createCriteria(Tool.class);
+	            criteriaTool.add(Restrictions.eq("toolId", toolId));
+	            Tool tool = (Tool) criteriaTool.uniqueResult();
+	
+	            Criteria criteria = getSession().createCriteria(ToolConfiguration.class);
+	            criteria.add(Restrictions.eq("tool", tool));
+	
+	            return criteria.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getListOfToolConfigurationsByToolId(toolId=" + toolId + ") query from Tool: "
                     + e.getMessage(), e);
@@ -55,16 +56,17 @@ public class ToolConfigurationDAO extends GenericDAO<ToolConfiguration, Long>{
 
     public ToolConfiguration getToolConfigurationByToolIdAndConfigKey(Long toolId, String configKey) throws MiddlewareQueryException {
         try {
-            Criteria criteriaTool = getSession().createCriteria(Tool.class);
-            criteriaTool.add(Restrictions.eq("toolId", toolId));
-            Tool tool = (Tool) criteriaTool.uniqueResult();
-
-            Criteria criteria = getSession().createCriteria(ToolConfiguration.class);
-            criteria.add(Restrictions.eq("tool", tool));
-            criteria.add(Restrictions.eq("configKey", configKey));
-
-            return (ToolConfiguration) criteria.uniqueResult();
-
+        	if (toolId != null){
+	            Criteria criteriaTool = getSession().createCriteria(Tool.class);
+	            criteriaTool.add(Restrictions.eq("toolId", toolId));
+	            Tool tool = (Tool) criteriaTool.uniqueResult();
+	
+	            Criteria criteria = getSession().createCriteria(ToolConfiguration.class);
+	            criteria.add(Restrictions.eq("tool", tool));
+	            criteria.add(Restrictions.eq("configKey", configKey));
+	
+	            return (ToolConfiguration) criteria.uniqueResult();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getToolConfigurationByToolIdAndConfigKey(toolId=" + toolId + ", configKey="
                     + configKey + ") query from Tool: " + e.getMessage(), e);

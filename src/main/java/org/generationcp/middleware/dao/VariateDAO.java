@@ -29,10 +29,11 @@ public class VariateDAO extends GenericDAO<Variate, Integer>{
     @SuppressWarnings("unchecked")
     public List<Variate> getByStudyID(Integer studyId) throws MiddlewareQueryException {
         try {
-            Query query = getSession().getNamedQuery(Variate.GET_VARIATES_BY_STUDYID);
-            query.setParameter("studyId", studyId);
-
-            return (List<Variate>) query.list();
+			if (studyId != null) {
+				Query query = getSession().getNamedQuery(Variate.GET_VARIATES_BY_STUDYID);
+				query.setParameter("studyId", studyId);
+				return (List<Variate>) query.list();
+			}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByStudyID(studyId=" + studyId + ") query from Variate: " + e.getMessage(), e);
         }
@@ -42,11 +43,12 @@ public class VariateDAO extends GenericDAO<Variate, Integer>{
     @SuppressWarnings("unchecked")
     public List<Variate> getByRepresentationId(Integer representationId) throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(Variate.GET_BY_REPRESENTATION_ID);
-            query.setParameter("representationId", representationId);
-            query.addEntity("v", Variate.class);
-
-            return (List<Variate>) query.list();
+	        	if (representationId != null){
+	            SQLQuery query = getSession().createSQLQuery(Variate.GET_BY_REPRESENTATION_ID);
+	            query.setParameter("representationId", representationId);
+	            query.addEntity("v", Variate.class);
+	            return (List<Variate>) query.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByRepresentationId(representationId=" + representationId
                     + ") query from Variate: " + e.getMessage(), e);

@@ -26,13 +26,15 @@ public class ProgenitorDAO extends GenericDAO<Progenitor, ProgenitorPK>{
 
     public Progenitor getByGIDAndPID(Integer gid, Integer pid) throws MiddlewareQueryException {
         try {
-            List<Criterion> criterions = new ArrayList<Criterion>();
-            criterions.add(Restrictions.eq("pid", pid));
-            criterions.add(Restrictions.eq("progntrsPK.gid", gid));
-            List<Progenitor> progenitors = getByCriteria(criterions);
-            if (!progenitors.isEmpty()) {
-                return progenitors.get(0);
-            }
+        	if (gid != null && pid != null){
+	            List<Criterion> criterions = new ArrayList<Criterion>();
+	            criterions.add(Restrictions.eq("pid", pid));
+	            criterions.add(Restrictions.eq("progntrsPK.gid", gid));
+	            List<Progenitor> progenitors = getByCriteria(criterions);
+	            if (!progenitors.isEmpty()) {
+	                return progenitors.get(0);
+	            }
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByGIDAndPID(gid=" + gid + ", pid=" + pid + ") query from Progenitor: "
                     + e.getMessage(), e);

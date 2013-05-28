@@ -31,30 +31,32 @@ public class NameDAO extends GenericDAO<Name, Integer>{
     @SuppressWarnings("unchecked")
     public List<Name> getByGIDWithFilters(Integer gid, Integer status, GermplasmNameType type) throws MiddlewareQueryException {
         try {
-            StringBuilder queryString = new StringBuilder();
-            queryString.append("SELECT {n.*} from NAMES n WHERE n.gid = :gid ");
-
-            if (status != null && status != 0) {
-                queryString.append("AND n.nstat = :nstat ");
-            }
-
-            if (type != null) {
-                queryString.append("AND n.ntype = :ntype ");
-            }
-
-            SQLQuery query = getSession().createSQLQuery(queryString.toString());
-            query.addEntity("n", Name.class);
-            query.setParameter("gid", gid);
-
-            if (status != null && status != 0) {
-                query.setParameter("nstat", status);
-            }
-
-            if (type != null) {
-                query.setParameter("ntype", Integer.valueOf(type.getUserDefinedFieldID()));
-            }
-
-            return query.list();
+        	if (gid != null){
+	            StringBuilder queryString = new StringBuilder();
+	            queryString.append("SELECT {n.*} from NAMES n WHERE n.gid = :gid ");
+	
+	            if (status != null && status != 0) {
+	                queryString.append("AND n.nstat = :nstat ");
+	            }
+	
+	            if (type != null) {
+	                queryString.append("AND n.ntype = :ntype ");
+	            }
+	
+	            SQLQuery query = getSession().createSQLQuery(queryString.toString());
+	            query.addEntity("n", Name.class);
+	            query.setParameter("gid", gid);
+	
+	            if (status != null && status != 0) {
+	                query.setParameter("nstat", status);
+	            }
+	
+	            if (type != null) {
+	                query.setParameter("ntype", Integer.valueOf(type.getUserDefinedFieldID()));
+	            }
+	
+	            return query.list();
+        	}
 
             /**
              * List<Criterion> criterions = new ArrayList<Criterion>();
@@ -81,17 +83,19 @@ public class NameDAO extends GenericDAO<Name, Integer>{
     @SuppressWarnings("unchecked")
     public Name getByGIDAndNval(Integer gid, String nval) throws MiddlewareQueryException {
         try {
-            Criteria crit = getSession().createCriteria(Name.class);
-            crit.add(Restrictions.eq("germplasmId", gid));
-            crit.add(Restrictions.eq("nval", nval));
-            List<Name> names = crit.list();
-            if (names.isEmpty()) {
-                // return null if no Name objects match
-                return null;
-            } else {
-                // return first result in the case of multiple matches
-                return names.get(0);
-            }
+        	if (gid != null){
+	            Criteria crit = getSession().createCriteria(Name.class);
+	            crit.add(Restrictions.eq("germplasmId", gid));
+	            crit.add(Restrictions.eq("nval", nval));
+	            List<Name> names = crit.list();
+	            if (names.isEmpty()) {
+	                // return null if no Name objects match
+	                return null;
+	            } else {
+	                // return first result in the case of multiple matches
+	                return names.get(0);
+	            }
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByGIDAndNval(gid=" + gid + ", nval=" + nval + ") query from Name "
                     + e.getMessage(), e);
@@ -101,28 +105,25 @@ public class NameDAO extends GenericDAO<Name, Integer>{
 
     public void validateId(Name name) throws MiddlewareQueryException {
         // Check if not a local record (has negative ID)
-        Integer id = name.getNid();
-        if (id != null && id.intValue() > 0) {
-            logAndThrowException("Error with validateId(name=" + name + "): Cannot update a Central Database record. "
-                    + "Name object to update must be a Local Record (ID must be negative)");
-        }
+    	if (name != null){
+	        Integer id = name.getNid();
+	        if (id != null && id.intValue() > 0) {
+	            logAndThrowException("Error with validateId(name=" + name + "): Cannot update a Central Database record. "
+	                    + "Name object to update must be a Local Record (ID must be negative)");
+	        }
+    	} else {
+            logAndThrowException("Error with validateId(name=" + name + "): name is null. ");
+    	}
     }
 
     @SuppressWarnings("unchecked")
     public List<Name> getNamesByNameIds(List<Integer> nIds) throws MiddlewareQueryException {
         try {
-
-            if (nIds == null || nIds.isEmpty()) {
-                return new ArrayList<Name>();
+            if (nIds != null && !nIds.isEmpty()) {
+	            Criteria crit = getSession().createCriteria(Name.class);
+	            crit.add(Restrictions.in("nid", nIds));
+	            return crit.list();
             }
-
-            Criteria crit = getSession().createCriteria(Name.class);
-            crit.add(Restrictions.in("nid", nIds));
-            List<Name> names = crit.list();
-            if (names.isEmpty()) {
-                return new ArrayList<Name>();
-            }
-            return names;
         } catch (HibernateException e) {
             logAndThrowException("Error with getNamesByNameIds(nIds=" + nIds + ") query from Name " + e.getMessage(), e);
         }
@@ -132,15 +133,12 @@ public class NameDAO extends GenericDAO<Name, Integer>{
     @SuppressWarnings("unchecked")
     public List<Name> getPreferredIdsByListId(Integer listId) throws MiddlewareQueryException {
        try {
-           SQLQuery query = getSession().createSQLQuery(Name.GET_PREFERRED_IDS_BY_LIST_ID);
-           query.setParameter("listId", listId);
-           query.addEntity("n", Name.class);
-           
-           List<Name> preferredIds = query.list();
-           if (preferredIds.isEmpty()) {
-               return new ArrayList<Name>();
-           }
-           return preferredIds;
+    	   if (listId != null){
+	           SQLQuery query = getSession().createSQLQuery(Name.GET_PREFERRED_IDS_BY_LIST_ID);
+	           query.setParameter("listId", listId);
+	           query.addEntity("n", Name.class);
+	           return query.list();
+    	   }
        } catch (HibernateException e) {
            logAndThrowException("Error with getPreferredIdsByListId(listId=" + listId + ") query from Name " + e.getMessage(), e);
        }
@@ -149,12 +147,11 @@ public class NameDAO extends GenericDAO<Name, Integer>{
 
     public Name getNameByNameId(Integer nId) throws MiddlewareQueryException {
         try {
-            Criteria crit = getSession().createCriteria(Name.class);
-            crit.add(Restrictions.eq("nid", nId));
-
-            Name name = (Name) crit.uniqueResult();
-
-            return name;
+        	if (nId != null){
+	            Criteria crit = getSession().createCriteria(Name.class);
+	            crit.add(Restrictions.eq("nid", nId));
+	            return (Name) crit.uniqueResult();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getNameByNameId(nId=" + nId + ") query from Name " + e.getMessage(), e);
         }
@@ -170,26 +167,23 @@ public class NameDAO extends GenericDAO<Name, Integer>{
      */
     @SuppressWarnings("rawtypes")
     public List<GidNidElement> getGidAndNidByGermplasmNames(List<String> germplasmNames) throws MiddlewareQueryException {
-
         List<GidNidElement> toReturn = new ArrayList<GidNidElement>();
 
-        if (germplasmNames == null || germplasmNames.isEmpty()) {
-            return toReturn;
-        }
-
         try {
-            SQLQuery query = getSession().createSQLQuery(Name.GET_GID_AND_NID_BY_GERMPLASM_NAME);
-            query.setParameterList("germplasmNameList", germplasmNames);
-            List results = query.list();
-
-            for (Object o : results) {
-                Object[] result = (Object[]) o;
-                if (result != null) {
-                    Integer gId = (Integer) result[0];
-                    Integer nId = (Integer) result[1];
-                    GidNidElement element = new GidNidElement(gId, nId);
-                    toReturn.add(element);
-                }
+            if (germplasmNames != null && !germplasmNames.isEmpty()) {
+	            SQLQuery query = getSession().createSQLQuery(Name.GET_GID_AND_NID_BY_GERMPLASM_NAME);
+	            query.setParameterList("germplasmNameList", germplasmNames);
+	            List results = query.list();
+	
+	            for (Object o : results) {
+	                Object[] result = (Object[]) o;
+	                if (result != null) {
+	                    Integer gId = (Integer) result[0];
+	                    Integer nId = (Integer) result[1];
+	                    GidNidElement element = new GidNidElement(gId, nId);
+	                    toReturn.add(element);
+	                }
+	            }
             }
         } catch (HibernateException e) {
             logAndThrowException("Error with getGidAndNidByGermplasmNames(germplasmNames=" + germplasmNames

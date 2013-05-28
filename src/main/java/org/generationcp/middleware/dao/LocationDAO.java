@@ -72,16 +72,18 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
 
     public long countByName(String name, Operation operation) throws MiddlewareQueryException {
         try {
-            Criteria criteria = getSession().createCriteria(Location.class);
-            criteria.setProjection(Projections.rowCount());
-
-            if (operation == null || operation == Operation.EQUAL) {
-                criteria.add(Restrictions.eq("lname", name));
-            } else if (operation == Operation.LIKE) {
-                criteria.add(Restrictions.like("lname", name));
-            }
-
-            return ((Long) criteria.uniqueResult()).longValue(); //count
+        	if (name != null){
+	            Criteria criteria = getSession().createCriteria(Location.class);
+	            criteria.setProjection(Projections.rowCount());
+	
+	            if (operation == null || operation == Operation.EQUAL) {
+	                criteria.add(Restrictions.eq("lname", name));
+	            } else if (operation == Operation.LIKE) {
+	                criteria.add(Restrictions.like("lname", name));
+	            }
+	
+	            return ((Long) criteria.uniqueResult()).longValue(); 
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with countByName(name=" + name + ", operation=" + operation
                     + ") query from Location: " + e.getMessage(), e);
@@ -91,12 +93,14 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
 
     @SuppressWarnings("unchecked")
     public List<Location> getByCountry(Country country) throws MiddlewareQueryException {
-        Integer countryId = country.getCntryid();
         try {
-            Criteria criteria = getSession().createCriteria(Location.class);
-            criteria.add(Restrictions.eq("cntryid", countryId));
-            criteria.addOrder(Order.asc("lname"));
-            return criteria.list();
+        	if (country != null){
+	            Integer countryId = country.getCntryid();
+	            Criteria criteria = getSession().createCriteria(Location.class);
+	            criteria.add(Restrictions.eq("cntryid", countryId));
+	            criteria.addOrder(Order.asc("lname"));
+	            return criteria.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByCountry(country=" + country + ") query from Location: "
                     + e.getMessage(), e);
@@ -105,14 +109,16 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
     }
     
     @SuppressWarnings("unchecked")
-    public List<Location> getByCountryAndType(Country country,Integer type) throws MiddlewareQueryException {
-        Integer countryId = country.getCntryid();
+    public List<Location> getByCountryAndType(Country country, Integer type) throws MiddlewareQueryException {
         try {
-            Criteria criteria = getSession().createCriteria(Location.class);
-            criteria.add(Restrictions.eq("cntryid", countryId));
-            criteria.add(Restrictions.eq("ltype", type));
-            criteria.addOrder(Order.asc("lname"));
-            return criteria.list();
+        	if (country != null && type != null){
+                Integer countryId = country.getCntryid();
+	            Criteria criteria = getSession().createCriteria(Location.class);
+	            criteria.add(Restrictions.eq("cntryid", countryId));
+	            criteria.add(Restrictions.eq("ltype", type));
+	            criteria.addOrder(Order.asc("lname"));
+	            return criteria.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByCountry(country=" + country + ") query from Location: "
                     + e.getMessage(), e);
@@ -122,13 +128,15 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
 
     @SuppressWarnings("unchecked")
     public List<Location> getByCountry(Country country, int start, int numOfRows) throws MiddlewareQueryException {
-        Integer countryId = country.getCntryid();
         try {
-            Criteria criteria = getSession().createCriteria(Location.class);
-            criteria.add(Restrictions.eq("cntryid", countryId));
-            criteria.setFirstResult(start);
-            criteria.setMaxResults(numOfRows);
-            return criteria.list();
+        	if (country != null){
+                Integer countryId = country.getCntryid();
+	            Criteria criteria = getSession().createCriteria(Location.class);
+	            criteria.add(Restrictions.eq("cntryid", countryId));
+	            criteria.setFirstResult(start);
+	            criteria.setMaxResults(numOfRows);
+	            return criteria.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByCountry(country=" + country + ") query from Location: "
                     + e.getMessage(), e);
@@ -137,12 +145,14 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
     }
 
     public long countByCountry(Country country) throws MiddlewareQueryException {
-        Integer countryId = country.getCntryid();
         try {
-            Criteria criteria = getSession().createCriteria(Location.class);
-            criteria.add(Restrictions.eq("cntryid", countryId));
-            criteria.setProjection(Projections.rowCount());
-            return ((Long) criteria.uniqueResult()).longValue(); //count
+        	if (country != null){
+                Integer countryId = country.getCntryid();
+	            Criteria criteria = getSession().createCriteria(Location.class);
+	            criteria.add(Restrictions.eq("cntryid", countryId));
+	            criteria.setProjection(Projections.rowCount());
+	            return ((Long) criteria.uniqueResult()).longValue(); 
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with countByCountry(country=" + country 
                     + ") query from Location: " + e.getMessage(), e);
@@ -154,10 +164,12 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
     @SuppressWarnings("unchecked")
     public List<Location> getByType(Integer type) throws MiddlewareQueryException {
         try {
-            Criteria criteria = getSession().createCriteria(Location.class);
-            criteria.add(Restrictions.eq("ltype", type));
-            criteria.addOrder(Order.asc("lname"));
-            return criteria.list();
+        	if (type != null){
+	            Criteria criteria = getSession().createCriteria(Location.class);
+	            criteria.add(Restrictions.eq("ltype", type));
+	            criteria.addOrder(Order.asc("lname"));
+	            return criteria.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByType(type=" + type + ") query from Location: "
                     + e.getMessage(), e);
@@ -170,11 +182,13 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
     @SuppressWarnings("unchecked")
     public List<Location> getByType(Integer type, int start, int numOfRows) throws MiddlewareQueryException {
         try {
-            Criteria criteria = getSession().createCriteria(Location.class);
-            criteria.add(Restrictions.eq("ltype", type));
-            criteria.setFirstResult(start);
-            criteria.setMaxResults(numOfRows);
-            return criteria.list();
+        	if (type != null){
+	            Criteria criteria = getSession().createCriteria(Location.class);
+	            criteria.add(Restrictions.eq("ltype", type));
+	            criteria.setFirstResult(start);
+	            criteria.setMaxResults(numOfRows);
+	            return criteria.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByType(type=" + type + ") query from Location: "
                     + e.getMessage(), e);
@@ -184,10 +198,12 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
 
     public long countByType(Integer type) throws MiddlewareQueryException {
         try {
-            Criteria criteria = getSession().createCriteria(Location.class);
-            criteria.add(Restrictions.eq("ltype", type));
-            criteria.setProjection(Projections.rowCount());
-            return ((Long) criteria.uniqueResult()).longValue(); //count
+        	if (type != null){
+	            Criteria criteria = getSession().createCriteria(Location.class);
+	            criteria.add(Restrictions.eq("ltype", type));
+	            criteria.setProjection(Projections.rowCount());
+	            return ((Long) criteria.uniqueResult()).longValue(); 
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with countBytype(type=" + type 
                     + ") query from Location: " + e.getMessage(), e);
@@ -195,7 +211,8 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
         return 0;
     }
     
-    public List<Location> getAllBreedingLocations() throws MiddlewareQueryException {
+    @SuppressWarnings("rawtypes")
+	public List<Location> getAllBreedingLocations() throws MiddlewareQueryException {
     	List<Location> locationList = new ArrayList<Location>();
         try {
         	Session session = getSession();
@@ -227,7 +244,8 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
         }
     }
     
-    public Long countAllBreedingLocations() throws MiddlewareQueryException, HibernateException {
+    @SuppressWarnings("deprecation")
+	public Long countAllBreedingLocations() throws MiddlewareQueryException, HibernateException {
         try {
         	Session session = getSession();
         	SQLQuery query = session.createSQLQuery(Location.COUNT_ALL_BREEDING_LOCATIONS);
@@ -239,28 +257,30 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
         return Long.valueOf(0);
     }
     
-    public List<LocationDetails> getLocationDetails(Integer locationId,Integer start, Integer numOfRows) throws MiddlewareQueryException {
+    @SuppressWarnings("unchecked")
+	public List<LocationDetails> getLocationDetails(Integer locationId, Integer start, Integer numOfRows) throws MiddlewareQueryException {
     	        try {
-    	            StringBuilder queryString = new StringBuilder();
-    	            queryString.append("select lname as location_name,locid,");
-    	            queryString.append(" c.isofull as country_full_name, labbr as location_abbreviation,"); 
-    	            queryString.append(" ud.fname as location_type,");
-    	            queryString.append(" ud.fdesc as location_description");
-    	            queryString.append(" from location l");
-    	            queryString.append(" inner join cntry c on l.cntryid = c.cntryid");
-    	            queryString.append(" inner join udflds ud on ud.fldno = l.ltype");
-    	            queryString.append(" where locid = :id");
-    	            
-    	            SQLQuery query = getSession().createSQLQuery(queryString.toString());
-    	            query.setParameter("id", locationId);
-    	            query.setFirstResult(start);
-    	            query.setMaxResults(numOfRows);
-    	            query.addEntity(LocationDetails.class);
-    	            	
-    	            List<LocationDetails> list = query.list();
-    	         
-    	            return list;
-
+    	        	if (locationId != null){
+	    	            StringBuilder queryString = new StringBuilder();
+	    	            queryString.append("select lname as location_name,locid,");
+	    	            queryString.append(" c.isofull as country_full_name, labbr as location_abbreviation,"); 
+	    	            queryString.append(" ud.fname as location_type,");
+	    	            queryString.append(" ud.fdesc as location_description");
+	    	            queryString.append(" from location l");
+	    	            queryString.append(" inner join cntry c on l.cntryid = c.cntryid");
+	    	            queryString.append(" inner join udflds ud on ud.fldno = l.ltype");
+	    	            queryString.append(" where locid = :id");
+	    	            
+	    	            SQLQuery query = getSession().createSQLQuery(queryString.toString());
+	    	            query.setParameter("id", locationId);
+	    	            query.setFirstResult(start);
+	    	            query.setMaxResults(numOfRows);
+	    	            query.addEntity(LocationDetails.class);
+	    	            	
+	    	            List<LocationDetails> list = query.list();
+	    	         
+	    	            return list;
+    	        	}
     	        } catch (HibernateException e) {
     	            logAndThrowException("Error with getLocationDetails(id=" + locationId + ") : " + e.getMessage(), e);
     	        }

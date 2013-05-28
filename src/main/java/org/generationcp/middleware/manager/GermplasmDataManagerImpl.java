@@ -25,7 +25,6 @@ import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
-import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -63,17 +62,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     private static final Logger LOG = LoggerFactory.getLogger(GermplasmDataManagerImpl.class);
 
-    private AttributeDAO attributeDao;
-    private BibrefDAO bibrefDao;
-    private GermplasmDAO germplasmDao;
-    private LocationDAO locationDao;
-    private MethodDAO methodDao;
-    private NameDAO nameDao;
-    private ProgenitorDAO progenitorDao;
-    private UserDefinedFieldDAO userDefinedFieldDao;
-	
-	
-    
     public GermplasmDataManagerImpl() {
     }
 
@@ -84,78 +72,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public GermplasmDataManagerImpl(Session sessionForLocal, Session sessionForCentral) {
         super(sessionForLocal, sessionForCentral);
     }
-    
-    private AttributeDAO getAttributeDao() {
-        if (attributeDao == null) {
-            attributeDao = new AttributeDAO();
-        }
-        attributeDao.setSession(getActiveSession());
-        return attributeDao;
-    }
-
-    private BibrefDAO getBibrefDao() {
-        if (bibrefDao == null) {
-            bibrefDao = new BibrefDAO();
-        }
-        bibrefDao.setSession(getActiveSession());
-        return bibrefDao;
-    }
-
-    private GermplasmDAO getGermplasmDao() {
-        if (germplasmDao == null) {
-            germplasmDao = new GermplasmDAO();
-        }
-        germplasmDao.setSession(getActiveSession());
-        return germplasmDao;
-    }
-
-    private LocationDAO getLocationDao() {
-        if (locationDao == null) {
-            locationDao = new LocationDAO();
-        }
-        locationDao.setSession(getActiveSession());
-        return locationDao;
-    }
-
-    private MethodDAO getMethodDao() {
-        if (methodDao == null) {
-            methodDao = new MethodDAO();
-        }
-        methodDao.setSession(getActiveSession());
-        return methodDao;
-    }
-
-    private NameDAO getNameDao() {
-        if (nameDao == null) {
-            nameDao = new NameDAO();
-        }
-        nameDao.setSession(getActiveSession());
-        return nameDao;
-    }
-
-    private ProgenitorDAO getProgenitorDao() {
-        if (progenitorDao == null) {
-            progenitorDao = new ProgenitorDAO();
-        }
-        progenitorDao.setSession(getActiveSession());
-        return progenitorDao;
-    }
-
-    private UserDefinedFieldDAO getUserDefinedFieldDao() {
-        if (userDefinedFieldDao == null) {
-            userDefinedFieldDao = new UserDefinedFieldDAO();
-        }
-        userDefinedFieldDao.setSession(getActiveSession());
-        return userDefinedFieldDao;
-    }
-
-	private LocationDAO getLocationDAO() {
-		if (locationDao == null) {
-			locationDao = new LocationDAO();
-		}
-		locationDao.setSession(getActiveSession());
-		return locationDao;
-	}    
     
     @Override
     public List<Location> getAllLocations(int start, int numOfRows) throws MiddlewareQueryException {

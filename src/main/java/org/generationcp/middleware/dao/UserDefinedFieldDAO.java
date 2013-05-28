@@ -25,13 +25,15 @@ import org.hibernate.criterion.Restrictions;
 public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer>{
 	
 	@SuppressWarnings("unchecked")
-    public List<UserDefinedField> getByFieldTableNameAndType(String tableName,String fieldType) throws MiddlewareQueryException {
+    public List<UserDefinedField> getByFieldTableNameAndType(String tableName, String fieldType) throws MiddlewareQueryException {
         try {
-            Criteria criteria = getSession().createCriteria(UserDefinedField.class);
-            criteria.add(Restrictions.eq("ftable", tableName));
-            criteria.add(Restrictions.eq("ftype", fieldType));
-            criteria.addOrder(Order.asc("fname"));
-            return criteria.list();
+        	if (tableName != null && fieldType != null){
+	            Criteria criteria = getSession().createCriteria(UserDefinedField.class);
+	            criteria.add(Restrictions.eq("ftable", tableName));
+	            criteria.add(Restrictions.eq("ftype", fieldType));
+	            criteria.addOrder(Order.asc("fname"));
+	            return criteria.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByFieldTableNameAndType(name=" + tableName+" type= "+fieldType+ " ) query from Location: "
                     + e.getMessage(), e);

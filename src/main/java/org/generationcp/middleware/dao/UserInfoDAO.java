@@ -26,7 +26,7 @@ public class UserInfoDAO extends GenericDAO<UserInfo, Integer>{
 
     public boolean updateLoginCounter(UserInfo userInfo) {
         int loginCount = 0;
-        if (userInfo.getLoginCount() != null) {
+        if (userInfo != null && userInfo.getLoginCount() != null) {
             loginCount = userInfo.getLoginCount().intValue();
         }
         loginCount++;
@@ -40,12 +40,15 @@ public class UserInfoDAO extends GenericDAO<UserInfo, Integer>{
     }
 
     public boolean insertOrUpdateUserInfo(UserInfo userInfo) {
-        String queryString = "REPLACE INTO workbench_user_info (user_id, login_count) VALUES (:userId, :loginCount)";
-         Session s = getSession();
-         Query q = s.createSQLQuery(queryString);
-         q.setInteger("userId", userInfo.getUserId());
-         q.setInteger("loginCount", userInfo.getLoginCount());
-         return q.executeUpdate() > 0;
+    	if (userInfo != null){
+	        String queryString = "REPLACE INTO workbench_user_info (user_id, login_count) VALUES (:userId, :loginCount)";
+	         Session s = getSession();
+	         Query q = s.createSQLQuery(queryString);
+	         q.setInteger("userId", userInfo.getUserId());
+	         q.setInteger("loginCount", userInfo.getLoginCount());
+	         return q.executeUpdate() > 0;
+    	}
+    	return false;
     }
 
     public UserInfo getUserInfoByUserId(int userId) throws MiddlewareQueryException {

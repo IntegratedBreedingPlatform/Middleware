@@ -67,22 +67,24 @@ public class NumericLevelDAO extends GenericDAO<NumericLevel, NumericLevelPK>{
             throws MiddlewareQueryException {
         List<DatasetCondition> toreturn = new ArrayList<DatasetCondition>();
         try {
-            SQLQuery query = getSession().createSQLQuery(NumericLevel.GET_CONDITION_AND_VALUE);
-            query.setParameter("factorid", factorId);
-            query.setParameter("levelno", levelNo);
-
-            List results = query.list();
-            for (Object o : results) {
-                Object[] result = (Object[]) o;
-                String name = (String) result[0];
-                Double value = (Double) result[1];
-                Integer traitid = (Integer) result[2];
-                Integer scaleid = (Integer) result[3];
-                Integer methodid = (Integer) result[4];
-                String type = (String) result[5];
-
-                DatasetCondition condition = new DatasetCondition(factorId, name, value, traitid, scaleid, methodid, type);
-                toreturn.add(condition);
+        	if (factorId != null && levelNo != null){
+	            SQLQuery query = getSession().createSQLQuery(NumericLevel.GET_CONDITION_AND_VALUE);
+	            query.setParameter("factorid", factorId);
+	            query.setParameter("levelno", levelNo);
+	
+	            List results = query.list();
+	            for (Object o : results) {
+	                Object[] result = (Object[]) o;
+	                String name = (String) result[0];
+	                Double value = (Double) result[1];
+	                Integer traitid = (Integer) result[2];
+	                Integer scaleid = (Integer) result[3];
+	                Integer methodid = (Integer) result[4];
+	                String type = (String) result[5];
+	
+	                DatasetCondition condition = new DatasetCondition(factorId, name, value, traitid, scaleid, methodid, type);
+	                toreturn.add(condition);
+	            }
             }
         } catch (HibernateException e) {
             logAndThrowException("Error with getConditionAndValueByFactorIdAndLevelNo(factorId=" + factorId + ", levelNo="
@@ -93,11 +95,11 @@ public class NumericLevelDAO extends GenericDAO<NumericLevel, NumericLevelPK>{
 
     public long countStudyInformationByGID(Long gid) throws MiddlewareQueryException {
         try {
-            Query query = getSession().createSQLQuery(NumericLevel.COUNT_STUDIES_BY_GID);
-            query.setParameter("gid", gid);
-
-            BigInteger count = (BigInteger) query.uniqueResult();
-            return count.longValue();
+        	if (gid != null){
+	            Query query = getSession().createSQLQuery(NumericLevel.COUNT_STUDIES_BY_GID);
+	            query.setParameter("gid", gid);
+	            return ((BigInteger) query.uniqueResult()).longValue();
+        	}
         } catch (Exception ex) {
             logAndThrowException("Error with countStudyInformationByGID(gid=" + gid + ") query from NumericLevel "
                     + ex.getMessage(), ex);
@@ -109,20 +111,22 @@ public class NumericLevelDAO extends GenericDAO<NumericLevel, NumericLevelPK>{
     public List<StudyInfo> getStudyInformationByGID(Long gid) throws MiddlewareQueryException {
         List<StudyInfo> toreturn = new ArrayList<StudyInfo>();
         try {
-            Query query = getSession().createSQLQuery(NumericLevel.GET_STUDIES_BY_GID);
-            query.setParameter("gid", gid);
-
-            List results = query.list();
-            for (Object o : results) {
-                Object[] result = (Object[]) o;
-                Integer studyid = (Integer) result[0];
-                String name = (String) result[1];
-                String title = (String) result[2];
-                String objective = (String) result[3];
-                BigInteger rowCount = (BigInteger) result[4];
-
-                StudyInfo info = new StudyInfo(studyid, name.trim(), title.trim(), objective.trim(), rowCount.intValue());
-                toreturn.add(info);
+        	if (gid != null){
+	            Query query = getSession().createSQLQuery(NumericLevel.GET_STUDIES_BY_GID);
+	            query.setParameter("gid", gid);
+	
+	            List results = query.list();
+	            for (Object o : results) {
+	                Object[] result = (Object[]) o;
+	                Integer studyid = (Integer) result[0];
+	                String name = (String) result[1];
+	                String title = (String) result[2];
+	                String objective = (String) result[3];
+	                BigInteger rowCount = (BigInteger) result[4];
+	
+	                StudyInfo info = new StudyInfo(studyid, name.trim(), title.trim(), objective.trim(), rowCount.intValue());
+	                toreturn.add(info);
+	            }
             }
         } catch (Exception ex) {
             logAndThrowException("Error with getStudyInformationByGID(gid=" + gid + ") query from NumericLevel "
@@ -134,14 +138,16 @@ public class NumericLevelDAO extends GenericDAO<NumericLevel, NumericLevelPK>{
     @SuppressWarnings("unchecked")
     public List<NumericLevel> getByFactorAndDatasetID(Factor factor, Integer datasetId) throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(NumericLevel.GET_BY_FACTOR_AND_REPRESNO);
-            query.setParameter("factorid", factor.getFactorId());
-            query.setParameter("labelid", factor.getId());
-            query.setParameter("represno", datasetId);
-            
-            query.addEntity("ln", NumericLevel.class);
-            
-            return query.list();
+        	if (factor != null && datasetId != null){
+	            SQLQuery query = getSession().createSQLQuery(NumericLevel.GET_BY_FACTOR_AND_REPRESNO);
+	            query.setParameter("factorid", factor.getFactorId());
+	            query.setParameter("labelid", factor.getId());
+	            query.setParameter("represno", datasetId);
+	            
+	            query.addEntity("ln", NumericLevel.class);
+	            
+	            return query.list();
+        	}
         } catch(HibernateException e) {
             logAndThrowException("Error with getByFactorAndDatasetID(factor=" + factor + ", datasetId=" + datasetId 
                     + ") query from NumericLevel: " + e.getMessage(), e);

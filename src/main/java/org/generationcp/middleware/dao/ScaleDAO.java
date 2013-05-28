@@ -25,10 +25,12 @@ public class ScaleDAO extends GenericDAO<Scale, Integer>{
     @SuppressWarnings("unchecked")
     public List<Scale> getByTraitId(Integer traitId) throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(Scale.GET_BY_TRAIT_ID);
-            query.addEntity("s", Scale.class);
-            query.setParameter("traitid", traitId);
-            return query.list();
+        	if (traitId != null){
+	            SQLQuery query = getSession().createSQLQuery(Scale.GET_BY_TRAIT_ID);
+	            query.addEntity("s", Scale.class);
+	            query.setParameter("traitid", traitId);
+	            return query.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByTraitId(traitId=" + traitId + ") query from Scale: " + e.getMessage(), e);
         }

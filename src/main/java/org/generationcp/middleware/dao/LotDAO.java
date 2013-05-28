@@ -41,10 +41,10 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
 
     public long countByEntityType(String type) throws MiddlewareQueryException {
         try {
-            Criteria criteria = getSession().createCriteria(Lot.class);
+    		Criteria criteria = getSession().createCriteria(Lot.class);
             criteria.setProjection(Projections.rowCount());
             criteria.add(Restrictions.eq("entityType", type));
-            return ((Long) criteria.uniqueResult()).longValue(); //count
+            return ((Long) criteria.uniqueResult()).longValue(); 
         } catch (HibernateException e) {
             logAndThrowException("Error with countByEntityType(type=" + type + ") query from Lot: " + e.getMessage(), e);
         }
@@ -54,12 +54,14 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
     @SuppressWarnings("unchecked")
     public List<Lot> getByEntityTypeAndEntityId(String type, Integer entityId, int start, int numOfRows) throws MiddlewareQueryException {
         try {
-            Criteria criteria = getSession().createCriteria(Lot.class);
-            criteria.add(Restrictions.eq("entityType", type));
-            criteria.add(Restrictions.eq("entityId", entityId));
-            criteria.setFirstResult(start);
-            criteria.setMaxResults(numOfRows);
-            return criteria.list();
+        	if (entityId != null){
+	            Criteria criteria = getSession().createCriteria(Lot.class);
+	            criteria.add(Restrictions.eq("entityType", type));
+	            criteria.add(Restrictions.eq("entityId", entityId));
+	            criteria.setFirstResult(start);
+	            criteria.setMaxResults(numOfRows);
+	            return criteria.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByEntityTypeAndEntityId(type=" + type + ", entityId=" + entityId
                     + ") query from Lot: " + e.getMessage(), e);
@@ -69,11 +71,13 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
 
     public long countByEntityTypeAndEntityId(String type, Integer entityId) throws MiddlewareQueryException {
         try {
-            Criteria criteria = getSession().createCriteria(Lot.class);
-            criteria.setProjection(Projections.rowCount());
-            criteria.add(Restrictions.eq("entityType", type));
-            criteria.add(Restrictions.eq("entityId", entityId));
-            return ((Long) criteria.uniqueResult()).longValue(); //count
+        	if (entityId != null){
+	            Criteria criteria = getSession().createCriteria(Lot.class);
+	            criteria.setProjection(Projections.rowCount());
+	            criteria.add(Restrictions.eq("entityType", type));
+	            criteria.add(Restrictions.eq("entityId", entityId));
+	            return ((Long) criteria.uniqueResult()).longValue(); 
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with countByEntityTypeAndEntityId(type=" + type + ", entityId=" + entityId
                     + ") query from Lot: " + e.getMessage(), e);
@@ -85,12 +89,14 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
     public List<Lot> getByEntityTypeAndLocationId(String type, Integer locationId, int start, int numOfRows)
             throws MiddlewareQueryException {
         try {
-            Criteria criteria = getSession().createCriteria(Lot.class);
-            criteria.add(Restrictions.eq("entityType", type));
-            criteria.add(Restrictions.eq("locationId", locationId));
-            criteria.setFirstResult(start);
-            criteria.setMaxResults(numOfRows);
-            return criteria.list();
+        	if (locationId != null){
+	            Criteria criteria = getSession().createCriteria(Lot.class);
+	            criteria.add(Restrictions.eq("entityType", type));
+	            criteria.add(Restrictions.eq("locationId", locationId));
+	            criteria.setFirstResult(start);
+	            criteria.setMaxResults(numOfRows);
+	            return criteria.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByEntityTypeAndLocationId(type=" + type + ", locationId=" + locationId
                     + ") query from Lot: " + e.getMessage(), e);
@@ -100,11 +106,13 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
 
     public long countByEntityTypeAndLocationId(String type, Integer locationId) throws MiddlewareQueryException {
         try {
-            Criteria criteria = getSession().createCriteria(Lot.class);
-            criteria.setProjection(Projections.rowCount());
-            criteria.add(Restrictions.eq("entityType", type));
-            criteria.add(Restrictions.eq("locationId", locationId));
-            return ((Long) criteria.uniqueResult()).longValue(); // count
+        	if (locationId != null){
+	            Criteria criteria = getSession().createCriteria(Lot.class);
+	            criteria.setProjection(Projections.rowCount());
+	            criteria.add(Restrictions.eq("entityType", type));
+	            criteria.add(Restrictions.eq("locationId", locationId));
+	            return ((Long) criteria.uniqueResult()).longValue(); 
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with countByEntityTypeAndLocationId(type=" + type + ", locationId=" + locationId
                     + ") query from Lot: " + e.getMessage(), e);
@@ -116,13 +124,15 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
     public List<Lot> getByEntityTypeAndEntityIdAndLocationId(String type, Integer entityId, Integer locationId, int start, int numOfRows)
             throws MiddlewareQueryException {
         try {
-            Criteria criteria = getSession().createCriteria(Lot.class);
-            criteria.add(Restrictions.eq("entityType", type));
-            criteria.add(Restrictions.eq("entityId", entityId));
-            criteria.add(Restrictions.eq("locationId", locationId));
-            criteria.setFirstResult(start);
-            criteria.setMaxResults(numOfRows);
-            return criteria.list();
+        	if (entityId != null && locationId != null){
+	            Criteria criteria = getSession().createCriteria(Lot.class);
+	            criteria.add(Restrictions.eq("entityType", type));
+	            criteria.add(Restrictions.eq("entityId", entityId));
+	            criteria.add(Restrictions.eq("locationId", locationId));
+	            criteria.setFirstResult(start);
+	            criteria.setMaxResults(numOfRows);
+	            return criteria.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByEntityTypeAndEntityIdAndLocationId(type=" + type + ", entityId=" + entityId
                     + ", locationId=" + locationId + ") query from Lot: " + e.getMessage(), e);
@@ -133,12 +143,14 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
     public long countByEntityTypeAndEntityIdAndLocationId(String type, Integer entityId, Integer locationId)
             throws MiddlewareQueryException {
         try {
-            Criteria criteria = getSession().createCriteria(Lot.class);
-            criteria.setProjection(Projections.rowCount());
-            criteria.add(Restrictions.eq("entityType", type));
-            criteria.add(Restrictions.eq("entityId", entityId));
-            criteria.add(Restrictions.eq("locationId", locationId));
-            return ((Long) criteria.uniqueResult()).longValue(); //count
+        	if (entityId != null && locationId != null){
+	            Criteria criteria = getSession().createCriteria(Lot.class);
+	            criteria.setProjection(Projections.rowCount());
+	            criteria.add(Restrictions.eq("entityType", type));
+	            criteria.add(Restrictions.eq("entityId", entityId));
+	            criteria.add(Restrictions.eq("locationId", locationId));
+	            return ((Long) criteria.uniqueResult()).longValue(); 
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with countByEntityTypeAndEntityIdAndLocationId(type=" + type + ", entityId="
                     + entityId + ", locationId=" + locationId + ") query from Lot: " + e.getMessage(), e);
@@ -148,13 +160,15 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
 
     public Long getActualLotBalance(Integer lotId) throws MiddlewareQueryException {
         try {
-            Lot lot = getById(lotId, false);
-            Criteria criteria = getSession().createCriteria(Transaction.class);
-            criteria.setProjection(Projections.sum("quantity"));
-            criteria.add(Restrictions.eq("lot", lot));
-            // get only committed transactions
-            criteria.add(Restrictions.eq("status", 1));
-            return (Long) criteria.uniqueResult();
+        	if (lotId != null){
+	            Lot lot = getById(lotId, false);
+	            Criteria criteria = getSession().createCriteria(Transaction.class);
+	            criteria.setProjection(Projections.sum("quantity"));
+	            criteria.add(Restrictions.eq("lot", lot));
+	            // get only committed transactions
+	            criteria.add(Restrictions.eq("status", 1));
+	            return (Long) criteria.uniqueResult();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getActualLotBalance(lotId=" + lotId + ") query from Lot: " + e.getMessage(), e);
         }
@@ -163,13 +177,15 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
 
     public Long getAvailableLotBalance(Integer lotId) throws MiddlewareQueryException {
         try {
-            Lot lot = getById(lotId, false);
-            Criteria criteria = getSession().createCriteria(Transaction.class);
-            criteria.setProjection(Projections.sum("quantity"));
-            criteria.add(Restrictions.eq("lot", lot));
-            // get all non-cancelled transactions
-            criteria.add(Restrictions.ne("status", 9));
-            return (Long) criteria.uniqueResult();
+        	if (lotId != null){
+	            Lot lot = getById(lotId, false);
+	            Criteria criteria = getSession().createCriteria(Transaction.class);
+	            criteria.setProjection(Projections.sum("quantity"));
+	            criteria.add(Restrictions.eq("lot", lot));
+	            // get all non-cancelled transactions
+	            criteria.add(Restrictions.ne("status", 9));
+	            return (Long) criteria.uniqueResult();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getAvailableLotBalance(lotId=" + lotId + ") query from Lot: " + e.getMessage(),
                     e);
@@ -179,10 +195,14 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
 
     public void validateId(Lot lot) throws MiddlewareQueryException {
         // Check if not a local record (has negative ID)
-        Integer id = lot.getId();
-        if (id != null && id.intValue() > 0) {
-            logAndThrowException("Error with validateId(lot=" + lot + "): Cannot update a Central Database record. "
-                    + "Attribute object to update must be a Local Record (ID must be negative)");
+    	if (lot != null){
+	        Integer id = lot.getId();
+	        if (id != null && id.intValue() > 0) {
+	            logAndThrowException("Error with validateId(lot=" + lot + "): Cannot update a Central Database record. "
+	                    + "Attribute object to update must be a Local Record (ID must be negative)");
+	        }
+    	}else{
+    	    logAndThrowException("Error with validateId(lot=" + lot + "): lot is null)");
         }
     }
 }

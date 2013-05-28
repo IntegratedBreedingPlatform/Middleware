@@ -49,14 +49,16 @@ public class ProjectLocationMapDAO extends GenericDAO<ProjectLocationMap, Long>{
     public List<Long> getLocationIdsByProjectId(Long projectId, int start, int numOfRows) throws MiddlewareQueryException {
 
         try {
-            Criteria criteria = getSession().createCriteria(ProjectLocationMap.class);
-            Project p = new Project();
-            p.setProjectId(projectId);
-            criteria.add(Restrictions.eq("project", p));
-            criteria.setProjection(Projections.property("locationId"));
-            criteria.setFirstResult(start);
-            criteria.setMaxResults(numOfRows);
-            return criteria.list();
+			if (projectId != null) {
+				Criteria criteria = getSession().createCriteria(ProjectLocationMap.class);
+				Project p = new Project();
+				p.setProjectId(projectId);
+				criteria.add(Restrictions.eq("project", p));
+				criteria.setProjection(Projections.property("locationId"));
+				criteria.setFirstResult(start);
+				criteria.setMaxResults(numOfRows);
+				return criteria.list();
+			}
         } catch (HibernateException e) {
             logAndThrowException("Error with getLocationIdsByProjectId(projectId=" + projectId
                     + ") query from ProjectLocationMap: " + e.getMessage(), e);
@@ -73,13 +75,14 @@ public class ProjectLocationMapDAO extends GenericDAO<ProjectLocationMap, Long>{
      */
     public long countLocationIdsByProjectId(Long projectId) throws MiddlewareQueryException {
         try {
-            Criteria criteria = getSession().createCriteria(ProjectLocationMap.class);
-            Project p = new Project();
-            p.setProjectId(projectId);
-            criteria.add(Restrictions.eq("project", p));
-            criteria.setProjection(Projections.rowCount());
-
-            return ((Long) criteria.uniqueResult()).longValue();
+			if (projectId != null) {
+	            Criteria criteria = getSession().createCriteria(ProjectLocationMap.class);
+	            Project p = new Project();
+	            p.setProjectId(projectId);
+	            criteria.add(Restrictions.eq("project", p));
+	            criteria.setProjection(Projections.rowCount());
+	            return ((Long) criteria.uniqueResult()).longValue();
+			}
         } catch (HibernateException e) {
             logAndThrowException("Error with countLocationIdsByProjectId(projectId=" + projectId
                     + ") query from ProjectLocationMap: " + e.getMessage(), e);
@@ -89,19 +92,16 @@ public class ProjectLocationMapDAO extends GenericDAO<ProjectLocationMap, Long>{
 
     @SuppressWarnings("unchecked")
     public List<ProjectLocationMap> getByProjectId(Long projectId, int start, int numOfRows) throws MiddlewareQueryException {
-
-        if (projectId == null) {
-            return new ArrayList<ProjectLocationMap>();
-        }
-
-        try {
-            Criteria criteria = getSession().createCriteria(ProjectLocationMap.class);
-            Project p = new Project();
-            p.setProjectId(projectId);
-            criteria.add(Restrictions.eq("project", p));
-            criteria.setFirstResult(start);
-            criteria.setMaxResults(numOfRows);
-            return criteria.list();
+        try {			
+        	if (projectId != null) {
+	            Criteria criteria = getSession().createCriteria(ProjectLocationMap.class);
+	            Project p = new Project();
+	            p.setProjectId(projectId);
+	            criteria.add(Restrictions.eq("project", p));
+	            criteria.setFirstResult(start);
+	            criteria.setMaxResults(numOfRows);
+	            return criteria.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getProjectLocationMapByProjectId(projectId=" + projectId
                     + ") query from ProjectLocationMap: " + e.getMessage(), e);

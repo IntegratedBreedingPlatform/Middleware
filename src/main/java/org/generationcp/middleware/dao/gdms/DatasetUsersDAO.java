@@ -15,7 +15,6 @@ package org.generationcp.middleware.dao.gdms;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.pojos.gdms.DatasetUsers;
-import org.generationcp.middleware.pojos.gdms.MarkerAlias;
 
 /**
  * <b>Description</b>: DAO for Marker Alias object.
@@ -27,7 +26,6 @@ import org.generationcp.middleware.pojos.gdms.MarkerAlias;
  * <b>File Created</b>: Mar 7, 2013
  */
 
-@SuppressWarnings("unchecked")
 public class DatasetUsersDAO extends GenericDAO<DatasetUsers, Integer>{
 
 

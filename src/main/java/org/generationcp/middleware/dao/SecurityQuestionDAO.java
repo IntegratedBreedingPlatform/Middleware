@@ -33,9 +33,11 @@ public class SecurityQuestionDAO extends GenericDAO<SecurityQuestion, Integer> {
     @SuppressWarnings("unchecked")
     public List<SecurityQuestion> getByUserId (Integer userId) throws MiddlewareQueryException {
         try {
-            Criteria criteria = getSession().createCriteria(SecurityQuestion.class);
-            criteria.add(Restrictions.eq("userId", userId));
-            return criteria.list();
+        	if (userId != null){
+	            Criteria criteria = getSession().createCriteria(SecurityQuestion.class);
+	            criteria.add(Restrictions.eq("userId", userId));
+	            return criteria.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByUserId(userId=" + userId + ") query from SecurityQuestion: " + e.getMessage(), e);
         }

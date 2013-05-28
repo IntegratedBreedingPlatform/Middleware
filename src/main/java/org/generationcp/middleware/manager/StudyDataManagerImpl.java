@@ -25,9 +25,6 @@ import org.generationcp.middleware.dao.NumericLevelDAO;
 import org.generationcp.middleware.dao.OindexDAO;
 import org.generationcp.middleware.dao.RepresentationDAO;
 import org.generationcp.middleware.dao.StudyDAO;
-import org.generationcp.middleware.dao.StudyEffectDAO;
-import org.generationcp.middleware.dao.TraitDAO;
-import org.generationcp.middleware.dao.VariateDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -55,18 +52,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
     private static final Logger LOG = LoggerFactory.getLogger(StudyDataManagerImpl.class);
 
-    private CharacterDataDAO characterDataDao;
-    private CharacterLevelDAO characterLevelDao;
-    private FactorDAO factorDao;
-    private NumericDataDAO numericDataDao;
-    private NumericLevelDAO numericLevelDao;
-    private OindexDAO oIndexDao;
-    private RepresentationDAO representationDao;
-    private StudyDAO studyDao;
-    private StudyEffectDAO studyEffectDao;
-    private TraitDAO traitDao;
-    private VariateDAO variateDao;
-
     public StudyDataManagerImpl() {
     }
 
@@ -78,93 +63,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         super(sessionForLocal, sessionForCentral);
     }
 
-    private CharacterDataDAO getCharacterDataDao() {
-        if (characterDataDao == null) {
-            characterDataDao = new CharacterDataDAO();
-        }
-        characterDataDao.setSession(getActiveSession());
-        return characterDataDao;
-    }
-
-    private CharacterLevelDAO getCharacterLevelDao() {
-        if (characterLevelDao == null) {
-            characterLevelDao = new CharacterLevelDAO();
-        }
-        characterLevelDao.setSession(getActiveSession());
-        return characterLevelDao;
-    }
-
-    private FactorDAO getFactorDao() {
-        if (factorDao == null) {
-            factorDao = new FactorDAO();
-        }
-        factorDao.setSession(getActiveSession());
-        return factorDao;
-    }
-
-    private NumericDataDAO getNumericDataDao() {
-        if (numericDataDao == null) {
-            numericDataDao = new NumericDataDAO();
-        }
-        numericDataDao.setSession(getActiveSession());
-        return numericDataDao;
-    }
-
-    private NumericLevelDAO getNumericLevelDao() {
-        if (numericLevelDao == null) {
-            numericLevelDao = new NumericLevelDAO();
-        }
-        numericLevelDao.setSession(getActiveSession());
-        return numericLevelDao;
-    }
-
-    private OindexDAO getOindexDao() {
-        if (oIndexDao == null) {
-            oIndexDao = new OindexDAO();
-        }
-        oIndexDao.setSession(getActiveSession());
-        return oIndexDao;
-    }
-
-    private RepresentationDAO getRepresentationDao() {
-        if (representationDao == null) {
-            representationDao = new RepresentationDAO();
-        }
-        representationDao.setSession(getActiveSession());
-        return representationDao;
-    }
-
-    private StudyDAO getStudyDao() {
-        if (studyDao == null) {
-            studyDao = new StudyDAO();
-        }
-        studyDao.setSession(getActiveSession());
-        return studyDao;
-    }
-
-    private StudyEffectDAO getStudyEffectDao() {
-        if (studyEffectDao == null) {
-            studyEffectDao = new StudyEffectDAO();
-        }
-        studyEffectDao.setSession(getActiveSession());
-        return studyEffectDao;
-    }
-
-    private TraitDAO getTraitDao() {
-        if (traitDao == null) {
-            traitDao = new TraitDAO();
-        }
-        traitDao.setSession(getActiveSession());
-        return traitDao;
-    }
-
-    private VariateDAO getVariateDao() {
-        if (variateDao == null) {
-            variateDao = new VariateDAO();
-        }
-        variateDao.setSession(getActiveSession());
-        return variateDao;
-    }
 
     @Override
     public List<Integer> getGIDSByPhenotypicData(

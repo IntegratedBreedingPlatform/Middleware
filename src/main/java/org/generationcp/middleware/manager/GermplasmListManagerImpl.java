@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -34,25 +33,6 @@ import org.slf4j.LoggerFactory;
 public class GermplasmListManagerImpl extends DataManager implements GermplasmListManager{
 
     private static final Logger LOG = LoggerFactory.getLogger(GermplasmListManagerImpl.class);
-
-    private GermplasmListDAO germplasmListDao;
-	private GermplasmListDataDAO germplasmListDataDao;
-	
-	private GermplasmListDAO getGermplasmListDAO() {
-		if (germplasmListDao == null) {
-			germplasmListDao = new GermplasmListDAO();
-		}
-		germplasmListDao.setSession(getActiveSession());
-		return germplasmListDao;
-	}
-	
-	private GermplasmListDataDAO getGermplasmListDataDAO() {
-		if (germplasmListDataDao == null) {
-			germplasmListDataDao = new GermplasmListDataDAO();
-		}
-		germplasmListDataDao.setSession(getActiveSession());
-		return germplasmListDataDao;
-	}
 
     public GermplasmListManagerImpl() {
     }
@@ -534,7 +514,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     				new Object[] {parentId}, new Class[] {Integer.class});
     }
 
-    @Override
+    @SuppressWarnings("rawtypes")
+	@Override
     public List<UserDefinedField> getGermplasmListTypes() throws MiddlewareQueryException {
     	List<UserDefinedField> toReturn = new ArrayList<UserDefinedField>();
     	
@@ -564,13 +545,13 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     	return toReturn;
     }
     
-    
+    @SuppressWarnings("rawtypes")
     @Override
     public List<UserDefinedField> getGermplasmNameTypes() throws MiddlewareQueryException {
     	List<UserDefinedField> toReturn = new ArrayList<UserDefinedField>();
     	
     	Database instance = Database.CENTRAL;    	
-    	List results = getFromInstanceByMethod(getGermplasmListDAO(), instance, "getGermplasmNameTypes", 
+		List results = getFromInstanceByMethod(getGermplasmListDAO(), instance, "getGermplasmNameTypes", 
 				new Object[] {}, new Class[] {});
     	
         for (Object o : results) {

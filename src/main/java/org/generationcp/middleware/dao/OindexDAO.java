@@ -28,14 +28,12 @@ public class OindexDAO extends GenericDAO<OindexDAO, Integer>{
 
     public long countOunitIDsByRepresentationId(Integer representationId) throws MiddlewareQueryException {
         try {
-            Criteria criteria = getSession().createCriteria(Oindex.class);
-            criteria.add(Restrictions.eq("representationNumber", representationId));
-
-            criteria.setProjection(Projections.countDistinct("observationUnitId"));
-
-            Long ounitIdCount = (Long) criteria.uniqueResult();
-
-            return ounitIdCount;
+        	if (representationId != null){
+	            Criteria criteria = getSession().createCriteria(Oindex.class);
+	            criteria.add(Restrictions.eq("representationNumber", representationId));
+	            criteria.setProjection(Projections.countDistinct("observationUnitId"));
+	            return (Long) criteria.uniqueResult();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with countOunitIDsByRepresentationId(representationId=" + representationId
                     + ") query from Oindex: " + e.getMessage(), e);
@@ -46,16 +44,14 @@ public class OindexDAO extends GenericDAO<OindexDAO, Integer>{
     @SuppressWarnings("unchecked")
     public List<Integer> getOunitIDsByRepresentationId(Integer representationId, int start, int numOfRows) throws MiddlewareQueryException {
         try {
-            Criteria criteria = getSession().createCriteria(Oindex.class);
-            criteria.add(Restrictions.eq("representationNumber", representationId));
-
-            criteria.setProjection(Projections.distinct(Projections.property("observationUnitId")));
-            criteria.setFirstResult(start);
-            criteria.setMaxResults(numOfRows);
-
-            List<Integer> ounitIDs = criteria.list();
-
-            return ounitIDs;
+        	if (representationId != null){
+	            Criteria criteria = getSession().createCriteria(Oindex.class);
+	            criteria.add(Restrictions.eq("representationNumber", representationId));
+	            criteria.setProjection(Projections.distinct(Projections.property("observationUnitId")));
+	            criteria.setFirstResult(start);
+	            criteria.setMaxResults(numOfRows);
+	            return criteria.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getOunitIDsByRepresentationId(representationId=" + representationId
                     + ")query from Oindex: " + e.getMessage(), e);
@@ -75,14 +71,15 @@ public class OindexDAO extends GenericDAO<OindexDAO, Integer>{
     public List<Object[]> getFactorIdAndLevelNoOfConditionsByRepresentationId(Integer representationId) throws MiddlewareQueryException {
         List<Object[]> toreturn = new ArrayList<Object[]>();
         try {
-            //first get the number of rows in the dataset
-            long numOfRows = countOunitIDsByRepresentationId(representationId);
-
-            SQLQuery query = getSession().createSQLQuery(Oindex.GET_FACTORID_AND_LEVELNO_OF_CONDITIONS_BY_REPRESNO);
-            query.setParameter("represno", representationId);
-            query.setParameter("count", Long.valueOf(numOfRows));
-
-            toreturn = query.list();
+        	if (representationId != null){
+	            //first get the number of rows in the dataset
+	            long numOfRows = countOunitIDsByRepresentationId(representationId);
+	
+	            SQLQuery query = getSession().createSQLQuery(Oindex.GET_FACTORID_AND_LEVELNO_OF_CONDITIONS_BY_REPRESNO);
+	            query.setParameter("represno", representationId);
+	            query.setParameter("count", Long.valueOf(numOfRows));
+	            toreturn = query.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getFactorIdAndLevelNoOfConditionsByRepresentationId(representationId="
                     + representationId + ") query from Oindex: " + e.getMessage(), e);

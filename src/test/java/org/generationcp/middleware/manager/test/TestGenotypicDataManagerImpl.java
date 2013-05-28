@@ -577,23 +577,35 @@ public class TestGenotypicDataManagerImpl{
     @Test
     public void testGetNIdsByDatasetIdsAndMarkerIdsAndNotGIds() throws Exception { 
         List<Integer> gIds = new ArrayList<Integer>(); 
-        gIds.add(Integer.valueOf(29)); // Please replace the germplasm ids found in the target crop to be used in testing
-        gIds.add(Integer.valueOf(303));
-        gIds.add(Integer.valueOf(4950));
+        gIds.add(Integer.valueOf(956)); // Please replace the germplasm ids found in the target crop to be used in testing
+        gIds.add(Integer.valueOf(1042));
+        gIds.add(Integer.valueOf(1128));
         
         List<Integer> datasetIds = new ArrayList<Integer>(); 
         datasetIds.add(Integer.valueOf(2)); // Please replace the dataset ids found in the target crop to be used in testing
         
         List<Integer> markerIds = new ArrayList<Integer>(); 
-        markerIds.add(Integer.valueOf(6803)); // Please replace the marker ids found in the target crop to be used in testing
+        markerIds.add(Integer.valueOf(6)); // Please replace the marker ids found in the target crop to be used in testing
+        markerIds.add(Integer.valueOf(10)); 
 
         List<Integer> nIdList = manager.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds, 
                 0, manager.countNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds));
-        System.out.println("testGetNIdsByDatasetIdsAndMarkerIdsAndNotGIds() RESULTS: " + nIdList);
+        System.out.println("testGetNIdsByDatasetIdsAndMarkerIdsAndNotGIds(datasetIds="+datasetIds+") RESULTS: " + nIdList);
+        
+        nIdList = manager.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(null, gIds, markerIds, 0, 5);
+        System.out.println("testGetNIdsByDatasetIdsAndMarkerIdsAndNotGIds(datasetIds=null) RESULTS: " + nIdList);
+        
+        nIdList = manager.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, null, markerIds, 0, 5);
+        System.out.println("testGetNIdsByDatasetIdsAndMarkerIdsAndNotGIds(gIds=null) RESULTS: " + nIdList);
+        
+        nIdList = manager.getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, gIds, null, 0, 5);
+        System.out.println("testGetNIdsByDatasetIdsAndMarkerIdsAndNotGIds(markerIds=null) RESULTS: " + nIdList);
+        
+        
     }  
     
     @Test
-    public void testcCountNIdsByDatasetIdsAndMarkerIdsAndNotGIds() throws Exception { 
+    public void testCountNIdsByDatasetIdsAndMarkerIdsAndNotGIds() throws Exception { 
         List<Integer> gIds = new ArrayList<Integer>(); 
         gIds.add(Integer.valueOf(29)); // Please replace the germplasm ids found in the target crop to be used in testing
         gIds.add(Integer.valueOf(303));

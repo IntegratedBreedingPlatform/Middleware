@@ -26,7 +26,6 @@ import org.generationcp.middleware.pojos.gdms.MarkerOnMap;
  * <b>File Created</b>: Mar 7, 2013
  */
 
-@SuppressWarnings("unchecked")
 public class MarkerOnMapDAO extends GenericDAO<MarkerOnMap, Integer>{
 
 

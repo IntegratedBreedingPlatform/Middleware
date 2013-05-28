@@ -33,24 +33,20 @@ public class ProjectBackupDAO extends GenericDAO<ProjectBackup, Long> {
             List<Object> results = query.list();
 
             for (Object o : results) {
-                Object[] projectBackup = (Object[]) o;
+				Object[] projectBackup = (Object[]) o;
+				Long projectBackupId = Integer.class
+						.isInstance(projectBackup[0]) ? ((Integer) projectBackup[0])
+						.longValue() : (Long) projectBackup[0];
+				Long projectId = Integer.class.isInstance(projectBackup[1]) ? ((Integer) projectBackup[1])
+						.longValue() : (Long) projectBackup[1];
+				Date backupTime = (Date) projectBackup[2];
+				String backupPath = (String) projectBackup[3];
 
-                
-                
-                
-                Long projectBackupId = Integer.class.isInstance(projectBackup[0]) ? ((Integer)projectBackup[0]).longValue() : (Long)projectBackup[0];
-                Long projectId = Integer.class.isInstance(projectBackup[1]) ? ((Integer)projectBackup[1]).longValue() : (Long)projectBackup[1];
-                Date backupTime = (Date) projectBackup[2];
-                String backupPath = (String) projectBackup[3];
-
-                ProjectBackup u = new ProjectBackup(projectBackupId, projectId, backupTime, backupPath);
-                projectBackupList.add(u);
+				ProjectBackup u = new ProjectBackup(projectBackupId, projectId,
+						backupTime, backupPath);
+				projectBackupList.add(u);
             }
-
             return projectBackupList;
-
-
-
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error in getAllProjectBackups() query from Project: " + e.getMessage(), e);
         }

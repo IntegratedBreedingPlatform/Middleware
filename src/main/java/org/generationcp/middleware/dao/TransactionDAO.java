@@ -27,12 +27,18 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
 
     public void validateId(Transaction transaction) throws MiddlewareQueryException {
         // Check if not a local record (has negative ID)
-        Integer id = transaction.getId();
-        if (id != null && id.intValue() > 0) {
-            logAndThrowException("Error with validateId(transaction=" + transaction
-                    + "): Cannot update a Central Database record. "
-                    + "Transaction object to update must be a Local Record (ID must be negative)");
-        }
+		if (transaction != null) {
+			Integer id = transaction.getId();
+			if (id != null && id.intValue() > 0) {
+				logAndThrowException("Error with validateId(transaction="
+						+ transaction
+						+ "): Cannot update a Central Database record. "
+						+ "Transaction object to update must be a Local Record (ID must be negative)");
+			}
+		} else {
+			logAndThrowException("Error with validateId(transaction="
+					+ transaction + "): transaction is null. ");
+		}
     }
 
     @SuppressWarnings("unchecked")
@@ -94,13 +100,15 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
     @SuppressWarnings("unchecked")
     public List<Transaction> getAllReserveByRequestor(Integer personId, int start, int numOfRows) throws MiddlewareQueryException {
         try {
-            Criteria criteria = getSession().createCriteria(Transaction.class);
-            criteria.add(Restrictions.eq("status", Integer.valueOf(0)));
-            criteria.add(Restrictions.lt("quantity", Integer.valueOf(0)));
-            criteria.add(Restrictions.eq("personId", personId));
-            criteria.setFirstResult(start);
-            criteria.setMaxResults(numOfRows);
-            return criteria.list();
+        	if (personId != null){
+	            Criteria criteria = getSession().createCriteria(Transaction.class);
+	            criteria.add(Restrictions.eq("status", Integer.valueOf(0)));
+	            criteria.add(Restrictions.lt("quantity", Integer.valueOf(0)));
+	            criteria.add(Restrictions.eq("personId", personId));
+	            criteria.setFirstResult(start);
+	            criteria.setMaxResults(numOfRows);
+	            return criteria.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getAllReserveByRequestor(personId=" + personId + ") query from Transaction: "
                     + e.getMessage(), e);
@@ -110,12 +118,14 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
 
     public long countAllReserveByRequestor(Integer personId) throws MiddlewareQueryException {
         try {
-            Criteria criteria = getSession().createCriteria(Transaction.class);
-            criteria.setProjection(Projections.rowCount());
-            criteria.add(Restrictions.eq("status", Integer.valueOf(0)));
-            criteria.add(Restrictions.lt("quantity", Integer.valueOf(0)));
-            criteria.add(Restrictions.eq("personId", personId));
-            return ((Long) criteria.uniqueResult()).longValue(); //count
+        	if (personId != null){
+	            Criteria criteria = getSession().createCriteria(Transaction.class);
+	            criteria.setProjection(Projections.rowCount());
+	            criteria.add(Restrictions.eq("status", Integer.valueOf(0)));
+	            criteria.add(Restrictions.lt("quantity", Integer.valueOf(0)));
+	            criteria.add(Restrictions.eq("personId", personId));
+	            return ((Long) criteria.uniqueResult()).longValue(); 
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with countAllReserveByRequestor(personId=" + personId + ") query from Transaction: "
                     + e.getMessage(), e);
@@ -126,13 +136,15 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
     @SuppressWarnings("unchecked")
     public List<Transaction> getAllDepositByDonor(Integer personId, int start, int numOfRows) throws MiddlewareQueryException {
         try {
-            Criteria criteria = getSession().createCriteria(Transaction.class);
-            criteria.add(Restrictions.eq("status", Integer.valueOf(0)));
-            criteria.add(Restrictions.gt("quantity", Integer.valueOf(0)));
-            criteria.add(Restrictions.eq("personId", personId));
-            criteria.setFirstResult(start);
-            criteria.setMaxResults(numOfRows);
-            return criteria.list();
+        	if (personId != null){
+	            Criteria criteria = getSession().createCriteria(Transaction.class);
+	            criteria.add(Restrictions.eq("status", Integer.valueOf(0)));
+	            criteria.add(Restrictions.gt("quantity", Integer.valueOf(0)));
+	            criteria.add(Restrictions.eq("personId", personId));
+	            criteria.setFirstResult(start);
+	            criteria.setMaxResults(numOfRows);
+	            return criteria.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getAllDepositByDonor(personId=" + personId + ") query from Transaction: "
                     + e.getMessage(), e);
@@ -142,12 +154,14 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
 
     public long countAllDepositByDonor(Integer personId) throws MiddlewareQueryException {
         try {
-            Criteria criteria = getSession().createCriteria(Transaction.class);
-            criteria.setProjection(Projections.rowCount());
-            criteria.add(Restrictions.eq("status", Integer.valueOf(0)));
-            criteria.add(Restrictions.gt("quantity", Integer.valueOf(0)));
-            criteria.add(Restrictions.eq("personId", personId));
-            return ((Long) criteria.uniqueResult()).longValue(); //count
+        	if (personId != null){
+	            Criteria criteria = getSession().createCriteria(Transaction.class);
+	            criteria.setProjection(Projections.rowCount());
+	            criteria.add(Restrictions.eq("status", Integer.valueOf(0)));
+	            criteria.add(Restrictions.gt("quantity", Integer.valueOf(0)));
+	            criteria.add(Restrictions.eq("personId", personId));
+	            return ((Long) criteria.uniqueResult()).longValue(); 
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with countAllDepositByDonor(personId=" + personId + ") query from Transaction: "
                     + e.getMessage(), e);

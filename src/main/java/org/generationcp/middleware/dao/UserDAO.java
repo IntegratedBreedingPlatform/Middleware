@@ -30,13 +30,15 @@ public class UserDAO extends GenericDAO<User, Integer>{
 
     public User getByUsernameAndPassword(String username, String password) throws MiddlewareQueryException{
         try {
-            Criteria criteria = getSession().createCriteria(User.class)
-                                            .add(Restrictions.eq("name", username))
-                                            .add(Restrictions.eq("password", password));
-            
-            @SuppressWarnings("unchecked")
-            List<User> users = criteria.list();
-            return users.size() > 0 ? users.get(0) : null;
+			if (username != null && password != null) {
+				Criteria criteria = getSession().createCriteria(User.class)
+						.add(Restrictions.eq("name", username))
+						.add(Restrictions.eq("password", password));
+
+				@SuppressWarnings("unchecked")
+				List<User> users = criteria.list();
+	            return users.size() > 0 ? users.get(0) : null;
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByUsernameAndPassword(username="+username+") query from User: " + e.getMessage(), e);
         }
@@ -44,13 +46,15 @@ public class UserDAO extends GenericDAO<User, Integer>{
     }
     public boolean isPasswordSameAsUserName(String username) throws MiddlewareQueryException{
         try {
-            Criteria criteria = getSession().createCriteria(User.class)
-                                            .add(Restrictions.eq("name", username))
-                                            .add(Restrictions.eq("password", username));
-            
-            @SuppressWarnings("unchecked")
-            List<User> users = criteria.list();
-            return users.size() > 0 ? true : false;
+        	if (username != null){
+				Criteria criteria = getSession().createCriteria(User.class)
+						.add(Restrictions.eq("name", username))
+						.add(Restrictions.eq("password", username));
+
+				@SuppressWarnings("unchecked")
+				List<User> users = criteria.list();
+				return users.size() > 0 ? true : false;
+			}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByUsernameAndPassword(username="+username+") query from User: " + e.getMessage(), e);
         }
@@ -59,30 +63,31 @@ public class UserDAO extends GenericDAO<User, Integer>{
     
     public boolean changePassword(String userName, String password) throws MiddlewareQueryException {
         try{
-            String queryString = "UPDATE users SET upswd = :password WHERE uname LIKE :username";
-            Session s = getSession();
-            Query q = s.createSQLQuery(queryString);
-            q.setString("username", userName);
-            q.setString("password", password);
-            int success = q.executeUpdate();
-
-            return success > 0;
-        }catch(Exception e)
-        {
+			if (userName != null && password != null) {
+	            String queryString = "UPDATE users SET upswd = :password WHERE uname LIKE :username";
+	            Session s = getSession();
+	            Query q = s.createSQLQuery(queryString);
+	            q.setString("username", userName);
+	            q.setString("password", password);
+	            int success = q.executeUpdate();
+	
+	            return success > 0;
+			}
+        }catch(Exception e){
             e.printStackTrace();
-            return false;
         }
+        return false;
     }
     
     public User getUserDetailsByUsername(String username) throws MiddlewareQueryException{
         try {
-            Criteria criteria = getSession().createCriteria(User.class)
-                                            .add(Restrictions.eq("name", username));
-            
-            @SuppressWarnings("unchecked")
-            List<User> users = criteria.list();
-            
-            return users.size() > 0 ? users.get(0) : null;
+			if (username != null) {
+				Criteria criteria = getSession().createCriteria(User.class)
+						.add(Restrictions.eq("name", username));
+				@SuppressWarnings("unchecked")
+				List<User> users = criteria.list();
+				return users.size() > 0 ? users.get(0) : null;
+			}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByUsernameAndPassword(username="+username+") query from User: " + e.getMessage(), e);
         }
@@ -92,14 +97,16 @@ public class UserDAO extends GenericDAO<User, Integer>{
     
     public boolean isUsernameExists(String userName) throws MiddlewareQueryException {
         try{
-        Criteria criteria = getSession().createCriteria(User.class);
-        criteria.add(Restrictions.eq("name", userName));
-        
-        //used a List in case of dirty data
-        @SuppressWarnings("unchecked")
-        List<User> users = criteria.list();
-        
-        return !users.isEmpty();
+			if (userName != null) {
+				Criteria criteria = getSession().createCriteria(User.class);
+				criteria.add(Restrictions.eq("name", userName));
+
+				// used a List in case of dirty data
+				@SuppressWarnings("unchecked")
+				List<User> users = criteria.list();
+
+				return !users.isEmpty();
+			}
         } catch (HibernateException e) {
             logAndThrowException("Error with isUsernameExists(username="+userName+") query from User: " + e.getMessage(), e);
         }
@@ -109,12 +116,13 @@ public class UserDAO extends GenericDAO<User, Integer>{
     @SuppressWarnings("unchecked")
     public List<User> getByNameUsingEqual(String name, int start, int numOfRows) throws MiddlewareQueryException {
         try {
-            Query query = getSession().getNamedQuery(User.GET_BY_NAME_USING_EQUAL);
-            query.setParameter("name", name);
-            query.setFirstResult(start);
-            query.setMaxResults(numOfRows);
-
-            return (List<User>) query.list();
+        	if (name != null){
+	            Query query = getSession().getNamedQuery(User.GET_BY_NAME_USING_EQUAL);
+	            query.setParameter("name", name);
+	            query.setFirstResult(start);
+	            query.setMaxResults(numOfRows);	
+	            return (List<User>) query.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByNameUsingEqual(name="+name+") query from User: " + e.getMessage(), e);
         }
@@ -124,12 +132,13 @@ public class UserDAO extends GenericDAO<User, Integer>{
     @SuppressWarnings("unchecked")
     public List<User> getByNameUsingLike(String name, int start, int numOfRows) throws MiddlewareQueryException {
         try {
-            Query query = getSession().getNamedQuery(User.GET_BY_NAME_USING_LIKE);
-            query.setParameter("name", name);
-            query.setFirstResult(start);
-            query.setMaxResults(numOfRows);
-
-            return (List<User>) query.list();
+        	if (name != null){
+	            Query query = getSession().getNamedQuery(User.GET_BY_NAME_USING_LIKE);
+	            query.setParameter("name", name);
+	            query.setFirstResult(start);
+	            query.setMaxResults(numOfRows);
+	            return (List<User>) query.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByNameUsingLike(name="+name+") query from User: " + e.getMessage(), e);
         }
@@ -151,13 +160,13 @@ public class UserDAO extends GenericDAO<User, Integer>{
     @SuppressWarnings("unchecked")
 	public List<Integer> getUserIdsByCountryIds(Collection<Integer> countryIds) throws MiddlewareQueryException {
     	try {
-    		Criteria criteria = getSession().createCriteria(Locdes.class);
-    		criteria.createAlias("location", "l");
-    		criteria.add(Restrictions.in("l.cntryid", countryIds));
-    		criteria.setProjection(Projections.distinct(Projections.property("user.userid")));
-    		
-    		return criteria.list();
-    		
+    		if (countryIds != null & countryIds.size() > 0){
+	    		Criteria criteria = getSession().createCriteria(Locdes.class);
+	    		criteria.createAlias("location", "l");
+	    		criteria.add(Restrictions.in("l.cntryid", countryIds));
+	    		criteria.setProjection(Projections.distinct(Projections.property("user.userid")));
+	    		return criteria.list();
+    		}
     	} catch (HibernateException e) {
     		logAndThrowException("Error with getUserIdsByCountryIds() query from User: " + e.getMessage(), e);
     	}

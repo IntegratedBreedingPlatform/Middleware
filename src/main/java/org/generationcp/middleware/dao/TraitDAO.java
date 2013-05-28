@@ -25,16 +25,17 @@ public class TraitDAO extends GenericDAO<Trait, Integer>{
     @SuppressWarnings("rawtypes")
     public Trait getByTraitId(Integer id) throws MiddlewareQueryException {
         try {
-            Criteria crit = getSession().createCriteria(Trait.class);
-            crit.add(Restrictions.eq("traitId", id));
-            crit.add(Restrictions.eq("nameStatus", Integer.valueOf(1)));
-            List results = crit.list();
-
-            if (results.isEmpty()) {
-                return null;
-            } else {
-                return (Trait) results.get(0);
-            }
+        	if (id != null){
+	            Criteria crit = getSession().createCriteria(Trait.class);
+	            crit.add(Restrictions.eq("traitId", id));
+	            crit.add(Restrictions.eq("nameStatus", Integer.valueOf(1)));
+	            List results = crit.list();
+	            if (results.isEmpty()) {
+	                return null;
+	            } else {
+	                return (Trait) results.get(0);
+	            }
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByTraitId(id=" + id + ") query from Trait: " + e.getMessage(), e);
         }

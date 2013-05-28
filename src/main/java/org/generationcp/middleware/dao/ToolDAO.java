@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.hibernate.Criteria;
@@ -27,21 +26,25 @@ import org.hibernate.criterion.Restrictions;
 public class ToolDAO extends GenericDAO<Tool, Long>{
 
     public Tool getByToolName(String toolName) throws MiddlewareQueryException {
-        try {
-            Criteria criteria = getSession().createCriteria(Tool.class).add(Restrictions.eq("toolName", toolName)).setMaxResults(1);
-
-            return (Tool) criteria.uniqueResult();
-        } catch (HibernateException e) {
-            logAndThrowException("Error with getByToolName(toolName=" + toolName + ") query from Tool: " + e.getMessage(), e);
-        }
+		try {
+			Criteria criteria = getSession().createCriteria(Tool.class)
+					.add(Restrictions.eq("toolName", toolName))
+					.setMaxResults(1);
+			return (Tool) criteria.uniqueResult();
+		} catch (HibernateException e) {
+			logAndThrowException("Error with getByToolName(toolName=" + toolName + ") query from Tool: " + e.getMessage(), e);
+		}
         return null;
     }
 
     public Tool getByToolId(Long toolId) throws MiddlewareQueryException {
         try {
-            Criteria criteria = getSession().createCriteria(Tool.class).add(Restrictions.eq("toolId", toolId)).setMaxResults(1);
-
-            return (Tool) criteria.uniqueResult();
+			if (toolId != null) {
+				Criteria criteria = getSession().createCriteria(Tool.class)
+						.add(Restrictions.eq("toolId", toolId))
+						.setMaxResults(1);
+		return (Tool) criteria.uniqueResult();
+			}
         } catch (HibernateException e) {
             logAndThrowException("Error withgetByToolId(toolId=" + toolId + ") query from Tool: " + e.getMessage(), e);
         }
@@ -51,9 +54,9 @@ public class ToolDAO extends GenericDAO<Tool, Long>{
     @SuppressWarnings("unchecked")
     public List<Tool> getToolsByToolType(ToolType toolType) throws MiddlewareQueryException {
         try {
-            Criteria criteria = getSession().createCriteria(Tool.class).add(Restrictions.eq("toolType", toolType));
-
-            return criteria.list();
+			Criteria criteria = getSession().createCriteria(Tool.class).add(
+					Restrictions.eq("toolType", toolType));
+			return criteria.list();
         } catch (HibernateException e) {
             logAndThrowException("Error with getToolsByToolType(toolType=" + toolType + ") query from Tool: "
                     + e.getMessage(), e);

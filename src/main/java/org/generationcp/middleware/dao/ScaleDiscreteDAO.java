@@ -27,9 +27,11 @@ public class ScaleDiscreteDAO extends GenericDAO<ScaleDiscrete, ScaleDiscretePK>
     @SuppressWarnings("unchecked")
     public List<ScaleDiscrete> getByScaleId(Integer id) throws MiddlewareQueryException {
         try {
-            Criteria crit = getSession().createCriteria(ScaleDiscrete.class);
-            crit.add(Restrictions.eq("id.scaleId", id));
-            return crit.list();
+        	if (id != null){
+	            Criteria crit = getSession().createCriteria(ScaleDiscrete.class);
+	            crit.add(Restrictions.eq("id.scaleId", id));
+	            return crit.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error in getByScaleId(id=" + id + ") query from ScaleDiscrete: " + e.getMessage(), e);
         }

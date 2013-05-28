@@ -46,11 +46,13 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
     @SuppressWarnings("unchecked")
     public List<Study> getBySDateUsingEqual(Integer sdate, int start, int numOfRows) throws MiddlewareQueryException {
         try {
-            Query query = getSession().getNamedQuery(Study.GET_BY_SDATE_USING_EQUAL);
-            query.setParameter("startDate", sdate);
-            query.setFirstResult(start);
-            query.setMaxResults(numOfRows);
-            return (List<Study>) query.list();
+        	if (sdate != null){
+	            Query query = getSession().getNamedQuery(Study.GET_BY_SDATE_USING_EQUAL);
+	            query.setParameter("startDate", sdate);
+	            query.setFirstResult(start);
+	            query.setMaxResults(numOfRows);
+	            return (List<Study>) query.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getBySDateUsingEqual(sdate=" + sdate + ") query from Study: " + e.getMessage(),
                     e);
@@ -61,11 +63,13 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
     @SuppressWarnings("unchecked")
     public List<Study> getByEDateUsingEqual(Integer edate, int start, int numOfRows) throws MiddlewareQueryException {
         try {
-            Query query = getSession().getNamedQuery(Study.GET_BY_EDATE_USING_EQUAL);
-            query.setParameter("endDate", edate);
-            query.setFirstResult(start);
-            query.setMaxResults(numOfRows);
-            return (List<Study>) query.list();
+        	if (edate != null){
+	            Query query = getSession().getNamedQuery(Study.GET_BY_EDATE_USING_EQUAL);
+	            query.setParameter("endDate", edate);
+	            query.setFirstResult(start);
+	            query.setMaxResults(numOfRows);
+	            return (List<Study>) query.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByEDateUsingEqual(sdate=" + edate + ") query from Study: " + e.getMessage(),
                     e);
@@ -201,12 +205,13 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
     public long countBySDate(Integer sdate, Operation operation) throws MiddlewareQueryException {
 
         try {
-            // if operation == null or operation = Operation.EQUAL
-            Query query = getSession().getNamedQuery(Study.COUNT_BY_SDATE_USING_EQUAL);
-
-            query.setParameter("startDate", sdate);
-            return ((Long) query.uniqueResult()).longValue();
-
+        	if (sdate != null){
+	            // if operation == null or operation = Operation.EQUAL
+	            Query query = getSession().getNamedQuery(Study.COUNT_BY_SDATE_USING_EQUAL);
+	
+	            query.setParameter("startDate", sdate);
+	            return ((Long) query.uniqueResult()).longValue();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with countBySDate(sdate=" + sdate + ", operation=" + operation
                     + ") query from Study: " + e.getMessage(), e);
@@ -217,12 +222,13 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
     public long countByEDate(Integer edate, Operation operation) throws MiddlewareQueryException {
 
         try {
-            // if operation == null or operation = Operation.EQUAL
-            Query query = getSession().getNamedQuery(Study.COUNT_BY_EDATE_USING_EQUAL);
-
-            query.setParameter("endDate", edate);
-            return ((Long) query.uniqueResult()).longValue();
-
+        	if (edate != null){
+	            // if operation == null or operation = Operation.EQUAL
+	            Query query = getSession().getNamedQuery(Study.COUNT_BY_EDATE_USING_EQUAL);
+	
+	            query.setParameter("endDate", edate);
+	            return ((Long) query.uniqueResult()).longValue();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with countByEDate(edate=" + edate + ", operation=" + operation
                     + ") query from Study: " + e.getMessage(), e);
@@ -260,11 +266,13 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
 
     public long countAllStudyByParentFolderID(Integer parentFolderId) throws MiddlewareQueryException {
         try {
-            Criteria criteria = getSession().createCriteria(Study.class);
-            // top level studies are studies without parent folders (shierarchy = 0)
-            criteria.add(Restrictions.eq("hierarchy", parentFolderId));
-            criteria.setProjection(Projections.countDistinct("id"));
-            return ((Long) criteria.uniqueResult()).longValue();
+        	if (parentFolderId != null){
+	            Criteria criteria = getSession().createCriteria(Study.class);
+	            // top level studies are studies without parent folders (shierarchy = 0)
+	            criteria.add(Restrictions.eq("hierarchy", parentFolderId));
+	            criteria.setProjection(Projections.countDistinct("id"));
+	            return ((Long) criteria.uniqueResult()).longValue();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with countAllStudyByParentFolderID(parentFolderId=" + parentFolderId
                     + ") query from Study: " + e.getMessage(), e);
@@ -275,12 +283,14 @@ public class StudyDAO extends GenericDAO<Study, Integer>{
     @SuppressWarnings("unchecked")
     public List<Study> getByParentFolderID(Integer parentFolderId, int start, int numOfRows) throws MiddlewareQueryException {
         try {
-            Criteria criteria = getSession().createCriteria(Study.class);
-            // studies with parent folder = parentFolderId
-            criteria.add(Restrictions.eq("hierarchy", parentFolderId));
-            criteria.setFirstResult(start);
-            criteria.setMaxResults(numOfRows);
-            return (List<Study>) criteria.list();
+        	if (parentFolderId != null){
+	            Criteria criteria = getSession().createCriteria(Study.class);
+	            // studies with parent folder = parentFolderId
+	            criteria.add(Restrictions.eq("hierarchy", parentFolderId));
+	            criteria.setFirstResult(start);
+	            criteria.setMaxResults(numOfRows);
+	            return (List<Study>) criteria.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByParentFolderID(parentFolderId=" + parentFolderId + ") query from Study: "
                     + e.getMessage(), e);

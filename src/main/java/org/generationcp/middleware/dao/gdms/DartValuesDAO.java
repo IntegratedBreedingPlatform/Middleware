@@ -26,7 +26,6 @@ import org.generationcp.middleware.pojos.gdms.DartValues;
  * <b>File Created</b>: Mar 8, 2013
  */
 
-@SuppressWarnings("unchecked")
 public class DartValuesDAO extends GenericDAO<DartValues, Integer>{
 
 

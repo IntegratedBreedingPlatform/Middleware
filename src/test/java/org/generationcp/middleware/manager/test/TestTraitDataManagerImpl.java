@@ -113,7 +113,7 @@ public class TestTraitDataManagerImpl{
     public void testGetTraitMethodById() throws Exception {
         Integer id = Integer.valueOf(1);
         TraitMethod method = manager.getTraitMethodById(id);
-        System.out.println("testGetTraitMethodById(id=" + id + ")" + method);
+        System.out.println("testGetTraitMethodById(id=" + id + "): " + method);
     }
 
     @Test

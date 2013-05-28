@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.generationcp.middleware.dao.LotDAO;
-import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.TransactionDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -46,10 +45,6 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
     private static final Logger LOG = LoggerFactory.getLogger(InventoryDataManagerImpl.class);
 
-    private LotDAO lotDao;
-    private PersonDAO personDao;
-    private TransactionDAO transactionDao;
-
     public InventoryDataManagerImpl() {
     }
 
@@ -59,30 +54,6 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
     public InventoryDataManagerImpl(Session sessionForLocal, Session sessionForCentral) {
         super(sessionForLocal, sessionForCentral);
-    }
-
-    private LotDAO getLotDao() {
-        if (lotDao == null) {
-            lotDao = new LotDAO();
-        }
-        lotDao.setSession(getActiveSession());
-        return lotDao;
-    }
-
-    private PersonDAO getPersonDao() {
-        if (personDao == null) {
-            personDao = new PersonDAO();
-        }
-        personDao.setSession(getActiveSession());
-        return personDao;
-    }
-
-    private TransactionDAO getTransactionDao() {
-        if (transactionDao == null) {
-            transactionDao = new TransactionDAO();
-        }
-        transactionDao.setSession(getActiveSession());
-        return transactionDao;
     }
 
     @Override

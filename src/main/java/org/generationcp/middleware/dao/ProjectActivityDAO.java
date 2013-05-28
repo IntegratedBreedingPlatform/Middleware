@@ -45,19 +45,17 @@ public class ProjectActivityDAO extends GenericDAO<ProjectActivity, Integer>{
     @SuppressWarnings("unchecked")
     public List<ProjectActivity> getByProjectId(Long projectId, int start, int numOfRows) throws MiddlewareQueryException {
         List<ProjectActivity> toReturn = new ArrayList<ProjectActivity>();
-        if (projectId == null) {
-            return toReturn;
-        }
-
         try {
-            Criteria criteria = getSession().createCriteria(ProjectActivity.class);
-            Project p = new Project();
-            p.setProjectId(projectId);
-            criteria.add(Restrictions.eq("project", p));
-            criteria.setFirstResult(start);
-            criteria.setMaxResults(numOfRows);
-            criteria.addOrder(Order.desc("createdAt"));
-            toReturn = (List<ProjectActivity>) criteria.list();
+            if (projectId != null) {
+	            Criteria criteria = getSession().createCriteria(ProjectActivity.class);
+	            Project p = new Project();
+	            p.setProjectId(projectId);
+	            criteria.add(Restrictions.eq("project", p));
+	            criteria.setFirstResult(start);
+	            criteria.setMaxResults(numOfRows);
+	            criteria.addOrder(Order.desc("createdAt"));
+	            toReturn = (List<ProjectActivity>) criteria.list();
+            }
         } catch (HibernateException e) {
             logAndThrowException("Error with getByProjectId(projectId=" + projectId + ") query from ProjectActivity "
                     + e.getMessage(), e);
@@ -74,10 +72,12 @@ public class ProjectActivityDAO extends GenericDAO<ProjectActivity, Integer>{
      */
     public long countByProjectId(Long projectId) throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(ProjectActivity.COUNT_ACTIVITIES_BY_PROJECT_ID);
-            query.setParameter("projectId", projectId.intValue());
-            BigInteger result = (BigInteger) query.uniqueResult();
-            return result.longValue();
+            if (projectId != null) {
+	            SQLQuery query = getSession().createSQLQuery(ProjectActivity.COUNT_ACTIVITIES_BY_PROJECT_ID);
+	            query.setParameter("projectId", projectId.intValue());
+	            BigInteger result = (BigInteger) query.uniqueResult();
+	            return result.longValue();
+            }
         } catch (HibernateException e) {
             logAndThrowException("Error with countByProjectId(projectId=" + projectId + ") query from ProjectActivity "
                     + e.getMessage(), e);

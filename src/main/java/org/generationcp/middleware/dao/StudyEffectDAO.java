@@ -25,9 +25,11 @@ public class StudyEffectDAO extends GenericDAO<StudyEffect, Integer>{
     @SuppressWarnings("unchecked")
     public List<StudyEffect> getByStudyID(Integer studyId) throws MiddlewareQueryException {
         try {
-            Query query = getSession().getNamedQuery(StudyEffect.GET_STUDY_EFFECTS_BY_STUDYID);
-            query.setParameter("studyId", studyId);
-            return (List<StudyEffect>) query.list();
+        	if (studyId != null){
+        		Query query = getSession().getNamedQuery(StudyEffect.GET_STUDY_EFFECTS_BY_STUDYID);
+        		query.setParameter("studyId", studyId);
+        		return (List<StudyEffect>) query.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByStudyID(studyId=" + studyId + ") query from StudyEffect: " + e.getMessage(), e);
         }

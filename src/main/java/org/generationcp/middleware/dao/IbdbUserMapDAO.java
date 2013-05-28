@@ -10,10 +10,12 @@ public class IbdbUserMapDAO extends GenericDAO<IbdbUserMap, Long>{
 
     public Integer getLocalIbdbUserId(Integer workbenchUserId, Long projectId) throws MiddlewareQueryException {
         try {
-            Query query = getSession().createSQLQuery(IbdbUserMap.GET_LOCAL_IBDB_USER_ID);
-            query.setParameter("workbenchUserId", workbenchUserId);
-            query.setParameter("projectId", projectId);
-            return (Integer) query.uniqueResult();
+        	if (workbenchUserId != null && projectId != null){
+	            Query query = getSession().createSQLQuery(IbdbUserMap.GET_LOCAL_IBDB_USER_ID);
+	            query.setParameter("workbenchUserId", workbenchUserId);
+	            query.setParameter("projectId", projectId);
+	            return (Integer) query.uniqueResult();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getLocalIbdbUserId(workbenchUserId=" + workbenchUserId + ", projectId="
                     + projectId + ") query from IbdbUserMap: " + e.getMessage(), e);

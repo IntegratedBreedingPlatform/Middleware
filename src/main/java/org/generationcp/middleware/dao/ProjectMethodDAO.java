@@ -42,17 +42,14 @@ public class ProjectMethodDAO extends GenericDAO<ProjectMethod, Integer>{
      */
     @SuppressWarnings("unchecked")
     public List<Integer> getByProjectId(Long projectId, int start, int numOfRows) throws MiddlewareQueryException {
-
-        if (projectId == null) {
-            return new ArrayList<Integer>();
-        }
-
         try {
-            SQLQuery query = getSession().createSQLQuery(ProjectMethod.GET_METHODS_BY_PROJECT_ID);
-            query.setParameter("projectId", projectId.intValue());
-            query.setFirstResult(start);
-            query.setMaxResults(numOfRows);
-            return (List<Integer>) query.list();
+        	if (projectId != null){
+	            SQLQuery query = getSession().createSQLQuery(ProjectMethod.GET_METHODS_BY_PROJECT_ID);
+	            query.setParameter("projectId", projectId.intValue());
+	            query.setFirstResult(start);
+	            query.setMaxResults(numOfRows);
+	            return (List<Integer>) query.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByProjectId(projectId=" + projectId + ") query from ProjectMethod: "
                     + e.getMessage(), e);
@@ -69,10 +66,12 @@ public class ProjectMethodDAO extends GenericDAO<ProjectMethod, Integer>{
      */
     public long countByProjectId(Long projectId) throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(ProjectMethod.COUNT_METHODS_BY_PROJECT_ID);
-            query.setParameter("projectId", projectId.intValue());
-            BigInteger result = (BigInteger) query.uniqueResult();
-            return result.longValue();
+        	if (projectId != null){
+	            SQLQuery query = getSession().createSQLQuery(ProjectMethod.COUNT_METHODS_BY_PROJECT_ID);
+	            query.setParameter("projectId", projectId.intValue());
+	            BigInteger result = (BigInteger) query.uniqueResult();
+	            return result.longValue();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with countByProjectId(projectId=" + projectId + ") query from ProjectMethod: "
                     + e.getMessage(), e);
@@ -83,25 +82,23 @@ public class ProjectMethodDAO extends GenericDAO<ProjectMethod, Integer>{
     @SuppressWarnings("rawtypes")
     public List<ProjectMethod> getProjectMethodByProject(Project project, int start, int numOfRows) throws MiddlewareQueryException {
         List<ProjectMethod> toReturn = new ArrayList<ProjectMethod>();
-        if (project == null || project.getProjectId() == null) {
-            return toReturn;
-        }
-
         try {
-            SQLQuery query = getSession().createSQLQuery(ProjectMethod.GET_PROJECT_METHODS_BY_PROJECT_ID);
-            query.setParameter("projectId", project.getProjectId().intValue());
-            query.setFirstResult(start);
-            query.setMaxResults(numOfRows);
-            List results = query.list();
-            for (Object o : results) {
-                Object[] result = (Object[]) o;
-                if (result != null) {
-                    Integer projectMethodId = (Integer) result[0];
-                    Integer methodId = (Integer) result[2];
-                    ProjectMethod projectMethod = new ProjectMethod(projectMethodId, project, methodId);
-                    toReturn.add(projectMethod);
-                }
-            }
+        	if (project != null && project.getProjectId() != null) {                
+	            SQLQuery query = getSession().createSQLQuery(ProjectMethod.GET_PROJECT_METHODS_BY_PROJECT_ID);
+	            query.setParameter("projectId", project.getProjectId().intValue());
+	            query.setFirstResult(start);
+	            query.setMaxResults(numOfRows);
+	            List results = query.list();
+	            for (Object o : results) {
+	                Object[] result = (Object[]) o;
+	                if (result != null) {
+	                    Integer projectMethodId = (Integer) result[0];
+	                    Integer methodId = (Integer) result[2];
+	                    ProjectMethod projectMethod = new ProjectMethod(projectMethodId, project, methodId);
+	                    toReturn.add(projectMethod);
+	                }
+	            }
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getProjectMethodByProjectId(project=" + project
                     + ") query from ProjectMethod: " + e.getMessage(), e);

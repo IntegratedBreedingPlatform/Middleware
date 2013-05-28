@@ -26,23 +26,19 @@ import org.hibernate.criterion.Restrictions;
  */
 public class CropTypeDAO extends GenericDAO<CropType, Long>{
 
-    /**
-     * Gets the CropType by crop name.
-     *
-     * @param cropName the crop name
-     * @return the CropType matching the given name
-     * @throws MiddlewareQueryException
-     */
     public CropType getByName(String cropName) throws MiddlewareQueryException {
+    	CropType toReturn = null;
         try {
-            Criteria criteria = getSession().createCriteria(CropType.class);
-            criteria.add(Restrictions.eq("cropName", cropName));
-            return (CropType) criteria.uniqueResult();
+        	if (cropName != null){
+	            Criteria criteria = getSession().createCriteria(CropType.class);
+	            criteria.add(Restrictions.eq("cropName", cropName));
+	            toReturn = (CropType) criteria.uniqueResult();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByName(cropName=" + cropName + ") query from CropType: "
                     + e.getMessage(), e);
         }
-        return null;
+        return toReturn;
     }
 
 }

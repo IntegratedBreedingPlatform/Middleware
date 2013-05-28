@@ -26,27 +26,29 @@ public class CountryDAO extends GenericDAO<Country, Integer>{
 	
 	@SuppressWarnings("unchecked")
     public List<Country> getAllCountry() throws MiddlewareQueryException {
+		List<Country> toReturn = new ArrayList<Country>();
         try {
             Query query = getSession().getNamedQuery(Country.GET_ALL);
-
-            return (List<Country>) query.list();
+            toReturn = (List<Country>) query.list();
         } catch (HibernateException e) {
             logAndThrowException("Error with getAllCountry() query from Country: " + e.getMessage(), e);
         }
-        return new ArrayList<Country>();
+        return toReturn;
     }
 
 	
 	@SuppressWarnings("unchecked")
 	public List<Country> getByIsoFull(String isoFull) throws MiddlewareQueryException {
+		List<Country> toReturn = new ArrayList<Country>();
 		try {
-			Criteria criteria = getSession().createCriteria(getPersistentClass());
-			criteria.add(Restrictions.eq("isofull", isoFull));
-			
-			return criteria.list();
+			if (isoFull != null){
+				Criteria criteria = getSession().createCriteria(getPersistentClass());
+				criteria.add(Restrictions.eq("isofull", isoFull));
+				toReturn = criteria.list();
+			}
 		} catch (HibernateException e) {
 			logAndThrowException("Error calling getByIsoFull() query from Country: " + e.getMessage(), e);
 		}
-		return new ArrayList<Country>();
+		return toReturn;
 	}
 }

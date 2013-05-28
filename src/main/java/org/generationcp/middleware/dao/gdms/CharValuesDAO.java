@@ -45,29 +45,26 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
     public List<AllelicValueWithMarkerIdElement> getAllelicValuesByDatasetId(Integer datasetId, int start, int numOfRows)
             throws MiddlewareQueryException {
         List<AllelicValueWithMarkerIdElement> toReturn = new ArrayList<AllelicValueWithMarkerIdElement>();
-        if (datasetId == null) {
-            return toReturn;
-        }
 
         try {
-            SQLQuery query = getSession().createSQLQuery(CharValues.GET_ALLELIC_VALUES_BY_DATASET_ID);
-            query.setParameter("datasetId", datasetId);
-            query.setFirstResult(start);
-            query.setMaxResults(numOfRows);
-            List results = query.list();
-
-            for (Object o : results) {
-                Object[] result = (Object[]) o;
-                if (result != null) {
-                    Integer gid = (Integer) result[0];
-                    Integer markerId = (Integer) result[1];
-                    String data = (String) result[2];
-                    AllelicValueWithMarkerIdElement allelicValueElement = new AllelicValueWithMarkerIdElement(gid, data, markerId);
-                    toReturn.add(allelicValueElement);
-                }
+            if (datasetId != null) {
+	            SQLQuery query = getSession().createSQLQuery(CharValues.GET_ALLELIC_VALUES_BY_DATASET_ID);
+	            query.setParameter("datasetId", datasetId);
+	            query.setFirstResult(start);
+	            query.setMaxResults(numOfRows);
+	            List results = query.list();
+	
+	            for (Object o : results) {
+	                Object[] result = (Object[]) o;
+	                if (result != null) {
+	                    Integer gid = (Integer) result[0];
+	                    Integer markerId = (Integer) result[1];
+	                    String data = (String) result[2];
+	                    AllelicValueWithMarkerIdElement allelicValueElement = new AllelicValueWithMarkerIdElement(gid, data, markerId);
+	                    toReturn.add(allelicValueElement);
+	                }
+	            }
             }
-
-            
         } catch (HibernateException e) {
             logAndThrowException("Error with getAllelicValuesByDatasetId(datasetId=" + datasetId
                     + ") queryfrom char_values : " + e.getMessage(), e);
@@ -84,13 +81,14 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
      */
     public long countByDatasetId(Integer datasetId) throws MiddlewareQueryException {
         try {
-            Query query = getSession().createSQLQuery(CharValues.COUNT_BY_DATASET_ID);
-            query.setParameter("datasetId", datasetId);
-            BigInteger result = (BigInteger) query.uniqueResult();
-            if (result != null) {
-                return result.longValue();
+            if (datasetId != null) {
+	            Query query = getSession().createSQLQuery(CharValues.COUNT_BY_DATASET_ID);
+	            query.setParameter("datasetId", datasetId);
+	            BigInteger result = (BigInteger) query.uniqueResult();
+	            if (result != null) {
+	                return result.longValue();
+	            }
             }
-            return 0;
         } catch (HibernateException e) {
             logAndThrowException("Error with countByDatasetId(datasetId=" + datasetId + ") query from char_values: "
                     + e.getMessage(), e);
@@ -98,48 +96,33 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
         return 0;
     }
 
-    /**
-     * Gets the gI ds by marker id.
-     *
-     * @param markerId the marker id
-     * @param start the start
-     * @param numOfRows the num of rows
-     * @return the gI ds by marker id
-     * @throws MiddlewareQueryException the MiddlewareQueryException
-     */
     @SuppressWarnings("unchecked")
     public List<Integer> getGIDsByMarkerId(Integer markerId, int start, int numOfRows) throws MiddlewareQueryException {
 
         try {
-            SQLQuery query = getSession().createSQLQuery(CharValues.GET_GIDS_BY_MARKER_ID);
-            query.setParameter("markerId", markerId);
-            query.setFirstResult(start);
-            query.setMaxResults(numOfRows);
-
-            List<Integer> gids = query.list();
-            return gids;
+            if (markerId != null) {
+	            SQLQuery query = getSession().createSQLQuery(CharValues.GET_GIDS_BY_MARKER_ID);
+	            query.setParameter("markerId", markerId);
+	            query.setFirstResult(start);
+	            query.setMaxResults(numOfRows);
+	            return query.list();
+	        }
         } catch (HibernateException e) {
             logAndThrowException("Error with getGIDsByMarkerId(markerId=" + markerId + ") query from CharValues: " + e.getMessage(), e);
         }
         return new ArrayList<Integer>();
     }
 
-    /**
-     * Count gids by marker id.
-     *
-     * @param markerId the marker id
-     * @return the long
-     * @throws MiddlewareQueryException the MiddlewareQueryException
-     */
     public long countGIDsByMarkerId(Integer markerId) throws MiddlewareQueryException {
         try {
-            SQLQuery query = getSession().createSQLQuery(CharValues.COUNT_GIDS_BY_MARKER_ID);
-            query.setParameter("markerId", markerId);
-            BigInteger result = (BigInteger) query.uniqueResult();
-            if (result != null) {
-                return result.longValue();
-            }
-            return 0;
+        	if (markerId != null){
+	            SQLQuery query = getSession().createSQLQuery(CharValues.COUNT_GIDS_BY_MARKER_ID);
+	            query.setParameter("markerId", markerId);
+	            BigInteger result = (BigInteger) query.uniqueResult();
+	            if (result != null) {
+	                return result.longValue();
+	            }
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with countGIDsByMarkerId(markerId=" + markerId + ") query from CharValues: " + e.getMessage(), e);
         }
@@ -148,13 +131,14 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
 
     public long countCharValuesByGids(List<Integer> gids) throws MiddlewareQueryException{
         try {
-            SQLQuery query = getSession().createSQLQuery(CharValues.COUNT_CHAR_VALUES_BY_GIDS);
-            query.setParameterList("gids", gids);
-            BigInteger result = (BigInteger) query.uniqueResult();
-            if (result != null) {
-                return result.longValue();
-            }
-            return 0;
+        	if (gids != null && !gids.isEmpty()){
+	            SQLQuery query = getSession().createSQLQuery(CharValues.COUNT_CHAR_VALUES_BY_GIDS);
+	            query.setParameterList("gids", gids);
+	            BigInteger result = (BigInteger) query.uniqueResult();
+	            if (result != null) {
+	                return result.longValue();
+	            }
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with countCharValuesByGids(gids=" + gids + ") query from CharValues: " + e.getMessage(), e);
         }

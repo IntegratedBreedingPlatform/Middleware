@@ -11,9 +11,57 @@
  *******************************************************************************/
 package org.generationcp.middleware.v2.util;
 
+import org.generationcp.middleware.dao.AttributeDAO;
+import org.generationcp.middleware.dao.BibrefDAO;
+import org.generationcp.middleware.dao.CharacterDataDAO;
+import org.generationcp.middleware.dao.CharacterLevelDAO;
 import org.generationcp.middleware.dao.CountryDAO;
+import org.generationcp.middleware.dao.FactorDAO;
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.dao.GermplasmListDAO;
+import org.generationcp.middleware.dao.GermplasmListDataDAO;
+import org.generationcp.middleware.dao.InstallationDAO;
+import org.generationcp.middleware.dao.LocationDAO;
+import org.generationcp.middleware.dao.LotDAO;
+import org.generationcp.middleware.dao.MethodDAO;
+import org.generationcp.middleware.dao.NameDAO;
+import org.generationcp.middleware.dao.NumericDataDAO;
+import org.generationcp.middleware.dao.NumericLevelDAO;
+import org.generationcp.middleware.dao.OindexDAO;
+import org.generationcp.middleware.dao.PersonDAO;
+import org.generationcp.middleware.dao.ProgenitorDAO;
+import org.generationcp.middleware.dao.RepresentationDAO;
+import org.generationcp.middleware.dao.ScaleContinuousDAO;
+import org.generationcp.middleware.dao.ScaleDAO;
+import org.generationcp.middleware.dao.ScaleDiscreteDAO;
+import org.generationcp.middleware.dao.StudyDAO;
+import org.generationcp.middleware.dao.StudyEffectDAO;
+import org.generationcp.middleware.dao.TraitDAO;
+import org.generationcp.middleware.dao.TraitMethodDAO;
+import org.generationcp.middleware.dao.TransactionDAO;
 import org.generationcp.middleware.dao.UserDAO;
+import org.generationcp.middleware.dao.UserDefinedFieldDAO;
+import org.generationcp.middleware.dao.VariateDAO;
+import org.generationcp.middleware.dao.gdms.AccMetadataSetDAO;
+import org.generationcp.middleware.dao.gdms.AlleleValuesDAO;
+import org.generationcp.middleware.dao.gdms.CharValuesDAO;
+import org.generationcp.middleware.dao.gdms.DartValuesDAO;
+import org.generationcp.middleware.dao.gdms.DatasetDAO;
+import org.generationcp.middleware.dao.gdms.DatasetUsersDAO;
+import org.generationcp.middleware.dao.gdms.MapDAO;
+import org.generationcp.middleware.dao.gdms.MappingDataDAO;
+import org.generationcp.middleware.dao.gdms.MappingPopDAO;
+import org.generationcp.middleware.dao.gdms.MappingPopValuesDAO;
+import org.generationcp.middleware.dao.gdms.MarkerAliasDAO;
+import org.generationcp.middleware.dao.gdms.MarkerDAO;
+import org.generationcp.middleware.dao.gdms.MarkerDetailsDAO;
+import org.generationcp.middleware.dao.gdms.MarkerInfoDAO;
+import org.generationcp.middleware.dao.gdms.MarkerMetadataSetDAO;
+import org.generationcp.middleware.dao.gdms.MarkerOnMapDAO;
+import org.generationcp.middleware.dao.gdms.MarkerUserInfoDAO;
+import org.generationcp.middleware.dao.gdms.QtlDAO;
+import org.generationcp.middleware.dao.gdms.QtlDetailsDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
@@ -83,6 +131,69 @@ public class DatabaseBroker {
     private Session activeSession;
     
     private Database activeDatabase;
+    
+    
+    // GDMS DAOs
+    private NameDAO nameDao;
+    private AccMetadataSetDAO accMetadataSetDao;
+    private AlleleValuesDAO alleleValuesDao;
+    private CharValuesDAO charValuesDao;
+    private DartValuesDAO dartValuesDao;
+    private DatasetDAO datasetDao;
+    private DatasetUsersDAO datasetUsersDao;
+    private MapDAO mapDao;
+    private MappingDataDAO mappingDataDao;
+    private MappingPopDAO mappingPopDao;
+    private MappingPopValuesDAO mappingPopValuesDao;
+    private MarkerAliasDAO markerAliasDao;
+    private MarkerDAO markerDao;
+    private MarkerDetailsDAO markerDetailsDao;
+    private MarkerInfoDAO markerInfoDao;
+    private MarkerMetadataSetDAO markerMetadataSetDao;
+    private MarkerOnMapDAO markerOnMapDao;
+    private MarkerUserInfoDAO markerUserInfoDao;
+    private QtlDAO qtlDao;
+    private QtlDetailsDAO qtlDetailsDao;
+    
+    // GermplasmDataManager DAOs
+    private AttributeDAO attributeDao;
+    private BibrefDAO bibrefDao;
+    private GermplasmDAO germplasmDao;
+    private LocationDAO locationDao;
+    private MethodDAO methodDao;
+    private ProgenitorDAO progenitorDao;
+    private UserDefinedFieldDAO userDefinedFieldDao;
+
+    // GermplasmListDataManager DAOs
+    private GermplasmListDAO germplasmListDao;
+	private GermplasmListDataDAO germplasmListDataDao;
+	
+	// InventoryDataManager DAOs
+    private LotDAO lotDao;
+    private PersonDAO personDao;
+    private TransactionDAO transactionDao;
+
+    // StudyDataManagerv1 DAOs
+    private CharacterDataDAO characterDataDao;
+    private CharacterLevelDAO characterLevelDao;
+    private FactorDAO factorDao;
+    private NumericDataDAO numericDataDao;
+    private NumericLevelDAO numericLevelDao;
+    private OindexDAO oIndexDao;
+    private RepresentationDAO representationDao;
+    private StudyDAO studyDao;
+    private StudyEffectDAO studyEffectDao;
+    private TraitDAO traitDao;
+    private VariateDAO variateDao;
+
+    private ScaleContinuousDAO scaleContinuousDao;
+    private ScaleDAO scaleDao;
+    private ScaleDiscreteDAO scaleDiscreteDao;
+    private TraitMethodDAO traitMethodDao;
+
+    // UserDataManager DAOs
+    private InstallationDAO installationDao;
+
 
     protected DatabaseBroker(){
     	
@@ -363,7 +474,7 @@ public class DatabaseBroker {
     }
 
 
-    //================================  Get DAO Methods =============================
+    //================================  StudyDataManagerv2 DAO Methods =============================
 
     protected final DmsProjectDao getDmsProjectDao() {
 	    DmsProjectDao dmsProjectDao = new DmsProjectDao();
@@ -496,6 +607,417 @@ public class DatabaseBroker {
     	cvTermSynonymDao.setSession(getActiveSession());
     	return cvTermSynonymDao;
     }
+    
+    //================================  GDMS DAO Methods =============================
+    
+    protected final NameDAO getNameDao() {
+        if (nameDao == null) {
+            nameDao = new NameDAO();
+        }
+        nameDao.setSession(getActiveSession());
+        return nameDao;
+    }
+
+    protected final AccMetadataSetDAO getAccMetadataSetDao() {
+        if (accMetadataSetDao == null) {
+            accMetadataSetDao = new AccMetadataSetDAO();
+        }
+        accMetadataSetDao.setSession(getActiveSession());
+        return accMetadataSetDao;
+    }
+
+    protected final AlleleValuesDAO getAlleleValuesDao() {
+        if (alleleValuesDao == null) {
+            alleleValuesDao = new AlleleValuesDAO();
+        }
+        alleleValuesDao.setSession(getActiveSession());
+        return alleleValuesDao;
+    }
+
+    protected final CharValuesDAO getCharValuesDao() {
+        if (charValuesDao == null) {
+            charValuesDao = new CharValuesDAO();
+        }
+        charValuesDao.setSession(getActiveSession());
+        return charValuesDao;
+    }
+
+    protected final DartValuesDAO getDartValuesDao() {
+        if (dartValuesDao == null) {
+            dartValuesDao = new DartValuesDAO();
+        }
+        dartValuesDao.setSession(getActiveSession());
+        return dartValuesDao;
+    }
+
+    protected final DatasetDAO getDatasetDao() {
+        if (datasetDao == null) {
+            datasetDao = new DatasetDAO();
+        }
+        datasetDao.setSession(getActiveSession());
+        return datasetDao;
+    }
+
+    protected final DatasetUsersDAO getDatasetUsersDao() {
+        if (datasetUsersDao == null) {
+            datasetUsersDao = new DatasetUsersDAO();
+        }
+        datasetUsersDao.setSession(getActiveSession());
+        return datasetUsersDao;
+    }
+
+    protected final MapDAO getMapDao() {
+        if (mapDao == null) {
+            mapDao = new MapDAO();
+        }
+        mapDao.setSession(getActiveSession());
+        return mapDao;
+    }
+
+    protected final MappingDataDAO getMappingDataDao() {
+        if (mappingDataDao == null) {
+            mappingDataDao = new MappingDataDAO();
+        }
+        mappingDataDao.setSession(getActiveSession());
+        return mappingDataDao;
+    }
+
+    protected final MappingPopDAO getMappingPopDao() {
+        if (mappingPopDao == null) {
+            mappingPopDao = new MappingPopDAO();
+        }
+        mappingPopDao.setSession(getActiveSession());
+        return mappingPopDao;
+    }
+
+    protected final MappingPopValuesDAO getMappingPopValuesDao() {
+        if (mappingPopValuesDao == null) {
+            mappingPopValuesDao = new MappingPopValuesDAO();
+        }
+        mappingPopValuesDao.setSession(getActiveSession());
+        return mappingPopValuesDao;
+    }
+
+    protected final MarkerAliasDAO getMarkerAliasDao() {
+        if (markerAliasDao == null) {
+            markerAliasDao = new MarkerAliasDAO();
+        }
+        markerAliasDao.setSession(getActiveSession());
+        return markerAliasDao;
+    }
+
+    protected final MarkerDAO getMarkerDao() {
+        if (markerDao == null) {
+            markerDao = new MarkerDAO();
+        }
+        markerDao.setSession(getActiveSession());
+        return markerDao;
+    }
+
+    protected final MarkerDetailsDAO getMarkerDetailsDao() {
+        if (markerDetailsDao == null) {
+            markerDetailsDao = new MarkerDetailsDAO();
+        }
+        markerDetailsDao.setSession(getActiveSession());
+        return markerDetailsDao;
+    }
+
+    protected final MarkerInfoDAO getMarkerInfoDao() {
+        if (markerInfoDao == null) {
+            markerInfoDao = new MarkerInfoDAO();
+        }
+        markerInfoDao.setSession(getActiveSession());
+        return markerInfoDao;
+    }
+
+    protected final MarkerMetadataSetDAO getMarkerMetadataSetDao() {
+        if (markerMetadataSetDao == null) {
+            markerMetadataSetDao = new MarkerMetadataSetDAO();
+        }
+        markerMetadataSetDao.setSession(getActiveSession());
+        return markerMetadataSetDao;
+    }
+
+    protected final MarkerOnMapDAO getMarkerOnMapDao() {
+        if (markerOnMapDao == null) {
+            markerOnMapDao = new MarkerOnMapDAO();
+        }
+        markerOnMapDao.setSession(getActiveSession());
+        return markerOnMapDao;
+    }
+
+    protected final MarkerUserInfoDAO getMarkerUserInfoDao() {
+        if (markerUserInfoDao == null) {
+            markerUserInfoDao = new MarkerUserInfoDAO();
+        }
+        markerUserInfoDao.setSession(getActiveSession());
+        return markerUserInfoDao;
+    }
+
+    protected final QtlDAO getQtlDao() {
+        if (qtlDao == null) {
+            qtlDao = new QtlDAO();
+        }
+        qtlDao.setSession(getActiveSession());
+        return qtlDao;
+    }
+
+    protected final QtlDetailsDAO getQtlDetailsDao() {
+        if (qtlDetailsDao == null) {
+            qtlDetailsDao = new QtlDetailsDAO();
+        }
+        qtlDetailsDao.setSession(getActiveSession());
+        return qtlDetailsDao;
+    }
+
+    //================================ GermplasmDataManager DAO Methods =============================
+    
+    
+    protected final AttributeDAO getAttributeDao() {
+        if (attributeDao == null) {
+            attributeDao = new AttributeDAO();
+        }
+        attributeDao.setSession(getActiveSession());
+        return attributeDao;
+    }
+
+    protected final BibrefDAO getBibrefDao() {
+        if (bibrefDao == null) {
+            bibrefDao = new BibrefDAO();
+        }
+        bibrefDao.setSession(getActiveSession());
+        return bibrefDao;
+    }
+
+    protected final GermplasmDAO getGermplasmDao() {
+        if (germplasmDao == null) {
+            germplasmDao = new GermplasmDAO();
+        }
+        germplasmDao.setSession(getActiveSession());
+        return germplasmDao;
+    }
+
+    protected final LocationDAO getLocationDao() {
+        if (locationDao == null) {
+            locationDao = new LocationDAO();
+        }
+        locationDao.setSession(getActiveSession());
+        return locationDao;
+    }
+
+    protected final MethodDAO getMethodDao() {
+        if (methodDao == null) {
+            methodDao = new MethodDAO();
+        }
+        methodDao.setSession(getActiveSession());
+        return methodDao;
+    }
+
+    protected final ProgenitorDAO getProgenitorDao() {
+        if (progenitorDao == null) {
+            progenitorDao = new ProgenitorDAO();
+        }
+        progenitorDao.setSession(getActiveSession());
+        return progenitorDao;
+    }
+
+    protected final UserDefinedFieldDAO getUserDefinedFieldDao() {
+        if (userDefinedFieldDao == null) {
+            userDefinedFieldDao = new UserDefinedFieldDAO();
+        }
+        userDefinedFieldDao.setSession(getActiveSession());
+        return userDefinedFieldDao;
+    }
+
+    protected final LocationDAO getLocationDAO() {
+		if (locationDao == null) {
+			locationDao = new LocationDAO();
+		}
+		locationDao.setSession(getActiveSession());
+		return locationDao;
+	}    
+    
+    //================================ GermplasmListDataManager DAO Methods =============================
+    
+    protected final GermplasmListDAO getGermplasmListDAO() {
+		if (germplasmListDao == null) {
+			germplasmListDao = new GermplasmListDAO();
+		}
+		germplasmListDao.setSession(getActiveSession());
+		return germplasmListDao;
+	}
+	
+	protected final GermplasmListDataDAO getGermplasmListDataDAO() {
+		if (germplasmListDataDao == null) {
+			germplasmListDataDao = new GermplasmListDataDAO();
+		}
+		germplasmListDataDao.setSession(getActiveSession());
+		return germplasmListDataDao;
+	}
+
+    //================================  InventoryDataManager DAO Methods =============================
+	
+    protected final LotDAO getLotDao() {
+        if (lotDao == null) {
+            lotDao = new LotDAO();
+        }
+        lotDao.setSession(getActiveSession());
+        return lotDao;
+    }
+
+    protected final PersonDAO getPersonDao() {
+        if (personDao == null) {
+            personDao = new PersonDAO();
+        }
+        personDao.setSession(getActiveSession());
+        return personDao;
+    }
+
+    protected final TransactionDAO getTransactionDao() {
+        if (transactionDao == null) {
+            transactionDao = new TransactionDAO();
+        }
+        transactionDao.setSession(getActiveSession());
+        return transactionDao;
+    }    
+
+    //================================  StudyDataManagerv1 DAO Methods =============================
+    
+
+    protected final CharacterDataDAO getCharacterDataDao() {
+        if (characterDataDao == null) {
+            characterDataDao = new CharacterDataDAO();
+        }
+        characterDataDao.setSession(getActiveSession());
+        return characterDataDao;
+    }
+
+    protected final CharacterLevelDAO getCharacterLevelDao() {
+        if (characterLevelDao == null) {
+            characterLevelDao = new CharacterLevelDAO();
+        }
+        characterLevelDao.setSession(getActiveSession());
+        return characterLevelDao;
+    }
+
+    protected final FactorDAO getFactorDao() {
+        if (factorDao == null) {
+            factorDao = new FactorDAO();
+        }
+        factorDao.setSession(getActiveSession());
+        return factorDao;
+    }
+
+    protected final NumericDataDAO getNumericDataDao() {
+        if (numericDataDao == null) {
+            numericDataDao = new NumericDataDAO();
+        }
+        numericDataDao.setSession(getActiveSession());
+        return numericDataDao;
+    }
+
+    protected final NumericLevelDAO getNumericLevelDao() {
+        if (numericLevelDao == null) {
+            numericLevelDao = new NumericLevelDAO();
+        }
+        numericLevelDao.setSession(getActiveSession());
+        return numericLevelDao;
+    }
+
+    protected final OindexDAO getOindexDao() {
+        if (oIndexDao == null) {
+            oIndexDao = new OindexDAO();
+        }
+        oIndexDao.setSession(getActiveSession());
+        return oIndexDao;
+    }
+
+    protected final RepresentationDAO getRepresentationDao() {
+        if (representationDao == null) {
+            representationDao = new RepresentationDAO();
+        }
+        representationDao.setSession(getActiveSession());
+        return representationDao;
+    }
+
+    protected final StudyDAO getStudyDao() {
+        if (studyDao == null) {
+            studyDao = new StudyDAO();
+        }
+        studyDao.setSession(getActiveSession());
+        return studyDao;
+    }
+
+    protected final StudyEffectDAO getStudyEffectDao() {
+        if (studyEffectDao == null) {
+            studyEffectDao = new StudyEffectDAO();
+        }
+        studyEffectDao.setSession(getActiveSession());
+        return studyEffectDao;
+    }
+
+    protected final TraitDAO getTraitDao() {
+        if (traitDao == null) {
+            traitDao = new TraitDAO();
+        }
+        traitDao.setSession(getActiveSession());
+        return traitDao;
+    }
+
+    protected final VariateDAO getVariateDao() {
+        if (variateDao == null) {
+            variateDao = new VariateDAO();
+        }
+        variateDao.setSession(getActiveSession());
+        return variateDao;
+    }
+    
+    //================================  StudyDataManagerv1 DAO Methods =============================
+
+    protected final ScaleContinuousDAO getScaleContinuousDao() {
+        if (scaleContinuousDao == null){
+            scaleContinuousDao = new ScaleContinuousDAO();
+        }
+        scaleContinuousDao.setSession(getActiveSession());
+        return scaleContinuousDao;
+    }
+    
+    protected final ScaleDAO getScaleDao() {
+        if (scaleDao == null){
+            scaleDao = new ScaleDAO();
+        }
+        scaleDao.setSession(getActiveSession());
+        return scaleDao;
+    }
+
+    protected final ScaleDiscreteDAO getScaleDiscreteDao() {
+        if (scaleDiscreteDao == null){
+            scaleDiscreteDao = new ScaleDiscreteDAO();
+        }
+        scaleDiscreteDao.setSession(getActiveSession());
+        return scaleDiscreteDao;
+    }
+    
+    protected final TraitMethodDAO getTraitMethodDao() {
+        if (traitMethodDao == null){
+            traitMethodDao = new TraitMethodDAO();
+        }
+        traitMethodDao.setSession(getActiveSession());
+        return traitMethodDao;
+    }
+    
+    //================================  UserDataManager DAO Methods =============================
+
+
+    protected final InstallationDAO getInstallationDao() {
+        if (installationDao == null) {
+            installationDao = new InstallationDAO();
+        }
+        installationDao.setSession(getActiveSession());
+        return installationDao;
+    }
+
+    //===========================================================================================
     
     protected final void clearSessions() {
     	if (sessionForLocal != null) {

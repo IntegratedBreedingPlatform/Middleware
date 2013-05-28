@@ -31,64 +31,66 @@ public class CharacterDataDAO extends GenericDAO<CharacterData, CharacterDataPK>
     @SuppressWarnings("unchecked")
     public List<Integer> getObservationUnitIdsByTraitScaleMethodAndValueCombinations(List<TraitCombinationFilter> filters, int start,
             int numOfRows) throws MiddlewareQueryException {
+    	List<Integer> toReturn =  new ArrayList<Integer>();
         try {
-            Criteria criteria = getSession().createCriteria(CharacterData.class);
-            criteria.createAlias("variate", "variate");
-            criteria.setProjection(Projections.distinct(Projections.property("id.observationUnitId")));
-
-            // keeps track if at least one filter was added
-            boolean filterAdded = false;
-
-            for (TraitCombinationFilter combination : filters) {
-                Object value = combination.getValue();
-
-                // accept only String values
-                if (value instanceof String) {
-                    criteria.add(Restrictions.eq("variate.traitId", combination.getTraitId()));
-                    criteria.add(Restrictions.eq("variate.scaleId", combination.getScaleId()));
-                    criteria.add(Restrictions.eq("variate.methodId", combination.getMethodId()));
-                    criteria.add(Restrictions.eq("value", value));
-
-                    filterAdded = true;
-                }
-            }
-
-            if (filterAdded) {
-                // if there is at least one filter, execute query and return results
-                criteria.setFirstResult(start);
-                criteria.setMaxResults((numOfRows));
-                return criteria.list();
-            } else {
-                // return empty list if no filter was added
-                return new ArrayList<Integer>();
-            }
+        	if (filters != null && filters.size() > 0){
+	            Criteria criteria = getSession().createCriteria(CharacterData.class);
+	            criteria.createAlias("variate", "variate");
+	            criteria.setProjection(Projections.distinct(Projections.property("id.observationUnitId")));
+	
+	            // keeps track if at least one filter was added
+	            boolean filterAdded = false;
+	
+	            for (TraitCombinationFilter combination : filters) {
+	                Object value = combination.getValue();
+	
+	                // accept only String values
+	                if (value instanceof String) {
+	                    criteria.add(Restrictions.eq("variate.traitId", combination.getTraitId()));
+	                    criteria.add(Restrictions.eq("variate.scaleId", combination.getScaleId()));
+	                    criteria.add(Restrictions.eq("variate.methodId", combination.getMethodId()));
+	                    criteria.add(Restrictions.eq("value", value));
+	
+	                    filterAdded = true;
+	                }
+	            }
+	
+	            if (filterAdded) {
+	                // if there is at least one filter, execute query and return results
+	                criteria.setFirstResult(start);
+	                criteria.setMaxResults((numOfRows));
+	                toReturn = criteria.list();
+	            }
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getObservationUnitIdsByTraitScaleMethodAndValueCombinations(filters=" + filters
                     + ") query from CharacterData: " + e.getMessage(), e);
         }
-        return new ArrayList<Integer>();
+        return toReturn;
     }
 
     @SuppressWarnings("rawtypes")
     public List<CharacterDataElement> getValuesByOunitIDList(List<Integer> ounitIdList) throws MiddlewareQueryException {
         List<CharacterDataElement> dataValues = new ArrayList<CharacterDataElement>();
         try {
-            SQLQuery query = getSession().createSQLQuery(CharacterData.GET_BY_OUNIT_ID_LIST);
-            query.setParameterList("ounitIdList", ounitIdList);
-
-            List results = query.list();
-            for (Object o : results) {
-                Object[] result = (Object[]) o;
-                if (result != null) {
-                    Integer ounitId = (Integer) result[0];
-                    Integer variateId = (Integer) result[1];
-                    String variateName = (String) result[2];
-                    String value = (String) result[3];
-
-                    CharacterDataElement dataElement = new CharacterDataElement(ounitId, variateId, variateName, value);
-                    dataValues.add(dataElement);
-                }
-            }
+        	if (ounitIdList != null && ounitIdList.size() > 0){
+	            SQLQuery query = getSession().createSQLQuery(CharacterData.GET_BY_OUNIT_ID_LIST);
+	            query.setParameterList("ounitIdList", ounitIdList);
+	
+	            List results = query.list();
+	            for (Object o : results) {
+	                Object[] result = (Object[]) o;
+	                if (result != null) {
+	                    Integer ounitId = (Integer) result[0];
+	                    Integer variateId = (Integer) result[1];
+	                    String variateName = (String) result[2];
+	                    String value = (String) result[3];
+	
+	                    CharacterDataElement dataElement = new CharacterDataElement(ounitId, variateId, variateName, value);
+	                    dataValues.add(dataElement);
+	                }
+	            }
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getValuesByOunitIDList(ounitIdList=" + ounitIdList + ") query from CharacterData: "
                     + e.getMessage(), e);

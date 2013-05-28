@@ -26,10 +26,11 @@ public class RepresentationDAO extends GenericDAO<Representation, Integer>{
     @SuppressWarnings("unchecked")
     public List<Representation> getRepresentationByEffectID(Integer effectId) throws MiddlewareQueryException {
         try {
-            Query query = getSession().getNamedQuery(Representation.GET_REPRESENTATION_BY_EFFECT_ID);
-            query.setParameter("effectId", effectId);
-
-            return (List<Representation>) query.list();
+        	if (effectId != null){
+	            Query query = getSession().getNamedQuery(Representation.GET_REPRESENTATION_BY_EFFECT_ID);
+	            query.setParameter("effectId", effectId);
+	            return (List<Representation>) query.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException(
                     "Error with getRepresentationByEffectID(effectId=" + effectId + ") query from Representation: " + e.getMessage(), e);
@@ -40,10 +41,11 @@ public class RepresentationDAO extends GenericDAO<Representation, Integer>{
     @SuppressWarnings("unchecked")
     public List<Representation> getRepresentationByStudyID(Integer studyId) throws MiddlewareQueryException {
         try {
-            Query query = getSession().getNamedQuery(Representation.GET_REPRESENTATION_BY_STUDY_ID);
-            query.setParameter("studyId", studyId);
-
-            return (List<Representation>) query.list();
+        	if (studyId != null){
+	            Query query = getSession().getNamedQuery(Representation.GET_REPRESENTATION_BY_STUDY_ID);
+	            query.setParameter("studyId", studyId);
+	            return (List<Representation>) query.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException(
                     "Error with getRepresentationByStudyID(studyId=" + studyId + ") query from Representation: " + e.getMessage(), e);

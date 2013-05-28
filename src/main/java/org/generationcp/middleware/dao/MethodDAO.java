@@ -32,7 +32,6 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
     public List<Method> getAllMethod() throws MiddlewareQueryException {
         try {
             Query query = getSession().getNamedQuery(Method.GET_ALL);
-
             return (List<Method>) query.list();
         } catch (HibernateException e) {
             logAndThrowException("Error with getAllMethod() query from Method: " + e.getMessage(), e);

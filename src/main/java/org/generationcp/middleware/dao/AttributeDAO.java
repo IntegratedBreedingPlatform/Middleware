@@ -24,14 +24,17 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer>{
 
     @SuppressWarnings("unchecked")
     public List<Attribute> getByGID(Integer gid) throws MiddlewareQueryException {
-        try {
-            Query query = getSession().getNamedQuery(Attribute.GET_BY_GID);
-            query.setParameter("gid", gid);
-            return (List<Attribute>) query.list();
+    	List<Attribute> toReturn = new ArrayList<Attribute>();
+    	try {
+    		if (gid != null){    	    	
+    			Query query = getSession().getNamedQuery(Attribute.GET_BY_GID);
+    			query.setParameter("gid", gid);
+    			toReturn = (List<Attribute>) query.list();
+    		}            	
         } catch (HibernateException e) {
             logAndThrowException("Error with getByGID(gid=" + gid + ") query from Attributes: " + e.getMessage(), e);
         }
-        return new ArrayList<Attribute>();
+        return toReturn;
     }
 
     public void validateId(Attribute attribute) throws MiddlewareQueryException {

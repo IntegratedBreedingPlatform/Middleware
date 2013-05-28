@@ -15,11 +15,6 @@ package org.generationcp.middleware.manager;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.dao.ScaleContinuousDAO;
-import org.generationcp.middleware.dao.ScaleDAO;
-import org.generationcp.middleware.dao.ScaleDiscreteDAO;
-import org.generationcp.middleware.dao.TraitDAO;
-import org.generationcp.middleware.dao.TraitMethodDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.TraitDataManager;
@@ -38,12 +33,6 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
 
     private static final Logger LOG = LoggerFactory.getLogger(TraitDataManagerImpl.class);
 
-    private ScaleContinuousDAO scaleContinuousDao;
-    private ScaleDAO scaleDao;
-    private ScaleDiscreteDAO scaleDiscreteDao;
-    private TraitDAO traitDao;
-    private TraitMethodDAO traitMethodDao;
-
     public TraitDataManagerImpl() {
     }
 
@@ -55,46 +44,6 @@ public class TraitDataManagerImpl extends DataManager implements TraitDataManage
         super(sessionForLocal, sessionForCentral);
     }
     
-    private ScaleContinuousDAO getScaleContinuousDao() {
-        if (scaleContinuousDao == null){
-            scaleContinuousDao = new ScaleContinuousDAO();
-        }
-        scaleContinuousDao.setSession(getActiveSession());
-        return scaleContinuousDao;
-    }
-    
-    private ScaleDAO getScaleDao() {
-        if (scaleDao == null){
-            scaleDao = new ScaleDAO();
-        }
-        scaleDao.setSession(getActiveSession());
-        return scaleDao;
-    }
-
-    private ScaleDiscreteDAO getScaleDiscreteDao() {
-        if (scaleDiscreteDao == null){
-            scaleDiscreteDao = new ScaleDiscreteDAO();
-        }
-        scaleDiscreteDao.setSession(getActiveSession());
-        return scaleDiscreteDao;
-    }
-    
-    private TraitDAO getTraitDao() {
-        if (traitDao == null){
-            traitDao = new TraitDAO();
-        }
-        traitDao.setSession(getActiveSession());
-        return traitDao;
-    }
-
-    private TraitMethodDAO getTraitMethodDao() {
-        if (traitMethodDao == null){
-            traitMethodDao = new TraitMethodDAO();
-        }
-        traitMethodDao.setSession(getActiveSession());
-        return traitMethodDao;
-    }
-
     @Override
     public Scale getScaleByID(Integer id) throws MiddlewareQueryException {
         if (setWorkingDatabase(id)){

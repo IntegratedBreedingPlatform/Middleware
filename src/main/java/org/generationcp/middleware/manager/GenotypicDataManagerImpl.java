@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.gdms.AccMetadataSetDAO;
 import org.generationcp.middleware.dao.gdms.AlleleValuesDAO;
 import org.generationcp.middleware.dao.gdms.CharValuesDAO;
@@ -27,13 +26,11 @@ import org.generationcp.middleware.dao.gdms.DartValuesDAO;
 import org.generationcp.middleware.dao.gdms.DatasetDAO;
 import org.generationcp.middleware.dao.gdms.DatasetUsersDAO;
 import org.generationcp.middleware.dao.gdms.MapDAO;
-import org.generationcp.middleware.dao.gdms.MappingDataDAO;
 import org.generationcp.middleware.dao.gdms.MappingPopDAO;
 import org.generationcp.middleware.dao.gdms.MappingPopValuesDAO;
 import org.generationcp.middleware.dao.gdms.MarkerAliasDAO;
 import org.generationcp.middleware.dao.gdms.MarkerDAO;
 import org.generationcp.middleware.dao.gdms.MarkerDetailsDAO;
-import org.generationcp.middleware.dao.gdms.MarkerInfoDAO;
 import org.generationcp.middleware.dao.gdms.MarkerMetadataSetDAO;
 import org.generationcp.middleware.dao.gdms.MarkerOnMapDAO;
 import org.generationcp.middleware.dao.gdms.MarkerUserInfoDAO;
@@ -91,27 +88,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     private static final Logger LOG = LoggerFactory.getLogger(GenotypicDataManagerImpl.class);
 
-    private NameDAO nameDao;
-    private AccMetadataSetDAO accMetadataSetDao;
-    private AlleleValuesDAO alleleValuesDao;
-    private CharValuesDAO charValuesDao;
-    private DartValuesDAO dartValuesDao;
-    private DatasetDAO datasetDao;
-    private DatasetUsersDAO datasetUsersDao;
-    private MapDAO mapDao;
-    private MappingDataDAO mappingDataDao;
-    private MappingPopDAO mappingPopDao;
-    private MappingPopValuesDAO mappingPopValuesDao;
-    private MarkerAliasDAO markerAliasDao;
-    private MarkerDAO markerDao;
-    private MarkerDetailsDAO markerDetailsDao;
-    private MarkerInfoDAO markerInfoDao;
-    private MarkerMetadataSetDAO markerMetadataSetDao;
-    private MarkerOnMapDAO markerOnMapDao;
-    private MarkerUserInfoDAO markerUserInfoDao;
-    private QtlDAO qtlDao;
-    private QtlDetailsDAO qtlDetailsDao;
-
     public GenotypicDataManagerImpl() {
     }
 
@@ -121,166 +97,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     public GenotypicDataManagerImpl(Session sessionForLocal, Session sessionForCentral) {
         super(sessionForLocal, sessionForCentral);
-    }
-
-    private NameDAO getNameDao() {
-        if (nameDao == null) {
-            nameDao = new NameDAO();
-        }
-        nameDao.setSession(getActiveSession());
-        return nameDao;
-    }
-
-    private AccMetadataSetDAO getAccMetadataSetDao() {
-        if (accMetadataSetDao == null) {
-            accMetadataSetDao = new AccMetadataSetDAO();
-        }
-        accMetadataSetDao.setSession(getActiveSession());
-        return accMetadataSetDao;
-    }
-
-    private AlleleValuesDAO getAlleleValuesDao() {
-        if (alleleValuesDao == null) {
-            alleleValuesDao = new AlleleValuesDAO();
-        }
-        alleleValuesDao.setSession(getActiveSession());
-        return alleleValuesDao;
-    }
-
-    private CharValuesDAO getCharValuesDao() {
-        if (charValuesDao == null) {
-            charValuesDao = new CharValuesDAO();
-        }
-        charValuesDao.setSession(getActiveSession());
-        return charValuesDao;
-    }
-
-    private DartValuesDAO getDartValuesDao() {
-        if (dartValuesDao == null) {
-            dartValuesDao = new DartValuesDAO();
-        }
-        dartValuesDao.setSession(getActiveSession());
-        return dartValuesDao;
-    }
-
-    private DatasetDAO getDatasetDao() {
-        if (datasetDao == null) {
-            datasetDao = new DatasetDAO();
-        }
-        datasetDao.setSession(getActiveSession());
-        return datasetDao;
-    }
-
-    private DatasetUsersDAO getDatasetUsersDao() {
-        if (datasetUsersDao == null) {
-            datasetUsersDao = new DatasetUsersDAO();
-        }
-        datasetUsersDao.setSession(getActiveSession());
-        return datasetUsersDao;
-    }
-
-    private MapDAO getMapDao() {
-        if (mapDao == null) {
-            mapDao = new MapDAO();
-        }
-        mapDao.setSession(getActiveSession());
-        return mapDao;
-    }
-
-    private MappingDataDAO getMappingDataDao() {
-        if (mappingDataDao == null) {
-            mappingDataDao = new MappingDataDAO();
-        }
-        mappingDataDao.setSession(getActiveSession());
-        return mappingDataDao;
-    }
-
-    private MappingPopDAO getMappingPopDao() {
-        if (mappingPopDao == null) {
-            mappingPopDao = new MappingPopDAO();
-        }
-        mappingPopDao.setSession(getActiveSession());
-        return mappingPopDao;
-    }
-
-    private MappingPopValuesDAO getMappingPopValuesDao() {
-        if (mappingPopValuesDao == null) {
-            mappingPopValuesDao = new MappingPopValuesDAO();
-        }
-        mappingPopValuesDao.setSession(getActiveSession());
-        return mappingPopValuesDao;
-    }
-
-    private MarkerAliasDAO getMarkerAliasDao() {
-        if (markerAliasDao == null) {
-            markerAliasDao = new MarkerAliasDAO();
-        }
-        markerAliasDao.setSession(getActiveSession());
-        return markerAliasDao;
-    }
-
-    private MarkerDAO getMarkerDao() {
-        if (markerDao == null) {
-            markerDao = new MarkerDAO();
-        }
-        markerDao.setSession(getActiveSession());
-        return markerDao;
-    }
-
-    private MarkerDetailsDAO getMarkerDetailsDao() {
-        if (markerDetailsDao == null) {
-            markerDetailsDao = new MarkerDetailsDAO();
-        }
-        markerDetailsDao.setSession(getActiveSession());
-        return markerDetailsDao;
-    }
-
-    private MarkerInfoDAO getMarkerInfoDao() {
-        if (markerInfoDao == null) {
-            markerInfoDao = new MarkerInfoDAO();
-        }
-        markerInfoDao.setSession(getActiveSession());
-        return markerInfoDao;
-    }
-
-    private MarkerMetadataSetDAO getMarkerMetadataSetDao() {
-        if (markerMetadataSetDao == null) {
-            markerMetadataSetDao = new MarkerMetadataSetDAO();
-        }
-        markerMetadataSetDao.setSession(getActiveSession());
-        return markerMetadataSetDao;
-    }
-
-    private MarkerOnMapDAO getMarkerOnMapDao() {
-        if (markerOnMapDao == null) {
-            markerOnMapDao = new MarkerOnMapDAO();
-        }
-        markerOnMapDao.setSession(getActiveSession());
-        return markerOnMapDao;
-    }
-
-    private MarkerUserInfoDAO getMarkerUserInfoDao() {
-        if (markerUserInfoDao == null) {
-            markerUserInfoDao = new MarkerUserInfoDAO();
-        }
-        markerUserInfoDao.setSession(getActiveSession());
-        return markerUserInfoDao;
-    }
-
-    private QtlDAO getQtlDao() {
-        if (qtlDao == null) {
-            qtlDao = new QtlDAO();
-        }
-        qtlDao.setSession(getActiveSession());
-        return qtlDao;
-    }
-
-    private QtlDetailsDAO getQtlDetailsDao() {
-        if (qtlDetailsDao == null) {
-            qtlDetailsDao = new QtlDetailsDAO();
-        }
-        qtlDetailsDao.setSession(getActiveSession());
-        return qtlDetailsDao;
     }
 
     @Override
@@ -605,14 +421,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     
     private List<Integer> getNIdsByMarkerIdsAndDatasetIdsAndNotGIdsFromDB(List<Integer> datasetIds, List<Integer> markerIds,
-            List<Integer> gIds) throws MiddlewareQueryException {
+            List<Integer> gIds, int start, int numOfRows) throws MiddlewareQueryException {
         Set<Integer> nidSet = new TreeSet<Integer>();
         
         if (setWorkingDatabase(Database.CENTRAL)){
-            nidSet.addAll(getAccMetadataSetDao().getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds));
+            nidSet.addAll(getAccMetadataSetDao().getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds, start, numOfRows));
         }
         if (setWorkingDatabase(Database.LOCAL)){
-            nidSet.addAll(getAccMetadataSetDao().getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds));
+            nidSet.addAll(getAccMetadataSetDao().getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds, start, numOfRows));
         }
 
         return new ArrayList<Integer>(((TreeSet<Integer>)nidSet).descendingSet());
@@ -621,15 +437,21 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<Integer> getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(List<Integer> datasetIds, List<Integer> markerIds, List<Integer> gIds,
             int start, int numOfRows) throws MiddlewareQueryException {
-        List<Integer> nidList = getNIdsByMarkerIdsAndDatasetIdsAndNotGIdsFromDB(datasetIds, markerIds, gIds);
-        return nidList.subList(start, start+numOfRows);
+        List<Integer> nidList = getNIdsByMarkerIdsAndDatasetIdsAndNotGIdsFromDB(datasetIds, markerIds, gIds, start, numOfRows);
+    	return nidList; //.subList(start, start+numOfRows);
     }
 
     @Override
     public int countNIdsByMarkerIdsAndDatasetIdsAndNotGIds(List<Integer> datasetIds, List<Integer> markerIds, List<Integer> gIds)
             throws MiddlewareQueryException {
-        List<Integer> nidList = getNIdsByMarkerIdsAndDatasetIdsAndNotGIdsFromDB(datasetIds, markerIds, gIds);
-        return nidList.size();
+    	int count = 0;
+        if (setWorkingDatabase(Database.CENTRAL)){
+            count += getAccMetadataSetDao().countNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds);
+        }
+        if (setWorkingDatabase(Database.LOCAL)){
+        	count += getAccMetadataSetDao().countNIdsByMarkerIdsAndDatasetIdsAndNotGIds(datasetIds, markerIds, gIds);
+        }
+        return count;
     }
 
     private List<Integer> getNIdsByMarkerIdsAndDatasetIds(List<Integer> datasetIds, List<Integer> markerIds) throws MiddlewareQueryException {

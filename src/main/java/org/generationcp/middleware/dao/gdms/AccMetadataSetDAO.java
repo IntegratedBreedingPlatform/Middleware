@@ -33,22 +33,14 @@ import org.hibernate.SQLQuery;
  */
 public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer>{
 
-    /**
-     * Gets the name ids by germplasm ids.
-     *
-     * @param gIds the germplasm ids
-     * @return the name ids by germplasm ids
-     */
     @SuppressWarnings("unchecked")
     public List<Integer> getNameIdsByGermplasmIds(List<Integer> gIds) throws MiddlewareQueryException {
         try {
-            if (gIds == null || gIds.isEmpty()) {
-                return new ArrayList<Integer>();
+            if (gIds != null && !gIds.isEmpty()){
+	            SQLQuery query = getSession().createSQLQuery(AccMetadataSet.GET_NAME_IDS_BY_GERMPLASM_IDS);
+	            query.setParameterList("gIdList", gIds);
+	            return (List<Integer>) query.list();
             }
-
-            SQLQuery query = getSession().createSQLQuery(AccMetadataSet.GET_NAME_IDS_BY_GERMPLASM_IDS);
-            query.setParameterList("gIdList", gIds);
-            return (List<Integer>) query.list();
         } catch (HibernateException e) {
         	logAndThrowException("Error with getNameIdsByGermplasmIds(" + gIds + ") query from AccMetadataSet: " + e.getMessage(), e);
         }
@@ -58,8 +50,9 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer>{
     @SuppressWarnings("unchecked")
     public List<Integer> getNIDsByDatasetIds(List<Integer> datasetIds, List<Integer> gids, int start, int numOfRows)
             throws MiddlewareQueryException {
-        try {
-            List<Integer> nids;
+        List<Integer> nids = new ArrayList<Integer>();
+        try { 
+        	if (datasetIds != null && !datasetIds.isEmpty()){
             SQLQuery query;
 
             if (gids == null || gids.isEmpty()) {
@@ -74,31 +67,48 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer>{
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
             nids = query.list();
-
-            return nids;
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getNIDsByDatasetIds(datasetIds=" + datasetIds + ", gids=" + gids + ") query from AccMetadataSet: "
                     + e.getMessage(), e);
         }
-        return new ArrayList<Integer>();
+        return nids;
     }
     
     @SuppressWarnings("unchecked")
-    public Set<Integer> getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(List<Integer> datasetIds, List<Integer> markerIds, List<Integer> gIds)
+    public Set<Integer> getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(List<Integer> datasetIds, List<Integer> markerIds, List<Integer> gIds, int start, int numOfRows)
             throws MiddlewareQueryException {
         try {
             
-            SQLQuery query;
-
-            query = getSession().createSQLQuery(AccMetadataSet.GET_NIDS_BY_DATASET_IDS_AND_MARKER_IDS_AND_NOT_GIDS);
-            query.setParameterList("gids", gIds);
-            query.setParameterList("represnos", datasetIds);
-            query.setParameterList("markerids", markerIds);
-            //query.setFirstResult(start);
-            //query.setMaxResults(numOfRows);
-            Set<Integer> nidSet = new TreeSet<Integer>(query.list());
-
-            return nidSet;
+        	if (datasetIds != null && !datasetIds.isEmpty()){
+        		StringBuilder queryString = new StringBuilder(AccMetadataSet.GET_NIDS_BY_DATASET_IDS_AND_MARKER_IDS_AND_NOT_GIDS_SELECT);
+        		queryString.append(AccMetadataSet.GET_NIDS_BY_DATASET_IDS_AND_MARKER_IDS_AND_NOT_GIDS_FROM);
+        		
+        		if (markerIds != null && !markerIds.isEmpty()){
+        			queryString.append(AccMetadataSet.GET_NIDS_BY_DATASET_IDS_FILTER_BY_MARKER_IDS);
+	            }
+	            
+        		if (gIds != null && !gIds.isEmpty()){
+        			queryString.append(AccMetadataSet.GET_NIDS_BY_DATASET_IDS_FILTER_NOT_BY_GIDS);
+        		}
+        		
+        		queryString.append(AccMetadataSet.GET_NIDS_BY_DATASET_IDS_ORDER);
+        		
+	            SQLQuery query;
+	            query = getSession().createSQLQuery(queryString.toString());
+	            query.setParameterList("represnos", datasetIds);
+	            if (markerIds != null && !markerIds.isEmpty()){
+	        		query.setParameterList("markerids", markerIds);
+	            }
+        		if (gIds != null && !gIds.isEmpty()){
+        			query.setParameterList("gids", gIds);
+        		}
+        		query.setFirstResult(start);
+        		query.setMaxResults(numOfRows);
+        		
+	            Set<Integer> nidSet = new TreeSet<Integer>(query.list());
+	            return nidSet;
+        	}
             
         } catch (HibernateException e) {
         	logAndThrowException("Error with getNIDsByDatasetIdsAndMarkerIdsAndNotGIDs(datasetIds=" + datasetIds + ", markerIds=" + markerIds + ", gIds=" + gIds + ") query from AccMetadataSet: "
@@ -107,20 +117,69 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer>{
         return new TreeSet<Integer>();
     }
     
+    public int countNIdsByMarkerIdsAndDatasetIdsAndNotGIds(List<Integer> datasetIds, List<Integer> markerIds, List<Integer> gIds)
+            throws MiddlewareQueryException {
+        try {
+            
+        	if (datasetIds != null && !datasetIds.isEmpty()){
+        		StringBuilder queryString = new StringBuilder(AccMetadataSet.COUNT_NIDS_BY_DATASET_IDS_AND_MARKER_IDS_AND_NOT_GIDS_SELECT);
+        		queryString.append(AccMetadataSet.GET_NIDS_BY_DATASET_IDS_AND_MARKER_IDS_AND_NOT_GIDS_FROM);
+        		
+        		if (markerIds != null && !markerIds.isEmpty()){
+        			queryString.append(AccMetadataSet.GET_NIDS_BY_DATASET_IDS_FILTER_BY_MARKER_IDS);
+	            }
+	            
+        		if (gIds != null && !gIds.isEmpty()){
+        			queryString.append(AccMetadataSet.GET_NIDS_BY_DATASET_IDS_FILTER_NOT_BY_GIDS);
+        		}
+        		
+        		queryString.append(AccMetadataSet.GET_NIDS_BY_DATASET_IDS_ORDER);
+        		
+	            SQLQuery query;
+	            query = getSession().createSQLQuery(queryString.toString());
+	            query.setParameterList("represnos", datasetIds);
+	            if (markerIds != null && !markerIds.isEmpty()){
+	        		query.setParameterList("markerids", markerIds);
+	            }
+        		if (gIds != null && !gIds.isEmpty()){
+        			query.setParameterList("gids", gIds);
+        		}
+        		
+        		return ((BigInteger) query.uniqueResult()).intValue();
+        	}
+            
+        } catch (HibernateException e) {
+        	logAndThrowException("Error with countNIDsByDatasetIdsAndMarkerIdsAndNotGIDs(datasetIds=" + datasetIds 
+        			+ ", markerIds=" + markerIds + ", gIds=" + gIds + ") query from AccMetadataSet: "
+                    + e.getMessage(), e);
+        }
+        return 0;
+    }
+
     @SuppressWarnings("unchecked")
     public Set<Integer> getNIdsByMarkerIdsAndDatasetIds(List<Integer> datasetIds, List<Integer> markerIds)
             throws MiddlewareQueryException {
         try {
             
-            SQLQuery query;
-
-            query = getSession().createSQLQuery(AccMetadataSet.GET_NIDS_BY_DATASET_IDS_AND_MARKER_IDS);
-            query.setParameterList("represnos", datasetIds);
-            query.setParameterList("markerids", markerIds);
+        	if (datasetIds != null && !datasetIds.isEmpty()){
             
-            Set<Integer> nidSet = new TreeSet<Integer>(query.list());
-
-            return nidSet;
+        		StringBuilder queryString = new StringBuilder(AccMetadataSet.GET_NIDS_BY_DATASET_IDS_AND_MARKER_IDS);
+        		
+        		if (markerIds != null && !markerIds.isEmpty()){
+        			queryString.append(AccMetadataSet.GET_NIDS_BY_DATASET_IDS_FILTER_BY_MARKER_IDS);
+        		}
+        		queryString.append(AccMetadataSet.GET_NIDS_BY_DATASET_IDS_ORDER);
+        		
+        		SQLQuery query;
+        		query = getSession().createSQLQuery(queryString.toString());
+        		query.setParameterList("represnos", datasetIds);
+        		if (markerIds != null && !markerIds.isEmpty()){
+            		query.setParameterList("markerids", markerIds);
+        		}
+            
+        		Set<Integer> nidSet = new TreeSet<Integer>(query.list());
+        		return nidSet;
+        	}
             
         } catch (HibernateException e) {
         	logAndThrowException("Error with getNIdsByMarkerIdsAndDatasetIds(datasetIds=" + datasetIds + ", markerIds=" + markerIds + ") query from AccMetadataSet: "
@@ -131,11 +190,8 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer>{
 
     @SuppressWarnings("rawtypes")
     public List<AccMetadataSetPK> getAccMetadataSetByGids(List<Integer> gids, int start, int numOfRows) throws MiddlewareQueryException {
-
         List<AccMetadataSetPK> dataValues = new ArrayList<AccMetadataSetPK>();
         try {
-
-
             if (gids != null && !gids.isEmpty()) {
                 
                 SQLQuery query = getSession().createSQLQuery(AccMetadataSet.GET_ACC_METADATASETS_BY_GIDS);
@@ -152,9 +208,7 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer>{
                         Integer datasetId = (Integer) result[2];
 
                         AccMetadataSetPK dataElement = new AccMetadataSetPK(datasetId, gid, nid);
-
                         dataValues.add(dataElement);
-                        
                     }
                 }
             }

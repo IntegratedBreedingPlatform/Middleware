@@ -34,25 +34,31 @@ public class FactorDAO extends GenericDAO<Factor, Integer>{
     public Set<Integer> getGIDSByObservationUnitIds(Set<Integer> ounitIds, int start, int numOfRows) throws MiddlewareQueryException {
         Set<Integer> results = new HashSet<Integer>();
         try {
-            SQLQuery levelNQuery = getSession().createSQLQuery(Factor.GET_GID_FROM_NUMERIC_LEVELS_GIVEN_OBSERVATION_UNIT_IDS);
-            levelNQuery.setParameterList("ounitids", ounitIds);
-            levelNQuery.setFirstResult(start);
-            levelNQuery.setMaxResults(numOfRows);
+        	if (ounitIds != null & ounitIds.size() > 0){
+				SQLQuery levelNQuery = getSession()
+						.createSQLQuery(
+								Factor.GET_GID_FROM_NUMERIC_LEVELS_GIVEN_OBSERVATION_UNIT_IDS);
+				levelNQuery.setParameterList("ounitids", ounitIds);
+				levelNQuery.setFirstResult(start);
+				levelNQuery.setMaxResults(numOfRows);
 
-            List<Double> gids1 = levelNQuery.list();
-            for (Double gid : gids1) {
-                results.add(gid.intValue());
-            }
+				List<Double> gids1 = levelNQuery.list();
+				for (Double gid : gids1) {
+					results.add(gid.intValue());
+				}
 
-            SQLQuery levelCQuery = getSession().createSQLQuery(Factor.GET_GID_FROM_CHARACTER_LEVELS_GIVEN_OBSERVATION_UNIT_IDS);
-            levelCQuery.setParameterList("ounitids", ounitIds);
-            levelCQuery.setFirstResult(start);
-            levelCQuery.setMaxResults(numOfRows);
+				SQLQuery levelCQuery = getSession()
+						.createSQLQuery(
+								Factor.GET_GID_FROM_CHARACTER_LEVELS_GIVEN_OBSERVATION_UNIT_IDS);
+				levelCQuery.setParameterList("ounitids", ounitIds);
+				levelCQuery.setFirstResult(start);
+				levelCQuery.setMaxResults(numOfRows);
 
-            List<String> gids2 = levelCQuery.list();
-            for (String gid : gids2) {
-                results.add(Integer.parseInt(gid));
-            }
+				List<String> gids2 = levelCQuery.list();
+				for (String gid : gids2) {
+					results.add(Integer.parseInt(gid));
+				}
+        	}
 
         } catch (HibernateException e) {
             logAndThrowException(
@@ -63,96 +69,104 @@ public class FactorDAO extends GenericDAO<Factor, Integer>{
 
     @SuppressWarnings("unchecked")
     public List<Factor> getByStudyID(Integer studyId) throws MiddlewareQueryException {
+    	List<Factor> toReturn = new ArrayList<Factor>();
         try {
-            Query query = getSession().getNamedQuery(Factor.GET_FACTORS_BY_STUDYID);
-            query.setParameter("studyId", studyId);
-
-            List<Factor> results = query.list();
-            return results;
+        	if (studyId != null){
+	            Query query = getSession().getNamedQuery(Factor.GET_FACTORS_BY_STUDYID);
+	            query.setParameter("studyId", studyId);
+	            toReturn = query.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByStudyID(studyId=" + studyId + ") query from Factor: "
                     + e.getMessage(), e);
         }
-        return new ArrayList<Factor>();
+        return toReturn;
     }
 
     @SuppressWarnings("unchecked")
     public List<Factor> getByRepresentationID(Integer representationId) throws MiddlewareQueryException {
+    	List<Factor> toReturn = new ArrayList<Factor>();
         try {
-            SQLQuery query = getSession().createSQLQuery(Factor.GET_BY_REPRESENTATION_ID);
-            query.setParameter("representationId", representationId);
-            query.addEntity("f", Factor.class);
-
-            List<Factor> results = query.list();
-            return results;
+        	if (representationId != null){
+	            SQLQuery query = getSession().createSQLQuery(Factor.GET_BY_REPRESENTATION_ID);
+	            query.setParameter("representationId", representationId);
+	            query.addEntity("f", Factor.class);
+	            toReturn = query.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByRepresentationID(representationId=" + representationId
                     + ") query from Factor: " + e.getMessage(), e);
         }
-        return new ArrayList<Factor>();
+        return toReturn;
     }
 
     @SuppressWarnings("unchecked")
-    public String getMainLabel(Integer factorid) throws MiddlewareQueryException {
+    public String getMainLabel(Integer factorId) throws MiddlewareQueryException {
+    	String toReturn = null;
         try {
-            Criteria criteria = getSession().createCriteria(getPersistentClass());
-            criteria.add(Restrictions.eq("id", factorid));
-            criteria.add(Restrictions.eq("factorId", factorid));
-
-            List<Factor> results = criteria.list();
-            if (!results.isEmpty()) {
-                Factor factor = results.get(0);
-                return factor.getName();
-            }
+        	if (factorId != null){
+	            Criteria criteria = getSession().createCriteria(getPersistentClass());
+	            criteria.add(Restrictions.eq("id", factorId));
+	            criteria.add(Restrictions.eq("factorId", factorId));
+	
+	            List<Factor> results = criteria.list();
+	            if (!results.isEmpty()) {
+	                Factor factor = results.get(0);
+	                toReturn = factor.getName();
+	            }
+        	}
         } catch (HibernateException e) {
-            logAndThrowException("Error with getMainLabel(factorId=" + factorid + ") query from Factor: "
+            logAndThrowException("Error with getMainLabel(factorId=" + factorId + ") query from Factor: "
                     + e.getMessage(), e);
         }
-        return null;
+        return toReturn;
     }
     
     @SuppressWarnings("unchecked")
-    public Factor getFactorOfDatasetGivenTraitid(Integer representationId, Integer traitid) throws MiddlewareQueryException {
+    public Factor getFactorOfDatasetGivenTraitid(Integer representationId, Integer traitId) throws MiddlewareQueryException {
+    	Factor toReturn = null;
         try {
-            SQLQuery query = getSession().createSQLQuery(Factor.GET_FACTOR_OF_DATASET_GIVEN_TRAITID);
-            query.setParameter("representationId", representationId);
-            query.setParameter("traitid", traitid);
-            query.addEntity("f", Factor.class);
-            
-            List<Factor> results = query.list();
-            if(!results.isEmpty()){
-                Factor factor = results.get(0);
-                return factor;
-            }
+        	if (representationId != null && traitId != null){
+	            SQLQuery query = getSession().createSQLQuery(Factor.GET_FACTOR_OF_DATASET_GIVEN_TRAITID);
+	            query.setParameter("representationId", representationId);
+	            query.setParameter("traitid", traitId);
+	            query.addEntity("f", Factor.class);
+	            
+	            List<Factor> results = query.list();
+	            if(!results.isEmpty()){
+	                toReturn =  results.get(0);
+	            }
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getFactorOfDatasetGivenTid(representationId=" + representationId
-                    + ", traitid = " + traitid + ") query from Factor: " + e.getMessage(), e);
+                    + ", traitid = " + traitId + ") query from Factor: " + e.getMessage(), e);
         }
-        return null;
+        return toReturn;
     }
     
     public boolean isLabelNumeric(int labelId) throws MiddlewareQueryException {
+    	boolean toReturn = false;
         try {
             Query query = getSession().createSQLQuery(Factor.GET_LABEL_ID_DATATYPE);
             query.setParameter("labelid", labelId);
             
             String result = "";
             
-            if (!query.list().isEmpty()) 
+            if (!query.list().isEmpty()) {
                 result = (String) query.list().get(0);
-            else 
+            }else{ 
                 throw new HibernateException("Database Error: No Datatype assigned on the label id: " + labelId);
-            
-            if (result.equals(NUMERIC_DATATYPE)) 
-                return true;
-            else if (result.equals(CHARACTER_DATATYPE))
-               return false;
-            else
+            }
+            if (result.equals(NUMERIC_DATATYPE)){ 
+                toReturn = true;
+            }else if (result.equals(CHARACTER_DATATYPE)){
+            	toReturn = false;
+            }else{
                 throw new HibernateException("Database Error: No Datatype assigned on the label id: " + labelId);
+            }
         } catch (HibernateException e) {
-            logAndThrowException("Error with isLabelNumeric: " + e.getMessage(),
-                    e);
+            logAndThrowException("Error with isLabelNumeric: " + e.getMessage(), e);
         }
-        return false;
+        return toReturn;
     }
 }

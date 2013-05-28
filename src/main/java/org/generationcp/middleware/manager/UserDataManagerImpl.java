@@ -4,7 +4,6 @@ package org.generationcp.middleware.manager;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.dao.InstallationDAO;
 import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -22,9 +21,6 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
 
     private static final Logger LOG = LoggerFactory.getLogger(UserDataManagerImpl.class);
 
-    private InstallationDAO installationDao;
-    private PersonDAO personDao;
-
     public UserDataManagerImpl() {
         super();
     }
@@ -35,22 +31,6 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
 
     public UserDataManagerImpl(Session sessionForLocal, Session sessionForCentral) {
         super(sessionForLocal, sessionForCentral);
-    }
-
-    private InstallationDAO getInstallationDao() {
-        if (installationDao == null) {
-            installationDao = new InstallationDAO();
-        }
-        installationDao.setSession(getActiveSession());
-        return installationDao;
-    }
-
-    private PersonDAO getPersonDao() {
-        if (personDao == null) {
-            personDao = new PersonDAO();
-        }
-        personDao.setSession(getActiveSession());
-        return personDao;
     }
 
     @SuppressWarnings("unchecked")

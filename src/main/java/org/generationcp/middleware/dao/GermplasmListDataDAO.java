@@ -31,14 +31,16 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
     @SuppressWarnings("unchecked")
     public List<GermplasmListData> getByListId(Integer id, int start, int numOfRows) throws MiddlewareQueryException {
         try {
-            Criteria criteria = getSession().createCriteria(GermplasmListData.class);
-            criteria.createAlias("list", "l");
-            criteria.add(Restrictions.eq("l.id", id));
-            criteria.add(Restrictions.ne("status", STATUS_DELETED));
-            criteria.setFirstResult(start);
-            criteria.setMaxResults(numOfRows);
-            criteria.addOrder(Order.asc("entryId"));
-            return criteria.list();
+        	if (id != null){
+	            Criteria criteria = getSession().createCriteria(GermplasmListData.class);
+	            criteria.createAlias("list", "l");
+	            criteria.add(Restrictions.eq("l.id", id));
+	            criteria.add(Restrictions.ne("status", STATUS_DELETED));
+	            criteria.setFirstResult(start);
+	            criteria.setMaxResults(numOfRows);
+	            criteria.addOrder(Order.asc("entryId"));
+	            return criteria.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByListId(id=" + id + ") query from GermplasmListData " + e.getMessage(), e);
         }
@@ -47,12 +49,14 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 
     public long countByListId(Integer id) throws MiddlewareQueryException {
         try {
-            Criteria criteria = getSession().createCriteria(GermplasmListData.class);
-            criteria.createAlias("list", "l");
-            criteria.add(Restrictions.eq("l.id", id));
-            criteria.add(Restrictions.ne("status", STATUS_DELETED));
-            criteria.setProjection(Projections.rowCount());
-            return ((Long) criteria.uniqueResult()).longValue(); //count
+        	if (id != null){
+	            Criteria criteria = getSession().createCriteria(GermplasmListData.class);
+	            criteria.createAlias("list", "l");
+	            criteria.add(Restrictions.eq("l.id", id));
+	            criteria.add(Restrictions.ne("status", STATUS_DELETED));
+	            criteria.setProjection(Projections.rowCount());
+	            return ((Long) criteria.uniqueResult()).longValue(); //count
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with countByListId(id=" + id + ") query from GermplasmListData " + e.getMessage(), e);
         }
@@ -62,13 +66,15 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
     @SuppressWarnings("unchecked")
     public List<GermplasmListData> getByListIdAndGID(Integer listId, Integer gid) throws MiddlewareQueryException {
         try {
-            Criteria criteria = getSession().createCriteria(GermplasmListData.class);
-            criteria.createAlias("list", "l");
-            criteria.add(Restrictions.eq("l.id", listId));
-            criteria.add(Restrictions.eq("gid", gid));
-            criteria.add(Restrictions.ne("status", STATUS_DELETED));
-            criteria.addOrder(Order.asc("entryId"));
-            return criteria.list();
+        	if (listId != null && gid != null){
+	            Criteria criteria = getSession().createCriteria(GermplasmListData.class);
+	            criteria.createAlias("list", "l");
+	            criteria.add(Restrictions.eq("l.id", listId));
+	            criteria.add(Restrictions.eq("gid", gid));
+	            criteria.add(Restrictions.ne("status", STATUS_DELETED));
+	            criteria.addOrder(Order.asc("entryId"));
+	            return criteria.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByListIdAndGID(listId=" + listId + ", gid=" + gid
                     + ") query from GermplasmListData " + e.getMessage(), e);
@@ -78,13 +84,15 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 
     public GermplasmListData getByListIdAndEntryId(Integer listId, Integer entryId) throws MiddlewareQueryException {
         try {
-            Criteria criteria = getSession().createCriteria(GermplasmListData.class);
-            criteria.createAlias("list", "l");
-            criteria.add(Restrictions.eq("l.id", listId));
-            criteria.add(Restrictions.eq("entryId", entryId));
-            criteria.add(Restrictions.ne("status", STATUS_DELETED));
-            criteria.addOrder(Order.asc("entryId"));
-            return (GermplasmListData) criteria.uniqueResult();
+        	if (listId != null && entryId != null){
+	            Criteria criteria = getSession().createCriteria(GermplasmListData.class);
+	            criteria.createAlias("list", "l");
+	            criteria.add(Restrictions.eq("l.id", listId));
+	            criteria.add(Restrictions.eq("entryId", entryId));
+	            criteria.add(Restrictions.ne("status", STATUS_DELETED));
+	            criteria.addOrder(Order.asc("entryId"));
+	            return (GermplasmListData) criteria.uniqueResult();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByListIdAndEntryId(listId=" + listId + ", entryId=" + entryId
                     + ") query from GermplasmListData " + e.getMessage(), e);
@@ -95,15 +103,17 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
     @SuppressWarnings("unchecked")
     public List<GermplasmListData> getByGID(Integer gid, int start, int numOfRows) throws MiddlewareQueryException {
         try {
-            Criteria criteria = getSession().createCriteria(GermplasmListData.class);
-            criteria.createAlias("list", "l");
-            criteria.add(Restrictions.eq("gid", gid));
-            criteria.add(Restrictions.ne("status", STATUS_DELETED));
-            criteria.setFirstResult(start);
-            criteria.setMaxResults(numOfRows);
-            criteria.addOrder(Order.asc("l.id"));
-            criteria.addOrder(Order.asc("entryId"));
-            return criteria.list();
+        	if (gid != null){
+	            Criteria criteria = getSession().createCriteria(GermplasmListData.class);
+	            criteria.createAlias("list", "l");
+	            criteria.add(Restrictions.eq("gid", gid));
+	            criteria.add(Restrictions.ne("status", STATUS_DELETED));
+	            criteria.setFirstResult(start);
+	            criteria.setMaxResults(numOfRows);
+	            criteria.addOrder(Order.asc("l.id"));
+	            criteria.addOrder(Order.asc("entryId"));
+	            return criteria.list();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByGID(gid=" + gid + ") query from GermplasmListData " + e.getMessage(), e);
         }
@@ -112,11 +122,13 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 
     public long countByGID(Integer gid) throws MiddlewareQueryException {
         try {
-            Criteria criteria = getSession().createCriteria(GermplasmListData.class);
-            criteria.add(Restrictions.eq("gid", gid));
-            criteria.add(Restrictions.ne("status", STATUS_DELETED));
-            criteria.setProjection(Projections.rowCount());
-            return ((Long) criteria.uniqueResult()).longValue(); //count
+        	if (gid != null){
+	            Criteria criteria = getSession().createCriteria(GermplasmListData.class);
+	            criteria.add(Restrictions.eq("gid", gid));
+	            criteria.add(Restrictions.ne("status", STATUS_DELETED));
+	            criteria.setProjection(Projections.rowCount());
+	            return ((Long) criteria.uniqueResult()).longValue(); 
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with countByGID(gid=" + gid + ") query from GermplasmListData " + e.getMessage(), e);
         }
@@ -125,9 +137,11 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 
     public int deleteByListId(Integer listId) throws MiddlewareQueryException {
         try {
-            Query query = getSession().getNamedQuery(GermplasmListData.DELETE_BY_LIST_ID);
-            query.setInteger("listId", listId);
-            return query.executeUpdate();
+        	if (listId != null){
+	            Query query = getSession().getNamedQuery(GermplasmListData.DELETE_BY_LIST_ID);
+	            query.setInteger("listId", listId);
+	            return query.executeUpdate();
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with deleteByListId(listId=" + listId + ")  query from GermplasmListData "
                     + e.getMessage(), e);
@@ -137,11 +151,16 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 
     public void validateId(GermplasmListData germplasmListData) throws MiddlewareQueryException {
         // Check if not a local record (has negative ID)
+    	if (germplasmListData != null){
         Integer id = germplasmListData.getId();
         if (id != null && id.intValue() > 0) {
             logAndThrowException("Error with validateId(germplasmListData=" + germplasmListData
                     + "): Cannot update a Central Database record. "
                     + "GermplasmListData object to update must be a Local Record (ID must be negative)");
         }
+    	}else{
+            logAndThrowException("Error with validateId(germplasmListData=" + germplasmListData
+                    + "): GermplasmListData is null");
+    	}
     }
 }

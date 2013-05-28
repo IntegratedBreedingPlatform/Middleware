@@ -18,10 +18,11 @@ public class InstallationDAO extends GenericDAO<Installation, Long>{
     public List<Installation> getByAdminId(Long id) throws MiddlewareQueryException {
         List<Installation> toreturn = new ArrayList<Installation>();
         try {
-            Criteria criteria = getSession().createCriteria(Installation.class);
-            criteria.add(Restrictions.eq("adminId", id));
-
-            toreturn.addAll(criteria.list());
+        	if (id != null){
+	            Criteria criteria = getSession().createCriteria(Installation.class);
+	            criteria.add(Restrictions.eq("adminId", id));
+	            toreturn.addAll(criteria.list());
+        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByAdminId(id="+id+") query from Installation: " + e.getMessage(), e);
         }

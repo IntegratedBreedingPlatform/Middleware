@@ -27,9 +27,11 @@ public class WorkflowTemplateDAO extends GenericDAO<WorkflowTemplate, Long>{
     @SuppressWarnings("unchecked")
     public List<WorkflowTemplate> getByName(String name) throws MiddlewareQueryException{
         try{
-            Criteria criteria = getSession().createCriteria(WorkflowTemplate.class);
-            criteria.add(Restrictions.eq("name", name));
-            return (List<WorkflowTemplate>) criteria.list();
+			if (name != null) {
+				Criteria criteria = getSession().createCriteria(WorkflowTemplate.class);
+				criteria.add(Restrictions.eq("name", name));
+				return (List<WorkflowTemplate>) criteria.list();
+			}
         } catch (HibernateException e) {
             logAndThrowException("Error in getByName(name=" + name 
                 + ") query from WorkflowTemplate: " + e.getMessage(), e);
