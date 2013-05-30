@@ -17,6 +17,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Set;
 
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
@@ -130,6 +131,27 @@ public class TestOntologyDataManagerImpl {
 		Term term = manager.addMethod(name, definition);
 		assertTrue(term.getId() < 0);
 	    System.out.println("testAddMethod():  " + term);
+	    term = manager.getTermById(term.getId());
+	    System.out.println("From db:  " + term);
+	}
+	
+	@Test
+	public void testFindStandardVariablesByNameOrSynonym() throws Exception {
+		System.out.println("Test FindStandardVariablesByNameOrSynonym");
+		Set<StandardVariable> standardVariables = manager.findStandardVariablesByNameOrSynonym("foo bar");
+		assertTrue(standardVariables.size() == 0);
+		
+		standardVariables = manager.findStandardVariablesByNameOrSynonym("Accession name");
+		assertTrue(standardVariables.size() == 1);
+		for (StandardVariable stdVar : standardVariables) {
+			stdVar.print(0);
+		}
+		
+		standardVariables = manager.findStandardVariablesByNameOrSynonym("THR");
+		assertTrue(standardVariables.size() == 1);
+		for (StandardVariable stdVar : standardVariables) {
+			stdVar.print(0);
+		}
 	}
 
 	@AfterClass

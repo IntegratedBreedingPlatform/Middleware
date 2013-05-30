@@ -1,8 +1,12 @@
 package org.generationcp.middleware.v2.manager;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DataManager;
+import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.v2.domain.StandardVariable;
 import org.generationcp.middleware.v2.domain.Term;
 import org.generationcp.middleware.v2.manager.api.OntologyDataManager;
@@ -69,8 +73,23 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public StandardVariable getStandardVariableByAbbr(String abbreviation) throws MiddlewareQueryException {
-		// TODO Auto-generated method stub
-		return null;
+	public Set<StandardVariable> findStandardVariablesByNameOrSynonym(String nameOrSynonym) throws MiddlewareQueryException {
+		Set<StandardVariable> standardVariables = new HashSet<StandardVariable>();
+		if (setWorkingDatabase(Database.LOCAL)) {
+			standardVariables.addAll(getStandardVariablesByNameOrSynonym(nameOrSynonym));
+		}
+		if (setWorkingDatabase(Database.CENTRAL)) {
+			standardVariables.addAll(getStandardVariablesByNameOrSynonym(nameOrSynonym));
+		}
+		return standardVariables;
+	}
+	
+	private Set<StandardVariable> getStandardVariablesByNameOrSynonym(String nameOrSynonym) throws MiddlewareQueryException {
+		Set<StandardVariable> standardVariables = new HashSet<StandardVariable>();
+		Set<Integer> stdVarIds = getCvTermDao().findStdVariablesByNameOrSynonym(nameOrSynonym);
+		for (Integer stdVarId : stdVarIds) {
+			standardVariables.add(getStandardVariable(stdVarId));
+		}
+		return standardVariables;
 	}
 }

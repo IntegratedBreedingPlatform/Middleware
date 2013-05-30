@@ -13,6 +13,8 @@
 package org.generationcp.middleware.v2.manager.api;
 
 
+import java.util.Set;
+
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.v2.domain.StandardVariable;
 import org.generationcp.middleware.v2.domain.Term;
@@ -43,11 +45,11 @@ public interface OntologyDataManager {
 	public StandardVariable getStandardVariable(int stdVariableId) throws MiddlewareQueryException; 
 	
 	/**
-	 * @param abbreviation
+	 * @param nameOrSynonym
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	StandardVariable getStandardVariableByAbbr(String abbreviation) throws MiddlewareQueryException;
+	Set<StandardVariable> findStandardVariablesByNameOrSynonym(String nameOrSynonym) throws MiddlewareQueryException;
 	
 	/**
 	 * Adds a StandardVariable to the database.  
