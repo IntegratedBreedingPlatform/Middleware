@@ -8,11 +8,15 @@ public class Term {
 
 	private int id;
 	
+	private int vocabularyId;
+	
 	private String name;
 	
 	private String definition;
 	
 	private List<NameSynonym> nameSynonyms;
+
+	private Boolean obsolete;
 
 	public Term() { }
 	
@@ -35,6 +39,14 @@ public class Term {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public int getVocabularyId() {
+		return vocabularyId;
+	}
+
+	public void setVocabularyId(int vocabularyId) {
+		this.vocabularyId = vocabularyId;
 	}
 
 	public String getName() {
@@ -63,11 +75,13 @@ public class Term {
 
 	public void print(int indent) {
 		Debug.println(indent, "Id: " + getId());
+		Debug.println(indent, "Vocabulary: " + getVocabularyId());
 		Debug.println(indent, "Name: " + getName());
 	    Debug.println(indent, "Definition: " + getDefinition());
 	    if (nameSynonyms != null) {
 	    	Debug.println(indent, "NameSynonyms: " + nameSynonyms);
 	    }
+	    Debug.println(indent, "Obsolete: " + obsolete);
 	}
 	
 	@Override
@@ -97,5 +111,13 @@ public class Term {
 		}
 		builder.append("]");
 		return builder.toString();
+	}
+
+	public void setObsolete(Boolean obsolete) {
+		this.obsolete = obsolete;
+	}
+	
+	public boolean isObsolete() {
+		return this.obsolete == null ? false : this.obsolete;
 	}
 }

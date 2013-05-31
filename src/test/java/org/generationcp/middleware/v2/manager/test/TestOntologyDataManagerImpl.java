@@ -153,6 +153,64 @@ public class TestOntologyDataManagerImpl {
 			stdVar.print(0);
 		}
 	}
+	
+	@Test
+	public void testFindMethodById() throws Exception {
+		System.out.println("Test findMethodById");
+		
+		// term doesn't exist
+		Term term = manager.findMethodById(999999);
+		assertTrue(term == null);
+		
+		// term exist but isn't a method
+		term = manager.findMethodById(22066);
+		assertTrue(term == null);
+		
+		// term does exist in central
+		term = manager.findMethodById(20732);
+		assertTrue(term != null);
+		term.print(0);
+		System.out.println();
+		
+		// add a method to local
+		String name = "Test Method " + new Random().nextInt(10000);
+		String definition = "Test Definition";
+		term = manager.addMethod(name, definition);
+		// term does exist in local
+		
+		term = manager.findMethodById(term.getId());
+		assertTrue(term != null);
+		term.print(0);
+	}
+	
+	@Test
+	public void testFindMethodByName() throws Exception {
+		System.out.println("Test findMethodByName");
+		
+		// term doesn't exist
+		Term term = manager.findMethodByName("foo bar");
+		assertTrue(term == null);
+		
+		// term exist but isn't a method
+		term = manager.findMethodByName("PANH");
+		assertTrue(term == null);
+		
+		// term does exist in central
+		term = manager.findMethodByName("Vegetative Stage");
+		assertTrue(term != null);
+		term.print(0);
+		System.out.println();
+		
+		// add a method to local
+		String name = "Test Method " + new Random().nextInt(10000);
+		String definition = "Test Definition";
+		term = manager.addMethod(name, definition);
+		// term does exist in local
+		
+		term = manager.findMethodByName(term.getName());
+		assertTrue(term != null);
+		term.print(0);
+	}
 
 	@AfterClass
 	public static void tearDown() throws Exception {

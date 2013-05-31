@@ -54,4 +54,21 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		}
 		return stdVarIds;
 	}
+
+	public CVTerm getByNameAndCvId(String name, int cvId) throws MiddlewareQueryException {
+        CVTerm term = null;
+		
+		try {
+			Criteria criteria = getSession().createCriteria(getPersistentClass());
+			criteria.add(Restrictions.eq("cvId", cvId));
+			criteria.add(Restrictions.eq("name", name));
+			
+			term = (CVTerm) criteria.uniqueResult();
+		
+		} catch (HibernateException e) {
+			logAndThrowException("Error at getByNameAndCvId=" + name + ", " + cvId + " query on CVTermDao: " + e.getMessage(), e);
+		}
+		
+		return term;
+	}
 }

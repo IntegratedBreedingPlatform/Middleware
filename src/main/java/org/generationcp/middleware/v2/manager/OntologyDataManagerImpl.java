@@ -92,4 +92,14 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		}
 		return standardVariables;
 	}
+
+	@Override
+	public Term findMethodById(int id) throws MiddlewareQueryException {
+		return getMethodBuilder().findMethodById(id);
+	}
+
+	@Override
+	public Term findMethodByName(String name) throws MiddlewareQueryException {
+		return getMethodBuilder().findMethodByName(name);
+	}
 }

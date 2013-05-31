@@ -21,6 +21,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.v2.domain.builder.DataSetBuilder;
 import org.generationcp.middleware.v2.domain.builder.ExperimentBuilder;
+import org.generationcp.middleware.v2.domain.builder.MethodBuilder;
 import org.generationcp.middleware.v2.domain.builder.StandardVariableBuilder;
 import org.generationcp.middleware.v2.domain.builder.StockBuilder;
 import org.generationcp.middleware.v2.domain.builder.StudyFactorBuilder;
@@ -806,6 +807,10 @@ public abstract class DataManager extends DatabaseBroker{
 
     protected final TermBuilder getTermBuilder() {
     	return new TermBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    protected final MethodBuilder getMethodBuilder() {
+    	return new MethodBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
     
     protected final StandardVariableBuilder getStandardVariableBuilder() {

@@ -72,8 +72,19 @@ public interface OntologyDataManager {
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	public Term addMethod(String name, String definition) throws MiddlewareQueryException;
+	Term addMethod(String name, String definition) throws MiddlewareQueryException;
 	
-
-
+	/**
+	 * @param id
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	Term findMethodById(int id) throws MiddlewareQueryException;
+	
+	/**
+	 * @param name
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	Term findMethodByName(String name) throws MiddlewareQueryException;
 }

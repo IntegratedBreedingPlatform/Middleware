@@ -25,6 +25,8 @@ public class TermBuilder extends Builder {
 		
 		if (cVTerm != null){
 			term = new Term(cVTerm.getCvTermId(), cVTerm.getName(), cVTerm.getDefinition());
+			term.setObsolete(cVTerm.isObsolete());
+			term.setVocabularyId(cVTerm.getCv());
 		}
 		return term;
 	}
