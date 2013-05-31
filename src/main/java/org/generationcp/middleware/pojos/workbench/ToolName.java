@@ -12,4 +12,5 @@ public enum ToolName {
     ,breeding_view
     ,list_manager
     ,crossing_manager
+    ,nursery_template_wizard
 }
