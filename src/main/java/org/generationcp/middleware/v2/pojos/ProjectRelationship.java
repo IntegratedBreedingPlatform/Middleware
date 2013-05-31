@@ -125,8 +125,8 @@ public class ProjectRelationship implements Serializable {
 	@Override
 	public String toString() {
 		return "ProjectRelationship [projectRelationshipId="
-				+ projectRelationshipId + ", subjectProject=" + subjectProject
-				+ ", objectProject=" + objectProject + ", typeId=" + typeId
+				+ projectRelationshipId + ", subjectProjectId=" + subjectProject.getProjectId()
+				+ ", objectProjectId=" + objectProject.getProjectId() + ", typeId=" + typeId
 				+ "]";
 	}
 
