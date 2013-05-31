@@ -13,4 +13,6 @@ public enum ToolName {
     ,list_manager
     ,crossing_manager
     ,nursery_template_wizard
+    ,breeding_planner
+    ,germplasm_import
 }
