@@ -301,4 +301,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public Stocks getStocksInDataset(int datasetId) throws MiddlewareQueryException {
 		return getStockBuilder().getStocksInDataset(datasetId);
 	}
+
+	@Override
+	public long countStocks(int datasetId, int trialEnvironmentId, int variateStdVarId) throws MiddlewareQueryException {
+		if (this.setWorkingDatabase(datasetId)) {
+			return getStockDao().countStocks(datasetId, trialEnvironmentId, variateStdVarId);
+		}
+		return 0;
+	}
 }

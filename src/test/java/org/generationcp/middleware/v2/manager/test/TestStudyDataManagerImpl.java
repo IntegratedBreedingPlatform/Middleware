@@ -603,6 +603,12 @@ public class TestStudyDataManagerImpl {
 		System.out.println("Count of Experiments By TE and Variate: " + count);
 	}
 	
+	@Test
+	public void testCountStocks() throws Exception {
+		long count = manager.countStocks(10087, 10081, 18190);
+		System.out.println("Test CountStocks: " + count);
+	}
+	
 	@AfterClass
 	public static void tearDown() throws Exception {
 		if (factory != null) {

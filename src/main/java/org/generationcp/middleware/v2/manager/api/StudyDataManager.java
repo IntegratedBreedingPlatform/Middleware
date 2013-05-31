@@ -238,4 +238,13 @@ public interface StudyDataManager {
      * @throws MiddlewareQueryException
      */
     Stocks getStocksInDataset(int datasetId) throws MiddlewareQueryException;
+    
+    /**
+     * @param datasetId
+     * @param trialEnvironmentId
+     * @param variateStdVarId
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    long countStocks(int datasetId, int trialEnvironmentId, int variateStdVarId) throws MiddlewareQueryException;
 }

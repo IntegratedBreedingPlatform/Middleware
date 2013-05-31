@@ -9,7 +9,6 @@ import java.util.Set;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.v2.domain.StudyReference;
-import org.generationcp.middleware.v2.pojos.Geolocation;
 import org.generationcp.middleware.v2.pojos.StockModel;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -153,4 +152,26 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		}
 		return stockModels;
 	}
+    
+   	public long countStocks(int datasetId, int trialEnvironmentId, int variateStdVarId) throws MiddlewareQueryException {
+   		try {
+   			
+   			String sql = "select count(distinct nes.stock_id) " +
+   			             "from nd_experiment e, nd_experiment_phenotype ep, phenotype p, nd_experiment_stock nes, nd_experiment_project nep " +
+   			             "where e.nd_experiment_id = ep.nd_experiment_id  " +
+   			             "  and ep.phenotype_id = p.phenotype_id  " +
+   			             "  and nes.nd_experiment_id = e.nd_experiment_id " + 
+   			             "  and nep.nd_experiment_id = e.nd_experiment_id " +
+   			             "  and e.nd_geolocation_id = " + trialEnvironmentId + 
+   			             "  and p.observable_id = " + variateStdVarId + 
+   			             "  and nep.project_id = " + datasetId;
+   			Query query = getSession().createSQLQuery(sql);
+   		
+   			return ((BigInteger) query.uniqueResult()).longValue();
+   						
+   		} catch(HibernateException e) {
+   			logAndThrowException("Error at countStocks=" + datasetId + " at StockDao: " + e.getMessage(), e);
+   		}
+   		return 0;
+   	}
 }
