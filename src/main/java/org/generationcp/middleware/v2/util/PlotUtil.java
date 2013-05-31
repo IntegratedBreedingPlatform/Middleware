@@ -12,6 +12,7 @@ public class PlotUtil {
 	public static List<TermId> getAllPlotTypes() {
 		if (plotTypes == null) {
 			 plotTypes = new ArrayList<TermId>();
+			 plotTypes.add(TermId.TRIAL_ENVIRONMENT_EXPERIMENT);
 			 plotTypes.add(TermId.PLOT_EXPERIMENT);
 			 plotTypes.add(TermId.SAMPLE_EXPERIMENT);
 			 plotTypes.add(TermId.AVERAGE_EXPERIMENT);
