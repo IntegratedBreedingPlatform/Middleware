@@ -143,7 +143,7 @@ public class ProjectProperty implements Serializable {
 	@Override
 	public String toString() {
 		return "ProjectProperty [projectPropertyId=" + projectPropertyId
-				+ ", project=" + project + ", typeId=" + typeId + ", value="
+				+ ", projectId=" + project.getProjectId() + ", typeId=" + typeId + ", value="
 				+ value + ", rank=" + rank + "]";
 	}
 	
