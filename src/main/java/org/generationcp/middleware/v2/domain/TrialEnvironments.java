@@ -1,6 +1,10 @@
 package org.generationcp.middleware.v2.domain;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class TrialEnvironments {
@@ -11,6 +15,26 @@ public class TrialEnvironments {
 		if (trialEnvironment != null) {
 		    trialEnvironments.add(trialEnvironment);
 		}
+	}
+	
+	public List<Variable> getVariablesByLocalName(String localName){
+		List<Variable> vars = new ArrayList<Variable>();
+		for (TrialEnvironment trialEnvironment : trialEnvironments) {
+			Variable var = trialEnvironment.getVariables().findByLocalName(localName);
+			if (var != null) vars.add(var);
+			
+		}
+		Collections.sort(vars, new  Comparator<Variable>() {
+
+			@Override
+			public int compare(Variable o1, Variable o2) {
+				// TODO Auto-generated method stub
+				return o1.getValue().compareTo(o2.getValue());
+			}
+		}
+		);
+		
+		return vars;
 	}
 	
 	public TrialEnvironment findOnlyOneByLocalName(String localName, String value) {
