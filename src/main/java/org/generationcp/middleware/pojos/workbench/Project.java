@@ -268,8 +268,8 @@ public class Project implements Serializable{
         builder.append(startDate);
         builder.append(", userId=");
         builder.append(userId);
-        builder.append(", template=");
-        builder.append(template);
+        //builder.append(", template=");
+        //builder.append(template);
         builder.append(", cropType=");
         builder.append(cropType);
         builder.append(", localDbName=");
