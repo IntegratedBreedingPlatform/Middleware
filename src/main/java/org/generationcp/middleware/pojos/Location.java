@@ -218,18 +218,24 @@ public class Location implements Serializable, Comparable<Location>{
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-
-        if (obj instanceof Location) {
-            Location param = (Location) obj;
-            if (this.getLocid() == param.getLocid()) {
-                return true;
-            }
-        }
-
-        return false;
+    	 if (this == obj) {
+             return true;
+         }
+         if (obj == null) {
+             return false;
+         }
+         if (getClass() != obj.getClass()) {
+             return false;
+         }
+         Location other = (Location) obj;
+         if (this.locid == null) {
+             if (other.getLocid() != null) {
+                 return false;
+             }
+         } else if (!this.locid.equals(other.getLocid())) {
+             return false;
+         }
+         return true;
     }
 
     @Override
