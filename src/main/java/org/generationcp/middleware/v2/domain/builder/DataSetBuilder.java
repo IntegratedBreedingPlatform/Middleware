@@ -52,7 +52,12 @@ public class DataSetBuilder extends Builder {
 		dataSet.setStudyId(getStudyId(project));
 		dataSet.setDataSetType(getDataSetType(project));
 		dataSet.setVariableTypes(getVariableTypes(project));
+		dataSet.setLocationIds(getLocationIds(project.getProjectId()));
 		return dataSet;
+	}
+
+	private Set<Integer> getLocationIds(Integer projectId) throws MiddlewareQueryException {
+		return this.getGeolocationDao().getLocationIds(projectId);
 	}
 
 	private VariableTypeList getVariableTypes(DmsProject project) throws MiddlewareQueryException {

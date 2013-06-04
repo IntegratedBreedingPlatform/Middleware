@@ -73,4 +73,21 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 		}
 		return null;
 	}
+
+	@SuppressWarnings("unchecked")
+	public Set<Integer> getLocationIds(Integer projectId) throws MiddlewareQueryException {
+		Set<Integer> locationIds = new HashSet<Integer>();
+		try {
+			String sql = "SELECT DISTINCT e.nd_geolocation_id"
+					+ " FROM nd_experiment e, nd_experiment_project ep "
+					+ " WHERE e.nd_experiment_id = ep.nd_experiment_id "
+					+ "   and ep.project_id = " + projectId;
+			Query query = getSession().createSQLQuery(sql);
+			locationIds.addAll((List<Integer>) query.list());
+						
+		} catch(HibernateException e) {
+			logAndThrowException("Error at getLocationIds=" + projectId + " at GeolocationDao: " + e.getMessage(), e);
+		}
+		return locationIds;
+	}
 }

@@ -1,5 +1,9 @@
 package org.generationcp.middleware.v2.domain;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.generationcp.middleware.v2.util.Debug;
 
 public class DataSet {
@@ -15,6 +19,8 @@ public class DataSet {
 	private DataSetType dataSetType;
 	
 	private VariableTypeList variableTypes;
+	
+	private Set<Integer> locationIds = new HashSet<Integer>();
 
 	public int getId() {
 		return id;
@@ -64,6 +70,22 @@ public class DataSet {
 		this.variableTypes = variableTypes;
 	}
 	
+	public Set<Integer> getLocationIds() {
+		return locationIds;
+	}
+
+	public void setLocationIds(Set<Integer> locationIds) {
+		this.locationIds = locationIds;
+		if (this.locationIds == null) this.locationIds = new HashSet<Integer>();
+	}
+	
+	public boolean containsLocationId(int locationId) {
+		for (Integer locId : locationIds) {
+			if (locId == locationId) return true;
+		}
+		return false;
+	}
+
 	public VariableTypeList getFactorsByProperty(int propertyId) {
 		VariableTypeList filteredFactors = new VariableTypeList();
 		
@@ -98,6 +120,7 @@ public class DataSet {
 		Debug.println(indent + 3, "Id: " + getId());
 		Debug.println(indent + 3, "Name: " + getName());
 	    Debug.println(indent + 3, "Description: " + getDescription());
+	    Debug.println(indent + 3, "Location Ids: " + this.getLocationIds());
 	    Debug.println(indent + 3, "Variable Types: ");
 	    variableTypes.print(indent + 6);
 	}
@@ -125,6 +148,4 @@ public class DataSet {
 		builder.append("]");
 		return builder.toString();
 	}
-
-	
 }
