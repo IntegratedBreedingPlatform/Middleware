@@ -309,4 +309,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		}
 		return 0;
 	}
+
+	@Override
+	public DataSet findOneDataSetByType(int studyId, DataSetType dataSetType) throws MiddlewareQueryException {
+		List<DataSet> datasets = getDataSetsByType(studyId, dataSetType);
+		if (datasets != null && datasets.size() >= 1) {
+			return datasets.get(0);
+		}
+		return null;
+	}
 }

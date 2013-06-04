@@ -247,4 +247,15 @@ public interface StudyDataManager {
      * @throws MiddlewareQueryException
      */
     long countStocks(int datasetId, int trialEnvironmentId, int variateStdVarId) throws MiddlewareQueryException;
+
+    /**
+     * Returns a single dataset belonging to the study with the given type.  If there
+     * is more than one matching dataset, only one is returned.  If there are none, null
+     * is returned.
+     * @param studyId
+     * @param type
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    DataSet findOneDataSetByType(int studyId, DataSetType type) throws MiddlewareQueryException;
 }

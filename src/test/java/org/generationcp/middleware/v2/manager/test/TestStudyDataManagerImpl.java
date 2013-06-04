@@ -598,6 +598,30 @@ public class TestStudyDataManagerImpl {
 	}
 	
 	@Test
+	public void testFindOneDataSetByType() throws Exception {
+		int studyId = 10010;
+		DataSetType dataSetType = DataSetType.MEANS_DATA;
+		System.out.println("testFindOneDataSetByType(studyId = " + studyId + ", dataSetType = " + dataSetType + ")");
+		DataSet dataset = manager.findOneDataSetByType(studyId, dataSetType);
+	    if (dataset != null) {
+		    System.out.println("Dataset" + dataset.getId() + "-" + dataset.getName() + "-" + dataset.getDescription());
+	    }
+		
+		studyId = 10080;
+		dataSetType = DataSetType.MEANS_DATA;
+		System.out.println("testFindOneDataSetByType(studyId = " + studyId + ", dataSetType = " + dataSetType + ")");
+		dataset = manager.findOneDataSetByType(studyId, dataSetType);
+		if (dataset != null) {
+			System.out.println("Dataset" + dataset.getId() + "-" + dataset.getName() + "-" + dataset.getDescription());
+		}
+		
+		dataSetType = DataSetType.SUMMARY_DATA;
+		System.out.println("testFindOneDataSetByType(studyId = " + studyId + ", dataSetType = " + dataSetType + ")");
+		dataset = manager.findOneDataSetByType(studyId, dataSetType);
+		Assert.assertTrue(dataset == null);
+	}
+	
+	@Test
 	public void testCountExperimentsByTrialEnvironmentAndVariate() throws Exception {
 		long count = manager.countExperimentsByTrialEnvironmentAndVariate(10070, 20870);
 		System.out.println("Count of Experiments By TE and Variate: " + count);
