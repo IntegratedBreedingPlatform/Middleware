@@ -32,6 +32,7 @@ import org.generationcp.middleware.v2.domain.builder.TrialEnvironmentBuilder;
 import org.generationcp.middleware.v2.domain.builder.VariableInfoBuilder;
 import org.generationcp.middleware.v2.domain.builder.VariableTypeBuilder;
 import org.generationcp.middleware.v2.domain.builder.StudyVariateBuilder;
+import org.generationcp.middleware.v2.domain.destroyer.DataSetDestroyer;
 import org.generationcp.middleware.v2.domain.saver.DatasetProjectSaver;
 import org.generationcp.middleware.v2.domain.saver.ExperimentModelSaver;
 import org.generationcp.middleware.v2.domain.saver.GeolocationSaver;
@@ -895,5 +896,9 @@ public abstract class DataManager extends DatabaseBroker{
     
     protected final CvTermSaver getTermSaver() {
     	return new CvTermSaver(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    protected final DataSetDestroyer getDataSetDestroyer() {
+    	return new DataSetDestroyer(sessionProviderForLocal, sessionProviderForCentral);
     }
 }

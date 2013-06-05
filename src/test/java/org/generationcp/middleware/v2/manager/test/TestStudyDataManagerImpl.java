@@ -633,6 +633,16 @@ public class TestStudyDataManagerImpl {
 		System.out.println("Test CountStocks: " + count);
 	}
 	
+	@Test
+	public void testDeleteDataSet() throws Exception {
+		StudyReference studyRef = this.addTestStudy();
+		DatasetReference datasetRef = this.addTestDataset(studyRef.getId());
+		this.addTestExperiments(datasetRef.getId(), 10);
+		
+		System.out.println("Test Delete DataSet: " + datasetRef.getId());
+		manager.deleteDataSet(datasetRef.getId());
+	}
+	
 	@AfterClass
 	public static void tearDown() throws Exception {
 		if (factory != null) {

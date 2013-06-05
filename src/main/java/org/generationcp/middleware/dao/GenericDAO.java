@@ -180,6 +180,14 @@ public abstract class GenericDAO<T, ID extends Serializable> {
             throw new MiddlewareQueryException("Error in merge(entity): " + e.getMessage(), e);
         }
     }
+    
+    public void evict(T entity) throws MiddlewareQueryException {
+        try {
+            getSession().evict(entity);
+        } catch (HibernateException e) {
+            throw new MiddlewareQueryException("Error in evict(" + entity + "): " + e.getMessage(), e);
+        }
+    }
 
     public void makeTransient(T entity) throws MiddlewareQueryException {
         try {

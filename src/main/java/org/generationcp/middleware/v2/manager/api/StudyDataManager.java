@@ -258,4 +258,10 @@ public interface StudyDataManager {
      * @throws MiddlewareQueryException
      */
     DataSet findOneDataSetByType(int studyId, DataSetType type) throws MiddlewareQueryException;
+    
+    /**
+     * @param datasetId
+     * @throws MiddlewareQueryException
+     */
+    void deleteDataSet(int datasetId) throws MiddlewareQueryException;
 }
