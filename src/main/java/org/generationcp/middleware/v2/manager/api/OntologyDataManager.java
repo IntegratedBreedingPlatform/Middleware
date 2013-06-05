@@ -44,6 +44,16 @@ public interface OntologyDataManager {
      */
 	public StandardVariable getStandardVariable(int stdVariableId) throws MiddlewareQueryException; 
 	
+	 /**
+     * Retrieves a the standardVariableId given the property, scale and method Ids
+     * 
+     * @param propertyId, scaleId, methodId
+     * @return
+     * @throws MiddlewareQueryException
+     */
+	public Integer getStandadardVariableIdByPropertyScaleMethod(Integer propertyId,Integer scaleId, Integer methodId) throws MiddlewareQueryException; 
+
+	
 	/**
 	 * @param nameOrSynonym
 	 * @return
