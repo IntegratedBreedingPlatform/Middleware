@@ -331,7 +331,23 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			trans.commit();
         } catch (Exception e) {
 	    	rollbackTransaction(trans);
-	        throw new MiddlewareQueryException("error in addDataSet " + e.getMessage(), e);
+	        throw new MiddlewareQueryException("error in deleteDataSet " + e.getMessage(), e);
+	    }
+	}
+
+	@Override
+	public void deleteExperimentsByLocation(int datasetId, int locationId) throws MiddlewareQueryException {
+		requireLocalDatabaseInstance();
+		Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+ 
+        try {
+            trans = session.beginTransaction();
+            getDataSetDestroyer().deleteExperimentsByLocation(datasetId, locationId);
+			trans.commit();
+        } catch (Exception e) {
+	    	rollbackTransaction(trans);
+	        throw new MiddlewareQueryException("error in deleteExperimentsByLocation " + e.getMessage(), e);
 	    }
 	}
 }

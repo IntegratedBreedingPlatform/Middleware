@@ -57,8 +57,32 @@ public class DataSetDao extends GenericDAO<DmsProject, Integer> {
             this.clear();
 
 		} catch(HibernateException e) {
-			e.printStackTrace();
 			logAndThrowException("Error in delete=" + datasetId + " in DataSetDao: " + e.getMessage(), e);
+		}
+	}
+
+	public void deleteExperimentsByLocation(int datasetId, int locationId) throws MiddlewareQueryException {
+		try {
+			this.flush();
+			
+			// Delete experiments
+			SQLQuery statement = getSession().createSQLQuery("delete e, eprop, ep, es, epheno, pheno " +
+                       "from nd_experiment e, nd_experimentprop eprop, nd_experiment_project ep, " +
+					   "nd_experiment_stock es, nd_experiment_phenotype epheno, phenotype pheno " + 
+                       "where ep.project_id = " + datasetId +
+                       "  and e.nd_geolocation_id = " + locationId +
+					   "  and e.nd_experiment_id = ep.nd_experiment_id " +
+                       "  and e.nd_experiment_id = eprop.nd_experiment_id " + 
+					   "  and e.nd_experiment_id = es.nd_experiment_id " + 
+                       "  and e.nd_experiment_id = epheno.nd_experiment_id " +
+					   "  and epheno.phenotype_id = pheno.phenotype_id");
+			statement.executeUpdate();
+			
+            this.flush();
+            this.clear();
+
+		} catch(HibernateException e) {
+			logAndThrowException("Error in deleteExperimentsByLocation=" + datasetId + ", " + locationId + " in DataSetDao: " + e.getMessage(), e);
 		}
 	}
 }

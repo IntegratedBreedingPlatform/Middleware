@@ -643,6 +643,18 @@ public class TestStudyDataManagerImpl {
 		manager.deleteDataSet(datasetRef.getId());
 	}
 	
+	@Test
+	public void testDeleteExperimentsByLocation() throws Exception {
+		StudyReference studyRef = this.addTestStudyWithNoLocation();
+		DatasetReference datasetRef = this.addTestDatasetWithLocation(studyRef.getId());
+		int locationId = this.addTestExperimentsWithLocation(datasetRef.getId(), 10);
+		int locationId2 = this.addTestExperimentsWithLocation(datasetRef.getId(), 10);
+		
+		System.out.println("Test Delete ExperimentsByLocation: " + datasetRef.getId() + ", " + locationId);
+		System.out.println("Location id of " + locationId2 + " will NOT be deleted");
+		manager.deleteExperimentsByLocation(datasetRef.getId(), locationId);
+	}
+	
 	@AfterClass
 	public static void tearDown() throws Exception {
 		if (factory != null) {
@@ -689,6 +701,7 @@ public class TestStudyDataManagerImpl {
 		variableList.add(createVariable(8194, altitude, 0));
 		variableList.add(createVariable(8135, property1, 0));
 		variableList.add(createVariable(8180, property2, 0));
+		variableList.add(createVariable(8195, "999", 0));
 		return variableList;
 	}
 	
@@ -729,6 +742,30 @@ public class TestStudyDataManagerImpl {
 
 		return manager.addStudy(parentStudyId, typeList, studyValues);
 	}
+	
+	private StudyReference addTestStudyWithNoLocation() throws Exception {
+        int parentStudyId = 1;
+		
+		VariableTypeList typeList = new VariableTypeList();
+		
+		VariableList variableList = new VariableList();
+
+		Variable variable = createVariable(TermId.STUDY_NAME.getId(), "Study Name " + new Random().nextInt(10000), 1);
+		typeList.add(variable.getVariableType());
+		variableList.add(variable);
+		
+		variable = createVariable(TermId.STUDY_TITLE.getId(), "Study Description", 2);
+		typeList.add(variable.getVariableType());
+		variableList.add(variable);
+
+		StudyValues studyValues = new StudyValues();
+		studyValues.setVariableList(variableList);
+		
+		VariableList germplasmVariableList = createGermplasm("unique name", "1000", "name", "2000", "prop1", "prop2");
+		studyValues.setGermplasmId(manager.addStock(germplasmVariableList));
+
+		return manager.addStudy(parentStudyId, typeList, studyValues);
+	}
 
 	private DatasetReference addTestDataset(int studyId) throws Exception {
 		//Parent study, assign a parent study id value, if none exists in db, 
@@ -752,6 +789,31 @@ public class TestStudyDataManagerImpl {
 		return manager.addDataSet(studyId, typeList, datasetValues);
 	}
 	
+	private DatasetReference addTestDatasetWithLocation(int studyId) throws Exception {
+		//Parent study, assign a parent study id value, if none exists in db, 
+		
+		VariableTypeList typeList = new VariableTypeList();
+		
+		DatasetValues datasetValues = new DatasetValues();
+		datasetValues.setName("My Dataset Name " + new Random().nextInt(10000));
+		datasetValues.setDescription("My Dataset Description");
+		datasetValues.setType(DataSetType.MEANS_DATA);
+		
+		VariableType variableType = createVariableType(18000, "Grain Yield", "whatever", 4);
+		typeList.add(variableType);
+		
+		variableType = createVariableType(18050, "Disease Pressure", "whatever", 5);
+		typeList.add(variableType);
+		
+		variableType = createVariableType(8200, "Plot No", "whatever", 6);
+		typeList.add(variableType);
+		
+		variableType = createVariableType(8195, "Site Code", "whatever", 7);
+		typeList.add(variableType);
+
+		return manager.addDataSet(studyId, typeList, datasetValues);
+	}
+	
 	public void addTestExperiments(int datasetId, int numExperiments) throws Exception {
 		DataSet dataSet = manager.getDataSet(datasetId);
 		for (int i = 0; i < numExperiments; i++) {
@@ -766,6 +828,26 @@ public class TestStudyDataManagerImpl {
 			experimentValues.setLocationId(-1);
 			manager.addExperiment(datasetId, ExperimentType.PLOT, experimentValues);
 		}
+	}
+	
+	public int addTestExperimentsWithLocation(int datasetId, int numExperiments) throws Exception {
+		VariableList locationVariableList = createTrialEnvironment("Description", "1.0", "2.0", "data", "3.0", "prop1", "prop2");
+		int locationId = manager.addTrialEnvironment(locationVariableList);
+		
+		DataSet dataSet = manager.getDataSet(datasetId);
+		for (int i = 0; i < numExperiments; i++) {
+			ExperimentValues experimentValues = new ExperimentValues();
+			VariableList varList = new VariableList();
+			varList.add(createVariable(dataSet, 18000, "99"));
+			varList.add(createVariable(dataSet, 18050, "19000"));
+			varList.add(createVariable(dataSet, 8200, "3"));
+			
+			experimentValues.setVariableList(varList);
+			experimentValues.setGermplasmId(-1);
+			experimentValues.setLocationId(locationId);
+			manager.addExperiment(datasetId, ExperimentType.PLOT, experimentValues);
+		}
+		return locationId;
 	}
 
 	private Variable createVariable(DataSet dataSet, int stdVarId, String value) {

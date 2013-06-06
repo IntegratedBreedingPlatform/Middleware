@@ -264,4 +264,11 @@ public interface StudyDataManager {
      * @throws MiddlewareQueryException
      */
     void deleteDataSet(int datasetId) throws MiddlewareQueryException;
+    
+    /**
+     * @param datasetId
+     * @param locationId
+     * @throws MiddlewareQueryException
+     */
+    void deleteExperimentsByLocation(int datasetId, int locationId) throws MiddlewareQueryException;
 }
