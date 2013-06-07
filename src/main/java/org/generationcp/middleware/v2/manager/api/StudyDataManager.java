@@ -271,4 +271,11 @@ public interface StudyDataManager {
      * @throws MiddlewareQueryException
      */
     void deleteExperimentsByLocation(int datasetId, int locationId) throws MiddlewareQueryException;
+    
+    /**
+	 * @param id
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	String getLocalNameByStandardVariableId(Integer projectId, Integer standardVariableId) throws MiddlewareQueryException;
 }

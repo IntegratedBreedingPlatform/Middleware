@@ -47,6 +47,8 @@ import org.generationcp.middleware.v2.search.filter.GidStudyQueryFilter;
 import org.generationcp.middleware.v2.search.filter.ParentFolderStudyQueryFilter;
 import org.generationcp.middleware.v2.search.filter.StudyQueryFilter;
 import org.generationcp.middleware.v2.util.PlotUtil;
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -349,5 +351,30 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	    	rollbackTransaction(trans);
 	        throw new MiddlewareQueryException("error in deleteExperimentsByLocation " + e.getMessage(), e);
 	    }
+	}
+	
+	@Override
+	public String getLocalNameByStandardVariableId(Integer projectId, Integer standardVariableId) throws MiddlewareQueryException {
+		setWorkingDatabase(projectId);
+		Session session = getActiveSession();
+		
+		try {
+			
+			String sql = "select pp.value " + 
+					"from projectprop pp " +
+					"inner join projectprop pp2 on pp.rank = pp2.rank and pp.type_id = 1041 " +
+					"where pp.project_id = :projectId and pp2.value = :standardVariableId";
+
+			
+			Query query = session.createSQLQuery(sql);
+			query.setParameter("projectId", projectId);
+			query.setParameter("standardVariableId", standardVariableId);
+			
+			return  (String) query.uniqueResult();
+						
+		} catch(HibernateException e) {
+			logAndThrowException("Error at getLocalNameByStandardVariableId :" + e.getMessage(), e);
+		}
+		return null;
 	}
 }
