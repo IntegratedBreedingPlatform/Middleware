@@ -23,6 +23,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 
 /**
  * http://gmod.org/wiki/Chado_Natural_Diversity_Module#Table:_nd_experiment_project
@@ -51,6 +54,7 @@ public class ExperimentProject implements Serializable {
 	@Basic(optional = false)
 	@OneToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "nd_experiment_id")
+	@Fetch (FetchMode.SELECT)
 	private ExperimentModel experiment;
 	
 	/**

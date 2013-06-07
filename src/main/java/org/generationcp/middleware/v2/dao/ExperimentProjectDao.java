@@ -10,6 +10,7 @@ import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.pojos.ExperimentProject;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
 
@@ -65,12 +66,28 @@ public class ExperimentProjectDao extends GenericDAO<ExperimentProject, Integer>
 	@SuppressWarnings("unchecked")
 	public List<ExperimentProject> getExperimentProjects(int projectId, List<TermId> types, int start, int numOfRows) throws MiddlewareQueryException {
 		try {
+			/*
 			Criteria criteria = getSession().createCriteria(getPersistentClass());
 			criteria.add(Restrictions.eq("projectId", projectId));
 			criteria.createAlias("experiment", "experiment").add(Restrictions.in("experiment.typeId", getIds(types)));
 			criteria.setMaxResults(numOfRows);
 			criteria.setFirstResult(start);
 			return criteria.list();
+			*/
+			
+			List <Integer> lists = new ArrayList<Integer>();
+			for (TermId termId : types) {
+				lists.add(termId.getId());
+			}
+			
+			Query q = getSession().createQuery("from ExperimentProject as ep where ep.projectId =:p_id and ep.experiment.typeId in (:type_ids)")
+					.setParameter("p_id",projectId)
+					.setParameterList("type_ids",lists)
+					.setMaxResults(numOfRows)
+					.setFirstResult(start)
+					;
+			
+			return q.list();
 		} 
 		catch (HibernateException e) {
 			logAndThrowException("Error at getExperimentProjects=" + projectId + ", " + types + " query at ExperimentProjectDao: " + e.getMessage(), e);

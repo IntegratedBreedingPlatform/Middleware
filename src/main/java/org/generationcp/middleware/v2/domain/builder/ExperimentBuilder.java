@@ -6,9 +6,9 @@ import java.util.Set;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.Experiment;
 import org.generationcp.middleware.v2.domain.StandardVariable;
+import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.Variable;
 import org.generationcp.middleware.v2.domain.VariableList;
 import org.generationcp.middleware.v2.domain.VariableType;
@@ -52,6 +52,9 @@ public class ExperimentBuilder extends Builder {
 		List<Experiment> experiments = new ArrayList<Experiment>();
 		if (setWorkingDatabase(projectId)) {
 			List<ExperimentProject> experimentProjects = getExperimentProjectDao().getExperimentProjects(projectId, types, start, numOfRows);
+			
+			//System.out.println("experimentProjects.size() = " + experimentProjects.size());
+			
 			for (ExperimentProject experimentProject : experimentProjects) {
 				experiments.add(createExperiment(experimentProject.getExperiment(), variableTypes));
 			}
