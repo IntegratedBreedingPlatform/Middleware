@@ -66,6 +66,10 @@ public class VariableType implements Comparable<VariableType>{
 		standardVariable.print(indent);
 	}
 	
+	public int hashCode() {
+		return standardVariable.hashCode();
+	}
+	
 	public boolean equals(Object obj) {
 		if (obj == null) return false;
 		if (!(obj instanceof VariableType)) return false;

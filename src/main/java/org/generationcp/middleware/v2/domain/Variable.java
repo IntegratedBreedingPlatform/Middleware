@@ -13,6 +13,7 @@ public class Variable  implements Comparable<Variable> {
 	public Variable(VariableType variableType, String value) {
 		this.variableType = variableType;
 		this.value = value;
+		if (variableType == null) throw new RuntimeException();
 	}
 	
 	public Variable(VariableType variableType, Double value) {
@@ -20,6 +21,7 @@ public class Variable  implements Comparable<Variable> {
 		if (value != null) {
 			this.value = Double.toString(value);
 		}
+		if (variableType == null) throw new RuntimeException();
 	}
 
 	public Variable(VariableType variableType, Integer value) {
@@ -27,6 +29,7 @@ public class Variable  implements Comparable<Variable> {
 		if (value != null) {
 			this.value = Integer.toString(value);
 		}
+		if (variableType == null) throw new RuntimeException();
 	}
 
 	public VariableType getVariableType() {
@@ -35,6 +38,7 @@ public class Variable  implements Comparable<Variable> {
 
 	public void setVariableType(VariableType variableType) {
 		this.variableType = variableType;
+		if (variableType == null) throw new RuntimeException();
 	}
 
 	public String getValue() {
@@ -97,6 +101,8 @@ public class Variable  implements Comparable<Variable> {
 	@Override
 	// Sort in ascending order by rank
 	public int compareTo(Variable compareValue) { 
+		//System.out.println("This: " + this);
+		//System.out.println("Compare Value: " + compareValue);
         int compareRank = ((Variable) compareValue).getVariableType().getRank(); 
         return Integer.valueOf(getVariableType().getRank()).compareTo(compareRank);
  	}

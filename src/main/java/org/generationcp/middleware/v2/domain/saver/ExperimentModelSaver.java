@@ -104,7 +104,7 @@ public class ExperimentModelSaver extends Saver {
 		return location;
 	}
 
-	private Set<ExperimentProperty> createProperties(ExperimentModel experimentModel, VariableList factors) throws MiddlewareQueryException {
+	private List<ExperimentProperty> createProperties(ExperimentModel experimentModel, VariableList factors) throws MiddlewareQueryException {
 		if (factors != null && factors.getVariables() != null && factors.getVariables().size() > 0) {
 			for (Variable variable : factors.getVariables()) {
 				if (TermId.TRIAL_DESIGN_INFO_STORAGE.getId() == variable.getVariableType().getStandardVariable().getStoredIn().getId()) {
@@ -118,7 +118,7 @@ public class ExperimentModelSaver extends Saver {
 	
 	private void addProperty(ExperimentModel experimentModel, Variable variable) throws MiddlewareQueryException {
 		if (experimentModel.getProperties() == null) {
-			experimentModel.setProperties(new HashSet<ExperimentProperty>());
+			experimentModel.setProperties(new ArrayList<ExperimentProperty>());
 		}
 		ExperimentProperty property = new ExperimentProperty();
 		
@@ -260,7 +260,7 @@ public class ExperimentModelSaver extends Saver {
 	}
 
 	private ExperimentProperty findProperty(ExperimentModel experiment, StandardVariable variable) {
-		Set<ExperimentProperty> experimentProperties = experiment.getProperties();
+		List<ExperimentProperty> experimentProperties = experiment.getProperties();
 		if (experimentProperties != null) {
 			for (ExperimentProperty property : experimentProperties) {
 				if (property.getTypeId() == variable.getId()) {
@@ -273,7 +273,7 @@ public class ExperimentModelSaver extends Saver {
 	
 	private void addNewProperty(ExperimentModel experimentModel, StandardVariable stdVariable, Object value) throws MiddlewareQueryException {
 		if (experimentModel.getProperties() == null) {
-			experimentModel.setProperties(new HashSet<ExperimentProperty>());
+			experimentModel.setProperties(new ArrayList<ExperimentProperty>());
 		}
 		ExperimentProperty property = new ExperimentProperty();
 		

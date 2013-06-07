@@ -64,9 +64,9 @@ public class ExperimentModel implements Serializable {
     @Column(name="type_id")
     private Integer typeId;
     
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name="nd_experiment_id") 
-	private Set<ExperimentProperty> properties;
+	private List<ExperimentProperty> properties;
     
     @ManyToOne
     @JoinTable(name="nd_experiment_project", 
@@ -121,11 +121,11 @@ public class ExperimentModel implements Serializable {
 		this.typeId = typeId;
 	}
 
-	public Set<ExperimentProperty> getProperties() {
+	public List<ExperimentProperty> getProperties() {
 		return properties;
 	}
 
-	public void setProperties(Set<ExperimentProperty> properties) {
+	public void setProperties(List<ExperimentProperty> properties) {
 		this.properties = properties;
 	}
 

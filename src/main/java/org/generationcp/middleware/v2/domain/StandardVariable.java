@@ -197,6 +197,10 @@ public class StandardVariable {
 		}
 	}
 	
+	public int hashCode() {
+		return term.getId();
+	}
+	
 	public boolean equals(Object obj) {
 		if (obj == null) return false;
 		if (!(obj instanceof StandardVariable)) return false;
