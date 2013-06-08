@@ -228,6 +228,11 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
         }
         return false;
     }
+    
+    public User getUserByUserName(String userName) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+        return getUserDao().getUserByUserName(userName);
+    }
 
     @Override
     public List<Installation> getAllInstallationRecords(int start, int numOfRows, Database instance) throws MiddlewareQueryException {

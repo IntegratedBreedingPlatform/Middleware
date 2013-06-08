@@ -142,6 +142,15 @@ public interface UserDataManager {
     public boolean isUsernameExists(String userName) throws MiddlewareQueryException;
     
     /**
+     * Get the User with the specified username.
+     * 
+     * @param userName
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    public User getUserByUserName(String userName) throws MiddlewareQueryException;
+    
+    /**
      * Returns all the installation records
      * 
      * @param start

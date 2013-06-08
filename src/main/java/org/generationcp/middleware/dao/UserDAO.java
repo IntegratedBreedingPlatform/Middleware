@@ -112,6 +112,24 @@ public class UserDAO extends GenericDAO<User, Integer>{
         }
         return false;
     }
+    
+    public User getUserByUserName(String userName) throws MiddlewareQueryException {
+        try{
+            if (userName != null) {
+                Criteria criteria = getSession().createCriteria(User.class);
+                criteria.add(Restrictions.eq("name", userName));
+
+                // used a List in case of dirty data
+                @SuppressWarnings("unchecked")
+                List<User> users = criteria.list();
+
+                return users.isEmpty() ? null : users.get(0);
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with isUsernameExists(username="+userName+") query from User: " + e.getMessage(), e);
+        }
+        return null;
+    }
 	
     @SuppressWarnings("unchecked")
     public List<User> getByNameUsingEqual(String name, int start, int numOfRows) throws MiddlewareQueryException {
