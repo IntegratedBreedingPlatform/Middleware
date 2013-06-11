@@ -932,46 +932,26 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             // get parents of node
             Germplasm germplasmOfNode = node.getGermplasm();
             
-            if(germplasmOfNode.getGid() <0)
-            	setWorkingDatabase(Database.LOCAL);
-            else
-            	setWorkingDatabase(Database.CENTRAL);
-            
             if (germplasmOfNode.getGnpgs() == -1) {
                 // get and add the source germplasm
             	
-                if(germplasmOfNode.getGpid1() <0)
-                	setWorkingDatabase(Database.LOCAL);
-                else
-                	setWorkingDatabase(Database.CENTRAL);
-                
                 Germplasm parent = getGermplasmWithPrefName(germplasmOfNode.getGpid1());
                 
                 if (parent != null) {
 
-                    if(parent.getGpid1() <0)
-                    	setWorkingDatabase(Database.LOCAL);
-                    else
-                    	setWorkingDatabase(Database.CENTRAL);
+                    Germplasm grandParent1 = getGermplasmWithPrefName(parent.getGpid1());	
+                    if(grandParent1 != null){
+                	GermplasmPedigreeTreeNode nodeForGrandParent1 = new GermplasmPedigreeTreeNode();
+               		nodeForGrandParent1.setGermplasm(grandParent1);
+               		node.getLinkedNodes().add(addParentsExcludeDerivativeLines(nodeForGrandParent1, level - 1));
+                    }
                 	
-                	Germplasm grandParent1 = getGermplasmWithPrefName(parent.getGpid1());	
-                	if(grandParent1 != null){
-                		GermplasmPedigreeTreeNode nodeForGrandParent1 = new GermplasmPedigreeTreeNode();
-                		nodeForGrandParent1.setGermplasm(grandParent1);
-                		node.getLinkedNodes().add(addParentsExcludeDerivativeLines(nodeForGrandParent1, level - 1));
-                	}
-                	
-                    if(parent.getGpid2() <0)
-                    	setWorkingDatabase(Database.LOCAL);
-                    else
-                    	setWorkingDatabase(Database.CENTRAL);
-                	
-                	Germplasm grandParent2 = getGermplasmWithPrefName(parent.getGpid2());	
-                	if(grandParent2 != null){
-                		GermplasmPedigreeTreeNode nodeForGrandParent2 = new GermplasmPedigreeTreeNode();
-                		nodeForGrandParent2.setGermplasm(grandParent2);
-                		node.getLinkedNodes().add(addParentsExcludeDerivativeLines(nodeForGrandParent2, level - 1));
-                	}
+                    Germplasm grandParent2 = getGermplasmWithPrefName(parent.getGpid2());	
+                    if(grandParent2 != null){
+                        GermplasmPedigreeTreeNode nodeForGrandParent2 = new GermplasmPedigreeTreeNode();
+                	nodeForGrandParent2.setGermplasm(grandParent2);
+               		node.getLinkedNodes().add(addParentsExcludeDerivativeLines(nodeForGrandParent2, level - 1));
+                    }
                     	
                 }
             } else if (germplasmOfNode.getGnpgs() >= 2) {
