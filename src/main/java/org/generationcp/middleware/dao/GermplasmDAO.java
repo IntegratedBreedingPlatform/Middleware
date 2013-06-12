@@ -609,7 +609,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
     		
     		SQLQuery query = getSession().createSQLQuery(Germplasm.GET_MAX_IN_SEQUENCE_FOR_CROSS_NAME_PREFIX);
     		query.setParameter("prefix", prefix);
-    		query.setParameter("prefixRegex", "^" + prefix + "[1-9]");
+    		query.setParameter("prefixRegex", "^" + prefix + "[0-9]");
     		
     		//gets last number used in sequence and increments by 1
     		Integer maxNumberInSequence = (Integer) query.uniqueResult();
