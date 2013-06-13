@@ -363,7 +363,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			String sql = "select DISTINCT pp.value " + 
 					"from projectprop pp " +
 					"inner join projectprop pp2 on pp.rank = pp2.rank and pp.type_id = 1041 " +
-					"where pp.project_id = :projectId and pp2.value = :standardVariableId";
+					"where pp.project_id = :projectId and pp2.value = :standardVariableId LIMIT 0,1";
 
 			
 			Query query = session.createSQLQuery(sql);
