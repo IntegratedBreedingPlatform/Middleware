@@ -72,7 +72,7 @@ public class CropType implements Serializable{
     }
     
     public String getLocalDatabaseNameWithProjectId(Long projectId) {
-        return String.format("%s_%s_local", cropName.trim().toLowerCase().replaceAll("\\s+", "_"), projectId);
+        return String.format("ibdbv2_%s_%s_local", cropName.trim().toLowerCase().replaceAll("\\s+", "_"), projectId);
     }
 
     @Override
