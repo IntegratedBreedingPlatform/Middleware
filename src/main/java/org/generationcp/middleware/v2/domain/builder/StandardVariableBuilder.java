@@ -31,13 +31,17 @@ public class StandardVariableBuilder extends Builder {
 	// If the standard variable is already in the cache, return. Else, create the variable, add to cache then return
 	public StandardVariable create(int standardVariableId) throws MiddlewareQueryException {
 
+		/**
 		StandardVariableCache cache = StandardVariableCache.getInstance();
 		StandardVariable standardVariable = cache.get(standardVariableId); 
+		**/
+		/**StandardVariable standardVariable = null;
 		if (standardVariable != null){
 			return standardVariable;
 		}
+		**/
 		
-		standardVariable = new StandardVariable();
+		StandardVariable standardVariable = new StandardVariable();
 		standardVariable.setId(standardVariableId);
 		CVTerm cvTerm = getCvTerm(standardVariableId);
 		if (cvTerm != null) {
@@ -47,7 +51,7 @@ public class StandardVariableBuilder extends Builder {
 			addConstraints(standardVariable, cvTerm);
 			addRelatedTerms(standardVariable, cvTerm);
 		}
-		cache.put(standardVariable);
+		//cache.put(standardVariable);
 		return standardVariable;
 	}
 
