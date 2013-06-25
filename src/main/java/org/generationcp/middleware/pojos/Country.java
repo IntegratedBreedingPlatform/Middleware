@@ -30,7 +30,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "cntry")
 @NamedQueries({ @NamedQuery(name = "getAllCountry", query = "FROM Country") })
-public class Country implements Serializable{
+public class Country implements Serializable, Comparable<Country>{
 
     private static final long serialVersionUID = 1L;
     public static final String GET_ALL = "getAllCountry";
@@ -267,5 +267,16 @@ public class Country implements Serializable{
         builder.append("]");
         return builder.toString();
     }
+    
+
+    public int compareTo(Country compareCountry) {
+ 
+        String compareName = ((Country) compareCountry).getIsoabbr(); 
+ 
+        //ascending order
+        return this.getIsoabbr().compareTo(compareName);
+ 
+    }
+ 
 
 }
