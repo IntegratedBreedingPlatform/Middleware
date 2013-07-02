@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.dao;
 
 import java.util.ArrayList;
@@ -26,6 +25,10 @@ import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+/**
+ * DAO class for {@link CharacterData}.
+ * 
+ */
 public class CharacterDataDAO extends GenericDAO<CharacterData, CharacterDataPK>{
 
     @SuppressWarnings("unchecked")

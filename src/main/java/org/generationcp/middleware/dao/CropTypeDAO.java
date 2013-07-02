@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.dao;
 
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -19,7 +18,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.criterion.Restrictions;
 
 /**
- * The Class CropTypeDAO.
+ * DAO class for {@link CropType}.
  * 
  * @author Joyce Avestro
  * 

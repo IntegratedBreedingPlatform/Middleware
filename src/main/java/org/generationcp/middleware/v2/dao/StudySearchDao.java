@@ -26,11 +26,11 @@ import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 
 /**
+ * DAO class for searching studies stored in {@link DmsProject}.
  * 
- * @author Don
+ * @author Donald Barre
  *
  */
-
 public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 
 	

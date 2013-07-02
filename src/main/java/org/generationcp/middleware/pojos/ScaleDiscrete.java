@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
@@ -20,6 +19,10 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+/**
+ * POJO for scaledis table.
+ * 
+ */
 @Entity
 @Table(name = "scaledis")
 public class ScaleDiscrete implements Serializable{

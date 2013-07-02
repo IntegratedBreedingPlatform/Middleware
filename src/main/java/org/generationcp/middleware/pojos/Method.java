@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
@@ -29,7 +28,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 /**
- * POJO for methods table
+ * POJO for methods table.
  * 
  * @author Kevin Manansala, Mark Agarrado
  */

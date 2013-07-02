@@ -1,12 +1,24 @@
+/*******************************************************************************
+ * Copyright (c) 2012, All Rights Reserved.
+ * 
+ * Generation Challenge Programme (GCP)
+ * 
+ * 
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * 
+ *******************************************************************************/
 package org.generationcp.middleware.v2.domain;
 
 import org.generationcp.middleware.v2.util.Debug;
 
+/** 
+ * Contains the details of an experiment - id, factors, variates.
+ */
 public class Experiment {
 
 	private int id;
-	
-	//private DataSet dataSet;
 	
 	private VariableList factors;
 	
@@ -19,14 +31,6 @@ public class Experiment {
 	public void setId(int id) {
 		this.id = id;
 	}
-
-	//public DataSet getDataSet() {
-	//	return dataSet;
-	//}
-
-	//public void setDataSet(DataSet dataSet) {
-	//	this.dataSet = dataSet;
-	//}
 
 	public VariableList getFactors() {
 		return factors.sort();
@@ -65,8 +69,6 @@ public class Experiment {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Experiment [id=");
 		builder.append(id);
-		//builder.append(", dataSet=");
-		//builder.append(dataSet);
 		builder.append(", factors=");
 		builder.append(factors);
 		builder.append(", variates=");

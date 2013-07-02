@@ -27,6 +27,10 @@ import javax.persistence.Table;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+/**
+ * POJO for ims_transaction table.
+ * 
+ */
 @NamedQueries({
         @NamedQuery(name = "getEmptyLot", query = "FROM Transaction WHERE status=1 GROUP BY lotid HAVING SUM(quantity) = 0"),
         @NamedQuery(name = "getLotWithMinimumAmount",

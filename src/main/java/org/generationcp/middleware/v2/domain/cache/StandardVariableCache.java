@@ -16,7 +16,14 @@ import java.util.Map;
 
 import org.generationcp.middleware.v2.domain.StandardVariable;
 
-
+/**
+ * This class is used to store standard variable in the cache to improve retrieval performance. 
+ * When a standard variable is retrieved, it is first checked if it's in the cache. 
+ * If it's not, it will be retrieved from the database.
+ * 
+ * @author Joyce Avestro
+ *
+ */
 public class StandardVariableCache {
 
 	private static final StandardVariableCache instance = new StandardVariableCache();

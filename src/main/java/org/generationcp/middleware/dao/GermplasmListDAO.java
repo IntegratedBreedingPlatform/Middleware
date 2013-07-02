@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.dao;
 
 import java.util.ArrayList;
@@ -28,6 +27,10 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+/**
+ * DAO class for {@link GermplasmList}.
+ * 
+ */
 public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
 
     private static final Integer STATUS_DELETED = 9;

@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
@@ -17,6 +16,10 @@ import java.io.Serializable;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+/**
+ * Placeholder POJO for {@link CharacterLevel} 
+ * 
+ */
 public class CharacterLevelElement implements Serializable{
 
     private static final long serialVersionUID = -4284129132975100671L;

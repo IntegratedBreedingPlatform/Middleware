@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos.workbench;
 
 import java.io.Serializable;
@@ -24,12 +23,10 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 /**
- * <b>Description</b>: POJO for workbench_project_loc_map table.
+ * POJO for workbench_project_loc_map table.
  * 
+ * @author Michael Blancaflor 
  * <br>
- * <br>
- * 
- * <b>Author</b>: Michael Blancaflor <br>
  * <b>File Created</b>: Aug 9, 2012
  */
 @Entity

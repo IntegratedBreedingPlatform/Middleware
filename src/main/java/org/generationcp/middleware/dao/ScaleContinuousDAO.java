@@ -9,11 +9,14 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.dao;
 
 import org.generationcp.middleware.pojos.ScaleContinuous;
 
+/**
+ * DAO class for {@link ScaleContinuous}.
+ * 
+ */
 public class ScaleContinuousDAO extends GenericDAO<ScaleContinuous, Integer>{
 
 }

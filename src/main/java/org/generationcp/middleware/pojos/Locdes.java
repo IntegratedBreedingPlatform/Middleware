@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
@@ -26,7 +25,7 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 /**
- * POJO for locdes table
+ * POJO for locdes table. 
  * 
  * @author klmanansala
  */

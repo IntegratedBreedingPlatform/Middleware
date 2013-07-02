@@ -13,16 +13,14 @@ package org.generationcp.middleware.pojos.gdms;
 
 import java.io.Serializable;
 
-
 /**
- * <b>Description</b>: Placeholder POJO for Mapping Detail Element
+ * Placeholder POJO for Mapping Detail Element.
  * 
  * @author Joyce Avestro
  * 
  */
 public class MapDetailElement implements Serializable{
 
-    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
     
     private Integer markerCount;
@@ -55,52 +53,42 @@ public class MapDetailElement implements Serializable{
 		this.mapDescription = mapDescription;
 		this.mapUnit = mapUnit;
 	}
-
     
     public Integer getMarkerCount() {
         return markerCount;
     }
-
     
     public void setMarkerCount(Integer markerCount) {
         this.markerCount = markerCount;
     }
 
-    
     public Double getMaxStartPosition() {
         return maxStartPosition;
     }
 
-    
     public void setMaxStartPosition(Double maxStartPosition) {
         this.maxStartPosition = maxStartPosition;
     }
-
     
     public String getLinkageGroup() {
         return linkageGroup;
     }
-
     
     public void setLinkageGroup(String linkageGroup) {
         this.linkageGroup = linkageGroup;
     }
-
     
     public String getMapName() {
         return mapName;
     }
-
     
     public void setMapName(String mapName) {
         this.mapName = mapName;
     }
-
     
     public String getMapType() {
         return mapType;
     }
-
     
     public void setMapType(String mapType) {
         this.mapType = mapType;
@@ -110,21 +98,17 @@ public class MapDetailElement implements Serializable{
 		return mapDescription;
 	}
 
-
 	public void setMapDescription(String mapDescription) {
 		this.mapDescription = mapDescription;
 	}
-
 
 	public String getMapUnit() {
 		return mapUnit;
 	}
 
-
 	public void setMapUnit(String mapUnit) {
 		this.mapUnit = mapUnit;
 	}
-
 
 	@Override
     public int hashCode() {

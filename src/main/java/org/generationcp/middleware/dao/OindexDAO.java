@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.dao;
 
 import java.util.ArrayList;
@@ -24,7 +23,11 @@ import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
-public class OindexDAO extends GenericDAO<OindexDAO, Integer>{
+/**
+ * DAO class for {@link Oindex}.
+ * 
+ */
+public class OindexDAO extends GenericDAO<Oindex, Integer>{
 
     public long countOunitIDsByRepresentationId(Integer representationId) throws MiddlewareQueryException {
         try {

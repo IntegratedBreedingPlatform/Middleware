@@ -32,11 +32,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 
 /**
- * <b>Description</b>: DAO for Marker object.
- * 
- * <br>
- * <br>
- * 
+ * DAO class for {@link Marker}.
+ *
  * <b>Authors</b>: Mark Agarrado <br>
  * <b>File Created</b>: Jul 10, 2012
  */

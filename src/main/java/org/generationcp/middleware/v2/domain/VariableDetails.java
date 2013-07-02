@@ -1,6 +1,19 @@
+/*******************************************************************************
+ * Copyright (c) 2012, All Rights Reserved.
+ * 
+ * Generation Challenge Programme (GCP)
+ * 
+ * 
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * 
+ *******************************************************************************/
 package org.generationcp.middleware.v2.domain;
 
-
+/** 
+ * Contains the details of a variable - id, name, description, property, method, scale, data type, study id.
+ */
 public abstract class VariableDetails {
 
 	private Integer id;
@@ -84,11 +97,26 @@ public abstract class VariableDetails {
 		return true;
 	}
 	@Override
-	public String toString() {
-		return "VariableDetails [id=" + id + ", name=" + name
-				+ ", description=" + description + ", property=" + property
-				+ ", method=" + method + ", scale=" + scale + ", dataType="
-				+ dataType + ", studyId=" + studyId + "]";
-	}
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("VariableDetails [id=");
+        builder.append(id);
+        builder.append(", name=");
+        builder.append(name);
+        builder.append(", description=");
+        builder.append(description);
+        builder.append(", property=");
+        builder.append(property);
+        builder.append(", method=");
+        builder.append(method);
+        builder.append(", scale=");
+        builder.append(scale);
+        builder.append(", dataType=");
+        builder.append(dataType);
+        builder.append(", studyId=");
+        builder.append(studyId);
+        builder.append("]");
+        return builder.toString();
+    }
 
 }

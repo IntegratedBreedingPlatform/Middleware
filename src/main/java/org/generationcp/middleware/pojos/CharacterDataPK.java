@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
@@ -18,6 +17,10 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
+/**
+ * The primary identifier of {@link CharacterData}.
+ * 
+ */
 @Embeddable
 public class CharacterDataPK implements Serializable{
 

@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.dao;
 
 import java.util.ArrayList;
@@ -25,6 +24,10 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+/**
+ * DAO class for {@link WorkbenchDataset}.
+ * 
+ */
 public class WorkbenchDatasetDAO extends GenericDAO<WorkbenchDataset, Long>{
 
     public WorkbenchDataset getById(Long datasetId) throws MiddlewareQueryException{        

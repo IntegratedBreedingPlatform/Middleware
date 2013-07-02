@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.v2.pojos;
 
 import java.io.Serializable;
@@ -60,61 +59,49 @@ public class StockProperty implements Serializable {
 	@Column(name = "value")
 	private String value;
 
-
 	@Basic(optional = false)
 	@Column(name = "rank")
 	private Integer rank;
-
 
 	public Integer getStockPropId() {
 		return stockPropId;
 	}
 
-
 	public void setStockPropId(Integer stockPropId) {
 		this.stockPropId = stockPropId;
 	}
-
 
 	public StockModel getStock() {
 		return stockModel;
 	}
 
-
 	public void setStock(StockModel stockModel) {
 		this.stockModel = stockModel;
 	}
-
 
 	public Integer getTypeId() {
 		return typeId;
 	}
 
-
 	public void setTypeId(Integer typeId) {
 		this.typeId = typeId;
 	}
-
 
 	public String getValue() {
 		return value;
 	}
 
-
 	public void setValue(String value) {
 		this.value = value;
 	}
-
 
 	public Integer getRank() {
 		return rank;
 	}
 
-
 	public void setRank(Integer rank) {
 		this.rank = rank;
 	}
-
 
 	@Override
 	public int hashCode() {
@@ -128,7 +115,6 @@ public class StockProperty implements Serializable {
 		result = prime * result + ((value == null) ? 0 : value.hashCode());
 		return result;
 	}
-
 
 	@Override
 	public boolean equals(Object obj) {
@@ -167,7 +153,6 @@ public class StockProperty implements Serializable {
 		return true;
 	}
 
-
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -184,8 +169,5 @@ public class StockProperty implements Serializable {
 		builder.append("]");
 		return builder.toString();
 	}
-
-	
-	
 	
 }

@@ -1,7 +1,21 @@
+/*******************************************************************************
+ * Copyright (c) 2012, All Rights Reserved.
+ * 
+ * Generation Challenge Programme (GCP)
+ * 
+ * 
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * 
+ *******************************************************************************/
 package org.generationcp.middleware.v2.domain;
 
 import org.generationcp.middleware.v2.util.Debug;
 
+/** 
+ * Contains the details of a Variable - type and value.
+ */
 public class Variable  implements Comparable<Variable> {
 
 	private VariableType variableType;
@@ -101,8 +115,6 @@ public class Variable  implements Comparable<Variable> {
 	@Override
 	// Sort in ascending order by rank
 	public int compareTo(Variable compareValue) { 
-		//System.out.println("This: " + this);
-		//System.out.println("Compare Value: " + compareValue);
         int compareRank = ((Variable) compareValue).getVariableType().getRank(); 
         return Integer.valueOf(getVariableType().getRank()).compareTo(compareRank);
  	}

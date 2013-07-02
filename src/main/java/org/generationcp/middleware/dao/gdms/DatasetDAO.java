@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.dao.gdms;
 
 import java.math.BigInteger;
@@ -25,8 +24,8 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 
 /**
- * The Class DatasetDAO.
- * 
+ * DAO class for {@link Dataset}.
+ *
  * @author Joyce Avestro
  * 
  */

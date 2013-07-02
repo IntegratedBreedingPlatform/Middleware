@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos.report;
 
 import java.io.Serializable;
@@ -17,6 +16,9 @@ import java.io.Serializable;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Scale;
 
+/**
+ * This POJO represents a row in reports about Lot records.
+ */ 
 public class LotReportRow implements Serializable{
 
     private static final long serialVersionUID = 2572260467983831666L;

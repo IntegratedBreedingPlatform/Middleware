@@ -9,15 +9,14 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.dao.gdms;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.pojos.gdms.MarkerUserInfo;
 
 /**
- * The Class MarkerUserInfoDAO.
- * 
+ * DAO class for {@link MarkerUserInfo}.
+ *
  * @author Joyce Avestro
  * 
  */

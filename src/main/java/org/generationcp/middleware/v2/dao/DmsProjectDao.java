@@ -35,11 +35,11 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 /**
+ * DAO class for {@link DmsProject}.
  * 
  * @author Darla Ani, Joyce Avestro
  *
  */
-
 public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	private static final String GET_CHILDREN_OF_FOLDER =		

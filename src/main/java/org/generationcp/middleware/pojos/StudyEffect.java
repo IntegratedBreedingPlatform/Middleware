@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
@@ -25,6 +24,10 @@ import javax.persistence.Table;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+/**
+ * POJO for steffect table.
+ * 
+ */
 @NamedQueries({ @NamedQuery(name = "getStudyEffectsByStudyID", query = "FROM StudyEffect se WHERE se.studyId = :studyId") })
 @Entity
 @Table(name = "steffect")

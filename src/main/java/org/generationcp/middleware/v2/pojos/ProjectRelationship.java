@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2012, All Rights Reserved.
+ * 
+ * Generation Challenge Programme (GCP)
+ * 
+ * 
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * 
+ *******************************************************************************/
 package org.generationcp.middleware.v2.pojos;
 
 import java.io.Serializable;
@@ -13,7 +24,6 @@ import javax.persistence.UniqueConstraint;
 
 /**
  * http://gmod.org/wiki/Chado_Tables
- * 
  * 
  * @author tippsgo
  *
@@ -123,11 +133,18 @@ public class ProjectRelationship implements Serializable {
 	}
 
 	@Override
-	public String toString() {
-		return "ProjectRelationship [projectRelationshipId="
-				+ projectRelationshipId + ", subjectProjectId=" + subjectProject.getProjectId()
-				+ ", objectProjectId=" + objectProject.getProjectId() + ", typeId=" + typeId
-				+ "]";
-	}
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("ProjectRelationship [projectRelationshipId=");
+        builder.append(projectRelationshipId);
+        builder.append(", subjectProject=");
+        builder.append(subjectProject);
+        builder.append(", objectProject=");
+        builder.append(objectProject);
+        builder.append(", typeId=");
+        builder.append(typeId);
+        builder.append("]");
+        return builder.toString();
+    }
 
 }

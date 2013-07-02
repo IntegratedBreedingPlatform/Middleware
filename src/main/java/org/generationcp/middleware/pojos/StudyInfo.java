@@ -16,7 +16,7 @@ package org.generationcp.middleware.pojos;
 import java.io.Serializable;
 
 /**
- * The POJO which holds study information for germplasms
+ * The POJO which holds study information for germplasms.
  * @author Kevin L. Manansala
  *
  */

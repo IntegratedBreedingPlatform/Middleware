@@ -1,4 +1,14 @@
-
+/*******************************************************************************
+ * Copyright (c) 2012, All Rights Reserved.
+ * 
+ * Generation Challenge Programme (GCP)
+ * 
+ * 
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * 
+ *******************************************************************************/
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
@@ -17,6 +27,10 @@ import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Implementation of the UserDataManager interface. To instantiate this
+ * class, a Hibernate Session must be passed to its constructor.
+ */ 
 public class UserDataManagerImpl extends DataManager implements UserDataManager{
 
     private static final Logger LOG = LoggerFactory.getLogger(UserDataManagerImpl.class);

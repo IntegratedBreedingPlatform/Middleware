@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos.gdms;
 
 import java.io.Serializable;
@@ -22,7 +21,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 /**
- * POJO for dataset table
+ * POJO for dataset table.
  * 
  * @author Joyce Avestro
  * 

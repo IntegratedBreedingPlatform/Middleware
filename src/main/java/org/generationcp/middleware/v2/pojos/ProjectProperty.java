@@ -141,10 +141,20 @@ public class ProjectProperty implements Serializable {
 	}
 
 	@Override
-	public String toString() {
-		return "ProjectProperty [projectPropertyId=" + projectPropertyId
-				+ ", projectId=" + project.getProjectId() + ", typeId=" + typeId + ", value="
-				+ value + ", rank=" + rank + "]";
-	}
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("ProjectProperty [projectPropertyId=");
+        builder.append(projectPropertyId);
+        builder.append(", project=");
+        builder.append(project);
+        builder.append(", typeId=");
+        builder.append(typeId);
+        builder.append(", value=");
+        builder.append(value);
+        builder.append(", rank=");
+        builder.append(rank);
+        builder.append("]");
+        return builder.toString();
+    }
 	
 }

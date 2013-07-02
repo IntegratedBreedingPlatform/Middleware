@@ -22,6 +22,10 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
+/**
+ * POJO for variate table.
+ * 
+ */
 @NamedQueries({ @NamedQuery(name = "getVariatesByStudyID", query = "FROM Variate v WHERE v.studyId = :studyId") })
 @Entity
 @Table(name = "variate")

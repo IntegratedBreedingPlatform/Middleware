@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.v2.domain.builder;
 
 
@@ -17,8 +16,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.v2.util.DatabaseBroker;
 
 /**
- * The Class Builder (stolen from DataManager).
- * Mainly used for local-central initially.
+ * Provides builder classes (DatasetBuilder, StudyVariableBuilder, etc) based on the given session for local / central.
  * 
  * @author Donald Barre
  */

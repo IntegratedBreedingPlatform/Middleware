@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2012, All Rights Reserved.
+ * 
+ * Generation Challenge Programme (GCP)
+ * 
+ * 
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * 
+ *******************************************************************************/
 package org.generationcp.middleware.v2.dao;
 
 import java.util.HashSet;
@@ -11,9 +22,12 @@ import org.generationcp.middleware.v2.pojos.Geolocation;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 
+/**
+ * DAO class for {@link Geolocation}.
+ * 
+ */
 public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 
-	
 	public Geolocation getParentGeolocation(int projectId) throws MiddlewareQueryException {
 		try {
 			String sql = "SELECT DISTINCT g.*"
@@ -55,6 +69,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 		return locations;
 	}
 
+	@SuppressWarnings("unchecked")
 	public Geolocation findByDescription(String description) throws MiddlewareQueryException {
 		try {
 			

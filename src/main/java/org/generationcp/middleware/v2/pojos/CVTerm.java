@@ -72,7 +72,6 @@ public class CVTerm implements Serializable {
 	 * cvterm. Note that a cvterm may have multiple secondary dbxrefs - see also
 	 * table: cvterm_dbxref (from http://gmod.org/wiki/Chado_Tables)
 	 */
-	// TODO Add join definition when dbxRef table becomes available, or ignore if the foreign key constraint is removed
 	@Column(name = "dbxref_id")
 	private Integer dbxRefId;
 

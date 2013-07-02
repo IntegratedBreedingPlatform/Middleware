@@ -24,6 +24,10 @@ import javax.persistence.Table;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+/**
+ * POJO for instln table.
+ * 
+ */
 @Entity
 @Table(name = "instln")
 public class Installation implements Serializable{
@@ -121,167 +125,134 @@ public class Installation implements Serializable{
     public Long getId() {
         return id;
     }
-
     
     public void setId(Long id) {
         this.id = id;
     }
-
     
     public Long getAdminId() {
         return adminId;
     }
-
     
     public void setAdminId(Long adminId) {
         this.adminId = adminId;
     }
-
     
     public Long getLastUpdateDate() {
         return lastUpdateDate;
     }
-
     
     public void setLastUpdateDate(Long lastUpdateDate) {
         this.lastUpdateDate = lastUpdateDate;
     }
-
     
     public Long getLastGermplasmUpdated() {
         return lastGermplasmUpdated;
     }
-
     
     public void setLastGermplasmUpdated(Long lastGermplasmUpdated) {
         this.lastGermplasmUpdated = lastGermplasmUpdated;
     }
-
     
     public Long getLastLocationUpdated() {
         return lastLocationUpdated;
     }
-
     
     public void setLastLocationUpdated(Long lastLocationUpdated) {
         this.lastLocationUpdated = lastLocationUpdated;
     }
 
-    
     public Long getLastChangeRecordUpdated() {
         return lastChangeRecordUpdated;
     }
-
     
     public void setLastChangeRecordUpdated(Long lastChangeRecordUpdated) {
         this.lastChangeRecordUpdated = lastChangeRecordUpdated;
     }
-
     
     public Long getLastNameUpdated() {
         return lastNameUpdated;
     }
-
     
     public void setLastNameUpdated(Long lastNameUpdated) {
         this.lastNameUpdated = lastNameUpdated;
     }
-
     
     public Long getLastAttributeUpdated() {
         return lastAttributeUpdated;
     }
-
     
     public void setLastAttributeUpdated(Long lastAttributeUpdated) {
         this.lastAttributeUpdated = lastAttributeUpdated;
     }
-
     
     public Long getLastLocationDescriptorUpdated() {
         return lastLocationDescriptorUpdated;
     }
-
     
     public void setLastLocationDescriptorUpdated(Long lastLocationDescriptorUpdated) {
         this.lastLocationDescriptorUpdated = lastLocationDescriptorUpdated;
     }
-
     
     public Long getLastMethodUpdated() {
         return lastMethodUpdated;
     }
-
     
     public void setLastMethodUpdated(Long lastMethodUpdated) {
         this.lastMethodUpdated = lastMethodUpdated;
     }
-
     
     public Long getLastUserFieldUpdated() {
         return lastUserFieldUpdated;
     }
-
     
     public void setLastUserFieldUpdated(Long lastUserFieldUpdated) {
         this.lastUserFieldUpdated = lastUserFieldUpdated;
     }
-
     
     public Long getLastReferenceUpdated() {
         return lastReferenceUpdated;
     }
-
     
     public void setLastReferenceUpdated(Long lastReferenceUpdated) {
         this.lastReferenceUpdated = lastReferenceUpdated;
     }
-
     
     public Long getLastPersonUpdated() {
         return lastPersonUpdated;
     }
-
     
     public void setLastPersonUpdated(Long lastPersonUpdated) {
         this.lastPersonUpdated = lastPersonUpdated;
     }
-
     
     public Long getLastListUpdated() {
         return lastListUpdated;
     }
 
-    
     public void setLastListUpdated(Long lastListUpdated) {
         this.lastListUpdated = lastListUpdated;
     }
-
     
     public String getDescription() {
         return description;
     }
-
     
     public void setDescription(String description) {
         this.description = description;
     }
-
     
     public Integer getDmsStatus() {
         return dmsStatus;
     }
-
     
     public void setDmsStatus(Integer dmsStatus) {
         this.dmsStatus = dmsStatus;
     }
 
-    
     public Long getLastLrecUpdated() {
         return lastLrecUpdated;
     }
-
     
     public void setLastLrecUpdated(Long lastLrecUpdated) {
         this.lastLrecUpdated = lastLrecUpdated;

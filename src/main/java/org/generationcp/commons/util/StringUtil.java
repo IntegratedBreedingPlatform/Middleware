@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.commons.util;
 
 import java.lang.reflect.Array;
@@ -19,6 +18,10 @@ import java.util.Collection;
 import org.apache.commons.lang3.StringUtils;
 
 /**
+ * Contains utility classes for String formatting, format checking and conversion.
+ * For parse methods, the given input String is converted to the required output if available. 
+ * If no value is available, the given default output is returned. 
+ *
  * 
  * @author Glenn Marintes
  */

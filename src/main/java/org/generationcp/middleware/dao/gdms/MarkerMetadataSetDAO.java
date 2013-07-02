@@ -22,8 +22,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 
 /**
- * The Class MarkerMetadataSetDAO.
- * 
+ * DAO class for {@link MarkerMetadataSet}.
+ *
  * @author Joyce Avestro
  * 
  */

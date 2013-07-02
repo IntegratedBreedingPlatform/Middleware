@@ -18,7 +18,6 @@ import javax.persistence.Column;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-
 /**
  * The Class MarkerNameElement. Contains the pair germplasm id and marker name. 
  * Used in getting marker names by gid.
@@ -28,88 +27,45 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  */
 public class MarkerNameElement implements Serializable{
         
-    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
-    /** The germplasm id. */
     @Basic(optional = false)
     @Column(name = "gid")
     private Integer gId;
     
-    /** The marker name. */
     @Basic(optional = false)
     @Column(name = "marker_name")
     private String markerName;
     
-    /**
-     * Instantiates a new marker name element.
-     */
     MarkerNameElement(){
     }
    
-    /**
-     * Instantiates a new marker name element.
-     *
-     * @param gId the germplasm id
-     * @param markerName the marker name
-     */
     public MarkerNameElement(Integer gId, String markerName){
         this.gId = gId;
         this.markerName = markerName;              
     }
 
-    
-    /**
-     * Gets the g id.
-     *
-     * @return the g id
-     */
     public Integer getgId() {
         return gId;
     }
 
-    
-    /**
-     * Sets the g id.
-     *
-     * @param gId the new g id
-     */
     public void setgId(Integer gId) {
         this.gId = gId;
     }
 
-    
-    /**
-     * Gets the marker name.
-     *
-     * @return the marker name
-     */
     public String getMarkerName() {
         return markerName;
     }
 
-    
-    /**
-     * Sets the marker name.
-     *
-     * @param markerName the new marker name
-     */
     public void setMarkerName(String markerName) {
         this.markerName = markerName;
     }
    
-
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         return new HashCodeBuilder(139, 17).append(gId).append(markerName).toHashCode();
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {

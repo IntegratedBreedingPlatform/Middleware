@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos.gdms;
 
 import java.io.Serializable;
@@ -24,7 +23,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
- * POJO for mapping_pop table.
+ * POJO for gdms_mapping_pop table.
  *
  * @author Joyce Avestro
  */
@@ -32,7 +31,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @Table(name = "gdms_mapping_pop")
 public class MappingPop implements Serializable{
 
-    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
     
     public static final String GET_PARENTS_BY_DATASET_ID =

@@ -9,13 +9,12 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.manager;
 
 /**
  * Used to specify the different seasons
  * 
- * @author Joyce Avestro
+ * @author Joyce Avestro, Tiffany Go
  * 
  */
 public enum Season {

@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
@@ -32,7 +31,7 @@ import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.SQLDelete;
 
 /**
- * POJO for listnms table
+ * POJO for listnms table.
  * 
  * @author Kevin Manansala, Mark Agarrado
  * 

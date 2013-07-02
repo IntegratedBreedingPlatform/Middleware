@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.dao;
 
 import java.util.List;
@@ -21,6 +20,10 @@ import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
 
+/**
+ * DAO class for {@link Project}.
+ * 
+ */
 public class ProjectDAO extends GenericDAO<Project, Long> {
 
 	public Project getById(Long projectId) throws MiddlewareQueryException {

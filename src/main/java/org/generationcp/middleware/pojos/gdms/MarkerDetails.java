@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos.gdms;
 
 import java.io.Serializable;
@@ -28,7 +27,6 @@ import javax.persistence.Table;
 @Table(name = "gdms_marker_details")
 public class MarkerDetails implements Serializable{
 
-    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
     @Id

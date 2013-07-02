@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.v2.domain.saver;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -17,7 +16,9 @@ import org.generationcp.middleware.v2.domain.builder.StandardVariableBuilder;
 import org.generationcp.middleware.v2.util.DatabaseBroker;
 
 /**
- * The super class for all the Saver classes. 
+ * Provides saver classes that can be used to save logical/physical data in IBDBv2.
+ * Creates saver classes based on the given local/central session parameters.
+ * The super class of all the Saver classes. 
  * 
  * @author Joyce Avestro
  */

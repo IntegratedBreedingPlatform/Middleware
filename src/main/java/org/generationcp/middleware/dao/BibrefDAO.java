@@ -9,11 +9,14 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.dao;
 
 import org.generationcp.middleware.pojos.Bibref;
 
+/**
+ * DAO class for {@link Bibref}.
+ * 
+ */
 public class BibrefDAO extends GenericDAO<Bibref, Integer>{
 
 }

@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.dao;
 
 import java.util.List;
@@ -22,6 +21,10 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
+/**
+ * DAO class for {@link UserInfo}.
+ * 
+ */
 public class UserInfoDAO extends GenericDAO<UserInfo, Integer>{
 
     public boolean updateLoginCounter(UserInfo userInfo) {

@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos.workbench;
 
 import java.io.Serializable;
@@ -31,6 +30,10 @@ import javax.persistence.Table;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+/**
+ * POJO for workbench_workflow_template table.
+ *  
+ */
 @Entity
 @Table(name = "workbench_workflow_template")
 public class WorkflowTemplate implements Serializable{
@@ -144,7 +147,6 @@ public class WorkflowTemplate implements Serializable{
         }
         stepsString.append("]");
 
-        
         StringBuilder builder = new StringBuilder();
         builder.append("WorkflowTemplate [templateId=");
         builder.append(templateId);

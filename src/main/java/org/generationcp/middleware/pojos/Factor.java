@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
@@ -22,6 +21,10 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
+/**
+ * POJO for factor table.
+ * 
+ */
 @NamedQueries({ @NamedQuery(name = "getFactorsByStudyID", query = "FROM Factor f WHERE f.studyId = :studyId") })
 @Entity
 @Table(name = "factor")

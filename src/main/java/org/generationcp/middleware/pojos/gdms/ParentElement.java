@@ -19,24 +19,23 @@ import javax.persistence.Embeddable;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+/**
+ * Placeholder POJO for Parent Element.
+ * 
+ */
 @Embeddable
 public class ParentElement implements Serializable{
     
-    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
-    /** The parent A gid. */
     @Column(name = "parent_a_nid")
     private Integer parentANId;
 
-    /** The parent B gid. */
     @Column(name = "parent_b_nid")
     private Integer parentBNId;
 
-    /** The mapping type. */
     @Column(name = "mapping_type")
     private String mappingPopType;
-
 
     public ParentElement() {
     }
@@ -71,17 +70,11 @@ public class ParentElement implements Serializable{
         this.mappingPopType = mappingType;
     }
     
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 139).append(parentANId).append(parentBNId).append(mappingPopType).toHashCode();
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {

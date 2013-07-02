@@ -9,12 +9,9 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos.gdms;
 
 import java.io.Serializable;
-import java.util.Comparator;
-
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -25,12 +22,9 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
- * <b>Description</b>: Marker Alias POJO
+ * POJO for gdms_marker_alias table.
  * 
- * <br>
- * <br>
- * 
- * <b>Author</b>: Dennis Billano <br>
+ * @author Dennis Billano
  * <b>File Created</b>: March 7, 2013
  */
 @Entity
@@ -38,34 +32,20 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class MarkerAlias implements Serializable{
 
-    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
     
-    /** The marker id. */
     @Id
     @Basic(optional = false)
     @Column(name = "marker_id")
     private Integer markerId;
 
-    /** The marker type. */
     @Basic(optional = false)
     @Column(name = "alias")
     private String alias;
 
-    
-    
-    /**
-     * Instantiates a new marker alias.
-     */
     public MarkerAlias() {
     }
 
-    /**
-     * Instantiates a new marker alias.
-     *
-     * @param markerId the marker id
-     * @param alias the markeralias
-     */
     public MarkerAlias(Integer markerId,
                     String alias) {
         
@@ -73,45 +53,22 @@ public class MarkerAlias implements Serializable{
         this.alias = alias;
     }
     
-    /**
-     * Gets the marker id.
-     *
-     * @return the marker id
-     */
     public Integer getMarkerId() {
         return markerId;
     }
-    
-    /**
-     * Sets the marker id.
-     *
-     * @param markerId the new marker id
-     */
+
     public void setMarkerId(Integer markerId) {
         this.markerId = markerId;
     }
 
-    /**
-     * Gets the alias.
-     *
-     * @return the alias
-     */
     public String getAlias() {
         return alias;
     }
 
-    /**
-     * Sets the alias.
-     *
-     * @param alias the new alias
-     */
     public void setAlias(String alias) {
         this.alias = alias;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -128,9 +85,6 @@ public class MarkerAlias implements Serializable{
         return new EqualsBuilder().append(markerId, rhs.markerId).isEquals();
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         return new HashCodeBuilder(61, 131).append(markerId).toHashCode();

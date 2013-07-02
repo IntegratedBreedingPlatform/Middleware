@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
@@ -23,7 +22,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
- * POJO for country
+ * POJO for country table.
  * 
  * @author klmanansala
  */

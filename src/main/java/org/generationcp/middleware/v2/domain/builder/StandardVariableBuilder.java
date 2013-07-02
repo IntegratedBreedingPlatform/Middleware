@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2012, All Rights Reserved.
+ * 
+ * Generation Challenge Programme (GCP)
+ * 
+ * 
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * 
+ *******************************************************************************/
 package org.generationcp.middleware.v2.domain.builder;
 
 import java.util.ArrayList;
@@ -14,7 +25,6 @@ import org.generationcp.middleware.v2.domain.StandardVariable;
 import org.generationcp.middleware.v2.domain.Term;
 import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.domain.VariableConstraints;
-import org.generationcp.middleware.v2.domain.cache.StandardVariableCache;
 import org.generationcp.middleware.v2.pojos.CVTerm;
 import org.generationcp.middleware.v2.pojos.CVTermProperty;
 import org.generationcp.middleware.v2.pojos.CVTermRelationship;
@@ -31,16 +41,6 @@ public class StandardVariableBuilder extends Builder {
 	// If the standard variable is already in the cache, return. Else, create the variable, add to cache then return
 	public StandardVariable create(int standardVariableId) throws MiddlewareQueryException {
 
-		/**
-		StandardVariableCache cache = StandardVariableCache.getInstance();
-		StandardVariable standardVariable = cache.get(standardVariableId); 
-		**/
-		/**StandardVariable standardVariable = null;
-		if (standardVariable != null){
-			return standardVariable;
-		}
-		**/
-		
 		StandardVariable standardVariable = new StandardVariable();
 		standardVariable.setId(standardVariableId);
 		CVTerm cvTerm = getCvTerm(standardVariableId);
@@ -51,7 +51,6 @@ public class StandardVariableBuilder extends Builder {
 			addConstraints(standardVariable, cvTerm);
 			addRelatedTerms(standardVariable, cvTerm);
 		}
-		//cache.put(standardVariable);
 		return standardVariable;
 	}
 

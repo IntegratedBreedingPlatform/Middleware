@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.dao;
 
 import java.math.BigInteger;
@@ -21,6 +20,10 @@ import org.generationcp.middleware.pojos.Representation;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 
+/**
+ * DAO class for {@link Representation}.
+ * 
+ */
 public class RepresentationDAO extends GenericDAO<Representation, Integer>{
 
     @SuppressWarnings("unchecked")

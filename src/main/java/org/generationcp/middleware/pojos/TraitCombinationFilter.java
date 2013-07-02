@@ -9,11 +9,14 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
 
+/**
+ * POJO for Trait combination filter consisting of traitId, scaleId, methodId and value.
+ *
+ */
 public class TraitCombinationFilter implements Serializable{
 
     private static final long serialVersionUID = 5568757097327354065L;

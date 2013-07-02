@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos.workbench;
 
 import java.io.Serializable;
@@ -22,6 +21,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+/**
+ * POJO for workbench_role table.
+ *  
+ */
 @Entity
 @Table(name = "workbench_role")
 public class Role implements Serializable{
@@ -97,6 +100,15 @@ public class Role implements Serializable{
         this.label = label;
     }
     
+    public String getLabelOrder() {
+        return labelOrder;
+    }
+
+    public void setLabelOrder(String labelOrder) {
+        this.labelOrder = labelOrder;
+    }
+
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();

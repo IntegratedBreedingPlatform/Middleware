@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
@@ -67,6 +66,10 @@ import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Implementation of the WorkbenchDataManager interface. To instantiate this
+ * class, a Hibernate Session must be passed to its constructor.
+ */ 
 public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(WorkbenchDataManagerImpl.class);

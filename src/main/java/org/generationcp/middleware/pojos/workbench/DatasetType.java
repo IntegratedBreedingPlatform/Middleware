@@ -9,9 +9,12 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos.workbench;
 
+/**
+ * The types of dataset: STUDY, GERMPLASM_LIST.
+ *
+ */
 public enum DatasetType {
     STUDY, GERMPLASM_LIST 
 }

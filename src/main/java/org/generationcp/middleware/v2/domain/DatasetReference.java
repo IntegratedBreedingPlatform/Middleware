@@ -9,12 +9,11 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.v2.domain;
 
 
 /**
- * This class is used to display Dataset nodes
+ * Contains the primary details of a dataset - id, name, description.
  * 
  * @author Joyce Avestro
  *

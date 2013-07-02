@@ -29,7 +29,6 @@ import javax.persistence.Basic;
 @Table(name = "gdms_marker_user_info")
 public class MarkerUserInfo implements Serializable{
 
-    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
     
     @Id
@@ -58,41 +57,33 @@ public class MarkerUserInfo implements Serializable{
         this.institute = institute;
     }
 
-    
     public Integer getMarkerId() {
         return markerId;
     }
-
     
     public void setMarkerId(Integer markerId) {
         this.markerId = markerId;
     }
-
     
     public String getPrincipalInvestigator() {
         return principalInvestigator;
     }
-
     
     public void setPrincipalInvestigator(String principalInvestigator) {
         this.principalInvestigator = principalInvestigator;
     }
-
     
     public String getContact() {
         return contact;
     }
-
     
     public void setContact(String contact) {
         this.contact = contact;
     }
 
-    
     public String getInstitute() {
         return institute;
     }
-
     
     public void setInstitute(String institute) {
         this.institute = institute;

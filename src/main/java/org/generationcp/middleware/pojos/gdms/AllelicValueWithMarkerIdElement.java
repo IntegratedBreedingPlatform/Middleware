@@ -17,15 +17,12 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
- * <b>Description</b>: Placeholder POJO for Allelic Value that stores the marker id
+ * Placeholder POJO for Allelic Value that stores the marker id
  * Used by GenotypicDataManager.getAllelicValuesFromCharValuesByDatasetId().
  * Used by GenotypicDataManager.getAllelicValuesFromAlleleValuesByDatasetId().
  * Used by GenotypicDataManager.getAllelicValuesFromMappingPopValuesByDatasetId().
  * 
- * <br>
- * 
- * <b>Author</b>: Joyce Avestro <br>
- * <b>File Created</b>: Aug 07, 2012
+ * @author Joyce Avestro 
  */
 public class AllelicValueWithMarkerIdElement implements Serializable{
 

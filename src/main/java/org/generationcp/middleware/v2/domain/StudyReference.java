@@ -14,7 +14,7 @@ package org.generationcp.middleware.v2.domain;
 
 
 /**
- * This class is used to display Study nodes
+ * Contains the primary details of a study - id, name, description.
  * 
  * @author Joyce Avestro
  *

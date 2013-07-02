@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.dao;
 
 import java.util.ArrayList;
@@ -20,6 +19,10 @@ import org.generationcp.middleware.pojos.Scale;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 
+/**
+ * DAO class for {@link Scale}.
+ * 
+ */
 public class ScaleDAO extends GenericDAO<Scale, Integer>{
 
     @SuppressWarnings("unchecked")

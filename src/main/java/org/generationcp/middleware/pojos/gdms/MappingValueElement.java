@@ -16,45 +16,25 @@ import java.io.Serializable;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-
 /**
- * <b>Description</b>: Placeholder POJO for Mapping Value Element
+ * Placeholder POJO for Mapping Value Element
  * 
- * <br>
- * <br>
- * 
- * <b>Author</b>: Mark Agarrado <br>
- * <b>File Created</b>: Jul 11, 2012
+ * @author Mark Agarrado
  */
 public class MappingValueElement implements Serializable{
 
-    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
     
-    /** The Dataset Id. */
     private Integer datasetId;
     
-    /** The Mapping Type. */
     private String mappingPopType;
     
-    /** The Parent A GID. */
     private Integer parentAGid;
     
-    /** The Parent B GID. */
     private Integer parentBGid;
     
-    /** The Marker Type. */
     private String markerType;
 
-    /**
-     * Instantiates a Mapping Value Element object.
-     * 
-     * @param datasetId
-     * @param mappingType
-     * @param parentAGid
-     * @param parentBGid
-     * @param markerType
-     */
     public MappingValueElement(Integer datasetId,
                                 String mappingType, 
                                 Integer parentAGid, 
@@ -68,102 +48,42 @@ public class MappingValueElement implements Serializable{
         this.markerType = markerType;
     }
 
-    
-    /**
-     * Gets the Dataset Id.
-     * 
-     * @return the datasetId
-     */
     public Integer getDatasetId() {
         return datasetId;
     }
 
-    
-    /**
-     * Sets the Dataset Id.
-     * 
-     * @param datasetId the datasetId to set
-     */
     public void setDatasetId(Integer datasetId) {
         this.datasetId = datasetId;
     }
 
-    
-    /**
-     * Gets the Mapping Type.
-     * 
-     * @return the mappingType
-     */
     public String getMappingType() {
         return mappingPopType;
     }
 
-    
-    /**
-     * Sets the Mapping Type.
-     * 
-     * @param mappingType the mappingType to set
-     */
     public void setMappingType(String mappingType) {
         this.mappingPopType = mappingType;
     }
 
-    
-    /**
-     * Gets the Parent A GID.
-     * 
-     * @return the parentAGid
-     */
     public Integer getParentAGid() {
         return parentAGid;
     }
 
-    
-    /**
-     * Sets the Parent A GID.
-     * 
-     * @param parentAGid the parentAGid to set
-     */
     public void setParentAGid(Integer parentAGid) {
         this.parentAGid = parentAGid;
     }
 
-    
-    /**
-     * Gets the Parent B GID.
-     * 
-     * @return the parentBGid
-     */
     public Integer getParentBGid() {
         return parentBGid;
     }
 
-    
-    /**
-     * Sets the Parent B GID.
-     * 
-     * @param parentBGid the parentBGid to set
-     */
     public void setParentBGid(Integer parentBGid) {
         this.parentBGid = parentBGid;
     }
 
-    
-    /**
-     * Gets the Marker Type.
-     * 
-     * @return the markerType
-     */
     public String getMarkerType() {
         return markerType;
     }
 
-    
-    /**
-     * Sets the Marker Type.
-     * 
-     * @param markerType the markerType to set
-     */
     public void setMarkerType(String markerType) {
         this.markerType = markerType;
     }
@@ -185,9 +105,6 @@ public class MappingValueElement implements Serializable{
         return builder.toString();
     }
     
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -208,9 +125,6 @@ public class MappingValueElement implements Serializable{
                 .append(markerType, rhs.markerType).isEquals();
     }
     
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         return new HashCodeBuilder(77, 177).append(datasetId)

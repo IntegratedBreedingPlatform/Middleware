@@ -14,7 +14,6 @@ package org.generationcp.middleware.v2.pojos;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;

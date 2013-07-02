@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos.workbench;
 
 import java.io.Serializable;
@@ -29,8 +28,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.generationcp.middleware.pojos.User;
 
 /**
- * The Class ProjectActivity.
- * 
+ * POJO for workbench_project_activity table.
+ *  
  *  @author Joyce Avestro
  *  
  */
@@ -40,45 +39,39 @@ public class ProjectActivity implements Serializable{
 
     private static final long serialVersionUID = 1L;
     
-    /** The Constant GET_ACTIVITIES_BY_PROJECT_ID. Used by ProjectActivityDAO.getByProjectId() */
+    /** Used by ProjectActivityDAO.getByProjectId() */
     public static final String GET_ACTIVITIES_BY_PROJECT_ID = 
             "SELECT wpa.* " + 
             "FROM workbench_project_activity wpa " +
             "WHERE project_id = :projectId " +
             "ORDER BY date";
     
-    /** The Constant COUNT_ACTIVITIES_BY_PROJECT_ID. Used by ProjectActivityDAO.countByProjectId() */
+    /** Used by ProjectActivityDAO.countByProjectId() */
     public static final String COUNT_ACTIVITIES_BY_PROJECT_ID = 
             "SELECT COUNT(*) " + 
             "FROM workbench_project_activity " +
             "WHERE project_id = :projectId";
     
-    /** The db-generated project activity id */
     @Id
     @Basic(optional = false)
     @GeneratedValue
     @Column(name = "project_activity_id")
     private Integer projectActivityId;
 
-    /** The project this activity is associated with. */
     @OneToOne(optional = false)
     @JoinColumn(name = "project_id")
     private Project project;
 
-    /** The name of this project activity. */
     @Column(name = "name")
     private String name;
 
-    /** The descripiton of this project activity. */
     @Column(name = "description")
     private String description;
 
-    /** The user of this project activity. */
     @OneToOne(optional = false)
     @JoinColumn(name = "user_id")
     private User user;
     
-    /** The date of this project activity. */
     @Column(name = "date")
     private Date createdAt;
     

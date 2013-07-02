@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.dao;
 
 import java.math.BigInteger;
@@ -25,6 +24,10 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 
+/**
+ * DAO class for {@link Germplasm}.
+ * 
+ */
 public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 
 

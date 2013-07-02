@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos.workbench;
 
 import java.io.Serializable;
@@ -28,8 +27,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.generationcp.middleware.pojos.User;
 
 /**
- * The Class ProjectUser.
- * 
+ * POJO for workbench_project_user_role table.
+ *  
  *  @author Joyce Avestro
  *  
  */

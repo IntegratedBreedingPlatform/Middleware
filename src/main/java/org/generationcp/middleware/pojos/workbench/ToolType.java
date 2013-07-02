@@ -9,9 +9,11 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos.workbench;
 
+/**
+ * The type of tools - WEB, WEB_WITH_LOGIN, NATIVE.
+ */ 
 public enum ToolType {
     WEB, WEB_WITH_LOGIN, NATIVE
 }

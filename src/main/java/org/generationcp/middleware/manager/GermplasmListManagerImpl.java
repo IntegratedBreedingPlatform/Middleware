@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
@@ -29,6 +28,10 @@ import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Implementation of the GermplasmListManager interface. To instantiate this
+ * class, a Hibernate Session must be passed to its constructor.
+ */ 
 @SuppressWarnings("unchecked")
 public class GermplasmListManagerImpl extends DataManager implements GermplasmListManager{
 

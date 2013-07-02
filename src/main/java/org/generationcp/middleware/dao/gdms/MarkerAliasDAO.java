@@ -9,19 +9,14 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.dao.gdms;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.pojos.gdms.MarkerAlias;
 
-
 /**
- * <b>Description</b>: DAO for Marker Alias object.
- * 
- * <br>
- * <br>
- * 
+ * DAO class for {@link MarkerAlias}.
+ *
  * <b>Authors</b>: Dennis Billano <br>
  * <b>File Created</b>: Mar 7, 2013
  */

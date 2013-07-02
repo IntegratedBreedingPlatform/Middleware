@@ -228,193 +228,154 @@ public class QtlDetails implements Serializable{
     public QtlDetailsPK getId() {
         return id;
     }
-
     
     public void setQtlId(QtlDetailsPK id) {
         this.id = id;
     }
-
         
     public Float getMinPosition() {
         return minPosition;
     }
-
     
     public void setMinPosition(Float minPosition) {
         this.minPosition = minPosition;
     }
 
-    
     public Float getMaxPosition() {
         return maxPosition;
     }
-
     
     public void setMaxPosition(Float maxPosition) {
         this.maxPosition = maxPosition;
     }
-
     
     public Integer getTraitId() {
         return traitId;
     }
-
     
     public void setTraitId(Integer traitId) {
         this.traitId = traitId;
     }
-
     
     public String getExperiment() {
         return experiment;
     }
-
     
     public void setExperiment(String experiment) {
         this.experiment = experiment;
     }
-
     
     public Float getEffect() {
         return effect;
     }
-
     
     public void setEffect(Float effect) {
         this.effect = effect;
     }
-
     
     public Float getScoreValue() {
         return scoreValue;
     }
-
     
     public void setScoreValue(Float scoreValue) {
         this.scoreValue = scoreValue;
     }
-
     
     public Float getrSquare() {
         return rSquare;
     }
-
     
     public void setrSquare(Float rSquare) {
         this.rSquare = rSquare;
     }
-
     
     public String getLinkageGroup() {
         return linkageGroup;
     }
-
     
     public void setLinkageGroup(String linkageGroup) {
         this.linkageGroup = linkageGroup;
     }
-
     
     public String getInteractions() {
         return interactions;
     }
-
     
     public void setInteractions(String interactions) {
         this.interactions = interactions;
     }
-
     
     public String getLeftFlankingMarker() {
         return leftFlankingMarker;
     }
-
     
     public void setLeftFlankingMarker(String leftFlankingMarker) {
         this.leftFlankingMarker = leftFlankingMarker;
     }
-
     
     public String getRightFlankingMarker() {
         return rightFlankingMarker;
     }
-
     
     public void setRightFlankingMarker(String rightFlankingMarker) {
         this.rightFlankingMarker = rightFlankingMarker;
     }
-
     
     public Float getPosition() {
         return position;
     }
-
     
     public void setPosition(Float position) {
         this.position = position;
     }
-
     
     public Float getClen() {
         return clen;
     }
-
     
     public void setClen(Float clen) {
         this.clen = clen;
     }
-
     
     public String getSeAdditive() {
         return seAdditive;
     }
 
-    
     public void setSeAdditive(String seAdditive) {
         this.seAdditive = seAdditive;
     }
 
-    
     public String getHvParent() {
         return hvParent;
     }
-
     
     public void setHvParent(String hvParent) {
         this.hvParent = hvParent;
     }
 
-    
     public String getHvAllele() {
         return hvAllele;
     }
-
     
     public void setHvAllele(String hvAllele) {
         this.hvAllele = hvAllele;
     }
-
     
     public String getLvParent() {
         return lvParent;
     }
-
     
     public void setLvParent(String lvParent) {
         this.lvParent = lvParent;
     }
-
     
     public String getLvAllele() {
         return lvAllele;
     }
-
     
     public void setLvAllele(String lvAllele) {
         this.lvAllele = lvAllele;
     }
-
-    
 
     @Override
     public int hashCode() {
@@ -441,7 +402,6 @@ public class QtlDetails implements Serializable{
         result = prime * result + ((traitId == null) ? 0 : traitId.hashCode());
         return result;
     }
-
 
     @Override
     public boolean equals(Object obj) {
@@ -550,7 +510,6 @@ public class QtlDetails implements Serializable{
         return true;
     }
 
-
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -597,9 +556,6 @@ public class QtlDetails implements Serializable{
         builder.append("]");
         return builder.toString();
     }
-    
-    
-    
     
 
 }

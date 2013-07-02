@@ -11,14 +11,10 @@
  *******************************************************************************/
 package org.generationcp.middleware.pojos.gdms;
 
-
 /**
- * <b>Description</b>: Node element for holding matching Marker ID and Marker Name.
+ * Node element for holding matching Marker ID and Marker Name.
  * 
- * <br>
- * <br>
- * 
- * <b>Author</b>: Michael Blancaflor
+ * @author Michael Blancaflor
  * <br>
  * <b>File Created</b>: Aug 7, 2012
  */

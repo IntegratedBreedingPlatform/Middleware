@@ -18,7 +18,6 @@ import java.util.StringTokenizer;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Germplasm;
 
-
 /**
  * Utility methods for the GermplasmDataManager class
  * 

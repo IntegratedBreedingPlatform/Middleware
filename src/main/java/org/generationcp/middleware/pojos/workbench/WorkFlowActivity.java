@@ -9,12 +9,15 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos.workbench;
 
 import java.io.Serializable;
 import java.util.Date;
 
+/**
+ * POJO for the workbench workflow activity.
+ *
+ */
 public class WorkFlowActivity implements Serializable{
 
     private static final long serialVersionUID = 1L;

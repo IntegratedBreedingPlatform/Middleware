@@ -15,12 +15,11 @@ package org.generationcp.middleware.v2.domain.destroyer;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.v2.dao.DataSetDao;
-import org.generationcp.middleware.v2.dao.ExperimentPropertyDao;
 import org.generationcp.middleware.v2.util.DatabaseBroker;
 
 /**
- * The Class Builder (stolen from DataManager).
- * Mainly used for local-central initially.
+ * Provides destroyer classes that can be used to delete logical/physical data in IBDBv2.
+ * Creates destroyer classes based on the given local/central session parameters.
  * 
  * @author Donald Barre
  */

@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.dao.gdms;
 
 import org.generationcp.middleware.dao.GenericDAO;
@@ -17,11 +16,8 @@ import org.generationcp.middleware.pojos.gdms.DartValues;
 
 
 /**
- * <b>Description</b>: DAO for DartValues object.
- * 
- * <br>
- * <br>
- * 
+ * DAO class for {@link DartValues}.
+ *
  * <b>Authors</b>: Dennis Billano <br>
  * <b>File Created</b>: Mar 8, 2013
  */

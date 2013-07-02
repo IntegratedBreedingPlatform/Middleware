@@ -18,11 +18,11 @@ import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 
 /**
+ * DAO class for Dataset (Stored in {@link DmsProject}).
  * 
- * @author Don
+ * @author Donald Barre
  *
  */
-
 public class DataSetDao extends GenericDAO<DmsProject, Integer> {
 
 	public void delete(int datasetId) throws MiddlewareQueryException {

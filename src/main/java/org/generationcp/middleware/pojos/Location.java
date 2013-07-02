@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
@@ -28,17 +27,14 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-
-
-@NamedQueries({ @NamedQuery(name = "getAllLocation", query = "FROM Location"),
-    @NamedQuery(name = "countAllLocation", query = "SELECT COUNT(l) FROM Location l")
-})
-
 /**
- * POJO for location table
+ * POJO for location table.
  * 
  * @author Kevin Manansala, Mark Agarrado, Joyce Avestro
  */
+@NamedQueries({ @NamedQuery(name = "getAllLocation", query = "FROM Location"),
+    @NamedQuery(name = "countAllLocation", query = "SELECT COUNT(l) FROM Location l")
+})
 @Entity
 @Table(name = "location")
 // JAXB Element Tags for JSON output
@@ -264,8 +260,6 @@ public class Location implements Serializable, Comparable<Location>{
         builder.append("]");
         return builder.toString();
     }
-
-
     
     public int compareTo(Location compareLocation) {
  

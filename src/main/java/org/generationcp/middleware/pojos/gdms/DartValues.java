@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos.gdms;
 
 import java.io.Serializable;
@@ -31,7 +30,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @Table(name = "gdms_dart_values")
 public class DartValues implements Serializable{
 
-    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
     
     @Id
@@ -151,18 +149,11 @@ public class DartValues implements Serializable{
         this.discordance = discordance;
     }            
     
-    
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         return new HashCodeBuilder(13, 127).append(markerId).toHashCode();
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -181,11 +172,27 @@ public class DartValues implements Serializable{
 
     @Override
     public String toString() {
-        return "DartValues [adId=" + adId + ", datasetId=" + datasetId
-                + ", markerId=" + markerId + ", cloneId=" + cloneId
-                + ", qValue=" + qValue + ", reproducibility=" + reproducibility
-                + ", callRate=" + callRate + ", picValue=" + picValue
-                + ", discordance=" + discordance + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("DartValues [adId=");
+        builder.append(adId);
+        builder.append(", datasetId=");
+        builder.append(datasetId);
+        builder.append(", markerId=");
+        builder.append(markerId);
+        builder.append(", cloneId=");
+        builder.append(cloneId);
+        builder.append(", qValue=");
+        builder.append(qValue);
+        builder.append(", reproducibility=");
+        builder.append(reproducibility);
+        builder.append(", callRate=");
+        builder.append(callRate);
+        builder.append(", picValue=");
+        builder.append(picValue);
+        builder.append(", discordance=");
+        builder.append(discordance);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

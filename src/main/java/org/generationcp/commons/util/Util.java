@@ -9,7 +9,17 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
+/*******************************************************************************
+ * Copyright (c) 2012, All Rights Reserved.
+ * 
+ * Generation Challenge Programme (GCP)
+ * 
+ * 
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * 
+ *******************************************************************************/
 package org.generationcp.commons.util;
 
 import java.util.ArrayList;
@@ -17,6 +27,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * A utility class used to get primitive values of wrapper classes, check for
+ * null values, and list functions such as getting the max, existence of a
+ * value, existence of null, and making a list read only.
+ * 
+ */
 public class Util{
 
     /**
@@ -56,6 +72,11 @@ public class Util{
         return false;
     }
 
+    /**
+     * Returns true if all values are null.
+     * @param args
+     * @return
+     */
     public static boolean isAllNull(Object... args) {
         for (Object obj : args) {
             if (obj != null) {
@@ -97,6 +118,12 @@ public class Util{
         return list == null || list.isEmpty();
     }
 
+    /**
+     * Returns the maximum among the input values.
+     * @param value1
+     * @param values
+     * @return
+     */
     public static int max(int value1, int... values) {
         int max = value1;
 
@@ -109,6 +136,11 @@ public class Util{
         return max;
     }
 
+    /**
+     * Makes the given objects in the list unmodifiable.
+     * @param objects
+     * @return
+     */
     public static <T> List<T> makeReadOnlyList(T... objects) {
         if (objects == null) {
             return Collections.unmodifiableList(new ArrayList<T>());

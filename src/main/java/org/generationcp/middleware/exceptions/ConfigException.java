@@ -9,9 +9,12 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.exceptions;
 
+/**
+ * Exception for configuration issues.
+ *
+ */
 public class ConfigException extends RuntimeException{
 
     private static final long serialVersionUID = 1L;

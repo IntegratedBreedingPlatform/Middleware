@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.dao;
 
 import java.math.BigInteger;
@@ -29,7 +28,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 /**
- * The Class ProjectUserDAO.
+ * DAO class for {@link ProjectUserRole}.
  * 
  * @author Joyce Avestro
  * 

@@ -89,8 +89,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 /**
- * The Class DatabaseBroker. 
- * Mainly used to handle DAO instances and sessions connecting to the database
+ * Used to handle DAO instances and sessions connecting to the database.
  * Superclass of DataManager, Builder, Searcher and Saver classes.
  * Maintains session for local and central connection.
  * 

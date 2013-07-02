@@ -17,9 +17,8 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
-
 /**
- * Embeddable primary key of QtlDetails
+ * The primary identifier of {@link QtlDetails}.
  * 
  * @author Joyce Avestro
  * 
@@ -40,33 +39,27 @@ public class QtlDetailsPK implements Serializable{
     public QtlDetailsPK() {
     }
 
-
     public QtlDetailsPK(Integer qtlId, Integer mapId) {
         super();
         this.qtlId = qtlId;
         this.mapId = mapId;
     }
-
     
-        public Integer getQtlId() {
+    public Integer getQtlId() {
         return qtlId;
     }
 
-    
     public void setQtlId(Integer qtlId) {
         this.qtlId = qtlId;
     }
 
-    
     public Integer getMapId() {
         return mapId;
     }
 
-    
     public void setMapId(Integer mapId) {
         this.mapId = mapId;
     }
-
 
     @Override
     public int hashCode() {
@@ -76,7 +69,6 @@ public class QtlDetailsPK implements Serializable{
         result = prime * result + ((qtlId == null) ? 0 : qtlId.hashCode());
         return result;
     }
-
 
     @Override
     public boolean equals(Object obj) {
@@ -100,7 +92,6 @@ public class QtlDetailsPK implements Serializable{
         return true;
     }
 
-
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -111,7 +102,5 @@ public class QtlDetailsPK implements Serializable{
         builder.append("]");
         return builder.toString();
     }
-    
-    
 
 }

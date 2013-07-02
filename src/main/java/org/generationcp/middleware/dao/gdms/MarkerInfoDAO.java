@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.dao.gdms;
 
 import java.math.BigInteger;
@@ -23,8 +22,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 
 /**
- * The Class MarkerInfoDAO.
- * 
+ * DAO class for {@link MarkerInfo}.
+ *
  * @author Joyce Avestro
  * 
  */

@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos.gdms;
 
 import java.io.Serializable;
@@ -32,7 +31,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @Table(name = "gdms_char_values")
 public class CharValues implements Serializable{
 
-    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
     
     // For getMarkerNamesByGIds()
@@ -95,47 +93,29 @@ public class CharValues implements Serializable{
             "FROM gdms_char_values " +
             "WHERE gid in (:gids)";
 
-
-    /** The ac id. */
     @Id
     @Basic(optional = false)
     @Column(name = "ac_id")
     private Integer acId;
     
-    /** The dataset id. */
     @Basic(optional = false)
     @Column(name = "dataset_id")
     private Integer datasetId;
 
-    /** The marker id. */
     @Basic(optional = false)
     @Column(name = "marker_id")
     private Integer markerId;
 
-    /** The g id. */
     @Basic(optional = false)
     @Column(name = "gid")
     private Integer gId;
     
-    /** The char value. */
     @Column(name = "char_value")
     String charValue;
     
-    /**
-     * Instantiates a new char values.
-     */
     public CharValues() {
     }
 
-    /**
-     * Instantiates a new char values.
-     *
-     * @param acId the ac id
-     * @param datasetId the dataset id
-     * @param markerId the marker id
-     * @param gId the g id
-     * @param charValue the char value
-     */
     public CharValues(Integer acId, Integer datasetId, Integer markerId, Integer gId, String charValue) {
         super();
         this.acId = acId;
@@ -145,107 +125,51 @@ public class CharValues implements Serializable{
         this.charValue = charValue;
     }
     
-    /**
-     * Gets the ac id.
-     *
-     * @return the ac id
-     */
     public Integer getAcId() {
         return acId;
     }
-    
-    /**
-     * Sets the ac id.
-     *
-     * @param acId the new ac id
-     */
+
     public void setAcId(Integer acId) {
         this.acId = acId;
     }
     
-    /**
-     * Gets the dataset id.
-     *
-     * @return the dataset id
-     */
     public Integer getDatasetId() {
         return datasetId;
     }
     
-    /**
-     * Sets the dataset id.
-     *
-     * @param datasetId the new dataset id
-     */
     public void setDatasetId(Integer datasetId) {
         this.datasetId = datasetId;
     }
     
-    /**
-     * Gets the marker id.
-     *
-     * @return the marker id
-     */
     public Integer getMarkerId() {
         return markerId;
     }
     
-    /**
-     * Sets the marker id.
-     *
-     * @param markerId the new marker id
-     */
     public void setMarkerId(Integer markerId) {
         this.markerId = markerId;
     }
     
-    /**
-     * Gets the g id.
-     *
-     * @return the g id
-     */
     public Integer getgId() {
         return gId;
     }
     
-    /**
-     * Sets the g id.
-     *
-     * @param gId the new g id
-     */
     public void setgId(Integer gId) {
         this.gId = gId;
     }
     
-    /**
-     * Gets the char value.
-     *
-     * @return the char value
-     */
     public String getCharValue() {
         return charValue;
     }
     
-    /**
-     * Sets the char value.
-     *
-     * @param charValue the new char value
-     */
     public void setCharValue(String charValue) {
         this.charValue = charValue;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         return new HashCodeBuilder(3, 139).append(acId).toHashCode();
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {

@@ -18,27 +18,19 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
- * <b>Description</b>: Placeholder POJO for Allelic Value Element
+ * Placeholder POJO for Allelic Value Element.
  * Used by GenotypicDataManager.getAllelicValuesByGidsAndMarkerNames().
  * 
- * <br>
- * <br>
- * 
- * <b>Author</b>: Mark Agarrado <br>
- * <b>File Created</b>: Jul 13, 2012
+ * @author Mark Agarrado
  */
 public class AllelicValueElement implements Serializable{
 
-    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
-    /** The Germplasm Id. */
     private Integer gid;
     
-    /** The Data value. */
     private String data;
     
-    /** The Marker Name. */
     private String markerName;
     
     private Integer datasetId;
@@ -82,8 +74,6 @@ public class AllelicValueElement implements Serializable{
         this.peakHeight = null;
     }
 
-
-
     /**
      * Instantiates a AllelicValueElement object with gid, data(char_value for table char_values, 
      * allele_bin_value for allele_values table and map_char_value for mapping_pop_values), marker name.
@@ -99,80 +89,41 @@ public class AllelicValueElement implements Serializable{
         this.peakHeight = peakHeight;
     }
     
-    /**
-     * Gets the Germplasm Id.
-     * 
-     * @return the gid
-     */
     public Integer getGid() {
         return gid;
     }
 
-    
-    /**
-     * Sets the Germplasm Id.
-     * 
-     * @param gid the gid to set
-     */
     public void setGid(Integer gid) {
         this.gid = gid;
     }
 
-    
-    /**
-     * Gets the Data value.
-     * 
-     * @return the data
-     */
     public String getData() {
         return data;
     }
 
-    
-    /**
-     * Sets the Data value.
-     * 
-     * @param data the data to set
-     */
     public void setData(String data) {
         this.data = data;
     }
 
-    
-    /**
-     * Gets the Marker Name.
-     * 
-     * @return the markerName
-     */
     public String getMarkerName() {
         return markerName;
     }
 
-    
-    /**
-     * Sets the Marker Name.
-     * 
-     * @param markerName the markerName to set
-     */
     public void setMarkerName(String markerName) {
         this.markerName = markerName;
     }
     
-    
     public Integer getDatasetId() {
         return datasetId;
     }
-
     
     public void setDatasetId(Integer datasetId) {
         this.datasetId = datasetId;
     }
-
     
     public String getAlleleBinValue() {
         return alleleBinValue;
     }
-
     
     public void setAlleleBinValue(String alleleBinValue) {
         this.alleleBinValue = alleleBinValue;
@@ -205,9 +156,6 @@ public class AllelicValueElement implements Serializable{
 		return builder.toString();
 	}
     
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -227,9 +175,6 @@ public class AllelicValueElement implements Serializable{
                 .append(markerName, rhs.markerName).isEquals();
     }
     
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 77).append(gid)

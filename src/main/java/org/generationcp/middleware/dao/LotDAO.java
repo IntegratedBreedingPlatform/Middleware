@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.dao;
 
 import java.util.ArrayList;
@@ -23,6 +22,10 @@ import org.hibernate.HibernateException;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+/**
+ * DAO class for {@link Lot}.
+ * 
+ */
 public class LotDAO extends GenericDAO<Lot, Integer>{
 
     @SuppressWarnings("unchecked")

@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.dao;
 
 import java.util.ArrayList;
@@ -23,6 +22,10 @@ import org.hibernate.Query;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+/**
+ * DAO class for {@link Transaction}.
+ * 
+ */
 public class TransactionDAO extends GenericDAO<Transaction, Integer>{
 
     public void validateId(Transaction transaction) throws MiddlewareQueryException {

@@ -24,80 +24,39 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  */
 public class GermplasmMarkerElement {
         
-    /** The germplasm name. */
     private String germplasmName;
     
-    /** The marker names. */
     private List<String> markerNames;
     
-    /**
-     * Instantiates a new marker name element.
-     */
     GermplasmMarkerElement(){
     }
    
-    /**
-     * Instantiates a new marker name element.
-     *
-     * @param gId the germplasm id
-     * @param markerName the marker name
-     */
     public GermplasmMarkerElement(String germplasmName, List<String> markerNames){
         this.germplasmName = germplasmName;
         this.markerNames = markerNames;
     }
     
-    /**
-     * Gets the marker names.
-     *
-     * @return the marker names
-     */
     public List<String> getMarkerNames() {
         return markerNames;
     }
 
-    
-    /**
-     * Sets the marker names.
-     *
-     * @param markerNames the new marker name list
-     */
     public void setMarkerName(List<String> markerNames) {
         this.markerNames = markerNames;
     }
    
-
-    
-    /**
-     *
-     * @return the germplasmName
-     */
     public String getGermplasmName() {
         return germplasmName;
     }
 
-    
-    /**
-     * Sets the germplasm name.
-     *
-     * @param germplasmName the new germplasmName
-     */
     public void setGermplasmName(String germplasmName) {
         this.germplasmName = germplasmName;
     }
 
-    
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         return new HashCodeBuilder(139, 11).append(germplasmName).toHashCode();
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {

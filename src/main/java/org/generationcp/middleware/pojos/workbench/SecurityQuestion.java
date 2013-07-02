@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos.workbench;
 
 import java.io.Serializable;
@@ -26,7 +25,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 
 /**
- * The POJO for the workbench user's security questions.
+ * The POJO for the workbench user's security questions (workbench_security_question table).
  * 
  *  @author Mark Agarrado
  *  

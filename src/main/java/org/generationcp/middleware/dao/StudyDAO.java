@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.dao;
 
 import java.math.BigInteger;
@@ -27,6 +26,10 @@ import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+/**
+ * DAO class for {@link Study}.
+ * 
+ */
 public class StudyDAO extends GenericDAO<Study, Integer>{
 
     @SuppressWarnings("unchecked")

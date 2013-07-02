@@ -21,14 +21,9 @@ import javax.persistence.Table;
 
 
 /**
- * <b>Description</b>: POJO for Map table.
+ * POJO for gdms_map table.
  * 
- * <br>
- * <br>
- * 
- * <b>Author</b>: Michael Blancaflor
- * <br>
- * <b>File Created</b>: Jul 9, 2012
+ * @author Michael Blancaflor
  */
 @Entity
 @Table(name = "gdms_map")

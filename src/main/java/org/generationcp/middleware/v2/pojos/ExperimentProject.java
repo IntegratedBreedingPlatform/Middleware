@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.v2.pojos;
 
 import java.io.Serializable;
@@ -36,7 +35,6 @@ import org.hibernate.annotations.FetchMode;
  * @author Darla Ani
  *
  */
-
 @Entity
 @Table(name = "nd_experiment_project")
 public class ExperimentProject implements Serializable {

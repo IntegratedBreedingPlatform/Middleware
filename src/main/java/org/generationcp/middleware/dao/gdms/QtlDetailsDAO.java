@@ -24,9 +24,10 @@ import org.hibernate.SQLQuery;
 
 
 /**
- * DAO for QtlDetails objects
- * 
+ * DAO class for {@link QtlDetails}.
+ *
  * @author Joyce Avestro
+ * 
  */
 @SuppressWarnings("unchecked")
 public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{

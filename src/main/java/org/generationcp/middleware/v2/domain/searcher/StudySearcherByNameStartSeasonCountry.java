@@ -12,12 +12,10 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.pojos.Country;
-import org.generationcp.middleware.v2.domain.StudyReference;
 import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.pojos.CVTerm;
 import org.generationcp.middleware.v2.pojos.DmsProject;
 import org.generationcp.middleware.v2.search.filter.BrowseStudyQueryFilter;
-import org.generationcp.middleware.v2.search.filter.StudyQueryFilter;
 
 public class StudySearcherByNameStartSeasonCountry extends Searcher {
 
@@ -26,11 +24,7 @@ public class StudySearcherByNameStartSeasonCountry extends Searcher {
 			HibernateSessionProvider sessionProviderForCentral) { 
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
-	/*
-	public List<StudyReference> searchByFilter(BrowseStudyQueryFilter filter, int start, int numOfRows) throws MiddlewareQueryException {
-		
-	}
-	*/
+
 	public List<DmsProject> searchByFilter(BrowseStudyQueryFilter filter, int start, int numOfRows) throws MiddlewareQueryException {
 		Set<DmsProject> studies = new HashSet<DmsProject>();
 		

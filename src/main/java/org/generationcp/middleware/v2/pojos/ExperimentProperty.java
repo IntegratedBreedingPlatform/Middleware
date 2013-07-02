@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2012, All Rights Reserved.
+ * 
+ * Generation Challenge Programme (GCP)
+ * 
+ * 
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * 
+ *******************************************************************************/
 package org.generationcp.middleware.v2.pojos;
 
 import java.io.Serializable;
@@ -46,12 +57,8 @@ public class ExperimentProperty implements Serializable {
     @JoinColumn(name = "nd_experiment_id", nullable = false)
 	private ExperimentModel experiment;
     
-	
-
 	public ExperimentProperty(){
-		
 	}
-	
 	
     @Override
     public String toString() {
@@ -93,41 +100,33 @@ public class ExperimentProperty implements Serializable {
 		return true;
 	}
 
-
 	public Integer getNdExperimentpropId() {
 		return ndExperimentpropId;
 	}
-
 
 	public void setNdExperimentpropId(Integer nd_experimentprop_id) {
 		this.ndExperimentpropId = nd_experimentprop_id;
 	}
 
-
 	public Integer getTypeId() {
 		return typeId;
 	}
-
 
 	public void setTypeId(Integer type_id) {
 		this.typeId = type_id;
 	}
 
-
 	public String getValue() {
 		return value;
 	}
-
 
 	public void setValue(String value) {
 		this.value = value;
 	}
 
-
 	public Integer getRank() {
 		return rank;
 	}
-
 
 	public void setRank(Integer rank) {
 		this.rank = rank;
@@ -140,6 +139,5 @@ public class ExperimentProperty implements Serializable {
 	public void setExperiment(ExperimentModel experiment) {
 		this.experiment = experiment;
 	}
-
 	
 }

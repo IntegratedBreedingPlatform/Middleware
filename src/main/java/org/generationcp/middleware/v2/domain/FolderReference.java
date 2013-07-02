@@ -9,12 +9,11 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.v2.domain;
 
 
 /**
- * This class is used to display root or top-level folders of Studies
+ * Contains the primary details of a folder - id, name, description.
  * 
  * @author Darla Ani
  *

@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos.gdms;
 
 import java.io.Serializable;
@@ -22,7 +21,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
- * POJO for marker_metadataset table.
+ * POJO for gdms_marker_metadataset table.
  *
  * @author Joyce Avestro
  */
@@ -30,11 +29,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @Table(name = "gdms_marker_metadataset")
 public class MarkerMetadataSet implements Serializable{
 
-    
-    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
-    /** The Constant GET_MARKER_ID_BY_DATASET_ID. */
     public static final String GET_MARKER_ID_BY_DATASET_ID = 
             "SELECT marker_id " +
             "FROM gdms_marker_metadataset " +
@@ -57,7 +53,6 @@ public class MarkerMetadataSet implements Serializable{
             "    AND gdms_acc_metadataset.gid = :gid " + 
             "ORDER BY gdms_marker_metadataset.marker_id ";
 
-    /** The id. */
     @EmbeddedId
     protected MarkerMetadataSetPK id;
 
@@ -71,56 +66,31 @@ public class MarkerMetadataSet implements Serializable{
     public MarkerMetadataSet(Integer datasetId, Integer markerId) {
         this.id = new MarkerMetadataSetPK(datasetId, markerId);
     }
-
     
     public MarkerMetadataSetPK getId() {
         return id;
     }
 
-    
     public void setId(MarkerMetadataSetPK id) {
         this.id = id;
     }
 
-    /**
-     * Gets the dataset id.
-     *
-     * @return the dataset id
-     */
     public Integer getDatasetId() {
         return id.getDatasetId();
     }
     
-    /**
-     * Sets the dataset id.
-     *
-     * @param datasetId the new dataset id
-     */
     public void setDatasetId(Integer datasetId) {
         id.setDatasetId(datasetId);
     }
     
-    /**
-     * Gets the marker id.
-     *
-     * @return the marker id
-     */
     public Integer getMarkerId() {
         return id.getMarkerId();
     }
     
-    /**
-     * Sets the marker id.
-     *
-     * @param markerId the new marker id
-     */
     public void setMarkerId(Integer markerId) {
         id.setMarkerId(markerId);
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -137,9 +107,6 @@ public class MarkerMetadataSet implements Serializable{
         return new EqualsBuilder().appendSuper(super.equals(obj)).append(id, rhs.id).isEquals();
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         return new HashCodeBuilder(37, 101).append(id).toHashCode();

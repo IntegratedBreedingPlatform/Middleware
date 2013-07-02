@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos.workbench;
 
 import java.io.Serializable;
@@ -19,6 +18,10 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Id;
 
+/**
+ * POJO for workbench_crop table.
+ *  
+ */
 @Entity
 @Table(name = "workbench_crop")
 public class CropType implements Serializable{

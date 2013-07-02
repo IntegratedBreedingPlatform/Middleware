@@ -9,14 +9,14 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.v2.domain.searcher;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.v2.util.DatabaseBroker;
 
 /**
- * Mainly used for local-central initially.
+ * Provides searcher classes that can be used to retrieve data from IBDBv2 schema.
+ * Creates searcher classes based on the given local/central session parameters.
  * 
  * @author Donald Barre
  */

@@ -13,7 +13,7 @@
 package org.generationcp.middleware.v2.domain;
 
 /**
- * Abstract POJO that stores ID and Name fields.
+ * Abstract POJO that stores ID, name and description fields.
  * 
  * @author Darla Ani
  *

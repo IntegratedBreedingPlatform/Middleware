@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
@@ -25,6 +24,10 @@ import javax.persistence.Table;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+/**
+ * POJO for represtn table.
+ * 
+ */
 @NamedQueries({
         // SELECT * FROM represtn WHERE effectid = 1176
         @NamedQuery(name = "getRepresentationByEffectId", query = "SELECT r FROM Representation r WHERE r.effectId = :effectId"),
@@ -44,7 +47,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
             		"WHERE dc.variatid = :variatid and ou.represno = :represno", resultClass = Integer.class)
 
 })*/
-
 @Entity
 @Table(name = "represtn")
 public class Representation implements Serializable{

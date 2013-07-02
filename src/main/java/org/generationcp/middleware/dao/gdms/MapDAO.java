@@ -23,11 +23,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 
 /**
- * <b>Description</b>: DAO for Map table
- * 
- * <br>
- * <br>
- * 
+ * DAO class for {@link Map}.
+ *
  * <b>Author</b>: Michael Blancaflor
  * <br>
  * <b>File Created</b>: Jul 9, 2012.

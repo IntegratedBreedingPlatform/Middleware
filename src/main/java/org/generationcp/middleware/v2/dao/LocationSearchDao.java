@@ -11,40 +11,22 @@
  *******************************************************************************/
 package org.generationcp.middleware.v2.dao;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.v2.domain.Reference;
-import org.generationcp.middleware.v2.domain.TermId;
-import org.generationcp.middleware.v2.domain.DatasetReference;
-import org.generationcp.middleware.v2.domain.FolderReference;
-import org.generationcp.middleware.v2.domain.StudyReference;
-import org.generationcp.middleware.v2.pojos.DmsProject;
-import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.SQLQuery;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.ProjectionList;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 
 /**
+ * DAO class for {@link Location}.
  * 
  * @author Darla Ani, Joyce Avestro
  *
  */
-
 public class LocationSearchDao extends GenericDAO<Location, Integer> {
 	
 	@SuppressWarnings("unchecked")

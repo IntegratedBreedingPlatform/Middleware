@@ -15,6 +15,7 @@ package org.generationcp.middleware.pojos.gdms;
 import java.io.Serializable;
 
 /**
+ * Placeholder POJO for QtlDetail Element.
  * 
  * @author Joyce Avestro
  * 

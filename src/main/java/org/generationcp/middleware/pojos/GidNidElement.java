@@ -16,28 +16,19 @@ import java.io.Serializable;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-
 /**
- * <b>Description</b>: Placeholder POJO for Gid-Nid Pairs Element
+ * Placeholder POJO for Gid-Nid Pairs Element
  * 
- * <br>
- * <br>
+ * @author Joyce Avestro
  * 
- * <b>Author</b>: Joyce Avestro <br>
- * <b>File Created</b>: August 8, 2012
  */
 public class GidNidElement implements Serializable{
 
-    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
     
-    /** The Germplasm Id. */
     private Integer germplasmId;
     
-    /** The Name Id. */
     private Integer nameId;
-
-
     
     public GidNidElement(Integer germplasmId, Integer nameId) {
         super();
@@ -73,9 +64,6 @@ public class GidNidElement implements Serializable{
         return builder.toString();
     }
     
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -93,9 +81,6 @@ public class GidNidElement implements Serializable{
                 .append(nameId, rhs.nameId).isEquals();
     }
     
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         return new HashCodeBuilder(77, 7).append(germplasmId)

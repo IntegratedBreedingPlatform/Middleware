@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
@@ -26,6 +25,10 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.generationcp.commons.util.StringUtil;
 import org.generationcp.commons.util.Util;
 
+/**
+ * POJO for persons table.
+ * 
+ */
 @Entity
 @Table(name = "persons")
 public class Person implements Serializable{
@@ -180,10 +183,10 @@ public class Person implements Serializable{
     
     public String getDisplayName() {
         String displayName = StringUtil.joinIgnoreEmpty(" "
-                                                        ,firstName == null || Util.isOneOf(firstName, "-", "'-'") ? "" : firstName
-                                                        ,middleName == null || Util.isOneOf(middleName, "-", "'-'") ? "" : middleName
-                                                        ,lastName == null || Util.isOneOf(lastName, "-", "'-'") ? "" : lastName
-                                                        );
+            ,firstName == null || Util.isOneOf(firstName, "-", "'-'") ? "" : firstName
+            ,middleName == null || Util.isOneOf(middleName, "-", "'-'") ? "" : middleName
+            ,lastName == null || Util.isOneOf(lastName, "-", "'-'") ? "" : lastName
+                        );
         return displayName;
     }
 

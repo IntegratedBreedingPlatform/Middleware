@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.dao;
 
 import java.util.ArrayList;
@@ -25,10 +24,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 /**
- * <b>Description</b>: DAO class for ProjectLocationMap.
- * 
- * <br>
- * <br>
+ * DAO class for {@link ProjectLocationMap}.
  * 
  * <b>Author</b>: Michael Blancaflor
  * <br>

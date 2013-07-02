@@ -9,9 +9,7 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.dao;
-
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +20,10 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Restrictions;
 
+/**
+ * DAO class for {@link WorkflowTemplate}.
+ * 
+ */
 public class WorkflowTemplateDAO extends GenericDAO<WorkflowTemplate, Long>{
 
     @SuppressWarnings("unchecked")

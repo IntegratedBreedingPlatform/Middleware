@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.dao;
 
 import java.util.ArrayList;
@@ -23,10 +22,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.criterion.Restrictions;
 
 /**
- * <b>Description</b>: DAO class for {@link ToolConfiguration}.
- * 
- * <br>
- * <br>
+ * DAO class for {@link ToolConfiguration}.
  * 
  * <b>Author</b>: Michael Blancaflor
  * <br>

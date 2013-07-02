@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.manager;
 
 import java.io.File;
@@ -23,6 +22,10 @@ import java.util.Properties;
 import org.generationcp.commons.util.ResourceFinder;
 import org.generationcp.middleware.exceptions.ConfigException;
 
+/**
+ * Database connection parameters: host, port, dbName, url, driverName, userName and password.
+ *
+ */
 public class DatabaseConnectionParameters{
 
     private String host;

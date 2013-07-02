@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.dao;
 
 import java.math.BigInteger;
@@ -19,6 +18,10 @@ import org.generationcp.middleware.pojos.Person;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 
+/**
+ * DAO class for {@link Person}.
+ * 
+ */
 public class PersonDAO extends GenericDAO<Person, Integer>{
 
     public boolean isPersonExists(String firstName, String lastName) throws MiddlewareQueryException {

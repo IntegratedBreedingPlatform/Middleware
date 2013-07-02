@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos.gdms;
 
 import java.io.Serializable;
@@ -24,7 +23,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
- * POJO for marker_retrieval_info table.
+ * POJO for gdms_marker_retrieval_info table.
  *
  * @author Joyce Avestro
  */
@@ -32,7 +31,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @Table(name = "gdms_marker_retrieval_info")
 public class MarkerInfo implements Serializable{
 
-    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
     
     /* Used by MarkerInfoDAO.getByMarkerName() */
@@ -57,7 +55,6 @@ public class MarkerInfo implements Serializable{
                     ", genotypes_count " +
             "FROM gdms_marker_retrieval_info " +
             "WHERE LOWER(marker_name) LIKE LOWER(:markerName)";
-
 
     /* Used by MarkerInfoDAO.countByMarkerName() */
     public static final String COUNT_BY_MARKER_NAME = 
@@ -122,7 +119,6 @@ public class MarkerInfo implements Serializable{
             "SELECT COUNT(*) " +
             "FROM gdms_marker_retrieval_info " +
             "WHERE LOWER(db_accession_id) LIKE LOWER(:dbAccessionId)";
-
     
     @Id
     @Column(name = "marker_id")
@@ -353,17 +349,11 @@ public class MarkerInfo implements Serializable{
         this.genotypesCount = genotypesCount;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         return new HashCodeBuilder(13, 127).append(markerId).toHashCode();
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {

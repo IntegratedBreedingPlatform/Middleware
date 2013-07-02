@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
@@ -42,7 +41,6 @@ import org.generationcp.middleware.v2.domain.saver.StockSaver;
 import org.generationcp.middleware.v2.domain.saver.StudySaver;
 import org.generationcp.middleware.v2.domain.saver.CvTermSaver;
 import org.generationcp.middleware.v2.domain.searcher.StudySearcherByNameStartSeasonCountry;
-import org.generationcp.middleware.v2.factory.TermFactory;
 import org.generationcp.middleware.v2.util.DatabaseBroker;
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -51,7 +49,9 @@ import org.slf4j.LoggerFactory;
 /**
  * The Class DataManager.
  * Superclass of DataManager implementations.
- * Mainly used for local-central initially.
+ * Contains generic implementation of retrieval methods. 
+ * Supports local-central dynamics.
+ * Contains getters of Builder, Saver, Searcher objects.
  * 
  * @author Joyce Avestro
  * @author Glenn Marintes
@@ -868,10 +868,6 @@ public abstract class DataManager extends DatabaseBroker{
     
     protected final DatasetProjectSaver getDatasetProjectSaver() {
     	return new DatasetProjectSaver(sessionProviderForLocal, sessionProviderForCentral);
-    }
-    
-    protected final TermFactory getTermFactory() {
-    	return new TermFactory();
     }
     
     protected final ExperimentModelSaver getExperimentModelSaver() {

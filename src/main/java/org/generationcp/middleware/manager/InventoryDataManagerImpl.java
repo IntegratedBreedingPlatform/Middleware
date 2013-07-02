@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
@@ -34,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Implementation of the InventoryDataManager interface.
  * Most of the functions in this class only use the connection to the local
  * instance, this is because the lot and transaction tables only exist in a
  * local instance.

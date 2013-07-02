@@ -31,7 +31,7 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 /**
- * POJO for udflds table
+ * POJO for udflds table.
  * 
  * @author Kevin Manansala, Mark Agarrado
  */

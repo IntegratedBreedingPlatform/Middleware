@@ -17,6 +17,10 @@ import java.io.Serializable;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+/**
+ * Placeholder POJO for {@link NumericData} 
+ * 
+ */
 public class NumericDataElement implements Serializable{
 
     private static final long serialVersionUID = -4284129132975100671L;

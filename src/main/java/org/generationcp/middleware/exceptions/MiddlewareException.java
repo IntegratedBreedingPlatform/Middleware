@@ -9,9 +9,12 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.exceptions;
 
+/**
+ * Exceptions for non-database Middleware issues.
+ *
+ */
 public class MiddlewareException extends Exception{
 
     private static final long serialVersionUID = 1L;

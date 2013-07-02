@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.dao;
 
 import java.math.BigInteger;
@@ -27,6 +26,10 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 
+/**
+ * DAO class for {@link NumericLevel}.
+ * 
+ */
 public class NumericLevelDAO extends GenericDAO<NumericLevel, NumericLevelPK>{
 
     @SuppressWarnings("rawtypes")

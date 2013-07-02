@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.dao;
 
 import java.util.ArrayList;
@@ -22,6 +21,10 @@ import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 
+/**
+ * DAO class for {@link Progenitor}.
+ * 
+ */
 public class ProgenitorDAO extends GenericDAO<Progenitor, ProgenitorPK>{
 
     public Progenitor getByGIDAndPID(Integer gid, Integer pid) throws MiddlewareQueryException {

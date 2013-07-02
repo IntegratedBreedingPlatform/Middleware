@@ -11,7 +11,6 @@
  * Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  **************************************************************/
-
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;

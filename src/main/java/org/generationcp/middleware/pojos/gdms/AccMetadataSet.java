@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos.gdms;
 
 import java.io.Serializable;
@@ -22,7 +21,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
- * POJO for acc_metadataset table
+ * POJO for acc_metadataset table.
  * 
  * @author Joyce Avestro
  *  
@@ -81,8 +80,6 @@ public class AccMetadataSet implements Serializable{
             "INNER JOIN gdms_marker_metadataset gmm on gmm.dataset_id = gam.dataset_id " + 
             "WHERE gam.dataset_id IN (:represnos) " ;
 
-
-    /** The id. */
     @EmbeddedId
     protected AccMetadataSetPK id;
 
@@ -97,20 +94,10 @@ public class AccMetadataSet implements Serializable{
         this.id = new AccMetadataSetPK(datasetId, germplasmId, nameId);
     }
 
-    /**
-     * Gets the id.
-     *
-     * @return the id
-     */
     public AccMetadataSetPK getId() {
         return id;
     }
     
-    /**
-     * Sets the id.
-     *
-     * @param id the new id
-     */
     public void setId(AccMetadataSetPK id) {
         this.id = id;
     }
@@ -144,10 +131,6 @@ public class AccMetadataSet implements Serializable{
         id.setNameId(nameId);
     }
     
-
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -164,9 +147,6 @@ public class AccMetadataSet implements Serializable{
         return new EqualsBuilder().appendSuper(super.equals(obj)).append(id, rhs.id).isEquals();
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37).append(id).toHashCode();

@@ -9,7 +9,6 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
@@ -19,7 +18,7 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 /**
- * POJO for primary key of Progntrs
+ * The primary identifier of {@link CharacterData}.
  * 
  * @author klmanansala
  */

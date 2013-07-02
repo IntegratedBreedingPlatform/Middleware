@@ -11,7 +11,6 @@
  *******************************************************************************/
 package org.generationcp.middleware.v2.domain.saver;
 
-
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;

@@ -28,6 +28,10 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.generationcp.middleware.pojos.User;
 
+/**
+ * POJO for workbench_project_user_mysql_account table.
+ *  
+ */
 @Entity
 @Table(name = "workbench_project_user_mysql_account")
 public class ProjectUserMysqlAccount implements Serializable{

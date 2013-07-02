@@ -1,7 +1,19 @@
+/*******************************************************************************
+ * Copyright (c) 2012, All Rights Reserved.
+ * 
+ * Generation Challenge Programme (GCP)
+ * 
+ * 
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * 
+ *******************************************************************************/
 package org.generationcp.middleware.pojos.gdms;
 
 /**
- * Mainly used by GenotypicDataManager.getQtlDataByTraits()
+ * Placeholder POJO for QtlData element.
+ * Mainly used by GenotypicDataManager.getQtlDataByTraits().
  * 
  * @author Joyce Avestro
  *
@@ -46,126 +58,101 @@ public class QtlDataElement {
 		this.rSquare = rSquare;
 	}
 
-
 	public String getQtlName() {
 		return qtlName;
 	}
-
 
 	public void setQtlName(String qtlName) {
 		this.qtlName = qtlName;
 	}
 
-
 	public String getLinkageGroup() {
 		return linkageGroup;
 	}
-
 
 	public void setLinkageGroup(String linkageGroup) {
 		this.linkageGroup = linkageGroup;
 	}
 
-
 	public Float getPosition() {
 		return position;
 	}
-
 
 	public void setPosition(Float position) {
 		this.position = position;
 	}
 
-
 	public Float getMinPosition() {
 		return minPosition;
 	}
-
 
 	public void setMinPosition(Float minPosition) {
 		this.minPosition = minPosition;
 	}
 
-
 	public Float getMaxPosition() {
 		return maxPosition;
 	}
-
 
 	public void setMaxPosition(Float maxPosition) {
 		this.maxPosition = maxPosition;
 	}
 
-
 	public Integer getTraitId() {
 		return traitId;
 	}
-
 
 	public void setTraitId(Integer traitId) {
 		this.traitId = traitId;
 	}
 
-
 	public String getExperiment() {
 		return experiment;
 	}
-
 
 	public void setExperiment(String experiment) {
 		this.experiment = experiment;
 	}
 
-
 	public String getLeftFlankingMarker() {
 		return leftFlankingMarker;
 	}
-
 
 	public void setLeftFlankingMarker(String leftFlankingMarker) {
 		this.leftFlankingMarker = leftFlankingMarker;
 	}
 
-
 	public String getRightFlankingMarker() {
 		return rightFlankingMarker;
 	}
-
 
 	public void setRightFlankingMarker(String rightFlankingMarker) {
 		this.rightFlankingMarker = rightFlankingMarker;
 	}
 
-
 	public Integer getEffect() {
 		return effect;
 	}
-
 
 	public void setEffect(Integer effect) {
 		this.effect = effect;
 	}
 
-
 	public Float getScoreValue() {
 		return scoreValue;
 	}
-
 
 	public void setScoreValue(Float scoreValue) {
 		this.scoreValue = scoreValue;
 	}
 
-
 	public Float getrSquare() {
 		return rSquare;
 	}
 
-
 	public void setrSquare(Float rSquare) {
 		this.rSquare = rSquare;
 	}
-
 
 	@Override
 	public String toString() {
