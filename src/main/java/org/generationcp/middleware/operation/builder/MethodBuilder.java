@@ -11,7 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.builder;
 
-import org.generationcp.middleware.domain.Term;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;

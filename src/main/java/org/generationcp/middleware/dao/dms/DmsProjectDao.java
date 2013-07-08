@@ -18,11 +18,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.generationcp.middleware.dao.GenericDAO;
-import org.generationcp.middleware.domain.DatasetReference;
-import org.generationcp.middleware.domain.FolderReference;
-import org.generationcp.middleware.domain.Reference;
-import org.generationcp.middleware.domain.StudyReference;
-import org.generationcp.middleware.domain.TermId;
+import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.FolderReference;
+import org.generationcp.middleware.domain.dms.Reference;
+import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.hibernate.Criteria;

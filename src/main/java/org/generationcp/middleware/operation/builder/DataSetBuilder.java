@@ -13,10 +13,10 @@ package org.generationcp.middleware.operation.builder;
 
 import java.util.Set;
 
-import org.generationcp.middleware.domain.DataSet;
-import org.generationcp.middleware.domain.DataSetType;
-import org.generationcp.middleware.domain.TermId;
-import org.generationcp.middleware.domain.VariableTypeList;
+import org.generationcp.middleware.domain.dms.DataSet;
+import org.generationcp.middleware.domain.dms.DataSetType;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.helper.VariableInfo;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;

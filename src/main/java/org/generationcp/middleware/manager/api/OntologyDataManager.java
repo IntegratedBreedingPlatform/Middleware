@@ -14,8 +14,8 @@ package org.generationcp.middleware.manager.api;
 
 import java.util.Set;
 
-import org.generationcp.middleware.domain.StandardVariable;
-import org.generationcp.middleware.domain.Term;
+import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
 /**

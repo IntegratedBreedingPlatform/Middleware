@@ -14,7 +14,7 @@ package org.generationcp.middleware.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.domain.TermId;
+import org.generationcp.middleware.domain.oms.TermId;
 
 public class PlotUtil {
 

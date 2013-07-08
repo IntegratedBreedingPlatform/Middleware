@@ -11,7 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.search;
 
-import org.generationcp.middleware.domain.StudyReference;
+import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
 public interface StudyResultSet {

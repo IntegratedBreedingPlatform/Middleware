@@ -12,10 +12,10 @@
 package org.generationcp.middleware.operation.builder;
 
 
-import org.generationcp.middleware.domain.Experiment;
-import org.generationcp.middleware.domain.Study;
-import org.generationcp.middleware.domain.TermId;
-import org.generationcp.middleware.domain.VariableTypeList;
+import org.generationcp.middleware.domain.dms.Experiment;
+import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;

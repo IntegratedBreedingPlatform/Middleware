@@ -14,8 +14,8 @@ package org.generationcp.middleware.operation.builder;
 import java.util.List;
 import java.util.Set;
 
-import org.generationcp.middleware.domain.VariableType;
-import org.generationcp.middleware.domain.VariableTypeList;
+import org.generationcp.middleware.domain.dms.VariableType;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.helper.VariableInfo;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;

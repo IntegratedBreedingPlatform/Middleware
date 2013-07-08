@@ -17,7 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.generationcp.middleware.domain.TermId;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;

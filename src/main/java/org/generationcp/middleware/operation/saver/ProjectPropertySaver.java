@@ -15,11 +15,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
-import org.generationcp.middleware.domain.TermId;
-import org.generationcp.middleware.domain.Variable;
-import org.generationcp.middleware.domain.VariableList;
-import org.generationcp.middleware.domain.VariableType;
-import org.generationcp.middleware.domain.VariableTypeList;
+import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.dms.VariableType;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;

@@ -14,7 +14,7 @@ package org.generationcp.middleware.domain.cache;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.generationcp.middleware.domain.StandardVariable;
+import org.generationcp.middleware.domain.dms.StandardVariable;
 
 /**
  * This class is used to store standard variable in the cache to improve retrieval performance. 

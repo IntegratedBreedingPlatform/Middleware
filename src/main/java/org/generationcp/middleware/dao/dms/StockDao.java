@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.generationcp.middleware.dao.GenericDAO;
-import org.generationcp.middleware.domain.StudyReference;
+import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.hibernate.Criteria;

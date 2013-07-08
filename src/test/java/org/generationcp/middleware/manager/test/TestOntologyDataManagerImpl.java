@@ -19,12 +19,12 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Set;
 
-import org.generationcp.middleware.domain.Enumeration;
-import org.generationcp.middleware.domain.NameSynonym;
-import org.generationcp.middleware.domain.NameType;
-import org.generationcp.middleware.domain.StandardVariable;
-import org.generationcp.middleware.domain.Term;
-import org.generationcp.middleware.domain.VariableConstraints;
+import org.generationcp.middleware.domain.dms.Enumeration;
+import org.generationcp.middleware.domain.dms.NameSynonym;
+import org.generationcp.middleware.domain.dms.NameType;
+import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.VariableConstraints;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;

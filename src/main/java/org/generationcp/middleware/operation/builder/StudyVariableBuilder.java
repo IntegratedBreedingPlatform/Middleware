@@ -13,12 +13,12 @@ package org.generationcp.middleware.operation.builder;
 
 import java.util.List;
 
-import org.generationcp.middleware.domain.Experiment;
-import org.generationcp.middleware.domain.TermId;
-import org.generationcp.middleware.domain.Variable;
-import org.generationcp.middleware.domain.VariableList;
-import org.generationcp.middleware.domain.VariableType;
-import org.generationcp.middleware.domain.VariableTypeList;
+import org.generationcp.middleware.domain.dms.Experiment;
+import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.dms.VariableType;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;

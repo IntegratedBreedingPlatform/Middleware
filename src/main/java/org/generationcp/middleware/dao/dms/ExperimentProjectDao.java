@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
-import org.generationcp.middleware.domain.TermId;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.ExperimentProject;
 import org.hibernate.Criteria;

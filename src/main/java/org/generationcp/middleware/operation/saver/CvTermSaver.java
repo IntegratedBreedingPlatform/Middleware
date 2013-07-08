@@ -13,8 +13,8 @@ package org.generationcp.middleware.operation.saver;
 
 
 import org.generationcp.middleware.dao.oms.CVTermDao;
-import org.generationcp.middleware.domain.CvId;
-import org.generationcp.middleware.domain.Term;
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;

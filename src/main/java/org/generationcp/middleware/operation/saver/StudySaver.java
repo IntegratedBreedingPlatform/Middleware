@@ -12,8 +12,8 @@
 package org.generationcp.middleware.operation.saver;
 
 
-import org.generationcp.middleware.domain.StudyValues;
-import org.generationcp.middleware.domain.VariableTypeList;
+import org.generationcp.middleware.domain.dms.StudyValues;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 

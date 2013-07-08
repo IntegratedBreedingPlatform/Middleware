@@ -16,7 +16,7 @@ import java.util.List;
 
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ProjectRelationshipDao;
-import org.generationcp.middleware.domain.TermId;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
