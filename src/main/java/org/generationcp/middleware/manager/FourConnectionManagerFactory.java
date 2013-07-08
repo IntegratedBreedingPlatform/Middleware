@@ -23,7 +23,7 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.manager.api.TraitDataManager;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.util.ResourceFinder;
 import org.hibernate.SessionFactory;
@@ -223,8 +223,8 @@ public class FourConnectionManagerFactory implements Serializable{
         return new GermplasmListManagerImpl(sessionProviderForGMSLocal, sessionProviderForGMSCentral);
     }
 
-    public TraitDataManager getTraitDataManager() {
-        return new TraitDataManagerImpl(sessionProviderForDMSLocal, sessionProviderForDMSCentral);
+    public OntologyDataManager getOntologyDataManager() {
+        return new OntologyDataManagerImpl(sessionProviderForDMSLocal, sessionProviderForDMSCentral);
     }
 
     public StudyDataManager getStudyDataManager() throws ConfigException {

@@ -17,13 +17,13 @@ import java.util.Set;
 
 import org.generationcp.middleware.dao.LotDAO;
 import org.generationcp.middleware.dao.TransactionDAO;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Lot;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.Scale;
 import org.generationcp.middleware.pojos.report.LotReportRow;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
 import org.hibernate.SQLQuery;
@@ -375,7 +375,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
         Session sessionForCentral = getCurrentSessionForCentral();
         Session sessionForLocal = getCurrentSessionForLocal();
         GermplasmDataManagerImpl germplasmManager = new GermplasmDataManagerImpl(sessionForLocal, sessionForCentral);
-        TraitDataManagerImpl traitManager = new TraitDataManagerImpl(sessionForLocal, sessionForCentral);
+        OntologyDataManagerImpl ontologyManager = new OntologyDataManagerImpl(sessionForLocal, sessionForCentral);
 
         if (setWorkingDatabase(Database.LOCAL)) {
             List<org.generationcp.middleware.pojos.Transaction> transactions = getTransactionDao().getAllUncommitted(start, numOfRows);
@@ -386,9 +386,9 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
                 row.setQuantity(t.getQuantity());
                 row.setCommentOfLot(t.getLot().getComments());
 
-                Scale scale = traitManager.getScaleByID(t.getLot().getScaleId());
-                row.setScaleOfLot(scale);
-
+                Term termScale = ontologyManager.getTermById(t.getLot().getScaleId());
+                row.setScaleOfLot(termScale);
+                
                 Location location = germplasmManager.getLocationByID(t.getLot().getLocationId());
                 row.setLocationOfLot(location);
 
@@ -414,7 +414,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
         List<TransactionReportRow> report = new ArrayList<TransactionReportRow>();
         GermplasmDataManagerImpl germplasmManager = new GermplasmDataManagerImpl(sessionForLocal, sessionForCentral);
-        TraitDataManagerImpl traitManager = new TraitDataManagerImpl(sessionForLocal, sessionForCentral);
+        OntologyDataManagerImpl ontologyManager = new OntologyDataManagerImpl(sessionForLocal, sessionForCentral);
 
         List<org.generationcp.middleware.pojos.Transaction> transactions = getAllReserveTransactions(start, numOfRows);
         for (org.generationcp.middleware.pojos.Transaction t : transactions) {
@@ -424,8 +424,8 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
             row.setCommentOfLot(t.getLot().getComments());
             row.setEntityIdOfLot(t.getLot().getEntityId());
 
-            Scale scale = traitManager.getScaleByID(t.getLot().getScaleId());
-            row.setScaleOfLot(scale);
+            Term termScale = ontologyManager.getTermById(t.getLot().getScaleId());
+            row.setScaleOfLot(termScale);
 
             Location location = germplasmManager.getLocationByID(t.getLot().getLocationId());
             row.setLocationOfLot(location);
@@ -451,7 +451,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
         Session sessionForCentral = getCurrentSessionForCentral();
         Session sessionForLocal = getCurrentSessionForLocal();
         GermplasmDataManagerImpl germplasmManager = new GermplasmDataManagerImpl(sessionForLocal, sessionForCentral);
-        TraitDataManagerImpl traitManager = new TraitDataManagerImpl(sessionForLocal, sessionForCentral);
+        OntologyDataManagerImpl ontologyManager = new OntologyDataManagerImpl(sessionForLocal, sessionForCentral);
 
         if (setWorkingDatabase(Database.LOCAL)) {
             List<org.generationcp.middleware.pojos.Transaction> transactions = getTransactionDao().getAllWithdrawals(start, numOfRows);
@@ -462,8 +462,8 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
                 row.setCommentOfLot(t.getLot().getComments());
                 row.setEntityIdOfLot(t.getLot().getEntityId());
 
-                Scale scale = traitManager.getScaleByID(t.getLot().getScaleId());
-                row.setScaleOfLot(scale);
+                Term termScale = ontologyManager.getTermById(t.getLot().getScaleId());
+                row.setScaleOfLot(termScale);
 
                 Location location = germplasmManager.getLocationByID(t.getLot().getLocationId());
                 row.setLocationOfLot(location);
@@ -517,7 +517,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
         query.setMaxResults(numOfRows);
 
         GermplasmDataManagerImpl germplasmManager = new GermplasmDataManagerImpl(sessionForLocal, sessionForCentral);
-        TraitDataManagerImpl traitManager = new TraitDataManagerImpl(sessionForLocal, sessionForCentral);
+        OntologyDataManagerImpl ontologyManager = new OntologyDataManagerImpl(sessionForLocal, sessionForCentral);
         List<LotReportRow> report = new ArrayList<LotReportRow>();
 
         List<?> results = query.list();
@@ -535,8 +535,8 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
                 Location location = germplasmManager.getLocationByID((Integer) result[3]);
                 row.setLocationOfLot(location);
 
-                Scale scale = traitManager.getScaleByID((Integer) result[4]);
-                row.setScaleOfLot(scale);
+                Term termScale = ontologyManager.getTermById((Integer) result[4]);
+                row.setScaleOfLot(termScale);
 
                 report.add(row);
             }
@@ -597,7 +597,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
         Session sessionForLocal = getCurrentSessionForLocal();
 
         GermplasmDataManagerImpl germplasmManager = new GermplasmDataManagerImpl(sessionForLocal, sessionForCentral);
-        TraitDataManagerImpl traitManager = new TraitDataManagerImpl(sessionForLocal, sessionForCentral);
+        OntologyDataManagerImpl ontologyManager = new OntologyDataManagerImpl(sessionForLocal, sessionForCentral);
         List<LotReportRow> report = new ArrayList<LotReportRow>();
         for (Lot lot : listOfLots) {
             LotReportRow row = new LotReportRow();
@@ -612,8 +612,8 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
             Location location = germplasmManager.getLocationByID(lot.getLocationId());
             row.setLocationOfLot(location);
 
-            Scale scale = traitManager.getScaleByID(lot.getScaleId());
-            row.setScaleOfLot(scale);
+            Term termScale = ontologyManager.getTermById(lot.getScaleId());
+            row.setScaleOfLot(termScale);
 
             row.setCommentOfLot(lot.getComments());
 

@@ -40,9 +40,6 @@
   <mapping class="org.generationcp.middleware.pojos.UserDefinedField"/>
   <mapping class="org.generationcp.middleware.pojos.GermplasmList"/>
   <mapping class="org.generationcp.middleware.pojos.GermplasmListData"/>
-  <mapping class="org.generationcp.middleware.pojos.ScaleContinuous"/>
-  <mapping class="org.generationcp.middleware.pojos.ScaleDiscrete"/>
-  <mapping class="org.generationcp.middleware.pojos.ScaleDiscretePK"/>
   <mapping class="org.generationcp.middleware.pojos.Lot"/>
   <mapping class="org.generationcp.middleware.pojos.Transaction"/>
   <mapping class="org.generationcp.middleware.pojos.Person"/>
@@ -107,26 +104,5 @@
   <mapping class="org.generationcp.middleware.pojos.dms.ExperimentStock"/>
   <mapping class="org.generationcp.middleware.pojos.dms.ProjectRelationship"/>
   
-  <!-- Old DMS Schema (will be removed in the future) -->
-  <mapping class="org.generationcp.middleware.pojos.CharacterLevel"/>
-  <mapping class="org.generationcp.middleware.pojos.CharacterLevelPK"/>
-  <mapping class="org.generationcp.middleware.pojos.NumericLevel"/>
-  <mapping class="org.generationcp.middleware.pojos.NumericLevelPK"/>
-  <mapping class="org.generationcp.middleware.pojos.TraitMethod"/>
-  <mapping class="org.generationcp.middleware.pojos.Trait"/>
-  <mapping class="org.generationcp.middleware.pojos.NumericData"/>
-  <mapping class="org.generationcp.middleware.pojos.NumericDataPK"/>
-  <mapping class="org.generationcp.middleware.pojos.CharacterData"/>
-  <mapping class="org.generationcp.middleware.pojos.CharacterDataPK"/>
-  <mapping class="org.generationcp.middleware.pojos.Variate"/>
-  <mapping class="org.generationcp.middleware.pojos.Factor"/>
-  <mapping class="org.generationcp.middleware.pojos.Oindex"/>
-  <mapping class="org.generationcp.middleware.pojos.Scale"/>
-  <mapping class="org.generationcp.middleware.pojos.Study"/>
-  <mapping class="org.generationcp.middleware.pojos.StudyEffect"/>
-  <mapping class="org.generationcp.middleware.pojos.StudyEffectPK"/>
-  <mapping class="org.generationcp.middleware.pojos.Representation"/>
-
-
  </session-factory>
 </hibernate-configuration>

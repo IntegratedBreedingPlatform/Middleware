@@ -13,10 +13,7 @@ package org.generationcp.middleware.util;
 
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.BibrefDAO;
-import org.generationcp.middleware.dao.CharacterDataDAO;
-import org.generationcp.middleware.dao.CharacterLevelDAO;
 import org.generationcp.middleware.dao.CountryDAO;
-import org.generationcp.middleware.dao.FactorDAO;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
@@ -26,23 +23,11 @@ import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.LotDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
-import org.generationcp.middleware.dao.NumericDataDAO;
-import org.generationcp.middleware.dao.NumericLevelDAO;
-import org.generationcp.middleware.dao.OindexDAO;
 import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
-import org.generationcp.middleware.dao.RepresentationDAO;
-import org.generationcp.middleware.dao.ScaleContinuousDAO;
-import org.generationcp.middleware.dao.ScaleDAO;
-import org.generationcp.middleware.dao.ScaleDiscreteDAO;
-import org.generationcp.middleware.dao.StudyDAO;
-import org.generationcp.middleware.dao.StudyEffectDAO;
-import org.generationcp.middleware.dao.TraitDAO;
-import org.generationcp.middleware.dao.TraitMethodDAO;
 import org.generationcp.middleware.dao.TransactionDAO;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
-import org.generationcp.middleware.dao.VariateDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.ExperimentPhenotypeDao;
@@ -171,24 +156,6 @@ public class DatabaseBroker {
     private LotDAO lotDao;
     private PersonDAO personDao;
     private TransactionDAO transactionDao;
-
-    // StudyDataManagerv1 DAOs
-    private CharacterDataDAO characterDataDao;
-    private CharacterLevelDAO characterLevelDao;
-    private FactorDAO factorDao;
-    private NumericDataDAO numericDataDao;
-    private NumericLevelDAO numericLevelDao;
-    private OindexDAO oIndexDao;
-    private RepresentationDAO representationDao;
-    private StudyDAO studyDao;
-    private StudyEffectDAO studyEffectDao;
-    private TraitDAO traitDao;
-    private VariateDAO variateDao;
-
-    private ScaleContinuousDAO scaleContinuousDao;
-    private ScaleDAO scaleDao;
-    private ScaleDiscreteDAO scaleDiscreteDao;
-    private TraitMethodDAO traitMethodDao;
 
     // UserDataManager DAOs
     private InstallationDAO installationDao;
@@ -880,130 +847,6 @@ public class DatabaseBroker {
         return transactionDao;
     }    
 
-    //================================  StudyDataManagerv1 DAO Methods =============================
-    
-
-    protected final CharacterDataDAO getCharacterDataDao() {
-        if (characterDataDao == null) {
-            characterDataDao = new CharacterDataDAO();
-        }
-        characterDataDao.setSession(getActiveSession());
-        return characterDataDao;
-    }
-
-    protected final CharacterLevelDAO getCharacterLevelDao() {
-        if (characterLevelDao == null) {
-            characterLevelDao = new CharacterLevelDAO();
-        }
-        characterLevelDao.setSession(getActiveSession());
-        return characterLevelDao;
-    }
-
-    protected final FactorDAO getFactorDao() {
-        if (factorDao == null) {
-            factorDao = new FactorDAO();
-        }
-        factorDao.setSession(getActiveSession());
-        return factorDao;
-    }
-
-    protected final NumericDataDAO getNumericDataDao() {
-        if (numericDataDao == null) {
-            numericDataDao = new NumericDataDAO();
-        }
-        numericDataDao.setSession(getActiveSession());
-        return numericDataDao;
-    }
-
-    protected final NumericLevelDAO getNumericLevelDao() {
-        if (numericLevelDao == null) {
-            numericLevelDao = new NumericLevelDAO();
-        }
-        numericLevelDao.setSession(getActiveSession());
-        return numericLevelDao;
-    }
-
-    protected final OindexDAO getOindexDao() {
-        if (oIndexDao == null) {
-            oIndexDao = new OindexDAO();
-        }
-        oIndexDao.setSession(getActiveSession());
-        return oIndexDao;
-    }
-
-    protected final RepresentationDAO getRepresentationDao() {
-        if (representationDao == null) {
-            representationDao = new RepresentationDAO();
-        }
-        representationDao.setSession(getActiveSession());
-        return representationDao;
-    }
-
-    protected final StudyDAO getStudyDao() {
-        if (studyDao == null) {
-            studyDao = new StudyDAO();
-        }
-        studyDao.setSession(getActiveSession());
-        return studyDao;
-    }
-
-    protected final StudyEffectDAO getStudyEffectDao() {
-        if (studyEffectDao == null) {
-            studyEffectDao = new StudyEffectDAO();
-        }
-        studyEffectDao.setSession(getActiveSession());
-        return studyEffectDao;
-    }
-
-    protected final TraitDAO getTraitDao() {
-        if (traitDao == null) {
-            traitDao = new TraitDAO();
-        }
-        traitDao.setSession(getActiveSession());
-        return traitDao;
-    }
-
-    protected final VariateDAO getVariateDao() {
-        if (variateDao == null) {
-            variateDao = new VariateDAO();
-        }
-        variateDao.setSession(getActiveSession());
-        return variateDao;
-    }
-    
-    //================================  StudyDataManagerv1 DAO Methods =============================
-
-    protected final ScaleContinuousDAO getScaleContinuousDao() {
-        if (scaleContinuousDao == null){
-            scaleContinuousDao = new ScaleContinuousDAO();
-        }
-        scaleContinuousDao.setSession(getActiveSession());
-        return scaleContinuousDao;
-    }
-    
-    protected final ScaleDAO getScaleDao() {
-        if (scaleDao == null){
-            scaleDao = new ScaleDAO();
-        }
-        scaleDao.setSession(getActiveSession());
-        return scaleDao;
-    }
-
-    protected final ScaleDiscreteDAO getScaleDiscreteDao() {
-        if (scaleDiscreteDao == null){
-            scaleDiscreteDao = new ScaleDiscreteDAO();
-        }
-        scaleDiscreteDao.setSession(getActiveSession());
-        return scaleDiscreteDao;
-    }
-    
-    protected final TraitMethodDAO getTraitMethodDao() {
-        if (traitMethodDao == null){
-            traitMethodDao = new TraitMethodDAO();
-        }
-        traitMethodDao.setSession(getActiveSession());
-        return traitMethodDao;
-    }
     
     //================================  UserDataManager DAO Methods =============================
 

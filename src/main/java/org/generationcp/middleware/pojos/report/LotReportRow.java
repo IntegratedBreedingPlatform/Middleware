@@ -13,8 +13,8 @@ package org.generationcp.middleware.pojos.report;
 
 import java.io.Serializable;
 
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.Scale;
 
 /**
  * This POJO represents a row in reports about Lot records.
@@ -27,7 +27,7 @@ public class LotReportRow implements Serializable{
     private Integer entityIdOfLot;
     private Long actualLotBalance;
     private Location locationOfLot;
-    private Scale scaleOfLot;
+    private Term scaleOfLot;
     private String commentOfLot;
 
     public Integer getLotId() {
@@ -62,11 +62,11 @@ public class LotReportRow implements Serializable{
         this.locationOfLot = locationOfLot;
     }
 
-    public Scale getScaleOfLot() {
+    public Term getScaleOfLot() {
         return scaleOfLot;
     }
 
-    public void setScaleOfLot(Scale scaleOfLot) {
+    public void setScaleOfLot(Term scaleOfLot) {
         this.scaleOfLot = scaleOfLot;
     }
     

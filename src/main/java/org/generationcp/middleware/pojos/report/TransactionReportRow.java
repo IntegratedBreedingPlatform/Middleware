@@ -13,9 +13,9 @@ package org.generationcp.middleware.pojos.report;
 
 import java.io.Serializable;
 
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.Scale;
 
 /**
  * This POJO represents a row in reports about Transaction records. Note that
@@ -34,7 +34,7 @@ public class TransactionReportRow implements Serializable{
 
     private Integer date;
     private Integer quantity;
-    private Scale scaleOfLot;
+    private Term scaleOfLot;
     private Location locationOfLot;
     private String commentOfLot;
     private Integer entityIdOfLot;
@@ -60,11 +60,11 @@ public class TransactionReportRow implements Serializable{
         this.quantity = quantity;
     }
 
-    public Scale getScaleOfLot() {
+    public Term getScaleOfLot() {
         return scaleOfLot;
     }
 
-    public void setScaleOfLot(Scale scaleOfLot) {
+    public void setScaleOfLot(Term scaleOfLot) {
         this.scaleOfLot = scaleOfLot;
     }
 

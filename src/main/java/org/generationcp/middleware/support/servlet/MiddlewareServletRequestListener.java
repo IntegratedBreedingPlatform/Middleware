@@ -23,8 +23,8 @@ import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.manager.api.TraitDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.hibernate.SessionFactory;
 
@@ -99,14 +99,14 @@ public class MiddlewareServletRequestListener implements ServletRequestListener 
     }
 
     /**
-     * Get the {@link TraitDataManager} instance associated with the specified
+     * Get the {@link OntologyDataManager} instance associated with the specified
      * {@link ServletRequest} instance.
      * 
      * @param request
      * @return
      */
-    public static TraitDataManager getTraitDataManagerForRequest(ServletRequest request) {
-        return getManagerFactoryForRequest(request).getTraitDataManager();
+    public static OntologyDataManager getOntologyDataManagerForRequest(ServletRequest request) {
+        return getManagerFactoryForRequest(request).getOntologyDataManager();
     }
 
     /**

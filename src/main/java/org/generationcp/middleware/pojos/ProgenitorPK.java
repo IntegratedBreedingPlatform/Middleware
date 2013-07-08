@@ -18,7 +18,7 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 /**
- * The primary identifier of {@link CharacterData}.
+ * The primary identifier of {@link Progenitor}.
  * 
  * @author klmanansala
  */
