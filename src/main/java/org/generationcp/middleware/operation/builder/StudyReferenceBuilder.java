@@ -1,0 +1,39 @@
+/*******************************************************************************
+ * Copyright (c) 2012, All Rights Reserved.
+ * 
+ * Generation Challenge Programme (GCP)
+ * 
+ * 
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * 
+ *******************************************************************************/
+package org.generationcp.middleware.operation.builder;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import org.generationcp.middleware.domain.StudyReference;
+import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+
+public class StudyReferenceBuilder extends Builder {
+
+	public StudyReferenceBuilder(
+			HibernateSessionProvider sessionProviderForLocal,
+			HibernateSessionProvider sessionProviderForCentral) {
+		super(sessionProviderForLocal, sessionProviderForCentral);
+	}
+
+	public List<StudyReference> build(Collection<DmsProject> projects) {
+		List<StudyReference> studyReferences = new ArrayList<StudyReference>();
+		if (projects != null && projects.size() > 0) {
+			for (DmsProject project : projects) {
+				studyReferences.add(new StudyReference(project.getProjectId(), project.getName(), project.getDescription()));
+			}
+		}
+		return studyReferences;
+	}
+}

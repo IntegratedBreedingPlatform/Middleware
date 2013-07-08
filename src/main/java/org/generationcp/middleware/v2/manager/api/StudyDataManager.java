@@ -14,27 +14,27 @@ package org.generationcp.middleware.v2.manager.api;
 
 import java.util.List;
 
+import org.generationcp.middleware.domain.DataSet;
+import org.generationcp.middleware.domain.DataSetType;
+import org.generationcp.middleware.domain.DatasetReference;
+import org.generationcp.middleware.domain.DatasetValues;
+import org.generationcp.middleware.domain.Experiment;
+import org.generationcp.middleware.domain.ExperimentType;
+import org.generationcp.middleware.domain.ExperimentValues;
+import org.generationcp.middleware.domain.FolderReference;
+import org.generationcp.middleware.domain.Reference;
+import org.generationcp.middleware.domain.Stocks;
+import org.generationcp.middleware.domain.Study;
+import org.generationcp.middleware.domain.StudyReference;
+import org.generationcp.middleware.domain.StudyValues;
+import org.generationcp.middleware.domain.TrialEnvironments;
+import org.generationcp.middleware.domain.VariableList;
+import org.generationcp.middleware.domain.VariableType;
+import org.generationcp.middleware.domain.VariableTypeList;
+import org.generationcp.middleware.domain.search.StudyResultSet;
+import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
-import org.generationcp.middleware.v2.domain.DataSet;
-import org.generationcp.middleware.v2.domain.DataSetType;
-import org.generationcp.middleware.v2.domain.DatasetReference;
-import org.generationcp.middleware.v2.domain.DatasetValues;
-import org.generationcp.middleware.v2.domain.Experiment;
-import org.generationcp.middleware.v2.domain.ExperimentType;
-import org.generationcp.middleware.v2.domain.ExperimentValues;
-import org.generationcp.middleware.v2.domain.FolderReference;
-import org.generationcp.middleware.v2.domain.Reference;
-import org.generationcp.middleware.v2.domain.Stocks;
-import org.generationcp.middleware.v2.domain.Study;
-import org.generationcp.middleware.v2.domain.StudyReference;
-import org.generationcp.middleware.v2.domain.StudyValues;
-import org.generationcp.middleware.v2.domain.TrialEnvironments;
-import org.generationcp.middleware.v2.domain.VariableList;
-import org.generationcp.middleware.v2.domain.VariableType;
-import org.generationcp.middleware.v2.domain.VariableTypeList;
-import org.generationcp.middleware.v2.search.StudyResultSet;
-import org.generationcp.middleware.v2.search.filter.StudyQueryFilter;
 
 /**
  * This is the API for retrieving phenotypic data stored as Studies and
