@@ -9,7 +9,7 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-package org.generationcp.middleware.util;
+package org.generationcp.middleware.hibernate;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,8 +18,8 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.Properties;
 
-import org.generationcp.commons.util.ResourceFinder;
 import org.generationcp.middleware.exceptions.ConfigException;
+import org.generationcp.middleware.util.ResourceFinder;
 import org.hibernate.HibernateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

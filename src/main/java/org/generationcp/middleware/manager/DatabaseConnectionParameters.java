@@ -19,8 +19,8 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.Properties;
 
-import org.generationcp.commons.util.ResourceFinder;
 import org.generationcp.middleware.exceptions.ConfigException;
+import org.generationcp.middleware.util.ResourceFinder;
 
 /**
  * Database connection parameters: host, port, dbName, url, driverName, userName and password.

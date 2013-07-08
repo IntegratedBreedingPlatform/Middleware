@@ -9,7 +9,7 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-package org.generationcp.commons.hibernate;
+package org.generationcp.middleware.hibernate;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

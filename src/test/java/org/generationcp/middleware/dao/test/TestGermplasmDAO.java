@@ -15,8 +15,8 @@ package org.generationcp.middleware.dao.test;
 import java.util.List;
 
 import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.hibernate.HibernateUtil;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.util.HibernateUtil;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;

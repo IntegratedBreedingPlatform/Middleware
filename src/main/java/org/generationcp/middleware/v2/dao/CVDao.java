@@ -11,9 +11,9 @@
  *******************************************************************************/
 package org.generationcp.middleware.v2.dao;
 
-import org.generationcp.commons.util.StringUtil;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.util.StringUtil;
 import org.generationcp.middleware.v2.pojos.CV;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;

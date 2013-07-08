@@ -14,10 +14,10 @@ package org.generationcp.middleware.pojos.test;
 
 import java.util.List;
 
+import org.generationcp.middleware.hibernate.HibernateUtil;
 import org.generationcp.middleware.pojos.Lot;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Transaction;
-import org.generationcp.middleware.util.HibernateUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.junit.AfterClass;

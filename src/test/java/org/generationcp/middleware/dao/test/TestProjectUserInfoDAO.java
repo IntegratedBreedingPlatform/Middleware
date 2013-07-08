@@ -13,9 +13,9 @@
 package org.generationcp.middleware.dao.test;
 
 import org.generationcp.middleware.dao.ProjectUserInfoDAO;
+import org.generationcp.middleware.hibernate.HibernateUtil;
 
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
-import org.generationcp.middleware.util.HibernateUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

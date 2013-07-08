@@ -14,8 +14,8 @@ package org.generationcp.middleware.utils.test;
 
 import java.util.List;
 
+import org.generationcp.middleware.hibernate.HibernateUtil;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.util.HibernateUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.junit.Test;

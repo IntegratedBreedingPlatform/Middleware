@@ -16,7 +16,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.generationcp.middleware.dao.FactorDAO;
-import org.generationcp.middleware.util.HibernateUtil;
+import org.generationcp.middleware.hibernate.HibernateUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

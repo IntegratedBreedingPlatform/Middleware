@@ -14,10 +14,10 @@ package org.generationcp.middleware.v2.domain.saver;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.commons.util.StringUtil;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.util.StringUtil;
 import org.generationcp.middleware.v2.domain.Enumeration;
 import org.generationcp.middleware.v2.domain.NameSynonym;
 import org.generationcp.middleware.v2.domain.StandardVariable;

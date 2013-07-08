@@ -10,14 +10,14 @@
  * 
  *******************************************************************************/
 
-package org.generationcp.middleware.util;
+package org.generationcp.middleware.hibernate;
 
 import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.net.URL;
 
-import org.generationcp.commons.util.ResourceFinder;
 import org.generationcp.middleware.exceptions.ConfigException;
+import org.generationcp.middleware.util.ResourceFinder;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;

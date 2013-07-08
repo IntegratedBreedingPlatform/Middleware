@@ -15,7 +15,6 @@ import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.net.URL;
 
-import org.generationcp.commons.util.ResourceFinder;
 import org.generationcp.middleware.exceptions.ConfigException;
 import org.generationcp.middleware.hibernate.HibernateSessionPerThreadProvider;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -26,6 +25,7 @@ import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.TraitDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
+import org.generationcp.middleware.util.ResourceFinder;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.slf4j.Logger;

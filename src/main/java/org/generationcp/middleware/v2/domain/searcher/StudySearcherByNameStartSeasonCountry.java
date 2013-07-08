@@ -6,12 +6,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.generationcp.commons.util.StringUtil;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.pojos.Country;
+import org.generationcp.middleware.util.StringUtil;
 import org.generationcp.middleware.v2.domain.TermId;
 import org.generationcp.middleware.v2.pojos.CVTerm;
 import org.generationcp.middleware.v2.pojos.DmsProject;

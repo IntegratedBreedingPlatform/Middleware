@@ -14,6 +14,7 @@ package org.generationcp.middleware.pojos.test;
 
 import java.util.List;
 
+import org.generationcp.middleware.hibernate.HibernateUtil;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Country;
@@ -29,7 +30,6 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.util.HibernateUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.junit.AfterClass;

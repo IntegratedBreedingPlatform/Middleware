@@ -9,7 +9,7 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-package org.generationcp.commons.util;
+package org.generationcp.middleware.util;
 
 import java.lang.reflect.Array;
 import java.math.BigInteger;

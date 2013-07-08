@@ -16,9 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.dao.NumericDataDAO;
+import org.generationcp.middleware.hibernate.HibernateUtil;
 import org.generationcp.middleware.pojos.NumericRange;
 import org.generationcp.middleware.pojos.TraitCombinationFilter;
-import org.generationcp.middleware.util.HibernateUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

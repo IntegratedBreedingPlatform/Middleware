@@ -22,8 +22,8 @@ import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.generationcp.commons.util.StringUtil;
-import org.generationcp.commons.util.Util;
+import org.generationcp.middleware.util.StringUtil;
+import org.generationcp.middleware.util.Util;
 
 /**
  * POJO for persons table.

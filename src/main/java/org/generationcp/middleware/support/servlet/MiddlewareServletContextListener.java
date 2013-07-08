@@ -21,8 +21,8 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.ServletRequestEvent;
 
 import org.generationcp.middleware.exceptions.ConfigException;
+import org.generationcp.middleware.hibernate.SessionFactoryUtil;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
-import org.generationcp.middleware.util.SessionFactoryUtil;
 import org.hibernate.SessionFactory;
 
 /**

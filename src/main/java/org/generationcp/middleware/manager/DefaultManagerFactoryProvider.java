@@ -20,14 +20,14 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.generationcp.commons.hibernate.HttpRequestAware;
 import org.generationcp.middleware.exceptions.ConfigException;
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.hibernate.HttpRequestAware;
+import org.generationcp.middleware.hibernate.SessionFactoryUtil;
 import org.generationcp.middleware.manager.api.ManagerFactoryProvider;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
-import org.generationcp.middleware.util.SessionFactoryUtil;
 import org.hibernate.SessionFactory;
 
 /**

@@ -17,8 +17,8 @@ package org.generationcp.middleware.dao.test;
 import java.util.List;
 
 import org.generationcp.middleware.dao.NumericLevelDAO;
+import org.generationcp.middleware.hibernate.HibernateUtil;
 import org.generationcp.middleware.pojos.StudyInfo;
-import org.generationcp.middleware.util.HibernateUtil;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;

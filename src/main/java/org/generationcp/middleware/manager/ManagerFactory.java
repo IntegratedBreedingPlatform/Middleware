@@ -21,7 +21,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Properties;
 
-import org.generationcp.commons.util.ResourceFinder;
 import org.generationcp.middleware.exceptions.ConfigException;
 import org.generationcp.middleware.hibernate.HibernateSessionPerThreadProvider;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -33,6 +32,7 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 //import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.TraitDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
+import org.generationcp.middleware.util.ResourceFinder;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AnnotationConfiguration;

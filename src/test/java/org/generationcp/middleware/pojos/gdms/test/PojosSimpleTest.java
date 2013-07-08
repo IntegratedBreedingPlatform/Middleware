@@ -14,6 +14,7 @@ package org.generationcp.middleware.pojos.gdms.test;
 
 import java.util.List;
 
+import org.generationcp.middleware.hibernate.HibernateUtil;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.generationcp.middleware.pojos.gdms.AlleleValues;
 import org.generationcp.middleware.pojos.gdms.CharValues;
@@ -24,7 +25,6 @@ import org.generationcp.middleware.pojos.gdms.MappingPop;
 import org.generationcp.middleware.pojos.gdms.MappingPopValues;
 import org.generationcp.middleware.pojos.gdms.Marker;
 import org.generationcp.middleware.pojos.gdms.MarkerMetadataSet;
-import org.generationcp.middleware.util.HibernateUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.junit.AfterClass;

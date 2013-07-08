@@ -14,6 +14,7 @@ package org.generationcp.middleware.pojos.test;
 
 import java.util.List;
 
+import org.generationcp.middleware.hibernate.HibernateUtil;
 import org.generationcp.middleware.pojos.CharacterData;
 import org.generationcp.middleware.pojos.CharacterLevel;
 import org.generationcp.middleware.pojos.Factor;
@@ -28,7 +29,6 @@ import org.generationcp.middleware.pojos.StudyEffect;
 import org.generationcp.middleware.pojos.Trait;
 import org.generationcp.middleware.pojos.TraitMethod;
 import org.generationcp.middleware.pojos.Variate;
-import org.generationcp.middleware.util.HibernateUtil;
 import org.generationcp.middleware.v2.pojos.CV;
 import org.generationcp.middleware.v2.pojos.CVTerm;
 import org.generationcp.middleware.v2.pojos.CVTermProperty;
