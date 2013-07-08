@@ -10,7 +10,7 @@
  * 
  *******************************************************************************/
 
-package org.generationcp.middleware.v2.manager.test;
+package org.generationcp.middleware.manager.test;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;

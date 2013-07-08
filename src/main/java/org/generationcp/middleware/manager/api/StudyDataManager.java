@@ -9,702 +9,273 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
+
 package org.generationcp.middleware.manager.api;
 
 import java.util.List;
 
+import org.generationcp.middleware.domain.DataSet;
+import org.generationcp.middleware.domain.DataSetType;
+import org.generationcp.middleware.domain.DatasetReference;
+import org.generationcp.middleware.domain.DatasetValues;
+import org.generationcp.middleware.domain.Experiment;
+import org.generationcp.middleware.domain.ExperimentType;
+import org.generationcp.middleware.domain.ExperimentValues;
+import org.generationcp.middleware.domain.FolderReference;
+import org.generationcp.middleware.domain.Reference;
+import org.generationcp.middleware.domain.Stocks;
+import org.generationcp.middleware.domain.Study;
+import org.generationcp.middleware.domain.StudyReference;
+import org.generationcp.middleware.domain.StudyValues;
+import org.generationcp.middleware.domain.TrialEnvironments;
+import org.generationcp.middleware.domain.VariableList;
+import org.generationcp.middleware.domain.VariableType;
+import org.generationcp.middleware.domain.VariableTypeList;
+import org.generationcp.middleware.domain.search.StudyResultSet;
+import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
-import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.manager.Season;
-import org.generationcp.middleware.pojos.CharacterDataElement;
-import org.generationcp.middleware.pojos.CharacterLevel;
-import org.generationcp.middleware.pojos.CharacterLevelElement;
-import org.generationcp.middleware.pojos.DatasetCondition;
-import org.generationcp.middleware.pojos.Factor;
-import org.generationcp.middleware.pojos.NumericDataElement;
-import org.generationcp.middleware.pojos.NumericLevel;
-import org.generationcp.middleware.pojos.NumericLevelElement;
-import org.generationcp.middleware.pojos.Representation;
-import org.generationcp.middleware.pojos.Study;
-import org.generationcp.middleware.pojos.StudyEffect;
-import org.generationcp.middleware.pojos.StudyInfo;
-import org.generationcp.middleware.pojos.Trait;
-import org.generationcp.middleware.pojos.TraitCombinationFilter;
-import org.generationcp.middleware.pojos.Variate;
 
 /**
  * This is the API for retrieving phenotypic data stored as Studies and
- * datasets.
+ * datasets from the CHADO schema.
  * 
- * @author Kevin Manansala
  * 
  */
-public interface StudyDataManager{
+public interface StudyDataManager {
 
+	/**
+	 * Get the Study for a specific study id.
+	 * 
+	 * @param studyId the study's unique id
+	 * @return the study or null if not found
+	 * @throws MiddlewareQueryException 
+	 */
+	Study getStudy(int studyId) throws MiddlewareQueryException;
+
+	/**
+	 * Returns list of root or top-level folders from specified database
+	 * 
+	 * @param instance
+	 *            - can be CENTRAL or LOCAL
+	 * @return List of Folder POJOs or null if none found
+	 * @throws MiddlewareQueryException 
+	 */
+	List<FolderReference> getRootFolders(Database instance) throws MiddlewareQueryException;
+	
+	
+	/**
+	 * Returns list of children of a folder given its id from the specified database
+	 * 
+	 * @param folderId
+	 *            - the id of the folder to match
+	 * @param instance
+	 *            - can be CENTRAL or LOCAL
+	 * @return List of AbstractNode (FolderNode, StudyNode) POJOs or null if none found
+	 * @throws MiddlewareQueryException 
+	 */
+	List<Reference> getChildrenOfFolder(int folderId) throws MiddlewareQueryException;
+	
+	
+	/**
+	 * Returns the list of dataset nodes for a specific study.
+	 * Retrieves from central if studyId is positive, otherwise retrieves from local.
+	 * 
+	 * @param studyId 
+	 * 			- the study id to match
+	 * @return List of DatasetNodes belonging to the study
+	 * @throws MiddlewareQueryException
+	 */
+	List<DatasetReference> getDatasetReferences(int studyId) throws MiddlewareQueryException;
+	
+	/**
+	 * @param dataSetId
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	DataSet getDataSet(int dataSetId) throws MiddlewareQueryException;
+	
+	/**
+	 * Get experiments from a dataset.  Each experiment contains 
+	 * @param datasetId
+	 * @param startIndex
+	 * @param numRows
+	 * @return
+	 */
+	List<Experiment> getExperiments(int dataSetId, int start, int numOfRows) throws MiddlewareQueryException;
+	
+	/**
+	 * Get the count of the number of experiments in a dataset.
+	 * @param dataSetId
+	 * @return
+	 */
+	long countExperiments(int dataSetId) throws MiddlewareQueryException;
+	
+	/**
+	 * Returns the list of study references for a particular search filter.
+	 *
+	 * @param filter
+	 * @param numOfRows
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	StudyResultSet searchStudies(StudyQueryFilter filter, int numOfRows) throws MiddlewareQueryException;
+	
+	/**
+	 * Returns the list of factors for a specific study.
+	 * 
+	 * @param studyId
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	VariableTypeList getAllStudyFactors(int studyId) throws MiddlewareQueryException;
+	
+	/**
+	 * Returns the list of variates for a specific study.
+	 * 
+	 * @param studyId
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	VariableTypeList getAllStudyVariates(int studyId) throws MiddlewareQueryException;
+	
     /**
-     * Returns a List of GIDs identifying Germplasms exhibiting specific values
-     * of traits as observed in studies. The search filters are composed of
-     * combinations of trait, scale, method and value specified by the users.
-     * 
-     * The start and numOfRows will be used to limit results of the queries used
-     * to retrieve the GIDs. They do not however depict the size of the List of
-     * Integers returned by this function. It is recommended to check the size
-     * of the List to get the actual count of GIDs it contains.
-     * 
-     * @param filters
-     * @param start
-     *            - the starting index of the sublist of results to be returned
-     * @param numOfRows
-     *            - the number of rows to be included in the sublist of results
-     *            to be returned
-     * @param instance
-     *            - the database instance to connect to: Database.CENTRAL,
-     *            Database.LOCAL
-     * @return The list of GIDs by Phenotypic Data
-     * @throws MiddlewareQueryException
-     */
-    public List<Integer> getGIDSByPhenotypicData(List<TraitCombinationFilter> filters, int start, int numOfRows, Database instance)
-            throws MiddlewareQueryException;
-
-    /**
-     * Returns the study records matching the given name
-     * 
-     * @param name
-     *            - search string (pattern or exact match) for the name of the
-     *            study
-     * @param start
-     *            - the starting index of the sublist of results to be returned
-     * @param numOfRows
-     *            - the number of rows to be included in the sublist of results
-     *            to be returned
-     * @param op
-     *            - can be EQUAL like LIKE For LIKE operation, the parameter
-     *            name may include the following: "%" - to indicate 0 or more
-     *            characters in the pattern "_" - to indicate any single
-     *            character in the pattern
-     * @param instance
-     *            - can be CENTRAL or LOCAL
-     * @return List of Study POJOs
-     * @throws MiddlewareQueryException
-     */
-    public List<Study> getStudyByName(String name, int start, int numOfRows, Operation op, Database instance) throws MiddlewareQueryException;
-
-    /**
-     * Returns the study records matching the given name
-     * 
-     * @param name
-     *            - search string (pattern or exact match) for the name of the
-     *            study
-     * @param op
-     *            - can be EQUAL like LIKE For LIKE operation, the parameter
-     *            name may include the following: "%" - to indicate 0 or more
-     *            characters in the pattern "_" - to indicate any single
-     *            character in the pattern
-     * @param instance
-     *            - can be CENTRAL or LOCAL
-     * @return number of Study records matching the given criteria
-     * @throws MiddlewareQueryException
-     */
-    public long countStudyByName(String name, Operation op, Database instance) throws MiddlewareQueryException;
-
-
-    /**
-     * Returns the study records matching the given country
-     * 
-     * @param country
-     *            - search string (pattern or exact match) for the country of the
-     *            study
-     * @param start
-     *            - the starting index of the sublist of results to be returned
-     * @param numOfRows
-     *            - the number of rows to be included in the sublist of results
-     *            to be returned
-     * @param op
-     *            - can be EQUAL like LIKE For LIKE operation, the parameter
-     *            name may include the following: "%" - to indicate 0 or more
-     *            characters in the pattern "_" - to indicate any single
-     *            character in the pattern
-     * @param instance
-     *            - can be CENTRAL or LOCAL
-     * @return List of Study POJOs
-     * @throws MiddlewareQueryException
-     */
-    public List<Study> getStudyByCountry(String country, int start, int numOfRows, Operation op, Database instance) throws MiddlewareQueryException;
-
-    /**
-     * Returns the count of the study records of the given country
-     * 
-     * @param name
-     *            - search string (pattern or exact match) for the country of the
-     *            study
-     * @param op
-     *            - can be EQUAL like LIKE For LIKE operation, the parameter
-     *            name may include the following: "%" - to indicate 0 or more
-     *            characters in the pattern "_" - to indicate any single
-     *            character in the pattern
-     * @param instance
-     *            - can be CENTRAL or LOCAL
-     * @return number of Study records matching the given criteria
-     * @throws MiddlewareQueryException
-     */
-    public long countStudyByCountry(String name, Operation op, Database instance) throws MiddlewareQueryException;
-
-    
-
-
-    /**
-     * Returns the study records matching the given season
-     * 
-     * @param season
-     *            - the season to match
-     * @param start
-     *            - the starting index of the sublist of results to be returned
-     * @param numOfRows
-     *            - the number of rows to be included in the sublist of results
-     *            to be returned
-     * @param instance
-     *            - can be CENTRAL or LOCAL
-     * @return List of Study POJOs
-     * @throws MiddlewareQueryException
-     */
-    public List<Study> getStudyBySeason(Season season, int start, int numOfRows, Database instance) throws MiddlewareQueryException;
-
-    /**
-     * Returns the count of the study records of the given season
-     * 
-     * @param season
-     *            - the season to match
-     * @param instance
-     *            - can be CENTRAL or LOCAL
-     * @return number of Study records matching the given criteria
-     * @throws MiddlewareQueryException
-     */
-    public long countStudyBySeason(Season season, Database instance) throws MiddlewareQueryException;
-
-    /**
-     * Returns the study records matching the given sdate
-     * 
-     * @param sdate
-     *            - search string (exact match) for the sdate of the
-     *            study
-     * @param start
-     *            - the starting index of the sublist of results to be returned
-     * @param numOfRows
-     *            - the number of rows to be included in the sublist of results
-     *            to be returned
-     * @param op
-     *            - can be EQUAL
-     * @param instance
-     *            - can be CENTRAL or LOCAL
-     * @return List of Study POJOs
-     * @throws MiddlewareQueryException
-     */
-    public List<Study> getStudyBySDate(Integer sdate, int start, int numOfRows, Operation op, Database instance) throws MiddlewareQueryException;
-
-    /**
-     * Returns the study records matching the given sdate
-     * 
-     * @param sdate
-     *            - search string (exact match) for the sdate of the
-     *            study
-     * @param op
-     *            - can be EQUAL
-     * @param instance
-     *            - can be CENTRAL or LOCAL
-     * @return number of Study records matching the given criteria
-     * @throws MiddlewareQueryException
-     */
-    public long countStudyBySDate(Integer sdate, Operation op, Database instance) throws MiddlewareQueryException;
+	 * Adds a study. Adds an entry into Project, ProjectProperty, ProjectRelationships and Experiment 
+	 * Inserts constants and conditions listed in variableTypeList. 
+	 * Sets the parent to the given parentFolderId input parameter. 
+	 * 
+	 * @param parentFolderId The ID of the parent folder
+	 * @param variableTypeList The conditions and constants of the Study
+	 * @param studyValues The values for the variables to insert
+	 * @return StudyReference corresponding to the newly-created Study
+	 * @throws MiddlewareQueryException
+	 */
+    StudyReference addStudy(int parentFolderId, VariableTypeList variableTypeList, StudyValues studyValues) throws MiddlewareQueryException;
     
     /**
-     * Returns the study records matching the given sdate
-     * 
-     * @param sdate
-     *            - search string (exact match) for the sdate of the
-     *            study
-     * @param start
-     *            - the starting index of the sublist of results to be returned
-     * @param numOfRows
-     *            - the number of rows to be included in the sublist of results
-     *            to be returned
-     * @param op
-     *            - can be EQUAL
-     * @param instance
-     *            - can be CENTRAL or LOCAL
-     * @return List of Study POJOs
-     * @throws MiddlewareQueryException
-     */
-    public List<Study> getStudyByEDate(Integer edate, int start, int numOfRows, Operation op, Database instance) throws MiddlewareQueryException;
-
-    /**
-     * Returns the study records matching the given edate
-     * 
-     * @param edate
-     *            - search string (exact match) for the edate of the
-     *            study
-     * @param op
-     *            - can be EQUAL
-     * @param instance
-     *            - can be CENTRAL or LOCAL
-     * @return number of Study records matching the given criteria
-     * @throws MiddlewareQueryException
-     */
-    public long countStudyByEDate(Integer edate, Operation op, Database instance) throws MiddlewareQueryException;
-    
-    /**
-     * Retrieves a Study record of the given id
-     * 
-     * @param id
-     * @return A Study POJO
-     * @throws MiddlewareQueryException
-     */
-    public Study getStudyByID(Integer id) throws MiddlewareQueryException;
-
-    /**
-     * Returns a List of {@code Study} objects that are top-level studies, or
-     * studies that do not have parent folders.
-     * 
-     * @param start
-     *            - the starting index of the sublist of results to be returned
-     * @param numOfRows
-     *            - the number of rows to be included in the sublist of results
-     *            to be returned
-     * @param instance
-     *            - can be Database.LOCAL or Database.CENTRAL
-     * @return The list of all the top-level studies
-     * @throws MiddlewareQueryException
-     */
-    public List<Study> getAllTopLevelStudies(int start, int numOfRows, Database instance) throws MiddlewareQueryException;
-
-    /**
-     * Returns the total number of top level studies.
+     * Adds a dataset, dataset labels (factors and variate labels), and parent study association.
      *
-     * @return the int
-     */
-    public long countAllTopLevelStudies(Database instance) throws MiddlewareQueryException;
-    
-    /**
-     * Returns the total number of studies belong to a study parent folder.
-     *
-     * @return the int
-     */
-    
-    public long countAllStudyByParentFolderID(Integer parentFolderId,Database instance) throws MiddlewareQueryException;
-    
-    
-    /**
-     * Returns a List of {@code Study} objects that belong to the specified
-     * Parent Folder ID.
-     * 
-     * @param parentFolderId
-     *            - the parent folder's studyid
-     * @param start
-     *            - the starting index of the sublist of results to be returned
-     * @param numOfRows
-     *            - the number of rows to be included in the sublist of results
-     *            to be returned
-     * @return The list of all the studies belonging to the specified parent
-     *         folder. Returns an empty list if there are no connections
-     *         detected for both local and central instances.
+     * @param studyId
+     * @param variableTypeList
+     * @param datasetValues
+     * @return
      * @throws MiddlewareQueryException
      */
-    public List<Study> getStudiesByParentFolderID(Integer parentFolderId, int start, int numOfRows) throws MiddlewareQueryException;
-
+    DatasetReference addDataSet(int studyId, VariableTypeList variableTypeList, DatasetValues datasetValues) throws MiddlewareQueryException;
+    
     /**
-     * Returns all Factor records which belong to the Study identified by the
-     * given id.
+     * Add a new variable/column to the dataset.
+     * @param datasetId
+     * @param variableType
+     * @throws MiddlewareQueryException 
+     */
+    void addDataSetVariableType(int datasetId, VariableType variableType) throws MiddlewareQueryException;
+    
+    /**
+     * @param datasetId
+     * @param experimentId
+     * @param variableId
+     * @param value
+     */
+    void setExperimentValue(int experimentId, int variableId, String value) throws MiddlewareQueryException;
+    
+    /**
+     * Adds an experiment row to the dataset.
+     * 
+     * @param dataSetId
+     * @param experimentValues
+     * @throws MiddlewareQueryException
+     */
+    void addExperiment(int dataSetId, ExperimentType experimentType, ExperimentValues experimentValues) throws MiddlewareQueryException;
+    
+    /**
+     * Accepts a variable list and sets up the trial environment data in the local database.
+     * It will throw an exception if the variable in the variable list passed is not recognized for trial environment.
+     * It will return the ID of the trial environment data created.
+     * 
+     * @param variableList
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    int addTrialEnvironment(VariableList variableList) throws MiddlewareQueryException;
+    
+    /**
+     * Accepts a variable list and sets up the stock data in the local database.
+     * It will throw an exception if the variable in the variable list is not a stock variable.
+     * It will return the ID of the stock data created.
+     * 
+     * @param variableList
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    int addStock(VariableList variableList) throws MiddlewareQueryException;
+    
+    /**
      * 
      * @param studyId
-     *            - id of the Study
-     * @return List of Factor POJOs
+     * @param dataSetType
+     * @return
      */
-    public List<Factor> getFactorsByStudyID(Integer studyId) throws MiddlewareQueryException;
+    List<DataSet> getDataSetsByType(int studyId, DataSetType dataSetType) throws MiddlewareQueryException;
+    
+    /**
+     * @param trialEnvironmentId
+     * @param variateVariableId
+     * @return
+     */
+    long countExperimentsByTrialEnvironmentAndVariate(int trialEnvironmentId, int variateVariableId) throws MiddlewareQueryException;
 
     /**
-     * Returns all Variate records which belong to the Study identified by the
-     * given id.
-     * 
+     * @param datasetId
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    TrialEnvironments getTrialEnvironmentsInDataset(int datasetId) throws MiddlewareQueryException;
+    
+    /**
+     * @param datasetId
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    Stocks getStocksInDataset(int datasetId) throws MiddlewareQueryException;
+    
+    /**
+     * @param datasetId
+     * @param trialEnvironmentId
+     * @param variateStdVarId
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    long countStocks(int datasetId, int trialEnvironmentId, int variateStdVarId) throws MiddlewareQueryException;
+
+    /**
+     * Returns a single dataset belonging to the study with the given type.  If there
+     * is more than one matching dataset, only one is returned.  If there are none, null
+     * is returned.
      * @param studyId
-     *            - id of the Study
-     * @return List of Variate POJOs
-     */
-    public List<Variate> getVariatesByStudyID(Integer studyId) throws MiddlewareQueryException;
-
-    /**
-     * Returns all the Effect records which belong to the Study identified by
-     * the given id.
-     * 
-     * @param studyId
-     *            - id of the Study
-     * @return List of StudyEffect POJOs
-     */
-    public List<StudyEffect> getEffectsByStudyID(Integer studyId) throws MiddlewareQueryException;
-
-    /**
-     * Returns all the Representation records with the given effectId.
-     * 
-     * @param effectId
-     * @return List of Representation POJOs
-     */
-    public List<Representation> getRepresentationByEffectID(Integer effectId) throws MiddlewareQueryException;
-
-    /**
-     * Returns all the Representation records with the given studyId.
-     * 
-     * @param studyId
-     * @return List of Representation POJOs
-     */
-    public List<Representation> getRepresentationByStudyID(Integer studyId) throws MiddlewareQueryException;
-
-    /**
-     * Returns a List of {@code Factor} objects that belong to the specified
-     * Representation ID.
-     * 
-     * @param representationId
-     *            - the ID of the Representation
-     * @return The list of all the factors belonging to the specified
-     *         Representation. Returns an empty list if there are no connections
-     *         detected for both local and central instances.
+     * @param type
+     * @return
      * @throws MiddlewareQueryException
      */
-    public List<Factor> getFactorsByRepresentationId(Integer representationId) throws MiddlewareQueryException;
-
-    /**
-     * Returns the number of OunitIDs that are associated to the specified
-     * Representation ID.
-     * 
-     * @param representationId
-     *            - the ID of the Representation
-     * @return The number of all the OunitIDs associated to the specified
-     *         Representation. Returns 0 if there are no connections detected
-     *         for both local and central instances.
-     * @throws MiddlewareQueryException
-     */
-    public long countOunitIDsByRepresentationId(Integer representationId) throws MiddlewareQueryException;
-
-    /**
-     * Returns a List of OunitIDs that are associated to the specified
-     * Representation ID.
-     * 
-     * @param representationId
-     *            - the ID of the Representation
-     * @param start
-     *            - the starting index of the sublist of results to be returned
-     * @param numOfRows
-     *            - the number of rows to be included in the sublist of results
-     *            to be returned
-     * @return The list of all the OunitIDs associated to the specified
-     *         Representation. Returns an empty list if there are no connections
-     *         detected for both local and central instances.
-     * @throws MiddlewareQueryException
-     */
-    public List<Integer> getOunitIDsByRepresentationId(Integer representationId, int start, int numOfRows) throws MiddlewareQueryException;
-
-    /**
-     * Returns a List of {@code Variate} objects that belong to the specified
-     * Representation ID.
-     * 
-     * @param representationId
-     *            - the ID of the Representation
-     * @return The list of all the variates belonging to the specified
-     *         Representation. Returns an empty list if there are no connections
-     *         detected for both local and central instances.
-     * @throws MiddlewareQueryException
-     */
-    public List<Variate> getVariatesByRepresentationId(Integer representationId) throws MiddlewareQueryException;
-
-    /**
-     * Returns a list of NumericDataElements that represents the column values
-     * for each specified ounitID (for each specified row).
-     * 
-     * @param ounitIdList
-     *            - list of ounitIDs to get the corresponding column values. IDs
-     *            in the list must be all from the Central DB or all from the
-     *            Local DB.
-     * @return The list of column values / NumericDataElements for the specified
-     *         ounitIDs
-     * @throws MiddlewareQueryException
-     */
-    public List<NumericDataElement> getNumericDataValuesByOunitIdList(List<Integer> ounitIdList) throws MiddlewareQueryException;
-
-    /**
-     * Returns a list of CharacterDataElements that represents the column values
-     * for each specified ounitID (for each specified row).
-     * 
-     * @param ounitIdList
-     *            - list of ounitIDs to get the corresponding column values. IDs
-     *            in the list must be all from the Central DB or all from the
-     *            Local DB.
-     * @return The list of column values / CharacterDataElements for the
-     *         specified ounitIDs
-     * @throws MiddlewareQueryException
-     */
-    public List<CharacterDataElement> getCharacterDataValuesByOunitIdList(List<Integer> ounitIdList) throws MiddlewareQueryException;
-
-    /**
-     * Returns a list of NumericLevelElements that represents the column values
-     * for each specified ounitID (for each specified row).
-     * 
-     * @param ounitIdList
-     *            - list of ounitIDs to get the corresponding column values. IDs
-     *            in the list must be all from the Central DB or all from the
-     *            Local DB.
-     * @return The list of column values / NumericLevelElements for the
-     *         specified ounitIDs
-     * @throws MiddlewareQueryException
-     */
-    public List<NumericLevelElement> getNumericLevelValuesByOunitIdList(List<Integer> ounitIdList) throws MiddlewareQueryException;
-
-    /**
-     * Returns a list of CharacterLevelElements that represents the column
-     * values for each specified ounitID (for each specified row).
-     * 
-     * @param ounitIdList
-     *            - list of ounitIDs to get the corresponding column values. IDs
-     *            in the list must be all from the Central DB or all from the
-     *            Local DB.
-     * @return The list of column values / CharacterLevelElements for the
-     *         specified ounitIDs
-     * @throws MiddlewareQueryException
-     */
-    public List<CharacterLevelElement> getCharacterLevelValuesByOunitIdList(List<Integer> ounitIdList) throws MiddlewareQueryException;
-
-    /**
-     * Returns a list of DatasetCondition objects representing the Factors 
-     * which have constant values in the dataset identified by the given 
-     * representation ID.
-     * 
-     * @param representationId
-     * @return The list of DatasetCondition based on the given representation ID
-     * @throws MiddlewareQueryException
-     */
-    public List<DatasetCondition> getConditionsByRepresentationId(Integer representationId) throws MiddlewareQueryException;
+    DataSet findOneDataSetByType(int studyId, DataSetType type) throws MiddlewareQueryException;
     
     /**
-     * Returns the main label given a value of the factorid column of a factor record.
-     * 
-     * @param factorid
-     * @return The main label of factor given a factor ID
-     * @throws MiddlewareQueryException
-     */
-    public String getMainLabelOfFactorByFactorId(Integer factorid) throws MiddlewareQueryException;
-    
-    /**
-     * Returns the number of studies where the Germplasm, identified
-     * by the given gid, is involved with. 
-     * 
-     * @param gid
-     * @return The count of Study information based on the given GID
-     * @throws MiddlewareQueryException
-     */
-    public long countStudyInformationByGID(Long gid) throws MiddlewareQueryException;
-    
-    /**
-     * Returns a list of StudyInfo objects for the studies where the Germplasm, 
-     * identified by the given gid, is involved with.
-     *  
-     * @param gid
-     * @return The list of Study information based on the given GID
-     * @throws MiddlewareQueryException
-     */
-    public List<StudyInfo> getStudyInformationByGID(Long gid) throws MiddlewareQueryException;
-
-    /**
-     * Returns the Trait object representing the record for the REPLICATION trait.
-     * 
-     * @return Trait
-     * @throws MiddlewareQueryException
-     */
-    public Trait getReplicationTrait() throws MiddlewareQueryException;
-    
-    /**
-     * Returns the Trait object representing the record for the BLOCK trait.
-     * 
-     * @return Trait
-     * @throws MiddlewareQueryException
-     */
-    public Trait getBlockTrait() throws MiddlewareQueryException;
-    
-    /**
-     * Returns the Trait object representing the record for the ENVIRONMENT trait.
-     * 
-     * @return Trait
-     * @throws MiddlewareQueryException
-     */
-    public Trait getEnvironmentTrait() throws MiddlewareQueryException;
-    
-    /**
-     * Returns the Trait object representing the record for the DESIGN trait.
-     * 
-     * @return Trait
-     * @throws MiddlewareQueryException
-     */
-    public Trait getDesignTrait() throws MiddlewareQueryException;
-    
-    /**
-     * Returns the Factor with the trait identified by the given tid. This Factor belongs to the dataset
-     * identified by the given representationId.
-     * 
-     * @param representationId
-     * @param tid
-     * @return Factor
-     * @throws MiddlewareQueryException
-     */
-    public Factor getFactorOfDatasetByTraitid(Integer representationId, Integer traitid) throws MiddlewareQueryException;
-    
-    /**
-     * Returns the list of Character Levels for the given Factor on the dataset identified by the given id.
-     * @param factor
      * @param datasetId
-     * @return  The list of character levels based on the given factor and dataset id
      * @throws MiddlewareQueryException
      */
-    public List<CharacterLevel> getCharacterLevelsByFactorAndDatasetId(Factor factor, Integer datasetId) throws MiddlewareQueryException;
+    void deleteDataSet(int datasetId) throws MiddlewareQueryException;
     
     /**
-     * Returns the list of Numeric Levels for the given Factor on the dataset identified by the given id.
-     * @param factor
      * @param datasetId
-     * @return The numeric levels by factor and dataset ID
+     * @param locationId
      * @throws MiddlewareQueryException
      */
-    public List<NumericLevel> getNumericLevelsByFactorAndDatasetId(Factor factor, Integer datasetId) throws MiddlewareQueryException;
+    void deleteExperimentsByLocation(int datasetId, int locationId) throws MiddlewareQueryException;
     
     /**
-     * Returns a boolean value given a variate id and a dataset id
-     * 
-     * @param variateId
-     *            - selected variate
-     * @param datasetId
-     *            - selected dataset
-     * @return boolean
-     * @throws MiddlewareQueryException
-     */
-    public boolean hasValuesByVariateAndDataset(int variateId, int datasetId) throws MiddlewareQueryException;
-    
-    /**
-     * Returns a boolean value given a numeric variate id and a dataset id
-     * 
-     * @param variateId
-     *            - selected numeric variate
-     * @param datasetId
-     *            - selected dataset
-     * @return boolean
-     * @throws MiddlewareQueryException
-     */
-    public boolean hasValuesByNumVariateAndDataset(int variateId, int datasetId) throws MiddlewareQueryException;
-    
-    /**
-     * Returns a boolean value given a character variate id and a dataset id
-     * 
-     * @param variateId
-     *            - selected character variate
-     * @param datasetId
-     *            - selected dataset
-     * @return boolean
-     * @throws MiddlewareQueryException
-     */
-    public boolean hasValuesByCharVariateAndDataset(int variateId, int datasetId) throws MiddlewareQueryException;
-    
-    /**
-     * Returns a boolean value given a label id, label value, variate id and a dataset id
-     * 
-     * @param labelId
-     *            - selected label
-     * @param value
-     *            - selected label value
-     * @param variateId
-     *            - selected variate
-     * @param datasetId
-     *            - selected dataset                 
-     * @return boolean
-     * @throws MiddlewareQueryException
-     */
-    public boolean hasValuesByLabelAndLabelValueAndVariateAndDataset(int labelId, String value, int variateId, int datasetId) throws MiddlewareQueryException;
-    
-    /**
-     * Returns a boolean value given a character label id, label value, variate id and a dataset id
-     * 
-     * @param labelId
-     *            - selected numeric label
-     * @param value
-     *            - selected label value
-     * @param variateId
-     *            - selected numeric variate
-     * @param datasetId
-     *            - selected dataset                 
-     * @return boolean
-     * @throws MiddlewareQueryException
-     */
-    public boolean hasValuesByNumLabelAndLabelValueAndNumVariateAndDataset(int labelId, double value, int variateId, int datasetId) throws MiddlewareQueryException;
-    
-    /**
-     * Returns a boolean value given a character label id, label value, variate id and a dataset id
-     * 
-     * @param labelId
-     *            - selected character label
-     * @param value
-     *            - selected label value
-     * @param variateId
-     *            - selected numeric variate
-     * @param datasetId
-     *            - selected dataset                 
-     * @return boolean
-     * @throws MiddlewareQueryException
-     */
-    public boolean hasValuesByCharLabelAndLabelValueAndNumVariateAndDataset(int labelId, String value, int variateId, int datasetId) throws MiddlewareQueryException;
-    
-    /**
-     * Returns a boolean value given a character label id, label value, variate id and a dataset id
-     * 
-     * @param labelId
-     *            - selected numeric label
-     * @param value
-     *            - selected label value
-     * @param variateId
-     *            - selected character variate
-     * @param datasetId
-     *            - selected dataset                 
-     * @return boolean
-     * @throws MiddlewareQueryException
-     */
-    public boolean hasValuesByNumLabelAndLabelValueAndCharVariateAndDataset(int labelId, double value, int variateId, int datasetId) throws MiddlewareQueryException;
-    
-    /**
-     * Returns a boolean value given a character label id, label value, variate id and a dataset id
-     * 
-     * @param labelId
-     *            - selected character label
-     * @param value
-     *            - selected label value
-     * @param variateId
-     *            - selected character variate
-     * @param datasetId
-     *            - selected dataset                 
-     * @return boolean
-     * @throws MiddlewareQueryException
-     */
-    public boolean hasValuesByCharLabelAndLabelValueAndCharVariateAndDataset(int labelId, String value, int variateId, int datasetId) throws MiddlewareQueryException;
-    
-    /**
-     * Returns a boolean value given a label id
-     * 
-     * @param labelId
-     *            - selected character label              
-     * @return boolean
-     * @throws MiddlewareQueryException
-     */
-    public boolean isLabelNumeric(int labelId) throws MiddlewareQueryException;
-    
-    /**
-     * Returns a datatype value given a variate id
-     * 
-     * @param labelId
-     *          - selected character variate              
-     * @return boolean
-     * @throws MiddlewareQueryException
-     */
-    public boolean isVariateNumeric(int variateId) throws MiddlewareQueryException;
-    
+	 * @param id
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	String getLocalNameByStandardVariableId(Integer projectId, Integer standardVariableId) throws MiddlewareQueryException;
 }

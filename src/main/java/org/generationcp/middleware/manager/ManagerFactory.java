@@ -276,8 +276,8 @@ public class ManagerFactory implements Serializable {
         return new StudyDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
     }
     
-    public org.generationcp.middleware.v2.manager.api.StudyDataManager getNewStudyDataManager() throws ConfigException {
-    	return new org.generationcp.middleware.v2.manager.StudyDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+    public org.generationcp.middleware.manager.api.StudyDataManager getNewStudyDataManager() throws ConfigException {
+    	return new org.generationcp.middleware.manager.StudyDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
     }
 
     public org.generationcp.middleware.manager.api.OntologyDataManager getNewOntologyDataManager() throws ConfigException {

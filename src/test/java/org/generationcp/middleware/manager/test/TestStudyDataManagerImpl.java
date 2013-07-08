@@ -12,579 +12,848 @@
 
 package org.generationcp.middleware.manager.test;
 
-import java.util.ArrayList;
-import java.util.List;
+import static org.junit.Assert.assertNotNull;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+
+import junit.framework.Assert;
+
+import org.generationcp.middleware.domain.DataSet;
+import org.generationcp.middleware.domain.DataSetType;
+import org.generationcp.middleware.domain.DatasetReference;
+import org.generationcp.middleware.domain.DatasetValues;
+import org.generationcp.middleware.domain.Experiment;
+import org.generationcp.middleware.domain.ExperimentType;
+import org.generationcp.middleware.domain.ExperimentValues;
+import org.generationcp.middleware.domain.FactorType;
+import org.generationcp.middleware.domain.FolderReference;
+import org.generationcp.middleware.domain.Reference;
+import org.generationcp.middleware.domain.StandardVariable;
+import org.generationcp.middleware.domain.Stocks;
+import org.generationcp.middleware.domain.Study;
+import org.generationcp.middleware.domain.StudyReference;
+import org.generationcp.middleware.domain.StudyValues;
+import org.generationcp.middleware.domain.Term;
+import org.generationcp.middleware.domain.TermId;
+import org.generationcp.middleware.domain.TrialEnvironments;
+import org.generationcp.middleware.domain.Variable;
+import org.generationcp.middleware.domain.VariableList;
+import org.generationcp.middleware.domain.VariableType;
+import org.generationcp.middleware.domain.VariableTypeList;
+import org.generationcp.middleware.domain.search.StudyResultSet;
+import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
+import org.generationcp.middleware.domain.search.filter.GidStudyQueryFilter;
+import org.generationcp.middleware.domain.search.filter.ParentFolderStudyQueryFilter;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
-import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.Season;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.pojos.CharacterDataElement;
-import org.generationcp.middleware.pojos.CharacterLevel;
-import org.generationcp.middleware.pojos.CharacterLevelElement;
-import org.generationcp.middleware.pojos.DatasetCondition;
-import org.generationcp.middleware.pojos.Factor;
-import org.generationcp.middleware.pojos.NumericDataElement;
-import org.generationcp.middleware.pojos.NumericLevel;
-import org.generationcp.middleware.pojos.NumericLevelElement;
-import org.generationcp.middleware.pojos.NumericRange;
-import org.generationcp.middleware.pojos.Representation;
-import org.generationcp.middleware.pojos.Study;
-import org.generationcp.middleware.pojos.StudyEffect;
-import org.generationcp.middleware.pojos.StudyInfo;
-import org.generationcp.middleware.pojos.Trait;
-import org.generationcp.middleware.pojos.TraitCombinationFilter;
-import org.generationcp.middleware.pojos.Variate;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class TestStudyDataManagerImpl{
+public class TestStudyDataManagerImpl {
 
-    private static ManagerFactory factory;
-    private static StudyDataManager manager;
+	private static final Integer STUDY_ID = 10010;
+	private static final Integer DATASET_ID = 10045;
 
-    @BeforeClass
-    public static void setUp() throws Exception {
-        DatabaseConnectionParameters local = new DatabaseConnectionParameters("testDatabaseConfig.properties", "local");
-        DatabaseConnectionParameters central = new DatabaseConnectionParameters("testDatabaseConfig.properties", "central");
-        factory = new ManagerFactory(local, central);
-        manager = factory.getStudyDataManager();
-    }
-    
-    @Test
-    public void testGetGIDSByPhenotypicData() throws Exception {
-        Integer traitId = Integer.valueOf(1003);
-        Integer scaleId = Integer.valueOf(9);
-        Integer methodId = Integer.valueOf(30);
-        NumericRange range = new NumericRange(new Double(2000), new Double(3000));
-        TraitCombinationFilter combination = new TraitCombinationFilter(traitId, scaleId, methodId, range);
-        List<TraitCombinationFilter> filters = new ArrayList<TraitCombinationFilter>();
-        filters.add(combination);
+	private static ManagerFactory factory;
+	private static StudyDataManager manager;
+	private static OntologyDataManager ontologyManager;
 
-        // TraitCombinationFilter combination1 = new TraitCombinationFilter(new
-        // Integer(1007), new Integer(266), new Integer(260), new Double(5));
-        // filters.add(combination1);
-        // TraitCombinationFilter combination2 = new TraitCombinationFilter(new
-        // Integer(1007), new Integer(266), new Integer(260), "5");
-        // filters.add(combination2);
+	@BeforeClass
+	public static void setUp() throws Exception {
+		DatabaseConnectionParameters local = new DatabaseConnectionParameters(
+				"testDatabaseConfig.properties", "local");
+		DatabaseConnectionParameters central = new DatabaseConnectionParameters(
+				"testDatabaseConfig.properties", "central");
+		factory = new ManagerFactory(local, central);
+		manager = factory.getNewStudyDataManager();
+		ontologyManager = factory.getNewOntologyDataManager();
+	}
 
-        List<Integer> results = manager.getGIDSByPhenotypicData(filters, 0, 10, Database.CENTRAL);
-        System.out.println("testGetGIDSByPhenotypicData(traitId=" + scaleId + ", scaleId=" + scaleId + ", methodId=" + methodId
-                + ", range(" + range.getStart() + ", " + range.getEnd() + ")) RESULTS:");
-        for (Integer gid : results)
-            System.out.println("  " + gid);
-    }
+	@Test
+	public void getGetStudyDetails() throws Exception {
+		Study study = manager.getStudy(STUDY_ID);
+		assertNotNull(study);
+		System.out.println("ID: " + study.getId());
+		System.out.println("Name: " + study.getName());
+		System.out.println("Title:" + study.getTitle());
+		System.out.println("PI: " + study.getPrimaryInvestigator());
+		System.out.println("Start Date:" + study.getStartDate());
+		System.out.println("Creation Date: " + study.getCreationDate());
+	}
 
-    @Test
-    public void testGetStudyByNameUsingLike() throws Exception {
-        String name = "IRTN%";
-        List<Study> studyList = manager.getStudyByName(name, 0, 5, Operation.LIKE, Database.CENTRAL);
-        System.out.println("testGetStudyByNameUsingLike(" + name + ") RESULTS: ");
-        for (Study study : studyList) {
-            System.out.println("  " + study);
-        }
-    }
+	@Test
+	public void testGetAllStudyFactor() throws Exception {
+		System.out.println("testGetFactorDetails");
+		int studyId = 10010;
+		VariableTypeList factors = manager.getAllStudyFactors(studyId);
+		assertNotNull(factors);
+		Assert.assertTrue(factors.getVariableTypes().size() > 0);
+		System.out.println("FACTORS RETRIEVED " + factors.getVariableTypes().size());
+		factors.print(0);
+	}
 
-    @Test
-    public void testGetStudyByNameUsingEqual() throws Exception {
-        String name = "PEATSOIL";
-        List<Study> studyList = manager.getStudyByName(name, 0, 5, Operation.EQUAL, Database.CENTRAL);
-        System.out.println("testGetStudyByNameUsingEqual(" + name + ") RESULTS: ");
-        for (Study study : studyList) {
-            System.out.println("  " + study);
-        }
-    }
+	@Test
+	public void testGetAllStudyVariates() throws Exception {
+		System.out.println("testGetVariates");
+		int studyId = 10010;
+		VariableTypeList variates = manager.getAllStudyVariates(studyId);
+		assertNotNull(variates);
+		Assert.assertTrue(variates.getVariableTypes().size() > 0);
+		variates.print(0);
+	}
 
-    @Test
-    public void testCountStudyByName() throws Exception {
-        String name = "IRTN%";
-        long start = System.currentTimeMillis();
-        long count = manager.countStudyByName("IRTN%", Operation.LIKE, Database.CENTRAL);
-        long end = System.currentTimeMillis();
-        System.out.println("testCountStudyByName(" + name + "): " + count);
-        System.out.println("  QUERY TIME: " + (end - start) + " ms");
-    }
-    
+	@Test
+	public void testGetStudiesByFolder() throws Exception {
+		int folderId = 1030;
+		StudyResultSet resultSet = manager.searchStudies(new ParentFolderStudyQueryFilter(folderId), 5);
+		System.out.println("testGetStudiesByFolder(" + folderId + "): " + resultSet.size());
+		Assert.assertTrue(resultSet.size() > 0);
+		while (resultSet.hasMore()) {
+			StudyReference studyRef = resultSet.next();
+			System.out.println(studyRef);
+		}
+	}
+	
+	@Test
+	public void testSearchStudiesForName() throws Exception {
+		System.out.println("testSearchStudiesForName");
+		BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
+	    
+		filter.setName("FooFoo"); //INVALID: Not a study, should not find any studies
+		StudyResultSet resultSet = manager.searchStudies(filter, 10);
+		Assert.assertTrue(resultSet.size() == 0);
+		
+		filter.setName("RYT2000WS"); //VALID: is a study
+		
+		resultSet = manager.searchStudies(filter, 10);
+		System.out.println("INPUT: " + filter);
+		System.out.println("Size: " + resultSet.size());
+		while (resultSet.hasMore()) {
+			System.out.println("\t" + resultSet.next());
+			System.out.flush();
+		}
+	}
+	
+	@Test
+	public void testSearchStudiesForStartDate() throws Exception {
+		System.out.println("testSearchStudiesForStartDate");
+		BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
+	    filter.setStartDate(20050119);
+		
+		StudyResultSet resultSet = manager.searchStudies(filter, 10);
+		System.out.println("INPUT: " + filter);
+		System.out.println("Size: " + resultSet.size());
+		while (resultSet.hasMore()) {
+			System.out.println("\t" + resultSet.next());
+			System.out.flush();
+		}
+	}
+	
+	@Test
+	public void testSearchStudiesForSeason() throws Exception {
+		Season seasons[] = { Season.GENERAL, Season.DRY, Season.WET };
+		
+		System.out.println("testSearchStudiesForSeason");
+		
+		for (Season season : seasons) {
+			
+		    System.out.println("Season: " + season);
+			BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
+			filter.setSeason(season);
+			StudyResultSet resultSet = manager.searchStudies(filter, 10);
+			System.out.println("Size: " + resultSet.size());
+			while (resultSet.hasMore()) {
+				System.out.println("\t" + resultSet.next());
+				System.out.flush();
+			}
+		}
+	}
 
-    @Test
-    public void testGetStudyBySeason() throws Exception {
-        Season season = Season.DRY;
-        List<Study> studyList = manager.getStudyBySeason(season, 0, (int) manager.countStudyBySeason(season, Database.CENTRAL), Database.CENTRAL);
-        System.out.println("testGetStudyBySeason(" + season + ") RESULTS: " + studyList.size());
-        for (Study study : studyList) {
-            System.out.println("  " + study);
-        }
-    }
+	@Test
+	public void testSearchStudiesForCountry() throws Exception {
+		System.out.println("testSearchStudies");
+		BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
+	    
+		filter.setCountry("Republic of the Philippines");
+		
+		StudyResultSet resultSet = manager.searchStudies(filter, 10);
+		System.out.println("INPUT: " + filter);
+		System.out.println("Size: " + resultSet.size());
+		while (resultSet.hasMore()) {
+			System.out.println("\t" + resultSet.next());
+			System.out.flush();
+		}
+	}
+	
+	@Test
+	public void testSearchStudiesForAll() throws Exception {
+		System.out.println("testSearchStudiesForAll");
+		BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
+	    filter.setStartDate(20050119);
+		filter.setName("RYT2000WS"); //VALID: is a study
+		filter.setCountry("Republic of the Philippines");
+		filter.setSeason(Season.DRY);
+		
+		StudyResultSet resultSet = manager.searchStudies(filter, 10);
+		System.out.println("INPUT: " + filter);
+		System.out.println("Size: " + resultSet.size());
+		while (resultSet.hasMore()) {
+			System.out.println("\t" + resultSet.next());
+			System.out.flush();
+		}
+	}
 
-    @Test
-    public void testCountStudyBySeason() throws Exception {
-        Season season = Season.DRY;
-        long count =  manager.countStudyBySeason(season, Database.CENTRAL);
-        System.out.println("testCountStudyBySeason(" + season + "): " + count);
-    }
-    
-    
-    @Test
-    public void testGetStudyBySDateUsingEqual() throws Exception {
-        Integer sdate = 20050119;
-        List<Study> studyList = manager.getStudyBySDate(sdate, 0, 2, Operation.EQUAL, Database.CENTRAL);
-        System.out.println("testGetStudyBySDateUsingEqual(" + sdate + ") RESULTS: ");
-        for (Study study : studyList) {
-            System.out.println("  " + study);
-        }
-    }
+	@Test
+	public void testGetRootFolders() throws Exception {
+		List<FolderReference> rootFolders = manager
+				.getRootFolders(Database.CENTRAL);
+		assertNotNull(rootFolders);
+		assert (rootFolders.size() > 0);
+		System.out.println("testGetRootFolders(): " + rootFolders.size());
+		for (FolderReference node : rootFolders) {
+			System.out.println("   " + node);
+		}
+	}
 
-    @Test
-    public void testCountStudyBySDate() throws Exception {
-        Integer sdate = 20050119;
-        long start = System.currentTimeMillis();
-        long count = manager.countStudyBySDate(sdate, Operation.LIKE, Database.CENTRAL);
-        long end = System.currentTimeMillis();
-        System.out.println("testCountStudyBySDate(" + sdate + "): " + count);
-        System.out.println("  QUERY TIME: " + (end - start) + " ms");
-    }
+	@Test
+	public void testGetChildrenOfFolder() throws Exception {
+		List<Integer> folderIds = Arrays.asList(1000, 2000);
+		for (Integer folderId : folderIds){
+			List<Reference> childrenNodes = manager.getChildrenOfFolder(folderId);
+			assertNotNull(childrenNodes);
+			assert (childrenNodes.size() > 0);
+			System.out.println("testGetChildrenOfFolder(folderId="+folderId+"): " + childrenNodes.size());
+			for (Reference node : childrenNodes) {
+				System.out.println("   " + node);
+			} 
+		}
+	}
 
-    @Test
-    public void testGetStudyByEDateUsingEqual() throws Exception {
-        Integer edate = 2004;
-        List<Study> studyList = manager.getStudyByEDate(edate, 0, 2, Operation.EQUAL, Database.CENTRAL);
-        System.out.println("testGetStudyByEDateUsingEqual(" + edate + ") RESULTS: ");
-        for (Study study : studyList) {
-            System.out.println("  " + study);
-        }
-    }
+	@Test
+	public void testGetDatasetNodesByStudyId() throws Exception {
+		Integer studyId = 10010;
+		List<DatasetReference> datasetReferences = manager
+				.getDatasetReferences(studyId);
+		assertNotNull(datasetReferences);
+		assert (datasetReferences.size() > 0);
+		System.out.println("testGetDatasetNodesByStudyId(): "
+				+ datasetReferences.size());
+		for (DatasetReference node : datasetReferences) {
+			System.out.println("   " + node);
+		}
+	}
 
-    
+	@Test
+	public void testSearchStudiesByGid() throws Exception {
+		System.out.println("testSearchStudiesByGid");
+		Integer gid = 70125;
+		GidStudyQueryFilter filter = new GidStudyQueryFilter(gid);
+		StudyResultSet resultSet = manager.searchStudies(filter, 50);
+		Assert.assertNotNull(resultSet);
+		System.out.println("Study Count: " + resultSet.size());
+		while (resultSet.hasMore()) {
+			StudyReference studyRef = resultSet.next();
+			System.out.println(studyRef);
+		}
+	}
 
-    @Test
-    public void testGetStudyByCountryUsingLike() throws Exception {
-        String country = "Arme%";
-        List<Study> studyList = manager.getStudyByCountry(country, 0, 5, Operation.LIKE, Database.CENTRAL);
-        System.out.println("testGetStudyByCountryUsingLike(" + country + ") RESULTS: ");
-        for (Study study : studyList) {
-            System.out.println("  " + study);
-        }
-    }
+	@Test
+	public void testAddStudy() throws Exception {
 
-    @Test
-    public void testGetStudyByCountryUsingEqual() throws Exception {
-        String country = "Armenia";
-        List<Study> studyList = manager.getStudyByCountry(country, 0, 5, Operation.EQUAL, Database.CENTRAL);
-        System.out.println("testGetStudyByCountryUsingEqual(" + country + ") RESULTS: ");
-        for (Study study : studyList) {
-            System.out.println("  " + study);
-        }
-    }
+		int parentStudyId = 1;
+		
+		VariableTypeList typeList = new VariableTypeList();
+		
+		VariableList variableList = new VariableList();
 
-    @Test
-    public void testCountStudyByCountry() throws Exception {
-        String country = "Arme%";
-        long count = manager.countStudyByCountry(country, Operation.LIKE, Database.CENTRAL);
-        System.out.println("testCountStudyByCountry(" + country + "): " + count);
-    }
+		Variable variable = createVariable(TermId.STUDY_NAME.getId(), "Study Name " + new Random().nextInt(10000), 1);
+		typeList.add(variable.getVariableType());
+		variableList.add(variable);
+		
+		variable = createVariable(TermId.STUDY_TITLE.getId(), "Study Description", 2);
+		typeList.add(variable.getVariableType());
+		variableList.add(variable);
 
-    @Test
-    public void testCountStudyByEDate() throws Exception {
-        Integer edate = 2004;
-        long start = System.currentTimeMillis();
-        long count = manager.countStudyByEDate(edate, Operation.LIKE, Database.CENTRAL);
-        long end = System.currentTimeMillis();
-        System.out.println("testCountStudyByEDate(" + edate + "): " + count);
-        System.out.println("  QUERY TIME: " + (end - start) + " ms");
-    }
-    
-    @Test
-    public void testGetStudyByID() throws Exception {
-        Integer id = Integer.valueOf(714);
-        Study study = manager.getStudyByID(id);
-        System.out.println("testGetStudyByID(" + id + "): " + study);
-    }
+		StudyValues studyValues = new StudyValues();
+		studyValues.setVariableList(variableList);
+		
+		VariableList locationVariableList = createTrialEnvironment("Description", "1.0", "2.0", "data", "3.0", "prop1", "prop2");
+		studyValues.setLocationId(manager.addTrialEnvironment(locationVariableList));
+		
+		VariableList germplasmVariableList = createGermplasm("unique name", "1000", "name", "2000", "prop1", "prop2");
+		studyValues.setGermplasmId(manager.addStock(germplasmVariableList));
 
-    @Test
-    public void testGetAllTopLevelStudies() throws Exception {
-        List<Study> topLevelStudies = manager.getAllTopLevelStudies(0, 10, Database.LOCAL);
-        System.out.println("testGetAllTopLevelStudies() Number of top-level studies: " + topLevelStudies.size());
-        for (Study study : topLevelStudies) {
-            System.out.println("  " + study);
-        }
-    }
+		StudyReference studyRef = manager.addStudy(parentStudyId, typeList, studyValues);
 
-    @Test
-    public void testCountAllTopLevelStudies() throws Exception {
-        long count = manager.countAllTopLevelStudies(Database.CENTRAL);
-        System.out.println("testCountAllTopLevelStudies(): " + count);
-    }
+		Assert.assertTrue(studyRef.getId() < 0);
+		System.out.println("testAddStudy(): " + studyRef);
+	}
+	
+	@Test
+	public void testAddStudyWithNoLocation() throws Exception {
 
-    @Test
-    public void testCountAllStudyByParentFolderID() throws Exception {
-        Integer parentFolderId = Integer.valueOf(640);
-        long count = manager.countAllStudyByParentFolderID(parentFolderId, Database.CENTRAL);
-        System.out.println("testCountAllStudyByParentFolderID(" + parentFolderId + ") Number of Studies belong to this parent folder: "
-                + count);
-    }
+		int parentStudyId = 1;
+		
+		VariableTypeList typeList = new VariableTypeList();
+		
+		VariableList variableList = new VariableList();
 
-    @Test
-    public void testGetStudiesByParentFolderID() throws Exception {
-        Integer parentFolderId = Integer.valueOf(640);
-        List<Study> studies = manager.getStudiesByParentFolderID(parentFolderId, 0, 100);
-        System.out.println("testGetStudiesByParentFolderID(" + parentFolderId + ") STUDIES BY PARENT FOLDER: " + studies.size());
-        for (Study study : studies) {
-            System.out.println("  " + study);
-        }
-    }
+		Variable variable = createVariable(TermId.STUDY_NAME.getId(), "Study Name " + new Random().nextInt(10000), 1);
+		typeList.add(variable.getVariableType());
+		variableList.add(variable);
+		
+		variable = createVariable(TermId.STUDY_TITLE.getId(), "Study Description", 2);
+		typeList.add(variable.getVariableType());
+		variableList.add(variable);
+		
+		typeList.add(createVariableType(TermId.GID.getId(), "GID", "gid", 3));
 
-    @Test
-    public void testGetFactorsByStudyID() throws Exception {
-        Integer studyId = Integer.valueOf(430);
-        List<Factor> factors = manager.getFactorsByStudyID(studyId);
-        System.out.println("testGetFactorsByStudyID(" + studyId + ") RESULTS: " + factors.size());
-        for (Factor factor : factors) {
-            System.out.println("  " + factor);
-        }
-    }
+		StudyValues studyValues = new StudyValues();
+		studyValues.setVariableList(variableList);
+		
+		studyValues.setLocationId(null);
+		
+		VariableList germplasmVariableList = createGermplasm("unique name", "1000", "name", "2000", "prop1", "prop2");
+		studyValues.setGermplasmId(manager.addStock(germplasmVariableList));
 
-    @Test
-    public void testGetVariatesByStudyID() throws Exception {
-        Integer studyId = Integer.valueOf(430);
-        List<Variate> variates = manager.getVariatesByStudyID(studyId);
-        System.out.println("testGetVariatesByStudyID(" + studyId + ") RESULTS: " + variates.size());
-        for (Variate variate : variates) {
-            System.out.println("  " + variate);
-        }
-    }
+		StudyReference studyRef = manager.addStudy(parentStudyId, typeList, studyValues);
 
-    @Test
-    public void testGetEffectsByStudyID() throws Exception {
-        Integer studyId = Integer.valueOf(430);
-        List<StudyEffect> studyEffects = manager.getEffectsByStudyID(studyId);
-        System.out.println("testGetEffectsByStudyID(" + studyId + ") RESULTS: " + studyEffects.size());
-        for (StudyEffect studyEffect : studyEffects) {
-            System.out.println("  " + studyEffect);
-        }
-    }
+		Assert.assertTrue(studyRef.getId() < 0);
+		Study study = manager.getStudy(studyRef.getId());
+		study.print(0);
+	}
+	
+	@Test
+	public void testGetDataSet() throws Exception {
+		for (int i = 10015; i <= 10075; i += 10) {
+			DataSet dataSet = manager.getDataSet(i);
+			dataSet.print(0);
+		}
+	}
 
-    @Test
-    public void testGetRepresentationByEffectID() throws Exception {
-        Integer effectId = Integer.valueOf(430);
-        List<Representation> representations = manager.getRepresentationByEffectID(effectId);
-        System.out.println("testGetRepresentationByEffectID(" + effectId + ") RESULTS: " + representations.size());
-        for (Representation representation : representations) {
-            System.out.println("  " + representation);
-        }
-    }
+	@Test
+	public void testCountExperiments() throws Exception {
+		System.out.println("Dataset Experiment Count: "
+				+ manager.countExperiments(DATASET_ID));
+	}
 
-    @Test
-    public void testGetRepresentationByStudyID() throws Exception {
-        Integer studyId = Integer.valueOf(1);
-        List<Representation> representations = manager.getRepresentationByStudyID(studyId);
-        System.out.println("testGetRepresentationByStudyID(" + studyId + ") RESULTS: " + representations.size());
-        for (Representation representation : representations) {
-            System.out.println("  " + representation);
-        }
-    }
+	@Test
+	public void testGetExperiments() throws Exception {
+		for (int i = 0; i < 2; i++) {
+			List<Experiment> experiments = manager.getExperiments(DATASET_ID,
+					50 * i, 50);
+			for (Experiment experiment : experiments) {
+				experiment.print(0);
+			}
+		}
+	}
+	
+	@Test
+	public void testGetExperimentsWithAverage() throws Exception {
+		List<Experiment> experiments = manager.getExperiments(5803, 0, 50);
+		for (Experiment experiment : experiments) {
+			experiment.print(0);
+		}
+	}
 
-    @Test
-    public void testGetFactorsByRepresentationId() throws Exception {
-        Integer representationId = Integer.valueOf(1176);
-        List<Factor> factors = manager.getFactorsByRepresentationId(representationId);
-        System.out.println("testGetFactorsByRepresentationId(" + representationId + ") RESULTS: " + factors.size());
-        for (Factor factor : factors) {
-            System.out.println("  " + factor);
-        }
-    }
+	@Test
+	public void testAddDataSet() throws Exception {
+		//Parent study, assign a parent study id value, if none exists in db, 
+		//you may create a dummy one. or you may run testAddStudy first to create
+		//the study
+		int parentStudyId = -1;
+		
+		VariableTypeList typeList = new VariableTypeList();
+		VariableList variableList = new VariableList();
+		Variable variable;
+		
+		//please make sure that the study name is unique and does not exist in the db.
+		variable = createVariable(TermId.DATASET_NAME.getId(), "My Dataset Name " + new Random().nextInt(10000), 1);
+		typeList.add(variable.getVariableType());
+		updateVariableType(variable.getVariableType(), "DATASET_NAME", "Dataset name (local)");
+		variableList.add(variable);
+		
+		variable = createVariable(TermId.DATASET_TITLE.getId(), "My Dataset Description", 2);
+		typeList.add(variable.getVariableType());
+		updateVariableType(variable.getVariableType(), "DATASET_TITLE", "Dataset title (local)");
+		variableList.add(variable);
+		
+		variable = createVariable(TermId.DATASET_TYPE.getId(), "10070", 3);
+		typeList.add(variable.getVariableType());
+		updateVariableType(variable.getVariableType(), "DATASET_TYPE", "Dataset type (local)");
+		variableList.add(variable);
+		
+		DatasetValues datasetValues = new DatasetValues();
+		datasetValues.setVariables(variableList);
 
-    @Test
-    public void testCountOunitIDsByRepresentationId() throws Exception {
-        Integer representationId = Integer.valueOf(1176);
-        long ounitIdCount = manager.countOunitIDsByRepresentationId(representationId);
-        System.out.println("testCountOunitIDsByRepresentationId(" + representationId + ") COUNT OF OUNIT IDS BY REPRESENTATION: "
-                + ounitIdCount);
-    }
+		DatasetReference datasetReference = manager.addDataSet(parentStudyId, typeList, datasetValues);
+		System.out.println("Dataset added : " + datasetReference);
+		
+	}
+	
+	@Test
+	public void testAddDatasetWithNoDataType() throws Exception {
+		System.out.println("Test addDatasetWithNoCoreValues");
+		StudyReference studyRef = this.addTestStudy();
+        VariableTypeList typeList = new VariableTypeList();
+		
+		DatasetValues datasetValues = new DatasetValues();
+		datasetValues.setName("No Datatype dataset" + new Random().nextInt(10000));
+		datasetValues.setDescription("whatever ds");
+		
+		VariableType variableType = createVariableType(18000, "Grain Yield", "whatever", 4);
+		typeList.add(variableType);
+		
+		variableType = createVariableType(18050, "Disease Pressure", "whatever", 5);
+		typeList.add(variableType);
+		
+		variableType = createVariableType(8200, "Plot No", "whatever", 6);
+		typeList.add(variableType);
+	
+		DatasetReference dataSetRef = manager.addDataSet(studyRef.getId(), typeList, datasetValues);
+		
+		DataSet dataSet = manager.getDataSet(dataSetRef.getId());
+		dataSet.print(0);
+	}
+	
+	@Test
+	public void testAddDataSetVariableType() throws Exception {
+		//Parent study, assign a parent study id value, if none exists in db, 
+		//you may create a dummy one. or you may run testAddStudy first to create
+		//the study
+		int parentStudyId = -1;
+		
+		VariableTypeList typeList = new VariableTypeList();
+		VariableList variableList = new VariableList();
+		Variable variable;
+		
+		//please make sure that the study name is unique and does not exist in the db.
+		variable = createVariable(TermId.DATASET_NAME.getId(), "My Dataset Name " + new Random().nextInt(10000), 1);
+		typeList.add(variable.getVariableType());
+		updateVariableType(variable.getVariableType(), "DATASET_NAME", "Dataset name (local)");
+		variableList.add(variable);
+		
+		variable = createVariable(TermId.DATASET_TITLE.getId(), "My Dataset Description", 2);
+		typeList.add(variable.getVariableType());
+		updateVariableType(variable.getVariableType(), "DATASET_TITLE", "Dataset title (local)");
+		variableList.add(variable);
+		
+		variable = createVariable(TermId.DATASET_TYPE.getId(), "10070", 3);
+		typeList.add(variable.getVariableType());
+		updateVariableType(variable.getVariableType(), "DATASET_TYPE", "Dataset type (local)");
+		variableList.add(variable);
+		
+		DatasetValues datasetValues = new DatasetValues();
+		datasetValues.setVariables(variableList);
 
-    @Test
-    public void testGetOunitIDsByRepresentationId() throws Exception {
-        Integer representationId = Integer.valueOf(1176);
-        List<Integer> ounitIDs = manager.getOunitIDsByRepresentationId(representationId, 0, 100);
-        System.out.println("testGetOunitIDsByRepresentationId(" + representationId + ") RESULTS: " + ounitIDs.size() + "\n  " + ounitIDs);
-    }
+		DatasetReference datasetReference = manager.addDataSet(parentStudyId, typeList, datasetValues);
+		System.out.println("Dataset added : " + datasetReference);
+		
+		DataSet dataSet = manager.getDataSet(datasetReference.getId());
+		System.out.println("Original Dataset");
+		dataSet.print(3);
+		
+		VariableType variableType = new VariableType();
+		variableType.setLocalName("Dog");
+		variableType.setLocalDescription("Man's best friend");
+		variableType.setStandardVariable(ontologyManager.getStandardVariable(8240));
+		variableType.setRank(99);
+		manager.addDataSetVariableType(dataSet.getId(), variableType);
+		
+		dataSet = manager.getDataSet(datasetReference.getId());
+		System.out.println("Modified Dataset");
+		dataSet.print(3);
+		
+	}
+	
+	@Test
+	public void testAddExperiment() throws Exception {
+		List<Experiment> experiments = manager.getExperiments(10015, 0, /* 1093 */1);
+		int dataSetId = -1;
+		ExperimentValues experimentValues = new ExperimentValues();
+		List<Variable> varList = new ArrayList<Variable>();
+		varList.addAll(experiments.get(0).getFactors().getVariables());
+		varList.addAll(experiments.get(0).getVariates().getVariables());
+		VariableList list = new VariableList();
+		list.setVariables(varList);
+		experimentValues.setVariableList(list);
+		experimentValues.setGermplasmId(-1);
+		experimentValues.setLocationId(-1);
+		manager.addExperiment(dataSetId, ExperimentType.PLOT, experimentValues);
+	}
+	
+	@Test
+	public void testSetExperimentValue() throws Exception {
+		System.out.println("Test SetExperimentValue");
+		StudyReference studyRef = this.addTestStudy();
+		DatasetReference datasetRef = this.addTestDataset(studyRef.getId());
+		addTestExperiments(datasetRef.getId(), 4);
+		List<Experiment> experiments = manager.getExperiments(datasetRef.getId(), 0, 2);
+		
+		printExperiments("Original", datasetRef.getId());
+		for (Experiment experiment: experiments) {
+			manager.setExperimentValue(experiment.getId(), 18000, "666");
+			manager.setExperimentValue(experiment.getId(), 18050, "19010");
+			manager.setExperimentValue(experiment.getId(), 8200, "4");
+		}
+		printExperiments("Modified", datasetRef.getId());
+	}
+	
+	@Test
+	public void testGetTrialEnvironmentsInDataset() throws Exception {
+		System.out.println("Test getTrialEnvironmentsInDataset");
+		TrialEnvironments trialEnvironments = manager.getTrialEnvironmentsInDataset(10085);
+		trialEnvironments.print(0);
+	}
+	
+	@Test
+	public void testGetStocksInDataset() throws Exception {
+		System.out.println("Test getStocksInDataset");
+		Stocks stocks = manager.getStocksInDataset(10085);
+		stocks.print(0);
+	}
+	
+	private void printExperiments(String title, int datasetId) throws Exception {
+		System.out.println(title);
+		List<Experiment> experiments = manager.getExperiments(datasetId, 0, 4);
+		for (Experiment experiment: experiments) {
+			experiment.print(3);
+		}
+	}
 
-    @Test
-    public void testGetVariatesByRepresentationId() throws Exception {
-        Integer representationId = Integer.valueOf(1176);
-        List<Variate> variates = manager.getVariatesByRepresentationId(representationId);
-        System.out.println("testGetVariatesByRepresentationId(" + representationId + ") VARIATES BY REPRESENTATION: " + variates.size());
-        for (Variate variate : variates) {
-            System.out.println("  " + variate);
-        }
-    }
+	@Test
+	public void testAddTrialEnvironment() throws Exception {
+		VariableList variableList = createTrialEnvironment("loc desc", "1.1", "2.2", "datum", "3.3", "prop1", "prop2");
+		manager.addTrialEnvironment(variableList);
+	}
+	
+	@Test
+	public void testAddGermplasm() throws Exception {
+		VariableList variableList = createGermplasm("unique name", "1000", "name", "2000", "prop1", "prop2");
+		manager.addStock(variableList);
+	}
+	
+	@Test
+	public void testGetFactorsByProperty() throws Exception {
+		int propertyId = 2205;
+		int datasetId = 10015;
+		System.out.println("testGetFactorsByProperty (dataset=" + datasetId + ", property=" + propertyId);
+		DataSet dataset = manager.getDataSet(datasetId);
+		VariableTypeList factors = dataset.getFactorsByProperty(propertyId);
+		if (factors != null && factors.getVariableTypes() != null && factors.getVariableTypes().size() > 0) {
+			for (VariableType factor : factors.getVariableTypes()) {
+				factor.print(0);
+			}
+		} else {
+			System.out.println("NO FACTORS FOUND FOR DATASET = " + datasetId + " WITH PROPERTY = " + propertyId);
+		}
+	}
+	
+	@Test
+	public void testGetFactorsByFactorType() throws Exception {
+		FactorType factorType = FactorType.DATASET;
+		int datasetId = 10087;
+		System.out.println("testGetFactorsByFactorType (dataset=" + datasetId + ", factorType=" + factorType + ")");
+		DataSet dataset = manager.getDataSet(datasetId);
+		VariableTypeList factors = dataset.getFactorsByFactorType(factorType);
+		if (factors != null && factors.getVariableTypes() != null && factors.getVariableTypes().size() > 0) {
+			for (VariableType factor : factors.getVariableTypes()) {
+				factor.print(0);
+			}
+		} else {
+			System.out.println("NO FACTORS FOUND FOR DATASET = " + datasetId + " WITH FACTOR TYPE = " + factorType);
+		}
+	}
+	
+	@Test
+	public void testGetDataSetsByType() throws Exception {
+		int studyId = 10010;
+		DataSetType dataSetType = DataSetType.MEANS_DATA;
+		System.out.println("testGetDataSetsByType(studyId = " + studyId + ", dataSetType = " + dataSetType + ")");
+		List<DataSet> datasets = manager.getDataSetsByType(studyId, dataSetType);
+		for (DataSet dataset : datasets) {
+			System.out.println("Dataset" + dataset.getId() + "-" + dataset.getName() + "-" + dataset.getDescription());
+		}
+		
+		studyId = 10080;
+		dataSetType = DataSetType.MEANS_DATA;
+		System.out.println("testGetDataSetsByType(studyId = " + studyId + ", dataSetType = " + dataSetType + ")");
+		datasets = manager.getDataSetsByType(studyId, dataSetType);
+		for (DataSet dataset : datasets) {
+			System.out.println("Dataset" + dataset.getId() + "-" + dataset.getName() + "-" + dataset.getDescription());
+		}
+		
+		System.out.println("Display data set type in getDataSet");
+		DataSet dataSet = manager.getDataSet(10087);
+		System.out.println("DataSet = " + dataSet.getId() + ", name = " + dataSet.getName() + ", description = " + dataSet.getDescription() + ", type = " + dataSet.getDataSetType()	);
+	}
+	
+	@Test
+	public void testFindOneDataSetByType() throws Exception {
+		int studyId = 10010;
+		DataSetType dataSetType = DataSetType.MEANS_DATA;
+		System.out.println("testFindOneDataSetByType(studyId = " + studyId + ", dataSetType = " + dataSetType + ")");
+		DataSet dataset = manager.findOneDataSetByType(studyId, dataSetType);
+	    if (dataset != null) {
+		    System.out.println("Dataset" + dataset.getId() + "-" + dataset.getName() + "-" + dataset.getDescription());
+	    }
+		
+		studyId = 10080;
+		dataSetType = DataSetType.MEANS_DATA;
+		System.out.println("testFindOneDataSetByType(studyId = " + studyId + ", dataSetType = " + dataSetType + ")");
+		dataset = manager.findOneDataSetByType(studyId, dataSetType);
+		if (dataset != null) {
+			System.out.println("Dataset" + dataset.getId() + "-" + dataset.getName() + "-" + dataset.getDescription());
+		}
+		
+		dataSetType = DataSetType.SUMMARY_DATA;
+		System.out.println("testFindOneDataSetByType(studyId = " + studyId + ", dataSetType = " + dataSetType + ")");
+		dataset = manager.findOneDataSetByType(studyId, dataSetType);
+		Assert.assertTrue(dataset == null);
+	}
+	
+	@Test
+	public void testCountExperimentsByTrialEnvironmentAndVariate() throws Exception {
+		long count = manager.countExperimentsByTrialEnvironmentAndVariate(10070, 20870);
+		System.out.println("Count of Experiments By TE and Variate: " + count);
+	}
+	
+	@Test
+	public void testCountStocks() throws Exception {
+		long count = manager.countStocks(10087, 10081, 18190);
+		System.out.println("Test CountStocks: " + count);
+	}
+	
+	@Test
+	public void testDeleteDataSet() throws Exception {
+		StudyReference studyRef = this.addTestStudy();
+		DatasetReference datasetRef = this.addTestDataset(studyRef.getId());
+		this.addTestExperiments(datasetRef.getId(), 10);
+		
+		System.out.println("Test Delete DataSet: " + datasetRef.getId());
+		manager.deleteDataSet(datasetRef.getId());
+	}
+	
+	@Test
+	public void testDeleteExperimentsByLocation() throws Exception {
+		StudyReference studyRef = this.addTestStudyWithNoLocation();
+		DatasetReference datasetRef = this.addTestDatasetWithLocation(studyRef.getId());
+		int locationId = this.addTestExperimentsWithLocation(datasetRef.getId(), 10);
+		int locationId2 = this.addTestExperimentsWithLocation(datasetRef.getId(), 10);
+		
+		System.out.println("Test Delete ExperimentsByLocation: " + datasetRef.getId() + ", " + locationId);
+		System.out.println("Location id of " + locationId2 + " will NOT be deleted");
+		manager.deleteExperimentsByLocation(datasetRef.getId(), locationId);
+	}
+	
+	@AfterClass
+	public static void tearDown() throws Exception {
+		if (factory != null) {
+			factory.close();
+		}
+	}
+	
+	
+	private Variable createVariable(int termId, String value, int rank) throws Exception {
+		StandardVariable stVar = ontologyManager.getStandardVariable(termId);
+		
+		VariableType vtype = new VariableType();
+		vtype.setStandardVariable(stVar);
+		vtype.setRank(rank);
+		Variable var = new Variable();
+		var.setValue(value);
+		var.setVariableType(vtype);
+		return var;
+	}
+	
+	private VariableType createVariableType(int termId, String name, String description, int rank) throws Exception {
+		StandardVariable stdVar = ontologyManager.getStandardVariable(termId);
+		
+		VariableType vtype = new VariableType();
+		vtype.setLocalName(name);
+		vtype.setLocalDescription(description);
+		vtype.setRank(rank);
+		vtype.setStandardVariable(stdVar);
+		
+		return vtype;
+	}
+	
+	private void updateVariableType(VariableType type, String name, String description) {
+		type.setLocalName(name);
+		type.setLocalDescription(description);
+	}
 
-    @Test
-    public void testGetNumericDataValuesByOunitIdList() throws Exception {
-        List<Integer> ounitIdList = new ArrayList<Integer>();
-        ounitIdList.add(447201);
-        ounitIdList.add(447202);
-        ounitIdList.add(447203);
-        ounitIdList.add(447204);
-        ounitIdList.add(447205);
-        List<NumericDataElement> dataElements = manager.getNumericDataValuesByOunitIdList(ounitIdList);
-        System.out.println("testGetNumericDataValuesByOunitIdList(" + ounitIdList + ") NUMERIC DATA VALUES BY OUNITIDLIST: "
-                + dataElements.size());
-        for (NumericDataElement data : dataElements) {
-            System.out.println("  " + data);
-        }
-    }
+	private VariableList createTrialEnvironment(String name, String latitude, String longitude, String data, String altitude, String property1, String property2) throws Exception{
+		VariableList variableList = new VariableList();
+		variableList.add(createVariable(8170, name, 0));
+		variableList.add(createVariable(8191, latitude, 0));
+		variableList.add(createVariable(8192, longitude, 0));
+		variableList.add(createVariable(8193, data, 0));
+		variableList.add(createVariable(8194, altitude, 0));
+		variableList.add(createVariable(8135, property1, 0));
+		variableList.add(createVariable(8180, property2, 0));
+		variableList.add(createVariable(8195, "999", 0));
+		return variableList;
+	}
+	
+	private VariableList createGermplasm(String name, String gid, String designation, String code, String property1, String property2) throws Exception{
+		VariableList variableList = new VariableList();
+		variableList.add(createVariable(8230, name, 1));
+		variableList.add(createVariable(8240, gid, 2));
+		variableList.add(createVariable(8250, designation, 3));
+		variableList.add(createVariable(8300, code, 4));
+		variableList.add(createVariable(8255, property1, 5));
+		variableList.add(createVariable(8377, property2, 6));
+		return variableList;
+	}
+	
+	private StudyReference addTestStudy() throws Exception {
+        int parentStudyId = 1;
+		
+		VariableTypeList typeList = new VariableTypeList();
+		
+		VariableList variableList = new VariableList();
 
-    @Test
-    public void testGetCharacterDataValuesByOunitIdList() throws Exception {
-        List<Integer> ounitIdList = new ArrayList<Integer>();
-        ounitIdList.add(447201);
-        ounitIdList.add(447202);
-        ounitIdList.add(447203);
-        ounitIdList.add(447204);
-        ounitIdList.add(447205);
-        List<CharacterDataElement> dataElements = manager.getCharacterDataValuesByOunitIdList(ounitIdList);
-        System.out.println("testGetCharacterDataValuesByOunitIdList(" + ounitIdList + ") CHARACTER DATA VALUES BY OUNITIDLIST: "
-                + dataElements.size());
-        for (CharacterDataElement data : dataElements) {
-            System.out.println("  " + data);
-        }
-    }
+		Variable variable = createVariable(TermId.STUDY_NAME.getId(), "Study Name " + new Random().nextInt(10000), 1);
+		typeList.add(variable.getVariableType());
+		variableList.add(variable);
+		
+		variable = createVariable(TermId.STUDY_TITLE.getId(), "Study Description", 2);
+		typeList.add(variable.getVariableType());
+		variableList.add(variable);
 
-    @Test
-    public void testGetNumericLevelValuesByOunitIdList() throws Exception {
-        List<Integer> ounitIdList = new ArrayList<Integer>();
-        ounitIdList.add(447201);
-        ounitIdList.add(447202);
-        ounitIdList.add(447203);
-        ounitIdList.add(447204);
-        ounitIdList.add(447205);
-        List<NumericLevelElement> levelElements = manager.getNumericLevelValuesByOunitIdList(ounitIdList);
-        System.out.println("testGetNumericLevelValuesByOunitIdList(" + ounitIdList + ") NUMERIC LEVEL VALUES BY OUNITIDLIST: "
-                + levelElements.size());
-        for (NumericLevelElement level : levelElements) {
-            System.out.println("  " + level);
-        }
-    }
+		StudyValues studyValues = new StudyValues();
+		studyValues.setVariableList(variableList);
+		
+		VariableList locationVariableList = createTrialEnvironment("Description", "1.0", "2.0", "data", "3.0", "prop1", "prop2");
+		studyValues.setLocationId(manager.addTrialEnvironment(locationVariableList));
+		
+		VariableList germplasmVariableList = createGermplasm("unique name", "1000", "name", "2000", "prop1", "prop2");
+		studyValues.setGermplasmId(manager.addStock(germplasmVariableList));
 
-    @Test
-    public void testGetCharacterLevelValuesByOunitIdList() throws Exception {
-        List<Integer> ounitIdList = new ArrayList<Integer>();
-        ounitIdList.add(447201);
-        ounitIdList.add(447202);
-        ounitIdList.add(447203);
-        ounitIdList.add(447204);
-        ounitIdList.add(447205);
-        List<CharacterLevelElement> levelElements = manager.getCharacterLevelValuesByOunitIdList(ounitIdList);
-        System.out.println("CHARACTER LEVEL VALUES BY OUNITIDLIST: " + levelElements.size());
-        System.out.println("testGetCharacterLevelValuesByOunitIdList(" + ounitIdList + ") CHARACTER LEVEL VALUES BY OUNITIDLIST: "
-                + levelElements.size());
-        for (CharacterLevelElement level : levelElements) {
-            System.out.println("  " + level);
-        }
-    }
+		return manager.addStudy(parentStudyId, typeList, studyValues);
+	}
+	
+	private StudyReference addTestStudyWithNoLocation() throws Exception {
+        int parentStudyId = 1;
+		
+		VariableTypeList typeList = new VariableTypeList();
+		
+		VariableList variableList = new VariableList();
 
-    @Test
-    public void testGetConditionsByRepresentationId() throws Exception {
-        Integer representationId = Integer.valueOf(2);
-        List<DatasetCondition> results = manager.getConditionsByRepresentationId(representationId);
-        System.out.println("testGetConditionsByRepresentationId(" + representationId + ") RESULTS: ");
-        for (DatasetCondition result : results) {
-            System.out.println("  " + result);
-        }
-    }
+		Variable variable = createVariable(TermId.STUDY_NAME.getId(), "Study Name " + new Random().nextInt(10000), 1);
+		typeList.add(variable.getVariableType());
+		variableList.add(variable);
+		
+		variable = createVariable(TermId.STUDY_TITLE.getId(), "Study Description", 2);
+		typeList.add(variable.getVariableType());
+		variableList.add(variable);
 
-    @Test
-    public void testGetMainLabelOfFactorByFactorId() throws Exception {
-        Integer factorId = Integer.valueOf(1031);
-        System.out.println("testGetMainLabelOfFactorByFactorId(" + factorId + ") RESULTS: "
-                + manager.getMainLabelOfFactorByFactorId(factorId));
-    }
+		StudyValues studyValues = new StudyValues();
+		studyValues.setVariableList(variableList);
+		
+		VariableList germplasmVariableList = createGermplasm("unique name", "1000", "name", "2000", "prop1", "prop2");
+		studyValues.setGermplasmId(manager.addStock(germplasmVariableList));
 
-    @Test
-    public void testCountStudyInformationByGID() throws Exception {
-        Long gid = Long.valueOf(50533);
-        System.out.println("testCountStudyInformationByGID(" + gid + "): " + manager.countStudyInformationByGID(gid));
-    }
+		return manager.addStudy(parentStudyId, typeList, studyValues);
+	}
 
-    @Test
-    public void testGetStudyInformationByGID() throws Exception {
-        Long gid = Long.valueOf(50533);
-        List<StudyInfo> results = manager.getStudyInformationByGID(gid);
-        System.out.println("testGetStudyInformationByGID(" + gid + ") RESULTS:");
-        for (StudyInfo info : results) {
-            System.out.println("  " + info);
-        }
-    }
-    
-    @Test
-    public void testGetReplicationTrait() throws Exception {
-        Trait trait = manager.getReplicationTrait();
-        System.out.println(trait);
-    }
-    
-    @Test
-    public void testGetBlockTrait() throws Exception {
-        Trait trait = manager.getBlockTrait();
-        System.out.println(trait);
-    }
-    
-    @Test
-    public void testGetFactorOfDatasetByTraitid() throws Exception {
-        Trait trait = manager.getReplicationTrait();
-        if(trait != null){
-            Factor factor = manager.getFactorOfDatasetByTraitid(Integer.valueOf(1245), trait.getTraitId());
-            System.out.println(factor);
-        }
-    }
-    
-    @Test
-    public void testGetCharacterLevelsByFactorAndDatasetId() throws Exception {
-        Factor factor = new Factor();
-        factor.setId(Integer.valueOf(1031));
-        factor.setFactorId(Integer.valueOf(1031));
-        List<CharacterLevel> results = manager.getCharacterLevelsByFactorAndDatasetId(factor, Integer.valueOf(2));
-        System.out.println("RESULTS:");
-        for(CharacterLevel level : results){
-            System.out.println(level);
-        }
-    }
-    
-    @Test
-    public void testGetNumericLevelsByFactorAndDatasetId() throws Exception {
-        Factor factor = new Factor();
-        factor.setId(Integer.valueOf(2));
-        factor.setFactorId(Integer.valueOf(1031));
-        List<NumericLevel> results = manager.getNumericLevelsByFactorAndDatasetId(factor, Integer.valueOf(2));
-        System.out.println("RESULTS:");
-        for(NumericLevel level : results){
-            System.out.println(level);
-        }
-    }
-    
-    @Test
-    public void testHasValuesByVariateAndDataset() throws Exception {
-        int variateId = 35;
-        int datasetId = 4;
-        long start = System.currentTimeMillis();
-        boolean value = manager.hasValuesByVariateAndDataset(variateId, datasetId);
-        long end = System.currentTimeMillis();
-        System.out.println("testHasValuesByVariateAndDataset(" + variateId + ", " + datasetId + "): " + value);
-        System.out.println("  QUERY TIME: " + (end - start) + " ms");
-    }
-    
-    @Test
-    public void testHasValuesByNumericVariateAndDataset() throws Exception {
-        int variateId = 35;
-        int datasetId = 4;
-        long start = System.currentTimeMillis();
-        boolean value = manager.hasValuesByNumVariateAndDataset(variateId, datasetId);
-        long end = System.currentTimeMillis();
-        System.out.println("testHasValuesByNumericVariateAndDataset(" + variateId + ", " + datasetId + "): " + value);
-        System.out.println("  QUERY TIME: " + (end - start) + " ms");
-    }
-    
-    @Test
-    public void testHasValuesByCharacterVariateAndDataset() throws Exception {
-        int variateId = 42;
-        int datasetId = 4;
-        long start = System.currentTimeMillis();
-        boolean value = manager.hasValuesByCharVariateAndDataset(variateId, datasetId);
-        long end = System.currentTimeMillis();
-        System.out.println("testHasValuesByCharacterVariateAndDataset(" + variateId + ", " + datasetId + "): " + value);
-        System.out.println("  QUERY TIME: " + (end - start) + " ms");
-    }
-    
-    @Test
-    public void testHasValuesByLabelAndLabelValueAndVariateAndDataset() throws Exception {
-        int labelId = 73;
-        String value = "HB";
-        int variateId = 304;
-        int datasetId = 20;
-        long start = System.currentTimeMillis();
-        boolean result = manager.hasValuesByLabelAndLabelValueAndVariateAndDataset(labelId, value, variateId, datasetId);
-        long end = System.currentTimeMillis();
-        System.out.println("testHasValuesByLabelAndLabelValueAndVariateAndDataset(" + labelId + ", " + value + ", " + variateId + ", " + datasetId + "): " + result);
-        System.out.println("  QUERY TIME: " + (end - start) + " ms");
-    }
-    
-    @Test
-    public void testHasValuesByNumLabelAndLabelValueAndNumVariateAndDataset() throws Exception {
-        int labelId = 76;
-        double value = 1d;
-        int variateId = 304;
-        int datasetId = 20;
-        long start = System.currentTimeMillis();
-        boolean result = manager.hasValuesByNumLabelAndLabelValueAndNumVariateAndDataset(labelId, value, variateId, datasetId);
-        long end = System.currentTimeMillis();
-        System.out.println("testHasValuesByNumLabelAndLabelValueAndNumVariateAndDataset(" + labelId + ", " + value + ", " + variateId + ", " + datasetId + "): " + result);
-        System.out.println("  QUERY TIME: " + (end - start) + " ms");
-    }
-    
-    @Test
-    public void testHasValuesByCharLabelAndLabelValueAndNumVariateAndDataset() throws Exception {
-        int labelId = 73;
-        String value = "HB";
-        int variateId = 304;
-        int datasetId = 20;
-        long start = System.currentTimeMillis();
-        boolean result = manager.hasValuesByCharLabelAndLabelValueAndNumVariateAndDataset(labelId, value, variateId, datasetId);
-        long end = System.currentTimeMillis();
-        System.out.println("TestHasValuesByCharLabelAndLabelValueAndNumVariateAndDataset(" + labelId + ", " + value + ", " + variateId + ", " + datasetId + "): " + result);
-        System.out.println("  QUERY TIME: " + (end - start) + " ms");
-    }
-    
-    @Test
-    public void testHasValuesByNumLabelAndLabelValueAndCharVariateAndDataset() throws Exception {
-        int labelId = 80;
-        double value = 309784d;
-        int variateId = 287;
-        int datasetId = 20;
-        long start = System.currentTimeMillis();
-        boolean result = manager.hasValuesByNumLabelAndLabelValueAndCharVariateAndDataset(labelId, value, variateId, datasetId);
-        long end = System.currentTimeMillis();
-        System.out.println("testHasValuesByNumLabelAndLabelValueAndCharVariateAndDataset(" + labelId + ", " + value + ", " + variateId + ", " + datasetId + "): " + result);
-        System.out.println("  QUERY TIME: " + (end - start) + " ms");
-    }
-    
-    @Test
-    public void testHasValuesByCharLabelAndLabelValueAndCharVariateAndDataset() throws Exception {
-        int labelId = 77;
-        String value = "HB0128";
-        int variateId = 287;
-        int datasetId = 20;
-        long start = System.currentTimeMillis();
-        boolean result = manager.hasValuesByCharLabelAndLabelValueAndCharVariateAndDataset(labelId, value, variateId, datasetId);
-        long end = System.currentTimeMillis();
-        System.out.println("testHasValuesByCharLabelAndLabelValueAndCharVariateAndDataset(" + labelId + ", " + value + ", " + variateId + ", " + datasetId + "): " + result);
-        System.out.println("  QUERY TIME: " + (end - start) + " ms");
-    }
-    
-    @Test
-    public void testIsLabelNumeric() throws Exception {
-        int labelId = 80;
-        long start = System.currentTimeMillis();
-        boolean result = manager.isLabelNumeric(labelId);
-        long end = System.currentTimeMillis();
-        System.out.println("testIsLabelNumeric(" + labelId + "): " + result);
-        System.out.println("  QUERY TIME: " + (end - start) + " ms");
-    }
-    
-    @Test
-    public void testIsVariateNumeric() throws Exception {
-        int variateId = 304;
-        long start = System.currentTimeMillis();
-        boolean result = manager.isVariateNumeric(variateId);
-        long end = System.currentTimeMillis();
-        System.out.println("testIsVariateNumeric(" + variateId + "): " + result);
-        System.out.println("  QUERY TIME: " + (end - start) + " ms");
-    }
-    
-    @AfterClass
-    public static void tearDown() throws Exception {
-        factory.close();
-    }
+	private DatasetReference addTestDataset(int studyId) throws Exception {
+		//Parent study, assign a parent study id value, if none exists in db, 
+		
+		VariableTypeList typeList = new VariableTypeList();
+		
+		DatasetValues datasetValues = new DatasetValues();
+		datasetValues.setName("My Dataset Name " + new Random().nextInt(10000));
+		datasetValues.setDescription("My Dataset Description");
+		datasetValues.setType(DataSetType.MEANS_DATA);
+		
+		VariableType variableType = createVariableType(18000, "Grain Yield", "whatever", 4);
+		typeList.add(variableType);
+		
+		variableType = createVariableType(18050, "Disease Pressure", "whatever", 5);
+		typeList.add(variableType);
+		
+		variableType = createVariableType(8200, "Plot No", "whatever", 6);
+		typeList.add(variableType);
 
+		return manager.addDataSet(studyId, typeList, datasetValues);
+	}
+	
+	private DatasetReference addTestDatasetWithLocation(int studyId) throws Exception {
+		//Parent study, assign a parent study id value, if none exists in db, 
+		
+		VariableTypeList typeList = new VariableTypeList();
+		
+		DatasetValues datasetValues = new DatasetValues();
+		datasetValues.setName("My Dataset Name " + new Random().nextInt(10000));
+		datasetValues.setDescription("My Dataset Description");
+		datasetValues.setType(DataSetType.MEANS_DATA);
+		
+		VariableType variableType = createVariableType(18000, "Grain Yield", "whatever", 4);
+		typeList.add(variableType);
+		
+		variableType = createVariableType(18050, "Disease Pressure", "whatever", 5);
+		typeList.add(variableType);
+		
+		variableType = createVariableType(8200, "Plot No", "whatever", 6);
+		typeList.add(variableType);
+		
+		variableType = createVariableType(8195, "Site Code", "whatever", 7);
+		typeList.add(variableType);
+
+		return manager.addDataSet(studyId, typeList, datasetValues);
+	}
+	
+	public void addTestExperiments(int datasetId, int numExperiments) throws Exception {
+		DataSet dataSet = manager.getDataSet(datasetId);
+		for (int i = 0; i < numExperiments; i++) {
+			ExperimentValues experimentValues = new ExperimentValues();
+			VariableList varList = new VariableList();
+			varList.add(createVariable(dataSet, 18000, "99"));
+			varList.add(createVariable(dataSet, 18050, "19000"));
+			varList.add(createVariable(dataSet, 8200, "3"));
+			
+			experimentValues.setVariableList(varList);
+			experimentValues.setGermplasmId(-1);
+			experimentValues.setLocationId(-1);
+			manager.addExperiment(datasetId, ExperimentType.PLOT, experimentValues);
+		}
+	}
+	
+	public int addTestExperimentsWithLocation(int datasetId, int numExperiments) throws Exception {
+		VariableList locationVariableList = createTrialEnvironment("Description", "1.0", "2.0", "data", "3.0", "prop1", "prop2");
+		int locationId = manager.addTrialEnvironment(locationVariableList);
+		
+		DataSet dataSet = manager.getDataSet(datasetId);
+		for (int i = 0; i < numExperiments; i++) {
+			ExperimentValues experimentValues = new ExperimentValues();
+			VariableList varList = new VariableList();
+			varList.add(createVariable(dataSet, 18000, "99"));
+			varList.add(createVariable(dataSet, 18050, "19000"));
+			varList.add(createVariable(dataSet, 8200, "3"));
+			
+			experimentValues.setVariableList(varList);
+			experimentValues.setGermplasmId(-1);
+			experimentValues.setLocationId(locationId);
+			manager.addExperiment(datasetId, ExperimentType.PLOT, experimentValues);
+		}
+		return locationId;
+	}
+
+	private Variable createVariable(DataSet dataSet, int stdVarId, String value) {
+		Variable variable = new Variable();
+		variable.setValue(value);
+		variable.setVariableType(dataSet.getVariableTypes().findById(stdVarId));
+		return variable;
+	}
 }
