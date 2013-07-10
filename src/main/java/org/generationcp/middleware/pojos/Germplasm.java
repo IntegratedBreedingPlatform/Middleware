@@ -288,11 +288,17 @@ public class Germplasm implements Serializable{
             "SELECT COUNT(DISTINCT g.gid) FROM germplsm g JOIN names n ON g.gid = n.gid WHERE "
                     + "nval LIKE :name OR nval LIKE :noSpaceName OR nval LIKE :standardizedName ";  
     
-    public static final String GET_MAX_IN_SEQUENCE_FOR_CROSS_NAME_PREFIX =
-        "SELECT GETNUMBERINNAME(nVal, :prefix) AS lastNumber " +
+    public static final String GET_NEXT_IN_SEQUENCE_FOR_CROSS_NAME_PREFIX =
+        "SELECT CONVERT(REPLACE(nval, :prefix, ''), SIGNED)+1 AS last_number " +
         "FROM names " +
-        "WHERE nVal REGEXP :prefixRegex " +
-        "ORDER BY lastNumber DESC LIMIT 1";
+        "WHERE nval REGEXP :prefixRegex " +
+        "ORDER BY last_number DESC LIMIT 1";
+    
+    public static final String GET_NEXT_IN_SEQUENCE_FOR_CROSS_NAME_WITH_SPACE =
+        "SELECT CONVERT(REPLACE(nval, :prefix, ''), SIGNED)+1 AS last_number " +
+        "FROM names " +
+        "WHERE nval LIKE :prefixLike " +
+        "ORDER BY last_number DESC LIMIT 1";
     
     @Id
     @Basic(optional = false)

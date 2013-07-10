@@ -609,16 +609,37 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
     	String nextInSequence = "1";
     	
     	try {
+    	      /*
+    	       * This query will generate next number will be queried on first "word" 
+    	       * of cross name.
+               * 
+               * eg.
+               *   input prefix: "IR"
+               *   output: next number in "IRNNNNN -----" sequence 
+    	       */
+        	SQLQuery query = getSession().createSQLQuery(Germplasm.GET_NEXT_IN_SEQUENCE_FOR_CROSS_NAME_PREFIX);
+                query.setParameter("prefix", prefix);
+                query.setParameter("prefixRegex", "^" + prefix + "[0-9]");
     		
-    		SQLQuery query = getSession().createSQLQuery(Germplasm.GET_MAX_IN_SEQUENCE_FOR_CROSS_NAME_PREFIX);
-    		query.setParameter("prefix", prefix);
-    		query.setParameter("prefixRegex", "^" + prefix + "[0-9]");
+                
+              /* 
+               * Uncomment out block of code below (and comment out the one above) if the next number
+               * will be queried on second "word" of cross name.
+               * IMPORTANT: assumes that passed in prefix value has a whitespace at the end
+               * 
+               * eg.
+               *   input prefix: "IR "
+               *   output: next number in "IR NNNNN..." sequence
+               */
+//                SQLQuery query = getSession().createSQLQuery(Germplasm.GET_NEXT_IN_SEQUENCE_FOR_CROSS_NAME_WITH_SPACE);
+//    		query.setParameter("prefix", prefix);
+//    		query.setParameter("prefixLike", prefix + "%");
+               
+                
+    		BigInteger nextNumberInSequence = (BigInteger) query.uniqueResult();
     		
-    		//gets last number used in sequence and increments by 1
-    		Integer maxNumberInSequence = (Integer) query.uniqueResult();
-    		
-    		if (maxNumberInSequence != null){
-    			nextInSequence = String.valueOf(maxNumberInSequence + 1);
+    		if (nextNumberInSequence != null){
+    			nextInSequence = String.valueOf(nextNumberInSequence);
     		}
 		
     	} catch (HibernateException e) {
