@@ -212,6 +212,20 @@ public interface GermplasmDataManager {
     public List<Location> getAllLocations(int start, int numOfRows) throws MiddlewareQueryException;
     
     /**
+     * Returns all Local Locations
+     * 
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
+     * @return All Locations based on the given start and numOfRows
+     */  
+	public List<Location> getAllLocalLocations(int start, int numOfRows)
+			throws MiddlewareQueryException;
+    
+    
+    /**
      * Returns number of all Locations
      * 
      * @return the number of all Locations

@@ -77,6 +77,15 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public List<Location> getAllLocations(int start, int numOfRows) throws MiddlewareQueryException {
         return (List<Location>) getFromCentralAndLocal(getLocationDao(), start, numOfRows);
     }
+    
+    @Override
+    public List<Location> getAllLocalLocations(int start, int numOfRows) throws MiddlewareQueryException {
+    	if (setWorkingDatabase(Database.LOCAL)) {
+    		return this.getLocationDao().getAll(start, numOfRows);
+    	}
+    	
+    	return new ArrayList<Location>();
+    }
 
     @Override
     public long countAllLocations() throws MiddlewareQueryException {
