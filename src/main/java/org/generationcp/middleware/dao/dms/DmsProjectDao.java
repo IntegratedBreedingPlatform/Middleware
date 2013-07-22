@@ -146,7 +146,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		
 		try {
 			/*
-			SELECT DISTINCT p.projectId, p.name, pr.objectProject.projectId 
+			SELECT DISTINCT p.projectId, p.name, p.description, pr.objectProject.projectId 
 			FROM DmsProject p JOIN p.relatedTos pr 
 			WHERE pr.typeId = CVTermId.BELONGS_TO_STUDY.getId()
 			      AND pr.objectProject.projectId = :studyId 
@@ -161,6 +161,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			ProjectionList projectionList = Projections.projectionList();
 			projectionList.add(Projections.property("projectId"));
 			projectionList.add(Projections.property("name"));
+			projectionList.add(Projections.property("description"));
 			projectionList.add(Projections.property("pr.objectProject.projectId"));
 			criteria.setProjection(projectionList);
 			
@@ -171,7 +172,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			for (Object[] row : list){
 				Integer id = (Integer) row[0]; //project.id
 				String name = (String) row [1]; //project.name
-				datasetReferences.add(new DatasetReference(id, name));
+				String description = (String) row [2]; //project.description
+				datasetReferences.add(new DatasetReference(id, name, description));
 			}
 			
 		} catch (HibernateException e) {
