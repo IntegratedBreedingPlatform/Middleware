@@ -13,7 +13,7 @@ package org.generationcp.middleware.dao.dms;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -146,14 +146,14 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
     
     @SuppressWarnings("unchecked")
 	public Set<StockModel> findInDataSet(int datasetId) throws MiddlewareQueryException {
-		Set<StockModel> stockModels = new HashSet<StockModel>();
+		Set<StockModel> stockModels = new LinkedHashSet<StockModel>();
 		try {
 			
 			String sql = "SELECT DISTINCT es.stock_id"
 					+ " FROM nd_experiment_stock es"
 					+ " INNER JOIN nd_experiment e ON e.nd_experiment_id = es.nd_experiment_id"
 					+ " INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id"
-					+ " WHERE ep.project_id = :projectId";
+					+ " WHERE ep.project_id = :projectId ORDER BY es.stock_id";
 			Query query = getSession().createSQLQuery(sql)
 								.setParameter("projectId", datasetId);
 			List<Integer> ids = query.list();

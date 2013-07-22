@@ -11,7 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /** 
@@ -19,7 +19,7 @@ import java.util.Set;
  */
 public class Stocks {
 
-	private Set<Stock> stocks = new HashSet<Stock>();
+	private Set<Stock> stocks = new LinkedHashSet<Stock>();
 	
 	public void add(Stock trialEnvironment) {
 		if (trialEnvironment != null) {
