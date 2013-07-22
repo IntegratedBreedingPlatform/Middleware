@@ -12,6 +12,7 @@
 package org.generationcp.middleware.dao.dms;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -49,13 +50,13 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public Set<Geolocation> findInDataSet(int datasetId) throws MiddlewareQueryException {
-		Set<Geolocation> locations = new HashSet<Geolocation>();
+		Set<Geolocation> locations = new LinkedHashSet<Geolocation>();
 		try {
 			
 			String sql = "SELECT DISTINCT e.nd_geolocation_id"
 					+ " FROM nd_experiment e"
 					+ " INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id"
-					+ " WHERE ep.project_id = :projectId";
+					+ " WHERE ep.project_id = :projectId ORDER BY e.nd_geolocation_id";
 			Query query = getSession().createSQLQuery(sql)
 								.setParameter("projectId", datasetId);
 			List<Integer> ids = query.list();
