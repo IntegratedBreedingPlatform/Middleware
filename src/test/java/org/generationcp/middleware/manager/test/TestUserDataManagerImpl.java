@@ -1,7 +1,10 @@
 
 package org.generationcp.middleware.manager.test;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.util.List;
+import junit.framework.Assert;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
@@ -65,7 +68,7 @@ public class TestUserDataManagerImpl{
         System.out.println("testAddUser() ADDED: " + user);
 
         // cleanup
-        manager.deleteUser(user);
+        //manager.deleteUser(user);
     }
 
     @Test
@@ -163,6 +166,42 @@ public class TestUserDataManagerImpl{
         Installation result = manager.getLatestInstallationRecord(Database.CENTRAL);
         System.out.println("testGetLatestInstallationRecord() :" + result);
     }
+    
+    
+    @Test  
+	public void testGetPersonById() throws Exception {
+		int id = 1;
+		Person personid = manager.getPersonById(id);
+		Assert.assertNotNull(personid);
+		System.out.println("testGetPersonById: " + personid);
+	}
+    
+    @Test  
+	public void testGetUserById() throws Exception {
+		int id = 1;
+		User userid = manager.getUserById(id);
+		Assert.assertNotNull(userid);
+		System.out.println("testGetUserById: " + userid);
+	}
+    
+    @Test  
+	public void testGetUserByUserName() throws Exception {
+		String name = "user_test";
+		User userName = manager.getUserByUserName(name);
+		Assert.assertNotNull(userName);
+		System.out.println("testGetUserByUserName: " + userName);
+	}
+    
+    @Test
+    public void testIsValidUserLogin() throws MiddlewareQueryException {
+    	String validuser = "username"; //enter valid username
+    	String validpass = "password"; // enter valid password
+        System.out.println("testIsValidUserLogin (using valid username & password): " + manager.isValidUserLogin(validuser, validpass));
+        String invaliduser = "username"; //enter invalid username
+    	String invalidpass = "password"; // enter invalid password
+        System.out.println("testIsValidUserLogin (using invalid username & password): " + manager.isValidUserLogin(invaliduser, invalidpass));
+    }
+    
 
     @AfterClass
     public static void tearDown() throws Exception {
