@@ -23,6 +23,7 @@ import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -471,7 +472,50 @@ public class TestGermplasmListManagerImpl{
     	List<UserDefinedField> userDefinedFields = new ArrayList<UserDefinedField>();
     	userDefinedFields = manager.getGermplasmNameTypes();
         System.out.println("testGetGermplasmNameTypes() RESULTS:" + userDefinedFields);
-    }    
+    }   
+    
+   
+    @Test
+    public void testGetAllTopLevelListsBatched() throws Exception {
+    	int batchSize = 1;
+    	List<GermplasmList> results = manager.getAllTopLevelListsBatched(batchSize, Database.CENTRAL);
+        Assert.assertNotNull(results);
+        Assert.assertTrue(!results.isEmpty());
+        System.out.println("testGetAllTopLevelListsBatched("+batchSize+") Results: ");
+        for (GermplasmList result : results) {
+            System.out.println("  " + result);
+        }
+        System.out.println("Number of record/s: " + results.size());
+    }
+    
+    @Test
+    public void testGetGermplasmListByParentFolderId() throws Exception {
+    	Integer parentId = Integer.valueOf(54);
+    	List<GermplasmList> results = manager.getGermplasmListByParentFolderId(parentId, 1, 100);
+        Assert.assertNotNull(results);
+        Assert.assertTrue(!results.isEmpty());
+        System.out.println("testGetGermplasmListByParentFolderId("+parentId+") Results: ");
+        for (GermplasmList result : results) {
+            System.out.println("  " + result);
+        }
+        System.out.println("Number of record/s: " + results.size());
+    }
+    
+    @Test
+    public void testGetGermplasmListByParentFolderIdBatched() throws Exception {
+    	Integer parentId = Integer.valueOf(54);
+    	int batchSize = 1;
+    	List<GermplasmList> results = new ArrayList<GermplasmList>();
+    	results = manager.getGermplasmListByParentFolderIdBatched(parentId, batchSize);
+        Assert.assertNotNull(results);
+        Assert.assertTrue(!results.isEmpty());
+        System.out.println("testGetGermplasmListByParentFolderIdBatched() Results: ");
+        for (GermplasmList result : results) {
+            System.out.println("  " + result);
+        }
+        System.out.println("Number of record/s: " + results.size());
+    }
+    
     
     @AfterClass
     public static void tearDown() throws Exception {
