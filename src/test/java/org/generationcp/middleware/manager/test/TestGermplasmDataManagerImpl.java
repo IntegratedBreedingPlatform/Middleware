@@ -12,6 +12,8 @@
 
 package org.generationcp.middleware.manager.test;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +37,8 @@ import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.gdms.MapDetailElement;
+import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.generationcp.middleware.utils.test.MockDataUtil;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -1019,6 +1023,177 @@ public class TestGermplasmDataManagerImpl{
             System.out.println(gid + " : " + results.get(gid));
         }
     }
+    
+    @Test
+    public void testCountAllGermplasm() throws MiddlewareQueryException {
+        long count = manager.countAllGermplasm((Database.CENTRAL));
+        Assert.assertNotNull(count);
+        System.out.println("testCountAllGermplasm() Results: " + count);
+    } 
+    
+    @Test
+    public void testGetAllMethods() throws Exception {
+    	List<Method> results = manager.getAllMethods();
+        Assert.assertNotNull(results);
+        Assert.assertTrue(!results.isEmpty());
+        System.out.println("testGetAllMethods() Results: ");
+        for (Method result : results){
+        	System.out.println(result);
+        }
+        System.out.println("Number of record/s: " +results.size());
+    }
+    
+    @Test
+    public void testCountDescendants() throws Exception {
+    	Integer gid = 10; //change gid value
+    	long count = manager.countDescendants(gid);
+    	Assert.assertNotNull(count);
+    	System.out.println("testCountDescendants("+gid+") Results: " + count);
+    }
+    
+    @Test
+    public void testCountGermplasmByPrefName() throws Exception {
+    	String name = "CHALIMBANA"; //change nval
+    	long count = manager.countGermplasmByPrefName(name);
+    	Assert.assertNotNull(count);
+    	System.out.println("testCountGermplasmByPrefName("+name+") Results: " + count);
+    }
+    
+    @Test
+    public void testCountGroupRelatives() throws Exception {
+    	Integer gid = 1; //change gid value
+    	long count = manager.countGroupRelatives(gid);
+    	Assert.assertNotNull(count);
+    	System.out.println("testCountGroupRelatives("+gid+") Results: " + count);
+    }
+    
+    @Test
+    public void testCountManagementNeighbors() throws Exception {
+    	Integer gid = 1; //change gid value
+    	long count = manager.countManagementNeighbors(gid);
+    	Assert.assertNotNull(count);
+    	System.out.println("testCountManagementNeighbors("+gid+") Results: " + count);
+    }
+    
+    @Test
+    public void testGetAllGermplasm() throws Exception {
+    	List<Germplasm> germplasms = manager.getAllGermplasm(1, 100, Database.CENTRAL);
+    	Assert.assertNotNull(germplasms);
+        Assert.assertTrue(!germplasms.isEmpty());
+        System.out.println("testGetAllLocations Results: ");
+        for (Germplasm germplasm : germplasms) {
+            System.out.println("  " + germplasm);
+        }
+        System.out.println("Number of record/s: " +germplasms.size());
+    }
+    
+    @Test
+    public void testGetAttributeById() throws Exception {
+    	Integer id = Integer.valueOf(-1);
+        Attribute attributes = manager.getAttributeById(id);
+        assertNotNull(attributes);
+        System.out.println("testGetAttributeById("+id+") Results:");
+        System.out.println("  " + attributes);
+    }
+    
+    @Test
+    public void testGetCountryById() throws Exception {
+    	Integer id = Integer.valueOf(1);
+    	Country countries = manager.getCountryById(id);
+    	assertNotNull(countries);
+        System.out.println("testGetCountryById("+id+") Results:");
+        System.out.println("  " + countries);
+    }
+    
+    @Test
+    public void testGetGenerationHistory() throws Exception {
+    	Integer gid = Integer.valueOf(1);
+    	List<Germplasm> genhistory = manager.getGenerationHistory(gid);
+    	Assert.assertNotNull(genhistory);
+        Assert.assertTrue(!genhistory.isEmpty());
+        System.out.println("testGetGenerationHistory("+gid+") Results: ");
+        for (Germplasm genhistories : genhistory) {
+            System.out.println("  " + genhistories);
+        }
+        System.out.println("Number of record/s: " +genhistory.size());
+    }
+    
+    @Test
+    public void testGetGroupRelatives() throws Exception {
+    	Integer gid = Integer.valueOf(1);
+    	List<Germplasm> grouprel = manager.getGroupRelatives(gid, 1, 100);
+    	Assert.assertNotNull(grouprel);
+        Assert.assertTrue(!grouprel.isEmpty());
+        System.out.println("testGetGroupRelatives("+gid+") Results: ");
+        for (Germplasm grouprels : grouprel) {
+            System.out.println("  " + grouprels);
+        }
+        System.out.println("Number of record/s: " +grouprel.size());
+    }
+    
+    @Test
+    public void testGetLocationByID() throws Exception {
+    	Integer id = Integer.valueOf(1);
+    	Location locid = manager.getLocationByID(id);
+    	assertNotNull(locid);
+        System.out.println("testGetLocationByID("+id+") Results: ");
+        System.out.println("  " + locid);
+    }
+    
+    @Test
+    public void testGetLocationDetailsByLocId() throws Exception {
+    	Integer locationId = Integer.valueOf(2);
+    	List<LocationDetails> locdetails = manager.getLocationDetailsByLocId(locationId, 1, 100);
+    	Assert.assertNotNull(locdetails);
+        Assert.assertTrue(!locdetails.isEmpty());
+        System.out.println("testGetLocationDetailsByLocId("+locationId+") Results: ");
+        for (LocationDetails locdetail : locdetails) {
+            System.out.println("  " + locdetail);
+        }
+    }
+    
+    @Test
+    public void testGetManagementNeighbors() throws Exception {
+    	Integer gid = Integer.valueOf(2);
+    	long count = manager.countManagementNeighbors(gid);
+    	List<Germplasm> mneighbors = manager.getManagementNeighbors(gid, 1, (int) count);
+    	Assert.assertNotNull(mneighbors);
+    	Assert.assertTrue(!mneighbors.isEmpty());
+        System.out.println("testGetManagementNeighbors("+gid+") Results: ");
+        for (Germplasm mneighbor : mneighbors) {
+            System.out.println("  " + mneighbor);
+        }
+        System.out.println("Number of record/s: "+count+" ");
+    }
+    
+    @Test
+    public void testGetMethodByID() throws Exception {
+    	Integer id = Integer.valueOf(2);
+    	Method methodid = manager.getMethodByID(id);
+    	assertNotNull(methodid);
+        System.out.println("testGetMethodByID("+id+") Results: ");
+        System.out.println("  " + methodid);
+    }
+    
+    @Test
+    public void testGetParentByGIDAndProgenitorNumber() throws Exception {
+    	Integer gid = Integer.valueOf(2);
+    	Integer progenitorNumber = Integer.valueOf(2);
+    	Germplasm result = manager.getParentByGIDAndProgenitorNumber(gid, progenitorNumber);
+    	assertNotNull(result);
+        System.out.println("testGetParentByGIDAndProgenitorNumber Results: ");
+        System.out.println("  " + result);
+    }
+    
+    @Test
+    public void testGetUserDefinedFieldByID() throws Exception {
+    	Integer id = Integer.valueOf(2);
+    	UserDefinedField result = manager.getUserDefinedFieldByID(id);
+    	assertNotNull(result);
+        System.out.println("testGetUserDefinedFieldByID Results: ");
+        System.out.println("  " + result);
+    }
+    
     
     @AfterClass
     public static void tearDown() throws Exception {
