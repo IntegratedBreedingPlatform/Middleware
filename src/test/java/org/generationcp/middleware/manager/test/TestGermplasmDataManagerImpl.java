@@ -36,6 +36,7 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.gdms.MapDetailElement;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
@@ -1150,6 +1151,7 @@ public class TestGermplasmDataManagerImpl{
         for (LocationDetails locdetail : locdetails) {
             System.out.println("  " + locdetail);
         }
+        System.out.println("Number of record/s: " +locdetails.size() );
     }
     
     @Test
@@ -1163,7 +1165,7 @@ public class TestGermplasmDataManagerImpl{
         for (Germplasm mneighbor : mneighbors) {
             System.out.println("  " + mneighbor);
         }
-        System.out.println("Number of record/s: "+count+" ");
+        System.out.println("Number of record/s: " +mneighbors.size() );
     }
     
     @Test
@@ -1194,6 +1196,27 @@ public class TestGermplasmDataManagerImpl{
         System.out.println("  " + result);
     }
     
+    @Test
+    public void testGetDescendants() throws Exception {
+    	Integer id = Integer.valueOf(2);
+    	List<Object[]> results = manager.getDescendants(id, 1, 100);
+    	assertNotNull(results);
+    	Assert.assertTrue(!results.isEmpty());
+        System.out.println("testGetDescendants Results: ");
+        for (Object[] result : results) {
+            System.out.println("  " + result);
+        }
+        System.out.println("Number of record/s: " +results.size() );
+    }
+    
+    @Test
+    public void testGetBibliographicReferenceByID() throws Exception {
+    	Integer id = Integer.valueOf(2);
+    	Bibref result = manager.getBibliographicReferenceByID(id);
+    	assertNotNull(result);
+        System.out.println("testGetBibliographicReferenceByID Results: ");
+        System.out.println("  " + result);
+    }  
     
     @AfterClass
     public static void tearDown() throws Exception {
