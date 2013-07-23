@@ -189,28 +189,31 @@ public class Lot implements Serializable{
     }
 
     @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("Lot [");
-        builder.append(", userId=");
-        builder.append(userId);
-        builder.append(", entityType=");
-        builder.append(entityType);
-        builder.append(", entityId=");
-        builder.append(entityId);
-        builder.append(", locationId=");
-        builder.append(locationId);
-        builder.append(", scaleId=");
-        builder.append(scaleId);
-        builder.append(", status=");
-        builder.append(status);
-        builder.append(", source=");
-        builder.append(source);
-        builder.append(", comments=");
-        builder.append(comments);
-        builder.append("]");
-        return builder.toString();
-    }
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Lot [id=");
+		builder.append(id);
+		builder.append(", userId=");
+		builder.append(userId);
+		builder.append(", entityType=");
+		builder.append(entityType);
+		builder.append(", entityId=");
+		builder.append(entityId);
+		builder.append(", locationId=");
+		builder.append(locationId);
+		builder.append(", scaleId=");
+		builder.append(scaleId);
+		builder.append(", status=");
+		builder.append(status);
+		builder.append(", source=");
+		builder.append(source);
+		builder.append(", comments=");
+		builder.append(comments);
+		builder.append(", transactions=");
+		builder.append(transactions);
+		builder.append("]");
+		return builder.toString();
+	}
 
     @Override
     public boolean equals(Object obj) {
