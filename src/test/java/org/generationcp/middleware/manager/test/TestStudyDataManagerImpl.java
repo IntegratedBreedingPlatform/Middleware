@@ -655,6 +655,14 @@ public class TestStudyDataManagerImpl {
 		manager.deleteExperimentsByLocation(datasetRef.getId(), locationId);
 	}
 	
+	@Test
+	public void testGetLocalNameByStandardVariableId() throws Exception {
+	    Integer projectId = 10085; 
+	    Integer standardVariableId = 8230;
+	    String localName = manager.getLocalNameByStandardVariableId(projectId, standardVariableId);
+	    System.out.println("testGetLocalNameByStandardVariableId("+projectId+", "+standardVariableId+"): " + localName);	    
+	}
+	
 	@AfterClass
 	public static void tearDown() throws Exception {
 		if (factory != null) {
