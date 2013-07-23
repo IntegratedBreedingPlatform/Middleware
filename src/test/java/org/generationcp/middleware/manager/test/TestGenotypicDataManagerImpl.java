@@ -12,16 +12,22 @@
 
 package org.generationcp.middleware.manager.test;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import junit.framework.Assert;
+
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
+import org.generationcp.middleware.pojos.Lot;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.Transaction;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSetPK;
 import org.generationcp.middleware.pojos.gdms.AlleleValues;
@@ -1658,8 +1664,134 @@ public class TestGenotypicDataManagerImpl{
 		qtlTraits.add(1001);     // "DE"
         long count =  manager.countQtlDataByQtlTraits(qtlTraits); 
         System.out.println("testCountQtlDataByQtlTraits() RESULTS: " + count);
-    }    
-
+    }
+    
+    
+    @Test
+    public void testCountAllelicValuesFromAlleleValuesByDatasetId() throws Exception { 
+        Integer datasetId = -1; // change value of the datasetid
+        long count = manager.countAllelicValuesFromAlleleValuesByDatasetId(datasetId);
+        Assert.assertNotNull(count);
+        System.out.println("testCountAllelicValuesFromAlleleValuesByDatasetId("+datasetId+") Results: " + count);
+    }
+    
+    @Test
+    public void testCountAllelicValuesFromCharValuesByDatasetId() throws Exception { 
+        Integer datasetId = -1; // change value of the datasetid
+        long count = manager.countAllelicValuesFromCharValuesByDatasetId(datasetId);
+        Assert.assertNotNull(count);
+        System.out.println("testCountAllelicValuesFromCharValuesByDatasetId("+datasetId+") Results: " + count);
+    }
+    
+    @Test
+    public void testCountAllelicValuesFromMappingPopValuesByDatasetId() throws Exception { 
+        Integer datasetId = 3; // change value of the datasetid
+        long count = manager.countAllelicValuesFromMappingPopValuesByDatasetId(datasetId);
+        Assert.assertNotNull(count);
+        System.out.println("testCountAllelicValuesFromMappingPopValuesByDatasetId("+datasetId+") Results: " + count);
+    }
+    
+    @Test
+    public void testCountAllParentsFromMappingPopulation() throws Exception {
+    	long count = manager.countAllParentsFromMappingPopulation();
+        Assert.assertNotNull(count);
+        System.out.println("testCountAllParentsFromMappingPopulation() Results: " + count);
+    }
+    
+    @Test
+    public void testCountMapDetailsByName() throws Exception {
+    	String nameLike = "GCP-833TestMap"; //change map_name
+    	long count = manager.countMapDetailsByName(nameLike);
+        Assert.assertNotNull(count);
+        System.out.println("testCountMapDetailsByName("+nameLike+") Results: " + count);
+    }
+    
+    @Test
+    public void testCountMarkerInfoByDbAccessionId() throws Exception {
+    	String dbAccessionId = ""; //change dbAccessionId
+    	long count = manager.countMarkerInfoByDbAccessionId(dbAccessionId);
+        Assert.assertNotNull(count);
+        System.out.println("testCountMarkerInfoByDbAccessionId("+dbAccessionId+") Results: " + count);
+    }
+    
+    @Test
+    public void testCountMarkerInfoByGenotype() throws Exception {
+    	String genotype = ""; //change genotype
+    	long count = manager.countMarkerInfoByGenotype(genotype);
+        Assert.assertNotNull(count);
+        System.out.println("testCountMarkerInfoByGenotype("+genotype+") Results: " + count);
+    }
+    
+    @Test
+    public void testCountMarkerInfoByMarkerName() throws Exception {
+    	String markerName = "SeqTEST"; //change markerName
+    	long count = manager.countMarkerInfoByMarkerName(markerName);
+        Assert.assertNotNull(count);
+        System.out.println("testCountMarkerInfoByMarkerName("+markerName+") Results: " + count);
+    }
+    
+    @Test
+    public void testGetAllParentsFromMappingPopulation() throws Exception {
+    	long count = manager.countAllParentsFromMappingPopulation();
+    	List<ParentElement> results = manager.getAllParentsFromMappingPopulation(0, (int) count);
+    	assertNotNull(results);
+        Assert.assertTrue(!results.isEmpty());
+        System.out.println("testGetAllParentsFromMappingPopulation() Results: ");
+        for (ParentElement result : results){
+        	System.out.println("  " + result);
+        }
+        System.out.println("Number of record/s: "+count+" ");
+    }
+ 
+    @Test
+    public void testGetMapDetailsByName() throws Exception {
+    	String nameLike = "GCP-833TestMap"; //change map_name
+    	long count = manager.countMapDetailsByName(nameLike);
+    	List<MapDetailElement> results = manager.getMapDetailsByName(nameLike, 0, (int) count);
+    	assertNotNull(results);
+        Assert.assertTrue(!results.isEmpty());
+        System.out.println("testGetMapDetailsByName("+nameLike+")");
+        for (MapDetailElement result : results){
+        	System.out.println("  " + result);
+        }
+        System.out.println("Number of record/s: "+count+" ");
+    }
+    
+    @Test
+    public void testGetMarkersByIds() throws Exception {
+    	List<Integer> markerIds = new ArrayList<Integer>();
+    	markerIds.add(1);
+    	markerIds.add(3);
+    	
+    	List<Marker> results = manager.getMarkersByIds(markerIds, 0,100);
+    	assertNotNull(results);
+        Assert.assertTrue(!results.isEmpty());
+        System.out.println("testGetMarkersByIds("+markerIds+") Results: ");
+        for (Marker result : results){
+        	System.out.println("  " + result);
+        }
+        System.out.println("Number of record/s: " +results.size() );
+    }
+    
+    @Test
+    public void testCountAllMaps() throws Exception {
+	long count = manager.countAllMaps(Database.LOCAL);
+    Assert.assertNotNull(count);
+    System.out.println("testCountAllMaps("+Database.LOCAL+") Results: " + count);	
+    }
+    
+    @Test
+    public void testGetAllMaps() throws Exception {
+    List<Map> results= manager.getAllMaps(1, 100, Database.LOCAL);
+    Assert.assertNotNull(results);
+    Assert.assertTrue(!results.isEmpty());
+    System.out.println("testGetAllMaps("+Database.LOCAL+") Results:");
+    for (Map result : results){
+    	System.out.println("  " + result);
+    }
+    System.out.println("Number of record/s: " +results.size() );
+    }
+   
     
     @AfterClass
     public static void tearDown() throws Exception {
