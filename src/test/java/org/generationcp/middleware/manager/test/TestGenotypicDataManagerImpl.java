@@ -550,6 +550,7 @@ public class TestGenotypicDataManagerImpl{
 
         List<AllelicValueElement> results = manager.getIntAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds, 0, 
                 (int) manager.countIntAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds));
+        System.out.println("testGetIntAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: ");
         for (AllelicValueElement result : results){
         	System.out.println("  " + result);
         }
@@ -577,7 +578,11 @@ public class TestGenotypicDataManagerImpl{
 
         List<AllelicValueElement> results = manager.getCharAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds, 0, 
                 (int) manager.countCharAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds));
-        System.out.println("testGetCharAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: " + results.size() + "\n" + results);
+        System.out.println("testGetIntAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: ");
+        for (AllelicValueElement result : results){
+        	System.out.println("  " + result);
+        }
+       System.out.println("Number of record/s: " +results.size() );
     }
 
 
