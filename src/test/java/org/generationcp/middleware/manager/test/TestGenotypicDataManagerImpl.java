@@ -278,11 +278,20 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testGetAllelicValuesFromMappingPopValuesByDatasetId() throws Exception {
-        Integer datasetId = Integer.valueOf(2);
-        long count = manager.countAllelicValuesFromCharValuesByDatasetId(datasetId);
+    	//23-Jul-2013, currently no test data with datasetid = 2 in groundnut central, using datasetid=3 instead
+        //Integer datasetId = Integer.valueOf(2);
+        Integer datasetId = Integer.valueOf(3);
+        long count = manager.countAllelicValuesFromMappingPopValuesByDatasetId(datasetId); 
+        		//manager.countAllelicValuesFromCharValuesByDatasetId(datasetId);
         List<AllelicValueWithMarkerIdElement> allelicValues = manager.getAllelicValuesFromMappingPopValuesByDatasetId(datasetId, 0,
                 (int) count);
-        System.out.println("testGetAllelicValuesFromMappingPopValuesByDatasetId(" + datasetId + ") RESULTS: " + allelicValues);
+        System.out.println("COUNT IS " + count);
+        System.out.println("testGetAllelicValuesFromMappingPopValuesByDatasetId(" + datasetId + ") RESULTS: ");
+        if (allelicValues != null) {
+        	for (AllelicValueWithMarkerIdElement elem : allelicValues) {
+        		System.out.println(elem);
+        	}
+        }
     }
 
     @Test

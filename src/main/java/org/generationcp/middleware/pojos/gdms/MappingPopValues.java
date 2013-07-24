@@ -71,7 +71,7 @@ public class MappingPopValues implements Serializable{
             "SELECT gid, marker_id, CONCAT(map_char_value, '') " +
             "FROM gdms_mapping_pop_values " +
             "WHERE dataset_id = :datasetId " +
-            "ORDER BY gid DESC, marker_id ASC";
+            "ORDER BY gid ASC, marker_id ASC";
 
     public static final String COUNT_BY_DATASET_ID = 
             "SELECT COUNT(*) " +
