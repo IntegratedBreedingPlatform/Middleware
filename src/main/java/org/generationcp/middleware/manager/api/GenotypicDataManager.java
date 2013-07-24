@@ -1714,4 +1714,19 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException
      */
     public void deleteSSRGenotypingDatasets(Integer datasetId) throws MiddlewareQueryException;
+    
+    /**
+     * Delete SNPGenotypingDatasets by dataset id.
+     * @param datasetId
+     * @throws MiddlewareQueryException
+     */
+    public void deleteSNPGenotypingDatasets(Integer datasetId) throws MiddlewareQueryException;
+
+    /**
+     * Delete DArTGenotypingDatasets by dataset id.
+     * @param datasetId
+     * @throws MiddlewareQueryException
+     */
+    public void deleteDArTGenotypingDatasets(Integer datasetId) throws MiddlewareQueryException;
+
 }

@@ -143,5 +143,21 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
         }
         return 0;
     }
+    
+    public void deleteByDatasetId(int datasetId) throws MiddlewareQueryException {
+        try {
+            this.flush();
+            
+            SQLQuery statement = getSession().createSQLQuery("DELETE FROM gdms_char_values WHERE dataset_id = " + datasetId);
+            statement.executeUpdate();
+
+            this.flush();
+            this.clear();
+
+        } catch(HibernateException e) {
+            logAndThrowException("Error in deleteByDatasetId=" + datasetId + " in CharValuesDAO: " + e.getMessage(), e);
+        }
+    }
+
 
 }

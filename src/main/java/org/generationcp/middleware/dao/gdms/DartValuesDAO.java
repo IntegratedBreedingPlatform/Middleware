@@ -12,7 +12,10 @@
 package org.generationcp.middleware.dao.gdms;
 
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.DartValues;
+import org.hibernate.HibernateException;
+import org.hibernate.SQLQuery;
 
 
 /**
@@ -24,5 +27,19 @@ import org.generationcp.middleware.pojos.gdms.DartValues;
 
 public class DartValuesDAO extends GenericDAO<DartValues, Integer>{
 
+    public void deleteByDatasetId(int datasetId) throws MiddlewareQueryException {
+        try {
+            this.flush();
+            
+            SQLQuery statement = getSession().createSQLQuery("DELETE FROM gdms_dart_values WHERE dataset_id = " + datasetId);
+            statement.executeUpdate();
+
+            this.flush();
+            this.clear();
+
+        } catch(HibernateException e) {
+            logAndThrowException("Error in deleteByDatasetId=" + datasetId + " in DartValuesDAO: " + e.getMessage(), e);
+        }
+    }
 
 }

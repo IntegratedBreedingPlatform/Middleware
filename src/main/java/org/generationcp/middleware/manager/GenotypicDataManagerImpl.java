@@ -2185,7 +2185,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             getDatasetUsersDao().deleteByDatasetId(datasetId);
             getDatasetDao().deleteByDatasetId(datasetId);            
             
-            
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
@@ -2212,8 +2211,59 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Cannot delete QTLs and Dataset: GenotypicDataManager.deleteQTLs(datasetId = " + datasetId + "):  " 
+            logAndThrowException("Cannot delete SSR Genotyping Datasets: " +
+            		"GenotypicDataManager.deleteSSRGenotypingDatasets(datasetId = " + datasetId + "):  " 
             		+ e.getMessage(), e);
         }
 	}
+	
+   @Override
+    public void deleteSNPGenotypingDatasets(Integer datasetId) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+        
+        try {
+            trans = session.beginTransaction();
+            
+            getCharValuesDao().deleteByDatasetId(datasetId);
+            getDatasetUsersDao().deleteByDatasetId(datasetId);
+            getAccMetadataSetDao().deleteByDatasetId(datasetId);
+            getMarkerMetadataSetDao().deleteByDatasetId(datasetId);
+            getDatasetDao().deleteByDatasetId(datasetId);            
+            
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Cannot delete SNP Genotyping Datasets: " +
+                    "GenotypicDataManager.deleteSNPGenotypingDatasets(datasetId = " + datasetId + "):  " 
+                    + e.getMessage(), e);
+        }
+    }
+   
+   @Override
+   public void deleteDArTGenotypingDatasets(Integer datasetId) throws MiddlewareQueryException {
+       requireLocalDatabaseInstance();
+       Session session = getCurrentSessionForLocal();
+       Transaction trans = null;
+       
+       try {
+           trans = session.beginTransaction();
+           
+           getAlleleValuesDao().deleteByDatasetId(datasetId);
+           getDartValuesDao().deleteByDatasetId(datasetId);
+           getDatasetUsersDao().deleteByDatasetId(datasetId);
+           getAccMetadataSetDao().deleteByDatasetId(datasetId);
+           getMarkerMetadataSetDao().deleteByDatasetId(datasetId);
+           getDatasetDao().deleteByDatasetId(datasetId);            
+           
+           trans.commit();
+       } catch (Exception e) {
+           rollbackTransaction(trans);
+           logAndThrowException("Cannot delete DArT Genotyping Datasets: " +
+                   "GenotypicDataManager.deleteDArTGenotypingDatasets(datasetId = " + datasetId + "):  " 
+                   + e.getMessage(), e);
+       }
+   }
+  
 }
