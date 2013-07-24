@@ -81,7 +81,7 @@ public class AccMetadataSet implements Serializable{
             "WHERE gam.dataset_id IN (:represnos) " ;
     
     public static final String COUNT_NIDS_BY_DATASET_IDS = 
-    		"SELECT COUNT(nid) FROM gdms_acc_metadataset WHERE dataset_id IN (:datasetIds)";
+    		"SELECT COUNT(DISTINCT nid) FROM gdms_acc_metadataset WHERE dataset_id IN (:datasetIds)";
 
     @EmbeddedId
     protected AccMetadataSetPK id;
