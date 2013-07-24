@@ -60,6 +60,7 @@ import org.generationcp.middleware.pojos.gdms.QtlDataElement;
 import org.generationcp.middleware.pojos.gdms.QtlDetailElement;
 import org.generationcp.middleware.pojos.gdms.QtlDetails;
 import org.generationcp.middleware.pojos.gdms.QtlDetailsPK;
+import org.generationcp.middleware.util.Debug;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -1841,6 +1842,18 @@ public class TestGenotypicDataManagerImpl{
         List<Integer> gIds = Arrays.asList(1434, 1435, 1436);   // IBDBv2 Groundnut
         long count = manager.countMappingPopValuesByGids(gIds);
         System.out.println("countMappingPopValuesByGids(" + gIds + ") = " + count);
+    }
+    
+    @Test
+    public void testGetAllFromMarkerMetadatasetByMarker() throws Exception {
+        Integer markerId = 3302; 
+        List<MarkerMetadataSet> result = manager.getAllFromMarkerMetadatasetByMarker(markerId);
+        System.out.println("testGetAllFromMarkerMetadatasetByMarker(" + markerId + "): " + result.size());
+        if (result != null) {
+            for (MarkerMetadataSet elem : result) {
+                Debug.println(4, elem.toString());
+            }
+        }
     }
     
     @AfterClass

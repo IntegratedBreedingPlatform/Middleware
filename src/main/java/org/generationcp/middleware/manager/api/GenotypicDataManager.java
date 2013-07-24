@@ -1636,4 +1636,15 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException
      */
     public long countMappingPopValuesByGids(List<Integer> gIds) throws MiddlewareQueryException;
+    
+    /**
+     * Returns the list of MarkerMetadataSet from gdms_marker_metadataset matching the given marker ID.
+     * @param markerId
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    public List<MarkerMetadataSet> getAllFromMarkerMetadatasetByMarker(Integer markerId) throws MiddlewareQueryException;
+    
+    
+    
 }

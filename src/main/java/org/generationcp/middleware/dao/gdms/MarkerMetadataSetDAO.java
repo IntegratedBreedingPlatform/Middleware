@@ -94,5 +94,36 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
         }
         return count;
     }
+    
+    
+    
+    @SuppressWarnings("rawtypes")
+    public List<MarkerMetadataSet> getByMarkerId(Integer markerId) throws MiddlewareQueryException{
+        List<MarkerMetadataSet> toReturn = new ArrayList<MarkerMetadataSet>();
+        try{
+            if (markerId != null){
+                SQLQuery query = getSession().createSQLQuery(MarkerMetadataSet.GET_BY_MARKER_ID); 
+                query.setParameter("markerId", markerId);
+
+                List results = query.list();
+                for (Object o : results) {
+                    Object[] result = (Object[]) o;
+                    if (result != null) {
+                        Integer datasetId =  (Integer) result[0];
+                        Integer markerId2 = (Integer) result[1];
+
+                        MarkerMetadataSet dataElement = new MarkerMetadataSet(datasetId, markerId2);
+                        toReturn.add(dataElement);
+                    }
+                }
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getByMarkerId(markerId=" + markerId 
+                    + ") query from MarkerMetadataSet: " + e.getMessage(), e);
+        }
+        return toReturn;
+
+    }
+
 
 }

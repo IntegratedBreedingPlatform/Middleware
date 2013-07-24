@@ -52,6 +52,12 @@ public class MarkerMetadataSet implements Serializable{
             "WHERE gdms_marker_metadataset.dataset_id in (:datasetids)  " +
             "    AND gdms_acc_metadataset.gid = :gid " + 
             "ORDER BY gdms_marker_metadataset.marker_id ";
+    
+    public static final String GET_BY_MARKER_ID = 
+            "SELECT * " +
+            "FROM gdms_marker_metadataset " +
+            "WHERE  marker_id = :markerId ";
+   
 
     @EmbeddedId
     protected MarkerMetadataSetPK id;
