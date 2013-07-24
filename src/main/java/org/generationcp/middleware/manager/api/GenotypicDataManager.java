@@ -1673,5 +1673,11 @@ public interface GenotypicDataManager{
      */
     public List<AccMetadataSetPK> getAllFromAccMetadataset(List<Integer> gIds, Integer datasetId, SetOperation operation) throws MiddlewareQueryException;
     
-    
+    /**
+     * Returns the map name and marker count given a list of marker ids.
+     * @param markerIds
+     * @return map name and marker count as a list of MapDetailElements
+     * @throws MiddlewareQueryException
+     */
+    public List<MapDetailElement> getMapAndMarkerCountByMarkers(List<Integer> markerIds) throws MiddlewareQueryException;
 }

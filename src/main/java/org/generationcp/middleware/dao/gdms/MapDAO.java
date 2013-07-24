@@ -152,4 +152,22 @@ public class MapDAO extends GenericDAO<Map, Integer>{
     	return null;
     }
     
+    @SuppressWarnings("rawtypes")
+	public List<MapDetailElement> getMapAndMarkerCountByMarkers(List<Integer> markerIds) throws MiddlewareQueryException {
+    	List<MapDetailElement> details = new ArrayList<MapDetailElement>();
+    	try {
+    		SQLQuery query = getSession().createSQLQuery(Map.GET_MAP_AND_MARKER_COUNT_BY_MARKERS);
+    		query.setParameterList("markerIds", markerIds);
+    		List results = query.list();
+    		for (Object o : results) {
+    			Object[] result = (Object[]) o;
+    			details.add(new MapDetailElement(((BigInteger) result[1]).intValue(), null, null, result[0].toString(), null, null, null));
+    		}
+    		
+    	} catch (HibernateException e) {
+    		e.printStackTrace();
+    		logAndThrowException("Error with getMapAndMarkerCountByMarkers(" + markerIds + ") in MapDAO: " + e.getMessage(), e);
+    	}
+    	return details;
+    }
 }

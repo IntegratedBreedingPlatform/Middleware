@@ -2144,7 +2144,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                 new Class[] { List.class,  Integer.class, SetOperation.class});
     }
 
+    @Override
+    public List<MapDetailElement> getMapAndMarkerCountByMarkers(List<Integer> markerIds) throws MiddlewareQueryException {
+    	return super.getAllFromCentralAndLocalByMethod(getMapDao(), "getMapAndMarkerCountByMarkers", 
+    			new Object[] {markerIds}, new Class[] {List.class});
+    }
     
-    
-
 }

@@ -90,6 +90,13 @@ public class Map implements Serializable{
     public static final String GET_MAP_ID_BY_NAME = 
     		"SELECT map_id FROM gdms_map WHERE map_name = :mapName";
 
+    public static final String GET_MAP_AND_MARKER_COUNT_BY_MARKERS = 
+    		"SELECT CONCAT(m.map_name, ''), COUNT(k.marker_id) " +
+    		"FROM gdms_map m " +
+    		"INNER JOIN gdms_markers_onmap k ON k.map_id = m.map_id " +
+    		"WHERE k.marker_id IN (:markerIds) " +
+    		"GROUP BY m.map_name";
+    
     public Map() {        
     }
 
