@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Set;
 
+import junit.framework.Assert;
+
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.NameSynonym;
 import org.generationcp.middleware.domain.dms.NameType;
@@ -37,7 +39,7 @@ public class TestOntologyDataManagerImpl {
 	private static final Integer CV_TERM_ID = 1010;
 	private static final String CV_TERM_NAME = "Study Information";
 	private static final Integer STD_VARIABLE_ID = 8350; // 8310; 
-
+	
 	private static ManagerFactory factory;
 	private static OntologyDataManager manager;
 
@@ -133,6 +135,17 @@ public class TestOntologyDataManagerImpl {
 	    System.out.println("testAddMethod():  " + term);
 	    term = manager.getTermById(term.getId());
 	    System.out.println("From db:  " + term);
+	}
+	
+	@Test
+	public void testGetStandadardVariableIdByPropertyScaleMethod() throws Exception {
+		Integer propertyId = Integer.valueOf(2002);
+		Integer scaleId = Integer.valueOf(6000);
+		Integer methodId = Integer.valueOf(4030);
+		
+		Integer varid = manager.getStandadardVariableIdByPropertyScaleMethod(propertyId, scaleId, methodId);
+		Assert.assertNotNull(varid);
+		System.out.println("testGetStandadardVariableIdByPropertyScaleMethod() Results: " + varid);
 	}
 	
 	@Test
