@@ -55,6 +55,7 @@ import org.generationcp.middleware.pojos.gdms.MarkerMetadataSetPK;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerOnMap;
 import org.generationcp.middleware.pojos.gdms.MarkerUserInfo;
+import org.generationcp.middleware.pojos.gdms.Mta;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.generationcp.middleware.pojos.gdms.Qtl;
 import org.generationcp.middleware.pojos.gdms.QtlDataElement;
@@ -1889,18 +1890,36 @@ public class TestGenotypicDataManagerImpl{
     
     @Test
     public void testGetMapAndMarkerCountByMarkers() throws Exception {
-    	List<Integer> markerIds = Arrays.asList(1317, 1318, 1788, 1053, 2279, 50);
-    	System.out.println("testGetMapAndMarkerCountByMarkers(" + markerIds + ")");
-    	List<MapDetailElement> details = manager.getMapAndMarkerCountByMarkers(markerIds);
-    	if (details != null && details.size() > 0) {
-    		System.out.println("FOUND " + details.size() + " records");
-    		for (MapDetailElement detail : details) {
-    			System.out.println(detail.getMapName() + " - " + detail.getMarkerCount());
-    		}
-    	} else {
-    		System.out.println("NO RECORDS FOUND");
-    	}
+        List<Integer> markerIds = Arrays.asList(1317, 1318, 1788, 1053, 2279, 50);
+        System.out.println("testGetMapAndMarkerCountByMarkers(" + markerIds + ")");
+        List<MapDetailElement> details = manager.getMapAndMarkerCountByMarkers(markerIds);
+        if (details != null && details.size() > 0) {
+            System.out.println("FOUND " + details.size() + " records");
+            for (MapDetailElement detail : details) {
+                System.out.println(detail.getMapName() + " - " + detail.getMarkerCount());
+            }
+        } else {
+            System.out.println("NO RECORDS FOUND");
+        }
     }
+    
+    @Test
+    public void testGetAllMTAs() throws Exception {
+        List<Mta> result = manager.getAllMTAs();
+        System.out.println("testGetAllMTAs(): " + result.size());
+        if (result != null) {
+            for (Mta elem : result) {
+                Debug.println(4, elem.toString());
+            }
+        }
+    }
+    
+    @Test
+    public void testCountAllMTAs() throws Exception {
+        long count = manager.countAllMTAs();
+        System.out.println("testCountAllMTAs(): " + count);
+    }
+    
     
     @AfterClass
     public static void tearDown() throws Exception {

@@ -60,6 +60,7 @@ import org.generationcp.middleware.dao.gdms.MarkerInfoDAO;
 import org.generationcp.middleware.dao.gdms.MarkerMetadataSetDAO;
 import org.generationcp.middleware.dao.gdms.MarkerOnMapDAO;
 import org.generationcp.middleware.dao.gdms.MarkerUserInfoDAO;
+import org.generationcp.middleware.dao.gdms.MtaDAO;
 import org.generationcp.middleware.dao.gdms.QtlDAO;
 import org.generationcp.middleware.dao.gdms.QtlDetailsDAO;
 import org.generationcp.middleware.dao.oms.CVDao;
@@ -138,6 +139,7 @@ public class DatabaseBroker {
     private MarkerUserInfoDAO markerUserInfoDao;
     private QtlDAO qtlDao;
     private QtlDetailsDAO qtlDetailsDao;
+    private MtaDAO mtaDao;
     
     // GermplasmDataManager DAOs
     private AttributeDAO attributeDao;
@@ -735,6 +737,16 @@ public class DatabaseBroker {
         qtlDetailsDao.setSession(getActiveSession());
         return qtlDetailsDao;
     }
+    
+    protected final MtaDAO getMtaDao() {
+        if (mtaDao == null) {
+            mtaDao = new MtaDAO();
+        }
+        mtaDao.setSession(getActiveSession());
+        return mtaDao;
+    }
+
+
 
     //================================ GermplasmDataManager DAO Methods =============================
     

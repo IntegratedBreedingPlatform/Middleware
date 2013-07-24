@@ -66,6 +66,7 @@ import org.generationcp.middleware.pojos.gdms.MarkerMetadataSetPK;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerOnMap;
 import org.generationcp.middleware.pojos.gdms.MarkerUserInfo;
+import org.generationcp.middleware.pojos.gdms.Mta;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.generationcp.middleware.pojos.gdms.Qtl;
 import org.generationcp.middleware.pojos.gdms.QtlDataElement;
@@ -2149,5 +2150,16 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     	return super.getAllFromCentralAndLocalByMethod(getMapDao(), "getMapAndMarkerCountByMarkers", 
     			new Object[] {markerIds}, new Class[] {List.class});
     }
-    
+
+    @Override
+    public List<Mta> getAllMTAs() throws MiddlewareQueryException{
+        return super.getAllFromCentralAndLocal(getMtaDao());
+    }
+
+    @Override
+    public long countAllMTAs() throws MiddlewareQueryException{
+        return super.countAllFromCentralAndLocalByMethod(getMtaDao(), "countAll", new Object[]{}, new Class[]{});
+        
+    }
+
 }
