@@ -1856,6 +1856,20 @@ public class TestGenotypicDataManagerImpl{
         }
     }
     
+    @Test
+    public void testGetDatasetDetailsByDatasetId() throws Exception {
+        Integer datasetId = 5; 
+        Dataset dataset = manager.getDatasetDetailsByDatasetId(datasetId);
+        System.out.println("testGetDatasetDetailsByDatasetId(" + datasetId + "): " + dataset);
+    }
+    
+    @Test
+    public void testGetQTLIdsByDatasetIds() throws Exception {
+        List<Integer> datasetIds = Arrays.asList(1, 2, 3, 4);   // IBDBv2 Groundnut
+        List<Integer> qtlIds = manager.getQTLIdsByDatasetIds(datasetIds);
+        System.out.println("testGetQTLIdsByDatasetIds(" + datasetIds + "): " + qtlIds);
+    }
+    
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();

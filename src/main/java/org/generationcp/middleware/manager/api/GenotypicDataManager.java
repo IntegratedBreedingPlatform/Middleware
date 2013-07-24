@@ -1645,6 +1645,20 @@ public interface GenotypicDataManager{
      */
     public List<MarkerMetadataSet> getAllFromMarkerMetadatasetByMarker(Integer markerId) throws MiddlewareQueryException;
     
+    /**
+     * Returns the Dataset details given a dataset ID 
+     * @param datasetId
+     * @return Dataset
+     * @throws MiddlewareQueryException
+     */
+    public Dataset getDatasetDetailsByDatasetId(Integer datasetId) throws MiddlewareQueryException;
     
+    /**
+     * Returns the QTL IDs given a list of dataset IDs 
+     * @param datasetIds
+     * @return QTL IDs
+     * @throws MiddlewareQueryException
+     */
+    public List<Integer> getQTLIdsByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException;
     
 }

@@ -133,6 +133,12 @@ public class Qtl implements Serializable{
             + "WHERE tid = :qtlTrait " 
             ;
         
+    
+    public static final String GET_QTL_IDS_BY_DATASET_IDS =
+            "SELECT qtl_id "
+            + "FROM gdms_qtl "
+            + "WHERE dataset_id in (:datasetIds) ";
+    
     private static final long serialVersionUID = 1L;
 
     @Id

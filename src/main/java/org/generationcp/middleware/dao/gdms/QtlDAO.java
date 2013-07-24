@@ -273,5 +273,20 @@ public class QtlDAO  extends GenericDAO<Qtl, Integer>{
         return 0;
     }
 
-
+    
+    @SuppressWarnings("unchecked")
+    public List<Integer> getQTLIdsByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException{
+        try {
+            if (datasetIds != null && datasetIds.get(0) != null){
+                Query query = getSession().createSQLQuery(Qtl.GET_QTL_IDS_BY_DATASET_IDS);
+                query.setParameterList("datasetIds", datasetIds);
+                List<Integer> results = query.list();
+                return results;
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getQTLIdsByDatasetIds(datasetIds=" + datasetIds + ") query from gdms_qtl: "
+                    + e.getMessage(), e);
+        }
+        return new ArrayList<Integer>();
+    }
 }

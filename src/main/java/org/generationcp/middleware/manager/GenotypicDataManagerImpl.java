@@ -2119,9 +2119,21 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                                                     getMarkerMetadataSetDao(), 
                                                     "getByMarkerId", new Object[] { markerId },
                                                     new Class[] { Integer.class });
-
     }
 
+    @Override
+    public Dataset getDatasetDetailsByDatasetId(Integer datasetId) throws MiddlewareQueryException{
+        if (setWorkingDatabase(datasetId)){
+            return getDatasetDao().getById(datasetId);   
+        }
+        return null;
+    }
+    
+    @Override
+    public List<Integer> getQTLIdsByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException{
+        return super.getFromInstanceByIdAndMethod(getQtlDao(), datasetIds.get(0), 
+                "getQTLIdsByDatasetIds", new Object[] { datasetIds }, new Class[] { List.class });
+    }
     
 
 }
