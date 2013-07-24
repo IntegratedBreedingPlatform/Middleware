@@ -1628,4 +1628,12 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException
      */
     public Integer getMapIdByName(String mapName) throws MiddlewareQueryException;
+    
+    /**
+     * Returns the number of mapping pop values from gdms_mapping_pop_values given a list of germplasm IDs
+     * @param gIDs
+     * @return count of mapping pop values
+     * @throws MiddlewareQueryException
+     */
+    public long countMappingPopValuesByGids(List<Integer> gIds) throws MiddlewareQueryException;
 }

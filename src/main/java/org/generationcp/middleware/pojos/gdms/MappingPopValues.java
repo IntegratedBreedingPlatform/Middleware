@@ -88,6 +88,12 @@ public class MappingPopValues implements Serializable{
         "FROM gdms_mapping_pop_values " +
         "WHERE marker_id = :markerId";
     
+    public static final String COUNT_BY_GIDS = 
+    "SELECT COUNT(distinct mp_id) " +
+    "FROM gdms_mapping_pop_values " +
+    "WHERE gid in (:gIdList)";
+    
+    
     @Id
     @Basic(optional = false)
     @Column(name = "mp_id")

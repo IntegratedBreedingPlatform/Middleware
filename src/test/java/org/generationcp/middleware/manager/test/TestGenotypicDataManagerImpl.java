@@ -26,9 +26,7 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
-import org.generationcp.middleware.pojos.Lot;
 import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.Transaction;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSetPK;
 import org.generationcp.middleware.pojos.gdms.AlleleValues;
@@ -1836,6 +1834,13 @@ public class TestGenotypicDataManagerImpl{
     	mapName = "TEST"; //local test data INSERT INTO gdms_map (map_id, map_name, map_type, mp_id, map_desc, map_unit) values(-1, 'TEST', 'genetic', 0, 'TEST', 'cM');
     	mapId = manager.getMapIdByName(mapName);
     	System.out.println("Map ID for " + mapName + " = " + mapId);
+    }
+    
+    @Test
+    public void testCountMappingPopValuesByGids() throws Exception {
+        List<Integer> gIds = Arrays.asList(1434, 1435, 1436);   // IBDBv2 Groundnut
+        long count = manager.countMappingPopValuesByGids(gIds);
+        System.out.println("countMappingPopValuesByGids(" + gIds + ") = " + count);
     }
     
     @AfterClass

@@ -2106,4 +2106,12 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     	}
     	return mapId;
     }
+    
+    @Override
+    public long countMappingPopValuesByGids(List<Integer> gIds) throws MiddlewareQueryException{
+        return super.countAllFromCentralAndLocalByMethod(this.getMappingPopValuesDao(), "countByGids", new Object[] { gIds },
+                new Class[] { List.class });
+    }
+    
+
 }

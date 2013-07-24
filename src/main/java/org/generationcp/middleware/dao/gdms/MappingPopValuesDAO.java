@@ -145,4 +145,20 @@ public class MappingPopValuesDAO extends GenericDAO<MappingPopValues, Integer>{
         }
         return 0;
     }
+    
+    public long countByGids(List<Integer> gIds) throws MiddlewareQueryException {
+        try {
+            if (gIds != null && gIds.get(0) != null){
+                SQLQuery query = getSession().createSQLQuery(MappingPopValues.COUNT_BY_GIDS);
+                query.setParameterList("gIdList", gIds);
+                BigInteger result = (BigInteger) query.uniqueResult();
+                if (result != null) {
+                    return result.longValue();
+                }
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with countByGids(gIds=" + gIds + ") query from MappingPopValues: " + e.getMessage(), e);
+        }
+        return 0;
+    }
 }
