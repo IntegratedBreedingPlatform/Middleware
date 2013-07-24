@@ -1681,7 +1681,7 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException
      */
     public List<MapDetailElement> getMapAndMarkerCountByMarkers(List<Integer> markerIds) throws MiddlewareQueryException;
-
+    
     /**
      * Returns all MTA data from both central and local databases.
      */
@@ -1700,4 +1700,11 @@ public interface GenotypicDataManager{
      */
     public List<Mta> getMTAsByTrait(Integer traitId) throws MiddlewareQueryException;
 
+    /**
+     * Delete QTLs given a dataset id and a qtl id.
+     * @param datasetId
+     * @param qtlId
+     * @throws MiddlewareQueryException
+     */
+    public void deleteQTLs(List<Integer> qtlIds, Integer datasetId) throws MiddlewareQueryException;
 }

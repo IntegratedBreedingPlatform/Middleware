@@ -135,7 +135,7 @@ public class QtlDetails implements Serializable{
     		+ "AND gqd.tid "
     		+ "IN (:qtlTraits) " 
     		;
-
+    
     @EmbeddedId
     protected QtlDetailsPK id;
     

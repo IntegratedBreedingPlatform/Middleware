@@ -2168,4 +2168,40 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                 new Class[] { Integer.class });
     }
 
+    @Override
+    public void deleteQTLs(List<Integer> qtlIds, Integer datasetId) throws MiddlewareQueryException {
+    	requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+        
+        try {
+            trans = session.beginTransaction();
+            
+            //delete qtl and qtl details
+            List<QtlDetails> details = getQtlDetailsDao().getByQtlIds(qtlIds);
+            for (QtlDetails detail : details) {
+            	getQtlDetailsDao().makeTransient(detail);
+            }
+            List<Qtl> qtls = getQtlDao().getByIds(qtlIds);
+            for (Qtl qtl : qtls) {
+            	getQtlDao().makeTransient(qtl);
+            }
+            
+            //delete dataset users and dataset
+            List<DatasetUsers> users = getDatasetUsersDao().getByDatasetId(datasetId);
+            for (DatasetUsers user : users) {
+            	getDatasetUsersDao().makeTransient(user);
+            }
+            Dataset dataset = getDatasetDao().getById(datasetId);
+            if (dataset != null) {
+            	getDatasetDao().makeTransient(dataset);
+            }
+            
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Cannot delete QTLs and Dataset: GenotypicDataManager.deleteQTLs(qtlIds="
+                    + qtlIds + " and datasetId = " + datasetId + "):  " + e.getMessage(), e);
+        }
+    }
 }
