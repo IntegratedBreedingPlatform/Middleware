@@ -1951,7 +1951,14 @@ public class TestGenotypicDataManagerImpl{
     
     @Test
     public void testDeleteSSRGenotypingDatasets() throws Exception {
-    	int datasetId = -1;
+    	/* TEST DATA - GROUNDNUT
+    	insert into gdms_dataset values(-7, 'TEST DATASET', 'TEST', 'QTL', 'Groundnut', 'Groundnut', '2013-07-24', null, 'int', null, null, null, null,  null, null, null);
+    	insert into gdms_dataset_users values (-7, 123);
+    	insert into gdms_allele_values values(-4, -7, 1, 1, '238:238', '0.0:0.0', 10);
+    	insert into gdms_acc_metadataset values (-7, 1, 1);
+		insert into gdms_marker_metadataset values(-7, 1);
+    	 */
+    	int datasetId = -7;
     	System.out.println("testDeleteSSRGenotypingDatasets(" + datasetId + ")");
     	manager.deleteSSRGenotypingDatasets(datasetId);
     	System.out.println("done with testDeleteSSRGenotypingDatasets");
