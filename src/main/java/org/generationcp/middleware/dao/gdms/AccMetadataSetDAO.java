@@ -235,4 +235,23 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer>{
         }
         return count;
     }
+    
+    public long countNidsByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException {
+    	long count = 0;
+    	try {
+    		if (datasetIds != null && !datasetIds.isEmpty()) {
+    			SQLQuery query = getSession().createSQLQuery(AccMetadataSet.COUNT_NIDS_BY_DATASET_IDS);
+    			query.setParameterList("datasetIds", datasetIds);
+                BigInteger result = (BigInteger) query.uniqueResult();
+                if (result != null) {
+                    count = result.longValue();
+                }
+    		}
+    		
+    	} catch(HibernateException e) {
+    		logAndThrowException("Error with countNidsByDatasetIds=" + datasetIds + ") query from AccMetadataSet: "
+    				+ e.getMessage(), e);
+    	}
+    	return count;
+    }
 }

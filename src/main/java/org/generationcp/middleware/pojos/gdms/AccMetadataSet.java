@@ -79,6 +79,9 @@ public class AccMetadataSet implements Serializable{
             "SELECT DISTINCT nid from gdms_acc_metadataset gam "+
             "INNER JOIN gdms_marker_metadataset gmm on gmm.dataset_id = gam.dataset_id " + 
             "WHERE gam.dataset_id IN (:represnos) " ;
+    
+    public static final String COUNT_NIDS_BY_DATASET_IDS = 
+    		"SELECT COUNT(nid) FROM gdms_acc_metadataset WHERE dataset_id IN (:datasetIds)";
 
     @EmbeddedId
     protected AccMetadataSetPK id;

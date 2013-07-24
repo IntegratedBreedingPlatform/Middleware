@@ -1613,5 +1613,11 @@ public interface GenotypicDataManager{
      */
     public long countQtlDataByQtlTraits(List<Integer> qtlTraitIds) throws MiddlewareQueryException;
 
-    
+    /**
+     * Returns the number of nIds from AccMetaDataSet given a list of dataset Ids so that the GDMS UI can integrate to the GDMS database
+     * @param datasetIds
+     * @return Count of NIDs
+     * @throws MiddlewareQueryException
+     */
+    public long countNidsFromAccMetadatasetByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException;
 }

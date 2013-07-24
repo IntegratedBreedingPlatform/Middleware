@@ -2089,4 +2089,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                 new Class[] { List.class });
     	
     }
+    
+    @Override
+    public long countNidsFromAccMetadatasetByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException {
+    	return super.countAllFromCentralAndLocalByMethod(getAccMetadataSetDao(), "countNidsByDatasetIds",
+    			new Object[] {datasetIds}, new Class[] {List.class});
+    }
 }

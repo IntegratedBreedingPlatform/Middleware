@@ -15,6 +15,7 @@ package org.generationcp.middleware.manager.test;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -1812,8 +1813,15 @@ public class TestGenotypicDataManagerImpl{
     	System.out.println("  " + result);
     }
     System.out.println("Number of record/s: " +results.size() );
+    
     }
-   
+
+    @Test
+    public void testCountNidsFromAccMetadatasetByDatasetIds() throws Exception {
+    	List<Integer> datasetIds = Arrays.asList(2, 3, 4);
+    	long count = manager.countNidsFromAccMetadatasetByDatasetIds(datasetIds);
+    	System.out.println("testCountNidsFromAccMetadatasetByDatasetIds(" + datasetIds + ") = " + count);
+    }
     
     @AfterClass
     public static void tearDown() throws Exception {
