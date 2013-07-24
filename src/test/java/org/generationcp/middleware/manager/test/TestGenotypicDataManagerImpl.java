@@ -1818,9 +1818,24 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testCountNidsFromAccMetadatasetByDatasetIds() throws Exception {
+    	//GROUNDNUT DATABASE
     	List<Integer> datasetIds = Arrays.asList(2, 3, 4);
     	long count = manager.countNidsFromAccMetadatasetByDatasetIds(datasetIds);
     	System.out.println("testCountNidsFromAccMetadatasetByDatasetIds(" + datasetIds + ") = " + count);
+    }
+    
+    @Test
+    public void testGetMapIdByName() throws Exception {
+    	//GROUNDNUT DATABASE
+    	String mapName = "Consensus_Biotic";  //CENTRAL test data
+    	Integer mapId = manager.getMapIdByName(mapName);
+    	System.out.println("Map ID for " + mapName + " = " + mapId);
+    	mapName = "name that does not exist";
+    	mapId = manager.getMapIdByName(mapName);
+    	System.out.println("Map ID for " + mapName + " = " + mapId);
+    	mapName = "TEST"; //local test data INSERT INTO gdms_map (map_id, map_name, map_type, mp_id, map_desc, map_unit) values(-1, 'TEST', 'genetic', 0, 'TEST', 'cM');
+    	mapId = manager.getMapIdByName(mapName);
+    	System.out.println("Map ID for " + mapName + " = " + mapId);
     }
     
     @AfterClass

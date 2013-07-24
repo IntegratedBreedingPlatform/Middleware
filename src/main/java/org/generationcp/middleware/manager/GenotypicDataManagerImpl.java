@@ -2095,4 +2095,15 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     	return super.countAllFromCentralAndLocalByMethod(getAccMetadataSetDao(), "countNidsByDatasetIds",
     			new Object[] {datasetIds}, new Class[] {List.class});
     }
+    
+    @Override
+    public Integer getMapIdByName(String mapName) throws MiddlewareQueryException {
+    	setWorkingDatabase(Database.CENTRAL);
+    	Integer mapId = getMapDao().getMapIdByName(mapName);
+    	if (mapId == null) {
+    		setWorkingDatabase(Database.LOCAL);
+    		mapId = getMapDao().getMapIdByName(mapName);
+    	}
+    	return mapId;
+    }
 }

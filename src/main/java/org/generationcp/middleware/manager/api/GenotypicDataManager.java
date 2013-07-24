@@ -1620,4 +1620,12 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException
      */
     public long countNidsFromAccMetadatasetByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException;
+    
+    /**
+     * Returns the Map ID given the map name. 
+     * @param mapName
+     * @return the Map ID
+     * @throws MiddlewareQueryException
+     */
+    public Integer getMapIdByName(String mapName) throws MiddlewareQueryException;
 }

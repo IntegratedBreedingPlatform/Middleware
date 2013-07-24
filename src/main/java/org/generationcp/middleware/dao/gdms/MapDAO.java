@@ -139,6 +139,17 @@ public class MapDAO extends GenericDAO<Map, Integer>{
         }
         return 0;
     }
-    
+
+    public Integer getMapIdByName(String mapName) throws MiddlewareQueryException {
+    	try {
+    		SQLQuery query = getSession().createSQLQuery(Map.GET_MAP_ID_BY_NAME);
+    		query.setParameter("mapName", mapName);
+    		return (Integer) query.uniqueResult();
+    		
+    	} catch (HibernateException e) {
+    		logAndThrowException("Error with getMapIdByName(" + mapName + ") in MapDAO: " + e.getMessage(), e);
+    	}
+    	return null;
+    }
     
 }

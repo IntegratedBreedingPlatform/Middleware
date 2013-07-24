@@ -86,6 +86,9 @@ public class Map implements Serializable{
 
     public static final String COUNT_MAP_DETAILS_BY_NAME = 
             COUNT_MAP_DETAILS + "WHERE lower(gdms_mapping_data.map_name) LIKE (:nameLike) ";
+    
+    public static final String GET_MAP_ID_BY_NAME = 
+    		"SELECT map_id FROM gdms_map WHERE map_name = :mapName";
 
     public Map() {        
     }
