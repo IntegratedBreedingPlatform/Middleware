@@ -125,5 +125,20 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
 
     }
 
+    public void deleteByDatasetId(Integer datasetId) throws MiddlewareQueryException {
+		try {
+			this.flush();
+			
+			SQLQuery statement = getSession().createSQLQuery("DELETE FROM gdms_marker_metadataset WHERE dataset_id = " + datasetId);
+			statement.executeUpdate();
+
+			this.flush();
+            this.clear();
+
+		} catch(HibernateException e) {
+			logAndThrowException("Error in deleteByDatasetId=" + datasetId + " in MarkerMetadataSetDAO: " + e.getMessage(), e);
+		}
+    }
+
 
 }

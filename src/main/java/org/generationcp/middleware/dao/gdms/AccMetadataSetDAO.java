@@ -289,4 +289,19 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer>{
         }
         return dataValues;
      }
+
+     public void deleteByDatasetId(Integer datasetId) throws MiddlewareQueryException {
+		try {
+			this.flush();
+			
+			SQLQuery statement = getSession().createSQLQuery("DELETE FROM gdms_acc_metadataset WHERE dataset_id = " + datasetId);
+			statement.executeUpdate();
+
+			this.flush();
+            this.clear();
+
+		} catch(HibernateException e) {
+			logAndThrowException("Error in deleteByDatasetId=" + datasetId + " in AccMetadataSetDAO: " + e.getMessage(), e);
+		}
+    }
 }

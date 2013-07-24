@@ -15,14 +15,13 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.QtlDataElement;
 import org.generationcp.middleware.pojos.gdms.QtlDetails;
-import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
-import org.hibernate.criterion.Restrictions;
 
 
 /**
@@ -241,20 +240,18 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
         return 0;
     }
     
-    public List<QtlDetails> getByQtlIds(List<Integer> qtlIds) throws MiddlewareQueryException {
-    	List<QtlDetails> list = new ArrayList<QtlDetails>();
-    	try {
-    		if (qtlIds != null && !qtlIds.isEmpty()) {
-    			Criteria criteria = getSession().createCriteria(QtlDetails.class);
-                criteria.add(Restrictions.in("id.qtlId", qtlIds));
-    			
-	            return criteria.list();
-    		}
-    		
-        } catch (HibernateException e) {
-        	logAndThrowException("Error with getByQtlIds(" + qtlIds + ") query from QtlDetails: " + e.getMessage(), e);    
-    	}
-    	return list;
-    }
+	public void deleteByQtlIds(List<Integer> qtlIds) throws MiddlewareQueryException {
+		try {
+			this.flush();
+			
+			SQLQuery statement = getSession().createSQLQuery("DELETE FROM gdms_qtl_details WHERE qtl_id IN (" + StringUtils.join(qtlIds, ",") + ")");
+			statement.executeUpdate();
 
+			this.flush();
+            this.clear();
+
+		} catch(HibernateException e) {
+			logAndThrowException("Error in deleteByQtlIds=" + qtlIds + " in QtlDAO: " + e.getMessage(), e);
+		}
+    }
 }

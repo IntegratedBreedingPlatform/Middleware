@@ -1935,18 +1935,26 @@ public class TestGenotypicDataManagerImpl{
     @Test
     public void testDeleteQTLs() throws Exception {
     	/*TEST DATA - GROUNDNUT
+    	insert into gdms_dataset values(-7, 'TEST DATASET', 'TEST', 'QTL', 'Groundnut', 'Groundnut', '2013-07-24', null, 'int', null, null, null, null,  null, null, null);
+    	insert into gdms_dataset_users values (-7, 123);
     	insert into gdms_qtl values (-1, 'TEST QTL1', -7);
     	insert into gdms_qtl values (-2, 'TEST QTL2', -7);
-    	insert into gdms_dataset values(-7, 'TEST DATASET', 'TEST', 'QTL', 'Groundnut', 'Groundnut', '2013-07-24', null, 'int', null, null, null, null,  null, null, null);
     	insert into gdms_qtl_details values (-1, -1, 0, 8.1, 0, null, 0, 2.3, 5.4, 'LG01', null, 'GM1959', 'GM2050', 12.01, 0, null, null, null, null, null);
     	insert into gdms_qtl_details values (-2, -2, 0, 8.1, 0, null, 0, 2.3, 5.4, 'LG01', null, 'GM1959', 'GM2050', 12.01, 0, null, null, null, null, null);
-    	insert into gdms_dataset_users values (-7, 123);
     	*/
     	List<Integer> qtlIds = Arrays.asList(-1, -2);
     	int datasetId = -7;
     	System.out.println("testDeleteQTLs(qtlIds=" + qtlIds + ", datasetId=" + datasetId);
     	manager.deleteQTLs(qtlIds, datasetId);
-    	System.out.println("done");
+    	System.out.println("done with testDeleteQTLs");
+    }
+    
+    @Test
+    public void testDeleteSSRGenotypingDatasets() throws Exception {
+    	int datasetId = -1;
+    	System.out.println("testDeleteSSRGenotypingDatasets(" + datasetId + ")");
+    	manager.deleteSSRGenotypingDatasets(datasetId);
+    	System.out.println("done with testDeleteSSRGenotypingDatasets");
     }
     
     @AfterClass

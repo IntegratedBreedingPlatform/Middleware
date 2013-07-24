@@ -11,15 +11,11 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao.gdms;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.DatasetUsers;
-import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.SQLQuery;
 
 /**
  * DAO class for {@link DatasetUsers}.
@@ -30,19 +26,18 @@ import org.hibernate.criterion.Restrictions;
 
 public class DatasetUsersDAO extends GenericDAO<DatasetUsers, Integer>{
 
-	@SuppressWarnings("unchecked")
-	public List<DatasetUsers> getByDatasetId(int datasetId) throws MiddlewareQueryException {
-    	List<DatasetUsers> list = new ArrayList<DatasetUsers>();
-    	try {
-    		Criteria criteria = getSession().createCriteria(DatasetUsers.class);
-            criteria.add(Restrictions.eq("datasetId", datasetId));
-            
-            return criteria.list();
-    		
-        } catch (HibernateException e) {
-        	logAndThrowException("Error with getByDatasetId(" + datasetId + ") query from DatasetUsersDAO: " + e.getMessage(), e);    
-    	}
-    	return list;
+    public void deleteByDatasetId(int datasetId) throws MiddlewareQueryException {
+		try {
+			this.flush();
+			
+			SQLQuery statement = getSession().createSQLQuery("DELETE FROM gdms_dataset_users WHERE dataset_id = " + datasetId);
+			statement.executeUpdate();
+
+			this.flush();
+            this.clear();
+
+		} catch(HibernateException e) {
+			logAndThrowException("Error in deleteByDatasetId=" + datasetId + " in DatasetUsersDAO: " + e.getMessage(), e);
+		}
     }
-	
 }

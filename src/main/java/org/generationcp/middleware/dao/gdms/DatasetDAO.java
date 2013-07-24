@@ -155,4 +155,19 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer>{
 		}
 		return 0;
     }
+    
+	public void deleteByDatasetId(Integer datasetId) throws MiddlewareQueryException {
+		try {
+			this.flush();
+			
+			SQLQuery statement = getSession().createSQLQuery("DELETE FROM gdms_dataset WHERE dataset_id = " + datasetId);
+			statement.executeUpdate();
+
+			this.flush();
+            this.clear();
+
+		} catch(HibernateException e) {
+			logAndThrowException("Error in deleteByDatasetId=" + datasetId + " in DatasetDAO: " + e.getMessage(), e);
+		}
+    }
 }

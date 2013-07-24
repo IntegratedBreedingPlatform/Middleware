@@ -1707,4 +1707,11 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException
      */
     public void deleteQTLs(List<Integer> qtlIds, Integer datasetId) throws MiddlewareQueryException;
+    
+    /**
+     * Delete SSRGenotypingDatasets by dataset id.
+     * @param datasetId
+     * @throws MiddlewareQueryException
+     */
+    public void deleteSSRGenotypingDatasets(Integer datasetId) throws MiddlewareQueryException;
 }
