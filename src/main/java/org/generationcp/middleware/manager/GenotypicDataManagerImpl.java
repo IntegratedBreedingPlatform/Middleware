@@ -2265,5 +2265,31 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                    + e.getMessage(), e);
        }
    }
+   
+   @Override
+   public void deleteMappingPopulationDatasets(Integer datasetId) throws MiddlewareQueryException {
+       requireLocalDatabaseInstance();
+       Session session = getCurrentSessionForLocal();
+       Transaction trans = null;
+       
+       try {
+           trans = session.beginTransaction();
+           
+           getMappingPopValuesDao().deleteByDatasetId(datasetId);
+           getMappingPopDao().deleteByDatasetId(datasetId);
+           getDatasetUsersDao().deleteByDatasetId(datasetId);
+           getAccMetadataSetDao().deleteByDatasetId(datasetId);
+           getMarkerMetadataSetDao().deleteByDatasetId(datasetId);
+           getDatasetDao().deleteByDatasetId(datasetId);            
+           
+           trans.commit();
+       } catch (Exception e) {
+           rollbackTransaction(trans);
+           logAndThrowException("Cannot delete Mapping Population Datasets: " +
+                   "GenotypicDataManager.deleteMappingPopulationDatasets(datasetId = " + datasetId + "):  " 
+                   + e.getMessage(), e);
+       }
+   }
+
   
 }

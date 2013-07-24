@@ -1996,6 +1996,22 @@ public class TestGenotypicDataManagerImpl{
         System.out.println("done with testDeleteDArTGenotypingDatasets");
     }
 
+    @Test
+    public void testDeleteMappingPopulationDatasets() throws Exception {
+        /* TEST DATA - GROUNDNUT
+        insert into gdms_dataset values(-5, 'TEST DATASET', 'TEST', 'QTL', 'Groundnut', 'Groundnut', '2013-07-24', null, 'int', null, null, null, null,  null, null, null);
+        insert into gdms_dataset_users values (-5, 123);
+        insert into gdms_mapping_pop_values values( -25, 'X', -5, 1434, 2537);
+        insert into gdms_mapping_pop values(-5, 'test', 956, 1042, 999, 'test', 'test', 'test', 0);
+        insert into gdms_acc_metadataset values (-5, 1, 1);
+        insert into gdms_marker_metadataset values(-5, 1);
+         */
+        int datasetId = -5;
+        System.out.println("testDeleteMappingPopulationDatasets(" + datasetId + ")");
+        manager.deleteMappingPopulationDatasets(datasetId);
+        System.out.println("done with testDeleteMappingPopulationDatasets");
+    }
+
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();

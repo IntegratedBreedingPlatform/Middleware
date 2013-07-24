@@ -1728,5 +1728,12 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException
      */
     public void deleteDArTGenotypingDatasets(Integer datasetId) throws MiddlewareQueryException;
-
+    
+    /**
+     * Delete MappingPopulationDatasets by dataset id.
+     * @param datasetId
+     * @throws MiddlewareQueryException
+     */
+    public void deleteMappingPopulationDatasets(Integer datasetId) throws MiddlewareQueryException;
+    
 }
