@@ -571,6 +571,7 @@ public class TestGenotypicDataManagerImpl{
     @Test
     public void testGetCharAlleleValuesForPolymorphicMarkersRetrieval() throws Exception {
         List<Integer> germplasmIds = new ArrayList<Integer>(); 
+        //For rice db(v20), you can use germplasmIds: 58, 29811
         germplasmIds.add(Integer.valueOf(956)); // Please replace the gids found in the target crop to be used in testing
         germplasmIds.add(Integer.valueOf(1042));
         germplasmIds.add(Integer.valueOf(-2213));
@@ -681,7 +682,11 @@ public class TestGenotypicDataManagerImpl{
 
         List<AllelicValueElement> results = manager.getMappingAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds, 0, 
                 (int) manager.countMappingAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds));
-        System.out.println("testGetMappingAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: " + results.size() + "\n" + results);
+        System.out.println("testGetMappingAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: ");
+        for (AllelicValueElement result : results){
+        	System.out.println("  " + result);
+        }
+       System.out.println("Number of record/s: " +results.size() );
     }
 
 
