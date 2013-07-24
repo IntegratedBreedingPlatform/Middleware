@@ -31,6 +31,22 @@ public class Mta implements Serializable{
 
     private static final long serialVersionUID = 1L;
 
+    public static final String GET_MTAS_BY_TRAIT = 
+            "SELECT mta_id "
+            + "     ,marker_id "
+            + "     ,dataset_id "
+            + "     ,map_id "
+            + "     ,linkage_group "
+            + "     ,position "
+            + "     ,tid "
+            + "     ,effect "
+            + "     ,CONCAT(hv_allele, '') "
+            + "     ,CONCAT(experiment, '') "
+            + "     ,score_value "
+            + "     ,r_square "
+            + "FROM gdms_mta "
+            + "WHERE tid = :traitId ";
+
     @Id
     @Basic(optional = false)
     @Column(name = "mta_id")

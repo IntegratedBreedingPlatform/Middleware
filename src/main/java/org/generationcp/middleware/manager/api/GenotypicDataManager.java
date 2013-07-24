@@ -1691,5 +1691,13 @@ public interface GenotypicDataManager{
      * Counts all MTA data from both central and local databases.
      */
     public long countAllMTAs() throws MiddlewareQueryException;
+    
+    /**
+     * Returns all MTAs matching the given Trait ID
+     * @param traitId
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    public List<Mta> getMTAsByTrait(Integer traitId) throws MiddlewareQueryException;
 
 }

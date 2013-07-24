@@ -1920,6 +1920,18 @@ public class TestGenotypicDataManagerImpl{
         System.out.println("testCountAllMTAs(): " + count);
     }
     
+    @Test
+    public void testGetMTAsByTrait() throws Exception {
+        Integer traitId = 1;
+        List<Mta> result = manager.getMTAsByTrait(traitId);
+        System.out.println("testGetMTAsByTrait(): " + result.size());
+        if (result != null) {
+            for (Mta elem : result) {
+                Debug.println(4, elem.toString());
+            }
+        }
+    }
+    
     
     @AfterClass
     public static void tearDown() throws Exception {

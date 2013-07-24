@@ -2159,7 +2159,13 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public long countAllMTAs() throws MiddlewareQueryException{
         return super.countAllFromCentralAndLocalByMethod(getMtaDao(), "countAll", new Object[]{}, new Class[]{});
-        
+    }
+
+    @Override
+    public List<Mta> getMTAsByTrait(Integer traitId) throws MiddlewareQueryException{
+        return super.getFromInstanceByIdAndMethod(getMtaDao(), traitId,
+                "getMtasByTrait", new Object[] { traitId },
+                new Class[] { Integer.class });
     }
 
 }
