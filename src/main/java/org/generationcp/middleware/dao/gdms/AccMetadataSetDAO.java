@@ -19,6 +19,7 @@ import java.util.TreeSet;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.SetOperation;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSetPK;
 import org.hibernate.HibernateException;
@@ -254,4 +255,38 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer>{
     	}
     	return count;
     }
+    
+    @SuppressWarnings("rawtypes")
+    public List<AccMetadataSetPK> getAccMetadataSetByGidsAndDatasetId(List<Integer> gids, 
+            Integer datasetId, SetOperation operation)throws MiddlewareQueryException{
+        
+        List<AccMetadataSetPK> dataValues = new ArrayList<AccMetadataSetPK>();
+        try {
+            if (gids != null && !gids.isEmpty()) {
+                
+                String queryString = SetOperation.IN.equals(operation)? AccMetadataSet.GET_ACC_METADATASETS_BY_DATASET_ID_AND_IN_GIDS : 
+                    AccMetadataSet.GET_ACC_METADATASETS_BY_DATASET_ID_AND_NOT_IN_GIDS;
+                SQLQuery query = getSession().createSQLQuery(queryString);
+                query.setParameterList("gids", gids);
+                query.setParameter("datasetId", datasetId);
+                
+
+                List results = query.list();
+                for (Object o : results) {
+                    Object[] result = (Object[]) o;
+                    if (result != null) {
+                        Integer gid = (Integer) result[0];
+                        Integer nid = (Integer) result[1];
+
+                        AccMetadataSetPK dataElement = new AccMetadataSetPK(datasetId, gid, nid);
+                        dataValues.add(dataElement);
+                    }
+                }
+            }
+        } catch (HibernateException e) {
+                logAndThrowException("Error with getAccMetadataSetByGidsAndDatasetId(gids=" + gids + ", datasetId=" + datasetId + 
+                        ") query from AccMetadataSet: " + e.getMessage(), e);
+        }
+        return dataValues;
+     }
 }

@@ -25,6 +25,7 @@ import junit.framework.Assert;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
+import org.generationcp.middleware.manager.SetOperation;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
@@ -1855,7 +1856,6 @@ public class TestGenotypicDataManagerImpl{
             }
         }
     }
-    
     @Test
     public void testGetDatasetDetailsByDatasetId() throws Exception {
         Integer datasetId = 5; 
@@ -1868,6 +1868,23 @@ public class TestGenotypicDataManagerImpl{
         List<Integer> datasetIds = Arrays.asList(1, 2, 3, 4);   // IBDBv2 Groundnut
         List<Integer> qtlIds = manager.getQTLIdsByDatasetIds(datasetIds);
         System.out.println("testGetQTLIdsByDatasetIds(" + datasetIds + "): " + qtlIds);
+    }
+    
+    @Test
+    public void testGetAllFromAccMetadataset() throws Exception {
+        List<Integer> gids = new ArrayList<Integer>();
+        gids.add(2012);
+        gids.add(2014);
+        gids.add(2016);
+        
+        Integer datasetId = 5; 
+        List<AccMetadataSetPK> result = manager.getAllFromAccMetadataset(gids, datasetId, SetOperation.NOT_IN);
+        System.out.println("testGetAllFromAccMetadataset(gid=" + gids + ", datasetId=" + datasetId + "): " + result.size());
+        if (result != null) {
+            for (AccMetadataSetPK elem : result) {
+                Debug.println(4, elem.toString());
+            }
+        }
     }
     
     @AfterClass

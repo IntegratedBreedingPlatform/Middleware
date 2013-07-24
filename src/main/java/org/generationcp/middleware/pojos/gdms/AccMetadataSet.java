@@ -50,6 +50,18 @@ public class AccMetadataSet implements Serializable{
             "FROM gdms_acc_metadataset " +
             "WHERE gid IN (:gids) ";
     
+    public static final String GET_ACC_METADATASETS_BY_DATASET_ID_AND_IN_GIDS = 
+        "SELECT gid, nid " +
+        "FROM gdms_acc_metadataset " +
+        "WHERE gid IN (:gids) " +
+        "AND dataset_id = :datasetId";
+    
+    public static final String GET_ACC_METADATASETS_BY_DATASET_ID_AND_NOT_IN_GIDS = 
+        "SELECT gid, nid " +
+        "FROM gdms_acc_metadataset " +
+        "WHERE gid NOT IN (:gids) " +
+        "AND dataset_id = :datasetId";
+    
     public static final String COUNT_ACC_METADATASETS_BY_GIDS = 
             "SELECT COUNT(*) " +
             "FROM gdms_acc_metadataset " +

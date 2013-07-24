@@ -2119,6 +2119,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                                                     getMarkerMetadataSetDao(), 
                                                     "getByMarkerId", new Object[] { markerId },
                                                     new Class[] { Integer.class });
+
     }
 
     @Override
@@ -2134,6 +2135,16 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         return super.getFromInstanceByIdAndMethod(getQtlDao(), datasetIds.get(0), 
                 "getQTLIdsByDatasetIds", new Object[] { datasetIds }, new Class[] { List.class });
     }
+
+    @Override
+    public List<AccMetadataSetPK> getAllFromAccMetadataset(List<Integer> gIds,
+            Integer datasetId, SetOperation operation) throws MiddlewareQueryException {
+        return (List<AccMetadataSetPK>) super.getAllFromCentralAndLocalByMethod(
+                getAccMetadataSetDao(), "getAccMetadataSetByGidsAndDatasetId", new Object[] { gIds,  datasetId, operation},
+                new Class[] { List.class,  Integer.class, SetOperation.class});
+    }
+
+    
     
 
 }

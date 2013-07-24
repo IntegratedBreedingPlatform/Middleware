@@ -16,6 +16,7 @@ import java.util.Set;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.manager.SetOperation;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSetPK;
@@ -1660,5 +1661,17 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException
      */
     public List<Integer> getQTLIdsByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException;
+
+    /**
+     * Returns the list of AccMetadataSet from gdms_acc_metadataset matching given list of GIDs applied for given Set Operation
+     * and matching dataset ID
+     * @param gIds - list of germplasm IDs
+     * @param datasetId
+     * @param operation - operation to be applied for list of GIDs. Either IN or NOT IN.
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    public List<AccMetadataSetPK> getAllFromAccMetadataset(List<Integer> gIds, Integer datasetId, SetOperation operation) throws MiddlewareQueryException;
+    
     
 }
