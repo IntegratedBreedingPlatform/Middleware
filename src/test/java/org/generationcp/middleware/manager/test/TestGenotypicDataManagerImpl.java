@@ -1738,7 +1738,7 @@ public class TestGenotypicDataManagerImpl{
     
     @Test
     public void testCountMarkerInfoByGenotype() throws Exception {
-    	String genotype = ""; //change genotype
+    	String genotype = "cv. Tatu"; //change genotype
     	long count = manager.countMarkerInfoByGenotype(genotype);
         Assert.assertNotNull(count);
         System.out.println("testCountMarkerInfoByGenotype("+genotype+") Results: " + count);
