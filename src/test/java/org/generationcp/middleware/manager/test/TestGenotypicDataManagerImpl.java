@@ -541,8 +541,11 @@ public class TestGenotypicDataManagerImpl{
 
         List<AllelicValueElement> results = manager.getIntAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds, 0, 
                 (int) manager.countIntAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds));
-        System.out.println("testGetIntAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: " + results.size() + "\n" + results);
-    }
+        for (AllelicValueElement result : results){
+        	System.out.println("  " + result);
+        }
+       System.out.println("Number of record/s: " +results.size() );
+       }
 
     @Test
     public void testCountIntAlleleValuesForPolymorphicMarkersRetrieval() throws Exception { 
