@@ -16,6 +16,7 @@ import java.util.Set;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.manager.GdmsTable;
 import org.generationcp.middleware.manager.SetOperation;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
@@ -1779,4 +1780,15 @@ public interface GenotypicDataManager{
      * @return
      */
     public List<Integer> getMarkerFromMappingPopByGids(List<Integer> gIds) throws MiddlewareQueryException;
+
+    /**
+     * Retrieves the last ID of a given GDMS table. 
+     * For the local instance, this will be the MIN value.
+     * For the central instance, this will be the MAX value.
+     * @param gdmsTable
+     * @return the last ID of the GDMS table
+     * @throws MiddlewareQueryException
+     */
+    public long getLastId(Database instance, GdmsTable gdmsTable) throws MiddlewareQueryException;
+    
 }

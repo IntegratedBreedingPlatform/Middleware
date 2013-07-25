@@ -17,9 +17,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.Database;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.LockOptions;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
@@ -223,6 +225,19 @@ public abstract class GenericDAO<T, ID extends Serializable> {
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error in getNegativeId(idName=" + idName + "): " + e.getMessage(), e);
         }
+    }
+    
+    public static Integer getLastId(Session session, Database instance, String tableName, String idName) throws MiddlewareQueryException {
+    	try {
+    		String selectCol = (instance == Database.LOCAL ? "MIN" : "MAX") + "(" + idName + ")";
+    		SQLQuery query = session.createSQLQuery("SELECT " + selectCol + " FROM " + tableName);
+    		Integer result = (Integer) query.uniqueResult();
+    		
+    		return result != null ? result : 0;    		
+    		
+    	} catch(HibernateException e) {
+    		throw new MiddlewareQueryException("Error in getMaxId(instance=" + instance + ", tableName=" + tableName + ", idName=" + idName + "): " + e.getMessage(), e);
+    	}
     }
 
     public void flush() {

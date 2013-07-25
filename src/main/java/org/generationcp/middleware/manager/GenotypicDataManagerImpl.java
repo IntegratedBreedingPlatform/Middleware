@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.dao.gdms.AccMetadataSetDAO;
 import org.generationcp.middleware.dao.gdms.AlleleValuesDAO;
 import org.generationcp.middleware.dao.gdms.CharValuesDAO;
@@ -75,6 +76,7 @@ import org.generationcp.middleware.pojos.gdms.QtlDetails;
 import org.generationcp.middleware.pojos.gdms.QtlDetailsPK;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.id.IdentityGenerator.GetGeneratedKeysDelegate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -2340,4 +2342,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                new Object[] { gIds }, new Class[] { List.class });
    }
 
+	@Override
+	public long getLastId(Database instance, GdmsTable gdmsTable) throws MiddlewareQueryException {
+		setWorkingDatabase(instance);
+		return GenericDAO.getLastId(getActiveSession(), instance, gdmsTable.getTableName(), gdmsTable.getIdName());
+	}
+ 
 }

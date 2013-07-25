@@ -24,6 +24,7 @@ import junit.framework.Assert;
 
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
+import org.generationcp.middleware.manager.GdmsTable;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.SetOperation;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
@@ -2077,7 +2078,22 @@ public class TestGenotypicDataManagerImpl{
         List<Integer> result = manager.getMarkerFromMappingPopByGids(gIds);
         System.out.println("testGetMarkerFromMappingPopValuesByGids(): " + result.size() +"\n\t" + result);
     }
+    
+    @Test
+    public void testGetLastId() throws Exception {
+    	Database instance = Database.LOCAL;
+    	for (GdmsTable gdmsTable : GdmsTable.values()) {
+        	long lastId = manager.getLastId(instance, gdmsTable);
+        	System.out.println("testGetLastId(" + gdmsTable + ") in " + instance + " = " + lastId);
+    	}    	
 
+    	instance = Database.CENTRAL;
+    	for (GdmsTable gdmsTable : GdmsTable.values()) {
+        	long lastId = manager.getLastId(instance, gdmsTable);
+        	System.out.println("testGetLastId(" + gdmsTable + ") in " + instance + " = " + lastId);
+    	}    	
+    }
+    
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();
