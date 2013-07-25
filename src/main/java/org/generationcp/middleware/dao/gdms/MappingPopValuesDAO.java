@@ -176,4 +176,20 @@ public class MappingPopValuesDAO extends GenericDAO<MappingPopValues, Integer>{
             logAndThrowException("Error in deleteByDatasetId=" + datasetId + " in MappingPopValuesDAO: " + e.getMessage(), e);
         }
     }
+    
+    @SuppressWarnings("unchecked")
+    public List<Integer> getMarkerIdsByGids(List<Integer> gIds) throws MiddlewareQueryException {
+
+        try {
+            if (gIds != null && gIds.size() > 0) {
+                SQLQuery query = getSession().createSQLQuery(MappingPopValues.GET_MARKER_IDS_BY_GIDS);
+                query.setParameterList("gids", gIds);
+                
+                return query.list();
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getMarkerIdsByGids(gIds=" + gIds + ") query from MappingPopValuesDAO: " + e.getMessage(), e);
+        }
+        return new ArrayList<Integer>();
+    }
 }

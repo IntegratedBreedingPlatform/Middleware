@@ -133,6 +133,11 @@ public class AlleleValues implements Serializable{
             "SELECT COUNT(*) " 
             + "FROM gdms_mapping_pop_values INNER JOIN gdms_marker ON gdms_marker.marker_id = gdms_mapping_pop_values.marker_id " 
             + "WHERE gdms_mapping_pop_values.gid IN (:gids) ";
+    
+    public static final String GET_MARKER_IDS_BY_GIDS = 
+        "SELECT DISTINCT marker_id " +
+        "FROM gdms_allele_values " +
+        "WHERE gid IN (:gids)";
 
     @Id
     @Basic(optional = false)

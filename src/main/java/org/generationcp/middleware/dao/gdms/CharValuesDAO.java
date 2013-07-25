@@ -158,6 +158,22 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer>{
             logAndThrowException("Error in deleteByDatasetId=" + datasetId + " in CharValuesDAO: " + e.getMessage(), e);
         }
     }
+    
+    @SuppressWarnings("unchecked")
+    public List<Integer> getMarkerIdsByGids(List<Integer> gIds) throws MiddlewareQueryException {
+
+        try {
+            if (gIds != null && gIds.size() > 0) {
+                SQLQuery query = getSession().createSQLQuery(CharValues.GET_MARKER_IDS_BY_GIDS);
+                query.setParameterList("gids", gIds);
+                
+                return query.list();
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getMarkerIdsByGids(gIds=" + gIds + ") query from CharValues: " + e.getMessage(), e);
+        }
+        return new ArrayList<Integer>();
+    }
 
 
 }

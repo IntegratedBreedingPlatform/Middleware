@@ -93,6 +93,11 @@ public class MappingPopValues implements Serializable{
     "FROM gdms_mapping_pop_values " +
     "WHERE gid in (:gIdList)";
     
+    public static final String GET_MARKER_IDS_BY_GIDS = 
+        "SELECT DISTINCT marker_id " +
+        "FROM gdms_mapping_pop_values " +
+        "WHERE gid IN (:gids)";
+    
     
     @Id
     @Basic(optional = false)

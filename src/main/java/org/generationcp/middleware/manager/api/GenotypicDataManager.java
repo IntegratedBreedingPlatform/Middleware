@@ -1758,4 +1758,25 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException
      */
     public void deleteMaps(Integer mapId) throws MiddlewareQueryException;
+    
+    /**
+     * Retrieve the list of Marker IDs from CharValues matching list of GIDs.
+     * @param gIds
+     * @return
+     */
+    public List<Integer> getMarkerFromCharValuesByGids(List<Integer> gIds) throws MiddlewareQueryException;
+    
+    /**
+     * Retrieve the list of Marker IDs from AlleleValues matching list of GIDs.
+     * @param gIds
+     * @return
+     */
+    public List<Integer> getMarkerFromAlleleValuesByGids(List<Integer> gIds) throws MiddlewareQueryException;
+    
+    /**
+     * Retrieve the list of Marker IDs from MappingPop matching list of GIDs.
+     * @param gIds
+     * @return
+     */
+    public List<Integer> getMarkerFromMappingPopByGids(List<Integer> gIds) throws MiddlewareQueryException;
 }

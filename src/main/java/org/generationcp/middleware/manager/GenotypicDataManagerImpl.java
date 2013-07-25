@@ -2322,5 +2322,22 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
        }
    }
 
-  
+   @Override
+   public List<Integer> getMarkerFromCharValuesByGids(List<Integer> gIds) throws MiddlewareQueryException {
+       return super.getAllFromCentralAndLocalByMethod(getCharValuesDao(), "getMarkerIdsByGids", 
+               new Object[] { gIds }, new Class[] { List.class });
+   }
+    
+   @Override
+   public List<Integer> getMarkerFromAlleleValuesByGids(List<Integer> gIds) throws MiddlewareQueryException {
+       return super.getAllFromCentralAndLocalByMethod(getAlleleValuesDao(), "getMarkerIdsByGids", 
+               new Object[] { gIds }, new Class[] { List.class });
+   }
+    
+   @Override
+   public List<Integer> getMarkerFromMappingPopByGids(List<Integer> gIds) throws MiddlewareQueryException {
+       return super.getAllFromCentralAndLocalByMethod(getMappingPopValuesDao(), "getMarkerIdsByGids", 
+               new Object[] { gIds }, new Class[] { List.class });
+   }
+
 }

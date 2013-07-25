@@ -329,5 +329,21 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer>{
 			logAndThrowException("Error in deleteByDatasetId=" + datasetId + " in AlleleValuesDAO: " + e.getMessage(), e);
 		}
     }
+    
+    @SuppressWarnings("unchecked")
+    public List<Integer> getMarkerIdsByGids(List<Integer> gIds) throws MiddlewareQueryException {
+
+        try {
+            if (gIds != null && gIds.size() > 0) {
+                SQLQuery query = getSession().createSQLQuery(AlleleValues.GET_MARKER_IDS_BY_GIDS);
+                query.setParameterList("gids", gIds);
+                
+                return query.list();
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getMarkerIdsByGids(gIds=" + gIds + ") query from AlleleValuesDAO: " + e.getMessage(), e);
+        }
+        return new ArrayList<Integer>();
+    }
 
 }

@@ -2056,6 +2056,27 @@ public class TestGenotypicDataManagerImpl{
         manager.deleteMaps(mapId);
         System.out.println("done with testDeleteMaps");
     }
+    
+    @Test
+    public void testGetMarkerFromCharValuesByGids() throws Exception {
+        List<Integer> gIds = Arrays.asList(2012, 2014, 2016, 310544);
+        List<Integer> result = manager.getMarkerFromCharValuesByGids(gIds);
+        System.out.println("testGetMarkerFromCharValuesByGids(): " + result.size() +"\n\t" + result);
+    }
+    
+    @Test
+    public void testGetMarkerFromAlleleValuesByGids() throws Exception {
+        List<Integer> gIds = Arrays.asList(2213, 2214);
+        List<Integer> result = manager.getMarkerFromAlleleValuesByGids(gIds);
+        System.out.println("testGetMarkerFromAlleleValuesByGids(): " + result.size() +"\n\t" + result);
+    }
+    
+    @Test
+    public void testGetMarkerFromMappingPopValuesByGids() throws Exception {
+        List<Integer> gIds = Arrays.asList(1434, 1435);
+        List<Integer> result = manager.getMarkerFromMappingPopByGids(gIds);
+        System.out.println("testGetMarkerFromMappingPopValuesByGids(): " + result.size() +"\n\t" + result);
+    }
 
     @AfterClass
     public static void tearDown() throws Exception {

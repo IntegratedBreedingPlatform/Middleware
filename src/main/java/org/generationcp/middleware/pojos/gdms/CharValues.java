@@ -92,6 +92,11 @@ public class CharValues implements Serializable{
             "SELECT COUNT(*) " +
             "FROM gdms_char_values " +
             "WHERE gid in (:gids)";
+    
+    public static final String GET_MARKER_IDS_BY_GIDS = 
+        "SELECT DISTINCT marker_id " +
+        "FROM gdms_char_values " +
+        "WHERE gid IN (:gids)";
 
     @Id
     @Basic(optional = false)
