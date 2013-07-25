@@ -2016,7 +2016,7 @@ public class TestGenotypicDataManagerImpl{
     }
     
     @Test
-    public void testGetQTLsByMapId() throws Exception {
+    public void testGetQtlDetailsByMapId() throws Exception {
     	int mapId = 7;
     	System.out.println("testGetQTLsByMapId(" + mapId + ")");
     	List<QtlDetails> qtls = manager.getQtlDetailsByMapId(mapId);
@@ -2031,7 +2031,7 @@ public class TestGenotypicDataManagerImpl{
     }
 
     @Test
-    public void testCountQTLsByMapId() throws Exception {
+    public void testCountQtlDetailsByMapId() throws Exception {
     	int mapId = 7;
     	System.out.println("testCountQTLsByMapId(" + mapId + ")");
     	long count = manager.countQtlDetailsByMapId(mapId);
