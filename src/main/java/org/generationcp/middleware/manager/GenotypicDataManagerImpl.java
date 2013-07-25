@@ -2290,16 +2290,37 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                    + e.getMessage(), e);
        }
    }
+   
+   @Override
+   public List<QtlDetails> getQtlDetailsByMapId(Integer mapId) throws MiddlewareQueryException {
+           return getFromInstanceByIdAndMethod(getQtlDetailsDao(), mapId, "getQtlDetailsByMapId", new Object[] {mapId}, new Class[] {Integer.class});
+   }
 
-	@Override
-	public List<QtlDetails> getQtlDetailsByMapId(Integer mapId) throws MiddlewareQueryException {
-		return getFromInstanceByIdAndMethod(getQtlDetailsDao(), mapId, "getQtlDetailsByMapId", new Object[] {mapId}, new Class[] {Integer.class});
-	}
-
-	@Override
-	public long countQtlDetailsByMapId(Integer mapId) throws MiddlewareQueryException {
-		return countFromInstanceByIdAndMethod(getQtlDetailsDao(), mapId, "countQtlDetailsByMapId", new Object[] {mapId}, new Class[] {Integer.class});
-	}
+   @Override
+   public long countQtlDetailsByMapId(Integer mapId) throws MiddlewareQueryException {
+           return countFromInstanceByIdAndMethod(getQtlDetailsDao(), mapId, "countQtlDetailsByMapId", new Object[] {mapId}, new Class[] {Integer.class});
+   }
+   
+   @Override
+   public void deleteMaps(Integer mapId) throws MiddlewareQueryException {
+       requireLocalDatabaseInstance();
+       Session session = getCurrentSessionForLocal();
+       Transaction trans = null;
+       
+       try {
+           trans = session.beginTransaction();
+           
+           getMarkerOnMapDao().deleteByMapId(mapId);
+           getMapDao().deleteByMapId(mapId);
+           
+           trans.commit();
+       } catch (Exception e) {
+           rollbackTransaction(trans);
+           logAndThrowException("Cannot delete Mapping Population Datasets: " +
+                   "GenotypicDataManager.deleteMappingPopulationDatasets(datasetId = " + mapId + "):  " 
+                   + e.getMessage(), e);
+       }
+   }
 
   
 }

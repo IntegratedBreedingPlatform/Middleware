@@ -1751,4 +1751,11 @@ public interface GenotypicDataManager{
      * @throws MiddlewareQueryException
      */
     public long countQtlDetailsByMapId(Integer mapId) throws MiddlewareQueryException;
+       
+    /**
+     * Delete Map by map id.
+     * @param mapId
+     * @throws MiddlewareQueryException
+     */
+    public void deleteMaps(Integer mapId) throws MiddlewareQueryException;
 }

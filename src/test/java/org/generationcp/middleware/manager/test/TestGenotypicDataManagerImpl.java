@@ -2017,25 +2017,44 @@ public class TestGenotypicDataManagerImpl{
     
     @Test
     public void testGetQtlDetailsByMapId() throws Exception {
-    	int mapId = 7;
-    	System.out.println("testGetQTLsByMapId(" + mapId + ")");
-    	List<QtlDetails> qtls = manager.getQtlDetailsByMapId(mapId);
-    	if (qtls != null && qtls.size() > 0) {
-    		System.out.println("RESULTS");
-    		for (QtlDetails qtl : qtls) {
-    			System.out.println(qtl);
-    		}
-    	} else {
-    		System.out.println("NO QTLs FOUND");
-    	}
+        int mapId = 7;
+        System.out.println("testGetQTLsByMapId(" + mapId + ")");
+        List<QtlDetails> qtls = manager.getQtlDetailsByMapId(mapId);
+        if (qtls != null && qtls.size() > 0) {
+                System.out.println("RESULTS");
+                for (QtlDetails qtl : qtls) {
+                        System.out.println(qtl);
+                }
+        } else {
+                System.out.println("NO QTLs FOUND");
+        }
     }
 
     @Test
     public void testCountQtlDetailsByMapId() throws Exception {
-    	int mapId = 7;
-    	System.out.println("testCountQTLsByMapId(" + mapId + ")");
-    	long count = manager.countQtlDetailsByMapId(mapId);
-    	System.out.println("COUNT = " + count);
+        int mapId = 7;
+        System.out.println("testCountQTLsByMapId(" + mapId + ")");
+        long count = manager.countQtlDetailsByMapId(mapId);
+        System.out.println("COUNT = " + count);
+    }
+    
+    @Test
+    public void testDeleteMaps() throws Exception {
+        /* TEST DATA - GROUNDNUT
+        INSERT INTO gdms_map VALUES(-1,'BC-1','genetic',0,'BC-1','cM');
+        INSERT INTO gdms_map VALUES(-2,'Consensus_Abiotic','genetic',0,'Consensus_Abiotic','cM');
+        INSERT INTO gdms_markers_onmap VALUES(-1,1317,0,0,'BC-1_b11');
+        INSERT INTO gdms_markers_onmap VALUES(-1,1318,4.2,4.2,'BC-1_b11');
+        INSERT INTO gdms_markers_onmap VALUES(-1,1321,0,0,'BC-1_b10');
+        INSERT INTO gdms_markers_onmap VALUES(-1,1345,0,0,'BC-1_b09');
+        INSERT INTO gdms_markers_onmap VALUES(-2,1776,102.84,102.84,'LG11');
+        INSERT INTO gdms_markers_onmap VALUES(-2,1794,33.3,33.3,'LG14');
+        INSERT INTO gdms_markers_onmap VALUES(-2,1782,158.9,158.9,'LG12');
+         */
+        int mapId = -1;
+        System.out.println("testDeleteMaps(" + mapId + ")");
+        manager.deleteMaps(mapId);
+        System.out.println("done with testDeleteMaps");
     }
 
     @AfterClass
