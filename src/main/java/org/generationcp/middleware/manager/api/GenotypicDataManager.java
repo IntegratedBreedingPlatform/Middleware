@@ -1736,4 +1736,19 @@ public interface GenotypicDataManager{
      */
     public void deleteMappingPopulationDatasets(Integer datasetId) throws MiddlewareQueryException;
     
+    /**
+     * Retrieves the QTL details (including QTL ID and Trait ID/TID) given a Map ID.
+     * @param mapId
+     * @return list of QTL Details
+     * @throws MiddlewareQueryException
+     */
+    public List<QtlDetails> getQtlDetailsByMapId(Integer mapId) throws MiddlewareQueryException;
+
+    /**
+     * Counts the QTL details (including QTL ID and Trait ID/TID) given a Map ID.
+     * @param mapId
+     * @return list of QTL Details
+     * @throws MiddlewareQueryException
+     */
+    public long countQtlDetailsByMapId(Integer mapId) throws MiddlewareQueryException;
 }

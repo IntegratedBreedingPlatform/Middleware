@@ -2291,5 +2291,15 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
        }
    }
 
+	@Override
+	public List<QtlDetails> getQtlDetailsByMapId(Integer mapId) throws MiddlewareQueryException {
+		return getFromInstanceByIdAndMethod(getQtlDetailsDao(), mapId, "getQtlDetailsByMapId", new Object[] {mapId}, new Class[] {Integer.class});
+	}
+
+	@Override
+	public long countQtlDetailsByMapId(Integer mapId) throws MiddlewareQueryException {
+		return countFromInstanceByIdAndMethod(getQtlDetailsDao(), mapId, "countQtlDetailsByMapId", new Object[] {mapId}, new Class[] {Integer.class});
+	}
+
   
 }

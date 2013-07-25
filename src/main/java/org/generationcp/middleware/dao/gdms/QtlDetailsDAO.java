@@ -20,8 +20,11 @@ import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.QtlDataElement;
 import org.generationcp.middleware.pojos.gdms.QtlDetails;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 
 
 /**
@@ -251,7 +254,34 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
             this.clear();
 
 		} catch(HibernateException e) {
-			logAndThrowException("Error in deleteByQtlIds=" + qtlIds + " in QtlDAO: " + e.getMessage(), e);
+			logAndThrowException("Error in deleteByQtlIds=" + qtlIds + " in QtlDetailsDAO: " + e.getMessage(), e);
 		}
     }
+	
+	public List<QtlDetails> getQtlDetailsByMapId(Integer mapId) throws MiddlewareQueryException {
+		try {
+			Criteria criteria = getSession().createCriteria(getPersistentClass());
+			criteria.add(Restrictions.eq("id.mapId", mapId));
+			
+			return criteria.list();
+
+		} catch(HibernateException e) {
+			logAndThrowException("Error in getQtlDetailsByMapId=" + mapId + " in QtlDetailsDAO: " + e.getMessage(), e);
+		}
+		return new ArrayList<QtlDetails>();
+	}
+	
+	public long countQtlDetailsByMapId(Integer mapId) throws MiddlewareQueryException {
+		try {
+			Criteria criteria = getSession().createCriteria(getPersistentClass());
+			criteria.add(Restrictions.eq("id.mapId", mapId));
+			criteria.setProjection(Projections.rowCount());
+			
+			return (Long) criteria.uniqueResult();
+
+		} catch(HibernateException e) {
+			logAndThrowException("Error in countQtlDetailsByMapId=" + mapId + " in QtlDetailsDAO: " + e.getMessage(), e);
+		}
+		return 0;
+	}
 }

@@ -2014,6 +2014,29 @@ public class TestGenotypicDataManagerImpl{
         manager.deleteMappingPopulationDatasets(datasetId);
         System.out.println("done with testDeleteMappingPopulationDatasets");
     }
+    
+    @Test
+    public void testGetQTLsByMapId() throws Exception {
+    	int mapId = 7;
+    	System.out.println("testGetQTLsByMapId(" + mapId + ")");
+    	List<QtlDetails> qtls = manager.getQtlDetailsByMapId(mapId);
+    	if (qtls != null && qtls.size() > 0) {
+    		System.out.println("RESULTS");
+    		for (QtlDetails qtl : qtls) {
+    			System.out.println(qtl);
+    		}
+    	} else {
+    		System.out.println("NO QTLs FOUND");
+    	}
+    }
+
+    @Test
+    public void testCountQTLsByMapId() throws Exception {
+    	int mapId = 7;
+    	System.out.println("testCountQTLsByMapId(" + mapId + ")");
+    	long count = manager.countQtlDetailsByMapId(mapId);
+    	System.out.println("COUNT = " + count);
+    }
 
     @AfterClass
     public static void tearDown() throws Exception {
