@@ -1641,6 +1641,14 @@ public interface GenotypicDataManager{
     public long countMappingPopValuesByGids(List<Integer> gIds) throws MiddlewareQueryException;
     
     /**
+     * Returns the number of mapping allele values gdms_allele_values given a list of germplasm IDs.
+     * @param gIds
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    public long countMappingAlleleValuesByGids(List<Integer> gIds) throws MiddlewareQueryException;
+    
+    /**
      * Returns the list of MarkerMetadataSet from gdms_marker_metadataset matching the given marker ID.
      * @param markerId
      * @return

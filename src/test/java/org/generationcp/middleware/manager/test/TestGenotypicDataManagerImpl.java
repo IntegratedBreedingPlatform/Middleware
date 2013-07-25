@@ -1851,6 +1851,13 @@ public class TestGenotypicDataManagerImpl{
     }
     
     @Test
+    public void testCountMappingAlleleValuesByGids() throws Exception {
+        List<Integer> gIds = Arrays.asList(2213, 2214);
+        long count = manager.countMappingAlleleValuesByGids(gIds);
+        System.out.println("testCountMappingAlleleValuesByGids(" + gIds + ") = " + count);
+    }
+    
+    @Test
     public void testGetAllFromMarkerMetadatasetByMarker() throws Exception {
         Integer markerId = 3302; 
         List<MarkerMetadataSet> result = manager.getAllFromMarkerMetadatasetByMarker(markerId);

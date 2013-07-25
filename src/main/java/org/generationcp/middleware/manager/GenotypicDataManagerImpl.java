@@ -76,7 +76,6 @@ import org.generationcp.middleware.pojos.gdms.QtlDetails;
 import org.generationcp.middleware.pojos.gdms.QtlDetailsPK;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.id.IdentityGenerator.GetGeneratedKeysDelegate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -2113,6 +2112,12 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public long countMappingPopValuesByGids(List<Integer> gIds) throws MiddlewareQueryException{
         return super.countAllFromCentralAndLocalByMethod(this.getMappingPopValuesDao(), "countByGids", new Object[] { gIds },
+                new Class[] { List.class });
+    }
+    
+    @Override
+    public long countMappingAlleleValuesByGids(List<Integer> gIds) throws MiddlewareQueryException{
+        return super.countAllFromCentralAndLocalByMethod(this.getAlleleValuesDao(), "countByGids", new Object[] { gIds },
                 new Class[] { List.class });
     }
     

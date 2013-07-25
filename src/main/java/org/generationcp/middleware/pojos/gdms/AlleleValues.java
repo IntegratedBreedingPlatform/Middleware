@@ -138,6 +138,11 @@ public class AlleleValues implements Serializable{
         "SELECT DISTINCT marker_id " +
         "FROM gdms_allele_values " +
         "WHERE gid IN (:gids)";
+    
+    public static final String COUNT_BY_GIDS = 
+        "SELECT COUNT(*) " +
+        "FROM gdms_allele_values " +
+        "WHERE gid in (:gIdList)";
 
     @Id
     @Basic(optional = false)

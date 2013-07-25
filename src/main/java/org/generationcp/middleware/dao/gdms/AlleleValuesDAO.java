@@ -345,5 +345,21 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer>{
         }
         return new ArrayList<Integer>();
     }
+    
+    public long countByGids(List<Integer> gIds) throws MiddlewareQueryException {
+        try {
+            if (gIds != null && gIds.get(0) != null){
+                SQLQuery query = getSession().createSQLQuery(AlleleValues.COUNT_BY_GIDS);
+                query.setParameterList("gIdList", gIds);
+                BigInteger result = (BigInteger) query.uniqueResult();
+                if (result != null) {
+                    return result.longValue();
+                }
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with countByGids(gIds=" + gIds + ") query from AlleleValuesDAO: " + e.getMessage(), e);
+        }
+        return 0;
+    }
 
 }
