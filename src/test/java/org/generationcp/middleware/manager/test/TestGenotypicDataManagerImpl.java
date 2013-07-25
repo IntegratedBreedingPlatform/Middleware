@@ -116,9 +116,12 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testGetMapInfoByMapName() throws Exception {
-        String mapName = ""; //TODO: test with a given map name
-        List<MapInfo> results = manager.getMapInfoByMapName(mapName, Database.LOCAL);
-        System.out.println("testGetMapInfoByMapName(mapName=" + mapName + ") RESULTS: " + results);
+        String mapName = "RIL-8 (Yueyou13 x J 11)"; //TODO: test with a given map name
+        List<MapInfo> results = manager.getMapInfoByMapName(mapName, Database.CENTRAL);
+        System.out.println("testGetMapInfoByMapName(mapName=" + mapName + ") RESULTS size: " + results.size());
+        for (MapInfo mapInfo : results){
+            Debug.println(0, mapInfo.toString());
+        }
     }
 
     @Test
@@ -1934,19 +1937,19 @@ public class TestGenotypicDataManagerImpl{
     
     @Test
     public void testDeleteQTLs() throws Exception {
-    	/*TEST DATA - GROUNDNUT
-    	insert into gdms_dataset values(-7, 'TEST DATASET', 'TEST', 'QTL', 'Groundnut', 'Groundnut', '2013-07-24', null, 'int', null, null, null, null,  null, null, null);
-    	insert into gdms_dataset_users values (-7, 123);
-    	insert into gdms_qtl values (-1, 'TEST QTL1', -7);
-    	insert into gdms_qtl values (-2, 'TEST QTL2', -7);
-    	insert into gdms_qtl_details values (-1, -1, 0, 8.1, 0, null, 0, 2.3, 5.4, 'LG01', null, 'GM1959', 'GM2050', 12.01, 0, null, null, null, null, null);
-    	insert into gdms_qtl_details values (-2, -2, 0, 8.1, 0, null, 0, 2.3, 5.4, 'LG01', null, 'GM1959', 'GM2050', 12.01, 0, null, null, null, null, null);
-    	*/
-    	List<Integer> qtlIds = Arrays.asList(-1, -2);
-    	int datasetId = -7;
-    	System.out.println("testDeleteQTLs(qtlIds=" + qtlIds + ", datasetId=" + datasetId);
-    	manager.deleteQTLs(qtlIds, datasetId);
-    	System.out.println("done with testDeleteQTLs");
+        /*TEST DATA - GROUNDNUT
+        insert into gdms_dataset values(-7, 'TEST DATASET', 'TEST', 'QTL', 'Groundnut', 'Groundnut', '2013-07-24', null, 'int', null, null, null, null,  null, null, null);
+        insert into gdms_dataset_users values (-7, 123);
+        insert into gdms_qtl values (-1, 'TEST QTL1', -7);
+        insert into gdms_qtl values (-2, 'TEST QTL2', -7);
+        insert into gdms_qtl_details values (-1, -1, 0, 8.1, 0, null, 0, 2.3, 5.4, 'LG01', null, 'GM1959', 'GM2050', 12.01, 0, null, null, null, null, null);
+        insert into gdms_qtl_details values (-2, -2, 0, 8.1, 0, null, 0, 2.3, 5.4, 'LG01', null, 'GM1959', 'GM2050', 12.01, 0, null, null, null, null, null);
+        */
+        List<Integer> qtlIds = Arrays.asList(-1, -2);
+        int datasetId = -7;
+        System.out.println("testDeleteQTLs(qtlIds=" + qtlIds + ", datasetId=" + datasetId);
+        manager.deleteQTLs(qtlIds, datasetId);
+        System.out.println("done with testDeleteQTLs");
     }
     
     @Test

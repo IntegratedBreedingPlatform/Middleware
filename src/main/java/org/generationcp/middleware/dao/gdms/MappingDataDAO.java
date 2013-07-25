@@ -18,8 +18,10 @@ import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.generationcp.middleware.pojos.gdms.MappingData;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * DAO class for {@link MappingData}.
@@ -37,14 +39,24 @@ public class MappingDataDAO extends GenericDAO<MappingData, Integer>{
      */
     @SuppressWarnings("unchecked")
     public List<MapInfo> getMapInfoByMapName(String mapName) throws MiddlewareQueryException {
+        List<MapInfo> mapInfoList = new ArrayList<MapInfo>();
         try {
-            SQLQuery query = getSession().createSQLQuery(MappingData.GET_MAP_INFO_BY_MAP_NAME);
-            query.setParameter("mapName", mapName);
-            return (List<MapInfo>) query.list(); // return map info     
+            
+            Criteria criteria = getSession().createCriteria(getPersistentClass());
+            criteria.add(Restrictions.eq("mapName", mapName));
+            criteria.addOrder(Order.asc("linkageGroup"));
+            criteria.addOrder(Order.asc("startPosition"));
+            criteria.addOrder(Order.asc("markerName"));
+            List<MappingData> list = criteria.list();
+            for (MappingData mapData : list){
+                mapInfoList.add(MapInfo.build(mapData));
+            }
+              
         } catch (HibernateException e) {
             logAndThrowException("Error with getMapInfoByMapName(mapName=" + mapName + ") query from MappingData: " + e.getMessage(), e);
         }
-        return new ArrayList<MapInfo>();
+        
+        return mapInfoList;
     }
 
 }

@@ -14,7 +14,6 @@ package org.generationcp.middleware.pojos.gdms;
 import java.io.Serializable;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * The Class MapInfo. For the details of a MappingData.
@@ -25,15 +24,21 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 public class MapInfo implements Serializable{
 
     private static final long serialVersionUID = 1L;
+    
+    private Integer markerId;
 
     private String markerName;
+    
+    private String mapName;
     
     private String linkageGroup;
     
     private Float startPosition;
 
-    public MapInfo(String markerName, String linkageGroup, Float startPosition) {
+    public MapInfo(Integer markerId, String markerName, String mapName, String linkageGroup, Float startPosition) {
+        this.markerId = markerId;
         this.markerName = markerName;
+        this.mapName = mapName;
         this.linkageGroup = linkageGroup;
         this.startPosition = startPosition;
     }
@@ -62,33 +67,66 @@ public class MapInfo implements Serializable{
         this.startPosition = startPosition;
     }
 
+    
+    public Integer getMarkerId() {
+        return markerId;
+    }
+
+    
+    public void setMarkerId(Integer markerId) {
+        this.markerId = markerId;
+    }
+
+    
+    public String getMapName() {
+        return mapName;
+    }
+
+    
+    public void setMapName(String mapName) {
+        this.mapName = mapName;
+    }
+
+
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(41, 37).append(markerName).append(linkageGroup).append(startPosition).toHashCode();
+        final int prime = 31;
+        int result = 1;
+        result = prime * result
+                + ((linkageGroup == null) ? 0 : linkageGroup.hashCode());
+        result = prime * result + ((mapName == null) ? 0 : mapName.hashCode());
+        result = prime * result
+                + ((markerId == null) ? 0 : markerId.hashCode());
+        result = prime * result
+                + ((markerName == null) ? 0 : markerName.hashCode());
+        result = prime * result
+                + ((startPosition == null) ? 0 : startPosition.hashCode());
+        return result;
     }
-    
+
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (obj == this) {
+        if (this == obj)
             return true;
-        }
-        if (!(obj instanceof MapInfo)) {
+        if (obj == null)
             return false;
-        }
-
+        if (getClass() != obj.getClass())
+            return false;
         MapInfo rhs = (MapInfo) obj;
-        return new EqualsBuilder().appendSuper(super.equals(obj)).append(markerName, rhs.markerName)
-                .append(linkageGroup, rhs.linkageGroup).append(startPosition, rhs.startPosition).isEquals();
+        return new EqualsBuilder().appendSuper(super.equals(obj)).append(markerId, rhs.markerId)
+        .append(linkageGroup, rhs.linkageGroup).append(startPosition, rhs.startPosition)
+        .append(mapName, rhs.mapName).append(markerName, rhs.markerName).isEquals();
     }
-    
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("MapInfo [markerName=");
+        builder.append("MapInfo [markerId=");
+        builder.append(markerId);
+        builder.append(", markerName=");
         builder.append(markerName);
+        builder.append(", mapName=");
+        builder.append(mapName);
         builder.append(", linkageGroup=");
         builder.append(linkageGroup);
         builder.append(", startPosition=");
@@ -96,5 +134,12 @@ public class MapInfo implements Serializable{
         builder.append("]");
         return builder.toString();
     }
+    
+    public static MapInfo build(MappingData mapData){
+        return new MapInfo(mapData.getMarkerId(), mapData.getMarkerName(), mapData.getMapName(), 
+                mapData.getLinkageGroup(), mapData.getStartPosition());
+    }
+    
+
 
 }
