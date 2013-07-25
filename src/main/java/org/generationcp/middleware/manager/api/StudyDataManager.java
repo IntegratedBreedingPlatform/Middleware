@@ -31,6 +31,7 @@ import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -45,7 +46,8 @@ import org.generationcp.middleware.manager.Database;
 public interface StudyDataManager {
 
 	/**
-	 * Get the Study for a specific study id.
+	 * Get the Study for a specific study id. 
+     * Retrieves from central if the given ID is positive, otherwise retrieves from local.
 	 * 
 	 * @param studyId the study's unique id
 	 * @return the study or null if not found
@@ -54,93 +56,102 @@ public interface StudyDataManager {
 	Study getStudy(int studyId) throws MiddlewareQueryException;
 
 	/**
-	 * Returns list of root or top-level folders from specified database
+	 * Returns list of root or top-level folders from specified database.
 	 * 
-	 * @param instance
-	 *            - can be CENTRAL or LOCAL
-	 * @return List of Folder POJOs or null if none found
+	 * @param instance Can be CENTRAL or LOCAL
+	 * @return List of Folder POJOs or empty list if none found
 	 * @throws MiddlewareQueryException 
 	 */
 	List<FolderReference> getRootFolders(Database instance) throws MiddlewareQueryException;
 	
 	
 	/**
-	 * Returns list of children of a folder given its id from the specified database
+	 * Returns list of children of a folder given its ID. 
+     * Retrieves from central if the given ID is positive, otherwise retrieves from local.
 	 * 
-	 * @param folderId
-	 *            - the id of the folder to match
-	 * @param instance
-	 *            - can be CENTRAL or LOCAL
-	 * @return List of AbstractNode (FolderNode, StudyNode) POJOs or null if none found
+	 * @param folderId The id of the folder to match
+	 * @param instance Can be CENTRAL or LOCAL
+	 * @return List of AbstractNode (FolderNode, StudyNode) POJOs or empty list if none found
 	 * @throws MiddlewareQueryException 
 	 */
 	List<Reference> getChildrenOfFolder(int folderId) throws MiddlewareQueryException;
 	
 	
 	/**
-	 * Returns the list of dataset nodes for a specific study.
-	 * Retrieves from central if studyId is positive, otherwise retrieves from local.
+	 * Returns the list of DataSet references for a specific study.
+	 * Retrieves from central if the given ID is positive, otherwise retrieves from local.
 	 * 
-	 * @param studyId 
-	 * 			- the study id to match
-	 * @return List of DatasetNodes belonging to the study
+	 * @param studyId  The study id to match
+	 * @return List of DatasetReferences belonging to the study or empty list if none found
 	 * @throws MiddlewareQueryException
 	 */
 	List<DatasetReference> getDatasetReferences(int studyId) throws MiddlewareQueryException;
 	
 	/**
+	 * Returns the DataSet corresponding to the given dataset ID.
+     * Retrieves from central if the given ID is positive, otherwise retrieves from local.
+	 * 
 	 * @param dataSetId
-	 * @return
+	 * @return The DataSet matching the given ID or null if none found
 	 * @throws MiddlewareQueryException
 	 */
 	DataSet getDataSet(int dataSetId) throws MiddlewareQueryException;
 	
+
 	/**
-	 * Get experiments from a dataset.  Each experiment contains 
-	 * @param datasetId
-	 * @param startIndex
-	 * @param numRows
-	 * @return
+	 * Gets the experiments given a dataset ID. 
+	 * 
+	 * @param dataSetId The dataset ID to match
+	 * @param start The start index of the rows to retrieve
+	 * @param numOfRows The number of items to retrieve
+	 * @return List of Experiments associated to the dataset ID or empty list if none found
+	 * @throws MiddlewareQueryException
 	 */
 	List<Experiment> getExperiments(int dataSetId, int start, int numOfRows) throws MiddlewareQueryException;
 	
 	/**
-	 * Get the count of the number of experiments in a dataset.
+	 * Get the number of experiments in a dataset.
+     * Retrieves from central if the given ID is positive, otherwise retrieves from local.
+	 * 
 	 * @param dataSetId
-	 * @return
+	 * @return the count
 	 */
 	long countExperiments(int dataSetId) throws MiddlewareQueryException;
 	
 	/**
 	 * Returns the list of study references for a particular search filter.
 	 *
-	 * @param filter
-	 * @param numOfRows
-	 * @return
+	 * @param filter The filter for the search 
+	 *                 - could be an instance of BrowseStudyQueryFilter, GidStudyQueryFilter, ParentFolderStudyQueryFilter.
+	 * @param numOfRows The number of rows to retrieve
+	 * @return The result set containing the matching studies
 	 * @throws MiddlewareQueryException
 	 */
 	StudyResultSet searchStudies(StudyQueryFilter filter, int numOfRows) throws MiddlewareQueryException;
 	
 	/**
 	 * Returns the list of factors for a specific study.
+     * Retrieves from central if the given ID is positive, otherwise retrieves from local.
 	 * 
-	 * @param studyId
-	 * @return
+	 * @param studyId 
+	 * @return The factors of the study stored in a VariableTypeList
 	 * @throws MiddlewareQueryException
 	 */
 	VariableTypeList getAllStudyFactors(int studyId) throws MiddlewareQueryException;
 	
 	/**
 	 * Returns the list of variates for a specific study.
+     * Retrieves from central if the given ID is positive, otherwise retrieves from local.
 	 * 
 	 * @param studyId
-	 * @return
+	 * @return The variates of the study stored in a VariableTypeList
 	 * @throws MiddlewareQueryException
 	 */
 	VariableTypeList getAllStudyVariates(int studyId) throws MiddlewareQueryException;
 	
     /**
-	 * Adds a study. Adds an entry into Project, ProjectProperty, ProjectRelationships and Experiment 
+	 * Adds a study to the local database. 
+	 * Adds an entry into Project, ProjectProperty, ProjectRelationships and Experiment.
 	 * Inserts constants and conditions listed in variableTypeList. 
 	 * Sets the parent to the given parentFolderId input parameter. 
 	 * 
@@ -153,12 +164,12 @@ public interface StudyDataManager {
     StudyReference addStudy(int parentFolderId, VariableTypeList variableTypeList, StudyValues studyValues) throws MiddlewareQueryException;
     
     /**
-     * Adds a dataset, dataset labels (factors and variate labels), and parent study association.
+     * Adds a dataset, dataset labels (factors and variate labels), and parent study association in the local database.
      *
      * @param studyId
      * @param variableTypeList
      * @param datasetValues
-     * @return
+     * @return DatasetReference corresponding to the newly-created DataSet
      * @throws MiddlewareQueryException
      */
     DatasetReference addDataSet(int studyId, VariableTypeList variableTypeList, DatasetValues datasetValues) throws MiddlewareQueryException;
@@ -172,78 +183,94 @@ public interface StudyDataManager {
     void addDataSetVariableType(int datasetId, VariableType variableType) throws MiddlewareQueryException;
     
     /**
-     * @param datasetId
-     * @param experimentId
-     * @param variableId
-     * @param value
+     * Updates an Experiment to contain the given value.
+     * 
+     * @param experimentId The ID of the experiment to update
+     * @param variableId The standard variable ID
+     * @param value The value to set
      */
     void setExperimentValue(int experimentId, int variableId, String value) throws MiddlewareQueryException;
     
     /**
      * Adds an experiment row to the dataset.
      * 
-     * @param dataSetId
-     * @param experimentValues
+     * @param dataSetId The ID of the dataset to add the experiment into
+     * @param experimentType The type of Experiment - could be ExperimentType.PLOT, ExperimentType.SAMPLE, ExperimentType.AVERAGE, ExperimentType.SUMMARY
+     * @param experimentValues The values to set
      * @throws MiddlewareQueryException
      */
     void addExperiment(int dataSetId, ExperimentType experimentType, ExperimentValues experimentValues) throws MiddlewareQueryException;
     
     /**
+     * Adds a Trial Environment.
      * Accepts a variable list and sets up the trial environment data in the local database.
      * It will throw an exception if the variable in the variable list passed is not recognized for trial environment.
-     * It will return the ID of the trial environment data created.
      * 
      * @param variableList
-     * @return
+     * @return ID of the trial environment data created.
      * @throws MiddlewareQueryException
      */
     int addTrialEnvironment(VariableList variableList) throws MiddlewareQueryException;
     
     /**
+     * Adds a Stock entry.
      * Accepts a variable list and sets up the stock data in the local database.
      * It will throw an exception if the variable in the variable list is not a stock variable.
-     * It will return the ID of the stock data created.
      * 
      * @param variableList
-     * @return
+     * @return ID of the stock data created
      * @throws MiddlewareQueryException
      */
     int addStock(VariableList variableList) throws MiddlewareQueryException;
     
     /**
+     * Returns a list of datasets based on the given type. 
+     * Retrieves from central if the given ID is positive, otherwise retrieves from local.
      * 
      * @param studyId
      * @param dataSetType
-     * @return
+     * @return The list of datasets matching the dataSetType or empty list if non found.
      */
     List<DataSet> getDataSetsByType(int studyId, DataSetType dataSetType) throws MiddlewareQueryException;
     
     /**
+     * Returns the number of experiments matching the given trial environment and variate.
+     * Counts from central if the given ID is positive, otherwise counts from local.
+     * 
      * @param trialEnvironmentId
      * @param variateVariableId
-     * @return
+     * @return The count
      */
     long countExperimentsByTrialEnvironmentAndVariate(int trialEnvironmentId, int variateVariableId) throws MiddlewareQueryException;
 
     /**
+     * Retrieves the trial environments belonging to the given dataset.
+     * Retrieves from central if the given ID is positive, otherwise retrieves from local.
+     * 
      * @param datasetId
-     * @return
+     * @return The trial environments
      * @throws MiddlewareQueryException
      */
     TrialEnvironments getTrialEnvironmentsInDataset(int datasetId) throws MiddlewareQueryException;
     
     /**
+     * Retrieves the stocks belonging to the given dataset.
+     * Retrieves from central if the given ID is positive, otherwise retrieves from local.
+     * 
      * @param datasetId
-     * @return
+     * @return The stocks
      * @throws MiddlewareQueryException
      */
     Stocks getStocksInDataset(int datasetId) throws MiddlewareQueryException;
     
     /**
+     * Returns the number of stocks matching the given dataset ID, trial environment ID and variate ID.
+     * Counts from central if the given ID is positive, otherwise counts from local.
+     * 
      * @param datasetId
      * @param trialEnvironmentId
      * @param variateStdVarId
-     * @return
+     * @return The count
      * @throws MiddlewareQueryException
      */
     long countStocks(int datasetId, int trialEnvironmentId, int variateStdVarId) throws MiddlewareQueryException;
@@ -260,12 +287,16 @@ public interface StudyDataManager {
     DataSet findOneDataSetByType(int studyId, DataSetType type) throws MiddlewareQueryException;
     
     /**
+     * Deletes the dataset matching the given ID.
+     * 
      * @param datasetId
      * @throws MiddlewareQueryException
      */
     void deleteDataSet(int datasetId) throws MiddlewareQueryException;
     
     /**
+     * Deletes location matching the given dataset ID and location ID.
+     * 
      * @param datasetId
      * @param locationId
      * @throws MiddlewareQueryException
@@ -273,9 +304,12 @@ public interface StudyDataManager {
     void deleteExperimentsByLocation(int datasetId, int locationId) throws MiddlewareQueryException;
     
     /**
-	 * @param id
-	 * @return
-	 * @throws MiddlewareQueryException
-	 */
-	String getLocalNameByStandardVariableId(Integer projectId, Integer standardVariableId) throws MiddlewareQueryException;
+     * Retrieves the local name associated to the given project ID and standard variable ID.
+     * 
+     * @param projectId
+     * @param standardVariableId
+     * @return The local name
+     * @throws MiddlewareQueryException
+     */
+    String getLocalNameByStandardVariableId(Integer projectId, Integer standardVariableId) throws MiddlewareQueryException;
 }
