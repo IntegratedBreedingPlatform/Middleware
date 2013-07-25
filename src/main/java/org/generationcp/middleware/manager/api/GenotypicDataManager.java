@@ -1799,4 +1799,12 @@ public interface GenotypicDataManager{
      */
     public long getLastId(Database instance, GdmsTable gdmsTable) throws MiddlewareQueryException;
     
+    /**
+     * Adds MTA, Dataset, and DatasetUsers records to the database.
+     * @param dataset
+     * @param mta
+     * @param users
+     * @throws MiddlewareQueryException
+     */
+    public void addMTA(Dataset dataset, Mta mta, DatasetUsers users) throws MiddlewareQueryException;
 }

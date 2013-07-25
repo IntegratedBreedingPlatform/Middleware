@@ -14,6 +14,7 @@ package org.generationcp.middleware.manager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -2351,6 +2352,34 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	public long getLastId(Database instance, GdmsTable gdmsTable) throws MiddlewareQueryException {
 		setWorkingDatabase(instance);
 		return GenericDAO.getLastId(getActiveSession(), instance, gdmsTable.getTableName(), gdmsTable.getIdName());
+	}
+
+	@Override
+	public void addMTA(Dataset dataset, Mta mta, DatasetUsers users) throws MiddlewareQueryException {
+       requireLocalDatabaseInstance();
+       Session session = getCurrentSessionForLocal();
+       Transaction trans = null;
+       
+       try {
+           trans = session.beginTransaction();
+           
+           dataset.setDatasetId(getDatasetDao().getNegativeId("datasetId"));
+           dataset.setDatasetType("MTA");
+           dataset.setUploadTemplateDate(new Date());
+           getDatasetDao().save(dataset);
+           
+           users.setDatasetId(dataset.getDatasetId());
+           getDatasetUsersDao().save(users);
+           
+           mta.setMtaId(getMtaDao().getNegativeId("mtaId"));
+           mta.setDatasetId(dataset.getDatasetId());
+           getMtaDao().save(mta);
+           
+           trans.commit();
+       } catch (Exception e) {
+           rollbackTransaction(trans);
+           logAndThrowException("Error in GenotypicDataManager.addMTA: " + e.getMessage(), e);
+       }
 	}
  
 }

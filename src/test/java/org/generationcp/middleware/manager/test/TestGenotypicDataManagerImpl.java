@@ -2101,6 +2101,16 @@ public class TestGenotypicDataManagerImpl{
     	}    	
     }
     
+    @Test
+    public void testAddMTA() throws Exception {
+    	Dataset dataset = new Dataset(null, "TEST DATASET NAME", "DATASET DESC", "MTA", "GENUS", "SPECIES", null, "REMARKS", 
+    			"int", null, "METHOD", "0.43", "INSTITUTE", "PI", "EMAIL", "OBJECTIVE");
+    	Mta mta = new Mta(null, 1, null, 1, "LINKAGE GROUP", 2.1f, 3, 1, "HVALLELE", "EXPERIMENT", 3.3f, 2.2f);
+    	DatasetUsers users = new DatasetUsers(null, 1);
+    	manager.addMTA(dataset, mta, users);
+    	System.out.println("done with testAddMTA");
+    }
+    
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();
