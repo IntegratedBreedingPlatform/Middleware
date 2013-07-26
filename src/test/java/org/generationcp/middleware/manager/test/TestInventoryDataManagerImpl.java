@@ -184,7 +184,7 @@ public class TestInventoryDataManagerImpl{
         List<Integer> idList = manager.addLot(lots);
 
         if (lot.getId() != null) {
-            System.out.println("testAddLot() Added: " + lot);
+            System.out.println("testAddLot() Added: " + idList);
         }
 
         //TODO: delete lots
@@ -309,8 +309,8 @@ public class TestInventoryDataManagerImpl{
     }
 
     @Test
-    public void countAllReserveTransactions() throws Exception {
-        System.out.println("countAllReserveTransactions(): " + manager.countAllReserveTransactions());
+    public void testCountAllReserveTransactions() throws Exception {
+        System.out.println("CountAllReserveTransactions(): " + manager.countAllReserveTransactions());
     }
 
     @Test
@@ -324,7 +324,7 @@ public class TestInventoryDataManagerImpl{
     }
 
     @Test
-    public void countAllDepositTransactions() throws Exception {
+    public void testCountAllDepositTransactions() throws Exception {
         System.out.println("countAllDepositTransactions(): " + manager.countAllDepositTransactions());
     }
 
@@ -340,9 +340,9 @@ public class TestInventoryDataManagerImpl{
     }
 
     @Test
-    public void countAllReserveTransactionsByRequestor() throws Exception {
+    public void testCountAllReserveTransactionsByRequestor() throws Exception {
         Integer personId = Integer.valueOf(253);
-        System.out.println("countAllReserveTransactionsByRequestor(" + personId + "): "
+        System.out.println("CountAllReserveTransactionsByRequestor(" + personId + "): "
                 + manager.countAllReserveTransactionsByRequestor(personId));
     }
 
@@ -358,10 +358,9 @@ public class TestInventoryDataManagerImpl{
     }
 
     @Test
-    public void countAllDepositTransactionsByDonor() throws Exception {
+    public void testCountAllDepositTransactionsByDonor() throws Exception {
         Integer personId = Integer.valueOf(253);
-        System.out
-                .println("countAllDepositTransactionsByDonor(" + personId + ") : " + manager.countAllDepositTransactionsByDonor(personId));
+        System.out.println("CountAllDepositTransactionsByDonor(" + personId + ") : " + manager.countAllDepositTransactionsByDonor(personId));
     }
 
     @Test
@@ -472,6 +471,43 @@ public class TestInventoryDataManagerImpl{
         for (LotReportRow row : report)
             System.out.println("  " + row);
     }
+    
+    @Test
+    public void testCountAllUncommittedTransactions() throws Exception {
+        System.out.println("testCountAllUncommittedTransactions() Results: " + manager.countAllUncommittedTransactions());
+    }
+    
+    @Test
+    public void testCountAllWithdrawalTransactions() throws Exception {
+        System.out.println("testCountAllWithdrawalTransactions() Results: " + manager.countAllWithdrawalTransactions());
+    }
+
+    @Test
+    public void testCountAllLots() throws Exception {
+        System.out.println("testCountAllLots() Results: " + manager.countAllLots());
+    }
+    
+    @Test
+    public void testGetAllLots() throws Exception {
+        List<Lot> results = manager.getAllLots(0,50);
+        Assert.assertNotNull(results);
+        Assert.assertTrue(!results.isEmpty());
+        System.out.println("testGetAllLots() Results:");
+        for (Lot result : results){
+    	   System.out.println(result);
+       }
+       System.out.println("Number of records: " +results.size());
+    }
+    
+    @Test
+    public void testGetTransactionById() throws Exception {
+        Integer id = -1;
+        Transaction transactionid = manager.getTransactionById(id);
+		Assert.assertNotNull(transactionid);
+		System.out.println("testGetTransactionById("+id+") Results:");
+		System.out.println(transactionid);
+    }
+    
 
     @AfterClass
     public static void tearDown() throws Exception {
