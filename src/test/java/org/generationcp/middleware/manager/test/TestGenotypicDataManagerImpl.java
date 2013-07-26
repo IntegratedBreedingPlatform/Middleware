@@ -270,8 +270,10 @@ public class TestGenotypicDataManagerImpl{
         Integer datasetId = Integer.valueOf(2);
         long count = manager.countAllelicValuesFromCharValuesByDatasetId(datasetId);
         List<AllelicValueWithMarkerIdElement> allelicValues = manager.getAllelicValuesFromCharValuesByDatasetId(datasetId, 0, (int) count);
-        System.out.println("testGetAllelicValuesFromCharValuesByDatasetId(" + datasetId + ") RESULTS: " + allelicValues.size()
-                + allelicValues);
+        System.out.println("testGetAllelicValuesFromCharValuesByDatasetId(" + datasetId + ") RESULTS: " + allelicValues.size());
+        for(AllelicValueWithMarkerIdElement results : allelicValues) {
+        	System.out.println(results);
+        }
     }
 
     @Test
@@ -280,8 +282,10 @@ public class TestGenotypicDataManagerImpl{
         long count = manager.countAllelicValuesFromAlleleValuesByDatasetId(datasetId);
         List<AllelicValueWithMarkerIdElement> allelicValues = manager
                 .getAllelicValuesFromAlleleValuesByDatasetId(datasetId, 0, (int) count);
-        System.out.println("testGetAllelicValuesFromAlleleValuesByDatasetId(dataset=" + datasetId + ") RESULTS: " + allelicValues.size()
-                + allelicValues);
+        System.out.println("testGetAllelicValuesFromAlleleValuesByDatasetId(dataset=" + datasetId + ") RESULTS: " + allelicValues.size());
+        for(AllelicValueWithMarkerIdElement results : allelicValues) {
+        	System.out.println(results);
+        }
     }
 
     @Test
@@ -1812,7 +1816,7 @@ public class TestGenotypicDataManagerImpl{
     
     @Test
     public void testGetAllMaps() throws Exception {
-    List<Map> results= manager.getAllMaps(1, 100, Database.LOCAL);
+    List<Map> results= manager.getAllMaps(0, 100, Database.LOCAL);
     Assert.assertNotNull(results);
     Assert.assertTrue(!results.isEmpty());
     System.out.println("testGetAllMaps("+Database.LOCAL+") Results:");
