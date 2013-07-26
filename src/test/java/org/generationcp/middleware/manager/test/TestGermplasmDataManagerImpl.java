@@ -1078,7 +1078,7 @@ public class TestGermplasmDataManagerImpl{
     
     @Test
     public void testGetAllGermplasm() throws Exception {
-    	List<Germplasm> germplasms = manager.getAllGermplasm(1, 100, Database.CENTRAL);
+    	List<Germplasm> germplasms = manager.getAllGermplasm(0, 100, Database.CENTRAL);
     	Assert.assertNotNull(germplasms);
         Assert.assertTrue(!germplasms.isEmpty());
         System.out.println("testGetAllLocations Results: ");
@@ -1122,7 +1122,7 @@ public class TestGermplasmDataManagerImpl{
     @Test
     public void testGetGroupRelatives() throws Exception {
     	Integer gid = Integer.valueOf(1);
-    	List<Germplasm> grouprel = manager.getGroupRelatives(gid, 1, 100);
+    	List<Germplasm> grouprel = manager.getGroupRelatives(gid, 0, 100);
     	Assert.assertNotNull(grouprel);
         Assert.assertTrue(!grouprel.isEmpty());
         System.out.println("testGetGroupRelatives("+gid+") Results: ");
@@ -1144,7 +1144,7 @@ public class TestGermplasmDataManagerImpl{
     @Test
     public void testGetLocationDetailsByLocId() throws Exception {
     	Integer locationId = Integer.valueOf(2);
-    	List<LocationDetails> locdetails = manager.getLocationDetailsByLocId(locationId, 1, 100);
+    	List<LocationDetails> locdetails = manager.getLocationDetailsByLocId(locationId, 0, 100);
     	Assert.assertNotNull(locdetails);
         Assert.assertTrue(!locdetails.isEmpty());
         System.out.println("testGetLocationDetailsByLocId("+locationId+") Results: ");
@@ -1158,7 +1158,7 @@ public class TestGermplasmDataManagerImpl{
     public void testGetManagementNeighbors() throws Exception {
     	Integer gid = Integer.valueOf(2);
     	long count = manager.countManagementNeighbors(gid);
-    	List<Germplasm> mneighbors = manager.getManagementNeighbors(gid, 1, (int) count);
+    	List<Germplasm> mneighbors = manager.getManagementNeighbors(gid, 0, (int) count);
     	Assert.assertNotNull(mneighbors);
     	Assert.assertTrue(!mneighbors.isEmpty());
         System.out.println("testGetManagementNeighbors("+gid+") Results: ");
@@ -1199,7 +1199,7 @@ public class TestGermplasmDataManagerImpl{
     @Test
     public void testGetDescendants() throws Exception {
     	Integer id = Integer.valueOf(2);
-    	List<Object[]> results = manager.getDescendants(id, 1, 100);
+    	List<Object[]> results = manager.getDescendants(id, 0, 100);
     	assertNotNull(results);
     	Assert.assertTrue(!results.isEmpty());
         System.out.println("testGetDescendants Results: ");
