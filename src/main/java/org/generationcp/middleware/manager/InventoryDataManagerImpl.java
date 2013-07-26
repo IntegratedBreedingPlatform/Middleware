@@ -477,7 +477,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
         return report;
     }
 
-    public Person getPersonById(Integer id) throws MiddlewareQueryException {
+    private Person getPersonById(Integer id) throws MiddlewareQueryException {
         if (setWorkingDatabase(id)) {
             return getPersonDao().getById(id, false);
         }

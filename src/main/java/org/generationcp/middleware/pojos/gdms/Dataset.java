@@ -87,13 +87,34 @@ public class Dataset implements Serializable{
     		;
     
     public static final String COUNT_DATASET_NAMES_BY_QTL_ID = 
-    		"SELECT COUNT(DISTINCT CONCAT(dataset_name,'')) "
-			+ "FROM gdms_dataset gd "
-    		+ "INNER JOIN "
-    		+ "gdms_qtl gq ON gd.dataset_id = gq.dataset_id " 
-    		+ "WHERE gq.qtl_id = :qtlId "
-    		;
+            "SELECT COUNT(DISTINCT CONCAT(dataset_name,'')) "
+            + "FROM gdms_dataset gd "
+            + "INNER JOIN "
+            + "gdms_qtl gq ON gd.dataset_id = gq.dataset_id " 
+            + "WHERE gq.qtl_id = :qtlId "
+            ;
     
+    public static final String GET_DATASETS_BY_IDS = 
+            "SELECT dataset_id "
+                    + ", CONCAT(dataset_name, '')  "
+                    + ", dataset_desc  "
+                    + ", CONCAT(dataset_type, '')  "
+                    + ", CONCAT(genus, '')  "
+                    + ", CONCAT(species, '')  "
+                    + ", upload_template_date  "
+                    + ", remarks  "
+                    + ", CONCAT(datatype, '')  "
+                    + ", missing_data  "
+                    + ", method  "
+                    + ", score  "
+                    + ", institute  "
+                    + ", principal_investigator  "
+                    + ", email  "
+                    + ", purpose_of_study  " 
+            + "FROM gdms_dataset "
+            + "WHERE dataset_id in (:datasetIds) "
+            ;
+
     @Id
     @Basic(optional = false)
     @Column(name = "dataset_id")

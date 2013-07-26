@@ -1875,10 +1875,15 @@ public class TestGenotypicDataManagerImpl{
         }
     }
     @Test
-    public void testGetDatasetDetailsByDatasetId() throws Exception {
-        Integer datasetId = 5; 
-        Dataset dataset = manager.getDatasetDetailsByDatasetId(datasetId);
-        System.out.println("testGetDatasetDetailsByDatasetId(" + datasetId + "): " + dataset);
+    public void testGetDatasetDetailsByDatasetIds() throws Exception {
+        List<Integer> datasetIds = Arrays.asList(3, 4, 5); 
+        List<Dataset> result = manager.getDatasetDetailsByDatasetIds(datasetIds);
+        System.out.println("testGetDatasetDetailsByDatasetId(" + datasetIds + "): " + result.size());
+        if (result != null) {
+            for (Dataset elem : result) {
+                Debug.println(4, elem.toString());
+            }
+        }
     }
     
     @Test

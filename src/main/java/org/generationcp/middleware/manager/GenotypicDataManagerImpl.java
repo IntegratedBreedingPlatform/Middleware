@@ -2132,11 +2132,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
 
     @Override
-    public Dataset getDatasetDetailsByDatasetId(Integer datasetId) throws MiddlewareQueryException{
-        if (setWorkingDatabase(datasetId)){
-            return getDatasetDao().getById(datasetId);   
-        }
-        return null;
+    public List<Dataset> getDatasetDetailsByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException{
+        return super.getFromInstanceByIdAndMethod(getDatasetDao(), datasetIds.get(0), 
+                "getDatasetsByIds", new Object[] { datasetIds }, new Class[] { List.class });
     }
     
     @Override

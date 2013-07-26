@@ -53,6 +53,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
         return (List<User>) getAllFromCentralAndLocal(getUserDao());
     }
 
+    @Override
     public long countAllUsers() throws MiddlewareQueryException {
         return countAllFromCentralAndLocal(getUserDao());
     }
@@ -243,6 +244,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
         return false;
     }
     
+    @Override
     public User getUserByUserName(String userName) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
         return getUserDao().getUserByUserName(userName);

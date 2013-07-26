@@ -13,6 +13,7 @@ package org.generationcp.middleware.dao.gdms;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
@@ -136,7 +137,6 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer>{
             logAndThrowException("Error with getDatasetNamesByQtlId() query from Dataset: " + e.getMessage(), e);
         }
         return new ArrayList<String>();
-
 	}
 
 	public long countDatasetNamesByQtlId(Integer qtlId)
@@ -170,4 +170,44 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer>{
 			logAndThrowException("Error in deleteByDatasetId=" + datasetId + " in DatasetDAO: " + e.getMessage(), e);
 		}
     }
+	
+	@SuppressWarnings("rawtypes")
+    public List<Dataset> getDatasetsByIds(List<Integer> datasetIds) throws MiddlewareQueryException{
+	    List<Dataset> dataValues = new ArrayList<Dataset>();
+        try {
+            if (datasetIds != null && datasetIds.get(0) != null){
+                SQLQuery query = getSession().createSQLQuery(Dataset.GET_DATASETS_BY_IDS);
+                query.setParameterList("datasetIds", datasetIds);
+                List results = query.list();
+                for (Object o : results) {
+                    Object[] result = (Object[]) o;
+                    if (result != null) {
+                        Integer datasetId = (Integer) result[0];
+                        String datasetName = (String) result[1];
+                        String datasetDesc = (String) result[2];
+                        String datasetType = (String) result[3];
+                        String genus = (String) result[4];
+                        String species = (String) result[5];
+                        Date uploadTemplateDate = (Date) result[6];
+                        String remarks = (String) result[7];
+                        String dataType = (String) result[8];
+                        String missingData = (String) result[9];
+                        String method = (String) result[10];
+                        String score = (String) result[11];
+                        String institute = (String) result[12];
+                        String principalInvestigator = (String) result[13];
+                        String email = (String) result[14];
+                        String purposeOfStudy = (String) result[15];
+                        
+                        Dataset dataset = new Dataset(datasetId, datasetName, datasetDesc, datasetType, genus, species, uploadTemplateDate, remarks, dataType, missingData,
+                                method, score, institute, principalInvestigator, email, purposeOfStudy);
+                        dataValues.add(dataset);
+                    }
+                }
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getDatasetsByIds() query from Dataset: " + e.getMessage(), e);
+        }
+        return dataValues;
+	}
 }
