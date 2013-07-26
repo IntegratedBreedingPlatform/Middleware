@@ -491,7 +491,7 @@ public class TestGermplasmListManagerImpl{
     @Test
     public void testGetGermplasmListByParentFolderId() throws Exception {
     	Integer parentId = Integer.valueOf(54);
-    	List<GermplasmList> results = manager.getGermplasmListByParentFolderId(parentId, 1, 100);
+    	List<GermplasmList> results = manager.getGermplasmListByParentFolderId(parentId, 0, 100);
         Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
         System.out.println("testGetGermplasmListByParentFolderId("+parentId+") Results: ");
