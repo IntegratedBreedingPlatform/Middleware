@@ -276,10 +276,11 @@ public class TestGenotypicDataManagerImpl{
     @Test
     public void testGetAllelicValuesFromAlleleValuesByDatasetId() throws Exception {
         Integer datasetId = Integer.valueOf(2);
-        long count = manager.countAllelicValuesFromCharValuesByDatasetId(datasetId);
+        long count = manager.countAllelicValuesFromAlleleValuesByDatasetId(datasetId);
         List<AllelicValueWithMarkerIdElement> allelicValues = manager
                 .getAllelicValuesFromAlleleValuesByDatasetId(datasetId, 0, (int) count);
-        System.out.println("testGetAllelicValuesFromAlleleValuesByDatasetId(" + datasetId + ") RESULTS: " + allelicValues);
+        System.out.println("testGetAllelicValuesFromAlleleValuesByDatasetId(dataset=" + datasetId + ") RESULTS: " + allelicValues.size()
+                + allelicValues);
     }
 
     @Test
