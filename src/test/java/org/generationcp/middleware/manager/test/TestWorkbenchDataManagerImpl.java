@@ -14,7 +14,11 @@ package org.generationcp.middleware.manager.test;
 
 import java.util.*;
 
+import junit.framework.Assert;
+
 import org.generationcp.middleware.dao.ToolConfigurationDAO;
+import org.generationcp.middleware.dao.ProjectUserInfoDAO;
+import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionPerThreadProvider;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -23,6 +27,7 @@ import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.Lot;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -30,14 +35,20 @@ import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectLocationMap;
 import org.generationcp.middleware.pojos.workbench.ProjectMethod;
+import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount;
 import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
+import org.generationcp.middleware.pojos.workbench.WorkbenchSetting;
 import org.generationcp.middleware.pojos.workbench.Role;
+import org.generationcp.middleware.pojos.workbench.UserInfo;
+import org.generationcp.middleware.pojos.workbench.SecurityQuestion;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
+import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 import org.generationcp.middleware.pojos.workbench.ProjectBackup;
+import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -62,13 +73,13 @@ public class TestWorkbenchDataManagerImpl{
         Project project1 = new Project();
         project1.setProjectName("Test Project 1");
         project1.setUserId(1);
-        project1.setCropType(manager.getCropTypeByName(CropType.CHICKPEA));
+        project1.setCropType(manager.getCropTypeByName(CropType.RICE));
         project1.setStartDate(new GregorianCalendar().getTime());
         project1.setLastOpenDate(new GregorianCalendar().getTime());
 
         Project project2 = new Project();
         project2.setProjectName("Test Project 2");
-        project2.setCropType(manager.getCropTypeByName(CropType.CHICKPEA));
+        project2.setCropType(manager.getCropTypeByName(CropType.RICE));
         project2.setStartDate(new GregorianCalendar().getTime());
         project2.setLastOpenDate(new GregorianCalendar().getTime());
 
@@ -731,10 +742,309 @@ public class TestWorkbenchDataManagerImpl{
         // cleanup
         manager.deleteProjectBackup(projectBackup);
     }
-    
+ 
     //TODO testAddIbdbUserMap()
     
     //TODO testUpdateWorkbenchRuntimeData()
+    
+    
+    @Test
+    public void testCountAllPersons() throws MiddlewareQueryException {
+    	long count = manager.countAllPersons(); 
+    	Assert.assertNotNull(count);
+        System.out.println("testCountAllPersons: " + count );
+    }
+    
+    @Test
+    public void testCountAllUsers() throws MiddlewareQueryException {
+    	long count = manager.countAllUsers(); 
+    	Assert.assertNotNull(count);
+        System.out.println("testCountAllUsers: " + count );
+    }
+    
+    @Test
+    public void testGetAllPersons() throws MiddlewareQueryException {
+    	List<Person> results = manager.getAllPersons();
+        Assert.assertNotNull(results);
+        Assert.assertTrue(!results.isEmpty());
+        System.out.println("testGetAllPersons Results:");
+        for (Person result : results){
+    	   System.out.println(result);
+       }
+    }
+    
+    @Test
+    public void testGetAllRolesDesc() throws MiddlewareQueryException {
+    	List<Role> results = manager.getAllRolesDesc();
+    	Assert.assertNotNull(results);
+        Assert.assertTrue(!results.isEmpty());
+        System.out.println("testGetAllRolesDesc Results:");
+        for (Role result : results){
+    	   System.out.println(result);
+       }
+    }
+    
+    @Test
+    public void testGetAllRolesOrderedByLabel() throws MiddlewareQueryException {
+    	List<Role> results = manager.getAllRolesOrderedByLabel();
+    	Assert.assertNotNull(results);
+        Assert.assertTrue(!results.isEmpty());
+        System.out.println("testGetAllRolesOrderedByLabel Results:");
+        for (Role result : results){
+    	   System.out.println(result);
+       }
+    }
+    
+    @Test
+    public void testGetAllTools() throws MiddlewareQueryException {
+    	List<Tool> results = manager.getAllTools();
+    	Assert.assertNotNull(results);
+        Assert.assertTrue(!results.isEmpty());
+        System.out.println("testGetAllTools Results:");
+        for (Tool result : results) {
+    	   System.out.println(result);
+       }
+    }
+    
+    @Test
+    public void testGetAllUsers() throws MiddlewareQueryException {
+    	List<User> results = manager.getAllUsers();
+    	Assert.assertNotNull(results);
+        Assert.assertTrue(!results.isEmpty());
+        System.out.println("testGetAllUsers Results:");
+        for (User result : results){
+        	System.out.println(result);
+        }
+    }
+    
+    @Test
+    public void testGetAllUsersSorted() throws MiddlewareQueryException {
+    	List<User> results = manager.getAllUsersSorted();
+    	Assert.assertNotNull(results);
+        Assert.assertTrue(!results.isEmpty());
+        System.out.println("testGetAllUsersSorted Results:");
+        for (User result : results) {
+        	System.out.println(result);
+       }
+    }
+    
+    @Test
+    public void testGetLastOpenedProject() throws MiddlewareQueryException {
+    	Integer userId = Integer.valueOf(1);
+    	Project results = manager.getLastOpenedProject(userId);
+        Assert.assertNotNull(results);
+        System.out.println("testGetLastOpenedProject Results:");
+        System.out.println(results);
+    }
+    
+    @Test
+    public void testGetPersonById() throws MiddlewareQueryException {
+    	int id = 1;
+    	Person results = manager.getPersonById(id);
+        Assert.assertNotNull(results);
+        System.out.println("testGetPersonById Results:");
+        System.out.println(results);
+    }
+
+    @Test
+    public void testGetProjectActivitiesByProjectId() throws MiddlewareQueryException {
+    	long projectId = 1; //change the projectid
+    	List<ProjectActivity> results = manager.getProjectActivitiesByProjectId(projectId, 1, 50);
+    	Assert.assertNotNull(results);
+        Assert.assertTrue(!results.isEmpty());
+        System.out.println("testGetProjectActivitiesByProjectId Results:");
+        for (ProjectActivity result : results){
+        	System.out.println(result);
+       }
+    }
+    
+    @Test
+    public void testGetProjectLocationMapByProjectId() throws MiddlewareQueryException {
+    	long projectId = 1; //change the project id
+    	List<ProjectLocationMap> results = manager.getProjectLocationMapByProjectId(projectId, 1, 50);
+    	Assert.assertNotNull(results);
+        Assert.assertTrue(!results.isEmpty());
+        System.out.println("testGetProjectLocationMapByProjectId Results:");
+        for (ProjectLocationMap result : results){
+        	System.out.println(result);
+       }
+    }
+    
+    @Test
+    public void testGetProjectUserRoleById() throws MiddlewareQueryException {
+    	Integer id = Integer.valueOf(1); //change the user id
+    	ProjectUserRole userrole = manager.getProjectUserRoleById(id);
+    	Assert.assertNotNull(userrole);
+        System.out.println("testGetProjectUserRoleById Results:");
+        System.out.println(userrole);
+    }
+    
+    @Test
+    public void testGetQuestionsByUserId() throws MiddlewareQueryException {
+    	Integer userId = Integer.valueOf(1); //change the user id
+    	List<SecurityQuestion> results = manager.getQuestionsByUserId(userId);
+    	Assert.assertNotNull(results);
+        Assert.assertTrue(!results.isEmpty());
+        System.out.println("testGetQuestionsByUserId Results:");
+        for (SecurityQuestion result : results) {
+        	System.out.println(result);
+        }
+    }
+    
+    @Test
+    public void testGetProjectsList() throws MiddlewareQueryException {
+    	List<Project> results = manager.getProjects(0, 100);
+        System.out.println("testGetProjectsList(): ");
+        for (Project result : results) {
+            System.out.println("  " + result);
+
+        }
+    }
+    
+    @Test
+    public void testGetProjectMethodByProject() throws MiddlewareQueryException {
+    	Project project = manager.getProjects().get(0);
+    	List<ProjectMethod> results = manager.getProjectMethodByProject(project, 0, 100);
+        System.out.println("testGetProjectMethodByProject(): ");
+        for (ProjectMethod result : results) {
+            System.out.println("  " + result);
+
+        }
+    } 
+    
+    @Test
+    public void testGetProjectsByUser() throws MiddlewareQueryException {
+    	User user = manager.getAllUsers().get(0);
+    	List<Project> results = manager.getProjectsByUser(user);
+        System.out.println("testGetProjectsByUser(): ");
+        for (Project result : results) {
+            System.out.println("  " + result);
+
+        }
+        System.out.println("Number of record/s: "+results.size());
+    } 
+    
+    @Test
+    public void testGetProjectUserRolesByProject() throws MiddlewareQueryException {
+    	Project project = manager.getProjects().get(0);
+    	List<ProjectUserRole> results = manager.getProjectUserRolesByProject(project);
+    	System.out.println("testGetProjectUserRolesByProject(): ");
+        for (ProjectUserRole result : results) {
+            System.out.println("  " + result);
+        }
+        System.out.println("Number of record/s: "+results.size());
+    }
+    
+    @Test
+    public void testGetUserById() throws MiddlewareQueryException {
+    	int id = 1;
+    	User user = manager.getUserById(id);
+    	Assert.assertNotNull(user);
+    	System.out.println("testGetUserById("+id+"): ");
+    	System.out.println(user);
+    }
+    
+    @Test
+    public void testGetWorkbenchDatasetById() throws MiddlewareQueryException  {
+        Long datasetId = 1L; //change datasetId value
+    	WorkbenchDataset result = manager.getWorkbenchDatasetById(datasetId);
+    	Assert.assertNotNull(result);
+    	System.out.println("testGetWorkbenchDatasetById("+datasetId+"): ");
+    	System.out.println(result);
+    }   
+    
+    @Test
+    public void testGetWorkbenchRuntimeData() throws MiddlewareQueryException  {
+    	WorkbenchRuntimeData result = manager.getWorkbenchRuntimeData();
+    	Assert.assertNotNull(result);
+    	System.out.println("testGetWorkbenchRuntimeData: ");
+    	System.out.println(result);
+    }  
+    
+    @Test
+    public void testGetWorkbenchSetting() throws MiddlewareQueryException  {
+    	WorkbenchSetting result = manager.getWorkbenchSetting();
+    	Assert.assertNotNull(result);
+    	System.out.println("testGetWorkbenchSetting: ");
+    	System.out.println(result);
+    }  
+    
+    @Test
+    public void testGetWorkflowTemplateByName() throws MiddlewareQueryException  {
+    	String name ="testing";
+    	List<WorkflowTemplate> results = manager.getWorkflowTemplateByName(name);
+    	Assert.assertNotNull(results);
+        Assert.assertTrue(!results.isEmpty());
+        System.out.println("testGetWorkflowTemplateByName("+name+") Results:");
+        for (WorkflowTemplate result : results) {
+        	System.out.println(result);
+        }
+    }
+    
+    @Test
+    public void testGetWorkflowTemplatesList() throws MiddlewareQueryException  {
+    	List<WorkflowTemplate> results = manager.getWorkflowTemplates();
+    	Assert.assertNotNull(results);
+        Assert.assertTrue(!results.isEmpty());
+        System.out.println("testGetWorkflowTemplatesList() Results:");
+        for (WorkflowTemplate result : results) {
+        	System.out.println(result);
+        }
+        System.out.println("Number of record/s: "+results.size());
+    } 
+    
+    @Test
+    public void testGetWorkflowTemplates() throws MiddlewareQueryException  {
+    	List<WorkflowTemplate> results = manager.getWorkflowTemplates(0, 100);
+    	Assert.assertNotNull(results);
+        Assert.assertTrue(!results.isEmpty());
+        System.out.println("testGetWorkflowTemplates() Results:");
+        for (WorkflowTemplate result : results) {
+        	System.out.println(result);
+        }
+        System.out.println("Number of record/s: "+results.size());
+    }
+    
+    @Test
+    public void testGetProjectUserInfoDao() throws MiddlewareQueryException  {
+    	ProjectUserInfoDAO results = manager.getProjectUserInfoDao();
+    	Assert.assertNotNull(results);
+        System.out.println("testGetWorkflowTemplates() Results:");
+        System.out.println(results);
+
+    }
+    
+    @Test
+    public void testGetToolDao() throws MiddlewareQueryException  {
+    	ToolDAO results = manager.getToolDao();
+    	Assert.assertNotNull(results);
+        System.out.println("testGetToolDao() Results:");
+        System.out.println(results);
+
+    }
+    
+    @Test
+    public void testGetUserInfo() throws MiddlewareQueryException  {
+    	int userId = 1;
+    	UserInfo results = manager.getUserInfo(userId);
+    	Assert.assertNotNull(results);
+        System.out.println("testGetUserInfo() Results:");
+        System.out.println(results);
+
+    }
+    
+    @Test
+    public void testGetToolsWithType() throws MiddlewareQueryException  {
+    	List<Tool> results = manager.getToolsWithType(ToolType.NATIVE);
+    	Assert.assertNotNull(results);
+        Assert.assertTrue(!results.isEmpty());
+        System.out.println("testgetToolsWithType() Results:");
+        for (Tool result : results) {
+        	System.out.println(result);
+        }
+        System.out.println("Number of record/s: "+results.size());
+
+    }
     
     @AfterClass
     public static void tearDown() throws Exception {
