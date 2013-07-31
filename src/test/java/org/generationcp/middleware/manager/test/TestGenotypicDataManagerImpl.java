@@ -1867,7 +1867,8 @@ public class TestGenotypicDataManagerImpl{
     public void testGetAllFromMarkerMetadatasetByMarker() throws Exception {
         Integer markerId = 3302; 
         List<MarkerMetadataSet> result = manager.getAllFromMarkerMetadatasetByMarker(markerId);
-        System.out.println("testGetAllFromMarkerMetadatasetByMarker(" + markerId + "): " + result.size());
+        System.out.println("testGetAllFromMarkerMetadatasetByMarker(" + markerId + "): " 
+                    + (result != null? result.size() : 0));
         if (result != null) {
             for (MarkerMetadataSet elem : result) {
                 Debug.println(4, elem.toString());
@@ -1878,7 +1879,8 @@ public class TestGenotypicDataManagerImpl{
     public void testGetDatasetDetailsByDatasetIds() throws Exception {
         List<Integer> datasetIds = Arrays.asList(3, 4, 5); 
         List<Dataset> result = manager.getDatasetDetailsByDatasetIds(datasetIds);
-        System.out.println("testGetDatasetDetailsByDatasetId(" + datasetIds + "): " + result.size());
+        System.out.println("testGetDatasetDetailsByDatasetId(" + datasetIds + "): " 
+                + (result != null? result.size() : 0));
         if (result != null) {
             for (Dataset elem : result) {
                 Debug.println(4, elem.toString());
@@ -1902,7 +1904,8 @@ public class TestGenotypicDataManagerImpl{
         
         Integer datasetId = 5; 
         List<AccMetadataSetPK> result = manager.getAllFromAccMetadataset(gids, datasetId, SetOperation.NOT_IN);
-        System.out.println("testGetAllFromAccMetadataset(gid=" + gids + ", datasetId=" + datasetId + "): " + result.size());
+        System.out.println("testGetAllFromAccMetadataset(gid=" + gids + ", datasetId=" + datasetId + "): " 
+                + (result != null? result.size() : 0));
         if (result != null) {
             for (AccMetadataSetPK elem : result) {
                 Debug.println(4, elem.toString());
@@ -1928,7 +1931,8 @@ public class TestGenotypicDataManagerImpl{
     @Test
     public void testGetAllMTAs() throws Exception {
         List<Mta> result = manager.getAllMTAs();
-        System.out.println("testGetAllMTAs(): " + result.size());
+        System.out.println("testGetAllMTAs(): " 
+                + (result != null? result.size() : 0));
         if (result != null) {
             for (Mta elem : result) {
                 Debug.println(4, elem.toString());
@@ -1946,7 +1950,8 @@ public class TestGenotypicDataManagerImpl{
     public void testGetMTAsByTrait() throws Exception {
         Integer traitId = 1;
         List<Mta> result = manager.getMTAsByTrait(traitId);
-        System.out.println("testGetMTAsByTrait(): " + result.size());
+        System.out.println("testGetMTAsByTrait(): " 
+                + (result != null? result.size() : 0));
         if (result != null) {
             for (Mta elem : result) {
                 Debug.println(4, elem.toString());

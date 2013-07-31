@@ -181,7 +181,7 @@ public class UserDAO extends GenericDAO<User, Integer>{
     @SuppressWarnings("unchecked")
 	public List<Integer> getUserIdsByCountryIds(Collection<Integer> countryIds) throws MiddlewareQueryException {
     	try {
-    		if (countryIds != null & countryIds.size() > 0){
+    		if (countryIds != null && countryIds.size() > 0){
 	    		Criteria criteria = getSession().createCriteria(Locdes.class);
 	    		criteria.createAlias("location", "l");
 	    		criteria.add(Restrictions.in("l.cntryid", countryIds));

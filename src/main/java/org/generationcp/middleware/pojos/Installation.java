@@ -307,7 +307,7 @@ public class Installation implements Serializable{
         if (obj == this) {
             return true;
         }
-        if (!(obj instanceof Lot)) {
+        if (!(obj instanceof Installation)) {
             return false;
         }
 

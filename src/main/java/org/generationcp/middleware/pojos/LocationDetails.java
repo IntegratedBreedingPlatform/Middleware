@@ -166,7 +166,7 @@ public class LocationDetails implements Serializable,
 
         if (obj instanceof LocationDetails) {
             LocationDetails param = (LocationDetails) obj;
-            if (this.getLocid() == param.getLocid()) {
+            if (this.getLocid().equals(param.getLocid())) {
                 return true;
             }
         }

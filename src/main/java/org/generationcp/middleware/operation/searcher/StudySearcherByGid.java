@@ -32,6 +32,7 @@ public class StudySearcherByGid extends Searcher {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 	
+	// TODO: DELETE? UNUSED? 
 	public List<StudyReference> searchStudies(GidStudyQueryFilter filter, int start, int numOfRows) throws MiddlewareQueryException {
 		int gid = filter.getGid();
 		List<StudyReference> studyRefs = new ArrayList<StudyReference>();

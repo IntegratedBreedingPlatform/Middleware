@@ -91,10 +91,10 @@ public abstract class DataManager extends DatabaseBroker{
      */
     @SuppressWarnings({ "unused", "rawtypes" })
     private Class[] getParameterTypes(Object[] parameters) {
-        Class[] parameterTypes = new Class[parameters.length];
         if (parameters == null) {
             parameters = new Object[] {};
         }
+        Class[] parameterTypes = new Class[parameters.length];
         for (int i = 0; i < parameters.length; i++) {
             Class parameterClass = parameters[i].getClass();
             if (parameterClass.isPrimitive()) {

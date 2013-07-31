@@ -145,7 +145,7 @@ public class Locdes implements Serializable{
 
         if (obj instanceof Locdes) {
             Locdes param = (Locdes) obj;
-            if (this.getLdid() == param.getLdid()) {
+            if (this.getLdid().equals(param.getLdid())) {
                 return true;
             }
         }

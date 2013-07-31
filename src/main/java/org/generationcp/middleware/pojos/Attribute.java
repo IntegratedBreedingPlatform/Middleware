@@ -181,7 +181,7 @@ public class Attribute implements Serializable{
 
         if (obj instanceof Attribute) {
             Attribute param = (Attribute) obj;
-            if (this.getAid() == param.getAid()) {
+            if (this.getAid().equals(param.getAid())) {
                 return true;
             }
         }

@@ -72,7 +72,9 @@ public class StudySearcherByNameStartSeasonCountry extends Searcher {
 			setWorkingDatabase(Database.CENTRAL);
 			List<Country> countries = getCountryDao().getByIsoFull(countryName);
 			setWorkingDatabase(Database.LOCAL);
-			countries.addAll(getCountryDao().getByIsoFull(countryName));
+			if (countries != null){
+			    countries.addAll(getCountryDao().getByIsoFull(countryName));
+			}
 			
 			if (countries != null && countries.size() > 0) {
 				List<Integer> countryIds = new ArrayList<Integer>(); 

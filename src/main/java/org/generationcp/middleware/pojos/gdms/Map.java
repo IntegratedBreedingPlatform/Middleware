@@ -178,7 +178,7 @@ public class Map implements Serializable{
 
         if (obj instanceof Map) {
             Map param = (Map) obj;
-            if (this.getMapId() == param.getMapId()) {
+            if (this.getMapId().equals(param.getMapId())) {
                 return true;
             }
         }

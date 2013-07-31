@@ -146,12 +146,25 @@ public class Study {
 	    }
 	}
 	
-	public boolean equals(Object obj) {
-		if (obj == null) return false;
-		if (!(obj instanceof Study)) return false;
-		Study other = (Study) obj;
-		return getId() == other.getId();
-	}
+	@Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result
+                + ((conditions == null) ? 0 : conditions.hashCode());
+        result = prime * result
+                + ((constants == null) ? 0 : constants.hashCode());
+        result = prime * result + id;
+        return result;
+    }
+
+	@Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (!(obj instanceof Study)) return false;
+        Study other = (Study) obj;
+        return getId() == other.getId();
+    }
 
 	@Override
 	public String toString() {

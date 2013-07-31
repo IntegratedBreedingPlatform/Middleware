@@ -18,17 +18,18 @@ import org.generationcp.middleware.domain.oms.TermId;
 
 public class PlotUtil {
 
-	private static List<TermId> plotTypes = null;
+	private static List<TermId> plotTypes;
+	
+	static {
+	    plotTypes = new ArrayList<TermId>();
+        plotTypes.add(TermId.TRIAL_ENVIRONMENT_EXPERIMENT);
+        plotTypes.add(TermId.PLOT_EXPERIMENT);
+        plotTypes.add(TermId.SAMPLE_EXPERIMENT);
+        plotTypes.add(TermId.AVERAGE_EXPERIMENT);
+        plotTypes.add(TermId.SUMMARY_EXPERIMENT);
+	}
 	
 	public static List<TermId> getAllPlotTypes() {
-		if (plotTypes == null) {
-			 plotTypes = new ArrayList<TermId>();
-			 plotTypes.add(TermId.TRIAL_ENVIRONMENT_EXPERIMENT);
-			 plotTypes.add(TermId.PLOT_EXPERIMENT);
-			 plotTypes.add(TermId.SAMPLE_EXPERIMENT);
-			 plotTypes.add(TermId.AVERAGE_EXPERIMENT);
-			 plotTypes.add(TermId.SUMMARY_EXPERIMENT);
-		}
 		return plotTypes;
 	}
 

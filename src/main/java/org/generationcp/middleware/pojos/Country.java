@@ -221,7 +221,7 @@ public class Country implements Serializable, Comparable<Country>{
 
         if (obj instanceof Country) {
             Country param = (Country) obj;
-            if (this.getCntryid() == param.getCntryid()) {
+            if (this.getCntryid().equals(param.getCntryid())) {
                 return true;
             }
         }

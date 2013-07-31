@@ -116,7 +116,7 @@ public class Georef implements Serializable{
 
         if (obj instanceof Georef) {
             Georef param = (Georef) obj;
-            if (this.getLocid() == param.getLocid()) {
+            if (this.getLocid().equals(param.getLocid())) {
                 return true;
             }
         }

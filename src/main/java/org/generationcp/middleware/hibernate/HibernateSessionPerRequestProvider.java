@@ -42,7 +42,7 @@ public class HibernateSessionPerRequestProvider implements HibernateSessionProvi
         this.sessionFactory = sessionFactory;
     }
     
-    public SessionFactory getSessionFactory() {
+    public synchronized SessionFactory getSessionFactory() {
         return sessionFactory;
     }
 

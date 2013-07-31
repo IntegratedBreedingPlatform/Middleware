@@ -836,7 +836,9 @@ public class TestGermplasmDataManagerImpl{
         Integer attributeId = -1; //Assumption: attribute with id = -1 exists
         
         Attribute attribute = manager.getAttributeById(attributeId);
-        String attributeString = "";
+
+        if (attribute  != null){
+            String attributeString = "";
             attributeString = attribute.toString();
             attribute.setAdate(0);
             attribute.setLocationId(0);
@@ -845,7 +847,6 @@ public class TestGermplasmDataManagerImpl{
             attribute.setTypeId(0);
             Integer id = manager.updateGermplasmAttribute(attribute);
 
-        if (attribute  != null){
             System.out.println("testUpdateGermplasmAttribute(" + attributeId + ") RESULTS: "
                     + "\ntBEFORE: " + attributeString
                     + "\ntAFTER: " + attribute);
@@ -1206,7 +1207,7 @@ public class TestGermplasmDataManagerImpl{
         for (Object[] result : results) {
             System.out.println("  " + result);
         }
-        System.out.println("Number of record/s: " +results.size() );
+        System.out.println("Number of record/s: " + results.size() );
     }
     
     @Test
@@ -1226,11 +1227,13 @@ public class TestGermplasmDataManagerImpl{
     private String renderNode(GermplasmPedigreeTreeNode node, String prefix){
        String outputString = "";
  	   if(node != null){
-		   outputString = "-"+prefix+" "+node.getGermplasm().getGid();
+            outputString = "-" + prefix + " " + node.getGermplasm().getGid();
+            for (GermplasmPedigreeTreeNode parent : node.getLinkedNodes()) {
+                outputString = outputString + "\n"
+                        + renderNode(parent, prefix + "-");
+            }
  	   }
-       for (GermplasmPedigreeTreeNode parent : node.getLinkedNodes()) {
-           outputString = outputString + "\n" + renderNode(parent, prefix + "-"); 
-       }
+
        return outputString;
     }
 }

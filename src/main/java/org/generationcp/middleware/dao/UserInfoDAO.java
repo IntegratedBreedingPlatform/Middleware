@@ -37,7 +37,9 @@ public class UserInfoDAO extends GenericDAO<UserInfo, Integer>{
         String queryString = "UPDATE workbench_user_info SET login_count = :loginCount where user_id = :userId";
         Session s = getSession();
         Query q = s.createSQLQuery(queryString);
-        q.setInteger("userId", userInfo.getUserId());
+        if (userInfo != null){
+            q.setInteger("userId", userInfo.getUserId());
+        }
         q.setInteger("loginCount", loginCount);
         return q.executeUpdate() > 0;
     }

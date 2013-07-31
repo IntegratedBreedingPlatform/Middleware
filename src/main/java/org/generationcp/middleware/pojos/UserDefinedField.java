@@ -216,9 +216,9 @@ public class UserDefinedField implements Serializable{
             return false;
         }
 
-        if (obj instanceof Attribute) {
+        if (obj instanceof UserDefinedField) {
             UserDefinedField param = (UserDefinedField) obj;
-            if (this.getFldno() == param.getFldno()) {
+            if (this.getFldno().equals(param.getFldno())) {
                 return true;
             }
         }

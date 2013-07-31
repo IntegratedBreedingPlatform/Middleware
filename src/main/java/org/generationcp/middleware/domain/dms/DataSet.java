@@ -138,12 +138,31 @@ public class DataSet {
 	    variableTypes.print(indent + 6);
 	}
 	
-	public boolean equals(Object obj) {
-		if (obj == null) return false;
-		if (!(obj instanceof DataSet)) return false;
-		DataSet other = (DataSet) obj;
-		return getId() == other.getId();
-	}
+	@Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result
+                + ((dataSetType == null) ? 0 : dataSetType.hashCode());
+        result = prime * result
+                + ((description == null) ? 0 : description.hashCode());
+        result = prime * result + id;
+        result = prime * result
+                + ((locationIds == null) ? 0 : locationIds.hashCode());
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + studyId;
+        result = prime * result
+                + ((variableTypes == null) ? 0 : variableTypes.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (!(obj instanceof DataSet)) return false;
+        DataSet other = (DataSet) obj;
+        return getId() == other.getId();
+    }
 
 	@Override
 	public String toString() {

@@ -186,7 +186,7 @@ public class Name implements Serializable{
 
         if (obj instanceof Name) {
             Name param = (Name) obj;
-            if (this.getNid() == param.getNid()) {
+            if (this.getNid().equals(param.getNid())) {
                 return true;
             }
         }

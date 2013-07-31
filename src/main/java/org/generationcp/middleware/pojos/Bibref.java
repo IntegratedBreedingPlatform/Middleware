@@ -266,7 +266,7 @@ public class Bibref implements Serializable{
 
         if (obj instanceof Bibref) {
             Bibref param = (Bibref) obj;
-            if (this.getRefid() == param.getRefid()) {
+            if (this.getRefid().equals(param.getRefid())) {
                 return true;
             }
         }

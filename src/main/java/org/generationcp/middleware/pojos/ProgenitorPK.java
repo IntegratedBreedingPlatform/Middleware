@@ -75,7 +75,8 @@ public class ProgenitorPK implements Serializable{
 
         if (obj instanceof ProgenitorPK) {
             ProgenitorPK param = (ProgenitorPK) obj;
-            if (this.getGid() == param.getGid() && this.getPno() == param.getPno()) {
+            if (this.getGid().equals(param.getGid()) 
+                    && this.getPno().equals(param.getPno())) {
                 return true;
             }
         }
