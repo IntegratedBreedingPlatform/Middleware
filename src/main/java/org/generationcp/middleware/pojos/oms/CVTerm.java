@@ -19,7 +19,6 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -94,10 +93,10 @@ public class CVTerm implements Serializable {
 	@Column(name = "is_relationshiptype")
 	private Integer isRelationshipType;
 	
-	@OneToMany(mappedBy = "cvTerm", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "cvTerm", cascade = CascadeType.ALL)
 	private List<CVTermProperty> properties;
 	
-	@OneToMany(mappedBy = "cvTerm", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "cvTerm", cascade = CascadeType.ALL)
 	private List<CVTermSynonym> synonyms;
 	
 	public CVTerm() {

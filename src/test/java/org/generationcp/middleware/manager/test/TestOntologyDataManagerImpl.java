@@ -148,25 +148,37 @@ public class TestOntologyDataManagerImpl {
 		System.out.println("testGetStandadardVariableIdByPropertyScaleMethod() Results: " + varid);
 	}
 	
-	@Test
-	public void testFindStandardVariablesByNameOrSynonym() throws Exception {
-		System.out.println("Test FindStandardVariablesByNameOrSynonym");
-		Set<StandardVariable> standardVariables = manager.findStandardVariablesByNameOrSynonym("foo bar");
-		assertTrue(standardVariables.size() == 0);
-		
-		standardVariables = manager.findStandardVariablesByNameOrSynonym("Accession name");
-		assertTrue(standardVariables.size() == 1);
-		for (StandardVariable stdVar : standardVariables) {
-			stdVar.print(0);
-		}
-		
-		standardVariables = manager.findStandardVariablesByNameOrSynonym("THR");
-		assertTrue(standardVariables.size() == 1);
-		for (StandardVariable stdVar : standardVariables) {
-			stdVar.print(0);
-		}
-	}
-	
+    @Test
+    public void testFindStandardVariablesByNameOrSynonym() throws Exception {
+        System.out.println("Test FindStandardVariablesByNameOrSynonym");
+        Set<StandardVariable> standardVariables = manager.findStandardVariablesByNameOrSynonym("foo bar");
+        assertTrue(standardVariables.size() == 0);
+        
+        standardVariables = manager.findStandardVariablesByNameOrSynonym("Accession name");
+        assertTrue(standardVariables.size() == 1);
+        for (StandardVariable stdVar : standardVariables) {
+            stdVar.print(0);
+        }
+        
+        standardVariables = manager.findStandardVariablesByNameOrSynonym("THR");
+        assertTrue(standardVariables.size() == 1);
+        for (StandardVariable stdVar : standardVariables) {
+            stdVar.print(0);
+        }
+    } 
+
+    @Test
+    public void testFindStandardVariablesByNameOrSynonymWithProperties() throws Exception {
+        System.out.println("Test getTraitDetailsByTAbbr");
+        Set<StandardVariable> standardVariables = manager.findStandardVariablesByNameOrSynonym("Accession name");
+        assertTrue(standardVariables.size() == 1);
+        for (StandardVariable stdVar : standardVariables) {
+            stdVar.print(0);
+            Term term = manager.getTermById(stdVar.getId());
+            term.print(4);   
+        }
+    }
+
 	@Test
 	public void testFindMethodById() throws Exception {
 		System.out.println("Test findMethodById");

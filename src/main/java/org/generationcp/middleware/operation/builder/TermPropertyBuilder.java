@@ -11,45 +11,32 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.builder;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermProperty;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 
-public class TermBuilder extends Builder {
+public class TermPropertyBuilder extends Builder {
 
-	public TermBuilder(HibernateSessionProvider sessionProviderForLocal,
+	public TermPropertyBuilder(HibernateSessionProvider sessionProviderForLocal,
 			               HibernateSessionProvider sessionProviderForCentral) {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 
-	public Term get(int termId) throws MiddlewareQueryException {
-		Term term = null;
-		if (setWorkingDatabase(termId)) {
-			term = mapCVTermToTerm(getCvTermDao().getById(termId));
+	public TermProperty get(int termPropertyId) throws MiddlewareQueryException {
+	    TermProperty term = null;
+		if (setWorkingDatabase(termPropertyId)) {
+			term = create(getCvTermPropertyDao().getById(termPropertyId));
 		}
 		return term;
 	}
 	
-	private Term mapCVTermToTerm(CVTerm cVTerm){
-		Term term = null;
-		
-		if (cVTerm != null){
-			term = new Term(cVTerm.getCvTermId(), cVTerm.getName(), cVTerm.getDefinition());
-			term.setObsolete(cVTerm.isObsolete());
-			term.setVocabularyId(cVTerm.getCv());
-			
-			List<TermProperty> properties = new ArrayList<TermProperty>();
-			for (CVTermProperty property: cVTerm.getProperties()){
-			    properties.add(getTermPropertyBuilder().create(property));
-			}
-			term.setProperties(properties);
+	public TermProperty create(CVTermProperty cVTermProperty){
+		TermProperty termProperty = null;
+		if (cVTermProperty != null){
+			termProperty = new TermProperty(cVTermProperty.getCvTermPropertyId(), cVTermProperty.getTypeId(), cVTermProperty.getValue(),
+			        cVTermProperty.getRank());
 		}
-		return term;
+		return termProperty;
 	}
 }

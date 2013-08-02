@@ -62,4 +62,9 @@ public abstract class Builder extends DatabaseBroker {
     protected final TermBuilder getTermBuilder() {
     	return new TermBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
+    
+    protected final TermPropertyBuilder getTermPropertyBuilder() {
+        return new TermPropertyBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
 }

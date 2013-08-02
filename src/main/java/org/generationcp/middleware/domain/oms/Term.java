@@ -32,7 +32,9 @@ public class Term {
 	private List<NameSynonym> nameSynonyms;
 
 	private Boolean obsolete;
-
+	
+	private List<TermProperty> properties;
+	
 	public Term() { }
 	
 	public Term(int id, String name, String definition) {
@@ -87,15 +89,26 @@ public class Term {
 	public void setNameSynonyms(List<NameSynonym> nameSynonyms) {
 		this.nameSynonyms = nameSynonyms;
 	}
+	
+	public List<TermProperty> getProperties() {
+        return properties;
+    }
+    
+    public void setProperties(List<TermProperty> properties) {
+        this.properties = properties;
+    }
 
-	public void print(int indent) {
+    public void print(int indent) {
 		Debug.println(indent, "Id: " + getId());
 		Debug.println(indent, "Vocabulary: " + getVocabularyId());
 		Debug.println(indent, "Name: " + getName());
 	    Debug.println(indent, "Definition: " + getDefinition());
-	    if (nameSynonyms != null) {
-	    	Debug.println(indent, "NameSynonyms: " + nameSynonyms);
-	    }
+        if (nameSynonyms != null) {
+            Debug.println(indent, "NameSynonyms: " + nameSynonyms);
+        }
+        if (properties != null) {
+            Debug.println(indent, "TermProperties: " + properties);
+        }
 	    Debug.println(indent, "Obsolete: " + obsolete);
 	}
 	
