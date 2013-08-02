@@ -36,14 +36,15 @@ public class DataSetDao extends GenericDAO<DmsProject, Integer> {
 			statement.executeUpdate();
 			
 			// Delete experiments
-			statement = getSession().createSQLQuery("delete e, ep, es, epheno, pheno " +
+			statement = getSession().createSQLQuery("delete e, ep, es, epheno, pheno, eprop " +
                        "from nd_experiment e, nd_experiment_project ep, " +
-					   "nd_experiment_stock es, nd_experiment_phenotype epheno, phenotype pheno " + 
+					   "nd_experiment_stock es, nd_experiment_phenotype epheno, phenotype pheno, nd_experimentprop eprop " + 
                        "where ep.project_id = " + datasetId +
 					   "  and e.nd_experiment_id = ep.nd_experiment_id " +
 					   "  and e.nd_experiment_id = es.nd_experiment_id " + 
                        "  and e.nd_experiment_id = epheno.nd_experiment_id " + 
-					   "  and epheno.phenotype_id = pheno.phenotype_id");
+					   "  and epheno.phenotype_id = pheno.phenotype_id " +
+					   "  and e.nd_experiment_id = eprop.nd_experiment_id");
 			statement.executeUpdate();
 			
 			// Delete project stuff
@@ -65,15 +66,16 @@ public class DataSetDao extends GenericDAO<DmsProject, Integer> {
 			this.flush();
 			
 			// Delete experiments
-			SQLQuery statement = getSession().createSQLQuery("delete e, ep, es, epheno, pheno " +
+			SQLQuery statement = getSession().createSQLQuery("delete e, ep, es, epheno, pheno, eprop " +
                        "from nd_experiment e, nd_experiment_project ep, " +
-					   "nd_experiment_stock es, nd_experiment_phenotype epheno, phenotype pheno " + 
+					   "nd_experiment_stock es, nd_experiment_phenotype epheno, phenotype pheno, nd_experimentprop eprop " + 
                        "where ep.project_id = " + datasetId +
                        "  and e.nd_geolocation_id = " + locationId +
 					   "  and e.nd_experiment_id = ep.nd_experiment_id " +
 					   "  and e.nd_experiment_id = es.nd_experiment_id " + 
                        "  and e.nd_experiment_id = epheno.nd_experiment_id " +
-					   "  and epheno.phenotype_id = pheno.phenotype_id");
+					   "  and epheno.phenotype_id = pheno.phenotype_id " +
+					   "  and e.nd_experiment_id = eprop.nd_experiment_id");
 			statement.executeUpdate();
 			
             this.flush();
