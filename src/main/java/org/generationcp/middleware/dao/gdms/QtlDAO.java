@@ -97,7 +97,6 @@ public class QtlDAO  extends GenericDAO<Qtl, Integer>{
 	                    String tRName = (String) result[13];
 	                    String ontology = (String) result[14];
 	                    
-	                    
 	                    QtlDetailElement element = new QtlDetailElement(
 	                    		qtlName, mapName, chromosome, minPosition, maxPosition, traitId,
 	                            experiment, leftFlankingMarker, rightFlankingMarker, effect, 
@@ -161,7 +160,6 @@ public class QtlDAO  extends GenericDAO<Qtl, Integer>{
                     String interactions = (String) result[12];
                     String tRName = (String) result[13];
                     String ontology = (String) result[14];
-                    
                     
                     QtlDetailElement element = new QtlDetailElement(
                     		qtlName, mapName, chromosome, minPosition, maxPosition, traitId,

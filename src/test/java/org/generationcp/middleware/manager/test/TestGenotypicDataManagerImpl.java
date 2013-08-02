@@ -744,17 +744,16 @@ public class TestGenotypicDataManagerImpl{
     
     @Test
     public void testGetQtlByName() throws Exception {
-        String qtlName = "SLA%";     // Crop tested: Groundnut
+        String qtlName = "HI Control%";     // Crop tested: Groundnut
 
         List<QtlDetailElement> results = manager.getQtlByName(qtlName, 0, 
                 (int) manager.countQtlByName(qtlName));
         System.out.println("testGetQtlByName() RESULTS: " + results);
-    }
-
+    } 
 
     @Test
     public void testCountQtlByName() throws Exception { 
-        String qtlName = "SLA%";     // Crop tested: Groundnut
+        String qtlName = "HI Control%";     // Crop tested: Groundnut
         long count = manager.countQtlByName(qtlName);
         System.out.println("testCountQtlByName() RESULTS: " + count);
     }    
@@ -1662,12 +1661,11 @@ public class TestGenotypicDataManagerImpl{
         List<Integer> qtlIDs = new ArrayList<Integer>();
         qtlIDs.add(1);
       
-
         List<QtlDetailElement> results = manager.getQtlByQtlIds(qtlIDs, 0, 
                 (int) manager.countQtlByQtlIds(qtlIDs));
         System.out.println("testGetQtlByQTLIDs() RESULTS: " + results);
     }
-
+   
 
     @Test
     public void testCountQTLByQTLIDs() throws Exception { 
