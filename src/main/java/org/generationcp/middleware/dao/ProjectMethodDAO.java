@@ -104,5 +104,28 @@ public class ProjectMethodDAO extends GenericDAO<ProjectMethod, Integer>{
         }
         return toReturn;
     }
+    
+    @SuppressWarnings("rawtypes")
+    public List<Integer> getBreedingMethodIdsByWorkbenchProjectId(Integer projectId) throws MiddlewareQueryException {
+        List<Integer> toReturn = new ArrayList<Integer>();
+        try {
+            if (projectId != null) {                
+                SQLQuery query = getSession().createSQLQuery(ProjectMethod.GET_PROJECT_METHODS_BY_PROJECT_ID);
+                query.setParameter("projectId", projectId);
+                List results = query.list();
+                for (Object o : results) {
+                    Object[] result = (Object[]) o;
+                    if (result != null) {
+                        Integer id = (Integer) result[0];
+                        toReturn.add(id);
+                    }
+                }
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getBreedingMethodIdsByWorkbenchProjectId(projectId=" + projectId
+                    + ") query from ProjectMethod: " + e.getMessage(), e);
+        }
+        return toReturn;
+    }
 
 }

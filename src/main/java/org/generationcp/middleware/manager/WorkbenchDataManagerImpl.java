@@ -1450,4 +1450,10 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     public boolean changeUserPassword(String username, String password) throws MiddlewareQueryException {
         return getUserDao().changePassword(username, password);
     }
+    
+    @Override
+    public List<Integer> getBreedingMethodIdsByWorkbenchProjectId(Integer projectId) throws MiddlewareQueryException{
+        return getProjectMethodDao().getBreedingMethodIdsByWorkbenchProjectId(projectId);
+    }
+
 }

@@ -55,6 +55,11 @@ public class ProjectMethod implements Serializable{
             "FROM workbench_project_method " +
             "WHERE project_id = :projectId";
     
+    public static final String GET_BREEDING_METHOD_IDS_BY_PROJECT_ID = 
+            "SELECT method_id " +
+            "FROM workbench_project_method " + 
+            "WHERE project_id = :projectId";   
+    
     @Id
     @Basic(optional = false)
     @GeneratedValue

@@ -27,7 +27,6 @@ import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.Lot;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -35,7 +34,6 @@ import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectLocationMap;
 import org.generationcp.middleware.pojos.workbench.ProjectMethod;
-import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount;
 import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSetting;
@@ -49,6 +47,7 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 import org.generationcp.middleware.pojos.workbench.ProjectBackup;
 import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
+import org.generationcp.middleware.util.Debug;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -1043,8 +1042,18 @@ public class TestWorkbenchDataManagerImpl{
         	System.out.println(result);
         }
         System.out.println("Number of record/s: "+results.size());
-
     }
+
+    @Test
+    public void testGetBreedingMethodIdsByWorkbenchProjectId() throws MiddlewareQueryException {
+        Integer projectId = 1;
+        List<Integer> ids = manager.getBreedingMethodIdsByWorkbenchProjectId(projectId);
+        Debug.println(0, "testGetBreedingMethodIdsByWorkbenchProjectId(projectId=" + projectId + "): " + ids.size());
+        for (Integer id : ids){
+            System.out.println(" ID = " + id);
+        }
+    }
+    
     
     @AfterClass
     public static void tearDown() throws Exception {

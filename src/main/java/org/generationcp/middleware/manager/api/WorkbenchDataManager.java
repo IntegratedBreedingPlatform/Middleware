@@ -950,4 +950,14 @@ public interface WorkbenchDataManager {
      * @throws MiddlewareQueryException
      */
     public ProjectUserInfo saveOrUpdateProjectUserInfo(ProjectUserInfo projectUserInfo) throws MiddlewareQueryException;
+    
+    /**
+     * Retrieves ids of the breeding methods selected for a given workbench project
+     * 
+     * @param projectId
+     * @return List of breeding method IDs
+     * @throws MiddlewareQueryException
+     */
+    public List<Integer> getBreedingMethodIdsByWorkbenchProjectId(Integer projectId) throws MiddlewareQueryException;
+
 }
