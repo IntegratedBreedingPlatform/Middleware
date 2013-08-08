@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.builder;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -18,6 +19,7 @@ import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.FactorType;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.TrialEnvironment;
+import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
@@ -121,5 +123,14 @@ public class TrialEnvironmentBuilder extends Builder {
 		setWorkingDatabase(Database.LOCAL);
 		environments.addAll(getGeolocationDao().getAllTrialEnvironments());
 		return environments;
+	}
+	
+	public List<TrialEnvironmentProperty> getPropertiesForTrialEnvironments(List<Integer> environmentIds) throws MiddlewareQueryException {
+		List<TrialEnvironmentProperty> properties = new ArrayList<TrialEnvironmentProperty>();
+		setWorkingDatabase(Database.CENTRAL);
+		properties.addAll(getGeolocationDao().getPropertiesForTrialEnvironments(environmentIds));
+		setWorkingDatabase(Database.LOCAL);
+		properties.addAll(getGeolocationDao().getPropertiesForTrialEnvironments(environmentIds));
+		return properties;
 	}
 }

@@ -27,6 +27,7 @@ import org.generationcp.middleware.domain.dms.Stocks;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.StudyValues;
+import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
@@ -319,4 +320,13 @@ public interface StudyDataManager {
      * @throws MiddlewareQueryException
      */
     TrialEnvironments getAllTrialEnvironments() throws MiddlewareQueryException;
+    
+    /**
+     * Get all environment properties given a list of environments.
+     * 
+     * @param trialEnvtIds
+     * @return a List of Environment Properties
+     * @throws MiddlewareQueryException
+     */
+    List<TrialEnvironmentProperty> getPropertiesForTrialEnvironments(List<Integer> trialEnvtIds) throws MiddlewareQueryException;
 }

@@ -36,6 +36,7 @@ import org.generationcp.middleware.domain.dms.Stocks;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.StudyValues;
+import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
@@ -667,6 +668,17 @@ public class TestStudyDataManagerImpl {
 		TrialEnvironments environments = manager.getAllTrialEnvironments();
 		System.out.println("SIZE=" + environments.size());
 		environments.print(1);
+	}
+	
+	@Test
+	public void testGetPropertiesForTrialEnvironments() throws Exception {
+		List<Integer> environmentIds = Arrays.asList(5770, 10081);
+		System.out.println("testGetPropertiesForTrialEnvironments");
+		List<TrialEnvironmentProperty> properties = manager.getPropertiesForTrialEnvironments(environmentIds);
+		System.out.println("SIZE=" + properties.size());
+		for (TrialEnvironmentProperty property : properties) {
+			property.print(0);
+		}
 	}
 	
 	@AfterClass

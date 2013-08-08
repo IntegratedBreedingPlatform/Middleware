@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao.dms;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -20,6 +22,7 @@ import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.LocationDto;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.TrialEnvironment;
+import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -136,5 +139,27 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			logAndThrowException("Error at getAllTrialEnvironments at GeolocationDao: " + e.getMessage(), e);
 		}
 		return environments;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<TrialEnvironmentProperty> getPropertiesForTrialEnvironments(List<Integer> environmentIds) throws MiddlewareQueryException {
+		List<TrialEnvironmentProperty> properties = new ArrayList<TrialEnvironmentProperty>();
+		try {
+			String sql = "SELECT cvt.name, cvt.definition, COUNT(DISTINCT gp.nd_geolocation_id)"
+							+ " FROM cvterm cvt"
+							+ " INNER JOIN nd_geolocationprop gp ON gp.type_id = cvt.cvterm_id"
+							+ " WHERE gp.nd_geolocation_id IN (:environmentIds)"
+							+ " GROUP BY gp.type_id, cvt.name, cvt.definition";
+			Query query = getSession().createSQLQuery(sql)
+							.setParameterList("environmentIds", environmentIds);
+			List<Object[]> result = query.list();
+			for (Object[] row : result) {
+				properties.add(new TrialEnvironmentProperty((String) row[0], (String) row[1], ((BigInteger) row[2]).intValue()));
+			}
+			
+		} catch(HibernateException e) {
+			logAndThrowException("Error at getPropertiesForTrialEnvironments=" + environmentIds + " at GeolocationDao: " + e.getMessage(), e);
+		}
+		return properties;
 	}
 }

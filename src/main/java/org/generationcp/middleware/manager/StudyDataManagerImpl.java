@@ -27,6 +27,7 @@ import org.generationcp.middleware.domain.dms.Stocks;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.StudyValues;
+import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
@@ -379,6 +380,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public TrialEnvironments getAllTrialEnvironments() throws MiddlewareQueryException {
 		return getTrialEnvironmentBuilder().getAllTrialEnvironments();
+	}
+
+	@Override
+	public List<TrialEnvironmentProperty> getPropertiesForTrialEnvironments(List<Integer> trialEnvtIds) throws MiddlewareQueryException {
+		return getTrialEnvironmentBuilder().getPropertiesForTrialEnvironments(trialEnvtIds);
 	}
 	
 	
