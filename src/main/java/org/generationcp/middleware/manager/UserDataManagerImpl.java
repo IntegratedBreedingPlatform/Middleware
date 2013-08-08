@@ -86,6 +86,33 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
 
         return idUserSaved;
     }
+    
+    @Override
+    public Integer addUserToCentral(User user) throws MiddlewareQueryException {
+        setWorkingDatabase(Database.CENTRAL);
+        Session session = getActiveSession();
+        Transaction trans = null;
+
+        Integer idUserSaved = null;
+        try {
+            trans = session.beginTransaction();
+            UserDAO dao = getUserDao();
+
+            User recordSaved = dao.saveOrUpdate(user);
+            idUserSaved = recordSaved.getUserid();
+
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while saving User to central database: UserDataManager.addUserToCentral(user=" + user + "): " + e.getMessage(), e,
+                    LOG);
+        } finally {
+            session.flush();
+        }
+
+        return idUserSaved;
+    }
+
 
     @Override
     public Integer updateUser(User user) throws MiddlewareQueryException {
@@ -167,6 +194,31 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
             rollbackTransaction(trans);
             logAndThrowException(
                     "Error encountered while saving Person: UserDataManager.addPerson(person=" + person + "): " + e.getMessage(), e, LOG);
+        } finally {
+            session.flush();
+        }
+        return idPersonSaved;
+    }
+    
+    @Override
+    public Integer addPersonToCentral(Person person) throws MiddlewareQueryException {
+        setWorkingDatabase(Database.CENTRAL);
+        Session session = getActiveSession();
+        Transaction trans = null;
+
+        Integer idPersonSaved = null;
+        try {
+            trans = session.beginTransaction();
+            PersonDAO dao = getPersonDao();
+
+            Person recordSaved = dao.saveOrUpdate(person);
+            idPersonSaved = recordSaved.getId();
+
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException(
+                    "Error encountered while saving Person to central database: UserDataManager.addPersonToCentral(person=" + person + "): " + e.getMessage(), e, LOG);
         } finally {
             session.flush();
         }
