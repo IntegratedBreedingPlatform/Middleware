@@ -113,6 +113,9 @@ public enum TermId {
 
 	// Stock Type
 	, ENTRY_CODE(8300)
+	
+	//Location 
+	, LOCATION_ID(8190)
 	;
 	
 	private final int id;

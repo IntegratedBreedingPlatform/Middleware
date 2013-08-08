@@ -311,4 +311,12 @@ public interface StudyDataManager {
      * @throws MiddlewareQueryException
      */
     String getLocalNameByStandardVariableId(Integer projectId, Integer standardVariableId) throws MiddlewareQueryException;
+    
+    /**
+     * Retrieves a list of all trial environments.
+     * 
+     * @return TrialEnvironments
+     * @throws MiddlewareQueryException
+     */
+    TrialEnvironments getAllTrialEnvironments() throws MiddlewareQueryException;
 }

@@ -661,6 +661,14 @@ public class TestStudyDataManagerImpl {
 	    System.out.println("testGetLocalNameByStandardVariableId("+projectId+", "+standardVariableId+"): " + localName);	    
 	}
 	
+	@Test
+	public void testGetAllTrialEnvironments() throws Exception {
+		System.out.println("testGetAllTrialEnvironemnts");
+		TrialEnvironments environments = manager.getAllTrialEnvironments();
+		System.out.println("SIZE=" + environments.size());
+		environments.print(1);
+	}
+	
 	@AfterClass
 	public static void tearDown() throws Exception {
 		if (factory != null) {

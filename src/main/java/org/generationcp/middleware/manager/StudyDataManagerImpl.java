@@ -375,4 +375,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		}
 		return null;
 	}
+
+	@Override
+	public TrialEnvironments getAllTrialEnvironments() throws MiddlewareQueryException {
+		return getTrialEnvironmentBuilder().getAllTrialEnvironments();
+	}
+	
+	
 }

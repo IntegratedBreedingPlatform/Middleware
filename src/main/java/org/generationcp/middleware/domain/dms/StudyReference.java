@@ -12,6 +12,8 @@
 
 package org.generationcp.middleware.domain.dms;
 
+import org.generationcp.middleware.util.Debug;
+
 
 /**
  * Contains the primary details of a study - id, name, description.
@@ -30,5 +32,9 @@ public class StudyReference extends Reference {
 		super.setId(id);
 		super.setName(name);
 		super.setDescription(description);
+	}
+	
+	public void print(int indent) {
+		Debug.println(indent, "STUDY:[id=" + getId() + ", name=" + getName() + ", description=" + getDescription() + "]");
 	}
 }

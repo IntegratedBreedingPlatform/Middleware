@@ -20,10 +20,18 @@ public class TrialEnvironment {
 
 	private int id;
 	private VariableList variables;
+	private LocationDto location;
+	private StudyReference study;
 	
 	public TrialEnvironment(int id, VariableList variables) {
 		this.id = id;
 		this.variables = variables;
+	}
+	
+	public TrialEnvironment(int id, LocationDto location, StudyReference study) {
+		this.id = id;
+		this.location = location;
+		this.study = study;
 	}
 	
 	public int getId() {
@@ -38,8 +46,25 @@ public class TrialEnvironment {
 		return variables;
 	}
 	
+	public LocationDto getLocation() {
+		return location;
+	}
+
+	public StudyReference getStudy() {
+		return study;
+	}
+
 	public void print(int indent) {
 		Debug.println(indent, "Trial Environment " + id);
-		variables.print(indent + 3);
+		if (variables != null) {
+			variables.print(indent + 3);
+		}
+		if (location != null) {
+			location.print(indent+1);
+		}
+		if (study != null) {
+			study.print(indent+1);
+		}
+		
 	}
 }

@@ -31,6 +31,18 @@ public class TrialEnvironments {
 		}
 	}
 	
+	public void addAll(TrialEnvironments trialEnvironments) {
+		if (trialEnvironments != null) {
+			for (TrialEnvironment environment : trialEnvironments.getTrialEnvironments()) {
+				add(environment);
+			}
+		}
+	}
+	
+	public Set<TrialEnvironment> getTrialEnvironments() {
+		return this.trialEnvironments;
+	}
+	
 	public List<Variable> getVariablesByLocalName(String localName){
 		List<Variable> vars = new ArrayList<Variable>();
 		for (TrialEnvironment trialEnvironment : trialEnvironments) {
@@ -75,5 +87,9 @@ public class TrialEnvironments {
 		for (TrialEnvironment trialEnvironment : trialEnvironments) {
 			trialEnvironment.print(indent);
 		}
+	}
+	
+	public int size() {
+		return trialEnvironments != null ? trialEnvironments.size() : 0;
 	}
 }

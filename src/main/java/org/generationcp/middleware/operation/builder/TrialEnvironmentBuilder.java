@@ -26,6 +26,7 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 
@@ -111,5 +112,14 @@ public class TrialEnvironmentBuilder extends Builder {
 		    }
 		}
 		return value;
+	}
+	
+	public TrialEnvironments getAllTrialEnvironments() throws MiddlewareQueryException {
+		TrialEnvironments environments = new TrialEnvironments();
+		setWorkingDatabase(Database.CENTRAL);
+		environments.addAll(getGeolocationDao().getAllTrialEnvironments());
+		setWorkingDatabase(Database.LOCAL);
+		environments.addAll(getGeolocationDao().getAllTrialEnvironments());
+		return environments;
 	}
 }
