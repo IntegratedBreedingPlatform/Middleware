@@ -17,6 +17,7 @@ import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.FactorType;
+import org.generationcp.middleware.domain.dms.LocationDto;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.TrialEnvironment;
 import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
@@ -121,8 +122,25 @@ public class TrialEnvironmentBuilder extends Builder {
 		TrialEnvironments environments = new TrialEnvironments();
 		setWorkingDatabase(Database.CENTRAL);
 		environments.addAll(getGeolocationDao().getAllTrialEnvironments());
+		
 		setWorkingDatabase(Database.LOCAL);
-		environments.addAll(getGeolocationDao().getAllTrialEnvironments());
+		TrialEnvironments localEnvironments = getGeolocationDao().getAllTrialEnvironments();
+		if (localEnvironments != null && localEnvironments.getTrialEnvironments() != null) {
+			setWorkingDatabase(Database.CENTRAL);
+			for (TrialEnvironment environment : localEnvironments.getTrialEnvironments()) {
+				if (environment.getLocation() != null && environment.getLocation().getId() != null 
+				&& environment.getLocation().getId().intValue() >= 0) {
+					LocationDto newLocation = getLocationDao().getLocationDtoById(environment.getLocation().getId());
+					if (newLocation != null) {
+						environment.getLocation().setCountryName(newLocation.getCountryName());
+						environment.getLocation().setLocationName(newLocation.getLocationName());
+						environment.getLocation().setProvinceName(newLocation.getProvinceName());
+					}
+				}
+				environments.add(environment);
+			}
+		}
+		
 		return environments;
 	}
 	

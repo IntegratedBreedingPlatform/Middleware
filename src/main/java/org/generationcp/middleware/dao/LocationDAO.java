@@ -14,6 +14,7 @@ package org.generationcp.middleware.dao;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.domain.dms.LocationDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Country;
@@ -288,5 +289,27 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
     	            logAndThrowException("Error with getLocationDetails(id=" + locationId + ") : " + e.getMessage(), e);
     	        }
     	        return null;
+    }
+    
+    public LocationDto getLocationDtoById(int id) throws MiddlewareQueryException {
+    	LocationDto location = null;
+    	try {
+    		String sql = "SELECT l.lname, prov.lname, c.isoabbr"
+    					+ " FROM location l"
+						+ " LEFT JOIN location prov ON prov.locid = l.snl1id"
+						+ " LEFT JOIN cntry c ON c.cntryid = l.cntryid"
+						+ " WHERE l.locid = :id";
+    		SQLQuery query = getSession().createSQLQuery(sql);
+    		query.setParameter("id", id);
+    		Object[] result = (Object[]) query.uniqueResult();
+    		
+    		if (result != null) {
+    			return new LocationDto(id, (String) result[0], (String) result[1], (String) result[2]);
+    		}
+    		
+    	} catch (HibernateException e) {
+    		logAndThrowException("Error with getLocationDtoById(id=" + id + "): " + e.getMessage(), e);
+    	}
+    	return location;
     }
 }
