@@ -329,4 +329,13 @@ public interface StudyDataManager {
      * @throws MiddlewareQueryException
      */
     List<TrialEnvironmentProperty> getPropertiesForTrialEnvironments(List<Integer> trialEnvtIds) throws MiddlewareQueryException;
+    
+    /**
+     * Get all studies given a list of environments.
+     * 
+     * @param environmentIds
+     * @return a list of Study References
+     * @throws MiddlewareQueryException
+     */
+    List<StudyReference> getStudiesForTrialEnvironments(List<Integer> environmentIds) throws MiddlewareQueryException;
 }

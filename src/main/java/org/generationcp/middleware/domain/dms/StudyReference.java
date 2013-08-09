@@ -23,6 +23,8 @@ import org.generationcp.middleware.util.Debug;
  */
 public class StudyReference extends Reference {
 	
+	private Integer numberOfEnvironments;
+	
 	public StudyReference(Integer id, String name) {
 		super.setId(id);
 		super.setName(name);
@@ -34,7 +36,22 @@ public class StudyReference extends Reference {
 		super.setDescription(description);
 	}
 	
+	public StudyReference(Integer id, String name, String description, Integer numberOfEnvironments) {
+		super.setId(id);
+		super.setName(name);
+		super.setDescription(description);
+		this.setNumberOfEnvironments(numberOfEnvironments);
+	}
+	
+	public Integer getNumberOfEnvironments() {
+		return numberOfEnvironments;
+	}
+
+	public void setNumberOfEnvironments(Integer numberOfEnvironments) {
+		this.numberOfEnvironments = numberOfEnvironments;
+	}
+
 	public void print(int indent) {
-		Debug.println(indent, "STUDY:[id=" + getId() + ", name=" + getName() + ", description=" + getDescription() + "]");
+		Debug.println(indent, "STUDY:[id=" + getId() + ", name=" + getName() + ", description=" + getDescription() + ", noOfEnv=" + numberOfEnvironments + "]");
 	}
 }

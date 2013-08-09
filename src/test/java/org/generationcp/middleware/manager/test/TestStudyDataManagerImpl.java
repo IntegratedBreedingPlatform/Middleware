@@ -53,9 +53,13 @@ import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestName;
 
 public class TestStudyDataManagerImpl {
 
@@ -65,6 +69,11 @@ public class TestStudyDataManagerImpl {
 	private static ManagerFactory factory;
 	private static StudyDataManager manager;
 	private static OntologyDataManager ontologyManager;
+	
+	private long startTime;
+	
+	@Rule
+	public TestName name = new TestName();
 
 	@BeforeClass
 	public static void setUp() throws Exception {
@@ -77,8 +86,18 @@ public class TestStudyDataManagerImpl {
 		ontologyManager = factory.getNewOntologyDataManager();
 	}
 
+	@Before
+	public void beforeEachTest() {
+		startTime = System.nanoTime();
+	}
+	
+	@After
+	public void afterEachTest() {
+		System.out.println(name.getMethodName() + ": Elapsed Time=" + (System.nanoTime() - startTime) + " ns");
+	}
+	
 	@Test
-	public void getGetStudyDetails() throws Exception {
+	public void testGetStudyDetails() throws Exception {
 		Study study = manager.getStudy(STUDY_ID);
 		assertNotNull(study);
 		System.out.println("ID: " + study.getId());
@@ -673,11 +692,22 @@ public class TestStudyDataManagerImpl {
 	@Test
 	public void testGetPropertiesForTrialEnvironments() throws Exception {
 		List<Integer> environmentIds = Arrays.asList(5770, 10081);
-		System.out.println("testGetPropertiesForTrialEnvironments");
+		System.out.println("testGetPropertiesForTrialEnvironments = " + environmentIds);
 		List<TrialEnvironmentProperty> properties = manager.getPropertiesForTrialEnvironments(environmentIds);
 		System.out.println("SIZE=" + properties.size());
 		for (TrialEnvironmentProperty property : properties) {
 			property.print(0);
+		}
+	}
+	
+	@Test
+	public void testGetStudiesForTrialEnvironments() throws Exception {
+		List<Integer> environmentIds = Arrays.asList(5770, 10081);
+		System.out.println("testGetStudiesForTrialEnvironments = " + environmentIds);
+		List<StudyReference> studies = manager.getStudiesForTrialEnvironments(environmentIds);
+		System.out.println("SIZE=" + studies.size());
+		for (StudyReference study : studies) {
+			study.print(1);
 		}
 	}
 	

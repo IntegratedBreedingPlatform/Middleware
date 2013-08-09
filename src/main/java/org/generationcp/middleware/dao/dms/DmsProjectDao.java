@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao.dms;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -408,6 +409,32 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			logAndThrowException("Error in getDataSetsByProjectProperty(" + type + ", " + value + ") query in DmsProjectDao: " + e.getMessage(), e);
 		}
 		return new ArrayList<DmsProject>();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<StudyReference> getStudiesByTrialEnvironments(List<Integer> environmentIds) throws MiddlewareQueryException {
+		List<StudyReference> studies = new ArrayList<StudyReference>();
+		try {
+			String sql = "SELECT p.project_id, p.name, p.description, count(DISTINCT e.nd_geolocation_id)"
+							+ " FROM project p"
+							+ " INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id = " + TermId.BELONGS_TO_STUDY.getId()
+							+ " INNER JOIN nd_experiment_project ep"
+							+ " INNER JOIN nd_experiment e ON e.nd_experiment_id = ep.nd_experiment_id"
+							+ " INNER JOIN nd_geolocation g on g.nd_geolocation_id = e.nd_geolocation_id"
+							+ " WHERE (ep.project_id = p.project_id OR ep.project_id = pr.subject_project_id)"
+							+ " AND e.nd_geolocation_id IN (:environmentIds)"
+							+ " GROUP BY p.project_id, p.name, p.description";
+			Query query = getSession().createSQLQuery(sql)
+							.setParameterList("environmentIds", environmentIds);
+			List<Object[]> result = query.list();
+			for (Object[] row : result) {
+				studies.add(new StudyReference((Integer) row[0], (String) row[1], (String) row[2], ((BigInteger) row[3]).intValue()));
+			}
+			
+		} catch(HibernateException e) {
+			logAndThrowException("Error in getStudiesByTrialEnvironments=" + environmentIds + " query in DmsProjectDao: " + e.getMessage(), e);
+		}
+		return studies;
 	}
 
 }

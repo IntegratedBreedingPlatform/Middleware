@@ -16,7 +16,9 @@ import java.util.Collection;
 import java.util.List;
 
 import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 
 public class StudyReferenceBuilder extends Builder {
@@ -35,5 +37,14 @@ public class StudyReferenceBuilder extends Builder {
 			}
 		}
 		return studyReferences;
+	}
+
+	public List<StudyReference> getStudiesForTrialEnvironments(List<Integer> environmentIds) throws MiddlewareQueryException {
+		List<StudyReference> studies = new ArrayList<StudyReference>();
+		setWorkingDatabase(Database.CENTRAL);
+		studies.addAll(getDmsProjectDao().getStudiesByTrialEnvironments(environmentIds));
+		setWorkingDatabase(Database.LOCAL);
+		studies.addAll(getDmsProjectDao().getStudiesByTrialEnvironments(environmentIds));
+		return studies;
 	}
 }

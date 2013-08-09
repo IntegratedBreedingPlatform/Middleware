@@ -386,6 +386,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public List<TrialEnvironmentProperty> getPropertiesForTrialEnvironments(List<Integer> trialEnvtIds) throws MiddlewareQueryException {
 		return getTrialEnvironmentBuilder().getPropertiesForTrialEnvironments(trialEnvtIds);
 	}
-	
+
+	@Override
+	public List<StudyReference> getStudiesForTrialEnvironments(List<Integer> environmentIds) throws MiddlewareQueryException {
+		return getStudyNodeBuilder().getStudiesForTrialEnvironments(environmentIds);
+	}
 	
 }
