@@ -93,7 +93,8 @@ public class TestStudyDataManagerImpl {
 	
 	@After
 	public void afterEachTest() {
-		System.out.println(name.getMethodName() + ": Elapsed Time=" + (System.nanoTime() - startTime) + " ns");
+		long elapsedTime = System.nanoTime() - startTime;
+		System.out.println(name.getMethodName() + ": Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime/1000000000) + " s");
 	}
 	
 	@Test
