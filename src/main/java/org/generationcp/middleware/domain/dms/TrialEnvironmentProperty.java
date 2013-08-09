@@ -4,16 +4,32 @@ import org.generationcp.middleware.util.Debug;
 
 public class TrialEnvironmentProperty {
 
+	private Integer id;
 	private String name;
 	private String description;
-	private int numberOfEnvironments;
+	private Integer numberOfEnvironments;
 	
-	public TrialEnvironmentProperty(String name, String description, int numberOfEnvironments) {
+	public TrialEnvironmentProperty(String name, String description, Integer numberOfEnvironments) {
 		this.name = name;
 		this.description = description;
 		this.numberOfEnvironments = numberOfEnvironments;
 	}
 	
+	public TrialEnvironmentProperty(Integer id, String name, String description, Integer numberOfEnvironments) {
+		this.id = id;
+		this.name = name;
+		this.description = description;
+		this.numberOfEnvironments = numberOfEnvironments;
+	}
+	
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -26,10 +42,10 @@ public class TrialEnvironmentProperty {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	public int getNumberOfEnvironments() {
+	public Integer getNumberOfEnvironments() {
 		return numberOfEnvironments;
 	}
-	public void setNumberOfEnvironments(int numberOfEnvironments) {
+	public void setNumberOfEnvironments(Integer numberOfEnvironments) {
 		this.numberOfEnvironments = numberOfEnvironments;
 	}
 	

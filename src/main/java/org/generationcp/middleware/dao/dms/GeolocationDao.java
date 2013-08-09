@@ -145,16 +145,16 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 	public List<TrialEnvironmentProperty> getPropertiesForTrialEnvironments(List<Integer> environmentIds) throws MiddlewareQueryException {
 		List<TrialEnvironmentProperty> properties = new ArrayList<TrialEnvironmentProperty>();
 		try {
-			String sql = "SELECT cvt.name, cvt.definition, COUNT(DISTINCT gp.nd_geolocation_id)"
-							+ " FROM cvterm cvt"
-							+ " INNER JOIN nd_geolocationprop gp ON gp.type_id = cvt.cvterm_id"
+			String sql = "SELECT gp.type_id, cvt.name, cvt.definition, COUNT(DISTINCT gp.nd_geolocation_id)"
+							+ " FROM nd_geolocationprop gp"
+							+ " LEFT JOIN cvterm cvt ON gp.type_id = cvt.cvterm_id"
 							+ " WHERE gp.nd_geolocation_id IN (:environmentIds)"
 							+ " GROUP BY gp.type_id, cvt.name, cvt.definition";
 			Query query = getSession().createSQLQuery(sql)
 							.setParameterList("environmentIds", environmentIds);
 			List<Object[]> result = query.list();
 			for (Object[] row : result) {
-				properties.add(new TrialEnvironmentProperty((String) row[0], (String) row[1], ((BigInteger) row[2]).intValue()));
+				properties.add(new TrialEnvironmentProperty((Integer) row[0], (String) row[1], (String) row[2], ((BigInteger) row[3]).intValue()));
 			}
 			
 		} catch(HibernateException e) {

@@ -691,7 +691,7 @@ public class TestStudyDataManagerImpl {
 	
 	@Test
 	public void testGetPropertiesForTrialEnvironments() throws Exception {
-		List<Integer> environmentIds = Arrays.asList(5770, 10081);
+		List<Integer> environmentIds = Arrays.asList(5770, 10081, -1);
 		System.out.println("testGetPropertiesForTrialEnvironments = " + environmentIds);
 		List<TrialEnvironmentProperty> properties = manager.getPropertiesForTrialEnvironments(environmentIds);
 		System.out.println("SIZE=" + properties.size());

@@ -31,6 +31,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 
 public class TrialEnvironmentBuilder extends Builder {
 
@@ -129,8 +130,19 @@ public class TrialEnvironmentBuilder extends Builder {
 		List<TrialEnvironmentProperty> properties = new ArrayList<TrialEnvironmentProperty>();
 		setWorkingDatabase(Database.CENTRAL);
 		properties.addAll(getGeolocationDao().getPropertiesForTrialEnvironments(environmentIds));
+
 		setWorkingDatabase(Database.LOCAL);
-		properties.addAll(getGeolocationDao().getPropertiesForTrialEnvironments(environmentIds));
+		List<TrialEnvironmentProperty> localProperties = getGeolocationDao().getPropertiesForTrialEnvironments(environmentIds);
+		setWorkingDatabase(Database.CENTRAL);
+		for (TrialEnvironmentProperty property : localProperties) {
+			if (property.getId() >= 0) {
+				CVTerm term = getCvTermDao().getById(property.getId());
+				property.setName(term.getName());
+				property.setDescription(term.getDefinition());
+			}
+			properties.add(property);
+		}
+
 		return properties;
 	}
 }
