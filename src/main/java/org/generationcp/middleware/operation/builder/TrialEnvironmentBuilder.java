@@ -158,7 +158,14 @@ public class TrialEnvironmentBuilder extends Builder {
 				property.setName(term.getName());
 				property.setDescription(term.getDefinition());
 			}
-			properties.add(property);
+			int index = properties.indexOf(property);
+			if (index > -1) {
+				properties.get(index).setNumberOfEnvironments(
+										properties.get(index).getNumberOfEnvironments().intValue() +
+										property.getNumberOfEnvironments().intValue());
+			} else {
+				properties.add(property);
+			}
 		}
 
 		return properties;
