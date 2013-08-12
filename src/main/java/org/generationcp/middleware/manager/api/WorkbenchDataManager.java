@@ -111,6 +111,13 @@ public interface WorkbenchDataManager {
     public void deleteProject(Project project) throws MiddlewareQueryException;
 
     /**
+     * Delete project dependencies.
+     *
+     * @param project - the project to delete dependencies
+     * @throws MiddlewareQueryException
+     */
+    public void deleteProjectDependencies(Project project) throws MiddlewareQueryException;
+    /**
      * Gets the workflow templates.
      *
      * @return the workflow templates

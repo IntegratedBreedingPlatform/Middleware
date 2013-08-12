@@ -85,6 +85,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     private ProjectMethodDAO projectMethodDao;
     private ProjectUserMysqlAccountDAO projectUserMysqlAccountDao;
     private ProjectUserRoleDAO projectUserRoleDao;
+    private ProjectUserMysqlAccountDAO projectUserMysqlAccountDAO;
     private ProjectUserInfoDAO projectUserInfoDao;
     private RoleDAO roleDao; 
     private SecurityQuestionDAO securityQuestionDao;
@@ -137,7 +138,14 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         projectActivityDao.setSession(getCurrentSession());
         return projectActivityDao;
     }
-
+    
+    private ProjectUserMysqlAccountDAO getProjectUserMysqlAccountDAO() {
+        if (projectUserMysqlAccountDAO == null){
+        	projectUserMysqlAccountDAO = new ProjectUserMysqlAccountDAO();
+        }
+        projectUserMysqlAccountDAO.setSession(getCurrentSession());
+        return projectUserMysqlAccountDAO;
+    }
     private ProjectDAO getProjectDao() {
         if (projectDao == null){
             projectDao = new ProjectDAO();
@@ -404,16 +412,79 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         
         return project;
     }
+    
+    @Override
+    public void deleteProjectDependencies(Project project) throws MiddlewareQueryException {
+    	
+    	try {
+    		Long projectId = project.getProjectId();
+            List<ProjectActivity> projectActivities = getProjectActivitiesByProjectId(projectId, 0,
+                    (int) countProjectActivitiesByProjectId(projectId));
+            for (ProjectActivity projectActivity : projectActivities) {
+               deleteProjectActivity(projectActivity);
+            }
 
+            List<ProjectMethod> projectMethods = getProjectMethodByProject(project, 0,
+                    (int) countMethodIdsByProjectId(projectId));
+            for (ProjectMethod projectMethod : projectMethods) {
+               deleteProjectMethod(projectMethod);
+            }
+
+            List<ProjectUserRole> projectUsers = getProjectUserRolesByProject(project);
+            for (ProjectUserRole projectUser : projectUsers) {
+                deleteProjectUserRole(projectUser);
+            }
+            ProjectUserMysqlAccount mysqlaccount = getProjectUserMysqlAccountDAO().getByProjectIdAndUserId(project.getProjectId().intValue(), project.getUserId());
+            if(mysqlaccount != null)
+            	deleteProjectUserMysqlAccount(mysqlaccount);
+           
+            		
+           
+            
+            List<WorkbenchDataset> datasets = getWorkbenchDatasetByProjectId(projectId, 0,
+                    (int) countWorkbenchDatasetByProjectId(projectId));
+            for (WorkbenchDataset dataset : datasets) {
+                deleteWorkbenchDataset(dataset);
+            }
+            
+            List<ProjectLocationMap> projectLocationMaps = getProjectLocationMapByProjectId(projectId, 0,
+                    (int) countLocationIdsByProjectId(projectId));
+            //manager.deleteProjectLocationMap(projectLocationMaps);
+            for (ProjectLocationMap projectLocationMap : projectLocationMaps) {
+                deleteProjectLocationMap(projectLocationMap);
+            } 
+            
+            deleteProject(project);
+    	}catch (Exception e) {
+              
+                logAndThrowException("Cannot delete Project Dependencies: WorkbenchDataManager.deleteProjectDependencies(project=" + project + "): "
+                        + e.getMessage(), e);
+            }
+    }
+    public void deleteProjectUserMysqlAccount(ProjectUserMysqlAccount mysqlaccount) throws MiddlewareQueryException
+    {
+    	Session session = getCurrentSession();
+        Transaction trans = null;
+        try{
+        	trans = session.beginTransaction();
+        	getProjectUserMysqlAccountDAO().makeTransient(mysqlaccount);
+            trans.commit();
+            
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Cannot delete Project: WorkbenchDataManager.deleteProject(mysqlaccount=" + mysqlaccount + "): "
+                    + e.getMessage(), e);
+        }
+    }
     @Override
     public void deleteProject(Project project) throws MiddlewareQueryException {
+    	Session session = getCurrentSession();
         Transaction trans = null;
-        Session session = getCurrentSession();
-        
-        try {
-            trans = session.beginTransaction();
+        try{
+        	trans = session.beginTransaction();
             getProjectDao().makeTransient(project);
             trans.commit();
+            
         } catch (Exception e) {
             rollbackTransaction(trans);
             logAndThrowException("Cannot delete Project: WorkbenchDataManager.deleteProject(project=" + project + "): "
