@@ -12,6 +12,7 @@
 package org.generationcp.middleware.dao;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.generationcp.middleware.domain.dms.LocationDto;
@@ -291,25 +292,28 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
     	        return null;
     }
     
-    public LocationDto getLocationDtoById(int id) throws MiddlewareQueryException {
-    	LocationDto location = null;
+    @SuppressWarnings("unchecked")
+	public List<LocationDto> getLocationDtoByIds(Collection<Integer> ids) throws MiddlewareQueryException {
+		List<LocationDto> returnList = new ArrayList<LocationDto>();
     	try {
-    		String sql = "SELECT l.lname, prov.lname, c.isoabbr"
+    		String sql = "SELECT l.lname, prov.lname, c.isoabbr, l.locid"
     					+ " FROM location l"
 						+ " LEFT JOIN location prov ON prov.locid = l.snl1id"
 						+ " LEFT JOIN cntry c ON c.cntryid = l.cntryid"
-						+ " WHERE l.locid = :id";
+						+ " WHERE l.locid in (:ids)";
     		SQLQuery query = getSession().createSQLQuery(sql);
-    		query.setParameter("id", id);
-    		Object[] result = (Object[]) query.uniqueResult();
+    		query.setParameterList("ids", ids);
+    		List<Object[]> results = query.list();
     		
-    		if (result != null) {
-    			return new LocationDto(id, (String) result[0], (String) result[1], (String) result[2]);
+    		if (results != null) {
+    			for (Object[] result : results) {
+    				returnList.add(new LocationDto((Integer) result[3], (String) result[0], (String) result[1], (String) result[2]));
+    			}
     		}
     		
     	} catch (HibernateException e) {
-    		logAndThrowException("Error with getLocationDtoById(id=" + id + "): " + e.getMessage(), e);
+    		logAndThrowException("Error with getLocationDtoById(id=" + ids + "): " + e.getMessage(), e);
     	}
-    	return location;
+		return returnList;
     }
 }

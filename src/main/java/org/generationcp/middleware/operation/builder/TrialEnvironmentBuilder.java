@@ -12,6 +12,7 @@
 package org.generationcp.middleware.operation.builder;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -127,17 +128,24 @@ public class TrialEnvironmentBuilder extends Builder {
 		TrialEnvironments localEnvironments = getGeolocationDao().getAllTrialEnvironments();
 		if (localEnvironments != null && localEnvironments.getTrialEnvironments() != null) {
 			setWorkingDatabase(Database.CENTRAL);
+			Set<Integer> ids = new HashSet<Integer>();
 			for (TrialEnvironment environment : localEnvironments.getTrialEnvironments()) {
 				if (environment.getLocation() != null && environment.getLocation().getId() != null 
 				&& environment.getLocation().getId().intValue() >= 0) {
-					LocationDto newLocation = getLocationDao().getLocationDtoById(environment.getLocation().getId());
-					if (newLocation != null) {
+					ids.add(environment.getLocation().getId());
+				}
+			}
+			if (ids != null && ids.size() > 0) {
+				List<LocationDto> newLocations = getLocationDao().getLocationDtoByIds(ids);
+				for (TrialEnvironment environment : localEnvironments.getTrialEnvironments()) {
+					if (environment.getLocation() != null && newLocations != null && newLocations.indexOf(environment.getLocation().getId()) > -1) {
+						LocationDto newLocation = newLocations.get(newLocations.indexOf(environment.getLocation().getId()));
 						environment.getLocation().setCountryName(newLocation.getCountryName());
 						environment.getLocation().setLocationName(newLocation.getLocationName());
 						environment.getLocation().setProvinceName(newLocation.getProvinceName());
 					}
+					environments.add(environment);
 				}
-				environments.add(environment);
 			}
 		}
 		
