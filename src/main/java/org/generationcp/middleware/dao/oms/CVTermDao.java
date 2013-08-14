@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao.oms;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -85,5 +87,22 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		}
 		
 		return term;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<CVTerm> getByIds(Collection<Integer> ids) throws MiddlewareQueryException {
+		List<CVTerm> terms = new ArrayList<CVTerm>();
+		
+		try {
+			Criteria criteria = getSession().createCriteria(getPersistentClass());
+			criteria.add(Restrictions.in("cvTermId", ids));
+			
+			terms = criteria.list();
+			
+		} catch(HibernateException e) {
+			logAndThrowException("Error at GetByIds=" + ids + " query on CVTermDao: " + e.getMessage(), e);
+		}
+		
+		return terms;
 	}
 }

@@ -135,17 +135,15 @@ public class TrialEnvironmentBuilder extends Builder {
 					ids.add(environment.getLocation().getId());
 				}
 			}
-			if (ids != null && ids.size() > 0) {
-				List<LocationDto> newLocations = getLocationDao().getLocationDtoByIds(ids);
-				for (TrialEnvironment environment : localEnvironments.getTrialEnvironments()) {
-					if (environment.getLocation() != null && newLocations != null && newLocations.indexOf(environment.getLocation().getId()) > -1) {
-						LocationDto newLocation = newLocations.get(newLocations.indexOf(environment.getLocation().getId()));
-						environment.getLocation().setCountryName(newLocation.getCountryName());
-						environment.getLocation().setLocationName(newLocation.getLocationName());
-						environment.getLocation().setProvinceName(newLocation.getProvinceName());
-					}
-					environments.add(environment);
+			List<LocationDto> newLocations = getLocationDao().getLocationDtoByIds(ids);
+			for (TrialEnvironment environment : localEnvironments.getTrialEnvironments()) {
+				if (environment.getLocation() != null && newLocations != null && newLocations.indexOf(environment.getLocation().getId()) > -1) {
+					LocationDto newLocation = newLocations.get(newLocations.indexOf(environment.getLocation().getId()));
+					environment.getLocation().setCountryName(newLocation.getCountryName());
+					environment.getLocation().setLocationName(newLocation.getLocationName());
+					environment.getLocation().setProvinceName(newLocation.getProvinceName());
 				}
+				environments.add(environment);
 			}
 		}
 		
@@ -160,18 +158,35 @@ public class TrialEnvironmentBuilder extends Builder {
 		setWorkingDatabase(Database.LOCAL);
 		List<TrialEnvironmentProperty> localProperties = getGeolocationDao().getPropertiesForTrialEnvironments(environmentIds);
 		setWorkingDatabase(Database.CENTRAL);
+		Set<Integer> ids = new HashSet<Integer>();
 		for (TrialEnvironmentProperty property : localProperties) {
 			if (property.getId() >= 0) {
-				CVTerm term = getCvTermDao().getById(property.getId());
-				property.setName(term.getName());
-				property.setDescription(term.getDefinition());
+				//CVTerm term = getCvTermDao().getById(property.getId());
+				//property.setName(term.getName());
+				//property.setDescription(term.getDefinition());
+				ids.add(property.getId());
 			}
+		}
+		System.out.println("IDS ARE " + ids);
+		List<CVTerm> terms = getCvTermDao().getByIds(ids);
+		for (TrialEnvironmentProperty property : localProperties) {
 			int index = properties.indexOf(property);
 			if (index > -1) {
 				properties.get(index).setNumberOfEnvironments(
 										properties.get(index).getNumberOfEnvironments().intValue() +
 										property.getNumberOfEnvironments().intValue());
 			} else {
+				CVTerm term = null;
+				for (CVTerm aTerm : terms) {
+					if (aTerm.getCvTermId().equals(property.getId())) {
+						term = aTerm;
+						break;
+					}
+				}
+				if (term != null) {
+					property.setName(term.getName());
+					property.setDescription(term.getDefinition());
+				}
 				properties.add(property);
 			}
 		}

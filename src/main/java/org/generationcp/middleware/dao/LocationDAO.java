@@ -295,25 +295,27 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
     @SuppressWarnings("unchecked")
 	public List<LocationDto> getLocationDtoByIds(Collection<Integer> ids) throws MiddlewareQueryException {
 		List<LocationDto> returnList = new ArrayList<LocationDto>();
-    	try {
-    		String sql = "SELECT l.lname, prov.lname, c.isoabbr, l.locid"
-    					+ " FROM location l"
-						+ " LEFT JOIN location prov ON prov.locid = l.snl1id"
-						+ " LEFT JOIN cntry c ON c.cntryid = l.cntryid"
-						+ " WHERE l.locid in (:ids)";
-    		SQLQuery query = getSession().createSQLQuery(sql);
-    		query.setParameterList("ids", ids);
-    		List<Object[]> results = query.list();
-    		
-    		if (results != null) {
-    			for (Object[] result : results) {
-    				returnList.add(new LocationDto((Integer) result[3], (String) result[0], (String) result[1], (String) result[2]));
-    			}
-    		}
-    		
-    	} catch (HibernateException e) {
-    		logAndThrowException("Error with getLocationDtoById(id=" + ids + "): " + e.getMessage(), e);
-    	}
+		if (ids != null && ids.size() > 0) {
+	    	try {
+	    		String sql = "SELECT l.lname, prov.lname, c.isoabbr, l.locid"
+	    					+ " FROM location l"
+							+ " LEFT JOIN location prov ON prov.locid = l.snl1id"
+							+ " LEFT JOIN cntry c ON c.cntryid = l.cntryid"
+							+ " WHERE l.locid in (:ids)";
+	    		SQLQuery query = getSession().createSQLQuery(sql);
+	    		query.setParameterList("ids", ids);
+	    		List<Object[]> results = query.list();
+	    		
+	    		if (results != null) {
+	    			for (Object[] result : results) {
+	    				returnList.add(new LocationDto((Integer) result[3], (String) result[0], (String) result[1], (String) result[2]));
+	    			}
+	    		}
+	    		
+	    	} catch (HibernateException e) {
+	    		logAndThrowException("Error with getLocationDtoById(id=" + ids + "): " + e.getMessage(), e);
+	    	}
+		}
 		return returnList;
     }
 }
