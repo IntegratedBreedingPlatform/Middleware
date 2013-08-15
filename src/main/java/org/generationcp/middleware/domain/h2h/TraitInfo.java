@@ -31,6 +31,20 @@ public class TraitInfo{
     
     private long observationCount;
     
+    public TraitInfo() {
+    }
+
+    public TraitInfo(String traitName, int traitId, String description,
+            long locationCount, long germplasmCount, long observationCount) {
+        super();
+        this.traitName = traitName;
+        this.traitId = traitId;
+        this.description = description;
+        this.locationCount = locationCount;
+        this.germplasmCount = germplasmCount;
+        this.observationCount = observationCount;
+    }
+
     public String getTraitName() {
         return traitName;
     }
