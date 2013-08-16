@@ -356,7 +356,13 @@ public class TestStudyDataManagerImpl {
 		for (int i = 10015; i <= 10075; i += 10) {
 			DataSet dataSet = manager.getDataSet(i);
 			dataSet.print(0);
-		}
+		}	    
+	}
+	
+	@Test
+	public void testGetDataSetFromSorghumLocal() throws Exception {  //GCP-4986
+	      DataSet dataSet = manager.getDataSet(-4);
+	      dataSet.print(0);
 	}
 
 	@Test
