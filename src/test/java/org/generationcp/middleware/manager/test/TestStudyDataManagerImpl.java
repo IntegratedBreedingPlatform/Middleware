@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
@@ -36,7 +36,6 @@ import org.generationcp.middleware.domain.dms.Stocks;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.StudyValues;
-import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
@@ -99,7 +98,7 @@ public class TestStudyDataManagerImpl {
 	
 	@Test
 	public void testGetStudyDetails() throws Exception {
-		Study study = manager.getStudy(STUDY_ID);
+        Study study = manager.getStudy(STUDY_ID);
 		assertNotNull(study);
 		System.out.println("ID: " + study.getId());
 		System.out.println("Name: " + study.getName());
@@ -112,7 +111,7 @@ public class TestStudyDataManagerImpl {
 	@Test
 	public void testGetAllStudyFactor() throws Exception {
 		System.out.println("testGetFactorDetails");
-		int studyId = 10010;
+        int studyId = 10010;
 		VariableTypeList factors = manager.getAllStudyFactors(studyId);
 		assertNotNull(factors);
 		Assert.assertTrue(factors.getVariableTypes().size() > 0);
@@ -123,7 +122,7 @@ public class TestStudyDataManagerImpl {
 	@Test
 	public void testGetAllStudyVariates() throws Exception {
 		System.out.println("testGetVariates");
-		int studyId = 10010;
+        int studyId = 10010;
 		VariableTypeList variates = manager.getAllStudyVariates(studyId);
 		assertNotNull(variates);
 		Assert.assertTrue(variates.getVariableTypes().size() > 0);
@@ -259,7 +258,7 @@ public class TestStudyDataManagerImpl {
 
 	@Test
 	public void testGetDatasetNodesByStudyId() throws Exception {
-		Integer studyId = 10010;
+        Integer studyId = 10010;
 		List<DatasetReference> datasetReferences = manager
 				.getDatasetReferences(studyId);
 		assertNotNull(datasetReferences);
@@ -357,14 +356,19 @@ public class TestStudyDataManagerImpl {
 			DataSet dataSet = manager.getDataSet(i);
 			dataSet.print(0);
 		}	    
+	}	
+		
+	@Test
+	public void testGetDataSetsOfStudy() throws Exception {  //GCP-4986
+        int studyId = -2;  // Sorghum
+	    List<DatasetReference> dataSetRefs = manager.getDatasetReferences(studyId);
+	   
+	    for (DatasetReference dataSetRef : dataSetRefs){
+	        DataSet dataSet = manager.getDataSet(dataSetRef.getId());
+	        dataSet.print(0);
+	    }   
 	}
 	
-	@Test
-	public void testGetDataSetFromSorghumLocal() throws Exception {  //GCP-4986
-	      DataSet dataSet = manager.getDataSet(-4);
-	      dataSet.print(0);
-	}
-
 	@Test
 	public void testCountExperiments() throws Exception {
 		System.out.println("Dataset Experiment Count: "
@@ -686,36 +690,6 @@ public class TestStudyDataManagerImpl {
 	    Integer standardVariableId = 8230;
 	    String localName = manager.getLocalNameByStandardVariableId(projectId, standardVariableId);
 	    System.out.println("testGetLocalNameByStandardVariableId("+projectId+", "+standardVariableId+"): " + localName);	    
-	}
-	
-	@Test
-	public void testGetAllTrialEnvironments() throws Exception {
-		System.out.println("testGetAllTrialEnvironemnts");
-		TrialEnvironments environments = manager.getAllTrialEnvironments();
-		System.out.println("SIZE=" + environments.size());
-		environments.print(1);
-	}
-	
-	@Test
-	public void testGetPropertiesForTrialEnvironments() throws Exception {
-		List<Integer> environmentIds = Arrays.asList(5770, 10081, -1);
-		System.out.println("testGetPropertiesForTrialEnvironments = " + environmentIds);
-		List<TrialEnvironmentProperty> properties = manager.getPropertiesForTrialEnvironments(environmentIds);
-		System.out.println("SIZE=" + properties.size());
-		for (TrialEnvironmentProperty property : properties) {
-			property.print(0);
-		}
-	}
-	
-	@Test
-	public void testGetStudiesForTrialEnvironments() throws Exception {
-		List<Integer> environmentIds = Arrays.asList(5770, 10081);
-		System.out.println("testGetStudiesForTrialEnvironments = " + environmentIds);
-		List<StudyReference> studies = manager.getStudiesForTrialEnvironments(environmentIds);
-		System.out.println("SIZE=" + studies.size());
-		for (StudyReference study : studies) {
-			study.print(1);
-		}
 	}
 	
 	@AfterClass

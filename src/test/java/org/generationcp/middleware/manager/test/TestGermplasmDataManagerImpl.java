@@ -870,108 +870,6 @@ public class TestGermplasmDataManagerImpl{
     }
     
     @Test
-    public void testGetDerivativeNeighborhood() throws Exception {
-   	
-    	System.out.println("TestDerivativeNeighborhood");
-    	MockDataUtil.mockNeighborhoodTestData(manager, 'D');
-    	GermplasmPedigreeTree tree;
-    	
-    	System.out.println("TestCase #1: GID = TOP node (GID, Backward, Forward = -1, 0, 6)");
-    	tree = manager.getDerivativeNeighborhood(-1, 0, 6);
-    	MockDataUtil.printTree(tree);
-    	Assert.assertEquals("-1*-2**-4***-9***-10**-5*-3**-6**-7***-11****-12****-13*****-14**-8***-15****-17****-18*****-20***-16****-19", MockDataUtil.printTree(tree, "*", ""));
-    	
-    	System.out.println("TestCase #2: GID = LEAF node (GID, Backward, Forward = -5, 2, 10)");
-    	tree = manager.getDerivativeNeighborhood(-5, 2, 10);
-    	MockDataUtil.printTree(tree);
-     	Assert.assertEquals("-1*-2**-4***-9***-10**-5*-3**-6**-7***-11****-12****-13*****-14**-8***-15****-17****-18*****-20***-16****-19", MockDataUtil.printTree(tree, "*", ""));
-    	
-    	System.out.println("TestCase #3: GID = MID node AND Backward < Depth of LEAF (GID, Backward, Forward = -11, 1, 10)");
-    	tree = manager.getDerivativeNeighborhood(-11, 1, 10);
-    	MockDataUtil.printTree(tree);
-    	Assert.assertEquals("-7*-11**-12**-13***-14", MockDataUtil.printTree(tree, "*", ""));
-    	
-    	System.out.println("TestCase #4: GID = MID node AND Backward = Dept of LEAF (GID, Backward, Forward = -11, 3, 10)");
-    	tree = manager.getDerivativeNeighborhood(-11, 3, 10);
-    	MockDataUtil.printTree(tree);
-    	Assert.assertEquals("-1*-2**-4***-9***-10**-5*-3**-6**-7***-11****-12****-13*****-14**-8***-15****-17****-18*****-20***-16****-19", MockDataUtil.printTree(tree, "*", ""));
-
-    	System.out.println("TestCase #5: GID = MID node AND Backward > Dept of LEAF (GID, Backward, Forward = -11, 5, 10)");
-    	tree = manager.getDerivativeNeighborhood(-11, 5, 10);
-    	MockDataUtil.printTree(tree);
-    	Assert.assertEquals("-1*-2**-4***-9***-10**-5*-3**-6**-7***-11****-12****-13*****-14**-8***-15****-17****-18*****-20***-16****-19", MockDataUtil.printTree(tree, "*", ""));
-
-    	System.out.println("TestCase #6: GID = MID node AND Forward < Tree Depth - MID depth (GID, Backward, Forward = -3, 1, 2)");
-    	tree = manager.getDerivativeNeighborhood(-3, 1, 2);
-    	MockDataUtil.printTree(tree);
-    	Assert.assertEquals("-1*-2**-4***-9***-10**-5*-3**-6**-7***-11**-8***-15***-16", MockDataUtil.printTree(tree, "*", ""));
-    	
-    	System.out.println("TestCase #7: GID is MAN, but Ancestors and Descendants have non-MAN members (GID, Backward, Forward = -15, 2, 1)");
-    	tree = manager.getDerivativeNeighborhood(-15, 2, 1);
-    	MockDataUtil.printTree(tree);
-    	Assert.assertEquals("-3*-6*-7**-11***-12***-13*-8**-15***-17***-18**-16***-19", MockDataUtil.printTree(tree, "*", ""));
-
-    	System.out.println("TestCase #8: Should stop at GEN even if Backward count is not exhausted (GID, Backward, Forward = -9, 4, 1)");
-    	tree = manager.getDerivativeNeighborhood(-9, 4, 1);
-    	MockDataUtil.printTree(tree);
-    	Assert.assertEquals("-4*-9*-10", MockDataUtil.printTree(tree, "*", ""));
-    	
-    	//cleanup
-    	MockDataUtil.cleanupMockMaintenanceTestData(manager);
-    }
-
-    @Test
-    public void testGetMaintenanceNeighborhood() throws Exception {
-   	
-    	System.out.println("TestMaintenanceNeighborhood");
-    	MockDataUtil.mockNeighborhoodTestData(manager, 'M');
-    	GermplasmPedigreeTree tree;
-    	
-    	System.out.println("TestCase #1: GID = TOP node (GID, Backward, Forward = -1, 0, 6)");
-    	tree = manager.getMaintenanceNeighborhood(-1, 0, 6);
-    	MockDataUtil.printTree(tree);
-    	Assert.assertEquals("-1*-2*-3**-6**-7***-11****-12****-13*****-14", MockDataUtil.printTree(tree, "*", ""));
-    	
-    	System.out.println("TestCase #2: GID = LEAF node (GID, Backward, Forward = -5, 2, 10)");
-    	tree = manager.getMaintenanceNeighborhood(-5, 2, 10);
-    	MockDataUtil.printTree(tree);
-    	Assert.assertEquals("-1*-2*-3**-6**-7***-11****-12****-13*****-14", MockDataUtil.printTree(tree, "*", ""));
-    	
-    	System.out.println("TestCase #3: GID = MID node AND Backward < Depth of LEAF (GID, Backward, Forward = -11, 1, 10)");
-    	tree = manager.getMaintenanceNeighborhood(-11, 1, 10);
-    	MockDataUtil.printTree(tree);
-    	Assert.assertEquals("-7*-11**-12**-13***-14", MockDataUtil.printTree(tree, "*", ""));
-    	
-    	System.out.println("TestCase #4: GID = MID node AND Backward = Dept of LEAF (GID, Backward, Forward = -11, 3, 10)");
-    	tree = manager.getMaintenanceNeighborhood(-11, 3, 10);
-    	MockDataUtil.printTree(tree);
-    	Assert.assertEquals("-1*-2*-3**-6**-7***-11****-12****-13*****-14", MockDataUtil.printTree(tree, "*", ""));
-
-    	System.out.println("TestCase #5: GID = MID node AND Backward > Dept of LEAF (GID, Backward, Forward = -11, 5, 10)");
-    	tree = manager.getMaintenanceNeighborhood(-11, 5, 10);
-    	MockDataUtil.printTree(tree);
-    	Assert.assertEquals("-1*-2*-3**-6**-7***-11****-12****-13*****-14", MockDataUtil.printTree(tree, "*", ""));
-
-    	System.out.println("TestCase #6: GID = MID node AND Forward < Tree Depth - MID depth (GID, Backward, Forward = -3, 1, 2)");
-    	tree = manager.getMaintenanceNeighborhood(-3, 1, 2);
-    	MockDataUtil.printTree(tree);
-    	Assert.assertEquals("-1*-2*-3**-6**-7***-11", MockDataUtil.printTree(tree, "*", ""));
-    	
-    	System.out.println("TestCase #7: GID is MAN, but Ancestors and Descendants have non-MAN members (GID, Backward, Forward = -15, 2, 1)");
-    	tree = manager.getMaintenanceNeighborhood(-15, 2, 1);
-    	MockDataUtil.printTree(tree);
-    	Assert.assertEquals("-1*-2*-3**-6**-7***-11", MockDataUtil.printTree(tree, "*", ""));
-
-    	System.out.println("TestCase #8: Should stop at GEN even if Backward count is not exhausted (GID, Backward, Forward = -9, 4, 1)");
-    	tree = manager.getMaintenanceNeighborhood(-9, 4, 1);
-    	MockDataUtil.printTree(tree);
-    	Assert.assertEquals("-4*-9*-10", MockDataUtil.printTree(tree, "*", ""));
-    	
-    	//cleanup
-    	MockDataUtil.cleanupMockMaintenanceTestData(manager);
-    }
-    
-    @Test
     public void testGetAllBreedingLocations() throws MiddlewareQueryException {
         List<Location> locations = manager.getAllBreedingLocations();
         System.out.println("getAllBreedingLocations()  " + locations);
@@ -982,18 +880,6 @@ public class TestGermplasmDataManagerImpl{
         Long locationCount = (Long) manager.countAllBreedingLocations();
         System.out.println("countAllBreedingLocations() - Total Count = " + locationCount);
     }        
-    
-    @Test
-    public void testGeneratePedigreeTree() throws MiddlewareQueryException {
-    	// Using the sample on the story description (rice)
-    	int gid = 50533;
-    	int levels = 3;
-    	Boolean includeDerivativeLines = true;
-    	
-    	GermplasmPedigreeTree germplasmPedigreeTree = manager.generatePedigreeTree(gid, levels, includeDerivativeLines);
-    	System.out.println("generatePedigreeTree(" + gid + ", " + levels + ", " + includeDerivativeLines +")");
-    	System.out.println(renderNode(germplasmPedigreeTree.getRoot(),""));
-    }
     
     @Test
     public void testGetNextSequenceNumberForCrossNameInDatabase() throws MiddlewareQueryException{
@@ -1155,6 +1041,15 @@ public class TestGermplasmDataManagerImpl{
         System.out.println("Number of record/s: " +locdetails.size() );
     }
     
+
+    @Test
+    public void testGetBibliographicalReferenceById() throws Exception {
+        Integer id = Integer.valueOf(1);
+        Bibref bibref = manager.getBibliographicReferenceByID(id);
+        System.out.println("testGetBibliographicalReferenceById(" + id + ") RESULTS: " + bibref);
+    }
+
+    
     @Test
     public void testGetManagementNeighbors() throws Exception {
     	Integer gid = Integer.valueOf(2);
@@ -1224,16 +1119,4 @@ public class TestGermplasmDataManagerImpl{
         factory.close();
     }
     
-    private String renderNode(GermplasmPedigreeTreeNode node, String prefix){
-       String outputString = "";
- 	   if(node != null){
-            outputString = "-" + prefix + " " + node.getGermplasm().getGid();
-            for (GermplasmPedigreeTreeNode parent : node.getLinkedNodes()) {
-                outputString = outputString + "\n"
-                        + renderNode(parent, prefix + "-");
-            }
- 	   }
-
-       return outputString;
-    }
 }

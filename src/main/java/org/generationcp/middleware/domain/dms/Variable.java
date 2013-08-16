@@ -64,16 +64,17 @@ public class Variable  implements Comparable<Variable> {
 	}
 	
 	public String getDisplayValue() {
-	    if (value == null){
-            value = "";
-        } else if (variableType.getStandardVariable().hasEnumerations()) {
+	    if (variableType.getStandardVariable().hasEnumerations()) {
 		    try{
 		        value = variableType.getStandardVariable().findEnumerationById(Integer.parseInt(value)).getName();
 		    }catch(NumberFormatException e){
 		        // Ignore, just return the value
 		    }
 		}
-		return value;
+	    if (value == null){
+            value = "";
+        } 
+	    return value;
 	}
 
 	public void print(int indent) {

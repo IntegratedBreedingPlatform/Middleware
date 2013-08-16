@@ -24,10 +24,12 @@ import java.util.Properties;
 import org.generationcp.middleware.exceptions.ConfigException;
 import org.generationcp.middleware.hibernate.HibernateSessionPerThreadProvider;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.api.CrossStudyDataManager;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
+import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
@@ -261,6 +263,14 @@ public class ManagerFactory implements Serializable {
 
     public GermplasmDataManager getGermplasmDataManager() {
         return new GermplasmDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
+    public PedigreeDataManager getPedigreeDataManager() {
+        return new PedigreeDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
+    public CrossStudyDataManager getCrossStudyDataManager() {
+        return new CrossStudyDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
     }
 
     public GermplasmListManager getGermplasmListManager() {
