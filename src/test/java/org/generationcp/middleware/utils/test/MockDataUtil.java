@@ -7,6 +7,7 @@ import java.util.List;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
@@ -85,9 +86,17 @@ public class MockDataUtil {
 	
 	private static <M> void setToManager(M manager, String fieldName, Object value) throws MiddlewareQueryException {
     	try {
-    		Field field = manager.getClass().getDeclaredField(fieldName);
+    		//TODO: when using spring, change this directly to inject mock class instead of reflection
+    		Field field = manager.getClass().getSuperclass().getSuperclass().getDeclaredField(fieldName);
     		field.setAccessible(true);
     		field.set(manager, value);
+    		//TODO: hard coded while not using spring injection
+    		Field gMgrField = manager.getClass().getDeclaredField("germplasmDataManager");
+    		gMgrField.setAccessible(true);
+    		GermplasmDataManager gManager = (GermplasmDataManager) gMgrField.get(manager);
+    		field = gManager.getClass().getSuperclass().getSuperclass().getDeclaredField(fieldName);
+    		field.setAccessible(true);
+    		field.set(gManager, value);
     	
     	} catch (Exception e) {
     		throw new MiddlewareQueryException("Failed to inject DAOs to the Manager for Testing: " + e.getMessage());

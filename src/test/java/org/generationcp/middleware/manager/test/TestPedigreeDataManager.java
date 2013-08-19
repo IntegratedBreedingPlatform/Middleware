@@ -185,7 +185,7 @@ public class TestPedigreeDataManager{
     public void testGetDerivativeNeighborhood2() throws Exception {
     
         System.out.println("TestDerivativeNeighborhood");
-        MockDataUtil.mockNeighborhoodTestData(germplasmManager, 'D');
+        MockDataUtil.mockNeighborhoodTestData(pedigreeManager, 'D');
         GermplasmPedigreeTree tree;
         
         System.out.println("TestCase #1: GID = TOP node (GID, Backward, Forward = -1, 0, 6)");
