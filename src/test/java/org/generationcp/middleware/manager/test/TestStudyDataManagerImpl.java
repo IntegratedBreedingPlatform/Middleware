@@ -357,17 +357,18 @@ public class TestStudyDataManagerImpl {
 			dataSet.print(0);
 		}	    
 	}	
-		
-	@Test
-	public void testGetDataSetsOfStudy() throws Exception {  //GCP-4986
-        int studyId = -2;  // Sorghum
-	    List<DatasetReference> dataSetRefs = manager.getDatasetReferences(studyId);
-	   
-	    for (DatasetReference dataSetRef : dataSetRefs){
-	        DataSet dataSet = manager.getDataSet(dataSetRef.getId());
-	        dataSet.print(0);
-	    }   
-	}
+    
+    @Test
+    public void testGetDataSetOfSorghum() throws Exception {  //GCP-4986
+        int dataSetId = -4; // Local sorghum
+        DataSet dataSet = manager.getDataSet(dataSetId);
+        dataSet.print(0);
+        List<Experiment> experiments = manager.getExperiments(dataSetId, 0, (int) manager.countExperiments(dataSetId));
+        System.out.println(" Experiments: " + experiments.size());
+        for (Experiment e: experiments){
+            e.print(4);
+        }
+    }
 	
 	@Test
 	public void testCountExperiments() throws Exception {
