@@ -12,7 +12,10 @@
 
 package org.generationcp.middleware.manager.api;
 
+import java.util.List;
+
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 
 
@@ -145,5 +148,117 @@ public interface PedigreeDataManager{
      */
     public GermplasmPedigreeTree getMaintenanceNeighborhood(Integer gid, int numberOfStepsBackward, int numberOfStepsForward)
             throws MiddlewareQueryException;
+
+    
+    /**
+     * Returns the Germplasm representing the children of the Germplasm
+     * identified by the given gid. The function returns a List of Object
+     * arrays. Each Object array contains 2 elements, the first is an int to
+     * specify the progenitor number and the second is the Germplasm POJO
+     * representing the child germplasm.
+     * 
+     * @param gid
+     *            - gid of the parent Germplasm
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
+     * @return List of Object arrays, the arrays have 2 elements in them
+     * @throws MiddlewareQueryException
+     */
+    public List<Object[]> getDescendants(Integer gid, int start, int numOfRows) throws MiddlewareQueryException;
+
+    /**
+     * Returns the number of children of the Germplasm identified by the given
+     * gid.
+     * 
+     * @param gid
+     * @return count of children
+     * @throws MiddlewareQueryException
+     */
+    public long countDescendants(Integer gid) throws MiddlewareQueryException;
+
+    
+
+    
+    /**
+     * Returns the Germplasm which are management group neighbors of the
+     * Germplasm identified by the given GID. The given Germplasm is assumed to
+     * be a root of a management group. The Germplasm POJOs included in the
+     * results come with their preferred names which can be accessed by calling
+     * Germplasm.getPreferredName().
+     * 
+     * @param gid
+     *            - gid of the Germplasm
+     * @param start
+     *            - the starting index of the sublist of results to be returned
+     * @param numOfRows
+     *            - the number of rows to be included in the sublist of results
+     *            to be returned
+     * @return List of Germplasm POJOs
+     * @throws MiddlewareQueryException
+     */
+    public List<Germplasm> getManagementNeighbors(Integer gid, int start, int numOfRows) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Returns the number of management neighbors of the Germplasm with the given id.
+     * 
+     * @param gid - the Germplasm id
+     * @return the number of management neighbors
+     * @throws MiddlewareQueryException
+     */
+    public long countManagementNeighbors(Integer gid) throws MiddlewareQueryException;
+    
+    /**
+     * Returns the number of group relatives a Germplasm has.
+     * 
+     * @param gid
+     * @return The number of group relatives of a Germplasm
+     * @throws MiddlewareQueryException
+     */
+    public long countGroupRelatives(Integer gid) throws MiddlewareQueryException;
+                                             
+    /**
+     * Returns the Germplasm which are group relatives of the Germplasm
+     * identified by the given GID. The Germplasm POJOs included in the results
+     * come with their preferred names which can be accessed by calling
+     * Germplasm.getPreferredName().
+     * 
+     * @param gid
+     * @return List of Germplasm POJOs
+     * @throws MiddlewareQueryException
+     */
+    public List<Germplasm> getGroupRelatives(Integer gid, int start, int numRows) throws MiddlewareQueryException;
+
+    /**
+     * Returns the generation history of the Germplasm identified by the given
+     * GID. The history is created by tracing back through the source germplasms
+     * from the given Germplasm through its progenitors, up until a Germplasm
+     * created by a generative method is encountered. The Germplasm POJOs
+     * included in the results come with their preferred names which can be
+     * accessed by calling Germplasm.getPreferredName().
+     * 
+     * @param gid
+     * @return List of Germplasm POJOs, arranged from the given Germplasm down
+     *         to the last source on the generation history
+     * @throws MiddlewareQueryException
+     */
+    public List<Germplasm> getGenerationHistory(Integer gid) throws MiddlewareQueryException;
+
+    /**
+     * Returns the Germplasm representing the parent of the child Germplasm
+     * identified by the given gid and having the given progenitor number.
+     * 
+     * @param gid
+     *            - gid of child Germplasm
+     * @param progenitorNumber
+     *            - progenitor number of the parent with respect to the child
+     * @return Germplasm POJO
+     * @throws MiddlewareQueryException
+     */
+    public Germplasm getParentByGIDAndProgenitorNumber(Integer gid, Integer progenitorNumber) throws MiddlewareQueryException;
+
 
 }

@@ -29,8 +29,6 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
-import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.pojos.GidNidElement;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
@@ -38,9 +36,6 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.pojos.gdms.MapDetailElement;
-import org.generationcp.middleware.pojos.gdms.ParentElement;
-import org.generationcp.middleware.utils.test.MockDataUtil;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -932,37 +927,13 @@ public class TestGermplasmDataManagerImpl{
     }
     
     @Test
-    public void testCountDescendants() throws Exception {
-    	Integer gid = 10; //change gid value
-    	long count = manager.countDescendants(gid);
-    	Assert.assertNotNull(count);
-    	System.out.println("testCountDescendants("+gid+") Results: " + count);
-    }
-    
-    @Test
     public void testCountGermplasmByPrefName() throws Exception {
     	String name = "CHALIMBANA"; //change nval
     	long count = manager.countGermplasmByPrefName(name);
     	Assert.assertNotNull(count);
     	System.out.println("testCountGermplasmByPrefName("+name+") Results: " + count);
     }
-    
-    @Test
-    public void testCountGroupRelatives() throws Exception {
-    	Integer gid = 1; //change gid value
-    	long count = manager.countGroupRelatives(gid);
-    	Assert.assertNotNull(count);
-    	System.out.println("testCountGroupRelatives("+gid+") Results: " + count);
-    }
-    
-    @Test
-    public void testCountManagementNeighbors() throws Exception {
-    	Integer gid = 1; //change gid value
-    	long count = manager.countManagementNeighbors(gid);
-    	Assert.assertNotNull(count);
-    	System.out.println("testCountManagementNeighbors("+gid+") Results: " + count);
-    }
-    
+
     @Test
     public void testGetAllGermplasm() throws Exception {
     	List<Germplasm> germplasms = manager.getAllGermplasm(0, 100, Database.CENTRAL);
@@ -992,33 +963,7 @@ public class TestGermplasmDataManagerImpl{
         System.out.println("testGetCountryById("+id+") Results:");
         System.out.println("  " + countries);
     }
-    
-    @Test
-    public void testGetGenerationHistory() throws Exception {
-    	Integer gid = Integer.valueOf(1);
-    	List<Germplasm> genhistory = manager.getGenerationHistory(gid);
-    	Assert.assertNotNull(genhistory);
-        Assert.assertTrue(!genhistory.isEmpty());
-        System.out.println("testGetGenerationHistory("+gid+") Results: ");
-        for (Germplasm genhistories : genhistory) {
-            System.out.println("  " + genhistories);
-        }
-        System.out.println("Number of record/s: " +genhistory.size());
-    }
-    
-    @Test
-    public void testGetGroupRelatives() throws Exception {
-    	Integer gid = Integer.valueOf(1);
-    	List<Germplasm> grouprel = manager.getGroupRelatives(gid, 0, 100);
-    	Assert.assertNotNull(grouprel);
-        Assert.assertTrue(!grouprel.isEmpty());
-        System.out.println("testGetGroupRelatives("+gid+") Results: ");
-        for (Germplasm grouprels : grouprel) {
-            System.out.println("  " + grouprels);
-        }
-        System.out.println("Number of record/s: " +grouprel.size());
-    }
-    
+
     @Test
     public void testGetLocationByID() throws Exception {
     	Integer id = Integer.valueOf(1);
@@ -1051,20 +996,6 @@ public class TestGermplasmDataManagerImpl{
 
     
     @Test
-    public void testGetManagementNeighbors() throws Exception {
-    	Integer gid = Integer.valueOf(2);
-    	long count = manager.countManagementNeighbors(gid);
-    	List<Germplasm> mneighbors = manager.getManagementNeighbors(gid, 0, (int) count);
-    	Assert.assertNotNull(mneighbors);
-    	Assert.assertTrue(!mneighbors.isEmpty());
-        System.out.println("testGetManagementNeighbors("+gid+") Results: ");
-        for (Germplasm mneighbor : mneighbors) {
-            System.out.println("  " + mneighbor);
-        }
-        System.out.println("Number of record/s: " +mneighbors.size() );
-    }
-    
-    @Test
     public void testGetMethodByID() throws Exception {
     	Integer id = Integer.valueOf(2);
     	Method methodid = manager.getMethodByID(id);
@@ -1074,35 +1005,12 @@ public class TestGermplasmDataManagerImpl{
     }
     
     @Test
-    public void testGetParentByGIDAndProgenitorNumber() throws Exception {
-    	Integer gid = Integer.valueOf(2);
-    	Integer progenitorNumber = Integer.valueOf(2);
-    	Germplasm result = manager.getParentByGIDAndProgenitorNumber(gid, progenitorNumber);
-    	assertNotNull(result);
-        System.out.println("testGetParentByGIDAndProgenitorNumber Results: ");
-        System.out.println("  " + result);
-    }
-    
-    @Test
     public void testGetUserDefinedFieldByID() throws Exception {
     	Integer id = Integer.valueOf(2);
     	UserDefinedField result = manager.getUserDefinedFieldByID(id);
     	assertNotNull(result);
         System.out.println("testGetUserDefinedFieldByID Results: ");
         System.out.println("  " + result);
-    }
-    
-    @Test
-    public void testGetDescendants() throws Exception {
-    	Integer id = Integer.valueOf(2);
-    	List<Object[]> results = manager.getDescendants(id, 0, 100);
-    	assertNotNull(results);
-    	Assert.assertTrue(!results.isEmpty());
-        System.out.println("testGetDescendants Results: ");
-        for (Object[] result : results) {
-            System.out.println("  " + result);
-        }
-        System.out.println("Number of record/s: " + results.size() );
     }
     
     @Test

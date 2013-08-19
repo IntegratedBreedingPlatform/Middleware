@@ -12,6 +12,8 @@
 
 package org.generationcp.middleware.manager.test;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -47,7 +49,7 @@ public class TestPedigreeDataManager{
     @Test
     public void testGetGermplasmDescendants() throws Exception {
         Integer gid = Integer.valueOf(47888);
-        List<Object[]> germplsmList = germplasmManager.getDescendants(gid, 0, 20);
+        List<Object[]> germplsmList = pedigreeManager.getDescendants(gid, 0, 20);
 
         System.out.println("testGetGermplasmDescendants(" + gid + ") RESULTS: ");
         for (Object[] object : germplsmList) {
@@ -59,7 +61,7 @@ public class TestPedigreeDataManager{
     @Test
     public void testCountGermplasmDescendants() throws Exception {
         Integer gid = Integer.valueOf(47888);
-        long count = germplasmManager.countDescendants(gid);
+        long count = pedigreeManager.countDescendants(gid);
         System.out.println("testCountGermplasmDescendants(" + gid + ") RESULTS: " + count);
     }
 
@@ -67,7 +69,7 @@ public class TestPedigreeDataManager{
     public void testGetProgenitorByGID() throws Exception {
         Integer gid = Integer.valueOf(779745);
         Integer pNo = Integer.valueOf(10);
-        Germplasm germplasm = germplasmManager.getParentByGIDAndProgenitorNumber(gid, pNo);
+        Germplasm germplasm = pedigreeManager.getParentByGIDAndProgenitorNumber(gid, pNo);
         System.out.println("testGetProgenitorByGID(" + gid + ", " + pNo + ") RESULTS: " + germplasm);
     }
 
@@ -111,10 +113,11 @@ public class TestPedigreeDataManager{
 
     @Test
     public void testGetManagementNeighbors() throws Exception {
-        Integer gid = Integer.valueOf(625);
-        int count = (int) germplasmManager.countManagementNeighbors(gid);
-        List<Germplasm> neighbors = germplasmManager.getManagementNeighbors(gid, 0, count);
-
+        Integer gid = Integer.valueOf(2);
+        int count = (int) pedigreeManager.countManagementNeighbors(gid);
+        List<Germplasm> neighbors = pedigreeManager.getManagementNeighbors(gid, 0, count);
+        Assert.assertNotNull(neighbors);
+        Assert.assertTrue(!neighbors.isEmpty());
         System.out.println("testGetManagementNeighbors(" + gid + ") RESULTS: " + count);
         for (Germplasm g : neighbors) {
             String name = g.getPreferredName() != null ? g.getPreferredName().getNval() : null;
@@ -126,10 +129,12 @@ public class TestPedigreeDataManager{
     public void testGetGroupRelatives() throws Exception {
         Integer gid = Integer.valueOf(1);
         
-        long count = germplasmManager.countGroupRelatives(gid);
-        List<Germplasm> neighbors = germplasmManager.getGroupRelatives(gid, 0, (int) count);
+        long count = pedigreeManager.countGroupRelatives(gid);
+        List<Germplasm> neighbors = pedigreeManager.getGroupRelatives(gid, 0, (int) count);
+        Assert.assertNotNull(neighbors);
+        Assert.assertTrue(!neighbors.isEmpty());
 
-        System.out.println("testGetGroupRelatives(" + gid + ") RESULTS:");
+        System.out.println("testGetGroupRelatives(" + gid + ") RESULTS: " + neighbors.size());
         for (Germplasm g : neighbors) {
             String name = g.getPreferredName() != null ? g.getPreferredName().getNval() : null;
             System.out.println("  " + g.getGid() + " : " + name);
@@ -139,14 +144,30 @@ public class TestPedigreeDataManager{
     @Test
     public void testGetGenerationHistory() throws Exception {
         Integer gid = new Integer(50533);
-        List<Germplasm> results = germplasmManager.getGenerationHistory(gid);
+        List<Germplasm> results = pedigreeManager.getGenerationHistory(gid);
+        Assert.assertNotNull(results);
+        Assert.assertTrue(!results.isEmpty());
 
-        System.out.println("testGetGenerationHistory(" + gid + ") RESULTS:");
+        System.out.println("testGetGenerationHistory(" + gid + ") RESULTS: " + results.size());
         for (Germplasm g : results) {
             String name = g.getPreferredName() != null ? g.getPreferredName().getNval() : null;
             System.out.println("  " + g.getGid() + " : " + name);
         }
     }
+    
+    @Test
+    public void testGetDescendants() throws Exception {
+        Integer id = Integer.valueOf(2);
+        List<Object[]> results = pedigreeManager.getDescendants(id, 0, 100);
+        assertNotNull(results);
+        Assert.assertTrue(!results.isEmpty());
+        System.out.println("testGetDescendants Results: ");
+        for (Object[] result : results) {
+            System.out.println("  " + result);
+        }
+        System.out.println("Number of record/s: " + results.size() );
+    }
+    
 
     @Test
     public void testGetDerivativeNeighborhood() throws Exception {
@@ -164,7 +185,7 @@ public class TestPedigreeDataManager{
     public void testGetDerivativeNeighborhood2() throws Exception {
     
         System.out.println("TestDerivativeNeighborhood");
-        MockDataUtil.mockNeighborhoodTestData(pedigreeManager, 'D');
+        MockDataUtil.mockNeighborhoodTestData(germplasmManager, 'D');
         GermplasmPedigreeTree tree;
         
         System.out.println("TestCase #1: GID = TOP node (GID, Backward, Forward = -1, 0, 6)");
@@ -279,6 +300,44 @@ public class TestPedigreeDataManager{
         //cleanup
         MockDataUtil.cleanupMockMaintenanceTestData(pedigreeManager);
     }
+    
+
+        
+    @Test
+    public void testGetParentByGIDAndProgenitorNumber() throws Exception {
+        Integer gid = Integer.valueOf(2);
+        Integer progenitorNumber = Integer.valueOf(2);
+        Germplasm result = pedigreeManager.getParentByGIDAndProgenitorNumber(gid, progenitorNumber);
+        assertNotNull(result);
+        System.out.println("testGetParentByGIDAndProgenitorNumber Results: ");
+        System.out.println("  " + result);
+    }
+    
+
+    @Test
+    public void testCountDescendants() throws Exception {
+        Integer gid = 10; //change gid value
+        long count = pedigreeManager.countDescendants(gid);
+        Assert.assertNotNull(count);
+        System.out.println("testCountDescendants("+gid+") Results: " + count);
+    }
+    
+    @Test
+    public void testCountGroupRelatives() throws Exception {
+        Integer gid = 1; //change gid value
+        long count = pedigreeManager.countGroupRelatives(gid);
+        Assert.assertNotNull(count);
+        System.out.println("testCountGroupRelatives("+gid+") Results: " + count);
+    }
+    
+    @Test
+    public void testCountManagementNeighbors() throws Exception {
+        Integer gid = 1; //change gid value
+        long count = pedigreeManager.countManagementNeighbors(gid);
+        Assert.assertNotNull(count);
+        System.out.println("testCountManagementNeighbors("+gid+") Results: " + count);
+    }
+    
     
 
     @AfterClass

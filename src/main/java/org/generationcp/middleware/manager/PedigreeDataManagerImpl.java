@@ -13,6 +13,7 @@
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -30,6 +31,7 @@ import org.hibernate.Session;
  * class, a Hibernate Session must be passed to its constructor.
  * 
  */
+@SuppressWarnings("unchecked")
 public class PedigreeDataManagerImpl extends DataManager implements PedigreeDataManager{
 
     private GermplasmDataManagerImpl germplasmDataManager;
@@ -339,5 +341,91 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
         }
     }
 
-   
+
+    @Override
+    public Germplasm getParentByGIDAndProgenitorNumber(Integer gid, Integer progenitorNumber) throws MiddlewareQueryException {
+        if (setWorkingDatabase(gid)) {
+            return getGermplasmDao().getProgenitorByGID(gid, progenitorNumber);
+        }
+        return null;
+    }
+
+    @Override
+    public List<Object[]> getDescendants(Integer gid, int start, int numOfRows) throws MiddlewareQueryException {
+        List<Object[]> result = new ArrayList<Object[]>();
+        Object[] germplasmList;
+
+        if (setWorkingDatabase(gid)) {
+            List<Germplasm> germplasmDescendant = getGermplasmDao().getGermplasmDescendantByGID(gid, start, numOfRows);
+            for (Germplasm g : germplasmDescendant) {
+                germplasmList = new Object[2];
+                if (g.getGpid1().equals(gid)) {
+                    germplasmList[0] = 1;
+                } else if (g.getGpid2().equals(gid)) {
+                    germplasmList[0] = 2;
+                } else {
+                    germplasmList[0] = getProgenitorDao().getByGIDAndPID(g.getGid(), gid).getProgntrsPK().getPno().intValue();
+                }
+                germplasmList[1] = g;
+
+                result.add(germplasmList);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public long countDescendants(Integer gid) throws MiddlewareQueryException {
+        return super.countFromInstanceByIdAndMethod(getGermplasmDao(), gid, "countGermplasmDescendantByGID", new Object[] { gid },
+                new Class[] { Integer.class });
+    }
+
+    @Override
+    public List<Germplasm> getManagementNeighbors(Integer gid, int start, int numOfRows) throws MiddlewareQueryException {
+        List<String> methods = Arrays.asList("countManagementNeighbors", "getManagementNeighbors");
+        return (List<Germplasm>) super.getFromCentralAndLocalByMethod(getGermplasmDao(), methods, start, numOfRows, new Object[] { gid },
+                new Class[] { Integer.class });
+    }
+
+    @Override
+    public long countManagementNeighbors(Integer gid) throws MiddlewareQueryException {
+        return super.countAllFromCentralAndLocalByMethod(getGermplasmDao(), "countManagementNeighbors", new Object[] { gid },
+                new Class[] { Integer.class });
+    }
+
+    @Override
+    public long countGroupRelatives(Integer gid) throws MiddlewareQueryException {
+        return super.countFromInstanceByIdAndMethod(getGermplasmDao(), gid, "countGroupRelatives", new Object[] { gid },
+                new Class[] { Integer.class });
+    }
+
+    @Override
+    public List<Germplasm> getGroupRelatives(Integer gid, int start, int numRows) throws MiddlewareQueryException {
+        return (List<Germplasm>) super.getFromInstanceByIdAndMethod(getGermplasmDao(), gid, "getGroupRelatives", 
+                new Object[]{gid, start, numRows}, new Class[]{Integer.class, Integer.TYPE, Integer.TYPE});
+    }
+
+    @Override
+    public List<Germplasm> getGenerationHistory(Integer gid) throws MiddlewareQueryException {
+        List<Germplasm> toreturn = new ArrayList<Germplasm>();
+
+        Germplasm currentGermplasm = germplasmDataManager.getGermplasmWithPrefName(gid);
+        if (currentGermplasm != null) {
+            toreturn.add(currentGermplasm);
+
+            while (currentGermplasm.getGnpgs() == -1) {
+                // trace back the sources
+                Integer sourceId = currentGermplasm.getGpid2();
+                currentGermplasm = germplasmDataManager.getGermplasmWithPrefName(sourceId);
+
+                if (currentGermplasm != null) {
+                    toreturn.add(currentGermplasm);
+                } else {
+                    break;
+                }
+            }
+        }
+        return toreturn;
+    }
+
 }
