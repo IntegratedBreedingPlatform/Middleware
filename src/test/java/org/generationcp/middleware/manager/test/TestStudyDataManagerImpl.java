@@ -365,8 +365,26 @@ public class TestStudyDataManagerImpl {
         dataSet.print(0);
         List<Experiment> experiments = manager.getExperiments(dataSetId, 0, (int) manager.countExperiments(dataSetId));
         System.out.println(" Experiments: " + experiments.size());
-        for (Experiment e: experiments){
-            e.print(4);
+        
+        System.out.println(" Variables.getDisplayValue(): " + experiments.size());
+        for (Experiment experiment: experiments){
+            List<Variable> variables = new ArrayList<Variable>();
+
+            VariableList factors = experiment.getFactors();
+            if(factors != null){
+                variables.addAll(factors.getVariables());
+            }
+            
+            VariableList variates = experiment.getVariates();
+            if(variates != null){
+                variables.addAll(variates.getVariables());
+            }
+            
+            for (Variable variable: variables)
+            if (!("GID".equals(variable.getVariableType().getLocalName().trim()))) {
+                String value = variable.getDisplayValue();
+                System.out.println("\t" + experiment.getId() + "  :  " + variable.getVariableType().getStandardVariable().getName() + "  :  " + value );
+            }
         }
     }
 	

@@ -66,7 +66,10 @@ public class Variable  implements Comparable<Variable> {
 	public String getDisplayValue() {
 	    if (variableType.getStandardVariable().hasEnumerations()) {
 		    try{
-		        value = variableType.getStandardVariable().findEnumerationById(Integer.parseInt(value)).getName();
+		        Enumeration enumeration = variableType.getStandardVariable().findEnumerationById(Integer.parseInt(value)); 
+		        if (enumeration != null) { 
+		            value = enumeration.getName();
+		        }
 		    }catch(NumberFormatException e){
 		        // Ignore, just return the value
 		    }
