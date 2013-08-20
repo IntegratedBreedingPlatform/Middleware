@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao;
 
+import java.util.List;
+
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.hibernate.Criteria;
@@ -34,6 +36,21 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer>{
         } catch(HibernateException ex){
             logAndThrowException("Error in getByProjectIdAndUserId(projectId = " + projectId
                     + ", userId = " + userId + "):" + ex.getMessage(), ex);
+        }
+        return null;
+    }
+    
+    public List<ProjectUserInfo> getByProjectId(Integer projectId) throws MiddlewareQueryException{
+        try{
+        	if (projectId != null ){
+	            Criteria criteria = getSession().createCriteria(ProjectUserInfo.class);
+	            criteria.add(Restrictions.eq("projectId", projectId ));
+	                        
+	            return (List<ProjectUserInfo>)criteria.list();
+        	}
+        } catch(HibernateException ex){
+            logAndThrowException("Error in getByProjectIdAndUserId(projectId = " + projectId
+                    + "):" + ex.getMessage(), ex);
         }
         return null;
     }

@@ -422,7 +422,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
                     (int) countProjectActivitiesByProjectId(projectId));
             for (ProjectActivity projectActivity : projectActivities) {
                deleteProjectActivity(projectActivity);
-            }
+            } 
 
             List<ProjectMethod> projectMethods = getProjectMethodByProject(project, 0,
                     (int) countMethodIdsByProjectId(projectId));
@@ -454,12 +454,31 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
                 deleteProjectLocationMap(projectLocationMap);
             } 
             
+            List<ProjectUserInfo> projectUserInfos = getByProjectId(projectId.intValue());
+            for (ProjectUserInfo projectUserInfo : projectUserInfos) {
+            	deleteProjectUserInfoDao(projectUserInfo);
+            } 
             deleteProject(project);
     	}catch (Exception e) {
               
                 logAndThrowException("Cannot delete Project Dependencies: WorkbenchDataManager.deleteProjectDependencies(project=" + project + "): "
                         + e.getMessage(), e);
             }
+    }
+    public void deleteProjectUserInfoDao(ProjectUserInfo projectUserInfo)  throws MiddlewareQueryException
+    {
+    	Session session = getCurrentSession();
+        Transaction trans = null;
+        try{
+        	trans = session.beginTransaction();
+        	getProjectUserInfoDao().makeTransient(projectUserInfo);
+            trans.commit();
+            
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Cannot delete Project: WorkbenchDataManager.deleteProjectUserInfoDao(projectUserInfo=" + projectUserInfo + "): "
+                    + e.getMessage(), e);
+        }
     }
     public void deleteProjectUserMysqlAccount(ProjectUserMysqlAccount mysqlaccount) throws MiddlewareQueryException
     {
@@ -962,6 +981,14 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         }
 
         return idsSaved;
+    }
+    
+
+  
+    public List<ProjectUserInfo> getByProjectId(Integer projectId)
+            throws MiddlewareQueryException {
+        return getProjectUserInfoDao().getByProjectId(projectId);
+
     }
 
     @Override
