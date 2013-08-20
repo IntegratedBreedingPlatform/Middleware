@@ -19,6 +19,7 @@ import java.util.List;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
+import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.CrossStudyDataManager;
@@ -90,6 +91,17 @@ public class TestCrossStudyDataManagerImpl {
 			study.print(1);
 		}
 	}
+	
+    @Test
+    public void testGetTraitsForNumericVariates() throws Exception {
+        List<Integer> environmentIds = Arrays.asList(10081, 10082, 10083, 10084, 10085, 10086, 10087); //Rice
+        List<NumericTraitInfo> result = manager.getTraitsForNumericVariates(environmentIds);
+        System.out.println("testGetTraitsForNumericVariates(): " + result.size());
+        for (NumericTraitInfo trait : result){
+            System.out.println("    " + trait);
+        }
+    }
+
 	
 	@AfterClass
 	public static void tearDown() throws Exception {

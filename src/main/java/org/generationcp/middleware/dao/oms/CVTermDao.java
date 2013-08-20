@@ -29,6 +29,7 @@ import org.hibernate.criterion.Restrictions;
  * DAO class for {@link CVTerm}.
  * 
  */
+@SuppressWarnings("unchecked")
 public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 	
@@ -50,7 +51,6 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return term;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public Set<Integer> findStdVariablesByNameOrSynonym(String nameOrSynonym) throws MiddlewareQueryException {
 		Set<Integer> stdVarIds = new HashSet<Integer>();
 		try {
@@ -89,7 +89,6 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return term;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public List<CVTerm> getByIds(Collection<Integer> ids) throws MiddlewareQueryException {
 		List<CVTerm> terms = new ArrayList<CVTerm>();
 		
@@ -105,4 +104,37 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		
 		return terms;
 	}
+	
+	public List<CVTerm> getVariablesByType(List<Integer> types) throws MiddlewareQueryException {
+        List<CVTerm> terms = new ArrayList<CVTerm>();
+        
+        try {
+            SQLQuery query = getSession().createSQLQuery(
+                        "SELECT cvt.cvterm_id, cvt.name, cvt.definition "
+                        + "FROM cvterm cvt " 
+                        + "INNER JOIN cvterm_relationship cvr ON cvr.subject_id = cvt.cvterm_id " 
+                        + "             AND cvr.type_id = 1105 AND cvr.object_id IN (:types) ");
+            query.setParameterList("types", types);
+            
+            List<Object[]> list =  query.list();
+            
+            for (Object[] row : list){
+                Integer id = (Integer) row[0]; 
+                String name = (String) row [1];
+                String definition = (String) row[2]; 
+                
+                CVTerm cvTerm = new CVTerm();
+                cvTerm.setCvTermId(id);
+                cvTerm.setName(name);
+                cvTerm.setDefinition(definition);
+                terms.add(cvTerm);
+            }
+        } catch(HibernateException e) {
+            logAndThrowException("Error at getVariablesByType=" + types + " query on CVTermDao: " + e.getMessage(), e);
+        }
+
+        return terms;	    
+	}
+	
+
 }

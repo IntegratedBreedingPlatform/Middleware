@@ -15,7 +15,9 @@ package org.generationcp.middleware.domain.h2h;
 
 /**
  * Contains the details of a numeric trait - name, id, description, 
- * number of locations, germplasms and observations as inherited from TraitInfo.
+ * number of locations, germplasms and observations as inherited from TraitInfo
+ * plus the additional fields minValue, maxValue, medianValue.
+ * 
  */
 public class NumericTraitInfo extends TraitInfo{
     
@@ -25,11 +27,19 @@ public class NumericTraitInfo extends TraitInfo{
     
     public NumericTraitInfo() {
     }
+    
+    public NumericTraitInfo(TraitInfo traitInfo) {
+        super(traitInfo.getTraitName(), traitInfo.getTraitId(), traitInfo
+                .getDescription(), traitInfo.getLocationCount(),
+                traitInfo.getGermplasmCount(), traitInfo.getObservationCount());
+    }
 
     public NumericTraitInfo(String traitName, int traitId, String description,
-            long locationCount, long germplasmCount, long observationCount) {
+            long locationCount, long germplasmCount, long observationCount, double minValue, double maxValue, double medianValue) {
         super(traitName, traitId, description, locationCount, germplasmCount, observationCount);
-        
+        this.minValue = minValue;
+        this.maxValue = maxValue;
+        this.medianValue = medianValue;
     }
 
     public double getMinValue() {
@@ -71,5 +81,5 @@ public class NumericTraitInfo extends TraitInfo{
         return builder.toString();
     }
 
-    
+
 }

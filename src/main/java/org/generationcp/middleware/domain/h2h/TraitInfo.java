@@ -17,7 +17,7 @@ package org.generationcp.middleware.domain.h2h;
  * Contains the details of a trait - name, id, description, 
  * number of locations, germplasms and observations.
  */
-public class TraitInfo{
+public class TraitInfo  implements Comparable<TraitInfo>{
     
     private String traitName;
     
@@ -120,23 +120,7 @@ public class TraitInfo{
         if (getClass() != obj.getClass())
             return false;
         TraitInfo other = (TraitInfo) obj;
-        if (description == null) {
-            if (other.description != null)
-                return false;
-        } else if (!description.equals(other.description))
-            return false;
-        if (germplasmCount != other.germplasmCount)
-            return false;
-        if (locationCount != other.locationCount)
-            return false;
-        if (observationCount != other.observationCount)
-            return false;
         if (traitId != other.traitId)
-            return false;
-        if (traitName == null) {
-            if (other.traitName != null)
-                return false;
-        } else if (!traitName.equals(other.traitName))
             return false;
         return true;
     }
@@ -160,5 +144,11 @@ public class TraitInfo{
         return builder.toString();
     }
 
-    
+    @Override
+    // Sort in ascending order by trait id
+    public int compareTo(TraitInfo compareValue) { 
+        int compareId = ((TraitInfo) compareValue).getTraitId(); 
+        return Integer.valueOf(getTraitId()).compareTo(compareId);
+    }
+
 }

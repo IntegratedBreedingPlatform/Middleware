@@ -13,7 +13,6 @@
 package org.generationcp.middleware.manager.api;
 
 import java.util.List;
-import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
@@ -56,10 +55,10 @@ public interface CrossStudyDataManager{
      * Numeric variates are those with type "Numeric variable" (cvterm ID = 1110) or type "Date variable" (cvterm ID = 1117). 
      * 
      * @param environmentIds
-     * @return
+     * @return List of NumericTraitInfo
      * @throws MiddlewareQueryException
      */
-    Set<NumericTraitInfo> getTraitsForNumericVariates(List<Integer> environmentIds) throws MiddlewareQueryException;
+    List<NumericTraitInfo> getTraitsForNumericVariates(List<Integer> environmentIds) throws MiddlewareQueryException;
     
 
 }
