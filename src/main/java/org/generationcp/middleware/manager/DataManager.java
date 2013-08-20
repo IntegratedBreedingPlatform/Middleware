@@ -28,6 +28,7 @@ import org.generationcp.middleware.operation.builder.StudyFactorBuilder;
 import org.generationcp.middleware.operation.builder.StudyReferenceBuilder;
 import org.generationcp.middleware.operation.builder.StudyVariateBuilder;
 import org.generationcp.middleware.operation.builder.TermBuilder;
+import org.generationcp.middleware.operation.builder.TraitBuilder;
 import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
 import org.generationcp.middleware.operation.builder.VariableInfoBuilder;
 import org.generationcp.middleware.operation.builder.VariableTypeBuilder;
@@ -842,14 +843,18 @@ public abstract class DataManager extends DatabaseBroker{
     	return new StudyReferenceBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
     
-    protected final TrialEnvironmentBuilder getTrialEnvironmentBuilder() {
-    	return new TrialEnvironmentBuilder(sessionProviderForLocal, sessionProviderForCentral);
-    }
-    
     protected final StockBuilder getStockBuilder() {
     	return new StockBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
 
+    protected final TraitBuilder getTraitBuilder() {
+        return new TraitBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    protected final TrialEnvironmentBuilder getTrialEnvironmentBuilder() {
+        return new TrialEnvironmentBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
     protected final VariableInfoBuilder getVariableInfoBuilder() {
     	return new VariableInfoBuilder();
     }

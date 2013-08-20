@@ -13,10 +13,12 @@
 package org.generationcp.middleware.manager;
 
 import java.util.List;
+import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
+import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.CrossStudyDataManager;
@@ -56,5 +58,10 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
     public List<StudyReference> getStudiesForTrialEnvironments(List<Integer> environmentIds) throws MiddlewareQueryException {
         return getStudyNodeBuilder().getStudiesForTrialEnvironments(environmentIds);
     }
+    
+    public Set<NumericTraitInfo> getTraitsForNumericVariates(List<Integer> environmentIds) throws MiddlewareQueryException {
+        return getTraitBuilder().getTraitsForNumericVariates(environmentIds);
+    }
+
 
 }
