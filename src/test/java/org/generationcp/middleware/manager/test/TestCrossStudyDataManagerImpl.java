@@ -112,6 +112,7 @@ public class TestCrossStudyDataManagerImpl {
         for (CharacterTraitInfo trait : result){
             trait.print(4);
         }
+        System.out.println("testGetTraitsForCharacterVariates(): " + result.size());
     }
    
     @Test

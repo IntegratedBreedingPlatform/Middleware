@@ -94,15 +94,18 @@ public class TraitBuilder extends Builder{
        
         List<TraitInfo> traitInfoList = getTraitCounts(variableTerms, environmentIds);
         
+        //Create characterTraitCInfoList from TraitInfo with counts
         List<CharacterTraitInfo> characaterTraitInfoList = new ArrayList<CharacterTraitInfo>();
         for (TraitInfo trait : traitInfoList){
             CharacterTraitInfo characterTrait = new CharacterTraitInfo(trait);
-            setWorkingDatabase(Database.CENTRAL);
-            characterTrait.addValues(getPhenotypeDao().getCharacterTraitInfoValues(environmentIds, trait.getTraitId()));
-            setWorkingDatabase(Database.LOCAL);
-            characterTrait.addValues(getPhenotypeDao().getCharacterTraitInfoValues(environmentIds, trait.getTraitId()));
             characaterTraitInfoList.add(characterTrait);
         }
+        
+        // Get the distinct phenotype values from the databases
+        setWorkingDatabase(Database.CENTRAL);
+        getPhenotypeDao().getCharacterTraitInfoValues(environmentIds, characaterTraitInfoList);
+        setWorkingDatabase(Database.LOCAL);
+        getPhenotypeDao().getCharacterTraitInfoValues(environmentIds, characaterTraitInfoList);
         
         return characaterTraitInfoList;
     }

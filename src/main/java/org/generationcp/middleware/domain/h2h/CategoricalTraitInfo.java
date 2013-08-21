@@ -49,6 +49,13 @@ public class CategoricalTraitInfo extends TraitInfo{
         this.valuesCount = valuesCount;
     }
     
+    public void addValuesCount(String value, Integer count) {
+        if (valuesCount == null){
+            valuesCount = new HashMap<String, Integer>();
+        }
+        valuesCount.put(value, count);
+    }
+    
     public void addValuesCount(Map<String, Integer>  newValuesCount) {
         if (valuesCount == null){
             valuesCount = new HashMap<String, Integer>();

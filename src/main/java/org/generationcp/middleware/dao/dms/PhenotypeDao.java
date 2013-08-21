@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
 import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
 import org.generationcp.middleware.domain.h2h.TraitInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -161,6 +162,48 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
     }
     
+    public void getCharacterTraitInfoValues(List<Integer> environmentIds, List<CharacterTraitInfo> traitInfoList) throws MiddlewareQueryException{
+        
+        // Get trait IDs
+        List<Integer> traitIds = new ArrayList<Integer>();
+        for (CharacterTraitInfo trait : traitInfoList){
+            traitIds.add(trait.getTraitId());
+        }
+        
+        try {
+            SQLQuery query = getSession().createSQLQuery(
+                    "SELECT DISTINCT p.observable_id, p.value "
+                    + "FROM phenotype p "
+                    + "    INNER JOIN nd_experiment_phenotype eph ON eph.phenotype_id = p.phenotype_id "
+                    + "    INNER JOIN nd_experiment e ON e.nd_experiment_id = eph.nd_experiment_id "
+                    + "WHERE e.nd_geolocation_id IN (:environmentIds) "
+                    + "    AND p.observable_id IN (:traitIds) "
+                    );
+            query.setParameterList("environmentIds", environmentIds);
+            query.setParameterList("traitIds", traitIds);
+
+            List<Object> results = query.list();
+            for(Object result : results){
+                Object resultArray[] = (Object[]) result;
+                Integer traitId = (Integer) resultArray[0];
+                String value = (String) resultArray[1];
+
+                for (CharacterTraitInfo trait : traitInfoList){
+                    if (trait.getTraitId() == traitId){
+                        trait.addValue(value);
+                        break;
+                    }
+                }
+
+            }
+            
+        } catch(HibernateException e) {
+            logAndThrowException("Error at getCharacterraitInfoValues() query on PhenotypeDao: " + e.getMessage(), e);
+        }
+
+
+    }
+    
     public Map<String, Integer>  getCategoricalTraitInfoValues(List<Integer> environmentIds, Integer traitId) throws MiddlewareQueryException{
         Map<String, Integer> toReturn = new HashMap<String, Integer>();
         try {
@@ -183,7 +226,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
                 Integer count = (Integer) resultArray[1];
                 toReturn.put(value, count);
             }
-
             
         } catch(HibernateException e) {
             logAndThrowException("Error at getCategoricalTraitInfoValues() query on PhenotypeDao: " + e.getMessage(), e);

@@ -49,6 +49,13 @@ public class CharacterTraitInfo extends TraitInfo{
         this.values = values;
     }
     
+    public void addValue(String newValue) {
+        if (values == null){
+            values = new ArrayList<String>();
+        }
+        values.add(newValue);
+    }
+    
     public void addValues(List<String> newValues) {
         if (values == null){
             values = new ArrayList<String>();
