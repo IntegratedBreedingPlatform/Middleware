@@ -17,6 +17,8 @@ import java.util.List;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
+import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
+import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
 import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
@@ -61,4 +63,27 @@ public interface CrossStudyDataManager{
     List<NumericTraitInfo> getTraitsForNumericVariates(List<Integer> environmentIds) throws MiddlewareQueryException;
     
 
+    /**
+     * Retrieves a set of standard variables (traits) used for the character
+     * variates observed in given list of environments. Character variates are
+     * those with type "Character variable" (cvterm ID = 1120).
+     * 
+     * @param environmentIds
+     * @return List of CharacterTraitInfo
+     * @throws MiddlewareQueryException
+     */
+    List<CharacterTraitInfo> getTraitsForCharacterVariates(List<Integer> environmentIds) throws MiddlewareQueryException;
+    
+    /**
+     * Retrieve a set of standard variables (traits) used for the categorical
+     * variables observed in given list of environments. Categorical variables
+     * are those with type "Categorical variable" (cvterm ID = 1130).
+     * 
+     * @param environmentIds
+     * @return List of CategoricalTraitInfo
+     * @throws MiddlewareQueryException
+     */
+    List<CategoricalTraitInfo> getTraitsForCategoricalVariates(List<Integer> environmentIds) throws MiddlewareQueryException;
+
+    
 }

@@ -19,6 +19,8 @@ import java.util.List;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
+import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
+import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
 import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
@@ -98,9 +100,30 @@ public class TestCrossStudyDataManagerImpl {
         List<NumericTraitInfo> result = manager.getTraitsForNumericVariates(environmentIds);
         System.out.println("testGetTraitsForNumericVariates(): " + result.size());
         for (NumericTraitInfo trait : result){
-            System.out.println("    " + trait);
+            trait.print(4);
         }
     }
+    
+    @Test
+    public void testGetTraitsForCharacterVariates() throws Exception {
+        List<Integer> environmentIds = Arrays.asList( 10040, 10050, 10060, 10070); //Rice
+        List<CharacterTraitInfo> result = manager.getTraitsForCharacterVariates(environmentIds);
+        System.out.println("testGetTraitsForCharacterVariates(): " + result.size());
+        for (CharacterTraitInfo trait : result){
+            trait.print(4);
+        }
+    }
+   
+    @Test
+    public void testGetTraitsForCategoricalVariates() throws Exception {
+        List<Integer> environmentIds = Arrays.asList( 10040, 10050, 10060, 10070); //Rice
+        List<CategoricalTraitInfo> result = manager.getTraitsForCategoricalVariates(environmentIds);
+        System.out.println("testGetTraitsForCategoricalVariates(): " + result.size());
+        for (CategoricalTraitInfo trait : result){
+            trait.print(4);
+        }
+    }
+   
 
 	
 	@AfterClass

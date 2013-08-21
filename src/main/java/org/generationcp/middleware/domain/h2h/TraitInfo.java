@@ -12,6 +12,8 @@
 
 package org.generationcp.middleware.domain.h2h;
 
+import org.generationcp.middleware.util.Debug;
+
 
 /**
  * Contains the details of a trait - name, id, description, 
@@ -142,6 +144,10 @@ public class TraitInfo  implements Comparable<TraitInfo>{
         builder.append(observationCount);
         builder.append("]");
         return builder.toString();
+    }
+    
+    public void print(int indent){
+        Debug.println(indent, toString());
     }
 
     @Override
