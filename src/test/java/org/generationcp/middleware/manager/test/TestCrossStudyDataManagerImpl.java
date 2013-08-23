@@ -100,6 +100,7 @@ public class TestCrossStudyDataManagerImpl {
         List<NumericTraitInfo> result = manager.getTraitsForNumericVariates(environmentIds);
         System.out.println("testGetTraitsForNumericVariates(): " + result.size());
         for (NumericTraitInfo trait : result){
+            //System.out.println(trait);
             trait.print(4);
         }
     }
@@ -110,6 +111,7 @@ public class TestCrossStudyDataManagerImpl {
         List<CharacterTraitInfo> result = manager.getTraitsForCharacterVariates(environmentIds);
         System.out.println("testGetTraitsForCharacterVariates(): " + result.size());
         for (CharacterTraitInfo trait : result){
+            //System.out.println(trait);
             trait.print(4);
         }
         System.out.println("testGetTraitsForCharacterVariates(): " + result.size());
@@ -117,15 +119,15 @@ public class TestCrossStudyDataManagerImpl {
    
     @Test
     public void testGetTraitsForCategoricalVariates() throws Exception {
-        List<Integer> environmentIds = Arrays.asList( 10040, 10050, 10060, 10070); //Rice
+        List<Integer> environmentIds = Arrays.asList(10010, 10020, 10030, 10040, 10050, 10060, 10070); //Rice
         List<CategoricalTraitInfo> result = manager.getTraitsForCategoricalVariates(environmentIds);
         System.out.println("testGetTraitsForCategoricalVariates(): " + result.size());
-        for (CategoricalTraitInfo trait : result){
+        for (CategoricalTraitInfo trait : result) {
+            //System.out.println(trait);
             trait.print(4);
         }
+        System.out.println("testGetTraitsForCategoricalVariates(): " + result.size());
     }
-   
-
 	
 	@AfterClass
 	public static void tearDown() throws Exception {

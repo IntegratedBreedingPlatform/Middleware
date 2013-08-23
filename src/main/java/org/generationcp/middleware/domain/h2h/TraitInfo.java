@@ -21,9 +21,9 @@ import org.generationcp.middleware.util.Debug;
  */
 public class TraitInfo  implements Comparable<TraitInfo>{
     
-    private String traitName;
+    private int id;
     
-    private int traitId;
+    private String name;
     
     private String description;
     
@@ -36,31 +36,37 @@ public class TraitInfo  implements Comparable<TraitInfo>{
     public TraitInfo() {
     }
 
-    public TraitInfo(String traitName, int traitId, String description,
+    public TraitInfo( int id, String name, String description){
+        this.id = id;
+        this.name = name;
+        this.description = description;
+    }
+        
+    public TraitInfo( int id, String name, String description,
             long locationCount, long germplasmCount, long observationCount) {
         super();
-        this.traitName = traitName;
-        this.traitId = traitId;
+        this.id = id;
+        this.name = name;
         this.description = description;
         this.locationCount = locationCount;
         this.germplasmCount = germplasmCount;
         this.observationCount = observationCount;
     }
 
-    public String getTraitName() {
-        return traitName;
+    public int getId() {
+        return id;
     }
     
-    public void setTraitName(String traitName) {
-        this.traitName = traitName;
+    public void setId(int id) {
+        this.id = id;
     }
     
-    public int getTraitId() {
-        return traitId;
+    public String getName() {
+        return name;
     }
     
-    public void setTraitId(int traitId) {
-        this.traitId = traitId;
+    public void setName(String name) {
+        this.name = name;
     }
     
     public String getDescription() {
@@ -107,9 +113,9 @@ public class TraitInfo  implements Comparable<TraitInfo>{
                 + (int) (locationCount ^ (locationCount >>> 32));
         result = prime * result
                 + (int) (observationCount ^ (observationCount >>> 32));
-        result = prime * result + traitId;
+        result = prime * result + id;
         result = prime * result
-                + ((traitName == null) ? 0 : traitName.hashCode());
+                + ((name == null) ? 0 : name.hashCode());
         return result;
     }
 
@@ -122,7 +128,7 @@ public class TraitInfo  implements Comparable<TraitInfo>{
         if (getClass() != obj.getClass())
             return false;
         TraitInfo other = (TraitInfo) obj;
-        if (traitId != other.traitId)
+        if (id != other.id)
             return false;
         return true;
     }
@@ -130,10 +136,11 @@ public class TraitInfo  implements Comparable<TraitInfo>{
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("TraitInfo [traitName=");
-        builder.append(traitName);
-        builder.append(", traitId=");
-        builder.append(traitId);
+        builder.append("TraitInfo [");
+        builder.append("traitId=");
+        builder.append(id);
+        builder.append(", traitName=");
+        builder.append(name);
         builder.append(", description=");
         builder.append(description);
         builder.append(", locationCount=");
@@ -147,14 +154,26 @@ public class TraitInfo  implements Comparable<TraitInfo>{
     }
     
     public void print(int indent){
-        Debug.println(indent, toString());
+        Debug.println(indent, getEntityName() + ":");
+        Debug.println(indent + 3, "Trait Id: " + getId());
+        Debug.println(indent + 3, "Trait Name: " + getName());
+        Debug.println(indent + 3, "Description: " + getDescription());
+        Debug.println(indent + 3, "Location Count: " + getLocationCount());
+        Debug.println(indent + 3, "Germplasm Count: " + getGermplasmCount());
+        Debug.println(indent + 3, "Observation Count: " + getObservationCount());
+    }
+    
+    private String getEntityName() {
+        return this.getClass().getName();
     }
 
     @Override
     // Sort in ascending order by trait id
     public int compareTo(TraitInfo compareValue) { 
-        int compareId = ((TraitInfo) compareValue).getTraitId(); 
-        return Integer.valueOf(getTraitId()).compareTo(compareId);
+        int compareId = ((TraitInfo) compareValue).getId(); 
+        return Integer.valueOf(getId()).compareTo(compareId);
     }
+    
+
 
 }

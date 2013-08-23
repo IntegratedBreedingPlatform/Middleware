@@ -15,7 +15,9 @@ package org.generationcp.middleware.operation.builder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
@@ -40,7 +42,7 @@ public class TraitBuilder extends Builder{
 
         // Get numeric variables from central
         setWorkingDatabase(Database.CENTRAL);
-        List<CVTerm> variableTerms = getCvTermDao().getVariablesByType(Arrays.asList(TermId.NUMERIC_VARIABLE.getId(), TermId.DATE_VARIABLE.getId()));
+        List<CVTerm> variableTerms = getCvTermDao().getVariablesByType(Arrays.asList(TermId.NUMERIC_VARIABLE.getId(), TermId.DATE_VARIABLE.getId()), null);
         List<Integer> variableIds = getVariableIds(variableTerms);
 
         // Get locationCount, germplasmCount, observationCount, minValue, maxValue
@@ -69,14 +71,18 @@ public class TraitBuilder extends Builder{
             }
         }
         
+        if (numericTraitInfoList.size() == 0){
+            return numericTraitInfoList;
+        }
+        
         // Get median value
         getMedianValue(numericTraitInfoList, environmentIds);
 
         // Set name and description
         for (NumericTraitInfo traitInfo : numericTraitInfoList) {
             for (CVTerm variable : variableTerms) {
-                if (traitInfo.getTraitId() == variable.getCvTermId()) {
-                    traitInfo.setTraitName(variable.getName());
+                if (traitInfo.getId() == variable.getCvTermId()) {
+                    traitInfo.setName(variable.getName());
                     traitInfo.setDescription(variable.getDefinition());
                     break;
                 }
@@ -87,58 +93,105 @@ public class TraitBuilder extends Builder{
     }
     
     public List<CharacterTraitInfo> getTraitsForCharacterVariates(List<Integer> environmentIds) throws MiddlewareQueryException {
-        
+        List<CharacterTraitInfo> characterTraitInfoList = new ArrayList<CharacterTraitInfo>();
+
         // Get character variable terms
         setWorkingDatabase(Database.CENTRAL);
-        List<CVTerm> variableTerms = getCvTermDao().getVariablesByType(Arrays.asList(TermId.CHARACTER_VARIABLE.getId()));
+        List<CVTerm> variableTerms = getCvTermDao().getVariablesByType(Arrays.asList(TermId.CHARACTER_VARIABLE.getId()), null);
        
-        List<TraitInfo> traitInfoList = getTraitCounts(variableTerms, environmentIds);
+        // Get location, germplasm and observation counts 
+        List<TraitInfo> traitInfoList = getTraitCounts(getVariableIds(variableTerms), environmentIds);
         
-        //Create characterTraitCInfoList from TraitInfo with counts
-        List<CharacterTraitInfo> characaterTraitInfoList = new ArrayList<CharacterTraitInfo>();
+        // Set name and description
+        for (TraitInfo traitInfo : traitInfoList) {
+            for (CVTerm variable : variableTerms) {
+                if (traitInfo.getId() == variable.getCvTermId()) {
+                    traitInfo.setName(variable.getName());
+                    traitInfo.setDescription(variable.getDefinition());
+                    break;
+                }
+            }
+        }
+        
+        if (traitInfoList.size() == 0){
+            return characterTraitInfoList;
+        }
+
+        //Create characterTraitInfoList from TraitInfo with counts
+        Collections.sort(traitInfoList);
         for (TraitInfo trait : traitInfoList){
-            CharacterTraitInfo characterTrait = new CharacterTraitInfo(trait);
-            characaterTraitInfoList.add(characterTrait);
+            characterTraitInfoList.add( new CharacterTraitInfo(trait));
         }
         
         // Get the distinct phenotype values from the databases
         setWorkingDatabase(Database.CENTRAL);
-        getPhenotypeDao().getCharacterTraitInfoValues(environmentIds, characaterTraitInfoList);
+        Map<Integer, List<String>> centralTraitValues = getPhenotypeDao().getCharacterTraitInfoValues(environmentIds, characterTraitInfoList);
         setWorkingDatabase(Database.LOCAL);
-        getPhenotypeDao().getCharacterTraitInfoValues(environmentIds, characaterTraitInfoList);
+        Map<Integer, List<String>> localTraitValues = getPhenotypeDao().getCharacterTraitInfoValues(environmentIds, characterTraitInfoList);
         
-        return characaterTraitInfoList;
+        for (CharacterTraitInfo traitInfo : characterTraitInfoList){
+                List<String> values = centralTraitValues.get(traitInfo.getId());
+                if (localTraitValues.get(traitInfo.getId()) != null){
+                    values.addAll(localTraitValues.get(traitInfo.getId()));
+                }
+                Collections.sort(values);
+                traitInfo.setValues(values);
+        }
+        
+        return characterTraitInfoList;
     }
     
     public List<CategoricalTraitInfo> getTraitsForCategoricalVariates(List<Integer> environmentIds) throws MiddlewareQueryException {
-        
-        // Get categorical variable terms
-        setWorkingDatabase(Database.CENTRAL);
-        List<CVTerm> variableTerms = getCvTermDao().getVariablesByType(Arrays.asList(TermId.CATEGORICAL_VARIABLE.getId()));
-        
-        List<TraitInfo> traitInfoList = getTraitCounts(variableTerms, environmentIds);
-
-        
         List<CategoricalTraitInfo> categoricalTraitInfoList = new ArrayList<CategoricalTraitInfo>();
-        for (TraitInfo trait : traitInfoList){
-            CategoricalTraitInfo categoricalTrait = new CategoricalTraitInfo(trait);
-            setWorkingDatabase(Database.CENTRAL);
-            categoricalTrait.addValuesCount(getPhenotypeDao().getCategoricalTraitInfoValues(environmentIds, trait.getTraitId()));
-            setWorkingDatabase(Database.LOCAL);
-            categoricalTrait.addValuesCount(getPhenotypeDao().getCategoricalTraitInfoValues(environmentIds, trait.getTraitId()));
-            categoricalTraitInfoList.add(categoricalTrait);
+
+        // Get locationCount, germplasmCount, observationCount
+        List<TraitInfo> centraltraitInfoList = new ArrayList<TraitInfo>();
+        List<TraitInfo> localTraitInfoList = new ArrayList<TraitInfo>();
+
+        setWorkingDatabase(Database.CENTRAL);
+        centraltraitInfoList.addAll(getPhenotypeDao().getTraitInfoCounts(environmentIds));
+        setWorkingDatabase(Database.LOCAL);
+        localTraitInfoList.addAll(getPhenotypeDao().getTraitInfoCounts(environmentIds));
+        
+        // Merge local and central results
+        Collections.sort(centraltraitInfoList);
+        Collections.sort(localTraitInfoList);        
+        for (TraitInfo centralTrait : centraltraitInfoList){
+            for (TraitInfo localTrait : localTraitInfoList){
+                if (centralTrait.equals(localTrait)){
+                    centralTrait.setLocationCount(centralTrait.getLocationCount() + localTrait.getLocationCount());
+                    centralTrait.setGermplasmCount(centralTrait.getGermplasmCount() + localTrait.getGermplasmCount());
+                    centralTrait.setObservationCount(centralTrait.getObservationCount() + localTrait.getObservationCount());
+                    break;
+                }                
+            }
+            categoricalTraitInfoList.add(new CategoricalTraitInfo(centralTrait));
         }
         
+        if (categoricalTraitInfoList.size() == 0){
+            return categoricalTraitInfoList;
+        }
+        
+        // Set name, description and get categorical domain values from central
+        setWorkingDatabase(Database.CENTRAL);
+        categoricalTraitInfoList = getCvTermDao().setCategoricalVariables(categoricalTraitInfoList);
+        
+        // Get categorical values count from phenotype
+        setWorkingDatabase(Database.CENTRAL);
+        getPhenotypeDao().setCategoricalTraitInfoValues(categoricalTraitInfoList);
+        setWorkingDatabase(Database.LOCAL);
+        getPhenotypeDao().setCategoricalTraitInfoValues(categoricalTraitInfoList);
+        
+
         return categoricalTraitInfoList;
+        
     }
     
-    private List<TraitInfo> getTraitCounts(List<CVTerm> variableTerms, List<Integer> environmentIds) throws MiddlewareQueryException{
+    private List<TraitInfo> getTraitCounts(List<Integer> variableIds, List<Integer> environmentIds) throws MiddlewareQueryException{
         List<TraitInfo> traitInfoList = new ArrayList<TraitInfo>();
         List<TraitInfo> localTraitInfoList = new ArrayList<TraitInfo>();
 
-        List<Integer> variableIds = getVariableIds(variableTerms);
-
-        // Get locationCount, germplasmCount, observationCount
+         // Get locationCount, germplasmCount, observationCount
         setWorkingDatabase(Database.CENTRAL);
         traitInfoList.addAll(getPhenotypeDao().getTraitInfoCounts(environmentIds, variableIds));
 
@@ -159,19 +212,7 @@ public class TraitBuilder extends Builder{
             }
         }
 
-        // Set name and description
-        for (TraitInfo traitInfo : traitInfoList) {
-            for (CVTerm variable : variableTerms) {
-                if (traitInfo.getTraitId() == variable.getCvTermId()) {
-                    traitInfo.setTraitName(variable.getName());
-                    traitInfo.setDescription(variable.getDefinition());
-                    break;
-                }
-            }
-        }
-        
-        return traitInfoList;
-        
+        return traitInfoList;        
     }
 
 
@@ -183,28 +224,35 @@ public class TraitBuilder extends Builder{
         return variableIds;
 
     }
-        
+    
     private void getMedianValue(List<NumericTraitInfo> numericTraitInfoList,
             List<Integer> environmentIds) throws MiddlewareQueryException {
 
+        Map<Integer, List<Double>> centralTraitValues = new HashMap<Integer, List<Double>>();
+        Map<Integer, List<Double>> localTraitValues = new HashMap<Integer, List<Double>>();
+
+        setWorkingDatabase(Database.CENTRAL);
+        centralTraitValues.putAll(getPhenotypeDao().getNumericTraitInfoValues(environmentIds, numericTraitInfoList));
+
+        setWorkingDatabase(Database.LOCAL);
+        localTraitValues.putAll(getPhenotypeDao().getNumericTraitInfoValues(environmentIds, numericTraitInfoList));
+        
         for (NumericTraitInfo traitInfo : numericTraitInfoList) {
-            List<Double> phenotypeValues = new ArrayList<Double>();
-
-            setWorkingDatabase(Database.CENTRAL);
-            phenotypeValues.addAll(getPhenotypeDao().getNumericTraitInfoValues(environmentIds, traitInfo.getTraitId()));
-
-            setWorkingDatabase(Database.LOCAL);
-            phenotypeValues.addAll(getPhenotypeDao().getNumericTraitInfoValues(environmentIds, traitInfo.getTraitId()));
-
-            Collections.sort(phenotypeValues);
             
-            double medianValue = phenotypeValues.get(phenotypeValues.size() / 2); // if the number of values is odd
-            if (phenotypeValues.size() % 2 == 0){ // change if the number of values is even
-                double middleNumOne = phenotypeValues.get(phenotypeValues.size() / 2 - 1);
-                double middleNumTwo =  phenotypeValues.get(phenotypeValues.size() / 2);
+            List<Double> values = centralTraitValues.get(traitInfo.getId());
+            if (localTraitValues.get(traitInfo.getId()) != null){
+                values.addAll(localTraitValues.get(traitInfo.getId()));
+            }
+            Collections.sort(values);
+            
+            double medianValue = values.get(values.size() / 2); // if the number of values is odd
+            if (values.size() % 2 == 0){ // change if the number of values is even
+                double middleNumOne = values.get(values.size() / 2 - 1);
+                double middleNumTwo =  values.get(values.size() / 2);
                 medianValue = (middleNumOne + middleNumTwo) / 2;
             }
             traitInfo.setMedianValue(medianValue);
+            
         }
 
     }

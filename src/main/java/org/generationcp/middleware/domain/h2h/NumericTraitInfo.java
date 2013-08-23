@@ -12,6 +12,8 @@
 
 package org.generationcp.middleware.domain.h2h;
 
+import org.generationcp.middleware.util.Debug;
+
 
 /**
  * Contains the details of a numeric trait - name, id, description, 
@@ -29,14 +31,14 @@ public class NumericTraitInfo extends TraitInfo{
     }
     
     public NumericTraitInfo(TraitInfo traitInfo) {
-        super(traitInfo.getTraitName(), traitInfo.getTraitId(), traitInfo
+        super(traitInfo.getId(), traitInfo.getName(), traitInfo
                 .getDescription(), traitInfo.getLocationCount(),
                 traitInfo.getGermplasmCount(), traitInfo.getObservationCount());
     }
 
     public NumericTraitInfo(String traitName, int traitId, String description,
             long locationCount, long germplasmCount, long observationCount, double minValue, double maxValue, double medianValue) {
-        super(traitName, traitId, description, locationCount, germplasmCount, observationCount);
+        super(traitId, traitName, description, locationCount, germplasmCount, observationCount);
         this.minValue = minValue;
         this.maxValue = maxValue;
         this.medianValue = medianValue;
@@ -81,5 +83,11 @@ public class NumericTraitInfo extends TraitInfo{
         return builder.toString();
     }
 
+    public void print(int indent){
+        super.print(indent);
+        Debug.println(indent + 3, "Minimum Value: " + getMinValue());
+        Debug.println(indent + 3, "Maximum Value: " + getMaxValue());
+        Debug.println(indent + 3, "Median Value: " + getMedianValue());
+    }
 
 }

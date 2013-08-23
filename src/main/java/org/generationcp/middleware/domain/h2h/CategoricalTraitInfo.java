@@ -12,8 +12,10 @@
 
 package org.generationcp.middleware.domain.h2h;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.generationcp.middleware.util.Debug;
 
 
 /**
@@ -24,43 +26,59 @@ import java.util.Map;
  */
 public class CategoricalTraitInfo extends TraitInfo{
     
-    private Map<String, Integer> valuesCount;
-    
+    private List<CategoricalValue> valuesCount;
+        
     public CategoricalTraitInfo() {
     }
     
     public CategoricalTraitInfo(TraitInfo traitInfo) {
-        super(traitInfo.getTraitName(), traitInfo.getTraitId(), traitInfo
+        super(traitInfo.getId(), traitInfo.getName(), traitInfo
                 .getDescription(), traitInfo.getLocationCount(),
                 traitInfo.getGermplasmCount(), traitInfo.getObservationCount());
     }
 
-    public CategoricalTraitInfo(String traitName, int traitId, String description,
-            long locationCount, long germplasmCount, long observationCount, Map<String, Integer> valuesCount) {
-        super(traitName, traitId, description, locationCount, germplasmCount, observationCount);
-        this.valuesCount = valuesCount;
+    public CategoricalTraitInfo(int traitId, String traitName, String description){
+        super(traitId, traitName, description);
     }
 
-    public Map<String, Integer> getValuesCount() {
+    public CategoricalTraitInfo(int traitId, String traitName, String description,
+            long locationCount, long germplasmCount, long observationCount) {
+        super(traitId, traitName, description, locationCount, germplasmCount, observationCount);
+    }
+  
+    public List<CategoricalValue> getValues() {
         return valuesCount;
     }
     
-    public void setValuesCount(Map<String, Integer>  valuesCount) {
+    public void setValues(List<CategoricalValue> valuesCount) {
         this.valuesCount = valuesCount;
     }
     
-    public void addValuesCount(String value, Integer count) {
+    public void addValue(CategoricalValue newValue){
         if (valuesCount == null){
-            valuesCount = new HashMap<String, Integer>();
+            valuesCount = new ArrayList<CategoricalValue>();
         }
-        valuesCount.put(value, count);
+        if (valuesCount.contains(newValue)){
+            int index = valuesCount.indexOf(newValue);
+            valuesCount.set(index, newValue);
+        } else {
+            valuesCount.add(newValue);
+        }
     }
-    
-    public void addValuesCount(Map<String, Integer>  newValuesCount) {
+
+    public void addValueCount(CategoricalValue value, long count){
         if (valuesCount == null){
-            valuesCount = new HashMap<String, Integer>();
+            valuesCount = new ArrayList<CategoricalValue>();
         }
-        valuesCount.putAll(newValuesCount);
+        if (valuesCount.contains(value)){
+            int index = valuesCount.indexOf(value);
+            CategoricalValue existingValue = valuesCount.get(index);
+            existingValue.setCount(existingValue.getCount() + count);
+            valuesCount.set(index, existingValue);
+        } else {
+            value.setCount(count);
+            valuesCount.add(value);
+        }
     }
 
     @Override
@@ -68,10 +86,22 @@ public class CategoricalTraitInfo extends TraitInfo{
         StringBuilder builder = new StringBuilder();
         builder.append("CategoricalTraitInfo [");
         builder.append(super.toString());
+        builder.append(", numberOfValues=");
+        builder.append(valuesCount != null ? valuesCount.size() : 0);
         builder.append(", valuesCount=");
+        builder.append(valuesCount);
         builder.append("]");
         return builder.toString();
     }
 
-
+    public void print(int indent){
+        super.print(indent);
+        Debug.println(indent + 3, "ValuesCount: " + (valuesCount != null ? valuesCount.size() : 0));
+        if (valuesCount != null){
+            for (CategoricalValue value : valuesCount){
+                value.print(indent + 6);
+            }
+        }
+    }
+    
 }
