@@ -89,7 +89,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
     
     @Override
     public Integer addUserToCentral(User user) throws MiddlewareQueryException {
-        setWorkingDatabase(Database.CENTRAL);
+        requireCentralDatabaseInstance();
         Session session = getActiveSession();
         Transaction trans = null;
 
@@ -202,7 +202,8 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
     
     @Override
     public Integer addPersonToCentral(Person person) throws MiddlewareQueryException {
-        setWorkingDatabase(Database.CENTRAL);
+        requireCentralDatabaseInstance();
+        
         Session session = getActiveSession();
         Transaction trans = null;
 
