@@ -96,14 +96,16 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	public List<CVTerm> getByIds(Collection<Integer> ids) throws MiddlewareQueryException {
 		List<CVTerm> terms = new ArrayList<CVTerm>();
 		
-		try {
-			Criteria criteria = getSession().createCriteria(getPersistentClass());
-			criteria.add(Restrictions.in("cvTermId", ids));
-			
-			terms = criteria.list();
-			
-		} catch(HibernateException e) {
-			logAndThrowException("Error at GetByIds=" + ids + " query on CVTermDao: " + e.getMessage(), e);
+		if (ids != null && ids.size() > 0) {
+			try {
+				Criteria criteria = getSession().createCriteria(getPersistentClass());
+				criteria.add(Restrictions.in("cvTermId", ids));
+				
+				terms = criteria.list();
+				
+			} catch(HibernateException e) {
+				logAndThrowException("Error at GetByIds=" + ids + " query on CVTermDao: " + e.getMessage(), e);
+			}
 		}
 		
 		return terms;
