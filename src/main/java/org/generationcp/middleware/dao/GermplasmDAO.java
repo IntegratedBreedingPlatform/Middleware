@@ -650,6 +650,27 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
     	return nextInSequence;
     }
 
+    @SuppressWarnings("unchecked")
+    public List<Germplasm> getByLocationId(String name, int locationID) throws MiddlewareQueryException {
+    	try{
+    		StringBuilder queryString = new StringBuilder();
+            queryString.append("SELECT {g.*} FROM germplsm g JOIN names n ON g.gid = n.gid JOIN location l ON g.glocn = l.locid WHERE ");
+        	queryString.append("n.nval = :name ");
+            queryString.append("AND l.locid = :locationID ");
+
+            SQLQuery query = getSession().createSQLQuery(queryString.toString());
+            query.setParameter("name", name);
+            query.setParameter("locationID", locationID);
+            query.addEntity("g", Germplasm.class);
+
+            return query.list();
+            
+    	} catch (HibernateException e) {
+            logAndThrowException("Error with getByLocationId(name=" + name + ", locationID=" + locationID + ") query from Germplasm: " + e.getMessage(), e);
+        }
+        return new ArrayList<Germplasm>();
+    }
+    
     /**
      * @SuppressWarnings("unchecked") public List<Germplasm>
      *                                getByExample(Germplasm sample, int start,

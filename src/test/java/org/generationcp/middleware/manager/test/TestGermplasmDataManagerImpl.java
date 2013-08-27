@@ -1022,6 +1022,23 @@ public class TestGermplasmDataManagerImpl{
         System.out.println("  " + result);
     }  
     
+    @Test
+    public void testGetGermplasmByLocationId() throws Exception {
+    	String name = "RCH";
+    	int locationID = 0;
+    	
+    	long start = System.currentTimeMillis();
+    	List<Germplasm> germplasmList = manager.getGermplasmByLocationId(name, locationID);
+        Assert.assertTrue(germplasmList != null);
+
+        System.out.println("testGetGermplasmByLocationId(" + name + ") RESULTS: ");
+        for (Germplasm g : germplasmList) {
+            System.out.println("  " + g);
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
+    }
+    
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();

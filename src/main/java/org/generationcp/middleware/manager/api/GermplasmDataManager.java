@@ -1159,4 +1159,16 @@ public interface GermplasmDataManager {
      */
     public Map<Integer, String> getPrefferedIdsByGIDs(List<Integer> gids) throws MiddlewareQueryException;
 
+    /**
+     * Given the germplasm name and a location ID, returns list of all germplasm with specified name and location id
+     * 
+     * @param name 
+     * 			- search string for the name of the germplasm
+     * @param locationId
+     *          - location id to search details from
+     * @return List of Germplasm POJOs
+     * @throws MiddlewareQueryException
+     */
+    public List<Germplasm> getGermplasmByLocationId(String name, int locationID) throws MiddlewareQueryException;
+    
 }

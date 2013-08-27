@@ -1433,4 +1433,15 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         return toreturn;
     }       
     
+    @Override
+    public List<Germplasm> getGermplasmByLocationId(String name, int locationID) throws MiddlewareQueryException {
+    	List<Germplasm> germplasmList = new ArrayList<Germplasm>();
+    	if (setWorkingDatabase(Database.LOCAL)) {
+    		germplasmList.addAll(getGermplasmDao().getByLocationId(name, locationID));
+        }
+    	if (setWorkingDatabase(Database.CENTRAL)) {
+    		germplasmList.addAll(getGermplasmDao().getByLocationId(name, locationID));
+    	}
+    	return germplasmList;
+    }
 }
