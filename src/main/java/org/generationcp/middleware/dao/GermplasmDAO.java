@@ -654,9 +654,9 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
     public List<Germplasm> getByLocationId(String name, int locationID) throws MiddlewareQueryException {
     	try{
     		StringBuilder queryString = new StringBuilder();
-            queryString.append("SELECT {g.*} FROM germplsm g JOIN names n ON g.gid = n.gid JOIN location l ON g.glocn = l.locid WHERE ");
+            queryString.append("SELECT {g.*} FROM germplsm g JOIN names n ON g.gid = n.gid WHERE ");
         	queryString.append("n.nval = :name ");
-            queryString.append("AND l.locid = :locationID ");
+            queryString.append("AND g.glocn = :locationID ");
 
             SQLQuery query = getSession().createSQLQuery(queryString.toString());
             query.setParameter("name", name);
