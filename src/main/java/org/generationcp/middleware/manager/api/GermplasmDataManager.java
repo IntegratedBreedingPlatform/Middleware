@@ -1171,4 +1171,13 @@ public interface GermplasmDataManager {
      */
     public List<Germplasm> getGermplasmByLocationId(String name, int locationID) throws MiddlewareQueryException;
     
+    /**
+     * Given a gid, return the Germplasm POJO representing the record identified
+     * by the id with its method type.
+     * 
+     * @param gid
+     *            - the id of the germplasm record to be retrieved
+     * @return the Germplasm POJO representing the record
+     */
+    public Germplasm getGermplasmWithMethodType(Integer gid) throws MiddlewareQueryException;
 }

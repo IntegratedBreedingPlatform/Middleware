@@ -427,5 +427,78 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
         }
         return toreturn;
     }
+    
+    @Override
+    public List<Germplasm> getPedigreeLine(Integer gid, int locationID) throws MiddlewareQueryException {
+    	List<Germplasm> germplasms = new ArrayList<Germplasm>();
+	
+    	Germplasm currentGermplasm = germplasmDataManager.getGermplasmByGID(gid);
+    	
+    	if (currentGermplasm != null) {
+    		germplasms = addParentsWithDerivativeMethod(germplasms, currentGermplasm, locationID);
+    	}
+    	
+    	return germplasms;
+    }
+
+    /**
+     * Recursive function to get the list of all ancestor germplasm with DER method
+     * type and the given the locationID
+     * 
+     * @param germplasms
+     * @param currentGermplasm
+     * @param locationID
+     * @return the given Germplasm list with its parents added to it
+     * @throws MiddlewareQueryException
+     */
+    private List<Germplasm> addParentsWithDerivativeMethod(List<Germplasm> germplasms, Germplasm currentGermplasm, int locationID) throws MiddlewareQueryException {
+		// get parents of node
+        if (currentGermplasm.getGnpgs() == -1) {
+            // get the source germplasm
+            Germplasm parent = germplasmDataManager.getGermplasmWithMethodType(currentGermplasm.getGpid2());
+            if (parent != null) {
+            	Method method = parent.getMethod();
+            	String mType = "";
+            	
+            	if (method != null) {
+            		mType = method.getMtype();
+            	}
+            	
+            	// add parent only if method = DER and if it matches the given locationID
+            	if ("DER".equals(mType) && parent.getLocationId().intValue() == locationID) {
+            		germplasms.add(parent);
+            	} 
+            	germplasms = addParentsWithDerivativeMethod(germplasms, parent, locationID);
+            }
+        } else if (currentGermplasm.getGnpgs() >= 1) {
+            // get female parent
+            Germplasm femaleParent = germplasmDataManager.getGermplasmByGID(currentGermplasm.getGpid1());
+            if (femaleParent != null) {
+            	germplasms = addParentsWithDerivativeMethod(germplasms, femaleParent, locationID);
+            }
+        	
+            // get male parent
+            Germplasm maleParent = germplasmDataManager.getGermplasmByGID(currentGermplasm.getGpid2());
+            if (maleParent != null) {
+            	germplasms = addParentsWithDerivativeMethod(germplasms, maleParent, locationID);
+            }
+			
+            if (currentGermplasm.getGnpgs() > 2) {
+                // if there are more parents, get each of them
+                List<Germplasm> otherParents = new ArrayList<Germplasm>();
+
+                if (currentGermplasm.getGid() < 0 && setWorkingDatabase(Database.LOCAL)) {
+                    otherParents = getGermplasmDao().getProgenitorsByGIDWithPrefName(currentGermplasm.getGid());
+                } else if (currentGermplasm.getGid() > 0 && setWorkingDatabase(Database.CENTRAL)) {
+                    otherParents = getGermplasmDao().getProgenitorsByGIDWithPrefName(currentGermplasm.getGid());
+                }
+
+                for (Germplasm otherParent : otherParents) {
+                	germplasms = addParentsWithDerivativeMethod(germplasms, otherParent, locationID);
+                }
+            }
+        }
+		return germplasms;
+    }
 
 }

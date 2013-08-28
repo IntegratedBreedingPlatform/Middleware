@@ -20,6 +20,7 @@ import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.Method;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -669,6 +670,31 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             logAndThrowException("Error with getByLocationId(name=" + name + ", locationID=" + locationID + ") query from Germplasm: " + e.getMessage(), e);
         }
         return new ArrayList<Germplasm>();
+    }
+    
+    public Germplasm getByGIDWithMethodType(Integer gid) throws MiddlewareQueryException {
+        try {
+        	if (gid != null){
+	            SQLQuery query = getSession().createSQLQuery(Germplasm.GET_BY_GID_WITH_METHOD_TYPE);
+	            query.addEntity("g", Germplasm.class);
+	            query.addEntity("m", Method.class);
+	            query.setParameter("gid", gid);
+	            List results = query.list();
+	            
+	            if(results.size() > 0){
+	                Object[] result = (Object[]) results.get(0);
+	                if (result != null) {
+	                    Germplasm germplasm = (Germplasm) result[0];
+	                    Method method = (Method) result[1];
+	                    germplasm.setMethod(method);
+	                    return germplasm;
+	                } 
+	            }
+        	}
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getByGIDWithMethodType(gid=" + gid + ") from Germplasm: " + e.getMessage(), e);
+        }
+        return null;
     }
     
     /**

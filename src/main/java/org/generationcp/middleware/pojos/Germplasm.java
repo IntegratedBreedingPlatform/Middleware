@@ -300,6 +300,11 @@ public class Germplasm implements Serializable{
         "WHERE nval LIKE :prefixLike " +
         "ORDER BY last_number DESC LIMIT 1";
     
+    public static final String GET_BY_GID_WITH_METHOD_TYPE = 
+            "SELECT {g.*}, {m.*} " +
+            "FROM germplsm g LEFT JOIN methods m ON g.methn = m.mid " +
+            "WHERE g.gid = :gid";
+    
     @Id
     @Basic(optional = false)
     @Column(name = "gid")
@@ -408,6 +413,14 @@ public class Germplasm implements Serializable{
      */
     @Transient
     private String preferredAbbreviation = null;
+    
+    /**
+     * This variable is populated only when the Germplasm POJO is retrieved by
+     * using GermplasmDataManager.getGermplasmWithMethodType(). Otherwise it is null
+     * always.
+     */
+    @Transient
+    private Method method = null;
 
     public Germplasm() {
     }
@@ -603,6 +616,14 @@ public class Germplasm implements Serializable{
     public void setPreferredAbbreviation(String preferredAbbreviation) {
         this.preferredAbbreviation = preferredAbbreviation;
     }
+    
+    public void setMethod(Method method) {
+    	this.method = method;
+    }
+    
+    public Method getMethod() {
+    	return method;
+    }
 
     /**
      * public Set<Progenitor> getProgenitor() { return progntr; }
@@ -637,7 +658,7 @@ public class Germplasm implements Serializable{
         return "Germplasm [gid=" + gid + ", methodId=" + methodId + ", gnpgs=" + gnpgs + ", gpid1=" + gpid1 + ", gpid2=" + gpid2
                 + ", userId=" + userId + ", lgid=" + lgid + ", locationId=" + locationId + ", gdate=" + gdate + ", referenceId="
                 + referenceId + ", grplce=" + grplce + ", mgid=" + mgid + ", preferredName=" + preferredName + ", preferredAbbreviation="
-                + preferredAbbreviation + "]";
+                + preferredAbbreviation + ", method=" + method + "]";
     }
     
     

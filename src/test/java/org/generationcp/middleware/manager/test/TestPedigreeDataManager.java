@@ -45,7 +45,7 @@ public class TestPedigreeDataManager{
         pedigreeManager = factory.getPedigreeDataManager();
     }
 
-
+    
     @Test
     public void testGetGermplasmDescendants() throws Exception {
         Integer gid = Integer.valueOf(47888);
@@ -338,7 +338,17 @@ public class TestPedigreeDataManager{
         System.out.println("testCountManagementNeighbors("+gid+") Results: " + count);
     }
     
-    
+    @Test
+    public void testGetPedigreeLine() throws Exception {
+        Integer gid = new Integer(306436);
+        int locationID = 187;
+        List<Germplasm> results = pedigreeManager.getPedigreeLine(gid, locationID);
+
+        System.out.println("testGetPedigreeLine(" + gid + ", " + locationID + ") RESULTS: " + results.size());
+        for (Germplasm g : results) {
+        	System.out.println("  " + g);
+        }
+    }
 
     @AfterClass
     public static void tearDown() throws Exception {

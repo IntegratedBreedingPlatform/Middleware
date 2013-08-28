@@ -1444,4 +1444,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     	}
     	return germplasmList;
     }
+    
+    @Override
+    public Germplasm getGermplasmWithMethodType(Integer gid) throws MiddlewareQueryException {
+        if (setWorkingDatabase(gid)) {
+            return (Germplasm) getGermplasmDao().getByGIDWithMethodType(gid);
+        }
+        return null;
+    }
 }

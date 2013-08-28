@@ -260,5 +260,18 @@ public interface PedigreeDataManager{
      */
     public Germplasm getParentByGIDAndProgenitorNumber(Integer gid, Integer progenitorNumber) throws MiddlewareQueryException;
 
-
+    /**
+     * Given the gid of the the germplasm, return the list of all ancestor 
+     * germplasm with DER mtype and the locationID. The list is created by tracing back 
+     * through the source germplasms from the given Germplasm through its progenitors, up until a Germplasm
+     * created by a generative method is encountered.
+     * 
+     * @param gid
+     * 			- gid of the Germplasm
+     * @param locationID
+     * 			- locationID of the Ancestor Germplasms
+     * @return List of all ancestor Germplasm POJOs
+     * @throws MiddlewareQueryException
+     */
+    public List<Germplasm> getPedigreeLine(Integer gid, int locationID) throws MiddlewareQueryException;
 }
