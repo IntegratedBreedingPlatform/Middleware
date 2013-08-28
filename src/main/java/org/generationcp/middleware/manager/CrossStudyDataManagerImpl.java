@@ -19,6 +19,7 @@ import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
+import org.generationcp.middleware.domain.h2h.GermplasmPair;
 import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -73,6 +74,11 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
     @Override
     public List<CategoricalTraitInfo> getTraitsForCategoricalVariates(List<Integer> environmentIds) throws MiddlewareQueryException{
         return getTraitBuilder().getTraitsForCategoricalVariates(environmentIds);
+    }
+
+    @Override
+    public List<GermplasmPair> getEnvironmentsForGermplasmPairs(List<GermplasmPair> germplasmPairs) throws MiddlewareQueryException{
+        return getTrialEnvironmentBuilder().getEnvironmentForGermplasmPairs(germplasmPairs);
     }
 
 

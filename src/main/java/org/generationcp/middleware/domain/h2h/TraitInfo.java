@@ -36,6 +36,11 @@ public class TraitInfo  implements Comparable<TraitInfo>{
     public TraitInfo() {
     }
 
+    public TraitInfo( int id, String name){
+        this.id = id;
+        this.name = name;
+    }
+        
     public TraitInfo( int id, String name, String description){
         this.id = id;
         this.name = name;

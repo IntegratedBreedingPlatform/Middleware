@@ -13,6 +13,7 @@
 package org.generationcp.middleware.manager.test;
 
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -21,6 +22,7 @@ import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
+import org.generationcp.middleware.domain.h2h.GermplasmPair;
 import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
@@ -128,7 +130,31 @@ public class TestCrossStudyDataManagerImpl {
         }
         System.out.println("testGetTraitsForCategoricalVariates(): " + result.size());
     }
-	
+    
+    @Test
+    public void testGetEnvironmentsForGermplasmPairs() throws Exception {
+        List<GermplasmPair> pairs = new ArrayList<GermplasmPair>();
+        pairs.add(new GermplasmPair(1, 2));
+        pairs.add(new GermplasmPair(1, 3));
+        pairs.add(new GermplasmPair(2, 4));
+        pairs.add(new GermplasmPair(2, 5));
+        pairs.add(new GermplasmPair(3, 4));
+        pairs.add(new GermplasmPair(3, 5));
+        pairs.add(new GermplasmPair(3, 6));
+        pairs.add(new GermplasmPair(-1, -2));
+        pairs.add(new GermplasmPair(-4, -6));
+        
+        List<GermplasmPair> result = manager.getEnvironmentsForGermplasmPairs(pairs);
+        
+        
+        System.out.println("testGetEnvironmentsForGermplasmPairs(): " + result.size());
+        for (GermplasmPair pair : result) {
+            //System.out.println(trait);
+            pair.print(4);
+        }
+        System.out.println("testGetEnvironmentsForGermplasmPairs(): " + result.size());
+    }
+    
 	@AfterClass
 	public static void tearDown() throws Exception {
 		if (factory != null) {

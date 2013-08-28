@@ -11,6 +11,10 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.generationcp.middleware.domain.h2h.TraitInfo;
 import org.generationcp.middleware.util.Debug;
 
 /** 
@@ -21,19 +25,33 @@ public class TrialEnvironment {
 	private int id;
 	private VariableList variables;
 	private LocationDto location;
+    private List<TraitInfo> traits;
 	private StudyReference study;
 	
-	public TrialEnvironment(int id, VariableList variables) {
-		this.id = id;
-		this.variables = variables;
-	}
 	
-	public TrialEnvironment(int id, LocationDto location, StudyReference study) {
-		this.id = id;
-		this.location = location;
-		this.study = study;
-	}
-	
+    public TrialEnvironment(int id) {
+        this.id = id;
+    }
+    
+    public TrialEnvironment(int id, VariableList variables) {
+        this.id = id;
+        this.variables = variables;
+    }
+    
+    public TrialEnvironment(int id, LocationDto location, StudyReference study) {
+        this.id = id;
+        this.location = location;
+        this.study = study;
+    }
+    
+    public TrialEnvironment(int id, LocationDto location, List<TraitInfo> traits, StudyReference study) {
+        this.id = id;
+        this.traits = traits;
+        this.location = location;
+        this.study = study;
+        this.variables = null;
+    }
+    
 	public int getId() {
 		return id;
 	}
@@ -42,10 +60,14 @@ public class TrialEnvironment {
 		return variables.containsValueByLocalName(localName, value);
 	}
 	
-	public VariableList getVariables() {
-		return variables;
-	}
-	
+    public VariableList getVariables() {
+        return variables;
+    }
+    
+    public List<TraitInfo> getTraits() {
+        return traits;
+    }
+    
 	public LocationDto getLocation() {
 		return location;
 	}
@@ -54,16 +76,57 @@ public class TrialEnvironment {
 		return study;
 	}
 
-	public void print(int indent) {
-		Debug.println(indent, "Trial Environment " + id);
+    public void setTraits(List<TraitInfo> traits) {
+        this.traits = traits;
+    }
+
+    public void addTrait(TraitInfo trait) {
+        if (traits == null){
+            traits = new ArrayList<TraitInfo>();
+        }
+        traits.add(trait);
+    }
+    
+    
+
+	@Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + id;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        TrialEnvironment other = (TrialEnvironment) obj;
+        if (id != other.id)
+            return false;
+        return true;
+    }
+
+    public void print(int indent) {
+		Debug.println(indent, "Trial Environment: " + id);
 		if (variables != null) {
 			variables.print(indent + 3);
 		}
 		if (location != null) {
-			location.print(indent+1);
+			location.print(indent + 3);
 		}
+        if (traits != null) {
+            Debug.println(indent + 3, "Traits: " + traits.size());
+            for (TraitInfo trait : traits){
+                trait.print(indent + 6);
+            }
+        }
 		if (study != null) {
-			study.print(indent+1);
+			study.print(indent + 3);
 		}
 		
 	}

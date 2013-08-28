@@ -13,13 +13,18 @@ package org.generationcp.middleware.dao.dms;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.ExperimentStock;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -44,4 +49,45 @@ public class ExperimentStockDao extends GenericDAO<ExperimentStock, Integer> {
 		}
 		return new ArrayList<Integer>();
 	}
+
+    @SuppressWarnings("unchecked")
+    public Map<Integer, Set<Integer>> getEnvironmentsOfGermplasms(Set<Integer> gids) throws MiddlewareQueryException{
+        Map<Integer, Set<Integer>> germplasmEnvironments = new HashMap<Integer, Set<Integer>>();
+        
+        for(Integer gid : gids){
+            germplasmEnvironments.put(gid, new HashSet<Integer>());
+        }
+        
+        String sql = "SELECT DISTINCT es.stock_id, e.nd_geolocation_id "
+                    + "FROM nd_experiment e "
+                    + "     INNER JOIN nd_experiment_stock es ON e.nd_experiment_id = es.nd_experiment_id AND es.stock_id IN (:gids) "
+                    + "ORDER BY es.stock_id "
+                    ;
+        try{
+            Query query = getSession().createSQLQuery(sql).setParameterList(
+                    "gids", gids);
+
+            List<Object[]> result = query.list();
+
+            for (Object[] row : result) {
+                Integer stockId = (Integer) row[0];
+                Integer environmentId = (Integer) row[1];
+
+                Set<Integer> stockEnvironments = germplasmEnvironments
+                        .get(stockId);
+                stockEnvironments.add(environmentId);
+                germplasmEnvironments.remove(stockId);
+                germplasmEnvironments.put(stockId, stockEnvironments);
+            }
+
+        } catch (HibernateException e) {
+            logAndThrowException(
+                    "Error at getEnvironmentsOfGermplasms(" + gids + ") query on ExperimentStockDao: " + e.getMessage(), e);
+        }
+
+
+        return germplasmEnvironments;
+
+    }
+   
 }

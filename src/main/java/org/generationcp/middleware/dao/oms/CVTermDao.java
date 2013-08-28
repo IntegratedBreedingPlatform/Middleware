@@ -23,6 +23,7 @@ import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CategoricalValue;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.domain.h2h.TraitInfo;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -243,6 +244,36 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
       }
     
       return categoricalTraitInfoList;
+    }
+
+    public List<TraitInfo> getTraitInfo(List<Integer> traitIds) throws MiddlewareQueryException {
+        List<TraitInfo> traits = new ArrayList<TraitInfo>();
+        
+        try{
+        
+            SQLQuery query = getSession().createSQLQuery(
+                    "SELECT cvterm_id, name, definition "
+                    + "FROM cvterm " 
+                    + "WHERE cvterm_id IN (:traitIds) "
+                    );
+            query.setParameterList("traitIds", traitIds);
+            
+            List<Object[]> list = query.list();
+      
+            for (Object[] row : list) {
+                Integer id = (Integer) row[0];
+                String name = (String) row[1];
+                String description = (String) row[2];
+                
+                traits.add(new TraitInfo(id, name, description));
+                
+            }
+
+        } catch (HibernateException e) {
+            logAndThrowException(
+                    "Error at getTraitInfo() query on CVTermDao: " + e.getMessage(), e);
+        }
+        return traits;
     }
 	
 	

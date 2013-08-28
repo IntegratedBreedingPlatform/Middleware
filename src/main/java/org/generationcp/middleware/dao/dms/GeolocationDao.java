@@ -166,4 +166,57 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 		}
 		return properties;
 	}
+	
+    @SuppressWarnings("unchecked")
+    public List<TrialEnvironment> getTrialEnvironmentDetails(
+            Set<Integer> environmentIds) throws MiddlewareQueryException {
+        List<TrialEnvironment> environmentDetails = new ArrayList<TrialEnvironment>();
+         
+        String sql = 
+                "SELECT DISTINCT l.locid "
+                + "     , l.lname "
+                + "     , prov.lname  "
+                + "     , c.isoabbr "
+                + "     , p.project_id "
+                + "     , p.name "
+                + "FROM nd_experiment e "
+                + "     INNER JOIN nd_experiment_stock es ON e.nd_experiment_id = es.nd_experiment_id " 
+                + "     INNER JOIN location l on e.nd_geolocation_id = l.locid AND e.nd_geolocation_id IN (:locationIds) "
+                + "     LEFT JOIN location prov ON prov.locid = l.snl1id  "
+                + "     LEFT JOIN cntry c ON c.cntryid = l.cntryid "
+                + "     INNER JOIN nd_experiment_project ep ON e.nd_experiment_id = ep.nd_experiment_id "
+                + "     INNER JOIN project p ON ep.project_id = p.project_id  "
+                + "     INNER JOIN projectprop pp ON p.project_id = pp.project_id "
+                + "     LEFT JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id = 1150 "
+                + "WHERE l.locid = e.nd_geolocation_id AND (ep.project_id = p.project_id OR ep.project_id = pr.subject_project_id) " 
+            ;
+        
+        try{
+    
+            Query query = getSession().createSQLQuery(sql)
+                    .setParameterList("locationIds", environmentIds);
+    
+            List<Object[]> result = query.list();
+    
+            for (Object[] row : result) {
+                Integer environmentId = (Integer) row[0];
+                String locationName = (String) row[1];
+                String provinceName = (String) row[2];
+                String countryName = (String) row[3];
+                Integer studyId = (Integer) row[4];
+                String studyName = (String) row[5];
+                
+                environmentDetails.add(new TrialEnvironment(environmentId
+                                                , new LocationDto(environmentId, locationName, provinceName, countryName)
+                                                , new StudyReference(studyId, studyName)));
+                
+            }
+        } catch(HibernateException e) {
+            logAndThrowException("Error at getTrialEnvironmentDetails=" + environmentIds + " at GeolocationDao: " + e.getMessage(), e);
+        }
+
+
+        return environmentDetails;
+    }
+ 
 }

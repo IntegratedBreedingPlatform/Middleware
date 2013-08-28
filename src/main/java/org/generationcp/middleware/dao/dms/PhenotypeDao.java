@@ -245,6 +245,80 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
     }
     
+    public void setCategoricalTraitInfoValues(List<CategoricalTraitInfo> traitInfoList, boolean isCentral) throws MiddlewareQueryException{
+        Map<Integer, String> valueIdName = new HashMap<Integer, String>();
+
+        // Get trait IDs
+        List<Integer> traitIds = new ArrayList<Integer>();
+        for (CategoricalTraitInfo trait : traitInfoList){
+            traitIds.add(trait.getId());
+        }
+        
+        String queryString = 
+                "SELECT p.observable_id, p.cvalue_id, COUNT(p.phenotype_id) AS valuesCount " 
+                + "FROM phenotype p "
+                + "WHERE p.cvalue_id IS NOT NULL AND p.observable_id IN (:traitIds) "
+                + "GROUP BY p.observable_id, p.cvalue_id ";
+        
+        if (isCentral) {
+                queryString = 
+                    "SELECT p.observable_id, p.cvalue_id, c.name, COUNT(p.phenotype_id) AS valuesCount " 
+                    + "FROM phenotype p  "
+                    + "INNER JOIN cvterm c on p.cvalue_id = c.cvterm_id "
+                    + "WHERE p.cvalue_id IS NOT NULL AND p.observable_id IN (:traitIds) " 
+                    + "GROUP BY p.observable_id, p.cvalue_id, c.name  ";
+            }
+
+        try {
+            SQLQuery query = getSession().createSQLQuery(queryString);
+            query.setParameterList("traitIds", traitIds);
+
+            List<Object[]> list =  query.list();
+            
+            for (Object[] row : list){
+                Integer traitId = (Integer) row[0]; 
+                Integer cValueId = (Integer) row [1];
+                Long count = 0L;
+                if (isCentral){
+                    String cValueName = (String) row[2];
+                    valueIdName.put(cValueId, cValueName);
+                    count = ((BigInteger) row[3]).longValue();
+                } else {
+                    count = ((BigInteger) row[2]).longValue();
+                }
+                
+                // add value count to categorical traits
+                for (CategoricalTraitInfo traitInfo: traitInfoList){
+                    if(traitInfo.getId() == traitId){
+                        traitInfo.addValueCount(new CategoricalValue(cValueId), count.longValue());
+                        break;
+                    }
+                }
+                
+            }
+            
+            // This step was added since the valueName is not retrieved correctly with the previous query in Java (setCategoricalVariables). 
+            // Most probably because of the two cvterm id-name present in the query.
+            // The steps that follow will just retrieve the name of the categorical values in each variable.
+            
+            if (isCentral){
+                for (CategoricalTraitInfo traitInfo : traitInfoList){
+                    List<CategoricalValue> values = traitInfo.getValues();
+                    for (CategoricalValue value : values){
+                        String name = valueIdName.get(value.getId());
+                        value.setName(name);
+                    }
+                    traitInfo.setValues(values);    
+                }
+            }
+
+        } catch(HibernateException e) {
+            logAndThrowException("Error at getCategoricalTraitInfoValues() query on PhenotypeDao: " + e.getMessage(), e);
+        }
+        
+    }
+
+    
     public void setCategoricalTraitInfoValues(List<CategoricalTraitInfo> traitInfoList) throws MiddlewareQueryException{
         
         // Get trait IDs

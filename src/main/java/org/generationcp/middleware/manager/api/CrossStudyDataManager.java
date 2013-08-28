@@ -19,6 +19,7 @@ import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
+import org.generationcp.middleware.domain.h2h.GermplasmPair;
 import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
@@ -85,5 +86,16 @@ public interface CrossStudyDataManager{
      */
     List<CategoricalTraitInfo> getTraitsForCategoricalVariates(List<Integer> environmentIds) throws MiddlewareQueryException;
 
+    /**
+     * Given a list of pairs of GIDs, return all environments where any of the pair of GIDs have been observed. 
+     * Both the GIDs in a pair must have been used in an experiment in a specific environment 
+     * for that environment to be included in the result.
+     * 
+     * @param germplasmPairs List of germplasm pairs of GIDs
+     * @return List of TrialEnvironments corresponding to the list of Germplasm IDs
+     * @throws MiddlewareQueryException
+     */
+    List<GermplasmPair> getEnvironmentsForGermplasmPairs(List<GermplasmPair> germplasmPairs) throws MiddlewareQueryException;
+    
     
 }
