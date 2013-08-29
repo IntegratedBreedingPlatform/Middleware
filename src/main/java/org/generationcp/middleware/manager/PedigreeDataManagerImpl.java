@@ -49,6 +49,11 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
         super(sessionForLocal, sessionForCentral);
         germplasmDataManager = new GermplasmDataManagerImpl(sessionForLocal, sessionForCentral);
     }
+    
+    public PedigreeDataManagerImpl(Session sessionForLocal, Session sessionForCentral,GermplasmDataManagerImpl germplasmDataManager) {
+        super(sessionForLocal, sessionForCentral);
+        this.germplasmDataManager =germplasmDataManager;
+    }
         
     @Override
     public GermplasmPedigreeTree generatePedigreeTree(Integer gid, int level) throws MiddlewareQueryException {
@@ -286,7 +291,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
             //for MAN neighborhood, move the step count only if the ancestor is a MAN.
             //otherwise, skip through the ancestor without changing the step count
             if (methodType == 'M') {
-                Method method = getMethodDao().getById(germplasm.getMethodId(), false);
+                Method method = germplasmDataManager.getMethodByID(germplasm.getMethodId());//getMethodDao().getById(germplasm.getMethodId(), false); 
                 if (method != null && "MAN".equals(method.getMtype())) {
                     nextStep--;
                 }
@@ -416,7 +421,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
             while (currentGermplasm.getGnpgs() == -1) {
                 // trace back the sources
                 Integer sourceId = currentGermplasm.getGpid2();
-                currentGermplasm = germplasmDataManager.getGermplasmWithPrefName(sourceId);
+                currentGermplasm = getGermplasmDataManager().getGermplasmWithPrefName(sourceId);
 
                 if (currentGermplasm != null) {
                     toreturn.add(currentGermplasm);
@@ -501,4 +506,15 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 		return germplasms;
     }
 
+
+    private GermplasmDataManagerImpl getGermplasmDataManager(){
+	return this.germplasmDataManager;
+    }
+    
+    public void setGermplasmDataManager(
+	    	GermplasmDataManagerImpl germplasmDataManager) {
+	        this.germplasmDataManager = germplasmDataManager;
+	    }
+
+    
 }
