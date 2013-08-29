@@ -168,9 +168,12 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 	}
 	
     @SuppressWarnings("unchecked")
-    public List<TrialEnvironment> getTrialEnvironmentDetails(
-            Set<Integer> environmentIds) throws MiddlewareQueryException {
+    public List<TrialEnvironment> getTrialEnvironmentDetails(Set<Integer> environmentIds) throws MiddlewareQueryException {
         List<TrialEnvironment> environmentDetails = new ArrayList<TrialEnvironment>();
+        
+        if (environmentIds.size() == 0){
+            return environmentDetails;
+        }
          
         String sql = 
                 "SELECT DISTINCT l.locid "

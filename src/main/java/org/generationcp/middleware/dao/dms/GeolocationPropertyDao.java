@@ -52,6 +52,9 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
     public List<TrialEnvironment> getEnvironmentTraits(Set<TrialEnvironment> trialEnvironments) throws MiddlewareQueryException {
         List<TrialEnvironment> environmentDetails = new ArrayList<TrialEnvironment>();
         
+        if (trialEnvironments.size() == 0){
+            return environmentDetails;
+        }
         List<Integer> environmentIds = new ArrayList<Integer>();
         for (TrialEnvironment environment : trialEnvironments) {
             environmentIds.add(environment.getId());
