@@ -135,6 +135,8 @@ public class TestCrossStudyDataManagerImpl {
     public void testGetEnvironmentsForGermplasmPairs() throws Exception {
         List<GermplasmPair> pairs = new ArrayList<GermplasmPair>();
         pairs.add(new GermplasmPair(1, 2));
+        pairs.add(new GermplasmPair(-1, 2));
+        pairs.add(new GermplasmPair(-1, -2));
         pairs.add(new GermplasmPair(1, 3));
         pairs.add(new GermplasmPair(2, 4));
         pairs.add(new GermplasmPair(2, 5));

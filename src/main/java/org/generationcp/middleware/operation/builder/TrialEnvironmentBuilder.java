@@ -292,10 +292,13 @@ public class TrialEnvironmentBuilder extends Builder {
                 for (Integer env2 : g2Environments){
 
                     if (env1.equals(env2)){
-                        TrialEnvironment newEnv = trialEnvironments.get(trialEnvironments.indexOf(new TrialEnvironment(env1)));
-                        // If the environment has no traits, do not include in the list of common environments
-                        if (newEnv != null && newEnv.getTraits() != null && newEnv.getTraits().size() > 0){ 
-                            environments.add(newEnv);
+                        int index = trialEnvironments.indexOf(new TrialEnvironment(env1));
+                        if (index > -1){
+                            TrialEnvironment newEnv = trialEnvironments.get(index);
+                            // If the environment has no traits, do not include in the list of common environments
+                            if (newEnv != null && newEnv.getTraits() != null && newEnv.getTraits().size() > 0){ 
+                                environments.add(newEnv);
+                            }
                         }
                     }
                 }
