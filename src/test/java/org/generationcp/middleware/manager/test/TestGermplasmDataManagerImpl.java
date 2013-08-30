@@ -53,7 +53,7 @@ public class TestGermplasmDataManagerImpl{
         factory = new ManagerFactory(local, central);
         manager = factory.getGermplasmDataManager();
     }
-    /*
+    
     @Test
     public void testGetAllLocations() throws Exception {
         long start = System.currentTimeMillis();
@@ -1038,7 +1038,7 @@ public class TestGermplasmDataManagerImpl{
         long end = System.currentTimeMillis();
         System.out.println("  QUERY TIME: " + (end - start) + " ms");
     }
-    */
+    
     @Test
     public void testGetGermplasmByGidRange() throws Exception {
     	int startGID = 1;
