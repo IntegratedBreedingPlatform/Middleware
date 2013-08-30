@@ -1180,4 +1180,16 @@ public interface GermplasmDataManager {
      * @return the Germplasm POJO representing the record
      */
     public Germplasm getGermplasmWithMethodType(Integer gid) throws MiddlewareQueryException;
+    
+    /**
+     * Given a range of gid, return the list of all Germplasm 
+     * 
+     * @param startGID
+     * 			- the start ID of the range of germplasm gids
+     * @param endGID
+     * 			- the end ID of the range of germplasm gids
+     * @return List of Germplasm POJOs
+     * @throws MiddlewareQueryException
+     */ 
+    public List<Germplasm> getGermplasmByGidRange(int startGID, int endGID) throws MiddlewareQueryException;
 }

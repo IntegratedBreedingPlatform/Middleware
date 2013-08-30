@@ -697,6 +697,27 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         return null;
     }
     
+    @SuppressWarnings("unchecked")
+    public List<Germplasm> getByGIDRange(int startGID, int endGID) throws MiddlewareQueryException {
+    	try{
+    		StringBuilder queryString = new StringBuilder();
+            queryString.append("SELECT {g.*} FROM germplsm g WHERE ");
+        	queryString.append("g.gid >= :startGID ");
+            queryString.append("AND g.gid <= :endGID ");
+
+            SQLQuery query = getSession().createSQLQuery(queryString.toString());
+            query.setParameter("startGID", startGID);
+            query.setParameter("endGID", endGID);
+            query.addEntity("g", Germplasm.class);
+
+            return query.list();
+            
+    	} catch (HibernateException e) {
+            logAndThrowException("Error with getByGIDRange(startGID=" + startGID + ", endGID=" + endGID + ") query from Germplasm: " + e.getMessage(), e);
+        }
+        return new ArrayList<Germplasm>();
+    }
+    
     /**
      * @SuppressWarnings("unchecked") public List<Germplasm>
      *                                getByExample(Germplasm sample, int start,

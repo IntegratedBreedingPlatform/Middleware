@@ -1452,4 +1452,24 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         }
         return null;
     }
+    
+    @Override
+    public List<Germplasm> getGermplasmByGidRange(int startGID, int endGID) throws MiddlewareQueryException {
+    	List<Germplasm> germplasmList = new ArrayList<Germplasm>();
+    	
+    	//assumes the lesser value be the start of the range
+    	if(endGID < startGID){ 
+    		int temp = endGID;
+    		endGID = startGID;
+    		startGID = temp;
+    	}
+    	
+    	if (setWorkingDatabase(Database.LOCAL)) {
+    		germplasmList.addAll(getGermplasmDao().getByGIDRange(startGID, endGID));
+    	}
+    	if (setWorkingDatabase(Database.CENTRAL)) {
+    		germplasmList.addAll(getGermplasmDao().getByGIDRange(startGID, endGID));
+    	}
+    	return germplasmList;
+    }
 }

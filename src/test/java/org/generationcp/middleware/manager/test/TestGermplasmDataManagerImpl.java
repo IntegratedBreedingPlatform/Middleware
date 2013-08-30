@@ -53,7 +53,7 @@ public class TestGermplasmDataManagerImpl{
         factory = new ManagerFactory(local, central);
         manager = factory.getGermplasmDataManager();
     }
-    
+    /*
     @Test
     public void testGetAllLocations() throws Exception {
         long start = System.currentTimeMillis();
@@ -1032,6 +1032,23 @@ public class TestGermplasmDataManagerImpl{
         Assert.assertTrue(germplasmList != null);
 
         System.out.println("testGetGermplasmByLocationId(" + name + ") RESULTS: ");
+        for (Germplasm g : germplasmList) {
+            System.out.println("  " + g);
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
+    }
+    */
+    @Test
+    public void testGetGermplasmByGidRange() throws Exception {
+    	int startGID = 1;
+    	int endGID = 3;
+    	
+    	long start = System.currentTimeMillis();
+    	List<Germplasm> germplasmList = manager.getGermplasmByGidRange(startGID, endGID);
+        Assert.assertTrue(germplasmList != null);
+
+        System.out.println("testGetGermplasmByGidRange(" + startGID + "," + endGID + ") RESULTS: ");
         for (Germplasm g : germplasmList) {
             System.out.println("  " + g);
         }
