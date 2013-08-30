@@ -22,6 +22,8 @@ import java.util.Map;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
 import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
+import org.generationcp.middleware.domain.h2h.Observation;
+import org.generationcp.middleware.domain.h2h.ObservationKey;
 import org.generationcp.middleware.domain.h2h.TraitInfo;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -255,6 +257,35 @@ public class TraitBuilder extends Builder{
             
         }
 
+    }
+
+    public List<Observation> getObservationsForTraitOnGermplasms(List<Integer> traitIds, 
+            List<Integer> germplasmIds, List<Integer> environmentIds) throws MiddlewareQueryException{
+        List<Observation> localObservations = new ArrayList<Observation>();
+        List<Observation> centralObservations = new ArrayList<Observation>();
+
+        // Separate local and central observations
+        for (int i = 0; i < traitIds.size(); i++){
+            Observation observation = new Observation(
+                    new ObservationKey(traitIds.get(i), germplasmIds.get(i), environmentIds.get(i)));
+            if (germplasmIds.get(i) < 0){
+                localObservations.add(observation);
+            } else {
+                centralObservations.add(observation);
+            }
+        }
+        
+        if (centralObservations.size() > 0){
+            setWorkingDatabase(Database.CENTRAL);
+            centralObservations = getPhenotypeDao().getObservationForTraitOnGermplasms(centralObservations);
+        }
+        if (localObservations.size() > 0){
+            setWorkingDatabase(Database.LOCAL);
+            centralObservations = getPhenotypeDao().getObservationForTraitOnGermplasms(localObservations);
+        }
+        
+        centralObservations.addAll(localObservations);        
+        return centralObservations;
     }
 
 }

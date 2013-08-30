@@ -21,6 +21,7 @@ import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
 import org.generationcp.middleware.domain.h2h.GermplasmPair;
 import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
+import org.generationcp.middleware.domain.h2h.Observation;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
 
@@ -97,5 +98,20 @@ public interface CrossStudyDataManager{
      */
     List<GermplasmPair> getEnvironmentsForGermplasmPairs(List<GermplasmPair> germplasmPairs) throws MiddlewareQueryException;
     
-    
+    /**
+     * For each combination of trait, germplasm, and environment, the value observed is returned. 
+     * If there was no observation for a combination, null is returned.
+     * Information to return for each combination of trait, germplasm, environment: 
+     *          - trait id
+     *          - germplasm id
+     *          - environment id
+     *          - value observed (null if no observation)
+     * @param traitId
+     * @param germplasmIds
+     * @param environmentIds
+     * @return 
+     * @throws MiddlewareQueryException
+     */
+    List<Observation> getObservationsForTraitOnGermplasms(List<Integer> traitIds, List<Integer> germplasmIds, 
+            List<Integer> environmentIds) throws MiddlewareQueryException;
 }

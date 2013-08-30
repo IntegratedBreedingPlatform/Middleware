@@ -12,6 +12,8 @@
 
 package org.generationcp.middleware.domain.h2h;
 
+import org.generationcp.middleware.util.Debug;
+
 
 /**
  * The primary identifier of Observation.
@@ -95,6 +97,13 @@ public class ObservationKey{
         builder.append(environmentId);
         builder.append("]");
         return builder.toString();
+    }
+
+    public void print(int indent) {
+        Debug.println(indent, "Observation Key: ");
+        Debug.println(indent + 3, "Trait Id: " + getTraitId());
+        Debug.println(indent + 3, "Germplasm Id: " + getGermplasmId());
+        Debug.println(indent + 3, "Environment Id: " + getEnvironmentId());
     }
     
 }

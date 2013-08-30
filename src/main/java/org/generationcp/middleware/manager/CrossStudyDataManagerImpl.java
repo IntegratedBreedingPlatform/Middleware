@@ -21,6 +21,7 @@ import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
 import org.generationcp.middleware.domain.h2h.GermplasmPair;
 import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
+import org.generationcp.middleware.domain.h2h.Observation;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.CrossStudyDataManager;
@@ -81,5 +82,15 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
         return getTrialEnvironmentBuilder().getEnvironmentForGermplasmPairs(germplasmPairs);
     }
 
+    @Override
+    public List<Observation> getObservationsForTraitOnGermplasms(List<Integer> traitIds, List<Integer> germplasmIds, 
+            List<Integer> environmentIds) throws MiddlewareQueryException{
+        
+        if (traitIds.size() != germplasmIds.size() || germplasmIds.size() != environmentIds.size() 
+                || traitIds.size() != environmentIds.size()){
+            throw new MiddlewareQueryException("Lists must be of the same size.");
+        }
+        return getTraitBuilder().getObservationsForTraitOnGermplasms(traitIds, germplasmIds, environmentIds);
+    }
 
 }

@@ -24,6 +24,7 @@ import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
 import org.generationcp.middleware.domain.h2h.GermplasmPair;
 import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
+import org.generationcp.middleware.domain.h2h.Observation;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.CrossStudyDataManager;
@@ -147,8 +148,7 @@ public class TestCrossStudyDataManagerImpl {
         pairs.add(new GermplasmPair(-4, -6));
         
         List<GermplasmPair> result = manager.getEnvironmentsForGermplasmPairs(pairs);
-        
-        
+       
         System.out.println("testGetEnvironmentsForGermplasmPairs(): " + result.size());
         for (GermplasmPair pair : result) {
             //System.out.println(trait);
@@ -157,6 +157,22 @@ public class TestCrossStudyDataManagerImpl {
         System.out.println("testGetEnvironmentsForGermplasmPairs(): " + result.size());
     }
     
+    @Test
+    public void testGetObservationsForTraitOnGermplasms() throws Exception {
+        List<Integer> traitIds = Arrays.asList(20830, 21730, 20848);
+        List<Integer> germplasmIds = Arrays.asList(1093, 1092, 1091);
+        List<Integer> environmentIds = Arrays.asList(10010, 10010, 10010);
+
+        List<Observation> result = manager.getObservationsForTraitOnGermplasms(traitIds, germplasmIds, environmentIds);
+       
+        System.out.println("testGetObservationsForTraitOnGermplasms(): " + result.size());
+        for (Observation row : result) {
+            //System.out.println(trait);
+            row.print(4);
+        }
+        System.out.println("Observation(): " + result.size());
+    }
+  
 	@AfterClass
 	public static void tearDown() throws Exception {
 		if (factory != null) {

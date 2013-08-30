@@ -12,6 +12,8 @@
 
 package org.generationcp.middleware.domain.h2h;
 
+import org.generationcp.middleware.util.Debug;
+
 
 public class Observation{
 
@@ -19,8 +21,12 @@ public class Observation{
     
     private String value;
 
+    public Observation(ObservationKey id) {
+        this.id = id;
+        this.value = null;
+    }
+    
     public Observation(ObservationKey id, String value) {
-        super();
         this.id = id;
         this.value = value;
     }
@@ -81,6 +87,12 @@ public class Observation{
         builder.append(value);
         builder.append("]");
         return builder.toString();
+    }
+    
+    public void print(int indent){
+        Debug.println(indent, "Observation: ");
+        id.print(indent + 3);
+        Debug.println(indent + 3, "Value: " + getValue());        
     }
     
 }
