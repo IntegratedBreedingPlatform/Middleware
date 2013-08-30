@@ -111,6 +111,16 @@ public interface WorkbenchDataManager {
     public void deleteProject(Project project) throws MiddlewareQueryException;
 
     /**
+     * drop the projects local database. 
+     * 
+     * Drops the database of the given project. 
+     *
+     * @param project - the project to delete the database
+     * @throws MiddlewareQueryException
+     */
+    public void dropLocalDatabase(Project project) throws MiddlewareQueryException;
+    
+    /**
      * Delete project dependencies.
      *
      * @param project - the project to delete dependencies

@@ -40,7 +40,13 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 		}
 		return null;
 	}
-
+	
+	public void deleteDatabase(String projectName)
+	{
+		SQLQuery query = getSession().createSQLQuery("drop schema `"+projectName+"`;");
+		
+		query.executeUpdate();
+	}
 	public Project getByName(String projectName)
 			throws MiddlewareQueryException {
 		try {

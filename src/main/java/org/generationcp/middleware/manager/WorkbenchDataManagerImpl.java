@@ -178,6 +178,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         return projectUserMysqlAccountDao;
     }
     
+    
+    
     @Override
     public ProjectUserInfoDAO getProjectUserInfoDao() {
         if (projectUserInfoDao == null){
@@ -1102,6 +1104,19 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     public List<Integer> addProjectActivity(List<ProjectActivity> projectActivityList) throws MiddlewareQueryException {
         
         return addOrUpdateProjectActivityData(projectActivityList, Operation.ADD);
+    }
+    
+    /**
+     * drop the projects local database. 
+     * 
+     * Drops the database of the given project. 
+     *
+     * @param project - the project to delete the database
+     * @throws MiddlewareQueryException
+     */
+    public void dropLocalDatabase(Project project) throws MiddlewareQueryException
+    {
+    	getProjectDao().deleteDatabase(project.getLocalDbName());
     }
 
     private List<Integer> addOrUpdateProjectActivityData(List<ProjectActivity> projectActivityList, Operation operation)
