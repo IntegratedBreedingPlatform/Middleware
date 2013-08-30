@@ -14,6 +14,8 @@ package org.generationcp.middleware.dao;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.generationcp.middleware.domain.dms.LocationDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -317,5 +319,30 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
 	    	}
 		}
 		return returnList;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public Map<Integer, String> getLocationNamesByGIDs(List<Integer> gids) throws MiddlewareQueryException {
+        Map<Integer, String> toreturn = new HashMap<Integer, String>();
+        for(Integer gid : gids){
+            toreturn.put(gid, null);
+        }
+        
+        try{
+            SQLQuery query = getSession().createSQLQuery(Location.GET_LOCATION_NAMES_BY_GIDS);
+            query.setParameterList("gids", gids);
+            
+            List<Object> results = query.list();
+            for(Object result : results){
+                Object resultArray[] = (Object[]) result;
+                Integer gid = (Integer) resultArray[0];
+                String location = (String) resultArray[1];
+                toreturn.put(gid, location);
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getLocationNamesByGIDs(gids=" + gids + ") query from Location " + e.getMessage(), e);
+        }
+        
+        return toreturn;
     }
 }

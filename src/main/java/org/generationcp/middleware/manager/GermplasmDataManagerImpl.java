@@ -1525,4 +1525,46 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
          
          return toreturn;
     }
+    
+    @Override
+    public Map<Integer, String> getLocationNamesByGids (List<Integer> gids) throws MiddlewareQueryException{
+    	 Map<Integer, String> toreturn = new HashMap<Integer, String>();
+         
+         List<Integer> positiveGIDs = new ArrayList<Integer>();
+         List<Integer> negativeGIDs = new ArrayList<Integer>();
+         
+         //separate ids from local and central
+         for(Integer gid : gids){
+             if(gid > 0){
+                 positiveGIDs.add(gid);
+             } else {
+                 negativeGIDs.add(gid);
+             }
+         }
+         
+         //get data from central and add it to the map
+         if(!positiveGIDs.isEmpty()){
+        	 Map<Integer, String> resultsFromCentral = new HashMap<Integer, String>();
+        	 if (setWorkingDatabase(Database.CENTRAL)) {
+        		 resultsFromCentral = getLocationDao().getLocationNamesByGIDs(positiveGIDs);
+        	 }
+             for(Integer gid : resultsFromCentral.keySet()){
+                 toreturn.put(gid, resultsFromCentral.get(gid));
+             }
+         }
+         
+         //get data from local and add it to the map
+         if(!negativeGIDs.isEmpty()){
+        	 Map<Integer, String> resultsFromLocal = new HashMap<Integer, String>();
+        	 if (setWorkingDatabase(Database.LOCAL)) {
+        		 resultsFromLocal = getLocationDao().getLocationNamesByGIDs(negativeGIDs);
+        	 }
+             for(Integer gid : resultsFromLocal.keySet()){
+                 toreturn.put(gid, resultsFromLocal.get(gid));
+             }
+         }
+         
+         return toreturn;
+    }
+
 }
