@@ -1075,6 +1075,22 @@ public class TestGermplasmDataManagerImpl{
         System.out.println("  QUERY TIME: " + (end - start) + " ms");
     }
     
+    @Test
+    public void testGetPreferredNamesByGIDs() throws MiddlewareQueryException{
+        List<Integer> gids = new ArrayList<Integer>();
+        gids.add(Integer.valueOf(50533));
+        gids.add(Integer.valueOf(50532));
+        gids.add(Integer.valueOf(50531));
+        gids.add(Integer.valueOf(404865));
+        gids.add(Integer.valueOf(274017));
+        
+        Map<Integer, String> results = manager.getPreferredNamesByGids(gids);
+        System.out.println("RESULTS:");
+        for(Integer gid : results.keySet()){
+            System.out.println(gid + " : " + results.get(gid));
+        }
+    }
+    
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();

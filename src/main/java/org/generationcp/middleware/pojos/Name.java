@@ -48,6 +48,11 @@ public class Name implements Serializable{
             "SELECT gid, nval "
             + "FROM names " 
             + "WHERE nstat = 8 AND gid IN (:gids)";
+    
+    public static final String GET_PREFFERED_NAMES_BY_GIDS =
+            "SELECT gid, nval "
+            + "FROM names " 
+            + "WHERE nstat = 1 AND gid IN (:gids)";
 
     @Id
     @Basic(optional = false)

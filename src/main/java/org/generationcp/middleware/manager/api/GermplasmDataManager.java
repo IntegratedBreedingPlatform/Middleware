@@ -1200,5 +1200,10 @@ public interface GermplasmDataManager {
      * @return
      * @throws MiddlewareQueryException
      */
-    List<Germplasm> getGermplasms(List<Integer> gids) throws MiddlewareQueryException;
+    public List<Germplasm> getGermplasms(List<Integer> gids) throws MiddlewareQueryException;
+    
+    /**
+     * Given a List of GIDs, return the list of all Germplasm together with their PreferredName
+     */
+    public Map<Integer, String> getPreferredNamesByGids (List<Integer> gids) throws MiddlewareQueryException;
 }
