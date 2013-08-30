@@ -1464,18 +1464,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     		startGID = temp;
     	}
     	
-    	if( startGID < 0 || endGID < 0 ){
-    		if (setWorkingDatabase(Database.LOCAL)) {
-        		germplasmList.addAll(getGermplasmDao().getByGIDRange(startGID, endGID));
-        	}
-    	}
-    	else{
-    		if (setWorkingDatabase(Database.CENTRAL)) {
-        		germplasmList.addAll(getGermplasmDao().getByGIDRange(startGID, endGID));
-        	}
+    	if (setWorkingDatabase(startGID)) {
+    		germplasmList.addAll(getGermplasmDao().getByGIDRange(startGID, endGID));
+    		return germplasmList;
     	}
     	
-    	return germplasmList;
+    	return null;
     }
     
     @Override 
