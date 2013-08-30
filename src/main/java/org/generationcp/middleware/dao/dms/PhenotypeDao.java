@@ -377,9 +377,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
         
         try {
             SQLQuery query = getSession().createSQLQuery(
-                    "SELECT p.value, p.observable_id, es.stock_id, e.nd_geolocation_id "
+                    "SELECT DISTINCT p.observable_id, s.dbxref_id, e.nd_geolocation_id, p.value "
                     + "FROM nd_experiment e "
-                    + "    INNER JOIN nd_experiment_stock es ON e.nd_experiment_id = es.nd_experiment_id AND es.stock_id IN (:germplasmIds) "
+                    + "    INNER JOIN nd_experiment_stock es ON e.nd_experiment_id = es.nd_experiment_id " 
+                    + "     INNER JOIN stock s ON es.stock_id = s.stock_id AND s.dbxref_id IN (:germplasmIds) "
                     + "    INNER JOIN nd_experiment_phenotype ep ON e.nd_experiment_id = ep.nd_experiment_id AND e.nd_geolocation_id IN (:environmentIds) "
                     + "    INNER JOIN phenotype p ON ep.phenotype_id = p.phenotype_id AND p.observable_id IN (:traitIds) "
                     );
@@ -390,10 +391,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
             List<Object[]> list =  query.list();
             
             for (Object[] row : list){
-                Integer traitId = (Integer) row[1]; 
-                Integer germplasmId = (Integer) row [2];
-                Integer environmentId = (Integer) row[3];
-                String value = (String) row[0];
+                Integer traitId = (Integer) row[0]; 
+                Integer germplasmId = (Integer) row [1];
+                Integer environmentId = (Integer) row[2];
+                String value = (String) row[3];
                 
                 ObservationKey rowKey = new ObservationKey(traitId, germplasmId, environmentId);
                 

@@ -265,15 +265,18 @@ public class TraitBuilder extends Builder{
         List<Observation> centralObservations = new ArrayList<Observation>();
 
         // Separate local and central observations
-        for (int i = 0; i < traitIds.size(); i++){
+        for (int i = 0; i < environmentIds.size(); i++){
             Observation observation = new Observation(
                     new ObservationKey(traitIds.get(i), germplasmIds.get(i), environmentIds.get(i)));
-            if (germplasmIds.get(i) < 0){
+            if (environmentIds.get(i) < 0){
                 localObservations.add(observation);
             } else {
                 centralObservations.add(observation);
             }
         }
+        
+        System.out.println("==== CENTRAL OBSERVATIONS = " + centralObservations);
+        System.out.println("==== LOCAL OBSERVATIONS = " + localObservations);
         
         if (centralObservations.size() > 0){
             setWorkingDatabase(Database.CENTRAL);
@@ -281,7 +284,7 @@ public class TraitBuilder extends Builder{
         }
         if (localObservations.size() > 0){
             setWorkingDatabase(Database.LOCAL);
-            centralObservations = getPhenotypeDao().getObservationForTraitOnGermplasms(localObservations);
+            localObservations = getPhenotypeDao().getObservationForTraitOnGermplasms(localObservations);
         }
         
         centralObservations.addAll(localObservations);        

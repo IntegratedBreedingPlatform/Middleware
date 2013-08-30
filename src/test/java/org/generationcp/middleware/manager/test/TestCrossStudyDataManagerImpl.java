@@ -159,16 +159,15 @@ public class TestCrossStudyDataManagerImpl {
     
     @Test
     public void testGetObservationsForTraitOnGermplasms() throws Exception {
-        List<Integer> traitIds = Arrays.asList(20830, 21730, 20848);
-        List<Integer> germplasmIds = Arrays.asList(1093, 1092, 1091);
-        List<Integer> environmentIds = Arrays.asList(10010, 10010, 10010);
+        List<Integer> traitIds = Arrays.asList(22564, 22073, 21735, 20848, 18000);
+        List<Integer> germplasmIds = Arrays.asList(39, 1709, 1709, 1000, 1000);
+        List<Integer> environmentIds = Arrays.asList(5770, 10085, 5748, -1, -6);
 
         List<Observation> result = manager.getObservationsForTraitOnGermplasms(traitIds, germplasmIds, environmentIds);
        
         System.out.println("testGetObservationsForTraitOnGermplasms(): " + result.size());
-        for (Observation row : result) {
-            //System.out.println(trait);
-            row.print(4);
+        for (Observation observation : result) {
+            observation.print(4);
         }
         System.out.println("Observation(): " + result.size());
     }
