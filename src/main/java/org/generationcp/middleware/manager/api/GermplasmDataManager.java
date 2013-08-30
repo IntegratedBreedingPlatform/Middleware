@@ -1192,4 +1192,13 @@ public interface GermplasmDataManager {
      * @throws MiddlewareQueryException
      */ 
     public List<Germplasm> getGermplasmByGidRange(int startGID, int endGID) throws MiddlewareQueryException;
+    
+    /**
+     * Given a List of GIDs, return the list of all Germplasm
+     * 
+     * @param List<Integer> gids
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    List<Germplasm> getGermplasms(List<Integer> gids) throws MiddlewareQueryException;
 }

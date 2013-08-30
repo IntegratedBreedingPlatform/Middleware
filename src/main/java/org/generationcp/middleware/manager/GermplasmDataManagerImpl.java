@@ -1472,4 +1472,18 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     	}
     	return germplasmList;
     }
+    
+    @Override 
+    public List<Germplasm> getGermplasms(List<Integer> gids) throws MiddlewareQueryException{
+    	List<Germplasm> germplasmList = new ArrayList<Germplasm>();
+    	
+    	if (setWorkingDatabase(Database.LOCAL)) {
+    		germplasmList.addAll(getGermplasmDao().getByGIDList(gids));
+    	}
+    	if (setWorkingDatabase(Database.CENTRAL)) {
+    		germplasmList.addAll(getGermplasmDao().getByGIDList(gids));
+    	}
+    	
+    	return germplasmList;
+    }
 }

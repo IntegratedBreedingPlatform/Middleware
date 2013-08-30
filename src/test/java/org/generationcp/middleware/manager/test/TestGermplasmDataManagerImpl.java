@@ -1056,6 +1056,25 @@ public class TestGermplasmDataManagerImpl{
         System.out.println("  QUERY TIME: " + (end - start) + " ms");
     }
     
+    @Test
+    public void testGetGermplasmByGIDList() throws Exception {
+    	List<Integer> gids = new ArrayList<Integer>();
+    	gids.add(1);
+    	gids.add(-1);
+    	gids.add(5);
+    	
+    	long start = System.currentTimeMillis();
+    	List<Germplasm> germplasmList = manager.getGermplasms(gids);
+        Assert.assertTrue(germplasmList != null);
+
+        System.out.println("testGetGermplasmByGidList(" + gids + ") RESULTS: ");
+        for (Germplasm g : germplasmList) {
+            System.out.println("  " + g);
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("  QUERY TIME: " + (end - start) + " ms");
+    }
+    
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();

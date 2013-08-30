@@ -718,6 +718,26 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         return new ArrayList<Germplasm>();
     }
     
+    @SuppressWarnings("unchecked")
+    public List<Germplasm> getByGIDList(List<Integer> gids) throws MiddlewareQueryException {
+    	
+    	try{
+    		StringBuilder queryString = new StringBuilder();
+            queryString.append("SELECT {g.*} FROM germplsm g WHERE ");
+        	queryString.append("g.gid IN( :gids )");
+
+            SQLQuery query = getSession().createSQLQuery(queryString.toString());
+            query.setParameterList("gids", gids);
+            query.addEntity("g", Germplasm.class);
+
+            return query.list();
+            
+    	} catch (HibernateException e) {
+            logAndThrowException("Error with getByGIDList(gids=" + gids.toString() + ") query from Germplasm: " + e.getMessage(), e);
+        }
+        return new ArrayList<Germplasm>();
+    }
+    
     /**
      * @SuppressWarnings("unchecked") public List<Germplasm>
      *                                getByExample(Germplasm sample, int start,
