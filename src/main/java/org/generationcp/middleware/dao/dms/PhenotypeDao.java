@@ -45,7 +45,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
             SQLQuery query = getSession().createSQLQuery(
                     "SELECT p.observable_id, "
                     + "COUNT(DISTINCT e.nd_geolocation_id) AS location_count, "
-                    + "COUNT(DISTINCT es.stock_id) AS germplasm_count, "
+                    + "COUNT(DISTINCT s.dbxref_id) AS germplasm_count, "
                     + "COUNT(DISTINCT e.nd_experiment_id) AS observation_count , "
                     + "MIN(p.value * 1) AS min_value, "
                     + "MAX(p.value * 1) AS max_value "
@@ -53,6 +53,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
                     + "    INNER JOIN nd_experiment_phenotype eph ON eph.phenotype_id = p.phenotype_id "
                     + "    INNER JOIN nd_experiment e ON e.nd_experiment_id = eph.nd_experiment_id "
                     + "    INNER JOIN nd_experiment_stock es ON es.nd_experiment_id = e.nd_experiment_id "
+                    + "    INNER JOIN stock s ON es.stock_id = s.stock_id "
                     + "WHERE e.nd_geolocation_id IN (:environmentIds) "
                     + "    AND p.observable_id IN (:numericVariableIds) "
                     + "GROUP by p.observable_id ");
@@ -87,12 +88,13 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
             SQLQuery query = getSession().createSQLQuery(
                     "SELECT p.observable_id, "
                     + "COUNT(DISTINCT e.nd_geolocation_id) AS location_count, "
-                    + "COUNT(DISTINCT es.stock_id) AS germplasm_count, "
+                    + "COUNT(DISTINCT s.dbxref_id) AS germplasm_count, "
                     + "COUNT(DISTINCT e.nd_experiment_id) AS observation_count "
                     + "FROM phenotype p "
                     + "    INNER JOIN nd_experiment_phenotype eph ON eph.phenotype_id = p.phenotype_id "
                     + "    INNER JOIN nd_experiment e ON e.nd_experiment_id = eph.nd_experiment_id "
                     + "    INNER JOIN nd_experiment_stock es ON es.nd_experiment_id = e.nd_experiment_id "
+                    + "    INNER JOIN stock s ON es.stock_id = s.stock_id "
                     + "WHERE e.nd_geolocation_id IN (:environmentIds) "
                     + "    AND p.observable_id IN (:variableIds) "
                     + "GROUP by p.observable_id ");
@@ -125,12 +127,13 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
             SQLQuery query = getSession().createSQLQuery(
                     "SELECT p.observable_id, "
                     + "COUNT(DISTINCT e.nd_geolocation_id) AS location_count, "
-                    + "COUNT(DISTINCT es.stock_id) AS germplasm_count, "
+                    + "COUNT(DISTINCT s.dbxref_id) AS germplasm_count, "
                     + "COUNT(DISTINCT e.nd_experiment_id) AS observation_count "
                     + "FROM phenotype p "
                     + "    INNER JOIN nd_experiment_phenotype eph ON eph.phenotype_id = p.phenotype_id "
                     + "    INNER JOIN nd_experiment e ON e.nd_experiment_id = eph.nd_experiment_id "
                     + "    INNER JOIN nd_experiment_stock es ON es.nd_experiment_id = e.nd_experiment_id "
+                    + "    INNER JOIN stock s ON es.stock_id = s.stock_id "
                     + "WHERE e.nd_geolocation_id IN (:environmentIds) "
                     + "GROUP by p.observable_id ");
             query.setParameterList("environmentIds", environmentIds);

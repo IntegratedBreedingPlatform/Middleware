@@ -62,10 +62,11 @@ public class ExperimentStockDao extends GenericDAO<ExperimentStock, Integer> {
             germplasmEnvironments.put(gid, new HashSet<Integer>());
         }
         
-        String sql = "SELECT DISTINCT es.stock_id, e.nd_geolocation_id "
+        String sql = "SELECT DISTINCT s.dbxref_id, e.nd_geolocation_id "
                     + "FROM nd_experiment e "
-                    + "     INNER JOIN nd_experiment_stock es ON e.nd_experiment_id = es.nd_experiment_id AND es.stock_id IN (:gids) "
-                    + "ORDER BY es.stock_id "
+                    + "     INNER JOIN nd_experiment_stock es ON e.nd_experiment_id = es.nd_experiment_id " 
+                    + "     INNER JOIN stock s ON es.stock_id = s.stock_id AND s.dbxref_id IN (:gids) "
+                    + "ORDER BY s.dbxref_id "
                     ;
         try{
             Query query = getSession().createSQLQuery(sql).setParameterList(
