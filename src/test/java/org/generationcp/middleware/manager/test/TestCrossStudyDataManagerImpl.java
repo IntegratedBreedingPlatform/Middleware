@@ -134,18 +134,20 @@ public class TestCrossStudyDataManagerImpl {
     
     @Test
     public void testGetEnvironmentsForGermplasmPairs() throws Exception {
+    	
         List<GermplasmPair> pairs = new ArrayList<GermplasmPair>();
-        pairs.add(new GermplasmPair(1, 2));
-        pairs.add(new GermplasmPair(-1, 2));
-        pairs.add(new GermplasmPair(-1, -2));
-        pairs.add(new GermplasmPair(1, 3));
-        pairs.add(new GermplasmPair(2, 4));
-        pairs.add(new GermplasmPair(2, 5));
-        pairs.add(new GermplasmPair(3, 4));
-        pairs.add(new GermplasmPair(3, 5));
-        pairs.add(new GermplasmPair(3, 6));
-        pairs.add(new GermplasmPair(-1, -2));
-        pairs.add(new GermplasmPair(-4, -6));
+        
+        List<Integer> centralGids = Arrays.asList(462831, 777109, 462816, 462746, 437703, 437768);
+        List<Integer> localGids = Arrays.asList(1000);
+
+        pairs.add(new GermplasmPair(centralGids.get(0), centralGids.get(1)));
+        pairs.add(new GermplasmPair(localGids.get(0), centralGids.get(1)));
+        pairs.add(new GermplasmPair(centralGids.get(0), centralGids.get(2)));
+        pairs.add(new GermplasmPair(centralGids.get(1), centralGids.get(3)));
+        pairs.add(new GermplasmPair(centralGids.get(1), centralGids.get(4)));
+        pairs.add(new GermplasmPair(centralGids.get(2), centralGids.get(3)));
+        pairs.add(new GermplasmPair(centralGids.get(2), centralGids.get(4)));
+        pairs.add(new GermplasmPair(centralGids.get(2), centralGids.get(5)));
         
         List<GermplasmPair> result = manager.getEnvironmentsForGermplasmPairs(pairs);
        
