@@ -264,7 +264,7 @@ public class TraitBuilder extends Builder{
         List<Observation> localObservations = new ArrayList<Observation>();
         List<Observation> centralObservations = new ArrayList<Observation>();
 
-        // Separate local and central observations
+        // Separate local and central observations - environmentIds determine where to get the data from
         for (int i = 0; i < environmentIds.size(); i++){
             Observation observation = new Observation(
                     new ObservationKey(traitIds.get(i), germplasmIds.get(i), environmentIds.get(i)));
@@ -274,9 +274,6 @@ public class TraitBuilder extends Builder{
                 centralObservations.add(observation);
             }
         }
-        
-        System.out.println("==== CENTRAL OBSERVATIONS = " + centralObservations);
-        System.out.println("==== LOCAL OBSERVATIONS = " + localObservations);
         
         if (centralObservations.size() > 0){
             setWorkingDatabase(Database.CENTRAL);
@@ -290,5 +287,34 @@ public class TraitBuilder extends Builder{
         centralObservations.addAll(localObservations);        
         return centralObservations;
     }
+
+	public List<Observation> getObservationsForTraits(List<Integer> traitIds, List<Integer> environmentIds) 
+								throws MiddlewareQueryException{
+        List<Observation> localObservations = new ArrayList<Observation>();
+        List<Observation> centralObservations = new ArrayList<Observation>();
+
+        // Separate local and central observations - environmentIds determine where to get the data from
+        for (int i = 0; i < environmentIds.size(); i++){
+            Observation observation = new Observation(
+                    new ObservationKey(traitIds.get(i), environmentIds.get(i)));
+            if (environmentIds.get(i) < 0){
+                localObservations.add(observation);
+            } else {
+                centralObservations.add(observation);
+            }
+        }
+        
+        if (centralObservations.size() > 0){
+            setWorkingDatabase(Database.CENTRAL);
+            centralObservations = getPhenotypeDao().getObservationForTraits(centralObservations);
+        }
+        if (localObservations.size() > 0){
+            setWorkingDatabase(Database.LOCAL);
+            localObservations = getPhenotypeDao().getObservationForTraits(localObservations);
+        }
+        
+        centralObservations.addAll(localObservations);        
+        return centralObservations;
+	}
 
 }

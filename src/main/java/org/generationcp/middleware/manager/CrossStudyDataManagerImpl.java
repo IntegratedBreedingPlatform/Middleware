@@ -92,5 +92,11 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
         }
         return getTraitBuilder().getObservationsForTraitOnGermplasms(traitIds, germplasmIds, environmentIds);
     }
+    
+    @Override
+    public List<Observation> getObservationsForTraits(List<Integer> traitIds, List<Integer> environmentIds) throws MiddlewareQueryException{
+        return getTraitBuilder().getObservationsForTraits(traitIds, environmentIds);
+    	
+    }
 
 }

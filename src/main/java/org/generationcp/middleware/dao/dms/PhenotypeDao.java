@@ -416,4 +416,52 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
         return observations;
     }
     
+    public List<Observation> getObservationForTraits(
+            List<Observation> observations) throws MiddlewareQueryException {
+
+        Set<Integer> traitIds = new HashSet<Integer>();
+        Set<Integer> environmentIds = new HashSet<Integer>();
+        for (int i = 0; i<observations.size(); i++){
+            ObservationKey key = observations.get(i).getId();
+            traitIds.add(key.getTraitId());
+            environmentIds.add(key.getEnvironmentId());
+        }
+        
+    	List<Observation> toReturn = new ArrayList<Observation>();
+        
+        try {
+            SQLQuery query = getSession().createSQLQuery(
+                    "SELECT DISTINCT p.observable_id, s.dbxref_id, e.nd_geolocation_id, p.value "
+                    + "FROM nd_experiment e "
+                    + "    INNER JOIN nd_experiment_stock es ON e.nd_experiment_id = es.nd_experiment_id " 
+                    + "     INNER JOIN stock s ON es.stock_id = s.stock_id "
+                    + "    INNER JOIN nd_experiment_phenotype ep ON e.nd_experiment_id = ep.nd_experiment_id AND e.nd_geolocation_id IN (:environmentIds) "
+                    + "    INNER JOIN phenotype p ON ep.phenotype_id = p.phenotype_id AND p.observable_id IN (:traitIds) "
+                    );
+            query.setParameterList("traitIds", traitIds)
+                    .setParameterList("environmentIds", environmentIds);
+
+            List<Object[]> list =  query.list();
+            
+            for (Object[] row : list){
+                Integer traitId = (Integer) row[0]; 
+                Integer germplasmId = (Integer) row [1];
+                Integer environmentId = (Integer) row[2];
+                String value = (String) row[3];
+
+                for (Observation observation: observations){
+                	ObservationKey inputId = observation.getId();
+                    if(inputId.getTraitId() == traitId && inputId.getEnvironmentId() == environmentId){
+                        toReturn.add(new Observation(new ObservationKey(traitId, germplasmId, environmentId), value));                
+                        break;
+                    }
+                }
+
+            }
+
+        } catch(HibernateException e) {
+            logAndThrowException("Error at getObservationForTraitOnGermplasms() query on PhenotypeDao: " + e.getMessage(), e);
+        }
+        return toReturn;
+    }
 }
