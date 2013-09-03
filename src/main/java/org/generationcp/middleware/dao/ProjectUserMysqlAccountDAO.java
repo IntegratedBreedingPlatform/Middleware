@@ -38,4 +38,22 @@ public class ProjectUserMysqlAccountDAO extends GenericDAO<ProjectUserMysqlAccou
         }
         return null;
     }
+
+ 
+    @SuppressWarnings("unchecked")
+	public List<ProjectUserMysqlAccount> getByProjectId(Integer projectId) throws MiddlewareQueryException{
+        try{
+        	if (projectId != null ){
+	            Criteria criteria = getSession().createCriteria(ProjectUserMysqlAccount.class);
+	            criteria.createAlias("project", "p");
+	            criteria.createAlias("user", "u");
+	            criteria.add(Restrictions.eq("p.projectId", Long.valueOf(projectId.longValue())));
+	            return (List<ProjectUserMysqlAccount>) criteria.list();
+        	}
+        } catch(HibernateException ex){
+            logAndThrowException("Error in getByProjectIdAndUserId(projectId = " + projectId
+                    + "):" + ex.getMessage(), ex);
+        }
+        return null;
+    }
 }

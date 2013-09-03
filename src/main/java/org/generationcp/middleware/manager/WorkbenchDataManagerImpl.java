@@ -436,9 +436,12 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             for (ProjectUserRole projectUser : projectUsers) {
                 deleteProjectUserRole(projectUser);
             }
-            ProjectUserMysqlAccount mysqlaccount = getProjectUserMysqlAccountDAO().getByProjectIdAndUserId(project.getProjectId().intValue(), project.getUserId());
-            if(mysqlaccount != null)
-            	deleteProjectUserMysqlAccount(mysqlaccount);
+           
+ 	    List<ProjectUserMysqlAccount> mysqlaccounts = getProjectUserMysqlAccountDAO().getByProjectId(project.getProjectId().intValue());
+            if(mysqlaccounts != null)
+            	for (ProjectUserMysqlAccount mysqlaccount : mysqlaccounts) {
+            		deleteProjectUserMysqlAccount(mysqlaccount);
+                }
            
             		
            
