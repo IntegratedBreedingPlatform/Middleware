@@ -17,7 +17,7 @@ import org.hibernate.Criteria;
 import java.util.List;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Restrictions;
-
+  
 /**
  * DAO class for {@link ProjectUserMysqlAccount}.
  * 
