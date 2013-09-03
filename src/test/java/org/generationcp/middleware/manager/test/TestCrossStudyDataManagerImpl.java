@@ -25,6 +25,7 @@ import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
 import org.generationcp.middleware.domain.h2h.GermplasmPair;
 import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
 import org.generationcp.middleware.domain.h2h.Observation;
+import org.generationcp.middleware.domain.h2h.TraitObservation;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.CrossStudyDataManager;
@@ -186,6 +187,18 @@ public class TestCrossStudyDataManagerImpl {
             observation.print(4);
         }
         System.out.println("testGetObservationsForTraits(): " + result.size());
+    }
+    
+	@Test
+    public void testGetObservationsForTrait() throws Exception {
+        int traitId = 22574;
+    	List<Integer> environmentIds = Arrays.asList(5771, 5772, 5773, 5774, 5775, 5776); //Rice
+        
+    	List<TraitObservation> result = manager.getObservationsForTrait(traitId, environmentIds);
+        System.out.println("testGetObservationsForTrait(): " + result.size());
+        for (TraitObservation trait : result){
+            System.out.println("    " + trait);
+        }
     }
   
 	@AfterClass

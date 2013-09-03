@@ -24,6 +24,7 @@ import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
 import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
 import org.generationcp.middleware.domain.h2h.Observation;
 import org.generationcp.middleware.domain.h2h.ObservationKey;
+import org.generationcp.middleware.domain.h2h.TraitObservation;
 import org.generationcp.middleware.domain.h2h.TraitInfo;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -316,5 +317,38 @@ public class TraitBuilder extends Builder{
         centralObservations.addAll(localObservations);        
         return centralObservations;
 	}
+	
+	public List<TraitObservation> getObservationsForTrait(int traitId, List<Integer> environmentIds) throws MiddlewareQueryException{
+    	List<TraitObservation> localTraitObservations = new ArrayList<TraitObservation>();
+    	List<TraitObservation> centralTraitObservations = new ArrayList<TraitObservation>();
+    	
+    	List<Integer> localEnvironmentIds = new ArrayList<Integer>();
+    	List<Integer> centralEnvironmentIds = new ArrayList<Integer>();
+    	
+        for (int i = 0; i < environmentIds.size(); i++){
+        	int envId = environmentIds.get(i); 
+            if ( envId < 0){
+                localEnvironmentIds.add(envId);
+            } else {
+            	centralEnvironmentIds.add(envId);
+            }
+        }
+    	
+        if( centralEnvironmentIds.size() > 0 ){
+        	setWorkingDatabase(Database.CENTRAL);
+        	centralTraitObservations = getPhenotypeDao().getObservationsForTrait(traitId, centralEnvironmentIds);
+        }
+    	
+    	
+    	if( localEnvironmentIds.size() > 0 ){
+    		setWorkingDatabase(Database.LOCAL);
+        	localTraitObservations = getPhenotypeDao().getObservationsForTrait(traitId, localEnvironmentIds);
+    	}
+    	
+    	centralTraitObservations.addAll(localTraitObservations);
+    	
+    	return centralTraitObservations;
+    }
+
 
 }

@@ -22,6 +22,7 @@ import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
 import org.generationcp.middleware.domain.h2h.GermplasmPair;
 import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
 import org.generationcp.middleware.domain.h2h.Observation;
+import org.generationcp.middleware.domain.h2h.TraitObservation;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.CrossStudyDataManager;
@@ -97,6 +98,11 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
     public List<Observation> getObservationsForTraits(List<Integer> traitIds, List<Integer> environmentIds) throws MiddlewareQueryException{
         return getTraitBuilder().getObservationsForTraits(traitIds, environmentIds);
     	
+    }
+    
+    @Override
+    public List<TraitObservation> getObservationsForTrait(int traitId, List<Integer> environmentIds) throws MiddlewareQueryException{
+    	return getTraitBuilder().getObservationsForTrait(traitId, environmentIds);
     }
 
 }
