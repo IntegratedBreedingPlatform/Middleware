@@ -92,7 +92,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     private ToolConfigurationDAO toolConfigurationDao;
     private ToolDAO toolDao;
     private UserDAO userDao;
+  
     private UserInfoDAO userInfoDao;
+  
     private WorkbenchDatasetDAO workbenchDatasetDao;
     private WorkbenchRuntimeDataDAO workbenchRuntimeDataDao;
     private WorkbenchSettingDAO workbenchSettingDao;
@@ -177,6 +179,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         projectUserMysqlAccountDao.setSession(getCurrentSession());
         return projectUserMysqlAccountDao;
     }
+    
+    
     
     
     
@@ -463,13 +467,44 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             for (ProjectUserInfo projectUserInfo : projectUserInfos) {
             	deleteProjectUserInfoDao(projectUserInfo);
             } 
-            deleteProject(project);
+            
+            
+            List<ProjectBackup> projectBackups = getProjectBackups(project);
+            for (ProjectBackup projectBackup : projectBackups) {
+            	deleteProjectBackup(projectBackup);
+            } 
+            
+            List<IbdbUserMap> ibdbUserMaps = getIbdbUserMapsByProjectId(project.getProjectId());
+            for (IbdbUserMap ibdbUserMap : ibdbUserMaps) {
+            	deleteIbdbProjectBackup(ibdbUserMap);
+            } 
+            //deleteProject(project);
     	}catch (Exception e) {
               
                 logAndThrowException("Cannot delete Project Dependencies: WorkbenchDataManager.deleteProjectDependencies(project=" + project + "): "
                         + e.getMessage(), e);
             }
     }
+    public void deleteIbdbProjectBackup(IbdbUserMap ibdbUserMap) throws MiddlewareQueryException
+    {
+    	Session session = getCurrentSession();
+        Transaction trans = null;
+        try{
+        	trans = session.beginTransaction();
+        	getIbdbUserMapDao().makeTransient(ibdbUserMap);
+            trans.commit();
+            
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Cannot delete Project: WorkbenchDataManager.deleteIbdbProjectBackup(ibdbUserMap=" + ibdbUserMap + "): "
+                    + e.getMessage(), e);
+        }
+    }
+    public List<IbdbUserMap> getIbdbUserMapsByProjectId(Long projectId) throws MiddlewareQueryException
+    {
+    	return getIbdbUserMapDao().getIbdbUserMapByID(projectId);
+    }
+    
     public void deleteProjectUserInfoDao(ProjectUserInfo projectUserInfo)  throws MiddlewareQueryException
     {
     	Session session = getCurrentSession();
@@ -508,6 +543,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         	trans = session.beginTransaction();
             getProjectDao().makeTransient(project);
             trans.commit();
+           
             
         } catch (Exception e) {
             rollbackTransaction(trans);

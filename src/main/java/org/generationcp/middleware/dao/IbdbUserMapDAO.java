@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao;
 
+import java.util.List;
+
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.hibernate.HibernateException;
@@ -32,6 +34,22 @@ public class IbdbUserMapDAO extends GenericDAO<IbdbUserMap, Long>{
         	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getLocalIbdbUserId(workbenchUserId=" + workbenchUserId + ", projectId="
+                    + projectId + ") query from IbdbUserMap: " + e.getMessage(), e);
+        }
+        return null;
+    }
+    
+    public List<IbdbUserMap> getIbdbUserMapByID(Long projectId) throws MiddlewareQueryException {
+        try {
+        	if (projectId != null){
+	            Query query = getSession().createSQLQuery(IbdbUserMap.GET_LOCAL_IBDB_USER_ID);
+	            query.setParameter("projectId", projectId);
+	            @SuppressWarnings("unchecked")
+				List<IbdbUserMap> results = query.list();
+	            return results;
+        	}
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getIbdbUserMapByID( projectId="
                     + projectId + ") query from IbdbUserMap: " + e.getMessage(), e);
         }
         return null;
