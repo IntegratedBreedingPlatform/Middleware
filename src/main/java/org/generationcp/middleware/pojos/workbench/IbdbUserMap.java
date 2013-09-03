@@ -34,6 +34,9 @@ public class IbdbUserMap implements Serializable {
     
     public static final String GET_LOCAL_IBDB_USER_ID = 
         "SELECT ibdb_user_id FROM workbench_ibdb_user_map WHERE workbench_user_id = :workbenchUserId AND project_id = :projectId";
+    
+    public static final String GET_LOCAL_IBDB_BY_PROJECT = 
+            "SELECT ibdb_user_id FROM workbench_ibdb_user_map WHERE project_id = :projectId";
 
     @Id
     @Basic(optional = false)

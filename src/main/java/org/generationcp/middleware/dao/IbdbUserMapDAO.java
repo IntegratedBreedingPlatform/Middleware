@@ -15,8 +15,10 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
+import org.generationcp.middleware.pojos.workbench.ProjectBackup;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * DAO class for {@link IbdbUserMap}.
@@ -39,14 +41,13 @@ public class IbdbUserMapDAO extends GenericDAO<IbdbUserMap, Long>{
         return null;
     }
     
-    public List<IbdbUserMap> getIbdbUserMapByID(Long projectId) throws MiddlewareQueryException {
+    @SuppressWarnings("unchecked")
+	public List<IbdbUserMap> getIbdbUserMapByID(Long projectId) throws MiddlewareQueryException {
         try {
         	if (projectId != null){
-	            Query query = getSession().createSQLQuery(IbdbUserMap.GET_LOCAL_IBDB_USER_ID);
-	            query.setParameter("projectId", projectId);
-	            @SuppressWarnings("unchecked")
-				List<IbdbUserMap> results = query.list();
-	            return results;
+        		 return getSession().createCriteria(IbdbUserMap.class)
+                         .add(Restrictions.eq("projectId", projectId))
+                         .list();
         	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getIbdbUserMapByID( projectId="

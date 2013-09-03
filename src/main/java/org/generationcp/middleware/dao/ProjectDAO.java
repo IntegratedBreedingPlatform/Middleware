@@ -40,7 +40,12 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 		}
 		return null;
 	}
-	
+	public void deleteProject(String projectName)
+	{
+		SQLQuery query = getSession().createSQLQuery("delete from workbench_project where project_name= '"+projectName+"';");
+		
+		query.executeUpdate();
+	}
 	public void deleteDatabase(String projectName)
 	{
 		SQLQuery query = getSession().createSQLQuery("drop schema `"+projectName+"`;");

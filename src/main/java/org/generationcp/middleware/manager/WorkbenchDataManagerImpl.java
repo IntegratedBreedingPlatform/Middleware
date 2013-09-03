@@ -537,18 +537,17 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     }
     @Override
     public void deleteProject(Project project) throws MiddlewareQueryException {
-    	Session session = getCurrentSession();
-        Transaction trans = null;
+    	
         try{
-        	trans = session.beginTransaction();
-            getProjectDao().makeTransient(project);
-            trans.commit();
+        	getProjectDao().deleteProject(project.getProjectName());
            
             
         } catch (Exception e) {
-            rollbackTransaction(trans);
+           
             logAndThrowException("Cannot delete Project: WorkbenchDataManager.deleteProject(project=" + project + "): "
                     + e.getMessage(), e);
+            
+            
         }
     }
 
