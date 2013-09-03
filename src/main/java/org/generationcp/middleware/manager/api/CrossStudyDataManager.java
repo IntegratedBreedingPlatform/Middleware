@@ -114,4 +114,21 @@ public interface CrossStudyDataManager{
      */
     List<Observation> getObservationsForTraitOnGermplasms(List<Integer> traitIds, List<Integer> germplasmIds, 
             List<Integer> environmentIds) throws MiddlewareQueryException;
+
+    /**
+     * Given a list of traits and environments, return observed data for the list of traits in the given list of environments.
+     * 
+     * With each observation, we need the ff information:
+     * 			- trait - id of trait (standard variable) being observed
+     * 			- environment ID
+     * 			- GID- GID of germplasm related to observation (experiment)
+     * 			- observed value - phenotype.value
+     * 
+     * @param traitIds
+     * @param environmentIds
+     * @return
+     * @throws MiddlewareQueryException
+     */
+	List<Observation> getObservationsForTraits(List<Integer> traitIds,
+			List<Integer> environmentIds) throws MiddlewareQueryException;
 }

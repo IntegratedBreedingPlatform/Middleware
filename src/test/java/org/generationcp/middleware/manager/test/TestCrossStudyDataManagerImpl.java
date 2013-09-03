@@ -138,7 +138,7 @@ public class TestCrossStudyDataManagerImpl {
         List<GermplasmPair> pairs = new ArrayList<GermplasmPair>();
         
         List<Integer> centralGids = Arrays.asList(462831, 777109, 462816, 462746, 437703, 437768);
-        List<Integer> localGids = Arrays.asList(1000);
+        List<Integer> localGids = Arrays.asList(1000, -1, -2);
 
         pairs.add(new GermplasmPair(centralGids.get(0), centralGids.get(1)));
         pairs.add(new GermplasmPair(localGids.get(0), centralGids.get(1)));
@@ -148,12 +148,12 @@ public class TestCrossStudyDataManagerImpl {
         pairs.add(new GermplasmPair(centralGids.get(2), centralGids.get(3)));
         pairs.add(new GermplasmPair(centralGids.get(2), centralGids.get(4)));
         pairs.add(new GermplasmPair(centralGids.get(2), centralGids.get(5)));
+        pairs.add(new GermplasmPair(localGids.get(1), localGids.get(2)));
         
         List<GermplasmPair> result = manager.getEnvironmentsForGermplasmPairs(pairs);
        
         System.out.println("testGetEnvironmentsForGermplasmPairs(): " + result.size());
         for (GermplasmPair pair : result) {
-            //System.out.println(trait);
             pair.print(4);
         }
         System.out.println("testGetEnvironmentsForGermplasmPairs(): " + result.size());
@@ -171,7 +171,21 @@ public class TestCrossStudyDataManagerImpl {
         for (Observation observation : result) {
             observation.print(4);
         }
-        System.out.println("Observation(): " + result.size());
+        System.out.println("testGetObservationsForTraitOnGermplasms(): " + result.size());
+    }
+  
+    @Test
+    public void testGetObservationsForTraits() throws Exception {
+        List<Integer> traitIds = Arrays.asList(22564, 22073, 21735, 20848, 18000);
+        List<Integer> environmentIds = Arrays.asList(5770, 10085, 5748, -1, -6);
+
+        List<Observation> result = manager.getObservationsForTraits(traitIds, environmentIds);
+       
+        System.out.println("testGetObservationsForTraits(): " + result.size());
+        for (Observation observation : result) {
+            observation.print(4);
+        }
+        System.out.println("testGetObservationsForTraits(): " + result.size());
     }
   
 	@AfterClass

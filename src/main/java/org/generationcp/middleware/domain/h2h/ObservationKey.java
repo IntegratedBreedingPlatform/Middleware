@@ -27,8 +27,12 @@ public class ObservationKey{
     
     private int environmentId;
 
+    public ObservationKey(int traitId, int environmentId) {
+        this.traitId = traitId;
+        this.environmentId = environmentId;
+    }
+
     public ObservationKey(int traitId, int germplasmId, int environmentId) {
-        super();
         this.traitId = traitId;
         this.germplasmId = germplasmId;
         this.environmentId = environmentId;
