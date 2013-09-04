@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.LocationDto;
 import org.generationcp.middleware.domain.dms.StudyReference;
@@ -119,20 +120,20 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 	public TrialEnvironments getAllTrialEnvironments() throws MiddlewareQueryException {
 		TrialEnvironments environments = new TrialEnvironments();
 		try {
-			String sql = "SELECT DISTINCT gp.nd_geolocation_id, l.lname, prov.lname, c.isoabbr, p.project_id, p.name, gp.value"
+			String sql = "SELECT DISTINCT gp.nd_geolocation_id, l.lname, prov.provinceName, c.isoabbr, p.project_id, p.name, gp.value"
 						+ " FROM project p"
 						+ " INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id = " + TermId.BELONGS_TO_STUDY.getId()
 						+ " INNER JOIN nd_experiment_project ep ON (ep.project_id = p.project_id OR ep.project_id = pr.subject_project_id)"
 						+ " INNER JOIN nd_experiment e ON e.nd_experiment_id = ep.nd_experiment_id"
 						+ " INNER JOIN nd_geolocationprop gp ON gp.nd_geolocation_id = e.nd_geolocation_id AND gp.type_id = " + TermId.LOCATION_ID.getId()
 						+ " LEFT JOIN location l ON l.locid = gp.value"
-						+ " LEFT JOIN location prov ON prov.locid = l.snl1id"
+						+ " LEFT JOIN (SELECT lname as provinceName, locid FROM location) prov ON prov.locid = l.snl1id"
 						+ " LEFT JOIN cntry c ON c.cntryid = l.cntryid"
 						;
 			Query query = getSession().createSQLQuery(sql);
 			List<Object[]> list = query.list();
 			for (Object[] row : list) {
-				if (StringUtils.isNumeric((String) row[6])) {
+				if (NumberUtils.isNumber((String) row[6])) {
 					environments.add(new TrialEnvironment((Integer) row[0], 
 										new LocationDto(Integer.valueOf(row[6].toString()), (String) row[1], (String) row[2], (String) row[3]), 
 										new StudyReference((Integer) row[4], (String) row[5])));
@@ -243,7 +244,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			query.setParameterList("traitIds", traitIds);
 			List<Object[]> list = query.list();
 			for (Object[] row : list) {
-				if (StringUtils.isNumeric((String) row[6])) {
+				if (NumberUtils.isNumber((String) row[6])) {
 					environments.add(new TrialEnvironment((Integer) row[0], 
 										new LocationDto(Integer.valueOf(row[6].toString()), (String) row[1], (String) row[2], (String) row[3]), 
 										new StudyReference((Integer) row[4], (String) row[5])));
