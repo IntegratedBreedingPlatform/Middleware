@@ -105,4 +105,8 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
     	return getTraitBuilder().getObservationsForTrait(traitId, environmentIds);
     }
 
+    @Override
+    public TrialEnvironments getEnvironmentsForTraits(List<Integer> traitIds) throws MiddlewareQueryException{
+    	return getTrialEnvironmentBuilder().getEnvironmentsForTraits(traitIds);
+    }
 }

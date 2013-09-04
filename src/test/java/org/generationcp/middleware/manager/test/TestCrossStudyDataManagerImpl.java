@@ -200,6 +200,19 @@ public class TestCrossStudyDataManagerImpl {
             System.out.println("    " + trait);
         }
     }
+	
+	@Test
+	public void testGetEnvironmentsForTraits() throws Exception {
+    	List<Integer> traitIds = new ArrayList<Integer>();
+    	
+    	traitIds.add(22006);
+    	traitIds.add(22485);
+    	
+		System.out.println("testGetEnvironmentForTraits");
+		TrialEnvironments environments = manager.getEnvironmentsForTraits(traitIds);
+		System.out.println("SIZE=" + environments.size());
+		environments.print(1);
+	}
   
 	@AfterClass
 	public static void tearDown() throws Exception {

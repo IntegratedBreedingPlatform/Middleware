@@ -323,5 +323,37 @@ public class TrialEnvironmentBuilder extends Builder {
         return idsToReturn;
         
     }
+    
+    public TrialEnvironments getEnvironmentsForTraits(List<Integer> traitIds) throws MiddlewareQueryException {
+    	
+		TrialEnvironments environments = new TrialEnvironments();
+		setWorkingDatabase(Database.CENTRAL);
+		environments.addAll(getGeolocationDao().getEnvironmentsForTraits(traitIds));
+		
+		setWorkingDatabase(Database.LOCAL);
+		TrialEnvironments localEnvironments = getGeolocationDao().getEnvironmentsForTraits(traitIds);
+		if (localEnvironments != null && localEnvironments.getTrialEnvironments() != null) {
+			setWorkingDatabase(Database.CENTRAL);
+			Set<Integer> ids = new HashSet<Integer>();
+			for (TrialEnvironment environment : localEnvironments.getTrialEnvironments()) {
+				if (environment.getLocation() != null && environment.getLocation().getId() != null 
+				&& environment.getLocation().getId().intValue() >= 0) {
+					ids.add(environment.getLocation().getId());
+				}
+			}
+			List<LocationDto> newLocations = getLocationDao().getLocationDtoByIds(ids);
+			for (TrialEnvironment environment : localEnvironments.getTrialEnvironments()) {
+				if (environment.getLocation() != null && newLocations != null && newLocations.indexOf(environment.getLocation().getId()) > -1) {
+					LocationDto newLocation = newLocations.get(newLocations.indexOf(environment.getLocation().getId()));
+					environment.getLocation().setCountryName(newLocation.getCountryName());
+					environment.getLocation().setLocationName(newLocation.getLocationName());
+					environment.getLocation().setProvinceName(newLocation.getProvinceName());
+				}
+				environments.add(environment);
+			}
+		}
+		
+		return environments;
+	}
 
 }

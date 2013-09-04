@@ -143,5 +143,17 @@ public interface CrossStudyDataManager{
      * @throws MiddlewareQueryException
      */
     List<TraitObservation> getObservationsForTrait(int traitId, List<Integer> environmentIds) throws MiddlewareQueryException;
-    
+ 
+    /**
+     * Given list of trait (standard variable) IDs, return all environments where any of the traits has been observed.
+     * With each environment, we need the ff information:
+     * 		- environment ID - nd_geolocation record ID
+     * 		- location - location name, province name and country name of location 
+     * 			associated with environment. 
+     * 		- name of the study
+     * @param traitIds
+     * @return List of TrialEnvironments where any of the traits has been observed
+     * @throws MiddlewareQueryException 
+     */
+    TrialEnvironments getEnvironmentsForTraits(List<Integer> traitIds) throws MiddlewareQueryException;
 }
