@@ -25,6 +25,7 @@ import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
 import org.generationcp.middleware.domain.h2h.GermplasmPair;
 import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
 import org.generationcp.middleware.domain.h2h.Observation;
+import org.generationcp.middleware.domain.h2h.TraitObservation;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.CrossStudyDataManager;
@@ -187,6 +188,31 @@ public class TestCrossStudyDataManagerImpl {
         }
         System.out.println("testGetObservationsForTraits(): " + result.size());
     }
+    
+	@Test
+    public void testGetObservationsForTrait() throws Exception {
+        int traitId = 22574;
+    	List<Integer> environmentIds = Arrays.asList(5771, 5772, 5773, 5774, 5775, 5776); //Rice
+        
+    	List<TraitObservation> result = manager.getObservationsForTrait(traitId, environmentIds);
+        System.out.println("testGetObservationsForTrait(): " + result.size());
+        for (TraitObservation trait : result){
+            System.out.println("    " + trait);
+        }
+    }
+	
+	@Test
+	public void testGetEnvironmentsForTraits() throws Exception {
+    	List<Integer> traitIds = new ArrayList<Integer>();
+    	
+    	traitIds.add(22006);
+    	traitIds.add(22485);
+    	
+		System.out.println("testGetEnvironmentForTraits");
+		TrialEnvironments environments = manager.getEnvironmentsForTraits(traitIds);
+		System.out.println("SIZE=" + environments.size());
+		environments.print(1);
+	}
   
 	@AfterClass
 	public static void tearDown() throws Exception {

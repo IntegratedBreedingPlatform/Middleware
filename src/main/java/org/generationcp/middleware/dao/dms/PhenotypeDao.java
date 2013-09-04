@@ -27,6 +27,7 @@ import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
 import org.generationcp.middleware.domain.h2h.Observation;
 import org.generationcp.middleware.domain.h2h.ObservationKey;
 import org.generationcp.middleware.domain.h2h.TraitInfo;
+import org.generationcp.middleware.domain.h2h.TraitObservation;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.hibernate.HibernateException;
@@ -464,4 +465,47 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
         }
         return toReturn;
     }
+    
+
+
+	public List<TraitObservation> getObservationsForTrait(int traitId, List<Integer> environmentIds) throws MiddlewareQueryException {
+		List<TraitObservation> toreturn = new ArrayList<TraitObservation>();
+
+		try {
+			StringBuilder queryString = new StringBuilder();
+			queryString.append("SELECT p.observable_id, p.value, s.dbxref_id, e.nd_experiment_id, l.lname ");
+			queryString.append("FROM phenotype p ");
+			queryString.append("INNER JOIN nd_experiment_phenotype eph ON eph.phenotype_id = p.phenotype_id ");
+			queryString.append("INNER JOIN nd_experiment e ON e.nd_experiment_id = eph.nd_experiment_id ");
+			queryString.append("INNER JOIN nd_geolocationprop gp ON gp.nd_geolocation_id = e.nd_geolocation_id AND gp.type_id = 8190 ");
+			queryString.append("INNER JOIN location l ON l.locid = gp.value ");
+			queryString.append("INNER JOIN nd_experiment_stock es ON es.nd_experiment_id = e.nd_experiment_id ");
+			queryString.append("INNER JOIN stock s ON s.stock_id = es.stock_id ");
+			queryString.append("WHERE p.observable_id = :traitId AND e.nd_geolocation_id IN ( :environmentIds )");
+			
+			System.out.println(queryString.toString());
+			 
+			 SQLQuery query = getSession().createSQLQuery(queryString.toString());
+			 query.setParameter("traitId", traitId)
+			 .setParameterList("environmentIds", environmentIds);
+			 
+			 List<Object[]> list =  query.list();
+			 
+			  for (Object[] row : list){
+	                Integer id = (Integer) row[0]; 
+	                String value = (String) row[1];
+	                Integer gid = (Integer) row[2];
+	                Integer observationId = (Integer) row[3];
+	                String locationName = row[4].toString();
+	                
+	                toreturn.add(new TraitObservation(id, value,gid,observationId,locationName));
+	            }
+
+        } catch(HibernateException e) {
+            logAndThrowException("Error at getObservationsForTrait() query on PhenotypeDao: " + e.getMessage(), e);
+            
+        }
+		
+		return toreturn;
+	}
 }

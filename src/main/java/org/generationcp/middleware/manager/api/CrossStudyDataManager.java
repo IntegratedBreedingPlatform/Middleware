@@ -22,6 +22,7 @@ import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
 import org.generationcp.middleware.domain.h2h.GermplasmPair;
 import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
 import org.generationcp.middleware.domain.h2h.Observation;
+import org.generationcp.middleware.domain.h2h.TraitObservation;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
 
@@ -131,4 +132,28 @@ public interface CrossStudyDataManager{
      */
 	List<Observation> getObservationsForTraits(List<Integer> traitIds,
 			List<Integer> environmentIds) throws MiddlewareQueryException;
+	
+
+    /**
+     * For each trait in given trial environments, the observed values from local and central databases are returned  
+     * 
+     * @param traitID - phenotype ID
+     * @param environmentIds - List of environment Ids
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    List<TraitObservation> getObservationsForTrait(int traitId, List<Integer> environmentIds) throws MiddlewareQueryException;
+ 
+    /**
+     * Given list of trait (standard variable) IDs, return all environments where any of the traits has been observed.
+     * With each environment, we need the ff information:
+     * 		- environment ID - nd_geolocation record ID
+     * 		- location - location name, province name and country name of location 
+     * 			associated with environment. 
+     * 		- name of the study
+     * @param traitIds
+     * @return List of TrialEnvironments where any of the traits has been observed
+     * @throws MiddlewareQueryException 
+     */
+    TrialEnvironments getEnvironmentsForTraits(List<Integer> traitIds) throws MiddlewareQueryException;
 }
