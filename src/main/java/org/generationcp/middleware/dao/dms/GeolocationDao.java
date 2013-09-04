@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.LocationDto;
 import org.generationcp.middleware.domain.dms.StudyReference;
@@ -243,7 +244,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			query.setParameterList("traitIds", traitIds);
 			List<Object[]> list = query.list();
 			for (Object[] row : list) {
-				if (StringUtils.isNumeric((String) row[6])) {
+				if (NumberUtils.isNumber((String) row[6])) {
 					environments.add(new TrialEnvironment((Integer) row[0], 
 										new LocationDto(Integer.valueOf(row[6].toString()), (String) row[1], (String) row[2], (String) row[3]), 
 										new StudyReference((Integer) row[4], (String) row[5])));
