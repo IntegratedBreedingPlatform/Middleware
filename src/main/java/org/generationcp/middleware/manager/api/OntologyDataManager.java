@@ -96,4 +96,13 @@ public interface OntologyDataManager {
 	 * @throws MiddlewareQueryException
 	 */
 	Term findMethodByName(String name) throws MiddlewareQueryException;
+	
+	/**
+	 * Retrieves the StandardVariable given the property, scale and method names
+	 * 
+	 * @param property, scale, method
+	 * @return StandardVariable
+	 * @throws MiddlewareQueryException
+	 * */
+	StandardVariable findStandardVariableByTraitScaleMethodNames(String property, String scale, String method) throws MiddlewareQueryException;
 }

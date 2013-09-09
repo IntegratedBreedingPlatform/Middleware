@@ -50,7 +50,7 @@ public class TestOntologyDataManagerImpl {
 		factory = new ManagerFactory(local, central);
 		manager = factory.getNewOntologyDataManager();
 	}
-
+/*
 	@Test
 	public void testGetCvTermById() throws Exception {
 		Term term = manager.getTermById(CV_TERM_ID);
@@ -235,6 +235,14 @@ public class TestOntologyDataManagerImpl {
 		term = manager.findMethodByName(term.getName());
 		assertTrue(term != null);
 		term.print(0);
+	}
+	*/
+	
+	@Test
+	public void testFindStandardVariableByTraitScaleMethodNames() throws Exception{
+		System.out.println("Test findStandardVariableByTraitScaleMethodNames");
+		StandardVariable stdVar = manager.findStandardVariableByTraitScaleMethodNames("User", "DBCV", "Assigned");		
+		System.out.println("testFindStandardVariableByTraitScaleMethodNames(): " + stdVar);
 	}
 
 	@AfterClass
