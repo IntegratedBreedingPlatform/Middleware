@@ -24,14 +24,10 @@ import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CategoricalValue;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.domain.h2h.TraitInfo;
-import org.generationcp.middleware.manager.Database;
-import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.SQLQuery;
-import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -315,9 +311,9 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		try {
 			StringBuilder queryString = new StringBuilder();
 			queryString.append("SELECT ");
-			queryString.append("(SELECT cvterm_id FROM cvterm WHERE name = :property AND cv_id = 1010) propertyId, ");
-			queryString.append("(SELECT cvterm_id FROM cvterm WHERE name = :scale AND cv_id = 1030) scaleId, ");
-			queryString.append("(SELECT cvterm_id FROM cvterm WHERE name = :method AND cv_id = 1020) methodId, ");
+			queryString.append("(SELECT cvterm_id FROM cvterm WHERE name = :property AND cv_id = 1010 AND is_obsolete = 0) propertyId, ");
+			queryString.append("(SELECT cvterm_id FROM cvterm WHERE name = :scale AND cv_id = 1030 AND is_obsolete = 0) scaleId, ");
+			queryString.append("(SELECT cvterm_id FROM cvterm WHERE name = :method AND cv_id = 1020 AND is_obsolete = 0) methodId ");
 			
 			SQLQuery query = getSession().createSQLQuery(queryString.toString());
 			query.setParameter("property", property);
