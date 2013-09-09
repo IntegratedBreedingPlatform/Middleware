@@ -24,6 +24,8 @@ public class Workbook {
 	
 	private List<MeasurementVariable> factors; 
 	
+	private List<MeasurementVariable> constants; 
+	
 	private List<MeasurementVariable> variates; 
 	
 	private List<MeasurementRow> observations; 
@@ -35,11 +37,13 @@ public class Workbook {
 	public Workbook(StudyDetails studyDetails,
 			List<MeasurementVariable> conditions,
 			List<MeasurementVariable> factors,
+			List<MeasurementVariable> constants,
 			List<MeasurementVariable> variates,
 			List<MeasurementRow> observations) {
 		this.studyDetails = studyDetails;
 		this.conditions = conditions;
 		this.factors = factors;
+		this.constants = constants;
 		this.variates = variates;
 		this.observations = observations;
 	}
@@ -76,6 +80,14 @@ public class Workbook {
 		this.variates = variates;
 	}
 
+	public List<MeasurementVariable> getConstants() {
+		return constants;
+	}
+
+	public void setConstants(List<MeasurementVariable> constants) {
+		this.constants = constants;
+	}
+
 	public List<MeasurementRow> getObservations() {
 		return observations;
 	}
@@ -93,6 +105,8 @@ public class Workbook {
 		builder.append(conditions);
 		builder.append(", factors=");
 		builder.append(factors);
+		builder.append(", constants=");
+		builder.append(constants);
 		builder.append(", variates=");
 		builder.append(variates);
 		builder.append(", observations=");
@@ -110,6 +124,10 @@ public class Workbook {
 		}
 		Debug.println(indent + 3, "Factors: ");
 		for (MeasurementVariable variable : factors){
+			variable.print(indent + 6);
+		}
+		Debug.println(indent + 3, "Constants: ");
+		for (MeasurementVariable variable : constants){
 			variable.print(indent + 6);
 		}
 		Debug.println(indent + 3, "Variates: ");
