@@ -24,10 +24,14 @@ import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CategoricalValue;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.domain.h2h.TraitInfo;
+import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -276,6 +280,91 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
         return traits;
     }
 	
+	public Integer findStandardVariableIdByTraitScaleMethodNamesCentral(
+			String property, String scale, String method) 
+			throws MiddlewareQueryException {
+		try {
+			StringBuilder queryString = new StringBuilder();
+			queryString.append("SELECT DISTINCT cvr.subject_id ");
+			queryString.append("FROM cvterm_relationship cvr ");
+			queryString.append("INNER JOIN cvterm_relationship cvrp ON cvr.subject_id = cvrp.subject_id AND cvrp.type_id = 1200 ");
+			queryString.append("INNER JOIN cvterm_relationship cvrs ON cvr.subject_id = cvrs.subject_id AND cvrs.type_id = 1220 ");
+			queryString.append("INNER JOIN cvterm_relationship cvrm ON cvr.subject_id = cvrm.subject_id AND cvrm.type_id = 1210 "); 
+			queryString.append("INNER JOIN cvterm cvtp ON cvtp.cvterm_id = cvrp.object_id ");
+			queryString.append("INNER JOIN cvterm cvts ON cvts.cvterm_id = cvrs.object_id "); 
+			queryString.append("INNER JOIN cvterm cvtm ON cvtm.cvterm_id = cvrm.object_id ");
+			queryString.append("WHERE cvtp.name = :property and cvts.name = :scale and cvtm.name = :method");
+			
+			SQLQuery query = getSession().createSQLQuery(queryString.toString());
+			query.setParameter("property", property);
+			query.setParameter("scale", scale);
+			query.setParameter("method", method);
+			
+			Integer id = (Integer) query.uniqueResult();
+						
+			return id;
+						
+		} catch(HibernateException e) {
+			logAndThrowException("Error at findStandardVariableIdByTraitScaleMethodNames :" + e.getMessage(), e);
+		}
+		return null;
+	}
 	
-
+	public Integer[] getCvTermIdsByTraitScaleMethodNamesLocal(String property, String scale, String method) 
+			throws MiddlewareQueryException {
+		try {
+			StringBuilder queryString = new StringBuilder();
+			queryString.append("SELECT ");
+			queryString.append("(SELECT cvterm_id FROM cvterm WHERE name = :property AND cv_id = 1010) propertyId, ");
+			queryString.append("(SELECT cvterm_id FROM cvterm WHERE name = :scale AND cv_id = 1030) scaleId, ");
+			queryString.append("(SELECT cvterm_id FROM cvterm WHERE name = :method AND cv_id = 1020) methodId, ");
+			
+			SQLQuery query = getSession().createSQLQuery(queryString.toString());
+			query.setParameter("property", property);
+			query.setParameter("scale", scale);
+			query.setParameter("method", method);
+			
+			List<Object[]> list = query.list();
+			Integer[] cvTermIds = new Integer[3];
+		      
+            for (Object[] row : list) {
+            	cvTermIds[0] = (Integer)row[0];
+            	cvTermIds[1] = (Integer)row[1];
+            	cvTermIds[2] = (Integer)row[2];
+            }
+			
+			return cvTermIds;
+						
+		} catch(HibernateException e) {
+			logAndThrowException("Error at findStandardVariableIdByTraitScaleMethodNames :" + e.getMessage(), e);
+		}
+		return null;
+	}
+	
+	public Integer getStandadardVariableIdByPropertyScaleMethod(Integer propertyId, Integer scaleId, Integer methodId)
+			throws MiddlewareQueryException {
+		try {
+			StringBuilder queryString = new StringBuilder();
+			queryString.append("SELECT DISTINCT cvr.subject_id ");
+			queryString.append("FROM cvterm_relationship cvr ");
+			queryString.append("INNER JOIN cvterm_relationship cvrp ON cvr.subject_id = cvrp.subject_id AND cvrp.type_id = 1200 ");
+			queryString.append("INNER JOIN cvterm_relationship cvrs ON cvr.subject_id = cvrs.subject_id AND cvrs.type_id = 1220 ");
+			queryString.append("INNER JOIN cvterm_relationship cvrm ON cvr.subject_id = cvrm.subject_id AND cvrm.type_id = 1210 ");
+			queryString.append("WHERE cvrp.object_id = :propertyId AND cvrs.object_id = :scaleId AND cvrm.object_id = :methodId LIMIT 0,1");
+			
+			SQLQuery query = getSession().createSQLQuery(queryString.toString());
+			query.setParameter("propertyId", propertyId);
+			query.setParameter("scaleId", scaleId);
+			query.setParameter("methodId", methodId);
+			
+			Integer id = (Integer) query.uniqueResult();
+						
+			return id;
+						
+		} catch(HibernateException e) {
+			logAndThrowException("Error at getStandadardVariableIdByPropertyScaleMethod :" + e.getMessage(), e);
+		}
+		return null;	
+	
+	}
 }
