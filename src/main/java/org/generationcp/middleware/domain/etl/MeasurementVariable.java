@@ -23,6 +23,8 @@ public class MeasurementVariable {
 
 	private String method;
 	
+	private String property;
+	
 	private String dataType;
 	
 	private String value;
@@ -33,11 +35,12 @@ public class MeasurementVariable {
 	}
 
 	public MeasurementVariable(String name, String description, String scale,
-			String method, String dataType, String value, String label) {
+			String method, String property, String dataType, String value, String label) {
 		this.name = name;
 		this.description = description;
 		this.scale = scale;
 		this.method = method;
+		this.property = property;
 		this.dataType = dataType;
 		this.value = value;
 		this.label = label;
@@ -75,6 +78,14 @@ public class MeasurementVariable {
 		this.method = method;
 	}
 
+	public String getProperty() {
+		return property;
+	}
+
+	public void setProperty(String property) {
+		this.property = property;
+	}
+
 	public String getDataType() {
 		return dataType;
 	}
@@ -110,6 +121,8 @@ public class MeasurementVariable {
 		builder.append(scale);
 		builder.append(", method=");
 		builder.append(method);
+		builder.append(", property=");
+		builder.append(property);
 		builder.append(", dataType=");
 		builder.append(dataType);
 		builder.append(", value=");
@@ -126,6 +139,7 @@ public class MeasurementVariable {
 	    Debug.println(indent + 3, "Description: " + description);
 		Debug.println(indent + 3, "Scale: " + scale);
 	    Debug.println(indent + 3, "Method: " + method);
+	    Debug.println(indent + 3, "Property: " + property);
 	    Debug.println(indent + 3, "Data Type: " + dataType);
 	    Debug.println(indent + 3, "Value: " + value);
 	    Debug.println(indent + 3, "Label: " + label);
