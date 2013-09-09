@@ -11,13 +11,10 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.cache.StandardVariableCache;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -158,12 +155,18 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		Integer stdVariableId = null;
 		
 		if (setWorkingDatabase(Database.CENTRAL)) {
+			//get standardVariableid from central first 
 			stdVariableId = getCvTermDao().findStandardVariableIdByTraitScaleMethodNamesCentral(property, scale, method);
+			
+			//if not found in central, check if it exists in the local database
 			if (stdVariableId == null) {
 				if(setWorkingDatabase(Database.LOCAL)) {
 					Integer[] cvTermIds = new Integer[3];
 					cvTermIds = getCvTermDao().getCvTermIdsByTraitScaleMethodNamesLocal(property, scale, method);
+					
+					//if standard variable is in the local database
 					if (cvTermIds != null) {
+						//check its object ids, if positive, get standard variable from central, else local
 						if (setWorkingDatabase(cvTermIds[0])) {
 							stdVariableId = getCvTermDao().getStandadardVariableIdByPropertyScaleMethod(cvTermIds[0], cvTermIds[1], cvTermIds[2]);
 						}
@@ -172,7 +175,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 				}
 			} 		
 		}
-		
 		StandardVariable sv = getStandardVariable(stdVariableId);
 		return sv;
 	}
