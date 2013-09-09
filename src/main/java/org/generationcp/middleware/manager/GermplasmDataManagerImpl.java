@@ -1097,7 +1097,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public List<Location> getLocationsByNameCountryAndType(String name,Country country, Integer type) throws MiddlewareQueryException {
         return (List<Location>) super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getByNameCountryAndType", new Object[] { name,country,
-                type}, new Class[]{Country.class, Integer.class});
+                type}, new Class[]{String.class,Country.class, Integer.class});
     }
     
     @Override
