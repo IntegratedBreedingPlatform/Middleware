@@ -147,4 +147,37 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		
 	
 	}
+	
+	@Override
+	public StandardVariable findStandardVariableByTraitScaleMethodNames(
+			String property, String scale, String method) 
+			throws MiddlewareQueryException {
+		Integer stdVariableId = null;
+		
+		if (setWorkingDatabase(Database.CENTRAL)) {
+			//get standardVariableid from central first 
+			stdVariableId = getCvTermDao().findStandardVariableIdByTraitScaleMethodNamesCentral(property, scale, method);
+			
+			//if not found in central, check if it exists in the local database
+			if (stdVariableId == null) {
+				if(setWorkingDatabase(Database.LOCAL)) {
+					Integer[] cvTermIds = new Integer[3];
+					cvTermIds = getCvTermDao().getCvTermIdsByTraitScaleMethodNamesLocal(property, scale, method);
+					
+					//if standard variable is in the local database
+					if (cvTermIds != null) {
+						//check its object ids, if positive, get standard variable from central, else local
+						if (setWorkingDatabase(cvTermIds[0])) {
+							stdVariableId = getCvTermDao().getStandadardVariableIdByPropertyScaleMethod(cvTermIds[0], cvTermIds[1], cvTermIds[2]);
+						}
+					}
+						
+				}
+			} 		
+		}
+		StandardVariable sv = getStandardVariable(stdVariableId);
+		return sv;
+	}
+	
+	
 }

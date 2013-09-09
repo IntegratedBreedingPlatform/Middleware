@@ -236,6 +236,14 @@ public class TestOntologyDataManagerImpl {
 		assertTrue(term != null);
 		term.print(0);
 	}
+	
+	
+	@Test
+	public void testFindStandardVariableByTraitScaleMethodNames() throws Exception{
+		System.out.println("Test findStandardVariableByTraitScaleMethodNames");
+		StandardVariable stdVar = manager.findStandardVariableByTraitScaleMethodNames("User", "DBCV", "Assigned");		
+		System.out.println("testFindStandardVariableByTraitScaleMethodNames(): " + stdVar);
+	}
 
 	@AfterClass
 	public static void tearDown() throws Exception {
