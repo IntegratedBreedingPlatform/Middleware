@@ -12,7 +12,6 @@
 package org.generationcp.middleware.operation.transformer.etl;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.operation.builder.StudyBuilder;
 import org.generationcp.middleware.util.DatabaseBroker;
 
 public class Transformer extends DatabaseBroker {
