@@ -132,6 +132,25 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
         }
         return new ArrayList<Location>();
     }
+    
+    @SuppressWarnings("unchecked")
+    public List<Location> getByNameCountryAndType(String name, Country country, Integer type) throws MiddlewareQueryException {
+        try {
+        	if (country != null && type != null){
+                Integer countryId = country.getCntryid();
+	            Criteria criteria = getSession().createCriteria(Location.class);
+	            criteria.add(Restrictions.eq("cntryid", countryId));
+	            criteria.add(Restrictions.eq("ltype", type));
+	            criteria.add(Restrictions.eq("lname",name));
+	            criteria.addOrder(Order.asc("lname"));
+	            return criteria.list();
+        	}
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getByCountry(country=" + country + ") query from Location: "
+                    + e.getMessage(), e);
+        }
+        return new ArrayList<Location>();
+    }
 
     @SuppressWarnings("unchecked")
     public List<Location> getByCountry(Country country, int start, int numOfRows) throws MiddlewareQueryException {
