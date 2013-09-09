@@ -50,7 +50,7 @@ public class TestOntologyDataManagerImpl {
 		factory = new ManagerFactory(local, central);
 		manager = factory.getNewOntologyDataManager();
 	}
-/*
+
 	@Test
 	public void testGetCvTermById() throws Exception {
 		Term term = manager.getTermById(CV_TERM_ID);
@@ -236,7 +236,7 @@ public class TestOntologyDataManagerImpl {
 		assertTrue(term != null);
 		term.print(0);
 	}
-	*/
+	
 	
 	@Test
 	public void testFindStandardVariableByTraitScaleMethodNames() throws Exception{
