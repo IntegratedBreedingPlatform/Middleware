@@ -28,13 +28,15 @@ public class StudyDetails {
 	private String endDate;
 	
 	private String studyType;
+	
+	private long parentFolderId;
 
 	public StudyDetails(){
 		
 	}
 	
 	public StudyDetails(String studyName, String title, String pmKey,
-			String objective, String startDate, String endDate, String studyType) {
+			String objective, String startDate, String endDate, String studyType, long parentFolderId) {
 		this.studyName = studyName;
 		this.title = title;
 		this.pmKey = pmKey;
@@ -42,6 +44,7 @@ public class StudyDetails {
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.studyType = studyType;
+		this.parentFolderId = parentFolderId;
 	}
 
 	public String getStudyName() {
@@ -100,6 +103,14 @@ public class StudyDetails {
 		this.studyType = studyType;
 	}
 
+	public long getParentFolderId() {
+		return parentFolderId;
+	}
+
+	public void setParentFolderId(long parentFolderId) {
+		this.parentFolderId = parentFolderId;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -117,6 +128,8 @@ public class StudyDetails {
 		builder.append(endDate);
 		builder.append(", studyType=");
 		builder.append(studyType);
+		builder.append(", parentFolderId=");
+		builder.append(parentFolderId);
 		builder.append("]");
 		return builder.toString();
 	}
@@ -130,6 +143,7 @@ public class StudyDetails {
 	    Debug.println(indent + 3, "Start Date: " + startDate);
 	    Debug.println(indent + 3, "End Date: " + endDate);
 		Debug.println(indent + 3, "Study Type: " + studyType);
+		Debug.println(indent + 3, "Parent Folder Id: " + parentFolderId);
 	}
 
 }
