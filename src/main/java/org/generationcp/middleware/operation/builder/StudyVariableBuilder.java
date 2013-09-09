@@ -19,6 +19,7 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
@@ -30,7 +31,7 @@ public class StudyVariableBuilder extends Builder {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 
-	public VariableList create(DmsProject project, Experiment experiment, VariableTypeList variableTypes) {
+	public VariableList create(DmsProject project, Experiment experiment, VariableTypeList variableTypes) throws MiddlewareQueryException {
 		VariableList variables = new VariableList();
 		
 		for (VariableType variableType : variableTypes.getVariableTypes()) {
@@ -40,7 +41,7 @@ public class StudyVariableBuilder extends Builder {
 		return variables.sort();
 	}
 
-	private Variable createVariable(VariableType variableType, DmsProject project, Experiment experiment) {
+	private Variable createVariable(VariableType variableType, DmsProject project, Experiment experiment) throws MiddlewareQueryException {
 		Variable variable = new Variable();
 		variable.setVariableType(variableType);
 
@@ -51,7 +52,14 @@ public class StudyVariableBuilder extends Builder {
 			variable.setValue(project.getDescription());
 		}
 		else if (storedIn(variableType, TermId.STUDY_INFO_STORAGE)) {
-			variable.setValue(getPropertyValue(variableType.getId(), project.getProperties()));
+			//exception = study status and study type both get its value from the name of the cvterm, not the property
+			if(hasId(variableType,TermId.STUDY_STATUS) ||
+			   hasId(variableType,TermId.STUDY_TYPE)) {
+				String propertyValue = getPropertyValue(variableType.getId(), project.getProperties());
+				variable.setValue(getTermBuilder().get(Integer.parseInt(propertyValue)).getName());
+			} else {
+				variable.setValue(getPropertyValue(variableType.getId(), project.getProperties()));
+			}
 		}
 		else {
 			Variable factor = experiment.getFactors().findById(variableType.getId());
@@ -70,6 +78,10 @@ public class StudyVariableBuilder extends Builder {
 
 	private boolean storedIn(VariableType variableType, TermId termId) {
 		return variableType.getStandardVariable().getStoredIn().getId() == termId.getId();
+	}
+
+	private boolean hasId(VariableType variableType, TermId termId) {
+		return variableType.getId() == termId.getId();
 	}
 	
 	private String getPropertyValue(int id, List<ProjectProperty> properties) {
