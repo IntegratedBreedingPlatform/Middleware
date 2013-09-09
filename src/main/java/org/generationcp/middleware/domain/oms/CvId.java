@@ -23,6 +23,7 @@ public enum CvId {
 	,METHODS(1020)
 	,SCALES(1030)
 	,VARIABLES(1040)
+	,STUDY_STATUS(2005)
 	;
 	
 	private final int id;

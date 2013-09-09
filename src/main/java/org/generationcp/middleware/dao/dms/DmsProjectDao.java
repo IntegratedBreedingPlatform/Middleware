@@ -23,6 +23,7 @@ import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -50,6 +51,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "		INNER JOIN project_relationship pr on subject.project_id = pr.subject_project_id  "
 			+ "WHERE (pr.type_id = " + TermId.HAS_PARENT_FOLDER.getId() + " or pr.type_id = " + TermId.IS_STUDY.getId() + ") " 
 			+ "		AND pr.object_project_id = :folderId "
+			+ "		AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId()
+			+ "     	AND pp.project_id = subject.project_id AND pp.value = " 
+			+ "         (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) "
 			+ "ORDER BY name "
 			;
 
@@ -60,6 +64,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "WHERE   pr.type_id = "  + TermId.IS_STUDY.getId() + " "
 			+ "        AND pr.subject_project_id = p.project_id "
 			+ "        AND pr.object_project_id = :folderId "
+			+ "		AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId()
+			+ "     	AND pp.project_id = p.project_id AND pp.value = " 
+			+ "         (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) "
 			+ "ORDER BY p.name "
 			;
 

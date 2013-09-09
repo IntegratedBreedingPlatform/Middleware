@@ -42,8 +42,9 @@ public enum TermId {
 	, START_DATE(8050)
 	, END_DATE(8060)
 	, STUDY_UID(8020)
-	, STUDY_IP(8120)
+	/*, STUDY_IP(8120)*/
 	, CREATION_DATE(8048)
+	, STUDY_STATUS(8006)
 	
 	// Dataset Fields
 	, DATASET_NAME(8150)

@@ -76,7 +76,7 @@ public class Study {
 	}
 
 	public Integer getStatus() {
-		return getDisplayValueAsInt(TermId.STUDY_IP);
+		return getDisplayValueAsInt(TermId.STUDY_STATUS);
 	}
 
 	public Integer getCreationDate() {
