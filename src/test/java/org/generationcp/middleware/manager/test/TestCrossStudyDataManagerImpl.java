@@ -163,7 +163,7 @@ public class TestCrossStudyDataManagerImpl {
     @Test
     public void testGetObservationsForTraitOnGermplasms() throws Exception {
         List<Integer> traitIds = Arrays.asList(22564, 22073, 21735, 20848, 18000);
-        List<Integer> germplasmIds = Arrays.asList(39, 1709, 1709, 1000, 1000);
+        List<Integer> germplasmIds = Arrays.asList(39, 1709, 1000);
         List<Integer> environmentIds = Arrays.asList(5770, 10085, 5748, -1, -6);
 
         List<Observation> result = manager.getObservationsForTraitOnGermplasms(traitIds, germplasmIds, environmentIds);

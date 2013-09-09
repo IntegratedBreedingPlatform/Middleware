@@ -266,16 +266,21 @@ public class TraitBuilder extends Builder{
         List<Observation> centralObservations = new ArrayList<Observation>();
 
         // Separate local and central observations - environmentIds determine where to get the data from
-        for (int i = 0; i < environmentIds.size(); i++){
-            Observation observation = new Observation(
-                    new ObservationKey(traitIds.get(i), germplasmIds.get(i), environmentIds.get(i)));
-            if (environmentIds.get(i) < 0){
-                localObservations.add(observation);
-            } else {
-                centralObservations.add(observation);
+        for (Integer traitId: traitIds){
+            for (Integer germplasmId: germplasmIds){
+                for (Integer environmentId: environmentIds){
+                	Observation observation = new Observation(
+                			new ObservationKey(traitId, germplasmId, environmentId));
+		            if (environmentId < 0){
+		                localObservations.add(observation);
+		            } else {
+		                centralObservations.add(observation);
+		            }
+                }
             }
         }
         
+
         if (centralObservations.size() > 0){
             setWorkingDatabase(Database.CENTRAL);
             centralObservations = getPhenotypeDao().getObservationForTraitOnGermplasms(centralObservations);

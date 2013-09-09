@@ -86,11 +86,6 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
     @Override
     public List<Observation> getObservationsForTraitOnGermplasms(List<Integer> traitIds, List<Integer> germplasmIds, 
             List<Integer> environmentIds) throws MiddlewareQueryException{
-        
-        if (traitIds.size() != germplasmIds.size() || germplasmIds.size() != environmentIds.size() 
-                || traitIds.size() != environmentIds.size()){
-            throw new MiddlewareQueryException("Lists must be of the same size.");
-        }
         return getTraitBuilder().getObservationsForTraitOnGermplasms(traitIds, germplasmIds, environmentIds);
     }
     
