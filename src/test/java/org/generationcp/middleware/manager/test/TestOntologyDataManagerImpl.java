@@ -16,6 +16,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
@@ -26,13 +27,20 @@ import org.generationcp.middleware.domain.dms.NameSynonym;
 import org.generationcp.middleware.domain.dms.NameType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestName;
+
+import com.apple.crypto.provider.Debug;
 
 public class TestOntologyDataManagerImpl {
 
@@ -43,12 +51,28 @@ public class TestOntologyDataManagerImpl {
 	private static ManagerFactory factory;
 	private static OntologyDataManager manager;
 
+	private long startTime;
+
+	@Rule
+	public TestName name = new TestName();
+
 	@BeforeClass
 	public static void setUp() throws Exception {
 		DatabaseConnectionParameters local = new DatabaseConnectionParameters("testDatabaseConfig.properties", "local");
 		DatabaseConnectionParameters central = new DatabaseConnectionParameters("testDatabaseConfig.properties", "central");
 		factory = new ManagerFactory(local, central);
 		manager = factory.getNewOntologyDataManager();
+	}
+
+	@Before
+	public void beforeEachTest() {
+		startTime = System.nanoTime();
+	}
+	
+	@After
+	public void afterEachTest() {
+		long elapsedTime = System.nanoTime() - startTime;
+		System.out.println("#####" + name.getMethodName() + ": Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime/1000000000) + " s");
 	}
 
 	@Test
@@ -243,6 +267,39 @@ public class TestOntologyDataManagerImpl {
 		System.out.println("Test findStandardVariableByTraitScaleMethodNames");
 		StandardVariable stdVar = manager.findStandardVariableByTraitScaleMethodNames("User", "DBCV", "Assigned");		
 		System.out.println("testFindStandardVariableByTraitScaleMethodNames(): " + stdVar);
+	}
+	
+
+	@Test
+	public void testGetAllTermsByCvId() throws Exception{
+		System.out.println("testGetAllTermsByCvId:");
+		List<Term> terms = manager.getAllTermsByCvId(CvId.METHODS);		
+		System.out.println("testGetAllTermsByCvId - Get Methods: " + terms.size());
+		printTerms(terms);
+		terms = manager.getAllTermsByCvId(CvId.PROPERTIES);		
+		System.out.println("testGetAllTermsByCvId - Get Properties: " + terms.size());
+		printTerms(terms);
+		terms = manager.getAllTermsByCvId(CvId.SCALES);		
+		System.out.println("testGetAllTermsByCvId - Get Scales: " + terms.size());
+		printTerms(terms);
+	}
+	
+	private void printTerms(List<Term> terms){
+		for (Term term : terms){
+			term.print(4);
+			System.out.println("    ----------");
+		}
+	}
+
+	@Test
+	public void testCountTermsByCvId() throws Exception{
+		System.out.println("testCountTermsByCvId:");
+		long count = manager.countTermsByCvId(CvId.METHODS);		
+		System.out.println("testCountTermsByCvId() - Count All Methods: " + count);
+		count = manager.countTermsByCvId(CvId.PROPERTIES);		
+		System.out.println("testCountTermsByCvId() - Count All Properties: " + count);
+		count = manager.countTermsByCvId(CvId.SCALES);		
+		System.out.println("testCountTermsByCvId() - Count All Scales: " + count);
 	}
 
 	@AfterClass
