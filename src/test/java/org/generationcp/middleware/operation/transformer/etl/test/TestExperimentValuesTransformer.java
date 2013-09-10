@@ -43,7 +43,7 @@ public class TestExperimentValuesTransformer {
 	
 	@Test
 	public void testTransform() throws Exception {
-
+		System.out.println("testTransform");
 		MeasurementRow mRow = createMeasurementRowTestData();
 		VariableTypeList varTypeList = createVariableTypeListTestData();
 		
