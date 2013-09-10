@@ -70,4 +70,23 @@ public class DatasetValues {
 	public void setVariables(VariableList variables) {
 		this.variables = variables;
 	}
+	
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(getEntityName() + " [name=");
+		builder.append(getName());
+		builder.append(", description=");
+		builder.append(getDescription());
+		builder.append(", DataSetType=");
+		builder.append(getType().toString());
+		builder.append(", VariableList=");
+		builder.append(getVariables().toString());
+		builder.append("]");
+		return builder.toString();
+	}
+	
+	public String getEntityName(){
+		return "DatasetValues";
+	}
 }
