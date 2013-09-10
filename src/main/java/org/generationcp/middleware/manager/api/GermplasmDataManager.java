@@ -309,6 +309,18 @@ public interface GermplasmDataManager {
      */
     public List<Location> getLocationsByCountryAndType(Country country,Integer type) throws MiddlewareQueryException;
 
+    /**
+     * Returns all the Location records with
+     * name, country and location type  matching  the given parameter. The data is retrieved from both local and central databases.
+     * @param name
+     * @param country
+     * @param type
+     * @return
+     * @throws MiddlewareQueryException
+     */
+	public List<Location> getLocationsByNameCountryAndType(String name,
+			Country country, Integer type) throws MiddlewareQueryException;
+    
 
     /**
      * Returns the Location records with
@@ -1216,4 +1228,6 @@ public interface GermplasmDataManager {
      * @throws MiddlewareQueryException
      */
     public Map<Integer, String> getLocationNamesByGids (List<Integer> gids) throws MiddlewareQueryException;
+
+
 }
