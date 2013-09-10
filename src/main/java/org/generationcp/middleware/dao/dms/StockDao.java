@@ -19,6 +19,8 @@ import java.util.Set;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.hibernate.Criteria;
@@ -63,7 +65,10 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 					                                     "  and s.stock_id = es.stock_id " +
 					                                     "  and es.nd_experiment_id = e.nd_experiment_id " +
 					                                     "  and ep.nd_experiment_id = e.nd_experiment_id " + 
-					                                     "  and e.type_id = 1010");
+					                                     "  and e.type_id = 1010"+
+					                                     "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId() +
+					                         			 "  AND pp.project_id = ep.project_id AND pp.value = " +
+					                         			 "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) ");
 			return ((BigInteger) query.uniqueResult()).longValue();
 			
 		} catch(HibernateException e) {
@@ -83,7 +88,10 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 					                                     "  and es.nd_experiment_id = e.nd_experiment_id " +
 					                                     "  and ep.nd_experiment_id = e.nd_experiment_id " + 
 					                                     "  and e.type_id = 1010 " +
-					                                     "  and p.project_id = ep.project_id");
+					                                     "  and p.project_id = ep.project_id "+
+					                                     "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId() +
+					                         			 "  AND pp.project_id = p.project_id AND pp.value = " +
+					                         			 "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) ");
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
 			
@@ -108,7 +116,10 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 					                                     "  and es.nd_experiment_id = e.nd_experiment_id " +
 					                                     "  and ep.nd_experiment_id = e.nd_experiment_id " + 
 					                                     "  and e.type_id = 1155 " +
-					                                     "  and pr.subject_project_id = ep.project_id");
+					                                     "  and pr.subject_project_id = ep.project_id"+
+					                                     "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId() +
+					                         			 "  AND pp.project_id = pr.object_project_id AND pp.value = " +
+					                         			 "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) ");
 			return ((BigInteger) query.uniqueResult()).longValue();
 			
 		} catch(HibernateException e) {
@@ -129,7 +140,10 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 					                                     "  and ep.nd_experiment_id = e.nd_experiment_id " + 
 					                                     "  and e.type_id = 1155 " +
 					                                     "  and pr.subject_project_id = ep.project_id " +
-					                                     "  and pr.object_project_id = p.project_id");
+					                                     "  and pr.object_project_id = p.project_id " +
+					                                     "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId() +
+					                         			 "  AND pp.project_id = p.project_id AND pp.value = " +
+					                         			 "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) ");
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
 			
