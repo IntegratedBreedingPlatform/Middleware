@@ -159,6 +159,13 @@ public class TestStudyDataManagerImpl {
 			System.out.println("\t" + resultSet.next());
 			System.out.flush();
 		}
+		/* 
+		 to test deleted study, run in mysql:
+		  update projectprop set value = 12990  
+		  where type_id = 8006 and project_id = (select project_id from project where name = 'RYT2000WS')
+		  then uncomment the test below
+		 */
+		//Assert.assertTrue(resultSet.size() == 0);
 	}
 	
 	@Test
@@ -168,12 +175,22 @@ public class TestStudyDataManagerImpl {
 	    filter.setStartDate(20050119);
 		
 		StudyResultSet resultSet = manager.searchStudies(filter, 10);
+		
 		System.out.println("INPUT: " + filter);
 		System.out.println("Size: " + resultSet.size());
 		while (resultSet.hasMore()) {
 			System.out.println("\t" + resultSet.next());
 			System.out.flush();
 		}
+		//long before = resultSet.size();
+		/* 
+		 to test deleted study, uncomment line above, then run in mysql: 
+		  update projectprop set value = 12990  
+		  where type_id = 8006 and project_id = 5739
+		  Note: 5739 is one of the project_id returned
+		  then uncomment the test below
+		 */
+		//Assert.assertTrue(resultSet.size() == before-1);
 	}
 	
 	@Test

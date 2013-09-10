@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Season;
@@ -38,7 +39,10 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 		try {
 			SQLQuery query = getSession().createSQLQuery("select count(distinct p.project_id) " +
 		                                                 "from project p " + 
-					                                     "where p.name = '" + name + "'");
+					                                     "where p.name = '" + name + "'" +
+					                                     "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId() +
+					                         			 "  AND pp.project_id = p.project_id AND pp.value = " +
+					                         			 "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) ");
 					                                  
 			return ((BigInteger) query.uniqueResult()).longValue();
 			
@@ -54,7 +58,10 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 		try {
 			SQLQuery query = getSession().createSQLQuery("select distinct p.project_id, p.name, p.description " +
 		                                                 "from project p " +
-					                                     "where p.name = '" + name + "'");
+					                                     "where p.name = '" + name + "'"+
+					                                     "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId() +
+					                         			 "  AND pp.project_id = p.project_id AND pp.value = " +
+					                         			 "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) ");
 					                                  
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
@@ -75,7 +82,10 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 			SQLQuery query = getSession().createSQLQuery("select count(distinct pp.project_id) " +
 		                                                 "from projectprop pp " + 
 					                                     "where pp.type_id = " + TermId.START_DATE.getId() +
-					                                     "  and pp.value = '" + startDate + "'");
+					                                     "  and pp.value = '" + startDate + "'"+
+					                                     "	AND NOT EXISTS (SELECT 1 FROM projectprop ss WHERE ss.type_id = "+ TermId.STUDY_STATUS.getId() +
+					                         			 "  AND ss.project_id = pp.project_id AND ss.value = " +
+					                         			 "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) ");
 					                                  
 			return ((BigInteger) query.uniqueResult()).longValue();
 			
@@ -94,7 +104,10 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 		                                                 "from projectprop pp, project p " + 
 					                                     "where pp.type_id = " + TermId.START_DATE.getId() +
 					                                     "  and pp.value = '" + startDate + "'" +
-					                                     "  and pp.project_id = p.project_id");
+					                                     "  and pp.project_id = p.project_id"+
+					                                     "	AND NOT EXISTS (SELECT 1 FROM projectprop ss WHERE ss.type_id = "+ TermId.STUDY_STATUS.getId() +
+					                         			 "  AND ss.project_id = p.project_id AND ss.value = " +
+					                         			 "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) ");
 					                                  
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
@@ -130,7 +143,10 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 						                                     "       (e.nd_experiment_id = ep.nd_experiment_id" +
 						                                     "          and e.type_id in " + PlotUtil.getSqlTypeIds() + 
 						                                     "          and ep.project_id = pr.subject_project_id" +
-						                                     "          and pr.object_project_id = p.project_id))");
+						                                     "          and pr.object_project_id = p.project_id))"+
+						                                     "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId() +
+						                         			 "  AND pp.project_id = p.project_id AND pp.value = " +
+						                         			 "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) ");
 				
 				return ((BigInteger) query.uniqueResult()).longValue();
 			}
@@ -162,7 +178,10 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 	                                                         "       (e.nd_experiment_id = ep.nd_experiment_id" +
 	                                                         "          and e.type_id in " + PlotUtil.getSqlTypeIds() + 
 	                                                         "          and ep.project_id = pr.subject_project_id" +
-	                                                         "          and pr.object_project_id = p.project_id))");
+	                                                         "          and pr.object_project_id = p.project_id))"+
+						                                     "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId() +
+						                         			 "  AND pp.project_id = p.project_id AND pp.value = " +
+						                         			 "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) ");
 						                                  
 				query.setFirstResult(start);
 				query.setMaxResults(numOfRows);
@@ -195,7 +214,10 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 					                                     "       (e.nd_experiment_id = ep.nd_experiment_id" +
 					                                     "          and e.type_id in " + PlotUtil.getSqlTypeIds() + 
 					                                     "          and ep.project_id = pr.subject_project_id" +
-					                                     "          and pr.object_project_id = p.project_id))");
+					                                     "          and pr.object_project_id = p.project_id))"+
+					                                     "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId() +
+					                         			 "  AND pp.project_id = p.project_id AND pp.value = " +
+					                         			 "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) ");
 			
 			return ((BigInteger) query.uniqueResult()).longValue();
 			
@@ -220,7 +242,10 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
                                                          "       (e.nd_experiment_id = ep.nd_experiment_id" +
                                                          "          and e.type_id in " + PlotUtil.getSqlTypeIds() + 
                                                          "          and ep.project_id = pr.subject_project_id" +
-                                                         "          and pr.object_project_id = p.project_id))");
+                                                         "          and pr.object_project_id = p.project_id))"+
+					                                     "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId() +
+					                         			 "  AND pp.project_id = p.project_id AND pp.value = " +
+					                         			 "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) ");
 					                                  
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
