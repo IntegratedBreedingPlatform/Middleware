@@ -180,7 +180,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	public List<Term> getMethodsForTrait(Integer traitId)
 			throws MiddlewareQueryException {
 		List<Term> methodTerms = new ArrayList<Term>();
-		List<Integer> methodIds = new ArrayList<Integer>();
+		Set<Integer> methodIds = new HashSet<Integer>();
 		if (setWorkingDatabase(Database.CENTRAL)) {
 			List<Integer> centralMethodIds = getCvTermDao().findMethodTermIdsByTrait(traitId);
 			if (centralMethodIds != null) {
@@ -204,7 +204,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	public List<Term> getScalesForTrait(Integer traitId)
 			throws MiddlewareQueryException {
 		List<Term> scaleTerms = new ArrayList<Term>();
-		List<Integer> scaleIds = new ArrayList<Integer>();
+		Set<Integer> scaleIds = new HashSet<Integer>();
 		if (setWorkingDatabase(Database.CENTRAL)) {
 			List<Integer> centralMethodIds = getCvTermDao().findScaleTermIdsByTrait(traitId);
 			if (centralMethodIds != null) {
