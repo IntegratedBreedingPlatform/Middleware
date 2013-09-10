@@ -33,7 +33,7 @@ public class TestVariableListTransformer {
 
 	@BeforeClass
 	public static void setUp() throws Exception {
-		transformer = new VariableListTransformer();
+//		transformer = new VariableListTransformer();
 		
 	}
 

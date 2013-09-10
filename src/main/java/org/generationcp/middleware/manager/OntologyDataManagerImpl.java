@@ -12,9 +12,11 @@
 package org.generationcp.middleware.manager;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -177,6 +179,17 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		}
 		StandardVariable sv = getStandardVariable(stdVariableId);
 		return sv;
+	}
+
+	@Override
+	public List<Term> getAllTermsByCvId(CvId cvId) throws MiddlewareQueryException {
+		return getTermBuilder().getTermsByCvId(cvId);
+	}
+
+	@Override
+	public long countTermsByCvId(CvId cvId) throws MiddlewareQueryException {
+		setWorkingDatabase(cvId.getId());
+		return getCvTermDao().countTermsByCvId(cvId);
 	}
 	
 	
