@@ -1,7 +1,9 @@
 package org.generationcp.middleware.operation.transformer.etl.test;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import org.generationcp.middleware.domain.dms.DatasetValues;
 import org.generationcp.middleware.domain.dms.FactorType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Variable;
@@ -10,6 +12,7 @@ import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.operation.transformer.etl.VariableListTransformer;
 import org.junit.After;
 import org.junit.Assert;
@@ -73,7 +76,7 @@ public class TestVariableListTransformer {
 	
 	@Test
 	public void transformTrialEnvironment() throws Exception {
-		System.out.println("testTransformStock");
+		System.out.println("testTransformTrialEnvironment");
 		VariableTypeList variableTypeList = createVariableTypeListTestData();
 		MeasurementRow measurementRow = createMeasurementRowTestData(variableTypeList);
 		
@@ -82,10 +85,9 @@ public class TestVariableListTransformer {
 		System.out.println("Input VariableTypeList");
 		variableTypeList.print(1);
 		
-		VariableList stocks = transformer.transformStock(measurementRow, variableTypeList);
+		VariableList stocks = transformer.transformTrialEnvironment(measurementRow, variableTypeList);
 		
-		Assert.assertNotNull(stocks);
-		VariableList result = getStockResult(variableTypeList);
+		VariableList result = getStockResult2(variableTypeList);
 		Assert.assertEquals(result.getVariables().size(), stocks.getVariables().size());
 		int i = 0;
 		System.out.println("Output:");
@@ -96,7 +98,35 @@ public class TestVariableListTransformer {
 			i++;
 		}
 	}
-
+	
+	@Test
+	public void transformTrialEnvironment2() throws Exception {
+		System.out.println("testTransformTrialEnvironment 2");
+		List<MeasurementVariable> mVarList = createMeasurementVariableListTestData();
+		VariableTypeList variableTypeList = createVariableTypeListTestData();
+		
+		System.out.println("Input MeasurementVariables");
+		mVarList.toString();
+		System.out.println("Input VariableTypeList");
+		variableTypeList.print(1);
+		
+		VariableList stocks = transformer.transformTrialEnvironment(mVarList, variableTypeList);
+		Assert.assertNotNull(stocks);
+		
+		VariableList result = getStockResult2(variableTypeList);
+		Assert.assertEquals(result.getVariables().size(), stocks.getVariables().size());
+		
+		System.out.println(stocks.toString());
+		
+		int i = 0;
+		System.out.println("Output:");
+		for (Variable stock : stocks.getVariables()) {
+			Assert.assertEquals(result.getVariables().get(i).getValue(), stock.getValue());
+			Assert.assertEquals(result.getVariables().get(i).getVariableType(), stock.getVariableType());
+			stock.print(1);
+			i++;
+		}
+	}
 	
 	private MeasurementRow createMeasurementRowTestData(VariableTypeList varTypeList) {
 		MeasurementRow row = new MeasurementRow();
@@ -141,11 +171,40 @@ public class TestVariableListTransformer {
 		return list;
 	}
 	
+	private VariableList getStockResult2(VariableTypeList varTypeList) {
+		VariableList list = new VariableList();
+		int i = 0;
+		for (VariableType varType : varTypeList.getVariableTypes()) {
+			if (varType.getStandardVariable().getFactorType() == FactorType.TRIAL_ENVIRONMENT) {
+				list.add(new Variable(varType, "value" + (i+1)));
+			}
+			i++;
+		}
+		return list;
+	}
+	
 	private StandardVariable createVariable(FactorType factorType) {
 		StandardVariable stdvar = new StandardVariable();
 		if (factorType != null) {
 			stdvar.setFactorType(factorType);
 		}
 		return stdvar;
+	}
+	
+	private List<MeasurementVariable> createMeasurementVariableListTestData() {
+		List<MeasurementVariable> mVarList = new ArrayList<MeasurementVariable>();
+		
+		mVarList.add(new MeasurementVariable("FACTOR1", "Name of Principal Investigator", "DBCV",  "ASSIGNED", "PERSON",  "C", "value1", "STUDY"));
+		mVarList.add(new MeasurementVariable("FACTOR2", "ID of Principal Investigator", "DBID", "ASSIGNED", "PERSON", "N", "value2", "STUDY"));
+		mVarList.add(new MeasurementVariable("FACTOR3", "TRIAL NUMBER", "NUMBER",  "ENUMERATED", "TRIAL INSTANCE", "N", "value3", "TRIAL"));
+		mVarList.add(new MeasurementVariable("FACTOR4", "COOPERATOR NAME", "DBCV", "Conducted", "Person", "C", "value4", "TRIAL"));
+		mVarList.add(new MeasurementVariable("FACTOR5", "Name of Principal Investigator", "DBCV",  "ASSIGNED", "PERSON",  "C", "value5", "STUDY"));
+		mVarList.add(new MeasurementVariable("FACTOR6", "ID of Principal Investigator", "DBID", "ASSIGNED", "PERSON", "N", "value6", "STUDY"));
+		mVarList.add(new MeasurementVariable("FACTOR7", "TRIAL NUMBER", "NUMBER",  "ENUMERATED", "TRIAL INSTANCE", "N", "value7", "TRIAL"));
+		mVarList.add(new MeasurementVariable("FACTOR8", "COOPERATOR NAME", "DBCV", "Conducted", "Person", "C", "value8", "TRIAL"));
+		mVarList.add(new MeasurementVariable("VARIATE1", "Name of Principal Investigator", "DBCV",  "ASSIGNED", "PERSON",  "C", "value9", "STUDY"));
+		mVarList.add(new MeasurementVariable("VARIATE2", "ID of Principal Investigator", "DBID", "ASSIGNED", "PERSON", "N", "value10", "STUDY"));
+		
+		return mVarList;
 	}
 }
