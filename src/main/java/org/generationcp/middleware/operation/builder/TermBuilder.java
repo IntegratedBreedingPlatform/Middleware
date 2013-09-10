@@ -14,7 +14,6 @@ package org.generationcp.middleware.operation.builder;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermProperty;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -46,25 +45,11 @@ public class TermBuilder extends Builder {
 			term.setVocabularyId(cVTerm.getCv());
 			
 			List<TermProperty> properties = new ArrayList<TermProperty>();
-			if (cVTerm.getProperties() != null){
-				for (CVTermProperty property: cVTerm.getProperties()){
-				    properties.add(getTermPropertyBuilder().create(property));
-				}
+			for (CVTermProperty property: cVTerm.getProperties()){
+			    properties.add(getTermPropertyBuilder().create(property));
 			}
 			term.setProperties(properties);
 		}
 		return term;
-	}
-
-	public List<Term> getTermsByCvId(CvId cvId) throws MiddlewareQueryException {
-		List<Term> terms = new ArrayList<Term>();		
-		if (setWorkingDatabase(cvId.getId())) {
-			List<CVTerm> cvTerms = getCvTermDao().getTermsByCvId(cvId);
-			for (CVTerm cvTerm : cvTerms){
-				terms.add(mapCVTermToTerm(cvTerm));
-			}
-		}
-		
-		return terms;
 	}
 }

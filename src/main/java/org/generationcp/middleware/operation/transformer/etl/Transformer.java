@@ -38,7 +38,7 @@ public abstract class Transformer extends DatabaseBroker {
 	}
 	
 	protected final VariableListTransformer getVariableListTransformer(){
-		return new VariableListTransformer(sessionProviderForLocal, sessionProviderForCentral);
+		return new VariableListTransformer(/*sessionProviderForLocal, sessionProviderForCentral*/);
 	}
 	
 	protected final ExperimentValuesTransformer getExperimentValuesTransformer(){
