@@ -70,6 +70,32 @@ public class TestVariableListTransformer {
 			i++;
 		}
 	}
+	
+	@Test
+	public void transformTrialEnvironment() throws Exception {
+		System.out.println("testTransformStock");
+		VariableTypeList variableTypeList = createVariableTypeListTestData();
+		MeasurementRow measurementRow = createMeasurementRowTestData(variableTypeList);
+		
+		System.out.println("Input MeasurmentRow");
+		measurementRow.print(1);
+		System.out.println("Input VariableTypeList");
+		variableTypeList.print(1);
+		
+		VariableList stocks = transformer.transformStock(measurementRow, variableTypeList);
+		
+		Assert.assertNotNull(stocks);
+		VariableList result = getStockResult(variableTypeList);
+		Assert.assertEquals(result.getVariables().size(), stocks.getVariables().size());
+		int i = 0;
+		System.out.println("Output:");
+		for (Variable stock : stocks.getVariables()) {
+			Assert.assertEquals(result.getVariables().get(i).getValue(), stock.getValue());
+			Assert.assertEquals(result.getVariables().get(i).getVariableType(), stock.getVariableType());
+			stock.print(1);
+			i++;
+		}
+	}
 
 	
 	private MeasurementRow createMeasurementRowTestData(VariableTypeList varTypeList) {
