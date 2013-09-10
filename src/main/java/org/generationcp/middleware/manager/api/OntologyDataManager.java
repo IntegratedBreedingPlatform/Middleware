@@ -12,6 +12,7 @@
 package org.generationcp.middleware.manager.api;
 
 
+import java.util.List;
 import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -105,4 +106,22 @@ public interface OntologyDataManager {
 	 * @throws MiddlewareQueryException
 	 * */
 	StandardVariable findStandardVariableByTraitScaleMethodNames(String property, String scale, String method) throws MiddlewareQueryException;
+	
+	/**
+	 * Retrieve method given the traitId
+	 * 
+	 * @param traitId
+	 * @return List<Term>
+	 * @throws MiddlewareQueryException
+	 */
+	List<Term> getMethodsForTrait(Integer traitId) throws MiddlewareQueryException;
+	
+	/**
+	 * Retrieve scales given the traitId
+	 * 
+	 * @param traitId
+	 * @return List<Term>
+	 * @throws MiddlewareQueryException
+	 */
+	List<Term> getScalesForTrait(Integer traitId) throws MiddlewareQueryException;
 }

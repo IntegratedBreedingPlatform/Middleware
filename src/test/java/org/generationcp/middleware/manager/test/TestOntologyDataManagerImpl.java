@@ -12,20 +12,9 @@
 
 package org.generationcp.middleware.manager.test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import java.util.List;
 
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.Set;
-
-import junit.framework.Assert;
-
-import org.generationcp.middleware.domain.dms.Enumeration;
-import org.generationcp.middleware.domain.dms.NameSynonym;
-import org.generationcp.middleware.domain.dms.NameType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
@@ -33,6 +22,8 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class TestOntologyDataManagerImpl {
 
@@ -250,5 +241,67 @@ public class TestOntologyDataManagerImpl {
 		if (factory != null) {
 			factory.close();
 		}
+	}
+	
+	@Test
+	public void testGetMethodsForTrait() throws Exception{
+		System.out.println("Test getMethodsForTrait");
+		StandardVariable stdVar = manager.findStandardVariableByTraitScaleMethodNames("User", "DBCV", "Assigned");
+		List<Term> terms = manager.getMethodsForTrait(stdVar.getProperty().getId());
+		System.out.println("Size: " + terms.size());
+		assertNotNull(terms);
+		boolean hasAssigned = false;
+		for (Term term : terms) {
+			if(term.getName().equals("Assigned")) {
+				hasAssigned = true;
+			}
+			System.out.println("method: " + term.getName());
+		}
+		assertTrue(hasAssigned);//should return Assigned
+		
+		//2nd test
+		stdVar = manager.findStandardVariableByTraitScaleMethodNames("Germplasm entry", "Number", "Enumerated");
+		terms = manager.getMethodsForTrait(stdVar.getProperty().getId());
+		System.out.println("Size: " + terms.size());
+		assertNotNull(terms);
+		boolean hasEnumerated = false;
+		for (Term term : terms) {
+			if(term.getName().equals("Enumerated")) {
+				hasEnumerated = true;
+			}
+			System.out.println("method: " + term.getName());
+		}
+		assertTrue(hasEnumerated);//should return Enumerated
+	}
+	
+	@Test
+	public void testGetScalesForTrait() throws Exception{
+		System.out.println("Test getScalesForTrait");
+		StandardVariable stdVar = manager.findStandardVariableByTraitScaleMethodNames("User", "DBCV", "Assigned");
+		List<Term> terms = manager.getScalesForTrait(stdVar.getProperty().getId());
+		System.out.println("Size: " + terms.size());
+		assertNotNull(terms);
+		boolean hasDBCV = false;
+		for (Term term : terms) {
+			if(term.getName().equals("DBCV")) {
+				hasDBCV = true;
+			}
+			System.out.println("scale: " + term.getName());
+		}
+		assertTrue(hasDBCV);//should return DBCV
+		
+		//2nd test
+		stdVar = manager.findStandardVariableByTraitScaleMethodNames("Germplasm entry", "Number", "Enumerated");
+		terms = manager.getScalesForTrait(stdVar.getProperty().getId());
+		System.out.println("Size: " + terms.size());
+		assertNotNull(terms);
+		boolean hasNumber = false;
+		for (Term term : terms) {
+			if(term.getName().equals("Number")) {
+				hasNumber = true;
+			}
+			System.out.println("scale: " + term.getName());
+		}
+		assertTrue(hasNumber);//should return Number
 	}
 }
