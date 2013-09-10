@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Debug;
 
 /** 
@@ -68,7 +69,12 @@ public class Variable  implements Comparable<Variable> {
 		    try{
 		        Enumeration enumeration = variableType.getStandardVariable().findEnumerationById(Integer.parseInt(value)); 
 		        if (enumeration != null) { 
-		            value = enumeration.getName();
+		        	if(variableType.getStandardVariable().getDataType()!=null &&
+		        	   variableType.getStandardVariable().getDataType().getId()==TermId.CATEGORICAL_VARIABLE.getId()) {
+		        		value = enumeration.getDescription();//GCP-5536 - return the definition of the cvterm representing the value of the categorical variable
+		        	} else {
+		        		value = enumeration.getName();
+		        	}
 		        }
 		    }catch(NumberFormatException e){
 		        // Ignore, just return the value
