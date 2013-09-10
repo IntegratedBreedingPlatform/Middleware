@@ -76,7 +76,7 @@ public class TestVariableListTransformer {
 	
 	@Test
 	public void transformTrialEnvironment() throws Exception {
-		System.out.println("testTransformTrialEnvironment");
+		System.out.println("testTransformStock");
 		VariableTypeList variableTypeList = createVariableTypeListTestData();
 		MeasurementRow measurementRow = createMeasurementRowTestData(variableTypeList);
 		
@@ -87,6 +87,7 @@ public class TestVariableListTransformer {
 		
 		VariableList stocks = transformer.transformTrialEnvironment(measurementRow, variableTypeList);
 		
+		Assert.assertNotNull(stocks);
 		VariableList result = getStockResult2(variableTypeList);
 		Assert.assertEquals(result.getVariables().size(), stocks.getVariables().size());
 		int i = 0;
@@ -176,7 +177,7 @@ public class TestVariableListTransformer {
 		int i = 0;
 		for (VariableType varType : varTypeList.getVariableTypes()) {
 			if (varType.getStandardVariable().getFactorType() == FactorType.TRIAL_ENVIRONMENT) {
-				list.add(new Variable(varType, "value" + (i+1)));
+				list.add(new Variable(varType, "value" + i));
 			}
 			i++;
 		}
@@ -194,16 +195,16 @@ public class TestVariableListTransformer {
 	private List<MeasurementVariable> createMeasurementVariableListTestData() {
 		List<MeasurementVariable> mVarList = new ArrayList<MeasurementVariable>();
 		
-		mVarList.add(new MeasurementVariable("FACTOR1", "Name of Principal Investigator", "DBCV",  "ASSIGNED", "PERSON",  "C", "value1", "STUDY"));
-		mVarList.add(new MeasurementVariable("FACTOR2", "ID of Principal Investigator", "DBID", "ASSIGNED", "PERSON", "N", "value2", "STUDY"));
-		mVarList.add(new MeasurementVariable("FACTOR3", "TRIAL NUMBER", "NUMBER",  "ENUMERATED", "TRIAL INSTANCE", "N", "value3", "TRIAL"));
-		mVarList.add(new MeasurementVariable("FACTOR4", "COOPERATOR NAME", "DBCV", "Conducted", "Person", "C", "value4", "TRIAL"));
-		mVarList.add(new MeasurementVariable("FACTOR5", "Name of Principal Investigator", "DBCV",  "ASSIGNED", "PERSON",  "C", "value5", "STUDY"));
-		mVarList.add(new MeasurementVariable("FACTOR6", "ID of Principal Investigator", "DBID", "ASSIGNED", "PERSON", "N", "value6", "STUDY"));
-		mVarList.add(new MeasurementVariable("FACTOR7", "TRIAL NUMBER", "NUMBER",  "ENUMERATED", "TRIAL INSTANCE", "N", "value7", "TRIAL"));
-		mVarList.add(new MeasurementVariable("FACTOR8", "COOPERATOR NAME", "DBCV", "Conducted", "Person", "C", "value8", "TRIAL"));
-		mVarList.add(new MeasurementVariable("VARIATE1", "Name of Principal Investigator", "DBCV",  "ASSIGNED", "PERSON",  "C", "value9", "STUDY"));
-		mVarList.add(new MeasurementVariable("VARIATE2", "ID of Principal Investigator", "DBID", "ASSIGNED", "PERSON", "N", "value10", "STUDY"));
+		mVarList.add(new MeasurementVariable("FACTOR1", "Name of Principal Investigator", "DBCV",  "ASSIGNED", "PERSON",  "C", "value0", "STUDY"));
+		mVarList.add(new MeasurementVariable("FACTOR2", "ID of Principal Investigator", "DBID", "ASSIGNED", "PERSON", "N", "value1", "STUDY"));
+		mVarList.add(new MeasurementVariable("FACTOR3", "TRIAL NUMBER", "NUMBER",  "ENUMERATED", "TRIAL INSTANCE", "N", "value2", "TRIAL"));
+		mVarList.add(new MeasurementVariable("FACTOR4", "COOPERATOR NAME", "DBCV", "Conducted", "Person", "C", "value3", "TRIAL"));
+		mVarList.add(new MeasurementVariable("FACTOR5", "Name of Principal Investigator", "DBCV",  "ASSIGNED", "PERSON",  "C", "value4", "STUDY"));
+		mVarList.add(new MeasurementVariable("FACTOR6", "ID of Principal Investigator", "DBID", "ASSIGNED", "PERSON", "N", "value5", "STUDY"));
+		mVarList.add(new MeasurementVariable("FACTOR7", "TRIAL NUMBER", "NUMBER",  "ENUMERATED", "TRIAL INSTANCE", "N", "value6", "TRIAL"));
+		mVarList.add(new MeasurementVariable("FACTOR8", "COOPERATOR NAME", "DBCV", "Conducted", "Person", "C", "value7", "TRIAL"));
+		mVarList.add(new MeasurementVariable("VARIATE1", "Name of Principal Investigator", "DBCV",  "ASSIGNED", "PERSON",  "C", "value8", "STUDY"));
+		mVarList.add(new MeasurementVariable("VARIATE2", "ID of Principal Investigator", "DBID", "ASSIGNED", "PERSON", "N", "value9", "STUDY"));
 		
 		return mVarList;
 	}

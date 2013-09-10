@@ -40,15 +40,19 @@ public class VariableListTransformer {
 		
 		if (mRow != null && mRow.getDataList() != null && variableTypeList != null && variableTypeList.getVariableTypes() != null) {
 			if (mRow.getDataList().size() == variableTypeList.getVariableTypes().size()) {
-				int i = 0;
-				for (VariableType variableType : variableTypeList.getVariableTypes()) {
-					if (variableType.getStandardVariable().getFactorType() == FactorType.TRIAL_ENVIRONMENT) {
-						variableList.add(new Variable(variableType, mRow.getDataList().get(i).getValue()));
-					}
-					i++;
-				}
+				List<VariableType> varTypes = variableTypeList.getVariableTypes();
 				
-			} else {//else invalid data
+				for(int i = 0, l = varTypes.size(); i < l; i++ ){
+					VariableType varType = varTypes.get(i);
+					String value = mRow.getDataList().get(i).getValue();
+										
+					if (varType.getStandardVariable().getFactorType() == FactorType.TRIAL_ENVIRONMENT) {
+						Variable variable = new Variable(varType, value);
+						variableList.add(variable);
+					}
+				}
+			}
+			else{
 				throw new MiddlewareQueryException("Variables did not match the Measurements Row.");
 			}
 		}
