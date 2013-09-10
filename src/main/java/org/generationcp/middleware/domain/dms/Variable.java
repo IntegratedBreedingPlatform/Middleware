@@ -72,7 +72,6 @@ public class Variable  implements Comparable<Variable> {
 		        	if(variableType.getStandardVariable().getDataType()!=null &&
 		        	   variableType.getStandardVariable().getDataType().getId()==TermId.CATEGORICAL_VARIABLE.getId()) {
 		        		//GCP-5536 - don't change value set
-		        		return value;
 		        	} else {
 		        		value = enumeration.getName();
 		        	}
