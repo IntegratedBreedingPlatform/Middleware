@@ -18,9 +18,14 @@ import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.ServiceFactory;
 import org.generationcp.middleware.service.api.DataImportService;
+import org.generationcp.middleware.utils.test.TestWorkbookUtil;
+import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestName;
 
 public class TestDataImportServiceImpl {
 	
@@ -28,6 +33,11 @@ public class TestDataImportServiceImpl {
 	private static ManagerFactory managerFactory;
 	private static DataImportService dataImportService;
 	private static StudyDataManager studyManager;
+	
+	private long startTime;
+	
+	@Rule
+	public TestName name = new TestName();
 	
 	@BeforeClass
 	public static void setUp() throws Exception {
@@ -44,14 +54,27 @@ public class TestDataImportServiceImpl {
 
 	}
 	
+	@Before
+	public void beforeEachTest() {
+		startTime = System.nanoTime();
+	}
+	
 	@Test
 	public void testSaveDataset() throws MiddlewareQueryException{
-		Workbook workbook = new Workbook();
+		Workbook workbook = TestWorkbookUtil.getTestWorkbook();
+		workbook.print(0);
 		int id = dataImportService.saveDataset(workbook);
 		System.out.println("Created study:" + id);
 		
 //		studyManager.getStudy(id);
 	}
+	
+	@After
+	public void afterEachTest() {
+		long elapsedTime = System.nanoTime() - startTime;
+		System.out.println("#####" + name.getMethodName() + ": Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime/1000000000) + " s");
+	}
+	
 	
 	@AfterClass
 	public static void tearDown() throws Exception {
