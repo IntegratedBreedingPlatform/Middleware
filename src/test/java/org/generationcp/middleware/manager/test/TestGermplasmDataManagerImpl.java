@@ -36,15 +36,24 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestName;
 
 public class TestGermplasmDataManagerImpl{
 
     private static ManagerFactory factory;
     private static GermplasmDataManager manager;
+
+	private long startTime;
+
+	@Rule
+	public TestName name = new TestName();
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -53,7 +62,17 @@ public class TestGermplasmDataManagerImpl{
         factory = new ManagerFactory(local, central);
         manager = factory.getGermplasmDataManager();
     }
-    
+
+	@Before
+	public void beforeEachTest() {
+		startTime = System.nanoTime();
+	}
+	
+	@After
+	public void afterEachTest() {
+		long elapsedTime = System.nanoTime() - startTime;
+		System.out.println("#####" + name.getMethodName() + ": Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime/1000000000) + " s");
+	}
     @Test
     public void testGetAllLocations() throws Exception {
         long start = System.currentTimeMillis();
@@ -878,7 +897,7 @@ public class TestGermplasmDataManagerImpl{
     
     @Test
     public void testGetNextSequenceNumberForCrossNameInDatabase() throws MiddlewareQueryException{
-    	String prefix = "ASDF";
+    	String prefix = "IR";
     	Database db = Database.CENTRAL;
     	System.out.println("Next number in sequence for prefix (" + prefix + ") in " + db + " database: " + 
     			manager.getNextSequenceNumberForCrossName(prefix, db));
@@ -886,7 +905,7 @@ public class TestGermplasmDataManagerImpl{
     
     @Test
     public void testGetNextSequenceNumberForCrossName() throws MiddlewareQueryException{
-    	String prefix = "C97-MNT-0";
+    	String prefix = "C97-MNT-";
     	System.out.println("Next number in sequence for prefix (" + prefix + "): " + 
     			manager.getNextSequenceNumberForCrossName(prefix));
     }

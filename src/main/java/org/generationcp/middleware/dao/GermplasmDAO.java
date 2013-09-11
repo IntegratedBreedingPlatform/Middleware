@@ -610,39 +610,39 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
     	String nextInSequence = "1";
     	
     	try {
-    	      /*
-    	       * This query will generate next number will be queried on first "word" 
-    	       * of cross name.
-               * 
-               * eg.
-               *   input prefix: "IR"
-               *   output: next number in "IRNNNNN -----" sequence 
-    	       */
-        	SQLQuery query = getSession().createSQLQuery(Germplasm.GET_NEXT_IN_SEQUENCE_FOR_CROSS_NAME_PREFIX);
-                query.setParameter("prefix", prefix);
-                query.setParameter("prefixLen", prefix.length());
+		      /*
+		       * This query will generate next number will be queried on first "word" 
+		       * of cross name.
+		       * 
+		       * eg.
+		       *   input prefix: "IR"
+		       *   output: next number in "IRNNNNN -----" sequence 
+		       */
     		
-                
+        	SQLQuery query = getSession().createSQLQuery(Germplasm.GET_NEXT_IN_SEQUENCE_FOR_CROSS_NAME_PREFIX3);
+        	query.setParameter("prefix", prefix);
+        	query.setParameter("prefixLike", prefix + "%");
+    		
               /* 
-               * Uncomment out block of code below (and comment out the one above) if the next number
-               * will be queried on second "word" of cross name.
+               * If the next number will be queried on second "word" of cross name.
                * IMPORTANT: assumes that passed in prefix value has a whitespace at the end
                * 
                * eg.
                *   input prefix: "IR "
                *   output: next number in "IR NNNNN..." sequence
                */
-//                SQLQuery query = getSession().createSQLQuery(Germplasm.GET_NEXT_IN_SEQUENCE_FOR_CROSS_NAME_WITH_SPACE);
+    			
+//    		SQLQuery query = getSession().createSQLQuery(Germplasm.GET_NEXT_IN_SEQUENCE_FOR_CROSS_NAME_WITH_SPACE);
 //    		query.setParameter("prefix", prefix);
 //    		query.setParameter("prefixLike", prefix + "%");
-               
-                
+//                
+		
     		BigInteger nextNumberInSequence = (BigInteger) query.uniqueResult();
     		
     		if (nextNumberInSequence != null){
     			nextInSequence = String.valueOf(nextNumberInSequence);
     		}
-		
+                
     	} catch (HibernateException e) {
 			logAndThrowException("Error with getNextSequenceNumberForCrossName(prefix=" + prefix + ") " +
 					"query : " + e.getMessage(), e);
