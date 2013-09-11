@@ -84,6 +84,7 @@ public class TestWorkbookUtil {
 	
 	//VARIATES
 	public static final String VARIATE1 = "GYLD";
+	public static final String VARIATE2 = "CHALK_PCT";
 //	public static final String VARIATE2 = "NBEPm2";
 //	public static final String VARIATE3 = "equi-Kkni";
 //	public static final String VARIATE4 = "DTFL";
@@ -151,12 +152,12 @@ public class TestWorkbookUtil {
 		conditions.add(new MeasurementVariable("TRIAL", "TRIAL NUMBER", 
 				NUMBER, ENUMERATED, TRIAL_INSTANCE, NUMERIC, "1", TRIAL));
 		
-		conditions.add(new MeasurementVariable("COOPERATOR", "COOPERATOR NAME", 
-				DBCV, CONDUCTED, PERSON, CHAR, "", TRIAL));		
-		
-		conditions.add(new MeasurementVariable("COOPERATOR ID", "COOPERATOR ID", 
-				DBID, CONDUCTED, PERSON, NUMERIC, "", TRIAL));		
-		
+//		conditions.add(new MeasurementVariable("COOPERATOR", "COOPERATOR NAME", 
+//				DBCV, CONDUCTED, PERSON, CHAR, "", TRIAL));		
+//		
+//		conditions.add(new MeasurementVariable("COOPERATOR ID", "COOPERATOR ID", 
+//				DBID, CONDUCTED, PERSON, NUMERIC, "", TRIAL));		
+//		
 		conditions.add(new MeasurementVariable("SITE", "TRIAL SITE NAME", 
 				DBCV, ASSIGNED, LOCATION, CHAR, "", TRIAL));		
 		
@@ -185,8 +186,8 @@ public class TestWorkbookUtil {
 		factors.add(new MeasurementVariable(CROSS, "The pedigree string of the germplasm", 
 				PEDIGREE_STRING, ASSIGNED, CROSS_HISTORY, CHAR, STUDY, ENTRY));		
 		
-//		factors.add(new MeasurementVariable(SEED_SOURCE, "The seed source of the germplasm", 
-//				NAME, SELECTED, SEED_SOURCE, CHAR, STUDY, ENTRY));		
+		factors.add(new MeasurementVariable(SEED_SOURCE, "The seed source of the germplasm", 
+				NAME, SELECTED, SEED_SOURCE, CHAR, STUDY, ENTRY));		
 		
 		factors.add(new MeasurementVariable(PLOT, "Plot number ", 
 				NESTED_NUMBER, ENUMERATED, FIELD_PLOT, NUMERIC, STUDY, PLOT));		
@@ -230,7 +231,8 @@ public class TestWorkbookUtil {
 		
 		variates.add(new MeasurementVariable(VARIATE1, "Grain yield -dry and weigh (kg/ha)", 
 				KG_HA, "Dry and weigh", "Yield", NUMERIC, STUDY, STUDY));		
-		
+		variates.add(new MeasurementVariable(VARIATE2, "Chalkiness of endosperm - Cervitec (percent)", 
+				"Average of Median Percentage", "Cervitec", "Chalkiness of endosperm", NUMERIC, STUDY, STUDY));	
 //		variates.add(new MeasurementVariable(VARIATE2, "(formerly RDTG) Grain Yield", 
 //				KG_HA, NOT_SPECIFIED, GRAIN_YIELD, NUMERIC, STUDY, STUDY));		
 //		
@@ -279,13 +281,14 @@ public class TestWorkbookUtil {
 			dataList.add(new MeasurementData(GID, computeGID(i)));
 			dataList.add(new MeasurementData(DESIG, G_NAMES[i-1]));
 			dataList.add(new MeasurementData(CROSS, "-"));
-//			dataList.add(new MeasurementData(SOURCE, "-"));
+			dataList.add(new MeasurementData(SOURCE, "-"));
 			dataList.add(new MeasurementData(PLOT, String.valueOf(i)));
 			dataList.add(new MeasurementData(BLOCK, ""));
 			dataList.add(new MeasurementData(REP, ""));
 //			dataList.add(new MeasurementData(ROW, String.valueOf(37+i)));
 //			dataList.add(new MeasurementData(COL, "1"));
 			dataList.add(new MeasurementData(VARIATE1, randomizeValue(random, fmt, 5000)));
+			dataList.add(new MeasurementData(VARIATE2, randomizeValue(random, fmt, 100)));
 			
 			row.setDataList(dataList);
 			observations.add(row);
