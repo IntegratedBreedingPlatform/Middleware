@@ -109,6 +109,17 @@ public class TestStudyDataManagerImpl {
 		System.out.println("Study status: " + study.getStatus());
 		System.out.println("Study type: " + study.getType());
 	}
+	
+	@Test
+	public void testGetStudyConditions() throws Exception {
+        Study study = manager.getStudy(STUDY_ID);
+		assertNotNull(study);
+		VariableList vList = study.getConditions();
+		for(Variable v : vList.getVariables()) {
+			System.out.print("name[" + v.getVariableType().getStandardVariable().getName() +"]=");
+			System.out.println(v.getDisplayValue());
+		}
+	}
 
 	@Test
 	public void testGetAllStudyFactor() throws Exception {
