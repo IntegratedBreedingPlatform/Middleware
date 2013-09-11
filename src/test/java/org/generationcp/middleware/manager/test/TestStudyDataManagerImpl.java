@@ -402,6 +402,7 @@ public class TestStudyDataManagerImpl {
             for (Variable variable: variables)
             if (!("GID".equals(variable.getVariableType().getLocalName().trim()))) {
                 String value = variable.getDisplayValue();
+                System.out.println("Data Type is "+ variable.getVariableType().getStandardVariable().getDataType().getName());
                 System.out.println("\t" + experiment.getId() + "  :  " + variable.getVariableType().getStandardVariable().getName() + "  :  " + value );
             }
         }

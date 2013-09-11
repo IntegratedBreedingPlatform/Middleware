@@ -90,7 +90,7 @@ public class Study {
 			variable = constants.findById(termId);
 		}
 		if (variable != null) {
-			value = variable.getDisplayValue();
+			value = variable.getActualValue();
 		}
 		return value;
 	}
