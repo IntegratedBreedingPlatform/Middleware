@@ -99,65 +99,66 @@ public class VariableListTransformer extends Transformer {
 		String localDescription = null;
 		String value = null;
 		int stdVariableId = 0;
-		for (int rank=1;rank<=7;rank++) {
-			//variables to be used later
-			//only get STUDY_NAME, STUDY_TITLE, PM_KEY, STUDY_OBJECTIVE, STUDY_TYPE, START_DATE, END_DATE
-			switch(rank) {
-				case 1: stdVariableId = TermId.STUDY_NAME.getId();
-						localName = "STUDY_NAME";
-						localDescription = "Study name";
-					    value = studyDetails.getStudyName();					     
-					    break;					    
-				case 2: stdVariableId = TermId.STUDY_TITLE.getId();
-						localName = "STUDY_TITLE";
-						localDescription = "Study title";
-					    value = studyDetails.getTitle();					     
-			    		break;
-				case 3: stdVariableId = TermId.PM_KEY.getId();
-						localName = "PM_KEY";
-						localDescription = "Project Management Key";
-			    		value = studyDetails.getPmKey();					     
-			    		break; 	
-				case 4: stdVariableId = TermId.STUDY_OBJECTIVE.getId();
-						localName = "STUDY_OBJECTIVE";
-						localDescription = "Study objective";
-	    				value = studyDetails.getObjective();					     
-	    				break; 	
-				case 5: stdVariableId = TermId.STUDY_TYPE.getId();
-						localName = "TYPE";
-						localDescription = "Study type";
-						value = studyDetails.getStudyType();					     
-						break; 	 	
-				case 6: stdVariableId = TermId.START_DATE.getId();
-						localName = "START";
-						localDescription = "Start date";
-						value = studyDetails.getStartDate();					     
-						break; 	 	
-				case 7: stdVariableId = TermId.END_DATE.getId();
-						localName = "END";
-						localDescription = "End date";
-						value = studyDetails.getEndDate();					     
-						break; 	 	
+		if (studyDetails != null) {
+			for (int rank=1;rank<=7;rank++) {
+				//variables to be used later
+				//only get STUDY_NAME, STUDY_TITLE, PM_KEY, STUDY_OBJECTIVE, STUDY_TYPE, START_DATE, END_DATE
+				switch(rank) {
+					case 1: stdVariableId = TermId.STUDY_NAME.getId();
+							localName = "STUDY_NAME";
+							localDescription = "Study name";
+						    value = studyDetails.getStudyName();					     
+						    break;					    
+					case 2: stdVariableId = TermId.STUDY_TITLE.getId();
+							localName = "STUDY_TITLE";
+							localDescription = "Study title";
+						    value = studyDetails.getTitle();					     
+				    		break;
+					case 3: stdVariableId = TermId.PM_KEY.getId();
+							localName = "PM_KEY";
+							localDescription = "Project Management Key";
+				    		value = studyDetails.getPmKey();					     
+				    		break; 	
+					case 4: stdVariableId = TermId.STUDY_OBJECTIVE.getId();
+							localName = "STUDY_OBJECTIVE";
+							localDescription = "Study objective";
+		    				value = studyDetails.getObjective();					     
+		    				break; 	
+					case 5: stdVariableId = TermId.STUDY_TYPE.getId();
+							localName = "TYPE";
+							localDescription = "Study type";
+							value = studyDetails.getStudyType();					     
+							break; 	 	
+					case 6: stdVariableId = TermId.START_DATE.getId();
+							localName = "START";
+							localDescription = "Start date";
+							value = studyDetails.getStartDate();					     
+							break; 	 	
+					case 7: stdVariableId = TermId.END_DATE.getId();
+							localName = "END";
+							localDescription = "End date";
+							value = studyDetails.getEndDate();					     
+							break; 	 	
+				}
+				//for standardVariable
+				StandardVariable standardVariable = getStandardVariableBuilder().create(stdVariableId);
+				
+				//for variableType
+				VariableType variableType = new VariableType();
+				variableType.setLocalName(localName);
+				variableType.setLocalDescription(localDescription);
+				variableType.setRank(rank);
+				variableType.setStandardVariable(standardVariable);
+				
+				//for variable
+				Variable variable = new Variable();
+				variable.setVariableType(variableType);
+				variable.setValue(value);
+			    
+				//add variable
+				variables.add(variable);
 			}
-			//for standardVariable
-			StandardVariable standardVariable = getStandardVariableBuilder().create(stdVariableId);
-			
-			//for variableType
-			VariableType variableType = new VariableType();
-			variableType.setLocalName(localName);
-			variableType.setLocalDescription(localDescription);
-			variableType.setRank(rank);
-			variableType.setStandardVariable(standardVariable);
-			
-			//for variable
-			Variable variable = new Variable();
-			variable.setVariableType(variableType);
-			variable.setValue(value);
-		    
-			//add variable
-			variables.add(variable);
 		}
-		
 		return variables.sort();
 	}
 }

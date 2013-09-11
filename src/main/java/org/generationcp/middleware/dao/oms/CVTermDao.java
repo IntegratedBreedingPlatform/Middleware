@@ -324,12 +324,16 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			
 			List<Object[]> list = query.list();
 			Integer[] cvTermIds = new Integer[3];
-		      
-            for (Object[] row : list) {
-            	cvTermIds[0] = (Integer)row[0];
-            	cvTermIds[1] = (Integer)row[1];
-            	cvTermIds[2] = (Integer)row[2];
-            }
+
+			if (list != null) {
+	            for (Object[] row : list) {
+	            	cvTermIds[0] = (Integer)row[0];
+	            	cvTermIds[1] = (Integer)row[1];
+	            	cvTermIds[2] = (Integer)row[2];
+	            }
+			} else {
+				cvTermIds = null;
+			}
 			
 			return cvTermIds;
 						

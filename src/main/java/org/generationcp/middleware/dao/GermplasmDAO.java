@@ -620,7 +620,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
     	       */
         	SQLQuery query = getSession().createSQLQuery(Germplasm.GET_NEXT_IN_SEQUENCE_FOR_CROSS_NAME_PREFIX);
                 query.setParameter("prefix", prefix);
-                query.setParameter("prefixRegex", "^" + prefix + "[0-9]");
+                query.setParameter("prefixLen", prefix.length());
     		
                 
               /* 
