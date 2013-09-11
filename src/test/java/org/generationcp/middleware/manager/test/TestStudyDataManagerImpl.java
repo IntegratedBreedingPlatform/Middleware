@@ -106,6 +106,8 @@ public class TestStudyDataManagerImpl {
 		System.out.println("PI: " + study.getPrimaryInvestigator());
 		System.out.println("Start Date:" + study.getStartDate());
 		System.out.println("Creation Date: " + study.getCreationDate());
+		System.out.println("Study status: " + study.getStatus());
+		System.out.println("Study type: " + study.getType());
 	}
 
 	@Test
