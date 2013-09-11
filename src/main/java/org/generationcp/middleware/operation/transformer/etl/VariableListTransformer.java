@@ -2,17 +2,25 @@ package org.generationcp.middleware.operation.transformer.etl;
 
 import java.util.List;
 
-import org.generationcp.middleware.domain.dms.ExperimentValues;
 import org.generationcp.middleware.domain.dms.FactorType;
+import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 
-public class VariableListTransformer {
+public class VariableListTransformer extends Transformer {
+	
+	public VariableListTransformer(HibernateSessionProvider sessionProviderForLocal,
+            HibernateSessionProvider sessionProviderForCentral) {
+				super(sessionProviderForLocal, sessionProviderForCentral);
+	}
 	
 	public VariableList transformStock(MeasurementRow mRow, VariableTypeList variableTypeList) throws MiddlewareQueryException {
 		VariableList variableList = new VariableList();
@@ -82,5 +90,74 @@ public class VariableListTransformer {
 		}
 		
 		return variableList;
+	}
+	
+	public VariableList transformStudyDetails(StudyDetails studyDetails) throws MiddlewareQueryException {
+		
+		VariableList variables = new VariableList();
+		String localName = null;
+		String localDescription = null;
+		String value = null;
+		int stdVariableId = 0;
+		for (int rank=1;rank<=7;rank++) {
+			//variables to be used later
+			//only get STUDY_NAME, STUDY_TITLE, PM_KEY, STUDY_OBJECTIVE, STUDY_TYPE, START_DATE, END_DATE
+			switch(rank) {
+				case 1: stdVariableId = TermId.STUDY_NAME.getId();
+						localName = "STUDY_NAME";
+						localDescription = "Study name";
+					    value = studyDetails.getStudyName();					     
+					    break;					    
+				case 2: stdVariableId = TermId.STUDY_TITLE.getId();
+						localName = "STUDY_TITLE";
+						localDescription = "Study title";
+					    value = studyDetails.getTitle();					     
+			    		break;
+				case 3: stdVariableId = TermId.PM_KEY.getId();
+						localName = "PM_KEY";
+						localDescription = "Project Management Key";
+			    		value = studyDetails.getPmKey();					     
+			    		break; 	
+				case 4: stdVariableId = TermId.STUDY_OBJECTIVE.getId();
+						localName = "STUDY_OBJECTIVE";
+						localDescription = "Study objective";
+	    				value = studyDetails.getObjective();					     
+	    				break; 	
+				case 5: stdVariableId = TermId.STUDY_TYPE.getId();
+						localName = "TYPE";
+						localDescription = "Study type";
+						value = studyDetails.getStudyType();					     
+						break; 	 	
+				case 6: stdVariableId = TermId.START_DATE.getId();
+						localName = "START";
+						localDescription = "Start date";
+						value = studyDetails.getStartDate();					     
+						break; 	 	
+				case 7: stdVariableId = TermId.END_DATE.getId();
+						localName = "END";
+						localDescription = "End date";
+						value = studyDetails.getEndDate();					     
+						break; 	 	
+			}
+			//for standardVariable
+			StandardVariable standardVariable = getStandardVariableBuilder().create(stdVariableId);
+			
+			//for variableType
+			VariableType variableType = new VariableType();
+			variableType.setLocalName(localName);
+			variableType.setLocalDescription(localDescription);
+			variableType.setRank(rank);
+			variableType.setStandardVariable(standardVariable);
+			
+			//for variable
+			Variable variable = new Variable();
+			variable.setVariableType(variableType);
+			variable.setValue(value);
+		    
+			//add variable
+			variables.add(variable);
+		}
+		
+		return variables.sort();
 	}
 }

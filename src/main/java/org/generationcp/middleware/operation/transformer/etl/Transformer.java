@@ -14,6 +14,7 @@ package org.generationcp.middleware.operation.transformer.etl;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.OntologyDataManagerImpl;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.util.DatabaseBroker;
 
 public abstract class Transformer extends DatabaseBroker {
@@ -37,7 +38,7 @@ public abstract class Transformer extends DatabaseBroker {
 	}
 	
 	protected final VariableListTransformer getVariableListTransformer(){
-		return new VariableListTransformer(/*sessionProviderForLocal, sessionProviderForCentral*/);
+		return new VariableListTransformer(sessionProviderForLocal, sessionProviderForCentral);
 	}
 	
 	protected final ExperimentValuesTransformer getExperimentValuesTransformer(){
@@ -49,5 +50,9 @@ public abstract class Transformer extends DatabaseBroker {
     		ontologyDataManager = new OntologyDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
     	}
     	return ontologyDataManager;
+    }
+    
+    protected final StandardVariableBuilder getStandardVariableBuilder() {
+    	return new StandardVariableBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
 }

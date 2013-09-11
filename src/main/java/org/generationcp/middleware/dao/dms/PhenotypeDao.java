@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.domain.dms.TrialEnvironment;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CategoricalValue;
 import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
@@ -31,6 +32,7 @@ import org.generationcp.middleware.domain.h2h.TraitObservation;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 
 /**
@@ -508,4 +510,53 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		
 		return toreturn;
 	}
+
+
+    public List<TrialEnvironment> getEnvironmentTraits(Set<TrialEnvironment> trialEnvironments) throws MiddlewareQueryException {
+        List<TrialEnvironment> environmentDetails = new ArrayList<TrialEnvironment>();
+        
+        if (trialEnvironments.size() == 0){
+            return environmentDetails;
+        }
+        List<Integer> environmentIds = new ArrayList<Integer>();
+        for (TrialEnvironment environment : trialEnvironments) {
+            environmentIds.add(environment.getId());
+            environmentDetails.add(environment);
+        }
+
+        String sql =
+        		"SELECT DISTINCT e.nd_geolocation_id, p.observable_id, c.name, c.definition " 
+        		+ "FROM phenotype p "
+        		+ "	INNER JOIN nd_experiment_phenotype ep ON p.phenotype_id = ep.phenotype_id "
+        		+ "	INNER JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id "
+        		+ "				AND e.nd_geolocation_id IN (:locationIds) 	 "
+        		+ "	LEFT JOIN cvterm c ON p.observable_id = c.cvterm_id "
+        		;
+
+        try {
+            Query query = getSession().createSQLQuery(sql)
+                    .setParameterList("locationIds", environmentIds);
+
+            List<Object[]> result = query.list();
+
+            for (Object[] row : result) {
+                Integer environmentId = (Integer) row[0];
+                Integer traitId = (Integer) row[1];
+                String traitName = (String) row[2];
+                String traitDescription = (String) row[3];
+
+                int index = environmentDetails.indexOf(new TrialEnvironment(environmentId));
+                TrialEnvironment environment = environmentDetails.get(index);
+                environment.addTrait(new TraitInfo(traitId, traitName, traitDescription));
+                environmentDetails.set(index, environment);
+            }
+
+        } catch (HibernateException e) {
+            logAndThrowException(
+                    "Error at getEnvironmentTraits() query on PhenotypeDao: "
+                            + e.getMessage(), e);
+        }
+
+        return environmentDetails;
+    }
 }

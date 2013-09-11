@@ -11,10 +11,13 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -178,6 +181,63 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		StandardVariable sv = getStandardVariable(stdVariableId);
 		return sv;
 	}
+
+	@Override
+	public List<Term> getAllTermsByCvId(CvId cvId) throws MiddlewareQueryException {
+		return getTermBuilder().getTermsByCvId(cvId);
+	}
+
+	@Override
+	public long countTermsByCvId(CvId cvId) throws MiddlewareQueryException {
+		setWorkingDatabase(cvId.getId());
+		return getCvTermDao().countTermsByCvId(cvId);
+    }
+    
+	public List<Term> getMethodsForTrait(Integer traitId)
+			throws MiddlewareQueryException {
+		List<Term> methodTerms = new ArrayList<Term>();
+		Set<Integer> methodIds = new HashSet<Integer>();
+		if (setWorkingDatabase(Database.CENTRAL)) {
+			List<Integer> centralMethodIds = getCvTermDao().findMethodTermIdsByTrait(traitId);
+			if (centralMethodIds != null) {
+				methodIds.addAll(centralMethodIds);
+			}
+		}
+		if(setWorkingDatabase(Database.LOCAL)) {
+			List<Integer> localMethodIds = getCvTermDao().findMethodTermIdsByTrait(traitId);
+			if (localMethodIds != null) {
+				methodIds.addAll(localMethodIds);
+			}
+		}
+		//iterate list
+		for (Integer termId : methodIds) {
+			methodTerms.add(getTermBuilder().get(termId));
+		}
+		return methodTerms;
+	}
 	
+	@Override
+	public List<Term> getScalesForTrait(Integer traitId)
+			throws MiddlewareQueryException {
+		List<Term> scaleTerms = new ArrayList<Term>();
+		Set<Integer> scaleIds = new HashSet<Integer>();
+		if (setWorkingDatabase(Database.CENTRAL)) {
+			List<Integer> centralMethodIds = getCvTermDao().findScaleTermIdsByTrait(traitId);
+			if (centralMethodIds != null) {
+				scaleIds.addAll(centralMethodIds);
+			}
+		}
+		if(setWorkingDatabase(Database.LOCAL)) {
+			List<Integer> localMethodIds = getCvTermDao().findScaleTermIdsByTrait(traitId);
+			if (localMethodIds != null) {
+				scaleIds.addAll(localMethodIds);
+			}
+		}
+		//iterate list
+		for (Integer termId : scaleIds) {
+			scaleTerms.add(getTermBuilder().get(termId));
+		}
+		return scaleTerms;
+	}
 	
 }

@@ -116,6 +116,7 @@ public class GermplasmPair{
        Debug.println(indent + 3, "gid2 = " + gid2);
        Debug.println(indent + 3, "# common environments = " + environments.size());
        environments.print(indent + 6);
+       Debug.println(indent + 3, "# common environments = " + environments.size());
        
    }
 

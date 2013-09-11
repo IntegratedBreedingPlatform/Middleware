@@ -12,9 +12,11 @@
 package org.generationcp.middleware.manager.api;
 
 
+import java.util.List;
 import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
@@ -103,6 +105,47 @@ public interface OntologyDataManager {
 	 * @param property, scale, method
 	 * @return StandardVariable
 	 * @throws MiddlewareQueryException
-	 * */
+	 */
 	StandardVariable findStandardVariableByTraitScaleMethodNames(String property, String scale, String method) throws MiddlewareQueryException;
+	
+	/**
+	 * Retrieve method given the traitId
+	 * 
+	 * @param traitId
+	 * @return List<Term>
+	 * @throws MiddlewareQueryException
+	 */
+	List<Term> getMethodsForTrait(Integer traitId) throws MiddlewareQueryException;
+	
+	/**
+	 * Retrieve scales given the traitId
+	 * 
+	 * @param traitId
+	 * @return List<Term>
+	 * @throws MiddlewareQueryException
+	 */
+	List<Term> getScalesForTrait(Integer traitId) throws MiddlewareQueryException;
+	
+	/**
+	 * Returns the list of Term entries based on the given CvId. The CvId can be CvId.PROPERTIES, CvId.METHODS, CvId.SCALES, CvId.VARIABLES.
+	 * 
+	 * This can be used to get all scales, all traits, all trait methods, all properties, all methods and all variables.
+	 * 
+	 * @param cvId
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	List<Term> getAllTermsByCvId(CvId cvId) throws MiddlewareQueryException;
+	
+	
+	/**
+	 * Returns the count of entries based on the given CvId. The CvId can be CvId.PROPERTIES, CvId.METHODS, CvId.SCALES, CvId.VARIABLES.
+	 * 
+	 * This can be used to count all scales, all traits, all trait methods, all properties, all methods and  all variables.
+	 * 
+	 * @param cvId
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	long countTermsByCvId(CvId cvId) throws MiddlewareQueryException; 
 }

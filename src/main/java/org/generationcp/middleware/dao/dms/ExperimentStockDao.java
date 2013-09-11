@@ -75,14 +75,13 @@ public class ExperimentStockDao extends GenericDAO<ExperimentStock, Integer> {
             List<Object[]> result = query.list();
 
             for (Object[] row : result) {
-                Integer stockId = (Integer) row[0];
+                Integer gId = (Integer) row[0];
                 Integer environmentId = (Integer) row[1];
 
-                Set<Integer> stockEnvironments = germplasmEnvironments
-                        .get(stockId);
-                stockEnvironments.add(environmentId);
-                germplasmEnvironments.remove(stockId);
-                germplasmEnvironments.put(stockId, stockEnvironments);
+                Set<Integer> gidEnvironments = germplasmEnvironments.get(gId);
+                gidEnvironments.add(environmentId);
+                germplasmEnvironments.remove(gId);
+                germplasmEnvironments.put(gId, gidEnvironments);
             }
 
         } catch (HibernateException e) {

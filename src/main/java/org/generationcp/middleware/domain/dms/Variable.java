@@ -71,7 +71,7 @@ public class Variable  implements Comparable<Variable> {
 		        if (enumeration != null) { 
 		        	if(variableType.getStandardVariable().getDataType()!=null &&
 		        	   variableType.getStandardVariable().getDataType().getId()==TermId.CATEGORICAL_VARIABLE.getId()) {
-		        		value = enumeration.getDescription();//GCP-5536 - return the definition of the cvterm representing the value of the categorical variable
+		        		//GCP-5536 - don't change value set
 		        	} else {
 		        		value = enumeration.getName();
 		        	}

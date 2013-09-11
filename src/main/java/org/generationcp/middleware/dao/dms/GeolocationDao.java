@@ -18,7 +18,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.LocationDto;
@@ -175,26 +174,21 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
         if (environmentIds.size() == 0){
             return environmentDetails;
         }
-         
+
         String sql = 
-                "SELECT DISTINCT l.locid "
-                + "     , l.lname "
-                + "     , prov.lname  "
-                + "     , c.isoabbr "
-                + "     , p.project_id "
-                + "     , p.name "
-                + "FROM nd_experiment e "
-                + "     INNER JOIN nd_experiment_stock es ON e.nd_experiment_id = es.nd_experiment_id " 
-                + "     INNER JOIN location l on e.nd_geolocation_id = l.locid AND e.nd_geolocation_id IN (:locationIds) "
-                + "     LEFT JOIN location prov ON prov.locid = l.snl1id  "
-                + "     LEFT JOIN cntry c ON c.cntryid = l.cntryid "
-                + "     INNER JOIN nd_experiment_project ep ON e.nd_experiment_id = ep.nd_experiment_id "
-                + "     INNER JOIN project p ON ep.project_id = p.project_id  "
-                + "     INNER JOIN projectprop pp ON p.project_id = pp.project_id "
-                + "     LEFT JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id = 1150 "
-                + "WHERE l.locid = e.nd_geolocation_id AND (ep.project_id = p.project_id OR ep.project_id = pr.subject_project_id) " 
-            ;
-        
+		        "SELECT DISTINCT e.nd_geolocation_id, l.lname, prov.lname, c.isoabbr, p.project_id, p.name " 
+        		+ "FROM nd_experiment e "
+		        + "	INNER JOIN nd_geolocationprop gp ON e.nd_geolocation_id = gp.nd_geolocation_id " 
+        		+ "						AND gp.type_id =  " + TermId.LOCATION_ID.getId() 
+        		+ " 					AND e.nd_geolocation_id IN (:locationIds) " 		
+		        + "	INNER JOIN location l ON l.locid = gp.value "
+		        + "	INNER JOIN location prov ON prov.locid = l.snl1id "
+		        + "	INNER JOIN cntry c ON l.cntryid = c.cntryid "
+		        + "	INNER JOIN nd_experiment_project ep ON e.nd_experiment_id = ep.nd_experiment_id "
+		        + "	INNER JOIN project_relationship pr ON pr.subject_project_id = ep.project_id AND pr.type_id = " + TermId.BELONGS_TO_STUDY.getId() + " " 
+		        + "	INNER JOIN project p ON p.project_id = pr.object_project_id "
+		        ;        
+
         try{
     
             Query query = getSession().createSQLQuery(sql)

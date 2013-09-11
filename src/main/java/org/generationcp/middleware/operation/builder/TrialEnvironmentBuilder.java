@@ -201,21 +201,22 @@ public class TrialEnvironmentBuilder extends Builder {
     public List<GermplasmPair> getEnvironmentForGermplasmPairs(List<GermplasmPair> germplasmPairs) throws MiddlewareQueryException {
         List<TrialEnvironment> trialEnvironments = new ArrayList<TrialEnvironment>();
         
-        // Get gids for local and gids for central
+        // Get gids for local and gids for central. Local may contain (+) and (-) gids
         Set<Integer> centralGids = new HashSet<Integer>();
         Set<Integer> localGids = new HashSet<Integer>();
         for (GermplasmPair pair : germplasmPairs){
             int gid = pair.getGid1();
             for (int i = 0; i < 2; i++){
                 if (gid < 0){
-                    localGids.add(gid);
+                    localGids.add(gid);                    
                 } else {
                     centralGids.add(gid);
+                    localGids.add(gid);
                 }
                 gid = pair.getGid2();
             }
         }
-
+        
         // GET DETAILS FROM CENTRAL
         setWorkingDatabase(Database.CENTRAL);
         
@@ -226,28 +227,28 @@ public class TrialEnvironmentBuilder extends Builder {
         Set<Integer> centralEnvironmentIds = getEnvironmentIdsFromMap(centralGermplasmEnvironments);
         Set<TrialEnvironment> centralTrialEnvironmentDetails = new HashSet<TrialEnvironment>();
         centralTrialEnvironmentDetails.addAll(getGeolocationDao().getTrialEnvironmentDetails(centralEnvironmentIds));
-        
+
         // Step 3: Get environment traits
-        trialEnvironments = getGeolocationPropertyDao().getEnvironmentTraits(centralTrialEnvironmentDetails);
-        
+        trialEnvironments = getPhenotypeDao().getEnvironmentTraits(centralTrialEnvironmentDetails);
+
         // GET DETAILS FROM LOCAL
         setWorkingDatabase(Database.LOCAL);
         
         // Step 1: Get Trial Environments for each GID
         Map<Integer, Set<Integer>> localGermplasmEnvironments = getExperimentStockDao().getEnvironmentsOfGermplasms(localGids);
-        
+
         // Step 2: Get the trial environment details
         Set<Integer> localEnvironmentIds = getEnvironmentIdsFromMap(localGermplasmEnvironments);
         Set<TrialEnvironment> localTrialEnvironmentDetails = new HashSet<TrialEnvironment>();
         localTrialEnvironmentDetails.addAll(getGeolocationDao().getTrialEnvironmentDetails(localEnvironmentIds));
         
         // Step 3: Get environment traits
-        trialEnvironments.addAll(getGeolocationPropertyDao().getEnvironmentTraits(localTrialEnvironmentDetails));
-        
+        List<TrialEnvironment> localTrialEnvironments = getPhenotypeDao().getEnvironmentTraits(localTrialEnvironmentDetails);
+
         // STEP 3B: Get the trait id and name from central (ONLY FOR LOCAL)
         List<Integer> traitIds = new ArrayList<Integer>();
         
-        for (TrialEnvironment env : localTrialEnvironmentDetails){
+        for (TrialEnvironment env : localTrialEnvironments){
             List<TraitInfo> localTraits = env.getTraits();
             if (localTraits != null){
                 for (TraitInfo trait : localTraits){
@@ -259,7 +260,7 @@ public class TrialEnvironmentBuilder extends Builder {
         if (traitIds.size() > 0){
             List<TraitInfo> localTraitDetails = getCvTermDao().getTraitInfo(traitIds);
     
-            for (TrialEnvironment env : localTrialEnvironmentDetails){
+            for (TrialEnvironment env : localTrialEnvironments){
                 List<TraitInfo> localTraits = env.getTraits();
                 List<TraitInfo> newLocalTraits = new ArrayList<TraitInfo>();
                 if (localTraits != null){
@@ -276,16 +277,19 @@ public class TrialEnvironmentBuilder extends Builder {
             }
         }
         
-        // Step 4: Build germplasm pairs. Get what's common between GID1 AND GID2
-        Map<Integer, Set<Integer>> germplasmEnvironments = centralGermplasmEnvironments;
-        germplasmEnvironments.putAll(localGermplasmEnvironments);
+        // Consolidate local and central trial environments with trait details
+        trialEnvironments.addAll(localTrialEnvironments);
         
+        // Step 4: Build germplasm pairs. Get what's common between GID1 AND GID2
         for (GermplasmPair pair : germplasmPairs){
             int gid1 = pair.getGid1();
             int gid2 = pair.getGid2();
             
-            Set<Integer> g1Environments = germplasmEnvironments.get(gid1);
-            Set<Integer> g2Environments = germplasmEnvironments.get(gid2);
+            Set<Integer> g1Environments = centralGermplasmEnvironments.get(gid1);
+            g1Environments.addAll(localGermplasmEnvironments.get(gid1));
+            Set<Integer> g2Environments = centralGermplasmEnvironments.get(gid2);
+            g2Environments.addAll(localGermplasmEnvironments.get(gid2));
+
             TrialEnvironments environments = new TrialEnvironments();
             
             for (Integer env1 : g1Environments){

@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao.oms;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -22,8 +23,9 @@ import java.util.Set;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CategoricalValue;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.domain.h2h.TraitInfo;
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -363,4 +365,106 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return null;	
 	
 	}
+	
+
+	public List<CVTerm> getTermsByCvId(CvId cvId) throws MiddlewareQueryException{
+		List<CVTerm> terms = new ArrayList<CVTerm>();
+		
+        try{
+            
+            SQLQuery query = getSession().createSQLQuery(
+                    "SELECT cvterm_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype "
+                    + "FROM cvterm " 
+                    + "WHERE cv_id = :cvId "
+                    );
+            query.setParameter("cvId", cvId.getId());
+            
+			List<Object[]> list = query.list();
+            for (Object[] row : list) {
+            	Integer termId = (Integer) row[0];
+            	String name = (String) row[1];
+            	String definition = (String) row[2];
+            	Integer dbxrefId = (Integer) row[3];
+            	Integer isObsolete = (Integer) row[4];
+            	Integer isRelationshipType = (Integer) row[5];
+            	
+            	terms.add(new CVTerm(termId, cvId.getId(), name, definition, dbxrefId, isObsolete, isRelationshipType));
+            	
+            }
+            
+        } catch (HibernateException e) {
+            logAndThrowException("Error at getTermsByCvId() query on CVTermDao: " + e.getMessage(), e);
+        }
+        
+        return terms;
+	}
+
+	public long countTermsByCvId(CvId cvId) throws MiddlewareQueryException{
+		
+        try{
+            
+            SQLQuery query = getSession().createSQLQuery(
+                    "SELECT COUNT(cvterm_id) "
+                    + "FROM cvterm " 
+                    + "WHERE cv_id = :cvId "
+                    );
+            query.setParameter("cvId", cvId.getId());
+            
+            return ((BigInteger) query.uniqueResult()).longValue();
+      
+        } catch (HibernateException e) {
+            logAndThrowException("Error at countTermsByCvId() query on CVTermDao: " + e.getMessage(), e);
+        }
+        
+        return 0;
+	}
+	
+	public List<Integer> findMethodTermIdsByTrait(Integer traitId) 
+			throws MiddlewareQueryException {
+		try {
+			//Standard variable has the combination of property-scale-method
+			StringBuilder queryString = new StringBuilder();
+			queryString.append("SELECT DISTINCT cvrm.object_id ");
+			queryString.append("FROM cvterm_relationship cvr ");
+			queryString.append("INNER JOIN cvterm_relationship cvrp ON cvr.subject_id = cvrp.subject_id AND cvrp.type_id = 1200 ");
+			queryString.append("INNER JOIN cvterm_relationship cvrs ON cvr.subject_id = cvrs.subject_id AND cvrs.type_id = 1220 ");
+			queryString.append("INNER JOIN cvterm_relationship cvrm ON cvr.subject_id = cvrm.subject_id AND cvrm.type_id = 1210 "); 
+			queryString.append("WHERE cvrp.object_id = :traitId");
+			
+			SQLQuery query = getSession().createSQLQuery(queryString.toString());
+			query.setInteger("traitId", traitId);
+			
+			List<Integer> methodIds = (List<Integer>) query.list();						
+			return methodIds;
+						
+		} catch(HibernateException e) {
+			logAndThrowException("Error at findMethodTermIdsByTrait :" + e.getMessage(), e);
+		}
+		return null;
+	}
+	
+	public List<Integer> findScaleTermIdsByTrait(Integer traitId) 
+			throws MiddlewareQueryException {
+		try {
+			//Standard variable has the combination of property-scale-method
+			StringBuilder queryString = new StringBuilder();
+			queryString.append("SELECT DISTINCT cvrs.object_id ");
+			queryString.append("FROM cvterm_relationship cvr ");
+			queryString.append("INNER JOIN cvterm_relationship cvrp ON cvr.subject_id = cvrp.subject_id AND cvrp.type_id = 1200 ");
+			queryString.append("INNER JOIN cvterm_relationship cvrs ON cvr.subject_id = cvrs.subject_id AND cvrs.type_id = 1220 ");
+			queryString.append("INNER JOIN cvterm_relationship cvrm ON cvr.subject_id = cvrm.subject_id AND cvrm.type_id = 1210 "); 
+			queryString.append("WHERE cvrp.object_id = :traitId");
+			
+			SQLQuery query = getSession().createSQLQuery(queryString.toString());
+			query.setInteger("traitId", traitId);
+			
+			List<Integer> scaleIds = (List<Integer>) query.list();						
+			return scaleIds;
+						
+		} catch(HibernateException e) {
+			logAndThrowException("Error at findScaleTermIdsByTrait :" + e.getMessage(), e);
+		}
+		return null;
+	}
+	
 }
