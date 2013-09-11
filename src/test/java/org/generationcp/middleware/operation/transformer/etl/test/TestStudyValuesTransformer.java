@@ -15,7 +15,6 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.transformer.etl.StudyValuesTransformer;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -27,18 +26,6 @@ public class TestStudyValuesTransformer {
 	private long startTime;
 	
 	private static StudyValuesTransformer transformer;
-	
-	private static final String TEST_PROPERTY1 = "testProperty1";
-	private static final String TEST_METHOD1 = "testMethod1";
-	private static final String TEST_SCALE1 = "testScale1";
-	
-	private static final String TEST_PROPERTY2 = "testProperty2";
-	private static final String TEST_METHOD2 = "testMethod2";
-	private static final String TEST_SCALE2 = "testScale2";
-	
-	private static final String TEST_PROPERTY3 = "testProperty3";
-	private static final String TEST_METHOD3 = "testMethod3";
-	private static final String TEST_SCALE3 = "testScale3";
 
 	@Rule
 	public TestName name = new TestName();
@@ -74,9 +61,6 @@ public class TestStudyValuesTransformer {
 		for (Variable stock : result.getVariables()) {
 			System.out.println(stock);
 		}
-		
-		//Assert.assertNotNull(studyVal);
-		//System.out.println(studyVal.toString());
 		
 	}
 	
