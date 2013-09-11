@@ -3,7 +3,6 @@ package org.generationcp.middleware.operation.transformer.etl.test;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.domain.dms.DatasetValues;
 import org.generationcp.middleware.domain.dms.FactorType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Variable;
@@ -13,6 +12,7 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.transformer.etl.VariableListTransformer;
 import org.junit.After;
@@ -131,6 +131,35 @@ public class TestVariableListTransformer {
 		}
 	}
 	
+	@Test
+	public void testTransformStudyDetails() throws Exception {
+		StudyDetails studyDetails = createTestStudyDetails();
+		System.out.println("Input studyDetails");
+		studyDetails.print(1);
+		
+		VariableList variables = transformer.transformStudyDetails(studyDetails);
+		
+		Assert.assertNotNull(variables);
+		
+		for (Variable v : variables.getVariables()) {
+			Assert.assertEquals(v.getValue(),getStudyDetailValue(v.getVariableType().getRank(),studyDetails));
+			v.print(1);
+		}
+	}
+	
+	private String getStudyDetailValue(int rank, StudyDetails studyDetails) {
+		switch(rank) {
+			case 1: return studyDetails.getStudyName();	
+			case 2: return studyDetails.getTitle();	
+			case 3: return studyDetails.getPmKey();
+			case 4: return studyDetails.getObjective();
+			case 5: return studyDetails.getStudyType();
+			case 6: return studyDetails.getStartDate();
+			case 7: return studyDetails.getEndDate();
+		}
+		return null;
+	}
+	
 	private MeasurementRow createMeasurementRowTestData(VariableTypeList varTypeList) {
 		MeasurementRow row = new MeasurementRow();
 		row.setDataList(new ArrayList<MeasurementData>());
@@ -209,5 +238,17 @@ public class TestVariableListTransformer {
 		mVarList.add(new MeasurementVariable("VARIATE2", "ID of Principal Investigator", "DBID", "ASSIGNED", "PERSON", "N", "value9", "STUDY"));
 		
 		return mVarList;
+	}
+	
+	private StudyDetails createTestStudyDetails() {
+		StudyDetails studyDetails = new StudyDetails();
+		studyDetails.setStudyName("Study name");
+		studyDetails.setTitle("Study title");
+		studyDetails.setPmKey("123");
+		studyDetails.setObjective("Test transformer");
+		studyDetails.setStudyType("RYT");
+		studyDetails.setStartDate("20000101");
+		studyDetails.setEndDate("20000130");
+		return studyDetails;
 	}
 }
