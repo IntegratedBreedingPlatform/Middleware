@@ -1,0 +1,136 @@
+package org.generationcp.middleware.operation.transformer.etl.test;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.generationcp.middleware.domain.dms.FactorType;
+import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.StudyValues;
+import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.dms.VariableType;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.operation.transformer.etl.StudyValuesTransformer;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TestName;
+import org.mockito.Mockito;
+
+public class TestStudyValuesTransformer {
+	private long startTime;
+	
+	private static StudyValuesTransformer transformer;
+	
+	private static final String TEST_PROPERTY1 = "testProperty1";
+	private static final String TEST_METHOD1 = "testMethod1";
+	private static final String TEST_SCALE1 = "testScale1";
+	
+	private static final String TEST_PROPERTY2 = "testProperty2";
+	private static final String TEST_METHOD2 = "testMethod2";
+	private static final String TEST_SCALE2 = "testScale2";
+	
+	private static final String TEST_PROPERTY3 = "testProperty3";
+	private static final String TEST_METHOD3 = "testMethod3";
+	private static final String TEST_SCALE3 = "testScale3";
+
+	@Rule
+	public TestName name = new TestName();
+
+	@BeforeClass
+	public static void setUp() throws Exception {
+		
+		transformer = new StudyValuesTransformer(Mockito.mock(HibernateSessionProvider.class), Mockito.mock(HibernateSessionProvider.class));
+	}
+
+	@Before
+	public void beforeEachTest() {
+		startTime = System.nanoTime();
+	}
+	
+	@Test
+	public void testTransform() throws Exception {
+
+		Integer germplasmId = new Integer(1);
+		Integer locationId = new Integer(1);
+		StudyDetails studyDetails = createStudyDetailsTestData();
+		List<MeasurementVariable> measurementVariables= createMeasurementVariableListTestData();
+		VariableTypeList varTypeList = createVariableTypeListTestData();
+		
+		StudyValues studyVal = transformer.transform(germplasmId, locationId, studyDetails, measurementVariables, varTypeList);
+		
+		VariableList result = studyVal.getVariableList();
+
+		System.out.println("Output:");
+		System.out.println("GermplasmId:" + studyVal.getGermplasmId());
+		System.out.println("LocationId:" + studyVal.getLocationId());
+		
+		for (Variable stock : result.getVariables()) {
+			System.out.println(stock);
+		}
+		
+		//Assert.assertNotNull(studyVal);
+		//System.out.println(studyVal.toString());
+		
+	}
+	
+	@After
+	public void afterEachTest() {
+		long elapsedTime = System.nanoTime() - startTime;
+		System.out.println("#####" + name.getMethodName() + ": Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime/1000000000) + " s");
+	}
+	
+	private StudyDetails createStudyDetailsTestData() {
+		StudyDetails studyDetails = new StudyDetails("pheno_t7", "Phenotyping trials of the Population 114", "0",
+				"To evaluate the Population 114", "20130805", "20130805", "T", 1);
+		return studyDetails;
+	}
+	
+	private List<MeasurementVariable> createMeasurementVariableListTestData() {
+		List<MeasurementVariable> mVarList = new ArrayList<MeasurementVariable>();
+		
+		mVarList.add(new MeasurementVariable("STUDY1", "Name of Principal Investigator", "DBCV",  "ASSIGNED", "PERSON",  "C", "value0", "STUDY"));
+		mVarList.add(new MeasurementVariable("STUDY2", "ID of Principal Investigator", "DBID", "ASSIGNED", "PERSON", "N", "value1", "STUDY"));
+		mVarList.add(new MeasurementVariable("STUDY3", "ID of Principal Investigator", "DBID", "ASSIGNED", "PERSON", "N", "value9", "STUDY"));
+		mVarList.add(new MeasurementVariable("FACTOR4", "COOPERATOR NAME", "DBCV", "Conducted", "Person", "C", "value3", "TRIAL"));
+		mVarList.add(new MeasurementVariable("FACTOR5", "Name of Principal Investigator", "DBCV",  "ASSIGNED", "PERSON",  "C", "value4", "STUDY"));
+		mVarList.add(new MeasurementVariable("FACTOR6", "ID of Principal Investigator", "DBID", "ASSIGNED", "PERSON", "N", "value5", "STUDY"));
+		mVarList.add(new MeasurementVariable("FACTOR7", "TRIAL NUMBER", "NUMBER",  "ENUMERATED", "TRIAL INSTANCE", "N", "value6", "TRIAL"));
+		mVarList.add(new MeasurementVariable("FACTOR8", "COOPERATOR NAME", "DBCV", "Conducted", "Person", "C", "value7", "TRIAL"));
+		mVarList.add(new MeasurementVariable("VARIATE1", "Name of Principal Investigator", "DBCV",  "ASSIGNED", "PERSON",  "C", "value8", "STUDY"));
+		mVarList.add(new MeasurementVariable("VARIATE2", "ID of Principal Investigator", "DBID", "ASSIGNED", "PERSON", "N", "value9", "STUDY"));
+		
+		return mVarList;
+	}
+	
+	private VariableTypeList createVariableTypeListTestData() {
+		VariableTypeList list = new VariableTypeList();
+		
+		list.add(new VariableType("STUDY1", "STUDY 1", createVariable(FactorType.STUDY), 1));
+		list.add(new VariableType("STUDY2", "STUDY 2", createVariable(FactorType.STUDY), 2));
+		list.add(new VariableType("STUDY3", "STUDY 3", createVariable(FactorType.STUDY), 3));
+		list.add(new VariableType("FACTOR4", "FACTOR 4", createVariable(FactorType.TRIAL_DESIGN), 4));
+		list.add(new VariableType("FACTOR5", "FACTOR 5", createVariable(FactorType.GERMPLASM), 5));
+		list.add(new VariableType("FACTOR6", "FACTOR 6", createVariable(FactorType.GERMPLASM), 6));
+		list.add(new VariableType("FACTOR7", "FACTOR 7", createVariable(FactorType.TRIAL_ENVIRONMENT), 7));
+		list.add(new VariableType("FACTOR8", "FACTOR 8", createVariable(FactorType.TRIAL_ENVIRONMENT), 8));
+		list.add(new VariableType("VARIATE1", "VARIATE 1", createVariable(null), 9));
+		list.add(new VariableType("VARIATE2", "VARIATE 2", createVariable(null), 10));
+		
+		return list;
+	}
+	
+	private StandardVariable createVariable(FactorType factorType) {
+		StandardVariable stdvar = new StandardVariable();
+		if (factorType != null) {
+			stdvar.setFactorType(factorType);
+		}
+		return stdvar;
+	}
+}
