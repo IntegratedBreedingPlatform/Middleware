@@ -1,6 +1,11 @@
 package org.generationcp.middleware.operation.transformer.etl;
 
+import org.generationcp.middleware.domain.dms.FactorType;
 import org.generationcp.middleware.domain.dms.StudyValues;
+import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.dms.VariableType;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -15,9 +20,35 @@ public class StudyValuesTransformer extends Transformer {
 				super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 	
-	public StudyValues transform(StudyDetails studyDetails, List<MeasurementVariable> mvList) throws MiddlewareQueryException {
-		StudyValues studyValues = null;
+	public StudyValues transform(Integer germplasmId, Integer locationId, StudyDetails studyDetails, 
+			List<MeasurementVariable> measurementVariables, VariableTypeList variableTypeList) throws MiddlewareQueryException {
+		
+		StudyValues studyValues = new StudyValues();
+		VariableList variableList = new VariableList();
+		VariableList variableListFromStudy = getVariableListTransformer().transformStudyDetails(studyDetails);
+		
+		int i = 0;
+		
+		if (variableTypeList != null) {
+			for (VariableType variableType : variableTypeList.getVariableTypes()) {
+				if (variableType.getStandardVariable().getFactorType() == FactorType.STUDY ) {
+					variableList.add(new Variable(variableType, measurementVariables.get(i).getValue()));
+				}
+				i++;
+			}
+		}
+		
+		if (variableListFromStudy != null) {
+			for(Variable variable : variableListFromStudy.getVariables()) {
+				variableList.add(variable);
+			}
+		}
+				
+		studyValues.setVariableList(variableList);
+		studyValues.setGermplasmId(germplasmId);
+		studyValues.setLocationId(locationId);
 		
 		return studyValues;
 	}
+	
 }
