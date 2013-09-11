@@ -23,9 +23,9 @@ import java.util.Set;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CategoricalValue;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.domain.h2h.TraitInfo;
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -418,4 +418,53 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
         
         return 0;
 	}
+	
+	public List<Integer> findMethodTermIdsByTrait(Integer traitId) 
+			throws MiddlewareQueryException {
+		try {
+			//Standard variable has the combination of property-scale-method
+			StringBuilder queryString = new StringBuilder();
+			queryString.append("SELECT DISTINCT cvrm.object_id ");
+			queryString.append("FROM cvterm_relationship cvr ");
+			queryString.append("INNER JOIN cvterm_relationship cvrp ON cvr.subject_id = cvrp.subject_id AND cvrp.type_id = 1200 ");
+			queryString.append("INNER JOIN cvterm_relationship cvrs ON cvr.subject_id = cvrs.subject_id AND cvrs.type_id = 1220 ");
+			queryString.append("INNER JOIN cvterm_relationship cvrm ON cvr.subject_id = cvrm.subject_id AND cvrm.type_id = 1210 "); 
+			queryString.append("WHERE cvrp.object_id = :traitId");
+			
+			SQLQuery query = getSession().createSQLQuery(queryString.toString());
+			query.setInteger("traitId", traitId);
+			
+			List<Integer> methodIds = (List<Integer>) query.list();						
+			return methodIds;
+						
+		} catch(HibernateException e) {
+			logAndThrowException("Error at findMethodTermIdsByTrait :" + e.getMessage(), e);
+		}
+		return null;
+	}
+	
+	public List<Integer> findScaleTermIdsByTrait(Integer traitId) 
+			throws MiddlewareQueryException {
+		try {
+			//Standard variable has the combination of property-scale-method
+			StringBuilder queryString = new StringBuilder();
+			queryString.append("SELECT DISTINCT cvrs.object_id ");
+			queryString.append("FROM cvterm_relationship cvr ");
+			queryString.append("INNER JOIN cvterm_relationship cvrp ON cvr.subject_id = cvrp.subject_id AND cvrp.type_id = 1200 ");
+			queryString.append("INNER JOIN cvterm_relationship cvrs ON cvr.subject_id = cvrs.subject_id AND cvrs.type_id = 1220 ");
+			queryString.append("INNER JOIN cvterm_relationship cvrm ON cvr.subject_id = cvrm.subject_id AND cvrm.type_id = 1210 "); 
+			queryString.append("WHERE cvrp.object_id = :traitId");
+			
+			SQLQuery query = getSession().createSQLQuery(queryString.toString());
+			query.setInteger("traitId", traitId);
+			
+			List<Integer> scaleIds = (List<Integer>) query.list();						
+			return scaleIds;
+						
+		} catch(HibernateException e) {
+			logAndThrowException("Error at findScaleTermIdsByTrait :" + e.getMessage(), e);
+		}
+		return null;
+	}
+	
 }

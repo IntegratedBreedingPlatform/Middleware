@@ -108,6 +108,23 @@ public interface OntologyDataManager {
 	 */
 	StandardVariable findStandardVariableByTraitScaleMethodNames(String property, String scale, String method) throws MiddlewareQueryException;
 	
+	/**
+	 * Retrieve method given the traitId
+	 * 
+	 * @param traitId
+	 * @return List<Term>
+	 * @throws MiddlewareQueryException
+	 */
+	List<Term> getMethodsForTrait(Integer traitId) throws MiddlewareQueryException;
+	
+	/**
+	 * Retrieve scales given the traitId
+	 * 
+	 * @param traitId
+	 * @return List<Term>
+	 * @throws MiddlewareQueryException
+	 */
+	List<Term> getScalesForTrait(Integer traitId) throws MiddlewareQueryException;
 	
 	/**
 	 * Returns the list of Term entries based on the given CvId. The CvId can be CvId.PROPERTIES, CvId.METHODS, CvId.SCALES, CvId.VARIABLES.
