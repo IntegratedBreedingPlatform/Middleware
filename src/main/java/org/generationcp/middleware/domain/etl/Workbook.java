@@ -134,7 +134,7 @@ public class Workbook {
 		for (MeasurementVariable variable : variates){
 			variable.print(indent + 6);
 		}
-		Debug.println(indent + 3, "Conditions: ");
+		Debug.println(indent + 3, "Observations: ");
 		for (MeasurementRow row : observations){
 			row.print(indent + 6);
 		}
