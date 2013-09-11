@@ -13,6 +13,7 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.transformer.etl.VariableListTransformer;
 import org.junit.After;
 import org.junit.Assert;
@@ -21,6 +22,7 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
+import org.mockito.Mockito;
 
 public class TestVariableListTransformer {
 	
@@ -33,7 +35,7 @@ public class TestVariableListTransformer {
 
 	@BeforeClass
 	public static void setUp() throws Exception {
-		transformer = new VariableListTransformer();
+		transformer = new VariableListTransformer(Mockito.mock(HibernateSessionProvider.class), Mockito.mock(HibernateSessionProvider.class));
 		
 	}
 

@@ -12,10 +12,16 @@
 
 package org.generationcp.middleware.manager.test;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
+import org.generationcp.middleware.domain.dms.Enumeration;
+import org.generationcp.middleware.domain.dms.NameSynonym;
+import org.generationcp.middleware.domain.dms.NameType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
@@ -23,6 +29,7 @@ import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -31,7 +38,6 @@ import org.junit.rules.TestName;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import com.apple.crypto.provider.Debug;
 
 public class TestOntologyDataManagerImpl {
 
