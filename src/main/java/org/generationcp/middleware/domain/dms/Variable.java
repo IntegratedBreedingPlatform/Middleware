@@ -65,16 +65,34 @@ public class Variable  implements Comparable<Variable> {
 	}
 	
 	public String getDisplayValue() {
-	    if (variableType.getStandardVariable().hasEnumerations()) {
+		if (variableType.getStandardVariable().hasEnumerations()) {
 		    try{
-		        Enumeration enumeration = variableType.getStandardVariable().findEnumerationById(Integer.parseInt(value)); 
+		        Enumeration enumeration = variableType.getStandardVariable().findEnumerationById(Integer.parseInt(value));
 		        if (enumeration != null) { 
 		        	if(variableType.getStandardVariable().getDataType()!=null &&
 		        	   variableType.getStandardVariable().getDataType().getId()==TermId.CATEGORICAL_VARIABLE.getId()) {
-		        		//GCP-5536 - don't change value set
+		        		//GCP-5536 - get description instead
+		        		value = enumeration.getDescription();
 		        	} else {
 		        		value = enumeration.getName();
 		        	}
+		        }
+		    }catch(NumberFormatException e){
+		        // Ignore, just return the value
+		    }
+		}
+	    if (value == null){
+            value = "";
+        } 
+	    return value;
+	}
+	
+	public String getActualValue() {
+		if (variableType.getStandardVariable().hasEnumerations()) {
+		    try{
+		        Enumeration enumeration = variableType.getStandardVariable().findEnumerationById(Integer.parseInt(value));
+		        if (enumeration != null) { 
+		        	value = enumeration.getName();
 		        }
 		    }catch(NumberFormatException e){
 		        // Ignore, just return the value
