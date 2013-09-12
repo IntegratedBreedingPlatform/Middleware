@@ -13,6 +13,7 @@
 package org.generationcp.middleware.service.api;
 
 import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
 /**
  * This is the API for importing data to new schema. The methods here involve
@@ -28,5 +29,5 @@ public interface DataImportService {
 	 * @param workbook
 	 * @return id of created trial or nursery
 	 */
-	int saveDataset(Workbook workbook);
+	int saveDataset(Workbook workbook) throws MiddlewareQueryException;
 }

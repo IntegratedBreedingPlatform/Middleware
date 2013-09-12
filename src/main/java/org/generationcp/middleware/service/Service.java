@@ -11,11 +11,14 @@
  *******************************************************************************/
 package org.generationcp.middleware.service;
 
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.operation.saver.WorkbookSaver;
 import org.generationcp.middleware.util.DatabaseBroker;
+import org.slf4j.Logger;
 
 public abstract class Service extends DatabaseBroker {
-	
+
 	public Service(){		
 	}
 	
@@ -23,5 +26,12 @@ public abstract class Service extends DatabaseBroker {
         super(sessionProviderForLocal, sessionProviderForCentral);		
 	}
 	
+    protected void logAndThrowException(String message, Throwable e, Logger log) throws MiddlewareQueryException {
+        log.error(message + e.getMessage() + "\n" + e.getStackTrace());
+        throw new MiddlewareQueryException(message + e.getMessage(), e);
+    }
 
+    protected final WorkbookSaver getWorkbookSaver() {
+    	return new WorkbookSaver(sessionProviderForLocal, sessionProviderForCentral);
+    }
 }

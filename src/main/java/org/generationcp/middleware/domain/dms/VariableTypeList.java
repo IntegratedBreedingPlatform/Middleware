@@ -128,4 +128,14 @@ public class VariableTypeList {
 			}
 		}
 	}
+	
+	public void allocateRoom(int size) {
+		for (VariableType vtype : variableTypes) {
+			vtype.setRank(vtype.getRank() + size);
+		}
+	}
+	
+	public int size() {
+		return (variableTypes != null ? variableTypes.size() : 0);
+	}
 }

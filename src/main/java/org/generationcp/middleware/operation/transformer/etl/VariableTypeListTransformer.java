@@ -17,8 +17,12 @@ public class VariableTypeListTransformer extends Transformer {
 	}
 	
 	public VariableTypeList transform(List<MeasurementVariable> measurementVariables) throws MiddlewareQueryException {
+		return transform(measurementVariables, 1);
+	}
+	
+	public VariableTypeList transform(List<MeasurementVariable> measurementVariables, int rank) throws MiddlewareQueryException {
 		VariableTypeList variableTypeList = new VariableTypeList();
-		int rank = 1;
+		
 		for (MeasurementVariable measurementVariable : measurementVariables) {
 			StandardVariable standardVariable = getOntologyDataManager().findStandardVariableByTraitScaleMethodNames(
 						measurementVariable.getProperty(), 

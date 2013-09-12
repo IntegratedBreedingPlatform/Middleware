@@ -11,12 +11,15 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.etl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.util.Debug;
 
 
 public class Workbook {
+	
+	public static final String STUDY_LABEL = "STUDY";
 	
 	private StudyDetails studyDetails;
 	
@@ -94,6 +97,45 @@ public class Workbook {
 
 	public void setObservations(List<MeasurementRow> observations) {
 		this.observations = observations;
+	}
+	
+	public List<MeasurementVariable> getMeasurementDatasetVariables() {
+		List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
+		
+		list.addAll(factors);
+		list.addAll(variates);
+		
+		return list;
+	}
+
+	public List<MeasurementVariable> getStudyVariables() {
+		return getConditionsAndConstants(true);
+	}
+	
+	public List<MeasurementVariable> getTrialVariables() {
+		return getConditionsAndConstants(false);
+	}
+	
+	private List<MeasurementVariable> getConditionsAndConstants(boolean isStudy) {
+		List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
+		
+		list.addAll(getVariables(conditions, isStudy));
+		list.addAll(getVariables(constants, isStudy));
+		
+		return list;
+	}
+	
+	private List<MeasurementVariable> getVariables(List<MeasurementVariable> variables, boolean isStudy) {
+		List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
+		if (variables != null && variables.size() > 0) {
+			for (MeasurementVariable variable : variables) {
+				if (isStudy && variable.getLabel().toUpperCase().startsWith(STUDY_LABEL)
+				|| !isStudy && !variable.getLabel().toUpperCase().startsWith(STUDY_LABEL)) {
+					list.add(variable);
+				}
+			}
+		}
+		return list;
 	}
 
 	@Override
