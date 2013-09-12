@@ -81,23 +81,23 @@ public class DatasetProjectSaver extends Saver {
 
 	private void addNameVariableTypeIfNecessary(VariableTypeList variableTypeList) throws MiddlewareQueryException {
 		if (variableTypeList.findById(TermId.DATASET_NAME) == null) {
-			variableTypeList.makeRoom(0);
-			variableTypeList.add(new VariableType("DATASET_NAME", "Dataset name", getStandardVariable(TermId.DATASET_NAME), 0));
+			variableTypeList.makeRoom(1);
+			variableTypeList.add(new VariableType("DATASET_NAME", "Dataset name", getStandardVariable(TermId.DATASET_NAME), 1));
 		}
 	}
 	
 	private void addDescriptionVariableTypeIfNecessary(VariableTypeList variableTypeList) throws MiddlewareQueryException {
 		if (variableTypeList.findById(TermId.DATASET_TITLE) == null) {
-			variableTypeList.makeRoom(1);
-			variableTypeList.add(new VariableType("DATASET_TITLE", "Dataset title", getStandardVariable(TermId.DATASET_TITLE), 1));
+			variableTypeList.makeRoom(2);
+			variableTypeList.add(new VariableType("DATASET_TITLE", "Dataset title", getStandardVariable(TermId.DATASET_TITLE), 2));
 		}
 	}
 	
 	private VariableType addDataTypeVariableTypeIfNecessary(VariableTypeList variableTypeList) throws MiddlewareQueryException {
 		VariableType variableType = variableTypeList.findById(TermId.DATASET_TYPE);
 		if (variableType == null) {
-			variableType = new VariableType("DATASET_TYPE", "Dataset type", getStandardVariable(TermId.DATASET_TYPE), 2);
-			variableTypeList.makeRoom(2);
+			variableType = new VariableType("DATASET_TYPE", "Dataset type", getStandardVariable(TermId.DATASET_TYPE), 3);
+			variableTypeList.makeRoom(3);
 			variableTypeList.add(variableType);
 		}
 		return variableType;
