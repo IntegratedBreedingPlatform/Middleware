@@ -223,6 +223,7 @@ public class WorkbookSaver extends Saver {
 	
 	private boolean isTrialFactorInDataset(VariableTypeList list) {
 		for (VariableType var : list.getVariableTypes()) {
+			System.out.println(var);
 			if (TermId.TRIAL_INSTANCE_STORAGE.getId() == var.getStandardVariable().getStoredIn().getId()) {
 				return true;
 			}
