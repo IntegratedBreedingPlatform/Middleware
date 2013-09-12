@@ -105,6 +105,10 @@ public class VariableList {
 		}
 		return null;
 	}
+	
+	public int size() {
+		return (variables != null ? variables.size() : 0);
+	}
 
 	public void print(int indent) {
 		if (variables != null) {

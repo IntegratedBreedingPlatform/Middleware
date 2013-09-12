@@ -34,7 +34,7 @@ public abstract class Values {
 	}
 
 	public VariableList getVariableList() {
-		return variableList.sort();
+		return variableList != null ? variableList.sort() : null;
 	}
 
 	public void setVariableList(VariableList variableList) {

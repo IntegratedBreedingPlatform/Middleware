@@ -26,6 +26,7 @@ public class StudyValuesTransformer extends Transformer {
 		StudyValues studyValues = new StudyValues();
 		VariableList variableList = new VariableList();
 		VariableList variableListFromStudy = getVariableListTransformer().transformStudyDetails(studyDetails);
+		variableTypeList.allocateRoom(variableListFromStudy.size());
 		
 		int i = 0;
 		
@@ -41,6 +42,7 @@ public class StudyValuesTransformer extends Transformer {
 		if (variableListFromStudy != null) {
 			for(Variable variable : variableListFromStudy.getVariables()) {
 				variableList.add(variable);
+				variableTypeList.add(variable.getVariableType());
 			}
 		}
 				

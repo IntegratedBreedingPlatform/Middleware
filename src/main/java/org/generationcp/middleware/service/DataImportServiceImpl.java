@@ -12,10 +12,18 @@
 package org.generationcp.middleware.service;
 
 import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.service.api.DataImportService;
+import org.generationcp.middleware.util.TimerWatch;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DataImportServiceImpl extends Service implements DataImportService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DataImportServiceImpl.class);
 
 	public DataImportServiceImpl(
 			HibernateSessionProvider sessionProviderForLocal,
@@ -24,9 +32,31 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	@Override
-	public int saveDataset(Workbook workbook) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+	public int saveDataset(Workbook workbook) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+    	TimerWatch timerWatch = new TimerWatch("saveDataset (grand total)", LOG);
 
+        try {
+        	
+            trans = session.beginTransaction();
+            
+            int studyId = getWorkbookSaver().save(workbook);
+       		
+			trans.commit();
+
+			return studyId;
+
+        } catch (Exception e) {
+        	e.printStackTrace();
+        	rollbackTransaction(trans);
+			logAndThrowException("Error encountered with saveDataset(): " + e.getMessage(), e, LOG);
+
+        } finally {
+        	timerWatch.stop();
+        }
+
+        return 0;
+	}
 }
