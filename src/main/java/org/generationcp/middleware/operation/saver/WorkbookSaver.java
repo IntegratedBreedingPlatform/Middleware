@@ -56,7 +56,7 @@ public class WorkbookSaver extends Saver {
 		int studyId = createStudy(workbook, studyLocationId);
 		
    		createTrialDataset(workbook, studyId, locationIds, trialMV, trialVariables);
-   		createMeasurementEffectDataset(workbook, studyId, trialVariables);
+   		createMeasurementEffectDataset(workbook, studyId, trialMV);
    		
    		return studyId;
 	}
@@ -175,10 +175,11 @@ public class WorkbookSaver extends Saver {
 		watch.stop();
 	}
 	
-	private void createMeasurementEffectDataset(Workbook workbook, int studyId, VariableTypeList trialVariables) throws MiddlewareQueryException {
+	private void createMeasurementEffectDataset(Workbook workbook, int studyId, List<MeasurementVariable> trialMV) throws MiddlewareQueryException {
 		TimerWatch watch = new TimerWatch("preparing measurement effect variables", LOG);
         List<MeasurementVariable> datasetMV = workbook.getMeasurementDatasetVariables();
         VariableTypeList origDatasetVariables = getVariableTypeListTransformer().transform(datasetMV);
+        VariableTypeList trialVariables = getVariableTypeListTransformer().transform(trialMV);
         VariableTypeList datasetVariables = new VariableTypeList();
         if (!isTrialFactorInDataset(origDatasetVariables)) {
         	datasetVariables.addAll(trialVariables);
