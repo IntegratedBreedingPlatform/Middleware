@@ -291,16 +291,19 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			queryString.append("INNER JOIN cvterm cvtp ON cvtp.cvterm_id = cvrp.object_id ");
 			queryString.append("INNER JOIN cvterm cvts ON cvts.cvterm_id = cvrs.object_id "); 
 			queryString.append("INNER JOIN cvterm cvtm ON cvtm.cvterm_id = cvrm.object_id ");
-			queryString.append("WHERE cvtp.name = :property and cvts.name = :scale and cvtm.name = :method");
+			queryString.append("WHERE cvtp.name = :property and cvts.name = :scale and cvtm.name = :method ");
+			queryString.append("ORDER by cvr.subject_id ASC");
 			
 			SQLQuery query = getSession().createSQLQuery(queryString.toString());
 			query.setParameter("property", property);
 			query.setParameter("scale", scale);
 			query.setParameter("method", method);
 			
-			Integer id = (Integer) query.uniqueResult();
-						
-			return id;
+			List<Integer> ids = query.list();
+			
+			if (ids != null && ids.size() > 0){
+				return ids.get(0);
+			}			
 						
 		} catch(HibernateException e) {
 			logAndThrowException("Error at findStandardVariableIdByTraitScaleMethodNames :" + e.getMessage(), e);
