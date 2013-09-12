@@ -137,6 +137,7 @@ public class TestWorkbookUtil {
 		details.setStartDate("20130805");
 		details.setEndDate("20130805");
 		details.setParentFolderId(-1);
+		details.setStudyType("10010");
 		
 		workbook.setStudyDetails(details);
 	}

@@ -60,7 +60,7 @@ public class ProjectRelationshipSaver extends Saver {
 		ArrayList<ProjectRelationship> relationships = new ArrayList<ProjectRelationship>();
 		
 		if (project != null) {
-			 relationships.add(new ProjectRelationship(0, project, parent, TermId.HAS_PARENT_FOLDER.getId()));
+			 //relationships.add(new ProjectRelationship(0, project, parent, TermId.HAS_PARENT_FOLDER.getId()));
 			 relationships.add(new ProjectRelationship(0, project, parent, TermId.IS_STUDY.getId()));
 		}
 		return relationships;
