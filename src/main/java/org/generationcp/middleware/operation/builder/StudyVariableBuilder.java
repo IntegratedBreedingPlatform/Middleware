@@ -52,14 +52,7 @@ public class StudyVariableBuilder extends Builder {
 			variable.setValue(project.getDescription());
 		}
 		else if (storedIn(variableType, TermId.STUDY_INFO_STORAGE)) {
-			//exception = study status and study type both get its value from the name of the cvterm, not the property
-			if(hasId(variableType,TermId.STUDY_STATUS) ||
-			   hasId(variableType,TermId.STUDY_TYPE)) {
-				String propertyValue = getPropertyValue(variableType.getId(), project.getProperties());
-				variable.setValue(getTermBuilder().get(Integer.parseInt(propertyValue)).getName());
-			} else {
-				variable.setValue(getPropertyValue(variableType.getId(), project.getProperties()));
-			}
+			variable.setValue(getPropertyValue(variableType.getId(), project.getProperties()));//revert - it needs to set the cvterm_id always 
 		}
 		else {
 			Variable factor = experiment.getFactors().findById(variableType.getId());

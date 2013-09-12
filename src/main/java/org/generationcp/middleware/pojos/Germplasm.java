@@ -289,6 +289,12 @@ public class Germplasm implements Serializable{
                     + "nval LIKE :name OR nval LIKE :noSpaceName OR nval LIKE :standardizedName ";  
     
     public static final String GET_NEXT_IN_SEQUENCE_FOR_CROSS_NAME_PREFIX =
+            "SELECT CONVERT(REPLACE(nval, :prefix, ''), SIGNED)+1 AS last_number " +
+            "FROM names " +
+            "WHERE nval REGEXP :prefixRegex " +
+            "ORDER BY last_number DESC LIMIT 1";
+
+    public static final String GET_NEXT_IN_SEQUENCE_FOR_CROSS_NAME_PREFIX2 =
     		"SELECT CONVERT(REPLACE(nval, :prefix, ''), SIGNED)+1 AS last_number  " +
 	    	"FROM names " +
 	    	"WHERE (SUBSTRING(nval, 1, :prefixLen) = :prefix " +
@@ -297,6 +303,12 @@ public class Germplasm implements Serializable{
 	    	"AND substring(nval, :prefixLen+2, LENGTH(nval)-:prefixLen+1) = concat( '', 0 + substring(nval, :prefixLen+2, LENGTH(nval)-:prefixLen+1))) " +
 	    	"ORDER BY last_number DESC LIMIT 1";
 
+    public static final String GET_NEXT_IN_SEQUENCE_FOR_CROSS_NAME_PREFIX3 =
+            "SELECT CONVERT(SUBSTRING_INDEX(RTRIM(REPLACE(nval, :prefix, '')), ' ', -1), SIGNED) + 1 AS last_number "
+    		 + "FROM names "
+    		 + "WHERE nval like :prefixLike "
+    		 + "ORDER BY last_number DESC LIMIT 1 "
+    		 ;
     
     public static final String GET_NEXT_IN_SEQUENCE_FOR_CROSS_NAME_WITH_SPACE =
         "SELECT CONVERT(REPLACE(nval, :prefix, ''), SIGNED)+1 AS last_number " +
