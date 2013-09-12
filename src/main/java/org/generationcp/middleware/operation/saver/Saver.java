@@ -13,6 +13,11 @@ package org.generationcp.middleware.operation.saver;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
+import org.generationcp.middleware.operation.transformer.etl.DatasetValuesTransformer;
+import org.generationcp.middleware.operation.transformer.etl.ExperimentValuesTransformer;
+import org.generationcp.middleware.operation.transformer.etl.StudyValuesTransformer;
+import org.generationcp.middleware.operation.transformer.etl.VariableListTransformer;
+import org.generationcp.middleware.operation.transformer.etl.VariableTypeListTransformer;
 import org.generationcp.middleware.util.DatabaseBroker;
 
 /**
@@ -66,4 +71,28 @@ public abstract class Saver extends DatabaseBroker{
     protected final StandardVariableBuilder getStandardVariableBuilder() {
     	return new StandardVariableBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
+
+	protected final VariableTypeListTransformer getVariableTypeListTransformer() {
+		return new VariableTypeListTransformer(sessionProviderForLocal, sessionProviderForCentral);
+	}
+	
+	protected final VariableListTransformer getVariableListTransformer() {
+		return new VariableListTransformer(sessionProviderForLocal, sessionProviderForCentral);
+	}
+
+	protected final StudyValuesTransformer getStudyValuesTransformer() {
+		return new StudyValuesTransformer(sessionProviderForLocal, sessionProviderForCentral);
+	}
+	
+	protected final DatasetValuesTransformer getDatasetValuesTransformer() {
+		return new DatasetValuesTransformer(sessionProviderForLocal, sessionProviderForCentral);
+	}
+	
+	protected final ExperimentValuesTransformer getExperimentValuesTransformer() {
+		return new ExperimentValuesTransformer(sessionProviderForLocal, sessionProviderForCentral);
+	}
+	
+	protected final DatasetProjectSaver getDatasetProjectSaver() {
+		return new DatasetProjectSaver(sessionProviderForLocal, sessionProviderForCentral);
+	}
 }
