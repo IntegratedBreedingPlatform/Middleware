@@ -39,6 +39,8 @@ public class TestWorkbookUtil {
 	public static final String COL_LAYOUT = "COLUMN IN LAYOUT";
 	public static final String GRAIN_YIELD = "Grain Yield";
 	public static final String PLANT_HEIGHT = "Plant Height";
+	public static final String REPLICATION_FACTOR = "REPLICATION FACTOR";
+	public static final String BLOCKING_FACTOR = "BLOCKING FACTOR";
 	
 	//SCALES
 	public static final String DBCV = "DBCV";
@@ -47,7 +49,7 @@ public class TestWorkbookUtil {
 	public static final String TYPE = "TYPE";
 	public static final String PEDIGREE_STRING = "PEDIGREE STRING";
 	public static final String NAME = "NAME";
-	public static final String NESTED_NUMBER = "NESTED_NUMBER";
+	public static final String NESTED_NUMBER = "NESTED NUMBER";
 	public static final String DATE = "Date (yyyymmdd)";
 	public static final String CALCULATED = "CALCULATED";
 	public static final String KG_HA = "kg/ha";
@@ -128,13 +130,14 @@ public class TestWorkbookUtil {
 	
 	private static void createStudyDetails() {
 		StudyDetails details = new StudyDetails();
-		details.setStudyName("pheno_t7");
+		details.setStudyName("pheno_t7" + new Random().nextInt(10000));
 		details.setTitle("Phenotyping trials of the Population 114");
 		details.setPmKey("0");
 		details.setObjective("To evaluate the Population 114");
 		details.setStartDate("20130805");
 		details.setEndDate("20130805");
 		details.setParentFolderId(-1);
+		details.setStudyType("10010");
 		
 		workbook.setStudyDetails(details);
 	}
@@ -194,10 +197,10 @@ public class TestWorkbookUtil {
 		
 		//Plot Factors
 		factors.add(new MeasurementVariable(BLOCK, "INCOMPLETE BLOCK", 
-				NUMBER, ENUMERATED, BLOCK, NUMERIC, STUDY, PLOT));	
+				NUMBER, ENUMERATED, BLOCKING_FACTOR, NUMERIC, STUDY, PLOT));	
 		
 		factors.add(new MeasurementVariable(REP, REPLICATION, 
-				NUMBER, ENUMERATED, REPLICATION, NUMERIC, STUDY, PLOT));
+				NUMBER, ENUMERATED, REPLICATION_FACTOR, NUMERIC, STUDY, PLOT));
 		
 //		factors.add(new MeasurementVariable(ROW, "ROW NUMBER", 
 //				NUMBER, ENUMERATED, ROW_LAYOUT, NUMERIC, STUDY, PLOT));	
