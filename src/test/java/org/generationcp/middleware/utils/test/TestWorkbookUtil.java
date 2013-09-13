@@ -136,7 +136,7 @@ public class TestWorkbookUtil {
 		details.setObjective("To evaluate the Population 114");
 		details.setStartDate("20130805");
 		details.setEndDate("20130805");
-		details.setParentFolderId(-1);
+		details.setParentFolderId(1);
 		details.setStudyType("10010");
 		
 		workbook.setStudyDetails(details);
