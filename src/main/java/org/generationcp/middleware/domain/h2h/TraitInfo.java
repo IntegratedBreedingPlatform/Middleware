@@ -33,6 +33,8 @@ public class TraitInfo  implements Comparable<TraitInfo>{
     
     private long observationCount;
     
+    private TraitType type;
+    
     public TraitInfo() {
     }
 
@@ -102,6 +104,16 @@ public class TraitInfo  implements Comparable<TraitInfo>{
         return observationCount;
     }
     
+    public void setType(TraitType type) {
+        this.type = type;
+    }
+
+    public TraitType getType() {
+    	//TODO set the type. return numeric for now only
+    	type = TraitType.NUMERIC;
+        return type;
+    }
+    
     public void setObservationCount(long observationCount) {
         this.observationCount = observationCount;
     }
@@ -154,6 +166,8 @@ public class TraitInfo  implements Comparable<TraitInfo>{
         builder.append(germplasmCount);
         builder.append(", observationCount=");
         builder.append(observationCount);
+        builder.append(", type=");
+        builder.append(type);
         builder.append("]");
         return builder.toString();
     }
@@ -166,6 +180,7 @@ public class TraitInfo  implements Comparable<TraitInfo>{
         Debug.println(indent + 3, "Location Count: " + getLocationCount());
         Debug.println(indent + 3, "Germplasm Count: " + getGermplasmCount());
         Debug.println(indent + 3, "Observation Count: " + getObservationCount());
+        Debug.println(indent + 3, "Trait Type: " + getType());
     }
     
     private String getEntityName() {
