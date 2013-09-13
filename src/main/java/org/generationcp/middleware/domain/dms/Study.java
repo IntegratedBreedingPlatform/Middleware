@@ -98,7 +98,7 @@ public class Study {
 	public Integer getDisplayValueAsInt(TermId termId) {
 		Integer value = null;
 		String strValue = getDisplayValue(termId);
-		if (strValue != null) {
+		if (strValue != null && !"".equals(strValue)) {
 			value = Integer.parseInt(strValue);
 		}
 		return value;
