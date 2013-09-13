@@ -136,15 +136,25 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
     @SuppressWarnings("unchecked")
     public List<Location> getByNameCountryAndType(String name, Country country, Integer type) throws MiddlewareQueryException {
         try {
-        	if (country != null && type != null){
-                Integer countryId = country.getCntryid();
-	            Criteria criteria = getSession().createCriteria(Location.class);
-	            criteria.add(Restrictions.eq("cntryid", countryId));
-	            criteria.add(Restrictions.eq("ltype", type));
-	            criteria.add(Restrictions.eq("lname",name));
-	            criteria.addOrder(Order.asc("lname"));
+
+        		Integer countryId = null;
+        		if (country != null)
+        			countryId = country.getCntryid();
+	            
+        		Criteria criteria = getSession().createCriteria(Location.class);
+	            
+        		if (countryId != null)
+        			criteria.add(Restrictions.eq("cntryid", countryId));
+	            
+        		if (type!= null)
+        			criteria.add(Restrictions.eq("ltype", type));
+	            
+        		if (name != null && !name.isEmpty())
+        			criteria.add(Restrictions.like("lname","%" + name.trim() + "%"));
+	            
+        		criteria.addOrder(Order.asc("lname"));
+        		        		
 	            return criteria.list();
-        	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getByCountry(country=" + country + ") query from Location: "
                     + e.getMessage(), e);
@@ -293,8 +303,8 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
 	    	            queryString.append(" ud.fname as location_type,");
 	    	            queryString.append(" ud.fdesc as location_description");
 	    	            queryString.append(" from location l");
-	    	            queryString.append(" inner join cntry c on l.cntryid = c.cntryid");
-	    	            queryString.append(" inner join udflds ud on ud.fldno = l.ltype");
+	    	            queryString.append(" left join cntry c on l.cntryid = c.cntryid");
+	    	            queryString.append(" left join udflds ud on ud.fldno = l.ltype");
 	    	            queryString.append(" where locid = :id");
 	    	            
 	    	            SQLQuery query = getSession().createSQLQuery(queryString.toString());
