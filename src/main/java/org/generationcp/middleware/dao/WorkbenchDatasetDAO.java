@@ -119,7 +119,7 @@ public class WorkbenchDatasetDAO extends GenericDAO<WorkbenchDataset, Long>{
 	            } else if (Operation.LIKE.equals(op)) {
 	                criteria.add(Restrictions.like("name", name, MatchMode.ANYWHERE));
 	            } else {
-	                logAndThrowException("Error in getByName(name="+name+"): Operation " + op.toString() + " not supported.");
+	                logAndThrowException("Error in getByName(name="+name+"): Operation " + op.toString() + " not supported.", new Throwable());
 	            }
 	           
 	            criteria.setFirstResult(start);
@@ -150,7 +150,7 @@ public class WorkbenchDatasetDAO extends GenericDAO<WorkbenchDataset, Long>{
 	            } else if (Operation.LIKE.equals(op)) {
 	                criteria.add(Restrictions.like("name", name, MatchMode.ANYWHERE));
 	            } else {
-	                logAndThrowException("Error in countByName(name="+name+"): Operation " + op.toString() + " not supported.");
+	                logAndThrowException("Error in countByName(name="+name+"): Operation " + op.toString() + " not supported.", new Throwable());
 	            }
 	            
 	            criteria.setProjection(Projections.rowCount());

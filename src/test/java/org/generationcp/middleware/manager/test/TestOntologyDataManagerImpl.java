@@ -148,6 +148,56 @@ public class TestOntologyDataManagerImpl {
 	}
 	
 	@Test
+	public void testAddStandardVariableWithMissingScalePropertyMethod() throws Exception {
+		StandardVariable stdVariable = new StandardVariable();
+		stdVariable.setName("Test SPM" + new Random().nextInt(10000));
+		stdVariable.setDescription("Std variable with new scale, property, method");
+		
+		Term newProperty = new Term(0, "Test Property", "Test Property");
+		Term property = manager.findTermByName(newProperty.getName(),CvId.PROPERTIES);
+		if(property==null) {
+			System.out.println("new property = " + newProperty.getName());
+			property = newProperty;
+		} else {
+			System.out.println("property id = " + property.getId());
+		}
+		Term newScale = new Term(0, "Test Scale", "Test Scale");
+		Term scale = manager.findTermByName(newScale.getName(),CvId.SCALES);
+		if(scale==null) {
+			System.out.println("new scale = " + newScale.getName());
+			scale = newScale;
+		} else {
+			System.out.println("scale id = " + scale.getId());
+		}
+		Term newMethod = new Term(0, "Test Method", "Test Method");
+		Term method = manager.findTermByName(newMethod.getName(),CvId.METHODS);
+		if(method==null) {
+			System.out.println("new method = " + newMethod.getName());
+			method = newMethod;
+		} else {
+			System.out.println("method id = " + method.getId());
+		}
+		stdVariable.setProperty(property);
+		stdVariable.setScale(scale);
+		stdVariable.setMethod(method);
+		
+		stdVariable.setStoredIn(new Term(1010, "Study information", "Study element"));
+		stdVariable.setDataType(new Term(1120, "Character variable", "variable with char values"));
+		stdVariable.setNameSynonyms(new ArrayList<NameSynonym>());
+		stdVariable.getNameSynonyms().add(new NameSynonym("test", NameType.ALTERNATIVE_ENGLISH));
+		stdVariable.getNameSynonyms().add(new NameSynonym("essai", NameType.ALTERNATIVE_FRENCH));
+		stdVariable.setEnumerations(new ArrayList<Enumeration>());
+		stdVariable.getEnumerations().add(new Enumeration(10000, "N", "Nursery", 1));
+		stdVariable.getEnumerations().add(new Enumeration(10001, "HB", "Hybridization nursery", 2));
+		stdVariable.getEnumerations().add(new Enumeration(10002, "PN", "Pedigree nursery", 3));
+		stdVariable.setConstraints(new VariableConstraints(100, 999));
+		
+		manager.addStandardVariable(stdVariable);
+		
+		System.out.println("Standard variable saved: " + stdVariable.getId());
+	}
+	
+	@Test
 	public void testAddMethod() throws Exception {
 		String name = "Test Method " + new Random().nextInt(10000);
 		String definition = "Test Definition";
@@ -366,5 +416,60 @@ public class TestOntologyDataManagerImpl {
 			System.out.println("scale: " + term.getName());
 		}
 		assertTrue(hasNumber);//should return Number
+	}
+	
+	@Test
+	public void testAddTerm() throws Exception {
+		String name = "Test Method " + new Random().nextInt(10000);
+		String definition = "Test Definition";
+		
+		//add a method, should allow insert
+		
+		CvId cvId = CvId.METHODS;
+		Term term = manager.addTerm(name, definition, cvId);
+		assertNotNull(term);
+		assertTrue(term.getId() < 0);
+	    System.out.println("testAddTerm():  " + term);
+	    term = manager.getTermById(term.getId());
+	    System.out.println("From db:  " + term);
+	    
+	    // add a variable, should not allow insert and should throw an exception
+	    // uncomment the ff. to test adding variables
+	    /* 
+	    name = "Test Variable " + new Random().nextInt(10000);
+		definition = "Test Variable";
+	    cvId = CvId.VARIABLES;
+		term = manager.addTerm(name, definition, cvId);
+		assertTrue(term == null);
+	    */
+	}
+	
+	@Test
+	public void testFindTermByName() throws Exception {
+		System.out.println("Test findTermByName");
+		
+		// term doesn't exist
+		Term term = manager.findTermByName("foo bar", CvId.METHODS);
+		assertTrue(term == null);
+		
+		// term exist but isn't a method
+		term = manager.findTermByName("PANH", CvId.METHODS);
+		assertTrue(term == null);
+		
+		// term does exist in central
+		term = manager.findTermByName("Vegetative Stage", CvId.METHODS);
+		assertTrue(term != null);
+		term.print(0);
+		System.out.println();
+		
+		// add a method to local
+		String name = "Test Method " + new Random().nextInt(10000);
+		String definition = "Test Definition";
+		term = manager.addTerm(name, definition, CvId.METHODS);
+		// term does exist in local
+		
+		term = manager.findTermByName(term.getName(), CvId.METHODS);
+		assertTrue(term != null);
+		term.print(0);
 	}
 }

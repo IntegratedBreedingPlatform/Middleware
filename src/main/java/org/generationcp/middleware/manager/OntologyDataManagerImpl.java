@@ -19,6 +19,7 @@ import java.util.Set;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
@@ -59,7 +60,26 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
  
         try {
             trans = session.beginTransaction();
-            getStandardVariableSaver().save(stdVariable);
+            //check if scale, property and method exists first
+            Term scale = findTermByName(stdVariable.getScale().getName(),CvId.SCALES);
+            if(scale==null) {
+            	stdVariable.setScale(getTermSaver().save(stdVariable.getScale().getName(), stdVariable.getScale().getDefinition(), CvId.SCALES));
+            	System.out.println("new scale with id = " + stdVariable.getScale().getId());
+            }
+            Term property = findTermByName(stdVariable.getProperty().getName(),CvId.PROPERTIES);
+            if(property==null) {
+            	stdVariable.setProperty(getTermSaver().save(stdVariable.getProperty().getName(), stdVariable.getProperty().getDefinition(), CvId.PROPERTIES));
+            	System.out.println("new property with id = " + stdVariable.getProperty().getId());
+            }
+            Term method = findTermByName(stdVariable.getMethod().getName(),CvId.METHODS);
+            if(method==null) {
+            	stdVariable.setMethod(getTermSaver().save(stdVariable.getMethod().getName(), stdVariable.getMethod().getDefinition(), CvId.METHODS));
+            	System.out.println("new method with id = " + stdVariable.getMethod().getId());
+            }
+            if(findStandardVariableByTraitScaleMethodNames(stdVariable.getProperty().getName(),
+            		stdVariable.getScale().getName(),stdVariable.getMethod().getName())==null) {
+            	getStandardVariableSaver().save(stdVariable);
+            }
 			trans.commit();
 			
         } catch (Exception e) {
@@ -68,22 +88,10 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	    }
 	} 
 	
+	@Deprecated
 	@Override
 	public Term addMethod(String name, String definition) throws MiddlewareQueryException{
-		requireLocalDatabaseInstance();
-		Session session = getCurrentSessionForLocal();
-        Transaction trans = null;
- 
-        try {
-            trans = session.beginTransaction();
-			Term term = getTermSaver().save(name, definition);
-			trans.commit();
-	        return term;
-	    } catch (Exception e) {
-	    	rollbackTransaction(trans);
-	        throw new MiddlewareQueryException("error in addMethod " + e.getMessage(), e);
-	    }
-
+		return addTerm(name, definition, CvId.METHODS);
 	}
 
 	@Override
@@ -243,6 +251,33 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 			scaleTerms.add(getTermBuilder().get(termId));
 		}
 		return scaleTerms;
+	}
+	
+	@Override
+	public Term findTermByName(String name, CvId cvId) throws MiddlewareQueryException {
+		return getTermBuilder().findTermByName(name, cvId);
+	}
+	
+	@Override
+	public Term addTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException{
+		requireLocalDatabaseInstance();
+		Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+        Term term = null;
+        
+	    try {
+	    	if (CvId.VARIABLES.getId() != cvId.getId()) {
+	            trans = session.beginTransaction();
+				term = getTermSaver().save(name, definition, cvId);
+				trans.commit();
+	    	} else {
+	    		throw new MiddlewareQueryException("variables cannot be used in this method");
+	    	}
+	    	return term;
+	    } catch (Exception e) {
+	    	rollbackTransaction(trans);
+	        throw new MiddlewareQueryException("error in addTerm " + e.getMessage(), e);
+	    }
 	}
 	
 }

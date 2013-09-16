@@ -202,10 +202,10 @@ public class LotDAO extends GenericDAO<Lot, Integer>{
 	        Integer id = lot.getId();
 	        if (id != null && id.intValue() > 0) {
 	            logAndThrowException("Error with validateId(lot=" + lot + "): Cannot update a Central Database record. "
-	                    + "Attribute object to update must be a Local Record (ID must be negative)");
+	                    + "Attribute object to update must be a Local Record (ID must be negative)", new Throwable());
 	        }
     	}else{
-    	    logAndThrowException("Error with validateId(lot=" + lot + "): lot is null)");
+    	    logAndThrowException("Error with validateId(lot=" + lot + "): lot is null)", new Throwable());
         }
     }
 }

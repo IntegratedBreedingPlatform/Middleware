@@ -36,11 +36,11 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer>{
 				logAndThrowException("Error with validateId(transaction="
 						+ transaction
 						+ "): Cannot update a Central Database record. "
-						+ "Transaction object to update must be a Local Record (ID must be negative)");
+						+ "Transaction object to update must be a Local Record (ID must be negative)", new Throwable());
 			}
 		} else {
 			logAndThrowException("Error with validateId(transaction="
-					+ transaction + "): transaction is null. ");
+					+ transaction + "): transaction is null. ", new Throwable());
 		}
     }
 

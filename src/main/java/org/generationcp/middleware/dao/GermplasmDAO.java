@@ -598,11 +598,11 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 	        if (id != null && id.intValue() > 0) {
 	            logAndThrowException("Error with validateId(germplasm=" + germplasm
 	                    + "): Cannot update a Central Database record. "
-	                    + "Attribute object to update must be a Local Record (ID must be negative)");
+	                    + "Attribute object to update must be a Local Record (ID must be negative)", new Throwable());
 	        }
     	} else {
 	            logAndThrowException("Error with validateId(germplasm=" + germplasm
-	                    + "): germplasm is null. ");
+	                    + "): germplasm is null. ", new Throwable());
     	}
     }
     

@@ -19,6 +19,7 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermProperty;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 
@@ -66,5 +67,31 @@ public class TermBuilder extends Builder {
 		}
 		
 		return terms;
+	}
+	
+	public Term findTermByName(String name, CvId cvId) throws MiddlewareQueryException {
+		Term term = null;
+		
+		if (setWorkingDatabase(Database.CENTRAL)) {
+			term = mapToTerm(getCvTermDao().getByNameAndCvId(name, cvId.getId()));
+			if (term == null) {
+				if (setWorkingDatabase(Database.LOCAL)) {
+					term =  mapToTerm(getCvTermDao().getByNameAndCvId(name, cvId.getId()));
+				}
+			}
+		}
+		
+		return term;
+	}
+	
+	private Term mapToTerm(CVTerm cvTerm) {
+		Term term = null;
+		
+		if (cvTerm != null){
+			term = new Term(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition());
+			term.setObsolete(cvTerm.isObsolete());
+			term.setVocabularyId(cvTerm.getCv());
+		}
+		return term;
 	}
 }

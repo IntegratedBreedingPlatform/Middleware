@@ -35,7 +35,13 @@ public class TraitInfo  implements Comparable<TraitInfo>{
     
     private TraitType type;
     
+    private String scaleName;
+    
     public TraitInfo() {
+    }
+
+    public TraitInfo( int id){
+        this.id = id;
     }
 
     public TraitInfo( int id, String name){
@@ -49,13 +55,17 @@ public class TraitInfo  implements Comparable<TraitInfo>{
         this.description = description;
     }
         
+    public TraitInfo( int id, String name, String description, String scaleName, Integer typeId){
+    	this(id, name, description);
+        this.scaleName = scaleName;
+        this.type = TraitType.valueOf(typeId);
+        this.description = description;
+    }
+        
     public TraitInfo( int id, String name, String description,
             long locationCount, long germplasmCount, long observationCount) {
-        super();
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.locationCount = locationCount;
+    	this(id, name, description);
+    	this.locationCount = locationCount;
         this.germplasmCount = germplasmCount;
         this.observationCount = observationCount;
     }
@@ -100,10 +110,6 @@ public class TraitInfo  implements Comparable<TraitInfo>{
         this.germplasmCount = germplasmCount;
     }
     
-    public long getObservationCount() {
-        return observationCount;
-    }
-    
     public void setType(TraitType type) {
         this.type = type;
     }
@@ -114,10 +120,22 @@ public class TraitInfo  implements Comparable<TraitInfo>{
         return type;
     }
     
+	public String getScaleName() {
+		return scaleName;
+	}
+
+	public void setScaleName(String scaleName) {
+		this.scaleName = scaleName;
+	}
+    
     public void setObservationCount(long observationCount) {
         this.observationCount = observationCount;
     }
 
+    public long getObservationCount() {
+        return observationCount;
+    }
+    
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -168,6 +186,8 @@ public class TraitInfo  implements Comparable<TraitInfo>{
         builder.append(observationCount);
         builder.append(", type=");
         builder.append(type);
+        builder.append(", scaleName=");
+        builder.append(scaleName);
         builder.append("]");
         return builder.toString();
     }
@@ -181,6 +201,7 @@ public class TraitInfo  implements Comparable<TraitInfo>{
         Debug.println(indent + 3, "Germplasm Count: " + getGermplasmCount());
         Debug.println(indent + 3, "Observation Count: " + getObservationCount());
         Debug.println(indent + 3, "Trait Type: " + getType());
+        Debug.println(indent + 3, "Scale Name: " + getScaleName());
     }
     
     private String getEntityName() {
@@ -193,7 +214,7 @@ public class TraitInfo  implements Comparable<TraitInfo>{
         int compareId = ((TraitInfo) compareValue).getId(); 
         return Integer.valueOf(getId()).compareTo(compareId);
     }
-    
+
 
 
 }
