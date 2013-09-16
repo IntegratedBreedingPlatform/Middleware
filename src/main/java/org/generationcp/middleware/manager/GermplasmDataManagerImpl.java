@@ -418,7 +418,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             } else {
                 // throw exception if no Name record with specified value does not exist
                 logAndThrowException("Error in GermplasmpDataManager.updateGermplasmPrefNameAbbrev(gid=" + gid + ", newPrefValue="
-                        + newPrefValue + ", nameOrAbbrev=" + nameOrAbbrev + "): The specified Germplasm Name does not exist.", LOG);
+                        + newPrefValue + ", nameOrAbbrev=" + nameOrAbbrev + "): The specified Germplasm Name does not exist.", new Throwable(), LOG);
             }
 
             // end transaction, commit to database
@@ -872,14 +872,14 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         Germplasm child = getGermplasmByGID(gid);
         if (child == null) {
             logAndThrowException("Error in GermplasmDataManager.updateProgenitor(gid=" + gid + ", progenitorId=" + progenitorId
-                    + ", progenitorNumber=" + progenitorNumber + "): There is no germplasm record with gid: " + gid, LOG);
+                    + ", progenitorNumber=" + progenitorNumber + "): There is no germplasm record with gid: " + gid, new Throwable(), LOG);
         }
 
         // check if the germplasm record identified by progenitorId exists
         Germplasm parent = getGermplasmByGID(progenitorId);
         if (parent == null) {
             logAndThrowException("Error in GermplasmDataManager.updateProgenitor(gid=" + gid + ", progenitorId=" + progenitorId
-                    + ", progenitorNumber=" + progenitorNumber + "): There is no germplasm record with progenitorId: " + progenitorId, LOG);
+                    + ", progenitorNumber=" + progenitorNumber + "): There is no germplasm record with progenitorId: " + progenitorId, new Throwable(), LOG);
         }
 
         // check progenitor number
@@ -899,7 +899,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             } else {
                 logAndThrowException("Error in GermplasmDataManager.updateProgenitor(gid=" + gid + ", progenitorId=" + progenitorId
                         + ", progenitorNumber=" + progenitorNumber
-                        + "): The gid supplied as parameter does not refer to a local record. Only local records may be updated.", LOG);
+                        + "): The gid supplied as parameter does not refer to a local record. Only local records may be updated.", new Throwable(), LOG);
             }
         } else if (progenitorNumber > 2) {
             ProgenitorDAO dao = getProgenitorDao();
@@ -932,7 +932,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             }
         } else {
             logAndThrowException("Error in GermplasmDataManager.updateProgenitor(gid=" + gid + ", progenitorId=" + progenitorId
-                    + ", progenitorNumber=" + progenitorNumber + "): Invalid progenitor number: " + progenitorNumber, LOG);
+                    + ", progenitorNumber=" + progenitorNumber + "): Invalid progenitor number: " + progenitorNumber, new Throwable(), LOG);
         }
 
         return progenitorId;
@@ -1341,12 +1341,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
                         return cross;
                     } else {
-                        logAndThrowException("Error with expanding cross, can not find method with id: " + germplasmToExpand.getMethodId(),
-                                LOG);
+                        logAndThrowException("Error with expanding cross, can not find method with id: " + germplasmToExpand.getMethodId(), 
+                        		new Throwable(), LOG);
                     }
                 }
             } else {
-                logAndThrowException("expandGermplasmCross was incorrectly called", LOG);
+                logAndThrowException("expandGermplasmCross was incorrectly called", new Throwable(), LOG);
             }
         }
         return element;
