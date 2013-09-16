@@ -148,4 +148,26 @@ public interface OntologyDataManager {
 	 * @throws MiddlewareQueryException
 	 */
 	long countTermsByCvId(CvId cvId) throws MiddlewareQueryException; 
+	
+	/**
+	 * Returns Term based on the given name and cvid.  
+	 * 
+	 * @param name, cvId
+	 * @return Term
+	 * @throws MiddlewareQueryException
+	 * */
+	Term findTermByName(String name, CvId cvId) throws MiddlewareQueryException;
+	
+	/**
+	 * Adds a new Term to the database. 
+	 * Creates a new cvterm entry in the local database. 
+	 * Returns a negative id.
+	 * 
+	 * @param name
+	 * @param definition
+	 * @param cvId
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	Term addTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException;
 }

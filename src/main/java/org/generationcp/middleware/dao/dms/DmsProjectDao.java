@@ -331,7 +331,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			return results;
 		
 		} catch(HibernateException e) {
-			logAndThrowException("Error getByFactor=" + factorId + " at DmsProjectDao: " + e.getMessage());
+			logAndThrowException("Error getByFactor=" + factorId + " at DmsProjectDao: " + e.getMessage(), new Throwable());
 		}
 		return new ArrayList<DmsProject>();
 	}

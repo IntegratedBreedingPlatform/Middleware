@@ -112,10 +112,10 @@ public class NameDAO extends GenericDAO<Name, Integer>{
 	        Integer id = name.getNid();
 	        if (id != null && id.intValue() > 0) {
 	            logAndThrowException("Error with validateId(name=" + name + "): Cannot update a Central Database record. "
-	                    + "Name object to update must be a Local Record (ID must be negative)");
+	                    + "Name object to update must be a Local Record (ID must be negative)", new Throwable());
 	        }
     	} else {
-            logAndThrowException("Error with validateId(name=" + name + "): name is null. ");
+            logAndThrowException("Error with validateId(name=" + name + "): name is null. ", new Throwable());
     	}
     }
 

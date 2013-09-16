@@ -745,21 +745,10 @@ public abstract class DataManager extends DatabaseBroker{
      * @throws MiddlewareQueryException
      */
     protected void logAndThrowException(String message, Throwable e) throws MiddlewareQueryException {
-        LOG.error(message);
-        throw new MiddlewareQueryException(message);
+        LOG.error(message + e.getMessage() + "\n" + e.getStackTrace());
+        throw new MiddlewareQueryException(message + e.getMessage(), e);
     }
 
-    /**
-     * Logs an error based on the given message using the given Logger parameter.
-     * 
-     * @param message   The message to log and to set on the exception
-     * @param log   The Logger to use
-     * @throws MiddlewareQueryException
-     */
-    protected void logAndThrowException(String message, Logger log) throws MiddlewareQueryException {
-        log.error(message);
-        throw new MiddlewareQueryException(message);
-    }
 
     /**
      * Logs an error based on the given message using the given Logger parameter.     <br/> 

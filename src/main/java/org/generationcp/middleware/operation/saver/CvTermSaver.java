@@ -28,7 +28,7 @@ public class CvTermSaver extends Saver {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 
-	public Term save(String name, String definition)  throws MiddlewareException, MiddlewareQueryException{ 
+	public Term save(String name, String definition, CvId cvId)  throws MiddlewareException, MiddlewareQueryException{ 
 		requireLocalDatabaseInstance();
 
 		validateInputFields(name, definition);
@@ -41,7 +41,7 @@ public class CvTermSaver extends Saver {
 			e.printStackTrace();
 			throw new MiddlewareQueryException(e.getMessage());
 		}
-		CVTerm cvTerm = create(generatedId, name, definition, CvId.METHODS.getId(), false, false); 
+		CVTerm cvTerm = create(generatedId, name, definition, cvId.getId(), false, false); 
 		dao.save(cvTerm);
 
 		return new Term(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition());
