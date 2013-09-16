@@ -118,6 +118,13 @@ public enum TermId {
 	
 	//Location 
 	, LOCATION_ID(8190)
+	
+	//Study Type
+	, NURSERY(10000)
+	, TRIAL(10010)
+	
+	//Main Factor (Variable)
+	, TRIAL_INSTANCE_FACTOR(8170)
 	;
 	
 	private final int id;
