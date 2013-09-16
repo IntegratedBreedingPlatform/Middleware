@@ -367,4 +367,59 @@ public class TestOntologyDataManagerImpl {
 		}
 		assertTrue(hasNumber);//should return Number
 	}
+	
+	@Test
+	public void testAddTerm() throws Exception {
+		String name = "Test Method " + new Random().nextInt(10000);
+		String definition = "Test Definition";
+		
+		//add a method, should allow insert
+		
+		CvId cvId = CvId.METHODS;
+		Term term = manager.addTerm(name, definition, cvId);
+		assertNotNull(term);
+		assertTrue(term.getId() < 0);
+	    System.out.println("testAddTerm():  " + term);
+	    term = manager.getTermById(term.getId());
+	    System.out.println("From db:  " + term);
+	    
+	    // add a variable, should not allow insert and should throw an exception
+	    // uncomment the ff. to test adding variables
+	    /* 
+	    name = "Test Variable " + new Random().nextInt(10000);
+		definition = "Test Variable";
+	    cvId = CvId.VARIABLES;
+		term = manager.addTerm(name, definition, cvId);
+		assertTrue(term == null);
+	    */
+	}
+	
+	@Test
+	public void testFindTermByName() throws Exception {
+		System.out.println("Test findTermByName");
+		
+		// term doesn't exist
+		Term term = manager.findTermByName("foo bar", CvId.METHODS);
+		assertTrue(term == null);
+		
+		// term exist but isn't a method
+		term = manager.findTermByName("PANH", CvId.METHODS);
+		assertTrue(term == null);
+		
+		// term does exist in central
+		term = manager.findTermByName("Vegetative Stage", CvId.METHODS);
+		assertTrue(term != null);
+		term.print(0);
+		System.out.println();
+		
+		// add a method to local
+		String name = "Test Method " + new Random().nextInt(10000);
+		String definition = "Test Definition";
+		term = manager.addTerm(name, definition, CvId.METHODS);
+		// term does exist in local
+		
+		term = manager.findTermByName(term.getName(), CvId.METHODS);
+		assertTrue(term != null);
+		term.print(0);
+	}
 }

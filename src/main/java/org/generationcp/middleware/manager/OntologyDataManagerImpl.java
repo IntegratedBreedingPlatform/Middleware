@@ -68,22 +68,10 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	    }
 	} 
 	
+	@Deprecated
 	@Override
 	public Term addMethod(String name, String definition) throws MiddlewareQueryException{
-		requireLocalDatabaseInstance();
-		Session session = getCurrentSessionForLocal();
-        Transaction trans = null;
- 
-        try {
-            trans = session.beginTransaction();
-			Term term = getTermSaver().save(name, definition);
-			trans.commit();
-	        return term;
-	    } catch (Exception e) {
-	    	rollbackTransaction(trans);
-	        throw new MiddlewareQueryException("error in addMethod " + e.getMessage(), e);
-	    }
-
+		return addTerm(name, definition, CvId.METHODS);
 	}
 
 	@Override
@@ -243,6 +231,33 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 			scaleTerms.add(getTermBuilder().get(termId));
 		}
 		return scaleTerms;
+	}
+	
+	@Override
+	public Term findTermByName(String name, CvId cvId) throws MiddlewareQueryException {
+		return getTermBuilder().findTermByName(name, cvId);
+	}
+	
+	@Override
+	public Term addTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException{
+		requireLocalDatabaseInstance();
+		Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+        Term term = null;
+        
+	    try {
+	    	if (CvId.VARIABLES.getId() != cvId.getId()) {
+	            trans = session.beginTransaction();
+				term = getTermSaver().save(name, definition, cvId);
+				trans.commit();
+	    	} else {
+	    		throw new MiddlewareQueryException("variables cannot be used in this method");
+	    	}
+	    	return term;
+	    } catch (Exception e) {
+	    	rollbackTransaction(trans);
+	        throw new MiddlewareQueryException("error in addTerm " + e.getMessage(), e);
+	    }
 	}
 	
 }
