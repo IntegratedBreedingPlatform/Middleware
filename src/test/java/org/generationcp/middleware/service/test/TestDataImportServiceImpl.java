@@ -18,6 +18,7 @@ import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.ServiceFactory;
 import org.generationcp.middleware.service.api.DataImportService;
+import org.generationcp.middleware.utils.test.TestNurseryWorkbookUtil;
 import org.generationcp.middleware.utils.test.TestWorkbookUtil;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -67,6 +68,14 @@ public class TestDataImportServiceImpl {
 		System.out.println("Created study:" + id);
 		
 //		studyManager.getStudy(id);
+	}
+	
+	@Test
+	public void testSaveNurseryDataset() throws MiddlewareQueryException{
+		Workbook workbook = TestNurseryWorkbookUtil.getTestWorkbook();
+		workbook.print(0);
+		int id = dataImportService.saveDataset(workbook);
+		System.out.println("Created study:" + id);
 	}
 	
 	@After

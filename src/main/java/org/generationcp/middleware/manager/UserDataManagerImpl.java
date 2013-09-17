@@ -14,6 +14,7 @@ package org.generationcp.middleware.manager;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -97,17 +98,20 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
         try {
             trans = session.beginTransaction();
             UserDAO dao = getUserDao();
+            
+            Integer userId = GenericDAO.getLastId(getActiveSession(), Database.CENTRAL, "users", "userid");
+            user.setUserid(userId == null ? 1 : userId + 1);
 
             User recordSaved = dao.saveOrUpdate(user);
             idUserSaved = recordSaved.getUserid();
 
             trans.commit();
+            
+            session.flush();
         } catch (Exception e) {
             rollbackTransaction(trans);
             logAndThrowException("Error encountered while saving User to central database: UserDataManager.addUserToCentral(user=" + user + "): " + e.getMessage(), e,
                     LOG);
-        } finally {
-            session.flush();
         }
 
         return idUserSaved;
@@ -211,18 +215,22 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager{
         try {
             trans = session.beginTransaction();
             PersonDAO dao = getPersonDao();
+            
+            Integer personId = GenericDAO.getLastId(getActiveSession(), Database.CENTRAL, "persons", "personid");
+            person.setId(personId == null ? 1 : personId + 1);
 
             Person recordSaved = dao.saveOrUpdate(person);
             idPersonSaved = recordSaved.getId();
 
             trans.commit();
+            
+            session.flush();
         } catch (Exception e) {
             rollbackTransaction(trans);
             logAndThrowException(
                     "Error encountered while saving Person to central database: UserDataManager.addPersonToCentral(person=" + person + "): " + e.getMessage(), e, LOG);
-        } finally {
-            session.flush();
         }
+        
         return idPersonSaved;
     }
 

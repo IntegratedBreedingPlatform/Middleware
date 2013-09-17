@@ -21,6 +21,7 @@ import org.generationcp.middleware.manager.Database;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.LockOptions;
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
@@ -241,5 +242,19 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 
     public void clear() {
         getSession().clear();
+    }
+    
+    public void setStartAndNumOfRows(Query query,int start, int numOfRows) {
+    	if(numOfRows>0) {
+        	query.setFirstResult(start);
+            query.setMaxResults(numOfRows);	
+        }
+    }
+    
+    public void setStartAndNumOfRows(Criteria criteria,int start, int numOfRows) {
+    	if(numOfRows>0) {
+        	criteria.setFirstResult(start);
+            criteria.setMaxResults(numOfRows);	
+        }
     }
 }

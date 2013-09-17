@@ -23,7 +23,7 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.StudyType;
 
-public class TestWorkbookUtil {
+public class TestNurseryWorkbookUtil {
 	
 	//PROPERTIES
 	public static final String PERSON = "PERSON";
@@ -131,14 +131,14 @@ public class TestWorkbookUtil {
 	
 	private static void createStudyDetails() {
 		StudyDetails details = new StudyDetails();
-		details.setStudyName("pheno_t7" + new Random().nextInt(10000));
-		details.setTitle("Phenotyping trials of the Population 114");
+		details.setStudyName("nursery_" + new Random().nextInt(10000));
+		details.setTitle("Nursery Workbook");
 		details.setPmKey("0");
 		details.setObjective("To evaluate the Population 114");
 		details.setStartDate("20130805");
 		details.setEndDate("20130805");
 		details.setParentFolderId(1);
-		details.setStudyType(StudyType.T);
+		details.setStudyType(StudyType.N);
 		
 		workbook.setStudyDetails(details);
 	}
@@ -153,8 +153,8 @@ public class TestWorkbookUtil {
 		conditions.add(new MeasurementVariable("PI ID", "ID of Principal Investigator", 
 				DBID, ASSIGNED, PERSON, NUMERIC, "", STUDY));		
 		
-		conditions.add(new MeasurementVariable("TRIAL", "TRIAL NUMBER", 
-				NUMBER, ENUMERATED, TRIAL_INSTANCE, NUMERIC, "1", TRIAL));
+		//conditions.add(new MeasurementVariable("TRIAL", "TRIAL NUMBER", 
+		//		NUMBER, ENUMERATED, TRIAL_INSTANCE, NUMERIC, "1", TRIAL));
 		
 //		conditions.add(new MeasurementVariable("COOPERATOR", "COOPERATOR NAME", 
 //				DBCV, CONDUCTED, PERSON, CHAR, "", TRIAL));		
@@ -235,8 +235,8 @@ public class TestWorkbookUtil {
 		
 		variates.add(new MeasurementVariable(VARIATE1, "Grain yield -dry and weigh (kg/ha)", 
 				KG_HA, "Dry and weigh", "Yield", NUMERIC, STUDY, STUDY));		
-		variates.add(new MeasurementVariable(VARIATE2, "Chalkiness of endosperm - Cervitec (percent)", 
-				"Average of Median Percentage", "Cervitec", "Chalkiness of endosperm", NUMERIC, STUDY, STUDY));	
+		//variates.add(new MeasurementVariable(VARIATE2, "Chalkiness of endosperm - Cervitec (percent)", 
+		//		"Average of Median Percentage", "Cervitec", "Chalkiness of endosperm", NUMERIC, STUDY, STUDY));	
 //		variates.add(new MeasurementVariable(VARIATE2, "(formerly RDTG) Grain Yield", 
 //				KG_HA, NOT_SPECIFIED, GRAIN_YIELD, NUMERIC, STUDY, STUDY));		
 //		
@@ -292,7 +292,7 @@ public class TestWorkbookUtil {
 //			dataList.add(new MeasurementData(ROW, String.valueOf(37+i)));
 //			dataList.add(new MeasurementData(COL, "1"));
 			dataList.add(new MeasurementData(VARIATE1, randomizeValue(random, fmt, 5000)));
-			dataList.add(new MeasurementData(VARIATE2, randomizeValue(random, fmt, 100)));
+			//dataList.add(new MeasurementData(VARIATE2, randomizeValue(random, fmt, 100)));
 			
 			row.setDataList(dataList);
 			observations.add(row);

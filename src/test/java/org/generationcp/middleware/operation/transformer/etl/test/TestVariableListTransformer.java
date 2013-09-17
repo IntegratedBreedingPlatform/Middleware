@@ -13,6 +13,7 @@ import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.transformer.etl.VariableListTransformer;
 import org.junit.After;
@@ -153,7 +154,7 @@ public class TestVariableListTransformer {
 			case 2: return studyDetails.getTitle();	
 			case 3: return studyDetails.getPmKey();
 			case 4: return studyDetails.getObjective();
-			case 5: return studyDetails.getStudyType();
+			case 5: return Integer.toString(studyDetails.getStudyType().getId());
 			case 6: return studyDetails.getStartDate();
 			case 7: return studyDetails.getEndDate();
 		}
@@ -246,7 +247,7 @@ public class TestVariableListTransformer {
 		studyDetails.setTitle("Study title");
 		studyDetails.setPmKey("123");
 		studyDetails.setObjective("Test transformer");
-		studyDetails.setStudyType("RYT");
+		studyDetails.setStudyType(StudyType.T);
 		studyDetails.setStartDate("20000101");
 		studyDetails.setEndDate("20000130");
 		return studyDetails;
