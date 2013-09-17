@@ -21,6 +21,7 @@ import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.domain.oms.StudyType;
 
 public class TestWorkbookUtil {
 	
@@ -137,7 +138,7 @@ public class TestWorkbookUtil {
 		details.setStartDate("20130805");
 		details.setEndDate("20130805");
 		details.setParentFolderId(1);
-		details.setStudyType("10010");
+		details.setStudyType(StudyType.T);
 		
 		workbook.setStudyDetails(details);
 	}
