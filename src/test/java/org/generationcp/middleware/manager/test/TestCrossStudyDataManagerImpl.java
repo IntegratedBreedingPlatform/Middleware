@@ -13,6 +13,8 @@
 package org.generationcp.middleware.manager.test;
 
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -181,14 +183,60 @@ public class TestCrossStudyDataManagerImpl {
         List<Integer> traitIds = Arrays.asList(22564, 22073, 21735, 20848, 18000);
         List<Integer> environmentIds = Arrays.asList(5770, 10085, 5748, -1, -6);
 
-        List<Observation> result = manager.getObservationsForTraits(traitIds, environmentIds);
+        /*List<Observation> result = manager.getObservationsForTraits(traitIds, environmentIds);
        
         System.out.println("testGetObservationsForTraits(): " + result.size());
         for (Observation observation : result) {
             observation.print(4);
         }
         System.out.println("testGetObservationsForTraits(): " + result.size());
+        */
+        
+        //new
+        List<Observation> result1 = new ArrayList<Observation>();
+        List<Observation> result = manager.getObservationsForTraits(traitIds, environmentIds,0,2);
+        System.out.println("new testGetObservationsForTraits(): " + result.size());
+        for (Observation observation : result) {
+            observation.print(4);
+        }
+        result1.addAll(result);
+        
+        result = manager.getObservationsForTraits(traitIds, environmentIds,2,2);
+        System.out.println("new testGetObservationsForTraits(): " + result.size());
+        for (Observation observation : result) {
+            observation.print(4);
+        }
+        result1.addAll(result);
+        
+        result = manager.getObservationsForTraits(traitIds, environmentIds,0,4);
+        System.out.println("new testGetObservationsForTraits(): " + result.size());
+        for (Observation observation : result) {
+            observation.print(4);
+        }
+        //compare combination of first 2 and new 4 observations 
+        assertEquals(result1, result);
+        
+        result = manager.getObservationsForTraits(traitIds, environmentIds,299,2);
+        System.out.println("new testGetObservationsForTraits(): " + result.size());
+        //should return 2 records from local given there are 299 central records
+        assertEquals(2, result.size());
+        for (Observation observation : result) {
+            observation.print(4);
+        }
+        //compare with old
+        List<Observation> oldResult = manager.getObservationsForTraits(traitIds, environmentIds);
+        System.out.println("RESULT SIZE of old testGetObservationsForTraits(): " + oldResult.size());
+        //get last 2 (should be from local)
+        oldResult = oldResult.subList(oldResult.size()-2, oldResult.size());
+        System.out.println("Size: " + oldResult.size());
+        assertEquals(2, oldResult.size());
+        for (Observation observation : oldResult) {
+            observation.print(4);
+        }
     }
+
+    
+    
     
 	@Test
     public void testGetObservationsForTrait() throws Exception {

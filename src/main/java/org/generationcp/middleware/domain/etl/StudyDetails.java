@@ -11,8 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.etl;
 
-import org.apache.commons.lang3.math.NumberUtils;
-import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.util.Debug;
 
 public class StudyDetails {
@@ -29,7 +28,7 @@ public class StudyDetails {
 	
 	private String endDate;
 	
-	private String studyType;
+	private StudyType studyType;
 	
 	private long parentFolderId;
 
@@ -38,7 +37,7 @@ public class StudyDetails {
 	}
 	
 	public StudyDetails(String studyName, String title, String pmKey,
-			String objective, String startDate, String endDate, String studyType, long parentFolderId) {
+			String objective, String startDate, String endDate, StudyType studyType, long parentFolderId) {
 		this.studyName = studyName;
 		this.title = title;
 		this.pmKey = pmKey;
@@ -97,11 +96,11 @@ public class StudyDetails {
 		this.endDate = endDate;
 	}
 
-	public String getStudyType() {
+	public StudyType getStudyType() {
 		return studyType;
 	}
 
-	public void setStudyType(String studyType) {
+	public void setStudyType(StudyType studyType) {
 		this.studyType = studyType;
 	}
 
@@ -114,8 +113,8 @@ public class StudyDetails {
 	}
 	
 	public boolean isNursery() {
-		if (this.studyType != null && NumberUtils.isDigits(this.studyType)) {
-			return TermId.NURSERY.getId() == Integer.valueOf(this.studyType);
+		if (this.studyType != null && this.studyType==StudyType.N) {
+			return true;
 		}
 		return false;
 	}
