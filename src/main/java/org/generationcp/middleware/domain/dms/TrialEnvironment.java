@@ -68,6 +68,10 @@ public class TrialEnvironment {
         return traits;
     }
     
+	public void setLocation(LocationDto location) {
+		this.location = location;
+	}
+
 	public LocationDto getLocation() {
 		return location;
 	}

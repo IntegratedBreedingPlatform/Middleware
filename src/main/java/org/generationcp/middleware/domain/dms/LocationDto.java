@@ -12,6 +12,11 @@ public class LocationDto {
 	
 	private String countryName;
 	
+	public LocationDto(Integer id, String locationName) {
+		this.id = id;
+		this.locationName = locationName;
+	}
+
 	public LocationDto(Integer id, String locationName, String provinceName, String countryName) {
 		this.id = id;
 		this.locationName = locationName;

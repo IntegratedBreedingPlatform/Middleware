@@ -24,6 +24,7 @@ import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CategoricalValue;
 import org.generationcp.middleware.domain.h2h.TraitInfo;
+import org.generationcp.middleware.domain.h2h.TraitType;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -179,7 +180,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
                   + "    AND cvt_categorical.cvterm_id in (:traitIds) "
                   );
           query.setParameterList("traitIds", traitIds);
-    
+
           List<Object[]> list = query.list();
     
           Map<Integer, String> valueIdName = new HashMap<Integer, String>();
@@ -255,18 +256,17 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
         try{
         
             StringBuilder sql = new StringBuilder()
-            .append("SELECT cvt.cvterm_id, cvt.name, cvt.definition,  c_scale.name, cr_type.object_id ")
+            .append("SELECT cvt.cvterm_id, cvt.name, cvt.definition,  c_scale.scaleName, cr_type.object_id ")
             .append("FROM cvterm cvt ") 
             .append("	INNER JOIN cvterm_relationship cr_scale ON cvt.cvterm_id = cr_scale.subject_id ")
-            .append("   INNER JOIN  cvterm c_scale ON c_scale.cvterm_id = cr_scale.object_id ") 
+            .append("   INNER JOIN (SELECT cvterm_id, scaleName FROM cvterm) c_scale ON c_scale.cvterm_id = cr_scale.object_id ") 
             .append("        AND cr_scale.type_id = ").append(TermId.HAS_SCALE.getId()).append(" ")
             .append("	INNER JOIN cvterm_relationship cr_type ON cr_type.subject_id = cr_scale.subject_id ")
             .append("		AND cr_type.type_id = ").append(TermId.HAS_TYPE.getId()).append(" ")
-            .append("WHERE cvt.cvterm_id in (@traitIds) ")
+            .append("WHERE cvt.cvterm_id in (:traitIds) ")
             ;
-
+            
             SQLQuery query = getSession().createSQLQuery(sql.toString());
-
             query.setParameterList("traitIds", traitIds);
             
             List<Object[]> list = query.list();

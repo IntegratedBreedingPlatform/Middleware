@@ -568,21 +568,22 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
             environmentDetails.add(environment);
         }
 
-		StringBuilder sql = new StringBuilder()
-				.append("SELECT DISTINCT e.nd_geolocation_id, p.observable_id, c.name, c.definition, c_scale.name, cr_type.object_id  ")
-				.append("FROM phenotype p ")
-				.append("	INNER JOIN nd_experiment_phenotype ep ON p.phenotype_id = ep.phenotype_id ")
-				.append("	INNER JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id ")
-				.append("				AND e.nd_geolocation_id IN (:locationIds) 	 ")
-				.append("	LEFT JOIN cvterm c ON p.observable_id = c.cvterm_id ")
-				.append("	INNER JOIN cvterm_relationship cr_scale ON c.cvterm_id = cr_scale.subject_id ")
-				.append("	INNER JOIN  cvterm c_scale ON c_scale.cvterm_id = cr_scale.object_id ")
-				.append("	    AND cr_scale.type_id = ").append(TermId.HAS_SCALE.getId()).append(" ")
-				.append("	INNER JOIN cvterm_relationship cr_type ON cr_type.subject_id = cr_scale.subject_id ")
-				.append("	    AND cr_type.type_id =  ").append(TermId.HAS_TYPE.getId()).append(" ");
 
         try {
-            Query query = getSession().createSQLQuery(sql.toString())
+    		StringBuilder sql = new StringBuilder()
+			.append("SELECT DISTINCT e.nd_geolocation_id, p.observable_id, c.name, c.definition, c_scale.scaleName, cr_type.object_id  ")
+			.append("FROM phenotype p ")
+			.append("	INNER JOIN nd_experiment_phenotype ep ON p.phenotype_id = ep.phenotype_id ")
+			.append("	INNER JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id ")
+			.append("				AND e.nd_geolocation_id IN (:locationIds) 	 ")
+			.append("	LEFT JOIN cvterm c ON p.observable_id = c.cvterm_id ")
+			.append("	INNER JOIN cvterm_relationship cr_scale ON c.cvterm_id = cr_scale.subject_id ")
+			.append("	INNER JOIN  (SELECT cvterm_id, name AS scaleName FROM cvterm) c_scale ON c_scale.cvterm_id = cr_scale.object_id ")
+			.append("	    AND cr_scale.type_id = ").append(TermId.HAS_SCALE.getId()).append(" ")
+			.append("	INNER JOIN cvterm_relationship cr_type ON cr_type.subject_id = cr_scale.subject_id ")
+			.append("	    AND cr_type.type_id =  ").append(TermId.HAS_TYPE.getId()).append(" ");
+
+    		Query query = getSession().createSQLQuery(sql.toString())
                     .setParameterList("locationIds", environmentIds);
 
             List<Object[]> result = query.list();
@@ -609,4 +610,5 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
         return environmentDetails;
     }
+
 }
