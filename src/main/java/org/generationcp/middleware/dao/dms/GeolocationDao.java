@@ -167,6 +167,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 		return properties;
 	}
 	
+	
     @SuppressWarnings("unchecked")
     public List<TrialEnvironment> getTrialEnvironmentDetails(Set<Integer> environmentIds) throws MiddlewareQueryException {
         List<TrialEnvironment> environmentDetails = new ArrayList<TrialEnvironment>();
@@ -175,40 +176,75 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
             return environmentDetails;
         }
 
-        String sql = 
-		        "SELECT DISTINCT e.nd_geolocation_id, l.lname, prov.lname, c.isoabbr, p.project_id, p.name " 
+        try{
+            
+        	// Get location name, study id and study name
+        	String sql = 
+		        "SELECT DISTINCT e.nd_geolocation_id, l.lname, l.locid, p.project_id, p.name " 
         		+ "FROM nd_experiment e "
 		        + "	INNER JOIN nd_geolocationprop gp ON e.nd_geolocation_id = gp.nd_geolocation_id " 
         		+ "						AND gp.type_id =  " + TermId.LOCATION_ID.getId() 
         		+ " 					AND e.nd_geolocation_id IN (:locationIds) " 		
 		        + "	INNER JOIN location l ON l.locid = gp.value "
-		        + "	INNER JOIN location prov ON prov.locid = l.snl1id "
-		        + "	INNER JOIN cntry c ON l.cntryid = c.cntryid "
 		        + "	INNER JOIN nd_experiment_project ep ON e.nd_experiment_id = ep.nd_experiment_id "
 		        + "	INNER JOIN project_relationship pr ON pr.subject_project_id = ep.project_id AND pr.type_id = " + TermId.BELONGS_TO_STUDY.getId() + " " 
 		        + "	INNER JOIN project p ON p.project_id = pr.object_project_id "
-		        ;        
-
-        try{
-    
+        		;
+        	
             Query query = getSession().createSQLQuery(sql)
                     .setParameterList("locationIds", environmentIds);
-    
+
+            List<Integer> locIds = new ArrayList<Integer>();
+            
             List<Object[]> result = query.list();
-    
+            
             for (Object[] row : result) {
                 Integer environmentId = (Integer) row[0];
                 String locationName = (String) row[1];
-                String provinceName = (String) row[2];
-                String countryName = (String) row[3];
-                Integer studyId = (Integer) row[4];
-                String studyName = (String) row[5];
+                Integer locId = (Integer) row[2];
+                Integer studyId = (Integer) row[3];
+                String studyName = (String) row[4];
                 
                 environmentDetails.add(new TrialEnvironment(environmentId
-                                                , new LocationDto(environmentId, locationName, provinceName, countryName)
+                                                , new LocationDto(environmentId, locationName)
                                                 , new StudyReference(studyId, studyName)));
+                locIds.add(locId);
+            }
+                
+            // Get province and country
+        	sql =
+        			"SELECT DISTINCT l.locid, prov.lname, c.isoabbr "             		
+            		+ "FROM location l "
+    		        + "	INNER JOIN location prov ON prov.locid = l.snl1id AND l.locid IN (:locIds) "
+    		        + "	INNER JOIN cntry c ON l.cntryid = c.cntryid "
+    		        ;        
+            query = getSession().createSQLQuery(sql)
+                    .setParameterList("locIds", locIds);
+        	
+            result = query.list();
+            
+
+            for (Object[] row : result) {
+                Integer locationId = (Integer) row[0];
+                String provinceName = (String) row[1];
+                String countryName = (String) row[2];
+                
+                
+                for (int j = 0, sizeJ = environmentDetails.size(); j < sizeJ; j++){
+                	Integer locId = locIds.get(j);
+                	if (locId.equals(locationId)){
+                		TrialEnvironment env = environmentDetails.get(j);
+                		LocationDto loc = env.getLocation();
+                    	loc.setProvinceName(provinceName);
+                    	loc.setCountryName(countryName);
+                    	env.setLocation(loc);
+                    	environmentDetails.set(j, env);
+                    	break;
+                	}
+                }
                 
             }
+
         } catch(HibernateException e) {
             logAndThrowException("Error at getTrialEnvironmentDetails=" + environmentIds + " at GeolocationDao: " + e.getMessage(), e);
         }
@@ -250,5 +286,8 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 		}
 		return environments;
 	}
+    
+    
+   
  
 }
