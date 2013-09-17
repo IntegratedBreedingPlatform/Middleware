@@ -165,27 +165,32 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 			throws MiddlewareQueryException {
 		StandardVariable sv = null;
 		Integer stdVariableId = null;
+		Term termProperty, termScale, termMethod;
+		Integer propertyId = null, scaleId = null, methodId = null;
 		
-		if (setWorkingDatabase(Database.CENTRAL)) {
-			//get standardVariableid from central first 
-			stdVariableId = getCvTermDao().findStandardVariableIdByTraitScaleMethodNamesCentral(property, scale, method);
-			
-			//if not found in central, check if it exists in the local database
+		termProperty = findTermByName(property, CvId.PROPERTIES);
+		termScale = findTermByName(scale, CvId.SCALES);
+		termMethod = findTermByName(method, CvId.METHODS);
+		
+		if (termProperty != null) {
+			propertyId = termProperty.getId();
+		}
+		
+		if (termScale != null) {
+			scaleId = termScale.getId();
+		}
+		
+		if (termMethod != null) {
+			methodId = termMethod.getId();
+		}
+		
+		if (setWorkingDatabase(Database.LOCAL)) {
+			stdVariableId = getCvTermDao().getStandadardVariableIdByPropertyScaleMethod(propertyId, scaleId, methodId);
 			if (stdVariableId == null) {
-				if(setWorkingDatabase(Database.LOCAL)) {
-					
-					Integer[] cvTermIds = new Integer[3];
-					cvTermIds = getCvTermDao().getCvTermIdsByTraitScaleMethodNamesLocal(property, scale, method);
-					
-					//if standard variable is in the local database
-					if (cvTermIds != null) {
-						//check its object ids, if positive, get standard variable from central, else local
-						if (setWorkingDatabase(cvTermIds[0])) {
-							stdVariableId = getCvTermDao().getStandadardVariableIdByPropertyScaleMethod(cvTermIds[0], cvTermIds[1], cvTermIds[2]);
-						}
-					}		
+				if (setWorkingDatabase(Database.CENTRAL)) {
+					stdVariableId = getCvTermDao().getStandadardVariableIdByPropertyScaleMethod(propertyId, scaleId, methodId);
 				}
-			} 		
+			}
 		}
 		
 		if (stdVariableId != null) {

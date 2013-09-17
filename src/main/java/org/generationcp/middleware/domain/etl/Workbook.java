@@ -99,6 +99,10 @@ public class Workbook {
 		this.observations = observations;
 	}
 	
+	public boolean isNursery() {
+		return this.studyDetails.isNursery();
+	}
+	
 	public List<MeasurementVariable> getMeasurementDatasetVariables() {
 		List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
 		
@@ -136,6 +140,10 @@ public class Workbook {
 			}
 		}
 		return list;
+	}
+	
+	public List<MeasurementVariable> getTrialFactors() {
+		return getVariables(conditions, false);
 	}
 
 	@Override

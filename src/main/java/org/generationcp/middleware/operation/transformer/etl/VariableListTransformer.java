@@ -127,7 +127,8 @@ public class VariableListTransformer extends Transformer {
 					case 5: stdVariableId = TermId.STUDY_TYPE.getId();
 							localName = "TYPE";
 							localDescription = "Study type";
-							value = studyDetails.getStudyType();					     
+							value = studyDetails.getStudyType()!=null?
+									Integer.toString(studyDetails.getStudyType().getId()):null;					     
 							break; 	 	
 					case 6: stdVariableId = TermId.START_DATE.getId();
 							localName = "START";

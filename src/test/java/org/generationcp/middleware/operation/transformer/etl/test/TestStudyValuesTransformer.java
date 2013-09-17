@@ -12,6 +12,7 @@ import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.transformer.etl.StudyValuesTransformer;
 import org.junit.After;
@@ -72,7 +73,7 @@ public class TestStudyValuesTransformer {
 	
 	private StudyDetails createStudyDetailsTestData() {
 		StudyDetails studyDetails = new StudyDetails("pheno_t7", "Phenotyping trials of the Population 114", "0",
-				"To evaluate the Population 114", "20130805", "20130805", "T", 1);
+				"To evaluate the Population 114", "20130805", "20130805", StudyType.N, 1);
 		return studyDetails;
 	}
 	
