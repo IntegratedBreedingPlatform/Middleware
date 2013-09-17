@@ -94,8 +94,7 @@ public class StockModel implements Serializable {
     @Column(name="is_obsolete")
     private Boolean isObsolete;
 	
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	@JoinColumn(name="stock_id") 
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy="stockModel")
 	private Set<StockProperty> properties;
 
 	public Integer getStockId() {

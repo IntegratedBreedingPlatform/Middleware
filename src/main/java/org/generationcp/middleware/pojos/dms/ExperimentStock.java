@@ -17,6 +17,8 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -48,9 +50,9 @@ public class ExperimentStock implements Serializable {
 	/**
 	 * The Experiment object.
 	 */
-	@Basic(optional = false)
-	@Column(name = "nd_experiment_id")
-	private Integer experimentId;
+	@ManyToOne
+    @JoinColumn(name = "nd_experiment_id", nullable = false)
+	private ExperimentModel experiment;
 
 	/**
 	 * The Type object.
@@ -83,12 +85,12 @@ public class ExperimentStock implements Serializable {
 		this.typeId = typeId;
 	}
 
-	public Integer getExperimentId() {
-		return experimentId;
+	public ExperimentModel getExperiment() {
+		return experiment;
 	}
 
-	public void setExperimentId(Integer experimentId) {
-		this.experimentId = experimentId;
+	public void setExperiment(ExperimentModel experiment) {
+		this.experiment = experiment;
 	}
 
 	@Override

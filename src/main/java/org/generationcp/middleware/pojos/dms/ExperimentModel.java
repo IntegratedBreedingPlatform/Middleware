@@ -63,8 +63,7 @@ public class ExperimentModel implements Serializable {
     @Column(name="type_id")
     private Integer typeId;
     
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinColumn(name="nd_experiment_id") 
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy="experiment")
 	private List<ExperimentProperty> properties;
     
     @ManyToOne
@@ -73,8 +72,7 @@ public class ExperimentModel implements Serializable {
         inverseJoinColumns={@JoinColumn(name="project_id", insertable=false,updatable=false)})
     private DmsProject project;
     
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name="nd_experiment_id")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy="experiment")    
     private List<ExperimentStock> experimentStocks;
     
     @OneToMany(fetch = FetchType.LAZY)
@@ -87,6 +85,11 @@ public class ExperimentModel implements Serializable {
     
 
 	public ExperimentModel() {
+	}
+	
+	public ExperimentModel(Integer ndExperimentId) {
+		super();
+		this.ndExperimentId = ndExperimentId;
 	}
 
 	public ExperimentModel(Integer ndExperimentId, Geolocation geoLocation, Integer typeId) {

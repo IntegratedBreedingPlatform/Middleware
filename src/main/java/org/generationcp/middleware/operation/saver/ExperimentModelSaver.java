@@ -56,7 +56,6 @@ public class ExperimentModelSaver extends Saver {
 		}
 		ExperimentModel experimentModel = create(projectId, values, myExperimentType);
 		getExperimentDao().save(experimentModel);
-		
 		addExperimentProject(experimentModel, projectId);
 		getPhenotypeSaver().savePhenotypes(experimentModel, values.getVariableList());
 		
@@ -92,7 +91,7 @@ public class ExperimentModelSaver extends Saver {
 		}
 		if (values.getGermplasmId() != null) {
 			experimentModel.setExperimentStocks(new ArrayList<ExperimentStock>());
-			experimentModel.getExperimentStocks().add(createExperimentStock(experimentModel.getNdExperimentId(), values.getGermplasmId()));
+			experimentModel.getExperimentStocks().add(createExperimentStock(experimentModel, values.getGermplasmId()));
 		}
 		return experimentModel;
 	}
@@ -148,16 +147,15 @@ public class ExperimentModelSaver extends Saver {
 		exproj.setExperimentProjectId(getExperimentProjectDao().getNegativeId("experimentProjectId"));
 		exproj.setProjectId(projectId);
 		exproj.setExperiment(experimentModel);
-		
 		getExperimentProjectDao().save(exproj);
 	}
 	
-	private ExperimentStock createExperimentStock(int experimentModelId, int stockId) throws MiddlewareQueryException {
+	private ExperimentStock createExperimentStock(ExperimentModel experiment, int stockId) throws MiddlewareQueryException {
 		ExperimentStock experimentStock = new ExperimentStock();
 		experimentStock.setExperimentStockId(getExperimentStockDao().getNegativeId("experimentStockId"));
 		experimentStock.setTypeId(TermId.IBDB_STRUCTURE.getId());
 		experimentStock.setStockId(stockId);
-		experimentStock.setExperimentId(experimentModelId);
+		experimentStock.setExperiment(experiment);
 		
 		return experimentStock;
 	}
