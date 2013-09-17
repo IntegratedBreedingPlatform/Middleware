@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.etl;
 
+import org.apache.commons.lang3.math.NumberUtils;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Debug;
 
 public class StudyDetails {
@@ -109,6 +111,13 @@ public class StudyDetails {
 
 	public void setParentFolderId(long parentFolderId) {
 		this.parentFolderId = parentFolderId;
+	}
+	
+	public boolean isNursery() {
+		if (this.studyType != null && NumberUtils.isDigits(this.studyType)) {
+			return TermId.NURSERY.getId() == Integer.valueOf(this.studyType);
+		}
+		return false;
 	}
 
 	@Override

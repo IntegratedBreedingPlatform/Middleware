@@ -25,6 +25,7 @@ import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CategoricalValue;
 import org.generationcp.middleware.domain.h2h.TraitInfo;
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.hibernate.Criteria;
@@ -253,11 +254,19 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
         
         try{
         
-            SQLQuery query = getSession().createSQLQuery(
-                    "SELECT cvterm_id, name, definition "
-                    + "FROM cvterm " 
-                    + "WHERE cvterm_id IN (:traitIds) "
-                    );
+            StringBuilder sql = new StringBuilder()
+            .append("SELECT cvt.cvterm_id, cvt.name, cvt.definition,  c_scale.name, cr_type.object_id ")
+            .append("FROM cvterm cvt ") 
+            .append("	INNER JOIN cvterm_relationship cr_scale ON cvt.cvterm_id = cr_scale.subject_id ")
+            .append("   INNER JOIN  cvterm c_scale ON c_scale.cvterm_id = cr_scale.object_id ") 
+            .append("        AND cr_scale.type_id = ").append(TermId.HAS_SCALE.getId()).append(" ")
+            .append("	INNER JOIN cvterm_relationship cr_type ON cr_type.subject_id = cr_scale.subject_id ")
+            .append("		AND cr_type.type_id = ").append(TermId.HAS_TYPE.getId()).append(" ")
+            .append("WHERE cvt.cvterm_id in (@traitIds) ")
+            ;
+
+            SQLQuery query = getSession().createSQLQuery(sql.toString());
+
             query.setParameterList("traitIds", traitIds);
             
             List<Object[]> list = query.list();
@@ -266,8 +275,10 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
                 Integer id = (Integer) row[0];
                 String name = (String) row[1];
                 String description = (String) row[2];
-                
-                traits.add(new TraitInfo(id, name, description));
+                String scaleName = (String) row[3];
+                Integer typeId = (Integer) row [4];
+                		
+                traits.add(new TraitInfo(id, name, description, scaleName, typeId));
                 
             }
 

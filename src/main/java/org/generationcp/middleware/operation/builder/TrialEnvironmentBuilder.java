@@ -286,26 +286,32 @@ public class TrialEnvironmentBuilder extends Builder {
             int gid2 = pair.getGid2();
             
             Set<Integer> g1Environments = centralGermplasmEnvironments.get(gid1);
-            g1Environments.addAll(localGermplasmEnvironments.get(gid1));
+            if (g1Environments != null) {
+            	g1Environments.addAll(localGermplasmEnvironments.get(gid1));
+            }
             Set<Integer> g2Environments = centralGermplasmEnvironments.get(gid2);
-            g2Environments.addAll(localGermplasmEnvironments.get(gid2));
+            if (g2Environments != null) {
+            	g2Environments.addAll(localGermplasmEnvironments.get(gid2));
+            }
 
             TrialEnvironments environments = new TrialEnvironments();
             
-            for (Integer env1 : g1Environments){
-                for (Integer env2 : g2Environments){
-
-                    if (env1.equals(env2)){
-                        int index = trialEnvironments.indexOf(new TrialEnvironment(env1));
-                        if (index > -1){
-                            TrialEnvironment newEnv = trialEnvironments.get(index);
-                            // If the environment has no traits, do not include in the list of common environments
-                            if (newEnv != null && newEnv.getTraits() != null && newEnv.getTraits().size() > 0){ 
-                                environments.add(newEnv);
-                            }
-                        }
-                    }
-                }
+            if (g1Environments != null && g2Environments != null){
+	            for (Integer env1 : g1Environments){
+	                for (Integer env2 : g2Environments){
+	
+	                    if (env1.equals(env2)){
+	                        int index = trialEnvironments.indexOf(new TrialEnvironment(env1));
+	                        if (index > -1){
+	                            TrialEnvironment newEnv = trialEnvironments.get(index);
+	                            // If the environment has no traits, do not include in the list of common environments
+	                            if (newEnv != null && newEnv.getTraits() != null && newEnv.getTraits().size() > 0){ 
+	                                environments.add(newEnv);
+	                            }
+	                        }
+	                    }
+	                }
+	            }
             }
             
             pair.setTrialEnvironments(environments);

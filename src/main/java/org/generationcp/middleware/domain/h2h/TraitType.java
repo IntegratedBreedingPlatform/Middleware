@@ -11,15 +11,42 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.h2h;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.generationcp.middleware.domain.oms.TermId;
+
 /**
  * The different trait info types used - NUMERIC, CHARACTER, CATEGORICAL
  *
  */
 public enum TraitType {
 
-	NUMERIC,
-	CHARACTER,
-	CATEGORICAL
-	;
+	NUMERIC(Arrays.asList(
+            TermId.NUMERIC_VARIABLE.getId(),
+            TermId.DATE_VARIABLE.getId())),
+	CHARACTER(Arrays.asList(
+            TermId.CHARACTER_VARIABLE.getId())),
+	CATEGORICAL(Arrays.asList(
+            TermId.CATEGORICAL_VARIABLE.getId()));
+
 	
+	private final List<Integer> typeIds;
+	
+	private TraitType(List<Integer> termIds) {
+		this.typeIds = termIds;
+	}
+		
+	public List<Integer> getTypeIds() {
+		return this.typeIds;
+	}
+	
+	public static TraitType valueOf(Integer typeId){
+		for (TraitType type : TraitType.values()){
+			if (type.getTypeIds().contains(typeId)){
+				return type;
+			}
+		}
+		return null;
+	}
 }

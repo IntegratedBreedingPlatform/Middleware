@@ -29,6 +29,7 @@ import org.generationcp.middleware.domain.h2h.Observation;
 import org.generationcp.middleware.domain.h2h.ObservationKey;
 import org.generationcp.middleware.domain.h2h.TraitInfo;
 import org.generationcp.middleware.domain.h2h.TraitObservation;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.hibernate.HibernateException;
@@ -522,7 +523,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			queryString.append("FROM phenotype p ");
 			queryString.append("INNER JOIN nd_experiment_phenotype eph ON eph.phenotype_id = p.phenotype_id ");
 			queryString.append("INNER JOIN nd_experiment e ON e.nd_experiment_id = eph.nd_experiment_id ");
-			queryString.append("INNER JOIN nd_geolocationprop gp ON gp.nd_geolocation_id = e.nd_geolocation_id AND gp.type_id = 8190 ");
+			queryString.append("INNER JOIN nd_geolocationprop gp ON gp.nd_geolocation_id = e.nd_geolocation_id AND gp.type_id = " + TermId.LOCATION_ID.getId() + " ");
 			queryString.append("INNER JOIN location l ON l.locid = gp.value ");
 			queryString.append("INNER JOIN nd_experiment_stock es ON es.nd_experiment_id = e.nd_experiment_id ");
 			queryString.append("INNER JOIN stock s ON s.stock_id = es.stock_id ");
@@ -567,17 +568,21 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
             environmentDetails.add(environment);
         }
 
-        String sql =
-        		"SELECT DISTINCT e.nd_geolocation_id, p.observable_id, c.name, c.definition " 
-        		+ "FROM phenotype p "
-        		+ "	INNER JOIN nd_experiment_phenotype ep ON p.phenotype_id = ep.phenotype_id "
-        		+ "	INNER JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id "
-        		+ "				AND e.nd_geolocation_id IN (:locationIds) 	 "
-        		+ "	LEFT JOIN cvterm c ON p.observable_id = c.cvterm_id "
-        		;
+		StringBuilder sql = new StringBuilder()
+				.append("SELECT DISTINCT e.nd_geolocation_id, p.observable_id, c.name, c.definition, c_scale.name, cr_type.object_id  ")
+				.append("FROM phenotype p ")
+				.append("	INNER JOIN nd_experiment_phenotype ep ON p.phenotype_id = ep.phenotype_id ")
+				.append("	INNER JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id ")
+				.append("				AND e.nd_geolocation_id IN (:locationIds) 	 ")
+				.append("	LEFT JOIN cvterm c ON p.observable_id = c.cvterm_id ")
+				.append("	INNER JOIN cvterm_relationship cr_scale ON c.cvterm_id = cr_scale.subject_id ")
+				.append("	INNER JOIN  cvterm c_scale ON c_scale.cvterm_id = cr_scale.object_id ")
+				.append("	    AND cr_scale.type_id = ").append(TermId.HAS_SCALE.getId()).append(" ")
+				.append("	INNER JOIN cvterm_relationship cr_type ON cr_type.subject_id = cr_scale.subject_id ")
+				.append("	    AND cr_type.type_id =  ").append(TermId.HAS_TYPE.getId()).append(" ");
 
         try {
-            Query query = getSession().createSQLQuery(sql)
+            Query query = getSession().createSQLQuery(sql.toString())
                     .setParameterList("locationIds", environmentIds);
 
             List<Object[]> result = query.list();
@@ -587,10 +592,12 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
                 Integer traitId = (Integer) row[1];
                 String traitName = (String) row[2];
                 String traitDescription = (String) row[3];
+                String scaleName = (String) row[4];
+                Integer typeId = (Integer) row [5];
 
                 int index = environmentDetails.indexOf(new TrialEnvironment(environmentId));
                 TrialEnvironment environment = environmentDetails.get(index);
-                environment.addTrait(new TraitInfo(traitId, traitName, traitDescription));
+                environment.addTrait(new TraitInfo(traitId, traitName, traitDescription, scaleName, typeId));
                 environmentDetails.set(index, environment);
             }
 
