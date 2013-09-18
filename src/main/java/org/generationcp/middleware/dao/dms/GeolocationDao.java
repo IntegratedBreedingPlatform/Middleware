@@ -220,8 +220,8 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
     	        		+ "						AND gp.type_id =  " + TermId.LOCATION_ID.getId() 
     	        		+ " 					AND e.nd_geolocation_id IN (:locationIds) " 		
     			        + "	INNER JOIN location l ON l.locid = gp.value "
-	    		        + "	INNER JOIN location prov ON prov.locid = l.snl1id "
-	    		        + "	INNER JOIN cntry c ON l.cntryid = c.cntryid "
+	    		        + "	LEFT JOIN location prov ON prov.locid = l.snl1id "
+	    		        + "	LEFT JOIN cntry c ON l.cntryid = c.cntryid "
 	    		        ;        
 	            query = getSession().createSQLQuery(sql)
 	                    .setParameterList("locationIds", environmentIds);
