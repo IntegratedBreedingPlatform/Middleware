@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.domain.h2h;
 
+import org.generationcp.middleware.domain.dms.TrialEnvironment;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.util.Debug;
 
@@ -105,7 +106,9 @@ public class GermplasmPair{
         builder.append(", gId2=");
         builder.append(gid2);
         builder.append(", environments=");
-        builder.append(environments);
+        for (TrialEnvironment env : environments.getTrialEnvironments()){
+        	builder.append(env.toString()).append(", ");
+        }
         builder.append("]");
         return builder.toString();
     }

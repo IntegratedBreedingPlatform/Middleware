@@ -41,38 +41,36 @@ public enum FactorType {
             TermId.TRIAL_DESIGN_INFO_STORAGE.getId()),
            Arrays.asList("PLOT"));
 
+
+    private List<Integer> factorStorages;
+    private List<String> labelList;
+    
     private FactorType(List<Integer> factorStorages, List<String> labelList) {
         this.factorStorages = factorStorages;
         this.labelList = labelList;
     }
 
-    private List<Integer> factorStorages;
-
-    public List<Integer> getFactorStorages() {
+	public List<Integer> getFactorStorages() {
         return this.factorStorages;
     }
-  
-    private List<String> labelList;
+
+	public List<String> getLabelList() {
+		return labelList;
+	}
     
     public static FactorType getFactorTypeForLabel(String label){
     	
-    	if(label.equalsIgnoreCase("STUDY")){
-    		return FactorType.STUDY;
+    	if (label != null){    		
+    		for (FactorType factorType : FactorType.values()){
+    			List<String> labelList = factorType.getLabelList();
+    			for (String factorLabel : labelList){
+    				if (factorLabel.toUpperCase().equals(label.toUpperCase())){
+    					return factorType;
+    				}
+    			}
+    		}
     	}
-    	else if(label.equalsIgnoreCase("")){
-    		return FactorType.DATASET;
-    	}
-    	else if(label.equalsIgnoreCase("TRIAL") || label.equalsIgnoreCase("OCC") || label.equalsIgnoreCase("TRIAL_NO")){
-    		return FactorType.TRIAL_ENVIRONMENT;	
-    	}
-    	else if(label.equalsIgnoreCase("ENTRY")){
-    		return FactorType.GERMPLASM;
-    	}
-    	else if(label.equalsIgnoreCase("PLOT")){
-    		return FactorType.TRIAL_DESIGN;
-    	}
-    	
-    	
+    	    	
     	return null;
     }
 }

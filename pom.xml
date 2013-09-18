@@ -128,6 +128,7 @@
 	</dependencies>
 
 	<build>
+		<pluginManagement>
 		<plugins>
 			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>
@@ -191,5 +192,6 @@
 				<version>2.8</version>
 			</plugin>
 		</plugins>
+		</pluginManagement>
 	</build>
 </project> 

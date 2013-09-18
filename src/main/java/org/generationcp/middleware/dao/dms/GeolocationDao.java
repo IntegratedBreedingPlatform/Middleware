@@ -211,38 +211,40 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
                 locIds.add(locId);
             }
                 
-            // Get province and country
-        	sql =
-        			"SELECT DISTINCT l.locid, prov.lname, c.isoabbr "             		
-            		+ "FROM location l "
-    		        + "	INNER JOIN location prov ON prov.locid = l.snl1id AND l.locid IN (:locIds) "
-    		        + "	INNER JOIN cntry c ON l.cntryid = c.cntryid "
-    		        ;        
-            query = getSession().createSQLQuery(sql)
-                    .setParameterList("locIds", locIds);
-        	
-            result = query.list();
-            
-
-            for (Object[] row : result) {
-                Integer locationId = (Integer) row[0];
-                String provinceName = (String) row[1];
-                String countryName = (String) row[2];
-                
-                
-                for (int j = 0, sizeJ = environmentDetails.size(); j < sizeJ; j++){
-                	Integer locId = locIds.get(j);
-                	if (locId.equals(locationId)){
-                		TrialEnvironment env = environmentDetails.get(j);
-                		LocationDto loc = env.getLocation();
-                    	loc.setProvinceName(provinceName);
-                    	loc.setCountryName(countryName);
-                    	env.setLocation(loc);
-                    	environmentDetails.set(j, env);
-                    	break;
-                	}
-                }
-                
+            if (locIds.size() > 0) {
+            	// Get province and country
+	        	sql =
+	        			"SELECT DISTINCT l.locid, prov.lname, c.isoabbr "             		
+	            		+ "FROM location l "
+	    		        + "	INNER JOIN location prov ON prov.locid = l.snl1id AND l.locid IN (:locIds) "
+	    		        + "	INNER JOIN cntry c ON l.cntryid = c.cntryid "
+	    		        ;        
+	            query = getSession().createSQLQuery(sql)
+	                    .setParameterList("locIds", locIds);
+	        	
+	            result = query.list();
+	            
+	
+	            for (Object[] row : result) {
+	                Integer locationId = (Integer) row[0];
+	                String provinceName = (String) row[1];
+	                String countryName = (String) row[2];
+	                
+	                
+	                for (int j = 0, sizeJ = environmentDetails.size(); j < sizeJ; j++){
+	                	Integer locId = locIds.get(j);
+	                	if (locId.equals(locationId)){
+	                		TrialEnvironment env = environmentDetails.get(j);
+	                		LocationDto loc = env.getLocation();
+	                    	loc.setProvinceName(provinceName);
+	                    	loc.setCountryName(countryName);
+	                    	env.setLocation(loc);
+	                    	environmentDetails.set(j, env);
+	                    	break;
+	                	}
+	                }
+	                
+	            }
             }
 
         } catch(HibernateException e) {

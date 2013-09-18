@@ -259,7 +259,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
             .append("SELECT cvt.cvterm_id, cvt.name, cvt.definition,  c_scale.scaleName, cr_type.object_id ")
             .append("FROM cvterm cvt ") 
             .append("	INNER JOIN cvterm_relationship cr_scale ON cvt.cvterm_id = cr_scale.subject_id ")
-            .append("   INNER JOIN (SELECT cvterm_id, scaleName FROM cvterm) c_scale ON c_scale.cvterm_id = cr_scale.object_id ") 
+            .append("   INNER JOIN (SELECT cvterm_id, name AS scaleName FROM cvterm) c_scale ON c_scale.cvterm_id = cr_scale.object_id ") 
             .append("        AND cr_scale.type_id = ").append(TermId.HAS_SCALE.getId()).append(" ")
             .append("	INNER JOIN cvterm_relationship cr_type ON cr_type.subject_id = cr_scale.subject_id ")
             .append("		AND cr_type.type_id = ").append(TermId.HAS_TYPE.getId()).append(" ")

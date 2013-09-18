@@ -966,6 +966,9 @@ public class TestGermplasmDataManagerImpl{
     }
     
     @Test
+    /* If database has no data, run testAddGermplasmAttribute first before running
+     *  this method to insert a new record
+     */
     public void testGetAttributeById() throws Exception {
     	Integer id = Integer.valueOf(-1);
         Attribute attributes = manager.getAttributeById(id);

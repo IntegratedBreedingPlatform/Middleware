@@ -16,6 +16,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 import org.generationcp.middleware.hibernate.HibernateUtil;
+import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -26,12 +27,11 @@ import org.junit.Test;
 
 public class TestNamedQueries{
 
-    private static final String CONFIG = "test-hibernate.cfg.xml";
-    private HibernateUtil hibernateUtil;
+    private static HibernateUtil hibernateUtil;
 
     @BeforeClass
-    public void setUp() throws Exception {
-        hibernateUtil = new HibernateUtil(CONFIG);
+    public static void setUp() throws Exception {
+        hibernateUtil = new HibernateUtil(new DatabaseConnectionParameters("testDatabaseConfig.properties", "central"));
     }
 
     @Test
@@ -99,7 +99,7 @@ public class TestNamedQueries{
     }
 
     @AfterClass
-    public void tearDown() throws Exception {
+    public static void tearDown() throws Exception {
         hibernateUtil.shutdown();
     }
 

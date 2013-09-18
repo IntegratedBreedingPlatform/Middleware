@@ -114,8 +114,27 @@ public class TrialEnvironment {
             return false;
         return true;
     }
+    
+    
 
-    public void print(int indent) {
+    @Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("TrialEnvironment [id=");
+		builder.append(id);
+		builder.append(", variables=");
+		builder.append(variables);
+		builder.append(", location=");
+		builder.append(location);
+		builder.append(", traits=");
+		builder.append(traits);
+		builder.append(", study=");
+		builder.append(study);
+		builder.append("]");
+		return builder.toString();
+	}
+
+	public void print(int indent) {
 		Debug.println(indent, "Trial Environment: " + id);
 		if (variables != null) {
 			variables.print(indent + 3);
