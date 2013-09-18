@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.hibernate.HibernateUtil;
+import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -24,13 +25,12 @@ import org.junit.Test;
 
 public class TestGermplasmDAO{
 
-    private static final String CONFIG = "test-hibernate.cfg.xml";
     private static HibernateUtil hibernateUtil;
     private static GermplasmDAO dao;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        hibernateUtil = new HibernateUtil(CONFIG);
+        hibernateUtil = new HibernateUtil(new DatabaseConnectionParameters("testDatabaseConfig.properties", "central"));
         dao = new GermplasmDAO();
         dao.setSession(hibernateUtil.getCurrentSession());
     }
