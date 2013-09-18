@@ -37,7 +37,7 @@ public class StandardVariableSaver extends Saver {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 
-	public void save(StandardVariable stdVar) throws MiddlewareQueryException {
+	public Integer save(StandardVariable stdVar) throws MiddlewareQueryException {
 		setWorkingDatabase(Database.LOCAL);
 		CVTerm varTerm = createCvTerm(stdVar);
 		int varId = varTerm.getCvTermId();
@@ -61,6 +61,8 @@ public class StandardVariableSaver extends Saver {
 		saveRelationship(varId, TermId.STORED_IN.getId(), stdVar.getStoredIn());
 		
 		saveEnumerations(varId, stdVar.getEnumerations());
+		
+		return stdVar.getId();
 	}
 	
 	private CVTerm createCvTerm(StandardVariable stdVar) throws MiddlewareQueryException {

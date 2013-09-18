@@ -137,6 +137,20 @@ public interface OntologyDataManager {
 	 */
 	List<Term> getAllTermsByCvId(CvId cvId) throws MiddlewareQueryException;
 	
+	/**
+	 * Returns the list of Term entries based on the given CvId filtered by start and number of records. The CvId can be CvId.PROPERTIES, CvId.METHODS, CvId.SCALES, CvId.VARIABLES.
+	 * 
+	 * 
+	 * This can be used to get all scales, all traits, all trait methods, all properties, all methods and all variables.
+	 * 
+	 * @param cvId
+	 * @param start
+	 * @param numOfRows
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	List<Term> getAllTermsByCvId(CvId cvId, int start, int numOfRows) throws MiddlewareQueryException;
+	
 	
 	/**
 	 * Returns the count of entries based on the given CvId. The CvId can be CvId.PROPERTIES, CvId.METHODS, CvId.SCALES, CvId.VARIABLES.
@@ -170,4 +184,13 @@ public interface OntologyDataManager {
 	 * @throws MiddlewareQueryException
 	 */
 	Term addTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException;
+	
+	/**
+	 * Returns the list of Term entries based on possible data types
+	 * 
+	 * @return list of data type Term objects 
+	 * @throws MiddlewareQueryException
+	 */
+	List<Term> getDataTypes() throws MiddlewareQueryException;
+	
 }

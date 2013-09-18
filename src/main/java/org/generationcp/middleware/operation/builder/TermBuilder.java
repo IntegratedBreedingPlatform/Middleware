@@ -17,6 +17,7 @@ import java.util.List;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermProperty;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
@@ -58,9 +59,13 @@ public class TermBuilder extends Builder {
 	}
 
 	public List<Term> getTermsByCvId(CvId cvId) throws MiddlewareQueryException {
+		return getTermsByCvId(cvId,0,0);
+	}
+	
+	public List<Term> getTermsByCvId(CvId cvId,int start, int numOfRows) throws MiddlewareQueryException {
 		List<Term> terms = new ArrayList<Term>();		
 		if (setWorkingDatabase(cvId.getId())) {
-			List<CVTerm> cvTerms = getCvTermDao().getTermsByCvId(cvId);
+			List<CVTerm> cvTerms = getCvTermDao().getTermsByCvId(cvId,start,numOfRows);
 			for (CVTerm cvTerm : cvTerms){
 				terms.add(mapCVTermToTerm(cvTerm));
 			}
@@ -93,5 +98,28 @@ public class TermBuilder extends Builder {
 			term.setVocabularyId(cvTerm.getCv());
 		}
 		return term;
+	}
+	
+	public List<Term> getTermsByIds(List<Integer> ids) throws MiddlewareQueryException {
+		List<Term> terms = null;
+		if (setWorkingDatabase(Database.CENTRAL)) {
+			List<CVTerm> cvTerms = getCvTermDao().getByIds(ids);
+			if(cvTerms!=null) {
+				terms = new ArrayList<Term>();
+				for (CVTerm cvTerm : cvTerms) {
+					Term term = mapCVTermToTerm(cvTerm);
+					terms.add(term);
+				}
+			}
+		}
+		return terms;
+	}
+
+	public Term findOrSaveTermByName(String name, CvId cv) throws MiddlewareQueryException, MiddlewareException {
+		Term term = findTermByName(name, cv);
+        if (term == null) {
+        	term = getTermSaver().save(name, name, CvId.METHODS);
+        }
+        return term;
 	}
 }
