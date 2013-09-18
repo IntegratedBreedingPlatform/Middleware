@@ -289,7 +289,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
         return traits;
     }
 	
-	public Integer getStandadardVariableIdByPropertyScaleMethod(Integer propertyId, Integer scaleId, Integer methodId)
+	public Integer getStandadardVariableIdByPropertyScaleMethod(Integer propertyId, Integer scaleId, Integer methodId, String sortOrder)
 			throws MiddlewareQueryException {
 		try {
 			StringBuilder queryString = new StringBuilder();
@@ -298,7 +298,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			queryString.append("INNER JOIN cvterm_relationship cvrp ON cvr.subject_id = cvrp.subject_id AND cvrp.type_id = 1200 ");
 			queryString.append("INNER JOIN cvterm_relationship cvrs ON cvr.subject_id = cvrs.subject_id AND cvrs.type_id = 1220 ");
 			queryString.append("INNER JOIN cvterm_relationship cvrm ON cvr.subject_id = cvrm.subject_id AND cvrm.type_id = 1210 ");
-			queryString.append("WHERE cvrp.object_id = :propertyId AND cvrs.object_id = :scaleId AND cvrm.object_id = :methodId LIMIT 0,1");
+			queryString.append("WHERE cvrp.object_id = :propertyId AND cvrs.object_id = :scaleId AND cvrm.object_id = :methodId ");
+			queryString.append("ORDER BY cvr.subject_id ").append(sortOrder).append(" LIMIT 0,1");
 			
 			SQLQuery query = getSession().createSQLQuery(queryString.toString());
 			query.setParameter("propertyId", propertyId);
