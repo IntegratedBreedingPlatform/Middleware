@@ -200,7 +200,7 @@ public class ExperimentBuilder extends Builder {
 	private void addGermplasmFactors(VariableList factors, ExperimentModel experimentModel, VariableTypeList variableTypes) throws MiddlewareQueryException {
 		List<ExperimentStock> experimentStocks = experimentModel.getExperimentStocks();
 		if (experimentStocks != null && experimentStocks.size() == 1) {
-			StockModel stockModel = getStockBuilder().get(experimentStocks.get(0).getStockId());
+			StockModel stockModel = getStockBuilder().get(experimentStocks.get(0).getStock().getStockId());
 			for (VariableType variableType : variableTypes.getVariableTypes()) {
 				if (isGermplasmFactor(variableType)) {
 					factors.add(createGermplasmFactor(stockModel, variableType));
