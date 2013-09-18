@@ -75,8 +75,8 @@ public class TestGenotypicDataManagerImpl{
 
     @BeforeClass
     public static void setUp() throws Exception {
-        DatabaseConnectionParameters local = new DatabaseConnectionParameters("testDatabaseConfig.properties", "local");
-        DatabaseConnectionParameters central = new DatabaseConnectionParameters("testDatabaseConfig.properties", "central");
+        DatabaseConnectionParameters local = new DatabaseConnectionParameters("testDatabaseConfig.properties", "localgroundnut");
+        DatabaseConnectionParameters central = new DatabaseConnectionParameters("testDatabaseConfig.properties", "centralgroundnut");
         factory = new ManagerFactory(local, central);
         manager = factory.getGenotypicDataManager();
     }

@@ -95,7 +95,28 @@ public class ExperimentProjectDao extends GenericDAO<ExperimentProject, Integer>
 				lists.add(termId.getId());
 			}
 			
-			Query q = getSession().createQuery("from ExperimentProject as ep where ep.projectId =:p_id and ep.experiment.typeId in (:type_ids)")
+			StringBuilder queryString = new StringBuilder();
+			queryString.append("select distinct ep from ExperimentProject as ep ");
+			queryString.append("inner join ep.experiment as exp ");
+			queryString.append("left outer join exp.properties as plot with plot.typeId IN (8200,8380) ");
+			queryString.append("left outer join exp.properties as rep with rep.typeId = 8210 ");
+			queryString.append("left outer join exp.experimentStocks as es ");
+			queryString.append("left outer join es.stock as st ");
+			queryString.append("where ep.projectId =:p_id and ep.experiment.typeId in (:type_ids) ");
+			queryString.append("order by ep.experiment.geoLocation.description ASC, ");
+			queryString.append("plot.value ASC, ");
+			queryString.append("rep.value ASC, ");
+			queryString.append("st.uniqueName ASC, ");
+			
+			if(projectId < 0){
+				queryString.append("ep.experiment.ndExperimentId DESC");
+			}
+			else{
+				queryString.append("ep.experiment.ndExperimentId ASC");
+			}
+
+			//Query q = getSession().createQuery("from ExperimentProject as ep where ep.projectId =:p_id and ep.experiment.typeId in (:type_ids)")
+			Query q = getSession().createQuery(queryString.toString())
 					.setParameter("p_id",projectId)
 					.setParameterList("type_ids",lists)
 					.setMaxResults(numOfRows)
