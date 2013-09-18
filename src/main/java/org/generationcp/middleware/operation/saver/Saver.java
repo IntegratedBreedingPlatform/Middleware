@@ -13,6 +13,7 @@ package org.generationcp.middleware.operation.saver;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
+import org.generationcp.middleware.operation.builder.StockModelBuilder;
 import org.generationcp.middleware.operation.builder.VariableTypeBuilder;
 import org.generationcp.middleware.operation.transformer.etl.DatasetValuesTransformer;
 import org.generationcp.middleware.operation.transformer.etl.ExperimentValuesTransformer;
@@ -99,5 +100,9 @@ public abstract class Saver extends DatabaseBroker{
 	
 	protected final VariableTypeBuilder getVariableTypeBuilder() {
 		return new VariableTypeBuilder(sessionProviderForLocal, sessionProviderForCentral);
+	}
+	
+	protected final StockModelBuilder getStockModelBuilder() {
+		return new StockModelBuilder(sessionProviderForLocal, sessionProviderForCentral);
 	}
 }

@@ -154,7 +154,7 @@ public class ExperimentModelSaver extends Saver {
 		ExperimentStock experimentStock = new ExperimentStock();
 		experimentStock.setExperimentStockId(getExperimentStockDao().getNegativeId("experimentStockId"));
 		experimentStock.setTypeId(TermId.IBDB_STRUCTURE.getId());
-		experimentStock.setStockId(stockId);
+		experimentStock.setStock(this.getStockModelBuilder().get(stockId));
 		experimentStock.setExperiment(experiment);
 		
 		return experimentStock;
