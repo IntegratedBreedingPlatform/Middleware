@@ -58,9 +58,13 @@ public class TermBuilder extends Builder {
 	}
 
 	public List<Term> getTermsByCvId(CvId cvId) throws MiddlewareQueryException {
+		return getTermsByCvId(cvId,0,0);
+	}
+	
+	public List<Term> getTermsByCvId(CvId cvId,int start, int numOfRows) throws MiddlewareQueryException {
 		List<Term> terms = new ArrayList<Term>();		
 		if (setWorkingDatabase(cvId.getId())) {
-			List<CVTerm> cvTerms = getCvTermDao().getTermsByCvId(cvId);
+			List<CVTerm> cvTerms = getCvTermDao().getTermsByCvId(cvId,start,numOfRows);
 			for (CVTerm cvTerm : cvTerms){
 				terms.add(mapCVTermToTerm(cvTerm));
 			}

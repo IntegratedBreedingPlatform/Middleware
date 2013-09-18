@@ -204,6 +204,11 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	public List<Term> getAllTermsByCvId(CvId cvId) throws MiddlewareQueryException {
 		return getTermBuilder().getTermsByCvId(cvId);
 	}
+	
+	@Override
+	public List<Term> getAllTermsByCvId(CvId cvId, int start, int numOfRows) throws MiddlewareQueryException {
+		return getTermBuilder().getTermsByCvId(cvId,start,numOfRows);
+	}
 
 	@Override
 	public long countTermsByCvId(CvId cvId) throws MiddlewareQueryException {

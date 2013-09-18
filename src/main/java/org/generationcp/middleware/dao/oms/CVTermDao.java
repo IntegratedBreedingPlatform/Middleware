@@ -318,7 +318,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	}
 	
 
-	public List<CVTerm> getTermsByCvId(CvId cvId) throws MiddlewareQueryException{
+	public List<CVTerm> getTermsByCvId(CvId cvId,int start,int numOfRows) throws MiddlewareQueryException{
 		List<CVTerm> terms = new ArrayList<CVTerm>();
 		
         try{
@@ -327,9 +327,10 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
                     "SELECT cvterm_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype "
                     + "FROM cvterm " 
                     + "WHERE cv_id = :cvId "
+                    + "ORDER BY cvterm_id, name "
                     );
             query.setParameter("cvId", cvId.getId());
-            
+            setStartAndNumOfRows(query, start, numOfRows);
 			List<Object[]> list = query.list();
             for (Object[] row : list) {
             	Integer termId = (Integer) row[0];
