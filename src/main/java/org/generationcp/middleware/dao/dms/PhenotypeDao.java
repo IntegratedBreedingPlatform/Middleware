@@ -423,7 +423,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
               
     
     public long countObservationForTraits(List<Observation> observations) throws MiddlewareQueryException {
-
+    	if(observations==null || observations.isEmpty()) {
+        	return 0;
+        }
         StringBuilder sb = new StringBuilder("SELECT COUNT(DISTINCT p.observable_id, s.dbxref_id, e.nd_geolocation_id, p.value) ");
     	sb.append("FROM nd_experiment e ");
     	sb.append("INNER JOIN nd_experiment_stock es ON e.nd_experiment_id = es.nd_experiment_id "); 
@@ -461,6 +463,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
         Set<Integer> traitIds = new HashSet<Integer>();
         Set<Integer> environmentIds = new HashSet<Integer>();
+        if(observations==null || observations.isEmpty()) {
+        	return null;
+        }
         for (int i = 0; i<observations.size(); i++){
             ObservationKey key = observations.get(i).getId();
             traitIds.add(key.getTraitId());
