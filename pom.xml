@@ -134,17 +134,17 @@
 				<version>1.7</version>
 				<executions>
 					<execution>
-						<phase>verify</phase>
+						<phase>compile</phase>
 						<configuration>
 							<tasks>
-								<copy todir="src/main/resources">
-									<fileset dir="pipeline/config/ci" id="fromDir">
+								<copy todir="src/main/resources" overwrite="true">
+									<fileset dir="pipeline/config/rebecca" id="fromDir">
 										<include name="IBPDatasource.properties" />
 										<include name="workbench.properties" />
 									</fileset>
 								</copy>
-								<copy todir="src/test/resources">
-									<fileset dir="pipeline/config/ci" id="fromDir">
+								<copy todir="src/test/resources" overwrite="true">
+									<fileset dir="pipeline/config/rebecca" id="fromDir">
 										<include name="test-hibernate.cfg.xml" />
 										<include name="testDatabaseConfig.properties" />
 									</fileset>
