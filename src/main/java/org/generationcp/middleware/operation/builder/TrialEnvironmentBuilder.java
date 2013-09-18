@@ -217,6 +217,7 @@ public class TrialEnvironmentBuilder extends Builder {
             }
         }
         
+        
         // GET DETAILS FROM CENTRAL
         setWorkingDatabase(Database.CENTRAL);
         
@@ -258,6 +259,7 @@ public class TrialEnvironmentBuilder extends Builder {
         }
         
         if (traitIds.size() > 0){
+            setWorkingDatabase(Database.CENTRAL);
             List<TraitInfo> localTraitDetails = getCvTermDao().getTraitInfo(traitIds);
     
             for (TrialEnvironment env : localTrialEnvironments){
@@ -288,10 +290,14 @@ public class TrialEnvironmentBuilder extends Builder {
             Set<Integer> g1Environments = centralGermplasmEnvironments.get(gid1);
             if (g1Environments != null) {
             	g1Environments.addAll(localGermplasmEnvironments.get(gid1));
+            } else {
+            	g1Environments = localGermplasmEnvironments.get(gid1);
             }
             Set<Integer> g2Environments = centralGermplasmEnvironments.get(gid2);
             if (g2Environments != null) {
             	g2Environments.addAll(localGermplasmEnvironments.get(gid2));
+            } else {
+            	g2Environments = localGermplasmEnvironments.get(gid2);
             }
 
             TrialEnvironments environments = new TrialEnvironments();

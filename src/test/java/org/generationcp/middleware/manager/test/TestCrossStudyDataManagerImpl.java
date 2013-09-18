@@ -139,26 +139,24 @@ public class TestCrossStudyDataManagerImpl {
     public void testGetEnvironmentsForGermplasmPairs() throws Exception {
     	
         List<GermplasmPair> pairs = new ArrayList<GermplasmPair>();
-        
-//        List<Integer> centralGids = Arrays.asList(462831, 777109, 462816, 462746, 437703, 437768);
-//        List<Integer> localGids = Arrays.asList(1000, -1, -2);
-//        pairs.add(new GermplasmPair(centralGids.get(0), centralGids.get(1)));
-//        pairs.add(new GermplasmPair(localGids.get(0), centralGids.get(1)));
-//        pairs.add(new GermplasmPair(centralGids.get(0), centralGids.get(2)));
-//        pairs.add(new GermplasmPair(centralGids.get(1), centralGids.get(3)));
-//        pairs.add(new GermplasmPair(centralGids.get(1), centralGids.get(4)));
-//        pairs.add(new GermplasmPair(centralGids.get(2), centralGids.get(3)));
-//        pairs.add(new GermplasmPair(centralGids.get(2), centralGids.get(4)));
-//        pairs.add(new GermplasmPair(centralGids.get(2), centralGids.get(5)));
-//        pairs.add(new GermplasmPair(localGids.get(1), localGids.get(2)));
 
+        // Case 1: Central - Central
         pairs.add(new GermplasmPair(2434138, 1356114));
+        //pairs.add(new GermplasmPair(1317670, 383601));
+        
+        
+        // Case 2: Local - Local
+        pairs.add(new GermplasmPair(-1, -2));
+        
+        // Case 3: Central - Local
+        
         
         List<GermplasmPair> result = manager.getEnvironmentsForGermplasmPairs(pairs);
        
         System.out.println("testGetEnvironmentsForGermplasmPairs(): " + result.size());
         for (GermplasmPair pair : result) {
-            pair.print(4);
+        	//pair.print(4);
+            System.out.println(pair.toString());
         }
         System.out.println("testGetEnvironmentsForGermplasmPairs(): " + result.size());
     }
