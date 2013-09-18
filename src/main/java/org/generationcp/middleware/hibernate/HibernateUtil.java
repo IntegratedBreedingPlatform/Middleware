@@ -13,10 +13,13 @@
 package org.generationcp.middleware.hibernate;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.Serializable;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.generationcp.middleware.exceptions.ConfigException;
+import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.util.ResourceFinder;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -124,6 +127,39 @@ public class HibernateUtil implements Serializable{
         } catch (FileNotFoundException ex) {
             throw new ConfigException(ex.getMessage());
         }
+    }
+    
+    /**
+     * Creates a SessionFactory which connects to the database given the DatabaseConnectionParameters object. 
+     * The host, port, databasename, username and password fields will be used as connection parameters.
+     * 
+     * 
+     * 
+     * @param propertyFilename
+     * @param key 
+     * @throws ConfigException
+     * @throws HibernateException
+     * @throws IOException 
+     * @throws URISyntaxException 
+     * @throws FileNotFoundException 
+     */
+    public HibernateUtil(DatabaseConnectionParameters connectionParams) throws ConfigException,
+            HibernateException, FileNotFoundException, URISyntaxException, IOException {
+        this(MIDDLEWARE_INTERNAL_HIBERNATE_CFG, connectionParams);
+    }
+    
+    /**
+     * Creates a SessionFactory which connects to the database given the DatabaseConnectionParameters object. 
+     * The host, port, databasename, username and password fields will be used as connection parameters.
+     * 
+     * @param hibernateCfgFilename
+     * @param connectionParams
+     * @throws ConfigException
+     * @throws HibernateException
+     */
+    public HibernateUtil(String hibernateCfgFilename, DatabaseConnectionParameters connectionParams) throws ConfigException,
+            HibernateException {
+        this(hibernateCfgFilename, "jdbc:mysql://" + connectionParams.getHost() + ":" + connectionParams.getPort() + "/" + connectionParams.getDbName(), connectionParams.getUsername(), connectionParams.getPassword());
     }
 
     /**

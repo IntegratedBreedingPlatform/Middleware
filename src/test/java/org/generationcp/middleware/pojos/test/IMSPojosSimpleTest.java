@@ -15,6 +15,7 @@ package org.generationcp.middleware.pojos.test;
 import java.util.List;
 
 import org.generationcp.middleware.hibernate.HibernateUtil;
+import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.pojos.Lot;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Transaction;
@@ -27,12 +28,11 @@ import org.junit.Test;
 
 public class IMSPojosSimpleTest{
 
-    private static final String CONFIG = "test-hibernate.cfg.xml";
     private static HibernateUtil hibernateUtil;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        hibernateUtil = new HibernateUtil(CONFIG);
+        hibernateUtil = new HibernateUtil(new DatabaseConnectionParameters("testDatabaseConfig.properties", "local"));
     }
 
     @Test

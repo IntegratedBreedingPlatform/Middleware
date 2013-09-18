@@ -15,6 +15,7 @@ package org.generationcp.middleware.pojos.gdms.test;
 import java.util.List;
 
 import org.generationcp.middleware.hibernate.HibernateUtil;
+import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.generationcp.middleware.pojos.gdms.AlleleValues;
 import org.generationcp.middleware.pojos.gdms.CharValues;
@@ -35,12 +36,11 @@ import org.junit.Test;
 @SuppressWarnings("rawtypes")
 public class PojosSimpleTest{
 
-    private static final String CONFIG = "test-hibernate.cfg.xml";
     private static HibernateUtil hibernateUtil;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        hibernateUtil = new HibernateUtil(CONFIG);
+        hibernateUtil = new HibernateUtil(new DatabaseConnectionParameters("testDatabaseConfig.properties", "central"));
     }
 
     @Test

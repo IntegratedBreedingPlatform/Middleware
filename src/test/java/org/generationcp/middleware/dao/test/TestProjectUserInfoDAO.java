@@ -15,6 +15,7 @@ package org.generationcp.middleware.dao.test;
 import org.generationcp.middleware.dao.ProjectUserInfoDAO;
 import org.generationcp.middleware.hibernate.HibernateUtil;
 
+import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.junit.After;
 import org.junit.Before;
@@ -22,13 +23,12 @@ import org.junit.Test;
 
 public class TestProjectUserInfoDAO{
 
-    private static final String CONFIG = "test-hibernate.cfg.xml";
     private HibernateUtil hibernateUtil;
     private ProjectUserInfoDAO dao;
 
     @Before
     public void setUp() throws Exception {
-        hibernateUtil = new HibernateUtil(CONFIG);
+        hibernateUtil = new HibernateUtil(new DatabaseConnectionParameters("testDatabaseConfig.properties", "workbench"));
         dao = new ProjectUserInfoDAO();
         dao.setSession(hibernateUtil.getCurrentSession());
     }
