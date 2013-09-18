@@ -115,9 +115,7 @@ public class TraitInfo  implements Comparable<TraitInfo>{
     }
 
     public TraitType getType() {
-    	//TODO set the type. return numeric for now only
-    	type = TraitType.NUMERIC;
-        return type;
+    	return type;
     }
     
 	public String getScaleName() {
