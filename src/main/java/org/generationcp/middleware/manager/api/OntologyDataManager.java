@@ -184,4 +184,13 @@ public interface OntologyDataManager {
 	 * @throws MiddlewareQueryException
 	 */
 	Term addTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException;
+	
+	/**
+	 * Returns the list of Term entries based on possible data types
+	 * 
+	 * @return list of data type Term objects 
+	 * @throws MiddlewareQueryException
+	 */
+	List<Term> getDataTypes() throws MiddlewareQueryException;
+	
 }

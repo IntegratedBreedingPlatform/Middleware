@@ -98,4 +98,19 @@ public class TermBuilder extends Builder {
 		}
 		return term;
 	}
+	
+	public List<Term> getTermsByIds(List<Integer> ids) throws MiddlewareQueryException {
+		List<Term> terms = null;
+		if (setWorkingDatabase(Database.CENTRAL)) {
+			List<CVTerm> cvTerms = getCvTermDao().getByIds(ids);
+			if(cvTerms!=null) {
+				terms = new ArrayList<Term>();
+				for (CVTerm cvTerm : cvTerms) {
+					Term term = mapCVTermToTerm(cvTerm);
+					terms.add(term);
+				}
+			}
+		}
+		return terms;
+	}
 }

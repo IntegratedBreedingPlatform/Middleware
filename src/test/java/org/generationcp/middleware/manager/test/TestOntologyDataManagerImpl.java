@@ -505,4 +505,12 @@ public class TestOntologyDataManagerImpl {
 		assertTrue(term != null);
 		term.print(0);
 	}
+	
+	@Test
+	public void testGetDataTypes() throws Exception{
+		System.out.println("testGetDataTypes:");
+		List<Term> terms = manager.getDataTypes();		
+		System.out.println("testGetDataTypes: " + terms.size());
+		printTerms(terms);
+	}
 }

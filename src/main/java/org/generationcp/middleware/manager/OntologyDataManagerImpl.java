@@ -12,6 +12,7 @@
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -215,7 +216,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		setWorkingDatabase(cvId.getId());
 		return getCvTermDao().countTermsByCvId(cvId);
     }
-    
+	@Override
 	public List<Term> getMethodsForTrait(Integer traitId)
 			throws MiddlewareQueryException {
 		List<Term> methodTerms = new ArrayList<Term>();
@@ -288,6 +289,19 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	    	rollbackTransaction(trans);
 	        throw new MiddlewareQueryException("error in addTerm " + e.getMessage(), e);
 	    }
+	}
+	
+	@Override
+	public List<Term> getDataTypes() throws MiddlewareQueryException {
+		List<Integer> dataTypeIds = Arrays.asList(TermId.CLASS.getId()
+				,TermId.NUMERIC_VARIABLE.getId()
+				,TermId.DATE_VARIABLE.getId()
+				,TermId.NUMERIC_DBID_VARIABLE.getId()
+				,TermId.CHARACTER_DBID_VARIABLE.getId()
+				,TermId.CHARACTER_VARIABLE.getId()
+				,TermId.TIMESTAMP_VARIABLE.getId()
+				,TermId.CATEGORICAL_VARIABLE.getId());
+		return getTermBuilder().getTermsByIds(dataTypeIds);
 	}
 	
 }
