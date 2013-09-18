@@ -1,13 +1,13 @@
 #IBPMiddleware hibernate configuration 
 local.host = localhost
 local.port = 3306
-local.dbname = ibdb_ichis
+local.dbname = ibdbv2_rice_local
 local.username = root
 local.password = password
 
 central.host = localhost
 central.port = 3306
-central.dbname = ibdb_ichis
+central.dbname = ibdbv2_rice_central
 central.username = root
 central.password = password
 
@@ -16,3 +16,15 @@ workbench.port = 3306
 workbench.dbname = workbench
 workbench.username = root
 workbench.password = password
+
+localgroundnut.host = localhost
+localgroundnut.port = 3306
+localgroundnut.dbname = ibdbv2_groundnut_local
+localgroundnut.username = root
+localgroundnut.password = 
+
+centralgroundnut.host = localhost
+centralgroundnut.port = 3306
+centralgroundnut.dbname = ibdbv2_groundnut_central
+centralgroundnut.username = root
+centralgroundnut.password = 
