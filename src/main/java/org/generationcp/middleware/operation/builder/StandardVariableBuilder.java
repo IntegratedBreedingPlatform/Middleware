@@ -183,24 +183,9 @@ public class StandardVariableBuilder extends Builder {
         Term scale = getTermBuilder().findOrSaveTermByName(scaleName, CvId.SCALES);
         Term method = getTermBuilder().findOrSaveTermByName(methodName, CvId.METHODS);
         
-        Integer stdVariableId = null;
-        if (setWorkingDatabase(Database.LOCAL)) {
-			stdVariableId = getCvTermDao().getStandadardVariableIdByPropertyScaleMethod(
-					property.getId(), scale.getId(), method.getId(), "DESC");
-			
-			if (stdVariableId == null) {
-				if (setWorkingDatabase(Database.CENTRAL)) {
-					stdVariableId = getCvTermDao().getStandadardVariableIdByPropertyScaleMethod(
-							property.getId(), scale.getId(), method.getId(), "ASC");
-				}
-			}
-		}
-        
-        StandardVariable standardVariable = null;
-		if (stdVariableId != null) {
-			standardVariable = getStandardVariableBuilder().create(stdVariableId);
+        StandardVariable standardVariable = getByPropertyScaleMethod(property.getId(), scale.getId(), method.getId());
 		
-		} else {
+        if (standardVariable == null) {
 			standardVariable = new StandardVariable();
 			standardVariable.setName(name);
 			standardVariable.setDescription(description);
@@ -210,8 +195,8 @@ public class StandardVariableBuilder extends Builder {
 			standardVariable.setDataType(getDataType(dataTypeString));
 			standardVariable.setStoredIn(getStorageTypeTermByFactorType(factorType));
 			
-			stdVariableId = getStandardVariableSaver().save(standardVariable);
-        	standardVariable = getStandardVariableBuilder().create(stdVariableId);
+			Integer standardVariableId = getStandardVariableSaver().save(standardVariable);
+        	standardVariable = getStandardVariableBuilder().create(standardVariableId);
         }
         
 		return standardVariable;
@@ -245,5 +230,26 @@ public class StandardVariableBuilder extends Builder {
 			storedIn = getTermBuilder().get(storedInId);
 		}
 		return storedIn;
+	}
+	
+	public StandardVariable getByPropertyScaleMethod(Integer propertyId, Integer scaleId, Integer methodId) throws MiddlewareQueryException {
+        Integer stdVariableId = null;
+        if (setWorkingDatabase(Database.LOCAL)) {
+			stdVariableId = getCvTermDao().getStandadardVariableIdByPropertyScaleMethod(
+					propertyId, scaleId, methodId, "DESC");
+			
+			if (stdVariableId == null) {
+				if (setWorkingDatabase(Database.CENTRAL)) {
+					stdVariableId = getCvTermDao().getStandadardVariableIdByPropertyScaleMethod(
+							propertyId, scaleId, methodId, "ASC");
+				}
+			}
+		}
+        
+        StandardVariable standardVariable = null;
+		if (stdVariableId != null) {
+			standardVariable = getStandardVariableBuilder().create(stdVariableId);
+		}
+		return standardVariable;
 	}
 }

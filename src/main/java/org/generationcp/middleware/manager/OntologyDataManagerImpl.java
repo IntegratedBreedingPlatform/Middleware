@@ -164,7 +164,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	public StandardVariable findStandardVariableByTraitScaleMethodNames(
 			String property, String scale, String method) 
 			throws MiddlewareQueryException {
-		StandardVariable sv = null;
 		Integer stdVariableId = null;
 		Term termProperty, termScale, termMethod;
 		Integer propertyId = null, scaleId = null, methodId = null;
@@ -185,20 +184,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 			methodId = termMethod.getId();
 		}
 		
-		if (setWorkingDatabase(Database.LOCAL)) {
-			stdVariableId = getCvTermDao().getStandadardVariableIdByPropertyScaleMethod(propertyId, scaleId, methodId, "DESC");
-			if (stdVariableId == null) {
-				if (setWorkingDatabase(Database.CENTRAL)) {
-					stdVariableId = getCvTermDao().getStandadardVariableIdByPropertyScaleMethod(propertyId, scaleId, methodId, "ASC");
-				}
-			}
-		}
-		
-		if (stdVariableId != null) {
-			sv = getStandardVariable(stdVariableId);
-		} 
-		
-		return sv;
+		return getStandardVariableBuilder().getByPropertyScaleMethod(propertyId, scaleId, methodId);
 	}
 
 	@Override
