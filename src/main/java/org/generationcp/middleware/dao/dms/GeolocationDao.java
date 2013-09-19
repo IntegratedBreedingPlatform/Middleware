@@ -194,6 +194,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
             Query query = getSession().createSQLQuery(sql)
                     .setParameterList("locationIds", environmentIds);
 
+            //System.out.println(environmentIds);
             List<Integer> locIds = new ArrayList<Integer>();
             
             List<Object[]> result = query.list();
@@ -211,6 +212,8 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
                 locIds.add(locId);
             }
                 
+            //System.out.println(locIds);
+            
             if (locIds.size() > 0) {
             	// Get province and country
 	        	sql =
@@ -236,15 +239,24 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 	                
 	                
 	                for (int i = 0, size = environmentDetails.size(); i < size; i++){
-	                	Integer locId = locIds.get(i);
-	                	if (locId.equals(locationId)){
-	                		TrialEnvironment env = environmentDetails.get(i);
-	                		LocationDto loc = env.getLocation();
+	                	TrialEnvironment env = environmentDetails.get(i);
+	                	LocationDto loc = env.getLocation();
+	                	
+	                	//Integer locId = locIds.get(i);
+	                	//if (locId.equals(locationId)){
+	                	//if(loc.getId().intValue() == 10277 && locationId.intValue() == 10277){
+	                	//	System.out.println("Here");
+	                	//}
+	                	
+	                	if(loc.getId().intValue() == locationId.intValue())
+	                	{
+	                		
 	                    	loc.setProvinceName(provinceName);
 	                    	loc.setCountryName(countryName);
 	                    	env.setLocation(loc);
-	                    	environmentDetails.set(i, env);
-	                    	break;
+	                    	//commented the break since there are chances that locationId can be the same for different environments
+	                    	//environmentDetails.set(i, env);
+	                    	//break;
 	                	}
 	                }
 	                
@@ -252,6 +264,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
             }
 
         } catch(HibernateException e) {
+        	//System.out.println(e.getMessage());
             logAndThrowException("Error at getTrialEnvironmentDetails=" + environmentIds + " at GeolocationDao: " + e.getMessage(), e);
         }
 
