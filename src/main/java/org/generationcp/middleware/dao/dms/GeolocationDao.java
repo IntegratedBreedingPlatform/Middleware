@@ -234,17 +234,14 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 	                String provinceName = (String) row[1];
 	                String countryName = (String) row[2];
 	                
-	                
 	                for (int i = 0, size = environmentDetails.size(); i < size; i++){
-	                	Integer locId = locIds.get(i);
-	                	if (locId.equals(locationId)){
-	                		TrialEnvironment env = environmentDetails.get(i);
-	                		LocationDto loc = env.getLocation();
+                		TrialEnvironment env = environmentDetails.get(i);
+                		LocationDto loc = env.getLocation();
+                		
+	                	if (loc.getId().intValue() == locationId.intValue()){
 	                    	loc.setProvinceName(provinceName);
 	                    	loc.setCountryName(countryName);
 	                    	env.setLocation(loc);
-	                    	environmentDetails.set(i, env);
-	                    	break;
 	                	}
 	                }
 	                
