@@ -75,7 +75,7 @@ public class TestDataImportServiceImpl {
 		Workbook workbook = TestNurseryWorkbookUtil.getTestWorkbook();
 		workbook.print(0);
 		int id = dataImportService.saveDataset(workbook);
-		System.out.println("Created study:" + id);
+		System.out.println("Created study:" + id + ", name = " + workbook.getStudyDetails().getStudyName());
 	}
 	
 	@After

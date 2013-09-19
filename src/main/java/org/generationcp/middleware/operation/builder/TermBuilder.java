@@ -17,6 +17,7 @@ import java.util.List;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermProperty;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
@@ -126,5 +127,13 @@ public class TermBuilder extends Builder {
 			}
 		}
 		return terms;
+	}
+
+	public Term findOrSaveTermByName(String name, CvId cv) throws MiddlewareQueryException, MiddlewareException {
+		Term term = findTermByName(name, cv);
+        if (term == null) {
+        	term = getTermSaver().save(name, name, cv);
+        }
+        return term;
 	}
 }

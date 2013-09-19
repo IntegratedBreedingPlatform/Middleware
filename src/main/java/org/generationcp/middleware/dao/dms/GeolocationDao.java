@@ -206,7 +206,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
                 String studyName = (String) row[4];
                 
                 environmentDetails.add(new TrialEnvironment(environmentId
-                                                , new LocationDto(environmentId, locationName)
+                                                , new LocationDto(locId, locationName)
                                                 , new StudyReference(studyId, studyName)));
                 locIds.add(locId);
             }
@@ -215,12 +215,16 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
             	// Get province and country
 	        	sql =
 	        			"SELECT DISTINCT l.locid, prov.lname, c.isoabbr "             		
-	            		+ "FROM location l "
-	    		        + "	INNER JOIN location prov ON prov.locid = l.snl1id AND l.locid IN (:locIds) "
-	    		        + "	INNER JOIN cntry c ON l.cntryid = c.cntryid "
+    	        		+ "FROM nd_experiment e "
+    			        + "	INNER JOIN nd_geolocationprop gp ON e.nd_geolocation_id = gp.nd_geolocation_id " 
+    	        		+ "						AND gp.type_id =  " + TermId.LOCATION_ID.getId() 
+    	        		+ " 					AND e.nd_geolocation_id IN (:locationIds) " 		
+    			        + "	INNER JOIN location l ON l.locid = gp.value "
+	    		        + "	LEFT JOIN location prov ON prov.locid = l.snl1id "
+	    		        + "	LEFT JOIN cntry c ON l.cntryid = c.cntryid "
 	    		        ;        
 	            query = getSession().createSQLQuery(sql)
-	                    .setParameterList("locIds", locIds);
+	                    .setParameterList("locationIds", environmentIds);
 	        	
 	            result = query.list();
 	            
@@ -231,15 +235,15 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 	                String countryName = (String) row[2];
 	                
 	                
-	                for (int j = 0, sizeJ = environmentDetails.size(); j < sizeJ; j++){
-	                	Integer locId = locIds.get(j);
+	                for (int i = 0, size = environmentDetails.size(); i < size; i++){
+	                	Integer locId = locIds.get(i);
 	                	if (locId.equals(locationId)){
-	                		TrialEnvironment env = environmentDetails.get(j);
+	                		TrialEnvironment env = environmentDetails.get(i);
 	                		LocationDto loc = env.getLocation();
 	                    	loc.setProvinceName(provinceName);
 	                    	loc.setCountryName(countryName);
 	                    	env.setLocation(loc);
-	                    	environmentDetails.set(j, env);
+	                    	environmentDetails.set(i, env);
 	                    	break;
 	                	}
 	                }

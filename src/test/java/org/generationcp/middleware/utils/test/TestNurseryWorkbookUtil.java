@@ -153,15 +153,12 @@ public class TestNurseryWorkbookUtil {
 		conditions.add(new MeasurementVariable("PI ID", "ID of Principal Investigator", 
 				DBID, ASSIGNED, PERSON, NUMERIC, "", STUDY));		
 		
-		//conditions.add(new MeasurementVariable("TRIAL", "TRIAL NUMBER", 
-		//		NUMBER, ENUMERATED, TRIAL_INSTANCE, NUMERIC, "1", TRIAL));
+		conditions.add(new MeasurementVariable("COOPERATOR", "COOPERATOR NAME", 
+				DBCV, CONDUCTED, PERSON, CHAR, "John Smith", TRIAL));		
 		
-//		conditions.add(new MeasurementVariable("COOPERATOR", "COOPERATOR NAME", 
-//				DBCV, CONDUCTED, PERSON, CHAR, "", TRIAL));		
-//		
-//		conditions.add(new MeasurementVariable("COOPERATOR ID", "COOPERATOR ID", 
-//				DBID, CONDUCTED, PERSON, NUMERIC, "", TRIAL));		
-//		
+		conditions.add(new MeasurementVariable("COOPERATOR ID", "COOPERATOR ID", 
+				DBID, CONDUCTED, PERSON, NUMERIC, "121", TRIAL));		
+		
 		conditions.add(new MeasurementVariable("SITE", "TRIAL SITE NAME", 
 				DBCV, ASSIGNED, LOCATION, CHAR, "", TRIAL));		
 		
