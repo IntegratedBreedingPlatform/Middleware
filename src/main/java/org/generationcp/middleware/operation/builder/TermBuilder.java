@@ -118,7 +118,7 @@ public class TermBuilder extends Builder {
 	public Term findOrSaveTermByName(String name, CvId cv) throws MiddlewareQueryException, MiddlewareException {
 		Term term = findTermByName(name, cv);
         if (term == null) {
-        	term = getTermSaver().save(name, name, CvId.METHODS);
+        	term = getTermSaver().save(name, name, cv);
         }
         return term;
 	}
