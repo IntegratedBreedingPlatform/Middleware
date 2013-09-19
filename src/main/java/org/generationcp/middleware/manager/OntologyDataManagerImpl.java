@@ -24,6 +24,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -206,15 +207,32 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		return getTermBuilder().getTermsByCvId(cvId);
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Term> getAllTermsByCvId(CvId cvId, int start, int numOfRows) throws MiddlewareQueryException {
-		return getTermBuilder().getTermsByCvId(cvId,start,numOfRows);
+		List<String> methods = Arrays.asList("countTermsByCvId", "getTermsByCvId");
+        Object[] centralParameters = new Object[] { cvId };
+        Object[] localParameters = new Object[] { cvId };
+        List<CVTerm> cvTerms =  getFromCentralAndLocalByMethod(
+    			getCvTermDao(), methods, start, numOfRows, 
+    			centralParameters, localParameters, new Class[] { CvId.class });
+        List<Term> terms = null;
+        if(cvTerms!=null && !cvTerms.isEmpty()) {
+        	terms = new ArrayList<Term>();
+        	for (CVTerm cvTerm : cvTerms){
+    			terms.add(getTermBuilder().mapCVTermToTerm(cvTerm));
+    		}	
+        }
+        return terms;	
 	}
 
 	@Override
 	public long countTermsByCvId(CvId cvId) throws MiddlewareQueryException {
-		setWorkingDatabase(cvId.getId());
-		return getCvTermDao().countTermsByCvId(cvId);
+		setWorkingDatabase(Database.CENTRAL);
+		long centralCount = getCvTermDao().countTermsByCvId(cvId);
+		setWorkingDatabase(Database.LOCAL);
+		long localCount = getCvTermDao().countTermsByCvId(cvId);
+		return centralCount + localCount;
     }
 	@Override
 	public List<Term> getMethodsForTrait(Integer traitId)
@@ -305,3 +323,14 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 	
 }
+
+
+
+
+
+
+
+
+
+
+
