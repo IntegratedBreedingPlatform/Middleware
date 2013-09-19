@@ -206,7 +206,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
                 String studyName = (String) row[4];
                 
                 environmentDetails.add(new TrialEnvironment(environmentId
-                                                , new LocationDto(environmentId, locationName)
+                                                , new LocationDto(locId, locationName)
                                                 , new StudyReference(studyId, studyName)));
                 locIds.add(locId);
             }

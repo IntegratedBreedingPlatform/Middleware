@@ -155,8 +155,8 @@ public class TestCrossStudyDataManagerImpl {
        
         System.out.println("testGetEnvironmentsForGermplasmPairs(): " + result.size());
         for (GermplasmPair pair : result) {
-        	//pair.print(4);
-            System.out.println(pair.toString());
+        	pair.print(4);
+//            System.out.println(pair.toString());
         }
         System.out.println("testGetEnvironmentsForGermplasmPairs(): " + result.size());
     }
