@@ -12,6 +12,7 @@
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -163,7 +164,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	public StandardVariable findStandardVariableByTraitScaleMethodNames(
 			String property, String scale, String method) 
 			throws MiddlewareQueryException {
-		StandardVariable sv = null;
 		Integer stdVariableId = null;
 		Term termProperty, termScale, termMethod;
 		Integer propertyId = null, scaleId = null, methodId = null;
@@ -184,25 +184,17 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 			methodId = termMethod.getId();
 		}
 		
-		if (setWorkingDatabase(Database.LOCAL)) {
-			stdVariableId = getCvTermDao().getStandadardVariableIdByPropertyScaleMethod(propertyId, scaleId, methodId, "DESC");
-			if (stdVariableId == null) {
-				if (setWorkingDatabase(Database.CENTRAL)) {
-					stdVariableId = getCvTermDao().getStandadardVariableIdByPropertyScaleMethod(propertyId, scaleId, methodId, "ASC");
-				}
-			}
-		}
-		
-		if (stdVariableId != null) {
-			sv = getStandardVariable(stdVariableId);
-		} 
-		
-		return sv;
+		return getStandardVariableBuilder().getByPropertyScaleMethod(propertyId, scaleId, methodId);
 	}
 
 	@Override
 	public List<Term> getAllTermsByCvId(CvId cvId) throws MiddlewareQueryException {
 		return getTermBuilder().getTermsByCvId(cvId);
+	}
+	
+	@Override
+	public List<Term> getAllTermsByCvId(CvId cvId, int start, int numOfRows) throws MiddlewareQueryException {
+		return getTermBuilder().getTermsByCvId(cvId,start,numOfRows);
 	}
 
 	@Override
@@ -210,7 +202,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		setWorkingDatabase(cvId.getId());
 		return getCvTermDao().countTermsByCvId(cvId);
     }
-    
+	@Override
 	public List<Term> getMethodsForTrait(Integer traitId)
 			throws MiddlewareQueryException {
 		List<Term> methodTerms = new ArrayList<Term>();
@@ -283,6 +275,19 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	    	rollbackTransaction(trans);
 	        throw new MiddlewareQueryException("error in addTerm " + e.getMessage(), e);
 	    }
+	}
+	
+	@Override
+	public List<Term> getDataTypes() throws MiddlewareQueryException {
+		List<Integer> dataTypeIds = Arrays.asList(TermId.CLASS.getId()
+				,TermId.NUMERIC_VARIABLE.getId()
+				,TermId.DATE_VARIABLE.getId()
+				,TermId.NUMERIC_DBID_VARIABLE.getId()
+				,TermId.CHARACTER_DBID_VARIABLE.getId()
+				,TermId.CHARACTER_VARIABLE.getId()
+				,TermId.TIMESTAMP_VARIABLE.getId()
+				,TermId.CATEGORICAL_VARIABLE.getId());
+		return getTermBuilder().getTermsByIds(dataTypeIds);
 	}
 	
 }

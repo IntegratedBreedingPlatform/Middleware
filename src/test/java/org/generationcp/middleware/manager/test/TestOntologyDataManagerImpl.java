@@ -36,8 +36,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
+import com.mchange.util.AssertException;
+
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 public class TestOntologyDataManagerImpl {
 
@@ -331,6 +334,36 @@ public class TestOntologyDataManagerImpl {
 		printTerms(terms);
 	}
 	
+	@Test
+	public void testGetAllTermsByCvIdWithStartAndNumOfRows() throws Exception{
+		System.out.println("testGetAllTermsByCvIdWithStartAndNumOfRows:");
+		List<Term> terms1 = manager.getAllTermsByCvId(CvId.METHODS, 0, 2);		
+		System.out.println("Get First 2 Methods: " + terms1.size());
+		printTerms(terms1);
+		
+		List<Term> terms2 = manager.getAllTermsByCvId(CvId.METHODS, 2, 2);		
+		System.out.println("Get Next 2 Methods: " + terms2.size());
+		printTerms(terms2);
+		
+		terms1.addAll(terms2);
+		
+		List<Term> terms = manager.getAllTermsByCvId(CvId.METHODS, 0, 4);		
+		System.out.println("Get First 4 Methods: " + terms.size());
+		printTerms(terms);
+		
+		assertEquals(terms1, terms);
+		
+		List<Term> allTerms = manager.getAllTermsByCvId(CvId.METHODS);		
+		System.out.println("Get All Methods: " + allTerms.size());
+		
+		List<Term> allTerms2 = manager.getAllTermsByCvId(CvId.METHODS, 0, allTerms.size());		
+		System.out.println("Get All Methods with start and numOfRows: " + allTerms2.size());
+		printTerms(allTerms2);
+		
+		assertEquals(allTerms, allTerms2);
+		
+	}
+	
 	private void printTerms(List<Term> terms){
 		for (Term term : terms){
 			term.print(4);
@@ -471,5 +504,13 @@ public class TestOntologyDataManagerImpl {
 		term = manager.findTermByName(term.getName(), CvId.METHODS);
 		assertTrue(term != null);
 		term.print(0);
+	}
+	
+	@Test
+	public void testGetDataTypes() throws Exception{
+		System.out.println("testGetDataTypes:");
+		List<Term> terms = manager.getDataTypes();		
+		System.out.println("testGetDataTypes: " + terms.size());
+		printTerms(terms);
 	}
 }

@@ -211,38 +211,44 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
                 locIds.add(locId);
             }
                 
-            // Get province and country
-        	sql =
-        			"SELECT DISTINCT l.locid, prov.lname, c.isoabbr "             		
-            		+ "FROM location l "
-    		        + "	INNER JOIN location prov ON prov.locid = l.snl1id AND l.locid IN (:locIds) "
-    		        + "	INNER JOIN cntry c ON l.cntryid = c.cntryid "
-    		        ;        
-            query = getSession().createSQLQuery(sql)
-                    .setParameterList("locIds", locIds);
-        	
-            result = query.list();
-            
-
-            for (Object[] row : result) {
-                Integer locationId = (Integer) row[0];
-                String provinceName = (String) row[1];
-                String countryName = (String) row[2];
-                
-                
-                for (int j = 0, sizeJ = environmentDetails.size(); j < sizeJ; j++){
-                	Integer locId = locIds.get(j);
-                	if (locId.equals(locationId)){
-                		TrialEnvironment env = environmentDetails.get(j);
-                		LocationDto loc = env.getLocation();
-                    	loc.setProvinceName(provinceName);
-                    	loc.setCountryName(countryName);
-                    	env.setLocation(loc);
-                    	environmentDetails.set(j, env);
-                    	break;
-                	}
-                }
-                
+            if (locIds.size() > 0) {
+            	// Get province and country
+	        	sql =
+	        			"SELECT DISTINCT l.locid, prov.lname, c.isoabbr "             		
+    	        		+ "FROM nd_experiment e "
+    			        + "	INNER JOIN nd_geolocationprop gp ON e.nd_geolocation_id = gp.nd_geolocation_id " 
+    	        		+ "						AND gp.type_id =  " + TermId.LOCATION_ID.getId() 
+    	        		+ " 					AND e.nd_geolocation_id IN (:locationIds) " 		
+    			        + "	INNER JOIN location l ON l.locid = gp.value "
+	    		        + "	LEFT JOIN location prov ON prov.locid = l.snl1id "
+	    		        + "	LEFT JOIN cntry c ON l.cntryid = c.cntryid "
+	    		        ;        
+	            query = getSession().createSQLQuery(sql)
+	                    .setParameterList("locationIds", environmentIds);
+	        	
+	            result = query.list();
+	            
+	
+	            for (Object[] row : result) {
+	                Integer locationId = (Integer) row[0];
+	                String provinceName = (String) row[1];
+	                String countryName = (String) row[2];
+	                
+	                
+	                for (int i = 0, size = environmentDetails.size(); i < size; i++){
+	                	Integer locId = locIds.get(i);
+	                	if (locId.equals(locationId)){
+	                		TrialEnvironment env = environmentDetails.get(i);
+	                		LocationDto loc = env.getLocation();
+	                    	loc.setProvinceName(provinceName);
+	                    	loc.setCountryName(countryName);
+	                    	env.setLocation(loc);
+	                    	environmentDetails.set(i, env);
+	                    	break;
+	                	}
+	                }
+	                
+	            }
             }
 
         } catch(HibernateException e) {

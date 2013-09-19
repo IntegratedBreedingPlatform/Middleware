@@ -91,4 +91,21 @@ public class LocationDto {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("LocationDto [id=");
+		builder.append(id);
+		builder.append(", locationName=");
+		builder.append(locationName);
+		builder.append(", provinceName=");
+		builder.append(provinceName);
+		builder.append(", countryName=");
+		builder.append(countryName);
+		builder.append("]");
+		return builder.toString();
+	}
+	
+	
+
 }

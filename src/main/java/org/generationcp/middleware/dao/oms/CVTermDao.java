@@ -259,7 +259,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
             .append("SELECT cvt.cvterm_id, cvt.name, cvt.definition,  c_scale.scaleName, cr_type.object_id ")
             .append("FROM cvterm cvt ") 
             .append("	INNER JOIN cvterm_relationship cr_scale ON cvt.cvterm_id = cr_scale.subject_id ")
-            .append("   INNER JOIN (SELECT cvterm_id, scaleName FROM cvterm) c_scale ON c_scale.cvterm_id = cr_scale.object_id ") 
+            .append("   INNER JOIN (SELECT cvterm_id, name AS scaleName FROM cvterm) c_scale ON c_scale.cvterm_id = cr_scale.object_id ") 
             .append("        AND cr_scale.type_id = ").append(TermId.HAS_SCALE.getId()).append(" ")
             .append("	INNER JOIN cvterm_relationship cr_type ON cr_type.subject_id = cr_scale.subject_id ")
             .append("		AND cr_type.type_id = ").append(TermId.HAS_TYPE.getId()).append(" ")
@@ -318,7 +318,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	}
 	
 
-	public List<CVTerm> getTermsByCvId(CvId cvId) throws MiddlewareQueryException{
+	public List<CVTerm> getTermsByCvId(CvId cvId,int start,int numOfRows) throws MiddlewareQueryException{
 		List<CVTerm> terms = new ArrayList<CVTerm>();
 		
         try{
@@ -327,9 +327,10 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
                     "SELECT cvterm_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype "
                     + "FROM cvterm " 
                     + "WHERE cv_id = :cvId "
+                    + "ORDER BY cvterm_id, name "
                     );
             query.setParameter("cvId", cvId.getId());
-            
+            setStartAndNumOfRows(query, start, numOfRows);
 			List<Object[]> list = query.list();
             for (Object[] row : list) {
             	Integer termId = (Integer) row[0];

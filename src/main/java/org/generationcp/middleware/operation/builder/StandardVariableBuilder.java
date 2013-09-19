@@ -21,17 +21,19 @@ import org.generationcp.middleware.domain.dms.NameSynonym;
 import org.generationcp.middleware.domain.dms.NameType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.pojos.oms.CVTermSynonym;
 
 public class StandardVariableBuilder extends Builder {
-
 
 	public StandardVariableBuilder(HibernateSessionProvider sessionProviderForLocal,
 			                   HibernateSessionProvider sessionProviderForCentral) {
@@ -171,5 +173,83 @@ public class StandardVariableBuilder extends Builder {
 			}
 		}
 		return null;
+	}
+	
+	public StandardVariable findOrSave(String name, String description, String propertyName, String scaleName, 
+			String methodName, FactorType factorType, String dataTypeString) 
+			throws MiddlewareQueryException, MiddlewareException {
+		
+        Term property = getTermBuilder().findOrSaveTermByName(propertyName, CvId.PROPERTIES);
+        Term scale = getTermBuilder().findOrSaveTermByName(scaleName, CvId.SCALES);
+        Term method = getTermBuilder().findOrSaveTermByName(methodName, CvId.METHODS);
+        
+        StandardVariable standardVariable = getByPropertyScaleMethod(property.getId(), scale.getId(), method.getId());
+		
+        if (standardVariable == null) {
+			standardVariable = new StandardVariable();
+			standardVariable.setName(name);
+			standardVariable.setDescription(description);
+			standardVariable.setProperty(property);
+			standardVariable.setScale(scale);
+			standardVariable.setMethod(method);
+			standardVariable.setDataType(getDataType(dataTypeString));
+			standardVariable.setStoredIn(getStorageTypeTermByFactorType(factorType));
+			
+			Integer standardVariableId = getStandardVariableSaver().save(standardVariable);
+        	standardVariable = getStandardVariableBuilder().create(standardVariableId);
+        }
+        
+		return standardVariable;
+	}
+	
+	private Term getDataType(String dataTypeString) throws MiddlewareQueryException {
+        Term dataType = null;
+        if (dataTypeString != null) {
+        	dataType = ("N".equals(dataTypeString)  
+        			? getTermBuilder().get(TermId.NUMERIC_VARIABLE.getId())
+        			: getTermBuilder().get(TermId.CHARACTER_VARIABLE.getId()));
+        }
+        return dataType;
+	}
+	
+	private Term getStorageTypeTermByFactorType(FactorType factorType) throws MiddlewareQueryException {
+		Term storedIn = null;
+		if (factorType != null) {
+			Integer storedInId = null;
+			switch (factorType) {
+				case STUDY : storedInId = TermId.STUDY_INFO_STORAGE.getId();
+					break;
+				case DATASET : storedInId = TermId.DATASET_INFO_STORAGE.getId();
+					break;
+				case GERMPLASM : storedInId = TermId.GERMPLASM_ENTRY_STORAGE.getId();
+					break;
+				case TRIAL_DESIGN : storedInId = TermId.TRIAL_DESIGN_INFO_STORAGE.getId();
+					break;
+				case TRIAL_ENVIRONMENT : storedInId = TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId();
+			}
+			storedIn = getTermBuilder().get(storedInId);
+		}
+		return storedIn;
+	}
+	
+	public StandardVariable getByPropertyScaleMethod(Integer propertyId, Integer scaleId, Integer methodId) throws MiddlewareQueryException {
+        Integer stdVariableId = null;
+        if (setWorkingDatabase(Database.LOCAL)) {
+			stdVariableId = getCvTermDao().getStandadardVariableIdByPropertyScaleMethod(
+					propertyId, scaleId, methodId, "DESC");
+			
+			if (stdVariableId == null) {
+				if (setWorkingDatabase(Database.CENTRAL)) {
+					stdVariableId = getCvTermDao().getStandadardVariableIdByPropertyScaleMethod(
+							propertyId, scaleId, methodId, "ASC");
+				}
+			}
+		}
+        
+        StandardVariable standardVariable = null;
+		if (stdVariableId != null) {
+			standardVariable = getStandardVariableBuilder().create(stdVariableId);
+		}
+		return standardVariable;
 	}
 }

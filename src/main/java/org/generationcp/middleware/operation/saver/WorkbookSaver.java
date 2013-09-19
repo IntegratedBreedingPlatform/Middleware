@@ -31,6 +31,7 @@ import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.helper.VariableInfo;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -206,7 +207,7 @@ public class WorkbookSaver extends Saver {
 	}
 	
 	private void createMeasurementEffectDataset(Workbook workbook, int studyId, List<MeasurementVariable> trialMV,
-	List<MeasurementVariable> effectMV, VariableTypeList effectVariables) throws MiddlewareQueryException {
+	List<MeasurementVariable> effectMV, VariableTypeList effectVariables) throws MiddlewareQueryException, MiddlewareException {
 
 		TimerWatch watch = new TimerWatch("preparing measurement effect variables", LOG);
 		//create measurements dataset
@@ -265,7 +266,7 @@ public class WorkbookSaver extends Saver {
 	}
 	
 	private VariableTypeList propagateTrialFactorsIfNecessary(List<MeasurementVariable> trialFactors, VariableTypeList effectVariables, 
-	Workbook workbook) throws MiddlewareQueryException {
+	Workbook workbook) throws MiddlewareQueryException, MiddlewareException {
 		
 		VariableTypeList newList = new VariableTypeList();
 		

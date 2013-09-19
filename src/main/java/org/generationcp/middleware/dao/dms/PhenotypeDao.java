@@ -582,10 +582,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			.append("	INNER JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id ")
 			.append("				AND e.nd_geolocation_id IN (:locationIds) 	 ")
 			.append("	LEFT JOIN cvterm c ON p.observable_id = c.cvterm_id ")
-			.append("	INNER JOIN cvterm_relationship cr_scale ON c.cvterm_id = cr_scale.subject_id ")
-			.append("	INNER JOIN  (SELECT cvterm_id, name AS scaleName FROM cvterm) c_scale ON c_scale.cvterm_id = cr_scale.object_id ")
+			.append("	LEFT JOIN cvterm_relationship cr_scale ON c.cvterm_id = cr_scale.subject_id ")
+			.append("	LEFT JOIN  (SELECT cvterm_id, name AS scaleName FROM cvterm) c_scale ON c_scale.cvterm_id = cr_scale.object_id ")
 			.append("	    AND cr_scale.type_id = ").append(TermId.HAS_SCALE.getId()).append(" ")
-			.append("	INNER JOIN cvterm_relationship cr_type ON cr_type.subject_id = cr_scale.subject_id ")
+			.append("	LEFT JOIN cvterm_relationship cr_type ON cr_type.subject_id = cr_scale.subject_id ")
 			.append("	    AND cr_type.type_id =  ").append(TermId.HAS_TYPE.getId()).append(" ");
 
     		Query query = getSession().createSQLQuery(sql.toString())
