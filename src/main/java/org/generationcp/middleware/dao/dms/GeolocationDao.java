@@ -210,7 +210,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
                                                 , new StudyReference(studyId, studyName)));
                 locIds.add(locId);
             }
-                
+            
             if (locIds.size() > 0) {
             	// Get province and country
 	        	sql =
@@ -235,11 +235,11 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 	                String countryName = (String) row[2];
 	                
 	                for (int i = 0, size = environmentDetails.size(); i < size; i++){
-                		TrialEnvironment env = environmentDetails.get(i);
-                		LocationDto loc = env.getLocation();
-                		
-	                	if (loc.getId().intValue() == locationId.intValue()){
-	                    	loc.setProvinceName(provinceName);
+	                	TrialEnvironment env = environmentDetails.get(i);
+	                	LocationDto loc = env.getLocation();
+
+	                	if(loc.getId().intValue() == locationId.intValue()){
+	                		loc.setProvinceName(provinceName);
 	                    	loc.setCountryName(countryName);
 	                    	env.setLocation(loc);
 	                	}

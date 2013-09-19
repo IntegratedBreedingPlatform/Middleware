@@ -129,7 +129,7 @@ public class Workbook {
 		return list;
 	}
 	
-	private List<MeasurementVariable> getVariables(List<MeasurementVariable> variables, boolean isStudy) {
+	public List<MeasurementVariable> getVariables(List<MeasurementVariable> variables, boolean isStudy) {
 		List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
 		if (variables != null && variables.size() > 0) {
 			for (MeasurementVariable variable : variables) {

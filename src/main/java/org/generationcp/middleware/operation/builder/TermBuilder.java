@@ -39,7 +39,7 @@ public class TermBuilder extends Builder {
 		return term;
 	}
 	
-	private Term mapCVTermToTerm(CVTerm cVTerm){
+	public Term mapCVTermToTerm(CVTerm cVTerm){
 		Term term = null;
 		
 		if (cVTerm != null){
@@ -59,7 +59,21 @@ public class TermBuilder extends Builder {
 	}
 
 	public List<Term> getTermsByCvId(CvId cvId) throws MiddlewareQueryException {
-		return getTermsByCvId(cvId,0,0);
+		List<Term> terms = new ArrayList<Term>();		
+		if (setWorkingDatabase(Database.CENTRAL)) {
+			List<CVTerm> cvTerms = getCvTermDao().getTermsByCvId(cvId,0,0);
+			for (CVTerm cvTerm : cvTerms){
+				terms.add(mapCVTermToTerm(cvTerm));
+			}
+		}
+		if (setWorkingDatabase(Database.LOCAL)) {
+			List<CVTerm> cvTerms = getCvTermDao().getTermsByCvId(cvId,0,0);
+			for (CVTerm cvTerm : cvTerms){
+				terms.add(mapCVTermToTerm(cvTerm));
+			}
+		}
+		
+		return terms;
 	}
 	
 	public List<Term> getTermsByCvId(CvId cvId,int start, int numOfRows) throws MiddlewareQueryException {
