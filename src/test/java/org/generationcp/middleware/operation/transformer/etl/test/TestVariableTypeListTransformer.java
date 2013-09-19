@@ -84,8 +84,8 @@ public class TestVariableTypeListTransformer {
 	public void testTransform() throws Exception {
 
 		List<MeasurementVariable> measurementVariables = createMeasurmentVariablesTestData();
-		Mockito.when(transformer.transform(measurementVariables)).thenCallRealMethod();
-		VariableTypeList variableTypeList = transformer.transform(measurementVariables);
+		Mockito.when(transformer.transform(measurementVariables, true)).thenCallRealMethod();
+		VariableTypeList variableTypeList = transformer.transform(measurementVariables, true);
 		Assert.assertNotNull(variableTypeList);
 		int i = 0;
 		for (VariableType variableType : variableTypeList.getVariableTypes()) {
