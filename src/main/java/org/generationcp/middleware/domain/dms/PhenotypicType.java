@@ -41,7 +41,7 @@ public enum PhenotypicType {
            Arrays.asList("ENTRY", "ENTRY_NO")), 
     TRIAL_DESIGN(Arrays.asList(
             TermId.TRIAL_DESIGN_INFO_STORAGE.getId()),
-           Arrays.asList("PLOT", "PLOT_NO"));
+           Arrays.asList("PLOT", "PLOT_NO")),
     VARIATE(Arrays.asList(
 		   TermId.OBSERVATION_VARIATE.getId(),
 		   TermId.CATEGORICAL_VARIATE.getId()),
