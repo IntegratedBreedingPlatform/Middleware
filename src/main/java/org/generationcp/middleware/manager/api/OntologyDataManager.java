@@ -13,8 +13,10 @@ package org.generationcp.middleware.manager.api;
 
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
@@ -192,5 +194,14 @@ public interface OntologyDataManager {
 	 * @throws MiddlewareQueryException
 	 */
 	List<Term> getDataTypes() throws MiddlewareQueryException;
+	
+	
+	/**
+	 * Returns the key-value pairs of PhenotypicType - StandardVariable 
+	 * 
+	 * @return Map of PhenotypicType - StandardVariable
+	 * @throws MiddlewareQueryException
+	 */
+	Map<String, StandardVariable> getStandardVariablesForPhenotypicType(PhenotypicType type) throws MiddlewareQueryException;
 	
 }

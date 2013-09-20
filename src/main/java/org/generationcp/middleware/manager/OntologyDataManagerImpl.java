@@ -15,8 +15,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
@@ -308,6 +310,11 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		return getTermBuilder().getTermsByIds(dataTypeIds);
 	}
 	
+	@Override
+	public Map<String, StandardVariable> getStandardVariablesForPhenotypicType(PhenotypicType type) throws MiddlewareQueryException{
+		
+		return null;	
+	}
 }
 
 
