@@ -31,13 +31,18 @@ public class StudyDetails {
 	private StudyType studyType;
 	
 	private long parentFolderId;
+	
+	private String trialDatasetName;
+
+	private String measurementDatasetName;
 
 	public StudyDetails(){
 		
 	}
 	
 	public StudyDetails(String studyName, String title, String pmKey,
-			String objective, String startDate, String endDate, StudyType studyType, long parentFolderId) {
+			String objective, String startDate, String endDate, StudyType studyType, 
+			long parentFolderId, String trialDatasetName, String measurementDatasetName) {
 		this.studyName = studyName;
 		this.title = title;
 		this.pmKey = pmKey;
@@ -46,6 +51,8 @@ public class StudyDetails {
 		this.endDate = endDate;
 		this.studyType = studyType;
 		this.parentFolderId = parentFolderId;
+		this.trialDatasetName = trialDatasetName;
+		this.measurementDatasetName = measurementDatasetName;
 	}
 
 	public String getStudyName() {
@@ -117,6 +124,22 @@ public class StudyDetails {
 			return true;
 		}
 		return false;
+	}
+	
+	public String getTrialDatasetName() {
+		return trialDatasetName;
+	}
+
+	public void setTrialDatasetName(String trialDatasetName) {
+		this.trialDatasetName = trialDatasetName;
+	}
+
+	public String getMeasurementDatasetName() {
+		return measurementDatasetName;
+	}
+
+	public void setMeasurementDatasetName(String measurementDatasetName) {
+		this.measurementDatasetName = measurementDatasetName;
 	}
 
 	@Override

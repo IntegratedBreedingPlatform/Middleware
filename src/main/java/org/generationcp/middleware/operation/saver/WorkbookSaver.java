@@ -193,7 +193,12 @@ public class WorkbookSaver extends Saver {
 		
 		//create trial dataset
 		TimerWatch watch = new TimerWatch("transform trial dataset", LOG);
- 		String trialName = generateTrialDatasetName(workbook.getStudyDetails().getStudyName());
+ 		
+		String trialName = workbook.getStudyDetails().getTrialDatasetName();
+ 		if(trialName == null || trialName.equals("") ){
+ 			trialName = generateTrialDatasetName(workbook.getStudyDetails().getStudyName());
+ 		}
+ 			
 		DatasetValues trialValues = getDatasetValuesTransformer().transform(trialName, trialName, 
 										DataSetType.PLOT_DATA, trialMV, trialVariables);
 		if (workbook.isNursery() && (trialMV == null || trialMV.size() == 0 || getMainFactor(trialMV) == null)) {
@@ -218,7 +223,12 @@ public class WorkbookSaver extends Saver {
 		TimerWatch watch = new TimerWatch("preparing measurement effect variables", LOG);
 		//create measurements dataset
         watch.restart("transform measurement effect dataset");
-		String datasetName = generateMeasurementEffectDatasetName(workbook.getStudyDetails().getStudyName());
+		
+        String datasetName = workbook.getStudyDetails().getMeasurementDatasetName();
+        if(datasetName == null || datasetName.equals("")){
+        	datasetName = generateMeasurementEffectDatasetName(workbook.getStudyDetails().getStudyName());
+        }
+        
 		DatasetValues datasetValues = getDatasetValuesTransformer().transform(datasetName, datasetName,
 										DataSetType.PLOT_DATA, effectMV, effectVariables);
 
