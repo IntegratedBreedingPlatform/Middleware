@@ -38,10 +38,10 @@ public enum PhenotypicType {
             TermId.ENTRY_GID_STORAGE.getId(),
             TermId.ENTRY_DESIGNATION_STORAGE.getId(),
             TermId.ENTRY_CODE_STORAGE.getId()),
-           Arrays.asList("ENTRY")), 
+           Arrays.asList("ENTRY", "ENTRY_NO")), 
     TRIAL_DESIGN(Arrays.asList(
             TermId.TRIAL_DESIGN_INFO_STORAGE.getId()),
-           Arrays.asList("PLOT")),
+           Arrays.asList("PLOT", "PLOT_NO"));
     VARIATE(Arrays.asList(
 		   TermId.OBSERVATION_VARIATE.getId(),
 		   TermId.CATEGORICAL_VARIATE.getId()),
