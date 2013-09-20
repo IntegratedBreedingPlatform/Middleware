@@ -11,6 +11,10 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.builder;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.StockModel;
@@ -28,5 +32,18 @@ public class StockModelBuilder extends Builder {
 			stockModel = getStockDao().getById(stockId);
 		}
 		return stockModel;
+	}
+	
+	public Map<String, Integer> getStockMapForDataset(int datasetId) throws MiddlewareQueryException {
+		Map<String, Integer> stockMap = new HashMap<String, Integer>();
+		
+		if (setWorkingDatabase(datasetId)) {
+			Set<StockModel> stocks = getStockDao().findInDataSet(datasetId);
+			for (StockModel stock : stocks) {
+				stockMap.put(stock.getUniqueName(), stock.getStockId());
+			}
+		}
+		
+		return stockMap;
 	}
 }

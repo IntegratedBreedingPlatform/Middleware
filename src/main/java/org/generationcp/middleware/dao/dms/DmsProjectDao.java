@@ -443,5 +443,26 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 		return studies;
 	}
+	
+	public Integer getProjectIdByName(String name, TermId relationship) throws MiddlewareQueryException {
+		try {
+			String sql = "SELECT s.project_id FROM project s "
+					+ " WHERE name = :name "
+					+ " AND EXISTS (SELECT 1 FROM project_relationship pr WHERE pr.subject_project_id = s.project_id "
+					+ "   AND pr.type_id = " + relationship.getId() + ") " 
+	                + "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId() 
+	                + "   AND pp.project_id = s.project_id AND pp.value = "
+	    			+ "   (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) "
+	    			+ " LIMIT 1";
+			
+			Query query = getSession().createSQLQuery(sql)
+							.setParameter("name", name);
+			return (Integer) query.uniqueResult();
+			
+		} catch(HibernateException e) {
+			logAndThrowException("Error in getStudyIdByName=" + name + " query in DmsProjectDao: " + e.getMessage(), e);
+		}
+		return null;
+	}
 
 }

@@ -108,30 +108,55 @@ public class TestWorkbookUtil {
 		};
 	
 	private static Workbook workbook;
-		
+	private static List<Workbook> workbooks;
+
 	public static Workbook getTestWorkbook(){
 		if (workbook == null){
 			createTestWorkbook();
 		}
 		return workbook;
 	}
-	
+
+	public static List<Workbook> getTestWorkbooks(int noOfTrial){
+		if (workbooks == null){
+			workbooks = new ArrayList<Workbook>();
+			String studyName = "pheno_t7" + new Random().nextInt(10000);
+			for (int i = 1; i <= noOfTrial; i++) {
+				workbooks.add(createTestWorkbook(studyName, i));
+			}
+		}
+		return workbooks;
+	}
 	
 	private static void createTestWorkbook(){
 		workbook = new Workbook();
 		
-		createStudyDetails();
-		createConditions();
-		createFactors();
-		createConstants();
-		createVariates();
-		createObservations();
+		String studyName = "pheno_t7" + new Random().nextInt(10000);
+		createStudyDetails(studyName, workbook);
+		createConditions(workbook, 1);
+		createFactors(workbook);
+		createConstants(workbook);
+		createVariates(workbook);
+		createObservations(workbook);
+	}
+
+	private static Workbook createTestWorkbook(String studyName, int trialNo){
+		Workbook wbook = new Workbook();
+		
+		createStudyDetails(studyName, wbook);
+		createConditions(wbook, trialNo);
+		createFactors(wbook);
+		createConstants(wbook);
+		createVariates(wbook);
+		createObservations(wbook);
+		
+		return wbook;
 	}
 
 	
-	private static void createStudyDetails() {
+	private static void createStudyDetails(String studyName, Workbook workbook) {
 		StudyDetails details = new StudyDetails();
-		details.setStudyName("pheno_t7" + new Random().nextInt(10000));
+		details.setStudyName(studyName);
 		details.setTitle("Phenotyping trials of the Population 114");
 		details.setPmKey("0");
 		details.setObjective("To evaluate the Population 114");
@@ -144,7 +169,7 @@ public class TestWorkbookUtil {
 	}
 	
 	
-	private static void createConditions(){
+	private static void createConditions(Workbook workbook, int trialNo){
 		List<MeasurementVariable> conditions = new ArrayList<MeasurementVariable>();
 		
 		conditions.add(new MeasurementVariable("PI Name", "Name of Principal Investigator", 
@@ -154,7 +179,7 @@ public class TestWorkbookUtil {
 				DBID, ASSIGNED, PERSON, NUMERIC, "", STUDY));		
 		
 		conditions.add(new MeasurementVariable("TRIAL", "TRIAL NUMBER", 
-				NUMBER, ENUMERATED, TRIAL_INSTANCE, NUMERIC, "1", TRIAL));
+				NUMBER, ENUMERATED, TRIAL_INSTANCE, NUMERIC, String.valueOf(trialNo), TRIAL));
 		
 //		conditions.add(new MeasurementVariable("COOPERATOR", "COOPERATOR NAME", 
 //				DBCV, CONDUCTED, PERSON, CHAR, "", TRIAL));		
@@ -163,10 +188,10 @@ public class TestWorkbookUtil {
 //				DBID, CONDUCTED, PERSON, NUMERIC, "", TRIAL));		
 //		
 		conditions.add(new MeasurementVariable("SITE", "TRIAL SITE NAME", 
-				DBCV, ASSIGNED, LOCATION, CHAR, "", TRIAL));		
+				DBCV, ASSIGNED, LOCATION, CHAR, "SITE " + String.valueOf(trialNo), TRIAL));		
 		
 		conditions.add(new MeasurementVariable("SITE ID", "TRIAL SITE ID", 
-				DBID, ASSIGNED, LOCATION, NUMERIC, "", TRIAL));		
+				DBID, ASSIGNED, LOCATION, NUMERIC, String.valueOf(trialNo), TRIAL));		
 		
 		conditions.add(new MeasurementVariable("DESIGN", "EXPERIMENTAL DESIGN", 
 				TYPE, ASSIGNED, EXPERIMENTAL_DESIGN, CHAR, "", TRIAL));
@@ -175,7 +200,7 @@ public class TestWorkbookUtil {
 	}
 	
 	
-	private static void createFactors(){
+	private static void createFactors(Workbook workbook){
 		List<MeasurementVariable> factors = new ArrayList<MeasurementVariable>();
 		// Entry Factors
 		factors.add(new MeasurementVariable(ENTRY, "The germplasm entry number", 
@@ -213,7 +238,7 @@ public class TestWorkbookUtil {
 	}
 	
 	
-	private static void createConstants(){
+	private static void createConstants(Workbook workbook){
 		List<MeasurementVariable> constants = new ArrayList<MeasurementVariable>();
 		
 		constants.add(new MeasurementVariable("DATE_SEEDED", "Date Seeded", 
@@ -230,7 +255,7 @@ public class TestWorkbookUtil {
 	}
 	
 	
-	private static void createVariates(){
+	private static void createVariates(Workbook workbook){
 		List<MeasurementVariable> variates = new ArrayList<MeasurementVariable>();
 		
 		variates.add(new MeasurementVariable(VARIATE1, "Grain yield -dry and weigh (kg/ha)", 
@@ -269,7 +294,7 @@ public class TestWorkbookUtil {
 	}
 	
 	
-	private static void createObservations(){
+	private static void createObservations(Workbook workbook){
 		List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
 		
 		MeasurementRow row;

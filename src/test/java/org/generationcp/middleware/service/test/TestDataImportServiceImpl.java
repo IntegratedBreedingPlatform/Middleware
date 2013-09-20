@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.service.test;
 
+import java.util.List;
+
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
@@ -65,7 +67,7 @@ public class TestDataImportServiceImpl {
 		Workbook workbook = TestWorkbookUtil.getTestWorkbook();
 		workbook.print(0);
 		int id = dataImportService.saveDataset(workbook);
-		System.out.println("Created study:" + id);
+		System.out.println("Created study:" + id + ", name = " + workbook.getStudyDetails().getStudyName());
 		
 //		studyManager.getStudy(id);
 	}
@@ -76,6 +78,21 @@ public class TestDataImportServiceImpl {
 		workbook.print(0);
 		int id = dataImportService.saveDataset(workbook);
 		System.out.println("Created study:" + id + ", name = " + workbook.getStudyDetails().getStudyName());
+	}
+	
+	@Test
+	public void testSaveMultiLocationDataset() throws MiddlewareQueryException {
+		List<Workbook> workbooks = TestWorkbookUtil.getTestWorkbooks(5);
+		int id = 0;
+		for (Workbook workbook : workbooks) {
+			//comment these out if you want to let the system generate the dataset names.
+			/*
+			workbook.getStudyDetails().setTrialDatasetName("MyTrial_" + workbook.getStudyDetails().getStudyName());
+			workbook.getStudyDetails().setMeasurementDatasetName("MyMeasurement_" + workbook.getStudyDetails().getStudyName());
+			*/
+			id = dataImportService.saveDataset(workbook);
+		}
+		System.out.println("Created study: " + id + ", name = " + workbooks.get(0).getStudyDetails().getStudyName());
 	}
 	
 	@After
