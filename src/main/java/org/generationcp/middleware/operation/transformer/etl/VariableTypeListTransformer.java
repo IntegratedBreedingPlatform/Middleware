@@ -18,13 +18,13 @@ public class VariableTypeListTransformer extends Transformer {
 				super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 	
-	public VariableTypeList transform(List<MeasurementVariable> measurementVariables) 
+	public VariableTypeList transform(List<MeasurementVariable> measurementVariables, boolean isVariate) 
 			throws MiddlewareQueryException, MiddlewareException {
 		
-		return transform(measurementVariables, 1);
+		return transform(measurementVariables, isVariate, 1);
 	}
 	
-	public VariableTypeList transform(List<MeasurementVariable> measurementVariables, int rank) 
+	public VariableTypeList transform(List<MeasurementVariable> measurementVariables, boolean isVariate, int rank) 
 			throws MiddlewareQueryException, MiddlewareException {
 		
 		VariableTypeList variableTypeList = new VariableTypeList();
@@ -37,7 +37,7 @@ public class VariableTypeListTransformer extends Transformer {
 					measurementVariable.getProperty(),
 					measurementVariable.getScale(),
 					measurementVariable.getMethod(), 
-					FactorType.getFactorTypeForLabel(measurementVariable.getLabel()),
+					isVariate ? null : FactorType.getFactorTypeForLabel(measurementVariable.getLabel()),
 					measurementVariable.getDataType());
 			
 			VariableType variableType = new VariableType(

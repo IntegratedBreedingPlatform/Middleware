@@ -63,7 +63,7 @@ public class LocationDto {
 	}
 	
 	public void print(int indent) {
-		Debug.println(indent, "LOCATION:[locationName=" + locationName + ", provinceName=" + provinceName + ", countryName=" + countryName + "]");
+		Debug.println(indent, "LOCATION:[locationId=" + id + ", locationName=" + locationName + ", provinceName=" + provinceName + ", countryName=" + countryName + "]");
 	}
 
 	@Override

@@ -317,7 +317,6 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	
 	}
 	
-
 	public List<CVTerm> getTermsByCvId(CvId cvId,int start,int numOfRows) throws MiddlewareQueryException{
 		List<CVTerm> terms = new ArrayList<CVTerm>();
 		

@@ -73,7 +73,7 @@ public class TestStudyValuesTransformer {
 	
 	private StudyDetails createStudyDetailsTestData() {
 		StudyDetails studyDetails = new StudyDetails("pheno_t7", "Phenotyping trials of the Population 114", "0",
-				"To evaluate the Population 114", "20130805", "20130805", StudyType.N, 1);
+				"To evaluate the Population 114", "20130805", "20130805", StudyType.N, 1,"This is a TrialDataSetName","This is a measurementDatasetName");
 		return studyDetails;
 	}
 	
