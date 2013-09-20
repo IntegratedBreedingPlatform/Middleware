@@ -3,7 +3,7 @@ package org.generationcp.middleware.operation.transformer.etl.test;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.domain.dms.FactorType;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.StudyValues;
 import org.generationcp.middleware.domain.dms.Variable;
@@ -97,24 +97,24 @@ public class TestStudyValuesTransformer {
 	private VariableTypeList createVariableTypeListTestData() {
 		VariableTypeList list = new VariableTypeList();
 		
-		list.add(new VariableType("STUDY1", "STUDY 1", createVariable(FactorType.STUDY), 1));
-		list.add(new VariableType("STUDY2", "STUDY 2", createVariable(FactorType.STUDY), 2));
-		list.add(new VariableType("STUDY3", "STUDY 3", createVariable(FactorType.STUDY), 3));
-		list.add(new VariableType("FACTOR4", "FACTOR 4", createVariable(FactorType.TRIAL_DESIGN), 4));
-		list.add(new VariableType("FACTOR5", "FACTOR 5", createVariable(FactorType.GERMPLASM), 5));
-		list.add(new VariableType("FACTOR6", "FACTOR 6", createVariable(FactorType.GERMPLASM), 6));
-		list.add(new VariableType("FACTOR7", "FACTOR 7", createVariable(FactorType.TRIAL_ENVIRONMENT), 7));
-		list.add(new VariableType("FACTOR8", "FACTOR 8", createVariable(FactorType.TRIAL_ENVIRONMENT), 8));
+		list.add(new VariableType("STUDY1", "STUDY 1", createVariable(PhenotypicType.STUDY), 1));
+		list.add(new VariableType("STUDY2", "STUDY 2", createVariable(PhenotypicType.STUDY), 2));
+		list.add(new VariableType("STUDY3", "STUDY 3", createVariable(PhenotypicType.STUDY), 3));
+		list.add(new VariableType("FACTOR4", "FACTOR 4", createVariable(PhenotypicType.TRIAL_DESIGN), 4));
+		list.add(new VariableType("FACTOR5", "FACTOR 5", createVariable(PhenotypicType.GERMPLASM), 5));
+		list.add(new VariableType("FACTOR6", "FACTOR 6", createVariable(PhenotypicType.GERMPLASM), 6));
+		list.add(new VariableType("FACTOR7", "FACTOR 7", createVariable(PhenotypicType.TRIAL_ENVIRONMENT), 7));
+		list.add(new VariableType("FACTOR8", "FACTOR 8", createVariable(PhenotypicType.TRIAL_ENVIRONMENT), 8));
 		list.add(new VariableType("VARIATE1", "VARIATE 1", createVariable(null), 9));
 		list.add(new VariableType("VARIATE2", "VARIATE 2", createVariable(null), 10));
 		
 		return list;
 	}
 	
-	private StandardVariable createVariable(FactorType factorType) {
+	private StandardVariable createVariable(PhenotypicType getPhenotypicType) {
 		StandardVariable stdvar = new StandardVariable();
-		if (factorType != null) {
-			stdvar.setFactorType(factorType);
+		if (getPhenotypicType != null) {
+			stdvar.setPhenotypicType(getPhenotypicType);
 		}
 		return stdvar;
 	}

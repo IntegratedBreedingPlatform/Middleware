@@ -36,8 +36,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
-import com.mchange.util.AssertException;
-
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
@@ -103,7 +101,7 @@ public class TestOntologyDataManagerImpl {
 		assertTrue(stdVar.getMethod() == stdVar2.getMethod());
 		assertTrue(stdVar.getDataType() == stdVar2.getDataType());
 		assertTrue(stdVar.getStoredIn() == stdVar2.getStoredIn());
-		assertTrue(stdVar.getFactorType() == stdVar2.getFactorType());
+		assertTrue(stdVar.getPhenotypicType() == stdVar2.getPhenotypicType());
 		assertTrue(stdVar.getConstraints() == stdVar2.getConstraints());
 		assertTrue(stdVar.getName().equals(stdVar2.getName()));
 		assertTrue(stdVar.getDescription().equals(stdVar2.getDescription()));

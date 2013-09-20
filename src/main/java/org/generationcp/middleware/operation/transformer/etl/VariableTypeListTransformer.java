@@ -2,7 +2,7 @@ package org.generationcp.middleware.operation.transformer.etl;
 
 import java.util.List;
 
-import org.generationcp.middleware.domain.dms.FactorType;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
@@ -37,7 +37,7 @@ public class VariableTypeListTransformer extends Transformer {
 					measurementVariable.getProperty(),
 					measurementVariable.getScale(),
 					measurementVariable.getMethod(), 
-					isVariate ? null : FactorType.getFactorTypeForLabel(measurementVariable.getLabel()),
+					isVariate ? null : PhenotypicType.getPhenotypicTypeForLabel(measurementVariable.getLabel()),
 					measurementVariable.getDataType());
 			
 			VariableType variableType = new VariableType(

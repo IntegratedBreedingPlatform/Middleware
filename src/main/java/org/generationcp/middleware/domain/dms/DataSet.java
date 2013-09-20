@@ -114,13 +114,13 @@ public class DataSet {
 		return filteredFactors.sort();
 	}
 	
-	public VariableTypeList getFactorsByFactorType(FactorType factorType) {
+	public VariableTypeList getFactorsByPhenotypicType(PhenotypicType factorType) {
 		VariableTypeList filteredFactors = new VariableTypeList();
 		
 		VariableTypeList factors = getVariableTypes() != null ? getVariableTypes().getFactors() : null;
 		if (factors != null && factors.getVariableTypes() != null) {
 			for (VariableType factor : factors.getVariableTypes()) {
-				if (factor.getStandardVariable().getFactorType() == factorType) {
+				if (factor.getStandardVariable().getPhenotypicType() == factorType) {
 					filteredFactors.add(factor);
 				}
 			}

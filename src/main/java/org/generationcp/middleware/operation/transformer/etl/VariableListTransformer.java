@@ -2,7 +2,7 @@ package org.generationcp.middleware.operation.transformer.etl;
 
 import java.util.List;
 
-import org.generationcp.middleware.domain.dms.FactorType;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
@@ -29,7 +29,7 @@ public class VariableListTransformer extends Transformer {
 			if (mRow.getDataList().size() == variableTypeList.getVariableTypes().size()) {
 				int i = 0;
 				for (VariableType variableType : variableTypeList.getVariableTypes()) {
-					if (variableType.getStandardVariable().getFactorType() == FactorType.GERMPLASM) {
+					if (variableType.getStandardVariable().getPhenotypicType() == PhenotypicType.GERMPLASM) {
 						variableList.add(new Variable(variableType, mRow.getDataList().get(i).getValue()));
 					}
 					i++;
@@ -54,7 +54,7 @@ public class VariableListTransformer extends Transformer {
 					VariableType varType = varTypes.get(i);
 					String value = mRow.getDataList().get(i).getValue();
 										
-					if (varType.getStandardVariable().getFactorType() == FactorType.TRIAL_ENVIRONMENT) {
+					if (varType.getStandardVariable().getPhenotypicType() == PhenotypicType.TRIAL_ENVIRONMENT) {
 						Variable variable = new Variable(varType, value);
 						variableList.add(variable);
 					}
@@ -79,7 +79,7 @@ public class VariableListTransformer extends Transformer {
 					VariableType varType = varTypes.get(i);
 					String value = mVarList.get(i).getValue();
 					
-					if (varType.getStandardVariable().getFactorType() == FactorType.TRIAL_ENVIRONMENT) {
+					if (varType.getStandardVariable().getPhenotypicType() == PhenotypicType.TRIAL_ENVIRONMENT) {
 						variableList.add(new Variable(varType,value));
 					}
 				}

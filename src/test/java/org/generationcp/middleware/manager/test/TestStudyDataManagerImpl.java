@@ -28,7 +28,7 @@ import org.generationcp.middleware.domain.dms.DatasetValues;
 import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.ExperimentValues;
-import org.generationcp.middleware.domain.dms.FactorType;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -638,18 +638,18 @@ public class TestStudyDataManagerImpl {
 	}
 	
 	@Test
-	public void testGetFactorsByFactorType() throws Exception {
-		FactorType factorType = FactorType.DATASET;
+	public void testGetFactorsByPhenotypicType() throws Exception {
+		PhenotypicType role = PhenotypicType.DATASET;
 		int datasetId = 10087;
-		System.out.println("testGetFactorsByFactorType (dataset=" + datasetId + ", factorType=" + factorType + ")");
+		System.out.println("testGetFactorsByPhenotypicType (dataset=" + datasetId + ", role=" + role + ")");
 		DataSet dataset = manager.getDataSet(datasetId);
-		VariableTypeList factors = dataset.getFactorsByFactorType(factorType);
+		VariableTypeList factors = dataset.getFactorsByPhenotypicType(role);
 		if (factors != null && factors.getVariableTypes() != null && factors.getVariableTypes().size() > 0) {
 			for (VariableType factor : factors.getVariableTypes()) {
 				factor.print(0);
 			}
 		} else {
-			System.out.println("NO FACTORS FOUND FOR DATASET = " + datasetId + " WITH FACTOR TYPE = " + factorType);
+			System.out.println("NO FACTORS FOUND FOR DATASET = " + datasetId + " WITH FACTOR TYPE = " + role);
 		}
 	}
 	

@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.generationcp.middleware.domain.dms.Enumeration;
-import org.generationcp.middleware.domain.dms.FactorType;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.NameSynonym;
 import org.generationcp.middleware.domain.dms.NameType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -64,7 +64,7 @@ public class StandardVariableBuilder extends Builder {
 			standardVariable.setScale(createTerm(cvTermRelationships, TermId.HAS_SCALE));
 			standardVariable.setDataType(createTerm(cvTermRelationships, TermId.HAS_TYPE));
 			standardVariable.setStoredIn(createTerm(cvTermRelationships, TermId.STORED_IN));
-			standardVariable.setFactorType(createFactorType(standardVariable.getStoredIn().getId()));
+			standardVariable.setPhenotypicType(createRole(standardVariable.getStoredIn().getId()));
 			addEnumerations(standardVariable, cvTermRelationships);
 		}
 	}
@@ -166,17 +166,17 @@ public class StandardVariableBuilder extends Builder {
 		return null;
 	}
 	
-	private FactorType createFactorType(int storedInTerm) {
-		for (FactorType factorType : FactorType.values()) {
-			if (factorType.getFactorStorages().contains(storedInTerm)) {
-				return factorType;
+	private PhenotypicType createRole(int storedInTerm) {
+		for (PhenotypicType role : PhenotypicType.values()) {
+			if (role.getTypeStorages().contains(storedInTerm)) {
+				return role;
 			}
 		}
 		return null;
 	}
 	
 	public StandardVariable findOrSave(String name, String description, String propertyName, String scaleName, 
-			String methodName, FactorType factorType, String dataTypeString) 
+			String methodName, PhenotypicType role, String dataTypeString) 
 			throws MiddlewareQueryException, MiddlewareException {
 		
         Term property = getTermBuilder().findOrSaveTermByName(propertyName, CvId.PROPERTIES);
@@ -193,7 +193,7 @@ public class StandardVariableBuilder extends Builder {
 			standardVariable.setScale(scale);
 			standardVariable.setMethod(method);
 			standardVariable.setDataType(getDataType(dataTypeString));
-			standardVariable.setStoredIn(getStorageTypeTermByFactorType(factorType));
+			standardVariable.setStoredIn(getStorageTypeTermByRole(role));
 			
 			Integer standardVariableId = getStandardVariableSaver().save(standardVariable);
         	standardVariable = getStandardVariableBuilder().create(standardVariableId);
@@ -212,11 +212,11 @@ public class StandardVariableBuilder extends Builder {
         return dataType;
 	}
 	
-	private Term getStorageTypeTermByFactorType(FactorType factorType) throws MiddlewareQueryException {
+	private Term getStorageTypeTermByRole(PhenotypicType role) throws MiddlewareQueryException {
 		Term storedIn = null;
-		if (factorType != null) {
+		if (role != null) {
 			Integer storedInId = null;
-			switch (factorType) {
+			switch (role) {
 				case STUDY : storedInId = TermId.STUDY_INFO_STORAGE.getId();
 					break;
 				case DATASET : storedInId = TermId.DATASET_INFO_STORAGE.getId();
@@ -226,6 +226,8 @@ public class StandardVariableBuilder extends Builder {
 				case TRIAL_DESIGN : storedInId = TermId.TRIAL_DESIGN_INFO_STORAGE.getId();
 					break;
 				case TRIAL_ENVIRONMENT : storedInId = TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId();
+					break;
+				case VARIATE: storedInId = TermId.OBSERVATION_VARIATE.getId();
 			}
 			storedIn = getTermBuilder().get(storedInId);
 		} else {

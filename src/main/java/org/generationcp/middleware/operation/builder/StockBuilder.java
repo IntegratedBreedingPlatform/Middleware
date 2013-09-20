@@ -14,7 +14,7 @@ package org.generationcp.middleware.operation.builder;
 import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.FactorType;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Stock;
 import org.generationcp.middleware.domain.dms.Stocks;
 import org.generationcp.middleware.domain.dms.Study;
@@ -51,8 +51,8 @@ public class StockBuilder extends Builder {
 
 	private VariableTypeList getStockVariableTypes(Study study, DataSet dataSet) {
 		VariableTypeList stockVariableTypes = new VariableTypeList();
-		stockVariableTypes.addAll(study.getVariableTypesByFactorType(FactorType.GERMPLASM));
-		stockVariableTypes.addAll(dataSet.getFactorsByFactorType(FactorType.GERMPLASM));
+		stockVariableTypes.addAll(study.getVariableTypesByPhenotypicType(PhenotypicType.GERMPLASM));
+		stockVariableTypes.addAll(dataSet.getFactorsByPhenotypicType(PhenotypicType.GERMPLASM));
 		return stockVariableTypes;
 	}
 

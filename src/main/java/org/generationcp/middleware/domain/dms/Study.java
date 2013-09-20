@@ -179,12 +179,12 @@ public class Study {
 		return builder.toString();
 	}
 
-	public VariableTypeList getVariableTypesByFactorType(FactorType factorType) {
+	public VariableTypeList getVariableTypesByPhenotypicType(PhenotypicType pheotypicType) {
 		VariableTypeList filteredFactors = new VariableTypeList();
 		VariableTypeList factors = getConditionVariableTypes();
 		if (factors != null && factors.getVariableTypes() != null) {
 			for (VariableType factor : factors.getVariableTypes()) {
-				if (factor.getStandardVariable().getFactorType() == factorType) {
+				if (factor.getStandardVariable().getPhenotypicType() == pheotypicType) {
 					filteredFactors.add(factor);
 				}
 			}

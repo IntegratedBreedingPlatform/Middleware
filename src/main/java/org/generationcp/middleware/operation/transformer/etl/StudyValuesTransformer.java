@@ -1,6 +1,6 @@
 package org.generationcp.middleware.operation.transformer.etl;
 
-import org.generationcp.middleware.domain.dms.FactorType;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StudyValues;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
@@ -32,7 +32,7 @@ public class StudyValuesTransformer extends Transformer {
 		
 		if (variableTypeList != null) {
 			for (VariableType variableType : variableTypeList.getVariableTypes()) {
-				if (variableType.getStandardVariable().getFactorType() == FactorType.STUDY ) {
+				if (variableType.getStandardVariable().getPhenotypicType() == PhenotypicType.STUDY ) {
 					variableList.add(new Variable(variableType, measurementVariables.get(i).getValue()));
 				}
 				i++;

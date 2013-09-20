@@ -19,7 +19,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.FactorType;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.LocationDto;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.TrialEnvironment;
@@ -62,8 +62,8 @@ public class TrialEnvironmentBuilder extends Builder {
 
 	private VariableTypeList getTrialEnvironmentVariableTypes(Study study, DataSet dataSet) {
 		VariableTypeList trialEnvironmentVariableTypes = new VariableTypeList();
-		trialEnvironmentVariableTypes.addAll(study.getVariableTypesByFactorType(FactorType.TRIAL_ENVIRONMENT));
-		trialEnvironmentVariableTypes.addAll(dataSet.getFactorsByFactorType(FactorType.TRIAL_ENVIRONMENT));
+		trialEnvironmentVariableTypes.addAll(study.getVariableTypesByPhenotypicType(PhenotypicType.TRIAL_ENVIRONMENT));
+		trialEnvironmentVariableTypes.addAll(dataSet.getFactorsByPhenotypicType(PhenotypicType.TRIAL_ENVIRONMENT));
 		return trialEnvironmentVariableTypes;
 	}
 

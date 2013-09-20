@@ -7,10 +7,12 @@ import java.util.List;
 import org.generationcp.middleware.domain.oms.TermId;
 
 /**
- * The different factor types used for study, dataset, trial environment, germplasm, trial design.
+ * The different phenotypic types used in standard variable. 
+ * For factor type, these are used: STUDY, DATASET, TRIAL_ENVIRONMENT, GERMPLASM, TRIAL_DESIGN
+ * For role type, these are used: TRIAL_ENVIRONMENT, GERMPLASM, TRIAL_DESIGN, VARIATE
  *
  */
-public enum FactorType {
+public enum PhenotypicType {
 
     STUDY(Arrays.asList(
             TermId.STUDY_NAME_STORAGE.getId(),
@@ -39,33 +41,38 @@ public enum FactorType {
            Arrays.asList("ENTRY")), 
     TRIAL_DESIGN(Arrays.asList(
             TermId.TRIAL_DESIGN_INFO_STORAGE.getId()),
-           Arrays.asList("PLOT"));
+           Arrays.asList("PLOT")),
+    VARIATE(Arrays.asList(
+		   TermId.OBSERVATION_VARIATE.getId(),
+		   TermId.CATEGORICAL_VARIATE.getId()),
+		   Arrays.asList("STUDY", "PLOT", "TRIAL"))
+           ;
 
 
-    private List<Integer> factorStorages;
+    private List<Integer> typeStorages;
     private List<String> labelList;
     
-    private FactorType(List<Integer> factorStorages, List<String> labelList) {
-        this.factorStorages = factorStorages;
+    private PhenotypicType(List<Integer> typeStorages, List<String> labelList) {
+        this.typeStorages = typeStorages;
         this.labelList = labelList;
     }
 
-	public List<Integer> getFactorStorages() {
-        return this.factorStorages;
+	public List<Integer> getTypeStorages() {
+        return this.typeStorages;
     }
 
 	public List<String> getLabelList() {
 		return labelList;
 	}
     
-    public static FactorType getFactorTypeForLabel(String label){
+    public static PhenotypicType getPhenotypicTypeForLabel(String label){
     	
     	if (label != null){    		
-    		for (FactorType factorType : FactorType.values()){
-    			List<String> labelList = factorType.getLabelList();
+    		for (PhenotypicType type : PhenotypicType.values()){
+    			List<String> labelList = type.getLabelList();
     			for (String factorLabel : labelList){
     				if (factorLabel.toUpperCase().equals(label.toUpperCase())){
-    					return factorType;
+    					return type;
     				}
     			}
     		}
