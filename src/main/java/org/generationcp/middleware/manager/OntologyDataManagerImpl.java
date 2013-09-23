@@ -345,7 +345,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		int end = ((start + numOfRows) > list.length - 1 )? list.length - 1 : (start + numOfRows) ;
 		String endSD = list[end].toString();
 
-		return standardVariables.subMap(startSD, endSD);	
+		return standardVariables.subMap(startSD, true, endSD, true);	
 	}
 }
 

@@ -518,7 +518,7 @@ public class TestOntologyDataManagerImpl {
 	public void testGetStandardVariablesForPhenotypicType() throws Exception{
 		System.out.println("Test testGetStandardVariablesForPhenotypicType");
 		
-		PhenotypicType phenotypicType =  PhenotypicType.STUDY;
+		PhenotypicType phenotypicType =  PhenotypicType.TRIAL_ENVIRONMENT;
 		Integer start = 0;
 		Integer numOfRows = 100;
 		
@@ -527,5 +527,7 @@ public class TestOntologyDataManagerImpl {
 		for(Object key : standardVariables.keySet()) {
 	        System.out.println(key + " : " + standardVariables.get(key).getId() + " : " + standardVariables.get(key).toString());
 	    }
+		
+		System.out.println("count: " + standardVariables.size());
 	}
 }
