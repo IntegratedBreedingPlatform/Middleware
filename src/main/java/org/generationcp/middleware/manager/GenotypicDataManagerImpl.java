@@ -2017,36 +2017,45 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         try {
             // Begin save transaction
             trans = session.beginTransaction();
-
+            
             // Add GDMS Marker
-            MarkerDAO markerDao = getMarkerDao();
+            Integer markerSavedId = marker.getMarkerId() == null ? getMarkerIdByMarkerName(marker.getMarkerName()) : marker.getMarkerId();
+            if (markerSavedId == null) {
+            	requireLocalDatabaseInstance();
+                MarkerDAO markerDao = getMarkerDao();
 
-            Integer markerGeneratedId = markerDao.getNegativeId("markerId");
-            marker.setMarkerId(markerGeneratedId);
-
-            marker.setMarkerType("UA");
-
-            Marker markerRecordSaved = markerDao.saveOrUpdate(marker);
-            Integer markerSavedId = markerRecordSaved.getMarkerId();
-
+                Integer markerGeneratedId = markerDao.getNegativeId("markerId");
+	            marker.setMarkerId(markerGeneratedId);
+	
+	            marker.setMarkerType("UA");
+	
+	            Marker markerRecordSaved = markerDao.saveOrUpdate(marker);
+	            markerSavedId = markerRecordSaved.getMarkerId();
+            }
+            
             if (markerSavedId == null) {
                 throw new Exception(); // To immediately roll back and to avoid executing the other insert functions
             }
 
             // Add Map
-            MapDAO mapDao = getMapDao();
-
-            Integer mapGeneratedId = mapDao.getNegativeId("mapId");
-            map.setMapId(mapGeneratedId);
-
-            Map mapRecordSaved = mapDao.saveOrUpdate(map);
-            Integer mapSavedId = mapRecordSaved.getMapId();
-
+            Integer mapSavedId = map.getMapId() == null ? getMapIdByMapName(map.getMapName()) : map.getMapId();
+            if (mapSavedId == null) {
+            	requireLocalDatabaseInstance();
+            	MapDAO mapDao = getMapDao();
+            	
+	            Integer mapGeneratedId = mapDao.getNegativeId("mapId");
+	            map.setMapId(mapGeneratedId);
+	
+	            Map mapRecordSaved = mapDao.saveOrUpdate(map);
+	            mapSavedId = mapRecordSaved.getMapId();
+            }
+            
             if (mapSavedId == null) {
                 throw new Exception(); // To immediately roll back and to avoid executing the other insert functions
             }
 
             // Add Marker on Map
+            requireLocalDatabaseInstance();
             MarkerOnMapDAO markerOnMapDao = getMarkerOnMapDao();
 
             // No need to generate id, MarkerOnMap(markerId, mapId) are foreign keys
@@ -2075,6 +2084,32 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         }
 
         return transactionStatus;
+    }
+    
+    private Integer getMarkerIdByMarkerName(String markerName) throws MiddlewareQueryException {
+    	Integer markerId = null;
+    	
+    	setWorkingDatabase(Database.CENTRAL);
+    	markerId = getMarkerDao().getIdByName(markerName);
+    	if (markerId == null) {
+    		setWorkingDatabase(Database.LOCAL);
+    		markerId = getMarkerDao().getIdByName(markerName);
+    	}
+    	
+    	return markerId;
+    }
+    
+    private Integer getMapIdByMapName(String mapName) throws MiddlewareQueryException {
+    	Integer mapId = null;
+    	
+    	setWorkingDatabase(Database.CENTRAL);
+    	mapId = getMapDao().getMapIdByName(mapName);
+    	if (mapId == null) {
+    		setWorkingDatabase(Database.LOCAL);
+    		mapId = getMapDao().getMapIdByName(mapName);
+    	}
+    	
+    	return mapId;
     }
     
     @Override

@@ -670,6 +670,19 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
         return 0L;
     }
     
+    public Integer getIdByName(String name) throws MiddlewareQueryException {
+    	try {
+    		SQLQuery query = getSession().createSQLQuery(Marker.GET_ID_BY_NAME);
+    		query.setParameter("markerName", name);
+    		return (Integer) query.uniqueResult();
+    		
+    	} catch(HibernateException e) {
+    		logAndThrowException("Error with getIdByName(" + name + "): " + e.getMessage(), e);
+    	}
+    	
+    	return null;
+    }
+    
 /*    @SuppressWarnings("rawtypes")
     public Set<Integer> getMarkersByMarkerIDs(List<Integer> markerIDs, int start, int numOfRows) throws MiddlewareQueryException{
         try {

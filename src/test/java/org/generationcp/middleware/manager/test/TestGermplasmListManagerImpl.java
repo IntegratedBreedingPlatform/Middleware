@@ -15,24 +15,30 @@ package org.generationcp.middleware.manager.test;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.generationcp.middleware.manager.DataManager;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
+/* The add/update/delete tests are highly dependent on the tests before it 
+   Therefore the order of execution is important.
+   In the future, we will change this to make tests independent of each other.
+   As a temporary solution, we will force the ordering in those methods using FixMethodOrder"
+*/
+@FixMethodOrder(MethodSorters.JVM)
 public class TestGermplasmListManagerImpl{
 
     private static ManagerFactory factory;
@@ -385,7 +391,7 @@ public class TestGermplasmListManagerImpl{
         List<GermplasmList> germplasmLists = new ArrayList<GermplasmList>();
         List<GermplasmListData> listDataList = new ArrayList<GermplasmListData>();
 
-        System.out.println("Test Case #1: test deleteGermplasmListByListId");
+/*        System.out.println("Test Case #1: test deleteGermplasmListByListId");
         GermplasmList germplasmList = manager.getGermplasmListByName("Test List #1", 0, 1, Operation.EQUAL, Database.LOCAL).get(0);
         germplasmLists.add(germplasmList);
         listDataList.addAll(germplasmList.getListData());
@@ -396,9 +402,9 @@ public class TestGermplasmListManagerImpl{
         germplasmLists.add(germplasmList);
         listDataList.addAll(germplasmList.getListData());
         System.out.println("\tremoved " + manager.deleteGermplasmList(germplasmList) + " record(s)");
-
+*/
         System.out.println("Test Case #3: test deleteGermplasmList(list of data) - with cascade delete");
-        germplasmList = manager.getGermplasmListByName("Test List #2", 0, 1, Operation.EQUAL, Database.LOCAL).get(0);
+        GermplasmList germplasmList = manager.getGermplasmListByName("Test List #2", 0, 1, Operation.EQUAL, Database.LOCAL).get(0);
         List<GermplasmList> toBeDeleted = new ArrayList<GermplasmList>();
         toBeDeleted.add(germplasmList);
         listDataList.addAll(germplasmList.getListData());

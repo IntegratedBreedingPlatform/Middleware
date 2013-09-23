@@ -155,6 +155,11 @@ public class Marker implements Serializable{
             + "WHERE marker_id IN (:markerIdList) " 
             ;
     
+    public static final String GET_ID_BY_NAME =
+    		"SELECT marker_id "
+    		+ "FROM gdms_marker "
+    		+ "WHERE marker_name = :markerName";
+    
     @Id
     @Basic(optional = false)
     @Column(name = "marker_id")
