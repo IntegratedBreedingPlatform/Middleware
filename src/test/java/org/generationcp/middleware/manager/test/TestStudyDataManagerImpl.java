@@ -639,17 +639,23 @@ public class TestStudyDataManagerImpl {
 	
 	@Test
 	public void testGetFactorsByPhenotypicType() throws Exception {
-		PhenotypicType role = PhenotypicType.DATASET;
+		PhenotypicType phenotypicType = PhenotypicType.DATASET;
 		int datasetId = 10087;
-		System.out.println("testGetFactorsByPhenotypicType (dataset=" + datasetId + ", role=" + role + ")");
+		datasetId = -30;
+		System.out.println("testGetFactorsByPhenotypicType (dataset=" + datasetId + ", role=" + phenotypicType + ")");
 		DataSet dataset = manager.getDataSet(datasetId);
-		VariableTypeList factors = dataset.getFactorsByPhenotypicType(role);
-		if (factors != null && factors.getVariableTypes() != null && factors.getVariableTypes().size() > 0) {
-			for (VariableType factor : factors.getVariableTypes()) {
-				factor.print(0);
+		if (dataset != null){
+			VariableTypeList factors = dataset.getFactorsByPhenotypicType(phenotypicType);
+		
+			if (factors != null && factors.getVariableTypes() != null && factors.getVariableTypes().size() > 0) {
+				for (VariableType factor : factors.getVariableTypes()) {
+					factor.print(0);
+				}
+			} else {
+				System.out.println("NO FACTORS FOUND FOR DATASET = " + datasetId + " WITH FACTOR TYPE = " + phenotypicType);
 			}
 		} else {
-			System.out.println("NO FACTORS FOUND FOR DATASET = " + datasetId + " WITH FACTOR TYPE = " + role);
+			System.out.println("DATASET = " + datasetId + " NOT FOUND. ");
 		}
 	}
 	
