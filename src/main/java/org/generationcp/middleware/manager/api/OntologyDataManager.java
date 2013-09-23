@@ -204,4 +204,18 @@ public interface OntologyDataManager {
 	 */
 	Map<String, StandardVariable> getStandardVariablesForPhenotypicType(PhenotypicType type) throws MiddlewareQueryException;
 	
+	/**
+	 * Returns the standard variables associated to a project from projectprop, cvterm or trait - in the given order.
+	 * 
+	 * 1. Search for DISTINCT standard variables used for projectprop records where projectprop.value equals input name (eg. REP)
+	 * 2. If no variable found, search for cvterm (standard variables) with given name.
+	 * 3. If no variable still found for steps 1 and 2, treat the header as a trait / property name. 
+	 * 		Search for trait with given name and return the standard variables using that trait (if any)
+	 * 
+	 * @param headers
+	 * @return The key in map would be the header string. If no standard variable list found, an empty list on map is returned for that header key.
+	 * @throws MiddlewareQueryException
+	 */
+	Map<String, List<StandardVariable>> getStandardVariablesInProjects(List<String> headers) throws MiddlewareQueryException;
+	
 }

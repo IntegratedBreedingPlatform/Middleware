@@ -315,6 +315,12 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		
 		return null;	
 	}
+	
+	@Override
+	public Map<String, List<StandardVariable>> getStandardVariablesInProjects(List<String> headers) throws MiddlewareQueryException{
+		return null;
+	}
+
 }
 
 
