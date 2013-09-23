@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -311,9 +312,40 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 	
 	@Override
-	public Map<String, StandardVariable> getStandardVariablesForPhenotypicType(PhenotypicType type) throws MiddlewareQueryException{
+	public Map<String, StandardVariable> getStandardVariablesForPhenotypicType(PhenotypicType type, int start, int numOfRows) 
+			throws MiddlewareQueryException{
 		
-		return null;	
+		TreeMap<String, StandardVariable> standardVariables = new TreeMap<String,StandardVariable>();
+		List<Integer> centralStdVariableIds = new ArrayList<Integer>();
+		List<Integer> localStdVariableIds = new ArrayList<Integer>();
+		
+		if (setWorkingDatabase(Database.CENTRAL)) {
+			centralStdVariableIds = getCvTermDao().getStandardVariableIdsByPhenotypicType(type);
+			
+			for(Integer stdVarId : centralStdVariableIds ){
+				StandardVariable sd = getStandardVariableBuilder().create(stdVarId);
+				standardVariables.put(sd.getName(),sd);
+			}
+		}
+		
+		if (setWorkingDatabase(Database.LOCAL)) {
+			localStdVariableIds = getCvTermDao().getStandardVariableIdsByPhenotypicType(type);
+			
+			for(Integer stdVarId : localStdVariableIds ){
+				StandardVariable sd = getStandardVariableBuilder().create(stdVarId);
+				standardVariables.put(sd.getName(),sd);
+			}
+		}
+		
+		Set<String> standardVariablesSet = standardVariables.keySet();
+		Object[] list = standardVariablesSet.toArray();
+		
+		String startSD = list[start].toString();
+		
+		int end = ((start + numOfRows) > list.length - 1 )? list.length - 1 : (start + numOfRows) ;
+		String endSD = list[end].toString();
+
+		return standardVariables.subMap(startSD, endSD);	
 	}
 }
 

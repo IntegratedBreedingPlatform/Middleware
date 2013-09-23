@@ -14,12 +14,14 @@ package org.generationcp.middleware.manager.test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.NameSynonym;
 import org.generationcp.middleware.domain.dms.NameType;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.oms.CvId;
@@ -154,7 +156,7 @@ public class TestOntologyDataManagerImpl {
 		stdVariable.setName("Test SPM" + new Random().nextInt(10000));
 		stdVariable.setDescription("Std variable with new scale, property, method");
 		
-		Term newProperty = new Term(0, "Test Property", "Test Property");
+		Term newProperty = new Term(2451, "Environment", "Environment");
 		Term property = manager.findTermByName(newProperty.getName(),CvId.PROPERTIES);
 		if(property==null) {
 			System.out.println("new property = " + newProperty.getName());
@@ -162,7 +164,7 @@ public class TestOntologyDataManagerImpl {
 		} else {
 			System.out.println("property id = " + property.getId());
 		}
-		Term newScale = new Term(0, "Test Scale", "Test Scale");
+		Term newScale = new Term(6020, "Text", "Text");
 		Term scale = manager.findTermByName(newScale.getName(),CvId.SCALES);
 		if(scale==null) {
 			System.out.println("new scale = " + newScale.getName());
@@ -510,5 +512,20 @@ public class TestOntologyDataManagerImpl {
 		List<Term> terms = manager.getDataTypes();		
 		System.out.println("testGetDataTypes: " + terms.size());
 		printTerms(terms);
+	}
+	
+	@Test 
+	public void testGetStandardVariablesForPhenotypicType() throws Exception{
+		System.out.println("Test testGetStandardVariablesForPhenotypicType");
+		
+		PhenotypicType phenotypicType =  PhenotypicType.STUDY;
+		Integer start = 0;
+		Integer numOfRows = 100;
+		
+		Map<String, StandardVariable> standardVariables = manager.getStandardVariablesForPhenotypicType(phenotypicType, start, numOfRows);
+		
+		for(Object key : standardVariables.keySet()) {
+	        System.out.println(key + " : " + standardVariables.get(key).getId() + " : " + standardVariables.get(key).toString());
+	    }
 	}
 }

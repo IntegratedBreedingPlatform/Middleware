@@ -202,6 +202,6 @@ public interface OntologyDataManager {
 	 * @return Map of PhenotypicType - StandardVariable
 	 * @throws MiddlewareQueryException
 	 */
-	Map<String, StandardVariable> getStandardVariablesForPhenotypicType(PhenotypicType type) throws MiddlewareQueryException;
+	Map<String, StandardVariable> getStandardVariablesForPhenotypicType(PhenotypicType type, int start,int numOfRows) throws MiddlewareQueryException;
 	
 }
