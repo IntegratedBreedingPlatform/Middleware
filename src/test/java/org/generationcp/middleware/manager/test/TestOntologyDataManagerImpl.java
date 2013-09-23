@@ -103,8 +103,8 @@ public class TestOntologyDataManagerImpl {
 		assertTrue(stdVar.getStoredIn() == stdVar2.getStoredIn());
 		assertTrue(stdVar.getPhenotypicType() == stdVar2.getPhenotypicType());
 		assertTrue(stdVar.getConstraints() == stdVar2.getConstraints());
-		assertTrue(stdVar.getName().equals(stdVar2.getName()));
-		assertTrue(stdVar.getDescription().equals(stdVar2.getDescription()));
+		if (stdVar.getName() != null) assertTrue(stdVar.getName().equals(stdVar2.getName()));
+		if (stdVar.getDescription() != null) assertTrue(stdVar.getDescription().equals(stdVar2.getDescription()));
 		assertTrue(stdVar.getEnumerations() == stdVar2.getEnumerations());
 		
 	    System.out.println("testCopyStandardVariable(): \n    " + stdVar + "\n    " + stdVar2);

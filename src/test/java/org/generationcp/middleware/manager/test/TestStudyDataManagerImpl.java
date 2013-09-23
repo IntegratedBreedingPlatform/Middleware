@@ -641,7 +641,6 @@ public class TestStudyDataManagerImpl {
 	public void testGetFactorsByPhenotypicType() throws Exception {
 		PhenotypicType phenotypicType = PhenotypicType.DATASET;
 		int datasetId = 10087;
-		datasetId = -30;
 		System.out.println("testGetFactorsByPhenotypicType (dataset=" + datasetId + ", role=" + phenotypicType + ")");
 		DataSet dataset = manager.getDataSet(datasetId);
 		if (dataset != null){
