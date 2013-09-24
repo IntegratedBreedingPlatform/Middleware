@@ -296,46 +296,100 @@ public class StandardVariableBuilder extends Builder {
 		}
 		return standardVariable;
 	}
-
+	
 	public Map<String, List<StandardVariable>> getStandardVariablesInProjects(List<String> headers) 
 			throws MiddlewareQueryException {
 		Map<String, List<StandardVariable>> standardVariablesInProjects = new HashMap<String, List<StandardVariable>>();
 		
-		Map<String, Set<Integer>> standardVariableIdsInProjectsLocal = new HashMap<String, Set<Integer>>();
-		Map<String, Set<Integer>> standardVariableIdsInProjectsCentral = new HashMap<String, Set<Integer>>();
+		Map<String, Set<Integer>> standardVariableIdsInProjects = new HashMap<String, Set<Integer>>();
 
-        if (setWorkingDatabase(Database.LOCAL)) {
-
-			// Step 1: Search for DISTINCT standard variables used for projectprop records 
-        	// where projectprop.value equals input name (eg. REP)
-        	standardVariableIdsInProjectsLocal = getStandardVariableIdsForProjectProperties(headers);
-			
-			// Step 2: If no variable found, search for cvterm (standard variables) with given name.
-			standardVariableIdsInProjectsLocal.putAll(getStandardVariableIdsForTerms(headers));
-						
-			// Step 3. If no variable still found for steps 1 and 2, treat the header as a trait / property name. 
-			// Search for trait with given name and return the standard variables using that trait (if any)
-			standardVariableIdsInProjectsLocal.putAll(getStandardVariableIdsForTraits(headers));
-        }
-
-		if (setWorkingDatabase(Database.CENTRAL)){
-			
-			standardVariableIdsInProjectsCentral.putAll(getStandardVariableIdsForProjectProperties(headers));
-			
-			standardVariableIdsInProjectsCentral.putAll(getStandardVariableIdsForTerms(headers));
-						
-			standardVariableIdsInProjectsCentral.putAll(getStandardVariableIdsForTraits(headers));
+		// Step 1: Search for DISTINCT standard variables used for projectprop records where projectprop.value equals input name (eg. REP)
+		List<String> names = headers;
+		if (setWorkingDatabase(Database.LOCAL)) {
+			standardVariableIdsInProjects = getStandardVariableIdsForProjectProperties(names);
 		}
+		if (setWorkingDatabase(Database.CENTRAL)){
+			Map<String, Set<Integer>> stdVarIdsRetrieved = getStandardVariableIdsForProjectProperties(names);
+			
+			// Combine the items retrieved from local and central
+			for (String name: names){
+				name = name.toUpperCase();
+				Set<Integer> varIds = standardVariableIdsInProjects.get(name);
+				if (varIds == null || varIds.size() == 0){
+					standardVariableIdsInProjects.put(name, stdVarIdsRetrieved.get(name));
+				} else {
+					varIds.addAll(stdVarIdsRetrieved.get(name));
+					standardVariableIdsInProjects.put(name, varIds);
+				}
+			}
+			
+		}
+
+		// Step 2: If no variable found, search for cvterm (standard variables) with given name.
+		
+		// Exclude header items with result from step 1
+		names = new ArrayList<String>();
+		for (String name : headers){
+			Set<Integer> varIds = standardVariableIdsInProjects.get(name.toUpperCase());
+			if (varIds == null || varIds.size() == 0){
+				names.add(name);
+			}			
+		}
+		
+		if (setWorkingDatabase(Database.LOCAL)) {
+			standardVariableIdsInProjects.putAll(getStandardVariableIdsForTerms(names));
+		}
+		if (setWorkingDatabase(Database.CENTRAL)) {
+			Map<String, Set<Integer>> stdVarIdsRetrieved = getStandardVariableIdsForTerms(names);
+			
+			// Combine the items retrieved from local and central
+			for (String name: names){
+				name = name.toUpperCase();
+				Set<Integer> varIds = standardVariableIdsInProjects.get(name);
+				if (varIds == null || varIds.size() == 0){
+					standardVariableIdsInProjects.put(name, stdVarIdsRetrieved.get(name));
+				} else {
+					varIds.addAll(stdVarIdsRetrieved.get(name));
+					standardVariableIdsInProjects.put(name, varIds);
+				}
+			}
+		}
+						
+		// Step 3. If no variable still found for steps 1 and 2, treat the header as a trait / property name. 
+		// Search for trait with given name and return the standard variables using that trait (if any)
+
+		// Exclude header items with result from step 2
+		names = new ArrayList<String>();
+		for (String name : headers){
+			Set<Integer> varIds = standardVariableIdsInProjects.get(name.toUpperCase());
+			if (varIds == null || varIds.size() == 0){
+				names.add(name);
+			}			
+		}
+		
+		if (setWorkingDatabase(Database.LOCAL)) {
+			standardVariableIdsInProjects.putAll(getStandardVariableIdsForTraits(names));
+        }
+		if (setWorkingDatabase(Database.CENTRAL)) {
+			Map<String, Set<Integer>> stdVarIdsRetrieved = getStandardVariableIdsForTraits(names);
+			
+			// Combine the items retrieved from local and central
+			for (String name: names){
+				name = name.toUpperCase();
+				Set<Integer> varIds = standardVariableIdsInProjects.get(name);
+				if (varIds == null || varIds.size() == 0){
+					standardVariableIdsInProjects.put(name, stdVarIdsRetrieved.get(name));
+				} else {
+					varIds.addAll(stdVarIdsRetrieved.get(name));
+					standardVariableIdsInProjects.put(name, varIds);
+				}
+			}
+        }
 
 		// Build map 
 		for (String name : headers){
-
-			Set<Integer> varIds = standardVariableIdsInProjectsLocal.get(name);
-			if (varIds != null){
-				varIds.addAll(standardVariableIdsInProjectsCentral.get(name));
-			} else {
-				varIds = standardVariableIdsInProjectsCentral.get(name);
-			}
+			String upperName = name.toUpperCase();
+			Set<Integer> varIds = standardVariableIdsInProjects.get(upperName);
 			
 			List<StandardVariable> variables = new ArrayList<StandardVariable>();
 			if (varIds != null){

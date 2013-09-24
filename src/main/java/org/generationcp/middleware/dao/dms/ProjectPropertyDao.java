@@ -34,6 +34,11 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		throws MiddlewareQueryException{
 		Map<String, Set<Integer>> standardVariablesInProjects = new HashMap<String, Set<Integer>>();
 
+		// Store the names in the map in uppercase
+		for (int i = 0, size = propertyNames.size(); i < size; i++) {
+			propertyNames.set(i, propertyNames.get(i).toUpperCase());
+		}
+
 		try {
 
 			if (propertyNames.size() > 0) {
@@ -52,7 +57,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 				
         		Set<Integer> stdVarIds = new HashSet<Integer>();
 	            for (Object[] row : results){
-	            	String name = ((String) row[0]).trim(); //.toUpperCase().trim();
+	            	String name = ((String) row[0]).trim().toUpperCase();
 	            	String stdVarId = (String) row[1];
 	            	
 	            	if (standardVariablesInProjects.containsKey(name)){

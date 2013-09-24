@@ -39,13 +39,21 @@ public class TestProjectPropertyDao{
 
     @Test
     public void testGetStandardVariableIdsByPropertyNames() throws Exception {
-    	List<String> propertyNames = Arrays.asList("ENTRY","ENTRYNO","PLOT", "TRIAL_NO", "TRIAL", "STUDY", "DATASET");
+    	List<String> propertyNames = Arrays.asList("ENTRY","ENTRYNO", "PLOT", "TRIAL_NO", "TRIAL", "STUDY", "DATASET", "LOC", "LOCN", "NURSER", "Plot Number");
     			
     	Map<String, Set<Integer>> results = dao.getStandardVariableIdsByPropertyNames(propertyNames);
 
         System.out.println("testGetStandardVariableIdsByPropertyNames(propertyNames=" + propertyNames + ") RESULTS:");
         for (String name : propertyNames) {
         	System.out.println ("    Header = " + name + ", Terms = " + results.get(name));
+        	
+        	/* TO VERIFY:
+        	 	SELECT DISTINCT ppValue.value, ppStdVar.id 
+				FROM projectprop ppValue 
+					INNER JOIN (SELECT project_id, value id FROM projectprop WHERE type_id = 1070) AS ppStdVar  
+					 		ON ppValue.project_id = ppStdVar.project_id AND ppValue.type_id = 1060 
+					 				AND ppValue.value IN (:propertyNames)  
+        	 */
         }
     }
     

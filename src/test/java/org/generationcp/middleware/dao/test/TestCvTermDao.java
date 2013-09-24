@@ -43,7 +43,7 @@ public class TestCvTermDao{
 
     @Test
     public void testGetTermsByNameOrSynonyms() throws Exception {
-    	List<String> nameOrSynonyms = Arrays.asList("ENTRY","ENTRYNO","PLOT", "TRIAL_NO", "TRIAL", "STUDY", "DATASET");
+    	List<String> nameOrSynonyms = Arrays.asList("ENTRY","ENTRYNO", "PLOT", "TRIAL_NO", "TRIAL", "STUDY", "DATASET", "LOC", "LOCN", "NURSER", "Plot Number");
 
     	Map<String, Set<Integer>> results = dao.getTermsByNameOrSynonyms(nameOrSynonyms, CvId.VARIABLES.getId());   
     	
@@ -51,6 +51,15 @@ public class TestCvTermDao{
         for (String name : nameOrSynonyms) {
         	System.out.println ("    Name/Synonym = " + name + ", Terms = " + results.get(name));
         }
+        
+        /* SQL TO VERIFY:
+			SELECT DISTINCT cvterm.name, syn.synonym, cvterm.cvterm_id  
+			FROM cvterm, cvtermsynonym syn 
+			WHERE cvterm.cv_id = 1040
+			 AND (cvterm.name IN (:nameOrSynonyms) 
+			      OR (syn.synonym IN (:nameOrSynonyms) AND syn.cvterm_id = cvterm.cvterm_id)) 
+         */
+        
     }
     
     @Test
@@ -70,7 +79,7 @@ public class TestCvTermDao{
     }
     @Test
     public void testGetStandardVariableIdsByProperties() throws Exception {
-    	List<String> nameOrSynonyms = Arrays.asList("ENTRY","ENTRYNO","PLOT", "TRIAL_NO", "TRIAL", "STUDY", "DATASET");
+    	List<String> nameOrSynonyms = Arrays.asList("ENTRY","ENTRYNO", "PLOT", "TRIAL_NO", "TRIAL", "STUDY", "DATASET", "LOC", "LOCN", "NURSER", "Plot Number");
     	Map<String, Set<Integer>> results = dao.getStandardVariableIdsByProperties(nameOrSynonyms);   
     	
         System.out.println("testGetStandardVariableIdsByProperties(nameOrSynonyms=" + nameOrSynonyms + ") RESULTS:");
@@ -81,11 +90,11 @@ public class TestCvTermDao{
         /* SQL TO VERIFY:
 			SELECT DISTINCT cvtr.name, syn.synonym, cvt.cvterm_id
 			FROM cvterm_relationship cvr
-			INNER JOIN cvterm cvtr ON cvr.object_id = cvtr.cvterm_id AND cvr.type_id = 1200
-			INNER JOIN cvterm cvt ON cvr.subject_id = cvt.cvterm_id AND cvt.cv_id = 1040
-			, cvtermsynonym syn
+					INNER JOIN cvterm cvtr ON cvr.object_id = cvtr.cvterm_id AND cvr.type_id = 1200
+					INNER JOIN cvterm cvt ON cvr.subject_id = cvt.cvterm_id AND cvt.cv_id = 1040
+					, cvtermsynonym syn
 			WHERE (cvtr.cvterm_id = syn.cvterm_id AND syn.synonym IN (:propertyNames) 
-			    OR cvtr.name IN (:propertyNames);
+			    	OR cvtr.name IN (:propertyNames));
          */
     }
 
