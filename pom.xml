@@ -124,6 +124,13 @@
 			<version>1.9.5-rc1</version>
 			<scope>test</scope>
 		</dependency>
+		
+		<!-- Used for Workbook Parser -->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>3.8</version>
+		</dependency>
 
 	</dependencies>
 

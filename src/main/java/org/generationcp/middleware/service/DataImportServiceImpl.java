@@ -11,11 +11,14 @@
  *******************************************************************************/
 package org.generationcp.middleware.service;
 
+import java.io.File;
+
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.util.TimerWatch;
+import org.generationgcp.middleware.operation.parser.WorkbookParser;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -58,5 +61,10 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         }
 
         return 0;
+	}
+	
+	@Override
+	public Workbook parseWorkbook(File file) throws MiddlewareQueryException{
+		return WorkbookParser.parseFile(file);
 	}
 }
