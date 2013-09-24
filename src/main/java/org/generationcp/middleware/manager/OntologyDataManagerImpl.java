@@ -392,6 +392,11 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         }
         return terms;
 	}
+	
+	@Override
+	public Term addProperty(String name, String definition, int isA) throws MiddlewareQueryException{
+		return null;
+	}
 }
 
 
