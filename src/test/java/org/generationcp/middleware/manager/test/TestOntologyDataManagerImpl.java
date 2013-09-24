@@ -516,13 +516,16 @@ public class TestOntologyDataManagerImpl {
 	
     @Test
     public void testGetStandardVariablesInProjects() throws Exception {
-    	List<String> headers = Arrays.asList("ENTRY","ENTRYNO", "PLOT", "TRIAL_NO", "TRIAL", "STUDY", "DATASET");
+//    	List<String> headers = Arrays.asList("ENTRY","ENTRYNO", "PLOT", "TRIAL_NO", "TRIAL", "STUDY", "DATASET");
+    	List<String> headers = Arrays.asList("ENTRY","ENTRYNO", "PLOT", "TRIAL_NO", "TRIAL", "STUDY", "DATASET", "LOC", "LOCN", "NURSER", "Plot Number");
+//    	List<String> headers = Arrays.asList("INTNN2", "PEDL1", "PEDL2", "PANL1", "PANL2", "NHH", "NBGPAN", "PH", "INTNN", "PEDL", "PANL");
+    	
     	Map<String, List<StandardVariable>> results = manager.getStandardVariablesInProjects(headers);
 
-        System.out.println("getStandardVariablesInProjects(headers=" + headers + ") RESULTS:");
+        System.out.println("testGetStandardVariablesInProjects(headers=" + headers + ") RESULTS:");
         for (String name : headers) {
         	System.out.print ("Header = " + name + ", StandardVariables: ");
-        	if (results.get(name) != null){
+        	if (results.get(name).size() > 0){
 	        	for (StandardVariable var : results.get(name)){
 	        		System.out.print(var.getId() + ", ");
 	        	}

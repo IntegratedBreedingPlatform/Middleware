@@ -106,14 +106,14 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	            	Integer cvtermId = (Integer) row[2];
 	            
         			Set<Integer> stdVarIds = new HashSet<Integer>();
-	            	if (nameOrSynonyms.contains(cvtermName.trim())){
+	            	if (nameOrSynonyms.contains(cvtermName)){
 	            		if (stdVarMap.containsKey(cvtermName)){
 	            			stdVarIds = stdVarMap.get(cvtermName);
 	            		}
             			stdVarIds.add(cvtermId);
             			stdVarMap.put(cvtermName, stdVarIds);
 
-	            	} else if (nameOrSynonyms.contains(cvtermSynonym.trim())){
+	            	} else if (nameOrSynonyms.contains(cvtermSynonym)){
 	            		if (stdVarMap.containsKey(cvtermSynonym)){
 	            			stdVarIds = stdVarMap.get(cvtermSynonym);
 	            		}
@@ -547,14 +547,14 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	            	Integer cvtermId = (Integer) row[2];
 	            
        			Set<Integer> stdVarIds = new HashSet<Integer>();
-	            	if (propertyNameOrSynonyms.contains(cvtermName.trim())){
+	            	if (propertyNameOrSynonyms.contains(cvtermName)){
 	            		if (stdVarMap.containsKey(cvtermName)){
 	            			stdVarIds = stdVarMap.get(cvtermName);
 	            		}
            			stdVarIds.add(cvtermId);
            			stdVarMap.put(cvtermName, stdVarIds);
 
-	            	} else if (propertyNameOrSynonyms.contains(cvtermSynonym.trim())){
+	            	} else if (propertyNameOrSynonyms.contains(cvtermSynonym)){
 	            		if (stdVarMap.containsKey(cvtermSynonym)){
 	            			stdVarIds = stdVarMap.get(cvtermSynonym);
 	            		}

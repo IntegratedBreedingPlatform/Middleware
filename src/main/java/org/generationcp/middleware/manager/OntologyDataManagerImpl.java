@@ -89,7 +89,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 			
         } catch (Exception e) {
 	    	rollbackTransaction(trans);
-	        throw new MiddlewareQueryException("error in addStandardVariable " + e.getMessage(), e);
+	        throw new MiddlewareQueryException("Error in addStandardVariable " + e.getMessage(), e);
 	    }
 	} 
 	

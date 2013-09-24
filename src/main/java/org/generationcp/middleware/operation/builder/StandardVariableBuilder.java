@@ -221,7 +221,7 @@ public class StandardVariableBuilder extends Builder {
 			standardVariable.setScale(scale);
 			standardVariable.setMethod(method);
 			standardVariable.setDataType(getDataType(dataTypeString));
-			standardVariable.setStoredIn(getStorageTypeTermByRole(role));
+			standardVariable.setStoredIn(getStorageTypeTermByPhenotypicType(role));
 			
 			Integer standardVariableId = getStandardVariableSaver().save(standardVariable);
         	standardVariable = getStandardVariableBuilder().create(standardVariableId);
@@ -240,11 +240,11 @@ public class StandardVariableBuilder extends Builder {
         return dataType;
 	}
 	
-	private Term getStorageTypeTermByRole(PhenotypicType role) throws MiddlewareQueryException {
+	private Term getStorageTypeTermByPhenotypicType(PhenotypicType phenotypicType) throws MiddlewareQueryException {
 		Term storedIn = null;
-		if (role != null) {
+		if (phenotypicType != null) {
 			Integer storedInId = null;
-			switch (role) {
+			switch (phenotypicType) {
 				case STUDY : storedInId = TermId.STUDY_INFO_STORAGE.getId();
 					break;
 				case DATASET : storedInId = TermId.DATASET_INFO_STORAGE.getId();
@@ -325,11 +325,12 @@ public class StandardVariableBuilder extends Builder {
 				varIds = standardVariableIdsInProjectsCentral.get(name);
 			}
 			
+			List<StandardVariable> variables = new ArrayList<StandardVariable>();
 			if (varIds != null){
 				List<Integer> standardVariableIds = new ArrayList<Integer>(varIds);
-				List<StandardVariable> variables = create(standardVariableIds);
-				standardVariablesInProjects.put(name, variables);
+				variables = create(standardVariableIds);
 			}
+			standardVariablesInProjects.put(name, variables);
 		
 		}
 		
