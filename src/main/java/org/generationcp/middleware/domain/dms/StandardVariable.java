@@ -34,6 +34,8 @@ public class StandardVariable {
     
     private Term storedIn;
     
+    private Term isA;
+    
     private PhenotypicType phenotypicType;
     
     private VariableConstraints constraints;  // may be null
@@ -44,7 +46,7 @@ public class StandardVariable {
     }
     
 	public StandardVariable(Term property, Term scale, Term method,
-			Term dataType, Term storedIn, PhenotypicType phenotypicType,
+			Term dataType, Term storedIn, Term isA, PhenotypicType phenotypicType,
 			VariableConstraints constraints,
 			List<Enumeration> enumerations) {
 		this.property = property;
@@ -52,6 +54,7 @@ public class StandardVariable {
 		this.method = method;
 		this.dataType = dataType;
 		this.storedIn = storedIn;
+		this.isA = isA;
 		this.phenotypicType = phenotypicType;
 		this.constraints = constraints;
 		this.enumerations = enumerations;
@@ -60,7 +63,8 @@ public class StandardVariable {
     /* Copy constructor. Used by the copy method */
     private StandardVariable(StandardVariable stdVar) {
     	this(stdVar.getProperty(), stdVar.getScale(), stdVar.getMethod(),
-			stdVar.getDataType(), stdVar.getStoredIn(), stdVar.getPhenotypicType(), stdVar.getConstraints(),
+			stdVar.getDataType(), stdVar.getStoredIn(), stdVar.getIsA(), 
+			stdVar.getPhenotypicType(), stdVar.getConstraints(),
 			stdVar.getEnumerations());
     	this.setId(0);  
     	this.setName(stdVar.getName());
@@ -201,6 +205,7 @@ public class StandardVariable {
 		Debug.println(indent, "method " + method);
 		Debug.println(indent, "scale: " + scale);
 		Debug.println(indent, "storedIn: " + storedIn);
+		Debug.println(indent, "isA: " + isA);
 		Debug.println(indent, "phenotypicType: " + phenotypicType);
 		if (constraints != null) {
 			Debug.println(indent, "constraints: " + constraints);
@@ -240,6 +245,8 @@ public class StandardVariable {
 		builder.append(dataType);
 		builder.append(", storedIn=");
 		builder.append(storedIn);
+		builder.append(", isA=");
+		builder.append(isA);
 		builder.append(", phenotypicType=");
 		builder.append(phenotypicType);
 		builder.append(", constraints=");
@@ -251,4 +258,14 @@ public class StandardVariable {
 		builder.append("]");
 		return builder.toString();
 	}
+
+	public Term getIsA() {
+		return isA;
+	}
+
+	public void setIsA(Term isA) {
+		this.isA = isA;
+	}
+	
+	
 }

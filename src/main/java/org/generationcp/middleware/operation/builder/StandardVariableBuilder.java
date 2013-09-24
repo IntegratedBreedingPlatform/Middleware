@@ -38,6 +38,7 @@ import org.generationcp.middleware.pojos.oms.CVTermSynonym;
 
 public class StandardVariableBuilder extends Builder {
 
+	
 	public StandardVariableBuilder(HibernateSessionProvider sessionProviderForLocal,
 			                   HibernateSessionProvider sessionProviderForCentral) {
 		super(sessionProviderForLocal, sessionProviderForCentral);
@@ -85,6 +86,14 @@ public class StandardVariableBuilder extends Builder {
 			standardVariable.setScale(createTerm(cvTermRelationships, TermId.HAS_SCALE));
 			standardVariable.setDataType(createTerm(cvTermRelationships, TermId.HAS_TYPE));
 			standardVariable.setStoredIn(createTerm(cvTermRelationships, TermId.STORED_IN));
+			standardVariable.setIsA(createTerm(cvTermRelationships, TermId.IS_A));
+			//add handling of null isA
+			if(standardVariable.getIsA()==null) {
+				//get isA of property
+				List<CVTermRelationship> propertyCvTermRelationships = 
+						getCvTermRelationshipDao().getBySubject(standardVariable.getProperty().getId());
+				standardVariable.setIsA(createTerm(propertyCvTermRelationships, TermId.IS_A));
+			}
 			standardVariable.setPhenotypicType(createPhenotypicType(standardVariable.getStoredIn().getId()));
 			addEnumerations(standardVariable, cvTermRelationships);
 		}
@@ -161,7 +170,10 @@ public class StandardVariableBuilder extends Builder {
 
 	private Term createTerm(List<CVTermRelationship> cvTermRelationships, TermId relationship) throws MiddlewareQueryException {
 		Integer id = findTermId(cvTermRelationships, relationship);
-		return createTerm(id);
+		if(id!=null) { //add to handle missing cvterm_relationship (i.e. is_a)
+			return createTerm(id);
+		}
+		return null;
 	}
 
 	private Term createTerm(Integer id) throws MiddlewareQueryException {

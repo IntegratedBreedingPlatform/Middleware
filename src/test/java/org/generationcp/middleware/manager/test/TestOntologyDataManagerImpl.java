@@ -137,6 +137,7 @@ public class TestOntologyDataManagerImpl {
 		stdVariable.setScale(new Term(6000, "DBCV", "Controlled vocabulary from a database"));
 		stdVariable.setStoredIn(new Term(1010, "Study information", "Study element"));
 		stdVariable.setDataType(new Term(1120, "Character variable", "variable with char values"));
+		stdVariable.setIsA(new Term(1050,"Study condition","Study condition class"));
 		stdVariable.setNameSynonyms(new ArrayList<NameSynonym>());
 		stdVariable.getNameSynonyms().add(new NameSynonym("Person", NameType.ALTERNATIVE_ENGLISH));
 		stdVariable.getNameSynonyms().add(new NameSynonym("Tiga-gamit", NameType.ALTERNATIVE_FRENCH));
