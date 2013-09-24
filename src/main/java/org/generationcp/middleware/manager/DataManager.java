@@ -12,12 +12,10 @@
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
-import org.generationcp.middleware.domain.h2h.Observation;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
@@ -36,6 +34,7 @@ import org.generationcp.middleware.operation.builder.VariableInfoBuilder;
 import org.generationcp.middleware.operation.builder.VariableTypeBuilder;
 import org.generationcp.middleware.operation.destroyer.DataSetDestroyer;
 import org.generationcp.middleware.operation.saver.CvTermSaver;
+import org.generationcp.middleware.operation.saver.CvTermRelationshipSaver;
 import org.generationcp.middleware.operation.saver.DatasetProjectSaver;
 import org.generationcp.middleware.operation.saver.ExperimentModelSaver;
 import org.generationcp.middleware.operation.saver.GeolocationSaver;
@@ -997,6 +996,10 @@ public abstract class DataManager extends DatabaseBroker{
     
     protected final CvTermSaver getTermSaver() {
     	return new CvTermSaver(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    protected final CvTermRelationshipSaver getTermRelationshipSaver() {
+    	return new CvTermRelationshipSaver(sessionProviderForLocal, sessionProviderForCentral);
     }
     
     protected final DataSetDestroyer getDataSetDestroyer() {

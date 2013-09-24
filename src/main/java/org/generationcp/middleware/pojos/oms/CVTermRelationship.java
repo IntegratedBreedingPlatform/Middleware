@@ -109,7 +109,7 @@ public class CVTermRelationship implements Serializable{
 		return objectId;
 	}
 
-	public void setObject(Integer objectId) {
+	public void setObjectId(Integer objectId) {
 		this.objectId = objectId;
 	}
 

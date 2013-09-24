@@ -97,7 +97,7 @@ public class StandardVariableSaver extends Saver {
 		relationship.setCvTermRelationshipId(getCvTermRelationshipDao().getNegativeId("cvTermRelationshipId"));
 		relationship.setSubjectId(subjectId);
 		relationship.setTypeId(typeId);
-		relationship.setObject(objectId);
+		relationship.setObjectId(objectId);
 		
 		getCvTermRelationshipDao().save(relationship);
 	}
