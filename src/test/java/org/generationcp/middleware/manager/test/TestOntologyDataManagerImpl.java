@@ -13,7 +13,9 @@
 package org.generationcp.middleware.manager.test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -510,5 +512,60 @@ public class TestOntologyDataManagerImpl {
 		List<Term> terms = manager.getDataTypes();		
 		System.out.println("testGetDataTypes: " + terms.size());
 		printTerms(terms);
+	}
+	
+	
+    @Test
+    public void testGetStandardVariablesInProjects() throws Exception {
+    	List<String> headers = Arrays.asList("ENTRY","ENTRYNO", "PLOT", "TRIAL_NO", "TRIAL", "STUDY", "DATASET");
+    	Map<String, List<StandardVariable>> results = manager.getStandardVariablesInProjects(headers);
+
+        System.out.println("getStandardVariablesInProjects(headers=" + headers + ") RESULTS:");
+        for (String name : headers) {
+        	System.out.print ("Header = " + name + ", StandardVariables: ");
+        	if (results.get(name) != null){
+	        	for (StandardVariable var : results.get(name)){
+	        		System.out.print(var.getId() + ", ");
+	        	}
+	        	System.out.println();
+        	} else {
+            	System.out.println ("    No standard variables found.");        		
+        	}
+        }
+    }
+
+
+	@Test
+	public void testFindTermsByNameOrSynonym() throws Exception {
+		// term doesn't exist
+		List<Term> terms = manager.findTermsByNameOrSynonym("foo bar", CvId.METHODS);
+		assertTrue(terms.size() == 0);
+		
+		// term exist but isn't a method
+		terms = manager.findTermsByNameOrSynonym("PANH", CvId.METHODS);
+		assertTrue(terms.size() == 0);
+		
+		// term does exist in central
+		terms = manager.findTermsByNameOrSynonym("Vegetative Stage", CvId.METHODS);
+		assertTrue(terms != null);
+		terms.get(0).print(0);
+		System.out.println();
+		
+		// name is in synonyms
+		terms = manager.findTermsByNameOrSynonym("Accession Name", CvId.VARIABLES);
+		assertTrue(terms != null);
+		terms.get(0).print(0);
+		System.out.println();
+		
+//		// add a method to local
+//		String name = "Test Method " + new Random().nextInt(10000);
+//		String definition = "Test Definition";
+//		Term term = manager.addTerm(name, definition, CvId.METHODS);
+//		// term does exist in local
+//		
+//		terms = manager.findTermsByNameOrSynonym(term.getName(), CvId.METHODS);
+//		assertTrue(terms != null);
+//		terms.get(0).print(0);
+
 	}
 }

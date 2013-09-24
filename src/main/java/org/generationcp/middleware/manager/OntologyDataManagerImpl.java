@@ -112,7 +112,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	
 	private Set<StandardVariable> getStandardVariablesByNameOrSynonym(String nameOrSynonym) throws MiddlewareQueryException {
 		Set<StandardVariable> standardVariables = new HashSet<StandardVariable>();
-		Set<Integer> stdVarIds = getCvTermDao().findStdVariablesByNameOrSynonym(nameOrSynonym);
+		Set<Integer> stdVarIds = getCvTermDao().getTermsByNameOrSynonym(nameOrSynonym, CvId.VARIABLES.getId());
 		for (Integer stdVarId : stdVarIds) {
 			standardVariables.add(getStandardVariable(stdVarId));
 		}
@@ -167,7 +167,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	public StandardVariable findStandardVariableByTraitScaleMethodNames(
 			String property, String scale, String method) 
 			throws MiddlewareQueryException {
-		Integer stdVariableId = null;
 		Term termProperty, termScale, termMethod;
 		Integer propertyId = null, scaleId = null, methodId = null;
 		
@@ -318,9 +317,31 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	
 	@Override
 	public Map<String, List<StandardVariable>> getStandardVariablesInProjects(List<String> headers) throws MiddlewareQueryException{
-		return null;
+		return getStandardVariableBuilder().getStandardVariablesInProjects(headers);		
 	}
 
+	@Override
+	public List<Term> findTermsByNameOrSynonym(String nameOrSynonym, CvId cvId) throws MiddlewareQueryException {
+		List<Term> terms = new ArrayList<Term>();
+		List<CVTerm> cvTerms = new ArrayList<CVTerm>();
+		Set<Integer> termIds = new HashSet<Integer>();
+		 
+		if (setWorkingDatabase(Database.LOCAL)) {
+			termIds = getCvTermDao().getTermsByNameOrSynonym(nameOrSynonym, cvId.getId());
+			cvTerms.addAll(getCvTermDao().getByIds(termIds));
+		}
+		if (setWorkingDatabase(Database.CENTRAL)) {
+			termIds = getCvTermDao().getTermsByNameOrSynonym(nameOrSynonym, cvId.getId());
+			cvTerms.addAll(getCvTermDao().getByIds(termIds));
+		}
+		
+		for (CVTerm cvTerm : cvTerms){
+			terms.add(getTermBuilder().mapCVTermToTerm(cvTerm));
+		}
+		
+		return terms;
+
+	}
 }
 
 

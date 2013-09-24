@@ -217,5 +217,14 @@ public interface OntologyDataManager {
 	 * @throws MiddlewareQueryException
 	 */
 	Map<String, List<StandardVariable>> getStandardVariablesInProjects(List<String> headers) throws MiddlewareQueryException;
+
+	/**
+	 * Retrieves the List of Terms matching the given nameOrSynonym and CvId
+	 * @param nameOrSynonym
+	 * @param cvId
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	List<Term> findTermsByNameOrSynonym(String nameOrSynonym, CvId cvId) throws MiddlewareQueryException;
 	
 }

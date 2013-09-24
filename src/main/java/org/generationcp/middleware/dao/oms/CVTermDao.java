@@ -24,7 +24,6 @@ import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CategoricalValue;
 import org.generationcp.middleware.domain.h2h.TraitInfo;
-import org.generationcp.middleware.domain.h2h.TraitType;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -60,37 +59,107 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return term;
 	}
 	
-	public Set<Integer> findStdVariablesByNameOrSynonym(String nameOrSynonym) throws MiddlewareQueryException {
-		Set<Integer> stdVarIds = new HashSet<Integer>();
+	public Set<Integer> getTermsByNameOrSynonym(String nameOrSynonym, int cvId) throws MiddlewareQueryException {
+		Set<Integer> termIds = new HashSet<Integer>();
 		try {
-			SQLQuery query = getSession().createSQLQuery("select distinct cvterm.cvterm_id " +
-	                                                     "from cvterm cvterm, cvtermsynonym syn " +
-	                                                     "where cvterm.cv_id = 1040 " +
-	                                                     "   and (cvterm.name = '" + nameOrSynonym + "'" +
-	                                                     "        or (syn.synonym = '" + nameOrSynonym + "'" +
-	                                                     "            and syn.cvterm_id = cvterm.cvterm_id))");
-	             
-	        List<Object> results = (List<Object>) query.list();
-	        for (Object row : results) {
-	            stdVarIds.add((Integer) row);
-	        }
+				SQLQuery query = getSession().createSQLQuery(
+							"SELECT DISTINCT cvterm.cvterm_id "
+									+ "FROM cvterm, cvtermsynonym syn "
+									+ "WHERE cvterm.cv_id = :cvId "
+									+ " AND (cvterm.name = :nameOrSynonym "
+									+ "      OR (syn.synonym = :nameOrSynonym AND syn.cvterm_id = cvterm.cvterm_id))");
+
+				query.setParameter("cvId", cvId);
+				query.setParameter("nameOrSynonym", nameOrSynonym);
+		             
+		        List<Object> results = (List<Object>) query.list();
+		        for (Object row : results) {
+		            termIds.add((Integer) row);
+		        }
 			
 		} catch(HibernateException e) {
-			logAndThrowException("Error in findStdVariablesByNameOrSynonym=" + nameOrSynonym + " in CVTermDao: " + e.getMessage(), e);
+			logAndThrowException("Error in getTermsByNameOrSynonym=" + nameOrSynonym + " in CVTermDao: " + e.getMessage(), e);
 		}
-		return stdVarIds;
+		return termIds;
 	}
 
+	public Map<String, Set<Integer>> getTermsByNameOrSynonyms(List<String> nameOrSynonyms, int cvId) throws MiddlewareQueryException {
+		 Map<String, Set<Integer>> stdVarMap = new HashMap<String, Set<Integer>> ();
+		try {
+			if (nameOrSynonyms.size() > 0) {
+				SQLQuery query = getSession().createSQLQuery(
+						"SELECT DISTINCT cvterm.name, syn.synonym, cvterm.cvterm_id " + 
+						 "FROM cvterm, cvtermsynonym syn " +
+						 "WHERE cvterm.cv_id = :cvId " + 
+						 " AND (cvterm.name IN (:nameOrSynonyms) " +
+						 "      OR (syn.synonym IN (:nameOrSynonyms) AND syn.cvterm_id = cvterm.cvterm_id)) "
+				);
+				query.setParameter("cvId", cvId);
+				query.setParameterList("nameOrSynonyms", nameOrSynonyms);
+				
+		        List<Object[]> results = query.list();
+
+	            for (Object[] row : results){
+	            	String cvtermName = ((String) row[0]).trim();
+	            	String cvtermSynonym = ((String) row[1]).trim();
+	            	Integer cvtermId = (Integer) row[2];
+	            
+        			Set<Integer> stdVarIds = new HashSet<Integer>();
+	            	if (nameOrSynonyms.contains(cvtermName.trim())){
+	            		if (stdVarMap.containsKey(cvtermName)){
+	            			stdVarIds = stdVarMap.get(cvtermName);
+	            		}
+            			stdVarIds.add(cvtermId);
+            			stdVarMap.put(cvtermName, stdVarIds);
+
+	            	} else if (nameOrSynonyms.contains(cvtermSynonym.trim())){
+	            		if (stdVarMap.containsKey(cvtermSynonym)){
+	            			stdVarIds = stdVarMap.get(cvtermSynonym);
+	            		}
+            			stdVarIds.add(cvtermId);
+            			stdVarMap.put(cvtermSynonym, stdVarIds);
+	            	} 
+	            	
+	            }
+
+			}
+			
+		} catch(HibernateException e) {
+			logAndThrowException("Error in getTermsByNameOrSynonyms=" + nameOrSynonyms + " in CVTermDao: " + e.getMessage(), e);
+		}
+		return stdVarMap;
+	}
+	
 	public CVTerm getByNameAndCvId(String name, int cvId) throws MiddlewareQueryException {
         CVTerm term = null;
 		
 		try {
-			Criteria criteria = getSession().createCriteria(getPersistentClass());
-			criteria.add(Restrictions.eq("cvId", cvId));
-			criteria.add(Restrictions.eq("name", name));
-			
-			term = (CVTerm) criteria.uniqueResult();
-		
+			SQLQuery query = getSession().createSQLQuery(
+					"SELECT DISTINCT cvt.cvterm_id, cvt.cv_id, cvt.name, cvt.definition" +
+					"		, cvt.dbxref_id, cvt.is_obsolete, cvt.is_relationshiptype " + 
+					 "FROM cvterm cvt, cvtermsynonym syn " +
+					 "WHERE cvt.cv_id = :cvId " + 
+					 " AND (cvt.name = :nameOrSynonym " +
+					 "      OR (syn.synonym = :nameOrSynonym AND syn.cvterm_id = cvt.cvterm_id)) "
+			);
+			query.setParameter("cvId", cvId);
+			query.setParameter("nameOrSynonym", name);
+
+	        List<Object[]> results = query.list();
+
+	        if (results.size() > 0){
+	        	Object[] row = results.get(0);
+	        	Integer cvtermId = (Integer) row[0];
+	        	Integer cvtermCvId = (Integer) row[1];
+	        	String cvtermName = (String) row[2];
+	        	String cvtermDefinition = (String) row[3];
+	        	Integer dbxrefId = (Integer) row[4];
+	        	Integer isObsolete = (Integer) row[5];
+	        	Integer isRelationshipType = (Integer) row[6];
+	        	
+	        	term = new CVTerm(cvtermId, cvtermCvId, cvtermName, cvtermDefinition, dbxrefId, isObsolete, isRelationshipType);
+	        }
+
 		} catch (HibernateException e) {
 			logAndThrowException("Error at getByNameAndCvId=" + name + ", " + cvId + " query on CVTermDao: " + e.getMessage(), e);
 		}
@@ -416,6 +485,66 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			logAndThrowException("Error at findScaleTermIdsByTrait :" + e.getMessage(), e);
 		}
 		return null;
+	}
+
+	/**
+	 * Returns standard variables associated to the given list of trait names or synonyms
+	 * 
+	 * @param propertyNameOrSynonyms
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	public Map<String, Set<Integer>> getStandardVariableIdsByProperties(List<String> propertyNameOrSynonyms) throws MiddlewareQueryException {
+		Map<String, Set<Integer>> stdVarMap = new HashMap<String, Set<Integer>> ();
+		
+		try {
+			if (propertyNameOrSynonyms.size() > 0) {
+				
+				StringBuffer sqlString = new StringBuffer()
+						.append("SELECT DISTINCT cvtr.name, syn.synonym, cvt.cvterm_id ")
+						.append("FROM cvterm_relationship cvr ")
+						.append("INNER JOIN cvterm cvtr ON cvr.object_id = cvtr.cvterm_id AND cvr.type_id = 1200 ")
+						.append("INNER JOIN cvterm cvt ON cvr.subject_id = cvt.cvterm_id AND cvt.cv_id = 1040 ")
+						.append(", cvtermsynonym syn ")
+						.append("WHERE (cvtr.cvterm_id = syn.cvterm_id AND syn.synonym IN (:propertyNameOrSynonyms) ")
+						.append("OR cvtr.name IN (:propertyNameOrSynonyms)) ");
+					
+				SQLQuery query = getSession().createSQLQuery(sqlString.toString());
+				query.setParameterList("propertyNameOrSynonyms", propertyNameOrSynonyms);
+				
+		        List<Object[]> results = query.list();
+
+	            for (Object[] row : results){
+	            	String cvtermName = ((String) row[0]).trim();
+	            	String cvtermSynonym = ((String) row[1]).trim();
+	            	Integer cvtermId = (Integer) row[2];
+	            
+       			Set<Integer> stdVarIds = new HashSet<Integer>();
+	            	if (propertyNameOrSynonyms.contains(cvtermName.trim())){
+	            		if (stdVarMap.containsKey(cvtermName)){
+	            			stdVarIds = stdVarMap.get(cvtermName);
+	            		}
+           			stdVarIds.add(cvtermId);
+           			stdVarMap.put(cvtermName, stdVarIds);
+
+	            	} else if (propertyNameOrSynonyms.contains(cvtermSynonym.trim())){
+	            		if (stdVarMap.containsKey(cvtermSynonym)){
+	            			stdVarIds = stdVarMap.get(cvtermSynonym);
+	            		}
+           			stdVarIds.add(cvtermId);
+           			stdVarMap.put(cvtermSynonym, stdVarIds);
+	            	} 
+	            	
+	            }
+
+			}
+			
+		} catch(HibernateException e) {
+			logAndThrowException("Error in getStandardVariableIdsByProperties=" + propertyNameOrSynonyms + " in CVTermDao: " + e.getMessage(), e);
+		}
+		
+		return stdVarMap;
+		
 	}
 	
 }

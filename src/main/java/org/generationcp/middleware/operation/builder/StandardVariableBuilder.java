@@ -13,7 +13,10 @@ package org.generationcp.middleware.operation.builder;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -56,6 +59,24 @@ public class StandardVariableBuilder extends Builder {
 		return standardVariable;
 	}
 
+	public List<StandardVariable> create(List<Integer> standardVariableIds) throws MiddlewareQueryException {
+		List<StandardVariable> standardVariables = new ArrayList<StandardVariable>();
+		
+		List<CVTerm> cvTerms = getCvTerms(standardVariableIds);
+		for (CVTerm cvTerm : cvTerms){
+			if (cvTerm != null) {
+				StandardVariable standardVariable = new StandardVariable();
+				standardVariable.setId(cvTerm.getCvTermId());
+				standardVariable.setName(cvTerm.getName());
+				standardVariable.setDescription(cvTerm.getDefinition());
+				addConstraints(standardVariable, cvTerm);
+				addRelatedTerms(standardVariable, cvTerm);
+				standardVariables.add(standardVariable);
+			}
+		}
+		return standardVariables;
+	}
+
 	private void addRelatedTerms(StandardVariable standardVariable, CVTerm cvTerm) throws MiddlewareQueryException {
 		if (setWorkingDatabase(standardVariable.getId())) {
 			List<CVTermRelationship> cvTermRelationships  = getCvTermRelationshipDao().getBySubject(standardVariable.getId());
@@ -64,7 +85,7 @@ public class StandardVariableBuilder extends Builder {
 			standardVariable.setScale(createTerm(cvTermRelationships, TermId.HAS_SCALE));
 			standardVariable.setDataType(createTerm(cvTermRelationships, TermId.HAS_TYPE));
 			standardVariable.setStoredIn(createTerm(cvTermRelationships, TermId.STORED_IN));
-			standardVariable.setPhenotypicType(createRole(standardVariable.getStoredIn().getId()));
+			standardVariable.setPhenotypicType(createPhenotypicType(standardVariable.getStoredIn().getId()));
 			addEnumerations(standardVariable, cvTermRelationships);
 		}
 	}
@@ -166,10 +187,17 @@ public class StandardVariableBuilder extends Builder {
 		return null;
 	}
 	
-	private PhenotypicType createRole(int storedInTerm) {
-		for (PhenotypicType role : PhenotypicType.values()) {
-			if (role.getTypeStorages().contains(storedInTerm)) {
-				return role;
+	private List<CVTerm> getCvTerms(List<Integer> ids) throws MiddlewareQueryException {
+		if (setWorkingDatabase(ids.get(0))) {
+		    return getCvTermDao().getByIds(ids);
+		}
+		return null;
+	}
+	
+	private PhenotypicType createPhenotypicType(int storedInTerm) {
+		for (PhenotypicType phenotypicType : PhenotypicType.values()) {
+			if (phenotypicType.getTypeStorages().contains(storedInTerm)) {
+				return phenotypicType;
 			}
 		}
 		return null;
@@ -256,4 +284,74 @@ public class StandardVariableBuilder extends Builder {
 		}
 		return standardVariable;
 	}
+
+	public Map<String, List<StandardVariable>> getStandardVariablesInProjects(List<String> headers) 
+			throws MiddlewareQueryException {
+		Map<String, List<StandardVariable>> standardVariablesInProjects = new HashMap<String, List<StandardVariable>>();
+		
+		Map<String, Set<Integer>> standardVariableIdsInProjectsLocal = new HashMap<String, Set<Integer>>();
+		Map<String, Set<Integer>> standardVariableIdsInProjectsCentral = new HashMap<String, Set<Integer>>();
+
+        if (setWorkingDatabase(Database.LOCAL)) {
+
+			// Step 1: Search for DISTINCT standard variables used for projectprop records 
+        	// where projectprop.value equals input name (eg. REP)
+        	standardVariableIdsInProjectsLocal = getStandardVariableIdsForProjectProperties(headers);
+			
+			// Step 2: If no variable found, search for cvterm (standard variables) with given name.
+			standardVariableIdsInProjectsLocal.putAll(getStandardVariableIdsForTerms(headers));
+						
+			// Step 3. If no variable still found for steps 1 and 2, treat the header as a trait / property name. 
+			// Search for trait with given name and return the standard variables using that trait (if any)
+			standardVariableIdsInProjectsLocal.putAll(getStandardVariableIdsForTraits(headers));
+        }
+
+		if (setWorkingDatabase(Database.CENTRAL)){
+			
+			standardVariableIdsInProjectsCentral.putAll(getStandardVariableIdsForProjectProperties(headers));
+			
+			standardVariableIdsInProjectsCentral.putAll(getStandardVariableIdsForTerms(headers));
+						
+			standardVariableIdsInProjectsCentral.putAll(getStandardVariableIdsForTraits(headers));
+		}
+
+		// Build map 
+		for (String name : headers){
+
+			Set<Integer> varIds = standardVariableIdsInProjectsLocal.get(name);
+			if (varIds != null){
+				varIds.addAll(standardVariableIdsInProjectsCentral.get(name));
+			} else {
+				varIds = standardVariableIdsInProjectsCentral.get(name);
+			}
+			
+			if (varIds != null){
+				List<Integer> standardVariableIds = new ArrayList<Integer>(varIds);
+				List<StandardVariable> variables = create(standardVariableIds);
+				standardVariablesInProjects.put(name, variables);
+			}
+		
+		}
+		
+		return standardVariablesInProjects;
+	}
+
+	
+	public Map<String, Set<Integer>> getStandardVariableIdsForProjectProperties(List<String> propertyNames)
+		throws MiddlewareQueryException{
+		return getProjectPropertyDao().getStandardVariableIdsByPropertyNames(propertyNames);
+	}
+	
+	public Map<String, Set<Integer>> getStandardVariableIdsForTerms(List<String> termNames)
+		throws MiddlewareQueryException{
+		return getCvTermDao().getTermsByNameOrSynonyms(termNames, CvId.VARIABLES.getId());
+		
+	}
+	
+	public Map<String, Set<Integer>> getStandardVariableIdsForTraits(List<String> traitNames)
+			throws MiddlewareQueryException{
+		return getCvTermDao().getStandardVariableIdsByProperties(traitNames);
+	}
+	
+
 }
