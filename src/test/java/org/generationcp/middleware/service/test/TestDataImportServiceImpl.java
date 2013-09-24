@@ -11,6 +11,9 @@
  *******************************************************************************/
 package org.generationcp.middleware.service.test;
 
+
+
+import java.io.File;
 import java.util.List;
 
 import org.generationcp.middleware.domain.etl.Workbook;
@@ -78,6 +81,17 @@ public class TestDataImportServiceImpl {
 		workbook.print(0);
 		int id = dataImportService.saveDataset(workbook);
 		System.out.println("Created study:" + id + ", name = " + workbook.getStudyDetails().getStudyName());
+	}
+	
+	@Test 
+	public void testParseWorkbook() throws MiddlewareQueryException{
+		//change based on path location of your template file
+		File file = new File("C:/Users/Efficio LLC/Downloads/Work/GCP/templates/Population114_Pheno_FB_1.xls");
+		Workbook workbook = dataImportService.parseWorkbook(file);
+		workbook.print(0);
+		
+		int id = dataImportService.saveDataset(workbook);
+		System.out.println("Created study:" + id);
 	}
 	
 	@Test

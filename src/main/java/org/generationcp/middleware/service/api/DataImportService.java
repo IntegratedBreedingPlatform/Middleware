@@ -12,6 +12,8 @@
 
 package org.generationcp.middleware.service.api;
 
+import java.io.File;
+
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
@@ -30,4 +32,12 @@ public interface DataImportService {
 	 * @return id of created trial or nursery
 	 */
 	int saveDataset(Workbook workbook) throws MiddlewareQueryException;
+	
+	/**
+	 * Given a file, parse the file to create a workbook object
+	 * 
+	 * @param file
+	 * @return workbook 
+	 */
+	Workbook parseWorkbook(File file) throws MiddlewareQueryException;
 }
