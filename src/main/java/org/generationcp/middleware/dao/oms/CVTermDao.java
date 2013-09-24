@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CategoricalValue;
 import org.generationcp.middleware.domain.h2h.TraitInfo;
@@ -384,6 +385,32 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		}
 		return null;	
 	
+	}
+	
+	public List<Integer> getStandardVariableIdsByPhenotypicType(PhenotypicType type) 
+			throws MiddlewareQueryException {
+		try {
+			//Standard variable has the combination of property-scale-method
+			StringBuilder queryString = new StringBuilder();
+			queryString.append("SELECT DISTINCT cvr.subject_id ");
+			queryString.append("FROM cvterm_relationship cvr ");
+			queryString.append("INNER JOIN cvterm_relationship cvrp ON cvr.subject_id = cvrp.subject_id AND cvrp.type_id = 1200 ");
+			queryString.append("INNER JOIN cvterm_relationship cvrs ON cvr.subject_id = cvrs.subject_id AND cvrs.type_id = 1220 ");
+			queryString.append("INNER JOIN cvterm_relationship cvrm ON cvr.subject_id = cvrm.subject_id AND cvrm.type_id = 1210 ");
+			queryString.append("INNER JOIN cvterm_relationship storedIn ON cvr.subject_id = storedIn.subject_id AND storedIn.type_id = 1044 ");
+			queryString.append("INNER JOIN cvterm term ON cvr.subject_id = term.cvterm_id ");
+			queryString.append("WHERE storedIn.object_id IN (:type) ORDER BY term.name");
+			
+			SQLQuery query = getSession().createSQLQuery(queryString.toString());
+			query.setParameterList("type", type.getTypeStorages());
+			
+			List<Integer> standardVariableIds = (List<Integer>) query.list();						
+			return standardVariableIds;
+						
+		} catch(HibernateException e) {
+			logAndThrowException("Error at getStandardVariableIdsByPhenotypicType :" + e.getMessage(), e);
+		}
+		return null;
 	}
 	
 	public List<CVTerm> getTermsByCvId(CvId cvId,int start,int numOfRows) throws MiddlewareQueryException{

@@ -22,6 +22,7 @@ import java.util.Set;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.NameSynonym;
 import org.generationcp.middleware.domain.dms.NameType;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.oms.CvId;
@@ -156,7 +157,7 @@ public class TestOntologyDataManagerImpl {
 		stdVariable.setName("Test SPM" + new Random().nextInt(10000));
 		stdVariable.setDescription("Std variable with new scale, property, method");
 		
-		Term newProperty = new Term(0, "Test Property", "Test Property");
+		Term newProperty = new Term(2451, "Environment", "Environment");
 		Term property = manager.findTermByName(newProperty.getName(),CvId.PROPERTIES);
 		if(property==null) {
 			System.out.println("new property = " + newProperty.getName());
@@ -164,7 +165,7 @@ public class TestOntologyDataManagerImpl {
 		} else {
 			System.out.println("property id = " + property.getId());
 		}
-		Term newScale = new Term(0, "Test Scale", "Test Scale");
+		Term newScale = new Term(6020, "Text", "Text");
 		Term scale = manager.findTermByName(newScale.getName(),CvId.SCALES);
 		if(scale==null) {
 			System.out.println("new scale = " + newScale.getName());
@@ -299,16 +300,6 @@ public class TestOntologyDataManagerImpl {
 		assertTrue(term != null);
 		term.print(0);
 		System.out.println();
-		
-		// add a method to local
-		String name = "Test Method " + new Random().nextInt(10000);
-		String definition = "Test Definition";
-		term = manager.addMethod(name, definition);
-		// term does exist in local
-		
-		term = manager.findMethodByName(term.getName());
-		assertTrue(term != null);
-		term.print(0);
 	}
 	
 	
@@ -495,15 +486,6 @@ public class TestOntologyDataManagerImpl {
 		term.print(0);
 		System.out.println();
 		
-		// add a method to local
-		String name = "Test Method " + new Random().nextInt(10000);
-		String definition = "Test Definition";
-		term = manager.addTerm(name, definition, CvId.METHODS);
-		// term does exist in local
-		
-		term = manager.findTermByName(term.getName(), CvId.METHODS);
-		assertTrue(term != null);
-		term.print(0);
 	}
 	
 	@Test
@@ -514,6 +496,23 @@ public class TestOntologyDataManagerImpl {
 		printTerms(terms);
 	}
 	
+	@Test 
+	public void testGetStandardVariablesForPhenotypicType() throws Exception{
+		System.out.println("Test testGetStandardVariablesForPhenotypicType");
+		
+		PhenotypicType phenotypicType =  PhenotypicType.TRIAL_ENVIRONMENT;
+		Integer start = 0;
+		Integer numOfRows = 100;
+		
+		Map<String, StandardVariable> standardVariables = manager.getStandardVariablesForPhenotypicType(phenotypicType, start, numOfRows);
+		
+		for(Object key : standardVariables.keySet()) {
+	        System.out.println(key + " : " + standardVariables.get(key).getId() + " : " + standardVariables.get(key).toString());
+	    }
+		
+		System.out.println("count: " + standardVariables.size());
+	}
+
 	
     @Test
     public void testGetStandardVariablesInProjects() throws Exception {
@@ -566,6 +565,6 @@ public class TestOntologyDataManagerImpl {
 //		terms = manager.findTermsByNameOrSynonym(term.getName(), CvId.METHODS);
 //		assertTrue(terms != null);
 //		terms.get(0).print(0);
-
 	}
+
 }

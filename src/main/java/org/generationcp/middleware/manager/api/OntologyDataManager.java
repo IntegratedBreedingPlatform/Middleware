@@ -202,7 +202,7 @@ public interface OntologyDataManager {
 	 * @return Map of PhenotypicType - StandardVariable
 	 * @throws MiddlewareQueryException
 	 */
-	Map<String, StandardVariable> getStandardVariablesForPhenotypicType(PhenotypicType type) throws MiddlewareQueryException;
+	Map<String, StandardVariable> getStandardVariablesForPhenotypicType(PhenotypicType type, int start,int numOfRows) throws MiddlewareQueryException;
 	
 	/**
 	 * Returns the standard variables associated to a project from projectprop, cvterm or trait - in the given order.
