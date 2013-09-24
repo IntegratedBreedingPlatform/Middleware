@@ -227,4 +227,13 @@ public interface OntologyDataManager {
 	 */
 	List<Term> findTermsByNameOrSynonym(String nameOrSynonym, CvId cvId) throws MiddlewareQueryException;
 	
+	/**
+	 * Returns the list of Term entries based on possible "is a" of properties
+	 * 
+	 * @return list of is_a Term objects 
+	 * @throws MiddlewareQueryException
+	 */
+	
+	List<Term> getIsAOfProperties(int start, int numOfRows) throws MiddlewareQueryException;
+	
 }

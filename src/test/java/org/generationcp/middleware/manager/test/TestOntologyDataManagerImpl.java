@@ -137,6 +137,7 @@ public class TestOntologyDataManagerImpl {
 		stdVariable.setScale(new Term(6000, "DBCV", "Controlled vocabulary from a database"));
 		stdVariable.setStoredIn(new Term(1010, "Study information", "Study element"));
 		stdVariable.setDataType(new Term(1120, "Character variable", "variable with char values"));
+		stdVariable.setIsA(new Term(1050,"Study condition","Study condition class"));
 		stdVariable.setNameSynonyms(new ArrayList<NameSynonym>());
 		stdVariable.getNameSynonyms().add(new NameSynonym("Person", NameType.ALTERNATIVE_ENGLISH));
 		stdVariable.getNameSynonyms().add(new NameSynonym("Tiga-gamit", NameType.ALTERNATIVE_FRENCH));
@@ -570,4 +571,28 @@ public class TestOntologyDataManagerImpl {
 //		terms.get(0).print(0);
 	}
 
+	@Test
+	public void testGetIsAOfProperties() throws Exception{
+		System.out.println("testGetIsAOfProperties:");
+		List<Term> terms1 = manager.getIsAOfProperties(0, 2);		
+		System.out.println("Get First 2 isA: " + terms1.size());
+		printTerms(terms1);
+		
+		List<Term> terms2 = manager.getIsAOfProperties(2, 2);		
+		System.out.println("Get Next 2 isA: " + terms2.size());
+		printTerms(terms2);
+		
+		terms1.addAll(terms2);
+		
+		List<Term> terms = manager.getIsAOfProperties(0, 4);		
+		System.out.println("Get First 4 isA: " + terms.size());
+		printTerms(terms);
+		
+		assertEquals(terms1, terms);
+		
+		List<Term> allTerms = manager.getIsAOfProperties(0,0);		
+		System.out.println("Get All isA: " + allTerms.size());
+		printTerms(allTerms);
+		
+	}
 }

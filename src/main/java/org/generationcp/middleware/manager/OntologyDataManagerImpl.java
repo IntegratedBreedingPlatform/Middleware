@@ -374,6 +374,24 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		return terms;
 
 	}
+
+	@Override
+	public List<Term> getIsAOfProperties(int start, int numOfRows) throws MiddlewareQueryException {
+		List<String> methods = Arrays.asList("countIsAOfTermsByCvId", "getIsAOfTermsByCvId");
+        Object[] centralParameters = new Object[] { CvId.PROPERTIES };
+        Object[] localParameters = new Object[] { CvId.PROPERTIES };
+        List<CVTerm> cvTerms =  getFromCentralAndLocalByMethod(
+    			getCvTermDao(), methods, start, numOfRows, 
+    			centralParameters, localParameters, new Class[] { CvId.class });
+        List<Term> terms = null;
+        if(cvTerms!=null && !cvTerms.isEmpty()) {
+        	terms = new ArrayList<Term>();
+        	for (CVTerm cvTerm : cvTerms){
+    			terms.add(getTermBuilder().mapCVTermToTerm(cvTerm));
+    		}	
+        }
+        return terms;
+	}
 }
 
 
