@@ -86,6 +86,12 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 	public Map<String, Set<Integer>> getTermsByNameOrSynonyms(List<String> nameOrSynonyms, int cvId) throws MiddlewareQueryException {
 		 Map<String, Set<Integer>> stdVarMap = new HashMap<String, Set<Integer>> ();
+
+		// Store the names in the map in uppercase
+		for (int i = 0, size = nameOrSynonyms.size(); i < size; i++) {
+			nameOrSynonyms.set(i, nameOrSynonyms.get(i).toUpperCase());
+		}
+
 		try {
 			if (nameOrSynonyms.size() > 0) {
 				SQLQuery query = getSession().createSQLQuery(
@@ -101,8 +107,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		        List<Object[]> results = query.list();
 
 	            for (Object[] row : results){
-	            	String cvtermName = ((String) row[0]).trim();
-	            	String cvtermSynonym = ((String) row[1]).trim();
+	            	String cvtermName = ((String) row[0]).trim().toUpperCase();
+	            	String cvtermSynonym = ((String) row[1]).trim().toUpperCase();
 	            	Integer cvtermId = (Integer) row[2];
 	            
         			Set<Integer> stdVarIds = new HashSet<Integer>();
@@ -524,6 +530,11 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	public Map<String, Set<Integer>> getStandardVariableIdsByProperties(List<String> propertyNameOrSynonyms) throws MiddlewareQueryException {
 		Map<String, Set<Integer>> stdVarMap = new HashMap<String, Set<Integer>> ();
 		
+		// Store the names in the map in uppercase
+		for (int i = 0, size = propertyNameOrSynonyms.size(); i < size; i++) {
+			propertyNameOrSynonyms.set(i, propertyNameOrSynonyms.get(i).toUpperCase());
+		}
+
 		try {
 			if (propertyNameOrSynonyms.size() > 0) {
 				
@@ -542,19 +553,20 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		        List<Object[]> results = query.list();
 
 	            for (Object[] row : results){
-	            	String cvtermName = ((String) row[0]).trim();
-	            	String cvtermSynonym = ((String) row[1]).trim();
+	            	String cvtermName = ((String) row[0]).trim().toUpperCase();
+	            	String cvtermSynonym = ((String) row[1]).trim().toUpperCase();
 	            	Integer cvtermId = (Integer) row[2];
 	            
        			Set<Integer> stdVarIds = new HashSet<Integer>();
-	            	if (propertyNameOrSynonyms.contains(cvtermName)){
+            	if (propertyNameOrSynonyms.contains(cvtermName)){
 	            		if (stdVarMap.containsKey(cvtermName)){
 	            			stdVarIds = stdVarMap.get(cvtermName);
 	            		}
            			stdVarIds.add(cvtermId);
            			stdVarMap.put(cvtermName, stdVarIds);
 
-	            	} else if (propertyNameOrSynonyms.contains(cvtermSynonym)){
+	            	} 
+	            	if (propertyNameOrSynonyms.contains(cvtermSynonym)){
 	            		if (stdVarMap.containsKey(cvtermSynonym)){
 	            			stdVarIds = stdVarMap.get(cvtermSynonym);
 	            		}
