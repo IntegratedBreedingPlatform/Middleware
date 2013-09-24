@@ -187,6 +187,8 @@ public class TestOntologyDataManagerImpl {
 		stdVariable.setMethod(method);
 		
 		stdVariable.setStoredIn(new Term(1010, "Study information", "Study element"));
+		//added as this is required
+		stdVariable.setIsA(new Term(1050,"Study condition","Study condition class"));		
 		stdVariable.setDataType(new Term(1120, "Character variable", "variable with char values"));
 		stdVariable.setNameSynonyms(new ArrayList<NameSynonym>());
 		stdVariable.getNameSynonyms().add(new NameSynonym("test", NameType.ALTERNATIVE_ENGLISH));
