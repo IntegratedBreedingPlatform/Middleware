@@ -136,4 +136,12 @@ public class TermBuilder extends Builder {
         }
         return term;
 	}
+	
+	public Term getTermOfClass(int termId) throws MiddlewareQueryException {
+		Term term = null;
+		if (setWorkingDatabase(termId)) {
+			term = mapCVTermToTerm(getCvTermDao().getTermOfClass(termId));
+		}
+		return term;
+	}
 }
