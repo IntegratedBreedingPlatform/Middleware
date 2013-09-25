@@ -56,7 +56,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		return stockIds;
 	}
 	
-	public long countStudiesByGidViaStudy(int gid) throws MiddlewareQueryException {
+	public long countStudiesByGid(int gid) throws MiddlewareQueryException {
 		
 		try {
 			SQLQuery query = getSession().createSQLQuery("select count(distinct ep.project_id) " +
@@ -64,8 +64,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 					                                     "where s.dbxref_id = " + gid +
 					                                     "  and s.stock_id = es.stock_id " +
 					                                     "  and es.nd_experiment_id = e.nd_experiment_id " +
-					                                     "  and ep.nd_experiment_id = e.nd_experiment_id " + 
-					                                     "  and e.type_id = 1010"+
+					                                     "  and ep.nd_experiment_id = e.nd_experiment_id " +
 					                                     "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId() +
 					                         			 "  AND pp.project_id = ep.project_id AND pp.value = " +
 					                         			 "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) ");
@@ -77,87 +76,34 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		return 0;
 	}
 	
-   @SuppressWarnings("unchecked")
-   public List<StudyReference> getStudiesByGidViaStudy(int gid, int start, int numOfRows) throws MiddlewareQueryException {
-		List<StudyReference> studyReferences = new ArrayList<StudyReference>();
-		try {
-			SQLQuery query = getSession().createSQLQuery("select distinct p.project_id, p.name, p.description " +
-		                                                 "from stock s, nd_experiment_stock es, nd_experiment e, nd_experiment_project ep, project p " + 
-					                                     "where s.dbxref_id = " + gid +
-					                                     "  and s.stock_id = es.stock_id " +
-					                                     "  and es.nd_experiment_id = e.nd_experiment_id " +
-					                                     "  and ep.nd_experiment_id = e.nd_experiment_id " + 
-					                                     "  and e.type_id = 1010 " +
-					                                     "  and p.project_id = ep.project_id "+
-					                                     "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId() +
-					                         			 "  AND pp.project_id = p.project_id AND pp.value = " +
-					                         			 "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) ");
-			query.setFirstResult(start);
-			query.setMaxResults(numOfRows);
-			
-			List<Object[]> results = (List<Object[]>) query.list();
-			for (Object[] row : results) {
-				studyReferences.add(new StudyReference((Integer) row[0], (String) row[1], (String) row[2]));
+	@SuppressWarnings("unchecked")
+	public List<StudyReference> getStudiesByGid(int gid, int start, int numOfRows) throws MiddlewareQueryException {
+			List<StudyReference> studyReferences = new ArrayList<StudyReference>();
+			try {
+				SQLQuery query = getSession().createSQLQuery("select distinct p.project_id, p.name, p.description " +
+			                                                 "from stock s, nd_experiment_stock es, nd_experiment e, nd_experiment_project ep, project p " + 
+						                                     "where s.dbxref_id = " + gid +
+						                                     "  and s.stock_id = es.stock_id " +
+						                                     "  and es.nd_experiment_id = e.nd_experiment_id " +
+						                                     "  and ep.nd_experiment_id = e.nd_experiment_id " +
+						                                     "  and p.project_id = ep.project_id "+
+						                                     "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId() +
+						                         			 "  AND pp.project_id = p.project_id AND pp.value = " +
+						                         			 "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) ");
+				query.setFirstResult(start);
+				query.setMaxResults(numOfRows);
+				
+				List<Object[]> results = (List<Object[]>) query.list();
+				for (Object[] row : results) {
+					studyReferences.add(new StudyReference((Integer) row[0], (String) row[1], (String) row[2]));
+				}
+				
+			} catch(HibernateException e) {
+				logAndThrowException("Error in countStudiesByGid=" + gid + " in StockDao: " + e.getMessage(), e);
 			}
-			
-		} catch(HibernateException e) {
-			logAndThrowException("Error in countStudiesByGid=" + gid + " in StockDao: " + e.getMessage(), e);
-		}
-		return studyReferences;
+			return studyReferences;
 	}
 	
-    public long countStudiesByGidViaPlot(int gid) throws MiddlewareQueryException {
-		
-		try {
-			SQLQuery query = getSession().createSQLQuery("select count(distinct pr.object_project_id) " +
-		                                                 "from stock s, nd_experiment_stock es, nd_experiment e, nd_experiment_project ep, project_relationship pr " + 
-					                                     "where s.dbxref_id = " + gid +
-					                                     "  and s.stock_id = es.stock_id " +
-					                                     "  and es.nd_experiment_id = e.nd_experiment_id " +
-					                                     "  and ep.nd_experiment_id = e.nd_experiment_id " + 
-					                                     "  and e.type_id = 1155 " +
-					                                     "  and pr.subject_project_id = ep.project_id"+
-					                                     "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId() +
-					                         			 "  AND pp.project_id = pr.object_project_id AND pp.value = " +
-					                         			 "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) ");
-			return ((BigInteger) query.uniqueResult()).longValue();
-			
-		} catch(HibernateException e) {
-			logAndThrowException("Error in countStudiesByGidViaPlot=" + gid + " in StockDao: " + e.getMessage(), e);
-		}
-		return 0;
-	}
-    
-    @SuppressWarnings("unchecked")
-	public List<StudyReference> getStudiesByGidViaPlot(int gid, int start, int numOfRows) throws MiddlewareQueryException {
-    	List<StudyReference> studyReferences = new ArrayList<StudyReference>();
-		try {
-			SQLQuery query = getSession().createSQLQuery("select distinct p.project_id, p.name, p.description " +
-		                                                 "from stock s, nd_experiment_stock es, nd_experiment e, nd_experiment_project ep, project_relationship pr, project p " + 
-					                                     "where s.dbxref_id = " + gid +
-					                                     "  and s.stock_id = es.stock_id " +
-					                                     "  and es.nd_experiment_id = e.nd_experiment_id " +
-					                                     "  and ep.nd_experiment_id = e.nd_experiment_id " + 
-					                                     "  and e.type_id = 1155 " +
-					                                     "  and pr.subject_project_id = ep.project_id " +
-					                                     "  and pr.object_project_id = p.project_id " +
-					                                     "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId() +
-					                         			 "  AND pp.project_id = p.project_id AND pp.value = " +
-					                         			 "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) ");
-			query.setFirstResult(start);
-			query.setMaxResults(numOfRows);
-			
-			List<Object[]> results = (List<Object[]>) query.list();
-			for (Object[] row : results) {
-				studyReferences.add(new StudyReference((Integer) row[0], (String) row[1], (String) row[2]));
-			}
-			
-		} catch(HibernateException e) {
-			logAndThrowException("Error in countStudiesByGidViaPlot=" + gid + " in StockDao: " + e.getMessage(), e);
-		}
-		return studyReferences;
-	}
-    
     @SuppressWarnings("unchecked")
 	public Set<StockModel> findInDataSet(int datasetId) throws MiddlewareQueryException {
 		Set<StockModel> stockModels = new LinkedHashSet<StockModel>();

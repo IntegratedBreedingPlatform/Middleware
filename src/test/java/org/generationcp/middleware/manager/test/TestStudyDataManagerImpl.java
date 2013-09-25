@@ -303,7 +303,7 @@ public class TestStudyDataManagerImpl {
 	@Test
 	public void testSearchStudiesByGid() throws Exception {
 		System.out.println("testSearchStudiesByGid");
-		Integer gid = 70125;
+		Integer gid = 1356114;
 		GidStudyQueryFilter filter = new GidStudyQueryFilter(gid);
 		StudyResultSet resultSet = manager.searchStudies(filter, 50);
 		Assert.assertNotNull(resultSet);

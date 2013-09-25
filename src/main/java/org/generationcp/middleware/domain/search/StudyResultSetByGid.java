@@ -25,10 +25,8 @@ public class StudyResultSetByGid extends Searcher implements StudyResultSet {
 	private int gid;
 	private int numOfRows;
 	
-	private long countOfLocalStudiesViaStudy;
-	private long countOfLocalStudiesViaPlot;
-	private long countOfCentralStudiesViaStudy;
-	private long countOfCentralStudiesViaPlot;
+	private long countOfLocalStudies;
+	private long countOfCentralStudies;
 	
 	private int currentRow;
 	
@@ -45,25 +43,16 @@ public class StudyResultSetByGid extends Searcher implements StudyResultSet {
 		this.gid = filter.getGid();
 		this.numOfRows = numOfRows;
 		
-		this.countOfLocalStudiesViaStudy = countStudiesViaStudy(Database.LOCAL, gid);
-		this.countOfLocalStudiesViaPlot = countStudiesViaPlot(Database.LOCAL, gid);
-		this.countOfCentralStudiesViaStudy = countStudiesViaStudy(Database.CENTRAL, gid);
-		this.countOfCentralStudiesViaPlot = countStudiesViaPlot(Database.CENTRAL, gid);
+		this.countOfLocalStudies = countStudies(Database.LOCAL, gid);
+		this.countOfCentralStudies = countStudies(Database.CENTRAL, gid);
 		
 		this.currentRow = 0;
 		this.bufIndex = 0;
 	}
-
-	private long countStudiesViaStudy(Database database, int gid) throws MiddlewareQueryException {
+	
+	private long countStudies(Database database, int gid) throws MiddlewareQueryException {
 		if (this.setWorkingDatabase(database)) {
-			return this.getStockDao().countStudiesByGidViaStudy(gid);
-		}
-		return 0;
-	}
-
-	private long countStudiesViaPlot(Database database, int gid) throws MiddlewareQueryException {
-		if (this.setWorkingDatabase(database)) {
-			return this.getStockDao().countStudiesByGidViaPlot(gid);
+			return this.getStockDao().countStudiesByGid(gid);
 		}
 		return 0;
 	}
@@ -87,56 +76,33 @@ public class StudyResultSetByGid extends Searcher implements StudyResultSet {
 	}
 
 	private void fillBuffer() throws MiddlewareQueryException {
-		if (currentRow < this.countOfLocalStudiesViaStudy) {
-			fillBufferFromLocalStudiesViaStudy();
-		}
-		else if (currentRow < this.countOfLocalStudiesViaStudy + this.countOfLocalStudiesViaPlot) {
-			fillBufferFromLocalStudiesViaPlot();
-		}
-		else if (currentRow < this.countOfLocalStudiesViaStudy + this.countOfLocalStudiesViaPlot + this.countOfCentralStudiesViaStudy) {
-			fillBufferFromCentralStudiesViaStudy();
+		if (currentRow < this.countOfLocalStudies) {
+			fillBufferFromLocalStudies();
 		}
 		else {
-			fillBufferFromCentralStudiesViaPlot();
+			fillBufferFromCentralStudies();
 		}
 	}
 
-	private void fillBufferFromLocalStudiesViaStudy() throws MiddlewareQueryException {
+	private void fillBufferFromLocalStudies() throws MiddlewareQueryException {
 		if (this.setWorkingDatabase(Database.LOCAL)) {
-			buffer = this.getStockDao().getStudiesByGidViaStudy(gid, currentRow, numOfRows);
+			int start = currentRow - (int) countOfLocalStudies;
+			buffer = this.getStockDao().getStudiesByGid(gid, start, numOfRows);
 			bufIndex = 0;
 		}
 	}
 
-	private void fillBufferFromLocalStudiesViaPlot() throws MiddlewareQueryException {
-		if (this.setWorkingDatabase(Database.LOCAL)) {
-			int start = currentRow - (int) countOfLocalStudiesViaStudy;
-			buffer = this.getStockDao().getStudiesByGidViaPlot(gid, start, numOfRows);
-			bufIndex = 0;
-		}
-	}
-
-	private void fillBufferFromCentralStudiesViaStudy() throws MiddlewareQueryException {
+	private void fillBufferFromCentralStudies() throws MiddlewareQueryException {
 		if (this.setWorkingDatabase(Database.CENTRAL)) {
-			int start = currentRow - (int) countOfLocalStudiesViaStudy - (int) this.countOfLocalStudiesViaPlot;
-			buffer = this.getStockDao().getStudiesByGidViaStudy(gid, start, numOfRows);
-			bufIndex = 0;
-		}
-	}
-
-	private void fillBufferFromCentralStudiesViaPlot() throws MiddlewareQueryException {
-		if (this.setWorkingDatabase(Database.CENTRAL)) {
-			int start = currentRow - (int) countOfLocalStudiesViaStudy - (int) this.countOfLocalStudiesViaPlot - (int) this.countOfCentralStudiesViaStudy;
-			buffer = this.getStockDao().getStudiesByGidViaPlot(gid, start, numOfRows);
+			int start = currentRow - (int) countOfLocalStudies;
+			buffer = this.getStockDao().getStudiesByGid(gid, start, numOfRows);
 			bufIndex = 0;
 		}
 	}
 
 	@Override
 	public long size() {
-		return this.countOfLocalStudiesViaStudy +
-			   this.countOfLocalStudiesViaPlot +
-			   this.countOfCentralStudiesViaStudy +
-			   this.countOfCentralStudiesViaPlot;
+		return this.countOfLocalStudies +
+			   this.countOfCentralStudies;
 	}
 }
