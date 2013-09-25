@@ -426,6 +426,18 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 		return term;
 	}
+
+	@Override
+	public long countIsAOfProperties() throws MiddlewareQueryException {
+		long count = 0;
+		if (setWorkingDatabase(Database.CENTRAL)) {
+			count += getCvTermDao().countIsAOfTermsByCvId(CvId.PROPERTIES);
+		}
+		if (setWorkingDatabase(Database.LOCAL)) {
+			count += getCvTermDao().countIsAOfTermsByCvId(CvId.PROPERTIES);
+		}		
+		return count;
+	}
 }
 
 
