@@ -588,6 +588,14 @@ public class TestOntologyDataManagerImpl {
 	}
 	
 	@Test
+	public void testCountIsAOfProperties() throws Exception{
+		System.out.println("testCountIsAOfProperties:");
+		long asOf = manager.countIsAOfProperties();		
+		System.out.println("count is a properties " + asOf);
+		
+	}
+	
+	@Test
 	public void testAddProperty() throws Exception {
 		String name = "Germplasm type";
 		String definition = "Germplasm type description";
