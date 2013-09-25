@@ -113,7 +113,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	
 	private Set<StandardVariable> getStandardVariablesByNameOrSynonym(String nameOrSynonym) throws MiddlewareQueryException {
 		Set<StandardVariable> standardVariables = new HashSet<StandardVariable>();
-		Set<Integer> stdVarIds = getCvTermDao().getTermsByNameOrSynonym(nameOrSynonym, CvId.VARIABLES.getId());
+		List<Integer> stdVarIds = getCvTermDao().getTermsByNameOrSynonym(nameOrSynonym, CvId.VARIABLES.getId());
 		for (Integer stdVarId : stdVarIds) {
 			standardVariables.add(getStandardVariable(stdVarId));
 		}
@@ -356,7 +356,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	public List<Term> findTermsByNameOrSynonym(String nameOrSynonym, CvId cvId) throws MiddlewareQueryException {
 		List<Term> terms = new ArrayList<Term>();
 		List<CVTerm> cvTerms = new ArrayList<CVTerm>();
-		Set<Integer> termIds = new HashSet<Integer>();
+		List<Integer> termIds = new ArrayList<Integer>();
 		 
 		if (setWorkingDatabase(Database.LOCAL)) {
 			termIds = getCvTermDao().getTermsByNameOrSynonym(nameOrSynonym, cvId.getId());

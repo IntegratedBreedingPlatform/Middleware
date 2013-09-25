@@ -77,6 +77,13 @@ public class TestCvTermDao{
     	assertTrue(cvterm.getCvTermId() == 4030);
     	
     }
+    
+    @Test
+    public void testGetTermsByNameOrSynonym() throws Exception {
+    	List<Integer> termIds = dao.getTermsByNameOrSynonym("Cooperator", 1010);
+    	System.out.println("testGetTermsByNameOrSynonym(): " + termIds);
+    }
+    
     @Test
     public void testGetStandardVariableIdsByProperties() throws Exception {
     	List<String> nameOrSynonyms = Arrays.asList("ENTRY","ENTRYNO", "PLOT", "TRIAL_NO", "TRIAL", "STUDY", "DATASET", "LOC", "LOCN", "NURSER", "Plot Number");

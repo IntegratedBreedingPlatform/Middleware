@@ -60,8 +60,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return term;
 	}
 	
-	public Set<Integer> getTermsByNameOrSynonym(String nameOrSynonym, int cvId) throws MiddlewareQueryException {
-		Set<Integer> termIds = new HashSet<Integer>();
+	public List<Integer> getTermsByNameOrSynonym(String nameOrSynonym, int cvId) throws MiddlewareQueryException {
+		List<Integer> termIds = new ArrayList<Integer>();
 		try {
 				SQLQuery query = getSession().createSQLQuery(
 							"SELECT DISTINCT cvterm.cvterm_id "
@@ -77,7 +77,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		        for (Object row : results) {
 		            termIds.add((Integer) row);
 		        }
-			
+		        
 		} catch(HibernateException e) {
 			logAndThrowException("Error in getTermsByNameOrSynonym=" + nameOrSynonym + " in CVTermDao: " + e.getMessage(), e);
 		}
