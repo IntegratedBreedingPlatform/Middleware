@@ -166,9 +166,9 @@ public class WorkbookParser {
 	                    ,getCellStringValue(wb,currentSheet,currentRow,7)));
 	
 	        	//set locationId 
-	        	if (name.equals("CONDITIONS") && getCellStringValue(wb,currentSheet,currentRow,0).toUpperCase().equals("TRIAL")) {
-	        		if (getCellStringValue(wb,currentSheet,currentRow,7) != "" && getCellStringValue(wb,currentSheet,currentRow,7) != null) {
-	        			locationId = Long.parseLong(getCellStringValue(wb,currentSheet,currentRow,7));
+	        	if (name.equals("CONDITION") && getCellStringValue(wb,currentSheet,currentRow,0).toUpperCase().equals("TRIAL")) {
+	        		if (getCellStringValue(wb,currentSheet,currentRow,6) != "" && getCellStringValue(wb,currentSheet,currentRow,6) != null) {
+	        			locationId = Long.parseLong(getCellStringValue(wb,currentSheet,currentRow,6));
 	        		}
 	        	}
 	        	
@@ -254,25 +254,25 @@ public class WorkbookParser {
     }
     
     private static StudyType getStudyTypeValue(String studyType) {
-		if (studyType == StudyType.N.getName()) {
+		if (studyType.toUpperCase().equals(StudyType.N.getName().toUpperCase())) {
 			return StudyType.N;
-		} else if (studyType == StudyType.HB.getName()) {
+		} else if (studyType.toUpperCase().equals(StudyType.HB.getName().toUpperCase())) {
 			return StudyType.HB;
-		} else if (studyType == StudyType.PN.getName()) {
+		} else if (studyType.toUpperCase().equals(StudyType.PN.getName().toUpperCase())) {
 			return StudyType.PN;
-		} else if (studyType == StudyType.CN.getName()) {
+		} else if (studyType.toUpperCase().equals(StudyType.CN.getName().toUpperCase())) {
 			return StudyType.CN;
-		} else if (studyType == StudyType.OYT.getName()) {
+		} else if (studyType.toUpperCase().equals(StudyType.OYT.getName().toUpperCase())) {
 			return StudyType.OYT;
-		} else if (studyType == StudyType.BON.getName()) {
+		} else if (studyType.toUpperCase().equals(StudyType.BON.getName().toUpperCase())) {
 			return StudyType.BON;
-		} else if (studyType == StudyType.T.getName()) {
+		} else if (studyType.toUpperCase().equals(StudyType.T.getName().toUpperCase())) {
 			return StudyType.T;
-		} else if (studyType == StudyType.RYT.getName()) {
+		} else if (studyType.toUpperCase().equals(StudyType.RYT.getName().toUpperCase())) {
 			return StudyType.RYT;
-		} else if (studyType == StudyType.OFT.getName()) {
+		} else if (studyType.toUpperCase().equals(StudyType.OFT.getName().toUpperCase())) {
 			return StudyType.OFT;
-		} else if (studyType == StudyType.S.getName()) {
+		} else if (studyType.toUpperCase().equals(StudyType.S.getName().toUpperCase())) {
 			return StudyType.S;
 		} else {
 			return StudyType.E;
