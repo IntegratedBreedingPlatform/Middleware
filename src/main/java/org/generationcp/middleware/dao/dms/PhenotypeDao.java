@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.TrialEnvironment;
@@ -371,7 +372,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
     public List<Observation> getObservationForTraitOnGermplasms(
             List<Observation> observations) throws MiddlewareQueryException {
-
+    	TreeMap<String,Observation> observationResults = new TreeMap<String,Observation>();
+    	
         Set<Integer> traitIds = new HashSet<Integer>();
         Set<Integer> germplasmIds = new HashSet<Integer>();
         Set<Integer> environmentIds = new HashSet<Integer>();
@@ -404,20 +406,18 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
                 String value = (String) row[3];
                 
                 ObservationKey rowKey = new ObservationKey(traitId, germplasmId, environmentId);
-                
-                for (Observation observation: observations){
-                    if(observation.getId().equals(rowKey)){
-                        observation.setValue(value);
-                        break;
-                    }
-                }
-                
+                Observation observation = new Observation(rowKey,value);
+                String key = traitId + " " + germplasmId + " " + environmentId + " " + value;
+                observationResults.put(key,observation);
             }
 
         } catch(HibernateException e) {
             logAndThrowException("Error at getObservationForTraitOnGermplasms() query on PhenotypeDao: " + e.getMessage(), e);
         }
-        return observations;
+        
+        List<Observation> observationFinal = new ArrayList<Observation>(observationResults.values());
+        
+        return observationFinal;
     }
     
               
