@@ -645,4 +645,41 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
         return 0;
 	}
 	
+	public CVTerm getTermOfClass(int termId) throws MiddlewareQueryException {
+		CVTerm term = null;
+		
+		try {
+			StringBuffer sqlString = new StringBuffer()
+			.append("SELECT cvt.* ")
+			.append("FROM cvterm cvt ")
+			.append("INNER JOIN cvterm_relationship cvr on cvr.object_id = cvt.cvterm_id ")
+			.append("INNER JOIN cvterm v on cvr.subject_id = v.cvterm_id ")
+			.append("WHERE cvr.type_id = 1225 AND v.cvterm_id = :termId");
+		
+			SQLQuery query = getSession().createSQLQuery(sqlString.toString());
+			query.setParameter("termId", termId);
+
+
+	        List<Object[]> results = query.list();
+
+	        if (results.size() > 0){
+	        	Object[] row = results.get(0);
+	        	Integer cvtermId = (Integer) row[0];
+	        	Integer cvtermCvId = (Integer) row[1];
+	        	String cvtermName = (String) row[2];
+	        	String cvtermDefinition = (String) row[3];
+	        	Integer dbxrefId = (Integer) row[4];
+	        	Integer isObsolete = (Integer) row[5];
+	        	Integer isRelationshipType = (Integer) row[6];
+	        	
+	        	term = new CVTerm(cvtermId, cvtermCvId, cvtermName, cvtermDefinition, dbxrefId, isObsolete, isRelationshipType);
+	        }
+
+		} catch (HibernateException e) {
+			logAndThrowException("Error at getTermOfClass=" + termId + " query on CVTermDao: " + e.getMessage(), e);
+		}
+		
+		return term;
+	}
+	
 }
