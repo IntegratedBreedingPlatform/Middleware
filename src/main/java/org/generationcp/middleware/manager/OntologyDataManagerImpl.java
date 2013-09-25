@@ -22,6 +22,7 @@ import java.util.TreeMap;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -425,6 +426,28 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	    }
 
 		return term;
+	}
+	
+	@Override
+	public Property getProperty(int termId) throws MiddlewareQueryException {
+		Property property = new Property();
+		
+		property.setTerm(getTermBuilder().get(termId));
+		property.setIsA(getTermBuilder().getTermOfClass(termId));
+		
+		return property;
+	}
+
+	@Override
+	public long countIsAOfProperties() throws MiddlewareQueryException {
+		long count = 0;
+		if (setWorkingDatabase(Database.CENTRAL)) {
+			count += getCvTermDao().countIsAOfTermsByCvId(CvId.PROPERTIES);
+		}
+		if (setWorkingDatabase(Database.LOCAL)) {
+			count += getCvTermDao().countIsAOfTermsByCvId(CvId.PROPERTIES);
+		}		
+		return count;
 	}
 }
 

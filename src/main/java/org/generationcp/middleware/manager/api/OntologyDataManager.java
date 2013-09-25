@@ -19,6 +19,7 @@ import java.util.Set;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
@@ -228,6 +229,15 @@ public interface OntologyDataManager {
 	List<Term> findTermsByNameOrSynonym(String nameOrSynonym, CvId cvId) throws MiddlewareQueryException;
 	
 	/**
+	 * Returns the count of Term entries based on possible "is a" of properties
+	 * 
+	 * @return count of is_a Term objects 
+	 * @throws MiddlewareQueryException
+	 */
+	
+	long countIsAOfProperties() throws MiddlewareQueryException;
+	
+	/**
 	 * Returns the list of Term entries based on possible "is a" of properties
 	 * 
 	 * @return list of is_a Term objects 
@@ -249,4 +259,11 @@ public interface OntologyDataManager {
 	 */
 	Term addProperty(String name, String definition, int isA) throws MiddlewareQueryException;
 	
+	/**
+	 * Given the termId, retrieve the Property POJO.
+	 * @param termId
+	 * @return property
+	 * @throws MiddlewareQueryException
+	 */
+	Property getProperty(int termId) throws MiddlewareQueryException;
 }

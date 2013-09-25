@@ -26,6 +26,7 @@ import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
@@ -588,6 +589,14 @@ public class TestOntologyDataManagerImpl {
 	}
 	
 	@Test
+	public void testCountIsAOfProperties() throws Exception{
+		System.out.println("testCountIsAOfProperties:");
+		long asOf = manager.countIsAOfProperties();		
+		System.out.println("count is a properties " + asOf);
+		
+	}
+	
+	@Test
 	public void testAddProperty() throws Exception {
 		String name = "Germplasm type";
 		String definition = "Germplasm type description";
@@ -598,6 +607,15 @@ public class TestOntologyDataManagerImpl {
         System.out.println("testAddProperty(name=" + name + ", definition=" + definition + ", isA=" + isA + "): " );
         	term.print(4);
 
+	}
+	
+	@Test
+	public void testGetProperty() throws Exception {
+		int termId = 2452;
+		
+		Property property = manager.getProperty(termId);
+		
+		System.out.println(property);
 	}
 	
 }
