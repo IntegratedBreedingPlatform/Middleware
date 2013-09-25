@@ -46,9 +46,9 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 				StringBuffer sqlString = new StringBuffer()
 					.append("SELECT DISTINCT ppValue.value, ppStdVar.id ")
 					.append( "FROM projectprop ppValue  ")
-					.append("INNER JOIN (SELECT project_id, value id FROM projectprop WHERE type_id = 1070) AS ppStdVar  " )
-					.append("    ON ppValue.project_id = ppStdVar.project_id AND ppValue.type_id = 1060  ")
-					.append("    AND ppValue.value IN (:propertyNames)  ")
+					.append("INNER JOIN (SELECT project_id, value id, rank FROM projectprop WHERE type_id = 1070) AS ppStdVar  " )
+					.append("    ON ppValue.project_id = ppStdVar.project_id AND ppValue.type_id != 1060  AND ppValue.rank = ppStdVar.rank ")
+					.append("    AND ppValue.value IN (:propertyNames) ")
 					;
 				SQLQuery query = getSession().createSQLQuery(sqlString.toString());
 				query.setParameterList("propertyNames", propertyNames);
