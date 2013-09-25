@@ -361,11 +361,15 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		 
 		if (setWorkingDatabase(Database.LOCAL)) {
 			termIds = getCvTermDao().getTermsByNameOrSynonym(nameOrSynonym, cvId.getId());
-			cvTerms.addAll(getCvTermDao().getByIds(termIds));
+			for (Integer id : termIds){
+				cvTerms.add(getCvTermDao().getById(id));
+			}
 		}
 		if (setWorkingDatabase(Database.CENTRAL)) {
 			termIds = getCvTermDao().getTermsByNameOrSynonym(nameOrSynonym, cvId.getId());
-			cvTerms.addAll(getCvTermDao().getByIds(termIds));
+			for (Integer id : termIds){
+				cvTerms.add(getCvTermDao().getById(id));
+			}
 		}
 		
 		for (CVTerm cvTerm : cvTerms){

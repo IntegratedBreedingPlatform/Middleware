@@ -310,7 +310,7 @@ public class TestOntologyDataManagerImpl {
 	@Test
 	public void testFindStandardVariableByTraitScaleMethodNames() throws Exception{
 		System.out.println("Test findStandardVariableByTraitScaleMethodNames");
-		StandardVariable stdVar = manager.findStandardVariableByTraitScaleMethodNames("User", "DBCV", "Assigned");		
+		StandardVariable stdVar = manager.findStandardVariableByTraitScaleMethodNames("Cooperator", "DBCV", "Assigned");		
 		System.out.println("testFindStandardVariableByTraitScaleMethodNames(): " + stdVar);
 	}
 	
@@ -560,7 +560,14 @@ public class TestOntologyDataManagerImpl {
 		assertTrue(terms != null);
 		terms.get(0).print(0);
 		System.out.println();
-		
+
+		// name is both in term and in synonyms 
+		// need to modify the entry in cvterm where name = "Cooperator" to have cv_id = 1010
+		terms = manager.findTermsByNameOrSynonym("Cooperator", CvId.PROPERTIES);
+		assertTrue(terms != null);
+		terms.get(0).print(0);
+		System.out.println();
+
 	}
 
 	@Test

@@ -13,7 +13,6 @@ package org.generationcp.middleware.dao.oms;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -63,16 +62,20 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	public List<Integer> getTermsByNameOrSynonym(String nameOrSynonym, int cvId) throws MiddlewareQueryException {
 		List<Integer> termIds = new ArrayList<Integer>();
 		try {
-				SQLQuery query = getSession().createSQLQuery(
-							"SELECT DISTINCT cvterm.cvterm_id "
-									+ "FROM cvterm, cvtermsynonym syn "
-									+ "WHERE cvterm.cv_id = :cvId "
-									+ " AND (cvterm.name = :nameOrSynonym "
-									+ "      OR (syn.synonym = :nameOrSynonym AND syn.cvterm_id = cvterm.cvterm_id))");
-
+			
+			StringBuffer sqlString = new StringBuffer()
+					.append("SELECT DISTINCT cvt.cvterm_id ")
+					.append("FROM cvterm cvt ")
+					.append("WHERE cvt.cv_id = :cvId and cvt.name = :nameOrSynonym ")
+					.append("UNION ")
+					.append("SELECT DISTINCT cvt.cvterm_id ")
+					.append("FROM cvterm cvt INNER JOIN cvtermsynonym syn ON  syn.cvterm_id = cvt.cvterm_id ")
+					.append("AND cvt.cv_id = :cvId AND syn.synonym = :nameOrSynonym ");
+			    
+				SQLQuery query = getSession().createSQLQuery(sqlString.toString());
 				query.setParameter("cvId", cvId);
 				query.setParameter("nameOrSynonym", nameOrSynonym);
-		             
+						             
 		        List<Object> results = (List<Object>) query.list();
 		        for (Object row : results) {
 		            termIds.add((Integer) row);
@@ -94,13 +97,17 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 		try {
 			if (nameOrSynonyms.size() > 0) {
-				SQLQuery query = getSession().createSQLQuery(
-						"SELECT DISTINCT cvterm.name, syn.synonym, cvterm.cvterm_id " + 
-						 "FROM cvterm, cvtermsynonym syn " +
-						 "WHERE cvterm.cv_id = :cvId " + 
-						 " AND (cvterm.name IN (:nameOrSynonyms) " +
-						 "      OR (syn.synonym IN (:nameOrSynonyms) AND syn.cvterm_id = cvterm.cvterm_id)) "
-				);
+
+				StringBuffer sqlString = new StringBuffer()
+				.append("SELECT DISTINCT cvt.name, syn.synonym, cvt.cvterm_id ")
+				.append("FROM cvterm cvt, cvtermsynonym syn ")
+				.append("WHERE cvt.cv_id = :cvId and cvt.name IN (:nameOrSynonyms) ")
+				.append("UNION ")
+				.append("SELECT DISTINCT cvt.name, syn.synonym, cvt.cvterm_id ")
+				.append("FROM cvterm cvt INNER JOIN cvtermsynonym syn ON  syn.cvterm_id = cvt.cvterm_id ")
+				.append("AND cvt.cv_id = :cvId AND syn.synonym IN (:nameOrSynonyms) ");
+
+				SQLQuery query = getSession().createSQLQuery(sqlString.toString());
 				query.setParameter("cvId", cvId);
 				query.setParameterList("nameOrSynonyms", nameOrSynonyms);
 				
@@ -141,14 +148,19 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
         CVTerm term = null;
 		
 		try {
-			SQLQuery query = getSession().createSQLQuery(
-					"SELECT DISTINCT cvt.cvterm_id, cvt.cv_id, cvt.name, cvt.definition" +
-					"		, cvt.dbxref_id, cvt.is_obsolete, cvt.is_relationshiptype " + 
-					 "FROM cvterm cvt, cvtermsynonym syn " +
-					 "WHERE cvt.cv_id = :cvId " + 
-					 " AND (cvt.name = :nameOrSynonym " +
-					 "      OR (syn.synonym = :nameOrSynonym AND syn.cvterm_id = cvt.cvterm_id)) "
-			);
+
+			StringBuffer sqlString = new StringBuffer()
+					.append("SELECT DISTINCT cvt.cvterm_id, cvt.cv_id, cvt.name, cvt.definition ")
+					.append(", cvt.dbxref_id, cvt.is_obsolete, cvt.is_relationshiptype  ")
+					.append("FROM cvterm cvt ")
+					.append("WHERE cvt.cv_id = :cvId and cvt.name = :nameOrSynonym ")
+					.append("UNION ")
+					.append("	SELECT DISTINCT cvt.cvterm_id, cvt.cv_id, cvt.name, cvt.definition ")
+					.append(", cvt.dbxref_id, cvt.is_obsolete, cvt.is_relationshiptype  ")
+					.append("FROM cvterm cvt INNER JOIN cvtermsynonym syn ON  syn.cvterm_id = cvt.cvterm_id ")
+					.append("AND cvt.cv_id = :cvId AND syn.synonym = :nameOrSynonym ");
+			
+			SQLQuery query = getSession().createSQLQuery(sqlString.toString());
 			query.setParameter("cvId", cvId);
 			query.setParameter("nameOrSynonym", name);
 
@@ -166,6 +178,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	        	
 	        	term = new CVTerm(cvtermId, cvtermCvId, cvtermName, cvtermDefinition, dbxrefId, isObsolete, isRelationshipType);
 	        }
+	        
 
 		} catch (HibernateException e) {
 			logAndThrowException("Error at getByNameAndCvId=" + name + ", " + cvId + " query on CVTermDao: " + e.getMessage(), e);
@@ -174,7 +187,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return term;
 	}
 	
-	public List<CVTerm> getByIds(Collection<Integer> ids) throws MiddlewareQueryException {
+	public List<CVTerm> getByIds(List<Integer> ids) throws MiddlewareQueryException {
 		List<CVTerm> terms = new ArrayList<CVTerm>();
 		
 		if (ids != null && ids.size() > 0) {
@@ -183,7 +196,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				criteria.add(Restrictions.in("cvTermId", ids));
 				
 				terms = criteria.list();
-				
+
 			} catch(HibernateException e) {
 				logAndThrowException("Error at GetByIds=" + ids + " query on CVTermDao: " + e.getMessage(), e);
 			}

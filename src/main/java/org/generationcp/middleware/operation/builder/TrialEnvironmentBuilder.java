@@ -172,7 +172,7 @@ public class TrialEnvironmentBuilder extends Builder {
 			}
 		}
 		System.out.println("IDS ARE " + ids);
-		List<CVTerm> terms = getCvTermDao().getByIds(ids);
+		List<CVTerm> terms = getCvTermDao().getByIds(new ArrayList<Integer>(ids));
 		for (TrialEnvironmentProperty property : localProperties) {
 			int index = properties.indexOf(property);
 			if (index > -1) {
