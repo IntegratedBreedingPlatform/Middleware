@@ -436,8 +436,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	public Property getProperty(int termId) throws MiddlewareQueryException {
 		Property property = new Property();
 		
-		property.setTerm(getTermBuilder().get(termId));
-		property.setIsA(getTermBuilder().getTermOfClass(termId));
+		property.setTerm(getTermBuilder().getTermOfProperty(termId, CvId.PROPERTIES.getId()));
+		property.setIsA(getTermBuilder().getTermOfClassOfProperty(termId, CvId.PROPERTIES.getId(), TermId.IS_A.getId()));
 		
 		return property;
 	}

@@ -137,10 +137,18 @@ public class TermBuilder extends Builder {
         return term;
 	}
 	
-	public Term getTermOfClass(int termId) throws MiddlewareQueryException {
+	public Term getTermOfProperty(int termId, int cvId) throws MiddlewareQueryException {
 		Term term = null;
 		if (setWorkingDatabase(termId)) {
-			term = mapCVTermToTerm(getCvTermDao().getTermOfClass(termId));
+			term = mapCVTermToTerm(getCvTermDao().getTermOfProperty(termId, cvId));
+		}
+		return term;
+	}
+	
+	public Term getTermOfClassOfProperty(int termId, int cvId, int isATermId) throws MiddlewareQueryException {
+		Term term = null;
+		if (setWorkingDatabase(termId)) {
+			term = mapCVTermToTerm(getCvTermDao().getTermOfClassOfProperty(termId, cvId, isATermId));
 		}
 		return term;
 	}
