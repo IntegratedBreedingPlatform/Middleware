@@ -86,6 +86,12 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 	public Map<String, Set<Integer>> getTermsByNameOrSynonyms(List<String> nameOrSynonyms, int cvId) throws MiddlewareQueryException {
 		 Map<String, Set<Integer>> stdVarMap = new HashMap<String, Set<Integer>> ();
+
+		// Store the names in the map in uppercase
+		for (int i = 0, size = nameOrSynonyms.size(); i < size; i++) {
+			nameOrSynonyms.set(i, nameOrSynonyms.get(i).toUpperCase());
+		}
+
 		try {
 			if (nameOrSynonyms.size() > 0) {
 				SQLQuery query = getSession().createSQLQuery(
@@ -101,8 +107,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		        List<Object[]> results = query.list();
 
 	            for (Object[] row : results){
-	            	String cvtermName = ((String) row[0]).trim();
-	            	String cvtermSynonym = ((String) row[1]).trim();
+	            	String cvtermName = ((String) row[0]).trim().toUpperCase();
+	            	String cvtermSynonym = ((String) row[1]).trim().toUpperCase();
 	            	Integer cvtermId = (Integer) row[2];
 	            
         			Set<Integer> stdVarIds = new HashSet<Integer>();
@@ -524,6 +530,11 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	public Map<String, Set<Integer>> getStandardVariableIdsByProperties(List<String> propertyNameOrSynonyms) throws MiddlewareQueryException {
 		Map<String, Set<Integer>> stdVarMap = new HashMap<String, Set<Integer>> ();
 		
+		// Store the names in the map in uppercase
+		for (int i = 0, size = propertyNameOrSynonyms.size(); i < size; i++) {
+			propertyNameOrSynonyms.set(i, propertyNameOrSynonyms.get(i).toUpperCase());
+		}
+
 		try {
 			if (propertyNameOrSynonyms.size() > 0) {
 				
@@ -542,19 +553,20 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		        List<Object[]> results = query.list();
 
 	            for (Object[] row : results){
-	            	String cvtermName = ((String) row[0]).trim();
-	            	String cvtermSynonym = ((String) row[1]).trim();
+	            	String cvtermName = ((String) row[0]).trim().toUpperCase();
+	            	String cvtermSynonym = ((String) row[1]).trim().toUpperCase();
 	            	Integer cvtermId = (Integer) row[2];
 	            
        			Set<Integer> stdVarIds = new HashSet<Integer>();
-	            	if (propertyNameOrSynonyms.contains(cvtermName)){
+            	if (propertyNameOrSynonyms.contains(cvtermName)){
 	            		if (stdVarMap.containsKey(cvtermName)){
 	            			stdVarIds = stdVarMap.get(cvtermName);
 	            		}
            			stdVarIds.add(cvtermId);
            			stdVarMap.put(cvtermName, stdVarIds);
 
-	            	} else if (propertyNameOrSynonyms.contains(cvtermSynonym)){
+	            	} 
+	            	if (propertyNameOrSynonyms.contains(cvtermSynonym)){
 	            		if (stdVarMap.containsKey(cvtermSynonym)){
 	            			stdVarIds = stdVarMap.get(cvtermSynonym);
 	            		}
@@ -572,6 +584,65 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		
 		return stdVarMap;
 		
+	}
+	
+	public List<CVTerm> getIsAOfTermsByCvId(CvId cvId,int start,int numOfRows) throws MiddlewareQueryException{
+		List<CVTerm> terms = new ArrayList<CVTerm>();
+		
+        try{
+            
+            SQLQuery query = getSession().createSQLQuery(
+                    "SELECT DISTINCT isA.cvterm_id, isA.name, isA.definition, isA.dbxref_id, isA.is_obsolete, isA.is_relationshiptype "
+                    + "FROM cvterm isA, cvterm_relationship rel, cvterm subj " 
+                    + "WHERE subj.cv_id = :cvId "
+                    + "AND subj.cvterm_id = rel.subject_id "
+                    + "AND rel.object_id = isA.cvterm_id "
+                    + "AND rel.type_id = "+TermId.IS_A.getId()+" "
+                    + "ORDER BY isA.name, isA.cvterm_id "
+                    );
+            query.setParameter("cvId", cvId.getId());
+            setStartAndNumOfRows(query, start, numOfRows);
+			List<Object[]> list = query.list();
+            for (Object[] row : list) {
+            	Integer termId = (Integer) row[0];
+            	String name = (String) row[1];
+            	String definition = (String) row[2];
+            	Integer dbxrefId = (Integer) row[3];
+            	Integer isObsolete = (Integer) row[4];
+            	Integer isRelationshipType = (Integer) row[5];
+            	
+            	terms.add(new CVTerm(termId, cvId.getId(), name, definition, dbxrefId, isObsolete, isRelationshipType));
+            	
+            }
+            
+        } catch (HibernateException e) {
+            logAndThrowException("Error at getTermsByCvId() query on CVTermDao: " + e.getMessage(), e);
+        }
+        
+        return terms;
+	}
+
+	public long countIsAOfTermsByCvId(CvId cvId) throws MiddlewareQueryException{
+		
+        try{
+            
+            SQLQuery query = getSession().createSQLQuery(
+                    "SELECT COUNT(DISTINCT isA.cvterm_id) "
+                     + "FROM cvterm isA, cvterm_relationship rel, cvterm subj " 
+                     + "WHERE subj.cv_id = :cvId "
+                     + "AND subj.cvterm_id = rel.subject_id "
+                     + "AND rel.object_id = isA.cvterm_id "
+                     + "AND rel.type_id = "+TermId.IS_A.getId()+" "
+                    );
+            query.setParameter("cvId", cvId.getId());
+            
+            return ((BigInteger) query.uniqueResult()).longValue();
+      
+        } catch (HibernateException e) {
+            logAndThrowException("Error at countTermsByCvId() query on CVTermDao: " + e.getMessage(), e);
+        }
+        
+        return 0;
 	}
 	
 }

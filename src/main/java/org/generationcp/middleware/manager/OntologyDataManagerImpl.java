@@ -374,6 +374,58 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		return terms;
 
 	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Term> getIsAOfProperties(int start, int numOfRows) throws MiddlewareQueryException {
+		List<String> methods = Arrays.asList("countIsAOfTermsByCvId", "getIsAOfTermsByCvId");
+        Object[] centralParameters = new Object[] { CvId.PROPERTIES };
+        Object[] localParameters = new Object[] { CvId.PROPERTIES };
+        List<CVTerm> cvTerms =  getFromCentralAndLocalByMethod(
+    			getCvTermDao(), methods, start, numOfRows, 
+    			centralParameters, localParameters, new Class[] { CvId.class });
+        List<Term> terms = null;
+        if(cvTerms!=null && !cvTerms.isEmpty()) {
+        	terms = new ArrayList<Term>();
+        	for (CVTerm cvTerm : cvTerms){
+    			terms.add(getTermBuilder().mapCVTermToTerm(cvTerm));
+    		}	
+        }
+        return terms;
+	}
+	
+	@Override
+	public Term addProperty(String name, String definition, int isA) throws MiddlewareQueryException{
+		
+		Term term = findTermByName(name, CvId.PROPERTIES);
+		
+		if (term != null){
+			return term;
+		}
+		
+		requireLocalDatabaseInstance();
+		Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+        
+	    try {
+			trans = session.beginTransaction();
+			term = getTermSaver().save(name, definition, CvId.PROPERTIES);
+			Term isATerm = getTermById(isA);
+			
+			if (isATerm != null) {
+				getTermRelationshipSaver().save(term.getId(), TermId.IS_A.getId(), isATerm.getId());
+			} else {
+				throw new MiddlewareQueryException("The isA passed is not a valid Class term: " + isA);
+			}
+			
+			trans.commit();
+	    } catch (Exception e) {
+	    	rollbackTransaction(trans);
+	        throw new MiddlewareQueryException("Error in addProperty " + e.getMessage(), e);
+	    }
+
+		return term;
+	}
 }
 
 

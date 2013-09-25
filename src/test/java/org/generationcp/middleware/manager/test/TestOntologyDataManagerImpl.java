@@ -137,6 +137,7 @@ public class TestOntologyDataManagerImpl {
 		stdVariable.setScale(new Term(6000, "DBCV", "Controlled vocabulary from a database"));
 		stdVariable.setStoredIn(new Term(1010, "Study information", "Study element"));
 		stdVariable.setDataType(new Term(1120, "Character variable", "variable with char values"));
+		stdVariable.setIsA(new Term(1050,"Study condition","Study condition class"));
 		stdVariable.setNameSynonyms(new ArrayList<NameSynonym>());
 		stdVariable.getNameSynonyms().add(new NameSynonym("Person", NameType.ALTERNATIVE_ENGLISH));
 		stdVariable.getNameSynonyms().add(new NameSynonym("Tiga-gamit", NameType.ALTERNATIVE_FRENCH));
@@ -186,6 +187,8 @@ public class TestOntologyDataManagerImpl {
 		stdVariable.setMethod(method);
 		
 		stdVariable.setStoredIn(new Term(1010, "Study information", "Study element"));
+		//added as this is required
+		stdVariable.setIsA(new Term(1050,"Study condition","Study condition class"));		
 		stdVariable.setDataType(new Term(1120, "Character variable", "variable with char values"));
 		stdVariable.setNameSynonyms(new ArrayList<NameSynonym>());
 		stdVariable.getNameSynonyms().add(new NameSynonym("test", NameType.ALTERNATIVE_ENGLISH));
@@ -516,9 +519,7 @@ public class TestOntologyDataManagerImpl {
 	
     @Test
     public void testGetStandardVariablesInProjects() throws Exception {
-//    	List<String> headers = Arrays.asList("ENTRY","ENTRYNO", "PLOT", "TRIAL_NO", "TRIAL", "STUDY", "DATASET");
     	List<String> headers = Arrays.asList("ENTRY","ENTRYNO", "PLOT", "TRIAL_NO", "TRIAL", "STUDY", "DATASET", "LOC", "LOCN", "NURSER", "Plot Number");
-//    	List<String> headers = Arrays.asList("INTNN2", "PEDL1", "PEDL2", "PANL1", "PANL2", "NHH", "NBGPAN", "PH", "INTNN", "PEDL", "PANL");
     	
     	Map<String, List<StandardVariable>> results = manager.getStandardVariablesInProjects(headers);
 
@@ -559,15 +560,44 @@ public class TestOntologyDataManagerImpl {
 		terms.get(0).print(0);
 		System.out.println();
 		
-//		// add a method to local
-//		String name = "Test Method " + new Random().nextInt(10000);
-//		String definition = "Test Definition";
-//		Term term = manager.addTerm(name, definition, CvId.METHODS);
-//		// term does exist in local
-//		
-//		terms = manager.findTermsByNameOrSynonym(term.getName(), CvId.METHODS);
-//		assertTrue(terms != null);
-//		terms.get(0).print(0);
 	}
 
+	@Test
+	public void testGetIsAOfProperties() throws Exception{
+		System.out.println("testGetIsAOfProperties:");
+		List<Term> terms1 = manager.getIsAOfProperties(0, 2);		
+		System.out.println("Get First 2 isA: " + terms1.size());
+		printTerms(terms1);
+		
+		List<Term> terms2 = manager.getIsAOfProperties(2, 2);		
+		System.out.println("Get Next 2 isA: " + terms2.size());
+		printTerms(terms2);
+		
+		terms1.addAll(terms2);
+		
+		List<Term> terms = manager.getIsAOfProperties(0, 4);		
+		System.out.println("Get First 4 isA: " + terms.size());
+		printTerms(terms);
+		
+		assertEquals(terms1, terms);
+		
+		List<Term> allTerms = manager.getIsAOfProperties(0,0);		
+		System.out.println("Get All isA: " + allTerms.size());
+		printTerms(allTerms);
+		
+	}
+	
+	@Test
+	public void testAddProperty() throws Exception {
+		String name = "Germplasm type";
+		String definition = "Germplasm type description";
+		int isA = 1087;
+		
+        System.out.println("testAddProperty(name=" + name + ", definition=" + definition + ", isA=" + isA + "): ");
+		Term term = manager.addProperty(name, definition, isA);
+        System.out.println("testAddProperty(name=" + name + ", definition=" + definition + ", isA=" + isA + "): " );
+        	term.print(4);
+
+	}
+	
 }

@@ -227,4 +227,26 @@ public interface OntologyDataManager {
 	 */
 	List<Term> findTermsByNameOrSynonym(String nameOrSynonym, CvId cvId) throws MiddlewareQueryException;
 	
+	/**
+	 * Returns the list of Term entries based on possible "is a" of properties
+	 * 
+	 * @return list of is_a Term objects 
+	 * @throws MiddlewareQueryException
+	 */
+	
+	List<Term> getIsAOfProperties(int start, int numOfRows) throws MiddlewareQueryException;
+	
+	/**
+	 * Adds a new property to the database that adds the property term and it's is a relationship) 
+	 * Creates a new cvterm entry in the local database and a cvterm_relationship of type is_a
+	 * Returns the added term.
+	 * 
+	 * @param name
+	 * @param definition
+	 * @param isA
+	 * @return Term
+	 * @throws MiddlewareQueryException
+	 */
+	Term addProperty(String name, String definition, int isA) throws MiddlewareQueryException;
+	
 }
