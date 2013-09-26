@@ -2062,7 +2062,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             markerOnMap.setMarkerId(markerSavedId);
             markerOnMap.setMapId(mapSavedId);
 
-            MarkerOnMap markerOnMapRecordSaved = markerOnMapDao.saveOrUpdate(markerOnMap);
+            if (markerOnMapDao.findByMarkerIdAndMapId(markerSavedId, mapSavedId) != null) {
+            	throw new Exception("The marker on map combination already exists (markerId=" + markerSavedId + ", mapId=" + mapSavedId + ")" );
+            }
+            MarkerOnMap markerOnMapRecordSaved = markerOnMapDao.save(markerOnMap);
             Integer markerOnMapSavedId = markerOnMapRecordSaved.getMapId();
 
             if (markerOnMapSavedId == null) {
