@@ -22,6 +22,7 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.GdmsTable;
@@ -1139,9 +1140,15 @@ public class TestGenotypicDataManagerImpl{
     	String linkageGroup = "Test";
       
         MarkerOnMap markerOnMap = new MarkerOnMap(mapId, markerId, startPosition, endPosition, linkageGroup);
-      
-        Integer idAdded = manager.addMarkerOnMap(markerOnMap);
-        System.out.println("testAddMarkerOnMap() Added: " + (idAdded != null ? markerOnMap : null));
+
+        try{
+        	Integer idAdded = manager.addMarkerOnMap(markerOnMap);
+            System.out.println("testAddMarkerOnMap() Added: " + (idAdded != null ? markerOnMap : null));
+        } catch(MiddlewareQueryException e){
+        	if (e.getMessage().contains("Map Id not found")){
+        		System.out.println("Foreign key constraint violation: Map Id not found");
+        	}
+        }
     }    
     
     @Test
@@ -1561,10 +1568,18 @@ public class TestGenotypicDataManagerImpl{
 
         MarkerOnMap markerOnMap = new MarkerOnMap(mapId, markerId, startPosition, endPosition, linkageGroup);
         
-        Boolean addStatus = manager.setMaps(marker, markerOnMap, map);
-        System.out.println("testSetMaps() Added: " + (addStatus != null ? marker : null) 
-                    + " | " + (addStatus != null ? markerOnMap : null) 
-                    + " | " + (addStatus != null ? map : null));
+        Boolean addStatus = null;
+        try{
+	        addStatus = manager.setMaps(marker, markerOnMap, map);
+        } catch(MiddlewareQueryException e){
+        	if (e.getMessage().contains("The marker on map combination already exists")){
+        			System.out.println("The marker on map combination already exists");        		
+        	} else {
+	        		System.out.println("testSetMaps() Added: " + (addStatus != null ? marker : null) 
+	                    + " | " + (addStatus != null ? markerOnMap : null) 
+	                    + " | " + (addStatus != null ? map : null));
+        	}
+        }   
     }
     
     @Test

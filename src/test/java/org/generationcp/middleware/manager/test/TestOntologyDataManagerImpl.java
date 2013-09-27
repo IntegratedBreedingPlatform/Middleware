@@ -217,12 +217,12 @@ public class TestOntologyDataManagerImpl {
 	}
 	
 	@Test
-	public void testGetStandadardVariableIdByPropertyScaleMethod() throws Exception {
-		Integer propertyId = Integer.valueOf(2002);
+	public void testGetStandardVariableIdByPropertyScaleMethod() throws Exception {
+		Integer propertyId = Integer.valueOf(2010);
 		Integer scaleId = Integer.valueOf(6000);
 		Integer methodId = Integer.valueOf(4030);
 		
-		Integer varid = manager.getStandadardVariableIdByPropertyScaleMethod(propertyId, scaleId, methodId);
+		Integer varid = manager.getStandardVariableIdByPropertyScaleMethod(propertyId, scaleId, methodId);
 		Assert.assertNotNull(varid);
 		System.out.println("testGetStandadardVariableIdByPropertyScaleMethod() Results: " + varid);
 	}

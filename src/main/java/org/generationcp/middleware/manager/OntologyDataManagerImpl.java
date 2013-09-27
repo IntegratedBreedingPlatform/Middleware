@@ -29,8 +29,6 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.oms.CVTerm;
-import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -132,37 +130,9 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public Integer getStandadardVariableIdByPropertyScaleMethod(
-			Integer propertyId, Integer scaleId, Integer methodId)
+	public Integer getStandardVariableIdByPropertyScaleMethod(Integer propertyId, Integer scaleId, Integer methodId) 
 			throws MiddlewareQueryException {
-			requireLocalDatabaseInstance();
-			Session session = getCurrentSessionForLocal();
-		
-			try {
-			
-			String sql = "select distinct cvr.subject_id "
-					+ "from cvterm_relationship cvr " 
-					+ "inner join cvterm_relationship cvrp on cvr.subject_id = cvrp.subject_id and cvrp.type_id = 1200 "
-					+ "inner join cvterm_relationship cvrs on cvr.subject_id = cvrs.subject_id and cvrs.type_id = 1220 "
-					+ "inner join cvterm_relationship cvrm on cvr.subject_id = cvrm.subject_id and cvrm.type_id = 1210 "
-					+ "where cvrp.object_id = :propertyId and cvrs.object_id = :scaleId and cvrm.object_id = :methodId LIMIT 0,1";
-			
-			Query query = session.createSQLQuery(sql);
-			query.setParameter("propertyId", propertyId);
-			query.setParameter("scaleId", scaleId);
-			query.setParameter("methodId", methodId);
-								
-			Integer id = (Integer) query.uniqueResult();
-			
-			return id;
-						
-		} catch(HibernateException e) {
-			logAndThrowException("Error at getStandadardVariableIdByPropertyScaleMethod :" + e.getMessage(), e);
-		}
-		return null;
-		
-		
-	
+		return getStandardVariableBuilder().getIdByPropertyScaleMethod(propertyId, scaleId, methodId);
 	}
 	
 	@Override
