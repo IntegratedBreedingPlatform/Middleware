@@ -18,7 +18,6 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -188,6 +187,9 @@ public class TestGermplasmAddUpdateFunctions{
         n.setUserId(new Integer(1));
 
         int added = manager.addGermplasm(g, n);
+        
+        System.out.println("Germplasm added: " + added); 
+       
     }
 
     @AfterClass

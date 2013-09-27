@@ -19,7 +19,6 @@ import java.util.List;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
@@ -33,7 +32,6 @@ import org.junit.Test;
 public class TestPedigreeDataManager{
 
     private static ManagerFactory factory;
-    private static GermplasmDataManager germplasmManager;
     private static PedigreeDataManager pedigreeManager;
 
     @BeforeClass
@@ -41,7 +39,6 @@ public class TestPedigreeDataManager{
         DatabaseConnectionParameters local = new DatabaseConnectionParameters("testDatabaseConfig.properties", "local");
         DatabaseConnectionParameters central = new DatabaseConnectionParameters("testDatabaseConfig.properties", "central");
         factory = new ManagerFactory(local, central);
-        germplasmManager = factory.getGermplasmDataManager();
         pedigreeManager = factory.getPedigreeDataManager();
     }
 

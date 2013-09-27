@@ -859,7 +859,7 @@ public class TestGermplasmDataManagerImpl{
             attribute.setUserId(0);
             attribute.setReferenceId(0);
             attribute.setTypeId(0);
-            Integer id = manager.updateGermplasmAttribute(attribute);
+            manager.updateGermplasmAttribute(attribute);
 
             System.out.println("testUpdateGermplasmAttribute(" + attributeId + ") RESULTS: "
                     + "\ntBEFORE: " + attributeString
