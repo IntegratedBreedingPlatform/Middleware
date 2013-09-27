@@ -103,10 +103,10 @@ public class ExperimentProjectDao extends GenericDAO<ExperimentProject, Integer>
 			queryString.append("left outer join exp.experimentStocks as es ");
 			queryString.append("left outer join es.stock as st ");
 			queryString.append("where ep.projectId =:p_id and ep.experiment.typeId in (:type_ids) ");
-			queryString.append("order by ep.experiment.geoLocation.description ASC, ");
-			queryString.append("plot.value ASC, ");
-			queryString.append("rep.value ASC, ");
-			queryString.append("st.uniqueName ASC, ");
+			queryString.append("order by (ep.experiment.geoLocation.description * 1) ASC, ");
+			queryString.append("(plot.value * 1) ASC, ");
+			queryString.append("(rep.value * 1) ASC, ");
+			queryString.append("(st.uniqueName * 1) ASC, ");
 			
 			if(projectId < 0){
 				queryString.append("ep.experiment.ndExperimentId DESC");
