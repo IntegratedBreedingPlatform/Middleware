@@ -2,11 +2,7 @@
 package org.generationcp.middleware.manager.test;
 
 import static org.junit.Assert.assertNotNull;
-
 import java.util.List;
-import java.util.Random;
-
-import junit.framework.Assert;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
@@ -36,7 +32,7 @@ public class TestUserDataManagerImpl{
     @Test
     public void testGetAllUsers() throws Exception {
         List<User> users = manager.getAllUsers();
-        Assert.assertNotNull(users);
+        assertNotNull(users);
 
         System.out.println("testGetAllUsers() RESULTS: " + users.size());
         for (User user : users) {
@@ -69,7 +65,7 @@ public class TestUserDataManagerImpl{
         manager.addUser(user);
 
         user = manager.getUserById(user.getUserid());
-        Assert.assertNotNull(user);
+        assertNotNull(user);
         System.out.println("testAddUser() ADDED: " + user);
 
         // cleanup
@@ -79,7 +75,7 @@ public class TestUserDataManagerImpl{
     @Test
     public void testGetAllPersons() throws Exception{
         List<Person> persons = manager.getAllPersons();
-        Assert.assertNotNull(persons);
+        assertNotNull(persons);
 
         System.out.println("testGetAllPersons() RESULTS: " + persons.size());
         for (Person person : persons) {
@@ -115,7 +111,7 @@ public class TestUserDataManagerImpl{
         manager.addPerson(person);
 
         person = manager.getPersonById(person.getId());
-        Assert.assertNotNull(person);
+        assertNotNull(person);
         System.out.println("testAddPerson() ADDED: " + person);
 
         // delete the person
@@ -193,7 +189,7 @@ public class TestUserDataManagerImpl{
     	//central database
 		int id = 1;
 		Person personid = manager.getPersonById(id);
-		Assert.assertNotNull(personid);
+		assertNotNull(personid);
 		System.out.println("Central database: " + personid);
 
 		//local database
@@ -216,7 +212,7 @@ public class TestUserDataManagerImpl{
         manager.addPerson(person);
 
 		Person personid2 = manager.getPersonById(person.getId());
-		Assert.assertNotNull(personid2);
+		assertNotNull(personid2);
 		System.out.println("Local Database: " + personid2);
 
         manager.deletePerson(person);
@@ -228,7 +224,7 @@ public class TestUserDataManagerImpl{
     	//central database
 		int id = 1;
 		User userid = manager.getUserById(id);
-		Assert.assertNotNull(userid);
+		assertNotNull(userid);
 		System.out.println("Central Database: " + userid);
 
     	//local database
@@ -249,7 +245,7 @@ public class TestUserDataManagerImpl{
         manager.addUser(user);
 
         User userid2 = manager.getUserById(user.getUserid());
-        Assert.assertNotNull(userid2);
+        assertNotNull(userid2);
         System.out.println("Local Database: " + userid2);
 
         // cleanup
@@ -276,7 +272,7 @@ public class TestUserDataManagerImpl{
 
 		String name = "user_test";
 		User userName = manager.getUserByUserName(name);
-		Assert.assertNotNull(userName);
+		assertNotNull(userName);
 		System.out.println("testGetUserByUserName: " + userName);
 
 	    manager.deleteUser(user);
@@ -285,7 +281,6 @@ public class TestUserDataManagerImpl{
 
     @Test
     public void testIsValidUserLogin() throws MiddlewareQueryException {
-
     	String validuser = "GMCLAREN"; //enter valid username
     	String validpass = "IR123"; // enter valid password
         System.out.println("testIsValidUserLogin (using valid username & password): " + manager.isValidUserLogin(validuser, validpass));
