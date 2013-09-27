@@ -25,6 +25,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+@SuppressWarnings("rawtypes")
 public class TestNamedQueries{
 
     private static HibernateUtil hibernateUtil;

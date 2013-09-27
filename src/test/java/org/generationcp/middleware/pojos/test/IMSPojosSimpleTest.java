@@ -26,6 +26,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+@SuppressWarnings("rawtypes")
 public class IMSPojosSimpleTest{
 
     private static HibernateUtil hibernateUtil;
@@ -51,7 +52,7 @@ public class IMSPojosSimpleTest{
         }
     }
 
-    @Test
+	@Test
     public void testTransaction() throws Exception {
         Session session = hibernateUtil.getCurrentSession();
         Query query = session.createQuery("FROM Transaction");
