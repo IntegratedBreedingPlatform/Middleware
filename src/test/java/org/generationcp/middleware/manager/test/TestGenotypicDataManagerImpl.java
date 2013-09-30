@@ -887,8 +887,8 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testAddQtlDetails() throws Exception {
-        Integer qtlId = -5;          // Crop tested: Groundnut
-        Integer mapId = 1; 
+        Integer qtlId = -1;          // Crop tested: Groundnut
+        Integer mapId = -2; 
         Float minPosition = 0f; 
         Float maxPosition = 8f; 
         Integer traitId = 1001; // "DE"; 
@@ -1131,8 +1131,8 @@ public class TestGenotypicDataManagerImpl{
     @Test
     public void testAddMarkerOnMap() throws Exception {
   	
-    	Integer mapId = -1;
-    	Integer markerId = -1;
+    	Integer mapId = -2;
+    	Integer markerId = -6;
     	Float startPosition = Float.valueOf("123.4");
     	Float endPosition = Float.valueOf("567.8");
 //    	String mapUnit = "TS";
