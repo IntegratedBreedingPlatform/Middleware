@@ -224,6 +224,9 @@ public class WorkbookParser {
 	            	if (col == 0) {
 	            		stockId = Long.parseLong(getCellStringValue(wb, currentSheet, currentRow, col));
 	            	} 
+	            	if (measurementDataLabel.get(col).equals("GYLD")) {
+	            		System.out.println(getCellStringValue(wb, currentSheet, currentRow, col));
+	            	}
             		measurementData.add(new MeasurementData(measurementDataLabel.get(col), getCellStringValue(wb, currentSheet, currentRow, col)));
 	            }
 	            
@@ -247,7 +250,13 @@ public class WorkbookParser {
             Sheet sheet = wb.getSheetAt(sheetNumber);
             Row row = sheet.getRow(rowNumber);
             Cell cell = row.getCell(columnNumber);
-            return String.valueOf(Integer.valueOf((int) cell.getNumericCellValue()));
+            
+            if (cell.getNumericCellValue() == Math.floor(cell.getNumericCellValue())) {
+            	return String.valueOf(Integer.valueOf((int) cell.getNumericCellValue()));
+            } else {
+            	return String.valueOf(Double.valueOf((double) cell.getNumericCellValue()));
+            }
+            
         } catch(NullPointerException e) {
             return "";
         }
