@@ -497,7 +497,7 @@ public class TestGermplasmListManagerImpl{
     
     @Test
     public void testGetGermplasmListByParentFolderId() throws Exception {
-    	Integer parentId = Integer.valueOf(54);
+    	Integer parentId = Integer.valueOf(0);
     	List<GermplasmList> results = manager.getGermplasmListByParentFolderId(parentId, 0, 100);
         Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
@@ -510,7 +510,7 @@ public class TestGermplasmListManagerImpl{
     
     @Test
     public void testGetGermplasmListByParentFolderIdBatched() throws Exception {
-    	Integer parentId = Integer.valueOf(54);
+    	Integer parentId = Integer.valueOf(0);
     	int batchSize = 1;
     	List<GermplasmList> results = new ArrayList<GermplasmList>();
     	results = manager.getGermplasmListByParentFolderIdBatched(parentId, batchSize);
