@@ -245,9 +245,18 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<MappingValueElement> getMappingValuesByGidsAndMarkerNames(List<Integer> gids, List<String> markerNames, int start,
             int numOfRows) throws MiddlewareQueryException {
-        List<Integer> markerIds = getMarkerDao().getIdsByNames(markerNames, start, numOfRows);
-        return (List<MappingValueElement>) super.getFromInstanceByIdAndMethod(getMappingPopDao(), gids.get(0), 
-                "getMappingValuesByGidAndMarkerIds", new Object[]{gids, markerIds}, new Class[]{List.class, List.class});
+    	List<MappingValueElement> mappingValueElementLists = new ArrayList<MappingValueElement>();
+    	
+    	int gid = gids.get(0);
+    	
+    	if(setWorkingDatabase(gid)){
+    		List<Integer> markerIds = getMarkerDao().getIdsByNames(markerNames, start, numOfRows);
+    		
+    		mappingValueElementLists =  super.getFromInstanceByIdAndMethod(getMappingPopDao(), gids.get(0), 
+                    "getMappingValuesByGidAndMarkerIds", new Object[]{gids, markerIds}, new Class[]{List.class, List.class});
+    	}
+    	
+        return mappingValueElementLists;
     }
 
     @Override
