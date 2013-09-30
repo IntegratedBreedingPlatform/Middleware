@@ -38,6 +38,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+@SuppressWarnings("rawtypes")
 public class PojosSimpleTest{
 
     private static HibernateUtil hibernateUtil;
@@ -47,7 +48,7 @@ public class PojosSimpleTest{
         hibernateUtil = new HibernateUtil(new DatabaseConnectionParameters("testDatabaseConfig.properties", "central"));
     }
 
-    @Test
+	@Test
     public void testAtributs() {
         Session session = hibernateUtil.getCurrentSession();
         Query query = session.createQuery("FROM Attribute");

@@ -158,7 +158,8 @@ public class Marker implements Serializable{
     public static final String GET_ID_BY_NAME =
     		"SELECT marker_id "
     		+ "FROM gdms_marker "
-    		+ "WHERE marker_name = :markerName";
+    		+ "WHERE marker_name = :markerName "
+    		+ "LIMIT 0,1";
     
     @Id
     @Basic(optional = false)

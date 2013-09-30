@@ -4,11 +4,12 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.operation.transformer.etl.Transformer;
 import org.generationcp.middleware.operation.transformer.etl.VariableTypeListTransformer;
 import org.junit.After;
@@ -25,7 +26,11 @@ public class TestVariableTypeListTransformer {
 	private long startTime;
 	
 	private static VariableTypeListTransformer transformer;
-	private static OntologyDataManager ontologyDataManager;
+	private static StandardVariableBuilder standardVariableBuilder;
+	
+	private static final String FACTOR1 = "FACTOR1";
+	private static final String FACTOR2 = "FACTOR2";
+	private static final String VARIATE1 = "VARIATE1";
 	
 	private static final String TEST_PROPERTY1 = "testProperty1";
 	private static final String TEST_METHOD1 = "testMethod1";
@@ -43,7 +48,8 @@ public class TestVariableTypeListTransformer {
 	private static final StandardVariable stdvar2 = new StandardVariable();
 	private static final StandardVariable stdvar3 = new StandardVariable();
 	
-	private static final StandardVariable[] stdvarArr = new StandardVariable[] {stdvar1, stdvar2, stdvar3}; 
+	private static final StandardVariable[] factorArr = new StandardVariable[] {stdvar1, stdvar2}; 
+	private static final StandardVariable[] variateArr = new StandardVariable[] {stdvar3}; 
 	
 
 	@Rule
@@ -52,20 +58,21 @@ public class TestVariableTypeListTransformer {
 	@BeforeClass
 	public static void setUp() throws Exception {
 		transformer = Mockito.mock(VariableTypeListTransformer.class);
-		ontologyDataManager = Mockito.mock(OntologyDataManager.class);
-		//Mockito.when(transformer.getOntologyDataManager()).thenReturn(ontologyDataManager);
-		injectOntologyDataManager(transformer, ontologyDataManager);
+		standardVariableBuilder = Mockito.mock(StandardVariableBuilder.class);
+		injectStandardVariableBuilder(transformer, standardVariableBuilder);
 		stdvar1.setId(1);
 		Mockito.when(
-				ontologyDataManager.findStandardVariableByTraitScaleMethodNames(TEST_PROPERTY1, TEST_SCALE1, TEST_METHOD1))
+				standardVariableBuilder.findOrSave(FACTOR1, FACTOR1, TEST_PROPERTY1, TEST_SCALE1, TEST_METHOD1, 
+						PhenotypicType.TRIAL_ENVIRONMENT, "C"))
 				.thenReturn(stdvar1);
 		stdvar2.setId(2);
 		Mockito.when(
-				ontologyDataManager.findStandardVariableByTraitScaleMethodNames(TEST_PROPERTY2, TEST_SCALE2, TEST_METHOD2))
+				standardVariableBuilder.findOrSave(FACTOR2, FACTOR2, TEST_PROPERTY2, TEST_SCALE2, TEST_METHOD2, 
+						PhenotypicType.TRIAL_ENVIRONMENT, "C"))
 				.thenReturn(stdvar2);
 		stdvar3.setId(3);
 		Mockito.when(
-				ontologyDataManager.findStandardVariableByTraitScaleMethodNames(TEST_PROPERTY3, TEST_SCALE3, TEST_METHOD3))
+				standardVariableBuilder.findOrSave(VARIATE1, VARIATE1, TEST_PROPERTY3, TEST_SCALE3, TEST_METHOD3, null, "C"))
 				.thenReturn(stdvar3);
 	}
 
@@ -81,11 +88,22 @@ public class TestVariableTypeListTransformer {
 	}
 	
 	@Test
-	public void testTransform() throws Exception {
-
-		List<MeasurementVariable> measurementVariables = createMeasurmentVariablesTestData();
-		Mockito.when(transformer.transform(measurementVariables, true)).thenCallRealMethod();
-		VariableTypeList variableTypeList = transformer.transform(measurementVariables, true);
+	public void testTransformFactor() throws Exception {
+		boolean isVariate = false;
+		testTransform(isVariate);
+	}
+	
+	@Test
+	public void testTransformVariate() throws Exception {
+		boolean isVariate = true;
+		testTransform(isVariate);
+	}
+	
+	private void testTransform(boolean isVariate) throws Exception {
+		List<MeasurementVariable> measurementVariables = createMeasurmentVariablesTestData(isVariate);
+		Mockito.when(transformer.transform(measurementVariables, isVariate)).thenCallRealMethod();
+		Mockito.when(transformer.transform(measurementVariables, isVariate, 1)).thenCallRealMethod();
+		VariableTypeList variableTypeList = transformer.transform(measurementVariables, isVariate);
 		Assert.assertNotNull(variableTypeList);
 		int i = 0;
 		for (VariableType variableType : variableTypeList.getVariableTypes()) {
@@ -93,34 +111,41 @@ public class TestVariableTypeListTransformer {
 			Assert.assertEquals(measurementVariables.get(i).getDescription(), variableType.getLocalDescription());
 			Assert.assertEquals(i+1, variableType.getRank());
 			Assert.assertNotNull(variableType.getStandardVariable());
-			Assert.assertEquals(stdvarArr[i], variableType.getStandardVariable());
+			if (isVariate) {
+				Assert.assertEquals(variateArr[i], variableType.getStandardVariable());
+			} else {
+				Assert.assertEquals(factorArr[i], variableType.getStandardVariable());
+			}
+			variableType.print(1);
 			i++;
 		}
-		
 	}
 	
-	private static void injectOntologyDataManager(Transformer transformer, OntologyDataManager ontologyDataManager) {
+	private static void injectStandardVariableBuilder(Transformer transformer, StandardVariableBuilder standardVariableBuilder) {
 		try {
-			Field field = Transformer.class.getDeclaredField("ontologyDataManager");
+			Field field = Transformer.class.getDeclaredField("standardVariableBuilder");
 			field.setAccessible(true);
-			field.set(transformer, ontologyDataManager);
+			field.set(transformer, standardVariableBuilder);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	private List<MeasurementVariable> createMeasurmentVariablesTestData() {
+	private List<MeasurementVariable> createMeasurmentVariablesTestData(boolean isVariate) {
 		List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
 		
-		MeasurementVariable variable = new MeasurementVariable("FACTOR1", "FACTOR 1", TEST_SCALE1, TEST_METHOD1, TEST_PROPERTY1, "C", "value1", "label1");
-		list.add(variable);
+		if (!isVariate) {
+			MeasurementVariable variable = new MeasurementVariable(FACTOR1, FACTOR1, TEST_SCALE1, TEST_METHOD1, TEST_PROPERTY1, "C", "value1", "TRIAL");
+			list.add(variable);
+			
+			variable = new MeasurementVariable(FACTOR2, FACTOR2, TEST_SCALE2, TEST_METHOD2, TEST_PROPERTY2, "C", "value2", "TRIAL");
+			list.add(variable);
 		
-		variable = new MeasurementVariable("FACTOR2", "FACTOR 2", TEST_SCALE2, TEST_METHOD2, TEST_PROPERTY2, "C", "value2", "label2");
-		list.add(variable);
-		
-		variable = new MeasurementVariable("VARIATE1", "VARIATE 1", TEST_SCALE3, TEST_METHOD3, TEST_PROPERTY3, "C", "value3", "label3");
-		list.add(variable);
+		} else {
+			MeasurementVariable variable = new MeasurementVariable(VARIATE1, VARIATE1, TEST_SCALE3, TEST_METHOD3, TEST_PROPERTY3, "C", "value3", "TRIAL");
+			list.add(variable);
+		}
 		
 		return list;
 	}

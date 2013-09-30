@@ -37,6 +37,7 @@ import org.generationcp.middleware.dao.gdms.MarkerOnMapDAO;
 import org.generationcp.middleware.dao.gdms.MarkerUserInfoDAO;
 import org.generationcp.middleware.dao.gdms.QtlDAO;
 import org.generationcp.middleware.dao.gdms.QtlDetailsDAO;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
@@ -1134,6 +1135,12 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
         Integer idSaved = null;
         try {
+        	
+        	// Check if the foreign key exists
+        	if (getMapDao().getById(markerOnMap.getMapId()) == null){
+        		throw new MiddlewareException("Map Id not found: " + markerOnMap.getMapId());
+        	}
+        	
             trans = session.beginTransaction();
             MarkerOnMapDAO dao = getMarkerOnMapDao();
 

@@ -13,6 +13,7 @@
 package org.generationcp.middleware.manager.test;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,8 +21,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import junit.framework.Assert;
-
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.GdmsTable;
@@ -1139,9 +1139,15 @@ public class TestGenotypicDataManagerImpl{
     	String linkageGroup = "Test";
       
         MarkerOnMap markerOnMap = new MarkerOnMap(mapId, markerId, startPosition, endPosition, linkageGroup);
-      
-        Integer idAdded = manager.addMarkerOnMap(markerOnMap);
-        System.out.println("testAddMarkerOnMap() Added: " + (idAdded != null ? markerOnMap : null));
+
+        try{
+        	Integer idAdded = manager.addMarkerOnMap(markerOnMap);
+            System.out.println("testAddMarkerOnMap() Added: " + (idAdded != null ? markerOnMap : null));
+        }catch(MiddlewareQueryException e){
+        	if (e.getMessage().contains("Map Id not found")){
+        		System.out.println("Foreign key constraint violation: Map Id not found");
+        	}
+        }
     }    
     
     @Test
@@ -1561,10 +1567,18 @@ public class TestGenotypicDataManagerImpl{
 
         MarkerOnMap markerOnMap = new MarkerOnMap(mapId, markerId, startPosition, endPosition, linkageGroup);
         
-        Boolean addStatus = manager.setMaps(marker, markerOnMap, map);
-        System.out.println("testSetMaps() Added: " + (addStatus != null ? marker : null) 
-                    + " | " + (addStatus != null ? markerOnMap : null) 
-                    + " | " + (addStatus != null ? map : null));
+        Boolean addStatus = null;
+        try{
+	        addStatus = manager.setMaps(marker, markerOnMap, map);
+        } catch(MiddlewareQueryException e){
+        	if (e.getMessage().contains("The marker on map combination already exists")){
+        			System.out.println("The marker on map combination already exists");        		
+        	} else {
+	        		System.out.println("testSetMaps() Added: " + (addStatus != null ? marker : null) 
+	                    + " | " + (addStatus != null ? markerOnMap : null) 
+	                    + " | " + (addStatus != null ? map : null));
+        	}
+        }   
     }
     
     @Test
@@ -1703,7 +1717,7 @@ public class TestGenotypicDataManagerImpl{
     public void testCountAllelicValuesFromAlleleValuesByDatasetId() throws Exception { 
         Integer datasetId = -1; // change value of the datasetid
         long count = manager.countAllelicValuesFromAlleleValuesByDatasetId(datasetId);
-        Assert.assertNotNull(count);
+        assertNotNull(count);
         System.out.println("testCountAllelicValuesFromAlleleValuesByDatasetId("+datasetId+") Results: " + count);
     }
     
@@ -1711,7 +1725,7 @@ public class TestGenotypicDataManagerImpl{
     public void testCountAllelicValuesFromCharValuesByDatasetId() throws Exception { 
         Integer datasetId = -1; // change value of the datasetid
         long count = manager.countAllelicValuesFromCharValuesByDatasetId(datasetId);
-        Assert.assertNotNull(count);
+        assertNotNull(count);
         System.out.println("testCountAllelicValuesFromCharValuesByDatasetId("+datasetId+") Results: " + count);
     }
     
@@ -1719,14 +1733,14 @@ public class TestGenotypicDataManagerImpl{
     public void testCountAllelicValuesFromMappingPopValuesByDatasetId() throws Exception { 
         Integer datasetId = 3; // change value of the datasetid
         long count = manager.countAllelicValuesFromMappingPopValuesByDatasetId(datasetId);
-        Assert.assertNotNull(count);
+        assertNotNull(count);
         System.out.println("testCountAllelicValuesFromMappingPopValuesByDatasetId("+datasetId+") Results: " + count);
     }
     
     @Test
     public void testCountAllParentsFromMappingPopulation() throws Exception {
     	long count = manager.countAllParentsFromMappingPopulation();
-        Assert.assertNotNull(count);
+        assertNotNull(count);
         System.out.println("testCountAllParentsFromMappingPopulation() Results: " + count);
     }
     
@@ -1734,7 +1748,7 @@ public class TestGenotypicDataManagerImpl{
     public void testCountMapDetailsByName() throws Exception {
     	String nameLike = "GCP-833TestMap"; //change map_name
     	long count = manager.countMapDetailsByName(nameLike);
-        Assert.assertNotNull(count);
+        assertNotNull(count);
         System.out.println("testCountMapDetailsByName("+nameLike+") Results: " + count);
     }
     
@@ -1742,7 +1756,7 @@ public class TestGenotypicDataManagerImpl{
     public void testCountMarkerInfoByDbAccessionId() throws Exception {
     	String dbAccessionId = ""; //change dbAccessionId
     	long count = manager.countMarkerInfoByDbAccessionId(dbAccessionId);
-        Assert.assertNotNull(count);
+        assertNotNull(count);
         System.out.println("testCountMarkerInfoByDbAccessionId("+dbAccessionId+") Results: " + count);
     }
     
@@ -1750,7 +1764,7 @@ public class TestGenotypicDataManagerImpl{
     public void testCountMarkerInfoByGenotype() throws Exception {
     	String genotype = "cv. Tatu"; //change genotype
     	long count = manager.countMarkerInfoByGenotype(genotype);
-        Assert.assertNotNull(count);
+        assertNotNull(count);
         System.out.println("testCountMarkerInfoByGenotype("+genotype+") Results: " + count);
     }
     
@@ -1758,7 +1772,7 @@ public class TestGenotypicDataManagerImpl{
     public void testCountMarkerInfoByMarkerName() throws Exception {
     	String markerName = "SeqTEST"; //change markerName
     	long count = manager.countMarkerInfoByMarkerName(markerName);
-        Assert.assertNotNull(count);
+        assertNotNull(count);
         System.out.println("testCountMarkerInfoByMarkerName("+markerName+") Results: " + count);
     }
     
@@ -1767,7 +1781,7 @@ public class TestGenotypicDataManagerImpl{
     	long count = manager.countAllParentsFromMappingPopulation();
     	List<ParentElement> results = manager.getAllParentsFromMappingPopulation(0, (int) count);
     	assertNotNull(results);
-        Assert.assertTrue(!results.isEmpty());
+        assertTrue(!results.isEmpty());
         System.out.println("testGetAllParentsFromMappingPopulation() Results: ");
         for (ParentElement result : results){
         	System.out.println("  " + result);
@@ -1781,7 +1795,7 @@ public class TestGenotypicDataManagerImpl{
     	long count = manager.countMapDetailsByName(nameLike);
     	List<MapDetailElement> results = manager.getMapDetailsByName(nameLike, 0, (int) count);
     	assertNotNull(results);
-        Assert.assertTrue(!results.isEmpty());
+        assertTrue(!results.isEmpty());
         System.out.println("testGetMapDetailsByName("+nameLike+")");
         for (MapDetailElement result : results){
         	System.out.println("  " + result);
@@ -1797,7 +1811,7 @@ public class TestGenotypicDataManagerImpl{
     	
     	List<Marker> results = manager.getMarkersByIds(markerIds, 0,100);
     	assertNotNull(results);
-        Assert.assertTrue(!results.isEmpty());
+        assertTrue(!results.isEmpty());
         System.out.println("testGetMarkersByIds("+markerIds+") Results: ");
         for (Marker result : results){
         	System.out.println("  " + result);
@@ -1808,15 +1822,15 @@ public class TestGenotypicDataManagerImpl{
     @Test
     public void testCountAllMaps() throws Exception {
 	long count = manager.countAllMaps(Database.LOCAL);
-    Assert.assertNotNull(count);
+    assertNotNull(count);
     System.out.println("testCountAllMaps("+Database.LOCAL+") Results: " + count);	
     }
     
     @Test
     public void testGetAllMaps() throws Exception {
     List<Map> results= manager.getAllMaps(0, 100, Database.LOCAL);
-    Assert.assertNotNull(results);
-    Assert.assertTrue(!results.isEmpty());
+    assertNotNull(results);
+    assertTrue(!results.isEmpty());
     System.out.println("testGetAllMaps("+Database.LOCAL+") Results:");
     for (Map result : results){
     	System.out.println("  " + result);

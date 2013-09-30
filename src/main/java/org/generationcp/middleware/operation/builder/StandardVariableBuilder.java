@@ -277,8 +277,18 @@ public class StandardVariableBuilder extends Builder {
 	}
 	
 	public StandardVariable getByPropertyScaleMethod(Integer propertyId, Integer scaleId, Integer methodId) throws MiddlewareQueryException {
-        Integer stdVariableId = null;
-        if (setWorkingDatabase(Database.LOCAL)) {
+        
+		Integer stdVariableId =  getIdByPropertyScaleMethod(propertyId, scaleId, methodId);
+        StandardVariable standardVariable = null;
+		if (stdVariableId != null) {
+			standardVariable = getStandardVariableBuilder().create(stdVariableId);
+		}
+		return standardVariable;
+	}
+	
+	public Integer getIdByPropertyScaleMethod(Integer propertyId, Integer scaleId, Integer methodId) throws MiddlewareQueryException {
+		Integer stdVariableId = null;
+	    if (setWorkingDatabase(Database.LOCAL)) {
 			stdVariableId = getCvTermDao().getStandadardVariableIdByPropertyScaleMethod(
 					propertyId, scaleId, methodId, "DESC");
 			
@@ -289,13 +299,9 @@ public class StandardVariableBuilder extends Builder {
 				}
 			}
 		}
-        
-        StandardVariable standardVariable = null;
-		if (stdVariableId != null) {
-			standardVariable = getStandardVariableBuilder().create(stdVariableId);
-		}
-		return standardVariable;
+	    return stdVariableId;
 	}
+
 	
 	public Map<String, List<StandardVariable>> getStandardVariablesInProjects(List<String> headers) 
 			throws MiddlewareQueryException {

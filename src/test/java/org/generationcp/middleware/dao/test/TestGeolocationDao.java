@@ -17,14 +17,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.domain.dms.TrialEnvironment;
 import org.generationcp.middleware.hibernate.HibernateUtil;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
-import org.generationcp.middleware.pojos.Germplasm;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

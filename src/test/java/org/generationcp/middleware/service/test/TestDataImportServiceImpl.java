@@ -19,8 +19,6 @@ import java.util.List;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
-import org.generationcp.middleware.manager.ManagerFactory;
-import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.ServiceFactory;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.utils.test.TestNurseryWorkbookUtil;
@@ -36,9 +34,7 @@ import org.junit.rules.TestName;
 public class TestDataImportServiceImpl {
 	
 	private static ServiceFactory serviceFactory;
-	private static ManagerFactory managerFactory;
 	private static DataImportService dataImportService;
-	private static StudyDataManager studyManager;
 	
 	private long startTime;
 	
@@ -53,10 +49,8 @@ public class TestDataImportServiceImpl {
 				"testDatabaseConfig.properties", "central");
 		
 		serviceFactory = new ServiceFactory(local, central);
-		managerFactory = new ManagerFactory(local, central);
 		
 		dataImportService = serviceFactory.getDataImportService();
-		studyManager = managerFactory.getNewStudyDataManager();
 
 	}
 	
@@ -86,7 +80,7 @@ public class TestDataImportServiceImpl {
 	@Test 
 	public void testParseWorkbook() throws MiddlewareQueryException{
 		//change based on path location of your template file
-		File file = new File("C:/Users/Efficio LLC/Downloads/Work/GCP/templates/Population114_Pheno_FB_1.xls");
+		File file = new File("src/test/resources/Population114_Pheno_FB_1.xls");
 		Workbook workbook = dataImportService.parseWorkbook(file);
 		workbook.print(0);
 		

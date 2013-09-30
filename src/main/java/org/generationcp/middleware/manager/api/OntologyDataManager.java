@@ -55,7 +55,7 @@ public interface OntologyDataManager {
      * @return
      * @throws MiddlewareQueryException
      */
-	public Integer getStandadardVariableIdByPropertyScaleMethod(Integer propertyId,Integer scaleId, Integer methodId) throws MiddlewareQueryException; 
+	public Integer getStandardVariableIdByPropertyScaleMethod(Integer propertyId,Integer scaleId, Integer methodId) throws MiddlewareQueryException; 
 
 	
 	/**

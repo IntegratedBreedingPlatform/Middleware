@@ -21,9 +21,10 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.junit.Test;
 
+@SuppressWarnings("unchecked")
 public class TestHibernateUtil{
 
-    @Test
+	@Test
     public void testHibernateUtil() throws Exception {
         DatabaseConnectionParameters params =  new DatabaseConnectionParameters("testDatabaseConfig.properties", "central");
         HibernateUtil util = new HibernateUtil(new DatabaseConnectionParameters("testDatabaseConfig.properties", "central"));
