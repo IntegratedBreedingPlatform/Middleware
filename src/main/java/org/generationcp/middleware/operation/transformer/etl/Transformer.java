@@ -12,14 +12,12 @@
 package org.generationcp.middleware.operation.transformer.etl;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.OntologyDataManagerImpl;
-import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.util.DatabaseBroker;
 
 public abstract class Transformer extends DatabaseBroker {
 	
-	private OntologyDataManager ontologyDataManager;
+	private StandardVariableBuilder standardVariableBuilder;
 	
 	protected Transformer(HibernateSessionProvider sessionProviderForLocal, HibernateSessionProvider sessionProviderForCentral) {
        super(sessionProviderForLocal, sessionProviderForCentral);
@@ -45,14 +43,10 @@ public abstract class Transformer extends DatabaseBroker {
 		return new ExperimentValuesTransformer(sessionProviderForLocal, sessionProviderForCentral);
 	}
 	
-    protected final OntologyDataManager getOntologyDataManager() {
-    	if (ontologyDataManager == null) {
-    		ontologyDataManager = new OntologyDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
-    	}
-    	return ontologyDataManager;
-    }
-    
     protected final StandardVariableBuilder getStandardVariableBuilder() {
-    	return new StandardVariableBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    	if (standardVariableBuilder == null) {
+    		standardVariableBuilder = new StandardVariableBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    	} 
+    	return standardVariableBuilder;
     }
 }
