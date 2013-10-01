@@ -14,6 +14,7 @@ package org.generationcp.middleware.operation.builder;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermProperty;
@@ -148,7 +149,15 @@ public class TermBuilder extends Builder {
 	public Term getTermOfClassOfProperty(int termId, int cvId, int isATermId) throws MiddlewareQueryException {
 		Term term = null;
 		if (setWorkingDatabase(termId)) {
-			term = mapCVTermToTerm(getCvTermDao().getTermOfClassOfProperty(termId, cvId, isATermId));
+			List<Integer> list = getCvTermRelationshipDao().getObjectIdByTypeAndSubject(isATermId,termId);
+			//since we're getting the isA relationship, we're only expecting only one object (only hasValue has many result)
+			if(list!=null && !list.isEmpty()) {
+				Integer objectId = list.get(0);
+				if (setWorkingDatabase(objectId)) {
+					term = mapCVTermToTerm(getCvTermDao().getById(objectId));
+				}
+			}
+			
 		}
 		return term;
 	}
