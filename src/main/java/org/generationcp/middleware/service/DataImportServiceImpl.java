@@ -45,6 +45,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         	
             trans = session.beginTransaction();
             
+            session.flush();
             int studyId = getWorkbookSaver().save(workbook);
        		
 			trans.commit();

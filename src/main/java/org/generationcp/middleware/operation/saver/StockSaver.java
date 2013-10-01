@@ -13,6 +13,7 @@ package org.generationcp.middleware.operation.saver;
 
 import java.util.HashSet;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -21,7 +22,6 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
-import org.generationcp.middleware.util.StringUtil;
 
 public class StockSaver extends Saver {
 
@@ -57,7 +57,15 @@ public class StockSaver extends Saver {
 					
 				} else if (TermId.ENTRY_GID_STORAGE.getId() == storedInId) {
 					stockModel = getStockObject(stockModel);
-					stockModel.setDbxrefId(StringUtil.isEmpty(value) ? null : Integer.valueOf(value));
+					Integer dbxref = null;
+					if (NumberUtils.isNumber(value)) {
+						if (value.indexOf(".") > -1) {
+							dbxref = Integer.valueOf(value.substring(0, value.indexOf(".")));
+						} else {
+							dbxref = Integer.valueOf(value);
+						}
+					}
+					stockModel.setDbxrefId(dbxref);
 					
 				} else if (TermId.ENTRY_DESIGNATION_STORAGE.getId() == storedInId) {
 					stockModel = getStockObject(stockModel);
