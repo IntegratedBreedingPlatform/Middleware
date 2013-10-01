@@ -266,4 +266,13 @@ public interface OntologyDataManager {
 	 * @throws MiddlewareQueryException
 	 */
 	Property getProperty(int termId) throws MiddlewareQueryException;
+	
+	/**
+	 * Given the name, retrieve the Property POJO.
+	 * @param name
+	 * @return property
+	 * @throws MiddlewareQueryException
+	 */
+	Property getProperty(String name) throws MiddlewareQueryException;
+	
 }

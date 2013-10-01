@@ -607,8 +607,8 @@ public class TestOntologyDataManagerImpl {
 	
 	@Test
 	public void testAddProperty() throws Exception {
-		String name = "Germplasm type";
-		String definition = "Germplasm type description";
+		String name = "Germplasm type 3";
+		String definition = "Germplasm type description 3";
 		int isA = 1087;
 		
         System.out.println("testAddProperty(name=" + name + ", definition=" + definition + ", isA=" + isA + "): ");
@@ -624,6 +624,13 @@ public class TestOntologyDataManagerImpl {
 		
 		Property property = manager.getProperty(termId);
 		
+		System.out.println(property);
+	}
+	
+	@Test
+	public void testGetPropertyByName() throws Exception {
+		String name = "Season";
+		Property property = manager.getProperty(name);
 		System.out.println(property);
 	}
 	
