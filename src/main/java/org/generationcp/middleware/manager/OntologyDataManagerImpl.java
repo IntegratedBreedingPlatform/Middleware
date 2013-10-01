@@ -411,6 +411,16 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		
 		return property;
 	}
+	
+	@Override
+	public Property getProperty(String name) throws MiddlewareQueryException {
+		Property property = new Property();
+		
+		property.setTerm(findTermByName(name, CvId.PROPERTIES));
+		property.setIsA(getTermBuilder().getTermOfClassOfProperty(property.getTerm().getId(), CvId.PROPERTIES.getId(), TermId.IS_A.getId()));
+		
+		return property;
+	}
 
 	@Override
 	public long countIsAOfProperties() throws MiddlewareQueryException {
