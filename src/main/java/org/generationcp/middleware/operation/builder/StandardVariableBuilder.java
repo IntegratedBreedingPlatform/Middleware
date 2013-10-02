@@ -357,7 +357,9 @@ public class StandardVariableBuilder extends Builder {
 				if (varIds == null || varIds.size() == 0){
 					standardVariableIdsInProjects.put(name, stdVarIdsRetrieved.get(name));
 				} else {
-					varIds.addAll(stdVarIdsRetrieved.get(name));
+					if (stdVarIdsRetrieved != null && stdVarIdsRetrieved.get(name) != null){
+						varIds.addAll(stdVarIdsRetrieved.get(name));
+					}
 					standardVariableIdsInProjects.put(name, varIds);
 				}
 			}
@@ -388,7 +390,9 @@ public class StandardVariableBuilder extends Builder {
 				if (varIds == null || varIds.size() == 0){
 					standardVariableIdsInProjects.put(name, stdVarIdsRetrieved.get(name));
 				} else {
-					varIds.addAll(stdVarIdsRetrieved.get(name));
+					if (stdVarIdsRetrieved != null && stdVarIdsRetrieved.get(name) != null){
+						varIds.addAll(stdVarIdsRetrieved.get(name));
+					}
 					standardVariableIdsInProjects.put(name, varIds);
 				}
 			}
