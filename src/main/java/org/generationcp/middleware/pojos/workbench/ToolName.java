@@ -30,4 +30,5 @@ public enum ToolName {
     ,nursery_template_wizard
     ,breeding_planner
     ,germplasm_import
+    ,dataset_importer
 }

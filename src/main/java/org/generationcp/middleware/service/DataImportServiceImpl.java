@@ -58,7 +58,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
         } finally {
         	timerWatch.stop();
-            session.flush();
+            //session.flush();
         }
 
         return 0;

@@ -407,7 +407,9 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		Property property = new Property();
 		
 		property.setTerm(getTermBuilder().getTermOfProperty(termId, CvId.PROPERTIES.getId()));
-		property.setIsA(getTermBuilder().getTermOfClassOfProperty(termId, CvId.PROPERTIES.getId(), TermId.IS_A.getId()));
+		if(property.getTerm()!=null) {
+			property.setIsA(getTermBuilder().getTermOfClassOfProperty(termId, CvId.PROPERTIES.getId(), TermId.IS_A.getId()));
+		}
 		
 		return property;
 	}
@@ -417,7 +419,9 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		Property property = new Property();
 		
 		property.setTerm(findTermByName(name, CvId.PROPERTIES));
-		property.setIsA(getTermBuilder().getTermOfClassOfProperty(property.getTerm().getId(), CvId.PROPERTIES.getId(), TermId.IS_A.getId()));
+		if(property.getTerm()!=null) {
+			property.setIsA(getTermBuilder().getTermOfClassOfProperty(property.getTerm().getId(), CvId.PROPERTIES.getId(), TermId.IS_A.getId()));
+		}
 		
 		return property;
 	}
