@@ -1,5 +1,7 @@
 package org.generationcp.middleware.domain.dms;
 
+import java.util.Map;
+
 import org.generationcp.middleware.util.Debug;
 
 public class TrialEnvironmentProperty {
@@ -7,19 +9,26 @@ public class TrialEnvironmentProperty {
 	private Integer id;
 	private String name;
 	private String description;
+	private Map<Integer, String> environmentValuesMap;
 	private Integer numberOfEnvironments;
 	
-	public TrialEnvironmentProperty(String name, String description, Integer numberOfEnvironments) {
+	public TrialEnvironmentProperty(String name, String description, Map<Integer,String> environmentValuesMap) {
 		this.name = name;
 		this.description = description;
-		this.numberOfEnvironments = numberOfEnvironments;
+		this.environmentValuesMap = environmentValuesMap;
+		if (environmentValuesMap != null){
+			this.numberOfEnvironments = this.environmentValuesMap.size();
+		}
 	}
 	
-	public TrialEnvironmentProperty(Integer id, String name, String description, Integer numberOfEnvironments) {
+	public TrialEnvironmentProperty(Integer id, String name, String description, Map<Integer,String> environmentValuesMap) {
 		this.id = id;
 		this.name = name;
 		this.description = description;
-		this.numberOfEnvironments = numberOfEnvironments;
+		this.environmentValuesMap = environmentValuesMap;
+		if (environmentValuesMap != null){
+			this.numberOfEnvironments = this.environmentValuesMap.size();
+		}
 	}
 	
 	public Integer getId() {
@@ -49,8 +58,20 @@ public class TrialEnvironmentProperty {
 		this.numberOfEnvironments = numberOfEnvironments;
 	}
 	
+	public Map<Integer, String> getEnvironmentValuesMap() {
+		return environmentValuesMap;
+	}
+
+	public void setEnvironmentValuesMap(Map<Integer, String> environmentValuesMap) {
+		this.environmentValuesMap = environmentValuesMap;
+	}
+
 	public void print(int indent) {
 		Debug.println(indent, "TrialEnvironmentProperty[name=" + name + ", description=" + description + ", count=" + numberOfEnvironments + "]");
+		Debug.println(indent+3, "EnvironmentPropertyValues:");
+		for (Map.Entry<Integer, String > entry : environmentValuesMap.entrySet()){
+			Debug.println(indent+6, "Environment=" + entry.getKey() + ", PropertyValue=" + entry.getValue());
+		}
 	}
 
 	@Override

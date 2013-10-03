@@ -11,11 +11,12 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao.dms;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.math.NumberUtils;
@@ -149,17 +150,44 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 	public List<TrialEnvironmentProperty> getPropertiesForTrialEnvironments(List<Integer> environmentIds) throws MiddlewareQueryException {
 		List<TrialEnvironmentProperty> properties = new ArrayList<TrialEnvironmentProperty>();
 		try {
-			String sql = "SELECT gp.type_id, cvt.name, cvt.definition, COUNT(DISTINCT gp.nd_geolocation_id)"
+			String sql = "SELECT gp.type_id, cvt.name, cvt.definition, gp.nd_geolocation_id, gp.value"
 							+ " FROM nd_geolocationprop gp"
 							+ " LEFT JOIN cvterm cvt ON gp.type_id = cvt.cvterm_id"
 							+ " WHERE gp.nd_geolocation_id IN (:environmentIds)"
-							+ " GROUP BY gp.type_id, cvt.name, cvt.definition";
+							+ " ORDER BY gp.type_id, gp.nd_geolocation_id";
 			Query query = getSession().createSQLQuery(sql)
 							.setParameterList("environmentIds", environmentIds);
+			
+			int lastId = 0;
+			String lastName = new String();
+			String lastDescription = new String();
+			Map<Integer, String> environmentValuesMap = new HashMap<Integer, String>();
+			
 			List<Object[]> result = query.list();
 			for (Object[] row : result) {
-				properties.add(new TrialEnvironmentProperty((Integer) row[0], (String) row[1], (String) row[2], ((BigInteger) row[3]).intValue()));
+				Integer id = (Integer) row[0];
+				
+				if (lastId != id.intValue()){
+					String name = (String) row[1];
+					String description = (String) row[2];
+					
+					if (lastId != 0){
+						properties.add(new TrialEnvironmentProperty(lastId, lastName, lastDescription, environmentValuesMap));
+					}
+					
+					lastId = id;
+					lastName = name;
+					lastDescription = description;
+					environmentValuesMap.clear();
+				}
+				
+				environmentValuesMap.put((Integer)row[3], (String) row[4]);
 			}
+			
+			if (lastId != 0){
+				properties.add(new TrialEnvironmentProperty(lastId, lastName, lastDescription, environmentValuesMap));
+			}
+			
 			
 		} catch(HibernateException e) {
 			logAndThrowException("Error at getPropertiesForTrialEnvironments=" + environmentIds + " at GeolocationDao: " + e.getMessage(), e);
