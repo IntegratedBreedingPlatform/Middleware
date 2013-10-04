@@ -150,9 +150,15 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 	public List<TrialEnvironmentProperty> getPropertiesForTrialEnvironments(List<Integer> environmentIds) throws MiddlewareQueryException {
 		List<TrialEnvironmentProperty> properties = new ArrayList<TrialEnvironmentProperty>();
 		try {
-			String sql = "SELECT gp.type_id, cvt.name, cvt.definition, gp.nd_geolocation_id, gp.value"
+			// if categorical value, get related cvterm.definition as property value. 
+			// Else, get the value as it's stored in nd_geolocationprop
+			String sql = "SELECT DISTINCT gp.type_id, cvt.name, cvt.definition, gp.nd_geolocation_id, "
+							+ "CASE WHEN (v.name IS NOT NULL AND cvr.cvterm_relationship_id IS NOT NULL) THEN v.definition "
+							+ " ELSE gp.value END AS propvalue "
 							+ " FROM nd_geolocationprop gp"
 							+ " LEFT JOIN cvterm cvt ON gp.type_id = cvt.cvterm_id"
+							+ " LEFT JOIN cvterm v ON v.cvterm_id = gp.value"
+							+ " LEFT JOIN cvterm_relationship cvr ON cvr.subject_id = gp.type_id AND cvr.type_id = 1190"
 							+ " WHERE gp.nd_geolocation_id IN (:environmentIds)"
 							+ " ORDER BY gp.type_id, gp.nd_geolocation_id";
 			Query query = getSession().createSQLQuery(sql)
@@ -178,9 +184,9 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 					lastId = id;
 					lastName = name;
 					lastDescription = description;
-					environmentValuesMap.clear();
+					environmentValuesMap = new HashMap<Integer, String>();
 				}
-				
+
 				environmentValuesMap.put((Integer)row[3], (String) row[4]);
 			}
 			
