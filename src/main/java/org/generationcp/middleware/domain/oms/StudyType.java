@@ -46,8 +46,14 @@ public enum StudyType {
 	public String getName() {
 		return name;
 	}
-	
-	
-	
-	
+
+    public static StudyType getStudyType(String name) {
+        for (StudyType studyType : StudyType.values()) {
+            if (studyType.getName().equals(name)) {
+                return studyType;
+            }
+        }
+
+        return null;
+    }
 }

@@ -126,7 +126,11 @@ public class WorkbookParser {
 
         //determine study type
         String studyType = getCellStringValue(wb, DESCRIPTION_SHEET, STUDY_TYPE_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
-        StudyType studyTypeValue = getStudyTypeValue(studyType);
+        StudyType studyTypeValue = StudyType.getStudyType(studyType);
+
+        if (studyTypeValue == null) {
+            studyTypeValue = StudyType.E;
+        }
 
         StudyDetails studyDetails = new StudyDetails(study, title, pmKey, objective, startDate, endDate, studyTypeValue, 0, null, null);
         
@@ -282,7 +286,8 @@ public class WorkbookParser {
     }
 
 
-
+/*
+// Refactored logic to StudyType, since it is more appropriate
     private static StudyType getStudyTypeValue(String studyType) {
         if (studyType.toUpperCase().equals(StudyType.N.getName().toUpperCase())) {
             return StudyType.N;
@@ -307,8 +312,9 @@ public class WorkbookParser {
         } else {
             return StudyType.E;
         }
-    }
+    }*/
 
+    // TODO refactor calls to this method to use PoiUtil in IBPCommons
     private static Boolean rowIsEmpty(Workbook wb, Integer sheet, Integer row, int len) {
         Integer col = 0;
         for (col = 0; col < len; col++) {
