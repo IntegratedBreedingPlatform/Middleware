@@ -60,7 +60,7 @@ public class WorkbookParser {
      * @return workbook
      * @throws MiddlewareQueryException
      */
-    public org.generationcp.middleware.domain.etl.Workbook parseFile(File file) throws MiddlewareQueryException {
+    public org.generationcp.middleware.domain.etl.Workbook parseFile(File file) throws WorkbookParserException {
 
         org.generationcp.middleware.domain.etl.Workbook workbook = new org.generationcp.middleware.domain.etl.Workbook();
         Workbook wb;
@@ -82,7 +82,7 @@ public class WorkbookParser {
                     throw new Error("Error with reading file uploaded. File doesn't have the first sheet - Description");
                 }
             } catch (Exception e) {
-                throw new MiddlewareQueryException("Error encountered with parseFile(): " + e.getMessage(), e);
+                throw new WorkbookParserException("Error encountered with parseFile(): " + e.getMessage(), e);
             }
 
             try {
@@ -92,7 +92,7 @@ public class WorkbookParser {
                     throw new Error("Error with reading file uploaded. File doesn't have the second sheet - Observation");
                 }
             } catch (Exception e) {
-                throw new MiddlewareQueryException("Error encountered with parseFile(): " + e.getMessage(), e);
+                throw new WorkbookParserException("Error encountered with parseFile(): " + e.getMessage(), e);
             }
 
             workbook.setStudyDetails(readStudyDetails(wb));
@@ -106,15 +106,15 @@ public class WorkbookParser {
             workbook.setObservations(readObservations(wb, workbook));
 
         } catch (FileNotFoundException e) {
-            throw new MiddlewareQueryException("File not found " + e.getMessage(), e);
+            throw new WorkbookParserException("File not found " + e.getMessage(), e);
         } catch (IOException e) {
-            throw new MiddlewareQueryException("Error accessing file " + e.getMessage(), e);
+            throw new WorkbookParserException("Error accessing file " + e.getMessage(), e);
         }
 
         return workbook;
     }
 
-    private StudyDetails readStudyDetails(Workbook wb) throws MiddlewareQueryException {
+    private StudyDetails readStudyDetails(Workbook wb) throws WorkbookParserException {
 
         //get study details
         String study = getCellStringValue(wb, DESCRIPTION_SHEET, STUDY_NAME_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
@@ -150,7 +150,7 @@ public class WorkbookParser {
         return studyDetails;
     }
 
-    private List<MeasurementVariable> readMeasurementVariables(Workbook wb, String name) throws MiddlewareQueryException {
+    private List<MeasurementVariable> readMeasurementVariables(Workbook wb, String name) throws WorkbookParserException {
         List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
 
         try {
@@ -209,11 +209,11 @@ public class WorkbookParser {
 
             return measurementVariables;
         } catch (Exception e) {
-            throw new MiddlewareQueryException(e.getMessage(), e);
+            throw new WorkbookParserException(e.getMessage(), e);
         }
     }
 
-    private List<MeasurementRow> readObservations(Workbook wb, org.generationcp.middleware.domain.etl.Workbook workbook) throws MiddlewareQueryException {
+    private List<MeasurementRow> readObservations(Workbook wb, org.generationcp.middleware.domain.etl.Workbook workbook) throws WorkbookParserException {
         List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
         long stockId = 0;
 
@@ -259,7 +259,7 @@ public class WorkbookParser {
 
             return observations;
         } catch (Exception e) {
-            throw new MiddlewareQueryException(e.getMessage(), e);
+            throw new WorkbookParserException(e.getMessage(), e);
         }
     }
 
