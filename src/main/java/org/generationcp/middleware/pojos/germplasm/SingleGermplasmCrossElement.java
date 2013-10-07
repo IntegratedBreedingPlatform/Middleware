@@ -31,11 +31,15 @@ public class SingleGermplasmCrossElement implements GermplasmCrossElement{
     
     @Override
     public String toString() {
-        Name nameObject = this.germplasm.getPreferredName();
-        if(nameObject == null){
-            return this.germplasm.getGid().toString();
-        } else {
-            return nameObject.getNval();
-        }
+    	if(this.germplasm != null){
+	        Name nameObject = this.germplasm.getPreferredName();
+	        if(nameObject == null){
+	            return this.germplasm.getGid().toString();
+	        } else {
+	            return nameObject.getNval();
+	        }
+    	} else{
+    		return "Unknown";
+    	}
     }
 }

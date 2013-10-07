@@ -47,7 +47,11 @@ public class GermplasmCross implements GermplasmCrossElement{
     public String toString() {
         StringBuilder toreturn = new StringBuilder();
         
-        toreturn.append(this.firstParent.toString());
+        if(this.firstParent != null){
+        	toreturn.append(this.firstParent.toString());
+        } else{
+        	toreturn.append("Unknown");
+        }
         
         //number of slashes between first and second parent depends on the number
         //of crosses made
@@ -63,7 +67,11 @@ public class GermplasmCross implements GermplasmCrossElement{
             toreturn.append("/");
         }
         
-        toreturn.append(this.secondParent.toString());
+        if(this.secondParent != null){
+        	toreturn.append(this.secondParent.toString());
+        } else{
+        	toreturn.append("Unknown");
+        }
         
         return toreturn.toString();
     }
