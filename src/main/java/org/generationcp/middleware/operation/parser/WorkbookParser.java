@@ -21,13 +21,8 @@ import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.StudyType;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -52,7 +47,7 @@ public class WorkbookParser {
     private List<String> errorMessages;
 
     /*private static Integer currentSheet;
-	private static Integer currentRow;
+    private static Integer currentRow;
 	private static long locationId;
 */
 
@@ -100,6 +95,7 @@ public class WorkbookParser {
                 throw new WorkbookParserException("Error encountered with parseFile(): " + e.getMessage(), e);
             }
 
+            // throw an exception here if
             if (errorMessages.size() > 0) {
                 throw new WorkbookParserException(errorMessages);
             }
@@ -109,6 +105,10 @@ public class WorkbookParser {
             workbook.setFactors(readMeasurementVariables(wb, "FACTOR"));
             workbook.setConstants(readMeasurementVariables(wb, "CONSTANT"));
             workbook.setVariates(readMeasurementVariables(wb, "VARIATE"));
+
+            if (errorMessages.size() > 0) {
+                throw new WorkbookParserException(errorMessages);
+            }
 
             currentRow = 0;
 
@@ -180,7 +180,8 @@ public class WorkbookParser {
 	            System.out.println(getCellStringValue(wb, currentSheet,currentRow,0).toUpperCase());
 	            */
 
-                throw new Error("Incorrect headers for " + name);
+                // TODO change this so that it's in line with exception strategy
+                throw new WorkbookParserException("Incorrect headers for " + name);
             }
 
             //If file is still valid (after checking headers), proceed
@@ -233,13 +234,17 @@ public class WorkbookParser {
             List<String> measurementDataLabel = new ArrayList<String>();
             for (int col = 0; col < factors.size() + variates.size(); col++) {
                 if (col < factors.size()) {
+
                     if (!factors.get(col).getName().toUpperCase().equals(getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col).toUpperCase())) {
-                        throw new Error("Incorrect header for observations.");
+                        throw new WorkbookParserException("Incorrect header for observations.");
                     }
+
                 } else {
+
                     if (!variates.get(col - factors.size()).getName().toUpperCase().equals(getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col).toUpperCase())) {
-                        throw new Error("Incorrect header for observations.");
+                        throw new WorkbookParserException("Incorrect header for observations.");
                     }
+
                 }
                 measurementDataLabel.add(getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col));
             }
