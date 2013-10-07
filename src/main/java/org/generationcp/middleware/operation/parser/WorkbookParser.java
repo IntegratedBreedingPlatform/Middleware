@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.parser;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -174,9 +175,9 @@ public class WorkbookParser {
                     || !getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 5).toUpperCase().equals("DATA TYPE")
                     || !getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 6).toUpperCase().equals("VALUE")
                     || !getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 7).toUpperCase().equals("LABEL")) {
-	            
+
 	        	/* for debugging purposes
-	            System.out.println("DEBUG | Invalid file on readMeasurementVariables");
+                System.out.println("DEBUG | Invalid file on readMeasurementVariables");
 	            System.out.println(getCellStringValue(wb, currentSheet,currentRow,0).toUpperCase());
 	            */
 
@@ -187,14 +188,46 @@ public class WorkbookParser {
             //If file is still valid (after checking headers), proceed
             currentRow++;
             while (!rowIsEmpty(wb, DESCRIPTION_SHEET, currentRow, 8)) {
-                measurementVariables.add(new MeasurementVariable(getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 0)
+
+                // GCP-5802
+                MeasurementVariable var = new MeasurementVariable(getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 0)
                         , getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 1)
                         , getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 3)
                         , getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 4)
                         , getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 2)
                         , getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 5)
                         , getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 6)
-                        , getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 7)));
+                        , getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 7));
+
+                if (StringUtils.isEmpty(var.getName())) {
+                    errorMessages.add("missing.field.name");
+                }
+
+                if (StringUtils.isEmpty(var.getDescription())) {
+                    errorMessages.add("missing.field.description");
+                }
+
+                if (StringUtils.isEmpty(var.getProperty())) {
+                    errorMessages.add("missing.field.property");
+                }
+
+                if (StringUtils.isEmpty(var.getScale())) {
+                    errorMessages.add("missing.field.scale");
+                }
+
+                if (StringUtils.isEmpty(var.getMethod())) {
+                    errorMessages.add("missing.field.method");
+                }
+
+                if (StringUtils.isEmpty(var.getDataType())) {
+                    errorMessages.add("missing.field.datatype");
+                }
+
+                if (StringUtils.isEmpty(var.getLabel())) {
+                    errorMessages.add("missing.field.label");
+                }
+
+                measurementVariables.add(var);
 
                 //set locationId
                 if (name.equals("CONDITION") && getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 0).toUpperCase().equals("TRIAL")) {
@@ -202,7 +235,7 @@ public class WorkbookParser {
                         locationId = Long.parseLong(getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 6));
                     }
                 }
-	        	
+
 	        	/* for debugging purposes
 	            System.out.println("");
 	            System.out.println("DEBUG | "+name+":"+getCellStringValue(wb,currentSheet,currentRow,0));
@@ -236,12 +269,14 @@ public class WorkbookParser {
                 if (col < factors.size()) {
 
                     if (!factors.get(col).getName().toUpperCase().equals(getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col).toUpperCase())) {
+                        // TODO change this so that it's in line with exception strategy
                         throw new WorkbookParserException("Incorrect header for observations.");
                     }
 
                 } else {
 
                     if (!variates.get(col - factors.size()).getName().toUpperCase().equals(getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col).toUpperCase())) {
+                        // TODO change this so that it's in line with exception strategy
                         throw new WorkbookParserException("Incorrect header for observations.");
                     }
 

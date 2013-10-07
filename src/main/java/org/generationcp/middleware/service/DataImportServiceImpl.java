@@ -17,6 +17,7 @@ import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.parser.WorkbookParser;
+import org.generationcp.middleware.operation.parser.WorkbookParserException;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.util.TimerWatch;
 import org.hibernate.Session;
@@ -65,7 +66,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 	
 	@Override
-	public Workbook parseWorkbook(File file) throws MiddlewareQueryException{
+	public Workbook parseWorkbook(File file) throws WorkbookParserException{
 		return new WorkbookParser().parseFile(file);
 	}
 }
