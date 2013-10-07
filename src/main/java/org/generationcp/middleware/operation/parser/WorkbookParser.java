@@ -22,8 +22,11 @@ import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.util.Message;
 
 import java.io.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,7 +48,7 @@ public class WorkbookParser {
 
     private int currentRow;
     private long locationId;
-    private List<String> errorMessages;
+    private List<Message> errorMessages;
 
     /*private static Integer currentSheet;
 	private static Integer currentRow;
@@ -66,7 +69,7 @@ public class WorkbookParser {
 
         currentRow = 0;
         locationId = 0;
-        errorMessages = new LinkedList<String>();
+        errorMessages = new LinkedList<Message>();
 
         try {
 
@@ -78,7 +81,7 @@ public class WorkbookParser {
                 Sheet sheet1 = wb.getSheetAt(DESCRIPTION_SHEET);
 
                 if (sheet1 == null || sheet1.getSheetName() == null || !(sheet1.getSheetName().equals("Description"))) {
-                    errorMessages.add("missing.sheet.description");
+                    errorMessages.add(new Message("missing.sheet.description"));
                     /*throw new Error("Error with reading file uploaded. File doesn't have the first sheet - Description");*/
                 }
             } catch (Exception e) {
@@ -89,7 +92,7 @@ public class WorkbookParser {
                 Sheet sheet2 = wb.getSheetAt(OBSERVATION_SHEET);
 
                 if (sheet2 == null || sheet2.getSheetName() == null || !(sheet2.getSheetName().equals("Observation"))) {
-                    errorMessages.add("missing.sheet.observation");
+                    errorMessages.add(new Message("missing.sheet.observation"));
                     /*throw new Error("Error with reading file uploaded. File doesn't have the second sheet - Observation");*/
                 }
             } catch (Exception e) {
@@ -221,31 +224,31 @@ public class WorkbookParser {
                         , getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 7));
 
                 if (StringUtils.isEmpty(var.getName())) {
-                    errorMessages.add("missing.field.name");
+                    errorMessages.add(new Message("missing.field.name", Integer.toString(currentRow + 1)));
                 }
 
                 if (StringUtils.isEmpty(var.getDescription())) {
-                    errorMessages.add("missing.field.description");
+                    errorMessages.add(new Message("missing.field.description", Integer.toString(currentRow + 1)));
                 }
 
                 if (StringUtils.isEmpty(var.getProperty())) {
-                    errorMessages.add("missing.field.property");
+                    errorMessages.add(new Message("missing.field.property", Integer.toString(currentRow + 1)));
                 }
 
                 if (StringUtils.isEmpty(var.getScale())) {
-                    errorMessages.add("missing.field.scale");
+                    errorMessages.add(new Message("missing.field.scale", Integer.toString(currentRow + 1)));
                 }
 
                 if (StringUtils.isEmpty(var.getMethod())) {
-                    errorMessages.add("missing.field.method");
+                    errorMessages.add(new Message("missing.field.method", Integer.toString(currentRow + 1)));
                 }
 
                 if (StringUtils.isEmpty(var.getDataType())) {
-                    errorMessages.add("missing.field.datatype");
+                    errorMessages.add(new Message("missing.field.datatype", Integer.toString(currentRow + 1)));
                 }
 
                 if (StringUtils.isEmpty(var.getLabel())) {
-                    errorMessages.add("missing.field.label");
+                    errorMessages.add(new Message("missing.field.label", Integer.toString(currentRow + 1)));
                 }
 
                 measurementVariables.add(var);

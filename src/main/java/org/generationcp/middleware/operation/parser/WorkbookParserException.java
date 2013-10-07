@@ -1,5 +1,7 @@
 package org.generationcp.middleware.operation.parser;
 
+import org.generationcp.middleware.util.Message;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,12 +12,12 @@ import java.util.List;
  */
 public class WorkbookParserException extends Exception{
 
-    private List<String> messages;
+    private List<Message> messages;
 
     public WorkbookParserException() {
     }
 
-    public WorkbookParserException(List<String> messages) {
+    public WorkbookParserException(List<Message> messages) {
         this.messages = messages;
     }
 
@@ -27,15 +29,15 @@ public class WorkbookParserException extends Exception{
         super(message, cause);
     }
 
-    public void addMessage(String message) {
+    public void addMessage(Message message) {
         if (messages == null) {
-            messages = new LinkedList<String>();
+            messages = new LinkedList<Message>();
         }
 
         messages.add(message);
     }
 
-    public List<String> getErrorMessages() {
+    public List<Message> getErrorMessages() {
         return messages;
     }
 
