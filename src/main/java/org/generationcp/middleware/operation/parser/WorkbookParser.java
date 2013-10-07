@@ -73,9 +73,10 @@ public class WorkbookParser {
             InputStream inp = new FileInputStream(file);
             wb = new HSSFWorkbook(inp);
 
+            // NEEDS REFACTORING. CHANGE THROWN ERROR TO AN EXCEPTION, SO THAT CALLING METHODS CAN HANDLE IT PROPERLY
             //validations
             try {
-                Sheet sheet1 = wb.getSheetAt(0);
+                Sheet sheet1 = wb.getSheetAt(DESCRIPTION_SHEET);
 
                 if (sheet1 == null || sheet1.getSheetName() == null || !(sheet1.getSheetName().equals("Description"))) {
                     throw new Error("Error with reading file uploaded. File doesn't have the first sheet - Description");
@@ -85,7 +86,7 @@ public class WorkbookParser {
             }
 
             try {
-                Sheet sheet2 = wb.getSheetAt(1);
+                Sheet sheet2 = wb.getSheetAt(OBSERVATION_SHEET);
 
                 if (sheet2 == null || sheet2.getSheetName() == null || !(sheet2.getSheetName().equals("Observation"))) {
                     throw new Error("Error with reading file uploaded. File doesn't have the second sheet - Observation");
@@ -272,13 +273,15 @@ public class WorkbookParser {
             if (cell.getNumericCellValue() == Math.floor(cell.getNumericCellValue())) {
                 return String.valueOf(Integer.valueOf((int) cell.getNumericCellValue()));
             } else {
-                return String.valueOf(Double.valueOf((double) cell.getNumericCellValue()));
+                return String.valueOf(Double.valueOf(cell.getNumericCellValue()));
             }
 
         } catch (NullPointerException e) {
             return "";
         }
     }
+
+
 
     private static StudyType getStudyTypeValue(String studyType) {
         if (studyType.toUpperCase().equals(StudyType.N.getName().toUpperCase())) {
