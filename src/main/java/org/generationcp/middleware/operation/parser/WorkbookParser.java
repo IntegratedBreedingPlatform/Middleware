@@ -29,6 +29,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class WorkbookParser {
@@ -48,6 +49,8 @@ public class WorkbookParser {
 
     private int currentRow;
     private long locationId;
+    private List<String> errorMessages;
+
     /*private static Integer currentSheet;
 	private static Integer currentRow;
 	private static long locationId;
@@ -58,7 +61,7 @@ public class WorkbookParser {
      *
      * @param file
      * @return workbook
-     * @throws MiddlewareQueryException
+     * @throws WorkbookParserException
      */
     public org.generationcp.middleware.domain.etl.Workbook parseFile(File file) throws WorkbookParserException {
 
@@ -67,19 +70,20 @@ public class WorkbookParser {
 
         currentRow = 0;
         locationId = 0;
+        errorMessages = new LinkedList<String>();
 
         try {
 
             InputStream inp = new FileInputStream(file);
             wb = new HSSFWorkbook(inp);
 
-            // NEEDS REFACTORING. CHANGE THROWN ERROR TO AN EXCEPTION, SO THAT CALLING METHODS CAN HANDLE IT PROPERLY
             //validations
             try {
                 Sheet sheet1 = wb.getSheetAt(DESCRIPTION_SHEET);
 
                 if (sheet1 == null || sheet1.getSheetName() == null || !(sheet1.getSheetName().equals("Description"))) {
-                    throw new Error("Error with reading file uploaded. File doesn't have the first sheet - Description");
+                    errorMessages.add("missing.sheet.description");
+                    /*throw new Error("Error with reading file uploaded. File doesn't have the first sheet - Description");*/
                 }
             } catch (Exception e) {
                 throw new WorkbookParserException("Error encountered with parseFile(): " + e.getMessage(), e);
@@ -89,10 +93,15 @@ public class WorkbookParser {
                 Sheet sheet2 = wb.getSheetAt(OBSERVATION_SHEET);
 
                 if (sheet2 == null || sheet2.getSheetName() == null || !(sheet2.getSheetName().equals("Observation"))) {
-                    throw new Error("Error with reading file uploaded. File doesn't have the second sheet - Observation");
+                    errorMessages.add("missing.sheet.observation");
+                    /*throw new Error("Error with reading file uploaded. File doesn't have the second sheet - Observation");*/
                 }
             } catch (Exception e) {
                 throw new WorkbookParserException("Error encountered with parseFile(): " + e.getMessage(), e);
+            }
+
+            if (errorMessages.size() > 0) {
+                throw new WorkbookParserException(errorMessages);
             }
 
             workbook.setStudyDetails(readStudyDetails(wb));
@@ -325,5 +334,4 @@ public class WorkbookParser {
         }
         return true;
     }
-
 }

@@ -15,6 +15,10 @@ public class WorkbookParserException extends Exception{
     public WorkbookParserException() {
     }
 
+    public WorkbookParserException(List<String> messages) {
+        this.messages = messages;
+    }
+
     public WorkbookParserException(String message) {
         super(message);
     }
