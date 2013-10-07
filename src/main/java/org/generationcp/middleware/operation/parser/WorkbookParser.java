@@ -183,7 +183,7 @@ public class WorkbookParser {
 
                 //set locationId
                 if (name.equals("CONDITION") && getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 0).toUpperCase().equals("TRIAL")) {
-                    if (getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 6) != "" && getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 6) != null) {
+                    if (getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 6) != null && !getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 6).equals("")) {
                         locationId = Long.parseLong(getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 6));
                     }
                 }
