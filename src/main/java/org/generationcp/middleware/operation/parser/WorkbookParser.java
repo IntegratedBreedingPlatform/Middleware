@@ -48,7 +48,7 @@ public class WorkbookParser {
     private List<String> errorMessages;
 
     /*private static Integer currentSheet;
-    private static Integer currentRow;
+	private static Integer currentRow;
 	private static long locationId;
 */
 
@@ -137,7 +137,28 @@ public class WorkbookParser {
         //determine study type
         String studyType = getCellStringValue(wb, DESCRIPTION_SHEET, STUDY_TYPE_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
         StudyType studyTypeValue = StudyType.getStudyType(studyType);
-
+        
+        if (study != null){
+        	if (study.trim().equals("")) throw new WorkbookParserException("Study Name is blank");
+        }
+        if (title != null) {
+        	if (title.trim().equals("")) throw new WorkbookParserException("Study Tile is blank");
+        }
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        
+        if (startDate.length() > 8) throw new WorkbookParserException("Start Date should be in YYYYMMDD format");
+        try {
+			if (!startDate.equals("")) dateFormat.parse(startDate);
+		} catch (ParseException e) {
+			throw new WorkbookParserException("Start Date should be in YYYYMMDD format");
+		}
+        if (endDate.length() > 8) throw new WorkbookParserException("End Date should be in YYYYMMDD format");
+        try {
+        	if (!endDate.equals("")) dateFormat.parse(endDate);
+		} catch (ParseException e) {
+			throw new WorkbookParserException("End Date should be in YYYYMMDD format");
+		}
+        
         if (studyTypeValue == null) {
             studyTypeValue = StudyType.E;
         }
@@ -175,9 +196,9 @@ public class WorkbookParser {
                     || !getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 5).toUpperCase().equals("DATA TYPE")
                     || !getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 6).toUpperCase().equals("VALUE")
                     || !getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 7).toUpperCase().equals("LABEL")) {
-
+	            
 	        	/* for debugging purposes
-                System.out.println("DEBUG | Invalid file on readMeasurementVariables");
+	            System.out.println("DEBUG | Invalid file on readMeasurementVariables");
 	            System.out.println(getCellStringValue(wb, currentSheet,currentRow,0).toUpperCase());
 	            */
 
