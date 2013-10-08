@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.parser;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -21,13 +22,9 @@ import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.StudyType;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.util.Message;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -51,7 +48,7 @@ public class WorkbookParser {
 
     private int currentRow;
     private long locationId;
-    private List<String> errorMessages;
+    private List<Message> errorMessages;
 
     /*private static Integer currentSheet;
 	private static Integer currentRow;
@@ -72,7 +69,7 @@ public class WorkbookParser {
 
         currentRow = 0;
         locationId = 0;
-        errorMessages = new LinkedList<String>();
+        errorMessages = new LinkedList<Message>();
 
         try {
 
@@ -84,7 +81,7 @@ public class WorkbookParser {
                 Sheet sheet1 = wb.getSheetAt(DESCRIPTION_SHEET);
 
                 if (sheet1 == null || sheet1.getSheetName() == null || !(sheet1.getSheetName().equals("Description"))) {
-                    errorMessages.add("missing.sheet.description");
+                    errorMessages.add(new Message("missing.sheet.description"));
                     /*throw new Error("Error with reading file uploaded. File doesn't have the first sheet - Description");*/
                 }
             } catch (Exception e) {
@@ -95,13 +92,14 @@ public class WorkbookParser {
                 Sheet sheet2 = wb.getSheetAt(OBSERVATION_SHEET);
 
                 if (sheet2 == null || sheet2.getSheetName() == null || !(sheet2.getSheetName().equals("Observation"))) {
-                    errorMessages.add("missing.sheet.observation");
+                    errorMessages.add(new Message("missing.sheet.observation"));
                     /*throw new Error("Error with reading file uploaded. File doesn't have the second sheet - Observation");*/
                 }
             } catch (Exception e) {
                 throw new WorkbookParserException("Error encountered with parseFile(): " + e.getMessage(), e);
             }
 
+            // throw an exception here if
             if (errorMessages.size() > 0) {
                 throw new WorkbookParserException(errorMessages);
             }
@@ -111,6 +109,10 @@ public class WorkbookParser {
             workbook.setFactors(readMeasurementVariables(wb, "FACTOR"));
             workbook.setConstants(readMeasurementVariables(wb, "CONSTANT"));
             workbook.setVariates(readMeasurementVariables(wb, "VARIATE"));
+
+            if (errorMessages.size() > 0) {
+                throw new WorkbookParserException(errorMessages);
+            }
 
             currentRow = 0;
 
@@ -203,20 +205,53 @@ public class WorkbookParser {
 	            System.out.println(getCellStringValue(wb, currentSheet,currentRow,0).toUpperCase());
 	            */
 
-                throw new Error("Incorrect headers for " + name);
+                // TODO change this so that it's in line with exception strategy
+                throw new WorkbookParserException("Incorrect headers for " + name);
             }
 
             //If file is still valid (after checking headers), proceed
             currentRow++;
             while (!rowIsEmpty(wb, DESCRIPTION_SHEET, currentRow, 8)) {
-                measurementVariables.add(new MeasurementVariable(getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 0)
+
+                // GCP-5802
+                MeasurementVariable var = new MeasurementVariable(getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 0)
                         , getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 1)
                         , getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 3)
                         , getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 4)
                         , getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 2)
                         , getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 5)
                         , getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 6)
-                        , getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 7)));
+                        , getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 7));
+
+                if (StringUtils.isEmpty(var.getName())) {
+                    errorMessages.add(new Message("missing.field.name", Integer.toString(currentRow + 1)));
+                }
+
+                if (StringUtils.isEmpty(var.getDescription())) {
+                    errorMessages.add(new Message("missing.field.description", Integer.toString(currentRow + 1)));
+                }
+
+                if (StringUtils.isEmpty(var.getProperty())) {
+                    errorMessages.add(new Message("missing.field.property", Integer.toString(currentRow + 1)));
+                }
+
+                if (StringUtils.isEmpty(var.getScale())) {
+                    errorMessages.add(new Message("missing.field.scale", Integer.toString(currentRow + 1)));
+                }
+
+                if (StringUtils.isEmpty(var.getMethod())) {
+                    errorMessages.add(new Message("missing.field.method", Integer.toString(currentRow + 1)));
+                }
+
+                if (StringUtils.isEmpty(var.getDataType())) {
+                    errorMessages.add(new Message("missing.field.datatype", Integer.toString(currentRow + 1)));
+                }
+
+                if (StringUtils.isEmpty(var.getLabel())) {
+                    errorMessages.add(new Message("missing.field.label", Integer.toString(currentRow + 1)));
+                }
+
+                measurementVariables.add(var);
 
                 //set locationId
                 if (name.equals("CONDITION") && getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 0).toUpperCase().equals("TRIAL")) {
@@ -224,7 +259,7 @@ public class WorkbookParser {
                         locationId = Long.parseLong(getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 6));
                     }
                 }
-	        	
+
 	        	/* for debugging purposes
 	            System.out.println("");
 	            System.out.println("DEBUG | "+name+":"+getCellStringValue(wb,currentSheet,currentRow,0));
@@ -256,13 +291,19 @@ public class WorkbookParser {
             List<String> measurementDataLabel = new ArrayList<String>();
             for (int col = 0; col < factors.size() + variates.size(); col++) {
                 if (col < factors.size()) {
+
                     if (!factors.get(col).getName().toUpperCase().equals(getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col).toUpperCase())) {
-                        throw new Error("Incorrect header for observations.");
+                        // TODO change this so that it's in line with exception strategy
+                        throw new WorkbookParserException("Incorrect header for observations.");
                     }
+
                 } else {
+
                     if (!variates.get(col - factors.size()).getName().toUpperCase().equals(getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col).toUpperCase())) {
-                        throw new Error("Incorrect header for observations.");
+                        // TODO change this so that it's in line with exception strategy
+                        throw new WorkbookParserException("Incorrect header for observations.");
                     }
+
                 }
                 measurementDataLabel.add(getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col));
             }

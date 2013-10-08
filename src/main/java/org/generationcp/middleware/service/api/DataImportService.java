@@ -40,5 +40,5 @@ public interface DataImportService {
 	 * @param file
 	 * @return workbook 
 	 */
-	Workbook parseWorkbook(File file) throws MiddlewareQueryException, WorkbookParserException ;
+	Workbook parseWorkbook(File file) throws WorkbookParserException;
 }

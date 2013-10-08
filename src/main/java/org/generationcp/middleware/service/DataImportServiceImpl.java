@@ -66,7 +66,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 	
 	@Override
-	public Workbook parseWorkbook(File file) throws MiddlewareQueryException, WorkbookParserException {
+	public Workbook parseWorkbook(File file) throws WorkbookParserException{
 		return new WorkbookParser().parseFile(file);
 	}
 }
