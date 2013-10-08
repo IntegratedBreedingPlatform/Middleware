@@ -112,6 +112,11 @@ public class WorkbookParser {
             workbook.setConstants(readMeasurementVariables(wb, "CONSTANT"));
             workbook.setVariates(readMeasurementVariables(wb, "VARIATE"));
 
+            // check if required CONDITION is present for specific study types
+            if (workbook.getStudyDetails().getStudyType() != StudyType.N && locationId == 0) {
+                errorMessages.add(new Message("error.missing.trial.factor"));
+            }
+
             if (errorMessages.size() > 0) {
                 throw new WorkbookParserException(errorMessages);
             }
@@ -226,7 +231,7 @@ public class WorkbookParser {
                     || !getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 7).toUpperCase().equals("LABEL")) {
 
 	        	/* for debugging purposes
-	            System.out.println("DEBUG | Invalid file on readMeasurementVariables");
+                System.out.println("DEBUG | Invalid file on readMeasurementVariables");
 	            System.out.println(getCellStringValue(wb, currentSheet,currentRow,0).toUpperCase());
 	            */
 
