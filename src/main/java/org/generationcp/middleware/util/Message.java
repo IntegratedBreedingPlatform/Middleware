@@ -41,8 +41,4 @@ public class Message {
     public void setMessageParams(String[] messageParams) {
         this.messageParams = messageParams;
     }
-
-    public String[] getMessageParams() {
-        return messageParams.toArray(new String[messageParams.size()]);
-    }
 }
