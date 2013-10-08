@@ -81,7 +81,7 @@ public class TestDataImportServiceImpl {
 	@Test 
 	public void testParseWorkbook() throws MiddlewareQueryException, WorkbookParserException{
 		//change based on path location of your template file
-		File file = new File("src/test/resources/Population114_Pheno_FB_1.xls");
+		File file = new File("D://Population114_Pheno_FB_3.xls");
 		Workbook workbook = dataImportService.parseWorkbook(file);
 		workbook.print(0);
 		
