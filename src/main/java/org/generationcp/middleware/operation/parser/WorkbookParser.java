@@ -30,6 +30,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Date;
 
 public class WorkbookParser {
 
@@ -134,8 +135,8 @@ public class WorkbookParser {
         String title = getCellStringValue(wb, DESCRIPTION_SHEET, STUDY_TITLE_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
         String pmKey = getCellStringValue(wb, DESCRIPTION_SHEET, PMKEY_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
         String objective = getCellStringValue(wb, DESCRIPTION_SHEET, OBJECTIVE_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
-        String startDate = getCellStringValue(wb, DESCRIPTION_SHEET, START_DATE_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
-        String endDate = getCellStringValue(wb, DESCRIPTION_SHEET, END_DATE_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
+        String startDateStr = getCellStringValue(wb, DESCRIPTION_SHEET, START_DATE_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
+        String endDateStr = getCellStringValue(wb, DESCRIPTION_SHEET, END_DATE_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
 
         //determine study type
         String studyType = getCellStringValue(wb, DESCRIPTION_SHEET, STUDY_TYPE_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
@@ -148,32 +149,40 @@ public class WorkbookParser {
         	if (title.trim().equals("")) errorMessages.add(new Message("error.blank.study.title"));
         }
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-        
-        if (startDate.length() > 8) {
+
+        Date startDate = null;
+        Date endDate = null;
+
+        if (startDateStr.length() > 8) {
         	errorMessages.add(new Message("error.start.date.invalid"));
         } else {
 	        try {
-				if (!startDate.equals("")) dateFormat.parse(startDate);
+				if (!startDateStr.equals("")) startDate = dateFormat.parse(startDateStr);
 			} catch (ParseException e) {
-				errorMessages.add(new Message("start.date.invalid"));
+				errorMessages.add(new Message("error.start.date.invalid"));
 			}
         }
-        if (endDate.length() > 8) {
+        if (endDateStr.length() > 8) {
         	errorMessages.add(new Message("error.end.date.invalid"));
         }else{
         	 try {
-             	if (!endDate.equals("")) dateFormat.parse(endDate);
+             	if (!endDateStr.equals("")) endDate = dateFormat.parse(endDateStr);
      		} catch (ParseException e) {
      			errorMessages.add(new Message("error.end.date.invalid"));
      		}
              
         }
+
+        if (startDate != null && endDate != null && startDate.after(endDate)) {
+            errorMessages.add(new Message("error.start.is.after.end.date"));
+        }
+
        
         if (studyTypeValue == null) {
             studyTypeValue = StudyType.E;
         }
 
-        StudyDetails studyDetails = new StudyDetails(study, title, pmKey, objective, startDate, endDate, studyTypeValue, 0, null, null);
+        StudyDetails studyDetails = new StudyDetails(study, title, pmKey, objective, startDateStr, endDateStr, studyTypeValue, 0, null, null);
         
         /* for debugging purposes
         System.out.println("DEBUG | Study:" + study);
