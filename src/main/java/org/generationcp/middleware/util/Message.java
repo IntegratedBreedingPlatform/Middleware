@@ -13,32 +13,32 @@ import java.util.List;
 public class Message {
     private String messageKey;
 
-    private List<String> messageParams;
+    private String[] messageParams;
 
     public Message(String messageKey) {
         this.messageKey = messageKey;
     }
 
     public Message(String messageKey, String... params) {
+        this.messageKey = messageKey;
         if (params != null) {
-            messageParams = Arrays.asList(params);
+            messageParams = params;
         }
-    }
-
-    public void addMessageParameter(String parameter) {
-        if (messageParams == null) {
-            messageParams = new LinkedList<String>();
-        }
-
-        messageParams.add(parameter);
     }
 
     public String getMessageKey() {
         return messageKey;
-
     }
 
-    public void setMessageParams(List<String> messageParams) {
+    public String[] getMessageParams() {
+        return messageParams;
+    }
+
+    public void setMessageKey(String messageKey) {
+        this.messageKey = messageKey;
+    }
+
+    public void setMessageParams(String[] messageParams) {
         this.messageParams = messageParams;
     }
 }
