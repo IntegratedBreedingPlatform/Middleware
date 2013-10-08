@@ -142,24 +142,24 @@ public class WorkbookParser {
         StudyType studyTypeValue = StudyType.getStudyType(studyType);
         
         if (study != null){
-        	if (study.trim().equals("")) throw new WorkbookParserException("Study Name is blank");
+        	if (study.trim().equals("")) errorMessages.add(new Message("error.blank.study.name"));
         }
         if (title != null) {
-        	if (title.trim().equals("")) throw new WorkbookParserException("Study Tile is blank");
+        	if (title.trim().equals("")) errorMessages.add(new Message("error.blank.study.title"));
         }
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         
-        if (startDate.length() > 8) throw new WorkbookParserException("Start Date should be in YYYYMMDD format");
+        if (startDate.length() > 8) errorMessages.add(new Message("error.start.date.invalid"));
         try {
 			if (!startDate.equals("")) dateFormat.parse(startDate);
 		} catch (ParseException e) {
-			throw new WorkbookParserException("Start Date should be in YYYYMMDD format");
+			errorMessages.add(new Message("start.date.invalid"));
 		}
-        if (endDate.length() > 8) throw new WorkbookParserException("End Date should be in YYYYMMDD format");
+        if (endDate.length() > 8) errorMessages.add(new Message("error.end.date.invalid"));
         try {
         	if (!endDate.equals("")) dateFormat.parse(endDate);
 		} catch (ParseException e) {
-			throw new WorkbookParserException("End Date should be in YYYYMMDD format");
+			errorMessages.add(new Message("error.end.date.invalid"));
 		}
         
         if (studyTypeValue == null) {
