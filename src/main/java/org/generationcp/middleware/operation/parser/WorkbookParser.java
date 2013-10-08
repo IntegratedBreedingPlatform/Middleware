@@ -22,15 +22,16 @@ import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.util.Message;
 
 import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Date;
 
 public class WorkbookParser {
 
@@ -52,7 +53,7 @@ public class WorkbookParser {
     private List<Message> errorMessages;
 
     /*private static Integer currentSheet;
-	private static Integer currentRow;
+    private static Integer currentRow;
 	private static long locationId;
 */
 
@@ -63,7 +64,7 @@ public class WorkbookParser {
      * @return workbook
      * @throws WorkbookParserException
      */
-    public org.generationcp.middleware.domain.etl.Workbook parseFile(File file) throws WorkbookParserException {
+    public org.generationcp.middleware.domain.etl.Workbook parseFile(File file) throws WorkbookParserException, MiddlewareQueryException {
 
         org.generationcp.middleware.domain.etl.Workbook workbook = new org.generationcp.middleware.domain.etl.Workbook();
         Workbook wb;
@@ -115,10 +116,6 @@ public class WorkbookParser {
                 throw new WorkbookParserException(errorMessages);
             }
 
-            currentRow = 0;
-
-            workbook.setObservations(readObservations(wb, workbook));
-
         } catch (FileNotFoundException e) {
             throw new WorkbookParserException("File not found " + e.getMessage(), e);
         } catch (IOException e) {
@@ -126,6 +123,18 @@ public class WorkbookParser {
         }
 
         return workbook;
+    }
+
+    public void parseAndSetObservationRows(File file, org.generationcp.middleware.domain.etl.Workbook workbook) throws WorkbookParserException {
+        try {
+            InputStream inp = new FileInputStream(file);
+            Workbook wb = new HSSFWorkbook(inp);
+
+            currentRow = 0;
+            workbook.setObservations(readObservations(wb, workbook));
+        } catch (IOException e) {
+            throw new WorkbookParserException("Error accessing file " + e.getMessage(), e);
+        }
     }
 
     private StudyDetails readStudyDetails(Workbook wb) throws WorkbookParserException {
@@ -141,12 +150,12 @@ public class WorkbookParser {
         //determine study type
         String studyType = getCellStringValue(wb, DESCRIPTION_SHEET, STUDY_TYPE_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
         StudyType studyTypeValue = StudyType.getStudyType(studyType);
-        
-        if (study != null){
-        	if (study.trim().equals("")) errorMessages.add(new Message("error.blank.study.name"));
+
+        if (study != null) {
+            if (study.trim().equals("")) errorMessages.add(new Message("error.blank.study.name"));
         }
         if (title != null) {
-        	if (title.trim().equals("")) errorMessages.add(new Message("error.blank.study.title"));
+            if (title.trim().equals("")) errorMessages.add(new Message("error.blank.study.title"));
         }
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
@@ -154,30 +163,30 @@ public class WorkbookParser {
         Date endDate = null;
 
         if (startDateStr.length() > 8) {
-        	errorMessages.add(new Message("error.start.date.invalid"));
+            errorMessages.add(new Message("error.start.date.invalid"));
         } else {
-	        try {
-				if (!startDateStr.equals("")) startDate = dateFormat.parse(startDateStr);
-			} catch (ParseException e) {
-				errorMessages.add(new Message("error.start.date.invalid"));
-			}
+            try {
+                if (!startDateStr.equals("")) startDate = dateFormat.parse(startDateStr);
+            } catch (ParseException e) {
+                errorMessages.add(new Message("error.start.date.invalid"));
+            }
         }
         if (endDateStr.length() > 8) {
-        	errorMessages.add(new Message("error.end.date.invalid"));
-        }else{
-        	 try {
-             	if (!endDateStr.equals("")) endDate = dateFormat.parse(endDateStr);
-     		} catch (ParseException e) {
-     			errorMessages.add(new Message("error.end.date.invalid"));
-     		}
-             
+            errorMessages.add(new Message("error.end.date.invalid"));
+        } else {
+            try {
+                if (!endDateStr.equals("")) endDate = dateFormat.parse(endDateStr);
+            } catch (ParseException e) {
+                errorMessages.add(new Message("error.end.date.invalid"));
+            }
+
         }
 
         if (startDate != null && endDate != null && startDate.after(endDate)) {
             errorMessages.add(new Message("error.start.is.after.end.date"));
         }
 
-       
+
         if (studyTypeValue == null) {
             studyTypeValue = StudyType.E;
         }
@@ -215,7 +224,7 @@ public class WorkbookParser {
                     || !getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 5).toUpperCase().equals("DATA TYPE")
                     || !getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 6).toUpperCase().equals("VALUE")
                     || !getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 7).toUpperCase().equals("LABEL")) {
-	            
+
 	        	/* for debugging purposes
 	            System.out.println("DEBUG | Invalid file on readMeasurementVariables");
 	            System.out.println(getCellStringValue(wb, currentSheet,currentRow,0).toUpperCase());
@@ -352,6 +361,7 @@ public class WorkbookParser {
         }
     }
 
+
     private static String getCellStringValue(Workbook wb, Integer sheetNumber, Integer rowNumber, Integer columnNumber) {
         try {
             Sheet sheet = wb.getSheetAt(sheetNumber);
@@ -375,43 +385,15 @@ public class WorkbookParser {
     }
 
 
-/*
-// Refactored logic to StudyType, since it is more appropriate
-    private static StudyType getStudyTypeValue(String studyType) {
-        if (studyType.toUpperCase().equals(StudyType.N.getName().toUpperCase())) {
-            return StudyType.N;
-        } else if (studyType.toUpperCase().equals(StudyType.HB.getName().toUpperCase())) {
-            return StudyType.HB;
-        } else if (studyType.toUpperCase().equals(StudyType.PN.getName().toUpperCase())) {
-            return StudyType.PN;
-        } else if (studyType.toUpperCase().equals(StudyType.CN.getName().toUpperCase())) {
-            return StudyType.CN;
-        } else if (studyType.toUpperCase().equals(StudyType.OYT.getName().toUpperCase())) {
-            return StudyType.OYT;
-        } else if (studyType.toUpperCase().equals(StudyType.BON.getName().toUpperCase())) {
-            return StudyType.BON;
-        } else if (studyType.toUpperCase().equals(StudyType.T.getName().toUpperCase())) {
-            return StudyType.T;
-        } else if (studyType.toUpperCase().equals(StudyType.RYT.getName().toUpperCase())) {
-            return StudyType.RYT;
-        } else if (studyType.toUpperCase().equals(StudyType.OFT.getName().toUpperCase())) {
-            return StudyType.OFT;
-        } else if (studyType.toUpperCase().equals(StudyType.S.getName().toUpperCase())) {
-            return StudyType.S;
-        } else {
-            return StudyType.E;
-        }
-    }*/
-
-    // TODO refactor calls to this method to use PoiUtil in IBPCommons
     private static Boolean rowIsEmpty(Workbook wb, Integer sheet, Integer row, int len) {
         Integer col = 0;
         for (col = 0; col < len; col++) {
-            if (getCellStringValue(wb, sheet, row, col) != "" && getCellStringValue(wb, sheet, row, col) != null) {
+            if (!getCellStringValue(wb, sheet, row, col).equals("") && getCellStringValue(wb, sheet, row, col) != null) {
                 return false;
             }
             col++;
         }
         return true;
     }
+
 }
