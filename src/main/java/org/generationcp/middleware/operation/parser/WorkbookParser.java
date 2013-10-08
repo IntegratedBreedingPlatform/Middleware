@@ -52,10 +52,13 @@ public class WorkbookParser {
     private long locationId;
     private List<Message> errorMessages;
 
-    /*private static Integer currentSheet;
-    private static Integer currentRow;
-	private static long locationId;
-*/
+    //GCP-5815
+    private org.generationcp.middleware.domain.etl.Workbook currentWorkbook;
+    private final static String[] EXPECTED_VARIABLE_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE", "LABEL"};
+    private final static String[] EXPECTED_NURSERY_VARIATE_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "", "SAMPLE LEVEL"};
+    private final static String[] EXPECTED_NURSERY_CONSTANT_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE", "SAMPLE LEVEL"};
+    private final static String[] EXPECTED_NURSERY_FACTOR_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "NESTED IN", "LABEL"};
+
 
     /**
      * Parses given file and transforms it into a Workbook
@@ -66,7 +69,7 @@ public class WorkbookParser {
      */
     public org.generationcp.middleware.domain.etl.Workbook parseFile(File file) throws WorkbookParserException, MiddlewareQueryException {
 
-        org.generationcp.middleware.domain.etl.Workbook workbook = new org.generationcp.middleware.domain.etl.Workbook();
+        currentWorkbook = new org.generationcp.middleware.domain.etl.Workbook();
         Workbook wb;
 
         currentRow = 0;
@@ -106,14 +109,14 @@ public class WorkbookParser {
                 throw new WorkbookParserException(errorMessages);
             }
 
-            workbook.setStudyDetails(readStudyDetails(wb));
-            workbook.setConditions(readMeasurementVariables(wb, "CONDITION"));
-            workbook.setFactors(readMeasurementVariables(wb, "FACTOR"));
-            workbook.setConstants(readMeasurementVariables(wb, "CONSTANT"));
-            workbook.setVariates(readMeasurementVariables(wb, "VARIATE"));
+            currentWorkbook.setStudyDetails(readStudyDetails(wb));
+            currentWorkbook.setConditions(readMeasurementVariables(wb, "CONDITION"));
+            currentWorkbook.setFactors(readMeasurementVariables(wb, "FACTOR"));
+            currentWorkbook.setConstants(readMeasurementVariables(wb, "CONSTANT"));
+            currentWorkbook.setVariates(readMeasurementVariables(wb, "VARIATE"));
 
             // check if required CONDITION is present for specific study types
-            if (workbook.getStudyDetails().getStudyType() != StudyType.N && locationId == 0) {
+            if (currentWorkbook.getStudyDetails().getStudyType() != StudyType.N && locationId == 0) {
                 errorMessages.add(new Message("error.missing.trial.factor"));
             }
 
@@ -127,7 +130,7 @@ public class WorkbookParser {
             throw new WorkbookParserException("Error accessing file " + e.getMessage(), e);
         }
 
-        return workbook;
+        return currentWorkbook;
     }
 
     public void parseAndSetObservationRows(File file, org.generationcp.middleware.domain.etl.Workbook workbook) throws WorkbookParserException {
@@ -221,20 +224,27 @@ public class WorkbookParser {
 
             currentRow++; //Skip empty row
             //Check if headers are correct
-            if (!getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 0).toUpperCase().equals(name)
-                    || !getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 1).toUpperCase().equals("DESCRIPTION")
-                    || !getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 2).toUpperCase().equals("PROPERTY")
-                    || !getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 3).toUpperCase().equals("SCALE")
-                    || !getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 4).toUpperCase().equals("METHOD")
-                    || !getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 5).toUpperCase().equals("DATA TYPE")
-                    || !getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 6).toUpperCase().equals("VALUE")
-                    || !getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 7).toUpperCase().equals("LABEL")) {
 
-	        	/* for debugging purposes
-                System.out.println("DEBUG | Invalid file on readMeasurementVariables");
-	            System.out.println(getCellStringValue(wb, currentSheet,currentRow,0).toUpperCase());
-	            */
+            // GCP-5815
+            String[] expectedHeaders = null;
+            if (currentWorkbook.getStudyDetails().getStudyType() != StudyType.N) {
+                expectedHeaders = EXPECTED_VARIABLE_HEADERS;
 
+
+            } else {
+                if (name.equals("FACTOR")) {
+                    expectedHeaders = EXPECTED_NURSERY_FACTOR_HEADERS;
+                } else if (name.equals("VARIATE")) {
+                    expectedHeaders = EXPECTED_NURSERY_VARIATE_HEADERS;
+                } else if (name.equals("CONSTANT")) {
+                    expectedHeaders = EXPECTED_NURSERY_CONSTANT_HEADERS;
+                } else {
+                    expectedHeaders = EXPECTED_VARIABLE_HEADERS;
+                }
+
+            }
+
+            if (!checkHeadersValid(wb, DESCRIPTION_SHEET, currentRow, expectedHeaders)) {
                 // TODO change this so that it's in line with exception strategy
                 throw new WorkbookParserException("Incorrect headers for " + name);
             }
@@ -291,7 +301,7 @@ public class WorkbookParser {
                 }
 
 	        	/* for debugging purposes
-	            System.out.println("");
+                System.out.println("");
 	            System.out.println("DEBUG | "+name+":"+getCellStringValue(wb,currentSheet,currentRow,0));
 	            System.out.println("DEBUG | Description:"+getCellStringValue(wb,currentSheet,currentRow,1));
 	            System.out.println("DEBUG | Property:"+getCellStringValue(wb,currentSheet,currentRow,2));
@@ -310,7 +320,8 @@ public class WorkbookParser {
         }
     }
 
-    private List<MeasurementRow> readObservations(Workbook wb, org.generationcp.middleware.domain.etl.Workbook workbook) throws WorkbookParserException {
+    private List<MeasurementRow> readObservations(Workbook wb, org.generationcp.middleware.domain.etl.Workbook
+            workbook) throws WorkbookParserException {
         List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
         long stockId = 0;
 
@@ -387,6 +398,20 @@ public class WorkbookParser {
         } catch (NullPointerException e) {
             return "";
         }
+    }
+
+    // GCP-5815
+    private boolean checkHeadersValid(Workbook workbook, int sheetNumber, int row, String[] expectedHeaders) {
+
+        for (int i = 0; i < expectedHeaders.length; i++) {
+            // a plus is added to the column count, since the first column is the name of the group; e.g., FACTOR, CONDITION, ETC
+            String cellValue = getCellStringValue(workbook, sheetNumber, row, i + 1);
+            if (!expectedHeaders[i].equals(cellValue)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 
