@@ -149,19 +149,26 @@ public class WorkbookParser {
         }
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         
-        if (startDate.length() > 8) errorMessages.add(new Message("error.start.date.invalid"));
-        try {
-			if (!startDate.equals("")) dateFormat.parse(startDate);
-		} catch (ParseException e) {
-			errorMessages.add(new Message("start.date.invalid"));
-		}
-        if (endDate.length() > 8) errorMessages.add(new Message("error.end.date.invalid"));
-        try {
-        	if (!endDate.equals("")) dateFormat.parse(endDate);
-		} catch (ParseException e) {
-			errorMessages.add(new Message("error.end.date.invalid"));
-		}
-        
+        if (startDate.length() > 8) {
+        	errorMessages.add(new Message("error.start.date.invalid"));
+        } else {
+	        try {
+				if (!startDate.equals("")) dateFormat.parse(startDate);
+			} catch (ParseException e) {
+				errorMessages.add(new Message("start.date.invalid"));
+			}
+        }
+        if (endDate.length() > 8) {
+        	errorMessages.add(new Message("error.end.date.invalid"));
+        }else{
+        	 try {
+             	if (!endDate.equals("")) dateFormat.parse(endDate);
+     		} catch (ParseException e) {
+     			errorMessages.add(new Message("error.end.date.invalid"));
+     		}
+             
+        }
+       
         if (studyTypeValue == null) {
             studyTypeValue = StudyType.E;
         }
