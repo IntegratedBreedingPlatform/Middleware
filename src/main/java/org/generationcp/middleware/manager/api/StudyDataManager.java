@@ -54,6 +54,8 @@ public interface StudyDataManager {
 	 */
 	Study getStudy(int studyId) throws MiddlewareQueryException;
 
+    int getStudyIdByName(String studyName) throws MiddlewareQueryException;
+
 	/**
 	 * Returns list of root or top-level folders from specified database.
 	 * 
