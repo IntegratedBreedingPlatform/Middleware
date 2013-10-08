@@ -82,7 +82,7 @@ public class WorkbookParser {
                 Sheet sheet1 = wb.getSheetAt(DESCRIPTION_SHEET);
 
                 if (sheet1 == null || sheet1.getSheetName() == null || !(sheet1.getSheetName().equals("Description"))) {
-                    errorMessages.add(new Message("missing.sheet.description"));
+                    errorMessages.add(new Message("error.missing.sheet.description"));
                     /*throw new Error("Error with reading file uploaded. File doesn't have the first sheet - Description");*/
                 }
             } catch (Exception e) {
@@ -93,7 +93,7 @@ public class WorkbookParser {
                 Sheet sheet2 = wb.getSheetAt(OBSERVATION_SHEET);
 
                 if (sheet2 == null || sheet2.getSheetName() == null || !(sheet2.getSheetName().equals("Observation"))) {
-                    errorMessages.add(new Message("missing.sheet.observation"));
+                    errorMessages.add(new Message("error.missing.sheet.observation"));
                     /*throw new Error("Error with reading file uploaded. File doesn't have the second sheet - Observation");*/
                 }
             } catch (Exception e) {
@@ -240,31 +240,31 @@ public class WorkbookParser {
                         , getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 7));
 
                 if (StringUtils.isEmpty(var.getName())) {
-                    errorMessages.add(new Message("missing.field.name", Integer.toString(currentRow + 1)));
+                    errorMessages.add(new Message("error.missing.field.name", Integer.toString(currentRow + 1)));
                 }
 
                 if (StringUtils.isEmpty(var.getDescription())) {
-                    errorMessages.add(new Message("missing.field.description", Integer.toString(currentRow + 1)));
+                    errorMessages.add(new Message("error.missing.field.description", Integer.toString(currentRow + 1)));
                 }
 
                 if (StringUtils.isEmpty(var.getProperty())) {
-                    errorMessages.add(new Message("missing.field.property", Integer.toString(currentRow + 1)));
+                    errorMessages.add(new Message("error.missing.field.property", Integer.toString(currentRow + 1)));
                 }
 
                 if (StringUtils.isEmpty(var.getScale())) {
-                    errorMessages.add(new Message("missing.field.scale", Integer.toString(currentRow + 1)));
+                    errorMessages.add(new Message("error.missing.field.scale", Integer.toString(currentRow + 1)));
                 }
 
                 if (StringUtils.isEmpty(var.getMethod())) {
-                    errorMessages.add(new Message("missing.field.method", Integer.toString(currentRow + 1)));
+                    errorMessages.add(new Message("error.missing.field.method", Integer.toString(currentRow + 1)));
                 }
 
                 if (StringUtils.isEmpty(var.getDataType())) {
-                    errorMessages.add(new Message("missing.field.datatype", Integer.toString(currentRow + 1)));
+                    errorMessages.add(new Message("error.missing.field.datatype", Integer.toString(currentRow + 1)));
                 }
 
                 if (StringUtils.isEmpty(var.getLabel())) {
-                    errorMessages.add(new Message("missing.field.label", Integer.toString(currentRow + 1)));
+                    errorMessages.add(new Message("error.missing.field.label", Integer.toString(currentRow + 1)));
                 }
 
                 measurementVariables.add(var);
