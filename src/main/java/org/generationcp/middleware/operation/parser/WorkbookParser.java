@@ -148,7 +148,7 @@ public class WorkbookParser {
         	if (title.trim().equals("")) throw new WorkbookParserException("Study Tile is blank");
         }
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-        
+        dateFormat.setLenient(false);
         if (startDate.length() > 8) throw new WorkbookParserException("Start Date should be in YYYYMMDD format");
         try {
 			if (!startDate.equals("")) dateFormat.parse(startDate);
