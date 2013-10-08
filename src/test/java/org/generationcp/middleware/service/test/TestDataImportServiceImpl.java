@@ -19,6 +19,7 @@ import java.util.List;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
+import org.generationcp.middleware.operation.parser.WorkbookParserException;
 import org.generationcp.middleware.service.ServiceFactory;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.utils.test.TestNurseryWorkbookUtil;
@@ -78,9 +79,9 @@ public class TestDataImportServiceImpl {
 	}
 	
 	@Test 
-	public void testParseWorkbook() throws MiddlewareQueryException{
+	public void testParseWorkbook() throws MiddlewareQueryException, WorkbookParserException{
 		//change based on path location of your template file
-		File file = new File("src/test/resources/Population114_Pheno_FB_1.xls");
+		File file = new File("D://Population114_Pheno_FB_3.xls");
 		Workbook workbook = dataImportService.parseWorkbook(file);
 		workbook.print(0);
 		
