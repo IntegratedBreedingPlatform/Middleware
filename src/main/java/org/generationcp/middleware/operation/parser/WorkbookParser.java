@@ -22,12 +22,14 @@ import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.util.Message;
 
 import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -50,10 +52,13 @@ public class WorkbookParser {
     private long locationId;
     private List<Message> errorMessages;
 
-    /*private static Integer currentSheet;
-	private static Integer currentRow;
-	private static long locationId;
-*/
+    //GCP-5815
+    private org.generationcp.middleware.domain.etl.Workbook currentWorkbook;
+    private final static String[] EXPECTED_VARIABLE_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE", "LABEL"};
+    private final static String[] EXPECTED_NURSERY_VARIATE_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "", "SAMPLE LEVEL"};
+    private final static String[] EXPECTED_NURSERY_CONSTANT_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE", "SAMPLE LEVEL"};
+    private final static String[] EXPECTED_NURSERY_FACTOR_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "NESTED IN", "LABEL"};
+
 
     /**
      * Parses given file and transforms it into a Workbook
@@ -62,9 +67,9 @@ public class WorkbookParser {
      * @return workbook
      * @throws WorkbookParserException
      */
-    public org.generationcp.middleware.domain.etl.Workbook parseFile(File file) throws WorkbookParserException {
+    public org.generationcp.middleware.domain.etl.Workbook parseFile(File file) throws WorkbookParserException, MiddlewareQueryException {
 
-        org.generationcp.middleware.domain.etl.Workbook workbook = new org.generationcp.middleware.domain.etl.Workbook();
+        currentWorkbook = new org.generationcp.middleware.domain.etl.Workbook();
         Workbook wb;
 
         currentRow = 0;
@@ -81,7 +86,7 @@ public class WorkbookParser {
                 Sheet sheet1 = wb.getSheetAt(DESCRIPTION_SHEET);
 
                 if (sheet1 == null || sheet1.getSheetName() == null || !(sheet1.getSheetName().equals("Description"))) {
-                    errorMessages.add(new Message("missing.sheet.description"));
+                    errorMessages.add(new Message("error.missing.sheet.description"));
                     /*throw new Error("Error with reading file uploaded. File doesn't have the first sheet - Description");*/
                 }
             } catch (Exception e) {
@@ -92,7 +97,7 @@ public class WorkbookParser {
                 Sheet sheet2 = wb.getSheetAt(OBSERVATION_SHEET);
 
                 if (sheet2 == null || sheet2.getSheetName() == null || !(sheet2.getSheetName().equals("Observation"))) {
-                    errorMessages.add(new Message("missing.sheet.observation"));
+                    errorMessages.add(new Message("error.missing.sheet.observation"));
                     /*throw new Error("Error with reading file uploaded. File doesn't have the second sheet - Observation");*/
                 }
             } catch (Exception e) {
@@ -104,19 +109,20 @@ public class WorkbookParser {
                 throw new WorkbookParserException(errorMessages);
             }
 
-            workbook.setStudyDetails(readStudyDetails(wb));
-            workbook.setConditions(readMeasurementVariables(wb, "CONDITION"));
-            workbook.setFactors(readMeasurementVariables(wb, "FACTOR"));
-            workbook.setConstants(readMeasurementVariables(wb, "CONSTANT"));
-            workbook.setVariates(readMeasurementVariables(wb, "VARIATE"));
+            currentWorkbook.setStudyDetails(readStudyDetails(wb));
+            currentWorkbook.setConditions(readMeasurementVariables(wb, "CONDITION"));
+            currentWorkbook.setFactors(readMeasurementVariables(wb, "FACTOR"));
+            currentWorkbook.setConstants(readMeasurementVariables(wb, "CONSTANT"));
+            currentWorkbook.setVariates(readMeasurementVariables(wb, "VARIATE"));
+
+            // check if required CONDITION is present for specific study types
+            if (currentWorkbook.getStudyDetails().getStudyType() != StudyType.N && locationId == 0) {
+                errorMessages.add(new Message("error.missing.trial.factor"));
+            }
 
             if (errorMessages.size() > 0) {
                 throw new WorkbookParserException(errorMessages);
             }
-
-            currentRow = 0;
-
-            workbook.setObservations(readObservations(wb, workbook));
 
         } catch (FileNotFoundException e) {
             throw new WorkbookParserException("File not found " + e.getMessage(), e);
@@ -124,7 +130,19 @@ public class WorkbookParser {
             throw new WorkbookParserException("Error accessing file " + e.getMessage(), e);
         }
 
-        return workbook;
+        return currentWorkbook;
+    }
+
+    public void parseAndSetObservationRows(File file, org.generationcp.middleware.domain.etl.Workbook workbook) throws WorkbookParserException {
+        try {
+            InputStream inp = new FileInputStream(file);
+            Workbook wb = new HSSFWorkbook(inp);
+
+            currentRow = 0;
+            workbook.setObservations(readObservations(wb, workbook));
+        } catch (IOException e) {
+            throw new WorkbookParserException("Error accessing file " + e.getMessage(), e);
+        }
     }
 
     private StudyDetails readStudyDetails(Workbook wb) throws WorkbookParserException {
@@ -134,39 +152,54 @@ public class WorkbookParser {
         String title = getCellStringValue(wb, DESCRIPTION_SHEET, STUDY_TITLE_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
         String pmKey = getCellStringValue(wb, DESCRIPTION_SHEET, PMKEY_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
         String objective = getCellStringValue(wb, DESCRIPTION_SHEET, OBJECTIVE_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
-        String startDate = getCellStringValue(wb, DESCRIPTION_SHEET, START_DATE_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
-        String endDate = getCellStringValue(wb, DESCRIPTION_SHEET, END_DATE_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
+        String startDateStr = getCellStringValue(wb, DESCRIPTION_SHEET, START_DATE_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
+        String endDateStr = getCellStringValue(wb, DESCRIPTION_SHEET, END_DATE_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
 
         //determine study type
         String studyType = getCellStringValue(wb, DESCRIPTION_SHEET, STUDY_TYPE_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
         StudyType studyTypeValue = StudyType.getStudyType(studyType);
-        
-        if (study != null){
-        	if (study.trim().equals("")) throw new WorkbookParserException("Study Name is blank");
+
+        if (study != null) {
+            if (study.trim().equals("")) errorMessages.add(new Message("error.blank.study.name"));
         }
         if (title != null) {
-        	if (title.trim().equals("")) throw new WorkbookParserException("Study Tile is blank");
+            if (title.trim().equals("")) errorMessages.add(new Message("error.blank.study.title"));
         }
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-        dateFormat.setLenient(false);
-        if (startDate.length() > 8) throw new WorkbookParserException("Start Date should be in YYYYMMDD format");
-        try {
-			if (!startDate.equals("")) dateFormat.parse(startDate);
-		} catch (ParseException e) {
-			throw new WorkbookParserException("Start Date should be in YYYYMMDD format");
-		}
-        if (endDate.length() > 8) throw new WorkbookParserException("End Date should be in YYYYMMDD format");
-        try {
-        	if (!endDate.equals("")) dateFormat.parse(endDate);
-		} catch (ParseException e) {
-			throw new WorkbookParserException("End Date should be in YYYYMMDD format");
-		}
-        
+
+        Date startDate = null;
+        Date endDate = null;
+
+        if (startDateStr.length() > 8) {
+            errorMessages.add(new Message("error.start.date.invalid"));
+        } else {
+            try {
+                if (!startDateStr.equals("")) startDate = dateFormat.parse(startDateStr);
+            } catch (ParseException e) {
+                errorMessages.add(new Message("error.start.date.invalid"));
+            }
+        }
+        if (endDateStr.length() > 8) {
+            errorMessages.add(new Message("error.end.date.invalid"));
+        } else {
+            try {
+                if (!endDateStr.equals("")) endDate = dateFormat.parse(endDateStr);
+            } catch (ParseException e) {
+                errorMessages.add(new Message("error.end.date.invalid"));
+            }
+
+        }
+
+        if (startDate != null && endDate != null && startDate.after(endDate)) {
+            errorMessages.add(new Message("error.start.is.after.end.date"));
+        }
+
+
         if (studyTypeValue == null) {
             studyTypeValue = StudyType.E;
         }
 
-        StudyDetails studyDetails = new StudyDetails(study, title, pmKey, objective, startDate, endDate, studyTypeValue, 0, null, null);
+        StudyDetails studyDetails = new StudyDetails(study, title, pmKey, objective, startDateStr, endDateStr, studyTypeValue, 0, null, null);
         
         /* for debugging purposes
         System.out.println("DEBUG | Study:" + study);
@@ -191,20 +224,27 @@ public class WorkbookParser {
 
             currentRow++; //Skip empty row
             //Check if headers are correct
-            if (!getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 0).toUpperCase().equals(name)
-                    || !getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 1).toUpperCase().equals("DESCRIPTION")
-                    || !getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 2).toUpperCase().equals("PROPERTY")
-                    || !getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 3).toUpperCase().equals("SCALE")
-                    || !getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 4).toUpperCase().equals("METHOD")
-                    || !getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 5).toUpperCase().equals("DATA TYPE")
-                    || !getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 6).toUpperCase().equals("VALUE")
-                    || !getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 7).toUpperCase().equals("LABEL")) {
-	            
-	        	/* for debugging purposes
-	            System.out.println("DEBUG | Invalid file on readMeasurementVariables");
-	            System.out.println(getCellStringValue(wb, currentSheet,currentRow,0).toUpperCase());
-	            */
 
+            // GCP-5815
+            String[] expectedHeaders = null;
+            if (currentWorkbook.getStudyDetails().getStudyType() != StudyType.N) {
+                expectedHeaders = EXPECTED_VARIABLE_HEADERS;
+
+
+            } else {
+                if (name.equals("FACTOR")) {
+                    expectedHeaders = EXPECTED_NURSERY_FACTOR_HEADERS;
+                } else if (name.equals("VARIATE")) {
+                    expectedHeaders = EXPECTED_NURSERY_VARIATE_HEADERS;
+                } else if (name.equals("CONSTANT")) {
+                    expectedHeaders = EXPECTED_NURSERY_CONSTANT_HEADERS;
+                } else {
+                    expectedHeaders = EXPECTED_VARIABLE_HEADERS;
+                }
+
+            }
+
+            if (!checkHeadersValid(wb, DESCRIPTION_SHEET, currentRow, expectedHeaders)) {
                 // TODO change this so that it's in line with exception strategy
                 throw new WorkbookParserException("Incorrect headers for " + name);
             }
@@ -224,31 +264,31 @@ public class WorkbookParser {
                         , getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 7));
 
                 if (StringUtils.isEmpty(var.getName())) {
-                    errorMessages.add(new Message("missing.field.name", Integer.toString(currentRow + 1)));
+                    errorMessages.add(new Message("error.missing.field.name", Integer.toString(currentRow + 1)));
                 }
 
                 if (StringUtils.isEmpty(var.getDescription())) {
-                    errorMessages.add(new Message("missing.field.description", Integer.toString(currentRow + 1)));
+                    errorMessages.add(new Message("error.missing.field.description", Integer.toString(currentRow + 1)));
                 }
 
                 if (StringUtils.isEmpty(var.getProperty())) {
-                    errorMessages.add(new Message("missing.field.property", Integer.toString(currentRow + 1)));
+                    errorMessages.add(new Message("error.missing.field.property", Integer.toString(currentRow + 1)));
                 }
 
                 if (StringUtils.isEmpty(var.getScale())) {
-                    errorMessages.add(new Message("missing.field.scale", Integer.toString(currentRow + 1)));
+                    errorMessages.add(new Message("error.missing.field.scale", Integer.toString(currentRow + 1)));
                 }
 
                 if (StringUtils.isEmpty(var.getMethod())) {
-                    errorMessages.add(new Message("missing.field.method", Integer.toString(currentRow + 1)));
+                    errorMessages.add(new Message("error.missing.field.method", Integer.toString(currentRow + 1)));
                 }
 
                 if (StringUtils.isEmpty(var.getDataType())) {
-                    errorMessages.add(new Message("missing.field.datatype", Integer.toString(currentRow + 1)));
+                    errorMessages.add(new Message("error.missing.field.datatype", Integer.toString(currentRow + 1)));
                 }
 
                 if (StringUtils.isEmpty(var.getLabel())) {
-                    errorMessages.add(new Message("missing.field.label", Integer.toString(currentRow + 1)));
+                    errorMessages.add(new Message("error.missing.field.label", Integer.toString(currentRow + 1)));
                 }
 
                 measurementVariables.add(var);
@@ -261,7 +301,7 @@ public class WorkbookParser {
                 }
 
 	        	/* for debugging purposes
-	            System.out.println("");
+                System.out.println("");
 	            System.out.println("DEBUG | "+name+":"+getCellStringValue(wb,currentSheet,currentRow,0));
 	            System.out.println("DEBUG | Description:"+getCellStringValue(wb,currentSheet,currentRow,1));
 	            System.out.println("DEBUG | Property:"+getCellStringValue(wb,currentSheet,currentRow,2));
@@ -280,7 +320,8 @@ public class WorkbookParser {
         }
     }
 
-    private List<MeasurementRow> readObservations(Workbook wb, org.generationcp.middleware.domain.etl.Workbook workbook) throws WorkbookParserException {
+    private List<MeasurementRow> readObservations(Workbook wb, org.generationcp.middleware.domain.etl.Workbook
+            workbook) throws WorkbookParserException {
         List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
         long stockId = 0;
 
@@ -336,6 +377,7 @@ public class WorkbookParser {
         }
     }
 
+
     private static String getCellStringValue(Workbook wb, Integer sheetNumber, Integer rowNumber, Integer columnNumber) {
         try {
             Sheet sheet = wb.getSheetAt(sheetNumber);
@@ -358,44 +400,30 @@ public class WorkbookParser {
         }
     }
 
+    // GCP-5815
+    private boolean checkHeadersValid(Workbook workbook, int sheetNumber, int row, String[] expectedHeaders) {
 
-/*
-// Refactored logic to StudyType, since it is more appropriate
-    private static StudyType getStudyTypeValue(String studyType) {
-        if (studyType.toUpperCase().equals(StudyType.N.getName().toUpperCase())) {
-            return StudyType.N;
-        } else if (studyType.toUpperCase().equals(StudyType.HB.getName().toUpperCase())) {
-            return StudyType.HB;
-        } else if (studyType.toUpperCase().equals(StudyType.PN.getName().toUpperCase())) {
-            return StudyType.PN;
-        } else if (studyType.toUpperCase().equals(StudyType.CN.getName().toUpperCase())) {
-            return StudyType.CN;
-        } else if (studyType.toUpperCase().equals(StudyType.OYT.getName().toUpperCase())) {
-            return StudyType.OYT;
-        } else if (studyType.toUpperCase().equals(StudyType.BON.getName().toUpperCase())) {
-            return StudyType.BON;
-        } else if (studyType.toUpperCase().equals(StudyType.T.getName().toUpperCase())) {
-            return StudyType.T;
-        } else if (studyType.toUpperCase().equals(StudyType.RYT.getName().toUpperCase())) {
-            return StudyType.RYT;
-        } else if (studyType.toUpperCase().equals(StudyType.OFT.getName().toUpperCase())) {
-            return StudyType.OFT;
-        } else if (studyType.toUpperCase().equals(StudyType.S.getName().toUpperCase())) {
-            return StudyType.S;
-        } else {
-            return StudyType.E;
+        for (int i = 0; i < expectedHeaders.length; i++) {
+            // a plus is added to the column count, since the first column is the name of the group; e.g., FACTOR, CONDITION, ETC
+            String cellValue = getCellStringValue(workbook, sheetNumber, row, i + 1);
+            if (!expectedHeaders[i].equals(cellValue)) {
+                return false;
+            }
         }
-    }*/
 
-    // TODO refactor calls to this method to use PoiUtil in IBPCommons
+        return true;
+    }
+
+
     private static Boolean rowIsEmpty(Workbook wb, Integer sheet, Integer row, int len) {
         Integer col = 0;
         for (col = 0; col < len; col++) {
-            if (getCellStringValue(wb, sheet, row, col) != "" && getCellStringValue(wb, sheet, row, col) != null) {
+            if (!getCellStringValue(wb, sheet, row, col).equals("") && getCellStringValue(wb, sheet, row, col) != null) {
                 return false;
             }
             col++;
         }
         return true;
     }
+
 }
