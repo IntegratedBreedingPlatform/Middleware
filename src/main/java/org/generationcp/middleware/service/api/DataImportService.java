@@ -16,7 +16,7 @@ import java.io.File;
 
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.operation.parser.WorkbookParserException;
+import org.generationcp.middleware.exceptions.WorkbookParserException;
 
 /**
  * This is the API for importing data to new schema. The methods here involve
@@ -40,5 +40,7 @@ public interface DataImportService {
 	 * @param file
 	 * @return workbook 
 	 */
-	Workbook parseWorkbook(File file) throws WorkbookParserException, MiddlewareQueryException;
+	Workbook parseWorkbook(File file) throws WorkbookParserException;
+
+    Workbook strictParseWorkbook(File file) throws WorkbookParserException, MiddlewareQueryException;
 }

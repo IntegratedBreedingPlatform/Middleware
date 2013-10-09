@@ -19,7 +19,7 @@ import java.util.List;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
-import org.generationcp.middleware.operation.parser.WorkbookParserException;
+import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.service.ServiceFactory;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.utils.test.TestNurseryWorkbookUtil;

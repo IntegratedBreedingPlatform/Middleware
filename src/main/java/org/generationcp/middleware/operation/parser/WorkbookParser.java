@@ -22,7 +22,7 @@ import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.StudyType;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.util.Message;
 
 import java.io.*;
@@ -54,7 +54,7 @@ public class WorkbookParser {
 
     //GCP-5815
     private org.generationcp.middleware.domain.etl.Workbook currentWorkbook;
-    private final static String[] EXPECTED_VARIABLE_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE", "LABEL"};
+    private final static String[] DEFAULT_EXPECTED_VARIABLE_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE", "LABEL"};
     private final static String[] EXPECTED_NURSERY_VARIATE_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "", "SAMPLE LEVEL"};
     private final static String[] EXPECTED_NURSERY_CONSTANT_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE", "SAMPLE LEVEL"};
     private final static String[] EXPECTED_NURSERY_FACTOR_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "NESTED IN", "LABEL"};
@@ -65,9 +65,9 @@ public class WorkbookParser {
      *
      * @param file
      * @return workbook
-     * @throws WorkbookParserException
+     * @throws org.generationcp.middleware.exceptions.WorkbookParserException
      */
-    public org.generationcp.middleware.domain.etl.Workbook parseFile(File file) throws WorkbookParserException, MiddlewareQueryException {
+    public org.generationcp.middleware.domain.etl.Workbook parseFile(File file, boolean performValidation) throws WorkbookParserException{
 
         currentWorkbook = new org.generationcp.middleware.domain.etl.Workbook();
         Workbook wb;
@@ -105,7 +105,7 @@ public class WorkbookParser {
             }
 
             // throw an exception here if
-            if (errorMessages.size() > 0) {
+            if (errorMessages.size() > 0 && performValidation)  {
                 throw new WorkbookParserException(errorMessages);
             }
 
@@ -120,7 +120,7 @@ public class WorkbookParser {
                 errorMessages.add(new Message("error.missing.trial.factor"));
             }
 
-            if (errorMessages.size() > 0) {
+            if (errorMessages.size() > 0 && performValidation) {
                 throw new WorkbookParserException(errorMessages);
             }
 
@@ -228,7 +228,7 @@ public class WorkbookParser {
             // GCP-5815
             String[] expectedHeaders = null;
             if (currentWorkbook.getStudyDetails().getStudyType() != StudyType.N) {
-                expectedHeaders = EXPECTED_VARIABLE_HEADERS;
+                expectedHeaders = DEFAULT_EXPECTED_VARIABLE_HEADERS;
 
 
             } else {
@@ -239,12 +239,16 @@ public class WorkbookParser {
                 } else if (name.equals("CONSTANT")) {
                     expectedHeaders = EXPECTED_NURSERY_CONSTANT_HEADERS;
                 } else {
-                    expectedHeaders = EXPECTED_VARIABLE_HEADERS;
+                    expectedHeaders = DEFAULT_EXPECTED_VARIABLE_HEADERS;
                 }
 
             }
+            boolean valid = checkHeadersValid(wb, DESCRIPTION_SHEET, currentRow, expectedHeaders);
+            if (!valid && expectedHeaders != DEFAULT_EXPECTED_VARIABLE_HEADERS) {
+                valid = checkHeadersValid(wb, DESCRIPTION_SHEET, currentRow, DEFAULT_EXPECTED_VARIABLE_HEADERS);
+            }
 
-            if (!checkHeadersValid(wb, DESCRIPTION_SHEET, currentRow, expectedHeaders)) {
+            if (! valid) {
                 // TODO change this so that it's in line with exception strategy
                 throw new WorkbookParserException("Incorrect headers for " + name);
             }
@@ -295,7 +299,7 @@ public class WorkbookParser {
 
                 //set locationId
                 if (name.equals("CONDITION") && getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 0).toUpperCase().equals("TRIAL")) {
-                    if (getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 6) != null && !getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 6).equals("")) {
+                    if (! StringUtils.isEmpty(getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 6)) ) {
                         locationId = Long.parseLong(getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 6));
                     }
                 }

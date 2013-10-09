@@ -1,4 +1,4 @@
-package org.generationcp.middleware.operation.parser;
+package org.generationcp.middleware.exceptions;
 
 import org.generationcp.middleware.util.Message;
 
