@@ -116,10 +116,10 @@ public class WorkbookParser {
             currentWorkbook.setConstants(readMeasurementVariables(wb, "CONSTANT"));
             currentWorkbook.setVariates(readMeasurementVariables(wb, "VARIATE"));
 
-            // check if required CONDITION is present for specific study types
+            /*// check if required CONDITION is present for specific study types
             if (currentWorkbook.getStudyDetails().getStudyType() != StudyType.N && locationId == 0) {
                 errorMessages.add(new Message("error.missing.trial.factor"));
-            }
+            }*/
 
             if (errorMessages.size() > 0 && performValidation) {
                 throw new WorkbookParserException(errorMessages);

@@ -15,6 +15,8 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
@@ -103,6 +105,10 @@ public class DataImportServiceImpl extends Service implements DataImportService 
             messages.add(new Message("error.entry.doesnt.exist"));
         }
 
+        if (!isTrialEnvironmentExists(workbook.getConditions())) {
+            messages.add(new Message("error.missing.trial.condition"));
+        }
+
         if (messages.size() > 0) {
             throw new WorkbookParserException(messages);
         }
@@ -128,21 +134,37 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         return id;
     }
 
-    private Boolean isEntryExists(java.util.List<MeasurementVariable> list) {
+    private Boolean isEntryExists(java.util.List<MeasurementVariable> list) throws MiddlewareQueryException {
         OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(getSessionProviderForLocal(), getSessionProviderForCentral());
         for (MeasurementVariable mvar : list) {
-            try {
-                StandardVariable svar = ontology.findStandardVariableByTraitScaleMethodNames(mvar.getProperty(), mvar.getScale(), mvar.getMethod());
-                if (svar != null) {
-                    if (svar.getStoredIn() != null) {
-                        if (svar.getStoredIn().getId() == 1041) {
+
+            StandardVariable svar = ontology.findStandardVariableByTraitScaleMethodNames(mvar.getProperty(), mvar.getScale(), mvar.getMethod());
+            if (svar != null) {
+                if (svar.getStoredIn() != null) {
+                    if (svar.getStoredIn().getId() == 1041) {
+                        return true;
+                    }
+                }
+            }
+
+        }
+        return false;
+    }
+
+    private Boolean isTrialEnvironmentExists(List<MeasurementVariable> list) throws MiddlewareQueryException {
+        OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(getSessionProviderForLocal(), getSessionProviderForCentral());
+        for (MeasurementVariable mvar : list) {
+
+            StandardVariable svar = ontology.findStandardVariableByTraitScaleMethodNames(mvar.getProperty(), mvar.getScale(), mvar.getMethod());
+            if (svar != null) {
+                if (svar.getStoredIn() != null) {
+
+                    if (PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(svar.getStoredIn().getId())) {
+                        if (!StringUtils.isEmpty(mvar.getValue())) {
                             return true;
                         }
                     }
                 }
-            } catch (MiddlewareQueryException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
             }
         }
         return false;
