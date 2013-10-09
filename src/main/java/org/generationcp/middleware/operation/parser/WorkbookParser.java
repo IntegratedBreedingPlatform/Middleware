@@ -166,7 +166,7 @@ public class WorkbookParser {
             if (title.trim().equals("")) errorMessages.add(new Message("error.blank.study.title"));
         }
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-
+        dateFormat.setLenient(false);
         Date startDate = null;
         Date endDate = null;
 
