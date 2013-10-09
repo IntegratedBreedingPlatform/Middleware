@@ -13,10 +13,14 @@ package org.generationcp.middleware.operation.parser;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -59,7 +63,27 @@ public class WorkbookParser {
     private final static String[] EXPECTED_CONSTANT_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE", "SAMPLE LEVEL"};
     private final static String[] EXPECTED_FACTOR_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "NESTED IN", "LABEL"};
 
-
+    /**
+     * Added handling for parsing the file if its xls or xlsx
+     * @param file
+     * @return
+     * @throws IOException
+     */
+    private Workbook getCorrectWorkbook(File file) throws IOException{
+        InputStream inp = new FileInputStream(file);
+        InputStream inp2 = new FileInputStream(file);
+        Workbook wb;
+        try{
+            wb = new HSSFWorkbook(inp);
+        }catch (OfficeXmlFileException ee) {
+            // TODO: handle exception
+            wb = new XSSFWorkbook(inp2);
+        }finally{
+            inp.close();
+            inp2.close();
+        }
+        return wb;
+    }
     /**
      * Parses given file and transforms it into a Workbook
      *
@@ -79,8 +103,8 @@ public class WorkbookParser {
 
         try {
 
-            InputStream inp = new FileInputStream(file);
-            wb = new HSSFWorkbook(inp);
+            
+            wb = getCorrectWorkbook(file);
 
             //validations
             try {
@@ -129,15 +153,16 @@ public class WorkbookParser {
             throw new WorkbookParserException("File not found " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WorkbookParserException("Error accessing file " + e.getMessage(), e);
-        }
+        } 
 
         return currentWorkbook;
     }
 
     public void parseAndSetObservationRows(File file, org.generationcp.middleware.domain.etl.Workbook workbook) throws WorkbookParserException {
         try {
-            InputStream inp = new FileInputStream(file);
-            Workbook wb = new HSSFWorkbook(inp);
+            //InputStream inp = new FileInputStream(file);
+            //Workbook wb = new HSSFWorkbook(inp);
+            Workbook wb = getCorrectWorkbook(file);
 
             currentRow = 0;
             workbook.setObservations(readObservations(wb, workbook));
