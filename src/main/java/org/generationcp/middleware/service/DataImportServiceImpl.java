@@ -160,9 +160,11 @@ public class DataImportServiceImpl extends Service implements DataImportService 
                 if (svar.getStoredIn() != null) {
 
                     if (PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(svar.getStoredIn().getId())) {
-                        if (!StringUtils.isEmpty(mvar.getValue())) {
+
+                        // TODO for verification with Jeff / Mae
+                        /*if (!StringUtils.isEmpty(mvar.getValue())) {*/
                             return true;
-                        }
+                        /*}*/
                     }
                 }
             }
