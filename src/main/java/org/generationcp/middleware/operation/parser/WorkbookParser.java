@@ -170,7 +170,7 @@ public class WorkbookParser {
         Date startDate = null;
         Date endDate = null;
 
-        if (startDateStr.length() > 8) {
+        if (startDateStr.length() != 0 && startDateStr.length() != 8) {
             errorMessages.add(new Message("error.start.date.invalid"));
         } else {
             try {
@@ -179,7 +179,7 @@ public class WorkbookParser {
                 errorMessages.add(new Message("error.start.date.invalid"));
             }
         }
-        if (endDateStr.length() > 8) {
+        if (endDateStr.length() != 0 && endDateStr.length() != 8) {
             errorMessages.add(new Message("error.end.date.invalid"));
         } else {
             try {
