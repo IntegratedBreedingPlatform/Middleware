@@ -53,7 +53,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "		AND pr.object_project_id = :folderId "
 			+ "		AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId()
 			+ "     	AND pp.project_id = subject.project_id AND pp.value = " 
-			+ "         (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) "
+			+ "         "+TermId.DELETED_STUDY.getId()+") "
 			+ "ORDER BY name "
 			;
 
@@ -66,9 +66,21 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "        AND pr.object_project_id = :folderId "
 			+ "		AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId()
 			+ "     	AND pp.project_id = p.project_id AND pp.value = " 
-			+ "         (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) "
+			+ "         "+TermId.DELETED_STUDY.getId()+") "
 			+ "ORDER BY p.name "
 			;
+	
+	private static final String GET_ROOT_FOLDERS =
+			"SELECT DISTINCT p.project_id, p.name, p.description " 
+			+ " FROM project p "
+		  	+ " INNER JOIN project_relationship pr ON pr.subject_project_id = p.project_id " 
+		    + " WHERE pr.type_id = " + TermId.HAS_PARENT_FOLDER.getId() 
+		    + " AND pr.object_project_id = " + DmsProject.SYSTEM_FOLDER_ID  
+		    + " AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId()
+			+ "     	AND pp.project_id = p.project_id AND pp.value = " 
+			+ "         "+TermId.DELETED_STUDY.getId()+") "
+		    + " ORDER BY p.project_id ";
+		 
 
 	@SuppressWarnings("unchecked")
 	public List<FolderReference> getRootFolders() throws MiddlewareQueryException{
@@ -80,24 +92,17 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		 * 		JOIN p.relatedTos pr 
 		 * WHERE pr.typeId = CVTermId.HAS_PARENT_FOLDER.getId() 
 		 * 		 AND pr.objectProject.projectId = " + DmsProject.SYSTEM_FOLDER_ID  
-		 * ORDER BY name 
+		 * 		 AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId()
+		 *    	 AND pp.project_id = p.project_id AND pp.value = " 
+	     *         "+TermId.DELETED_STUDY.getId()+") "	
+		 * ORDER BY p.project_id 
 		 */
 		
 		try {
-			Criteria criteria = getSession().createCriteria(getPersistentClass());
-			criteria.createAlias("relatedTos", "pr");
-			criteria.add(Restrictions.eq("pr.typeId", TermId.HAS_PARENT_FOLDER.getId()));
-			criteria.add(Restrictions.eq("pr.objectProject.projectId", DmsProject.SYSTEM_FOLDER_ID));
 			
-			ProjectionList projectionList = Projections.projectionList();
-			projectionList.add(Projections.property("projectId"));
-			projectionList.add(Projections.property("name"));
-			projectionList.add(Projections.property("description"));
-			criteria.setProjection(projectionList);
+			Query query = getSession().createSQLQuery(GET_ROOT_FOLDERS);
+			List<Object[]> list =  query.list();
 			
-			criteria.addOrder(Order.asc("projectId"));
-			
-			List<Object[]> list = criteria.list();
 			if (list != null && list.size() > 0) {
 				for (Object[] row : list){
 					Integer id = (Integer)row[0]; //project.id

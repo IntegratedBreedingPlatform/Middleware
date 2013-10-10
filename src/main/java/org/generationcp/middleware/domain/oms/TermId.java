@@ -128,6 +128,8 @@ public enum TermId {
 	
 	//Main Factor (Variable)
 	, TRIAL_INSTANCE_FACTOR(8170)
+	
+	, DELETED_STUDY(12990)
 	;
 	
 	private final int id;
