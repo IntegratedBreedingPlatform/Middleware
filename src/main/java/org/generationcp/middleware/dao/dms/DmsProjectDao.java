@@ -53,7 +53,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "		AND pr.object_project_id = :folderId "
 			+ "		AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId()
 			+ "     	AND pp.project_id = subject.project_id AND pp.value = " 
-			+ "         (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) "
+			+ "         "+TermId.DELETED_STUDY.getId()+") "
 			+ "ORDER BY name "
 			;
 
@@ -66,7 +66,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "        AND pr.object_project_id = :folderId "
 			+ "		AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId()
 			+ "     	AND pp.project_id = p.project_id AND pp.value = " 
-			+ "         (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) "
+			+ "         "+TermId.DELETED_STUDY.getId()+") "
 			+ "ORDER BY p.name "
 			;
 
