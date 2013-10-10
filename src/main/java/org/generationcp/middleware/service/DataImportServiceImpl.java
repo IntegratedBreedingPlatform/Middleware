@@ -105,7 +105,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
             messages.add(new Message("error.entry.doesnt.exist"));
         }
 
-        if (!isTrialEnvironmentExists(workbook.getConditions())) {
+        if (!workbook.isNursery() && !isTrialEnvironmentExists(workbook.getConditions())) {
             messages.add(new Message("error.missing.trial.condition"));
         }
 
@@ -160,11 +160,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
                 if (svar.getStoredIn() != null) {
 
                     if (PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(svar.getStoredIn().getId())) {
-
-                        // TODO for verification with Jeff / Mae
-                        /*if (!StringUtils.isEmpty(mvar.getValue())) {*/
                             return true;
-                        /*}*/
                     }
                 }
             }
