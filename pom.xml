@@ -145,14 +145,23 @@
 	</dependencies>
 
 	<build>
-		<pluginManagement>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>**</include>
+                </includes>
+            </testResource>
+        </testResources>
+
 		<plugins>
 			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<version>1.7</version>
 				<executions>
 					<execution>
-						<phase>compile</phase>
+						<phase>generate-resources</phase>
 						<configuration>
 							<tasks>
 								<copy todir="src/main/resources" overwrite="true">
@@ -209,6 +218,5 @@
 				<version>2.8</version>
 			</plugin>
 		</plugins>
-		</pluginManagement>
 	</build>
 </project> 
