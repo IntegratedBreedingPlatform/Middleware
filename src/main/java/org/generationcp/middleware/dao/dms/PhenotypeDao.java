@@ -36,6 +36,8 @@ import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link Phenotype}.
@@ -43,6 +45,8 @@ import org.hibernate.SQLQuery;
  */
 @SuppressWarnings("unchecked")
 public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(PhenotypeDao.class);
 	
 	public List<NumericTraitInfo>  getNumericTraitInfoList(List<Integer> environmentIds, List<Integer> numericVariableIds) throws MiddlewareQueryException{
         List<NumericTraitInfo> numericTraitInfoList = new ArrayList<NumericTraitInfo>();
@@ -495,7 +499,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
         }
     	sb.append(") ");
     	sb.append("ORDER BY p.observable_id, s.dbxref_id, e.nd_geolocation_id, p.value ");
-    	//System.out.println(sb.toString());
+    	//LOG.debug(sb.toString());
         try {
             SQLQuery query = getSession().createSQLQuery(sb.toString());
             setStartAndNumOfRows(query, start, numOfRows);
@@ -534,7 +538,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			queryString.append("INNER JOIN stock s ON s.stock_id = es.stock_id ");
 			queryString.append("WHERE p.observable_id = :traitId AND e.nd_geolocation_id IN ( :environmentIds )");
 			
-			System.out.println(queryString.toString());
+			LOG.debug(queryString.toString());
 			 
 			 SQLQuery query = getSession().createSQLQuery(queryString.toString());
 			 query.setParameter("traitId", traitId)

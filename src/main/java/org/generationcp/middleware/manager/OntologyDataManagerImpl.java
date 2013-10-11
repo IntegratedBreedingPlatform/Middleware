@@ -31,9 +31,13 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class OntologyDataManagerImpl extends DataManager implements OntologyDataManager {
 	
+    private static final Logger LOG = LoggerFactory.getLogger(OntologyDataManagerImpl.class);
+
 	public OntologyDataManagerImpl() { 		
 	}
 
@@ -63,22 +67,23 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         Transaction trans = null;
  
         try {
+            
             trans = session.beginTransaction();
             //check if scale, property and method exists first
             Term scale = findTermByName(stdVariable.getScale().getName(),CvId.SCALES);
             if(scale==null) {
             	stdVariable.setScale(getTermSaver().save(stdVariable.getScale().getName(), stdVariable.getScale().getDefinition(), CvId.SCALES));
-            	System.out.println("new scale with id = " + stdVariable.getScale().getId());
+            	LOG.debug("new scale with id = " + stdVariable.getScale().getId());
             }
             Term property = findTermByName(stdVariable.getProperty().getName(),CvId.PROPERTIES);
             if(property==null) {
             	stdVariable.setProperty(getTermSaver().save(stdVariable.getProperty().getName(), stdVariable.getProperty().getDefinition(), CvId.PROPERTIES));
-            	System.out.println("new property with id = " + stdVariable.getProperty().getId());
+            	LOG.debug("new property with id = " + stdVariable.getProperty().getId());
             }
             Term method = findTermByName(stdVariable.getMethod().getName(),CvId.METHODS);
             if(method==null) {
             	stdVariable.setMethod(getTermSaver().save(stdVariable.getMethod().getName(), stdVariable.getMethod().getDefinition(), CvId.METHODS));
-            	System.out.println("new method with id = " + stdVariable.getMethod().getId());
+            	LOG.debug("new method with id = " + stdVariable.getMethod().getId());
             }
             if(findStandardVariableByTraitScaleMethodNames(stdVariable.getProperty().getName(),
             		stdVariable.getScale().getName(),stdVariable.getMethod().getName())==null) {

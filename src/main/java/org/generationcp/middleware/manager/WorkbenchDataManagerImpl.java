@@ -316,7 +316,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     }
     
     private void logAndThrowException(String message, Exception e) throws MiddlewareQueryException{
-        LOG.error(message + e.getMessage() + "\n" + e.getStackTrace());
+        LOG.error(e.getMessage(), e);
         throw new MiddlewareQueryException(message + e.getMessage(), e);
     }
     

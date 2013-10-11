@@ -855,7 +855,7 @@ public abstract class DataManager extends DatabaseBroker{
      * @throws MiddlewareQueryException
      */
     protected void logAndThrowException(String message, Throwable e) throws MiddlewareQueryException {
-        LOG.error(message + e.getMessage() + "\n" + e.getStackTrace());
+        LOG.error(e.getMessage(), e);
         throw new MiddlewareQueryException(message + e.getMessage(), e);
     }
 
@@ -870,7 +870,7 @@ public abstract class DataManager extends DatabaseBroker{
      * @throws MiddlewareQueryException
      */
     protected void logAndThrowException(String message, Throwable e, Logger log) throws MiddlewareQueryException {
-        log.error(message + e.getMessage() + "\n" + e.getStackTrace());
+        LOG.error(e.getMessage(), e);
         throw new MiddlewareQueryException(message + e.getMessage(), e);
     }
 

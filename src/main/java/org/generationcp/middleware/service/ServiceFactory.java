@@ -97,13 +97,13 @@ public class ServiceFactory implements Serializable {
             
             // FIXME: Do we really want to hide these exceptions?
         } catch (URISyntaxException e) {
-            LOG.error(e.toString() + "\n" + e.getStackTrace());
+            LOG.error(e.getMessage(), e);
         } catch (HibernateException e) {
-            LOG.error(e.toString() + "\n" + e.getStackTrace());
+            LOG.error(e.getMessage(), e);
         } catch (ConfigException e) {
-            LOG.error(e.toString() + "\n" + e.getStackTrace());
+            LOG.error(e.getMessage(), e);
         } catch (IOException e) {
-            LOG.error(e.toString() + "\n" + e.getStackTrace());
+            LOG.error(e.getMessage(), e);
         }
 
     }

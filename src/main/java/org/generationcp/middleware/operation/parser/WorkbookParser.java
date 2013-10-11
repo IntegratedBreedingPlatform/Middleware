@@ -28,6 +28,8 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.util.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.text.ParseException;
@@ -38,6 +40,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class WorkbookParser {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(WorkbookParser.class);
 
     public static final int DESCRIPTION_SHEET = 0;
     public static final int OBSERVATION_SHEET = 1;
@@ -228,13 +232,13 @@ public class WorkbookParser {
         StudyDetails studyDetails = new StudyDetails(study, title, pmKey, objective, startDateStr, endDateStr, studyTypeValue, 0, null, null);
         
         /* for debugging purposes
-        System.out.println("DEBUG | Study:" + study);
-        System.out.println("DEBUG | Title:" + title);
-        System.out.println("DEBUG | PMKey:" + pmKey);
-        System.out.println("DEBUG | Objective:" + objective);
-        System.out.println("DEBUG | Start Date:" + startDate.toString());
-        System.out.println("DEBUG | End Date:" + endDate.toString());
-        System.out.println("DEBUG | Study Type:" + studyType);
+        LOG.debug("Study:" + study);
+        LOG.debug("Title:" + title);
+        LOG.debug("PMKey:" + pmKey);
+        LOG.debug("Objective:" + objective);
+        LOG.debug("Start Date:" + startDate.toString());
+        LOG.debug("End Date:" + endDate.toString());
+        LOG.debug("Study Type:" + studyType);
         */
 
         while (!rowIsEmpty(wb, DESCRIPTION_SHEET, currentRow, 8)) {
@@ -326,15 +330,15 @@ public class WorkbookParser {
                 }
 
 	        	/* for debugging purposes
-                System.out.println("");
-	            System.out.println("DEBUG | "+name+":"+getCellStringValue(wb,currentSheet,currentRow,0));
-	            System.out.println("DEBUG | Description:"+getCellStringValue(wb,currentSheet,currentRow,1));
-	            System.out.println("DEBUG | Property:"+getCellStringValue(wb,currentSheet,currentRow,2));
-	            System.out.println("DEBUG | Scale:"+getCellStringValue(wb,currentSheet,currentRow,3));
-	            System.out.println("DEBUG | Method:"+getCellStringValue(wb,currentSheet,currentRow,4));
-	            System.out.println("DEBUG | Data Type:"+getCellStringValue(wb,currentSheet,currentRow,5));
-	            System.out.println("DEBUG | Value:"+getCellStringValue(wb,currentSheet,currentRow,6));
-	            System.out.println("DEBUG | Label:"+getCellStringValue(wb,currentSheet,currentRow,7));
+                LOG.debug("");
+	            LOG.debug(""+name+":"+getCellStringValue(wb,currentSheet,currentRow,0));
+	            LOG.debug("Description:"+getCellStringValue(wb,currentSheet,currentRow,1));
+	            LOG.debug("Property:"+getCellStringValue(wb,currentSheet,currentRow,2));
+	            LOG.debug("Scale:"+getCellStringValue(wb,currentSheet,currentRow,3));
+	            LOG.debug("Method:"+getCellStringValue(wb,currentSheet,currentRow,4));
+	            LOG.debug("Data Type:"+getCellStringValue(wb,currentSheet,currentRow,5));
+	            LOG.debug("Value:"+getCellStringValue(wb,currentSheet,currentRow,6));
+	            LOG.debug("Label:"+getCellStringValue(wb,currentSheet,currentRow,7));
 				*/
                 currentRow++;
             }
@@ -387,7 +391,7 @@ public class WorkbookParser {
 
                     // TODO verify usefulness / validity of next statement.
                     if (measurementDataLabel.get(col).equals("GYLD")) {
-                        System.out.println(getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col));
+                        LOG.debug(getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col));
                     }
                     measurementData.add(new MeasurementData(measurementDataLabel.get(col), getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col)));
                 }

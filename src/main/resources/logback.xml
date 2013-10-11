@@ -6,7 +6,7 @@
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%method [%line] - %msg%n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger.%method \(%line\) - %msg%n</pattern>
         </encoder>
     </appender>
   
@@ -21,12 +21,18 @@
         <prudent>true</prudent>
         <append>true</append>
         
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+		    <level>INFO</level>
+		    <onMatch>ACCEPT</onMatch>
+		    <onMismatch>DENY</onMismatch>
+		</filter>
+        
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${log-dir}/%d{yyyy/MM}/system-log.${HOSTNAME}.%d{dd}.log</fileNamePattern>
         </rollingPolicy>
         
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%method [%line] - %msg%n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger.%method \(%line\) - %msg%n</pattern>
         </encoder>
     </appender>
     
