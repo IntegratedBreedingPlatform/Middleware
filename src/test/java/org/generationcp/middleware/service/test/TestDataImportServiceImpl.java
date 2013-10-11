@@ -73,8 +73,8 @@ public class TestDataImportServiceImpl {
         for (Workbook workbook : workbooks) {
             //comment these out if you want to let the system generate the dataset names.
 
-                workbook.getStudyDetails().setTrialDatasetName("MyTrial_" + workbook.getStudyDetails().getStudyName());
-    			workbook.getStudyDetails().setMeasurementDatasetName("MyMeasurement_" + workbook.getStudyDetails().getStudyName());
+            workbook.getStudyDetails().setTrialDatasetName("MyTrial_" + workbook.getStudyDetails().getStudyName());
+            workbook.getStudyDetails().setMeasurementDatasetName("MyMeasurement_" + workbook.getStudyDetails().getStudyName());
 
             id = dataImportService.saveDataset(workbook);
         }
@@ -118,87 +118,71 @@ public class TestDataImportServiceImpl {
 
     @Test
     public void testParseWorkbookWrongDescriptionSheet() {
-        String fileLocation = this.getClass().getClassLoader().getResource("org/generationcp/middleware/service/test/GCP5808WrongDescriptionSheetName.xls").getFile();
-        try {
-            File file = new File(fileLocation);
-            Workbook workbook = dataImportService.strictParseWorkbook(file);
-        } catch (WorkbookParserException e) {
-            List<Message> messages = e.getErrorMessages();
-
-            assertNotNull(messages);
-            assertTrue(messages.size() == 1);
-            assertEquals("error.missing.sheet.description", messages.get(0).getMessageKey());
-            return;
-        } catch (MiddlewareQueryException e) {
-            fail("Unexpected exception : " + e.getMessage());
-        }
-
-        fail("Unable to detect wrong description sheet");
+        testFileAgainstExpectedErrorCondition("org/generationcp/middleware/service/test/GCP5808WrongDescriptionSheetName.xls", "error.missing.sheet.description", "Unable to detect wrong description sheet");
     }
 
     @Test
     public void testParseWorkbookWrongObservationSheet() {
-        String fileLocation = this.getClass().getClassLoader().getResource("org/generationcp/middleware/service/test/GCP5808WrongObservationSheetName.xls").getFile();
-        try {
-            File file = new File(fileLocation);
-            Workbook workbook = dataImportService.strictParseWorkbook(file);
-        } catch (WorkbookParserException e) {
-            List<Message> messages = e.getErrorMessages();
-
-            assertNotNull(messages);
-            assertTrue(messages.size() == 1);
-            assertEquals("error.missing.sheet.observation", messages.get(0).getMessageKey());
-            return;
-        } catch (MiddlewareQueryException e) {
-            fail("Unexpected exception : " + e.getMessage());
-        }
-
-        fail("Unable to detect wrong observation sheet");
+        testFileAgainstExpectedErrorCondition("org/generationcp/middleware/service/test/GCP5808WrongObservationSheetName.xls", "error.missing.sheet.observation", "Unable to detect wrong observation sheet");
     }
 
     @Test
     public void testParseWorkbookWithEntryWrongPMS() {
-        String fileLocation = this.getClass().getClassLoader().getResource("org/generationcp/middleware/service/test/GCP5800ScenarioWithEntryWrongPSM.xls").getFile();
-        try {
-            File file = new File(fileLocation);
-            Workbook workbook = dataImportService.strictParseWorkbook(file);
-        } catch (WorkbookParserException e) {
-            List<Message> messages = e.getErrorMessages();
-
-            assertNotNull(messages);
-            assertTrue(messages.size() == 1);
-            assertEquals("error.entry.doesnt.exist", messages.get(0).getMessageKey());
-            return;
-        } catch (MiddlewareQueryException e) {
-            fail("Unexpected exception : " + e.getMessage());
-        }
-
-        fail("Unable to detect invalid entry");
+        testFileAgainstExpectedErrorCondition("org/generationcp/middleware/service/test/GCP5800ScenarioWithEntryWrongPSM.xls", "error.entry.doesnt.exist", "Unable to detect invalid entry");
     }
 
     @Test
     public void testParseWorkbookNoEntry() {
-        String fileLocation = this.getClass().getClassLoader().getResource("org/generationcp/middleware/service/test/GCP5800ScenarioNoEntry.xls").getFile();
-        try {
-            File file = new File(fileLocation);
-            dataImportService.strictParseWorkbook(file);
-        } catch (WorkbookParserException e) {
-            List<Message> messages = e.getErrorMessages();
-
-            assertNotNull(messages);
-            assertTrue(messages.size() == 1);
-            assertEquals("error.entry.doesnt.exist", messages.get(0).getMessageKey());
-            return;
-        } catch (MiddlewareQueryException e) {
-            fail("Unexpected exception : " + e.getMessage());
-        }
-
-        fail("Unable to detect invalid entry");
+        testFileAgainstExpectedErrorCondition("org/generationcp/middleware/service/test/GCP5800ScenarioNoEntry.xls", "error.entry.doesnt.exist", "Unable to detect invalid entry");
     }
 
     @Test
     public void testParseWorkbookWithEntryWrongCategory() {
-        String fileLocation = this.getClass().getClassLoader().getResource("org/generationcp/middleware/service/test/GCP5800ScenarioWithEntryWrongCategory.xls").getFile();
+        testFileAgainstExpectedErrorCondition("org/generationcp/middleware/service/test/GCP5800ScenarioWithEntryWrongCategory.xls", "error.entry.doesnt.exist", "Unable to detect invalid entry");
+    }
+
+    @Test
+    public void testParseWorkbookWithNoTrialNonNursery() {
+        testFileAgainstExpectedErrorCondition("org/generationcp/middleware/service/test/GCP5799NonNurseryWorkbookNoTrialEnvironment.xls", "error.missing.trial.condition", "Unable to detect missing trial condition");
+    }
+
+    @Test
+    public void testParseWorkbookWithNoTrialNursery() {
+        String fileLocation = this.getClass().getClassLoader().getResource("org/generationcp/middleware/service/test/GCP5799NurseryWorkbookNoTrialEnvironment.xls").getFile();
+        File file = new File(fileLocation);
+        try {
+            dataImportService.strictParseWorkbook(file);
+        } catch (WorkbookParserException e) {
+            fail("Unable to correctly parse Nursery workbook with no trial condition");
+        } catch (MiddlewareQueryException e) {
+            fail("Unexpected exception : " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testParseWorkbookWithEmptyFields() {
+        String fileLocation = this.getClass().getClassLoader().getResource("org/generationcp/middleware/service/test/GCP5802SevenFieldsMissing.xls").getFile();
+        File file = new File(fileLocation);
+        try {
+            dataImportService.strictParseWorkbook(file);
+        } catch (WorkbookParserException e) {
+
+            List<Message> messages = e.getErrorMessages();
+
+            assertNotNull(messages);
+            // There should be 7 error messages to correspond with the 7 missing fields in the file
+            assertTrue(messages.size() == 7);
+
+            return;
+        } catch (MiddlewareQueryException e) {
+            fail("Unexpected exception : " + e.getMessage());
+        }
+
+        fail("Unable to detect empty fields");
+    }
+
+    protected void testFileAgainstExpectedErrorCondition(String qualifiedFilename, String expectedErrorKey, String errorMessage) {
+        String fileLocation = this.getClass().getClassLoader().getResource(qualifiedFilename).getFile();
         try {
             File file = new File(fileLocation);
             dataImportService.strictParseWorkbook(file);
@@ -207,13 +191,13 @@ public class TestDataImportServiceImpl {
 
             assertNotNull(messages);
             assertTrue(messages.size() == 1);
-            assertEquals("error.entry.doesnt.exist", messages.get(0).getMessageKey());
+            assertEquals(expectedErrorKey, messages.get(0).getMessageKey());
             return;
         } catch (MiddlewareQueryException e) {
             fail("Unexpected exception : " + e.getMessage());
         }
 
-        fail("Unable to detect invalid entry");
+        fail(errorMessage);
     }
 
 
