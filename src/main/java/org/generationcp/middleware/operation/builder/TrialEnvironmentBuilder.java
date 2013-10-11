@@ -38,9 +38,13 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TrialEnvironmentBuilder extends Builder {
 
+    private static final Logger LOG = LoggerFactory.getLogger(TrialEnvironmentBuilder.class);
+    
 	public TrialEnvironmentBuilder(
 			HibernateSessionProvider sessionProviderForLocal,
 			HibernateSessionProvider sessionProviderForCentral) {
@@ -171,7 +175,7 @@ public class TrialEnvironmentBuilder extends Builder {
 				ids.add(property.getId());
 			}
 		}
-		System.out.println("IDS ARE " + ids);
+		LOG.debug("IDS ARE " + ids);
 		List<CVTerm> terms = getCvTermDao().getByIds(new ArrayList<Integer>(ids));
 		for (TrialEnvironmentProperty property : localProperties) {
 			int index = properties.indexOf(property);

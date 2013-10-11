@@ -27,7 +27,7 @@ public abstract class Service extends DatabaseBroker {
 	}
 	
     protected void logAndThrowException(String message, Throwable e, Logger log) throws MiddlewareQueryException {
-        log.error(message + e.getMessage() + "\n" + e.getStackTrace());
+        log.error(e.getMessage(), e);
         throw new MiddlewareQueryException(message + e.getMessage(), e);
     }
 

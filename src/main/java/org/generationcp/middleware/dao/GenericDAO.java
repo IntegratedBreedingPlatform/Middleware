@@ -54,7 +54,7 @@ public abstract class GenericDAO<T, ID extends Serializable> {
     }
     
     protected void logAndThrowException(String message, Throwable e) throws MiddlewareQueryException{
-        LOG.error(message);
+        LOG.error(message, e);
         throw new MiddlewareQueryException(message, e);
     }
 

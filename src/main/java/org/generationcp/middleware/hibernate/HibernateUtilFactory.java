@@ -60,16 +60,16 @@ public abstract class HibernateUtilFactory {
             return new HibernateUtil(localHost, localPort, localDbname, localUsername, localPassword);
         }
         catch (URISyntaxException e) {
-            LOG.error(e.toString() + "\n" + e.getStackTrace());
+            LOG.error(e.getMessage(), e);
         }
         catch (HibernateException e) {
-            LOG.error(e.toString() + "\n" + e.getStackTrace());
+            LOG.error(e.getMessage(), e);
         }
         catch (ConfigException e) {
-            LOG.error(e.toString() + "\n" + e.getStackTrace());
+            LOG.error(e.getMessage(), e);
         }
         catch (IOException e) {
-            LOG.error(e.toString() + "\n" + e.getStackTrace());
+            LOG.error(e.getMessage(), e);
         }
 
         return null;
@@ -100,16 +100,16 @@ public abstract class HibernateUtilFactory {
             return new HibernateUtil(centralHost, centralPort, centralDbname, centralUsername, centralPassword);
         }
         catch (URISyntaxException e) {
-            LOG.error(e.toString() + "\n" + e.getStackTrace());
+            LOG.error(e.getMessage(), e);
         }
         catch (HibernateException e) {
-            LOG.error(e.toString() + "\n" + e.getStackTrace());
+            LOG.error(e.getMessage(), e);
         }
         catch (ConfigException e) {
-            LOG.error(e.toString() + "\n" + e.getStackTrace());
+            LOG.error(e.getMessage(), e);
         }
         catch (IOException e) {
-            LOG.error(e.toString() + "\n" + e.getStackTrace());
+            LOG.error(e.getMessage(), e);
         }
         
         return null;
