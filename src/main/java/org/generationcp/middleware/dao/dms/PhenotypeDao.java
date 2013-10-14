@@ -536,7 +536,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			queryString.append("INNER JOIN location l ON l.locid = gp.value ");
 			queryString.append("INNER JOIN nd_experiment_stock es ON es.nd_experiment_id = e.nd_experiment_id ");
 			queryString.append("INNER JOIN stock s ON s.stock_id = es.stock_id ");
-			queryString.append("WHERE p.observable_id = :traitId AND e.nd_geolocation_id IN ( :environmentIds )");
+			queryString.append("WHERE p.observable_id = :traitId AND e.nd_geolocation_id IN ( :environmentIds ) ");
+			queryString.append("ORDER BY s.dbxref_id ");
 			
 			LOG.debug(queryString.toString());
 			 
