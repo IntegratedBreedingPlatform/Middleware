@@ -69,7 +69,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
             query.setParameterList("environmentIds", environmentIds);
             query.setParameterList("numericVariableIds", numericVariableIds);
             
-            List<Object[]> list =  query.list();
+            List<Object[]> list = new ArrayList<Object[]>();
+
+            if(environmentIds.size()>0 && numericVariableIds.size()>0)
+                list = query.list();
               
             for (Object[] row : list){
                 Integer id = (Integer) row[0]; 
@@ -110,7 +113,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
             query.setParameterList("environmentIds", environmentIds);
             query.setParameterList("variableIds", variableIds);
             
-            List<Object[]> list =  query.list();
+            List<Object[]> list = new ArrayList<Object[]>();
+
+            if(environmentIds.size()>0 && variableIds.size()>0)
+                list = query.list();
               
             for (Object[] row : list){
                 Integer id = (Integer) row[0]; 
@@ -187,7 +193,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
             query.setParameterList("environmentIds", environmentIds);
             query.setParameterList("traitIds", traitIds);
 
-            List<Object[]> list =  query.list();
+            List<Object[]> list = new ArrayList<Object[]>();
+
+            if(environmentIds.size()>0)
+                list = query.list();
 
             for (Object[] row : list){
                 Integer traitId = (Integer) row[0];
@@ -237,7 +246,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
             query.setParameterList("environmentIds", environmentIds);
             query.setParameterList("traitIds", traitIds);
 
-            List<Object[]> list =  query.list();
+            List<Object[]> list = new ArrayList<Object[]>();
+
+            if(environmentIds.size()>0 && environmentIds.size()>0)
+                list = query.list();
             
             for (Object[] row : list){
                 Integer traitId = (Integer) row[0];
@@ -289,7 +301,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
             SQLQuery query = getSession().createSQLQuery(queryString);
             query.setParameterList("traitIds", traitIds);
 
-            List<Object[]> list =  query.list();
+            List<Object[]> list = new ArrayList<Object[]>();
+
+            if(traitIds.size()>0)
+                list = query.list();
             
             for (Object[] row : list){
                 Integer traitId = (Integer) row[0]; 
@@ -356,7 +371,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
             query.setParameterList("traitIds", traitIds);
             query.setParameterList("environmentIds", environmentIds);
 
-            List<Object[]> list =  query.list();
+            List<Object[]> list = new ArrayList<Object[]>();
+
+            if(environmentIds.size()>0 && traitIds.size()>0)
+                list = query.list();
             
             for (Object[] row : list){
                 Integer traitId = (Integer) row[0]; 
@@ -405,7 +423,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
                     .setParameterList("germplasmIds", germplasmIds)
                     .setParameterList("environmentIds", environmentIds);
 
-            List<Object[]> list =  query.list();
+            List<Object[]> list = new ArrayList<Object[]>();
+
+            if(environmentIds.size()>0 && traitIds.size()>0)
+                list = query.list();
             
             for (Object[] row : list){
                 Integer traitId = (Integer) row[0]; 
