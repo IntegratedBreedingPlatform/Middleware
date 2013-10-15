@@ -181,9 +181,9 @@ public class TraitBuilder extends Builder{
         
         // Get categorical values count from phenotype
         setWorkingDatabase(Database.CENTRAL);
-        getPhenotypeDao().setCategoricalTraitInfoValues(categoricalTraitInfoList);
+        getPhenotypeDao().setCategoricalTraitInfoValues(categoricalTraitInfoList, environmentIds);
         setWorkingDatabase(Database.LOCAL);
-        getPhenotypeDao().setCategoricalTraitInfoValues(categoricalTraitInfoList);
+        getPhenotypeDao().setCategoricalTraitInfoValues(categoricalTraitInfoList, environmentIds);
         
 
         return categoricalTraitInfoList;

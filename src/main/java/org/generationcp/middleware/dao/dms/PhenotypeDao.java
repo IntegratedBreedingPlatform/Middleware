@@ -335,7 +335,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
     }
 
     
-    public void setCategoricalTraitInfoValues(List<CategoricalTraitInfo> traitInfoList) throws MiddlewareQueryException{
+    public void setCategoricalTraitInfoValues(List<CategoricalTraitInfo> traitInfoList, List<Integer> environmentIds) throws MiddlewareQueryException{
         
         // Get trait IDs
         List<Integer> traitIds = new ArrayList<Integer>();
@@ -347,10 +347,14 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
             SQLQuery query = getSession().createSQLQuery(
                     "SELECT p.observable_id, p.cvalue_id, COUNT(p.phenotype_id) AS valuesCount "
                     + "FROM phenotype p "
+                    + "INNER JOIN nd_experiment_phenotype eph ON eph.phenotype_id = p.phenotype_id "
+                    + "INNER JOIN nd_experiment e ON e.nd_experiment_id = eph.nd_experiment_id "
                     + "WHERE p.cvalue_id IS NOT NULL AND p.observable_id IN (:traitIds) "
+                    + "  AND e.nd_geolocation_id IN (:environmentIds) "
                     + "GROUP BY p.observable_id, p.cvalue_id "
                     );
             query.setParameterList("traitIds", traitIds);
+            query.setParameterList("environmentIds", environmentIds);
 
             List<Object[]> list =  query.list();
             
