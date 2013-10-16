@@ -31,6 +31,8 @@ import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -313,6 +315,17 @@ public interface StudyDataManager {
      * @throws MiddlewareQueryException
      */
     String getLocalNameByStandardVariableId(Integer projectId, Integer standardVariableId) throws MiddlewareQueryException;
+
+    /**
+     * 
+     * Retrieves the study details of the given study type from the specified database.
+     *  
+     * @param instance Can be CENTRAL or LOCAL
+     * @param studyType Can be any of the types defined in {@link StudyType}
+     * @return The list of study details having the given study type from the given database
+     * @throws MiddlewareQueryException
+     */
+    List<StudyDetails> getAllStudyDetails(Database instance, StudyType studyType) throws MiddlewareQueryException;
     
 
 }

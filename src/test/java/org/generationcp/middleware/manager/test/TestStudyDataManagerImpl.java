@@ -41,6 +41,8 @@ import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
@@ -739,14 +741,25 @@ public class TestStudyDataManagerImpl {
 		manager.deleteExperimentsByLocation(datasetRef.getId(), locationId);
 	}
 	
-	@Test
-	public void testGetLocalNameByStandardVariableId() throws Exception {
-	    Integer projectId = 10085; 
-	    Integer standardVariableId = 8230;
-	    String localName = manager.getLocalNameByStandardVariableId(projectId, standardVariableId);
-	    System.out.println("testGetLocalNameByStandardVariableId("+projectId+", "+standardVariableId+"): " + localName);	    
-	}
-	
+    @Test
+    public void testGetLocalNameByStandardVariableId() throws Exception {
+        Integer projectId = 10085; 
+        Integer standardVariableId = 8230;
+        String localName = manager.getLocalNameByStandardVariableId(projectId, standardVariableId);
+        System.out.println("testGetLocalNameByStandardVariableId("+projectId+", "+standardVariableId+"): " + localName);        
+    }
+    
+    @Test
+    public void testGetAllStudyDetails() throws Exception {
+        
+        List<StudyDetails> nurseryStudyDetails = manager.getAllStudyDetails(Database.LOCAL, StudyType.N);
+        
+        System.out.println("testGetAllStudyDetails(Database.LOCAL, StudyType.N)");        
+        for (StudyDetails study : nurseryStudyDetails){
+            study.print(3);
+        }
+    }
+    
 	@AfterClass
 	public static void tearDown() throws Exception {
 		if (factory != null) {
@@ -948,4 +961,5 @@ public class TestStudyDataManagerImpl {
 		variable.setVariableType(dataSet.getVariableTypes().findById(stdVarId));
 		return variable;
 	}
+	
 }

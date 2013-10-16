@@ -37,7 +37,8 @@ public enum TermId {
 	, PM_KEY(8040)
 	, STUDY_TITLE(8007)
 	, STUDY_OBJECTIVE(8030)
-	, PI_ID(8110)
+    , PI_ID(8110)
+    , PI_NAME(8100)
 	, STUDY_TYPE(8070)
 	, START_DATE(8050)
 	, END_DATE(8060)
@@ -120,7 +121,8 @@ public enum TermId {
 	, ENTRY_CODE(8300)
 	
 	//Location 
-	, LOCATION_ID(8190)
+    , LOCATION_ID(8190)
+    , SITE_NAME(8196)
 	
 	//Study Type
 	, NURSERY(10000)

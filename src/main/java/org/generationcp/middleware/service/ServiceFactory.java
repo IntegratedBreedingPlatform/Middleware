@@ -26,6 +26,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionPerThreadProvider;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.service.api.DataImportService;
+import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.util.ResourceFinder;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
@@ -255,7 +256,11 @@ public class ServiceFactory implements Serializable {
     }
     
     public DataImportService getDataImportService(){
-    	return new DataImportServiceImpl(sessionProviderForLocal, sessionProviderForCentral);
+        return new DataImportServiceImpl(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
+    public FieldbookService getFieldbookService(){
+        return new FieldbookServiceImpl(sessionProviderForLocal, sessionProviderForCentral);
     }
 
 
