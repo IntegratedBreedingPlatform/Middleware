@@ -484,7 +484,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
             
             StringBuilder sqlString = new StringBuilder()
             .append("SELECT DISTINCT p.name AS name, p.description AS title, ppObjective.value AS objective, ppStartDate.value AS startDate, ")
-            .append(                        "ppEndDate.value AS endDate, ppPI.value AS pmKey, gpSiteName.value AS siteName ")
+            .append(                        "ppEndDate.value AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName ")
             .append("FROM project p ")
             .append("   INNER JOIN projectprop ppNursery ON p.project_id = ppNursery.project_id ")
             .append("                   AND ppNursery.type_id = ").append(TermId.STUDY_TYPE.getId()).append(" ")
@@ -496,7 +496,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
             .append("   LEFT JOIN projectprop ppEndDate ON p.project_id = ppEndDate.project_id ")
             .append("                   AND ppEndDate.type_id =  ").append(TermId.END_DATE.getId()).append(" ") // 8060 
             .append("   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
-            .append("                   AND ppPI.type_id =  ").append(TermId.PI_ID.getId()).append(" ") // 8110 
+            .append("                   AND ppPI.type_id =  ").append(TermId.PI_NAME.getId()).append(" ") // 8100 
             .append("   LEFT JOIN nd_experiment_project ep ON p.project_id = ep.project_id ")
             .append("       INNER JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id ")
             .append("       LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id ")
@@ -511,7 +511,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
                         .addScalar("objective")
                         .addScalar("startDate")
                         .addScalar("endDate")
-                        .addScalar("pmKey")
+                        .addScalar("piName")
                         .addScalar("siteName")
                         ;
 
@@ -524,10 +524,10 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
                     String objective = (String) row [2]; 
                     String startDate = (String) row [3]; 
                     String endDate = (String) row [4]; 
-                    String pmKey = (String) row [5]; 
+                    String piName = (String) row [5]; 
                     String siteName = (String) row [6];
                     
-                    studyDetails.add(new StudyDetails( name, title, pmKey, objective, startDate, endDate, studyType, 0, null, null, siteName));
+                    studyDetails.add(new StudyDetails( name, title, objective, startDate, endDate, studyType, piName, siteName));
                 }
             }
 

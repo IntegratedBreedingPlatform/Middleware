@@ -36,7 +36,9 @@ public class StudyDetails {
 
 	private String measurementDatasetName;
 	
-	private String siteName;
+    private String siteName;
+
+    private String piName;
 
 	public StudyDetails(){
 		
@@ -57,12 +59,14 @@ public class StudyDetails {
         this.measurementDatasetName = measurementDatasetName;
     }
 
-    public StudyDetails(String studyName, String title, String pmKey,
+    // Used by getStudyDetails
+    public StudyDetails(String studyName, String title,
             String objective, String startDate, String endDate, StudyType studyType, 
-            long parentFolderId, String trialDatasetName, String measurementDatasetName, String siteName) {
-        this(studyName, title, pmKey, objective, startDate, endDate, studyType, 
-                parentFolderId, trialDatasetName, measurementDatasetName);
-        this.setSiteName(siteName);
+            String piName, String siteName) {
+        this(studyName, title, null, objective, startDate, endDate, studyType, 
+                0, null, null);
+        this.siteName = siteName;
+        this.setPiName(piName);
     }
 
 	public String getStudyName() {
@@ -160,6 +164,20 @@ public class StudyDetails {
         this.siteName = siteName;
     }
 
+    /**
+     * @return the piName
+     */
+    public String getPiName() {
+        return piName;
+    }
+
+    /**
+     * @param piName the piName to set
+     */
+    public void setPiName(String piName) {
+        this.piName = piName;
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -185,6 +203,8 @@ public class StudyDetails {
         builder.append(measurementDatasetName);
         builder.append(", siteName=");
         builder.append(siteName);
+        builder.append(", piName=");
+        builder.append(piName);
         builder.append("]");
         return builder.toString();
     }
@@ -202,6 +222,7 @@ public class StudyDetails {
         Debug.println(indent + 3, "Trial Dataset Name: " + trialDatasetName);
         Debug.println(indent + 3, "Measurement Dataset Name: " + measurementDatasetName);
         Debug.println(indent + 3, "Site Name: " + siteName);
+        Debug.println(indent + 3, "PI Name: " + piName);
 	}
 
 }
