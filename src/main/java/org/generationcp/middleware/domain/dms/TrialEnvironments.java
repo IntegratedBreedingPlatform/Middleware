@@ -12,6 +12,7 @@
 package org.generationcp.middleware.domain.dms;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
@@ -28,6 +29,14 @@ public class TrialEnvironments {
 	public void add(TrialEnvironment trialEnvironment) {
 		if (trialEnvironment != null) {
 		    trialEnvironments.add(trialEnvironment);
+		}
+	}
+	
+	public void addAll(Collection<TrialEnvironment> trialEnvironments) {
+		if (trialEnvironments != null) {
+			for (TrialEnvironment environment : trialEnvironments) {
+				add(environment);
+			}
 		}
 	}
 	

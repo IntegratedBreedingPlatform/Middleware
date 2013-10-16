@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao.dms;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,6 +32,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 
 /**
  * DAO class for {@link Geolocation}.
@@ -38,6 +40,26 @@ import org.hibernate.Query;
  */
 public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 
+	private static final String GET_ALL_ENVIRONMENTS_QUERY = 
+		"SELECT DISTINCT gp.nd_geolocation_id as envtId, l.lname AS locationName, prov.lname AS provinceName, " +
+		"       c.isoabbr, p.project_id, p.name, gp.value AS locationId " +
+		"  FROM nd_geolocationprop gp " +
+		" INNER JOIN nd_experiment e on e.nd_geolocation_id = gp.nd_geolocation_id " +
+		"       AND e.nd_experiment_id = " +
+		"		( " +
+		"			SELECT MIN(nd_experiment_id) " +
+		"			  FROM nd_experiment min" +
+		"			 WHERE min.nd_geolocation_id = gp.nd_geolocation_id" +
+		"		) " +
+		" INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id" +
+		" INNER JOIN project_relationship pr ON (pr.object_project_id = ep.project_id OR pr.subject_project_id = ep.project_id) " +
+		"		AND pr.type_id = " + TermId.BELONGS_TO_STUDY.getId() +
+		" INNER JOIN project p ON p.project_id = pr.object_project_id " +
+		"  LEFT JOIN location l ON l.locid = gp.value " +
+		"  LEFT JOIN location prov ON prov.locid = l.snl1id " +
+		"  LEFT JOIN cntry c ON c.cntryid = l.cntryid " +
+		" WHERE gp.type_id = " + TermId.LOCATION_ID.getId();
+	
 	public Geolocation getParentGeolocation(int projectId) throws MiddlewareQueryException {
 		try {
 			String sql = "SELECT DISTINCT g.*"
@@ -116,21 +138,19 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 		return locationIds;
 	}
 	
+	
 	@SuppressWarnings("unchecked")
-	public TrialEnvironments getAllTrialEnvironments() throws MiddlewareQueryException {
-		TrialEnvironments environments = new TrialEnvironments();
+	public List<TrialEnvironment> getAllTrialEnvironments() throws MiddlewareQueryException {
+		List<TrialEnvironment> environments = new ArrayList<TrialEnvironment>();
 		try {
-			String sql = "SELECT DISTINCT gp.nd_geolocation_id, l.lname, prov.provinceName, c.isoabbr, p.project_id, p.name, gp.value"
-						+ " FROM project p"
-						+ " INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id = " + TermId.BELONGS_TO_STUDY.getId()
-						+ " INNER JOIN nd_experiment_project ep ON (ep.project_id = p.project_id OR ep.project_id = pr.subject_project_id)"
-						+ " INNER JOIN nd_experiment e ON e.nd_experiment_id = ep.nd_experiment_id"
-						+ " INNER JOIN nd_geolocationprop gp ON gp.nd_geolocation_id = e.nd_geolocation_id AND gp.type_id = " + TermId.LOCATION_ID.getId()
-						+ " LEFT JOIN location l ON l.locid = gp.value"
-						+ " LEFT JOIN (SELECT lname as provinceName, locid FROM location) prov ON prov.locid = l.snl1id"
-						+ " LEFT JOIN cntry c ON c.cntryid = l.cntryid"
-						;
-			Query query = getSession().createSQLQuery(sql);
+			SQLQuery query = getSession().createSQLQuery(GET_ALL_ENVIRONMENTS_QUERY);
+			query.addScalar("envtId");
+			query.addScalar("locationName");
+			query.addScalar("provinceName");
+			query.addScalar("isoabbr");
+			query.addScalar("project_id");
+			query.addScalar("name");
+			query.addScalar("locationId");
 			List<Object[]> list = query.list();
 			for (Object[] row : list) {
 				if (NumberUtils.isNumber((String) row[6])) {
@@ -144,6 +164,48 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			logAndThrowException("Error at getAllTrialEnvironments at GeolocationDao: " + e.getMessage(), e);
 		}
 		return environments;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<TrialEnvironment> getTrialEnvironments(int start, int numOfRows) throws MiddlewareQueryException {
+		List<TrialEnvironment> environments = new ArrayList<TrialEnvironment>();
+		try {
+			SQLQuery query = getSession().createSQLQuery(GET_ALL_ENVIRONMENTS_QUERY);
+			query.addScalar("envtId");
+			query.addScalar("locationName");
+			query.addScalar("provinceName");
+			query.addScalar("isoabbr");
+			query.addScalar("project_id");
+			query.addScalar("name");
+			query.addScalar("locationId");
+			setStartAndNumOfRows(query, start, numOfRows);
+			List<Object[]> list = query.list();
+			for (Object[] row : list) {
+				if (NumberUtils.isNumber((String) row[6])) {
+					environments.add(new TrialEnvironment((Integer) row[0], 
+										new LocationDto(Integer.valueOf(row[6].toString()), (String) row[1], (String) row[2], (String) row[3]), 
+										new StudyReference((Integer) row[4], (String) row[5])));
+				} //otherwise it's invalid data and should not be included
+			}
+			
+		} catch(HibernateException e) {
+			logAndThrowException("Error at getTrialEnvironments at GeolocationDao: " + e.getMessage(), e);
+		}
+		return environments;
+	}
+	
+	public long countAllTrialEnvironments() throws MiddlewareQueryException {
+		try {
+			String sql = "SELECT COUNT(DISTINCT nd_geolocation_id) "
+				+ " FROM nd_geolocationprop WHERE type_id = " + TermId.LOCATION_ID.getId();
+			Query query = getSession().createSQLQuery(sql);
+			return ((BigInteger) query.uniqueResult()).longValue();
+			
+		} catch(HibernateException e) {
+			logAndThrowException("Error at countAllTrialEnvironments at GeolocationDao: " + e.getMessage(), e);
+		}
+		
+		return 0;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -294,7 +356,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 	public TrialEnvironments getEnvironmentsForTraits(List<Integer> traitIds) throws MiddlewareQueryException {
 		TrialEnvironments environments = new TrialEnvironments();
 		try {
-			String sql = "SELECT DISTINCT gp.nd_geolocation_id, l.lname, prov.provinceName, c.isoabbr, p.project_id, p.name, gp.value"
+			String sql = "SELECT DISTINCT gp.nd_geolocation_id as envtId, l.lname as locationName, prov.lname as provinceName, c.isoabbr, p.project_id, p.name, gp.value as locationId"
 						+ " FROM project p"
 						+ " INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id = " + TermId.BELONGS_TO_STUDY.getId()
 						+ " INNER JOIN nd_experiment_project ep ON (ep.project_id = p.project_id OR ep.project_id = pr.subject_project_id)"
@@ -303,11 +365,18 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 						+ " INNER JOIN phenotype ph ON eph.phenotype_id = ph.phenotype_id"
 						+ " INNER JOIN nd_geolocationprop gp ON gp.nd_geolocation_id = e.nd_geolocation_id AND gp.type_id = " + TermId.LOCATION_ID.getId()
 						+ " LEFT JOIN location l ON l.locid = gp.value"
-						+ " LEFT JOIN (SELECT lname as provinceName, locid FROM location) prov ON prov.locid = l.snl1id"
+						+ " LEFT JOIN location prov ON prov.locid = l.snl1id"
 						+ " LEFT JOIN cntry c ON c.cntryid = l.cntryid"
 						+ " WHERE ph.observable_id IN (:traitIds);"
 						;
-			Query query = getSession().createSQLQuery(sql);
+			SQLQuery query = getSession().createSQLQuery(sql);
+			query.addScalar("envtId");
+			query.addScalar("locationName");
+			query.addScalar("provinceName");
+			query.addScalar("isoabbr");
+			query.addScalar("project_id");
+			query.addScalar("name");
+			query.addScalar("locationId");
 			query.setParameterList("traitIds", traitIds);
 			List<Object[]> list = query.list();
 			for (Object[] row : list) {

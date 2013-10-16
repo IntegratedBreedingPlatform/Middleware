@@ -72,10 +72,32 @@ public class TestCrossStudyDataManagerImpl {
 	
 	@Test
 	public void testGetAllTrialEnvironments() throws Exception {
-		System.out.println("testGetAllTrialEnvironemnts");
+		System.out.println("testGetAllTrialEnvironments");
 		TrialEnvironments environments = manager.getAllTrialEnvironments();
-		System.out.println("SIZE=" + environments.size());
 		environments.print(1);
+		System.out.println("SIZE=" + environments.size());
+	}
+	
+	@Test
+	public void testGetTrialEnvironments() throws Exception {
+		System.out.println("testGetTrialEnvironments");
+		long count = manager.countAllTrialEnvironments();
+		Integer batchSizeInt = 1000;
+		int iterations = ((Double) Math.ceil(count / batchSizeInt.doubleValue())).intValue();
+		
+		for (int i = 0; i < iterations; i++){
+			int start = i * batchSizeInt;
+			TrialEnvironments environments = manager.getTrialEnvironments(start, batchSizeInt);
+			environments.print(1);
+			System.out.println("start=" + start + ", size=" + environments.size());
+		}
+	}
+	
+	@Test
+	public void testCountAllTrialEnvironments() throws Exception {
+		System.out.println("testCountAllTrialEnvironments");
+		long count = manager.countAllTrialEnvironments();
+		System.out.println("SIZE=" + count);
 	}
 	
 	@Test

@@ -19,8 +19,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.LocationDto;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.TrialEnvironment;
 import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
@@ -133,18 +133,46 @@ public class TrialEnvironmentBuilder extends Builder {
 		environments.addAll(getGeolocationDao().getAllTrialEnvironments());
 		
 		setWorkingDatabase(Database.LOCAL);
-		TrialEnvironments localEnvironments = getGeolocationDao().getAllTrialEnvironments();
-		if (localEnvironments != null && localEnvironments.getTrialEnvironments() != null) {
+		List<TrialEnvironment> localEnvironments = getGeolocationDao().getAllTrialEnvironments();
+		buildLocalTrialEnvironment(environments, localEnvironments);
+		
+		return environments;
+	}
+	
+	public TrialEnvironments buildTrialEnvironments(List<TrialEnvironment> trialEnvironments) throws MiddlewareQueryException {
+		TrialEnvironments environments = new TrialEnvironments();
+		List<TrialEnvironment> localEnvironments = new ArrayList<TrialEnvironment>();
+		
+		// collect local environments in separate list
+		for (TrialEnvironment envt : trialEnvironments){
+			if (envt.getId() < 0){
+				localEnvironments.add(envt);
+			} else {
+				environments.add(envt);
+			}
+		}
+		
+		buildLocalTrialEnvironment(environments, localEnvironments);
+		
+		return environments;
+	}
+
+	
+	// set location name, country name and province name to local environments from central db
+	private void buildLocalTrialEnvironment(TrialEnvironments environments,
+			List<TrialEnvironment> localEnvironments) throws MiddlewareQueryException {
+	
+		if (environments != null && localEnvironments != null && localEnvironments.size() > 0) {
 			setWorkingDatabase(Database.CENTRAL);
 			Set<Integer> ids = new HashSet<Integer>();
-			for (TrialEnvironment environment : localEnvironments.getTrialEnvironments()) {
+			for (TrialEnvironment environment : localEnvironments) {
 				if (environment.getLocation() != null && environment.getLocation().getId() != null 
 				&& environment.getLocation().getId().intValue() >= 0) {
 					ids.add(environment.getLocation().getId());
 				}
 			}
 			List<LocationDto> newLocations = getLocationDao().getLocationDtoByIds(ids);
-			for (TrialEnvironment environment : localEnvironments.getTrialEnvironments()) {
+			for (TrialEnvironment environment : localEnvironments) {
 				if (environment.getLocation() != null && newLocations != null && newLocations.indexOf(environment.getLocation().getId()) > -1) {
 					LocationDto newLocation = newLocations.get(newLocations.indexOf(environment.getLocation().getId()));
 					environment.getLocation().setCountryName(newLocation.getCountryName());
@@ -155,7 +183,18 @@ public class TrialEnvironmentBuilder extends Builder {
 			}
 		}
 		
-		return environments;
+	}
+	
+	public long countAllTrialEnvironments() throws MiddlewareQueryException{
+		setWorkingDatabase(Database.CENTRAL);
+		long centralCount = getGeolocationDao().countAllTrialEnvironments();
+		System.out.println("CENTRAL = " + centralCount);
+		
+		setWorkingDatabase(Database.LOCAL);
+		long localCount =  getGeolocationDao().countAllTrialEnvironments();
+		System.out.println("LOCAL = " + localCount);
+		
+		return centralCount + localCount;
 	}
 	
 	public List<TrialEnvironmentProperty> getPropertiesForTrialEnvironments(List<Integer> environmentIds) throws MiddlewareQueryException {

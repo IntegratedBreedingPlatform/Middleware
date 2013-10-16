@@ -37,6 +37,22 @@ public interface CrossStudyDataManager{
     TrialEnvironments getAllTrialEnvironments() throws MiddlewareQueryException;
     
     /**
+     * Retrieves a list of all trial environments by batch.
+     * WARNING: Retrieving by method is slower than getting all environments at once
+     * 
+     * @return TrialEnvironments
+     * @throws MiddlewareQueryException
+     */
+    TrialEnvironments getTrialEnvironments(int start, int numOfRows) throws MiddlewareQueryException;
+    
+    /**
+     * Returns number of all central and local trial environments
+     * 
+     * @return
+     */
+    long countAllTrialEnvironments() throws MiddlewareQueryException;
+    
+    /**
      * Get all environment properties given a list of environments.
      * 
      * @param trialEnvtIds

@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.domain.dms.TrialEnvironment;
 import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
@@ -53,6 +54,21 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
     @Override
     public TrialEnvironments getAllTrialEnvironments() throws MiddlewareQueryException {
         return getTrialEnvironmentBuilder().getAllTrialEnvironments();
+    }
+    
+    @SuppressWarnings("unchecked")
+	@Override
+    public TrialEnvironments getTrialEnvironments(int start, int numOfRows) throws MiddlewareQueryException {
+    	List<String> methodNames = Arrays.asList("countAllTrialEnvironments", "getTrialEnvironments");
+    	List<TrialEnvironment> environmentList =  getFromCentralAndLocalByMethod(getGeolocationDao(), methodNames, 
+    			start, numOfRows, new Object[]{}, new Class[]{});
+    	
+    	return getTrialEnvironmentBuilder().buildTrialEnvironments(environmentList);
+    }
+    
+    @Override
+    public long countAllTrialEnvironments() throws MiddlewareQueryException {
+    	return getTrialEnvironmentBuilder().countAllTrialEnvironments();
     }
 
     @Override
