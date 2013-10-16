@@ -19,6 +19,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.service.ServiceFactory;
 import org.generationcp.middleware.service.api.FieldbookService;
+import org.generationcp.middleware.util.Debug;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -28,8 +29,6 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-
-import com.apple.crypto.provider.Debug;
 
 @RunWith(JUnit4.class)
 public class TestFieldbookServiceImpl {
@@ -64,7 +63,7 @@ public class TestFieldbookServiceImpl {
     public void testGetAllLocalNurseryDetails() throws MiddlewareQueryException {
 
         List<StudyDetails> nurseryStudyDetails = fieldbookService.getAllLocalNurseryDetails();
-        Debug.println("testGetAllLocalNurseryDetails: ");
+        Debug.println(0, "testGetAllLocalNurseryDetails: ");
         for (StudyDetails study : nurseryStudyDetails){
             study.print(3);
         }
