@@ -482,10 +482,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	    List<StudyDetails> studyDetails = new ArrayList<StudyDetails>();
         try {
             
-            
-            StringBuffer sqlString = new StringBuffer()
-            .append("SELECT DISTINCT p.name, p.description, ppObjective.value, ppStartDate.value, ")
-            .append(                        "ppEndDate.value, ppPI.value, gpSiteName.value ")
+            StringBuilder sqlString = new StringBuilder()
+            .append("SELECT DISTINCT p.name AS name, p.description AS title, ppObjective.value AS objective, ppStartDate.value AS startDate, ")
+            .append(                        "ppEndDate.value AS endDate, ppPI.value AS pmKey, gpSiteName.value AS siteName ")
             .append("FROM project p ")
             .append("   INNER JOIN projectprop ppNursery ON p.project_id = ppNursery.project_id ")
             .append("                   AND ppNursery.type_id = ").append(TermId.STUDY_TYPE.getId()).append(" ")
@@ -506,7 +505,16 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
             .append("               AND ppDeleted.project_id = p.project_id AND ppDeleted.value =  ").append(TermId.DELETED_STUDY.getId()).append(") ") // 12990     
             ;
         
-            Query query = getSession().createSQLQuery(sqlString.toString());
+            Query query = getSession().createSQLQuery(sqlString.toString())
+                        .addScalar("name")
+                        .addScalar("title")
+                        .addScalar("objective")
+                        .addScalar("startDate")
+                        .addScalar("endDate")
+                        .addScalar("pmKey")
+                        .addScalar("siteName")
+                        ;
+
             List<Object[]> list =  query.list();
             
             if (list != null && list.size() > 0) {
