@@ -120,7 +120,8 @@ public enum TermId {
 	, ENTRY_CODE(8300)
 	
 	//Location 
-	, LOCATION_ID(8190)
+    , LOCATION_ID(8190)
+    , SITE_NAME(8196)
 	
 	//Study Type
 	, NURSERY(10000)

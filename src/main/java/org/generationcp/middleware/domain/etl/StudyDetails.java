@@ -35,25 +35,35 @@ public class StudyDetails {
 	private String trialDatasetName;
 
 	private String measurementDatasetName;
+	
+	private String siteName;
 
 	public StudyDetails(){
 		
 	}
 	
-	public StudyDetails(String studyName, String title, String pmKey,
-			String objective, String startDate, String endDate, StudyType studyType, 
-			long parentFolderId, String trialDatasetName, String measurementDatasetName) {
-		this.studyName = studyName;
-		this.title = title;
-		this.pmKey = pmKey;
-		this.objective = objective;
-		this.startDate = startDate;
-		this.endDate = endDate;
-		this.studyType = studyType;
-		this.parentFolderId = parentFolderId;
-		this.trialDatasetName = trialDatasetName;
-		this.measurementDatasetName = measurementDatasetName;
-	}
+    public StudyDetails(String studyName, String title, String pmKey,
+            String objective, String startDate, String endDate, StudyType studyType, 
+            long parentFolderId, String trialDatasetName, String measurementDatasetName) {
+        this.studyName = studyName;
+        this.title = title;
+        this.pmKey = pmKey;
+        this.objective = objective;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.studyType = studyType;
+        this.parentFolderId = parentFolderId;
+        this.trialDatasetName = trialDatasetName;
+        this.measurementDatasetName = measurementDatasetName;
+    }
+
+    public StudyDetails(String studyName, String title, String pmKey,
+            String objective, String startDate, String endDate, StudyType studyType, 
+            long parentFolderId, String trialDatasetName, String measurementDatasetName, String siteName) {
+        this(studyName, title, pmKey, objective, startDate, endDate, studyType, 
+                parentFolderId, trialDatasetName, measurementDatasetName);
+        this.setSiteName(siteName);
+    }
 
 	public String getStudyName() {
 		return studyName;
@@ -142,28 +152,42 @@ public class StudyDetails {
 		this.measurementDatasetName = measurementDatasetName;
 	}
 
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("StudyDetails [studyName=");
-		builder.append(studyName);
-		builder.append(", title=");
-		builder.append(title);
-		builder.append(", pmKey=");
-		builder.append(pmKey);
-		builder.append(", objective=");
-		builder.append(objective);
-		builder.append(", startDate=");
-		builder.append(startDate);
-		builder.append(", endDate=");
-		builder.append(endDate);
-		builder.append(", studyType=");
-		builder.append(studyType);
-		builder.append(", parentFolderId=");
-		builder.append(parentFolderId);
-		builder.append("]");
-		return builder.toString();
-	}
+    public String getSiteName() {
+        return siteName;
+    }
+
+    public void setSiteName(String siteName) {
+        this.siteName = siteName;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("StudyDetails [studyName=");
+        builder.append(studyName);
+        builder.append(", title=");
+        builder.append(title);
+        builder.append(", pmKey=");
+        builder.append(pmKey);
+        builder.append(", objective=");
+        builder.append(objective);
+        builder.append(", startDate=");
+        builder.append(startDate);
+        builder.append(", endDate=");
+        builder.append(endDate);
+        builder.append(", studyType=");
+        builder.append(studyType);
+        builder.append(", parentFolderId=");
+        builder.append(parentFolderId);
+        builder.append(", trialDatasetName=");
+        builder.append(trialDatasetName);
+        builder.append(", measurementDatasetName=");
+        builder.append(measurementDatasetName);
+        builder.append(", siteName=");
+        builder.append(siteName);
+        builder.append("]");
+        return builder.toString();
+    }
 
 	public void print(int indent) {
 		Debug.println(indent, "StudyDetails: ");
@@ -174,7 +198,10 @@ public class StudyDetails {
 	    Debug.println(indent + 3, "Start Date: " + startDate);
 	    Debug.println(indent + 3, "End Date: " + endDate);
 		Debug.println(indent + 3, "Study Type: " + studyType);
-		Debug.println(indent + 3, "Parent Folder Id: " + parentFolderId);
+        Debug.println(indent + 3, "Parent Folder Id: " + parentFolderId);
+        Debug.println(indent + 3, "Trial Dataset Name: " + trialDatasetName);
+        Debug.println(indent + 3, "Measurement Dataset Name: " + measurementDatasetName);
+        Debug.println(indent + 3, "Site Name: " + siteName);
 	}
 
 }

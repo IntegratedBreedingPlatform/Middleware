@@ -31,6 +31,8 @@ import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.StudyResultSetByGid;
@@ -384,6 +386,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             logAndThrowException("Error at getLocalNameByStandardVariableId :" + e.getMessage(), e);
         }
         return null;
+    }
+    
+
+    @Override
+    public List<StudyDetails> getAllStudyDetails(Database instance, StudyType studyType) throws MiddlewareQueryException {
+        setWorkingDatabase(instance);
+        return getDmsProjectDao().getAllStudyDetails(studyType);
     }
 
 }
