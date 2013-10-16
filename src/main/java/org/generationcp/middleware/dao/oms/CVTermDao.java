@@ -305,14 +305,17 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
           
           List<Integer> valueIds = new ArrayList<Integer>();
           valueIds.addAll(valueIdName.keySet());
-          query = getSession().createSQLQuery(
-                  "SELECT cvterm_id, cvterm.name " +
-                  "FROM cvterm " +
-                  "WHERE cvterm_id IN (:ids) " 
-                  );
-          query.setParameterList("ids", valueIds);
           
-          list = query.list();
+          if(!valueIds.equals("") && valueIds!=null && valueIds.size()!=0){
+	          query = getSession().createSQLQuery(
+	                  "SELECT cvterm_id, cvterm.name " +
+	                  "FROM cvterm " +
+	                  "WHERE cvterm_id IN (:ids) " 
+	                  );
+	          query.setParameterList("ids", valueIds);
+	          
+	          list = query.list();
+          }
     
           for (Object[] row : list) {
               Integer variableId = (Integer) row[0];

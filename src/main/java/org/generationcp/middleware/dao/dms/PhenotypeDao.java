@@ -69,7 +69,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
             query.setParameterList("environmentIds", environmentIds);
             query.setParameterList("numericVariableIds", numericVariableIds);
             
-            List<Object[]> list =  query.list();
+            List<Object[]> list = new ArrayList<Object[]>();
+
+            if(environmentIds.size()>0 && numericVariableIds.size()>0)
+                list = query.list();
               
             for (Object[] row : list){
                 Integer id = (Integer) row[0]; 
@@ -110,7 +113,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
             query.setParameterList("environmentIds", environmentIds);
             query.setParameterList("variableIds", variableIds);
             
-            List<Object[]> list =  query.list();
+            List<Object[]> list = new ArrayList<Object[]>();
+
+            if(environmentIds.size()>0 && variableIds.size()>0)
+                list = query.list();
               
             for (Object[] row : list){
                 Integer id = (Integer) row[0]; 
@@ -187,7 +193,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
             query.setParameterList("environmentIds", environmentIds);
             query.setParameterList("traitIds", traitIds);
 
-            List<Object[]> list =  query.list();
+            List<Object[]> list = new ArrayList<Object[]>();
+
+            if(environmentIds.size()>0)
+                list = query.list();
 
             for (Object[] row : list){
                 Integer traitId = (Integer) row[0];
@@ -237,7 +246,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
             query.setParameterList("environmentIds", environmentIds);
             query.setParameterList("traitIds", traitIds);
 
-            List<Object[]> list =  query.list();
+            List<Object[]> list = new ArrayList<Object[]>();
+
+            if(environmentIds.size()>0 && environmentIds.size()>0)
+                list = query.list();
             
             for (Object[] row : list){
                 Integer traitId = (Integer) row[0];
@@ -289,7 +301,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
             SQLQuery query = getSession().createSQLQuery(queryString);
             query.setParameterList("traitIds", traitIds);
 
-            List<Object[]> list =  query.list();
+            List<Object[]> list = new ArrayList<Object[]>();
+
+            if(traitIds.size()>0)
+                list = query.list();
             
             for (Object[] row : list){
                 Integer traitId = (Integer) row[0]; 
@@ -335,7 +350,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
     }
 
     
-    public void setCategoricalTraitInfoValues(List<CategoricalTraitInfo> traitInfoList) throws MiddlewareQueryException{
+    public void setCategoricalTraitInfoValues(List<CategoricalTraitInfo> traitInfoList, List<Integer> environmentIds) throws MiddlewareQueryException{
         
         // Get trait IDs
         List<Integer> traitIds = new ArrayList<Integer>();
@@ -347,12 +362,19 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
             SQLQuery query = getSession().createSQLQuery(
                     "SELECT p.observable_id, p.cvalue_id, COUNT(p.phenotype_id) AS valuesCount "
                     + "FROM phenotype p "
+                    + "INNER JOIN nd_experiment_phenotype eph ON eph.phenotype_id = p.phenotype_id "
+                    + "INNER JOIN nd_experiment e ON e.nd_experiment_id = eph.nd_experiment_id "
                     + "WHERE p.cvalue_id IS NOT NULL AND p.observable_id IN (:traitIds) "
+                    + "  AND e.nd_geolocation_id IN (:environmentIds) "
                     + "GROUP BY p.observable_id, p.cvalue_id "
                     );
             query.setParameterList("traitIds", traitIds);
+            query.setParameterList("environmentIds", environmentIds);
 
-            List<Object[]> list =  query.list();
+            List<Object[]> list = new ArrayList<Object[]>();
+
+            if(environmentIds.size()>0 && traitIds.size()>0)
+                list = query.list();
             
             for (Object[] row : list){
                 Integer traitId = (Integer) row[0]; 
@@ -401,7 +423,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
                     .setParameterList("germplasmIds", germplasmIds)
                     .setParameterList("environmentIds", environmentIds);
 
-            List<Object[]> list =  query.list();
+            List<Object[]> list = new ArrayList<Object[]>();
+
+            if(environmentIds.size()>0 && traitIds.size()>0)
+                list = query.list();
             
             for (Object[] row : list){
                 Integer traitId = (Integer) row[0]; 
@@ -536,7 +561,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			queryString.append("INNER JOIN location l ON l.locid = gp.value ");
 			queryString.append("INNER JOIN nd_experiment_stock es ON es.nd_experiment_id = e.nd_experiment_id ");
 			queryString.append("INNER JOIN stock s ON s.stock_id = es.stock_id ");
-			queryString.append("WHERE p.observable_id = :traitId AND e.nd_geolocation_id IN ( :environmentIds )");
+			queryString.append("WHERE p.observable_id = :traitId AND e.nd_geolocation_id IN ( :environmentIds ) ");
+			queryString.append("ORDER BY s.dbxref_id ");
 			
 			LOG.debug(queryString.toString());
 			 
