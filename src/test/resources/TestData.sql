@@ -29,3 +29,28 @@ VALUES (-70, -2, -20, 1000), (-71, -3, -21, 1000);
 INSERT IGNORE INTO nd_geolocationprop (nd_geolocationprop_id, nd_geolocation_id, type_id, value, rank)
 VALUES (-50, -1, 8190, -2, 0)  -- location.locid = -2
 ;
+
+-- testGetUserByName
+DELETE FROM workbench.users WHERE userid = 10;
+
+INSERT INTO workbench.users (userid, instalid, ustatus,uaccess, utype, uname, upswd, personid, adate, cdate)
+VALUES (10, 0, 0, 0, 0, 'workbench_test', '123456', 1, 0, 0);
+
+-- testAddToolConfiguration
+ALTER TABLE workbench_tool_config DROP FOREIGN KEY fk_tool_config_1; 
+
+-- testGetWorkflowTemplateByName
+DELETE FROM workbench_workflow_template WHERE template_id=5;
+INSERT INTO workbench_workflow_template (template_id, name, user_defined)
+VALUES
+(5, 'Manager', 0);
+
+-- testGetProjectLocationMapByProjectId
+INSERT INTO workbench_project_loc_map (id, project_id, location_id)
+VALUES (1, 1, 1);
+
+-- testGetLocalIbdbUserId
+DELETE FROM workbench.workbench_ibdb_user_map WHERE workbench_user_id = 1 AND project_id = 3;
+INSERT INTO workbench.workbench_ibdb_user_map (workbench_user_id, project_id, ibdb_user_id)
+VALUES
+(1, 3, -1);

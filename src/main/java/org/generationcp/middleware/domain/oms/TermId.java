@@ -121,6 +121,7 @@ public enum TermId {
 	, ENTRY_CODE(8300)
 	
 	//Location 
+    , TRIAL_LOCATION(8180)
     , LOCATION_ID(8190)
     , SITE_NAME(8196)
 	
