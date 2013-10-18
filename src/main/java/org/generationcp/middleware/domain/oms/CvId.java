@@ -35,4 +35,14 @@ public enum CvId {
 	public int getId() {
 		return this.id;
 	}
+
+    public static CvId valueOf(int id) {
+        for (CvId cvId : CvId.values()) {
+            if (cvId.getId() == id) {
+                return cvId;
+            }
+        }
+
+        return null;
+    }
 }
