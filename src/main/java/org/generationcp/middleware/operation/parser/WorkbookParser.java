@@ -21,6 +21,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -318,6 +319,10 @@ public class WorkbookParser {
 
                 if (StringUtils.isEmpty(var.getLabel())) {
                     errorMessages.add(new Message("error.missing.field.label", Integer.toString(currentRow + 1)));
+                }
+                
+                if ((name.equals("FACTOR") || name.equals("CONDITION")) && PhenotypicType.getPhenotypicTypeForLabel(var.getLabel()) == null){
+                	 errorMessages.add(new Message("error.invalid.field.label", Integer.toString(currentRow + 1)));
                 }
 
                 measurementVariables.add(var);
