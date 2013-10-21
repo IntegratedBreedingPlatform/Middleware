@@ -20,7 +20,8 @@
  
 <!-- optional query to validate pooled connections:--> 
 <property name="hibernate.c3p0.idleConnectionTestPeriod">300</property> 
-<property name="hibernate.c3p0.preferredTestQuery">select 1</property> 
+<property name="hibernate.c3p0.preferredTestQuery">select 1</property>
+<property name="hibernate.c3p0.validate">true</property> 
   
   <mapping class="org.generationcp.middleware.pojos.Attribute"/>
   <mapping class="org.generationcp.middleware.pojos.Bibref"/>
