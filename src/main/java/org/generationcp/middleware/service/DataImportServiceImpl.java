@@ -127,7 +127,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
             messages.add(new Message("error.duplicate.study.name"));
         }
 
-        if (!isEntryExists(workbook.getFactors())) {
+        if (!isEntryExists(workbook.getFactors()) && !isEntryExists(workbook.getConditions())) {
             messages.add(new Message("error.entry.doesnt.exist"));
         }
 
