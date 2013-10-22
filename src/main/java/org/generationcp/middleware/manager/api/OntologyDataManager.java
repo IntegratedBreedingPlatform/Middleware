@@ -21,6 +21,7 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TraitReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
 /**
@@ -274,5 +275,18 @@ public interface OntologyDataManager {
 	 * @throws MiddlewareQueryException
 	 */
 	Property getProperty(String name) throws MiddlewareQueryException;
+	
+	
+	/**
+	 * Retrieves the trait classes containing the hierarchical structure 
+	 * of the trait groups: Trait Group --> Properties --> Standard Variables.
+	 * 
+	 * The lists are returned in alphabetical order of the name.
+	 *  
+	 * 
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	List<TraitReference> getTraitGroups() throws MiddlewareQueryException;
 	
 }

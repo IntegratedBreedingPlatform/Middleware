@@ -327,5 +327,12 @@ public interface StudyDataManager {
      */
     List<StudyDetails> getAllStudyDetails(Database instance, StudyType studyType) throws MiddlewareQueryException;
     
-
+    /**
+     * Checks if the name specified is an already existing project name
+     * 
+     * @param name
+     * @return true or false
+     * @throws MiddlewareQueryException
+     */
+    boolean checkIfProjectNameIsExisting(String name) throws MiddlewareQueryException;
 }

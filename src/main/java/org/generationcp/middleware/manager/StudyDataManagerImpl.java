@@ -88,6 +88,18 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
+    public boolean checkIfProjectNameIsExisting(String name) throws MiddlewareQueryException {
+        boolean isExisting = false;
+        setWorkingDatabase(Database.CENTRAL);
+        isExisting = getDmsProjectDao().checkIfProjectNameIsExisting(name);
+        if (!isExisting) {
+            setWorkingDatabase(Database.LOCAL);
+            isExisting = getDmsProjectDao().checkIfProjectNameIsExisting(name);
+        }
+        return isExisting;
+    }
+    
+    @Override
     public List<FolderReference> getRootFolders(Database instance) throws MiddlewareQueryException {
         if (setWorkingDatabase(instance)) {
             return getDmsProjectDao().getRootFolders();

@@ -25,6 +25,7 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.oms.TraitReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
@@ -442,6 +443,12 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		}		
 		return count;
 	}
+	
+	@Override
+	public  List<TraitReference> getTraitGroups() throws MiddlewareQueryException{
+	    return null;
+	}
+
 }
 
 
