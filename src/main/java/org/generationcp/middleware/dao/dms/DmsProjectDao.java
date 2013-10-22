@@ -537,5 +537,23 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
         return studyDetails;
 	    
 	}
+	
+	@SuppressWarnings("rawtypes")
+	public boolean checkIfProjectNameIsExisting(String name) throws MiddlewareQueryException {
+		try {
+			Criteria criteria = getSession().createCriteria(getPersistentClass());
+			criteria.add(Restrictions.eq("name", name));
+			
+			List list = criteria.list();
+			if(list!=null && !list.isEmpty()) {
+				return true;
+			}
+			
+		} catch (HibernateException e) {
+			logAndThrowException("Error in checkIfProjectNameIsExisting=" + name + " query on DmsProjectDao: " + e.getMessage(), e);
+		}
+		
+		return false;
+	}
 
 }

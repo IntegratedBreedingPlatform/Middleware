@@ -13,6 +13,8 @@
 package org.generationcp.middleware.manager.test;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -960,6 +962,20 @@ public class TestStudyDataManagerImpl {
 		variable.setValue(value);
 		variable.setVariableType(dataSet.getVariableTypes().findById(stdVarId));
 		return variable;
+	}
+	
+	@Test
+	public void testCheckIfProjectNameIsExisting() throws Exception {
+		Study study = manager.getStudy(10010);
+		String name = study.getName();
+		System.out.println("Name: " + name);
+		boolean isExisting = manager.checkIfProjectNameIsExisting(name);
+		assertTrue(isExisting);
+		
+		name = "SHOULDNOTEXISTSTUDY";
+		System.out.println("Name: " + name);
+		isExisting = manager.checkIfProjectNameIsExisting(name);
+		assertFalse(isExisting);
 	}
 	
 }
