@@ -446,7 +446,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	
 	@Override
 	public  List<TraitReference> getTraitGroups() throws MiddlewareQueryException{
-	    return null;
+       return getTraitGroupBuilder().get();
 	}
 
 }

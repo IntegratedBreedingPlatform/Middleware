@@ -28,7 +28,10 @@ import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TraitReference;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
+import org.generationcp.middleware.domain.oms.PropertyReference;
+import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.junit.After;
@@ -618,15 +621,55 @@ public class TestOntologyDataManagerImpl {
 
 	}
 	
-	@Test
-	public void testGetProperty() throws Exception {
-		int termId = 2452;
-		
-		Property property = manager.getProperty(termId);
-		
-		System.out.println(property);
-	}
-	
+    @Test
+    public void testGetProperty() throws Exception {
+        int termId = 2452;
+        
+        Property property = manager.getProperty(termId);
+        
+        System.out.println(property);
+    }
+    
+    @Test
+    public void testGetTraitGroups() throws Exception {
+        List<TraitReference> traitGroups = manager.getTraitGroups();
+        for (TraitReference traitGroup : traitGroups){
+            traitGroup.print(3);
+        }
+    }
+    
+    @Test
+    public void testPrintTraitGroupsWithNegativeIdsOnly() throws Exception {
+
+        List<TraitReference> traitGroups = manager.getTraitGroups();
+        for (TraitReference traitGroup : traitGroups){
+            traitGroup.print(3);
+            if (traitGroup.getId() < 0){
+                traitGroup.print(3);
+            }
+            List<org.generationcp.middleware.domain.oms.PropertyReference> properties = traitGroup.getProperties();
+            if (!properties.isEmpty()){
+                for(PropertyReference property : properties){
+                    if (property.getId() < 0){
+                        property.print(6);
+                    }
+                    List<StandardVariableReference> variables = property.getStandardVariables();
+                    if (!variables.isEmpty()){
+                        for(StandardVariableReference variable : variables){
+                            if (variable.getId() < 0){
+                                variable.print(9);
+                            }
+                        }
+                    }
+                }
+            }
+            
+        }
+        
+        
+    }
+    
+    
 	@Test
 	public void testGetPropertyByName() throws Exception {
 		String name = "Season";

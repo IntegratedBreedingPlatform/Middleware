@@ -32,6 +32,9 @@ public enum TermId {
 	, IS_A(1225)
 	, STORED_IN(1044)
 	
+	//Ontology
+	, ONTOLOGY_TRAIT_CLASS(1330)
+	
 	//Study Fields
 	, STUDY_NAME(8005)
 	, PM_KEY(8040)

@@ -20,9 +20,13 @@ import java.util.Set;
 
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.StandardVariableReference;
+import org.generationcp.middleware.domain.oms.TraitReference;
 import org.generationcp.middleware.hibernate.HibernateUtil;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.domain.oms.PropertyReference;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -105,7 +109,54 @@ public class TestCvTermDao{
          */
     }
 
-    
+    @Test
+    public void testGetTraitClasses() throws Exception {
+        List<TraitReference> traitClasses = dao.getTraitClasses();
+        assertTrue(traitClasses.size()>0);
+        Debug.println(4, "testGetTraitClasses(): " );
+        for (TraitReference trait : traitClasses){
+            Debug.println(8, trait.toString());
+        }
+    }
+
+    @Test
+    public void testGetPropertiesOfTraitClasses() throws Exception {
+        
+        List<Integer> traitClassIds = Arrays.asList(1340, 1345, 1350, 1360, 1370, 1380, 1410, 22568);
+        
+        Map<Integer, List<PropertyReference>> traitClassProperties = dao.getPropertiesOfTraitClasses(traitClassIds);
+        assertTrue(traitClassProperties.size() > 0);
+        Debug.println(4, "testGetPropertiesOfTraitClasses(): " );
+        for (Integer traitClassId : traitClassIds){
+            List<PropertyReference> properties = traitClassProperties.get(traitClassId);
+            if (properties != null){
+                Debug.println(4, traitClassId + " (size = " + properties.size() + ") : " + properties);
+                for (PropertyReference property : properties){
+                    property.print(4);
+                }
+            } else {
+                Debug.println(4, traitClassId + " (size = 0) : " + properties);
+            }
+        }
+    }
+
+    @Test
+    public void testGetStandardVariablesOfProperties() throws Exception {
+        
+        List<Integer> propertyIds = Arrays.asList(1340, 2000, 2002, 2010, 2012, 2015, 2270);
+        
+        Map<Integer, List<StandardVariableReference>> propertyVariables = dao.getStandardVariablesOfProperties(propertyIds);
+        assertTrue(propertyVariables.size() > 0);
+        Debug.println(4, "testGetStandardVariablesOfProperties(): " );
+        for (Integer id : propertyIds){
+            List<StandardVariableReference> properties = propertyVariables.get(id);
+            if (properties != null){
+                Debug.println(4, id + " (size = " + properties.size() + ") : " + properties);
+            } else {
+                Debug.println(4, id + " (size = 0) : " + properties);
+            }
+        }
+    }
     
     @AfterClass
     public static void tearDown() throws Exception {
