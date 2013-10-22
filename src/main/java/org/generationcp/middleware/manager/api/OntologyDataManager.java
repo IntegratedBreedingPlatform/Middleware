@@ -278,13 +278,15 @@ public interface OntologyDataManager {
 	
 	
 	/**
-	 * Retrieves the hierarchical structure of the trait groups: Trait Group --> Properties --> Standard Variables.
+	 * Retrieves the trait classes containing the hierarchical structure 
+	 * of the trait groups: Trait Group --> Properties --> Standard Variables.
+	 * 
 	 * The lists are returned in alphabetical order of the name.
 	 *  
 	 * 
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	TraitReference getTraitGroups() throws MiddlewareQueryException;
+	List<TraitReference> getTraitGroups() throws MiddlewareQueryException;
 	
 }
