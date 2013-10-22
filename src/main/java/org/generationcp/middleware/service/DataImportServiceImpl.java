@@ -116,6 +116,31 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
         return workbook;
     }
+    
+    @Override
+    public Workbook validateWorkbook(Workbook workbook) throws WorkbookParserException, MiddlewareQueryException {
+
+        // perform validations on the parsed data that require db access
+        List<Message> messages = new LinkedList<Message>();
+        Integer studyId = getStudyId(workbook.getStudyDetails().getStudyName());
+        if (studyId != null) {
+            messages.add(new Message("error.duplicate.study.name"));
+        }
+
+        if (!isEntryExists(workbook.getFactors())) {
+            messages.add(new Message("error.entry.doesnt.exist"));
+        }
+
+        if (!workbook.isNursery() && !isTrialEnvironmentExists(workbook.getConditions())) {
+            messages.add(new Message("error.missing.trial.condition"));
+        }
+
+        if (messages.size() > 0) {
+            throw new WorkbookParserException(messages);
+        }
+
+        return workbook;
+    }
 
     // copy pasted from WorkbookSaver
     // TODO refactor
