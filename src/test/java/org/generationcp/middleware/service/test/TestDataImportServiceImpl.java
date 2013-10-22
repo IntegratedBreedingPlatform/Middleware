@@ -15,6 +15,7 @@ package org.generationcp.middleware.service.test;
 import java.io.File;
 import java.util.List;
 
+import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
@@ -214,4 +215,21 @@ public class TestDataImportServiceImpl {
             serviceFactory.close();
         }
     }
+    
+    @Test
+	public void testCheckIfProjectNameIsExisting() throws Exception {
+    	//try to save first then use the name of the saved study
+    	Workbook workbook = TestWorkbookUtil.getTestWorkbook();
+        workbook.print(0);
+        dataImportService.saveDataset(workbook);
+        String name = workbook.getStudyDetails().getStudyName();
+		System.out.println("Name: " + name);
+		boolean isExisting = dataImportService.checkIfProjectNameIsExisting(name);
+		assertTrue(isExisting);
+		
+		name = "SHOULDNOTEXISTSTUDY";
+		System.out.println("Name: " + name);
+		isExisting = dataImportService.checkIfProjectNameIsExisting(name);
+		assertFalse(isExisting);
+	}
 }

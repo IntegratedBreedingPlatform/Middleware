@@ -46,4 +46,13 @@ public interface DataImportService {
 
 	Workbook validateWorkbook(Workbook workbook)
 			throws WorkbookParserException, MiddlewareQueryException;
+	
+	/**
+     * Checks if the name specified is an already existing project name
+     * 
+     * @param name
+     * @return true or false
+     * @throws MiddlewareQueryException
+     */
+    boolean checkIfProjectNameIsExisting(String name) throws MiddlewareQueryException;
 }
