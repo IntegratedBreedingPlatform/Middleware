@@ -799,14 +799,16 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
              SELECT cvterm_id, name, definition, cvr.object_id
              FROM cvterm cvt JOIN cvterm_relationship cvr 
                  ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = 1225 AND cvr.object_id IN (:traitClassIds)
+                 WHERE cv_id = 1010
                  ORDER BY cvr.object_id;
             */ 
 
             StringBuffer sqlString = new StringBuffer()
                 .append("SELECT cvterm_id, name, definition, cvr.object_id ")
                 .append("FROM cvterm cvt JOIN cvterm_relationship cvr ")
-                    .append("ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = ").append(TermId.IS_A.getId())
+                    .append("ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = ").append(TermId.IS_A.getId()).append(" ")
                     .append(" AND cvr.object_id  IN (:traitClassIds) ")
+                .append("WHERE cv_id =  ").append(CvId.PROPERTIES.getId()).append(" ")
                 .append("ORDER BY cvr.object_id ")
                 ;
             
