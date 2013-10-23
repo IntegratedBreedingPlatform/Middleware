@@ -173,9 +173,8 @@ public class TestWorkbenchDataManagerImpl{
     	userMap.setWorkbenchUserId(u.getUserid());
 
         // add the IBDB User Map
-        Integer newUserMapId = manager.addIbdbUserMap(userMap);
-
-        Assert.assertTrue("Should return a new user_map id",newUserMapId > 0);
+        Integer result = manager.addIbdbUserMap(userMap);
+        Assert.assertNotNull("Should return a new user_map id",result);
 
         System.out.println("testAddIbdbUserMap(): " + userMap);
 
