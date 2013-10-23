@@ -407,4 +407,26 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         return getDmsProjectDao().getAllStudyDetails(studyType);
     }
 
+    @Override
+    public long countProjectsByVariable(int variableId) throws MiddlewareQueryException {
+        setWorkingDatabase(Database.LOCAL);
+        long count = getDmsProjectDao().countByVariable(variableId);
+        if (variableId > 0) {
+            setWorkingDatabase(Database.CENTRAL);
+            count += getDmsProjectDao().countByVariable(variableId);
+        }
+        return count;
+    }
+
+    @Override
+    public long countExperimentsByVariable(int variableId, int storedInId) throws MiddlewareQueryException {
+        setWorkingDatabase(Database.LOCAL);
+        long count = getExperimentDao().countByObservedVariable(variableId, storedInId);
+        if (variableId > 0) {
+            setWorkingDatabase(Database.CENTRAL);
+            count += getExperimentDao().countByObservedVariable(variableId, storedInId);
+        }
+        return count;
+    }
+
 }

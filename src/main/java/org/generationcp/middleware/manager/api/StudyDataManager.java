@@ -335,4 +335,22 @@ public interface StudyDataManager {
      * @throws MiddlewareQueryException
      */
     boolean checkIfProjectNameIsExisting(String name) throws MiddlewareQueryException;
+    
+    /**
+     * Count the number of projects the variable was used in the project.
+     * 
+     * @param variableId
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    long countProjectsByVariable(int variableId) throws MiddlewareQueryException;
+    
+    /**
+     * Count the number of experiments the variable was used in the project.
+     * 
+     * @param variableId
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    long countExperimentsByVariable(int variableId, int storedInId) throws MiddlewareQueryException;
 }

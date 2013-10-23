@@ -212,4 +212,21 @@ public interface OntologyService {
      */
     List<Term> getAllRoles() throws MiddlewareQueryException;
 
+    /**
+     * Count the number of projects the variable was used.
+     * 
+     * @param variableId
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    long countProjectsByVariable(int variableId) throws MiddlewareQueryException;
+    
+    /**
+     * Count the number of experiments the variable was used.
+     * 
+     * @param variableId
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    long countExperimentsByVariable(int variableId, int storedInId) throws MiddlewareQueryException;
 }

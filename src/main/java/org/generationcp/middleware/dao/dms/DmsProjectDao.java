@@ -32,13 +32,12 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link DmsProject}.
@@ -48,9 +47,6 @@ import org.slf4j.LoggerFactory;
  */
 public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
     
-    
-    private static final Logger LOG = LoggerFactory.getLogger(DmsProjectDao.class);
-
 	private static final String GET_CHILDREN_OF_FOLDER =		
 			"SELECT DISTINCT subject.project_id, subject.name,  subject.description " 
 			+ "		, (CASE WHEN (type_id = " + TermId.IS_STUDY.getId() + ") THEN 1 ELSE 0 END) AS is_study  "
@@ -87,8 +83,18 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "     	AND pp.project_id = p.project_id AND pp.value = " 
 			+ "         "+TermId.DELETED_STUDY.getId()+") "
 		    + " ORDER BY p.project_id ";
-		 
-
+	
+	private static final String COUNT_PROJECTS_WITH_VARIABLE =
+	        "SELECT count(pp.project_id) " 
+	        + " FROM projectprop pp "
+	        + " WHERE NOT EXISTS( "
+	            + " SELECT 1 FROM projectprop stat "
+	            + " WHERE stat.project_id = pp.project_id "
+	            + " AND stat.type_id = " + TermId.STUDY_STATUS.getId()
+	            + " AND value = " + TermId.DELETED_STUDY.getId() + ") "
+	        + " AND pp.type_id = " + TermId.STANDARD_VARIABLE.getId()
+	        + " AND pp.value = :variableId";
+	
 	@SuppressWarnings("unchecked")
 	public List<FolderReference> getRootFolders() throws MiddlewareQueryException{
 		
@@ -555,5 +561,19 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		
 		return false;
 	}
+	
+    public long countByVariable(int variableId) throws MiddlewareQueryException {
+        try {
+            SQLQuery query = getSession().createSQLQuery(COUNT_PROJECTS_WITH_VARIABLE);
+            query.setParameter("variableId", variableId);
+            
+            return ((BigInteger) query.uniqueResult()).longValue();
+            
+        } catch(HibernateException e) {
+            logAndThrowException("Error at countByVariable=" + variableId + ", " + variableId + " query at DmsProjectDao: " + e.getMessage(), e);
+        }
+        return 0;
+    }
+
 
 }

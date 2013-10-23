@@ -165,6 +165,14 @@ public class OntologyServiceImpl extends Service implements OntologyService {
         return getOntologyDataManager().getTermsByIds(roleIds);
     }
 
+    @Override
+    public long countProjectsByVariable(int variableId) throws MiddlewareQueryException {
+        return getStudyDataManager().countProjectsByVariable(variableId);
+    }
 
+    @Override
+    public long countExperimentsByVariable(int variableId, int storedInId) throws MiddlewareQueryException {
+        return getStudyDataManager().countExperimentsByVariable(variableId, storedInId);
+    }
 
 }
