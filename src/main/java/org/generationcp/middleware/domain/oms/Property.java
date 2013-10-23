@@ -1,6 +1,9 @@
 package org.generationcp.middleware.domain.oms;
 
+import org.generationcp.middleware.util.Debug;
+
 public class Property {
+    
 	Term term;
 	Term IsA;
 	
@@ -34,5 +37,13 @@ public class Property {
 		builder.append("]");
 		return builder.toString();
 	}
+
+    public void print(int indent) {
+        Debug.println(indent, "Property: ");
+        Debug.println(indent + 3, "term: ");
+        term.print(indent+6);
+        Debug.println(indent + 3, "IsA: ");
+        IsA.print(indent+6);
+    }
 	
 }

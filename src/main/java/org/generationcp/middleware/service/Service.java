@@ -13,7 +13,9 @@ package org.generationcp.middleware.service;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.OntologyDataManagerImpl;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.saver.WorkbookSaver;
 import org.generationcp.middleware.util.DatabaseBroker;
@@ -40,4 +42,9 @@ public abstract class Service extends DatabaseBroker {
     protected final StudyDataManager getStudyDataManager() {
         return new StudyDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
     }
+    
+    protected final OntologyDataManager getOntologyDataManager() {
+        return new OntologyDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
 }

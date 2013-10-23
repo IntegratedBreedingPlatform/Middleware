@@ -1,0 +1,117 @@
+/*******************************************************************************
+ * Copyright (c) 2013, All Rights Reserved.
+ *
+ * Generation Challenge Programme (GCP)
+ *
+ *
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
+ *******************************************************************************/
+package org.generationcp.middleware.service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.oms.Property;
+import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TraitReference;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.service.api.OntologyService;
+
+public class OntologyServiceImpl extends Service implements OntologyService {
+
+    public OntologyServiceImpl(
+            HibernateSessionProvider sessionProviderForLocal,
+            HibernateSessionProvider sessionProviderForCentral) {
+        super(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
+    /*======================= STANDARD VARIABLE ================================== */
+
+    @Override
+    public StandardVariable getStandardVariable(int stdVariableId) throws MiddlewareQueryException {
+        return getOntologyDataManager().getStandardVariable(stdVariableId);
+    }
+
+    @Override
+    public StandardVariable getStandardVariable(Integer propertyId, Integer scaleId, Integer methodId)
+            throws MiddlewareQueryException {
+        OntologyDataManager manager = getOntologyDataManager();
+        Integer standardVariableId = manager.getStandardVariableIdByPropertyScaleMethod(propertyId, scaleId, methodId);
+        return manager.getStandardVariable(standardVariableId);
+    }
+
+    @Override
+    public List<StandardVariable> getStandardVariables(String nameOrSynonym) throws MiddlewareQueryException {
+        List<StandardVariable> standardVariables = new ArrayList<StandardVariable>();
+        standardVariables.addAll(getOntologyDataManager().findStandardVariablesByNameOrSynonym(nameOrSynonym));
+        return standardVariables;
+    }
+    
+    @Override
+    public void addStandardVariable(StandardVariable stdVariable) throws MiddlewareQueryException {
+        getOntologyDataManager().addStandardVariable(stdVariable);
+    }
+    
+    /*======================= PROPERTY ================================== */
+
+
+    @Override
+    public Property getProperty(int id) throws MiddlewareQueryException {
+        return getOntologyDataManager().getProperty(id);
+    }
+
+    @Override
+    public Property getProperty(String name) throws MiddlewareQueryException {
+        return getOntologyDataManager().getProperty(name);
+    }
+
+    @Override
+    public Term addProperty(String name, String definition, int isA) throws MiddlewareQueryException {
+        return getOntologyDataManager().addProperty(name, definition, isA);
+    }
+    
+    /*======================= SCALE ================================== */
+
+    @Override
+    public Term getScale(int id) throws MiddlewareQueryException {
+        return getOntologyDataManager().getTermById(id);
+    }
+
+    /*======================= METHOD ================================== */
+    
+    @Override
+    public Term getMethod(int id) throws MiddlewareQueryException {
+        return getOntologyDataManager().findMethodById(id);
+    }
+
+    @Override
+    public Term getMethod(String name) throws MiddlewareQueryException {
+        return getOntologyDataManager().findMethodByName(name);
+    }
+    
+    @Override
+    public Term addMethod(String name, String definition) throws MiddlewareQueryException {
+        return getOntologyDataManager().addMethod(name, definition);
+    }
+    
+    
+    /*======================= OTHERS ================================== */
+
+    @Override
+    public List<Term> getDataTypes() throws MiddlewareQueryException {
+        return getOntologyDataManager().getDataTypes();
+    }
+
+    
+    @Override
+    public List<TraitReference> getTraitGroups() throws MiddlewareQueryException {
+        return getOntologyDataManager().getTraitGroups();
+    }
+
+}
