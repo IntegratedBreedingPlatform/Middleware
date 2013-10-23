@@ -105,7 +105,7 @@ public interface OntologyService {
 
     
     /**
-     * Adds the property.
+     * Adds a property.
      *
      * @param name the name
      * @param definition the definition
@@ -144,7 +144,7 @@ public interface OntologyService {
      * @return the matching method
      * @throws MiddlewareQueryException
      */
-    Term getMethod(int id) throws MiddlewareQueryException;
+    Method getMethod(int id) throws MiddlewareQueryException;
 
     
     /**
@@ -154,7 +154,7 @@ public interface OntologyService {
      * @return the matching method
      * @throws MiddlewareQueryException
      */
-    Term getMethod(String name) throws MiddlewareQueryException;
+    Method getMethod(String name) throws MiddlewareQueryException;
     
     
     /**
@@ -163,10 +163,10 @@ public interface OntologyService {
      * @return All the methods
      * @throws MiddlewareQueryException
      */
-    List<Method>  getAllMethods() throws MiddlewareQueryException;
+    List<Method> getAllMethods() throws MiddlewareQueryException;
 
     /**
-     * Adds the method.
+     * Adds a method.
      *
      * @param name the name
      * @param definition the definition

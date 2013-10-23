@@ -142,14 +142,14 @@ public class TestOntologyServiceImpl {
     
     @Test
     public void testGetMethodById() throws MiddlewareQueryException {
-        Term method = ontologyService.getMethod(4030);       
+        Method method = ontologyService.getMethod(4030);       
         assertTrue(method != null);
         method.print(3);        
     }
 
     @Test
     public void testGetMethodByName() throws MiddlewareQueryException {
-        Term method = ontologyService.getMethod("Enumerated");       
+        Method method = ontologyService.getMethod("Enumerated");       
         assertTrue(method != null);
         method.print(3);        
     }

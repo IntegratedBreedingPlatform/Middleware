@@ -112,13 +112,13 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     /*======================= METHOD ================================== */
     
     @Override
-    public Term getMethod(int id) throws MiddlewareQueryException {
-        return getOntologyDataManager().findMethodById(id);
+    public Method getMethod(int id) throws MiddlewareQueryException {
+        return new Method(getOntologyDataManager().findMethodById(id));
     }
 
     @Override
-    public Term getMethod(String name) throws MiddlewareQueryException {
-        return getOntologyDataManager().findMethodByName(name);
+    public Method getMethod(String name) throws MiddlewareQueryException {
+        return new Method(getOntologyDataManager().findMethodByName(name));
     }
     
     @Override
