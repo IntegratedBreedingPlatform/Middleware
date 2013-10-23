@@ -54,3 +54,11 @@ DELETE FROM workbench.workbench_ibdb_user_map WHERE workbench_user_id = 1 AND pr
 INSERT INTO workbench.workbench_ibdb_user_map (workbench_user_id, project_id, ibdb_user_id)
 VALUES
 (1, 3, -1);
+
+-- testAddProjectUserMysqlAccounts
+ALTER TABLE workbench_project_user_mysql_account DROP FOREIGN KEY fk_project_user_mysql_1;
+
+--testGetProjectMethodByProject
+DELETE FROM workbench.workbench_project_method WHERE project_id=41;
+INSERT INTO workbench.workbench_project_method (project_id, method_id)
+VALUES (41, 6);

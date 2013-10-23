@@ -142,7 +142,7 @@ public class TestWorkbenchDataManagerImpl{
     public void testAddProjectActivity() throws MiddlewareQueryException {
         ProjectActivity projectActivity = new ProjectActivity();
 
-        projectActivity.setProject(manager.getProjectById(manager.getProjectBackups().get(0).getProjectId()));
+        projectActivity.setProject(manager.getProjectById(1L));
         projectActivity.setName("Fieldbook");
         projectActivity.setDescription("Launch FieldBook");
         projectActivity.setUser(manager.getUserById(1));
@@ -827,7 +827,7 @@ public class TestWorkbenchDataManagerImpl{
 
     @Test
     public void testGetProjectActivitiesByProjectId() throws MiddlewareQueryException {
-    	long projectId = manager.getProjects().get(0).getProjectId();
+    	long projectId = manager.getProjectById(1L).getProjectId();
     	List<ProjectActivity> results = manager.getProjectActivitiesByProjectId(projectId, 1, 50);
     	Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
