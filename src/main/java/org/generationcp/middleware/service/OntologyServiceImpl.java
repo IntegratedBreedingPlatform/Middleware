@@ -14,6 +14,7 @@ package org.generationcp.middleware.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Method;
@@ -140,7 +141,7 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     /*======================= OTHERS ================================== */
 
     @Override
-    public List<Term> getDataTypes() throws MiddlewareQueryException {
+    public List<Term> getAllDataTypes() throws MiddlewareQueryException {
         return getOntologyDataManager().getDataTypes();
     }
     
@@ -153,6 +154,17 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     public List<TraitReference> getAllTraitClasses() throws MiddlewareQueryException{
         return getOntologyDataManager().getAllTraitClasses();
     }
+
+    @Override
+    public List<Term> getAllRoles() throws MiddlewareQueryException{
+        List<Integer> roleIds = new ArrayList<Integer>();
+        roleIds.addAll(PhenotypicType.TRIAL_DESIGN.getTypeStorages());
+        roleIds.addAll(PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages());
+        roleIds.addAll(PhenotypicType.GERMPLASM.getTypeStorages());
+        roleIds.addAll(PhenotypicType.VARIATE.getTypeStorages());
+        return getOntologyDataManager().getTermsByIds(roleIds);
+    }
+
 
 
 }

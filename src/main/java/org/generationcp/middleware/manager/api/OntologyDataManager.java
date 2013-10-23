@@ -301,4 +301,14 @@ public interface OntologyDataManager {
      */
     List<TraitReference> getAllTraitClasses() throws MiddlewareQueryException;
 	
+    
+    /**
+     * Retrieves all the Term entries based on the given list of ids.
+     * 
+     * @param ids
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    public List<Term> getTermsByIds(List<Integer> ids) throws MiddlewareQueryException;
+
 }

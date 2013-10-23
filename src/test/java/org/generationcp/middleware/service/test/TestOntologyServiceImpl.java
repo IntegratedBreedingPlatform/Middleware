@@ -114,27 +114,6 @@ public class TestOntologyServiceImpl {
     }
 
     @Test
-    public void testGetAllScales() throws MiddlewareQueryException {
-        List<Scale> scales = ontologyService.getAllScales();       
-        assertTrue(!scales.isEmpty());
-        for (Scale scale : scales){
-            scale.print(3);
-        }
-        Debug.println(3, " # Records = " + scales.size());
-    }
-
-
-    @Test
-    public void testGetAllMethods() throws MiddlewareQueryException {
-        List<Method> methods = ontologyService.getAllMethods();       
-        assertTrue(!methods.isEmpty());
-        for (Method method : methods){
-            method.print(3);
-        }
-        Debug.println(3, " # Records = " + methods.size());
-    }
-    
-    @Test
     public void testAddProperty() throws MiddlewareQueryException {
     }
     
@@ -146,6 +125,18 @@ public class TestOntologyServiceImpl {
         assertTrue(scale != null);
         scale.print(3);
     }
+
+
+    @Test
+    public void testGetAllScales() throws MiddlewareQueryException {
+        List<Scale> scales = ontologyService.getAllScales();       
+        assertTrue(!scales.isEmpty());
+        for (Scale scale : scales){
+            scale.print(3);
+        }
+        Debug.println(3, " # Records = " + scales.size());
+    }
+
 
     /*======================= METHOD ================================== */
     
@@ -164,6 +155,16 @@ public class TestOntologyServiceImpl {
     }
     
     @Test
+    public void testGetAllMethods() throws MiddlewareQueryException {
+        List<Method> methods = ontologyService.getAllMethods();       
+        assertTrue(!methods.isEmpty());
+        for (Method method : methods){
+            method.print(3);
+        }
+        Debug.println(3, " # Records = " + methods.size());
+    }
+    
+    @Test
     public void testAddMethod() throws MiddlewareQueryException {
     }
     
@@ -172,7 +173,7 @@ public class TestOntologyServiceImpl {
 
     @Test
     public void testGetDataTypes() throws MiddlewareQueryException {
-        List<Term> dataTypes = ontologyService.getDataTypes();       
+        List<Term> dataTypes = ontologyService.getAllDataTypes();       
         assertTrue(!dataTypes.isEmpty());
         for (Term dataType : dataTypes){
             dataType.print(3);
@@ -191,7 +192,27 @@ public class TestOntologyServiceImpl {
 
     }
 
+    @Test
+    public void testGetAllTraitClasses() throws MiddlewareQueryException {
+        List<TraitReference> traitClasses = ontologyService.getAllTraitClasses();           
+        assertTrue(!traitClasses.isEmpty());
+        for (TraitReference traitClass : traitClasses){
+            traitClass.print(3);
+        }
+        Debug.println(3, " # Records = " + traitClasses.size());
 
+    }
+
+    @Test
+    public void testGetAllRoles() throws MiddlewareQueryException {
+        List<Term> roles = ontologyService.getAllRoles();           
+        assertTrue(!roles.isEmpty());
+        for (Term role : roles){
+            Debug.println(3, "---");
+            role.print(3);
+        }
+        Debug.println(3, " # Records = " + roles.size());
+    }
 
     @After
     public void afterEachTest() {
