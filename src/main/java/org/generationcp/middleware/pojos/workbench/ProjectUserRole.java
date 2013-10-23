@@ -40,7 +40,7 @@ public class ProjectUserRole implements Serializable{
     
     public static final String GET_USERS_BY_PROJECT_ID = 
             "SELECT users.userid, users.instalid, users.ustatus, users.uaccess, users.utype, " +
-            "users.uname, users.upswd, users.personid, users.adate, users.cdate, users.ulogincount " + 
+            "users.uname, users.upswd, users.personid, users.adate, users.cdate" +
             "FROM users JOIN workbench_project_user_role pu ON users.userid = pu.user_id " +
             "WHERE pu.project_id = :projectId " +
             "GROUP BY users.userid";
