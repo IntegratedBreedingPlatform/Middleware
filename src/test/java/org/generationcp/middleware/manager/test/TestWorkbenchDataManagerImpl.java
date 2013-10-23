@@ -182,14 +182,16 @@ public class TestWorkbenchDataManagerImpl{
 
     @Test
     public void testAddProjectLocationMap() throws MiddlewareQueryException {
-    	ProjectLocationMap projectLocationMap = new ProjectLocationMap();
+        ProjectLocationMap projectLocationMap = new ProjectLocationMap();
 
-    	projectLocationMap.setId(1);
     	projectLocationMap.setLocationId(1L);
     	projectLocationMap.setProject(manager.getProjectById(1L));
 
         // add the Add Project Location Map
-        manager.addProjectLocationMap(projectLocationMap);
+        Integer result = manager.addProjectLocationMap(projectLocationMap);
+
+        Assert.assertNotNull("Should return a result, id of the newly added projectlocationmap",result);
+
         System.out.println("testAddProjectLocationMap(): " + projectLocationMap);
 
     }
