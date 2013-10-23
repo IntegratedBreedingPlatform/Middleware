@@ -15,7 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Property;
+import org.generationcp.middleware.domain.oms.Scale;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TraitReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -72,6 +75,17 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     }
 
     @Override
+    public List<Property> getAllProperties() throws MiddlewareQueryException {
+        List<Property> properties = new ArrayList<Property>();
+        List<Term> propertyTerms = getOntologyDataManager().getAllTermsByCvId(CvId.PROPERTIES);
+        
+        for (Term term : propertyTerms){
+            properties.add(new Property(term));
+        }
+        return properties;        
+    }
+
+    @Override
     public Term addProperty(String name, String definition, int isA) throws MiddlewareQueryException {
         return getOntologyDataManager().addProperty(name, definition, isA);
     }
@@ -79,8 +93,19 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     /*======================= SCALE ================================== */
 
     @Override
-    public Term getScale(int id) throws MiddlewareQueryException {
-        return getOntologyDataManager().getTermById(id);
+    public Scale getScale(int id) throws MiddlewareQueryException {
+        return new Scale(getOntologyDataManager().getTermById(id));
+    }
+
+    @Override
+    public List<Scale> getAllScales() throws MiddlewareQueryException {
+        List<Scale> scales = new ArrayList<Scale>();
+        List<Term> scaleTerms = getOntologyDataManager().getAllTermsByCvId(CvId.SCALES);
+        
+        for (Term term : scaleTerms){
+            scales.add(new Scale(term));
+        }
+        return scales;        
     }
 
     /*======================= METHOD ================================== */
@@ -96,6 +121,17 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     }
     
     @Override
+    public List<Method> getAllMethods() throws MiddlewareQueryException {
+        List<Method> methods = new ArrayList<Method>();
+        List<Term> methodTerms = getOntologyDataManager().getAllTermsByCvId(CvId.METHODS);
+        
+        for (Term term : methodTerms){
+            methods.add(new Method(term));
+        }
+        return methods; 
+    }
+    
+    @Override
     public Term addMethod(String name, String definition) throws MiddlewareQueryException {
         return getOntologyDataManager().addMethod(name, definition);
     }
@@ -107,11 +143,16 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     public List<Term> getDataTypes() throws MiddlewareQueryException {
         return getOntologyDataManager().getDataTypes();
     }
-
     
     @Override
     public List<TraitReference> getTraitGroups() throws MiddlewareQueryException {
         return getOntologyDataManager().getTraitGroups();
     }
+
+    @Override
+    public List<TraitReference> getAllTraitClasses() throws MiddlewareQueryException{
+        return getOntologyDataManager().getAllTraitClasses();
+    }
+
 
 }

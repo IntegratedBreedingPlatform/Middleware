@@ -639,6 +639,14 @@ public class TestOntologyDataManagerImpl {
     }
     
     @Test
+    public void testGetAllTraitClasses() throws Exception {
+        List<TraitReference> traitClasses = manager.getAllTraitClasses();
+        for (TraitReference traitClass : traitClasses){
+            traitClass.print(3);
+        }
+    }
+    
+    @Test
     public void testPrintTraitGroupsWithNegativeIdsOnly() throws Exception {
 
         List<TraitReference> traitGroups = manager.getTraitGroups();

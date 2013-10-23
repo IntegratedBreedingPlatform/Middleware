@@ -15,7 +15,9 @@ package org.generationcp.middleware.service.api;
 import java.util.List;
 
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Property;
+import org.generationcp.middleware.domain.oms.Scale;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TraitReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -89,6 +91,10 @@ public interface OntologyService {
      * @throws MiddlewareQueryException 
      */
     Property getProperty(String name) throws MiddlewareQueryException;
+    
+    
+    List<Property> getAllProperties() throws MiddlewareQueryException;
+
 
     
     /**
@@ -111,7 +117,10 @@ public interface OntologyService {
      * @return the matching scale
      * @throws MiddlewareQueryException 
      */
-    Term getScale(int id) throws MiddlewareQueryException;
+    Scale getScale(int id) throws MiddlewareQueryException;
+    
+    List<Scale> getAllScales() throws MiddlewareQueryException;
+    
 
     /*======================= METHOD ================================== */
 
@@ -135,6 +144,8 @@ public interface OntologyService {
     Term getMethod(String name) throws MiddlewareQueryException;
     
     
+    List<Method> getAllMethods() throws MiddlewareQueryException;
+
     /**
      * Adds the method.
      *
@@ -157,7 +168,7 @@ public interface OntologyService {
      */
     List<Term> getDataTypes() throws MiddlewareQueryException;
 
-    
+  
     /**
      * Gets all the trait groups, its properties and standard variables in a hierarchical structure.
      *
@@ -166,5 +177,6 @@ public interface OntologyService {
      */
     List<TraitReference> getTraitGroups() throws MiddlewareQueryException;
 
+    List<TraitReference> getAllTraitClasses() throws MiddlewareQueryException;
 
 }

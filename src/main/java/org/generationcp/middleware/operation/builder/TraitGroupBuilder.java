@@ -30,13 +30,17 @@ public class TraitGroupBuilder extends Builder {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 
-	public List<TraitReference> get() throws MiddlewareQueryException {
+    /** 
+     * Gets all Trait Classes with properties and standard variables in a hierarchy from both Central and Local databases
+     * 
+     * @return
+     * @throws MiddlewareQueryException
+     */
+
+	public List<TraitReference> buildTraitGroupHierarchy() throws MiddlewareQueryException {
 
         // Step 1: Get all Trait Classes from Central and Local
-	    List<TraitReference> traitClasses = new ArrayList<TraitReference>();
-        traitClasses.addAll(getTraitClasses(Database.CENTRAL));
-        traitClasses.addAll(getTraitClasses(Database.LOCAL));
-        Collections.sort(traitClasses);
+	    List<TraitReference> traitClasses = getAllTraitClasses();
 	    
         // Step 2: Get all Trait Class Properties from Central and Local
         setPropertiesOfTraitClasses(Database.CENTRAL, traitClasses);
@@ -49,6 +53,20 @@ public class TraitGroupBuilder extends Builder {
         }
 
 	    return traitClasses;
+	}
+	
+    /** 
+     * Gets all Trait Classes from Central and Local
+     * 
+     * @return
+     * @throws MiddlewareQueryException
+     */
+	public List<TraitReference> getAllTraitClasses() throws MiddlewareQueryException {
+        List<TraitReference> traitClasses = new ArrayList<TraitReference>();
+        traitClasses.addAll(getTraitClasses(Database.CENTRAL));
+        traitClasses.addAll(getTraitClasses(Database.LOCAL));
+        Collections.sort(traitClasses);
+        return traitClasses;
 	}
 	
 	

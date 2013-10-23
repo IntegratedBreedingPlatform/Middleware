@@ -289,4 +289,16 @@ public interface OntologyDataManager {
 	 */
 	List<TraitReference> getTraitGroups() throws MiddlewareQueryException;
 	
+
+    /**
+     * Retrieves all the trait classes (id, name, description) from central and local.
+     * 
+     * The lists are returned in alphabetical order of the name.
+     *  
+     * 
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    List<TraitReference> getAllTraitClasses() throws MiddlewareQueryException;
+	
 }

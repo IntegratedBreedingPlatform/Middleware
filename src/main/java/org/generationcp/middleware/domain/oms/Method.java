@@ -13,36 +13,27 @@ package org.generationcp.middleware.domain.oms;
 
 import org.generationcp.middleware.util.Debug;
 
-public class Property {
+public class Method {
     
-	Term term;
-	
-	Term IsA;
-	
-	
-	public Property() {
-	}
+    private Term term;
+    
+    public Method() {
+    }
 
-    public Property(Term term) {
+    public Method(Term term) {
+        this.term = term;
+    }
+    
+
+    public Term getTerm() {
+        return term;
+    }
+
+    
+    public void setTerm(Term term) {
         this.term = term;
     }
 
-    public Term getIsA() {
-		return IsA;
-	}
-
-	public void setIsA(Term isA) {
-		IsA = isA;
-	}
-
-	public Term getTerm() {
-		return term;
-	}
-
-	public void setTerm(Term term) {
-		this.term = term;
-	}
-	
     public int getId() {
         return term.getId();
     }
@@ -50,7 +41,7 @@ public class Property {
     public void setId(int id) {
         term.setId(id);
     }
-	
+    
 
     public String getName() {
         return term.getName();
@@ -67,27 +58,20 @@ public class Property {
     public void setDefinition(String definition) {
         term.setDefinition(definition);
     }
-	
-	
+    
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("Property [term=");
-		builder.append(term);
-		builder.append(", IsA=");
-		builder.append(IsA);
+		builder.append("Method [");
+		builder.append(super.toString());
 		builder.append("]");
 		return builder.toString();
 	}
 
     public void print(int indent) {
-        Debug.println(indent, "Property: ");
-        Debug.println(indent + 3, "term: ");
-        term.print(indent + 6);
-        if (IsA != null){
-            Debug.println(indent + 3, "IsA: ");
-            IsA.print(indent + 6);
-        }
+        Debug.println(indent, "Method: ");
+        term.print(indent + 3);
     }
 	
 }

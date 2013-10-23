@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, All Rights Reserved.
+ * Copyright (c) 2013, All Rights Reserved.
  *
  * Generation Challenge Programme (GCP)
  *
@@ -17,13 +17,16 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Property;
+import org.generationcp.middleware.domain.oms.Scale;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TraitReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.service.ServiceFactory;
 import org.generationcp.middleware.service.api.OntologyService;
+import org.generationcp.middleware.util.Debug;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -101,6 +104,37 @@ public class TestOntologyServiceImpl {
     }
 
     @Test
+    public void testGetAllProperties() throws MiddlewareQueryException {
+        List<Property> properties = ontologyService.getAllProperties();       
+        assertTrue(!properties.isEmpty());
+        for (Property property : properties){
+            property.print(3);
+        }
+        Debug.println(3, " # Records = " + properties.size());
+    }
+
+    @Test
+    public void testGetAllScales() throws MiddlewareQueryException {
+        List<Scale> scales = ontologyService.getAllScales();       
+        assertTrue(!scales.isEmpty());
+        for (Scale scale : scales){
+            scale.print(3);
+        }
+        Debug.println(3, " # Records = " + scales.size());
+    }
+
+
+    @Test
+    public void testGetAllMethods() throws MiddlewareQueryException {
+        List<Method> methods = ontologyService.getAllMethods();       
+        assertTrue(!methods.isEmpty());
+        for (Method method : methods){
+            method.print(3);
+        }
+        Debug.println(3, " # Records = " + methods.size());
+    }
+    
+    @Test
     public void testAddProperty() throws MiddlewareQueryException {
     }
     
@@ -108,7 +142,7 @@ public class TestOntologyServiceImpl {
 
     @Test
     public void testGetScaleById() throws MiddlewareQueryException {
-        Term scale = ontologyService.getScale(6030);       
+        Scale scale = ontologyService.getScale(6030);       
         assertTrue(scale != null);
         scale.print(3);
     }
