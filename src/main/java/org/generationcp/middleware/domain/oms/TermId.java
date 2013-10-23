@@ -119,6 +119,7 @@ public enum TermId {
     , ORDER(1420)
 	, MIN_VALUE(1113)
 	, MAX_VALUE(1115)
+	, CROP_ONTOLOGY_ID(1226)
 
 	// Stock Type
 	, ENTRY_CODE(8300)

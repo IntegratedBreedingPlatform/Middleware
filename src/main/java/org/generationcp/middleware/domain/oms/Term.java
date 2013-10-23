@@ -50,6 +50,14 @@ public class Term {
 		this.nameSynonyms = nameSynonyms;
 	}
 
+    public Term(int id, String name, String definition, List<NameSynonym> nameSynonyms, List<TermProperty> properties) {
+        this.id = id;
+        this.name = name;
+        this.definition = definition;
+        this.nameSynonyms = nameSynonyms;
+        this.properties = properties;
+    }
+
 	public int getId() {
 		return id;
 	}

@@ -19,14 +19,15 @@ import java.util.Map;
 import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.Enumeration;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.NameSynonym;
 import org.generationcp.middleware.domain.dms.NameType;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.oms.TermProperty;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -56,6 +57,10 @@ public class StandardVariableBuilder extends Builder {
 			
 			addConstraints(standardVariable, cvTerm);
 			addRelatedTerms(standardVariable, cvTerm);
+			
+			if (standardVariable.getProperty() != null) {
+			    standardVariable.setCropOntologyId(getCropOntologyId(standardVariable.getProperty()));
+			}
 		}
 		return standardVariable;
 	}
@@ -72,7 +77,11 @@ public class StandardVariableBuilder extends Builder {
 				standardVariable.setDescription(cvTerm.getDefinition());
 				addConstraints(standardVariable, cvTerm);
 				addRelatedTerms(standardVariable, cvTerm);
-				standardVariables.add(standardVariable);
+	            if (standardVariable.getProperty() != null) {
+	                standardVariable.setCropOntologyId(getCropOntologyId(standardVariable.getProperty()));
+	            }
+
+	            standardVariables.add(standardVariable);
 			}
 		}
 		return standardVariables;
@@ -123,6 +132,17 @@ public class StandardVariableBuilder extends Builder {
 			return Integer.parseInt(property.getValue());
 		}
 		return 0;
+	}
+	
+	private String getCropOntologyId(Term term) {
+	    if (term != null && term.getProperties() != null && term.getProperties().size() > 0) {
+	        for (TermProperty termProperty : term.getProperties()) {
+	            if (TermId.CROP_ONTOLOGY_ID.getId() == termProperty.getTypeId()) {
+	                return termProperty.getValue();
+	            }
+	        }
+	    }
+	    return null;
 	}
 
 	private CVTermProperty findProperty(List<CVTermProperty> properties, int typeId) {
@@ -178,7 +198,10 @@ public class StandardVariableBuilder extends Builder {
 
 	private Term createTerm(Integer id) throws MiddlewareQueryException {
 		CVTerm cvTerm = getCvTerm(id);
-		return cvTerm != null ? new Term(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition(), createSynonyms(cvTerm.getSynonyms())) : null;
+		return cvTerm != null 
+		        ? new Term(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition(), 
+		                    createSynonyms(cvTerm.getSynonyms()), createTermProperties(cvTerm.getProperties())) 
+		        : null;
 	}
 	
 	private List<NameSynonym> createSynonyms(List<CVTermSynonym> synonyms) {
@@ -190,6 +213,17 @@ public class StandardVariableBuilder extends Builder {
 			}
 		}
 		return nameSynonyms;
+	}
+	
+	private List<TermProperty> createTermProperties(List<CVTermProperty> properties) {
+	    List<TermProperty> termProperties = null;
+	    if (properties != null && properties.size() > 0) {
+	        termProperties = new ArrayList<TermProperty>();
+	        for (CVTermProperty property : properties) {
+	            termProperties.add(new TermProperty(property.getCvTermPropertyId(), property.getTypeId(), property.getValue(), property.getRank()));
+	        }
+	    }
+	    return termProperties;
 	}
 
 	private CVTerm getCvTerm(int id) throws MiddlewareQueryException {
