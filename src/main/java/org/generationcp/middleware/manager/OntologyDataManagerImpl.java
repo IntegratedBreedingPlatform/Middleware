@@ -254,10 +254,15 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	
 	@Override
 	public Term addTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException{
-		requireLocalDatabaseInstance();
-		Session session = getCurrentSessionForLocal();
-        Transaction trans = null;
-        Term term = null;
+	    Term term = findTermByName(name, cvId);
+	        
+	    if (term != null){
+	        return term;
+	    }
+	    
+	    requireLocalDatabaseInstance();
+	    Session session = getCurrentSessionForLocal();
+            Transaction trans = null;
         
 	    try {
 	    	if (CvId.VARIABLES.getId() != cvId.getId()) {
@@ -459,6 +464,34 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         return getTermBuilder().getTermsByIds(ids);
     }
     
+    @Override
+    public Term addTraitClass(String name, String definition, CvId cvId) throws MiddlewareQueryException {
+        Term term = findTermByName(name, cvId);
+        
+        if (term != null){
+                return term;
+        }
+        
+        requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+            term = getTermSaver().save(name, definition, cvId);
+                
+            if (term != null) {
+                getTermRelationshipSaver().save(term.getId(), TermId.IS_A.getId(), TermId.ONTOLOGY_TRAIT_CLASS.getId());
+            }
+                
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            throw new MiddlewareQueryException("Error in addTraitClass " + e.getMessage(), e);
+        }
+
+        return term;
+    }
 }
 
 

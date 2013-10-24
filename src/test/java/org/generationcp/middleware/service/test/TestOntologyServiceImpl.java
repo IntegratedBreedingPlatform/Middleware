@@ -12,11 +12,14 @@
 package org.generationcp.middleware.service.test;
 
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
+import java.util.Random;
 
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Scale;
@@ -212,6 +215,20 @@ public class TestOntologyServiceImpl {
             role.print(3);
         }
         Debug.println(3, " # Records = " + roles.size());
+    }
+    
+    @Test
+    public void testAddTraitClasses() throws MiddlewareQueryException {
+        String name = "Test Trait Class " + new Random().nextInt(10000);
+        String definition = "Test Definition";
+        
+        //add a method, should allow insert
+        
+        CvId cvId = CvId.IBDB_TERMS;
+        Term term = ontologyService.addTraitClass(name, definition, cvId);
+        assertNotNull(term);
+        assertTrue(term.getId() < 0);
+        System.out.println("testAddTraitClasses():  " + term);
     }
 
     @After

@@ -759,6 +759,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
                 .append("FROM cvterm cvt JOIN cvterm_relationship cvr ")
                     .append("ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = ").append(TermId.IS_A.getId())
                     .append(" AND cvr.object_id = ").append(TermId.ONTOLOGY_TRAIT_CLASS.getId()).append(" ")
+                    .append(" AND cvt.cv_id = ").append(CvId.IBDB_TERMS.getId());
                 ;
             
             SQLQuery query = getSession().createSQLQuery(sqlString.toString());

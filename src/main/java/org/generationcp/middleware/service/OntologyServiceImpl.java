@@ -180,4 +180,8 @@ public class OntologyServiceImpl extends Service implements OntologyService {
         return getOntologyDataManager().addTerm(name, definition, cvId);
     }
 
+    @Override
+    public Term addTraitClass(String name, String definition, CvId cvId) throws MiddlewareQueryException {
+        return getOntologyDataManager().addTraitClass(name, definition, cvId);
+    }
 }

@@ -243,4 +243,17 @@ public interface OntologyService {
      * @throws MiddlewareQueryException
      */
     Term addTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException;
+    
+    /**
+     * Adds a new trait class to the database. 
+     * Creates a new cvterm and cvterm_relationship entry in the local database. 
+     * Returns a negative id.
+     * 
+     * @param name
+     * @param definition
+     * @param cvId
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    Term addTraitClass(String name, String definition, CvId cvId) throws MiddlewareQueryException;
 }
