@@ -162,6 +162,7 @@ public class OntologyServiceImpl extends Service implements OntologyService {
         roleIds.addAll(PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages());
         roleIds.addAll(PhenotypicType.GERMPLASM.getTypeStorages());
         roleIds.addAll(PhenotypicType.VARIATE.getTypeStorages());
+        
         return getOntologyDataManager().getTermsByIds(roleIds);
     }
 
@@ -183,5 +184,15 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     @Override
     public Term addTraitClass(String name, String definition, CvId cvId) throws MiddlewareQueryException {
         return getOntologyDataManager().addTraitClass(name, definition, cvId);
+    }
+    
+    @Override
+    public Term getTermById(int termId) throws MiddlewareQueryException {
+        return getOntologyDataManager().getTermById(termId);
+    }
+    
+    @Override
+    public PhenotypicType getPhenotypicTypeById(Integer termId) throws MiddlewareQueryException {
+        return PhenotypicType.getPhenotypicTypeById(termId);
     }
 }

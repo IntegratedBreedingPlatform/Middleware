@@ -14,6 +14,7 @@ package org.generationcp.middleware.service.api;
 
 import java.util.List;
 
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Method;
@@ -23,6 +24,7 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TraitReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
+// TODO: Auto-generated Javadoc
 /**
  * 
  * This is the API for Ontology Browser requirements.
@@ -37,7 +39,7 @@ public interface OntologyService {
      *
      * @param stdVariableId the standard variable id
      * @return the standard variable
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
     StandardVariable getStandardVariable(int stdVariableId) throws MiddlewareQueryException;
 
@@ -49,7 +51,7 @@ public interface OntologyService {
      * @param scaleId the scale id
      * @param methodId the method id
      * @return the standard variable
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
     StandardVariable getStandardVariable(Integer propertyId, Integer scaleId, Integer methodId) throws MiddlewareQueryException;
 
@@ -59,7 +61,7 @@ public interface OntologyService {
      *
      * @param nameOrSynonym the name or synonym to match
      * @return the standard variables
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
     List<StandardVariable> getStandardVariables(String nameOrSynonym) throws MiddlewareQueryException;
     
@@ -68,7 +70,7 @@ public interface OntologyService {
      * Adds a standard variable.
      *
      * @param stdVariable the standard variable  to add
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
     void addStandardVariable(StandardVariable stdVariable) throws MiddlewareQueryException;
     
@@ -80,7 +82,7 @@ public interface OntologyService {
      *
      * @param id the property id to match
      * @return the matching property
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
     Property getProperty(int id) throws MiddlewareQueryException;
 
@@ -90,7 +92,7 @@ public interface OntologyService {
      *
      * @param name the name of the property
      * @return the matching property
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
     Property getProperty(String name) throws MiddlewareQueryException;
     
@@ -99,7 +101,7 @@ public interface OntologyService {
      * Gets all properties from Central and Local.
      *
      * @return All the properties
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
     List<Property> getAllProperties() throws MiddlewareQueryException;
 
@@ -112,7 +114,7 @@ public interface OntologyService {
      * @param definition the definition
      * @param isA the is a type
      * @return the Term entry corresponding to the newly-added property
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
     Term addProperty(String name, String definition, int isA) throws MiddlewareQueryException;
 
@@ -123,7 +125,7 @@ public interface OntologyService {
      *
      * @param id the id to match
      * @return the matching scale
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
     Scale getScale(int id) throws MiddlewareQueryException;
     
@@ -131,7 +133,7 @@ public interface OntologyService {
      * Gets all scales from Central and Local.
      *
      * @return All the scales
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
     List<Scale> getAllScales() throws MiddlewareQueryException;
     
@@ -143,7 +145,7 @@ public interface OntologyService {
      *
      * @param id the id to match
      * @return the matching method
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
     Method getMethod(int id) throws MiddlewareQueryException;
 
@@ -153,7 +155,7 @@ public interface OntologyService {
      *
      * @param name the name to match
      * @return the matching method
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
     Method getMethod(String name) throws MiddlewareQueryException;
     
@@ -162,7 +164,7 @@ public interface OntologyService {
      * Gets the all methods from Central and Local.
      *
      * @return All the methods
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
     List<Method> getAllMethods() throws MiddlewareQueryException;
 
@@ -172,7 +174,7 @@ public interface OntologyService {
      * @param name the name
      * @param definition the definition
      * @return the Term entry corresponding to the newly-added method
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
     Term addMethod(String name, String definition) throws MiddlewareQueryException;
     
@@ -184,7 +186,7 @@ public interface OntologyService {
      * Gets all the data types.
      *
      * @return the data types
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
     List<Term> getAllDataTypes() throws MiddlewareQueryException;
 
@@ -193,7 +195,7 @@ public interface OntologyService {
      * Gets all the trait groups, its properties and standard variables in a hierarchical structure.
      *
      * @return the trait groups
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
     List<TraitReference> getTraitGroups() throws MiddlewareQueryException;
 
@@ -201,7 +203,7 @@ public interface OntologyService {
      * Gets all trait classes.
      *
      * @return All the trait classes
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
     List<TraitReference> getAllTraitClasses() throws MiddlewareQueryException;
 
@@ -209,51 +211,72 @@ public interface OntologyService {
      * Gets all roles.
      *
      * @return all the roles
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
     List<Term> getAllRoles() throws MiddlewareQueryException;
 
     /**
      * Count the number of projects the variable was used.
-     * 
-     * @param variableId
-     * @return
-     * @throws MiddlewareQueryException
+     *
+     * @param variableId the variable id
+     * @return the long
+     * @throws MiddlewareQueryException the middleware query exception
      */
     long countProjectsByVariable(int variableId) throws MiddlewareQueryException;
     
     /**
      * Count the number of experiments the variable was used.
-     * 
-     * @param variableId
-     * @return
-     * @throws MiddlewareQueryException
+     *
+     * @param variableId the variable id
+     * @param storedInId the stored in id
+     * @return the long
+     * @throws MiddlewareQueryException the middleware query exception
      */
     long countExperimentsByVariable(int variableId, int storedInId) throws MiddlewareQueryException;
     
     /**
-     * Adds a new Term to the database. 
-     * Creates a new cvterm entry in the local database. 
+     * Adds a new Term to the database.
+     * Creates a new cvterm entry in the local database.
      * Returns a negative id.
-     * 
-     * @param name
-     * @param definition
-     * @param cvId
-     * @return
-     * @throws MiddlewareQueryException
+     *
+     * @param name the name
+     * @param definition the definition
+     * @param cvId the cv id
+     * @return the term
+     * @throws MiddlewareQueryException the middleware query exception
      */
     Term addTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException;
     
     /**
-     * Adds a new trait class to the database. 
-     * Creates a new cvterm and cvterm_relationship entry in the local database. 
+     * Adds a new trait class to the database.
+     * Creates a new cvterm and cvterm_relationship entry in the local database.
      * Returns a negative id.
-     * 
-     * @param name
-     * @param definition
-     * @param cvId
-     * @return
-     * @throws MiddlewareQueryException
+     *
+     * @param name the name
+     * @param definition the definition
+     * @param cvId the cv id
+     * @return the term
+     * @throws MiddlewareQueryException the middleware query exception
      */
     Term addTraitClass(String name, String definition, CvId cvId) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Find term by name.
+     *
+     * @param termId the term id
+     * @return the term
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    public Term getTermById(int termId) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Gets the phenotypic type.
+     *
+     * @param termId the term id
+     * @return the phenotypic type
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    public PhenotypicType getPhenotypicTypeById(Integer termId) throws MiddlewareQueryException;
 }

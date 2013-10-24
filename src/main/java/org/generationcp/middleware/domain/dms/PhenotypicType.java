@@ -80,4 +80,15 @@ public enum PhenotypicType {
     	    	
     	return null;
     }
+    
+    public static PhenotypicType getPhenotypicTypeById(Integer termId) {
+        for (PhenotypicType type : PhenotypicType.values()) {
+            for (Integer id : type.getTypeStorages()) {
+                if (id.equals(termId)) {
+                    return type;
+                }
+            }
+        }
+        return null;
+    }
 }
