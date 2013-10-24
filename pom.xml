@@ -168,6 +168,7 @@
             </testResource>
         </testResources>
 
+		<pluginManagement>
         <plugins>
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -322,5 +323,6 @@
 
             </plugin>
         </plugins>
+        </pluginManagement>
     </build>
 </project> 
