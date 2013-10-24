@@ -142,7 +142,7 @@ public class TestWorkbenchDataManagerImpl{
     public void testAddProjectActivity() throws MiddlewareQueryException {
         ProjectActivity projectActivity = new ProjectActivity();
 
-        projectActivity.setProject(manager.getProjectById(1L));
+        projectActivity.setProject(manager.getProjectById(41L));
         projectActivity.setName("Fieldbook");
         projectActivity.setDescription("Launch FieldBook");
         projectActivity.setUser(manager.getUserById(1));
@@ -229,7 +229,7 @@ public class TestWorkbenchDataManagerImpl{
 
     @Test
     public void testGetUserByName() throws MiddlewareQueryException {
-        String name = "workbench_test";
+        String name = "user_test";
         User user = (User) manager.getUserByName(name, 0, 1, Operation.EQUAL).get(0);
         System.out.println("testGetUserByName(name=" + name + "):" + user);
     }
@@ -237,7 +237,7 @@ public class TestWorkbenchDataManagerImpl{
     @Test
     public void testAddWorkbenchDataset() throws MiddlewareQueryException {
         // Assumption: There is at least one project in the db
-        Project project = manager.getProjects().get(0); // First project in db
+        Project project = manager.getProjectById(1L); // First project in db
 
         WorkbenchDataset dataset = new WorkbenchDataset();
         dataset.setName("Test Dataset");
@@ -694,7 +694,7 @@ public class TestWorkbenchDataManagerImpl{
     public void testAddProjectBackup() throws MiddlewareQueryException {
         ProjectBackup projectBackup = new ProjectBackup();    
         
-        projectBackup.setProjectBackupId(1L);
+        //projectBackup.setProjectBackupId(1L);
         projectBackup.setProjectId(1L);
         projectBackup.setBackupPath("target/resource");
         projectBackup.setBackupTime(Calendar.getInstance().getTime());
@@ -708,7 +708,7 @@ public class TestWorkbenchDataManagerImpl{
 
     @Test
     public void testGetProjectBackupsByProject() throws MiddlewareQueryException {
-        Project project = manager.getProjectById(manager.getProjectBackups().get(0).getProjectId());
+        Project project = manager.getProjectById(1L);
         List<ProjectBackup> projectBackups = manager.getProjectBackups(project);
         Assert.assertNotNull(projectBackups);
         Assert.assertTrue(!projectBackups.isEmpty());
@@ -827,7 +827,7 @@ public class TestWorkbenchDataManagerImpl{
 
     @Test
     public void testGetProjectActivitiesByProjectId() throws MiddlewareQueryException {
-    	long projectId = manager.getProjectById(1L).getProjectId();
+    	long projectId = manager.getProjectById(41L).getProjectId();
     	List<ProjectActivity> results = manager.getProjectActivitiesByProjectId(projectId, 1, 50);
     	Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
@@ -1015,8 +1015,17 @@ public class TestWorkbenchDataManagerImpl{
 
     @Test
     public void testDeleteProjectActivity() throws MiddlewareQueryException  {
-        ProjectActivity projectActivity = manager.getProjectActivitiesByProjectId(1L, 0, 10).get(0);
+    	
+        ProjectActivity projectActivity = new ProjectActivity();
 
+        projectActivity.setProject(manager.getProjectById(1L));
+        projectActivity.setName("Fieldbook");
+        projectActivity.setDescription("Launch FieldBook");
+        projectActivity.setUser(manager.getUserById(1));
+        projectActivity.setCreatedAt(new Date(System.currentTimeMillis()));
+
+        // add the project activity
+        manager.addProjectActivity(projectActivity);
     	manager.deleteProjectActivity(projectActivity);
         System.out.println("Record is successfully deleted");
     }
