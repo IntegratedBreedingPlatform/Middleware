@@ -15,6 +15,7 @@ package org.generationcp.middleware.service.api;
 import java.util.List;
 
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Scale;
@@ -229,4 +230,17 @@ public interface OntologyService {
      * @throws MiddlewareQueryException
      */
     long countExperimentsByVariable(int variableId, int storedInId) throws MiddlewareQueryException;
+    
+    /**
+     * Adds a new Term to the database. 
+     * Creates a new cvterm entry in the local database. 
+     * Returns a negative id.
+     * 
+     * @param name
+     * @param definition
+     * @param cvId
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    Term addTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException;
 }
