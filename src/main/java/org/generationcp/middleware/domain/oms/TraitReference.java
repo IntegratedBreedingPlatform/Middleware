@@ -89,7 +89,7 @@ public class TraitReference extends Reference implements Comparable<TraitReferen
     @Override
     public int compareTo(TraitReference compareValue) {
         String compareName = ((TraitReference) compareValue).getName(); 
-        return getName().compareTo(compareName);
+        return getName().compareToIgnoreCase(compareName);
     }
 
 }

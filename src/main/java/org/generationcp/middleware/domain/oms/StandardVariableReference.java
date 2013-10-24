@@ -62,7 +62,7 @@ public class StandardVariableReference extends Reference implements Comparable<S
     @Override
     public int compareTo(StandardVariableReference compareValue) {
         String compareName = ((StandardVariableReference) compareValue).getName(); 
-        return getName().compareTo(compareName);
+        return getName().compareToIgnoreCase(compareName);
     }
     
 }

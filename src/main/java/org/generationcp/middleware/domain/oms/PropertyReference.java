@@ -89,7 +89,7 @@ public class PropertyReference extends Reference implements Comparable<PropertyR
     @Override
     public int compareTo(PropertyReference compareValue) {
         String compareName = ((PropertyReference) compareValue).getName(); 
-        return getName().compareTo(compareName);
+        return getName().compareToIgnoreCase(compareName);
     }
 
 }
