@@ -24,8 +24,8 @@ import org.generationcp.middleware.domain.h2h.CharacterTraitInfo;
 import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
 import org.generationcp.middleware.domain.h2h.Observation;
 import org.generationcp.middleware.domain.h2h.ObservationKey;
-import org.generationcp.middleware.domain.h2h.TraitObservation;
 import org.generationcp.middleware.domain.h2h.TraitInfo;
+import org.generationcp.middleware.domain.h2h.TraitObservation;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -262,32 +262,30 @@ public class TraitBuilder extends Builder{
 
     public List<Observation> getObservationsForTraitOnGermplasms(List<Integer> traitIds, 
             List<Integer> germplasmIds, List<Integer> environmentIds) throws MiddlewareQueryException{
-        List<Observation> localObservations = new ArrayList<Observation>();
-        List<Observation> centralObservations = new ArrayList<Observation>();
+    	
+        List<Integer> localEnvironments = new ArrayList<Integer>();
+        List<Integer> centralEnvironments = new ArrayList<Integer>();
 
-        // Separate local and central observations - environmentIds determine where to get the data from
-        for (Integer traitId: traitIds){
-            for (Integer germplasmId: germplasmIds){
-                for (Integer environmentId: environmentIds){
-                	Observation observation = new Observation(
-                			new ObservationKey(traitId, germplasmId, environmentId));
-		            if (environmentId < 0){
-		                localObservations.add(observation);
-		            } else {
-		                centralObservations.add(observation);
-		            }
-                }
+        // Separate local and central environments
+        for (int i = 0; i < environmentIds.size(); i++){
+            Integer environmentId = environmentIds.get(i);
+			if (environmentId < 0){
+                localEnvironments.add(environmentId);
+            } else {
+                centralEnvironments.add(environmentId);
             }
         }
         
+        List<Observation> localObservations = new ArrayList<Observation>();
+        List<Observation> centralObservations = new ArrayList<Observation>();
 
-        if (centralObservations.size() > 0){
+        if (centralEnvironments.size() > 0){
             setWorkingDatabase(Database.CENTRAL);
-            centralObservations = getPhenotypeDao().getObservationForTraitOnGermplasms(centralObservations);
+            centralObservations = getPhenotypeDao().getObservationForTraitOnGermplasms(traitIds, germplasmIds, centralEnvironments);
         }
-        if (localObservations.size() > 0){
+        if (localEnvironments.size() > 0){
             setWorkingDatabase(Database.LOCAL);
-            localObservations = getPhenotypeDao().getObservationForTraitOnGermplasms(localObservations);
+            localObservations = getPhenotypeDao().getObservationForTraitOnGermplasms(traitIds, germplasmIds, localEnvironments);
         }
         
         centralObservations.addAll(localObservations);        
@@ -298,27 +296,30 @@ public class TraitBuilder extends Builder{
 
 	public List<Observation> getObservationsForTraits(List<Integer> traitIds, List<Integer> environmentIds) 
 								throws MiddlewareQueryException{
-        List<Observation> localObservations = new ArrayList<Observation>();
-        List<Observation> centralObservations = new ArrayList<Observation>();
 
-        // Separate local and central observations - environmentIds determine where to get the data from
+        List<Integer> localEnvironments = new ArrayList<Integer>();
+        List<Integer> centralEnvironments = new ArrayList<Integer>();
+
+        // Separate local and central environments
         for (int i = 0; i < environmentIds.size(); i++){
-            Observation observation = new Observation(
-                    new ObservationKey(traitIds.get(i), environmentIds.get(i)));
-            if (environmentIds.get(i) < 0){
-                localObservations.add(observation);
+            Integer environmentId = environmentIds.get(i);
+			if (environmentId < 0){
+                localEnvironments.add(environmentId);
             } else {
-                centralObservations.add(observation);
+                centralEnvironments.add(environmentId);
             }
         }
         
-        if (centralObservations.size() > 0){
+        List<Observation> localObservations = new ArrayList<Observation>();
+        List<Observation> centralObservations = new ArrayList<Observation>();
+
+        if (centralEnvironments.size() > 0){
             setWorkingDatabase(Database.CENTRAL);
-            centralObservations = getPhenotypeDao().getObservationForTraits(centralObservations,0,0);
+            centralObservations = getPhenotypeDao().getObservationForTraits(traitIds, centralEnvironments,0,0);
         }
-        if (localObservations.size() > 0){
+        if (localEnvironments.size() > 0){
             setWorkingDatabase(Database.LOCAL);
-            localObservations = getPhenotypeDao().getObservationForTraits(localObservations,0,0);
+            localObservations = getPhenotypeDao().getObservationForTraits(traitIds, localEnvironments,0,0);
         }
         
         centralObservations.addAll(localObservations);        

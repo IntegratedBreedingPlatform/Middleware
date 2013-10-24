@@ -12,7 +12,6 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -115,15 +114,11 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
     @SuppressWarnings("unchecked")
 	@Override
     public List<Observation> getObservationsForTraits(List<Integer> traitIds, List<Integer> environmentIds, int start, int numOfRows) throws MiddlewareQueryException{
-    	List<Observation> centralObservations = new ArrayList<Observation>();
-    	List<Observation> localObservations = new ArrayList<Observation>();
-        getTraitBuilder().buildObservations(centralObservations, localObservations, traitIds, environmentIds);
         List<String> methods = Arrays.asList("countObservationForTraits", "getObservationForTraits");
-        Object[] centralParameters = new Object[] { centralObservations };
-        Object[] localParameters = new Object[] { localObservations };
+        Object[] parameters = new Object[] { traitIds, environmentIds};
     	return (List<Observation>) getFromCentralAndLocalByMethod(
     			getPhenotypeDao(), methods, start, numOfRows, 
-    			centralParameters, localParameters, new Class[] { List.class });
+    			parameters, parameters, new Class[] { List.class, List.class});
     }
     
     @Override
