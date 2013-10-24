@@ -36,8 +36,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
             "SELECT count(ep.nd_experiment_id) "
             + " FROM nd_experiment_project ep "
             + " INNER JOIN project p ON p.project_id = ep.project_id " 
-            + " WHERE ((1011 = :storedInId OR 1016 = :storedInId) AND p.type_id = :variableId AND p.name IS NOT NULL) "
-            + " OR ((1012 = :storedInId OR 1017 = :storedInId) AND p.type_id = :variableId AND p.description IS NOT NULL)";
+            + " WHERE ((1011 = :storedInId OR 1016 = :storedInId) AND p.name IS NOT NULL) "
+            + " OR ((1012 = :storedInId OR 1017 = :storedInId) AND p.description IS NOT NULL)";
 
     private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_PROJECTPROP = 
             "SELECT count(ep.nd_experiment_id) "
@@ -79,7 +79,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
             "SELECT count(es.nd_experiment_id) "
             + " FROM nd_experiment_stock es "
             + " INNER JOIN stockprop sp ON sp.stock_id = es.stock_id "
-            + " WHERE es.type_id = :variableId AND es.value IS NOT NULL";
+            + " WHERE sp.type_id = :variableId AND sp.value IS NOT NULL";
     
     private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_PHENOTYPE = 
             "SELECT count(ep.nd_experiment_id) "

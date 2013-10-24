@@ -762,7 +762,78 @@ public class TestStudyDataManagerImpl {
         }
     }
     
-	@AfterClass
+    @Test
+    public void testCountProjectsByVariable() throws Exception {
+        int variableId = 8050;
+        long count = manager.countProjectsByVariable(variableId);
+        System.out.println("countProjectsByVariable on " + variableId + " = " + count);
+    }
+    
+    @Test
+    public void testCountExperimentsByProjectPropVariable() throws Exception {
+        int variableId = 8050;
+        int storedInId = 1010;
+        long count = manager.countExperimentsByVariable(variableId, storedInId);
+        System.out.println("countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
+    }
+    
+    @Test
+    public void testCountExperimentsByProjectVariable() throws Exception {
+        int variableId = 8005;
+        int storedInId = 1011;
+        long count = manager.countExperimentsByVariable(variableId, storedInId);
+        System.out.println("countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
+    }
+
+    @Test
+    public void testCountExperimentsByExperimentPropVariable() throws Exception {
+        int variableId = 8200;
+        int storedInId = 1030;
+        long count = manager.countExperimentsByVariable(variableId, storedInId);
+        System.out.println("countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
+    }
+
+    @Test
+    public void testCountExperimentsByGeolocationVariable() throws Exception {
+        int variableId = 8170;
+        int storedInId = 1021;
+        long count = manager.countExperimentsByVariable(variableId, storedInId);
+        System.out.println("countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
+    }
+
+    @Test
+    public void testCountExperimentsByGeolocationPropVariable() throws Exception {
+        int variableId = 8370;
+        int storedInId = 1020;
+        long count = manager.countExperimentsByVariable(variableId, storedInId);
+        System.out.println("countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
+    }
+
+    @Test
+    public void testCountExperimentsByStockVariable() throws Exception {
+        int variableId = 8230;
+        int storedInId = 1041;
+        long count = manager.countExperimentsByVariable(variableId, storedInId);
+        System.out.println("countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
+    }
+
+    @Test
+    public void testCountExperimentsByStockPropVariable() throws Exception {
+        int variableId = 8255;
+        int storedInId = 1040;
+        long count = manager.countExperimentsByVariable(variableId, storedInId);
+        System.out.println("countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
+    }
+
+    @Test
+    public void testCountExperimentsByPhenotypeVariable() throws Exception {
+        int variableId = 18000;
+        int storedInId = 1043;
+        long count = manager.countExperimentsByVariable(variableId, storedInId);
+        System.out.println("countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
+    }
+
+    @AfterClass
 	public static void tearDown() throws Exception {
 		if (factory != null) {
 			factory.close();
