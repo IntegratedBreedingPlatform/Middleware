@@ -31,17 +31,17 @@ public enum PhenotypicType {
             TermId.LONGITUDE_STORAGE.getId(),
             TermId.DATUM_STORAGE.getId(),
             TermId.ALTITUDE_STORAGE.getId()),
-          Arrays.asList("TRIAL","OCC","TRIAL_NO")), 
+          Arrays.asList("TRIAL","OCC","TRIAL_NO", "TRIALNO", "SITE", "SITE_NO", "SITENO")), 
     GERMPLASM(Arrays.asList(
             TermId.GERMPLASM_ENTRY_STORAGE.getId(),
             TermId.ENTRY_NUMBER_STORAGE.getId(),
             TermId.ENTRY_GID_STORAGE.getId(),
             TermId.ENTRY_DESIGNATION_STORAGE.getId(),
             TermId.ENTRY_CODE_STORAGE.getId()),
-           Arrays.asList("ENTRY", "ENTRY_NO")), 
+           Arrays.asList("ENTRY", "ENTRY_NO", "ENTRYNO")), 
     TRIAL_DESIGN(Arrays.asList(
             TermId.TRIAL_DESIGN_INFO_STORAGE.getId()),
-           Arrays.asList("PLOT", "PLOT_NO")),
+           Arrays.asList("PLOT", "PLOT_NO", "PLOTNO")),
     VARIATE(Arrays.asList(
 		   TermId.OBSERVATION_VARIATE.getId(),
 		   TermId.CATEGORICAL_VARIATE.getId()),
