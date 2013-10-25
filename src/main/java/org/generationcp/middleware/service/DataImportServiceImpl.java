@@ -127,7 +127,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         }
 
         if (!isEntryExists(workbook.getFactors()) && !isEntryExists(workbook.getConditions())) {
-            messages.add(new Message("error.entry.doesnt.exist"));
+            messages.add(new Message("error.entry.doesnt.exist.wizard"));
         }
 
         if (!workbook.isNursery() && !isTrialEnvironmentExists(workbook.getConditions())) {
