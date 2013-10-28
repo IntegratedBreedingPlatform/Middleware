@@ -12,6 +12,10 @@
 
 package org.generationcp.middleware.manager.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,11 +31,12 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Property;
-import org.generationcp.middleware.domain.oms.Term;
-import org.generationcp.middleware.domain.oms.TraitReference;
-import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.domain.oms.PropertyReference;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
+import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TraitReference;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.junit.After;
@@ -42,10 +47,6 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertEquals;
 
 public class TestOntologyDataManagerImpl {
 
@@ -463,16 +464,21 @@ public class TestOntologyDataManagerImpl {
 	    System.out.println("testAddTerm():  " + term);
 	    term = manager.getTermById(term.getId());
 	    System.out.println("From db:  " + term);
-	    
-	    // add a variable, should not allow insert and should throw an exception
-	    // uncomment the ff. to test adding variables
-	    /* 
-	    name = "Test Variable " + new Random().nextInt(10000);
-		definition = "Test Variable";
-	    cvId = CvId.VARIABLES;
-		term = manager.addTerm(name, definition, cvId);
-		assertTrue(term == null);
-	    */
+
+	    //add another term with the same name --> should return the same term and not add a new term
+        Term term2 = manager.addTerm(name, definition, cvId);
+        assertNotNull(term2);
+	    assertEquals(term.getId(), term2.getId());
+	}
+	
+	@Test(expected = MiddlewareQueryException.class)
+	public void testAddTermException() throws Exception {
+        // add a variable, should not allow insert and should throw an exception
+        String name = "Test Variable " + new Random().nextInt(10000);
+        String definition = "Test Variable";
+        CvId cvId = CvId.VARIABLES;
+        Term term = manager.addTerm(name, definition, cvId);
+        assertTrue(term == null);
 	}
 	
 	@Test
