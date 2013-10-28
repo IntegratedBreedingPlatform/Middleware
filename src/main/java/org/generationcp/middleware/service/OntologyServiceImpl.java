@@ -195,4 +195,9 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     public PhenotypicType getPhenotypicTypeById(Integer termId) throws MiddlewareQueryException {
         return PhenotypicType.getPhenotypicTypeById(termId);
     }
+    
+    @Override
+    public Term findTermByName(String name, CvId cvId) throws MiddlewareQueryException {
+        return getOntologyDataManager().findTermByName(name, cvId);
+    }
 }

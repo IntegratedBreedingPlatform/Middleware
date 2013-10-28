@@ -279,4 +279,14 @@ public interface OntologyService {
      * @throws MiddlewareQueryException the middleware query exception
      */
     public PhenotypicType getPhenotypicTypeById(Integer termId) throws MiddlewareQueryException;
+    
+    /**
+     * Find term by name.
+     *
+     * @param name the name
+     * @param cvId the cv id
+     * @return the term
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    public Term findTermByName(String name, CvId cvId) throws MiddlewareQueryException;
 }
