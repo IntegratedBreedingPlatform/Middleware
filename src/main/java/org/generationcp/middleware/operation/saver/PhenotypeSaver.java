@@ -57,7 +57,7 @@ public class PhenotypeSaver extends Saver {
 		}
 		else if (TermId.CATEGORICAL_VARIATE.getId() == variable.getVariableType().getStandardVariable().getStoredIn().getId()) {
 			phenotype = getPhenotypeObject(phenotype);
-			phenotype.setcValue(new Integer(variable.getValue()));
+			phenotype.setcValue(Integer.valueOf(variable.getValue()));
 			phenotype.setObservableId(variable.getVariableType().getId());
 			phenotype.setUniqueName(phenotype.getPhenotypeId().toString());
 			phenotype.setName(String.valueOf(variable.getVariableType().getId()));

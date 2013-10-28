@@ -38,8 +38,7 @@ public class CvTermSaver extends Saver {
 		try {
 			generatedId = dao.getNegativeId("cvTermId");
 		} catch (MiddlewareQueryException e) {
-			e.printStackTrace();
-			throw new MiddlewareQueryException(e.getMessage());
+			throw new MiddlewareQueryException(e.getMessage(), e);
 		}
 		CVTerm cvTerm = create(generatedId, name, definition, cvId.getId(), false, false); 
 		dao.save(cvTerm);

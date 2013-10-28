@@ -17,6 +17,7 @@ import org.generationcp.middleware.hibernate.HibernateUtil;
 
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
+import org.generationcp.middleware.util.Debug;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,10 +39,10 @@ public class TestProjectUserInfoDAO{
            	
         ProjectUserInfo result = dao.getByProjectIdAndUserId(2, 1);
         if (result == null){
-        	System.out.println("testGetByProjectIdAndUserId RESULTS: no result");
+        	Debug.println(0, "testGetByProjectIdAndUserId RESULTS: no result");
         }else{
-        	System.out.println("testGetByProjectIdAndUserId RESULTS:" + result.getProjectId());
-        	System.out.println(result.toString());
+            Debug.println(0, "testGetByProjectIdAndUserId RESULTS:" + result.getProjectId());
+            Debug.println(0, result.toString());
         }
         
         

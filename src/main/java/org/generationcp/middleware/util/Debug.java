@@ -13,10 +13,16 @@ package org.generationcp.middleware.util;
 
 public class Debug {
 
-	public static void println(int indent, String s) {
-		for (int i = 0; i < indent; i++) {
-			System.out.print(" ");
-		}
-		System.out.println(s);
-	}
+    public static void println(int indent, String s) {
+        for (int i = 0; i < indent; i++) {
+            System.out.print(" ");
+        }
+        System.out.println(s);
+    }
+
+    public static void print(int indent, String s) {
+        for (int i = 0; i < indent; i++) {
+            System.out.print(" ");
+        }
+    }
 }

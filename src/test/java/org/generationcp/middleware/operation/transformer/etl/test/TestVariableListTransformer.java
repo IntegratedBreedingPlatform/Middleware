@@ -16,6 +16,7 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.transformer.etl.VariableListTransformer;
+import org.generationcp.middleware.util.Debug;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -42,24 +43,25 @@ public class TestVariableListTransformer {
 
 	@Before
 	public void beforeEachTest() {
+        Debug.println(0, "#####" + name.getMethodName() + " Start: ");
 		startTime = System.nanoTime();
 	}
 	
 	@After
 	public void afterEachTest() {
 		long elapsedTime = System.nanoTime() - startTime;
-		System.out.println("#####" + name.getMethodName() + ": Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime/1000000000) + " s");
+		Debug.println(0, "#####" + name.getMethodName() + ": Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime/1000000000) + " s");
 	}
 	
 	@Test
 	public void testTransformStock() throws Exception {
-		System.out.println("testTransformStock");
+		Debug.println(0, "testTransformStock");
 		VariableTypeList variableTypeList = createVariableTypeListTestData();
 		MeasurementRow measurementRow = createMeasurementRowTestData(variableTypeList);
 		
-		System.out.println("Input MeasurmentRow");
+		Debug.println(0, "Input MeasurmentRow");
 		measurementRow.print(1);
-		System.out.println("Input VariableTypeList");
+		Debug.println(0, "Input VariableTypeList");
 		variableTypeList.print(1);
 		
 		VariableList stocks = transformer.transformStock(measurementRow, variableTypeList);
@@ -68,7 +70,7 @@ public class TestVariableListTransformer {
 		VariableList result = getStockResult(variableTypeList);
 		Assert.assertEquals(result.getVariables().size(), stocks.getVariables().size());
 		int i = 0;
-		System.out.println("Output:");
+		Debug.println(0, "Output:");
 		for (Variable stock : stocks.getVariables()) {
 			Assert.assertEquals(result.getVariables().get(i).getValue(), stock.getValue());
 			Assert.assertEquals(result.getVariables().get(i).getVariableType(), stock.getVariableType());
@@ -79,13 +81,13 @@ public class TestVariableListTransformer {
 	
 	@Test
 	public void transformTrialEnvironment() throws Exception {
-		System.out.println("testTransformStock");
+		Debug.println(0, "testTransformStock");
 		VariableTypeList variableTypeList = createVariableTypeListTestData();
 		MeasurementRow measurementRow = createMeasurementRowTestData(variableTypeList);
 		
-		System.out.println("Input MeasurmentRow");
+		Debug.println(0, "Input MeasurmentRow");
 		measurementRow.print(1);
-		System.out.println("Input VariableTypeList");
+		Debug.println(0, "Input VariableTypeList");
 		variableTypeList.print(1);
 		
 		VariableList stocks = transformer.transformTrialEnvironment(measurementRow, variableTypeList);
@@ -94,7 +96,7 @@ public class TestVariableListTransformer {
 		VariableList result = getStockResult2(variableTypeList);
 		Assert.assertEquals(result.getVariables().size(), stocks.getVariables().size());
 		int i = 0;
-		System.out.println("Output:");
+		Debug.println(0, "Output:");
 		for (Variable stock : stocks.getVariables()) {
 			Assert.assertEquals(result.getVariables().get(i).getValue(), stock.getValue());
 			Assert.assertEquals(result.getVariables().get(i).getVariableType(), stock.getVariableType());
@@ -105,13 +107,13 @@ public class TestVariableListTransformer {
 	
 	@Test
 	public void transformTrialEnvironment2() throws Exception {
-		System.out.println("testTransformTrialEnvironment 2");
+		Debug.println(0, "testTransformTrialEnvironment 2");
 		List<MeasurementVariable> mVarList = createMeasurementVariableListTestData();
 		VariableTypeList variableTypeList = createVariableTypeListTestData();
 		
-		System.out.println("Input MeasurementVariables");
+		Debug.println(0, "Input MeasurementVariables");
 		mVarList.toString();
-		System.out.println("Input VariableTypeList");
+		Debug.println(0, "Input VariableTypeList");
 		variableTypeList.print(1);
 		
 		VariableList stocks = transformer.transformTrialEnvironment(mVarList, variableTypeList);
@@ -120,10 +122,10 @@ public class TestVariableListTransformer {
 		VariableList result = getStockResult2(variableTypeList);
 		Assert.assertEquals(result.getVariables().size(), stocks.getVariables().size());
 		
-		System.out.println(stocks.toString());
+		Debug.println(0, stocks.toString());
 		
 		int i = 0;
-		System.out.println("Output:");
+		Debug.println(0, "Output:");
 		for (Variable stock : stocks.getVariables()) {
 			Assert.assertEquals(result.getVariables().get(i).getValue(), stock.getValue());
 			Assert.assertEquals(result.getVariables().get(i).getVariableType(), stock.getVariableType());
@@ -135,7 +137,7 @@ public class TestVariableListTransformer {
 	@Test
 	public void testTransformStudyDetails() throws Exception {
 		StudyDetails studyDetails = createTestStudyDetails();
-		System.out.println("Input studyDetails");
+		Debug.println(0, "Input studyDetails");
 		studyDetails.print(1);
 		
 		VariableList variables = transformer.transformStudyDetails(studyDetails);

@@ -31,6 +31,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 public class TestCvTermDao{
@@ -51,9 +52,9 @@ public class TestCvTermDao{
 
     	Map<String, Set<Integer>> results = dao.getTermsByNameOrSynonyms(nameOrSynonyms, CvId.VARIABLES.getId());   
     	
-        System.out.println("testGetTermsByNameOrSynonyms(nameOrSynonyms=" + nameOrSynonyms + ") RESULTS:");
+        Debug.println(0, "testGetTermsByNameOrSynonyms(nameOrSynonyms=" + nameOrSynonyms + ") RESULTS:");
         for (String name : nameOrSynonyms) {
-        	System.out.println ("    Name/Synonym = " + name + ", Terms = " + results.get(name));
+        	Debug.println(0, "    Name/Synonym = " + name + ", Terms = " + results.get(name));
         }
         
         /* SQL TO VERIFY:
@@ -70,14 +71,14 @@ public class TestCvTermDao{
     public void testGetByNameAndCvId() throws Exception {
     	CVTerm cvterm = dao.getByNameAndCvId("User", CvId.PROPERTIES.getId());
     	assertTrue(cvterm.getCvTermId() == 2002);
-    	System.out.println("testGetByNameAndCvId(\"User\", "+CvId.PROPERTIES.getId()+"): " + cvterm);
+    	Debug.println(0, "testGetByNameAndCvId(\"User\", "+CvId.PROPERTIES.getId()+"): " + cvterm);
 
     	cvterm = dao.getByNameAndCvId("DBCV", CvId.SCALES.getId());
-    	System.out.println("testGetByNameAndCvId(\"DBCV\", "+CvId.SCALES.getId()+"): " + cvterm);
+    	Debug.println(0, "testGetByNameAndCvId(\"DBCV\", "+CvId.SCALES.getId()+"): " + cvterm);
     	assertTrue(cvterm.getCvTermId() == 6000);
 
     	cvterm = dao.getByNameAndCvId("Assigned", CvId.METHODS.getId());
-    	System.out.println("testGetByNameAndCvId(\"Assigned\", "+CvId.METHODS.getId()+"): " + cvterm);
+    	Debug.println(0, "testGetByNameAndCvId(\"Assigned\", "+CvId.METHODS.getId()+"): " + cvterm);
     	assertTrue(cvterm.getCvTermId() == 4030);
     	
     }
@@ -85,7 +86,7 @@ public class TestCvTermDao{
     @Test
     public void testGetTermsByNameOrSynonym() throws Exception {
     	List<Integer> termIds = dao.getTermsByNameOrSynonym("Cooperator", 1010);
-    	System.out.println("testGetTermsByNameOrSynonym(): " + termIds);
+    	Debug.println(0, "testGetTermsByNameOrSynonym(): " + termIds);
     }
     
     @Test
@@ -93,9 +94,9 @@ public class TestCvTermDao{
     	List<String> nameOrSynonyms = Arrays.asList("ENTRY","ENTRYNO", "PLOT", "TRIAL_NO", "TRIAL", "STUDY", "DATASET", "LOC", "LOCN", "NURSER", "Plot Number");
     	Map<String, Set<Integer>> results = dao.getStandardVariableIdsByProperties(nameOrSynonyms);   
     	
-        System.out.println("testGetStandardVariableIdsByProperties(nameOrSynonyms=" + nameOrSynonyms + ") RESULTS:");
+        Debug.println(0, "testGetStandardVariableIdsByProperties(nameOrSynonyms=" + nameOrSynonyms + ") RESULTS:");
         for (String name : nameOrSynonyms) {
-        	System.out.println ("    Name/Synonym = " + name + ", Terms = " + results.get(name));
+            Debug.println(0, "    Name/Synonym = " + name + ", Terms = " + results.get(name));
         }
         
         /* SQL TO VERIFY:

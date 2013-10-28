@@ -91,7 +91,7 @@ public class ToolDAO extends GenericDAO<Tool, Long>{
 			return out;
 		} catch (MiddlewareQueryException e) {
 			tx.rollback();
-			throw new MiddlewareQueryException(e.getMessage());
+			throw new MiddlewareQueryException(e.getMessage(), e);
 		}
 	}
     
@@ -106,7 +106,7 @@ public class ToolDAO extends GenericDAO<Tool, Long>{
 			return out;
 		} catch (MiddlewareQueryException e) {
 			tx.rollback();
-			throw new MiddlewareQueryException(e.getMessage());
+			throw new MiddlewareQueryException(e.getMessage(), e);
 		}
 	}
 }

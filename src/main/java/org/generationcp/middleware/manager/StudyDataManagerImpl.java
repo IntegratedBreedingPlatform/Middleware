@@ -163,7 +163,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             return new StudyReference(project.getProjectId(), project.getName(), project.getDescription());
 
         } catch (Exception e) {
-            e.printStackTrace();
             rollbackTransaction(trans);
             logAndThrowException("Error encountered with addStudy(folderId="
                     + parentFolderId + ", variableTypeList=" + variableTypeList

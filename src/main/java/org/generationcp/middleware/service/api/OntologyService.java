@@ -24,7 +24,6 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TraitReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
-// TODO: Auto-generated Javadoc
 /**
  * 
  * This is the API for Ontology Browser requirements.
@@ -268,7 +267,7 @@ public interface OntologyService {
      * @return the term
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public Term getTermById(int termId) throws MiddlewareQueryException;
+    Term getTermById(int termId) throws MiddlewareQueryException;
     
     
     /**
@@ -278,7 +277,7 @@ public interface OntologyService {
      * @return the phenotypic type
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public PhenotypicType getPhenotypicTypeById(Integer termId) throws MiddlewareQueryException;
+    PhenotypicType getPhenotypicTypeById(Integer termId) throws MiddlewareQueryException;
     
     /**
      * Find term by name.
@@ -288,5 +287,6 @@ public interface OntologyService {
      * @return the term
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public Term findTermByName(String name, CvId cvId) throws MiddlewareQueryException;
+    Term findTermByName(String name, CvId cvId) throws MiddlewareQueryException;
+
 }

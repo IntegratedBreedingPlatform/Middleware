@@ -188,11 +188,11 @@ public class TrialEnvironmentBuilder extends Builder {
 	public long countAllTrialEnvironments() throws MiddlewareQueryException{
 		setWorkingDatabase(Database.CENTRAL);
 		long centralCount = getGeolocationDao().countAllTrialEnvironments();
-		System.out.println("CENTRAL = " + centralCount);
+		LOG.debug("CENTRAL = " + centralCount);
 		
 		setWorkingDatabase(Database.LOCAL);
 		long localCount =  getGeolocationDao().countAllTrialEnvironments();
-		System.out.println("LOCAL = " + localCount);
+		LOG.debug("LOCAL = " + localCount);
 		
 		return centralCount + localCount;
 	}

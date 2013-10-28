@@ -214,19 +214,18 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
         List<CVTerm> terms = new ArrayList<CVTerm>();
         
         try {
-            String queryString = 
-                    "SELECT cvt.cvterm_id, cvt.name, cvt.definition "
-                    + "FROM cvterm cvt " 
-                    + "INNER JOIN cvterm_relationship cvr ON cvr.subject_id = cvt.cvterm_id " 
-                    + "             AND cvr.type_id = 1105 AND cvr.object_id IN (:types) "
+            StringBuffer queryString = new StringBuffer()
+                .append("SELECT cvt.cvterm_id, cvt.name, cvt.definition ")
+                .append("FROM cvterm cvt ") 
+                .append("INNER JOIN cvterm_relationship cvr ON cvr.subject_id = cvt.cvterm_id ") 
+                .append("             AND cvr.type_id = 1105 AND cvr.object_id IN (:types) ")
                     ;
             if (storedIn != null) {
-                queryString += 
-                    "INNER JOIN cvterm_relationship stored_in ON cvr.subject_id = stored_in.subject_id " 
-                    + "AND stored_in.type_id = 1044 AND stored_in.object_id = :storedIn " ;
+                queryString.append("INNER JOIN cvterm_relationship stored_in ON cvr.subject_id = stored_in.subject_id ") 
+                    .append("AND stored_in.type_id = 1044 AND stored_in.object_id = :storedIn ");
             }
-            
-            SQLQuery query = getSession().createSQLQuery(queryString);
+
+            SQLQuery query = getSession().createSQLQuery(queryString.toString());
             query.setParameterList("types", types);
             if (storedIn != null) {
                 query.setParameter("storedIn", storedIn);
@@ -431,8 +430,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			SQLQuery query = getSession().createSQLQuery(queryString.toString());
 			query.setParameterList("type", type.getTypeStorages());
 			
-			List<Integer> standardVariableIds = (List<Integer>) query.list();						
-			return standardVariableIds;
+			return (List<Integer>) query.list();
 						
 		} catch(HibernateException e) {
 			logAndThrowException("Error at getStandardVariableIdsByPhenotypicType :" + e.getMessage(), e);
@@ -508,8 +506,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			SQLQuery query = getSession().createSQLQuery(queryString.toString());
 			query.setInteger("traitId", traitId);
 			
-			List<Integer> methodIds = (List<Integer>) query.list();						
-			return methodIds;
+			return  (List<Integer>) query.list();
 						
 		} catch(HibernateException e) {
 			logAndThrowException("Error at findMethodTermIdsByTrait :" + e.getMessage(), e);
@@ -532,8 +529,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			SQLQuery query = getSession().createSQLQuery(queryString.toString());
 			query.setInteger("traitId", traitId);
 			
-			List<Integer> scaleIds = (List<Integer>) query.list();						
-			return scaleIds;
+			return (List<Integer>) query.list();
 						
 		} catch(HibernateException e) {
 			logAndThrowException("Error at findScaleTermIdsByTrait :" + e.getMessage(), e);
@@ -760,7 +756,6 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
                     .append("ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = ").append(TermId.IS_A.getId())
                     .append(" AND cvr.object_id = ").append(TermId.ONTOLOGY_TRAIT_CLASS.getId()).append(" ")
                     .append(" AND cvt.cv_id = ").append(CvId.IBDB_TERMS.getId());
-                ;
             
             SQLQuery query = getSession().createSQLQuery(sqlString.toString());
             

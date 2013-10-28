@@ -56,8 +56,7 @@ public class QtlDAO  extends GenericDAO<Qtl, Integer>{
             query.setParameter("qtlName", name);
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
-            List<Integer> qtlIds = query.list();
-            return qtlIds;
+            return (List<Integer>) query.list();
         } catch (HibernateException e) {
         	logAndThrowException("Error with getQtlIdByName(name=" + name + ") query from gdms_qtl: "
                     + e.getMessage(), e);
@@ -279,8 +278,7 @@ public class QtlDAO  extends GenericDAO<Qtl, Integer>{
             if (datasetIds != null && datasetIds.get(0) != null){
                 Query query = getSession().createSQLQuery(Qtl.GET_QTL_IDS_BY_DATASET_IDS);
                 query.setParameterList("datasetIds", datasetIds);
-                List<Integer> results = query.list();
-                return results;
+                return (List<Integer>) query.list();
             }
         } catch (HibernateException e) {
             logAndThrowException("Error with getQTLIdsByDatasetIds(datasetIds=" + datasetIds + ") query from gdms_qtl: "

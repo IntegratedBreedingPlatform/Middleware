@@ -49,10 +49,14 @@ import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 import org.generationcp.middleware.pojos.workbench.ProjectBackup;
 import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
 import org.generationcp.middleware.util.Debug;
+import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestName;
 import org.junit.runners.MethodSorters;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -71,6 +75,25 @@ public class TestWorkbenchDataManagerImpl{
         manager = new WorkbenchDataManagerImpl(sessionProvider);
     }
   
+    private long startTime;
+
+    @Rule
+    public TestName name = new TestName();
+
+
+
+    @Before
+    public void beforeEachTest() {
+        Debug.println(0, "#####" + name.getMethodName() + " Start: ");
+        startTime = System.nanoTime();
+    }
+
+    @After
+    public void afterEachTest() {
+        long elapsedTime = System.nanoTime() - startTime;
+        Debug.println(0, "#####" + name.getMethodName() + " End: Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime / 1000000000) + " s");
+    }
+
 
     @Test
     public void testAddUser() throws MiddlewareQueryException {
@@ -89,7 +112,7 @@ public class TestWorkbenchDataManagerImpl{
 
         // add user
         manager.addUser(user);
-        System.out.println("testAddUser(): " + user);
+        Debug.println(0, "testAddUser(): " + user);
 
     }
 
@@ -114,7 +137,7 @@ public class TestWorkbenchDataManagerImpl{
 
         // add the person
         manager.addPerson(person);
-        System.out.println("testAddPerson(): " + person);
+        Debug.println(0, "testAddPerson(): " + person);
 
     }
 
@@ -134,7 +157,7 @@ public class TestWorkbenchDataManagerImpl{
 
         // add the project
         manager.addProject(project);
-        System.out.println("testAddProject(): " + project);
+        Debug.println(0, "testAddProject(): " + project);
 
     }
 
@@ -150,7 +173,7 @@ public class TestWorkbenchDataManagerImpl{
 
         // add the project activity
         manager.addProjectActivity(projectActivity);
-        System.out.println("testAddProjectActivity(): " + projectActivity);
+        Debug.println(0, "testAddProjectActivity(): " + projectActivity);
 
     }
 
@@ -176,7 +199,7 @@ public class TestWorkbenchDataManagerImpl{
         Integer result = manager.addIbdbUserMap(userMap);
         Assert.assertNotNull("Should return a new user_map id",result);
 
-        System.out.println("testAddIbdbUserMap(): " + userMap);
+        Debug.println(0, "testAddIbdbUserMap(): " + userMap);
 
     }
 
@@ -192,7 +215,7 @@ public class TestWorkbenchDataManagerImpl{
 
         Assert.assertNotNull("Should return a result, id of the newly added projectlocationmap",result);
 
-        System.out.println("testAddProjectLocationMap(): " + projectLocationMap);
+        Debug.println(0, "testAddProjectLocationMap(): " + projectLocationMap);
 
     }
     
@@ -200,9 +223,9 @@ public class TestWorkbenchDataManagerImpl{
     public void testGetProjects() throws MiddlewareQueryException {
         List<Project> projects = manager.getProjects();
 
-        System.out.println("testGetProjects(): ");
+        Debug.println(0, "testGetProjects(): ");
         for (Project project : projects) {
-            System.out.println("  " + project);
+            Debug.println(0, "  " + project);
         }
     }
 
@@ -210,28 +233,28 @@ public class TestWorkbenchDataManagerImpl{
     public void testGetToolWithName() throws MiddlewareQueryException {
         String toolName = "fieldbook";
         Tool tool = manager.getToolWithName(toolName);
-        System.out.println("testGetToolWithName(" + toolName + "): " + tool);
+        Debug.println(0, "testGetToolWithName(" + toolName + "): " + tool);
     }
 
     @Test
     public void testGetProjectById() throws MiddlewareQueryException {
         Long id = manager.getProjects().get(0).getProjectId();
         Project project = manager.getProjectById(id);
-        System.out.println("testGetProjectById(" + id + "): " + project);
+        Debug.println(0, "testGetProjectById(" + id + "): " + project);
     }
 
     @Test
     public void testGetProjectByName() throws MiddlewareQueryException {
         String name = "Test Cowpea 1";// "Replace with project name to search";
         Project project = manager.getProjectByName(name);
-        System.out.println("testGetProjectByName(" + name + "): " + project);
+        Debug.println(0, "testGetProjectByName(" + name + "): " + project);
     }
 
     @Test
     public void testGetUserByName() throws MiddlewareQueryException {
         String name = "user_test";
         User user = (User) manager.getUserByName(name, 0, 1, Operation.EQUAL).get(0);
-        System.out.println("testGetUserByName(name=" + name + "):" + user);
+        Debug.println(0, "testGetUserByName(name=" + name + "):" + user);
     }
 
     @Test
@@ -245,7 +268,7 @@ public class TestWorkbenchDataManagerImpl{
         dataset.setCreationDate(new Date(System.currentTimeMillis()));
         dataset.setProject(project);
         manager.addWorkbenchDataset(dataset);
-        System.out.println("testAddWorkbenchDataset(): " + dataset);
+        Debug.println(0, "testAddWorkbenchDataset(): " + dataset);
 
     }
 
@@ -253,14 +276,14 @@ public class TestWorkbenchDataManagerImpl{
     public void testGetWorkbenchDatasetByProjectId() throws MiddlewareQueryException {
         Long projectId = 1L;
         List<WorkbenchDataset> list = manager.getWorkbenchDatasetByProjectId(projectId, 0, 10);
-        System.out.println("testGetWorkbenchDatasetByProjectId(" + projectId + "): ");
+        Debug.println(0, "testGetWorkbenchDatasetByProjectId(" + projectId + "): ");
 
         if (list.isEmpty()) {
-            System.out.println("  No records found.");
+            Debug.println(0, "  No records found.");
         }
 
         for (WorkbenchDataset d : list) {
-            System.out.println("  " + d.getDatasetId() + ": " + d.getName());
+            Debug.println(0, "  " + d.getDatasetId() + ": " + d.getName());
         }
     }
 
@@ -268,21 +291,21 @@ public class TestWorkbenchDataManagerImpl{
     public void testCountWorkbenchDatasetByProjectId() throws MiddlewareQueryException {
         Long projectId = 1L;
         long result = manager.countWorkbenchDatasetByProjectId(projectId);
-        System.out.println("testCountWorkbenchDatasetByProjectId(" + projectId + "): " + result);
+        Debug.println(0, "testCountWorkbenchDatasetByProjectId(" + projectId + "): " + result);
     }
 
     @Test
     public void testGetWorkbenchDatasetByName() throws MiddlewareQueryException {
         String name = "D";
         List<WorkbenchDataset> list = manager.getWorkbenchDatasetByName(name, Operation.EQUAL, 0, 10);
-        System.out.println("testGetWorkbenchDatasetByName(name=" + name + "): ");
+        Debug.println(0, "testGetWorkbenchDatasetByName(name=" + name + "): ");
 
         if (list.isEmpty()) {
-            System.out.println("  No records found.");
+            Debug.println(0, "  No records found.");
         }
 
         for (WorkbenchDataset d : list) {
-            System.out.println("  " + d.getDatasetId() + ": " + d.getName());
+            Debug.println(0, "  " + d.getDatasetId() + ": " + d.getName());
         }
     }
 
@@ -290,35 +313,35 @@ public class TestWorkbenchDataManagerImpl{
     public void testCountWorkbenchDatasetByName() throws MiddlewareQueryException {
         String name = "a";
         long result = manager.countWorkbenchDatasetByName(name, Operation.EQUAL);
-        System.out.println("testCountWorkbenchDatasetByName(name=" + name + "): " + result);
+        Debug.println(0, "testCountWorkbenchDatasetByName(name=" + name + "): " + result);
     }
 
     @Test
     public void testGetLocationIdsByProjectId() throws MiddlewareQueryException {
         Long projectId = 1L;
         List<Long> ids = manager.getLocationIdsByProjectId(projectId, 0, 10);
-        System.out.println("testgetLocationIdsByProjectId(" + projectId + "): " + ids);
+        Debug.println(0, "testgetLocationIdsByProjectId(" + projectId + "): " + ids);
     }
 
     @Test
     public void testCountLocationIdsByProjectId() throws MiddlewareQueryException {
         Long projectId = 1L;
         long result = manager.countLocationIdsByProjectId(projectId);
-        System.out.println("testCountLocationIdsByProjectId(" + projectId + "): " + result);
+        Debug.println(0, "testCountLocationIdsByProjectId(" + projectId + "): " + result);
     }
 
     @Test
     public void testGetMethodsByProjectId() throws MiddlewareQueryException {
         Long projectId = 1L;
         List<Integer> list = manager.getMethodIdsByProjectId(projectId, 0, 10);
-        System.out.println("testGetMethodsByProjectId(" + projectId + "): ");
+        Debug.println(0, "testGetMethodsByProjectId(" + projectId + "): ");
 
         if (list.isEmpty()) {
-            System.out.println("  No records found.");
+            Debug.println(0, "  No records found.");
         }
 
         for (Integer m : list) {
-            System.out.println("  " + m);
+            Debug.println(0, "  " + m);
         }
     }
 
@@ -326,7 +349,7 @@ public class TestWorkbenchDataManagerImpl{
     public void testCountMethodsByProjectId() throws MiddlewareQueryException {
         Long projectId = 1L;
         long result = manager.countMethodIdsByProjectId(projectId);
-        System.out.println("testCountMethodsByProjectId(" + projectId + "): " + result);
+        Debug.println(0, "testCountMethodsByProjectId(" + projectId + "): " + result);
     }
 
     @Test
@@ -350,21 +373,21 @@ public class TestWorkbenchDataManagerImpl{
         // add the projectUsers
         List<Integer> projectUsersAdded = manager.addProjectUserRole(projectUsers);
 
-        System.out.println("testAddProjectUsers(projectId=" + projectId + ") ADDED: " + projectUsersAdded.size());
+        Debug.println(0, "testAddProjectUsers(projectId=" + projectId + ") ADDED: " + projectUsersAdded.size());
     }
 
     @Test
     public void testGetUsersByProjectId() throws MiddlewareQueryException {
         Long projectId = manager.getProjects().get((manager.getProjects().size())-1).getProjectId();
         List<User> users = manager.getUsersByProjectId(projectId);
-        System.out.println("testGetUsersByProjectId(" + projectId + "): ");
+        Debug.println(0, "testGetUsersByProjectId(" + projectId + "): ");
 
         if (users.isEmpty()) {
-            System.out.println("  No records found.");
+            Debug.println(0, "  No records found.");
         }
 
         for (User u : users) {
-            System.out.println("  " + u.getUserid() + ": " + u.getName());
+            Debug.println(0, "  " + u.getUserid() + ": " + u.getName());
         }
     }
 
@@ -372,21 +395,21 @@ public class TestWorkbenchDataManagerImpl{
     public void testCountUsersByProjectId() throws MiddlewareQueryException {
     	Long projectId = manager.getProjects().get((manager.getProjects().size())-1).getProjectId();
         long result = manager.countUsersByProjectId(projectId);
-        System.out.println("testCountUsersByProjectId(" + projectId + "): " + result);
+        Debug.println(0, "testCountUsersByProjectId(" + projectId + "): " + result);
     }
 
     @Test
     public void testGetActivitiesByProjectId() throws MiddlewareQueryException {
     	Long projectId = manager.getProjects().get((manager.getProjects().size())-1).getProjectId();
         List<ProjectActivity> list = manager.getProjectActivitiesByProjectId(projectId, 0, 10);
-        System.out.println("testGetActivitiesByProjectId(" + projectId + "): ");
+        Debug.println(0, "testGetActivitiesByProjectId(" + projectId + "): ");
 
         if (list.isEmpty()) {
-            System.out.println("  No records found.");
+            Debug.println(0, "  No records found.");
         }
 
         for (ProjectActivity m : list) {
-            System.out.println("  " + m);
+            Debug.println(0, "  " + m);
         }
     }
 
@@ -394,7 +417,7 @@ public class TestWorkbenchDataManagerImpl{
     public void testCountActivitiesByProjectId() throws MiddlewareQueryException {
     	Long projectId = manager.getProjects().get((manager.getProjects().size())-1).getProjectId();
         long result = manager.countProjectActivitiesByProjectId(projectId);
-        System.out.println("testCountActivitiesByProjectId(" + projectId + "): " + result);
+        Debug.println(0, "testCountActivitiesByProjectId(" + projectId + "): " + result);
     }
 
     @Test
@@ -409,7 +432,7 @@ public class TestWorkbenchDataManagerImpl{
         toolConfig.setConfigValue("test value");
 
         manager.addToolConfiguration(toolConfig);
-        System.out.println("testAddToolConfiguration(toolId=" + toolId + "): " + toolConfig);
+        Debug.println(0, "testAddToolConfiguration(toolId=" + toolId + "): " + toolConfig);
 
         // clean up
         manager.deleteToolConfiguration(toolConfig);
@@ -431,11 +454,11 @@ public class TestWorkbenchDataManagerImpl{
             dao.setSession(hibernateUtil.getCurrentSession());
             ToolConfiguration result = dao.getById(toolId, false);
 
-            System.out.println("testUpdateToolConfiguration(toolId=" + toolId + "): ");
-            System.out.println("  FROM: " + oldToolConfigValue);
-            System.out.println("    TO: " + result);
+            Debug.println(0, "testUpdateToolConfiguration(toolId=" + toolId + "): ");
+            Debug.println(0, "  FROM: " + oldToolConfigValue);
+            Debug.println(0, "    TO: " + result);
         } else {
-            System.out.println("testUpdateToolConfiguration(toolId=" + toolId + "): Tool configuration not found.");
+            Debug.println(0, "testUpdateToolConfiguration(toolId=" + toolId + "): Tool configuration not found.");
         }
     }
 
@@ -451,9 +474,9 @@ public class TestWorkbenchDataManagerImpl{
             dao.setSession(hibernateUtil.getCurrentSession());
             ToolConfiguration result = dao.getById(toolId, false);
 
-            System.out.println("testDeleteToolConfiguration(toolId=" + toolId + "): " + result);
+            Debug.println(0, "testDeleteToolConfiguration(toolId=" + toolId + "): " + result);
         } else {
-            System.out.println("testDeleteToolConfiguration(toolId=" + toolId + "): Tool Configuration not found");
+            Debug.println(0, "testDeleteToolConfiguration(toolId=" + toolId + "): Tool Configuration not found");
         }
 
     }
@@ -462,13 +485,13 @@ public class TestWorkbenchDataManagerImpl{
     public void testGetListOfToolConfigurationsByToolId() throws MiddlewareQueryException {
         Long toolId = 1L;
         List<ToolConfiguration> result = manager.getListOfToolConfigurationsByToolId(toolId);
-        System.out.println("testGetListOfToolConfigurationsByToolId(" + toolId + "): ");
+        Debug.println(0, "testGetListOfToolConfigurationsByToolId(" + toolId + "): ");
 
         if (result.isEmpty()) {
-            System.out.println("  No records found.");
+            Debug.println(0, "  No records found.");
         } else {
             for (ToolConfiguration t : result) {
-                System.out.println("  " + t);
+                Debug.println(0, "  " + t);
             }
         }
     }
@@ -478,7 +501,7 @@ public class TestWorkbenchDataManagerImpl{
         Long toolId = 1L;
         String configKey = "test";
         ToolConfiguration toolConfig = manager.getToolConfigurationByToolIdAndConfigKey(toolId, configKey);
-        System.out.println("testGetToolConfigurationByToolIdAndConfigKey(toolId=" + toolId + ", configKey=" + configKey + "): "
+        Debug.println(0, "testGetToolConfigurationByToolIdAndConfigKey(toolId=" + toolId + ", configKey=" + configKey + "): "
                 + toolConfig);
     }
 
@@ -489,10 +512,10 @@ public class TestWorkbenchDataManagerImpl{
         try{
             String added = manager.addCropType(cropType);
             Assert.assertNotNull(added);            
-            System.out.println("testAddCropType(" + cropType + "): records added = " + added);
+            Debug.println(0, "testAddCropType(" + cropType + "): records added = " + added);
         }catch(MiddlewareQueryException e){
             if (e.getMessage().equals("Crop type already exists.")){
-                System.out.println(e.getMessage());
+                Debug.println(0, e.getMessage());
             } else {
                 throw e;
             }
@@ -504,7 +527,7 @@ public class TestWorkbenchDataManagerImpl{
     public void testGetInstalledCentralCrops() throws MiddlewareQueryException {
         ArrayList<CropType> cropTypes = (ArrayList<CropType>) manager.getInstalledCentralCrops();
         Assert.assertNotNull(cropTypes);
-        System.out.println("testGetInstalledCentralCrops(): " + cropTypes);
+        Debug.println(0, "testGetInstalledCentralCrops(): " + cropTypes);
     }
 
     @Test
@@ -512,7 +535,7 @@ public class TestWorkbenchDataManagerImpl{
         String cropName = CropType.CHICKPEA;
         CropType cropType = manager.getCropTypeByName(cropName);
         Assert.assertNotNull(cropName);      
-        System.out.println("testGetCropTypeByName(" + cropName + "): " + cropType);
+        Debug.println(0, "testGetCropTypeByName(" + cropName + "): " + cropType);
     }
 
 
@@ -522,7 +545,7 @@ public class TestWorkbenchDataManagerImpl{
         Long projectId = Long.valueOf(3);
         Integer localIbdbUserId = manager.getLocalIbdbUserId(workbenchUserId, projectId);
         Assert.assertNotNull(localIbdbUserId); 
-        System.out.println("testGetLocalIbdbUserId(workbenchUserId=" + workbenchUserId + ", projectId=" + projectId + "): "
+        Debug.println(0, "testGetLocalIbdbUserId(workbenchUserId=" + workbenchUserId + ", projectId=" + projectId + "): "
                 + localIbdbUserId);
     }
 
@@ -531,7 +554,7 @@ public class TestWorkbenchDataManagerImpl{
         Integer id = Integer.valueOf(1); // Assumption: there is a role with id 1
         Role role = manager.getRoleById(id);
         Assert.assertNotNull(role); 
-        System.out.println("testGetRoleById(id=" + id + "): \n  " + role);
+        Debug.println(0, "testGetRoleById(id=" + id + "): \n  " + role);
     }
 
     @Test
@@ -541,7 +564,7 @@ public class TestWorkbenchDataManagerImpl{
         WorkflowTemplate workflowTemplate = manager.getWorkflowTemplateByName(templateName).get(0);
         Role role = manager.getRoleByNameAndWorkflowTemplate(roleName, workflowTemplate);
         Assert.assertNotNull(role); 
-        System.out.println("testGetRoleByNameAndWorkflowTemplate(name=" + roleName + ", workflowTemplate=" + workflowTemplate.getName()
+        Debug.println(0, "testGetRoleByNameAndWorkflowTemplate(name=" + roleName + ", workflowTemplate=" + workflowTemplate.getName()
                 + "): \n  " + role);
     }
 
@@ -551,9 +574,9 @@ public class TestWorkbenchDataManagerImpl{
         List<Role> roles = manager.getRolesByWorkflowTemplate(workflowTemplate);
         Assert.assertNotNull(roles); 
         Assert.assertTrue(!roles.isEmpty());
-        System.out.println("testGetRolesByWorkflowTemplate(workflowTemplate=" + workflowTemplate.getName() + "): " + roles.size());
+        Debug.println(0, "testGetRolesByWorkflowTemplate(workflowTemplate=" + workflowTemplate.getName() + "): " + roles.size());
         for (Role role: roles){
-            System.out.println("  "+role);
+            Debug.println(0, "  "+role);
         }
     }
 
@@ -562,7 +585,7 @@ public class TestWorkbenchDataManagerImpl{
         Role role = manager.getRoleById(manager.getAllRoles().get(0).getRoleId());
         WorkflowTemplate template = manager.getWorkflowTemplateByRole(role);
         Assert.assertNotNull(template);
-        System.out.println("testGetWorkflowTemplateByRole(role=" + role.getName() + "): \n  " + template);
+        Debug.println(0, "testGetWorkflowTemplateByRole(role=" + role.getName() + "): \n  " + template);
     }
 
     @Test
@@ -577,9 +600,9 @@ public class TestWorkbenchDataManagerImpl{
             ProjectUserRole projectUser = projectUsers.get(0); // get the first user of the project
             User user = manager.getUserById(projectUser.getUserId());
             List<Role> roles = manager.getRolesByProjectAndUser(project, user); // get the roles
-            System.out.println("testGetRoleByProjectAndUser(project=" + project.getProjectName() + ", user=" + user.getName() + "): \n  " + roles);
+            Debug.println(0, "testGetRoleByProjectAndUser(project=" + project.getProjectName() + ", user=" + user.getName() + "): \n  " + roles);
         } else {
-            System.out.println("testGetRoleByProjectAndUser(project=" + project.getProjectName() + "): Error in data - Project has no users. ");
+            Debug.println(0, "testGetRoleByProjectAndUser(project=" + project.getProjectName() + "): Error in data - Project has no users. ");
         }
     }
 
@@ -589,9 +612,8 @@ public class TestWorkbenchDataManagerImpl{
         Assert.assertNotNull(roles);
         Assert.assertTrue(!roles.isEmpty());
         
-        System.out.println("RESULTS:");
         for(Role role : roles) {
-            System.out.println(role);
+            Debug.println(0, role.toString());
         }
     }
 
@@ -608,7 +630,7 @@ public class TestWorkbenchDataManagerImpl{
 
         Integer idSaved = manager.addProjectUserMysqlAccount(recordToSave);
         Assert.assertNotNull(idSaved);
-        System.out.println("Id of record saved: " + idSaved);
+        Debug.println(0, "Id of record saved: " + idSaved);
 
     }
 
@@ -660,9 +682,9 @@ public class TestWorkbenchDataManagerImpl{
         Assert.assertNotNull(idsSaved);
         Assert.assertTrue(!idsSaved.isEmpty());
 
-        System.out.println("Ids of records saved:");
+        Debug.println(0, "Ids of records saved:");
         for(Integer id : idsSaved){
-            System.out.println(id);
+            Debug.println(0, id.toString());
         }
 
         manager.deleteProject(project1);
@@ -675,7 +697,7 @@ public class TestWorkbenchDataManagerImpl{
         //with project id = 1 and user id = 1
         ProjectUserMysqlAccount record = manager.getProjectUserMysqlAccountByProjectIdAndUserId(Integer.valueOf(1), Integer.valueOf(1));
         Assert.assertNotNull(record);
-        System.out.println(record);
+        Debug.println(0, record.toString());
     }
 
     @Test
@@ -684,9 +706,9 @@ public class TestWorkbenchDataManagerImpl{
         Assert.assertNotNull(projectBackups);
         Assert.assertTrue(!projectBackups.isEmpty());
         
-        System.out.println("testGetProjectBackups(): ");
+        Debug.println(0, "testGetProjectBackups(): ");
         for (ProjectBackup project : projectBackups) {
-            System.out.println("  " + project);
+            Debug.println(0, "  " + project);
         }
     }
 
@@ -702,7 +724,7 @@ public class TestWorkbenchDataManagerImpl{
         manager.saveOrUpdateProjectBackup(projectBackup);
         Assert.assertNotNull(projectBackup);
         
-        System.out.println("testAddProjectBackup(): " + projectBackup);
+        Debug.println(0, "testAddProjectBackup(): " + projectBackup);
 
     }
 
@@ -713,9 +735,8 @@ public class TestWorkbenchDataManagerImpl{
         Assert.assertNotNull(projectBackups);
         Assert.assertTrue(!projectBackups.isEmpty());
         
-        System.out.println("testGetProjectBackupsByProject(): ");
         for (ProjectBackup backup : projectBackups) {
-            System.out.println("  " + backup);
+            Debug.println(0, "  " + backup);
         }
     }
 
@@ -723,14 +744,14 @@ public class TestWorkbenchDataManagerImpl{
     public void testCountAllPersons() throws MiddlewareQueryException {
     	long count = manager.countAllPersons();
     	Assert.assertNotNull(count);
-        System.out.println("testCountAllPersons: " + count );
+        Debug.println(0, "testCountAllPersons: " + count );
     }
 
     @Test
     public void testCountAllUsers() throws MiddlewareQueryException {
     	long count = manager.countAllUsers();
     	Assert.assertNotNull(count);
-        System.out.println("testCountAllUsers: " + count );
+        Debug.println(0, "testCountAllUsers: " + count );
     }
 
     @Test
@@ -739,9 +760,8 @@ public class TestWorkbenchDataManagerImpl{
         Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
         
-        System.out.println("testGetAllPersons Results:");
         for (Person result : results){
-    	   System.out.println(result);
+    	   Debug.println(0, result.toString());
        }
     }
 
@@ -751,9 +771,8 @@ public class TestWorkbenchDataManagerImpl{
     	Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
         
-        System.out.println("testGetAllRolesDesc Results:");
         for (Role result : results){
-    	   System.out.println(result);
+    	   Debug.println(0, result.toString());
        }
     }
 
@@ -763,9 +782,8 @@ public class TestWorkbenchDataManagerImpl{
     	Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
         
-        System.out.println("testGetAllRolesOrderedByLabel Results:");
         for (Role result : results){
-    	   System.out.println(result);
+    	   Debug.println(0, result.toString());
        }
     }
 
@@ -775,9 +793,8 @@ public class TestWorkbenchDataManagerImpl{
     	Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
         
-        System.out.println("testGetAllTools Results:");
         for (Tool result : results) {
-    	   System.out.println(result);
+    	   Debug.println(0, result.toString());
        }
     }
 
@@ -787,9 +804,8 @@ public class TestWorkbenchDataManagerImpl{
     	Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
         
-        System.out.println("testGetAllUsers Results:");
         for (User result : results){
-        	System.out.println(result);
+        	Debug.println(0, result.toString());
         }
     }
 
@@ -799,9 +815,8 @@ public class TestWorkbenchDataManagerImpl{
     	Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
         
-        System.out.println("testGetAllUsersSorted Results:");
         for (User result : results) {
-        	System.out.println(result);
+        	Debug.println(0, result.toString());
        }
     }
 
@@ -810,9 +825,7 @@ public class TestWorkbenchDataManagerImpl{
     	Integer userId = manager.getAllUsers().get(0).getUserid();
     	Project results = manager.getLastOpenedProject(userId);
         Assert.assertNotNull(results);
-        
-        System.out.println("testGetLastOpenedProject Results:");
-        System.out.println(results);
+        Debug.println(0, results.toString());
     }
 
     @Test
@@ -820,9 +833,7 @@ public class TestWorkbenchDataManagerImpl{
     	int id = manager.getAllPersons().get(0).getId();
     	Person results = manager.getPersonById(id);
         Assert.assertNotNull(results);
-        
-        System.out.println("testGetPersonById Results:");
-        System.out.println(results);
+        Debug.println(0, results.toString());
     }
 
     @Test
@@ -832,9 +843,8 @@ public class TestWorkbenchDataManagerImpl{
     	Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
         
-        System.out.println("testGetProjectActivitiesByProjectId Results:");
         for (ProjectActivity result : results){
-        	System.out.println(result);
+        	Debug.println(0, result.toString());
        }
     }
 
@@ -845,9 +855,8 @@ public class TestWorkbenchDataManagerImpl{
     	Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
         
-        System.out.println("testGetProjectLocationMapByProjectId Results:");
         for (ProjectLocationMap result : results){
-        	System.out.println(result);
+        	Debug.println(0, result.toString());
        }
     }
 
@@ -856,9 +865,7 @@ public class TestWorkbenchDataManagerImpl{
     	Integer id = manager.getProjects().get(0).getUserId();
     	ProjectUserRole userrole = manager.getProjectUserRoleById(id);
     	Assert.assertNotNull(userrole);
-    	
-        System.out.println("testGetProjectUserRoleById Results:");
-        System.out.println(userrole);
+        Debug.println(0, userrole.toString());
     }
 
     @Test
@@ -870,9 +877,8 @@ public class TestWorkbenchDataManagerImpl{
     	Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
         
-        System.out.println("testGetQuestionsByUserId Results:");
         for (SecurityQuestion result : results) {
-        	System.out.println(result);
+        	Debug.println(0, result.toString());
         }
     }
 
@@ -882,9 +888,9 @@ public class TestWorkbenchDataManagerImpl{
     	Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
         
-        System.out.println("testGetProjectsList(): ");
+        Debug.println(0, "testGetProjectsList(): ");
         for (Project result : results) {
-            System.out.println("  " + result);
+            Debug.println(0, "  " + result);
 
         }
     }
@@ -896,9 +902,9 @@ public class TestWorkbenchDataManagerImpl{
     	Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
         
-        System.out.println("testGetProjectMethodByProject(): ");
+        Debug.println(0, "testGetProjectMethodByProject(): ");
         for (ProjectMethod result : results) {
-            System.out.println("  " + result);
+            Debug.println(0, "  " + result);
 
         }
     }
@@ -910,12 +916,12 @@ public class TestWorkbenchDataManagerImpl{
     	Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
         
-        System.out.println("testGetProjectsByUser(): ");
+        Debug.println(0, "testGetProjectsByUser(): ");
         for (Project result : results) {
-            System.out.println("  " + result);
+            Debug.println(0, "  " + result);
 
         }
-        System.out.println("Number of record/s: "+results.size());
+        Debug.println(0, "Number of record/s: "+results.size());
     }
 
     @Test
@@ -925,11 +931,11 @@ public class TestWorkbenchDataManagerImpl{
     	Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
         
-    	System.out.println("testGetProjectUserRolesByProject(): ");
+    	Debug.println(0, "testGetProjectUserRolesByProject(): ");
         for (ProjectUserRole result : results) {
-            System.out.println("  " + result);
+            Debug.println(0, "  " + result);
         }
-        System.out.println("Number of record/s: "+results.size());
+        Debug.println(0, "Number of record/s: "+results.size());
     }
 
     @Test
@@ -937,8 +943,8 @@ public class TestWorkbenchDataManagerImpl{
     	int id = 1;
     	User user = manager.getUserById(id);
     	Assert.assertNotNull(user);
-    	System.out.println("testGetUserById("+id+"): ");
-    	System.out.println(user);
+    	Debug.println(0, "testGetUserById("+id+"): ");
+    	Debug.println(0, user.toString());
     }
 
     @Test
@@ -947,8 +953,8 @@ public class TestWorkbenchDataManagerImpl{
     	WorkbenchDataset result = manager.getWorkbenchDatasetById(datasetId);
     	Assert.assertNotNull(result);
     	
-    	System.out.println("testGetWorkbenchDatasetById("+datasetId+"): ");
-    	System.out.println(result);
+    	Debug.println(0, "testGetWorkbenchDatasetById("+datasetId+"): ");
+    	Debug.println(0, result.toString());
     }
 
     @Test
@@ -956,8 +962,7 @@ public class TestWorkbenchDataManagerImpl{
     	WorkbenchRuntimeData result = manager.getWorkbenchRuntimeData();
     	Assert.assertNotNull(result);
     	
-    	System.out.println("testGetWorkbenchRuntimeData: ");
-    	System.out.println(result);
+    	Debug.println(0, result.toString());
     }
 
     @Test
@@ -965,8 +970,7 @@ public class TestWorkbenchDataManagerImpl{
     	WorkbenchSetting result = manager.getWorkbenchSetting();
     	Assert.assertNotNull(result);
     	
-    	System.out.println("testGetWorkbenchSetting: ");
-    	System.out.println(result);
+    	Debug.println(0, result.toString());
     }
 
     @Test
@@ -976,9 +980,8 @@ public class TestWorkbenchDataManagerImpl{
     	Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
         
-        System.out.println("testGetWorkflowTemplateByName("+name+") Results:");
         for (WorkflowTemplate result : results) {
-        	System.out.println(result);
+        	Debug.println(0, result.toString());
         }
     }
 
@@ -988,11 +991,10 @@ public class TestWorkbenchDataManagerImpl{
     	Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
         
-        System.out.println("testGetWorkflowTemplatesList() Results:");
         for (WorkflowTemplate result : results) {
-        	System.out.println(result);
+        	Debug.println(0, result.toString());
         }
-        System.out.println("Number of record/s: "+results.size());
+        Debug.println(0, "Number of record/s: "+results.size());
     }
 
     @Test
@@ -1000,7 +1002,7 @@ public class TestWorkbenchDataManagerImpl{
         Person person = manager.getAllPersons().get((manager.getAllPersons().size())-1);
 
     	manager.deletePerson(person);
-        System.out.println("Record is successfully deleted");
+        Debug.println(0, "Record is successfully deleted");
     }
 
     /* TODO: Lets disable this test case for the meantime as the delete fxn left behind by abro differs from the ff transaction, (Please add a separate jira ticket for this) */
@@ -1010,7 +1012,7 @@ public class TestWorkbenchDataManagerImpl{
         Project project = manager.getProjects().get((manager.getProjects().size())-1);
 
     	manager.deleteProject(project);
-        System.out.println("Record is successfully deleted");
+        Debug.println(0, "Record is successfully deleted");
     } */
 
     @Test
@@ -1027,7 +1029,7 @@ public class TestWorkbenchDataManagerImpl{
         // add the project activity
         manager.addProjectActivity(projectActivity);
     	manager.deleteProjectActivity(projectActivity);
-        System.out.println("Record is successfully deleted");
+        Debug.println(0, "Record is successfully deleted");
     }
 
     @Test
@@ -1036,11 +1038,10 @@ public class TestWorkbenchDataManagerImpl{
     	Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
         
-        System.out.println("testGetWorkflowTemplates() Results:");
         for (WorkflowTemplate result : results) {
-        	System.out.println(result);
+        	Debug.println(0, result.toString());
         }
-        System.out.println("Number of record/s: "+results.size());
+        Debug.println(0, "Number of record/s: "+results.size());
     }
 
     @Test
@@ -1048,8 +1049,7 @@ public class TestWorkbenchDataManagerImpl{
     	ProjectUserInfoDAO results = manager.getProjectUserInfoDao();
     	Assert.assertNotNull(results);
     	
-        System.out.println("testGetWorkflowTemplates() Results:");
-        System.out.println(results);
+        Debug.println(0, results.toString());
 
     }
 
@@ -1057,20 +1057,14 @@ public class TestWorkbenchDataManagerImpl{
     public void testGetToolDao() throws MiddlewareQueryException  {
     	ToolDAO results = manager.getToolDao();
     	Assert.assertNotNull(results);
-    	
-        System.out.println("testGetToolDao() Results:");
-        System.out.println(results);
-
+    	Debug.println(0, results.toString());
     }
 
     @Test
     public void testGetUserInfo() throws MiddlewareQueryException  {
     	UserInfo results = manager.getUserInfo(manager.getAllUsers().get(0).getUserid());
     	Assert.assertNotNull(results);
-    	
-        System.out.println("testGetUserInfo() Results:");
-        System.out.println(results);
-
+        Debug.println(0, results.toString());
     }
 
     @Test
@@ -1079,11 +1073,10 @@ public class TestWorkbenchDataManagerImpl{
     	Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
         
-        System.out.println("testgetToolsWithType() Results:");
         for (Tool result : results) {
-        	System.out.println(result);
+        	Debug.println(0, result.toString());
         }
-        System.out.println("Number of record/s: "+results.size());
+        Debug.println(0, "Number of record/s: "+results.size());
     }
 
     @Test
@@ -1092,7 +1085,7 @@ public class TestWorkbenchDataManagerImpl{
         List<Integer> ids = manager.getBreedingMethodIdsByWorkbenchProjectId(projectId);
         Debug.println(0, "testGetBreedingMethodIdsByWorkbenchProjectId(projectId=" + projectId + "): " + ids.size());
         for (Integer id : ids){
-            System.out.println(" ID = " + id);
+            Debug.println(0, " ID = " + id);
         }
     }
 
@@ -1137,11 +1130,11 @@ public class TestWorkbenchDataManagerImpl{
 
       ProjectLocationMap projectLocationMap1 = new ProjectLocationMap();
       projectLocationMap1.setProject(manager.getProjects().get(manager.getProjects().size()-2));
-      projectLocationMap1.setLocationId(new Long(3));
+      projectLocationMap1.setLocationId(Long.valueOf(3));
 
       ProjectLocationMap projectLocationMap2 = new ProjectLocationMap();
       projectLocationMap2.setProject(manager.getProjects().get(manager.getProjects().size()-1));
-      projectLocationMap2.setLocationId(new Long(4));
+      projectLocationMap2.setLocationId(Long.valueOf(4));
 
       projectLocationMapList.add(projectLocationMap1);
       projectLocationMapList.add(projectLocationMap2);
@@ -1175,23 +1168,22 @@ public class TestWorkbenchDataManagerImpl{
       projectActivity1.setName("Activity 1");
       projectActivity1.setDescription("Test Description for Activity 1");
       projectActivity1.setCreatedAt(new Date(System.currentTimeMillis()));
-      projectActivity1.setUser(manager.getUserById(new Integer(1)));
+      projectActivity1.setUser(manager.getUserById(Integer.valueOf(1)));
 
       ProjectActivity projectActivity2 = new ProjectActivity();
       projectActivity2.setProject(manager.getProjects().get(manager.getProjects().size()-1));
       projectActivity2.setName("Activity 2");
       projectActivity2.setDescription("Test Description for Activity 2");
       projectActivity2.setCreatedAt(new Date(System.currentTimeMillis()));
-      projectActivity2.setUser(manager.getUserById(new Integer(1)));
+      projectActivity2.setUser(manager.getUserById(Integer.valueOf(1)));
 
       projectActivityList.add(projectActivity1);
       projectActivityList.add(projectActivity2);
 
       manager.addProjectActivity(projectActivityList);
 
-      System.out.println("testSaveProject() RESULTS: ");
-      System.out.println("  " + project1);
-      System.out.println("  " + project2);
+      Debug.println(0, "  " + project1);
+      Debug.println(0, "  " + project2);
 
     }
 
@@ -1234,7 +1226,7 @@ public class TestWorkbenchDataManagerImpl{
             manager.deleteProject(project);
 
         } catch (MiddlewareQueryException e) {
-            System.out.println("Error in deleteProject(): " + e.getMessage());
+            Debug.println(0, "Error in deleteProject(): " + e.getMessage());
             e.printStackTrace();
         }
 

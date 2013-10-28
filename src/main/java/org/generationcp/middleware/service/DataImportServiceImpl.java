@@ -62,7 +62,6 @@ public class DataImportServiceImpl extends Service implements DataImportService 
             return studyId;
 
         } catch (Exception e) {
-            e.printStackTrace();
             rollbackTransaction(trans);
             logAndThrowException("Error encountered with saveDataset(): " + e.getMessage(), e, LOG);
 
@@ -158,7 +157,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         return id;
     }
 
-    private Boolean isEntryExists(java.util.List<MeasurementVariable> list) throws MiddlewareQueryException {
+    private Boolean isEntryExists(List<MeasurementVariable> list) throws MiddlewareQueryException {
         OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(getSessionProviderForLocal(), getSessionProviderForCentral());
         for (MeasurementVariable mvar : list) {
 

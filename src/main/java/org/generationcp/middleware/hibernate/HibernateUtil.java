@@ -65,8 +65,8 @@ public class HibernateUtil implements Serializable{
             sessionFactory = cfg.buildSessionFactory();
 
             threadSession = new ThreadLocal<Session>();
-        } catch (FileNotFoundException ex) {
-            throw new ConfigException(ex.getMessage());
+        } catch (FileNotFoundException e) {
+            throw new ConfigException(e.getMessage(), e);
         }
     }
 
@@ -124,8 +124,8 @@ public class HibernateUtil implements Serializable{
             sessionFactory = cfg.buildSessionFactory();
 
             threadSession = new ThreadLocal<Session>();
-        } catch (FileNotFoundException ex) {
-            throw new ConfigException(ex.getMessage());
+        } catch (FileNotFoundException e) {
+            throw new ConfigException(e.getMessage(), e);
         }
     }
     

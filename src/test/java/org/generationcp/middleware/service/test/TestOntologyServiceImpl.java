@@ -12,6 +12,7 @@
 package org.generationcp.middleware.service.test;
 
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -43,6 +44,8 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public class TestOntologyServiceImpl {
     
+    private static final String NUMBER_OF_RECORDS = " # Records = ";
+    
     private static ServiceFactory serviceFactory;
     private static OntologyService ontologyService;
 
@@ -66,21 +69,21 @@ public class TestOntologyServiceImpl {
 
     @Before
     public void beforeEachTest() {
-        System.out.println("#####" + name.getMethodName() + " Start: ");
+        Debug.println(0, "#####" + name.getMethodName() + " Start: ");
         startTime = System.nanoTime();
     }
 
     @Test
     public void testGetStandardVariableById() throws MiddlewareQueryException {
         StandardVariable var = ontologyService.getStandardVariable(8005);
-        assertTrue(var != null);
+        assertNotNull(var);
         var.print(3);
     }
 
     @Test
     public void testGetStandardVariables() throws MiddlewareQueryException {
         List<StandardVariable> vars = ontologyService.getStandardVariables("USER_NAME");
-        assertTrue(!vars.isEmpty());
+        assertFalse(vars.isEmpty());
         for (StandardVariable var : vars){
             var.print(3);
         }
@@ -95,25 +98,25 @@ public class TestOntologyServiceImpl {
     @Test
     public void testGetPropertyById() throws MiddlewareQueryException {
         Property property = ontologyService.getProperty(2000);       
-        assertTrue(property != null);
+        assertNotNull(property);
         property.print(3);
     }
 
     @Test
     public void testGetPropertyByName() throws MiddlewareQueryException {
         Property property = ontologyService.getProperty("Dataset");       
-        assertTrue(property != null);
+        assertNotNull(property);
         property.print(3);
     }
 
     @Test
     public void testGetAllProperties() throws MiddlewareQueryException {
         List<Property> properties = ontologyService.getAllProperties();       
-        assertTrue(!properties.isEmpty());
+        assertFalse(properties.isEmpty());
         for (Property property : properties){
             property.print(3);
         }
-        Debug.println(3, " # Records = " + properties.size());
+        Debug.println(3, NUMBER_OF_RECORDS + properties.size());
     }
 
     @Test
@@ -125,7 +128,7 @@ public class TestOntologyServiceImpl {
     @Test
     public void testGetScaleById() throws MiddlewareQueryException {
         Scale scale = ontologyService.getScale(6030);       
-        assertTrue(scale != null);
+        assertNotNull(scale);
         scale.print(3);
     }
 
@@ -133,11 +136,11 @@ public class TestOntologyServiceImpl {
     @Test
     public void testGetAllScales() throws MiddlewareQueryException {
         List<Scale> scales = ontologyService.getAllScales();       
-        assertTrue(!scales.isEmpty());
+        assertFalse(scales.isEmpty());
         for (Scale scale : scales){
             scale.print(3);
         }
-        Debug.println(3, " # Records = " + scales.size());
+        Debug.println(3, NUMBER_OF_RECORDS + scales.size());
     }
 
 
@@ -146,25 +149,25 @@ public class TestOntologyServiceImpl {
     @Test
     public void testGetMethodById() throws MiddlewareQueryException {
         Method method = ontologyService.getMethod(4030);       
-        assertTrue(method != null);
+        assertNotNull(method);
         method.print(3);        
     }
 
     @Test
     public void testGetMethodByName() throws MiddlewareQueryException {
         Method method = ontologyService.getMethod("Enumerated");       
-        assertTrue(method != null);
+        assertNotNull(method);
         method.print(3);        
     }
     
     @Test
     public void testGetAllMethods() throws MiddlewareQueryException {
         List<Method> methods = ontologyService.getAllMethods();       
-        assertTrue(!methods.isEmpty());
+        assertFalse(methods.isEmpty());
         for (Method method : methods){
             method.print(3);
         }
-        Debug.println(3, " # Records = " + methods.size());
+        Debug.println(3, NUMBER_OF_RECORDS + methods.size());
     }
     
     @Test
@@ -177,7 +180,7 @@ public class TestOntologyServiceImpl {
     @Test
     public void testGetDataTypes() throws MiddlewareQueryException {
         List<Term> dataTypes = ontologyService.getAllDataTypes();       
-        assertTrue(!dataTypes.isEmpty());
+        assertFalse(dataTypes.isEmpty());
         for (Term dataType : dataTypes){
             dataType.print(3);
         }
@@ -188,7 +191,7 @@ public class TestOntologyServiceImpl {
     @Test
     public void testGetTraitGroups() throws MiddlewareQueryException {
         List<TraitReference> traitGroups = ontologyService.getTraitGroups();           
-        assertTrue(!traitGroups.isEmpty());
+        assertFalse(traitGroups.isEmpty());
         for (TraitReference traitGroup : traitGroups){
             traitGroup.print(3);
         }
@@ -198,23 +201,23 @@ public class TestOntologyServiceImpl {
     @Test
     public void testGetAllTraitClasses() throws MiddlewareQueryException {
         List<TraitReference> traitClasses = ontologyService.getAllTraitClasses();           
-        assertTrue(!traitClasses.isEmpty());
+        assertFalse(traitClasses.isEmpty());
         for (TraitReference traitClass : traitClasses){
             traitClass.print(3);
         }
-        Debug.println(3, " # Records = " + traitClasses.size());
+        Debug.println(3, NUMBER_OF_RECORDS + traitClasses.size());
 
     }
 
     @Test
     public void testGetAllRoles() throws MiddlewareQueryException {
         List<Term> roles = ontologyService.getAllRoles();           
-        assertTrue(!roles.isEmpty());
+        assertFalse(roles.isEmpty());
         for (Term role : roles){
             Debug.println(3, "---");
             role.print(3);
         }
-        Debug.println(3, " # Records = " + roles.size());
+        Debug.println(3, NUMBER_OF_RECORDS + roles.size());
     }
     
     @Test
@@ -228,13 +231,13 @@ public class TestOntologyServiceImpl {
         Term term = ontologyService.addTraitClass(name, definition, cvId);
         assertNotNull(term);
         assertTrue(term.getId() < 0);
-        System.out.println("testAddTraitClasses():  " + term);
+        Debug.println(0, "testAddTraitClasses():  " + term);
     }
 
     @After
     public void afterEachTest() {
         long elapsedTime = System.nanoTime() - startTime;
-        System.out.println("#####" + name.getMethodName() + " End: Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime / 1000000000) + " s");
+        Debug.println(0, "#####" + name.getMethodName() + " End: Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime / 1000000000) + " s");
     }
 
 

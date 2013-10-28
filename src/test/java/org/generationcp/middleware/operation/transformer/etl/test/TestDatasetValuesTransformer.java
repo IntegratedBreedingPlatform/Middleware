@@ -10,9 +10,8 @@ import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.operation.transformer.etl.DatasetValuesTransformer;
-import org.generationcp.middleware.operation.transformer.etl.VariableTypeListTransformer;
+import org.generationcp.middleware.util.Debug;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -37,7 +36,8 @@ public class TestDatasetValuesTransformer {
 
 	@Before
 	public void beforeEachTest() {
-		startTime = System.nanoTime();
+        Debug.println(0, "#####" + name.getMethodName() + " Start: ");
+        startTime = System.nanoTime();
 	}
 	
 	@Test
@@ -52,14 +52,14 @@ public class TestDatasetValuesTransformer {
 		DatasetValues datasetVal = transformer.transform(datasetName, datasetDescription, dataType, mVarList, varTypeList);
 		
 		Assert.assertNotNull(datasetVal);
-		System.out.println(datasetVal.toString());
+		Debug.println(0, datasetVal.toString());
 		
 	}
 	
 	@After
 	public void afterEachTest() {
 		long elapsedTime = System.nanoTime() - startTime;
-		System.out.println("#####" + name.getMethodName() + ": Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime/1000000000) + " s");
+		Debug.println(0, "#####" + name.getMethodName() + ": Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime/1000000000) + " s");
 	}
 	
 	private VariableTypeList createVariableTypeListTestData() {

@@ -462,7 +462,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
     		SQLQuery query = getSession().createSQLQuery(COUNT_OBSERVATIONS);
     	    query.setParameterList("traitIds", traitIds);
             query.setParameterList("environmentIds", environmentIds);
-    		return ((java.math.BigInteger)query.uniqueResult()).longValue(); 
+    		return ((BigInteger) query.uniqueResult()).longValue(); 
             
 
         } catch(HibernateException e) {

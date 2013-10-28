@@ -256,7 +256,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			return criteria.list();
 			
 		} catch (HibernateException e) {
-			e.printStackTrace();
 			logAndThrowException("Error in getStudiesByStudyProperty with " + valueExpression + " for property " + studyPropertyId 
 					+ " in DmsProjectDao: " + e.getMessage(), e);
 		}

@@ -21,6 +21,7 @@ import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.domain.dms.TrialEnvironment;
 import org.generationcp.middleware.hibernate.HibernateUtil;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
+import org.generationcp.middleware.util.Debug;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -43,7 +44,7 @@ public class TestGeolocationDao{
         Set<Integer> environmentIds = new HashSet<Integer>();
         environmentIds.add(5822);
         List<TrialEnvironment> results = dao.getTrialEnvironmentDetails(environmentIds);
-        System.out.println("testGetTrialEnvironmentDetails(environmentIds=" + environmentIds + ") RESULTS:");
+        Debug.println(0, "testGetTrialEnvironmentDetails(environmentIds=" + environmentIds + ") RESULTS:");
         for (TrialEnvironment env : results) {
         	env.print(4);
         }

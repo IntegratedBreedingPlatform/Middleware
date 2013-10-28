@@ -84,7 +84,7 @@ public class GermplasmMarkerElement {
                 markerNamesBuf.append(mName).append("]");
             }
         }
-        if (markerNames.size() == 0) {  // if empty markerNames
+        if (markerNames.isEmpty()) {  // if empty markerNames
             markerNamesBuf.append("]");
         }
 

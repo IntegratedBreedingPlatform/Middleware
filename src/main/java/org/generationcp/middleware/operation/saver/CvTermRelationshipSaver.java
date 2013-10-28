@@ -35,8 +35,7 @@ public class CvTermRelationshipSaver extends Saver {
 		try {
 			generatedId = dao.getNegativeId("cvTermRelationshipId");
 		} catch (MiddlewareQueryException e) {
-			e.printStackTrace();
-			throw new MiddlewareQueryException(e.getMessage());
+			throw new MiddlewareQueryException(e.getMessage(), e);
 		}
 		CVTermRelationship cvTermRelationship = create(generatedId, subjectId, typeId, objectId); 
 		dao.save(cvTermRelationship);

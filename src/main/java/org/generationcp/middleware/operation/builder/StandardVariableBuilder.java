@@ -302,6 +302,7 @@ public class StandardVariableBuilder extends Builder {
 				case TRIAL_ENVIRONMENT : storedInId = TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId();
 					break;
 				case VARIATE: storedInId = TermId.OBSERVATION_VARIATE.getId();
+				    break;
 			}
 			storedIn = getTermBuilder().get(storedInId);
 		} else {
