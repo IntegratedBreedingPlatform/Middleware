@@ -674,4 +674,13 @@ public class TestOntologyDataManagerImpl {
 		Debug.println(0, property.toString());
 	}
 	
+	@Test 
+        public void testGetAllStandardVariable() throws Exception{
+            Set<StandardVariable> standardVariables = manager.getAllStandardVariables();
+            for (StandardVariable stdVar : standardVariables) {
+                stdVar.print(0);
+            }
+            
+            Debug.println(0, "count: " + standardVariables.size());
+        }
 }

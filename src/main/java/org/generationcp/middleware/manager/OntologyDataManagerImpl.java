@@ -492,6 +492,16 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
         return term;
     }
+    
+    @Override
+    public Set<StandardVariable> getAllStandardVariables() throws MiddlewareQueryException {
+        Set<StandardVariable> standardVariables = new HashSet<StandardVariable>();
+        List<Term> terms = getAllTermsByCvId(CvId.VARIABLES);
+        for (Term term : terms) {
+            standardVariables.add(getStandardVariable(term.getId()));
+        }
+        return standardVariables;
+    }
 }
 
 

@@ -13,6 +13,7 @@
 package org.generationcp.middleware.service.api;
 
 import java.util.List;
+import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -24,6 +25,7 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TraitReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
+// TODO: Auto-generated Javadoc
 /**
  * 
  * This is the API for Ontology Browser requirements.
@@ -72,6 +74,15 @@ public interface OntologyService {
      * @throws MiddlewareQueryException the middleware query exception
      */
     void addStandardVariable(StandardVariable stdVariable) throws MiddlewareQueryException;
+    
+   
+    /**
+     * Gets the all standard variables.
+     *
+     * @return the all standard variables
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Set<StandardVariable> getAllStandardVariables() throws MiddlewareQueryException;
     
 
     /*======================= PROPERTY ================================== */

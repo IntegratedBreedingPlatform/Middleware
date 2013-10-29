@@ -333,9 +333,20 @@ public interface OntologyDataManager {
     /**
      * Adds the trait class.
      *
+     * @param name the name
+     * @param definition the definition
+     * @param cvId the cv id
      * @return the term
      * @throws MiddlewareQueryException the middleware query exception
      */
     public Term addTraitClass(String name, String definition, CvId cvId) throws MiddlewareQueryException;
 
+    
+    /**
+     * Gets the all standard variable.
+     *
+     * @return the all standard variable
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    public Set<StandardVariable> getAllStandardVariables() throws MiddlewareQueryException;
 }

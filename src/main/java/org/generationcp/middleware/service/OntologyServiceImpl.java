@@ -13,6 +13,7 @@ package org.generationcp.middleware.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -199,5 +200,10 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     @Override
     public Term findTermByName(String name, CvId cvId) throws MiddlewareQueryException {
         return getOntologyDataManager().findTermByName(name, cvId);
+    }
+    
+    @Override
+    public Set<StandardVariable> getAllStandardVariables() throws MiddlewareQueryException {
+        return getOntologyDataManager().getAllStandardVariables();
     }
 }
