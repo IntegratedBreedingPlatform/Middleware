@@ -166,6 +166,17 @@ public interface OntologyService {
     List<Scale> getAllScales() throws MiddlewareQueryException;
     
 
+    /**
+     * Adds a scale.
+     *
+     * @param name the name
+     * @param definition the definition
+     * @return the Term entry corresponding to the newly-added scale
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Term addScale(String name, String definition) throws MiddlewareQueryException;
+
+
     /*======================= METHOD ================================== */
 
     /**

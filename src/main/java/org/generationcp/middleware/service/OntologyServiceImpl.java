@@ -126,6 +126,14 @@ public class OntologyServiceImpl extends Service implements OntologyService {
         }
         return scales;        
     }
+    
+    @Override
+    public Term addScale(String name, String definition) throws MiddlewareQueryException {
+        return getOntologyDataManager().addTerm(name, definition, CvId.SCALES);
+
+    }
+    
+
 
     /*======================= METHOD ================================== */
     
@@ -152,7 +160,7 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     
     @Override
     public Term addMethod(String name, String definition) throws MiddlewareQueryException {
-        return getOntologyDataManager().addMethod(name, definition);
+        return getOntologyDataManager().addTerm(name, definition, CvId.METHODS);
     }
     
     

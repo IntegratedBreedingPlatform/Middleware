@@ -683,4 +683,12 @@ public class TestOntologyDataManagerImpl {
             
             Debug.println(0, "count: " + standardVariables.size());
         }
+	
+    @Test
+    public void testAddPropertyIsARelationship() throws Exception {
+        Term term = manager.addPropertyIsARelationship(1050, 1340);
+        Debug.println(0, "From db:  " + term);
+    }
+	    
+
 }

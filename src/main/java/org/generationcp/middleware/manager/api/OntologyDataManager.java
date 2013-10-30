@@ -24,7 +24,6 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TraitReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
-// TODO: Auto-generated Javadoc
 /**
  * This is the API for retrieving ontology data from the CHADO schema.
  * 
