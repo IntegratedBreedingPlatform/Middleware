@@ -621,6 +621,43 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     public Integer getStandardVariableIdByTermId(int cvTermId, TermId termId) throws MiddlewareQueryException {
         return getStandardVariableBuilder().getIdByTermId(cvTermId, termId);
     }
+
+    @Override
+    public void saveOrUpdateStandardVariable(StandardVariable standardVariable, Operation operation) 
+            throws MiddlewareQueryException, MiddlewareException {
+
+        standardVariable.setProperty(getTermBuilder().findOrSaveTermByName(standardVariable.getProperty().getName(), CvId.PROPERTIES));
+        standardVariable.setScale(getTermBuilder().findOrSaveTermByName(standardVariable.getScale().getName(), CvId.SCALES));
+        standardVariable.setMethod(getTermBuilder().findOrSaveTermByName(standardVariable.getMethod().getName(), CvId.METHODS));
+        
+        String errorCodes = getStandardVariableSaver().validate(standardVariable, operation);
+        
+        if (errorCodes != null && !errorCodes.isEmpty()) {
+            throw new MiddlewareQueryException(errorCodes);
+        }
+        
+        requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+
+            if (operation == Operation.ADD) {
+                getStandardVariableSaver().save(standardVariable);
+            }
+            else {
+                getStandardVariableSaver().update(standardVariable);
+            }
+
+            trans.commit();
+            
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            throw new MiddlewareQueryException("Error in saveOrUpdateStandardVariable " + e.getMessage(), e);
+        }
+    }
+
 }
 
 

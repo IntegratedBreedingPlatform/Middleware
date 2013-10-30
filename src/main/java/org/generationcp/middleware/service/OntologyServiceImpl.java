@@ -27,6 +27,7 @@ import org.generationcp.middleware.domain.oms.TraitReference;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.service.api.OntologyService;
 
@@ -269,4 +270,11 @@ public class OntologyServiceImpl extends Service implements OntologyService {
         return getOntologyDataManager().getAllStandardVariables();
     }
 
+    @Override
+    public void saveOrUpdateStandardVariable(StandardVariable standardVariable,
+            Operation operation) throws MiddlewareQueryException,
+            MiddlewareException {
+        
+        getOntologyDataManager().saveOrUpdateStandardVariable(standardVariable, operation);
+    }
 }

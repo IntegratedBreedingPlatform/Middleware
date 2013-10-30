@@ -25,6 +25,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TraitReference;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.Operation;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -407,4 +408,14 @@ public interface OntologyDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     public Integer getStandardVariableIdByTermId(int cvTermId, TermId termId) throws MiddlewareQueryException;
+
+    /**
+     * Insert or Update a Standard Variable.
+     * @param standardVariable
+     * @param operation
+     * @throws MiddlewareQueryException
+     * @throws MiddlewareException
+     */
+    void saveOrUpdateStandardVariable(StandardVariable standardVariable, Operation operation) throws MiddlewareQueryException, MiddlewareException;
+
 }

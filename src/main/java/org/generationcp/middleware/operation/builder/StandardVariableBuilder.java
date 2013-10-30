@@ -474,4 +474,15 @@ public class StandardVariableBuilder extends Builder {
             }
             return stdVariableId;
         }
+
+    public CVTerm getCvTerm(String name, int cvId) throws MiddlewareQueryException {
+        setWorkingDatabase(Database.CENTRAL);
+        CVTerm term = getCvTermDao().getByNameAndCvId(name, cvId);
+        if (term == null) {
+            setWorkingDatabase(Database.LOCAL);
+            term = getCvTermDao().getByNameAndCvId(name, cvId);
+        }
+        return term;
+    }
+
 }
