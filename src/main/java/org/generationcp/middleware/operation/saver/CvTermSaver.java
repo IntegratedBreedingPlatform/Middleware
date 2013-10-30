@@ -12,6 +12,8 @@
 package org.generationcp.middleware.operation.saver;
 
 
+import java.util.List;
+
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
@@ -30,10 +32,9 @@ public class CvTermSaver extends Saver {
 
 	public Term save(String name, String definition, CvId cvId)  throws MiddlewareException, MiddlewareQueryException{ 
 		requireLocalDatabaseInstance();
-
 		validateInputFields(name, definition);
-		
         CVTermDao dao = getCvTermDao();
+
         Integer generatedId;
 		try {
 			generatedId = dao.getNegativeId("cvTermId");
@@ -45,6 +46,27 @@ public class CvTermSaver extends Saver {
 
 		return new Term(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition());
 	}
+	
+
+    public Term saveOrUpdate(String name, String definition, CvId cvId) throws MiddlewareException, MiddlewareQueryException{
+        requireLocalDatabaseInstance();
+        validateInputFields(name, definition);
+        CVTermDao dao = getCvTermDao();
+        
+        List<Integer> termIds = dao.getTermsByNameOrSynonym(name, cvId.getId());
+
+        CVTerm cvTerm = null; 
+        if (termIds == null || termIds.isEmpty()){ // add
+            Integer generatedId = dao.getNegativeId("cvTermId");
+            cvTerm = create(generatedId, name, definition, cvId.getId(), false, false); 
+        } else if (termIds.size() == 1){ // update
+            cvTerm = create(termIds.get(0), name, definition, cvId.getId(), false, false); 
+        } else {
+            throw new MiddlewareException("Term with non-unique name (" + name +") retrieved for cv_id = " + cvId.getId());
+        }
+        dao.saveOrUpdate(cvTerm);
+        return new Term(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition());
+    }
 	
 	public CVTerm create(int id, String name, String definition, int cvId,  boolean isObsolete, boolean isRelationshipType){
 		CVTerm cvTerm = new CVTerm();

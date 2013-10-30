@@ -690,5 +690,13 @@ public class TestOntologyDataManagerImpl {
         Debug.println(0, "From db:  " + term);
     }
 	    
-
+    @Test
+    public void testAddOrUpdateProperty() throws Exception {
+        String name = "Study condition";
+        Term origTerm = manager.findTermByName(name, CvId.PROPERTIES);
+        Term term = manager.addOrUpdateProperty(name, "Study condition class new", 1340);
+        Debug.println(3, "Original:  " + origTerm);
+        Debug.println(3, "Updated:  " + term);
+    }
+    
 }

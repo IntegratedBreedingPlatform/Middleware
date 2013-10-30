@@ -367,4 +367,13 @@ public interface OntologyDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     public Term addPropertyIsARelationship(int propertyId, int isAId) throws MiddlewareQueryException;
+
+    /**
+     * @param name
+     * @param definition
+     * @param isAId
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    Term addOrUpdateProperty(String name, String definition, int isAId) throws MiddlewareQueryException;
 }

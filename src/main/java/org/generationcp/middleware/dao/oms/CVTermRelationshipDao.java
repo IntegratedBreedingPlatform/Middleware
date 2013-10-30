@@ -99,7 +99,7 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Long> 
             return null;
         }
     }
-	@SuppressWarnings("unchecked")
+
     public CVTermRelationship saveOrUpdateRelationship(CVTermRelationship cvTermRelationship) throws MiddlewareQueryException {
         try {
            saveOrUpdate(cvTermRelationship);

@@ -27,6 +27,7 @@ import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TraitReference;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
@@ -440,7 +441,28 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		return term;
 	}
 	
-	
+    @Override
+    public Term addOrUpdateProperty(String name, String definition, int isAId) throws MiddlewareQueryException {
+        
+        requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        Term term = findTermByName(name, CvId.PROPERTIES);
+
+        try {
+            trans = session.beginTransaction();
+            term = saveOrUpdateCvTerm(name, definition, CvId.PROPERTIES);
+            saveOrUpdateCvTermRelationship(term.getId(), isAId, TermId.IS_A.getId());
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            throw new MiddlewareQueryException("Error in addProperty " + e.getMessage(), e);
+        }
+
+        return term;
+    }
+    	
 	
 	@Override
     public boolean removeIsARelationship(int propertyId)
@@ -449,34 +471,49 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         return false;
     }
 
+	private Term saveOrUpdateCvTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException, MiddlewareException{
+        Term term = findTermByName(name, cvId);
+        if (term == null){   // If property is not existing, add
+            term = getTermSaver().save(name, definition, CvId.PROPERTIES);
+        } else { // If property is existing, update
+            term = getTermSaver().saveOrUpdate(name, definition, CvId.PROPERTIES);
+        }
+        return term;
+	}
+	
+	private void saveOrUpdateCvTermRelationship(int subjectId, int objectId, int typeId) throws MiddlewareQueryException, MiddlewareException{
+        Term typeTerm = getTermById(typeId);
+        if (typeTerm != null) {
+            CVTermRelationship cvRelationship = getCvTermRelationshipDao().getRelationshipSubjectIdObjectIdByTypeId(subjectId, objectId, typeId);
+            if(cvRelationship == null){
+                getTermRelationshipSaver().save(subjectId, typeId, objectId);
+            }else{
+                //we need to update
+                cvRelationship.setObjectId(typeTerm.getId());
+                getTermRelationshipSaver().saveOrUpdateRelationship(cvRelationship);
+            }
+        }
+	}
+	
     @Override
-    public Term addPropertyIsARelationship(int propertyId, int isAId)
-            throws MiddlewareQueryException {
-        
+    public Term addPropertyIsARelationship(int propertyId, int isAId) throws MiddlewareQueryException {
         
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
-        Term term = null;
+        
+        Term term = getTermById(propertyId);        
+        if (term == null){
+            throw new MiddlewareQueryException("Error in adding property is_a relationship: property does not exist. ");
+        }
+        
+        if (getTermById(isAId) == null) {
+            throw new MiddlewareQueryException("Error in adding property is_a relationship: The isA passed is not a valid Class term: " + isAId);
+        }
+
         try {
             trans = session.beginTransaction();
-            term = getTermById(propertyId);
-            Term isATerm = getTermById(isAId);
-            
-            if (isATerm != null) {
-                CVTermRelationship cvRelationship = getCvTermRelationshipDao().getRelationshipSubjectIdObjectIdByTypeId(term.getId(), TermId.IS_A.getId(), isATerm.getId());
-                if(cvRelationship == null){
-                    getTermRelationshipSaver().save(term.getId(), TermId.IS_A.getId(), isATerm.getId());
-                }else{
-                    //we need to update
-                    cvRelationship.setObjectId( isATerm.getId());
-                    getTermRelationshipSaver().saveOrUpdateRelationship(cvRelationship);
-                }
-                
-            } else {
-                throw new MiddlewareQueryException("The isA passed is not a valid Class term: " + isAId);
-            }
-            
+            saveOrUpdateCvTermRelationship(term.getId(), isAId, TermId.IS_A.getId());
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);

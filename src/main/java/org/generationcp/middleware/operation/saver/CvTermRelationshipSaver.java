@@ -52,24 +52,13 @@ public class CvTermRelationshipSaver extends Saver {
 		return relationship;
 	}
 	
-	public CVTermRelationship getRelationShip(Integer subjectId, Integer typeId, Integer objectId) throws MiddlewareException, MiddlewareQueryException{
-	    CVTermRelationshipDao dao = getCvTermRelationshipDao();
-	    CVTermRelationship relationship = null;
-	    try {
-	        relationship = dao.getRelationshipSubjectIdObjectIdByTypeId(subjectId, objectId, typeId);
-        } catch (MiddlewareQueryException e) {
-            // TODO Auto-generated catch block
-            throw new MiddlewareQueryException(e.getMessage(), e);
-        }
-	    return relationship;
-	}
 	public CVTermRelationship saveOrUpdateRelationship(CVTermRelationship cvTermRelationship) throws MiddlewareException, MiddlewareQueryException{
+        requireLocalDatabaseInstance();
         CVTermRelationshipDao dao = getCvTermRelationshipDao();
         CVTermRelationship relationship = null;
         try {
             relationship = dao.saveOrUpdateRelationship(cvTermRelationship);
         } catch (MiddlewareQueryException e) {
-            // TODO Auto-generated catch block
             throw new MiddlewareQueryException(e.getMessage(), e);
         }
         return relationship;
