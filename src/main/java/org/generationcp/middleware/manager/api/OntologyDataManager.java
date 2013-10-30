@@ -22,6 +22,7 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TraitReference;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
 /**
@@ -91,6 +92,7 @@ public interface OntologyDataManager {
 	 * @return the term
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
+	@Deprecated
 	Term addMethod(String name, String definition) throws MiddlewareQueryException;
 	
 	/**
@@ -371,9 +373,23 @@ public interface OntologyDataManager {
     /**
      * @param name
      * @param definition
-     * @param isAId
+     * @param cvId
+     * @param typeId
+     * @param objectId
      * @return
      * @throws MiddlewareQueryException
+     * @throws MiddlewareException 
      */
-    Term addOrUpdateProperty(String name, String definition, int isAId) throws MiddlewareQueryException;
+    Term addOrUpdateTermAndRelationship(String name, String definition, CvId cvId, int typeId, int objectId)
+            throws MiddlewareQueryException, MiddlewareException;
+
+    /**
+     * @param name
+     * @param definition
+     * @param cvId
+     * @return
+     * @throws MiddlewareQueryException
+     * @throws MiddlewareException 
+     */
+    Term addOrUpdateTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException, MiddlewareException;
 }

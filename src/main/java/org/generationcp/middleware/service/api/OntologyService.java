@@ -23,6 +23,7 @@ import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Scale;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TraitReference;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
 // TODO: Auto-generated Javadoc
@@ -126,7 +127,7 @@ public interface OntologyService {
 
     
     /**
-     * Adds a property.
+     * Adds a property. If the property is already found in the local database, it simply retrieves the record found.
      *
      * @param name the name
      * @param definition the definition
@@ -134,8 +135,23 @@ public interface OntologyService {
      * @return the Term entry corresponding to the newly-added property
      * @throws MiddlewareQueryException the middleware query exception
      */
-    Term addProperty(String name, String definition, int isA) throws MiddlewareQueryException;
+    Property addProperty(String name, String definition, int isA) throws MiddlewareQueryException;
     
+    /**
+     * Adds or updates a property with the given name and definition. 
+     * If the given property name is not found in the databases, a new record is added to local database.
+     * If the given name is already found in local database, update is performed. 
+     * If the given name is already found in central database, no update is performed.
+     * 
+     * @param name the name of the property
+     * @param definition the defintion of the property
+     * @param isAId the id of the trait class of the property
+     * @return the Term of the added / updated property
+     * @throws MiddlewareQueryException
+     * @throws MiddlewareException 
+     */
+    Property addOrUpdateProperty(String name, String definition, int isAId) throws MiddlewareQueryException, MiddlewareException;
+
     /**
      * Save a property.
      *
@@ -158,6 +174,16 @@ public interface OntologyService {
     Scale getScale(int id) throws MiddlewareQueryException;
     
     /**
+     * Gets the scale with the given name.
+     *
+     * @param name the name to match
+     * @return the matching scale
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Scale getScale(String name) throws MiddlewareQueryException;
+    
+    
+    /**
      * Gets all scales from Central and Local.
      *
      * @return All the scales
@@ -167,15 +193,28 @@ public interface OntologyService {
     
 
     /**
-     * Adds a scale.
+     * Adds a scale. If the scale is already found in the local database, it simply retrieves the record found.
      *
      * @param name the name
      * @param definition the definition
      * @return the Term entry corresponding to the newly-added scale
      * @throws MiddlewareQueryException the middleware query exception
      */
-    Term addScale(String name, String definition) throws MiddlewareQueryException;
-
+    Scale addScale(String name, String definition) throws MiddlewareQueryException;
+    
+    /**
+     * Adds or updates a scale with the given name and definition. 
+     * If the given scale name is not found in the databases, a new record is added to local database.
+     * If the given name is already found in local database, update is performed. 
+     * If the given name is already found in central database, no update is performed.
+     * 
+     * @param name the name of the scale
+     * @param definition the defintion of the scale
+     * @return the Term of the added / updated scale
+     * @throws MiddlewareQueryException
+     * @throws MiddlewareException 
+     */
+    Scale addOrUpdateScale(String name, String definition) throws MiddlewareQueryException, MiddlewareException;
 
     /*======================= METHOD ================================== */
 
@@ -208,15 +247,29 @@ public interface OntologyService {
     List<Method> getAllMethods() throws MiddlewareQueryException;
 
     /**
-     * Adds a method.
+     * Adds a method. If the method is already found in the local database, it simply retrieves the record found.
      *
      * @param name the name
      * @param definition the definition
      * @return the Term entry corresponding to the newly-added method
      * @throws MiddlewareQueryException the middleware query exception
      */
-    Term addMethod(String name, String definition) throws MiddlewareQueryException;
-    
+    Method addMethod(String name, String definition) throws MiddlewareQueryException;
+
+    /**
+     * Adds or updates a method with the given name and definition. 
+     * If the given method name is not found in the databases, a new record is added to local database.
+     * If the given name is already found in local database, update is performed. 
+     * If the given name is already found in central database, no update is performed.
+     * 
+     * @param name the name of the method
+     * @param definition the defintion of the method
+     * @return the Term of the added / updated method
+     * @throws MiddlewareQueryException
+     * @throws MiddlewareException 
+     */
+    Method addOrUpdateMethod(String name, String definition) throws MiddlewareQueryException, MiddlewareException;
+
 
     /*======================= OTHERS ================================== */
 

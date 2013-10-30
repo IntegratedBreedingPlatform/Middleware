@@ -63,9 +63,18 @@ public class Scale {
 
 	@Override
 	public String toString() {
+	    
+	    if (term == null){
+	        return null;
+	    }
+	    
 		StringBuilder builder = new StringBuilder();
-		builder.append("Scale [");
-		builder.append(super.toString());
+		builder.append("Scale [id=");
+        builder.append(term.getId());
+        builder.append(", name=");
+        builder.append(term.getName());
+        builder.append(", definition=");
+        builder.append(term.getDefinition());
 		builder.append("]");
 		return builder.toString();
 	}

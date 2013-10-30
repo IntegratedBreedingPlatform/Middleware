@@ -27,6 +27,11 @@ public class Property {
         this.term = term;
     }
 
+    public Property(Term term, Term isA) {
+        this.term = term;
+        this.IsA = isA;
+    }
+
     public Term getIsA() {
 		return IsA;
 	}
@@ -69,14 +74,23 @@ public class Property {
     }
 	
 	
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("Property [term=");
-		builder.append(term);
-		builder.append(", IsA=");
-		builder.append(IsA);
-		builder.append("]");
+    @Override
+    public String toString() {
+
+        if (term == null){
+            return null;
+        }
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("Property [id=");
+        builder.append(term.getId());
+        builder.append(", name=");
+        builder.append(term.getName());
+        builder.append(", definition=");
+        builder.append(term.getDefinition());
+        builder.append(", IsA=");
+        builder.append(IsA);
+        builder.append("]");
 		return builder.toString();
 	}
 

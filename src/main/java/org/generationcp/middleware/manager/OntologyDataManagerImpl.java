@@ -284,33 +284,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         }
     }
 
-//TODO    @Override
-    public Term addOrUpdateTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException {
-        Term term = findTermByName(name, cvId);
-
-        if (term != null) {
-            return term;
-        }
-
-        requireLocalDatabaseInstance();
-        Session session = getCurrentSessionForLocal();
-        Transaction trans = null;
-
-        try {
-            if (CvId.VARIABLES.getId() != cvId.getId()) {
-                trans = session.beginTransaction();
-                term = getTermSaver().save(name, definition, cvId);
-                trans.commit();
-            } else {
-                throw new MiddlewareQueryException("variables cannot be used in this method");
-            }
-            return term;
-        } catch (Exception e) {
-            rollbackTransaction(trans);
-            throw new MiddlewareQueryException("error in addTerm " + e.getMessage(), e);
-        }
-    }
-
     @Override
     public List<Term> getDataTypes() throws MiddlewareQueryException {
         List<Integer> dataTypeIds = Arrays.asList(TermId.CLASS.getId(), TermId.NUMERIC_VARIABLE.getId(),
@@ -440,29 +413,55 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 		return term;
 	}
-	
-    @Override
-    public Term addOrUpdateProperty(String name, String definition, int isAId) throws MiddlewareQueryException {
         
+    @Override
+    public Term addOrUpdateTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException, MiddlewareException{
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
-        Term term = findTermByName(name, CvId.PROPERTIES);
+        Term term = findTermByName(name, cvId);
+        if (term != null && term.getId() >= 0) {
+            throw new MiddlewareException("Error in addOrUpdateTerm: Term found in central - cannot be updated.");
+        }
 
         try {
             trans = session.beginTransaction();
-            term = saveOrUpdateCvTerm(name, definition, CvId.PROPERTIES);
-            saveOrUpdateCvTermRelationship(term.getId(), isAId, TermId.IS_A.getId());
+            term = saveOrUpdateCvTerm(name, definition, cvId);
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            throw new MiddlewareQueryException("Error in addProperty " + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error in addOrUpdateTerm: " + e.getMessage(), e);
+        }
+
+        return term;
+        
+    }
+
+    @Override
+    public Term addOrUpdateTermAndRelationship(String name, String definition, CvId cvId, int typeId, int objectId) throws MiddlewareQueryException, MiddlewareException {
+        requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        Term term = findTermByName(name, cvId);
+        if (term != null && term.getId() >= 0) {
+            throw new MiddlewareException("Error in addOrUpdateTermAndRelationship: Term found in central - cannot be updated.");
+        }
+
+        try {
+            trans = session.beginTransaction();
+            term = saveOrUpdateCvTerm(name, definition, cvId);
+            saveOrUpdateCvTermRelationship(term.getId(), objectId, typeId);
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            throw new MiddlewareQueryException("Error in addOrUpdateTermAndRelationship: " + e.getMessage(), e);
         }
 
         return term;
     }
-    	
+        
 	
 	@Override
     public boolean removeIsARelationship(int propertyId)
@@ -473,10 +472,10 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	private Term saveOrUpdateCvTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException, MiddlewareException{
         Term term = findTermByName(name, cvId);
-        if (term == null){   // If property is not existing, add
-            term = getTermSaver().save(name, definition, CvId.PROPERTIES);
-        } else { // If property is existing, update
-            term = getTermSaver().saveOrUpdate(name, definition, CvId.PROPERTIES);
+        if (term == null){   // If term is not existing, add
+            term = getTermSaver().save(name, definition, cvId);
+        } else { // If term is existing, update
+            term = getTermSaver().saveOrUpdate(name, definition, cvId);
         }
         return term;
 	}
@@ -485,11 +484,14 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         Term typeTerm = getTermById(typeId);
         if (typeTerm != null) {
             CVTermRelationship cvRelationship = getCvTermRelationshipDao().getRelationshipSubjectIdObjectIdByTypeId(subjectId, objectId, typeId);
-            if(cvRelationship == null){
+            if(cvRelationship == null){ // add the relationship
                 getTermRelationshipSaver().save(subjectId, typeId, objectId);
-            }else{
-                //we need to update
-                cvRelationship.setObjectId(typeTerm.getId());
+            }else{ // update the existing relationship
+                if (cvRelationship.getCvTermRelationshipId() >= 0) { 
+                    throw new MiddlewareException("Error in saveOrUpdateCvTermRelationship: Relationship found in central - cannot be updated.");
+                }
+
+                cvRelationship.setObjectId(objectId);
                 getTermRelationshipSaver().saveOrUpdateRelationship(cvRelationship);
             }
         }

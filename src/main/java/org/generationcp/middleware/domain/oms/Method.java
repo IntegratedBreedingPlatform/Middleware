@@ -62,10 +62,19 @@ public class Method {
 
 	@Override
 	public String toString() {
+	    
+        if (term == null) {
+            return null;
+        }
+
 		StringBuilder builder = new StringBuilder();
-		builder.append("Method [");
-		builder.append(super.toString());
-		builder.append("]");
+		builder.append("Method [id=");
+        builder.append(term.getId());
+        builder.append(", name=");
+        builder.append(term.getName());
+        builder.append(", definition=");
+        builder.append(term.getDefinition());
+        builder.append("]");
 		return builder.toString();
 	}
 

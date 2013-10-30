@@ -34,7 +34,9 @@ import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.PropertyReference;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TraitReference;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
@@ -213,7 +215,8 @@ public class TestOntologyDataManagerImpl {
 		Debug.println(0, "Standard variable saved: " + stdVariable.getId());
 	}
 	
-	@Test
+	@SuppressWarnings("deprecation")
+    @Test
 	public void testAddMethod() throws Exception {
 		String name = "Test Method " + new Random().nextInt(10000);
 		String definition = "Test Definition";
@@ -266,6 +269,7 @@ public class TestOntologyDataManagerImpl {
         }
     }
 
+    @SuppressWarnings("deprecation")
 	@Test
 	public void testFindMethodById() throws Exception {
 		
@@ -689,14 +693,61 @@ public class TestOntologyDataManagerImpl {
         Term term = manager.addPropertyIsARelationship(1050, 1340);
         Debug.println(0, "From db:  " + term);
     }
-	    
+	
+
     @Test
-    public void testAddOrUpdateProperty() throws Exception {
-        String name = "Study condition";
-        Term origTerm = manager.findTermByName(name, CvId.PROPERTIES);
-        Term term = manager.addOrUpdateProperty(name, "Study condition class new", 1340);
-        Debug.println(3, "Original:  " + origTerm);
-        Debug.println(3, "Updated:  " + term);
+    public void testAddOrUpdateTermAndRelationshipFoundInCentral() throws Exception {
+        String name = "Season";
+        String definition = "Growing Season " +(int) (Math.random() * 100); // add random number to see the update
+        try{
+            manager.addOrUpdateTermAndRelationship(name, definition, CvId.PROPERTIES, TermId.IS_A.getId(), 1340);
+        } catch (MiddlewareException e){
+            Debug.println(3, "MiddlewareQueryException expected: \"" + e.getMessage() + "\"");
+            assertSame(e.getMessage(), "Error in addOrUpdateTermAndRelationship: Term found in central - cannot be updated.");
+        }
+
     }
-    
+
+
+    @Test
+    public void testAddOrUpdateTermAndRelationshipNotInCentral() throws Exception {
+        String name = "Study condition NEW";
+        String definition = "Study condition NEW class " +(int) (Math.random() * 100); // add random number to see the update
+        Term origTerm = manager.findTermByName(name, CvId.PROPERTIES);
+        Term newTerm = manager.addOrUpdateTermAndRelationship(name, definition, CvId.PROPERTIES, TermId.IS_A.getId(), 1340);
+        Debug.println(3, "Original:  " + origTerm);
+        Debug.println(3, "Updated :  " + newTerm);
+        
+        if (origTerm != null) { // if the operation is update, the ids must be same
+            assertSame(origTerm.getId(), newTerm.getId());
+        }
+
+    }
+
+    @Test
+    public void testAddOrUpdateTermFoundInCentral() throws Exception {
+        String name = "Score";
+        String definition = "Score NEW " + (int) (Math.random() * 100); // add random number to see the update
+        try{
+            manager.addOrUpdateTerm(name, definition, CvId.SCALES);
+        } catch (MiddlewareException e){
+            Debug.println(3, "MiddlewareQueryException expected: \"" + e.getMessage() + "\"");
+            assertSame(e.getMessage(), "Error in addOrUpdateTerm: Term found in central - cannot be updated.");
+        }
+    }
+
+    @Test
+    public void testAddOrUpdateTermNotInCentral() throws Exception {
+        String name = "Real";
+        String definition = "Real Description NEW " + (int) (Math.random() * 100); // add random number to see the update
+        Term origTerm = manager.findTermByName(name, CvId.SCALES);
+        Term newTerm = manager.addOrUpdateTerm(name, definition, CvId.SCALES);
+        Debug.println(3, "Original:  " + origTerm);
+        Debug.println(3, "Updated :  " + newTerm);
+        
+        if (origTerm != null) { // if the operation is update, the ids must be same
+            assertSame(origTerm.getId(), newTerm.getId());
+        }
+    }
+
 }

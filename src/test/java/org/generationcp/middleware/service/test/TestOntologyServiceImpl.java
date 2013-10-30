@@ -14,6 +14,7 @@ package org.generationcp.middleware.service.test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
@@ -129,6 +130,25 @@ public class TestOntologyServiceImpl {
 
     @Test
     public void testAddProperty() throws MiddlewareQueryException {
+        int agronomicTraitClass = 1340;
+        Property property = ontologyService.addProperty("NEW property", "New property description", agronomicTraitClass);
+        property.print(3);
+    }
+
+    @Test
+    public void testAddOrUpdateProperty() throws Exception {
+        String name = "NEW property";
+        String definition = "New property description " + (int) (Math.random() * 100);
+        int agronomicTraitClass = 1340;
+        Property origProperty = ontologyService.getProperty(name);
+        Property newProperty = ontologyService.addOrUpdateProperty(name, definition, agronomicTraitClass);
+        
+        Debug.println(3, "Original:  " + origProperty);
+        Debug.println(3, "Updated :  " + newProperty);
+
+        if (origProperty != null){ // if the operation is update, the ids must be same
+                assertSame(origProperty.getId(), newProperty.getId());
+        }
     }
     
     /*======================= SCALE ================================== */
@@ -150,7 +170,28 @@ public class TestOntologyServiceImpl {
         }
         Debug.println(3, NUMBER_OF_RECORDS + scales.size());
     }
+    
+    @Test
+    public void testAddScale() throws MiddlewareQueryException {
+        Scale scale = ontologyService.addScale("NEW scale", "New scale description");
+        scale.print(3);
+    }
 
+    @Test
+    public void testAddOrUpdateScale() throws Exception {
+        String name = "NEW scale";
+        String definition = "New scale description " + (int) (Math.random() * 100);
+        Scale origScale = ontologyService.getScale(name);
+        Scale newScale = ontologyService.addOrUpdateScale(name, definition);
+        
+        Debug.println(3, "Original:  " + origScale);
+        Debug.println(3, "Updated :  " + newScale);
+
+        if (origScale != null){ // if the operation is update, the ids must be same
+                assertSame(origScale.getId(), newScale.getId());
+        }
+    }
+    
 
     /*======================= METHOD ================================== */
     
@@ -180,8 +221,24 @@ public class TestOntologyServiceImpl {
     
     @Test
     public void testAddMethod() throws MiddlewareQueryException {
+        Method method = ontologyService.addMethod("NEW method", "New method description");
+        method.print(3);
     }
-    
+
+    @Test
+    public void testAddOrUpdateMethod() throws Exception {
+        String name = "NEW method";
+        String definition = "New method description " + (int) (Math.random() * 100);
+        Method origMethod = ontologyService.getMethod(name);
+        Method newMethod = ontologyService.addOrUpdateMethod(name, definition);
+        
+        Debug.println(3, "Original:  " + origMethod);
+        Debug.println(3, "Updated :  " + newMethod);
+
+        if (origMethod != null){ // if the operation is update, the ids must be same
+                assertSame(origMethod.getId(), newMethod.getId());
+        }
+    }
     
     /*======================= OTHERS ================================== */
 
