@@ -30,6 +30,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -437,7 +438,15 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             Term isATerm = getTermById(isAId);
             
             if (isATerm != null) {
-                getTermRelationshipSaver().save(term.getId(), TermId.IS_A.getId(), isATerm.getId());
+                CVTermRelationship cvRelationship = getTermRelationshipSaver().getRelationShip(term.getId(), TermId.IS_A.getId(), isATerm.getId());
+                if(cvRelationship == null){
+                    getTermRelationshipSaver().save(term.getId(), TermId.IS_A.getId(), isATerm.getId());
+                }else{
+                    //we need to update
+                    cvRelationship.setObjectId( isATerm.getId());
+                    getTermRelationshipSaver().saveOrUpdateRelationship(cvRelationship);
+                }
+                
             } else {
                 throw new MiddlewareQueryException("The isA passed is not a valid Class term: " + isAId);
             }
