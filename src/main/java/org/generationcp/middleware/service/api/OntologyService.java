@@ -127,6 +127,16 @@ public interface OntologyService {
      * @throws MiddlewareQueryException the middleware query exception
      */
     Term addProperty(String name, String definition, int isA) throws MiddlewareQueryException;
+    
+    /**
+     * Save a property.
+     *
+     * @param propertyId the id of the property
+     * @param isA the is a type
+     * @return the Term entry corresponding to the newly-added property
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Term saveProperty(int propertyId, int isA) throws MiddlewareQueryException;
 
     /*======================= SCALE ================================== */
 

@@ -349,4 +349,23 @@ public interface OntologyDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     public Set<StandardVariable> getAllStandardVariables() throws MiddlewareQueryException;
+    
+    /**
+     * Removes the is a relationship.
+     *
+     * @param propertyId the property id
+     * @return true, if successful
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    public boolean removeIsARelationship(int propertyId) throws MiddlewareQueryException;
+    
+    /**
+     * Adds the property is a relationship.
+     *
+     * @param propertyId the property id
+     * @param isAId the is a id
+     * @return the term
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    public Term addPropertyIsARelationship(int propertyId, int isAId) throws MiddlewareQueryException;
 }

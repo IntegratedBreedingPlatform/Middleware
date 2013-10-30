@@ -92,7 +92,19 @@ public class OntologyServiceImpl extends Service implements OntologyService {
         return getOntologyDataManager().addProperty(name, definition, isA);
     }
     
+    
+    
     /*======================= SCALE ================================== */
+
+    @Override
+    public Term saveProperty(int propertyId, int isA) throws MiddlewareQueryException {
+
+        //we need to delete old isA relationship
+        
+        //we need to save new relationship
+        Term term = getOntologyDataManager().addPropertyIsARelationship(propertyId, isA);
+        return term;
+    }
 
     @Override
     public Scale getScale(int id) throws MiddlewareQueryException {

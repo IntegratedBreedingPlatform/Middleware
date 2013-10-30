@@ -413,7 +413,45 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		return term;
 	}
 	
+	
+	
 	@Override
+    public boolean removeIsARelationship(int propertyId)
+            throws MiddlewareQueryException {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public Term addPropertyIsARelationship(int propertyId, int isAId)
+            throws MiddlewareQueryException {
+        
+        
+        requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+        Term term = null;
+        try {
+            trans = session.beginTransaction();
+            term = getTermById(propertyId);
+            Term isATerm = getTermById(isAId);
+            
+            if (isATerm != null) {
+                getTermRelationshipSaver().save(term.getId(), TermId.IS_A.getId(), isATerm.getId());
+            } else {
+                throw new MiddlewareQueryException("The isA passed is not a valid Class term: " + isAId);
+            }
+            
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            throw new MiddlewareQueryException("Error in addProperty " + e.getMessage(), e);
+        }
+
+        return term;
+    }
+
+    @Override
 	public Property getProperty(int termId) throws MiddlewareQueryException {
 		Property property = new Property();
 		
