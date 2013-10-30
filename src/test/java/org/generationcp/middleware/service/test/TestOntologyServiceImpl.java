@@ -93,6 +93,14 @@ public class TestOntologyServiceImpl {
     public void testAddStandardVariable() throws MiddlewareQueryException {
     }
     
+    @Test
+    public void testGetAllTermsByCvId() throws MiddlewareQueryException {
+        List<Term> terms = ontologyService.getAllTermsByCvId(CvId.VARIABLES);
+        for (Term term: terms) {
+            term.print(3);
+        }
+    }
+    
     /*======================= PROPERTY ================================== */
 
     @Test

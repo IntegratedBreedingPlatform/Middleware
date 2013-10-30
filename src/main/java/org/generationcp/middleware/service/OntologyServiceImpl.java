@@ -63,6 +63,11 @@ public class OntologyServiceImpl extends Service implements OntologyService {
         getOntologyDataManager().addStandardVariable(stdVariable);
     }
     
+    @Override
+    public List<Term> getAllTermsByCvId(CvId cvId) throws MiddlewareQueryException {
+        return getOntologyDataManager().getAllTermsByCvId(cvId);
+    }
+    
     /*======================= PROPERTY ================================== */
 
 

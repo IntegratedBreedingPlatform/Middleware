@@ -84,7 +84,15 @@ public interface OntologyService {
      */
     Set<StandardVariable> getAllStandardVariables() throws MiddlewareQueryException;
     
-
+    /**
+     * Gets the all terms by cv id.
+     *
+     * @param cvId the cv id
+     * @return the all terms by cv id
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Term> getAllTermsByCvId(CvId cvId) throws MiddlewareQueryException;
+    
     /*======================= PROPERTY ================================== */
    
     /**
