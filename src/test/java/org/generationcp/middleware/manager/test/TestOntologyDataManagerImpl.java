@@ -749,5 +749,11 @@ public class TestOntologyDataManagerImpl {
             assertSame(origTerm.getId(), newTerm.getId());
         }
     }
+    
+    @Test
+    public void testGetStandardVariableIdByTermId() throws Exception {
+        Integer stdVariableId = manager.getStandardVariableIdByTermId(-59, TermId.HAS_PROPERTY);
+        Debug.println(0, "From db:  " + stdVariableId);
+    }
 
 }

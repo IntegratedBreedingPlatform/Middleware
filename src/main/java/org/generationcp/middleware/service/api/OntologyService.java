@@ -22,6 +22,7 @@ import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Scale;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TraitReference;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -93,6 +94,16 @@ public interface OntologyService {
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<Term> getAllTermsByCvId(CvId cvId) throws MiddlewareQueryException;
+    
+    /**
+     * Gets the standard variable id by term id.
+     *
+     * @param cvTermId the cv term id
+     * @param termId the term id
+     * @return the standard variable id by term id
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Integer getStandardVariableIdByTermId(int cvTermId, TermId termId) throws MiddlewareQueryException;
     
     /*======================= PROPERTY ================================== */
    

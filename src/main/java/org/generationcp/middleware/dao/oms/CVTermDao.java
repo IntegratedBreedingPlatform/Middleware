@@ -902,5 +902,30 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
         return variablesOfProperties;
     }
 
+    /*
+     * Retrieves the standard variable linked to an ontology
+     * */
+    public Integer getStandadardVariableIdByTermId(int cvTermId, TermId termId) throws MiddlewareQueryException {
+        try {
+            StringBuilder queryString = new StringBuilder();
+            queryString.append("SELECT DISTINCT cvr.subject_id ");
+            queryString.append("FROM cvterm_relationship cvr ");
+            queryString.append("INNER JOIN cvterm_relationship cvrt ON cvr.subject_id = cvrt.subject_id AND cvrt.type_id = :typeId ");
+            queryString.append("WHERE cvr.object_id = :cvTermId ");
+            queryString.append("ORDER BY cvr.subject_id ").append(" LIMIT 0,1");
+            System.out.println(queryString);
+            SQLQuery query = getSession().createSQLQuery(queryString.toString());
+            query.setParameter("typeId", termId.getId());
+            query.setParameter("cvTermId", cvTermId);
+            
+            Integer id = (Integer) query.uniqueResult();
+                                    
+            return id;
+                                    
+        } catch(HibernateException e) {
+                logAndThrowException("Error at getStandadardVariableIdByTermId :" + e.getMessage(), e);
+        }
+        return null;
+    }
 	
 }

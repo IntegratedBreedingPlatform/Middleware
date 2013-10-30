@@ -70,6 +70,11 @@ public class OntologyServiceImpl extends Service implements OntologyService {
         return getOntologyDataManager().getAllTermsByCvId(cvId);
     }
     
+    @Override
+    public Integer getStandardVariableIdByTermId(int cvTermId, TermId termId) throws MiddlewareQueryException {
+        return getOntologyDataManager().getStandardVariableIdByTermId(cvTermId, termId);
+    }
+    
     /*======================= PROPERTY ================================== */
 
 

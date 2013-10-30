@@ -467,5 +467,11 @@ public class StandardVariableBuilder extends Builder {
 		return getCvTermDao().getStandardVariableIdsByProperties(traitNames);
 	}
 	
-
+	public Integer getIdByTermId(int cvTermId, TermId termId) throws MiddlewareQueryException {
+            Integer stdVariableId = null;
+            if (setWorkingDatabase(Database.LOCAL)) {
+                stdVariableId = getCvTermDao().getStandadardVariableIdByTermId(cvTermId, termId);
+            }
+            return stdVariableId;
+        }
 }

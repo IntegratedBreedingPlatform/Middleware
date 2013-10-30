@@ -616,6 +616,11 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         }
         return standardVariables;
     }
+    
+    @Override
+    public Integer getStandardVariableIdByTermId(int cvTermId, TermId termId) throws MiddlewareQueryException {
+        return getStandardVariableBuilder().getIdByTermId(cvTermId, termId);
+    }
 }
 
 

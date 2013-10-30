@@ -21,10 +21,12 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TraitReference;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
+// TODO: Auto-generated Javadoc
 /**
  * This is the API for retrieving ontology data from the CHADO schema.
  * 
@@ -336,7 +338,6 @@ public interface OntologyDataManager {
      *
      * @param name the name
      * @param definition the definition
-     * @param cvId the cv id
      * @return the term
      * @throws MiddlewareQueryException the middleware query exception
      */
@@ -371,25 +372,39 @@ public interface OntologyDataManager {
     public Term addPropertyIsARelationship(int propertyId, int isAId) throws MiddlewareQueryException;
 
     /**
-     * @param name
-     * @param definition
-     * @param cvId
-     * @param typeId
-     * @param objectId
-     * @return
-     * @throws MiddlewareQueryException
-     * @throws MiddlewareException 
+     * Adds the or update term and relationship.
+     *
+     * @param name the name
+     * @param definition the definition
+     * @param cvId the cv id
+     * @param typeId the type id
+     * @param objectId the object id
+     * @return the term
+     * @throws MiddlewareQueryException the middleware query exception
+     * @throws MiddlewareException the middleware exception
      */
     Term addOrUpdateTermAndRelationship(String name, String definition, CvId cvId, int typeId, int objectId)
             throws MiddlewareQueryException, MiddlewareException;
 
     /**
-     * @param name
-     * @param definition
-     * @param cvId
-     * @return
-     * @throws MiddlewareQueryException
-     * @throws MiddlewareException 
+     * Adds the or update term.
+     *
+     * @param name the name
+     * @param definition the definition
+     * @param cvId the cv id
+     * @return the term
+     * @throws MiddlewareQueryException the middleware query exception
+     * @throws MiddlewareException the middleware exception
      */
     Term addOrUpdateTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException, MiddlewareException;
+    
+    /**
+     * Gets the standard variable id by term id.
+     *
+     * @param cvTermId the cv term id
+     * @param termId the term id
+     * @return the standard variable id by term id
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    public Integer getStandardVariableIdByTermId(int cvTermId, TermId termId) throws MiddlewareQueryException;
 }
