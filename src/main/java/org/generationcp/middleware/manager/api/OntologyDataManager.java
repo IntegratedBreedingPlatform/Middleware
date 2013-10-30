@@ -340,7 +340,7 @@ public interface OntologyDataManager {
      * @return the term
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public Term addTraitClass(String name, String definition, CvId cvId) throws MiddlewareQueryException;
+    public Term addTraitClass(String name, String definition) throws MiddlewareQueryException;
 
     
     /**

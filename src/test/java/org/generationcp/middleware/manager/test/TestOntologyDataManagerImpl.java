@@ -703,7 +703,7 @@ public class TestOntologyDataManagerImpl {
             manager.addOrUpdateTermAndRelationship(name, definition, CvId.PROPERTIES, TermId.IS_A.getId(), 1340);
         } catch (MiddlewareException e){
             Debug.println(3, "MiddlewareQueryException expected: \"" + e.getMessage() + "\"");
-            assertSame(e.getMessage(), "Error in addOrUpdateTermAndRelationship: Term found in central - cannot be updated.");
+            assertTrue(e.getMessage().contains(" is retrieved from the central database and cannot be updated"));
         }
 
     }
@@ -732,7 +732,7 @@ public class TestOntologyDataManagerImpl {
             manager.addOrUpdateTerm(name, definition, CvId.SCALES);
         } catch (MiddlewareException e){
             Debug.println(3, "MiddlewareQueryException expected: \"" + e.getMessage() + "\"");
-            assertSame(e.getMessage(), "Error in addOrUpdateTerm: Term found in central - cannot be updated.");
+            assertTrue(e.getMessage().contains(" is retrieved from the central database and cannot be updated"));
         }
     }
 

@@ -232,9 +232,17 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     }
 
     @Override
-    public Term addTraitClass(String name, String definition, CvId cvId) throws MiddlewareQueryException {
-        return getOntologyDataManager().addTraitClass(name, definition, cvId);
+    public Term addTraitClass(String name, String definition) throws MiddlewareQueryException {
+        return getOntologyDataManager().addTraitClass(name, definition);
     }
+    
+    
+    @Override
+    public Term addOrUpdateTraitClass(String name, String definition) throws MiddlewareQueryException, MiddlewareException {
+        return getOntologyDataManager()
+                .addOrUpdateTermAndRelationship(name, definition, CvId.IBDB_TERMS, TermId.IS_A.getId(), TermId.ONTOLOGY_TRAIT_CLASS.getId());
+    }
+    
     
     @Override
     public Term getTermById(int termId) throws MiddlewareQueryException {
@@ -255,4 +263,5 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     public Set<StandardVariable> getAllStandardVariables() throws MiddlewareQueryException {
         return getOntologyDataManager().getAllStandardVariables();
     }
+
 }

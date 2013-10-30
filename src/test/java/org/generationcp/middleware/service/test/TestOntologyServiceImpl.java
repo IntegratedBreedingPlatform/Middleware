@@ -292,8 +292,7 @@ public class TestOntologyServiceImpl {
         
         //add a method, should allow insert
         
-        CvId cvId = CvId.IBDB_TERMS;
-        Term term = ontologyService.addTraitClass(name, definition, cvId);
+        Term term = ontologyService.addTraitClass(name, definition);
         assertNotNull(term);
         assertTrue(term.getId() < 0);
         Debug.println(0, "testAddTraitClasses():  " + term);

@@ -298,7 +298,34 @@ public interface OntologyService {
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<TraitReference> getAllTraitClasses() throws MiddlewareQueryException;
-
+    
+    /**
+     * Adds a new trait class to the database.
+     * Creates a new cvterm and cvterm_relationship entry in the local database.
+     * Returns a negative id.
+     *
+     * @param name the name
+     * @param definition the definition
+     * @param cvId the cv id
+     * @return the term
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Term addTraitClass(String name, String definition) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Adds a new trait class to the database if it does not exist. 
+     * Otherwise, the existing trait class & its relationship is updated.
+     * Returns a negative id.
+     *
+     * @param name the name
+     * @param definition the definition
+     * @return the term
+     * @throws MiddlewareQueryException the middleware query exception
+     * @throws MiddlewareException 
+     */
+    Term addOrUpdateTraitClass(String name, String definition) throws MiddlewareQueryException, MiddlewareException;
+    
     /**
      * Gets all roles.
      *
@@ -338,20 +365,6 @@ public interface OntologyService {
      * @throws MiddlewareQueryException the middleware query exception
      */
     Term addTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException;
-    
-    /**
-     * Adds a new trait class to the database.
-     * Creates a new cvterm and cvterm_relationship entry in the local database.
-     * Returns a negative id.
-     *
-     * @param name the name
-     * @param definition the definition
-     * @param cvId the cv id
-     * @return the term
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    Term addTraitClass(String name, String definition, CvId cvId) throws MiddlewareQueryException;
-    
     
     /**
      * Find term by name.

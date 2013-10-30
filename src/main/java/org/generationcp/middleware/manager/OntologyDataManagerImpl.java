@@ -422,7 +422,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
         Term term = findTermByName(name, cvId);
         if (term != null && term.getId() >= 0) {
-            throw new MiddlewareException("Error in addOrUpdateTerm: Term found in central - cannot be updated.");
+            throw new MiddlewareException(term.getName() + " is retrieved from the central database and cannot be updated.");
         }
 
         try {
@@ -437,16 +437,17 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         return term;
         
     }
-
+    
     @Override
-    public Term addOrUpdateTermAndRelationship(String name, String definition, CvId cvId, int typeId, int objectId) throws MiddlewareQueryException, MiddlewareException {
+    public Term addOrUpdateTermAndRelationship(String name, String definition, CvId cvId, int typeId, int objectId) 
+            throws MiddlewareQueryException, MiddlewareException {
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
         Term term = findTermByName(name, cvId);
         if (term != null && term.getId() >= 0) {
-            throw new MiddlewareException("Error in addOrUpdateTermAndRelationship: Term found in central - cannot be updated.");
+            throw new MiddlewareException(term.getName() + " is retrieved from the central database and cannot be updated.");
         }
 
         try {
@@ -543,7 +544,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		
 		property.setTerm(findTermByName(name, CvId.PROPERTIES));
 		if(property.getTerm()!=null) {
-			property.setIsA(getTermBuilder().getTermOfClassOfProperty(property.getTerm().getId(), CvId.PROPERTIES.getId(), TermId.IS_A.getId()));
+			property.setIsA(getTermBuilder().getTermOfClassOfProperty(property.getTerm().getId(), 
+			        CvId.PROPERTIES.getId(), TermId.IS_A.getId()));
 		}
 		
 		return property;
@@ -577,8 +579,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     }
 
     @Override
-    public Term addTraitClass(String name, String definition, CvId cvId) throws MiddlewareQueryException {
-        Term term = findTermByName(name, cvId);
+    public Term addTraitClass(String name, String definition) throws MiddlewareQueryException {
+        Term term = findTermByName(name, CvId.IBDB_TERMS);
 
         if (term != null) {
             return term;
@@ -590,7 +592,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
         try {
             trans = session.beginTransaction();
-            term = getTermSaver().save(name, definition, cvId);
+            term = getTermSaver().save(name, definition, CvId.IBDB_TERMS);
 
             if (term != null) {
                 getTermRelationshipSaver().save(term.getId(), TermId.IS_A.getId(), TermId.ONTOLOGY_TRAIT_CLASS.getId());
