@@ -67,6 +67,23 @@ public class CvTermSaver extends Saver {
         dao.saveOrUpdate(cvTerm);
         return new Term(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition());
     }
+    
+    public Term update(Term term) throws MiddlewareException, MiddlewareQueryException{
+        requireLocalDatabaseInstance();
+        validateInputFields(term.getName(), term.getDefinition());
+        CVTermDao dao = getCvTermDao();
+
+        CVTerm cvTerm = dao.getById(term.getId());
+        
+        if (cvTerm != null) { //update
+             cvTerm.setName(term.getName());
+             cvTerm.setDefinition(term.getDefinition());
+             dao.update(cvTerm);
+        } else {
+            throw new MiddlewareException("Error: Term not found in the local database. ");
+        }
+        return new Term(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition());
+    }
 	
 	public CVTerm create(int id, String name, String definition, int cvId,  boolean isObsolete, boolean isRelationshipType){
 		CVTerm cvTerm = new CVTerm();

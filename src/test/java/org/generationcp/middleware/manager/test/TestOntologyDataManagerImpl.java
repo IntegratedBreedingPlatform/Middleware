@@ -737,11 +737,11 @@ public class TestOntologyDataManagerImpl {
     @Test
     public void testAddOrUpdateTermAndRelationshipFoundInCentral() throws Exception {
         String name = "Season";
-        String definition = "Growing Season " +(int) (Math.random() * 100); // add random number to see the update
+        String definition = "Growing Season " + (int) (Math.random() * 100); // add random number to see the update
         try{
             manager.addOrUpdateTermAndRelationship(name, definition, CvId.PROPERTIES, TermId.IS_A.getId(), 1340);
         } catch (MiddlewareException e){
-            Debug.println(3, "MiddlewareQueryException expected: \"" + e.getMessage() + "\"");
+            Debug.println(3, "MiddlewareException expected: \"" + e.getMessage() + "\"");
             assertTrue(e.getMessage().contains(" is retrieved from the central database and cannot be updated"));
         }
 
@@ -751,7 +751,7 @@ public class TestOntologyDataManagerImpl {
     @Test
     public void testAddOrUpdateTermAndRelationshipNotInCentral() throws Exception {
         String name = "Study condition NEW";
-        String definition = "Study condition NEW class " +(int) (Math.random() * 100); // add random number to see the update
+        String definition = "Study condition NEW class " + (int) (Math.random() * 100); // add random number to see the update
         Term origTerm = manager.findTermByName(name, CvId.PROPERTIES);
         Term newTerm = manager.addOrUpdateTermAndRelationship(name, definition, CvId.PROPERTIES, TermId.IS_A.getId(), 1340);
         Debug.println(3, "Original:  " + origTerm);
@@ -759,6 +759,39 @@ public class TestOntologyDataManagerImpl {
         
         if (origTerm != null) { // if the operation is update, the ids must be same
             assertSame(origTerm.getId(), newTerm.getId());
+        }
+
+    }
+    
+
+    @Test
+    public void testUpdateTermAndRelationshipFoundInCentral() throws Exception {
+        String name = "Slope";
+        String definition = "Land slope " + (int) (Math.random() * 100); // add random number to see the update
+        Term origTerm = manager.findTermByName(name, CvId.PROPERTIES);
+        try{
+            manager.updateTermAndRelationship(new Term(origTerm.getId(), name, definition), TermId.IS_A.getId(), 1340);
+        } catch (MiddlewareException e){
+            Debug.println(3, "MiddlewareException expected: \"" + e.getMessage() + "\"");
+            assertTrue(e.getMessage().contains("Cannot update terms in central"));
+        }
+    }
+
+    @Test
+    public void testUpdateTermAndRelationshipNotInCentral() throws Exception {
+        String name = "Slope NEW";
+        String definition = "Slope NEW class " + (int) (Math.random() * 100); // add random number to see the update
+        Term origTerm = manager.findTermByName(name, CvId.PROPERTIES);
+        if (origTerm == null){ // first run, add before update
+            origTerm = manager.addOrUpdateTermAndRelationship(name, definition, CvId.PROPERTIES, TermId.IS_A.getId(), 1340);
+        }
+        manager.updateTermAndRelationship(new Term(origTerm.getId(), name, definition), TermId.IS_A.getId(), 1340);
+        Term newTerm = manager.findTermByName(name, CvId.PROPERTIES);
+        Debug.println(3, "Original:  " + origTerm);
+        Debug.println(3, "Updated :  " + newTerm);
+        
+        if (origTerm != null) { 
+            assertTrue(newTerm.getDefinition().equals(definition));
         }
 
     }
@@ -770,7 +803,7 @@ public class TestOntologyDataManagerImpl {
         try{
             manager.addOrUpdateTerm(name, definition, CvId.SCALES);
         } catch (MiddlewareException e){
-            Debug.println(3, "MiddlewareQueryException expected: \"" + e.getMessage() + "\"");
+            Debug.println(3, "MiddlewareException expected: \"" + e.getMessage() + "\"");
             assertTrue(e.getMessage().contains(" is retrieved from the central database and cannot be updated"));
         }
     }
@@ -786,6 +819,38 @@ public class TestOntologyDataManagerImpl {
         
         if (origTerm != null) { // if the operation is update, the ids must be same
             assertSame(origTerm.getId(), newTerm.getId());
+        }
+    }
+    
+
+    @Test
+    public void testUpdateTermFoundInCentral() throws Exception {
+        String name = "Score";
+        String definition = "Score NEW " + (int) (Math.random() * 100); // add random number to see the update
+        Term origTerm = manager.findTermByName(name, CvId.SCALES);
+        try{
+            manager.updateTerm(new Term(origTerm.getId(), name, definition));
+        } catch (MiddlewareException e){
+            Debug.println(3, "MiddlewareException expected: \"" + e.getMessage() + "\"");
+            assertTrue(e.getMessage().contains("Cannot update terms in central"));
+        }
+    }
+
+    @Test
+    public void testUpdateTermNotInCentral() throws Exception {
+        String name = "Integer";
+        String definition = "Integer NEW " + (int) (Math.random() * 100); // add random number to see the update
+        Term origTerm = manager.findTermByName(name, CvId.SCALES);
+        if (origTerm == null){ // first run, add before update
+            origTerm = manager.addTerm(name, definition, CvId.SCALES);
+        }
+        manager.updateTerm(new Term(origTerm.getId(), name, definition));
+        Term newTerm = manager.findTermByName(name, CvId.SCALES);
+        Debug.println(3, "Original:  " + origTerm);
+        Debug.println(3, "Updated :  " + newTerm);
+        
+        if (origTerm != null) { 
+            assertTrue(newTerm.getDefinition().equals(definition));
         }
     }
     

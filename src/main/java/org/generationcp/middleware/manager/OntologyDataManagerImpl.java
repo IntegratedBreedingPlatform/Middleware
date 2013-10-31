@@ -276,26 +276,36 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
                 term = getTermSaver().save(name, definition, cvId);
                 trans.commit();
             } else {
-                throw new MiddlewareQueryException("variables cannot be used in this method");
+                throw new MiddlewareQueryException("Variables cannot be used in this method.");
             }
             return term;
         } catch (Exception e) {
             rollbackTransaction(trans);
-            throw new MiddlewareQueryException("error in addTerm " + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error in addTerm: " + e.getMessage(), e);
         }
     }
     
     @Override
-//    public void updateTerm(int termId, String name, String definition) throws MiddlewareException, MiddlewareQueryException{
     public void updateTerm(Term term) throws MiddlewareException, MiddlewareQueryException{
-        if (term.getId() >= 0){
+        
+        if (term != null && term.getId() >= 0){
             throw new MiddlewareException("Error in updateTerm: Cannot update terms in central.");
         }
         
-        //TODO
-        
-    }
+        requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
 
+        try {
+            trans = session.beginTransaction();
+            getTermSaver().update(term);
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            throw new MiddlewareQueryException("Error in updateTerm: " + e.getMessage(), e);
+        }
+    }
+    
     @Override
     public List<Term> getDataTypes() throws MiddlewareQueryException {
         List<Integer> dataTypeIds = Arrays.asList(TermId.CLASS.getId(), TermId.NUMERIC_VARIABLE.getId(),
@@ -475,6 +485,33 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         return term;
     }
 
+    public Term updateTermAndRelationship(Term term, int typeId, int objectId) throws MiddlewareQueryException, MiddlewareException{
+        
+        if (term != null && term.getId() >= 0){
+            throw new MiddlewareException("Error in updateTerm: Cannot update terms in central.");
+        }
+        
+        requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+            
+            term = getTermSaver().update(term);
+            
+            saveOrUpdateCvTermRelationship(term.getId(), objectId, typeId);
+            
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            throw new MiddlewareQueryException("Error in updateTerm: " + e.getMessage(), e);
+        }
+        
+        return term;
+        
+    }
+
 	private Term saveOrUpdateCvTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException, MiddlewareException{
         Term term = findTermByName(name, cvId);
         if (term == null){   // If term is not existing, add
@@ -499,6 +536,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
                 cvRelationship.setObjectId(objectId);
                 getTermRelationshipSaver().saveOrUpdateRelationship(cvRelationship);
             }
+        } else {
+            throw new MiddlewareException("Error in saveOrUpdateCvTermRelationship: The relationship type passed is not a valid value.");
         }
 	}
 	

@@ -216,7 +216,6 @@ public interface OntologyDataManager {
      * @param definition the definition
      * @throws MiddlewareQueryException the middleware query exception
      */
-//    void updateTerm(int termId, String name, String definition) throws MiddlewareException, MiddlewareQueryException;
     void updateTerm(Term term) throws MiddlewareException, MiddlewareQueryException;
     
 	/**
@@ -405,6 +404,19 @@ public interface OntologyDataManager {
     Term addOrUpdateTermAndRelationship(String name, String definition, CvId cvId, int typeId, int objectId)
             throws MiddlewareQueryException, MiddlewareException;
 
+    /**
+     * Updates the given term and its associated entry in the cvterm_relationship table.
+     * Searches first if the given term id exists. If it exists in local, the records are updated. 
+     *
+     * @param term The term to update
+     * @param typeId the type id of the relationship between the term id and the objectId
+     * @param objectId the object id
+     * @return the term
+     * @throws MiddlewareQueryException the middleware query exception
+     * @throws MiddlewareException the middleware exception
+     */
+    Term updateTermAndRelationship(Term term, int typeId, int objectId) throws MiddlewareQueryException, MiddlewareException;
+    
     /**
      * Adds or updates the term.
      *

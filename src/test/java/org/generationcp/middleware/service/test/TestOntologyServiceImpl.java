@@ -27,7 +27,9 @@ import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Scale;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.oms.TraitClass;
 import org.generationcp.middleware.domain.oms.TraitClassReference;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.service.ServiceFactory;
@@ -47,6 +49,8 @@ import org.junit.runners.JUnit4;
 public class TestOntologyServiceImpl {
     
     private static final String NUMBER_OF_RECORDS = " # Records = ";
+    private static final int AGRONOMIC_TRAIT_CLASS = 1340;
+
     
     private static ServiceFactory serviceFactory;
     private static OntologyService ontologyService;
@@ -131,8 +135,7 @@ public class TestOntologyServiceImpl {
 
     @Test
     public void testAddProperty() throws MiddlewareQueryException {
-        int agronomicTraitClass = 1340;
-        Property property = ontologyService.addProperty("NEW property", "New property description", agronomicTraitClass);
+        Property property = ontologyService.addProperty("NEW property", "New property description", AGRONOMIC_TRAIT_CLASS);
         property.print(3);
     }
 
@@ -140,9 +143,8 @@ public class TestOntologyServiceImpl {
     public void testAddOrUpdateProperty() throws Exception {
         String name = "NEW property";
         String definition = "New property description " + (int) (Math.random() * 100);
-        int agronomicTraitClass = 1340;
         Property origProperty = ontologyService.getProperty(name);
-        Property newProperty = ontologyService.addOrUpdateProperty(name, definition, agronomicTraitClass);
+        Property newProperty = ontologyService.addOrUpdateProperty(name, definition, AGRONOMIC_TRAIT_CLASS);
         
         Debug.println(3, "Original:  " + origProperty);
         Debug.println(3, "Updated :  " + newProperty);
@@ -152,6 +154,24 @@ public class TestOntologyServiceImpl {
         }
     }
     
+
+    @Test
+    public void testUpdateProperty() throws Exception {
+        String name = "UPDATE property";
+        String definition = "Update property description " + (int) (Math.random() * 100);
+        Property origProperty = ontologyService.getProperty(name);
+        if (origProperty == null || origProperty.getTerm() == null){ // first run, add before update
+            origProperty = ontologyService.addProperty(name, definition, AGRONOMIC_TRAIT_CLASS);
+        }
+        ontologyService.updateProperty(new Property(new Term(origProperty.getId(), name, definition), origProperty.getIsA()));
+        Property newProperty = ontologyService.getProperty(name);
+        
+        Debug.println(3, "Original:  " + origProperty);
+        Debug.println(3, "Updated :  " + newProperty);
+        assertTrue(newProperty.getDefinition().equals(definition));
+    }
+    
+    
     /*======================= SCALE ================================== */
 
     @Test
@@ -160,7 +180,6 @@ public class TestOntologyServiceImpl {
         assertNotNull(scale);
         scale.print(3);
     }
-
 
     @Test
     public void testGetAllScales() throws MiddlewareQueryException {
@@ -193,6 +212,22 @@ public class TestOntologyServiceImpl {
         }
     }
     
+    @Test
+    public void testUpdateScale() throws Exception {
+        String name = "UPDATE scale";
+        String definition = "Update scale description " + (int) (Math.random() * 100);
+        Scale origScale = ontologyService.getScale(name);
+        if (origScale == null || origScale.getTerm() == null){ // first run, add before update
+            origScale = ontologyService.addScale(name, definition);
+        }
+        ontologyService.updateScale(new Scale(new Term(origScale.getId(), name, definition)));
+        Scale newScale = ontologyService.getScale(name);
+        
+        Debug.println(3, "Original:  " + origScale);
+        Debug.println(3, "Updated :  " + newScale);
+        assertTrue(newScale.getDefinition().equals(definition));
+    }
+
 
     /*======================= METHOD ================================== */
     
@@ -241,6 +276,23 @@ public class TestOntologyServiceImpl {
         }
     }
     
+
+    @Test
+    public void testUpdateMethod() throws Exception {
+        String name = "UPDATE method";
+        String definition = "Update method description " + (int) (Math.random() * 100);
+        Method origMethod = ontologyService.getMethod(name);
+        if (origMethod == null || origMethod.getTerm() == null){ // first run, add before update
+            origMethod = ontologyService.addMethod(name, definition);
+        }
+        ontologyService.updateMethod(new Method(new Term(origMethod.getId(), name, definition)));
+        Method newMethod = ontologyService.getMethod(name);
+        
+        Debug.println(3, "Original:  " + origMethod);
+        Debug.println(3, "Updated :  " + newMethod);
+        assertTrue(newMethod.getDefinition().equals(definition));
+    }
+
     /*======================= OTHERS ================================== */
 
     @Test
@@ -255,7 +307,7 @@ public class TestOntologyServiceImpl {
 
     
     @Test
-    public void testGetAllTraitGroups() throws MiddlewareQueryException {
+    public void testGetAllTraitGroupsHierarchy() throws MiddlewareQueryException {
         List<TraitClassReference> traitGroups = ontologyService.getAllTraitGroupsHierarchy();           
         assertFalse(traitGroups.isEmpty());
         for (TraitClassReference traitGroup : traitGroups){
@@ -325,15 +377,53 @@ public class TestOntologyServiceImpl {
     }
     
     @Test
-    public void testAddTraitClasses() throws MiddlewareQueryException {
+    public void testAddTraitClass() throws MiddlewareQueryException {
         String name = "Test Trait Class " + new Random().nextInt(10000);
         String definition = "Test Definition";
         
-        Term term = ontologyService.addTraitClass(name, definition, TermId.ONTOLOGY_TRAIT_CLASS.getId()).getTerm();
-        assertNotNull(term);
-        assertTrue(term.getId() < 0);
-        Debug.println(0, "testAddTraitClasses():  " + term);
+        TraitClass traitClass = ontologyService.addTraitClass(name, definition, TermId.ONTOLOGY_TRAIT_CLASS.getId());
+        assertNotNull(traitClass);
+        assertTrue(traitClass.getId() < 0);
+        traitClass.print(3);
     }
+
+    @Test
+    public void testAddOrUpdateTraitClass() throws Exception {
+        String name = "NEW trait class";
+        String definition = "New trait class description " + (int) (Math.random() * 100);
+        TraitClass newTraitClass = ontologyService.addOrUpdateTraitClass(name, definition, AGRONOMIC_TRAIT_CLASS);
+        Debug.println(3, "Updated :  " + newTraitClass);
+        assertTrue(newTraitClass.getDefinition().equals(definition));
+    }
+
+    @Test
+    public void testUpdateTraitClassInCentral() throws Exception {
+        String newValue = "Agronomic New";
+        try {
+            TraitClass origTraitClass = new TraitClass(ontologyService.getTermById(AGRONOMIC_TRAIT_CLASS), 
+                                        ontologyService.getTermById(TermId.ONTOLOGY_TRAIT_CLASS.getId()));
+            ontologyService.updateTraitClass(new TraitClass(new Term(origTraitClass.getId(), newValue, newValue), 
+                                        origTraitClass.getIsA()));
+        } catch (MiddlewareException e){
+            Debug.println(3, "MiddlewareException expected: \"" + e.getMessage() + "\"");
+            assertTrue(e.getMessage().contains("Cannot update terms in central"));
+        }
+    }
+
+    @Test
+    public void testUpdateTraitClassNotInCentral() throws Exception {
+        String name = "UPDATE trait class";
+        String definition = "UPDATE trait class description " + (int) (Math.random() * 100);
+        TraitClass origTraitClass = ontologyService.addTraitClass(name, definition, AGRONOMIC_TRAIT_CLASS);            
+
+        if (origTraitClass != null){
+            TraitClass newTraitClass = ontologyService.updateTraitClass(new TraitClass(new Term(origTraitClass.getId(), name, definition), origTraitClass.getIsA()));
+            Debug.println(3, "Original:  " + origTraitClass);
+            Debug.println(3, "Updated :  " + newTraitClass);
+            assertTrue(newTraitClass.getDefinition().equals(definition));
+        }
+    }
+
 
     @After
     public void afterEachTest() {

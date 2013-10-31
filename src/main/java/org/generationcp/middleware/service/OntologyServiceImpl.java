@@ -115,9 +115,7 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     
     @Override
     public void updateProperty(Property property) throws MiddlewareQueryException, MiddlewareException{
-        //TODO
-//        getOntologyDataManager().updateTermAndRelationship(property.getTerm(), property.getIsA());
-
+        getOntologyDataManager().updateTermAndRelationship(property.getTerm(),  TermId.IS_A.getId(), property.getIsA().getId());
     }
 
     @Override
@@ -274,16 +272,16 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     
     @Override
     public TraitClass addOrUpdateTraitClass(String name, String definition, int parentTraitClassId) throws MiddlewareQueryException, MiddlewareException {
-        //TODO
-//        return getOntologyDataManager().addOrUpdateTermAndRelationship(name, definition, CvId.IBDB_TERMS, TermId.IS_A.getId(), parentTraitClassId);
-        return null;
+        Term term =  getOntologyDataManager().addOrUpdateTermAndRelationship(name, definition, CvId.IBDB_TERMS, TermId.IS_A.getId(), parentTraitClassId);
+        Term isA = getOntologyDataManager().getTermById(parentTraitClassId);
+        return new TraitClass(term, isA);
     }
 
     @Override
-    public void updateTraitClass(TraitClass traitClass) throws MiddlewareQueryException, MiddlewareException{
-        //TODO
-//        getOntologyDataManager().updateTermAndRelationship(traitClass.getId(), traitClass.getIsA());
-
+    public TraitClass updateTraitClass(TraitClass traitClass) throws MiddlewareQueryException, MiddlewareException{
+        Term term = getOntologyDataManager().updateTermAndRelationship(traitClass.getTerm(),  TermId.IS_A.getId(), traitClass.getIsA().getId());
+        Term isA = getOntologyDataManager().getTermById(traitClass.getIsA().getId());
+        return new TraitClass(term, isA);
     }
 
     

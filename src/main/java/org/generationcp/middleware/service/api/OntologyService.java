@@ -413,7 +413,7 @@ public interface OntologyService {
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
-    void updateTraitClass(TraitClass traitClass) throws MiddlewareQueryException, MiddlewareQueryException, MiddlewareException;
+    TraitClass updateTraitClass(TraitClass traitClass) throws MiddlewareQueryException, MiddlewareQueryException, MiddlewareException;
     
     /**
      * Delete trait class.

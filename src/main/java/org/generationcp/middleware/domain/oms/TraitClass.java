@@ -11,21 +11,22 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.oms;
 
-import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.util.Debug;
 
 
 /**
- * Contains the primary details of a trait class - id, name, description, plus the list of properties 
+ * The Trait Class ontology. 
  * 
  * @author Joyce Avestro
  *
  */
-public class TraitClass extends Reference implements Comparable<TraitClass>{
+public class TraitClass implements Comparable<TraitClass>{
     
     private Term term;
     
-    private Term isA; // Either TermId.ONTOLOGY_TRAIT_CLASS or TermId.ONTOLOGY_RESEARCH_CLASS
+    /* Either TermId.ONTOLOGY_TRAIT_CLASS or TermId.ONTOLOGY_RESEARCH_CLASS for first-level class.
+     * For lower-level class, this contains the parent trait class. */
+    private Term isA; 
     
     public TraitClass(Term term, Term isA) {
         this.term = term;
@@ -48,6 +49,32 @@ public class TraitClass extends Reference implements Comparable<TraitClass>{
         this.isA = isA;
     }
 
+
+    public int getId() {
+        return term.getId();
+    }
+
+    public void setId(int id) {
+        term.setId(id);
+    }
+    
+
+    public String getName() {
+        return term.getName();
+    }
+
+    public void setName(String name) {
+        term.setName(name);
+    }
+
+    public String getDefinition() {
+       return term.getDefinition();
+    }
+
+    public void setDefinition(String definition) {
+        term.setDefinition(definition);
+    }
+    
     @Override
     public String toString() {
 
