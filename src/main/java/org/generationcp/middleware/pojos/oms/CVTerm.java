@@ -93,12 +93,6 @@ public class CVTerm implements Serializable {
 	@Column(name = "is_relationshiptype")
 	private Integer isRelationshipType;
 	
-	@OneToMany(mappedBy = "cvTerm", cascade = CascadeType.ALL)
-	private List<CVTermProperty> properties;
-	
-	@OneToMany(mappedBy = "cvTerm", cascade = CascadeType.ALL)
-	private List<CVTermSynonym> synonyms;
-	
 	public CVTerm() {
 	}
 
@@ -169,22 +163,6 @@ public class CVTerm implements Serializable {
 
 	public void setIsRelationshipType(Boolean isRelationshipType) {
 		this.isRelationshipType = (int) (isRelationshipType ? 1 : 0);
-	}
-
-	public List<CVTermProperty> getProperties() {
-		return properties;
-	}
-
-	public void setProperties(List<CVTermProperty> properties) {
-		this.properties = properties;
-	}
-
-	public List<CVTermSynonym> getSynonyms() {
-		return synonyms;
-	}
-
-	public void setSynonyms(List<CVTermSynonym> synonyms) {
-		this.synonyms = synonyms;
 	}
 
 	@Override

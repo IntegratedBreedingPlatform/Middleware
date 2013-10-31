@@ -39,7 +39,7 @@ public class TermBuilder extends Builder {
 		return term;
 	}
 	
-	public Term mapCVTermToTerm(CVTerm cVTerm){
+	public Term mapCVTermToTerm(CVTerm cVTerm) throws MiddlewareQueryException {
 		Term term = null;
 		
 		if (cVTerm != null){
@@ -47,12 +47,9 @@ public class TermBuilder extends Builder {
 			term.setObsolete(cVTerm.isObsolete());
 			term.setVocabularyId(cVTerm.getCv());
 			
-			List<TermProperty> properties = new ArrayList<TermProperty>();
-			if (cVTerm.getProperties() != null){
-				for (CVTermProperty property: cVTerm.getProperties()){
-				    properties.add(getTermPropertyBuilder().create(property));
-				}
-			}
+			List<CVTermProperty> cvTermProperties = getTermPropertyBuilder().findProperties(cVTerm.getCvTermId());
+			List<TermProperty> properties = getTermPropertyBuilder().create(cvTermProperties);
+
 			term.setProperties(properties);
 		}
 		return term;

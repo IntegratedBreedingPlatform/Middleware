@@ -20,7 +20,6 @@ import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.NameSynonym;
-import org.generationcp.middleware.domain.dms.NameType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
@@ -122,12 +121,12 @@ public class StandardVariableBuilder extends Builder {
 		}
 	}
 
-	private Enumeration createEnumeration(CVTerm cvTerm) {
-		return new Enumeration(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition(), getRank(cvTerm));
+	private Enumeration createEnumeration(CVTerm cvTerm) throws MiddlewareQueryException {
+		return new Enumeration(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition(), getRank(cvTerm.getCvTermId()));
 	}
 
-	private int getRank(CVTerm cvTerm) {
-		CVTermProperty property = findProperty(cvTerm.getProperties(), TermId.ORDER.getId());
+	private int getRank(int cvTermId) throws MiddlewareQueryException {
+	    CVTermProperty property = getTermPropertyBuilder().findPropertyByType(cvTermId, TermId.ORDER.getId());
 		if (property != null) {
 			return Integer.parseInt(property.getValue());
 		}
@@ -145,7 +144,7 @@ public class StandardVariableBuilder extends Builder {
 	    return null;
 	}
 
-	private CVTermProperty findProperty(List<CVTermProperty> properties, int typeId) {
+/*	private CVTermProperty findProperty(List<CVTermProperty> properties, int typeId) {
 		if (properties != null) {
 			for (CVTermProperty property : properties) {
 				if (property.getTypeId() == typeId) {
@@ -155,15 +154,16 @@ public class StandardVariableBuilder extends Builder {
 		}
 		return null;
 	}
-
+*/
 	private boolean hasEnumerations(List<CVTermRelationship> cvTermRelationships) {
 		return findTermId(cvTermRelationships, TermId.HAS_VALUE) != null;
 	}
 
-	private void addConstraints(StandardVariable standardVariable, CVTerm cvTerm) {
-		if (cvTerm.getProperties() != null && !cvTerm.getProperties().isEmpty()) {
-			Integer minValue = getPropertyValue(cvTerm.getProperties(), TermId.MIN_VALUE);
-			Integer maxValue = getPropertyValue(cvTerm.getProperties(), TermId.MAX_VALUE);
+	private void addConstraints(StandardVariable standardVariable, CVTerm cvTerm) throws MiddlewareQueryException {
+	    List<CVTermProperty> properties = getTermPropertyBuilder().findProperties(cvTerm.getCvTermId());
+		if (properties != null && !properties.isEmpty()) {
+			Integer minValue = getPropertyValue(properties, TermId.MIN_VALUE);
+			Integer maxValue = getPropertyValue(properties, TermId.MAX_VALUE);
 			if (minValue != null || maxValue != null) {
 				standardVariable.setConstraints(new VariableConstraints(minValue, maxValue));
 			}
@@ -200,30 +200,18 @@ public class StandardVariableBuilder extends Builder {
 		CVTerm cvTerm = getCvTerm(id);
 		return cvTerm != null 
 		        ? new Term(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition(), 
-		                    createSynonyms(cvTerm.getSynonyms()), createTermProperties(cvTerm.getProperties())) 
+		                    createSynonyms(cvTerm.getCvTermId()), createTermProperties(cvTerm.getCvTermId())) 
 		        : null;
 	}
 	
-	private List<NameSynonym> createSynonyms(List<CVTermSynonym> synonyms) {
-		List<NameSynonym> nameSynonyms = null;
-		if (synonyms != null && synonyms.size() > 0) {
-			nameSynonyms = new ArrayList<NameSynonym>();
-			for (CVTermSynonym synonym : synonyms) {
-				nameSynonyms.add(new NameSynonym(synonym.getSynonym(), NameType.find(synonym.getTypeId())));
-			}
-		}
-		return nameSynonyms;
+	private List<NameSynonym> createSynonyms(int cvTermId) throws MiddlewareQueryException {
+	    List<CVTermSynonym> synonyms = getNameSynonymBuilder().findSynonyms(cvTermId);
+	    return getNameSynonymBuilder().create(synonyms);
 	}
 	
-	private List<TermProperty> createTermProperties(List<CVTermProperty> properties) {
-	    List<TermProperty> termProperties = null;
-	    if (properties != null && properties.size() > 0) {
-	        termProperties = new ArrayList<TermProperty>();
-	        for (CVTermProperty property : properties) {
-	            termProperties.add(new TermProperty(property.getCvTermPropertyId(), property.getTypeId(), property.getValue(), property.getRank()));
-	        }
-	    }
-	    return termProperties;
+	private List<TermProperty> createTermProperties(int cvTermId) throws MiddlewareQueryException {
+	    List<CVTermProperty> cvTermProperties = getTermPropertyBuilder().findProperties(cvTermId);
+	    return getTermPropertyBuilder().create(cvTermProperties);
 	}
 
 	private CVTerm getCvTerm(int id) throws MiddlewareQueryException {

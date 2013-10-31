@@ -18,8 +18,6 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -57,9 +55,8 @@ public class CVTermSynonym implements Serializable {
 	@Column(name = "type_id")
 	private Integer typeId;
 
-	@ManyToOne(targetEntity = CVTerm.class)
-	@JoinColumn(name = "cvterm_id", nullable = false)
-	private CVTerm cvTerm;
+	@Column(name = "cvterm_id")
+	private Integer cvTermId;
 	
 	
 	public CVTermSynonym(){
@@ -94,15 +91,15 @@ public class CVTermSynonym implements Serializable {
 		this.typeId = typeId;
 	}
 
-	public CVTerm getCvTerm() {
-		return cvTerm;
-	}
+    public Integer getCvTermId() {
+        return cvTermId;
+    }
+    
+    public void setCvTermId(Integer cvTermId) {
+        this.cvTermId = cvTermId;
+    }
 
-	public void setCvTerm(CVTerm cvTerm) {
-		this.cvTerm = cvTerm;
-	}
-
-	@Override
+    @Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;

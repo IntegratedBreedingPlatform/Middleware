@@ -142,10 +142,15 @@ public class TestOntologyDataManagerImpl {
 	
 	@Test
 	public void testAddStandardVariable() throws Exception {
-		StandardVariable stdVariable = new StandardVariable();
+	    //create new trait
+	    String propertyName = "property name " + new Random().nextInt(10000);
+	    manager.addProperty(propertyName, "test property", 1087);
+		
+	    StandardVariable stdVariable = new StandardVariable();
 		stdVariable.setName("variable name " + new Random().nextInt(10000));
 		stdVariable.setDescription("variable description");
-		stdVariable.setProperty(new Term(2002, "User", "Database user"));
+		//stdVariable.setProperty(new Term(2002, "User", "Database user"));
+		stdVariable.setProperty(manager.findTermByName(propertyName, CvId.PROPERTIES));
 		stdVariable.setMethod(new Term(4030, "Assigned", "Term, name or id assigned"));
 		stdVariable.setScale(new Term(6000, "DBCV", "Controlled vocabulary from a database"));
 		stdVariable.setStoredIn(new Term(1010, "Study information", "Study element"));
@@ -159,6 +164,7 @@ public class TestOntologyDataManagerImpl {
 		stdVariable.getEnumerations().add(new Enumeration(10001, "HB", "Hybridization nursery", 2));
 		stdVariable.getEnumerations().add(new Enumeration(10002, "PN", "Pedigree nursery", 3));
 		stdVariable.setConstraints(new VariableConstraints(100, 999));
+		stdVariable.setCropOntologyId("CROP-TEST");
 		
 		manager.addStandardVariable(stdVariable);
 		

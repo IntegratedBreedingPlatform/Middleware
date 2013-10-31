@@ -76,4 +76,8 @@ public abstract class Builder extends DatabaseBroker {
 	protected final StandardVariableSaver getStandardVariableSaver() {
 		return new StandardVariableSaver(sessionProviderForLocal, sessionProviderForCentral);
 	}
+	
+	protected final NameSynonymBuilder getNameSynonymBuilder() {
+	    return new NameSynonymBuilder(sessionProviderForLocal, sessionProviderForCentral);
+	}
 }
