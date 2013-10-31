@@ -112,6 +112,11 @@ public class OntologyServiceImpl extends Service implements OntologyService {
                             getTermById(isAId));
     }
     
+    @Override
+    public void deleteProperty(int cvTermId, int isAId) throws MiddlewareQueryException {
+        getOntologyDataManager().deleteTermAndRelationship(cvTermId, CvId.PROPERTIES, TermId.IS_A.getId(), isAId);
+    }
+    
     
     /*======================= SCALE ================================== */
 
@@ -158,6 +163,10 @@ public class OntologyServiceImpl extends Service implements OntologyService {
         return new Scale(getOntologyDataManager().addOrUpdateTerm(name, definition, CvId.SCALES));
     }
     
+    @Override
+    public void deleteScale(int cvTermId) throws MiddlewareQueryException {
+        getOntologyDataManager().deleteTerm(cvTermId, CvId.SCALES);
+    }
 
     /*======================= METHOD ================================== */
     
@@ -192,7 +201,9 @@ public class OntologyServiceImpl extends Service implements OntologyService {
         return new Method(getOntologyDataManager().addOrUpdateTerm(name, definition, CvId.METHODS));
     }
     
-
+    public void deleteMethod(int cvTermId) throws MiddlewareQueryException {
+        getOntologyDataManager().deleteTerm(cvTermId, CvId.METHODS);
+    }
     
     /*======================= OTHERS ================================== */
 
@@ -249,6 +260,10 @@ public class OntologyServiceImpl extends Service implements OntologyService {
                 .addOrUpdateTermAndRelationship(name, definition, CvId.IBDB_TERMS, TermId.IS_A.getId(), TermId.ONTOLOGY_TRAIT_CLASS.getId());
     }
     
+    @Override
+    public void deleteTraitClass(int cvTermId) throws MiddlewareQueryException {
+        getOntologyDataManager().deleteTermAndRelationship(cvTermId, CvId.IBDB_TERMS, TermId.IS_A.getId(), TermId.ONTOLOGY_TRAIT_CLASS.getId());
+    }
     
     @Override
     public Term getTermById(int termId) throws MiddlewareQueryException {

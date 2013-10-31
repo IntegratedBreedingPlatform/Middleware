@@ -92,5 +92,14 @@ public class CvTermSaver extends Saver {
 		} 
 	}
 	
-	
+	public void delete(CVTerm cvTerm, CvId cvId) throws MiddlewareQueryException {
+	    requireLocalDatabaseInstance();
+            CVTermDao dao = getCvTermDao();
+
+            try {
+                dao.makeTransient(cvTerm);
+            } catch (MiddlewareQueryException e) {
+                throw new MiddlewareQueryException(e.getMessage(), e);
+            }
+	} 
 }

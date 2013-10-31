@@ -64,5 +64,13 @@ public class CvTermRelationshipSaver extends Saver {
         return relationship;
     }
 
-	
+	public void deleteRelationship(CVTermRelationship cvTermRelationship) throws MiddlewareException, MiddlewareQueryException{
+	    requireLocalDatabaseInstance();
+    	    CVTermRelationshipDao dao = getCvTermRelationshipDao();
+    	    try {
+    	        dao.makeTransient(cvTermRelationship);
+    	    } catch (MiddlewareQueryException e) {
+    	        throw new MiddlewareQueryException(e.getMessage(), e);
+    	    }
+	}
 }

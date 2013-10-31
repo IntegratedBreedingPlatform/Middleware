@@ -150,20 +150,29 @@ public interface OntologyService {
     Property addProperty(String name, String definition, int isA) throws MiddlewareQueryException;
     
     /**
-     * Adds or updates a property with the given name and definition. 
+     * Adds or updates a property with the given name and definition.
      * If the given property name is not found in the databases, a new record is added to local database.
-     * If the given name is already found in local database, update is performed. 
+     * If the given name is already found in local database, update is performed.
      * If the given name is already found in central database, no update is performed.
-     * 
+     *
      * @param name the name of the property
      * @param definition the defintion of the property
      * @param isAId the id of the trait class of the property
      * @return the Term of the added / updated property
-     * @throws MiddlewareQueryException
-     * @throws MiddlewareException 
+     * @throws MiddlewareQueryException the middleware query exception
+     * @throws MiddlewareException the middleware exception
      */
     Property addOrUpdateProperty(String name, String definition, int isAId) throws MiddlewareQueryException, MiddlewareException;
 
+    /**
+     * Delete property.
+     *
+     * @param cvTermId the cv term id
+     * @param isAId the is a id
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    void deleteProperty(int cvTermId, int isAId) throws MiddlewareQueryException;
+    
     /**
      * Save a property.
      *
@@ -215,18 +224,27 @@ public interface OntologyService {
     Scale addScale(String name, String definition) throws MiddlewareQueryException;
     
     /**
-     * Adds or updates a scale with the given name and definition. 
+     * Adds or updates a scale with the given name and definition.
      * If the given scale name is not found in the databases, a new record is added to local database.
-     * If the given name is already found in local database, update is performed. 
+     * If the given name is already found in local database, update is performed.
      * If the given name is already found in central database, no update is performed.
-     * 
+     *
      * @param name the name of the scale
      * @param definition the defintion of the scale
      * @return the Term of the added / updated scale
-     * @throws MiddlewareQueryException
-     * @throws MiddlewareException 
+     * @throws MiddlewareQueryException the middleware query exception
+     * @throws MiddlewareException the middleware exception
      */
     Scale addOrUpdateScale(String name, String definition) throws MiddlewareQueryException, MiddlewareException;
+    
+    
+    /**
+     * Delete scale.
+     *
+     * @param cvTermId the cv term id
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    void deleteScale(int cvTermId) throws MiddlewareQueryException;
 
     /*======================= METHOD ================================== */
 
@@ -269,20 +287,26 @@ public interface OntologyService {
     Method addMethod(String name, String definition) throws MiddlewareQueryException;
 
     /**
-     * Adds or updates a method with the given name and definition. 
+     * Adds or updates a method with the given name and definition.
      * If the given method name is not found in the databases, a new record is added to local database.
-     * If the given name is already found in local database, update is performed. 
+     * If the given name is already found in local database, update is performed.
      * If the given name is already found in central database, no update is performed.
-     * 
+     *
      * @param name the name of the method
      * @param definition the defintion of the method
      * @return the Term of the added / updated method
-     * @throws MiddlewareQueryException
-     * @throws MiddlewareException 
+     * @throws MiddlewareQueryException the middleware query exception
+     * @throws MiddlewareException the middleware exception
      */
     Method addOrUpdateMethod(String name, String definition) throws MiddlewareQueryException, MiddlewareException;
 
-
+    /**
+     * Delete method.
+     *
+     * @param cvTermId the cv term id
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    void deleteMethod(int cvTermId) throws MiddlewareQueryException;
     /*======================= OTHERS ================================== */
 
 
@@ -318,7 +342,6 @@ public interface OntologyService {
      *
      * @param name the name
      * @param definition the definition
-     * @param cvId the cv id
      * @return the term
      * @throws MiddlewareQueryException the middleware query exception
      */
@@ -326,7 +349,7 @@ public interface OntologyService {
     
     
     /**
-     * Adds a new trait class to the database if it does not exist. 
+     * Adds a new trait class to the database if it does not exist.
      * Otherwise, the existing trait class & its relationship is updated.
      * Returns a negative id.
      *
@@ -334,9 +357,17 @@ public interface OntologyService {
      * @param definition the definition
      * @return the term
      * @throws MiddlewareQueryException the middleware query exception
-     * @throws MiddlewareException 
+     * @throws MiddlewareException the middleware exception
      */
     Term addOrUpdateTraitClass(String name, String definition) throws MiddlewareQueryException, MiddlewareException;
+    
+    /**
+     * Delete trait class.
+     *
+     * @param cvTermId the cv term id
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    void deleteTraitClass(int cvTermId) throws MiddlewareQueryException;
     
     /**
      * Gets all roles.
@@ -409,10 +440,11 @@ public interface OntologyService {
 
     /**
      * Insert or Update a Standard Variable.
-     * @param standardVariable
-     * @param operation
-     * @throws MiddlewareQueryException
-     * @throws MiddlewareException
+     *
+     * @param standardVariable the standard variable
+     * @param operation the operation
+     * @throws MiddlewareQueryException the middleware query exception
+     * @throws MiddlewareException the middleware exception
      */
     void saveOrUpdateStandardVariable(StandardVariable standardVariable, Operation operation) throws MiddlewareQueryException, MiddlewareException;
 }

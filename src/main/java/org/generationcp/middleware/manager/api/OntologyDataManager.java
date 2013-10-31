@@ -407,15 +407,35 @@ public interface OntologyDataManager {
      * @return the standard variable id by term id
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public Integer getStandardVariableIdByTermId(int cvTermId, TermId termId) throws MiddlewareQueryException;
+    Integer getStandardVariableIdByTermId(int cvTermId, TermId termId) throws MiddlewareQueryException;
 
     /**
      * Insert or Update a Standard Variable.
-     * @param standardVariable
-     * @param operation
-     * @throws MiddlewareQueryException
-     * @throws MiddlewareException
+     *
+     * @param standardVariable the standard variable
+     * @param operation the operation
+     * @throws MiddlewareQueryException the middleware query exception
+     * @throws MiddlewareException the middleware exception
      */
     void saveOrUpdateStandardVariable(StandardVariable standardVariable, Operation operation) throws MiddlewareQueryException, MiddlewareException;
 
+    /**
+     * Delete term.
+     *
+     * @param cvTermId the cv term id
+     * @param cvId the cv id
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    void deleteTerm(int cvTermId, CvId cvId) throws MiddlewareQueryException;
+    
+    /**
+     * Delete term and relationship.
+     *
+     * @param cvTermId the cv term id
+     * @param cvId the cv id
+     * @param typeId the type id
+     * @param objectId the object id
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    void deleteTermAndRelationship(int cvTermId, CvId cvId, int typeId, int objectId) throws MiddlewareQueryException;
 }

@@ -752,8 +752,81 @@ public class TestOntologyDataManagerImpl {
     
     @Test
     public void testGetStandardVariableIdByTermId() throws Exception {
-        Integer stdVariableId = manager.getStandardVariableIdByTermId(-59, TermId.HAS_PROPERTY);
+        StandardVariable stdVariable = new StandardVariable();
+        stdVariable.setName("variable name " + new Random().nextInt(10000));
+        stdVariable.setDescription("variable description");
+        stdVariable.setProperty(new Term(2002, "User", "Database user"));
+        stdVariable.setMethod(new Term(4030, "Assigned", "Term, name or id assigned"));
+        stdVariable.setScale(new Term(6000, "DBCV", "Controlled vocabulary from a database"));
+        stdVariable.setStoredIn(new Term(1010, "Study information", "Study element"));
+        stdVariable.setDataType(new Term(1120, "Character variable", "variable with char values"));
+        stdVariable.setIsA(new Term(1050,"Study condition","Study condition class"));
+        stdVariable.setNameSynonyms(new ArrayList<NameSynonym>());
+        stdVariable.getNameSynonyms().add(new NameSynonym("Person", NameType.ALTERNATIVE_ENGLISH));
+        stdVariable.getNameSynonyms().add(new NameSynonym("Tiga-gamit", NameType.ALTERNATIVE_FRENCH));
+        stdVariable.setEnumerations(new ArrayList<Enumeration>());
+        stdVariable.getEnumerations().add(new Enumeration(10000, "N", "Nursery", 1));
+        stdVariable.getEnumerations().add(new Enumeration(10001, "HB", "Hybridization nursery", 2));
+        stdVariable.getEnumerations().add(new Enumeration(10002, "PN", "Pedigree nursery", 3));
+        stdVariable.setConstraints(new VariableConstraints(100, 999));
+        
+        manager.addStandardVariable(stdVariable);
+        
+        Integer stdVariableId = manager.getStandardVariableIdByTermId(stdVariable.getProperty().getId(), TermId.HAS_PROPERTY);
         Debug.println(0, "From db:  " + stdVariableId);
+    }
+    
+    @Test
+    public void testDeleteTerm() throws Exception {
+        //terms to be deleted should be from local db
+        
+        String name = "Test Method " + new Random().nextInt(10000);
+        String definition = "Test Definition";
+        
+        //add a method, should allow insert
+        
+        CvId cvId = CvId.METHODS;
+        Term term = manager.addTerm(name, definition, cvId);
+        
+        manager.deleteTerm(term.getId(), cvId);
+        
+        //check if value does not exist anymore
+        term = manager.getTermById(term.getId());
+        assertNull(term);
+        
+        name = "Test Scale " + new Random().nextInt(10000);
+        definition = "Test Definition";
+        
+        cvId = CvId.SCALES;
+        term = manager.addTerm(name, definition, cvId);
+        
+        manager.deleteTerm(term.getId(), cvId);
+        
+        //check if value does not exist anymore
+        term = manager.getTermById(term.getId());
+        assertNull(term);
+    }
+    
+    @Test
+    public void testDeleteTermAndRelationship() throws Exception {
+        String name = "Test Property" + new Random().nextInt(10000);
+        String definition = "Property Definition";
+        int isA = 1087;
+        
+        Term term = manager.addProperty(name, definition, isA);
+        manager.deleteTermAndRelationship(term.getId(), CvId.PROPERTIES, TermId.IS_A.getId(), isA);
+        
+        term= manager.getTermById(term.getId());
+        assertNull(term);
+        
+        name = "Test Trait Class " + new Random().nextInt(10000);
+        definition = "Test Definition";
+        
+        term = manager.addTraitClass(name, definition);
+        manager.deleteTermAndRelationship(term.getId(), CvId.IBDB_TERMS, TermId.IS_A.getId(), TermId.ONTOLOGY_TRAIT_CLASS.getId());
+        
+        term = manager.getTermById(term.getId());
+        assertNull(term);
     }
 
 }

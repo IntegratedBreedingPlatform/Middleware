@@ -657,6 +657,70 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             throw new MiddlewareQueryException("Error in saveOrUpdateStandardVariable " + e.getMessage(), e);
         }
     }
+    
+    @Override
+    public void deleteTerm(int cvTermId, CvId cvId) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+        
+        try {
+            
+            if (cvTermId >= 0) {
+                throw new MiddlewareException(getTermById(cvTermId).getName() + " is retrieved from the central database and cannot be updated.");
+            }
+            
+            if (CvId.VARIABLES.getId() != cvId.getId()) {
+                trans = session.beginTransaction();
+                getTermSaver().delete(getCvTermDao().getById(cvTermId), cvId);
+                trans.commit();
+            } else {
+                throw new MiddlewareQueryException("variables cannot be used in this method");
+            }
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            throw new MiddlewareQueryException("error in addTerm " + e.getMessage(), e);
+        }
+    }
+    
+    @Override
+    public void deleteTermAndRelationship(int cvTermId, CvId cvId, int typeId, int objectId) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        try {
+            if (cvTermId >= 0) {
+                throw new MiddlewareException(getTermById(cvTermId).getName() + " is retrieved from the central database and cannot be updated.");
+            }
+            
+            if (CvId.VARIABLES.getId() != cvId.getId()) {
+                trans = session.beginTransaction();
+                deleteCvTermRelationship(cvTermId, objectId, typeId);
+                getTermSaver().delete(getCvTermDao().getById(cvTermId), cvId);
+                trans.commit();
+            } else {
+                throw new MiddlewareQueryException("variables cannot be used in this method");
+            }
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            throw new MiddlewareQueryException("Error in deleteTermAndRelationship: " + e.getMessage(), e);
+        }
+    }
+        
+    private void deleteCvTermRelationship(int subjectId, int objectId, int typeId) throws MiddlewareQueryException, MiddlewareException {
+        Term typeTerm = getTermById(typeId);
+        if (typeTerm != null) {
+            CVTermRelationship cvRelationship = getCvTermRelationshipDao().getRelationshipSubjectIdObjectIdByTypeId(subjectId, objectId, typeId);
+            if(cvRelationship != null){ 
+                if (cvRelationship.getCvTermRelationshipId() >= 0) { 
+                    throw new MiddlewareException("Error in deleteCvTermRelationship: Relationship found in central - cannot be deleted.");
+                }
+    
+                getTermRelationshipSaver().deleteRelationship(cvRelationship);
+            }
+        }
+    }
 
 }
 
