@@ -212,7 +212,7 @@ public class StandardVariableSaver extends Saver {
         Term term = getTermBuilder().findTermByName(standardVariable.getName(), CvId.VARIABLES);
         if (term != null && (operation == Operation.ADD || operation == Operation.UPDATE && term.getId() != standardVariable.getId())) {
             errorCodes = new StringBuilder();
-            errorCodes.append(ErrorCode.NON_UNIQUE_NAME.toString());
+            errorCodes.append(ErrorCode.NON_UNIQUE_NAME.getCode());
         }
 
         Integer varId = getStandardVariableBuilder().getIdByPropertyScaleMethod(
@@ -226,7 +226,7 @@ public class StandardVariableSaver extends Saver {
             else {
                 errorCodes.append(",");
             }
-            errorCodes.append(ErrorCode.NON_UNIQUE_PCM_COMBINATION.toString());
+            errorCodes.append(ErrorCode.NON_UNIQUE_PCM_COMBINATION.getCode());
         }
         
         return errorCodes != null ? errorCodes.toString() : null;
