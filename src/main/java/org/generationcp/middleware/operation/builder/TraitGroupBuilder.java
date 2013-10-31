@@ -38,11 +38,12 @@ public class TraitGroupBuilder extends Builder {
      * @return
      * @throws MiddlewareQueryException
      */
+	@Deprecated
 	public List<TraitClassReference> buildTraitGroupHierarchy(TermId classType) throws MiddlewareQueryException {
 
         // Step 1: Get all Trait Classes from Central and Local
 	    List<TraitClassReference> traitClasses = getTraitClasses(classType);
-	    
+	    	    
         // Step 2: Get all Trait Class Properties from Central and Local
         setPropertiesOfTraitClasses(Database.CENTRAL, traitClasses);
         setPropertiesOfTraitClasses(Database.LOCAL, traitClasses);
@@ -53,21 +54,25 @@ public class TraitGroupBuilder extends Builder {
             setStandardVariablesOfProperties(Database.LOCAL, traitClass.getProperties());
         }
 
+        // Step 4: Build and sort tree
+//        traitClasses = buildTree(traitClasses, classType.getId());
+//        sortTree(traitClasses);
+        
+
 	    return traitClasses;
 	}
 	
     /** 
-     * Gets all the Trait Classes with properties and standard variables in a hierarchy 
+     * Gets all the Trait Classes with properties and standard variables in a hierarchical structure 
      * from both Central and Local databases
      * 
      * @return
      * @throws MiddlewareQueryException
      */
-    public List<TraitClassReference> buildAllTraitGroupsHierarchy() throws MiddlewareQueryException {
+    public List<TraitClassReference> getAllTraitGroupsHierarchy() throws MiddlewareQueryException {
 
         // Step 1: Get all Trait Classes from Central and Local
-        List<TraitClassReference> traitClasses = getTraitClasses(TermId.ONTOLOGY_TRAIT_CLASS);
-        traitClasses = getTraitClasses(TermId.ONTOLOGY_RESEARCH_CLASS);
+        List<TraitClassReference> traitClasses = getAllTraitClasses();
         
         // Step 2: Get all Trait Class Properties from Central and Local
         setPropertiesOfTraitClasses(Database.CENTRAL, traitClasses);
@@ -79,25 +84,68 @@ public class TraitGroupBuilder extends Builder {
             setStandardVariablesOfProperties(Database.LOCAL, traitClass.getProperties());
         }
 
+        // Step 4: Build and sort tree
+        traitClasses = buildTree(traitClasses, TermId.IBDB_CLASS.getId());
+        sortTree(traitClasses);
+        
         return traitClasses;
     }
-	
+    
+    
     /** 
-     * Gets all Trait Classes from Central and Local
+     * Gets all the Trait Classes in a hierarchical structure from both Central and Local databases
      * 
      * @return
      * @throws MiddlewareQueryException
      */
-	public List<TraitClassReference> getAllTraitClasses() throws MiddlewareQueryException {
-        List<TraitClassReference> traitClasses = new ArrayList<TraitClassReference>();
-        traitClasses.addAll(getTraitClasses(Database.CENTRAL, TermId.ONTOLOGY_TRAIT_CLASS));
-        traitClasses.addAll(getTraitClasses(Database.LOCAL, TermId.ONTOLOGY_TRAIT_CLASS));
-        traitClasses.addAll(getTraitClasses(Database.CENTRAL, TermId.ONTOLOGY_RESEARCH_CLASS));
-        traitClasses.addAll(getTraitClasses(Database.LOCAL, TermId.ONTOLOGY_RESEARCH_CLASS));
+    public List<TraitClassReference> getAllTraitClassesHierarchy() throws MiddlewareQueryException {
+        List<TraitClassReference> traitClasses = getAllTraitClasses();
+        traitClasses = buildTree(traitClasses, TermId.IBDB_CLASS.getId());
+        sortTree(traitClasses);
+        return traitClasses;
+    }
+	
+    /** 
+     * Gets all Trait Classes in a flat table form from Central and Local
+     * 
+     * @return
+     * @throws MiddlewareQueryException
+     */
+	private List<TraitClassReference> getAllTraitClasses() throws MiddlewareQueryException {
+	    List<TraitClassReference> traitClasses = new ArrayList<TraitClassReference>();
+        setWorkingDatabase(Database.CENTRAL);
+        traitClasses.addAll(getCvTermDao().getAllTraitClasses());  
+        setWorkingDatabase(Database.LOCAL);
+        traitClasses.addAll(getCvTermDao().getAllTraitClasses());  
         Collections.sort(traitClasses);
         return traitClasses;
 	}
 	
+	
+    private List<TraitClassReference> buildTree(List<TraitClassReference> traitClasses, int parentTraitClassId){
+        List<TraitClassReference> childrenTraitClasses = new ArrayList<TraitClassReference>();
+        for (TraitClassReference traitClass : traitClasses){
+            if (traitClass.getParentTraitClassId() == parentTraitClassId){
+                traitClass.setTraitClassChildren(buildTree(traitClasses, traitClass.getId()) );
+                childrenTraitClasses.add(traitClass);
+            }
+        }
+        return childrenTraitClasses;
+    }
+
+    private void sortTree(List<TraitClassReference> traitClasses){
+        for (TraitClassReference traitClass : traitClasses){
+            sortChildren(traitClass);
+        }
+    }
+    
+    private void sortChildren(TraitClassReference traitClass){
+        traitClass.sortTraitClassChildren();
+        for (TraitClassReference child : traitClass.getTraitClassChildren()){
+            sortChildren(child);
+        }
+    }
+    
 	/**
 	 * Gets trait classes from central and local of the given class type
 	 * 
@@ -105,17 +153,15 @@ public class TraitGroupBuilder extends Builder {
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
+    @Deprecated
 	public List<TraitClassReference> getTraitClasses(TermId classType) throws MiddlewareQueryException {
         List<TraitClassReference> traitClasses = new ArrayList<TraitClassReference>();
-        traitClasses.addAll(getTraitClasses(Database.CENTRAL, classType));
-        traitClasses.addAll(getTraitClasses(Database.LOCAL, classType));
+        setWorkingDatabase(Database.CENTRAL);
+        traitClasses.addAll(getCvTermDao().getTraitClasses(classType));  
+        setWorkingDatabase(Database.LOCAL);
+        traitClasses.addAll(getCvTermDao().getTraitClasses(classType));  
         Collections.sort(traitClasses);
         return traitClasses;
-    }
-    
-    private List<TraitClassReference> getTraitClasses(Database instance, TermId classType) throws MiddlewareQueryException{
-        setWorkingDatabase(instance);
-        return getCvTermDao().getTraitClasses(classType);
     }
 
     private void setPropertiesOfTraitClasses(Database instance, List<TraitClassReference> traitClasses) throws MiddlewareQueryException{

@@ -316,26 +316,6 @@ public class TestOntologyServiceImpl {
         Debug.println(3, NUMBER_OF_RECORDS + traitGroups.size());
     }
 
-
-    
-    @Test
-    public void testGetTraitGroupsOntologyTraitClass() throws Exception {
-        List<TraitClassReference> traitGroups = ontologyService.getTraitGroupsHierarchy(TermId.ONTOLOGY_TRAIT_CLASS);
-        for (TraitClassReference traitGroup : traitGroups){
-            traitGroup.print(3);
-        }
-        Debug.println(3, NUMBER_OF_RECORDS + traitGroups.size());
-    }
-    
-    @Test
-    public void testGetTraitGroupsOntologyResearchClass() throws Exception {
-        List<TraitClassReference> traitGroups = ontologyService.getTraitGroupsHierarchy(TermId.ONTOLOGY_RESEARCH_CLASS);
-        for (TraitClassReference traitGroup : traitGroups){
-            traitGroup.print(3);
-        }
-        Debug.println(3, NUMBER_OF_RECORDS + traitGroups.size());
-    }
-    
     @Test
     public void testGetAllTraitClasses() throws MiddlewareQueryException {
         List<TraitClassReference> traitClasses = ontologyService.getAllTraitClasses();           
@@ -346,24 +326,6 @@ public class TestOntologyServiceImpl {
         Debug.println(3, NUMBER_OF_RECORDS + traitClasses.size());
     }
     
-
-    @Test
-    public void testGetAllTraitClassesOntologyTraitClass() throws Exception {
-        List<TraitClassReference> traitClasses = ontologyService.getTraitClasses(TermId.ONTOLOGY_TRAIT_CLASS);
-        for (TraitClassReference traitClass : traitClasses){
-            traitClass.print(3);
-        }
-        Debug.println(3, NUMBER_OF_RECORDS + traitClasses.size());
-    }
-
-    @Test
-    public void testGetAllTraitClassesOntologyResearchClass() throws Exception {
-        List<TraitClassReference> traitClasses = ontologyService.getTraitClasses(TermId.ONTOLOGY_RESEARCH_CLASS);
-        for (TraitClassReference traitClass : traitClasses){
-            traitClass.print(3);
-        }
-        Debug.println(3, NUMBER_OF_RECORDS + traitClasses.size());
-    }
 
     @Test
     public void testGetAllRoles() throws MiddlewareQueryException {

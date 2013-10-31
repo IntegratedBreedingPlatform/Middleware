@@ -12,6 +12,7 @@
 package org.generationcp.middleware.domain.oms;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.generationcp.middleware.domain.dms.Reference;
@@ -26,7 +27,7 @@ import org.generationcp.middleware.util.Debug;
  */
 public class TraitClassReference extends Reference implements Comparable<TraitClassReference>{
     
-    private TermId classType; // Either TermId.ONTOLOGY_TRAIT_CLASS or TermId.ONTOLOGY_RESEARCH_CLASS
+    private int parentTraitClassId; // Either TermId.ONTOLOGY_TRAIT_CLASS or TermId.ONTOLOGY_RESEARCH_CLASS for first-level class
     
     private List<TraitClassReference> traitClassChildren;
     
@@ -43,10 +44,10 @@ public class TraitClassReference extends Reference implements Comparable<TraitCl
         super.setDescription(description);
     }
 
-    public TraitClassReference(Integer id, String name, String description, TermId classType) {
+    public TraitClassReference(Integer id, String name, String description, int parentTraitClassId) {
         this(id, name);
         super.setDescription(description);
-        this.setClassType(classType);
+        this.setParentTraitClassId(parentTraitClassId);
     }
 
     /**
@@ -64,17 +65,17 @@ public class TraitClassReference extends Reference implements Comparable<TraitCl
     }
     
     /**
-     * @return the classType
+     * @return the parentTraitClassId
      */
-    public TermId getClassType() {
-        return classType;
+    public int getParentTraitClassId() {
+        return parentTraitClassId;
     }
 
     /**
-     * @param classType the classType to set
+     * @param parentTraitClassId the parent trait class ID to set
      */
-    public void setClassType(TermId classType) {
-        this.classType = classType;
+    public void setParentTraitClassId(int parentTraitClassId) {
+        this.parentTraitClassId = parentTraitClassId;
     }
 
     /**
@@ -90,6 +91,17 @@ public class TraitClassReference extends Reference implements Comparable<TraitCl
     public void setTraitClassChildren(List<TraitClassReference> traitClassChildren) {
         this.traitClassChildren = traitClassChildren;
     }
+    
+    public void addTraitClassChild(TraitClassReference traitClassChild){
+        if (traitClassChildren == null){
+            traitClassChildren = new ArrayList<TraitClassReference>();
+        }
+        traitClassChildren.add(traitClassChild);
+    }
+    
+    public void sortTraitClassChildren(){
+        Collections.sort(traitClassChildren);
+    }
 
     @Override
     public String toString() {
@@ -100,6 +112,10 @@ public class TraitClassReference extends Reference implements Comparable<TraitCl
         builder.append(getName());
         builder.append(", description=");
         builder.append(getDescription());
+        builder.append(", parentTraitClassId=");
+        builder.append(getParentTraitClassId());
+        builder.append(", traitClassChildren=");
+        builder.append(traitClassChildren);
         builder.append(", properties=");
         builder.append(properties);
         builder.append("]");
@@ -111,6 +127,15 @@ public class TraitClassReference extends Reference implements Comparable<TraitCl
         Debug.println(indent + 3, "Id: " + getId());
         Debug.println(indent + 3, "Name: " + getName());
         Debug.println(indent + 3, "Description: " + getDescription());
+        Debug.println(indent + 3, "Parent Class ID: " + getParentTraitClassId());
+        
+        Debug.println(indent + 3, "Trait Class Children: ");
+        if (traitClassChildren != null && !traitClassChildren.isEmpty()){
+            for (TraitClassReference child : traitClassChildren){
+                child.print(indent+6);
+            }
+        }
+        
         Debug.println(indent + 3, "Properties: ");
         for (PropertyReference property : properties){
             property.print(indent + 6);

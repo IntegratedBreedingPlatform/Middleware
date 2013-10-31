@@ -354,6 +354,7 @@ public interface OntologyService {
      * @return The trait groups
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     List<TraitClassReference> getTraitGroupsHierarchy(TermId classType) throws MiddlewareQueryException;
 
     /**
@@ -371,6 +372,7 @@ public interface OntologyService {
      * @return The trait classes of the given class type
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     List<TraitClassReference> getTraitClasses(TermId classType) throws MiddlewareQueryException;
 
        

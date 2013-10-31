@@ -737,7 +737,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	}
 
     /**
-     * Returns the entries in cvterm of all trait classes (with subject_id entry in cvterm_relationship where object_id = 1330 and type_id = 1225)
+     * Returns the entries in cvterm of all trait classes (with subject_id entry in cvterm_relationship where object_id = classType and type_id = 1225)
      */
     public List<TraitClassReference> getTraitClasses(TermId classType) throws MiddlewareQueryException{
         
@@ -766,7 +766,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
                 String cvtermName = (String) row[1];
                 String cvtermDefinition = (String) row[2];
                 
-                traitClasses.add(new TraitClassReference(cvtermId, cvtermName, cvtermDefinition, classType));
+                traitClasses.add(new TraitClassReference(cvtermId, cvtermName, cvtermDefinition, classType.getId()));
             }
 
         } catch (HibernateException e) {
@@ -775,6 +775,54 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
         return traitClasses;
         
+    }
+    
+    /**
+     * Retrieves all the trait classes (id, name, definition, parent trait class)
+     *
+     * @param traitClassIds
+     * @return
+     */
+    public List<TraitClassReference> getAllTraitClasses() throws MiddlewareQueryException{
+        List<TraitClassReference> traitClasses = new ArrayList<TraitClassReference>();
+        
+        try {
+            /*
+             SELECT cvterm_id, name, definition, cvr.object_id
+             FROM cvterm cvt JOIN cvterm_relationship cvr 
+                 ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = 1225
+                 WHERE cv_id = 1000 AND object_id NOT IN (1000, 1002, 1003)
+                 ORDER BY cvr.object_id;
+            */ 
+
+            StringBuffer sqlString = new StringBuffer()
+                .append("SELECT cvterm_id, name, definition, cvr.object_id ")
+                .append("FROM cvterm cvt JOIN cvterm_relationship cvr ")
+                .append("ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = ").append(TermId.IS_A.getId()).append(" ")
+                .append("WHERE cv_id = 1000 AND object_id NOT IN (1000, 1002, 1003)  ")
+                .append("ORDER BY cvr.object_id ")
+                ;
+            
+            
+            SQLQuery query = getSession().createSQLQuery(sqlString.toString());
+
+            List<Object[]> list = query.list();
+
+            for (Object[] row : list) {
+                Integer id = (Integer) row[0];
+                String name = (String) row[1];
+                String definition = (String) row[2];
+                Integer isAId = (Integer) row[3];
+
+                traitClasses.add(new TraitClassReference(id, name, definition, isAId));
+            }
+
+        } catch (HibernateException e) {
+            logAndThrowException("Error at getAllTraitClasses() query on CVTermDao: " + e.getMessage(), e);
+        }
+        
+        return traitClasses;
+
     }
     
     /**
@@ -905,7 +953,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
     /*
      * Retrieves the standard variable linked to an ontology
      * */
-    public Integer getStandadardVariableIdByTermId(int cvTermId, TermId termId) throws MiddlewareQueryException {
+    public Integer getStandardVariableIdByTermId(int cvTermId, TermId termId) throws MiddlewareQueryException {
         try {
             StringBuilder queryString = new StringBuilder();
             queryString.append("SELECT DISTINCT cvr.subject_id ");

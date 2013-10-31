@@ -113,8 +113,8 @@ public class TestCvTermDao{
     @Test
     public void testGetOntologyTraitClasses() throws Exception {
         List<TraitClassReference> traitClasses = dao.getTraitClasses(TermId.ONTOLOGY_TRAIT_CLASS);
-        assertTrue(traitClasses.size()>0);
-        Debug.println(4, "testGetTraitClasses(): " );
+        assertTrue(traitClasses.size() > 0);
+        Debug.println(4, "testGetOntologyTraitClasses(): " );
         for (TraitClassReference trait : traitClasses){
             Debug.println(8, trait.toString());
         }
@@ -123,8 +123,18 @@ public class TestCvTermDao{
     @Test
     public void testGetOntologyResearchClasses() throws Exception {
         List<TraitClassReference> traitClasses = dao.getTraitClasses(TermId.ONTOLOGY_RESEARCH_CLASS);
-        assertTrue(traitClasses.size()>0);
+        assertTrue(traitClasses.size() > 0);
         Debug.println(4, "testGetTraitClasses(): " );
+        for (TraitClassReference trait : traitClasses){
+            Debug.println(8, trait.toString());
+        }
+    }
+    
+    @Test
+    public void testGetAllTraitClasses() throws Exception {
+        List<TraitClassReference> traitClasses = dao.getAllTraitClasses();
+        assertTrue(traitClasses.size() > 0);
+        Debug.println(4, "testGetAllTraitClasses(): " );
         for (TraitClassReference trait : traitClasses){
             Debug.println(8, trait.toString());
         }

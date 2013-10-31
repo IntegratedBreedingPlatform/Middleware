@@ -32,7 +32,8 @@ public enum TermId {
 	, IS_A(1225)
 	, STORED_IN(1044)
 	
-	//Ontology 
+	//Ontology
+	, IBDB_CLASS(1001)
 	, ONTOLOGY_TRAIT_CLASS(1330)
 	, ONTOLOGY_RESEARCH_CLASS(1045)
 	

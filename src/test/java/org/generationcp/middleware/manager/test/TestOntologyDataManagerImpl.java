@@ -632,12 +632,11 @@ public class TestOntologyDataManagerImpl {
     }
     
     @Test
-    public void testGetAllTraitGroups() throws Exception {
+    public void testGetAllTraitGroupsHierarchy() throws Exception {
         List<TraitClassReference> traitGroups = manager.getAllTraitGroupsHierarchy();
         for (TraitClassReference traitGroup : traitGroups){
             traitGroup.print(3);
         }
-        Debug.println(3, NUMBER_OF_RECORDS + traitGroups.size());
     }
     
     @Test
@@ -664,7 +663,6 @@ public class TestOntologyDataManagerImpl {
         for (TraitClassReference traitClass : traitClasses){
             traitClass.print(3);
         }
-        Debug.println(3, NUMBER_OF_RECORDS + traitClasses.size());
     }
     
 

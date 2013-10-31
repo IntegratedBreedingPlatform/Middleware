@@ -224,6 +224,7 @@ public class OntologyServiceImpl extends Service implements OntologyService {
         return getOntologyDataManager().getAllTraitGroupsHierarchy();
     }
 
+    @Deprecated
     @Override
     public List<TraitClassReference> getTraitGroupsHierarchy(TermId classType) throws MiddlewareQueryException {
         return getOntologyDataManager().getTraitGroupsHierarchy(classType);
@@ -234,6 +235,7 @@ public class OntologyServiceImpl extends Service implements OntologyService {
         return getOntologyDataManager().getAllTraitClasses();
     }
 
+    @Deprecated
     @Override
     public List<TraitClassReference> getTraitClasses(TermId classType) throws MiddlewareQueryException{
         return getOntologyDataManager().getTraitClasses(classType);
