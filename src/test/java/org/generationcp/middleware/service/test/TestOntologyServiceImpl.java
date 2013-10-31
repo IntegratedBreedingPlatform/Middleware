@@ -26,7 +26,8 @@ import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Scale;
 import org.generationcp.middleware.domain.oms.Term;
-import org.generationcp.middleware.domain.oms.TraitReference;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.service.ServiceFactory;
@@ -254,24 +255,62 @@ public class TestOntologyServiceImpl {
 
     
     @Test
-    public void testGetTraitGroups() throws MiddlewareQueryException {
-        List<TraitReference> traitGroups = ontologyService.getTraitGroups();           
+    public void testGetAllTraitGroups() throws MiddlewareQueryException {
+        List<TraitClassReference> traitGroups = ontologyService.getAllTraitGroupsHierarchy();           
         assertFalse(traitGroups.isEmpty());
-        for (TraitReference traitGroup : traitGroups){
+        for (TraitClassReference traitGroup : traitGroups){
             traitGroup.print(3);
         }
-
+        Debug.println(3, NUMBER_OF_RECORDS + traitGroups.size());
     }
 
+
+    
+    @Test
+    public void testGetTraitGroupsOntologyTraitClass() throws Exception {
+        List<TraitClassReference> traitGroups = ontologyService.getTraitGroupsHierarchy(TermId.ONTOLOGY_TRAIT_CLASS);
+        for (TraitClassReference traitGroup : traitGroups){
+            traitGroup.print(3);
+        }
+        Debug.println(3, NUMBER_OF_RECORDS + traitGroups.size());
+    }
+    
+    @Test
+    public void testGetTraitGroupsOntologyResearchClass() throws Exception {
+        List<TraitClassReference> traitGroups = ontologyService.getTraitGroupsHierarchy(TermId.ONTOLOGY_RESEARCH_CLASS);
+        for (TraitClassReference traitGroup : traitGroups){
+            traitGroup.print(3);
+        }
+        Debug.println(3, NUMBER_OF_RECORDS + traitGroups.size());
+    }
+    
     @Test
     public void testGetAllTraitClasses() throws MiddlewareQueryException {
-        List<TraitReference> traitClasses = ontologyService.getAllTraitClasses();           
+        List<TraitClassReference> traitClasses = ontologyService.getAllTraitClasses();           
         assertFalse(traitClasses.isEmpty());
-        for (TraitReference traitClass : traitClasses){
+        for (TraitClassReference traitClass : traitClasses){
             traitClass.print(3);
         }
         Debug.println(3, NUMBER_OF_RECORDS + traitClasses.size());
+    }
+    
 
+    @Test
+    public void testGetAllTraitClassesOntologyTraitClass() throws Exception {
+        List<TraitClassReference> traitClasses = ontologyService.getTraitClasses(TermId.ONTOLOGY_TRAIT_CLASS);
+        for (TraitClassReference traitClass : traitClasses){
+            traitClass.print(3);
+        }
+        Debug.println(3, NUMBER_OF_RECORDS + traitClasses.size());
+    }
+
+    @Test
+    public void testGetAllTraitClassesOntologyResearchClass() throws Exception {
+        List<TraitClassReference> traitClasses = ontologyService.getTraitClasses(TermId.ONTOLOGY_RESEARCH_CLASS);
+        for (TraitClassReference traitClass : traitClasses){
+            traitClass.print(3);
+        }
+        Debug.println(3, NUMBER_OF_RECORDS + traitClasses.size());
     }
 
     @Test
@@ -290,9 +329,7 @@ public class TestOntologyServiceImpl {
         String name = "Test Trait Class " + new Random().nextInt(10000);
         String definition = "Test Definition";
         
-        //add a method, should allow insert
-        
-        Term term = ontologyService.addTraitClass(name, definition);
+        Term term = ontologyService.addTraitClass(name, definition, TermId.ONTOLOGY_TRAIT_CLASS.getId()).getTerm();
         assertNotNull(term);
         assertTrue(term.getId() < 0);
         Debug.println(0, "testAddTraitClasses():  " + term);

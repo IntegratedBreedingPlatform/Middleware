@@ -23,7 +23,8 @@ import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Scale;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.oms.TraitReference;
+import org.generationcp.middleware.domain.oms.TraitClass;
+import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -113,22 +114,19 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     }
     
     @Override
+    public void updateProperty(Property property) throws MiddlewareQueryException, MiddlewareException{
+        //TODO
+//        getOntologyDataManager().updateTermAndRelationship(property.getTerm(), property.getIsA());
+
+    }
+
+    @Override
     public void deleteProperty(int cvTermId, int isAId) throws MiddlewareQueryException {
         getOntologyDataManager().deleteTermAndRelationship(cvTermId, CvId.PROPERTIES, TermId.IS_A.getId(), isAId);
     }
     
     
     /*======================= SCALE ================================== */
-
-    @Override
-    public Term saveProperty(int propertyId, int isA) throws MiddlewareQueryException {
-
-        //we need to delete old isA relationship
-        
-        //we need to save new relationship
-        Term term = getOntologyDataManager().addPropertyIsARelationship(propertyId, isA);
-        return term;
-    }
 
     @Override
     public Scale getScale(int id) throws MiddlewareQueryException {
@@ -163,6 +161,11 @@ public class OntologyServiceImpl extends Service implements OntologyService {
         return new Scale(getOntologyDataManager().addOrUpdateTerm(name, definition, CvId.SCALES));
     }
     
+    @Override
+    public void updateScale(Scale scale) throws MiddlewareQueryException, MiddlewareException{
+        getOntologyDataManager().updateTerm(scale.getTerm());
+    }
+
     @Override
     public void deleteScale(int cvTermId) throws MiddlewareQueryException {
         getOntologyDataManager().deleteTerm(cvTermId, CvId.SCALES);
@@ -201,6 +204,12 @@ public class OntologyServiceImpl extends Service implements OntologyService {
         return new Method(getOntologyDataManager().addOrUpdateTerm(name, definition, CvId.METHODS));
     }
     
+    @Override
+    public void updateMethod(Method method) throws MiddlewareQueryException, MiddlewareException{
+        getOntologyDataManager().updateTerm(method.getTerm());
+    }
+
+    @Override
     public void deleteMethod(int cvTermId) throws MiddlewareQueryException {
         getOntologyDataManager().deleteTerm(cvTermId, CvId.METHODS);
     }
@@ -213,13 +222,23 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     }
     
     @Override
-    public List<TraitReference> getTraitGroups() throws MiddlewareQueryException {
-        return getOntologyDataManager().getTraitGroups();
+    public List<TraitClassReference> getAllTraitGroupsHierarchy() throws MiddlewareQueryException {
+        return getOntologyDataManager().getAllTraitGroupsHierarchy();
     }
 
     @Override
-    public List<TraitReference> getAllTraitClasses() throws MiddlewareQueryException{
+    public List<TraitClassReference> getTraitGroupsHierarchy(TermId classType) throws MiddlewareQueryException {
+        return getOntologyDataManager().getTraitGroupsHierarchy(classType);
+    }
+
+    @Override
+    public List<TraitClassReference> getAllTraitClasses() throws MiddlewareQueryException{
         return getOntologyDataManager().getAllTraitClasses();
+    }
+
+    @Override
+    public List<TraitClassReference> getTraitClasses(TermId classType) throws MiddlewareQueryException{
+        return getOntologyDataManager().getTraitClasses(classType);
     }
 
     @Override
@@ -249,16 +268,24 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     }
 
     @Override
-    public Term addTraitClass(String name, String definition) throws MiddlewareQueryException {
-        return getOntologyDataManager().addTraitClass(name, definition);
+    public TraitClass addTraitClass(String name, String definition, int parentTraitClassId) throws MiddlewareQueryException {
+        return getOntologyDataManager().addTraitClass(name, definition, parentTraitClassId);
     }
-    
     
     @Override
-    public Term addOrUpdateTraitClass(String name, String definition) throws MiddlewareQueryException, MiddlewareException {
-        return getOntologyDataManager()
-                .addOrUpdateTermAndRelationship(name, definition, CvId.IBDB_TERMS, TermId.IS_A.getId(), TermId.ONTOLOGY_TRAIT_CLASS.getId());
+    public TraitClass addOrUpdateTraitClass(String name, String definition, int parentTraitClassId) throws MiddlewareQueryException, MiddlewareException {
+        //TODO
+//        return getOntologyDataManager().addOrUpdateTermAndRelationship(name, definition, CvId.IBDB_TERMS, TermId.IS_A.getId(), parentTraitClassId);
+        return null;
     }
+
+    @Override
+    public void updateTraitClass(TraitClass traitClass) throws MiddlewareQueryException, MiddlewareException{
+        //TODO
+//        getOntologyDataManager().updateTermAndRelationship(traitClass.getId(), traitClass.getIsA());
+
+    }
+
     
     @Override
     public void deleteTraitClass(int cvTermId) throws MiddlewareQueryException {
@@ -292,4 +319,5 @@ public class OntologyServiceImpl extends Service implements OntologyService {
         
         getOntologyDataManager().saveOrUpdateStandardVariable(standardVariable, operation);
     }
+
 }

@@ -29,7 +29,7 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.PropertyReference;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.oms.TraitReference;
+import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.util.Debug;
@@ -739,22 +739,22 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
     /**
      * Returns the entries in cvterm of all trait classes (with subject_id entry in cvterm_relationship where object_id = 1330 and type_id = 1225)
      */
-    public List<TraitReference> getTraitClasses() throws MiddlewareQueryException{
+    public List<TraitClassReference> getTraitClasses(TermId classType) throws MiddlewareQueryException{
         
-        List<TraitReference> traitClasses = new ArrayList<TraitReference>();
+        List<TraitClassReference> traitClasses = new ArrayList<TraitClassReference>();
         
         try {
             /*
              SELECT cvterm_id, name, definition 
              FROM cvterm cvt JOIN cvterm_relationship cvr 
-                 ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = 1225 AND cvr.object_id = 1330;
+                 ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = 1225 AND cvr.object_id = 1330;  -- 1330 for Ontology Trait Class, 1045 for Ontology Research Class
             */ 
 
             StringBuffer sqlString = new StringBuffer()
                 .append("SELECT cvterm_id, name, definition ")
                 .append("FROM cvterm cvt JOIN cvterm_relationship cvr ")
                     .append("ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = ").append(TermId.IS_A.getId())
-                    .append(" AND cvr.object_id = ").append(TermId.ONTOLOGY_TRAIT_CLASS.getId()).append(" ")
+                    .append(" AND cvr.object_id = ").append(classType.getId()).append(" ")
                     .append(" AND cvt.cv_id = ").append(CvId.IBDB_TERMS.getId());
             
             SQLQuery query = getSession().createSQLQuery(sqlString.toString());
@@ -766,7 +766,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
                 String cvtermName = (String) row[1];
                 String cvtermDefinition = (String) row[2];
                 
-                traitClasses.add(new TraitReference(cvtermId, cvtermName, cvtermDefinition));
+                traitClasses.add(new TraitClassReference(cvtermId, cvtermName, cvtermDefinition, classType));
             }
 
         } catch (HibernateException e) {

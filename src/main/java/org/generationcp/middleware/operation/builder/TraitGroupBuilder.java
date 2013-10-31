@@ -18,7 +18,8 @@ import java.util.Map;
 
 import org.generationcp.middleware.domain.oms.PropertyReference;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
-import org.generationcp.middleware.domain.oms.TraitReference;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
@@ -31,23 +32,23 @@ public class TraitGroupBuilder extends Builder {
 	}
 
     /** 
-     * Gets all Trait Classes with properties and standard variables in a hierarchy from both Central and Local databases
+     * Gets the Trait Classes with properties and standard variables in a hierarchy 
+     * from both Central and Local databases based on the given class type.
      * 
      * @return
      * @throws MiddlewareQueryException
      */
-
-	public List<TraitReference> buildTraitGroupHierarchy() throws MiddlewareQueryException {
+	public List<TraitClassReference> buildTraitGroupHierarchy(TermId classType) throws MiddlewareQueryException {
 
         // Step 1: Get all Trait Classes from Central and Local
-	    List<TraitReference> traitClasses = getAllTraitClasses();
+	    List<TraitClassReference> traitClasses = getTraitClasses(classType);
 	    
         // Step 2: Get all Trait Class Properties from Central and Local
         setPropertiesOfTraitClasses(Database.CENTRAL, traitClasses);
         setPropertiesOfTraitClasses(Database.LOCAL, traitClasses);
 
         // Step 3: Get all StandardVariables of Properties from Central and Local
-        for (TraitReference traitClass : traitClasses){
+        for (TraitClassReference traitClass : traitClasses){
             setStandardVariablesOfProperties(Database.CENTRAL, traitClass.getProperties());
             setStandardVariablesOfProperties(Database.LOCAL, traitClass.getProperties());
         }
@@ -56,31 +57,73 @@ public class TraitGroupBuilder extends Builder {
 	}
 	
     /** 
+     * Gets all the Trait Classes with properties and standard variables in a hierarchy 
+     * from both Central and Local databases
+     * 
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    public List<TraitClassReference> buildAllTraitGroupsHierarchy() throws MiddlewareQueryException {
+
+        // Step 1: Get all Trait Classes from Central and Local
+        List<TraitClassReference> traitClasses = getTraitClasses(TermId.ONTOLOGY_TRAIT_CLASS);
+        traitClasses = getTraitClasses(TermId.ONTOLOGY_RESEARCH_CLASS);
+        
+        // Step 2: Get all Trait Class Properties from Central and Local
+        setPropertiesOfTraitClasses(Database.CENTRAL, traitClasses);
+        setPropertiesOfTraitClasses(Database.LOCAL, traitClasses);
+
+        // Step 3: Get all StandardVariables of Properties from Central and Local
+        for (TraitClassReference traitClass : traitClasses){
+            setStandardVariablesOfProperties(Database.CENTRAL, traitClass.getProperties());
+            setStandardVariablesOfProperties(Database.LOCAL, traitClass.getProperties());
+        }
+
+        return traitClasses;
+    }
+	
+    /** 
      * Gets all Trait Classes from Central and Local
      * 
      * @return
      * @throws MiddlewareQueryException
      */
-	public List<TraitReference> getAllTraitClasses() throws MiddlewareQueryException {
-        List<TraitReference> traitClasses = new ArrayList<TraitReference>();
-        traitClasses.addAll(getTraitClasses(Database.CENTRAL));
-        traitClasses.addAll(getTraitClasses(Database.LOCAL));
+	public List<TraitClassReference> getAllTraitClasses() throws MiddlewareQueryException {
+        List<TraitClassReference> traitClasses = new ArrayList<TraitClassReference>();
+        traitClasses.addAll(getTraitClasses(Database.CENTRAL, TermId.ONTOLOGY_TRAIT_CLASS));
+        traitClasses.addAll(getTraitClasses(Database.LOCAL, TermId.ONTOLOGY_TRAIT_CLASS));
+        traitClasses.addAll(getTraitClasses(Database.CENTRAL, TermId.ONTOLOGY_RESEARCH_CLASS));
+        traitClasses.addAll(getTraitClasses(Database.LOCAL, TermId.ONTOLOGY_RESEARCH_CLASS));
         Collections.sort(traitClasses);
         return traitClasses;
 	}
 	
-	
-    private List<TraitReference> getTraitClasses(Database instance) throws MiddlewareQueryException{
+	/**
+	 * Gets trait classes from central and local of the given class type
+	 * 
+	 * @param classType
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	public List<TraitClassReference> getTraitClasses(TermId classType) throws MiddlewareQueryException {
+        List<TraitClassReference> traitClasses = new ArrayList<TraitClassReference>();
+        traitClasses.addAll(getTraitClasses(Database.CENTRAL, classType));
+        traitClasses.addAll(getTraitClasses(Database.LOCAL, classType));
+        Collections.sort(traitClasses);
+        return traitClasses;
+    }
+    
+    private List<TraitClassReference> getTraitClasses(Database instance, TermId classType) throws MiddlewareQueryException{
         setWorkingDatabase(instance);
-        return getCvTermDao().getTraitClasses();
+        return getCvTermDao().getTraitClasses(classType);
     }
 
-    private void setPropertiesOfTraitClasses(Database instance, List<TraitReference> traitClasses) throws MiddlewareQueryException{
+    private void setPropertiesOfTraitClasses(Database instance, List<TraitClassReference> traitClasses) throws MiddlewareQueryException{
         
         setWorkingDatabase(instance);
         
         List<Integer> traitClassIds = new ArrayList<Integer>();
-        for (TraitReference traitClass : traitClasses){
+        for (TraitClassReference traitClass : traitClasses){
             traitClassIds.add(traitClass.getId());
         }
         Collections.sort(traitClassIds);
@@ -88,7 +131,7 @@ public class TraitGroupBuilder extends Builder {
         Map<Integer, List<PropertyReference>> retrievedProperties = getCvTermDao().getPropertiesOfTraitClasses(traitClassIds);
         
         if (!retrievedProperties.isEmpty()){
-            for (TraitReference traitClass : traitClasses){
+            for (TraitClassReference traitClass : traitClasses){
                 List<PropertyReference> traitClassProperties = traitClass.getProperties();
                 if (traitClassProperties != null && retrievedProperties.get(traitClass.getId()) != null){
                     traitClassProperties.addAll(retrievedProperties.get(traitClass.getId()));

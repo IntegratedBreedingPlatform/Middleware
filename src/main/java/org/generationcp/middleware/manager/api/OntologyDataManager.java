@@ -22,12 +22,12 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.oms.TraitReference;
+import org.generationcp.middleware.domain.oms.TraitClass;
+import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 
-// TODO: Auto-generated Javadoc
 /**
  * This is the API for retrieving ontology data from the CHADO schema.
  * 
@@ -205,6 +205,20 @@ public interface OntologyDataManager {
 	 */
 	Term addTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException;
 	
+
+    /**
+     * Updates an existing term in the database. 
+     * This method searches for the given id in local. 
+     * If it exists, the corresponding name and definition are updated.
+     * 
+     * @param termId the term id
+     * @param name the name
+     * @param definition the definition
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+//    void updateTerm(int termId, String name, String definition) throws MiddlewareException, MiddlewareQueryException;
+    void updateTerm(Term term) throws MiddlewareException, MiddlewareQueryException;
+    
 	/**
 	 * Returns the list of Term entries based on possible data types.
 	 *
@@ -300,29 +314,53 @@ public interface OntologyDataManager {
 	 */
 	Property getProperty(String name) throws MiddlewareQueryException;
 	
+   /**
+     * Retrieves ALL the trait classes containing the hierarchical structure
+     * of the trait groups: Trait Group --> Properties --> Standard Variables.
+     * 
+     * The list is returned in alphabetical order of the name.
+     *
+     * @return the trait groups
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+
+    List<TraitClassReference> getAllTraitGroupsHierarchy() throws MiddlewareQueryException;
 	
 	/**
 	 * Retrieves the trait classes containing the hierarchical structure
 	 * of the trait groups: Trait Group --> Properties --> Standard Variables.
+	 * The records are retrieved based on the given class type. 
 	 * 
-	 * The lists are returned in alphabetical order of the name.
+	 * The list is returned in alphabetical order of the name.
 	 *
+     * @param classType can be either TermId.ONTOLOGY_TRAIT_CLASS or TermId.ONTOLOGY_RESEARCH_CLASS
 	 * @return the trait groups
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<TraitReference> getTraitGroups() throws MiddlewareQueryException;
+    List<TraitClassReference> getTraitGroupsHierarchy(TermId classType) throws MiddlewareQueryException;	
+
+    /**
+     * Retrieves all the trait classes from both crop research ontology 
+     * and crop ontology trait class from central and local.
+     * 
+     * The list is returned in alphabetical order of the name.
+     *
+     * @return List of TraitReference objects (id, name, description)  
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<TraitClassReference> getAllTraitClasses() throws MiddlewareQueryException;
 	
 
     /**
-     * Retrieves all the trait classes (id, name, description) from central and local.
+     * Returns trait classes based on the given type from both central and local databases. 
      * 
-     * The lists are returned in alphabetical order of the name.
-     *
-     * @return the all trait classes
-     * @throws MiddlewareQueryException the middleware query exception
+     * The list is returned in alphabetical order of the name.
+     * 
+     * @param classType can be either TermId.ONTOLOGY_TRAIT_CLASS or TermId.ONTOLOGY_RESEARCH_CLASS
+     * @return List of TraitReference objects (id, name, description)  
+     * @throws MiddlewareQueryException
      */
-    List<TraitReference> getAllTraitClasses() throws MiddlewareQueryException;
-	
+    List<TraitClassReference> getTraitClasses(TermId classType) throws MiddlewareQueryException;
     
     /**
      * Retrieves all the Term entries based on the given list of ids.
@@ -342,11 +380,10 @@ public interface OntologyDataManager {
      * @return the term
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public Term addTraitClass(String name, String definition) throws MiddlewareQueryException;
-
-    
+    public TraitClass addTraitClass(String name, String definition, int parentTraitClassId) throws MiddlewareQueryException;
+            
     /**
-     * Gets the all standard variable.
+     * Gets all the standard variables.
      *
      * @return the all standard variable
      * @throws MiddlewareQueryException the middleware query exception
@@ -354,26 +391,7 @@ public interface OntologyDataManager {
     public Set<StandardVariable> getAllStandardVariables() throws MiddlewareQueryException;
     
     /**
-     * Removes the is a relationship.
-     *
-     * @param propertyId the property id
-     * @return true, if successful
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    public boolean removeIsARelationship(int propertyId) throws MiddlewareQueryException;
-    
-    /**
-     * Adds the property is a relationship.
-     *
-     * @param propertyId the property id
-     * @param isAId the is a id
-     * @return the term
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    public Term addPropertyIsARelationship(int propertyId, int isAId) throws MiddlewareQueryException;
-
-    /**
-     * Adds the or update term and relationship.
+     * Adds or updates the term and relationship.
      *
      * @param name the name
      * @param definition the definition
@@ -388,7 +406,7 @@ public interface OntologyDataManager {
             throws MiddlewareQueryException, MiddlewareException;
 
     /**
-     * Adds the or update term.
+     * Adds or updates the term.
      *
      * @param name the name
      * @param definition the definition

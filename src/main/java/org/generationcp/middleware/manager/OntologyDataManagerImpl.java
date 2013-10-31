@@ -26,7 +26,8 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.oms.TraitReference;
+import org.generationcp.middleware.domain.oms.TraitClass;
+import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -283,6 +284,17 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             throw new MiddlewareQueryException("error in addTerm " + e.getMessage(), e);
         }
     }
+    
+    @Override
+//    public void updateTerm(int termId, String name, String definition) throws MiddlewareException, MiddlewareQueryException{
+    public void updateTerm(Term term) throws MiddlewareException, MiddlewareQueryException{
+        if (term.getId() >= 0){
+            throw new MiddlewareException("Error in updateTerm: Cannot update terms in central.");
+        }
+        
+        //TODO
+        
+    }
 
     @Override
     public List<Term> getDataTypes() throws MiddlewareQueryException {
@@ -462,14 +474,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
         return term;
     }
-        
-	
-	@Override
-    public boolean removeIsARelationship(int propertyId)
-            throws MiddlewareQueryException {
-        // TODO Auto-generated method stub
-        return false;
-    }
 
 	private Term saveOrUpdateCvTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException, MiddlewareException{
         Term term = findTermByName(name, cvId);
@@ -498,34 +502,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         }
 	}
 	
-    @Override
-    public Term addPropertyIsARelationship(int propertyId, int isAId) throws MiddlewareQueryException {
-        
-        requireLocalDatabaseInstance();
-        Session session = getCurrentSessionForLocal();
-        Transaction trans = null;
-        
-        Term term = getTermById(propertyId);        
-        if (term == null){
-            throw new MiddlewareQueryException("Error in adding property is_a relationship: property does not exist. ");
-        }
-        
-        if (getTermById(isAId) == null) {
-            throw new MiddlewareQueryException("Error in adding property is_a relationship: The isA passed is not a valid Class term: " + isAId);
-        }
-
-        try {
-            trans = session.beginTransaction();
-            saveOrUpdateCvTermRelationship(term.getId(), isAId, TermId.IS_A.getId());
-            trans.commit();
-        } catch (Exception e) {
-            rollbackTransaction(trans);
-            throw new MiddlewareQueryException("Error in addProperty " + e.getMessage(), e);
-        }
-
-        return term;
-    }
-
     @Override
 	public Property getProperty(int termId) throws MiddlewareQueryException {
 		Property property = new Property();
@@ -564,13 +540,23 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     }
 
     @Override
-    public List<TraitReference> getTraitGroups() throws MiddlewareQueryException {
-        return getTraitGroupBuilder().buildTraitGroupHierarchy();
+    public List<TraitClassReference> getAllTraitGroupsHierarchy() throws MiddlewareQueryException {
+        return getTraitGroupBuilder().buildAllTraitGroupsHierarchy();
     }
 
     @Override
-    public List<TraitReference> getAllTraitClasses() throws MiddlewareQueryException {
+    public List<TraitClassReference> getTraitGroupsHierarchy(TermId classType) throws MiddlewareQueryException {
+        return getTraitGroupBuilder().buildTraitGroupHierarchy(classType);
+    }
+
+    @Override
+    public List<TraitClassReference> getAllTraitClasses() throws MiddlewareQueryException {
         return getTraitGroupBuilder().getAllTraitClasses();
+    }
+    
+    @Override
+    public List<TraitClassReference> getTraitClasses(TermId classType) throws MiddlewareQueryException {
+        return getTraitGroupBuilder().getTraitClasses(classType);
     }
 
     @Override
@@ -579,11 +565,11 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     }
 
     @Override
-    public Term addTraitClass(String name, String definition) throws MiddlewareQueryException {
+    public TraitClass addTraitClass(String name, String definition, int parentTraitClassId) throws MiddlewareQueryException {
         Term term = findTermByName(name, CvId.IBDB_TERMS);
 
         if (term != null) {
-            return term;
+            return new TraitClass(term, getTermById(parentTraitClassId));
         }
 
         requireLocalDatabaseInstance();
@@ -595,7 +581,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             term = getTermSaver().save(name, definition, CvId.IBDB_TERMS);
 
             if (term != null) {
-                getTermRelationshipSaver().save(term.getId(), TermId.IS_A.getId(), TermId.ONTOLOGY_TRAIT_CLASS.getId());
+                getTermRelationshipSaver().save(term.getId(), TermId.IS_A.getId(), parentTraitClassId);
             }
 
             trans.commit();
@@ -603,8 +589,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             rollbackTransaction(trans);
             throw new MiddlewareQueryException("Error in addTraitClass " + e.getMessage(), e);
         }
+        return new TraitClass(term, getTermById(parentTraitClassId));
 
-        return term;
     }
     
     @Override
@@ -679,7 +665,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             }
         } catch (Exception e) {
             rollbackTransaction(trans);
-            throw new MiddlewareQueryException("error in addTerm " + e.getMessage(), e);
+            throw new MiddlewareQueryException("error in deleteTerm " + e.getMessage(), e);
         }
     }
     
@@ -721,6 +707,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             }
         }
     }
+
 
 }
 

@@ -21,7 +21,8 @@ import java.util.Set;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
-import org.generationcp.middleware.domain.oms.TraitReference;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.hibernate.HibernateUtil;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.pojos.oms.CVTerm;
@@ -31,7 +32,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 public class TestCvTermDao{
@@ -111,11 +111,21 @@ public class TestCvTermDao{
     }
 
     @Test
-    public void testGetTraitClasses() throws Exception {
-        List<TraitReference> traitClasses = dao.getTraitClasses();
+    public void testGetOntologyTraitClasses() throws Exception {
+        List<TraitClassReference> traitClasses = dao.getTraitClasses(TermId.ONTOLOGY_TRAIT_CLASS);
         assertTrue(traitClasses.size()>0);
         Debug.println(4, "testGetTraitClasses(): " );
-        for (TraitReference trait : traitClasses){
+        for (TraitClassReference trait : traitClasses){
+            Debug.println(8, trait.toString());
+        }
+    }
+
+    @Test
+    public void testGetOntologyResearchClasses() throws Exception {
+        List<TraitClassReference> traitClasses = dao.getTraitClasses(TermId.ONTOLOGY_RESEARCH_CLASS);
+        assertTrue(traitClasses.size()>0);
+        Debug.println(4, "testGetTraitClasses(): " );
+        for (TraitClassReference trait : traitClasses){
             Debug.println(8, trait.toString());
         }
     }

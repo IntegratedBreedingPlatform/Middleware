@@ -35,7 +35,7 @@ import org.generationcp.middleware.domain.oms.PropertyReference;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.oms.TraitReference;
+import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
@@ -54,6 +54,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
 public class TestOntologyDataManagerImpl {
+
+    private static final String NUMBER_OF_RECORDS = " # Records = ";
 
 	private static final Integer CV_TERM_ID = 1010;
 	private static final String CV_TERM_NAME = "Study Information";
@@ -624,26 +626,64 @@ public class TestOntologyDataManagerImpl {
     }
     
     @Test
-    public void testGetTraitGroups() throws Exception {
-        List<TraitReference> traitGroups = manager.getTraitGroups();
-        for (TraitReference traitGroup : traitGroups){
+    public void testGetAllTraitGroups() throws Exception {
+        List<TraitClassReference> traitGroups = manager.getAllTraitGroupsHierarchy();
+        for (TraitClassReference traitGroup : traitGroups){
             traitGroup.print(3);
         }
+        Debug.println(3, NUMBER_OF_RECORDS + traitGroups.size());
+    }
+    
+    @Test
+    public void testGetTraitGroupsOntologyTraitClass() throws Exception {
+        List<TraitClassReference> traitGroups = manager.getTraitGroupsHierarchy(TermId.ONTOLOGY_TRAIT_CLASS);
+        for (TraitClassReference traitGroup : traitGroups){
+            traitGroup.print(3);
+        }
+        Debug.println(3, NUMBER_OF_RECORDS + traitGroups.size());
+    }
+    
+    @Test
+    public void testGetTraitGroupsOntologyResearchClass() throws Exception {
+        List<TraitClassReference> traitGroups = manager.getTraitGroupsHierarchy(TermId.ONTOLOGY_RESEARCH_CLASS);
+        for (TraitClassReference traitGroup : traitGroups){
+            traitGroup.print(3);
+        }
+        Debug.println(3, NUMBER_OF_RECORDS + traitGroups.size());
     }
     
     @Test
     public void testGetAllTraitClasses() throws Exception {
-        List<TraitReference> traitClasses = manager.getAllTraitClasses();
-        for (TraitReference traitClass : traitClasses){
+        List<TraitClassReference> traitClasses = manager.getAllTraitClasses();
+        for (TraitClassReference traitClass : traitClasses){
             traitClass.print(3);
         }
+        Debug.println(3, NUMBER_OF_RECORDS + traitClasses.size());
     }
     
+
+    @Test
+    public void testGetAllTraitClassesOntologyTraitClass() throws Exception {
+        List<TraitClassReference> traitClasses = manager.getTraitClasses(TermId.ONTOLOGY_TRAIT_CLASS);
+        for (TraitClassReference traitClass : traitClasses){
+            traitClass.print(3);
+        }
+        Debug.println(3, NUMBER_OF_RECORDS + traitClasses.size());
+    }
+
+    @Test
+    public void testGetAllTraitClassesOntologyResearchClass() throws Exception {
+        List<TraitClassReference> traitClasses = manager.getTraitClasses(TermId.ONTOLOGY_RESEARCH_CLASS);
+        for (TraitClassReference traitClass : traitClasses){
+            traitClass.print(3);
+        }
+        Debug.println(3, NUMBER_OF_RECORDS + traitClasses.size());
+    }
+
     @Test
     public void testPrintTraitGroupsWithNegativeIdsOnly() throws Exception {
-
-        List<TraitReference> traitGroups = manager.getTraitGroups();
-        for (TraitReference traitGroup : traitGroups){
+        List<TraitClassReference> traitGroups = manager.getTraitGroupsHierarchy(TermId.ONTOLOGY_TRAIT_CLASS);
+        for (TraitClassReference traitGroup : traitGroups){
             traitGroup.print(3);
             if (traitGroup.getId() < 0){
                 traitGroup.print(3);
@@ -688,13 +728,6 @@ public class TestOntologyDataManagerImpl {
             Debug.println(0, "count: " + standardVariables.size());
         }
 	
-    @Test
-    public void testAddPropertyIsARelationship() throws Exception {
-        Term term = manager.addPropertyIsARelationship(1050, 1340);
-        Debug.println(0, "From db:  " + term);
-    }
-	
-
     @Test
     public void testAddOrUpdateTermAndRelationshipFoundInCentral() throws Exception {
         String name = "Season";
@@ -822,7 +855,7 @@ public class TestOntologyDataManagerImpl {
         name = "Test Trait Class " + new Random().nextInt(10000);
         definition = "Test Definition";
         
-        term = manager.addTraitClass(name, definition);
+        term = manager.addTraitClass(name, definition, TermId.ONTOLOGY_TRAIT_CLASS.getId()).getTerm();
         manager.deleteTermAndRelationship(term.getId(), CvId.IBDB_TERMS, TermId.IS_A.getId(), TermId.ONTOLOGY_TRAIT_CLASS.getId());
         
         term = manager.getTermById(term.getId());

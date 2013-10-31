@@ -24,20 +24,30 @@ import org.generationcp.middleware.util.Debug;
  * @author Joyce Avestro
  *
  */
-public class TraitReference extends Reference implements Comparable<TraitReference>{
+public class TraitClassReference extends Reference implements Comparable<TraitClassReference>{
+    
+    private TermId classType; // Either TermId.ONTOLOGY_TRAIT_CLASS or TermId.ONTOLOGY_RESEARCH_CLASS
+    
+    private List<TraitClassReference> traitClassChildren;
     
     private List<PropertyReference> properties;
-
-    public TraitReference(Integer id, String name) {
+    
+    public TraitClassReference(Integer id, String name) {
 		super.setId(id);
 		super.setName(name);
-		properties = new ArrayList<PropertyReference>();
+		properties = new ArrayList<PropertyReference>();		
 	}
 
-	public TraitReference(Integer id, String name, String description) {
-	    this(id, name);
-		super.setDescription(description);
-	}
+    public TraitClassReference(Integer id, String name, String description) {
+        this(id, name);
+        super.setDescription(description);
+    }
+
+    public TraitClassReference(Integer id, String name, String description, TermId classType) {
+        this(id, name);
+        super.setDescription(description);
+        this.setClassType(classType);
+    }
 
     /**
      * @return the properties
@@ -53,6 +63,34 @@ public class TraitReference extends Reference implements Comparable<TraitReferen
         this.properties = properties;
     }
     
+    /**
+     * @return the classType
+     */
+    public TermId getClassType() {
+        return classType;
+    }
+
+    /**
+     * @param classType the classType to set
+     */
+    public void setClassType(TermId classType) {
+        this.classType = classType;
+    }
+
+    /**
+     * @return the traitClassChildren
+     */
+    public List<TraitClassReference> getTraitClassChildren() {
+        return traitClassChildren;
+    }
+
+    /**
+     * @param traitClassChildren the traitClassChildren to set
+     */
+    public void setTraitClassChildren(List<TraitClassReference> traitClassChildren) {
+        this.traitClassChildren = traitClassChildren;
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -87,8 +125,8 @@ public class TraitReference extends Reference implements Comparable<TraitReferen
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
     @Override
-    public int compareTo(TraitReference compareValue) {
-        String compareName = ((TraitReference) compareValue).getName(); 
+    public int compareTo(TraitClassReference compareValue) {
+        String compareName = ((TraitClassReference) compareValue).getName(); 
         return getName().compareToIgnoreCase(compareName);
     }
 

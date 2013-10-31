@@ -23,12 +23,12 @@ import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Scale;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.oms.TraitReference;
+import org.generationcp.middleware.domain.oms.TraitClass;
+import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 
-// TODO: Auto-generated Javadoc
 /**
  * 
  * This is the API for Ontology Browser requirements.
@@ -165,6 +165,15 @@ public interface OntologyService {
     Property addOrUpdateProperty(String name, String definition, int isAId) throws MiddlewareQueryException, MiddlewareException;
 
     /**
+     * Updates the given property. 
+     * This searches for the id. If it exists, the entry in the database is replaced with the new value.
+     * @param property The Property to update
+     * @throws MiddlewareQueryException the middleware query exception
+     * @throws MiddlewareException the middleware exception
+     */
+    void updateProperty(Property property) throws MiddlewareQueryException, MiddlewareException;
+
+    /**
      * Delete property.
      *
      * @param cvTermId the cv term id
@@ -173,16 +182,6 @@ public interface OntologyService {
      */
     void deleteProperty(int cvTermId, int isAId) throws MiddlewareQueryException;
     
-    /**
-     * Save a property.
-     *
-     * @param propertyId the id of the property
-     * @param isA the is a type
-     * @return the Term entry corresponding to the newly-added property
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    Term saveProperty(int propertyId, int isA) throws MiddlewareQueryException;
-
     /*======================= SCALE ================================== */
 
     /**
@@ -237,6 +236,15 @@ public interface OntologyService {
      */
     Scale addOrUpdateScale(String name, String definition) throws MiddlewareQueryException, MiddlewareException;
     
+    /**
+     * Updates the given scale. 
+     * This searches for the id. If it exists, the entry in the database is replaced with the new value.
+     * @param scale The Scale to update
+     * @throws MiddlewareQueryException the middleware query exception
+     * @throws MiddlewareException the middleware exception
+     */
+    void updateScale(Scale scale) throws MiddlewareQueryException, MiddlewareException;
+
     
     /**
      * Delete scale.
@@ -301,6 +309,15 @@ public interface OntologyService {
     Method addOrUpdateMethod(String name, String definition) throws MiddlewareQueryException, MiddlewareException;
 
     /**
+     * Updates the given method. 
+     * This searches for the id. If it exists, the entry in the database is replaced with the new value.
+     * @param method The Method to update
+     * @throws MiddlewareQueryException the middleware query exception
+     * @throws MiddlewareException the middleware exception
+     */
+    void updateMethod(Method method) throws MiddlewareQueryException, MiddlewareException;
+
+    /**
      * Delete method.
      *
      * @param cvTermId the cv term id
@@ -318,14 +335,26 @@ public interface OntologyService {
      */
     List<Term> getAllDataTypes() throws MiddlewareQueryException;
 
-  
     /**
      * Gets all the trait groups, its properties and standard variables in a hierarchical structure.
+     * All the trait classes under crop research ontology and ontology trait class are retrieved.
      *
      * @return the trait groups
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<TraitReference> getTraitGroups() throws MiddlewareQueryException;
+
+    List<TraitClassReference> getAllTraitGroupsHierarchy() throws MiddlewareQueryException;
+
+  
+    /**
+     * Gets the trait groups, its properties and standard variables in a hierarchical structure
+     * based on the given class type.
+     *
+     * @param classType can be either TermId.ONTOLOGY_TRAIT_CLASS or TermId.ONTOLOGY_RESEARCH_CLASS
+     * @return The trait groups
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<TraitClassReference> getTraitGroupsHierarchy(TermId classType) throws MiddlewareQueryException;
 
     /**
      * Gets all trait classes.
@@ -333,8 +362,18 @@ public interface OntologyService {
      * @return All the trait classes
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<TraitReference> getAllTraitClasses() throws MiddlewareQueryException;
+    List<TraitClassReference> getAllTraitClasses() throws MiddlewareQueryException;
     
+    /**
+     * Gets the trait classes based on the given class type
+     *
+     * @param classType can be either TermId.ONTOLOGY_TRAIT_CLASS or TermId.ONTOLOGY_RESEARCH_CLASS
+     * @return The trait classes of the given class type
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<TraitClassReference> getTraitClasses(TermId classType) throws MiddlewareQueryException;
+
+       
     /**
      * Adds a new trait class to the database.
      * Creates a new cvterm and cvterm_relationship entry in the local database.
@@ -342,10 +381,13 @@ public interface OntologyService {
      *
      * @param name the name
      * @param definition the definition
-     * @return the term
+     * @param parentTraitClassId  can be either TermId.ONTOLOGY_TRAIT_CLASS.getId() 
+     *                          or TermId.ONTOLOGY_RESEARCH_CLASS.getId() for first-level class 
+     *                          or another termId if not a first-level class
+     * @return the TraitClass added
      * @throws MiddlewareQueryException the middleware query exception
      */
-    Term addTraitClass(String name, String definition) throws MiddlewareQueryException;
+    TraitClass addTraitClass(String name, String definition, int parentTraitClassId) throws MiddlewareQueryException;
     
     
     /**
@@ -355,11 +397,23 @@ public interface OntologyService {
      *
      * @param name the name
      * @param definition the definition
-     * @return the term
+     * @param parentTraitClassId  can be either TermId.ONTOLOGY_TRAIT_CLASS.getId() 
+     *                          or TermId.ONTOLOGY_RESEARCH_CLASS.getId() for first-level class 
+     *                          or another termId if not a first-level class
+     * @return the TraitClass added
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
-    Term addOrUpdateTraitClass(String name, String definition) throws MiddlewareQueryException, MiddlewareException;
+    TraitClass addOrUpdateTraitClass(String name, String definition, int parentTraitClassId) throws MiddlewareQueryException, MiddlewareException;
+    
+    /**
+     * Updates the given trait class. 
+     * This searches for the id. If it exists, the entry in the database is replaced with the new value.
+     * @param traitClass The TraitClass to update
+     * @throws MiddlewareQueryException the middleware query exception
+     * @throws MiddlewareException the middleware exception
+     */
+    void updateTraitClass(TraitClass traitClass) throws MiddlewareQueryException, MiddlewareQueryException, MiddlewareException;
     
     /**
      * Delete trait class.
