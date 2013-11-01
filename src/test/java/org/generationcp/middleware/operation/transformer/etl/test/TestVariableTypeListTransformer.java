@@ -12,6 +12,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.operation.transformer.etl.Transformer;
 import org.generationcp.middleware.operation.transformer.etl.VariableTypeListTransformer;
+import org.generationcp.middleware.util.Debug;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -78,13 +79,14 @@ public class TestVariableTypeListTransformer {
 
 	@Before
 	public void beforeEachTest() {
-		startTime = System.nanoTime();
+        Debug.println(0, "#####" + name.getMethodName() + " Start: ");
+        startTime = System.nanoTime();
 	}
 	
 	@After
 	public void afterEachTest() {
 		long elapsedTime = System.nanoTime() - startTime;
-		System.out.println("#####" + name.getMethodName() + ": Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime/1000000000) + " s");
+		Debug.println(0, "#####" + name.getMethodName() + ": Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime/1000000000) + " s");
 	}
 	
 	@Test
@@ -128,7 +130,7 @@ public class TestVariableTypeListTransformer {
 			field.set(transformer, standardVariableBuilder);
 			
 		} catch (Exception e) {
-			e.printStackTrace();
+		    e.printStackTrace();
 		}
 	}
 	

@@ -12,6 +12,7 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.util.Debug;
 import org.mockito.Mockito;
 
 public class MockDataUtil {
@@ -99,7 +100,7 @@ public class MockDataUtil {
     		field.set(gManager, value);
     	
     	} catch (Exception e) {
-    		throw new MiddlewareQueryException("Failed to inject DAOs to the Manager for Testing: " + e.getMessage());
+    		throw new MiddlewareQueryException("Failed to inject DAOs to the Manager for Testing: " + e.getMessage(), e);
     	}
 		
 	}
@@ -170,7 +171,7 @@ public class MockDataUtil {
      * Default printing format for the console
      */
     public static void printTree(GermplasmPedigreeTree tree) {
-    	System.out.println(printTree(tree, "  ", "\n"));
+    	Debug.println(0, printTree(tree, "  ", "\n"));
     }
 
     /**

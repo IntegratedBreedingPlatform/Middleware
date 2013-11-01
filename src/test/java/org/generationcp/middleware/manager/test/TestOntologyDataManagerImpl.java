@@ -12,6 +12,10 @@
 
 package org.generationcp.middleware.manager.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,24 +31,31 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Property;
+import org.generationcp.middleware.domain.oms.PropertyReference;
+import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.oms.TraitClassReference;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.util.Debug;
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 
 public class TestOntologyDataManagerImpl {
+
+    private static final String NUMBER_OF_RECORDS = " # Records = ";
 
 	private static final Integer CV_TERM_ID = 1010;
 	private static final String CV_TERM_NAME = "Study Information";
@@ -68,13 +79,14 @@ public class TestOntologyDataManagerImpl {
 
 	@Before
 	public void beforeEachTest() {
+        Debug.println(0, "#####" + name.getMethodName() + " Start: ");
 		startTime = System.nanoTime();
 	}
 	
 	@After
 	public void afterEachTest() {
 		long elapsedTime = System.nanoTime() - startTime;
-		System.out.println("#####" + name.getMethodName() + ": Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime/1000000000) + " s");
+		Debug.println(0, "#####" + name.getMethodName() + ": Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime/1000000000) + " s");
 	}
 
 	@Test
@@ -84,14 +96,14 @@ public class TestOntologyDataManagerImpl {
 		assertTrue(term.getId() == CV_TERM_ID);
 		assertTrue(term.getName().equals(CV_TERM_NAME));
 		
-		System.out.println("testGetCvTermById(): " + term);
+		Debug.println(0, "testGetCvTermById(): " + term);
 	}
 	
 	@Test
 	public void testGetStandardVariable() throws Exception {
 		StandardVariable stdVar = manager.getStandardVariable(STD_VARIABLE_ID);
 		assertNotNull(stdVar);		
-		System.out.println("testGetStandardVariable(): " + stdVar);
+		Debug.println(0, "testGetStandardVariable(): " + stdVar);
 	}
 	
 	@Test
@@ -99,25 +111,25 @@ public class TestOntologyDataManagerImpl {
 		StandardVariable stdVar = manager.getStandardVariable(STD_VARIABLE_ID);
 		StandardVariable stdVar2 = stdVar.copy();
 		
-		assertTrue(stdVar.getId() != stdVar2.getId());
-		assertTrue(stdVar.getProperty() == stdVar2.getProperty());
-		assertTrue(stdVar.getScale() == stdVar2.getScale());
-		assertTrue(stdVar.getMethod() == stdVar2.getMethod());
-		assertTrue(stdVar.getDataType() == stdVar2.getDataType());
-		assertTrue(stdVar.getStoredIn() == stdVar2.getStoredIn());
-		assertTrue(stdVar.getPhenotypicType() == stdVar2.getPhenotypicType());
-		assertTrue(stdVar.getConstraints() == stdVar2.getConstraints());
+		assertNotSame(stdVar.getId(), stdVar2.getId());
+		assertSame(stdVar.getProperty(), stdVar2.getProperty());
+		assertSame(stdVar.getScale(), stdVar2.getScale());
+		assertSame(stdVar.getMethod(), stdVar2.getMethod());
+		assertSame(stdVar.getDataType(), stdVar2.getDataType());
+		assertSame(stdVar.getStoredIn(), stdVar2.getStoredIn());
+		assertSame(stdVar.getPhenotypicType(), stdVar2.getPhenotypicType());
+		assertSame(stdVar.getConstraints(), stdVar2.getConstraints());
 		if (stdVar.getName() != null) assertTrue(stdVar.getName().equals(stdVar2.getName()));
 		if (stdVar.getDescription() != null) assertTrue(stdVar.getDescription().equals(stdVar2.getDescription()));
-		assertTrue(stdVar.getEnumerations() == stdVar2.getEnumerations());
+		assertSame(stdVar.getEnumerations(), stdVar2.getEnumerations());
 		
-	    System.out.println("testCopyStandardVariable(): \n    " + stdVar + "\n    " + stdVar2);
+	    Debug.println(0, "testCopyStandardVariable(): \n    " + stdVar + "\n    " + stdVar2);
 	}
 	
 	
 	@Test
 	public void testStandardVariableCache() throws Exception {
-		System.out.println("testStandardVariableCache(): ");
+		Debug.println(0, "testStandardVariableCache(): ");
 		manager.getStandardVariable(STD_VARIABLE_ID); 		// First call to getStandardVariable() will put the value to the cache
 		manager.getStandardVariable(STD_VARIABLE_ID);		// Second (and subsequent) calls will retrieve the value from the cache
 	}
@@ -130,10 +142,15 @@ public class TestOntologyDataManagerImpl {
 	
 	@Test
 	public void testAddStandardVariable() throws Exception {
-		StandardVariable stdVariable = new StandardVariable();
+	    //create new trait
+	    String propertyName = "property name " + new Random().nextInt(10000);
+	    manager.addProperty(propertyName, "test property", 1087);
+		
+	    StandardVariable stdVariable = new StandardVariable();
 		stdVariable.setName("variable name " + new Random().nextInt(10000));
 		stdVariable.setDescription("variable description");
-		stdVariable.setProperty(new Term(2002, "User", "Database user"));
+		//stdVariable.setProperty(new Term(2002, "User", "Database user"));
+		stdVariable.setProperty(manager.findTermByName(propertyName, CvId.PROPERTIES));
 		stdVariable.setMethod(new Term(4030, "Assigned", "Term, name or id assigned"));
 		stdVariable.setScale(new Term(6000, "DBCV", "Controlled vocabulary from a database"));
 		stdVariable.setStoredIn(new Term(1010, "Study information", "Study element"));
@@ -147,10 +164,11 @@ public class TestOntologyDataManagerImpl {
 		stdVariable.getEnumerations().add(new Enumeration(10001, "HB", "Hybridization nursery", 2));
 		stdVariable.getEnumerations().add(new Enumeration(10002, "PN", "Pedigree nursery", 3));
 		stdVariable.setConstraints(new VariableConstraints(100, 999));
+		stdVariable.setCropOntologyId("CROP-TEST");
 		
 		manager.addStandardVariable(stdVariable);
 		
-		System.out.println("Standard variable saved: " + stdVariable.getId());
+		Debug.println(0, "Standard variable saved: " + stdVariable.getId());
 	}
 	
 	@Test
@@ -162,26 +180,26 @@ public class TestOntologyDataManagerImpl {
 		Term newProperty = new Term(2451, "Environment", "Environment");
 		Term property = manager.findTermByName(newProperty.getName(),CvId.PROPERTIES);
 		if(property==null) {
-			System.out.println("new property = " + newProperty.getName());
+			Debug.println(0, "new property = " + newProperty.getName());
 			property = newProperty;
 		} else {
-			System.out.println("property id = " + property.getId());
+			Debug.println(0, "property id = " + property.getId());
 		}
 		Term newScale = new Term(6020, "Text", "Text");
 		Term scale = manager.findTermByName(newScale.getName(),CvId.SCALES);
 		if(scale==null) {
-			System.out.println("new scale = " + newScale.getName());
+			Debug.println(0, "new scale = " + newScale.getName());
 			scale = newScale;
 		} else {
-			System.out.println("scale id = " + scale.getId());
+			Debug.println(0, "scale id = " + scale.getId());
 		}
 		Term newMethod = new Term(0, "Test Method", "Test Method");
 		Term method = manager.findTermByName(newMethod.getName(),CvId.METHODS);
 		if(method==null) {
-			System.out.println("new method = " + newMethod.getName());
+			Debug.println(0, "new method = " + newMethod.getName());
 			method = newMethod;
 		} else {
-			System.out.println("method id = " + method.getId());
+			Debug.println(0, "method id = " + method.getId());
 		}
 		stdVariable.setProperty(property);
 		stdVariable.setScale(scale);
@@ -202,18 +220,19 @@ public class TestOntologyDataManagerImpl {
 		
 		manager.addStandardVariable(stdVariable);
 		
-		System.out.println("Standard variable saved: " + stdVariable.getId());
+		Debug.println(0, "Standard variable saved: " + stdVariable.getId());
 	}
 	
-	@Test
+	@SuppressWarnings("deprecation")
+    @Test
 	public void testAddMethod() throws Exception {
 		String name = "Test Method " + new Random().nextInt(10000);
 		String definition = "Test Definition";
 		Term term = manager.addMethod(name, definition);
 		assertTrue(term.getId() < 0);
-	    System.out.println("testAddMethod():  " + term);
+	    Debug.println(0, "testAddMethod():  " + term);
 	    term = manager.getTermById(term.getId());
-	    System.out.println("From db:  " + term);
+	    Debug.println(0, "From db:  " + term);
 	}
 	
 	@Test
@@ -223,24 +242,24 @@ public class TestOntologyDataManagerImpl {
 		Integer methodId = Integer.valueOf(4030);
 		
 		Integer varid = manager.getStandardVariableIdByPropertyScaleMethod(propertyId, scaleId, methodId);
-		Assert.assertNotNull(varid);
-		System.out.println("testGetStandadardVariableIdByPropertyScaleMethod() Results: " + varid);
+		assertNotNull(varid);
+		Debug.println(0, "testGetStandadardVariableIdByPropertyScaleMethod() Results: " + varid);
 	}
 	
     @Test
     public void testFindStandardVariablesByNameOrSynonym() throws Exception {
-        System.out.println("Test FindStandardVariablesByNameOrSynonym");
+        Debug.println(0, "Test FindStandardVariablesByNameOrSynonym");
         Set<StandardVariable> standardVariables = manager.findStandardVariablesByNameOrSynonym("foo bar");
-        assertTrue(standardVariables.size() == 0);
+        assertSame(standardVariables.size(), 0);
         
         standardVariables = manager.findStandardVariablesByNameOrSynonym("Accession name");
-        assertTrue(standardVariables.size() == 1);
+        assertSame(standardVariables.size(), 1);
         for (StandardVariable stdVar : standardVariables) {
             stdVar.print(0);
         }
         
         standardVariables = manager.findStandardVariablesByNameOrSynonym("THR");
-        assertTrue(standardVariables.size() == 1);
+        assertSame(standardVariables.size(), 1);
         for (StandardVariable stdVar : standardVariables) {
             stdVar.print(0);
         }
@@ -248,9 +267,9 @@ public class TestOntologyDataManagerImpl {
 
     @Test
     public void testFindStandardVariablesByNameOrSynonymWithProperties() throws Exception {
-        System.out.println("Test getTraitDetailsByTAbbr");
+        Debug.println(0, "Test getTraitDetailsByTAbbr");
         Set<StandardVariable> standardVariables = manager.findStandardVariablesByNameOrSynonym("Accession name");
-        assertTrue(standardVariables.size() == 1);
+        assertSame(standardVariables.size(), 1);
         for (StandardVariable stdVar : standardVariables) {
             stdVar.print(0);
             Term term = manager.getTermById(stdVar.getId());
@@ -258,23 +277,23 @@ public class TestOntologyDataManagerImpl {
         }
     }
 
+    @SuppressWarnings("deprecation")
 	@Test
 	public void testFindMethodById() throws Exception {
-		System.out.println("Test findMethodById");
 		
 		// term doesn't exist
 		Term term = manager.findMethodById(999999);
-		assertTrue(term == null);
+		assertNull(term);
 		
 		// term exist but isn't a method
 		term = manager.findMethodById(22066);
-		assertTrue(term == null);
+		assertNull(term);
 		
 		// term does exist in central
 		term = manager.findMethodById(20732);
-		assertTrue(term != null);
+		assertNotNull(term);
 		term.print(0);
-		System.out.println();
+		Debug.println(0, "");
 		
 		// add a method to local
 		String name = "Test Method " + new Random().nextInt(10000);
@@ -283,76 +302,73 @@ public class TestOntologyDataManagerImpl {
 		// term does exist in local
 		
 		term = manager.findMethodById(term.getId());
-		assertTrue(term != null);
+		assertNotNull(term);
 		term.print(0);
 	}
 	
 	@Test
 	public void testFindMethodByName() throws Exception {
-		System.out.println("Test findMethodByName");
+		Debug.println(0, "Test findMethodByName");
 		
 		// term doesn't exist
 		Term term = manager.findMethodByName("foo bar");
-		assertTrue(term == null);
+		assertNull(term);
 		
 		// term exist but isn't a method
 		term = manager.findMethodByName("PANH");
-		assertTrue(term == null);
+		assertNull(term);
 		
 		// term does exist in central
 		term = manager.findMethodByName("Vegetative Stage");
-		assertTrue(term != null);
+		assertNotNull(term);
 		term.print(0);
-		System.out.println();
+		Debug.println(0, "");
 	}
 	
 	
 	@Test
 	public void testFindStandardVariableByTraitScaleMethodNames() throws Exception{
-		System.out.println("Test findStandardVariableByTraitScaleMethodNames");
 		StandardVariable stdVar = manager.findStandardVariableByTraitScaleMethodNames("Cooperator", "DBCV", "Assigned");		
-		System.out.println("testFindStandardVariableByTraitScaleMethodNames(): " + stdVar);
+		Debug.println(0, "testFindStandardVariableByTraitScaleMethodNames(): " + stdVar);
 	}
 	
 
 	@Test
 	public void testGetAllTermsByCvId() throws Exception{
-		System.out.println("testGetAllTermsByCvId:");
 		List<Term> terms = manager.getAllTermsByCvId(CvId.METHODS);		
-		System.out.println("testGetAllTermsByCvId - Get Methods: " + terms.size());
+		Debug.println(0, "testGetAllTermsByCvId - Get Methods: " + terms.size());
 		printTerms(terms);
 		terms = manager.getAllTermsByCvId(CvId.PROPERTIES);		
-		System.out.println("testGetAllTermsByCvId - Get Properties: " + terms.size());
+		Debug.println(0, "testGetAllTermsByCvId - Get Properties: " + terms.size());
 		printTerms(terms);
 		terms = manager.getAllTermsByCvId(CvId.SCALES);		
-		System.out.println("testGetAllTermsByCvId - Get Scales: " + terms.size());
+		Debug.println(0, "testGetAllTermsByCvId - Get Scales: " + terms.size());
 		printTerms(terms);
 	}
 	
 	@Test
 	public void testGetAllTermsByCvIdWithStartAndNumOfRows() throws Exception{
-		System.out.println("testGetAllTermsByCvIdWithStartAndNumOfRows:");
 		List<Term> terms1 = manager.getAllTermsByCvId(CvId.METHODS, 0, 2);		
-		System.out.println("Get First 2 Methods: " + terms1.size());
+		Debug.println(0, "Get First 2 Methods: " + terms1.size());
 		printTerms(terms1);
 		
 		List<Term> terms2 = manager.getAllTermsByCvId(CvId.METHODS, 2, 2);		
-		System.out.println("Get Next 2 Methods: " + terms2.size());
+		Debug.println(0, "Get Next 2 Methods: " + terms2.size());
 		printTerms(terms2);
 		
 		terms1.addAll(terms2);
 		
 		List<Term> terms = manager.getAllTermsByCvId(CvId.METHODS, 0, 4);		
-		System.out.println("Get First 4 Methods: " + terms.size());
+		Debug.println(0, "Get First 4 Methods: " + terms.size());
 		printTerms(terms);
 		
 		assertEquals(terms1, terms);
 		
 		List<Term> allTerms = manager.getAllTermsByCvId(CvId.METHODS);		
-		System.out.println("Get All Methods: " + allTerms.size());
+		Debug.println(0, "Get All Methods: " + allTerms.size());
 		
 		List<Term> allTerms2 = manager.getAllTermsByCvId(CvId.METHODS, 0, allTerms.size());		
-		System.out.println("Get All Methods with start and numOfRows: " + allTerms2.size());
+		Debug.println(0, "Get All Methods with start and numOfRows: " + allTerms2.size());
 		printTerms(allTerms2);
 		
 		assertEquals(allTerms, allTerms2);
@@ -362,19 +378,18 @@ public class TestOntologyDataManagerImpl {
 	private void printTerms(List<Term> terms){
 		for (Term term : terms){
 			term.print(4);
-			System.out.println("    ----------");
+			Debug.println(0, "    ----------");
 		}
 	}
 
 	@Test
 	public void testCountTermsByCvId() throws Exception{
-		System.out.println("testCountTermsByCvId:");
 		long count = manager.countTermsByCvId(CvId.METHODS);		
-		System.out.println("testCountTermsByCvId() - Count All Methods: " + count);
+		Debug.println(0, "testCountTermsByCvId() - Count All Methods: " + count);
 		count = manager.countTermsByCvId(CvId.PROPERTIES);		
-		System.out.println("testCountTermsByCvId() - Count All Properties: " + count);
+		Debug.println(0, "testCountTermsByCvId() - Count All Properties: " + count);
 		count = manager.countTermsByCvId(CvId.SCALES);		
-		System.out.println("testCountTermsByCvId() - Count All Scales: " + count);
+		Debug.println(0, "testCountTermsByCvId() - Count All Scales: " + count);
 	}
 
 	@AfterClass
@@ -386,62 +401,60 @@ public class TestOntologyDataManagerImpl {
 	
 	@Test
 	public void testGetMethodsForTrait() throws Exception{
-		System.out.println("Test getMethodsForTrait");
 		StandardVariable stdVar = manager.findStandardVariableByTraitScaleMethodNames("User", "DBCV", "Assigned");
 		List<Term> terms = manager.getMethodsForTrait(stdVar.getProperty().getId());
-		System.out.println("Size: " + terms.size());
+		Debug.println(0, "Size: " + terms.size());
 		assertNotNull(terms);
 		boolean hasAssigned = false;
 		for (Term term : terms) {
 			if(term.getName().equals("Assigned")) {
 				hasAssigned = true;
 			}
-			System.out.println("method: " + term.getName());
+			Debug.println(0, "method: " + term.getName());
 		}
 		assertTrue(hasAssigned);//should return Assigned
 		
 		//2nd test
 		stdVar = manager.findStandardVariableByTraitScaleMethodNames("Germplasm entry", "Number", "Enumerated");
 		terms = manager.getMethodsForTrait(stdVar.getProperty().getId());
-		System.out.println("Size: " + terms.size());
+		Debug.println(0, "Size: " + terms.size());
 		assertNotNull(terms);
 		boolean hasEnumerated = false;
 		for (Term term : terms) {
 			if(term.getName().equals("Enumerated")) {
 				hasEnumerated = true;
 			}
-			System.out.println("method: " + term.getName());
+			Debug.println(0, "method: " + term.getName());
 		}
 		assertTrue(hasEnumerated);//should return Enumerated
 	}
 	
 	@Test
 	public void testGetScalesForTrait() throws Exception{
-		System.out.println("Test getScalesForTrait");
 		StandardVariable stdVar = manager.findStandardVariableByTraitScaleMethodNames("User", "DBCV", "Assigned");
 		List<Term> terms = manager.getScalesForTrait(stdVar.getProperty().getId());
-		System.out.println("Size: " + terms.size());
+		Debug.println(0, "Size: " + terms.size());
 		assertNotNull(terms);
 		boolean hasDBCV = false;
 		for (Term term : terms) {
 			if(term.getName().equals("DBCV")) {
 				hasDBCV = true;
 			}
-			System.out.println("scale: " + term.getName());
+			Debug.println(0, "scale: " + term.getName());
 		}
 		assertTrue(hasDBCV);//should return DBCV
 		
 		//2nd test
 		stdVar = manager.findStandardVariableByTraitScaleMethodNames("Germplasm entry", "Number", "Enumerated");
 		terms = manager.getScalesForTrait(stdVar.getProperty().getId());
-		System.out.println("Size: " + terms.size());
+		Debug.println(0, "Size: " + terms.size());
 		assertNotNull(terms);
 		boolean hasNumber = false;
 		for (Term term : terms) {
 			if(term.getName().equals("Number")) {
 				hasNumber = true;
 			}
-			System.out.println("scale: " + term.getName());
+			Debug.println(0, "scale: " + term.getName());
 		}
 		assertTrue(hasNumber);//should return Number
 	}
@@ -457,7 +470,7 @@ public class TestOntologyDataManagerImpl {
 		Term term = manager.addTerm(name, definition, cvId);
 		assertNotNull(term);
 		assertTrue(term.getId() < 0);
-	    System.out.println("testAddTerm():  " + term);
+	    Debug.println(0, "testAddTerm():  " + term);
 	    term = manager.getTermById(term.getId());
 	    System.out.println("From db:  " + term);
 	    
@@ -474,36 +487,31 @@ public class TestOntologyDataManagerImpl {
 	
 	@Test
 	public void testFindTermByName() throws Exception {
-		System.out.println("Test findTermByName");
-		
 		// term doesn't exist
 		Term term = manager.findTermByName("foo bar", CvId.METHODS);
-		assertTrue(term == null);
+		assertNull(term);
 		
 		// term exist but isn't a method
 		term = manager.findTermByName("PANH", CvId.METHODS);
-		assertTrue(term == null);
+		assertNull(term);
 		
 		// term does exist in central
 		term = manager.findTermByName("Vegetative Stage", CvId.METHODS);
-		assertTrue(term != null);
+		assertNotNull(term);
 		term.print(0);
-		System.out.println();
+		Debug.println(0, "");
 		
 	}
 	
 	@Test
 	public void testGetDataTypes() throws Exception{
-		System.out.println("testGetDataTypes:");
 		List<Term> terms = manager.getDataTypes();		
-		System.out.println("testGetDataTypes: " + terms.size());
+		Debug.println(0, "testGetDataTypes: " + terms.size());
 		printTerms(terms);
 	}
 	
 	@Test 
 	public void testGetStandardVariablesForPhenotypicType() throws Exception{
-		System.out.println("Test testGetStandardVariablesForPhenotypicType");
-		
 		PhenotypicType phenotypicType =  PhenotypicType.TRIAL_ENVIRONMENT;
 		Integer start = 0;
 		Integer numOfRows = 100;
@@ -511,10 +519,10 @@ public class TestOntologyDataManagerImpl {
 		Map<String, StandardVariable> standardVariables = manager.getStandardVariablesForPhenotypicType(phenotypicType, start, numOfRows);
 		
 		for(Object key : standardVariables.keySet()) {
-	        System.out.println(key + " : " + standardVariables.get(key).getId() + " : " + standardVariables.get(key).toString());
+	        Debug.println(0, key + " : " + standardVariables.get(key).getId() + " : " + standardVariables.get(key).toString());
 	    }
 		
-		System.out.println("count: " + standardVariables.size());
+		Debug.println(0, "count: " + standardVariables.size());
 	}
 
 	
@@ -524,14 +532,14 @@ public class TestOntologyDataManagerImpl {
     	
     	Map<String, List<StandardVariable>> results = manager.getStandardVariablesInProjects(headers);
 
-        System.out.println("testGetStandardVariablesInProjects(headers=" + headers + ") RESULTS:");
+        Debug.println(0, "testGetStandardVariablesInProjects(headers=" + headers + ") RESULTS:");
         for (String name : headers) {
         	System.out.print ("Header = " + name + ", StandardVariables: ");
         	if (results.get(name).size() > 0){
 	        	for (StandardVariable var : results.get(name)){
 	        		System.out.print(var.getId() + ", ");
 	        	}
-	        	System.out.println();
+	        	Debug.println(0, "");
         	} else {
             	System.out.println ("    No standard variables found.");        		
         	}
@@ -543,66 +551,63 @@ public class TestOntologyDataManagerImpl {
 	public void testFindTermsByNameOrSynonym() throws Exception {
 		// term doesn't exist
 		List<Term> terms = manager.findTermsByNameOrSynonym("foo bar", CvId.METHODS);
-		assertTrue(terms.size() == 0);
+		assertSame(terms.size(), 0);
 		
 		// term exist but isn't a method
 		terms = manager.findTermsByNameOrSynonym("PANH", CvId.METHODS);
-		assertTrue(terms.size() == 0);
+		assertSame(terms.size(), 0);
 		
 		// term does exist in central
 		terms = manager.findTermsByNameOrSynonym("Vegetative Stage", CvId.METHODS);
-		assertTrue(terms != null);
+		assertNotNull(terms);
 		terms.get(0).print(0);
-		System.out.println();
+		Debug.println(0, "");
 		
 		// name is in synonyms
 		terms = manager.findTermsByNameOrSynonym("Accession Name", CvId.VARIABLES);
-		assertTrue(terms != null);
+		assertNotNull(terms);
 		terms.get(0).print(0);
-		System.out.println();
+		Debug.println(0, "");
 
 		// name is both in term and in synonyms 
 		// need to modify the entry in cvterm where name = "Cooperator" to have cv_id = 1010
 		terms = manager.findTermsByNameOrSynonym("Cooperator", CvId.PROPERTIES);
-		assertTrue(terms != null);
+		assertNotNull(terms);
 		for (Term term: terms){
 			term.print(0);
-			System.out.println();
+			Debug.println(0, "");
 		}
 
 	}
 
 	@Test
 	public void testGetIsAOfProperties() throws Exception{
-		System.out.println("testGetIsAOfProperties:");
 		List<Term> terms1 = manager.getIsAOfProperties(0, 2);		
-		System.out.println("Get First 2 isA: " + terms1.size());
+		Debug.println(0, "Get First 2 isA: " + terms1.size());
 		printTerms(terms1);
 		
 		List<Term> terms2 = manager.getIsAOfProperties(2, 2);		
-		System.out.println("Get Next 2 isA: " + terms2.size());
+		Debug.println(0, "Get Next 2 isA: " + terms2.size());
 		printTerms(terms2);
 		
 		terms1.addAll(terms2);
 		
 		List<Term> terms = manager.getIsAOfProperties(0, 4);		
-		System.out.println("Get First 4 isA: " + terms.size());
+		Debug.println(0, "Get First 4 isA: " + terms.size());
 		printTerms(terms);
 		
 		assertEquals(terms1, terms);
 		
 		List<Term> allTerms = manager.getIsAOfProperties(0,0);		
-		System.out.println("Get All isA: " + allTerms.size());
+		Debug.println(0, "Get All isA: " + allTerms.size());
 		printTerms(allTerms);
 		
 	}
 	
 	@Test
 	public void testCountIsAOfProperties() throws Exception{
-		System.out.println("testCountIsAOfProperties:");
 		long asOf = manager.countIsAOfProperties();		
-		System.out.println("count is a properties " + asOf);
-		
+		Debug.println(0, "count is a properties " + asOf);
 	}
 	
 	@Test
@@ -611,27 +616,319 @@ public class TestOntologyDataManagerImpl {
 		String definition = "Germplasm type description 3";
 		int isA = 1087;
 		
-        System.out.println("testAddProperty(name=" + name + ", definition=" + definition + ", isA=" + isA + "): ");
+        Debug.println(0, "testAddProperty(name=" + name + ", definition=" + definition + ", isA=" + isA + "): ");
 		Term term = manager.addProperty(name, definition, isA);
-        System.out.println("testAddProperty(name=" + name + ", definition=" + definition + ", isA=" + isA + "): " );
         	term.print(4);
 
 	}
 	
-	@Test
-	public void testGetProperty() throws Exception {
-		int termId = 2452;
-		
-		Property property = manager.getProperty(termId);
-		
-		System.out.println(property);
-	}
-	
+    @Test
+    public void testGetProperty() throws Exception {
+        int termId = 2452;
+        
+        Property property = manager.getProperty(termId);
+        
+        Debug.println(0, property.toString());
+    }
+    
+    @Test
+    public void testGetAllTraitGroupsHierarchy() throws Exception {
+        List<TraitClassReference> traitGroups = manager.getAllTraitGroupsHierarchy();
+        for (TraitClassReference traitGroup : traitGroups){
+            traitGroup.print(3);
+        }
+    }
+    
+    @Test
+    public void testGetTraitGroupsOntologyTraitClass() throws Exception {
+        List<TraitClassReference> traitGroups = manager.getTraitGroupsHierarchy(TermId.ONTOLOGY_TRAIT_CLASS);
+        for (TraitClassReference traitGroup : traitGroups){
+            traitGroup.print(3);
+        }
+        Debug.println(3, NUMBER_OF_RECORDS + traitGroups.size());
+    }
+    
+    @Test
+    public void testGetTraitGroupsOntologyResearchClass() throws Exception {
+        List<TraitClassReference> traitGroups = manager.getTraitGroupsHierarchy(TermId.ONTOLOGY_RESEARCH_CLASS);
+        for (TraitClassReference traitGroup : traitGroups){
+            traitGroup.print(3);
+        }
+        Debug.println(3, NUMBER_OF_RECORDS + traitGroups.size());
+    }
+    
+    @Test
+    public void testGetAllTraitClasses() throws Exception {
+        List<TraitClassReference> traitClasses = manager.getAllTraitClasses();
+        for (TraitClassReference traitClass : traitClasses){
+            traitClass.print(3);
+        }
+    }
+    
+
+    @Test
+    public void testGetAllTraitClassesOntologyTraitClass() throws Exception {
+        List<TraitClassReference> traitClasses = manager.getTraitClasses(TermId.ONTOLOGY_TRAIT_CLASS);
+        for (TraitClassReference traitClass : traitClasses){
+            traitClass.print(3);
+        }
+        Debug.println(3, NUMBER_OF_RECORDS + traitClasses.size());
+    }
+
+    @Test
+    public void testGetAllTraitClassesOntologyResearchClass() throws Exception {
+        List<TraitClassReference> traitClasses = manager.getTraitClasses(TermId.ONTOLOGY_RESEARCH_CLASS);
+        for (TraitClassReference traitClass : traitClasses){
+            traitClass.print(3);
+        }
+        Debug.println(3, NUMBER_OF_RECORDS + traitClasses.size());
+    }
+
+    @Test
+    public void testPrintTraitGroupsWithNegativeIdsOnly() throws Exception {
+        List<TraitClassReference> traitGroups = manager.getTraitGroupsHierarchy(TermId.ONTOLOGY_TRAIT_CLASS);
+        for (TraitClassReference traitGroup : traitGroups){
+            traitGroup.print(3);
+            if (traitGroup.getId() < 0){
+                traitGroup.print(3);
+            }
+            List<PropertyReference> properties = traitGroup.getProperties();
+            if (!properties.isEmpty()){
+                for(PropertyReference property : properties){
+                    if (property.getId() < 0){
+                        property.print(6);
+                    }
+                    List<StandardVariableReference> variables = property.getStandardVariables();
+                    if (!variables.isEmpty()){
+                        for(StandardVariableReference variable : variables){
+                            if (variable.getId() < 0){
+                                variable.print(9);
+                            }
+                        }
+                    }
+                }
+            }
+            
+        }
+        
+        
+    }
+    
+    
 	@Test
 	public void testGetPropertyByName() throws Exception {
 		String name = "Season";
 		Property property = manager.getProperty(name);
-		System.out.println(property);
+		Debug.println(0, property.toString());
 	}
 	
+	@Test 
+        public void testGetAllStandardVariable() throws Exception{
+            Set<StandardVariable> standardVariables = manager.getAllStandardVariables();
+            for (StandardVariable stdVar : standardVariables) {
+                stdVar.print(0);
+            }
+            
+            Debug.println(0, "count: " + standardVariables.size());
+        }
+	
+    @Test
+    public void testAddOrUpdateTermAndRelationshipFoundInCentral() throws Exception {
+        String name = "Season";
+        String definition = "Growing Season " + (int) (Math.random() * 100); // add random number to see the update
+        try{
+            manager.addOrUpdateTermAndRelationship(name, definition, CvId.PROPERTIES, TermId.IS_A.getId(), 1340);
+        } catch (MiddlewareException e){
+            Debug.println(3, "MiddlewareException expected: \"" + e.getMessage() + "\"");
+            assertTrue(e.getMessage().contains(" is retrieved from the central database and cannot be updated"));
+        }
+
+    }
+
+
+    @Test
+    public void testAddOrUpdateTermAndRelationshipNotInCentral() throws Exception {
+        String name = "Study condition NEW";
+        String definition = "Study condition NEW class " + (int) (Math.random() * 100); // add random number to see the update
+        Term origTerm = manager.findTermByName(name, CvId.PROPERTIES);
+        Term newTerm = manager.addOrUpdateTermAndRelationship(name, definition, CvId.PROPERTIES, TermId.IS_A.getId(), 1340);
+        Debug.println(3, "Original:  " + origTerm);
+        Debug.println(3, "Updated :  " + newTerm);
+        
+        if (origTerm != null) { // if the operation is update, the ids must be same
+            assertSame(origTerm.getId(), newTerm.getId());
+        }
+
+    }
+    
+
+    @Test
+    public void testUpdateTermAndRelationshipFoundInCentral() throws Exception {
+        String name = "Slope";
+        String definition = "Land slope " + (int) (Math.random() * 100); // add random number to see the update
+        Term origTerm = manager.findTermByName(name, CvId.PROPERTIES);
+        try{
+            manager.updateTermAndRelationship(new Term(origTerm.getId(), name, definition), TermId.IS_A.getId(), 1340);
+        } catch (MiddlewareException e){
+            Debug.println(3, "MiddlewareException expected: \"" + e.getMessage() + "\"");
+            assertTrue(e.getMessage().contains("Cannot update terms in central"));
+        }
+    }
+
+    @Test
+    public void testUpdateTermAndRelationshipNotInCentral() throws Exception {
+        String name = "Slope NEW";
+        String definition = "Slope NEW class " + (int) (Math.random() * 100); // add random number to see the update
+        Term origTerm = manager.findTermByName(name, CvId.PROPERTIES);
+        if (origTerm == null){ // first run, add before update
+            origTerm = manager.addOrUpdateTermAndRelationship(name, definition, CvId.PROPERTIES, TermId.IS_A.getId(), 1340);
+        }
+        manager.updateTermAndRelationship(new Term(origTerm.getId(), name, definition), TermId.IS_A.getId(), 1340);
+        Term newTerm = manager.findTermByName(name, CvId.PROPERTIES);
+        Debug.println(3, "Original:  " + origTerm);
+        Debug.println(3, "Updated :  " + newTerm);
+        
+        if (origTerm != null) { 
+            assertTrue(newTerm.getDefinition().equals(definition));
+        }
+
+    }
+
+    @Test
+    public void testAddOrUpdateTermFoundInCentral() throws Exception {
+        String name = "Score";
+        String definition = "Score NEW " + (int) (Math.random() * 100); // add random number to see the update
+        try{
+            manager.addOrUpdateTerm(name, definition, CvId.SCALES);
+        } catch (MiddlewareException e){
+            Debug.println(3, "MiddlewareException expected: \"" + e.getMessage() + "\"");
+            assertTrue(e.getMessage().contains(" is retrieved from the central database and cannot be updated"));
+        }
+    }
+
+    @Test
+    public void testAddOrUpdateTermNotInCentral() throws Exception {
+        String name = "Real";
+        String definition = "Real Description NEW " + (int) (Math.random() * 100); // add random number to see the update
+        Term origTerm = manager.findTermByName(name, CvId.SCALES);
+        Term newTerm = manager.addOrUpdateTerm(name, definition, CvId.SCALES);
+        Debug.println(3, "Original:  " + origTerm);
+        Debug.println(3, "Updated :  " + newTerm);
+        
+        if (origTerm != null) { // if the operation is update, the ids must be same
+            assertSame(origTerm.getId(), newTerm.getId());
+        }
+    }
+    
+
+    @Test
+    public void testUpdateTermFoundInCentral() throws Exception {
+        String name = "Score";
+        String definition = "Score NEW " + (int) (Math.random() * 100); // add random number to see the update
+        Term origTerm = manager.findTermByName(name, CvId.SCALES);
+        try{
+            manager.updateTerm(new Term(origTerm.getId(), name, definition));
+        } catch (MiddlewareException e){
+            Debug.println(3, "MiddlewareException expected: \"" + e.getMessage() + "\"");
+            assertTrue(e.getMessage().contains("Cannot update terms in central"));
+        }
+    }
+
+    @Test
+    public void testUpdateTermNotInCentral() throws Exception {
+        String name = "Integer";
+        String definition = "Integer NEW " + (int) (Math.random() * 100); // add random number to see the update
+        Term origTerm = manager.findTermByName(name, CvId.SCALES);
+        if (origTerm == null){ // first run, add before update
+            origTerm = manager.addTerm(name, definition, CvId.SCALES);
+        }
+        manager.updateTerm(new Term(origTerm.getId(), name, definition));
+        Term newTerm = manager.findTermByName(name, CvId.SCALES);
+        Debug.println(3, "Original:  " + origTerm);
+        Debug.println(3, "Updated :  " + newTerm);
+        
+        if (origTerm != null) { 
+            assertTrue(newTerm.getDefinition().equals(definition));
+        }
+    }
+    
+    @Test
+    public void testGetStandardVariableIdByTermId() throws Exception {
+        StandardVariable stdVariable = new StandardVariable();
+        stdVariable.setName("variable name " + new Random().nextInt(10000));
+        stdVariable.setDescription("variable description");
+        stdVariable.setProperty(new Term(2002, "User", "Database user"));
+        stdVariable.setMethod(new Term(4030, "Assigned", "Term, name or id assigned"));
+        stdVariable.setScale(new Term(6000, "DBCV", "Controlled vocabulary from a database"));
+        stdVariable.setStoredIn(new Term(1010, "Study information", "Study element"));
+        stdVariable.setDataType(new Term(1120, "Character variable", "variable with char values"));
+        stdVariable.setIsA(new Term(1050,"Study condition","Study condition class"));
+        stdVariable.setNameSynonyms(new ArrayList<NameSynonym>());
+        stdVariable.getNameSynonyms().add(new NameSynonym("Person", NameType.ALTERNATIVE_ENGLISH));
+        stdVariable.getNameSynonyms().add(new NameSynonym("Tiga-gamit", NameType.ALTERNATIVE_FRENCH));
+        stdVariable.setEnumerations(new ArrayList<Enumeration>());
+        stdVariable.getEnumerations().add(new Enumeration(10000, "N", "Nursery", 1));
+        stdVariable.getEnumerations().add(new Enumeration(10001, "HB", "Hybridization nursery", 2));
+        stdVariable.getEnumerations().add(new Enumeration(10002, "PN", "Pedigree nursery", 3));
+        stdVariable.setConstraints(new VariableConstraints(100, 999));
+        
+        manager.addStandardVariable(stdVariable);
+        
+        Integer stdVariableId = manager.getStandardVariableIdByTermId(stdVariable.getProperty().getId(), TermId.HAS_PROPERTY);
+        Debug.println(0, "From db:  " + stdVariableId);
+    }
+    
+    @Test
+    public void testDeleteTerm() throws Exception {
+        //terms to be deleted should be from local db
+        
+        String name = "Test Method " + new Random().nextInt(10000);
+        String definition = "Test Definition";
+        
+        //add a method, should allow insert
+        
+        CvId cvId = CvId.METHODS;
+        Term term = manager.addTerm(name, definition, cvId);
+        
+        manager.deleteTerm(term.getId(), cvId);
+        
+        //check if value does not exist anymore
+        term = manager.getTermById(term.getId());
+        assertNull(term);
+        
+        name = "Test Scale " + new Random().nextInt(10000);
+        definition = "Test Definition";
+        
+        cvId = CvId.SCALES;
+        term = manager.addTerm(name, definition, cvId);
+        
+        manager.deleteTerm(term.getId(), cvId);
+        
+        //check if value does not exist anymore
+        term = manager.getTermById(term.getId());
+        assertNull(term);
+    }
+    
+    @Test
+    public void testDeleteTermAndRelationship() throws Exception {
+        String name = "Test Property" + new Random().nextInt(10000);
+        String definition = "Property Definition";
+        int isA = 1087;
+        
+        Term term = manager.addProperty(name, definition, isA);
+        manager.deleteTermAndRelationship(term.getId(), CvId.PROPERTIES, TermId.IS_A.getId(), isA);
+        
+        term= manager.getTermById(term.getId());
+        assertNull(term);
+        
+        name = "Test Trait Class " + new Random().nextInt(10000);
+        definition = "Test Definition";
+        
+        term = manager.addTraitClass(name, definition, TermId.ONTOLOGY_TRAIT_CLASS.getId()).getTerm();
+        manager.deleteTermAndRelationship(term.getId(), CvId.IBDB_TERMS, TermId.IS_A.getId(), TermId.ONTOLOGY_TRAIT_CLASS.getId());
+        
+        term = manager.getTermById(term.getId());
+        assertNull(term);
+    }
+
 }

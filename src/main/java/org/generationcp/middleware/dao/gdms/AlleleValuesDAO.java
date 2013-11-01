@@ -115,8 +115,7 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer>{
 	            query.setParameter("markerId", markerId);
 	            query.setFirstResult(start);
 	            query.setMaxResults(numOfRows);
-	            List<Integer> gids = query.list();
-	            return gids;
+	            return (List<Integer>) query.list();
         	}
         } catch (HibernateException e) {
             logAndThrowException("Error with getGIDsByMarkerId(markerId=" + markerId + ") query from AlleleValues: " + e.getMessage(), e);

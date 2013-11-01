@@ -14,7 +14,6 @@ package org.generationcp.middleware.operation.builder;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermProperty;
@@ -40,7 +39,7 @@ public class TermBuilder extends Builder {
 		return term;
 	}
 	
-	public Term mapCVTermToTerm(CVTerm cVTerm){
+	public Term mapCVTermToTerm(CVTerm cVTerm) throws MiddlewareQueryException {
 		Term term = null;
 		
 		if (cVTerm != null){
@@ -48,12 +47,9 @@ public class TermBuilder extends Builder {
 			term.setObsolete(cVTerm.isObsolete());
 			term.setVocabularyId(cVTerm.getCv());
 			
-			List<TermProperty> properties = new ArrayList<TermProperty>();
-			if (cVTerm.getProperties() != null){
-				for (CVTermProperty property: cVTerm.getProperties()){
-				    properties.add(getTermPropertyBuilder().create(property));
-				}
-			}
+			List<CVTermProperty> cvTermProperties = getTermPropertyBuilder().findProperties(cVTerm.getCvTermId());
+			List<TermProperty> properties = getTermPropertyBuilder().create(cvTermProperties);
+
 			term.setProperties(properties);
 		}
 		return term;

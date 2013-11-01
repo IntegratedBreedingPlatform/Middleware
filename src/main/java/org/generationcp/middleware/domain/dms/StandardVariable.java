@@ -42,6 +42,8 @@ public class StandardVariable {
     
     private List<Enumeration> enumerations;
     
+    private String cropOntologyId;
+    
     public StandardVariable() {    	
     }
     
@@ -69,6 +71,7 @@ public class StandardVariable {
     	this.setId(0);  
     	this.setName(stdVar.getName());
     	this.setDescription(stdVar.getDescription());
+    	this.setCropOntologyId(stdVar.getCropOntologyId());
 	}
     
 	public int getId() {
@@ -159,7 +162,15 @@ public class StandardVariable {
 		this.phenotypicType = phenotypicType;
 	}
 
-	public Enumeration findEnumerationByName(String name) {
+    public String getCropOntologyId() {
+        return cropOntologyId;
+    }
+    
+    public void setCropOntologyId(String cropOntologyId) {
+        this.cropOntologyId = cropOntologyId;
+    }
+
+    public Enumeration findEnumerationByName(String name) {
 		if (enumerations != null) {
 			for (Enumeration enumeration : enumerations) {
 				if (enumeration.getName().equals(name)) {
@@ -255,6 +266,8 @@ public class StandardVariable {
 			builder.append(", enumerations=");
 		    builder.append(enumerations);
 		}
+        builder.append(", cropOntologyId=");
+        builder.append(cropOntologyId);
 		builder.append("]");
 		return builder.toString();
 	}

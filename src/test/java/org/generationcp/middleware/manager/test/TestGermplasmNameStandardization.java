@@ -13,6 +13,7 @@
 package org.generationcp.middleware.manager.test;
 
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
+import org.generationcp.middleware.util.Debug;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -24,7 +25,7 @@ public class TestGermplasmNameStandardization{
         String expectedResult = "I-1RT/P 1 A-23/";
 
         String result = GermplasmDataManagerUtil.standardizeName(parameter);
-        System.out.println("testNameStandardization(" + parameter + ") RESULTS: " + result);
+        Debug.println(0, "testNameStandardization(" + parameter + ") RESULTS: " + result);
         Assert.assertTrue(result.equals(expectedResult));
     }
 }

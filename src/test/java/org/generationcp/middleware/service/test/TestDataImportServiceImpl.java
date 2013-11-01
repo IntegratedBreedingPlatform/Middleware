@@ -21,6 +21,7 @@ import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.service.ServiceFactory;
 import org.generationcp.middleware.service.api.DataImportService;
+import org.generationcp.middleware.util.Debug;
 import org.generationcp.middleware.util.Message;
 import org.generationcp.middleware.utils.test.TestNurseryWorkbookUtil;
 import org.generationcp.middleware.utils.test.TestWorkbookUtil;
@@ -62,8 +63,10 @@ public class TestDataImportServiceImpl {
 
     @Before
     public void beforeEachTest() {
+        Debug.println(0, "#####" + name.getMethodName() + " Start: ");
         startTime = System.nanoTime();
     }
+
 
 
     @Test
@@ -78,7 +81,7 @@ public class TestDataImportServiceImpl {
 
             id = dataImportService.saveDataset(workbook);
         }
-        System.out.println("Created study: " + id + ", name = " + workbooks.get(0).getStudyDetails().getStudyName());
+        Debug.println(0, "Created study: " + id + ", name = " + workbooks.get(0).getStudyDetails().getStudyName());
     }
 
     @Test
@@ -86,7 +89,7 @@ public class TestDataImportServiceImpl {
         Workbook workbook = TestWorkbookUtil.getTestWorkbook();
         workbook.print(0);
         int id = dataImportService.saveDataset(workbook);
-        System.out.println("Created study:" + id + ", name = " + workbook.getStudyDetails().getStudyName());
+        Debug.println(0, "Created study:" + id + ", name = " + workbook.getStudyDetails().getStudyName());
 
     }
 
@@ -95,7 +98,7 @@ public class TestDataImportServiceImpl {
         Workbook workbook = TestNurseryWorkbookUtil.getTestWorkbook();
         workbook.print(0);
         int id = dataImportService.saveDataset(workbook);
-        System.out.println("Created study:" + id + ", name = " + workbook.getStudyDetails().getStudyName());
+        Debug.println(0, "Created study:" + id + ", name = " + workbook.getStudyDetails().getStudyName());
     }
 
     @Test
@@ -109,7 +112,7 @@ public class TestDataImportServiceImpl {
 
 
         int id = dataImportService.saveDataset(workbook);
-        System.out.println("Created study:" + id);
+        Debug.println(0, "Created study:" + id);
     }
 
 
@@ -171,7 +174,7 @@ public class TestDataImportServiceImpl {
 
             assertNotNull(messages);
             // There should be 7 error messages to correspond with the 7 missing fields in the file
-            assertTrue(messages.size() == 7);
+            assertSame(messages.size(), 7);
 
             return;
         } catch (MiddlewareQueryException e) {
@@ -190,7 +193,7 @@ public class TestDataImportServiceImpl {
             List<Message> messages = e.getErrorMessages();
 
             assertNotNull(messages);
-            assertTrue(messages.size() == 1);
+            assertSame(messages.size(), 1);
             assertEquals(expectedErrorKey, messages.get(0).getMessageKey());
             return;
         } catch (MiddlewareQueryException e) {
@@ -204,7 +207,7 @@ public class TestDataImportServiceImpl {
     @After
     public void afterEachTest() {
         long elapsedTime = System.nanoTime() - startTime;
-        System.out.println("#####" + name.getMethodName() + ": Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime / 1000000000) + " s");
+        Debug.println(0, "#####" + name.getMethodName() + ": Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime / 1000000000) + " s");
     }
 
 
@@ -214,4 +217,21 @@ public class TestDataImportServiceImpl {
             serviceFactory.close();
         }
     }
+    
+    @Test
+	public void testCheckIfProjectNameIsExisting() throws Exception {
+    	//try to save first then use the name of the saved study
+    	Workbook workbook = TestWorkbookUtil.getTestWorkbook();
+        workbook.print(0);
+        dataImportService.saveDataset(workbook);
+        String name = workbook.getStudyDetails().getStudyName();
+        Debug.println(0, "Name: " + name);
+		boolean isExisting = dataImportService.checkIfProjectNameIsExisting(name);
+		assertTrue(isExisting);
+		
+		name = "SHOULDNOTEXISTSTUDY";
+		Debug.println(0, "Name: " + name);
+		isExisting = dataImportService.checkIfProjectNameIsExisting(name);
+		assertFalse(isExisting);
+	}
 }

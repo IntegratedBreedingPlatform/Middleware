@@ -139,7 +139,7 @@ public class WorkflowTemplate implements Serializable{
         stepsString.append("[");
         
         if (steps == null){
-            return null;
+            return "";
         }
         
         for (WorkflowStep step : steps){

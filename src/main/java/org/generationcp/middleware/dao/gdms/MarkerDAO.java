@@ -60,8 +60,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
             query.setParameterList("markerNameList", names);
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
-            List<Integer> markerIds = query.list();
-            return markerIds;
+            return (List<Integer>) query.list();
         } catch (HibernateException e) {
         	logAndThrowException("Error with getIdsByNames(names=" + names + ") query from Marker: " + e.getMessage(), e);
         }
@@ -529,8 +528,7 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
             SQLQuery query = getSession().createSQLQuery(Marker.GET_ALL_DB_ACCESSION_IDS);
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
-            List<String> dbAccessionIds = query.list();
-            return dbAccessionIds;
+            return (List<String>) query.list();
         } catch (HibernateException e) {
         	logAndThrowException("Error with getAllDbAccessionIds() query from Marker: " + e.getMessage(), e);
         }

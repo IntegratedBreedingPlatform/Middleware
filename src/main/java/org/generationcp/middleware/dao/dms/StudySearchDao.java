@@ -262,15 +262,16 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	private String stringify(List<Integer> locationIds) {
-		String ids = new String();
-		boolean first = true;
-		for (Integer locId : locationIds) {
-			if (!first) {
-				ids += ",";
-			}
-		    ids += "'" + locId + "'";
-			first = false;
-		}
-		return ids;
+        StringBuffer ids = new StringBuffer();
+        boolean first = true;
+        for (Integer locId : locationIds) {
+            if (!first) {
+                ids.append(",");
+            }
+            ids.append("'").append(locId).append("'");
+            first = false;
+        }
+        return ids.toString();
+
 	}
 }

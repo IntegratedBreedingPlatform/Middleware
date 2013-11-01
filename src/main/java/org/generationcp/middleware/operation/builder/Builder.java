@@ -13,8 +13,6 @@ package org.generationcp.middleware.operation.builder;
 
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.OntologyDataManagerImpl;
-import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.operation.saver.CvTermSaver;
 import org.generationcp.middleware.operation.saver.StandardVariableSaver;
 import org.generationcp.middleware.util.DatabaseBroker;
@@ -77,5 +75,9 @@ public abstract class Builder extends DatabaseBroker {
 
 	protected final StandardVariableSaver getStandardVariableSaver() {
 		return new StandardVariableSaver(sessionProviderForLocal, sessionProviderForCentral);
+	}
+	
+	protected final NameSynonymBuilder getNameSynonymBuilder() {
+	    return new NameSynonymBuilder(sessionProviderForLocal, sessionProviderForCentral);
 	}
 }

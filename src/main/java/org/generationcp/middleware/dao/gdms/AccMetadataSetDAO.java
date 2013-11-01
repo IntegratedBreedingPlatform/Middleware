@@ -105,9 +105,7 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer>{
         		}
         		query.setFirstResult(start);
         		query.setMaxResults(numOfRows);
-        		
-	            Set<Integer> nidSet = new TreeSet<Integer>(query.list());
-	            return nidSet;
+        		return (Set<Integer>) new TreeSet<Integer>(query.list());
         	}
             
         } catch (HibernateException e) {
@@ -176,9 +174,7 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer>{
         		if (markerIds != null && !markerIds.isEmpty()){
             		query.setParameterList("markerids", markerIds);
         		}
-            
-        		Set<Integer> nidSet = new TreeSet<Integer>(query.list());
-        		return nidSet;
+            	return (Set<Integer>) new TreeSet<Integer>(query.list());
         	}
             
         } catch (HibernateException e) {

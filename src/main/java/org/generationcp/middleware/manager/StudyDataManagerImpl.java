@@ -31,6 +31,8 @@ import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.StudyResultSetByGid;
@@ -85,6 +87,18 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         return id;
     }
 
+    @Override
+    public boolean checkIfProjectNameIsExisting(String name) throws MiddlewareQueryException {
+        boolean isExisting = false;
+        setWorkingDatabase(Database.CENTRAL);
+        isExisting = getDmsProjectDao().checkIfProjectNameIsExisting(name);
+        if (!isExisting) {
+            setWorkingDatabase(Database.LOCAL);
+            isExisting = getDmsProjectDao().checkIfProjectNameIsExisting(name);
+        }
+        return isExisting;
+    }
+    
     @Override
     public List<FolderReference> getRootFolders(Database instance) throws MiddlewareQueryException {
         if (setWorkingDatabase(instance)) {
@@ -149,7 +163,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             return new StudyReference(project.getProjectId(), project.getName(), project.getDescription());
 
         } catch (Exception e) {
-            e.printStackTrace();
             rollbackTransaction(trans);
             logAndThrowException("Error encountered with addStudy(folderId="
                     + parentFolderId + ", variableTypeList=" + variableTypeList
@@ -384,6 +397,35 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             logAndThrowException("Error at getLocalNameByStandardVariableId :" + e.getMessage(), e);
         }
         return null;
+    }
+    
+
+    @Override
+    public List<StudyDetails> getAllStudyDetails(Database instance, StudyType studyType) throws MiddlewareQueryException {
+        setWorkingDatabase(instance);
+        return getDmsProjectDao().getAllStudyDetails(studyType);
+    }
+
+    @Override
+    public long countProjectsByVariable(int variableId) throws MiddlewareQueryException {
+        setWorkingDatabase(Database.LOCAL);
+        long count = getDmsProjectDao().countByVariable(variableId);
+        if (variableId > 0) {
+            setWorkingDatabase(Database.CENTRAL);
+            count += getDmsProjectDao().countByVariable(variableId);
+        }
+        return count;
+    }
+
+    @Override
+    public long countExperimentsByVariable(int variableId, int storedInId) throws MiddlewareQueryException {
+        setWorkingDatabase(Database.LOCAL);
+        long count = getExperimentDao().countByObservedVariable(variableId, storedInId);
+        if (variableId > 0) {
+            setWorkingDatabase(Database.CENTRAL);
+            count += getExperimentDao().countByObservedVariable(variableId, storedInId);
+        }
+        return count;
     }
 
 }

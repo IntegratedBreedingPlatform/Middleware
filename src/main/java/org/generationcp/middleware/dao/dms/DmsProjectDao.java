@@ -23,13 +23,16 @@ import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.ProjectionList;
@@ -43,7 +46,7 @@ import org.hibernate.criterion.Restrictions;
  *
  */
 public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
-
+    
 	private static final String GET_CHILDREN_OF_FOLDER =		
 			"SELECT DISTINCT subject.project_id, subject.name,  subject.description " 
 			+ "		, (CASE WHEN (type_id = " + TermId.IS_STUDY.getId() + ") THEN 1 ELSE 0 END) AS is_study  "
@@ -80,8 +83,18 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "     	AND pp.project_id = p.project_id AND pp.value = " 
 			+ "         "+TermId.DELETED_STUDY.getId()+") "
 		    + " ORDER BY p.project_id ";
-		 
-
+	
+	private static final String COUNT_PROJECTS_WITH_VARIABLE =
+	        "SELECT count(pp.project_id) " 
+	        + " FROM projectprop pp "
+	        + " WHERE NOT EXISTS( "
+	            + " SELECT 1 FROM projectprop stat "
+	            + " WHERE stat.project_id = pp.project_id "
+	            + " AND stat.type_id = " + TermId.STUDY_STATUS.getId()
+	            + " AND value = " + TermId.DELETED_STUDY.getId() + ") "
+	        + " AND pp.type_id = " + TermId.STANDARD_VARIABLE.getId()
+	        + " AND pp.value = :variableId";
+	
 	@SuppressWarnings("unchecked")
 	public List<FolderReference> getRootFolders() throws MiddlewareQueryException{
 		
@@ -243,7 +256,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			return criteria.list();
 			
 		} catch (HibernateException e) {
-			e.printStackTrace();
 			logAndThrowException("Error in getStudiesByStudyProperty with " + valueExpression + " for property " + studyPropertyId 
 					+ " in DmsProjectDao: " + e.getMessage(), e);
 		}
@@ -469,5 +481,98 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 		return null;
 	}
+	
+	@SuppressWarnings("unchecked")
+    public List<StudyDetails> getAllStudyDetails(StudyType studyType) throws MiddlewareQueryException {
+	    List<StudyDetails> studyDetails = new ArrayList<StudyDetails>();
+        try {
+            
+            StringBuilder sqlString = new StringBuilder()
+            .append("SELECT DISTINCT p.name AS name, p.description AS title, ppObjective.value AS objective, ppStartDate.value AS startDate, ")
+            .append(                        "ppEndDate.value AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName ")
+            .append("FROM project p ")
+            .append("   INNER JOIN projectprop ppNursery ON p.project_id = ppNursery.project_id ")
+            .append("                   AND ppNursery.type_id = ").append(TermId.STUDY_TYPE.getId()).append(" ")
+            .append("                   AND ppNursery.value = ").append(studyType.getId()).append(" ") // 10000 for Nursery
+            .append("   LEFT JOIN projectprop ppObjective ON p.project_id = ppObjective.project_id ")
+            .append("                   AND ppObjective.type_id =  ").append(TermId.STUDY_OBJECTIVE.getId()).append(" ") // 8030
+            .append("   LEFT JOIN projectprop ppStartDate ON p.project_id = ppStartDate.project_id ")
+            .append("                   AND ppStartDate.type_id =  ").append(TermId.START_DATE.getId()).append(" ") // 8050 
+            .append("   LEFT JOIN projectprop ppEndDate ON p.project_id = ppEndDate.project_id ")
+            .append("                   AND ppEndDate.type_id =  ").append(TermId.END_DATE.getId()).append(" ") // 8060 
+            .append("   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
+            .append("                   AND ppPI.type_id =  ").append(TermId.PI_NAME.getId()).append(" ") // 8100 
+            .append("   LEFT JOIN nd_experiment_project ep ON p.project_id = ep.project_id ")
+            .append("       INNER JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id ")
+            .append("       LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id ")
+            .append("           AND gpSiteName.type_id =  ").append(TermId.TRIAL_LOCATION.getId()).append(" ") // 8180 
+            .append("WHERE NOT EXISTS (SELECT 1 FROM projectprop ppDeleted WHERE ppDeleted.type_id =  ").append(TermId.STUDY_STATUS.getId()).append(" ") // 8006
+            .append("               AND ppDeleted.project_id = p.project_id AND ppDeleted.value =  ").append(TermId.DELETED_STUDY.getId()).append(") ") // 12990     
+            ;
+        
+            Query query = getSession().createSQLQuery(sqlString.toString())
+                        .addScalar("name")
+                        .addScalar("title")
+                        .addScalar("objective")
+                        .addScalar("startDate")
+                        .addScalar("endDate")
+                        .addScalar("piName")
+                        .addScalar("siteName")
+                        ;
+
+            List<Object[]> list =  query.list();
+            
+            if (list != null && list.size() > 0) {
+                for (Object[] row : list){
+                    String name = (String) row [0]; 
+                    String title = (String) row [1]; 
+                    String objective = (String) row [2]; 
+                    String startDate = (String) row [3]; 
+                    String endDate = (String) row [4]; 
+                    String piName = (String) row [5]; 
+                    String siteName = (String) row [6];
+                    
+                    studyDetails.add(new StudyDetails( name, title, objective, startDate, endDate, studyType, piName, siteName));
+                }
+            }
+
+        } catch(HibernateException e) {
+            logAndThrowException("Error in getAllStudyDetails() query in DmsProjectDao: " + e.getMessage(), e);
+        }
+        return studyDetails;
+	    
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public boolean checkIfProjectNameIsExisting(String name) throws MiddlewareQueryException {
+		try {
+			Criteria criteria = getSession().createCriteria(getPersistentClass());
+			criteria.add(Restrictions.eq("name", name));
+			
+			List list = criteria.list();
+			if(list!=null && !list.isEmpty()) {
+				return true;
+			}
+			
+		} catch (HibernateException e) {
+			logAndThrowException("Error in checkIfProjectNameIsExisting=" + name + " query on DmsProjectDao: " + e.getMessage(), e);
+		}
+		
+		return false;
+	}
+	
+    public long countByVariable(int variableId) throws MiddlewareQueryException {
+        try {
+            SQLQuery query = getSession().createSQLQuery(COUNT_PROJECTS_WITH_VARIABLE);
+            query.setParameter("variableId", variableId);
+            
+            return ((BigInteger) query.uniqueResult()).longValue();
+            
+        } catch(HibernateException e) {
+            logAndThrowException("Error at countByVariable=" + variableId + ", " + variableId + " query at DmsProjectDao: " + e.getMessage(), e);
+        }
+        return 0;
+    }
+
 
 }

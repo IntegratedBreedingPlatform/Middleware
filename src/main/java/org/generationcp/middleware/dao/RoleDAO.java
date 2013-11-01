@@ -39,7 +39,7 @@ public class RoleDAO extends GenericDAO<Role, Integer>{
             criteria.add(Restrictions.eq("name", name));
             criteria.add(Restrictions.eq("workflowTemplate", workflowTemplate));
             List<Role> roles = criteria.list();
-            return roles.size() > 0 ? roles.get(0) : null;
+            return !roles.isEmpty() ? roles.get(0) : null;
         } catch (HibernateException e) {
             logAndThrowException("Error in getByNameAndWorkflowTemplate(name=" + name + ", workflowTemplate=" + workflowTemplate
                 + ") query from Role: " + e.getMessage(), e);

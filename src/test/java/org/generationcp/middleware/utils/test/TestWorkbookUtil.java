@@ -188,7 +188,7 @@ public class TestWorkbookUtil {
 //				DBID, CONDUCTED, PERSON, NUMERIC, "", TRIAL));		
 //		
 		conditions.add(new MeasurementVariable("SITE", "TRIAL SITE NAME", 
-				DBCV, ASSIGNED, LOCATION, CHAR, "SITE " + String.valueOf(trialNo), TRIAL));		
+				DBCV, ASSIGNED, LOCATION, CHAR, "SITE " + trialNo, TRIAL));		
 		
 		conditions.add(new MeasurementVariable("SITE ID", "TRIAL SITE ID", 
 				DBID, ASSIGNED, LOCATION, NUMERIC, String.valueOf(trialNo), TRIAL));		

@@ -12,6 +12,8 @@
 package org.generationcp.middleware.operation.saver;
 
 
+import java.util.List;
+
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
@@ -30,22 +32,58 @@ public class CvTermSaver extends Saver {
 
 	public Term save(String name, String definition, CvId cvId)  throws MiddlewareException, MiddlewareQueryException{ 
 		requireLocalDatabaseInstance();
-
 		validateInputFields(name, definition);
-		
         CVTermDao dao = getCvTermDao();
+
         Integer generatedId;
 		try {
 			generatedId = dao.getNegativeId("cvTermId");
 		} catch (MiddlewareQueryException e) {
-			e.printStackTrace();
-			throw new MiddlewareQueryException(e.getMessage());
+			throw new MiddlewareQueryException(e.getMessage(), e);
 		}
 		CVTerm cvTerm = create(generatedId, name, definition, cvId.getId(), false, false); 
 		dao.save(cvTerm);
 
 		return new Term(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition());
 	}
+	
+
+    public Term saveOrUpdate(String name, String definition, CvId cvId) throws MiddlewareException, MiddlewareQueryException{
+        requireLocalDatabaseInstance();
+        validateInputFields(name, definition);
+        CVTermDao dao = getCvTermDao();
+        
+        List<Integer> termIds = dao.getTermsByNameOrSynonym(name, cvId.getId());
+
+        CVTerm cvTerm = null; 
+        if (termIds == null || termIds.isEmpty()){ // add
+            Integer generatedId = dao.getNegativeId("cvTermId");
+            cvTerm = create(generatedId, name, definition, cvId.getId(), false, false); 
+        } else if (termIds.size() == 1){ // update
+            cvTerm = create(termIds.get(0), name, definition, cvId.getId(), false, false); 
+        } else {
+            throw new MiddlewareException("Term with non-unique name (" + name +") retrieved for cv_id = " + cvId.getId());
+        }
+        dao.saveOrUpdate(cvTerm);
+        return new Term(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition());
+    }
+    
+    public Term update(Term term) throws MiddlewareException, MiddlewareQueryException{
+        requireLocalDatabaseInstance();
+        validateInputFields(term.getName(), term.getDefinition());
+        CVTermDao dao = getCvTermDao();
+
+        CVTerm cvTerm = dao.getById(term.getId());
+        
+        if (cvTerm != null) { //update
+             cvTerm.setName(term.getName());
+             cvTerm.setDefinition(term.getDefinition());
+             dao.update(cvTerm);
+        } else {
+            throw new MiddlewareException("Error: Term not found in the local database. ");
+        }
+        return new Term(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition());
+    }
 	
 	public CVTerm create(int id, String name, String definition, int cvId,  boolean isObsolete, boolean isRelationshipType){
 		CVTerm cvTerm = new CVTerm();
@@ -71,5 +109,14 @@ public class CvTermSaver extends Saver {
 		} 
 	}
 	
-	
+	public void delete(CVTerm cvTerm, CvId cvId) throws MiddlewareQueryException {
+	    requireLocalDatabaseInstance();
+            CVTermDao dao = getCvTermDao();
+
+            try {
+                dao.makeTransient(cvTerm);
+            } catch (MiddlewareQueryException e) {
+                throw new MiddlewareQueryException(e.getMessage(), e);
+            }
+	} 
 }

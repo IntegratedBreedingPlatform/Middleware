@@ -12,6 +12,8 @@
 
 package org.generationcp.middleware.domain.dms;
 
+import org.generationcp.middleware.util.Debug;
+
 /**
  * Abstract POJO that stores ID, name and description fields.
  * 
@@ -88,6 +90,13 @@ public abstract class Reference {
 		builder.append("]");
 		return builder.toString();
 	}
+
+    public void print(int indent){
+        Debug.println(indent, getEntityName() + ": ");
+        Debug.println(indent + 3, "Id: " + getId());
+        Debug.println(indent + 3, "Name: " + getName());
+        Debug.println(indent + 3, "Description: " + getDescription());
+    }
 
 	/**
 	 * Return the Logical name of implementing Subclass.

@@ -12,14 +12,25 @@ import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.pojos.Installation;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.util.Debug;
+import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestName;
 
 public class TestUserDataManagerImpl{
 
     private static ManagerFactory factory;
     private static UserDataManager manager;
+
+    private long startTime;
+
+    @Rule
+    public TestName name = new TestName();
+
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -29,21 +40,34 @@ public class TestUserDataManagerImpl{
         manager = factory.getUserDataManager();
     }
 
+
+    @Before
+    public void beforeEachTest() {
+        Debug.println(0, "#####" + name.getMethodName() + " Start: ");
+        startTime = System.nanoTime();
+    }
+
+    @After
+    public void afterEachTest() {
+        long elapsedTime = System.nanoTime() - startTime;
+        Debug.println(0, "#####" + name.getMethodName() + " End: Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime / 1000000000) + " s");
+    }
+
     @Test
     public void testGetAllUsers() throws Exception {
         List<User> users = manager.getAllUsers();
         assertNotNull(users);
 
-        System.out.println("testGetAllUsers() RESULTS: " + users.size());
+        Debug.println(0, "testGetAllUsers(): " + users.size());
         for (User user : users) {
-            System.out.println("  " + user);
+            Debug.println(0, "  " + user);
         }
     }
 
     @Test
     public void testCountAllUsers() throws Exception {
         long count = manager.countAllUsers();
-        System.out.println("testCountAllUsers(): " + count);
+        Debug.println(0, "testCountAllUsers(): " + count);
     }
 
     @Test
@@ -66,7 +90,7 @@ public class TestUserDataManagerImpl{
 
         user = manager.getUserById(user.getUserid());
         assertNotNull(user);
-        System.out.println("testAddUser() ADDED: " + user);
+        Debug.println(0, "testAddUser() ADDED: " + user);
 
         // cleanup
         manager.deleteUser(user);
@@ -77,16 +101,16 @@ public class TestUserDataManagerImpl{
         List<Person> persons = manager.getAllPersons();
         assertNotNull(persons);
 
-        System.out.println("testGetAllPersons() RESULTS: " + persons.size());
+        Debug.println(0, "testGetAllPersons(): " + persons.size());
         for (Person person : persons) {
-            System.out.println("  " + person);
+            Debug.println(0, "  " + person);
         }
     }
 
     @Test
     public void testCountAllPersons() throws Exception{
         long count = manager.countAllPersons();
-        System.out.println("testCountAllPersons(): " + count);
+        Debug.println(0, "testCountAllPersons(): " + count);
     }
 
     @Test
@@ -112,7 +136,7 @@ public class TestUserDataManagerImpl{
 
         person = manager.getPersonById(person.getId());
         assertNotNull(person);
-        System.out.println("testAddPerson() ADDED: " + person);
+        Debug.println(0, "testAddPerson() ADDED: " + person);
 
         // delete the person
         manager.deletePerson(person);
@@ -122,53 +146,53 @@ public class TestUserDataManagerImpl{
     public void testIsPersonExists() throws MiddlewareQueryException {
         String firstName = "PATERNO";
         String lastName = "BORLAGDAN";
-        System.out.println("testIsPersonExists(firstName=" + firstName + ", lastName=" + lastName + "): "
+        Debug.println(0, "testIsPersonExists(firstName=" + firstName + ", lastName=" + lastName + "): "
                 + manager.isPersonExists(firstName, lastName));
 
         firstName = "PATTY";
         lastName = "Borly".toUpperCase();
-        System.out.println("testIsPersonExists(firstName=" + firstName + ", lastName=" + lastName + "): "
+        Debug.println(0, "testIsPersonExists(firstName=" + firstName + ", lastName=" + lastName + "): "
                 + manager.isPersonExists(firstName, lastName));
     }
 
     @Test
     public void testIsUsernameExists() throws MiddlewareQueryException {
-    	System.out.println("testIsUsernameExists() ");
+    	Debug.println(0, "testIsUsernameExists() ");
         String userName = "GMCLAREN";
-        System.out.println("Existing Username (" + userName + "): " + manager.isUsernameExists(userName));
+        Debug.println(0, "Existing Username (" + userName + "): " + manager.isUsernameExists(userName));
         String userName2 = "CLAREN";
-        System.out.println("Non-existing Username (" + userName2 + "): " + manager.isUsernameExists(userName2));
+        Debug.println(0, "Non-existing Username (" + userName2 + "): " + manager.isUsernameExists(userName2));
     }
 
     @Test
     public void testGetAllInstallationRecords() throws Exception {
         List<Installation> results = manager.getAllInstallationRecords(0, 150, Database.CENTRAL);
         List<Installation> results2 = manager.getAllInstallationRecords(0, 150, Database.LOCAL);
-        System.out.println("testGetAllInstallationRecords()");
-        System.out.println("Central Database: " + results.size());
+        Debug.println(0, "testGetAllInstallationRecords()");
+        Debug.println(0, "Central Database: " + results.size());
         for (Installation holder : results) {
-            System.out.println("  " + holder);
+            Debug.println(0, "  " + holder);
         }
 
-        System.out.println("Local Database: " + results2.size());
+        Debug.println(0, "Local Database: " + results2.size());
         for (Installation holder : results2) {
-            System.out.println("  " + holder);
+            Debug.println(0, "  " + holder);
         }
     }
 
     @Test
     public void testGetInstallationRecordById() throws Exception {
         Long id = Long.valueOf(1);
-        System.out.println("testGetInstallationRecordById(" + id + ")" + manager.getInstallationRecordById(id));
+        Debug.println(0, "testGetInstallationRecordById(" + id + ")" + manager.getInstallationRecordById(id));
     }
 
     @Test
     public void testGetInstallationRecordsByAdminId() throws Exception {
         Long id = Long.valueOf(1);
         List<Installation> results = manager.getInstallationRecordsByAdminId(id);
-        System.out.println("testGetInstallationRecordsByAdminId(" + id + ") RESULTS: ");
+        Debug.println(0, "testGetInstallationRecordsByAdminId(" + id + ") RESULTS: ");
         for (Installation holder : results) {
-            System.out.println("  " + holder);
+            Debug.println(0, "  " + holder);
         }
     }
 
@@ -176,21 +200,19 @@ public class TestUserDataManagerImpl{
     public void testGetLatestInstallationRecord() throws Exception {
         Installation result = manager.getLatestInstallationRecord(Database.CENTRAL);
         Installation result2 = manager.getLatestInstallationRecord(Database.LOCAL);
-        System.out.println("testGetLatestInstallationRecord()");
-        System.out.println("Central Database: " + result);
-        System.out.println("Local Database: " + result2);
+        Debug.println(0, "Central Database: " + result);
+        Debug.println(0, "Local Database: " + result2);
     }
 
 
     @Test
 	public void testGetPersonById() throws Exception {
-		System.out.println("testGetPersonById() ");
 
     	//central database
 		int id = 1;
 		Person personid = manager.getPersonById(id);
 		assertNotNull(personid);
-		System.out.println("Central database: " + personid);
+		Debug.println(0, "Central database: " + personid);
 
 		//local database
         Person person = new Person();
@@ -213,19 +235,18 @@ public class TestUserDataManagerImpl{
 
 		Person personid2 = manager.getPersonById(person.getId());
 		assertNotNull(personid2);
-		System.out.println("Local Database: " + personid2);
+		Debug.println(0, "Local Database: " + personid2);
 
         manager.deletePerson(person);
 	}
 
     @Test
 	public void testGetUserById() throws Exception {
-    	System.out.println("testGetUserById() ");
     	//central database
 		int id = 1;
 		User userid = manager.getUserById(id);
 		assertNotNull(userid);
-		System.out.println("Central Database: " + userid);
+		Debug.println(0, "Central Database: " + userid);
 
     	//local database
         User user = new User();
@@ -246,7 +267,7 @@ public class TestUserDataManagerImpl{
 
         User userid2 = manager.getUserById(user.getUserid());
         assertNotNull(userid2);
-        System.out.println("Local Database: " + userid2);
+        Debug.println(0, "Local Database: " + userid2);
 
         // cleanup
         manager.deleteUser(user);
@@ -273,7 +294,7 @@ public class TestUserDataManagerImpl{
 		String name = "user_test";
 		User userName = manager.getUserByUserName(name);
 		assertNotNull(userName);
-		System.out.println("testGetUserByUserName: " + userName);
+		Debug.println(0, "testGetUserByUserName: " + userName);
 
 	    manager.deleteUser(user);
 
@@ -283,10 +304,10 @@ public class TestUserDataManagerImpl{
     public void testIsValidUserLogin() throws MiddlewareQueryException {
     	String validuser = "GMCLAREN"; //enter valid username
     	String validpass = "IR123"; // enter valid password
-        System.out.println("testIsValidUserLogin (using valid username & password): " + manager.isValidUserLogin(validuser, validpass));
+        Debug.println(0, "testIsValidUserLogin (using valid username & password): " + manager.isValidUserLogin(validuser, validpass));
         String invaliduser = "username"; //enter invalid username
     	String invalidpass = "password"; // enter invalid password
-        System.out.println("testIsValidUserLogin (using invalid username & password): " + manager.isValidUserLogin(invaliduser, invalidpass));
+        Debug.println(0, "testIsValidUserLogin (using invalid username & password): " + manager.isValidUserLogin(invaliduser, invalidpass));
     }
 
 

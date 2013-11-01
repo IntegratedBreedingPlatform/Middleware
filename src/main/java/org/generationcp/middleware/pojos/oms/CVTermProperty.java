@@ -58,10 +58,12 @@ public class CVTermProperty implements Serializable {
 	@Column(name = "rank")
 	private Integer rank;
 	
-	@ManyToOne(targetEntity = CVTerm.class)
+/*	@ManyToOne(targetEntity = CVTerm.class)
 	@JoinColumn(name = "cvterm_id", nullable = false)
 	private CVTerm cvTerm;
-
+*/
+	@Column(name="cvterm_id")
+	private Integer cvTermId;
 	
 	public Integer getCvTermPropertyId() {
 		return cvTermPropertyId;
@@ -94,7 +96,7 @@ public class CVTermProperty implements Serializable {
 	public void setRank(Integer rank) {
 		this.rank = rank;
 	}
-
+/*
 	public CVTerm getCvTerm() {
 		return cvTerm;
 	}
@@ -102,6 +104,14 @@ public class CVTermProperty implements Serializable {
 	public void setCvTerm(CVTerm cvTerm) {
 		this.cvTerm = cvTerm;
 	}
+*/
+    public Integer getCvTermId() {
+        return cvTermId;
+    }
+    
+    public void setCvTermId(Integer cvTermId) {
+        this.cvTermId = cvTermId;
+    }
 
 	@Override
 	public int hashCode() {
@@ -113,7 +123,7 @@ public class CVTermProperty implements Serializable {
 		return result;
 	}
 
-	@Override
+    @Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;

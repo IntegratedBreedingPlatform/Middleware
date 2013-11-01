@@ -18,6 +18,7 @@ import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.hibernate.HibernateUtil;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.util.Debug;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -40,26 +41,26 @@ public class TestGermplasmDAO{
      *       germplsmList = dao.getAll(0, 5); Assert.assertTrue(germplsmList !=
      *       null); Assert.assertTrue(germplsmList.size() >= 5);
      * 
-     *       System.out.println("SEARCH RESULTS:"); for(Germplasm g :
-     *       germplsmList) { System.out.println(g); } }
+     *       Debug.println(0, "SEARCH RESULTS:"); for(Germplasm g :
+     *       germplsmList) { Debug.println(0, g); } }
      * @Test public void testCountAll() throws Exception { long count =
      *       dao.countAll(); Assert.assertTrue(count != null);
-     *       System.out.println("COUNT = " + count); }
+     *       Debug.println(0, "COUNT = " + count); }
      * @Test public void testGetByPrefName() throws Exception { List<Germplasm>
      *       germplsmList = dao.getByPrefName("IR 64", 0, 5);
      *       Assert.assertTrue(germplsmList != null);
      *       Assert.assertTrue(germplsmList.size() >= 5);
      * 
-     *       System.out.println("SEARCH RESULTS:"); for(Germplasm g :
-     *       germplsmList) { System.out.println(g); } }
+     *       Debug.println(0, "SEARCH RESULTS:"); for(Germplasm g :
+     *       germplsmList) { Debug.println(0, g); } }
      * @Test public void testCountByPrefName() throws Exception { BigInteger
      *       count = dao.countByPrefName("IR 64"); Assert.assertTrue(count !=
-     *       null); System.out.println("COUNT = " + count); }
+     *       null); Debug.println(0, "COUNT = " + count); }
      * @Test public void testGetProgenitorsByGIDWithPrefName() throws Exception
      *       { List<Germplasm> results = dao.getProgenitorsByGIDWithPrefName(new
      *       Integer(306436)); Assert.assertTrue(results.size() > 0);
-     *       System.out.println("RESULTS:"); for(Germplasm g : results) {
-     *       System.out.println(g); System.out.println(g.getPreferredName()); }
+     *       Debug.println(0, "RESULTS:"); for(Germplasm g : results) {
+     *       Debug.println(0, g); Debug.println(0, g.getPreferredName()); }
      *       }
      **/
 
@@ -69,9 +70,9 @@ public class TestGermplasmDAO{
         //List<Germplasm> results = dao.getDerivativeChildren(gid);
         List<Germplasm> results = dao.getChildren(gid, 'D');
         Assert.assertTrue(results.size() > 0);
-        System.out.println("testGetDerivativeChildren(GId=" + gid + ") RESULTS:");
+        Debug.println(0, "testGetDerivativeChildren(GId=" + gid + ") RESULTS:");
         for (Germplasm g : results) {
-            System.out.println("  " + g.getGid() + " : " + g.getPreferredName().getNval());
+            Debug.println(0, "  " + g.getGid() + " : " + g.getPreferredName().getNval());
         }
     }
     
@@ -80,9 +81,9 @@ public class TestGermplasmDAO{
     	Integer gid = Integer.valueOf(2590);
         List<Germplasm> results = dao.getChildren(gid, 'M');
         Assert.assertTrue(results.size() > 0);
-        System.out.println("testGetMaintenanceChildren(GId=" + gid + ") RESULTS:");
+        Debug.println(0, "testGetMaintenanceChildren(GId=" + gid + ") RESULTS:");
         for (Germplasm g : results) {
-            System.out.println("  " + g.getGid() + " : " + g.getPreferredName().getNval());
+            Debug.println(0, "  " + g.getGid() + " : " + g.getPreferredName().getNval());
         }
     }
 

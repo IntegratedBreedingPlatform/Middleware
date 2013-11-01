@@ -672,6 +672,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         return new ArrayList<Germplasm>();
     }
     
+    @SuppressWarnings("rawtypes")
     public Germplasm getByGIDWithMethodType(Integer gid) throws MiddlewareQueryException {
         try {
         	if (gid != null){

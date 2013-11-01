@@ -32,12 +32,18 @@ public enum TermId {
 	, IS_A(1225)
 	, STORED_IN(1044)
 	
+	//Ontology
+	, IBDB_CLASS(1001)
+	, ONTOLOGY_TRAIT_CLASS(1330)
+	, ONTOLOGY_RESEARCH_CLASS(1045)
+	
 	//Study Fields
 	, STUDY_NAME(8005)
 	, PM_KEY(8040)
 	, STUDY_TITLE(8007)
 	, STUDY_OBJECTIVE(8030)
-	, PI_ID(8110)
+    , PI_ID(8110)
+    , PI_NAME(8100)
 	, STUDY_TYPE(8070)
 	, START_DATE(8050)
 	, END_DATE(8060)
@@ -115,12 +121,15 @@ public enum TermId {
     , ORDER(1420)
 	, MIN_VALUE(1113)
 	, MAX_VALUE(1115)
+	, CROP_ONTOLOGY_ID(1226)
 
 	// Stock Type
 	, ENTRY_CODE(8300)
 	
 	//Location 
-	, LOCATION_ID(8190)
+    , TRIAL_LOCATION(8180)
+    , LOCATION_ID(8190)
+    , SITE_NAME(8196)
 	
 	//Study Type
 	, NURSERY(10000)

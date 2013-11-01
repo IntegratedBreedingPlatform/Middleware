@@ -1,6 +1,7 @@
 package org.generationcp.middleware.util;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TimerWatch {
 
@@ -24,7 +25,7 @@ public class TimerWatch {
 		if (logger != null) {
 			logger.debug("##" + title + " = " + elapsedTime + " sec");
 		} else {
-			System.out.println("##" + title + " = " + elapsedTime + " sec");
+			Debug.println(0, "##" + title + " = " + elapsedTime + " sec");
 		}
 	}
 	

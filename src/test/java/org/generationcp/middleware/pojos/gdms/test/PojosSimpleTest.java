@@ -26,21 +26,37 @@ import org.generationcp.middleware.pojos.gdms.MappingPop;
 import org.generationcp.middleware.pojos.gdms.MappingPopValues;
 import org.generationcp.middleware.pojos.gdms.Marker;
 import org.generationcp.middleware.pojos.gdms.MarkerMetadataSet;
+import org.generationcp.middleware.util.Debug;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestName;
 
 @SuppressWarnings("rawtypes")
 public class PojosSimpleTest{
 
     private static HibernateUtil hibernateUtil;
 
+    private long startTime;
+
+    @Rule
+    public TestName name = new TestName();
+
     @BeforeClass
     public static void setUp() throws Exception {
         hibernateUtil = new HibernateUtil(new DatabaseConnectionParameters("testDatabaseConfig.properties", "central"));
+    }
+
+    @Before
+    public void beforeEachTest() {
+        Debug.println(0, "#####" + name.getMethodName() + " Start: ");
+        startTime = System.nanoTime();
     }
 
     @Test
@@ -50,12 +66,11 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
-        System.out.println("testAccMetadataSet() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof AccMetadataSet);
             Assert.assertTrue(obj != null);
             AccMetadataSet element = (AccMetadataSet) obj;
-            System.out.println("  " + element);
+            Debug.println(0, "  " + element);
         }
     }
 
@@ -66,12 +81,11 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
-        System.out.println("testAlleleValues() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof AlleleValues);
             Assert.assertTrue(obj != null);
             AlleleValues element = (AlleleValues) obj;
-            System.out.println("  " + element);
+            Debug.println(0, "  " + element);
         }
     }
 
@@ -82,12 +96,11 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
-        System.out.println("testCharValues() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof CharValues);
             Assert.assertTrue(obj != null);
             CharValues element = (CharValues) obj;
-            System.out.println("  " + element);
+            Debug.println(0, "  " + element);
         }
     }
 
@@ -98,12 +111,11 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
-        System.out.println("testDataset() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof Dataset);
             Assert.assertTrue(obj != null);
             Dataset element = (Dataset) obj;
-            System.out.println("  " + element);
+            Debug.println(0, "  " + element);
         }
     }
 
@@ -114,12 +126,11 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
-        System.out.println("testMap() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof Map);
             Assert.assertTrue(obj != null);
             Map element = (Map) obj;
-            System.out.println("  " + element);
+            Debug.println(0, "  " + element);
         }
     }
 
@@ -130,12 +141,11 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
-        System.out.println("testMappingData() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof MappingData);
             Assert.assertTrue(obj != null);
             MappingData element = (MappingData) obj;
-            System.out.println("  " + element);
+            Debug.println(0, "  " + element);
         }
     }
 
@@ -146,12 +156,11 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
-        System.out.println("testMappingPop() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof MappingPop);
             Assert.assertTrue(obj != null);
             MappingPop element = (MappingPop) obj;
-            System.out.println("  " + element);
+            Debug.println(0, "  " + element);
         }
     }
 
@@ -162,12 +171,11 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
-        System.out.println("testMappingPopValues() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof MappingPopValues);
             Assert.assertTrue(obj != null);
             MappingPopValues element = (MappingPopValues) obj;
-            System.out.println("  " + element);
+            Debug.println(0, "  " + element);
         }
     }
 
@@ -178,12 +186,11 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
-        System.out.println("testMarker() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof Marker);
             Assert.assertTrue(obj != null);
             Marker element = (Marker) obj;
-            System.out.println("  " + element);
+            Debug.println(0, "  " + element);
         }
     }
 
@@ -194,13 +201,18 @@ public class PojosSimpleTest{
         query.setMaxResults(5);
         List results = query.list();
 
-        System.out.println("testMarkerMetadataSet() RESULTS: ");
         for (Object obj : results) {
             Assert.assertTrue(obj instanceof MarkerMetadataSet);
             Assert.assertTrue(obj != null);
             MarkerMetadataSet element = (MarkerMetadataSet) obj;
-            System.out.println("  " + element);
+            Debug.println(0, "  " + element);
         }
+    }
+
+    @After
+    public void afterEachTest() {
+        long elapsedTime = System.nanoTime() - startTime;
+        Debug.println(0, "#####" + name.getMethodName() + " End: Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime / 1000000000) + " s");
     }
 
     @AfterClass

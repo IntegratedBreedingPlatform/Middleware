@@ -35,25 +35,39 @@ public class StudyDetails {
 	private String trialDatasetName;
 
 	private String measurementDatasetName;
+	
+    private String siteName;
+
+    private String piName;
 
 	public StudyDetails(){
 		
 	}
 	
-	public StudyDetails(String studyName, String title, String pmKey,
-			String objective, String startDate, String endDate, StudyType studyType, 
-			long parentFolderId, String trialDatasetName, String measurementDatasetName) {
-		this.studyName = studyName;
-		this.title = title;
-		this.pmKey = pmKey;
-		this.objective = objective;
-		this.startDate = startDate;
-		this.endDate = endDate;
-		this.studyType = studyType;
-		this.parentFolderId = parentFolderId;
-		this.trialDatasetName = trialDatasetName;
-		this.measurementDatasetName = measurementDatasetName;
-	}
+    public StudyDetails(String studyName, String title, String pmKey,
+            String objective, String startDate, String endDate, StudyType studyType, 
+            long parentFolderId, String trialDatasetName, String measurementDatasetName) {
+        this.studyName = studyName;
+        this.title = title;
+        this.pmKey = pmKey;
+        this.objective = objective;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.studyType = studyType;
+        this.parentFolderId = parentFolderId;
+        this.trialDatasetName = trialDatasetName;
+        this.measurementDatasetName = measurementDatasetName;
+    }
+
+    // Used by getStudyDetails
+    public StudyDetails(String studyName, String title,
+            String objective, String startDate, String endDate, StudyType studyType, 
+            String piName, String siteName) {
+        this(studyName, title, null, objective, startDate, endDate, studyType, 
+                0, null, null);
+        this.siteName = siteName;
+        this.setPiName(piName);
+    }
 
 	public String getStudyName() {
 		return studyName;
@@ -142,28 +156,58 @@ public class StudyDetails {
 		this.measurementDatasetName = measurementDatasetName;
 	}
 
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("StudyDetails [studyName=");
-		builder.append(studyName);
-		builder.append(", title=");
-		builder.append(title);
-		builder.append(", pmKey=");
-		builder.append(pmKey);
-		builder.append(", objective=");
-		builder.append(objective);
-		builder.append(", startDate=");
-		builder.append(startDate);
-		builder.append(", endDate=");
-		builder.append(endDate);
-		builder.append(", studyType=");
-		builder.append(studyType);
-		builder.append(", parentFolderId=");
-		builder.append(parentFolderId);
-		builder.append("]");
-		return builder.toString();
-	}
+    public String getSiteName() {
+        return siteName;
+    }
+
+    public void setSiteName(String siteName) {
+        this.siteName = siteName;
+    }
+
+    /**
+     * @return the piName
+     */
+    public String getPiName() {
+        return piName;
+    }
+
+    /**
+     * @param piName the piName to set
+     */
+    public void setPiName(String piName) {
+        this.piName = piName;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("StudyDetails [studyName=");
+        builder.append(studyName);
+        builder.append(", title=");
+        builder.append(title);
+        builder.append(", pmKey=");
+        builder.append(pmKey);
+        builder.append(", objective=");
+        builder.append(objective);
+        builder.append(", startDate=");
+        builder.append(startDate);
+        builder.append(", endDate=");
+        builder.append(endDate);
+        builder.append(", studyType=");
+        builder.append(studyType);
+        builder.append(", parentFolderId=");
+        builder.append(parentFolderId);
+        builder.append(", trialDatasetName=");
+        builder.append(trialDatasetName);
+        builder.append(", measurementDatasetName=");
+        builder.append(measurementDatasetName);
+        builder.append(", siteName=");
+        builder.append(siteName);
+        builder.append(", piName=");
+        builder.append(piName);
+        builder.append("]");
+        return builder.toString();
+    }
 
 	public void print(int indent) {
 		Debug.println(indent, "StudyDetails: ");
@@ -174,7 +218,11 @@ public class StudyDetails {
 	    Debug.println(indent + 3, "Start Date: " + startDate);
 	    Debug.println(indent + 3, "End Date: " + endDate);
 		Debug.println(indent + 3, "Study Type: " + studyType);
-		Debug.println(indent + 3, "Parent Folder Id: " + parentFolderId);
+        Debug.println(indent + 3, "Parent Folder Id: " + parentFolderId);
+        Debug.println(indent + 3, "Trial Dataset Name: " + trialDatasetName);
+        Debug.println(indent + 3, "Measurement Dataset Name: " + measurementDatasetName);
+        Debug.println(indent + 3, "Site Name: " + siteName);
+        Debug.println(indent + 3, "PI Name: " + piName);
 	}
 
 }

@@ -17,6 +17,7 @@ import java.util.List;
 import org.generationcp.middleware.hibernate.HibernateUtil;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.util.Debug;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.junit.Test;
@@ -34,11 +35,12 @@ public class TestHibernateUtil{
         query.setMaxResults(5);
         List<Germplasm> results = query.list();
 
-        System.out.println("testHibernateUtil(host=" + params.getHost() + ", port=" + params.getPort() + ", dbName=" + params.getDbName() + ", userName=" + params.getUsername()
+        Debug.println(0, "testHibernateUtil(host=" + params.getHost() + ", port=" + params.getPort() 
+                + ", dbName=" + params.getDbName() + ", userName=" + params.getUsername()
                 + ", password=" + params.getPassword() + ") GERMPLASMS: ");
 
         for (Germplasm g : results) {
-            System.out.println("  " + g);
+            Debug.println(0, "  " + g);
         }
     }
 }

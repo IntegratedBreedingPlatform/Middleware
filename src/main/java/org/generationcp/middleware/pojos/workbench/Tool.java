@@ -66,6 +66,10 @@ public class Tool implements Serializable{
     @Column(name = "user_tool")
     private Boolean userTool;
 
+    @Basic(optional = false)
+    @Column(name = "path")
+    private String path;
+
     public String getParameter() {
 		return parameter;
 	}
@@ -81,10 +85,6 @@ public class Tool implements Serializable{
 	public void setUserTool(Boolean userTool) {
 		this.userTool = userTool;
 	}
-
-	@Basic(optional = false)
-    @Column(name = "path")
-    private String path;
 
     public Long getToolId() {
         return toolId;

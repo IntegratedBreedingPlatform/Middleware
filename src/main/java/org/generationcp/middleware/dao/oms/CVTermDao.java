@@ -13,6 +13,7 @@ package org.generationcp.middleware.dao.oms;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -25,9 +26,13 @@ import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CategoricalValue;
 import org.generationcp.middleware.domain.h2h.TraitInfo;
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.PropertyReference;
+import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.util.Debug;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -209,19 +214,18 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
         List<CVTerm> terms = new ArrayList<CVTerm>();
         
         try {
-            String queryString = 
-                    "SELECT cvt.cvterm_id, cvt.name, cvt.definition "
-                    + "FROM cvterm cvt " 
-                    + "INNER JOIN cvterm_relationship cvr ON cvr.subject_id = cvt.cvterm_id " 
-                    + "             AND cvr.type_id = 1105 AND cvr.object_id IN (:types) "
+            StringBuffer queryString = new StringBuffer()
+                .append("SELECT cvt.cvterm_id, cvt.name, cvt.definition ")
+                .append("FROM cvterm cvt ") 
+                .append("INNER JOIN cvterm_relationship cvr ON cvr.subject_id = cvt.cvterm_id ") 
+                .append("             AND cvr.type_id = 1105 AND cvr.object_id IN (:types) ")
                     ;
             if (storedIn != null) {
-                queryString += 
-                    "INNER JOIN cvterm_relationship stored_in ON cvr.subject_id = stored_in.subject_id " 
-                    + "AND stored_in.type_id = 1044 AND stored_in.object_id = :storedIn " ;
+                queryString.append("INNER JOIN cvterm_relationship stored_in ON cvr.subject_id = stored_in.subject_id ") 
+                    .append("AND stored_in.type_id = 1044 AND stored_in.object_id = :storedIn ");
             }
-            
-            SQLQuery query = getSession().createSQLQuery(queryString);
+
+            SQLQuery query = getSession().createSQLQuery(queryString.toString());
             query.setParameterList("types", types);
             if (storedIn != null) {
                 query.setParameter("storedIn", storedIn);
@@ -306,7 +310,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
           List<Integer> valueIds = new ArrayList<Integer>();
           valueIds.addAll(valueIdName.keySet());
           
-          if(!valueIds.equals("") && valueIds!=null && valueIds.size()!=0){
+          if (valueIds != null && valueIds.size() != 0) {
 	          query = getSession().createSQLQuery(
 	                  "SELECT cvterm_id, cvterm.name " +
 	                  "FROM cvterm " +
@@ -426,8 +430,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			SQLQuery query = getSession().createSQLQuery(queryString.toString());
 			query.setParameterList("type", type.getTypeStorages());
 			
-			List<Integer> standardVariableIds = (List<Integer>) query.list();						
-			return standardVariableIds;
+			return (List<Integer>) query.list();
 						
 		} catch(HibernateException e) {
 			logAndThrowException("Error at getStandardVariableIdsByPhenotypicType :" + e.getMessage(), e);
@@ -503,8 +506,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			SQLQuery query = getSession().createSQLQuery(queryString.toString());
 			query.setInteger("traitId", traitId);
 			
-			List<Integer> methodIds = (List<Integer>) query.list();						
-			return methodIds;
+			return  (List<Integer>) query.list();
 						
 		} catch(HibernateException e) {
 			logAndThrowException("Error at findMethodTermIdsByTrait :" + e.getMessage(), e);
@@ -527,8 +529,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			SQLQuery query = getSession().createSQLQuery(queryString.toString());
 			query.setInteger("traitId", traitId);
 			
-			List<Integer> scaleIds = (List<Integer>) query.list();						
-			return scaleIds;
+			return (List<Integer>) query.list();
 						
 		} catch(HibernateException e) {
 			logAndThrowException("Error at findScaleTermIdsByTrait :" + e.getMessage(), e);
@@ -734,5 +735,245 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		
 		return term;
 	}
+
+    /**
+     * Returns the entries in cvterm of all trait classes (with subject_id entry in cvterm_relationship where object_id = classType and type_id = 1225)
+     */
+    public List<TraitClassReference> getTraitClasses(TermId classType) throws MiddlewareQueryException{
+        
+        List<TraitClassReference> traitClasses = new ArrayList<TraitClassReference>();
+        
+        try {
+            /*
+             SELECT cvterm_id, name, definition 
+             FROM cvterm cvt JOIN cvterm_relationship cvr 
+                 ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = 1225 AND cvr.object_id = 1330;  -- 1330 for Ontology Trait Class, 1045 for Ontology Research Class
+            */ 
+
+            StringBuffer sqlString = new StringBuffer()
+                .append("SELECT cvterm_id, name, definition ")
+                .append("FROM cvterm cvt JOIN cvterm_relationship cvr ")
+                    .append("ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = ").append(TermId.IS_A.getId())
+                    .append(" AND cvr.object_id = ").append(classType.getId()).append(" ")
+                    .append(" AND cvt.cv_id = ").append(CvId.IBDB_TERMS.getId());
+            
+            SQLQuery query = getSession().createSQLQuery(sqlString.toString());
+            
+            List<Object[]> list = query.list();
+            
+            for (Object[] row : list) {
+                Integer cvtermId = (Integer) row[0];
+                String cvtermName = (String) row[1];
+                String cvtermDefinition = (String) row[2];
+                
+                traitClasses.add(new TraitClassReference(cvtermId, cvtermName, cvtermDefinition, classType.getId()));
+            }
+
+        } catch (HibernateException e) {
+            logAndThrowException("Error at getTraitClasses() query on CVTermDao: " + e.getMessage(), e);
+        }
+
+        return traitClasses;
+        
+    }
+    
+    /**
+     * Retrieves all the trait classes (id, name, definition, parent trait class)
+     *
+     * @param traitClassIds
+     * @return
+     */
+    public List<TraitClassReference> getAllTraitClasses() throws MiddlewareQueryException{
+        List<TraitClassReference> traitClasses = new ArrayList<TraitClassReference>();
+        
+        try {
+            /*
+             SELECT cvterm_id, name, definition, cvr.object_id
+             FROM cvterm cvt JOIN cvterm_relationship cvr 
+                 ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = 1225
+                 WHERE cv_id = 1000 AND object_id NOT IN (1000, 1002, 1003)
+                 ORDER BY cvr.object_id;
+            */ 
+
+            StringBuffer sqlString = new StringBuffer()
+                .append("SELECT cvterm_id, name, definition, cvr.object_id ")
+                .append("FROM cvterm cvt JOIN cvterm_relationship cvr ")
+                .append("ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = ").append(TermId.IS_A.getId()).append(" ")
+                .append("WHERE cv_id = 1000 AND object_id NOT IN (1000, 1002, 1003)  ")
+                .append("ORDER BY cvr.object_id ")
+                ;
+            
+            
+            SQLQuery query = getSession().createSQLQuery(sqlString.toString());
+
+            List<Object[]> list = query.list();
+
+            for (Object[] row : list) {
+                Integer id = (Integer) row[0];
+                String name = (String) row[1];
+                String definition = (String) row[2];
+                Integer isAId = (Integer) row[3];
+
+                traitClasses.add(new TraitClassReference(id, name, definition, isAId));
+            }
+
+        } catch (HibernateException e) {
+            logAndThrowException("Error at getAllTraitClasses() query on CVTermDao: " + e.getMessage(), e);
+        }
+        
+        return traitClasses;
+
+    }
+    
+    /**
+     * Retrieves the properties of Trait Classes
+     */
+    public Map<Integer, List<PropertyReference>> getPropertiesOfTraitClasses(List<Integer> traitClassIds) throws MiddlewareQueryException{
+
+        Map<Integer, List<PropertyReference>> propertiesOfTraitClasses = new HashMap<Integer, List<PropertyReference>>();
+        
+        if (traitClassIds.isEmpty()){
+            return propertiesOfTraitClasses;
+        }
+
+        Collections.sort(traitClassIds);   
+        
+        try {
+            /*
+             SELECT cvterm_id, name, definition, cvr.object_id
+             FROM cvterm cvt JOIN cvterm_relationship cvr 
+                 ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = 1225 AND cvr.object_id IN (:traitClassIds)
+                 WHERE cv_id = 1010
+                 ORDER BY cvr.object_id;
+            */ 
+
+            StringBuffer sqlString = new StringBuffer()
+                .append("SELECT cvterm_id, name, definition, cvr.object_id ")
+                .append("FROM cvterm cvt JOIN cvterm_relationship cvr ")
+                    .append("ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = ").append(TermId.IS_A.getId()).append(" ")
+                    .append(" AND cvr.object_id  IN (:traitClassIds) ")
+                .append("WHERE cv_id =  ").append(CvId.PROPERTIES.getId()).append(" ")
+                .append("ORDER BY cvr.object_id ")
+                ;
+            
+            SQLQuery query = getSession().createSQLQuery(sqlString.toString());
+            query.setParameterList("traitClassIds", traitClassIds);
+            
+            List<Object[]> list = query.list();
+            
+            List<PropertyReference> properties = new ArrayList<PropertyReference>();
+            Integer prevTraitClassId = traitClassIds.get(0);
+
+            for (Object[] row : list) {
+                Integer cvtermId = (Integer) row[0];
+                String cvtermName = (String) row[1];
+                String cvtermDefinition = (String) row[2];
+                Integer traitClassId = (Integer) row[3];
+
+                if (!prevTraitClassId.equals(traitClassId)){
+                    propertiesOfTraitClasses.put(prevTraitClassId,  properties);
+                    properties = new ArrayList<PropertyReference>();
+                    prevTraitClassId = traitClassId;
+                }
+                properties.add(new PropertyReference(cvtermId, cvtermName, cvtermDefinition));
+            }
+            
+            propertiesOfTraitClasses.put(prevTraitClassId,  properties);
+
+        } catch (HibernateException e) {
+            logAndThrowException("Error at getTraitClassProperties() query on CVTermDao: " + e.getMessage(), e);
+        }
+        
+        return propertiesOfTraitClasses;
+    }
+
+
+    /**
+     * Retrieves the standard variables of trait properties
+     */
+    public Map<Integer, List<StandardVariableReference>> getStandardVariablesOfProperties(List<Integer> propertyIds) throws MiddlewareQueryException{
+        Map<Integer, List<StandardVariableReference>> variablesOfProperties = new HashMap<Integer, List<StandardVariableReference>>();
+        
+        if (propertyIds.isEmpty()){
+            return variablesOfProperties;
+        }
+        
+        Collections.sort(propertyIds);   
+        
+        try {
+            /*
+             SELECT cvterm_id, name, definition, cvr.object_id 
+             FROM cvterm cvt JOIN cvterm_relationship cvr 
+                 ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = 1200 AND cvr.object_id IN (:propertyIds)
+                 ORDER BY cvr.object_id;
+                        
+            */ 
+
+            StringBuffer sqlString = new StringBuffer()
+                .append("SELECT cvterm_id, name, definition, cvr.object_id ")
+                .append("FROM cvterm cvt JOIN cvterm_relationship cvr ")
+                    .append("ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = ").append(TermId.HAS_PROPERTY.getId())
+                    .append(" AND cvr.object_id  IN (:propertyIds) ")
+                .append("ORDER BY cvr.object_id ")
+                ;
+            
+            SQLQuery query = getSession().createSQLQuery(sqlString.toString());
+            query.setParameterList("propertyIds", propertyIds);
+            
+            Debug.println(4, sqlString.toString());
+            
+            List<Object[]> list = query.list();
+            
+            List<StandardVariableReference> variables = new ArrayList<StandardVariableReference>();
+            Integer prevPropertyId = propertyIds.get(0);
+
+            for (Object[] row : list) {
+                Integer cvtermId = (Integer) row[0];
+                String cvtermName = (String) row[1];
+                String cvtermDefinition = (String) row[2];
+                Integer traitClassId = (Integer) row[3];
+
+                if (!prevPropertyId.equals(traitClassId)){
+                    variablesOfProperties.put(prevPropertyId,  variables);
+                    variables = new ArrayList<StandardVariableReference>();
+                    prevPropertyId = traitClassId;
+                }
+                variables.add(new StandardVariableReference(cvtermId, cvtermName, cvtermDefinition));
+            }
+            
+            variablesOfProperties.put(prevPropertyId,  variables);
+
+        } catch (HibernateException e) {
+            logAndThrowException("Error at getStandardVariablesOfProperties() query on CVTermDao: " + e.getMessage(), e);
+        }
+        
+        return variablesOfProperties;
+    }
+
+    /*
+     * Retrieves the standard variable linked to an ontology
+     * */
+    public Integer getStandardVariableIdByTermId(int cvTermId, TermId termId) throws MiddlewareQueryException {
+        try {
+            StringBuilder queryString = new StringBuilder();
+            queryString.append("SELECT DISTINCT cvr.subject_id ");
+            queryString.append("FROM cvterm_relationship cvr ");
+            queryString.append("INNER JOIN cvterm_relationship cvrt ON cvr.subject_id = cvrt.subject_id AND cvrt.type_id = :typeId ");
+            queryString.append("WHERE cvr.object_id = :cvTermId ");
+            queryString.append("ORDER BY cvr.subject_id ").append(" LIMIT 0,1");
+            System.out.println(queryString);
+            SQLQuery query = getSession().createSQLQuery(queryString.toString());
+            query.setParameter("typeId", termId.getId());
+            query.setParameter("cvTermId", cvTermId);
+            
+            Integer id = (Integer) query.uniqueResult();
+                                    
+            return id;
+                                    
+        } catch(HibernateException e) {
+                logAndThrowException("Error at getStandadardVariableIdByTermId :" + e.getMessage(), e);
+        }
+        return null;
+    }
 	
 }

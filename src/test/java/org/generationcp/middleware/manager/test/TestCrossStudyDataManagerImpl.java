@@ -31,6 +31,7 @@ import org.generationcp.middleware.domain.h2h.TraitObservation;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.CrossStudyDataManager;
+import org.generationcp.middleware.util.Debug;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -61,29 +62,49 @@ public class TestCrossStudyDataManagerImpl {
 
 	@Before
 	public void beforeEachTest() {
+        Debug.println(0, "#####" + name.getMethodName() + " Start: ");
 		startTime = System.nanoTime();
 	}
 	
 	@After
 	public void afterEachTest() {
 		long elapsedTime = System.nanoTime() - startTime;
-		System.out.println("#####" + name.getMethodName() + ": Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime/1000000000) + " s");
+		Debug.println(0, "#####" + name.getMethodName() + ": Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime/1000000000) + " s");
 	}
 	
 	@Test
 	public void testGetAllTrialEnvironments() throws Exception {
-		System.out.println("testGetAllTrialEnvironemnts");
 		TrialEnvironments environments = manager.getAllTrialEnvironments();
-		System.out.println("SIZE=" + environments.size());
 		environments.print(1);
+		Debug.println(0, "SIZE=" + environments.size());
+	}
+	
+	@Test
+	public void testGetTrialEnvironments() throws Exception {
+		long count = manager.countAllTrialEnvironments();
+		Integer batchSizeInt = 1000;
+		int iterations = ((Double) Math.ceil(count / batchSizeInt.doubleValue())).intValue();
+		
+		for (int i = 0; i < iterations; i++){
+			int start = i * batchSizeInt;
+			TrialEnvironments environments = manager.getTrialEnvironments(start, batchSizeInt);
+			environments.print(1);
+			Debug.println(0, "start=" + start + ", size=" + environments.size());
+		}
+	}
+	
+	@Test
+	public void testCountAllTrialEnvironments() throws Exception {
+		long count = manager.countAllTrialEnvironments();
+		Debug.println(0, "SIZE=" + count);
 	}
 	
 	@Test
 	public void testGetPropertiesForTrialEnvironments() throws Exception {
 		List<Integer> environmentIds = Arrays.asList(5770, 10081, -1);
-		System.out.println("testGetPropertiesForTrialEnvironments = " + environmentIds);
+		Debug.println(0, "testGetPropertiesForTrialEnvironments = " + environmentIds);
 		List<TrialEnvironmentProperty> properties = manager.getPropertiesForTrialEnvironments(environmentIds);
-		System.out.println("SIZE=" + properties.size());
+		Debug.println(0, "SIZE=" + properties.size());
 		for (TrialEnvironmentProperty property : properties) {
 			property.print(0);
 		}
@@ -92,9 +113,9 @@ public class TestCrossStudyDataManagerImpl {
 	@Test
 	public void testGetStudiesForTrialEnvironments() throws Exception {
 		List<Integer> environmentIds = Arrays.asList(5770, 10081);
-		System.out.println("testGetStudiesForTrialEnvironments = " + environmentIds);
+		Debug.println(0, "testGetStudiesForTrialEnvironments = " + environmentIds);
 		List<StudyReference> studies = manager.getStudiesForTrialEnvironments(environmentIds);
-		System.out.println("SIZE=" + studies.size());
+		Debug.println(0, "SIZE=" + studies.size());
 		for (StudyReference study : studies) {
 			study.print(1);
 		}
@@ -104,9 +125,8 @@ public class TestCrossStudyDataManagerImpl {
     public void testGetTraitsForNumericVariates() throws Exception {
         List<Integer> environmentIds = Arrays.asList(10081, 10082, 10083, 10084, 10085, 10086, 10087); //Rice
         List<NumericTraitInfo> result = manager.getTraitsForNumericVariates(environmentIds);
-        System.out.println("testGetTraitsForNumericVariates(): " + result.size());
+        Debug.println(0, "testGetTraitsForNumericVariates(): " + result.size());
         for (NumericTraitInfo trait : result){
-            //System.out.println(trait);
             trait.print(4);
         }
     }
@@ -115,24 +135,21 @@ public class TestCrossStudyDataManagerImpl {
     public void testGetTraitsForCharacterVariates() throws Exception {
         List<Integer> environmentIds = Arrays.asList( 10040, 10050, 10060, 10070); //Rice
         List<CharacterTraitInfo> result = manager.getTraitsForCharacterVariates(environmentIds);
-        System.out.println("testGetTraitsForCharacterVariates(): " + result.size());
+        Debug.println(0, "testGetTraitsForCharacterVariates(): " + result.size());
         for (CharacterTraitInfo trait : result){
-            //System.out.println(trait);
             trait.print(4);
         }
-        System.out.println("testGetTraitsForCharacterVariates(): " + result.size());
     }
    
     @Test
     public void testGetTraitsForCategoricalVariates() throws Exception {
         List<Integer> environmentIds = Arrays.asList(10010, 10020, 10030, 10040, 10050, 10060, 10070); //Rice
         List<CategoricalTraitInfo> result = manager.getTraitsForCategoricalVariates(environmentIds);
-        System.out.println("testGetTraitsForCategoricalVariates(): " + result.size());
         for (CategoricalTraitInfo trait : result) {
-            //System.out.println(trait);
+            //Debug.println(0, trait);
             trait.print(4);
         }
-        System.out.println("testGetTraitsForCategoricalVariates(): " + result.size());
+        Debug.println(0, "testGetTraitsForCategoricalVariates(): " + result.size());
     }
     
     @Test
@@ -152,13 +169,10 @@ public class TestCrossStudyDataManagerImpl {
         
         
         List<GermplasmPair> result = manager.getEnvironmentsForGermplasmPairs(pairs);
-       
-        System.out.println("testGetEnvironmentsForGermplasmPairs(): " + result.size());
         for (GermplasmPair pair : result) {
         	pair.print(4);
-//            System.out.println(pair.toString());
         }
-        System.out.println("testGetEnvironmentsForGermplasmPairs(): " + result.size());
+        Debug.println(0, "testGetEnvironmentsForGermplasmPairs(): " + result.size());
     }
     
     @Test
@@ -175,11 +189,10 @@ public class TestCrossStudyDataManagerImpl {
 
         List<Observation> result = manager.getObservationsForTraitOnGermplasms(traitIds, germplasmIds, environmentIds);
        
-        System.out.println("testGetObservationsForTraitOnGermplasms(): " + result.size());
         for (Observation observation : result) {
             observation.print(4);
         }
-        System.out.println("testGetObservationsForTraitOnGermplasms(): " + result.size());
+        Debug.println(0, "testGetObservationsForTraitOnGermplasms(): " + result.size());
     }
   
     @Test
@@ -189,31 +202,31 @@ public class TestCrossStudyDataManagerImpl {
 
         /*List<Observation> result = manager.getObservationsForTraits(traitIds, environmentIds);
        
-        System.out.println("testGetObservationsForTraits(): " + result.size());
+        Debug.println(0, "testGetObservationsForTraits(): " + result.size());
         for (Observation observation : result) {
             observation.print(4);
         }
-        System.out.println("testGetObservationsForTraits(): " + result.size());
+        Debug.println(0, "testGetObservationsForTraits(): " + result.size());
         */
         
         //new
         List<Observation> result1 = new ArrayList<Observation>();
         List<Observation> result = manager.getObservationsForTraits(traitIds, environmentIds,0,2);
-        System.out.println("new testGetObservationsForTraits(): " + result.size());
+        Debug.println(0, "new testGetObservationsForTraits(): " + result.size());
         for (Observation observation : result) {
             observation.print(4);
         }
         result1.addAll(result);
         
         result = manager.getObservationsForTraits(traitIds, environmentIds,2,2);
-        System.out.println("new testGetObservationsForTraits(): " + result.size());
+        Debug.println(0, "new testGetObservationsForTraits(): " + result.size());
         for (Observation observation : result) {
             observation.print(4);
         }
         result1.addAll(result);
         
         result = manager.getObservationsForTraits(traitIds, environmentIds,0,4);
-        System.out.println("new testGetObservationsForTraits(): " + result.size());
+        Debug.println(0, "new testGetObservationsForTraits(): " + result.size());
         for (Observation observation : result) {
             observation.print(4);
         }
@@ -221,7 +234,7 @@ public class TestCrossStudyDataManagerImpl {
         assertEquals(result1, result);
         
         result = manager.getObservationsForTraits(traitIds, environmentIds,299,2);
-        System.out.println("new testGetObservationsForTraits(): " + result.size());
+        Debug.println(0, "new testGetObservationsForTraits(): " + result.size());
         //should return 2 records from local given there are 299 central records
         assertEquals(2, result.size());
         for (Observation observation : result) {
@@ -229,28 +242,25 @@ public class TestCrossStudyDataManagerImpl {
         }
         //compare with old
         List<Observation> oldResult = manager.getObservationsForTraits(traitIds, environmentIds);
-        System.out.println("RESULT SIZE of old testGetObservationsForTraits(): " + oldResult.size());
+        Debug.println(0, "RESULT SIZE of old testGetObservationsForTraits(): " + oldResult.size());
         //get last 2 (should be from local)
         oldResult = oldResult.subList(oldResult.size()-2, oldResult.size());
-        System.out.println("Size: " + oldResult.size());
+        Debug.println(0, "Size: " + oldResult.size());
         assertEquals(2, oldResult.size());
         for (Observation observation : oldResult) {
             observation.print(4);
         }
     }
 
-    
-    
-    
-	@Test
+    @Test
     public void testGetObservationsForTrait() throws Exception {
         int traitId = 22574;
     	List<Integer> environmentIds = Arrays.asList(5771, 5772, 5773, 5774, 5775, 5776); //Rice
         
     	List<TraitObservation> result = manager.getObservationsForTrait(traitId, environmentIds);
-        System.out.println("testGetObservationsForTrait(): " + result.size());
+        Debug.println(0, "testGetObservationsForTrait(): " + result.size());
         for (TraitObservation trait : result){
-            System.out.println("    " + trait);
+            Debug.println(0, "    " + trait);
         }
     }
 	
@@ -261,9 +271,9 @@ public class TestCrossStudyDataManagerImpl {
     	traitIds.add(22006);
     	traitIds.add(22485);
     	
-		System.out.println("testGetEnvironmentForTraits");
+		Debug.println(0, "testGetEnvironmentForTraits");
 		TrialEnvironments environments = manager.getEnvironmentsForTraits(traitIds);
-		System.out.println("SIZE=" + environments.size());
+		Debug.println(0, "SIZE=" + environments.size());
 		environments.print(1);
 	}
   

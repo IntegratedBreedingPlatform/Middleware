@@ -285,8 +285,7 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
         try {
         	Session session = getSession();
         	SQLQuery query = session.createSQLQuery(Location.COUNT_ALL_BREEDING_LOCATIONS);
-        	Long total = (Long) query.addScalar("count",Hibernate.LONG).uniqueResult();
-        	return total;
+        	return (Long) query.addScalar("count",Hibernate.LONG).uniqueResult();
         } catch (HibernateException e) {
             logAndThrowException("Error with countAllBredingLocations() query from Location: "+ e.getMessage(), e);
         }
@@ -326,7 +325,7 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
     @SuppressWarnings("unchecked")
 	public List<LocationDto> getLocationDtoByIds(Collection<Integer> ids) throws MiddlewareQueryException {
 		List<LocationDto> returnList = new ArrayList<LocationDto>();
-		if (ids != null && ids.size() > 0) {
+		if (ids != null && !ids.isEmpty()) {
 	    	try {
 	    		String sql = "SELECT l.lname, prov.lname, c.isoabbr, l.locid"
 	    					+ " FROM location l"

@@ -193,7 +193,7 @@ public class ExperimentModelSaver extends Saver {
 	private void setCategoricalVariateValue(ExperimentModel experiment, StandardVariable stdVariable, Object value) throws MiddlewareQueryException {
 		Phenotype phenotype = findPhenotype(experiment, stdVariable);
 		if (phenotype != null) {
-			phenotype.setcValue(value == null ? null : new Integer(value.toString()));
+			phenotype.setcValue(value == null ? null : Integer.valueOf(value.toString()));
 			getPhenotypeDao().update(phenotype);
 		}
 		else {
@@ -242,7 +242,7 @@ public class ExperimentModelSaver extends Saver {
 		
 		Phenotype phenotype = new Phenotype();
 		phenotype.setPhenotypeId(getPhenotypeDao().getNegativeId("phenotypeId"));
-		phenotype.setcValue(value == null ? null : new Integer(value.toString()));
+		phenotype.setcValue(value == null ? null : Integer.valueOf(value.toString()));
 		phenotype.setObservableId(stdVariable.getId());
 		phenotype.setUniqueName(phenotype.getPhenotypeId().toString());
 		phenotype.setName(String.valueOf(stdVariable.getId()));

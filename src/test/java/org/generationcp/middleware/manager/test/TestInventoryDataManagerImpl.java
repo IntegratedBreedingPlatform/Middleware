@@ -25,14 +25,26 @@ import org.generationcp.middleware.pojos.Lot;
 import org.generationcp.middleware.pojos.Transaction;
 import org.generationcp.middleware.pojos.report.LotReportRow;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
+import org.generationcp.middleware.util.Debug;
+import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestName;
 
 public class TestInventoryDataManagerImpl{
 
     private static ManagerFactory factory;
     private static InventoryDataManager manager;
+    
+
+    private long startTime;
+
+    @Rule
+    public TestName name = new TestName();
+
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -42,113 +54,126 @@ public class TestInventoryDataManagerImpl{
         manager = factory.getInventoryDataManager();
     }
 
+
+    @Before
+    public void beforeEachTest() {
+        Debug.println(0, "#####" + name.getMethodName() + " Start: ");
+        startTime = System.nanoTime();
+    }
+    
+    @After
+    public void afterEachTest() {
+        long elapsedTime = System.nanoTime() - startTime;
+        Debug.println(0, "#####" + name.getMethodName() + ": Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime/1000000000) + " s");
+    }
+
     @Test
     public void testGetLotsByEntityType() throws Exception {
         String type = "GERMPLSM";
         List<Lot> results = manager.getLotsByEntityType(type, 0, 5);
         Assert.assertTrue(results != null);
         Assert.assertTrue(!results.isEmpty());
-        System.out.println("testGetLotsByEntityType(" + type + ") RESULTS: ");
+        Debug.println(0, "testGetLotsByEntityType(" + type + ") RESULTS: ");
         for (Lot result : results)
-            System.out.println("  " + result);
+            Debug.println(0, "  " + result);
     }
 
     @Test
     public void testCountLotsByEntityType() throws Exception {
-        System.out.println("testCountLotsByEntityType(\"GERMPLSM\") RESULTS: " + manager.countLotsByEntityType("GERMPLSM"));
+        Debug.println(0, "testCountLotsByEntityType(\"GERMPLSM\") RESULTS: " + manager.countLotsByEntityType("GERMPLSM"));
     }
 
     @Test
     public void testGetLotsByEntityTypeAndEntityId() throws Exception {
         String type = "GERMPLSM";
-        Integer entityId = new Integer(50533);
+        Integer entityId = Integer.valueOf(50533);
         List<Lot> results = manager.getLotsByEntityTypeAndEntityId(type, entityId, 0, 5);
         Assert.assertTrue(results != null);
         Assert.assertTrue(!results.isEmpty());
-        System.out.println("testGetLotsByEntityTypeAndEntityId(type=" + type + ", entityId=" + entityId + ") RESULTS: ");
+        Debug.println(0, "testGetLotsByEntityTypeAndEntityId(type=" + type + ", entityId=" + entityId + ") RESULTS: ");
         for (Lot result : results)
-            System.out.println("  " + result);
+            Debug.println(0, "  " + result);
     }
 
     @Test
     public void testCountLotsByEntityTypeAndEntityId() throws Exception {
         String type = "GERMPLSM";
-        Integer entityId = new Integer(50533);
-        System.out.println("testCountLotsByEntityTypeAndEntityId(type=" + type + ", entityId=" + entityId + ") RESULTS: "
+        Integer entityId = Integer.valueOf(50533);
+        Debug.println(0, "testCountLotsByEntityTypeAndEntityId(type=" + type + ", entityId=" + entityId + ") RESULTS: "
                 + manager.countLotsByEntityTypeAndEntityId(type, entityId));
     }
 
     @Test
     public void testGetLotsByEntityTypeAndLocationId() throws Exception {
         String type = "GERMPLSM";
-        Integer locationId = new Integer(9000);
+        Integer locationId = Integer.valueOf(9000);
         List<Lot> results = manager.getLotsByEntityTypeAndLocationId(type, locationId, 0, 5);
         Assert.assertTrue(results != null);
         Assert.assertTrue(!results.isEmpty());
-        System.out.println("testGetLotsByEntityTypeAndLocationId(type=" + type + ", locationId=" + locationId + ") RESULTS: ");
+        Debug.println(0, "testGetLotsByEntityTypeAndLocationId(type=" + type + ", locationId=" + locationId + ") RESULTS: ");
         for (Lot result : results)
-            System.out.println("  " + result);
+            Debug.println(0, "  " + result);
     }
 
     @Test
     public void testCountLotsByEntityTypeAndLocationId() throws Exception {
         String type = "GERMPLSM";
-        Integer locationId = new Integer(9000);
-        System.out.println("testCountLotsByEntityTypeAndLocationId(type=" + type + ", locationId=" + locationId + ") RESULTS: "
+        Integer locationId = Integer.valueOf(9000);
+        Debug.println(0, "testCountLotsByEntityTypeAndLocationId(type=" + type + ", locationId=" + locationId + ") RESULTS: "
                 + manager.countLotsByEntityTypeAndLocationId(type, locationId));
     }
 
     @Test
     public void testGetLotsByEntityTypeAndEntityIdAndLocationId() throws Exception {
         String type = "GERMPLSM";
-        Integer entityId = new Integer(50533);
-        Integer locationId = new Integer(9000);
+        Integer entityId = Integer.valueOf(50533);
+        Integer locationId = Integer.valueOf(9000);
         List<Lot> results = manager.getLotsByEntityTypeAndEntityIdAndLocationId(type, entityId, locationId, 0, 5);
         Assert.assertTrue(results != null);
         Assert.assertTrue(!results.isEmpty());
-        System.out.println("testGetLotsByEntityTypeAndEntityIdAndLocationId(type=" + type + ", entityId=" + entityId + ", locationId="
+        Debug.println(0, "testGetLotsByEntityTypeAndEntityIdAndLocationId(type=" + type + ", entityId=" + entityId + ", locationId="
                 + locationId + ") RESULTS: ");
         for (Lot result : results)
-            System.out.println("  " + result);
+            Debug.println(0, "  " + result);
     }
 
     @Test
     public void testCountLotsByEntityTypeAndEntityIdAndLocationId() throws Exception {
         String type = "GERMPLSM";
-        Integer entityId = new Integer(50533);
-        Integer locationId = new Integer(9000);
-        System.out.println("testCountLotsByEntityTypeAndEntityIdAndLocationId(type=" + type + ", entityId=" + entityId + ", locationId="
+        Integer entityId = Integer.valueOf(50533);
+        Integer locationId = Integer.valueOf(9000);
+        Debug.println(0, "testCountLotsByEntityTypeAndEntityIdAndLocationId(type=" + type + ", entityId=" + entityId + ", locationId="
                 + locationId + ") RESULTS: " + manager.countLotsByEntityTypeAndEntityIdAndLocationId(type, entityId, locationId));
     }
 
     @Test
     public void testGetActualLotBalance() throws Exception {
         Integer lotId = Integer.valueOf(-1);
-        System.out.println("testGetActualLotBalance(lotId=" + lotId + "): " + manager.getActualLotBalance(lotId));
+        Debug.println(0, "testGetActualLotBalance(lotId=" + lotId + "): " + manager.getActualLotBalance(lotId));
     }
 
     @Test
     public void testGetAvailableLotBalance() throws Exception {
         Integer lotId = Integer.valueOf(-1);
-        System.out.println("testGetAvailableLotBalance(lotId=" + lotId + "): " + manager.getAvailableLotBalance(lotId));
+        Debug.println(0, "testGetAvailableLotBalance(lotId=" + lotId + "): " + manager.getAvailableLotBalance(lotId));
     }
 
     @Test
     public void testAddLot() throws Exception {
         Lot lot = new Lot();
         lot.setComments("sample added lot");
-        lot.setEntityId(new Integer(50533));
+        lot.setEntityId(Integer.valueOf(50533));
         lot.setEntityType("GERMPLSM");
-        lot.setLocationId(new Integer(9001));
-        lot.setScaleId(new Integer(1538));
+        lot.setLocationId(Integer.valueOf(9001));
+        lot.setScaleId(Integer.valueOf(1538));
         lot.setSource(null);
-        lot.setStatus(new Integer(0));
-        lot.setUserId(new Integer(1));
+        lot.setStatus(Integer.valueOf(0));
+        lot.setUserId(Integer.valueOf(1));
 
         Integer id = manager.addLot(lot);
 
         if (lot.getId() != null) {
-            System.out.println("testAddLot() Added: " + id + "\n\t" + lot);
+            Debug.println(0, "testAddLot() Added: " + id + "\n\t" + lot);
         }
         
         //TODO: delete lot
@@ -161,30 +186,30 @@ public class TestInventoryDataManagerImpl{
         
         Lot lot = new Lot();
         lot.setComments("sample added lot 1");
-        lot.setEntityId(new Integer(50533));
+        lot.setEntityId(Integer.valueOf(50533));
         lot.setEntityType("GERMPLSM");
-        lot.setLocationId(new Integer(9001));
-        lot.setScaleId(new Integer(1538));
+        lot.setLocationId(Integer.valueOf(9001));
+        lot.setScaleId(Integer.valueOf(1538));
         lot.setSource(null);
-        lot.setStatus(new Integer(0));
-        lot.setUserId(new Integer(1));        
+        lot.setStatus(Integer.valueOf(0));
+        lot.setUserId(Integer.valueOf(1));        
         lots.add(lot);
 
         lot = new Lot();
         lot.setComments("sample added lot 2");
-        lot.setEntityId(new Integer(50533));
+        lot.setEntityId(Integer.valueOf(50533));
         lot.setEntityType("GERMPLSM");
-        lot.setLocationId(new Integer(9001));
-        lot.setScaleId(new Integer(1538));
+        lot.setLocationId(Integer.valueOf(9001));
+        lot.setScaleId(Integer.valueOf(1538));
         lot.setSource(null);
-        lot.setStatus(new Integer(0));
-        lot.setUserId(new Integer(1));
+        lot.setStatus(Integer.valueOf(0));
+        lot.setUserId(Integer.valueOf(1));
         lots.add(lot);
 
         List<Integer> idList = manager.addLot(lots);
 
         if (lot.getId() != null) {
-            System.out.println("testAddLot() Added: " + idList);
+            Debug.println(0, "testAddLot() Added: " + idList);
         }
 
         //TODO: delete lots
@@ -197,7 +222,7 @@ public class TestInventoryDataManagerImpl{
         String oldComment = lot.getComments();
         lot.setComments("update comment");
         Integer id = manager.updateLot(lot);
-        System.out.println("testUpdateLot() RESULTS: " + id + "\n  Old comment: " + oldComment + "\n  New comment: " + lot.getComments());
+        Debug.println(0, "testUpdateLot() RESULTS: " + id + "\n  Old comment: " + oldComment + "\n  New comment: " + lot.getComments());
     }
 
     @Test
@@ -205,22 +230,22 @@ public class TestInventoryDataManagerImpl{
         // this test assumes there are existing lot records with entity type = GERMPLSM
         Transaction transaction = new Transaction();
         transaction.setComments("sample added transaction");
-        transaction.setDate(new Integer(20120413));
+        transaction.setDate(Integer.valueOf(20120413));
         Lot lot = manager.getLotsByEntityType("GERMPLSM", 0, 5).get(0);
         transaction.setLot(lot);
-        transaction.setPersonId(new Integer(1));
+        transaction.setPersonId(Integer.valueOf(1));
         transaction.setPreviousAmount(null);
-        transaction.setQuantity(new Integer(100));
+        transaction.setQuantity(Integer.valueOf(100));
         transaction.setSourceId(null);
         transaction.setSourceRecordId(null);
         transaction.setSourceType(null);
-        transaction.setStatus(new Integer(1));
-        transaction.setUserId(new Integer(1));
+        transaction.setStatus(Integer.valueOf(1));
+        transaction.setUserId(Integer.valueOf(1));
 
         manager.addTransaction(transaction);
 
         if (transaction.getId() != null) {
-            System.out.println("testAddTransaction() Added: " + transaction);
+            Debug.println(0, "testAddTransaction() Added: " + transaction);
         }
         //TODO Delete transactions
         
@@ -233,38 +258,38 @@ public class TestInventoryDataManagerImpl{
         List<Transaction> transactions = new ArrayList<Transaction>();
         Transaction transaction = new Transaction();
         transaction.setComments("sample added transaction 1");
-        transaction.setDate(new Integer(20120413));
+        transaction.setDate(Integer.valueOf(20120413));
         Lot lot = manager.getLotsByEntityType("GERMPLSM", 0, 5).get(0);
         transaction.setLot(lot);
-        transaction.setPersonId(new Integer(1));
+        transaction.setPersonId(Integer.valueOf(1));
         transaction.setPreviousAmount(null);
-        transaction.setQuantity(new Integer(100));
+        transaction.setQuantity(Integer.valueOf(100));
         transaction.setSourceId(null);
         transaction.setSourceRecordId(null);
         transaction.setSourceType(null);
-        transaction.setStatus(new Integer(1));
-        transaction.setUserId(new Integer(1));
+        transaction.setStatus(Integer.valueOf(1));
+        transaction.setUserId(Integer.valueOf(1));
         transactions.add(transaction);
 
         transaction = new Transaction();
         transaction.setComments("sample added transaction 2");
-        transaction.setDate(new Integer(20120413));
+        transaction.setDate(Integer.valueOf(20120413));
         lot = manager.getLotsByEntityType("GERMPLSM", 0, 5).get(0);
         transaction.setLot(lot);
-        transaction.setPersonId(new Integer(1));
+        transaction.setPersonId(Integer.valueOf(1));
         transaction.setPreviousAmount(null);
-        transaction.setQuantity(new Integer(100));
+        transaction.setQuantity(Integer.valueOf(100));
         transaction.setSourceId(null);
         transaction.setSourceRecordId(null);
         transaction.setSourceType(null);
-        transaction.setStatus(new Integer(1));
-        transaction.setUserId(new Integer(1));
+        transaction.setStatus(Integer.valueOf(1));
+        transaction.setUserId(Integer.valueOf(1));
         transactions.add(transaction);
 
         manager.addTransaction(transactions);
 
         if (transactions.size() > 0 && transactions.get(0).getId() != null) {
-            System.out.println("testAddTransaction() Added: " + transaction);
+            Debug.println(0, "testAddTransaction() Added: " + transaction);
         }
         
         //TODO Delete transactions
@@ -276,13 +301,13 @@ public class TestInventoryDataManagerImpl{
     public void testUpdateTransaction() throws Exception {
         // this test assumes that there are existing records in the transaction
         // table
-        Transaction t = manager.getTransactionById(new Integer(-1));
+        Transaction t = manager.getTransactionById(Integer.valueOf(-1));
         String oldValues = "  Old comment: " + t.getComments() + ", old status: " + t.getStatus();
         t.setComments("updated comment again");
-        t.setStatus(new Integer(0));
+        t.setStatus(Integer.valueOf(0));
 
         manager.updateTransaction(t);
-        System.out.println("testUpdateTransaction() RESULTS: " + "\n" + oldValues + "\n  New comment: " + t.getComments()
+        Debug.println(0, "testUpdateTransaction() RESULTS: " + "\n" + oldValues + "\n  New comment: " + t.getComments()
                 + ", new status: " + t.getStatus());
     }
     
@@ -293,9 +318,9 @@ public class TestInventoryDataManagerImpl{
         Set<Transaction> transactions = manager.getTransactionsByLotId(lotId);
         Assert.assertTrue(transactions != null);
         Assert.assertTrue(!transactions.isEmpty());
-        System.out.println("testGetTransactionsByLotId(" + lotId + ") RESULTS: ");
+        Debug.println(0, "testGetTransactionsByLotId(" + lotId + ") RESULTS: ");
         for (Transaction t : transactions)
-            System.out.println("  " + t);
+            Debug.println(0, "  " + t);
     }
 
     @Test
@@ -303,14 +328,13 @@ public class TestInventoryDataManagerImpl{
         List<Transaction> transactions = manager.getAllReserveTransactions(0, 5);
         Assert.assertTrue(transactions != null);
         Assert.assertTrue(!transactions.isEmpty());
-        System.out.println("testGetAllReserveTransactions() RESULTS: ");
         for (Transaction t : transactions)
-            System.out.println("  " + t);
+            Debug.println(0, "  " + t);
     }
 
     @Test
     public void testCountAllReserveTransactions() throws Exception {
-        System.out.println("CountAllReserveTransactions(): " + manager.countAllReserveTransactions());
+        Debug.println(0, "CountAllReserveTransactions(): " + manager.countAllReserveTransactions());
     }
 
     @Test
@@ -318,14 +342,14 @@ public class TestInventoryDataManagerImpl{
         List<Transaction> transactions = manager.getAllDepositTransactions(0, 5);
         Assert.assertTrue(transactions != null);
         Assert.assertTrue(!transactions.isEmpty());
-        System.out.println("testGetAllDepositTransactions() RESULTS: ");
+        Debug.println(0, "testGetAllDepositTransactions() RESULTS: ");
         for (Transaction t : transactions)
-            System.out.println("  " + t);
+            Debug.println(0, "  " + t);
     }
 
     @Test
     public void testCountAllDepositTransactions() throws Exception {
-        System.out.println("countAllDepositTransactions(): " + manager.countAllDepositTransactions());
+        Debug.println(0, "countAllDepositTransactions(): " + manager.countAllDepositTransactions());
     }
 
     @Test
@@ -334,15 +358,15 @@ public class TestInventoryDataManagerImpl{
         List<Transaction> transactions = manager.getAllReserveTransactionsByRequestor(personId, 0, 5);
         Assert.assertTrue(transactions != null);
         Assert.assertTrue(!transactions.isEmpty());
-        System.out.println("testGetAllReserveTransactionsByRequestor(" + personId + ") RESULTS: ");
+        Debug.println(0, "testGetAllReserveTransactionsByRequestor(" + personId + ") RESULTS: ");
         for (Transaction t : transactions)
-            System.out.println("  " + t);
+            Debug.println(0, "  " + t);
     }
 
     @Test
     public void testCountAllReserveTransactionsByRequestor() throws Exception {
         Integer personId = Integer.valueOf(253);
-        System.out.println("CountAllReserveTransactionsByRequestor(" + personId + "): "
+        Debug.println(0, "CountAllReserveTransactionsByRequestor(" + personId + "): "
                 + manager.countAllReserveTransactionsByRequestor(personId));
     }
 
@@ -352,91 +376,91 @@ public class TestInventoryDataManagerImpl{
         List<Transaction> transactions = manager.getAllDepositTransactionsByDonor(personId, 0, 5);
         Assert.assertTrue(transactions != null);
         Assert.assertTrue(!transactions.isEmpty());
-        System.out.println("testGetAllDepositTransactionsByDonor(" + personId + ") RESULTS: ");
+        Debug.println(0, "testGetAllDepositTransactionsByDonor(" + personId + ") RESULTS: ");
         for (Transaction t : transactions)
-            System.out.println("  " + t);
+            Debug.println(0, "  " + t);
     }
 
     @Test
     public void testCountAllDepositTransactionsByDonor() throws Exception {
         Integer personId = Integer.valueOf(253);
-        System.out.println("CountAllDepositTransactionsByDonor(" + personId + ") : " + manager.countAllDepositTransactionsByDonor(personId));
+        Debug.println(0, "CountAllDepositTransactionsByDonor(" + personId + ") : " + manager.countAllDepositTransactionsByDonor(personId));
     }
 
     @Test
     public void testGenerateReportOnAllUncommittedTransactions() throws Exception {
-        System.out.println("Number of uncommitted transactions [countAllUncommittedTransactions()]: "
+        Debug.println(0, "Number of uncommitted transactions [countAllUncommittedTransactions()]: "
                 + manager.countAllUncommittedTransactions());
         List<TransactionReportRow> report = manager.generateReportOnAllUncommittedTransactions(0, 5);
         Assert.assertTrue(report != null);
         Assert.assertTrue(!report.isEmpty());
-        System.out.println("testGenerateReportOnAllUncommittedTransactions() REPORT: ");
+        Debug.println(0, "testGenerateReportOnAllUncommittedTransactions() REPORT: ");
         for (TransactionReportRow row : report)
-            System.out.println("  " + row);
+            Debug.println(0, "  " + row);
     }
 
     @Test
     public void testGenerateReportOnAllReserveTransactions() throws Exception {
-        System.out.println("Number of reserved transactions [countAllReserveTransactions()]: " + manager.countAllReserveTransactions());
+        Debug.println(0, "Number of reserved transactions [countAllReserveTransactions()]: " + manager.countAllReserveTransactions());
         List<TransactionReportRow> report = manager.generateReportOnAllReserveTransactions(0, 5);
         Assert.assertTrue(report != null);
         Assert.assertTrue(!report.isEmpty());
-        System.out.println("testGenerateReportOnAllReserveTransactions() REPORT: ");
+        Debug.println(0, "testGenerateReportOnAllReserveTransactions() REPORT: ");
         for (TransactionReportRow row : report)
-            System.out.println("  " + row);
+            Debug.println(0, "  " + row);
     }
 
     @Test
     public void testGenerateReportOnAllWithdrawalTransactions() throws Exception {
-        System.out.println("Number of withdrawal transactions [countAllWithdrawalTransactions()]: "
+        Debug.println(0, "Number of withdrawal transactions [countAllWithdrawalTransactions()]: "
                 + manager.countAllWithdrawalTransactions());
         List<TransactionReportRow> report = manager.generateReportOnAllWithdrawalTransactions(0, 5);
         Assert.assertTrue(report != null);
         Assert.assertTrue(!report.isEmpty());
-        System.out.println("testGenerateReportOnAllWithdrawalTransactions() REPORT: ");
+        Debug.println(0, "testGenerateReportOnAllWithdrawalTransactions() REPORT: ");
         for (TransactionReportRow row : report)
-            System.out.println("  " + row);
+            Debug.println(0, "  " + row);
     }
 
     @Test
     public void testGenerateReportOnAllLots() throws Exception {
-        System.out.println("Balance Report on All Lots");
-        System.out.println("Number of lots [countAllLots()]: " + manager.countAllLots());
+        Debug.println(0, "Balance Report on All Lots");
+        Debug.println(0, "Number of lots [countAllLots()]: " + manager.countAllLots());
         List<LotReportRow> report = manager.generateReportOnAllLots(0, 10);
         Assert.assertTrue(report != null);
         Assert.assertTrue(!report.isEmpty());
-        System.out.println("testGenerateReportOnAllLots() REPORT: ");
+        Debug.println(0, "testGenerateReportOnAllLots() REPORT: ");
         for (LotReportRow row : report)
-            System.out.println("  " + row);
+            Debug.println(0, "  " + row);
     }
 
     @Test
     public void testGenerateReportsOnDormantLots() throws Exception {
         int year = 2012;
-        System.out.println("Balance Report on DORMANT Lots");
+        Debug.println(0, "Balance Report on DORMANT Lots");
         List<LotReportRow> report = manager.generateReportOnDormantLots(year, 0, 10);
         Assert.assertTrue(report != null);
         Assert.assertTrue(!report.isEmpty());
-        System.out.println("testGenerateReportsOnDormantLots(year=" + year + ") REPORT: ");
+        Debug.println(0, "testGenerateReportsOnDormantLots(year=" + year + ") REPORT: ");
         for (LotReportRow row : report)
-            System.out.println("  " + row);
+            Debug.println(0, "  " + row);
     }
 
     @Test
     public void testGenerateReportOnLotsByEntityType() throws Exception {
         String type = "GERMPLSM";
-        System.out.println("Balance Report on Lots by Entity Type: " + type);
+        Debug.println(0, "Balance Report on Lots by Entity Type: " + type);
         List<LotReportRow> report = manager.generateReportOnLotsByEntityType(type, 0, 10);
         Assert.assertTrue(report != null);
         Assert.assertTrue(!report.isEmpty());
-        System.out.println("testGenerateReportOnLotsByEntityType(" + type + ") REPORT: ");
+        Debug.println(0, "testGenerateReportOnLotsByEntityType(" + type + ") REPORT: ");
         for (LotReportRow row : report)
-            System.out.println("  " + row);
+            Debug.println(0, "  " + row);
     }
 
     @Test
     public void testGenerateReportOnLotsByEntityTypeAndEntityId() throws Exception {
-        System.out.println("Balance Report on Lots by Entity Type and Entity ID:");
+        Debug.println(0, "Balance Report on Lots by Entity Type and Entity ID:");
         String type = "GERMPLSM";
         List<Integer> entityIdList = new ArrayList<Integer>();
         entityIdList.add(50533);
@@ -446,45 +470,45 @@ public class TestInventoryDataManagerImpl{
 
         Assert.assertTrue(report != null);
         Assert.assertTrue(!report.isEmpty());
-        System.out.println("testGenerateReportOnLotsByEntityTypeAndEntityId(type=" + type + ", entityId=" + entityIdList + ") REPORT: ");
+        Debug.println(0, "testGenerateReportOnLotsByEntityTypeAndEntityId(type=" + type + ", entityId=" + entityIdList + ") REPORT: ");
         for (LotReportRow row : report)
-            System.out.println("  " + row);
+            Debug.println(0, "  " + row);
     }
 
     @Test
     public void testGenerateReportOnEmptyLot() throws Exception {
-        System.out.println("Report on empty lot");
+        Debug.println(0, "Report on empty lot");
         List<LotReportRow> report = manager.generateReportOnEmptyLots(0, 2);
         Assert.assertTrue(report != null);
-        System.out.println("testGenerateReportOnEmptyLot() REPORT: ");
+        Debug.println(0, "testGenerateReportOnEmptyLot() REPORT: ");
         for (LotReportRow row : report)
-            System.out.println("  " + row);
+            Debug.println(0, "  " + row);
     }
 
     @Test
     public void testGenerateReportOnLotWithMinimumAmount() throws Exception {
         long minimumAmount = 700;
-        System.out.println("Report on lot with minimum balance");
+        Debug.println(0, "Report on lot with minimum balance");
         List<LotReportRow> report = manager.generateReportOnLotsWithMinimumAmount(minimumAmount, 0, 5);
         Assert.assertTrue(report != null);
-        System.out.println("testGenerateReportOnLotWithMinimumAmount(minimumAmount="+minimumAmount+") REPORT: ");
+        Debug.println(0, "testGenerateReportOnLotWithMinimumAmount(minimumAmount="+minimumAmount+") REPORT: ");
         for (LotReportRow row : report)
-            System.out.println("  " + row);
+            Debug.println(0, "  " + row);
     }
     
     @Test
     public void testCountAllUncommittedTransactions() throws Exception {
-        System.out.println("testCountAllUncommittedTransactions() Results: " + manager.countAllUncommittedTransactions());
+        Debug.println(0, "testCountAllUncommittedTransactions() Results: " + manager.countAllUncommittedTransactions());
     }
     
     @Test
     public void testCountAllWithdrawalTransactions() throws Exception {
-        System.out.println("testCountAllWithdrawalTransactions() Results: " + manager.countAllWithdrawalTransactions());
+        Debug.println(0, "testCountAllWithdrawalTransactions() Results: " + manager.countAllWithdrawalTransactions());
     }
 
     @Test
     public void testCountAllLots() throws Exception {
-        System.out.println("testCountAllLots() Results: " + manager.countAllLots());
+        Debug.println(0, "testCountAllLots() Results: " + manager.countAllLots());
     }
     
     @Test
@@ -492,11 +516,11 @@ public class TestInventoryDataManagerImpl{
         List<Lot> results = manager.getAllLots(0,50);
         Assert.assertNotNull(results);
         Assert.assertTrue(!results.isEmpty());
-        System.out.println("testGetAllLots() Results:");
+        Debug.println(0, "testGetAllLots() Results:");
         for (Lot result : results){
-    	   System.out.println(result);
+    	   Debug.println(0, result.toString());
        }
-       System.out.println("Number of records: " +results.size());
+       Debug.println(0, "Number of records: " +results.size());
     }
     
     @Test
@@ -504,8 +528,8 @@ public class TestInventoryDataManagerImpl{
         Integer id = -1;
         Transaction transactionid = manager.getTransactionById(id);
 		Assert.assertNotNull(transactionid);
-		System.out.println("testGetTransactionById("+id+") Results:");
-		System.out.println(transactionid);
+		Debug.println(0, "testGetTransactionById("+id+") Results:");
+		Debug.println(0, transactionid.toString());
     }
     
 

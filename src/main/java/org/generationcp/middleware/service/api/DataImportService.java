@@ -43,4 +43,16 @@ public interface DataImportService {
 	Workbook parseWorkbook(File file) throws WorkbookParserException;
 
     Workbook strictParseWorkbook(File file) throws WorkbookParserException, MiddlewareQueryException;
+
+	Workbook validateWorkbook(Workbook workbook)
+			throws WorkbookParserException, MiddlewareQueryException;
+	
+	/**
+     * Checks if the name specified is an already existing project name
+     * 
+     * @param name
+     * @return true or false
+     * @throws MiddlewareQueryException
+     */
+    boolean checkIfProjectNameIsExisting(String name) throws MiddlewareQueryException;
 }

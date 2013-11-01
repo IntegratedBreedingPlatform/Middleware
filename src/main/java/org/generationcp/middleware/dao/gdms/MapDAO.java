@@ -165,7 +165,6 @@ public class MapDAO extends GenericDAO<Map, Integer>{
     		}
     		
     	} catch (HibernateException e) {
-    		e.printStackTrace();
     		logAndThrowException("Error with getMapAndMarkerCountByMarkers(" + markerIds + ") in MapDAO: " + e.getMessage(), e);
     	}
     	return details;

@@ -17,6 +17,11 @@
   <property name="hibernate.c3p0.timeout">300</property> 
   <property name="hibernate.c3p0.max_statements">50</property> 
   <property name="hibernate.c3p0.idle_test_period">3000</property>
+ 
+<!-- optional query to validate pooled connections:--> 
+<property name="hibernate.c3p0.idleConnectionTestPeriod">300</property> 
+<property name="hibernate.c3p0.preferredTestQuery">select 1</property>
+<property name="hibernate.c3p0.validate">true</property> 
   
   <mapping class="org.generationcp.middleware.pojos.Attribute"/>
   <mapping class="org.generationcp.middleware.pojos.Bibref"/>
@@ -77,8 +82,12 @@
   <mapping class="org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.ProjectBackup"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.UserInfo"/>
+  <mapping class="org.generationcp.middleware.pojos.workbench.IbdbUserMap"/>
+  <mapping class="org.generationcp.middleware.pojos.workbench.SecurityQuestion"/>
+  <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData"/> <!-- TODO: not sure if we're using this, just included as this is in the workbench schema -->
+  <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchSetting" /> <!-- TODO: same as above -->
 
-  <!-- Mapping classes for new OMS schema --> 
+     <!-- Mapping classes for new OMS schema -->
   <mapping class="org.generationcp.middleware.pojos.oms.CV"/>
   <mapping class="org.generationcp.middleware.pojos.oms.CVTerm"/>
   <mapping class="org.generationcp.middleware.pojos.oms.CVTermRelationship"/>

@@ -29,24 +29,27 @@ public class VariableTypeListTransformer extends Transformer {
 		
 		VariableTypeList variableTypeList = new VariableTypeList();
 		
-		for (MeasurementVariable measurementVariable : measurementVariables) {
-			
-			StandardVariable standardVariable = getStandardVariableBuilder().findOrSave(
-					measurementVariable.getName(), 
-					measurementVariable.getDescription(), 
-					measurementVariable.getProperty(),
-					measurementVariable.getScale(),
-					measurementVariable.getMethod(), 
-					isVariate ? null : PhenotypicType.getPhenotypicTypeForLabel(measurementVariable.getLabel()),
-					measurementVariable.getDataType());
-			
-			VariableType variableType = new VariableType(
-						measurementVariable.getName(), 
-						measurementVariable.getDescription(), 
-						standardVariable, rank++);
-			
-			variableTypeList.add(variableType);
+		if (measurementVariables != null && measurementVariables.size() > 0) {
+    		for (MeasurementVariable measurementVariable : measurementVariables) {
+    			
+    			StandardVariable standardVariable = getStandardVariableBuilder().findOrSave(
+    					measurementVariable.getName(), 
+    					measurementVariable.getDescription(), 
+    					measurementVariable.getProperty(),
+    					measurementVariable.getScale(),
+    					measurementVariable.getMethod(), 
+    					isVariate ? null : PhenotypicType.getPhenotypicTypeForLabel(measurementVariable.getLabel()),
+    					measurementVariable.getDataType());
+    			
+    			VariableType variableType = new VariableType(
+    						measurementVariable.getName(), 
+    						measurementVariable.getDescription(), 
+    						standardVariable, rank++);
+    			
+    			variableTypeList.add(variableType);
+    		}
 		}
+		
 		return variableTypeList;
 	}
 }

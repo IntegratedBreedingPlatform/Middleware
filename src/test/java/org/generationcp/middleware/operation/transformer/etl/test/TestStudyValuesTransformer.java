@@ -15,6 +15,7 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.transformer.etl.StudyValuesTransformer;
+import org.generationcp.middleware.util.Debug;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -39,14 +40,15 @@ public class TestStudyValuesTransformer {
 
 	@Before
 	public void beforeEachTest() {
-		startTime = System.nanoTime();
+        Debug.println(0, "#####" + name.getMethodName() + " Start: ");
+        startTime = System.nanoTime();
 	}
 	
 	@Test
 	public void testTransform() throws Exception {
 
-		Integer germplasmId = new Integer(1);
-		Integer locationId = new Integer(1);
+		Integer germplasmId = Integer.valueOf(1);
+		Integer locationId = Integer.valueOf(1);
 		StudyDetails studyDetails = createStudyDetailsTestData();
 		List<MeasurementVariable> measurementVariables= createMeasurementVariableListTestData();
 		VariableTypeList varTypeList = createVariableTypeListTestData();
@@ -55,12 +57,12 @@ public class TestStudyValuesTransformer {
 		
 		VariableList result = studyVal.getVariableList();
 
-		System.out.println("Output:");
-		System.out.println("GermplasmId:" + studyVal.getGermplasmId());
-		System.out.println("LocationId:" + studyVal.getLocationId());
+		Debug.println(0, "Output:");
+		Debug.println(0, "GermplasmId:" + studyVal.getGermplasmId());
+		Debug.println(0, "LocationId:" + studyVal.getLocationId());
 		
 		for (Variable stock : result.getVariables()) {
-			System.out.println(stock);
+			Debug.println(0, stock.toString());
 		}
 		
 	}
@@ -68,7 +70,7 @@ public class TestStudyValuesTransformer {
 	@After
 	public void afterEachTest() {
 		long elapsedTime = System.nanoTime() - startTime;
-		System.out.println("#####" + name.getMethodName() + ": Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime/1000000000) + " s");
+		Debug.println(0, "#####" + name.getMethodName() + ": Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime/1000000000) + " s");
 	}
 	
 	private StudyDetails createStudyDetailsTestData() {

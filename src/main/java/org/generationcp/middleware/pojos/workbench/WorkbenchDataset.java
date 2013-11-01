@@ -40,7 +40,7 @@ public class WorkbenchDataset implements Serializable{
     @Basic(optional = false)
     @GeneratedValue
     @Column(name = "dataset_id")
-    private Integer datasetId;
+    private Long datasetId;
 
     @Basic(optional = false)
     @Column(name = "name")
@@ -62,7 +62,7 @@ public class WorkbenchDataset implements Serializable{
     public WorkbenchDataset() {
     }
 
-    public WorkbenchDataset(Integer datasetId, String datasetName, String description, Date creationDate, Project project, DatasetType datasetType) {
+    public WorkbenchDataset(Long datasetId, String datasetName, String description, Date creationDate, Project project, DatasetType datasetType) {
         this.datasetId = datasetId;
         this.name = datasetName;
         this.description = description;
@@ -79,11 +79,11 @@ public class WorkbenchDataset implements Serializable{
         this.datasetType = datasetType;
     }
 
-    public Integer getDatasetId() {
+    public Long getDatasetId() {
         return datasetId;
     }
     
-    public void setDatasetId(Integer datasetId) {
+    public void setDatasetId(Long datasetId) {
         this.datasetId = datasetId;
     }
     

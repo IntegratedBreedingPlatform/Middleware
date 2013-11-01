@@ -35,8 +35,7 @@ public class CvTermRelationshipSaver extends Saver {
 		try {
 			generatedId = dao.getNegativeId("cvTermRelationshipId");
 		} catch (MiddlewareQueryException e) {
-			e.printStackTrace();
-			throw new MiddlewareQueryException(e.getMessage());
+			throw new MiddlewareQueryException(e.getMessage(), e);
 		}
 		CVTermRelationship cvTermRelationship = create(generatedId, subjectId, typeId, objectId); 
 		dao.save(cvTermRelationship);
@@ -52,6 +51,26 @@ public class CvTermRelationshipSaver extends Saver {
 		relationship.setObjectId(objectId);
 		return relationship;
 	}
-
 	
+	public CVTermRelationship saveOrUpdateRelationship(CVTermRelationship cvTermRelationship) throws MiddlewareException, MiddlewareQueryException{
+        requireLocalDatabaseInstance();
+        CVTermRelationshipDao dao = getCvTermRelationshipDao();
+        CVTermRelationship relationship = null;
+        try {
+            relationship = dao.saveOrUpdateRelationship(cvTermRelationship);
+        } catch (MiddlewareQueryException e) {
+            throw new MiddlewareQueryException(e.getMessage(), e);
+        }
+        return relationship;
+    }
+
+	public void deleteRelationship(CVTermRelationship cvTermRelationship) throws MiddlewareException, MiddlewareQueryException{
+	    requireLocalDatabaseInstance();
+    	    CVTermRelationshipDao dao = getCvTermRelationshipDao();
+    	    try {
+    	        dao.makeTransient(cvTermRelationship);
+    	    } catch (MiddlewareQueryException e) {
+    	        throw new MiddlewareQueryException(e.getMessage(), e);
+    	    }
+	}
 }

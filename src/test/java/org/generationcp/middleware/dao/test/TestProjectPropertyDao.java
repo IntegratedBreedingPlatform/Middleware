@@ -21,6 +21,7 @@ import java.util.Set;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.hibernate.HibernateUtil;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
+import org.generationcp.middleware.util.Debug;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -43,9 +44,9 @@ public class TestProjectPropertyDao{
     			
     	Map<String, Set<Integer>> results = dao.getStandardVariableIdsByPropertyNames(propertyNames);
 
-        System.out.println("testGetStandardVariableIdsByPropertyNames(propertyNames=" + propertyNames + ") RESULTS:");
+        Debug.println(0, "testGetStandardVariableIdsByPropertyNames(propertyNames=" + propertyNames + ") RESULTS:");
         for (String name : propertyNames) {
-        	System.out.println ("    Header = " + name + ", Terms = " + results.get(name));
+        	Debug.println(0, "    Header = " + name + ", Terms = " + results.get(name));
         	
         	/* TO VERIFY:
         	 	SELECT DISTINCT ppValue.value, ppStdVar.id 

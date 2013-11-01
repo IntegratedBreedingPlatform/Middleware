@@ -17,6 +17,7 @@ import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.util.Debug;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -67,37 +68,37 @@ public class TestGermplasmAddUpdateFunctions{
      *       manager.addBibliographicReference(bibref); }
      * @Test public void testAddGermplasmAttribute() throws Exception {
      *       Attribute a = new Attribute(); a.setGermplasmId(new
-     *       Integer(50533)); a.setAdate(new Integer(20120406));
-     *       a.setAval("sample attribute"); a.setLocationId(new Integer(1538));
-     *       a.setReferenceId(null); a.setTypeId(new Integer(103));
-     *       a.setUserId(new Integer(1)); int returned =
+     *       Integer(50533)); a.setAdate(Integer.valueOf(20120406));
+     *       a.setAval("sample attribute"); a.setLocationId(Integer.valueOf(1538));
+     *       a.setReferenceId(null); a.setTypeId(Integer.valueOf(103));
+     *       a.setUserId(Integer.valueOf(1)); int returned =
      *       manager.addGermplasmAttribute(a); Assert.assertTrue(returned == 1);
      *       }
      * @Test public void testAddGermplasmAttributeGivenList() throws Exception {
      *       List<Attribute> attributes = new ArrayList<Attribute>();
      * 
      *       Attribute a = new Attribute(); a.setGermplasmId(new
-     *       Integer(50533)); a.setAdate(new Integer(20120406));
-     *       a.setAval("sample attribute"); a.setLocationId(new Integer(1538));
-     *       a.setReferenceId(null); a.setTypeId(new Integer(103));
-     *       a.setUserId(new Integer(1)); attributes.add(a);
+     *       Integer(50533)); a.setAdate(Integer.valueOf(20120406));
+     *       a.setAval("sample attribute"); a.setLocationId(Integer.valueOf(1538));
+     *       a.setReferenceId(null); a.setTypeId(Integer.valueOf(103));
+     *       a.setUserId(Integer.valueOf(1)); attributes.add(a);
      * 
      *       Attribute a1 = new Attribute(); a1.setGermplasmId(new
-     *       Integer(156)); a1.setAdate(new Integer(20120406));
+     *       Integer(156)); a1.setAdate(Integer.valueOf(20120406));
      *       a1.setAval("sample attribute 2"); a1.setLocationId(new
      *       Integer(1538)); a1.setReferenceId(null); a1.setTypeId(new
-     *       Integer(103)); a1.setUserId(new Integer(1)); attributes.add(a1);
+     *       Integer(103)); a1.setUserId(Integer.valueOf(1)); attributes.add(a1);
      * 
      *       Attribute a2 = new Attribute(); a2.setGermplasmId(new
-     *       Integer(50533)); a2.setAdate(new Integer(20120406));
+     *       Integer(50533)); a2.setAdate(Integer.valueOf(20120406));
      *       a2.setAval("sample attribute 3"); a2.setLocationId(new
      *       Integer(1538)); a2.setReferenceId(null); a2.setTypeId(new
-     *       Integer(103)); a2.setUserId(new Integer(1)); attributes.add(a2);
+     *       Integer(103)); a2.setUserId(Integer.valueOf(1)); attributes.add(a2);
      * 
      *       int returned = manager.addGermplasmAttribute(attributes);
      *       Assert.assertTrue(returned == 3); }
      * @Test public void testUpdateGermplasmAttribute() throws Exception {
-     *       Attribute a = manager.getAttributeById(new Integer(-1));
+     *       Attribute a = manager.getAttributeById(Integer.valueOf(-1));
      *       a.setAval("updated sample attribute"); int returned =
      *       manager.updateGermplasmAttribute(a); Assert.assertTrue(returned ==
      *       1); }
@@ -105,24 +106,24 @@ public class TestGermplasmAddUpdateFunctions{
      *       Exception { List<Attribute> attributes = new
      *       ArrayList<Attribute>();
      * 
-     *       Attribute a = manager.getAttributeById(new Integer(-2));
+     *       Attribute a = manager.getAttributeById(Integer.valueOf(-2));
      *       a.setAval("sample attribute - updated"); attributes.add(a);
      * 
-     *       Attribute a1 = manager.getAttributeById(new Integer(-3));
+     *       Attribute a1 = manager.getAttributeById(Integer.valueOf(-3));
      *       a1.setAval("sample attribute 2 - updated"); attributes.add(a1);
      * 
-     *       Attribute a2 = manager.getAttributeById(new Integer(-4));
+     *       Attribute a2 = manager.getAttributeById(Integer.valueOf(-4));
      *       a2.setAval("sample attribute 3 - updated"); attributes.add(a2);
      * 
      *       int returned = manager.updateGermplasmAttribute(attributes);
      *       Assert.assertTrue(returned == 3); }
      * @Test public void testUpdateProgenitorWillCreateNewProgenitor() throws
      *       Exception { boolean success = manager.updateProgenitor(new
-     *       Integer(306437), new Integer(1), new Integer(5));
+     *       Integer(306437), Integer.valueOf(1), Integer.valueOf(5));
      *       Assert.assertTrue(success); }
      * @Test public void testUpdateProgenitorWillUpdateProgenitorRecord() throws
      *       Exception { boolean success = manager.updateProgenitor(new
-     *       Integer(306437), new Integer(2), new Integer(5));
+     *       Integer(306437), Integer.valueOf(2), Integer.valueOf(5));
      *       Assert.assertTrue(success); }
      * @Test public void testUpdateProgenitorWillUpdateGermplasm() throws
      *       Exception { //run this query first before testing //INSERT INTO
@@ -132,8 +133,8 @@ public class TestGermplasmAddUpdateFunctions{
      *       //VALUES(-1,
      *       62,-1,420273,431701,1,-10123,9016,0,1,0,1,null,null,null)
      * 
-     *       boolean success = manager.updateProgenitor(new Integer(-1), new
-     *       Integer(2), new Integer(1)); Assert.assertTrue(success); }
+     *       boolean success = manager.updateProgenitor(Integer.valueOf(-1), new
+     *       Integer(2), Integer.valueOf(1)); Assert.assertTrue(success); }
      * @Test public void testUpdateGermplasm() throws Exception { //run these
      *       queries first before testing
      * 
@@ -150,11 +151,11 @@ public class TestGermplasmAddUpdateFunctions{
      *       `,`gdate`,`gref`,`grplce`,`mgid`,`cid`,`sid`,`gchange`)
      *       ///VALUES(-2
      *       ,62,-1,420273,431701,1,-10124,9016,0,1,0,1,null,null,null)
-     *       Germplasm g = manager.getGermplasmByGID(new Integer(-1));
-     *       g.setGnpgs(new Integer(5));
+     *       Germplasm g = manager.getGermplasmByGID(Integer.valueOf(-1));
+     *       g.setGnpgs(Integer.valueOf(5));
      * 
-     *       Germplasm g2 = manager.getGermplasmByGID(new Integer(-2));
-     *       g2.setGnpgs(new Integer(5));
+     *       Germplasm g2 = manager.getGermplasmByGID(Integer.valueOf(-2));
+     *       g2.setGnpgs(Integer.valueOf(5));
      * 
      *       List<Germplasm> germplasms = new ArrayList<Germplasm>();
      *       germplasms.add(g); germplasms.add(g2);
@@ -166,29 +167,29 @@ public class TestGermplasmAddUpdateFunctions{
     @Test
     public void testAddGermplasm() throws Exception {
         Germplasm g = new Germplasm();
-        g.setGdate(new Integer(20120412));
-        g.setGnpgs(new Integer(0));
-        g.setGpid1(new Integer(0));
-        g.setGpid2(new Integer(0));
-        g.setGrplce(new Integer(0));
-        g.setLocationId(new Integer(9000));
-        g.setMethodId(new Integer(1));
-        g.setMgid(new Integer(1));
-        // g.setUserId(new Integer(527));
-        g.setUserId(new Integer(1));
-        g.setReferenceId(new Integer(1));
+        g.setGdate(Integer.valueOf(20120412));
+        g.setGnpgs(Integer.valueOf(0));
+        g.setGpid1(Integer.valueOf(0));
+        g.setGpid2(Integer.valueOf(0));
+        g.setGrplce(Integer.valueOf(0));
+        g.setLocationId(Integer.valueOf(9000));
+        g.setMethodId(Integer.valueOf(1));
+        g.setMgid(Integer.valueOf(1));
+        // g.setUserId(Integer.valueOf(527));
+        g.setUserId(Integer.valueOf(1));
+        g.setReferenceId(Integer.valueOf(1));
 
         Name n = new Name();
-        n.setLocationId(new Integer(9000));
-        n.setNdate(new Integer(20120412));
+        n.setLocationId(Integer.valueOf(9000));
+        n.setNdate(Integer.valueOf(20120412));
         n.setNval("Kevin 64");
-        n.setReferenceId(new Integer(1));
-        n.setTypeId(new Integer(1));
-        n.setUserId(new Integer(1));
+        n.setReferenceId(Integer.valueOf(1));
+        n.setTypeId(Integer.valueOf(1));
+        n.setUserId(Integer.valueOf(1));
 
         int added = manager.addGermplasm(g, n);
         
-        System.out.println("Germplasm added: " + added); 
+        Debug.println(0, "Germplasm added: " + added); 
        
     }
 

@@ -15,18 +15,17 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.OntologyDataManagerImpl;
 import org.generationcp.middleware.operation.parser.WorkbookParser;
-import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.util.Message;
 import org.generationcp.middleware.util.TimerWatch;
@@ -63,7 +62,6 @@ public class DataImportServiceImpl extends Service implements DataImportService 
             return studyId;
 
         } catch (Exception e) {
-            e.printStackTrace();
             rollbackTransaction(trans);
             logAndThrowException("Error encountered with saveDataset(): " + e.getMessage(), e, LOG);
 
@@ -96,8 +94,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         Workbook workbook = parser.parseFile(file, true);
         // perform validations on the parsed data that require db access
         List<Message> messages = new LinkedList<Message>();
-        Integer studyId = getStudyId(workbook.getStudyDetails().getStudyName());
-        if (studyId != null) {
+        boolean existing = checkIfProjectNameIsExisting(workbook.getStudyDetails().getStudyName());
+        if (existing) {
             messages.add(new Message("error.duplicate.study.name"));
         }
 
@@ -113,6 +111,31 @@ public class DataImportServiceImpl extends Service implements DataImportService 
             throw new WorkbookParserException(messages);
         }
         parser.parseAndSetObservationRows(file, workbook);
+
+        return workbook;
+    }
+    
+    @Override
+    public Workbook validateWorkbook(Workbook workbook) throws WorkbookParserException, MiddlewareQueryException {
+
+        // perform validations on the parsed data that require db access
+        List<Message> messages = new LinkedList<Message>();
+        boolean isExisting = checkIfProjectNameIsExisting(workbook.getStudyDetails().getStudyName());
+        if (isExisting) {
+            messages.add(new Message("error.duplicate.study.name"));
+        }
+
+        if (!isEntryExists(workbook.getFactors()) && !isEntryExists(workbook.getConditions())) {
+            messages.add(new Message("error.entry.doesnt.exist.wizard"));
+        }
+
+        if (!workbook.isNursery() && !isTrialEnvironmentExists(workbook.getConditions())) {
+            messages.add(new Message("error.missing.trial.condition"));
+        }
+
+        if (messages.size() > 0) {
+            throw new WorkbookParserException(messages);
+        }
 
         return workbook;
     }
@@ -134,7 +157,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         return id;
     }
 
-    private Boolean isEntryExists(java.util.List<MeasurementVariable> list) throws MiddlewareQueryException {
+    private Boolean isEntryExists(List<MeasurementVariable> list) throws MiddlewareQueryException {
         OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(getSessionProviderForLocal(), getSessionProviderForCentral());
         for (MeasurementVariable mvar : list) {
 
@@ -166,6 +189,18 @@ public class DataImportServiceImpl extends Service implements DataImportService 
             }
         }
         return false;
+    }
+    
+    @Override
+    public boolean checkIfProjectNameIsExisting(String name) throws MiddlewareQueryException {
+        boolean isExisting = false;
+        setWorkingDatabase(Database.CENTRAL);
+        isExisting = getDmsProjectDao().checkIfProjectNameIsExisting(name);
+        if (!isExisting) {
+            setWorkingDatabase(Database.LOCAL);
+            isExisting = getDmsProjectDao().checkIfProjectNameIsExisting(name);
+        }
+        return isExisting;
     }
 
 }

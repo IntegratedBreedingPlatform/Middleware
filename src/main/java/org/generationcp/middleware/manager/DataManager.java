@@ -29,6 +29,7 @@ import org.generationcp.middleware.operation.builder.StudyReferenceBuilder;
 import org.generationcp.middleware.operation.builder.StudyVariateBuilder;
 import org.generationcp.middleware.operation.builder.TermBuilder;
 import org.generationcp.middleware.operation.builder.TraitBuilder;
+import org.generationcp.middleware.operation.builder.TraitGroupBuilder;
 import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
 import org.generationcp.middleware.operation.builder.VariableInfoBuilder;
 import org.generationcp.middleware.operation.builder.VariableTypeBuilder;
@@ -1005,4 +1006,10 @@ public abstract class DataManager extends DatabaseBroker{
     protected final DataSetDestroyer getDataSetDestroyer() {
     	return new DataSetDestroyer(sessionProviderForLocal, sessionProviderForCentral);
     }
+    
+    protected final TraitGroupBuilder getTraitGroupBuilder() {
+        return new TraitGroupBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+
 }

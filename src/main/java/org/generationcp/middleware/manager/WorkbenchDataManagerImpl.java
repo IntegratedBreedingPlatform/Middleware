@@ -681,7 +681,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             // begin save transaction
             trans = session.beginTransaction();
             WorkbenchDataset datasetSaved = getWorkbenchDatasetDao().saveOrUpdate(dataset);
-            workbenchDatasetSaved = datasetSaved.getDatasetId();
+            workbenchDatasetSaved = datasetSaved.getDatasetId().intValue();
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);

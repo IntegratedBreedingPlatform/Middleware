@@ -30,7 +30,7 @@ import org.hibernate.criterion.Restrictions;
  * 
  */
 public class UserDAO extends GenericDAO<User, Integer>{
-
+    
     public User getByUsernameAndPassword(String username, String password) throws MiddlewareQueryException{
         try {
 			if (username != null && password != null) {
@@ -77,7 +77,7 @@ public class UserDAO extends GenericDAO<User, Integer>{
 	            return success > 0;
 			}
         }catch(Exception e){
-            e.printStackTrace();
+            logAndThrowException(e.getMessage(), e);
         }
         return false;
     }
@@ -181,7 +181,7 @@ public class UserDAO extends GenericDAO<User, Integer>{
     @SuppressWarnings("unchecked")
 	public List<Integer> getUserIdsByCountryIds(Collection<Integer> countryIds) throws MiddlewareQueryException {
     	try {
-    		if (countryIds != null && countryIds.size() > 0){
+    		if (countryIds != null && !countryIds.isEmpty()){
 	    		Criteria criteria = getSession().createCriteria(Locdes.class);
 	    		criteria.createAlias("location", "l");
 	    		criteria.add(Restrictions.in("l.cntryid", countryIds));

@@ -21,7 +21,12 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.oms.TraitClass;
+import org.generationcp.middleware.domain.oms.TraitClassReference;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.Operation;
 
 /**
  * This is the API for retrieving ontology data from the CHADO schema.
@@ -31,101 +36,112 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 public interface OntologyDataManager {
 
 	/**
-	 * Retrieves a Term record given its id. This can also be used to retrieve traits, methods and scales. 
-	 * 
-	 * @param termId
-	 * @return
-	 * @throws MiddlewareQueryException
+	 * Retrieves a Term record given its id. This can also be used to retrieve traits, methods and scales.
+	 *
+	 * @param termId the term id
+	 * @return the term by id
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
     public Term getTermById(int termId) throws MiddlewareQueryException;
     
     /**
-     * Retrieves a StandardVariable given its id
-     * 
-     * @param stdVariableId
-     * @return
-     * @throws MiddlewareQueryException
+     * Retrieves a StandardVariable given its id.
+     *
+     * @param stdVariableId the std variable id
+     * @return the standard variable
+     * @throws MiddlewareQueryException the middleware query exception
      */
 	public StandardVariable getStandardVariable(int stdVariableId) throws MiddlewareQueryException; 
 	
 	 /**
-     * Retrieves a the standardVariableId given the property, scale and method Ids
-     * 
-     * @param propertyId, scaleId, methodId
-     * @return
-     * @throws MiddlewareQueryException
-     */
+ 	 * Retrieves a the standardVariableId given the property, scale and method Ids.
+ 	 *
+ 	 * @param propertyId the property id
+ 	 * @param scaleId the scale id
+ 	 * @param methodId the method id
+ 	 * @return the standard variable id by property scale method
+ 	 * @throws MiddlewareQueryException the middleware query exception
+ 	 */
 	public Integer getStandardVariableIdByPropertyScaleMethod(Integer propertyId,Integer scaleId, Integer methodId) throws MiddlewareQueryException; 
 
 	
 	/**
-	 * @param nameOrSynonym
-	 * @return
-	 * @throws MiddlewareQueryException
+	 * Find standard variables by name or synonym.
+	 *
+	 * @param nameOrSynonym the name or synonym
+	 * @return the sets the
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Set<StandardVariable> findStandardVariablesByNameOrSynonym(String nameOrSynonym) throws MiddlewareQueryException;
 	
 	/**
-	 * Adds a StandardVariable to the database.  
+	 * Adds a StandardVariable to the database.
 	 * Must provide the property, method, scale, dataType, and storedIn info.
 	 * Otherwise, it will throw an exception.
-	 * 
-	 * @param stdVariable
-	 * @throws MiddlewareQueryException
+	 *
+	 * @param stdVariable the std variable
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	public void addStandardVariable(StandardVariable stdVariable) throws MiddlewareQueryException;
 
 	
 	/**
-	 * Adds a new Method to the database. 
-	 * Creates a new cvterm entry in the local database. 
+	 * Adds a new Method to the database.
+	 * Creates a new cvterm entry in the local database.
 	 * Returns a negative id.
-	 * 
-	 * @param name
-	 * @param definition
-	 * @return
-	 * @throws MiddlewareQueryException
+	 *
+	 * @param name the name
+	 * @param definition the definition
+	 * @return the term
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
+	@Deprecated
 	Term addMethod(String name, String definition) throws MiddlewareQueryException;
 	
 	/**
-	 * @param id
-	 * @return
-	 * @throws MiddlewareQueryException
+	 * Find method by id.
+	 *
+	 * @param id the id
+	 * @return the term
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Term findMethodById(int id) throws MiddlewareQueryException;
 	
 	/**
-	 * @param name
-	 * @return
-	 * @throws MiddlewareQueryException
+	 * Find method by name.
+	 *
+	 * @param name the name
+	 * @return the term
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Term findMethodByName(String name) throws MiddlewareQueryException;
 	
 	/**
-	 * Retrieves the StandardVariable given the property, scale and method names
-	 * 
-	 * @param property, scale, method
+	 * Retrieves the StandardVariable given the property, scale and method names.
+	 *
+	 * @param property the property
+	 * @param scale the scale
+	 * @param method the method
 	 * @return StandardVariable
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	StandardVariable findStandardVariableByTraitScaleMethodNames(String property, String scale, String method) throws MiddlewareQueryException;
 	
 	/**
-	 * Retrieve method given the traitId
-	 * 
-	 * @param traitId
+	 * Retrieve method given the traitId.
+	 *
+	 * @param traitId the trait id
 	 * @return List<Term>
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<Term> getMethodsForTrait(Integer traitId) throws MiddlewareQueryException;
 	
 	/**
-	 * Retrieve scales given the traitId
-	 * 
-	 * @param traitId
+	 * Retrieve scales given the traitId.
+	 *
+	 * @param traitId the trait id
 	 * @return List<Term>
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<Term> getScalesForTrait(Integer traitId) throws MiddlewareQueryException;
 	
@@ -133,10 +149,10 @@ public interface OntologyDataManager {
 	 * Returns the list of Term entries based on the given CvId. The CvId can be CvId.PROPERTIES, CvId.METHODS, CvId.SCALES, CvId.VARIABLES.
 	 * 
 	 * This can be used to get all scales, all traits, all trait methods, all properties, all methods and all variables.
-	 * 
-	 * @param cvId
-	 * @return
-	 * @throws MiddlewareQueryException
+	 *
+	 * @param cvId the cv id
+	 * @return the all terms by cv id
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<Term> getAllTermsByCvId(CvId cvId) throws MiddlewareQueryException;
 	
@@ -145,12 +161,12 @@ public interface OntologyDataManager {
 	 * 
 	 * 
 	 * This can be used to get all scales, all traits, all trait methods, all properties, all methods and all variables.
-	 * 
-	 * @param cvId
-	 * @param start
-	 * @param numOfRows
-	 * @return
-	 * @throws MiddlewareQueryException
+	 *
+	 * @param cvId the cv id
+	 * @param start the start
+	 * @param numOfRows the num of rows
+	 * @return the all terms by cv id
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<Term> getAllTermsByCvId(CvId cvId, int start, int numOfRows) throws MiddlewareQueryException;
 	
@@ -159,49 +175,66 @@ public interface OntologyDataManager {
 	 * Returns the count of entries based on the given CvId. The CvId can be CvId.PROPERTIES, CvId.METHODS, CvId.SCALES, CvId.VARIABLES.
 	 * 
 	 * This can be used to count all scales, all traits, all trait methods, all properties, all methods and  all variables.
-	 * 
-	 * @param cvId
-	 * @return
-	 * @throws MiddlewareQueryException
+	 *
+	 * @param cvId the cv id
+	 * @return the long
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	long countTermsByCvId(CvId cvId) throws MiddlewareQueryException; 
 	
 	/**
-	 * Returns Term based on the given name and cvid.  
-	 * 
-	 * @param name, cvId
+	 * Returns Term based on the given name and cvid.
+	 *
+	 * @param name the name
+	 * @param cvId the cv id
 	 * @return Term
-	 * @throws MiddlewareQueryException
-	 * */
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
 	Term findTermByName(String name, CvId cvId) throws MiddlewareQueryException;
 	
 	/**
-	 * Adds a new Term to the database. 
-	 * Creates a new cvterm entry in the local database. 
+	 * Adds a new Term to the database.
+	 * Creates a new cvterm entry in the local database.
 	 * Returns a negative id.
-	 * 
-	 * @param name
-	 * @param definition
-	 * @param cvId
-	 * @return
-	 * @throws MiddlewareQueryException
+	 *
+	 * @param name the name
+	 * @param definition the definition
+	 * @param cvId the cv id
+	 * @return the term
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Term addTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException;
 	
+
+    /**
+     * Updates an existing term in the database. 
+     * This method searches for the given id in local. 
+     * If it exists, the corresponding name and definition are updated.
+     * 
+     * @param termId the term id
+     * @param name the name
+     * @param definition the definition
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    void updateTerm(Term term) throws MiddlewareException, MiddlewareQueryException;
+    
 	/**
-	 * Returns the list of Term entries based on possible data types
-	 * 
-	 * @return list of data type Term objects 
-	 * @throws MiddlewareQueryException
+	 * Returns the list of Term entries based on possible data types.
+	 *
+	 * @return list of data type Term objects
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<Term> getDataTypes() throws MiddlewareQueryException;
 	
 	
 	/**
-	 * Returns the key-value pairs of PhenotypicType - StandardVariable 
-	 * 
+	 * Returns the key-value pairs of PhenotypicType - StandardVariable.
+	 *
+	 * @param type the type
+	 * @param start the start
+	 * @param numOfRows the num of rows
 	 * @return Map of PhenotypicType - StandardVariable
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Map<String, StandardVariable> getStandardVariablesForPhenotypicType(PhenotypicType type, int start,int numOfRows) throws MiddlewareQueryException;
 	
@@ -210,69 +243,231 @@ public interface OntologyDataManager {
 	 * 
 	 * 1. Search for DISTINCT standard variables used for projectprop records where projectprop.value equals input name (eg. REP)
 	 * 2. If no variable found, search for cvterm (standard variables) with given name.
-	 * 3. If no variable still found for steps 1 and 2, treat the header as a trait / property name. 
-	 * 		Search for trait with given name and return the standard variables using that trait (if any)
-	 * 
-	 * @param headers
+	 * 3. If no variable still found for steps 1 and 2, treat the header as a trait / property name.
+	 * Search for trait with given name and return the standard variables using that trait (if any)
+	 *
+	 * @param headers the headers
 	 * @return The key in map would be the header string. If no standard variable list found, an empty list on map is returned for that header key.
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Map<String, List<StandardVariable>> getStandardVariablesInProjects(List<String> headers) throws MiddlewareQueryException;
 
 	/**
-	 * Retrieves the List of Terms matching the given nameOrSynonym and CvId
-	 * @param nameOrSynonym
-	 * @param cvId
-	 * @return
-	 * @throws MiddlewareQueryException
+	 * Retrieves the List of Terms matching the given nameOrSynonym and CvId.
+	 *
+	 * @param nameOrSynonym the name or synonym
+	 * @param cvId the cv id
+	 * @return the list
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<Term> findTermsByNameOrSynonym(String nameOrSynonym, CvId cvId) throws MiddlewareQueryException;
 	
 	/**
-	 * Returns the count of Term entries based on possible "is a" of properties
-	 * 
-	 * @return count of is_a Term objects 
-	 * @throws MiddlewareQueryException
+	 * Returns the count of Term entries based on possible "is a" of properties.
+	 *
+	 * @return count of is_a Term objects
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	
 	long countIsAOfProperties() throws MiddlewareQueryException;
 	
 	/**
-	 * Returns the list of Term entries based on possible "is a" of properties
-	 * 
-	 * @return list of is_a Term objects 
-	 * @throws MiddlewareQueryException
+	 * Returns the list of Term entries based on possible "is a" of properties.
+	 *
+	 * @param start the start
+	 * @param numOfRows the num of rows
+	 * @return list of is_a Term objects
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	
 	List<Term> getIsAOfProperties(int start, int numOfRows) throws MiddlewareQueryException;
 	
 	/**
-	 * Adds a new property to the database that adds the property term and it's is a relationship) 
+	 * Adds a new property to the database that adds the property term and it's is a relationship)
 	 * Creates a new cvterm entry in the local database and a cvterm_relationship of type is_a
 	 * Returns the added term.
-	 * 
-	 * @param name
-	 * @param definition
-	 * @param isA
+	 *
+	 * @param name the name
+	 * @param definition the definition
+	 * @param isA the is a
 	 * @return Term
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Term addProperty(String name, String definition, int isA) throws MiddlewareQueryException;
 	
 	/**
 	 * Given the termId, retrieve the Property POJO.
-	 * @param termId
+	 *
+	 * @param termId the term id
 	 * @return property
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Property getProperty(int termId) throws MiddlewareQueryException;
 	
 	/**
 	 * Given the name, retrieve the Property POJO.
-	 * @param name
+	 *
+	 * @param name the name
 	 * @return property
-	 * @throws MiddlewareQueryException
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Property getProperty(String name) throws MiddlewareQueryException;
 	
+   /**
+     * Retrieves ALL the trait classes containing the hierarchical structure
+     * of the trait groups: Trait Group --> Properties --> Standard Variables.
+     * 
+     * The list is returned in alphabetical order of the name.
+     *
+     * @return the trait groups
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+
+    List<TraitClassReference> getAllTraitGroupsHierarchy() throws MiddlewareQueryException;
+	
+	/**
+	 * Retrieves the trait classes containing the hierarchical structure
+	 * of the trait groups: Trait Group --> Properties --> Standard Variables.
+	 * The records are retrieved based on the given class type. 
+	 * 
+	 * The list is returned in alphabetical order of the name.
+	 *
+     * @param classType can be either TermId.ONTOLOGY_TRAIT_CLASS or TermId.ONTOLOGY_RESEARCH_CLASS
+	 * @return the trait groups
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+    @Deprecated
+    List<TraitClassReference> getTraitGroupsHierarchy(TermId classType) throws MiddlewareQueryException;	
+
+    /**
+     * Retrieves all the trait classes from both crop research ontology 
+     * and crop ontology trait class from central and local.
+     * 
+     * The list is returned in alphabetical order of the name.
+     *
+     * @return List of TraitReference objects (id, name, description)  
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<TraitClassReference> getAllTraitClasses() throws MiddlewareQueryException;
+	
+
+    /**
+     * Returns trait classes based on the given type from both central and local databases. 
+     * 
+     * The list is returned in alphabetical order of the name.
+     * 
+     * @param classType can be either TermId.ONTOLOGY_TRAIT_CLASS or TermId.ONTOLOGY_RESEARCH_CLASS
+     * @return List of TraitReference objects (id, name, description)  
+     * @throws MiddlewareQueryException
+     */
+    @Deprecated
+    List<TraitClassReference> getTraitClasses(TermId classType) throws MiddlewareQueryException;
+    
+    /**
+     * Retrieves all the Term entries based on the given list of ids.
+     *
+     * @param ids the ids
+     * @return the terms by ids
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    public List<Term> getTermsByIds(List<Integer> ids) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Adds the trait class.
+     *
+     * @param name the name
+     * @param definition the definition
+     * @return the term
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    public TraitClass addTraitClass(String name, String definition, int parentTraitClassId) throws MiddlewareQueryException;
+            
+    /**
+     * Gets all the standard variables.
+     *
+     * @return the all standard variable
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    public Set<StandardVariable> getAllStandardVariables() throws MiddlewareQueryException;
+    
+    /**
+     * Adds or updates the term and relationship.
+     *
+     * @param name the name
+     * @param definition the definition
+     * @param cvId the cv id
+     * @param typeId the type id
+     * @param objectId the object id
+     * @return the term
+     * @throws MiddlewareQueryException the middleware query exception
+     * @throws MiddlewareException the middleware exception
+     */
+    Term addOrUpdateTermAndRelationship(String name, String definition, CvId cvId, int typeId, int objectId)
+            throws MiddlewareQueryException, MiddlewareException;
+
+    /**
+     * Updates the given term and its associated entry in the cvterm_relationship table.
+     * Searches first if the given term id exists. If it exists in local, the records are updated. 
+     *
+     * @param term The term to update
+     * @param typeId the type id of the relationship between the term id and the objectId
+     * @param objectId the object id
+     * @return the term
+     * @throws MiddlewareQueryException the middleware query exception
+     * @throws MiddlewareException the middleware exception
+     */
+    Term updateTermAndRelationship(Term term, int typeId, int objectId) throws MiddlewareQueryException, MiddlewareException;
+    
+    /**
+     * Adds or updates the term.
+     *
+     * @param name the name
+     * @param definition the definition
+     * @param cvId the cv id
+     * @return the term
+     * @throws MiddlewareQueryException the middleware query exception
+     * @throws MiddlewareException the middleware exception
+     */
+    Term addOrUpdateTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException, MiddlewareException;
+    
+    /**
+     * Gets the standard variable id by term id.
+     *
+     * @param cvTermId the cv term id
+     * @param termId the term id
+     * @return the standard variable id by term id
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Integer getStandardVariableIdByTermId(int cvTermId, TermId termId) throws MiddlewareQueryException;
+
+    /**
+     * Insert or Update a Standard Variable.
+     *
+     * @param standardVariable the standard variable
+     * @param operation the operation
+     * @throws MiddlewareQueryException the middleware query exception
+     * @throws MiddlewareException the middleware exception
+     */
+    void saveOrUpdateStandardVariable(StandardVariable standardVariable, Operation operation) throws MiddlewareQueryException, MiddlewareException;
+
+    /**
+     * Delete term.
+     *
+     * @param cvTermId the cv term id
+     * @param cvId the cv id
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    void deleteTerm(int cvTermId, CvId cvId) throws MiddlewareQueryException;
+    
+    /**
+     * Delete term and relationship.
+     *
+     * @param cvTermId the cv term id
+     * @param cvId the cv id
+     * @param typeId the type id
+     * @param objectId the object id
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    void deleteTermAndRelationship(int cvTermId, CvId cvId, int typeId, int objectId) throws MiddlewareQueryException;
 }
