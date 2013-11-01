@@ -309,7 +309,7 @@ public class TestOntologyServiceImpl {
     
     @Test
     public void testGetAllTraitGroupsHierarchy() throws MiddlewareQueryException {
-        List<TraitClassReference> traitGroups = ontologyService.getAllTraitGroupsHierarchy();           
+        List<TraitClassReference> traitGroups = ontologyService.getAllTraitGroupsHierarchy(true);           
         assertFalse(traitGroups.isEmpty());
         for (TraitClassReference traitGroup : traitGroups){
             traitGroup.print(3);
