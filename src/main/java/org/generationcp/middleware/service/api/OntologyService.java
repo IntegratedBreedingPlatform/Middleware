@@ -338,12 +338,12 @@ public interface OntologyService {
     /**
      * Gets all the trait groups, its properties and standard variables in a hierarchical structure.
      * All the trait classes under crop research ontology and ontology trait class are retrieved.
-     *
+     * @param includePropertiesAndVariable true if we want to include property and variable information
      * @return the trait groups
      * @throws MiddlewareQueryException the middleware query exception
      */
 
-    List<TraitClassReference> getAllTraitGroupsHierarchy() throws MiddlewareQueryException;
+    List<TraitClassReference> getAllTraitGroupsHierarchy(boolean includePropertiesAndVariable) throws MiddlewareQueryException;
 
   
     /**
