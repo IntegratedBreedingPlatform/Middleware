@@ -318,12 +318,12 @@ public interface OntologyDataManager {
      * of the trait groups: Trait Group --> Properties --> Standard Variables.
      * 
      * The list is returned in alphabetical order of the name.
-     *
+     * @param includePropertiesAndVariables true if we want to load the property and standard variable, else false
      * @return the trait groups
      * @throws MiddlewareQueryException the middleware query exception
      */
 
-    List<TraitClassReference> getAllTraitGroupsHierarchy() throws MiddlewareQueryException;
+    List<TraitClassReference> getAllTraitGroupsHierarchy(boolean includePropertiesAndVariables) throws MiddlewareQueryException;
 	
 	/**
 	 * Retrieves the trait classes containing the hierarchical structure
