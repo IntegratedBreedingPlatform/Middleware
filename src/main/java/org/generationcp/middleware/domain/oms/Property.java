@@ -72,6 +72,15 @@ public class Property {
     public void setDefinition(String definition) {
         term.setDefinition(definition);
     }
+    
+    public int getIsAId() {
+        if(IsA != null){
+            return IsA.getId();
+        }else{
+            return -1;
+        }
+        
+    }
 	
 	
     @Override
