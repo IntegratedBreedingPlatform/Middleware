@@ -752,7 +752,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     }
 
     @Override
-    public List<Property> getAllPropertieswithTraitClass() throws MiddlewareQueryException {
+    public List<Property> getAllPropertiesWithTraitClass() throws MiddlewareQueryException {
         List<Property> properties = getPropertyBuilder().getAllPropertiesWithTraitClass();
         Collections.sort(properties, new Comparator<Property>() {
 

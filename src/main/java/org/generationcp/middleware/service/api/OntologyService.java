@@ -509,5 +509,5 @@ public interface OntologyService {
      * @return
      * @throws MiddlewareQueryException
      */
-    List<Property> getAllPropertieswithTraitClass() throws MiddlewareQueryException;
+    List<Property> getAllPropertiesWithTraitClass() throws MiddlewareQueryException;
 }

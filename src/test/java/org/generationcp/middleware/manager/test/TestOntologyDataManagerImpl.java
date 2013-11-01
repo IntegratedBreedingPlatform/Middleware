@@ -933,7 +933,7 @@ public class TestOntologyDataManagerImpl {
     
     @Test
     public void testGetAllPropertiesWithTraitClass() throws Exception {
-        List<Property> properties = manager.getAllPropertieswithTraitClass();
+        List<Property> properties = manager.getAllPropertiesWithTraitClass();
         for (Property property : properties) {
             System.out.println(property);
         }
