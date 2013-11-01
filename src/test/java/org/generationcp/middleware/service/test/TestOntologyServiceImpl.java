@@ -14,6 +14,7 @@ package org.generationcp.middleware.service.test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
@@ -386,6 +387,59 @@ public class TestOntologyServiceImpl {
         }
     }
 
+    @Test
+    public void testDeleteTraitClass() throws Exception {
+        String name = "Test Trait Class " + new Random().nextInt(10000);
+        String definition = "Test Definition";
+        
+        Term term = ontologyService.addTraitClass(name, definition, TermId.ONTOLOGY_TRAIT_CLASS.getId()).getTerm();
+        ontologyService.deleteTraitClass(term.getId());
+        
+        term = ontologyService.getTermById(term.getId());
+        assertNull(term);
+    }
+    
+    @Test
+    public void testDeleteProperty() throws Exception {
+        String name = "Test Property" + new Random().nextInt(10000);
+        String definition = "Property Definition";
+        int isA = 1087;
+        
+        Property property = ontologyService.addProperty(name, definition, isA);
+        ontologyService.deleteProperty(property.getId(), isA);
+        
+        Term term= ontologyService.getTermById(property.getId());
+        assertNull(term);
+    }
+    
+    @Test
+    public void testDeleteMethod() throws Exception {
+        String name = "Test Method " + new Random().nextInt(10000);
+        String definition = "Test Definition";
+        
+        //add a method, should allow insert
+        Method method= ontologyService.addMethod(name, definition);
+        
+        ontologyService.deleteMethod(method.getId());
+        
+        //check if value does not exist anymore
+        Term term = ontologyService.getTermById(method.getId());
+        assertNull(term);
+    }
+    
+    @Test
+    public void testDeleteScale() throws Exception {
+        String name = "Test Scale " + new Random().nextInt(10000);
+        String definition = "Test Definition";
+        
+        Scale scale = ontologyService.addScale(name, definition);
+        
+        ontologyService.deleteScale(scale.getId());
+        
+        //check if value does not exist anymore
+        Term term = ontologyService.getTermById(scale.getId());
+        assertNull(term);
+    }
 
     @After
     public void afterEachTest() {
