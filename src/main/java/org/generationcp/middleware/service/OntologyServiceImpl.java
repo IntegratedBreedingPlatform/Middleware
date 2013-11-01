@@ -320,4 +320,10 @@ public class OntologyServiceImpl extends Service implements OntologyService {
         getOntologyDataManager().saveOrUpdateStandardVariable(standardVariable, operation);
     }
 
+    @Override
+    public List<Property> getAllPropertieswithTraitClass()
+            throws MiddlewareQueryException {
+        return getOntologyDataManager().getAllPropertieswithTraitClass();
+    }
+
 }

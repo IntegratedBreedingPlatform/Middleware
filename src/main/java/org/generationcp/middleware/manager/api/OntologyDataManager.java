@@ -470,4 +470,11 @@ public interface OntologyDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     void deleteTermAndRelationship(int cvTermId, CvId cvId, int typeId, int objectId) throws MiddlewareQueryException;
+    
+    /**
+     * Returns all Properties with its trait class.
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    List<Property> getAllPropertieswithTraitClass() throws MiddlewareQueryException;
 }

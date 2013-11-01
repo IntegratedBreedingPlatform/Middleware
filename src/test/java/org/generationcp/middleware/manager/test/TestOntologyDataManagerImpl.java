@@ -930,5 +930,13 @@ public class TestOntologyDataManagerImpl {
         term = manager.getTermById(term.getId());
         assertNull(term);
     }
+    
+    @Test
+    public void testGetAllPropertiesWithTraitClass() throws Exception {
+        List<Property> properties = manager.getAllPropertieswithTraitClass();
+        for (Property property : properties) {
+            System.out.println(property);
+        }
+    }
 
 }

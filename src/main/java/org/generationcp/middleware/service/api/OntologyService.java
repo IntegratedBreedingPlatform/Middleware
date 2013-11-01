@@ -503,4 +503,11 @@ public interface OntologyService {
      * @throws MiddlewareException the middleware exception
      */
     void saveOrUpdateStandardVariable(StandardVariable standardVariable, Operation operation) throws MiddlewareQueryException, MiddlewareException;
+    
+    /**
+     * Returns all Properties with its trait class.
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    List<Property> getAllPropertieswithTraitClass() throws MiddlewareQueryException;
 }
