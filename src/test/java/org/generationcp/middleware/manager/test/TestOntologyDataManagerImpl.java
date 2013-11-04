@@ -13,6 +13,7 @@
 package org.generationcp.middleware.manager.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -37,6 +38,7 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
@@ -731,6 +733,69 @@ public class TestOntologyDataManagerImpl {
             
             Debug.println(0, "count: " + standardVariables.size());
         }
+	
+
+    @Test
+    public void testGetStandardVariablesByTraitClass() throws MiddlewareQueryException {
+        List<StandardVariable> vars = manager.getStandardVariables(Integer.valueOf(1045), null, null, null);
+        
+        assertFalse(vars.isEmpty());
+        
+        StandardVariable expectedVar = new StandardVariable();
+        expectedVar.setId(1050);
+        assertTrue(vars.contains(expectedVar));
+        
+        for (StandardVariable var : vars){
+            Debug.println(3, var.toString());
+        }
+    }
+
+    @Test
+    public void testGetStandardVariablesByProperty() throws MiddlewareQueryException {
+        List<StandardVariable> vars = manager.getStandardVariables(null, Integer.valueOf(20109), null, null);
+       
+        assertFalse(vars.isEmpty()); 
+
+        StandardVariable expectedVar = new StandardVariable();
+        expectedVar.setId(20961);
+        assertTrue(vars.contains(expectedVar));// stdvarid = 20961
+        
+        for (StandardVariable var : vars){
+            Debug.println(3, var.toString());
+        }
+    }
+
+    @Test
+    public void testGetStandardVariablesByMethod() throws MiddlewareQueryException {
+        List<StandardVariable> vars = manager.getStandardVariables(null, null, Integer.valueOf(20643), null);
+        
+        assertFalse(vars.isEmpty());
+        
+        StandardVariable expectedVar = new StandardVariable();
+        expectedVar.setId(20954);
+        assertTrue(vars.contains(expectedVar));
+        
+        for (StandardVariable var : vars){
+            Debug.println(3, var.toString());
+        }
+    }
+
+    @Test
+    public void testGetStandardVariablesByScale() throws MiddlewareQueryException {
+        List<StandardVariable> vars = manager.getStandardVariables(null, null, null, Integer.valueOf(20392));
+        
+        assertFalse(vars.isEmpty());
+        
+        StandardVariable expectedVar = new StandardVariable();
+        expectedVar.setId(20953);
+        assertTrue(vars.contains(expectedVar));
+        
+
+        for (StandardVariable var : vars){
+            Debug.println(3, var.toString());
+        }
+    }
+
 	
     @Test
     public void testAddOrUpdateTermAndRelationshipFoundInCentral() throws Exception {

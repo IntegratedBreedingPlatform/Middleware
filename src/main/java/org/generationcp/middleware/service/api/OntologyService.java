@@ -29,7 +29,6 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 
-// TODO: Auto-generated Javadoc
 /**
  * 
  * This is the API for Ontology Browser requirements.
@@ -88,18 +87,41 @@ public interface OntologyService {
      */
     Set<StandardVariable> getAllStandardVariables() throws MiddlewareQueryException;
     
+    /**
+     * Gets all the standard variables matching the given trait class ID. 
+     * 
+     * @param traitClassId
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    List<StandardVariable> getStandardVariablesByTraitClass(Integer traitClassId) throws MiddlewareQueryException;
     
     /**
-     * Gets the all standard variables.
-     *
-     * @param traitClassId the trait class id
-     * @param propertyId the property id
-     * @param scaleId the scale id
-     * @param methodId the method id
-     * @return the all standard variables
-     * @throws MiddlewareQueryException the middleware query exception
+     * Gets all the standard variables matching the given property ID. 
+     * 
+     * @param propertyId
+     * @return
+     * @throws MiddlewareQueryException
      */
-    List<StandardVariable> getStandardVariables(Integer traitClassId, Integer propertyId, Integer scaleId, Integer methodId) throws MiddlewareQueryException;
+    List<StandardVariable> getStandardVariablesByProperty(Integer propertyId) throws MiddlewareQueryException;
+    
+    /**
+     * Gets all the standard variables matching the given method ID. 
+     * 
+     * @param methodId
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    List<StandardVariable> getStandardVariablesByMethod(Integer methodId) throws MiddlewareQueryException;
+    
+    /**
+     * Gets all the standard variables matching the given scale ID. 
+     * 
+     * @param scaleId
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    List<StandardVariable> getStandardVariablesByScale(Integer scaleId) throws MiddlewareQueryException;
     
     /**
      * Gets the all terms by cv id.

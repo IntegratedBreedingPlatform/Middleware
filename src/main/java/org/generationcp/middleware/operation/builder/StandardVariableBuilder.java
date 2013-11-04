@@ -102,7 +102,9 @@ public class StandardVariableBuilder extends Builder {
 						getCvTermRelationshipDao().getBySubject(standardVariable.getProperty().getId());
 				standardVariable.setIsA(createTerm(propertyCvTermRelationships, TermId.IS_A));
 			}
-			standardVariable.setPhenotypicType(createPhenotypicType(standardVariable.getStoredIn().getId()));
+			if (standardVariable.getStoredIn() != null){
+			    standardVariable.setPhenotypicType(createPhenotypicType(standardVariable.getStoredIn().getId()));
+			}
 			addEnumerations(standardVariable, cvTermRelationships);
 		}
 	}

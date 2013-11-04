@@ -101,6 +101,43 @@ public class TestOntologyServiceImpl {
         }
     }
     
+    
+    @Test
+    public void testGetStandardVariablesByTraitClass() throws MiddlewareQueryException {
+        List<StandardVariable> vars = ontologyService.getStandardVariablesByTraitClass(Integer.valueOf(1045));
+        assertFalse(vars.isEmpty());
+        for (StandardVariable var : vars){
+            Debug.println(3, var.toString());
+        }
+    }
+
+    @Test
+    public void testGetStandardVariablesByProperty() throws MiddlewareQueryException {
+        List<StandardVariable> vars = ontologyService.getStandardVariablesByProperty(Integer.valueOf(20109));
+        assertFalse(vars.isEmpty()); // stdvarid = 20961
+        for (StandardVariable var : vars){
+            Debug.println(3, var.toString());
+        }
+    }
+
+    @Test
+    public void testGetStandardVariablesByMethod() throws MiddlewareQueryException {
+        List<StandardVariable> vars = ontologyService.getStandardVariablesByMethod(Integer.valueOf(20643));
+        assertFalse(vars.isEmpty());
+        for (StandardVariable var : vars){
+            Debug.println(3, var.toString());
+        }
+    }
+
+    @Test
+    public void testGetStandardVariablesByScale() throws MiddlewareQueryException {
+        List<StandardVariable> vars = ontologyService.getStandardVariablesByScale(Integer.valueOf(20392));
+        assertFalse(vars.isEmpty());
+        for (StandardVariable var : vars){
+            Debug.println(3, var.toString());
+        }
+    }
+
     @Test
     public void testAddStandardVariable() throws MiddlewareQueryException {
     }
@@ -337,6 +374,7 @@ public class TestOntologyServiceImpl {
         assertFalse(traitGroups.isEmpty());
         for (TraitClassReference traitGroup : traitGroups){
             traitGroup.print(3);
+//            Debug.println(3, traitGroup.toString());
         }
         Debug.println(3, NUMBER_OF_RECORDS + traitGroups.size());
     }

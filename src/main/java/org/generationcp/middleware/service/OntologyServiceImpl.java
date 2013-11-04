@@ -83,16 +83,28 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     }
 
     @Override
-    public List<StandardVariable> getStandardVariables(Integer traitClassId, Integer propertyId, Integer scaleId, Integer methodId) throws MiddlewareQueryException{
-        //TODO 
-        return new ArrayList<StandardVariable>();
+    public List<StandardVariable> getStandardVariablesByTraitClass(Integer traitClassId) throws MiddlewareQueryException{
+        return getOntologyDataManager().getStandardVariables(traitClassId, null, null, null);
+    }
+    
+    @Override
+    public List<StandardVariable> getStandardVariablesByProperty(Integer propertyId) throws MiddlewareQueryException{
+        return getOntologyDataManager().getStandardVariables(null, propertyId, null, null);
+    }
+    
+    @Override
+    public List<StandardVariable> getStandardVariablesByMethod(Integer methodId) throws MiddlewareQueryException{
+        return getOntologyDataManager().getStandardVariables(null, null, methodId, null);
+    }
+    
+    @Override
+    public List<StandardVariable> getStandardVariablesByScale(Integer scaleId) throws MiddlewareQueryException{
+        return getOntologyDataManager().getStandardVariables(null, null, null, scaleId);
     }
     
     @Override
     public void saveOrUpdateStandardVariable(StandardVariable standardVariable,
-            Operation operation) throws MiddlewareQueryException,
-            MiddlewareException {
-        
+            Operation operation) throws MiddlewareQueryException, MiddlewareException {
         getOntologyDataManager().saveOrUpdateStandardVariable(standardVariable, operation);
     }
     

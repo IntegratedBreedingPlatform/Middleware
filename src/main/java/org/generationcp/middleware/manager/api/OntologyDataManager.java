@@ -392,6 +392,18 @@ public interface OntologyDataManager {
      */
     public Set<StandardVariable> getAllStandardVariables() throws MiddlewareQueryException;
     
+    
+    /**
+     * Gets the all standard variables based on the parameters with values. 
+     * At least one parameter needs to have a value.
+     * If a standard variable has no trait class, it is not included in the result.
+     *
+     * @return the standard variables matching the given parameters
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<StandardVariable> getStandardVariables(Integer traitClassId, Integer propertyId, Integer methodId, Integer scaleId) throws MiddlewareQueryException;
+    
+
     /**
      * Adds or updates the term and relationship.
      *

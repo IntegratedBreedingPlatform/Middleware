@@ -646,6 +646,26 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     }
     
     @Override
+    public List<StandardVariable> getStandardVariables(Integer traitClassId, Integer propertyId, Integer methodId,  Integer scaleId) 
+                    throws MiddlewareQueryException{
+        List<StandardVariable> standardVariables = new ArrayList<StandardVariable>();
+
+        setWorkingDatabase(Database.CENTRAL);
+        List<Integer> standardVariableIds = getCvTermDao().getStandardVariableIds(traitClassId, propertyId, methodId, scaleId);
+        for (Integer id : standardVariableIds) {
+            standardVariables.add(getStandardVariable(id));
+        }
+        setWorkingDatabase(Database.LOCAL);
+        standardVariableIds = getCvTermDao().getStandardVariableIds(traitClassId, propertyId, methodId, scaleId);
+        for (Integer id : standardVariableIds) {
+            standardVariables.add(getStandardVariable(id));
+        }
+        
+        
+        return standardVariables;
+    }
+    
+    @Override
     public Integer getStandardVariableIdByTermId(int cvTermId, TermId termId) throws MiddlewareQueryException {
         return getStandardVariableBuilder().getIdByTermId(cvTermId, termId);
     }

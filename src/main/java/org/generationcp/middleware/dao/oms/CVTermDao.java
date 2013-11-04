@@ -39,7 +39,6 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.hql.antlr.SqlTokenTypes;
 
 /**
  * DAO class for {@link CVTerm}.
@@ -978,7 +977,75 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
         }
         return null;
     }
-	
+    
+    /**
+     * Gets the all standard variables based on the parameters with values. 
+     * At least one parameter needs to have a value.
+     * If a standard variable has no trait class, it is not included in the result.
+     * 
+     * @param traitClassId
+     * @param propertyId
+     * @param methodId
+     * @param scaleId
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    public List<Integer> getStandardVariableIds(Integer traitClassId, Integer propertyId, Integer methodId, Integer scaleId) throws MiddlewareQueryException {
+        List<Integer> standardVariableIds = new ArrayList<Integer>();
+        try {
+            StringBuilder queryString = new StringBuilder()
+                .append("SELECT DISTINCT cvr.subject_id ")
+                .append("FROM cvterm_relationship cvr ");
+            
+            if (traitClassId != null){
+                queryString.append("INNER JOIN cvterm_relationship cvrt ON cvr.subject_id = cvrt.subject_id ");
+                queryString.append("    AND cvr.object_id = :traitClassId AND cvr.type_id = ").append(TermId.IS_A.getId()).append(" ");
+            }
+            if (propertyId != null){
+                queryString.append("INNER JOIN cvterm_relationship cvrp ON cvr.subject_id = cvrp.subject_id ");
+                queryString.append("    AND cvr.object_id = :propertyId AND cvr.type_id = ").append(TermId.HAS_PROPERTY.getId()).append(" ");
+            }
+            if (methodId != null){
+                queryString.append("INNER JOIN cvterm_relationship cvrm ON cvr.subject_id = cvrm.subject_id ");
+                queryString.append("    AND cvr.object_id = :methodId AND cvr.type_id = ").append(TermId.HAS_METHOD.getId()).append(" ");;
+            }
+            if (scaleId != null){
+                queryString.append("INNER JOIN cvterm_relationship cvrs ON cvr.subject_id = cvrs.subject_id ");
+                queryString.append("    AND  cvr.object_id = :scaleId AND cvr.type_id = ").append(TermId.HAS_SCALE.getId()).append(" ");
+            }
+
+            // Return only if it belongs to a trait class
+            queryString.append("INNER JOIN cvterm_relationship cvrtc ON cvr.subject_id = cvrtc.subject_id ");  
+            queryString.append("        AND cvrtc.type_id = 1225 ");
+
+            SQLQuery query = getSession().createSQLQuery(queryString.toString());
+            if (traitClassId != null){
+                query.setParameter("traitClassId", traitClassId);
+            }
+            if (propertyId != null){
+                query.setParameter("propertyId", propertyId);
+            }
+            if (methodId != null){
+                query.setParameter("methodId", methodId);
+            }
+            if (scaleId != null){
+                query.setParameter("scaleId", scaleId);
+            }
+            
+            List<Integer> result = query.list();
+            
+            if (result != null && !result.isEmpty()) {
+                for (Integer row : result) {
+                    standardVariableIds.add((Integer) row);
+                }
+            }
+                                    
+        } catch(HibernateException e) {
+                logAndThrowException("Error at getStandardVariableIds :" + e.getMessage(), e);
+        }
+        return standardVariableIds;
+    }
+    
     public List<Property> getAllPropertiesWithTraitClass() throws MiddlewareQueryException {
         List<Property> properties = new ArrayList<Property>();
         try {
