@@ -314,8 +314,9 @@ public interface OntologyDataManager {
 	Property getProperty(String name) throws MiddlewareQueryException;
 	
    /**
-     * Retrieves ALL the trait classes containing the hierarchical structure
-     * of the trait groups: Trait Group --> Properties --> Standard Variables.
+     * Retrieves ALL the trait classes containing the hierarchical structure of the trait classes.
+     * If includePropertiesAndVariables = true, it retrieves the properties and standard variables 
+     * in a hierarchical structure as well:  Trait Group --> Properties --> Standard Variables.
      * 
      * The list is returned in alphabetical order of the name.
      * @param includePropertiesAndVariables true if we want to load the property and standard variable, else false
@@ -348,6 +349,7 @@ public interface OntologyDataManager {
      * @return List of TraitReference objects (id, name, description)  
      * @throws MiddlewareQueryException the middleware query exception
      */
+    @Deprecated
     List<TraitClassReference> getAllTraitClasses() throws MiddlewareQueryException;
 	
 

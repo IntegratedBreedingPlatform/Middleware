@@ -100,6 +100,7 @@ public class TraitGroupBuilder extends Builder {
      * @return
      * @throws MiddlewareQueryException
      */
+    @Deprecated
     public List<TraitClassReference> getAllTraitClassesHierarchy() throws MiddlewareQueryException {
         List<TraitClassReference> traitClasses = getAllTraitClasses();
         traitClasses = buildTree(traitClasses, TermId.IBDB_CLASS.getId());

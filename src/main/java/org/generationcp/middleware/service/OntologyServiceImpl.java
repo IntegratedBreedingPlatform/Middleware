@@ -266,6 +266,7 @@ public class OntologyServiceImpl extends Service implements OntologyService {
         return getOntologyDataManager().getTraitGroupsHierarchy(classType);
     }
 
+    @Deprecated
     @Override
     public List<TraitClassReference> getAllTraitClasses() throws MiddlewareQueryException{
         return getOntologyDataManager().getAllTraitClasses();

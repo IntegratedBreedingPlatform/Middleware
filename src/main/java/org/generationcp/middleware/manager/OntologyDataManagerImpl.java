@@ -590,6 +590,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         return getTraitGroupBuilder().buildTraitGroupHierarchy(classType);
     }
 
+    @Deprecated
     @Override
     public List<TraitClassReference> getAllTraitClasses() throws MiddlewareQueryException {
         return getTraitGroupBuilder().getAllTraitClassesHierarchy();
