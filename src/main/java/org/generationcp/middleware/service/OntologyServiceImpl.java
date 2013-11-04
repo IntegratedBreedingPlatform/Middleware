@@ -77,6 +77,25 @@ public class OntologyServiceImpl extends Service implements OntologyService {
         return getOntologyDataManager().getStandardVariableIdByTermId(cvTermId, termId);
     }
     
+    @Override
+    public Set<StandardVariable> getAllStandardVariables() throws MiddlewareQueryException {
+        return getOntologyDataManager().getAllStandardVariables();
+    }
+
+    @Override
+    public List<StandardVariable> getStandardVariables(Integer traitClassId, Integer propertyId, Integer scaleId, Integer methodId) throws MiddlewareQueryException{
+        //TODO 
+        return new ArrayList<StandardVariable>();
+    }
+    
+    @Override
+    public void saveOrUpdateStandardVariable(StandardVariable standardVariable,
+            Operation operation) throws MiddlewareQueryException,
+            MiddlewareException {
+        
+        getOntologyDataManager().saveOrUpdateStandardVariable(standardVariable, operation);
+    }
+
     /*======================= PROPERTY ================================== */
 
 
@@ -307,19 +326,6 @@ public class OntologyServiceImpl extends Service implements OntologyService {
         return getOntologyDataManager().findTermByName(name, cvId);
     }
     
-    @Override
-    public Set<StandardVariable> getAllStandardVariables() throws MiddlewareQueryException {
-        return getOntologyDataManager().getAllStandardVariables();
-    }
-
-    @Override
-    public void saveOrUpdateStandardVariable(StandardVariable standardVariable,
-            Operation operation) throws MiddlewareQueryException,
-            MiddlewareException {
-        
-        getOntologyDataManager().saveOrUpdateStandardVariable(standardVariable, operation);
-    }
-
     @Override
     public List<Property> getAllPropertiesWithTraitClass()
             throws MiddlewareQueryException {

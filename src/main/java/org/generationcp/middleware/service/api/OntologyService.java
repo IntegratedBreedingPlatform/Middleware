@@ -78,7 +78,7 @@ public interface OntologyService {
      */
     void addStandardVariable(StandardVariable stdVariable) throws MiddlewareQueryException;
     
-   
+    
     /**
      * Gets the all standard variables.
      *
@@ -86,6 +86,15 @@ public interface OntologyService {
      * @throws MiddlewareQueryException the middleware query exception
      */
     Set<StandardVariable> getAllStandardVariables() throws MiddlewareQueryException;
+    
+    
+    /**
+     * Gets the all standard variables.
+     *
+     * @return the all standard variables
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<StandardVariable> getStandardVariables(Integer traitClassId, Integer propertyId, Integer scaleId, Integer methodId) throws MiddlewareQueryException;
     
     /**
      * Gets the all terms by cv id.
@@ -105,6 +114,18 @@ public interface OntologyService {
      * @throws MiddlewareQueryException the middleware query exception
      */
     Integer getStandardVariableIdByTermId(int cvTermId, TermId termId) throws MiddlewareQueryException;
+    
+    /**
+     * Insert or Update a Standard Variable.
+     *
+     * @param standardVariable the standard variable
+     * @param operation the operation
+     * @throws MiddlewareQueryException the middleware query exception
+     * @throws MiddlewareException the middleware exception
+     */
+    void saveOrUpdateStandardVariable(StandardVariable standardVariable, Operation operation) throws MiddlewareQueryException, MiddlewareException;
+    
+
     
     /*======================= PROPERTY ================================== */
    
@@ -495,19 +516,10 @@ public interface OntologyService {
     Term findTermByName(String name, CvId cvId) throws MiddlewareQueryException;
 
     /**
-     * Insert or Update a Standard Variable.
-     *
-     * @param standardVariable the standard variable
-     * @param operation the operation
-     * @throws MiddlewareQueryException the middleware query exception
-     * @throws MiddlewareException the middleware exception
-     */
-    void saveOrUpdateStandardVariable(StandardVariable standardVariable, Operation operation) throws MiddlewareQueryException, MiddlewareException;
-    
-    /**
      * Returns all Properties with its trait class.
      * @return
      * @throws MiddlewareQueryException
      */
     List<Property> getAllPropertiesWithTraitClass() throws MiddlewareQueryException;
+    
 }
