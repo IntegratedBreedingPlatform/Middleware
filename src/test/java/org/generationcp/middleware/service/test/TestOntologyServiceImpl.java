@@ -181,6 +181,15 @@ public class TestOntologyServiceImpl {
         scale.print(3);
     }
 
+
+    @Test
+    public void testGetScaleByName() throws MiddlewareQueryException {
+        Scale scale = ontologyService.getScale("Calculated");       
+        assertNotNull(scale);
+        scale.print(3);
+    }
+    
+    
     @Test
     public void testGetAllScales() throws MiddlewareQueryException {
         List<Scale> scales = ontologyService.getAllScales();       
