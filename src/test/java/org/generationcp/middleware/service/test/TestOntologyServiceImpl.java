@@ -18,10 +18,15 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.generationcp.middleware.domain.dms.Enumeration;
+import org.generationcp.middleware.domain.dms.NameSynonym;
+import org.generationcp.middleware.domain.dms.NameType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Property;
@@ -98,6 +103,16 @@ public class TestOntologyServiceImpl {
     
     @Test
     public void testAddStandardVariable() throws MiddlewareQueryException {
+    }
+    
+    @Test
+    public void testDeleteStandardVariable() throws MiddlewareQueryException {
+        StandardVariable stdVar = createNewStandardVariable();    
+        
+        ontologyService.deleteStandardVariable(stdVar.getId());
+        Term term = ontologyService.getTermById(stdVar.getId());
+        
+        assertNull(term);
     }
     
     @Test
@@ -448,6 +463,37 @@ public class TestOntologyServiceImpl {
         //check if value does not exist anymore
         Term term = ontologyService.getTermById(scale.getId());
         assertNull(term);
+    }
+    
+    private StandardVariable createNewStandardVariable() throws MiddlewareQueryException{
+        String propertyName = "property name " + new Random().nextInt(10000);
+        ontologyService.addProperty(propertyName, "test property", 1087);
+            
+        StandardVariable stdVariable = new StandardVariable();
+            stdVariable.setName("variable name " + new Random().nextInt(10000));
+            stdVariable.setDescription("variable description");
+            //stdVariable.setProperty(new Term(2002, "User", "Database user"));
+            stdVariable.setProperty(ontologyService.findTermByName(propertyName, CvId.PROPERTIES));
+            stdVariable.setMethod(new Term(4030, "Assigned", "Term, name or id assigned"));
+            stdVariable.setScale(new Term(6000, "DBCV", "Controlled vocabulary from a database"));
+            stdVariable.setStoredIn(new Term(1010, "Study information", "Study element"));
+            stdVariable.setDataType(new Term(1120, "Character variable", "variable with char values"));
+            stdVariable.setIsA(new Term(1050,"Study condition","Study condition class"));
+            stdVariable.setNameSynonyms(new ArrayList<NameSynonym>());
+            stdVariable.getNameSynonyms().add(new NameSynonym("Person", NameType.ALTERNATIVE_ENGLISH));
+            stdVariable.getNameSynonyms().add(new NameSynonym("Tiga-gamit", NameType.ALTERNATIVE_FRENCH));
+            stdVariable.setEnumerations(new ArrayList<Enumeration>());
+            stdVariable.getEnumerations().add(new Enumeration(10000, "N", "Nursery", 1));
+            stdVariable.getEnumerations().add(new Enumeration(10001, "HB", "Hybridization nursery", 2));
+            stdVariable.getEnumerations().add(new Enumeration(10002, "PN", "Pedigree nursery", 3));
+            stdVariable.setConstraints(new VariableConstraints(100, 999));
+            stdVariable.setCropOntologyId("CROP-TEST");
+            
+            ontologyService.addStandardVariable(stdVariable);
+            
+            Debug.println(0, "Standard variable saved: " + stdVariable.getId());
+            
+            return stdVariable;
     }
 
     @After

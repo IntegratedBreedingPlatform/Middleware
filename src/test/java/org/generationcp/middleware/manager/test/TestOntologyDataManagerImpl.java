@@ -854,25 +854,7 @@ public class TestOntologyDataManagerImpl {
     
     @Test
     public void testGetStandardVariableIdByTermId() throws Exception {
-        StandardVariable stdVariable = new StandardVariable();
-        stdVariable.setName("variable name " + new Random().nextInt(10000));
-        stdVariable.setDescription("variable description");
-        stdVariable.setProperty(new Term(2002, "User", "Database user"));
-        stdVariable.setMethod(new Term(4030, "Assigned", "Term, name or id assigned"));
-        stdVariable.setScale(new Term(6000, "DBCV", "Controlled vocabulary from a database"));
-        stdVariable.setStoredIn(new Term(1010, "Study information", "Study element"));
-        stdVariable.setDataType(new Term(1120, "Character variable", "variable with char values"));
-        stdVariable.setIsA(new Term(1050,"Study condition","Study condition class"));
-        stdVariable.setNameSynonyms(new ArrayList<NameSynonym>());
-        stdVariable.getNameSynonyms().add(new NameSynonym("Person", NameType.ALTERNATIVE_ENGLISH));
-        stdVariable.getNameSynonyms().add(new NameSynonym("Tiga-gamit", NameType.ALTERNATIVE_FRENCH));
-        stdVariable.setEnumerations(new ArrayList<Enumeration>());
-        stdVariable.getEnumerations().add(new Enumeration(10000, "N", "Nursery", 1));
-        stdVariable.getEnumerations().add(new Enumeration(10001, "HB", "Hybridization nursery", 2));
-        stdVariable.getEnumerations().add(new Enumeration(10002, "PN", "Pedigree nursery", 3));
-        stdVariable.setConstraints(new VariableConstraints(100, 999));
-        
-        manager.addStandardVariable(stdVariable);
+        StandardVariable stdVariable = createNewStandardVariable();
         
         Integer stdVariableId = manager.getStandardVariableIdByTermId(stdVariable.getProperty().getId(), TermId.HAS_PROPERTY);
         Debug.println(0, "From db:  " + stdVariableId);
@@ -938,5 +920,45 @@ public class TestOntologyDataManagerImpl {
             System.out.println(property);
         }
     }
+    
+    @Test
+    public void testDeleteStandardVariable() throws Exception {
+        StandardVariable stdVariable = createNewStandardVariable();        
+        
+        manager.deleteStandardVariable(stdVariable.getId());
+        Term term = manager.getTermById(stdVariable.getId());
+        
+        assertNull(term);
+    }
 
+    private StandardVariable createNewStandardVariable() throws Exception{
+        String propertyName = "property name " + new Random().nextInt(10000);
+        manager.addProperty(propertyName, "test property", 1087);
+            
+        StandardVariable stdVariable = new StandardVariable();
+        stdVariable.setName("variable name " + new Random().nextInt(10000));
+        stdVariable.setDescription("variable description");
+        //stdVariable.setProperty(new Term(2002, "User", "Database user"));
+        stdVariable.setProperty(manager.findTermByName(propertyName, CvId.PROPERTIES));
+        stdVariable.setMethod(new Term(4030, "Assigned", "Term, name or id assigned"));
+        stdVariable.setScale(new Term(6000, "DBCV", "Controlled vocabulary from a database"));
+        stdVariable.setStoredIn(new Term(1010, "Study information", "Study element"));
+        stdVariable.setDataType(new Term(1120, "Character variable", "variable with char values"));
+        stdVariable.setIsA(new Term(1050,"Study condition","Study condition class"));
+        stdVariable.setNameSynonyms(new ArrayList<NameSynonym>());
+        stdVariable.getNameSynonyms().add(new NameSynonym("Person", NameType.ALTERNATIVE_ENGLISH));
+        stdVariable.getNameSynonyms().add(new NameSynonym("Tiga-gamit", NameType.ALTERNATIVE_FRENCH));
+        stdVariable.setEnumerations(new ArrayList<Enumeration>());
+        stdVariable.getEnumerations().add(new Enumeration(10000, "N", "Nursery", 1));
+        stdVariable.getEnumerations().add(new Enumeration(10001, "HB", "Hybridization nursery", 2));
+        stdVariable.getEnumerations().add(new Enumeration(10002, "PN", "Pedigree nursery", 3));
+        stdVariable.setConstraints(new VariableConstraints(100, 999));
+        stdVariable.setCropOntologyId("CROP-TEST");
+        
+        manager.addStandardVariable(stdVariable);
+        
+        Debug.println(0, "Standard variable saved: " + stdVariable.getId());
+        
+        return stdVariable;
+    }
 }

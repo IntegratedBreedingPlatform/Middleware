@@ -95,6 +95,11 @@ public class OntologyServiceImpl extends Service implements OntologyService {
         
         getOntologyDataManager().saveOrUpdateStandardVariable(standardVariable, operation);
     }
+    
+    @Override
+    public void deleteStandardVariable(int stdVariableId) throws MiddlewareQueryException {
+        getOntologyDataManager().deleteStandardVariable(stdVariableId);
+    }
 
     /*======================= PROPERTY ================================== */
 

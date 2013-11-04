@@ -29,6 +29,7 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 
+// TODO: Auto-generated Javadoc
 /**
  * 
  * This is the API for Ontology Browser requirements.
@@ -91,6 +92,10 @@ public interface OntologyService {
     /**
      * Gets the all standard variables.
      *
+     * @param traitClassId the trait class id
+     * @param propertyId the property id
+     * @param scaleId the scale id
+     * @param methodId the method id
      * @return the all standard variables
      * @throws MiddlewareQueryException the middleware query exception
      */
@@ -125,7 +130,13 @@ public interface OntologyService {
      */
     void saveOrUpdateStandardVariable(StandardVariable standardVariable, Operation operation) throws MiddlewareQueryException, MiddlewareException;
     
-
+    /**
+     * Delete standard variable.
+     *
+     * @param standardVariable the standard variable
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    void deleteStandardVariable(int stdVariableId) throws MiddlewareQueryException;
     
     /*======================= PROPERTY ================================== */
    
@@ -387,7 +398,7 @@ public interface OntologyService {
     List<TraitClassReference> getAllTraitClasses() throws MiddlewareQueryException;
     
     /**
-     * Gets the trait classes based on the given class type
+     * Gets the trait classes based on the given class type.
      *
      * @param classType can be either TermId.ONTOLOGY_TRAIT_CLASS or TermId.ONTOLOGY_RESEARCH_CLASS
      * @return The trait classes of the given class type
@@ -430,9 +441,12 @@ public interface OntologyService {
     TraitClass addOrUpdateTraitClass(String name, String definition, int parentTraitClassId) throws MiddlewareQueryException, MiddlewareException;
     
     /**
-     * Updates the given trait class. 
+     * Updates the given trait class.
      * This searches for the id. If it exists, the entry in the database is replaced with the new value.
+     *
      * @param traitClass The TraitClass to update
+     * @return the trait class
+     * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
@@ -517,8 +531,9 @@ public interface OntologyService {
 
     /**
      * Returns all Properties with its trait class.
-     * @return
-     * @throws MiddlewareQueryException
+     *
+     * @return the all properties with trait class
+     * @throws MiddlewareQueryException the middleware query exception
      */
     List<Property> getAllPropertiesWithTraitClass() throws MiddlewareQueryException;
     

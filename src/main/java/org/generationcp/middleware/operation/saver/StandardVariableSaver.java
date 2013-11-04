@@ -13,12 +13,15 @@ package org.generationcp.middleware.operation.saver;
 
 import java.util.List;
 
+import org.generationcp.middleware.dao.oms.CVTermDao;
+import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.NameSynonym;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
@@ -39,6 +42,31 @@ public class StandardVariableSaver extends Saver {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 
+	public void delete(StandardVariable stdVar) throws MiddlewareQueryException, MiddlewareException {
+	    setWorkingDatabase(Database.LOCAL);
+	    
+	    deleteEnumerations(stdVar.getId(), stdVar.getEnumerations());
+	    
+	    if (stdVar.getCropOntologyId() != null) {
+	        deleteCropOntologyId(stdVar.getProperty().getId(), stdVar.getCropOntologyId());
+	    }
+	    
+	    deleteRelationship(stdVar.getId(), TermId.STORED_IN.getId(), stdVar.getStoredIn());
+	    deleteRelationship(stdVar.getId(), TermId.HAS_TYPE.getId(), stdVar.getDataType());
+	    deleteRelationship(stdVar.getId(), TermId.HAS_SCALE.getId(), stdVar.getScale());
+	    deleteRelationship(stdVar.getId(), TermId.HAS_PROPERTY.getId(), stdVar.getProperty());
+	    deleteRelationship(stdVar.getId(), TermId.HAS_METHOD.getId(), stdVar.getMethod());
+	    
+	    deleteSynonyms(stdVar.getId(), stdVar.getNameSynonyms());
+	    
+	    if (stdVar.getConstraints() != null) {
+                deleteConstraint(stdVar.getId(), TermId.MIN_VALUE.getId(), stdVar.getConstraints().getMinValue());
+                deleteConstraint(stdVar.getId(), TermId.MAX_VALUE.getId(), stdVar.getConstraints().getMaxValue());
+            }
+	    
+	    deleteCVTerm(getCvTermDao().getById(stdVar.getId()));
+	}
+	
 	public Integer save(StandardVariable stdVar) throws MiddlewareQueryException {
 		setWorkingDatabase(Database.LOCAL);
 		CVTerm varTerm = createCvTerm(stdVar);
@@ -260,4 +288,89 @@ public class StandardVariableSaver extends Saver {
             }
         }
     }
+    
+    private void deleteEnumerations(int varId, List<Enumeration> enumerations) throws MiddlewareQueryException, MiddlewareException {
+        if (enumerations != null && enumerations.size() > 0) {
+            for (Enumeration enumeration : enumerations) {
+                deleteCvTermRelationship(varId, TermId.HAS_VALUE.getId(), enumeration.getId());
+            }
+        }
+    }
+
+    private void deleteCvTermRelationship(int subjectId, int typeId, int objectId) throws MiddlewareQueryException, MiddlewareException {
+        Term typeTerm = getTermBuilder().get(typeId);
+        if (typeTerm != null) {
+            CVTermRelationship cvRelationship = getCvTermRelationshipDao().getRelationshipSubjectIdObjectIdByTypeId(subjectId, objectId, typeId);
+            if(cvRelationship != null){ 
+                if (cvRelationship.getCvTermRelationshipId() >= 0) { 
+                    throw new MiddlewareException("Error in deleteCvTermRelationship: Relationship found in central - cannot be deleted.");
+                }
+    
+                CVTermRelationshipDao dao = getCvTermRelationshipDao();
+                try {
+                    dao.makeTransient(cvRelationship);
+                } catch (MiddlewareQueryException e) {
+                    throw new MiddlewareQueryException(e.getMessage(), e);
+                }
+            }
+        }
+    }
+    
+    public void deleteCropOntologyId(Integer traitId, String cropOntologyId) throws MiddlewareQueryException {
+        if (traitId < 0) {
+            CVTerm trait = getCvTermDao().getById(traitId);
+            if (trait != null) { 
+                List<CVTermProperty> traitProperties = getTermPropertyBuilder().findProperties(traitId);
+                if (traitProperties != null) {
+                    for (CVTermProperty traitProperty : traitProperties) {
+                        if (traitProperty.getTypeId() == TermId.CROP_ONTOLOGY_ID.getId()) {
+                            if (traitProperty.getValue() != null && !traitProperty.getValue().equals(cropOntologyId)) {
+                                getCvTermPropertyDao().makeTransient(traitProperty);
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    private void deleteRelationship(int subjectId, int typeId, Term object) throws MiddlewareQueryException, MiddlewareException {
+        if (object != null) {
+            deleteCvTermRelationship(subjectId, typeId, object.getId());
+        } else {
+            throw new MiddlewareQueryException("The CvTermRelationship field is required for " + subjectId + " with relationship type of " + typeId);
+        }
+    }
+    
+    private void deleteSynonyms(int cvTermId, List<NameSynonym> nameSynonyms) throws MiddlewareQueryException {
+        if (nameSynonyms != null && nameSynonyms.size() > 0) {
+            List<CVTermSynonym> cvTermSynonyms = getCvTermSynonymDao().getByCvTermId(cvTermId);
+            if (cvTermSynonyms != null) {
+                for (CVTermSynonym cvTermSynonym : cvTermSynonyms) {
+                    getCvTermSynonymDao().makeTransient(cvTermSynonym);
+                }
+            }
+        }
+    }
+    
+    private void deleteConstraint(int cvTermId, int typeId, Integer constraintValue) throws MiddlewareQueryException {
+        if (constraintValue != null) {
+            List<CVTermProperty> properties = getCvTermPropertyDao().getByCvTermAndType(cvTermId, typeId);
+            
+            for(CVTermProperty cvTermProperty : properties) {
+                getCvTermPropertyDao().makeTransient(cvTermProperty);
+            }
+        }           
+    }
+    
+    public void deleteCVTerm(CVTerm cvTerm) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+        CVTermDao dao = getCvTermDao();
+        try {
+            dao.makeTransient(cvTerm);
+        } catch (MiddlewareQueryException e) {
+            throw new MiddlewareQueryException(e.getMessage(), e);
+        }
+    } 
 }

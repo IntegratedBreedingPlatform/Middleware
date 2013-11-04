@@ -100,7 +100,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
                 getStandardVariableSaver().save(stdVariable);
             }
             trans.commit();
-
         } catch (Exception e) {
             rollbackTransaction(trans);
             throw new MiddlewareQueryException("Error in addStandardVariable " + e.getMessage(), e);
@@ -762,6 +761,26 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             }
         });
         return properties;
+    }
+    
+    @Override
+    public void deleteStandardVariable(int stdVariableId) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+            StandardVariable stdVar = getStandardVariable(stdVariableId);
+            
+            getStandardVariableSaver().delete(stdVar);
+
+            trans.commit();
+            
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            throw new MiddlewareQueryException("Error in deleteStandardVariable " + e.getMessage(), e);
+        }
     }
 }
 

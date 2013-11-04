@@ -28,6 +28,7 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 
+// TODO: Auto-generated Javadoc
 /**
  * This is the API for retrieving ontology data from the CHADO schema.
  * 
@@ -207,13 +208,12 @@ public interface OntologyDataManager {
 	
 
     /**
-     * Updates an existing term in the database. 
-     * This method searches for the given id in local. 
+     * Updates an existing term in the database.
+     * This method searches for the given id in local.
      * If it exists, the corresponding name and definition are updated.
-     * 
-     * @param termId the term id
-     * @param name the name
-     * @param definition the definition
+     *
+     * @param term the term
+     * @throws MiddlewareException the middleware exception
      * @throws MiddlewareQueryException the middleware query exception
      */
     void updateTerm(Term term) throws MiddlewareException, MiddlewareQueryException;
@@ -352,13 +352,13 @@ public interface OntologyDataManager {
 	
 
     /**
-     * Returns trait classes based on the given type from both central and local databases. 
+     * Returns trait classes based on the given type from both central and local databases.
      * 
      * The list is returned in alphabetical order of the name.
-     * 
+     *
      * @param classType can be either TermId.ONTOLOGY_TRAIT_CLASS or TermId.ONTOLOGY_RESEARCH_CLASS
-     * @return List of TraitReference objects (id, name, description)  
-     * @throws MiddlewareQueryException
+     * @return List of TraitReference objects (id, name, description)
+     * @throws MiddlewareQueryException the middleware query exception
      */
     @Deprecated
     List<TraitClassReference> getTraitClasses(TermId classType) throws MiddlewareQueryException;
@@ -378,6 +378,7 @@ public interface OntologyDataManager {
      *
      * @param name the name
      * @param definition the definition
+     * @param parentTraitClassId the parent trait class id
      * @return the term
      * @throws MiddlewareQueryException the middleware query exception
      */
@@ -473,8 +474,17 @@ public interface OntologyDataManager {
     
     /**
      * Returns all Properties with its trait class.
-     * @return
-     * @throws MiddlewareQueryException
+     *
+     * @return the all properties with trait class
+     * @throws MiddlewareQueryException the middleware query exception
      */
     List<Property> getAllPropertiesWithTraitClass() throws MiddlewareQueryException;
+    
+    /**
+     * Delete standard variable.
+     *
+     * @param standardVariable the standard variable
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    void deleteStandardVariable(int stdVariableId) throws MiddlewareQueryException;
 }
