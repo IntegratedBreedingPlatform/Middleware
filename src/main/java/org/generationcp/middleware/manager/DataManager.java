@@ -21,6 +21,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.ExperimentBuilder;
 import org.generationcp.middleware.operation.builder.MethodBuilder;
+import org.generationcp.middleware.operation.builder.PropertyBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.operation.builder.StockBuilder;
 import org.generationcp.middleware.operation.builder.StudyBuilder;
@@ -1010,6 +1011,9 @@ public abstract class DataManager extends DatabaseBroker{
     protected final TraitGroupBuilder getTraitGroupBuilder() {
         return new TraitGroupBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
-    
+
+    protected final PropertyBuilder getPropertyBuilder() {
+        return new PropertyBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
 
 }

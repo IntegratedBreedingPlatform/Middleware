@@ -26,8 +26,10 @@ import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CategoricalValue;
 import org.generationcp.middleware.domain.h2h.TraitInfo;
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.PropertyReference;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -37,6 +39,7 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.hql.antlr.SqlTokenTypes;
 
 /**
  * DAO class for {@link CVTerm}.
@@ -961,7 +964,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
             queryString.append("INNER JOIN cvterm_relationship cvrt ON cvr.subject_id = cvrt.subject_id AND cvrt.type_id = :typeId ");
             queryString.append("WHERE cvr.object_id = :cvTermId ");
             queryString.append("ORDER BY cvr.subject_id ").append(" LIMIT 0,1");
-            System.out.println(queryString);
+
             SQLQuery query = getSession().createSQLQuery(queryString.toString());
             query.setParameter("typeId", termId.getId());
             query.setParameter("cvTermId", cvTermId);
@@ -976,4 +979,33 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
         return null;
     }
 	
+    public List<Property> getAllPropertiesWithTraitClass() throws MiddlewareQueryException {
+        List<Property> properties = new ArrayList<Property>();
+        try {
+            StringBuilder sql = new StringBuilder()
+                .append("SELECT p.cvterm_id, p.name, p.definition, pr.object_id ")
+                .append(" FROM cvterm p ")
+                .append(" INNER JOIN cvterm_relationship pr ON pr.subject_id = p.cvterm_id AND pr.type_id = ").append(TermId.IS_A.getId())
+                .append(" WHERE p.cv_id = ").append(CvId.PROPERTIES.getId())
+                .append(" AND p.is_obsolete = 0 ");
+            
+            SQLQuery query = getSession().createSQLQuery(sql.toString());
+            List<Object[]> result = query.list();
+            
+            if (result != null && !result.isEmpty()) {
+                for (Object[] row : result) {
+                    properties.add(
+                            new Property(
+                                    new Term((Integer) row[0], (String) row[1], (String) row[2])
+                                    , new Term((Integer) row[3], null, null)
+                            )
+                    );
+                }
+            }
+            
+        } catch(HibernateException e) {
+            logAndThrowException("Error at getStandadardVariableIdByTermId :" + e.getMessage(), e);
+        }
+        return properties;
+    }
 }

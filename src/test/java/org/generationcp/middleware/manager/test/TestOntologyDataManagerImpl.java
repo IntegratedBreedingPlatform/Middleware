@@ -633,7 +633,7 @@ public class TestOntologyDataManagerImpl {
     
     @Test
     public void testGetAllTraitGroupsHierarchy() throws Exception {
-        List<TraitClassReference> traitGroups = manager.getAllTraitGroupsHierarchy();
+        List<TraitClassReference> traitGroups = manager.getAllTraitGroupsHierarchy(true);
         for (TraitClassReference traitGroup : traitGroups){
             traitGroup.print(3);
         }
@@ -929,6 +929,14 @@ public class TestOntologyDataManagerImpl {
         
         term = manager.getTermById(term.getId());
         assertNull(term);
+    }
+    
+    @Test
+    public void testGetAllPropertiesWithTraitClass() throws Exception {
+        List<Property> properties = manager.getAllPropertiesWithTraitClass();
+        for (Property property : properties) {
+            System.out.println(property);
+        }
     }
 
 }

@@ -14,6 +14,8 @@ package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -579,8 +581,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     }
 
     @Override
-    public List<TraitClassReference> getAllTraitGroupsHierarchy() throws MiddlewareQueryException {
-        return getTraitGroupBuilder().getAllTraitGroupsHierarchy();
+    public List<TraitClassReference> getAllTraitGroupsHierarchy(boolean includePropertiesAndVariables) throws MiddlewareQueryException {
+        return getTraitGroupBuilder().getAllTraitGroupsHierarchy(includePropertiesAndVariables);
     }
 
     @Deprecated
@@ -749,7 +751,18 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         }
     }
 
+    @Override
+    public List<Property> getAllPropertiesWithTraitClass() throws MiddlewareQueryException {
+        List<Property> properties = getPropertyBuilder().getAllPropertiesWithTraitClass();
+        Collections.sort(properties, new Comparator<Property>() {
 
+            @Override
+            public int compare(Property o1, Property o2) {
+                return o1.getName().toUpperCase().compareTo(o2.getName().toUpperCase());
+            }
+        });
+        return properties;
+    }
 }
 
 

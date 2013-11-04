@@ -47,7 +47,13 @@ public class GermplasmDataManagerUtil{
      * @return the standardized germplasm name
      */
     public static String standardizeName(String name) {
-        String toreturn = name.trim();
+    	
+        String toreturn;
+        
+        if(name!=null)
+        	toreturn = name.trim();
+        else
+        	toreturn = "";
 
         // a) Capitalize all letters
         toreturn = toreturn.toUpperCase();
@@ -269,6 +275,8 @@ public class GermplasmDataManagerUtil{
 
     
     public static String removeSpaces(String string){
+    	if(string==null)
+    		return "";
         StringTokenizer tokenizer = new StringTokenizer(string);
         StringBuffer withSpacesRemoved = new StringBuffer();
         while (tokenizer.hasMoreTokens()) {

@@ -220,8 +220,8 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     }
     
     @Override
-    public List<TraitClassReference> getAllTraitGroupsHierarchy() throws MiddlewareQueryException {
-        return getOntologyDataManager().getAllTraitGroupsHierarchy();
+    public List<TraitClassReference> getAllTraitGroupsHierarchy(boolean includePropertiesAndVariable) throws MiddlewareQueryException {
+        return getOntologyDataManager().getAllTraitGroupsHierarchy(includePropertiesAndVariable);
     }
 
     @Deprecated
@@ -318,6 +318,12 @@ public class OntologyServiceImpl extends Service implements OntologyService {
             MiddlewareException {
         
         getOntologyDataManager().saveOrUpdateStandardVariable(standardVariable, operation);
+    }
+
+    @Override
+    public List<Property> getAllPropertiesWithTraitClass()
+            throws MiddlewareQueryException {
+        return getOntologyDataManager().getAllPropertiesWithTraitClass();
     }
 
 }

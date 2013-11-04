@@ -69,19 +69,21 @@ public class TraitGroupBuilder extends Builder {
      * @return
      * @throws MiddlewareQueryException
      */
-    public List<TraitClassReference> getAllTraitGroupsHierarchy() throws MiddlewareQueryException {
+    public List<TraitClassReference> getAllTraitGroupsHierarchy(boolean includePropertiesAndVariables) throws MiddlewareQueryException {
 
         // Step 1: Get all Trait Classes from Central and Local
         List<TraitClassReference> traitClasses = getAllTraitClasses();
         
-        // Step 2: Get all Trait Class Properties from Central and Local
-        setPropertiesOfTraitClasses(Database.CENTRAL, traitClasses);
-        setPropertiesOfTraitClasses(Database.LOCAL, traitClasses);
-
-        // Step 3: Get all StandardVariables of Properties from Central and Local
-        for (TraitClassReference traitClass : traitClasses){
-            setStandardVariablesOfProperties(Database.CENTRAL, traitClass.getProperties());
-            setStandardVariablesOfProperties(Database.LOCAL, traitClass.getProperties());
+        if(includePropertiesAndVariables){
+            // Step 2: Get all Trait Class Properties from Central and Local
+            setPropertiesOfTraitClasses(Database.CENTRAL, traitClasses);
+            setPropertiesOfTraitClasses(Database.LOCAL, traitClasses);
+    
+            // Step 3: Get all StandardVariables of Properties from Central and Local
+            for (TraitClassReference traitClass : traitClasses){
+                setStandardVariablesOfProperties(Database.CENTRAL, traitClass.getProperties());
+                setStandardVariablesOfProperties(Database.LOCAL, traitClass.getProperties());
+            }
         }
 
         // Step 4: Build and sort tree
@@ -89,7 +91,7 @@ public class TraitGroupBuilder extends Builder {
         sortTree(traitClasses);
         
         return traitClasses;
-    }
+    }        
     
     
     /** 
