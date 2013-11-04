@@ -25,6 +25,7 @@ import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.OntologyDataManagerImpl;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.operation.parser.WorkbookParser;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.util.Message;
@@ -94,16 +95,28 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         Workbook workbook = parser.parseFile(file, true);
         // perform validations on the parsed data that require db access
         List<Message> messages = new LinkedList<Message>();
-        boolean existing = checkIfProjectNameIsExisting(workbook.getStudyDetails().getStudyName());
-        if (existing) {
-            messages.add(new Message("error.duplicate.study.name"));
+        
+        OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(
+        		getSessionProviderForLocal(), getSessionProviderForCentral());
+        
+        String studyName = workbook.getStudyDetails().getStudyName();
+        String locationDescription = getLocationDescription(ontology,workbook.getConditions());
+        Integer locationId = getLocationIdByProjectNameAndDescription(studyName,locationDescription);
+        if(locationId!=null) {//same location and study
+        	messages.add(new Message("error.duplicate.study.name"));
+        } else {
+        	boolean isExisting = checkIfProjectNameIsExisting(studyName);
+        	//existing and is not a valid study
+        	if(isExisting && getStudyId(studyName)==null) {
+        		messages.add(new Message("error.duplicate.study.name"));
+        	}//else we will create a new study or append the data sets to the existing study
         }
-
-        if (!isEntryExists(workbook.getFactors())) {
+        
+        if (!isEntryExists(ontology,workbook.getFactors())) {
             messages.add(new Message("error.entry.doesnt.exist"));
         }
 
-        if (!workbook.isNursery() && !isTrialEnvironmentExists(workbook.getConditions())) {
+        if (!workbook.isNursery() && !isTrialEnvironmentExists(ontology,workbook.getConditions())) {
             messages.add(new Message("error.missing.trial.condition"));
         }
 
@@ -120,16 +133,29 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
         // perform validations on the parsed data that require db access
         List<Message> messages = new LinkedList<Message>();
-        boolean isExisting = checkIfProjectNameIsExisting(workbook.getStudyDetails().getStudyName());
-        if (isExisting) {
-            messages.add(new Message("error.duplicate.study.name"));
+        
+        OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(
+        		getSessionProviderForLocal(), getSessionProviderForCentral());
+        
+        String studyName = workbook.getStudyDetails().getStudyName();
+        String locationDescription = getLocationDescription(ontology,workbook.getConditions());
+        Integer locationId = getLocationIdByProjectNameAndDescription(studyName,locationDescription);
+        if(locationId!=null) {//same location and study
+        	messages.add(new Message("error.duplicate.study.name"));
+        } else {
+        	boolean isExisting = checkIfProjectNameIsExisting(studyName);
+        	//existing and is not a valid study
+        	if(isExisting && getStudyId(studyName)==null) {
+        		messages.add(new Message("error.duplicate.study.name"));
+        	}//else we will create a new study or append the data sets to the existing study
         }
-
-        if (!isEntryExists(workbook.getFactors()) && !isEntryExists(workbook.getConditions())) {
+        
+        
+        if (!isEntryExists(ontology,workbook.getFactors()) && !isEntryExists(ontology,workbook.getConditions())) {
             messages.add(new Message("error.entry.doesnt.exist.wizard"));
         }
 
-        if (!workbook.isNursery() && !isTrialEnvironmentExists(workbook.getConditions())) {
+        if (!workbook.isNursery() && !isTrialEnvironmentExists(ontology,workbook.getConditions())) {
             messages.add(new Message("error.missing.trial.condition"));
         }
 
@@ -140,8 +166,18 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         return workbook;
     }
 
-    // copy pasted from WorkbookSaver
-    // TODO refactor
+    private String getLocationDescription(OntologyDataManager ontology, List<MeasurementVariable> list) throws MiddlewareQueryException {
+    	for (MeasurementVariable mvar : list) {
+            StandardVariable svar = ontology.findStandardVariableByTraitScaleMethodNames(
+            		mvar.getProperty(), mvar.getScale(), mvar.getMethod());
+            if (svar != null && svar.getStoredIn() != null && 
+            		TermId.TRIAL_INSTANCE_STORAGE.getId()==svar.getStoredIn().getId()) {
+                return mvar.getValue();
+            }
+        }
+        return null;
+	}
+    
     private Integer getStudyId(String name) throws MiddlewareQueryException {
         return getProjectId(name, TermId.IS_STUDY);
     }
@@ -157,8 +193,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         return id;
     }
 
-    private Boolean isEntryExists(List<MeasurementVariable> list) throws MiddlewareQueryException {
-        OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(getSessionProviderForLocal(), getSessionProviderForCentral());
+    private Boolean isEntryExists(OntologyDataManager ontology, List<MeasurementVariable> list) throws MiddlewareQueryException {
         for (MeasurementVariable mvar : list) {
 
             StandardVariable svar = ontology.findStandardVariableByTraitScaleMethodNames(mvar.getProperty(), mvar.getScale(), mvar.getMethod());
@@ -174,8 +209,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         return false;
     }
 
-    private Boolean isTrialEnvironmentExists(List<MeasurementVariable> list) throws MiddlewareQueryException {
-        OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(getSessionProviderForLocal(), getSessionProviderForCentral());
+    private Boolean isTrialEnvironmentExists(OntologyDataManager ontology, List<MeasurementVariable> list) throws MiddlewareQueryException {
         for (MeasurementVariable mvar : list) {
 
             StandardVariable svar = ontology.findStandardVariableByTraitScaleMethodNames(mvar.getProperty(), mvar.getScale(), mvar.getMethod());
@@ -201,6 +235,18 @@ public class DataImportServiceImpl extends Service implements DataImportService 
             isExisting = getDmsProjectDao().checkIfProjectNameIsExisting(name);
         }
         return isExisting;
+    }
+    
+    @Override
+    public Integer getLocationIdByProjectNameAndDescription(String projectName, String locationDescription) throws MiddlewareQueryException {
+        Integer locationId = null;
+        setWorkingDatabase(Database.CENTRAL);
+        locationId = getGeolocationDao().getLocationIdByProjectNameAndDescription(projectName, locationDescription);
+        if (locationId==null) {
+            setWorkingDatabase(Database.LOCAL);
+            locationId = getGeolocationDao().getLocationIdByProjectNameAndDescription(projectName, locationDescription);
+        }
+        return locationId;
     }
 
 }

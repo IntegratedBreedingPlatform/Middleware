@@ -393,6 +393,28 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 		return environments;
 	}
     
+    @SuppressWarnings("unchecked")
+	public Integer getLocationIdByProjectNameAndDescription(String projectName, String locationDescription) throws MiddlewareQueryException {
+		try {
+			String sql = "SELECT DISTINCT e.nd_geolocation_id"
+					+ " FROM nd_experiment e, nd_experiment_project ep, project p, nd_geolocation g "
+					+ " WHERE e.nd_experiment_id = ep.nd_experiment_id "
+					+ "   and ep.project_id = p.project_id "
+					+ "   and e.nd_geolocation_id = g.nd_geolocation_id "
+					+ "   and p.name = '"+ projectName + "'" 
+					+ "   and g.description = '"+ locationDescription + "'";
+			Query query = getSession().createSQLQuery(sql);
+			List<Integer> list = (List<Integer>) query.list();
+			if(list!=null && !list.isEmpty()) {
+				return list.get(0);
+			}
+						
+		} catch(HibernateException e) {
+			logAndThrowException("Error at getLocationIdByProjectNameAndDescription with project name =" + projectName + " and location description = "+locationDescription+" at GeolocationDao: " + e.getMessage(), e);
+		}
+		return null;
+	}
+    
     
    
  

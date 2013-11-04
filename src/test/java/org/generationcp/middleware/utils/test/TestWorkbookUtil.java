@@ -140,7 +140,7 @@ public class TestWorkbookUtil {
 		createObservations(workbook);
 	}
 
-	private static Workbook createTestWorkbook(String studyName, int trialNo){
+	public static Workbook createTestWorkbook(String studyName, int trialNo){
 		Workbook wbook = new Workbook();
 		
 		createStudyDetails(studyName, wbook);

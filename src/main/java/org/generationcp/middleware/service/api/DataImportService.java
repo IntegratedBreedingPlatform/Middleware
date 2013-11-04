@@ -55,4 +55,14 @@ public interface DataImportService {
      * @throws MiddlewareQueryException
      */
     boolean checkIfProjectNameIsExisting(String name) throws MiddlewareQueryException;
+    
+    /**
+     * Checks if the experiment is already existing given the project name and location description
+     * 
+     * @param projectName
+     * @param locationDescription
+     * @return nd_geolocation_id
+     * @throws MiddlewareQueryException
+     */
+    Integer getLocationIdByProjectNameAndDescription(String projectName, String locationDescription) throws MiddlewareQueryException;
 }

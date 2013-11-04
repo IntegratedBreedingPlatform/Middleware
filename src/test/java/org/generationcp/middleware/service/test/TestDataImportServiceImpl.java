@@ -234,4 +234,16 @@ public class TestDataImportServiceImpl {
 		isExisting = dataImportService.checkIfProjectNameIsExisting(name);
 		assertFalse(isExisting);
 	}
+    
+    @Test
+    public void getLocationIdByProjectNameAndDescription() throws MiddlewareQueryException {
+    	//try to save first then use the name of the saved study
+    	Workbook workbook = TestWorkbookUtil.getTestWorkbook();
+        workbook.print(0);
+        dataImportService.saveDataset(workbook);
+        String name = workbook.getStudyDetails().getStudyName();
+        Debug.println(0, "Name: " + name);
+		Integer locationId = dataImportService.getLocationIdByProjectNameAndDescription(name,"1");
+		assertEquals(locationId.longValue(),1L);        
+    }
 }
