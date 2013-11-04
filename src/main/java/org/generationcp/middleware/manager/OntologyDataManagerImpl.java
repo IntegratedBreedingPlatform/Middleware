@@ -526,7 +526,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	private void saveOrUpdateCvTermRelationship(int subjectId, int objectId, int typeId) throws MiddlewareQueryException, MiddlewareException{
         Term typeTerm = getTermById(typeId);
         if (typeTerm != null) {
-            CVTermRelationship cvRelationship = getCvTermRelationshipDao().getRelationshipSubjectIdObjectIdByTypeId(subjectId, objectId, typeId);
+            CVTermRelationship cvRelationship = getCvTermRelationshipDao().getRelationshipBySubjectIdAndTypeId(subjectId, typeId);
             if(cvRelationship == null){ // add the relationship
                 getTermRelationshipSaver().save(subjectId, typeId, objectId);
             }else{ // update the existing relationship

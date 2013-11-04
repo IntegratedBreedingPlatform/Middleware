@@ -100,6 +100,28 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Long> 
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public CVTermRelationship getRelationshipBySubjectIdAndTypeId(int subjectId, int typeId) throws MiddlewareQueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(getPersistentClass());
+            criteria.add(Restrictions.eq("typeId", typeId));
+            criteria.add(Restrictions.eq("subjectId", subjectId));
+            
+            
+            List<CVTermRelationship> cvList = criteria.list();
+            if(cvList == null || cvList.isEmpty()){
+                return null;
+            }else{
+                return cvList.get(0);
+            }
+
+        } catch(HibernateException e) {
+            logAndThrowException("Error with getRelationshipBySubjectIdAndTypeId=" + subjectId + ", " + typeId + ") query from CVTermRelationship: " 
+                    + e.getMessage(), e);
+            return null;
+        }
+    }
+
     public CVTermRelationship saveOrUpdateRelationship(CVTermRelationship cvTermRelationship) throws MiddlewareQueryException {
         try {
            saveOrUpdate(cvTermRelationship);
