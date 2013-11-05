@@ -212,7 +212,10 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     
     @Override
     public Method getMethod(int id) throws MiddlewareQueryException {
-        return new Method(getOntologyDataManager().findMethodById(id));
+        Term methodTerm = getOntologyDataManager().findMethodById(id);
+        return methodTerm != null && methodTerm.getVocabularyId() == CvId.METHODS.getId()
+                ? new Method(methodTerm)
+                : null;
     }
 
     @Override
