@@ -742,10 +742,13 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             if (cvTermId >= 0) {
                 throw new MiddlewareException(getTermById(cvTermId).getName() + " is retrieved from the central database and cannot be updated.");
             }
+            if (getCvTermRelationshipDao().getRelationshipByObjectId(cvTermId) != null) {
+                throw new MiddlewareException(getTermById(cvTermId).getName() + " has dependencies and cannot be deleted");
+            }
             
             if (CvId.VARIABLES.getId() != cvId.getId()) {
                 trans = session.beginTransaction();
-                deleteCvTermRelationship(cvTermId, objectId, typeId);
+                deleteCvTermRelationship(cvTermId, typeId);
                 getTermSaver().delete(getCvTermDao().getById(cvTermId), cvId);
                 trans.commit();
             } else {
@@ -756,7 +759,21 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             throw new MiddlewareQueryException("Error in deleteTermAndRelationship: " + e.getMessage(), e);
         }
     }
-        
+    
+    private void deleteCvTermRelationship(int subjectId, int typeId) throws MiddlewareQueryException, MiddlewareException {
+        Term typeTerm = getTermById(typeId);
+        if (typeTerm != null) {
+            CVTermRelationship cvRelationship = getCvTermRelationshipDao().getRelationshipBySubjectIdAndTypeId(subjectId, typeId);
+            if(cvRelationship != null){ 
+                if (cvRelationship.getCvTermRelationshipId() >= 0) { 
+                    throw new MiddlewareException("Error in deleteCvTermRelationship: Relationship found in central - cannot be deleted.");
+                }
+    
+                getTermRelationshipSaver().deleteRelationship(cvRelationship);
+            }
+        }
+    }
+/*        
     private void deleteCvTermRelationship(int subjectId, int objectId, int typeId) throws MiddlewareQueryException, MiddlewareException {
         Term typeTerm = getTermById(typeId);
         if (typeTerm != null) {
@@ -770,7 +787,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             }
         }
     }
-
+*/
     @Override
     public List<Property> getAllPropertiesWithTraitClass() throws MiddlewareQueryException {
         List<Property> properties = getPropertyBuilder().getAllPropertiesWithTraitClass();
