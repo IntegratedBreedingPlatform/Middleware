@@ -133,4 +133,24 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Long> 
         }
         return cvTermRelationship;
     }
+
+    @SuppressWarnings("unchecked")
+    public CVTermRelationship getRelationshipByObjectId(int objectId) throws MiddlewareQueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(getPersistentClass());
+            criteria.add(Restrictions.eq("objectId", objectId));
+            
+            List<CVTermRelationship> cvList = criteria.list();
+            if(cvList == null || cvList.isEmpty()){
+                return null;
+            }else{
+                return cvList.get(0);
+            }
+
+        } catch(HibernateException e) {
+            logAndThrowException("Error with getRelationshipByObjectId=" + objectId + ") query from CVTermRelationship: " 
+                    + e.getMessage(), e);
+            return null;
+        }
+    }
 }
