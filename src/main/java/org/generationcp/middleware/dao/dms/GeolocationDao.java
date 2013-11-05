@@ -397,9 +397,11 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 	public Integer getLocationIdByProjectNameAndDescription(String projectName, String locationDescription) throws MiddlewareQueryException {
 		try {
 			String sql = "SELECT DISTINCT e.nd_geolocation_id"
-					+ " FROM nd_experiment e, nd_experiment_project ep, project p, nd_geolocation g "
+					+ " FROM nd_experiment e, nd_experiment_project ep, project p, nd_geolocation g, project_relationship pr "
 					+ " WHERE e.nd_experiment_id = ep.nd_experiment_id "
-					+ "   and ep.project_id = p.project_id "
+					+ "   and ep.project_id = pr.subject_project_id "
+					+ "   and pr.type_id = " + TermId.BELONGS_TO_STUDY.getId()  
+					+ "   and pr.object_project_id = p.project_id "//link to the dataset instead
 					+ "   and e.nd_geolocation_id = g.nd_geolocation_id "
 					+ "   and p.name = '"+ projectName + "'" 
 					+ "   and g.description = '"+ locationDescription + "'";
