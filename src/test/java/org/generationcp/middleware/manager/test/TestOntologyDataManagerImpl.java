@@ -33,9 +33,11 @@ import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.PropertyReference;
+import org.generationcp.middleware.domain.oms.Scale;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.oms.TermProperty;
 import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -919,7 +921,30 @@ public class TestOntologyDataManagerImpl {
     
     @Test
     public void testGetStandardVariableIdByTermId() throws Exception {
-        StandardVariable stdVariable = createNewStandardVariable();
+        String propertyName = "property name " + new Random().nextInt(10000);
+        manager.addProperty(propertyName, "test property", 1087);
+            
+        StandardVariable stdVariable = new StandardVariable();
+        stdVariable.setName("variable name " + new Random().nextInt(10000));
+        stdVariable.setDescription("variable description");
+        //stdVariable.setProperty(new Term(2002, "User", "Database user"));
+        stdVariable.setProperty(manager.findTermByName(propertyName, CvId.PROPERTIES));
+        stdVariable.setMethod(new Term(4030, "Assigned", "Term, name or id assigned"));
+        stdVariable.setScale(new Term(6000, "DBCV", "Controlled vocabulary from a database"));
+        stdVariable.setStoredIn(new Term(1010, "Study information", "Study element"));
+        stdVariable.setDataType(new Term(1120, "Character variable", "variable with char values"));
+        stdVariable.setIsA(new Term(1050,"Study condition","Study condition class"));
+        stdVariable.setNameSynonyms(new ArrayList<NameSynonym>());
+        stdVariable.getNameSynonyms().add(new NameSynonym("Person", NameType.ALTERNATIVE_ENGLISH));
+        stdVariable.getNameSynonyms().add(new NameSynonym("Tiga-gamit", NameType.ALTERNATIVE_FRENCH));
+        stdVariable.setEnumerations(new ArrayList<Enumeration>());
+        stdVariable.getEnumerations().add(new Enumeration(10000, "N", "Nursery", 1));
+        stdVariable.getEnumerations().add(new Enumeration(10001, "HB", "Hybridization nursery", 2));
+        stdVariable.getEnumerations().add(new Enumeration(10002, "PN", "Pedigree nursery", 3));
+        stdVariable.setConstraints(new VariableConstraints(100, 999));
+        stdVariable.setCropOntologyId("CROP-TEST");
+        
+        manager.addStandardVariable(stdVariable);
         
         Integer stdVariableId = manager.getStandardVariableIdByTermId(stdVariable.getProperty().getId(), TermId.HAS_PROPERTY);
         Debug.println(0, "From db:  " + stdVariableId);
@@ -988,42 +1013,39 @@ public class TestOntologyDataManagerImpl {
     
     @Test
     public void testDeleteStandardVariable() throws Exception {
-        StandardVariable stdVariable = createNewStandardVariable();        
+        List<TermProperty> termProperties = new ArrayList<TermProperty>();
+        termProperties.add(new TermProperty(1, TermId.CROP_ONTOLOGY_ID.getId(), "CO:12345", 0));
         
-        manager.deleteStandardVariable(stdVariable.getId());
-        Term term = manager.getTermById(stdVariable.getId());
-        
-        assertNull(term);
-    }
-
-    private StandardVariable createNewStandardVariable() throws Exception{
         String propertyName = "property name " + new Random().nextInt(10000);
         manager.addProperty(propertyName, "test property", 1087);
-            
-        StandardVariable stdVariable = new StandardVariable();
-        stdVariable.setName("variable name " + new Random().nextInt(10000));
-        stdVariable.setDescription("variable description");
-        //stdVariable.setProperty(new Term(2002, "User", "Database user"));
-        stdVariable.setProperty(manager.findTermByName(propertyName, CvId.PROPERTIES));
-        stdVariable.setMethod(new Term(4030, "Assigned", "Term, name or id assigned"));
-        stdVariable.setScale(new Term(6000, "DBCV", "Controlled vocabulary from a database"));
-        stdVariable.setStoredIn(new Term(1010, "Study information", "Study element"));
-        stdVariable.setDataType(new Term(1120, "Character variable", "variable with char values"));
-        stdVariable.setIsA(new Term(1050,"Study condition","Study condition class"));
-        stdVariable.setNameSynonyms(new ArrayList<NameSynonym>());
-        stdVariable.getNameSynonyms().add(new NameSynonym("Person", NameType.ALTERNATIVE_ENGLISH));
-        stdVariable.getNameSynonyms().add(new NameSynonym("Tiga-gamit", NameType.ALTERNATIVE_FRENCH));
-        stdVariable.setEnumerations(new ArrayList<Enumeration>());
-        stdVariable.getEnumerations().add(new Enumeration(10000, "N", "Nursery", 1));
-        stdVariable.getEnumerations().add(new Enumeration(10001, "HB", "Hybridization nursery", 2));
-        stdVariable.getEnumerations().add(new Enumeration(10002, "PN", "Pedigree nursery", 3));
-        stdVariable.setConstraints(new VariableConstraints(100, 999));
-        stdVariable.setCropOntologyId("CROP-TEST");
+        Property property = manager.getProperty(propertyName);
         
-        manager.addStandardVariable(stdVariable);
+        String scaleName = "scale name " + new Random().nextInt(10000);
+        Term scale = manager.addTerm(scaleName, "test scale", CvId.SCALES);
         
-        Debug.println(0, "Standard variable saved: " + stdVariable.getId());
+        String methodName = "method name " + new Random().nextInt(10000);
+        Term method = manager.addTerm(methodName, methodName, CvId.METHODS);
         
-        return stdVariable;
+        Term dataType =new Term(1120, "Character variable", "variable with char values");
+        Term storedIn = new Term(1010, "Study information", "Study element");
+        Term traitClass = new Term(600, "TRAIT CLASS", "TRAIT CLASS DEF", null, null);
+        
+        StandardVariable standardVariable = new StandardVariable();
+        standardVariable.setName("TestVariable" + new Random().nextInt(10000));
+        standardVariable.setDescription("Test Desc");
+        standardVariable.setProperty(property.getTerm());
+        standardVariable.setMethod(method);
+        standardVariable.setScale(scale);
+        standardVariable.setDataType(dataType);
+        standardVariable.setPhenotypicType(PhenotypicType.TRIAL_DESIGN);
+        standardVariable.setIsA(traitClass);
+        standardVariable.setStoredIn(storedIn);
+        standardVariable.setCropOntologyId("CO:1200");
+        manager.addStandardVariable(standardVariable);        
+        Debug.println(1, String.valueOf(standardVariable.getId()));
+        manager.deleteStandardVariable(standardVariable.getId());
+        Term term = manager.getTermById(standardVariable.getId());
+        
+        assertNull(term);
     }
 }
