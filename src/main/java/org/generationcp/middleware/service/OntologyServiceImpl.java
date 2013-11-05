@@ -164,7 +164,10 @@ public class OntologyServiceImpl extends Service implements OntologyService {
 
     @Override
     public Scale getScale(int id) throws MiddlewareQueryException {
-        return new Scale(getOntologyDataManager().getTermById(id));
+        Term scaleTerm = getOntologyDataManager().getTermById(id);
+        return (scaleTerm != null && scaleTerm.getVocabularyId() == CvId.SCALES.getId()
+                ? new Scale(scaleTerm)
+                : null);
     }
 
     @Override
