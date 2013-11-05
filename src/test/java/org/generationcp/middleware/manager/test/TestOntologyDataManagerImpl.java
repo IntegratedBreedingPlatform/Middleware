@@ -1003,6 +1003,45 @@ public class TestOntologyDataManagerImpl {
         assertNull(term);
     }
     
+    @Test    
+    public void testDeleteOntology() throws Exception {
+        String name = "Test Property" + new Random().nextInt(10000);
+        String definition = "Property Definition";
+        int isA = 1087;
+        /*
+        Term term = manager.addProperty(name, definition, isA);
+        manager.deleteTermAndRelationship(term.getId(), CvId.PROPERTIES, TermId.IS_A.getId(), isA);
+        
+        term= manager.getTermById(term.getId());
+        assertNull(term);
+        */
+        name = "Parent Test Trait Class " + new Random().nextInt(10000);
+        definition = "Parent Test Definition";
+        
+        Term termParent = manager.addTraitClass(name, definition, TermId.ONTOLOGY_TRAIT_CLASS.getId()).getTerm();
+        
+        name = "Child Test Trait Class " + new Random().nextInt(10000);
+        definition = "Child Test Definition";        
+        Term termChild = manager.addTraitClass(name, definition, termParent.getId()).getTerm();
+        boolean hasMiddlewareException = false;
+        try{
+            manager.deleteTermAndRelationship(termParent.getId(), CvId.IBDB_TERMS, TermId.IS_A.getId(), TermId.ONTOLOGY_TRAIT_CLASS.getId());
+        }catch (MiddlewareQueryException e) {
+            hasMiddlewareException = true;
+        }
+        assertEquals(true, hasMiddlewareException);
+        
+        //we do the cleanup here
+        
+        manager.deleteTermAndRelationship(termChild.getId(), CvId.IBDB_TERMS, TermId.IS_A.getId(), TermId.ONTOLOGY_TRAIT_CLASS.getId());
+        manager.deleteTermAndRelationship(termParent.getId(), CvId.IBDB_TERMS, TermId.IS_A.getId(), TermId.ONTOLOGY_TRAIT_CLASS.getId());
+        
+        Term term = manager.getTermById(termChild.getId());
+        assertNull(term);
+        term = manager.getTermById(termParent.getId());
+        assertNull(term);
+    }
+    
     @Test
     public void testGetAllPropertiesWithTraitClass() throws Exception {
         List<Property> properties = manager.getAllPropertiesWithTraitClass();
