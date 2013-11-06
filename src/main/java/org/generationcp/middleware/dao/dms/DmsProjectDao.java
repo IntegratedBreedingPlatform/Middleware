@@ -489,7 +489,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
             
             StringBuilder sqlString = new StringBuilder()
             .append("SELECT DISTINCT p.name AS name, p.description AS title, ppObjective.value AS objective, ppStartDate.value AS startDate, ")
-            .append(                        "ppEndDate.value AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName ")
+            .append(                        "ppEndDate.value AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, p.project_id AS id ")
             .append("FROM project p ")
             .append("   INNER JOIN projectprop ppNursery ON p.project_id = ppNursery.project_id ")
             .append("                   AND ppNursery.type_id = ").append(TermId.STUDY_TYPE.getId()).append(" ")
@@ -518,6 +518,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
                         .addScalar("endDate")
                         .addScalar("piName")
                         .addScalar("siteName")
+                        .addScalar("id")
                         ;
 
             List<Object[]> list =  query.list();
@@ -531,8 +532,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
                     String endDate = (String) row [4]; 
                     String piName = (String) row [5]; 
                     String siteName = (String) row [6];
+                    Integer id = (Integer) row[7];
                     
-                    studyDetails.add(new StudyDetails( name, title, objective, startDate, endDate, studyType, piName, siteName));
+                    studyDetails.add(new StudyDetails( id, name, title, objective, startDate, endDate, studyType, piName, siteName));
                 }
             }
 

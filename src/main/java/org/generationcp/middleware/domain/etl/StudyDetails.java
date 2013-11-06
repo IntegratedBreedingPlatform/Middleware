@@ -15,6 +15,8 @@ import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.util.Debug;
 
 public class StudyDetails {
+    
+    private Integer id;
 	
 	private String studyName;
 	
@@ -60,6 +62,14 @@ public class StudyDetails {
     }
 
     // Used by getStudyDetails
+    public StudyDetails(Integer id, String studyName, String title,
+            String objective, String startDate, String endDate, StudyType studyType, 
+            String piName, String siteName) {
+
+        this(studyName, title, objective, startDate, endDate, studyType, piName, siteName);
+        this.id = id;
+    }
+
     public StudyDetails(String studyName, String title,
             String objective, String startDate, String endDate, StudyType studyType, 
             String piName, String siteName) {
@@ -69,7 +79,15 @@ public class StudyDetails {
         this.setPiName(piName);
     }
 
-	public String getStudyName() {
+    public Integer getId() {
+        return id;
+    }
+    
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getStudyName() {
 		return studyName;
 	}
 
@@ -181,7 +199,10 @@ public class StudyDetails {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("StudyDetails [studyName=");
+        builder.append("StudyDetails [");
+        builder.append("id=");
+        builder.append(id);
+        builder.append(", studyName=");
         builder.append(studyName);
         builder.append(", title=");
         builder.append(title);
@@ -211,6 +232,7 @@ public class StudyDetails {
 
 	public void print(int indent) {
 		Debug.println(indent, "StudyDetails: ");
+        Debug.println(indent + 3, "Id: " + id);
 		Debug.println(indent + 3, "Name: " + studyName);
 	    Debug.println(indent + 3, "Title: " + title);
 	    Debug.println(indent + 3, "PM Key: " + pmKey);
