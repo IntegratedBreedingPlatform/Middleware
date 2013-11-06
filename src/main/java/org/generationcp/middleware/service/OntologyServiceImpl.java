@@ -20,7 +20,9 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Property;
+import org.generationcp.middleware.domain.oms.PropertyReference;
 import org.generationcp.middleware.domain.oms.Scale;
+import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TraitClass;
@@ -33,7 +35,7 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.service.api.OntologyService;
 
 public class OntologyServiceImpl extends Service implements OntologyService {
-
+    
     public OntologyServiceImpl(
             HibernateSessionProvider sessionProviderForLocal,
             HibernateSessionProvider sessionProviderForCentral) {
@@ -84,8 +86,24 @@ public class OntologyServiceImpl extends Service implements OntologyService {
 
     @Override
     public List<StandardVariable> getStandardVariablesByTraitClass(Integer traitClassId) throws MiddlewareQueryException{
-        return getOntologyDataManager().getStandardVariables(traitClassId, null, null, null);
+        return getVariablesOfTraitClassesFromTree( getOntologyDataManager().getAllTraitGroupsHierarchy(true));
     }
+    
+    private List<StandardVariable> getVariablesOfTraitClassesFromTree(List<TraitClassReference> tree) throws MiddlewareQueryException{
+        List<StandardVariable> variables = new ArrayList<StandardVariable>();
+        
+        for(TraitClassReference traitClass : tree){
+            for (PropertyReference property : traitClass.getProperties()){
+                for (StandardVariableReference varRef : property.getStandardVariables()){
+                    variables.add(getOntologyDataManager().getStandardVariable(varRef.getId()));                    
+                }
+            }
+            variables.addAll(getVariablesOfTraitClassesFromTree(traitClass.getTraitClassChildren()));
+        }
+        
+        return variables;
+    }
+
     
     @Override
     public List<StandardVariable> getStandardVariablesByProperty(Integer propertyId) throws MiddlewareQueryException{
