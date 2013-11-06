@@ -98,7 +98,6 @@ public class OntologyServiceImpl extends Service implements OntologyService {
                     variables.add(getOntologyDataManager().getStandardVariable(varRef.getId()));                    
                 }
             }
-            variables.addAll(getVariablesOfTraitClassesFromTree(traitClass.getTraitClassChildren()));
         }
         
         return variables;
