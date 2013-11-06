@@ -739,12 +739,12 @@ public class TestOntologyDataManagerImpl {
 
     @Test
     public void testGetStandardVariablesByTraitClass() throws MiddlewareQueryException {
-        List<StandardVariable> vars = manager.getStandardVariables(Integer.valueOf(1045), null, null, null);
+        List<StandardVariable> vars = manager.getStandardVariables(Integer.valueOf(1410), null, null, null);
         
         assertFalse(vars.isEmpty());
         
         StandardVariable expectedVar = new StandardVariable();
-        expectedVar.setId(1050);
+        expectedVar.setId(21744);
         assertTrue(vars.contains(expectedVar));
         
         for (StandardVariable var : vars){

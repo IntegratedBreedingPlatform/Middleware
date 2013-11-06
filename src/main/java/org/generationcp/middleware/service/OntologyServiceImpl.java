@@ -86,23 +86,8 @@ public class OntologyServiceImpl extends Service implements OntologyService {
 
     @Override
     public List<StandardVariable> getStandardVariablesByTraitClass(Integer traitClassId) throws MiddlewareQueryException{
-        return getVariablesOfTraitClassesFromTree( getOntologyDataManager().getAllTraitGroupsHierarchy(true));
+        return getOntologyDataManager().getStandardVariables(traitClassId, null, null, null);
     }
-    
-    private List<StandardVariable> getVariablesOfTraitClassesFromTree(List<TraitClassReference> tree) throws MiddlewareQueryException{
-        List<StandardVariable> variables = new ArrayList<StandardVariable>();
-        
-        for(TraitClassReference traitClass : tree){
-            for (PropertyReference property : traitClass.getProperties()){
-                for (StandardVariableReference varRef : property.getStandardVariables()){
-                    variables.add(getOntologyDataManager().getStandardVariable(varRef.getId()));                    
-                }
-            }
-        }
-        
-        return variables;
-    }
-
     
     @Override
     public List<StandardVariable> getStandardVariablesByProperty(Integer propertyId) throws MiddlewareQueryException{

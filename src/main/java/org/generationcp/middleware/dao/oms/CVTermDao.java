@@ -828,6 +828,16 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
     }
     
     /**
+     * Retrieves the properties of a Trait Class
+     */
+    public List<PropertyReference> getPropertiesOfTraitClass(Integer traitClassId) throws MiddlewareQueryException{
+        List<Integer> traitClasses = new ArrayList<Integer>();
+        traitClasses.add(traitClassId);
+        return getPropertiesOfTraitClasses(traitClasses).get(traitClassId);         
+    }
+
+    
+    /**
      * Retrieves the properties of Trait Classes
      */
     public Map<Integer, List<PropertyReference>> getPropertiesOfTraitClasses(List<Integer> traitClassIds) throws MiddlewareQueryException{
@@ -887,6 +897,16 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
         }
         
         return propertiesOfTraitClasses;
+    }
+    
+    
+    /**
+     * Retrieves the standard variables of a property
+     */
+    public List<StandardVariableReference> getStandardVariablesOfProperty(Integer propertyId) throws MiddlewareQueryException{
+        List<Integer> properties = new ArrayList<Integer>();
+        properties.add(propertyId);
+        return getStandardVariablesOfProperties(properties).get(propertyId);         
     }
 
 

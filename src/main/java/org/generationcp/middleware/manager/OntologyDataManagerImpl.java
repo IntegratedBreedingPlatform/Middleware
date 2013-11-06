@@ -26,6 +26,8 @@ import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Property;
+import org.generationcp.middleware.domain.oms.PropertyReference;
+import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TraitClass;
@@ -651,6 +653,13 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
                     throws MiddlewareQueryException{
         List<StandardVariable> standardVariables = new ArrayList<StandardVariable>();
 
+        if (traitClassId != null){
+            standardVariables.addAll(getStandardVariablesOfTraitClass(Database.CENTRAL, traitClassId));
+            standardVariables.addAll(getStandardVariablesOfTraitClass(Database.LOCAL, traitClassId));
+            return standardVariables;
+        }
+        
+        // For property, scale, method
         setWorkingDatabase(Database.CENTRAL);
         List<Integer> standardVariableIds = getCvTermDao().getStandardVariableIds(traitClassId, propertyId, methodId, scaleId);
         for (Integer id : standardVariableIds) {
@@ -664,6 +673,29 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         
         
         return standardVariables;
+    }
+    
+    private List<StandardVariable> getStandardVariablesOfTraitClass(Database instance, Integer traitClassId) throws MiddlewareQueryException{
+        List<StandardVariable> standardVariables = new ArrayList<StandardVariable>();
+        setWorkingDatabase(instance);
+
+        List<PropertyReference> properties = getCvTermDao().getPropertiesOfTraitClass(traitClassId);
+        List<Integer> propertyIds = new ArrayList<Integer>();
+        for (PropertyReference property : properties){
+            propertyIds.add(property.getId());
+        }
+        Map<Integer, List<StandardVariableReference>> propertyVars = getCvTermDao().getStandardVariablesOfProperties(propertyIds);
+        
+        for (Integer propId : propertyIds){
+            List<StandardVariableReference> stdVarRefs = propertyVars.get(propId);
+            if (stdVarRefs != null){
+                for (StandardVariableReference stdVarRef : stdVarRefs){
+                    standardVariables.add(getStandardVariable(stdVarRef.getId()));
+                }
+            }
+        }
+        return standardVariables;
+
     }
     
     @Override

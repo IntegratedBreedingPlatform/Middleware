@@ -104,7 +104,7 @@ public class TestOntologyServiceImpl {
     
     @Test
     public void testGetStandardVariablesByTraitClass() throws MiddlewareQueryException {
-        List<StandardVariable> vars = ontologyService.getStandardVariablesByTraitClass(Integer.valueOf(1330)); 
+        List<StandardVariable> vars = ontologyService.getStandardVariablesByTraitClass(Integer.valueOf(1410)); 
         assertFalse(vars.isEmpty());
         for (StandardVariable var : vars){
             Debug.println(3, var.toString());
