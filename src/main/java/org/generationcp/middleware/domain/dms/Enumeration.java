@@ -16,7 +16,7 @@ package org.generationcp.middleware.domain.dms;
  */
 public class Enumeration implements Comparable<Enumeration> {
 
-	private int id;
+	private Integer id;
 	
 	private String name;
 	
@@ -24,16 +24,20 @@ public class Enumeration implements Comparable<Enumeration> {
 	
 	private int rank;
 	
-	public Enumeration(int id, String name, String description, int rank) {
+	public Enumeration(Integer id, String name, String description, int rank) {
 		this.id = id;
 		this.name = name;
 		this.description = description;
 		this.rank = rank;
 	}
 
-	public int getId() {
-		return id;
-	}
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Integer getId() {
+        return id;
+    }
 
 	public String getName() {
 		return name;

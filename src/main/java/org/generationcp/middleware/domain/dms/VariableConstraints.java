@@ -18,14 +18,21 @@ import org.generationcp.middleware.util.Debug;
  */
 public class VariableConstraints {
 
+    private Integer id; // the cvtermprop id - to identify if from local or central
+    
 	private Integer minValue;
 	
 	private Integer maxValue;
 
-	public VariableConstraints(Integer minValue, Integer maxValue) {
-		this.minValue = minValue;
-		this.maxValue = maxValue;
-	}
+    public VariableConstraints(Integer minValue, Integer maxValue) {
+        this.minValue = minValue;
+        this.maxValue = maxValue;
+    }
+
+    public VariableConstraints(Integer id, Integer minValue, Integer maxValue) {
+        this.minValue = minValue;
+        this.maxValue = maxValue;
+    }
 
 	public Integer getMinValue() {
 		return minValue;
@@ -43,15 +50,28 @@ public class VariableConstraints {
 		this.maxValue = maxValue;
 	}
 
-	public void print(int indent) {
-		Debug.println(indent, "minValue: " + minValue);
+	
+    public Integer getId() {
+        return id;
+    }
+
+    
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public void print(int indent) {
+        Debug.println(indent, "id: " + id);
+        Debug.println(indent, "minValue: " + minValue);
 		Debug.println(indent, "maxValue: " + maxValue);
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("VariableConstraints [minValue=");
+		builder.append("VariableConstraints [id=");
+		builder.append(id);
+        builder.append(", minValue=");
 		builder.append(minValue);
 		builder.append(", maxValue=");
 		builder.append(maxValue);

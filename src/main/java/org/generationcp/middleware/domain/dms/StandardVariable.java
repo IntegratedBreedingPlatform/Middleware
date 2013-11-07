@@ -149,6 +149,18 @@ public class StandardVariable {
 	public List<Enumeration> getEnumerations() {
 		return enumerations;
 	}
+	
+	public Enumeration getEnumeration(String name, String description){
+	    if (enumerations != null){
+	        return null;
+	    }
+	    for (Enumeration enumeration : enumerations){
+	        if (enumeration.getName().equalsIgnoreCase(name) && enumeration.getDescription().equalsIgnoreCase(description)){
+	            return enumeration;
+	        }
+	    }
+	    return null;
+	}
 
 	public void setEnumerations(List<Enumeration> enumerations) {
 		this.enumerations = enumerations;

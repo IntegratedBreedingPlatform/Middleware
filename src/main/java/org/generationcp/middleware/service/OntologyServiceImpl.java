@@ -15,8 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Property;
@@ -113,6 +115,29 @@ public class OntologyServiceImpl extends Service implements OntologyService {
         getOntologyDataManager().deleteStandardVariable(stdVariableId);
     }
 
+    @Override
+    public VariableConstraints addOrUpdateStandardVariableMinMaxConstraints(int standardVariableId, VariableConstraints constraint) 
+            throws MiddlewareQueryException{
+        //TODO
+        return null;
+    }
+    
+    @Override
+    public void deleteStandardVariableMinMaxConstraints(int standardVariableId) throws MiddlewareQueryException{
+        //TODO
+    }
+
+    @Override
+    public Enumeration addStandardVariableValidValue(StandardVariable variable, Enumeration validValue) throws MiddlewareQueryException{
+        //TODO
+        return null;
+    }
+    
+    @Override
+    public void deleteStandardVariableValidValue(int standardVariableId, int validValueId) throws MiddlewareQueryException{
+        //TODO
+    }
+    
     /*======================= PROPERTY ================================== */
 
 

@@ -153,6 +153,48 @@ public class TestOntologyServiceImpl {
     }
     
     @Test
+    public void testAddOrUpdateStandardVariableMinMaxConstraints() throws MiddlewareQueryException {
+        //TODO
+        int standardVariableId = 8270; // numeric variable
+        VariableConstraints constraint = new VariableConstraints(-100, 100);
+        constraint = ontologyService.addOrUpdateStandardVariableMinMaxConstraints(
+                standardVariableId, constraint);
+        assertNotNull(constraint);
+        assertNotNull(constraint.getId());
+    }
+    
+    @Test
+    public void testDeleteStandardVariableMinMaxConstraints() throws MiddlewareQueryException {
+        //TODO
+        int standardVariableId = 8270;
+        assertNotNull(ontologyService.getStandardVariable(standardVariableId).getConstraints().getId());
+        ontologyService.deleteStandardVariableMinMaxConstraints(standardVariableId);
+        assertNull(ontologyService.getStandardVariable(standardVariableId).getConstraints().getId());
+    }
+
+    @Test
+    public void testAddStandardVariableValidValue() throws MiddlewareQueryException {
+        //TODO
+        int standardVariableId = 22550; // categorical variable
+        StandardVariable standardVariable = ontologyService.getStandardVariable(standardVariableId);
+        Enumeration validValue = new Enumeration(null, "8", "Majority of plants severely stunted", 8);
+        ontologyService.addStandardVariableValidValue(standardVariable, validValue);
+        assertNotNull(ontologyService.getStandardVariable(standardVariableId).getEnumeration("8", "Majority of plants severely stunted"));
+        
+    }
+    
+    @Test
+    public void testDeleteStandardVariableValidValueConstraints() throws MiddlewareQueryException {
+        //TODO
+        int standardVariableId = 22550;
+        Enumeration validValue = ontologyService.getStandardVariable(2250).getEnumeration("8", "Majority of plants severely stunted");
+        if (validValue != null && validValue.getId() != null){
+            ontologyService.deleteStandardVariableValidValue(standardVariableId, validValue.getId());
+            assertNull(ontologyService.getStandardVariable(2250).getEnumeration("8", "Majority of plants severely stunted"));
+        }
+    }
+    
+    @Test
     public void testGetAllTermsByCvId() throws MiddlewareQueryException {
         List<Term> terms = ontologyService.getAllTermsByCvId(CvId.VARIABLES);
         for (Term term: terms) {

@@ -15,8 +15,10 @@ package org.generationcp.middleware.service.api;
 import java.util.List;
 import java.util.Set;
 
+import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Method;
 import org.generationcp.middleware.domain.oms.Property;
@@ -159,6 +161,45 @@ public interface OntologyService {
      * @throws MiddlewareQueryException the middleware query exception
      */
     void deleteStandardVariable(int stdVariableId) throws MiddlewareQueryException;
+    
+    /**
+     * Adds or update the given standard variable's min-max constraints.
+     *
+     * @param standardVariableId the standard variable id
+     * @param constraint the constraint containing the min and max constraints
+     * @return the variable constraints with the id set
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    VariableConstraints addOrUpdateStandardVariableMinMaxConstraints(
+            int standardVariableId, VariableConstraints constraint) throws MiddlewareQueryException;
+    
+    /**
+     * Deletes the given standard variable's min-max constraints.
+     *
+     * @param standardVariableId the standard variable id
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    void deleteStandardVariableMinMaxConstraints(int standardVariableId) throws MiddlewareQueryException;
+
+    /**
+     * Adds a valid value to the given standard variable. 
+     * Checks if the standard variable passed is categorical.
+     *
+     * @param variable the variable
+     * @param validValue the valid value to add
+     * @return the enumeration containing the id of the new valid value
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Enumeration addStandardVariableValidValue(StandardVariable variable, Enumeration validValue) throws MiddlewareQueryException;
+    
+    /**
+     * Deletes the given valid value from a standard variable.
+     *
+     * @param standardVariableId the standard variable id
+     * @param validValueId the valid value id
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    void deleteStandardVariableValidValue(int standardVariableId, int validValueId) throws MiddlewareQueryException;
     
     /*======================= PROPERTY ================================== */
    
