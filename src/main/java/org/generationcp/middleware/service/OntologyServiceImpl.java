@@ -116,26 +116,24 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     }
 
     @Override
-    public VariableConstraints addOrUpdateStandardVariableMinMaxConstraints(int standardVariableId, VariableConstraints constraint) 
-            throws MiddlewareQueryException{
-        //TODO
-        return null;
+    public void addOrUpdateStandardVariableMinMaxConstraints(int standardVariableId, VariableConstraints constraints) 
+            throws MiddlewareQueryException, MiddlewareException{
+        getOntologyDataManager().addOrUpdateStandardVariableConstraints(standardVariableId, constraints);
     }
     
     @Override
     public void deleteStandardVariableMinMaxConstraints(int standardVariableId) throws MiddlewareQueryException{
-        //TODO
+        getOntologyDataManager().deleteStandardVariableLocalConstraints(standardVariableId);
     }
 
     @Override
     public Enumeration addStandardVariableValidValue(StandardVariable variable, Enumeration validValue) throws MiddlewareQueryException{
-        //TODO
-        return null;
+        return getOntologyDataManager().addStandardVariableEnumeration(variable, validValue);
     }
     
     @Override
     public void deleteStandardVariableValidValue(int standardVariableId, int validValueId) throws MiddlewareQueryException{
-        //TODO
+        getOntologyDataManager().deleteStandardVariableEnumeration(standardVariableId, validValueId);
     }
     
     /*======================= PROPERTY ================================== */
@@ -331,7 +329,7 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     }
     
     @Override 
-    public Term addTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException {
+    public Term addTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException {       
         return getOntologyDataManager().addTerm(name, definition, cvId);
     }
 

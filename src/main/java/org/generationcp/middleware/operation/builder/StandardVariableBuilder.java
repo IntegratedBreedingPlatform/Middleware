@@ -164,23 +164,28 @@ public class StandardVariableBuilder extends Builder {
 	private void addConstraints(StandardVariable standardVariable, CVTerm cvTerm) throws MiddlewareQueryException {
 	    List<CVTermProperty> properties = getTermPropertyBuilder().findProperties(cvTerm.getCvTermId());
 		if (properties != null && !properties.isEmpty()) {
-			Integer minValue = getPropertyValue(properties, TermId.MIN_VALUE);
-			Integer maxValue = getPropertyValue(properties, TermId.MAX_VALUE);
+            Integer minValue = null;
+            Integer maxValue = null;
+            Integer minValueId = null;
+            Integer maxValueId = null;
+			
+		     for (CVTermProperty property : properties) {
+		         if (property.getTypeId().equals(TermId.MIN_VALUE.getId())){  
+                         minValue = Integer.parseInt(property.getValue());
+                         minValueId = property.getCvTermPropertyId();
+		         }
+                 if (property.getTypeId().equals(TermId.MAX_VALUE.getId())){  
+                         maxValue = Integer.parseInt(property.getValue());
+                         maxValueId = property.getCvTermPropertyId();
+                 }
+		     }
+    
 			if (minValue != null || maxValue != null) {
-				standardVariable.setConstraints(new VariableConstraints(minValue, maxValue));
+				standardVariable.setConstraints(new VariableConstraints(minValueId, maxValueId, minValue, maxValue));
 			}
 		}
 	}
 
-	private Integer getPropertyValue(List<CVTermProperty> properties, TermId termId) {
-		for (CVTermProperty property : properties) {
-			if (property.getTypeId().equals(termId.getId())) {
-				return Integer.parseInt(property.getValue());
-			}
-		}
-		return null;
-	}
-	
 	private Integer findTermId(List<CVTermRelationship> cvTermRelationships, TermId relationship) {
 		for (CVTermRelationship cvTermRelationship : cvTermRelationships) {
 			if (cvTermRelationship.getTypeId().equals(relationship.getId())) {

@@ -18,6 +18,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -35,6 +38,7 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TraitClass;
 import org.generationcp.middleware.domain.oms.TraitClassReference;
+import org.generationcp.middleware.exceptions.ConfigException;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
@@ -57,6 +61,9 @@ public class TestOntologyServiceImpl {
     private static final String NUMBER_OF_RECORDS = " # Records = ";
     private static final int AGRONOMIC_TRAIT_CLASS = 1340;
 
+    private static final int NUMERIC_VARIABLE = 1;
+    private static final int CHARACTER_VARIABLE = 2;
+    private static final int CATEGORICAL_VARIABLE = 3;
     
     private static ServiceFactory serviceFactory;
     private static OntologyService ontologyService;
@@ -65,22 +72,27 @@ public class TestOntologyServiceImpl {
 
     @Rule
     public TestName name = new TestName();
+    
+    static DatabaseConnectionParameters local;
+    static DatabaseConnectionParameters central;
+
 
     @BeforeClass
     public static void setUp() throws Exception {
-        DatabaseConnectionParameters local = new DatabaseConnectionParameters(
+
+        local = new DatabaseConnectionParameters(
                 "testDatabaseConfig.properties", "local");
-        DatabaseConnectionParameters central = new DatabaseConnectionParameters(
+        central = new DatabaseConnectionParameters(
                 "testDatabaseConfig.properties", "central");
 
         serviceFactory = new ServiceFactory(local, central);
 
         ontologyService = serviceFactory.getOntologyService();
-
+        
     }
 
     @Before
-    public void beforeEachTest() {
+    public void beforeEachTest() throws FileNotFoundException, ConfigException, URISyntaxException, IOException {
         Debug.println(0, "#####" + name.getMethodName() + " Start: ");
         startTime = System.nanoTime();
     }
@@ -101,6 +113,15 @@ public class TestOntologyServiceImpl {
         }
     }
     
+    @Test
+    public void testGetNumericStandardVariableWithMinMax() throws MiddlewareQueryException {
+        StandardVariable var = ontologyService.getStandardVariable(8270);
+        assertNotNull(var);
+        assertNotNull(var.getConstraints());
+        assertNotNull(var.getConstraints().getMinValueId());
+        var.print(3);
+    }
+
     
     @Test
     public void testGetStandardVariablesByTraitClass() throws MiddlewareQueryException {
@@ -144,7 +165,7 @@ public class TestOntologyServiceImpl {
     
     @Test
     public void testDeleteStandardVariable() throws MiddlewareQueryException {
-        StandardVariable stdVar = createNewStandardVariable();    
+        StandardVariable stdVar = createNewStandardVariable(CHARACTER_VARIABLE);    
         
         ontologyService.deleteStandardVariable(stdVar.getId());
         Term term = ontologyService.getTermById(stdVar.getId());
@@ -153,23 +174,44 @@ public class TestOntologyServiceImpl {
     }
     
     @Test
-    public void testAddOrUpdateStandardVariableMinMaxConstraints() throws MiddlewareQueryException {
-        //TODO
+    public void testAddOrUpdateStandardVariableMinMaxConstraintsInCentral() throws Exception {
         int standardVariableId = 8270; // numeric variable
-        VariableConstraints constraint = new VariableConstraints(-100, 100);
-        constraint = ontologyService.addOrUpdateStandardVariableMinMaxConstraints(
-                standardVariableId, constraint);
-        assertNotNull(constraint);
-        assertNotNull(constraint.getId());
+        VariableConstraints constraints = new VariableConstraints(-100, 100);
+        try{
+            ontologyService.addOrUpdateStandardVariableMinMaxConstraints(
+                standardVariableId, constraints);
+        } catch (MiddlewareException e){
+            Debug.println(3, "MiddlewareException expected: \n\t" + e.getMessage());
+            assertTrue(e.getMessage().contains("Cannot update the constraints of standard variables from Central database."));
+        }
+    }
+    
+    @Test
+    public void testAddOrUpdateStandardVariableMinMaxConstraintsInLocal() throws Exception {
+        StandardVariable variable = createNewStandardVariable(NUMERIC_VARIABLE);
+        int standardVariableId = variable.getId(); 
+        VariableConstraints constraints = new VariableConstraints(-100, 100);
+        ontologyService.addOrUpdateStandardVariableMinMaxConstraints(
+                standardVariableId, constraints);
+        constraints.print(3);
+        assertNotNull(constraints);
+        assertNotNull(constraints.getMinValueId());
+        assertNotNull(constraints.getMaxValueId());
+        
+        // cleanup
+        ontologyService.deleteStandardVariable(standardVariableId);
     }
     
     @Test
     public void testDeleteStandardVariableMinMaxConstraints() throws MiddlewareQueryException {
-        //TODO
-        int standardVariableId = 8270;
-        assertNotNull(ontologyService.getStandardVariable(standardVariableId).getConstraints().getId());
+        StandardVariable variable = createNewStandardVariable(NUMERIC_VARIABLE);
+        int standardVariableId = variable.getId(); 
+        assertNotNull(variable.getConstraints().getMinValueId());
         ontologyService.deleteStandardVariableMinMaxConstraints(standardVariableId);
-        assertNull(ontologyService.getStandardVariable(standardVariableId).getConstraints().getId());
+        assertNull(ontologyService.getStandardVariable(standardVariableId).getConstraints());
+
+        // cleanup
+        ontologyService.deleteStandardVariable(standardVariableId);
     }
 
     @Test
@@ -248,7 +290,6 @@ public class TestOntologyServiceImpl {
                 assertSame(origProperty.getId(), newProperty.getId());
         }
     }
-    
 
     @Test
     public void testUpdateProperty() throws Exception {
@@ -275,7 +316,6 @@ public class TestOntologyServiceImpl {
         assertNotNull(scale);
         scale.print(3);
     }
-
 
     @Test
     public void testGetScaleByName() throws MiddlewareQueryException {
@@ -406,7 +446,6 @@ public class TestOntologyServiceImpl {
         for (Term dataType : dataTypes){
             dataType.print(3);
         }
-
     }
 
     
@@ -416,7 +455,6 @@ public class TestOntologyServiceImpl {
         assertFalse(traitGroups.isEmpty());
         for (TraitClassReference traitGroup : traitGroups){
             traitGroup.print(3);
-//            Debug.println(3, traitGroup.toString());
         }
         Debug.println(3, NUMBER_OF_RECORDS + traitGroups.size());
     }
@@ -447,11 +485,13 @@ public class TestOntologyServiceImpl {
     public void testAddTraitClass() throws MiddlewareQueryException {
         String name = "Test Trait Class " + new Random().nextInt(10000);
         String definition = "Test Definition";
-        
+
         TraitClass traitClass = ontologyService.addTraitClass(name, definition, TermId.ONTOLOGY_TRAIT_CLASS.getId());
         assertNotNull(traitClass);
         assertTrue(traitClass.getId() < 0);
         traitClass.print(3);
+        
+        ontologyService.deleteTraitClass(traitClass.getId());
     }
 
     @Test
@@ -545,28 +585,42 @@ public class TestOntologyServiceImpl {
         assertNull(term);
     }
     
-    private StandardVariable createNewStandardVariable() throws MiddlewareQueryException{
+
+    private StandardVariable createNewStandardVariable(int dataType) throws MiddlewareQueryException{
         String propertyName = "property name " + new Random().nextInt(10000);
         ontologyService.addProperty(propertyName, "test property", 1087);
             
         StandardVariable stdVariable = new StandardVariable();
             stdVariable.setName("variable name " + new Random().nextInt(10000));
             stdVariable.setDescription("variable description");
-            //stdVariable.setProperty(new Term(2002, "User", "Database user"));
             stdVariable.setProperty(ontologyService.findTermByName(propertyName, CvId.PROPERTIES));
             stdVariable.setMethod(new Term(4030, "Assigned", "Term, name or id assigned"));
             stdVariable.setScale(new Term(6000, "DBCV", "Controlled vocabulary from a database"));
             stdVariable.setStoredIn(new Term(1010, "Study information", "Study element"));
-            stdVariable.setDataType(new Term(1120, "Character variable", "variable with char values"));
+
+
+            switch (dataType){
+                case NUMERIC_VARIABLE:  
+                    stdVariable.setDataType(new Term(1110, "Numeric variable", "Variable with numeric values either continuous or integer"));
+                    stdVariable.setConstraints(new VariableConstraints(100, 999));
+                    break;
+                case CHARACTER_VARIABLE: 
+                        stdVariable.setDataType(new Term(1120, "Character variable", "variable with char values"));
+                        break;
+                case CATEGORICAL_VARIABLE : 
+                        stdVariable.setDataType(new Term(1130, "Categorical variable", "Variable with discrete class values (numeric or character all treated as character)"));
+                        stdVariable.setEnumerations(new ArrayList<Enumeration>());
+                        stdVariable.getEnumerations().add(new Enumeration(10000, "N", "Nursery", 1));
+                        stdVariable.getEnumerations().add(new Enumeration(10001, "HB", "Hybridization nursery", 2));
+                        stdVariable.getEnumerations().add(new Enumeration(10002, "PN", "Pedigree nursery", 3));
+                        break;
+            }
+            
+            
             stdVariable.setIsA(new Term(1050,"Study condition","Study condition class"));
             stdVariable.setNameSynonyms(new ArrayList<NameSynonym>());
             stdVariable.getNameSynonyms().add(new NameSynonym("Person", NameType.ALTERNATIVE_ENGLISH));
             stdVariable.getNameSynonyms().add(new NameSynonym("Tiga-gamit", NameType.ALTERNATIVE_FRENCH));
-            stdVariable.setEnumerations(new ArrayList<Enumeration>());
-            stdVariable.getEnumerations().add(new Enumeration(10000, "N", "Nursery", 1));
-            stdVariable.getEnumerations().add(new Enumeration(10001, "HB", "Hybridization nursery", 2));
-            stdVariable.getEnumerations().add(new Enumeration(10002, "PN", "Pedigree nursery", 3));
-            stdVariable.setConstraints(new VariableConstraints(100, 999));
             stdVariable.setCropOntologyId("CROP-TEST");
             
             ontologyService.addStandardVariable(stdVariable);
@@ -574,8 +628,10 @@ public class TestOntologyServiceImpl {
             Debug.println(0, "Standard variable saved: " + stdVariable.getId());
             
             return stdVariable;
-    }
 
+    }
+    
+    
     @After
     public void afterEachTest() {
         long elapsedTime = System.nanoTime() - startTime;

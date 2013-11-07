@@ -18,10 +18,12 @@ import org.generationcp.middleware.util.Debug;
  */
 public class VariableConstraints {
 
-    private Integer id; // the cvtermprop id - to identify if from local or central
+    private Integer minValueId; // the cvtermprop id of min constraint- to identify if from local or central
     
 	private Integer minValue;
 	
+    private Integer maxValueId; // the cvtermprop id of max constraint - to identify if from local or central
+    
 	private Integer maxValue;
 
     public VariableConstraints(Integer minValue, Integer maxValue) {
@@ -29,7 +31,9 @@ public class VariableConstraints {
         this.maxValue = maxValue;
     }
 
-    public VariableConstraints(Integer id, Integer minValue, Integer maxValue) {
+    public VariableConstraints(Integer minValueId, Integer maxValueId, Integer minValue, Integer maxValue) {
+        this.minValueId = minValueId;
+        this.maxValueId = maxValueId;
         this.minValue = minValue;
         this.maxValue = maxValue;
     }
@@ -51,30 +55,43 @@ public class VariableConstraints {
 	}
 
 	
-    public Integer getId() {
-        return id;
+    public Integer getMinValueId() {
+        return minValueId;
     }
 
     
-    public void setId(Integer id) {
-        this.id = id;
+    public void setMinValueId(Integer id) {
+        this.minValueId = id;
+    }
+
+    
+    public Integer getMaxValueId() {
+        return maxValueId;
+    }
+    
+    public void setMaxValueId(Integer id) {
+        this.maxValueId = id;
     }
 
     public void print(int indent) {
-        Debug.println(indent, "id: " + id);
-        Debug.println(indent, "minValue: " + minValue);
-		Debug.println(indent, "maxValue: " + maxValue);
+        Debug.println(indent, "VariableConstraints: ");
+        Debug.println(indent + 3, "minValueId: " + minValueId);
+        Debug.println(indent + 3, "minValue: " + minValue);
+        Debug.println(indent + 3, "maxValueId: " + maxValueId);
+		Debug.println(indent + 3, "maxValue: " + maxValue);
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("VariableConstraints [id=");
-		builder.append(id);
+		builder.append("VariableConstraints [minValueId=");
+		builder.append(minValueId);
         builder.append(", minValue=");
 		builder.append(minValue);
-		builder.append(", maxValue=");
-		builder.append(maxValue);
+        builder.append(", maxValueId=");
+        builder.append(maxValueId);
+        builder.append(", maxValue=");
+        builder.append(maxValue);
 		builder.append("]");
 		return builder.toString();
 	}

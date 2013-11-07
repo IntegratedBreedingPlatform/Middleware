@@ -18,6 +18,7 @@ import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.NameSynonym;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -66,6 +67,15 @@ public class StandardVariableSaver extends Saver {
 	    
 	    deleteCVTerm(getCvTermDao().getById(stdVar.getId()));
 	}
+
+	public void deleteConstraints(StandardVariable stdVar) throws MiddlewareQueryException{
+        setWorkingDatabase(Database.LOCAL);
+        if (stdVar.getConstraints() != null) {
+               deleteConstraint(stdVar.getId(), TermId.MIN_VALUE.getId(), stdVar.getConstraints().getMinValue());
+               deleteConstraint(stdVar.getId(), TermId.MAX_VALUE.getId(), stdVar.getConstraints().getMaxValue());
+           }
+
+	}
 	
 	public Integer save(StandardVariable stdVar) throws MiddlewareQueryException {
 		setWorkingDatabase(Database.LOCAL);
@@ -76,8 +86,10 @@ public class StandardVariableSaver extends Saver {
 		//getCvTermDao().save(varTerm);		
 		
         if (stdVar.getConstraints() != null) {
-            saveConstraint(varId, TermId.MIN_VALUE.getId(), stdVar.getConstraints().getMinValue());
-            saveConstraint(varId, TermId.MAX_VALUE.getId(), stdVar.getConstraints().getMaxValue());
+            Integer minValueId = saveConstraint(varId, TermId.MIN_VALUE.getId(), stdVar.getConstraints().getMinValue());
+            Integer maxValueId = saveConstraint(varId, TermId.MAX_VALUE.getId(), stdVar.getConstraints().getMaxValue());
+            stdVar.getConstraints().setMinValueId(minValueId);
+            stdVar.getConstraints().setMaxValueId(maxValueId);
         }
         
 		saveSynonyms(varId, stdVar.getNameSynonyms());
@@ -100,6 +112,26 @@ public class StandardVariableSaver extends Saver {
 		
 		return stdVar.getId();
 	}
+	
+	public void saveConstraints(int standardVariableId, VariableConstraints constraints) throws MiddlewareQueryException{
+	    requireLocalDatabaseInstance();
+	     
+	    if (constraints.getMinValueId() == null){ // add
+	        Integer minId = saveConstraint(standardVariableId, TermId.MIN_VALUE.getId(), constraints.getMinValue());
+	        constraints.setMinValueId(minId);
+	    } else { // update
+	        updateConstraint(constraints.getMinValueId(), standardVariableId, TermId.MIN_VALUE.getId(), constraints.getMinValue());
+	    }
+	    
+        if (constraints.getMaxValueId() == null){// add
+            Integer maxId = saveConstraint(standardVariableId, TermId.MAX_VALUE.getId(), constraints.getMaxValue());
+            constraints.setMaxValueId(maxId);
+        } else { // update
+            updateConstraint(constraints.getMaxValueId(), standardVariableId, TermId.MAX_VALUE.getId(), constraints.getMaxValue());
+        }
+        
+	}
+	
 	
 	private CVTerm createCvTerm(StandardVariable stdVar) throws MiddlewareQueryException {
 		CVTerm cvTerm = new CVTerm();
@@ -135,20 +167,33 @@ public class StandardVariableSaver extends Saver {
 		getCvTermRelationshipDao().save(relationship);
 	}
 	
-	private void saveConstraint(int cvTermId, int typeId, Integer constraintValue) throws MiddlewareQueryException {
+    private Integer saveConstraint(int cvTermId, int typeId, Integer constraintValue) throws MiddlewareQueryException {
         if (constraintValue != null) {
             CVTermProperty property = new CVTermProperty();
-            
-            property.setCvTermPropertyId(getCvTermPropertyDao().getNegativeId("cvTermPropertyId"));
+            int negativeId = getCvTermPropertyDao().getNegativeId("cvTermPropertyId");
+            property.setCvTermPropertyId(negativeId);
             property.setTypeId(typeId);
             property.setValue(constraintValue.toString());
             property.setRank(0);
             property.setCvTermId(cvTermId);
-            
             getCvTermPropertyDao().save(property);
-        }	    
-	}
-	
+            return property.getCvTermPropertyId();
+        }     
+        return null;
+    }
+    
+    private void updateConstraint(int constraintId, int cvTermId, int typeId, Integer constraintValue) throws MiddlewareQueryException {
+        if (constraintValue != null) {
+            CVTermProperty property = new CVTermProperty();
+            property.setCvTermPropertyId(constraintId);
+            property.setTypeId(typeId);
+            property.setValue(constraintValue.toString());
+            property.setRank(0);
+            property.setCvTermId(cvTermId);
+            getCvTermPropertyDao().update(property);
+        }     
+    }
+    
 	private void saveSynonyms(int cvTermId, List<NameSynonym> nameSynonyms) throws MiddlewareQueryException {
 		if (nameSynonyms != null && nameSynonyms.size() > 0) {
 			for (NameSynonym nameSynonym : nameSynonyms) {

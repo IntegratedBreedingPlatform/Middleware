@@ -151,7 +151,7 @@ public class StandardVariable {
 	}
 	
 	public Enumeration getEnumeration(String name, String description){
-	    if (enumerations != null){
+	    if (enumerations == null){
 	        return null;
 	    }
 	    for (Enumeration enumeration : enumerations){
@@ -227,14 +227,13 @@ public class StandardVariable {
 		Debug.println(indent, "property: " + property);
 		Debug.println(indent, "method " + method);
 		Debug.println(indent, "scale: " + scale);
-		Debug.println(indent, "storedIn: " + storedIn);
+        Debug.println(indent, "storedIn: " + storedIn);
+        Debug.println(indent, "dataType: " + dataType);
 		Debug.println(indent, "isA: " + isA);
 		Debug.println(indent, "phenotypicType: " + phenotypicType);
 		if (constraints != null) {
-			Debug.println(indent, "constraints: " + constraints);
-		}
-		if (this.constraints != null) {
-			this.constraints.print(indent);
+	        Debug.println(indent, "constraints: ");
+			constraints.print(indent + 3);
 		}
 		if (enumerations != null) {
 			Debug.println(indent, "enumerations: " + enumerations);
