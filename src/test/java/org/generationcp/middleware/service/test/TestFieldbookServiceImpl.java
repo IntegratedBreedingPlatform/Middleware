@@ -56,6 +56,7 @@ public class TestFieldbookServiceImpl {
 
     @Before
     public void beforeEachTest() {
+        Debug.println(0, "#####" + name.getMethodName() + " Start: ");
         startTime = System.nanoTime();
     }
 
@@ -63,13 +64,23 @@ public class TestFieldbookServiceImpl {
     public void testGetAllLocalNurseryDetails() throws MiddlewareQueryException {
 
         List<StudyDetails> nurseryStudyDetails = fieldbookService.getAllLocalNurseryDetails();
-        Debug.println(0, "testGetAllLocalNurseryDetails: ");
         for (StudyDetails study : nurseryStudyDetails){
             study.print(3);
         }
+        Debug.println(3, "NUMBER OF RECORDS: " + nurseryStudyDetails.size());
 
     }
 
+
+    @Test
+    public void testGetAllLocalTrialStudyDetails() throws MiddlewareQueryException {
+        List<StudyDetails> studyDetails = fieldbookService.getAllLocalTrialStudyDetails();
+        for (StudyDetails study : studyDetails){
+            study.print(3);
+        }
+        Debug.println(3, "NUMBER OF RECORDS: " + studyDetails.size());
+
+    }
 
 
     @After

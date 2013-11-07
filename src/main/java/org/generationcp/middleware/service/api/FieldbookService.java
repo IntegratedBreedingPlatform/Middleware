@@ -31,4 +31,13 @@ public interface FieldbookService {
      * @throws MiddlewareQueryException
      */
     List<StudyDetails> getAllLocalNurseryDetails() throws MiddlewareQueryException;
+    
+    /**
+     * Retrieves all the details of the trial studies stored in local database.
+     * 
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    List<StudyDetails> getAllLocalTrialStudyDetails() throws MiddlewareQueryException;
+
 }

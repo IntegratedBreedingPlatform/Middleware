@@ -32,6 +32,11 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     public List<StudyDetails> getAllLocalNurseryDetails() throws MiddlewareQueryException{
         return getStudyDataManager().getAllStudyDetails(Database.LOCAL, StudyType.N);
     }
+    
+    @Override 
+    public List<StudyDetails> getAllLocalTrialStudyDetails() throws MiddlewareQueryException{
+        return getStudyDataManager().getAllStudyDetails(Database.LOCAL, StudyType.T);
+    }
 
 
 }
