@@ -258,7 +258,7 @@ public class StandardVariableSaver extends Saver {
             property.setValue(constraintValue.toString());
             property.setRank(0);
             property.setCvTermId(cvTermId);
-            getCvTermPropertyDao().update(property);
+            getCvTermPropertyDao().merge(property);
         }     
     }
     
