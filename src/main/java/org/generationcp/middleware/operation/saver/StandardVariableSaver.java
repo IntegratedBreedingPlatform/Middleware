@@ -28,6 +28,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.ErrorCode;
+import org.generationcp.middleware.pojos.oms.CV;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
@@ -132,7 +133,53 @@ public class StandardVariableSaver extends Saver {
         
 	}
 	
+    public void saveEnumeration(StandardVariable variable, Enumeration enumeration) 
+            throws MiddlewareException, MiddlewareQueryException{
+        //TODO 
+        
+        validateInputEnumeration(variable, enumeration);
+        requireLocalDatabaseInstance();
+        
+        CV cv = new CV();
+        
+        
+        CVTerm cvTerm = new CVTerm();
+        cvTerm.setCvTermId(getCvTermDao().getNegativeId("cvTermId"));
+        cvTerm.setCv(CV_VARIABLES);
+        cvTerm.setName(enumeration.getName());
+        cvTerm.setDefinition(enumeration.getDescription());
+        cvTerm.setIsObsolete(false);
+        cvTerm.setIsRelationshipType(false);
+        getCvTermDao().save(cvTerm);
+        
+        saveCvTermRelationship(variable.getId(), TermId.HAS_VALUE.getId(), enumeration.getId());
+
+        
+    }
 	
+    private void validateInputEnumeration(StandardVariable variable, Enumeration enumeration) throws MiddlewareException{
+        String name = enumeration.getName();
+        String definition = enumeration.getDescription();
+        StringBuffer errorMessage = new StringBuffer("");
+        if (name == null || name.equals("")) {
+            errorMessage.append("\nname is null or empty");
+        }
+        if (variable.getEnumerationByName(name) != null){
+            errorMessage.append("\nthe value with name = " + name + " already exists.");
+        }
+        if (definition == null || definition.equals("")) {
+            errorMessage.append("\ndefinition is null or empty");
+        }
+        if (variable.getEnumerationByDescription(definition) != null){
+            errorMessage.append("\nthe value with definition = " + definition + " already exists.");
+        }
+            
+        if (!errorMessage.toString().equals("")){
+            throw new MiddlewareException(errorMessage.toString());
+        } 
+
+    }
+    
 	private CVTerm createCvTerm(StandardVariable stdVar) throws MiddlewareQueryException {
 		CVTerm cvTerm = new CVTerm();
 		

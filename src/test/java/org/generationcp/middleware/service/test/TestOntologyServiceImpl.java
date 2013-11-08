@@ -18,9 +18,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -38,7 +35,6 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TraitClass;
 import org.generationcp.middleware.domain.oms.TraitClassReference;
-import org.generationcp.middleware.exceptions.ConfigException;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
@@ -49,6 +45,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
@@ -92,7 +89,7 @@ public class TestOntologyServiceImpl {
     }
 
     @Before
-    public void beforeEachTest() throws FileNotFoundException, ConfigException, URISyntaxException, IOException {
+    public void beforeEachTest(){
         Debug.println(0, "#####" + name.getMethodName() + " Start: ");
         startTime = System.nanoTime();
     }
@@ -215,7 +212,7 @@ public class TestOntologyServiceImpl {
     }
 
     @Test
-    public void testAddStandardVariableValidValue() throws MiddlewareQueryException {
+    public void testAddStandardVariableValidValue() throws MiddlewareQueryException, MiddlewareException {
         //TODO
         int standardVariableId = 22550; // categorical variable
         StandardVariable standardVariable = ontologyService.getStandardVariable(standardVariableId);
