@@ -800,7 +800,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     
     @Override
     public Enumeration addStandardVariableEnumeration(StandardVariable variable, Enumeration enumeration) 
-        //TODO
             throws MiddlewareQueryException, MiddlewareException{
         
         if (variable.getEnumeration(enumeration.getName(), enumeration.getDescription()) != null) {
@@ -827,22 +826,21 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     @Override
     public void deleteStandardVariableEnumeration(int standardVariableId, int enumerationId) throws MiddlewareQueryException{
         //TODO
-//        requireLocalDatabaseInstance();
-//        Session session = getCurrentSessionForLocal();
-//        Transaction trans = null;
-//
-//        try {
-//            trans = session.beginTransaction();
-//            StandardVariable stdVar = getStandardVariable(standardVariableId);
-//            
-//            getStandardVariableSaver().deleteEnumeration(stdVar, enumerationId);
-//
-//            trans.commit();
-//            
-//        } catch (Exception e) {
-//            rollbackTransaction(trans);
-//            throw new MiddlewareQueryException("Error in deleteStandardVariableEnumeration " + e.getMessage(), e);
-//        }
+        requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+            StandardVariable stdVar = getStandardVariable(standardVariableId);
+            getStandardVariableSaver().deleteEnumeration(standardVariableId, stdVar.getEnumeration(enumerationId));
+
+            trans.commit();
+            
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            throw new MiddlewareQueryException("Error in deleteStandardVariableEnumeration " + e.getMessage(), e);
+        }
     }
 
         

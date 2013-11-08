@@ -66,7 +66,7 @@ public class StandardVariableSaver extends Saver {
                 deleteConstraint(stdVar.getId(), TermId.MAX_VALUE.getId(), stdVar.getConstraints().getMaxValue());
             }
 	    
-	    deleteCVTerm(getCvTermDao().getById(stdVar.getId()));
+	    deleteCvTerm(getCvTermDao().getById(stdVar.getId()));
 	}
 
 	public void deleteConstraints(StandardVariable stdVar) throws MiddlewareQueryException{
@@ -135,25 +135,24 @@ public class StandardVariableSaver extends Saver {
 	
     public void saveEnumeration(StandardVariable variable, Enumeration enumeration) 
             throws MiddlewareException, MiddlewareQueryException{
-        //TODO 
-        
-        validateInputEnumeration(variable, enumeration);
+
         requireLocalDatabaseInstance();
         
-        CV cv = new CV();
+        validateInputEnumeration(variable, enumeration);
         
+        // Check if cv entry of enumeration already exists
+        // Add cv entry of the standard variable if none found
+        Integer cvId = getCvDao().getIdByName(String.valueOf(variable.getId()));
+        if (cvId == null){
+            cvId = createCv(variable).getCvId();
+        }
         
-        CVTerm cvTerm = new CVTerm();
-        cvTerm.setCvTermId(getCvTermDao().getNegativeId("cvTermId"));
-        cvTerm.setCv(CV_VARIABLES);
-        cvTerm.setName(enumeration.getName());
-        cvTerm.setDefinition(enumeration.getDescription());
-        cvTerm.setIsObsolete(false);
-        cvTerm.setIsRelationshipType(false);
-        getCvTermDao().save(cvTerm);
+        //Save cvterm entry of the new valid value
+        CVTerm cvTerm = createCvTerm(enumeration, cvId);
+        enumeration.setId(cvTerm.getCvTermId());
         
+        // save cvterm relationship
         saveCvTermRelationship(variable.getId(), TermId.HAS_VALUE.getId(), enumeration.getId());
-
         
     }
 	
@@ -193,6 +192,28 @@ public class StandardVariableSaver extends Saver {
 		getCvTermDao().save(cvTerm);
 		return cvTerm;
 	}
+	
+    private CVTerm createCvTerm(Enumeration enumeration, Integer cvId) throws MiddlewareQueryException {
+        CVTerm cvTerm = new CVTerm();
+        cvTerm.setCvTermId(getCvTermDao().getNegativeId("cvTermId"));
+        cvTerm.setCv(cvId);
+        cvTerm.setName(enumeration.getName());
+        cvTerm.setDefinition(enumeration.getDescription());
+        cvTerm.setIsObsolete(false);
+        cvTerm.setIsRelationshipType(false);
+        getCvTermDao().save(cvTerm);
+        return cvTerm;
+    }
+
+    private CV createCv(StandardVariable variable) throws MiddlewareQueryException{
+        CV cv = new CV();
+        cv.setCvId(getCvTermDao().getNegativeId("cvId"));
+        cv.setName(String.valueOf(variable.getId()));
+        cv.setDefinition(String.valueOf(variable.getName() + " - " + variable.getDescription()));
+        getCvDao().save(cv);
+        return cv;
+
+    }
 	
 	private void saveRelationship(int subjectId, int typeId, Term object) throws MiddlewareQueryException {
 		if (object != null) {
@@ -381,10 +402,16 @@ public class StandardVariableSaver extends Saver {
         }
     }
     
-    private void deleteEnumerations(int varId, List<Enumeration> enumerations) throws MiddlewareQueryException, MiddlewareException {
+    public void deleteEnumeration(int varId, Enumeration enumeration) throws MiddlewareQueryException, MiddlewareException {
+        requireLocalDatabaseInstance();
+        deleteCvTermRelationship(varId, TermId.HAS_VALUE.getId(), enumeration.getId());
+        deleteCvTerm(getCvTermDao().getById(enumeration.getId()));
+    }
+ 
+    public void deleteEnumerations(int varId, List<Enumeration> enumerations) throws MiddlewareQueryException, MiddlewareException {
         if (enumerations != null && enumerations.size() > 0) {
             for (Enumeration enumeration : enumerations) {
-                deleteCvTermRelationship(varId, TermId.HAS_VALUE.getId(), enumeration.getId());
+                deleteEnumeration(varId, enumeration);
             }
         }
     }
@@ -456,7 +483,7 @@ public class StandardVariableSaver extends Saver {
         }           
     }
     
-    public void deleteCVTerm(CVTerm cvTerm) throws MiddlewareQueryException {
+    public void deleteCvTerm(CVTerm cvTerm) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
         CVTermDao dao = getCvTermDao();
         try {

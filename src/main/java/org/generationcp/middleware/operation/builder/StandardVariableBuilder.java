@@ -87,8 +87,16 @@ public class StandardVariableBuilder extends Builder {
 	}
 
 	private void addRelatedTerms(StandardVariable standardVariable, CVTerm cvTerm) throws MiddlewareQueryException {
+	    
+	    
+        setWorkingDatabase(Database.LOCAL);
+        List<CVTermRelationship> cvTermRelationships  = getCvTermRelationshipDao().getBySubject(standardVariable.getId());
+        setWorkingDatabase(Database.CENTRAL);
+        cvTermRelationships.addAll(getCvTermRelationshipDao().getBySubject(standardVariable.getId()));
+	        
+	    
 		if (setWorkingDatabase(standardVariable.getId())) {
-			List<CVTermRelationship> cvTermRelationships  = getCvTermRelationshipDao().getBySubject(standardVariable.getId());
+
 			standardVariable.setProperty(createTerm(cvTermRelationships, TermId.HAS_PROPERTY));	
 			standardVariable.setMethod(createTerm(cvTermRelationships, TermId.HAS_METHOD));
 			standardVariable.setScale(createTerm(cvTermRelationships, TermId.HAS_SCALE));
@@ -96,7 +104,7 @@ public class StandardVariableBuilder extends Builder {
 			standardVariable.setStoredIn(createTerm(cvTermRelationships, TermId.STORED_IN));
 			standardVariable.setIsA(createTerm(cvTermRelationships, TermId.IS_A));
 			//add handling of null isA
-			if(standardVariable.getIsA()==null) {
+			if(standardVariable.getIsA() == null) {
 				//get isA of property
 				List<CVTermRelationship> propertyCvTermRelationships = 
 						getCvTermRelationshipDao().getBySubject(standardVariable.getProperty().getId());
@@ -110,6 +118,8 @@ public class StandardVariableBuilder extends Builder {
 	}
 
 	private void addEnumerations(StandardVariable standardVariable, List<CVTermRelationship> cvTermRelationships) throws MiddlewareQueryException {
+	    
+	    //TODO
 		if (hasEnumerations(cvTermRelationships)) {
 			List<Enumeration> enumerations = new ArrayList<Enumeration>();
 			for (CVTermRelationship cvTermRelationship : cvTermRelationships) {

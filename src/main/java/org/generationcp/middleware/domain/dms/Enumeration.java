@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
+import org.generationcp.middleware.util.Debug;
+
 /** 
  * Used to contain sortable list of values.
  */
@@ -51,9 +53,19 @@ public class Enumeration implements Comparable<Enumeration> {
 		return description;
 	}
 	
-	public String toString() {
-		return "[" + id + ":" + name + "]";
-	}
+	@Override
+    public String toString() {
+        return "[" + id + ":" + name + "]";
+    }
+
+    public void print(int indent) {
+        Debug.println(indent, "Enumeration: ");
+        indent += 3;
+        Debug.println(indent, "id: " + id);
+        Debug.println(indent, "name: " + name);
+        Debug.println(indent, "description " + description);
+        Debug.println(indent, "rank: " + rank);
+    }
 
 	@Override
 	public int compareTo(Enumeration other) {

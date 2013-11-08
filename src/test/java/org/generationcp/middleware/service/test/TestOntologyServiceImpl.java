@@ -212,25 +212,37 @@ public class TestOntologyServiceImpl {
     }
 
     @Test
-    public void testAddStandardVariableValidValue() throws MiddlewareQueryException, MiddlewareException {
-        //TODO
+    public void testAddGetDeleteStandardVariableValidValue() throws MiddlewareQueryException, MiddlewareException {
         int standardVariableId = 22550; // categorical variable
-        StandardVariable standardVariable = ontologyService.getStandardVariable(standardVariableId);
-        Enumeration validValue = new Enumeration(null, "8", "Majority of plants severely stunted", 8);
-        ontologyService.addStandardVariableValidValue(standardVariable, validValue);
-        assertNotNull(ontologyService.getStandardVariable(standardVariableId).getEnumeration("8", "Majority of plants severely stunted"));
+        String validValueLabel = "8";
+        String validValueDescription = "Majority of plants severely stunted";
         
-    }
-    
-    @Test
-    public void testDeleteStandardVariableValidValueConstraints() throws MiddlewareQueryException {
-        //TODO
-        int standardVariableId = 22550;
-        Enumeration validValue = ontologyService.getStandardVariable(2250).getEnumeration("8", "Majority of plants severely stunted");
-        if (validValue != null && validValue.getId() != null){
-            ontologyService.deleteStandardVariableValidValue(standardVariableId, validValue.getId());
-            assertNull(ontologyService.getStandardVariable(2250).getEnumeration("8", "Majority of plants severely stunted"));
-        }
+        StandardVariable standardVariable = ontologyService.getStandardVariable(standardVariableId);
+        Enumeration validValue = new Enumeration(null, validValueLabel, validValueDescription, 8);
+        
+        Debug.println(3, "BEFORE ADD: ");
+        standardVariable.print(6);
+
+        ontologyService.addStandardVariableValidValue(standardVariable, validValue);
+
+        Debug.println(3, "AFTER ADD: ");
+        standardVariable = ontologyService.getStandardVariable(standardVariableId);
+        standardVariable.print(6);
+        
+        // Assertion for successful add
+        assertNotNull(standardVariable.getEnumeration(validValueLabel,validValueDescription));
+        
+        // Test delete
+        validValue = standardVariable.getEnumeration(validValueLabel, validValueDescription);
+        assertTrue(validValue != null && validValue.getId() != null);
+        
+        ontologyService.deleteStandardVariableValidValue(standardVariableId, validValue.getId());
+        
+        Debug.println(3, "AFTER DELETE: ");
+        standardVariable = ontologyService.getStandardVariable(standardVariableId);
+        standardVariable.print(6);
+        assertNull(standardVariable.getEnumeration(validValueLabel, validValueDescription));
+        
     }
     
     @Test

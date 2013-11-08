@@ -150,6 +150,18 @@ public class StandardVariable {
 		return enumerations;
 	}
 	
+    public Enumeration getEnumeration(Integer id){
+        if (enumerations == null){
+            return null;
+        }
+        for (Enumeration enumeration : enumerations){
+            if (enumeration.getId().equals(id)){
+                return enumeration;
+            }
+        }
+        return null;
+    }
+    
     public Enumeration getEnumeration(String name, String description){
         if (enumerations == null){
             return null;
