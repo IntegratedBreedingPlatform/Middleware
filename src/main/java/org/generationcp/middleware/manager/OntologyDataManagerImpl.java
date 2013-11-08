@@ -74,6 +74,12 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
+        
+        
+        Term existingStdVar = findTermByName(stdVariable.getName(), CvId.VARIABLES);
+        if (existingStdVar != null){
+        	 throw new MiddlewareQueryException(String.format("Error in addStandardVariable, Variable with name \"%s\" already exists", stdVariable.getName()));
+        }
 
         try {
 
