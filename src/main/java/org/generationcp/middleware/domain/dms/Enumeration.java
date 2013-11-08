@@ -30,6 +30,10 @@ public class Enumeration implements Comparable<Enumeration> {
 		this.description = description;
 		this.rank = rank;
 	}
+	
+	public Enumeration() {
+	    
+	}
 
     public void setId(Integer id) {
         this.id = id;
