@@ -22,8 +22,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.PropertyReference;
@@ -56,7 +58,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     }
 
     public OntologyDataManagerImpl(Session sessionForLocal, Session sessionForCentral) {
-        super(sessionForLocal, sessionForCentral);
+        super(sessionForLocal, sessionForCentral);        
     }
 
     @Override
@@ -745,6 +747,61 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         }
     }
     
+    @Override
+    public void addOrUpdateStandardVariableConstraints(int standardVariableId, VariableConstraints constraints) 
+            throws MiddlewareException, MiddlewareQueryException{
+        if (standardVariableId >= 0){
+            throw new MiddlewareException("Error in addOrUpdateStandardVariableConstraints: " +
+            		"Cannot update the constraints of standard variables from Central database.");
+        }
+        requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+            getStandardVariableSaver().saveConstraints(standardVariableId, constraints);
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            throw new MiddlewareQueryException("Error in addOrUpdateStandardVariableConstraints: " + e.getMessage(), e);
+        }
+    }
+    
+    @Override
+    public void deleteStandardVariableLocalConstraints(int standardVariableId) 
+            throws MiddlewareQueryException{
+        
+        requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+            StandardVariable stdVar = getStandardVariable(standardVariableId);
+            
+            getStandardVariableSaver().deleteConstraints(stdVar);
+
+            trans.commit();
+            
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            throw new MiddlewareQueryException("Error in deleteStandardVariableLocalConstraints " + e.getMessage(), e);
+        }
+    }
+    
+    @Override
+    public Enumeration addStandardVariableEnumeration(StandardVariable variable, Enumeration enumeration) throws MiddlewareQueryException{
+        //TODO
+        return null;
+    }
+    
+    @Override
+    public void deleteStandardVariableEnumeration(int standardVariableId, int enumerationId) throws MiddlewareQueryException{
+        //TODO
+    }
+
+        
     @Override
     public void deleteTerm(int cvTermId, CvId cvId) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();

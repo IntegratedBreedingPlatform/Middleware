@@ -36,7 +36,7 @@ import org.generationcp.middleware.manager.Operation;
  * This is the API for Ontology Browser requirements.
  * 
  */
-public interface OntologyService {
+public interface OntologyService{
     
     /*======================= STANDARD VARIABLE ================================== */
 
@@ -169,9 +169,10 @@ public interface OntologyService {
      * @param constraint the constraint containing the min and max constraints
      * @return the variable constraints with the id set
      * @throws MiddlewareQueryException the middleware query exception
+     * @throws MiddlewareException 
      */
-    VariableConstraints addOrUpdateStandardVariableMinMaxConstraints(
-            int standardVariableId, VariableConstraints constraint) throws MiddlewareQueryException;
+    void addOrUpdateStandardVariableMinMaxConstraints(
+            int standardVariableId, VariableConstraints constraints) throws MiddlewareQueryException, MiddlewareException;
     
     /**
      * Deletes the given standard variable's min-max constraints.
@@ -599,5 +600,7 @@ public interface OntologyService {
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<Property> getAllPropertiesWithTraitClass() throws MiddlewareQueryException;
+    
+    
     
 }

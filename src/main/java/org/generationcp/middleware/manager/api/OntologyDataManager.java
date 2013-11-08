@@ -16,8 +16,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Term;
@@ -396,10 +398,14 @@ public interface OntologyDataManager {
     
     
     /**
-     * Gets the all standard variables based on the parameters with values. 
+     * Gets the all standard variables based on the parameters with values.
      * At least one parameter needs to have a value.
      * If a standard variable has no trait class, it is not included in the result.
      *
+     * @param traitClassId the trait class id
+     * @param propertyId the property id
+     * @param methodId the method id
+     * @param scaleId the scale id
      * @return the standard variables matching the given parameters
      * @throws MiddlewareQueryException the middleware query exception
      */
@@ -467,6 +473,45 @@ public interface OntologyDataManager {
     void saveOrUpdateStandardVariable(StandardVariable standardVariable, Operation operation) throws MiddlewareQueryException, MiddlewareException;
 
     /**
+     * Adds or updates standard variable constraints.
+     *
+     * @param standardVariableId the standard variable id
+     * @param constraint the constraint
+     * @return the variable constraints
+     * @throws MiddlewareQueryException the middleware query exception
+     * @throws MiddlewareException 
+     */
+    void addOrUpdateStandardVariableConstraints(int standardVariableId, VariableConstraints constraints) 
+            throws MiddlewareQueryException, MiddlewareException;
+
+    /**
+     * Deletes standard variable constraints.
+     *
+     * @param standardVariableId the standard variable id
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    void deleteStandardVariableLocalConstraints(int standardVariableId) throws MiddlewareQueryException;
+    
+    /**
+     * Adds standard variable enumeration.
+     *
+     * @param variable the variable
+     * @param validValue the valid value
+     * @return the enumeration
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Enumeration addStandardVariableEnumeration(StandardVariable variable, Enumeration enumeration) throws MiddlewareQueryException;
+    
+    /**
+     * Deletes standard variable enumeration.
+     *
+     * @param standardVariableId the standard variable id
+     * @param validValueId the valid value id
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    void deleteStandardVariableEnumeration(int standardVariableId, int validValueId) throws MiddlewareQueryException;
+
+    /**
      * Delete term.
      *
      * @param cvTermId the cv term id
@@ -497,7 +542,7 @@ public interface OntologyDataManager {
     /**
      * Delete standard variable.
      *
-     * @param standardVariable the standard variable
+     * @param stdVariableId the std variable id
      * @throws MiddlewareQueryException the middleware query exception
      */
     void deleteStandardVariable(int stdVariableId) throws MiddlewareQueryException;
