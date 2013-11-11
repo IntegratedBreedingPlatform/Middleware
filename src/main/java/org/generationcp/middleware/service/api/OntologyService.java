@@ -190,8 +190,10 @@ public interface OntologyService{
      * @param validValue the valid value to add
      * @return the enumeration containing the id of the new valid value
      * @throws MiddlewareQueryException the middleware query exception
+     * @throws MiddlewareException 
      */
-    Enumeration addStandardVariableValidValue(StandardVariable variable, Enumeration validValue) throws MiddlewareQueryException;
+    Enumeration addStandardVariableValidValue(StandardVariable variable, Enumeration validValue) 
+            throws MiddlewareQueryException, MiddlewareException;
     
     /**
      * Deletes the given valid value from a standard variable.

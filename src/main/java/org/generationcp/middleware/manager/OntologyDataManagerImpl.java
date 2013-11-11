@@ -688,10 +688,17 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         setWorkingDatabase(instance);
 
         List<PropertyReference> properties = getCvTermDao().getPropertiesOfTraitClass(traitClassId);
+        if (instance == Database.LOCAL) {
+            setWorkingDatabase(Database.CENTRAL);
+            properties.addAll(getCvTermDao().getPropertiesOfTraitClass(traitClassId));
+            setWorkingDatabase(Database.LOCAL);
+        }
+
         List<Integer> propertyIds = new ArrayList<Integer>();
         for (PropertyReference property : properties){
             propertyIds.add(property.getId());
         }
+        
         Map<Integer, List<StandardVariableReference>> propertyVars = getCvTermDao().getStandardVariablesOfProperties(propertyIds);
         
         for (Integer propId : propertyIds){
@@ -702,6 +709,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
                 }
             }
         }
+        
         return standardVariables;
 
     }
@@ -791,14 +799,48 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     }
     
     @Override
-    public Enumeration addStandardVariableEnumeration(StandardVariable variable, Enumeration enumeration) throws MiddlewareQueryException{
-        //TODO
-        return null;
+    public Enumeration addStandardVariableEnumeration(StandardVariable variable, Enumeration enumeration) 
+            throws MiddlewareQueryException, MiddlewareException{
+        
+        if (variable.getEnumeration(enumeration.getName(), enumeration.getDescription()) != null) {
+            throw new MiddlewareException(
+                    "Error in addStandardVariableEnumeration(). Enumeration with the same name and description exists.");
+        }
+
+        requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+            getStandardVariableSaver().saveEnumeration(variable, enumeration);
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            throw new MiddlewareQueryException("Error in addStandardVariableEnumeration: " + e.getMessage(), e);
+        }
+        
+        return enumeration;
     }
     
     @Override
     public void deleteStandardVariableEnumeration(int standardVariableId, int enumerationId) throws MiddlewareQueryException{
         //TODO
+        requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+            StandardVariable stdVar = getStandardVariable(standardVariableId);
+            getStandardVariableSaver().deleteEnumeration(standardVariableId, stdVar.getEnumeration(enumerationId));
+
+            trans.commit();
+            
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            throw new MiddlewareQueryException("Error in deleteStandardVariableEnumeration " + e.getMessage(), e);
+        }
     }
 
         

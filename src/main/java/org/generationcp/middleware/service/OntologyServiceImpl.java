@@ -127,7 +127,8 @@ public class OntologyServiceImpl extends Service implements OntologyService {
     }
 
     @Override
-    public Enumeration addStandardVariableValidValue(StandardVariable variable, Enumeration validValue) throws MiddlewareQueryException{
+    public Enumeration addStandardVariableValidValue(StandardVariable variable, Enumeration validValue) 
+            throws MiddlewareQueryException, MiddlewareException{
         return getOntologyDataManager().addStandardVariableEnumeration(variable, validValue);
     }
     

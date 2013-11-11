@@ -150,17 +150,54 @@ public class StandardVariable {
 		return enumerations;
 	}
 	
-	public Enumeration getEnumeration(String name, String description){
-	    if (enumerations == null){
-	        return null;
-	    }
-	    for (Enumeration enumeration : enumerations){
-	        if (enumeration.getName().equalsIgnoreCase(name) && enumeration.getDescription().equalsIgnoreCase(description)){
-	            return enumeration;
-	        }
-	    }
-	    return null;
-	}
+    public Enumeration getEnumeration(Integer id){
+        if (enumerations == null){
+            return null;
+        }
+        for (Enumeration enumeration : enumerations){
+            if (enumeration.getId().equals(id)){
+                return enumeration;
+            }
+        }
+        return null;
+    }
+    
+    public Enumeration getEnumeration(String name, String description){
+        if (enumerations == null){
+            return null;
+        }
+        for (Enumeration enumeration : enumerations){
+            if (enumeration.getName().equalsIgnoreCase(name) && enumeration.getDescription().equalsIgnoreCase(description)){
+                return enumeration;
+            }
+        }
+        return null;
+    }
+    
+    public Enumeration getEnumerationByName(String name){
+        if (enumerations == null){
+            return null;
+        }
+        for (Enumeration enumeration : enumerations){
+            if (enumeration.getName().equalsIgnoreCase(name) ){
+                return enumeration;
+            }
+        }
+        return null;
+    }
+    
+    public Enumeration getEnumerationByDescription(String description){
+        if (enumerations == null){
+            return null;
+        }
+        for (Enumeration enumeration : enumerations){
+            if (enumeration.getDescription().equalsIgnoreCase(description)){
+                return enumeration;
+            }
+        }
+        return null;
+    }
+
 
 	public void setEnumerations(List<Enumeration> enumerations) {
 		this.enumerations = enumerations;

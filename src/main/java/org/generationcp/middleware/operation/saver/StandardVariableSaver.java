@@ -28,6 +28,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.ErrorCode;
+import org.generationcp.middleware.pojos.oms.CV;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
@@ -65,7 +66,7 @@ public class StandardVariableSaver extends Saver {
                 deleteConstraint(stdVar.getId(), TermId.MAX_VALUE.getId(), stdVar.getConstraints().getMaxValue());
             }
 	    
-	    deleteCVTerm(getCvTermDao().getById(stdVar.getId()));
+	    deleteCvTerm(getCvTermDao().getById(stdVar.getId()));
 	}
 
 	public void deleteConstraints(StandardVariable stdVar) throws MiddlewareQueryException{
@@ -132,7 +133,52 @@ public class StandardVariableSaver extends Saver {
         
 	}
 	
+    public void saveEnumeration(StandardVariable variable, Enumeration enumeration) 
+            throws MiddlewareException, MiddlewareQueryException{
+
+        requireLocalDatabaseInstance();
+        
+        validateInputEnumeration(variable, enumeration);
+        
+        // Check if cv entry of enumeration already exists
+        // Add cv entry of the standard variable if none found
+        Integer cvId = getCvDao().getIdByName(String.valueOf(variable.getId()));
+        if (cvId == null){
+            cvId = createCv(variable).getCvId();
+        }
+        
+        //Save cvterm entry of the new valid value
+        CVTerm cvTerm = createCvTerm(enumeration, cvId);
+        enumeration.setId(cvTerm.getCvTermId());
+        
+        // save cvterm relationship
+        saveCvTermRelationship(variable.getId(), TermId.HAS_VALUE.getId(), enumeration.getId());
+        
+    }
 	
+    private void validateInputEnumeration(StandardVariable variable, Enumeration enumeration) throws MiddlewareException{
+        String name = enumeration.getName();
+        String definition = enumeration.getDescription();
+        StringBuffer errorMessage = new StringBuffer("");
+        if (name == null || name.equals("")) {
+            errorMessage.append("\nname is null or empty");
+        }
+        if (variable.getEnumerationByName(name) != null){
+            errorMessage.append("\nthe value with name = " + name + " already exists.");
+        }
+        if (definition == null || definition.equals("")) {
+            errorMessage.append("\ndefinition is null or empty");
+        }
+        if (variable.getEnumerationByDescription(definition) != null){
+            errorMessage.append("\nthe value with definition = " + definition + " already exists.");
+        }
+            
+        if (!errorMessage.toString().equals("")){
+            throw new MiddlewareException(errorMessage.toString());
+        } 
+
+    }
+    
 	private CVTerm createCvTerm(StandardVariable stdVar) throws MiddlewareQueryException {
 		CVTerm cvTerm = new CVTerm();
 		
@@ -146,6 +192,28 @@ public class StandardVariableSaver extends Saver {
 		getCvTermDao().save(cvTerm);
 		return cvTerm;
 	}
+	
+    private CVTerm createCvTerm(Enumeration enumeration, Integer cvId) throws MiddlewareQueryException {
+        CVTerm cvTerm = new CVTerm();
+        cvTerm.setCvTermId(getCvTermDao().getNegativeId("cvTermId"));
+        cvTerm.setCv(cvId);
+        cvTerm.setName(enumeration.getName());
+        cvTerm.setDefinition(enumeration.getDescription());
+        cvTerm.setIsObsolete(false);
+        cvTerm.setIsRelationshipType(false);
+        getCvTermDao().save(cvTerm);
+        return cvTerm;
+    }
+
+    private CV createCv(StandardVariable variable) throws MiddlewareQueryException{
+        CV cv = new CV();
+        cv.setCvId(getCvTermDao().getNegativeId("cvId"));
+        cv.setName(String.valueOf(variable.getId()));
+        cv.setDefinition(String.valueOf(variable.getName() + " - " + variable.getDescription()));
+        getCvDao().save(cv);
+        return cv;
+
+    }
 	
 	private void saveRelationship(int subjectId, int typeId, Term object) throws MiddlewareQueryException {
 		if (object != null) {
@@ -190,7 +258,7 @@ public class StandardVariableSaver extends Saver {
             property.setValue(constraintValue.toString());
             property.setRank(0);
             property.setCvTermId(cvTermId);
-            getCvTermPropertyDao().update(property);
+            getCvTermPropertyDao().merge(property);
         }     
     }
     
@@ -334,10 +402,16 @@ public class StandardVariableSaver extends Saver {
         }
     }
     
-    private void deleteEnumerations(int varId, List<Enumeration> enumerations) throws MiddlewareQueryException, MiddlewareException {
+    public void deleteEnumeration(int varId, Enumeration enumeration) throws MiddlewareQueryException, MiddlewareException {
+        requireLocalDatabaseInstance();
+        deleteCvTermRelationship(varId, TermId.HAS_VALUE.getId(), enumeration.getId());
+        deleteCvTerm(getCvTermDao().getById(enumeration.getId()));
+    }
+ 
+    public void deleteEnumerations(int varId, List<Enumeration> enumerations) throws MiddlewareQueryException, MiddlewareException {
         if (enumerations != null && enumerations.size() > 0) {
             for (Enumeration enumeration : enumerations) {
-                deleteCvTermRelationship(varId, TermId.HAS_VALUE.getId(), enumeration.getId());
+                deleteEnumeration(varId, enumeration);
             }
         }
     }
@@ -409,7 +483,7 @@ public class StandardVariableSaver extends Saver {
         }           
     }
     
-    public void deleteCVTerm(CVTerm cvTerm) throws MiddlewareQueryException {
+    public void deleteCvTerm(CVTerm cvTerm) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
         CVTermDao dao = getCvTermDao();
         try {

@@ -499,8 +499,10 @@ public interface OntologyDataManager {
      * @param validValue the valid value
      * @return the enumeration
      * @throws MiddlewareQueryException the middleware query exception
+     * @throws MiddlewareException 
      */
-    Enumeration addStandardVariableEnumeration(StandardVariable variable, Enumeration enumeration) throws MiddlewareQueryException;
+    Enumeration addStandardVariableEnumeration(StandardVariable variable, Enumeration enumeration) 
+            throws MiddlewareQueryException, MiddlewareException;
     
     /**
      * Deletes standard variable enumeration.
