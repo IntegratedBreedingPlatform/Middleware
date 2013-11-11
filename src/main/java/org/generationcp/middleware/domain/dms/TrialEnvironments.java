@@ -63,6 +63,14 @@ public class TrialEnvironments {
 
 			@Override
 			public int compare(Variable o1, Variable o2) {
+				if (o1.getValue() == null ^ o2.getValue() == null) {
+			        return (o1 == null) ? -1 : 1;
+			    }
+
+			    if (o1.getValue() == null && o2.getValue() == null) {
+			        return 0;
+			    }
+			    
 				return o1.getValue().compareTo(o2.getValue());
 			}
 		}
