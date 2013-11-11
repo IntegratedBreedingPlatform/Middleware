@@ -149,6 +149,27 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
         return new ArrayList<Method>();
     }
     
+    @SuppressWarnings("unchecked")
+    public List<Method> getByGroupAndTypeAndName(String group,String type, String name) throws MiddlewareQueryException {
+        try {
+           
+            Criteria criteria = getSession().createCriteria(Method.class);
+            Criterion group1=Restrictions.eq("mgrp", group);
+            Criterion group2=Restrictions.eq("mgrp", "G");
+            LogicalExpression orExp=Restrictions.or(group1, group2);
+            criteria.add(Restrictions.eq("mtype", type));
+            criteria.add(Restrictions.eq("mname", name));
+            criteria.add(orExp);
+            criteria.addOrder(Order.asc("mname"));
+            return criteria.list();
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getMethodsByGroupAndType(group=" + group + " and "+type+") query from Method: " + e.getMessage(), e);
+        }
+        return new ArrayList<Method>();
+    }
+    
+    
+    
     public long countByGroup(String group) throws MiddlewareQueryException {
         try {
             Criteria criteria = getSession().createCriteria(Method.class);

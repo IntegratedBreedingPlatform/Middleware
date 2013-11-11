@@ -563,6 +563,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         return (List<Method>) super.getAllFromCentralAndLocalByMethod(getMethodDao(), "getByGroupAndType", new Object[] { group, type },
                 new Class[] { String.class, String.class });
     }
+    
+    @Override
+    public List<Method> getMethodsByGroupAndTypeAndName(String group, String type, String name) throws MiddlewareQueryException {
+        return (List<Method>) super.getAllFromCentralAndLocalByMethod(getMethodDao(), "getByGroupAndTypeAndName", new Object[] { group, type, name },
+                new Class[] { String.class, String.class, String.class });
+    }
 
     @Override
     public long countMethodsByGroup(String group) throws MiddlewareQueryException {
