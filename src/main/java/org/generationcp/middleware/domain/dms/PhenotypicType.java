@@ -67,18 +67,25 @@ public enum PhenotypicType {
     
     public static PhenotypicType getPhenotypicTypeForLabel(String label){
     	
+    	return getPhenotypicTypeForLabel(label,false);
+    }
+    
+    public static PhenotypicType getPhenotypicTypeForLabel(String label, boolean isVariate){
+    	
     	if (label != null){    		
     		for (PhenotypicType type : PhenotypicType.values()){
     			List<String> labelList = type.getLabelList();
     			for (String factorLabel : labelList){
     				if (factorLabel.toUpperCase().equals(label.toUpperCase())){
-    					return type;
+    					if(type!=PhenotypicType.VARIATE || (type==PhenotypicType.VARIATE && isVariate)) {//done since both TRIAL ENVIRONMENT and VARIABLE uses TRIAL as label
+    						return type;
+    					} 
     				}
     			}
     		}
     	}
     	    	
-    	return null;
+    	return PhenotypicType.VARIATE;//default
     }
     
     public static PhenotypicType getPhenotypicTypeById(Integer termId) {
