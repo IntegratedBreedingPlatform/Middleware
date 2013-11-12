@@ -103,7 +103,7 @@ public class TestOntologyServiceImpl {
 
     @Test
     public void testGetStandardVariables() throws MiddlewareQueryException {
-        List<StandardVariable> vars = ontologyService.getStandardVariables("USER_NAME");
+        List<StandardVariable> vars = ontologyService.getStandardVariables("CUAN_75DAG");
         assertFalse(vars.isEmpty());
         for (StandardVariable var : vars){
             var.print(3);
@@ -173,7 +173,7 @@ public class TestOntologyServiceImpl {
     @Test
     public void testAddOrUpdateStandardVariableMinMaxConstraintsInCentral() throws Exception {
         int standardVariableId = 8270; // numeric variable
-        VariableConstraints constraints = new VariableConstraints(-100, 100);
+        VariableConstraints constraints = new VariableConstraints(-100.0, 100.0);
         try{
             ontologyService.addOrUpdateStandardVariableMinMaxConstraints(
                 standardVariableId, constraints);
@@ -187,7 +187,7 @@ public class TestOntologyServiceImpl {
     public void testAddOrUpdateStandardVariableMinMaxConstraintsInLocal() throws Exception {
         StandardVariable variable = createNewStandardVariable(NUMERIC_VARIABLE);
         int standardVariableId = variable.getId(); 
-        VariableConstraints constraints = new VariableConstraints(-100, 100);
+        VariableConstraints constraints = new VariableConstraints(-100.0, 100.0);
         ontologyService.addOrUpdateStandardVariableMinMaxConstraints(
                 standardVariableId, constraints);
         constraints.print(3);
@@ -611,7 +611,7 @@ public class TestOntologyServiceImpl {
             switch (dataType){
                 case NUMERIC_VARIABLE:  
                     stdVariable.setDataType(new Term(1110, "Numeric variable", "Variable with numeric values either continuous or integer"));
-                    stdVariable.setConstraints(new VariableConstraints(100, 999));
+                    stdVariable.setConstraints(new VariableConstraints(100.0, 999.0));
                     break;
                 case CHARACTER_VARIABLE: 
                         stdVariable.setDataType(new Term(1120, "Character variable", "variable with char values"));
