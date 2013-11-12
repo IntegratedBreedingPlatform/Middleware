@@ -158,7 +158,10 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
             Criterion group2=Restrictions.eq("mgrp", "G");
             LogicalExpression orExp=Restrictions.or(group1, group2);
             criteria.add(Restrictions.eq("mtype", type));
-            criteria.add(Restrictions.eq("mname", name));
+
+            if (name != null && !name.isEmpty())
+                criteria.add(Restrictions.like("mname","%" + name.trim() + "%"));
+
             criteria.add(orExp);
             criteria.addOrder(Order.asc("mname"));
             return criteria.list();
