@@ -15,6 +15,7 @@ package org.generationcp.middleware.service.api;
 import java.util.List;
 
 import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
 /**
@@ -39,5 +40,22 @@ public interface FieldbookService {
      * @throws MiddlewareQueryException
      */
     List<StudyDetails> getAllLocalTrialStudyDetails() throws MiddlewareQueryException;
+    
+    /**
+     * Gets the field map info (entries, reps, plots and counts) of the given trial. 
+     * 
+     * @param trialId the id of the trial to retrieve the count from
+     * @return the FieldMapCount object containing the counts
+     */
+    FieldMapInfo getLocalFieldMapInfoOfTrial(int trialId) throws MiddlewareQueryException;
+    
+    /**
+     * Gets the field map info (entries, reps, plots and counts) of the given nursery. 
+     * 
+     * @param nurseryId the id of the nursery to retrieve the count from
+     * @return the FieldMapCount object containing the counts
+     */
+    FieldMapInfo getLocalFieldMapInfoOfNursery(int nurseryId) throws MiddlewareQueryException;
+    
 
 }

@@ -43,12 +43,14 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.GidStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.ParentFolderStudyQueryFilter;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
@@ -1038,4 +1040,20 @@ public class TestStudyDataManagerImpl {
 		assertFalse(isExisting);
 	}
 	
+    @Test
+    public void testGetFieldMapCountsOfTrial() throws MiddlewareQueryException{
+        int trialId = -147; 
+        FieldMapInfo fieldMapCount = manager.getFieldMapInfoOfStudy(trialId, StudyType.T, Database.LOCAL);
+        fieldMapCount.print(3);
+        assertTrue(fieldMapCount.getEntryCount() > 0);      
+    }
+    
+    @Test
+    public void testGetFieldMapCountsOfNursery() throws MiddlewareQueryException{
+        int nurseryId = -138;
+        FieldMapInfo fieldMapCount = manager.getFieldMapInfoOfStudy(nurseryId, StudyType.N, Database.LOCAL);
+        fieldMapCount.print(3);
+        assertTrue(fieldMapCount.getEntryCount() > 0);      
+    }
+    
 }

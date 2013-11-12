@@ -12,9 +12,12 @@
 package org.generationcp.middleware.service.test;
 
 
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 
 import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.service.ServiceFactory;
@@ -81,6 +84,23 @@ public class TestFieldbookServiceImpl {
         Debug.println(3, "NUMBER OF RECORDS: " + studyDetails.size());
 
     }
+    
+    @Test
+    public void testGetFieldMapCountsOfTrial() throws MiddlewareQueryException{
+        int trialId = -147; 
+        FieldMapInfo fieldMapCount = fieldbookService.getLocalFieldMapInfoOfTrial(trialId);
+        fieldMapCount.print(3);
+        assertTrue(fieldMapCount.getEntryCount() > 0);      
+    }
+    
+    @Test
+    public void testGetFieldMapCountsOfNursery() throws MiddlewareQueryException{
+        int nurseryId = -138; 
+        FieldMapInfo fieldMapCount = fieldbookService.getLocalFieldMapInfoOfNursery(nurseryId);
+        fieldMapCount.print(3);
+        assertTrue(fieldMapCount.getEntryCount() > 0);      
+    }
+
 
 
     @After

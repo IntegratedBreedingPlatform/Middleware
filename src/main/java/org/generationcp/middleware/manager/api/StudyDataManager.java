@@ -32,6 +32,7 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
@@ -353,4 +354,15 @@ public interface StudyDataManager {
      * @throws MiddlewareQueryException
      */
     long countExperimentsByVariable(int variableId, int storedInId) throws MiddlewareQueryException;
+
+    /**
+     * Gets the field map information (entries, reps, plots and count) of the given study id and study type. 
+     * 
+     * @param studyId the id of the study to retrieve the count from
+     * @param studyType Can be either StudyType.T (Trial) or StudyType.N (Nursery)
+     * @param instance The database instance to connect to
+     * @return the FieldMapCount object containing the counts
+     */
+    FieldMapInfo getFieldMapInfoOfStudy(int studyId, StudyType studyType, Database instance) throws MiddlewareQueryException;
+    
 }

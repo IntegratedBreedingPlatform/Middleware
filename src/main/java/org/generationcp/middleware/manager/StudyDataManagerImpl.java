@@ -14,6 +14,7 @@ package org.generationcp.middleware.manager;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -32,6 +33,7 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search.StudyResultSet;
@@ -46,6 +48,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.util.PlotUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -426,6 +429,37 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             count += getExperimentDao().countByObservedVariable(variableId, storedInId);
         }
         return count;
+    }
+    
+    @Override
+    public FieldMapInfo getFieldMapInfoOfStudy(int studyId, StudyType studyType, Database instance) throws MiddlewareQueryException{
+        FieldMapInfo fieldMapInfo = new FieldMapInfo();
+        setWorkingDatabase(instance);
+        
+        fieldMapInfo.setFieldbookId(studyId);
+        fieldMapInfo.setFieldbookName(getDmsProjectDao().getById(studyId).getName());
+        
+        // Set Entry Numbers and Germplasm Names
+        List<StockModel> stocks = getStockDao().getStocks(studyId);
+        List<String> entryNumbers = new ArrayList<String>();
+        List<String> germplasmNames = new ArrayList<String>();
+        
+        for (StockModel stock : stocks){
+            entryNumbers.add(stock.getUniqueName());
+            germplasmNames.add(stock.getName());
+        }
+
+        fieldMapInfo.setEntryNumbers(entryNumbers);
+        fieldMapInfo.setGermplasmNames(germplasmNames);
+        
+        // Set Reps
+        ExperimentPropertyDao experimentPropertyDao = getExperimentPropertyDao();
+        fieldMapInfo.setReps(experimentPropertyDao.getRepsOfProject(studyId));
+        
+        // Set Plot Count
+        fieldMapInfo.setPlotCount(experimentPropertyDao.getPlotCount(studyId));
+        
+        return fieldMapInfo;
     }
 
 }

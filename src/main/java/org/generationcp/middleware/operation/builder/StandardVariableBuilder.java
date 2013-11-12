@@ -106,9 +106,11 @@ public class StandardVariableBuilder extends Builder {
 			//add handling of null isA
 			if(standardVariable.getIsA() == null) {
 				//get isA of property
-				List<CVTermRelationship> propertyCvTermRelationships = 
-						getCvTermRelationshipDao().getBySubject(standardVariable.getProperty().getId());
-				standardVariable.setIsA(createTerm(propertyCvTermRelationships, TermId.IS_A));
+			    if (standardVariable.getProperty() != null){
+    				List<CVTermRelationship> propertyCvTermRelationships = 
+    						getCvTermRelationshipDao().getBySubject(standardVariable.getProperty().getId());
+    				standardVariable.setIsA(createTerm(propertyCvTermRelationships, TermId.IS_A));
+			    }
 			}
 			if (standardVariable.getStoredIn() != null){
 			    standardVariable.setPhenotypicType(createPhenotypicType(standardVariable.getStoredIn().getId()));

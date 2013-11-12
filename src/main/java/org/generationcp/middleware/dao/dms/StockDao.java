@@ -151,4 +151,57 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
    		}
    		return 0;
    	}
+   	
+   	@SuppressWarnings("unchecked")
+    public List<StockModel> getStocks(int projectId) throws MiddlewareQueryException{
+   	    List<StockModel> stocks = new ArrayList<StockModel>();
+   	    
+        try {
+            /*
+                SELECT DISTINCT s.*
+                FROM nd_experiment_project eproj 
+                    INNER JOIN nd_experiment_stock es ON eproj.nd_experiment_id = es.nd_experiment_id 
+                           AND eproj.project_id = @project_id
+                    INNER JOIN stock s ON es.stock_id = s.stock_id
+             */
+            
+            StringBuilder sql = new StringBuilder()
+                    .append("SELECT DISTINCT s.* ")
+                    .append("FROM nd_experiment_project eproj  ")
+                    .append("   INNER JOIN nd_experiment_stock es ON eproj.nd_experiment_id = es.nd_experiment_id ")
+                    .append("       AND eproj.project_id = :projectId ")
+                    .append("   INNER JOIN stock s ON es.stock_id = s.stock_id ")
+                    ;
+            
+            Query query = getSession().createSQLQuery(sql.toString());
+            query.setParameter("projectId", projectId);
+            
+            List<Object[]> list =  query.list();
+            
+            if (list != null && list.size() > 0) {
+                for (Object[] row : list){
+                    Integer id = (Integer) row[0];
+                    Integer dbxrefId = (Integer) row[1];
+                    Integer organismId = (Integer) row[2];
+                    String name = (String) row[3]; 
+                    String uniqueName = (String) row[4];
+                    String value = (String) row[5];
+                    String description = (String) row[6];
+                    Integer typeId = (Integer) row[7];
+                    Boolean isObsolete = (Boolean) row[8];
+                    
+                    stocks.add(new StockModel(id, dbxrefId, organismId, name, 
+                            uniqueName, value, description, typeId, isObsolete));
+                }
+            }
+
+            return stocks;
+            
+        } catch(HibernateException e) {
+            logAndThrowException("Error at getStocks(projectId=" + projectId + ") at StockDao: " + e.getMessage(), e);
+        }
+   	    
+   	    return stocks;
+   	}
+
 }

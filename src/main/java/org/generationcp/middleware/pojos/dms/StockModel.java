@@ -95,6 +95,23 @@ public class StockModel implements Serializable {
 	
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy="stockModel")
 	private Set<StockProperty> properties;
+	
+	public StockModel(){
+	}
+	
+    public StockModel(Integer stockId, Integer dbxrefId, Integer organismId, String name, String uniqueName,
+            String value, String description, Integer typeId, Boolean isObsolete) {
+        super();
+        this.stockId = stockId;
+        this.dbxrefId = dbxrefId;
+        this.organismId = organismId;
+        this.name = name;
+        this.uniqueName = uniqueName;
+        this.value = value;
+        this.description = description;
+        this.typeId = typeId;
+        this.isObsolete = isObsolete;
+    }
 
 	public Integer getStockId() {
 		return stockId;

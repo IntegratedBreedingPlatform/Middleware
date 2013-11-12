@@ -14,6 +14,7 @@ package org.generationcp.middleware.service;
 import java.util.List;
 
 import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -36,6 +37,18 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     @Override 
     public List<StudyDetails> getAllLocalTrialStudyDetails() throws MiddlewareQueryException{
         return getStudyDataManager().getAllStudyDetails(Database.LOCAL, StudyType.T);
+    }
+
+    @Override
+    public FieldMapInfo getLocalFieldMapInfoOfTrial(int trialId) throws MiddlewareQueryException{
+        //TODO
+        return getStudyDataManager().getFieldMapInfoOfStudy(trialId, StudyType.T, Database.LOCAL);
+    }
+    
+    @Override 
+    public FieldMapInfo getLocalFieldMapInfoOfNursery(int nurseryId) throws MiddlewareQueryException{
+        //TODO
+        return getStudyDataManager().getFieldMapInfoOfStudy(nurseryId, StudyType.N, Database.LOCAL);
     }
 
 

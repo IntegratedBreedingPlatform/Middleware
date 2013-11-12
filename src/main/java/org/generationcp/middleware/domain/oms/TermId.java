@@ -105,6 +105,11 @@ public enum TermId {
     , ENTRY_GID_STORAGE(1042)
     , ENTRY_DESIGNATION_STORAGE(1046)
     , ENTRY_CODE_STORAGE(1047)
+    
+    // Stock Plot / Fieldmap 
+    , PLOT_NO (8200)
+    , PLOT_NNO (8380)
+    , REP_NO (8210)
 	
     // Experiment storage
     , TRIAL_DESIGN_INFO_STORAGE(1030)

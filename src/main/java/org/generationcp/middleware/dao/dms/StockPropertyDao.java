@@ -43,4 +43,5 @@ public class StockPropertyDao extends GenericDAO<StockProperty, Integer> {
 		}
 		return new ArrayList<Integer>();
 	}
+
 }
