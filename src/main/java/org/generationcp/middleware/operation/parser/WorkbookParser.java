@@ -56,7 +56,6 @@ public class WorkbookParser {
     public static final int STUDY_DETAILS_VALUE_COLUMN_INDEX = 1;
 
     private int currentRow;
-    private long locationId;
     private List<Message> errorMessages;
 
     //GCP-5815
@@ -66,6 +65,7 @@ public class WorkbookParser {
     private final static String[] EXPECTED_CONSTANT_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE", "SAMPLE LEVEL"};
     private final static String[] EXPECTED_FACTOR_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "NESTED IN", "LABEL"};
 
+    private static final int DEFAULT_GEOLOCATION_ID = 1;
     /**
      * Added handling for parsing the file if its xls or xlsx
      * @param file
@@ -101,7 +101,6 @@ public class WorkbookParser {
         Workbook wb;
 
         currentRow = 0;
-        locationId = 0;
         errorMessages = new LinkedList<Message>();
 
         try {
@@ -325,14 +324,7 @@ public class WorkbookParser {
 
                 measurementVariables.add(var);
 
-                //set locationId
-                if (name.equals("CONDITION") && getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 0).toUpperCase().equals("TRIAL")) {
-                    if (!StringUtils.isEmpty(getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 6))) {
-                        locationId = Long.parseLong(getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 6));
-                    }
-                }
-
-	        	/* for debugging purposes
+                /* for debugging purposes
                 LOG.debug("");
 	            LOG.debug(""+name+":"+getCellStringValue(wb,currentSheet,currentRow,0));
 	            LOG.debug("Description:"+getCellStringValue(wb,currentSheet,currentRow,1));
@@ -399,7 +391,7 @@ public class WorkbookParser {
                     measurementData.add(new MeasurementData(measurementDataLabel.get(col), getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col)));
                 }
 
-                observations.add(new MeasurementRow(stockId, locationId, measurementData));
+                observations.add(new MeasurementRow(stockId, DEFAULT_GEOLOCATION_ID, measurementData));//note that the locationid will be replaced inside
                 currentRow++;
             }
 

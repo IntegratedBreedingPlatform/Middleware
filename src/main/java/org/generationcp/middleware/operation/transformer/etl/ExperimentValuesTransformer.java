@@ -18,11 +18,11 @@ public class ExperimentValuesTransformer extends Transformer {
 	}
 	
 
-	public ExperimentValues transform(MeasurementRow mRow, VariableTypeList varTypeList) throws MiddlewareQueryException {
+	public ExperimentValues transform(MeasurementRow mRow, VariableTypeList varTypeList,List<String> trialHeaders) throws MiddlewareQueryException {
 		ExperimentValues experimentValues = new ExperimentValues();
 		
-		if (mRow != null && mRow.getDataList() != null && varTypeList != null && varTypeList.getVariableTypes() != null) {
-			if (mRow.getDataList().size() == varTypeList.getVariableTypes().size()) {
+		if (mRow != null && mRow.getNonTrialDataList(trialHeaders) != null && varTypeList != null && varTypeList.getVariableTypes() != null) {
+			if (mRow.getNonTrialDataList(trialHeaders).size() == varTypeList.getVariableTypes().size()) {
 				Integer locationId = Integer.parseInt(String.valueOf(mRow.getLocationId()));
 				Integer germplasmId = Integer.parseInt(String.valueOf(mRow.getStockId()));
 				VariableList variableList = new VariableList() ;

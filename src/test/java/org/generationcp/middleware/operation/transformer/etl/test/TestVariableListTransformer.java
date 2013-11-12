@@ -58,13 +58,13 @@ public class TestVariableListTransformer {
 		Debug.println(0, "testTransformStock");
 		VariableTypeList variableTypeList = createVariableTypeListTestData();
 		MeasurementRow measurementRow = createMeasurementRowTestData(variableTypeList);
-		
+		List<String> trialHeaders = getTrialHeaders(variableTypeList);
 		Debug.println(0, "Input MeasurmentRow");
 		measurementRow.print(1);
 		Debug.println(0, "Input VariableTypeList");
 		variableTypeList.print(1);
 		
-		VariableList stocks = transformer.transformStock(measurementRow, variableTypeList);
+		VariableList stocks = transformer.transformStock(measurementRow, variableTypeList, trialHeaders);
 		
 		Assert.assertNotNull(stocks);
 		VariableList result = getStockResult(variableTypeList);
@@ -81,16 +81,16 @@ public class TestVariableListTransformer {
 	
 	@Test
 	public void transformTrialEnvironment() throws Exception {
-		Debug.println(0, "testTransformStock");
+		Debug.println(0, "transformTrialEnvironment");
 		VariableTypeList variableTypeList = createVariableTypeListTestData();
 		MeasurementRow measurementRow = createMeasurementRowTestData(variableTypeList);
-		
+		List<String> trialHeaders = getTrialHeaders(variableTypeList);
 		Debug.println(0, "Input MeasurmentRow");
 		measurementRow.print(1);
 		Debug.println(0, "Input VariableTypeList");
 		variableTypeList.print(1);
 		
-		VariableList stocks = transformer.transformTrialEnvironment(measurementRow, variableTypeList);
+		VariableList stocks = transformer.transformTrialEnvironment(measurementRow, variableTypeList, trialHeaders);
 		
 		Assert.assertNotNull(stocks);
 		VariableList result = getStockResult2(variableTypeList);
@@ -192,6 +192,18 @@ public class TestVariableListTransformer {
 		list.add(new VariableType("VARIATE2", "VARIATE 2", createVariable(null), 10));
 		
 		return list;
+	}
+	
+	public List<String> getTrialHeaders(VariableTypeList list) {
+		List<String> trialHeaders = new ArrayList<String>();
+		if (list != null && list.size() > 0) {
+			for (VariableType var : list.getVariableTypes()) {
+				if (PhenotypicType.TRIAL_ENVIRONMENT.equals(var.getStandardVariable().getPhenotypicType())) {
+					trialHeaders.add(var.getLocalName());
+				}
+			}
+		}
+		return trialHeaders;
 	}
 	
 	private VariableList getStockResult(VariableTypeList varTypeList) {

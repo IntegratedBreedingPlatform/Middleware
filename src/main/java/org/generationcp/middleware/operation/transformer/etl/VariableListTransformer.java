@@ -8,6 +8,7 @@ import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
@@ -22,15 +23,15 @@ public class VariableListTransformer extends Transformer {
 				super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 	
-	public VariableList transformStock(MeasurementRow mRow, VariableTypeList variableTypeList) throws MiddlewareQueryException {
+	public VariableList transformStock(MeasurementRow mRow, VariableTypeList variableTypeList, List<String> trialHeaders) throws MiddlewareQueryException {
 		VariableList variableList = new VariableList();
 
-		if (mRow != null && mRow.getDataList() != null && variableTypeList != null && variableTypeList.getVariableTypes() != null) {
-			if (mRow.getDataList().size() == variableTypeList.getVariableTypes().size()) {
+		if (mRow != null && mRow.getNonTrialDataList(trialHeaders) != null && variableTypeList != null && variableTypeList.getVariableTypes() != null) {
+			if (mRow.getNonTrialDataList(trialHeaders).size() == variableTypeList.getVariableTypes().size()) {
 				int i = 0;
 				for (VariableType variableType : variableTypeList.getVariableTypes()) {
 					if (variableType.getStandardVariable().getPhenotypicType() == PhenotypicType.GERMPLASM) {
-						variableList.add(new Variable(variableType, mRow.getDataList().get(i).getValue()));
+						variableList.add(new Variable(variableType, mRow.getNonTrialDataList(trialHeaders).get(i).getValue()));
 					}
 					i++;
 				}
@@ -43,16 +44,17 @@ public class VariableListTransformer extends Transformer {
 		return variableList;
 	}
 	
-	public VariableList transformTrialEnvironment(MeasurementRow mRow, VariableTypeList variableTypeList) throws MiddlewareQueryException {
+	public VariableList transformTrialEnvironment(MeasurementRow mRow, VariableTypeList variableTypeList, List<String> trialHeaders) throws MiddlewareQueryException {
 		VariableList variableList = new VariableList() ;
 		
-		if (mRow != null && mRow.getDataList() != null && variableTypeList != null && variableTypeList.getVariableTypes() != null) {
-			if (mRow.getDataList().size() == variableTypeList.getVariableTypes().size()) {
+		if (mRow != null && mRow.getTrialDataList(trialHeaders) != null && variableTypeList != null && variableTypeList.getVariableTypes() != null) {
+			List<MeasurementData> trialMD = mRow.getTrialDataList(trialHeaders);
+			if (trialMD.size() == variableTypeList.getVariableTypes().size()) {
 				List<VariableType> varTypes = variableTypeList.getVariableTypes();
 				
 				for(int i = 0, l = varTypes.size(); i < l; i++ ){
 					VariableType varType = varTypes.get(i);
-					String value = mRow.getDataList().get(i).getValue();
+					String value = trialMD.get(i).getValue();
 										
 					if (varType.getStandardVariable().getPhenotypicType() == PhenotypicType.TRIAL_ENVIRONMENT) {
 						Variable variable = new Variable(varType, value);

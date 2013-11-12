@@ -11,8 +11,10 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.etl;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.util.Debug;
 
 public class MeasurementRow {
@@ -46,6 +48,43 @@ public class MeasurementRow {
 
 	public void setLocationId(long locationId) {
 		this.locationId = locationId;
+	}
+	
+	public List<MeasurementData> getTrialDataList(List<String> trialHeaders) {
+		List<MeasurementData> list = new ArrayList<MeasurementData>();
+		if(dataList!=null && !dataList.isEmpty()) {
+			for (MeasurementData data : dataList) {
+				if(trialHeaders!=null && trialHeaders.contains(data.getLabel())) {
+					list.add(data);
+				}
+			}
+			return list;
+		}
+		return list;
+	}
+	
+	public List<MeasurementData> getNonTrialDataList(List<String> trialHeaders) {
+		List<MeasurementData> list = new ArrayList<MeasurementData>();
+		if(dataList!=null && !dataList.isEmpty()) {
+			for (MeasurementData data : dataList) {
+				if(trialHeaders==null || !trialHeaders.contains(data.getLabel())) {
+					list.add(data);
+				}
+			}
+			return list;
+		}
+		return list;
+	}
+	
+	public String getMeasurementDataValue(String label) {
+		if(label!=null && dataList!=null && !dataList.isEmpty()) {
+			for (MeasurementData data : dataList) {
+				if(label!=null && data.getLabel()!=null && label.equals(data.getLabel())) {
+					return data.getValue();
+				}
+			}
+		}
+		return null;
 	}
 
 	public List<MeasurementData> getDataList() {

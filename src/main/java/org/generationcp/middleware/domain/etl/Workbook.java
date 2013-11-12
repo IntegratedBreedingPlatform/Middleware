@@ -14,6 +14,7 @@ package org.generationcp.middleware.domain.etl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.util.Debug;
 
 
@@ -106,7 +107,7 @@ public class Workbook {
 	public List<MeasurementVariable> getMeasurementDatasetVariables() {
 		List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
 		
-		list.addAll(factors);
+		list.addAll(getNonTrialVariables(factors));
 		list.addAll(variates);
 		
 		return list;
@@ -117,7 +118,9 @@ public class Workbook {
 	}
 	
 	public List<MeasurementVariable> getTrialVariables() {
-		return getConditionsAndConstants(false);
+		List<MeasurementVariable> list = getConditionsAndConstants(false);
+		list.addAll(getTrialVariables(factors));
+		return list;
 	}
 	
 	private List<MeasurementVariable> getConditionsAndConstants(boolean isStudy) {
@@ -142,9 +145,47 @@ public class Workbook {
 		return list;
 	}
 	
-	public List<MeasurementVariable> getTrialFactors() {
-		return getVariables(conditions, false);
+	public List<MeasurementVariable> getNonTrialVariables(List<MeasurementVariable> variables) {
+		List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
+		if (variables != null && variables.size() > 0) {
+			for (MeasurementVariable variable : variables) {
+				if (!PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(variable.getLabel().toUpperCase())) {
+					list.add(variable);
+				}
+			}
+		}
+		return list;
 	}
+	
+	public List<MeasurementVariable> getTrialVariables(List<MeasurementVariable> variables) {
+		List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
+		if (variables != null && variables.size() > 0) {
+			for (MeasurementVariable variable : variables) {
+				if (PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(variable.getLabel().toUpperCase())) {
+					list.add(variable);
+				}
+			}
+		}
+		return list;
+	}
+	
+	public List<String> getTrialHeaders(List<MeasurementVariable> variables) {
+		List<String> list = new ArrayList<String>();
+		if (variables != null && variables.size() > 0) {
+			for (MeasurementVariable variable : variables) {
+				if (PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(variable.getLabel().toUpperCase())) {
+					list.add(variable.getName());
+				}
+			}
+		}
+		return list;
+	}
+	
+	
+	
+//	public List<MeasurementVariable> getTrialFactors() {
+//		return getVariables(conditions, false);
+//	}
 
 	@Override
 	public String toString() {

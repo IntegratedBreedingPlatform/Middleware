@@ -45,7 +45,7 @@ public class TestExperimentValuesTransformer {
 		MeasurementRow mRow = createMeasurementRowTestData();
 		VariableTypeList varTypeList = createVariableTypeListTestData();
 		
-		ExperimentValues expVal = transformer.transform(mRow,varTypeList);
+		ExperimentValues expVal = transformer.transform(mRow,varTypeList,null);
 		
 		Assert.assertNotNull(expVal);
 		Debug.println(0, expVal.toString());

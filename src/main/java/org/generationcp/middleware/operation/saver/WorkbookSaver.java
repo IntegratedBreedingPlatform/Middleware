@@ -11,8 +11,11 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.saver;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetValues;
@@ -52,35 +55,54 @@ public class WorkbookSaver extends Saver {
 	}
     
 	public int save(Workbook workbook) throws Exception {
-		
-		//TODO: call initial workbook validation such as mandatory fields check, etc.
-
+		//GCP-6091 start
 		List<MeasurementVariable> trialMV = workbook.getTrialVariables();
+		List<String> trialHeaders = workbook.getTrialHeaders(trialMV);        
         VariableTypeList trialVariables = getVariableTypeListTransformer()
         						.transform(workbook.getVariables(workbook.getConditions(), false), false);
+        List<MeasurementVariable> trialFactors = workbook.getTrialVariables(workbook.getFactors());
+        VariableTypeList trialVariableTypeList = null;
+        if(trialFactors!=null && !trialFactors.isEmpty()) {//multi-location
+        	trialVariableTypeList = getVariableTypeListTransformer().transform(trialFactors, false, trialVariables.size()+1);
+        	trialVariables.addAll(trialVariableTypeList);
+        }
+        //GCP-6091 end
         trialVariables.addAll(getVariableTypeListTransformer()
         						.transform(workbook.getVariables(workbook.getConstants(), false), true, trialVariables.size()+1));
+        
 
         List<MeasurementVariable> effectMV = workbook.getMeasurementDatasetVariables();
-        VariableTypeList effectVariables = getVariableTypeListTransformer().transform(workbook.getFactors(), false);
+        VariableTypeList effectVariables = getVariableTypeListTransformer().transform(workbook.getNonTrialVariables(workbook.getFactors()), false);
         effectVariables.addAll(getVariableTypeListTransformer().transform(workbook.getVariates(), true, effectVariables.size()+1));
         
-		int locationId = createLocationAndSetToObservations(workbook, trialMV, trialVariables);
-
-		int studyId = createStudyIfNecessary(workbook, locationId);
+        //GCP-6091 start
+        int studyLocationId = DEFAULT_GEOLOCATION_ID;
+        List<Integer> locationIds = new ArrayList<Integer>();
+        if(trialVariableTypeList!=null) {//multi-location
+        	studyLocationId = createLocationsAndSetToObservations(locationIds,workbook,trialVariableTypeList,trialHeaders);
+        } else {
+        	studyLocationId = createLocationAndSetToObservations(workbook, trialMV, trialVariables);
+        }
+		//GCP-6091 end
 		
+		int studyId = createStudyIfNecessary(workbook, studyLocationId); 
    		int trialDatasetId = createTrialDatasetIfNecessary(workbook, studyId, trialMV, trialVariables);
-   		createTrialExperiment(trialDatasetId, locationId);
+   		
+   		if(trialVariableTypeList!=null) {//multi-location
+   			for(Integer locationId : locationIds) {
+   				createTrialExperiment(trialDatasetId, locationId);
+   			}
+   		}  		
    		
    		int datasetId = createMeasurementEffectDatasetIfNecessary(workbook, studyId, trialMV, effectMV, effectVariables);
-   		createStocksIfNecessary(datasetId, workbook, effectVariables);
-   		createMeasurementEffectExperiments(datasetId, locationId, effectVariables, workbook);
+   		createStocksIfNecessary(datasetId, workbook, effectVariables, trialHeaders);
+   		createMeasurementEffectExperiments(datasetId, effectVariables, workbook, trialHeaders);
    		
    		return studyId;
 	}
 	
 	private int createLocationAndSetToObservations(Workbook workbook, List<MeasurementVariable> trialMV, 
-	VariableTypeList trialVariables) throws MiddlewareQueryException {
+			VariableTypeList trialVariables) throws MiddlewareQueryException {
 		
 		TimerWatch watch = new TimerWatch("transform trial environment", LOG);
 		VariableList geolocation = getVariableListTransformer().transformTrialEnvironment(trialMV, trialVariables);
@@ -103,6 +125,27 @@ public class WorkbookSaver extends Saver {
     	return studyLocationId != null ? studyLocationId : DEFAULT_GEOLOCATION_ID;
 	}
 	
+	private int createLocationsAndSetToObservations(List<Integer> locationIds, Workbook workbook, VariableTypeList trialFactors, List<String> trialHeaders) throws MiddlewareQueryException {
+		
+		Set<String> trialInstanceNumbers = new HashSet<String>();
+		Integer locationId = null;
+		for (MeasurementRow row : workbook.getObservations()) {
+			TimerWatch watch = new TimerWatch("transformTrialEnvironment in createLocationsAndSetToObservations", LOG);
+			VariableList geolocation = getVariableListTransformer().transformTrialEnvironment(row, trialFactors, trialHeaders);
+			if (geolocation != null && geolocation.size() > 0) {
+				String trialInstanceNumber = getTrialInstanceNumber(geolocation);
+				LOG.debug("trialInstanceNumber = "+trialInstanceNumber);
+				if(trialInstanceNumbers.add(trialInstanceNumber)) {//if new location (unique by trial instance number)
+		            watch.restart("save geolocation");
+		            locationId = getGeolocationSaver().saveGeolocation(geolocation);
+		            locationIds.add(locationId);
+				}
+				row.setLocationId(locationId);
+	        }
+		}
+		return new Long(workbook.getObservations().get(0).getLocationId()).intValue();//return studyLocationId
+	}
+	
 	private MeasurementVariable getMainFactor(List<MeasurementVariable> mvars) {
 		for (MeasurementVariable mvar : mvars) {
 			if (mvar.getName().equals(mvar.getLabel())) {
@@ -115,6 +158,15 @@ public class WorkbookSaver extends Saver {
 	private String getStockFactor(VariableList stockVariables) {
 		for (Variable variable : stockVariables.getVariables()) {
 			if (TermId.ENTRY_NUMBER_STORAGE.getId() == variable.getVariableType().getStandardVariable().getStoredIn().getId()) {
+				return variable.getValue();
+			}
+		}
+		return null;
+	}
+	
+	private String getTrialInstanceNumber(VariableList trialVariables) {
+		for (Variable variable : trialVariables.getVariables()) {
+			if (TermId.TRIAL_INSTANCE_STORAGE.getId() == variable.getVariableType().getStandardVariable().getStoredIn().getId()) {
 				return variable.getValue();
 			}
 		}
@@ -148,7 +200,7 @@ public class WorkbookSaver extends Saver {
 	        studyVariables.addAll(getVariableTypeListTransformer()
 	        		.transform(workbook.getVariables(workbook.getConstants(), true), true, studyVariables.size()+1));
 	
-			if (workbook.isNursery() && getMainFactor(workbook.getTrialFactors()) == null) {
+			if (workbook.isNursery() && getMainFactor(workbook.getTrialVariables()) == null) {
 				studyVariables.add(createOccVariableType(studyVariables.size()+1));
 			}
 	
@@ -214,7 +266,7 @@ public class WorkbookSaver extends Saver {
 											DataSetType.PLOT_DATA, effectMV, effectVariables);
 
 			watch.restart("save measurement effect dataset");
-			VariableTypeList datasetVariables = propagateTrialFactorsIfNecessary(workbook.getTrialFactors(), effectVariables, workbook);
+			VariableTypeList datasetVariables = propagateTrialFactorsIfNecessary(workbook.getTrialVariables(), effectVariables, workbook);
 			DmsProject dataset = getDatasetProjectSaver().addDataSet(studyId, datasetVariables, datasetValues);
 			datasetId = dataset.getProjectId();
 		}
@@ -223,14 +275,14 @@ public class WorkbookSaver extends Saver {
 		return datasetId;
 	}
 	
-	private void createStocksIfNecessary(int datasetId, Workbook workbook, VariableTypeList effectVariables) throws MiddlewareQueryException {
+	private void createStocksIfNecessary(int datasetId, Workbook workbook, VariableTypeList effectVariables,List<String> trialHeaders) throws MiddlewareQueryException {
 		Map<String, Integer> stockMap = getStockModelBuilder().getStockMapForDataset(datasetId);
 
 		TimerWatch watch = new TimerWatch("fetch stocks", LOG);
 		TimerWatch rowWatch = new TimerWatch("for each row", LOG);
 		
 		for (MeasurementRow row : workbook.getObservations()) {
-			VariableList stock = getVariableListTransformer().transformStock(row, effectVariables);
+			VariableList stock = getVariableListTransformer().transformStock(row, effectVariables, trialHeaders);
 			String stockFactor = getStockFactor(stock);
 			Integer stockId = stockMap.get(stockFactor);
 			if (stockId == null) {
@@ -245,14 +297,14 @@ public class WorkbookSaver extends Saver {
 		watch.stop();
 	}
 	
-	private void createMeasurementEffectExperiments(int datasetId, int locationId, VariableTypeList effectVariables, 
-			Workbook workbook) throws MiddlewareQueryException {
+	private void createMeasurementEffectExperiments(int datasetId, VariableTypeList effectVariables, 
+			Workbook workbook, List<String> trialHeaders) throws MiddlewareQueryException {
 		
 		TimerWatch watch = new TimerWatch("saving stocks and measurement effect data (total)", LOG);
 		TimerWatch rowWatch = new TimerWatch("for each row", LOG);
 		for(MeasurementRow row : workbook.getObservations()) {
 			rowWatch.restart("--save 1 experiment row");
-			ExperimentValues experimentValues = getExperimentValuesTransformer().transform(row, effectVariables);
+			ExperimentValues experimentValues = getExperimentValuesTransformer().transform(row, effectVariables, trialHeaders);
 			getExperimentModelSaver().addExperiment(datasetId, ExperimentType.PLOT, experimentValues);
 		}
 		rowWatch.stop();
