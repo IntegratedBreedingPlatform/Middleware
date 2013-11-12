@@ -20,37 +20,37 @@ public class VariableConstraints {
 
     private Integer minValueId; // the cvtermprop id of min constraint- to identify if from local or central
     
-	private Integer minValue;
+	private Double minValue;
 	
     private Integer maxValueId; // the cvtermprop id of max constraint - to identify if from local or central
     
-	private Integer maxValue;
+	private Double maxValue;
 
-    public VariableConstraints(Integer minValue, Integer maxValue) {
+    public VariableConstraints(Double minValue, Double maxValue) {
         this.minValue = minValue;
         this.maxValue = maxValue;
     }
 
-    public VariableConstraints(Integer minValueId, Integer maxValueId, Integer minValue, Integer maxValue) {
+    public VariableConstraints(Integer minValueId, Integer maxValueId, Double minValue, Double maxValue) {
         this.minValueId = minValueId;
         this.maxValueId = maxValueId;
         this.minValue = minValue;
         this.maxValue = maxValue;
     }
 
-	public Integer getMinValue() {
+	public Double getMinValue() {
 		return minValue;
 	}
 
-	public void setMinValue(Integer minValue) {
+	public void setMinValue(Double minValue) {
 		this.minValue = minValue;
 	}
 
-	public Integer getMaxValue() {
+	public Double getMaxValue() {
 		return maxValue;
 	}
 
-	public void setMaxValue(Integer maxValue) {
+	public void setMaxValue(Double maxValue) {
 		this.maxValue = maxValue;
 	}
 

@@ -92,7 +92,9 @@ public class WorkbookSaver extends Saver {
    			for(Integer locationId : locationIds) {
    				createTrialExperiment(trialDatasetId, locationId);
    			}
-   		}  		
+   		} else {
+   			createTrialExperiment(trialDatasetId, studyLocationId);
+   		}
    		
    		int datasetId = createMeasurementEffectDatasetIfNecessary(workbook, studyId, trialMV, effectMV, effectVariables);
    		createStocksIfNecessary(datasetId, workbook, effectVariables, trialHeaders);

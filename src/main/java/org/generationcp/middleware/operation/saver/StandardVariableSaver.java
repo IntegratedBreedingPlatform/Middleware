@@ -235,7 +235,7 @@ public class StandardVariableSaver extends Saver {
 		getCvTermRelationshipDao().save(relationship);
 	}
 	
-    private Integer saveConstraint(int cvTermId, int typeId, Integer constraintValue) throws MiddlewareQueryException {
+    private Integer saveConstraint(int cvTermId, int typeId, Double constraintValue) throws MiddlewareQueryException {
         if (constraintValue != null) {
             CVTermProperty property = new CVTermProperty();
             int negativeId = getCvTermPropertyDao().getNegativeId("cvTermPropertyId");
@@ -250,7 +250,7 @@ public class StandardVariableSaver extends Saver {
         return null;
     }
     
-    private void updateConstraint(int constraintId, int cvTermId, int typeId, Integer constraintValue) throws MiddlewareQueryException {
+    private void updateConstraint(int constraintId, int cvTermId, int typeId, Double constraintValue) throws MiddlewareQueryException {
         if (constraintValue != null) {
             CVTermProperty property = new CVTermProperty();
             property.setCvTermPropertyId(constraintId);
@@ -473,7 +473,7 @@ public class StandardVariableSaver extends Saver {
         }
     }
     
-    private void deleteConstraint(int cvTermId, int typeId, Integer constraintValue) throws MiddlewareQueryException {
+    private void deleteConstraint(int cvTermId, int typeId, Double constraintValue) throws MiddlewareQueryException {
         if (constraintValue != null) {
             List<CVTermProperty> properties = getCvTermPropertyDao().getByCvTermAndType(cvTermId, typeId);
             

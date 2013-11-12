@@ -166,7 +166,7 @@ public class TestOntologyDataManagerImpl {
 		stdVariable.getEnumerations().add(new Enumeration(10000, "N", "Nursery", 1));
 		stdVariable.getEnumerations().add(new Enumeration(10001, "HB", "Hybridization nursery", 2));
 		stdVariable.getEnumerations().add(new Enumeration(10002, "PN", "Pedigree nursery", 3));
-		stdVariable.setConstraints(new VariableConstraints(100, 999));
+		stdVariable.setConstraints(new VariableConstraints(100.0, 999.0));
 		stdVariable.setCropOntologyId("CROP-TEST");
 		
 		manager.addStandardVariable(stdVariable);
@@ -219,7 +219,7 @@ public class TestOntologyDataManagerImpl {
 		stdVariable.getEnumerations().add(new Enumeration(10000, "N", "Nursery", 1));
 		stdVariable.getEnumerations().add(new Enumeration(10001, "HB", "Hybridization nursery", 2));
 		stdVariable.getEnumerations().add(new Enumeration(10002, "PN", "Pedigree nursery", 3));
-		stdVariable.setConstraints(new VariableConstraints(100, 999));
+		stdVariable.setConstraints(new VariableConstraints(100.0, 999.0));
 		
 		manager.addStandardVariable(stdVariable);
 		
@@ -940,7 +940,7 @@ public class TestOntologyDataManagerImpl {
         stdVariable.getEnumerations().add(new Enumeration(10000, "N", "Nursery", 1));
         stdVariable.getEnumerations().add(new Enumeration(10001, "HB", "Hybridization nursery", 2));
         stdVariable.getEnumerations().add(new Enumeration(10002, "PN", "Pedigree nursery", 3));
-        stdVariable.setConstraints(new VariableConstraints(100, 999));
+        stdVariable.setConstraints(new VariableConstraints(100.0, 999.0));
         stdVariable.setCropOntologyId("CROP-TEST");
         
         manager.addStandardVariable(stdVariable);
