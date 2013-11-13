@@ -93,7 +93,14 @@ public class FieldMapInfo{
     }
     
     public long getRepCount() {
-        return reps.size();
+    	long max = 1;
+    	
+    	for (Integer rep : reps){
+    		if (rep > max){
+    			max = rep;
+    		}
+    	}
+        return max;
     }
 
     public long getPlotCount() {
