@@ -154,15 +154,22 @@ public class MethodDAO extends GenericDAO<Method, Integer>{
         try {
            
             Criteria criteria = getSession().createCriteria(Method.class);
-            Criterion group1=Restrictions.eq("mgrp", group);
-            Criterion group2=Restrictions.eq("mgrp", "G");
-            LogicalExpression orExp=Restrictions.or(group1, group2);
-            criteria.add(Restrictions.eq("mtype", type));
+
+            if (type != null && !type.isEmpty())
+                criteria.add(Restrictions.eq("mtype", type));
 
             if (name != null && !name.isEmpty())
                 criteria.add(Restrictions.like("mname","%" + name.trim() + "%"));
 
-            criteria.add(orExp);
+
+            if (group != null && !group.isEmpty()) {
+                Criterion group1=Restrictions.eq("mgrp", group);
+                Criterion group2=Restrictions.eq("mgrp", "G");
+                LogicalExpression orExp=Restrictions.or(group1, group2);
+
+                criteria.add(orExp);
+            }
+
             criteria.addOrder(Order.asc("mname"));
             return criteria.list();
         } catch (HibernateException e) {
