@@ -17,6 +17,7 @@ import java.util.List;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.Location;
 
 /**
  * This is the API for Fieldbook requirements.
@@ -56,6 +57,15 @@ public interface FieldbookService {
      * @return the FieldMapCount object containing the counts
      */
     FieldMapInfo getLocalFieldMapInfoOfNursery(int nurseryId) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Retrieves all locations from central and local databases.
+     * 
+     * @return List of locations
+     * @throws MiddlewareQueryException
+     */
+    List<Location> getAllLocations()throws MiddlewareQueryException;
     
 
 }

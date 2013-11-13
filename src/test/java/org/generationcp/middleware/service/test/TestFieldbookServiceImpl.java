@@ -20,6 +20,7 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
+import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.service.ServiceFactory;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.util.Debug;
@@ -101,7 +102,13 @@ public class TestFieldbookServiceImpl {
         assertTrue(fieldMapCount.getEntryCount() > 0);      
     }
 
-
+    @Test
+    public void testGetAllLocations() throws MiddlewareQueryException {
+    	List<Location> locations = fieldbookService.getAllLocations();
+    	for (Location loc : locations){
+    		Debug.println(3, loc.toString());
+    	}
+    }
 
     @After
     public void afterEachTest() {

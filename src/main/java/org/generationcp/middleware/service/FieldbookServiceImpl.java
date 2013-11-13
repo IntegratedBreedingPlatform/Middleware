@@ -19,6 +19,8 @@ import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.service.api.FieldbookService;
 
 public class FieldbookServiceImpl extends Service implements FieldbookService {
@@ -41,15 +43,18 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
     @Override
     public FieldMapInfo getLocalFieldMapInfoOfTrial(int trialId) throws MiddlewareQueryException{
-        //TODO
         return getStudyDataManager().getFieldMapInfoOfStudy(trialId, StudyType.T, Database.LOCAL);
     }
     
     @Override 
     public FieldMapInfo getLocalFieldMapInfoOfNursery(int nurseryId) throws MiddlewareQueryException{
-        //TODO
         return getStudyDataManager().getFieldMapInfoOfStudy(nurseryId, StudyType.N, Database.LOCAL);
     }
 
+    @Override 
+    public List<Location> getAllLocations()throws MiddlewareQueryException{
+    	GermplasmDataManager germplasmDataManager = getGermplasmDataManager();
+    	return germplasmDataManager.getAllLocations(0, (int) germplasmDataManager.countAllLocations());
+    }
 
 }
