@@ -16,8 +16,8 @@ import java.util.List;
 
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
-import org.generationcp.middleware.domain.germplasm.LocationReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.Location;
 
 /**
  * This is the API for Fieldbook requirements.
@@ -65,7 +65,7 @@ public interface FieldbookService {
      * @return List of location references
      * @throws MiddlewareQueryException
      */
-    List<LocationReference> getAllLocations()throws MiddlewareQueryException;
+    List<Location> getAllLocations()throws MiddlewareQueryException;
     
 
 }

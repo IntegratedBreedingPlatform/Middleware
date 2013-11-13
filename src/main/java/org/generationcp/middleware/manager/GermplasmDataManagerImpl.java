@@ -25,6 +25,7 @@ import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
+import org.generationcp.middleware.domain.germplasm.LocationReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -75,6 +76,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public List<Location> getAllLocations(int start, int numOfRows) throws MiddlewareQueryException {
         return (List<Location>) getFromCentralAndLocal(getLocationDao(), start, numOfRows);
     }
+    
+    public List<Location> getAllLocations() throws MiddlewareQueryException{
+    	return (List<Location>) getAllFromCentralAndLocal(getLocationDao());
+    }
+
     
     @Override
     public List<Location> getAllLocalLocations(int start, int numOfRows) throws MiddlewareQueryException {

@@ -14,6 +14,7 @@ package org.generationcp.middleware.manager.api;
 import java.util.List;
 import java.util.Map;
 
+import org.generationcp.middleware.domain.germplasm.LocationReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.GermplasmNameType;
@@ -210,6 +211,12 @@ public interface GermplasmDataManager {
      */   
     public List<Location> getAllLocations(int start, int numOfRows) throws MiddlewareQueryException;
     
+    /**
+     * Returns all Location information from central and local databases.
+     * @return All Locations 
+     */   
+    public List<Location> getAllLocations() throws MiddlewareQueryException;
+
     /**
      * Returns all Local Locations
      * 

@@ -88,7 +88,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 	}
 	
     public long getPlotCount(int projectId) throws MiddlewareQueryException{
-        
+        long count = 0;
+
         /*  
             SELECT CASE WHEN type_id = 8200 THEN MAX(CAST(eprop.value AS UNSIGNED))
                     WHEN type_id = 8380  THEN MAX(CAST(eprop.value AS SIGNED)) - 100
@@ -112,13 +113,16 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             Query query = getSession().createSQLQuery(sql.toString());
             query.setParameter("projectId", projectId);
 
-            return ((BigInteger) query.uniqueResult()).longValue();
+            Object result = query.uniqueResult();
+            if (result != null){
+            	count = ((BigInteger) result).longValue();
+            }
             
         } catch(HibernateException e) {
             logAndThrowException("Error at getPlotCount(projectId=" + projectId + ") at ExperimentPropertyDao: " + e.getMessage(), e);
         }
         
-        return 0;
+        return count;
         
     }
 	

@@ -11,16 +11,16 @@
  *******************************************************************************/
 package org.generationcp.middleware.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
-import org.generationcp.middleware.domain.germplasm.LocationReference;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.service.api.FieldbookService;
 
 public class FieldbookServiceImpl extends Service implements FieldbookService {
@@ -52,11 +52,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     }
 
     @Override 
-    public List<LocationReference> getAllLocations()throws MiddlewareQueryException{
-    	//TODO
-//    	GermplasmDataManager germplasmDataManager = getGermplasmDataManager();
-//    	return germplasmDataManager.getAllLocations(0, (int) germplasmDataManager.countAllLocations());
-    	return new ArrayList<LocationReference>();
+    public List<Location> getAllLocations()throws MiddlewareQueryException{
+    	GermplasmDataManager germplasmDataManager = getGermplasmDataManager();
+    	return germplasmDataManager.getAllLocations(0, (int) germplasmDataManager.countAllLocations());
     }
 
 }

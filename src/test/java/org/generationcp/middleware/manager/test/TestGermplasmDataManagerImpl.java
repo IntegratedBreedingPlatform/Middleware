@@ -76,10 +76,21 @@ public class TestGermplasmDataManagerImpl{
 		Debug.println(0, "#####" + name.getMethodName() + ": Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime/1000000000) + " s");
 	}
     @Test
-    public void testGetAllLocations() throws Exception {
+    public void testGetAllLocationsWithStartNumRows() throws Exception {
         List<Location> locationList = manager.getAllLocations(5, 10);
         assertTrue(locationList != null);
         Debug.println(0, "testGetAllLocations(5,10) RESULTS: ");
+        for (Location l : locationList) {
+            Debug.println(0, "  " + l);
+        }
+    }
+    
+
+    @Test
+    public void testGetAllLocations() throws Exception {
+        List<Location> locationList = manager.getAllLocations();
+        assertTrue(locationList != null);
+        Debug.println(0, "testGetAllLocations() RESULTS: ");
         for (Location l : locationList) {
             Debug.println(0, "  " + l);
         }
