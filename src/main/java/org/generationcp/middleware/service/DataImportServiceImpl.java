@@ -111,7 +111,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
             messages.add(new Message("error.entry.doesnt.exist"));
         }
 
-        if (!workbook.isNursery() && !isTrialEnvironmentExists(ontology,workbook.getTrialVariables())) {
+        if (!workbook.isNursery() && !isTrialInstanceNumberExists(ontology,workbook.getTrialVariables())) {
             messages.add(new Message("error.missing.trial.condition"));
         }
 
@@ -160,7 +160,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
             messages.add(new Message("error.entry.doesnt.exist.wizard"));
         }
 
-        if (!workbook.isNursery() && !isTrialEnvironmentExists(ontology,workbook.getTrialVariables())) {
+        if (!workbook.isNursery() && !isTrialInstanceNumberExists(ontology,workbook.getTrialVariables())) {
             messages.add(new Message("error.missing.trial.condition"));
         }
         
@@ -226,7 +226,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
             StandardVariable svar = ontology.findStandardVariableByTraitScaleMethodNames(mvar.getProperty(), mvar.getScale(), mvar.getMethod());
             if (svar != null) {
                 if (svar.getStoredIn() != null) {
-                    if (svar.getStoredIn().getId() == 1041) {
+                    if (svar.getStoredIn().getId() == TermId.ENTRY_NUMBER_STORAGE.getId()) {
                         return true;
                     }
                 }
@@ -236,15 +236,14 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         return false;
     }
 
-    private Boolean isTrialEnvironmentExists(OntologyDataManager ontology, List<MeasurementVariable> list) throws MiddlewareQueryException {
+    private Boolean isTrialInstanceNumberExists(OntologyDataManager ontology, List<MeasurementVariable> list) throws MiddlewareQueryException {
         for (MeasurementVariable mvar : list) {
 
             StandardVariable svar = ontology.findStandardVariableByTraitScaleMethodNames(mvar.getProperty(), mvar.getScale(), mvar.getMethod());
             if (svar != null) {
                 if (svar.getStoredIn() != null) {
-
-                    if (PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(svar.getStoredIn().getId())) {
-                            return true;
+                    if (svar.getStoredIn().getId() == TermId.TRIAL_INSTANCE_STORAGE.getId()) {
+                    	return true;
                     }
                 }
             }
