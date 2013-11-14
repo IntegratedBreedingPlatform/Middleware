@@ -90,6 +90,9 @@ public class FieldMapInfo{
     	for (FieldMapLabel label : labels){
     		reps.add(label.getRep());
     	}
+    	if (reps.size() == 0){
+    		return 1;
+    	}
     	return Collections.max(reps);
     }
 
