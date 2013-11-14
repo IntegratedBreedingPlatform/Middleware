@@ -41,7 +41,7 @@ public class TestExperimentPropertyDao{
 
     @Test
     public void testGetFieldMapLabels() throws Exception {
-        int projectId = 5790;
+        int projectId = 5734; //5790;
         List<FieldMapLabel> labels = dao.getFieldMapLabels(projectId);
         Debug.println(0, "testGetFieldMapLabels(projectId=" + projectId + ") RESULTS:");
         for (FieldMapLabel label: labels) {

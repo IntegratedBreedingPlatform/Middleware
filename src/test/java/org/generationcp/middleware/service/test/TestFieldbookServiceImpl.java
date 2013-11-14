@@ -88,7 +88,7 @@ public class TestFieldbookServiceImpl {
     
     @Test
     public void testGetFieldMapCountsOfTrial() throws MiddlewareQueryException{
-        int trialId = 5790; 
+        int trialId = 5734; //5790; 
         FieldMapInfo fieldMapCount = fieldbookService.getFieldMapInfoOfTrial(trialId);
         fieldMapCount.print(3);
         assertTrue(fieldMapCount.getEntryCount() > 0);      
@@ -96,7 +96,7 @@ public class TestFieldbookServiceImpl {
     
     @Test
     public void testGetFieldMapCountsOfNursery() throws MiddlewareQueryException{
-        int nurseryId = 5790; 
+        int nurseryId = 5734; //5790; 
         FieldMapInfo fieldMapCount = fieldbookService.getFieldMapInfoOfNursery(nurseryId);
         fieldMapCount.print(3);
         assertTrue(fieldMapCount.getEntryCount() > 0);      
