@@ -54,7 +54,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     @Override 
     public List<Location> getAllLocations()throws MiddlewareQueryException{
     	GermplasmDataManager germplasmDataManager = getGermplasmDataManager();
-    	return germplasmDataManager.getAllLocations(0, (int) germplasmDataManager.countAllLocations());
+    	return germplasmDataManager.getAllLocations();
     }
 
 }
