@@ -108,6 +108,7 @@ public class TestFieldbookServiceImpl {
     	for (Location loc : locations){
     		Debug.println(3, loc.toString());
     	}
+    	Debug.println(3, "NUMBER OF RECORDS: " + locations.size());
     }
 
     @After

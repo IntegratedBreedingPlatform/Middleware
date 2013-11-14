@@ -14,6 +14,7 @@ package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +26,6 @@ import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
-import org.generationcp.middleware.domain.germplasm.LocationReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -78,7 +78,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
     
     public List<Location> getAllLocations() throws MiddlewareQueryException{
-    	return (List<Location>) getAllFromCentralAndLocal(getLocationDao());
+    	List<Location> locations = getAllFromCentralAndLocal(getLocationDao());
+    	Collections.sort(locations);
+    	return locations;
     }
 
     
