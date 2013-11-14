@@ -42,13 +42,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     }
 
     @Override
-    public FieldMapInfo getLocalFieldMapInfoOfTrial(int trialId) throws MiddlewareQueryException{
-        return getStudyDataManager().getFieldMapInfoOfStudy(trialId, StudyType.T, Database.LOCAL);
+    public FieldMapInfo getFieldMapInfoOfTrial(int trialId) throws MiddlewareQueryException{
+        return getStudyDataManager().getFieldMapInfoOfStudy(trialId, StudyType.T);
     }
     
     @Override 
-    public FieldMapInfo getLocalFieldMapInfoOfNursery(int nurseryId) throws MiddlewareQueryException{
-        return getStudyDataManager().getFieldMapInfoOfStudy(nurseryId, StudyType.N, Database.LOCAL);
+    public FieldMapInfo getFieldMapInfoOfNursery(int nurseryId) throws MiddlewareQueryException{
+        return getStudyDataManager().getFieldMapInfoOfStudy(nurseryId, StudyType.N);
     }
 
     @Override 

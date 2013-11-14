@@ -1043,7 +1043,7 @@ public class TestStudyDataManagerImpl {
     @Test
     public void testGetFieldMapCountsOfTrial() throws MiddlewareQueryException{
         int trialId = -147; 
-        FieldMapInfo fieldMapCount = manager.getFieldMapInfoOfStudy(trialId, StudyType.T, Database.LOCAL);
+        FieldMapInfo fieldMapCount = manager.getFieldMapInfoOfStudy(trialId, StudyType.T);
         fieldMapCount.print(3);
         assertTrue(fieldMapCount.getEntryCount() > 0);      
     }
@@ -1051,7 +1051,7 @@ public class TestStudyDataManagerImpl {
     @Test
     public void testGetFieldMapCountsOfNursery() throws MiddlewareQueryException{
         int nurseryId = -138;
-        FieldMapInfo fieldMapCount = manager.getFieldMapInfoOfStudy(nurseryId, StudyType.N, Database.LOCAL);
+        FieldMapInfo fieldMapCount = manager.getFieldMapInfoOfStudy(nurseryId, StudyType.N);
         fieldMapCount.print(3);
         assertTrue(fieldMapCount.getEntryCount() > 0);      
     }
