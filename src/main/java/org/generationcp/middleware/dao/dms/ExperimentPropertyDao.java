@@ -75,15 +75,16 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 					.append("SELECT eproj.nd_experiment_id AS experimentId, s.uniquename AS entryNumber,  ")
 					.append("		 s.name AS germplasmName, epropRep.value AS rep, epropPlot.value AS plotNo ")
 					.append("FROM nd_experiment_project eproj  ")
+                    .append("   INNER JOIN project_relationship pr ON pr.object_project_id = :projectId AND pr.type_id = ").append(TermId.BELONGS_TO_STUDY.getId())
 					.append("	INNER JOIN nd_experiment_stock es ON eproj.nd_experiment_id = es.nd_experiment_id  ")
-					.append("		AND eproj.project_id = :projectId ")
+					.append("		AND eproj.project_id = pr.subject_project_id ")
 					.append("	INNER JOIN stock s ON es.stock_id = s.stock_id ")
 					.append("	LEFT JOIN nd_experimentprop epropRep ON eproj.nd_experiment_id = epropRep.nd_experiment_id ")
-					.append("		AND epropRep.type_id =  " + TermId.REP_NO.getId()  + "  AND eproj.project_id = :projectId ") // 8210
+					.append("		AND epropRep.type_id =  " + TermId.REP_NO.getId()  + "  AND eproj.project_id = pr.subject_project_id ") // 8210
 					.append("		AND epropRep.value IS NOT NULL  AND epropRep.value <> '' ")
 					.append("	INNER JOIN nd_experimentprop epropPlot ON eproj.nd_experiment_id = epropPlot.nd_experiment_id ")
 					.append("		AND epropPlot.type_id IN ("+ TermId.PLOT_NO.getId() + ", "+ TermId.PLOT_NNO.getId() +")  ") //8200, 8380
-					.append("		AND eproj.project_id = :projectId ")
+					.append("		AND eproj.project_id = pr.subject_project_id ")
 					.append("		AND epropPlot.value IS NOT NULL  AND epropPlot.value <> '' ")
 					.append("ORDER BY eproj.nd_experiment_id ");
 
