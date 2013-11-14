@@ -101,6 +101,11 @@ public class FieldMapInfo{
     	for (FieldMapLabel label : labels){
     		plotNumbers.add(label.getPlotNo());
     	}
+    	
+    	if (plotNumbers.size() == 0){
+    		return 0;
+    	}
+    	
     	int minPlot = Collections.min(plotNumbers);
     	int maxPlot = Collections.max(plotNumbers);
     	return maxPlot - minPlot + 1;
