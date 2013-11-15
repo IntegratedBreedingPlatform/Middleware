@@ -18,6 +18,8 @@ package org.generationcp.middleware.exceptions;
 public class MiddlewareQueryException extends Exception{
 
     private static final long serialVersionUID = 1L;
+    
+    private String code;
 
     public MiddlewareQueryException(String message) {
         super(message);
@@ -25,5 +27,14 @@ public class MiddlewareQueryException extends Exception{
 
     public MiddlewareQueryException(String message, Throwable cause) {
         super(message, cause);
+    }
+    
+    public MiddlewareQueryException(String code, String message) {
+        super(message);
+        this.code = code;
+    }
+    
+    public String getCode() {
+        return this.code;
     }
 }
