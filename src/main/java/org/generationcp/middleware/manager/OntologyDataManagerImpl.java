@@ -731,7 +731,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         String errorCodes = getStandardVariableSaver().validate(standardVariable, operation);
         
         if (errorCodes != null && !errorCodes.isEmpty()) {
-            throw new MiddlewareQueryException(errorCodes);
+            throw new MiddlewareQueryException(errorCodes, "The variable you entered is invalid");
         }
         
         requireLocalDatabaseInstance();
