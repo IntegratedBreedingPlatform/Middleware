@@ -499,5 +499,12 @@ public interface GermplasmListManager{
     
     public List<UserDefinedField> getGermplasmNameTypes() throws MiddlewareQueryException;    
     
+    /**
+     * Search for germplasm lists given a search term Q
+     * @param q
+     * @return - List of germplasm lists
+     * @throws MiddlewareQueryException
+     */
+    public List<GermplasmList> searchForGermplasmList(String q) throws MiddlewareQueryException;
     
 }

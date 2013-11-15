@@ -21,6 +21,7 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Method;
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -31,6 +32,7 @@ import org.hibernate.SQLQuery;
  */
 public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 
+	private static final String STATUS_DELETED = "9";
 
     @SuppressWarnings("unchecked")
     public List<Germplasm> getByPrefName(String name, int start, int numOfRows) throws MiddlewareQueryException {
@@ -870,4 +872,75 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
      *                                return ((Long) mainCriteria.uniqueResult()).longValue();
      *                                }
      **/
+
+    
+    
+    /**
+     * Get Germplasms with names like Q or germplasms part of list with names like Q
+     * @param q
+     * @return List of Germplasms
+     * @throws MiddlewareQueryException 
+     */
+    public List<Germplasm> searchForGermplasms(String q) throws MiddlewareQueryException{
+        try {
+
+        	List<Germplasm> result = new ArrayList<Germplasm>();
+        	List<Germplasm> resultParents = new ArrayList<Germplasm>();
+        	
+        	//First priority, germplasms with GID=q
+            SQLQuery p1_query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GID);
+            p1_query.setParameter("gid", q);
+            p1_query.addEntity("germplsm", Germplasm.class);
+            //p1_query.setParameter("deletedStatus", STATUS_DELETED);
+			result.addAll(p1_query.list());
+            
+            //Second priority, get germplasms with nVal like q
+            SQLQuery p2_query1 = getSession().createSQLQuery(Germplasm.SEARCH_GID_BY_GERMPLASM_NAME);
+            p2_query1.setParameter("q", q+"%");
+            p2_query1.setParameter("deletedStatus", STATUS_DELETED);
+            List p2_result1 = p2_query1.list();
+            
+            if(p2_result1.size()>0 && p2_result1.get(0)!=null){
+	            SQLQuery p2_query2 = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GIDS);
+	            p2_query2.setParameterList("gids", p2_result1);
+	            p2_query2.addEntity("germplsm", Germplasm.class);
+	            result.addAll(p2_query2.list());
+            }
+            
+            //Third priority, get germplasms in list with listname like (full text search) q
+            SQLQuery p3_query1 = getSession().createSQLQuery(Germplasm.SEARCH_LIST_ID_BY_LIST_NAME);
+            p3_query1.setParameter("q", q);
+            p3_query1.setParameter("deletedStatus", STATUS_DELETED);
+            
+            List p3_result1 = p2_query1.list();
+            
+            if(p3_result1.size()>0 && p3_result1.get(0)!=null){            
+	            SQLQuery p3_query2 = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_LIST_ID);
+	            p3_query2.setParameterList("listids", p3_result1);
+	            p3_query2.addEntity("germplsm", Germplasm.class);
+	            result.addAll(p3_query2.list());
+            }
+            
+            for(Germplasm g: result){
+            	List<Integer> parentGids = new ArrayList<Integer>();
+            	parentGids.add(g.getGpid1());
+            	parentGids.add(g.getGpid2());
+            	
+            	SQLQuery p_query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GIDS);
+	            p_query.setParameterList("gids", parentGids);
+	            p_query.addEntity("germplsm", Germplasm.class);
+	            
+	            resultParents.addAll(p_query.list());
+            }
+            result.addAll(resultParents);
+            
+            return result;
+
+        } catch (Exception e) {
+                logAndThrowException("Error with searchGermplasms(" + q + ") " + e.getMessage(), e);
+                }
+        return new ArrayList<Germplasm>();
+    }
+    
+    
 }

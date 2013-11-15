@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.hibernate.Criteria;
@@ -310,4 +311,28 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
         }    	
         return null;
     }    
+    
+    /**
+     * Get Germplasm Lists with names like Q or germplasms with name like Q or gid equal to Q
+     * @param q
+     * @return List of GermplasmLists
+     * @throws MiddlewareQueryException 
+     */
+    public List<GermplasmList> searchForGermplasmLists(String q) throws MiddlewareQueryException{
+        try {
+            SQLQuery query = getSession().createSQLQuery(GermplasmList.SEARCH_FOR_GERMPLASM_LIST);
+            query.setParameter("gid", q);
+            query.setParameter("q", "%"+q+"%");
+            query.addEntity("listnms", GermplasmList.class);
+
+            List<GermplasmList> germplasmLists = query.list();
+
+            return germplasmLists;
+
+        } catch (Exception e) {
+                logAndThrowException("Error with searchGermplasmLists(" + q + ") " + e.getMessage(), e);
+                }
+        return new ArrayList<GermplasmList>();
+    }
+    
 }

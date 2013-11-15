@@ -15,12 +15,14 @@ package org.generationcp.middleware.manager.test;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DataManager;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -546,6 +548,23 @@ public class TestGermplasmListManagerImpl{
         }
         Debug.println(0, "Number of record/s: " + results.size());
     }
+    
+    @Test
+    public void testSearchGermplasmList() throws MiddlewareQueryException{
+        String q = "50533";
+        //String q = "philippines";
+    	//String q = "HB2009DS";
+              
+        List<GermplasmList> results = manager.searchForGermplasmList(q);
+        
+        Debug.println(0, "###############################");
+        Debug.println(0, " searchForGermplasmList("+q+")");
+        Debug.println(0, "###############################");
+        
+        for(GermplasmList g : results){
+          Debug.println(3, g.getId() + " - " + g.getName());
+        }
+    } 
     
     
     @AfterClass

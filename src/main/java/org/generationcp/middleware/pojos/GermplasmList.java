@@ -78,6 +78,26 @@ public class GermplasmList implements Serializable{
     public static String GET_GERMPLASM_LIST_TYPES = "SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid FROM udflds WHERE ftable = 'LISTNMS' AND ftype = 'LISTTYPE'";
     public static String GET_GERMPLASM_NAME_TYPES = "SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid FROM udflds WHERE ftable = 'NAMES' AND ftype = 'NAME'";
     
+    public static String SEARCH_FOR_GERMPLASM_LIST =
+    		"SELECT DISTINCT listnms.* " +
+            "FROM listdata " +
+            "       LEFT JOIN listnms ON (listdata.listid=listnms.listid) " +
+            "WHERE lrstatus!=gid AND ((gid=:gid AND 0!=:gid) OR desig LIKE :q OR listname LIKE :q) ";
+    		
+    //Full Text version
+//    		"SELECT DISTINCT listid, listname, listdate, listtype, listuid, listdesc, lhierarchy, liststatus, sdate, edate, listlocn, listref, projectid " +
+//            "FROM ( " +
+//    		"    SELECT listnms.* " +
+//            "       , count(*) AS matches " +
+//            "       , (MATCH(listname) AGAINST(:q)) AS searchScore " +
+//            "    FROM listdata " +
+//            "       LEFT JOIN listnms ON (listdata.listid=listnms.listid) " +
+//            "    WHERE lrstatus!=gid AND ((gid=:gid AND 0!=:gid) OR desig LIKE :q) " +
+//            "    GROUP BY listdata.listid " +
+//            "    HAVING searchScore>0 OR matches>0 " +
+//            ") AS listnms " +
+//            "ORDER BY matches DESC, searchScore DESC";
+    
     public GermplasmList() {
 
     }
