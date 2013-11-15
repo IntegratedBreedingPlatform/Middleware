@@ -38,6 +38,7 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.pojos.ErrorCode;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.hibernate.Session;
@@ -452,19 +453,19 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
-
+        
         Term term = findTermByName(name, cvId);
         if (term != null && term.getId() >= 0) {
-            throw new MiddlewareException(term.getName() + " is retrieved from the central database and cannot be updated.");
+            throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_FROM_CENTRAL_UPDATE.getCode(), "The term you entered is invalid");
         }
 
         try {
             trans = session.beginTransaction();
             term = saveOrUpdateCvTerm(name, definition, cvId);
             trans.commit();
-        } catch (Exception e) {
+        } catch (MiddlewareQueryException e) {
             rollbackTransaction(trans);
-            throw new MiddlewareQueryException("Error in addOrUpdateTerm: " + e.getMessage(), e);
+            throw new MiddlewareQueryException(e.getCode(), e);
         }
 
         return term;
@@ -480,7 +481,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
         Term term = findTermByName(name, cvId);
         if (term != null && term.getId() >= 0) {
-            throw new MiddlewareException(term.getName() + " is retrieved from the central database and cannot be updated.");
+            throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_FROM_CENTRAL_UPDATE.getCode(), "The term you entered is invalid");
         }
 
         try {
@@ -488,9 +489,9 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             term = saveOrUpdateCvTerm(name, definition, cvId);
             saveOrUpdateCvTermRelationship(term.getId(), objectId, typeId);
             trans.commit();
-        } catch (Exception e) {
+        } catch (MiddlewareQueryException e) {
             rollbackTransaction(trans);
-            throw new MiddlewareQueryException("Error in addOrUpdateTermAndRelationship: " + e.getMessage(), e);
+            throw new MiddlewareQueryException(e.getCode(), e);
         }
 
         return term;
@@ -853,7 +854,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         try {
             
             if (cvTermId >= 0) {
-                throw new MiddlewareException(getTermById(cvTermId).getName() + " is retrieved from the central database and cannot be updated.");
+                throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_FROM_CENTRAL_DELETE.getCode(), "The term you selected cannot be deleted");
             }
             
             if (CvId.VARIABLES.getId() != cvId.getId()) {
@@ -863,9 +864,9 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             } else {
                 throw new MiddlewareQueryException("variables cannot be used in this method");
             }
-        } catch (Exception e) {
+        } catch (MiddlewareQueryException e) {
             rollbackTransaction(trans);
-            throw new MiddlewareQueryException("error in deleteTerm " + e.getMessage(), e);
+            throw new MiddlewareQueryException(e.getCode(), e);
         }
     }
     
@@ -877,10 +878,10 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
         try {
             if (cvTermId >= 0) {
-                throw new MiddlewareException(getTermById(cvTermId).getName() + " is retrieved from the central database and cannot be updated.");
+                throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_FROM_CENTRAL_DELETE.getCode(), "The term you selected cannot be deleted");
             }
             if (getCvTermRelationshipDao().getRelationshipByObjectId(cvTermId) != null) {
-                throw new MiddlewareException(getTermById(cvTermId).getName() + " has dependencies and cannot be deleted");
+                throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_HAS_LINKED_VARIABLE.getCode(), "The term you selected cannot be deleted");
             }
             
             if (CvId.VARIABLES.getId() != cvId.getId()) {
@@ -891,9 +892,12 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             } else {
                 throw new MiddlewareQueryException("variables cannot be used in this method");
             }
-        } catch (Exception e) {
+        } catch (MiddlewareQueryException e) {
             rollbackTransaction(trans);
-            throw new MiddlewareQueryException("Error in deleteTermAndRelationship: " + e.getMessage(), e);
+            throw new MiddlewareQueryException(e.getCode(), e);
+        } catch (MiddlewareException e) {
+            rollbackTransaction(trans);
+            throw new MiddlewareQueryException(e.getMessage(), e);
         }
     }
     
