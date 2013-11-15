@@ -57,7 +57,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			SELECT eproj.project_id, eproj.nd_experiment_id AS experimentId, s.uniquename AS entryNumber,
 						 s.name AS germplasmName, epropRep.value AS rep, epropPlot.value AS plotNo
 			FROM nd_experiment_project eproj 
-				INNER JOIN nd_experiment_stock es ON eproj.nd_experiment_id = es.nd_experiment_id 
+   				INNER JOIN project_relationship pr ON pr.object_project_id = :projectId AND pr.type_id = 1150
+   				INNER JOIN nd_experiment_stock es ON eproj.nd_experiment_id = es.nd_experiment_id 
 					 AND eproj.project_id = @projectId
 				INNER JOIN stock s ON es.stock_id = s.stock_id
 				LEFT JOIN nd_experimentprop epropRep ON eproj.nd_experiment_id = epropRep.nd_experiment_id

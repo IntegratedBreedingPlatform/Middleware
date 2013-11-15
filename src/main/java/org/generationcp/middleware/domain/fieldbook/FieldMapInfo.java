@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.domain.fieldbook;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,7 +28,9 @@ import org.generationcp.middleware.util.Debug;
  * @author Joyce Avestro
  *
  */
-public class FieldMapInfo{
+public class FieldMapInfo implements Serializable{
+    
+	private static final long serialVersionUID = 1L;
     
     private Integer fieldbookId;
     
