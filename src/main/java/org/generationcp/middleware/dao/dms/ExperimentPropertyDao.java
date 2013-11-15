@@ -72,6 +72,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 
         */
         try {
+            String order = projectId > 0 ? "ASC" : "DESC";
 			StringBuilder sql = new StringBuilder()
 					.append("SELECT eproj.nd_experiment_id AS experimentId, s.uniquename AS entryNumber,  ")
 					.append("		 s.name AS germplasmName, epropRep.value AS rep, epropPlot.value AS plotNo ")
@@ -87,7 +88,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 					.append("		AND epropPlot.type_id IN ("+ TermId.PLOT_NO.getId() + ", "+ TermId.PLOT_NNO.getId() +")  ") //8200, 8380
 					.append("		AND eproj.project_id = pr.subject_project_id ")
 					.append("		AND epropPlot.value IS NOT NULL  AND epropPlot.value <> '' ")
-					.append("ORDER BY eproj.nd_experiment_id ");
+					.append("ORDER BY eproj.nd_experiment_id ").append(order);
 
             Query query = getSession().createSQLQuery(sql.toString())
                     .addScalar("experimentId")
