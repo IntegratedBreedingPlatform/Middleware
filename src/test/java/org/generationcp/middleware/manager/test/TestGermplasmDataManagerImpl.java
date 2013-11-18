@@ -75,6 +75,7 @@ public class TestGermplasmDataManagerImpl{
 		long elapsedTime = System.nanoTime() - startTime;
 		Debug.println(0, "#####" + name.getMethodName() + ": Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime/1000000000) + " s");
 	}
+	
     @Test
     public void testGetAllLocationsWithStartNumRows() throws Exception {
         List<Location> locationList = manager.getAllLocations(5, 10);
@@ -1063,7 +1064,8 @@ public class TestGermplasmDataManagerImpl{
     
   @Test
   public void testSearchGermplasm() throws MiddlewareQueryException{
-      String q = "2003";
+      //String q = "2003";
+      String q = "dinurado";
             
       List<Germplasm> results = manager.searchForGermplasm(q);
       

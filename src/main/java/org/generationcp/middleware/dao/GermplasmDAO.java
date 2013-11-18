@@ -904,7 +904,11 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 	            SQLQuery p2_query2 = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GIDS);
 	            p2_query2.setParameterList("gids", p2_result1);
 	            p2_query2.addEntity("germplsm", Germplasm.class);
-	            result.addAll(p2_query2.list());
+	            List p2_query2_list = p2_query2.list();
+	            for(Object g : p2_query2_list){
+	            	if(!result.contains(g))
+	            		result.add((Germplasm) g);
+	            }
             }
             
             //Third priority, get germplasms in list with listname like (full text search) q
@@ -918,7 +922,12 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 	            SQLQuery p3_query2 = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_LIST_ID);
 	            p3_query2.setParameterList("listids", p3_result1);
 	            p3_query2.addEntity("germplsm", Germplasm.class);
-	            result.addAll(p3_query2.list());
+	            //result.addAll(p3_query2.list());
+	            List p3_query2_list = p3_query2.list();
+	            for(Object g : p3_query2_list){
+	            	if(!result.contains(g))
+	            		result.add((Germplasm) g);
+	            }
             }
             
             for(Germplasm g: result){
@@ -930,7 +939,13 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 	            p_query.setParameterList("gids", parentGids);
 	            p_query.addEntity("germplsm", Germplasm.class);
 	            
-	            resultParents.addAll(p_query.list());
+	            //resultParents.addAll(p_query.list());
+	            
+	            List p_query_list = p_query.list();
+	            for(Object g2 : p_query_list){
+	            	if(!result.contains(g2))
+	            		result.add((Germplasm) g2);
+	            }
             }
             result.addAll(resultParents);
             
