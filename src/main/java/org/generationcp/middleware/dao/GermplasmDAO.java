@@ -882,6 +882,9 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
      * @throws MiddlewareQueryException 
      */
     public List<Germplasm> searchForGermplasms(String q) throws MiddlewareQueryException{
+    	if(q.equals("")){
+    		return new ArrayList<Germplasm>();
+    	}
         try {
 
         	List<Germplasm> result = new ArrayList<Germplasm>();
