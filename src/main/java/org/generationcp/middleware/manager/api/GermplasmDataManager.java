@@ -1248,5 +1248,16 @@ public interface GermplasmDataManager {
      */
     public Map<Integer, String> getLocationNamesByGids (List<Integer> gids) throws MiddlewareQueryException;
 
+    /**
+     * Given a List of GIDs, return the list of gids mapped to their corresponding location
+     * @param List<Integer> gids
+     * 			- list of gids
+     * @return Map<Integer, String>
+     * 			- map of gids to their corresponding location name
+     * @throws MiddlewareQueryException
+     */
 
+    public List<Location> getLocationsByIDs(List<Integer> ids) throws  MiddlewareQueryException;
+
+    List<LocationDetails> getLocationDetailsByLocationIDs(List<Integer> ids) throws  MiddlewareQueryException;
 }

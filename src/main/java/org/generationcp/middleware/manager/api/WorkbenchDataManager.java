@@ -977,4 +977,5 @@ public interface WorkbenchDataManager {
      */
     public List<Integer> getBreedingMethodIdsByWorkbenchProjectId(Integer projectId) throws MiddlewareQueryException;
 
+    List<Long> getFavoriteProjectLocationIds(Long projectId, int start, int numOfRows) throws MiddlewareQueryException;
 }
