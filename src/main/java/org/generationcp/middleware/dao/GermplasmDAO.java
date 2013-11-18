@@ -882,6 +882,9 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
      * @throws MiddlewareQueryException 
      */
     public List<Germplasm> searchForGermplasms(String q) throws MiddlewareQueryException{
+    	if(q.equals("")){
+    		return new ArrayList<Germplasm>();
+    	}
         try {
 
         	List<Germplasm> result = new ArrayList<Germplasm>();
@@ -939,15 +942,14 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 	            p_query.setParameterList("gids", parentGids);
 	            p_query.addEntity("germplsm", Germplasm.class);
 	            
-	            //resultParents.addAll(p_query.list());
-	            
-	            List p_query_list = p_query.list();
-	            for(Object g2 : p_query_list){
-	            	if(!result.contains(g2))
-	            		result.add((Germplasm) g2);
-	            }
+	            resultParents.addAll(p_query.list());
             }
-            result.addAll(resultParents);
+            
+            //result.addAll(resultParents);
+            for(Object g2 : resultParents){
+            	if(!result.contains(g2))
+            		result.add((Germplasm) g2);
+            }
             
             return result;
 
