@@ -319,6 +319,9 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
      * @throws MiddlewareQueryException 
      */
     public List<GermplasmList> searchForGermplasmLists(String q) throws MiddlewareQueryException{
+    	if(q.equals("")){
+    		return new ArrayList<GermplasmList>();
+    	}
         try {
             SQLQuery query = getSession().createSQLQuery(GermplasmList.SEARCH_FOR_GERMPLASM_LIST);
             query.setParameter("gid", q);

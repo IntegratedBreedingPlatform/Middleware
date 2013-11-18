@@ -12,12 +12,7 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.BibrefDAO;
@@ -525,6 +520,34 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     @Override
+    public List<Method> getMethodsByIDs(List<Integer> ids) throws MiddlewareQueryException {
+        List<Method> results = new ArrayList<Method>();
+
+        List<Integer> pos = new ArrayList<Integer>();
+        List<Integer> negs = new ArrayList<Integer>();
+
+        //separate ids from local and central
+        for(Integer id : ids){
+            if(id > 0){
+                pos.add(id);
+            } else {
+                negs.add(id);
+            }
+        }
+
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            results.addAll(getMethodDao().getMethodsByIds(pos));
+        }
+
+
+        if (setWorkingDatabase(Database.LOCAL)) {
+            results.addAll(getMethodDao().getMethodsByIds(negs));
+        }
+
+        return results;
+    }
+
+    @Override
     public List<Method> getAllMethods() throws MiddlewareQueryException {
         return (List<Method>) getAllFromCentralAndLocalByMethod(getMethodDao(), "getAllMethod", new Object[] {}, new Class[] {});
     }
@@ -688,6 +711,78 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         }
         return null;
     }
+
+    @Override
+    public List<Location> getLocationsByIDs(List<Integer> ids) throws  MiddlewareQueryException {
+        List<Location> results = new ArrayList<Location>();
+
+        List<Integer> pos = new ArrayList<Integer>();
+        List<Integer> negs = new ArrayList<Integer>();
+
+        //separate ids from local and central
+        for(Integer id : ids){
+            if(id > 0){
+                pos.add(id);
+            } else {
+                negs.add(id);
+            }
+        }
+
+        if (pos != null && setWorkingDatabase(Database.CENTRAL)) {
+            results.addAll(getLocationDao().getLocationByIds(pos));
+        }
+
+        if (negs != null && setWorkingDatabase(Database.LOCAL)) {
+           results.addAll(getLocationDao().getLocationByIds(negs));
+        }
+        return results;
+    }
+
+    @Override
+    public List<LocationDetails> getLocationDetailsByLocationIDs(List<Integer> ids) throws  MiddlewareQueryException {
+        List<LocationDetails> results = new ArrayList<LocationDetails>();
+
+        List<Integer> pos = new ArrayList<Integer>();
+        List<Integer> negs = new ArrayList<Integer>();
+
+        //separate ids from local and central
+        for(Integer id : ids){
+            if(id > 0){
+                pos.add(id);
+            } else {
+                negs.add(id);
+            }
+        }
+
+        if (pos != null && setWorkingDatabase(Database.CENTRAL)) {
+            results.addAll(getLocationDao().getLocationDetails(pos,0,pos.size()));
+        }
+
+        if (negs != null && setWorkingDatabase(Database.LOCAL)) {
+              List<Location> locations = getLocationDao().getLocationByIds(negs);
+
+              for (Location l : locations) {
+                  Country c = this.getCountryById(l.getCntryid());
+                  UserDefinedField udf = this.getUserDefinedFieldByID(l.getLtype());
+
+                  // hack, reset working database to local
+                  //setWorkingDatabase(Database.LOCAL);
+
+                  LocationDetails ld = new LocationDetails();
+
+                  ld.setCountry_full_name(c.getIsofull());
+                  ld.setLocation_abbreviation(l.getLabbr());
+                  ld.setLocation_name(l.getLname());
+                  ld.setLocation_type(udf.getFname());
+                  ld.setLocation_description(udf.getFdesc());
+
+                  results.add(ld);
+              }
+        }
+
+        return results;
+    }
+
 
     @Override
     public Integer addLocation(Location location) throws MiddlewareQueryException {

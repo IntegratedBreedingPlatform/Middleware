@@ -551,10 +551,11 @@ public class TestGermplasmListManagerImpl{
     
     @Test
     public void testSearchGermplasmList() throws MiddlewareQueryException{
-        String q = "50533";
+        //String q = "50533";
         //String q = "philippines";
     	//String q = "HB2009DS";
-              
+        String q = "dinurado";  
+    	
         List<GermplasmList> results = manager.searchForGermplasmList(q);
         
         Debug.println(0, "###############################");

@@ -1251,8 +1251,18 @@ public interface GermplasmDataManager {
      * Search for germplasms given a search term Q
      * @param q
      * @return - List of germplasms (including parents (level 1) with gid=Q or name like Q or in list name like Q
+     * Given a List of GIDs, return the list of gids mapped to their corresponding location
+     * @param List<Integer> gids
+     * 			- list of gids
+     * @return Map<Integer, String>
+     * 			- map of gids to their corresponding location name
      * @throws MiddlewareQueryException
      */
     public List<Germplasm> searchForGermplasm(String q) throws MiddlewareQueryException;
 
+    public List<Location> getLocationsByIDs(List<Integer> ids) throws  MiddlewareQueryException;
+
+    public List<LocationDetails> getLocationDetailsByLocationIDs(List<Integer> ids) throws  MiddlewareQueryException;
+
+    public List<Method> getMethodsByIDs(List<Integer> ids) throws MiddlewareQueryException;
 }

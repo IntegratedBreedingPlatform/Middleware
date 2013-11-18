@@ -12,6 +12,7 @@
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.generationcp.middleware.dao.CropTypeDAO;
@@ -38,6 +39,7 @@ import org.generationcp.middleware.dao.WorkflowTemplateDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -1039,6 +1041,19 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     }
 
     @Override
+    public List<Long> getFavoriteProjectLocationIds(Long projectId, int start, int numOfRows) throws MiddlewareQueryException{
+        List<ProjectLocationMap> projectLocationMaps = this.getProjectLocationMapByProjectId(projectId,start,numOfRows);
+        List<Long> locationIds = new ArrayList<Long>();
+        for (ProjectLocationMap pLoc : projectLocationMaps) {
+            locationIds.add(pLoc.getLocationId());
+        }
+
+        return locationIds;
+    }
+
+
+
+    @Override
     public void deleteProjectLocationMap(ProjectLocationMap projectLocationMap) throws MiddlewareQueryException {
         Session session = getCurrentSession();
         Transaction trans = null;
@@ -1110,6 +1125,21 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     public List<ProjectMethod> getProjectMethodByProject(Project project, int start, int numOfRows) throws MiddlewareQueryException {
         return getProjectMethodDao().getProjectMethodByProject(project, start, numOfRows);
 
+    }
+
+    @Override
+    public List<Integer> getFavoriteProjectMethods(Project project, int start, int numOfRows) throws  MiddlewareQueryException {
+        List<Integer> results = new ArrayList<Integer>();
+
+        try {
+            for (ProjectMethod pm : getProjectMethodDao().getProjectMethodByProject(project,start,numOfRows)) {
+                results.add(pm.getMethodId());
+            }
+       } catch (Exception e) {
+           logAndThrowException("Error encountered while getting project methods");
+       }
+
+        return  results;
     }
 
     @Override

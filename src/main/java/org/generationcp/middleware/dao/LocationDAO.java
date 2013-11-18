@@ -11,12 +11,9 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.LocationDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
@@ -295,31 +292,66 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
     @SuppressWarnings("unchecked")
 	public List<LocationDetails> getLocationDetails(Integer locationId, Integer start, Integer numOfRows) throws MiddlewareQueryException {
     	        try {
-    	        	if (locationId != null){
-	    	            StringBuilder queryString = new StringBuilder();
-	    	            queryString.append("select lname as location_name,locid,");
-	    	            queryString.append(" c.isofull as country_full_name, labbr as location_abbreviation,"); 
-	    	            queryString.append(" ud.fname as location_type,");
-	    	            queryString.append(" ud.fdesc as location_description");
-	    	            queryString.append(" from location l");
-	    	            queryString.append(" left join cntry c on l.cntryid = c.cntryid");
-	    	            queryString.append(" left join udflds ud on ud.fldno = l.ltype");
+                    StringBuilder queryString = new StringBuilder();
+                    queryString.append("select lname as location_name,locid,");
+                    queryString.append(" c.isofull as country_full_name, labbr as location_abbreviation,");
+                    queryString.append(" ud.fname as location_type,");
+                    queryString.append(" ud.fdesc as location_description");
+                    queryString.append(" from location l");
+                    queryString.append(" left join cntry c on l.cntryid = c.cntryid");
+                    queryString.append(" left join udflds ud on ud.fldno = l.ltype");
+
+                    if (locationId != null){
 	    	            queryString.append(" where locid = :id");
-	    	            
+
 	    	            SQLQuery query = getSession().createSQLQuery(queryString.toString());
 	    	            query.setParameter("id", locationId);
 	    	            query.setFirstResult(start);
 	    	            query.setMaxResults(numOfRows);
 	    	            query.addEntity(LocationDetails.class);
-	    	            	
+
 	    	            List<LocationDetails> list = query.list();
 	    	         
 	    	            return list;
     	        	}
+
     	        } catch (HibernateException e) {
     	            logAndThrowException("Error with getLocationDetails(id=" + locationId + ") : " + e.getMessage(), e);
     	        }
     	        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<LocationDetails> getLocationDetails(List<Integer> locationId, Integer start, Integer numOfRows) throws MiddlewareQueryException {
+        try {
+            StringBuilder queryString = new StringBuilder();
+            queryString.append("select lname as location_name,locid,");
+            queryString.append(" c.isofull as country_full_name, labbr as location_abbreviation,");
+            queryString.append(" ud.fname as location_type,");
+            queryString.append(" ud.fdesc as location_description");
+            queryString.append(" from location l");
+            queryString.append(" left join cntry c on l.cntryid = c.cntryid");
+            queryString.append(" left join udflds ud on ud.fldno = l.ltype");
+
+            if (locationId != null) {
+
+                queryString.append(" where locid = :id");
+
+                SQLQuery query = getSession().createSQLQuery(queryString.toString());
+                query.setParameterList("id", locationId);
+                query.setFirstResult(start);
+                query.setMaxResults(numOfRows);
+                query.addEntity(LocationDetails.class);
+
+                List<LocationDetails> list = query.list();
+
+                return list;
+
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getLocationDetails(id=" + locationId + ") : " + e.getMessage(), e);
+        }
+        return null;
     }
     
     @SuppressWarnings("unchecked")
@@ -348,7 +380,23 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
 		}
 		return returnList;
     }
-    
+
+    @SuppressWarnings("unchecked")
+    public List<Location> getLocationByIds(Collection<Integer> ids) throws MiddlewareQueryException {
+        try {
+            return getSession().createCriteria(Location.class).add(Restrictions.in("locid",ids)).list();
+        } catch (HibernateException e) {
+            logAndThrowException(String.format("Error with getLocationByIds(id=[%s])", StringUtils.join(ids, ",")),e);
+        }
+
+        return new ArrayList<Location>();
+    }
+
+
+
+
+
+
     @SuppressWarnings("unchecked")
     public Map<Integer, String> getLocationNamesByGIDs(List<Integer> gids) throws MiddlewareQueryException {
         Map<Integer, String> toreturn = new HashMap<Integer, String>();

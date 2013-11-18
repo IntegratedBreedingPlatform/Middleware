@@ -30,6 +30,17 @@ import org.hibernate.criterion.Restrictions;
  * 
  */
 public class MethodDAO extends GenericDAO<Method, Integer>{
+    @SuppressWarnings("unchecked")
+    public List<Method> getMethodsByIds(List<Integer> ids) throws MiddlewareQueryException {
+        try {
+            return getSession().createCriteria(Method.class).add(Restrictions.in("mid",ids)).list();
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getMethodsByIds() query from Method: " + e.getMessage(),e);
+        }
+
+        return new ArrayList<Method>();
+
+    }
 
     @SuppressWarnings("unchecked")
     public List<Method> getAllMethod() throws MiddlewareQueryException {
