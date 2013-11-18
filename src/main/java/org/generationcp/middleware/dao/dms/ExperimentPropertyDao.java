@@ -54,21 +54,21 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
         /*  
 			SET @projectId = 5790;
 			
-			SELECT eproj.project_id, eproj.nd_experiment_id AS experimentId, s.uniquename AS entryNumber,
-						 s.name AS germplasmName, epropRep.value AS rep, epropPlot.value AS plotNo
-			FROM nd_experiment_project eproj 
-   				INNER JOIN project_relationship pr ON pr.object_project_id = :projectId AND pr.type_id = 1150
-   				INNER JOIN nd_experiment_stock es ON eproj.nd_experiment_id = es.nd_experiment_id 
-					 AND eproj.project_id = @projectId
-				INNER JOIN stock s ON es.stock_id = s.stock_id
-				LEFT JOIN nd_experimentprop epropRep ON eproj.nd_experiment_id = epropRep.nd_experiment_id
-						AND epropRep.type_id = 8210  AND eproj.project_id = @projectId
-						AND epropRep.value IS NOT NULL  AND epropRep.value <> ''
-				INNER JOIN nd_experimentprop epropPlot ON eproj.nd_experiment_id = epropPlot.nd_experiment_id
-			                        AND epropPlot.type_id IN (8200, 8380)  AND eproj.project_id = @projectId
-			                        AND epropPlot.value IS NOT NULL  AND epropPlot.value <> ''
-			ORDER BY eproj.nd_experiment_id
-			;
+            SELECT eproj.nd_experiment_id AS experimentId, s.uniquename AS entryNumber,  
+              s.name AS germplasmName, epropRep.value AS rep, epropPlot.value AS plotNo 
+            FROM nd_experiment_project eproj  
+            INNER JOIN project_relationship pr ON pr.object_project_id = @projectId AND pr.type_id = 1150
+            INNER JOIN nd_experiment_stock es ON eproj.nd_experiment_id = es.nd_experiment_id 
+              AND eproj.project_id = pr.subject_project_id 
+            INNER JOIN stock s ON es.stock_id = s.stock_id
+            LEFT JOIN nd_experimentprop epropRep ON eproj.nd_experiment_id = epropRep.nd_experiment_id 
+              AND epropRep.type_id =  8210 AND eproj.project_id = pr.subject_project_id 
+              AND epropRep.value IS NOT NULL  AND epropRep.value <> '' 
+            INNER JOIN nd_experimentprop epropPlot ON eproj.nd_experiment_id = epropPlot.nd_experiment_id 
+              AND epropPlot.type_id IN (8200, 8380)
+              AND eproj.project_id = pr.subject_project_id 
+              AND epropPlot.value IS NOT NULL  AND epropPlot.value <> '' 
+            ORDER BY eproj.nd_experiment_id ;
 
         */
         try {
