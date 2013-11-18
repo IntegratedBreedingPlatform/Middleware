@@ -96,7 +96,95 @@ public class TestGermplasmDataManagerImpl{
             Debug.println(0, "  " + l);
         }
     }
-    
+
+    @Test
+    public void testGetLocationsByIDs() throws Exception {
+
+        // Attempt to get all locations so we can proceed
+        List<Location> locationList = manager.getAllLocations();
+        assertTrue(locationList != null);
+        assertTrue("we cannot proceed test if size < 0",locationList.size()>0);
+
+        List<Integer> ids = new ArrayList<Integer>();
+
+        for (Location ls : locationList) {
+            ids.add(ls.getLocid());
+
+            // only get subset of locations
+            if (ids.size() < 5)
+                break;
+        }
+
+        List<Location> results = manager.getLocationsByIDs(ids);
+        assertTrue(results != null);
+        assertTrue(results.size() < 5);
+
+        Debug.println(0, "testGetLocationsByIDs() RESULTS: ");
+        for (Location l : results) {
+            Debug.println(0, "  " + l);
+        }
+
+    }
+
+    @Test
+    public void testGetLocationDetailsByIDs() throws Exception {
+
+        // Attempt to get all locations so we can proceed
+        List<Location> locationList = manager.getAllLocations();
+        assertTrue(locationList != null);
+        assertTrue("we cannot proceed test if size < 0",locationList.size()>0);
+
+        List<Integer> ids = new ArrayList<Integer>();
+
+        for (Location ls : locationList) {
+            ids.add(ls.getLocid());
+
+            // only get subset of locations
+            if (ids.size() < 5)
+                break;
+        }
+
+        List<LocationDetails> results = manager.getLocationDetailsByLocationIDs(ids);
+        assertTrue(results != null);
+        assertTrue(results.size() < 5);
+
+        Debug.println(0, "testGetLocationDetailsByIDs() RESULTS: ");
+        for (LocationDetails l : results) {
+            Debug.println(0, "  " + l);
+        }
+
+    }
+
+    @Test
+    public void testGetMethodsByIDs() throws Exception {
+
+        // Attempt to get all locations so we can proceed
+        List<Method> locationList = manager.getAllMethods();
+        assertTrue(locationList != null);
+        assertTrue("we cannot proceed test if size < 0",locationList.size()>0);
+
+        List<Integer> ids = new ArrayList<Integer>();
+
+        for (Method ls : locationList) {
+            ids.add(ls.getMid());
+
+            // only get subset of locations
+            if (ids.size() < 5)
+                break;
+        }
+
+        List<Method> results = manager.getMethodsByIDs(ids);
+        assertTrue(results != null);
+        assertTrue(results.size() < 5);
+
+        Debug.println(0, "testGetMethodsByIDs() RESULTS: ");
+        for (Method l : results) {
+            Debug.println(0, "  " + l);
+        }
+
+    }
+
+
     @Test
     public void testGetAllCountry() throws Exception {
         List<Country> countryList = manager.getAllCountry();
