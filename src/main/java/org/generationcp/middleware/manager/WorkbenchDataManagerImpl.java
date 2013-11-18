@@ -1128,6 +1128,21 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     }
 
     @Override
+    public List<Integer> getFavoriteProjectMethods(Project project, int start, int numOfRows) throws  MiddlewareQueryException {
+        List<Integer> results = new ArrayList<Integer>();
+
+        try {
+            for (ProjectMethod pm : getProjectMethodDao().getProjectMethodByProject(project,start,numOfRows)) {
+                results.add(pm.getMethodId());
+            }
+       } catch (Exception e) {
+           logAndThrowException("Error encountered while getting project methods");
+       }
+
+        return  results;
+    }
+
+    @Override
     public void deleteProjectMethod(ProjectMethod projectMethod) throws MiddlewareQueryException {
         Session session = getCurrentSession();
         Transaction trans = null;

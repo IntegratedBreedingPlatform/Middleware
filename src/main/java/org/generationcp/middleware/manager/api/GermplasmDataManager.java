@@ -1262,5 +1262,7 @@ public interface GermplasmDataManager {
 
     public List<Location> getLocationsByIDs(List<Integer> ids) throws  MiddlewareQueryException;
 
-    List<LocationDetails> getLocationDetailsByLocationIDs(List<Integer> ids) throws  MiddlewareQueryException;
+    public List<LocationDetails> getLocationDetailsByLocationIDs(List<Integer> ids) throws  MiddlewareQueryException;
+
+    public List<Method> getMethodsByIDs(List<Integer> ids) throws MiddlewareQueryException;
 }

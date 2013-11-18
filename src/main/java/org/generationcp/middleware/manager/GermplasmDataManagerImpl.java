@@ -520,6 +520,34 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     @Override
+    public List<Method> getMethodsByIDs(List<Integer> ids) throws MiddlewareQueryException {
+        List<Method> results = new ArrayList<Method>();
+
+        List<Integer> pos = new ArrayList<Integer>();
+        List<Integer> negs = new ArrayList<Integer>();
+
+        //separate ids from local and central
+        for(Integer id : ids){
+            if(id > 0){
+                pos.add(id);
+            } else {
+                negs.add(id);
+            }
+        }
+
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            results.addAll(getMethodDao().getMethodsByIds(pos));
+        }
+
+
+        if (setWorkingDatabase(Database.LOCAL)) {
+            results.addAll(getMethodDao().getMethodsByIds(negs));
+        }
+
+        return results;
+    }
+
+    @Override
     public List<Method> getAllMethods() throws MiddlewareQueryException {
         return (List<Method>) getAllFromCentralAndLocalByMethod(getMethodDao(), "getAllMethod", new Object[] {}, new Class[] {});
     }
