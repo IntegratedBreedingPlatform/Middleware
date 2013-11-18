@@ -62,8 +62,12 @@ public class WorkbookParser {
     private org.generationcp.middleware.domain.etl.Workbook currentWorkbook;
     private final static String[] DEFAULT_EXPECTED_VARIABLE_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE", "LABEL"};
     private final static String[] EXPECTED_VARIATE_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "", "SAMPLE LEVEL"};
+    private final static String[] EXPECTED_VARIATE_HEADERS_2 = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "", "SAMPLE LEVEL"};
     private final static String[] EXPECTED_CONSTANT_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE", "SAMPLE LEVEL"};
+    private final static String[] EXPECTED_CONSTANT_HEADERS_2 = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE", ""};
     private final static String[] EXPECTED_FACTOR_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "NESTED IN", "LABEL"};
+    private final static String[] EXPECTED_FACTOR_HEADERS_2 = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "", "LABEL"};
+    
 
     private static final int DEFAULT_GEOLOCATION_ID = 1;
     /**
@@ -255,18 +259,25 @@ public class WorkbookParser {
 
             // GCP-5815
             String[] expectedHeaders = null;
+            String[] expectedHeaders2 = null;
 
             if (name.equals("FACTOR")) {
                 expectedHeaders = EXPECTED_FACTOR_HEADERS;
+                expectedHeaders2 = EXPECTED_FACTOR_HEADERS_2;
             } else if (name.equals("VARIATE")) {
                 expectedHeaders = EXPECTED_VARIATE_HEADERS;
+                expectedHeaders2 = EXPECTED_VARIATE_HEADERS_2;
             } else if (name.equals("CONSTANT")) {
                 expectedHeaders = EXPECTED_CONSTANT_HEADERS;
+                expectedHeaders2 = EXPECTED_CONSTANT_HEADERS_2;
             } else {
                 expectedHeaders = DEFAULT_EXPECTED_VARIABLE_HEADERS;
             }
 
             boolean valid = checkHeadersValid(wb, DESCRIPTION_SHEET, currentRow, expectedHeaders);
+            if(!valid && expectedHeaders2 != null) {
+            	valid = checkHeadersValid(wb, DESCRIPTION_SHEET, currentRow, expectedHeaders2);
+            }
             if (!valid && expectedHeaders != DEFAULT_EXPECTED_VARIABLE_HEADERS) {
                 valid = checkHeadersValid(wb, DESCRIPTION_SHEET, currentRow, DEFAULT_EXPECTED_VARIABLE_HEADERS);
             }
@@ -314,7 +325,7 @@ public class WorkbookParser {
                     errorMessages.add(new Message("error.missing.field.datatype", Integer.toString(currentRow + 1)));
                 }
 
-                if (StringUtils.isEmpty(var.getLabel())) {
+                if (!name.equals("VARIATE") && StringUtils.isEmpty(var.getLabel())) {
                     errorMessages.add(new Message("error.missing.field.label", Integer.toString(currentRow + 1)));
                 }
                 
