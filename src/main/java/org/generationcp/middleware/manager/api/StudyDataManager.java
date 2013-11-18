@@ -360,9 +360,8 @@ public interface StudyDataManager {
      * 
      * @param studyId the id of the study to retrieve the count from
      * @param studyType Can be either StudyType.T (Trial) or StudyType.N (Nursery)
-     * @param instance The database instance to connect to
      * @return the FieldMapCount object containing the counts
      */
-    FieldMapInfo getFieldMapInfoOfStudy(int studyId, StudyType studyType, Database instance) throws MiddlewareQueryException;
+    FieldMapInfo getFieldMapInfoOfStudy(int studyId, StudyType studyType) throws MiddlewareQueryException;
     
 }

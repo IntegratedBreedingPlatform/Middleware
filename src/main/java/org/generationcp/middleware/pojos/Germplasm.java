@@ -35,7 +35,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 /**
  * POJO for germplsm table.
  * 
- * @author Kevin Manansala, Mark Agarrado
+ * @author Kevin Manansala, Mark Agarrado, Dennis Billano
  */
 @NamedQueries({ @NamedQuery(name = "getAllGermplasm", query = "FROM Germplasm"),
         @NamedQuery(name = "countAllGermplasm", query = "SELECT COUNT(g) FROM Germplasm g"),
@@ -320,6 +320,43 @@ public class Germplasm implements Serializable{
             "SELECT {g.*}, {m.*} " +
             "FROM germplsm g LEFT JOIN methods m ON g.methn = m.mid " +
             "WHERE g.gid = :gid";
+    
+    /**
+     * Used in germplasm data manager searchForGermplasm
+     */
+    public static final String SEARCH_GERMPLASM_BY_GID = 
+    		"SELECT germplsm.* " +
+    		"FROM germplsm " +
+    		"WHERE gid=:gid";
+    public static final String SEARCH_GERMPLASM_BY_GIDS = 
+    		"SELECT germplsm.* " +
+    		"FROM germplsm " +
+    		"WHERE gid IN (:gids)";
+    public static final String SEARCH_GID_BY_GERMPLASM_NAME = 
+    		"SELECT DISTINCT gid " +
+    		"FROM names " +
+    		"WHERE nstat!=:deletedStatus AND nval LIKE :q " +
+    		"LIMIT 5000";
+    public static final String SEARCH_LIST_ID_BY_LIST_NAME =
+    		"SELECT listid " +
+    		"FROM ( " +
+    		"    SELECT listnms.*, " +
+            "        (MATCH(listname) AGAINST(:q)) AS searchScore " +
+            "    FROM listnms " +
+            "    WHERE liststatus!=:deletedStatus " +
+            "    GROUP BY listid  " +
+            "    HAVING searchScore>0 " +
+            ") AS searchResults " +
+            "ORDER BY searchScore DESC ";
+    public static final String SEARCH_GERMPLASM_BY_LIST_ID = 
+    		"SELECT germplsm.* " +
+    		"FROM listdata " +
+    		"	LEFT JOIN germplsm ON listdata.gid=germplsm.gid " +
+        	"WHERE listid IN (:listids) ";
+
+    		
+    		
+
     
     @Id
     @Basic(optional = false)

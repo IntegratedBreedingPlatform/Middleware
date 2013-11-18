@@ -48,7 +48,7 @@ public interface FieldbookService {
      * @param trialId the id of the trial to retrieve the count from
      * @return the FieldMapCount object containing the counts
      */
-    FieldMapInfo getLocalFieldMapInfoOfTrial(int trialId) throws MiddlewareQueryException;
+    FieldMapInfo getFieldMapInfoOfTrial(int trialId) throws MiddlewareQueryException;
     
     /**
      * Gets the field map info (entries, reps, plots and counts) of the given nursery. 
@@ -56,7 +56,7 @@ public interface FieldbookService {
      * @param nurseryId the id of the nursery to retrieve the count from
      * @return the FieldMapCount object containing the counts
      */
-    FieldMapInfo getLocalFieldMapInfoOfNursery(int nurseryId) throws MiddlewareQueryException;
+    FieldMapInfo getFieldMapInfoOfNursery(int nurseryId) throws MiddlewareQueryException;
     
     
     /**

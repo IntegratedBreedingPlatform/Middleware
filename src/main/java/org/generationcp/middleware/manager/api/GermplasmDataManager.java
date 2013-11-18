@@ -14,7 +14,6 @@ package org.generationcp.middleware.manager.api;
 import java.util.List;
 import java.util.Map;
 
-import org.generationcp.middleware.domain.germplasm.LocationReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.GermplasmNameType;
@@ -1249,6 +1248,9 @@ public interface GermplasmDataManager {
     public Map<Integer, String> getLocationNamesByGids (List<Integer> gids) throws MiddlewareQueryException;
 
     /**
+     * Search for germplasms given a search term Q
+     * @param q
+     * @return - List of germplasms (including parents (level 1) with gid=Q or name like Q or in list name like Q
      * Given a List of GIDs, return the list of gids mapped to their corresponding location
      * @param List<Integer> gids
      * 			- list of gids
@@ -1256,6 +1258,7 @@ public interface GermplasmDataManager {
      * 			- map of gids to their corresponding location name
      * @throws MiddlewareQueryException
      */
+    public List<Germplasm> searchForGermplasm(String q) throws MiddlewareQueryException;
 
     public List<Location> getLocationsByIDs(List<Integer> ids) throws  MiddlewareQueryException;
 

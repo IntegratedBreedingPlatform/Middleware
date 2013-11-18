@@ -75,6 +75,7 @@ public class TestGermplasmDataManagerImpl{
 		long elapsedTime = System.nanoTime() - startTime;
 		Debug.println(0, "#####" + name.getMethodName() + ": Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime/1000000000) + " s");
 	}
+	
     @Test
     public void testGetAllLocationsWithStartNumRows() throws Exception {
         List<Location> locationList = manager.getAllLocations(5, 10);
@@ -1060,6 +1061,26 @@ public class TestGermplasmDataManagerImpl{
             Debug.println(0, gid + " : " + results.get(gid));
         }
     }
+    
+  @Test
+  public void testSearchGermplasm() throws MiddlewareQueryException{
+      //String q = "2003";
+      String q = "dinurado";
+            
+      List<Germplasm> results = manager.searchForGermplasm(q);
+      
+      Debug.println(0, "###############################");
+      Debug.println(0, " searchForGermplasm("+q+")");
+      Debug.println(0, "###############################");
+      
+      for(Germplasm g : results){
+    	  String name = "";
+    	  if(g.getPreferredName()!=null)
+    		  if(g.getPreferredName().getNval()!=null)
+    			  name = g.getPreferredName().getNval().toString();
+          Debug.println(3, g.getGid() + " - " + name);
+      }
+  }         
     
     @AfterClass
     public static void tearDown() throws Exception {

@@ -290,24 +290,6 @@ public class OntologyServiceImpl extends Service implements OntologyService {
         return getOntologyDataManager().getAllTraitGroupsHierarchy(includePropertiesAndVariable);
     }
 
-    @Deprecated
-    @Override
-    public List<TraitClassReference> getTraitGroupsHierarchy(TermId classType) throws MiddlewareQueryException {
-        return getOntologyDataManager().getTraitGroupsHierarchy(classType);
-    }
-
-    @Deprecated
-    @Override
-    public List<TraitClassReference> getAllTraitClasses() throws MiddlewareQueryException{
-        return getOntologyDataManager().getAllTraitClasses();
-    }
-
-    @Deprecated
-    @Override
-    public List<TraitClassReference> getTraitClasses(TermId classType) throws MiddlewareQueryException{
-        return getOntologyDataManager().getTraitClasses(classType);
-    }
-
     @Override
     public List<Term> getAllRoles() throws MiddlewareQueryException{
         List<Integer> roleIds = new ArrayList<Integer>();

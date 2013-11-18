@@ -1467,7 +1467,7 @@ public class TestGenotypicDataManagerImpl{
         // MarkerMetadataSet Additional Field
         Integer markerId = 1;
 
-     // charValues Additional Fields
+        // charValues Additional Fields
         Integer acId = null;            // Crop tested: Groundnut
         String charValue = "CV"; 
        

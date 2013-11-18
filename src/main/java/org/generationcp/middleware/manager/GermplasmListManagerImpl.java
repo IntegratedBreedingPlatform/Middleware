@@ -19,6 +19,7 @@ import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.User;
@@ -579,6 +580,28 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     	return toReturn;
     }
     
- 
+    /**
+     * Search for germplasm lists given a search term Q
+     * @param q
+     * @return - List of germplasm lists
+     * @throws MiddlewareQueryException
+     */
+    public List<GermplasmList> searchForGermplasmList(String q) throws MiddlewareQueryException{
+        List<GermplasmList> resultsFromCentral;
+        List<GermplasmList> resultsFromLocal;
+        List<GermplasmList> combinedResults = new ArrayList<GermplasmList>();
+
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            resultsFromCentral = getGermplasmListDAO().searchForGermplasmLists(q);
+            combinedResults.addAll(resultsFromCentral);
+        }
+        
+        if (setWorkingDatabase(Database.LOCAL)) {
+            resultsFromLocal = getGermplasmListDAO().searchForGermplasmLists(q);
+            combinedResults.addAll(resultsFromLocal);
+        }
+
+        return combinedResults;
+    } 
     
 }

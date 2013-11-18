@@ -442,37 +442,6 @@ public interface OntologyService{
      */
 
     List<TraitClassReference> getAllTraitGroupsHierarchy(boolean includePropertiesAndVariable) throws MiddlewareQueryException;
-
-  
-    /**
-     * Gets the trait groups, its properties and standard variables in a hierarchical structure
-     * based on the given class type.
-     *
-     * @param classType can be either TermId.ONTOLOGY_TRAIT_CLASS or TermId.ONTOLOGY_RESEARCH_CLASS
-     * @return The trait groups
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    @Deprecated
-    List<TraitClassReference> getTraitGroupsHierarchy(TermId classType) throws MiddlewareQueryException;
-
-    /**
-     * Gets all trait classes.
-     *
-     * @return All the trait classes
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    List<TraitClassReference> getAllTraitClasses() throws MiddlewareQueryException;
-    
-    /**
-     * Gets the trait classes based on the given class type.
-     *
-     * @param classType can be either TermId.ONTOLOGY_TRAIT_CLASS or TermId.ONTOLOGY_RESEARCH_CLASS
-     * @return The trait classes of the given class type
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    @Deprecated
-    List<TraitClassReference> getTraitClasses(TermId classType) throws MiddlewareQueryException;
-
        
     /**
      * Adds a new trait class to the database.

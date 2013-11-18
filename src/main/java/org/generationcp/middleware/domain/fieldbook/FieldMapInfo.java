@@ -12,6 +12,9 @@
 
 package org.generationcp.middleware.domain.fieldbook;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.generationcp.middleware.util.Debug;
@@ -25,27 +28,28 @@ import org.generationcp.middleware.util.Debug;
  * @author Joyce Avestro
  *
  */
-public class FieldMapInfo{
+public class FieldMapInfo implements Serializable{
+    
+	private static final long serialVersionUID = 1L;
     
     private Integer fieldbookId;
     
     private String fieldbookName;
     
-    private List<String> entryNumbers;
+    private List<FieldMapLabel> labels;
+    
+    private boolean isTrial; // false if this is for nursery
+	
 
-    private List<String> germplasmNames;
-
-    private List<Integer> reps;
-
-    public long plotCount;
-   
     public FieldMapInfo() {
+    	isTrial = false; // not a trial by default
     }
 
-    public FieldMapInfo(Integer fieldbookId, String fieldbookName, int entryCount, int repCount, int plotCount) {
+    public FieldMapInfo(Integer fieldbookId, String fieldbookName, List<FieldMapLabel> labels) {
+    	this.isTrial = false;
         this.fieldbookId = fieldbookId;
         this.fieldbookName = fieldbookName;
-        this.plotCount = plotCount;
+        this.labels = labels;
     }
 
     public Integer getFieldbookId() {
@@ -64,70 +68,68 @@ public class FieldMapInfo{
         this.fieldbookName = fieldbookName;
     }
     
-    public List<String> getGermplasmNames() {
-        return germplasmNames;
+    public List<FieldMapLabel> getFieldMapLabels() {
+    	return labels;
     }
 
-    public void setGermplasmNames(List<String> germplasmNames) {
-        this.germplasmNames = germplasmNames;
+    public void setFieldMapLabels(List<FieldMapLabel> labels) {
+    	this.labels = labels;
     }
     
-    public List<Integer> getReps() {
-        return reps;
-    }
-    
-    public void setReps(List<Integer> reps) {
-        this.reps = reps;
-    }
-    
-    public void setEntryNumbers(List<String> entryNumbers) {
-        this.entryNumbers = entryNumbers;
-    }
-    
-    public List<String> getEntryNumbers() {
-        return entryNumbers;
-    }
-    
+	public boolean isTrial() {
+		return isTrial;
+	}
+
+	public void setTrial(boolean isTrial) {
+		this.isTrial = isTrial;
+	}
+
     public long getEntryCount() {
-        return entryNumbers.size();
+    	return labels.size() / getRepCount();
     }
     
     public long getRepCount() {
-    	long max = 1;
-    	
-    	for (Integer rep : reps){
-    		if (rep > max){
-    			max = rep;
-    		}
+    	List<Integer> reps = new ArrayList<Integer>();
+    	for (FieldMapLabel label : labels){
+    		reps.add(label.getRep());
     	}
-        return max;
+    	if (reps.size() == 0){
+    		return 1;
+    	}
+    	return Collections.max(reps);
     }
 
     public long getPlotCount() {
-        return plotCount;
+    	List<Integer> plotNumbers = new ArrayList<Integer>();
+    	for (FieldMapLabel label : labels){
+    		plotNumbers.add(label.getPlotNo());
+    	}
+    	
+    	if (plotNumbers.size() == 0){
+    		return 0;
+    	}
+    	
+    	int minPlot = Collections.min(plotNumbers);
+    	int maxPlot = Collections.max(plotNumbers);
+    	return maxPlot - minPlot + 1;
     }
-
-    public void setPlotCount(long plotCount) {
-        this.plotCount = plotCount;
-    }
-
 
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append("FieldMapInfo [fieldbookName=");
         builder.append(fieldbookName);
-        builder.append(", entryNumbers=");
-        builder.append(entryNumbers.toString());
-        builder.append(", entryCount=");
-        builder.append(entryNumbers.size());
-        builder.append(", reps=");
-        builder.append(reps.toString());
-        builder.append(", repCount=");
-        builder.append(reps.size());
-        builder.append(", plotCount=");
-        builder.append(plotCount);
-        builder.append("]");
+        builder.append(", labels=");
+        builder.append(labels.toString());
+        builder.append(", numberOfEntries=");
+        builder.append(getEntryCount());
+        builder.append(", numberOfReps=");
+        builder.append(getRepCount());
+        builder.append(", numberOfPlots=");
+        builder.append(getPlotCount());
+        builder.append(", isTrial=");
+		builder.append(isTrial);
+		builder.append("]");
         return builder.toString();
     }
 
@@ -135,10 +137,13 @@ public class FieldMapInfo{
         Debug.println(indent, "FieldMapInfo: " );
         indent = indent + 3;
         Debug.println(indent, "Fieldbook Name: " + fieldbookName);
-        Debug.println(indent, "Entry Numbers: " + entryNumbers.toString());
-        Debug.println(indent, "Number of Entries: " + entryNumbers.size());
-        Debug.println(indent, "Reps: " + reps.toString());
-        Debug.println(indent, "Number of Reps: " + reps.size());
-        Debug.println(indent, "Number of Plots: " + plotCount);
+        Debug.println(indent, "Is Trial = " + isTrial);
+        Debug.println(indent, "Labels: " );
+        for (FieldMapLabel label : labels){
+        	label.print(indent + 3);
+        }
+        Debug.println(indent, "Number of Entries: " + getEntryCount());
+        Debug.println(indent, "Number of Reps: " + getRepCount());
+        Debug.println(indent, "Number of Plots: " + getPlotCount());
     }
 }
