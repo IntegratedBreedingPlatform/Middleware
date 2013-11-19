@@ -87,10 +87,9 @@ public class FieldMapInfo implements Serializable{
 	}
 
     public long getEntryCount() {
-//    	return labels.size();
-    	Set<String> entries = new HashSet<String>();
+    	Set<Integer> entries = new HashSet<Integer>();
     	for (FieldMapLabel label : labels){
-    		entries.add(label.getGermplasmName());
+    		entries.add(label.getEntryNumber());
     	}
     	return entries.size();
     }
@@ -107,19 +106,6 @@ public class FieldMapInfo implements Serializable{
     }
 
     public long getPlotCount() {
-//    	List<Integer> plotNumbers = new ArrayList<Integer>();
-//    	for (FieldMapLabel label : labels){
-//    		plotNumbers.add(label.getPlotNo());
-//    	}
-//    	
-//    	if (plotNumbers.size() == 0){
-//    		return 0;
-//    	}
-//    	
-//    	int minPlot = Collections.min(plotNumbers);
-//    	int maxPlot = Collections.max(plotNumbers);
-//    	return maxPlot - minPlot + 1;
-    	
     	return labels.size();
     }
 

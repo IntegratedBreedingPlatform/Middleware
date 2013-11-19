@@ -68,7 +68,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
               AND epropPlot.type_id IN (8200, 8380)
               AND eproj.project_id = pr.subject_project_id 
               AND epropPlot.value IS NOT NULL  AND epropPlot.value <> '' 
-            ORDER BY eproj.nd_experiment_id ;
+            ORDER BY eproj.nd_experiment_id ;  -- ASC /DESC depending on the sign of the id
 
         */
         try {
