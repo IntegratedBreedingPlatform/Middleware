@@ -15,7 +15,9 @@ package org.generationcp.middleware.domain.fieldbook;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.generationcp.middleware.util.Debug;
 
@@ -85,7 +87,12 @@ public class FieldMapInfo implements Serializable{
 	}
 
     public long getEntryCount() {
-    	return labels.size() / getRepCount();
+//    	return labels.size();
+    	Set<String> entries = new HashSet<String>();
+    	for (FieldMapLabel label : labels){
+    		entries.add(label.getGermplasmName());
+    	}
+    	return entries.size();
     }
     
     public long getRepCount() {
@@ -100,18 +107,20 @@ public class FieldMapInfo implements Serializable{
     }
 
     public long getPlotCount() {
-    	List<Integer> plotNumbers = new ArrayList<Integer>();
-    	for (FieldMapLabel label : labels){
-    		plotNumbers.add(label.getPlotNo());
-    	}
+//    	List<Integer> plotNumbers = new ArrayList<Integer>();
+//    	for (FieldMapLabel label : labels){
+//    		plotNumbers.add(label.getPlotNo());
+//    	}
+//    	
+//    	if (plotNumbers.size() == 0){
+//    		return 0;
+//    	}
+//    	
+//    	int minPlot = Collections.min(plotNumbers);
+//    	int maxPlot = Collections.max(plotNumbers);
+//    	return maxPlot - minPlot + 1;
     	
-    	if (plotNumbers.size() == 0){
-    		return 0;
-    	}
-    	
-    	int minPlot = Collections.min(plotNumbers);
-    	int maxPlot = Collections.max(plotNumbers);
-    	return maxPlot - minPlot + 1;
+    	return labels.size();
     }
 
     @Override
