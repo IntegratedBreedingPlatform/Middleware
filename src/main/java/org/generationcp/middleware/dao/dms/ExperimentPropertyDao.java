@@ -19,6 +19,7 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
+import org.generationcp.middleware.util.Debug;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -90,6 +91,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 					.append("		AND epropPlot.value IS NOT NULL  AND epropPlot.value <> '' ")
 					.append("ORDER BY eproj.nd_experiment_id ").append(order);
 
+			Debug.println(3, sql.toString());
+			
             Query query = getSession().createSQLQuery(sql.toString())
                     .addScalar("experimentId")
                     .addScalar("entryNumber")
@@ -109,11 +112,14 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                     String rep = (String) row[3];
                     String plotNo = (String) row[4];
 
-                    labels.add(new FieldMapLabel(experimentId 
-                    			, (entryNumber == null ? null : Integer.parseInt(entryNumber))
-                    			, germplasmName
-                    			, (rep == null ? 1 : Integer.parseInt(rep))
-                    			, (plotNo == null ? 0 : Integer.parseInt(plotNo))));
+                    FieldMapLabel label = new FieldMapLabel(experimentId 
+                			, (entryNumber == null ? null : Integer.parseInt(entryNumber))
+                			, germplasmName
+                			, (rep == null ? 1 : Integer.parseInt(rep))
+                			, (plotNo == null ? 0 : Integer.parseInt(plotNo)));
+                    labels.add(label);
+                    label.print(6);
+                    
                 }
             }
             
