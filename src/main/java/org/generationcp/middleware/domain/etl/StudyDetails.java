@@ -12,6 +12,7 @@
 package org.generationcp.middleware.domain.etl;
 
 import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.util.Debug;
 
 public class StudyDetails {
@@ -41,6 +42,8 @@ public class StudyDetails {
     private String siteName;
 
     private String piName;
+    
+    private Season season;
 
 	public StudyDetails(){
 		
@@ -196,6 +199,15 @@ public class StudyDetails {
         this.piName = piName;
     }
 
+	public Season getSeason() {
+		return season;
+	}
+
+	public void setSeason(Season season) {
+		this.season = season;
+	}
+
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -226,6 +238,8 @@ public class StudyDetails {
         builder.append(siteName);
         builder.append(", piName=");
         builder.append(piName);
+        builder.append(", season=");
+        builder.append(season);
         builder.append("]");
         return builder.toString();
     }
@@ -244,6 +258,7 @@ public class StudyDetails {
         Debug.println(indent + 3, "Trial Dataset Name: " + trialDatasetName);
         Debug.println(indent + 3, "Measurement Dataset Name: " + measurementDatasetName);
         Debug.println(indent + 3, "Site Name: " + siteName);
+        Debug.println(indent + 3, "Season: " + season);
         Debug.println(indent + 3, "PI Name: " + piName);
 	}
 

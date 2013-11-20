@@ -28,7 +28,9 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.util.Debug;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -535,6 +537,101 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
                     Integer id = (Integer) row[7];
                     
                     studyDetails.add(new StudyDetails( id, name, title, objective, startDate, endDate, studyType, piName, siteName));
+                }
+            }
+
+        } catch(HibernateException e) {
+            logAndThrowException("Error in getAllStudyDetails() query in DmsProjectDao: " + e.getMessage(), e);
+        }
+        return studyDetails;
+	    
+	}
+	
+	/**
+	 * Retrieves all the study details 
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	@SuppressWarnings("unchecked")
+	public List<StudyDetails> getAllNurseryAndTrialStudyDetails() throws MiddlewareQueryException {
+	    List<StudyDetails> studyDetails = new ArrayList<StudyDetails>();
+        try {
+            
+            StringBuilder sqlString = new StringBuilder()
+            .append("SELECT DISTINCT p.name AS name, p.description AS title, ppObjective.value AS objective, ppStartDate.value AS startDate, ")
+            .append(                        "ppEndDate.value AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, ")
+    		.append(                        "ppNursery.value AS studyType, gpSeason.value AS season, p.project_id AS id ")
+            .append("FROM project p ")
+            .append("   INNER JOIN projectprop ppNursery ON p.project_id = ppNursery.project_id ")
+            .append("                   AND ppNursery.type_id = ").append(TermId.STUDY_TYPE.getId()).append(" ")
+            .append("                   AND (ppNursery.value = ").append(TermId.NURSERY.getId()).append(" ") // 10000 for Nursery
+            .append("                   OR ppNursery.value = ").append(TermId.TRIAL.getId()).append(") ") // 10010 for Trial
+            .append("   LEFT JOIN projectprop ppObjective ON p.project_id = ppObjective.project_id ")
+            .append("                   AND ppObjective.type_id =  ").append(TermId.STUDY_OBJECTIVE.getId()).append(" ") // 8030
+            .append("   LEFT JOIN projectprop ppStartDate ON p.project_id = ppStartDate.project_id ")
+            .append("                   AND ppStartDate.type_id =  ").append(TermId.START_DATE.getId()).append(" ") // 8050 
+            .append("   LEFT JOIN projectprop ppEndDate ON p.project_id = ppEndDate.project_id ")
+            .append("                   AND ppEndDate.type_id =  ").append(TermId.END_DATE.getId()).append(" ") // 8060 
+            .append("   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
+            .append("                   AND ppPI.type_id =  ").append(TermId.PI_NAME.getId()).append(" ") // 8100 
+            .append("   LEFT JOIN nd_experiment_project ep ON p.project_id = ep.project_id ")
+            .append("   INNER JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id ")
+            .append("   LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id ")
+            .append("           AND gpSiteName.type_id =  ").append(TermId.TRIAL_LOCATION.getId()).append(" ") // 8180 
+            .append("   LEFT JOIN nd_geolocationprop gpSeason ON e.nd_geolocation_id = gpSeason.nd_geolocation_id ")
+            .append("           AND gpSeason.type_id =  ").append("8371").append(" ") // 2452 
+            .append("WHERE NOT EXISTS (SELECT 1 FROM projectprop ppDeleted WHERE ppDeleted.type_id =  ").append(TermId.STUDY_STATUS.getId()).append(" ") // 8006
+            .append("               AND ppDeleted.project_id = p.project_id AND ppDeleted.value =  ").append(TermId.DELETED_STUDY.getId()).append(") ") // 12990     
+            ;
+        
+            Query query = getSession().createSQLQuery(sqlString.toString())
+                        .addScalar("name")
+                        .addScalar("title")
+                        .addScalar("objective")
+                        .addScalar("startDate")
+                        .addScalar("endDate")
+                        .addScalar("piName")
+                        .addScalar("siteName")
+                        .addScalar("studyType")
+                        .addScalar("season")
+                        .addScalar("id")
+                        ;
+
+            List<Object[]> list =  query.list();
+            
+            if (list != null && list.size() > 0) {
+                for (Object[] row : list){
+                    String name = (String) row [0]; 
+                    String title = (String) row [1]; 
+                    String objective = (String) row [2]; 
+                    String startDate = (String) row [3]; 
+                    String endDate = (String) row [4]; 
+                    String piName = (String) row [5]; 
+                    String siteName = (String) row [6];
+                    String studyTypeStr = (String) row [7];
+                    Integer seasonInt = (Integer) row [8];
+                    Integer id = (Integer) row[9];
+                    
+                    StudyType studyType = StudyType.N; 
+                    if (Integer.parseInt(studyTypeStr) == TermId.NURSERY.getId()){
+                    	studyType = StudyType.T;
+                    }
+                    
+                    Season season = Season.GENERAL;
+                    
+                    Debug.println(3, "============ seasonInt: " + seasonInt);
+                    if (seasonInt == TermId.SEASON_DRY.getId()){
+                    	season = Season.DRY;
+                    } else if (seasonInt == TermId.SEASON_WET.getId()){
+                    	season = Season.WET;
+                    }
+                    
+                    //TODO
+                    
+                    StudyDetails detail = new StudyDetails( id, name, title, objective, startDate, endDate, studyType, piName, siteName);
+                    detail.setSeason(season);
+                    studyDetails.add(detail);
+                    
                 }
             }
 

@@ -753,6 +753,14 @@ public class TestStudyDataManagerImpl {
         }
     }
     
+
+    @Test
+    public void testGetAllNurseryAndTrialStudyDetails() throws Exception {
+        List<StudyDetails> studyDetails = manager.getAllNurseryAndTrialStudyDetails();
+        for (StudyDetails study : studyDetails){
+            study.print(3);
+        }
+    }
     @Test
     public void testCountProjectsByVariable() throws Exception {
         int variableId = 8050;

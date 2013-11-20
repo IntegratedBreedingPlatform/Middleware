@@ -408,6 +408,20 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
+	public List<StudyDetails> getAllNurseryAndTrialStudyDetails() throws MiddlewareQueryException{
+    	List<StudyDetails> studyDetails = new ArrayList<StudyDetails>();
+        studyDetails.addAll(getAllNurseryAndTrialStudyDetails(Database.CENTRAL));
+        studyDetails.addAll(getAllNurseryAndTrialStudyDetails(Database.LOCAL));
+        return studyDetails;
+    }
+
+    @Override
+	public List<StudyDetails> getAllNurseryAndTrialStudyDetails(Database instance) throws MiddlewareQueryException{
+        setWorkingDatabase(instance);
+        return getDmsProjectDao().getAllNurseryAndTrialStudyDetails();
+    }
+
+    @Override
     public long countProjectsByVariable(int variableId) throws MiddlewareQueryException {
         setWorkingDatabase(Database.LOCAL);
         long count = getDmsProjectDao().countByVariable(variableId);
