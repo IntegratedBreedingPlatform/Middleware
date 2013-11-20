@@ -19,6 +19,8 @@ public enum ToolName {
      germplasm_browser
     ,study_browser
     ,germplasm_list_browser
+    ,germplasm_headtohead
+    ,germplasm_mainheadtohead
     ,germplasm_phenotypic
     ,gdms
     ,fieldbook
@@ -31,4 +33,5 @@ public enum ToolName {
     ,breeding_planner
     ,germplasm_import
     ,dataset_importer
+    ,ibpwebservice
 }
