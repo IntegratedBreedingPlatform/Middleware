@@ -31,6 +31,7 @@ import org.hibernate.criterion.Restrictions;
  */
 public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Integer> {
 
+
 	@SuppressWarnings("unchecked")
 	public List<Integer> getExperimentIdsByPropertyTypeAndValue(Integer typeId, String value) throws MiddlewareQueryException {
 		try {
@@ -68,7 +69,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
               AND epropPlot.type_id IN (8200, 8380)
               AND eproj.project_id = pr.subject_project_id 
               AND epropPlot.value IS NOT NULL  AND epropPlot.value <> '' 
-            ORDER BY eproj.nd_experiment_id ;
+            ORDER BY eproj.nd_experiment_id ;  -- ASC /DESC depending on the sign of the id
 
         */
         try {
@@ -89,7 +90,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 					.append("		AND eproj.project_id = pr.subject_project_id ")
 					.append("		AND epropPlot.value IS NOT NULL  AND epropPlot.value <> '' ")
 					.append("ORDER BY eproj.nd_experiment_id ").append(order);
-
+			
             Query query = getSession().createSQLQuery(sql.toString())
                     .addScalar("experimentId")
                     .addScalar("entryNumber")
@@ -109,11 +110,12 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                     String rep = (String) row[3];
                     String plotNo = (String) row[4];
 
-                    labels.add(new FieldMapLabel(experimentId 
-                    			, (entryNumber == null ? null : Integer.parseInt(entryNumber))
-                    			, germplasmName
-                    			, (rep == null ? 1 : Integer.parseInt(rep))
-                    			, (plotNo == null ? 0 : Integer.parseInt(plotNo))));
+                    FieldMapLabel label = new FieldMapLabel(experimentId 
+                			, (entryNumber == null ? null : Integer.parseInt(entryNumber))
+                			, germplasmName
+                			, (rep == null ? 1 : Integer.parseInt(rep))
+                			, (plotNo == null ? 0 : Integer.parseInt(plotNo)));
+                    labels.add(label);
                 }
             }
             

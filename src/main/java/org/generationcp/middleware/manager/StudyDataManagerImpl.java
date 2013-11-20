@@ -408,6 +408,20 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
+	public List<StudyDetails> getAllNurseryAndTrialStudyDetails() throws MiddlewareQueryException{
+    	List<StudyDetails> studyDetails = new ArrayList<StudyDetails>();
+        studyDetails.addAll(getAllNurseryAndTrialStudyDetails(Database.CENTRAL));
+        studyDetails.addAll(getAllNurseryAndTrialStudyDetails(Database.LOCAL));
+        return studyDetails;
+    }
+
+    @Override
+	public List<StudyDetails> getAllNurseryAndTrialStudyDetails(Database instance) throws MiddlewareQueryException{
+        setWorkingDatabase(instance);
+        return getDmsProjectDao().getAllNurseryAndTrialStudyDetails();
+    }
+
+    @Override
     public long countProjectsByVariable(int variableId) throws MiddlewareQueryException {
         setWorkingDatabase(Database.LOCAL);
         long count = getDmsProjectDao().countByVariable(variableId);
@@ -444,26 +458,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         }
         
         fieldMapInfo.setFieldMapLabels(getExperimentPropertyDao().getFieldMapLabels(studyId));
-        
-//        // Set Entry Numbers and Germplasm Names
-//        List<StockModel> stocks = getStockDao().getStocks(studyId);
-//        List<String> entryNumbers = new ArrayList<String>();
-//        List<String> germplasmNames = new ArrayList<String>();
-//        
-//        for (StockModel stock : stocks){
-//            entryNumbers.add(stock.getUniqueName());
-//            germplasmNames.add(stock.getName());
-//        }
-//
-//        fieldMapInfo.setEntryNumbers(entryNumbers);
-//        fieldMapInfo.setGermplasmNames(germplasmNames);
-//        
-//        // Set Reps
-//        ExperimentPropertyDao experimentPropertyDao = getExperimentPropertyDao();
-//        fieldMapInfo.setReps(experimentPropertyDao.getRepsOfProject(studyId));
-//        
-//        // Set Plot Count
-//        fieldMapInfo.setPlotCount(experimentPropertyDao.getPlotCount(studyId));
         
         return fieldMapInfo;
     }

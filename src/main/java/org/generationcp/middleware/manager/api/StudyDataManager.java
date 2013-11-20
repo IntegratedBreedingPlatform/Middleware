@@ -328,6 +328,26 @@ public interface StudyDataManager {
      */
     List<StudyDetails> getAllStudyDetails(Database instance, StudyType studyType) throws MiddlewareQueryException;
     
+
+    /**
+     * 
+     * Retrieves the details of nursery and trial studies  from the specified database.
+     *  
+     * @param instance Can be CENTRAL or LOCAL
+     * @return The list of study details having the given study type from the given database
+     * @throws MiddlewareQueryException
+     */
+    List<StudyDetails> getAllNurseryAndTrialStudyDetails(Database instance) throws MiddlewareQueryException;
+    
+    /**
+     * 
+     * Retrieves the details of nursery and trial studies  from central and local.
+     *  
+     * @return The list of study details having the given study type from the given database
+     * @throws MiddlewareQueryException
+     */
+	List<StudyDetails> getAllNurseryAndTrialStudyDetails() throws MiddlewareQueryException;
+
     /**
      * Checks if the name specified is an already existing project name
      * 

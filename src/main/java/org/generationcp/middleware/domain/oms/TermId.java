@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.oms;
 
+import org.generationcp.middleware.manager.Season;
+
 /**
  * The cvterm ID constants used in Middleware.
  *
@@ -80,6 +82,9 @@ public enum TermId {
 	
 	//Properties
 	, SEASON(2452)
+	, SEASON_WET(10300)
+	, SEASON_DRY(10290)
+	
 	, GID(8240)
 	
 	// Experiment Types
