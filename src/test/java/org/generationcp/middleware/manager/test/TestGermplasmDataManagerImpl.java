@@ -1169,7 +1169,19 @@ public class TestGermplasmDataManagerImpl{
           Debug.println(3, g.getGid() + " - " + name);
       }
   }         
-    
+  
+  @Test
+  public void getGermplasmDatesByGids() throws MiddlewareQueryException{
+	  List<Integer> gids = new ArrayList<Integer>();
+	  gids.add(50533);
+	  gids.add(-1);
+	  Map<Integer,Integer> results = manager.getGermplasmDatesByGids(gids);
+      Debug.println(0, "###############################");
+      Debug.println(0, " getGermplasmDatesByGids("+gids+")");
+      Debug.println(0, "###############################");
+	  System.out.println(results);
+  }
+  
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();

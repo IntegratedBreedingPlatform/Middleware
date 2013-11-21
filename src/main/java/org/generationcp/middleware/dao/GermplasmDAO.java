@@ -13,7 +13,9 @@ package org.generationcp.middleware.dao;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmNameType;
@@ -959,5 +961,20 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         return new ArrayList<Germplasm>();
     }
     
+    
+    public Map<Integer, Integer> getGermplasmDatesByGids(List<Integer> gids){
+    	Map<Integer, Integer> resultMap = new HashMap<Integer, Integer>();
+        SQLQuery query = getSession().createSQLQuery(Germplasm.GET_GERMPLASM_DATES_BY_GIDS);
+        query.setParameterList("gids", gids);
+        @SuppressWarnings("rawtypes")
+		List results = query.list();
+        for(Object result: results){
+        	Object resultArray[] = (Object[]) result;
+            Integer gid = (Integer) resultArray[0];
+            Integer gdate = (Integer) resultArray[1];
+            resultMap.put(gid, gdate);
+        }
+        return resultMap;
+    }
     
 }

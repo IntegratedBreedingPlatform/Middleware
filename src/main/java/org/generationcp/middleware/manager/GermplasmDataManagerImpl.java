@@ -1705,6 +1705,24 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
         return combinedResults;
     }
+   
     
+    public Map<Integer, Integer> getGermplasmDatesByGids(List<Integer> gids) throws MiddlewareQueryException {
+    	Map<Integer, Integer> resultsFromCentral;
+    	Map<Integer, Integer> resultsFromLocal;
+    	Map<Integer, Integer> combinedResults = new HashMap<Integer, Integer>();
+
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            resultsFromCentral = getGermplasmDao().getGermplasmDatesByGids(gids);
+            combinedResults.putAll(resultsFromCentral);
+        }
+        
+        if (setWorkingDatabase(Database.LOCAL)) {
+        	resultsFromLocal = getGermplasmDao().getGermplasmDatesByGids(gids);
+            combinedResults.putAll(resultsFromLocal);
+        }
+
+        return combinedResults;
+    }
     
 }

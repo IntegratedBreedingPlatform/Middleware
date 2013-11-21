@@ -1265,4 +1265,13 @@ public interface GermplasmDataManager {
     public List<LocationDetails> getLocationDetailsByLocationIDs(List<Integer> ids) throws  MiddlewareQueryException;
 
     public List<Method> getMethodsByIDs(List<Integer> ids) throws MiddlewareQueryException;
+    
+    /**
+     * Get gDates given GIDs
+     * @param gids
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    public Map<Integer, Integer> getGermplasmDatesByGids(List<Integer> gids) throws MiddlewareQueryException;
+
 }
