@@ -56,7 +56,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
-
+    
     private static final Logger LOG = LoggerFactory.getLogger(StudyDataManagerImpl.class);
 
     public StudyDataManagerImpl() {
@@ -410,8 +410,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     @Override
 	public List<StudyDetails> getAllNurseryAndTrialStudyDetails() throws MiddlewareQueryException{
     	List<StudyDetails> studyDetails = new ArrayList<StudyDetails>();
-        studyDetails.addAll(getAllNurseryAndTrialStudyDetails(Database.CENTRAL));
         studyDetails.addAll(getAllNurseryAndTrialStudyDetails(Database.LOCAL));
+        studyDetails.addAll(getAllNurseryAndTrialStudyDetails(Database.CENTRAL));
         return studyDetails;
     }
 

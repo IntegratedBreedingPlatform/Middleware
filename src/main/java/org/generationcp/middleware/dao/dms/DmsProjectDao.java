@@ -556,16 +556,48 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	public List<StudyDetails> getAllNurseryAndTrialStudyDetails() throws MiddlewareQueryException {
 	    List<StudyDetails> studyDetails = new ArrayList<StudyDetails>();
         try {
-            
+            /*
+                SELECT DISTINCT p.name AS name, p.description AS title
+                        , ppObjective.value AS objective
+                        , ppStartDate.value AS startDate
+                        , ppEndDate.value AS endDate
+                        , ppPI.value AS piName
+                        , gpSiteName.value AS siteName
+                         , ppStudyType.value AS studyType
+                        , gpSeason.value AS season
+                        , p.project_id AS id 
+                FROM project p 
+                INNER JOIN projectprop ppStudyType ON p.project_id = ppStudyType.project_id 
+                               AND ppStudyType.type_id = 8070 -- TermId.STUDY_TYPE.getIdc 
+                               AND (ppStudyType.value = 10000 -- TermId.NURSERY.getId()  --  10000 for Nursery
+                               OR ppStudyType.value = 10010) -- TermId.TRIAL.getId()  --  10010 for Trial
+                LEFT JOIN projectprop ppObjective ON p.project_id = ppObjective.project_id 
+                               AND ppObjective.type_id =  8030 -- TermId.STUDY_OBJECTIVE.getId()  --  8030
+                LEFT JOIN projectprop ppStartDate ON p.project_id = ppStartDate.project_id 
+                               AND ppStartDate.type_id =  8050 -- TermId.START_DATE.getId()  --  8050 
+                LEFT JOIN projectprop ppEndDate ON p.project_id = ppEndDate.project_id 
+                               AND ppEndDate.type_id =  8060 -- TermId.END_DATE.getId()  --  8060 
+                LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id 
+                               AND ppPI.type_id =  8100 -- TermId.PI_NAME.getId()  --  8100 
+                LEFT JOIN nd_experiment_project ep ON p.project_id = ep.project_id 
+               INNER JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id 
+               LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id 
+                       AND gpSiteName.type_id =  8180 -- TermId.TRIAL_LOCATION.getId()  --  8180 
+               LEFT JOIN nd_geolocationprop gpSeason ON e.nd_geolocation_id = gpSeason.nd_geolocation_id 
+                       AND gpSeason.type_id =  8371  --  2452 
+            WHERE NOT EXISTS (SELECT 1 FROM projectprop ppDeleted WHERE ppDeleted.type_id = 8006 --  TermId.STUDY_STATUS.getId(  --  8006
+                           AND ppDeleted.project_id = p.project_id AND ppDeleted.value =  12990 ) -- TermId.DELETED_STUDY.getId(  --  12990     
+
+             */
             StringBuilder sqlString = new StringBuilder()
             .append("SELECT DISTINCT p.name AS name, p.description AS title, ppObjective.value AS objective, ppStartDate.value AS startDate, ")
             .append(                        "ppEndDate.value AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, ")
-    		.append(                        "ppNursery.value AS studyType, gpSeason.value AS season, p.project_id AS id ")
+    		.append(                        "ppStudyType.value AS studyType, gpSeason.value AS season, p.project_id AS id ")
             .append("FROM project p ")
-            .append("   INNER JOIN projectprop ppNursery ON p.project_id = ppNursery.project_id ")
-            .append("                   AND ppNursery.type_id = ").append(TermId.STUDY_TYPE.getId()).append(" ")
-            .append("                   AND (ppNursery.value = ").append(TermId.NURSERY.getId()).append(" ") // 10000 for Nursery
-            .append("                   OR ppNursery.value = ").append(TermId.TRIAL.getId()).append(") ") // 10010 for Trial
+            .append("   INNER JOIN projectprop ppStudyType ON p.project_id = ppStudyType.project_id ")
+            .append("                   AND ppStudyType.type_id = ").append(TermId.STUDY_TYPE.getId()).append(" ") // 8070
+            .append("                   AND (ppStudyType.value = ").append(TermId.NURSERY.getId()).append(" ") // 10000 for Nursery
+            .append("                   OR ppStudyType.value = ").append(TermId.TRIAL.getId()).append(") ") // 10010 for Trial
             .append("   LEFT JOIN projectprop ppObjective ON p.project_id = ppObjective.project_id ")
             .append("                   AND ppObjective.type_id =  ").append(TermId.STUDY_OBJECTIVE.getId()).append(" ") // 8030
             .append("   LEFT JOIN projectprop ppStartDate ON p.project_id = ppStartDate.project_id ")
@@ -618,15 +650,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
                     }
                     
                     Season season = Season.GENERAL;
-                    
-                    Debug.println(3, "============ seasonInt: " + seasonInt);
-                    if (seasonInt == TermId.SEASON_DRY.getId()){
+                    if (seasonInt != null && seasonInt == TermId.SEASON_DRY.getId()){
                     	season = Season.DRY;
-                    } else if (seasonInt == TermId.SEASON_WET.getId()){
+                    } else if (seasonInt != null && seasonInt == TermId.SEASON_WET.getId()){
                     	season = Season.WET;
                     }
-                    
-                    //TODO
                     
                     StudyDetails detail = new StudyDetails( id, name, title, objective, startDate, endDate, studyType, piName, siteName);
                     detail.setSeason(season);
