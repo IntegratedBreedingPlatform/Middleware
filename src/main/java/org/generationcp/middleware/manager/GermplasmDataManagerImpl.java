@@ -1725,4 +1725,31 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         return combinedResults;
     }
     
+    public Map<Integer, Object> getMethodsByGids(List<Integer> gids) throws MiddlewareQueryException {
+    	
+    	Map<Integer, Object> results = new HashMap<Integer, Object>();
+    	
+    	Map<Integer, Integer> centralMethodIds = new HashMap<Integer, Integer>();
+    	Map<Integer, Integer> localMethodIds = new HashMap<Integer, Integer>();
+    	
+    	List<Method> methods = new ArrayList<Method>();
+    	
+        if (setWorkingDatabase(Database.CENTRAL)) {
+        	centralMethodIds = getGermplasmDao().getMethodIdsByGids(gids);
+        	for(Map.Entry<Integer,Integer> entry: centralMethodIds.entrySet()){
+        		Method method = getMethodDao().getById(entry.getValue(), false);
+        		results.put(entry.getKey(), method);
+        	}
+        }
+        if (setWorkingDatabase(Database.LOCAL)) {
+        	localMethodIds = getGermplasmDao().getMethodIdsByGids(gids);
+        	for(Map.Entry<Integer,Integer> entry: localMethodIds.entrySet()){
+        		Method method = getMethodDao().getById(entry.getValue(), false);
+        		results.put(entry.getKey(), method);
+        	}
+        }
+
+        return results;
+    }    
+    
 }
