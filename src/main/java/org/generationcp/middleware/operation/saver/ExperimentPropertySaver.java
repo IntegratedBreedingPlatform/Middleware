@@ -66,7 +66,9 @@ public class ExperimentPropertySaver extends Saver {
             getExperimentPropertySaver().saveOrUpdateProperty(experiment, TermId.BLOCK, info.getBlockName());
             getExperimentPropertySaver().saveOrUpdateProperty(experiment, TermId.TOTAL_ROWS, String.valueOf(info.getColumnsInBlock()));
             getExperimentPropertySaver().saveOrUpdateProperty(experiment, TermId.TOTAL_COLUMNS, String.valueOf(info.getRangesInBlock()));
-            getExperimentPropertySaver().saveOrUpdateProperty(experiment, TermId.PLANTING_ORDER, String.valueOf(info.getPlantingOrder()));
+            int plantingOrder = info.getPlantingOrder() != null && info.getPlantingOrder().equals(2) 
+                    ? TermId.SERPENTINE.getId() : TermId.ROW_COLUMN.getId();
+            getExperimentPropertySaver().saveOrUpdateProperty(experiment, TermId.PLANTING_ORDER, String.valueOf(plantingOrder));
         }
     }
 }
