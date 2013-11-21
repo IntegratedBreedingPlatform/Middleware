@@ -84,8 +84,6 @@ public class StandardVariableSaver extends Saver {
 		int varId = varTerm.getCvTermId();
 		stdVar.setId(varId);
 
-		//getCvTermDao().save(varTerm);		
-		
         if (stdVar.getConstraints() != null) {
             Integer minValueId = saveConstraint(varId, TermId.MIN_VALUE.getId(), stdVar.getConstraints().getMinValue());
             Integer maxValueId = saveConstraint(varId, TermId.MAX_VALUE.getId(), stdVar.getConstraints().getMaxValue());
@@ -95,8 +93,6 @@ public class StandardVariableSaver extends Saver {
         
 		saveSynonyms(varId, stdVar.getNameSynonyms());
 
-		//getCvTermDao().update(varTerm);
-		
 		saveRelationship(varId, TermId.HAS_PROPERTY.getId(), stdVar.getProperty());
 		saveRelationship(varId, TermId.HAS_SCALE.getId(), stdVar.getScale());
 		saveRelationship(varId, TermId.HAS_METHOD.getId(), stdVar.getMethod());
@@ -110,7 +106,7 @@ public class StandardVariableSaver extends Saver {
 		}
 		
 		saveEnumerations(varId, stdVar.getEnumerations());
-		
+				
 		return stdVar.getId();
 	}
 	
@@ -180,16 +176,23 @@ public class StandardVariableSaver extends Saver {
     }
     
 	private CVTerm createCvTerm(StandardVariable stdVar) throws MiddlewareQueryException {
-		CVTerm cvTerm = new CVTerm();
 		
-		cvTerm.setCvTermId(getCvTermDao().getNegativeId("cvTermId"));
-		cvTerm.setCv(CV_VARIABLES);
-		cvTerm.setName(stdVar.getName());
-		cvTerm.setDefinition(stdVar.getDescription());
-		cvTerm.setIsObsolete(false);
-		cvTerm.setIsRelationshipType(false);
+		// check to see if term exists in DB before we create a new one
+		CVTerm cvTerm = getCvTermDao().getByNameAndCvId(stdVar.getName(), CV_VARIABLES);
 		
-		getCvTermDao().save(cvTerm);
+		if(cvTerm == null) {
+		
+			cvTerm = new CVTerm();
+			cvTerm.setCvTermId(getCvTermDao().getNegativeId("cvTermId"));
+			cvTerm.setCv(CV_VARIABLES);
+			cvTerm.setName(stdVar.getName());
+			cvTerm.setDefinition(stdVar.getDescription());
+			cvTerm.setIsObsolete(false);
+			cvTerm.setIsRelationshipType(false);
+			
+			getCvTermDao().save(cvTerm);
+		}
+		
 		return cvTerm;
 	}
 	
@@ -217,22 +220,33 @@ public class StandardVariableSaver extends Saver {
 	
 	private void saveRelationship(int subjectId, int typeId, Term object) throws MiddlewareQueryException {
 		if (object != null) {
-			saveCvTermRelationship(subjectId, typeId, object.getId());
-			
+			// see if this relationship already exists (this saves us from dealing with a Unique Constraint Exception)
+			boolean exists = false;
+			CVTermRelationship relationship = getCvTermRelationshipDao().getRelationshipBySubjectIdAndTypeId(subjectId, typeId);
+			if(relationship != null) {
+				if(relationship.getObjectId().intValue() == object.getId()) {
+					// the relationship exists, as stipulated by unique constraint subject-type-object must be unique
+					exists = true;
+				}
+			}
+			// save to DB if this relationship does not already exist
+			if(!exists) saveCvTermRelationship(subjectId, typeId, object.getId());
 		} else {
 			throw new MiddlewareQueryException("The CvTermRelationship field is required for " + subjectId + " with relationship type of " + typeId);
 		}
 	}
 	
 	private void saveCvTermRelationship(int subjectId, int typeId, int objectId) throws MiddlewareQueryException {
-		CVTermRelationship relationship = new CVTermRelationship();
 		
-		relationship.setCvTermRelationshipId(getCvTermRelationshipDao().getNegativeId("cvTermRelationshipId"));
-		relationship.setSubjectId(subjectId);
-		relationship.setTypeId(typeId);
-		relationship.setObjectId(objectId);
-		
-		getCvTermRelationshipDao().save(relationship);
+			CVTermRelationship relationship = new CVTermRelationship();
+			
+			relationship.setCvTermRelationshipId(getCvTermRelationshipDao().getNegativeId("cvTermRelationshipId"));
+			relationship.setSubjectId(subjectId);
+			relationship.setTypeId(typeId);
+			relationship.setObjectId(objectId);
+			
+			getCvTermRelationshipDao().save(relationship);
+			
 	}
 	
     private Integer saveConstraint(int cvTermId, int typeId, Double constraintValue) throws MiddlewareQueryException {
