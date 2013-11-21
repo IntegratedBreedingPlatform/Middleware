@@ -12,6 +12,7 @@
 package org.generationcp.middleware.operation.saver;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +44,8 @@ import org.slf4j.LoggerFactory;
 //ASsumptions - can be added to validations
 //Mandatory fields:  workbook.studyDetails.studyName
 //template must not contain exact same combo of property-scale-method
+
+//TODO : CONTROL THE SESSION - we need to flush in new Standard Variables as soon as we can - before Datasets and constructed
 public class WorkbookSaver extends Saver {
 
     private static final Logger LOG = LoggerFactory.getLogger(WorkbookSaver.class);
@@ -54,7 +57,27 @@ public class WorkbookSaver extends Saver {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
     
-	public int save(Workbook workbook) throws Exception {
+    /**
+     * This method transforms Variable data from a Fieldbook presented as an XLS style Workbook.
+     * - Variables new to the ontology are created and persisted
+     * - Columns and rows are transformed into entities suitables for persistence
+     * 
+     * Note : the result of this process is suitable for Dataset Creation
+     * 
+     * @param workbook
+     * @return Map<String>, ?> : a map of 3 sub-maps containing Strings(headers), VariableTypeLists and Lists of MeasurementVariables
+     * @throws Exception
+     */
+    
+    @SuppressWarnings("rawtypes")
+	public Map saveVariables(Workbook workbook) throws Exception 
+    {
+    	// Create Maps, which we will fill with transformed Workbook Variable Data
+    	Map<String, Map<String, ?>> variableMap = new HashMap<String, Map<String,?>>();
+    	Map<String, List<String>> headerMap = new HashMap<String, List<String>>();
+    	Map<String, VariableTypeList> variableTypeMap = new HashMap<String, VariableTypeList>();
+    	Map<String, List<MeasurementVariable>> measurementVariableMap = new HashMap<String, List<MeasurementVariable>>();
+    	
 		//GCP-6091 start
 		List<MeasurementVariable> trialMV = workbook.getTrialVariables();
 		List<String> trialHeaders = workbook.getTrialHeaders(trialMV);        
@@ -69,12 +92,73 @@ public class WorkbookSaver extends Saver {
         //GCP-6091 end
         trialVariables.addAll(getVariableTypeListTransformer()
         						.transform(workbook.getVariables(workbook.getConstants(), false), true, trialVariables.size()+1));
-        
 
         List<MeasurementVariable> effectMV = workbook.getMeasurementDatasetVariables();
         VariableTypeList effectVariables = getVariableTypeListTransformer().transform(workbook.getNonTrialVariables(workbook.getFactors()), false);
         effectVariables.addAll(getVariableTypeListTransformer().transform(workbook.getVariates(), true, effectVariables.size()+1));
         
+        // Load Lists into Maps in order to return to the front end (and force Session Flush)
+        // -- headers
+        headerMap.put("trialHeaders", trialHeaders);
+        // -- variableTypeLists
+        variableTypeMap.put("trialVariableTypeList", trialVariableTypeList);
+        variableTypeMap.put("trialVariables", trialVariables);
+        variableTypeMap.put("effectVariables", effectVariables);
+        // -- measurementVariables
+        measurementVariableMap.put("trialMV", trialMV);
+        measurementVariableMap.put("effectMV", effectMV);
+        // load 3 maps into a super Map
+        variableMap.put("headerMap", headerMap);
+        variableMap.put("variableTypeMap", variableTypeMap);
+        variableMap.put("measurementVariableMap", measurementVariableMap);
+        return variableMap;
+        
+    }
+    
+    /**
+     * Dataset creation and persistence for Fieldbook upload
+     * 
+     * NOTE IMPORTANT : This step will fail if the Fieldbook has not had new Variables processed 
+     * and new ontology terms created.
+     * 
+     * 
+     * @param workbook
+     * @param variableMap : a map of 3 sub-maps containing Strings(headers), VariableTypeLists and Lists of MeasurementVariables
+     * @return int (success/fail)
+     * @throws Exception
+     */
+	@SuppressWarnings("unchecked")
+	public int saveDataset(Workbook workbook, Map<String, ?> variableMap) throws Exception {
+		
+		// unpack maps first level - Maps of Strings, Maps of VariableTypeList , Maps of Lists of MeasurementVariable
+		Map<String, List<String>> headerMap = (Map<String, List<String>>) variableMap.get("headerMap");
+		Map<String, VariableTypeList> variableTypeMap = (Map<String, VariableTypeList>) variableMap.get("variableTypeMap");
+		Map<String, List<MeasurementVariable>> measurementVariableMap = (Map<String, List<MeasurementVariable>>) variableMap.get("measurementVariableMap");
+
+		// unpack maps
+		// Strings
+		List<String> trialHeaders = headerMap.get("trialHeaders");
+		//VariableTypeLists
+		VariableTypeList trialVariableTypeList = variableTypeMap.get("trialVariableTypeList");
+		VariableTypeList trialVariables = variableTypeMap.get("trialVariables");
+		VariableTypeList effectVariables = variableTypeMap.get("effectVariables");
+		// Lists of measurementVariables
+		List<MeasurementVariable> trialMV = measurementVariableMap.get("trialMV");
+		List<MeasurementVariable> effectMV = measurementVariableMap.get("effectMV");
+		
+		// TODO : Review code and see whether variable validation and possible dataset creation abort
+		// is a good idea (rebecca)
+//		boolean error = false;
+//		for (VariableType ev : effectVariables.getVariableTypes()) {
+//			if(ev.getStandardVariable().getStoredIn() == null) {
+//				LOG.info("No ROLE for : " + ev.getStandardVariable().getName());
+//				error = true;
+//			}
+//			else LOG.info("Role for : " + ev.getStandardVariable().getName() + " : " + ev.getStandardVariable().getStoredIn().getId());
+//		}
+//		if(error) return -1;
+		
+		
         //GCP-6091 start
         int studyLocationId = DEFAULT_GEOLOCATION_ID;
         List<Integer> locationIds = new ArrayList<Integer>();
@@ -99,7 +183,7 @@ public class WorkbookSaver extends Saver {
    		int datasetId = createMeasurementEffectDatasetIfNecessary(workbook, studyId, trialMV, effectMV, effectVariables);
    		createStocksIfNecessary(datasetId, workbook, effectVariables, trialHeaders);
    		createMeasurementEffectExperiments(datasetId, effectVariables, workbook, trialHeaders);
-   		
+        
    		return studyId;
 	}
 	
