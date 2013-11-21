@@ -115,6 +115,12 @@ public enum TermId {
     , PLOT_NO (8200)
     , PLOT_NNO (8380)
     , REP_NO (8210)
+    , ROW_NO (22769)
+    , COLUMN_NO (22770)
+    , BLOCK (8220)
+    , TOTAL_ROWS (22772)
+    , TOTAL_COLUMNS (22773)
+    , PLANTING_ORDER (22774)
 	
     // Experiment storage
     , TRIAL_DESIGN_INFO_STORAGE(1030)
@@ -149,6 +155,10 @@ public enum TermId {
 	, TRIAL_INSTANCE_FACTOR(8170)
 	
 	, DELETED_STUDY(12990)
+	
+	//Planting Order
+	, ROW_COLUMN (22778)
+	, SERPENTINE (22779)
 	;
 	
 	private final int id;

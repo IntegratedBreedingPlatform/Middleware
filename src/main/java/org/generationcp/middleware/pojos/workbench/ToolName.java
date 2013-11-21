@@ -16,22 +16,46 @@ package org.generationcp.middleware.pojos.workbench;
  *
  */
 public enum ToolName {
-     germplasm_browser
-    ,study_browser
+    // Breeding Planner native app
+     breeding_planner
+    
+    // BreedingView native app
+    ,breeding_view
+    
+    // fieldbook native appapp
+    ,breeding_manager
+    ,fieldbook
+    ,ibfb_germplasm_import
+    
+    // MBDT native app
+    ,mbdt
+    
+    // OptiMAS native app
+    ,optimas
+    
+    // BreedingManager webapp
+    ,crossing_manager
+    ,germplasm_import
+    ,list_manager
+    ,nursery_template_wizard
+    
+    // DatasetImporter webapp
+    ,dataset_importer
+    
+    // GDMS webapp
+    ,gdms
+    
+    // GermplasmStudyBrowser webapp
+    ,germplasm_browser
     ,germplasm_list_browser
     ,germplasm_headtohead
     ,germplasm_mainheadtohead
-    ,germplasm_phenotypic
-    ,gdms
-    ,fieldbook
-    ,optimas
-    ,breeding_manager
-    ,breeding_view
-    ,list_manager
-    ,crossing_manager
-    ,nursery_template_wizard
-    ,breeding_planner
-    ,germplasm_import
-    ,dataset_importer
+    ,query_for_adapted_germplasm
+    ,study_browser
+    
+    // ibpwebservice webapp
     ,ibpwebservice
+    
+    // not needed anymore?
+    ,germplasm_phenotypic
 }

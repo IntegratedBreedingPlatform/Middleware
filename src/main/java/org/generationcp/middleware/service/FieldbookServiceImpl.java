@@ -12,6 +12,7 @@
 package org.generationcp.middleware.service;
 
 import java.util.List;
+import java.util.Set;
 
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
@@ -42,13 +43,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     }
 
     @Override
-    public FieldMapInfo getFieldMapInfoOfTrial(int trialId) throws MiddlewareQueryException{
-        return getStudyDataManager().getFieldMapInfoOfStudy(trialId, StudyType.T);
+    public FieldMapInfo getFieldMapInfoOfTrial(int trialId, int geolocationId) throws MiddlewareQueryException{
+        return getStudyDataManager().getFieldMapInfoOfStudy(trialId, StudyType.T, geolocationId);
     }
     
     @Override 
-    public FieldMapInfo getFieldMapInfoOfNursery(int nurseryId) throws MiddlewareQueryException{
-        return getStudyDataManager().getFieldMapInfoOfStudy(nurseryId, StudyType.N);
+    public FieldMapInfo getFieldMapInfoOfNursery(int nurseryId, int geolocationId) throws MiddlewareQueryException{
+        return getStudyDataManager().getFieldMapInfoOfStudy(nurseryId, StudyType.N, geolocationId);
     }
 
     @Override 
@@ -57,4 +58,21 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     	return germplasmDataManager.getAllLocations();
     }
 
+    @Override
+    public void saveOrUpdateFieldmapProperties(FieldMapInfo info) throws MiddlewareQueryException {
+     
+        getStudyDataManager().saveOrUpdateFieldmapProperties(info);
+    
+    }
+
+    //TODO: REMOVE THIS, THIS IS JUST FOR TESTING
+    @Override
+    public int getGeolocationId(int projectId) throws MiddlewareQueryException {
+        setWorkingDatabase(projectId);
+        Set<Integer> geolocations = getGeolocationDao().getLocationIds(projectId);
+        if (geolocations == null || geolocations.size() == 0) {
+            throw new MiddlewareQueryException("error in test data");
+        }
+        return geolocations.iterator().next();
+    }
 }

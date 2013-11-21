@@ -43,6 +43,7 @@ import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.GidStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.ParentFolderStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
+import org.generationcp.middleware.domain.workbench.StudyNode;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -56,7 +57,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
-
+    
     private static final Logger LOG = LoggerFactory.getLogger(StudyDataManagerImpl.class);
 
     public StudyDataManagerImpl() {
@@ -408,17 +409,17 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-	public List<StudyDetails> getAllNurseryAndTrialStudyDetails() throws MiddlewareQueryException{
-    	List<StudyDetails> studyDetails = new ArrayList<StudyDetails>();
-        studyDetails.addAll(getAllNurseryAndTrialStudyDetails(Database.CENTRAL));
-        studyDetails.addAll(getAllNurseryAndTrialStudyDetails(Database.LOCAL));
-        return studyDetails;
+	public List<StudyNode> getAllNurseryAndTrialStudyNodes() throws MiddlewareQueryException{
+    	List<StudyNode> studyNodes = new ArrayList<StudyNode>();
+        studyNodes.addAll(getNurseryAndTrialStudyNodes(Database.LOCAL));
+        studyNodes.addAll(getNurseryAndTrialStudyNodes(Database.CENTRAL));
+        return studyNodes;
     }
 
     @Override
-	public List<StudyDetails> getAllNurseryAndTrialStudyDetails(Database instance) throws MiddlewareQueryException{
+	public List<StudyNode> getNurseryAndTrialStudyNodes(Database instance) throws MiddlewareQueryException{
         setWorkingDatabase(instance);
-        return getDmsProjectDao().getAllNurseryAndTrialStudyDetails();
+        return getDmsProjectDao().getAllNurseryAndTrialStudyNodes();
     }
 
     @Override
@@ -444,7 +445,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
     
     @Override
-    public FieldMapInfo getFieldMapInfoOfStudy(int studyId, StudyType studyType) throws MiddlewareQueryException{
+    public FieldMapInfo getFieldMapInfoOfStudy(int studyId, StudyType studyType, int geolocationId) throws MiddlewareQueryException{
         FieldMapInfo fieldMapInfo = new FieldMapInfo();
         setWorkingDatabase(studyId);
         
@@ -457,9 +458,32 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         	fieldMapInfo.setTrial(false);
         }
         
-        fieldMapInfo.setFieldMapLabels(getExperimentPropertyDao().getFieldMapLabels(studyId));
+        fieldMapInfo.setFieldMapLabels(getExperimentPropertyDao().getFieldMapLabels(studyId, geolocationId));
         
         return fieldMapInfo;
     }
-
+    
+    @Override
+    public void saveOrUpdateFieldmapProperties(FieldMapInfo info) throws MiddlewareQueryException {
+        
+        if (info != null && info.getFieldMapLabels() != null && !info.getFieldMapLabels().isEmpty()) {
+            requireLocalDatabaseInstance();
+            Session session = getCurrentSessionForLocal();
+            Transaction trans = null;
+    
+            try {
+                trans = session.beginTransaction();
+                
+                getExperimentPropertySaver().saveFieldmapProperties(info);
+                
+                trans.commit();
+    
+            } catch (Exception e) {
+                rollbackTransaction(trans);
+                logAndThrowException("Error encountered with saveOrUpdateFieldmapProperties(): " + e.getMessage(),
+                        e, LOG);
+            }
+        }
+    }
+    
 }

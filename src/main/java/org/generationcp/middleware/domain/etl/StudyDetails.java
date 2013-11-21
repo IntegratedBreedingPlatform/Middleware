@@ -129,6 +129,13 @@ public class StudyDetails {
 	public void setStartDate(String startDate) {
 		this.startDate = startDate;
 	}
+	
+	public String getStartYear(){
+	    if (startDate != null){
+	        return startDate.substring(0,4);
+	    }
+	    return null;
+	}
 
 	public String getEndDate() {
 		return endDate;

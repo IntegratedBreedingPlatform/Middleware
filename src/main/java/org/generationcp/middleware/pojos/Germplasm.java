@@ -354,10 +354,14 @@ public class Germplasm implements Serializable{
     		"	LEFT JOIN germplsm ON listdata.gid=germplsm.gid " +
         	"WHERE listid IN (:listids) ";
     public static final String GET_GERMPLASM_DATES_BY_GIDS =
-	"SELECT gid, gdate " +
-	"FROM germplsm " +
-	"WHERE gid IN (:gids)";
- 
+		"SELECT gid, gdate " +
+		"FROM germplsm " +
+		"WHERE gid IN (:gids)";
+    public static final String GET_METHOD_IDS_BY_GIDS =
+    		"SELECT gid, methn " +
+    		"FROM germplsm " +
+    		"WHERE gid IN (:gids)";
+    
     		
     		
 

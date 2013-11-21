@@ -18,34 +18,40 @@ package org.generationcp.middleware.domain.oms;
 public enum StudyType {
 
 	//CV_ID = 2010
-	N("N",10000)
-	,HB("HB",10001)
-	,PN("PN",10002)
-	,CN("CN",10003)
-	,OYT("OYT",10005)
-	,BON("BON",10007)
-	,T("T",10010)
-	,RYT("RYT",10015)
-	,OFT("OFT",10017)
-	,S("S",10020)
-	,E("E",10030);
+	N("N", 10000, "Nursery")
+	,HB("HB", 10001, "Hybridization Nursery")
+	,PN("PN", 10002, "Pedigree Nursery")
+	,CN("CN", 10003, "Characterization Nursery")
+	,OYT("OYT", 10005, "Observational Yield Trial")
+	,BON("BON", 10007, "BULU Observational Nursery")
+	,T("T", 10010, "Trial")
+	,RYT("RYT", 10015, "Replication Yield Trial")
+	,OFT("OFT", 10017, "On Form Trial")
+	,S("S", 10020, "Survey")
+	,E("E", 10030, "Experiment");
 	
 	
 	private final int id;
 	private final String name; 
+	private final String label;
 	
-	private StudyType(String name, int id) {
+	private StudyType(String name, int id, String label) {
 		this.name = name;
 		this.id = id;
+		this.label = label;
 	}
 	
 	public int getId() {
 		return this.id;
 	}
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
+
+    public String getLabel() {
+        return label;
+    }
 
     public static StudyType getStudyType(String name) {
         for (StudyType studyType : StudyType.values()) {

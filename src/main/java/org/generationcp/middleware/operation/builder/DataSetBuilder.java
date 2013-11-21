@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.builder;
 
+import java.util.List;
 import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.DataSet;
@@ -22,6 +23,7 @@ import org.generationcp.middleware.helper.VariableInfo;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.pojos.dms.ProjectRelationship;
 
 public class DataSetBuilder extends Builder {
 
@@ -94,5 +96,22 @@ public class DataSetBuilder extends Builder {
 		}
 		return null;
 	}
-	
+
+	public DmsProject getTrialDataset(int studyId, int measurementDatasetId) throws MiddlewareQueryException {
+	    setWorkingDatabase(studyId);
+	    DmsProject trialDataset = null;
+	    DmsProject study = getDmsProjectDao().getById(studyId);
+	    List<ProjectRelationship> datasets = study.getRelatedBys();
+	    if (datasets != null) {
+	        for (ProjectRelationship dataset : datasets) {
+	            if (dataset.getTypeId().equals(TermId.BELONGS_TO_STUDY.getId()) 
+	                    && !dataset.getSubjectProject().equals(measurementDatasetId)) {
+	                
+	                trialDataset = dataset.getSubjectProject();
+	                break;
+	            }
+	        }
+	    }
+	    return trialDataset;
+	}
 }

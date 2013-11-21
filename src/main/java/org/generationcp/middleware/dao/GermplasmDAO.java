@@ -977,4 +977,19 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         return resultMap;
     }
     
+    public Map<Integer, Integer> getMethodIdsByGids(List<Integer> gids){
+    	Map<Integer, Integer> resultMap = new HashMap<Integer, Integer>();
+        SQLQuery query = getSession().createSQLQuery(Germplasm.GET_METHOD_IDS_BY_GIDS);
+        query.setParameterList("gids", gids);
+        @SuppressWarnings("rawtypes")
+		List results = query.list();
+        for(Object result: results){
+        	Object resultArray[] = (Object[]) result;
+            Integer gid = (Integer) resultArray[0];
+            Integer methodId = (Integer) resultArray[1];
+            resultMap.put(gid, methodId);
+        }
+        return resultMap;
+    }    
+    
 }

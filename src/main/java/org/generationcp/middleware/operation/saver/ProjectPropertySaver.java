@@ -15,10 +15,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
+import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -113,6 +115,20 @@ public class ProjectPropertySaver extends Saver {
 		property.setProject(project);
 		getProjectPropertyDao().save(property);
 		project.addProperty(property);
+	}
+	
+	public void createProjectPropertyIfNecessary(DmsProject project, TermId termId, int storedIn) throws MiddlewareQueryException {
+	    setWorkingDatabase(project.getProjectId());
+        ProjectProperty property = getProjectPropertyDao().getByStandardVariableId(project, termId.getId());
+        if (property == null) {
+            setWorkingDatabase(project.getProjectId());
+            int rank = getProjectPropertyDao().getNextRank(project.getProjectId());
+            StandardVariable stdvar = new StandardVariable();
+            stdvar.setId(termId.getId());
+            stdvar.setStoredIn(new Term(storedIn, null, null));
+            VariableType variableType = new VariableType(termId.toString(), termId.toString(), stdvar, rank);
+            saveVariableType(project, variableType);
+        }
 	}
 	
 }

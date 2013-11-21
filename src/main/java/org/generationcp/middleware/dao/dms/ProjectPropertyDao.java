@@ -19,9 +19,13 @@ import java.util.Set;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * DAO class for {@link ProjectProperty}.
@@ -82,5 +86,34 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 	}
 
 	
+	public ProjectProperty getByStandardVariableId(DmsProject project, int standardVariableId) throws MiddlewareQueryException {
+	    ProjectProperty projectProperty = null;
+	    try {
+	        Criteria criteria = getSession().createCriteria(getPersistentClass());
+	        criteria.add(Restrictions.eq("project", project));
+	        criteria.add(Restrictions.eq("value", String.valueOf(standardVariableId)));
+	        
+	        projectProperty = (ProjectProperty) criteria.uniqueResult();
+	        
+        } catch (HibernateException e) {
+            logAndThrowException(
+                    "Error in getByStandardVariableId("    + project.getProjectId() + ", " + standardVariableId + ") in ProjectPropertyDao: " + e.getMessage(), e);
+        }
+	    return projectProperty;
+	}
 	
+	public int getNextRank(int projectId) throws MiddlewareQueryException {
+	    try {
+	        String sql = "SELECT max(rank) FROM projectprop WHERE project_id = :projectId";
+	        Query query = getSession().createSQLQuery(sql);
+	        query.setParameter("projectId", projectId);
+	        
+	        return (Integer) query.uniqueResult() + 1;
+	        
+        } catch (HibernateException e) {
+            logAndThrowException(
+                    "Error in getNextRank("    + projectId + ") in ProjectPropertyDao: " + e.getMessage(), e);
+        }
+	    return 0;
+	}
 }
