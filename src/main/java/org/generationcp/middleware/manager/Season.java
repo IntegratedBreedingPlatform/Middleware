@@ -18,18 +18,32 @@ package org.generationcp.middleware.manager;
  * 
  */
 public enum Season {
-    DRY ("Dry season"), WET ("Wet season"), GENERAL;
+    DRY ("Dry", "Dry season", 0), WET ("Wet", "Wet season", 1), GENERAL("General", "General", 2);
     
+    private String label;
+
     private String definition;
+    
+    private Integer sortOrder;
     
     private Season() {
     }
     
-    private Season(String definition) {
+    private Season(String label, String definition, Integer sortOrder) {
+        this.label = label;
     	this.definition = definition;
+    	this.sortOrder = sortOrder;
+    }
+    
+    public String getLabel() {
+        return this.label;
     }
     
     public String getDefinition() {
-    	return this.definition;
+        return this.definition;
+    }
+    
+    public Integer getSortOrder(){
+        return this.sortOrder;
     }
 }
