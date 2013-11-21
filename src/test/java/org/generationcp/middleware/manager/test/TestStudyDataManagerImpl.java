@@ -759,7 +759,9 @@ public class TestStudyDataManagerImpl {
         List<StudyDetails> studyDetails = manager.getAllNurseryAndTrialStudyDetails();
         for (StudyDetails study : studyDetails){
             study.print(3);
+            Debug.println(6, "Year: " + study.getStartYear());
         }
+        Debug.println(3, "Number of Records: " + studyDetails.size());
     }
     @Test
     public void testCountProjectsByVariable() throws Exception {
