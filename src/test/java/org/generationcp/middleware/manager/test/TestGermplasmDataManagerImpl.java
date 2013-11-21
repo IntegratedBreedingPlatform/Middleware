@@ -1186,7 +1186,7 @@ public class TestGermplasmDataManagerImpl{
   public void getMethodsByGids() throws MiddlewareQueryException{
 	  List<Integer> gids = new ArrayList<Integer>();
 	  gids.add(50533);
-	  gids.add(-1);
+	  gids.add(-145);
 	  Map<Integer,Object> results = manager.getMethodsByGids(gids);
       Debug.println(0, "###############################");
       Debug.println(0, " getGermplasmDatesByGids("+gids+")");
