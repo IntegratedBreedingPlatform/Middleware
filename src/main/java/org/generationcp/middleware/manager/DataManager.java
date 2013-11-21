@@ -35,10 +35,11 @@ import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
 import org.generationcp.middleware.operation.builder.VariableInfoBuilder;
 import org.generationcp.middleware.operation.builder.VariableTypeBuilder;
 import org.generationcp.middleware.operation.destroyer.DataSetDestroyer;
-import org.generationcp.middleware.operation.saver.CvTermSaver;
 import org.generationcp.middleware.operation.saver.CvTermRelationshipSaver;
+import org.generationcp.middleware.operation.saver.CvTermSaver;
 import org.generationcp.middleware.operation.saver.DatasetProjectSaver;
 import org.generationcp.middleware.operation.saver.ExperimentModelSaver;
+import org.generationcp.middleware.operation.saver.ExperimentPropertySaver;
 import org.generationcp.middleware.operation.saver.GeolocationSaver;
 import org.generationcp.middleware.operation.saver.ProjectSaver;
 import org.generationcp.middleware.operation.saver.StandardVariableSaver;
@@ -1014,6 +1015,10 @@ public abstract class DataManager extends DatabaseBroker{
 
     protected final PropertyBuilder getPropertyBuilder() {
         return new PropertyBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
+    protected final ExperimentPropertySaver getExperimentPropertySaver() {
+        return new ExperimentPropertySaver(sessionProviderForLocal, sessionProviderForCentral);
     }
 
 }

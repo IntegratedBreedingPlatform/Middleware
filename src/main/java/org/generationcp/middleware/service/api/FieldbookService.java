@@ -48,7 +48,7 @@ public interface FieldbookService {
      * @param trialId the id of the trial to retrieve the count from
      * @return the FieldMapCount object containing the counts
      */
-    FieldMapInfo getFieldMapInfoOfTrial(int trialId) throws MiddlewareQueryException;
+    FieldMapInfo getFieldMapInfoOfTrial(int trialId, int geolocationId) throws MiddlewareQueryException;
     
     /**
      * Gets the field map info (entries, reps, plots and counts) of the given nursery. 
@@ -56,7 +56,7 @@ public interface FieldbookService {
      * @param nurseryId the id of the nursery to retrieve the count from
      * @return the FieldMapCount object containing the counts
      */
-    FieldMapInfo getFieldMapInfoOfNursery(int nurseryId) throws MiddlewareQueryException;
+    FieldMapInfo getFieldMapInfoOfNursery(int nurseryId, int geolocationId) throws MiddlewareQueryException;
     
     
     /**
@@ -68,4 +68,19 @@ public interface FieldbookService {
     List<Location> getAllLocations()throws MiddlewareQueryException;
     
 
+    /**
+     * Save or update Field Map Properties like row, column, block, total rows, total columns, planting order.
+     * 
+     * @param experimentId
+     * @param studyId
+     * @param row
+     * @param column
+     * @param block
+     * @param totalRows
+     * @param totalColumns
+     * @param plantingOrder
+     * @throws MiddlewareQueryException
+     */
+    void saveOrUpdateFieldmapProperties(FieldMapInfo info) throws MiddlewareQueryException;
+            
 }

@@ -12,8 +12,8 @@
 
 package org.generationcp.middleware.manager.test;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -29,8 +29,8 @@ import org.generationcp.middleware.domain.dms.DatasetValues;
 import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.ExperimentValues;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.FolderReference;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Stocks;
@@ -44,6 +44,7 @@ import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
+import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search.StudyResultSet;
@@ -1052,8 +1053,9 @@ public class TestStudyDataManagerImpl {
 	
     @Test
     public void testGetFieldMapCountsOfTrial() throws MiddlewareQueryException{
-        int trialId = -147; 
-        FieldMapInfo fieldMapCount = manager.getFieldMapInfoOfStudy(trialId, StudyType.T);
+        int trialId = -186; 
+        int geolocationId = -123; //please specify the geolocation id used by the trial 
+        FieldMapInfo fieldMapCount = manager.getFieldMapInfoOfStudy(trialId, StudyType.T, geolocationId);
         fieldMapCount.print(3);
         assertTrue(fieldMapCount.getEntryCount() > 0);      
     }
@@ -1061,9 +1063,35 @@ public class TestStudyDataManagerImpl {
     @Test
     public void testGetFieldMapCountsOfNursery() throws MiddlewareQueryException{
         int nurseryId = -138;
-        FieldMapInfo fieldMapCount = manager.getFieldMapInfoOfStudy(nurseryId, StudyType.N);
+        int geolocationId = 1; //nursery uses the default geolocation id of 1.
+        FieldMapInfo fieldMapCount = manager.getFieldMapInfoOfStudy(nurseryId, StudyType.N, geolocationId);
         fieldMapCount.print(3);
         assertTrue(fieldMapCount.getEntryCount() > 0);      
+    }
+    
+    @Test
+    public void testSaveFieldMapProperties() throws MiddlewareQueryException {
+        int trialId = -186; 
+        int geolocationId = -123; //please specify the geolocation id used by the trial 
+        FieldMapInfo info = manager.getFieldMapInfoOfStudy(trialId, StudyType.T, geolocationId);
+        info.setBlockName("Block Name 1");
+        info.setFieldbookId(-186);
+        info.setColumnsInBlock(7);
+        info.setRangesInBlock(8);
+        info.setPlantingOrder(1);
+        int columnCount = 1, rangeCount = 1;
+        for (FieldMapLabel label : info.getFieldMapLabels()) {
+            label.setColumn(columnCount);
+            label.setRange(rangeCount++);
+            if (rangeCount > 8) {
+                columnCount++;
+                rangeCount = 1;
+            }
+            if (columnCount > 7) {
+                break;
+            }
+        }
+        manager.saveOrUpdateFieldmapProperties(info);
     }
     
 }

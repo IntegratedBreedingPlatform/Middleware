@@ -12,6 +12,7 @@
 package org.generationcp.middleware.operation.saver;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.operation.builder.ExperimentBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.operation.builder.StockModelBuilder;
 import org.generationcp.middleware.operation.builder.TermBuilder;
@@ -115,4 +116,12 @@ public abstract class Saver extends DatabaseBroker{
 	protected final TermPropertyBuilder getTermPropertyBuilder() {
 	    return new TermPropertyBuilder(sessionProviderForLocal, sessionProviderForCentral);
 	}
+
+    protected final ExperimentBuilder getExperimentBuilder() {
+        return new ExperimentBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
+    protected final ExperimentPropertySaver getExperimentPropertySaver() {
+        return new ExperimentPropertySaver(sessionProviderForLocal, sessionProviderForCentral);
+    }
 }

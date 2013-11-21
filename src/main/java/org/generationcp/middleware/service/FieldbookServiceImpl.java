@@ -42,13 +42,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     }
 
     @Override
-    public FieldMapInfo getFieldMapInfoOfTrial(int trialId) throws MiddlewareQueryException{
-        return getStudyDataManager().getFieldMapInfoOfStudy(trialId, StudyType.T);
+    public FieldMapInfo getFieldMapInfoOfTrial(int trialId, int geolocationId) throws MiddlewareQueryException{
+        return getStudyDataManager().getFieldMapInfoOfStudy(trialId, StudyType.T, geolocationId);
     }
     
     @Override 
-    public FieldMapInfo getFieldMapInfoOfNursery(int nurseryId) throws MiddlewareQueryException{
-        return getStudyDataManager().getFieldMapInfoOfStudy(nurseryId, StudyType.N);
+    public FieldMapInfo getFieldMapInfoOfNursery(int nurseryId, int geolocationId) throws MiddlewareQueryException{
+        return getStudyDataManager().getFieldMapInfoOfStudy(nurseryId, StudyType.N, geolocationId);
     }
 
     @Override 
@@ -57,4 +57,10 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     	return germplasmDataManager.getAllLocations();
     }
 
+    @Override
+    public void saveOrUpdateFieldmapProperties(FieldMapInfo info) throws MiddlewareQueryException {
+     
+        getStudyDataManager().saveOrUpdateFieldmapProperties(info);
+    
+    }
 }

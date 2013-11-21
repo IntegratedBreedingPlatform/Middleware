@@ -42,6 +42,14 @@ public class FieldMapInfo implements Serializable{
     
     private boolean isTrial; // false if this is for nursery
 	
+    private String blockName;
+    
+    private Integer columnsInBlock;
+    
+    private Integer rangesInBlock;
+    
+    private Integer plantingOrder;
+    
 
     public FieldMapInfo() {
     	isTrial = false; // not a trial by default
@@ -107,6 +115,68 @@ public class FieldMapInfo implements Serializable{
 
     public long getPlotCount() {
     	return labels.size();
+    }
+
+    
+    /**
+     * @return the blockName
+     */
+    public String getBlockName() {
+        return blockName;
+    }
+
+    
+    /**
+     * @param blockName the blockName to set
+     */
+    public void setBlockName(String blockName) {
+        this.blockName = blockName;
+    }
+
+    
+    /**
+     * @return the columnsInBlock
+     */
+    public Integer getColumnsInBlock() {
+        return columnsInBlock;
+    }
+
+    
+    /**
+     * @param columnsInBlock the columnsInBlock to set
+     */
+    public void setColumnsInBlock(Integer columnsInBlock) {
+        this.columnsInBlock = columnsInBlock;
+    }
+
+    
+    /**
+     * @return the rangesInBlock
+     */
+    public Integer getRangesInBlock() {
+        return rangesInBlock;
+    }
+
+    
+    /**
+     * @param rangesInBlock the rangesInBlock to set
+     */
+    public void setRangesInBlock(Integer rangesInBlock) {
+        this.rangesInBlock = rangesInBlock;
+    }
+    
+    /**
+     * @return the plantingOrder
+     */
+    public Integer getPlantingOrder() {
+        return plantingOrder;
+    }
+    
+    /**
+     * @param plantingOrder the plantingOrder to set
+     */
+    public void setPlantingOrder(Integer plantingOrder) {
+        this.plantingOrder = plantingOrder;
     }
 
     @Override

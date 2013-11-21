@@ -38,6 +38,10 @@ public class FieldMapLabel implements Serializable{
 
     private Integer plotNo;
     
+    private Integer column;
+    
+    private Integer range;
+    
     public FieldMapLabel() {
     }
 
@@ -93,7 +97,35 @@ public class FieldMapLabel implements Serializable{
 		this.plotNo = plotNo;
 	}
 
-	@Override
+    /**
+     * @return the column
+     */
+    public Integer getColumn() {
+        return column;
+    }
+    
+    /**
+     * @param column the column to set
+     */
+    public void setColumn(Integer column) {
+        this.column = column;
+    }
+    
+    /**
+     * @return the range
+     */
+    public Integer getRange() {
+        return range;
+    }
+
+    /**
+     * @param range the range to set
+     */
+    public void setRange(Integer range) {
+        this.range = range;
+    }
+
+    @Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("FieldMapLabel [experimentId=");
