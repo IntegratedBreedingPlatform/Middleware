@@ -15,6 +15,7 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -53,30 +54,74 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         super(sessionProviderForLocal, sessionProviderForCentral);
     }
 
-    @Override
+    /**
+     * Saves a Dataset from a Workbook into the database via
+     * 1. Saving new Ontology Variables (column headers)
+     * 2. Saving data
+     * 
+     * The operation is performed in two separate transactions in order to force a Hibernate
+     * Session Flush, and thereby persist all required terms to the Ontology Tables
+     * 
+     */
+    @SuppressWarnings("unchecked")
+	@Override
     public int saveDataset(Workbook workbook) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
+        Map<String, ?>  variableMap = null;
         TimerWatch timerWatch = new TimerWatch("saveDataset (grand total)", LOG);
+        
+        // Transaction 1 : Transform Variables and save new Ontology Terms
+        // Send : xls workbook
+        // Return : Map of 3 sub maps with transformed variables (ontology fully loaded) - here is how it was loaded : 
+        // -- headers : Strings
+        //         headerMap.put("trialHeaders", trialHeaders);
+        // -- variableTypeLists (VariableTypeList)
+        // 			variableTypeMap.put("trialVariableTypeList", trialVariableTypeList);
+        // 			variableTypeMap.put("trialVariables", trialVariables);
+        // 			variableTypeMap.put("effectVariables", effectVariables);
+        // -- measurementVariables (List<MeasurementVariable>)
+        // 			measurementVariableMap.put("trialMV", trialMV);
+        // 			measurementVariableMap.put("effectMV", effectMV);
 
         try {
 
             trans = session.beginTransaction();
-
-            int studyId = getWorkbookSaver().save(workbook);
-
+            
+            variableMap = getWorkbookSaver().saveVariables(workbook);
+            
             trans.commit();
-
-            return studyId;
-
+            
         } catch (Exception e) {
             rollbackTransaction(trans);
             logAndThrowException("Error encountered with saveDataset(): " + e.getMessage(), e, LOG);
 
         } finally {
             timerWatch.stop();
-            //session.flush();
+        }
+
+        // Transaction 2 : save data
+        // Send : Map of 3 sub maps, with data to create Dataset
+        // Receive int (success/fail)
+        Transaction trans2 = null;
+        
+        try {
+            
+            trans2 = session.beginTransaction();
+            
+            int studyId = getWorkbookSaver().saveDataset(workbook, variableMap);
+
+            trans2.commit();
+
+            return studyId;
+
+        } catch (Exception e) {
+            rollbackTransaction(trans2);
+            logAndThrowException("Error encountered with saveDataset(): " + e.getMessage(), e, LOG);
+
+        } finally {
+            timerWatch.stop();
         }
 
         return 0;
