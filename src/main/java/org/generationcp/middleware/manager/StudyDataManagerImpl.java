@@ -43,6 +43,7 @@ import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.GidStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.ParentFolderStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
+import org.generationcp.middleware.domain.workbench.StudyNode;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -408,17 +409,17 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-	public List<StudyDetails> getAllNurseryAndTrialStudyDetails() throws MiddlewareQueryException{
-    	List<StudyDetails> studyDetails = new ArrayList<StudyDetails>();
-        studyDetails.addAll(getAllNurseryAndTrialStudyDetails(Database.LOCAL));
-        studyDetails.addAll(getAllNurseryAndTrialStudyDetails(Database.CENTRAL));
-        return studyDetails;
+	public List<StudyNode> getAllNurseryAndTrialStudyNodes() throws MiddlewareQueryException{
+    	List<StudyNode> studyNodes = new ArrayList<StudyNode>();
+        studyNodes.addAll(getNurseryAndTrialStudyNodes(Database.LOCAL));
+        studyNodes.addAll(getNurseryAndTrialStudyNodes(Database.CENTRAL));
+        return studyNodes;
     }
 
     @Override
-	public List<StudyDetails> getAllNurseryAndTrialStudyDetails(Database instance) throws MiddlewareQueryException{
+	public List<StudyNode> getNurseryAndTrialStudyNodes(Database instance) throws MiddlewareQueryException{
         setWorkingDatabase(instance);
-        return getDmsProjectDao().getAllNurseryAndTrialStudyDetails();
+        return getDmsProjectDao().getAllNurseryAndTrialStudyNodes();
     }
 
     @Override
