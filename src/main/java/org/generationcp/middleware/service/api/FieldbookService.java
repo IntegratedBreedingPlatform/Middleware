@@ -83,4 +83,7 @@ public interface FieldbookService {
      */
     void saveOrUpdateFieldmapProperties(FieldMapInfo info) throws MiddlewareQueryException;
             
+    
+    //TODO remove this, this is just for testing
+    int getGeolocationId(int projectId) throws MiddlewareQueryException;
 }
