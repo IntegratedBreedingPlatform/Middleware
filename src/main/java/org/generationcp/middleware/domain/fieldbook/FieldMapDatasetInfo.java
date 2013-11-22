@@ -117,7 +117,7 @@ public class FieldMapDatasetInfo implements Serializable{
      */
     public FieldMapTrialInstanceInfo getTrialInstance(Integer geolocationId) {
         for (FieldMapTrialInstanceInfo trialInstance: trialInstances) {
-            if (geolocationId == trialInstance.getGeolocationId()) {
+            if (geolocationId.equals(trialInstance.getGeolocationId())) {
                 return trialInstance;
             } 
         }

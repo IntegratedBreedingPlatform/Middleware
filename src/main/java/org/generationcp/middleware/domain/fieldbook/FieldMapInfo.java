@@ -149,7 +149,7 @@ public class FieldMapInfo implements Serializable{
      */
     public FieldMapDatasetInfo getDataSet(Integer datasetId) {
         for (FieldMapDatasetInfo dataset: datasets) {
-            if (datasetId == dataset.getDatasetId()) {
+            if (datasetId.equals(dataset.getDatasetId())) {
                 return dataset;
             } 
         }

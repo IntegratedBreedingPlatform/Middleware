@@ -50,6 +50,12 @@ public class FieldMapTrialInstanceInfo implements Serializable{
     
     /** The planting order. */
     private Integer plantingOrder;
+    
+    /** The start column index */
+    private Integer startColumn;
+    
+    /** The start range index */
+    private Integer startRange;
         
     /**
      * Instantiates a new field map trial instance info.
@@ -253,6 +259,38 @@ public class FieldMapTrialInstanceInfo implements Serializable{
             } 
         }
         return null;
+    }
+
+    
+    /**
+     * @return the startColumn
+     */
+    public Integer getStartColumn() {
+        return startColumn;
+    }
+
+    
+    /**
+     * @param startColumn the startColumn to set
+     */
+    public void setStartColumn(Integer startColumn) {
+        this.startColumn = startColumn;
+    }
+
+    
+    /**
+     * @return the startRange
+     */
+    public Integer getStartRange() {
+        return startRange;
+    }
+
+    
+    /**
+     * @param startRange the startRange to set
+     */
+    public void setStartRange(Integer startRange) {
+        this.startRange = startRange;
     }
 
     /* (non-Javadoc)

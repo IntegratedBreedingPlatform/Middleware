@@ -14,6 +14,7 @@ package org.generationcp.middleware.service;
 import java.util.List;
 import java.util.Set;
 
+import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.oms.StudyType;
@@ -74,5 +75,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
             throw new MiddlewareQueryException("error in test data");
         }
         return geolocations.iterator().next();
+    }
+    @Override
+    public List<DatasetReference> getDatasetReferences(int studyId) throws MiddlewareQueryException {
+        return getStudyDataManager().getDatasetReferences(studyId);
     }
 }
