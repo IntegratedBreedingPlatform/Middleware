@@ -43,7 +43,7 @@ public class TestExperimentPropertyDao{
     public void testGetFieldMapLabels() throws Exception {
         int projectId = 5734; //5790;
         int geolocationId = 5723;
-        List<FieldMapLabel> labels = dao.getFieldMapLabels(projectId, geolocationId);
+        List<FieldMapLabel> labels = dao.getFieldMapLabels(projectId);
         Debug.println(0, "testGetFieldMapLabels(projectId=" + projectId + ") RESULTS:");
         for (FieldMapLabel label: labels) {
         	Debug.println(3, label.toString());

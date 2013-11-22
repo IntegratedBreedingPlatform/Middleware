@@ -431,7 +431,7 @@ public interface StudyDataManager{
      *            Can be either StudyType.T (Trial) or StudyType.N (Nursery)
      * @return the FieldMapCount object containing the counts
      */
-    FieldMapInfo getFieldMapInfoOfStudy(int studyId, StudyType studyType, int geolocationId) throws MiddlewareQueryException;
+    FieldMapInfo getFieldMapInfoOfStudy(int studyId, StudyType studyType) throws MiddlewareQueryException;
     
     /**
      * Save or Update Field Map Properties like row, column, block, total rows, total columns, planting order.

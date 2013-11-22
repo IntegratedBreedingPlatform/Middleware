@@ -22,6 +22,7 @@ import java.util.Set;
 import org.generationcp.middleware.util.Debug;
 
 
+// TODO: Auto-generated Javadoc
 /**
  * 
  * Contains the field map information needed by the Field Map tool: 
@@ -32,183 +33,152 @@ import org.generationcp.middleware.util.Debug;
  */
 public class FieldMapInfo implements Serializable{
     
-	private static final long serialVersionUID = 1L;
+    /** The Constant serialVersionUID. */
+    private static final long serialVersionUID = 1L;
     
+    /** The fieldbook id. */
     private Integer fieldbookId;
     
+    /** The fieldbook name. */
     private String fieldbookName;
     
-    private List<FieldMapLabel> labels;
-    
+    /** The is trial. */
     private boolean isTrial; // false if this is for nursery
-	
-    private String blockName;
     
-    private Integer columnsInBlock;
-    
-    private Integer rangesInBlock;
-    
-    private Integer plantingOrder;
+    /** The datasets. */
+    private List<FieldMapDatasetInfo> datasets;
     
 
+    /**
+     * Instantiates a new field map info.
+     */
     public FieldMapInfo() {
     	isTrial = false; // not a trial by default
     }
 
+    /**
+     * Instantiates a new field map info.
+     *
+     * @param fieldbookId the fieldbook id
+     * @param fieldbookName the fieldbook name
+     * @param labels the labels
+     */
     public FieldMapInfo(Integer fieldbookId, String fieldbookName, List<FieldMapLabel> labels) {
     	this.isTrial = false;
         this.fieldbookId = fieldbookId;
         this.fieldbookName = fieldbookName;
-        this.labels = labels;
     }
 
+    /**
+     * Gets the fieldbook id.
+     *
+     * @return the fieldbook id
+     */
     public Integer getFieldbookId() {
         return fieldbookId;
     }
     
+    /**
+     * Sets the fieldbook id.
+     *
+     * @param fieldbookId the new fieldbook id
+     */
     public void setFieldbookId(Integer fieldbookId) {
         this.fieldbookId = fieldbookId;
     }
     
+    /**
+     * Gets the fieldbook name.
+     *
+     * @return the fieldbook name
+     */
     public String getFieldbookName() {
         return fieldbookName;
     }
     
+    /**
+     * Sets the fieldbook name.
+     *
+     * @param fieldbookName the new fieldbook name
+     */
     public void setFieldbookName(String fieldbookName) {
         this.fieldbookName = fieldbookName;
     }
     
-    public List<FieldMapLabel> getFieldMapLabels() {
-    	return labels;
-    }
-
-    public void setFieldMapLabels(List<FieldMapLabel> labels) {
-    	this.labels = labels;
-    }
-    
-	public boolean isTrial() {
-		return isTrial;
-	}
-
-	public void setTrial(boolean isTrial) {
-		this.isTrial = isTrial;
-	}
-
-    public long getEntryCount() {
-    	Set<Integer> entries = new HashSet<Integer>();
-    	for (FieldMapLabel label : labels){
-    		entries.add(label.getEntryNumber());
-    	}
-    	return entries.size();
-    }
-    
-    public long getRepCount() {
-    	List<Integer> reps = new ArrayList<Integer>();
-    	for (FieldMapLabel label : labels){
-    		reps.add(label.getRep());
-    	}
-    	if (reps.size() == 0){
-    		return 1;
-    	}
-    	return Collections.max(reps);
-    }
-
-    public long getPlotCount() {
-    	return labels.size();
-    }
-
-    
     /**
-     * @return the blockName
+     * Checks if is trial.
+     *
+     * @return true, if is trial
      */
-    public String getBlockName() {
-        return blockName;
+    public boolean isTrial() {
+	return isTrial;
     }
 
-    
     /**
-     * @param blockName the blockName to set
+     * Sets the trial.
+     *
+     * @param isTrial the new trial
      */
-    public void setBlockName(String blockName) {
-        this.blockName = blockName;
+    public void setTrial(boolean isTrial) {
+	this.isTrial = isTrial;
     }
-
-    
+        
     /**
-     * @return the columnsInBlock
+     * Gets the datasets.
+     *
+     * @return the datasets
      */
-    public Integer getColumnsInBlock() {
-        return columnsInBlock;
-    }
-
-    
-    /**
-     * @param columnsInBlock the columnsInBlock to set
-     */
-    public void setColumnsInBlock(Integer columnsInBlock) {
-        this.columnsInBlock = columnsInBlock;
-    }
-
-    
-    /**
-     * @return the rangesInBlock
-     */
-    public Integer getRangesInBlock() {
-        return rangesInBlock;
-    }
-
-    
-    /**
-     * @param rangesInBlock the rangesInBlock to set
-     */
-    public void setRangesInBlock(Integer rangesInBlock) {
-        this.rangesInBlock = rangesInBlock;
+    public List<FieldMapDatasetInfo> getDatasets() {
+        return datasets;
     }
     
     /**
-     * @return the plantingOrder
+     * Sets the datasets.
+     *
+     * @param datasets the new datasets
      */
-    public Integer getPlantingOrder() {
-        return plantingOrder;
+    public void setDatasets(List<FieldMapDatasetInfo> datasets) {
+        this.datasets = datasets;
     }
     
     /**
-     * @param plantingOrder the plantingOrder to set
+     * Gets the data set.
+     *
+     * @param datasetId the dataset id
+     * @return the data set
      */
-    public void setPlantingOrder(Integer plantingOrder) {
-        this.plantingOrder = plantingOrder;
+    public FieldMapDatasetInfo getDataSet(Integer datasetId) {
+        for (FieldMapDatasetInfo dataset: datasets) {
+            if (datasetId == dataset.getDatasetId()) {
+                return dataset;
+            } 
+        }
+        return null;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append("FieldMapInfo [fieldbookName=");
-        builder.append(fieldbookName);
-        builder.append(", labels=");
-        builder.append(labels.toString());
-        builder.append(", numberOfEntries=");
-        builder.append(getEntryCount());
-        builder.append(", numberOfReps=");
-        builder.append(getRepCount());
-        builder.append(", numberOfPlots=");
-        builder.append(getPlotCount());
+        builder.append(fieldbookName);        
         builder.append(", isTrial=");
 		builder.append(isTrial);
 		builder.append("]");
         return builder.toString();
     }
 
+    /**
+     * Prints the.
+     *
+     * @param indent the indent
+     */
     public void print(int indent) {
         Debug.println(indent, "FieldMapInfo: " );
         indent = indent + 3;
         Debug.println(indent, "Fieldbook Name: " + fieldbookName);
         Debug.println(indent, "Is Trial = " + isTrial);
-        Debug.println(indent, "Labels: " );
-        for (FieldMapLabel label : labels){
-        	label.print(indent + 3);
-        }
-        Debug.println(indent, "Number of Entries: " + getEntryCount());
-        Debug.println(indent, "Number of Reps: " + getRepCount());
-        Debug.println(indent, "Number of Plots: " + getPlotCount());
     }
 }

@@ -445,7 +445,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
     
     @Override
-    public FieldMapInfo getFieldMapInfoOfStudy(int studyId, StudyType studyType, int geolocationId) throws MiddlewareQueryException{
+    public FieldMapInfo getFieldMapInfoOfStudy(int studyId, StudyType studyType) throws MiddlewareQueryException{
         FieldMapInfo fieldMapInfo = new FieldMapInfo();
         setWorkingDatabase(studyId);
         
@@ -458,14 +458,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         	fieldMapInfo.setTrial(false);
         }
         
-        fieldMapInfo.setFieldMapLabels(getExperimentPropertyDao().getFieldMapLabels(studyId, geolocationId));
+        //fieldMapInfo.setFieldMapLabels(getExperimentPropertyDao().getFieldMapLabels(studyId));
         
         return fieldMapInfo;
     }
     
     @Override
     public void saveOrUpdateFieldmapProperties(FieldMapInfo info) throws MiddlewareQueryException {
-        
+        /*
         if (info != null && info.getFieldMapLabels() != null && !info.getFieldMapLabels().isEmpty()) {
             requireLocalDatabaseInstance();
             Session session = getCurrentSessionForLocal();
@@ -484,6 +484,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
                         e, LOG);
             }
         }
+        */
     }
     
 }

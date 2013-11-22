@@ -48,66 +48,71 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 		return new ArrayList<Integer>();
 	}
 	
+	
     @SuppressWarnings("unchecked")
-	public List<FieldMapLabel> getFieldMapLabels(int studyId, int geolocationId) throws MiddlewareQueryException{
-    	List<FieldMapLabel> labels = new ArrayList<FieldMapLabel>();
-
+    public List<FieldMapLabel> getFieldMapLabels(int projectId) throws MiddlewareQueryException{
+        List<FieldMapLabel> labels = new ArrayList<FieldMapLabel>();
+    
         /*  
-            SET @studyId = -186;
-            SET @geolocationId = -123;
-            
+            SET @projectId = 5790;
+                        
             SELECT eproj.nd_experiment_id AS experimentId, s.uniquename AS entryNumber,  
-              s.name AS germplasmName, epropRep.value AS rep, epropPlot.value AS plotNo
+              s.name AS germplasmName, epropRep.value AS rep, epropPlot.value AS plotNo 
             FROM nd_experiment_project eproj  
-            INNER JOIN project_relationship pr ON pr.subject_project_id = eproj.project_id
-              AND pr.object_project_id = @studyId
-            INNER JOIN nd_experiment e ON e.nd_experiment_id = eproj.nd_experiment_id 
-              AND e.nd_geolocation_id = @geolocationId
+            INNER JOIN project_relationship pr ON pr.object_project_id = @projectId AND pr.type_id = 1150
             INNER JOIN nd_experiment_stock es ON eproj.nd_experiment_id = es.nd_experiment_id 
+              AND eproj.project_id = pr.subject_project_id 
             INNER JOIN stock s ON es.stock_id = s.stock_id
             LEFT JOIN nd_experimentprop epropRep ON eproj.nd_experiment_id = epropRep.nd_experiment_id 
-              AND epropRep.type_id =  8210 
+              AND epropRep.type_id =  8210 AND eproj.project_id = pr.subject_project_id 
               AND epropRep.value IS NOT NULL  AND epropRep.value <> '' 
             INNER JOIN nd_experimentprop epropPlot ON eproj.nd_experiment_id = epropPlot.nd_experiment_id 
               AND epropPlot.type_id IN (8200, 8380)
+              AND eproj.project_id = pr.subject_project_id 
               AND epropPlot.value IS NOT NULL  AND epropPlot.value <> '' 
-            WHERE eproj.project_id = -188
-            ORDER BY eproj.nd_experiment_id DESC  -- ASC /DESC depending on the sign of the id
+            ORDER BY eproj.nd_experiment_id ;  -- ASC /DESC depending on the sign of the id
+    
         */
         try {
-            String order = studyId > 0 ? "ASC" : "DESC";
-			StringBuilder sql = new StringBuilder()
-					.append("SELECT eproj.nd_experiment_id AS experimentId, s.uniquename AS entryNumber,  ")
-					.append("		 s.name AS germplasmName, epropRep.value AS rep, epropPlot.value AS plotNo ")
-					.append("FROM nd_experiment_project eproj  ")
-					.append("   INNER JOIN project_relationship pr ON pr.subject_project_id = eproj.project_id ")
-					.append("       AND pr.type_id = ").append(TermId.BELONGS_TO_STUDY.getId())
-					.append("       AND pr.object_project_id = :studyId ")
-                    .append("   INNER JOIN nd_experiment e ON e.nd_experiment_id = eproj.nd_experiment_id ")
-                    .append("       AND e.nd_geolocation_id = :geolocationId ")
-					.append("	INNER JOIN nd_experiment_stock es ON eproj.nd_experiment_id = es.nd_experiment_id  ")
-					.append("	INNER JOIN stock s ON es.stock_id = s.stock_id ")
-					.append("	LEFT JOIN nd_experimentprop epropRep ON eproj.nd_experiment_id = epropRep.nd_experiment_id ")
-					.append("		AND epropRep.type_id =  " + TermId.REP_NO.getId()) // 8210
-					.append("		AND epropRep.value IS NOT NULL  AND epropRep.value <> '' ")
-					.append("	INNER JOIN nd_experimentprop epropPlot ON eproj.nd_experiment_id = epropPlot.nd_experiment_id ")
-					.append("		AND epropPlot.type_id IN ("+ TermId.PLOT_NO.getId() + ", "+ TermId.PLOT_NNO.getId() +")  ") //8200, 8380
-					.append("		AND epropPlot.value IS NOT NULL  AND epropPlot.value <> '' ")
-					.append("ORDER BY eproj.nd_experiment_id ").append(order);
-
-			//Debug.println(3, sql.toString());
-			
+            String order = projectId > 0 ? "ASC" : "DESC";
+            StringBuilder sql = new StringBuilder()
+                                        .append("SELECT eproj.project_id AS datasetId, proj.name AS datasetName, ")
+                                        .append("geo.nd_geolocation_id AS geolocationId, site.value AS siteName, ")
+                                        .append("eproj.nd_experiment_id AS experimentId, s.uniquename AS entryNumber, ") 
+                                        .append("s.name AS germplasmName, epropRep.value AS rep, epropPlot.value AS plotNo ")
+                                        .append("FROM nd_experiment_project eproj  ")
+                    .append("   INNER JOIN project_relationship pr ON pr.object_project_id = :projectId AND pr.type_id = ").append(TermId.BELONGS_TO_STUDY.getId())
+                                        .append("       INNER JOIN nd_experiment_stock es ON eproj.nd_experiment_id = es.nd_experiment_id  ")
+                                        .append("               AND eproj.project_id = pr.subject_project_id ")
+                                        .append("       INNER JOIN stock s ON es.stock_id = s.stock_id ")
+                                        .append("       LEFT JOIN nd_experimentprop epropRep ON eproj.nd_experiment_id = epropRep.nd_experiment_id ")
+                                        .append("               AND epropRep.type_id =  " + TermId.REP_NO.getId()  + "  AND eproj.project_id = pr.subject_project_id ") // 8210
+                                        .append("               AND epropRep.value IS NOT NULL  AND epropRep.value <> '' ")
+                                        .append("       INNER JOIN nd_experimentprop epropPlot ON eproj.nd_experiment_id = epropPlot.nd_experiment_id ")
+                                        .append("               AND epropPlot.type_id IN ("+ TermId.PLOT_NO.getId() + ", "+ TermId.PLOT_NNO.getId() +")  ") //8200, 8380
+                                        .append("               AND eproj.project_id = pr.subject_project_id ")
+                                        .append("               AND epropPlot.value IS NOT NULL  AND epropPlot.value <> '' ")
+                                        .append("       INNER JOIN nd_experiment geo ON eproj.nd_experiment_id = geo.nd_experiment_id ")
+                                        .append("               AND geo.type_id = ").append(TermId.PLOT_EXPERIMENT.getId())
+                                        .append("       INNER JOIN nd_geolocationprop site ON geo.nd_geolocation_id = site.nd_geolocation_id ")
+                                        .append("               AND site.type_id = ").append(TermId.TRIAL_LOCATION.getId())
+                                        .append("       INNER JOIN project proj on proj.project_id = eproj.project_id ")
+                                        .append("ORDER BY eproj.nd_experiment_id ").append(order);
+                        
             Query query = getSession().createSQLQuery(sql.toString())
+                    .addScalar("datasetId")
+                    .addScalar("datasetName")
+                    .addScalar("geolocationId")
+                    .addScalar("datasetName")
                     .addScalar("experimentId")
                     .addScalar("entryNumber")
                     .addScalar("germplasmName")
                     .addScalar("rep")
                     .addScalar("plotNo")
                     ;
-            query.setParameter("studyId", studyId);
-            query.setParameter("geolocationId", geolocationId);
-
-            List<Object[]> list =  query.list();
+            query.setParameter("projectId", projectId);
+    
+            List<Object[]> list =  query.list();           
             
             if (list != null && list.size() > 0) {
                 for (Object[] row : list){
@@ -116,24 +121,22 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                     String germplasmName = (String) row[2]; 
                     String rep = (String) row[3];
                     String plotNo = (String) row[4];
-
+    
                     FieldMapLabel label = new FieldMapLabel(experimentId 
-                			, (entryNumber == null ? null : Integer.parseInt(entryNumber))
-                			, germplasmName
-                			, (rep == null ? 1 : Integer.parseInt(rep))
-                			, (plotNo == null ? 0 : Integer.parseInt(plotNo)));
+                                        , (entryNumber == null ? null : Integer.parseInt(entryNumber))
+                                        , germplasmName
+                                        , (rep == null ? 1 : Integer.parseInt(rep))
+                                        , (plotNo == null ? 0 : Integer.parseInt(plotNo)));
                     labels.add(label);
                 }
             }
             
         } catch(HibernateException e) {
-            logAndThrowException("Error at getFieldMapLabels(" + studyId + ", " + geolocationId + ") at ExperimentPropertyDao: " + e.getMessage(), e);
+            logAndThrowException("Error at getFieldMapLabels(projectId=" + projectId + ") at ExperimentPropertyDao: " + e.getMessage(), e);
         }
         
         return labels;
         
     }
-	
-    
     
 }

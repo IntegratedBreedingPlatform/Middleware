@@ -1,0 +1,158 @@
+/*******************************************************************************
+ * Copyright (c) 2013, All Rights Reserved.
+ * 
+ * Generation Challenge Programme (GCP)
+ * 
+ * 
+ * This software is licensed for use under the terms of the GNU General Public
+ * License (http://bit.ly/8Ztv8M) and the provisions of Part F of the Generation
+ * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * 
+ *******************************************************************************/
+
+package org.generationcp.middleware.domain.fieldbook;
+
+import java.io.Serializable;
+import java.util.List;
+
+import org.generationcp.middleware.util.Debug;
+
+// TODO: Auto-generated Javadoc
+/**
+ * The Class FieldMapDatasetInfo.
+ */
+public class FieldMapDatasetInfo implements Serializable{
+    
+    /** The Constant serialVersionUID. */
+    private static final long serialVersionUID = 1L;
+
+    /** The dataset id. */
+    private Integer datasetId;
+    
+    /** The dataset name. */
+    private String datasetName;
+    
+    /** The trial instances. */
+    private List<FieldMapTrialInstanceInfo> trialInstances;
+        
+    /**
+     * Instantiates a new field map dataset info.
+     */
+    public FieldMapDatasetInfo() {
+    }
+
+    /**
+     * Instantiates a new field map dataset info.
+     *
+     * @param datasetId the dataset id
+     * @param datasetName the dataset name
+     * @param trialInstances the trial instances
+     */
+    public FieldMapDatasetInfo(Integer datasetId, String datasetName, 
+        List<FieldMapTrialInstanceInfo> trialInstances) {
+    	this.datasetId = datasetId;
+    	this.datasetName = datasetName;
+    	this.trialInstances = trialInstances;
+    }
+
+    /**
+     * Gets the dataset id.
+     *
+     * @return the dataset id
+     */
+    public Integer getDatasetId() {
+        return datasetId;
+    }
+
+    /**
+     * Sets the dataset id.
+     *
+     * @param datasetId the new dataset id
+     */
+    public void setDatasetId(Integer datasetId) {
+        this.datasetId = datasetId;
+    }
+    
+    /**
+     * Gets the dataset name.
+     *
+     * @return the dataset name
+     */
+    public String getDatasetName() {
+        return datasetName;
+    }
+
+    /**
+     * Sets the dataset name.
+     *
+     * @param datasetName the new dataset name
+     */
+    public void setDatasetName(String datasetName) {
+        this.datasetName = datasetName;
+    }
+    
+    /**
+     * Gets the trial instances.
+     *
+     * @return the trial instances
+     */
+    public List<FieldMapTrialInstanceInfo> getTrialInstances() {
+        return trialInstances;
+    }
+
+    /**
+     * Sets the trial instances.
+     *
+     * @param trialInstances the new trial instances
+     */
+    public void setTrialInstances(List<FieldMapTrialInstanceInfo> trialInstances) {
+        this.trialInstances = trialInstances;
+    }
+    
+    /**
+     * Gets the trial instance.
+     *
+     * @param geolocationId the geolocation id
+     * @return the trial instance
+     */
+    public FieldMapTrialInstanceInfo getTrialInstance(Integer geolocationId) {
+        for (FieldMapTrialInstanceInfo trialInstance: trialInstances) {
+            if (geolocationId == trialInstance.getGeolocationId()) {
+                return trialInstance;
+            } 
+        }
+        return null;
+    }
+    
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+            builder.append("FieldMapDatasetInfo [datasetId=");
+            builder.append(datasetId);
+            builder.append(", datasetName=");
+            builder.append(datasetName);
+            builder.append(", trialInstances=");
+            builder.append(trialInstances.toString());
+            builder.append("]");
+            return builder.toString();
+    }
+
+    /**
+     * Prints the.
+     *
+     * @param indent the indent
+     */
+    public void print(int indent) {
+        Debug.println(indent, "FieldMapTrialInstanceInfo: " );
+        indent = indent + 3;
+        Debug.println(indent, "Dataset Id = " + datasetId);
+        Debug.println(indent, "Dataset Name = " + datasetName);
+        Debug.println(indent, "Trial Instances = " );
+        for (FieldMapTrialInstanceInfo trialInstance : trialInstances){
+            trialInstance.print(indent + 3);
+        }
+    }
+}

@@ -59,6 +59,7 @@ public class ExperimentPropertySaver extends Saver {
     }
     
     public void saveFieldmapProperties(FieldMapInfo info) throws MiddlewareQueryException {
+        /*
         for (FieldMapLabel label : info.getFieldMapLabels()) {
             ExperimentModel experiment = getExperimentBuilder().getExperimentModel(label.getExperimentId());
             getExperimentPropertySaver().saveOrUpdateProperty(experiment, TermId.ROW_NO, String.valueOf(label.getColumn()));
@@ -69,6 +70,6 @@ public class ExperimentPropertySaver extends Saver {
             int plantingOrder = info.getPlantingOrder() != null && info.getPlantingOrder().equals(2) 
                     ? TermId.SERPENTINE.getId() : TermId.ROW_COLUMN.getId();
             getExperimentPropertySaver().saveOrUpdateProperty(experiment, TermId.PLANTING_ORDER, String.valueOf(plantingOrder));
-        }
+        }*/
     }
 }
