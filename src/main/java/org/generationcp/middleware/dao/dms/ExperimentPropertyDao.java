@@ -15,7 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
+import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
@@ -50,14 +52,15 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 	
 	
     @SuppressWarnings("unchecked")
-    public List<FieldMapLabel> getFieldMapLabels(int projectId) throws MiddlewareQueryException{
-        List<FieldMapLabel> labels = new ArrayList<FieldMapLabel>();
-    
+    public List<FieldMapDatasetInfo> getFieldMapLabels(int projectId) throws MiddlewareQueryException{
+        List<FieldMapDatasetInfo> datasets = null;
         /*  
             SET @projectId = 5790;
                         
-            SELECT eproj.nd_experiment_id AS experimentId, s.uniquename AS entryNumber,  
-              s.name AS germplasmName, epropRep.value AS rep, epropPlot.value AS plotNo 
+            SELECT eproj.project_id AS datasetId, proj.name AS datasetName, 
+            geo.nd_geolocation_id AS geolocationId, site.value AS siteName,
+            eproj.nd_experiment_id AS experimentId, s.uniquename AS entryNumber, 
+            s.name AS germplasmName, epropRep.value AS rep, epropPlot.value AS plotNo
             FROM nd_experiment_project eproj  
             INNER JOIN project_relationship pr ON pr.object_project_id = @projectId AND pr.type_id = 1150
             INNER JOIN nd_experiment_stock es ON eproj.nd_experiment_id = es.nd_experiment_id 
@@ -69,7 +72,13 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             INNER JOIN nd_experimentprop epropPlot ON eproj.nd_experiment_id = epropPlot.nd_experiment_id 
               AND epropPlot.type_id IN (8200, 8380)
               AND eproj.project_id = pr.subject_project_id 
-              AND epropPlot.value IS NOT NULL  AND epropPlot.value <> '' 
+              AND epropPlot.value IS NOT NULL  AND epropPlot.value <> ''
+            INNER JOIN nd_experiment geo ON eproj.nd_experiment_id = geo.nd_experiment_id
+              AND geo.type_id = 1155
+            INNER JOIN nd_geolocationprop site ON geo.nd_geolocation_id = site.nd_geolocation_id
+              AND site.type_id = 8180
+            INNER JOIN project proj on proj.project_id = eproj.project_id
+ 
             ORDER BY eproj.nd_experiment_id ;  -- ASC /DESC depending on the sign of the id
     
         */
@@ -115,28 +124,87 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             List<Object[]> list =  query.list();           
             
             if (list != null && list.size() > 0) {
-                for (Object[] row : list){
-                    Integer experimentId = (Integer) row[0];
-                    String entryNumber = ((String) row[1]);
-                    String germplasmName = (String) row[2]; 
-                    String rep = (String) row[3];
-                    String plotNo = (String) row[4];
-    
-                    FieldMapLabel label = new FieldMapLabel(experimentId 
-                                        , (entryNumber == null ? null : Integer.parseInt(entryNumber))
-                                        , germplasmName
-                                        , (rep == null ? 1 : Integer.parseInt(rep))
-                                        , (plotNo == null ? 0 : Integer.parseInt(plotNo)));
-                    labels.add(label);
-                }
+                datasets = createFieldMapDatasetInfo(list);        
             }
             
         } catch(HibernateException e) {
             logAndThrowException("Error at getFieldMapLabels(projectId=" + projectId + ") at ExperimentPropertyDao: " + e.getMessage(), e);
         }
         
-        return labels;
+        return datasets;
+    }
+    
+    private List<FieldMapDatasetInfo> createFieldMapDatasetInfo(List<Object[]> list) {
+        List<FieldMapDatasetInfo> datasets = new ArrayList<FieldMapDatasetInfo>();
+        FieldMapDatasetInfo dataset = null;
+        List<FieldMapTrialInstanceInfo> trialInstances = null;
+        FieldMapTrialInstanceInfo trialInstance = null;
+        List<FieldMapLabel> labels = null;
+        Integer datasetId = null;
+        Integer geolocationId = null;
+        String datasetName = null;
+        String siteName = null;
         
+        for (Object[] row : list) {
+            if (geolocationId == null){
+                trialInstance = new FieldMapTrialInstanceInfo();
+                labels = new ArrayList<FieldMapLabel>();
+            } else {
+                //if trial instance or dataset has changed, add previously saved trial instance
+                if (!geolocationId.equals((Integer)row[2]) || !datasetId.equals((Integer)row[0])) {
+                    trialInstance.setGeolocationId(geolocationId);
+                    trialInstance.setSiteName(siteName);
+                    trialInstance.setFieldMapLabels(labels);
+                    trialInstances.add(trialInstance);
+                    trialInstance = new FieldMapTrialInstanceInfo();
+                    labels = new ArrayList<FieldMapLabel>();
+                }
+            }
+            
+            if (datasetId == null) {
+                dataset = new FieldMapDatasetInfo();
+                trialInstances = new ArrayList<FieldMapTrialInstanceInfo>();
+            } else { 
+                //if dataset has changed, add previously saved dataset to the list
+                if (!datasetId.equals((Integer)row[0])) {
+                    dataset.setDatasetId(datasetId);
+                    dataset.setDatasetName(datasetName);
+                    dataset.setTrialInstances(trialInstances);
+                    datasets.add(dataset);
+                    dataset = new FieldMapDatasetInfo();
+                    trialInstances = new ArrayList<FieldMapTrialInstanceInfo>();
+                } 
+            }
+            
+            Integer experimentId = (Integer) row[4];
+            String entryNumber = ((String) row[5]);
+            String germplasmName = (String) row[6]; 
+            String rep = (String) row[7];
+            String plotNo = (String) row[8];
+
+            FieldMapLabel label = new FieldMapLabel(experimentId 
+                                , (entryNumber == null ? null : Integer.parseInt(entryNumber))
+                                , germplasmName
+                                , (rep == null ? 1 : Integer.parseInt(rep))
+                                , (plotNo == null ? 0 : Integer.parseInt(plotNo)));
+            labels.add(label);
+            
+            datasetId = (Integer) row[0];
+            datasetName = (String) row[1];
+            geolocationId = (Integer) row[2];
+            siteName = (String) row[3];
+        }
+        //add last trial instance and dataset
+        trialInstance.setGeolocationId(geolocationId);
+        trialInstance.setSiteName(siteName);
+        trialInstance.setFieldMapLabels(labels);
+        trialInstances.add(trialInstance);
+        dataset.setDatasetId(datasetId);
+        dataset.setDatasetName(datasetName);
+        dataset.setTrialInstances(trialInstances);
+        datasets.add(dataset);
+        
+        return datasets;
     }
     
 }

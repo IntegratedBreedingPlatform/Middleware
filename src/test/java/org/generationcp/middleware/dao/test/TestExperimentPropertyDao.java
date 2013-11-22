@@ -18,7 +18,7 @@ import static org.junit.Assert.assertFalse;
 import java.util.List;
 
 import org.generationcp.middleware.dao.dms.ExperimentPropertyDao;
-import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
+import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.hibernate.HibernateUtil;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.util.Debug;
@@ -42,13 +42,12 @@ public class TestExperimentPropertyDao{
     @Test
     public void testGetFieldMapLabels() throws Exception {
         int projectId = 5734; //5790;
-        int geolocationId = 5723;
-        List<FieldMapLabel> labels = dao.getFieldMapLabels(projectId);
+        List<FieldMapDatasetInfo> datasets = dao.getFieldMapLabels(projectId);
         Debug.println(0, "testGetFieldMapLabels(projectId=" + projectId + ") RESULTS:");
-        for (FieldMapLabel label: labels) {
-        	Debug.println(3, label.toString());
+        for (FieldMapDatasetInfo dataset: datasets) {
+        	Debug.println(3, dataset.toString());
         }
-        assertFalse(labels.isEmpty());
+        assertFalse(datasets.isEmpty());
     }
     
     @AfterClass

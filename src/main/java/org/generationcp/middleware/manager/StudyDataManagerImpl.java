@@ -458,7 +458,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         	fieldMapInfo.setTrial(false);
         }
         
-        //fieldMapInfo.setFieldMapLabels(getExperimentPropertyDao().getFieldMapLabels(studyId));
+        fieldMapInfo.setDatasets(getExperimentPropertyDao().getFieldMapLabels(studyId));
         
         return fieldMapInfo;
     }

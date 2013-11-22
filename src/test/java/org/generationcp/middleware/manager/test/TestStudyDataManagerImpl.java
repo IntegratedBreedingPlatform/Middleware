@@ -1060,20 +1060,19 @@ public class TestStudyDataManagerImpl{
 
     @Test
     public void testGetFieldMapCountsOfTrial() throws MiddlewareQueryException{
-        int trialId = -186; 
-        int geolocationId = -123; //please specify the geolocation id used by the trial 
-        /*FieldMapInfo fieldMapCount = manager.getFieldMapInfoOfStudy(trialId, StudyType.T, geolocationId);
-        fieldMapCount.print(3);
-        assertTrue(fieldMapCount.getEntryCount() > 0);
-        */
+        int trialId = -52;  
+        FieldMapInfo fieldMapInfo = manager.getFieldMapInfoOfStudy(trialId, StudyType.T);
+        Debug.println(0, fieldMapInfo.getFieldbookName());
+        Debug.println(0, fieldMapInfo.getDatasets().toString());
+        //assertTrue(fieldMapCount.getEntryCount() > 0);
     }
 
     @Test
     public void testGetFieldMapCountsOfNursery() throws MiddlewareQueryException {
         int nurseryId = -138;
-        int geolocationId = 1; //nursery uses the default geolocation id of 1.
-        //FieldMapInfo fieldMapCount = manager.getFieldMapInfoOfStudy(nurseryId, StudyType.N, geolocationId);
-        //fieldMapCount.print(3);
+        FieldMapInfo fieldMapInfo = manager.getFieldMapInfoOfStudy(nurseryId, StudyType.N);
+        Debug.println(0, fieldMapInfo.getFieldbookName());
+        Debug.println(0, fieldMapInfo.getDatasets().toString());
         //assertTrue(fieldMapCount.getEntryCount() > 0);
     }
     
