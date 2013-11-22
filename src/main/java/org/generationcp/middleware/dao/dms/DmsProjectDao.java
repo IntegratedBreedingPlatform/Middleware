@@ -619,7 +619,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
                     String description = (String) row [2]; 
                     String startDate = (String) row [3]; 
                     String studyTypeStr = (String) row [4];
-                    Integer seasonInt = (Integer) row [5];
+                    String seasonStr = (String) row[5];
                     
                     StudyType studyType = StudyType.N; 
                     if (Integer.parseInt(studyTypeStr) == TermId.NURSERY.getId()){
@@ -627,9 +627,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
                     }
                     
                     Season season = Season.GENERAL;
-                    if (seasonInt != null && seasonInt == TermId.SEASON_DRY.getId()){
+                    if (seasonStr != null && Integer.parseInt(seasonStr.trim()) == TermId.SEASON_DRY.getId()){
                     	season = Season.DRY;
-                    } else if (seasonInt != null && seasonInt == TermId.SEASON_WET.getId()){
+                    } else if (seasonStr != null && Integer.parseInt(seasonStr.trim()) == TermId.SEASON_WET.getId()){
                     	season = Season.WET;
                     }
                     studyNodes.add(new StudyNode(id, name, description, startDate, studyType, season));
