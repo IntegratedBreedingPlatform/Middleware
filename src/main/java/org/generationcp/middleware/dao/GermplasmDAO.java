@@ -937,14 +937,18 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             
             for(Germplasm g: result){
             	List<Integer> parentGids = new ArrayList<Integer>();
-            	parentGids.add(g.getGpid1());
-            	parentGids.add(g.getGpid2());
+            	if(g!=null && g.getGpid1()!=null)
+            		parentGids.add(g.getGpid1());
+            	if(g!=null && g.getGpid2()!=null)
+            		parentGids.add(g.getGpid2());
             	
-            	SQLQuery p_query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GIDS);
-	            p_query.setParameterList("gids", parentGids);
-	            p_query.addEntity("germplsm", Germplasm.class);
+            	if(parentGids.size()>0){
+            		SQLQuery p_query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GIDS);
+	            	p_query.setParameterList("gids", parentGids);
+	            	p_query.addEntity("germplsm", Germplasm.class);
 	            
-	            resultParents.addAll(p_query.list());
+	            	resultParents.addAll(p_query.list());
+            	}
             }
             
             //result.addAll(resultParents);
