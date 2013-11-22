@@ -174,4 +174,12 @@ public class Tool implements Serializable{
 
         return new EqualsBuilder().append(toolId, otherObj.toolId).isEquals();
     }
+
+    public Tool() {}
+
+    public Tool(String toolName, String title, String path) {
+        this.toolName = toolName;
+        this.title = title;
+        this.path = path;
+    }
 }

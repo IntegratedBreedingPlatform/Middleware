@@ -86,6 +86,8 @@
   <mapping class="org.generationcp.middleware.pojos.workbench.SecurityQuestion"/>
   <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData"/> <!-- TODO: not sure if we're using this, just included as this is in the workbench schema -->
   <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchSetting" /> <!-- TODO: same as above -->
+  <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory"/>
+  <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink" />
 
      <!-- Mapping classes for new OMS schema -->
   <mapping class="org.generationcp.middleware.pojos.oms.CV"/>
