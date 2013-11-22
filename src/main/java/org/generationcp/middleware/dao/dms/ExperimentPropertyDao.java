@@ -112,7 +112,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                     .addScalar("datasetId")
                     .addScalar("datasetName")
                     .addScalar("geolocationId")
-                    .addScalar("datasetName")
+                    .addScalar("siteName")
                     .addScalar("experimentId")
                     .addScalar("entryNumber")
                     .addScalar("germplasmName")

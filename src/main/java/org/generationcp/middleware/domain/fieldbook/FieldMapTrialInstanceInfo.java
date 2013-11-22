@@ -56,6 +56,12 @@ public class FieldMapTrialInstanceInfo implements Serializable{
     
     /** The start range index */
     private Integer startRange;
+    
+    private long entryCount;
+    
+    private long repCount;
+    
+    private long plotCount;
         
     /**
      * Instantiates a new field map trial instance info.
@@ -221,6 +227,10 @@ public class FieldMapTrialInstanceInfo implements Serializable{
         return entries.size();
     }
     
+    public void setEntryCount(long entryCount) {
+        this.entryCount = entryCount;
+    }
+    
     /**
      * Gets the rep count.
      *
@@ -236,6 +246,10 @@ public class FieldMapTrialInstanceInfo implements Serializable{
         }
         return Collections.max(reps);
     }
+    
+    public void setRepCount(long repCount) {
+        this.repCount = repCount;
+    }
 
     /**
      * Gets the plot count.
@@ -244,6 +258,10 @@ public class FieldMapTrialInstanceInfo implements Serializable{
      */
     public long getPlotCount() {
         return labels.size();
+    }
+    
+    public void setPlotCount(long plotCount) {
+        this.plotCount = plotCount;
     }
     
     /**
