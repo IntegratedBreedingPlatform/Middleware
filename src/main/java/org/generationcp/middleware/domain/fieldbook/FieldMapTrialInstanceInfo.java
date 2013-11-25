@@ -372,8 +372,8 @@ public class FieldMapTrialInstanceInfo implements Serializable{
     /**
      * @return the hasFieldMap
      */
-    public boolean isHasFieldMap() {
-        return hasFieldMap;
+    public boolean getHasFieldMap() {
+        return isFieldMapGenerated();
     }
 
     
