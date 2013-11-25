@@ -34,6 +34,7 @@ public enum ToolName {
     ,optimas
     
     // BreedingManager webapp
+    ,bm_list_manager
     ,crossing_manager
     ,germplasm_import
     ,list_manager
