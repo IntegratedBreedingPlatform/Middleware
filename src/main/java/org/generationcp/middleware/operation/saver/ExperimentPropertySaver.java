@@ -11,8 +11,11 @@
  *******************************************************************************/
 package org.generationcp.middleware.operation.saver;
 
+import java.util.List;
+
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
+import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -59,17 +62,19 @@ public class ExperimentPropertySaver extends Saver {
     }
     
     public void saveFieldmapProperties(FieldMapInfo info) throws MiddlewareQueryException {
-        /*
-        for (FieldMapLabel label : info.getFieldMapLabels()) {
+        FieldMapTrialInstanceInfo tInfo = info.getDatasets().get(0).getTrialInstances().get(0);
+        List<FieldMapLabel> labels = tInfo.getFieldMapLabels();
+        
+        for (FieldMapLabel label : labels) {
             ExperimentModel experiment = getExperimentBuilder().getExperimentModel(label.getExperimentId());
             getExperimentPropertySaver().saveOrUpdateProperty(experiment, TermId.ROW_NO, String.valueOf(label.getColumn()));
             getExperimentPropertySaver().saveOrUpdateProperty(experiment, TermId.COLUMN_NO, String.valueOf(label.getRange()));
-            getExperimentPropertySaver().saveOrUpdateProperty(experiment, TermId.BLOCK, info.getBlockName());
-            getExperimentPropertySaver().saveOrUpdateProperty(experiment, TermId.TOTAL_ROWS, String.valueOf(info.getColumnsInBlock()));
-            getExperimentPropertySaver().saveOrUpdateProperty(experiment, TermId.TOTAL_COLUMNS, String.valueOf(info.getRangesInBlock()));
-            int plantingOrder = info.getPlantingOrder() != null && info.getPlantingOrder().equals(2) 
+            getExperimentPropertySaver().saveOrUpdateProperty(experiment, TermId.BLOCK, tInfo.getBlockName());
+            getExperimentPropertySaver().saveOrUpdateProperty(experiment, TermId.TOTAL_ROWS, String.valueOf(tInfo.getColumnsInBlock()));
+            getExperimentPropertySaver().saveOrUpdateProperty(experiment, TermId.TOTAL_COLUMNS, String.valueOf(tInfo.getRangesInBlock()));
+            int plantingOrder = tInfo.getPlantingOrder() != null && tInfo.getPlantingOrder().equals(2) 
                     ? TermId.SERPENTINE.getId() : TermId.ROW_COLUMN.getId();
             getExperimentPropertySaver().saveOrUpdateProperty(experiment, TermId.PLANTING_ORDER, String.valueOf(plantingOrder));
-        }*/
+        }
     }
 }
