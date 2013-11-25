@@ -1618,6 +1618,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         return getWorkbenchSidebarCategoryLinkDao().getAll();
     }
 
+    @Override
+    public List<WorkbenchSidebarCategoryLink> getAllWorkbenchSidebarLinksByCategoryId(WorkbenchSidebarCategory category) throws MiddlewareQueryException {
+        return getWorkbenchSidebarCategoryLinkDao().getAllWorkbenchSidebarLinksByCategoryId(category,0,Integer.MAX_VALUE);
+    }
+
     private WorkbenchSidebarCategoryLinkDAO getWorkbenchSidebarCategoryLinkDao() {
         if (workbenchSidebarCategoryLinkDAO == null){
             workbenchSidebarCategoryLinkDAO = new WorkbenchSidebarCategoryLinkDAO();
