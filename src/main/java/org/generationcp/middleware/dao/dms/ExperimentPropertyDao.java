@@ -88,7 +88,9 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                                         .append("SELECT eproj.project_id AS datasetId, proj.name AS datasetName, ")
                                         .append("geo.nd_geolocation_id AS geolocationId, site.value AS siteName, ")
                                         .append("eproj.nd_experiment_id AS experimentId, s.uniquename AS entryNumber, ") 
-                                        .append("s.name AS germplasmName, epropRep.value AS rep, epropPlot.value AS plotNo ")
+                                        .append("s.name AS germplasmName, epropRep.value AS rep, epropPlot.value AS plotNo, ")
+                                        .append("row.value AS row, col.value AS col, rBlock.value AS rowsInBlock, ")
+                                        .append("cBlock.value AS columnsInBlock, pOrder.value AS plantingOrder ")
                                         .append("FROM nd_experiment_project eproj  ")
                     .append("   INNER JOIN project_relationship pr ON pr.object_project_id = :projectId AND pr.type_id = ").append(TermId.BELONGS_TO_STUDY.getId())
                                         .append("       INNER JOIN nd_experiment_stock es ON eproj.nd_experiment_id = es.nd_experiment_id  ")
@@ -106,7 +108,17 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                                         .append("       INNER JOIN nd_geolocationprop site ON geo.nd_geolocation_id = site.nd_geolocation_id ")
                                         .append("               AND site.type_id = ").append(TermId.TRIAL_LOCATION.getId())
                                         .append("       INNER JOIN project proj on proj.project_id = eproj.project_id ")
-                                        .append("ORDER BY eproj.nd_experiment_id ").append(order);
+                                        .append("       LEFT JOIN nd_experimentprop row ON row.nd_experiment_id = eproj.nd_experiment_id ")
+                                        .append("               AND row.type_id = ").append(TermId.ROW_NO.getId())
+                                        .append("       LEFT JOIN nd_experimentprop col ON col.nd_experiment_id = eproj.nd_experiment_id ")
+                                        .append("               AND col.type_id = ").append(TermId.COLUMN_NO.getId())
+                                        .append("       LEFT JOIN nd_experimentprop rBlock ON rBlock.nd_experiment_id = eproj.nd_experiment_id ")
+                                        .append("               AND rBlock.type_id = ").append(TermId.TOTAL_ROWS.getId())
+                                        .append("       LEFT JOIN nd_experimentprop cBlock ON cBlock.nd_experiment_id = eproj.nd_experiment_id ")
+                                        .append("               AND cBlock.type_id = ").append(TermId.TOTAL_COLUMNS.getId())
+                                        .append("       LEFT JOIN nd_experimentprop pOrder ON pOrder.nd_experiment_id = eproj.nd_experiment_id ")
+                                        .append("               AND pOrder.type_id = ").append(TermId.PLANTING_ORDER.getId())
+                                        .append(" ORDER BY eproj.nd_experiment_id ").append(order);
                         
             Query query = getSession().createSQLQuery(sql.toString())
                     .addScalar("datasetId")
@@ -118,6 +130,11 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                     .addScalar("germplasmName")
                     .addScalar("rep")
                     .addScalar("plotNo")
+                    .addScalar("row")
+                    .addScalar("col")
+                    .addScalar("rowsInBlock")
+                    .addScalar("columnsInBlock")
+                    .addScalar("plantingOrder")
                     ;
             query.setParameter("projectId", projectId);
     
@@ -144,6 +161,9 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
         Integer geolocationId = null;
         String datasetName = null;
         String siteName = null;
+        Integer rowsInBlock = null;
+        Integer columnsInBlock = null;
+        Integer plantingOrder = null;
         
         for (Object[] row : list) {
             if (geolocationId == null){
@@ -155,6 +175,17 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                     trialInstance.setGeolocationId(geolocationId);
                     trialInstance.setSiteName(siteName);
                     trialInstance.setFieldMapLabels(labels);
+                    trialInstance.setColumnsInBlock(rowsInBlock);
+                    trialInstance.setRangesInBlock(columnsInBlock);
+                    if (plantingOrder != null) {
+                        trialInstance.setHasFieldMap(true);
+                        if (plantingOrder.equals(TermId.ROW_COLUMN.getId())) {
+                            trialInstance.setPlantingOrder(1);
+                        }
+                        else {
+                            trialInstance.setPlantingOrder(2);
+                        }
+                    }
                     trialInstances.add(trialInstance);
                     trialInstance = new FieldMapTrialInstanceInfo();
                     labels = new ArrayList<FieldMapLabel>();
@@ -187,17 +218,47 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                                 , germplasmName
                                 , (rep == null ? 1 : Integer.parseInt(rep))
                                 , (plotNo == null ? 0 : Integer.parseInt(plotNo)));
+            if (row[9] != null && !((String) row[9]).isEmpty()) {
+                label.setColumn(Integer.parseInt((String) row[9]));
+            }
+            if (row[10] != null && !((String) row[10]).isEmpty()) {
+                label.setRange(Integer.parseInt((String) row[10]));
+            }
             labels.add(label);
             
             datasetId = (Integer) row[0];
             datasetName = (String) row[1];
             geolocationId = (Integer) row[2];
             siteName = (String) row[3];
+            
+            String rBlock = (String) row[11];
+            String cBlock = (String) row[12];
+            String pOrder = (String) row[13];
+            
+            if (rBlock != null && !rBlock.isEmpty()) {
+                rowsInBlock = Integer.parseInt(rBlock);
+            }
+            if (cBlock != null && !cBlock.isEmpty()) {
+                columnsInBlock = Integer.parseInt(cBlock);
+            }
+            if (pOrder != null && !pOrder.isEmpty()) {
+                plantingOrder = Integer.parseInt(pOrder);
+            }
         }
         //add last trial instance and dataset
         trialInstance.setGeolocationId(geolocationId);
         trialInstance.setSiteName(siteName);
         trialInstance.setFieldMapLabels(labels);
+        trialInstance.setColumnsInBlock(rowsInBlock);
+        trialInstance.setRangesInBlock(columnsInBlock);
+        if (plantingOrder != null) {
+            if (plantingOrder.equals(TermId.ROW_COLUMN.getId())) {
+                trialInstance.setPlantingOrder(1);
+            }
+            else {
+                trialInstance.setPlantingOrder(2);
+            }
+        }
         trialInstances.add(trialInstance);
         dataset.setDatasetId(datasetId);
         dataset.setDatasetName(datasetName);

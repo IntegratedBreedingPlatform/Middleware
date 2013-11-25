@@ -62,6 +62,8 @@ public class FieldMapTrialInstanceInfo implements Serializable{
     private long repCount;
     
     private long plotCount;
+    
+    private boolean hasFieldMap;
         
     /**
      * Instantiates a new field map trial instance info.
@@ -83,6 +85,17 @@ public class FieldMapTrialInstanceInfo implements Serializable{
 	this.labels = labels;
     }
 
+    public boolean isFieldMapGenerated() {
+        if (getFieldMapLabels() != null) {
+            for (FieldMapLabel label : getFieldMapLabels()) {
+                if (label.getColumn() != null && label.getColumn() > 0) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
     /**
      * Gets the geolocation id.
      *
@@ -350,5 +363,21 @@ public class FieldMapTrialInstanceInfo implements Serializable{
         Debug.println(indent, "Number of Entries: " + getEntryCount());
         Debug.println(indent, "Number of Reps: " + getRepCount());
         Debug.println(indent, "Number of Plots: " + getPlotCount());
+    }
+
+    
+    /**
+     * @return the hasFieldMap
+     */
+    public boolean isHasFieldMap() {
+        return hasFieldMap;
+    }
+
+    
+    /**
+     * @param hasFieldMap the hasFieldMap to set
+     */
+    public void setHasFieldMap(boolean hasFieldMap) {
+        this.hasFieldMap = hasFieldMap;
     }
 }

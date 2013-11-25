@@ -13,6 +13,7 @@
 package org.generationcp.middleware.domain.fieldbook;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.util.Debug;
@@ -55,6 +56,18 @@ public class FieldMapDatasetInfo implements Serializable{
     	this.trialInstances = trialInstances;
     }
 
+    public List<FieldMapTrialInstanceInfo> getTrialInstancesWithFieldMap() {
+        List<FieldMapTrialInstanceInfo> info = new ArrayList<FieldMapTrialInstanceInfo>();
+        if (trialInstances != null && trialInstances.size() > 0) {
+            for (FieldMapTrialInstanceInfo geoloc : trialInstances) {
+                if (geoloc.isFieldMapGenerated()) {
+                    info.add(geoloc);
+                }
+            }
+        }
+        return info;
+    }
+    
     /**
      * Gets the dataset id.
      *
