@@ -67,14 +67,15 @@ public class ExperimentPropertySaver extends Saver {
         
         for (FieldMapLabel label : labels) {
             ExperimentModel experiment = getExperimentBuilder().getExperimentModel(label.getExperimentId());
-            getExperimentPropertySaver().saveOrUpdateProperty(experiment, TermId.ROW_NO, String.valueOf(label.getColumn()));
-            getExperimentPropertySaver().saveOrUpdateProperty(experiment, TermId.COLUMN_NO, String.valueOf(label.getRange()));
-            getExperimentPropertySaver().saveOrUpdateProperty(experiment, TermId.BLOCK, tInfo.getBlockName());
-            getExperimentPropertySaver().saveOrUpdateProperty(experiment, TermId.TOTAL_ROWS, String.valueOf(tInfo.getColumnsInBlock()));
-            getExperimentPropertySaver().saveOrUpdateProperty(experiment, TermId.TOTAL_COLUMNS, String.valueOf(tInfo.getRangesInBlock()));
+            getExperimentPropertySaver().saveOrUpdateProperty(experiment, TermId.COLUMN_NO, String.valueOf(label.getColumn()));
+            getExperimentPropertySaver().saveOrUpdateProperty(experiment, TermId.RANGE_NO, String.valueOf(label.getRange()));
+            getExperimentPropertySaver().saveOrUpdateProperty(experiment, TermId.BLOCK_NAME, tInfo.getBlockName());
+            getExperimentPropertySaver().saveOrUpdateProperty(experiment, TermId.COLUMNS_IN_BLOCK, String.valueOf(tInfo.getColumnsInBlock()));
+            getExperimentPropertySaver().saveOrUpdateProperty(experiment, TermId.RANGES_IN_BLOCK, String.valueOf(tInfo.getRangesInBlock()));
             int plantingOrder = tInfo.getPlantingOrder() != null && tInfo.getPlantingOrder().equals(2) 
                     ? TermId.SERPENTINE.getId() : TermId.ROW_COLUMN.getId();
             getExperimentPropertySaver().saveOrUpdateProperty(experiment, TermId.PLANTING_ORDER, String.valueOf(plantingOrder));
+            getExperimentPropertySaver().saveOrUpdateProperty(experiment, TermId.ROWS_PER_PLOT, String.valueOf(tInfo.getRowsPerPlot()));
         }
     }
 }

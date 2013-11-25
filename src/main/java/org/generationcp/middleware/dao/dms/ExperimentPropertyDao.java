@@ -90,7 +90,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                                         .append("eproj.nd_experiment_id AS experimentId, s.uniquename AS entryNumber, ") 
                                         .append("s.name AS germplasmName, epropRep.value AS rep, epropPlot.value AS plotNo, ")
                                         .append("row.value AS row, col.value AS col, rBlock.value AS rowsInBlock, ")
-                                        .append("cBlock.value AS columnsInBlock, pOrder.value AS plantingOrder ")
+                                        .append("cBlock.value AS columnsInBlock, pOrder.value AS plantingOrder, ")
+                                        .append("rpp.value AS rowsPerPlot ")
                                         .append("FROM nd_experiment_project eproj  ")
                     .append("   INNER JOIN project_relationship pr ON pr.object_project_id = :projectId AND pr.type_id = ").append(TermId.BELONGS_TO_STUDY.getId())
                                         .append("       INNER JOIN nd_experiment_stock es ON eproj.nd_experiment_id = es.nd_experiment_id  ")
@@ -109,15 +110,17 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                                         .append("               AND site.type_id = ").append(TermId.TRIAL_LOCATION.getId())
                                         .append("       INNER JOIN project proj on proj.project_id = eproj.project_id ")
                                         .append("       LEFT JOIN nd_experimentprop row ON row.nd_experiment_id = eproj.nd_experiment_id ")
-                                        .append("               AND row.type_id = ").append(TermId.ROW_NO.getId())
+                                        .append("               AND row.type_id = ").append(TermId.COLUMN_NO.getId())
                                         .append("       LEFT JOIN nd_experimentprop col ON col.nd_experiment_id = eproj.nd_experiment_id ")
-                                        .append("               AND col.type_id = ").append(TermId.COLUMN_NO.getId())
+                                        .append("               AND col.type_id = ").append(TermId.RANGE_NO.getId())
                                         .append("       LEFT JOIN nd_experimentprop rBlock ON rBlock.nd_experiment_id = eproj.nd_experiment_id ")
-                                        .append("               AND rBlock.type_id = ").append(TermId.TOTAL_ROWS.getId())
+                                        .append("               AND rBlock.type_id = ").append(TermId.COLUMNS_IN_BLOCK.getId())
                                         .append("       LEFT JOIN nd_experimentprop cBlock ON cBlock.nd_experiment_id = eproj.nd_experiment_id ")
-                                        .append("               AND cBlock.type_id = ").append(TermId.TOTAL_COLUMNS.getId())
+                                        .append("               AND cBlock.type_id = ").append(TermId.RANGES_IN_BLOCK.getId())
                                         .append("       LEFT JOIN nd_experimentprop pOrder ON pOrder.nd_experiment_id = eproj.nd_experiment_id ")
                                         .append("               AND pOrder.type_id = ").append(TermId.PLANTING_ORDER.getId())
+                                        .append("       LEFT JOIN nd_experimentprop rpp ON rpp.nd_experiment_id = eproj.nd_experiment_id ")
+                                        .append("               AND rpp.type_id = ").append(TermId.ROWS_PER_PLOT.getId())
                                         .append(" ORDER BY eproj.nd_experiment_id ").append(order);
                         
             Query query = getSession().createSQLQuery(sql.toString())
@@ -135,6 +138,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                     .addScalar("rowsInBlock")
                     .addScalar("columnsInBlock")
                     .addScalar("plantingOrder")
+                    .addScalar("rowsPerPlot")
                     ;
             query.setParameter("projectId", projectId);
     
@@ -164,6 +168,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
         Integer rowsInBlock = null;
         Integer columnsInBlock = null;
         Integer plantingOrder = null;
+        Integer rowsPerPlot = null;
         
         for (Object[] row : list) {
             if (geolocationId == null){
@@ -177,6 +182,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                     trialInstance.setFieldMapLabels(labels);
                     trialInstance.setColumnsInBlock(rowsInBlock);
                     trialInstance.setRangesInBlock(columnsInBlock);
+                    trialInstance.setRowsPerPlot(rowsPerPlot);
                     if (plantingOrder != null) {
                         trialInstance.setHasFieldMap(true);
                         if (plantingOrder.equals(TermId.ROW_COLUMN.getId())) {
@@ -234,6 +240,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             String rBlock = (String) row[11];
             String cBlock = (String) row[12];
             String pOrder = (String) row[13];
+            String rpp = (String) row[14];
             
             if (rBlock != null && !rBlock.isEmpty()) {
                 rowsInBlock = Integer.parseInt(rBlock);
@@ -244,6 +251,9 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             if (pOrder != null && !pOrder.isEmpty()) {
                 plantingOrder = Integer.parseInt(pOrder);
             }
+            if (rpp != null && !rpp.isEmpty()) {
+                rowsPerPlot = Integer.parseInt(rpp);
+            }
         }
         //add last trial instance and dataset
         trialInstance.setGeolocationId(geolocationId);
@@ -251,6 +261,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
         trialInstance.setFieldMapLabels(labels);
         trialInstance.setColumnsInBlock(rowsInBlock);
         trialInstance.setRangesInBlock(columnsInBlock);
+        trialInstance.setRowsPerPlot(rowsPerPlot);
         if (plantingOrder != null) {
             if (plantingOrder.equals(TermId.ROW_COLUMN.getId())) {
                 trialInstance.setPlantingOrder(1);

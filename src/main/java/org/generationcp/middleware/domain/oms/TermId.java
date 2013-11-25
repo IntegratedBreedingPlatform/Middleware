@@ -115,12 +115,13 @@ public enum TermId {
     , PLOT_NO (8200)
     , PLOT_NNO (8380)
     , REP_NO (8210)
-    , ROW_NO (32769)
-    , COLUMN_NO (32770)
-    , BLOCK (8221)
-    , TOTAL_ROWS (32772)
-    , TOTAL_COLUMNS (32773)
+    , COLUMN_NO (32769)
+    , RANGE_NO (32770)
+    , BLOCK_NAME (8221)
+    , COLUMNS_IN_BLOCK (32772)
+    , RANGES_IN_BLOCK (32773)
     , PLANTING_ORDER (32774)
+    , ROWS_PER_PLOT (32780)
 	
     // Experiment storage
     , TRIAL_DESIGN_INFO_STORAGE(1030)

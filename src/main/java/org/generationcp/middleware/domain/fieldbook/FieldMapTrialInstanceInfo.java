@@ -64,6 +64,9 @@ public class FieldMapTrialInstanceInfo implements Serializable{
     private long plotCount;
     
     private boolean hasFieldMap;
+    
+    private Integer rowsPerPlot;
+    
         
     /**
      * Instantiates a new field map trial instance info.
@@ -380,4 +383,22 @@ public class FieldMapTrialInstanceInfo implements Serializable{
     public void setHasFieldMap(boolean hasFieldMap) {
         this.hasFieldMap = hasFieldMap;
     }
+
+    
+    /**
+     * @return the rowsPerPlot
+     */
+    public Integer getRowsPerPlot() {
+        return rowsPerPlot;
+    }
+
+    
+    /**
+     * @param rowsPerPlot the rowsPerPlot to set
+     */
+    public void setRowsPerPlot(Integer rowsPerPlot) {
+        this.rowsPerPlot = rowsPerPlot;
+    }
+
+
 }
