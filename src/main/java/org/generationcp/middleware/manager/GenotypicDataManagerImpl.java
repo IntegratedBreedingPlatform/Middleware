@@ -1090,7 +1090,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             saveAccMetadataSet(datasetId, accMetadataSet);
             saveMarkerMetadataSet(datasetId, markerMetadataSet);
             saveDatasetUser(datasetId, datasetUser);
-            saveAlleleValues(alleleValues);
+            saveAlleleValues(datasetId, alleleValues);
             trans.commit();
             return true;    
         } catch (Exception e) {
