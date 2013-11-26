@@ -91,7 +91,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                                         .append("s.name AS germplasmName, epropRep.value AS rep, epropPlot.value AS plotNo, ")
                                         .append("row.value AS row, col.value AS col, rBlock.value AS rowsInBlock, ")
                                         .append("cBlock.value AS columnsInBlock, pOrder.value AS plantingOrder, ")
-                                        .append("rpp.value AS rowsPerPlot ")
+                                        .append("rpp.value AS rowsPerPlot, blkName.value AS blockName ")
                                         .append("FROM nd_experiment_project eproj  ")
                     .append("   INNER JOIN project_relationship pr ON pr.object_project_id = :projectId AND pr.type_id = ").append(TermId.BELONGS_TO_STUDY.getId())
                                         .append("       INNER JOIN nd_experiment_stock es ON eproj.nd_experiment_id = es.nd_experiment_id  ")
@@ -121,6 +121,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                                         .append("               AND pOrder.type_id = ").append(TermId.PLANTING_ORDER.getId())
                                         .append("       LEFT JOIN nd_experimentprop rpp ON rpp.nd_experiment_id = eproj.nd_experiment_id ")
                                         .append("               AND rpp.type_id = ").append(TermId.ROWS_PER_PLOT.getId())
+                                        .append("       LEFT JOIN nd_experimentprop blkName ON blkName.nd_experiment_id = eproj.nd_experiment_id ")
+                                        .append("               AND blkName.type_id = ").append(TermId.BLOCK_NAME.getId())
                                         .append(" ORDER BY eproj.nd_experiment_id ").append(order);
                         
             Query query = getSession().createSQLQuery(sql.toString())
@@ -139,6 +141,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                     .addScalar("columnsInBlock")
                     .addScalar("plantingOrder")
                     .addScalar("rowsPerPlot")
+                    .addScalar("blockName")
                     ;
             query.setParameter("projectId", projectId);
     
@@ -165,6 +168,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
         Integer geolocationId = null;
         String datasetName = null;
         String siteName = null;
+        String blockName = null;
         Integer rowsInBlock = null;
         Integer columnsInBlock = null;
         Integer plantingOrder = null;
@@ -179,6 +183,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 if (!geolocationId.equals((Integer)row[2]) || !datasetId.equals((Integer)row[0])) {
                     trialInstance.setGeolocationId(geolocationId);
                     trialInstance.setSiteName(siteName);
+                    trialInstance.setBlockName(blockName);
                     trialInstance.setFieldMapLabels(labels);
                     trialInstance.setColumnsInBlock(rowsInBlock);
                     trialInstance.setRangesInBlock(columnsInBlock);
@@ -236,6 +241,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             datasetName = (String) row[1];
             geolocationId = (Integer) row[2];
             siteName = (String) row[3];
+            blockName = (String) row[15];
             
             String rBlock = (String) row[11];
             String cBlock = (String) row[12];
@@ -258,6 +264,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
         //add last trial instance and dataset
         trialInstance.setGeolocationId(geolocationId);
         trialInstance.setSiteName(siteName);
+        trialInstance.setBlockName(blockName);
         trialInstance.setFieldMapLabels(labels);
         trialInstance.setColumnsInBlock(rowsInBlock);
         trialInstance.setRangesInBlock(columnsInBlock);
