@@ -14,6 +14,7 @@ package org.generationcp.middleware.dao.dms;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
@@ -229,10 +230,10 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                                 , germplasmName
                                 , (rep == null ? 1 : Integer.parseInt(rep))
                                 , (plotNo == null ? 0 : Integer.parseInt(plotNo)));
-            if (row[9] != null && !((String) row[9]).isEmpty()) {
+            if (NumberUtils.isNumber((String) row[9])) {
                 label.setColumn(Integer.parseInt((String) row[9]));
             }
-            if (row[10] != null && !((String) row[10]).isEmpty()) {
+            if (NumberUtils.isNumber((String) row[10])) {
                 label.setRange(Integer.parseInt((String) row[10]));
             }
             labels.add(label);
@@ -248,16 +249,16 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             String pOrder = (String) row[13];
             String rpp = (String) row[14];
             
-            if (rBlock != null && !rBlock.isEmpty()) {
+            if (NumberUtils.isNumber(rBlock)) {
                 rowsInBlock = Integer.parseInt(rBlock);
             }
-            if (cBlock != null && !cBlock.isEmpty()) {
+            if (NumberUtils.isNumber(cBlock)) {
                 columnsInBlock = Integer.parseInt(cBlock);
             }
-            if (pOrder != null && !pOrder.isEmpty()) {
+            if (NumberUtils.isNumber(pOrder)) {
                 plantingOrder = Integer.parseInt(pOrder);
             }
-            if (rpp != null && !rpp.isEmpty()) {
+            if (NumberUtils.isNumber(rpp)) {
                 rowsPerPlot = Integer.parseInt(rpp);
             }
         }
