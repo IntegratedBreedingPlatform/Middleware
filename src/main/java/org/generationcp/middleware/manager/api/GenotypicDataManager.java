@@ -1475,23 +1475,7 @@ public interface GenotypicDataManager{
      */
     public Boolean setSNP(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser, 
             CharValues charValues, Dataset dataset, Marker marker) throws MiddlewareQueryException;
-    
-    /**
-     * Sets Mapping Data.
-     * 
-     * @param accMetadataSet - Accession Metadataset
-     * @param markerMetadataSet - Marker Metadataset
-     * @param datasetUser - Dataset Users
-     * @param mappingPop - Mapping Population
-     * @param mappingPopValues - Mapping population Values
-     * @param dataset - Dataset
-     * @param marker - Marker (not mandatory)
-     * @return true if values were successfully saved in the database, false otherwise
-     * @throws MiddlewareQueryException
-     */
-    public Boolean setMappingData(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser,
-            MappingPop mappingPop, MappingPopValues mappingPopValues, Dataset dataset, Marker marker) throws MiddlewareQueryException;
-    
+
     /**
      * Sets Mapping Data of type ABH
      * 
@@ -1505,7 +1489,7 @@ public interface GenotypicDataManager{
      * @return true if values were successfully saved in the database, false otherwise
      * @throws MiddlewareQueryException
      */
-    public Boolean setMappingABH(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser,
+    public Boolean setMappingData(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser,
             MappingPop mappingPop, MappingPopValues mappingPopValues, Dataset dataset, Marker marker) throws MiddlewareQueryException;
     
     /**

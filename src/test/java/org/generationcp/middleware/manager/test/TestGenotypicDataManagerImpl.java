@@ -1346,6 +1346,17 @@ public class TestGenotypicDataManagerImpl{
         }
     }
     
+    
+    private List<Object> createMappingRecords() throws Exception{
+        List<Object> records = new ArrayList<Object>();
+        Dataset dataset = createDataset();
+        
+        //TODO
+        
+        return records;
+    }
+    
+    
     @Test
     public void testSetQTL() throws Exception {
         Integer datasetId = null; //Will be set/overridden by the function
@@ -1385,7 +1396,16 @@ public class TestGenotypicDataManagerImpl{
         Qtl qtl = new Qtl(qtlId, qtlName, datasetId);
         
         Boolean addStatus = manager.setQTL(datasetUser, dataset, qtlDetails, qtl);
-        Debug.println(0, "testSetQTL() Added: " + (addStatus != null ? datasetUser : null) + (addStatus != null ? dataset : null) + (addStatus != null ? qtlDetails : null) + (addStatus != null ? qtl : null));
+        Debug.println(0, "testSetQTL() Added: " + (addStatus != null ? datasetUser : null) 
+                + (addStatus != null ? dataset : null) + (addStatus != null ? qtlDetails : null) + (addStatus != null ? qtl : null));
+        if (addStatus){
+            Debug.println(0, "testSetQTL() Added: ");
+            Debug.println(3, datasetUser.toString()); 
+            Debug.println(3, dataset.toString()); 
+            Debug.println(3, qtlDetails.toString()); 
+            Debug.println(3, qtl.toString()); 
+        }
+
     }
     
     @Test
@@ -1432,12 +1452,15 @@ public class TestGenotypicDataManagerImpl{
         Marker marker = (Marker) createMarkerMarkeRecords().get(0);
 
         Boolean addStatus = manager.setDart(accMetadataSet, markerMetadataSet, datasetUser, alleleValues, dataset, dartValues, marker);
-        Debug.println(0, "testSetDArT() Added: " + (addStatus != null ? accMetadataSet : null) 
-                    + " | " + (addStatus != null ? markerMetadataSet : null) 
-                    + " | " + (addStatus != null ? datasetUser : null) 
-                    + " | " + (addStatus != null ? alleleValues : null)  
-                    + " | " + (addStatus != null ? dataset : null) 
-                    + " | " + (addStatus != null ? dartValues : null));
+        if (addStatus){
+            Debug.println(0, "testSetDArT() Added: ");
+            Debug.println(3, accMetadataSet.toString()); 
+            Debug.println(3, markerMetadataSet.toString()); 
+            Debug.println(3, datasetUser.toString()); 
+            Debug.println(3, alleleValues.toString()); 
+            Debug.println(3, dataset.toString()); 
+            Debug.println(3, marker.toString()); 
+        }
     }
     
     @Test
@@ -1473,11 +1496,15 @@ public class TestGenotypicDataManagerImpl{
         Marker marker = (Marker) createMarkerMarkeRecords().get(0);
 
         Boolean addStatus = manager.setSSR(accMetadataSet, markerMetadataSet, datasetUser, alleleValues, dataset, marker);
-        Debug.println(0, "testSetSSR() Added: " + (addStatus != null ? accMetadataSet : null) 
-                    + " | " + (addStatus != null ? markerMetadataSet : null) 
-                    + " | " + (addStatus != null ? datasetUser : null) 
-                    + " | " + (addStatus != null ? alleleValues : null)  
-                    + " | " + (addStatus != null ? dataset : null)); 
+        if (addStatus){
+            Debug.println(0, "testSetSSR() Added: ");
+            Debug.println(3, accMetadataSet.toString()); 
+            Debug.println(3, markerMetadataSet.toString()); 
+            Debug.println(3, datasetUser.toString()); 
+            Debug.println(3, alleleValues.toString()); 
+            Debug.println(3, dataset.toString()); 
+            Debug.println(3, marker.toString()); 
+        }
     }
     
     
@@ -1511,11 +1538,15 @@ public class TestGenotypicDataManagerImpl{
         Marker marker = (Marker) createMarkerMarkeRecords().get(0);
 
         Boolean addStatus = manager.setSNP(accMetadataSet, markerMetadataSet, datasetUser, charValues, dataset, marker);
-        Debug.println(0, "testSetSNP() Added: " + (addStatus != null ? accMetadataSet : null) 
-                    + " | " + (addStatus != null ? markerMetadataSet : null) 
-                    + " | " + (addStatus != null ? datasetUser : null) 
-                    + " | " + (addStatus != null ? charValues : null) 
-                    + " | " + (addStatus != null ? dataset : null));
+        if (addStatus){
+            Debug.println(0, "testSetSNP() Added: ");
+            Debug.println(3, accMetadataSet.toString()); 
+            Debug.println(3, markerMetadataSet.toString()); 
+            Debug.println(3, datasetUser.toString()); 
+            Debug.println(3, charValues.toString()); 
+            Debug.println(3, dataset.toString()); 
+            Debug.println(3, marker.toString()); 
+        }
     }
     
     @Test
@@ -1578,20 +1609,18 @@ public class TestGenotypicDataManagerImpl{
         Marker marker = (Marker) createMarkerMarkeRecords().get(0);
         
         Boolean addStatus = manager.setMappingData(accMetadataSet, markerMetadataSet, datasetUser, mappingPop, mappingPopValues, dataset, marker);
-        Debug.println(0, "testSetMappingData() Added: " + (addStatus != null ? accMetadataSet : null) 
-                    + " | " + (addStatus != null ? markerMetadataSet : null) 
-                    + " | " + (addStatus != null ? datasetUser : null) 
-                    + " | " + (addStatus != null ? mappingPop : null)
-                    + " | " + (addStatus != null ? mappingPopValues : null)
-                    + " | " + (addStatus != null ? dataset : null));
-    }
-    
+        if (addStatus){
+            Debug.println(0, "testSetMappingData() Added: ");
+            Debug.println(3, accMetadataSet.toString()); 
+            Debug.println(3, markerMetadataSet.toString()); 
+            Debug.println(3, datasetUser.toString()); 
+            Debug.println(3, mappingPopValues.toString()); 
+            Debug.println(3, dataset.toString()); 
+            Debug.println(3, marker.toString()); 
+        }
 
-    @Test
-    public void testSetMappingABH() throws Exception {
-        //TODO
     }
-        
+
     @Test
     public void testSetMappingAllelicSNP() throws Exception {
         //TODO
