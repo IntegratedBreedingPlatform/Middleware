@@ -1586,7 +1586,23 @@ public class TestGenotypicDataManagerImpl{
                     + " | " + (addStatus != null ? dataset : null));
     }
     
-    //TODO setMappingData new test methods
+
+    @Test
+    public void testSetMappingABH() throws Exception {
+        //TODO
+    }
+        
+    @Test
+    public void testSetMappingAllelicSNP() throws Exception {
+        //TODO
+    }
+        
+    @Test
+    public void testSetMappingAllelicSSRDArT() throws Exception {
+        //TODO
+    }
+        
+        
     
     @Test
     public void testSetMaps() throws Exception {
@@ -1902,7 +1918,7 @@ public class TestGenotypicDataManagerImpl{
     }
     
     @Test
-    public void testCountMarkersFromAccMetadatasetByDatasetIds() throws Exception {
+    public void testCountMarkersFromMarkerMetadatasetByDatasetIds() throws Exception {
         //GROUNDNUT DATABASE
         List<Integer> datasetIds = Arrays.asList(2, 3, 4);
         long count = manager.countMarkersFromMarkerMetadatasetByDatasetIds(datasetIds);
