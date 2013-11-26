@@ -170,5 +170,21 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	    }
 	    return 0;
 	}
+
+	public ExperimentModel getExperimentByProjectIdAndLocation(Integer projectId, Integer locationId) throws MiddlewareQueryException {
+		try {
+			Criteria criteria = getSession().createCriteria(getPersistentClass());
+			criteria.add(Restrictions.eq("project.projectId", projectId));
+			criteria.add(Restrictions.eq("geoLocation.locationId", locationId));
+			@SuppressWarnings("rawtypes")
+			List list = criteria.list();
+			if(list!=null && !list.isEmpty()) {
+				return (ExperimentModel)list.get(0);
+			}
+		} catch (HibernateException e) {
+			logAndThrowException("Error at getExperimentByProjectIdAndLocation=" + projectId + "," + locationId + " query at ExperimentDao: " + e.getMessage(), e);
+		}
+		return null;
+	}
 	
 }

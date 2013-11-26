@@ -604,4 +604,31 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
         return environmentDetails;
     }
 
+
+	public void deletePhenotypesByProjectIdAndLocationId(Integer projectId, Integer locationId) throws MiddlewareQueryException {
+		try {
+			this.flush();
+			
+			// Delete phenotypes and experiment phenotypes
+			String sql = "delete pheno, epheno" +
+                    " from nd_experiment_project ep, nd_experiment e," +
+                    " nd_experiment_phenotype epheno, phenotype pheno" + 
+                    " where ep.project_id = " + projectId +
+                    " and e.nd_geolocation_id = " + locationId +
+                    " and e.nd_experiment_id = ep.nd_experiment_id" +
+			 		" and e.nd_experiment_id = epheno.nd_experiment_id" +
+					" and epheno.phenotype_id = pheno.phenotype_id";
+            System.out.println(sql);
+			SQLQuery statement = getSession().createSQLQuery(sql);
+			statement.executeUpdate();
+			
+            this.flush();
+            this.clear();
+
+		} catch(HibernateException e) {
+			logAndThrowException("Error in deletePhenotypesByProjectIdAndLocationId=" 
+					+ projectId + ", " + locationId + " in PhenotypeDao: " + e.getMessage(), e);
+		}
+	}
+
 }

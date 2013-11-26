@@ -32,7 +32,6 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
-import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -49,6 +48,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.util.PlotUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -501,13 +501,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             	getProjectPropertySaver().saveProjectProperties(project,variableTypeList);
             }
             if(experimentValues!=null && !experimentValues.isEmpty()) {
-            	for (Integer locationId : locationIds) {
-            		getDataSetDestroyer().deleteExperimentsByLocationAndExperimentType(
-            				project.getProjectId(), locationId, TermId.SUMMARY_EXPERIMENT.getId());
+            	for (Integer locationId : locationIds) {	
+            		//delete phenotypes by project id and locationId
+            		getPhenotypeDao().deletePhenotypesByProjectIdAndLocationId(project.getProjectId(),locationId);
 				}
             	for (ExperimentValues exp : experimentValues) {
             		if(exp.getVariableList()!=null && exp.getVariableList().size()>0) {
-            			getExperimentModelSaver().addExperiment(project.getProjectId(), ExperimentType.SUMMARY, exp);
+            			ExperimentModel experimentModel = getExperimentDao().getExperimentByProjectIdAndLocation(project.getProjectId(),exp.getLocationId());
+            			getPhenotypeSaver().savePhenotypes(experimentModel, exp.getVariableList());
             		}
 				}
             	
