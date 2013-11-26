@@ -15,5 +15,5 @@ package org.generationcp.middleware.pojos.workbench;
  * The type of tools - WEB, WEB_WITH_LOGIN, NATIVE.
  */ 
 public enum ToolType {
-    WEB, WEB_WITH_LOGIN, NATIVE
+    WEB, WEB_WITH_LOGIN, NATIVE, WORKBENCH, ADMIN
 }

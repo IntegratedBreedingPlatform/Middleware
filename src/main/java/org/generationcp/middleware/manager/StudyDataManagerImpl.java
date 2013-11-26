@@ -32,6 +32,7 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -465,8 +466,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     
     @Override
     public void saveOrUpdateFieldmapProperties(FieldMapInfo info) throws MiddlewareQueryException {
-        /*
-        if (info != null && info.getFieldMapLabels() != null && !info.getFieldMapLabels().isEmpty()) {
+        
+        if (info != null && !info.getDatasetsWithFieldMap().isEmpty()) {
+            
             requireLocalDatabaseInstance();
             Session session = getCurrentSessionForLocal();
             Transaction trans = null;
@@ -484,7 +486,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
                         e, LOG);
             }
         }
-        */
+        
     }
     
     @Override

@@ -20,26 +20,7 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
-import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
-import org.generationcp.middleware.pojos.workbench.Project;
-import org.generationcp.middleware.pojos.workbench.ProjectActivity;
-import org.generationcp.middleware.pojos.workbench.ProjectBackup;
-import org.generationcp.middleware.pojos.workbench.ProjectLocationMap;
-import org.generationcp.middleware.pojos.workbench.ProjectMethod;
-import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
-import org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount;
-import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
-import org.generationcp.middleware.pojos.workbench.Role;
-import org.generationcp.middleware.pojos.workbench.SecurityQuestion;
-import org.generationcp.middleware.pojos.workbench.Tool;
-import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
-import org.generationcp.middleware.pojos.workbench.ToolType;
-import org.generationcp.middleware.pojos.workbench.UserInfo;
-import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
-import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
-import org.generationcp.middleware.pojos.workbench.WorkbenchSetting;
-import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
+import org.generationcp.middleware.pojos.workbench.*;
 
 /**
  * This is the API used by the Workbench to retrieve Workbench project
@@ -980,4 +961,10 @@ public interface WorkbenchDataManager {
     List<Long> getFavoriteProjectLocationIds(Long projectId, int start, int numOfRows) throws MiddlewareQueryException;
 
     List<Integer> getFavoriteProjectMethods(Project project, int start, int numOfRows) throws  MiddlewareQueryException;
+
+    List<WorkbenchSidebarCategory> getAllWorkbenchSidebarCategory() throws MiddlewareQueryException;
+
+    List<WorkbenchSidebarCategoryLink> getAllWorkbenchSidebarLinks() throws MiddlewareQueryException;
+
+    List<WorkbenchSidebarCategoryLink> getAllWorkbenchSidebarLinksByCategoryId(WorkbenchSidebarCategory category) throws MiddlewareQueryException;
 }

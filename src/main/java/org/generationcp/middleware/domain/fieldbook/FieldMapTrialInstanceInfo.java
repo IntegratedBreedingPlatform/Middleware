@@ -56,6 +56,17 @@ public class FieldMapTrialInstanceInfo implements Serializable{
     
     /** The start range index */
     private Integer startRange;
+    
+    private long entryCount;
+    
+    private long repCount;
+    
+    private long plotCount;
+    
+    private boolean hasFieldMap;
+    
+    private Integer rowsPerPlot;
+    
         
     /**
      * Instantiates a new field map trial instance info.
@@ -77,6 +88,17 @@ public class FieldMapTrialInstanceInfo implements Serializable{
 	this.labels = labels;
     }
 
+    public boolean isFieldMapGenerated() {
+        if (getFieldMapLabels() != null) {
+            for (FieldMapLabel label : getFieldMapLabels()) {
+                if (label.getColumn() != null && label.getColumn() > 0) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
     /**
      * Gets the geolocation id.
      *
@@ -221,6 +243,10 @@ public class FieldMapTrialInstanceInfo implements Serializable{
         return entries.size();
     }
     
+    public void setEntryCount(long entryCount) {
+        this.entryCount = entryCount;
+    }
+    
     /**
      * Gets the rep count.
      *
@@ -236,6 +262,10 @@ public class FieldMapTrialInstanceInfo implements Serializable{
         }
         return Collections.max(reps);
     }
+    
+    public void setRepCount(long repCount) {
+        this.repCount = repCount;
+    }
 
     /**
      * Gets the plot count.
@@ -244,6 +274,10 @@ public class FieldMapTrialInstanceInfo implements Serializable{
      */
     public long getPlotCount() {
         return labels.size();
+    }
+    
+    public void setPlotCount(long plotCount) {
+        this.plotCount = plotCount;
     }
     
     /**
@@ -333,4 +367,38 @@ public class FieldMapTrialInstanceInfo implements Serializable{
         Debug.println(indent, "Number of Reps: " + getRepCount());
         Debug.println(indent, "Number of Plots: " + getPlotCount());
     }
+
+    
+    /**
+     * @return the hasFieldMap
+     */
+    public boolean getHasFieldMap() {
+        return isFieldMapGenerated();
+    }
+
+    
+    /**
+     * @param hasFieldMap the hasFieldMap to set
+     */
+    public void setHasFieldMap(boolean hasFieldMap) {
+        this.hasFieldMap = hasFieldMap;
+    }
+
+    
+    /**
+     * @return the rowsPerPlot
+     */
+    public Integer getRowsPerPlot() {
+        return rowsPerPlot;
+    }
+
+    
+    /**
+     * @param rowsPerPlot the rowsPerPlot to set
+     */
+    public void setRowsPerPlot(Integer rowsPerPlot) {
+        this.rowsPerPlot = rowsPerPlot;
+    }
+
+
 }

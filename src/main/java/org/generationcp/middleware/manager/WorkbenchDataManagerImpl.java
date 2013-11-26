@@ -15,53 +15,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.generationcp.middleware.dao.CropTypeDAO;
-import org.generationcp.middleware.dao.IbdbUserMapDAO;
-import org.generationcp.middleware.dao.PersonDAO;
-import org.generationcp.middleware.dao.ProjectActivityDAO;
-import org.generationcp.middleware.dao.ProjectBackupDAO;
-import org.generationcp.middleware.dao.ProjectDAO;
-import org.generationcp.middleware.dao.ProjectLocationMapDAO;
-import org.generationcp.middleware.dao.ProjectMethodDAO;
-import org.generationcp.middleware.dao.ProjectUserInfoDAO;
-import org.generationcp.middleware.dao.ProjectUserMysqlAccountDAO;
-import org.generationcp.middleware.dao.ProjectUserRoleDAO;
-import org.generationcp.middleware.dao.RoleDAO;
-import org.generationcp.middleware.dao.SecurityQuestionDAO;
-import org.generationcp.middleware.dao.ToolConfigurationDAO;
-import org.generationcp.middleware.dao.ToolDAO;
-import org.generationcp.middleware.dao.UserDAO;
-import org.generationcp.middleware.dao.UserInfoDAO;
-import org.generationcp.middleware.dao.WorkbenchDatasetDAO;
-import org.generationcp.middleware.dao.WorkbenchRuntimeDataDAO;
-import org.generationcp.middleware.dao.WorkbenchSettingDAO;
-import org.generationcp.middleware.dao.WorkflowTemplateDAO;
+import org.generationcp.middleware.dao.*;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
-import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
-import org.generationcp.middleware.pojos.workbench.Project;
-import org.generationcp.middleware.pojos.workbench.ProjectActivity;
-import org.generationcp.middleware.pojos.workbench.ProjectBackup;
-import org.generationcp.middleware.pojos.workbench.ProjectLocationMap;
-import org.generationcp.middleware.pojos.workbench.ProjectMethod;
-import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
-import org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount;
-import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
-import org.generationcp.middleware.pojos.workbench.Role;
-import org.generationcp.middleware.pojos.workbench.SecurityQuestion;
-import org.generationcp.middleware.pojos.workbench.Tool;
-import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
-import org.generationcp.middleware.pojos.workbench.ToolType;
-import org.generationcp.middleware.pojos.workbench.UserInfo;
-import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
-import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
-import org.generationcp.middleware.pojos.workbench.WorkbenchSetting;
-import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
+import org.generationcp.middleware.pojos.workbench.*;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -102,6 +63,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     private WorkbenchSettingDAO workbenchSettingDao;
     private WorkflowTemplateDAO workflowTemplateDao;
     private ProjectBackupDAO projectBackupDao;
+    private WorkbenchSidebarCategoryDAO workbenchSidebarCategoryDAO;
+    private WorkbenchSidebarCategoryLinkDAO workbenchSidebarCategoryLinkDAO;
 
     public WorkbenchDataManagerImpl(HibernateSessionProvider sessionProvider) {
         this.sessionProvider = sessionProvider;
@@ -1635,6 +1598,37 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     @Override
     public List<Integer> getBreedingMethodIdsByWorkbenchProjectId(Integer projectId) throws MiddlewareQueryException{
         return getProjectMethodDao().getBreedingMethodIdsByWorkbenchProjectId(projectId);
+    }
+
+    @Override
+    public List<WorkbenchSidebarCategory> getAllWorkbenchSidebarCategory() throws MiddlewareQueryException {
+        return getWorkbenchSidebarCategoryDao().getAll();
+    }
+
+    private WorkbenchSidebarCategoryDAO getWorkbenchSidebarCategoryDao() {
+        if (workbenchSidebarCategoryDAO == null){
+            workbenchSidebarCategoryDAO = new WorkbenchSidebarCategoryDAO();
+        }
+        workbenchSidebarCategoryDAO.setSession(getCurrentSession());
+        return workbenchSidebarCategoryDAO;
+    }
+
+    @Override
+    public List<WorkbenchSidebarCategoryLink> getAllWorkbenchSidebarLinks() throws MiddlewareQueryException {
+        return getWorkbenchSidebarCategoryLinkDao().getAll();
+    }
+
+    @Override
+    public List<WorkbenchSidebarCategoryLink> getAllWorkbenchSidebarLinksByCategoryId(WorkbenchSidebarCategory category) throws MiddlewareQueryException {
+        return getWorkbenchSidebarCategoryLinkDao().getAllWorkbenchSidebarLinksByCategoryId(category,0,Integer.MAX_VALUE);
+    }
+
+    private WorkbenchSidebarCategoryLinkDAO getWorkbenchSidebarCategoryLinkDao() {
+        if (workbenchSidebarCategoryLinkDAO == null){
+            workbenchSidebarCategoryLinkDAO = new WorkbenchSidebarCategoryLinkDAO();
+        }
+        workbenchSidebarCategoryLinkDAO.setSession(getCurrentSession());
+        return workbenchSidebarCategoryLinkDAO;
     }
 
 }

@@ -68,6 +68,20 @@ public class FieldMapInfo implements Serializable{
         this.fieldbookId = fieldbookId;
         this.fieldbookName = fieldbookName;
     }
+    
+    public List<FieldMapDatasetInfo> getDatasetsWithFieldMap() {
+        List<FieldMapDatasetInfo> info = new ArrayList<FieldMapDatasetInfo>();
+        
+        if (getDatasets() != null && !getDatasets().isEmpty()) {
+            for (FieldMapDatasetInfo dataset : getDatasets()) {
+                if (!dataset.getTrialInstancesWithFieldMap().isEmpty()) {
+                    info.add(dataset);
+                }
+            }
+        }
+        
+        return info;
+    }
 
     /**
      * Gets the fieldbook id.
