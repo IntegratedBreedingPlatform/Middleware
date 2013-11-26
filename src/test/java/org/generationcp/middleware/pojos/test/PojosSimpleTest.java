@@ -295,6 +295,22 @@ public class PojosSimpleTest{
             Debug.println(0, "  " + holder);
         }
     }
+    
+    @Test
+    public void testListDataProperty() {
+        Session session = hibernateUtil.getCurrentSession();
+        
+        // UNCOMMENT TO TEST: (IMPORTANT -- RUN IN RICE DB ONLY)
+        Query query = session.createQuery("FROM GermplasmListData where id IN (32334, 32335, 32336)");
+        List results = query.list();
+
+        for (Object obj : results) {
+        	Assert.assertTrue(obj instanceof GermplasmListData);
+        	Assert.assertTrue(obj != null);
+        	GermplasmListData data = (GermplasmListData) obj;
+        	data.print(0);
+        }
+    }
 
     @After
     public void afterEachTest() {
