@@ -276,10 +276,11 @@ public class DatabaseBroker {
      * Checks for the existence of a local database session. Throws an exception if not found.
      * 
      */
-    protected void requireLocalDatabaseInstance() throws MiddlewareQueryException {
+    protected Session requireLocalDatabaseInstance() throws MiddlewareQueryException {
         if (!setWorkingDatabase(Database.LOCAL)) {
             throw new MiddlewareQueryException(NO_LOCAL_INSTANCE_MSG);
         }
+        return getCurrentSessionForLocal();
     }
 
     /**

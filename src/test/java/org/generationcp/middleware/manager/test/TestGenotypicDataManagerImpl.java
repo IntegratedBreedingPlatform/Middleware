@@ -1219,14 +1219,20 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testSetSSRMarkers() throws Exception {
-    	List<Object> markerRecrods = createMarkerMarkeRecords();
-        Marker marker = (Marker) markerRecrods.get(0);
-        MarkerAlias markerAlias = (MarkerAlias) markerRecrods.get(1);
-        MarkerDetails markerDetails = (MarkerDetails) markerRecrods.get(2);
-        MarkerUserInfo markerUserInfo = (MarkerUserInfo) markerRecrods.get(3);
+    	List<Object> markerRecords = createMarkerMarkeRecords();
+        Marker marker = (Marker) markerRecords.get(0);
+        MarkerAlias markerAlias = (MarkerAlias) markerRecords.get(1);
+        MarkerDetails markerDetails = (MarkerDetails) markerRecords.get(2);
+        MarkerUserInfo markerUserInfo = (MarkerUserInfo) markerRecords.get(3);
         
         Boolean addStatus = manager.setSSRMarkers(marker, markerAlias, markerDetails, markerUserInfo);
-        Debug.println(0, "testSetSSRMarkers() Added: " + (addStatus != null ? marker : null) + (addStatus != null ? markerAlias : null) + (addStatus != null ? markerDetails : null) + (addStatus != null ? markerUserInfo : null));
+        if (addStatus){
+            Debug.println(0, "testSetSSRMarkers() Added: ");
+            Debug.println(3, marker.toString());
+            Debug.println(3, markerAlias.toString());
+            Debug.println(3, markerDetails.toString());
+            Debug.println(3, markerUserInfo.toString());
+        }
     }
     
 	private List<Object> createMarkerMarkeRecords() {
@@ -1295,7 +1301,13 @@ public class TestGenotypicDataManagerImpl{
         MarkerUserInfo markerUserInfo = (MarkerUserInfo) markerRecrods.get(3);
 
         Boolean addStatus = manager.setSNPMarkers(marker, markerAlias, markerDetails, markerUserInfo);
-        Debug.println(0, "testSetSNPMarkers() Added: " + (addStatus != null ? marker : null) + (addStatus != null ? markerAlias : null) + (addStatus != null ? markerDetails : null) + (addStatus != null ? markerUserInfo : null));
+        if (addStatus){
+            Debug.println(0, "testSetSNPMarkers() Added: ");
+            Debug.println(3, marker.toString());
+            Debug.println(3, markerAlias.toString());
+            Debug.println(3, markerDetails.toString());
+            Debug.println(3, markerUserInfo.toString());
+        }
     }
 
     @Test
@@ -1307,7 +1319,13 @@ public class TestGenotypicDataManagerImpl{
         MarkerUserInfo markerUserInfo = (MarkerUserInfo) markerRecrods.get(3);
 
         Boolean addStatus = manager.setCAPMarkers(marker, markerAlias, markerDetails, markerUserInfo);
-        Debug.println(0, "testSetCAPMarkers() Added: " + (addStatus != null ? marker : null) + (addStatus != null ? markerAlias : null) + (addStatus != null ? markerDetails : null) + (addStatus != null ? markerUserInfo : null));
+        if (addStatus){
+            Debug.println(0, "testSetCAPMarkers() Added: ");
+            Debug.println(3, marker.toString());
+            Debug.println(3, markerAlias.toString());
+            Debug.println(3, markerDetails.toString());
+            Debug.println(3, markerUserInfo.toString());
+        }
     }
 
     @Test
@@ -1319,7 +1337,13 @@ public class TestGenotypicDataManagerImpl{
         MarkerUserInfo markerUserInfo = (MarkerUserInfo) markerRecrods.get(3);
 
         Boolean addStatus = manager.setCISRMarkers(marker, markerAlias, markerDetails, markerUserInfo);
-        Debug.println(0, "testSetCISRMarkers() Added: " + (addStatus != null ? marker : null) + (addStatus != null ? markerAlias : null) + (addStatus != null ? markerDetails : null) + (addStatus != null ? markerUserInfo : null));
+        if (addStatus){
+            Debug.println(0, "testSetCISRMarkers() Added: ");
+            Debug.println(3, marker.toString());
+            Debug.println(3, markerAlias.toString());
+            Debug.println(3, markerDetails.toString());
+            Debug.println(3, markerUserInfo.toString());
+        }
     }
     
     @Test
@@ -1405,7 +1429,9 @@ public class TestGenotypicDataManagerImpl{
         
         DartValues dartValues = new DartValues(adId, datasetId, markerId, cloneId, qValue, reproducibility, callRate, picValue, discordance);
         
-        Boolean addStatus = manager.setDart(accMetadataSet, markerMetadataSet, datasetUser, alleleValues, dataset, dartValues);
+        Marker marker = (Marker) createMarkerMarkeRecords().get(0);
+
+        Boolean addStatus = manager.setDart(accMetadataSet, markerMetadataSet, datasetUser, alleleValues, dataset, dartValues, marker);
         Debug.println(0, "testSetDArT() Added: " + (addStatus != null ? accMetadataSet : null) 
                     + " | " + (addStatus != null ? markerMetadataSet : null) 
                     + " | " + (addStatus != null ? datasetUser : null) 
@@ -1444,7 +1470,9 @@ public class TestGenotypicDataManagerImpl{
         
         AlleleValues alleleValues = new AlleleValues(anId, datasetId, gId, markerId, alleleBinValue, alleleRawValue, peakHeight);
         
-        Boolean addStatus = manager.setSSR(accMetadataSet, markerMetadataSet, datasetUser, alleleValues, dataset);
+        Marker marker = (Marker) createMarkerMarkeRecords().get(0);
+
+        Boolean addStatus = manager.setSSR(accMetadataSet, markerMetadataSet, datasetUser, alleleValues, dataset, marker);
         Debug.println(0, "testSetSSR() Added: " + (addStatus != null ? accMetadataSet : null) 
                     + " | " + (addStatus != null ? markerMetadataSet : null) 
                     + " | " + (addStatus != null ? datasetUser : null) 
@@ -1480,7 +1508,9 @@ public class TestGenotypicDataManagerImpl{
         DatasetUsers datasetUser = new DatasetUsers(datasetId, userId);
         CharValues charValues = new CharValues(acId, datasetId, markerId, gId, charValue);
      
-        Boolean addStatus = manager.setSNP(accMetadataSet, markerMetadataSet, datasetUser, charValues, dataset);
+        Marker marker = (Marker) createMarkerMarkeRecords().get(0);
+
+        Boolean addStatus = manager.setSNP(accMetadataSet, markerMetadataSet, datasetUser, charValues, dataset, marker);
         Debug.println(0, "testSetSNP() Added: " + (addStatus != null ? accMetadataSet : null) 
                     + " | " + (addStatus != null ? markerMetadataSet : null) 
                     + " | " + (addStatus != null ? datasetUser : null) 
@@ -1545,7 +1575,9 @@ public class TestGenotypicDataManagerImpl{
         
         MappingPopValues mappingPopValues = new MappingPopValues(mpId, mapCharValue, datasetId, gId, markerId);
         
-        Boolean addStatus = manager.setMappingData(accMetadataSet, markerMetadataSet, datasetUser, mappingPop, mappingPopValues, dataset);
+        Marker marker = (Marker) createMarkerMarkeRecords().get(0);
+        
+        Boolean addStatus = manager.setMappingData(accMetadataSet, markerMetadataSet, datasetUser, mappingPop, mappingPopValues, dataset, marker);
         Debug.println(0, "testSetMappingData() Added: " + (addStatus != null ? accMetadataSet : null) 
                     + " | " + (addStatus != null ? markerMetadataSet : null) 
                     + " | " + (addStatus != null ? datasetUser : null) 
@@ -1553,6 +1585,8 @@ public class TestGenotypicDataManagerImpl{
                     + " | " + (addStatus != null ? mappingPopValues : null)
                     + " | " + (addStatus != null ? dataset : null));
     }
+    
+    //TODO setMappingData new test methods
     
     @Test
     public void testSetMaps() throws Exception {
@@ -1861,10 +1895,18 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testCountNidsFromAccMetadatasetByDatasetIds() throws Exception {
-    	//GROUNDNUT DATABASE
-    	List<Integer> datasetIds = Arrays.asList(2, 3, 4);
-    	long count = manager.countNidsFromAccMetadatasetByDatasetIds(datasetIds);
-    	Debug.println(0, "testCountNidsFromAccMetadatasetByDatasetIds(" + datasetIds + ") = " + count);
+        //GROUNDNUT DATABASE
+        List<Integer> datasetIds = Arrays.asList(2, 3, 4);
+        long count = manager.countNidsFromAccMetadatasetByDatasetIds(datasetIds);
+        Debug.println(0, "testCountNidsFromAccMetadatasetByDatasetIds(" + datasetIds + ") = " + count);
+    }
+    
+    @Test
+    public void testCountMarkersFromAccMetadatasetByDatasetIds() throws Exception {
+        //GROUNDNUT DATABASE
+        List<Integer> datasetIds = Arrays.asList(2, 3, 4);
+        long count = manager.countMarkersFromMarkerMetadatasetByDatasetIds(datasetIds);
+        Debug.println(0, "testCountMarkersFromAccMetadatasetByDatasetIds(" + datasetIds + ") = " + count);
     }
     
     @Test

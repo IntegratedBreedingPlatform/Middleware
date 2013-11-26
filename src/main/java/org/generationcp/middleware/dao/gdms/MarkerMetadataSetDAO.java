@@ -95,6 +95,25 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
         return count;
     }
     
+    public long countByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException {
+        long count = 0;
+        try {
+            if (datasetIds != null && !datasetIds.isEmpty()) {
+                SQLQuery query = getSession().createSQLQuery(MarkerMetadataSet.COUNT_MARKER_BY_DATASET_IDS);
+                query.setParameterList("datasetIds", datasetIds);
+                BigInteger result = (BigInteger) query.uniqueResult();
+                if (result != null) {
+                    count = result.longValue();
+                }
+            }
+            
+        } catch(HibernateException e) {
+            logAndThrowException("Error with countByDatasetIds=" + datasetIds + ") query from MarkerMetadataSet: "
+                    + e.getMessage(), e);
+        }
+        return count;
+    }
+
     
     
     @SuppressWarnings("rawtypes")

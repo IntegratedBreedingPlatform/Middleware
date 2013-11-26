@@ -58,6 +58,12 @@ public class MarkerMetadataSet implements Serializable{
             "FROM gdms_marker_metadataset " +
             "WHERE  marker_id = :markerId ";
    
+    public static final String COUNT_MARKER_BY_DATASET_IDS = 
+            "SELECT COUNT(DISTINCT marker_id) " 
+            + "FROM gdms_marker_metadataset "
+            + "WHERE dataset_id IN (:datasetIds)";
+
+
 
     @EmbeddedId
     protected MarkerMetadataSetPK id;

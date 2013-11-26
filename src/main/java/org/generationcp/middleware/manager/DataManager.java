@@ -49,6 +49,7 @@ import org.generationcp.middleware.operation.saver.StudySaver;
 import org.generationcp.middleware.operation.searcher.StudySearcherByNameStartSeasonCountry;
 import org.generationcp.middleware.util.DatabaseBroker;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -850,6 +851,47 @@ public abstract class DataManager extends DatabaseBroker{
         }
         return count;
     }
+    
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public Object save(GenericDAO dao, Object entity) throws MiddlewareQueryException {
+        Session session = requireLocalDatabaseInstance();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+            Object recordSaved = dao.save(entity);
+            trans.commit();
+            return recordSaved;
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered with saving " + entity.getClass() + "(" + entity.toString() + "): \n" + e.getMessage(), 
+                    e, LOG);
+            return null;
+        } finally {
+            session.flush();
+        }
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public Object saveOrUpdate(GenericDAO dao, Object entity) throws MiddlewareQueryException {
+        Session session = requireLocalDatabaseInstance();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+            Object recordSaved = dao.saveOrUpdate(entity);
+            trans.commit();
+            return recordSaved;
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered with saving " + entity.getClass() + "(" + entity.toString() + "): \n" + e.getMessage(), 
+                    e, LOG);
+            return null;
+        } finally {
+            session.flush();
+        }
+    }
+
 
     /**
      * Logs an error based on the given message using the given Logger parameter.
