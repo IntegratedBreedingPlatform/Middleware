@@ -1060,6 +1060,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         try {
             trans = session.beginTransaction();
             Integer datasetId = saveDataset(dataset, TYPE_DART, DATA_TYPE_INT);
+            dataset.setDatasetId(datasetId);
             saveMarker(marker, TYPE_DART);
             saveAccMetadataSet(datasetId, accMetadataSet);
             saveMarkerMetadataSet(datasetId, markerMetadataSet);
@@ -1086,6 +1087,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         try {
             trans = session.beginTransaction();
             Integer datasetId = saveDataset(dataset, TYPE_SSR, DATA_TYPE_INT);
+            dataset.setDatasetId(datasetId);
             saveMarker(marker, TYPE_SSR);
             saveAccMetadataSet(datasetId, accMetadataSet);
             saveMarkerMetadataSet(datasetId, markerMetadataSet);
@@ -1111,6 +1113,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         try {
             trans = session.beginTransaction();
             Integer datasetId = saveDataset(dataset, TYPE_SNP, DATA_TYPE_INT);
+            dataset.setDatasetId(datasetId);
             saveMarker(marker, TYPE_SNP);
             saveAccMetadataSet(datasetId, accMetadataSet);
             saveMarkerMetadataSet(datasetId, markerMetadataSet);
@@ -1135,13 +1138,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
         try {
             trans = session.beginTransaction();
-            Integer datasetId = saveDataset(dataset, TYPE_MAPPING, DATA_TYPE_MAP);
-            saveMarker(marker, TYPE_MAPPING);
-            saveAccMetadataSet(datasetId, accMetadataSet);
-            saveMarkerMetadataSet(datasetId, markerMetadataSet);
-            saveDatasetUser(datasetId, datasetUser);
-            saveMappingPop(datasetId, mappingPop);
-            saveMappingPopValues(datasetId, mappingPopValues);
+            saveMappingData(accMetadataSet, markerMetadataSet, datasetUser, mappingPop, mappingPopValues, dataset, marker);
+//            Integer datasetId = saveDataset(dataset, TYPE_MAPPING, DATA_TYPE_MAP);
+//            saveMarker(marker, TYPE_MAPPING);
+//            saveAccMetadataSet(datasetId, accMetadataSet);
+//            saveMarkerMetadataSet(datasetId, markerMetadataSet);
+//            saveDatasetUser(datasetId, datasetUser);
+//            saveMappingPop(datasetId, mappingPop);
+//            saveMappingPopValues(datasetId, mappingPopValues);
             trans.commit();
             return true;
         } catch (Exception e) {
@@ -1157,7 +1161,28 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     public Boolean setMappingABH(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser,
             MappingPop mappingPop, MappingPopValues mappingPopValues, Dataset dataset, Marker marker) throws MiddlewareQueryException {
         //TODO
-        return null;
+        Session session = requireLocalDatabaseInstance();
+        Transaction trans = null;
+        
+        try {
+            trans = session.beginTransaction();
+            saveMappingData(accMetadataSet, markerMetadataSet, datasetUser, mappingPop, mappingPopValues, dataset, marker);
+//            Integer datasetId = saveDataset(dataset, TYPE_MAPPING, DATA_TYPE_MAP);
+//            saveMarker(marker, TYPE_MAPPING);
+//            saveAccMetadataSet(datasetId, accMetadataSet);
+//            saveMarkerMetadataSet(datasetId, markerMetadataSet);
+//            saveDatasetUser(datasetId, datasetUser);
+//            saveMappingPop(datasetId, mappingPop);
+//            saveMappingPopValues(datasetId, mappingPopValues);
+            trans.commit();
+            return true;
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while setting Mapping Data: setMappingData(): " + e.getMessage(), e, LOG);
+            return false;
+        } finally {
+            session.flush();
+        }
     }
     
     @Override
@@ -1165,7 +1190,23 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             MappingPop mappingPop, MappingPopValues mappingPopValues, Dataset dataset, Marker marker, CharValues charValues) 
                     throws MiddlewareQueryException {
         //TODO
-        return null;
+        Session session = requireLocalDatabaseInstance();
+        Transaction trans = null;
+        
+        try {
+            trans = session.beginTransaction();
+            Integer datasetId = saveMappingData(accMetadataSet, markerMetadataSet, datasetUser, 
+                                                    mappingPop, mappingPopValues, dataset, marker);
+            saveCharValues(datasetId, charValues);
+            trans.commit();
+            return true;
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while setting Mapping Data: setMappingAllelicSNP(): " + e.getMessage(), e, LOG);
+            return false;
+        } finally {
+            session.flush();
+        }    
     }
 
     @Override
@@ -1173,7 +1214,37 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             MappingPop mappingPop, MappingPopValues mappingPopValues, Dataset dataset, Marker marker, AlleleValues alleleValues) 
                     throws MiddlewareQueryException {
         // TODO
-        return null;
+        Session session = requireLocalDatabaseInstance();
+        Transaction trans = null;
+        
+        try {
+            trans = session.beginTransaction();
+            Integer datasetId = saveMappingData(accMetadataSet, markerMetadataSet, datasetUser, 
+                                                    mappingPop, mappingPopValues, dataset, marker);
+            saveAlleleValues(datasetId, alleleValues);
+            trans.commit();
+            return true;
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while setting Mapping Data: setMappingAllelicSSRDArT(): " + e.getMessage(), e, LOG);
+            return false;
+        } finally {
+            session.flush();
+        }   
+    }
+    
+    // Returns the datasetId
+    private Integer saveMappingData(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser,
+            MappingPop mappingPop, MappingPopValues mappingPopValues, Dataset dataset, Marker marker) throws Exception {
+        Integer datasetId = saveDataset(dataset, TYPE_MAPPING, DATA_TYPE_MAP);
+        dataset.setDatasetId(datasetId);
+        saveMarker(marker, TYPE_MAPPING);
+        saveAccMetadataSet(datasetId, accMetadataSet);
+        saveMarkerMetadataSet(datasetId, markerMetadataSet);
+        saveDatasetUser(datasetId, datasetUser);
+        saveMappingPop(datasetId, mappingPop);
+        saveMappingPopValues(datasetId, mappingPopValues);
+        return datasetId;
     }
 
     @Override
@@ -1556,6 +1627,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
             Dataset datasetRecordSaved = datasetDao.saveOrUpdate(dataset);
             datasetId = datasetRecordSaved.getDatasetId();
+
         }
         
         if (datasetId == null) {
