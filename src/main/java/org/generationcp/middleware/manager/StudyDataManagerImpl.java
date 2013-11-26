@@ -487,4 +487,35 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         */
     }
     
+    @Override
+    public void saveTrialDatasetSummary(DmsProject project, VariableTypeList variableTypeList, List<ExperimentValues> experimentValues, List<Integer> locationIds) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+            if(variableTypeList!=null && variableTypeList.getVariableTypes()!=null && !variableTypeList.getVariableTypes().isEmpty()) {
+            	getProjectPropertySaver().saveProjectProperties(project,variableTypeList);
+            }
+            if(experimentValues!=null && !experimentValues.isEmpty()) {
+            	for (Integer locationId : locationIds) {
+            		getDataSetDestroyer().deleteExperimentsByLocationAndExperimentType(
+            				project.getProjectId(), locationId, TermId.SUMMARY_EXPERIMENT.getId());
+				}
+            	for (ExperimentValues exp : experimentValues) {
+            		if(exp.getVariableList()!=null && exp.getVariableList().size()>0) {
+            			getExperimentModelSaver().addExperiment(project.getProjectId(), ExperimentType.SUMMARY, exp);
+            		}
+				}
+            	
+            }
+            trans.commit();
+
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            throw new MiddlewareQueryException("error in addDataSet " + e.getMessage(), e);
+        }
+    }
+    
 }

@@ -39,6 +39,7 @@ import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
 import org.generationcp.middleware.domain.workbench.StudyNode;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.pojos.dms.DmsProject;
 
 /**
  * This is the API for retrieving phenotypic data stored as Studies and datasets
@@ -447,5 +448,16 @@ public interface StudyDataManager{
      * @throws MiddlewareQueryException
      */
     void saveOrUpdateFieldmapProperties(FieldMapInfo info) throws MiddlewareQueryException;
+    
+    /**
+     * Save Project Properties of the Project
+     * 
+     * @param project
+     * @param variableTypeList
+     * @param experimentValues
+     * @param locationIds
+     * @throws MiddlewareQueryException
+     */
+    void saveTrialDatasetSummary(DmsProject project, VariableTypeList variableTypeList, List<ExperimentValues> experimentValues, List<Integer> locationIds) throws MiddlewareQueryException;
 
 }

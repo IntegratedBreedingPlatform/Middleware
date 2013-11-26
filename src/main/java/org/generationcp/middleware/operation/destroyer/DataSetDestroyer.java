@@ -38,4 +38,11 @@ public class DataSetDestroyer extends Destroyer {
 			this.getDmsProjectDao().clear();
 		}
 	}
+	
+	public void deleteExperimentsByLocationAndExperimentType(int datasetId, int locationId, int typeId) throws MiddlewareQueryException {
+		if (this.setWorkingDatabase(datasetId)) {
+			this.getDataSetDao().deleteExperimentsByLocationAndType(datasetId, locationId, typeId);
+			this.getDmsProjectDao().clear();
+		}
+	}
 }

@@ -103,6 +103,9 @@ public class MeasurementVariable {
 	}
 
 	public String getLabel() {
+		if(label==null) {
+			label = "";
+		}
 		return label;
 	}
 

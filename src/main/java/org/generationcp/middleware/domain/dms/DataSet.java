@@ -180,4 +180,13 @@ public class DataSet {
 		builder.append("]");
 		return builder.toString();
 	}
+	
+	public VariableType findVariableTypeByLocalName(String localName) {
+		for (VariableType variableType : variableTypes.getVariableTypes()) {
+			if (variableType.getLocalName().equals(localName)) {
+				return variableType;
+			}
+		}
+		return null;
+	}
 }

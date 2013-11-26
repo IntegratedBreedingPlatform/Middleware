@@ -41,6 +41,7 @@ import org.generationcp.middleware.operation.saver.DatasetProjectSaver;
 import org.generationcp.middleware.operation.saver.ExperimentModelSaver;
 import org.generationcp.middleware.operation.saver.ExperimentPropertySaver;
 import org.generationcp.middleware.operation.saver.GeolocationSaver;
+import org.generationcp.middleware.operation.saver.ProjectPropertySaver;
 import org.generationcp.middleware.operation.saver.ProjectSaver;
 import org.generationcp.middleware.operation.saver.StandardVariableSaver;
 import org.generationcp.middleware.operation.saver.StockSaver;
@@ -987,6 +988,10 @@ public abstract class DataManager extends DatabaseBroker{
     
     protected final ProjectSaver getProjectSaver() {
     	return new ProjectSaver(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    protected final ProjectPropertySaver getProjectPropertySaver() {
+    	return new ProjectPropertySaver(sessionProviderForLocal, sessionProviderForCentral);
     }
     
     protected final StockSaver getStockSaver() {

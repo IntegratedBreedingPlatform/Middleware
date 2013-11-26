@@ -62,8 +62,8 @@ public class ProjectPropertySaver extends Saver {
         for (ProjectProperty property : properties){
             generatedId = projectPropertyDao.getNegativeId("projectPropertyId");
             property.setProjectPropertyId(generatedId);
-             property.setProject(project);
-             projectPropertyDao.save(property);
+            property.setProject(project);
+            projectPropertyDao.save(property);
         }
         
 		project.setProperties(properties);
