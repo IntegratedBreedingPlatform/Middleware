@@ -1489,7 +1489,7 @@ public interface GenotypicDataManager{
      * @return true if values were successfully saved in the database, false otherwise
      * @throws MiddlewareQueryException
      */
-    public Boolean setMappingData(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser,
+    public Boolean setMappingABH(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser,
             MappingPop mappingPop, MappingPopValues mappingPopValues, Dataset dataset, Marker marker) throws MiddlewareQueryException;
     
     /**
@@ -1716,14 +1716,6 @@ public interface GenotypicDataManager{
      */
     public Dataset getDatasetById(Integer datasetId) throws MiddlewareQueryException;
     
-    /**
-     * Returns the Dataset details given a dataset name
-     * @param datasetName
-     * @return Dataset entry matching the given dataset name
-     * @throws MiddlewareQueryException
-     */
-    public Dataset getDatasetByName(String datasetName) throws MiddlewareQueryException;
-
     /**
      * Returns the Dataset details given a list of dataset IDs
      * @param datasetIds

@@ -18,6 +18,7 @@ import static org.junit.Assert.assertNotNull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -81,6 +82,17 @@ public class TestGenotypicDataManagerImpl{
 
     @Rule
     public TestName name = new TestName();
+
+    private static final String DATASET = "Dataset";
+    private static final String DATASET_USERS = "DatasetUsers";
+    private static final String ACC_METADATA_SET = "AccMetadataSet";
+    private static final String MARKER_METADATA_SET = "MarkerMetadataSet";
+    private static final String ALLELE_VALUES = "AlleleValues";
+    private static final String CHAR_VALUES = "CharValues";
+    private static final String MAPPING_POP = "MappingPop";
+    private static final String MAPPING_POP_VALUES = "MappingPopValues";
+    private static final String DART_VALUES = "DartValues";
+    private static final String MARKER = "Marker";
 
 
 
@@ -1346,12 +1358,75 @@ public class TestGenotypicDataManagerImpl{
         }
     }
     
-    
-    private List<Object> createMappingRecords() throws Exception{
-        List<Object> records = new ArrayList<Object>();
-        Dataset dataset = createDataset();
+    // Create test data for setSSR, setSNP, setDArT, setMappingData
+    private java.util.Map<String, Object> createMappingRecords() throws Exception{
+        java.util.Map<String, Object> records = new HashMap<String, Object>();
+
+        // DatasetUser Fields
+        Integer datasetId = null; //Will be set/overridden by the function
+        Integer userId = 123;
+
+        // AccMetadataSet Additional Fields
+        Integer gId = 1; 
+        Integer nameId = 1;
+
+        // MarkerMetadataSet Additional Field
+        Integer markerId = 1;
+
+        // AlleleValues Additional Fields
+        Integer anId = null;     //Will be set/overridden by the function
+        String alleleBinValue = "238:238";
+        String alleleRawValue = "0.0:0.0";
+        Integer peakHeight = 10;
         
-        //TODO
+        // DartValues Additional Fields
+        Integer adId = null;  //Will be set/overridden by the function
+        Integer cloneId = 1;
+        Float qValue = 0f; 
+        Float reproducibility = 0f;
+        Float callRate = 0f; 
+        Float picValue = 0f; 
+        Float discordance = 0f;
+
+        // charValues Additional Fields
+        Integer acId = null;           
+        String charValue = "CV"; 
+        
+        // MappingPop Additional Fields
+        String mappingType = "abh";
+        Integer parentAGId = 1035;
+        Integer parentBGId = 1036;
+        Integer populationSize = 999;
+        String populationType = "";
+        String mapDataDescription = "Flood resistant";
+        String scoringScheme = "";
+        Integer mapId = 1;
+        
+        // MappingPopValues Additional Fields
+        Integer mpId = null;  //Will be set/overridden by the function
+        String mapCharValue = "-";
+
+        Dataset dataset = createDataset();
+        AccMetadataSet accMetadataSet = new AccMetadataSet(datasetId, gId, nameId);
+        MarkerMetadataSet markerMetadataSet = new MarkerMetadataSet(datasetId, markerId);
+        DatasetUsers datasetUser = new DatasetUsers(datasetId, userId);
+        AlleleValues alleleValues = new AlleleValues(anId, datasetId, gId, markerId, alleleBinValue, alleleRawValue, peakHeight);
+        CharValues charValues = new CharValues(acId, datasetId, markerId, gId, charValue);
+        DartValues dartValues = new DartValues(adId, datasetId, markerId, cloneId, qValue, reproducibility, callRate, picValue, discordance);
+        MappingPop mappingPop = new MappingPop(datasetId, mappingType, parentAGId, parentBGId, populationSize, populationType, mapDataDescription, scoringScheme, mapId);
+        MappingPopValues mappingPopValues = new MappingPopValues(mpId, mapCharValue, datasetId, gId, markerId);
+        Marker marker = (Marker) createMarkerMarkeRecords().get(0);
+
+        records.put(DATASET, dataset);
+        records.put(ACC_METADATA_SET, accMetadataSet);
+        records.put(MARKER_METADATA_SET, markerMetadataSet);
+        records.put(DATASET_USERS, datasetUser);
+        records.put(ALLELE_VALUES, alleleValues);
+        records.put(CHAR_VALUES, charValues);
+        records.put(DART_VALUES, dartValues);
+        records.put(MAPPING_POP, mappingPop);
+        records.put(MAPPING_POP_VALUES, mappingPopValues);
+        records.put(MARKER, marker);
         
         return records;
     }
@@ -1411,47 +1486,17 @@ public class TestGenotypicDataManagerImpl{
     @Test
     public void testSetDart() throws Exception {
         
-        // DatasetUser Fields
-        Integer datasetId = null; //Will be set/overridden by the function
-        Integer userId = 123;
+        java.util.Map<String, Object> mappingRecords = createMappingRecords();
+        Dataset dataset = (Dataset) mappingRecords.get(DATASET);
+        AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
+        MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
+        DatasetUsers datasetUser = (DatasetUsers) mappingRecords.get(DATASET_USERS);
+        Marker marker = (Marker) mappingRecords.get(MARKER);
+        AlleleValues alleleValues = (AlleleValues) mappingRecords.get(ALLELE_VALUES);
+        DartValues dartValues = (DartValues) mappingRecords.get(DART_VALUES);
 
-        // AccMetadataSet Additional Fields
-        Integer gId = 1; 
-        Integer nameId = 1;
-
-        // MarkerMetadataSet Additional Field
-        Integer markerId = 1;
-
-        // AlleleValues Additional Fields
-        Integer anId = null;     //Will be set/overridden by the function
-        String alleleBinValue = "238:238";
-        String alleleRawValue = "0.0:0.0";
-        Integer peakHeight = 10;
-        
-        // DartValues Additional Fields
-        Integer adId = null;  //Will be set/overridden by the function
-        Integer cloneId = 1;
-        Float qValue = 0f; 
-        Float reproducibility = 0f;
-        Float callRate = 0f; 
-        Float picValue = 0f; 
-        Float discordance = 0f;
-        
-        Dataset dataset = createDataset();
-        
-        AccMetadataSet accMetadataSet = new AccMetadataSet(datasetId, gId, nameId);
-        
-        MarkerMetadataSet markerMetadataSet = new MarkerMetadataSet(datasetId, markerId);
-        
-        DatasetUsers datasetUser = new DatasetUsers(datasetId, userId);
-        
-        AlleleValues alleleValues = new AlleleValues(anId, datasetId, gId, markerId, alleleBinValue, alleleRawValue, peakHeight);
-        
-        DartValues dartValues = new DartValues(adId, datasetId, markerId, cloneId, qValue, reproducibility, callRate, picValue, discordance);
-        
-        Marker marker = (Marker) createMarkerMarkeRecords().get(0);
-
-        Boolean addStatus = manager.setDart(accMetadataSet, markerMetadataSet, datasetUser, alleleValues, dataset, dartValues, marker);
+        Boolean addStatus = manager.setDart(accMetadataSet, markerMetadataSet, datasetUser, 
+                                                alleleValues, dataset, dartValues, marker);
         if (addStatus){
             Debug.println(0, "testSetDArT() Added: ");
             Debug.println(3, accMetadataSet.toString()); 
@@ -1466,34 +1511,13 @@ public class TestGenotypicDataManagerImpl{
     @Test
     public void testSetSSR() throws Exception {
         
-        // DatasetUser Fields
-        Integer datasetId = null; //Will be set/overridden by the function
-        Integer userId = 123;
-
-        // AccMetadataSet Additional Fields
-        Integer gId = 1; 
-        Integer nameId = 1;
-
-        // MarkerMetadataSet Additional Field
-        Integer markerId = 1;
-
-        // AlleleValues Additional Fields
-        Integer anId = null;     //Will be set/overridden by the function
-        String alleleBinValue = "238:238";
-        String alleleRawValue = "0.0:0.0";
-        Integer peakHeight = 10;
-        
-        Dataset dataset = createDataset();        
-        
-        AccMetadataSet accMetadataSet = new AccMetadataSet(datasetId, gId, nameId);
-        
-        MarkerMetadataSet markerMetadataSet = new MarkerMetadataSet(datasetId, markerId);
-        
-        DatasetUsers datasetUser = new DatasetUsers(datasetId, userId);
-        
-        AlleleValues alleleValues = new AlleleValues(anId, datasetId, gId, markerId, alleleBinValue, alleleRawValue, peakHeight);
-        
-        Marker marker = (Marker) createMarkerMarkeRecords().get(0);
+        java.util.Map<String, Object> mappingRecords = createMappingRecords();
+        Dataset dataset = (Dataset) mappingRecords.get(DATASET);
+        AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
+        MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
+        DatasetUsers datasetUser = (DatasetUsers) mappingRecords.get(DATASET_USERS);
+        Marker marker = (Marker) mappingRecords.get(MARKER);
+        AlleleValues alleleValues = (AlleleValues) mappingRecords.get(ALLELE_VALUES);
 
         Boolean addStatus = manager.setSSR(accMetadataSet, markerMetadataSet, datasetUser, alleleValues, dataset, marker);
         if (addStatus){
@@ -1511,33 +1535,16 @@ public class TestGenotypicDataManagerImpl{
     @Test
     public void testSetSNP() throws Exception {
         
-        // DatasetUser Fields
-        Integer datasetId = null; //Will be set/overridden by the function
-        Integer userId = 123;
+        java.util.Map<String, Object> mappingRecords = createMappingRecords();
+        Dataset dataset = (Dataset) mappingRecords.get(DATASET);
+        AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
+        MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
+        DatasetUsers datasetUser = (DatasetUsers) mappingRecords.get(DATASET_USERS);
+        Marker marker = (Marker) mappingRecords.get(MARKER);
+        CharValues charValues = (CharValues) mappingRecords.get(CHAR_VALUES);
 
-        // AccMetadataSet Additional Fields
-        Integer gId = 1; 
-        Integer nameId = 1;
-
-        // MarkerMetadataSet Additional Field
-        Integer markerId = 1;
-
-        // charValues Additional Fields
-        Integer acId = null;            // Crop tested: Groundnut
-        String charValue = "CV"; 
-       
-        Dataset dataset = createDataset();        
-        
-        AccMetadataSet accMetadataSet = new AccMetadataSet(datasetId, gId, nameId);
-        
-        MarkerMetadataSet markerMetadataSet = new MarkerMetadataSet(datasetId, markerId);
-        
-        DatasetUsers datasetUser = new DatasetUsers(datasetId, userId);
-        CharValues charValues = new CharValues(acId, datasetId, markerId, gId, charValue);
-     
-        Marker marker = (Marker) createMarkerMarkeRecords().get(0);
-
-        Boolean addStatus = manager.setSNP(accMetadataSet, markerMetadataSet, datasetUser, charValues, dataset, marker);
+        Boolean addStatus = manager.setSNP(accMetadataSet, markerMetadataSet, 
+                                                datasetUser, charValues, dataset, marker);
         if (addStatus){
             Debug.println(0, "testSetSNP() Added: ");
             Debug.println(3, accMetadataSet.toString()); 
@@ -1550,12 +1557,16 @@ public class TestGenotypicDataManagerImpl{
     }
     
     @Test
-    public void testSetMappingData() throws Exception {
-        // Tested on Groundnut DB
-
-        // DatasetUser Fields
-        Integer datasetId = null; //Will be set/overridden by the function
-        Integer userId = 123;
+    public void testSetMappingABH() throws Exception {
+        
+        java.util.Map<String, Object> mappingRecords = createMappingRecords();
+        Dataset dataset = (Dataset) mappingRecords.get(DATASET);
+        AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
+        MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
+        DatasetUsers datasetUser = (DatasetUsers) mappingRecords.get(DATASET_USERS);
+        MappingPop mappingPop = (MappingPop) mappingRecords.get(MAPPING_POP);
+        MappingPopValues mappingPopValues = (MappingPopValues) mappingRecords.get(MAPPING_POP_VALUES);
+        Marker marker = (Marker) mappingRecords.get(MARKER);
 
         // Dataset Fields
         String datasetName = "Map_Pop GCP-832 Test";
@@ -1565,28 +1576,6 @@ public class TestGenotypicDataManagerImpl{
         String dataType = "map"; 
         String genus = "Groundnut"; 
 
-        // AccMetadataSet Additional Fields
-        Integer gId = 1; 
-        Integer nameId = 1;
-
-        // MarkerMetadataSet Additional Field
-        Integer markerId = 1;
-
-        // MappingPop Additional Fields
-        String mappingType = "abh";
-        Integer parentAGId = 1035;
-        Integer parentBGId = 1036;
-        Integer populationSize = 999;
-        String populationType = "";
-        String mapDataDescription = "Flood resistant";
-        String scoringScheme = "";
-        Integer mapId = 1;
-        
-        // MappingPopValues Additional Fields
-        Integer mpId = null;  //Will be set/overridden by the function
-        String mapCharValue = "-";
-        
-        Dataset dataset = createDataset();
         dataset.setDatasetName(datasetName);
         dataset.setDatasetDesc(datasetDesc);
         dataset.setDatasetType(datasetType);
@@ -1595,22 +1584,10 @@ public class TestGenotypicDataManagerImpl{
         dataset.setDataType(dataType);
         dataset.setGenus(genus);
         
-        
-        AccMetadataSet accMetadataSet = new AccMetadataSet(datasetId, gId, nameId);
-        
-        MarkerMetadataSet markerMetadataSet = new MarkerMetadataSet(datasetId, markerId);
-        
-        DatasetUsers datasetUser = new DatasetUsers(datasetId, userId);
-        
-        MappingPop mappingPop = new MappingPop(datasetId, mappingType, parentAGId, parentBGId, populationSize, populationType, mapDataDescription, scoringScheme, mapId);
-        
-        MappingPopValues mappingPopValues = new MappingPopValues(mpId, mapCharValue, datasetId, gId, markerId);
-        
-        Marker marker = (Marker) createMarkerMarkeRecords().get(0);
-        
-        Boolean addStatus = manager.setMappingData(accMetadataSet, markerMetadataSet, datasetUser, mappingPop, mappingPopValues, dataset, marker);
+        Boolean addStatus = manager.setMappingABH(accMetadataSet, markerMetadataSet, datasetUser, 
+                                            mappingPop, mappingPopValues, dataset, marker);
         if (addStatus){
-            Debug.println(0, "testSetMappingData() Added: ");
+            Debug.println(0, "testSetMappingABH() Added: ");
             Debug.println(3, accMetadataSet.toString()); 
             Debug.println(3, markerMetadataSet.toString()); 
             Debug.println(3, datasetUser.toString()); 
@@ -1623,12 +1600,56 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testSetMappingAllelicSNP() throws Exception {
-        //TODO
-    }
         
+        java.util.Map<String, Object> mappingRecords = createMappingRecords();
+        Dataset dataset = (Dataset) mappingRecords.get(DATASET);
+        AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
+        MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
+        DatasetUsers datasetUser = (DatasetUsers) mappingRecords.get(DATASET_USERS);
+        MappingPop mappingPop = (MappingPop) mappingRecords.get(MAPPING_POP);
+        MappingPopValues mappingPopValues = (MappingPopValues) mappingRecords.get(MAPPING_POP_VALUES);
+        Marker marker = (Marker) mappingRecords.get(MARKER);
+        CharValues charValues = (CharValues) mappingRecords.get(CHAR_VALUES);
+        
+        Boolean addStatus = manager.setMappingAllelicSNP(accMetadataSet, markerMetadataSet, datasetUser, mappingPop, 
+                                    mappingPopValues, dataset, marker, charValues);
+        if (addStatus){
+            Debug.println(0, "testSetMappingAllelicSNP() Added: ");
+            Debug.println(3, accMetadataSet.toString()); 
+            Debug.println(3, markerMetadataSet.toString()); 
+            Debug.println(3, datasetUser.toString()); 
+            Debug.println(3, mappingPopValues.toString()); 
+            Debug.println(3, dataset.toString()); 
+            Debug.println(3, marker.toString()); 
+            Debug.println(3, charValues.toString()); 
+        }
+    }
+           
     @Test
     public void testSetMappingAllelicSSRDArT() throws Exception {
-        //TODO
+        
+        java.util.Map<String, Object> mappingRecords = createMappingRecords();
+        Dataset dataset = (Dataset) mappingRecords.get(DATASET);
+        AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
+        MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
+        DatasetUsers datasetUser = (DatasetUsers) mappingRecords.get(DATASET_USERS);
+        MappingPop mappingPop = (MappingPop) mappingRecords.get(MAPPING_POP);
+        MappingPopValues mappingPopValues = (MappingPopValues) mappingRecords.get(MAPPING_POP_VALUES);
+        Marker marker = (Marker) mappingRecords.get(MARKER);
+        AlleleValues alleleValues = (AlleleValues) mappingRecords.get(ALLELE_VALUES);
+        
+        Boolean addStatus = manager.setMappingAllelicSSRDArT(accMetadataSet, markerMetadataSet, datasetUser, mappingPop, 
+                                    mappingPopValues, dataset, marker, alleleValues);
+        if (addStatus){
+            Debug.println(0, "testSetMappingAllelicSSRDArT() Added: ");
+            Debug.println(3, accMetadataSet.toString()); 
+            Debug.println(3, markerMetadataSet.toString()); 
+            Debug.println(3, datasetUser.toString()); 
+            Debug.println(3, mappingPopValues.toString()); 
+            Debug.println(3, dataset.toString()); 
+            Debug.println(3, marker.toString()); 
+            Debug.println(3, alleleValues.toString()); 
+        }
     }
         
         

@@ -37,6 +37,7 @@ import org.generationcp.middleware.dao.gdms.MarkerOnMapDAO;
 import org.generationcp.middleware.dao.gdms.MarkerUserInfoDAO;
 import org.generationcp.middleware.dao.gdms.QtlDAO;
 import org.generationcp.middleware.dao.gdms.QtlDetailsDAO;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
@@ -1146,7 +1147,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
 
     @Override
-    public Boolean setMappingData(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser,
+    public Boolean setMappingABH(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser,
             MappingPop mappingPop, MappingPopValues mappingPopValues, Dataset dataset, Marker marker) throws MiddlewareQueryException {
         Session session = requireLocalDatabaseInstance();
         Transaction trans = null;
@@ -1214,14 +1215,19 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     // Returns the datasetId
     private Integer saveMappingData(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser,
             MappingPop mappingPop, MappingPopValues mappingPopValues, Dataset dataset, Marker marker) throws Exception {
+
         Integer datasetId = saveDataset(dataset, TYPE_MAPPING, DATA_TYPE_MAP);
         dataset.setDatasetId(datasetId);
-        saveMarker(marker, TYPE_MAPPING);
+        
+        Integer markerId = saveMarker(marker, TYPE_MAPPING);
+        marker.setMarkerId(markerId);
+        
         saveAccMetadataSet(datasetId, accMetadataSet);
         saveMarkerMetadataSet(datasetId, markerMetadataSet);
         saveDatasetUser(datasetId, datasetUser);
         saveMappingPop(datasetId, mappingPop);
         saveMappingPopValues(datasetId, mappingPopValues);
+        
         return datasetId;
     }
 
@@ -1245,15 +1251,18 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         }
     }
     
-    private Integer getMarkerIdByMarkerName(String markerName) throws MiddlewareQueryException {
-    	Integer markerId = null;    	
-    	setWorkingDatabase(Database.CENTRAL);
-    	markerId = getMarkerDao().getIdByName(markerName);
-    	if (markerId == null) {
-    		setWorkingDatabase(Database.LOCAL);
-    		markerId = getMarkerDao().getIdByName(markerName);
-    	}
-    	return markerId;
+    private Integer getMarkerIdByMarkerName(String markerName) throws MiddlewareQueryException, MiddlewareException {
+        
+        setWorkingDatabase(Database.CENTRAL);
+        Integer markerId = getMarkerDao().getIdByName(markerName);
+
+        if (markerId != null) {
+            throw new MiddlewareException(
+                    "Marker exists in central. Please specify a new GDMS marker record or choose a marker in local.");
+        }
+
+        setWorkingDatabase(Database.LOCAL);
+        return getMarkerDao().getIdByName(markerName);        
     }
     
     private Integer getMapIdByMapName(String mapName) throws MiddlewareQueryException {
@@ -1336,7 +1345,15 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     	return dataset;
     }
     
-    public Dataset getDatasetByName(String datasetName) throws MiddlewareQueryException{
+    private Dataset getDatasetByName(String datasetName) throws MiddlewareQueryException, MiddlewareException{
+
+        // If dataset exists in central, throw an exception
+        setWorkingDatabase(Database.CENTRAL);
+        if (getDatasetDao().getByName(datasetName) != null){
+            throw new MiddlewareException(
+                    "Dataset exists in central. Please specify a new GDMS dataset record or choose a dataset in local.");
+        }
+       
         setWorkingDatabase(Database.LOCAL);
         return getDatasetDao().getByName(datasetName);
     }
@@ -1580,8 +1597,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     // --------------------------------- COMMON SAVER METHODS ------------------------------------------//
     
 	private Integer saveDataset(Dataset dataset, String datasetType, String dataType) throws Exception{
-        requireLocalDatabaseInstance();
-        DatasetDAO datasetDao = getDatasetDao();
 
         // Get dataset from the database if it exists
         Integer datasetId = dataset.getDatasetId();
@@ -1593,6 +1608,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         }
 
         if (datasetId == null) {
+            requireLocalDatabaseInstance();
+            DatasetDAO datasetDao = getDatasetDao();
             Integer datasetGeneratedId = datasetDao.getNegativeId("datasetId");
             dataset.setDatasetId(datasetGeneratedId);
 
@@ -1617,24 +1634,32 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	
 	// If the marker is not yet in the database, add.
 	private Integer saveMarker(Marker marker, String markerType) throws Exception{
-        requireLocalDatabaseInstance();
+	    
+        // Get marker from the database if it exists
+        Integer markerId = marker.getMarkerId();
+        if (markerId == null){
+            Integer markerIdWithName = getMarkerIdByMarkerName(marker.getMarkerName());
+            if (markerIdWithName != null){
+                markerId = markerIdWithName;
+            }
+        }
 
-		Integer markerSavedId = marker.getMarkerId() == null ? getMarkerIdByMarkerName(marker.getMarkerName()) : marker.getMarkerId();
-		        
-        if (markerSavedId == null) {
+	    // Save if new        
+        if (markerId == null) {
+            requireLocalDatabaseInstance();
             MarkerDAO markerDao = getMarkerDao();
             Integer markerGeneratedId = markerDao.getNegativeId("markerId");
             marker.setMarkerId(markerGeneratedId);
             marker.setMarkerType(markerType);
             Marker markerRecordSaved = markerDao.saveOrUpdate(marker);
-            markerSavedId = markerRecordSaved.getMarkerId();
+            markerId = markerRecordSaved.getMarkerId();
         }
         
-        if (markerSavedId == null) {
+        if (markerId == null) {
             throw new Exception(); // To immediately roll back and to avoid executing the other insert functions
         }
 
-        return markerSavedId;
+        return markerId;
 	}
 	
 	private Integer saveMarkerAlias(MarkerAlias markerAlias) throws Exception{
