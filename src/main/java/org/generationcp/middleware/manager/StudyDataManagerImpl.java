@@ -516,7 +516,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
         } catch (Exception e) {
             rollbackTransaction(trans);
-            throw new MiddlewareQueryException("error in addDataSet " + e.getMessage(), e);
+            throw new MiddlewareQueryException("error in saveTrialDatasetSummary " + e.getMessage(), e);
         }
     }
     

@@ -71,7 +71,7 @@ public class GermplasmList implements Serializable{
 
     @Column(name = "liststatus")
     private Integer status;
-
+    
     @OneToMany(mappedBy = "list", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<GermplasmListData> listData = new ArrayList<GermplasmListData>();
 
@@ -276,6 +276,22 @@ public class GermplasmList implements Serializable{
             return false;
         }
         return true;
+    }
+    
+    public Integer getParentId() {
+    	return getParent()!=null?getParent().getId():null;
+    }
+    
+    public boolean isFolder() {
+    	return getType()!=null && getType().equalsIgnoreCase("FOLDER")?true:false;
+    }
+    
+    public boolean isList() {
+    	return getType()!=null && getType().equalsIgnoreCase("LST")?true:false;
+    }
+    
+    public boolean hasParent() {
+    	return getParent()!=null?true:false;
     }
 
 }
