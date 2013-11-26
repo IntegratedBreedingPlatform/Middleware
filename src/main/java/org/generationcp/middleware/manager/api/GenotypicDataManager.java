@@ -14,6 +14,7 @@ package org.generationcp.middleware.manager.api;
 import java.util.List;
 import java.util.Set;
 
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.GdmsTable;
@@ -1344,6 +1345,7 @@ public interface GenotypicDataManager{
      * @param markerOnMap
      * @return mapId - mapId of the inserted record
      * @throws MiddlewareQueryException
+     * @throws MiddlewareException 
      */
     public Integer addMarkerOnMap(MarkerOnMap markerOnMap) throws MiddlewareQueryException;
     
@@ -1437,11 +1439,12 @@ public interface GenotypicDataManager{
      * @param alleleValues - (AlleleValues)
      * @param dataset - (Dataset) dataset_type = "DArT", datatype = "int" 
      * @param dartValues - (DartValues)
+     * @param marker - Marker (not mandatory)
      * @return (boolean) - true if successful, exception or false if failed
      * @throws MiddlewareQueryException
      */
     public Boolean setDart(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser, 
-            AlleleValues alleleValues, Dataset dataset, DartValues dartValues) throws MiddlewareQueryException;
+            AlleleValues alleleValues, Dataset dataset, DartValues dartValues, Marker marker) throws MiddlewareQueryException;
     
     /**
      * Sets SSR
@@ -1450,12 +1453,13 @@ public interface GenotypicDataManager{
      * @param datasetUser - (DatasetUser)
      * @param alleleValues - (AlleleValues)
      * @param dataset - (Dataset) dataset_type = "SSR", datatype = "int" 
+     * @param marker - Marker (not mandatory)
      * @return (boolean) - true if successful, exception or false if failed
      * @throws MiddlewareQueryException
      */
 
     public Boolean setSSR(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser, 
-            AlleleValues alleleValues, Dataset dataset) throws MiddlewareQueryException;
+            AlleleValues alleleValues, Dataset dataset, Marker marker) throws MiddlewareQueryException;
 
     
     /**
@@ -1465,11 +1469,12 @@ public interface GenotypicDataManager{
      * @param datasetUser - (DatasetUser)
      * @param charValues - (CharValues)
      * @param dataset - (Dataset) dataset_type = "SNP", datatype = "int" 
+     * @param marker - Marker (not mandatory)
      * @return (boolean) - true if successful, exception or false if failed
      * @throws MiddlewareQueryException
      */
     public Boolean setSNP(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser, 
-            CharValues charValues, Dataset dataset) throws MiddlewareQueryException;
+            CharValues charValues, Dataset dataset, Marker marker) throws MiddlewareQueryException;
     
     /**
      * Sets Mapping Data.
@@ -1480,12 +1485,65 @@ public interface GenotypicDataManager{
      * @param mappingPop - Mapping Population
      * @param mappingPopValues - Mapping population Values
      * @param dataset - Dataset
+     * @param marker - Marker (not mandatory)
      * @return true if values were successfully saved in the database, false otherwise
      * @throws MiddlewareQueryException
      */
     public Boolean setMappingData(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser,
-            MappingPop mappingPop, MappingPopValues mappingPopValues, Dataset dataset) throws MiddlewareQueryException;
+            MappingPop mappingPop, MappingPopValues mappingPopValues, Dataset dataset, Marker marker) throws MiddlewareQueryException;
     
+    /**
+     * Sets Mapping Data of type ABH
+     * 
+     * @param accMetadataSet - Accession Metadataset
+     * @param markerMetadataSet - Marker Metadataset
+     * @param datasetUser - Dataset Users
+     * @param mappingPop - Mapping Population
+     * @param mappingPopValues - Mapping population Values
+     * @param dataset - Dataset
+     * @param marker - Marker (not mandatory)
+     * @return true if values were successfully saved in the database, false otherwise
+     * @throws MiddlewareQueryException
+     */
+    public Boolean setMappingABH(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser,
+            MappingPop mappingPop, MappingPopValues mappingPopValues, Dataset dataset, Marker marker) throws MiddlewareQueryException;
+    
+    /**
+     * Sets Mapping Data of Allelic SNP
+     * 
+     * @param accMetadataSet - Accession Metadataset
+     * @param markerMetadataSet - Marker Metadataset
+     * @param datasetUser - Dataset Users
+     * @param mappingPop - Mapping Population
+     * @param mappingPopValues - Mapping population Values
+     * @param dataset - Dataset
+     * @param marker - Marker (not mandatory)
+     * @param charValues - CharValues
+     * @return true if values were successfully saved in the database, false otherwise
+     * @throws MiddlewareQueryException
+     */
+    public Boolean setMappingAllelicSNP(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser,
+            MappingPop mappingPop, MappingPopValues mappingPopValues, Dataset dataset, Marker marker, CharValues charValues) 
+                    throws MiddlewareQueryException;
+    
+    /**
+     * Sets Mapping Data of Allelic SSR DArT
+     * 
+     * @param accMetadataSet - Accession Metadataset
+     * @param markerMetadataSet - Marker Metadataset
+     * @param datasetUser - Dataset Users
+     * @param mappingPop - Mapping Population
+     * @param mappingPopValues - Mapping population Values
+     * @param dataset - Dataset
+     * @param marker - Marker (not mandatory)
+     * @param alleleValues - AlleleValues
+     * @return true if values were successfully saved in the database, false otherwise
+     * @throws MiddlewareQueryException
+     */
+    public Boolean setMappingAllelicSSRDArT(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser,
+            MappingPop mappingPop, MappingPopValues mappingPopValues, Dataset dataset, Marker marker, AlleleValues alleleValues) 
+                    throws MiddlewareQueryException;
+ 
     /**
      * Sets Maps/
      * 
@@ -1617,12 +1675,22 @@ public interface GenotypicDataManager{
     public long countQtlDataByQtlTraits(List<Integer> qtlTraitIds) throws MiddlewareQueryException;
 
     /**
-     * Returns the number of nIds from AccMetaDataSet given a list of dataset Ids so that the GDMS UI can integrate to the GDMS database
+     * Returns the number of nIds from AccMetaDataSet given a list of dataset Ids 
+     * 
      * @param datasetIds
      * @return Count of NIDs
      * @throws MiddlewareQueryException
      */
     public long countNidsFromAccMetadatasetByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException;
+    
+    /**
+     * Returns the number of markers from Marker given a list of dataset Ids 
+     * @param datasetIds
+     * @return Count of entries from MarkerMetaDataset
+     * @throws MiddlewareQueryException
+     */
+    public long countMarkersFromMarkerMetadatasetByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException;
+
     
     /**
      * Returns the Map ID given the map name. 
@@ -1656,6 +1724,22 @@ public interface GenotypicDataManager{
      */
     public List<MarkerMetadataSet> getAllFromMarkerMetadatasetByMarker(Integer markerId) throws MiddlewareQueryException;
     
+    /**
+     * Returns the Dataset details given a dataset ID
+     * @param datasetId
+     * @return Dataset entry matching the given dataset ID
+     * @throws MiddlewareQueryException
+     */
+    public Dataset getDatasetById(Integer datasetId) throws MiddlewareQueryException;
+    
+    /**
+     * Returns the Dataset details given a dataset name
+     * @param datasetName
+     * @return Dataset entry matching the given dataset name
+     * @throws MiddlewareQueryException
+     */
+    public Dataset getDatasetByName(String datasetName) throws MiddlewareQueryException;
+
     /**
      * Returns the Dataset details given a list of dataset IDs
      * @param datasetIds

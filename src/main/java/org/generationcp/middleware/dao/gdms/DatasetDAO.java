@@ -20,9 +20,11 @@ import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * DAO class for {@link Dataset}.
@@ -210,4 +212,21 @@ public class DatasetDAO extends GenericDAO<Dataset, Integer>{
         }
         return dataValues;
 	}
+
+    public Dataset getByName(String datasetName) throws MiddlewareQueryException {
+        try {
+            if (datasetName != null){
+                Criteria crit = getSession().createCriteria(Dataset.class);
+                crit.add(Restrictions.eq("datasetName", datasetName));
+                List<Object> result = crit.list();
+                if (result.size() > 0){
+                    return (Dataset) result.get(0);
+                } 
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getByName(datasetName=" + datasetName + ") query from Dataset " + e.getMessage(), e);
+        }
+        return null;
+    }
+
 }

@@ -115,7 +115,7 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer>{
         return new TreeSet<Integer>();
     }
     
-    public int countNIdsByMarkerIdsAndDatasetIdsAndNotGIds(List<Integer> datasetIds, List<Integer> markerIds, List<Integer> gIds)
+    public long countNIdsByMarkerIdsAndDatasetIdsAndNotGIds(List<Integer> datasetIds, List<Integer> markerIds, List<Integer> gIds)
             throws MiddlewareQueryException {
         try {
             
