@@ -12,17 +12,22 @@
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.generationcp.middleware.util.Debug;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.SQLDelete;
@@ -84,6 +89,9 @@ public class GermplasmListData implements Serializable{
     @Column(name = "llrecid")
     private Integer localRecordId;
 
+    @OneToMany(mappedBy = "listData", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<ListDataProperty> properties;
+    
     public GermplasmListData() {
 
     }
@@ -199,7 +207,15 @@ public class GermplasmListData implements Serializable{
         this.localRecordId = localRecordId;
     }
 
-    @Override
+    public List<ListDataProperty> getProperties() {
+		return properties;
+	}
+
+	public void setProperties(List<ListDataProperty> properties) {
+		this.properties = properties;
+	}
+
+	@Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append("GermplasmListData [id=");
@@ -252,6 +268,13 @@ public class GermplasmListData implements Serializable{
             return false;
         }
         return true;
+    }
+    
+    public void print(int indent){
+    	Debug.println(0, toString());
+    	for (ListDataProperty property : properties){
+    		property.print(indent + 3);
+    	}
     }
 
 }
