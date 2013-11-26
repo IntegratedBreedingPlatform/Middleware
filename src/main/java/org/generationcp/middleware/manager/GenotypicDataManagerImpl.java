@@ -1167,13 +1167,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         try {
             trans = session.beginTransaction();
             saveMappingData(accMetadataSet, markerMetadataSet, datasetUser, mappingPop, mappingPopValues, dataset, marker);
-//            Integer datasetId = saveDataset(dataset, TYPE_MAPPING, DATA_TYPE_MAP);
-//            saveMarker(marker, TYPE_MAPPING);
-//            saveAccMetadataSet(datasetId, accMetadataSet);
-//            saveMarkerMetadataSet(datasetId, markerMetadataSet);
-//            saveDatasetUser(datasetId, datasetUser);
-//            saveMappingPop(datasetId, mappingPop);
-//            saveMappingPopValues(datasetId, mappingPopValues);
             trans.commit();
             return true;
         } catch (Exception e) {
@@ -1612,9 +1605,15 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         requireLocalDatabaseInstance();
         DatasetDAO datasetDao = getDatasetDao();
 
-        Integer datasetId = (Integer) (dataset.getDatasetId() == null 
-                                    ? getDatasetByName(dataset.getDatasetName()).getDatasetId() 
-                                    : dataset.getDatasetId());
+        // Get dataset from the database if it exists
+        Integer datasetId = dataset.getDatasetId();
+        if (datasetId == null){
+            Dataset datasetWithName = getDatasetByName(dataset.getDatasetName());
+            if (datasetWithName != null){
+                datasetId = datasetWithName.getDatasetId();
+            }
+        }
+
         if (datasetId == null) {
             Integer datasetGeneratedId = datasetDao.getNegativeId("datasetId");
             dataset.setDatasetId(datasetGeneratedId);
@@ -1643,6 +1642,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         requireLocalDatabaseInstance();
 
 		Integer markerSavedId = marker.getMarkerId() == null ? getMarkerIdByMarkerName(marker.getMarkerName()) : marker.getMarkerId();
+		        
         if (markerSavedId == null) {
             MarkerDAO markerDao = getMarkerDao();
             Integer markerGeneratedId = markerDao.getNegativeId("markerId");
