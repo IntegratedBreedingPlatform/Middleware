@@ -16,10 +16,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
+import org.generationcp.middleware.domain.gms.ListDataInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.User;
@@ -602,6 +602,12 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
         }
 
         return combinedResults;
-    } 
+    }
+
+	@Override
+	public List<ListDataInfo> saveListDataColumns(List<ListDataInfo> listDataCollection) 
+			throws MiddlewareQueryException {
+		return getListDataPropertySaver().saveProperties(listDataCollection);
+	} 
     
 }

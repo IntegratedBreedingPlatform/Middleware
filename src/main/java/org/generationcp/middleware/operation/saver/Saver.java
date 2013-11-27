@@ -124,4 +124,8 @@ public abstract class Saver extends DatabaseBroker{
     protected final ExperimentPropertySaver getExperimentPropertySaver() {
         return new ExperimentPropertySaver(sessionProviderForLocal, sessionProviderForCentral);
     }
+    
+    protected final ListDataPropertySaver getListDataPropertySaver() {
+        return new ListDataPropertySaver(sessionProviderForLocal, sessionProviderForCentral);
+    }
 }
