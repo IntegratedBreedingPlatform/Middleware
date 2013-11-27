@@ -47,7 +47,7 @@ public class ListDataProperty implements Serializable{
     private GermplasmListData listData;
     
     @Basic(optional = false)
-    @Column(name = "column")
+    @Column(name = "column_name")
     private String column;
     
     @Column(name = "value")
@@ -64,6 +64,21 @@ public class ListDataProperty implements Serializable{
 		this.listData = listData;
 		this.column = column;
 		this.value = value;
+	}
+	
+	public ListDataProperty(GermplasmListData listData,
+			String column, String value) {
+		super();
+		this.listData = listData;
+		this.column = column;
+		this.value = value;
+	}
+	
+	public ListDataProperty(GermplasmListData listData,
+			String column) {
+		super();
+		this.listData = listData;
+		this.column = column;
 	}
 
 	public Integer getListDataPropertyId() {
