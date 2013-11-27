@@ -15,6 +15,8 @@ package org.generationcp.middleware.manager.test;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.domain.gms.ListDataColumn;
+import org.generationcp.middleware.domain.gms.ListDataInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DataManager;
 import org.generationcp.middleware.manager.Database;
@@ -22,7 +24,6 @@ import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -564,6 +565,33 @@ public class TestGermplasmListManagerImpl{
         
         for(GermplasmList g : results){
           Debug.println(3, g.getId() + " - " + g.getName());
+        }
+    } 
+    
+    @Test
+    public void testSaveListDataColumns() throws MiddlewareQueryException {
+    	List<ListDataInfo> listDataCollection = new ArrayList<ListDataInfo>();
+    	
+    	//list ID 1
+    	List<ListDataColumn> columns = new ArrayList<ListDataColumn>();
+    	columns.add(new ListDataColumn("Preferred Name", "IRGC65"));
+    	columns.add(new ListDataColumn("Germplasm Date", ""));
+    	columns.add(new ListDataColumn("Location1", null));
+    	columns.add(new ListDataColumn("Location2", "IRRI222"));
+    	columns.add(new ListDataColumn("Location3", "IRRI333"));
+    	listDataCollection.add( new ListDataInfo(-552, columns)); // Change the List Data ID applicable for local db
+    	
+    	//list ID 2
+    	columns = new ArrayList<ListDataColumn>();
+    	columns.add(new ListDataColumn("Location1", "IRRI1"));
+    	columns.add(new ListDataColumn("Location2", "IRRI2"));
+    	columns.add(new ListDataColumn("Location3", "IRRI3"));
+    	listDataCollection.add( new ListDataInfo(-550, columns)); // Change the List Data ID applicable for local db
+    	
+    	
+        List<ListDataInfo> results = manager.saveListDataColumns(listDataCollection);
+        for (ListDataInfo data : results){
+        	data.print(0);
         }
     } 
     

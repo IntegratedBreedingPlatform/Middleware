@@ -25,7 +25,7 @@ public class ListDataColumn implements Serializable {
 
 	private static final long serialVersionUID = -8994156381257150996L;
 	
-	private Integer listDataColumnId;
+	private Integer listDataColumnId; //ListDataProperty.listDataPropertyId
 	private String columnName;
 	private String value;
 	
@@ -33,6 +33,12 @@ public class ListDataColumn implements Serializable {
 			String value) {
 		super();
 		this.listDataColumnId = listDataColumnId;
+		this.columnName = columnName;
+		this.value = value;
+	}
+	
+	public ListDataColumn(String columnName, String value) {
+		super();
 		this.columnName = columnName;
 		this.value = value;
 	}

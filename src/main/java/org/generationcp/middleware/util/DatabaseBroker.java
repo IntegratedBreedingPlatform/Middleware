@@ -19,6 +19,7 @@ import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.dao.InstallationDAO;
+import org.generationcp.middleware.dao.ListDataPropertyDAO;
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.LotDAO;
 import org.generationcp.middleware.dao.MethodDAO;
@@ -153,6 +154,7 @@ public class DatabaseBroker {
     // GermplasmListDataManager DAOs
     private GermplasmListDAO germplasmListDao;
 	private GermplasmListDataDAO germplasmListDataDao;
+	private ListDataPropertyDAO listDataPropertyDao;
 	
 	// InventoryDataManager DAOs
     private LotDAO lotDao;
@@ -832,6 +834,15 @@ public class DatabaseBroker {
 		}
 		germplasmListDataDao.setSession(getActiveSession());
 		return germplasmListDataDao;
+	}
+	
+    
+    protected final ListDataPropertyDAO getListDataPropertyDAO() {
+		if (listDataPropertyDao == null) {
+			listDataPropertyDao = new ListDataPropertyDAO();
+		}
+		listDataPropertyDao.setSession(getActiveSession());
+		return listDataPropertyDao;
 	}
 
     //================================  InventoryDataManager DAO Methods =============================
