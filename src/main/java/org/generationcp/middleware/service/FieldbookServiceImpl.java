@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -23,6 +24,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.service.api.FieldbookService;
 
 public class FieldbookServiceImpl extends Service implements FieldbookService {
@@ -64,6 +66,23 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
      
         getStudyDataManager().saveOrUpdateFieldmapProperties(info);
     
+    }
+
+    
+    
+    @Override
+    public List<Location> getFavoriteLocationByProjectId(List<Long> locationIds) throws MiddlewareQueryException {
+        // TODO Auto-generated method stub
+        
+        List<Location> locationList = new ArrayList();
+        
+        for(int i = 0 ; i < locationIds.size() ; i++){
+            Integer locationId = Integer.valueOf(locationIds.get(i).toString());
+            Location location = getGermplasmDataManager().getLocationByID(locationId);
+            locationList.add(location);
+        }
+        
+        return locationList;
     }
 
     //TODO: REMOVE THIS, THIS IS JUST FOR TESTING

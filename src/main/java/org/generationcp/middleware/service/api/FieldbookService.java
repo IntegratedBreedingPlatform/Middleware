@@ -19,6 +19,7 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.LocationDetails;
 
 /**
  * This is the API for Fieldbook requirements.
@@ -88,4 +89,8 @@ public interface FieldbookService {
     //TODO remove this, this is just for testing
     int getGeolocationId(int projectId) throws MiddlewareQueryException;
     List<DatasetReference> getDatasetReferences(int studyId) throws MiddlewareQueryException;
+    
+    List<Location> getFavoriteLocationByProjectId(List<Long> locationIds)  throws MiddlewareQueryException;
+    
+
 }
