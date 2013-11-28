@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.oms.StudyType;
@@ -71,6 +72,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     
     
     @Override
+    public Study getStudy(int studyId) throws MiddlewareQueryException  {
+        Study study = getStudyDataManager().getStudy(studyId);
+        return study;
+    }
+
+    @Override           
     public List<Location> getFavoriteLocationByProjectId(List<Long> locationIds) throws MiddlewareQueryException {
         // TODO Auto-generated method stub
         
