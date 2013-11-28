@@ -1255,10 +1255,15 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                 if (germplasmToExpand.getGnpgs() < 0) {
                     //for germplasms created via a derivative or maintenance method
                     //skip and then expand on the gpid1 parent
-                    if (germplasmToExpand.getGpid1() != 0 && germplasmToExpand.getGpid1() != null) {
+                    if (germplasmToExpand.getGpid1() != null && germplasmToExpand.getGpid1() != 0) {
                         SingleGermplasmCrossElement nextElement = new SingleGermplasmCrossElement();
-                        nextElement.setGermplasm(getGermplasmWithPrefName(germplasmToExpand.getGpid1()));
-                        return expandGermplasmCross(nextElement, level);
+                        Germplasm gpid1Germplasm = getGermplasmWithPrefName(germplasmToExpand.getGpid1());
+                        if(gpid1Germplasm != null){
+	                        nextElement.setGermplasm(gpid1Germplasm);
+	                        return expandGermplasmCross(nextElement, level);
+                        } else{
+                        	return element;
+                        }
                     } else {
                         return element;
                     }
@@ -1350,6 +1355,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                             if (expandedThirdGrandParent instanceof GermplasmCross) {
                                 numOfCrossesForSecond = ((GermplasmCross) expandedThirdGrandParent).getNumberOfCrossesBefore() + 1;
                             }
+                            secondCross.setNumberOfCrossesBefore(numOfCrossesForSecond);
 
                             //create the cross of the two sets of grandparents, this will be returned
                             cross.setFirstParent(firstCross);
