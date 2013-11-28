@@ -89,7 +89,7 @@ public class GermplasmListData implements Serializable{
     @Column(name = "llrecid")
     private Integer localRecordId;
 
-    @OneToMany(mappedBy = "listData", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "listData", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ListDataProperty> properties;
     
     public GermplasmListData() {
