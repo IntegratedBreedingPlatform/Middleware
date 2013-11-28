@@ -25,7 +25,6 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.service.api.FieldbookService;
 
 public class FieldbookServiceImpl extends Service implements FieldbookService {
@@ -47,13 +46,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     }
 
     @Override
-    public FieldMapInfo getFieldMapInfoOfTrial(int trialId) throws MiddlewareQueryException{
-        return getStudyDataManager().getFieldMapInfoOfStudy(trialId, StudyType.T);
+    public List<FieldMapInfo> getFieldMapInfoOfTrial(List<Integer> trialIdList) throws MiddlewareQueryException{
+        return getStudyDataManager().getFieldMapInfoOfStudy(trialIdList, StudyType.T);
     }
     
     @Override 
-    public FieldMapInfo getFieldMapInfoOfNursery(int nurseryId) throws MiddlewareQueryException{
-        return getStudyDataManager().getFieldMapInfoOfStudy(nurseryId, StudyType.N);
+    public List<FieldMapInfo> getFieldMapInfoOfNursery(List<Integer> nurseryIdList) throws MiddlewareQueryException{
+        return getStudyDataManager().getFieldMapInfoOfStudy(nurseryIdList, StudyType.N);
     }
 
     @Override 
