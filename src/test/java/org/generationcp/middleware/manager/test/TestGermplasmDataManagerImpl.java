@@ -1194,6 +1194,35 @@ public class TestGermplasmDataManagerImpl{
 	  System.out.println(results);
   }  
   
+	@Test
+    public void getAttributeTypesByGIDList() throws MiddlewareQueryException {
+        List<Integer> gids = new ArrayList<Integer>();
+        gids.add(110);
+        gids.add(50533);
+        gids.add(202580);
+        List<UserDefinedField> results = manager.getAttributeTypesByGIDList(gids);
+        Debug.println(0, "###############################");
+        Debug.println(0, " getAttributeTypesByGIDList("+gids+")");
+        Debug.println(0, "###############################");
+        for(UserDefinedField field : results) {
+            Debug.println(0, field.getFname());
+        }
+    }
+	
+	@Test
+    public void getAttributeValuesByTypeAndGIDList() throws MiddlewareQueryException {
+        List<Integer> gids = new ArrayList<Integer>();
+        gids.add(110);
+        gids.add(50533);
+        gids.add(202580);
+        Integer attributeType = 1115;
+        Map<Integer, String> results = manager.getAttributeValuesByTypeAndGIDList(attributeType, gids);
+        Debug.println(0, "###############################");
+        Debug.println(0, " getAttributeValuesByTypeAndGIDList(" + attributeType + ", "+gids+")");
+        Debug.println(0, "###############################");
+        Debug.println(0, results.toString());
+    }
+  
     @AfterClass
     public static void tearDown() throws Exception {
         factory.close();

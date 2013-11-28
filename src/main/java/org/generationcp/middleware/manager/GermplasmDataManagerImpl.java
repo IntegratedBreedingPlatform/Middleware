@@ -12,7 +12,12 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.BibrefDAO;
@@ -509,6 +514,30 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public List<Attribute> getAttributesByGID(Integer gid) throws MiddlewareQueryException {
         return (List<Attribute>) super.getFromInstanceByIdAndMethod(getAttributeDao(), gid, "getByGID", 
                 new Object[]{gid}, new Class[]{Integer.class});
+    }
+    
+    @Override
+    public List<UserDefinedField> getAttributeTypesByGIDList(List<Integer> gidList) throws MiddlewareQueryException {
+        return (List<UserDefinedField>) super.getAllFromCentralAndLocalByMethod(getAttributeDao(), "getAttributeTypesByGIDList",
+                new Object[] { gidList }, new Class[] { List.class });
+    }
+    
+    @Override
+    public Map<Integer, String> getAttributeValuesByTypeAndGIDList(Integer attributeType, List<Integer> gidList) throws MiddlewareQueryException {
+        Map<Integer, String> returnMap = new HashMap<Integer, String>();
+        // initialize map with GIDs
+        for (Integer gid : gidList) {
+            returnMap.put(gid, "-");
+        }
+        
+        // retrieve attribute values
+        List<Attribute> attributeList = super.getAllFromCentralAndLocalByMethod(getAttributeDao(), "getAttributeValuesByTypeAndGIDList",
+                new Object[] { attributeType, gidList }, new Class[] { Integer.class, List.class });
+        for (Attribute attribute : attributeList) {
+            returnMap.put(attribute.getGermplasmId(), attribute.getAval());
+        }
+        
+        return returnMap;
     }
 
     @Override

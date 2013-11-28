@@ -703,6 +703,29 @@ public interface GermplasmDataManager {
      * @return List of Atributs POJOs
      */
     public List<Attribute> getAttributesByGID(Integer gid) throws MiddlewareQueryException;
+    
+    /**
+     * Returns all the list of attribute types identified by the given list of gids.
+     *  
+     * @param gidList
+     *             - list of GIDs 
+     * @return List of UserDefinedField POJOs that contains the attribute types and names for the given GIDs.
+     * @throws MiddlewareQueryException
+     */
+    public List<UserDefinedField> getAttributeTypesByGIDList(List<Integer> gidList) throws MiddlewareQueryException;
+    
+    /**
+     * Returns a Map of GIDs to the attribute values given an attribute type and a list of GIDs.
+     * 
+     * @param attributeType
+     *             - attribute type of the values to retrieve
+     * @param gidList
+     *             - list of GIDs
+     * @return Map<Integer, String>
+     *             - map of gids to their corresponding attribute values for the specified attribute type
+     * @throws MiddlewareQueryException
+     */
+    public Map<Integer, String> getAttributeValuesByTypeAndGIDList(Integer attributeType, List<Integer> gidList) throws MiddlewareQueryException;
 
     /**
      * Returns the Method record identified by the id.

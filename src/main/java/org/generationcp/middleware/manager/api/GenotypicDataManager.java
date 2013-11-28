@@ -1012,6 +1012,15 @@ public interface GenotypicDataManager{
      */
     public long countQtlByName(String name) throws MiddlewareQueryException;
     
+    /**
+     *  Retrieves the QTL names for the list of QTL IDs provided. 
+     *  Retrieves data from both central and local, depending on the ID given.
+     *  
+     * @param qtlIds
+     * @return Map of qtlId and its corresponding qtlName
+     * @throws MiddlewareQueryException
+     */
+    public java.util.Map<Integer, String> getQtlNamesByQtlIds(List<Integer> qtlIds) throws MiddlewareQueryException;
 
     /**
      * Retrieves QTL IDs from the gdms_qtl table matching the given trait id
@@ -1114,7 +1123,15 @@ public interface GenotypicDataManager{
      */
     public Long countMapDetailsByName(String nameLike) throws MiddlewareQueryException;
     
-
+    /**
+     * Returns the list of map names in which the respective markers are present.
+     * 
+     * @param markerIds
+     * @return Map of marker id with the list of map names
+     * @throws MiddlewareQueryException
+     */
+    public java.util.Map<Integer, List<String>> getMapNamesByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException;
+     
     /**
      * Gets all the Map details.
      *

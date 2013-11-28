@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -670,6 +671,19 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         }
         return super.countAllFromCentralAndLocalByMethod(getQtlDao(), "countQtlDetailsByName", new Object[]{name}, new Class[]{String.class});
     }
+    
+    @Override
+    public java.util.Map<Integer, String> getQtlNamesByQtlIds(List<Integer> qtlIds) throws MiddlewareQueryException{
+        java.util.Map<Integer, String> qtlNames = new HashMap<Integer, String>();
+
+        setWorkingDatabase(Database.CENTRAL);
+        qtlNames.putAll(getQtlDao().getQtlNameByQtlIds(qtlIds));
+
+        setWorkingDatabase(Database.LOCAL);
+        qtlNames.putAll(getQtlDao().getQtlNameByQtlIds(qtlIds));
+        
+        return qtlNames;
+    }
 
     @Override
     public List<QtlDetailElement> getQtlByQtlIds(List<Integer> qtlIds, int start, int numOfRows) throws MiddlewareQueryException {
@@ -737,13 +751,34 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     public Long countMapDetailsByName(String nameLike) throws MiddlewareQueryException {
         return super.countAllFromCentralAndLocalByMethod(getMapDao(), "countMapDetailsByName", new Object[]{nameLike}, new Class[]{String.class});
     }
+    
+    @Override
+    public java.util.Map<Integer, List<String>> getMapNamesByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException{
 
+        java.util.Map<Integer, List<String>> markerMaps = new HashMap<Integer, List<String>>();
+
+        if (markerIds == null || markerIds.size() == 0){
+            return markerMaps;
+        }
+        
+        // Get from Central
+        setWorkingDatabase(Database.CENTRAL);
+        markerMaps.putAll(getMarkerOnMapDao().getMapNameByMarkerIds(markerIds));
+        
+        setWorkingDatabase(Database.LOCAL);
+        markerMaps.putAll(getMarkerOnMapDao().getMapNameByMarkerIds(markerIds));
+
+        return markerMaps;
+    }
+
+    @Override
     public List<MapDetailElement> getAllMapDetails(int start, int numOfRows) throws MiddlewareQueryException {
         List<String> methods = Arrays.asList("countAllMapDetails", "getAllMapDetails");
         return (List<MapDetailElement>) super.getFromCentralAndLocalByMethod(getMapDao(), methods, start, numOfRows, 
                 new Object[]{}, new Class[]{});
     }
 
+    @Override
     public long countAllMapDetails() throws MiddlewareQueryException {
         return super.countAllFromCentralAndLocalByMethod(getMapDao(), "countAllMapDetails", new Object[]{}, new Class[]{});
     }
