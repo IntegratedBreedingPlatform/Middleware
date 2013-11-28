@@ -17,10 +17,13 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.generationcp.middleware.util.Debug;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 /**
  * POJO for listdataprop table
@@ -39,10 +42,9 @@ public class ListDataProperty implements Serializable{
     @Column(name = "listdataprop_id")
     private Integer listDataPropertyId;
 
-//    @ManyToOne(targetEntity = GermplasmListData.class)
-//	@JoinColumn(name = "listdata_id", nullable = false)
-//    @NotFound(action = NotFoundAction.IGNORE)
-    @Transient
+    @ManyToOne(targetEntity = GermplasmListData.class)
+	@JoinColumn(name = "listdata_id", nullable = false)
+    @NotFound(action = NotFoundAction.IGNORE)
     private GermplasmListData listData;
     
     @Basic(optional = false)
