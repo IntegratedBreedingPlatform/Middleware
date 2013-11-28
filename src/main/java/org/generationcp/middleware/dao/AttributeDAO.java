@@ -16,8 +16,10 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Attribute;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 
 /**
  * DAO class for {@link Attribute}.
@@ -38,6 +40,52 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer>{
             logAndThrowException("Error with getByGID(gid=" + gid + ") query from Attributes: " + e.getMessage(), e);
         }
         return toReturn;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<UserDefinedField> getAttributeTypesByGIDList(List<Integer> gidList) throws MiddlewareQueryException {
+        List<UserDefinedField> returnList = new ArrayList<UserDefinedField>();
+        if (gidList != null && !gidList.isEmpty()) {
+            try {
+                String sql = "SELECT {u.*}"
+                            + " FROM atributs a"
+                            + " INNER JOIN udflds u"
+                            + " WHERE a.atype=u.fldno"
+                            + " AND a.gid in (:gidList)"
+                            + " ORDER BY u.fname";
+                SQLQuery query = getSession().createSQLQuery(sql);
+                query.addEntity("u", UserDefinedField.class);
+                query.setParameterList("gidList", gidList);
+                returnList = query.list();
+                
+            } catch (HibernateException e) {
+                logAndThrowException("Error with getAttributesByGIDList(gidList=" + gidList + "): " + e.getMessage(), e);
+            }
+        }
+        return returnList;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<Attribute> getAttributeValuesByTypeAndGIDList(Integer attributeType, List<Integer> gidList)
+            throws MiddlewareQueryException {
+        List<Attribute> returnList = new ArrayList<Attribute>();
+        if (gidList != null && !gidList.isEmpty()) {
+            try {
+                String sql = "SELECT {a.*}"
+                            + " FROM atributs a"
+                            + " WHERE a.atype=:attributeType"
+                            + " AND a.gid in (:gidList)";
+                SQLQuery query = getSession().createSQLQuery(sql);
+                query.addEntity("a", Attribute.class);
+                query.setParameter("attributeType", attributeType);
+                query.setParameterList("gidList", gidList);
+                returnList = query.list();
+            } catch (HibernateException e) {
+                logAndThrowException("Error with getAttributeValuesByTypeAndGIDList(attributeType=" +
+                		attributeType + ", gidList=" + gidList + "): " + e.getMessage(), e);
+            }
+        }
+        return returnList;
     }
 
     public void validateId(Attribute attribute) throws MiddlewareQueryException {
