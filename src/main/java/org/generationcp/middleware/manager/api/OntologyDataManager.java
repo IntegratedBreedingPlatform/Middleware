@@ -30,7 +30,6 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 
-// TODO: Auto-generated Javadoc
 /**
  * This is the API for retrieving ontology data from the CHADO schema.
  * 
@@ -327,46 +326,7 @@ public interface OntologyDataManager {
      */
 
     List<TraitClassReference> getAllTraitGroupsHierarchy(boolean includePropertiesAndVariables) throws MiddlewareQueryException;
-	
-	/**
-	 * Retrieves the trait classes containing the hierarchical structure
-	 * of the trait groups: Trait Group --> Properties --> Standard Variables.
-	 * The records are retrieved based on the given class type. 
-	 * 
-	 * The list is returned in alphabetical order of the name.
-	 *
-     * @param classType can be either TermId.ONTOLOGY_TRAIT_CLASS or TermId.ONTOLOGY_RESEARCH_CLASS
-	 * @return the trait groups
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-    @Deprecated
-    List<TraitClassReference> getTraitGroupsHierarchy(TermId classType) throws MiddlewareQueryException;	
 
-    /**
-     * Retrieves all the trait classes from both crop research ontology 
-     * and crop ontology trait class from central and local.
-     * 
-     * The list is returned in alphabetical order of the name.
-     *
-     * @return List of TraitReference objects (id, name, description)  
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    @Deprecated
-    List<TraitClassReference> getAllTraitClasses() throws MiddlewareQueryException;
-	
-
-    /**
-     * Returns trait classes based on the given type from both central and local databases.
-     * 
-     * The list is returned in alphabetical order of the name.
-     *
-     * @param classType can be either TermId.ONTOLOGY_TRAIT_CLASS or TermId.ONTOLOGY_RESEARCH_CLASS
-     * @return List of TraitReference objects (id, name, description)
-     * @throws MiddlewareQueryException the middleware query exception
-     */
-    @Deprecated
-    List<TraitClassReference> getTraitClasses(TermId classType) throws MiddlewareQueryException;
-    
     /**
      * Retrieves all the Term entries based on the given list of ids.
      *

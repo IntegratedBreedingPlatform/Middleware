@@ -13,7 +13,9 @@ package org.generationcp.middleware.dao.gdms;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -95,7 +97,7 @@ public class QtlDAO  extends GenericDAO<Qtl, Integer>{
 	                    String interactions = (String) result[12];
 	                    String tRName = (String) result[13];
 	                    String ontology = (String) result[14];
-	                    
+	                                           
 	                    QtlDetailElement element = new QtlDetailElement(
 	                    		qtlName, mapName, chromosome, minPosition, maxPosition, traitId,
 	                            experiment, leftFlankingMarker, rightFlankingMarker, effect, 
@@ -298,7 +300,48 @@ public class QtlDAO  extends GenericDAO<Qtl, Integer>{
             this.clear();
 
 		} catch(HibernateException e) {
-			logAndThrowException("Error in deleteByQtlIds=" + qtlIds + " in QtlDAO: " + e.getMessage(), e);
+			logAndThrowException("Error in deleteByQtlIds=" + qtlIds + " from Qtl: " + e.getMessage(), e);
 		}
     }
+ 	
+ 	@SuppressWarnings("unchecked")
+    public Map<Integer, String> getQtlNameByQtlIds(List<Integer> qtlIds) throws MiddlewareQueryException{
+ 	   Map<Integer, String> qtlNames = new HashMap<Integer, String>();
+ 	   
+       try {
+           /*
+               SELECT DISTINCT qtl_id, qtl_name 
+               FROM gdms_qtl 
+               WHERE qtl_id IN (:qtlIds);
+            */
+
+           StringBuilder sqlString = new StringBuilder()
+           .append("SELECT DISTINCT qtl_id, CONCAT(qtl_name, '')  ")
+           .append("FROM gdms_qtl  ")
+           .append("WHERE qtl_id IN (:qtlIds) ")
+           ;
+       
+           Query query = getSession().createSQLQuery(sqlString.toString());
+           query.setParameterList("qtlIds", qtlIds);
+
+           List<Object[]> list =  query.list();
+           
+           if (list != null && list.size() > 0) {
+               for (Object[] row : list){
+                   Integer qtlId = (Integer) row[0];
+                   String qtlName = (String) row [1]; 
+
+                   qtlNames.put(qtlId, qtlName);
+               }
+           }
+
+       } catch(HibernateException e) {
+           logAndThrowException("Error in getMapNameByMarkerIds() query from QTL: " + e.getMessage(), e);
+       }
+ 	   
+ 	   return qtlNames;
+ 	}
+ 	
+ 	
+ 	
 }

@@ -791,6 +791,17 @@ public class TestGenotypicDataManagerImpl{
         Debug.println(0, "testCountQtlByName() RESULTS: " + count);
     }    
 
+    
+    @Test
+    public void testgetQtlNamesByQtlIds() throws Exception { 
+        List<Integer> qtlIds = Arrays.asList(1, 2, 3, -4, -5);
+        java.util.Map<Integer, String> qtlNames = manager.getQtlNamesByQtlIds(qtlIds);
+        assertTrue(qtlNames.size() > 0);
+        for (int i=0;  i<qtlIds.size(); i++){
+            Debug.println(3, "QTL ID = " + qtlIds.get(i) + " : QTL NAME = " + qtlNames.get(qtlIds.get(i)));
+        }
+
+    }    
 
     @Test
     public void testGetQtlByTrait() throws Exception {
@@ -1760,14 +1771,14 @@ public class TestGenotypicDataManagerImpl{
         
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
         Dataset dataset = (Dataset) mappingRecords.get(DATASET);
-        dataset.setDatasetName(dataset.getDatasetName() + (int) (Math.random()*100));  //TODO Remove line to test duplicate dataset entries
+        dataset.setDatasetName(dataset.getDatasetName() + (int) (Math.random()*100));  //Used to insert a new dataset
         AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
         MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
         DatasetUsers datasetUser = (DatasetUsers) mappingRecords.get(DATASET_USERS);
         MappingPop mappingPop = (MappingPop) mappingRecords.get(MAPPING_POP);
         MappingPopValues mappingPopValues = (MappingPopValues) mappingRecords.get(MAPPING_POP_VALUES);
         Marker marker = (Marker) mappingRecords.get(MARKER);
-        marker.setMarkerName(marker.getMarkerName() + (int) (Math.random()*100));  //TODO Remove line to test duplicate marker entries
+        marker.setMarkerName(marker.getMarkerName() + (int) (Math.random()*100));  //Remove line to test duplicate marker entries
         AlleleValues alleleValues = (AlleleValues) mappingRecords.get(ALLELE_VALUES);
         
         Boolean addStatus = manager.setMappingAllelicSSRDArT(accMetadataSet, markerMetadataSet, datasetUser, mappingPop, 
@@ -1795,7 +1806,7 @@ public class TestGenotypicDataManagerImpl{
         MappingPop mappingPop = (MappingPop) mappingRecords.get(MAPPING_POP);
         MappingPopValues mappingPopValues = (MappingPopValues) mappingRecords.get(MAPPING_POP_VALUES);
         Marker marker = (Marker) mappingRecords.get(MARKER);
-        marker.setMarkerName(marker.getMarkerName() + (int) (Math.random()*100));  //TODO Remove line to test duplicate marker entries
+        marker.setMarkerName(marker.getMarkerName() + (int) (Math.random()*100));  //Remove line to test duplicate marker entries
         AlleleValues alleleValues = (AlleleValues) mappingRecords.get(ALLELE_VALUES);
         
         try{
@@ -2024,6 +2035,17 @@ public class TestGenotypicDataManagerImpl{
     	long count = manager.countMapDetailsByName(nameLike);
         assertNotNull(count);
         Debug.println(0, "testCountMapDetailsByName("+nameLike+") Results: " + count);
+    }
+    
+    
+    @Test
+    public void testGetMapNamesByMarkerIds() throws Exception {
+        List<Integer> markerIds = Arrays.asList(-6, 1317, 621, 825, 211);
+        java.util.Map<Integer, List<String>> markerMaps = manager.getMapNamesByMarkerIds(markerIds);
+        assertTrue(markerMaps.size() > 0);
+        for (int i = 0;  i < markerIds.size(); i++){
+            Debug.println(3, "Marker ID = " + markerIds.get(i) + " : Map Name/s = " + markerMaps.get(markerIds.get(i)));
+        }
     }
     
     @Test

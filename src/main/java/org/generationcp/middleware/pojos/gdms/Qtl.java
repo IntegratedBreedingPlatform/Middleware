@@ -65,7 +65,7 @@ public class Qtl implements Serializable{
                 + "INNER JOIN gdms_qtl gq ON gq.qtl_id = gqd.qtl_id "
                 + "INNER JOIN gdms_map gm ON gm.map_id = gqd.map_id "
                 + "INNER JOIN cvterm cvt ON gqd.tid = cvt.cvterm_id "
-                + "INNER JOIN cvtermprop cvtprop ON cvt.cvterm_id = cvtprop.cvterm_id "
+                + "LEFT JOIN cvtermprop cvtprop ON cvt.cvterm_id = cvtprop.cvterm_id "
             + "WHERE gq.qtl_id in(:qtl_id_list) "
             + "ORDER BY gq.qtl_id";
 
@@ -94,14 +94,16 @@ public class Qtl implements Serializable{
                 + ",gdms_qtl_details.interactions " 
                 + ",cvterm.name " //trname 
                 + ",cvtermprop.value " //ontology
-            + "FROM    gdms_qtl_details, gdms_qtl, gdms_map, cvterm, cvtermprop " 
+            + "FROM gdms_qtl_details "
+                + "INNER JOIN gdms_qtl ON gdms_qtl.qtl_id = gdms_qtl_details.qtl_id "
+                + "INNER JOIN gdms_map ON gdms_map.map_id = gdms_qtl_details.map_id "
+                + "INNER JOIN cvterm ON gdms_qtl_details.tid = cvterm.cvterm_id "
+                + "LEFT JOIN cvtermprop ON cvterm.cvterm_id = cvtermprop.cvterm_id "
             + "WHERE   gdms_qtl.qtl_name LIKE LOWER(:qtlName) "
-               + "AND gdms_qtl.qtl_id = gdms_qtl_details.qtl_id "
-               + "AND gdms_qtl_details.map_id = gdms_map.map_id "
-               + "AND gdms_qtl_details.tid = cvterm.cvterm_id " 
-               + "AND cvterm.cvterm_id = cvtermprop.cvterm_id "
             + "ORDER BY gdms_qtl.qtl_id "
             ;
+    
+
 
     public static final String COUNT_QTL_BY_NAME = 
             "SELECT  COUNT(*) " 
