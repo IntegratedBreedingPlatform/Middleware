@@ -26,6 +26,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.generationcp.middleware.util.Debug;
 import org.hibernate.annotations.NotFound;
@@ -89,7 +90,8 @@ public class GermplasmListData implements Serializable{
     @Column(name = "llrecid")
     private Integer localRecordId;
 
-    @OneToMany(mappedBy = "listData", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    @OneToMany(mappedBy = "listData", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Transient
     private List<ListDataProperty> properties;
     
     public GermplasmListData() {
