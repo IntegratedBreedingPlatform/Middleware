@@ -446,22 +446,26 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
     
     @Override
-    public FieldMapInfo getFieldMapInfoOfStudy(int studyId, StudyType studyType) throws MiddlewareQueryException{
-        FieldMapInfo fieldMapInfo = new FieldMapInfo();
-        setWorkingDatabase(studyId);
+    public List<FieldMapInfo> getFieldMapInfoOfStudy(List<Integer> studyIdList, StudyType studyType) throws MiddlewareQueryException{
+        List<FieldMapInfo> fieldMapInfos = new ArrayList<FieldMapInfo>();
         
-        fieldMapInfo.setFieldbookId(studyId);
-        fieldMapInfo.setFieldbookName(getDmsProjectDao().getById(studyId).getName());
-
-        if (studyType == StudyType.T){
-        	fieldMapInfo.setTrial(true);
-        } else {
-        	fieldMapInfo.setTrial(false);
+        for (Integer studyId : studyIdList) {
+            FieldMapInfo fieldMapInfo = new FieldMapInfo();
+            setWorkingDatabase(studyId);
+            
+            fieldMapInfo.setFieldbookId(studyId);
+            fieldMapInfo.setFieldbookName(getDmsProjectDao().getById(studyId).getName());
+    
+            if (studyType == StudyType.T){
+            	fieldMapInfo.setTrial(true);
+            } else {
+            	fieldMapInfo.setTrial(false);
+            }
+            
+            fieldMapInfo.setDatasets(getExperimentPropertyDao().getFieldMapLabels(studyId));
+            fieldMapInfos.add(fieldMapInfo);
         }
-        
-        fieldMapInfo.setDatasets(getExperimentPropertyDao().getFieldMapLabels(studyId));
-        
-        return fieldMapInfo;
+        return fieldMapInfos;
     }
     
     @Override
