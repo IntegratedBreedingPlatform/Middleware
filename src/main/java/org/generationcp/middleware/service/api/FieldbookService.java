@@ -15,6 +15,7 @@ package org.generationcp.middleware.service.api;
 import java.util.List;
 
 import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -91,6 +92,6 @@ public interface FieldbookService {
     List<DatasetReference> getDatasetReferences(int studyId) throws MiddlewareQueryException;
     
     List<Location> getFavoriteLocationByProjectId(List<Long> locationIds)  throws MiddlewareQueryException;
-    
+    Study getStudy(int studyId) throws MiddlewareQueryException ;
 
 }
