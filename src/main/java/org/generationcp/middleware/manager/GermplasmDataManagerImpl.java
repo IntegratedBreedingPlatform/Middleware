@@ -1481,6 +1481,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                                 cross.setNumberOfCrossesBefore(numOfCrossesForGrandParents + 1);
                             }
 
+                        } else if(methodName.contains("backcross")){
+                        	Germplasm firstParent = getGermplasmWithPrefName(germplasmToExpand.getGpid1());
+                        	Germplasm secondParent = getGermplasmWithPrefName(germplasmToExpand.getGpid2());
+                        	
+                        	//determine which is the recurrent parent
+                        	
                         }
 
                         return cross;
