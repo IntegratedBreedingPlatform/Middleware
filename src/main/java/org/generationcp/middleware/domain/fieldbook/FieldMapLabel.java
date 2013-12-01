@@ -49,6 +49,8 @@ public class FieldMapLabel implements Serializable{
     /** The range. */
     private Integer range;
     
+    private String studyName;
+    
     /**
      * Instantiates a new field map label.
      */
@@ -200,6 +202,22 @@ public class FieldMapLabel implements Serializable{
      */
     public void setRange(Integer range) {
         this.range = range;
+    }
+
+    
+    /**
+     * @return the studyName
+     */
+    public String getStudyName() {
+        return studyName;
+    }
+
+    
+    /**
+     * @param studyName the studyName to set
+     */
+    public void setStudyName(String studyName) {
+        this.studyName = studyName;
     }
 
     /* (non-Javadoc)

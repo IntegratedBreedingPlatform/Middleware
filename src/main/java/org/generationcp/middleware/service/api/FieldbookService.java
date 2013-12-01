@@ -18,6 +18,7 @@ import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
+import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
@@ -85,6 +86,15 @@ public interface FieldbookService {
      * @throws MiddlewareQueryException
      */
     void saveOrUpdateFieldmapProperties(FieldMapInfo info) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Retrieve all field map labels in the block of the specified trial instance id.
+     * @param geolocationId
+     * @throws MiddlewareQueryException
+     */
+    List<FieldMapLabel> getAllFieldMapsInBlockByTrialInstanceId(int geolocationId) throws MiddlewareQueryException;
+
             
     
     //TODO remove this, this is just for testing

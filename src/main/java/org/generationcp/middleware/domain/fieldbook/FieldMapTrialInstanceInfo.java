@@ -33,7 +33,7 @@ public class FieldMapTrialInstanceInfo implements Serializable{
     /** The geolocation id. */
     private Integer geolocationId;
     
-    /** The site name. */
+    /** The site name. trial location id */
     private String siteName;
     
     /** The labels. */
@@ -41,6 +41,14 @@ public class FieldMapTrialInstanceInfo implements Serializable{
     
     /** The block name. */
     private String blockName;
+    
+    private String fieldName;
+    
+    /** site name or location name */
+    private String locationName;
+    
+    private String fieldmapUUID;
+    
     
     /** The columns in block. */
     private Integer columnsInBlock;
@@ -66,6 +74,8 @@ public class FieldMapTrialInstanceInfo implements Serializable{
     private boolean hasFieldMap;
     
     private Integer rowsPerPlot;
+    
+    private Integer machineRowCapacity;
     
         
     /**
@@ -399,6 +409,70 @@ public class FieldMapTrialInstanceInfo implements Serializable{
     public void setRowsPerPlot(Integer rowsPerPlot) {
         this.rowsPerPlot = rowsPerPlot;
     }
+
+    /**
+     * @return the fieldName
+     */
+    public String getFieldName() {
+        return fieldName;
+    }
+
+    
+    /**
+     * @param fieldName the fieldName to set
+     */
+    public void setFieldName(String fieldName) {
+        this.fieldName = fieldName;
+    }
+
+    
+    /**
+     * @return the fieldmapUUID
+     */
+    public String getFieldmapUUID() {
+        return fieldmapUUID;
+    }
+
+    
+    /**
+     * @param fieldmapUUID the fieldmapUUID to set
+     */
+    public void setFieldmapUUID(String fieldmapUUID) {
+        this.fieldmapUUID = fieldmapUUID;
+    }
+
+    
+    /**
+     * @return the machineRowCapacity
+     */
+    public Integer getMachineRowCapacity() {
+        return machineRowCapacity;
+    }
+
+    
+    /**
+     * @param machineRowCapacity the machineRowCapacity to set
+     */
+    public void setMachineRowCapacity(Integer machineRowCapacity) {
+        this.machineRowCapacity = machineRowCapacity;
+    }
+
+    
+    /**
+     * @return the locationName
+     */
+    public String getLocationName() {
+        return locationName;
+    }
+
+    
+    /**
+     * @param locationName the locationName to set
+     */
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
+    }
+
 
 
 }

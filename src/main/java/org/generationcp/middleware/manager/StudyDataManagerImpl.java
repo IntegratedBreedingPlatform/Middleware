@@ -33,6 +33,7 @@ import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
+import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search.StudyResultSet;
@@ -523,6 +524,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             rollbackTransaction(trans);
             throw new MiddlewareQueryException("error in saveTrialDatasetSummary " + e.getMessage(), e);
         }
+    }
+    
+    @Override
+    public List<FieldMapLabel> getAllFieldMapsInBlockByTrialInstanceId(int geolocationId) throws MiddlewareQueryException {
+        setWorkingDatabase(geolocationId);
+        return getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(geolocationId);
     }
     
 }

@@ -33,6 +33,7 @@ import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
+import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
@@ -460,4 +461,10 @@ public interface StudyDataManager{
      */
     void saveTrialDatasetSummary(DmsProject project, VariableTypeList variableTypeList, List<ExperimentValues> experimentValues, List<Integer> locationIds) throws MiddlewareQueryException;
 
+    /**
+     * Retrieve all field map labels in the block of the specified trial instance id.
+     * @param geolocationId
+     * @throws MiddlewareQueryException
+     */
+    List<FieldMapLabel> getAllFieldMapsInBlockByTrialInstanceId(int geolocationId) throws MiddlewareQueryException;
 }
