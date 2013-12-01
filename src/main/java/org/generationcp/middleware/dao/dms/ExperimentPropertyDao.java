@@ -257,7 +257,6 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                         ;
                 query.setParameter("geolocationId", geolocationId);
 
-                System.out.println(sql.toString());
                 List<Object[]> list =  query.list();           
                 
                 if (list != null && list.size() > 0) {
