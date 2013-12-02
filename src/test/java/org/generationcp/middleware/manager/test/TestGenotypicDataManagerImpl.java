@@ -1298,7 +1298,7 @@ public class TestGenotypicDataManagerImpl{
         String principalInvestigator = "Juan Dela Cruz";
         String contact = "juan@irri.com.ph";
         String institute = "IRRI";
-        
+
         Marker marker = new Marker(markerId, markerType, markerName, species, dbAccessionId, reference, genotype, ploidy, primerId, remarks, assayType, motif, forwardPrimer, reversePrimer, productSize, annealingTemp, amplification);
         MarkerAlias markerAlias = new MarkerAlias(markerId, alias);
         MarkerDetails markerDetails = new MarkerDetails(markerId, noOfRepeats, motifType, sequence, sequenceLength,
@@ -1959,6 +1959,8 @@ public class TestGenotypicDataManagerImpl{
     public void testGetQTLByQTLIDs() throws Exception {
         List<Integer> qtlIDs = new ArrayList<Integer>();
         qtlIDs.add(1);
+        qtlIDs.add(2);
+        qtlIDs.add(3);
       
         List<QtlDetailElement> results = manager.getQtlByQtlIds(qtlIDs, 0, 
                 (int) manager.countQtlByQtlIds(qtlIDs));

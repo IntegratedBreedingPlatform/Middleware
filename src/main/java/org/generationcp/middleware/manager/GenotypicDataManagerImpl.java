@@ -1641,6 +1641,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     // --------------------------------- COMMON SAVER METHODS ------------------------------------------//
     
 	private Integer saveDataset(Dataset dataset, String datasetType, String dataType) throws Exception{
+        requireLocalDatabaseInstance();
 
 	    // If the dataset has same dataset name existing in the database (local and central) - should throw an error.
         if (getDatasetByName(dataset.getDatasetName()) != null){
@@ -1678,8 +1679,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	
 	// If the marker is not yet in the database, add.
 	private Integer saveMarker(Marker marker, String markerType) throws Exception{
-	    
-	    // If the marker has same marker name existing in the database (local and central) - use the existing record.
+        requireLocalDatabaseInstance();
+
+        // If the marker has same marker name existing in the database (local and central) - use the existing record.
         Integer markerId = marker.getMarkerId();
         if (markerId == null){
             Integer markerIdWithName = getMarkerIdByMarkerName(marker.getMarkerName());
@@ -1707,6 +1709,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	}
 	
 	private Integer saveMarkerAlias(MarkerAlias markerAlias) throws Exception{
+        requireLocalDatabaseInstance();
         MarkerAliasDAO markerAliasDao = getMarkerAliasDao();
         MarkerAlias markerAliasRecordSaved = markerAliasDao.save(markerAlias);
         Integer markerAliasRecordSavedMarkerId = markerAliasRecordSaved.getMarkerId();
@@ -1717,6 +1720,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	}
 
 	private Integer saveMarkerDetails(MarkerDetails markerDetails) throws Exception{
+        requireLocalDatabaseInstance();
         MarkerDetailsDAO markerDetailsDao = getMarkerDetailsDao();
 
         MarkerDetails markerDetailsRecordSaved = markerDetailsDao.save(markerDetails);
@@ -1728,6 +1732,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	}
 
 	private Integer saveMarkerUserInfo(MarkerUserInfo markerUserInfo) throws Exception {
+        requireLocalDatabaseInstance();
         MarkerUserInfoDAO dao = getMarkerUserInfoDao();
 
         MarkerUserInfo markerUserInfoRecordSaved = dao.save(markerUserInfo);
@@ -1739,6 +1744,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	}
 	
 	private Integer saveMap(Map map) throws Exception{
+        requireLocalDatabaseInstance();
 	    
         Integer mapSavedId = map.getMapId() == null ? getMapIdByMapName(map.getMapName()) : map.getMapId();
         if (mapSavedId == null) {
@@ -1794,11 +1800,12 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	}
 	
 	private MarkerMetadataSetPK saveMarkerMetadataSet(Integer datasetId, MarkerMetadataSet markerMetadataSet) throws Exception{
+	    requireLocalDatabaseInstance();
 	    MarkerMetadataSetDAO markerMetadataSetDao = getMarkerMetadataSetDao();
-        markerMetadataSet.setDatasetId(datasetId);
+	    markerMetadataSet.setDatasetId(datasetId);
 
         // No need to generate id, MarkerMetadataSetPK(datasetId, markerId) are foreign keys
-        MarkerMetadataSet markerMetadataSetRecordSaved = markerMetadataSetDao.saveOrUpdate(markerMetadataSet);
+        MarkerMetadataSet markerMetadataSetRecordSaved = markerMetadataSetDao.save(markerMetadataSet);
         MarkerMetadataSetPK markerMetadataSetSavedId = markerMetadataSetRecordSaved.getId();
 
         if (markerMetadataSetSavedId == null) {
@@ -1808,6 +1815,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	}
 	
 	private Integer saveDatasetUser(Integer datasetId, DatasetUsers datasetUser) throws Exception {
+        requireLocalDatabaseInstance();
         DatasetUsersDAO datasetUserDao = getDatasetUsersDao();
         datasetUser.setDatasetId(datasetId);
 
@@ -1823,6 +1831,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	}
 	
 	private Integer saveQtl(Integer datasetId, Qtl qtl) throws Exception {
+        requireLocalDatabaseInstance();
         QtlDAO qtlDao = getQtlDao();
 
         Integer qtlId = qtlDao.getNegativeId("qtlId");
@@ -1840,6 +1849,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	}
 	
 	private QtlDetailsPK saveQtlDetails(QtlDetails qtlDetails) throws Exception {
+        requireLocalDatabaseInstance();
         
         QtlDetailsDAO qtlDetailsDao = getQtlDetailsDao();
         QtlDetails qtlDetailsRecordSaved = qtlDetailsDao.saveOrUpdate(qtlDetails);
@@ -1854,6 +1864,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	}
 	
 	private Integer saveCharValues(Integer datasetId, CharValues charValues) throws Exception{
+        requireLocalDatabaseInstance();
         CharValuesDAO charValuesDao = getCharValuesDao();
 
         Integer generatedId = charValuesDao.getNegativeId("acId");
@@ -1871,6 +1882,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	}
 	
 	private Integer saveMappingPop(Integer datasetId, MappingPop mappingPop) throws Exception{
+        requireLocalDatabaseInstance();
         MappingPopDAO mappingPopDao = getMappingPopDao();
         mappingPop.setDatasetId(datasetId);
 
@@ -1889,6 +1901,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	}
 	
 	private Integer saveMappingPopValues(Integer datasetId, MappingPopValues mappingPopValues) throws Exception {
+        requireLocalDatabaseInstance();
         MappingPopValuesDAO mappingPopValuesDao = getMappingPopValuesDao();
         mappingPopValues.setDatasetId(datasetId);
 
@@ -1905,11 +1918,13 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	}
 	
     private Integer saveAlleleValues(Integer datasetId, AlleleValues alleleValues) throws Exception {
+        requireLocalDatabaseInstance();
         alleleValues.setDatasetId(datasetId);
         return saveAlleleValues(alleleValues);
     }
 
     private Integer saveAlleleValues(AlleleValues alleleValues) throws Exception {
+        requireLocalDatabaseInstance();
         AlleleValuesDAO alleleValuesDao = getAlleleValuesDao();
 
         Integer alleleValuesGeneratedId = alleleValuesDao.getNegativeId("anId");
@@ -1925,6 +1940,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     }
     
     private Integer saveDartValues(Integer datasetId, DartValues dartValues) throws Exception{
+        requireLocalDatabaseInstance();
 
         DartValuesDAO dartValuesDao = getDartValuesDao();
         dartValues.setDatasetId(datasetId);
