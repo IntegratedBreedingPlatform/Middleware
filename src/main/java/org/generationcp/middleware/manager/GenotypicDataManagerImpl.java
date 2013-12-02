@@ -1302,13 +1302,12 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         setWorkingDatabase(Database.CENTRAL);
         Integer markerId = getMarkerDao().getIdByName(markerName);
 
-        if (markerId != null) {
-            throw new MiddlewareException(
-                    "Marker exists in central. Please specify a new GDMS marker record or choose a marker in local.");
+        if (markerId == null) {
+            setWorkingDatabase(Database.LOCAL);
+            markerId = getMarkerDao().getIdByName(markerName);
         }
 
-        setWorkingDatabase(Database.LOCAL);
-        return getMarkerDao().getIdByName(markerName);        
+        return markerId;        
     }
     
     private Integer getMapIdByMapName(String mapName) throws MiddlewareQueryException {
