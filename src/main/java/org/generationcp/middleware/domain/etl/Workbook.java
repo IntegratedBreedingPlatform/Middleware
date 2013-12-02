@@ -180,6 +180,16 @@ public class Workbook {
 		}
 		return list;
 	}
+
+    public List<MeasurementVariable> getAllVariables() {
+        List<MeasurementVariable> variableList = new ArrayList<MeasurementVariable>();
+        variableList.addAll(conditions);
+        variableList.addAll(constants);
+        variableList.addAll(factors);
+        variableList.addAll(variates);
+
+        return variableList;
+    }
 	
 	
 	
