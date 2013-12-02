@@ -64,7 +64,7 @@ public class Qtl implements Serializable{
             + "FROM gdms_qtl_details gqd "
                 + "INNER JOIN gdms_qtl gq ON gq.qtl_id = gqd.qtl_id "
                 + "INNER JOIN gdms_map gm ON gm.map_id = gqd.map_id "
-                + "INNER JOIN cvterm cvt ON gqd.tid = cvt.cvterm_id "
+                + "LEFT JOIN cvterm cvt ON gqd.tid = cvt.cvterm_id "
                 + "LEFT JOIN cvtermprop cvtprop ON cvt.cvterm_id = cvtprop.cvterm_id "
             + "WHERE gq.qtl_id in(:qtl_id_list) "
             + "ORDER BY gq.qtl_id";
@@ -74,7 +74,7 @@ public class Qtl implements Serializable{
             + "FROM gdms_qtl_details gqd "
                 + "INNER JOIN gdms_qtl gq ON gq.qtl_id = gqd.qtl_id "
                 + "INNER JOIN gdms_map gm ON gm.map_id = gqd.map_id "
-                + "INNER JOIN cvterm cvt ON gqd.tid = cvt.cvterm_id "
+                + "LEFT JOIN cvterm cvt ON gqd.tid = cvt.cvterm_id "
             + "WHERE gq.qtl_id in(:qtl_id_list)"; 
 
 
