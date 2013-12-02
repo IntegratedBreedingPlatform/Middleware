@@ -77,8 +77,6 @@ public class FieldMapTrialInstanceInfo implements Serializable{
     
     private Integer machineRowCapacity;
     
-    private Integer order;
-    
         
     /**
      * Instantiates a new field map trial instance info.
@@ -340,21 +338,6 @@ public class FieldMapTrialInstanceInfo implements Serializable{
     }
 
     
-    /**
-     * @return the order
-     */
-    public Integer getOrder() {
-        return order;
-    }
-
-    
-    /**
-     * @param order the order to set
-     */
-    public void setOrder(Integer order) {
-        this.order = order;
-    }
-
     /* (non-Javadoc)
      * @see java.lang.Object#toString()
      */
