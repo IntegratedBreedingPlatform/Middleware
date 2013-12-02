@@ -51,6 +51,12 @@ public class FieldMapLabel implements Serializable{
     
     private String studyName;
     
+    private Integer datasetId;
+    
+    private Integer geolocationId;
+    
+    private String siteName;
+    
     /**
      * Instantiates a new field map label.
      */
@@ -218,6 +224,54 @@ public class FieldMapLabel implements Serializable{
      */
     public void setStudyName(String studyName) {
         this.studyName = studyName;
+    }
+
+    
+    /**
+     * @return the datasetId
+     */
+    public Integer getDatasetId() {
+        return datasetId;
+    }
+
+    
+    /**
+     * @param datasetId the datasetId to set
+     */
+    public void setDatasetId(Integer datasetId) {
+        this.datasetId = datasetId;
+    }
+
+    
+    /**
+     * @return the geolocationId
+     */
+    public Integer getGeolocationId() {
+        return geolocationId;
+    }
+
+    
+    /**
+     * @param geolocationId the geolocationId to set
+     */
+    public void setGeolocationId(Integer geolocationId) {
+        this.geolocationId = geolocationId;
+    }
+
+    
+    /**
+     * @return the siteName
+     */
+    public String getSiteName() {
+        return siteName;
+    }
+
+    
+    /**
+     * @param siteName the siteName to set
+     */
+    public void setSiteName(String siteName) {
+        this.siteName = siteName;
     }
 
     /* (non-Javadoc)

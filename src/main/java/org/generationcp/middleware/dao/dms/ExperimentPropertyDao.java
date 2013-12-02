@@ -12,7 +12,10 @@
 package org.generationcp.middleware.dao.dms;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.GenericDAO;
@@ -167,8 +170,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
         return datasets;
     }
     
-    public List<FieldMapLabel> getAllFieldMapsInBlockByTrialInstanceId(int geolocationId) throws MiddlewareQueryException {
-        List<FieldMapLabel> fieldmaps = new ArrayList<FieldMapLabel>();
+    public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int geolocationId) throws MiddlewareQueryException {
+        List<FieldMapInfo> fieldmaps = new ArrayList<FieldMapInfo>();
 
         try {
             String order = geolocationId > 0 ? "ASC" : "DESC";
@@ -192,6 +195,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 .append(" , blkName.value AS blockName ")
                 .append(" , locName.value AS locationName ")
                 .append(" , fldName.value AS fieldName ")
+                .append(" , st.project_id AS studyId ")
                 .append(" FROM ")
                 .append("  nd_experimentprop uid ")
                 .append("  INNER JOIN nd_experiment e ON e.nd_experiment_id = uid.nd_experiment_id ")
@@ -254,6 +258,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                         .addScalar("blockName")
                         .addScalar("locationName")
                         .addScalar("fieldName")
+                        .addScalar("studyId")
                         ;
                 query.setParameter("geolocationId", geolocationId);
 
@@ -408,8 +413,14 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
     }
     
     
-    private List<FieldMapLabel> createFieldMapLabels(List<Object[]> rows) {
-        List<FieldMapLabel> labels = new ArrayList<FieldMapLabel>();
+    private List<FieldMapInfo> createFieldMapLabels(List<Object[]> rows) {
+        //List<FieldMapLabel> labels = new ArrayList<FieldMapLabel>();
+        List<FieldMapInfo> infos = new ArrayList<FieldMapInfo>();
+        
+        Map<Integer, FieldMapInfo> infoMap = new HashMap<Integer, FieldMapInfo>();
+        Map<Integer, FieldMapDatasetInfo> datasetMap = new HashMap<Integer, FieldMapDatasetInfo>();
+        Map<Integer, FieldMapTrialInstanceInfo> trialMap = new HashMap<Integer, FieldMapTrialInstanceInfo>();
+        
         
         for (Object[] row : rows) {
             FieldMapLabel label = new FieldMapLabel();
@@ -421,10 +432,59 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             label.setColumn(getIntegerValue(row[10]));
             label.setRange(getIntegerValue(row[11]));
             label.setGermplasmName((String) row[7]);
-            labels.add(label);
+            label.setDatasetId((Integer) row[0]);
+            label.setGeolocationId((Integer) row[3]);
+            label.setSiteName((String) row[4]);
+
+            FieldMapTrialInstanceInfo trial = trialMap.get((Integer) row[3]);
+            if (trial == null) {
+                trial = new FieldMapTrialInstanceInfo();
+                trial.setGeolocationId((Integer) row[3]);
+                trial.setSiteName((String) row[4]);
+                trialMap.put(trial.getGeolocationId(), trial);
+
+                FieldMapDatasetInfo dataset = datasetMap.get((Integer) row[0]);
+                if (dataset == null) {
+                    dataset = new FieldMapDatasetInfo();
+                    dataset.setDatasetId((Integer) row[0]);
+                    datasetMap.put(dataset.getDatasetId(), dataset);
+                    
+                    FieldMapInfo study = infoMap.get((Integer) row[19]);
+                    if (study == null) {
+                        study = new FieldMapInfo();
+                        study.setFieldbookId((Integer) row[19]);
+                        study.setFieldbookName((String) row[2]);
+                        infoMap.put(study.getFieldbookId(), study);
+                    }
+                    if (study.getDatasets() == null) {
+                        study.setDatasets(new ArrayList<FieldMapDatasetInfo>());
+                    }
+                    if (study.getDataSet(dataset.getDatasetId()) == null) {
+                        study.getDatasets().add(dataset);
+                    }
+                }
+                if (dataset.getTrialInstances() == null) {
+                    dataset.setTrialInstances(new ArrayList<FieldMapTrialInstanceInfo>());
+                }
+                if (dataset.getTrialInstance(trial.getGeolocationId()) == null) {
+                    dataset.getTrialInstances().add(trial);
+                }
+            }
+            if (trial.getFieldMapLabels() == null) {
+                trial.setFieldMapLabels(new ArrayList<FieldMapLabel>());
+            }
+            trial.getFieldMapLabels().add(label);
+            
+            
+            //labels.add(label);
         }
         
-        return labels;
+        Set<Integer> keys = infoMap.keySet();
+        for (Integer key : keys) {
+            infos.add(infoMap.get(key));
+        }
+        return infos;
+        //return labels;
     }
     
     private Integer getIntegerValue(Object obj) {
