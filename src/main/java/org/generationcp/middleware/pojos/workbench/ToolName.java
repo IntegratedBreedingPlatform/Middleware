@@ -22,18 +22,22 @@ public enum ToolName {
     // BreedingView native app
     ,breeding_view
     
-    // fieldbook native appapp
+    // fieldbook native app
     ,breeding_manager
     ,fieldbook
     ,ibfb_germplasm_import
-    
+
+    // fieldbook web apps
+    ,fieldbook_web
+    ,nursery_manager_fieldbook_web
+    ,trial_manager_fieldbook_web
+    ,ontology_browser_fieldbook_web
     // MBDT native app
     ,mbdt
     
     // OptiMAS native app
     ,optimas
     
-    // BreedingManager webapp
     ,bm_list_manager
     ,crossing_manager
     ,germplasm_import
