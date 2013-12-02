@@ -466,5 +466,5 @@ public interface StudyDataManager{
      * @param geolocationId
      * @throws MiddlewareQueryException
      */
-    List<FieldMapLabel> getAllFieldMapsInBlockByTrialInstanceId(int geolocationId) throws MiddlewareQueryException;
+    List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int geolocationId) throws MiddlewareQueryException;
 }
