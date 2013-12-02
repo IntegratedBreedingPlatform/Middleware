@@ -97,7 +97,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 .append("row.value AS row, col.value AS col, rBlock.value AS rowsInBlock, ")
                 .append("cBlock.value AS columnsInBlock, pOrder.value AS plantingOrder, ")
                 .append("rpp.value AS rowsPerPlot, blkName.value AS blockName, ")
-                .append("locName.value AS locationName, fldName.value AS fieldName ")
+                .append("locName.value AS locationName, fldName.value AS fieldName, ")
+                .append("inst.description AS trialInstance ")
                 .append("FROM nd_experiment_project eproj  ")
                 .append("   INNER JOIN project_relationship pr ON pr.object_project_id = :projectId AND pr.type_id = ").append(TermId.BELONGS_TO_STUDY.getId())
                 .append("       INNER JOIN nd_experiment_stock es ON eproj.nd_experiment_id = es.nd_experiment_id  ")
@@ -112,6 +113,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 .append("               AND epropPlot.value IS NOT NULL  AND epropPlot.value <> '' ")
                 .append("       INNER JOIN nd_experiment geo ON eproj.nd_experiment_id = geo.nd_experiment_id ")
                 .append("               AND geo.type_id = ").append(TermId.PLOT_EXPERIMENT.getId())
+                .append("       INNER JOIN nd_geolocation inst ON geo.nd_geolocation_id = inst.nd_geolocation_id ")
                 .append("       INNER JOIN nd_geolocationprop site ON geo.nd_geolocation_id = site.nd_geolocation_id ")
                 .append("               AND site.type_id = ").append(TermId.TRIAL_LOCATION.getId())
                 .append("       INNER JOIN project proj on proj.project_id = eproj.project_id ")
@@ -154,6 +156,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                     .addScalar("blockName")
                     .addScalar("locationName")
                     .addScalar("fieldName")
+                    .addScalar("trialInstance")
                     ;
             query.setParameter("projectId", projectId);
     
@@ -286,6 +289,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
         Integer geolocationId = null;
         String datasetName = null;
         String siteName = null;
+        String trialInstanceNo = null;
         String blockName = null;
         String locationName = null;
         String fieldName = null;
@@ -303,6 +307,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 if (!geolocationId.equals((Integer)row[2]) || !datasetId.equals((Integer)row[0])) {
                     trialInstance.setGeolocationId(geolocationId);
                     trialInstance.setSiteName(siteName);
+                    trialInstance.setTrialInstanceNo(trialInstanceNo);
                     trialInstance.setBlockName(blockName);
                     trialInstance.setLocationName(locationName);
                     trialInstance.setFieldName(fieldName);
@@ -363,6 +368,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             datasetName = (String) row[1];
             geolocationId = (Integer) row[2];
             siteName = (String) row[3];
+            trialInstanceNo = (String) row[18];
             blockName = (String) row[15];
             locationName = (String) row[16];
             fieldName = (String) row[17];
@@ -388,6 +394,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
         //add last trial instance and dataset
         trialInstance.setGeolocationId(geolocationId);
         trialInstance.setSiteName(siteName);
+        trialInstance.setTrialInstanceNo(trialInstanceNo);
         trialInstance.setBlockName(blockName);
         trialInstance.setLocationName(locationName);
         trialInstance.setFieldName(fieldName);

@@ -36,17 +36,22 @@ public class FieldMapTrialInstanceInfo implements Serializable{
     /** The site name. trial location id */
     private String siteName;
     
+    /** The trial instance no. */
+    private String trialInstanceNo;
+    
     /** The labels. */
     private List<FieldMapLabel> labels;
     
     /** The block name. */
     private String blockName;
     
+    /** The field name. */
     private String fieldName;
     
-    /** site name or location name */
+    /** site name or location name. */
     private String locationName;
     
+    /** The fieldmap uuid. */
     private String fieldmapUUID;
     
     
@@ -59,22 +64,28 @@ public class FieldMapTrialInstanceInfo implements Serializable{
     /** The planting order. */
     private Integer plantingOrder;
     
-    /** The start column index */
+    /** The start column index. */
     private Integer startColumn;
     
-    /** The start range index */
+    /** The start range index. */
     private Integer startRange;
     
+    /** The entry count. */
     private long entryCount;
     
+    /** The rep count. */
     private long repCount;
     
+    /** The plot count. */
     private long plotCount;
     
+    /** The has field map. */
     private boolean hasFieldMap;
     
+    /** The rows per plot. */
     private Integer rowsPerPlot;
     
+    /** The machine row capacity. */
     private Integer machineRowCapacity;
     
         
@@ -98,6 +109,11 @@ public class FieldMapTrialInstanceInfo implements Serializable{
 	this.labels = labels;
     }
 
+    /**
+     * Checks if is field map generated.
+     *
+     * @return true, if is field map generated
+     */
     public boolean isFieldMapGenerated() {
         if (getFieldMapLabels() != null) {
             for (FieldMapLabel label : getFieldMapLabels()) {
@@ -144,7 +160,25 @@ public class FieldMapTrialInstanceInfo implements Serializable{
     public void setSiteName(String siteName) {
         this.siteName = siteName;
     }
-    
+
+    /**
+     * Gets the trial instance no.
+     *
+     * @return the trial instance no
+     */
+    public String getTrialInstanceNo() {
+        return trialInstanceNo;
+    }
+
+    /**
+     * Sets the trial instance no.
+     *
+     * @param trialInstanceNo the new trial instance no
+     */
+    public void setTrialInstanceNo(String trialInstanceNo) {
+        this.trialInstanceNo = trialInstanceNo;
+    }
+
     /**
      * Gets the field map labels.
      *
@@ -253,6 +287,11 @@ public class FieldMapTrialInstanceInfo implements Serializable{
         return entries.size();
     }
     
+    /**
+     * Sets the entry count.
+     *
+     * @param entryCount the new entry count
+     */
     public void setEntryCount(long entryCount) {
         this.entryCount = entryCount;
     }
@@ -273,6 +312,11 @@ public class FieldMapTrialInstanceInfo implements Serializable{
         return Collections.max(reps);
     }
     
+    /**
+     * Sets the rep count.
+     *
+     * @param repCount the new rep count
+     */
     public void setRepCount(long repCount) {
         this.repCount = repCount;
     }
@@ -286,6 +330,11 @@ public class FieldMapTrialInstanceInfo implements Serializable{
         return labels.size();
     }
     
+    /**
+     * Sets the plot count.
+     *
+     * @param plotCount the new plot count
+     */
     public void setPlotCount(long plotCount) {
         this.plotCount = plotCount;
     }
@@ -307,6 +356,8 @@ public class FieldMapTrialInstanceInfo implements Serializable{
 
     
     /**
+     * Gets the start column.
+     *
      * @return the startColumn
      */
     public Integer getStartColumn() {
@@ -315,6 +366,8 @@ public class FieldMapTrialInstanceInfo implements Serializable{
 
     
     /**
+     * Sets the start column.
+     *
      * @param startColumn the startColumn to set
      */
     public void setStartColumn(Integer startColumn) {
@@ -323,6 +376,8 @@ public class FieldMapTrialInstanceInfo implements Serializable{
 
     
     /**
+     * Gets the start range.
+     *
      * @return the startRange
      */
     public Integer getStartRange() {
@@ -331,6 +386,8 @@ public class FieldMapTrialInstanceInfo implements Serializable{
 
     
     /**
+     * Sets the start range.
+     *
      * @param startRange the startRange to set
      */
     public void setStartRange(Integer startRange) {
@@ -381,6 +438,8 @@ public class FieldMapTrialInstanceInfo implements Serializable{
 
     
     /**
+     * Gets the checks for field map.
+     *
      * @return the hasFieldMap
      */
     public boolean getHasFieldMap() {
@@ -389,6 +448,8 @@ public class FieldMapTrialInstanceInfo implements Serializable{
 
     
     /**
+     * Sets the checks for field map.
+     *
      * @param hasFieldMap the hasFieldMap to set
      */
     public void setHasFieldMap(boolean hasFieldMap) {
@@ -397,6 +458,8 @@ public class FieldMapTrialInstanceInfo implements Serializable{
 
     
     /**
+     * Gets the rows per plot.
+     *
      * @return the rowsPerPlot
      */
     public Integer getRowsPerPlot() {
@@ -405,6 +468,8 @@ public class FieldMapTrialInstanceInfo implements Serializable{
 
     
     /**
+     * Sets the rows per plot.
+     *
      * @param rowsPerPlot the rowsPerPlot to set
      */
     public void setRowsPerPlot(Integer rowsPerPlot) {
@@ -412,6 +477,8 @@ public class FieldMapTrialInstanceInfo implements Serializable{
     }
 
     /**
+     * Gets the field name.
+     *
      * @return the fieldName
      */
     public String getFieldName() {
@@ -420,6 +487,8 @@ public class FieldMapTrialInstanceInfo implements Serializable{
 
     
     /**
+     * Sets the field name.
+     *
      * @param fieldName the fieldName to set
      */
     public void setFieldName(String fieldName) {
@@ -428,6 +497,8 @@ public class FieldMapTrialInstanceInfo implements Serializable{
 
     
     /**
+     * Gets the fieldmap uuid.
+     *
      * @return the fieldmapUUID
      */
     public String getFieldmapUUID() {
@@ -436,6 +507,8 @@ public class FieldMapTrialInstanceInfo implements Serializable{
 
     
     /**
+     * Sets the fieldmap uuid.
+     *
      * @param fieldmapUUID the fieldmapUUID to set
      */
     public void setFieldmapUUID(String fieldmapUUID) {
@@ -444,6 +517,8 @@ public class FieldMapTrialInstanceInfo implements Serializable{
 
     
     /**
+     * Gets the machine row capacity.
+     *
      * @return the machineRowCapacity
      */
     public Integer getMachineRowCapacity() {
@@ -452,6 +527,8 @@ public class FieldMapTrialInstanceInfo implements Serializable{
 
     
     /**
+     * Sets the machine row capacity.
+     *
      * @param machineRowCapacity the machineRowCapacity to set
      */
     public void setMachineRowCapacity(Integer machineRowCapacity) {
@@ -460,6 +537,8 @@ public class FieldMapTrialInstanceInfo implements Serializable{
 
     
     /**
+     * Gets the location name.
+     *
      * @return the locationName
      */
     public String getLocationName() {
@@ -468,6 +547,8 @@ public class FieldMapTrialInstanceInfo implements Serializable{
 
     
     /**
+     * Sets the location name.
+     *
      * @param locationName the locationName to set
      */
     public void setLocationName(String locationName) {
