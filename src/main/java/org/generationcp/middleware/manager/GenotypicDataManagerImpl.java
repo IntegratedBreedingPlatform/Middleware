@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -670,6 +671,19 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         }
         return super.countAllFromCentralAndLocalByMethod(getQtlDao(), "countQtlDetailsByName", new Object[]{name}, new Class[]{String.class});
     }
+    
+    @Override
+    public java.util.Map<Integer, String> getQtlNamesByQtlIds(List<Integer> qtlIds) throws MiddlewareQueryException{
+        java.util.Map<Integer, String> qtlNames = new HashMap<Integer, String>();
+
+        setWorkingDatabase(Database.CENTRAL);
+        qtlNames.putAll(getQtlDao().getQtlNameByQtlIds(qtlIds));
+
+        setWorkingDatabase(Database.LOCAL);
+        qtlNames.putAll(getQtlDao().getQtlNameByQtlIds(qtlIds));
+        
+        return qtlNames;
+    }
 
     @Override
     public List<QtlDetailElement> getQtlByQtlIds(List<Integer> qtlIds, int start, int numOfRows) throws MiddlewareQueryException {
@@ -737,13 +751,34 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     public Long countMapDetailsByName(String nameLike) throws MiddlewareQueryException {
         return super.countAllFromCentralAndLocalByMethod(getMapDao(), "countMapDetailsByName", new Object[]{nameLike}, new Class[]{String.class});
     }
+    
+    @Override
+    public java.util.Map<Integer, List<String>> getMapNamesByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException{
 
+        java.util.Map<Integer, List<String>> markerMaps = new HashMap<Integer, List<String>>();
+
+        if (markerIds == null || markerIds.size() == 0){
+            return markerMaps;
+        }
+        
+        // Get from Central
+        setWorkingDatabase(Database.CENTRAL);
+        markerMaps.putAll(getMarkerOnMapDao().getMapNameByMarkerIds(markerIds));
+        
+        setWorkingDatabase(Database.LOCAL);
+        markerMaps.putAll(getMarkerOnMapDao().getMapNameByMarkerIds(markerIds));
+
+        return markerMaps;
+    }
+
+    @Override
     public List<MapDetailElement> getAllMapDetails(int start, int numOfRows) throws MiddlewareQueryException {
         List<String> methods = Arrays.asList("countAllMapDetails", "getAllMapDetails");
         return (List<MapDetailElement>) super.getFromCentralAndLocalByMethod(getMapDao(), methods, start, numOfRows, 
                 new Object[]{}, new Class[]{});
     }
 
+    @Override
     public long countAllMapDetails() throws MiddlewareQueryException {
         return super.countAllFromCentralAndLocalByMethod(getMapDao(), "countAllMapDetails", new Object[]{}, new Class[]{});
     }
@@ -1066,6 +1101,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             
             Integer markerId = saveMarker(marker, TYPE_DART);
             marker.setMarkerId(markerId);
+            markerMetadataSet.setMarkerId(markerId);
+            alleleValues.setMarkerId(markerId);
+            dartValues.setMarkerId(markerId);
             
             saveAccMetadataSet(datasetId, accMetadataSet);
             saveMarkerMetadataSet(datasetId, markerMetadataSet);
@@ -1098,6 +1136,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             
             Integer markerId = saveMarker(marker, TYPE_SSR);
             marker.setMarkerId(markerId);
+            markerMetadataSet.setMarkerId(markerId);
+            alleleValues.setMarkerId(markerId);
             
             saveAccMetadataSet(datasetId, accMetadataSet);
             saveMarkerMetadataSet(datasetId, markerMetadataSet);
@@ -1129,6 +1169,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             
             Integer markerId = saveMarker(marker, TYPE_SNP);
             marker.setMarkerId(markerId);
+            markerMetadataSet.setMarkerId(markerId);
+            charValues.setMarkerId(markerId);
 
             saveAccMetadataSet(datasetId, accMetadataSet);
             saveMarkerMetadataSet(datasetId, markerMetadataSet);
@@ -1177,6 +1219,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             trans = session.beginTransaction();
             Integer datasetId = saveMappingData(accMetadataSet, markerMetadataSet, datasetUser, 
                                                     mappingPop, mappingPopValues, dataset, marker);
+            charValues.setMarkerId(marker.getMarkerId());
             saveCharValues(datasetId, charValues);
             trans.commit();
             return true;
@@ -1200,6 +1243,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             trans = session.beginTransaction();
             Integer datasetId = saveMappingData(accMetadataSet, markerMetadataSet, datasetUser, 
                                                     mappingPop, mappingPopValues, dataset, marker);
+            alleleValues.setMarkerId(marker.getMarkerId());
             saveAlleleValues(datasetId, alleleValues);
             trans.commit();
             return true;
@@ -1221,6 +1265,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         
         Integer markerId = saveMarker(marker, TYPE_MAPPING);
         marker.setMarkerId(markerId);
+        markerMetadataSet.setMarkerId(markerId);
+        mappingPopValues.setMarkerId(markerId);
         
         saveAccMetadataSet(datasetId, accMetadataSet);
         saveMarkerMetadataSet(datasetId, markerMetadataSet);
@@ -1256,13 +1302,12 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         setWorkingDatabase(Database.CENTRAL);
         Integer markerId = getMarkerDao().getIdByName(markerName);
 
-        if (markerId != null) {
-            throw new MiddlewareException(
-                    "Marker exists in central. Please specify a new GDMS marker record or choose a marker in local.");
+        if (markerId == null) {
+            setWorkingDatabase(Database.LOCAL);
+            markerId = getMarkerDao().getIdByName(markerName);
         }
 
-        setWorkingDatabase(Database.LOCAL);
-        return getMarkerDao().getIdByName(markerName);        
+        return markerId;        
     }
     
     private Integer getMapIdByMapName(String mapName) throws MiddlewareQueryException {
@@ -1345,17 +1390,16 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     	return dataset;
     }
     
-    private Dataset getDatasetByName(String datasetName) throws MiddlewareQueryException, MiddlewareException{
+    private Dataset getDatasetByName(String datasetName) throws MiddlewareQueryException{
 
-        // If dataset exists in central, throw an exception
         setWorkingDatabase(Database.CENTRAL);
-        if (getDatasetDao().getByName(datasetName) != null){
-            throw new MiddlewareException(
-                    "Dataset exists in central. Please specify a new GDMS dataset record or choose a dataset in local.");
+        Dataset dataset = getDatasetDao().getByName(datasetName);
+        if (dataset == null){
+            setWorkingDatabase(Database.LOCAL);
+            dataset = getDatasetDao().getByName(datasetName);
         }
-       
-        setWorkingDatabase(Database.LOCAL);
-        return getDatasetDao().getByName(datasetName);
+        
+        return dataset;
     }
     
     @Override
@@ -1598,15 +1642,15 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     
 	private Integer saveDataset(Dataset dataset, String datasetType, String dataType) throws Exception{
 
-        // Get dataset from the database if it exists
-        Integer datasetId = dataset.getDatasetId();
-        if (datasetId == null){
-            Dataset datasetWithName = getDatasetByName(dataset.getDatasetName());
-            if (datasetWithName != null){
-                datasetId = datasetWithName.getDatasetId();
-            }
+	    // If the dataset has same dataset name existing in the database (local and central) - should throw an error.
+        if (getDatasetByName(dataset.getDatasetName()) != null){
+            throw new MiddlewareQueryException(
+                    "Dataset already exists. Please specify a new GDMS dataset record with a different name.");
         }
+        
 
+        // If the dataset is not yet existing in the database (local and central) - should create a new dataset in the local database.
+        Integer datasetId = dataset.getDatasetId();
         if (datasetId == null) {
             requireLocalDatabaseInstance();
             DatasetDAO datasetDao = getDatasetDao();
@@ -1635,7 +1679,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	// If the marker is not yet in the database, add.
 	private Integer saveMarker(Marker marker, String markerType) throws Exception{
 	    
-        // Get marker from the database if it exists
+	    // If the marker has same marker name existing in the database (local and central) - use the existing record.
         Integer markerId = marker.getMarkerId();
         if (markerId == null){
             Integer markerIdWithName = getMarkerIdByMarkerName(marker.getMarkerName());
@@ -1644,7 +1688,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             }
         }
 
-	    // Save if new        
+        // If the marker is not yet existing in the database (local and central) - should create a new marker in the local database.
         if (markerId == null) {
             requireLocalDatabaseInstance();
             MarkerDAO markerDao = getMarkerDao();
@@ -1654,7 +1698,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             Marker markerRecordSaved = markerDao.saveOrUpdate(marker);
             markerId = markerRecordSaved.getMarkerId();
         }
-        
+	            
         if (markerId == null) {
             throw new Exception(); // To immediately roll back and to avoid executing the other insert functions
         }

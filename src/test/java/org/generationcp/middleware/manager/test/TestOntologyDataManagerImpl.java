@@ -32,8 +32,6 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Property;
-import org.generationcp.middleware.domain.oms.PropertyReference;
-import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TermProperty;
@@ -57,8 +55,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
 public class TestOntologyDataManagerImpl {
-
-    private static final String NUMBER_OF_RECORDS = " # Records = ";
 
 	private static final Integer CV_TERM_ID = 1010;
 	private static final String CV_TERM_NAME = "Study Information";
@@ -640,81 +636,6 @@ public class TestOntologyDataManagerImpl {
         for (TraitClassReference traitGroup : traitGroups){
             traitGroup.print(3);
         }
-    }
-    
-    @Test
-    public void testGetTraitGroupsOntologyTraitClass() throws Exception {
-        List<TraitClassReference> traitGroups = manager.getTraitGroupsHierarchy(TermId.ONTOLOGY_TRAIT_CLASS);
-        for (TraitClassReference traitGroup : traitGroups){
-            traitGroup.print(3);
-        }
-        Debug.println(3, NUMBER_OF_RECORDS + traitGroups.size());
-    }
-    
-    @Test
-    public void testGetTraitGroupsOntologyResearchClass() throws Exception {
-        List<TraitClassReference> traitGroups = manager.getTraitGroupsHierarchy(TermId.ONTOLOGY_RESEARCH_CLASS);
-        for (TraitClassReference traitGroup : traitGroups){
-            traitGroup.print(3);
-        }
-        Debug.println(3, NUMBER_OF_RECORDS + traitGroups.size());
-    }
-    
-    @Test
-    public void testGetAllTraitClasses() throws Exception {
-        List<TraitClassReference> traitClasses = manager.getAllTraitClasses();
-        for (TraitClassReference traitClass : traitClasses){
-            traitClass.print(3);
-        }
-    }
-    
-
-    @Test
-    public void testGetAllTraitClassesOntologyTraitClass() throws Exception {
-        List<TraitClassReference> traitClasses = manager.getTraitClasses(TermId.ONTOLOGY_TRAIT_CLASS);
-        for (TraitClassReference traitClass : traitClasses){
-            traitClass.print(3);
-        }
-        Debug.println(3, NUMBER_OF_RECORDS + traitClasses.size());
-    }
-
-    @Test
-    public void testGetAllTraitClassesOntologyResearchClass() throws Exception {
-        List<TraitClassReference> traitClasses = manager.getTraitClasses(TermId.ONTOLOGY_RESEARCH_CLASS);
-        for (TraitClassReference traitClass : traitClasses){
-            traitClass.print(3);
-        }
-        Debug.println(3, NUMBER_OF_RECORDS + traitClasses.size());
-    }
-
-    @Test
-    public void testPrintTraitGroupsWithNegativeIdsOnly() throws Exception {
-        List<TraitClassReference> traitGroups = manager.getTraitGroupsHierarchy(TermId.ONTOLOGY_TRAIT_CLASS);
-        for (TraitClassReference traitGroup : traitGroups){
-            traitGroup.print(3);
-            if (traitGroup.getId() < 0){
-                traitGroup.print(3);
-            }
-            List<PropertyReference> properties = traitGroup.getProperties();
-            if (!properties.isEmpty()){
-                for(PropertyReference property : properties){
-                    if (property.getId() < 0){
-                        property.print(6);
-                    }
-                    List<StandardVariableReference> variables = property.getStandardVariables();
-                    if (!variables.isEmpty()){
-                        for(StandardVariableReference variable : variables){
-                            if (variable.getId() < 0){
-                                variable.print(9);
-                            }
-                        }
-                    }
-                }
-            }
-            
-        }
-        
-        
     }
     
     

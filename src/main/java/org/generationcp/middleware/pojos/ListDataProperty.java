@@ -16,13 +16,14 @@ import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.generationcp.middleware.util.Debug;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 /**
  * POJO for listdataprop table
@@ -37,17 +38,17 @@ public class ListDataProperty implements Serializable{
 	private static final long serialVersionUID = 2527090989063203962L;
 	
     @Id
-    @GeneratedValue
     @Basic(optional = false)
     @Column(name = "listdataprop_id")
     private Integer listDataPropertyId;
 
     @ManyToOne(targetEntity = GermplasmListData.class)
 	@JoinColumn(name = "listdata_id", nullable = false)
+    @NotFound(action = NotFoundAction.IGNORE)
     private GermplasmListData listData;
     
     @Basic(optional = false)
-    @Column(name = "column")
+    @Column(name = "column_name")
     private String column;
     
     @Column(name = "value")
@@ -64,6 +65,21 @@ public class ListDataProperty implements Serializable{
 		this.listData = listData;
 		this.column = column;
 		this.value = value;
+	}
+	
+	public ListDataProperty(GermplasmListData listData,
+			String column, String value) {
+		super();
+		this.listData = listData;
+		this.column = column;
+		this.value = value;
+	}
+	
+	public ListDataProperty(GermplasmListData listData,
+			String column) {
+		super();
+		this.listData = listData;
+		this.column = column;
 	}
 
 	public Integer getListDataPropertyId() {

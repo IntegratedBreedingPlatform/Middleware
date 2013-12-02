@@ -15,10 +15,13 @@ package org.generationcp.middleware.service.api;
 import java.util.List;
 
 import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
+import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.LocationDetails;
 
 /**
  * This is the API for Fieldbook requirements.
@@ -49,7 +52,7 @@ public interface FieldbookService {
      * @param trialId the id of the trial to retrieve the count from
      * @return the FieldMapCount object containing the counts
      */
-    FieldMapInfo getFieldMapInfoOfTrial(int trialId) throws MiddlewareQueryException;
+    List<FieldMapInfo> getFieldMapInfoOfTrial(List<Integer> trialIdList) throws MiddlewareQueryException;
     
     /**
      * Gets the field map info (entries, reps, plots and counts) of the given nursery. 
@@ -57,7 +60,7 @@ public interface FieldbookService {
      * @param nurseryId the id of the nursery to retrieve the count from
      * @return the FieldMapCount object containing the counts
      */
-    FieldMapInfo getFieldMapInfoOfNursery(int nurseryId) throws MiddlewareQueryException;
+    List<FieldMapInfo> getFieldMapInfoOfNursery(List<Integer> nurseryIdList) throws MiddlewareQueryException;
     
     
     /**
@@ -83,9 +86,22 @@ public interface FieldbookService {
      * @throws MiddlewareQueryException
      */
     void saveOrUpdateFieldmapProperties(FieldMapInfo info) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Retrieve all field map labels in the block of the specified trial instance id.
+     * @param geolocationId
+     * @throws MiddlewareQueryException
+     */
+    List<FieldMapLabel> getAllFieldMapsInBlockByTrialInstanceId(int geolocationId) throws MiddlewareQueryException;
+
             
     
     //TODO remove this, this is just for testing
     int getGeolocationId(int projectId) throws MiddlewareQueryException;
     List<DatasetReference> getDatasetReferences(int studyId) throws MiddlewareQueryException;
+    
+    List<Location> getFavoriteLocationByProjectId(List<Long> locationIds)  throws MiddlewareQueryException;
+    Study getStudy(int studyId) throws MiddlewareQueryException ;
+
 }

@@ -27,7 +27,7 @@ public class ListDataInfo implements Serializable {
 
 	private static final long serialVersionUID = 3171213000673469267L;
 	
-	private Integer listDataId;
+	private Integer listDataId; //GermplasListData.id
 	private List<ListDataColumn> columns;
 	
 	public ListDataInfo(Integer listDataId, List<ListDataColumn> columns) {
@@ -100,7 +100,7 @@ public class ListDataInfo implements Serializable {
 		if (columns != null){
 			Debug.println(indent + 3, "# of Columns: " + columns.size());
             for (ListDataColumn column : columns){
-                column.print(indent + 3);
+                column.print(indent + 5);
             }
 		}
 		

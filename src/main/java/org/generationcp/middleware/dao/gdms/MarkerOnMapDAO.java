@@ -11,7 +11,10 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao.gdms;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -61,5 +64,50 @@ public class MarkerOnMapDAO extends GenericDAO<MarkerOnMap, Integer>{
     	}
     	return null;
     }
+    
+    
+    @SuppressWarnings("unchecked")
+    public Map<Integer, List<String>> getMapNameByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException{
+        Map<Integer, List<String>> markerMaps = new HashMap<Integer, List<String>>();
+        
+        try {
+            /*
+                SELECT DISTINCT map_name, marker_id 
+                FROM gdms_map map INNER JOIN gdms_markers_onmap markermap ON map.map_id = markermap.map_id
+                WHERE markermap.marker_id IN (@markerIds);
+            */
+
+            StringBuilder sqlString = new StringBuilder()
+            .append("SELECT DISTINCT marker_id, CONCAT(map_name,'') ")
+            .append("FROM gdms_map map INNER JOIN gdms_markers_onmap markermap ON map.map_id = markermap.map_id ")
+            .append(" WHERE markermap.marker_id IN (:markerIds) ")
+            ;
+        
+            Query query = getSession().createSQLQuery(sqlString.toString());
+            query.setParameterList("markerIds", markerIds);
+
+            List<Object[]> list =  query.list();
+            
+            if (list != null && list.size() > 0) {
+                for (Object[] row : list){
+                    Integer markerId = (Integer) row[0];
+                    String mapName = (String) row [1]; 
+
+                    List<String> mapNames = new ArrayList<String>();
+                    if (markerMaps.containsKey(markerId)){
+                        mapNames = markerMaps.get(markerId);
+                    }
+                    mapNames.add(mapName);
+                    markerMaps.put(markerId, mapNames);
+                }
+            }
+
+        } catch(HibernateException e) {
+            logAndThrowException("Error in getMapNameByMarkerIds() query from MarkerOnMap: " + e.getMessage(), e);
+        }
+        return markerMaps;
+        
+    }
+    
 
 }

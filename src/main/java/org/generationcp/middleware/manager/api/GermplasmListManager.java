@@ -13,6 +13,8 @@ package org.generationcp.middleware.manager.api;
 
 import java.util.List;
 
+import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
+import org.generationcp.middleware.domain.gms.ListDataInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Operation;
@@ -506,5 +508,30 @@ public interface GermplasmListManager{
      * @throws MiddlewareQueryException
      */
     public List<GermplasmList> searchForGermplasmList(String q) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Inserts or updates the ListDataProperty records (columns) 
+     * corresponding to the ListDataColumn records
+     * 
+     * @param listDataCollection
+     * @return the list of ListDataInfo objects with the listDataColumnId field of each 
+     * 		ListDataColumn filled up if the corresponding ListDataProperty object was 
+     * 		successfully inserted or updated
+     * @throws MiddlewareQueryException
+     */
+    public List<ListDataInfo> saveListDataColumns(List<ListDataInfo> listDataCollection) 
+    		throws MiddlewareQueryException;
+    
+    
+    /**
+     * Retrieves list of distinct column names from ListDataProperty for given list
+     * Returns empty list if no related column found.
+     * 
+     * @param listId - id of list to retrieve columns for
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    public GermplasmListNewColumnsInfo getAdditionalColumnsForList(Integer listId) throws MiddlewareQueryException;
     
 }

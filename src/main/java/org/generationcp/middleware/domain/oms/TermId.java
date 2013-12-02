@@ -122,6 +122,9 @@ public enum TermId {
     , RANGES_IN_BLOCK (32773)
     , PLANTING_ORDER (32774)
     , ROWS_PER_PLOT (32780)
+    , FIELD_NAME (32783)
+    , FIELDMAP_UUID (32785)
+    , MACHINE_ROW_CAPACITY (32787)
 	
     // Experiment storage
     , TRIAL_DESIGN_INFO_STORAGE(1030)

@@ -11,12 +11,15 @@
  *******************************************************************************/
 package org.generationcp.middleware.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
+import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -44,13 +47,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     }
 
     @Override
-    public FieldMapInfo getFieldMapInfoOfTrial(int trialId) throws MiddlewareQueryException{
-        return getStudyDataManager().getFieldMapInfoOfStudy(trialId, StudyType.T);
+    public List<FieldMapInfo> getFieldMapInfoOfTrial(List<Integer> trialIdList) throws MiddlewareQueryException{
+        return getStudyDataManager().getFieldMapInfoOfStudy(trialIdList, StudyType.T);
     }
     
     @Override 
-    public FieldMapInfo getFieldMapInfoOfNursery(int nurseryId) throws MiddlewareQueryException{
-        return getStudyDataManager().getFieldMapInfoOfStudy(nurseryId, StudyType.N);
+    public List<FieldMapInfo> getFieldMapInfoOfNursery(List<Integer> nurseryIdList) throws MiddlewareQueryException{
+        return getStudyDataManager().getFieldMapInfoOfStudy(nurseryIdList, StudyType.N);
     }
 
     @Override 
@@ -66,6 +69,35 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     
     }
 
+    
+    
+    @Override
+    public Study getStudy(int studyId) throws MiddlewareQueryException  {
+        Study study = getStudyDataManager().getStudy(studyId);
+        return study;
+    }
+
+    @Override           
+    public List<Location> getFavoriteLocationByProjectId(List<Long> locationIds) throws MiddlewareQueryException {
+        // TODO Auto-generated method stub
+        
+        List<Location> locationList = new ArrayList();
+        
+        for(int i = 0 ; i < locationIds.size() ; i++){
+            Integer locationId = Integer.valueOf(locationIds.get(i).toString());
+            Location location = getGermplasmDataManager().getLocationByID(locationId);
+            locationList.add(location);
+        }
+        
+        return locationList;
+    }
+    
+    @Override
+    public List<FieldMapLabel> getAllFieldMapsInBlockByTrialInstanceId(int geolocationId) throws MiddlewareQueryException {
+        return getStudyDataManager().getAllFieldMapsInBlockByTrialInstanceId(geolocationId);
+    }
+
+
     //TODO: REMOVE THIS, THIS IS JUST FOR TESTING
     @Override
     public int getGeolocationId(int projectId) throws MiddlewareQueryException {
@@ -80,4 +112,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     public List<DatasetReference> getDatasetReferences(int studyId) throws MiddlewareQueryException {
         return getStudyDataManager().getDatasetReferences(studyId);
     }
+    
+    
 }

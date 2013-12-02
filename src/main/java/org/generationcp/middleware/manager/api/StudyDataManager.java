@@ -33,6 +33,7 @@ import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
+import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
@@ -432,7 +433,7 @@ public interface StudyDataManager{
      *            Can be either StudyType.T (Trial) or StudyType.N (Nursery)
      * @return the FieldMapCount object containing the counts
      */
-    FieldMapInfo getFieldMapInfoOfStudy(int studyId, StudyType studyType) throws MiddlewareQueryException;
+    List<FieldMapInfo> getFieldMapInfoOfStudy(List<Integer> studyIdList, StudyType studyType) throws MiddlewareQueryException;
     
     /**
      * Save or Update Field Map Properties like row, column, block, total rows, total columns, planting order.
@@ -460,4 +461,10 @@ public interface StudyDataManager{
      */
     void saveTrialDatasetSummary(DmsProject project, VariableTypeList variableTypeList, List<ExperimentValues> experimentValues, List<Integer> locationIds) throws MiddlewareQueryException;
 
+    /**
+     * Retrieve all field map labels in the block of the specified trial instance id.
+     * @param geolocationId
+     * @throws MiddlewareQueryException
+     */
+    List<FieldMapLabel> getAllFieldMapsInBlockByTrialInstanceId(int geolocationId) throws MiddlewareQueryException;
 }

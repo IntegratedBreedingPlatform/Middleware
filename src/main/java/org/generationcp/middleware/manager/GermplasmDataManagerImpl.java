@@ -12,7 +12,12 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.BibrefDAO;
@@ -509,6 +514,30 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     public List<Attribute> getAttributesByGID(Integer gid) throws MiddlewareQueryException {
         return (List<Attribute>) super.getFromInstanceByIdAndMethod(getAttributeDao(), gid, "getByGID", 
                 new Object[]{gid}, new Class[]{Integer.class});
+    }
+    
+    @Override
+    public List<UserDefinedField> getAttributeTypesByGIDList(List<Integer> gidList) throws MiddlewareQueryException {
+        return (List<UserDefinedField>) super.getAllFromCentralAndLocalByMethod(getAttributeDao(), "getAttributeTypesByGIDList",
+                new Object[] { gidList }, new Class[] { List.class });
+    }
+    
+    @Override
+    public Map<Integer, String> getAttributeValuesByTypeAndGIDList(Integer attributeType, List<Integer> gidList) throws MiddlewareQueryException {
+        Map<Integer, String> returnMap = new HashMap<Integer, String>();
+        // initialize map with GIDs
+        for (Integer gid : gidList) {
+            returnMap.put(gid, "-");
+        }
+        
+        // retrieve attribute values
+        List<Attribute> attributeList = super.getAllFromCentralAndLocalByMethod(getAttributeDao(), "getAttributeValuesByTypeAndGIDList",
+                new Object[] { attributeType, gidList }, new Class[] { Integer.class, List.class });
+        for (Attribute attribute : attributeList) {
+            returnMap.put(attribute.getGermplasmId(), attribute.getAval());
+        }
+        
+        return returnMap;
     }
 
     @Override
@@ -1255,10 +1284,15 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                 if (germplasmToExpand.getGnpgs() < 0) {
                     //for germplasms created via a derivative or maintenance method
                     //skip and then expand on the gpid1 parent
-                    if (germplasmToExpand.getGpid1() != 0 && germplasmToExpand.getGpid1() != null) {
+                    if (germplasmToExpand.getGpid1() != null && germplasmToExpand.getGpid1() != 0) {
                         SingleGermplasmCrossElement nextElement = new SingleGermplasmCrossElement();
-                        nextElement.setGermplasm(getGermplasmWithPrefName(germplasmToExpand.getGpid1()));
-                        return expandGermplasmCross(nextElement, level);
+                        Germplasm gpid1Germplasm = getGermplasmWithPrefName(germplasmToExpand.getGpid1());
+                        if(gpid1Germplasm != null){
+	                        nextElement.setGermplasm(gpid1Germplasm);
+	                        return expandGermplasmCross(nextElement, level);
+                        } else{
+                        	return element;
+                        }
                     } else {
                         return element;
                     }
@@ -1350,6 +1384,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                             if (expandedThirdGrandParent instanceof GermplasmCross) {
                                 numOfCrossesForSecond = ((GermplasmCross) expandedThirdGrandParent).getNumberOfCrossesBefore() + 1;
                             }
+                            secondCross.setNumberOfCrossesBefore(numOfCrossesForSecond);
 
                             //create the cross of the two sets of grandparents, this will be returned
                             cross.setFirstParent(firstCross);
@@ -1446,6 +1481,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                                 cross.setNumberOfCrossesBefore(numOfCrossesForGrandParents + 1);
                             }
 
+                        } else if(methodName.contains("backcross")){
+                        	Germplasm firstParent = getGermplasmWithPrefName(germplasmToExpand.getGpid1());
+                        	Germplasm secondParent = getGermplasmWithPrefName(germplasmToExpand.getGpid2());
+                        	
+                        	//determine which is the recurrent parent
+                        	
                         }
 
                         return cross;

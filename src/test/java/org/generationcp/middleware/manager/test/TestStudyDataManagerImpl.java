@@ -1060,29 +1060,39 @@ public class TestStudyDataManagerImpl{
 
     @Test
     public void testGetFieldMapCountsOfTrial() throws MiddlewareQueryException{
-        int trialId = -52;  
-        FieldMapInfo fieldMapInfo = manager.getFieldMapInfoOfStudy(trialId, StudyType.T);
-        Debug.println(0, fieldMapInfo.getFieldbookName());
-        Debug.println(0, fieldMapInfo.getDatasets().toString());
+        List<Integer> trialIdList = new ArrayList<Integer>();
+        trialIdList.add(new Integer(-52));  
+        List<FieldMapInfo> fieldMapInfos = manager.getFieldMapInfoOfStudy(trialIdList, StudyType.T);
+        for (FieldMapInfo fieldMapInfo : fieldMapInfos) {
+            Debug.println(0, fieldMapInfo.getFieldbookName());
+            Debug.println(0, fieldMapInfo.getDatasets().toString());
+        }
         //assertTrue(fieldMapCount.getEntryCount() > 0);
     }
 
     @Test
     public void testGetFieldMapCountsOfNursery() throws MiddlewareQueryException {
-        int nurseryId = -138;
-        FieldMapInfo fieldMapInfo = manager.getFieldMapInfoOfStudy(nurseryId, StudyType.N);
-        Debug.println(0, fieldMapInfo.getFieldbookName());
-        Debug.println(0, fieldMapInfo.getDatasets().toString());
+        List<Integer> nurseryIdList = new ArrayList<Integer>();
+        nurseryIdList.add(new Integer(-52));  
+        List<FieldMapInfo> fieldMapInfos = manager.getFieldMapInfoOfStudy(nurseryIdList, StudyType.N);
+        for (FieldMapInfo fieldMapInfo : fieldMapInfos) {
+            Debug.println(0, fieldMapInfo.getFieldbookName());
+            Debug.println(0, fieldMapInfo.getDatasets().toString());
+        }
         //assertTrue(fieldMapCount.getEntryCount() > 0);
     }
     
     @Test
     public void testSaveFieldMapProperties() throws MiddlewareQueryException {
-        int trialId = -186; 
+        List<Integer> trialIdList = new ArrayList<Integer>();
+        trialIdList.add(new Integer(-186));
+         
         int geolocationId = -123; //please specify the geolocation id used by the trial 
-        FieldMapInfo info = manager.getFieldMapInfoOfStudy(trialId, StudyType.T);
+        List<FieldMapInfo> info = manager.getFieldMapInfoOfStudy(trialIdList, StudyType.T);
         //info.setBlockName("Block Name 1");
-        info.setFieldbookId(-186);
+        if (info != null) {
+            info.get(0).setFieldbookId(-186);
+        }
         //info.setColumnsInBlock(7);
         //info.setRangesInBlock(8);
         //info.setPlantingOrder(1);
@@ -1099,7 +1109,7 @@ public class TestStudyDataManagerImpl{
                 break;
             }
         }*/
-        manager.saveOrUpdateFieldmapProperties(info);
+        manager.saveOrUpdateFieldmapProperties(info.get(0));
     }
     
 }

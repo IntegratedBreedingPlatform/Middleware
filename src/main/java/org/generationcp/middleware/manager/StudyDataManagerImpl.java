@@ -33,6 +33,7 @@ import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
+import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search.StudyResultSet;
@@ -446,22 +447,26 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
     
     @Override
-    public FieldMapInfo getFieldMapInfoOfStudy(int studyId, StudyType studyType) throws MiddlewareQueryException{
-        FieldMapInfo fieldMapInfo = new FieldMapInfo();
-        setWorkingDatabase(studyId);
+    public List<FieldMapInfo> getFieldMapInfoOfStudy(List<Integer> studyIdList, StudyType studyType) throws MiddlewareQueryException{
+        List<FieldMapInfo> fieldMapInfos = new ArrayList<FieldMapInfo>();
         
-        fieldMapInfo.setFieldbookId(studyId);
-        fieldMapInfo.setFieldbookName(getDmsProjectDao().getById(studyId).getName());
-
-        if (studyType == StudyType.T){
-        	fieldMapInfo.setTrial(true);
-        } else {
-        	fieldMapInfo.setTrial(false);
+        for (Integer studyId : studyIdList) {
+            FieldMapInfo fieldMapInfo = new FieldMapInfo();
+            setWorkingDatabase(studyId);
+            
+            fieldMapInfo.setFieldbookId(studyId);
+            fieldMapInfo.setFieldbookName(getDmsProjectDao().getById(studyId).getName());
+    
+            if (studyType == StudyType.T){
+            	fieldMapInfo.setTrial(true);
+            } else {
+            	fieldMapInfo.setTrial(false);
+            }
+            
+            fieldMapInfo.setDatasets(getExperimentPropertyDao().getFieldMapLabels(studyId));
+            fieldMapInfos.add(fieldMapInfo);
         }
-        
-        fieldMapInfo.setDatasets(getExperimentPropertyDao().getFieldMapLabels(studyId));
-        
-        return fieldMapInfo;
+        return fieldMapInfos;
     }
     
     @Override
@@ -519,6 +524,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             rollbackTransaction(trans);
             throw new MiddlewareQueryException("error in saveTrialDatasetSummary " + e.getMessage(), e);
         }
+    }
+    
+    @Override
+    public List<FieldMapLabel> getAllFieldMapsInBlockByTrialInstanceId(int geolocationId) throws MiddlewareQueryException {
+        setWorkingDatabase(geolocationId);
+        return getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(geolocationId);
     }
     
 }
