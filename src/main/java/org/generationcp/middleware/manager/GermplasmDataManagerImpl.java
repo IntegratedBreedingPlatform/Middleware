@@ -1525,35 +1525,66 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                         	Germplasm firstParent = getGermplasmWithPrefName(germplasmToExpand.getGpid1());
                         	Germplasm secondParent = getGermplasmWithPrefName(germplasmToExpand.getGpid2());
                         	
+                        	boolean itsABackCross = false;
+                        	
                         	//determine which is the recurrent parent
                         	if(firstParent != null && secondParent != null){
                         		SingleGermplasmCrossElement recurringParentElem = new SingleGermplasmCrossElement();
                         		SingleGermplasmCrossElement parentElem = new SingleGermplasmCrossElement();
 	                        	if(secondParent.getGnpgs() >= 2){
-	                        		if(firstParent.getGid() == secondParent.getGpid1()){
+	                        		if(firstParent.getGid().equals(secondParent.getGpid1())
+	                        				|| firstParent.getGid().equals(secondParent.getGpid2())){
+	                        			itsABackCross = true;
 	                        			backcross.setRecurringParentOnTheRight(false);
 	                        			
 	                        			recurringParentElem.setGermplasm(firstParent);
 	                        			
 	                        			Germplasm toCheck = null;
-	                        			if(secondParent.getGpid2() != null){
+	                        			if(firstParent.getGid().equals(secondParent.getGpid1()) && secondParent.getGpid2() != null){
 	                        				toCheck = getGermplasmWithPrefName(secondParent.getGpid2());
+	                        			} else if(firstParent.getGid().equals(secondParent.getGpid2()) && secondParent.getGpid1() != null){
+	                        				toCheck = getGermplasmWithPrefName(secondParent.getGpid1());
 	                        			}
 	                        			Object numOfDosesAndOtherParent[] = determineNumberOfRecurringParent(firstParent.getGid(), toCheck);
 	                        			parentElem.setGermplasm((Germplasm) numOfDosesAndOtherParent[1]);
 	                        			
-	                        			backcross.setNumberOfDosesOfRecurringParent(((Integer) numOfDosesAndOtherParent[0]).intValue());
+	                        			backcross.setNumberOfDosesOfRecurringParent(((Integer) numOfDosesAndOtherParent[0]).intValue() + 2);
 	                        		}
+	                        	} else if(firstParent.getGnpgs() >= 2){
+	                        		if(secondParent.getGid().equals(firstParent.getGpid1())
+	                        				|| secondParent.getGid().equals(firstParent.getGpid2())){
+	                        			itsABackCross = true;
+	                        			backcross.setRecurringParentOnTheRight(true);
+	                        			
+	                        			recurringParentElem.setGermplasm(secondParent);
+	                        			
+	                        			Germplasm toCheck = null;
+	                        			if(secondParent.getGid().equals(firstParent.getGpid1()) && firstParent.getGpid2() != null){
+	                        				toCheck = getGermplasmWithPrefName(firstParent.getGpid2());
+	                        			} else if(secondParent.getGid().equals(firstParent.getGpid2()) && firstParent.getGpid1() != null){
+	                        				toCheck = getGermplasmWithPrefName(firstParent.getGpid1());
+	                        			}
+	                        			Object numOfDosesAndOtherParent[] = determineNumberOfRecurringParent(secondParent.getGid(), toCheck);
+	                        			parentElem.setGermplasm((Germplasm) numOfDosesAndOtherParent[1]);
+	                        			
+	                        			backcross.setNumberOfDosesOfRecurringParent(((Integer) numOfDosesAndOtherParent[0]).intValue() + 2);
+	                        		}
+	                        	} else{
+	                        		itsABackCross = false;
 	                        	}
 	                        	
-	                        	GermplasmCrossElement expandedRecurringParent = expandGermplasmCross(recurringParentElem, level - 1);
-                    			backcross.setRecurringParent(expandedRecurringParent);
-                    			
-                    			GermplasmCrossElement expandedParent = expandGermplasmCross(parentElem, level -1);
-                    			backcross.setParent(expandedParent);
-                    			
-	                        	return backcross;
-                        	} else{
+	                        	if(itsABackCross){
+		                        	GermplasmCrossElement expandedRecurringParent = expandGermplasmCross(recurringParentElem, level - 1);
+	                    			backcross.setRecurringParent(expandedRecurringParent);
+	                    			
+	                    			GermplasmCrossElement expandedParent = expandGermplasmCross(parentElem, level -1);
+	                    			backcross.setParent(expandedParent);
+	                    			
+		                        	return backcross;
+	                        	}
+                        	}
+                        	
+                        	if(!itsABackCross){
                         		SingleGermplasmCrossElement firstParentElem = new SingleGermplasmCrossElement();
                         		firstParentElem.setGermplasm(firstParent);
                         		SingleGermplasmCrossElement secondParentElem = new SingleGermplasmCrossElement();
@@ -1590,11 +1621,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     	if(toCheck == null){
     		toreturn[0] = Integer.valueOf(0);
     		toreturn[1] = null;
-    	} else if(toCheck.getGpid1() != null && toCheck.getGpid1() != recurringParentGid
-    			&& toCheck.getGpid2() != null && toCheck.getGpid2() != recurringParentGid){
+    	} else if(toCheck.getGpid1() != null && !toCheck.getGpid1().equals(recurringParentGid)
+    			&& toCheck.getGpid2() != null && !toCheck.getGpid2().equals(recurringParentGid)){
     		toreturn[0] = Integer.valueOf(0);
     		toreturn[1] = toCheck;
-    	} else if(toCheck.getGpid1() != null && toCheck.getGpid1() == recurringParentGid){
+    	} else if(toCheck.getGpid1() != null && toCheck.getGpid1().equals(recurringParentGid)){
     		Germplasm nextToCheck = null;
     		if(toCheck.getGpid2() != null){
     			nextToCheck = getGermplasmWithPrefName(toCheck.getGpid2());
@@ -1602,7 +1633,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     		Object returned[] = determineNumberOfRecurringParent(recurringParentGid, nextToCheck);
     		toreturn[0] = ((Integer) returned[0]) + 1;
     		toreturn[1] = returned[1];
-    	} else if(toCheck.getGpid2() != null && toCheck.getGpid2() == recurringParentGid){
+    	} else if(toCheck.getGpid2() != null && toCheck.getGpid2().equals(recurringParentGid)){
     		Germplasm nextToCheck = null;
     		if(toCheck.getGpid1() != null){
     			nextToCheck = getGermplasmWithPrefName(toCheck.getGpid1());
