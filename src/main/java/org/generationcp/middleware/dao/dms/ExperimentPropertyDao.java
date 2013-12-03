@@ -212,9 +212,11 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 .append(" , fldName.value AS fieldName ")
                 .append(" , st.project_id AS studyId ")
                 .append(" , machRow.value AS machineRow ")
+                .append(" , geo.description AS trialInstance ")
                 .append(" FROM ")
                 .append("  nd_experimentprop uid ")
                 .append("  INNER JOIN nd_experiment e ON e.nd_experiment_id = uid.nd_experiment_id ")
+                .append("  INNER JOIN nd_geolocation geo ON geo.nd_geolocation_id = e.nd_geolocation_id ")
                 .append("  INNER JOIN nd_experiment_project eproj ON eproj.nd_experiment_id = uid.nd_experiment_id ")
                 .append("  INNER JOIN project p ON p.project_id = eproj.project_id ")
                 .append("  INNER JOIN project_relationship pr ON pr.subject_project_id = p.project_id ")
@@ -278,6 +280,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                         .addScalar("fieldName")
                         .addScalar("studyId")
                         .addScalar("machineRow")
+                        .addScalar("trialInstance")
                         ;
                 query.setParameter("geolocationId", geolocationId);
 
@@ -475,6 +478,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 trial.setColumnsInBlock(getIntegerValue(row[12]));
                 trial.setMachineRowCapacity(getIntegerValue(row[20]));
                 trial.setRowsPerPlot(getIntegerValue(row[15]));
+                trial.setTrialInstanceNo((String) row[21]);
                 Integer pOrder = getIntegerValue(row[14]);
                 if (pOrder != null) {
                     trial.setPlantingOrder(TermId.SERPENTINE.getId() == pOrder ? 2 : 1);
