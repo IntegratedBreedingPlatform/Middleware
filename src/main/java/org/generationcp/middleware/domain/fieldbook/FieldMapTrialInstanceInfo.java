@@ -88,6 +88,8 @@ public class FieldMapTrialInstanceInfo implements Serializable{
     /** The machine row capacity. */
     private Integer machineRowCapacity;
     
+    /** The order. */
+    private Integer order;
         
     /**
      * Instantiates a new field map trial instance info.
@@ -544,7 +546,6 @@ public class FieldMapTrialInstanceInfo implements Serializable{
     public String getLocationName() {
         return locationName;
     }
-
     
     /**
      * Sets the location name.
@@ -555,5 +556,21 @@ public class FieldMapTrialInstanceInfo implements Serializable{
         this.locationName = locationName;
     }
 
+    /**
+     * Gets the order.
+     *
+     * @return the order
+     */
+    public Integer getOrder() {
+        return order;
+    }
 
+    /**
+     * Sets the order.
+     *
+     * @param order the new order
+     */
+    public void setOrder(Integer order) {
+        this.order = order;
+    }
 }
