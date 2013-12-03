@@ -44,7 +44,6 @@ import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
-import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search.StudyResultSet;
@@ -1073,7 +1072,7 @@ public class TestStudyDataManagerImpl{
     @Test
     public void testGetFieldMapCountsOfNursery() throws MiddlewareQueryException {
         List<Integer> nurseryIdList = new ArrayList<Integer>();
-        nurseryIdList.add(new Integer(-52));  
+        nurseryIdList.add(new Integer(-173));  
         List<FieldMapInfo> fieldMapInfos = manager.getFieldMapInfoOfStudy(nurseryIdList, StudyType.N);
         for (FieldMapInfo fieldMapInfo : fieldMapInfos) {
             Debug.println(0, fieldMapInfo.getFieldbookName());
@@ -1109,7 +1108,8 @@ public class TestStudyDataManagerImpl{
                 break;
             }
         }*/
-        manager.saveOrUpdateFieldmapProperties(info.get(0));
+        //TODO
+        manager.saveOrUpdateFieldmapProperties(info, "");
     }
     
 }

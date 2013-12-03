@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.manager;
 
+import org.generationcp.middleware.domain.oms.TermId;
+
 /**
  * Used to specify the different seasons
  * 
@@ -45,5 +47,20 @@ public enum Season {
     
     public Integer getSortOrder(){
         return this.sortOrder;
+    }
+    
+    /**
+     * Returns the corresponding Season object based on the given string input
+     * @param seasonStr
+     * @return
+     */
+    public static Season getSeason(String seasonStr){
+        Season season = Season.GENERAL;
+        if (seasonStr != null && Integer.parseInt(seasonStr.trim()) == TermId.SEASON_DRY.getId()){
+            season = Season.DRY;
+        } else if (seasonStr != null && Integer.parseInt(seasonStr.trim()) == TermId.SEASON_WET.getId()){
+            season = Season.WET;
+        }
+        return season;
     }
 }

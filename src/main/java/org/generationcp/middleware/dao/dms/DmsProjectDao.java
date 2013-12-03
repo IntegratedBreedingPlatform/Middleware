@@ -596,7 +596,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
             .append("   LEFT JOIN nd_experiment_project ep ON p.project_id = ep.project_id ")
             .append("   INNER JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id ")
             .append("   LEFT JOIN nd_geolocationprop gpSeason ON e.nd_geolocation_id = gpSeason.nd_geolocation_id ")
-            .append("           AND gpSeason.type_id =  ").append("8371").append(" ") // 2452 
+            .append("           AND gpSeason.type_id =  ").append(TermId.SEASON_VAR.getId()).append(" ") // 8371 
             .append("WHERE NOT EXISTS (SELECT 1 FROM projectprop ppDeleted WHERE ppDeleted.type_id =  ").append(TermId.STUDY_STATUS.getId()).append(" ") // 8006
             .append("               AND ppDeleted.project_id = p.project_id AND ppDeleted.value =  ").append(TermId.DELETED_STUDY.getId()).append(") ") // 12990     
             ;
@@ -626,12 +626,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
                     	studyType = StudyType.T;
                     }
                     
-                    Season season = Season.GENERAL;
-                    if (seasonStr != null && Integer.parseInt(seasonStr.trim()) == TermId.SEASON_DRY.getId()){
-                    	season = Season.DRY;
-                    } else if (seasonStr != null && Integer.parseInt(seasonStr.trim()) == TermId.SEASON_WET.getId()){
-                    	season = Season.WET;
-                    }
+                    Season season = Season.getSeason(seasonStr); 
                     studyNodes.add(new StudyNode(id, name, description, startDate, studyType, season));
                     
                 }

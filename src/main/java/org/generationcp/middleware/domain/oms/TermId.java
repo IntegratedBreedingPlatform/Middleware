@@ -11,7 +11,6 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.oms;
 
-import org.generationcp.middleware.manager.Season;
 
 /**
  * The cvterm ID constants used in Middleware.
@@ -80,8 +79,9 @@ public enum TermId {
 	, BELONGS_TO_STUDY(1150) 
 	, IS_STUDY(1145)
 	
-	//Properties
+	//Season
 	, SEASON(2452)
+	, SEASON_VAR(8371) 
 	, SEASON_WET(10300)
 	, SEASON_DRY(10290)
 	

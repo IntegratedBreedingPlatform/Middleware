@@ -25,6 +25,7 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -98,10 +99,13 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 .append("cBlock.value AS columnsInBlock, pOrder.value AS plantingOrder, ")
                 .append("rpp.value AS rowsPerPlot, blkName.value AS blockName, ")
                 .append("locName.value AS locationName, fldName.value AS fieldName, ")
-                .append("inst.description AS trialInstance, st.name AS studyName ")
+                .append("inst.description AS trialInstance, st.name AS studyName, ")
+                .append("s.dbxref_id as gid, ppStartDate.value as startDate, gpSeason.value as season ")
                 .append("FROM nd_experiment_project eproj  ")
                 .append("   INNER JOIN project_relationship pr ON pr.object_project_id = :projectId AND pr.type_id = ").append(TermId.BELONGS_TO_STUDY.getId())
                 .append("   INNER JOIN project st ON st.project_id = pr.object_project_id ")
+                .append("       LEFT JOIN projectprop ppStartDate ON ppStartDate.project_id = pr.object_project_id ")
+                .append("               AND ppStartDate.type_id =  ").append(TermId.START_DATE.getId()).append(" ") //  8050 
                 .append("       INNER JOIN nd_experiment_stock es ON eproj.nd_experiment_id = es.nd_experiment_id  ")
                 .append("               AND eproj.project_id = pr.subject_project_id ")
                 .append("       INNER JOIN stock s ON es.stock_id = s.stock_id ")
@@ -136,6 +140,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 .append("               AND locName.type_id = ").append(TermId.SITE_NAME.getId())
                 .append("       LEFT JOIN nd_experimentprop fldName ON fldName.nd_experiment_id = eproj.nd_experiment_id ")
                 .append("               AND fldName.type_id = ").append(TermId.FIELD_NAME.getId())
+                .append("       LEFT JOIN nd_geolocationprop gpSeason ON geo.nd_geolocation_id = gpSeason.nd_geolocation_id ")
+                .append("               AND gpSeason.type_id =  ").append(TermId.SEASON_VAR.getId()).append(" ") //--  8371 (2452) 
                 .append(" ORDER BY eproj.nd_experiment_id ").append(order);
                         
             Query query = getSession().createSQLQuery(sql.toString())
@@ -159,6 +165,9 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                     .addScalar("fieldName")
                     .addScalar("trialInstance")
                     .addScalar("studyName")
+                    .addScalar("gid")
+                    .addScalar("startDate")
+                    .addScalar("season")
                     ;
             query.setParameter("projectId", projectId);
     
@@ -175,6 +184,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
         return datasets;
     }
     
+    @SuppressWarnings("unchecked")
     public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int geolocationId) throws MiddlewareQueryException {
         List<FieldMapInfo> fieldmaps = new ArrayList<FieldMapInfo>();
 
@@ -352,6 +362,9 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             String germplasmName = (String) row[6]; 
             String rep = (String) row[7];
             String plotNo = (String) row[8];
+            Integer gid = (Integer) row[20];
+            String startDate = (String) row[21];
+            String season = (String) row[22];
 
             FieldMapLabel label = new FieldMapLabel(experimentId 
                                 , (entryNumber == null ? null : Integer.parseInt(entryNumber))
@@ -365,6 +378,9 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 label.setRange(Integer.parseInt((String) row[10]));
             }
             label.setStudyName((String) row[19]);
+            label.setGid(gid);
+            label.setStartYear(startDate != null ? startDate.substring(0, 4) : null);
+            label.setSeason(Season.getSeason(season));
             labels.add(label);
             
             datasetId = (Integer) row[0];
