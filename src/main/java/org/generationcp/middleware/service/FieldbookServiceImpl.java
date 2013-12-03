@@ -62,9 +62,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     }
 
     @Override
-    public void saveOrUpdateFieldmapProperties(FieldMapInfo info) throws MiddlewareQueryException {
+    public void saveOrUpdateFieldmapProperties(List<FieldMapInfo> info, String fieldmapUUID) throws MiddlewareQueryException {
      
-        getStudyDataManager().saveOrUpdateFieldmapProperties(info);
+        getStudyDataManager().saveOrUpdateFieldmapProperties(info, fieldmapUUID);
     
     }
 

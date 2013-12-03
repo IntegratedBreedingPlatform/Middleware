@@ -73,17 +73,9 @@ public interface FieldbookService {
     /**
      * Save or update Field Map Properties like row, column, block, total rows, total columns, planting order.
      * 
-     * @param experimentId
-     * @param studyId
-     * @param row
-     * @param column
-     * @param block
-     * @param totalRows
-     * @param totalColumns
-     * @param plantingOrder
      * @throws MiddlewareQueryException
      */
-    void saveOrUpdateFieldmapProperties(FieldMapInfo info) throws MiddlewareQueryException;
+    void saveOrUpdateFieldmapProperties(List<FieldMapInfo> info, String fieldmapUUID) throws MiddlewareQueryException;
     
     
     /**

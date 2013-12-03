@@ -470,9 +470,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
     
     @Override
-    public void saveOrUpdateFieldmapProperties(FieldMapInfo info) throws MiddlewareQueryException {
+    public void saveOrUpdateFieldmapProperties(List<FieldMapInfo> info, String fieldmapUUID) throws MiddlewareQueryException {
         
-        if (info != null && !info.getDatasetsWithFieldMap().isEmpty()) {
+        if (info != null && !info.isEmpty()) {//&& !info.getDatasetsWithFieldMap().isEmpty()) {
             
             requireLocalDatabaseInstance();
             Session session = getCurrentSessionForLocal();
@@ -481,7 +481,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             try {
                 trans = session.beginTransaction();
                 
-                getExperimentPropertySaver().saveFieldmapProperties(info);
+                getExperimentPropertySaver().saveFieldmapProperties(info, fieldmapUUID);
                 
                 trans.commit();
     
