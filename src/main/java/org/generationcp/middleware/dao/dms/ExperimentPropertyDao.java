@@ -25,6 +25,7 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -97,9 +98,14 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 .append("row.value AS row, col.value AS col, rBlock.value AS rowsInBlock, ")
                 .append("cBlock.value AS columnsInBlock, pOrder.value AS plantingOrder, ")
                 .append("rpp.value AS rowsPerPlot, blkName.value AS blockName, ")
-                .append("locName.value AS locationName, fldName.value AS fieldName ")
+                .append("locName.value AS locationName, fldName.value AS fieldName, ")
+                .append("inst.description AS trialInstance, st.name AS studyName, ")
+                .append("s.dbxref_id as gid, ppStartDate.value as startDate, gpSeason.value as season ")
                 .append("FROM nd_experiment_project eproj  ")
                 .append("   INNER JOIN project_relationship pr ON pr.object_project_id = :projectId AND pr.type_id = ").append(TermId.BELONGS_TO_STUDY.getId())
+                .append("   INNER JOIN project st ON st.project_id = pr.object_project_id ")
+                .append("       LEFT JOIN projectprop ppStartDate ON ppStartDate.project_id = pr.object_project_id ")
+                .append("               AND ppStartDate.type_id =  ").append(TermId.START_DATE.getId()).append(" ") //  8050 
                 .append("       INNER JOIN nd_experiment_stock es ON eproj.nd_experiment_id = es.nd_experiment_id  ")
                 .append("               AND eproj.project_id = pr.subject_project_id ")
                 .append("       INNER JOIN stock s ON es.stock_id = s.stock_id ")
@@ -112,7 +118,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 .append("               AND epropPlot.value IS NOT NULL  AND epropPlot.value <> '' ")
                 .append("       INNER JOIN nd_experiment geo ON eproj.nd_experiment_id = geo.nd_experiment_id ")
                 .append("               AND geo.type_id = ").append(TermId.PLOT_EXPERIMENT.getId())
-                .append("       INNER JOIN nd_geolocationprop site ON geo.nd_geolocation_id = site.nd_geolocation_id ")
+                .append("       INNER JOIN nd_geolocation inst ON geo.nd_geolocation_id = inst.nd_geolocation_id ")
+                .append("       LEFT JOIN nd_geolocationprop site ON geo.nd_geolocation_id = site.nd_geolocation_id ")
                 .append("               AND site.type_id = ").append(TermId.TRIAL_LOCATION.getId())
                 .append("       INNER JOIN project proj on proj.project_id = eproj.project_id ")
                 .append("       LEFT JOIN nd_experimentprop row ON row.nd_experiment_id = eproj.nd_experiment_id ")
@@ -133,6 +140,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 .append("               AND locName.type_id = ").append(TermId.SITE_NAME.getId())
                 .append("       LEFT JOIN nd_experimentprop fldName ON fldName.nd_experiment_id = eproj.nd_experiment_id ")
                 .append("               AND fldName.type_id = ").append(TermId.FIELD_NAME.getId())
+                .append("       LEFT JOIN nd_geolocationprop gpSeason ON geo.nd_geolocation_id = gpSeason.nd_geolocation_id ")
+                .append("               AND gpSeason.type_id =  ").append(TermId.SEASON_VAR.getId()).append(" ") //--  8371 (2452) 
                 .append(" ORDER BY eproj.nd_experiment_id ").append(order);
                         
             Query query = getSession().createSQLQuery(sql.toString())
@@ -154,6 +163,11 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                     .addScalar("blockName")
                     .addScalar("locationName")
                     .addScalar("fieldName")
+                    .addScalar("trialInstance")
+                    .addScalar("studyName")
+                    .addScalar("gid")
+                    .addScalar("startDate")
+                    .addScalar("season")
                     ;
             query.setParameter("projectId", projectId);
     
@@ -170,6 +184,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
         return datasets;
     }
     
+    @SuppressWarnings("unchecked")
     public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int geolocationId) throws MiddlewareQueryException {
         List<FieldMapInfo> fieldmaps = new ArrayList<FieldMapInfo>();
 
@@ -196,9 +211,12 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 .append(" , locName.value AS locationName ")
                 .append(" , fldName.value AS fieldName ")
                 .append(" , st.project_id AS studyId ")
+                .append(" , machRow.value AS machineRow ")
+                .append(" , geo.description AS trialInstance ")
                 .append(" FROM ")
                 .append("  nd_experimentprop uid ")
                 .append("  INNER JOIN nd_experiment e ON e.nd_experiment_id = uid.nd_experiment_id ")
+                .append("  INNER JOIN nd_geolocation geo ON geo.nd_geolocation_id = e.nd_geolocation_id ")
                 .append("  INNER JOIN nd_experiment_project eproj ON eproj.nd_experiment_id = uid.nd_experiment_id ")
                 .append("  INNER JOIN project p ON p.project_id = eproj.project_id ")
                 .append("  INNER JOIN project_relationship pr ON pr.subject_project_id = p.project_id ")
@@ -211,7 +229,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 .append("  INNER JOIN nd_experimentprop epropPlot ON epropPlot.nd_experiment_id = uid.nd_experiment_id ")
                 .append("    AND epropPlot.type_id IN (").append(TermId.PLOT_NO.getId()).append(", ")
                             .append(TermId.PLOT_NNO.getId()).append(") ").append(" AND epropPlot.value <> '' ")
-                .append("  INNER JOIN nd_geolocationprop site ON site.nd_geolocation_id = e.nd_geolocation_id ")
+                .append("  LEFT JOIN nd_geolocationprop site ON site.nd_geolocation_id = e.nd_geolocation_id ")
                 .append("    AND site.type_id = ").append(TermId.TRIAL_LOCATION.getId())
                 .append("  LEFT JOIN nd_experimentprop row ON row.nd_experiment_id = uid.nd_experiment_id ")
                 .append("    AND row.type_id = ").append(TermId.COLUMN_NO.getId())
@@ -231,6 +249,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 .append("    AND locName.type_id = ").append(TermId.SITE_NAME.getId())
                 .append("  LEFT JOIN nd_experimentprop fldName ON fldName.nd_experiment_id = uid.nd_experiment_id ")
                 .append("     AND fldName.type_id = ").append(TermId.FIELD_NAME.getId())
+                .append("  LEFT JOIN nd_experimentprop machRow ON machRow.nd_experiment_id = uid.nd_experiment_id ")
+                .append("     AND machRow.type_id = ").append(TermId.MACHINE_ROW_CAPACITY.getId())
                 .append(" WHERE uid.value in (SELECT DISTINCT fmid.value ")
                 .append("    FROM nd_experiment e ")
                 .append("    INNER JOIN nd_experimentprop fmid ON fmid.type_id = 32785 AND fmid.nd_experiment_id = e.nd_experiment_id ")
@@ -259,6 +279,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                         .addScalar("locationName")
                         .addScalar("fieldName")
                         .addScalar("studyId")
+                        .addScalar("machineRow")
+                        .addScalar("trialInstance")
                         ;
                 query.setParameter("geolocationId", geolocationId);
 
@@ -286,6 +308,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
         Integer geolocationId = null;
         String datasetName = null;
         String siteName = null;
+        String trialInstanceNo = null;
         String blockName = null;
         String locationName = null;
         String fieldName = null;
@@ -303,6 +326,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 if (!geolocationId.equals((Integer)row[2]) || !datasetId.equals((Integer)row[0])) {
                     trialInstance.setGeolocationId(geolocationId);
                     trialInstance.setSiteName(siteName);
+                    trialInstance.setTrialInstanceNo(trialInstanceNo);
                     trialInstance.setBlockName(blockName);
                     trialInstance.setLocationName(locationName);
                     trialInstance.setFieldName(fieldName);
@@ -345,6 +369,9 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             String germplasmName = (String) row[6]; 
             String rep = (String) row[7];
             String plotNo = (String) row[8];
+            Integer gid = (Integer) row[20];
+            String startDate = (String) row[21];
+            String season = (String) row[22];
 
             FieldMapLabel label = new FieldMapLabel(experimentId 
                                 , (entryNumber == null ? null : Integer.parseInt(entryNumber))
@@ -357,12 +384,17 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             if (NumberUtils.isNumber((String) row[10])) {
                 label.setRange(Integer.parseInt((String) row[10]));
             }
+            label.setStudyName((String) row[19]);
+            label.setGid(gid);
+            label.setStartYear(startDate != null ? startDate.substring(0, 4) : null);
+            label.setSeason(Season.getSeason(season));
             labels.add(label);
             
             datasetId = (Integer) row[0];
             datasetName = (String) row[1];
             geolocationId = (Integer) row[2];
             siteName = (String) row[3];
+            trialInstanceNo = (String) row[18];
             blockName = (String) row[15];
             locationName = (String) row[16];
             fieldName = (String) row[17];
@@ -388,6 +420,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
         //add last trial instance and dataset
         trialInstance.setGeolocationId(geolocationId);
         trialInstance.setSiteName(siteName);
+        trialInstance.setTrialInstanceNo(trialInstanceNo);
         trialInstance.setBlockName(blockName);
         trialInstance.setLocationName(locationName);
         trialInstance.setFieldName(fieldName);
@@ -441,6 +474,18 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 trial = new FieldMapTrialInstanceInfo();
                 trial.setGeolocationId((Integer) row[3]);
                 trial.setSiteName((String) row[4]);
+                trial.setRangesInBlock(getIntegerValue(row[13]));
+                trial.setColumnsInBlock(getIntegerValue(row[12]));
+                trial.setMachineRowCapacity(getIntegerValue(row[20]));
+                trial.setRowsPerPlot(getIntegerValue(row[15]));
+                trial.setTrialInstanceNo((String) row[21]);
+                Integer pOrder = getIntegerValue(row[14]);
+                if (pOrder != null) {
+                    trial.setPlantingOrder(TermId.SERPENTINE.getId() == pOrder ? 2 : 1);
+                }
+                trial.setBlockName((String) row[16]);
+                trial.setFieldName((String) row[18]);
+                trial.setLocationName((String) row[17]);
                 trialMap.put(trial.getGeolocationId(), trial);
 
                 FieldMapDatasetInfo dataset = datasetMap.get((Integer) row[0]);
@@ -474,9 +519,6 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 trial.setFieldMapLabels(new ArrayList<FieldMapLabel>());
             }
             trial.getFieldMapLabels().add(label);
-            
-            
-            //labels.add(label);
         }
         
         Set<Integer> keys = infoMap.keySet();
@@ -484,7 +526,6 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             infos.add(infoMap.get(key));
         }
         return infos;
-        //return labels;
     }
     
     private Integer getIntegerValue(Object obj) {

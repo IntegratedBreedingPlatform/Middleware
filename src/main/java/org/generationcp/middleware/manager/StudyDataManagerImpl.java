@@ -32,8 +32,10 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
+import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search.StudyResultSet;
@@ -50,6 +52,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.util.Debug;
 import org.generationcp.middleware.util.PlotUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -60,6 +63,8 @@ import org.slf4j.LoggerFactory;
 
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
     
+    private GermplasmDataManagerImpl germplasmDataManager;
+    
     private static final Logger LOG = LoggerFactory.getLogger(StudyDataManagerImpl.class);
 
     public StudyDataManagerImpl() {
@@ -68,10 +73,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     public StudyDataManagerImpl(HibernateSessionProvider sessionProviderForLocal,
                                 HibernateSessionProvider sessionProviderForCentral) {
         super(sessionProviderForLocal, sessionProviderForCentral);
+        germplasmDataManager = new GermplasmDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+
     }
 
     public StudyDataManagerImpl(Session sessionForLocal, Session sessionForCentral) {
         super(sessionForLocal, sessionForCentral);
+        germplasmDataManager = new GermplasmDataManagerImpl(sessionForLocal, sessionForLocal);
     }
 
     @Override
@@ -463,16 +471,38 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             	fieldMapInfo.setTrial(false);
             }
             
-            fieldMapInfo.setDatasets(getExperimentPropertyDao().getFieldMapLabels(studyId));
+            List<FieldMapDatasetInfo> fieldMapDatasetInfos = 
+                        getExperimentPropertyDao().getFieldMapLabels(studyId);            
+            fieldMapInfo.setDatasets(fieldMapDatasetInfos);
+            
+            // Set pedigree
+            if (fieldMapDatasetInfos != null){
+                for (FieldMapDatasetInfo fieldMapDatasetInfo : fieldMapDatasetInfos){
+                    List<FieldMapTrialInstanceInfo> trialInstances = 
+                            fieldMapDatasetInfo.getTrialInstances();
+                    if (trialInstances != null && trialInstances.size()>0){
+                        for (FieldMapTrialInstanceInfo trialInstance : trialInstances){
+                            List<FieldMapLabel> labels = trialInstance.getFieldMapLabels();
+                            for (FieldMapLabel label : labels){
+                                Debug.println(3, "========= GID=" + label.getGid() + ", Pedigree=" 
+                                        + germplasmDataManager.getCrossExpansion(label.getGid(), 1));
+                                label.setPedigree(
+                                        germplasmDataManager.getCrossExpansion(label.getGid(), 1));
+                            }
+                        }
+                    }
+                }
+            }            
+            
             fieldMapInfos.add(fieldMapInfo);
         }
         return fieldMapInfos;
     }
     
     @Override
-    public void saveOrUpdateFieldmapProperties(FieldMapInfo info) throws MiddlewareQueryException {
+    public void saveOrUpdateFieldmapProperties(List<FieldMapInfo> info, String fieldmapUUID) throws MiddlewareQueryException {
         
-        if (info != null && !info.getDatasetsWithFieldMap().isEmpty()) {
+        if (info != null && !info.isEmpty()) {//&& !info.getDatasetsWithFieldMap().isEmpty()) {
             
             requireLocalDatabaseInstance();
             Session session = getCurrentSessionForLocal();
@@ -481,7 +511,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             try {
                 trans = session.beginTransaction();
                 
-                getExperimentPropertySaver().saveFieldmapProperties(info);
+                getExperimentPropertySaver().saveFieldmapProperties(info, fieldmapUUID);
                 
                 trans.commit();
     

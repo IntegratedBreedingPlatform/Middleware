@@ -133,7 +133,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 			if (valueId != 0) {
 				SQLQuery query = getSession().createSQLQuery("select count(distinct p.project_id) " +
 			                                                 "from nd_geolocationprop gp, nd_experiment e, nd_experiment_project ep, project_relationship pr, project p " +
-						                                     "where gp.type_id = 8371 " +
+						                                     "where gp.type_id = "+ TermId.SEASON_VAR.getId() + " " +
 						                                     "  and gp.value = '" + valueId + "'" +
 						                                     "  and gp.nd_geolocation_id = e.nd_geolocation_id " +
 						                                     "  and ((e.nd_experiment_id = ep.nd_experiment_id " + 
@@ -169,7 +169,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 			if (valueId != 0) {
 				SQLQuery query = getSession().createSQLQuery("select distinct p.project_id, p.name, p.description " +
 	                                                         "from nd_geolocationprop gp, nd_experiment e, nd_experiment_project ep, project_relationship pr, project p " +
-	                                                         "where gp.type_id = 8371 " +
+	                                                         "where gp.type_id = "+ TermId.SEASON_VAR.getId() + " " +
 	                                                         "  and gp.value = '" + valueId + "'" +
 	                                                         "  and gp.nd_geolocation_id = e.nd_geolocation_id " +
 	                                                         "  and ((e.nd_experiment_id = ep.nd_experiment_id " + 

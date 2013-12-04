@@ -13,6 +13,7 @@ package org.generationcp.middleware.operation.saver;
 
 import java.util.List;
 
+import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
@@ -61,28 +62,33 @@ public class ExperimentPropertySaver extends Saver {
         return null;
     }
     
-    public void saveFieldmapProperties(FieldMapInfo info) throws MiddlewareQueryException {
-        FieldMapTrialInstanceInfo tInfo = info.getDatasets().get(0).getTrialInstances().get(0);
-        List<FieldMapLabel> labels = tInfo.getFieldMapLabels();
-        
-        for (FieldMapLabel label : labels) {
-            //only save if entry was assigned a plot
-            if (label.getColumn() != null && label.getRange() != null) {
-                ExperimentModel experiment = getExperimentBuilder().getExperimentModel(label.getExperimentId());
-                saveOrUpdateProperty(experiment, TermId.COLUMN_NO, String.valueOf(label.getColumn()));
-                saveOrUpdateProperty(experiment, TermId.RANGE_NO, String.valueOf(label.getRange()));
-                saveOrUpdateProperty(experiment, TermId.BLOCK_NAME, tInfo.getBlockName());
-                saveOrUpdateProperty(experiment, TermId.COLUMNS_IN_BLOCK, String.valueOf(tInfo.getColumnsInBlock()));
-                saveOrUpdateProperty(experiment, TermId.RANGES_IN_BLOCK, String.valueOf(tInfo.getRangesInBlock()));
-                int plantingOrder = tInfo.getPlantingOrder() != null && tInfo.getPlantingOrder().equals(2) 
-                        ? TermId.SERPENTINE.getId() : TermId.ROW_COLUMN.getId();
-                saveOrUpdateProperty(experiment, TermId.PLANTING_ORDER, String.valueOf(plantingOrder));
-                saveOrUpdateProperty(experiment, TermId.ROWS_PER_PLOT, String.valueOf(tInfo.getRowsPerPlot()));
-                saveOrUpdateProperty(experiment, TermId.SITE_NAME, tInfo.getLocationName());
-                saveOrUpdateProperty(experiment, TermId.FIELD_NAME, tInfo.getFieldName());
-                saveOrUpdateProperty(experiment, TermId.FIELDMAP_UUID, tInfo.getFieldmapUUID());
-                if (tInfo.getMachineRowCapacity() != null) {
-                    saveOrUpdateProperty(experiment, TermId.MACHINE_ROW_CAPACITY, String.valueOf(tInfo.getMachineRowCapacity()));
+    public void saveFieldmapProperties(List<FieldMapInfo> infos, String fieldmapUUID) throws MiddlewareQueryException {
+        for (FieldMapInfo info : infos) {
+            for (FieldMapDatasetInfo dataset : info.getDatasets()) {
+                for (FieldMapTrialInstanceInfo tInfo : dataset.getTrialInstances()) {
+                    if (tInfo.getFieldMapLabels() != null) {
+                        for (FieldMapLabel label : tInfo.getFieldMapLabels()) {
+                            //only save if entry was assigned a plot
+                            if (label.getColumn() != null && label.getRange() != null) {
+                                ExperimentModel experiment = getExperimentBuilder().getExperimentModel(label.getExperimentId());
+                                saveOrUpdateProperty(experiment, TermId.COLUMN_NO, String.valueOf(label.getColumn()));
+                                saveOrUpdateProperty(experiment, TermId.RANGE_NO, String.valueOf(label.getRange()));
+                                saveOrUpdateProperty(experiment, TermId.BLOCK_NAME, tInfo.getBlockName());
+                                saveOrUpdateProperty(experiment, TermId.COLUMNS_IN_BLOCK, String.valueOf(tInfo.getColumnsInBlock()));
+                                saveOrUpdateProperty(experiment, TermId.RANGES_IN_BLOCK, String.valueOf(tInfo.getRangesInBlock()));
+                                int plantingOrder = tInfo.getPlantingOrder() != null && tInfo.getPlantingOrder().equals(2) 
+                                        ? TermId.SERPENTINE.getId() : TermId.ROW_COLUMN.getId();
+                                saveOrUpdateProperty(experiment, TermId.PLANTING_ORDER, String.valueOf(plantingOrder));
+                                saveOrUpdateProperty(experiment, TermId.ROWS_PER_PLOT, String.valueOf(tInfo.getRowsPerPlot()));
+                                saveOrUpdateProperty(experiment, TermId.SITE_NAME, tInfo.getLocationName());
+                                saveOrUpdateProperty(experiment, TermId.FIELD_NAME, tInfo.getFieldName());
+                                saveOrUpdateProperty(experiment, TermId.FIELDMAP_UUID, fieldmapUUID);
+                                if (tInfo.getMachineRowCapacity() != null) {
+                                    saveOrUpdateProperty(experiment, TermId.MACHINE_ROW_CAPACITY, String.valueOf(tInfo.getMachineRowCapacity()));
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

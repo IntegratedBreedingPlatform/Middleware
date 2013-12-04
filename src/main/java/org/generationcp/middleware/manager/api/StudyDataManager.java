@@ -33,7 +33,6 @@ import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
-import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
@@ -438,17 +437,9 @@ public interface StudyDataManager{
     /**
      * Save or Update Field Map Properties like row, column, block, total rows, total columns, planting order.
      * 
-     * @param experimentId
-     * @param studyId
-     * @param row
-     * @param column
-     * @param block
-     * @param totalRows
-     * @param totalColumns
-     * @param plantingOrder
      * @throws MiddlewareQueryException
      */
-    void saveOrUpdateFieldmapProperties(FieldMapInfo info) throws MiddlewareQueryException;
+    void saveOrUpdateFieldmapProperties(List<FieldMapInfo> info, String fieldmapUUID) throws MiddlewareQueryException;
     
     /**
      * Save Project Properties of the Project
