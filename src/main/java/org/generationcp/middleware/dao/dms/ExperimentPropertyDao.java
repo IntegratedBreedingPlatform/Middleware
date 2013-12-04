@@ -211,9 +211,12 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 .append(" , locName.value AS locationName ")
                 .append(" , fldName.value AS fieldName ")
                 .append(" , st.project_id AS studyId ")
+                .append(" , machRow.value AS machineRow ")
+                .append(" , geo.description AS trialInstance ")
                 .append(" FROM ")
                 .append("  nd_experimentprop uid ")
                 .append("  INNER JOIN nd_experiment e ON e.nd_experiment_id = uid.nd_experiment_id ")
+                .append("  INNER JOIN nd_geolocation geo ON geo.nd_geolocation_id = e.nd_geolocation_id ")
                 .append("  INNER JOIN nd_experiment_project eproj ON eproj.nd_experiment_id = uid.nd_experiment_id ")
                 .append("  INNER JOIN project p ON p.project_id = eproj.project_id ")
                 .append("  INNER JOIN project_relationship pr ON pr.subject_project_id = p.project_id ")
@@ -246,6 +249,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 .append("    AND locName.type_id = ").append(TermId.SITE_NAME.getId())
                 .append("  LEFT JOIN nd_experimentprop fldName ON fldName.nd_experiment_id = uid.nd_experiment_id ")
                 .append("     AND fldName.type_id = ").append(TermId.FIELD_NAME.getId())
+                .append("  LEFT JOIN nd_experimentprop machRow ON machRow.nd_experiment_id = uid.nd_experiment_id ")
+                .append("     AND machRow.type_id = ").append(TermId.MACHINE_ROW_CAPACITY.getId())
                 .append(" WHERE uid.value in (SELECT DISTINCT fmid.value ")
                 .append("    FROM nd_experiment e ")
                 .append("    INNER JOIN nd_experimentprop fmid ON fmid.type_id = 32785 AND fmid.nd_experiment_id = e.nd_experiment_id ")
@@ -274,6 +279,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                         .addScalar("locationName")
                         .addScalar("fieldName")
                         .addScalar("studyId")
+                        .addScalar("machineRow")
+                        .addScalar("trialInstance")
                         ;
                 query.setParameter("geolocationId", geolocationId);
 
@@ -467,6 +474,18 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 trial = new FieldMapTrialInstanceInfo();
                 trial.setGeolocationId((Integer) row[3]);
                 trial.setSiteName((String) row[4]);
+                trial.setRangesInBlock(getIntegerValue(row[13]));
+                trial.setColumnsInBlock(getIntegerValue(row[12]));
+                trial.setMachineRowCapacity(getIntegerValue(row[20]));
+                trial.setRowsPerPlot(getIntegerValue(row[15]));
+                trial.setTrialInstanceNo((String) row[21]);
+                Integer pOrder = getIntegerValue(row[14]);
+                if (pOrder != null) {
+                    trial.setPlantingOrder(TermId.SERPENTINE.getId() == pOrder ? 2 : 1);
+                }
+                trial.setBlockName((String) row[16]);
+                trial.setFieldName((String) row[18]);
+                trial.setLocationName((String) row[17]);
                 trialMap.put(trial.getGeolocationId(), trial);
 
                 FieldMapDatasetInfo dataset = datasetMap.get((Integer) row[0]);
@@ -500,9 +519,6 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 trial.setFieldMapLabels(new ArrayList<FieldMapLabel>());
             }
             trial.getFieldMapLabels().add(label);
-            
-            
-            //labels.add(label);
         }
         
         Set<Integer> keys = infoMap.keySet();
@@ -510,7 +526,6 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             infos.add(infoMap.get(key));
         }
         return infos;
-        //return labels;
     }
     
     private Integer getIntegerValue(Object obj) {
