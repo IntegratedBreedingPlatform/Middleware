@@ -62,7 +62,7 @@ public class AlleleValues implements Serializable{
                 "gdms_allele_values.gid, " +
                 "CONCAT(gdms_allele_values.allele_bin_value, ''), " +
                 "CONCAT(gdms_marker.marker_name, ''), " +
-                "gdms_allele_values.peak_height" +
+                "gdms_allele_values.peak_height " +
             "FROM gdms_allele_values, " +
                 "gdms_marker " +
             "WHERE gdms_allele_values.marker_id = gdms_marker.marker_id " +

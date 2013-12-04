@@ -484,8 +484,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
                         for (FieldMapTrialInstanceInfo trialInstance : trialInstances){
                             List<FieldMapLabel> labels = trialInstance.getFieldMapLabels();
                             for (FieldMapLabel label : labels){
-                                Debug.println(3, "========= GID=" + label.getGid() + ", Pedigree=" 
-                                        + germplasmDataManager.getCrossExpansion(label.getGid(), 1));
                                 label.setPedigree(
                                         germplasmDataManager.getCrossExpansion(label.getGid(), 1));
                             }

@@ -285,6 +285,7 @@ public class TestGenotypicDataManagerImpl{
         markerNames.add("1_0013");
         markerNames.add("1_0025");
         markerNames.add("1_0031");
+        
         List<Integer> gids = new ArrayList<Integer>();
         gids.add(-5276);
         gids.add(-5287);
@@ -294,10 +295,23 @@ public class TestGenotypicDataManagerImpl{
         gids.add(-6785);
         gids.add(-3785);
         gids.add(-3786);
+
         /* Results will vary depending on the database connected to.
          * As of the moment, we have no data that contains test values in all 3 source tables */
         List<AllelicValueElement> allelicValues = manager.getAllelicValuesByGidsAndMarkerNames(gids, markerNames);
         Debug.println(0, "testGetAllelicValuesByGidsAndMarkerNames(" + gids + ", " + markerNames + ") RESULTS: " + allelicValues);
+    }
+    
+
+    @Test
+    public void testGetAllelicValuesByGidsAndMarkerNamesForGDMS() throws Exception {
+        List<String> markerNames = Arrays.asList("IPAHM117", "IPAHM130");
+        List<Integer> gids = Arrays.asList(7, 956);
+
+        /* Results will vary depending on the database connected to.
+         * As of the moment, we have no data that contains test values in all 3 source tables */
+        List<AllelicValueElement> allelicValues = manager.getAllelicValuesByGidsAndMarkerNames(gids, markerNames);
+        Debug.println(0, "testGetAllelicValuesByGidsAndMarkerNamesForGDMS(" + gids + ", " + markerNames + ") RESULTS: " + allelicValues);
     }
 
     @Test
