@@ -758,11 +758,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             }
         }
 
-        if (pos != null && setWorkingDatabase(Database.CENTRAL)) {
+        if (pos != null && setWorkingDatabase(Database.CENTRAL) && pos.size()>0) {
             results.addAll(getLocationDao().getLocationByIds(pos));
         }
 
-        if (negs != null && setWorkingDatabase(Database.LOCAL)) {
+        if (negs != null && setWorkingDatabase(Database.LOCAL) && negs.size()>0) {
            results.addAll(getLocationDao().getLocationByIds(negs));
         }
         return results;
