@@ -71,6 +71,8 @@ public class FieldMapLabel implements Serializable{
     /** The start year. */
     private String startYear;
 
+    /* The direct ancestor (parent) of the gid */
+    private String pedigree;
 
     
     /**
@@ -376,6 +378,14 @@ public class FieldMapLabel implements Serializable{
         this.siteName = siteName;
     }
 
+    public String getPedigree() {
+        return pedigree;
+    }
+
+    public void setPedigree(String pedigree) {
+        this.pedigree = pedigree;
+    }
+
     /* (non-Javadoc)
      * @see java.lang.Object#toString()
      */
@@ -410,6 +420,8 @@ public class FieldMapLabel implements Serializable{
         builder.append(season);
         builder.append(", startYear=");
         builder.append(startYear);
+        builder.append(", pedigree=");
+        builder.append(pedigree);
         builder.append("]");
         return builder.toString();
     }
@@ -436,5 +448,7 @@ public class FieldMapLabel implements Serializable{
         Debug.println(indent, "GID = " + gid);
         Debug.println(indent, "Season = " + season);
         Debug.println(indent, "Start Year = " + startYear);
+        Debug.println(indent, "Pedigree = " + pedigree);
     }
+
 }

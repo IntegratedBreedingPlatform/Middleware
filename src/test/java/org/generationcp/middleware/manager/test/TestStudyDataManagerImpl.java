@@ -1060,11 +1060,13 @@ public class TestStudyDataManagerImpl{
     @Test
     public void testGetFieldMapCountsOfTrial() throws MiddlewareQueryException{
         List<Integer> trialIdList = new ArrayList<Integer>();
-        trialIdList.add(new Integer(-52));  
+        trialIdList.addAll(Arrays.asList(Integer.valueOf(-4)));  
         List<FieldMapInfo> fieldMapInfos = manager.getFieldMapInfoOfStudy(trialIdList, StudyType.T);
         for (FieldMapInfo fieldMapInfo : fieldMapInfos) {
             Debug.println(0, fieldMapInfo.getFieldbookName());
-            Debug.println(0, fieldMapInfo.getDatasets().toString());
+            if (fieldMapInfo.getDatasets() != null){
+                Debug.println(0, fieldMapInfo.getDatasets().toString());
+            }
         }
         //assertTrue(fieldMapCount.getEntryCount() > 0);
     }
@@ -1072,11 +1074,13 @@ public class TestStudyDataManagerImpl{
     @Test
     public void testGetFieldMapCountsOfNursery() throws MiddlewareQueryException {
         List<Integer> nurseryIdList = new ArrayList<Integer>();
-        nurseryIdList.add(new Integer(-173));  
+        nurseryIdList.addAll(Arrays.asList(Integer.valueOf(-1)));  
         List<FieldMapInfo> fieldMapInfos = manager.getFieldMapInfoOfStudy(nurseryIdList, StudyType.N);
         for (FieldMapInfo fieldMapInfo : fieldMapInfos) {
             Debug.println(0, fieldMapInfo.getFieldbookName());
-            Debug.println(0, fieldMapInfo.getDatasets().toString());
+            if (fieldMapInfo.getDatasets() != null){
+                Debug.println(0, fieldMapInfo.getDatasets().toString());
+            }
         }
         //assertTrue(fieldMapCount.getEntryCount() > 0);
     }
