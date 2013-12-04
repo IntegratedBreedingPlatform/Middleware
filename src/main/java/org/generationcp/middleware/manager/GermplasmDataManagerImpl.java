@@ -1594,6 +1594,22 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                         		cross.setSecondParent(secondParentElem);
                         		cross.setNumberOfCrossesBefore(0);
                         	}
+                        } else if (methodName.contains("cross")){
+                        	Germplasm firstParent = getGermplasmWithPrefName(germplasmToExpand.getGpid1());
+                        	Germplasm secondParent = getGermplasmWithPrefName(germplasmToExpand.getGpid2());
+                        	
+                        	SingleGermplasmCrossElement firstParentElem = new SingleGermplasmCrossElement();
+                    		firstParentElem.setGermplasm(firstParent);
+                    		SingleGermplasmCrossElement secondParentElem = new SingleGermplasmCrossElement();
+                    		secondParentElem.setGermplasm(secondParent);
+                    		
+                    		cross.setFirstParent(firstParentElem);
+                    		cross.setSecondParent(secondParentElem);
+                    		cross.setNumberOfCrossesBefore(0);
+                        } else{
+                        	SingleGermplasmCrossElement crossElement = new SingleGermplasmCrossElement();
+                        	crossElement.setGermplasm(germplasmToExpand);
+                        	return crossElement;
                         }
 
                         return cross;
