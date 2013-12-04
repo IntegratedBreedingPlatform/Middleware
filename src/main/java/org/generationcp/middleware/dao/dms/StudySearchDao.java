@@ -22,7 +22,6 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.util.PlotUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 
@@ -40,7 +39,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 			SQLQuery query = getSession().createSQLQuery("select count(distinct p.project_id) " +
 		                                                 "from project p " + 
 					                                     "where p.name = '" + name + "'" +
-					                                     "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId() +
+					                                     "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = " + TermId.STUDY_STATUS.getId() +
 					                         			 "  AND pp.project_id = p.project_id AND pp.value = " +
 					                         			 "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) ");
 					                                  
@@ -127,27 +126,46 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 	public long countStudiesBySeason(Season season) throws MiddlewareQueryException {
 		try {
 			int valueId = 0;
-			if (season == Season.DRY) valueId = 10290;
-			else if (season == Season.WET) valueId = 10300;
+			if (season == Season.DRY) valueId = TermId.SEASON_DRY.getId();
+			else if (season == Season.WET) valueId = TermId.SEASON_WET.getId();
 			
 			if (valueId != 0) {
-				SQLQuery query = getSession().createSQLQuery("select count(distinct p.project_id) " +
-			                                                 "from nd_geolocationprop gp, nd_experiment e, nd_experiment_project ep, project_relationship pr, project p " +
-						                                     "where gp.type_id = "+ TermId.SEASON_VAR.getId() + " " +
-						                                     "  and gp.value = '" + valueId + "'" +
-						                                     "  and gp.nd_geolocation_id = e.nd_geolocation_id " +
-						                                     "  and ((e.nd_experiment_id = ep.nd_experiment_id " + 
-						                                     "          and e.type_id = " + TermId.STUDY_EXPERIMENT.getId() + 
-						                                     "          and ep.project_id = p.project_id) " + 
-						                                     "       or " +
-						                                     "       (e.nd_experiment_id = ep.nd_experiment_id" +
-						                                     "          and e.type_id in " + PlotUtil.getSqlTypeIds() + 
-						                                     "          and ep.project_id = pr.subject_project_id" +
-						                                     "          and pr.object_project_id = p.project_id))"+
-						                                     "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId() +
-						                         			 "  AND pp.project_id = p.project_id AND pp.value = " +
-						                         			 "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) ");
-				
+//				SQLQuery query = getSession().createSQLQuery("select count(distinct p.project_id) " +
+//			                                                 "from nd_geolocationprop gp, nd_experiment e, nd_experiment_project ep, project_relationship pr, project p " +
+//						                                     "where gp.type_id = 8371 " +
+//						                                     "  and gp.value = '" + valueId + "'" +
+//						                                     "  and gp.nd_geolocation_id = e.nd_geolocation_id " +
+//						                                     "  and ((e.nd_experiment_id = ep.nd_experiment_id " + 
+//						                                     "          and e.type_id = " + TermId.STUDY_EXPERIMENT.getId() + 
+//						                                     "          and ep.project_id = p.project_id) " + 
+//						                                     "       or " +
+//						                                     "       (e.nd_experiment_id = ep.nd_experiment_id" +
+//						                                     "          and e.type_id in " + PlotUtil.getSqlTypeIds() + 
+//						                                     "          and ep.project_id = pr.subject_project_id" +
+//						                                     "          and pr.object_project_id = p.project_id))"+
+//						                                     "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId() +
+//						                         			 "  AND pp.project_id = p.project_id AND pp.value = " +
+//						                         			 "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) ");
+				SQLQuery query = getSession().createSQLQuery(
+						"SELECT COUNT(DISTINCT p.project_id)" +
+						" FROM project p " +
+						" INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  " + TermId.BELONGS_TO_STUDY.getId() +
+						" INNER JOIN nd_experiment_project ep " +
+						" INNER JOIN nd_experiment e ON e.nd_experiment_id = ep.nd_experiment_id " +
+						" INNER JOIN nd_geolocationprop gp on gp.nd_geolocation_id = e.nd_geolocation_id AND gp.type_id = " + TermId.SEASON_VAR.getId() +
+						" WHERE (ep.project_id = p.project_id OR ep.project_id = pr.subject_project_id) " +
+						"   AND  gp.value = '" + valueId + "'" +
+						"   AND e.nd_experiment_id = " +
+						" 	  (  " +
+						"		SELECT MIN(nd_experiment_id) " +
+						"		  FROM nd_experiment min " +
+						"		 WHERE min.nd_geolocation_id = gp.nd_geolocation_id " +
+						"  	   )" +
+						"	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId() +
+	           			"   AND pp.project_id = p.project_id AND pp.value = " +
+	           			"  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) "
+				);
+
 				return ((BigInteger) query.uniqueResult()).longValue();
 			}
 			
@@ -167,22 +185,40 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 			else if (season == Season.WET) valueId = 10300;
 			
 			if (valueId != 0) {
-				SQLQuery query = getSession().createSQLQuery("select distinct p.project_id, p.name, p.description " +
-	                                                         "from nd_geolocationprop gp, nd_experiment e, nd_experiment_project ep, project_relationship pr, project p " +
-	                                                         "where gp.type_id = "+ TermId.SEASON_VAR.getId() + " " +
-	                                                         "  and gp.value = '" + valueId + "'" +
-	                                                         "  and gp.nd_geolocation_id = e.nd_geolocation_id " +
-	                                                         "  and ((e.nd_experiment_id = ep.nd_experiment_id " + 
-	                                                         "          and e.type_id = " + TermId.STUDY_EXPERIMENT.getId() + 
-	                                                         "          and ep.project_id = p.project_id) or " +
-	                                                         "       (e.nd_experiment_id = ep.nd_experiment_id" +
-	                                                         "          and e.type_id in " + PlotUtil.getSqlTypeIds() + 
-	                                                         "          and ep.project_id = pr.subject_project_id" +
-	                                                         "          and pr.object_project_id = p.project_id))"+
-						                                     "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId() +
-						                         			 "  AND pp.project_id = p.project_id AND pp.value = " +
-						                         			 "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) ");
-						                                  
+//				SQLQuery query = getSession().createSQLQuery("select distinct p.project_id, p.name, p.description " +
+//	                                                         "from nd_geolocationprop gp, nd_experiment e, nd_experiment_project ep, project_relationship pr, project p " +
+//	                                                         "where gp.type_id = 8371 " +
+//	                                                         "  and gp.value = '" + valueId + "'" +
+//	                                                         "  and gp.nd_geolocation_id = e.nd_geolocation_id " +
+//	                                                         "  and ((e.nd_experiment_id = ep.nd_experiment_id " + 
+//	                                                         "          and e.type_id = " + TermId.STUDY_EXPERIMENT.getId() + 
+//	                                                         "          and ep.project_id = p.project_id) or " +
+//	                                                         "       (e.nd_experiment_id = ep.nd_experiment_id" +
+//	                                                         "          and e.type_id in " + PlotUtil.getSqlTypeIds() + 
+//	                                                         "          and ep.project_id = pr.subject_project_id" +
+//	                                                         "          and pr.object_project_id = p.project_id))"+
+//						                                     "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId() +
+//						                         			 "  AND pp.project_id = p.project_id AND pp.value = " +
+//						                         			 "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) ");
+			SQLQuery query = getSession().createSQLQuery(
+					"SELECT DISTINCT p.project_id, p.name, p.description" +
+					" FROM project p " +
+					" INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  " + TermId.BELONGS_TO_STUDY.getId() +
+					" INNER JOIN nd_experiment_project ep " +
+					" INNER JOIN nd_experiment e ON e.nd_experiment_id = ep.nd_experiment_id " +
+					" INNER JOIN nd_geolocationprop gp on gp.nd_geolocation_id = e.nd_geolocation_id AND gp.type_id = " + TermId.SEASON_VAR.getId() +
+					" WHERE (ep.project_id = p.project_id OR ep.project_id = pr.subject_project_id) " +
+					"   AND  gp.value = '" + valueId + "'" +
+					"   AND e.nd_experiment_id = " +
+					" 	  (  " +
+					"		SELECT MIN(nd_experiment_id) " +
+					"		  FROM nd_experiment min " +
+					"		 WHERE min.nd_geolocation_id = gp.nd_geolocation_id " +
+					"  	   )" +
+					"	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId() +
+           			"   AND pp.project_id = p.project_id AND pp.value = " +
+           			"  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) "
+			);
 				query.setFirstResult(start);
 				query.setMaxResults(numOfRows);
 				
@@ -202,23 +238,41 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 	
 	public long countStudiesByLocationIds(List<Integer> locationIds) throws MiddlewareQueryException {
 		try {
-			SQLQuery query = getSession().createSQLQuery("select count(distinct p.project_id) " +
-		                                                 "from nd_geolocationprop gp, nd_experiment e, nd_experiment_project ep, project_relationship pr, project p " +
-					                                     "where gp.type_id = 8190 " +
-					                                     "  and gp.value in (" + stringify(locationIds) + ")" +
-					                                     "  and gp.nd_geolocation_id = e.nd_geolocation_id " +
-					                                     "  and ((e.nd_experiment_id = ep.nd_experiment_id " + 
-					                                     "          and e.type_id = " + TermId.STUDY_EXPERIMENT.getId() + 
-					                                     "          and ep.project_id = p.project_id) " + 
-					                                     "       or " +
-					                                     "       (e.nd_experiment_id = ep.nd_experiment_id" +
-					                                     "          and e.type_id in " + PlotUtil.getSqlTypeIds() + 
-					                                     "          and ep.project_id = pr.subject_project_id" +
-					                                     "          and pr.object_project_id = p.project_id))"+
-					                                     "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId() +
-					                         			 "  AND pp.project_id = p.project_id AND pp.value = " +
-					                         			 "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) ");
-			
+//			SQLQuery query = getSession().createSQLQuery("select count(distinct p.project_id) " +
+//		                                                 "from nd_geolocationprop gp, nd_experiment e, nd_experiment_project ep, project_relationship pr, project p " +
+//					                                     "where gp.type_id = 8190 " +
+//					                                     "  and gp.value in (" + stringify(locationIds) + ")" +
+//					                                     "  and gp.nd_geolocation_id = e.nd_geolocation_id " +
+//					                                     "  and ((e.nd_experiment_id = ep.nd_experiment_id " + 
+//					                                     "          and e.type_id = " + TermId.STUDY_EXPERIMENT.getId() + 
+//					                                     "          and ep.project_id = p.project_id) " + 
+//					                                     "       or " +
+//					                                     "       (e.nd_experiment_id = ep.nd_experiment_id" +
+//					                                     "          and e.type_id in " + PlotUtil.getSqlTypeIds() + 
+//					                                     "          and ep.project_id = pr.subject_project_id" +
+//					                                     "          and pr.object_project_id = p.project_id))"+
+//					                                     "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId() +
+//					                         			 "  AND pp.project_id = p.project_id AND pp.value = " +
+//					                         			 "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) ");
+			SQLQuery query = getSession().createSQLQuery(
+					"SELECT COUNT(DISTINCT p.project_id)" +
+					" FROM project p " +
+					" INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  " + TermId.BELONGS_TO_STUDY.getId() +
+					" INNER JOIN nd_experiment_project ep " +
+					" INNER JOIN nd_experiment e ON e.nd_experiment_id = ep.nd_experiment_id " +
+					" INNER JOIN nd_geolocationprop gp on gp.nd_geolocation_id = e.nd_geolocation_id AND gp.type_id = " + TermId.LOCATION_ID.getId() +
+					" WHERE (ep.project_id = p.project_id OR ep.project_id = pr.subject_project_id) " +
+					"   AND  gp.value IN (" + stringify(locationIds) + ") " +
+					"   AND e.nd_experiment_id = " +
+					" 	  (  " +
+					"		SELECT MIN(nd_experiment_id) " +
+					"		  FROM nd_experiment min " +
+					"		 WHERE min.nd_geolocation_id = gp.nd_geolocation_id " +
+					"  	   )" +
+					"	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId() +
+           			"   AND pp.project_id = p.project_id AND pp.value = " +
+           			"  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) "
+			);
 			return ((BigInteger) query.uniqueResult()).longValue();
 			
 		} catch(HibernateException e) {
@@ -231,21 +285,40 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 	public List<StudyReference> getStudiesByLocationIds(List<Integer> locationIds, int start, int numOfRows) throws MiddlewareQueryException {
 		List<StudyReference> studyReferences = new ArrayList<StudyReference>();
 		try {
-			SQLQuery query = getSession().createSQLQuery("select distinct p.project_id, p.name, p.description " +
-                                                         "from nd_geolocationprop gp, nd_experiment e, nd_experiment_project ep, project_relationship pr, project p " +
-                                                         "where gp.type_id = 8190 " +
-                                                         "  and gp.value in (" + stringify(locationIds) + ")" +
-                                                         "  and gp.nd_geolocation_id = e.nd_geolocation_id " +
-                                                         "  and ((e.nd_experiment_id = ep.nd_experiment_id " + 
-                                                         "          and e.type_id = " + TermId.STUDY_EXPERIMENT.getId() + 
-                                                         "          and ep.project_id = p.project_id) or " +
-                                                         "       (e.nd_experiment_id = ep.nd_experiment_id" +
-                                                         "          and e.type_id in " + PlotUtil.getSqlTypeIds() + 
-                                                         "          and ep.project_id = pr.subject_project_id" +
-                                                         "          and pr.object_project_id = p.project_id))"+
-					                                     "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId() +
-					                         			 "  AND pp.project_id = p.project_id AND pp.value = " +
-					                         			 "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) ");
+//			SQLQuery query = getSession().createSQLQuery("select distinct p.project_id, p.name, p.description " +
+//                                                         "from nd_geolocationprop gp, nd_experiment e, nd_experiment_project ep, project_relationship pr, project p " +
+//                                                         "where gp.type_id = 8190 " +
+//                                                         "  and gp.value in (" + stringify(locationIds) + ")" +
+//                                                         "  and gp.nd_geolocation_id = e.nd_geolocation_id " +
+//                                                         "  and ((e.nd_experiment_id = ep.nd_experiment_id " + 
+//                                                         "          and e.type_id = " + TermId.STUDY_EXPERIMENT.getId() + 
+//                                                         "          and ep.project_id = p.project_id) or " +
+//                                                         "       (e.nd_experiment_id = ep.nd_experiment_id" +
+//                                                         "          and e.type_id in " + PlotUtil.getSqlTypeIds() + 
+//                                                         "          and ep.project_id = pr.subject_project_id" +
+//                                                         "          and pr.object_project_id = p.project_id))"+
+//					                                     "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId() +
+//					                         			 "  AND pp.project_id = p.project_id AND pp.value = " +
+//					                         			 "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) ");
+			SQLQuery query = getSession().createSQLQuery(
+					"SELECT DISTINCT p.project_id, p.name, p.description " +
+					" FROM project p " +
+					" INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  " + TermId.BELONGS_TO_STUDY.getId() +
+					" INNER JOIN nd_experiment_project ep " +
+					" INNER JOIN nd_experiment e ON e.nd_experiment_id = ep.nd_experiment_id " +
+					" INNER JOIN nd_geolocationprop gp on gp.nd_geolocation_id = e.nd_geolocation_id AND gp.type_id = " + TermId.LOCATION_ID.getId() +
+					" WHERE (ep.project_id = p.project_id OR ep.project_id = pr.subject_project_id) " +
+					"   AND  gp.value IN (" + stringify(locationIds) + ") " +
+					"   AND e.nd_experiment_id = " +
+					" 	  (  " +
+					"		SELECT MIN(nd_experiment_id) " +
+					"		  FROM nd_experiment min " +
+					"		 WHERE min.nd_geolocation_id = gp.nd_geolocation_id " +
+					"  	   )" +
+					"	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId() +
+           			"   AND pp.project_id = p.project_id AND pp.value = " +
+           			"  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) "
+			);
 					                                  
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
