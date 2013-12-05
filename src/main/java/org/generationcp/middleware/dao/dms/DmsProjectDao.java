@@ -622,7 +622,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
                     String seasonStr = (String) row[5];
                     
                     StudyType studyType = StudyType.N; 
-                    if (Integer.parseInt(studyTypeStr) == TermId.NURSERY.getId()){
+                    if (Integer.parseInt(studyTypeStr) != TermId.NURSERY.getId()){
                     	studyType = StudyType.T;
                     }
                     

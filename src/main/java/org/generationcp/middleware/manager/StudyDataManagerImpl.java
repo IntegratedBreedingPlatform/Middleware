@@ -14,6 +14,7 @@ package org.generationcp.middleware.manager;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -558,6 +559,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int geolocationId) throws MiddlewareQueryException {
         setWorkingDatabase(geolocationId);
         return getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(geolocationId);
+    }
+    
+    @Override
+    public boolean isStudy(int id) throws MiddlewareQueryException {
+    	setWorkingDatabase(id);
+    	return getProjectRelationshipDao().isSubjectTypeExisting(id, TermId.STUDY_HAS_FOLDER.getId());
     }
     
 }

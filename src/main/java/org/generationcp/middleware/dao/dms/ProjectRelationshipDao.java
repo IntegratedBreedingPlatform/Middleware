@@ -11,8 +11,14 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao.dms;
 
+import java.util.List;
+
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.ProjectRelationship;
+import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * DAO class for {@link ProjectRelationship}.
@@ -20,5 +26,23 @@ import org.generationcp.middleware.pojos.dms.ProjectRelationship;
  */
 public class ProjectRelationshipDao extends GenericDAO<ProjectRelationship, Integer> {
 	
+	@SuppressWarnings("rawtypes")
+	public boolean isSubjectTypeExisting(Integer subjectId, Integer typeId) throws MiddlewareQueryException {
+		try {
+			Criteria criteria = getSession().createCriteria(getPersistentClass());
+			criteria.add(Restrictions.eq("typeId", typeId));
+			criteria.add(Restrictions.eq("subjectProject.projectId", subjectId));
+			
+			List list = criteria.list();
+			if(list!=null && !list.isEmpty()) {
+				return true;
+			}
+			
+		} catch (HibernateException e) {
+			logAndThrowException("Error with isSubjectTypeExisting=" + subjectId + ", " + typeId 
+					+ ") query from ProjectRelationship: " + e.getMessage(), e);
+		}
+		return false;
+	}
 	
 }
