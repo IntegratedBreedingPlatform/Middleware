@@ -72,6 +72,9 @@ public class GermplasmList implements Serializable{
     @Column(name = "liststatus")
     private Integer status;
     
+    @Column(name = "notes")
+    private String notes;
+    
     @OneToMany(mappedBy = "list", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<GermplasmListData> listData = new ArrayList<GermplasmListData>();
 
@@ -118,6 +121,20 @@ public class GermplasmList implements Serializable{
         this.description = description;
         this.parent = parent;
         this.status = status;
+    }
+    
+    public GermplasmList(Integer id, String name, Long date, String type, Integer userId, String description, GermplasmList parent,
+            Integer status, String notes) {
+        super();
+        this.id = id;
+        this.name = name;
+        this.date = date;
+        this.type = type;
+        this.userId = userId;
+        this.description = description;
+        this.parent = parent;
+        this.status = status;
+        this.notes = notes;
     }
 
     public Integer getId() {
@@ -218,6 +235,14 @@ public class GermplasmList implements Serializable{
     public void setStatus(Integer status) {
         this.status = status;
     }
+    
+    public String getNotes(){
+    	return notes;
+    }
+    
+    public void setNotes(String notes){
+    	this.notes = notes;
+    }
 
     public List<GermplasmListData> getListData() {
         return listData;
@@ -244,6 +269,8 @@ public class GermplasmList implements Serializable{
         builder.append(description);
         builder.append(", status=");
         builder.append(status);
+        builder.append(", notes=");
+        builder.append(notes);
         builder.append("]");
         return builder.toString();
     }
