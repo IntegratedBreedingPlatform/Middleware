@@ -30,18 +30,21 @@ public class GermplasmDataManagerUtil{
     /**
      * Given a germplasm name, apply the standardization procedure to it.
      * 
-     * (L= any letter; ^= space; N= any numeral, S= any of {-,',[,],+,.}) a)
-     * Capitalize all letters Khao-Dawk-Mali105 becomes KHAO-DAWK-MALI105 b) L(
-     * becomes L^( and )L becomes )^L IR64(BPH) becomes IR64 (BPH) c) N( becomes
-     * N^( and )N becomes )^N IR64(5A) becomes IR64 (5A) d) L. becomes L^ IR 63
-     * SEL. becomes IR 64 SEL e) LN becomes L^N EXCEPT SLN MALI105 becomes MALI
-     * 105 but MALI-F4 IS unchanged f) NL becomes N^L EXCEPT SNL B 533A-1
-     * becomes B 533 A-1 but B 533 A-4B is unchanged g) LL-LL becomes LL^LL
-     * KHAO-DAWK-MALI 105 becomes KHAO DAWK MALI 105 h) ^0N becomes ^N IRTP
-     * 00123 becomes IRTP 123 i) ^^ becomes ^ j) REMOVE LEADING OR TRAILING ^ k)
-     * ^) becomes ) and (^ becomes ( l) L-N becomes L^N when there is only one
-     * ��� in the name and L is not preceded by a space m) ^/ becomes / and /^
-     * becomes /
+     * (L= any letter; ^= space; N= any numeral, S= any of {-,',[,],+,.}) 
+     * 
+     * a) Capitalize all letters Khao-Dawk-Mali105 becomes KHAO-DAWK-MALI105 
+     * b) L( becomes L^( and )L becomes )^L IR64(BPH) becomes IR64 (BPH) 
+     * c) N( becomes N^( and )N becomes )^N IR64(5A) becomes IR64 (5A) 
+     * d) L. becomes L^ IR 63 SEL. becomes IR 64 SEL 
+     * e) LN becomes L^N EXCEPT SLN MALI105 becomes MALI 105 but MALI-F4 IS unchanged 
+     * f) NL becomes N^L EXCEPT SNL B 533A-1 becomes B 533 A-1 but B 533 A-4B is unchanged 
+     * g) LL-LL becomes LL^LL KHAO-DAWK-MALI 105 becomes KHAO DAWK MALI 105 
+     * h) ^0N becomes ^N IRTP 00123 becomes IRTP 123 
+     * i) ^^ becomes ^ 
+     * j) REMOVE LEADING OR TRAILING ^ 
+     * k) ^) becomes ) and (^ becomes ( l) L-N becomes L^N when there is only one
+     * ��� in the name and L is not preceded by a space 
+     * m) ^/ becomes / and /^ becomes /
      * 
      * @param name
      * @return the standardized germplasm name
