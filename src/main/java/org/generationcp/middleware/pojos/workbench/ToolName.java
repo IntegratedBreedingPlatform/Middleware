@@ -16,6 +16,12 @@ package org.generationcp.middleware.pojos.workbench;
  *
  */
 public enum ToolName {
+    // Execute:
+    //     SELECT name FROM workbench_tool ORDER BY path, name
+    // in the database to get an organized list of names
+    // some tools have more than one name and it will be
+    // easier for us to group them here
+    
     // Breeding Planner native app
      breeding_planner
     
@@ -27,17 +33,13 @@ public enum ToolName {
     ,fieldbook
     ,ibfb_germplasm_import
 
-    // fieldbook web apps
-    ,fieldbook_web
-    ,nursery_manager_fieldbook_web
-    ,trial_manager_fieldbook_web
-    ,ontology_browser_fieldbook_web
     // MBDT native app
     ,mbdt
     
     // OptiMAS native app
     ,optimas
     
+    // BreedingManager webapp
     ,bm_list_manager
     ,crossing_manager
     ,germplasm_import
@@ -46,6 +48,12 @@ public enum ToolName {
     
     // DatasetImporter webapp
     ,dataset_importer
+    
+    // fieldbook web apps
+    ,fieldbook_web
+    ,nursery_manager_fieldbook_web
+    ,trial_manager_fieldbook_web
+    ,ontology_browser_fieldbook_web
     
     // GDMS webapp
     ,gdms
