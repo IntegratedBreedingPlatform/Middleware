@@ -13,11 +13,13 @@ package org.generationcp.middleware.operation.saver;
 
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.domain.dms.StudyValues;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
 
 public class ProjectSaver extends Saver {
 
@@ -75,6 +77,23 @@ public class ProjectSaver extends Saver {
 	private String getStringValue(StudyValues studyValues, int termId) {
 		return studyValues.getVariableList().findById(termId).getValue();
 	}
+	
+	/**
+	 * Saves a folder. Creates an entry in project and project_relationship
+	 */
+	public DmsProject saveFolder(int parentId, String name, String description) throws Exception{
+        requireLocalDatabaseInstance();
+        DmsProject project = new DmsProject();
+        mapStudytoProject(null, name, description, project);
+        
+        try {
+            project = save(project);
+            getProjectRelationshipSaver().saveProjectParentRelationship(project, parentId, false);  
+        } catch (Exception e) {
+            throw e;
+        }
+        return project;
 
+    }
 	
 }

@@ -53,7 +53,6 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.util.Debug;
 import org.generationcp.middleware.util.PlotUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -566,5 +565,83 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     	setWorkingDatabase(id);
     	return getProjectRelationshipDao().isSubjectTypeExisting(id, TermId.STUDY_HAS_FOLDER.getId());
     }
+
+	@Override
+	public int addSubFolder(int parentFolderId, String name, String description)
+			throws MiddlewareQueryException {
+		requireLocalDatabaseInstance();
+		DmsProject parentProject = getDmsProjectDao().getById(parentFolderId);
+		if(parentProject==null) {
+			throw new MiddlewareQueryException("DMS Project is not existing"); 
+		}
+		boolean isExisting = getDmsProjectDao().checkIfProjectNameIsExisting(name);
+		if(isExisting) {
+			throw new MiddlewareQueryException("Folder name is not unique"); 
+		}
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+        try {
+            trans = session.beginTransaction();
+            DmsProject project = getProjectSaver().saveFolder(parentFolderId, name, description);
+            trans.commit();
+            return project.getProjectId();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            throw new MiddlewareQueryException
+            	("Error encountered with addSubFolder(parentFolderId="
+                    + parentFolderId + ", name=" + name
+                    + ", description=" + description + "): " + e.getMessage(),
+                    e);
+        }
+	}
+	
+	
+	
+	@Override
+	public void deleteEmptyFolder(int id) throws MiddlewareQueryException {
+		requireLocalDatabaseInstance();
+		DmsProjectDao dmsProjectDao = getDmsProjectDao();
+		//check if folder is existing
+		DmsProject project = dmsProjectDao.getById(id);
+		if(project==null) {
+			throw new MiddlewareQueryException("Folder is not existing"); 
+		}
+		//check if folder has no children
+		List<Reference> children = dmsProjectDao.getChildrenOfFolder(id);
+		if(children!=null && !children.isEmpty()) {
+			throw new MiddlewareQueryException("Folder is not empty"); 
+		}
+		
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+        try {
+            trans = session.beginTransaction();
+            //modify the folder name
+        	String name = project.getName() + "#" + Math.random();
+        	project.setName(name);
+        	//delete the project_relationship
+        	getProjectRelationshipDao().deleteByProjectId(project.getProjectId());
+        	dmsProjectDao.saveOrUpdate(project);
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            throw new MiddlewareQueryException
+            	("Error encountered with deleteEmptyFolder(id="+ id + "): " + e.getMessage(), e);
+        }
+	}
+
+	@Override
+	public DmsProject getParentFolder(int id) throws MiddlewareQueryException {
+		requireLocalDatabaseInstance();
+		return getProjectRelationshipDao().getObjectBySubjectIdAndTypeId(id, TermId.HAS_PARENT_FOLDER.getId());
+	}
+
+	@Override
+	public DmsProject getProject(int id) throws MiddlewareQueryException {
+		setWorkingDatabase(id);
+		return getDmsProjectDao().getById(id);
+	}
+	
+	
     
 }

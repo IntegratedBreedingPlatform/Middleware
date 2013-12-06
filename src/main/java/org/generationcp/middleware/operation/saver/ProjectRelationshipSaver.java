@@ -31,7 +31,7 @@ public class ProjectRelationshipSaver extends Saver {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 
-	public void saveProjectParentRelationship(DmsProject project, int parentId) throws MiddlewareQueryException, MiddlewareException{
+	public void saveProjectParentRelationship(DmsProject project, int parentId, boolean isAStudy) throws MiddlewareQueryException, MiddlewareException{
 		requireLocalDatabaseInstance();
         DmsProjectDao projectDao = getDmsProjectDao();
         
@@ -40,7 +40,7 @@ public class ProjectRelationshipSaver extends Saver {
         	// Make the new study a root study
         	parent = projectDao.getById(DmsProject.SYSTEM_FOLDER_ID);  
         }
-        List<ProjectRelationship> relationships = mapProjectParentRelationships(project, parent);
+        List<ProjectRelationship> relationships = mapProjectParentRelationships(project, parent, isAStudy);
 
         ProjectRelationshipDao projectRelationshipDao = getProjectRelationshipDao();
         int index = 0;
@@ -56,12 +56,14 @@ public class ProjectRelationshipSaver extends Saver {
         project.setRelatedTos(relationships);
 	}	
 	
-	private List<ProjectRelationship> mapProjectParentRelationships(DmsProject project, DmsProject parent) throws MiddlewareException {
+	private List<ProjectRelationship> mapProjectParentRelationships(DmsProject project, DmsProject parent, boolean isAStudy) throws MiddlewareException {
 		ArrayList<ProjectRelationship> relationships = new ArrayList<ProjectRelationship>();
 		
 		if (project != null) {
 			 relationships.add(new ProjectRelationship(0, project, parent, TermId.HAS_PARENT_FOLDER.getId()));
-			 relationships.add(new ProjectRelationship(0, project, parent, TermId.IS_STUDY.getId()));
+			 if(isAStudy) {
+				 relationships.add(new ProjectRelationship(0, project, parent, TermId.IS_STUDY.getId()));
+			 }
 		}
 		return relationships;
 	}

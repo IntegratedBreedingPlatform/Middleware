@@ -465,4 +465,47 @@ public interface StudyDataManager{
      * @throws MiddlewareQueryException
      */
 	boolean isStudy(int id) throws MiddlewareQueryException;
+	
+	/**
+     * Adds a subFolder. Accepts a parentFolderId, the name and description of the folder. 
+     * It will throw an exception if the parentFolderId is not existing in the local database 
+     * and the name of the folder is not unique
+     * 
+     * @param parentFolderId
+     * @param name
+     * @param description
+     * @return ID of the folder created
+     * @throws MiddlewareQueryException
+     */
+    int addSubFolder(int parentFolderId, String name, String description) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Logically delete a folder by updating the folder's name and deleting its project relationships 
+     * 
+     * @param parentFolderId
+     * @param name
+     * @param description
+     * @return ID of the folder created
+     * @throws MiddlewareQueryException
+     */
+	public void deleteEmptyFolder(int id) throws MiddlewareQueryException;
+	
+	/**
+     * Returns the parent folder of the project. Accepts a project id.
+     * 
+     * @param id
+     * @return ID of the folder created
+     * @throws MiddlewareQueryException
+     */
+    DmsProject getParentFolder(int id) throws MiddlewareQueryException;
+    
+    /**
+     * Returns the dms project. Accepts a project id.
+     * 
+     * @param id
+     * @return DmsProject referenced by id
+     * @throws MiddlewareQueryException
+     */
+    DmsProject getProject(int id) throws MiddlewareQueryException;
 }

@@ -42,7 +42,7 @@ public class StudySaver extends Saver{
         try {
             project = getProjectSaver().save(project);
             getProjectPropertySaver().saveProjectProperties(project, variableTypeList);
-            getProjectRelationshipSaver().saveProjectParentRelationship(project, parentId);
+            getProjectRelationshipSaver().saveProjectParentRelationship(project, parentId, true);
             getExperimentModelSaver().addExperiment(project.getProjectId(), studyValues);            
         } catch (Exception e) {
             throw e;
