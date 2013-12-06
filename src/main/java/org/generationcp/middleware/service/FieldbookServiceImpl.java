@@ -92,8 +92,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     }
     
     @Override
-    public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int geolocationId) throws MiddlewareQueryException {
-        return getStudyDataManager().getAllFieldMapsInBlockByTrialInstanceId(geolocationId);
+    public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int datasetId, int geolocationId) throws MiddlewareQueryException {
+        return getStudyDataManager().getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId);
     }
 
 

@@ -555,9 +555,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
     
     @Override
-    public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int geolocationId) throws MiddlewareQueryException {
-        setWorkingDatabase(geolocationId);
-        return getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(geolocationId);
+    public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int datasetId, int geolocationId) throws MiddlewareQueryException {
+        setWorkingDatabase(datasetId);
+        return getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId);
     }
     
     @Override

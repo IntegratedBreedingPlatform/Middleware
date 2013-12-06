@@ -457,7 +457,7 @@ public interface StudyDataManager{
      * @param geolocationId
      * @throws MiddlewareQueryException
      */
-    List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int geolocationId) throws MiddlewareQueryException;
+    List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int datasetId, int geolocationId) throws MiddlewareQueryException;
 
     /**
      * Check if the given id is an existing study
