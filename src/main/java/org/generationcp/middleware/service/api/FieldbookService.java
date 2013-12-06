@@ -83,7 +83,7 @@ public interface FieldbookService {
      * @param geolocationId
      * @throws MiddlewareQueryException
      */
-    List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int geolocationId) throws MiddlewareQueryException;
+    List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int datasetId, int geolocationId) throws MiddlewareQueryException;
 
             
     

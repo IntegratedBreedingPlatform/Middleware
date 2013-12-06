@@ -185,7 +185,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
     }
     
     @SuppressWarnings("unchecked")
-    public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int geolocationId) throws MiddlewareQueryException {
+    public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int datasetId, int geolocationId) throws MiddlewareQueryException {
         List<FieldMapInfo> fieldmaps = new ArrayList<FieldMapInfo>();
 
         try {
@@ -254,7 +254,9 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 .append(" WHERE uid.value in (SELECT DISTINCT fmid.value ")
                 .append("    FROM nd_experiment e ")
                 .append("    INNER JOIN nd_experimentprop fmid ON fmid.type_id = 32785 AND fmid.nd_experiment_id = e.nd_experiment_id ")
-                .append("    WHERE e.nd_geolocation_id = :geolocationId) ")
+                .append("    INNER JOIN nd_experiment_project eproject ON eproject.nd_experiment_id = e.nd_experiment_id ")
+                .append("    WHERE e.nd_geolocation_id = :geolocationId ")
+                .append("    AND eproject.project_id = :datasetId) ")
                 .append(" ORDER BY eproj.nd_experiment_id ").append(order);
                 ;
                 
@@ -282,6 +284,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                         .addScalar("machineRow")
                         .addScalar("trialInstance")
                         ;
+                query.setParameter("datasetId", datasetId);
                 query.setParameter("geolocationId", geolocationId);
 
                 List<Object[]> list =  query.list();           
