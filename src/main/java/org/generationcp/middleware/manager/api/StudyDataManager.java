@@ -478,6 +478,8 @@ public interface StudyDataManager{
      * @throws MiddlewareQueryException
      */
     int addSubFolder(int parentFolderId, String name, String description) throws MiddlewareQueryException;
+
+    public boolean renameSubFolder(String newFolderName, int folderId) throws MiddlewareQueryException;
     
     
     /**
@@ -508,4 +510,6 @@ public interface StudyDataManager{
      * @throws MiddlewareQueryException
      */
     DmsProject getProject(int id) throws MiddlewareQueryException;
+
+    public boolean moveFolder(int sourceId, int targetId) throws MiddlewareQueryException;
 }

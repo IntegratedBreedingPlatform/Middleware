@@ -48,6 +48,7 @@ import org.generationcp.middleware.domain.search.filter.GidStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.ParentFolderStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
 import org.generationcp.middleware.domain.workbench.StudyNode;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -62,9 +63,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
-    
+
     private GermplasmDataManagerImpl germplasmDataManager;
-    
+
     private static final Logger LOG = LoggerFactory.getLogger(StudyDataManagerImpl.class);
 
     public StudyDataManagerImpl() {
@@ -110,7 +111,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         }
         return isExisting;
     }
-    
+
     @Override
     public List<FolderReference> getRootFolders(Database instance) throws MiddlewareQueryException {
         if (setWorkingDatabase(instance)) {
@@ -410,7 +411,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         }
         return null;
     }
-    
+
 
     @Override
     public List<StudyDetails> getAllStudyDetails(Database instance, StudyType studyType) throws MiddlewareQueryException {
@@ -419,15 +420,15 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-	public List<StudyNode> getAllNurseryAndTrialStudyNodes() throws MiddlewareQueryException{
-    	List<StudyNode> studyNodes = new ArrayList<StudyNode>();
+    public List<StudyNode> getAllNurseryAndTrialStudyNodes() throws MiddlewareQueryException {
+        List<StudyNode> studyNodes = new ArrayList<StudyNode>();
         studyNodes.addAll(getNurseryAndTrialStudyNodes(Database.LOCAL));
         studyNodes.addAll(getNurseryAndTrialStudyNodes(Database.CENTRAL));
         return studyNodes;
     }
 
     @Override
-	public List<StudyNode> getNurseryAndTrialStudyNodes(Database instance) throws MiddlewareQueryException{
+    public List<StudyNode> getNurseryAndTrialStudyNodes(Database instance) throws MiddlewareQueryException {
         setWorkingDatabase(instance);
         return getDmsProjectDao().getAllNurseryAndTrialStudyNodes();
     }
@@ -453,75 +454,75 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         }
         return count;
     }
-    
+
     @Override
-    public List<FieldMapInfo> getFieldMapInfoOfStudy(List<Integer> studyIdList, StudyType studyType) throws MiddlewareQueryException{
+    public List<FieldMapInfo> getFieldMapInfoOfStudy(List<Integer> studyIdList, StudyType studyType) throws MiddlewareQueryException {
         List<FieldMapInfo> fieldMapInfos = new ArrayList<FieldMapInfo>();
-        
+
         for (Integer studyId : studyIdList) {
             FieldMapInfo fieldMapInfo = new FieldMapInfo();
             setWorkingDatabase(studyId);
-            
+
             fieldMapInfo.setFieldbookId(studyId);
             fieldMapInfo.setFieldbookName(getDmsProjectDao().getById(studyId).getName());
-    
-            if (studyType == StudyType.T){
-            	fieldMapInfo.setTrial(true);
+
+            if (studyType == StudyType.T) {
+                fieldMapInfo.setTrial(true);
             } else {
-            	fieldMapInfo.setTrial(false);
+                fieldMapInfo.setTrial(false);
             }
-            
-            List<FieldMapDatasetInfo> fieldMapDatasetInfos = 
-                        getExperimentPropertyDao().getFieldMapLabels(studyId);            
+
+            List<FieldMapDatasetInfo> fieldMapDatasetInfos =
+                    getExperimentPropertyDao().getFieldMapLabels(studyId);
             fieldMapInfo.setDatasets(fieldMapDatasetInfos);
-            
+
             // Set pedigree
-            if (fieldMapDatasetInfos != null){
-                for (FieldMapDatasetInfo fieldMapDatasetInfo : fieldMapDatasetInfos){
-                    List<FieldMapTrialInstanceInfo> trialInstances = 
+            if (fieldMapDatasetInfos != null) {
+                for (FieldMapDatasetInfo fieldMapDatasetInfo : fieldMapDatasetInfos) {
+                    List<FieldMapTrialInstanceInfo> trialInstances =
                             fieldMapDatasetInfo.getTrialInstances();
-                    if (trialInstances != null && trialInstances.size()>0){
-                        for (FieldMapTrialInstanceInfo trialInstance : trialInstances){
+                    if (trialInstances != null && trialInstances.size() > 0) {
+                        for (FieldMapTrialInstanceInfo trialInstance : trialInstances) {
                             List<FieldMapLabel> labels = trialInstance.getFieldMapLabels();
-                            for (FieldMapLabel label : labels){
+                            for (FieldMapLabel label : labels) {
                                 label.setPedigree(
                                         germplasmDataManager.getCrossExpansion(label.getGid(), 1));
                             }
                         }
                     }
                 }
-            }            
-            
+            }
+
             fieldMapInfos.add(fieldMapInfo);
         }
         return fieldMapInfos;
     }
-    
+
     @Override
     public void saveOrUpdateFieldmapProperties(List<FieldMapInfo> info, String fieldmapUUID) throws MiddlewareQueryException {
-        
+
         if (info != null && !info.isEmpty()) {//&& !info.getDatasetsWithFieldMap().isEmpty()) {
-            
+
             requireLocalDatabaseInstance();
             Session session = getCurrentSessionForLocal();
             Transaction trans = null;
-    
+
             try {
                 trans = session.beginTransaction();
-                
+
                 getExperimentPropertySaver().saveFieldmapProperties(info, fieldmapUUID);
-                
+
                 trans.commit();
-    
+
             } catch (Exception e) {
                 rollbackTransaction(trans);
                 logAndThrowException("Error encountered with saveOrUpdateFieldmapProperties(): " + e.getMessage(),
                         e, LOG);
             }
         }
-        
+
     }
-    
+
     @Override
     public void saveTrialDatasetSummary(DmsProject project, VariableTypeList variableTypeList, List<ExperimentValues> experimentValues, List<Integer> locationIds) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
@@ -530,21 +531,21 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
         try {
             trans = session.beginTransaction();
-            if(variableTypeList!=null && variableTypeList.getVariableTypes()!=null && !variableTypeList.getVariableTypes().isEmpty()) {
-            	getProjectPropertySaver().saveProjectProperties(project,variableTypeList);
+            if (variableTypeList != null && variableTypeList.getVariableTypes() != null && !variableTypeList.getVariableTypes().isEmpty()) {
+                getProjectPropertySaver().saveProjectProperties(project, variableTypeList);
             }
-            if(experimentValues!=null && !experimentValues.isEmpty()) {
-            	for (Integer locationId : locationIds) {	
-            		//delete phenotypes by project id and locationId
-            		getPhenotypeDao().deletePhenotypesByProjectIdAndLocationId(project.getProjectId(),locationId);
-				}
-            	for (ExperimentValues exp : experimentValues) {
-            		if(exp.getVariableList()!=null && exp.getVariableList().size()>0) {
-            			ExperimentModel experimentModel = getExperimentDao().getExperimentByProjectIdAndLocation(project.getProjectId(),exp.getLocationId());
-            			getPhenotypeSaver().savePhenotypes(experimentModel, exp.getVariableList());
-            		}
-				}
-            	
+            if (experimentValues != null && !experimentValues.isEmpty()) {
+                for (Integer locationId : locationIds) {
+                    //delete phenotypes by project id and locationId
+                    getPhenotypeDao().deletePhenotypesByProjectIdAndLocationId(project.getProjectId(), locationId);
+                }
+                for (ExperimentValues exp : experimentValues) {
+                    if (exp.getVariableList() != null && exp.getVariableList().size() > 0) {
+                        ExperimentModel experimentModel = getExperimentDao().getExperimentByProjectIdAndLocation(project.getProjectId(), exp.getLocationId());
+                        getPhenotypeSaver().savePhenotypes(experimentModel, exp.getVariableList());
+                    }
+                }
+
             }
             trans.commit();
 
@@ -553,31 +554,61 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             throw new MiddlewareQueryException("error in saveTrialDatasetSummary " + e.getMessage(), e);
         }
     }
-    
+
     @Override
     public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int geolocationId) throws MiddlewareQueryException {
         setWorkingDatabase(geolocationId);
         return getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(geolocationId);
     }
-    
+
     @Override
     public boolean isStudy(int id) throws MiddlewareQueryException {
-    	setWorkingDatabase(id);
-    	return getProjectRelationshipDao().isSubjectTypeExisting(id, TermId.STUDY_HAS_FOLDER.getId());
+        setWorkingDatabase(id);
+        return getProjectRelationshipDao().isSubjectTypeExisting(id, TermId.STUDY_HAS_FOLDER.getId());
     }
 
-	@Override
-	public int addSubFolder(int parentFolderId, String name, String description)
-			throws MiddlewareQueryException {
-		requireLocalDatabaseInstance();
-		DmsProject parentProject = getDmsProjectDao().getById(parentFolderId);
-		if(parentProject==null) {
-			throw new MiddlewareQueryException("DMS Project is not existing"); 
-		}
-		boolean isExisting = getDmsProjectDao().checkIfProjectNameIsExisting(name);
-		if(isExisting) {
-			throw new MiddlewareQueryException("Folder name is not unique"); 
-		}
+    public boolean renameSubFolder(String newFolderName, int folderId) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+
+        // check for existing folder name
+
+        boolean isExisting = getDmsProjectDao().checkIfProjectNameIsExisting(newFolderName);
+        if (isExisting) {
+            throw new MiddlewareQueryException("Folder name is not unique");
+        }
+
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+            DmsProject currentFolder = getDmsProjectDao().getById(folderId);
+            currentFolder.setName(newFolderName);
+            DmsProject result = getDmsProjectDao().saveOrUpdate(currentFolder);
+            trans.commit();
+            return true;
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            throw new MiddlewareQueryException
+                    ("Error encountered with renameFolder(folderId="
+                            + folderId + ", name=" + newFolderName
+                            + ": " + e.getMessage(),
+                            e);
+        }
+    }
+
+    @Override
+    public int addSubFolder(int parentFolderId, String name, String description)
+            throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+        DmsProject parentProject = getDmsProjectDao().getById(parentFolderId);
+        if (parentProject == null) {
+            throw new MiddlewareQueryException("DMS Project is not existing");
+        }
+        boolean isExisting = getDmsProjectDao().checkIfProjectNameIsExisting(name);
+        if (isExisting) {
+            throw new MiddlewareQueryException("Folder name is not unique");
+        }
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
         try {
@@ -588,60 +619,89 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         } catch (Exception e) {
             rollbackTransaction(trans);
             throw new MiddlewareQueryException
-            	("Error encountered with addSubFolder(parentFolderId="
-                    + parentFolderId + ", name=" + name
-                    + ", description=" + description + "): " + e.getMessage(),
-                    e);
+                    ("Error encountered with addSubFolder(parentFolderId="
+                            + parentFolderId + ", name=" + name
+                            + ", description=" + description + "): " + e.getMessage(),
+                            e);
         }
-	}
-	
-	
-	
-	@Override
-	public void deleteEmptyFolder(int id) throws MiddlewareQueryException {
-		requireLocalDatabaseInstance();
-		DmsProjectDao dmsProjectDao = getDmsProjectDao();
-		//check if folder is existing
-		DmsProject project = dmsProjectDao.getById(id);
-		if(project==null) {
-			throw new MiddlewareQueryException("Folder is not existing"); 
-		}
-		//check if folder has no children
-		List<Reference> children = dmsProjectDao.getChildrenOfFolder(id);
-		if(children!=null && !children.isEmpty()) {
-			throw new MiddlewareQueryException("Folder is not empty"); 
-		}
-		
+    }
+
+    public boolean moveFolder(int sourceId, int targetId) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+        DmsProject source = getDmsProjectDao().getById(sourceId);
+        DmsProject target = getDmsProjectDao().getById(targetId);
+        if (source == null) {
+            throw new MiddlewareQueryException("Source Project is not existing");
+        }
+
+        if (target == null) {
+            throw new MiddlewareQueryException("Target Project is not existing");
+        }
+
+        Transaction trans = null;
+        try {
+            Session session = getCurrentSessionForLocal();
+
+            trans = session.beginTransaction();
+
+            // disassociate the source project from any parent it had previously
+            getProjectRelationshipDao().deleteChildAssociation(sourceId);
+
+            getProjectRelationshipSaver().saveProjectParentRelationship(source, targetId, false);
+            trans.commit();
+            return true;
+        } catch (MiddlewareException e) {
+            rollbackTransaction(trans);
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            return false;
+        }
+    }
+
+
+    @Override
+    public void deleteEmptyFolder(int id) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+        DmsProjectDao dmsProjectDao = getDmsProjectDao();
+        //check if folder is existing
+        DmsProject project = dmsProjectDao.getById(id);
+        if (project == null) {
+            throw new MiddlewareQueryException("Folder is not existing");
+        }
+        //check if folder has no children
+        List<Reference> children = dmsProjectDao.getChildrenOfFolder(id);
+        if (children != null && !children.isEmpty()) {
+            throw new MiddlewareQueryException("Folder is not empty");
+        }
+
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
         try {
             trans = session.beginTransaction();
             //modify the folder name
-        	String name = project.getName() + "#" + Math.random();
-        	project.setName(name);
-        	//delete the project_relationship
-        	getProjectRelationshipDao().deleteByProjectId(project.getProjectId());
-        	dmsProjectDao.saveOrUpdate(project);
+            String name = project.getName() + "#" + Math.random();
+            project.setName(name);
+            //delete the project_relationship
+            getProjectRelationshipDao().deleteByProjectId(project.getProjectId());
+            dmsProjectDao.saveOrUpdate(project);
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
             throw new MiddlewareQueryException
-            	("Error encountered with deleteEmptyFolder(id="+ id + "): " + e.getMessage(), e);
+                    ("Error encountered with deleteEmptyFolder(id=" + id + "): " + e.getMessage(), e);
         }
-	}
+    }
 
-	@Override
-	public DmsProject getParentFolder(int id) throws MiddlewareQueryException {
-		requireLocalDatabaseInstance();
-		return getProjectRelationshipDao().getObjectBySubjectIdAndTypeId(id, TermId.HAS_PARENT_FOLDER.getId());
-	}
+    @Override
+    public DmsProject getParentFolder(int id) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+        return getProjectRelationshipDao().getObjectBySubjectIdAndTypeId(id, TermId.HAS_PARENT_FOLDER.getId());
+    }
 
-	@Override
-	public DmsProject getProject(int id) throws MiddlewareQueryException {
-		setWorkingDatabase(id);
-		return getDmsProjectDao().getById(id);
-	}
-	
-	
-    
+    @Override
+    public DmsProject getProject(int id) throws MiddlewareQueryException {
+        setWorkingDatabase(id);
+        return getDmsProjectDao().getById(id);
+    }
+
+
 }
