@@ -495,6 +495,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 if (dataset == null) {
                     dataset = new FieldMapDatasetInfo();
                     dataset.setDatasetId((Integer) row[0]);
+                    dataset.setDatasetName((String) row[1]);
                     datasetMap.put(dataset.getDatasetId(), dataset);
                     
                     FieldMapInfo study = infoMap.get((Integer) row[19]);
