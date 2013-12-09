@@ -98,10 +98,9 @@ public class StandardVariableSaver extends Saver {
 		saveRelationship(varId, TermId.HAS_METHOD.getId(), stdVar.getMethod());
 		saveRelationship(varId, TermId.HAS_TYPE.getId(), stdVar.getDataType());
 		saveRelationship(varId, TermId.STORED_IN.getId(), stdVar.getStoredIn());
-		if(stdVar.getIsA()!=null) {//optional
-			saveRelationship(varId, TermId.IS_A.getId(), stdVar.getIsA());
-		}
-		System.out.println("hello" + stdVar.getCropOntologyId());
+		//if(stdVar.getIsA()!=null) {//optional
+		//	saveRelationship(varId, TermId.IS_A.getId(), stdVar.getIsA());
+		//}
 		if (stdVar.getCropOntologyId() != null) {
 		    saveOrUpdateCropOntologyId(stdVar.getProperty().getId(), stdVar.getCropOntologyId());
 		}
@@ -336,11 +335,6 @@ public class StandardVariableSaver extends Saver {
                         objectId = standardVariable.getDataType().getId();
                     }
                 }
-                else if (relationship.getTypeId() == TermId.IS_A.getId()) {
-                    if (standardVariable.getIsA() != null) {
-                        objectId = standardVariable.getIsA().getId();
-                    }
-                } 
                 
                 if (objectId != null && !objectId.equals(relationship.getObjectId())) {
                     relationship.setObjectId(objectId);
