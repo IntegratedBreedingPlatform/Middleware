@@ -343,7 +343,6 @@ public class StandardVariableSaver extends Saver {
             }
         }
         
-        System.out.println("hello" + standardVariable.getCropOntologyId());
         if (standardVariable.getCropOntologyId() != null) {
             saveOrUpdateCropOntologyId(standardVariable.getProperty().getId(), standardVariable.getCropOntologyId());
         }
@@ -404,7 +403,6 @@ public class StandardVariableSaver extends Saver {
             cropOntologyProperty.setRank(0);
             cropOntologyProperty.setTypeId(TermId.CROP_ONTOLOGY_ID.getId());
             cropOntologyProperty.setCvTermPropertyId(getCvTermPropertyDao().getNegativeId("cvTermPropertyId"));
-            System.out.println("GENERATED -- " + cropOntologyProperty.getCvTermPropertyId());
         }
         cropOntologyProperty.setValue(cropOntologyId);
         getCvTermPropertyDao().saveOrUpdate(cropOntologyProperty);
