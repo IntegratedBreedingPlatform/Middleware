@@ -144,15 +144,26 @@ public class StandardVariableBuilder extends Builder {
 		return 0;
 	}
 	
-	private String getCropOntologyId(Term term) {
+	private String getCropOntologyId(Term term) throws MiddlewareQueryException {
+	    String cropOntologyId = null;
 	    if (term != null && term.getProperties() != null && term.getProperties().size() > 0) {
 	        for (TermProperty termProperty : term.getProperties()) {
 	            if (TermId.CROP_ONTOLOGY_ID.getId() == termProperty.getTypeId()) {
-	                return termProperty.getValue();
+	                cropOntologyId = termProperty.getValue();
+	                break;
 	            }
 	        }
 	    }
-	    return null;
+	    if (term.getId() > 0) {
+	        Database database = getActiveDatabase();
+	        setWorkingDatabase(Database.LOCAL);
+	        CVTermProperty property = getCvTermPropertyDao().getOneByCvTermAndType(term.getId(), TermId.CROP_ONTOLOGY_ID.getId());
+	        if (property != null) {
+	            cropOntologyId = property.getValue();
+	        }
+	        setWorkingDatabase(database);
+	    }
+	    return cropOntologyId;
 	}
 
 /*	private CVTermProperty findProperty(List<CVTermProperty> properties, int typeId) {
