@@ -200,7 +200,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
                     String stdVarScale = standardVariable.getScale().getName();
 
                     if (!(stdVarMethod.equalsIgnoreCase(measurementVariable.getMethod()) && stdVarProperty.equalsIgnoreCase(measurementVariable.getProperty()) && stdVarScale.equalsIgnoreCase(measurementVariable.getScale()))) {
-                        messages.add(new Message("error.import.existing.standard.variable.name", measurementVariable.getName()));
+                        messages.add(new Message("error.import.existing.standard.variable.name", measurementVariable.getName(), stdVarProperty, stdVarMethod, stdVarScale));
                     }
                 }
             }
