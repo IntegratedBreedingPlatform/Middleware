@@ -94,9 +94,7 @@ public class StandardVariableBuilder extends Builder {
         setWorkingDatabase(Database.CENTRAL);
         cvTermRelationships.addAll(getCvTermRelationshipDao().getBySubject(standardVariable.getId()));
 	        
-	    
 		if (setWorkingDatabase(standardVariable.getId())) {
-
 			standardVariable.setProperty(createTerm(cvTermRelationships, TermId.HAS_PROPERTY));	
 			standardVariable.setMethod(createTerm(cvTermRelationships, TermId.HAS_METHOD));
 			standardVariable.setScale(createTerm(cvTermRelationships, TermId.HAS_SCALE));
@@ -105,6 +103,7 @@ public class StandardVariableBuilder extends Builder {
 			standardVariable.setIsA(createTerm(cvTermRelationships, TermId.IS_A));
 			//get isA of property
 		    if (standardVariable.getProperty() != null){
+		        setWorkingDatabase(standardVariable.getId());
 				List<CVTermRelationship> propertyCvTermRelationships = 
 						getCvTermRelationshipDao().getBySubject(standardVariable.getProperty().getId());
 				standardVariable.setIsA(createTerm(propertyCvTermRelationships, TermId.IS_A));
