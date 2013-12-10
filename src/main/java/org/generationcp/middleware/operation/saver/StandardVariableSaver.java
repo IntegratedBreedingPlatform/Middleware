@@ -397,15 +397,23 @@ public class StandardVariableSaver extends Saver {
             }
         }
         setWorkingDatabase(Database.LOCAL);
+        boolean isForCreate = true;
         if (cropOntologyProperty == null) {
-            cropOntologyProperty = new CVTermProperty();
-            cropOntologyProperty.setCvTermId(traitId);
-            cropOntologyProperty.setRank(0);
-            cropOntologyProperty.setTypeId(TermId.CROP_ONTOLOGY_ID.getId());
-            cropOntologyProperty.setCvTermPropertyId(getCvTermPropertyDao().getNegativeId("cvTermPropertyId"));
+            if (cropOntologyId == null || "".equals(cropOntologyId.trim())) {
+                isForCreate = false;
+            }
+            else {
+                cropOntologyProperty = new CVTermProperty();
+                cropOntologyProperty.setCvTermId(traitId);
+                cropOntologyProperty.setRank(0);
+                cropOntologyProperty.setTypeId(TermId.CROP_ONTOLOGY_ID.getId());
+                cropOntologyProperty.setCvTermPropertyId(getCvTermPropertyDao().getNegativeId("cvTermPropertyId"));
+            }
         }
-        cropOntologyProperty.setValue(cropOntologyId);
-        getCvTermPropertyDao().saveOrUpdate(cropOntologyProperty);
+        if (isForCreate) {
+            cropOntologyProperty.setValue(cropOntologyId);
+            getCvTermPropertyDao().saveOrUpdate(cropOntologyProperty);
+        }
         
     }
     
