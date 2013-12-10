@@ -1018,8 +1018,11 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
                 .append("FROM cvterm_relationship cvr ");
             
             if (traitClassId != null){
-                queryString.append("INNER JOIN cvterm_relationship cvrt ON cvr.subject_id = cvrt.subject_id ");
-                queryString.append("    AND cvr.object_id = :traitClassId AND cvr.type_id = ").append(TermId.IS_A.getId()).append(" ");
+                // Trait class via 'IS A' of property
+                queryString.append("INNER JOIN cvterm_relationship cvrpt ON cvr.subject_id = cvrpt.subject_id ");
+                queryString.append("    AND cvrpt.type_id = ").append(TermId.HAS_PROPERTY.getId()).append(" ");
+                queryString.append("INNER JOIN cvterm_relationship cvrt ON cvrpt.object_id = cvt.subject_id ");
+                queryString.append("    AND cvrt.object_id = :traitClassId AND cvrt.type_id = ").append(TermId.IS_A.getId()).append(" ");
             }
             if (propertyId != null){
                 queryString.append("INNER JOIN cvterm_relationship cvrp ON cvr.subject_id = cvrp.subject_id ");
@@ -1033,10 +1036,6 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
                 queryString.append("INNER JOIN cvterm_relationship cvrs ON cvr.subject_id = cvrs.subject_id ");
                 queryString.append("    AND  cvr.object_id = :scaleId AND cvr.type_id = ").append(TermId.HAS_SCALE.getId()).append(" ");
             }
-
-            // Return only if it belongs to a trait class
-            queryString.append("INNER JOIN cvterm_relationship cvrtc ON cvr.subject_id = cvrtc.subject_id ");  
-            queryString.append("        AND cvrtc.type_id = 1225 ");
 
             SQLQuery query = getSession().createSQLQuery(queryString.toString());
             if (traitClassId != null){
@@ -1059,12 +1058,54 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
                     standardVariableIds.add((Integer) row);
                 }
             }
+            
+            // Return only if it belongs to a trait class via the 'is a' of the property of the standard variable
+            standardVariableIds = getStandardVariablesBelongingToTraitClass(standardVariableIds);
                                     
         } catch(HibernateException e) {
                 logAndThrowException("Error at getStandardVariableIds :" + e.getMessage(), e);
         }
         return standardVariableIds;
     }
+    
+    
+    private List<Integer> getStandardVariablesBelongingToTraitClass(List<Integer> standardVariableIds) throws MiddlewareQueryException {
+        List<Integer> standardVariablesOfTraitClass = new ArrayList<Integer>();
+        
+        if (standardVariableIds == null || standardVariableIds.size() == 0){
+            return standardVariablesOfTraitClass;
+        }
+        
+        try {
+            // Trait class via 'IS A' of property
+            StringBuilder queryString = new StringBuilder()
+                .append("SELECT DISTINCT cvr.subject_id ")
+                .append("FROM  cvterm_relationship cvr ")
+                .append("   INNER JOIN cvterm_relationship cvrt ON cvr.object_id = cvrt.subject_id ")
+                .append("                       AND cvr.type_id = ").append(TermId.HAS_PROPERTY.getId()).append(" ")
+                .append("    AND cvrt.type_id = ").append(TermId.IS_A.getId()).append(" ")
+                .append("   AND cvr.subject_id IN (:standardVariableIds) ")
+                ;
+
+            SQLQuery query = getSession().createSQLQuery(queryString.toString());
+            query.setParameterList("standardVariableIds", standardVariableIds);
+            
+            List<Integer> result = query.list();
+            
+            if (result != null && !result.isEmpty()) {
+                for (Integer row : result) {
+                    standardVariablesOfTraitClass.add((Integer) row);
+                }
+            }
+
+        } catch(HibernateException e) {
+            logAndThrowException("Error at getStandardVariablesBelongingToTraitClass :" + e.getMessage(), e);
+        }
+
+        
+        return standardVariablesOfTraitClass;
+    }
+
     
     public List<Property> getAllPropertiesWithTraitClass() throws MiddlewareQueryException {
         List<Property> properties = new ArrayList<Property>();

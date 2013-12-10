@@ -103,15 +103,12 @@ public class StandardVariableBuilder extends Builder {
 			standardVariable.setDataType(createTerm(cvTermRelationships, TermId.HAS_TYPE));
 			standardVariable.setStoredIn(createTerm(cvTermRelationships, TermId.STORED_IN));
 			standardVariable.setIsA(createTerm(cvTermRelationships, TermId.IS_A));
-			//add handling of null isA
-			if(standardVariable.getIsA() == null) {
-				//get isA of property
-			    if (standardVariable.getProperty() != null){
-    				List<CVTermRelationship> propertyCvTermRelationships = 
-    						getCvTermRelationshipDao().getBySubject(standardVariable.getProperty().getId());
-    				standardVariable.setIsA(createTerm(propertyCvTermRelationships, TermId.IS_A));
-			    }
-			}
+			//get isA of property
+		    if (standardVariable.getProperty() != null){
+				List<CVTermRelationship> propertyCvTermRelationships = 
+						getCvTermRelationshipDao().getBySubject(standardVariable.getProperty().getId());
+				standardVariable.setIsA(createTerm(propertyCvTermRelationships, TermId.IS_A));
+		    }
 			if (standardVariable.getStoredIn() != null){
 			    standardVariable.setPhenotypicType(createPhenotypicType(standardVariable.getStoredIn().getId()));
 			}
@@ -147,15 +144,26 @@ public class StandardVariableBuilder extends Builder {
 		return 0;
 	}
 	
-	private String getCropOntologyId(Term term) {
+	private String getCropOntologyId(Term term) throws MiddlewareQueryException {
+	    String cropOntologyId = null;
 	    if (term != null && term.getProperties() != null && term.getProperties().size() > 0) {
 	        for (TermProperty termProperty : term.getProperties()) {
 	            if (TermId.CROP_ONTOLOGY_ID.getId() == termProperty.getTypeId()) {
-	                return termProperty.getValue();
+	                cropOntologyId = termProperty.getValue();
+	                break;
 	            }
 	        }
 	    }
-	    return null;
+	    if (term.getId() > 0) {
+	        Database database = getActiveDatabase();
+	        setWorkingDatabase(Database.LOCAL);
+	        CVTermProperty property = getCvTermPropertyDao().getOneByCvTermAndType(term.getId(), TermId.CROP_ONTOLOGY_ID.getId());
+	        if (property != null) {
+	            cropOntologyId = property.getValue();
+	        }
+	        setWorkingDatabase(database);
+	    }
+	    return cropOntologyId;
 	}
 
 /*	private CVTermProperty findProperty(List<CVTermProperty> properties, int typeId) {

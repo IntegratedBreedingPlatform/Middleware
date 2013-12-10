@@ -98,9 +98,9 @@ public class StandardVariableSaver extends Saver {
 		saveRelationship(varId, TermId.HAS_METHOD.getId(), stdVar.getMethod());
 		saveRelationship(varId, TermId.HAS_TYPE.getId(), stdVar.getDataType());
 		saveRelationship(varId, TermId.STORED_IN.getId(), stdVar.getStoredIn());
-		if(stdVar.getIsA()!=null) {//optional
-			saveRelationship(varId, TermId.IS_A.getId(), stdVar.getIsA());
-		}
+		//if(stdVar.getIsA()!=null) {//optional
+		//	saveRelationship(varId, TermId.IS_A.getId(), stdVar.getIsA());
+		//}
 		if (stdVar.getCropOntologyId() != null) {
 		    saveOrUpdateCropOntologyId(stdVar.getProperty().getId(), stdVar.getCropOntologyId());
 		}
@@ -335,11 +335,6 @@ public class StandardVariableSaver extends Saver {
                         objectId = standardVariable.getDataType().getId();
                     }
                 }
-                else if (relationship.getTypeId() == TermId.IS_A.getId()) {
-                    if (standardVariable.getIsA() != null) {
-                        objectId = standardVariable.getIsA().getId();
-                    }
-                } 
                 
                 if (objectId != null && !objectId.equals(relationship.getObjectId())) {
                     relationship.setObjectId(objectId);
@@ -380,40 +375,46 @@ public class StandardVariableSaver extends Saver {
         return errorCodes != null ? errorCodes.toString() : null;
     }
 
-    //TODO: to be determined if crop ontology id should be at the property level or at the standard variable level
     public void saveOrUpdateCropOntologyId(Integer traitId, String cropOntologyId) throws MiddlewareQueryException {
-        if (traitId < 0) {
-            CVTerm trait = getCvTermDao().getById(traitId);
-            if (trait != null) { 
-                boolean found = false;
-                List<CVTermProperty> traitProperties = getTermPropertyBuilder().findProperties(traitId);
-                if (traitProperties != null) {
-                    for (CVTermProperty traitProperty : traitProperties) {
-                        if (traitProperty.getTypeId() == TermId.CROP_ONTOLOGY_ID.getId()) {
-                            found = true;
-                            if (traitProperty.getValue() != null && !traitProperty.getValue().equals(cropOntologyId)) {
-                                if (cropOntologyId == null || "".equals(cropOntologyId)) {
-                                    getCvTermPropertyDao().makeTransient(traitProperty);
-                                } else {
-                                    traitProperty.setValue(cropOntologyId);
-                                    getCvTermPropertyDao().update(traitProperty);
-                                }
-                            }
-                            break;
-                        }
-                    }
-                }
-                if (!found) {
-                    CVTermProperty traitProperty = new CVTermProperty();
-                    traitProperty.setCvTermId(traitId);
-                    traitProperty.setTypeId(TermId.CROP_ONTOLOGY_ID.getId());
-                    traitProperty.setValue(cropOntologyId);
-                    traitProperty.setRank(0);
-                    traitProperty.setCvTermPropertyId(getCvTermPropertyDao().getNegativeId("cvTermPropertyId"));
-                    getCvTermPropertyDao().save(traitProperty);
+        requireLocalDatabaseInstance();
+        
+        CVTermProperty cropOntologyProperty = getCvTermPropertyDao().getOneByCvTermAndType(traitId, TermId.CROP_ONTOLOGY_ID.getId());
+        if (cropOntologyProperty == null) {
+            if (traitId > 0) {
+                setWorkingDatabase(traitId);
+                cropOntologyProperty = getCvTermPropertyDao().getOneByCvTermAndType(traitId, TermId.CROP_ONTOLOGY_ID.getId());
+                if (cropOntologyProperty != null && cropOntologyProperty.getValue() != null 
+                        && cropOntologyProperty.getValue().equalsIgnoreCase(cropOntologyId)) {
+                    //do nothing, no change
+                    return;
                 }
             }
         }
+        else {
+            if (cropOntologyId == null || "".equals(cropOntologyId)) {
+                getCvTermPropertyDao().makeTransient(cropOntologyProperty);
+                return;
+            }
+        }
+        setWorkingDatabase(Database.LOCAL);
+        boolean isForCreate = true;
+        if (cropOntologyProperty == null) {
+            if (cropOntologyId == null || "".equals(cropOntologyId.trim())) {
+                isForCreate = false;
+            }
+            else {
+                cropOntologyProperty = new CVTermProperty();
+                cropOntologyProperty.setCvTermId(traitId);
+                cropOntologyProperty.setRank(0);
+                cropOntologyProperty.setTypeId(TermId.CROP_ONTOLOGY_ID.getId());
+                cropOntologyProperty.setCvTermPropertyId(getCvTermPropertyDao().getNegativeId("cvTermPropertyId"));
+            }
+        }
+        if (isForCreate) {
+            cropOntologyProperty.setValue(cropOntologyId);
+            getCvTermPropertyDao().saveOrUpdate(cropOntologyProperty);
+        }
+        
     }
     
     public void deleteEnumeration(int varId, Enumeration enumeration) throws MiddlewareQueryException, MiddlewareException {
