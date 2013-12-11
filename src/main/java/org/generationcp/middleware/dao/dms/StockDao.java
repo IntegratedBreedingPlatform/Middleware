@@ -152,6 +152,28 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
    		return 0;
    	}
    	
+	public long countObservations(int datasetId, int trialEnvironmentId, int variateStdVarId) throws MiddlewareQueryException {
+   		try {
+   			
+   			String sql = "select count(e.nd_experiment_id) " +
+   			             "from nd_experiment e, nd_experiment_phenotype ep, phenotype p, nd_experiment_project nep " +
+   			             "where e.nd_experiment_id = ep.nd_experiment_id  " +
+   			             "  and ep.phenotype_id = p.phenotype_id  " +
+   			             "  and nep.nd_experiment_id = e.nd_experiment_id " +
+   			             "  and e.nd_geolocation_id = " + trialEnvironmentId + 
+   			             "  and p.observable_id = " + variateStdVarId + 
+   			             "  and nep.project_id = " + datasetId + 
+   						 "  and (trim(p.value) <> '' and p.value is not null)";
+   			Query query = getSession().createSQLQuery(sql);
+   		
+   			return ((BigInteger) query.uniqueResult()).longValue();
+   						
+   		} catch(HibernateException e) {
+   			logAndThrowException("Error at countObservations=" + datasetId + " at StockDao: " + e.getMessage(), e);
+   		}
+   		return 0;
+   	}
+   	
    	@SuppressWarnings("unchecked")
     public List<StockModel> getStocks(int projectId) throws MiddlewareQueryException{
    	    List<StockModel> stocks = new ArrayList<StockModel>();

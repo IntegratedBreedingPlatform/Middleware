@@ -41,6 +41,7 @@ public enum ToolName {
     
     // BreedingManager webapp
     ,bm_list_manager
+    ,bm_list_manager_main
     ,crossing_manager
     ,germplasm_import
     ,list_manager
