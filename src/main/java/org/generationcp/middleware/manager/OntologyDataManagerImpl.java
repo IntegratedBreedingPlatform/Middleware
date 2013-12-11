@@ -473,7 +473,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     }
     
     @Override
-    public Term addOrUpdateTermAndRelationship(String name, String definition, CvId cvId, int typeId, int objectId) 
+    public Term addOrUpdateTermAndRelationship(String name, String definition, CvId cvId, int typeId, int objectId, String cropOntologyId) 
             throws MiddlewareQueryException, MiddlewareException {
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
@@ -488,6 +488,10 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             trans = session.beginTransaction();
             term = saveOrUpdateCvTerm(name, definition, cvId);
             saveOrUpdateCvTermRelationship(term.getId(), objectId, typeId);
+            if (cropOntologyId != null && !"".equals(cropOntologyId.trim())) {
+                getStandardVariableSaver().saveOrUpdateCropOntologyId(term.getId(), cropOntologyId);
+            }
+            
             trans.commit();
         } catch (MiddlewareQueryException e) {
             rollbackTransaction(trans);

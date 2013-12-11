@@ -290,7 +290,7 @@ public class TestOntologyServiceImpl {
         String name = "NEW property";
         String definition = "New property description " + (int) (Math.random() * 100);
         Property origProperty = ontologyService.getProperty(name);
-        Property newProperty = ontologyService.addOrUpdateProperty(name, definition, AGRONOMIC_TRAIT_CLASS);
+        Property newProperty = ontologyService.addOrUpdateProperty(name, definition, AGRONOMIC_TRAIT_CLASS, null);
         
         Debug.println(3, "Original:  " + origProperty);
         Debug.println(3, "Updated :  " + newProperty);

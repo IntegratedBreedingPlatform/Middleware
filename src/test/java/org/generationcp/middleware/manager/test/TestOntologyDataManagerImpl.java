@@ -724,7 +724,7 @@ public class TestOntologyDataManagerImpl {
         String name = "Season";
         String definition = "Growing Season " + (int) (Math.random() * 100); // add random number to see the update
         try{
-            manager.addOrUpdateTermAndRelationship(name, definition, CvId.PROPERTIES, TermId.IS_A.getId(), 1340);
+            manager.addOrUpdateTermAndRelationship(name, definition, CvId.PROPERTIES, TermId.IS_A.getId(), 1340, null);
         } catch (MiddlewareException e){
             Debug.println(3, "MiddlewareException expected: \"" + e.getMessage() + "\"");
             assertTrue(e.getMessage().contains(" is retrieved from the central database and cannot be updated"));
@@ -738,7 +738,7 @@ public class TestOntologyDataManagerImpl {
         String name = "Study condition NEW";
         String definition = "Study condition NEW class " + (int) (Math.random() * 100); // add random number to see the update
         Term origTerm = manager.findTermByName(name, CvId.PROPERTIES);
-        Term newTerm = manager.addOrUpdateTermAndRelationship(name, definition, CvId.PROPERTIES, TermId.IS_A.getId(), 1340);
+        Term newTerm = manager.addOrUpdateTermAndRelationship(name, definition, CvId.PROPERTIES, TermId.IS_A.getId(), 1340, null);
         Debug.println(3, "Original:  " + origTerm);
         Debug.println(3, "Updated :  " + newTerm);
         
@@ -768,7 +768,7 @@ public class TestOntologyDataManagerImpl {
         String definition = "Slope NEW class " + (int) (Math.random() * 100); // add random number to see the update
         Term origTerm = manager.findTermByName(name, CvId.PROPERTIES);
         if (origTerm == null){ // first run, add before update
-            origTerm = manager.addOrUpdateTermAndRelationship(name, definition, CvId.PROPERTIES, TermId.IS_A.getId(), 1340);
+            origTerm = manager.addOrUpdateTermAndRelationship(name, definition, CvId.PROPERTIES, TermId.IS_A.getId(), 1340, null);
         }
         manager.updateTermAndRelationship(new Term(origTerm.getId(), name, definition), TermId.IS_A.getId(), 1340);
         Term newTerm = manager.findTermByName(name, CvId.PROPERTIES);

@@ -1111,9 +1111,10 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
         List<Property> properties = new ArrayList<Property>();
         try {
             StringBuilder sql = new StringBuilder()
-                .append("SELECT p.cvterm_id, p.name, p.definition, pr.object_id ")
+                .append("SELECT p.cvterm_id, p.name, p.definition, pr.object_id, coId.value ")
                 .append(" FROM cvterm p ")
                 .append(" INNER JOIN cvterm_relationship pr ON pr.subject_id = p.cvterm_id AND pr.type_id = ").append(TermId.IS_A.getId())
+                .append(" LEFT JOIN cvtermprop coId ON coId.cvterm_id = p.cvterm_id AND coId.type_id = ").append(TermId.CROP_ONTOLOGY_ID.getId())
                 .append(" WHERE p.cv_id = ").append(CvId.PROPERTIES.getId())
                 .append(" AND p.is_obsolete = 0 ");
             
@@ -1126,6 +1127,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
                             new Property(
                                     new Term((Integer) row[0], (String) row[1], (String) row[2])
                                     , new Term((Integer) row[3], null, null)
+                                    , (String) row[4]
                             )
                     );
                 }

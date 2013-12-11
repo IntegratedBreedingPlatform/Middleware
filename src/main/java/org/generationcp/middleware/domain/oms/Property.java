@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.oms;
 
+import java.util.ArrayList;
+
 import org.generationcp.middleware.util.Debug;
 
 public class Property {
@@ -30,6 +32,13 @@ public class Property {
     public Property(Term term, Term isA) {
         this.term = term;
         this.IsA = isA;
+    }
+    
+    public Property(Term term, Term isA, String cropOntologyId) {
+        this(term, isA);
+        TermProperty prop = new TermProperty(term.getId(), TermId.CROP_ONTOLOGY_ID.getId(), cropOntologyId, 0);
+        term.setProperties(new ArrayList<TermProperty>());
+        term.getProperties().add(prop);
     }
 
     public Term getIsA() {
@@ -68,7 +77,7 @@ public class Property {
     public String getDefinition() {
        return term.getDefinition();
     }
-
+    
     public void setDefinition(String definition) {
         term.setDefinition(definition);
     }
@@ -80,6 +89,18 @@ public class Property {
             return -1;
         }
         
+    }
+    
+    public String getCropOntologyId() {
+        String cropOntologyId = "";
+        if (term.getProperties() != null && !term.getProperties().isEmpty()) {
+            for (TermProperty prop : term.getProperties()) {
+                if (prop.getTypeId().equals(TermId.CROP_ONTOLOGY_ID.getId()) && prop.getValue() != null && !"".equals(prop.getValue())) {
+                    return prop.getValue();
+                }
+            }
+        }
+        return cropOntologyId;
     }
 	
 	
