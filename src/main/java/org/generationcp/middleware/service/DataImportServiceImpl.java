@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.service;
 
+import org.generationcp.middleware.domain.dms.NameSynonym;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -199,9 +200,52 @@ public class DataImportServiceImpl extends Service implements DataImportService 
                     String stdVarMethod = standardVariable.getMethod().getName();
                     String stdVarScale = standardVariable.getScale().getName();
 
-                    if (!(stdVarMethod.equalsIgnoreCase(measurementVariable.getMethod()) && stdVarProperty.equalsIgnoreCase(measurementVariable.getProperty()) && stdVarScale.equalsIgnoreCase(measurementVariable.getScale()))) {
-                        messages.add(new Message("error.import.existing.standard.variable.name", measurementVariable.getName(), stdVarProperty, stdVarMethod, stdVarScale));
+                    if (!(stdVarMethod.equalsIgnoreCase(measurementVariable.getMethod()))) {
+
+                        List<NameSynonym> synonyms = standardVariable.getMethod().getNameSynonyms();
+                        boolean found = false;
+                        for (NameSynonym synonym : synonyms) {
+                            if (measurementVariable.getMethod().equalsIgnoreCase(synonym.getName())) {
+                                found = true;
+                            }
+                        }
+
+                        if (!found) {
+                            messages.add(new Message("error.import.existing.standard.variable.name", measurementVariable.getName(), stdVarProperty, stdVarMethod, stdVarScale));
+                        }
                     }
+
+                    if (!(stdVarProperty.equalsIgnoreCase(measurementVariable.getProperty()))) {
+
+                        List<NameSynonym> synonyms = standardVariable.getProperty().getNameSynonyms();
+                        boolean found = false;
+                        for (NameSynonym synonym : synonyms) {
+                            if (measurementVariable.getProperty().equalsIgnoreCase(synonym.getName())) {
+                                found = true;
+                            }
+                        }
+
+                        if (!found) {
+                            messages.add(new Message("error.import.existing.standard.variable.name", measurementVariable.getName(), stdVarProperty, stdVarMethod, stdVarScale));
+                        }
+                    }
+
+                    if (!(stdVarScale.equalsIgnoreCase(measurementVariable.getScale()))) {
+
+                        List<NameSynonym> synonyms = standardVariable.getScale().getNameSynonyms();
+                        boolean found = false;
+                        for (NameSynonym synonym : synonyms) {
+                            if (measurementVariable.getScale().equalsIgnoreCase(synonym.getName())) {
+                                found = true;
+                            }
+                        }
+
+                        if (!found) {
+                            messages.add(new Message("error.import.existing.standard.variable.name", measurementVariable.getName(), stdVarProperty, stdVarMethod, stdVarScale));
+                        }
+                    }
+
+
                 }
             }
         }
