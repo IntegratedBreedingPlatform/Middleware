@@ -353,7 +353,9 @@ public class StandardVariableSaver extends Saver {
         StringBuilder errorCodes = null;
         
         Term term = getTermBuilder().findTermByName(standardVariable.getName(), CvId.VARIABLES);
-        if (term != null && (operation == Operation.ADD || operation == Operation.UPDATE && term.getId() != standardVariable.getId())) {
+        //remove this because we don't allow updates on variable name, so this scenario will never occur.
+//        if (term != null && (operation == Operation.ADD || operation == Operation.UPDATE && term.getId() != standardVariable.getId())) {
+        if (term != null && operation == Operation.ADD) {
             errorCodes = new StringBuilder();
             errorCodes.append(ErrorCode.NON_UNIQUE_NAME.getCode());
         }
