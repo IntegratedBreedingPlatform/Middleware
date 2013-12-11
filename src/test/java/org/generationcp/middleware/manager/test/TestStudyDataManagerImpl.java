@@ -58,6 +58,7 @@ import org.generationcp.middleware.manager.ManagerFactory;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.util.Debug;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -1071,6 +1072,15 @@ public class TestStudyDataManagerImpl{
         //assertTrue(fieldMapCount.getEntryCount() > 0);
     }
 
+    @Test
+    public void testGetParentFolder() throws MiddlewareQueryException{
+    	DmsProject proj = manager.getParentFolder(10010);
+    	if(proj==null)
+    		System.out.println("Parent is null");
+    	else
+    		System.out.println("Parent is NOT null");
+    }
+    
     @Test
     public void testGetFieldMapCountsOfNursery() throws MiddlewareQueryException {
         List<Integer> nurseryIdList = new ArrayList<Integer>();

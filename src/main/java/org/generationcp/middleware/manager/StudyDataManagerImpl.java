@@ -693,8 +693,15 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
     @Override
     public DmsProject getParentFolder(int id) throws MiddlewareQueryException {
-        requireLocalDatabaseInstance();
-        return getProjectRelationshipDao().getObjectBySubjectIdAndTypeId(id, TermId.HAS_PARENT_FOLDER.getId());
+    	if(id>0)
+    		requireCentralDatabaseInstance();
+    	else
+    		requireLocalDatabaseInstance();
+        DmsProject folderParentFolder = getProjectRelationshipDao().getObjectBySubjectIdAndTypeId(id, TermId.HAS_PARENT_FOLDER.getId());
+        DmsProject studyParentFolder = getProjectRelationshipDao().getObjectBySubjectIdAndTypeId(id, TermId.STUDY_HAS_FOLDER.getId());
+        if(folderParentFolder!=null)
+        	return folderParentFolder;
+       	return studyParentFolder;
     }
 
     @Override

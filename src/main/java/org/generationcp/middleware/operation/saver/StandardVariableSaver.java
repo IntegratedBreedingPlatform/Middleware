@@ -101,9 +101,9 @@ public class StandardVariableSaver extends Saver {
 		//if(stdVar.getIsA()!=null) {//optional
 		//	saveRelationship(varId, TermId.IS_A.getId(), stdVar.getIsA());
 		//}
-		if (stdVar.getCropOntologyId() != null) {
-		    saveOrUpdateCropOntologyId(stdVar.getProperty().getId(), stdVar.getCropOntologyId());
-		}
+//		if (stdVar.getCropOntologyId() != null) {
+//		    saveOrUpdateCropOntologyId(stdVar.getProperty().getId(), stdVar.getCropOntologyId());
+//		}
 		
 		saveEnumerations(varId, stdVar.getEnumerations());
 				
@@ -343,9 +343,9 @@ public class StandardVariableSaver extends Saver {
             }
         }
         
-        if (standardVariable.getCropOntologyId() != null) {
-            saveOrUpdateCropOntologyId(standardVariable.getProperty().getId(), standardVariable.getCropOntologyId());
-        }
+//        if (standardVariable.getCropOntologyId() != null) {
+//            saveOrUpdateCropOntologyId(standardVariable.getProperty().getId(), standardVariable.getCropOntologyId());
+//        }
     }
     
     public String validate(StandardVariable standardVariable, Operation operation) throws MiddlewareQueryException {

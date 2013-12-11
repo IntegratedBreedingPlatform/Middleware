@@ -384,7 +384,7 @@ public interface OntologyDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      * @throws MiddlewareException the middleware exception
      */
-    Term addOrUpdateTermAndRelationship(String name, String definition, CvId cvId, int typeId, int objectId)
+    Term addOrUpdateTermAndRelationship(String name, String definition, CvId cvId, int typeId, int objectId, String cropOntologyId)
             throws MiddlewareQueryException, MiddlewareException;
 
     /**

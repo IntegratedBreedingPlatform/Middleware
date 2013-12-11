@@ -42,7 +42,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 
 	private static final String GET_ALL_ENVIRONMENTS_QUERY = 
 		"SELECT DISTINCT gp.nd_geolocation_id as envtId, l.lname AS locationName, prov.lname AS provinceName, " +
-		"       c.isoabbr, p.project_id, p.name, gp.value AS locationId " +
+		"       c.isoabbr, p.project_id, p.name, gp.value AS locationId, p.description AS description " +
 		"  FROM nd_geolocationprop gp " +
 		" INNER JOIN nd_experiment e on e.nd_geolocation_id = gp.nd_geolocation_id " +
 		"       AND e.nd_experiment_id = " +
@@ -151,12 +151,13 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			query.addScalar("project_id");
 			query.addScalar("name");
 			query.addScalar("locationId");
+			query.addScalar("description");
 			List<Object[]> list = query.list();
 			for (Object[] row : list) {
 				if (NumberUtils.isNumber((String) row[6])) {
 					environments.add(new TrialEnvironment((Integer) row[0], 
 										new LocationDto(Integer.valueOf(row[6].toString()), (String) row[1], (String) row[2], (String) row[3]), 
-										new StudyReference((Integer) row[4], (String) row[5])));
+										new StudyReference((Integer) row[4], (String) row[5], (String) row[7])));
 				} //otherwise it's invalid data and should not be included
 			}
 			
@@ -178,13 +179,14 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			query.addScalar("project_id");
 			query.addScalar("name");
 			query.addScalar("locationId");
+			query.addScalar("description");
 			setStartAndNumOfRows(query, start, numOfRows);
 			List<Object[]> list = query.list();
 			for (Object[] row : list) {
 				if (NumberUtils.isNumber((String) row[6])) {
 					environments.add(new TrialEnvironment((Integer) row[0], 
 										new LocationDto(Integer.valueOf(row[6].toString()), (String) row[1], (String) row[2], (String) row[3]), 
-										new StudyReference((Integer) row[4], (String) row[5])));
+										new StudyReference((Integer) row[4], (String) row[5], (String) row[7])));
 				} //otherwise it's invalid data and should not be included
 			}
 			
@@ -276,7 +278,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
             
         	// Get location name, study id and study name
         	String sql = 
-		        "SELECT DISTINCT e.nd_geolocation_id, l.lname, l.locid, p.project_id, p.name " 
+		        "SELECT DISTINCT e.nd_geolocation_id, l.lname, l.locid, p.project_id, p.name, p.description " 
         		+ "FROM nd_experiment e "
 		        + "	INNER JOIN nd_geolocationprop gp ON e.nd_geolocation_id = gp.nd_geolocation_id " 
         		+ "						AND gp.type_id =  " + TermId.LOCATION_ID.getId() 
@@ -300,10 +302,11 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
                 Integer locId = (Integer) row[2];
                 Integer studyId = (Integer) row[3];
                 String studyName = (String) row[4];
+                String studyDescription = (String) row[5];
                 
                 environmentDetails.add(new TrialEnvironment(environmentId
                                                 , new LocationDto(locId, locationName)
-                                                , new StudyReference(studyId, studyName)));
+                                                , new StudyReference(studyId, studyName, studyDescription)));
                 locIds.add(locId);
             }
             
