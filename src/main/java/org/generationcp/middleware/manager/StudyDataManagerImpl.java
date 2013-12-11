@@ -345,6 +345,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         }
         return 0;
     }
+    
+    @Override
+    public long countObservations(int datasetId, int trialEnvironmentId, int variateStdVarId) throws MiddlewareQueryException {
+        if (this.setWorkingDatabase(datasetId)) {
+            return getStockDao().countObservations(datasetId, trialEnvironmentId, variateStdVarId);
+        }
+        return 0;
+    }
 
     @Override
     public DataSet findOneDataSetByType(int studyId, DataSetType dataSetType) throws MiddlewareQueryException {

@@ -315,6 +315,19 @@ public interface StudyDataManager{
     long countStocks(int datasetId, int trialEnvironmentId, int variateStdVarId) throws MiddlewareQueryException;
 
     /**
+     * Returns the number of observations with value, matching the given dataset ID, trial
+     * environment ID and variate ID. Counts from central if the given ID is
+     * positive, otherwise counts from local.
+     * 
+     * @param datasetId
+     * @param trialEnvironmentId
+     * @param variateStdVarId
+     * @return The count
+     * @throws MiddlewareQueryException
+     */
+    long countObservations(int datasetId, int trialEnvironmentId, int variateStdVarId) throws MiddlewareQueryException;
+    
+    /**
      * Returns a single dataset belonging to the study with the given type. If
      * there is more than one matching dataset, only one is returned. If there
      * are none, null is returned.
@@ -324,6 +337,7 @@ public interface StudyDataManager{
      * @return
      * @throws MiddlewareQueryException
      */
+    
     DataSet findOneDataSetByType(int studyId, DataSetType type) throws MiddlewareQueryException;
 
     /**
@@ -512,4 +526,6 @@ public interface StudyDataManager{
     DmsProject getProject(int id) throws MiddlewareQueryException;
 
     public boolean moveFolder(int sourceId, int targetId) throws MiddlewareQueryException;
+
+	
 }
