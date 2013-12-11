@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TermProperty;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -130,6 +131,8 @@ public class TermBuilder extends Builder {
 		Term term = findTermByName(name, cv);
         if (term == null) {
         	term = getTermSaver().save(name, name, cv);
+        	//assign unclassified trait class
+        	getCvTermRelationshipSaver().save(term.getId(), TermId.IS_A.getId(), TermId.UNCLASSIFIED_TRAIT_CLASS.getId());
         }
         return term;
 	}
