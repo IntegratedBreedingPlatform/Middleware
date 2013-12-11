@@ -103,7 +103,7 @@ public class StandardVariableBuilder extends Builder {
 			standardVariable.setIsA(createTerm(cvTermRelationships, TermId.IS_A));
 			//get isA of property
 		    if (standardVariable.getProperty() != null){
-		        setWorkingDatabase(standardVariable.getId());
+		        setWorkingDatabase(standardVariable.getProperty().getId());
 				List<CVTermRelationship> propertyCvTermRelationships = 
 						getCvTermRelationshipDao().getBySubject(standardVariable.getProperty().getId());
 				standardVariable.setIsA(createTerm(propertyCvTermRelationships, TermId.IS_A));
