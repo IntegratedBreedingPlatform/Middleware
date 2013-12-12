@@ -16,6 +16,7 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
@@ -196,56 +197,13 @@ public class DataImportServiceImpl extends Service implements DataImportService 
             Set<StandardVariable> variableSet = ontologyDataManager.findStandardVariablesByNameOrSynonym(measurementVariable.getName());
             for (StandardVariable standardVariable : variableSet) {
                 if (standardVariable.getName().equals(measurementVariable.getName())) {
-                    String stdVarProperty = standardVariable.getProperty().getName();
-                    String stdVarMethod = standardVariable.getMethod().getName();
-                    String stdVarScale = standardVariable.getScale().getName();
+                    boolean allMatches = nameMatches(measurementVariable.getProperty(), standardVariable.getProperty()) && nameMatches(measurementVariable.getScale(), standardVariable.getScale())
+                            && nameMatches(measurementVariable.getMethod(), standardVariable.getMethod());
 
-                    if (!(stdVarMethod.equalsIgnoreCase(measurementVariable.getMethod()))) {
-
-                        List<NameSynonym> synonyms = standardVariable.getMethod().getNameSynonyms();
-                        boolean found = false;
-                        for (NameSynonym synonym : synonyms) {
-                            if (measurementVariable.getMethod().equalsIgnoreCase(synonym.getName())) {
-                                found = true;
-                            }
-                        }
-
-                        if (!found) {
-                            messages.add(new Message("error.import.existing.standard.variable.name", measurementVariable.getName(), stdVarProperty, stdVarMethod, stdVarScale));
-                        }
+                    if (!allMatches) {
+                        messages.add(new Message("error.import.existing.standard.variable.name", measurementVariable.getName(), standardVariable.getProperty().getName(),
+                                standardVariable.getMethod().getName(), standardVariable.getScale().getName()));
                     }
-
-                    if (!(stdVarProperty.equalsIgnoreCase(measurementVariable.getProperty()))) {
-
-                        List<NameSynonym> synonyms = standardVariable.getProperty().getNameSynonyms();
-                        boolean found = false;
-                        for (NameSynonym synonym : synonyms) {
-                            if (measurementVariable.getProperty().equalsIgnoreCase(synonym.getName())) {
-                                found = true;
-                            }
-                        }
-
-                        if (!found) {
-                            messages.add(new Message("error.import.existing.standard.variable.name", measurementVariable.getName(), stdVarProperty, stdVarMethod, stdVarScale));
-                        }
-                    }
-
-                    if (!(stdVarScale.equalsIgnoreCase(measurementVariable.getScale()))) {
-
-                        List<NameSynonym> synonyms = standardVariable.getScale().getNameSynonyms();
-                        boolean found = false;
-                        for (NameSynonym synonym : synonyms) {
-                            if (measurementVariable.getScale().equalsIgnoreCase(synonym.getName())) {
-                                found = true;
-                            }
-                        }
-
-                        if (!found) {
-                            messages.add(new Message("error.import.existing.standard.variable.name", measurementVariable.getName(), stdVarProperty, stdVarMethod, stdVarScale));
-                        }
-                    }
-
-
                 }
             }
         }
@@ -253,6 +211,21 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         if (messages.size() > 0) {
             throw new WorkbookParserException(messages);
         }
+    }
+
+    private boolean nameMatches(String name, Term term) {
+        String actualTermName = term.getName();
+        boolean matches = actualTermName.equalsIgnoreCase(name);
+        if (!matches) {
+            List<NameSynonym> synonyms = term.getNameSynonyms();
+            for (NameSynonym synonym : synonyms) {
+                if (name.equalsIgnoreCase(synonym.getName())) {
+                    matches = true;
+                }
+            }
+        }
+
+        return matches;
     }
 
 
