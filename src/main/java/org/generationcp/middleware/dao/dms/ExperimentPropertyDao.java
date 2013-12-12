@@ -172,7 +172,6 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             query.setParameter("projectId", projectId);
     
             List<Object[]> list =  query.list();           
-            
             if (list != null && list.size() > 0) {
                 datasets = createFieldMapDatasetInfo(list);        
             }
@@ -375,12 +374,12 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             Integer gid = (Integer) row[20];
             String startDate = (String) row[21];
             String season = (String) row[22];
-
+            
             FieldMapLabel label = new FieldMapLabel(experimentId 
-                                , (entryNumber.equals("null")? null : Integer.parseInt(entryNumber))
+                                , (entryNumber == null || entryNumber.equals("null")? null : Integer.parseInt(entryNumber))
                                 , germplasmName
-                                , (rep.equals("null") ? 1 : Integer.parseInt(rep))
-                                , (plotNo.equals("null") ? 0 : Integer.parseInt(plotNo)));
+                                , (rep == null || rep.equals("null") ? 1 : Integer.parseInt(rep))
+                                , (plotNo == null || plotNo.equals("null") ? 0 : Integer.parseInt(plotNo)));
             if (NumberUtils.isNumber((String) row[9])) {
                 label.setColumn(Integer.parseInt((String) row[9]));
             }
@@ -389,7 +388,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             }
             label.setStudyName((String) row[19]);
             label.setGid(gid);
-            label.setStartYear(!startDate.equals("null") ? startDate.substring(0, 4) : null);
+            label.setStartYear(startDate != null && !startDate.equals("null") ? startDate.substring(0, 4) : null);
             label.setSeason(Season.getSeason(season));
             labels.add(label);
             
