@@ -377,10 +377,10 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             String season = (String) row[22];
 
             FieldMapLabel label = new FieldMapLabel(experimentId 
-                                , (entryNumber == null ? null : Integer.parseInt(entryNumber))
+                                , (entryNumber.equals("null")? null : Integer.parseInt(entryNumber))
                                 , germplasmName
-                                , (rep == null ? 1 : Integer.parseInt(rep))
-                                , (plotNo == null ? 0 : Integer.parseInt(plotNo)));
+                                , (rep.equals("null") ? 1 : Integer.parseInt(rep))
+                                , (plotNo.equals("null") ? 0 : Integer.parseInt(plotNo)));
             if (NumberUtils.isNumber((String) row[9])) {
                 label.setColumn(Integer.parseInt((String) row[9]));
             }
@@ -389,7 +389,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             }
             label.setStudyName((String) row[19]);
             label.setGid(gid);
-            label.setStartYear(startDate != null ? startDate.substring(0, 4) : null);
+            label.setStartYear(!startDate.equals("null") ? startDate.substring(0, 4) : null);
             label.setSeason(Season.getSeason(season));
             labels.add(label);
             
