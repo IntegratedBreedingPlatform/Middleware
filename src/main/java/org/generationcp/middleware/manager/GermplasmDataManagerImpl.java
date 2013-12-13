@@ -15,6 +15,7 @@ package org.generationcp.middleware.manager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -765,6 +766,18 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         if (negs != null && setWorkingDatabase(Database.LOCAL) && negs.size()>0) {
            results.addAll(getLocationDao().getLocationByIds(negs));
         }
+        
+        //loc.getLname();
+        
+        Collections.sort(results, new Comparator() {  
+            @Override  
+            public int compare(Object obj1, Object obj2) {  
+                Location loc1 = (Location)obj1;  
+                Location loc2 = (Location)obj2;  
+                return loc1.getLname().compareToIgnoreCase(loc2.getLname());  
+            }  
+        });  
+        
         return results;
     }
 
