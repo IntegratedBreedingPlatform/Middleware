@@ -183,6 +183,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
             criteria.add(Restrictions.ne("status", STATUS_DELETED));
             criteria.setFirstResult(start);
             criteria.setMaxResults(numOfRows);
+            criteria.addOrder(Order.asc("name"));
             return criteria.list();
         } catch (HibernateException e) {
             logAndThrowException("Error with getAllTopLevelLists() query from GermplasmList: " + e.getMessage(), e);
@@ -238,6 +239,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
 	            criteria.add(Restrictions.ne("status", STATUS_DELETED));
 	            criteria.setFirstResult(start);
 	            criteria.setMaxResults(numOfRows);
+	            criteria.addOrder(Order.asc("name"));
 	            return criteria.list();
         	}
         } catch (HibernateException e) {
