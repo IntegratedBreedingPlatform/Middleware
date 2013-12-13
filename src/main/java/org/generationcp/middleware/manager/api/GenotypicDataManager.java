@@ -26,6 +26,7 @@ import org.generationcp.middleware.pojos.gdms.AlleleValues;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
 import org.generationcp.middleware.pojos.gdms.CharValues;
+import org.generationcp.middleware.pojos.gdms.DartDataRow;
 import org.generationcp.middleware.pojos.gdms.DartValues;
 import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
@@ -34,6 +35,9 @@ import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapDetailElement;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
+import org.generationcp.middleware.pojos.gdms.MappingABHRow;
+import org.generationcp.middleware.pojos.gdms.MappingAllelicSNPRow;
+import org.generationcp.middleware.pojos.gdms.MappingAllelicSSRDArTRow;
 import org.generationcp.middleware.pojos.gdms.MappingPop;
 import org.generationcp.middleware.pojos.gdms.MappingPopValues;
 import org.generationcp.middleware.pojos.gdms.MappingValueElement;
@@ -51,9 +55,12 @@ import org.generationcp.middleware.pojos.gdms.Mta;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.generationcp.middleware.pojos.gdms.Qtl;
 import org.generationcp.middleware.pojos.gdms.QtlDataElement;
+import org.generationcp.middleware.pojos.gdms.QtlDataRow;
 import org.generationcp.middleware.pojos.gdms.QtlDetailElement;
 import org.generationcp.middleware.pojos.gdms.QtlDetails;
 import org.generationcp.middleware.pojos.gdms.QtlDetailsPK;
+import org.generationcp.middleware.pojos.gdms.SNPDataRow;
+import org.generationcp.middleware.pojos.gdms.SSRDataRow;
 
 /**
  * This is the API for retrieving and storing genotypic data.
@@ -1438,115 +1445,112 @@ public interface GenotypicDataManager{
     public Boolean setCISRMarkers(Marker marker, MarkerAlias markerAlias, MarkerDetails markerDetails, MarkerUserInfo markerUserInfo) throws MiddlewareQueryException;
 
     /**
-     * Sets QTL
-     * @param datasetUser - (DatasetUser)
+     * Sets QTL.
+     * 
+     *  To use, supply the Dataset and DatasetUsers objects to save. 
+     *  Also pass the QTL Genotyping data rows as a list of QtlDataRow objects.
+     * 
      * @param dataset - (Dataset) dataset_type will be set to/overridden by "QTL"
-     * @param qtlDetails - (QtlDetails) (qtl_id will be automatically set to inserted Qtl's ID)
-     * @param qtl - (Qtl) (dataset_id will be automatically set to inserted dataset's ID) 
+     * @param datasetUser - (DatasetUser)
+     * @param List<QtlDataRow> - QTL Genotyping data rows to insert 
      * @return (boolean) - true if successful, exception or false if failed
      * @throws MiddlewareQueryException
      */
-    public Boolean setQTL(DatasetUsers datasetUser, Dataset dataset, QtlDetails qtlDetails, Qtl qtl) throws MiddlewareQueryException;
+    public Boolean setQTL(Dataset dataset, DatasetUsers datasetUser, List<QtlDataRow> rows) throws MiddlewareQueryException;
 
     /**
      * Sets DArT
-     * @param accMetadataSet - (AccMetadataSet)
-     * @param markerMetadataSet - (MarkerMetadataSet)
-     * @param datasetUser - (DatasetUser)
-     * @param alleleValues - (AlleleValues)
+     * 
+     *  To use, supply the Dataset and DatasetUsers objects to save. 
+     *  Also pass the DArT Genotyping data rows as a list of DartDataRow objects.
+     * 
      * @param dataset - (Dataset) dataset_type = "DArT", datatype = "int" 
-     * @param dartValues - (DartValues)
-     * @param marker - Marker (not mandatory)
+     * @param datasetUser - (DatasetUser)
+     * @param List<DartDataRow> - DArT Genotyping data rows to insert 
      * @return (boolean) - true if successful, exception or false if failed
      * @throws MiddlewareQueryException
      */
-    public Boolean setDart(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser, 
-            AlleleValues alleleValues, Dataset dataset, DartValues dartValues, Marker marker) throws MiddlewareQueryException;
+    public Boolean setDart(Dataset dataset, DatasetUsers datasetUser, List<DartDataRow> rows) throws MiddlewareQueryException;
     
     /**
      * Sets SSR
-     * @param accMetadataSet - (AccMetadataSet)
-     * @param markerMetadataSet - (MarkerMetadataSet)
-     * @param datasetUser - (DatasetUser)
-     * @param alleleValues - (AlleleValues)
+     * 
+     *  To use, supply the Dataset and DatasetUsers objects to save. 
+     *  Also pass the SSR Genotyping data rows as a list of SSRDataRow objects.
+     * 
      * @param dataset - (Dataset) dataset_type = "SSR", datatype = "int" 
-     * @param marker - Marker (not mandatory)
+     * @param datasetUser - (DatasetUser)
+     * @param List<SSRDataRow> - SSR Genotyping data rows to insert 
      * @return (boolean) - true if successful, exception or false if failed
      * @throws MiddlewareQueryException
      */
-
-    public Boolean setSSR(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser, 
-            AlleleValues alleleValues, Dataset dataset, Marker marker) throws MiddlewareQueryException;
+    public Boolean setSSR(Dataset dataset, DatasetUsers datasetUser, List<SSRDataRow> rows) throws MiddlewareQueryException;
 
     
     /**
      * Sets SNP
-     * @param accMetadataSet - (AccMetadataSet)
-     * @param markerMetadataSet - (MarkerMetadataSet)
-     * @param datasetUser - (DatasetUser)
-     * @param charValues - (CharValues)
+     * 
+     *  To use, supply the Dataset and DatasetUsers objects to save. 
+     *  Also pass the SNP Genotyping data rows as a list of SNPDataRow objects.
+     * 
      * @param dataset - (Dataset) dataset_type = "SNP", datatype = "int" 
-     * @param marker - Marker (not mandatory)
+     * @param datasetUser - (DatasetUser)
+     * @param List<SNPDataRow> - SNP Genotyping data rows to insert 
      * @return (boolean) - true if successful, exception or false if failed
      * @throws MiddlewareQueryException
      */
-    public Boolean setSNP(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser, 
-            CharValues charValues, Dataset dataset, Marker marker) throws MiddlewareQueryException;
+    public Boolean setSNP(Dataset dataset, DatasetUsers datasetUser, List<SNPDataRow> rows) throws MiddlewareQueryException;
 
     /**
      * Sets Mapping Data of type ABH
      * 
-     * @param accMetadataSet - Accession Metadataset
-     * @param markerMetadataSet - Marker Metadataset
+     *  To use, supply the Dataset and DatasetUsers objects to save. 
+     *  Also pass the Mapping ABH Genotyping data rows as a list of MappingABHRow objects.
+     * 
+     * @param dataset - Dataset
      * @param datasetUser - Dataset Users
      * @param mappingPop - Mapping Population
-     * @param mappingPopValues - Mapping population Values
-     * @param dataset - Dataset
-     * @param marker - Marker (not mandatory)
+     * @param List<MappingABHRow> - Mapping ABH Genotyping data rows to insert 
      * @return true if values were successfully saved in the database, false otherwise
      * @throws MiddlewareQueryException
      */
-    public Boolean setMappingABH(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser,
-            MappingPop mappingPop, MappingPopValues mappingPopValues, Dataset dataset, Marker marker) throws MiddlewareQueryException;
+    public Boolean setMappingABH(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop, List<MappingABHRow> rows) 
+            throws MiddlewareQueryException;
     
     /**
      * Sets Mapping Data of Allelic SNP
      * 
-     * @param accMetadataSet - Accession Metadataset
-     * @param markerMetadataSet - Marker Metadataset
+     *  To use, supply the Dataset and DatasetUsers objects to save. 
+     *  Also pass the Mapping Allelic SNP Genotyping data rows as a list of MappingAllelicSNPRow objects.
+     * 
+     * @param dataset - Dataset
      * @param datasetUser - Dataset Users
      * @param mappingPop - Mapping Population
-     * @param mappingPopValues - Mapping population Values
-     * @param dataset - Dataset
-     * @param marker - Marker (not mandatory)
-     * @param charValues - CharValues
+     * @param List<MappingAllelicSNPRow> - Mapping Allelic SNP Genotyping data rows to insert 
      * @return true if values were successfully saved in the database, false otherwise
      * @throws MiddlewareQueryException
      */
-    public Boolean setMappingAllelicSNP(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser,
-            MappingPop mappingPop, MappingPopValues mappingPopValues, Dataset dataset, Marker marker, CharValues charValues) 
-                    throws MiddlewareQueryException;
+    public Boolean setMappingAllelicSNP(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop, List<MappingAllelicSNPRow> rows) 
+            throws MiddlewareQueryException;
     
     /**
      * Sets Mapping Data of Allelic SSR DArT
      * 
-     * @param accMetadataSet - Accession Metadataset
-     * @param markerMetadataSet - Marker Metadataset
+     *  To use, supply the Dataset and DatasetUsers objects to save. 
+     *  Also pass the Mapping Allelic SSR DArT Genotyping data rows as a list of MappingAllelicSSRDArTRow objects.
+     * 
+     * @param dataset - Dataset
      * @param datasetUser - Dataset Users
      * @param mappingPop - Mapping Population
-     * @param mappingPopValues - Mapping population Values
-     * @param dataset - Dataset
-     * @param marker - Marker (not mandatory)
-     * @param alleleValues - AlleleValues
+     * @param List<MappingAllelicSSRDArTRow> - Mapping Allelic SSR DArT Genotyping data rows to insert 
      * @return true if values were successfully saved in the database, false otherwise
      * @throws MiddlewareQueryException
      */
-    public Boolean setMappingAllelicSSRDArT(AccMetadataSet accMetadataSet, MarkerMetadataSet markerMetadataSet, DatasetUsers datasetUser,
-            MappingPop mappingPop, MappingPopValues mappingPopValues, Dataset dataset, Marker marker, AlleleValues alleleValues) 
-                    throws MiddlewareQueryException;
+    public Boolean setMappingAllelicSSRDArT(Dataset dataset, DatasetUsers datasetUser,  MappingPop mappingPop, 
+            List<MappingAllelicSSRDArTRow> rows) throws MiddlewareQueryException;
  
     /**
-     * Sets Maps/
+     * Sets Maps.
      * 
      * @param marker - GDMS Marker
      * @param markerOnMap - GDMS Marker On Map

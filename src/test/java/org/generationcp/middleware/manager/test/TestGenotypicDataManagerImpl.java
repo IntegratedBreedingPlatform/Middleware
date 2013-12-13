@@ -37,6 +37,7 @@ import org.generationcp.middleware.pojos.gdms.AlleleValues;
 import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
 import org.generationcp.middleware.pojos.gdms.CharValues;
+import org.generationcp.middleware.pojos.gdms.DartDataRow;
 import org.generationcp.middleware.pojos.gdms.DartValues;
 import org.generationcp.middleware.pojos.gdms.Dataset;
 import org.generationcp.middleware.pojos.gdms.DatasetElement;
@@ -45,6 +46,9 @@ import org.generationcp.middleware.pojos.gdms.GermplasmMarkerElement;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapDetailElement;
 import org.generationcp.middleware.pojos.gdms.MapInfo;
+import org.generationcp.middleware.pojos.gdms.MappingABHRow;
+import org.generationcp.middleware.pojos.gdms.MappingAllelicSNPRow;
+import org.generationcp.middleware.pojos.gdms.MappingAllelicSSRDArTRow;
 import org.generationcp.middleware.pojos.gdms.MappingPop;
 import org.generationcp.middleware.pojos.gdms.MappingPopValues;
 import org.generationcp.middleware.pojos.gdms.MappingValueElement;
@@ -62,9 +66,12 @@ import org.generationcp.middleware.pojos.gdms.Mta;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
 import org.generationcp.middleware.pojos.gdms.Qtl;
 import org.generationcp.middleware.pojos.gdms.QtlDataElement;
+import org.generationcp.middleware.pojos.gdms.QtlDataRow;
 import org.generationcp.middleware.pojos.gdms.QtlDetailElement;
 import org.generationcp.middleware.pojos.gdms.QtlDetails;
 import org.generationcp.middleware.pojos.gdms.QtlDetailsPK;
+import org.generationcp.middleware.pojos.gdms.SNPDataRow;
+import org.generationcp.middleware.pojos.gdms.SSRDataRow;
 import org.generationcp.middleware.util.Debug;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -1497,7 +1504,10 @@ public class TestGenotypicDataManagerImpl{
 
         Qtl qtl = new Qtl(qtlId, qtlName, datasetId);
         
-        Boolean addStatus = manager.setQTL(datasetUser, dataset, qtlDetails, qtl);
+        List<QtlDataRow> dataRows = new ArrayList<QtlDataRow>();
+        dataRows.add(new QtlDataRow(qtl, qtlDetails));
+                
+        Boolean addStatus = manager.setQTL(dataset, datasetUser, dataRows);
         Debug.println(0, "testSetQTL() Added: " + (addStatus != null ? datasetUser : null) 
                 + (addStatus != null ? dataset : null) + (addStatus != null ? qtlDetails : null) + (addStatus != null ? qtl : null));
 
@@ -1505,8 +1515,9 @@ public class TestGenotypicDataManagerImpl{
         Debug.println(0, "testSetQTL() Added: ");
         Debug.println(3, datasetUser.toString()); 
         Debug.println(3, dataset.toString()); 
-        Debug.println(3, qtlDetails.toString()); 
-        Debug.println(3, qtl.toString()); 
+        for (QtlDataRow row : dataRows){
+            Debug.println(3, row.toString());
+        }
 
     }
     
@@ -1523,16 +1534,19 @@ public class TestGenotypicDataManagerImpl{
         AlleleValues alleleValues = (AlleleValues) mappingRecords.get(ALLELE_VALUES);
         DartValues dartValues = (DartValues) mappingRecords.get(DART_VALUES);
 
-        Boolean addStatus = manager.setDart(accMetadataSet, markerMetadataSet, datasetUser, 
-                                                alleleValues, dataset, dartValues, marker);
+        List<DartDataRow> dataRows = new ArrayList<DartDataRow>();
+        dataRows.add(new DartDataRow(marker, accMetadataSet, markerMetadataSet, alleleValues, dartValues));
+
+        Boolean addStatus = manager.setDart(dataset, datasetUser, dataRows);
+        
         assertTrue(addStatus);
         Debug.println(0, "testSetDArT() Added: ");
-        Debug.println(3, accMetadataSet.toString()); 
-        Debug.println(3, markerMetadataSet.toString()); 
-        Debug.println(3, datasetUser.toString()); 
-        Debug.println(3, alleleValues.toString()); 
         Debug.println(3, dataset.toString()); 
-        Debug.println(3, marker.toString()); 
+        Debug.println(3, datasetUser.toString()); 
+        for (DartDataRow row : dataRows){
+            Debug.println(3, row.toString());
+        }
+
     }
     
     @Test
@@ -1547,11 +1561,12 @@ public class TestGenotypicDataManagerImpl{
         AlleleValues alleleValues = (AlleleValues) mappingRecords.get(ALLELE_VALUES);
         DartValues dartValues = (DartValues) mappingRecords.get(DART_VALUES);
 
+        List<DartDataRow> dataRows = new ArrayList<DartDataRow>();
+        dataRows.add(new DartDataRow(marker, accMetadataSet, markerMetadataSet, alleleValues, dartValues));
+
         try{
-                manager.setDart(accMetadataSet, markerMetadataSet, datasetUser, 
-                    alleleValues, dataset, dartValues, marker);  
-                manager.setDart(accMetadataSet, markerMetadataSet, datasetUser, 
-                        alleleValues, dataset, dartValues, marker);  
+                manager.setDart(dataset, datasetUser, dataRows);  
+                manager.setDart(dataset, datasetUser, dataRows);  
         } catch (MiddlewareQueryException e) {
             assertTrue(e.getMessage().contains("Dataset already exists"));
         }
@@ -1569,16 +1584,18 @@ public class TestGenotypicDataManagerImpl{
         Marker marker = (Marker) mappingRecords.get(MARKER);
         AlleleValues alleleValues = (AlleleValues) mappingRecords.get(ALLELE_VALUES);
 
-        Boolean addStatus = manager.setSSR(accMetadataSet, markerMetadataSet, datasetUser, alleleValues, dataset, marker);
+        List<SSRDataRow> dataRows = new ArrayList<SSRDataRow>();
+        dataRows.add(new SSRDataRow(marker, accMetadataSet, markerMetadataSet, alleleValues));
+
+        Boolean addStatus = manager.setSSR(dataset, datasetUser, dataRows);
 
         assertTrue(addStatus);
         Debug.println(0, "testSetSSR() Added: ");
-        Debug.println(3, accMetadataSet.toString()); 
-        Debug.println(3, markerMetadataSet.toString()); 
+        Debug.println(3, dataset.toString());         
         Debug.println(3, datasetUser.toString()); 
-        Debug.println(3, alleleValues.toString()); 
-        Debug.println(3, dataset.toString()); 
-        Debug.println(3, marker.toString()); 
+        for (SSRDataRow row : dataRows){
+            Debug.println(3, row.toString());
+        }
 
     }
     
@@ -1593,9 +1610,12 @@ public class TestGenotypicDataManagerImpl{
         Marker marker = (Marker) mappingRecords.get(MARKER);
         AlleleValues alleleValues = (AlleleValues) mappingRecords.get(ALLELE_VALUES);
 
+        List<SSRDataRow> dataRows = new ArrayList<SSRDataRow>();
+        dataRows.add(new SSRDataRow(marker, accMetadataSet, markerMetadataSet, alleleValues));
+
         try{
-            manager.setSSR(accMetadataSet, markerMetadataSet, datasetUser, alleleValues, dataset, marker);
-            manager.setSSR(accMetadataSet, markerMetadataSet, datasetUser, alleleValues, dataset, marker);
+            manager.setSSR(dataset, datasetUser, dataRows);
+            manager.setSSR(dataset, datasetUser, dataRows);
         } catch (MiddlewareQueryException e) {
             assertTrue(e.getMessage().contains("Dataset already exists"));
         }
@@ -1614,16 +1634,17 @@ public class TestGenotypicDataManagerImpl{
         Marker marker = (Marker) mappingRecords.get(MARKER);
         CharValues charValues = (CharValues) mappingRecords.get(CHAR_VALUES);
 
-        Boolean addStatus = manager.setSNP(accMetadataSet, markerMetadataSet, 
-                                                datasetUser, charValues, dataset, marker);
+        List<SNPDataRow> dataRows = new ArrayList<SNPDataRow>();
+        dataRows.add(new SNPDataRow(marker, accMetadataSet, markerMetadataSet, charValues));
+
+        Boolean addStatus = manager.setSNP(dataset, datasetUser, dataRows);
         assertTrue(addStatus);
         Debug.println(0, "testSetSNP() Added: ");
-        Debug.println(3, accMetadataSet.toString()); 
-        Debug.println(3, markerMetadataSet.toString()); 
+        Debug.println(3, dataset.toString());         
         Debug.println(3, datasetUser.toString()); 
-        Debug.println(3, charValues.toString()); 
-        Debug.println(3, dataset.toString()); 
-        Debug.println(3, marker.toString()); 
+        for (SNPDataRow row : dataRows){
+            Debug.println(3, row.toString());
+        }
     }
     
     @Test
@@ -1637,9 +1658,12 @@ public class TestGenotypicDataManagerImpl{
         Marker marker = (Marker) mappingRecords.get(MARKER);
         CharValues charValues = (CharValues) mappingRecords.get(CHAR_VALUES);
 
+        List<SNPDataRow> dataRows = new ArrayList<SNPDataRow>();
+        dataRows.add(new SNPDataRow(marker, accMetadataSet, markerMetadataSet, charValues));
+
         try{
-            manager.setSNP(accMetadataSet, markerMetadataSet, datasetUser, charValues, dataset, marker);
-            manager.setSNP(accMetadataSet, markerMetadataSet, datasetUser, charValues, dataset, marker);
+            manager.setSNP(dataset, datasetUser, dataRows);
+            manager.setSNP(dataset, datasetUser, dataRows);
         } catch (MiddlewareQueryException e) {
             assertTrue(e.getMessage().contains("Dataset already exists"));
         }
@@ -1675,17 +1699,19 @@ public class TestGenotypicDataManagerImpl{
         dataset.setDataType(dataType);
         dataset.setGenus(genus);
         
-        Boolean addStatus = manager.setMappingABH(accMetadataSet, markerMetadataSet, datasetUser, 
-                                            mappingPop, mappingPopValues, dataset, marker);
+        List<MappingABHRow> dataRows = new ArrayList<MappingABHRow>();
+        dataRows.add(new MappingABHRow(marker, accMetadataSet, markerMetadataSet, mappingPopValues));
+        
+        Boolean addStatus = manager.setMappingABH(dataset, datasetUser, mappingPop, dataRows);
 
         assertTrue(addStatus);
         Debug.println(0, "testSetMappingABH() Added: ");
-        Debug.println(3, accMetadataSet.toString()); 
-        Debug.println(3, markerMetadataSet.toString()); 
-        Debug.println(3, datasetUser.toString()); 
-        Debug.println(3, mappingPopValues.toString()); 
-        Debug.println(3, dataset.toString()); 
-        Debug.println(3, marker.toString()); 
+        Debug.println(3, dataset.toString());         
+        Debug.println(3, datasetUser.toString());    
+        Debug.println(3, mappingPop.toString()); 
+        for (MappingABHRow row : dataRows){
+            Debug.println(3, row.toString());
+        }
 
     }
     
@@ -1718,11 +1744,13 @@ public class TestGenotypicDataManagerImpl{
         dataset.setDataType(dataType);
         dataset.setGenus(genus);
         
+        List<MappingABHRow> dataRows = new ArrayList<MappingABHRow>();
+        dataRows.add(new MappingABHRow(marker, accMetadataSet, markerMetadataSet, mappingPopValues));
+        
+
         try{
-            manager.setMappingABH(accMetadataSet, markerMetadataSet, datasetUser, 
-                    mappingPop, mappingPopValues, dataset, marker);
-            manager.setMappingABH(accMetadataSet, markerMetadataSet, datasetUser, 
-                    mappingPop, mappingPopValues, dataset, marker);
+            manager.setMappingABH(dataset, datasetUser, mappingPop, dataRows);
+            manager.setMappingABH(dataset, datasetUser, mappingPop, dataRows);            
         } catch (MiddlewareQueryException e) {
             assertTrue(e.getMessage().contains("Dataset already exists"));
         }
@@ -1742,17 +1770,19 @@ public class TestGenotypicDataManagerImpl{
         Marker marker = (Marker) mappingRecords.get(MARKER);
         CharValues charValues = (CharValues) mappingRecords.get(CHAR_VALUES);
         
-        Boolean addStatus = manager.setMappingAllelicSNP(accMetadataSet, markerMetadataSet, datasetUser, mappingPop, 
-                                    mappingPopValues, dataset, marker, charValues);
+        List<MappingAllelicSNPRow> dataRows = new ArrayList<MappingAllelicSNPRow>();
+        dataRows.add(new MappingAllelicSNPRow(marker, accMetadataSet, markerMetadataSet, mappingPopValues, charValues));
+        
+        Boolean addStatus = manager.setMappingAllelicSNP(dataset, datasetUser, mappingPop, dataRows);
+
         assertTrue(addStatus);
         Debug.println(0, "testSetMappingAllelicSNP() Added: ");
-        Debug.println(3, accMetadataSet.toString()); 
-        Debug.println(3, markerMetadataSet.toString()); 
-        Debug.println(3, datasetUser.toString()); 
-        Debug.println(3, mappingPopValues.toString()); 
-        Debug.println(3, dataset.toString()); 
-        Debug.println(3, marker.toString()); 
-        Debug.println(3, charValues.toString()); 
+        Debug.println(3, dataset.toString());         
+        Debug.println(3, datasetUser.toString());    
+        Debug.println(3, mappingPop.toString()); 
+        for (MappingAllelicSNPRow row : dataRows){
+            Debug.println(3, row.toString());
+        }
     }
     
 
@@ -1769,11 +1799,12 @@ public class TestGenotypicDataManagerImpl{
         Marker marker = (Marker) mappingRecords.get(MARKER);
         CharValues charValues = (CharValues) mappingRecords.get(CHAR_VALUES);
 
+        List<MappingAllelicSNPRow> dataRows = new ArrayList<MappingAllelicSNPRow>();
+        dataRows.add(new MappingAllelicSNPRow(marker, accMetadataSet, markerMetadataSet, mappingPopValues, charValues));
+        
         try{
-            manager.setMappingAllelicSNP(accMetadataSet, markerMetadataSet, datasetUser, mappingPop, 
-                    mappingPopValues, dataset, marker, charValues);
-            manager.setMappingAllelicSNP(accMetadataSet, markerMetadataSet, datasetUser, mappingPop, 
-                    mappingPopValues, dataset, marker, charValues);
+            manager.setMappingAllelicSNP(dataset, datasetUser, mappingPop, dataRows);
+            manager.setMappingAllelicSNP(dataset, datasetUser, mappingPop, dataRows);
         } catch (MiddlewareQueryException e) {
             assertTrue(e.getMessage().contains("Dataset already exists"));
         }
@@ -1794,18 +1825,21 @@ public class TestGenotypicDataManagerImpl{
         Marker marker = (Marker) mappingRecords.get(MARKER);
         marker.setMarkerName(marker.getMarkerName() + (int) (Math.random()*100));  //Remove line to test duplicate marker entries
         AlleleValues alleleValues = (AlleleValues) mappingRecords.get(ALLELE_VALUES);
+        DartValues dartValues = (DartValues) mappingRecords.get(DART_VALUES);
         
-        Boolean addStatus = manager.setMappingAllelicSSRDArT(accMetadataSet, markerMetadataSet, datasetUser, mappingPop, 
-                                    mappingPopValues, dataset, marker, alleleValues);
+        List<MappingAllelicSSRDArTRow> dataRows = new ArrayList<MappingAllelicSSRDArTRow>();
+        dataRows.add(new MappingAllelicSSRDArTRow(marker, accMetadataSet, markerMetadataSet, mappingPopValues, alleleValues, dartValues));
+
+        Boolean addStatus = manager.setMappingAllelicSSRDArT(dataset, datasetUser, mappingPop, dataRows);
+        
         assertTrue(addStatus);
         Debug.println(0, "testSetMappingAllelicSSRDArT() Added: ");
-        Debug.println(3, accMetadataSet.toString()); 
-        Debug.println(3, markerMetadataSet.toString()); 
-        Debug.println(3, datasetUser.toString()); 
-        Debug.println(3, mappingPopValues.toString()); 
-        Debug.println(3, dataset.toString()); 
-        Debug.println(3, marker.toString()); 
-        Debug.println(3, alleleValues.toString()); 
+        Debug.println(3, dataset.toString());         
+        Debug.println(3, datasetUser.toString());    
+        Debug.println(3, mappingPop.toString()); 
+        for (MappingAllelicSSRDArTRow row : dataRows){
+            Debug.println(3, row.toString());
+        }
     }
         
 
@@ -1822,12 +1856,14 @@ public class TestGenotypicDataManagerImpl{
         Marker marker = (Marker) mappingRecords.get(MARKER);
         marker.setMarkerName(marker.getMarkerName() + (int) (Math.random()*100));  //Remove line to test duplicate marker entries
         AlleleValues alleleValues = (AlleleValues) mappingRecords.get(ALLELE_VALUES);
+        DartValues dartValues = (DartValues) mappingRecords.get(DART_VALUES);
         
+        List<MappingAllelicSSRDArTRow> dataRows = new ArrayList<MappingAllelicSSRDArTRow>();
+        dataRows.add(new MappingAllelicSSRDArTRow(marker, accMetadataSet, markerMetadataSet, mappingPopValues, alleleValues, dartValues));
+
         try{
-            manager.setMappingAllelicSSRDArT(accMetadataSet, markerMetadataSet, datasetUser, mappingPop, 
-                    mappingPopValues, dataset, marker, alleleValues);
-            manager.setMappingAllelicSSRDArT(accMetadataSet, markerMetadataSet, datasetUser, mappingPop, 
-                    mappingPopValues, dataset, marker, alleleValues);
+            manager.setMappingAllelicSSRDArT(dataset, datasetUser, mappingPop, dataRows);
+            manager.setMappingAllelicSSRDArT(dataset, datasetUser, mappingPop, dataRows);
         } catch (MiddlewareQueryException e) {
             assertTrue(e.getMessage().contains("Dataset already exists"));
         }
