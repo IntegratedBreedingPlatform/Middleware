@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -418,7 +419,7 @@ public class WorkbookParser {
             Sheet sheet = wb.getSheetAt(sheetNumber);
             Row row = sheet.getRow(rowNumber);
             Cell cell = row.getCell(columnNumber);
-            return cell.getStringCellValue();
+            return getCellStringValue(cell);
         } catch (IllegalStateException e) {
             Sheet sheet = wb.getSheetAt(sheetNumber);
             Row row = sheet.getRow(rowNumber);
@@ -453,12 +454,22 @@ public class WorkbookParser {
     private static Boolean rowIsEmpty(Workbook wb, Integer sheet, Integer row, int len) {
         Integer col = 0;
         for (col = 0; col < len; col++) {
-            if (!getCellStringValue(wb, sheet, row, col).equals("") && getCellStringValue(wb, sheet, row, col) != null) {
+        	String value = getCellStringValue(wb, sheet, row, col);
+            if (value != null && !value.equals("") ) {
                 return false;
             }
             col++;
         }
         return true;
+    }
+    
+    public static String getCellStringValue(Cell cell) {
+    	if (cell == null) {
+            return null;
+        }
+    	DataFormatter formatter = new DataFormatter();
+        String formattedCellValue = formatter.formatCellValue(cell);
+        return formattedCellValue;
     }
 
 }
