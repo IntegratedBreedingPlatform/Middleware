@@ -223,7 +223,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
                     ontologyDataManager.findStandardVariableByTraitScaleMethodNames(measurementVariable.getProperty(), measurementVariable.getScale(), measurementVariable.getMethod());
 
             if (!standardVariable.getName().equalsIgnoreCase(measurementVariable.getName())) {
-                messages.add(new Message("error.import.existing.standard.variable.psm", measurementVariable.getName(), standardVariable.getProperty().getName(),
+                messages.add(new Message("error.import.existing.standard.variable.psm", standardVariable.getName(), standardVariable.getProperty().getName(),
                         standardVariable.getMethod().getName(), standardVariable.getScale().getName()));
             }
         }
