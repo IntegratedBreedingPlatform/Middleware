@@ -166,6 +166,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         //GCP-6253
         checkForDuplicateVariableNames(ontology, workbook, messages);
 
+        checkForDuplicatePSMCombo(ontology, workbook, messages);
+
         return workbook;
     }
 
