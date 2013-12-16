@@ -38,9 +38,7 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
-import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.StudyType;
-import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.StudyResultSetByGid;
@@ -57,7 +55,6 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.util.PlotUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -602,7 +599,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             trans = session.beginTransaction();
             DmsProject currentFolder = getDmsProjectDao().getById(folderId);
             currentFolder.setName(newFolderName);
-            DmsProject result = getDmsProjectDao().saveOrUpdate(currentFolder);
+            getDmsProjectDao().saveOrUpdate(currentFolder);
             trans.commit();
             return true;
         } catch (Exception e) {
@@ -744,6 +741,71 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		Object[] parameters = new Object[] { };
         return getFromLocalAndCentralByMethod(getDmsProjectDao(), methods, start, numOfRows,
                 parameters, new Class[] { });
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	public List<StudyDetails> getAllStudyDetails(StudyType studyType) throws MiddlewareQueryException {
+		List<StudyDetails> list = new ArrayList<StudyDetails>();
+		if(setWorkingDatabase(Database.LOCAL)) {
+			List localList = getDmsProjectDao().getAllStudyDetails(studyType);
+			if(localList!=null) {
+				list.addAll(localList);
+			}
+		}
+		if(setWorkingDatabase(Database.CENTRAL)) {
+			List centralList = getDmsProjectDao().getAllStudyDetails(studyType);
+			if(centralList!=null) {
+				list.addAll(centralList);
+			}
+		}
+		return list;
+	}
+
+	@Override
+	public long countAllStudyDetails(StudyType studyType)
+			throws MiddlewareQueryException {
+		long count = 0;
+		if(setWorkingDatabase(Database.LOCAL)) {
+			count += getDmsProjectDao().countAllStudyDetails(studyType);
+		}
+		if(setWorkingDatabase(Database.CENTRAL)) {
+			count += getDmsProjectDao().countAllStudyDetails(studyType);
+		}
+		return count;
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	public List<StudyDetails> getAllNurseryAndTrialStudyDetails()
+			throws MiddlewareQueryException {
+		List<StudyDetails> list = new ArrayList<StudyDetails>();
+		if(setWorkingDatabase(Database.LOCAL)) {
+			List localList = getDmsProjectDao().getAllNurseryAndTrialStudyDetails();
+			if(localList!=null) {
+				list.addAll(localList);
+			}
+		}
+		if(setWorkingDatabase(Database.CENTRAL)) {
+			List centralList = getDmsProjectDao().getAllNurseryAndTrialStudyDetails();
+			if(centralList!=null) {
+				list.addAll(centralList);
+			}
+		}
+		return list;
+	}
+
+	@Override
+	public long countAllNurseryAndTrialStudyDetails()
+			throws MiddlewareQueryException {
+		long count = 0;
+		if(setWorkingDatabase(Database.LOCAL)) {
+			count += getDmsProjectDao().countAllNurseryAndTrialStudyDetails();
+		}
+		if(setWorkingDatabase(Database.CENTRAL)) {
+			count += getDmsProjectDao().countAllNurseryAndTrialStudyDetails();
+		}
+		return count;
 	}
 
 
