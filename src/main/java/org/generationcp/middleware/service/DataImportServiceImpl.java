@@ -12,6 +12,7 @@
 package org.generationcp.middleware.service;
 
 import org.generationcp.middleware.domain.dms.NameSynonym;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -168,6 +169,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
         checkForDuplicatePSMCombo(ontology, workbook, messages);
 
+        checkForInvalidLabel(workbook, messages);
+
         return workbook;
     }
 
@@ -222,9 +225,29 @@ public class DataImportServiceImpl extends Service implements DataImportService 
             StandardVariable standardVariable =
                     ontologyDataManager.findStandardVariableByTraitScaleMethodNames(measurementVariable.getProperty(), measurementVariable.getScale(), measurementVariable.getMethod());
 
+            if (standardVariable == null) {
+                return;
+            }
+
             if (!standardVariable.getName().equalsIgnoreCase(measurementVariable.getName())) {
                 messages.add(new Message("error.import.existing.standard.variable.psm", standardVariable.getName(), standardVariable.getProperty().getName(),
                         standardVariable.getMethod().getName(), standardVariable.getScale().getName()));
+            }
+        }
+
+        if (messages.size() > 0) {
+            throw new WorkbookParserException(messages);
+        }
+    }
+
+    private void checkForInvalidLabel(Workbook workbook, List<Message> messages) throws MiddlewareQueryException, WorkbookParserException {
+        List<MeasurementVariable> variableList = workbook.getFactors();
+        variableList.addAll(workbook.getConditions());
+
+        for (MeasurementVariable measurementVariable : variableList) {
+            PhenotypicType type = PhenotypicType.getPhenotypicTypeForLabel(measurementVariable.getLabel(), false);
+            if (type == PhenotypicType.VARIATE) {
+                messages.add(new Message("error.import.invalid.label", measurementVariable.getName(), measurementVariable.getLabel()));
             }
         }
 
