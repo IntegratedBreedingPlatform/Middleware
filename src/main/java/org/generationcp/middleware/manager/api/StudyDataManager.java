@@ -527,5 +527,35 @@ public interface StudyDataManager{
 
     public boolean moveFolder(int sourceId, int targetId) throws MiddlewareQueryException;
 
-	
+    /**
+     * 
+     * Retrieves the study details of the given study type from both central and local in batches
+     * ordered by db instance then study name
+     * 
+     * @param studyType
+     *            Can be any of the types defined in {@link StudyType}
+     * @param start
+     *            The start index of the rows to retrieve
+     * @param numOfRows
+     *            The number of items to retrieve
+     * @return The list of study details having the given study type
+     * @throws MiddlewareQueryException
+     */
+    List<StudyDetails> getStudyDetails(StudyType studyType, int start, int numOfRows) throws MiddlewareQueryException;
+    
+    /**
+     * 
+     * Retrieves the study details of the all nurseries and trials from both central and local in batches
+     * ordered by db instance then study name
+     * 
+     * @param start
+     *            The start index of the rows to retrieve
+     * @param numOfRows
+     *            The number of items to retrieve
+     * @return The list of study details of Nurseries and Trials
+     * @throws MiddlewareQueryException
+     */
+    List<StudyDetails> getNurseryAndTrialStudyDetails(int start, int numOfRows) throws MiddlewareQueryException;
+    
+    
 }

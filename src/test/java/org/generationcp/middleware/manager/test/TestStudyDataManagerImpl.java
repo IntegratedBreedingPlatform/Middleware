@@ -1126,4 +1126,24 @@ public class TestStudyDataManagerImpl{
         manager.saveOrUpdateFieldmapProperties(info, "");
     }
     
+    @Test
+    public void testGetStudyDetailsWithPaging() throws MiddlewareQueryException {
+    	Debug.println(0, "testGetStudyDetailsWithPaging");
+    	Debug.println(0, "List of Nurseries");
+    	List<StudyDetails> nlist = manager.getStudyDetails(StudyType.N, 0,10);
+        for (StudyDetails s : nlist) {
+            Debug.println(0, s.toString());
+        }
+        Debug.println(0, "List of Trials");
+        List<StudyDetails> tlist = manager.getStudyDetails(StudyType.T, 0,10);
+        for (StudyDetails s : tlist) {
+            Debug.println(0, s.toString());
+        }
+        Debug.println(0, "List of Trials and Nurseries");
+        List<StudyDetails> slist = manager.getNurseryAndTrialStudyDetails(0, 10);
+        for (StudyDetails s : slist) {
+            Debug.println(0, s.toString());
+        }
+    }
+    
 }
