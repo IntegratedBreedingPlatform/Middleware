@@ -1309,6 +1309,26 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
         return ibdbUserId;
     }
+    
+    @Override
+    public Integer getWorkbenchUserId(Integer ibdbUserId, Long projectId) throws MiddlewareQueryException {
+        Session session = getCurrentSession();
+        Transaction trans = null;
+
+        Integer workbenchUserId = null;
+        try {
+            trans = session.beginTransaction();
+            workbenchUserId = getIbdbUserMapDao().getWorkbenchUserId(ibdbUserId, projectId);
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException(
+                    "Error encountered while retrieving Local IBDB user id: WorkbenchDataManager.getLocalIbdbUserId(workbenchUserId="
+                            + workbenchUserId + ", projectId=" + projectId + "): " + e.getMessage(), e);
+        }
+
+        return workbenchUserId;
+    }
 
     @Override
     public Integer updateWorkbenchRuntimeData(WorkbenchRuntimeData workbenchRuntimeData) throws MiddlewareQueryException {
