@@ -166,6 +166,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         //GCP-6253
         checkForDuplicateVariableNames(ontology, workbook, messages);
 
+        checkForDuplicatePSMCombo(ontology, workbook, messages);
+
         return workbook;
     }
 
@@ -213,6 +215,24 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         }
     }
 
+    private void checkForDuplicatePSMCombo(OntologyDataManager ontologyDataManager, Workbook workbook, List<Message> messages) throws MiddlewareQueryException, WorkbookParserException {
+        List<MeasurementVariable> workbookVariables = workbook.getAllVariables();
+
+        for (MeasurementVariable measurementVariable : workbookVariables) {
+            StandardVariable standardVariable =
+                    ontologyDataManager.findStandardVariableByTraitScaleMethodNames(measurementVariable.getProperty(), measurementVariable.getScale(), measurementVariable.getMethod());
+
+            if (!standardVariable.getName().equalsIgnoreCase(measurementVariable.getName())) {
+                messages.add(new Message("error.import.existing.standard.variable.psm", standardVariable.getName(), standardVariable.getProperty().getName(),
+                        standardVariable.getMethod().getName(), standardVariable.getScale().getName()));
+            }
+        }
+
+        if (messages.size() > 0) {
+            throw new WorkbookParserException(messages);
+        }
+    }
+
     private boolean nameMatches(String name, Term term) {
         String actualTermName = term.getName();
         boolean matches = actualTermName.equalsIgnoreCase(name);
@@ -221,6 +241,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
             for (NameSynonym synonym : synonyms) {
                 if (name.equalsIgnoreCase(synonym.getName())) {
                     matches = true;
+                    break;
                 }
             }
         }

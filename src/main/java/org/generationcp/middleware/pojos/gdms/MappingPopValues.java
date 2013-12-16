@@ -58,7 +58,8 @@ public class MappingPopValues implements Serializable{
         "SELECT DISTINCT " +
             "gdms_mapping_pop_values.gid, " +
             "CONCAT(gdms_mapping_pop_values.map_char_value, ''), " +
-            "CONCAT(gdms_marker.marker_name, '') " +
+            "CONCAT(gdms_marker.marker_name, ''), " +
+            "CAST(NULL AS UNSIGNED INTEGER) " +  //peak height
         "FROM gdms_mapping_pop_values, " +
             "gdms_marker " +
         "WHERE gdms_mapping_pop_values.marker_id = gdms_marker.marker_id " +
