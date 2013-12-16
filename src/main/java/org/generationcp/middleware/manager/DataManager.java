@@ -293,6 +293,92 @@ public abstract class DataManager extends DatabaseBroker{
     }
 
     /**
+     * Same behavior as getFromCentralAndLocalByMethod but retrieves first in local database then in central database     <br/>
+     * 
+     * @param dao   The DAO to call the methods from
+     * @param methods   The methods to call (countXXX and its corresponding getXXX)
+     * @param start     The start row
+     * @param numOfRows     The number of rows to retrieve
+     * @param parameters    The parameters to be passed to the methods
+     * @param parameterTypes    The types of the parameters to be passed to the method
+     * @return List of all records satisfying the given parameters
+     * @throws MiddlewareQueryException
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public List getFromLocalAndCentralByMethod(GenericDAO dao, List<String> methods, int start, int numOfRows, Object[] parameters,
+            Class[] parameterTypes) throws MiddlewareQueryException {
+        
+        List toReturn = new ArrayList();
+        long centralCount = 0;
+        long localCount = 0;
+        long relativeLimit = 0;
+
+        // Get count method parameter types and parameters
+        Class[] countMethodParameterTypes = parameterTypes;
+        Object[] countMethodParameters = parameters;
+
+        // Get get method parameter types and parameters
+        Class[] getMethodParameterTypes = new Class[parameters.length + 2];
+        Object[] getMethodParameters = new Object[parameters.length + 2];
+
+        int i = 0;
+        for (i = 0; i < parameters.length; i++) {
+            getMethodParameterTypes[i] = parameterTypes[i];
+            getMethodParameters[i] = parameters[i];
+        }
+        getMethodParameterTypes[i] = Integer.TYPE;
+        getMethodParameterTypes[i + 1] = Integer.TYPE;
+        getMethodParameters[i] = start;
+        getMethodParameters[i + 1] = numOfRows;
+
+        String countMethodName = methods.get(0);
+        String getMethodName = methods.get(1);
+        try {
+            // Get the methods from the dao
+            java.lang.reflect.Method countMethod = dao.getClass().getMethod(countMethodName, countMethodParameterTypes);
+            java.lang.reflect.Method getMethod = dao.getClass().getMethod(getMethodName, getMethodParameterTypes);
+
+            if (setWorkingDatabase(Database.LOCAL, dao)) {
+                localCount = (Long) countMethod.invoke(dao, countMethodParameters);
+                if (localCount > start) {
+                    toReturn.addAll((Collection) getMethod.invoke(dao, getMethodParameters)); // start, numRows
+                    relativeLimit = numOfRows - (localCount - start);
+                    if (relativeLimit > 0) {
+                        if (setWorkingDatabase(Database.CENTRAL, dao)) {
+                            centralCount = (Long) countMethod.invoke(dao, countMethodParameters);
+                            if (centralCount > 0) {
+                                getMethodParameters[getMethodParameters.length - 2] = 0;
+                                getMethodParameters[getMethodParameters.length - 1] = (int) relativeLimit;
+                                toReturn.addAll((Collection) getMethod.invoke(dao, getMethodParameters)); //0, (int) relativeLimit
+                            }
+                        }
+                    }
+                } else {
+                    relativeLimit = start - localCount;
+                    if (setWorkingDatabase(Database.CENTRAL, dao)) {
+                        centralCount = (Long) countMethod.invoke(dao, countMethodParameters);
+                        if (centralCount > relativeLimit) {
+                            getMethodParameters[getMethodParameters.length - 2] = (int) relativeLimit;
+                            getMethodParameters[getMethodParameters.length - 1] = numOfRows;
+                            toReturn.addAll((Collection) getMethod.invoke(dao, getMethodParameters)); // (int) relativeLimit, numOfRows
+                        }
+                    }
+                }
+            } else if (setWorkingDatabase(Database.CENTRAL, dao)) {
+                centralCount = (Long) countMethod.invoke(dao, countMethodParameters);
+                if (centralCount > start) {
+                    toReturn.addAll((Collection) getMethod.invoke(dao, getMethodParameters)); //start, numOfRows
+                }
+            }
+        } catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException
+            e.printStackTrace();
+            logAndThrowException("Error in gettting all from local and central using " + getMethodName + ": " + e.getMessage(), e);
+        }
+        return toReturn;
+
+    }
+    
+    /**
      * A generic implementation of the getXXX(Object parameter, int start, int numOfRows).      <br/>
      * Calls the corresponding getXXX method as specified in the second value in the list of methods parameter.     <br/>
      * Both central and local should have the same number of parameters

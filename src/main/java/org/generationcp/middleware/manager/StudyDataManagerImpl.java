@@ -12,6 +12,7 @@
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
@@ -37,7 +38,9 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.StudyResultSetByGid;
@@ -54,6 +57,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.util.PlotUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -723,6 +727,24 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         setWorkingDatabase(id);
         return getDmsProjectDao().getById(id);
     }
+
+	@SuppressWarnings({ "unchecked" })
+	@Override
+	public List<StudyDetails> getStudyDetails(StudyType studyType, int start, int numOfRows) throws MiddlewareQueryException {
+		List<String> methods = Arrays.asList("countAllStudyDetails", "getAllStudyDetails");
+		Object[] parameters = new Object[] { studyType };
+        return getFromLocalAndCentralByMethod(getDmsProjectDao(), methods, start, numOfRows,
+                parameters, new Class[] { StudyType.class });
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<StudyDetails> getNurseryAndTrialStudyDetails(int start, int numOfRows) throws MiddlewareQueryException {
+		List<String> methods = Arrays.asList("countAllNurseryAndTrialStudyDetails", "getAllNurseryAndTrialStudyDetails");
+		Object[] parameters = new Object[] { };
+        return getFromLocalAndCentralByMethod(getDmsProjectDao(), methods, start, numOfRows,
+                parameters, new Class[] { });
+	}
 
 
 }

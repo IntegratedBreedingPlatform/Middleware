@@ -1023,4 +1023,16 @@ public interface WorkbenchDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<WorkbenchSidebarCategoryLink> getAllWorkbenchSidebarLinksByCategoryId(WorkbenchSidebarCategory category) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Returns the correspoding workbench user id 
+     *
+     * @param workbenchUserId - the specified Workbench User ID
+     * @param projectId - the specified Project ID
+     * @return Returns the IBDB User ID associated with the specified Workbench User ID and Project ID.
+     * Returns null when there is no IBDB User ID matching the specified Workbench User ID and Project ID.
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    public Integer getWorkbenchUserId(Integer ibdbUserId, Long projectId) throws MiddlewareQueryException;
 }
