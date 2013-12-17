@@ -167,7 +167,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         //GCP-6253
         checkForDuplicateVariableNames(ontology, workbook, messages);
 
-        checkForDuplicatePSMCombo(ontology, workbook, messages);
+        // temporarily disabled
+        /*checkForDuplicatePSMCombo(ontology, workbook, messages);*/
 
         checkForInvalidLabel(workbook, messages);
 
@@ -199,7 +200,23 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         List<MeasurementVariable> workbookVariables = workbook.getAllVariables();
 
         for (MeasurementVariable measurementVariable : workbookVariables) {
-            Set<StandardVariable> variableSet = ontologyDataManager.findStandardVariablesByNameOrSynonym(measurementVariable.getName());
+            StandardVariable standardVariable = ontologyDataManager.findStandardVariableByTraitScaleMethodNames(measurementVariable.getProperty(),
+                    measurementVariable.getScale(), measurementVariable.getMethod());
+            if (standardVariable == null) {
+                // if standard variable with PSM does not exist, no problem
+                Set<StandardVariable> variableSet = ontologyDataManager.findStandardVariablesByNameOrSynonym(measurementVariable.getName());
+
+                for (StandardVariable variable : variableSet) {
+                    if (variable.getName().equalsIgnoreCase(measurementVariable.getName())) {
+                        messages.add(new Message("error.import.existing.standard.variable.name", measurementVariable.getName(), standardVariable.getProperty().getName(),
+                                standardVariable.getMethod().getName(), standardVariable.getScale().getName()));
+                    }
+                }
+
+            } else {
+                continue;
+            }
+            /*Set<StandardVariable> variableSet = ontologyDataManager.findStandardVariablesByNameOrSynonym(measurementVariable.getName());
             for (StandardVariable standardVariable : variableSet) {
                 if (standardVariable.getName().equals(measurementVariable.getName())) {
                     boolean allMatches = nameMatches(measurementVariable.getProperty(), standardVariable.getProperty()) && nameMatches(measurementVariable.getScale(), standardVariable.getScale())
@@ -210,7 +227,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
                                 standardVariable.getMethod().getName(), standardVariable.getScale().getName()));
                     }
                 }
-            }
+            }*/
         }
 
         if (messages.size() > 0) {
@@ -229,7 +246,23 @@ public class DataImportServiceImpl extends Service implements DataImportService 
                 return;
             }
 
+            boolean found = false;
             if (!standardVariable.getName().equalsIgnoreCase(measurementVariable.getName())) {
+                List<NameSynonym> synonyms = standardVariable.getNameSynonyms();
+
+                if (synonyms != null) {
+                    for (NameSynonym synonym : synonyms) {
+                        if (synonym.getName().equalsIgnoreCase(measurementVariable.getName())) {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+            } else {
+                found = true;
+            }
+
+            if (!found) {
                 messages.add(new Message("error.import.existing.standard.variable.psm", standardVariable.getName(), standardVariable.getProperty().getName(),
                         standardVariable.getMethod().getName(), standardVariable.getScale().getName()));
             }
