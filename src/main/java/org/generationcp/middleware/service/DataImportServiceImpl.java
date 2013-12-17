@@ -35,10 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class DataImportServiceImpl extends Service implements DataImportService {
 
@@ -274,7 +271,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
     }
 
     private void checkForInvalidLabel(Workbook workbook, List<Message> messages) throws MiddlewareQueryException, WorkbookParserException {
-        List<MeasurementVariable> variableList = workbook.getFactors();
+        List<MeasurementVariable> variableList = new ArrayList<MeasurementVariable>();
+        variableList.addAll(workbook.getFactors());
         variableList.addAll(workbook.getConditions());
 
         for (MeasurementVariable measurementVariable : variableList) {
