@@ -208,8 +208,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
                 for (StandardVariable variable : variableSet) {
                     if (variable.getName().equalsIgnoreCase(measurementVariable.getName())) {
-                        messages.add(new Message("error.import.existing.standard.variable.name", measurementVariable.getName(), standardVariable.getProperty().getName(),
-                                standardVariable.getMethod().getName(), standardVariable.getScale().getName()));
+                        messages.add(new Message("error.import.existing.standard.variable.name", measurementVariable.getName(), variable.getProperty().getName(),
+                                variable.getMethod().getName(), variable.getScale().getName()));
                     }
                 }
 
