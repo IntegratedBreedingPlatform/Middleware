@@ -557,9 +557,12 @@ public class TestGermplasmDataManagerImpl{
 
     @Test
     public void testGetNamesByGID() throws Exception {
-        Integer gid = Integer.valueOf(50533);
+        Integer gid = Integer.valueOf(2434138);
         List<Name> names = manager.getNamesByGID(gid, null, null);
-        Debug.println(0, "testGetNamesByGID(" + gid + ") RESULTS: " + names);
+        Debug.println(0, "testGetNamesByGID(" + gid + ") RESULTS: " + names.size());
+        for (Name name : names){
+        	System.out.println(name);
+        }
     }
 
     @Test
@@ -942,9 +945,11 @@ public class TestGermplasmDataManagerImpl{
     
     @Test
     public void testGetNextSequenceNumberForCrossName() throws MiddlewareQueryException{
-    	String prefix = "C97-MNT-";
-    	Debug.println(0, "Next number in sequence for prefix (" + prefix + "): " + 
-    			manager.getNextSequenceNumberForCrossName(prefix));
+    	String prefix = "PARA7A2";
+//    	Debug.println(0, "Next number in sequence for prefix (" + prefix + "): " + 
+//    			manager.getNextSequenceNumberForCrossName(prefix));
+    	System.out.println(prefix.substring(prefix.length()-1) + " " + prefix.substring(prefix.length()-1).matches("\\d"));
+	    	
     }
    
     @Test
