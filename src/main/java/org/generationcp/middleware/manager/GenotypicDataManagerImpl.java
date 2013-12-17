@@ -1193,7 +1193,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             dataset.setDatasetId(datasetId);
             saveDatasetUser(datasetId, datasetUser);
             
-            
             // Save data rows
             if (rows != null && rows.size() > 0){
                 for (SNPDataRow row : rows){
@@ -1850,9 +1849,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	private AccMetadataSetPK saveAccMetadataSet(Integer datasetId, AccMetadataSet accMetadataSet) throws Exception{
         AccMetadataSetDAO accMetadataSetDao = getAccMetadataSetDao();
         accMetadataSet.setDatasetId(datasetId);
-
+        
         // No need to generate id, AccMetadataSetPK(datasetId, gId, nId) are foreign keys
-        AccMetadataSet accMetadataSetRecordSaved = accMetadataSetDao.saveOrUpdate(accMetadataSet);
+        AccMetadataSet accMetadataSetRecordSaved = accMetadataSetDao.merge(accMetadataSet);
         AccMetadataSetPK accMetadatasetSavedId = accMetadataSetRecordSaved.getId();
 
         if (accMetadatasetSavedId == null) {
@@ -1868,7 +1867,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	    markerMetadataSet.setMarkerId(markerId);
 
         // No need to generate id, MarkerMetadataSetPK(datasetId, markerId) are foreign keys
-        MarkerMetadataSet markerMetadataSetRecordSaved = markerMetadataSetDao.save(markerMetadataSet);
+        MarkerMetadataSet markerMetadataSetRecordSaved = markerMetadataSetDao.merge(markerMetadataSet);
         MarkerMetadataSetPK markerMetadataSetSavedId = markerMetadataSetRecordSaved.getId();
 
         if (markerMetadataSetSavedId == null) {

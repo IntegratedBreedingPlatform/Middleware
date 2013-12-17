@@ -557,5 +557,46 @@ public interface StudyDataManager{
      */
     List<StudyDetails> getNurseryAndTrialStudyDetails(int start, int numOfRows) throws MiddlewareQueryException;
     
+    /**
+     * 
+     * Retrieves all the study details of the given study type from both central and local ordered by db instance then study name
+     * 
+     * @param studyType
+     *            Can be any of the types defined in {@link StudyType}
+     * @return The list of study details having the given study type
+     * @throws MiddlewareQueryException
+     */
+    public List<StudyDetails> getAllStudyDetails(StudyType studyType) throws MiddlewareQueryException;
     
+    /**
+     * 
+     * Count all studies of the given study type from both central and local
+     * 
+     * @param studyType
+     *            Can be any of the types defined in {@link StudyType}
+     * @return The list of study details having the given study type
+     * @throws MiddlewareQueryException
+     */
+    public long countAllStudyDetails(StudyType studyType) throws MiddlewareQueryException;
+    
+    /**
+     * Retrieves the study details of the all nurseries and trials from both central and local
+     * ordered by db instance then study name
+     * 
+     * @return The list of study details of Nurseries and Trials
+     * 
+     * @throws MiddlewareQueryException
+     */
+    public List<StudyDetails> getAllNurseryAndTrialStudyDetails() throws MiddlewareQueryException;
+    
+    /**
+     * 
+     * Count all nurseries and trials from both central and local
+     * 
+     * @param studyType
+     *            Can be any of the types defined in {@link StudyType}
+     * @return The list of study details having the given study type
+     * @throws MiddlewareQueryException
+     */
+    public long countAllNurseryAndTrialStudyDetails() throws MiddlewareQueryException;
 }
