@@ -1130,20 +1130,47 @@ public class TestStudyDataManagerImpl{
     public void testGetStudyDetailsWithPaging() throws MiddlewareQueryException {
     	Debug.println(0, "testGetStudyDetailsWithPaging");
     	Debug.println(0, "List of Nurseries");
-    	List<StudyDetails> nlist = manager.getStudyDetails(StudyType.N, 0,10);
+    	List<StudyDetails> nlist = manager.getStudyDetails(StudyType.N, 0,Integer.MAX_VALUE);
         for (StudyDetails s : nlist) {
             Debug.println(0, s.toString());
         }
         Debug.println(0, "List of Trials");
-        List<StudyDetails> tlist = manager.getStudyDetails(StudyType.T, 0,10);
+        List<StudyDetails> tlist = manager.getStudyDetails(StudyType.T, 0,Integer.MAX_VALUE);
         for (StudyDetails s : tlist) {
             Debug.println(0, s.toString());
         }
         Debug.println(0, "List of Trials and Nurseries");
-        List<StudyDetails> slist = manager.getNurseryAndTrialStudyDetails(0, 10);
+        List<StudyDetails> slist = manager.getNurseryAndTrialStudyDetails(0,Integer.MAX_VALUE);
         for (StudyDetails s : slist) {
             Debug.println(0, s.toString());
         }
+        Debug.println(0, "List ALL Trials and Nurseries");
+        List<StudyDetails> list = manager.getAllNurseryAndTrialStudyDetails();
+        for (StudyDetails s : list) {
+            Debug.println(0, s.toString());
+        }
+        Debug.println(0, String.valueOf(manager.countAllNurseryAndTrialStudyDetails()));
+        Debug.println(0, "List ALL Trials and Nurseries");
+        list = manager.getAllNurseryAndTrialStudyDetails();
+        for (StudyDetails s : list) {
+            Debug.println(0, s.toString());
+        }
+        Debug.println(0, String.valueOf(manager.countAllNurseryAndTrialStudyDetails()));
+        
+        Debug.println(0, "List ALL Trials");
+        list = manager.getAllStudyDetails(StudyType.T);
+        for (StudyDetails s : list) {
+            Debug.println(0, s.toString());
+        }
+        Debug.println(0, String.valueOf(manager.countAllStudyDetails(StudyType.T)));
+        
+        Debug.println(0, "List ALL Nurseries");
+        list = manager.getAllStudyDetails(StudyType.T);
+        for (StudyDetails s : list) {
+            Debug.println(0, s.toString());
+        }
+        Debug.println(0, String.valueOf(manager.countAllStudyDetails(StudyType.N)));
+        
     }
     
 }

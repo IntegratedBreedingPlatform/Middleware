@@ -41,6 +41,8 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link DmsProject}.
@@ -49,6 +51,8 @@ import org.hibernate.criterion.Restrictions;
  *
  */
 public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
+	
+	private final static Logger LOG = LoggerFactory.getLogger(DmsProjectDao.class);
     
 	private static final String GET_CHILDREN_OF_FOLDER =		
 			"SELECT DISTINCT subject.project_id, subject.name,  subject.description " 
@@ -557,8 +561,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	public long countAllStudyDetails(StudyType studyType) throws MiddlewareQueryException {
 	    try {
             StringBuilder sqlString = new StringBuilder()
-            .append("SELECT COUNT(DISTINCT p.name, p.description, ppObjective.value, ppStartDate.value, ")
-            .append(                        "ppEndDate.value, ppPI.value, gpSiteName.value, p.project_id) ")
+            .append("SELECT COUNT(1) ")
             .append("FROM project p ")
             .append("   INNER JOIN projectprop ppNursery ON p.project_id = ppNursery.project_id ")
             .append("                   AND ppNursery.type_id = ").append(TermId.STUDY_TYPE.getId()).append(" ")
@@ -584,10 +587,15 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
             return ((BigInteger) query.uniqueResult()).longValue();
 
         } catch(HibernateException e) {
+        	e.printStackTrace();
             logAndThrowException("Error in countAllStudyDetails() query in DmsProjectDao: " + e.getMessage(), e);
         }
         return 0;
 	    
+	}
+	
+	public List<StudyDetails> getAllNurseryAndTrialStudyDetails() throws MiddlewareQueryException {
+		return getAllNurseryAndTrialStudyDetails(0, -1);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -662,8 +670,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	    try {
             
             StringBuilder sqlString = new StringBuilder()
-            .append("SELECT COUNT(DISTINCT p.name, p.description, ppObjective.value, ppStartDate.value, ")
-            .append(                        "ppEndDate.value, ppPI.value, gpSiteName.value, p.project_id, ppStudy.value) ")
+            .append("SELECT COUNT(1) ")
             .append("FROM project p ")
             .append("   INNER JOIN projectprop ppStudy ON p.project_id = ppStudy.project_id ")
             .append("                   AND ppStudy.type_id = ").append(TermId.STUDY_TYPE.getId()).append(" ")
@@ -683,7 +690,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
             .append("WHERE NOT EXISTS (SELECT 1 FROM projectprop ppDeleted WHERE ppDeleted.type_id =  ").append(TermId.STUDY_STATUS.getId()).append(" ") // 8006
             .append("               AND ppDeleted.project_id = p.project_id AND ppDeleted.value =  ").append(TermId.DELETED_STUDY.getId()).append(") ") // 12990
             ;
-        
+            
             Query query = getSession().createSQLQuery(sqlString.toString());
 
             return ((BigInteger) query.uniqueResult()).longValue();

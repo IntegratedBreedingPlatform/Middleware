@@ -454,7 +454,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
         
         Map<Integer, FieldMapInfo> infoMap = new HashMap<Integer, FieldMapInfo>();
         Map<Integer, FieldMapDatasetInfo> datasetMap = new HashMap<Integer, FieldMapDatasetInfo>();
-        Map<Integer, FieldMapTrialInstanceInfo> trialMap = new HashMap<Integer, FieldMapTrialInstanceInfo>();
+        Map<String, FieldMapTrialInstanceInfo> trialMap = new HashMap<String, FieldMapTrialInstanceInfo>();
         
         
         for (Object[] row : rows) {
@@ -471,7 +471,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             label.setGeolocationId((Integer) row[3]);
             label.setSiteName((String) row[4]);
 
-            FieldMapTrialInstanceInfo trial = trialMap.get((Integer) row[3]);
+            String trialKey = getTrialKey((Integer) row[0], (Integer) row[3]);
+            FieldMapTrialInstanceInfo trial = trialMap.get(trialKey);
             if (trial == null) {
                 trial = new FieldMapTrialInstanceInfo();
                 trial.setGeolocationId((Integer) row[3]);
@@ -488,36 +489,37 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 trial.setBlockName((String) row[16]);
                 trial.setFieldName((String) row[18]);
                 trial.setLocationName((String) row[17]);
-                trialMap.put(trial.getGeolocationId(), trial);
-
-                FieldMapDatasetInfo dataset = datasetMap.get((Integer) row[0]);
-                if (dataset == null) {
-                    dataset = new FieldMapDatasetInfo();
-                    dataset.setDatasetId((Integer) row[0]);
-                    dataset.setDatasetName((String) row[1]);
-                    datasetMap.put(dataset.getDatasetId(), dataset);
-                    
-                    FieldMapInfo study = infoMap.get((Integer) row[19]);
-                    if (study == null) {
-                        study = new FieldMapInfo();
-                        study.setFieldbookId((Integer) row[19]);
-                        study.setFieldbookName((String) row[2]);
-                        infoMap.put(study.getFieldbookId(), study);
-                    }
-                    if (study.getDatasets() == null) {
-                        study.setDatasets(new ArrayList<FieldMapDatasetInfo>());
-                    }
-                    if (study.getDataSet(dataset.getDatasetId()) == null) {
-                        study.getDatasets().add(dataset);
-                    }
+                trialMap.put(trialKey, trial);
+            }
+            
+            FieldMapDatasetInfo dataset = datasetMap.get((Integer) row[0]);
+            if (dataset == null) {
+                dataset = new FieldMapDatasetInfo();
+                dataset.setDatasetId((Integer) row[0]);
+                dataset.setDatasetName((String) row[1]);
+                datasetMap.put(dataset.getDatasetId(), dataset);
+                
+                FieldMapInfo study = infoMap.get((Integer) row[19]);
+                if (study == null) {
+                    study = new FieldMapInfo();
+                    study.setFieldbookId((Integer) row[19]);
+                    study.setFieldbookName((String) row[2]);
+                    infoMap.put(study.getFieldbookId(), study);
                 }
-                if (dataset.getTrialInstances() == null) {
-                    dataset.setTrialInstances(new ArrayList<FieldMapTrialInstanceInfo>());
+                if (study.getDatasets() == null) {
+                    study.setDatasets(new ArrayList<FieldMapDatasetInfo>());
                 }
-                if (dataset.getTrialInstance(trial.getGeolocationId()) == null) {
-                    dataset.getTrialInstances().add(trial);
+                if (study.getDataSet(dataset.getDatasetId()) == null) {
+                    study.getDatasets().add(dataset);
                 }
             }
+            if (dataset.getTrialInstances() == null) {
+                dataset.setTrialInstances(new ArrayList<FieldMapTrialInstanceInfo>());
+            }
+            if (dataset.getTrialInstance(trial.getGeolocationId()) == null) {
+                dataset.getTrialInstances().add(trial);
+            }
+
             if (trial.getFieldMapLabels() == null) {
                 trial.setFieldMapLabels(new ArrayList<FieldMapLabel>());
             }
@@ -529,6 +531,10 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             infos.add(infoMap.get(key));
         }
         return infos;
+    }
+    
+    private String getTrialKey(int datasetId, int trialId) {
+        return datasetId + "-" + trialId;
     }
     
     private Integer getIntegerValue(Object obj) {
