@@ -159,8 +159,23 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testGetMapInfoByMapName() throws Exception {
-        String mapName = "RIL-8 (Yueyou13 x J 11)"; //TODO: test with a given map name
+        String mapName = "RIL-8 (Yueyou13 x J 11)"; // CENTRAL test data
         List<MapInfo> results = manager.getMapInfoByMapName(mapName, Database.CENTRAL);
+
+//        String mapName = "GCP-833TestMap"; // CENTRAL test data
+//        List<MapInfo> results = manager.getMapInfoByMapName(mapName, Database.LOCAL);
+
+        Debug.println(0, "testGetMapInfoByMapName(mapName=" + mapName + ") RESULTS size: " + results.size());
+        for (MapInfo mapInfo : results){
+            Debug.println(0, mapInfo.toString());
+        }
+    }
+
+    @Test
+    public void testGetMapInfoByMapNameBothDB() throws Exception {
+        String mapName = "RIL-8 (Yueyou13 x J 11)"; // CENTRAL test data
+        List<MapInfo> results = manager.getMapInfoByMapName(mapName);
+
         Debug.println(0, "testGetMapInfoByMapName(mapName=" + mapName + ") RESULTS size: " + results.size());
         for (MapInfo mapInfo : results){
             Debug.println(0, mapInfo.toString());
@@ -365,10 +380,15 @@ public class TestGenotypicDataManagerImpl{
     @Test
     public void testGetMarkerNamesByMarkerIds() throws Exception {
         List<Integer> markerIds = new ArrayList<Integer>();
+        markerIds.add(1);
         markerIds.add(-1);
+        markerIds.add(2);
         markerIds.add(-2);
+        markerIds.add(3);
         markerIds.add(-3);
+        markerIds.add(4);
         markerIds.add(-4);
+        markerIds.add(5);
         markerIds.add(-5);
 
         List<MarkerIdMarkerNameElement> markerNames = manager.getMarkerNamesByMarkerIds(markerIds);

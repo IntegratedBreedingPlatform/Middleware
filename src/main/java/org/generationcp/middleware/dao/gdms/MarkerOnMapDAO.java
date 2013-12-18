@@ -19,9 +19,12 @@ import java.util.Map;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.MarkerOnMap;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * DAO class for {@link MarkerOnMap}.
@@ -109,5 +112,26 @@ public class MarkerOnMapDAO extends GenericDAO<MarkerOnMap, Integer>{
         
     }
     
+    
+    @SuppressWarnings("unchecked")
+    public List<MarkerOnMap> getMarkersOnMapByMapId(Integer mapId) throws MiddlewareQueryException {
+
+        List<MarkerOnMap> markersOnMap = new ArrayList<MarkerOnMap>();
+        
+        try{
+            Criteria criteria = getSession().createCriteria(getPersistentClass());
+            criteria.add(Restrictions.eq("mapId", mapId));
+            criteria.addOrder(Order.asc("linkageGroup"));
+            criteria.addOrder(Order.asc("startPosition"));
+    
+            return (List<MarkerOnMap>) criteria.list(); 
+            
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getByMapId query from MarkerOnMap: " + e.getMessage(), e);
+        }
+    
+        return markersOnMap;
+        
+    }
 
 }

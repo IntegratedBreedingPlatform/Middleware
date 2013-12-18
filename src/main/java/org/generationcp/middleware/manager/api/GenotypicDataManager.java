@@ -139,6 +139,19 @@ public interface GenotypicDataManager{
     public List<MapInfo> getMapInfoByMapName(String mapName, Database instance) throws MiddlewareQueryException;
 
     /**
+     * Gets map information (marker_name, linkage_group, start_position) 
+     * from mapping_data view by the given map name.
+     *  
+     * Retrieves data from both central and local.
+     *
+     * @param mapName 
+     *          - the name of the map to retrieve
+     * @return the map info corresponding to the given map name
+     * @throws MiddlewareQueryException
+     */
+    public List<MapInfo> getMapInfoByMapName(String mapName) throws MiddlewareQueryException;
+
+    /**
      * Counts all the dataset names.
      *
      * @param instance 
