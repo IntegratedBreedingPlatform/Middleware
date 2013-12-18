@@ -1060,7 +1060,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
             }
             
             // Return only if it belongs to a trait class via the 'is a' of the property of the standard variable
-            standardVariableIds = getStandardVariablesBelongingToTraitClass(standardVariableIds);
+            // standardVariableIds = getStandardVariablesBelongingToTraitClass(standardVariableIds);
                                     
         } catch(HibernateException e) {
                 logAndThrowException("Error at getStandardVariableIds :" + e.getMessage(), e);
@@ -1069,6 +1069,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
     }
     
     
+    @SuppressWarnings("unused")
     private List<Integer> getStandardVariablesBelongingToTraitClass(List<Integer> standardVariableIds) throws MiddlewareQueryException {
         List<Integer> standardVariablesOfTraitClass = new ArrayList<Integer>();
         
