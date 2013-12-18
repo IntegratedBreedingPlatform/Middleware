@@ -66,6 +66,7 @@ public enum ToolName {
     ,germplasm_mainheadtohead
     ,query_for_adapted_germplasm
     ,study_browser
+    ,study_browser_with_id
     
     // ibpwebservice webapp
     ,ibpwebservice
