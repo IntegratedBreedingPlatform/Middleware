@@ -29,7 +29,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  */
 @Entity
 @Table(name = "gdms_dataset_users")
-
 public class DatasetUsers implements Serializable{
 
     private static final long serialVersionUID = 1L;

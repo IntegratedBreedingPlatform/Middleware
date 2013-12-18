@@ -463,8 +463,8 @@ public class TestInventoryDataManagerImpl{
         Debug.println(0, "Balance Report on Lots by Entity Type and Entity ID:");
         String type = "GERMPLSM";
         List<Integer> entityIdList = new ArrayList<Integer>();
-        entityIdList.add(50533);
-        entityIdList.add(3);
+        entityIdList.add(532153);
+        entityIdList.add(537652);
 
         List<LotReportRow> report = manager.generateReportOnLotsByEntityTypeAndEntityId(type, entityIdList, 0, 10);
 
