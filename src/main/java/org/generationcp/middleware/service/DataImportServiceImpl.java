@@ -165,7 +165,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         checkForDuplicateVariableNames(ontology, workbook, messages);
 
         // temporarily disabled
-        /*checkForDuplicatePSMCombo(ontology, workbook, messages);*/
+        checkForDuplicatePSMCombo(workbook, messages);
 
         checkForInvalidLabel(workbook, messages);
 
@@ -232,36 +232,19 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         }
     }
 
-    private void checkForDuplicatePSMCombo(OntologyDataManager ontologyDataManager, Workbook workbook, List<Message> messages) throws MiddlewareQueryException, WorkbookParserException {
-        List<MeasurementVariable> workbookVariables = workbook.getAllVariables();
+    private void checkForDuplicatePSMCombo(Workbook workbook, List<Message> messages) throws MiddlewareQueryException, WorkbookParserException {
+        List<MeasurementVariable> workbookVariables = new ArrayList<MeasurementVariable>();
+        workbookVariables.addAll(workbook.getFactors());
+        workbookVariables.addAll(workbook.getVariates());
+
+        Map<String, String> psmMap = new HashMap<String, String>();
 
         for (MeasurementVariable measurementVariable : workbookVariables) {
-            StandardVariable standardVariable =
-                    ontologyDataManager.findStandardVariableByTraitScaleMethodNames(measurementVariable.getProperty(), measurementVariable.getScale(), measurementVariable.getMethod());
-
-            if (standardVariable == null) {
-                return;
-            }
-
-            boolean found = false;
-            if (!standardVariable.getName().equalsIgnoreCase(measurementVariable.getName())) {
-                List<NameSynonym> synonyms = standardVariable.getNameSynonyms();
-
-                if (synonyms != null) {
-                    for (NameSynonym synonym : synonyms) {
-                        if (synonym.getName().equalsIgnoreCase(measurementVariable.getName())) {
-                            found = true;
-                            break;
-                        }
-                    }
-                }
+            String temp = measurementVariable.getProperty().toLowerCase() + "-" + measurementVariable.getScale().toLowerCase() + "-" + measurementVariable.getMethod().toLowerCase();
+            if (! psmMap.containsKey(temp)) {
+                psmMap.put(temp, measurementVariable.getName());
             } else {
-                found = true;
-            }
-
-            if (!found) {
-                messages.add(new Message("error.import.existing.standard.variable.psm", standardVariable.getName(), standardVariable.getProperty().getName(),
-                        standardVariable.getMethod().getName(), standardVariable.getScale().getName()));
+                messages.add(new Message("error.duplicate.psm", psmMap.get(temp), measurementVariable.getName()));
             }
         }
 
