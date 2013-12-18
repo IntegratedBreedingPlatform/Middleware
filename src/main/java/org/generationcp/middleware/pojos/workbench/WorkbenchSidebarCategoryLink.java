@@ -22,7 +22,7 @@ public class WorkbenchSidebarCategoryLink implements Serializable {
     private Integer sidebarCategoryLinkId;
 
     @ManyToOne(targetEntity = Tool.class)
-    @JoinColumn (name="tool_id", nullable = false)
+    @JoinColumn (name="tool_name", referencedColumnName="name", nullable = false)
     private Tool tool;
 
     @ManyToOne(targetEntity = WorkbenchSidebarCategory.class)

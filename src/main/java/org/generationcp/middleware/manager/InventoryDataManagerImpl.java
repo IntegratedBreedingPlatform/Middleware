@@ -597,7 +597,8 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
         Session sessionForLocal = getCurrentSessionForLocal();
 
         GermplasmDataManagerImpl germplasmManager = new GermplasmDataManagerImpl(sessionForLocal, sessionForCentral);
-        OntologyDataManagerImpl ontologyManager = new OntologyDataManagerImpl(sessionForLocal, sessionForCentral);
+        OntologyDataManagerImpl ontologyManager = new OntologyDataManagerImpl(
+                getSessionProviderForLocal(), getSessionProviderForCentral());
         List<LotReportRow> report = new ArrayList<LotReportRow>();
         for (Lot lot : listOfLots) {
             LotReportRow row = new LotReportRow();
