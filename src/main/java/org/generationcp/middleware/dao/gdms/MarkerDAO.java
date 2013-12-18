@@ -28,8 +28,10 @@ import org.generationcp.middleware.pojos.gdms.MappingPopValues;
 import org.generationcp.middleware.pojos.gdms.Marker;
 import org.generationcp.middleware.pojos.gdms.MarkerIdMarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * DAO class for {@link Marker}.
@@ -417,6 +419,25 @@ public class MarkerDAO extends GenericDAO<Marker, Integer>{
                     + e.getMessage(), e);
         }
         return new ArrayList<MarkerIdMarkerNameElement>();
+    }
+    
+    public String getNameById(Integer markerId) throws MiddlewareQueryException {
+        String name = null;
+
+        try {
+            Criteria criteria = getSession().createCriteria(getPersistentClass());
+            criteria.add(Restrictions.eq("markerId", markerId));
+            Marker marker = (Marker) criteria.uniqueResult();
+
+            if (marker != null) {
+                name = marker.getMarkerName();
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getNameById query from Marker: " + e.getMessage(), e);
+        }
+
+        return name;
+
     }
 
     /**
