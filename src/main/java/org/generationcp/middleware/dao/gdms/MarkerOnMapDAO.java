@@ -19,12 +19,9 @@ import java.util.Map;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.MarkerOnMap;
-import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
 
 /**
  * DAO class for {@link MarkerOnMap}.
@@ -115,18 +112,37 @@ public class MarkerOnMapDAO extends GenericDAO<MarkerOnMap, Integer>{
     
     @SuppressWarnings("unchecked")
     public List<MarkerOnMap> getMarkersOnMapByMapId(Integer mapId) throws MiddlewareQueryException {
-
         List<MarkerOnMap> markersOnMap = new ArrayList<MarkerOnMap>();
+
+        try {
+            // SELECT * FROM gdms_markers_onmap WHERE map_id = -2 ORDER BY linkage_group, start_position;
+
+            StringBuilder sqlString = new StringBuilder()
+            .append("SELECT * FROM gdms_markers_onmap  ")
+            .append("WHERE map_id = :mapId  ")
+            .append("ORDER BY linkage_group, start_position ")
+            ;
         
-        try{
-            Criteria criteria = getSession().createCriteria(getPersistentClass());
-            criteria.add(Restrictions.eq("mapId", mapId));
-            criteria.addOrder(Order.asc("linkageGroup"));
-            criteria.addOrder(Order.asc("startPosition"));
-    
-            return (List<MarkerOnMap>) criteria.list(); 
+            Query query = getSession().createSQLQuery(sqlString.toString());
+            query.setParameter("mapId", mapId);
+
+            List<Object[]> list =  query.list();
             
-        } catch (HibernateException e) {
+            if (list != null && list.size() > 0) {
+                for (Object[] row : list){
+                    Integer mapId2 = (Integer) row[0];
+                    Integer markerId = (Integer) row[1];
+                    Double startPosition = (Double) row[2];
+                    Double endPosition = (Double) row[3];
+                    String linkageGroup = (String) row [4]; 
+                    
+                    markersOnMap.add(new MarkerOnMap(mapId2, markerId, startPosition.floatValue(), 
+                                            endPosition.floatValue(), linkageGroup));
+
+                }
+            }
+
+        } catch(HibernateException e) {
             logAndThrowException("Error with getByMapId query from MarkerOnMap: " + e.getMessage(), e);
         }
     

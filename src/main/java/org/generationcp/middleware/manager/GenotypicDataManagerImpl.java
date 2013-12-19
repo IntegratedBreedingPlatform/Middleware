@@ -403,7 +403,19 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                 new Object[]{markerIds}, new Class[]{List.class});
         markers.addAll(super.getFromInstanceByMethod(getMarkerDao(), Database.LOCAL, "getNamesByIds", 
                 new Object[]{markerIds}, new Class[]{List.class}));
-        return markers;
+        
+        // Sort based on the given input order
+        List<MarkerIdMarkerNameElement> markersToReturn = new ArrayList<MarkerIdMarkerNameElement>(); 
+        for (Integer markerId : markerIds){
+            for (MarkerIdMarkerNameElement element: markers){
+                if (element.getMarkerId() == markerId){
+                    markersToReturn.add(element);
+                    break;
+                }
+            }
+        }
+        
+        return markersToReturn;
     }
     
     private String getMarkerNameByMarkerId(Integer markerId) throws MiddlewareQueryException{
