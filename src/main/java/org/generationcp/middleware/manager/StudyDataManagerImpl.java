@@ -733,6 +733,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         return getFromLocalAndCentralByMethod(getDmsProjectDao(), methods, start, numOfRows,
                 parameters, new Class[] { StudyType.class });
 	}
+	
+	@Override
+	public List<StudyDetails> getStudyDetails(Database instance, StudyType studyType, int start, int numOfRows) throws MiddlewareQueryException {
+		setWorkingDatabase(instance);
+		return getDmsProjectDao().getAllStudyDetails(studyType,start,numOfRows);
+	}
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -741,6 +747,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		Object[] parameters = new Object[] { };
         return getFromLocalAndCentralByMethod(getDmsProjectDao(), methods, start, numOfRows,
                 parameters, new Class[] { });
+	}
+	
+	@Override
+	public List<StudyDetails> getNurseryAndTrialStudyDetails(Database instance, int start, int numOfRows) throws MiddlewareQueryException {
+		setWorkingDatabase(instance);
+        return getDmsProjectDao().getAllNurseryAndTrialStudyDetails(start,numOfRows);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
