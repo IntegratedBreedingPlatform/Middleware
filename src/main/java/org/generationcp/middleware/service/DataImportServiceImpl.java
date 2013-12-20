@@ -233,9 +233,10 @@ public class DataImportServiceImpl extends Service implements DataImportService 
     }
 
     private void checkForDuplicatePSMCombo(Workbook workbook, List<Message> messages) throws MiddlewareQueryException, WorkbookParserException {
-        List<MeasurementVariable> workbookVariables = new ArrayList<MeasurementVariable>();
-        workbookVariables.addAll(workbook.getFactors());
-        workbookVariables.addAll(workbook.getVariates());
+        // GCP-6438
+        List<MeasurementVariable> workbookVariables = workbook.getAllVariables();
+        /*workbookVariables.addAll(workbook.getFactors());
+        workbookVariables.addAll(workbook.getVariates());*/
 
         Map<String, String> psmMap = new HashMap<String, String>();
 
