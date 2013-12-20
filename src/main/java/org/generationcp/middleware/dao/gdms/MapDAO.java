@@ -19,8 +19,10 @@ import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.Map;
 import org.generationcp.middleware.pojos.gdms.MapDetailElement;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * DAO class for {@link Map}.
@@ -72,6 +74,22 @@ public class MapDAO extends GenericDAO<Map, Integer>{
         	logAndThrowException("Error with getMapDetailsByName() query from Map: " + e.getMessage(), e);
         }	
         return maps;
+    }
+
+    
+    public Map getByName(String mapName) throws MiddlewareQueryException {
+        Map map = null;
+        
+        try{
+            Criteria criteria = getSession().createCriteria(getPersistentClass());
+            criteria.add(Restrictions.eq("mapName", mapName));
+            map = (Map) criteria.uniqueResult(); 
+            
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getByName query from Map: " + e.getMessage(), e);
+        }
+    
+        return map;        
     }
 
     

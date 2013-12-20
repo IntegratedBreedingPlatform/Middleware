@@ -21,7 +21,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
  * @author Joyce Avestro
  * 
  */
-public class MapInfo implements Serializable{
+public class MapInfo implements Serializable, Comparable<MapInfo>{
 
     private static final long serialVersionUID = 1L;
     
@@ -34,13 +34,20 @@ public class MapInfo implements Serializable{
     private String linkageGroup;
     
     private Float startPosition;
+    
+    private String mapType;
+    
+    private String mapUnit;
 
-    public MapInfo(Integer markerId, String markerName, String mapName, String linkageGroup, Float startPosition) {
+    public MapInfo(Integer markerId, String markerName, String mapName, String linkageGroup, Float startPosition,
+            String mapType, String mapUnit) {
         this.markerId = markerId;
         this.markerName = markerName;
         this.mapName = mapName;
         this.linkageGroup = linkageGroup;
         this.startPosition = startPosition;
+        this.mapType = mapType;
+        this.mapUnit = mapUnit;
     }
 
     public String getMarkerName() {
@@ -76,15 +83,21 @@ public class MapInfo implements Serializable{
     public void setMarkerId(Integer markerId) {
         this.markerId = markerId;
     }
-
     
-    public String getMapName() {
-        return mapName;
+    public String getMapType() {
+        return mapType;
+    }
+    
+    public void setMapType(String mapType) {
+        this.mapType = mapType;
     }
 
+    public String getMapUnit() {
+        return mapUnit;
+    }
     
-    public void setMapName(String mapName) {
-        this.mapName = mapName;
+    public void setMapUnit(String mapUnit) {
+        this.mapUnit = mapUnit;
     }
 
 
@@ -101,6 +114,10 @@ public class MapInfo implements Serializable{
                 + ((markerName == null) ? 0 : markerName.hashCode());
         result = prime * result
                 + ((startPosition == null) ? 0 : startPosition.hashCode());
+        result = prime * result
+                + ((mapType == null) ? 0 : mapType.hashCode());
+        result = prime * result
+                + ((mapUnit == null) ? 0 : mapUnit.hashCode());
         return result;
     }
 
@@ -115,7 +132,8 @@ public class MapInfo implements Serializable{
         MapInfo rhs = (MapInfo) obj;
         return new EqualsBuilder().appendSuper(super.equals(obj)).append(markerId, rhs.markerId)
         .append(linkageGroup, rhs.linkageGroup).append(startPosition, rhs.startPosition)
-        .append(mapName, rhs.mapName).append(markerName, rhs.markerName).isEquals();
+        .append(mapName, rhs.mapName).append(markerName, rhs.markerName)
+        .append(mapType, rhs.mapType).append(mapUnit, rhs.mapUnit).isEquals();
     }
 
     @Override
@@ -131,15 +149,29 @@ public class MapInfo implements Serializable{
         builder.append(linkageGroup);
         builder.append(", startPosition=");
         builder.append(startPosition);
+        builder.append(", mapType=");
+        builder.append(mapType);
+        builder.append(", mapUnit=");
+        builder.append(mapUnit);
         builder.append("]");
         return builder.toString();
     }
     
     public static MapInfo build(MappingData mapData){
+        //TODO
         return new MapInfo(mapData.getMarkerId(), mapData.getMarkerName(), mapData.getMapName(), 
-                mapData.getLinkageGroup(), mapData.getStartPosition());
+                mapData.getLinkageGroup(), mapData.getStartPosition(), null, null);
     }
     
+    @Override
+    public int compareTo(MapInfo mapInfo2) {
+        int c = this.getLinkageGroup().compareTo(mapInfo2.getLinkageGroup()); // ascending by linkage group
+        if (c == 0){
+            c = this.getStartPosition().compareTo(mapInfo2.getStartPosition()); // ascending by start position
+        }
+        return c;
+    }
+
 
 
 }

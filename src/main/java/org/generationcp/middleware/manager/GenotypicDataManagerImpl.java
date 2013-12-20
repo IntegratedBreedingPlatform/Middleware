@@ -174,8 +174,40 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public List<MapInfo> getMapInfoByMapName(String mapName, Database instance) throws MiddlewareQueryException {
-        return (List<MapInfo>) super.getFromInstanceByMethod(getMappingDataDao(), instance, "getMapInfoByMapName",
-                new Object[] { mapName }, new Class[] { String.class });
+        List<MapInfo> mapInfoList = new ArrayList<MapInfo>();
+        setWorkingDatabase(instance);
+
+        // Step 1: Get map id by map name
+        Map map = getMapDao().getByName(mapName);
+        if (map == null){
+            return new ArrayList<MapInfo>();
+        }
+        
+        // Step 2: Get markerId, linkageGroup, startPosition from gdms_markers_onmap
+        List<MarkerOnMap> markersOnMap = getMarkerOnMapDao().getMarkersOnMapByMapId(map.getMapId());
+
+        // Step 3: Get marker name from gdms_marker and build MapInfo
+        for (MarkerOnMap markerOnMap : markersOnMap){
+            setWorkingDatabase(instance);
+            Integer markerId = markerOnMap.getMarkerId();
+            String markerName = getMarkerNameByMarkerId(markerId);
+            MapInfo mapInfo = new MapInfo(markerId, markerName, map.getMapName(), 
+                    markerOnMap.getLinkageGroup(), markerOnMap.getStartPosition(),
+                    map.getMapType(), map.getMapUnit());
+            mapInfoList.add(mapInfo);
+        }
+        
+        Collections.sort(mapInfoList);
+        return mapInfoList;
+        
+    }
+
+    @Override
+    public List<MapInfo> getMapInfoByMapName(String mapName) throws MiddlewareQueryException {
+        List<MapInfo> mapInfoList = getMapInfoByMapName(mapName, Database.CENTRAL); 
+        mapInfoList.addAll(getMapInfoByMapName(mapName, Database.LOCAL));
+        Collections.sort(mapInfoList);
+        return mapInfoList;
     }
 
     @Override
@@ -367,8 +399,16 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public List<MarkerIdMarkerNameElement> getMarkerNamesByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException {
-        return (List<MarkerIdMarkerNameElement>) super.getFromInstanceByIdAndMethod(getMarkerDao(), markerIds.get(0), "getNamesByIds", 
+        List<MarkerIdMarkerNameElement> markers = super.getFromInstanceByMethod(getMarkerDao(), Database.CENTRAL, "getNamesByIds", 
                 new Object[]{markerIds}, new Class[]{List.class});
+        markers.addAll(super.getFromInstanceByMethod(getMarkerDao(), Database.LOCAL, "getNamesByIds", 
+                new Object[]{markerIds}, new Class[]{List.class}));
+        return markers;
+    }
+    
+    private String getMarkerNameByMarkerId(Integer markerId) throws MiddlewareQueryException{
+        setWorkingDatabase(markerId);
+        return getMarkerDao().getNameById(markerId);
     }
 
     @Override
