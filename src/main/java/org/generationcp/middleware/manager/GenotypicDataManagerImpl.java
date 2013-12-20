@@ -191,7 +191,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             setWorkingDatabase(instance);
             Integer markerId = markerOnMap.getMarkerId();
             String markerName = getMarkerNameByMarkerId(markerId);
-            MapInfo mapInfo = new MapInfo(markerId, markerName, map.getMapName(), 
+            MapInfo mapInfo = new MapInfo(markerId, markerName, markerOnMap.getMapId(), map.getMapName(), 
                     markerOnMap.getLinkageGroup(), markerOnMap.getStartPosition(),
                     map.getMapType(), map.getMapUnit());
             mapInfoList.add(mapInfo);
