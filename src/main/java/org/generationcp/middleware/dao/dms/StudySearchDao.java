@@ -78,14 +78,21 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 	
 	public long countStudiesByStartDate(int startDate) throws MiddlewareQueryException {
 		try {
+			String dateString = String.valueOf(startDate);
+			//pad LIKE wildcard characters
+			if (dateString.length() == 4){ // only year specified
+				dateString += "____";
+			} else if (dateString.length() == 6){ // only month and year
+				dateString += "__";
+			}
 			SQLQuery query = getSession().createSQLQuery("select count(distinct pp.project_id) " +
 		                                                 "from projectprop pp " + 
 					                                     "where pp.type_id = " + TermId.START_DATE.getId() +
-					                                     "  and pp.value = '" + startDate + "'"+
+					                                     "  and pp.value LIKE :compareDate "+
 					                                     "	AND NOT EXISTS (SELECT 1 FROM projectprop ss WHERE ss.type_id = "+ TermId.STUDY_STATUS.getId() +
 					                         			 "  AND ss.project_id = pp.project_id AND ss.value = " +
 					                         			 "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) ");
-					                                  
+			query.setParameter("compareDate", dateString);
 			return ((BigInteger) query.uniqueResult()).longValue();
 			
 		} catch(HibernateException e) {
@@ -99,15 +106,23 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 		
 		List<StudyReference> studyReferences = new ArrayList<StudyReference>();
 		try {
+			String dateString = String.valueOf(startDate);
+			//pad LIKE wildcard characters
+			if (dateString.length() == 4){ // only year specified
+				dateString += "____";
+			} else if (dateString.length() == 6){ // only month and year
+				dateString += "__";
+			}
+			
 			SQLQuery query = getSession().createSQLQuery("select distinct p.project_id, p.name, p.description " +
 		                                                 "from projectprop pp, project p " + 
 					                                     "where pp.type_id = " + TermId.START_DATE.getId() +
-					                                     "  and pp.value = '" + startDate + "'" +
+					                                     "  and pp.value LIKE :compareDate " +
 					                                     "  and pp.project_id = p.project_id"+
 					                                     "	AND NOT EXISTS (SELECT 1 FROM projectprop ss WHERE ss.type_id = "+ TermId.STUDY_STATUS.getId() +
 					                         			 "  AND ss.project_id = p.project_id AND ss.value = " +
 					                         			 "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = "+CvId.STUDY_STATUS.getId()+")) ");
-					                                  
+			query.setParameter("compareDate", dateString);		                                  
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
 			
