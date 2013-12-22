@@ -212,6 +212,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 .append(" , st.project_id AS studyId ")
                 .append(" , machRow.value AS machineRow ")
                 .append(" , geo.description AS trialInstance ")
+                .append(" , s.dbxref_id AS gid ")
                 .append(" FROM ")
                 .append("  nd_experimentprop uid ")
                 .append("  INNER JOIN nd_experiment e ON e.nd_experiment_id = uid.nd_experiment_id ")
@@ -282,6 +283,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                         .addScalar("studyId")
                         .addScalar("machineRow")
                         .addScalar("trialInstance")
+                        .addScalar("gid")
                         ;
                 query.setParameter("datasetId", datasetId);
                 query.setParameter("geolocationId", geolocationId);
@@ -470,6 +472,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             label.setDatasetId((Integer) row[0]);
             label.setGeolocationId((Integer) row[3]);
             label.setSiteName((String) row[4]);
+            label.setGid((Integer) row[22]);
 
             String trialKey = getTrialKey((Integer) row[0], (Integer) row[3]);
             FieldMapTrialInstanceInfo trial = trialMap.get(trialKey);
