@@ -733,6 +733,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         return getFromLocalAndCentralByMethod(getDmsProjectDao(), methods, start, numOfRows,
                 parameters, new Class[] { StudyType.class });
 	}
+	
+	@Override
+	public List<StudyDetails> getStudyDetails(Database instance, StudyType studyType, int start, int numOfRows) throws MiddlewareQueryException {
+		setWorkingDatabase(instance);
+		return getDmsProjectDao().getAllStudyDetails(studyType,start,numOfRows);
+	}
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -741,6 +747,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		Object[] parameters = new Object[] { };
         return getFromLocalAndCentralByMethod(getDmsProjectDao(), methods, start, numOfRows,
                 parameters, new Class[] { });
+	}
+	
+	@Override
+	public List<StudyDetails> getNurseryAndTrialStudyDetails(Database instance, int start, int numOfRows) throws MiddlewareQueryException {
+		setWorkingDatabase(instance);
+        return getDmsProjectDao().getAllNurseryAndTrialStudyDetails(start,numOfRows);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -774,6 +786,16 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		}
 		return count;
 	}
+	
+	@Override
+	public long countStudyDetails(Database instance, StudyType studyType)
+			throws MiddlewareQueryException {
+		long count = 0;
+		if(setWorkingDatabase(Database.LOCAL)) {
+			count += getDmsProjectDao().countAllStudyDetails(studyType);
+		}
+		return count;
+	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
@@ -803,6 +825,16 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			count += getDmsProjectDao().countAllNurseryAndTrialStudyDetails();
 		}
 		if(setWorkingDatabase(Database.CENTRAL)) {
+			count += getDmsProjectDao().countAllNurseryAndTrialStudyDetails();
+		}
+		return count;
+	}
+	
+	@Override
+	public long countNurseryAndTrialStudyDetails(Database instance)
+			throws MiddlewareQueryException {
+		long count = 0;
+		if(setWorkingDatabase(Database.LOCAL)) {
 			count += getDmsProjectDao().countAllNurseryAndTrialStudyDetails();
 		}
 		return count;

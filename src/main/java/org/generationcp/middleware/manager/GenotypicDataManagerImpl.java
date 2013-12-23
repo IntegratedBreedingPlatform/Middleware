@@ -191,7 +191,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             setWorkingDatabase(instance);
             Integer markerId = markerOnMap.getMarkerId();
             String markerName = getMarkerNameByMarkerId(markerId);
-            MapInfo mapInfo = new MapInfo(markerId, markerName, map.getMapName(), 
+            MapInfo mapInfo = new MapInfo(markerId, markerName, markerOnMap.getMapId(), map.getMapName(), 
                     markerOnMap.getLinkageGroup(), markerOnMap.getStartPosition(),
                     map.getMapType(), map.getMapUnit());
             mapInfoList.add(mapInfo);
@@ -403,7 +403,19 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                 new Object[]{markerIds}, new Class[]{List.class});
         markers.addAll(super.getFromInstanceByMethod(getMarkerDao(), Database.LOCAL, "getNamesByIds", 
                 new Object[]{markerIds}, new Class[]{List.class}));
-        return markers;
+        
+        // Sort based on the given input order
+        List<MarkerIdMarkerNameElement> markersToReturn = new ArrayList<MarkerIdMarkerNameElement>(); 
+        for (Integer markerId : markerIds){
+            for (MarkerIdMarkerNameElement element: markers){
+                if (element.getMarkerId() == markerId){
+                    markersToReturn.add(element);
+                    break;
+                }
+            }
+        }
+        
+        return markersToReturn;
     }
     
     private String getMarkerNameByMarkerId(Integer markerId) throws MiddlewareQueryException{

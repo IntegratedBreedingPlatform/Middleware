@@ -55,7 +55,12 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
             Criteria criteria = getSession().createCriteria(GermplasmList.class);
             criteria.add(Restrictions.ne("status", STATUS_DELETED));
             criteria.setProjection(Projections.rowCount());
-            return ((Long) criteria.uniqueResult()).longValue(); // count
+            Long count = (Long) criteria.uniqueResult();
+            
+            if (count == null){
+                return 0;
+            }
+            return count.longValue(); 
         } catch (HibernateException e) {
             logAndThrowException("Error with countAllExceptDeleted() query from GermplasmList: " + e.getMessage(), e);
         }
