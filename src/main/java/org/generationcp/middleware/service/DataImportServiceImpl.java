@@ -195,8 +195,16 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
     private void checkForDuplicateVariableNames(OntologyDataManager ontologyDataManager, Workbook workbook, List<Message> messages) throws MiddlewareQueryException, WorkbookParserException {
         List<MeasurementVariable> workbookVariables = workbook.getAllVariables();
-
+        Map<String, MeasurementVariable> variableNameMap = new HashMap<String, MeasurementVariable>();
         for (MeasurementVariable measurementVariable : workbookVariables) {
+            if (variableNameMap.containsKey(measurementVariable.getName())) {
+                MeasurementVariable var = variableNameMap.get(measurementVariable.getName());
+                messages.add(new Message("error.import.existing.standard.variable.name", measurementVariable.getName(), var.getProperty(),
+                                                var.getMethod(), var.getScale()));
+            } else {
+                variableNameMap.put(measurementVariable.getName(), measurementVariable);
+            }
+
             StandardVariable standardVariable = ontologyDataManager.findStandardVariableByTraitScaleMethodNames(measurementVariable.getProperty(),
                     measurementVariable.getScale(), measurementVariable.getMethod());
             if (standardVariable == null) {
@@ -213,18 +221,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
             } else {
                 continue;
             }
-            /*Set<StandardVariable> variableSet = ontologyDataManager.findStandardVariablesByNameOrSynonym(measurementVariable.getName());
-            for (StandardVariable standardVariable : variableSet) {
-                if (standardVariable.getName().equals(measurementVariable.getName())) {
-                    boolean allMatches = nameMatches(measurementVariable.getProperty(), standardVariable.getProperty()) && nameMatches(measurementVariable.getScale(), standardVariable.getScale())
-                            && nameMatches(measurementVariable.getMethod(), standardVariable.getMethod());
 
-                    if (!allMatches) {
-                        messages.add(new Message("error.import.existing.standard.variable.name", measurementVariable.getName(), standardVariable.getProperty().getName(),
-                                standardVariable.getMethod().getName(), standardVariable.getScale().getName()));
-                    }
-                }
-            }*/
         }
 
         if (messages.size() > 0) {
