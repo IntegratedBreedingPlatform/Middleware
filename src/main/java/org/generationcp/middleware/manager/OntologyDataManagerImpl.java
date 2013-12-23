@@ -867,7 +867,15 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
                 throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_FROM_CENTRAL_DELETE.getCode(), "The term you selected cannot be deleted");
             }
             if (getCvTermRelationshipDao().getRelationshipByObjectId(cvTermId) != null) {
-                throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_HAS_LINKED_VARIABLE.getCode(), "The term you selected cannot be deleted");
+                if (getCvTermRelationshipDao().getRelationshipByObjectId(cvTermId).getTypeId().equals(TermId.IS_A.getId())) {
+                    if (getCvTermDao().getById(getCvTermRelationshipDao().getRelationshipByObjectId(cvTermId).getSubjectId()).getCv().equals(CvId.PROPERTIES.getId())) {
+                        throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_HAS_LINKED_PROPERTY.getCode(), "The term you selected cannot be deleted");
+                    } else {
+                        throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_HAS_IS_A_RELATIONSHIP.getCode(), "The term you selected cannot be deleted");
+                    }
+                } else {
+                    throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_HAS_LINKED_VARIABLE.getCode(), "The term you selected cannot be deleted");
+                }
             }
             
             if (CvId.VARIABLES.getId() != cvId.getId()) {

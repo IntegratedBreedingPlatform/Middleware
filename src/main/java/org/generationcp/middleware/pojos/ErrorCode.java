@@ -9,6 +9,8 @@ public enum ErrorCode {
     , ONTOLOGY_FROM_CENTRAL_UPDATE("error.ontology.from.central.update")
     , ONTOLOGY_FROM_CENTRAL_DELETE("error.ontology.from.central.delete")
     , ONTOLOGY_HAS_LINKED_VARIABLE("error.ontology.has.linked.variable")
+    , ONTOLOGY_HAS_IS_A_RELATIONSHIP("error.ontology.has.trait.class")
+    , ONTOLOGY_HAS_LINKED_PROPERTY("error.ontology.has.linked.property")
     ;
     
     private String code;
