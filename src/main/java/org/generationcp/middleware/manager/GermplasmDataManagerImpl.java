@@ -568,12 +568,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             }
         }
 
-        if (setWorkingDatabase(Database.CENTRAL)) {
+        if (!pos.isEmpty() && setWorkingDatabase(Database.CENTRAL)) {
             results.addAll(getMethodDao().getMethodsByIds(pos));
         }
 
 
-        if (setWorkingDatabase(Database.LOCAL)) {
+        if (!negs.isEmpty() && setWorkingDatabase(Database.LOCAL)) {
             results.addAll(getMethodDao().getMethodsByIds(negs));
         }
 
