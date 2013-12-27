@@ -142,8 +142,6 @@ public interface GenotypicDataManager{
      * Gets map information (marker_name, linkage_group, start_position) 
      * from mapping_data view by the given map name.
      *  
-     * Retrieves data from both central and local.
-     *
      * @param mapName 
      *          - the name of the map to retrieve
      * @return the map info corresponding to the given map name

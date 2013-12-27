@@ -31,7 +31,7 @@ public class ExperimentValuesTransformer extends Transformer {
 				
 				for(int i = 0, l = varTypes.size(); i < l; i++ ){
 					VariableType varType = varTypes.get(i);
-					String value = mRow.getDataList().get(i).getValue();
+					String value = mRow.getNonTrialDataList(trialHeaders).get(i).getValue();
 					
 					Variable variable = new Variable(varType, value);
 					variableList.add(variable);

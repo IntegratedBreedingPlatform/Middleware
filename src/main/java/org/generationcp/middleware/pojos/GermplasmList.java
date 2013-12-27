@@ -72,6 +72,21 @@ public class GermplasmList implements Serializable{
     @Column(name = "liststatus")
     private Integer status;
     
+    @Column(name = "sdate")
+    private Integer  sDate;
+    
+    @Column(name = "eDate")
+    private Integer  eDate;
+    
+    @Column(name = "listlocn")
+    private Integer  listLocation;
+    
+    @Column(name = "listref")
+    private Integer  listRef;
+    
+    @Column(name = "projectId")
+    private Integer  projectId; 
+    
     @Column(name = "notes")
     private String notes;
     
@@ -135,6 +150,29 @@ public class GermplasmList implements Serializable{
         this.parent = parent;
         this.status = status;
         this.notes = notes;
+    }
+
+    
+    
+    public GermplasmList(Integer id, String name, Long date, String type, Integer userId, String description,
+            GermplasmList parent, Integer status, Integer sDate, Integer eDate, Integer listLocation, Integer listRef,
+            Integer projectId, String notes, List<GermplasmListData> listData) {
+        super();
+        this.id = id;
+        this.name = name;
+        this.date = date;
+        this.type = type;
+        this.userId = userId;
+        this.description = description;
+        this.parent = parent;
+        this.status = status;
+        this.sDate = sDate;
+        this.eDate = eDate;
+        this.listLocation = listLocation;
+        this.listRef = listRef;
+        this.projectId = projectId;
+        this.notes = notes;
+        this.listData = listData;
     }
 
     public Integer getId() {
@@ -236,6 +274,56 @@ public class GermplasmList implements Serializable{
         this.status = status;
     }
     
+    
+    public Integer getsDate() {
+        return sDate;
+    }
+
+    
+    public void setsDate(Integer sDate) {
+        this.sDate = sDate;
+    }
+
+    
+    public Integer geteDate() {
+        return eDate;
+    }
+
+    
+    public void seteDate(Integer eDate) {
+        this.eDate = eDate;
+    }
+
+    
+    public Integer getListLocation() {
+        return listLocation;
+    }
+
+    
+    public void setListLocation(Integer listLocation) {
+        this.listLocation = listLocation;
+    }
+
+    
+    public Integer getListRef() {
+        return listRef;
+    }
+
+    
+    public void setListRef(Integer listRef) {
+        this.listRef = listRef;
+    }
+
+    
+    public Integer getProjectId() {
+        return projectId;
+    }
+
+    
+    public void setProjectId(Integer projectId) {
+        this.projectId = projectId;
+    }
+
     public String getNotes(){
     	return notes;
     }

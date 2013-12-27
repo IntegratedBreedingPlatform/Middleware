@@ -192,12 +192,23 @@ public class WorkbookParser {
         String studyType = getCellStringValue(wb, DESCRIPTION_SHEET, STUDY_TYPE_ROW_INDEX, STUDY_DETAILS_VALUE_COLUMN_INDEX);
         StudyType studyTypeValue = StudyType.getStudyType(studyType);
 
-        if (study != null) {
+
+        /*if (study != null) {
             if (study.trim().equals("")) errorMessages.add(new Message("error.blank.study.name"));
         }
         if (title != null) {
             if (title.trim().equals("")) errorMessages.add(new Message("error.blank.study.title"));
+        }*/
+
+        // GCP-6991 and GCP-6992
+        if (study == null || StringUtils.isEmpty(study)) {
+            errorMessages.add(new Message("error.blank.study.name"));
         }
+
+        if (title == null || StringUtils.isEmpty(title)) {
+            errorMessages.add(new Message("error.blank.study.title"));
+        }
+
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         dateFormat.setLenient(false);
         Date startDate = null;
@@ -392,9 +403,11 @@ public class WorkbookParser {
                 List<MeasurementData> measurementData = new ArrayList<MeasurementData>();
 
                 for (int col = 0; col < factors.size() + variates.size(); col++) {
-                    if (col == 0) {
+                    // danielv -- commented out because this is no longer relevant. Stock id is computed later on in the process
+                    // danielv -- this also resolves the nullpointerexception at GCP-6415
+                    /*if (col == 0) {
                         stockId = Long.parseLong(getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col));
-                    }
+                    }*/
 
                     // TODO verify usefulness / validity of next statement.
                     if (measurementDataLabel.get(col).equals("GYLD")) {
@@ -403,7 +416,9 @@ public class WorkbookParser {
                     measurementData.add(new MeasurementData(measurementDataLabel.get(col), getCellStringValue(wb, OBSERVATION_SHEET, currentRow, col)));
                 }
 
-                observations.add(new MeasurementRow(stockId, DEFAULT_GEOLOCATION_ID, measurementData));//note that the locationid will be replaced inside
+                // danielv -- made use of new constructor to make it clear that only the measurement data is needed at this point. The other values are computed later on in the process
+                observations.add(new MeasurementRow(measurementData));
+                /*observations.add(new MeasurementRow(stockId, DEFAULT_GEOLOCATION_ID, measurementData));//note that the locationid will be replaced inside*/
                 currentRow++;
             }
 

@@ -488,7 +488,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             trans = session.beginTransaction();
             term = saveOrUpdateCvTerm(name, definition, cvId);
             saveOrUpdateCvTermRelationship(term.getId(), objectId, typeId);
-            if (cropOntologyId != null && !"".equals(cropOntologyId.trim())) {
+            if (cropOntologyId != null/* && !"".equals(cropOntologyId.trim())*/) {
                 getStandardVariableSaver().saveOrUpdateCropOntologyId(term.getId(), cropOntologyId);
             }
             
@@ -745,10 +745,11 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     @Override
     public void addOrUpdateStandardVariableConstraints(int standardVariableId, VariableConstraints constraints) 
             throws MiddlewareException, MiddlewareQueryException{
-        if (standardVariableId >= 0){
+        /*if (standardVariableId >= 0){
             throw new MiddlewareException("Error in addOrUpdateStandardVariableConstraints: " +
             		"Cannot update the constraints of standard variables from Central database.");
         }
+        */
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
@@ -867,7 +868,15 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
                 throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_FROM_CENTRAL_DELETE.getCode(), "The term you selected cannot be deleted");
             }
             if (getCvTermRelationshipDao().getRelationshipByObjectId(cvTermId) != null) {
-                throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_HAS_LINKED_VARIABLE.getCode(), "The term you selected cannot be deleted");
+                if (getCvTermRelationshipDao().getRelationshipByObjectId(cvTermId).getTypeId().equals(TermId.IS_A.getId())) {
+                    if (getCvTermDao().getById(getCvTermRelationshipDao().getRelationshipByObjectId(cvTermId).getSubjectId()).getCv().equals(CvId.PROPERTIES.getId())) {
+                        throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_HAS_LINKED_PROPERTY.getCode(), "The term you selected cannot be deleted");
+                    } else {
+                        throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_HAS_IS_A_RELATIONSHIP.getCode(), "The term you selected cannot be deleted");
+                    }
+                } else {
+                    throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_HAS_LINKED_VARIABLE.getCode(), "The term you selected cannot be deleted");
+                }
             }
             
             if (CvId.VARIABLES.getId() != cvId.getId()) {
