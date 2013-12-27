@@ -488,7 +488,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             trans = session.beginTransaction();
             term = saveOrUpdateCvTerm(name, definition, cvId);
             saveOrUpdateCvTermRelationship(term.getId(), objectId, typeId);
-            if (cropOntologyId != null && !"".equals(cropOntologyId.trim())) {
+            if (cropOntologyId != null/* && !"".equals(cropOntologyId.trim())*/) {
                 getStandardVariableSaver().saveOrUpdateCropOntologyId(term.getId(), cropOntologyId);
             }
             
