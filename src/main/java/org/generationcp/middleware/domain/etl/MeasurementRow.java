@@ -28,6 +28,10 @@ public class MeasurementRow {
 	public MeasurementRow() {
 	}
 
+    public MeasurementRow(List<MeasurementData> dataList) {
+        this.dataList = dataList;
+    }
+
 	public MeasurementRow(long stockId, long locationId, List<MeasurementData> dataList) {
 		this.stockId = stockId;
 		this.locationId = locationId;

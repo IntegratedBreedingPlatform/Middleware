@@ -745,10 +745,11 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     @Override
     public void addOrUpdateStandardVariableConstraints(int standardVariableId, VariableConstraints constraints) 
             throws MiddlewareException, MiddlewareQueryException{
-        if (standardVariableId >= 0){
+        /*if (standardVariableId >= 0){
             throw new MiddlewareException("Error in addOrUpdateStandardVariableConstraints: " +
             		"Cannot update the constraints of standard variables from Central database.");
         }
+        */
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
