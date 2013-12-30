@@ -113,7 +113,6 @@ public class DataImportServiceImpl extends Service implements DataImportService 
             logAndThrowException("Error encountered with saveDataset(): " + e.getMessage(), e, LOG);
 
         } finally {
-        	session.close();
             timerWatch.stop();
         }
 
