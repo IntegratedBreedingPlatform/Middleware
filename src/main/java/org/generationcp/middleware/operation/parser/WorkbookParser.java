@@ -40,7 +40,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class WorkbookParser {
-    
+
     private static final Logger LOG = LoggerFactory.getLogger(WorkbookParser.class);
 
     public static final int DESCRIPTION_SHEET = 0;
@@ -68,30 +68,33 @@ public class WorkbookParser {
     private final static String[] EXPECTED_CONSTANT_HEADERS_2 = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE", ""};
     private final static String[] EXPECTED_FACTOR_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "NESTED IN", "LABEL"};
     private final static String[] EXPECTED_FACTOR_HEADERS_2 = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "", "LABEL"};
-    
+
 
     private static final int DEFAULT_GEOLOCATION_ID = 1;
+
     /**
      * Added handling for parsing the file if its xls or xlsx
+     *
      * @param file
      * @return
      * @throws IOException
      */
-    private Workbook getCorrectWorkbook(File file) throws IOException{
+    private Workbook getCorrectWorkbook(File file) throws IOException {
         InputStream inp = new FileInputStream(file);
         InputStream inp2 = new FileInputStream(file);
         Workbook wb;
-        try{
+        try {
             wb = new HSSFWorkbook(inp);
-        }catch (OfficeXmlFileException ee) {
+        } catch (OfficeXmlFileException ee) {
             // TODO: handle exception
             wb = new XSSFWorkbook(inp2);
-        }finally{
+        } finally {
             inp.close();
             inp2.close();
         }
         return wb;
     }
+
     /**
      * Parses given file and transforms it into a Workbook
      *
@@ -110,7 +113,7 @@ public class WorkbookParser {
 
         try {
 
-            
+
             wb = getCorrectWorkbook(file);
 
             //validations
@@ -160,7 +163,7 @@ public class WorkbookParser {
             throw new WorkbookParserException("File not found " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WorkbookParserException("Error accessing file " + e.getMessage(), e);
-        } 
+        }
 
         return currentWorkbook;
     }
@@ -266,7 +269,10 @@ public class WorkbookParser {
 
         try {
 
-            currentRow++; //Skip empty row
+            /*currentRow++; //Skip empty row*/
+            while (rowIsEmpty(wb, DESCRIPTION_SHEET, currentRow, 8)) {
+                currentRow++;
+            }
             //Check if headers are correct
 
             // GCP-5815
@@ -287,8 +293,8 @@ public class WorkbookParser {
             }
 
             boolean valid = checkHeadersValid(wb, DESCRIPTION_SHEET, currentRow, expectedHeaders);
-            if(!valid && expectedHeaders2 != null) {
-            	valid = checkHeadersValid(wb, DESCRIPTION_SHEET, currentRow, expectedHeaders2);
+            if (!valid && expectedHeaders2 != null) {
+                valid = checkHeadersValid(wb, DESCRIPTION_SHEET, currentRow, expectedHeaders2);
             }
             if (!valid && expectedHeaders != DEFAULT_EXPECTED_VARIABLE_HEADERS) {
                 valid = checkHeadersValid(wb, DESCRIPTION_SHEET, currentRow, DEFAULT_EXPECTED_VARIABLE_HEADERS);
@@ -300,7 +306,17 @@ public class WorkbookParser {
             }
 
             //If file is still valid (after checking headers), proceed
-            currentRow++;
+            do {
+                currentRow++;
+            } while (rowIsEmpty(wb, DESCRIPTION_SHEET, currentRow, 8));
+
+            // capture empty sections, and return to avoid spillover
+            String value = getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 0);
+
+            if (value.equalsIgnoreCase("FACTOR") || value.equalsIgnoreCase("CONSTANT") || value.equalsIgnoreCase("VARIATE")) {
+                return measurementVariables;
+            }
+
             while (!rowIsEmpty(wb, DESCRIPTION_SHEET, currentRow, 8)) {
 
                 // GCP-5802
@@ -340,9 +356,9 @@ public class WorkbookParser {
                 if (!name.equals("VARIATE") && StringUtils.isEmpty(var.getLabel())) {
                     errorMessages.add(new Message("error.missing.field.label", Integer.toString(currentRow + 1)));
                 }
-                
-                if ((name.equals("FACTOR") || name.equals("CONDITION")) && PhenotypicType.getPhenotypicTypeForLabel(var.getLabel()) == null){
-                	 errorMessages.add(new Message("error.invalid.field.label", Integer.toString(currentRow + 1)));
+
+                if ((name.equals("FACTOR") || name.equals("CONDITION")) && PhenotypicType.getPhenotypicTypeForLabel(var.getLabel()) == null) {
+                    errorMessages.add(new Message("error.invalid.field.label", Integer.toString(currentRow + 1)));
                 }
 
                 measurementVariables.add(var);
@@ -469,20 +485,20 @@ public class WorkbookParser {
     private static Boolean rowIsEmpty(Workbook wb, Integer sheet, Integer row, int len) {
         Integer col = 0;
         for (col = 0; col < len; col++) {
-        	String value = getCellStringValue(wb, sheet, row, col);
-            if (value != null && !value.equals("") ) {
+            String value = getCellStringValue(wb, sheet, row, col);
+            if (value != null && !value.equals("")) {
                 return false;
             }
             col++;
         }
         return true;
     }
-    
+
     public static String getCellStringValue(Cell cell) {
-    	if (cell == null) {
+        if (cell == null) {
             return null;
         }
-    	DataFormatter formatter = new DataFormatter();
+        DataFormatter formatter = new DataFormatter();
         String formattedCellValue = formatter.formatCellValue(cell);
         return formattedCellValue;
     }
