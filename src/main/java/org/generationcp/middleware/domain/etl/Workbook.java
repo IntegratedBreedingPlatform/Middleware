@@ -34,8 +34,33 @@ public class Workbook {
 	
 	private List<MeasurementRow> observations; 
 	
+	//derived variables used to improve performance
+	private List<String> trialHeaders;
+	private List<MeasurementVariable> trialVariables;
+	private List<MeasurementVariable> measurementDatasetVariables;
+	private List<MeasurementVariable> studyVariables;
+	private List<MeasurementVariable> nonTrialFactors;
+	private List<MeasurementVariable> trialFactors;
+	private List<MeasurementVariable> studyConditions;
+	private List<MeasurementVariable> studyConstants;
+	private List<MeasurementVariable> trialConditions;
+	private List<MeasurementVariable> trialConstants;
+	
+	public void reset() {
+		trialHeaders = null;
+		trialVariables = null;
+		measurementDatasetVariables = null;
+		studyVariables = null;
+		nonTrialFactors = null;
+		trialFactors = null;
+		studyConditions = null;
+		studyConstants = null;
+		trialConditions = null;
+		trialConstants = null;
+	}
+	
 	public Workbook(){
-		
+		reset();
 	}
 	
 	public Workbook(StudyDetails studyDetails,
@@ -50,6 +75,7 @@ public class Workbook {
 		this.constants = constants;
 		this.variates = variates;
 		this.observations = observations;
+		reset();
 	}
 
 	public StudyDetails getStudyDetails() {
@@ -105,33 +131,92 @@ public class Workbook {
 	}
 	
 	public List<MeasurementVariable> getMeasurementDatasetVariables() {
-		List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
-		
-		list.addAll(getNonTrialVariables(factors));
-		list.addAll(variates);
-		
-		return list;
+		if(measurementDatasetVariables==null) {
+			measurementDatasetVariables = new ArrayList<MeasurementVariable>();
+			
+			measurementDatasetVariables.addAll(getNonTrialFactors());
+			measurementDatasetVariables.addAll(variates);
+		}
+		return measurementDatasetVariables;
+	}
+
+	public List<MeasurementVariable> getNonTrialFactors() {
+		if(nonTrialFactors==null) {
+			nonTrialFactors = getNonTrialVariables(factors);
+		}
+		return nonTrialFactors;
 	}
 
 	public List<MeasurementVariable> getStudyVariables() {
-		return getConditionsAndConstants(true);
+		if(studyVariables==null) {
+			studyVariables = getConditionsAndConstants(true);
+		}
+		return studyVariables;
 	}
 	
 	public List<MeasurementVariable> getTrialVariables() {
-		List<MeasurementVariable> list = getConditionsAndConstants(false);
-		list.addAll(getTrialVariables(factors));
-		return list;
+		if(trialVariables==null) {
+			trialVariables = getConditionsAndConstants(false);
+			trialVariables.addAll(getTrialFactors());
+		}
+		return trialVariables;
 	}
 	
+	public List<MeasurementVariable> getTrialFactors() {
+		if(trialFactors==null) {
+			trialFactors = getTrialVariables(factors);
+		}
+		return trialFactors;
+	}
+
 	private List<MeasurementVariable> getConditionsAndConstants(boolean isStudy) {
 		List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
-		
-		list.addAll(getVariables(conditions, isStudy));
-		list.addAll(getVariables(constants, isStudy));
-		
+		if(isStudy) {
+			if(studyConditions == null && studyConstants == null) {
+				studyConditions = getStudyConditions();
+				studyConstants = getStudyConstants();
+			}
+			list.addAll(studyConditions);
+			list.addAll(studyConstants);
+		} else {
+			if(trialConditions == null && trialConstants == null) {
+				trialConditions = getTrialConditions();
+				trialConstants = getTrialConstants();
+			}
+			list.addAll(trialConditions);
+			list.addAll(trialConstants);
+		}
 		return list;
 	}
 	
+	public List<MeasurementVariable> getStudyConstants() {
+		if(studyConstants==null) {
+			studyConstants = getVariables(constants, true);
+		}
+		return studyConstants;
+	}
+
+	public List<MeasurementVariable> getStudyConditions() {
+		if(studyConditions == null) {
+			studyConditions = getVariables(conditions, true);
+		}
+		return studyConditions;
+	}
+	
+	public List<MeasurementVariable> getTrialConstants() {
+		if(trialConstants==null) {
+			trialConstants = getVariables(constants, false);
+		}
+		return trialConstants;
+	}
+
+	public List<MeasurementVariable> getTrialConditions() {
+		if(trialConditions == null) {
+			trialConditions = getVariables(conditions, false);
+		}
+		return trialConditions;
+	}
+
 	public List<MeasurementVariable> getVariables(List<MeasurementVariable> variables, boolean isStudy) {
 		List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
 		if (variables != null && variables.size() > 0) {
@@ -145,7 +230,7 @@ public class Workbook {
 		return list;
 	}
 	
-	public List<MeasurementVariable> getNonTrialVariables(List<MeasurementVariable> variables) {
+	private List<MeasurementVariable> getNonTrialVariables(List<MeasurementVariable> variables) {
 		List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
 		if (variables != null && variables.size() > 0) {
 			for (MeasurementVariable variable : variables) {
@@ -157,7 +242,7 @@ public class Workbook {
 		return list;
 	}
 	
-	public List<MeasurementVariable> getTrialVariables(List<MeasurementVariable> variables) {
+	private List<MeasurementVariable> getTrialVariables(List<MeasurementVariable> variables) {
 		List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
 		if (variables != null && variables.size() > 0) {
 			for (MeasurementVariable variable : variables) {
@@ -169,16 +254,19 @@ public class Workbook {
 		return list;
 	}
 	
-	public List<String> getTrialHeaders(List<MeasurementVariable> variables) {
-		List<String> list = new ArrayList<String>();
-		if (variables != null && variables.size() > 0) {
-			for (MeasurementVariable variable : variables) {
-				if (PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(variable.getLabel().toUpperCase())) {
-					list.add(variable.getName());
+	public List<String> getTrialHeaders() {
+		if(trialHeaders==null) {
+			trialHeaders = new ArrayList<String>();
+			List<MeasurementVariable> variables = getTrialVariables();
+			if (variables != null && variables.size() > 0) {
+				for (MeasurementVariable variable : variables) {
+					if (PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(variable.getLabel().toUpperCase())) {
+						trialHeaders.add(variable.getName());
+					}
 				}
 			}
 		}
-		return list;
+		return trialHeaders;
 	}
 
     public List<MeasurementVariable> getAllVariables() {

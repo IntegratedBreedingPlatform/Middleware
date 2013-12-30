@@ -26,12 +26,16 @@ public class VariableListTransformer extends Transformer {
 	public VariableList transformStock(MeasurementRow mRow, VariableTypeList variableTypeList, List<String> trialHeaders) throws MiddlewareQueryException {
 		VariableList variableList = new VariableList();
 
-		if (mRow != null && mRow.getNonTrialDataList(trialHeaders) != null && variableTypeList != null && variableTypeList.getVariableTypes() != null) {
-			if (mRow.getNonTrialDataList(trialHeaders).size() == variableTypeList.getVariableTypes().size()) {
+		if(mRow == null) {
+			return variableList;
+		}
+		List<MeasurementData> nonTrialMD = mRow.getNonTrialDataList(trialHeaders);
+		if (mRow != null &&  nonTrialMD != null && variableTypeList != null && variableTypeList.getVariableTypes() != null) {
+			if (nonTrialMD.size() == variableTypeList.getVariableTypes().size()) {
 				int i = 0;
 				for (VariableType variableType : variableTypeList.getVariableTypes()) {
 					if (variableType.getStandardVariable().getPhenotypicType() == PhenotypicType.GERMPLASM) {
-						variableList.add(new Variable(variableType, mRow.getNonTrialDataList(trialHeaders).get(i).getValue()));
+						variableList.add(new Variable(variableType, nonTrialMD.get(i).getValue()));
 					}
 					i++;
 				}
@@ -47,8 +51,11 @@ public class VariableListTransformer extends Transformer {
 	public VariableList transformTrialEnvironment(MeasurementRow mRow, VariableTypeList variableTypeList, List<String> trialHeaders) throws MiddlewareQueryException {
 		VariableList variableList = new VariableList() ;
 		
-		if (mRow != null && mRow.getTrialDataList(trialHeaders) != null && variableTypeList != null && variableTypeList.getVariableTypes() != null) {
-			List<MeasurementData> trialMD = mRow.getTrialDataList(trialHeaders);
+		if (mRow == null) {
+			return variableList;
+		}
+		List<MeasurementData> trialMD = mRow.getTrialDataList(trialHeaders);
+		if (trialMD != null && variableTypeList != null && variableTypeList.getVariableTypes() != null) {
 			if (trialMD.size() == variableTypeList.getVariableTypes().size()) {
 				List<VariableType> varTypes = variableTypeList.getVariableTypes();
 				
