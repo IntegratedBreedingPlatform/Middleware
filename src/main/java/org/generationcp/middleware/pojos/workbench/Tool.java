@@ -46,6 +46,10 @@ public class Tool implements Serializable{
     private String toolName;
     
     @Basic(optional = false)
+    @Column(name = "group_name")
+    private String groupName;
+    
+    @Basic(optional = false)
     @Column(name = "title")
     private String title;
     
@@ -100,6 +104,14 @@ public class Tool implements Serializable{
 
     public void setToolName(String toolName) {
         this.toolName = toolName;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 
     public String getTitle() {

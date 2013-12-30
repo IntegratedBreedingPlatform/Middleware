@@ -480,15 +480,17 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         Transaction trans = null;
 
         Term term = findTermByName(name, cvId);
-        if (term != null && term.getId() >= 0) {
+        if (term != null && term.getId() >= 0 && cvId.getId() != CvId.PROPERTIES.getId()) {
             throw new MiddlewareQueryException(ErrorCode.ONTOLOGY_FROM_CENTRAL_UPDATE.getCode(), "The term you entered is invalid");
         }
 
         try {
             trans = session.beginTransaction();
-            term = saveOrUpdateCvTerm(name, definition, cvId);
-            saveOrUpdateCvTermRelationship(term.getId(), objectId, typeId);
-            if (cropOntologyId != null && !"".equals(cropOntologyId.trim())) {
+            if (term == null || term.getId() < 0) {
+                term = saveOrUpdateCvTerm(name, definition, cvId);
+                saveOrUpdateCvTermRelationship(term.getId(), objectId, typeId);
+            }
+            if (cropOntologyId != null/* && !"".equals(cropOntologyId.trim())*/) {
                 getStandardVariableSaver().saveOrUpdateCropOntologyId(term.getId(), cropOntologyId);
             }
             
