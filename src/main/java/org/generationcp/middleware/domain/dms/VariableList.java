@@ -28,6 +28,10 @@ public class VariableList {
 	public void add(Variable variable) {
 		variables.add(variable);
 	}
+	
+	public void addAll(VariableList variableList) {
+	    variables.addAll(variableList.getVariables());
+	}
 
 	public Variable findById(TermId termId) {
 		return findById(termId.getId());
