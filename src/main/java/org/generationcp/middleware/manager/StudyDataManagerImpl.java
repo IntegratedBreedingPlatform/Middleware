@@ -346,7 +346,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         }
         return 0;
     }
-    
+
     @Override
     public long countObservations(int datasetId, int trialEnvironmentId, int variateStdVarId) throws MiddlewareQueryException {
         if (this.setWorkingDatabase(datasetId)) {
@@ -497,10 +497,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
                                 String pedigree = null;
                                 try {
                                     pedigree = germplasmDataManager.getCrossExpansion(label.getGid(), 1);
-                                } catch(Throwable e) {
+                                } catch (Throwable e) {
                                     //do nothing
                                 }
-                                
+
                                 label.setPedigree(pedigree);
                             }
                         }
@@ -638,6 +638,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
                             + parentFolderId + ", name=" + name
                             + ", description=" + description + "): " + e.getMessage(),
                             e);
+        } catch (Error e) {
+            rollbackTransaction(trans);
+            throw new MiddlewareQueryException
+                    ("Error encountered with addSubFolder(parentFolderId="
+                            + parentFolderId + ", name=" + name
+                            + ", description=" + description + "): " + e.getMessage(),
+                            e);
         }
     }
 
@@ -708,15 +715,15 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
     @Override
     public DmsProject getParentFolder(int id) throws MiddlewareQueryException {
-    	if(id>0)
-    		requireCentralDatabaseInstance();
-    	else
-    		requireLocalDatabaseInstance();
+        if (id > 0)
+            requireCentralDatabaseInstance();
+        else
+            requireLocalDatabaseInstance();
         DmsProject folderParentFolder = getProjectRelationshipDao().getObjectBySubjectIdAndTypeId(id, TermId.HAS_PARENT_FOLDER.getId());
         DmsProject studyParentFolder = getProjectRelationshipDao().getObjectBySubjectIdAndTypeId(id, TermId.STUDY_HAS_FOLDER.getId());
-        if(folderParentFolder!=null)
-        	return folderParentFolder;
-       	return studyParentFolder;
+        if (folderParentFolder != null)
+            return folderParentFolder;
+        return studyParentFolder;
     }
 
     @Override
@@ -725,120 +732,120 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         return getDmsProjectDao().getById(id);
     }
 
-	@SuppressWarnings({ "unchecked" })
-	@Override
-	public List<StudyDetails> getStudyDetails(StudyType studyType, int start, int numOfRows) throws MiddlewareQueryException {
-		List<String> methods = Arrays.asList("countAllStudyDetails", "getAllStudyDetails");
-		Object[] parameters = new Object[] { studyType };
+    @SuppressWarnings({"unchecked"})
+    @Override
+    public List<StudyDetails> getStudyDetails(StudyType studyType, int start, int numOfRows) throws MiddlewareQueryException {
+        List<String> methods = Arrays.asList("countAllStudyDetails", "getAllStudyDetails");
+        Object[] parameters = new Object[]{studyType};
         return getFromLocalAndCentralByMethod(getDmsProjectDao(), methods, start, numOfRows,
-                parameters, new Class[] { StudyType.class });
-	}
-	
-	@Override
-	public List<StudyDetails> getStudyDetails(Database instance, StudyType studyType, int start, int numOfRows) throws MiddlewareQueryException {
-		setWorkingDatabase(instance);
-		return getDmsProjectDao().getAllStudyDetails(studyType,start,numOfRows);
-	}
+                parameters, new Class[]{StudyType.class});
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<StudyDetails> getNurseryAndTrialStudyDetails(int start, int numOfRows) throws MiddlewareQueryException {
-		List<String> methods = Arrays.asList("countAllNurseryAndTrialStudyDetails", "getAllNurseryAndTrialStudyDetails");
-		Object[] parameters = new Object[] { };
+    @Override
+    public List<StudyDetails> getStudyDetails(Database instance, StudyType studyType, int start, int numOfRows) throws MiddlewareQueryException {
+        setWorkingDatabase(instance);
+        return getDmsProjectDao().getAllStudyDetails(studyType, start, numOfRows);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<StudyDetails> getNurseryAndTrialStudyDetails(int start, int numOfRows) throws MiddlewareQueryException {
+        List<String> methods = Arrays.asList("countAllNurseryAndTrialStudyDetails", "getAllNurseryAndTrialStudyDetails");
+        Object[] parameters = new Object[]{};
         return getFromLocalAndCentralByMethod(getDmsProjectDao(), methods, start, numOfRows,
-                parameters, new Class[] { });
-	}
-	
-	@Override
-	public List<StudyDetails> getNurseryAndTrialStudyDetails(Database instance, int start, int numOfRows) throws MiddlewareQueryException {
-		setWorkingDatabase(instance);
-        return getDmsProjectDao().getAllNurseryAndTrialStudyDetails(start,numOfRows);
-	}
-	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@Override
-	public List<StudyDetails> getAllStudyDetails(StudyType studyType) throws MiddlewareQueryException {
-		List<StudyDetails> list = new ArrayList<StudyDetails>();
-		if(setWorkingDatabase(Database.LOCAL)) {
-			List localList = getDmsProjectDao().getAllStudyDetails(studyType);
-			if(localList!=null) {
-				list.addAll(localList);
-			}
-		}
-		if(setWorkingDatabase(Database.CENTRAL)) {
-			List centralList = getDmsProjectDao().getAllStudyDetails(studyType);
-			if(centralList!=null) {
-				list.addAll(centralList);
-			}
-		}
-		return list;
-	}
+                parameters, new Class[]{});
+    }
 
-	@Override
-	public long countAllStudyDetails(StudyType studyType)
-			throws MiddlewareQueryException {
-		long count = 0;
-		if(setWorkingDatabase(Database.LOCAL)) {
-			count += getDmsProjectDao().countAllStudyDetails(studyType);
-		}
-		if(setWorkingDatabase(Database.CENTRAL)) {
-			count += getDmsProjectDao().countAllStudyDetails(studyType);
-		}
-		return count;
-	}
-	
-	@Override
-	public long countStudyDetails(Database instance, StudyType studyType)
-			throws MiddlewareQueryException {
-		long count = 0;
-		if(setWorkingDatabase(Database.LOCAL)) {
-			count += getDmsProjectDao().countAllStudyDetails(studyType);
-		}
-		return count;
-	}
+    @Override
+    public List<StudyDetails> getNurseryAndTrialStudyDetails(Database instance, int start, int numOfRows) throws MiddlewareQueryException {
+        setWorkingDatabase(instance);
+        return getDmsProjectDao().getAllNurseryAndTrialStudyDetails(start, numOfRows);
+    }
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@Override
-	public List<StudyDetails> getAllNurseryAndTrialStudyDetails()
-			throws MiddlewareQueryException {
-		List<StudyDetails> list = new ArrayList<StudyDetails>();
-		if(setWorkingDatabase(Database.LOCAL)) {
-			List localList = getDmsProjectDao().getAllNurseryAndTrialStudyDetails();
-			if(localList!=null) {
-				list.addAll(localList);
-			}
-		}
-		if(setWorkingDatabase(Database.CENTRAL)) {
-			List centralList = getDmsProjectDao().getAllNurseryAndTrialStudyDetails();
-			if(centralList!=null) {
-				list.addAll(centralList);
-			}
-		}
-		return list;
-	}
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    @Override
+    public List<StudyDetails> getAllStudyDetails(StudyType studyType) throws MiddlewareQueryException {
+        List<StudyDetails> list = new ArrayList<StudyDetails>();
+        if (setWorkingDatabase(Database.LOCAL)) {
+            List localList = getDmsProjectDao().getAllStudyDetails(studyType);
+            if (localList != null) {
+                list.addAll(localList);
+            }
+        }
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            List centralList = getDmsProjectDao().getAllStudyDetails(studyType);
+            if (centralList != null) {
+                list.addAll(centralList);
+            }
+        }
+        return list;
+    }
 
-	@Override
-	public long countAllNurseryAndTrialStudyDetails()
-			throws MiddlewareQueryException {
-		long count = 0;
-		if(setWorkingDatabase(Database.LOCAL)) {
-			count += getDmsProjectDao().countAllNurseryAndTrialStudyDetails();
-		}
-		if(setWorkingDatabase(Database.CENTRAL)) {
-			count += getDmsProjectDao().countAllNurseryAndTrialStudyDetails();
-		}
-		return count;
-	}
-	
-	@Override
-	public long countNurseryAndTrialStudyDetails(Database instance)
-			throws MiddlewareQueryException {
-		long count = 0;
-		if(setWorkingDatabase(Database.LOCAL)) {
-			count += getDmsProjectDao().countAllNurseryAndTrialStudyDetails();
-		}
-		return count;
-	}
+    @Override
+    public long countAllStudyDetails(StudyType studyType)
+            throws MiddlewareQueryException {
+        long count = 0;
+        if (setWorkingDatabase(Database.LOCAL)) {
+            count += getDmsProjectDao().countAllStudyDetails(studyType);
+        }
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            count += getDmsProjectDao().countAllStudyDetails(studyType);
+        }
+        return count;
+    }
+
+    @Override
+    public long countStudyDetails(Database instance, StudyType studyType)
+            throws MiddlewareQueryException {
+        long count = 0;
+        if (setWorkingDatabase(Database.LOCAL)) {
+            count += getDmsProjectDao().countAllStudyDetails(studyType);
+        }
+        return count;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    @Override
+    public List<StudyDetails> getAllNurseryAndTrialStudyDetails()
+            throws MiddlewareQueryException {
+        List<StudyDetails> list = new ArrayList<StudyDetails>();
+        if (setWorkingDatabase(Database.LOCAL)) {
+            List localList = getDmsProjectDao().getAllNurseryAndTrialStudyDetails();
+            if (localList != null) {
+                list.addAll(localList);
+            }
+        }
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            List centralList = getDmsProjectDao().getAllNurseryAndTrialStudyDetails();
+            if (centralList != null) {
+                list.addAll(centralList);
+            }
+        }
+        return list;
+    }
+
+    @Override
+    public long countAllNurseryAndTrialStudyDetails()
+            throws MiddlewareQueryException {
+        long count = 0;
+        if (setWorkingDatabase(Database.LOCAL)) {
+            count += getDmsProjectDao().countAllNurseryAndTrialStudyDetails();
+        }
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            count += getDmsProjectDao().countAllNurseryAndTrialStudyDetails();
+        }
+        return count;
+    }
+
+    @Override
+    public long countNurseryAndTrialStudyDetails(Database instance)
+            throws MiddlewareQueryException {
+        long count = 0;
+        if (setWorkingDatabase(Database.LOCAL)) {
+            count += getDmsProjectDao().countAllNurseryAndTrialStudyDetails();
+        }
+        return count;
+    }
 
 
 }
