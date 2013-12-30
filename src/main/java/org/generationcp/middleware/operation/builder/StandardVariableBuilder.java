@@ -189,11 +189,11 @@ public class StandardVariableBuilder extends Builder {
             Integer maxValueId = null;
 			
 		     for (CVTermProperty property : properties) {
-		         if (property.getTypeId().equals(TermId.MIN_VALUE.getId())){  
+		         if (property.getTypeId().equals(TermId.MIN_VALUE.getId()) && minValue == null){ 
                          minValue = Double.parseDouble(property.getValue());
                          minValueId = property.getCvTermPropertyId();
 		         }
-                 if (property.getTypeId().equals(TermId.MAX_VALUE.getId())){  
+                 if (property.getTypeId().equals(TermId.MAX_VALUE.getId()) && maxValue == null){  
                          maxValue = Double.parseDouble(property.getValue());
                          maxValueId = property.getCvTermPropertyId();
                  }
