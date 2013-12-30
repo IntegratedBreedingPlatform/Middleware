@@ -431,12 +431,14 @@ public class WorkbookSaver extends Saver {
 		
 		TimerWatch watch = new TimerWatch("saving stocks and measurement effect data (total)", LOG);
 		TimerWatch rowWatch = new TimerWatch("for each row", LOG);
+		
+		VariableList variatesInTrial = getTrialConstantsVariableList(trialMV, trialVariables);
 		int i = 2;//observation values start at row 2
 		Session session = getCurrentSessionForLocal();
 		for(MeasurementRow row : observations) {
 			rowWatch.restart("saving row "+(i++));
 			ExperimentValues experimentValues = getExperimentValuesTransformer().transform(row, effectVariables, trialHeaders);
-			experimentValues.getVariableList().addAll(getTrialConstantsVariableList(trialMV, trialVariables));
+			experimentValues.getVariableList().addAll(variatesInTrial);
 			getExperimentModelSaver().addExperiment(datasetId, ExperimentType.PLOT, experimentValues);
 			if ( i % 100 == 0 ) { //to save memory space - http://docs.jboss.org/hibernate/core/3.3/reference/en/html/batch.html#batch-inserts
 				session.flush();
