@@ -77,8 +77,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
                     + "COUNT(DISTINCT e.nd_geolocation_id) AS location_count, "
                     + "COUNT(DISTINCT s.dbxref_id) AS germplasm_count, "
                     + "COUNT(DISTINCT e.nd_experiment_id) AS observation_count , "
-                    + "MIN(p.value * 1) AS min_value, "
-                    + "MAX(p.value * 1) AS max_value "
+                    + "IF (MIN(p.value * 1) IS NULL, 0, MIN(p.value * 1))  AS min_value, "
+                    + "IF (MAX(p.value * 1) IS NULL, 0, MAX(p.value * 1)) AS max_value "
                     + "FROM phenotype p "
                     + "    INNER JOIN nd_experiment_phenotype eph ON eph.phenotype_id = p.phenotype_id "
                     + "    INNER JOIN nd_experiment e ON e.nd_experiment_id = eph.nd_experiment_id "
@@ -91,20 +91,23 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
             query.setParameterList("numericVariableIds", numericVariableIds);
             
             List<Object[]> list = new ArrayList<Object[]>();
-
-            if(environmentIds.size()>0 && numericVariableIds.size()>0)
-                list = query.list();
+            
+            if(environmentIds.size()>0 && numericVariableIds.size()>0){
+            	list = query.list();
+            	
+            	for (Object[] row : list){
+            		Integer id = (Integer) row[0]; 
+            		Long locationCount = ((BigInteger) row [1]).longValue();
+            		Long germplasmCount =((BigInteger) row [2]).longValue();
+            		Long observationCount = ((BigInteger)  row [3]).longValue();
+            		Double minValue = (Double) row[4];
+            		Double maxValue = (Double) row[5];
+            		
+            		NumericTraitInfo numericTraitInfo = new NumericTraitInfo(null, id, null, locationCount, germplasmCount, observationCount, minValue, maxValue, 0);
+					numericTraitInfoList.add(numericTraitInfo);
+            	}
+            }
               
-            for (Object[] row : list){
-                Integer id = (Integer) row[0]; 
-                Long locationCount = ((BigInteger) row [1]).longValue();
-                Long germplasmCount =((BigInteger) row [2]).longValue();
-                Long observationCount = ((BigInteger)  row [3]).longValue();
-                Double minValue = (Double) row[4];
-                Double maxValue = (Double) row[5];
-                  
-                numericTraitInfoList.add(new NumericTraitInfo(null, id, null, locationCount, germplasmCount, observationCount, minValue, maxValue, 0));
-              }
             
         } catch(HibernateException e) {
             logAndThrowException("Error at getNumericTraitInfoList() query on PhenotypeDao: " + e.getMessage(), e);
