@@ -38,6 +38,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.util.TimerWatch;
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -184,7 +185,24 @@ public class WorkbookSaver extends Saver {
    		
    		int datasetId = createMeasurementEffectDatasetIfNecessary(workbook, studyId, effectMV, effectVariables, trialVariables);
    		createStocksIfNecessary(datasetId, workbook, effectVariables, trialHeaders);
-   		createMeasurementEffectExperiments(datasetId, effectVariables, workbook, trialHeaders);
+   		
+   		//clean up some variable references to save memory space before saving the measurement effects
+   		variableMap = null;
+   		headerMap = null;
+   		variableTypeMap = null;
+   		measurementVariableMap = null;
+   		trialVariableTypeList = null;
+   		trialVariables = null;
+   		trialMV = null;
+   		effectMV = null;
+   		workbook.reset();
+   		workbook.setConditions(null);
+   		workbook.setConstants(null);
+   		workbook.setFactors(null);
+   		workbook.setStudyDetails(null);
+   		workbook.setVariates(null);
+   		
+   		createMeasurementEffectExperiments(datasetId, effectVariables, workbook.getObservations(), trialHeaders);
         
    		return studyId;
 	}
@@ -386,16 +404,20 @@ public class WorkbookSaver extends Saver {
 	}
 	
 	private void createMeasurementEffectExperiments(int datasetId, VariableTypeList effectVariables, 
-			Workbook workbook, List<String> trialHeaders) throws MiddlewareQueryException {
+			List<MeasurementRow> observations, List<String> trialHeaders) throws MiddlewareQueryException {
 		
 		TimerWatch watch = new TimerWatch("saving stocks and measurement effect data (total)", LOG);
 		TimerWatch rowWatch = new TimerWatch("for each row", LOG);
 		int i = 2;//observation values start at row 2
-		for(MeasurementRow row : workbook.getObservations()) {
+		Session session = getCurrentSessionForLocal();
+		for(MeasurementRow row : observations) {
 			rowWatch.restart("saving row "+(i++));
 			ExperimentValues experimentValues = getExperimentValuesTransformer().transform(row, effectVariables, trialHeaders);
 			getExperimentModelSaver().addExperiment(datasetId, ExperimentType.PLOT, experimentValues);
-			
+			if ( i % 100 == 0 ) { //to save memory space - http://docs.jboss.org/hibernate/core/3.3/reference/en/html/batch.html#batch-inserts
+				session.flush();
+				session.clear();
+			}
 		}
 		rowWatch.stop();
 		watch.stop();
