@@ -63,7 +63,7 @@ public class VariableInfoBuilder {
 				 return property;
 			 }
 			 
-			 if (!isLocalDescriptionType(property) && !isStandardVariableType(property)) {
+			 if (!isLocalDescriptionType(property) && !isStandardVariableType(property) && !isMultiFactorialType(property)) {
 				 if (!stdVariableId.equals(property.getTypeId())) {
 					 return property;
 				 }
@@ -82,6 +82,10 @@ public class VariableInfoBuilder {
 
 	private boolean isStandardVariableType(ProjectProperty property) {
 		return TermId.STANDARD_VARIABLE.getId() == property.getTypeId();
+	}
+	
+	private boolean isMultiFactorialType(ProjectProperty property) {
+		return TermId.MULTIFACTORIAL_INFO.getId() == property.getTypeId();
 	}
 
 	private Set<ProjectProperty> filterByRank(List<ProjectProperty> properties, int rank) {
