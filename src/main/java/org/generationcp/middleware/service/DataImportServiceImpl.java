@@ -80,7 +80,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         try {
 
             trans = session.beginTransaction();
-
+            
             variableMap = getWorkbookSaver().saveVariables(workbook);
 
             trans.commit();
@@ -329,7 +329,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         //check if multi-location (it means the location is defined in the observation sheet)
         //get first row - should contain the study location
         MeasurementRow row = workbook.getObservations().get(0);
-        List<MeasurementVariable> trialFactors = workbook.getTrialVariables(workbook.getFactors());
+        List<MeasurementVariable> trialFactors = workbook.getTrialFactors();
         for (MeasurementVariable mvar : trialFactors) {
             StandardVariable svar = ontology.findStandardVariableByTraitScaleMethodNames(mvar.getProperty(), mvar.getScale(), mvar.getMethod());
             if (svar != null) {

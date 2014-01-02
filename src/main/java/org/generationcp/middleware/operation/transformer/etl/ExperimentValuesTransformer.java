@@ -7,6 +7,7 @@ import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -20,9 +21,12 @@ public class ExperimentValuesTransformer extends Transformer {
 
 	public ExperimentValues transform(MeasurementRow mRow, VariableTypeList varTypeList,List<String> trialHeaders) throws MiddlewareQueryException {
 		ExperimentValues experimentValues = new ExperimentValues();
-		
-		if (mRow != null && mRow.getNonTrialDataList(trialHeaders) != null && varTypeList != null && varTypeList.getVariableTypes() != null) {
-			if (mRow.getNonTrialDataList(trialHeaders).size() == varTypeList.getVariableTypes().size()) {
+		if(mRow == null) {
+			return experimentValues;
+		}
+		List<MeasurementData> nonTrialMD = mRow.getNonTrialDataList(trialHeaders);
+		if (nonTrialMD != null && varTypeList != null && varTypeList.getVariableTypes() != null) {
+			if (nonTrialMD.size() == varTypeList.getVariableTypes().size()) {
 				Integer locationId = Integer.parseInt(String.valueOf(mRow.getLocationId()));
 				Integer germplasmId = Integer.parseInt(String.valueOf(mRow.getStockId()));
 				VariableList variableList = new VariableList() ;
@@ -31,7 +35,7 @@ public class ExperimentValuesTransformer extends Transformer {
 				
 				for(int i = 0, l = varTypes.size(); i < l; i++ ){
 					VariableType varType = varTypes.get(i);
-					String value = mRow.getNonTrialDataList(trialHeaders).get(i).getValue();
+					String value = nonTrialMD.get(i).getValue();
 					
 					Variable variable = new Variable(varType, value);
 					variableList.add(variable);

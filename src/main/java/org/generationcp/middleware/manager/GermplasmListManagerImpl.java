@@ -584,21 +584,22 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     /**
      * Search for germplasm lists given a search term Q
      * @param q
+     * @param operation
      * @return - List of germplasm lists
      * @throws MiddlewareQueryException
      */
-    public List<GermplasmList> searchForGermplasmList(String q) throws MiddlewareQueryException{
+    public List<GermplasmList> searchForGermplasmList(String q, Operation o) throws MiddlewareQueryException{
         List<GermplasmList> resultsFromCentral;
         List<GermplasmList> resultsFromLocal;
         List<GermplasmList> combinedResults = new ArrayList<GermplasmList>();
 
         if (setWorkingDatabase(Database.CENTRAL)) {
-            resultsFromCentral = getGermplasmListDAO().searchForGermplasmLists(q);
+            resultsFromCentral = getGermplasmListDAO().searchForGermplasmLists(q, o);
             combinedResults.addAll(resultsFromCentral);
         }
         
         if (setWorkingDatabase(Database.LOCAL)) {
-            resultsFromLocal = getGermplasmListDAO().searchForGermplasmLists(q);
+            resultsFromLocal = getGermplasmListDAO().searchForGermplasmLists(q, o);
             combinedResults.addAll(resultsFromLocal);
         }
 
