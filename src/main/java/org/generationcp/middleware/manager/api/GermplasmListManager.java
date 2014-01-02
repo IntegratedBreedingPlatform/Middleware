@@ -504,10 +504,11 @@ public interface GermplasmListManager{
     /**
      * Search for germplasm lists given a search term Q
      * @param q
+     * @param operation
      * @return - List of germplasm lists
      * @throws MiddlewareQueryException
      */
-    public List<GermplasmList> searchForGermplasmList(String q) throws MiddlewareQueryException;
+    public List<GermplasmList> searchForGermplasmList(String q, Operation o) throws MiddlewareQueryException;
     
     
     /**

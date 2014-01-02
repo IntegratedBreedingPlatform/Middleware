@@ -1160,7 +1160,7 @@ public class TestGermplasmDataManagerImpl{
       //String q = "2003";
       String q = "dinurado";
             
-      List<Germplasm> results = manager.searchForGermplasm(q);
+      List<Germplasm> results = manager.searchForGermplasm(q, Operation.LIKE);
       
       Debug.println(0, "###############################");
       Debug.println(0, " searchForGermplasm("+q+")");

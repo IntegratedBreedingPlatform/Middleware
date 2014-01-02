@@ -880,10 +880,11 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
     /**
      * Get Germplasms with names like Q or germplasms part of list with names like Q
      * @param q
+     * @param opearation - like or equal
      * @return List of Germplasms
      * @throws MiddlewareQueryException 
      */
-    public List<Germplasm> searchForGermplasms(String q) throws MiddlewareQueryException{
+    public List<Germplasm> searchForGermplasms(String q, Operation o) throws MiddlewareQueryException{
     	if(q.equals("")){
     		return new ArrayList<Germplasm>();
     	}
@@ -900,8 +901,14 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 			result.addAll(p1_query.list());
             
             //Second priority, get germplasms with nVal like q
-            SQLQuery p2_query1 = getSession().createSQLQuery(Germplasm.SEARCH_GID_BY_GERMPLASM_NAME);
-            p2_query1.setParameter("q", q+"%");
+            SQLQuery p2_query1;
+            if(o.equals(Operation.EQUAL)) {
+            		p2_query1 = getSession().createSQLQuery(Germplasm.SEARCH_GID_BY_GERMPLASM_NAME_EQUAL);
+            		p2_query1.setParameter("q", q);
+            } else {
+            		p2_query1 = getSession().createSQLQuery(Germplasm.SEARCH_GID_BY_GERMPLASM_NAME);
+            		p2_query1.setParameter("q", q+"%");
+            }
             p2_query1.setParameter("deletedStatus", STATUS_DELETED);
             List p2_result1 = p2_query1.list();
             
@@ -917,7 +924,11 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             }
             
             //Third priority, get germplasms in list with listname like (full text search) q
-            SQLQuery p3_query1 = getSession().createSQLQuery(Germplasm.SEARCH_LIST_ID_BY_LIST_NAME);
+            SQLQuery p3_query1;
+            if(o.equals(Operation.EQUAL))
+            	p3_query1 = getSession().createSQLQuery(Germplasm.SEARCH_LIST_ID_BY_LIST_NAME_EQUAL);
+            else
+            	p3_query1 = getSession().createSQLQuery(Germplasm.SEARCH_LIST_ID_BY_LIST_NAME);
             p3_query1.setParameter("q", q);
             p3_query1.setParameter("deletedStatus", STATUS_DELETED);
             
@@ -935,28 +946,30 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 	            }
             }
             
-            for(Germplasm g: result){
-            	List<Integer> parentGids = new ArrayList<Integer>();
-            	if(g!=null && g.getGpid1()!=null)
-            		parentGids.add(g.getGpid1());
-            	if(g!=null && g.getGpid2()!=null)
-            		parentGids.add(g.getGpid2());
-            	
-            	if(parentGids.size()>0){
-            		SQLQuery p_query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GIDS);
-	            	p_query.setParameterList("gids", parentGids);
-	            	p_query.addEntity("germplsm", Germplasm.class);
+            //Add parents if operation is not EQUAL
+            if(!o.equals(Operation.EQUAL)){
+	            for(Germplasm g: result){
+	            	List<Integer> parentGids = new ArrayList<Integer>();
+	            	if(g!=null && g.getGpid1()!=null)
+	            		parentGids.add(g.getGpid1());
+	            	if(g!=null && g.getGpid2()!=null)
+	            		parentGids.add(g.getGpid2());
+	            	
+	            	if(parentGids.size()>0){
+	            		SQLQuery p_query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GIDS);
+		            	p_query.setParameterList("gids", parentGids);
+		            	p_query.addEntity("germplsm", Germplasm.class);
+		            
+		            	resultParents.addAll(p_query.list());
+	            	}
+	            }
 	            
-	            	resultParents.addAll(p_query.list());
-            	}
-            }
-            
-            //result.addAll(resultParents);
-            for(Object g2 : resultParents){
-            	if(!result.contains(g2))
-            		result.add((Germplasm) g2);
-            }
-            
+	            //result.addAll(resultParents);
+	            for(Object g2 : resultParents){
+	            	if(!result.contains(g2))
+	            		result.add((Germplasm) g2);
+	            }
+        	}
             return result;
 
         } catch (Exception e) {

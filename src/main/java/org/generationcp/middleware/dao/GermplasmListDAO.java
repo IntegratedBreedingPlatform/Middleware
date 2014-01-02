@@ -322,19 +322,26 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
     /**
      * Get Germplasm Lists with names like Q or germplasms with name like Q or gid equal to Q
      * @param q
+     * @param operation - like or equal
      * @return List of GermplasmLists
      * @throws MiddlewareQueryException 
      */
-    public List<GermplasmList> searchForGermplasmLists(String q) throws MiddlewareQueryException{
+    public List<GermplasmList> searchForGermplasmLists(String q, Operation o) throws MiddlewareQueryException{
     	if(q.equals("")){
     		return new ArrayList<GermplasmList>();
     	}
         try {
-            SQLQuery query = getSession().createSQLQuery(GermplasmList.SEARCH_FOR_GERMPLASM_LIST);
-            query.setParameter("gid", q);
-            query.setParameter("q", "%"+q+"%");
-            query.addEntity("listnms", GermplasmList.class);
-
+            SQLQuery query;
+            
+            if(o.equals(Operation.EQUAL)){
+            	query = getSession().createSQLQuery(GermplasmList.SEARCH_FOR_GERMPLASM_LIST_EQUAL);
+            	query.setParameter("q", "%"+q+"%");
+            } else {
+            	query = getSession().createSQLQuery(GermplasmList.SEARCH_FOR_GERMPLASM_LIST);
+            	query.setParameter("q", q);
+            }
+        	query.setParameter("gid", q);
+        	query.addEntity("listnms", GermplasmList.class);
             List<GermplasmList> germplasmLists = query.list();
 
             return germplasmLists;
