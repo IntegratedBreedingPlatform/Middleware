@@ -167,11 +167,11 @@ public class WorkbookSaver extends Saver {
         //GCP-6091 start
         int studyLocationId = DEFAULT_GEOLOCATION_ID;
         List<Integer> locationIds = new ArrayList<Integer>();
-        VariableList trialVariates = new VariableList();
+        Map<Integer,VariableList> trialVariatesMap = new HashMap<Integer,VariableList>();
         if(trialVariableTypeList!=null) {//multi-location
-   			studyLocationId = createLocationsAndSetToObservations(locationIds,workbook,trialVariableTypeList,trialHeaders, trialVariates);
+   			studyLocationId = createLocationsAndSetToObservations(locationIds,workbook,trialVariableTypeList,trialHeaders, trialVariatesMap);
         } else {
-        	studyLocationId = createLocationAndSetToObservations(workbook, trialMV, trialVariables, trialVariates);
+        	studyLocationId = createLocationAndSetToObservations(workbook, trialMV, trialVariables, trialVariatesMap);
         }
 		//GCP-6091 end
 		
@@ -180,10 +180,10 @@ public class WorkbookSaver extends Saver {
    		
    		if(trialVariableTypeList!=null) {//multi-location
    			for(Integer locationId : locationIds) {
-   				createTrialExperiment(trialDatasetId, locationId, trialVariates);
+   				createTrialExperiment(trialDatasetId, locationId, trialVariatesMap.get(locationId));
    			}
    		} else {
-   			createTrialExperiment(trialDatasetId, studyLocationId, trialVariates);
+   			createTrialExperiment(trialDatasetId, studyLocationId, trialVariatesMap.get(studyLocationId));
    		}
    		
    		int datasetId = createMeasurementEffectDatasetIfNecessary(workbook, studyId, effectMV, effectVariables, trialVariables);
@@ -203,13 +203,13 @@ public class WorkbookSaver extends Saver {
    		workbook.setStudyDetails(null);
    		workbook.setVariates(null);
    		
-   		createMeasurementEffectExperiments(datasetId, effectVariables,  workbook.getObservations(), trialHeaders, trialVariates);
+   		createMeasurementEffectExperiments(datasetId, effectVariables,  workbook.getObservations(), trialHeaders, trialVariatesMap);
         
    		return studyId;
 	}
 	
 	private int createLocationAndSetToObservations(Workbook workbook, List<MeasurementVariable> trialMV, 
-			VariableTypeList trialVariables, VariableList trialVariates) throws MiddlewareQueryException {
+			VariableTypeList trialVariables, Map<Integer,VariableList> trialVariatesMap) throws MiddlewareQueryException {
 		
 		TimerWatch watch = new TimerWatch("transform trial environment", LOG);
 		VariableList geolocation = getVariableListTransformer().transformTrialEnvironment(trialMV, trialVariables);
@@ -220,7 +220,9 @@ public class WorkbookSaver extends Saver {
             Geolocation g = getGeolocationSaver().saveGeolocation(geolocation, null);
             studyLocationId = g.getLocationId();
             if(g.getVariates()!=null && g.getVariates().size() > 0) {
+            	VariableList trialVariates = new VariableList();
             	trialVariates.addAll(g.getVariates());
+            	trialVariatesMap.put(studyLocationId, trialVariates);
             }
 
         } else if (workbook.isNursery()) {
@@ -236,7 +238,7 @@ public class WorkbookSaver extends Saver {
     	return studyLocationId != null ? studyLocationId : DEFAULT_GEOLOCATION_ID;
 	}
 	
-	private int createLocationsAndSetToObservations(List<Integer> locationIds, Workbook workbook, VariableTypeList trialFactors, List<String> trialHeaders, VariableList variates) throws MiddlewareQueryException {
+	private int createLocationsAndSetToObservations(List<Integer> locationIds, Workbook workbook, VariableTypeList trialFactors, List<String> trialHeaders, Map<Integer,VariableList> trialVariatesMap) throws MiddlewareQueryException {
 		
 		Set<String> trialInstanceNumbers = new HashSet<String>();
 		Integer locationId = null;
@@ -252,7 +254,9 @@ public class WorkbookSaver extends Saver {
 		            locationId = g.getLocationId();
 		            locationIds.add(locationId);
 		            if(g.getVariates()!=null && g.getVariates().size() > 0) {
-		            	variates.addAll(g.getVariates());
+		            	VariableList trialVariates = new VariableList();
+		            	trialVariates.addAll(g.getVariates());
+		            	trialVariatesMap.put(locationId,trialVariates);
 		            }
 				}
 				row.setLocationId(locationId);
@@ -414,7 +418,7 @@ public class WorkbookSaver extends Saver {
 	}
 	
 	private void createMeasurementEffectExperiments(int datasetId, VariableTypeList effectVariables, 
-			List<MeasurementRow> observations, List<String> trialHeaders, VariableList trialVariates) throws MiddlewareQueryException {
+			List<MeasurementRow> observations, List<String> trialHeaders, Map<Integer,VariableList> trialVariatesMap) throws MiddlewareQueryException {
 		
 		TimerWatch watch = new TimerWatch("saving stocks and measurement effect data (total)", LOG);
 		TimerWatch rowWatch = new TimerWatch("for each row", LOG);
@@ -426,7 +430,10 @@ public class WorkbookSaver extends Saver {
 		for(MeasurementRow row : observations) {
 			rowWatch.restart("saving row "+(i++));
 			ExperimentValues experimentValues = experimentValuesTransformer.transform(row, effectVariables, trialHeaders);
-			experimentValues.getVariableList().addAll(trialVariates);
+			VariableList trialVariates = trialVariatesMap.get((int)row.getLocationId());
+			if(trialVariates!=null) {
+				experimentValues.getVariableList().addAll(trialVariates);
+			}
 			experimentModelSaver.addExperiment(datasetId, ExperimentType.PLOT, experimentValues);
 			if ( i % 100 == 0 ) { //to save memory space - http://docs.jboss.org/hibernate/core/3.3/reference/en/html/batch.html#batch-inserts
 				session.flush();
