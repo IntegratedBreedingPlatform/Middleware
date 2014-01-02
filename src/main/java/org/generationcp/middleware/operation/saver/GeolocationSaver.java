@@ -76,6 +76,9 @@ public class GeolocationSaver extends Saver {
 				} else if (TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId() == storedInId) {
 					geolocation = getGeolocationObject(geolocation);
 					addProperty(geolocation, createProperty(propertyIndex--, variable));
+				
+				} else if (TermId.OBSERVATION_VARIATE.getId() == storedInId || TermId.CATEGORICAL_VARIATE.getId() == storedInId) {
+				    //allow it, but do nothing
 					
 				} else {
 					throw new MiddlewareQueryException("Non-Trial Environment Variable was used in calling create location: " + variable.getVariableType().getId());
@@ -112,4 +115,5 @@ public class GeolocationSaver extends Saver {
 		property.setGeolocation(geolocation);
 		geolocation.getProperties().add(property);
 	}
+	
 }

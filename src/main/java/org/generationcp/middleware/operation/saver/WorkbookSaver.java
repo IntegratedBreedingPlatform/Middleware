@@ -36,8 +36,10 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.helper.VariableInfo;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.operation.transformer.etl.ExperimentValuesTransformer;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.util.TimerWatch;
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -176,15 +178,30 @@ public class WorkbookSaver extends Saver {
    		
    		if(trialVariableTypeList!=null) {//multi-location
    			for(Integer locationId : locationIds) {
-   				createTrialExperiment(trialDatasetId, locationId);
+   				createTrialExperiment(trialDatasetId, locationId, trialMV, trialVariables);
    			}
    		} else {
-   			createTrialExperiment(trialDatasetId, studyLocationId);
+   			createTrialExperiment(trialDatasetId, studyLocationId, trialMV, trialVariables);
    		}
    		
    		int datasetId = createMeasurementEffectDatasetIfNecessary(workbook, studyId, effectMV, effectVariables, trialVariables);
    		createStocksIfNecessary(datasetId, workbook, effectVariables, trialHeaders);
-   		createMeasurementEffectExperiments(datasetId, effectVariables, workbook, trialHeaders);
+   		
+   		//clean up some variable references to save memory space before saving the measurement effects
+   		variableMap = null;
+   		headerMap = null;
+   		variableTypeMap = null;
+   		measurementVariableMap = null;
+   		trialVariableTypeList = null;
+   		effectMV = null;
+   		workbook.reset();
+   		workbook.setConditions(null);
+   		workbook.setConstants(null);
+   		workbook.setFactors(null);
+   		workbook.setStudyDetails(null);
+   		workbook.setVariates(null);
+   		
+   		createMeasurementEffectExperiments(datasetId, effectVariables,  workbook.getObservations(), trialHeaders, trialMV, trialVariables);
         
    		return studyId;
 	}
@@ -269,11 +286,33 @@ public class WorkbookSaver extends Saver {
 		return "MEASUREMENT EFEC_" + studyName;
 	}
 	
-	private ExperimentValues createTrialExperimentValues(Integer locationId) {
-		ExperimentValues value = new ExperimentValues();
-		value.setLocationId(locationId);
+	private ExperimentValues createTrialExperimentValues(Integer locationId, List<MeasurementVariable> trialMV, VariableTypeList trialVariables) {
+        ExperimentValues value = new ExperimentValues();
+        value.setLocationId(locationId);
+        
+	    //create trial experiment values for those that were not covered in gelocationSaver - mostly constants.
+        VariableList varList = getTrialConstantsVariableList(trialMV, trialVariables);
+        
+        value.setVariableList(varList);
 		
 		return value;
+	}
+	
+	private VariableList getTrialConstantsVariableList(List<MeasurementVariable> trialMV, VariableTypeList trialVariables) {
+        VariableList varList = new VariableList();
+        int index = 0;
+        List<VariableType> list = trialVariables.getVariableTypes();
+        for (MeasurementVariable mv : trialMV) {
+            VariableType varType = list.get(index);
+            if (varType.getStandardVariable().getStoredIn().getId() == TermId.OBSERVATION_VARIATE.getId()
+                    || varType.getStandardVariable().getStoredIn().getId() == TermId.CATEGORICAL_VARIATE.getId()) {
+             
+                varList.add(new Variable(varType, mv.getValue()));
+            }
+            
+            index++;
+        }
+        return varList;
 	}
 	
 	private int createStudyIfNecessary(Workbook workbook, int studyLocationId) throws Exception {
@@ -331,9 +370,11 @@ public class WorkbookSaver extends Saver {
 		return trialDatasetId;
 	}
 	
-	private void createTrialExperiment(int trialProjectId, int locationId) throws MiddlewareQueryException {
+	private void createTrialExperiment(int trialProjectId, int locationId, List<MeasurementVariable> trialMV, 
+	        VariableTypeList trialVariables) throws MiddlewareQueryException {
+	    
 		TimerWatch watch = new TimerWatch("save trial experiments", LOG);
-		ExperimentValues trialDatasetValues = createTrialExperimentValues(locationId);
+		ExperimentValues trialDatasetValues = createTrialExperimentValues(locationId, trialMV, trialVariables);
 		getExperimentModelSaver().addExperiment(trialProjectId, ExperimentType.PLOT, trialDatasetValues);
 		watch.stop();
 	}
@@ -386,16 +427,26 @@ public class WorkbookSaver extends Saver {
 	}
 	
 	private void createMeasurementEffectExperiments(int datasetId, VariableTypeList effectVariables, 
-			Workbook workbook, List<String> trialHeaders) throws MiddlewareQueryException {
+			List<MeasurementRow> observations, List<String> trialHeaders, List<MeasurementVariable> trialMV,
+			VariableTypeList trialVariables) throws MiddlewareQueryException {
 		
 		TimerWatch watch = new TimerWatch("saving stocks and measurement effect data (total)", LOG);
 		TimerWatch rowWatch = new TimerWatch("for each row", LOG);
+		
+		VariableList variatesInTrial = getTrialConstantsVariableList(trialMV, trialVariables);
 		int i = 2;//observation values start at row 2
-		for(MeasurementRow row : workbook.getObservations()) {
+		Session session = getCurrentSessionForLocal();
+		ExperimentValuesTransformer experimentValuesTransformer = getExperimentValuesTransformer();
+		ExperimentModelSaver experimentModelSaver = getExperimentModelSaver();
+		for(MeasurementRow row : observations) {
 			rowWatch.restart("saving row "+(i++));
-			ExperimentValues experimentValues = getExperimentValuesTransformer().transform(row, effectVariables, trialHeaders);
-			getExperimentModelSaver().addExperiment(datasetId, ExperimentType.PLOT, experimentValues);
-			
+			ExperimentValues experimentValues = experimentValuesTransformer.transform(row, effectVariables, trialHeaders);
+			experimentValues.getVariableList().addAll(variatesInTrial);
+			experimentModelSaver.addExperiment(datasetId, ExperimentType.PLOT, experimentValues);
+			if ( i % 100 == 0 ) { //to save memory space - http://docs.jboss.org/hibernate/core/3.3/reference/en/html/batch.html#batch-inserts
+				session.flush();
+				session.clear();
+			}
 		}
 		rowWatch.stop();
 		watch.stop();

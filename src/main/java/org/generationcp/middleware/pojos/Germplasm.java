@@ -336,6 +336,11 @@ public class Germplasm implements Serializable{
     		"FROM names " +
     		"WHERE nstat!=:deletedStatus AND nval LIKE :q " +
     		"LIMIT 5000";
+    public static final String SEARCH_GID_BY_GERMPLASM_NAME_EQUAL = 
+    		"SELECT DISTINCT gid " +
+    		"FROM names " +
+    		"WHERE nstat!=:deletedStatus AND nval = :q " +
+    		"LIMIT 5000";
     public static final String SEARCH_LIST_ID_BY_LIST_NAME =
     		"SELECT listid " +
     		"FROM ( " +
@@ -343,6 +348,18 @@ public class Germplasm implements Serializable{
             "        (MATCH(listname) AGAINST(:q)) AS searchScore " +
             "    FROM listnms " +
             "    WHERE liststatus!=:deletedStatus " +
+            "    GROUP BY listid  " +
+            "    HAVING searchScore>0 " +
+            ") AS searchResults " +
+            "ORDER BY searchScore DESC ";
+    public static final String SEARCH_LIST_ID_BY_LIST_NAME_EQUAL =
+    		"SELECT listid " +
+    		"FROM ( " +
+    		"    SELECT listnms.*, " +
+            "        (MATCH(listname) AGAINST(:q)) AS searchScore " +
+            "    FROM listnms " +
+            "    WHERE liststatus!=:deletedStatus " +
+            "        AND listname=:q " +
             "    GROUP BY listid  " +
             "    HAVING searchScore>0 " +
             ") AS searchResults " +

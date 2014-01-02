@@ -558,7 +558,7 @@ public class TestGermplasmListManagerImpl{
     	//String q = "HB2009DS";
         String q = "dinurado";  
     	
-        List<GermplasmList> results = manager.searchForGermplasmList(q);
+        List<GermplasmList> results = manager.searchForGermplasmList(q, Operation.EQUAL);
         
         Debug.println(0, "###############################");
         Debug.println(0, " searchForGermplasmList("+q+")");
