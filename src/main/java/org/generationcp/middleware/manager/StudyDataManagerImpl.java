@@ -55,6 +55,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.util.PlotUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -243,7 +244,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
         try {
             trans = session.beginTransaction();
-            int id = getGeolocationSaver().saveGeolocation(variableList);
+            Geolocation geolocation = getGeolocationSaver().saveGeolocation(variableList, null);
+            int id = geolocation.getLocationId();
             trans.commit();
             return id;
 

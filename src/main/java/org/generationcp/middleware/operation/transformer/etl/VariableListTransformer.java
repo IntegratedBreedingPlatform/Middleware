@@ -63,7 +63,8 @@ public class VariableListTransformer extends Transformer {
 					VariableType varType = varTypes.get(i);
 					String value = trialMD.get(i).getValue();
 										
-					if (varType.getStandardVariable().getPhenotypicType() == PhenotypicType.TRIAL_ENVIRONMENT) {
+					if (varType.getStandardVariable().getPhenotypicType() == PhenotypicType.TRIAL_ENVIRONMENT ||
+						varType.getStandardVariable().getPhenotypicType() == PhenotypicType.VARIATE) {//include variate
 						Variable variable = new Variable(varType, value);
 						variableList.add(variable);
 					}
