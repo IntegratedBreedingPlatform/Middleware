@@ -79,7 +79,7 @@ public class TraitBuilder extends Builder{
         }
         
         // Get median value
-        getMedianValue(numericTraitInfoList, environmentIds);
+        getMedianValues(numericTraitInfoList, environmentIds);
 
         // Set name and description
         for (NumericTraitInfo traitInfo : numericTraitInfoList) {
@@ -228,37 +228,54 @@ public class TraitBuilder extends Builder{
 
     }
     
-    private void getMedianValue(List<NumericTraitInfo> numericTraitInfoList,
+    private void getMedianValues(List<NumericTraitInfo> numericTraitInfoList,
             List<Integer> environmentIds) throws MiddlewareQueryException {
 
         Map<Integer, List<Double>> centralTraitValues = new HashMap<Integer, List<Double>>();
         Map<Integer, List<Double>> localTraitValues = new HashMap<Integer, List<Double>>();
 
-        setWorkingDatabase(Database.CENTRAL);
-        centralTraitValues.putAll(getPhenotypeDao().getNumericTraitInfoValues(environmentIds, numericTraitInfoList));
-
-        setWorkingDatabase(Database.LOCAL);
-        localTraitValues.putAll(getPhenotypeDao().getNumericTraitInfoValues(environmentIds, numericTraitInfoList));
-        
-        for (NumericTraitInfo traitInfo : numericTraitInfoList) {
-            
-            List<Double> values = centralTraitValues.get(traitInfo.getId());
-            if (localTraitValues.get(traitInfo.getId()) != null){
-                values.addAll(localTraitValues.get(traitInfo.getId()));
-            }
-            Collections.sort(values);
-            
-            double medianValue = values.get(values.size() / 2); // if the number of values is odd
-            if (values.size() % 2 == 0){ // change if the number of values is even
-                double middleNumOne = values.get(values.size() / 2 - 1);
-                double middleNumTwo =  values.get(values.size() / 2);
-                medianValue = (middleNumOne + middleNumTwo) / 2;
-            }
-            traitInfo.setMedianValue(medianValue);
-            
+        //for large crop, break up central DB calls per trait to avoid out of memory error for large DBs
+        if (environmentIds.size() > 1000){
+        	setWorkingDatabase(Database.LOCAL);
+        	localTraitValues.putAll(getPhenotypeDao().getNumericTraitInfoValues(environmentIds, numericTraitInfoList));
+        	
+        	setWorkingDatabase(Database.CENTRAL);
+        	for (NumericTraitInfo traitInfo : numericTraitInfoList){
+        		centralTraitValues.putAll(getPhenotypeDao().getNumericTraitInfoValues(environmentIds, traitInfo.getId()));
+        		getMedianValue(centralTraitValues, localTraitValues, traitInfo);
+        	}
+        } else {
+        	setWorkingDatabase(Database.CENTRAL);
+        	centralTraitValues.putAll(getPhenotypeDao().getNumericTraitInfoValues(environmentIds, numericTraitInfoList));
+        	
+        	setWorkingDatabase(Database.LOCAL);
+        	localTraitValues.putAll(getPhenotypeDao().getNumericTraitInfoValues(environmentIds, numericTraitInfoList));
+        	
+        	for (NumericTraitInfo traitInfo : numericTraitInfoList) {
+        		getMedianValue(centralTraitValues, localTraitValues, traitInfo);
+        	}
         }
 
+
     }
+
+	private void getMedianValue(Map<Integer, List<Double>> centralTraitValues,
+			Map<Integer, List<Double>> localTraitValues,
+			NumericTraitInfo traitInfo) {
+		List<Double> values = centralTraitValues.get(traitInfo.getId());
+		if (localTraitValues.get(traitInfo.getId()) != null){
+		    values.addAll(localTraitValues.get(traitInfo.getId()));
+		}
+		Collections.sort(values);
+		
+		double medianValue = values.get(values.size() / 2); // if the number of values is odd
+		if (values.size() % 2 == 0){ // change if the number of values is even
+		    double middleNumOne = values.get(values.size() / 2 - 1);
+		    double middleNumTwo =  values.get(values.size() / 2);
+		    medianValue = (middleNumOne + middleNumTwo) / 2;
+		}
+		traitInfo.setMedianValue(medianValue);
+	}
 
     public List<Observation> getObservationsForTraitOnGermplasms(List<Integer> traitIds, 
             List<Integer> germplasmIds, List<Integer> environmentIds) throws MiddlewareQueryException{

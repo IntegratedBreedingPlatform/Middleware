@@ -16,6 +16,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -463,7 +464,7 @@ public class WorkbookParser {
             Sheet sheet = wb.getSheetAt(sheetNumber);
             Row row = sheet.getRow(rowNumber);
             Cell cell = row.getCell(columnNumber);
-            return getCellStringValue(cell);
+            return getCellStringValue(wb,cell);
         } catch (IllegalStateException e) {
             Sheet sheet = wb.getSheetAt(sheetNumber);
             Row row = sheet.getRow(rowNumber);
@@ -507,12 +508,13 @@ public class WorkbookParser {
         return true;
     }
 
-    public static String getCellStringValue(Cell cell) {
+    public static String getCellStringValue(Workbook wb, Cell cell) {
         if (cell == null) {
             return null;
         }
+        FormulaEvaluator formulaEval = wb.getCreationHelper().createFormulaEvaluator();
         DataFormatter formatter = new DataFormatter();
-        String formattedCellValue = formatter.formatCellValue(cell);
+        String formattedCellValue = formatter.formatCellValue(cell,formulaEval);
         return formattedCellValue;
     }
 

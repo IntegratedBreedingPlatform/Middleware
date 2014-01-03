@@ -247,6 +247,51 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
     }
     
+    public  Map<Integer, List<Double>> getNumericTraitInfoValues(List<Integer> environmentIds, Integer trait) throws MiddlewareQueryException{
+        Map<Integer, List<Double>> traitValues = new HashMap<Integer, List<Double>>();
+        
+        try {
+            SQLQuery query = getSession().createSQLQuery(
+                    "SELECT p.observable_id, p.value * 1 "
+                    + "FROM phenotype p "
+                    + "    INNER JOIN nd_experiment_phenotype eph ON eph.phenotype_id = p.phenotype_id "
+                    + "    INNER JOIN nd_experiment e ON e.nd_experiment_id = eph.nd_experiment_id "
+                    + "WHERE e.nd_geolocation_id IN (:environmentIds) "
+                    + "    AND p.observable_id = :traitId "
+                    );
+            query.setParameterList("environmentIds", environmentIds);
+            query.setParameter("traitId", trait);
+
+            List<Object[]> list = new ArrayList<Object[]>();
+
+            if(environmentIds.size()>0)
+                list = query.list();
+
+            for (Object[] row : list){
+                Integer traitId = (Integer) row[0];
+                Double value = (Double) row[1];
+
+                List<Double> values = new ArrayList<Double>();
+                values.add(value); 
+                // If the trait exists in the map, add the value found. Else, just add the <trait, values> pair.
+                if (traitValues.containsKey(traitId)){
+                    values = traitValues.get(traitId);
+                    values.add(value);
+                    traitValues.remove(traitId);
+                }
+                traitValues.put(traitId, values);
+                
+            }
+            
+            
+        } catch(HibernateException e) {
+            logAndThrowException("Error at getNumericTraitInfoValues() query on PhenotypeDao: " + e.getMessage(), e);
+        }
+
+        return traitValues;
+
+    }
+    
     public Map<Integer, List<String>> getCharacterTraitInfoValues(List<Integer> environmentIds, List<CharacterTraitInfo> traitInfoList) throws MiddlewareQueryException{
         
         Map<Integer, List<String>> traitValues = new HashMap<Integer, List<String>>();

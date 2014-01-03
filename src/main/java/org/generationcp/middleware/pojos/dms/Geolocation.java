@@ -22,6 +22,9 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.generationcp.middleware.domain.dms.VariableList;
 
 /**
  * 
@@ -56,6 +59,9 @@ public class Geolocation implements Serializable {
 	
     @Column(name = "altitude")
 	private Double altitude;
+    
+    @Transient
+    private VariableList variates;
     
     /**
 	 * List of Geolocation Properties
@@ -174,6 +180,16 @@ public class Geolocation implements Serializable {
 		builder.append(altitude);
 		builder.append("]");
 		return builder.toString();
+	}
+
+	@Transient 
+	public VariableList getVariates() {
+		return variates;
+	}
+
+	@Transient 
+	public void setVariates(VariableList variates) {
+		this.variates = variates;
 	}
 
 	

@@ -15,6 +15,8 @@ import java.util.ArrayList;
 
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.dms.VariableType;
+import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -31,18 +33,18 @@ public class GeolocationSaver extends Saver {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 	
-	public Integer saveGeolocation(VariableList variableList) throws MiddlewareQueryException {
+	public Geolocation saveGeolocation(VariableList variableList, MeasurementRow row) throws MiddlewareQueryException {
 		setWorkingDatabase(Database.LOCAL);
 		
-		Geolocation geolocation = create(variableList);
+		Geolocation geolocation = create(variableList, row);
 		if (geolocation != null) {
 			getGeolocationDao().save(geolocation);
-			return geolocation.getLocationId();
+			return geolocation;
 		}
 		return null;
 	}
 	
-	private Geolocation create(VariableList factors) throws MiddlewareQueryException {
+	private Geolocation create(VariableList factors, MeasurementRow row) throws MiddlewareQueryException {
 		Geolocation geolocation = null;
 		
 		if (factors != null && factors.getVariables() != null && factors.getVariables().size() > 0) {
@@ -78,7 +80,11 @@ public class GeolocationSaver extends Saver {
 					addProperty(geolocation, createProperty(propertyIndex--, variable));
 				
 				} else if (TermId.OBSERVATION_VARIATE.getId() == storedInId || TermId.CATEGORICAL_VARIATE.getId() == storedInId) {
-				    //allow it, but do nothing
+					geolocation = getGeolocationObject(geolocation);
+					if(row!=null) {//value is in observation sheet
+						variable.setValue(row.getMeasurementDataValue(variable.getVariableType().getLocalName()));
+					}
+					addVariate(geolocation, variable);
 					
 				} else {
 					throw new MiddlewareQueryException("Non-Trial Environment Variable was used in calling create location: " + variable.getVariableType().getId());
@@ -114,6 +120,13 @@ public class GeolocationSaver extends Saver {
 		}
 		property.setGeolocation(geolocation);
 		geolocation.getProperties().add(property);
+	}
+	
+	private void addVariate(Geolocation geolocation, Variable variable) {
+		if (geolocation.getVariates() == null) {
+			geolocation.setVariates(new VariableList());
+		}
+		geolocation.getVariates().add(variable);
 	}
 	
 }
