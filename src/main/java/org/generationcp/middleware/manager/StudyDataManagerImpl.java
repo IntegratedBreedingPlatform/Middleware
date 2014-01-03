@@ -650,7 +650,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         }
     }
 
-    public boolean moveFolder(int sourceId, int targetId) throws MiddlewareQueryException {
+    public boolean moveDmsProject(int sourceId, int targetId, boolean isAStudy) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
         DmsProject source = getDmsProjectDao().getById(sourceId);
         DmsProject target = getDmsProjectDao().getById(targetId);
@@ -671,7 +671,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             // disassociate the source project from any parent it had previously
             getProjectRelationshipDao().deleteChildAssociation(sourceId);
 
-            getProjectRelationshipSaver().saveProjectParentRelationship(source, targetId, false);
+            getProjectRelationshipSaver().saveProjectParentRelationship(source, targetId, isAStudy);
             trans.commit();
             return true;
         } catch (MiddlewareException e) {

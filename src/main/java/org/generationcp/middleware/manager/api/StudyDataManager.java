@@ -525,7 +525,7 @@ public interface StudyDataManager{
      */
     DmsProject getProject(int id) throws MiddlewareQueryException;
 
-    public boolean moveFolder(int sourceId, int targetId) throws MiddlewareQueryException;
+    public boolean moveDmsProject(int sourceId, int targetId, boolean isAStudy) throws MiddlewareQueryException;
 
     /**
      * 
