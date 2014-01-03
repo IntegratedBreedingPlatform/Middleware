@@ -247,7 +247,7 @@ public class WorkbookParser {
 
 
         if (studyTypeValue == null) {
-            studyTypeValue = StudyType.E;
+            studyTypeValue = StudyType.N;
         }
 
         StudyDetails studyDetails = new StudyDetails(study, title, pmKey, objective, startDateStr, endDateStr, studyTypeValue, 0, null, null);
