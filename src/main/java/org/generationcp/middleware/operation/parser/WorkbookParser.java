@@ -28,6 +28,7 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.util.Message;
+import org.generationcp.middleware.util.PoiUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,6 +69,8 @@ public class WorkbookParser {
     private final static String[] EXPECTED_CONSTANT_HEADERS_2 = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE", ""};
     private final static String[] EXPECTED_FACTOR_HEADERS = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "NESTED IN", "LABEL"};
     private final static String[] EXPECTED_FACTOR_HEADERS_2 = new String[]{"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "", "LABEL"};
+
+    private final static String[] SECTION_NAMES = new String[] {"CONDITION", "FACTOR", "CONSTANT", "VARIATE"};
 
 
     private static final int DEFAULT_GEOLOCATION_ID = 1;
@@ -313,8 +316,10 @@ public class WorkbookParser {
             // capture empty sections, and return to avoid spillover
             String value = getCellStringValue(wb, DESCRIPTION_SHEET, currentRow, 0);
 
-            if (value.equalsIgnoreCase("FACTOR") || value.equalsIgnoreCase("CONSTANT") || value.equalsIgnoreCase("VARIATE")) {
-                return measurementVariables;
+            for (String sectionName : SECTION_NAMES) {
+                if (value.equalsIgnoreCase(sectionName)) {
+                    return measurementVariables;
+                }
             }
 
             while (!rowIsEmpty(wb, DESCRIPTION_SHEET, currentRow, 8)) {
@@ -415,7 +420,15 @@ public class WorkbookParser {
             currentRow++;
 
             //add each row in observations
-            while (!rowIsEmpty(wb, OBSERVATION_SHEET, currentRow, factors.size() + variates.size())) {
+            Sheet observationSheet = wb.getSheetAt(OBSERVATION_SHEET);
+            Integer lastRowNum = PoiUtil.getLastRowNum(observationSheet);
+            while (currentRow < lastRowNum) {
+                // skip over blank rows in the observation sheet
+                if (rowIsEmpty(wb, OBSERVATION_SHEET, currentRow, factors.size() + variates.size())) {
+                    currentRow++;
+                    continue;
+                }
+
                 List<MeasurementData> measurementData = new ArrayList<MeasurementData>();
 
                 for (int col = 0; col < factors.size() + variates.size(); col++) {
