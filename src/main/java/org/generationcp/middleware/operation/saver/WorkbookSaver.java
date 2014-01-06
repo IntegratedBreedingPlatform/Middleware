@@ -386,7 +386,12 @@ public class WorkbookSaver extends Saver {
 											DataSetType.PLOT_DATA, effectMV, effectVariables);
 
 			watch.restart("save measurement effect dataset");
-			VariableTypeList datasetVariables = propagateTrialFactorsIfNecessary(effectVariables, trialVariables, workbook.isNursery());
+			//fix for GCP-6436 start
+			VariableTypeList datasetVariables = propagateTrialFactorsIfNecessary(effectVariables, trialVariables);
+			if (workbook.isNursery() && getMainFactor(workbook.getTrialVariables()) == null) {
+				datasetVariables.add(createOccVariableType(datasetVariables.size()+1));
+	        }
+			//fix for GCP-6436 end			
 			DmsProject dataset = getDatasetProjectSaver().addDataSet(studyId, datasetVariables, datasetValues);
 			datasetId = dataset.getProjectId();
 		}
@@ -435,7 +440,7 @@ public class WorkbookSaver extends Saver {
 				experimentValues.getVariableList().addAll(trialVariates);
 			}
 			experimentModelSaver.addExperiment(datasetId, ExperimentType.PLOT, experimentValues);
-			if ( i % 100 == 0 ) { //to save memory space - http://docs.jboss.org/hibernate/core/3.3/reference/en/html/batch.html#batch-inserts
+			if ( i % 50 == 0 ) { //to save memory space - http://docs.jboss.org/hibernate/core/3.3/reference/en/html/batch.html#batch-inserts
 				session.flush();
 				session.clear();
 			}
@@ -462,7 +467,7 @@ public class WorkbookSaver extends Saver {
 		return getVariableTypeBuilder().create(info);
 	}
 	
-	private VariableTypeList propagateTrialFactorsIfNecessary(VariableTypeList effectVariables, VariableTypeList trialVariables, boolean isNursery) throws MiddlewareQueryException, MiddlewareException {
+	private VariableTypeList propagateTrialFactorsIfNecessary(VariableTypeList effectVariables, VariableTypeList trialVariables) throws MiddlewareQueryException, MiddlewareException {
 		
 		VariableTypeList newList = new VariableTypeList();
 		
@@ -472,10 +477,6 @@ public class WorkbookSaver extends Saver {
         }
         newList.addAll(effectVariables);
 		
-		if (isNursery) {
-        	newList.add(createOccVariableType(newList.size()+1));
-        }
-        
 		return newList;
 	}
 	
