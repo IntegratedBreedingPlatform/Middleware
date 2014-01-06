@@ -85,7 +85,6 @@ public class ProjectRelationshipDao extends GenericDAO<ProjectRelationship, Inte
             StringBuilder sb = new StringBuilder();
             sb.append("delete from project_relationship ");
             sb.append("where subject_project_id = " + projectId.intValue());
-            sb.append(" and type_id = 1140");
             Query q = getSession().createSQLQuery(sb.toString());
             q.executeUpdate();
         } catch (HibernateException e) {

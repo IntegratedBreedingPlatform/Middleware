@@ -723,9 +723,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             requireLocalDatabaseInstance();
         DmsProject folderParentFolder = getProjectRelationshipDao().getObjectBySubjectIdAndTypeId(id, TermId.HAS_PARENT_FOLDER.getId());
         DmsProject studyParentFolder = getProjectRelationshipDao().getObjectBySubjectIdAndTypeId(id, TermId.STUDY_HAS_FOLDER.getId());
-        if (folderParentFolder != null)
-            return folderParentFolder;
-        return studyParentFolder;
+        if (studyParentFolder != null)
+            return studyParentFolder;
+        return folderParentFolder;
     }
 
     @Override
