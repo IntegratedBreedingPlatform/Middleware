@@ -669,7 +669,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             trans = session.beginTransaction();
 
             // disassociate the source project from any parent it had previously
-            getProjectRelationshipDao().deleteChildAssociation(sourceId);
+            getProjectRelationshipDao().deleteByProjectId(sourceId);
 
             getProjectRelationshipSaver().saveProjectParentRelationship(source, targetId, isAStudy);
             trans.commit();
