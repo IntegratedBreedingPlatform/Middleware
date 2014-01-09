@@ -60,6 +60,17 @@ public class ExperimentBuilder extends Builder {
 		return experiments;
 	}
 	
+	public List<Experiment> build(int projectId, TermId type, int start, int numOfRows, VariableTypeList variableTypes, boolean hasVariableType) throws MiddlewareQueryException {
+		List<Experiment> experiments = new ArrayList<Experiment>();
+		if (setWorkingDatabase(projectId)) {
+			List<ExperimentProject> experimentProjects = getExperimentProjectDao().getExperimentProjects(projectId, type.getId(), start, numOfRows);
+			for (ExperimentProject experimentProject : experimentProjects) {
+				experiments.add(createExperiment(experimentProject.getExperiment(), variableTypes, hasVariableType));
+			}
+		}
+		return experiments;
+	}
+	
 	public List<Experiment> build(int projectId, List<TermId> types, int start, int numOfRows, VariableTypeList variableTypes) throws MiddlewareQueryException {
 		List<Experiment> experiments = new ArrayList<Experiment>();
 		if (setWorkingDatabase(projectId)) {
@@ -82,10 +93,25 @@ public class ExperimentBuilder extends Builder {
 		return null;
 	}
 	
+	public Experiment buildOne(int projectId, TermId type, VariableTypeList variableTypes, boolean hasVariableType) throws MiddlewareQueryException {
+		List<Experiment> experiments = build(projectId, type, 0, 1, variableTypes, hasVariableType);
+		if (experiments != null && experiments.size() > 0) {
+			return experiments.get(0);
+		}
+		return null;
+	}
+	
 	private Experiment createExperiment(ExperimentModel experimentModel, VariableTypeList variableTypes) throws MiddlewareQueryException {
 		Experiment experiment = new Experiment();
 		experiment.setId(experimentModel.getNdExperimentId());
 		experiment.setFactors(getFactors(experimentModel, variableTypes));
+		experiment.setVariates(getVariates(experimentModel, variableTypes));
+		return experiment;
+	}
+	private Experiment createExperiment(ExperimentModel experimentModel, VariableTypeList variableTypes, boolean hasVariableType) throws MiddlewareQueryException {
+		Experiment experiment = new Experiment();
+		experiment.setId(experimentModel.getNdExperimentId());
+		experiment.setFactors(getFactors(experimentModel, variableTypes, hasVariableType));
 		experiment.setVariates(getVariates(experimentModel, variableTypes));
 		return experiment;
 	}
@@ -121,6 +147,16 @@ public class ExperimentBuilder extends Builder {
 		VariableList factors = new VariableList();
 		
 		addPlotExperimentFactors(factors, experimentModel, variableTypes);
+		
+		addLocationFactors(experimentModel, factors, variableTypes);
+		
+		return factors.sort();
+	}
+	
+	private VariableList getFactors(ExperimentModel experimentModel, VariableTypeList variableTypes, boolean hasVariableType) throws MiddlewareQueryException {
+		VariableList factors = new VariableList();
+		
+		addPlotExperimentFactors(factors, experimentModel, variableTypes, hasVariableType);
 		
 		addLocationFactors(experimentModel, factors, variableTypes);
 		
@@ -197,6 +233,10 @@ public class ExperimentBuilder extends Builder {
 		addExperimentFactors(variables, experimentModel, variableTypes);
 		addGermplasmFactors(variables, experimentModel, variableTypes);
 	}
+	private void addPlotExperimentFactors(VariableList variables, ExperimentModel experimentModel, VariableTypeList variableTypes, boolean hasVariableType) throws MiddlewareQueryException {
+		addExperimentFactors(variables, experimentModel, variableTypes, hasVariableType);
+		addGermplasmFactors(variables, experimentModel, variableTypes);
+	}
 	
 	private void addGermplasmFactors(VariableList factors, ExperimentModel experimentModel, VariableTypeList variableTypes) throws MiddlewareQueryException {
 		List<ExperimentStock> experimentStocks = experimentModel.getExperimentStocks();
@@ -269,9 +309,25 @@ public class ExperimentBuilder extends Builder {
 		}
 	}
 	
+	private void addExperimentFactors(VariableList variables, ExperimentModel experimentModel, VariableTypeList variableTypes, boolean hasVariableType) throws MiddlewareQueryException {
+		if (experimentModel.getProperties() != null) {
+			for (ExperimentProperty property : experimentModel.getProperties()) {
+				Variable var = createVariable(property, variableTypes, hasVariableType);
+				if(var.getVariableType() != null)
+					variables.add(var);
+			}
+		}
+	}
+	
 	private Variable createVariable(ExperimentProperty property, VariableTypeList variableTypes) throws MiddlewareQueryException {
 		Variable variable = new Variable();
 		variable.setVariableType(variableTypes.findById(property.getTypeId()));
+		variable.setValue(property.getValue());
+		return variable;
+	}
+	private Variable createVariable(ExperimentProperty property, VariableTypeList variableTypes, boolean hasVariableType) throws MiddlewareQueryException {
+		Variable variable = new Variable();
+		variable.setVariableType(variableTypes.findById(property.getTypeId()), hasVariableType);
 		variable.setValue(property.getValue());
 		return variable;
 	}

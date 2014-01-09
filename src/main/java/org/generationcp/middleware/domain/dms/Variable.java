@@ -55,6 +55,14 @@ public class Variable  implements Comparable<Variable> {
 		this.variableType = variableType;
 		if (variableType == null) throw new RuntimeException();
 	}
+	
+	public void setVariableType(VariableType variableType, boolean hasVariableType) {
+		this.variableType = variableType;
+		if(hasVariableType){
+			if (variableType == null) 
+				throw new RuntimeException();
+		}
+	}
 
 	public String getValue() {
 		return value;

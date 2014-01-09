@@ -89,8 +89,16 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     public Study getStudy(int studyId) throws MiddlewareQueryException {
         return getStudyBuilder().createStudy(studyId);
     }
+    
+    
 
     @Override
+	public Study getStudy(int studyId, boolean hasVariableType)
+			throws MiddlewareQueryException {
+    	 return getStudyBuilder().createStudy(studyId, hasVariableType);
+	}
+
+	@Override
     public int getStudyIdByName(String studyName) throws MiddlewareQueryException {
         Integer id = null;
         setWorkingDatabase(Database.CENTRAL);

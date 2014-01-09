@@ -72,7 +72,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     
     @Override
     public Study getStudy(int studyId) throws MiddlewareQueryException  {
-        Study study = getStudyDataManager().getStudy(studyId);
+    	//not using the variable type
+        Study study = getStudyDataManager().getStudy(studyId, false);
         return study;
     }
 

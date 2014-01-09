@@ -59,6 +59,7 @@ public interface StudyDataManager{
      * @throws MiddlewareQueryException
      */
     Study getStudy(int studyId) throws MiddlewareQueryException;
+    Study getStudy(int studyId, boolean hasVariableType) throws MiddlewareQueryException;
 
     int getStudyIdByName(String studyName) throws MiddlewareQueryException;
 
