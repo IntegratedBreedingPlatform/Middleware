@@ -69,10 +69,10 @@ public class ProjectRelationshipDao extends GenericDAO<ProjectRelationship, Inte
     public void deleteByProjectId(Integer projectId) throws MiddlewareQueryException {
         try {
             StringBuilder sb = new StringBuilder();
-            sb.append("delete from project_relationship ");
-            sb.append("where subject_project_id = " + projectId.intValue());
-            sb.append(" or object_project_id = " + projectId.intValue());
-            Query q = getSession().createSQLQuery(sb.toString());
+            sb.append("delete from ProjectRelationship ");
+            sb.append("where subjectProject.projectId = " + projectId.intValue());
+            sb.append(" or objectProject.projectId = " + projectId.intValue());
+            Query q = getSession().createQuery(sb.toString());
             q.executeUpdate();
         } catch (HibernateException e) {
             logAndThrowException("Error with deleteByProjectId=" + projectId +
@@ -83,12 +83,12 @@ public class ProjectRelationshipDao extends GenericDAO<ProjectRelationship, Inte
     public void deleteChildAssociation(Integer projectId) throws MiddlewareQueryException {
         try {
             StringBuilder sb = new StringBuilder();
-            sb.append("delete from project_relationship ");
-            sb.append("where subject_project_id = " + projectId.intValue());
-            Query q = getSession().createSQLQuery(sb.toString());
+            sb.append("delete from ProjectRelationship ");
+            sb.append("where subjectProject.projectId = " + projectId.intValue());
+            Query q = getSession().createQuery(sb.toString());
             q.executeUpdate();
         } catch (HibernateException e) {
-            logAndThrowException("Error with deleteByProjectId=" + projectId +
+            logAndThrowException("Error with deleteChildAssociation=" + projectId +
                     ") query from ProjectRelationship: " + e.getMessage(), e);
         }
     }
