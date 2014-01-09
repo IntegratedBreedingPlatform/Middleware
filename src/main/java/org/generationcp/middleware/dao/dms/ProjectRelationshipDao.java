@@ -20,6 +20,7 @@ import org.generationcp.middleware.pojos.dms.ProjectRelationship;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -72,7 +73,11 @@ public class ProjectRelationshipDao extends GenericDAO<ProjectRelationship, Inte
             sb.append("delete from ProjectRelationship ");
             sb.append("where subjectProject.projectId = " + projectId.intValue());
             sb.append(" or objectProject.projectId = " + projectId.intValue());
-            Query q = getSession().createQuery(sb.toString());
+            Session session = getSession();
+            Query q = session.createQuery(sb.toString());
+            //fix session caching start - http://stackoverflow.com/questions/1954208/hibernate-transaction-problem
+            session.flush();
+            session.clear();
             q.executeUpdate();
         } catch (HibernateException e) {
             logAndThrowException("Error with deleteByProjectId=" + projectId +
@@ -85,8 +90,14 @@ public class ProjectRelationshipDao extends GenericDAO<ProjectRelationship, Inte
             StringBuilder sb = new StringBuilder();
             sb.append("delete from ProjectRelationship ");
             sb.append("where subjectProject.projectId = " + projectId.intValue());
-            Query q = getSession().createQuery(sb.toString());
+            Session session = getSession();
+            Query q = session.createQuery(sb.toString());
+            //fix session caching start - http://stackoverflow.com/questions/1954208/hibernate-transaction-problem
+            session.flush();
+            session.clear();
+            //fix session caching end
             q.executeUpdate();
+            
         } catch (HibernateException e) {
             logAndThrowException("Error with deleteChildAssociation=" + projectId +
                     ") query from ProjectRelationship: " + e.getMessage(), e);
