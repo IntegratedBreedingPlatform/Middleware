@@ -75,8 +75,8 @@ public class StudyBuilder extends Builder {
 		
 		Experiment experiment = getExperimentBuilder().buildOne(project.getProjectId(), TermId.STUDY_EXPERIMENT, variableTypes, hasVariableType);
 		
-		study.setConditions(getStudyVariableBuilder().create(project, experiment, conditionVariableTypes));
-		study.setConstants(getStudyVariableBuilder().create(project, experiment, constantVariableTypes));
+		study.setConditions(getStudyVariableBuilder().create(project, experiment, conditionVariableTypes, hasVariableType));
+		study.setConstants(getStudyVariableBuilder().create(project, experiment, constantVariableTypes, hasVariableType));
 		
 		return study;
 	}
