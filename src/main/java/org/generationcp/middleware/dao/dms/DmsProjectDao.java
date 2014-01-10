@@ -84,8 +84,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			"SELECT DISTINCT p.project_id, p.name, p.description " 
 			+ " FROM project p "
 		  	+ " INNER JOIN project_relationship pr ON pr.subject_project_id = p.project_id " 
-		    + " WHERE pr.type_id = " + TermId.HAS_PARENT_FOLDER.getId() 
-		    + " AND pr.object_project_id = " + DmsProject.SYSTEM_FOLDER_ID  
+		    + " WHERE pr.object_project_id = " + DmsProject.SYSTEM_FOLDER_ID  
 		    + " AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "+ TermId.STUDY_STATUS.getId()
 			+ "     	AND pp.project_id = p.project_id AND pp.value = " 
 			+ "         "+TermId.DELETED_STUDY.getId()+") "

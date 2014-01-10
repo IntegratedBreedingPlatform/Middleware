@@ -356,6 +356,10 @@ public class WorkbookSaver extends Saver {
 			watch.restart("save trial dataset");
 			DmsProject trial = getDatasetProjectSaver().addDataSet(studyId, trialVariables, trialValues);
 			trialDatasetId = trial.getProjectId();
+		} else {
+			if (workbook.isNursery() && (trialMV == null || trialMV.size() == 0 || getMainFactor(trialMV) == null)) {
+				trialVariables.add(createOccVariableType(trialVariables.size()+1));
+			}
 		}
 		
 		watch.stop();
@@ -388,9 +392,7 @@ public class WorkbookSaver extends Saver {
 			watch.restart("save measurement effect dataset");
 			//fix for GCP-6436 start
 			VariableTypeList datasetVariables = propagateTrialFactorsIfNecessary(effectVariables, trialVariables);
-			if (workbook.isNursery() && getMainFactor(workbook.getTrialVariables()) == null) {
-				datasetVariables.add(createOccVariableType(datasetVariables.size()+1));
-	        }
+			//no need to add occ as it is already added in trialVariables
 			//fix for GCP-6436 end			
 			DmsProject dataset = getDatasetProjectSaver().addDataSet(studyId, datasetVariables, datasetValues);
 			datasetId = dataset.getProjectId();
