@@ -19,13 +19,8 @@ import org.generationcp.middleware.exceptions.ConfigException;
 import org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.ManagerFactory;
-import org.generationcp.middleware.manager.api.GenotypicDataManager;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.manager.api.InventoryDataManager;
-import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.manager.api.UserDataManager;
+import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
+import org.generationcp.middleware.manager.api.*;
 import org.hibernate.SessionFactory;
 
 /**
@@ -64,6 +59,8 @@ import org.hibernate.SessionFactory;
  */
 public class MiddlewareServletRequestListener implements ServletRequestListener {
     public final static String ATTR_MIDDLEWARE_SESSION_FACTORY = "MIDDLEWARE_SESSION_FACTORY";
+    public static final String ATTR_WORKBENCH_DATAMANAGER = "WORKBENCH_MANAGER";
+    public static final String ATTR_WORKBENCH_SESSION_PROVIDER = "WORKBENCH_SESSION_PROVIDER";
     
     /**
      * Get the ManagerFactory associated with the specified
@@ -74,6 +71,10 @@ public class MiddlewareServletRequestListener implements ServletRequestListener 
      */
     public static ManagerFactory getManagerFactoryForRequest(ServletRequest request) {
         return (ManagerFactory) request.getAttribute(ATTR_MIDDLEWARE_SESSION_FACTORY);
+    }
+
+    public static WorkbenchDataManager getWorkbenchManagerForRequest(ServletRequest request) {
+        return (WorkbenchDataManager) request.getAttribute(ATTR_WORKBENCH_DATAMANAGER);
     }
     
     /**
@@ -163,6 +164,7 @@ public class MiddlewareServletRequestListener implements ServletRequestListener 
         
         SessionFactory sessionFactoryForLocal = MiddlewareServletContextListener.getLocalSessionFactoryForRequestEvent(event);
         SessionFactory sessionFactoryForCentral = MiddlewareServletContextListener.getCentralSessionFactoryForRequestEvent(event);
+        SessionFactory sessionFactoryForWorkbench = MiddlewareServletContextListener.getWorkbenchSessionFactoryForRequestEvent(event);
         
         if (sessionFactoryForLocal == null && sessionFactoryForCentral == null) {
             throw new RuntimeException("No SessionFactory found for request. See " + MiddlewareServletContextListener.class.getName() + " documentation for reference.");
@@ -170,12 +172,17 @@ public class MiddlewareServletRequestListener implements ServletRequestListener 
         
         HibernateSessionProvider sessionProviderForLocal = new HibernateSessionPerRequestProvider(sessionFactoryForLocal);
         HibernateSessionProvider sessionProviderForCentral = new HibernateSessionPerRequestProvider(sessionFactoryForCentral);
+        HibernateSessionProvider sessionProviderForWorkbench = new HibernateSessionPerRequestProvider(sessionFactoryForWorkbench);
         
         ManagerFactory managerFactory = new ManagerFactory();
         managerFactory.setSessionProviderForLocal(sessionProviderForLocal);
         managerFactory.setSessionProviderForCentral(sessionProviderForCentral);
+
+        WorkbenchDataManager workbenchDataManager = new WorkbenchDataManagerImpl(sessionProviderForWorkbench);
         
         request.setAttribute(ATTR_MIDDLEWARE_SESSION_FACTORY, managerFactory);
+        request.setAttribute(ATTR_WORKBENCH_DATAMANAGER, workbenchDataManager);
+        request.setAttribute(ATTR_WORKBENCH_SESSION_PROVIDER, sessionFactoryForWorkbench);
     }
     
     @Override
@@ -186,5 +193,10 @@ public class MiddlewareServletRequestListener implements ServletRequestListener 
         if (managerFactory != null) {
             managerFactory.close();
         }
+
+        HibernateSessionProvider workbenchSessionProvider = (HibernateSessionProvider) request.getAttribute(ATTR_MIDDLEWARE_SESSION_FACTORY);
+        workbenchSessionProvider.close();
+
+
     }
 }
