@@ -32,7 +32,9 @@ public class StudyValuesTransformer extends Transformer {
 		
 		if (variableTypeList != null) {
 			for (VariableType variableType : variableTypeList.getVariableTypes()) {
-				if (variableType.getStandardVariable().getPhenotypicType() == PhenotypicType.STUDY ) {
+				if (variableType.getStandardVariable().getPhenotypicType() == PhenotypicType.STUDY 
+				        || variableType.getStandardVariable().getPhenotypicType() == PhenotypicType.VARIATE) {
+				    
 					variableList.add(new Variable(variableType, measurementVariables.get(i).getValue()));
 				}
 				i++;
