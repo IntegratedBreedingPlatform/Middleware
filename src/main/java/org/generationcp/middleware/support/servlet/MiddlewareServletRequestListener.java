@@ -182,7 +182,7 @@ public class MiddlewareServletRequestListener implements ServletRequestListener 
         
         request.setAttribute(ATTR_MIDDLEWARE_SESSION_FACTORY, managerFactory);
         request.setAttribute(ATTR_WORKBENCH_DATAMANAGER, workbenchDataManager);
-        request.setAttribute(ATTR_WORKBENCH_SESSION_PROVIDER, sessionFactoryForWorkbench);
+        request.setAttribute(ATTR_WORKBENCH_SESSION_PROVIDER, sessionProviderForWorkbench);
     }
     
     @Override
@@ -194,9 +194,7 @@ public class MiddlewareServletRequestListener implements ServletRequestListener 
             managerFactory.close();
         }
 
-        HibernateSessionProvider workbenchSessionProvider = (HibernateSessionProvider) request.getAttribute(ATTR_MIDDLEWARE_SESSION_FACTORY);
+        HibernateSessionProvider workbenchSessionProvider = (HibernateSessionProvider) request.getAttribute(ATTR_WORKBENCH_SESSION_PROVIDER);
         workbenchSessionProvider.close();
-
-
     }
 }
