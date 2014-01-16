@@ -65,6 +65,43 @@ public class ExperimentModelSaver extends Saver {
 		}
 	}
 	
+	public void addOrUpdateExperiment(int projectId, ExperimentType experimentType, Values values) throws MiddlewareQueryException {
+		setWorkingDatabase(Database.LOCAL);
+		
+		//update if existing
+		Boolean isUpdated = false;
+		for (Variable variable : values.getVariableList().getVariables()){
+			int val = getPhenotypeDao().updatePhenotypesByProjectIdAndLocationId(projectId, 
+					values.getLocationId(), 
+					values.getGermplasmId(), 
+					variable.getVariableType().getId(), 
+					variable.getValue());
+			if (val > 0) isUpdated = true;
+			System.out.println("Update Pheno Return Val: " + val);
+		}
+		
+		
+		if (!isUpdated){
+			TermId myExperimentType = null;
+			if (values instanceof StudyValues) {
+				myExperimentType = TermId.STUDY_EXPERIMENT;
+			} else {
+				myExperimentType = mapExperimentType(experimentType);
+			}
+			
+			ExperimentModel experimentModel = create(projectId, values, myExperimentType);
+			getExperimentDao().save(experimentModel);
+			addExperimentProject(experimentModel, projectId);
+			getPhenotypeSaver().savePhenotypes(experimentModel, values.getVariableList());
+			
+			//dataset projectprop values are already saved during addDataSet
+			if (values instanceof StudyValues) {
+				getProjectPropertySaver().saveProjectPropValues(projectId, values.getVariableList());
+			}
+		}
+	}
+	
+	
 	private TermId mapExperimentType(ExperimentType experimentType) {
 		switch (experimentType) {
 		case PLOT: return TermId.PLOT_EXPERIMENT;

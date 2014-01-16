@@ -243,6 +243,23 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             throw new MiddlewareQueryException("error in addExperiment " + e.getMessage(), e);
         }
     }
+    
+   
+    public void addOrUpdateExperiment(int dataSetId, ExperimentType experimentType, ExperimentValues experimentValues) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+            getExperimentModelSaver().addOrUpdateExperiment(dataSetId, experimentType, experimentValues);
+            trans.commit();
+
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            throw new MiddlewareQueryException("error in addExperiment " + e.getMessage(), e);
+        }
+    }
 
     @Override
     public int addTrialEnvironment(VariableList variableList) throws MiddlewareQueryException {
