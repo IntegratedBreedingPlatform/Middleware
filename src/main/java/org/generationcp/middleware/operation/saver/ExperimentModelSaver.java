@@ -68,6 +68,8 @@ public class ExperimentModelSaver extends Saver {
 	public void addOrUpdateExperiment(int projectId, ExperimentType experimentType, Values values) throws MiddlewareQueryException {
 		setWorkingDatabase(Database.LOCAL);
 		
+		int experimentId = getExperimentProjectDao().getExperimentIdByLocationIdStockId(projectId, values.getLocationId(), values.getGermplasmId());
+		
 		//update if existing
 		Boolean isUpdated = false;
 		for (Variable variable : values.getVariableList().getVariables()){
@@ -76,9 +78,17 @@ public class ExperimentModelSaver extends Saver {
 					values.getGermplasmId(), 
 					variable.getVariableType().getId(), 
 					variable.getValue());
+
 			if (val > 0) isUpdated = true;
-			System.out.println("Update Pheno Return Val: " + val);
+			
+			if (experimentId != 0 && val == 0){
+				getPhenotypeSaver().save(experimentId, variable);
+			}
+				
+			
+			
 		}
+		System.out.println("Update Pheno Return Val: " + isUpdated + ":" + values.getGermplasmId());
 		
 		
 		if (!isUpdated){

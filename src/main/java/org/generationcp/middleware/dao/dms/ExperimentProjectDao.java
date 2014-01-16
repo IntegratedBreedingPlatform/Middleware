@@ -149,4 +149,41 @@ public class ExperimentProjectDao extends GenericDAO<ExperimentProject, Integer>
 			return 0;
 		}
 	}
+
+	public int getExperimentIdByLocationIdStockId(int projectId,
+			Integer locationId, Integer stockId) throws MiddlewareQueryException {
+		try {
+			this.flush();
+			
+			// update the value of phenotypes
+			String sql = "SELECT exp.nd_experiment_id " +
+					"FROM nd_experiment_project ep " +
+					"INNER JOIN nd_experiment exp ON ep.nd_experiment_id = exp.nd_experiment_id " +
+					"INNER JOIN nd_experiment_stock expstock ON expstock.nd_experiment_id = exp.nd_experiment_id  " +
+					"INNER JOIN stock ON expstock.stock_id = stock.stock_id " +
+					" WHERE ep.project_id = " + projectId +
+					" AND exp.nd_geolocation_id = " + locationId + 
+					" AND exp.type_id = 1170 " +
+					" AND stock.stock_id = " + stockId;
+					
+            System.out.println(sql);
+			SQLQuery statement = getSession().createSQLQuery(sql);
+			Integer returnVal = (Integer) statement.uniqueResult();
+			
+            this.flush();
+            this.clear();
+            
+            if (returnVal==null){
+            	return 0;
+            }else{
+            	return returnVal.intValue();
+            }
+            
+
+		} catch(HibernateException e) {
+			logAndThrowException("Error in getExperimentIdByLocationIdStockId=" 
+					+ projectId + ", " + locationId + " in ExperimentProjectDao: " + e.getMessage(), e);
+			return 0;
+		}
+	}
 }
