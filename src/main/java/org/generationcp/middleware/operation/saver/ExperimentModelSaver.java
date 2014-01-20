@@ -88,8 +88,6 @@ public class ExperimentModelSaver extends Saver {
 			
 			
 		}
-		System.out.println("Update Pheno Return Val: " + isUpdated + ":" + values.getGermplasmId());
-		
 		
 		if (!isUpdated){
 			TermId myExperimentType = null;

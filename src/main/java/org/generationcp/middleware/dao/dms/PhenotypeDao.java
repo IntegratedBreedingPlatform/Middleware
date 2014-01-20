@@ -701,7 +701,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					" AND stock.stock_id = " + stockId +
 					" AND pheno.observable_id = " + cvTermId;
 					
-            System.out.println(sql);
 			SQLQuery statement = getSession().createSQLQuery(sql);
 			int returnVal = statement.executeUpdate();
 			
@@ -711,7 +710,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
             return returnVal;
 
 		} catch(HibernateException e) {
-			logAndThrowException("Error in deletePhenotypesByProjectIdAndLocationId=" 
+			logAndThrowException("Error in updatePhenotypesByProjectIdAndLocationId=" 
 					+ projectId + ", " + locationId + " in PhenotypeDao: " + e.getMessage(), e);
 			return 0;
 		}
