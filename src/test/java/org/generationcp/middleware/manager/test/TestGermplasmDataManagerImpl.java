@@ -58,8 +58,10 @@ public class TestGermplasmDataManagerImpl{
 
     @BeforeClass
     public static void setUp() throws Exception {
-        DatabaseConnectionParameters local = new DatabaseConnectionParameters("testDatabaseConfig.properties", "local");
-        DatabaseConnectionParameters central = new DatabaseConnectionParameters("testDatabaseConfig.properties", "central");
+        DatabaseConnectionParameters local = 
+                new DatabaseConnectionParameters("testDatabaseConfig.properties", "local");
+        DatabaseConnectionParameters central = 
+                new DatabaseConnectionParameters("testDatabaseConfig.properties", "central");
         factory = new ManagerFactory(local, central);
         manager = factory.getGermplasmDataManager();
     }
@@ -73,7 +75,8 @@ public class TestGermplasmDataManagerImpl{
 	@After
 	public void afterEachTest() {
 		long elapsedTime = System.nanoTime() - startTime;
-		Debug.println(0, "#####" + name.getMethodName() + ": Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime/1000000000) + " s");
+		Debug.println(0, "#####" + name.getMethodName() + ": Elapsed Time = " 
+		        + elapsedTime + " ns = " + ((double) elapsedTime/1000000000) + " s");
 	}
 	
     @Test
@@ -223,7 +226,8 @@ public class TestGermplasmDataManagerImpl{
         }
         
         List<Location> locationList2 = manager.getLocationsByName(name, start, numOfRows, Operation.EQUAL);
-        Debug.println(0, "testGetLocationsByName(" + name + ", start=" + start + ", numOfRows=" + numOfRows + ") RESULTS: ");
+        Debug.println(0, "testGetLocationsByName(" + name + ", start=" + start 
+                + ", numOfRows=" + numOfRows + ") RESULTS: ");
         for (Location l : locationList2) {
             Debug.println(0, "  " + l);
         }
@@ -250,7 +254,8 @@ public class TestGermplasmDataManagerImpl{
         }
 
         List<Location> locationList = manager.getLocationsByCountry(country, start, numOfRows);
-        Debug.println(0, "testGetLocationByCountry(country=" + country + ", start=" + start + ", numOfRows=" + numOfRows + "): "
+        Debug.println(0, "testGetLocationByCountry(country=" + country + ", start=" + start 
+                + ", numOfRows=" + numOfRows + "): "
                 + locationList.size());
         for (Location location : locationList) {
             Debug.println(0, "  " + location);
@@ -264,7 +269,8 @@ public class TestGermplasmDataManagerImpl{
         int type=405;
 
         List<Location> locations = manager.getLocationsByCountryAndType(country, type);
-        Debug.println(0, "testGetLocationByCountryAndType(country=" + country + "): type= "+type+ ":"+ locations.size());
+        Debug.println(0, "testGetLocationByCountryAndType(country=" + country 
+                + "): type= " + type + ":" + locations.size());
         for (Location location : locations) {
             Debug.println(0, "  " + location);
         }
@@ -292,7 +298,8 @@ public class TestGermplasmDataManagerImpl{
         }
 
         List<Location> locationList = manager.getLocationsByType(type, start, numOfRows);
-        Debug.println(0, "testGetLocationByType(type=" + type + ", start=" + start + ", numOfRows=" + numOfRows + "): "
+        Debug.println(0, "testGetLocationByType(type=" + type + ", start=" + start 
+                + ", numOfRows=" + numOfRows + "): "
                 + locationList.size());
         for (Location location : locationList) {
             Debug.println(0, "  " + location);
@@ -310,8 +317,9 @@ public class TestGermplasmDataManagerImpl{
     public void testGetGermplasmByName() throws Exception {
         String name = "IR 10";
         
-        List<Germplasm> germplasmList = manager.getGermplasmByName(name, 0, 5, GetGermplasmByNameModes.NORMAL, Operation.EQUAL, null, null,
-                Database.CENTRAL);
+        List<Germplasm> germplasmList = manager.getGermplasmByName(
+                            name, 0, 5, GetGermplasmByNameModes.NORMAL, 
+                            Operation.EQUAL, null, null, Database.CENTRAL);
         assertTrue(germplasmList != null);
 
         Debug.println(0, "testGetGermplasmByName(" + name + ") RESULTS: ");
@@ -323,17 +331,23 @@ public class TestGermplasmDataManagerImpl{
     @Test
     public void testGetGermplasmByNameOriginalStandardizedAndNoSpace() throws Exception {
         String name = "IR  65";
-        List<Germplasm> germplasmList = manager.getGermplasmByName(name, 0, Long.valueOf(manager.countGermplasmByName(name, Operation.EQUAL)).intValue(), Operation.EQUAL);
+        List<Germplasm> germplasmList = manager.getGermplasmByName(
+                name, 0, Long.valueOf(manager.countGermplasmByName(
+                                        name, Operation.EQUAL)).intValue(), Operation.EQUAL);
 
-        Debug.println(0, "testGetGermplasmByNameOriginalStandardizedAndNoSpace(" + name + ") RESULTS: " + germplasmList.size());
+        Debug.println(0, "testGetGermplasmByNameOriginalStandardizedAndNoSpace(" 
+                + name + ") RESULTS: " + germplasmList.size());
         for (Germplasm g : germplasmList) {
             Debug.println(0, "  " + g);
         }
         
         name = "IR 65%";
-        germplasmList = manager.getGermplasmByName(name, 0, Long.valueOf(manager.countGermplasmByName(name, Operation.LIKE)).intValue(), Operation.LIKE);
+        germplasmList = manager.getGermplasmByName(name, 0, 
+                Long.valueOf(manager.countGermplasmByName(name, Operation.LIKE)).intValue(), 
+                Operation.LIKE);
 
-        Debug.println(0, "testGetGermplasmByNameOriginalStandardizedAndNoSpace(" + name + ") RESULTS: " + germplasmList.size());
+        Debug.println(0, "testGetGermplasmByNameOriginalStandardizedAndNoSpace(" + name 
+                + ") RESULTS: " + germplasmList.size());
         for (Germplasm g : germplasmList) {
             Debug.println(0, "  " + g);
         }
@@ -343,7 +357,8 @@ public class TestGermplasmDataManagerImpl{
     public void testCountGermplasmByName() throws Exception {
         String name = "IR 10";
         
-        long count = manager.countGermplasmByName(name, GetGermplasmByNameModes.NORMAL, Operation.EQUAL, null, null, Database.CENTRAL);
+        long count = manager.countGermplasmByName(name, GetGermplasmByNameModes.NORMAL, 
+                Operation.EQUAL, null, null, Database.CENTRAL);
         Debug.println(0, "testCountGermplasmByName(" + name + ") RESULTS: " + count);
     }
 
@@ -351,14 +366,16 @@ public class TestGermplasmDataManagerImpl{
     public void testCountGermplasmByNameOriginalStandardizedAndNoSpace() throws Exception {
         String name = "IR  65";
         long count = manager.countGermplasmByName(name, Operation.EQUAL);
-        Debug.println(0, "testCountGermplasmByNameOriginalStandardizedAndNoSpace(" + name + ") RESULTS: " + count);
+        Debug.println(0, "testCountGermplasmByNameOriginalStandardizedAndNoSpace(" + name 
+                + ") RESULTS: " + count);
     }
 
     @Test
     public void testGetGermplasmByNameUsingLike() throws Exception {
         String name = "IR%";
         
-        List<Germplasm> germplasmList = manager.getGermplasmByName(name, 0, 5, GetGermplasmByNameModes.NORMAL, Operation.LIKE, null, null,
+        List<Germplasm> germplasmList = manager.getGermplasmByName(
+                name, 0, 5, GetGermplasmByNameModes.NORMAL, Operation.LIKE, null, null,
                 Database.CENTRAL);
         assertTrue(germplasmList != null);
 
@@ -372,14 +389,16 @@ public class TestGermplasmDataManagerImpl{
     public void testCountGermplasmByNameUsingLike() throws Exception {
         String name = "IR%";
         
-        long count = manager.countGermplasmByName(name, GetGermplasmByNameModes.NORMAL, Operation.LIKE, null, null, Database.CENTRAL);
+        long count = manager.countGermplasmByName(name, GetGermplasmByNameModes.NORMAL, 
+                Operation.LIKE, null, null, Database.CENTRAL);
         Debug.println(0, "testCountGermplasmByNameUsingLike(" + name + ") RESULTS:" + count);
     }
 
     @Test
     public void testGetGermplasmByNameWithStatus() throws Exception {
         String name = "IR 64";
-        List<Germplasm> germplasmList = manager.getGermplasmByName(name, 0, 5, GetGermplasmByNameModes.NORMAL, Operation.EQUAL,
+        List<Germplasm> germplasmList = manager.getGermplasmByName(name, 0, 5, 
+                GetGermplasmByNameModes.NORMAL, Operation.EQUAL,
                 Integer.valueOf(1), null, Database.CENTRAL);
         assertTrue(germplasmList != null);
 
@@ -392,7 +411,8 @@ public class TestGermplasmDataManagerImpl{
     @Test
     public void testCountGermplasmByNameWithStatus() throws Exception {
         String name = "IR 64";
-        long count = manager.countGermplasmByName(name, GetGermplasmByNameModes.NORMAL, Operation.EQUAL, Integer.valueOf(1), null,
+        long count = manager.countGermplasmByName(name, GetGermplasmByNameModes.NORMAL, 
+                Operation.EQUAL, Integer.valueOf(1), null,
                 Database.CENTRAL);
         Debug.println(0, "testCountGermplasmByNameWithStatus(" + name + ") RESULTS: " + count);
     }
@@ -400,7 +420,8 @@ public class TestGermplasmDataManagerImpl{
     @Test
     public void testGetGermplasmByNameWithStatusAndType() throws Exception {
         String name = "IR 64";
-        List<Germplasm> germplasmList = manager.getGermplasmByName(name, 0, 5, GetGermplasmByNameModes.NORMAL, Operation.EQUAL,
+        List<Germplasm> germplasmList = manager.getGermplasmByName(name, 0, 5, 
+                GetGermplasmByNameModes.NORMAL, Operation.EQUAL,
                 Integer.valueOf(1), GermplasmNameType.RELEASE_NAME, Database.CENTRAL);
         assertTrue(germplasmList != null);
 
@@ -413,7 +434,8 @@ public class TestGermplasmDataManagerImpl{
     @Test
     public void testCountGermplasmByNameWithStatusAndType() throws Exception {
         String name = "IR 64";
-        long count = manager.countGermplasmByName(name, GetGermplasmByNameModes.NORMAL, Operation.EQUAL, Integer.valueOf(1),
+        long count = manager.countGermplasmByName(name, GetGermplasmByNameModes.NORMAL, 
+                Operation.EQUAL, Integer.valueOf(1),
                 GermplasmNameType.RELEASE_NAME, Database.CENTRAL);
         Debug.println(0, "testCountGermplasmByNameWithStatusAndType(" + name + ") RESULTS: " + count);
     }
@@ -421,7 +443,8 @@ public class TestGermplasmDataManagerImpl{
     @Test
     public void testGetGermplasmByNameWithStatusUsingLike() throws Exception {
         String name = "IR%";
-        List<Germplasm> germplasmList = manager.getGermplasmByName(name, 0, 5, GetGermplasmByNameModes.NORMAL, Operation.LIKE, Integer.valueOf(
+        List<Germplasm> germplasmList = manager.getGermplasmByName(name, 0, 5, 
+                GetGermplasmByNameModes.NORMAL, Operation.LIKE, Integer.valueOf(
                 1), null, Database.CENTRAL);
         assertTrue(germplasmList != null);
         Debug.println(0, "testGetGermplasmByNameWithStatusUsingLike(" + name + ") RESULTS: ");
@@ -433,8 +456,9 @@ public class TestGermplasmDataManagerImpl{
     @Test
     public void testGetGermplasmByNameWithStatusAndTypeUsingLike() throws Exception {
         String name = "IR%";
-        List<Germplasm> germplasmList = manager.getGermplasmByName(name, 0, 5, GetGermplasmByNameModes.NORMAL, Operation.LIKE, 
-                                Integer.valueOf(1), GermplasmNameType.RELEASE_NAME, Database.CENTRAL);
+        List<Germplasm> germplasmList = manager.getGermplasmByName(name, 0, 5, 
+                GetGermplasmByNameModes.NORMAL, Operation.LIKE, 
+                Integer.valueOf(1), GermplasmNameType.RELEASE_NAME, Database.CENTRAL);
         assertTrue(germplasmList != null);
 
         Debug.println(0, "testGetGermplasmByNameWithStatusAndTypeUsingLike(" + name + ") RESULTS: ");
@@ -446,7 +470,8 @@ public class TestGermplasmDataManagerImpl{
     @Test
     public void testGetGermplasmByLocationNameUsingEqual() throws Exception {
         String name = "Philippines";
-        List<Germplasm> germplasmList = manager.getGermplasmByLocationName(name, 0, 5, Operation.EQUAL, Database.CENTRAL);
+        List<Germplasm> germplasmList = manager.getGermplasmByLocationName(name, 0, 5, 
+                Operation.EQUAL, Database.CENTRAL);
         Debug.println(0, "testGetGermplasmByLocationNameUsingEqual(" + name + ") RESULTS: ");
         for (Germplasm g : germplasmList) {
             Debug.println(0, "  " + g);
@@ -463,7 +488,8 @@ public class TestGermplasmDataManagerImpl{
     @Test
     public void testGetGermplasmByLocationNameUsingLike() throws Exception {
         String name = "International%";
-        List<Germplasm> germplasmList = manager.getGermplasmByLocationName(name, 0, 5, Operation.LIKE, Database.CENTRAL);
+        List<Germplasm> germplasmList = manager.getGermplasmByLocationName(name, 0, 5, 
+                Operation.LIKE, Database.CENTRAL);
         assertTrue(germplasmList != null);
         Debug.println(0, "testGetGermplasmByLocationNameUsingLike(" + name + ") RESULTS: ");
         for (Germplasm g : germplasmList) {
@@ -482,7 +508,8 @@ public class TestGermplasmDataManagerImpl{
     public void testGetGermplasmByMethodNameUsingEqual() throws Exception {
         String name = "SINGLE CROSS";
         
-        List<Germplasm> germplasmList = manager.getGermplasmByMethodName(name, 0, 5, Operation.EQUAL, Database.CENTRAL);
+        List<Germplasm> germplasmList = manager.getGermplasmByMethodName(name, 0, 5, 
+                Operation.EQUAL, Database.CENTRAL);
         assertTrue(germplasmList != null);
 
         Debug.println(0, "testGetGermplasmByMethodNameUsingEqual(" + name + ") RESULTS: ");
@@ -503,7 +530,8 @@ public class TestGermplasmDataManagerImpl{
     public void testGetGermplasmByMethodNameUsingLike() throws Exception {
         String name = "%CROSS%";
         
-        List<Germplasm> germplasmList = manager.getGermplasmByMethodName(name, 0, 5, Operation.LIKE, Database.CENTRAL);
+        List<Germplasm> germplasmList = manager.getGermplasmByMethodName(name, 0, 5, 
+                Operation.LIKE, Database.CENTRAL);
         assertTrue(germplasmList != null);
 
         Debug.println(0, "testGetGermplasmByMethodNameUsingLike(" + name + ") RESULTS: ");
@@ -568,44 +596,52 @@ public class TestGermplasmDataManagerImpl{
     @Test
     public void testGetPreferredNameByGID() throws Exception {
         Integer gid = Integer.valueOf(1);
-        Debug.println(0, "testGetPreferredNameByGID(" + gid + ") RESULTS: " + manager.getPreferredNameByGID(gid));
+        Debug.println(0, "testGetPreferredNameByGID(" + gid + ") RESULTS: " 
+                + manager.getPreferredNameByGID(gid));
     }
     
     @Test
     public void testGetPreferredNameValueByGID() throws Exception {
         Integer gid = Integer.valueOf(1);
-        Debug.println(0, "testGetPreferredNameValueByGID(" + gid + ") RESULTS: " + manager.getPreferredNameValueByGID(gid));
+        Debug.println(0, "testGetPreferredNameValueByGID(" + gid + ") RESULTS: " 
+                + manager.getPreferredNameValueByGID(gid));
     }
 
     @Test
     public void testGetPreferredAbbrevByGID() throws Exception {
         Integer gid = Integer.valueOf(1);
-        Debug.println(0, "testGetPreferredAbbrevByGID(" + gid + ") RESULTS: " + manager.getPreferredAbbrevByGID(gid));
+        Debug.println(0, "testGetPreferredAbbrevByGID(" + gid + ") RESULTS: " 
+                + manager.getPreferredAbbrevByGID(gid));
     }
     
     @Test
     public void testGetPreferredIdByGID() throws Exception {
         //tested using Rice DB
         Integer gid = Integer.valueOf(986634);
-        Debug.println(0, "testGetPreferredIdByGID(" + gid + ") RESULTS: " + manager.getPreferredIdByGID(gid));       
+        Debug.println(0, "testGetPreferredIdByGID(" + gid + ") RESULTS: " 
+                + manager.getPreferredIdByGID(gid));       
     }
     
     @Test
     public void testGetPreferredIdsByListId() throws Exception {
         //tested using Rice DB
         Integer listId = Integer.valueOf(2591);
-        Debug.println(0, "testGetPreferredIdsByListId(" + listId + ") RESULTS: " + manager.getPreferredIdsByListId(listId));       
+        Debug.println(0, "testGetPreferredIdsByListId(" + listId + ") RESULTS: " 
+                + manager.getPreferredIdsByListId(listId));       
     }
 
     @Test
     public void testGetNameByGIDAndNval() throws Exception {
         Integer gid = Integer.valueOf(225266);
         String nVal = "C 65-44";
-        Debug.println(0, "testGetNameByGIDAndNval(" + gid + ", " + nVal + ", GetGermplasmByNameModes.NORMAL) RESULTS: " 
+        Debug.println(0, "testGetNameByGIDAndNval(" + gid + ", " + nVal 
+                        + ", GetGermplasmByNameModes.NORMAL) RESULTS: " 
         				+ manager.getNameByGIDAndNval(gid, nVal, GetGermplasmByNameModes.NORMAL));
-        Debug.println(0, "testGetNameByGIDAndNval(" + gid + ", " + nVal + ", GetGermplasmByNameModes.SPACES_REMOVED) RESULTS: " 
+        Debug.println(0, "testGetNameByGIDAndNval(" + gid + ", " + nVal 
+                        + ", GetGermplasmByNameModes.SPACES_REMOVED) RESULTS: " 
         				+ manager.getNameByGIDAndNval(gid, nVal, GetGermplasmByNameModes.SPACES_REMOVED));
-        Debug.println(0, "testGetNameByGIDAndNval(" + gid + ", " + nVal + ", GetGermplasmByNameModes.STANDARDIZED) RESULTS: " 
+        Debug.println(0, "testGetNameByGIDAndNval(" + gid + ", " + nVal 
+                        + ", GetGermplasmByNameModes.STANDARDIZED) RESULTS: " 
         				+ manager.getNameByGIDAndNval(gid, nVal, GetGermplasmByNameModes.STANDARDIZED));
     }
 
@@ -615,7 +651,8 @@ public class TestGermplasmDataManagerImpl{
         Integer status = Integer.valueOf(1);
         GermplasmNameType type = null;
         List<Name> names = manager.getNamesByGID(gid, status, type);
-        Debug.println(0, "testGetNamesByGIDWithStatus(gid=" + gid + ", status" + status + ", type=" + type + ") RESULTS: " + names);
+        Debug.println(0, "testGetNamesByGIDWithStatus(gid=" + gid + ", status" + status 
+                + ", type=" + type + ") RESULTS: " + names);
     }
 
     @Test
@@ -624,8 +661,8 @@ public class TestGermplasmDataManagerImpl{
         Integer status = Integer.valueOf(8);
         GermplasmNameType type = GermplasmNameType.INTERNATIONAL_TESTING_NUMBER;
         List<Name> names = manager.getNamesByGID(gid, status, type);
-        System.out
-                .println("testGetNamesByGIDWithStatusAndType(gid=" + gid + ", status" + status + ", type=" + type + ") RESULTS: " + names);
+        Debug.println(0, "testGetNamesByGIDWithStatusAndType(gid=" + gid 
+                + ", status" + status + ", type=" + type + ") RESULTS: " + names);
     }
 
     @Test
@@ -667,12 +704,18 @@ public class TestGermplasmDataManagerImpl{
     @Test
     public void testAddMethods() throws MiddlewareQueryException {
         List<Method> methods = new ArrayList<Method>();
-        methods.add(new Method(-1, "GEN", "S", "UGM", "yesno", "description 1", Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0),
-                Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2), Integer.valueOf(19980610)));
-        methods.add(new Method(-2, "GEN", "S", "UGM", "yesno", "description 2", Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0),
-                Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2), Integer.valueOf(19980610)));
-        methods.add(new Method(-3, "GEN", "S", "UGM", "yesno", "description 3", Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0),
-                Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2), Integer.valueOf(19980610)));
+        methods.add(new Method(-1, "GEN", "S", "UGM", "yesno", "description 1", 
+                Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0),
+                Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), 
+                Integer.valueOf(2), Integer.valueOf(19980610)));
+        methods.add(new Method(-2, "GEN", "S", "UGM", "yesno", "description 2", 
+                Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0),
+                Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), 
+                Integer.valueOf(2), Integer.valueOf(19980610)));
+        methods.add(new Method(-3, "GEN", "S", "UGM", "yesno", "description 3", 
+                Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0),
+                Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), 
+                Integer.valueOf(2), Integer.valueOf(19980610)));
 
         // add the methods
         List<Integer> methodsAdded = manager.addMethod(methods);
@@ -700,7 +743,8 @@ public class TestGermplasmDataManagerImpl{
             Debug.println(0, "  " + method);
         }
         List<Method> methodList = manager.getMethodsByType(type, start, numOfRows);
-        Debug.println(0, "testGetMethodsByType(type=" + type + ", start=" + start + ", numOfRows=" + numOfRows + "): " + methodList.size());
+        Debug.println(0, "testGetMethodsByType(type=" + type + ", start=" + start 
+                + ", numOfRows=" + numOfRows + "): " + methodList.size());
         for (Method method : methodList) {
             Debug.println(0, "  " + method);
         }
@@ -727,7 +771,8 @@ public class TestGermplasmDataManagerImpl{
         }
 
         List<Method> methodList = manager.getMethodsByGroup(group, start, numOfRows);
-        Debug.println(0, "testGetMethodsByGroup(group=" + group + ", start=" + start + ", numOfRows=" + numOfRows + "): " + methodList.size());
+        Debug.println(0, "testGetMethodsByGroup(group=" + group + ", start=" + start 
+                + ", numOfRows=" + numOfRows + "): " + methodList.size());
         for (Method method : methodList) {
             Debug.println(0, "  " + method);
         }
@@ -753,7 +798,8 @@ public class TestGermplasmDataManagerImpl{
         String type= "GEN"; // Tested with rice and cowpea
 
         List<Method> methods = manager.getMethodsByGroupAndType(group, type);
-        Debug.println(0, "testGetMethodsByGroupAndType(group=" + group +"and "+type + "): " + methods.size());
+        Debug.println(0, "testGetMethodsByGroupAndType(group=" + group +"and "
+                + type + "): " + methods.size());
         for (Method method : methods) {
             Debug.println(0, "  " + method);
         }
@@ -766,7 +812,8 @@ public class TestGermplasmDataManagerImpl{
         String name = "ALLO-POLYPLOID CF"; // Tested with rice and cowpea
 
         List<Method> methods = manager.getMethodsByGroupAndTypeAndName(group, type, name);
-        Debug.println(0, "testGetMethodsByGroupAndTypeAndName(group=" + group +" and type="+type + " and name="+name + "): " + methods.size());
+        Debug.println(0, "testGetMethodsByGroupAndTypeAndName(group=" + group  
+                    + " and type=" + type + " and name=" + name + "): " + methods.size());
         for (Method method : methods) {
             Debug.println(0, "  " + method);
         }
@@ -799,7 +846,8 @@ public class TestGermplasmDataManagerImpl{
                 + manager.getLocationsByName("TEST-LOCATION-1", 0, 5, Operation.EQUAL));
 
         // cleanup
-        manager.deleteLocation(manager.getLocationsByName("TEST-LOCATION-1", 0, 5, Operation.EQUAL).get(0));
+        manager.deleteLocation(manager.getLocationsByName("TEST-LOCATION-1", 0, 5, 
+                Operation.EQUAL).get(0));
     }
 
     @Test
@@ -861,12 +909,14 @@ public class TestGermplasmDataManagerImpl{
     public void testUpdateGermplasmName() throws Exception {
         Integer nameId = -1; //Assumption: id=-1 exists
         Name name = manager.getGermplasmNameByID(nameId); 
-        String nameBefore = name.toString();
-        name.setLocationId(manager.getLocationByID(1).getLocid()); //Assumption: location with id=1 exists
-        manager.updateGermplasmName(name);
-        Debug.println(0, "testUpdateGermplasmName(" + nameId + ") RESULTS: " 
-                + "\n\tBEFORE: " + nameBefore
-                + "\n\tAFTER: " + name.toString());
+        if (name != null){
+            String nameBefore = name.toString();
+            name.setLocationId(manager.getLocationByID(1).getLocid()); //Assumption: location with id=1 exists
+            manager.updateGermplasmName(name);
+            Debug.println(0, "testUpdateGermplasmName(" + nameId + ") RESULTS: " 
+                    + "\n\tBEFORE: " + nameBefore
+                    + "\n\tAFTER: " + name.toString());
+        }
     }
 
     @Test
@@ -911,8 +961,10 @@ public class TestGermplasmDataManagerImpl{
     public void testGetUserDefinedFieldByFieldTable() throws MiddlewareQueryException {
     	String tableName="LOCATION";
     	String fieldType="LTYPE";
-        List<UserDefinedField> userDefineField = manager.getUserDefinedFieldByFieldTableNameAndType(tableName, fieldType);
-        Debug.println(0, "testGetUserDefineFieldByTableNameAndType(type=" + tableName + "): " + userDefineField.size());
+        List<UserDefinedField> userDefineField = manager
+                .getUserDefinedFieldByFieldTableNameAndType(tableName, fieldType);
+        Debug.println(0, "testGetUserDefineFieldByTableNameAndType(type=" + tableName 
+                + "): " + userDefineField.size());
         for (UserDefinedField u : userDefineField) {
             Debug.println(0, "  " + u);
         }
@@ -948,7 +1000,8 @@ public class TestGermplasmDataManagerImpl{
     	String prefix = "PARA7A2";
 //    	Debug.println(0, "Next number in sequence for prefix (" + prefix + "): " + 
 //    			manager.getNextSequenceNumberForCrossName(prefix));
-    	System.out.println(prefix.substring(prefix.length()-1) + " " + prefix.substring(prefix.length()-1).matches("\\d"));
+        Debug.println(0, prefix.substring(prefix.length()-1) + " " 
+                    + prefix.substring(prefix.length()-1).matches("\\d"));
 	    	
     }
    
@@ -1184,7 +1237,7 @@ public class TestGermplasmDataManagerImpl{
       Debug.println(0, "###############################");
       Debug.println(0, " getGermplasmDatesByGids("+gids+")");
       Debug.println(0, "###############################");
-	  System.out.println(results);
+      Debug.println(0, results.toString());
   }
   
   @Test
@@ -1196,7 +1249,7 @@ public class TestGermplasmDataManagerImpl{
       Debug.println(0, "###############################");
       Debug.println(0, " getGermplasmDatesByGids("+gids+")");
       Debug.println(0, "###############################");
-	  System.out.println(results);
+      Debug.println(0, results.toString());
   }  
   
 	@Test

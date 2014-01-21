@@ -52,7 +52,7 @@ public interface PedigreeDataManager{
      * @return GermplasmPedigreeTree representing the pedigree tree
      * @throws MiddlewareQueryException
      */
-    public GermplasmPedigreeTree generatePedigreeTree(Integer gid, int level) throws MiddlewareQueryException;
+    GermplasmPedigreeTree generatePedigreeTree(Integer gid, int level) throws MiddlewareQueryException;
     
     /**
      * Creates a pedigree tree for the Germplasm identified by the given gid.
@@ -87,7 +87,7 @@ public interface PedigreeDataManager{
      * @return GermplasmPedigreeTree representing the pedigree tree
      * @throws MiddlewareQueryException
      */
-    public GermplasmPedigreeTree generatePedigreeTree(Integer gid, int level, Boolean includeDerivativeLines) throws MiddlewareQueryException;
+    GermplasmPedigreeTree generatePedigreeTree(Integer gid, int level, Boolean includeDerivativeLines) throws MiddlewareQueryException;
 
     /**
      * Returns the GermplasmPedigreeTree object which represents the derivative
@@ -116,7 +116,7 @@ public interface PedigreeDataManager{
      *            given gid
      * @return GermplasmPedigreeTree representing the neighborhood
      */
-    public GermplasmPedigreeTree getDerivativeNeighborhood(Integer gid, int numberOfStepsBackward, int numberOfStepsForward)
+    GermplasmPedigreeTree getDerivativeNeighborhood(Integer gid, int numberOfStepsBackward, int numberOfStepsForward)
             throws MiddlewareQueryException;
 
     /**
@@ -146,7 +146,7 @@ public interface PedigreeDataManager{
      *            given gid
      * @return GermplasmPedigreeTree representing the neighborhood
      */
-    public GermplasmPedigreeTree getMaintenanceNeighborhood(Integer gid, int numberOfStepsBackward, int numberOfStepsForward)
+    GermplasmPedigreeTree getMaintenanceNeighborhood(Integer gid, int numberOfStepsBackward, int numberOfStepsForward)
             throws MiddlewareQueryException;
 
     
@@ -167,7 +167,7 @@ public interface PedigreeDataManager{
      * @return List of Object arrays, the arrays have 2 elements in them
      * @throws MiddlewareQueryException
      */
-    public List<Object[]> getDescendants(Integer gid, int start, int numOfRows) throws MiddlewareQueryException;
+    List<Object[]> getDescendants(Integer gid, int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Returns the number of children of the Germplasm identified by the given
@@ -177,7 +177,7 @@ public interface PedigreeDataManager{
      * @return count of children
      * @throws MiddlewareQueryException
      */
-    public long countDescendants(Integer gid) throws MiddlewareQueryException;
+    long countDescendants(Integer gid) throws MiddlewareQueryException;
 
     
 
@@ -199,7 +199,7 @@ public interface PedigreeDataManager{
      * @return List of Germplasm POJOs
      * @throws MiddlewareQueryException
      */
-    public List<Germplasm> getManagementNeighbors(Integer gid, int start, int numOfRows) throws MiddlewareQueryException;
+    List<Germplasm> getManagementNeighbors(Integer gid, int start, int numOfRows) throws MiddlewareQueryException;
     
     
     /**
@@ -209,7 +209,7 @@ public interface PedigreeDataManager{
      * @return the number of management neighbors
      * @throws MiddlewareQueryException
      */
-    public long countManagementNeighbors(Integer gid) throws MiddlewareQueryException;
+    long countManagementNeighbors(Integer gid) throws MiddlewareQueryException;
     
     /**
      * Returns the number of group relatives a Germplasm has.
@@ -218,7 +218,7 @@ public interface PedigreeDataManager{
      * @return The number of group relatives of a Germplasm
      * @throws MiddlewareQueryException
      */
-    public long countGroupRelatives(Integer gid) throws MiddlewareQueryException;
+    long countGroupRelatives(Integer gid) throws MiddlewareQueryException;
                                              
     /**
      * Returns the Germplasm which are group relatives of the Germplasm
@@ -230,7 +230,7 @@ public interface PedigreeDataManager{
      * @return List of Germplasm POJOs
      * @throws MiddlewareQueryException
      */
-    public List<Germplasm> getGroupRelatives(Integer gid, int start, int numRows) throws MiddlewareQueryException;
+    List<Germplasm> getGroupRelatives(Integer gid, int start, int numRows) throws MiddlewareQueryException;
 
     /**
      * Returns the generation history of the Germplasm identified by the given
@@ -245,7 +245,7 @@ public interface PedigreeDataManager{
      *         to the last source on the generation history
      * @throws MiddlewareQueryException
      */
-    public List<Germplasm> getGenerationHistory(Integer gid) throws MiddlewareQueryException;
+    List<Germplasm> getGenerationHistory(Integer gid) throws MiddlewareQueryException;
 
     /**
      * Returns the Germplasm representing the parent of the child Germplasm
@@ -258,7 +258,7 @@ public interface PedigreeDataManager{
      * @return Germplasm POJO
      * @throws MiddlewareQueryException
      */
-    public Germplasm getParentByGIDAndProgenitorNumber(Integer gid, Integer progenitorNumber) throws MiddlewareQueryException;
+    Germplasm getParentByGIDAndProgenitorNumber(Integer gid, Integer progenitorNumber) throws MiddlewareQueryException;
 
     /**
      * Given the gid of the the germplasm, return the list of all ancestor 
@@ -273,5 +273,5 @@ public interface PedigreeDataManager{
      * @return List of all ancestor Germplasm POJOs
      * @throws MiddlewareQueryException
      */
-    public List<Germplasm> getPedigreeLine(Integer gid, int locationID) throws MiddlewareQueryException;
+    List<Germplasm> getPedigreeLine(Integer gid, int locationID) throws MiddlewareQueryException;
 }

@@ -188,12 +188,14 @@ public class TrialEnvironmentBuilder extends Builder {
 	public long countAllTrialEnvironments() throws MiddlewareQueryException{
 		setWorkingDatabase(Database.CENTRAL);
 		long centralCount = getGeolocationDao().countAllTrialEnvironments();
-		LOG.debug("CENTRAL = " + centralCount);
-		
+        if (LOG.isDebugEnabled()){
+            LOG.debug("CENTRAL = " + centralCount);
+        }
 		setWorkingDatabase(Database.LOCAL);
 		long localCount =  getGeolocationDao().countAllTrialEnvironments();
-		LOG.debug("LOCAL = " + localCount);
-		
+        if (LOG.isDebugEnabled()){
+            LOG.debug("LOCAL = " + localCount);
+        }
 		return centralCount + localCount;
 	}
 	
@@ -214,7 +216,9 @@ public class TrialEnvironmentBuilder extends Builder {
 				ids.add(property.getId());
 			}
 		}
-		LOG.debug("IDS ARE " + ids);
+        if (LOG.isDebugEnabled()){
+            LOG.debug("IDS ARE " + ids);
+        }
 		List<CVTerm> terms = getCvTermDao().getByIds(new ArrayList<Integer>(ids));
 		for (TrialEnvironmentProperty property : localProperties) {
 			int index = properties.indexOf(property);

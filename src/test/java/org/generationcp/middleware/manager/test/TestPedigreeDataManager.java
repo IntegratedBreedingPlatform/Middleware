@@ -13,6 +13,7 @@
 package org.generationcp.middleware.manager.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -121,16 +122,14 @@ public class TestPedigreeDataManager{
     }
     
     private String renderNode(GermplasmPedigreeTreeNode node, String prefix){
-        String outputString = "";
+        StringBuffer outputString = new StringBuffer();
         if(node != null){
-             outputString = "-" + prefix + " " + node.getGermplasm().getGid();
+             outputString.append("-").append(prefix).append(" ").append(node.getGermplasm().getGid());
              for (GermplasmPedigreeTreeNode parent : node.getLinkedNodes()) {
-                 outputString = outputString + "\n"
-                         + renderNode(parent, prefix + "-");
+                 outputString.append("\n").append(renderNode(parent, prefix + "-"));
              }
         }
-
-        return outputString;
+        return outputString.toString();
      }
 
 
@@ -140,7 +139,7 @@ public class TestPedigreeDataManager{
         int count = (int) pedigreeManager.countManagementNeighbors(gid);
         List<Germplasm> neighbors = pedigreeManager.getManagementNeighbors(gid, 0, count);
         assertNotNull(neighbors);
-        assertTrue(!neighbors.isEmpty());
+        assertFalse(neighbors.isEmpty());
         Debug.println(0, "testGetManagementNeighbors(" + gid + ") RESULT: " + count);
         for (Germplasm g : neighbors) {
             String name = g.getPreferredName() != null ? g.getPreferredName().getNval() : null;
@@ -155,7 +154,7 @@ public class TestPedigreeDataManager{
         long count = pedigreeManager.countGroupRelatives(gid);
         List<Germplasm> neighbors = pedigreeManager.getGroupRelatives(gid, 0, (int) count);
         assertNotNull(neighbors);
-        assertTrue(!neighbors.isEmpty());
+        assertFalse(neighbors.isEmpty());
 
         Debug.println(0, "testGetGroupRelatives(" + gid + ") RESULT: " + neighbors.size());
         for (Germplasm g : neighbors) {
@@ -166,10 +165,10 @@ public class TestPedigreeDataManager{
 
     @Test
     public void testGetGenerationHistory() throws Exception {
-        Integer gid = new Integer(50533);
+        Integer gid = Integer.valueOf(50533);
         List<Germplasm> results = pedigreeManager.getGenerationHistory(gid);
         assertNotNull(results);
-        assertTrue(!results.isEmpty());
+        assertFalse(results.isEmpty());
 
         Debug.println(0, "testGetGenerationHistory(" + gid + ") RESULT: " + results.size());
         for (Germplasm g : results) {
@@ -183,7 +182,7 @@ public class TestPedigreeDataManager{
         Integer id = Integer.valueOf(2);
         List<Object[]> results = pedigreeManager.getDescendants(id, 0, 100);
         assertNotNull(results);
-        assertTrue(!results.isEmpty());
+        assertFalse(results.isEmpty());
         for (Object[] result : results) {
             Debug.println(0, "  " + result);
         }
@@ -360,7 +359,7 @@ public class TestPedigreeDataManager{
     
     @Test
     public void testGetPedigreeLine() throws Exception {
-        Integer gid = new Integer(306436);
+        Integer gid = Integer.valueOf(306436);
         int locationID = 187;
         List<Germplasm> results = pedigreeManager.getPedigreeLine(gid, locationID);
 

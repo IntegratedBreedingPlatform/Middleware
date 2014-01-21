@@ -92,7 +92,6 @@ public class Property {
     }
     
     public String getCropOntologyId() {
-        String cropOntologyId = "";
         if (term.getProperties() != null && !term.getProperties().isEmpty()) {
             for (TermProperty prop : term.getProperties()) {
                 if (prop.getTypeId().equals(TermId.CROP_ONTOLOGY_ID.getId()) && prop.getValue() != null && !"".equals(prop.getValue())) {
@@ -100,7 +99,7 @@ public class Property {
                 }
             }
         }
-        return cropOntologyId;
+        return "";
     }
 	
 	

@@ -1227,7 +1227,6 @@ public class TestWorkbenchDataManagerImpl{
 
         } catch (MiddlewareQueryException e) {
             Debug.println(0, "Error in deleteProject(): " + e.getMessage());
-            e.printStackTrace();
         }
 
     }

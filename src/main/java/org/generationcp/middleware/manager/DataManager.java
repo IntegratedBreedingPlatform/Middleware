@@ -285,7 +285,6 @@ public abstract class DataManager extends DatabaseBroker{
                 }
             }
         } catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException
-            e.printStackTrace();
             logAndThrowException("Error in gettting all from central and local using " + getMethodName + ": " + e.getMessage(), e);
         }
         return toReturn;
@@ -371,7 +370,6 @@ public abstract class DataManager extends DatabaseBroker{
                 }
             }
         } catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException
-            e.printStackTrace();
             logAndThrowException("Error in gettting all from local and central using " + getMethodName + ": " + e.getMessage(), e);
         }
         return toReturn;
@@ -480,7 +478,6 @@ public abstract class DataManager extends DatabaseBroker{
                 }
             }
         } catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException
-            e.printStackTrace();
             logAndThrowException("Error in gettting all from central and local using " + getMethodName + ": " + e.getMessage(), e);
         }
         return toReturn;
@@ -590,7 +587,6 @@ public abstract class DataManager extends DatabaseBroker{
                 }
             }
         } catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException
-            e.printStackTrace();
             logAndThrowException("Error in gettting all from central and local using " + getMethodName + ": " + e.getMessage(), e);
         }
         return toReturn;
@@ -665,7 +661,6 @@ public abstract class DataManager extends DatabaseBroker{
                 toReturn.addAll((List) method.invoke(dao, parameters));
             }
         } catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException
-            e.printStackTrace();
             logAndThrowException("Error in calling " + methodName + "(): " + e.getMessage(), e);
         }
         return toReturn;
@@ -703,7 +698,6 @@ public abstract class DataManager extends DatabaseBroker{
                 toReturn.addAll((List) method.invoke(dao, parameters));
             }
         } catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException
-            e.printStackTrace();
             logAndThrowException("Error in calling " + methodName + "(): " + e.getMessage(), e);
         }
         return toReturn;
@@ -767,7 +761,6 @@ public abstract class DataManager extends DatabaseBroker{
                 count = count + ((Long) countMethod.invoke(dao, parameters)).intValue();
             }
         } catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException
-            e.printStackTrace();
             logAndThrowException("Error in counting: " + e.getMessage(), e);
         }
         return count;
@@ -922,7 +915,6 @@ public abstract class DataManager extends DatabaseBroker{
                 count = count + ((Long) countMethod.invoke(dao, parameters)).intValue();
             }
         } catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException
-        	e.printStackTrace();
             logAndThrowException("Error in counting: " + e.getMessage(), e);
         }
         return count;

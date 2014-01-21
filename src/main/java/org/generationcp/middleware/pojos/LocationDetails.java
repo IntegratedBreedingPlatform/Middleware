@@ -200,7 +200,7 @@ public class LocationDetails implements Serializable,
         return this.location_name.compareTo(compareName);
     }
 
-    public static Comparator<LocationDetails> LocationNameComparator = new Comparator<LocationDetails>() {
+    public static Comparator<LocationDetails> LocationNameComparator = new Comparator<LocationDetails>() { 
 
          @Override
          public int compare(LocationDetails location1, LocationDetails location2) {

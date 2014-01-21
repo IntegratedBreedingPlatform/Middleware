@@ -52,49 +52,36 @@ public interface GermplasmDataManager {
      * GermplasmNameType is used to specify the type of names to be included in
      * the search. If the given type is null, all names will be included in the
      * search.
-     * 
-     * @param name
-     *            - search string for the name of the germplasm
-     * @param start
-     *            - the starting index of the sublist of results to be returned
-     * @param numOfRows
-     *            - the number of rows to be included in the sublist of results
-     *            to be returned
-     * @param mode
-     *            - can be normal, spaces removed, name standardized
-     * @param op
-     *            - can be EQUAL OR LIKE
-     * @param status
-     *            - nstat of the names to be included in the search
-     * @param type
-     *            - name type
-     * @param instance
-     *            - can be Database.LOCAL or Database.CENTRAL
-     * 
+     *
+     * @param name - search string for the name of the germplasm
+     * @param start - the starting index of the sublist of results to be returned
+     * @param numOfRows - the number of rows to be included in the sublist of results
+     * to be returned
+     * @param mode - can be normal, spaces removed, name standardized
+     * @param op - can be EQUAL OR LIKE
+     * @param status - nstat of the names to be included in the search
+     * @param type - name type
+     * @param instance - can be Database.LOCAL or Database.CENTRAL
      * @return List of Germplasm POJOs
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Germplasm> getGermplasmByName(String name, int start, int numOfRows, GetGermplasmByNameModes mode, Operation op,
+    List<Germplasm> getGermplasmByName(String name, int start, int numOfRows, GetGermplasmByNameModes mode, Operation op,
             Integer status, GermplasmNameType type, Database instance) throws MiddlewareQueryException;
 
     /**
-     * Searches for all germplasm records which matches the given name. 
-     * It will match records having the following names: (1) the given name as it is, 
+     * Searches for all germplasm records which matches the given name.
+     * It will match records having the following names: (1) the given name as it is,
      * (2) the name with standardization performed on it, and (3) name with spaces removed.
-     * 
-     * @param name
-     *            - search string for the name of the germplasm
-     * @param start
-     *            - the starting index of the sublist of results to be returned
-     * @param numOfRows
-     *            - the number of rows to be included in the sublist of results
-     *            to be returned
-     * @param op
-     *            - can be EQUAL OR LIKE
+     *
+     * @param name - search string for the name of the germplasm
+     * @param start - the starting index of the sublist of results to be returned
+     * @param numOfRows - the number of rows to be included in the sublist of results
+     * to be returned
+     * @param op - can be EQUAL OR LIKE
      * @return List of Germplasm POJOs
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Germplasm> getGermplasmByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException;
+    List<Germplasm> getGermplasmByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException;
 
     /**
      * Returns the number of germplasm records with any name matching the given
@@ -109,424 +96,367 @@ public interface GermplasmDataManager {
      * GermplasmNameType is used to specify the type of names to be included in
      * the search. If the given type is null, all names will be included in the
      * search.
-     * 
-     * @param name
-     *            - search string for the name of the germplasm
-     * @param mode
-     *            - can be normal, spaces removed, name standardized
-     * @param op
-     *            - can be EQUAL OR LIKE
-     * @param status
-     *            - nstat of the names to be included in the search
-     * @param type
-     *            - name type
-     * @param instance
-     *            - can be Database.LOCAL or Database.CENTRAL
-     * 
+     *
+     * @param name - search string for the name of the germplasm
+     * @param mode - can be normal, spaces removed, name standardized
+     * @param op - can be EQUAL OR LIKE
+     * @param status - nstat of the names to be included in the search
+     * @param type - name type
+     * @param instance - can be Database.LOCAL or Database.CENTRAL
      * @return number of germplasm records
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public long countGermplasmByName(String name, GetGermplasmByNameModes mode, Operation op, Integer status, GermplasmNameType type,
+    long countGermplasmByName(String name, GetGermplasmByNameModes mode, Operation op, Integer status, GermplasmNameType type,
             Database instance) throws MiddlewareQueryException;
 
     /**
      * Returns the number of germplasm records with any name matching the given
-     * parameter. 
-     * It will count records having the following names: (1) the given name as it is, 
+     * parameter.
+     * It will count records having the following names: (1) the given name as it is,
      * (2) the name with standardization performed on it, and (3) name with spaces removed.
-     * 
-     * @param name
-     *            - search string for the name of the germplasm
-     * @param op
-     *            - can be EQUAL OR LIKE
-     *            
+     *
+     * @param name - search string for the name of the germplasm
+     * @param op - can be EQUAL OR LIKE
      * @return number of germplasm records
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public long countGermplasmByName(String name, Operation op) throws MiddlewareQueryException;
+    long countGermplasmByName(String name, Operation op) throws MiddlewareQueryException;
     
     /**
      * Returns the germplasm records that were created at the locations with
      * names matching the given parameter.
-     * 
-     * @param name
-     *            - search string for the name of the locations
-     * @param start
-     *            - the starting index of the sublist of results to be returned
-     * @param numOfRows
-     *            - the number of rows to be included in the sublist of results
-     *            to be returned
-     * @param op
-     *            - can be EQUAL like LIKE
-     * @param instance
-     *            - can be Database.CENTRAL or Database.LOCAL
+     *
+     * @param name - search string for the name of the locations
+     * @param start - the starting index of the sublist of results to be returned
+     * @param numOfRows - the number of rows to be included in the sublist of results
+     * to be returned
+     * @param op - can be EQUAL like LIKE
+     * @param instance - can be Database.CENTRAL or Database.LOCAL
      * @return List of Germplasm POJOs
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Germplasm> getGermplasmByLocationName(String name, int start, int numOfRows, Operation op, Database instance)
+    List<Germplasm> getGermplasmByLocationName(String name, int start, int numOfRows, Operation op, Database instance)
             throws MiddlewareQueryException;
     
     /**
      * Returns the germplasm records that were created at the locations with
      * names matching the given parameter.
-     * 
-     * @param locationId
-     *            - location id to search details from
-     * @param start
-     *            - the starting index of the sublist of results to be returned
-     * @param numOfRows
-     *            - the number of rows to be included in the sublist of results
-     *            to be returned
+     *
+     * @param locationId - location id to search details from
+     * @param start - the starting index of the sublist of results to be returned
+     * @param numOfRows - the number of rows to be included in the sublist of results
+     * to be returned
      * @return List of Germplasm POJOs
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<LocationDetails> getLocationDetailsByLocId(Integer locationId, int start, int numOfRows)
+    List<LocationDetails> getLocationDetailsByLocId(Integer locationId, int start, int numOfRows)
             throws MiddlewareQueryException;
 
     /**
      * Returns the number of germplasm records that were created at the locations with
      * names matching the given parameter.
-     * 
-     * @param name
-     *            - search string for the name of the locations
-     * @param op
-     *            - can be EQUAL like LIKE
-     * @param instance
-     *            - can be Database.CENTRAL or Database.LOCAL
+     *
+     * @param name - search string for the name of the locations
+     * @param op - can be EQUAL like LIKE
+     * @param instance - can be Database.CENTRAL or Database.LOCAL
      * @return Number of Germplasms
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */    
-    public long countGermplasmByLocationName(String name, Operation op, Database instance) throws MiddlewareQueryException;
+    long countGermplasmByLocationName(String name, Operation op, Database instance) throws MiddlewareQueryException;
 
     /**
-     * Returns all Locations
-     * 
-     * @param start
-     *            - the starting index of the sublist of results to be returned
-     * @param numOfRows
-     *            - the number of rows to be included in the sublist of results
-     *            to be returned
+     * Returns all Locations.
+     *
+     * @param start - the starting index of the sublist of results to be returned
+     * @param numOfRows - the number of rows to be included in the sublist of results
+     * to be returned
      * @return All Locations based on the given start and numOfRows
+     * @throws MiddlewareQueryException the middleware query exception
      */   
-    public List<Location> getAllLocations(int start, int numOfRows) throws MiddlewareQueryException;
+    List<Location> getAllLocations(int start, int numOfRows) throws MiddlewareQueryException;
     
     /**
      * Returns all Location information from central and local databases.
-     * @return All Locations 
+     *
+     * @return All Locations
+     * @throws MiddlewareQueryException the middleware query exception
      */   
-    public List<Location> getAllLocations() throws MiddlewareQueryException;
+    List<Location> getAllLocations() throws MiddlewareQueryException;
 
     /**
-     * Returns all Local Locations
-     * 
-     * @param start
-     *            - the starting index of the sublist of results to be returned
-     * @param numOfRows
-     *            - the number of rows to be included in the sublist of results
-     *            to be returned
+     * Returns all Local Locations.
+     *
+     * @param start - the starting index of the sublist of results to be returned
+     * @param numOfRows - the number of rows to be included in the sublist of results
+     * to be returned
      * @return All Locations based on the given start and numOfRows
+     * @throws MiddlewareQueryException the middleware query exception
      */  
-	public List<Location> getAllLocalLocations(int start, int numOfRows)
+	List<Location> getAllLocalLocations(int start, int numOfRows)
 			throws MiddlewareQueryException;
     
     
     /**
-     * Returns number of all Locations
-     * 
+     * Returns number of all Locations.
+     *
      * @return the number of all Locations
+     * @throws MiddlewareQueryException the middleware query exception
      */   
-    public long countAllLocations() throws MiddlewareQueryException;
+    long countAllLocations() throws MiddlewareQueryException;
 
     /**
      * Returns the Location records with
      * names matching the given parameter.
-     * 
-     * @param name
-     *            - search string for the name of the locations
-     * @param op
-     *            - can be EQUAL like LIKE
+     *
+     * @param name - search string for the name of the locations
+     * @param op - can be EQUAL like LIKE
      * @return List of Location POJOs
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Location> getLocationsByName(String name, Operation op) throws MiddlewareQueryException;
+    List<Location> getLocationsByName(String name, Operation op) throws MiddlewareQueryException;
     
 
     /**
      * Returns the Location records with
      * names matching the given parameter.
-     * 
-     * @param name
-     *            - search string for the name of the locations
-     * @param start
-     *            - the starting index of the sublist of results to be returned
-     * @param numOfRows
-     *            - the number of rows to be included in the sublist of results
-     *            to be returned
-     * @param op
-     *            - can be EQUAL like LIKE
+     *
+     * @param name - search string for the name of the locations
+     * @param start - the starting index of the sublist of results to be returned
+     * @param numOfRows - the number of rows to be included in the sublist of results
+     * to be returned
+     * @param op - can be EQUAL like LIKE
      * @return List of Location POJOs
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Location> getLocationsByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException;
+    List<Location> getLocationsByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException;
     
     /**
-     * Returns all country records
+     * Returns all country records.
+     *
      * @return List of Location POJOs
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Country> getAllCountry() throws MiddlewareQueryException;
+    List<Country> getAllCountry() throws MiddlewareQueryException;
     
     /**
      * Returns the number of Locations with
      * names matching the given parameter.
-     * 
-     * @param name
-     *            - search string for the name of the locations
-     * @param op
-     *            - can be EQUAL like LIKE
+     *
+     * @param name - search string for the name of the locations
+     * @param op - can be EQUAL like LIKE
      * @return Number of Locations
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public long countLocationsByName(String name, Operation op) throws MiddlewareQueryException;
+    long countLocationsByName(String name, Operation op) throws MiddlewareQueryException;
 
 
     /**
      * Returns all the Location records with
      * country matching the given parameter. The data is retrieved from both local and central databases.
-     * 
-     * @param country
-     *            - search string for the country of the locations
+     *
+     * @param country - search string for the country of the locations
      * @return List of Location POJOs
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Location> getLocationsByCountry(Country country) throws MiddlewareQueryException;
+    List<Location> getLocationsByCountry(Country country) throws MiddlewareQueryException;
     
     
     /**
      * Returns all the Location records with
      * country and location type  matching  the given parameter. The data is retrieved from both local and central databases.
-     * 
-     * @param country
-     *            - search string for the country of the locations
-     * @param type
-     *            - search string for the locations type
+     *
+     * @param country - search string for the country of the locations
+     * @param type - search string for the locations type
      * @return List of Location POJOs
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Location> getLocationsByCountryAndType(Country country,Integer type) throws MiddlewareQueryException;
+    List<Location> getLocationsByCountryAndType(Country country,Integer type) throws MiddlewareQueryException;
 
     /**
      * Returns all the Location records with
      * name, country and location type  matching  the given parameter. The data is retrieved from both local and central databases.
-     * @param name
-     * @param country
-     * @param type
-     * @return
-     * @throws MiddlewareQueryException
+     *
+     * @param name the name
+     * @param country the country
+     * @param type the type
+     * @return the locations by name country and type
+     * @throws MiddlewareQueryException the middleware query exception
      */
-	public List<Location> getLocationsByNameCountryAndType(String name,
+	List<Location> getLocationsByNameCountryAndType(String name,
 			Country country, Integer type) throws MiddlewareQueryException;
     
 
     /**
      * Returns the Location records with
      * country matching the given parameter. The data is retrieved from both local and central databases.
-     * 
-     * @param country
-     *            - search string for the country of the locations
-     * @param start
-     *            - the starting index of the sublist of results to be returned
-     * @param numOfRows
-     *            - the number of rows to be included in the sublist of results
-     *            to be returned
+     *
+     * @param country - search string for the country of the locations
+     * @param start - the starting index of the sublist of results to be returned
+     * @param numOfRows - the number of rows to be included in the sublist of results
+     * to be returned
      * @return List of Location POJOs
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Location> getLocationsByCountry(Country country, int start, int numOfRows) throws MiddlewareQueryException;
+    List<Location> getLocationsByCountry(Country country, int start, int numOfRows) throws MiddlewareQueryException;
     
     /**
      * Returns the number of Locations with
      * countries matching the given parameter. The data is retrieved from both local and central databases.
-     * 
-     * @param country
-     *            - search string for the country of the locations
+     *
+     * @param country - search string for the country of the locations
      * @return Number of Locations
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public long countLocationsByCountry(Country country) throws MiddlewareQueryException;
+    long countLocationsByCountry(Country country) throws MiddlewareQueryException;
     
 
 
     /**
      * Returns the Location records with
      * type matching the given parameter. The data is retrieved from both local and central databases.
-     * 
-     * @param type
-     *            - search string for the type of the locations
+     *
+     * @param type - search string for the type of the locations
      * @return List of Location POJOs
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Location> getLocationsByType(Integer type) throws MiddlewareQueryException;
+    List<Location> getLocationsByType(Integer type) throws MiddlewareQueryException;
 
     /**
      * Returns the Location records with
      * type matching the given parameter. The data is retrieved from both local and central databases.
-     * 
-     * @param type
-     *            - search string for the type of the locations
-     * @param start
-     *            - the starting index of the sublist of results to be returned
-     * @param numOfRows
-     *            - the number of rows to be included in the sublist of results
-     *            to be returned
+     *
+     * @param type - search string for the type of the locations
+     * @param start - the starting index of the sublist of results to be returned
+     * @param numOfRows - the number of rows to be included in the sublist of results
+     * to be returned
      * @return List of Location POJOs
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Location> getLocationsByType(Integer type, int start, int numOfRows) throws MiddlewareQueryException;
+    List<Location> getLocationsByType(Integer type, int start, int numOfRows) throws MiddlewareQueryException;
     
     /**
      * Returns the number of Locations with
      * types matching the given parameter. The data is retrieved from both local and central databases.
-     * 
-     * @param type
-     *            - search string for the type of the locations
+     *
+     * @param type - search string for the type of the locations
      * @return Number of Locations
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public long countLocationsByType(Integer type) throws MiddlewareQueryException;
+    long countLocationsByType(Integer type) throws MiddlewareQueryException;
     
     
     /**
      * Retrieves all the Germplasm entries from the given database instance.
-     * 
-     * @param start
-     *            - the starting index of the sublist of results to be returned
-     * @param numOfRows
-     *            - the number of rows to be included in the sublist of results
-     *            to be returned
-     * @param instance
-     *            - can be Database.CENTRAL or Database.LOCAL
+     *
+     * @param start - the starting index of the sublist of results to be returned
+     * @param numOfRows - the number of rows to be included in the sublist of results
+     * to be returned
+     * @param instance - can be Database.CENTRAL or Database.LOCAL
      * @return All the germplasms from the database instance satisfying the start and numOfRows parameters
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Germplasm> getAllGermplasm(int start, int numOfRows, Database instance) throws MiddlewareQueryException;
+    List<Germplasm> getAllGermplasm(int start, int numOfRows, Database instance) throws MiddlewareQueryException;
 
     
     /**
      * Counts all the Germplasm entries from the given database instance.
-     * 
-     * @param instance
-     *            - can be Database.CENTRAL or Database.LOCAL
+     *
+     * @param instance - can be Database.CENTRAL or Database.LOCAL
      * @return The number of germplasms from the given database instance
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public long countAllGermplasm(Database instance) throws MiddlewareQueryException;
+    long countAllGermplasm(Database instance) throws MiddlewareQueryException;
 
     
     /**
      * Retrieves all the Germplasm entries from the given database instance matching the given preferred name.
-     * 
-     * @param name
-     *            - the preferred name to match
-     * @param start
-     *            - the starting index of the sublist of results to be returned
-     * @param numOfRows
-     *            - the number of rows to be included in the sublist of results
-     *            to be returned
-     * @param instance
-     *            - can be Database.CENTRAL or Database.LOCAL
+     *
+     * @param name - the preferred name to match
+     * @param start - the starting index of the sublist of results to be returned
+     * @param numOfRows - the number of rows to be included in the sublist of results
+     * to be returned
+     * @param instance - can be Database.CENTRAL or Database.LOCAL
      * @return All the germplasms from the database instance satisfying the given preferred name
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Germplasm> getGermplasmByPrefName(String name, int start, int numOfRows, Database instance) throws MiddlewareQueryException;
+    List<Germplasm> getGermplasmByPrefName(String name, int start, int numOfRows, Database instance) throws MiddlewareQueryException;
 
 
     /**
      * Counts all the Germplasm entries from central and local database instances matching the given preferred name.
-     * 
-     * @param name
-     *            - the preferred name to match
+     *
+     * @param name - the preferred name to match
      * @return The number of germplasms from the satisfying the given preferred name
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public long countGermplasmByPrefName(String name) throws MiddlewareQueryException;
+    long countGermplasmByPrefName(String name) throws MiddlewareQueryException;
 
     
     /**
      * Returns the germplasm records that were created by the methods with names
      * matching the given parameter.
-     * 
-     * @param name
-     *            - search string for the name of the methods
-     * @param start
-     *            - the starting index of the sublist of results to be returned
-     * @param numOfRows
-     *            - the number of rows to be included in the sublist of results
-     *            to be returned
-     * @param op
-     *            - can be EQUAL or LIKE
-     * @param instance
-     *            - can be Database.CENTRAL or Database.LOCAL
+     *
+     * @param name - search string for the name of the methods
+     * @param start - the starting index of the sublist of results to be returned
+     * @param numOfRows - the number of rows to be included in the sublist of results
+     * to be returned
+     * @param op - can be EQUAL or LIKE
+     * @param instance - can be Database.CENTRAL or Database.LOCAL
      * @return List of Germplasm POJOS
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Germplasm> getGermplasmByMethodName(String name, int start, int numOfRows, Operation op, Database instance)
+    List<Germplasm> getGermplasmByMethodName(String name, int start, int numOfRows, Operation op, Database instance)
             throws MiddlewareQueryException;
 
     /**
      * Returns the number of germplasm records that were created by methods with
-     * names matching the given parameter
-     * 
-     * @param name
-     *            - search string for the name of the methods
-     * @param op
-     *            - can be equal or like
-     * @param instance
-     *            - can be Database.CENTRAL or Database.LOCAL
+     * names matching the given parameter.
+     *
+     * @param name - search string for the name of the methods
+     * @param op - can be equal or like
+     * @param instance - can be Database.CENTRAL or Database.LOCAL
      * @return number of germplasm records
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public long countGermplasmByMethodName(String name, Operation op, Database instance) throws MiddlewareQueryException;
+    long countGermplasmByMethodName(String name, Operation op, Database instance) throws MiddlewareQueryException;
 
     /**
      * Returns the germplasm record identified by the given id.
-     * 
-     * @param gid
-     *            - id of the germplasm record to be retrieved
+     *
+     * @param gid - id of the germplasm record to be retrieved
      * @return the Germplasm POJO representing the record
-     * @throws MiddlewareQueryException 
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public Germplasm getGermplasmByGID(Integer gid) throws MiddlewareQueryException;
+    Germplasm getGermplasmByGID(Integer gid) throws MiddlewareQueryException;
 
     /**
      * Given a gid, return the Germplasm POJO representing the record identified
      * by the id with its preferred name.
-     * 
-     * @param gid
-     *            - the id of the germplasm record to be retrieved
+     *
+     * @param gid - the id of the germplasm record to be retrieved
      * @return the Germplasm POJO representing the record
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public Germplasm getGermplasmWithPrefName(Integer gid) throws MiddlewareQueryException;
+    Germplasm getGermplasmWithPrefName(Integer gid) throws MiddlewareQueryException;
 
     /**
      * Given a gid, return the Germplasm POJO representing the record identified
      * by the id with its preferred name and preferred abbreviation.
-     * 
-     * @param gid
-     *            - the id of the germplasm record to be retrieved
+     *
+     * @param gid - the id of the germplasm record to be retrieved
      * @return the Germplasm POJO representing the record
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public Germplasm getGermplasmWithPrefAbbrev(Integer gid) throws MiddlewareQueryException;
+    Germplasm getGermplasmWithPrefAbbrev(Integer gid) throws MiddlewareQueryException;
 
     /**
      * Returns the Name record identified by the given id.
-     * 
-     * @param id
-     *            - id of the name record
+     *
+     * @param id - id of the name record
      * @return the Name POJO representing the record
-     * @throws MiddlewareQueryException 
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public Name getGermplasmNameByID(Integer id) throws MiddlewareQueryException;
+    Name getGermplasmNameByID(Integer id) throws MiddlewareQueryException;
 
     /**
      * Returns all the names of the Germplasm identified by the gid parameter.
@@ -537,482 +467,443 @@ public interface GermplasmDataManager {
      * Results may also be filtered by type. The enum GermplasmNameType is used
      * to specify the type of names to be included in the result. If the given
      * type is null, all names will be included in the result.
-     * 
-     * @param gid
-     *            - id of the Germplasm
-     * @param status
-     *            - may be used to filter the results
-     * @param type
-     *            - may be used to filter the results
+     *
+     * @param gid - id of the Germplasm
+     * @param status - may be used to filter the results
+     * @param type - may be used to filter the results
      * @return List of Name POJOs
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Name> getNamesByGID(Integer gid, Integer status, GermplasmNameType type) throws MiddlewareQueryException;
+    List<Name> getNamesByGID(Integer gid, Integer status, GermplasmNameType type) throws MiddlewareQueryException;
 
     /**
      * Returns the preferred name of the Germplasm identified by the gid
      * parameter.
-     * 
-     * @param gid
-     *            - id of the Germplasm
+     *
+     * @param gid - id of the Germplasm
      * @return {@code Name} POJO of the Germplasm's preferred name. Returns
-     *         {@code null} when no preferred name is found.
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
+     * {@code null} when no preferred name is found.
      */
-    public Name getPreferredNameByGID(Integer gid) throws MiddlewareQueryException;
+    Name getPreferredNameByGID(Integer gid) throws MiddlewareQueryException;
 
     /**
      * Returns the preferred abbreviation of the Germplasm identified by the gid
      * parameter.
-     * 
-     * @param gid
-     *            - id of the Germplasm
+     *
+     * @param gid - id of the Germplasm
      * @return {@code Name} POJO of the Germplasm's preferred abbreviation.
-     *         Returns {@code null} when no preferred abbreviation is found.
-     * @throws MiddlewareQueryException
+     * Returns {@code null} when no preferred abbreviation is found.
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public Name getPreferredAbbrevByGID(Integer gid) throws MiddlewareQueryException;
+    Name getPreferredAbbrevByGID(Integer gid) throws MiddlewareQueryException;
     
     /**
      * Returns the preferred ID of the Germplasm identified by the gid
      * parameter.
-     * 
-     * @param gid
-     *            - id of the Germplasm
+     *
+     * @param gid - id of the Germplasm
      * @return {@code Name} POJO of the Germplasm's preferred ID.
-     *         Returns {@code null} when no preferred ID is found.
-     * @throws MiddlewareQueryException
+     * Returns {@code null} when no preferred ID is found.
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public Name getPreferredIdByGID(Integer gid) throws MiddlewareQueryException;
+    Name getPreferredIdByGID(Integer gid) throws MiddlewareQueryException;
     
     /**
      * Returns a list of preferred IDs of the Germplasms associated with the
      * Germplasm List identified by the listId parameter.
-     * 
-     * @param listId
-     *            - id of the Germplasm List
+     *
+     * @param listId - id of the Germplasm List
      * @return {@code Name} A list of POJOs of the Germplasms' preferred IDs.
-     *         Returns an empty list when no preferred ID is found.
-     * @throws MiddlewareQueryException
+     * Returns an empty list when no preferred ID is found.
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Name> getPreferredIdsByListId(Integer listId) throws MiddlewareQueryException;
+    List<Name> getPreferredIdsByListId(Integer listId) throws MiddlewareQueryException;
 
     /**
      * Returns the value (NVAL field) of preferred name of the Germplasm identified by the gid
      * parameter.
-     * 
-     * @param gid
-     *            - id of the Germplasm
+     *
+     * @param gid - id of the Germplasm
      * @return Germplasm's preferred name as string. Returns
-     *         {@code null} when no preferred name is found.
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
+     * {@code null} when no preferred name is found.
      */
-    public String getPreferredNameValueByGID(Integer gid) throws MiddlewareQueryException;
+    String getPreferredNameValueByGID(Integer gid) throws MiddlewareQueryException;
 
 
     /**
      * Returns the matching {@code Name} object given a Germplasm ID and a Name
      * value.
-     * 
-     * @param gid
-     *            - id of the Germplasm
-     * @param nval
-     *            - value of the Name to search            
-     * @param mode
-     *            - can be normal, spaces removed, name standardized
+     *
+     * @param gid - id of the Germplasm
+     * @param nval - value of the Name to search
+     * @param mode - can be normal, spaces removed, name standardized
      * @return {@code Name} POJO of the matching {@code Name} object. Returns
-     *         {@code null} when no {@code Name} with the specified gid and nval
-     *         is found.
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
+     * {@code null} when no {@code Name} with the specified gid and nval
+     * is found.
      */
-    public Name getNameByGIDAndNval(Integer gid, String nval, GetGermplasmByNameModes mode) throws MiddlewareQueryException;
+    Name getNameByGIDAndNval(Integer gid, String nval, GetGermplasmByNameModes mode) throws MiddlewareQueryException;
 
     /**
      * Sets the specified Name as the specified Germplasm's new preferred Name.
-     * 
-     * @param gid
-     *            - id of the Germplasm to be updated
-     * @param newPrefName
-     *            - new name to set as the preferred name
+     *
+     * @param gid - id of the Germplasm to be updated
+     * @param newPrefName - new name to set as the preferred name
      * @return Returns the id of the updated {@code Germplasm} record
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public Integer updateGermplasmPrefName(Integer gid, String newPrefName) throws MiddlewareQueryException;
+    Integer updateGermplasmPrefName(Integer gid, String newPrefName) throws MiddlewareQueryException;
 
     /**
      * Sets the specified Abbreviation as the specified Germplasm's new
      * preferred Abbreviation.
-     * 
-     * @param gid
-     *            - id of the Germplasm to be updated
-     * @param newPrefAbbrev
-     *            - new abbreviation to set as the preferred abbreviation
+     *
+     * @param gid - id of the Germplasm to be updated
+     * @param newPrefAbbrev - new abbreviation to set as the preferred abbreviation
      * @return Returns the id of the updated {@code Germplasm} record
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public Integer updateGermplasmPrefAbbrev(Integer gid, String newPrefAbbrev) throws MiddlewareQueryException;
+    Integer updateGermplasmPrefAbbrev(Integer gid, String newPrefAbbrev) throws MiddlewareQueryException;
 
     /**
      * Inserts a single {@code Name} object into the database.
-     * 
-     * @param name
-     *            - The {@code Name} object to be persisted to the database.
-     *            Must be a valid {@code Name} object.
+     *
+     * @param name - The {@code Name} object to be persisted to the database.
+     * Must be a valid {@code Name} object.
      * @return Returns the id of the newly-added Germplasm {@code Name}.
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public Integer addGermplasmName(Name name) throws MiddlewareQueryException;
+    Integer addGermplasmName(Name name) throws MiddlewareQueryException;
 
     /**
      * Inserts a list of multiple {@code Name} objects into the database.
-     * 
-     * @param names
-     *            - A list of {@code Name} objects to be persisted to the
-     *            database. {@code Name} objects must be valid.
+     *
+     * @param names - A list of {@code Name} objects to be persisted to the
+     * database. {@code Name} objects must be valid.
      * @return Returns the id of the newly-added Germplasm {@code Name}s.
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Integer> addGermplasmName(List<Name> names) throws MiddlewareQueryException;
+    List<Integer> addGermplasmName(List<Name> names) throws MiddlewareQueryException;
 
     /**
      * Updates a single {@code Name} object in the database.
-     * 
-     * @param name
-     *            - The {@code Name} object to be updated in the database. Must
-     *            be a valid {@code Name} object.
+     *
+     * @param name - The {@code Name} object to be updated in the database. Must
+     * be a valid {@code Name} object.
      * @return Returns the id of the updated Germplasm {@code Name}.
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public Integer updateGermplasmName(Name name) throws MiddlewareQueryException;
+    Integer updateGermplasmName(Name name) throws MiddlewareQueryException;
 
     /**
      * Updates the database with multiple {@code Name} objects specified.
-     * 
-     * @param names
-     *            - A list of {@code Name} objects to be updated in the
-     *            database. {@code Name} objects must be valid.
+     *
+     * @param names - A list of {@code Name} objects to be updated in the
+     * database. {@code Name} objects must be valid.
      * @return Returns the id of the updated Germplasm {@code Name}s.
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Integer> updateGermplasmName(List<Name> names) throws MiddlewareQueryException;
+    List<Integer> updateGermplasmName(List<Name> names) throws MiddlewareQueryException;
 
     /**
      * Returns all the attributes of the Germplasm identified by the given id.
-     * 
-     * @param gid
-     *            - id of the Germplasm
+     *
+     * @param gid - id of the Germplasm
      * @return List of Atributs POJOs
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Attribute> getAttributesByGID(Integer gid) throws MiddlewareQueryException;
+    List<Attribute> getAttributesByGID(Integer gid) throws MiddlewareQueryException;
     
     /**
      * Returns all the list of attribute types identified by the given list of gids.
-     *  
-     * @param gidList
-     *             - list of GIDs 
+     *
+     * @param gidList - list of GIDs
      * @return List of UserDefinedField POJOs that contains the attribute types and names for the given GIDs.
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<UserDefinedField> getAttributeTypesByGIDList(List<Integer> gidList) throws MiddlewareQueryException;
+    List<UserDefinedField> getAttributeTypesByGIDList(List<Integer> gidList) throws MiddlewareQueryException;
     
     /**
      * Returns a Map of GIDs to the attribute values given an attribute type and a list of GIDs.
-     * 
-     * @param attributeType
-     *             - attribute type of the values to retrieve
-     * @param gidList
-     *             - list of GIDs
+     *
+     * @param attributeType - attribute type of the values to retrieve
+     * @param gidList - list of GIDs
      * @return Map<Integer, String>
-     *             - map of gids to their corresponding attribute values for the specified attribute type
-     * @throws MiddlewareQueryException
+     * - map of gids to their corresponding attribute values for the specified attribute type
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public Map<Integer, String> getAttributeValuesByTypeAndGIDList(Integer attributeType, List<Integer> gidList) throws MiddlewareQueryException;
+    Map<Integer, String> getAttributeValuesByTypeAndGIDList(Integer attributeType, List<Integer> gidList) throws MiddlewareQueryException;
 
     /**
      * Returns the Method record identified by the id.
-     * 
-     * @param id
-     *            - id of the method record
+     *
+     * @param id - id of the method record
      * @return the Method POJO representing the record
-     * @throws MiddlewareQueryException 
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public Method getMethodByID(Integer id) throws MiddlewareQueryException;
+    Method getMethodByID(Integer id) throws MiddlewareQueryException;
 
     /**
      * Returns all the method records.
-     * 
+     *
      * @return List of Method POJOs
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Method> getAllMethods() throws MiddlewareQueryException;
+    List<Method> getAllMethods() throws MiddlewareQueryException;
     
     /**
      * Returns count of all the method records.
-     * 
+     *
      * @return count of methods
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public long countAllMethods() throws MiddlewareQueryException;
+    long countAllMethods() throws MiddlewareQueryException;
     
     /**
      * Returns all the method records matching the given type.
      * Retrieves from both local and central databases.
-     * 
+     *
      * @param type the type of the method
      * @return List of Method POJOs
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Method> getMethodsByType(String type) throws MiddlewareQueryException;
+    List<Method> getMethodsByType(String type) throws MiddlewareQueryException;
 
     /**
      * Returns all the method records matching the given group and the methods having the 'G' group.
      * Retrieves from both local and central databases.
-     * 
+     *
      * @param group the group of the method
      * @return List of Method POJOs
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Method> getMethodsByGroupIncludesGgroup(String group) throws MiddlewareQueryException;
+    List<Method> getMethodsByGroupIncludesGgroup(String group) throws MiddlewareQueryException;
 
     
     /**
      * Returns all the method records matching the given type.
      * Retrieves from both local and central databases.
-     * 
+     *
      * @param type the type of the method
-     * @param start
-     *            - the starting index of the sublist of results to be returned
-     * @param numOfRows
-     *            - the number of rows to be included in the sublist of results
-     *            to be returned
+     * @param start - the starting index of the sublist of results to be returned
+     * @param numOfRows - the number of rows to be included in the sublist of results
+     * to be returned
      * @return List of Method POJOs
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Method> getMethodsByType(String type, int start, int numOfRows) throws MiddlewareQueryException;
+    List<Method> getMethodsByType(String type, int start, int numOfRows) throws MiddlewareQueryException;
     
 
     /**
      * Returns the number of Methods with
      * type matching the given parameter.
      * Retrieves from both local and central databases.
-     * 
-     * @param type
-     *            - search string for the methods
+     *
+     * @param type - search string for the methods
      * @return Number of Methods matching the given type
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public long countMethodsByType(String type) throws MiddlewareQueryException;
+    long countMethodsByType(String type) throws MiddlewareQueryException;
 
     /**
      * Returns all the method records matching the given group.
      * Retrieves from both local and central databases.
-     * 
+     *
      * @param group the group of the method
      * @return List of Method POJOs
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Method> getMethodsByGroup(String group) throws MiddlewareQueryException;
+    List<Method> getMethodsByGroup(String group) throws MiddlewareQueryException;
 
 
     /**
      * Returns all the method records matching the given group.
      * Retrieves from both local and central databases.
-     * 
+     *
      * @param group the group of the method
-     * @param start
-     *            - the starting index of the sublist of results to be returned
-     * @param numOfRows
-     *            - the number of rows to be included in the sublist of results
-     *            to be returned
+     * @param start - the starting index of the sublist of results to be returned
+     * @param numOfRows - the number of rows to be included in the sublist of results
+     * to be returned
      * @return List of Method POJOs
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Method> getMethodsByGroup(String group, int start, int numOfRows) throws MiddlewareQueryException;
+    List<Method> getMethodsByGroup(String group, int start, int numOfRows) throws MiddlewareQueryException;
+    
     /**
      * Returns all the method and type records matching the given group and type.
      * Retrieves from both local and central databases.
-     * 
+     *
      * @param group the group of the method
      * @param type the type of the method
      * @return List of Method POJOs
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Method> getMethodsByGroupAndType(String group,String type) throws MiddlewareQueryException;
+    List<Method> getMethodsByGroupAndType(String group,String type) throws MiddlewareQueryException;
+    
     /**
      * Returns all the method and type records matching the given group, type and name.
      * Retrieves from both local and central databases.
-     * 
+     *
      * @param group the group of the method
      * @param type the type of the method
      * @param name the name of the method
      * @return List of Method POJOs
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Method> getMethodsByGroupAndTypeAndName(String group,String type, String name) throws MiddlewareQueryException;
+    List<Method> getMethodsByGroupAndTypeAndName(String group,String type, String name) throws MiddlewareQueryException;
     
     /**
      * Returns the number of Methods with
-     * group matching the given parameter. 
+     * group matching the given parameter.
      * 
      * Retrieves from both local and central databases.
-     * 
-     * @param group
-     *            - search string for the methods
+     *
+     * @param group - search string for the methods
      * @return Number of Methods matching the given group
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public long countMethodsByGroup(String group) throws MiddlewareQueryException;
+    long countMethodsByGroup(String group) throws MiddlewareQueryException;
 
     /**
      * Returns the udfld record identified by the given id.
-     * 
-     * @param id
-     *            - the id of the udfld record
+     *
+     * @param id - the id of the udfld record
      * @return the Udflds POJO representing the record
-     * @throws MiddlewareQueryException 
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public UserDefinedField getUserDefinedFieldByID(Integer id) throws MiddlewareQueryException;
+    UserDefinedField getUserDefinedFieldByID(Integer id) throws MiddlewareQueryException;
     
     
     
     /**
      * Returns the udfld records identified by the given tablename.
-     * 
-     * @param tableName
-     *            - the value of the ftable record
-     @param fieldType
-     *            - the value of the ftype record
+     *
+     * @param tableName - the value of the ftable record
+     * @param fieldType - the value of the ftype record
      * @return the Udflds POJO representing the record
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(String tableName,String fieldType) throws MiddlewareQueryException;
+    List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(String tableName,String fieldType) throws MiddlewareQueryException;
 
     /**
      * Returns the country record identified by the given id.
-     * 
-     * @param id
-     *            - id of the country record
+     *
+     * @param id - id of the country record
      * @return the Country POJO representing the record
-     * @throws MiddlewareQueryException 
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public Country getCountryById(Integer id) throws MiddlewareQueryException;
+    Country getCountryById(Integer id) throws MiddlewareQueryException;
 
     /**
      * Returns the location record identified by the given id.
-     * 
-     * @param id
-     *            - id of the location record
+     *
+     * @param id - id of the location record
      * @return the Location POJO representing the record
-     * @throws MiddlewareQueryException 
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public Location getLocationByID(Integer id) throws MiddlewareQueryException;
+    Location getLocationByID(Integer id) throws MiddlewareQueryException;
 
     /**
      * Inserts a single {@code Location} object into the database.
-     * 
-     * @param location
-     *            - The {@code Location} object to be persisted to the database.
-     *            Must be a valid {@code Location} object.
+     *
+     * @param location - The {@code Location} object to be persisted to the database.
+     * Must be a valid {@code Location} object.
      * @return Returns the id of the {@code Location} record inserted in the
-     *         database.
-     *         Returns the id of the newly-added Germplasm {@code Name}s.
-     * @throws MiddlewareQueryException
+     * database.
+     * Returns the id of the newly-added Germplasm {@code Name}s.
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public Integer addLocation(Location location) throws MiddlewareQueryException;
+    Integer addLocation(Location location) throws MiddlewareQueryException;
     
     /**
      * Inserts a single {@code Location} object into the database.
-     * 
-     * @param locations
-     *            - The {@code Location} object to be persisted to the database.
-     *            Must be a valid {@code Location} object.
+     *
+     * @param locations - The {@code Location} object to be persisted to the database.
+     * Must be a valid {@code Location} object.
      * @return Returns the ids of the {@code Location} records inserted in the
-     *         database.
-     * @throws MiddlewareQueryException
+     * database.
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Integer> addLocation(List<Location> locations) throws MiddlewareQueryException;
+    List<Integer> addLocation(List<Location> locations) throws MiddlewareQueryException;
     
     /**
      * Deletes a single {@code Location} object into the database.
-     * 
-     * @param location
-     *            - The {@code Location} object to be deleted from the database.
-     *            Must be a valid {@code Location} object.
-     * @throws MiddlewareQueryException
+     *
+     * @param location - The {@code Location} object to be deleted from the database.
+     * Must be a valid {@code Location} object.
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public void deleteLocation(Location location) throws MiddlewareQueryException;
+    void deleteLocation(Location location) throws MiddlewareQueryException;
 
     /**
      * Inserts a single {@code Method} object into the database.
-     * 
-     * @param method
-     *            - The {@code Method} object to be persisted to the database.
-     *            Must be a valid {@code Method} object.
+     *
+     * @param method - The {@code Method} object to be persisted to the database.
+     * Must be a valid {@code Method} object.
      * @return Returns the id of the {@code Method} record inserted in the
-     *         database.
-     * @throws MiddlewareQueryException
+     * database.
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public Integer addMethod(Method method) throws MiddlewareQueryException;
+    Integer addMethod(Method method) throws MiddlewareQueryException;
     
     /**
      * Inserts a list of {@code Method} objects into the database.
-     * 
-     * @param methods
-     *            - The list of {@code Method} objects to be persisted to the database.
-     *            Must be valid {@code Method} objects.
+     *
+     * @param methods - The list of {@code Method} objects to be persisted to the database.
+     * Must be valid {@code Method} objects.
      * @return Returns the ids of the {@code Method} records inserted in the
-     *         database.
-     * @throws MiddlewareQueryException
+     * database.
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Integer> addMethod(List<Method> methods) throws MiddlewareQueryException;
+    List<Integer> addMethod(List<Method> methods) throws MiddlewareQueryException;
     
     /**
      * Deletes a single {@code Method} object into the database.
-     * 
-     * @param method
-     *            - The {@code Method} object to be deleted from the database.
-     *            Must be a valid {@code Method} object.
-     * @throws MiddlewareQueryException
+     *
+     * @param method - The {@code Method} object to be deleted from the database.
+     * Must be a valid {@code Method} object.
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public void deleteMethod(Method method) throws MiddlewareQueryException;
+    void deleteMethod(Method method) throws MiddlewareQueryException;
 
     /**
      * Returns the Bibref record identified by the given id.
-     * 
-     * @param id
-     *            - id of the bibref record
+     *
+     * @param id - id of the bibref record
      * @return the Bibref POJO representing the record
-     * @throws MiddlewareQueryException 
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public Bibref getBibliographicReferenceByID(Integer id) throws MiddlewareQueryException;
+    Bibref getBibliographicReferenceByID(Integer id) throws MiddlewareQueryException;
 
     /**
      * Inserts a single {@code Bibref} (Bibliographic Reference) object into the
      * database.
-     * 
-     * @param bibref
-     *            - The {@code Bibref} object to be persisted to the database.
-     *            Must be a valid {@code Bibref} object.
+     *
+     * @param bibref - The {@code Bibref} object to be persisted to the database.
+     * Must be a valid {@code Bibref} object.
      * @return Returns the id of the {@code Bibref} record inserted in the
-     *         database.
-     * @throws MiddlewareQueryException
+     * database.
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public Integer addBibliographicReference(Bibref bibref) throws MiddlewareQueryException;
+    Integer addBibliographicReference(Bibref bibref) throws MiddlewareQueryException;
 
 
-//    /**
-//     * Returns the Germplasm records with field values matching the specified
-//     * values on the given sample Germplasm object. The following fields will be
-//     * checked for matches: method, gnpgs, gpid1, gpid2, user, location, gdate,
-//     * reference, mgid, and attributes.
-//     * 
-//     * @param sample
-//     * @param start
-//     * @param numOfRows
-//     * @return List of Germplasm POJOs
-//     */
-    // public List<Germplasm> getGermplasmByExample(Germplasm sample, int
-    // start, int numOfRows);
+    /*
+     * Returns the Germplasm records with field values matching the specified
+     * values on the given sample Germplasm object. The following fields will be
+     * checked for matches: method, gnpgs, gpid1, gpid2, user, location, gdate,
+     * reference, mgid, and attributes.
+     * 
+     * @param sample
+     * @param start
+     * @param numOfRows
+     * @return List of Germplasm POJOs
+     */
+    // List<Germplasm> getGermplasmByExample(Germplasm sample, int start, int numOfRows);
 
-    /**
+    /*
      * Returns the number of Germplasm records with field values matching the
      * specified values on the given sample Germplasm object. The following
      * fields will be checked for matches: method, gnpgs, gpid1, gpid2, user,
@@ -1021,57 +912,55 @@ public interface GermplasmDataManager {
      * @param sample
      * @return
      */
-    // public long countGermplasmByExample(Germplasm sample);
+    // long countGermplasmByExample(Germplasm sample);
 
     /**
      * Stores in the database the given valid Attribute object.
-     * 
-     * @param attribute
+     *
+     * @param attribute the attribute
      * @return the id of {@code Attribute} records stored in the database
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public Integer addGermplasmAttribute(Attribute attribute) throws MiddlewareQueryException;
+    Integer addGermplasmAttribute(Attribute attribute) throws MiddlewareQueryException;
 
     /**
      * Stores in the database all the given valid Attributes object contained in
      * the parameter.
-     * 
-     * @param attributes
-     *            - List of Attribute objects
+     *
+     * @param attributes - List of Attribute objects
      * @return the ids of the Attribute records stored in the database
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Integer> addGermplasmAttribute(List<Attribute> attributes) throws MiddlewareQueryException;
+    List<Integer> addGermplasmAttribute(List<Attribute> attributes) throws MiddlewareQueryException;
 
     /**
      * Given a valid Attribute object, update the corresponding record in the
      * database.
-     * 
-     * @param attribute
+     *
+     * @param attribute the attribute
      * @return Returns the id of the updated Germplasm {@code Attribute} record
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public Integer updateGermplasmAttribute(Attribute attribute) throws MiddlewareQueryException;
+    Integer updateGermplasmAttribute(Attribute attribute) throws MiddlewareQueryException;
 
     /**
      * Given a List of valid Attribute objects, update their corresponding
      * records in the database.
-     * 
-     * @param attributes
-     *            - List of Attribute objects
+     *
+     * @param attributes - List of Attribute objects
      * @return Returns the ids of the updated Germplasm {@code Attribute} record
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Integer> updateGermplasmAttribute(List<Attribute> attributes) throws MiddlewareQueryException;
+    List<Integer> updateGermplasmAttribute(List<Attribute> attributes) throws MiddlewareQueryException;
 
     /**
      * Returns the attribute record identified by the given id.
-     * 
-     * @param id
+     *
+     * @param id the id
      * @return The attribute record corresponding to the given id.
-     * @throws MiddlewareQueryException 
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public Attribute getAttributeById(Integer id) throws MiddlewareQueryException;
+    Attribute getAttributeById(Integer id) throws MiddlewareQueryException;
 
     /**
      * Given the gid of the child germplasm, the gid of the parent germplasm and
@@ -1082,46 +971,46 @@ public interface GermplasmDataManager {
      * or gpid2 fields (if the progenitor number given is 1 or 2), or will
      * either add or update the Progenitor record which represents this
      * relationship. A new Progenitor record will be stored when necessary.
-     * 
-     * @param gid
-     * @param progenitorId
-     * @param progenitorNumber
+     *
+     * @param gid the gid
+     * @param progenitorId the progenitor id
+     * @param progenitorNumber the progenitor number
      * @return Returns the id of the updated Progenitor
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public Integer updateProgenitor(Integer gid, Integer progenitorId, Integer progenitorNumber) throws MiddlewareQueryException;
+    Integer updateProgenitor(Integer gid, Integer progenitorId, Integer progenitorNumber) throws MiddlewareQueryException;
 
     /**
      * Given a valid Germplasm object, update the corresponding record in the
      * database.
-     * 
-     * @param germplasm
+     *
+     * @param germplasm the germplasm
      * @return Returns the id of the updated {@code Germplasm} record
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public Integer updateGermplasm(Germplasm germplasm) throws MiddlewareQueryException;
+    Integer updateGermplasm(Germplasm germplasm) throws MiddlewareQueryException;
 
     /**
      * Given a List of valid Germplasm objects, update the corresponding records
      * in the database.
-     * 
-     * @param germplasms
+     *
+     * @param germplasms the germplasms
      * @return Returns the ids of the updated {@code Germplasm} records
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Integer> updateGermplasm(List<Germplasm> germplasms) throws MiddlewareQueryException;
+    List<Integer> updateGermplasm(List<Germplasm> germplasms) throws MiddlewareQueryException;
 
     /**
      * Given a valid Germplasm object with a matching valid Name object to be
      * set as its preferred name, add a new Germplasm record and a new Name
      * record for the given parameters.
-     * 
-     * @param germplasm
-     * @param preferredName
+     *
+     * @param germplasm the germplasm
+     * @param preferredName the preferred name
      * @return the id of the {@code Germplasm} record added
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public Integer addGermplasm(Germplasm germplasm, Name preferredName) throws MiddlewareQueryException;
+    Integer addGermplasm(Germplasm germplasm, Name preferredName) throws MiddlewareQueryException;
 
     /**
      * Given a map of valid Germplasm and Name objects, add new records for the
@@ -1133,178 +1022,198 @@ public interface GermplasmDataManager {
      * Note that you need to assign temporary ids for the Germplasm objects so
      * that they can serve as the keys for the Map. The function will replace
      * these temp ids with the correct ones for storing in the database.
-     * 
-     * @param germplasmNameMap
+     *
+     * @param germplasmNameMap the germplasm name map
      * @return the ids of the {@code Germplasm} records added
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Integer> addGermplasm(Map<Germplasm, Name> germplasmNameMap) throws MiddlewareQueryException;
+    List<Integer> addGermplasm(Map<Germplasm, Name> germplasmNameMap) throws MiddlewareQueryException;
     
     /**
-     * Gets the germplasm Id and name Id from the names table with the given germplasm names
+     * Gets the germplasm Id and name Id from the names table with the given germplasm names.
      *
      * @param germplasmNames the germplasm names
-     * @return List of GidNidElement based on the specified list of germplasm names 
-     * @throws MiddlewareQueryException
+     * @return List of GidNidElement based on the specified list of germplasm names
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<GidNidElement> getGidAndNidByGermplasmNames(List<String> germplasmNames) throws MiddlewareQueryException;
+    List<GidNidElement> getGidAndNidByGermplasmNames(List<String> germplasmNames) throws MiddlewareQueryException;
 
     /**
-     * 
-     * @param gid
-     * @param level
+     * Gets the cross expansion.
+     *
+     * @param gid the gid
+     * @param level the level
      * @return The cross expansion based on the given gid and level
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public String getCrossExpansion(Integer gid, int level) throws MiddlewareQueryException;
+    String getCrossExpansion(Integer gid, int level) throws MiddlewareQueryException;
     
     /**
      * Get all breeding locations
      * 
-     * Return a List of Locations which represent the breeding locations stored in the location table of IBDB. 
-     * 
-     * @return
-     * @throws MiddlewareQueryException
+     * Return a List of Locations which represent the breeding locations stored in the location table of IBDB.
+     *
+     * @return the all breeding locations
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Location> getAllBreedingLocations() throws MiddlewareQueryException;
+    List<Location> getAllBreedingLocations() throws MiddlewareQueryException;
     
     /**
      * Count all breeding locations
      * 
-     * Return the total count of Locations which represent the breeding locations stored in the location table of IBDB. 
-     * 
-     * @return
-     * @throws MiddlewareQueryException
+     * Return the total count of Locations which represent the breeding locations stored in the location table of IBDB.
+     *
+     * @return the long
+     * @throws MiddlewareQueryException the middleware query exception
      */    
-    public Long countAllBreedingLocations() throws MiddlewareQueryException;
+    Long countAllBreedingLocations() throws MiddlewareQueryException;
     
     /**
-     * Returns the String representation of next available sequence number for 
+     * Returns the String representation of next available sequence number for
      * Germplasm Names with given prefix on specified database instance.
-     * 
-     * @param prefix
-     * 			- String used as prefix for Germplasm Names querying
-     * @param instance
-     *            - can be Database.LOCAL or Database.CENTRAL
+     *
+     * @param prefix - String used as prefix for Germplasm Names querying
+     * @param instance - can be Database.LOCAL or Database.CENTRAL
      * @return next available sequence number for a germplasm with given prefix.
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public String getNextSequenceNumberForCrossName(String prefix, Database instance) throws MiddlewareQueryException;
+    String getNextSequenceNumberForCrossName(String prefix, Database instance) throws MiddlewareQueryException;
     
     /**
-     * Returns the String representation of next available sequence number for 
+     * Returns the String representation of next available sequence number for
      * Germplasm Names with given prefix. Queries both Database.LOCAL and Database.CENTRAL
      * and returns the greater number.
-     * 
-     * @param prefix
-     * 			- String used as prefix for Germplasm Names querying
+     *
+     * @param prefix - String used as prefix for Germplasm Names querying
      * @return next available sequence number for a germplasm with given prefix.
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public String getNextSequenceNumberForCrossName(String prefix) throws MiddlewareQueryException;
+    String getNextSequenceNumberForCrossName(String prefix) throws MiddlewareQueryException;
 
     /**
      * Returns a Map of GIDs to preferred ids given a list of GIDs.
-     * 
-     * @param gids
-     * @return
-     * @throws MiddlewareQueryException
+     *
+     * @param gids the gids
+     * @return the preffered ids by gi ds
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public Map<Integer, String> getPrefferedIdsByGIDs(List<Integer> gids) throws MiddlewareQueryException;
+    Map<Integer, String> getPrefferedIdsByGIDs(List<Integer> gids) throws MiddlewareQueryException;
 
     /**
-     * Given the germplasm name and a location ID, returns list of all germplasm with specified name and location id
-     * 
-     * @param name 
-     * 			- search string for the name of the germplasm
-     * @param locationId
-     *          - location id to search details from
+     * Given the germplasm name and a location ID, returns list of all germplasm with specified name and location id.
+     *
+     * @param name - search string for the name of the germplasm
+     * @param locationID the location id
      * @return List of Germplasm POJOs
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Germplasm> getGermplasmByLocationId(String name, int locationID) throws MiddlewareQueryException;
+    List<Germplasm> getGermplasmByLocationId(String name, int locationID) throws MiddlewareQueryException;
     
     /**
      * Given a gid, return the Germplasm POJO representing the record identified
      * by the id with its method type.
-     * 
-     * @param gid
-     *            - the id of the germplasm record to be retrieved
+     *
+     * @param gid - the id of the germplasm record to be retrieved
      * @return the Germplasm POJO representing the record
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public Germplasm getGermplasmWithMethodType(Integer gid) throws MiddlewareQueryException;
+    Germplasm getGermplasmWithMethodType(Integer gid) throws MiddlewareQueryException;
     
     /**
-     * Given a range of gid, return the list of all Germplasm 
-     * 
-     * @param startGID
-     * 			- the start ID of the range of germplasm gids
-     * @param endGID
-     * 			- the end ID of the range of germplasm gids
+     * Given a range of gid, return the list of all Germplasm.
+     *
+     * @param startGID - the start ID of the range of germplasm gids
+     * @param endGID - the end ID of the range of germplasm gids
      * @return List of Germplasm POJOs
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */ 
-    public List<Germplasm> getGermplasmByGidRange(int startGID, int endGID) throws MiddlewareQueryException;
+    List<Germplasm> getGermplasmByGidRange(int startGID, int endGID) throws MiddlewareQueryException;
     
     /**
-     * Given a List of GIDs, return the list of all Germplasm
-     * 
-     * @param List<Integer> gids
-     * @return
-     * @throws MiddlewareQueryException
+     * Given a List of GIDs, return the list of all Germplasm.
+     *
+     * @param gids the gids
+     * @return the germplasms
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Germplasm> getGermplasms(List<Integer> gids) throws MiddlewareQueryException;
+    List<Germplasm> getGermplasms(List<Integer> gids) throws MiddlewareQueryException;
     
     /**
-     * Given a List of GIDs, return the list of all Germplasm together with their PreferredName
+     * Given a List of GIDs, return the list of all Germplasm together with their PreferredName.
+     *
+     * @param gids the gids
+     * @return the preferred names by gids
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public Map<Integer, String> getPreferredNamesByGids (List<Integer> gids) throws MiddlewareQueryException;
+    Map<Integer, String> getPreferredNamesByGids (List<Integer> gids) throws MiddlewareQueryException;
     
     /**
-     * Given a List of GIDs, return the list of gids mapped to their corresponding location name
-     * @param List<Integer> gids
-     * 			- list of gids 
+     * Given a List of GIDs, return the list of gids mapped to their corresponding location name.
+     *
+     * @param gids the gids
      * @return Map<Integer, String>
-     * 			- map of gids to their corresponding location name
-     * @throws MiddlewareQueryException
+     * - map of gids to their corresponding location name
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public Map<Integer, String> getLocationNamesByGids (List<Integer> gids) throws MiddlewareQueryException;
+    Map<Integer, String> getLocationNamesByGids (List<Integer> gids) throws MiddlewareQueryException;
 
     /**
-     * Search for germplasms given a search term Q
-     * @param q
-     * @param operation - Like or equal
+     * Search for germplasms given a search term Q.
+     *
+     * @param q the q
+     * @param o the o
      * @return - List of germplasms (including parents (level 1) with gid=Q or name like Q or in list name like Q
      * Given a List of GIDs, return the list of gids mapped to their corresponding location
-     * @param List<Integer> gids
-     * 			- list of gids
-     * @return Map<Integer, String>
-     * 			- map of gids to their corresponding location name
-     * @throws MiddlewareQueryException
+     * Map<Integer, String>
+     * - map of gids to their corresponding location name
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Germplasm> searchForGermplasm(String q, Operation o) throws MiddlewareQueryException;
+    List<Germplasm> searchForGermplasm(String q, Operation o) throws MiddlewareQueryException;
 
-    public List<Location> getLocationsByIDs(List<Integer> ids) throws  MiddlewareQueryException;
+    /**
+     * Gets the locations by the given IDs.
+     *
+     * @param ids Location IDs
+     * @return the corresponding Locations
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Location> getLocationsByIDs(List<Integer> ids) throws  MiddlewareQueryException;
 
-    public List<LocationDetails> getLocationDetailsByLocationIDs(List<Integer> ids) throws  MiddlewareQueryException;
+    /**
+     * Gets the location details by location IDs.
+     *
+     * @param ids the Location IDs
+     * @return the location details corresponding to the given IDs
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<LocationDetails> getLocationDetailsByLocationIDs(List<Integer> ids) throws  MiddlewareQueryException;
 
-    public List<Method> getMethodsByIDs(List<Integer> ids) throws MiddlewareQueryException;
+    /**
+     * Gets the methods by IDs.
+     *
+     * @param ids the Method Ids
+     * @return the methods corresponding to the given IDs
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Method> getMethodsByIDs(List<Integer> ids) throws MiddlewareQueryException;
     
     /**
-     * Get gDates given GIDs
-     * @param gids
+     * Get gDates given GIDs.
+     *
+     * @param gids the gids
      * @return <gid, integerdatevalue>
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public Map<Integer, Integer> getGermplasmDatesByGids(List<Integer> gids) throws MiddlewareQueryException;
+    Map<Integer, Integer> getGermplasmDatesByGids(List<Integer> gids) throws MiddlewareQueryException;
 
     /**
-     * Get methods given GIDs
-     * @param gids
+     * Get methods given GIDs.
+     *
+     * @param gids the gids
      * @return Map<gid, method>
-     * @throws MiddlewareQueryException
+     * @throws MiddlewareQueryException the middleware query exception
      */
-    public Map<Integer, Object> getMethodsByGids(List<Integer> gids) throws MiddlewareQueryException;
+    Map<Integer, Object> getMethodsByGids(List<Integer> gids) throws MiddlewareQueryException;
 
     
 }

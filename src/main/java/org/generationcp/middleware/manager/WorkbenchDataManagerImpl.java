@@ -12,14 +12,12 @@
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.generationcp.middleware.dao.*;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.*;

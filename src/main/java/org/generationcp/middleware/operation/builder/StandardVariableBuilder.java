@@ -153,7 +153,7 @@ public class StandardVariableBuilder extends Builder {
 	            }
 	        }
 	    }
-	    if (term.getId() > 0) {
+	    if (term != null && term.getId() > 0) {
 	        Database database = getActiveDatabase();
 	        setWorkingDatabase(Database.LOCAL);
 	        CVTermProperty property = getCvTermPropertyDao().getOneByCvTermAndType(term.getId(), TermId.CROP_ONTOLOGY_ID.getId());

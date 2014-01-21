@@ -523,8 +523,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
     @Override
     public List<Integer> getNIdsByMarkerIdsAndDatasetIdsAndNotGIds(List<Integer> datasetIds, List<Integer> markerIds, List<Integer> gIds,
             int start, int numOfRows) throws MiddlewareQueryException {
-        List<Integer> nidList = getNIdsByMarkerIdsAndDatasetIdsAndNotGIdsFromDB(datasetIds, markerIds, gIds, start, numOfRows);
-    	return nidList; //.subList(start, start+numOfRows);
+        return (List<Integer>) getNIdsByMarkerIdsAndDatasetIdsAndNotGIdsFromDB(datasetIds, markerIds, gIds, start, numOfRows);
     }
 
     @Override

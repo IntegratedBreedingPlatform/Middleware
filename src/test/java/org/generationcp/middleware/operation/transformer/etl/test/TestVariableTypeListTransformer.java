@@ -21,8 +21,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 import org.mockito.Mockito;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TestVariableTypeListTransformer {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(TestVariableTypeListTransformer.class);
 
 	private long startTime;
 	
@@ -101,7 +105,7 @@ public class TestVariableTypeListTransformer {
 		testTransform(isVariate);
 	}
 	
-	private void testTransform(boolean isVariate) throws Exception {
+	private void testTransform(boolean isVariate) throws Exception { 
 		List<MeasurementVariable> measurementVariables = createMeasurmentVariablesTestData(isVariate);
 		Mockito.when(transformer.transform(measurementVariables, isVariate)).thenCallRealMethod();
 		Mockito.when(transformer.transform(measurementVariables, isVariate, 1)).thenCallRealMethod();
@@ -128,9 +132,8 @@ public class TestVariableTypeListTransformer {
 			Field field = Transformer.class.getDeclaredField("standardVariableBuilder");
 			field.setAccessible(true);
 			field.set(transformer, standardVariableBuilder);
-			
 		} catch (Exception e) {
-		    e.printStackTrace();
+		    LOG.error(e.getMessage(), e);
 		}
 	}
 	

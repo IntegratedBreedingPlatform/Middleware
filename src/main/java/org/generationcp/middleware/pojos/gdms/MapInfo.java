@@ -13,7 +13,6 @@ package org.generationcp.middleware.pojos.gdms;
 
 import java.io.Serializable;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
 
 /**
  * The Class MapInfo. For the details of a MappingData.

@@ -247,8 +247,10 @@ public class WorkbookSaver extends Saver {
 			VariableList geolocation = getVariableListTransformer().transformTrialEnvironment(row, trialFactors, trialHeaders);
 			if (geolocation != null && geolocation.size() > 0) {
 				String trialInstanceNumber = getTrialInstanceNumber(geolocation);
-				LOG.debug("trialInstanceNumber = "+trialInstanceNumber);
-				if(trialInstanceNumbers.add(trialInstanceNumber)) {//if new location (unique by trial instance number)
+                if (LOG.isDebugEnabled()){
+                    LOG.debug("trialInstanceNumber = "+trialInstanceNumber);
+                }
+                if(trialInstanceNumbers.add(trialInstanceNumber)) {//if new location (unique by trial instance number)
 		            watch.restart("save geolocation");
 		            Geolocation g = getGeolocationSaver().saveGeolocation(geolocation, row); 
 		            locationId = g.getLocationId();
@@ -262,7 +264,8 @@ public class WorkbookSaver extends Saver {
 				row.setLocationId(locationId);
 	        }
 		}
-		return new Long(workbook.getObservations().get(0).getLocationId()).intValue();//return studyLocationId
+        //return studyLocationId
+		return Long.valueOf(workbook.getObservations().get(0).getLocationId()).intValue();
 	}
 	
 	private MeasurementVariable getMainFactor(List<MeasurementVariable> mvars) {

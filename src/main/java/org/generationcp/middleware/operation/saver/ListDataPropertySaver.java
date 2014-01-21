@@ -52,7 +52,7 @@ public class ListDataPropertySaver extends Saver {
     						}
     						String value = column.getValue();
     						if (value != null){
-    							value = value.trim().isEmpty() ? null : value; // if empty string, save as NULL
+    							value = value.trim().isEmpty() ? null : value; // if empty string, save as NULL PM
     						}
 							property.setValue(value);
     						
@@ -80,7 +80,7 @@ public class ListDataPropertySaver extends Saver {
             trans.commit();
         } catch (MiddlewareQueryException e) {
             rollbackTransaction(trans);
-            throw new MiddlewareQueryException("Error in saving List Data properties - " + e.getMessage());
+            throw new MiddlewareQueryException("Error in saving List Data properties - " + e.getMessage(), e);
             
         } finally {
             sessionForLocal.flush();

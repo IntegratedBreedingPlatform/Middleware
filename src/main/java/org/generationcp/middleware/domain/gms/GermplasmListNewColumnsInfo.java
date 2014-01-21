@@ -87,23 +87,26 @@ public class GermplasmListNewColumnsInfo implements Serializable {
 		return builder.toString();
 	}
 
-	public void print(int indent){
-		Debug.println(indent, "New Columns for List " + listId + 
-				", # of Columns = " + columnValuesMap.keySet().size());
-		
-		if (columnValuesMap != null){
-			Set<Entry<String, List<ListDataColumnValues>>> entrySet = columnValuesMap.entrySet();
-			for (Entry<String, List<ListDataColumnValues>> entry : entrySet){
-				Debug.println(indent+3, "COLUMN : " + entry.getKey());
-				
-				for (ListDataColumnValues columnValues : entry.getValue()){
-					Debug.println(indent+6, "ListData ID=" + columnValues.getListDataId() + 
-							", value=" + columnValues.getValue());
-				}
-			}
-		}
-		
-	}
+    public void print(int indent) {
+
+        if (columnValuesMap != null) {
+            if (columnValuesMap.keySet() != null) {
+                Debug.println(indent, "New Columns for List " + listId + ", # of Columns = "
+                        + columnValuesMap.keySet().size());
+            }
+
+            Set<Entry<String, List<ListDataColumnValues>>> entrySet = columnValuesMap.entrySet();
+            for (Entry<String, List<ListDataColumnValues>> entry : entrySet) {
+                Debug.println(indent + 3, "COLUMN : " + entry.getKey());
+
+                for (ListDataColumnValues columnValues : entry.getValue()) {
+                    Debug.println(indent + 6,
+                            "ListData ID=" + columnValues.getListDataId() + ", value=" + columnValues.getValue());
+                }
+            }
+        }
+
+    }
 	
 
 }

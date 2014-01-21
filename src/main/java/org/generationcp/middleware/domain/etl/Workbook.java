@@ -190,7 +190,7 @@ public class Workbook {
 	}
 	
 	public List<MeasurementVariable> getStudyConstants() {
-		if(studyConstants==null) {
+		if(studyConstants == null) {
 			studyConstants = getVariables(constants, true);
 		}
 		return studyConstants;

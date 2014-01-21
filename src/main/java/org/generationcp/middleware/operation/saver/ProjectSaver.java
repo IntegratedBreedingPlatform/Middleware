@@ -13,13 +13,11 @@ package org.generationcp.middleware.operation.saver;
 
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.domain.dms.StudyValues;
-import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.ProjectProperty;
 
 public class ProjectSaver extends Saver {
 
@@ -68,7 +66,7 @@ public class ProjectSaver extends Saver {
 			errorMessage.append("\nprojectKey is null");
 		}
 		
-		if (!errorMessage.toString().equals("")){
+		if (errorMessage.length() > 0){
 			throw new MiddlewareException(errorMessage.toString());
 		}
 

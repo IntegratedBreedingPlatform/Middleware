@@ -40,6 +40,7 @@ public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer>{
         return null;
     }
     
+    @SuppressWarnings("unchecked")
     public List<ProjectUserInfo> getByProjectId(Integer projectId) throws MiddlewareQueryException{
         try{
         	if (projectId != null ){

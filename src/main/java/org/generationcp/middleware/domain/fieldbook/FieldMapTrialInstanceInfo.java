@@ -21,7 +21,6 @@ import java.util.Set;
 
 import org.generationcp.middleware.util.Debug;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class FieldMapTrialInstanceInfo.
  */

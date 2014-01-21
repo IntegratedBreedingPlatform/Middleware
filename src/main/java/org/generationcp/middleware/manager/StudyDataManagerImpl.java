@@ -76,7 +76,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     public StudyDataManagerImpl(HibernateSessionProvider sessionProviderForLocal,
                                 HibernateSessionProvider sessionProviderForCentral) {
         super(sessionProviderForLocal, sessionProviderForCentral);
-        germplasmDataManager = new GermplasmDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+        germplasmDataManager = new GermplasmDataManagerImpl(sessionProviderForLocal, 
+                sessionProviderForCentral);
 
     }
 
@@ -162,19 +163,25 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public StudyResultSet searchStudies(StudyQueryFilter filter, int numOfRows) throws MiddlewareQueryException {
+    public StudyResultSet searchStudies(StudyQueryFilter filter, int numOfRows) 
+            throws MiddlewareQueryException {
         if (filter instanceof ParentFolderStudyQueryFilter) {
-            return new StudyResultSetByParentFolder((ParentFolderStudyQueryFilter) filter, numOfRows, this.sessionProviderForLocal, this.sessionProviderForCentral);
+            return new StudyResultSetByParentFolder((ParentFolderStudyQueryFilter) filter, numOfRows, 
+                    this.sessionProviderForLocal, this.sessionProviderForCentral);
         } else if (filter instanceof GidStudyQueryFilter) {
-            return new StudyResultSetByGid((GidStudyQueryFilter) filter, numOfRows, this.sessionProviderForLocal, this.sessionProviderForCentral);
+            return new StudyResultSetByGid((GidStudyQueryFilter) filter, numOfRows, 
+                    this.sessionProviderForLocal, this.sessionProviderForCentral);
         } else if (filter instanceof BrowseStudyQueryFilter) {
-            return new StudyResultSetByNameStartDateSeasonCountry((BrowseStudyQueryFilter) filter, numOfRows, this.sessionProviderForLocal, this.sessionProviderForCentral);
+            return new StudyResultSetByNameStartDateSeasonCountry(
+                    (BrowseStudyQueryFilter) filter, numOfRows, this.sessionProviderForLocal, 
+                    this.sessionProviderForCentral);
         }
         return null;
     }
 
     @Override
-    public StudyReference addStudy(int parentFolderId, VariableTypeList variableTypeList, StudyValues studyValues) throws MiddlewareQueryException {
+    public StudyReference addStudy(int parentFolderId, VariableTypeList variableTypeList, 
+            StudyValues studyValues) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
@@ -198,16 +205,19 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 
     @Override
-    public DatasetReference addDataSet(int studyId, VariableTypeList variableTypeList, DatasetValues datasetValues) throws MiddlewareQueryException {
+    public DatasetReference addDataSet(int studyId, VariableTypeList variableTypeList, 
+            DatasetValues datasetValues) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
         try {
             trans = session.beginTransaction();
-            DmsProject datasetProject = getDatasetProjectSaver().addDataSet(studyId, variableTypeList, datasetValues);
+            DmsProject datasetProject = getDatasetProjectSaver()
+                    .addDataSet(studyId, variableTypeList, datasetValues);
             trans.commit();
-            return new DatasetReference(datasetProject.getProjectId(), datasetProject.getName(), datasetProject.getDescription());
+            return new DatasetReference(datasetProject.getProjectId(), 
+                    datasetProject.getName(), datasetProject.getDescription());
 
         } catch (Exception e) {
             rollbackTransaction(trans);
@@ -216,10 +226,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public List<Experiment> getExperiments(int dataSetId, int start, int numRows) throws MiddlewareQueryException {
+    public List<Experiment> getExperiments(int dataSetId, int start, int numRows) 
+            throws MiddlewareQueryException {
         clearSessions();
         VariableTypeList variableTypes = getDataSetBuilder().getVariableTypes(dataSetId);
-        return getExperimentBuilder().build(dataSetId, PlotUtil.getAllPlotTypes(), start, numRows, variableTypes);
+        return getExperimentBuilder().build(
+                dataSetId, PlotUtil.getAllPlotTypes(), start, numRows, variableTypes);
     }
 
     @Override
@@ -228,7 +240,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public void addExperiment(int dataSetId, ExperimentType experimentType, ExperimentValues experimentValues) throws MiddlewareQueryException {
+    public void addExperiment(int dataSetId, ExperimentType experimentType, 
+            ExperimentValues experimentValues) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
@@ -245,7 +258,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
     
     @Override
-    public void addOrUpdateExperiment(int dataSetId, ExperimentType experimentType, ExperimentValues experimentValues) throws MiddlewareQueryException {
+    public void addOrUpdateExperiment(int dataSetId, ExperimentType experimentType, 
+            ExperimentValues experimentValues) throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
@@ -299,7 +313,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public List<DataSet> getDataSetsByType(int studyId, DataSetType dataSetType) throws MiddlewareQueryException {
+    public List<DataSet> getDataSetsByType(int studyId, DataSetType dataSetType) 
+            throws MiddlewareQueryException {
         setWorkingDatabase(studyId);
 
         List<DmsProject> datasetProjects = getDmsProjectDao().getDataSetsByStudyAndProjectProperty(
@@ -314,16 +329,19 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public long countExperimentsByTrialEnvironmentAndVariate(int trialEnvironmentId, int variateVariableId) throws MiddlewareQueryException {
+    public long countExperimentsByTrialEnvironmentAndVariate(
+            int trialEnvironmentId, int variateVariableId) throws MiddlewareQueryException {
         long count = 0;
         if (this.setWorkingDatabase(trialEnvironmentId)) {
-            count = getExperimentDao().countByTrialEnvironmentAndVariate(trialEnvironmentId, variateVariableId);
+            count = getExperimentDao().countByTrialEnvironmentAndVariate(
+                    trialEnvironmentId, variateVariableId);
         }
         return count;
     }
 
     @Override
-    public void addDataSetVariableType(int datasetId, VariableType variableType) throws MiddlewareQueryException {
+    public void addDataSetVariableType(int datasetId, VariableType variableType) 
+            throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
@@ -340,7 +358,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public void setExperimentValue(int experimentId, int variableId, String value) throws MiddlewareQueryException {
+    public void setExperimentValue(int experimentId, int variableId, String value) 
+            throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
@@ -357,7 +376,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public TrialEnvironments getTrialEnvironmentsInDataset(int datasetId) throws MiddlewareQueryException {
+    public TrialEnvironments getTrialEnvironmentsInDataset(int datasetId) 
+            throws MiddlewareQueryException {
         return getTrialEnvironmentBuilder().getTrialEnvironmentsInDataset(datasetId);
     }
 
@@ -367,7 +387,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public long countStocks(int datasetId, int trialEnvironmentId, int variateStdVarId) throws MiddlewareQueryException {
+    public long countStocks(int datasetId, int trialEnvironmentId, int variateStdVarId) 
+            throws MiddlewareQueryException {
         if (this.setWorkingDatabase(datasetId)) {
             return getStockDao().countStocks(datasetId, trialEnvironmentId, variateStdVarId);
         }
@@ -375,7 +396,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public long countObservations(int datasetId, int trialEnvironmentId, int variateStdVarId) throws MiddlewareQueryException {
+    public long countObservations(int datasetId, int trialEnvironmentId, int variateStdVarId) 
+            throws MiddlewareQueryException {
         if (this.setWorkingDatabase(datasetId)) {
             return getStockDao().countObservations(datasetId, trialEnvironmentId, variateStdVarId);
         }
@@ -383,7 +405,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public DataSet findOneDataSetByType(int studyId, DataSetType dataSetType) throws MiddlewareQueryException {
+    public DataSet findOneDataSetByType(int studyId, DataSetType dataSetType) 
+            throws MiddlewareQueryException {
         List<DataSet> datasets = getDataSetsByType(studyId, dataSetType);
         if (datasets != null && datasets.size() >= 1) {
             return datasets.get(0);
@@ -424,7 +447,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public String getLocalNameByStandardVariableId(Integer projectId, Integer standardVariableId) throws MiddlewareQueryException {
+    public String getLocalNameByStandardVariableId(Integer projectId, Integer standardVariableId) 
+            throws MiddlewareQueryException {
         setWorkingDatabase(projectId);
         Session session = getActiveSession();
 
@@ -450,7 +474,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 
     @Override
-    public List<StudyDetails> getAllStudyDetails(Database instance, StudyType studyType) throws MiddlewareQueryException {
+    public List<StudyDetails> getAllStudyDetails(Database instance, StudyType studyType) 
+            throws MiddlewareQueryException {
         setWorkingDatabase(instance);
         return getDmsProjectDao().getAllStudyDetails(studyType);
     }
@@ -492,7 +517,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public List<FieldMapInfo> getFieldMapInfoOfStudy(List<Integer> studyIdList, StudyType studyType) throws MiddlewareQueryException {
+    public List<FieldMapInfo> getFieldMapInfoOfStudy(List<Integer> studyIdList, StudyType studyType) 
+            throws MiddlewareQueryException {
         List<FieldMapInfo> fieldMapInfos = new ArrayList<FieldMapInfo>();
 
         for (Integer studyId : studyIdList) {
@@ -541,7 +567,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public void saveOrUpdateFieldmapProperties(List<FieldMapInfo> info, String fieldmapUUID) throws MiddlewareQueryException {
+    public void saveOrUpdateFieldmapProperties(List<FieldMapInfo> info, String fieldmapUUID) 
+            throws MiddlewareQueryException {
 
         if (info != null && !info.isEmpty()) {//&& !info.getDatasetsWithFieldMap().isEmpty()) {
 
@@ -558,32 +585,40 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
             } catch (Exception e) {
                 rollbackTransaction(trans);
-                logAndThrowException("Error encountered with saveOrUpdateFieldmapProperties(): " + e.getMessage(),
-                        e, LOG);
+                logAndThrowException("Error encountered with saveOrUpdateFieldmapProperties(): " 
+                        + e.getMessage(), e, LOG);
             }
         }
 
     }
 
     @Override
-    public void saveTrialDatasetSummary(DmsProject project, VariableTypeList variableTypeList, List<ExperimentValues> experimentValues, List<Integer> locationIds) throws MiddlewareQueryException {
+    public void saveTrialDatasetSummary(
+            DmsProject project, VariableTypeList variableTypeList, 
+            List<ExperimentValues> experimentValues, List<Integer> locationIds) 
+                    throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
 
         try {
             trans = session.beginTransaction();
-            if (variableTypeList != null && variableTypeList.getVariableTypes() != null && !variableTypeList.getVariableTypes().isEmpty()) {
+            if (variableTypeList != null 
+                    && variableTypeList.getVariableTypes() != null 
+                    && !variableTypeList.getVariableTypes().isEmpty()) {
                 getProjectPropertySaver().saveProjectProperties(project, variableTypeList);
             }
             if (experimentValues != null && !experimentValues.isEmpty()) {
                 for (Integer locationId : locationIds) {
                     //delete phenotypes by project id and locationId
-                    getPhenotypeDao().deletePhenotypesByProjectIdAndLocationId(project.getProjectId(), locationId);
+                    getPhenotypeDao().deletePhenotypesByProjectIdAndLocationId(
+                            project.getProjectId(), locationId);
                 }
                 for (ExperimentValues exp : experimentValues) {
                     if (exp.getVariableList() != null && exp.getVariableList().size() > 0) {
-                        ExperimentModel experimentModel = getExperimentDao().getExperimentByProjectIdAndLocation(project.getProjectId(), exp.getLocationId());
+                        ExperimentModel experimentModel = getExperimentDao()
+                                .getExperimentByProjectIdAndLocation(
+                                        project.getProjectId(), exp.getLocationId());
                         getPhenotypeSaver().savePhenotypes(experimentModel, exp.getVariableList());
                     }
                 }
@@ -603,7 +638,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         List<FieldMapInfo> fieldMapInfos = new ArrayList<FieldMapInfo>();
         setWorkingDatabase(datasetId);
         
-        fieldMapInfos = getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId);
+        fieldMapInfos = getExperimentPropertyDao()
+                .getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId);
 
         // Filter those belonging to the given geolocationId
         for (FieldMapInfo fieldMapInfo : fieldMapInfos) {
@@ -706,7 +742,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         }
     }
 
-    public boolean moveDmsProject(int sourceId, int targetId, boolean isAStudy) throws MiddlewareQueryException {
+    public boolean moveDmsProject(int sourceId, int targetId, boolean isAStudy) 
+            throws MiddlewareQueryException {
         requireLocalDatabaseInstance();
         DmsProject source = getDmsProjectDao().getById(sourceId);
         DmsProject target = getDmsProjectDao().getById(targetId);
@@ -732,7 +769,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             return true;
         } catch (MiddlewareException e) {
             rollbackTransaction(trans);
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            LOG.error(e.getMessage(), e);
             return false;
         }
     }
@@ -777,10 +814,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
             requireCentralDatabaseInstance();
         else
             requireLocalDatabaseInstance();
-        DmsProject folderParentFolder = getProjectRelationshipDao().getObjectBySubjectIdAndTypeId(id, TermId.HAS_PARENT_FOLDER.getId());
-        DmsProject studyParentFolder = getProjectRelationshipDao().getObjectBySubjectIdAndTypeId(id, TermId.STUDY_HAS_FOLDER.getId());
-        if (studyParentFolder != null)
+        DmsProject folderParentFolder = getProjectRelationshipDao()
+                .getObjectBySubjectIdAndTypeId(id, TermId.HAS_PARENT_FOLDER.getId());
+        DmsProject studyParentFolder = getProjectRelationshipDao()
+                .getObjectBySubjectIdAndTypeId(id, TermId.STUDY_HAS_FOLDER.getId());
+        if (studyParentFolder != null){
             return studyParentFolder;
+        }
         return folderParentFolder;
     }
 
@@ -792,7 +832,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
     @SuppressWarnings({"unchecked"})
     @Override
-    public List<StudyDetails> getStudyDetails(StudyType studyType, int start, int numOfRows) throws MiddlewareQueryException {
+    public List<StudyDetails> getStudyDetails(StudyType studyType, int start, int numOfRows) 
+            throws MiddlewareQueryException {
         List<String> methods = Arrays.asList("countAllStudyDetails", "getAllStudyDetails");
         Object[] parameters = new Object[]{studyType};
         return getFromLocalAndCentralByMethod(getDmsProjectDao(), methods, start, numOfRows,

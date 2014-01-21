@@ -61,32 +61,61 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
     public List<FieldMapDatasetInfo> getFieldMapLabels(int projectId) throws MiddlewareQueryException{
         List<FieldMapDatasetInfo> datasets = null;
         /*  
-            SET @projectId = 5790;
-                        
+            SET @projectId = -139;
+            
             SELECT eproj.project_id AS datasetId, proj.name AS datasetName, 
-            geo.nd_geolocation_id AS geolocationId, site.value AS siteName,
-            eproj.nd_experiment_id AS experimentId, s.uniquename AS entryNumber, 
-            s.name AS germplasmName, epropRep.value AS rep, epropPlot.value AS plotNo
+            geo.nd_geolocation_id AS geolocationId, site.value AS siteName, 
+            eproj.nd_experiment_id AS experimentId, s.uniquename AS entryNumber,  
+            s.name AS germplasmName, epropRep.value AS rep, epropPlot.value AS plotNo, 
+            row.value AS row, col.value AS col, rBlock.value AS rowsInBlock, 
+            cBlock.value AS columnsInBlock, pOrder.value AS plantingOrder, 
+            rpp.value AS rowsPerPlot, blkName.value AS blockName, 
+            locName.value AS locationName, fldName.value AS fieldName, 
+            inst.description AS trialInstance, st.name AS studyName, 
+            s.dbxref_id as gid, ppStartDate.value as startDate, gpSeason.value as season 
+            
             FROM nd_experiment_project eproj  
-            INNER JOIN project_relationship pr ON pr.object_project_id = @projectId AND pr.type_id = 1150
-            INNER JOIN nd_experiment_stock es ON eproj.nd_experiment_id = es.nd_experiment_id 
-              AND eproj.project_id = pr.subject_project_id 
-            INNER JOIN stock s ON es.stock_id = s.stock_id
-            LEFT JOIN nd_experimentprop epropRep ON eproj.nd_experiment_id = epropRep.nd_experiment_id 
-              AND epropRep.type_id =  8210 AND eproj.project_id = pr.subject_project_id 
-              AND epropRep.value IS NOT NULL  AND epropRep.value <> '' 
-            INNER JOIN nd_experimentprop epropPlot ON eproj.nd_experiment_id = epropPlot.nd_experiment_id 
-              AND epropPlot.type_id IN (8200, 8380)
-              AND eproj.project_id = pr.subject_project_id 
-              AND epropPlot.value IS NOT NULL  AND epropPlot.value <> ''
-            INNER JOIN nd_experiment geo ON eproj.nd_experiment_id = geo.nd_experiment_id
-              AND geo.type_id = 1155
-            INNER JOIN nd_geolocationprop site ON geo.nd_geolocation_id = site.nd_geolocation_id
-              AND site.type_id = 8180
-            INNER JOIN project proj on proj.project_id = eproj.project_id
- 
-            ORDER BY eproj.nd_experiment_id ;  -- ASC /DESC depending on the sign of the id
-    
+               INNER JOIN project_relationship pr ON pr.object_project_id = @projectId AND pr.type_id = 1150
+               INNER JOIN project st ON st.project_id = pr.object_project_id 
+                   LEFT JOIN projectprop ppStartDate ON ppStartDate.project_id = pr.object_project_id 
+                           AND ppStartDate.type_id = 8050 
+                   INNER JOIN nd_experiment_stock es ON eproj.nd_experiment_id = es.nd_experiment_id  
+                           AND eproj.project_id = pr.subject_project_id 
+                   INNER JOIN stock s ON es.stock_id = s.stock_id 
+                   LEFT JOIN nd_experimentprop epropRep ON eproj.nd_experiment_id = epropRep.nd_experiment_id 
+                           AND epropRep.type_id =  8210  AND eproj.project_id = pr.subject_project_id  
+                           AND epropRep.value IS NOT NULL  AND epropRep.value <> '' 
+                   INNER JOIN nd_experimentprop epropPlot ON eproj.nd_experiment_id = epropPlot.nd_experiment_id 
+                           AND epropPlot.type_id IN (8200, 8380)
+                           AND eproj.project_id = pr.subject_project_id 
+                           AND epropPlot.value IS NOT NULL  AND epropPlot.value <> '' 
+                   INNER JOIN nd_experiment geo ON eproj.nd_experiment_id = geo.nd_experiment_id 
+                           AND geo.type_id = 1155
+                   INNER JOIN nd_geolocation inst ON geo.nd_geolocation_id = inst.nd_geolocation_id 
+                   LEFT JOIN nd_geolocationprop site ON geo.nd_geolocation_id = site.nd_geolocation_id 
+                           AND site.type_id = 8180
+                   INNER JOIN project proj on proj.project_id = eproj.project_id 
+                   LEFT JOIN nd_experimentprop row ON row.nd_experiment_id = eproj.nd_experiment_id 
+                           AND row.type_id = 32769
+                   LEFT JOIN nd_experimentprop col ON col.nd_experiment_id = eproj.nd_experiment_id 
+                           AND col.type_id = 32770
+                   LEFT JOIN nd_experimentprop rBlock ON rBlock.nd_experiment_id = eproj.nd_experiment_id 
+                           AND rBlock.type_id = 32772
+                   LEFT JOIN nd_experimentprop cBlock ON cBlock.nd_experiment_id = eproj.nd_experiment_id 
+                           AND cBlock.type_id = 32773
+                   LEFT JOIN nd_experimentprop pOrder ON pOrder.nd_experiment_id = eproj.nd_experiment_id 
+                           AND pOrder.type_id = 32774
+                   LEFT JOIN nd_experimentprop rpp ON rpp.nd_experiment_id = eproj.nd_experiment_id 
+                           AND rpp.type_id = 32780
+                   LEFT JOIN nd_experimentprop blkName ON blkName.nd_experiment_id = eproj.nd_experiment_id 
+                           AND blkName.type_id = 8221
+                   LEFT JOIN nd_experimentprop locName ON locName.nd_experiment_id = eproj.nd_experiment_id 
+                           AND locName.type_id = 8196
+                   LEFT JOIN nd_experimentprop fldName ON fldName.nd_experiment_id = eproj.nd_experiment_id 
+                           AND fldName.type_id = 32783
+                   LEFT JOIN nd_geolocationprop gpSeason ON geo.nd_geolocation_id = gpSeason.nd_geolocation_id 
+                           AND gpSeason.type_id =  8371
+             ORDER BY eproj.nd_experiment_id DESC;    
         */
         try {
             String order = projectId > 0 ? "ASC" : "DESC";
@@ -264,7 +293,6 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 .append("    WHERE e.nd_geolocation_id = :geolocationId ")
                 .append("    AND eproject.project_id = :datasetId) ")
                 .append(" ORDER BY eproj.nd_experiment_id ").append(order);
-                ;
                 
                 Query query = getSession().createSQLQuery(sql.toString())
                         .addScalar("datasetId")

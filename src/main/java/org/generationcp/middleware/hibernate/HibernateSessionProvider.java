@@ -26,12 +26,12 @@ public interface HibernateSessionProvider {
      * 
      * @return
      */
-    public Session getSession();
+    Session getSession();
     
     /**
      * Close this {@link HibernateSessionProvider}.<br>
      * Implementations should clear resources used by this
      * {@link HibernateSessionProvider}.
      */
-    public void close();
+    void close();
 }

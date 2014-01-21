@@ -279,7 +279,7 @@ public class Location implements Serializable, Comparable<Location>{
  
     }
  
-    public static Comparator<Location> LocationNameComparator 
+    public static Comparator<Location> LocationNameComparator  
                           = new Comparator<Location>() {
         @Override
         public int compare(Location location1, Location location2) {

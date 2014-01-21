@@ -12,8 +12,6 @@
 package org.generationcp.middleware.service.test;
 
 
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -90,7 +88,7 @@ public class TestFieldbookServiceImpl {
     @Test
     public void testGetFieldMapCountsOfTrial() throws MiddlewareQueryException{
         List<Integer> trialIds = new ArrayList<Integer>();
-        trialIds.add(new Integer(5734)); 
+        trialIds.add(Integer.valueOf(1)); 
         List<FieldMapInfo> fieldMapCount = fieldbookService.getFieldMapInfoOfTrial(trialIds);
         for (FieldMapInfo fieldMapInfo : fieldMapCount) {
             fieldMapInfo.print(3);
@@ -101,13 +99,23 @@ public class TestFieldbookServiceImpl {
     @Test
     public void testGetFieldMapCountsOfNursery() throws MiddlewareQueryException{
         List<Integer> nurseryIds = new ArrayList<Integer>();
-        nurseryIds.add(new Integer(5734)); 
+        nurseryIds.add(Integer.valueOf(5734)); 
         List<FieldMapInfo> fieldMapCount = fieldbookService.getFieldMapInfoOfNursery(nurseryIds);
         for (FieldMapInfo fieldMapInfo : fieldMapCount) {
             fieldMapInfo.print(3);
         }
        // assertTrue(fieldMapCount.getEntryCount() > 0);      
     }
+
+    @Test
+    public void testGetAllFieldMapsInBlockByTrialInstanceId() throws MiddlewareQueryException{
+        List<FieldMapInfo> fieldMapCount = fieldbookService.getAllFieldMapsInBlockByTrialInstanceId(-2, -1);
+        for (FieldMapInfo fieldMapInfo : fieldMapCount) {
+            fieldMapInfo.print(3);
+        }
+        //assertTrue(fieldMapCount.getEntryCount() > 0);      
+    }
+    
 
     @Test
     public void testGetAllLocations() throws MiddlewareQueryException {

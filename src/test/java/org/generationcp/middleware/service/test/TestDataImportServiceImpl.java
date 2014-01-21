@@ -81,7 +81,8 @@ public class TestDataImportServiceImpl {
 
             id = dataImportService.saveDataset(workbook);
         }
-        Debug.println(0, "Created study: " + id + ", name = " + workbooks.get(0).getStudyDetails().getStudyName());
+        String name = workbooks.get(0).getStudyDetails() != null ? workbooks.get(0).getStudyDetails().getStudyName() : null;
+        Debug.println(0, "Created study: " + id + ", name = " + name);
     }
 
     @Test
@@ -98,7 +99,8 @@ public class TestDataImportServiceImpl {
         Workbook workbook = TestNurseryWorkbookUtil.getTestWorkbook();
         workbook.print(0);
         int id = dataImportService.saveDataset(workbook);
-        Debug.println(0, "Created study:" + id + ", name = " + workbook.getStudyDetails().getStudyName());
+        String name = workbook.getStudyDetails() != null ? workbook.getStudyDetails().getStudyName() : null;
+        Debug.println(0, "Created study:" + id + ", name = " + name);
     }
 
     @Test
@@ -224,7 +226,7 @@ public class TestDataImportServiceImpl {
     	Workbook workbook = TestWorkbookUtil.getTestWorkbook();
         workbook.print(0);
         dataImportService.saveDataset(workbook);
-        String name = workbook.getStudyDetails().getStudyName();
+        String name = workbook.getStudyDetails() != null ? workbook.getStudyDetails().getStudyName() : null;
         Debug.println(0, "Name: " + name);
 		boolean isExisting = dataImportService.checkIfProjectNameIsExisting(name);
 		assertTrue(isExisting);

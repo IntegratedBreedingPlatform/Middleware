@@ -18,8 +18,6 @@ import java.util.List;
 
 import org.generationcp.middleware.util.Debug;
 
-
-// TODO: Auto-generated Javadoc
 /**
  * 
  * Contains the field map information needed by the Field Map tool: 
@@ -191,6 +189,11 @@ public class FieldMapInfo implements Serializable{
         indent = indent + 3;
         Debug.println(indent, "Fieldbook Name: " + fieldbookName);
         Debug.println(indent, "Is Trial = " + isTrial);
+        if (datasets != null){
+            for (FieldMapDatasetInfo datasetInfo : datasets){
+                datasetInfo.print(indent);
+            }
+        }
     }
     
 }

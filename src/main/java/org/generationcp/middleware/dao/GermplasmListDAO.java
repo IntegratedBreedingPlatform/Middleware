@@ -16,7 +16,6 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.hibernate.Criteria;
@@ -326,6 +325,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
      * @return List of GermplasmLists
      * @throws MiddlewareQueryException 
      */
+    @SuppressWarnings("unchecked")
     public List<GermplasmList> searchForGermplasmLists(String q, Operation o) throws MiddlewareQueryException{
     	if(q.equals("")){
     		return new ArrayList<GermplasmList>();

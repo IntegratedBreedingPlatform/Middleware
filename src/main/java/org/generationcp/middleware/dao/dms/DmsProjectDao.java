@@ -41,8 +41,6 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link DmsProject}.
@@ -51,9 +49,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
-	
-	private final static Logger LOG = LoggerFactory.getLogger(DmsProjectDao.class);
-    
+	    
 	private static final String GET_CHILDREN_OF_FOLDER =		
 			"SELECT DISTINCT subject.project_id, subject.name,  subject.description " 
 			+ "		, (CASE WHEN (type_id = " + TermId.IS_STUDY.getId() + ") THEN 1 ELSE 0 END) AS is_study  "
@@ -488,7 +484,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return null;
 	}
 	
-	@SuppressWarnings("unchecked")
     public List<StudyDetails> getAllStudyDetails(StudyType studyType) throws MiddlewareQueryException {
 		return getAllStudyDetails(studyType, -1, -1);
 	}
@@ -586,7 +581,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
             return ((BigInteger) query.uniqueResult()).longValue();
 
         } catch(HibernateException e) {
-        	e.printStackTrace();
             logAndThrowException("Error in countAllStudyDetails() query in DmsProjectDao: " + e.getMessage(), e);
         }
         return 0;

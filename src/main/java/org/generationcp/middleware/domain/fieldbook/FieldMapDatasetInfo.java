@@ -159,7 +159,7 @@ public class FieldMapDatasetInfo implements Serializable{
      * @param indent the indent
      */
     public void print(int indent) {
-        Debug.println(indent, "FieldMapTrialInstanceInfo: " );
+        Debug.println(indent, "FieldMapDatasetInfo: " );
         indent = indent + 3;
         Debug.println(indent, "Dataset Id = " + datasetId);
         Debug.println(indent, "Dataset Name = " + datasetName);

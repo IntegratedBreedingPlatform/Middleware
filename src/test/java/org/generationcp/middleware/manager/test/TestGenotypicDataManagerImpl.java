@@ -1594,7 +1594,7 @@ public class TestGenotypicDataManagerImpl{
         
         java.util.Map<String, Object> mappingRecords = createMappingRecords();
         Dataset dataset = (Dataset) mappingRecords.get(DATASET);
-        dataset.setDatasetName(dataset.getDatasetName() + (int) (Math.random()*100)); //Used to insert a new dataset
+        dataset.setDatasetName(dataset.getDatasetName() + (int) (Math.random()*1000)); //Used to insert a new dataset
         AccMetadataSet accMetadataSet = (AccMetadataSet) mappingRecords.get(ACC_METADATA_SET);
         MarkerMetadataSet markerMetadataSet = (MarkerMetadataSet) mappingRecords.get(MARKER_METADATA_SET);
         DatasetUsers datasetUser = (DatasetUsers) mappingRecords.get(DATASET_USERS);

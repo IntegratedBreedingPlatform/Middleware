@@ -471,7 +471,7 @@ public class TestOntologyDataManagerImpl {
 		assertTrue(term.getId() < 0);
 	    Debug.println(0, "testAddTerm():  " + term);
 	    term = manager.getTermById(term.getId());
-	    System.out.println("From db:  " + term);
+	    Debug.println(0, "From db:  " + term);
 	    
 	    // add a variable, should not allow insert and should throw an exception
 	    // uncomment the ff. to test adding variables
@@ -533,14 +533,14 @@ public class TestOntologyDataManagerImpl {
 
         Debug.println(0, "testGetStandardVariablesInProjects(headers=" + headers + ") RESULTS:");
         for (String name : headers) {
-        	System.out.print ("Header = " + name + ", StandardVariables: ");
+            Debug.println(0, "Header = " + name + ", StandardVariables: ");
         	if (results.get(name).size() > 0){
 	        	for (StandardVariable var : results.get(name)){
-	        		System.out.print(var.getId() + ", ");
+	        		Debug.println(0, var.getId() + ", ");
 	        	}
 	        	Debug.println(0, "");
         	} else {
-            	System.out.println ("    No standard variables found.");        		
+        	    Debug.println(0, "    No standard variables found.");        		
         	}
         }
     }
@@ -966,7 +966,7 @@ public class TestOntologyDataManagerImpl {
     public void testGetAllPropertiesWithTraitClass() throws Exception {
         List<Property> properties = manager.getAllPropertiesWithTraitClass();
         for (Property property : properties) {
-            System.out.println(property);
+            Debug.println(0, property.toString());
         }
     }
     

@@ -799,11 +799,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
             }
         }
 
-        if (pos != null && setWorkingDatabase(Database.CENTRAL)) {
+        if (pos != null && pos.size() > 0 && setWorkingDatabase(Database.CENTRAL)) {
             results.addAll(getLocationDao().getLocationDetails(pos,0,pos.size()));
         }
 
-        if (negs != null && setWorkingDatabase(Database.LOCAL)) {
+        if (negs != null && negs.size() > 0 && setWorkingDatabase(Database.LOCAL)) {
               List<Location> locations = getLocationDao().getLocationByIds(negs);
 
               for (Location l : locations) {
@@ -1977,8 +1977,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     	Map<Integer, Integer> localMethodIds = new HashMap<Integer, Integer>();
     	
     	Map<Integer, Integer> combinedMethodIds = new HashMap<Integer, Integer>();
-    	
-    	List<Method> methods = new ArrayList<Method>();
     	
         if (setWorkingDatabase(Database.CENTRAL)) {
         	centralMethodIds = getGermplasmDao().getMethodIdsByGids(gids);

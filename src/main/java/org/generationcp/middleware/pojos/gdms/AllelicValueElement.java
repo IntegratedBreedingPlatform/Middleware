@@ -183,7 +183,7 @@ public class AllelicValueElement implements Serializable{
                 .append(markerName).toHashCode();
     }
 
-    public static Comparator<AllelicValueElement> AllelicValueElementComparator 
+    public static Comparator<AllelicValueElement> AllelicValueElementComparator
                           = new Comparator<AllelicValueElement>() {
         @Override
         public int compare(AllelicValueElement element1, AllelicValueElement element2) {

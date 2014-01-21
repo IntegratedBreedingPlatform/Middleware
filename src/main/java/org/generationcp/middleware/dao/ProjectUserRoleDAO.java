@@ -65,13 +65,11 @@ public class ProjectUserRoleDAO extends GenericDAO<ProjectUserRole, Integer>{
         }
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     public List<ProjectUserRole> getByProject(Project project) throws MiddlewareQueryException {
         try {
             List<Criterion> criteria = new ArrayList<Criterion>();
             criteria.add(Restrictions.eq("project", project));
-            List results = super.getByCriteria(criteria);
-            return (List<ProjectUserRole>) results;
+            return (List<ProjectUserRole>) super.getByCriteria(criteria);
         } catch (HibernateException e) {
             throw new MiddlewareQueryException("Error in getByProject(project=" + project + ") query from ProjectUser: " + e.getMessage(),
                     e);

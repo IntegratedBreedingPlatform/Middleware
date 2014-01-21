@@ -165,8 +165,7 @@ public class ExperimentProjectDao extends GenericDAO<ExperimentProject, Integer>
 					" AND exp.nd_geolocation_id = " + locationId + 
 					" AND exp.type_id = 1170 " +
 					" AND stock.stock_id = " + stockId;
-					
-            System.out.println(sql);
+
 			SQLQuery statement = getSession().createSQLQuery(sql);
 			Integer returnVal = (Integer) statement.uniqueResult();
 			

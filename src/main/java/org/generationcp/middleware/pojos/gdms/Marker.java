@@ -455,7 +455,7 @@ public class Marker implements Serializable{
         return builder.toString();
     }
 
-    public static Comparator<Marker> MarkerComparator = new Comparator<Marker>() {
+    public static Comparator<Marker> MarkerComparator = new Comparator<Marker>() { 
 
         @Override
         public int compare(Marker element1, Marker element2) {

@@ -1030,7 +1030,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
             }
             if (methodId != null){
                 queryString.append("INNER JOIN cvterm_relationship cvrm ON cvr.subject_id = cvrm.subject_id ");
-                queryString.append("    AND cvr.object_id = :methodId AND cvr.type_id = ").append(TermId.HAS_METHOD.getId()).append(" ");;
+                queryString.append("    AND cvr.object_id = :methodId AND cvr.type_id = ").append(TermId.HAS_METHOD.getId()).append(" ");
             }
             if (scaleId != null){
                 queryString.append("INNER JOIN cvterm_relationship cvrs ON cvr.subject_id = cvrs.subject_id ");

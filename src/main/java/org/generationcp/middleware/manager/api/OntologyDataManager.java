@@ -44,7 +44,7 @@ public interface OntologyDataManager {
 	 * @return the term by id
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-    public Term getTermById(int termId) throws MiddlewareQueryException;
+    Term getTermById(int termId) throws MiddlewareQueryException;
     
     /**
      * Retrieves a StandardVariable given its id.
@@ -53,7 +53,7 @@ public interface OntologyDataManager {
      * @return the standard variable
      * @throws MiddlewareQueryException the middleware query exception
      */
-	public StandardVariable getStandardVariable(int stdVariableId) throws MiddlewareQueryException; 
+	StandardVariable getStandardVariable(int stdVariableId) throws MiddlewareQueryException; 
 	
 	 /**
  	 * Retrieves a the standardVariableId given the property, scale and method Ids.
@@ -64,7 +64,7 @@ public interface OntologyDataManager {
  	 * @return the standard variable id by property scale method
  	 * @throws MiddlewareQueryException the middleware query exception
  	 */
-	public Integer getStandardVariableIdByPropertyScaleMethod(Integer propertyId,Integer scaleId, Integer methodId) throws MiddlewareQueryException; 
+	Integer getStandardVariableIdByPropertyScaleMethod(Integer propertyId,Integer scaleId, Integer methodId) throws MiddlewareQueryException; 
 
 	
 	/**
@@ -84,7 +84,7 @@ public interface OntologyDataManager {
 	 * @param stdVariable the std variable
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	public void addStandardVariable(StandardVariable stdVariable) throws MiddlewareQueryException;
+	void addStandardVariable(StandardVariable stdVariable) throws MiddlewareQueryException;
 
 	
 	/**
@@ -334,7 +334,7 @@ public interface OntologyDataManager {
      * @return the terms by ids
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Term> getTermsByIds(List<Integer> ids) throws MiddlewareQueryException;
+    List<Term> getTermsByIds(List<Integer> ids) throws MiddlewareQueryException;
     
     
     /**
@@ -346,7 +346,7 @@ public interface OntologyDataManager {
      * @return the term
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public TraitClass addTraitClass(String name, String definition, int parentTraitClassId) throws MiddlewareQueryException;
+    TraitClass addTraitClass(String name, String definition, int parentTraitClassId) throws MiddlewareQueryException;
             
     /**
      * Gets all the standard variables.
@@ -354,7 +354,7 @@ public interface OntologyDataManager {
      * @return the all standard variable
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public Set<StandardVariable> getAllStandardVariables() throws MiddlewareQueryException;
+    Set<StandardVariable> getAllStandardVariables() throws MiddlewareQueryException;
     
     
     /**

@@ -29,14 +29,14 @@ public interface UserDataManager {
      *
      * @return gets all Persons
      */   	
-    public List<User> getAllUsers() throws MiddlewareQueryException;
+    List<User> getAllUsers() throws MiddlewareQueryException;
     
     /**
      * Returns number of all Users.
      *
      * @return the number of all Users
      */   
-    public long countAllUsers() throws MiddlewareQueryException;
+    long countAllUsers() throws MiddlewareQueryException;
     
     /**
      * Adds the user.
@@ -45,7 +45,7 @@ public interface UserDataManager {
      * @return Returns the id of the {@code User} record added
      * @throws MiddlewareQueryException the MiddlewareQueryException
      */
-    public Integer addUser(User user) throws MiddlewareQueryException;
+    Integer addUser(User user) throws MiddlewareQueryException;
     
     /**
      * Updates the user
@@ -54,7 +54,7 @@ public interface UserDataManager {
      * @return Returns the id of the {@code User} record updated
      * @throws MiddlewareQueryException the MiddlewareQueryException
      */
-    public Integer updateUser(User user) throws MiddlewareQueryException;
+    Integer updateUser(User user) throws MiddlewareQueryException;
     
     /**
      * Gets the user by id.
@@ -62,7 +62,7 @@ public interface UserDataManager {
      * @param id the id
      * @return the user by id
      */
-    public User getUserById(int id) throws MiddlewareQueryException;
+    User getUserById(int id) throws MiddlewareQueryException;
     
     /**
      * Delete user.
@@ -70,21 +70,21 @@ public interface UserDataManager {
      * @param user the user
      * @throws MiddlewareQueryException the MiddlewareQueryException
      */
-    public void deleteUser(User user) throws MiddlewareQueryException;
+    void deleteUser(User user) throws MiddlewareQueryException;
     
     /**
      * Returns all Persons.
      *
      * @return gets all Persons
      */   
-    public List<Person> getAllPersons() throws MiddlewareQueryException;
+    List<Person> getAllPersons() throws MiddlewareQueryException;
     
     /**
      * Returns number of all Persons.
      *
      * @return the number of all Persons
      */   
-    public long countAllPersons() throws MiddlewareQueryException;
+    long countAllPersons() throws MiddlewareQueryException;
     
     
     /**
@@ -94,7 +94,7 @@ public interface UserDataManager {
      * @return Returns the id of the {@code Person} record added
      * @throws MiddlewareQueryException the MiddlewareQueryException
      */
-    public Integer addPerson(Person person) throws MiddlewareQueryException;
+    Integer addPerson(Person person) throws MiddlewareQueryException;
     
     /**
      * Gets the person by id.
@@ -102,7 +102,7 @@ public interface UserDataManager {
      * @param id the id
      * @return the person by id
      */
-    public Person getPersonById(int id) throws MiddlewareQueryException;
+    Person getPersonById(int id) throws MiddlewareQueryException;
     
     /**
      * Delete person.
@@ -110,7 +110,7 @@ public interface UserDataManager {
      * @param person the person
      * @throws MiddlewareQueryException the MiddlewareQueryException
      */
-    public void deletePerson(Person person) throws MiddlewareQueryException; 
+    void deletePerson(Person person) throws MiddlewareQueryException; 
     
     /**
      * Checks if is valid user login.
@@ -120,7 +120,7 @@ public interface UserDataManager {
      * @return true, if is valid user login
      * @throws MiddlewareQueryException the MiddlewareQueryException
      */
-    public boolean isValidUserLogin(String username, String password) throws MiddlewareQueryException;
+    boolean isValidUserLogin(String username, String password) throws MiddlewareQueryException;
     
     /**
      * Checks if is person exists.
@@ -130,7 +130,7 @@ public interface UserDataManager {
      * @return true, if is person exists
      * @throws MiddlewareQueryException the MiddlewareQueryException
      */
-    public boolean isPersonExists(String firstName, String lastName) throws MiddlewareQueryException;
+    boolean isPersonExists(String firstName, String lastName) throws MiddlewareQueryException;
     
     /**
      * Checks if is username exists.
@@ -139,7 +139,7 @@ public interface UserDataManager {
      * @return true, if is username exists
      * @throws MiddlewareQueryException the MiddlewareQueryException
      */
-    public boolean isUsernameExists(String userName) throws MiddlewareQueryException;
+    boolean isUsernameExists(String userName) throws MiddlewareQueryException;
     
     /**
      * Get the User with the specified username.
@@ -148,7 +148,7 @@ public interface UserDataManager {
      * @return
      * @throws MiddlewareQueryException
      */
-    public User getUserByUserName(String userName) throws MiddlewareQueryException;
+    User getUserByUserName(String userName) throws MiddlewareQueryException;
     
     /**
      * Returns all the installation records
@@ -163,7 +163,7 @@ public interface UserDataManager {
      * @return The list of all Installation records from the given database instance.
      * @throws MiddlewareQueryException
      */
-    public List<Installation> getAllInstallationRecords(int start, int numOfRows, Database instance) 
+    List<Installation> getAllInstallationRecords(int start, int numOfRows, Database instance) 
         throws MiddlewareQueryException; 
     
     /**
@@ -173,7 +173,7 @@ public interface UserDataManager {
      * @return The Installation record corresponding to the given ID.
      * @throws MiddlewareQueryException
      */
-    public Installation getInstallationRecordById(Long id) throws MiddlewareQueryException;
+    Installation getInstallationRecordById(Long id) throws MiddlewareQueryException;
     
     /**
      * Get the installation records with the admin id equal to the given id.
@@ -182,7 +182,7 @@ public interface UserDataManager {
      * @return The List of Installation records based on the given Admin ID.
      * @throws MiddlewareQueryException
      */
-    public List<Installation> getInstallationRecordsByAdminId(Long id) throws MiddlewareQueryException;
+    List<Installation> getInstallationRecordsByAdminId(Long id) throws MiddlewareQueryException;
     
     /**
      * Returns the installation record which have been added last to the database.
@@ -191,7 +191,7 @@ public interface UserDataManager {
      * @return The latest Installation record from the given database instance.
      * @throws MiddlewareQueryException
      */
-    public Installation getLatestInstallationRecord(Database instance) throws MiddlewareQueryException;
+    Installation getLatestInstallationRecord(Database instance) throws MiddlewareQueryException;
 
     /**
      * Adds the user to Central database.
@@ -200,7 +200,7 @@ public interface UserDataManager {
      * @return Returns the id of the {@code User} record added
      * @throws MiddlewareQueryException the MiddlewareQueryException
      */
-    public Integer addUserToCentral(User user) throws MiddlewareQueryException;
+    Integer addUserToCentral(User user) throws MiddlewareQueryException;
 	
 	 /**
      * Adds the person to Central database.
@@ -209,5 +209,5 @@ public interface UserDataManager {
      * @return Returns the id of the {@code Person} record added
      * @throws MiddlewareQueryException the MiddlewareQueryException
      */
-	public Integer addPersonToCentral(Person person) throws MiddlewareQueryException;
+	Integer addPersonToCentral(Person person) throws MiddlewareQueryException;
 }

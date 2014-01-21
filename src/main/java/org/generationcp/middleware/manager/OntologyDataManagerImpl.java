@@ -78,7 +78,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
         
-        
         Term existingStdVar = findTermByName(stdVariable.getName(), CvId.VARIABLES);
         if (existingStdVar != null){
         	 throw new MiddlewareQueryException(String.format("Error in addStandardVariable, Variable with name \"%s\" already exists", stdVariable.getName()));
@@ -92,19 +91,25 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             if (scale == null) {
                 stdVariable.setScale(getTermSaver().save(stdVariable.getScale().getName(),
                         stdVariable.getScale().getDefinition(), CvId.SCALES));
-                LOG.debug("new scale with id = " + stdVariable.getScale().getId());
+                if (LOG.isDebugEnabled()){
+                    LOG.debug("new scale with id = " + stdVariable.getScale().getId());
+                }
             }
             Term property = findTermByName(stdVariable.getProperty().getName(), CvId.PROPERTIES);
             if (property == null) {
                 stdVariable.setProperty(getTermSaver().save(stdVariable.getProperty().getName(),
                         stdVariable.getProperty().getDefinition(), CvId.PROPERTIES));
-                LOG.debug("new property with id = " + stdVariable.getProperty().getId());
+                if (LOG.isDebugEnabled()){
+                    LOG.debug("new property with id = " + stdVariable.getProperty().getId());
+                }
             }
             Term method = findTermByName(stdVariable.getMethod().getName(), CvId.METHODS);
             if (method == null) {
                 stdVariable.setMethod(getTermSaver().save(stdVariable.getMethod().getName(),
                         stdVariable.getMethod().getDefinition(), CvId.METHODS));
-                LOG.debug("new method with id = " + stdVariable.getMethod().getId());
+                if (LOG.isDebugEnabled()){
+                    LOG.debug("new method with id = " + stdVariable.getMethod().getId());
+                }
             }
             if (findStandardVariableByTraitScaleMethodNames(stdVariable.getProperty().getName(), stdVariable.getScale()
                     .getName(), stdVariable.getMethod().getName()) == null) {
@@ -815,7 +820,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     
     @Override
     public void deleteStandardVariableEnumeration(int standardVariableId, int enumerationId) throws MiddlewareQueryException{
-        //TODO
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;

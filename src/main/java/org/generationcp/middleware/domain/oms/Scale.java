@@ -81,7 +81,11 @@ public class Scale {
 
     public void print(int indent) {
         Debug.println(indent, "Scale: ");
-        term.print(indent + 3);
+        if (term != null){
+            term.print(indent + 3);
+        } else {
+            Debug.println(indent + 3, "null");
+        }
     }
 	
 }

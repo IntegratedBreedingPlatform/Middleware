@@ -22,7 +22,6 @@ import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.*;
 
-// TODO: Auto-generated Javadoc
 /**
  * This is the API used by the Workbench to retrieve Workbench project
  * information.
@@ -36,7 +35,7 @@ public interface WorkbenchDataManager {
      * @return the projects
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Project> getProjects()  throws MiddlewareQueryException;
+    List<Project> getProjects()  throws MiddlewareQueryException;
 
     /**
      * Gets the projects.
@@ -46,7 +45,7 @@ public interface WorkbenchDataManager {
      * @return the projects
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Project> getProjects(int start, int numOfRows)  throws MiddlewareQueryException;
+    List<Project> getProjects(int start, int numOfRows)  throws MiddlewareQueryException;
     
     /**
      * Gets the list of Projects that the specified User is associated with.
@@ -55,7 +54,7 @@ public interface WorkbenchDataManager {
      * @return the projects which the specified user is involved
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Project> getProjectsByUser(User user)  throws MiddlewareQueryException;
+    List<Project> getProjectsByUser(User user)  throws MiddlewareQueryException;
 
     /**
      * Save or update project.
@@ -64,7 +63,7 @@ public interface WorkbenchDataManager {
      * @return the project saved
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public Project saveOrUpdateProject(Project project) throws MiddlewareQueryException;
+    Project saveOrUpdateProject(Project project) throws MiddlewareQueryException;
 
     /**
      * Save a project.
@@ -73,7 +72,7 @@ public interface WorkbenchDataManager {
      * @return The Project added
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public Project addProject(Project project) throws MiddlewareQueryException;
+    Project addProject(Project project) throws MiddlewareQueryException;
     
     /**
      * Update a project using Hibernate's Session.merge() method.
@@ -82,7 +81,7 @@ public interface WorkbenchDataManager {
      * @return The merged Project.
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public Project mergeProject(Project project) throws MiddlewareQueryException;
+    Project mergeProject(Project project) throws MiddlewareQueryException;
     
     /**
      * Delete project.
@@ -90,7 +89,7 @@ public interface WorkbenchDataManager {
      * @param project - the project to delete
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public void deleteProject(Project project) throws MiddlewareQueryException;
+    void deleteProject(Project project) throws MiddlewareQueryException;
 
     /**
      * drop the projects local database.
@@ -100,7 +99,7 @@ public interface WorkbenchDataManager {
      * @param project - the project to delete the database
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public void dropLocalDatabase(Project project) throws MiddlewareQueryException;
+    void dropLocalDatabase(Project project) throws MiddlewareQueryException;
     
     /**
      * Delete project dependencies.
@@ -108,7 +107,7 @@ public interface WorkbenchDataManager {
      * @param project - the project to delete dependencies
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public void deleteProjectDependencies(Project project) throws MiddlewareQueryException;
+    void deleteProjectDependencies(Project project) throws MiddlewareQueryException;
     
     /**
      * Gets the workflow templates.
@@ -116,7 +115,7 @@ public interface WorkbenchDataManager {
      * @return the workflow templates
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<WorkflowTemplate> getWorkflowTemplates() throws MiddlewareQueryException;
+    List<WorkflowTemplate> getWorkflowTemplates() throws MiddlewareQueryException;
 
     /**
      * Gets the workflow templates.
@@ -126,7 +125,7 @@ public interface WorkbenchDataManager {
      * @return the workflow templates
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<WorkflowTemplate> getWorkflowTemplates(int start, int numOfRows) throws MiddlewareQueryException;
+    List<WorkflowTemplate> getWorkflowTemplates(int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Gets the workflow templates based on the given name.
@@ -135,7 +134,7 @@ public interface WorkbenchDataManager {
      * @return the workflow templates
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<WorkflowTemplate> getWorkflowTemplateByName(String name) throws MiddlewareQueryException;
+    List<WorkflowTemplate> getWorkflowTemplateByName(String name) throws MiddlewareQueryException;
 
     
     /**
@@ -143,7 +142,7 @@ public interface WorkbenchDataManager {
      *
      * @return the tool with the given name
      */
-    public ToolDAO getToolDao();
+    ToolDAO getToolDao();
 
     
     /**
@@ -152,7 +151,7 @@ public interface WorkbenchDataManager {
      * @return The list of all tools.
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Tool> getAllTools() throws MiddlewareQueryException;
+    List<Tool> getAllTools() throws MiddlewareQueryException;
 
     /**
      * Gets the tool with the given name.
@@ -161,7 +160,7 @@ public interface WorkbenchDataManager {
      * @return the tool with the given name
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public Tool getToolWithName(String toolName) throws MiddlewareQueryException;
+    Tool getToolWithName(String toolName) throws MiddlewareQueryException;
     
     /**
      * Get the list of tools with the specified type.
@@ -170,7 +169,7 @@ public interface WorkbenchDataManager {
      * @return the list of matching tools
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Tool> getToolsWithType(ToolType toolType) throws MiddlewareQueryException;
+    List<Tool> getToolsWithType(ToolType toolType) throws MiddlewareQueryException;
     
     /**
      * Checks if is valid user login.
@@ -180,7 +179,7 @@ public interface WorkbenchDataManager {
      * @return true, if is valid user login
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public boolean isValidUserLogin(String username, String password) throws MiddlewareQueryException;
+    boolean isValidUserLogin(String username, String password) throws MiddlewareQueryException;
     
     /**
      * Changes the password of the user.
@@ -190,7 +189,7 @@ public interface WorkbenchDataManager {
      * @return true, if is user login is completed
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public boolean changeUserPassword(String username, String password) throws MiddlewareQueryException;
+    boolean changeUserPassword(String username, String password) throws MiddlewareQueryException;
     
     /**
      * Checks if is person exists.
@@ -200,7 +199,7 @@ public interface WorkbenchDataManager {
      * @return true, if is person exists
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public boolean isPersonExists(String firstName, String lastName) throws MiddlewareQueryException;
+    boolean isPersonExists(String firstName, String lastName) throws MiddlewareQueryException;
     
     /**
      * Checks if a username exists.
@@ -209,7 +208,7 @@ public interface WorkbenchDataManager {
      * @return true, if is username exists
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public boolean isUsernameExists(String userName) throws MiddlewareQueryException;
+    boolean isUsernameExists(String userName) throws MiddlewareQueryException;
     
     /**
      * Get the user info record for the specified user.
@@ -218,7 +217,7 @@ public interface WorkbenchDataManager {
      * @return the user info
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public UserInfo getUserInfo(int userId) throws MiddlewareQueryException;
+    UserInfo getUserInfo(int userId) throws MiddlewareQueryException;
     
     /**
      * Increments the log in count.
@@ -226,7 +225,7 @@ public interface WorkbenchDataManager {
      * @param userId the user id
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public void incrementUserLogInCount(int userId) throws MiddlewareQueryException;
+    void incrementUserLogInCount(int userId) throws MiddlewareQueryException;
     
     /**
      * Insert or update the specified {@link UserInfo} record.
@@ -234,7 +233,7 @@ public interface WorkbenchDataManager {
      * @param userDetails the user details
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public void insertOrUpdateUserInfo(UserInfo userDetails) throws MiddlewareQueryException;
+    void insertOrUpdateUserInfo(UserInfo userDetails) throws MiddlewareQueryException;
     
     /**
      * Adds the person.
@@ -243,7 +242,7 @@ public interface WorkbenchDataManager {
      * @return Returns the id of the {@code Person} record added
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public Integer addPerson(Person person) throws MiddlewareQueryException;
+    Integer addPerson(Person person) throws MiddlewareQueryException;
     
     /**
      * Adds a user.
@@ -252,7 +251,7 @@ public interface WorkbenchDataManager {
      * @return Returns the id of the {@code User} record added
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public Integer addUser(User user) throws MiddlewareQueryException;
+    Integer addUser(User user) throws MiddlewareQueryException;
     
     /**
      * Gets a project by id.
@@ -261,7 +260,7 @@ public interface WorkbenchDataManager {
      * @return the project matching the given id
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public Project getProjectById(Long projectId) throws MiddlewareQueryException;
+    Project getProjectById(Long projectId) throws MiddlewareQueryException;
     
     /**
      * Gets a project by name. Should return only one value.
@@ -270,7 +269,7 @@ public interface WorkbenchDataManager {
      * @return the project matching the given name
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public Project getProjectByName(String projectName) throws MiddlewareQueryException;
+    Project getProjectByName(String projectName) throws MiddlewareQueryException;
 
     /**
      * Updates all the project roles for a project.
@@ -280,7 +279,7 @@ public interface WorkbenchDataManager {
      * @return void
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public void updateProjectsRolesForProject(Project project, List<ProjectUserRole> newRoles) throws MiddlewareQueryException;
+    void updateProjectsRolesForProject(Project project, List<ProjectUserRole> newRoles) throws MiddlewareQueryException;
     
     /**
      * Registers a workbench dataset.
@@ -289,7 +288,7 @@ public interface WorkbenchDataManager {
      * @return Returns the id of the {@code WorkbenchDataset} record added
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public Integer addWorkbenchDataset(WorkbenchDataset dataset) throws MiddlewareQueryException;
+    Integer addWorkbenchDataset(WorkbenchDataset dataset) throws MiddlewareQueryException;
     
     /**
      * Gets the workbench dataset by id.
@@ -298,7 +297,7 @@ public interface WorkbenchDataManager {
      * @return the workench dataset matching the given id
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public WorkbenchDataset getWorkbenchDatasetById(Long datasetId) throws MiddlewareQueryException;
+    WorkbenchDataset getWorkbenchDatasetById(Long datasetId) throws MiddlewareQueryException;
     
     /**
      * Delete a workbench dataset.
@@ -306,7 +305,7 @@ public interface WorkbenchDataManager {
      * @param dataset the dataset to delete
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public void deleteWorkbenchDataset(WorkbenchDataset dataset)  throws MiddlewareQueryException;
+    void deleteWorkbenchDataset(WorkbenchDataset dataset)  throws MiddlewareQueryException;
 
 
     /**
@@ -315,7 +314,7 @@ public interface WorkbenchDataManager {
      * @return A {@code List} of all the {@code User}s in the Workbench database.
      * @throws MiddlewareQueryException the middleware query exception
      */   	
-    public List<User> getAllUsers() throws MiddlewareQueryException;
+    List<User> getAllUsers() throws MiddlewareQueryException;
     
     /**
      * Returns all the Workbench users ordered by First Name then Last Name.
@@ -323,7 +322,7 @@ public interface WorkbenchDataManager {
      * @return A {@code List} of all the {@code User}s in the Workbench database.
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<User> getAllUsersSorted() throws MiddlewareQueryException;
+    List<User> getAllUsersSorted() throws MiddlewareQueryException;
     
     /**
      * Returns number of all Users.
@@ -331,7 +330,7 @@ public interface WorkbenchDataManager {
      * @return the number of all Users
      * @throws MiddlewareQueryException the middleware query exception
      */   
-    public long countAllUsers() throws MiddlewareQueryException;
+    long countAllUsers() throws MiddlewareQueryException;
     
     /**
      * Gets the user by id.
@@ -340,7 +339,7 @@ public interface WorkbenchDataManager {
      * @return the user matching the given id
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public User getUserById(int id) throws MiddlewareQueryException;
+    User getUserById(int id) throws MiddlewareQueryException;
     
     /**
      * Gets the user by name.
@@ -352,7 +351,7 @@ public interface WorkbenchDataManager {
      * @return the user by name
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<User> getUserByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException;
+    List<User> getUserByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException;
     
     /**
      * Deletes a user.
@@ -360,7 +359,7 @@ public interface WorkbenchDataManager {
      * @param user - the User to delete
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public void deleteUser(User user) throws MiddlewareQueryException;
+    void deleteUser(User user) throws MiddlewareQueryException;
     
     /**
      * Returns all Persons.
@@ -368,7 +367,7 @@ public interface WorkbenchDataManager {
      * @return all Persons
      * @throws MiddlewareQueryException the middleware query exception
      */   
-    public List<Person> getAllPersons() throws MiddlewareQueryException;
+    List<Person> getAllPersons() throws MiddlewareQueryException;
     
     /**
      * Returns number of all Persons.
@@ -376,7 +375,7 @@ public interface WorkbenchDataManager {
      * @return the number of all Persons
      * @throws MiddlewareQueryException the middleware query exception
      */   
-    public long countAllPersons() throws MiddlewareQueryException;
+    long countAllPersons() throws MiddlewareQueryException;
     
     /**
      * Gets the person by id.
@@ -385,7 +384,7 @@ public interface WorkbenchDataManager {
      * @return the person matching the given id
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public Person getPersonById(int id) throws MiddlewareQueryException;
+    Person getPersonById(int id) throws MiddlewareQueryException;
     
     /**
      * Deletes a person.
@@ -393,7 +392,7 @@ public interface WorkbenchDataManager {
      * @param person - the Person to delete
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public void deletePerson(Person person) throws MiddlewareQueryException; 
+    void deletePerson(Person person) throws MiddlewareQueryException; 
     
     /**
      * Returns the project last accessed by the user.
@@ -402,7 +401,7 @@ public interface WorkbenchDataManager {
      * @return the last Project opened by the given user
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public Project getLastOpenedProject(Integer userId) throws MiddlewareQueryException;
+    Project getLastOpenedProject(Integer userId) throws MiddlewareQueryException;
     
     /**
      * Returns a list of {@link WorkbenchDataset} records by project id.
@@ -413,7 +412,7 @@ public interface WorkbenchDataManager {
      * @return the list of {@link WorkbenchDataset}s
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<WorkbenchDataset> getWorkbenchDatasetByProjectId(Long projectId, int start, int numOfRows) throws MiddlewareQueryException;
+    List<WorkbenchDataset> getWorkbenchDatasetByProjectId(Long projectId, int start, int numOfRows) throws MiddlewareQueryException;
     
     /**
      * Returns the number of {@link WorkbenchDataset} records by project id.
@@ -422,7 +421,7 @@ public interface WorkbenchDataManager {
      * @return the number of {@link WorkbenchDataset} records
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public long countWorkbenchDatasetByProjectId(Long projectId) throws MiddlewareQueryException;
+    long countWorkbenchDatasetByProjectId(Long projectId) throws MiddlewareQueryException;
     
     /**
      * Returns a list of {@link WorkbenchDataset} by name.
@@ -434,7 +433,7 @@ public interface WorkbenchDataManager {
      * @return the list of {@link WorkbenchDataset}
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<WorkbenchDataset> getWorkbenchDatasetByName(String name, Operation op, int start, int numOfRows) throws MiddlewareQueryException;
+    List<WorkbenchDataset> getWorkbenchDatasetByName(String name, Operation op, int start, int numOfRows) throws MiddlewareQueryException;
     
     /**
      * Returns the number of {@link WorkbenchDataset} by name.
@@ -444,7 +443,7 @@ public interface WorkbenchDataManager {
      * @return the number of {@link WorkbenchDataset}
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public long countWorkbenchDatasetByName(String name, Operation op) throws MiddlewareQueryException;
+    long countWorkbenchDatasetByName(String name, Operation op) throws MiddlewareQueryException;
     
     /**
      * Returns a list of {@link Location} ids by project id.
@@ -455,7 +454,7 @@ public interface WorkbenchDataManager {
      * @return the list of {@link Location} ids
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Long> getLocationIdsByProjectId(Long projectId, int start, int numOfRows) throws MiddlewareQueryException;
+    List<Long> getLocationIdsByProjectId(Long projectId, int start, int numOfRows) throws MiddlewareQueryException;
     
     /**
      * Returns the number of {@link Location} ids by project id.
@@ -464,7 +463,7 @@ public interface WorkbenchDataManager {
      * @return the number of {@link Location} ids
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public long countLocationIdsByProjectId(Long projectId) throws MiddlewareQueryException;
+    long countLocationIdsByProjectId(Long projectId) throws MiddlewareQueryException;
 
     /**
      * Returns a list of method id by project id.
@@ -475,7 +474,7 @@ public interface WorkbenchDataManager {
      * @return the list of method ids
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Integer> getMethodIdsByProjectId(Long projectId, int start, int numOfRows) throws MiddlewareQueryException;
+    List<Integer> getMethodIdsByProjectId(Long projectId, int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Returns the number of method ids by project id.
@@ -484,7 +483,7 @@ public interface WorkbenchDataManager {
      * @return the number of method ids
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public long countMethodIdsByProjectId(Long projectId) throws MiddlewareQueryException;
+    long countMethodIdsByProjectId(Long projectId) throws MiddlewareQueryException;
     
     
     /**
@@ -496,7 +495,7 @@ public interface WorkbenchDataManager {
      * @return Returns the id of the {@code ProjectUserRole} record added
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public Integer addProjectUserRole(Project project, User user, Role role) throws MiddlewareQueryException;
+    Integer addProjectUserRole(Project project, User user, Role role) throws MiddlewareQueryException;
 
     /**
      * Adds a single workbench_project_user_role record.
@@ -505,7 +504,7 @@ public interface WorkbenchDataManager {
      * @return Returns the id of the {@code ProjectUserRole} record added
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public Integer addProjectUserRole(ProjectUserRole projectUserRole) throws MiddlewareQueryException;
+    Integer addProjectUserRole(ProjectUserRole projectUserRole) throws MiddlewareQueryException;
 
     /**
      * Adds multiple workbench_project_user_role records.
@@ -514,7 +513,7 @@ public interface WorkbenchDataManager {
      * @return Returns the ids of the {@code ProjectUserRole} records added
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Integer> addProjectUserRole(List<ProjectUserRole> projectUserRoles) throws MiddlewareQueryException;
+    List<Integer> addProjectUserRole(List<ProjectUserRole> projectUserRoles) throws MiddlewareQueryException;
 
     /**
      * Adds a project location.
@@ -524,7 +523,7 @@ public interface WorkbenchDataManager {
      * in the database.
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public Integer addProjectLocationMap(ProjectLocationMap projectLocationMap) throws MiddlewareQueryException;
+    Integer addProjectLocationMap(ProjectLocationMap projectLocationMap) throws MiddlewareQueryException;
     
     /**
      * Adds project locations.
@@ -533,7 +532,7 @@ public interface WorkbenchDataManager {
      * @return Returns the ids of the {@code ProjectLocationMap} record added
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Integer> addProjectLocationMap(List<ProjectLocationMap> projectLocationMapList) throws MiddlewareQueryException;
+    List<Integer> addProjectLocationMap(List<ProjectLocationMap> projectLocationMapList) throws MiddlewareQueryException;
     
     
     /**
@@ -545,7 +544,7 @@ public interface WorkbenchDataManager {
      * @return the project location map by project id
      * @throws MiddlewareQueryException the MiddlewareQueryException
      */
-    public List<ProjectLocationMap> getProjectLocationMapByProjectId(Long projectId, int start, int numOfRows) throws MiddlewareQueryException;
+    List<ProjectLocationMap> getProjectLocationMapByProjectId(Long projectId, int start, int numOfRows) throws MiddlewareQueryException;
     
 
     /**
@@ -554,7 +553,7 @@ public interface WorkbenchDataManager {
      * @param projectLocationMap the project location map
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public void deleteProjectLocationMap(ProjectLocationMap projectLocationMap) throws MiddlewareQueryException;
+    void deleteProjectLocationMap(ProjectLocationMap projectLocationMap) throws MiddlewareQueryException;
 
     /**
      * Adds project method.
@@ -563,7 +562,7 @@ public interface WorkbenchDataManager {
      * @return Returns the id of the {@code ProjectMethod} record added
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public Integer addProjectMethod(ProjectMethod projectMethod) throws MiddlewareQueryException;
+    Integer addProjectMethod(ProjectMethod projectMethod) throws MiddlewareQueryException;
     
     /**
      * Adds project methods.
@@ -572,7 +571,7 @@ public interface WorkbenchDataManager {
      * @return Returns the ids of the {@code ProjectUserRole} records added
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Integer> addProjectMethod(List<ProjectMethod> projectMethodList) throws MiddlewareQueryException;
+    List<Integer> addProjectMethod(List<ProjectMethod> projectMethodList) throws MiddlewareQueryException;
 
     
     /**
@@ -584,7 +583,7 @@ public interface WorkbenchDataManager {
      * @return the list of ProjectMethod records retrieved
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<ProjectMethod> getProjectMethodByProject(Project project, int start, int numOfRows) throws MiddlewareQueryException;
+    List<ProjectMethod> getProjectMethodByProject(Project project, int start, int numOfRows) throws MiddlewareQueryException;
     
 
     /**
@@ -593,7 +592,7 @@ public interface WorkbenchDataManager {
      * @param projectMethod - the project method
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public void deleteProjectMethod(ProjectMethod projectMethod) throws MiddlewareQueryException;
+    void deleteProjectMethod(ProjectMethod projectMethod) throws MiddlewareQueryException;
     
     /**
      * Adds a project activity.
@@ -602,7 +601,7 @@ public interface WorkbenchDataManager {
      * @return Returns the id of the {@code ProjectActivity} record added
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public Integer addProjectActivity(ProjectActivity projectActivity) throws MiddlewareQueryException;
+    Integer addProjectActivity(ProjectActivity projectActivity) throws MiddlewareQueryException;
     
     /**
      * Adds project activities.
@@ -611,7 +610,7 @@ public interface WorkbenchDataManager {
      * @return Returns the ids of the {@code ProjectActivity} records added
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Integer> addProjectActivity(List<ProjectActivity> projectActivityList) throws MiddlewareQueryException;
+    List<Integer> addProjectActivity(List<ProjectActivity> projectActivityList) throws MiddlewareQueryException;
     
     /**
      * Retrieves a workbench_project_user_role record by id.
@@ -620,7 +619,7 @@ public interface WorkbenchDataManager {
      * @return the associated ProjectUser
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public ProjectUserRole getProjectUserRoleById(Integer id) throws MiddlewareQueryException;
+    ProjectUserRole getProjectUserRoleById(Integer id) throws MiddlewareQueryException;
     
     /**
      * Retrieves the workbench_project_user_role records based on the given project.
@@ -629,7 +628,7 @@ public interface WorkbenchDataManager {
      * @return the associated list of ProjectUser
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<ProjectUserRole> getProjectUserRolesByProject(Project project) throws MiddlewareQueryException;
+    List<ProjectUserRole> getProjectUserRolesByProject(Project project) throws MiddlewareQueryException;
     
     /**
      * Deletes the given ProjectUserRole.
@@ -637,7 +636,7 @@ public interface WorkbenchDataManager {
      * @param projectUserRole - the ProjectUserRole to delete
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public void deleteProjectUserRole(ProjectUserRole projectUserRole) throws MiddlewareQueryException;
+    void deleteProjectUserRole(ProjectUserRole projectUserRole) throws MiddlewareQueryException;
     
     /**
      * Return a List of {@link User} records associated with a {@link Project}.
@@ -646,7 +645,7 @@ public interface WorkbenchDataManager {
      * @return the List of {@link User} records
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<User> getUsersByProjectId(Long projectId) throws MiddlewareQueryException;
+    List<User> getUsersByProjectId(Long projectId) throws MiddlewareQueryException;
 
     /**
      * Returns the number of {@link User} records associated with a {@link Project}.
@@ -655,7 +654,7 @@ public interface WorkbenchDataManager {
      * @return the number of {@link User} records
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public long countUsersByProjectId(Long projectId) throws MiddlewareQueryException;
+    long countUsersByProjectId(Long projectId) throws MiddlewareQueryException;
     
     /**
      * Get the list of all installed central crop databases.
@@ -663,7 +662,7 @@ public interface WorkbenchDataManager {
      * @return the installed central crops
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<CropType> getInstalledCentralCrops() throws MiddlewareQueryException;
+    List<CropType> getInstalledCentralCrops() throws MiddlewareQueryException;
     
     /**
      * Get the crop type corresponding to the given name.
@@ -672,7 +671,7 @@ public interface WorkbenchDataManager {
      * @return the CropType retrieved
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public CropType getCropTypeByName(String cropName) throws MiddlewareQueryException;
+    CropType getCropTypeByName(String cropName) throws MiddlewareQueryException;
 
     /**
      * Add a crop type to the database.
@@ -681,7 +680,7 @@ public interface WorkbenchDataManager {
      * @return Returns the id of the {@code CropType} record added
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public String addCropType(CropType cropType) throws MiddlewareQueryException;
+    String addCropType(CropType cropType) throws MiddlewareQueryException;
 
     /**
      * Return a List of {@link ProjectActivity} records associated with a {@link Project}.
@@ -692,7 +691,7 @@ public interface WorkbenchDataManager {
      * @return the List of {@link ProjectActivity} records
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<ProjectActivity> getProjectActivitiesByProjectId(Long projectId, int start, int numOfRows) throws MiddlewareQueryException;
+    List<ProjectActivity> getProjectActivitiesByProjectId(Long projectId, int start, int numOfRows) throws MiddlewareQueryException;
 
     /**
      * Delete a project activity.
@@ -700,7 +699,7 @@ public interface WorkbenchDataManager {
      * @param projectActivity - the project activity to delete
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public void deleteProjectActivity(ProjectActivity projectActivity) throws MiddlewareQueryException;
+    void deleteProjectActivity(ProjectActivity projectActivity) throws MiddlewareQueryException;
 
     /**
      * Returns the number of {@link ProjectActivity} records associated with a {@link Project}.
@@ -709,7 +708,7 @@ public interface WorkbenchDataManager {
      * @return the number of {@link ProjectActivity} records associated to the given project
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public long countProjectActivitiesByProjectId(Long projectId) throws MiddlewareQueryException;
+    long countProjectActivitiesByProjectId(Long projectId) throws MiddlewareQueryException;
     
     /**
      * Adds the tool configuration.
@@ -718,7 +717,7 @@ public interface WorkbenchDataManager {
      * @return Returns the id of the {@code ToolConfiguration} record added
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public Integer addToolConfiguration(ToolConfiguration toolConfig) throws MiddlewareQueryException;
+    Integer addToolConfiguration(ToolConfiguration toolConfig) throws MiddlewareQueryException;
     
     /**
      * Update tool configuration.
@@ -727,7 +726,7 @@ public interface WorkbenchDataManager {
      * @return Returns the id of the updated {@code ToolConfiguration} record
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public Integer updateToolConfiguration(ToolConfiguration toolConfig) throws MiddlewareQueryException;
+    Integer updateToolConfiguration(ToolConfiguration toolConfig) throws MiddlewareQueryException;
     
     /**
      * Delete tool configuration.
@@ -735,7 +734,7 @@ public interface WorkbenchDataManager {
      * @param toolConfig - the tool config to delete
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public void deleteToolConfiguration(ToolConfiguration toolConfig) throws MiddlewareQueryException;
+    void deleteToolConfiguration(ToolConfiguration toolConfig) throws MiddlewareQueryException;
     
     /**
      * Gets the list of {@link ToolConfiguration} records by tool id.
@@ -744,7 +743,7 @@ public interface WorkbenchDataManager {
      * @return the list of tool configurations by tool id
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<ToolConfiguration> getListOfToolConfigurationsByToolId(Long toolId) throws MiddlewareQueryException;
+    List<ToolConfiguration> getListOfToolConfigurationsByToolId(Long toolId) throws MiddlewareQueryException;
     
     /**
      * Gets the {@link ToolConfiguration} by tool id and config key.
@@ -754,7 +753,7 @@ public interface WorkbenchDataManager {
      * @return the tool configuration by tool id and config key
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public ToolConfiguration getToolConfigurationByToolIdAndConfigKey(Long toolId, String configKey) throws MiddlewareQueryException;
+    ToolConfiguration getToolConfigurationByToolIdAndConfigKey(Long toolId, String configKey) throws MiddlewareQueryException;
     
     /**
      * Add a Workbench User and IBDB local database User mapping.
@@ -763,7 +762,7 @@ public interface WorkbenchDataManager {
      * @return Returns the id of the {@code IbdbUserMap} record added
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public Integer addIbdbUserMap(IbdbUserMap userMap) throws MiddlewareQueryException;
+    Integer addIbdbUserMap(IbdbUserMap userMap) throws MiddlewareQueryException;
     
     /**
      * Returns the Local IBDB User ID given a combination of a Workbench User ID and a Project ID.
@@ -774,7 +773,7 @@ public interface WorkbenchDataManager {
      * Returns null when there is no IBDB User ID matching the specified Workbench User ID and Project ID.
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public Integer getLocalIbdbUserId(Integer workbenchUserId, Long projectId) throws MiddlewareQueryException;
+    Integer getLocalIbdbUserId(Integer workbenchUserId, Long projectId) throws MiddlewareQueryException;
     
     /**
      * Save or update the specified {@link WorkbenchRuntimeData}.
@@ -783,7 +782,7 @@ public interface WorkbenchDataManager {
      * @return Returns the id of the updated {@code WorkbenchRuntimeData} record
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public Integer updateWorkbenchRuntimeData(WorkbenchRuntimeData workbenchRuntimeData) throws MiddlewareQueryException;
+    Integer updateWorkbenchRuntimeData(WorkbenchRuntimeData workbenchRuntimeData) throws MiddlewareQueryException;
     
     /**
      * Gets the workbench runtime data.
@@ -791,7 +790,7 @@ public interface WorkbenchDataManager {
      * @return The WorkbenchRuntimeData
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public WorkbenchRuntimeData getWorkbenchRuntimeData() throws MiddlewareQueryException;
+    WorkbenchRuntimeData getWorkbenchRuntimeData() throws MiddlewareQueryException;
     
     /**
      * Gets the role by id.
@@ -800,7 +799,7 @@ public interface WorkbenchDataManager {
      * @return the role matching the given id
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public Role getRoleById(Integer id) throws MiddlewareQueryException;
+    Role getRoleById(Integer id) throws MiddlewareQueryException;
 
     /**
      * Gets the role by name and workflow template.
@@ -810,7 +809,7 @@ public interface WorkbenchDataManager {
      * @return the role matching the given name and workflow template
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public Role getRoleByNameAndWorkflowTemplate(String name, WorkflowTemplate workflowTemplate) throws MiddlewareQueryException;
+    Role getRoleByNameAndWorkflowTemplate(String name, WorkflowTemplate workflowTemplate) throws MiddlewareQueryException;
 
     /**
      * Gets the roles by workflow template.
@@ -819,7 +818,7 @@ public interface WorkbenchDataManager {
      * @return the role matching the given workflow template
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Role> getRolesByWorkflowTemplate(WorkflowTemplate workflowTemplate) throws MiddlewareQueryException;
+    List<Role> getRolesByWorkflowTemplate(WorkflowTemplate workflowTemplate) throws MiddlewareQueryException;
 
     /**
      * Gets the workflow template of the given role.
@@ -828,7 +827,7 @@ public interface WorkbenchDataManager {
      * @return the workflow template matching the given role
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public WorkflowTemplate getWorkflowTemplateByRole(Role role) throws MiddlewareQueryException;
+    WorkflowTemplate getWorkflowTemplateByRole(Role role) throws MiddlewareQueryException;
     
     /**
      * Gets the roles given the project and user.
@@ -838,7 +837,7 @@ public interface WorkbenchDataManager {
      * @return the list of roles matching the given workflow template
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Role> getRolesByProjectAndUser(Project project, User user) throws MiddlewareQueryException;
+    List<Role> getRolesByProjectAndUser(Project project, User user) throws MiddlewareQueryException;
 
     /**
      * Returns all records from the workbench_role table,.
@@ -846,7 +845,7 @@ public interface WorkbenchDataManager {
      * @return List of Role objects
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Role> getAllRoles() throws MiddlewareQueryException;
+    List<Role> getAllRoles() throws MiddlewareQueryException;
     
     /**
      * Returns all records from the workbench_role table, ordered by descending role_id.
@@ -854,7 +853,7 @@ public interface WorkbenchDataManager {
      * @return List of Role objects
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Role> getAllRolesDesc() throws MiddlewareQueryException;
+    List<Role> getAllRolesDesc() throws MiddlewareQueryException;
     
     /**
      * Returns all records from the workbench_role table, ordered by ascending label_order.
@@ -862,7 +861,7 @@ public interface WorkbenchDataManager {
      * @return List of Role objects
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Role> getAllRolesOrderedByLabel() throws MiddlewareQueryException;
+    List<Role> getAllRolesOrderedByLabel() throws MiddlewareQueryException;
 
     /**
      * Get the workbench setting object.
@@ -870,7 +869,7 @@ public interface WorkbenchDataManager {
      * @return The WorkbenchSetting
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public WorkbenchSetting getWorkbenchSetting() throws MiddlewareQueryException;
+    WorkbenchSetting getWorkbenchSetting() throws MiddlewareQueryException;
 
     /**
      * Saves the specified SecurityQuestion object.
@@ -878,7 +877,7 @@ public interface WorkbenchDataManager {
      * @param securityQuestion - the Security Question object to be saved.
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public void addSecurityQuestion(SecurityQuestion securityQuestion) throws MiddlewareQueryException;
+    void addSecurityQuestion(SecurityQuestion securityQuestion) throws MiddlewareQueryException;
 
     /**
      * Gets all the Security Questions associated with the specified User ID.
@@ -887,7 +886,7 @@ public interface WorkbenchDataManager {
      * @return -  a {@code List} of {@code SecurityQuestion} objects associated with the given User.
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<SecurityQuestion> getQuestionsByUserId(Integer userId) throws MiddlewareQueryException;
+    List<SecurityQuestion> getQuestionsByUserId(Integer userId) throws MiddlewareQueryException;
     
     /**
      * Returns the ProjectUserMysqlAccount record identified by the given project id and user id.
@@ -897,7 +896,7 @@ public interface WorkbenchDataManager {
      * @return The ProjectUserMysqlAccount of the given project id and user id.
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public ProjectUserMysqlAccount getProjectUserMysqlAccountByProjectIdAndUserId(Integer projectId, Integer userId) throws MiddlewareQueryException;
+    ProjectUserMysqlAccount getProjectUserMysqlAccountByProjectIdAndUserId(Integer projectId, Integer userId) throws MiddlewareQueryException;
     
     /**
      * Stores a list of ProjectUserMysqlAccount records in the database.
@@ -906,7 +905,7 @@ public interface WorkbenchDataManager {
      * @return List of ids of the records saved
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Integer> addProjectUserMysqlAccounts(List<ProjectUserMysqlAccount> records) throws MiddlewareQueryException;
+    List<Integer> addProjectUserMysqlAccounts(List<ProjectUserMysqlAccount> records) throws MiddlewareQueryException;
     
     /**
      * Stores a ProjectUserMysqlAccount record in the database.
@@ -915,7 +914,7 @@ public interface WorkbenchDataManager {
      * @return id of the record saved
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public Integer addProjectUserMysqlAccount(ProjectUserMysqlAccount record) throws MiddlewareQueryException;
+    Integer addProjectUserMysqlAccount(ProjectUserMysqlAccount record) throws MiddlewareQueryException;
 
     /**
      * Gets the backup projects.
@@ -923,7 +922,7 @@ public interface WorkbenchDataManager {
      * @return the backup projects
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<ProjectBackup> getProjectBackups()  throws MiddlewareQueryException;
+    List<ProjectBackup> getProjectBackups()  throws MiddlewareQueryException;
     
     /**
      * Gets the backup of the specified projects.
@@ -932,7 +931,7 @@ public interface WorkbenchDataManager {
      * @return the backup projects
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<ProjectBackup> getProjectBackups(Project project)  throws MiddlewareQueryException;
+    List<ProjectBackup> getProjectBackups(Project project)  throws MiddlewareQueryException;
 
     /**
      * Save or update backup project.
@@ -941,7 +940,7 @@ public interface WorkbenchDataManager {
      * @return the project backup saved
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public ProjectBackup saveOrUpdateProjectBackup(ProjectBackup projectBackup) throws MiddlewareQueryException;
+    ProjectBackup saveOrUpdateProjectBackup(ProjectBackup projectBackup) throws MiddlewareQueryException;
 
     /**
      * remove backup project.
@@ -949,7 +948,7 @@ public interface WorkbenchDataManager {
      * @param projectBackup - the project backup to be deleted
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public void deleteProjectBackup(ProjectBackup projectBackup) throws MiddlewareQueryException;
+    void deleteProjectBackup(ProjectBackup projectBackup) throws MiddlewareQueryException;
     
     /**
      * Gets the ProjectUserInfoDAO.
@@ -957,7 +956,7 @@ public interface WorkbenchDataManager {
      * @return ProjectUserInfoDAO
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public ProjectUserInfoDAO getProjectUserInfoDao() throws MiddlewareQueryException;
+    ProjectUserInfoDAO getProjectUserInfoDao() throws MiddlewareQueryException;
     
     /**
      * Saves or updates the ProjectUserInfo.
@@ -966,7 +965,7 @@ public interface WorkbenchDataManager {
      * @return ProjectUserInfo
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public ProjectUserInfo saveOrUpdateProjectUserInfo(ProjectUserInfo projectUserInfo) throws MiddlewareQueryException;
+    ProjectUserInfo saveOrUpdateProjectUserInfo(ProjectUserInfo projectUserInfo) throws MiddlewareQueryException;
     
     /**
      * Retrieves ids of the breeding methods selected for a given workbench project.
@@ -975,7 +974,7 @@ public interface WorkbenchDataManager {
      * @return List of breeding method IDs
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public List<Integer> getBreedingMethodIdsByWorkbenchProjectId(Integer projectId) throws MiddlewareQueryException;
+    List<Integer> getBreedingMethodIdsByWorkbenchProjectId(Integer projectId) throws MiddlewareQueryException;
 
     /**
      * Gets the favorite project location ids.
@@ -1034,5 +1033,5 @@ public interface WorkbenchDataManager {
      * Returns null when there is no IBDB User ID matching the specified Workbench User ID and Project ID.
      * @throws MiddlewareQueryException the middleware query exception
      */
-    public Integer getWorkbenchUserId(Integer ibdbUserId, Long projectId) throws MiddlewareQueryException;
+    Integer getWorkbenchUserId(Integer ibdbUserId, Long projectId) throws MiddlewareQueryException;
 }

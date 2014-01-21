@@ -16,6 +16,8 @@ package org.generationcp.middleware.util;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -30,6 +32,8 @@ import java.util.List;
  * TODO : determine if it's possible to remove duplicate copy of class in IBPCommons
  */
 public class PoiUtil {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(PoiUtil.class);
 
     // WorkBook convenience methods
     public static void setRepeatingRows(Workbook workBook, int sheetIndex, int fromRow, int toRow) {
@@ -385,10 +389,7 @@ public class PoiUtil {
             while (row != null) {
                 if (getCellValue(row.getCell(columnIndex)) == null || getCellValue(row.getCell(columnIndex)).toString().equalsIgnoreCase("")) {
                     //do nothing
-
-
                 } else {
-
                     b = false;
                     return false;
                 }
@@ -397,7 +398,7 @@ public class PoiUtil {
 
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error(e.getMessage(), e);
         } finally {
             return b;
         }
@@ -417,11 +418,8 @@ public class PoiUtil {
             Row row = sheet.getRow(index);
             while (row != null) {
                 if (getCellValue(row.getCell(columnIndex)) == null || getCellValue(row.getCell(columnIndex)).toString().equalsIgnoreCase("")) {
-
-
                     b = true;
                     return true;
-
                 } else {
                     //do nothing
                 }
@@ -429,7 +427,7 @@ public class PoiUtil {
                 row = sheet.getRow(index);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error(e.getMessage(), e);
         } finally {
             return b;
         }
@@ -461,15 +459,15 @@ public class PoiUtil {
                     if (cellvalue == null) {
                         cellvalue = "";
                     }
-                } catch (Exception ec) {
-
+                } catch (Exception e) {
+                    LOG.error(e.getMessage(), e);
                 }
                 contents.add(cellvalue);
                 index++;
                 row = sheet.getRow(index);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error(e.getMessage(), e);
         } finally {
             return contents.toArray(new String[0]);
         }

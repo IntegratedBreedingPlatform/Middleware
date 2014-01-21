@@ -514,8 +514,7 @@ public class WorkbookParser {
         }
         FormulaEvaluator formulaEval = wb.getCreationHelper().createFormulaEvaluator();
         DataFormatter formatter = new DataFormatter();
-        String formattedCellValue = formatter.formatCellValue(cell,formulaEval);
-        return formattedCellValue;
+        return (String) formatter.formatCellValue(cell,formulaEval);
     }
 
 }

@@ -13,7 +13,6 @@ package org.generationcp.middleware.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Study;
@@ -73,15 +72,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     @Override
     public Study getStudy(int studyId) throws MiddlewareQueryException  {
     	//not using the variable type
-        Study study = getStudyDataManager().getStudy(studyId, false);
-        return study;
+        return getStudyDataManager().getStudy(studyId, false);
     }
 
     @Override           
     public List<Location> getFavoriteLocationByProjectId(List<Long> locationIds) throws MiddlewareQueryException {
-        // TODO Auto-generated method stub
-        
-        List<Location> locationList = new ArrayList();
+        List<Location> locationList = new ArrayList<Location>();
         
         for(int i = 0 ; i < locationIds.size() ; i++){
             Integer locationId = Integer.valueOf(locationIds.get(i).toString());
@@ -97,17 +93,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         return getStudyDataManager().getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId);
     }
 
-
-    //TODO: REMOVE THIS, THIS IS JUST FOR TESTING
-    @Override
-    public int getGeolocationId(int projectId) throws MiddlewareQueryException {
-        setWorkingDatabase(projectId);
-        Set<Integer> geolocations = getGeolocationDao().getLocationIds(projectId);
-        if (geolocations == null || geolocations.size() == 0) {
-            throw new MiddlewareQueryException("error in test data");
-        }
-        return geolocations.iterator().next();
-    }
     @Override
     public List<DatasetReference> getDatasetReferences(int studyId) throws MiddlewareQueryException {
         return getStudyDataManager().getDatasetReferences(studyId);

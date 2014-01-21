@@ -169,7 +169,7 @@ public class StandardVariableSaver extends Saver {
             errorMessage.append("\nthe value with definition = " + definition + " already exists.");
         }
             
-        if (!errorMessage.toString().equals("")){
+        if (errorMessage.length() > 0){
             throw new MiddlewareException(errorMessage.toString());
         } 
 

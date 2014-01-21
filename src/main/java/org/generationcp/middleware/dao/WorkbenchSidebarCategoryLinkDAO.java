@@ -19,6 +19,7 @@ import java.util.List;
  */
 public class WorkbenchSidebarCategoryLinkDAO extends GenericDAO<WorkbenchSidebarCategoryLink,Integer> {
 
+    @SuppressWarnings("unchecked")
     public List<WorkbenchSidebarCategoryLink> getAllWorkbenchSidebarLinksByCategoryId(WorkbenchSidebarCategory category, int start, int numOfRows) throws MiddlewareQueryException {
         try {
             Criteria criteria = getSession().createCriteria(WorkbenchSidebarCategoryLink.class);

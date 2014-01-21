@@ -24,7 +24,7 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
  * @author Joyce Avestro
  *
  */
-public class StandardVariableCache {
+public final class StandardVariableCache {
 
 	private static final StandardVariableCache instance = new StandardVariableCache();
 

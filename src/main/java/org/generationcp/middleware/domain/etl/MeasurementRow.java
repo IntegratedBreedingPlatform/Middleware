@@ -14,7 +14,6 @@ package org.generationcp.middleware.domain.etl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.util.Debug;
 
 public class MeasurementRow {

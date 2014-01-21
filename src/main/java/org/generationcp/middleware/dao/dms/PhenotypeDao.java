@@ -666,7 +666,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
                     " and e.nd_experiment_id = ep.nd_experiment_id" +
 			 		" and e.nd_experiment_id = epheno.nd_experiment_id" +
 					" and epheno.phenotype_id = pheno.phenotype_id";
-            System.out.println(sql);
 			SQLQuery statement = getSession().createSQLQuery(sql);
 			statement.executeUpdate();
 			

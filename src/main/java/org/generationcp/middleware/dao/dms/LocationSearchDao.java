@@ -49,17 +49,17 @@ public class LocationSearchDao extends GenericDAO<Location, Integer> {
 	}
 
 	private String getCountryIds(List<Country> countries) {
-		String ids = new String();
 		boolean first = true;
+		StringBuffer ids = new StringBuffer();
 		for (Country country : countries) {
 			if (first) {
-			    ids += country.getCntryid();
+			    ids.append(country.getCntryid());
 			}
 			else {
-				ids += "," + country.getCntryid();
+			    ids.append( ",").append(country.getCntryid());
 			}
 			first = false;
 		}
-		return ids;
+		return ids.toString();
 	}
 }
