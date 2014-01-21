@@ -213,6 +213,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 .append(" , machRow.value AS machineRow ")
                 .append(" , geo.description AS trialInstance ")
                 .append(" , s.dbxref_id AS gid ")
+                .append(" , ppStartDate.value as startDate ") 
+                .append(" , gpSeason.value as season ")
                 .append(" FROM ")
                 .append("  nd_experimentprop uid ")
                 .append("  INNER JOIN nd_experiment e ON e.nd_experiment_id = uid.nd_experiment_id ")
@@ -251,6 +253,10 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                 .append("     AND fldName.type_id = ").append(TermId.FIELD_NAME.getId())
                 .append("  LEFT JOIN nd_experimentprop machRow ON machRow.nd_experiment_id = uid.nd_experiment_id ")
                 .append("     AND machRow.type_id = ").append(TermId.MACHINE_ROW_CAPACITY.getId())
+                .append("  LEFT JOIN projectprop ppStartDate ON ppStartDate.project_id = pr.object_project_id ")
+                .append("     AND ppStartDate.type_id =  ").append(TermId.START_DATE.getId()).append(" ")
+                .append("  LEFT JOIN nd_geolocationprop gpSeason ON geo.nd_geolocation_id = gpSeason.nd_geolocation_id ")
+                .append("     AND gpSeason.type_id =  ").append(TermId.SEASON_VAR.getId()).append(" ") //--  8371 (2452)
                 .append(" WHERE uid.value in (SELECT DISTINCT fmid.value ")
                 .append("    FROM nd_experiment e ")
                 .append("    INNER JOIN nd_experimentprop fmid ON fmid.type_id = 32785 AND fmid.nd_experiment_id = e.nd_experiment_id ")
@@ -284,6 +290,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
                         .addScalar("machineRow")
                         .addScalar("trialInstance")
                         .addScalar("gid")
+                        .addScalar("startDate")
+                        .addScalar("season")
                         ;
                 query.setParameter("datasetId", datasetId);
                 query.setParameter("geolocationId", geolocationId);
@@ -461,6 +469,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
         
         for (Object[] row : rows) {
             FieldMapLabel label = new FieldMapLabel();
+            String startDate = (String) row[23];
             label.setStudyName((String) row[2]);
             label.setExperimentId(getIntegerValue(row[5]));
             label.setEntryNumber(getIntegerValue(row[6]));
@@ -473,6 +482,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
             label.setGeolocationId((Integer) row[3]);
             label.setSiteName((String) row[4]);
             label.setGid((Integer) row[22]);
+            label.setStartYear(startDate != null && !startDate.equals("null") ? startDate.substring(0, 4) : null);
+            label.setSeason(Season.getSeason((String) row[24]));
 
             String trialKey = getTrialKey((Integer) row[0], (Integer) row[3]);
             FieldMapTrialInstanceInfo trial = trialMap.get(trialKey);

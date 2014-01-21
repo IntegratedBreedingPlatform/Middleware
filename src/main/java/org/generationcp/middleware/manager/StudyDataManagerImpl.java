@@ -581,9 +581,40 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
     }
 
     @Override
-    public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int datasetId, int geolocationId) throws MiddlewareQueryException {
+    public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int datasetId, int geolocationId)
+            throws MiddlewareQueryException {
+        List<FieldMapInfo> fieldMapInfos = new ArrayList<FieldMapInfo>();
         setWorkingDatabase(datasetId);
-        return getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId);
+        
+        fieldMapInfos = getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId);
+
+        // Filter those belonging to the given geolocationId
+        for (FieldMapInfo fieldMapInfo : fieldMapInfos) {
+            List<FieldMapDatasetInfo> datasetInfoList = fieldMapInfo.getDatasets();
+            if (datasetInfoList != null){
+                for (FieldMapDatasetInfo fieldMapDatasetInfo : datasetInfoList) {
+                    List<FieldMapTrialInstanceInfo> trialInstances =
+                            fieldMapDatasetInfo.getTrialInstances();
+                    if (trialInstances != null && trialInstances.size() > 0) {
+                        for (FieldMapTrialInstanceInfo trialInstance : trialInstances) {
+                            List<FieldMapLabel> labels = trialInstance.getFieldMapLabels();
+                            for (FieldMapLabel label : labels) {
+                                String pedigree = null;
+                                try {
+                                    pedigree = germplasmDataManager.getCrossExpansion(label.getGid(), 1);
+                                } catch (Throwable e) {
+                                    //do nothing
+                                }
+
+                                label.setPedigree(pedigree);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return fieldMapInfos;
     }
 
     @Override
