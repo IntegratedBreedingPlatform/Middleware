@@ -234,6 +234,22 @@ public interface StudyDataManager{
      */
     void addExperiment(int dataSetId, ExperimentType experimentType, ExperimentValues experimentValues)
             throws MiddlewareQueryException;
+    
+    /**
+     * Adds or updates an experiment row to the dataset.
+     * 
+     * @param dataSetId
+     *            The ID of the dataset to add the experiment into
+     * @param experimentType
+     *            The type of Experiment - could be ExperimentType.PLOT,
+     *            ExperimentType.SAMPLE, ExperimentType.AVERAGE,
+     *            ExperimentType.SUMMARY
+     * @param experimentValues
+     *            The values to set
+     * @throws MiddlewareQueryException
+     */
+    void addOrUpdateExperiment(int dataSetId, ExperimentType experimentType, ExperimentValues experimentValues)
+            throws MiddlewareQueryException;
 
     /**
      * Adds a Trial Environment. Accepts a variable list and sets up the trial

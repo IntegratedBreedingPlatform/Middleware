@@ -423,7 +423,7 @@ public class WorkbookParser {
             //add each row in observations
             Sheet observationSheet = wb.getSheetAt(OBSERVATION_SHEET);
             Integer lastRowNum = PoiUtil.getLastRowNum(observationSheet);
-            while (currentRow < lastRowNum) {
+            while (currentRow <= lastRowNum) {
                 // skip over blank rows in the observation sheet
                 if (rowIsEmpty(wb, OBSERVATION_SHEET, currentRow, factors.size() + variates.size())) {
                     currentRow++;

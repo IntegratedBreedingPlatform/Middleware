@@ -678,5 +678,42 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					+ projectId + ", " + locationId + " in PhenotypeDao: " + e.getMessage(), e);
 		}
 	}
+	
+	public int updatePhenotypesByProjectIdAndLocationId(Integer projectId, 
+			Integer locationId,
+			Integer stockId,
+			Integer cvTermId,
+			String value) throws MiddlewareQueryException {
+		try {
+			this.flush();
+			
+			// update the value of phenotypes
+			String sql = "UPDATE nd_experiment_project ep " +
+					"INNER JOIN nd_experiment exp ON ep.nd_experiment_id = exp.nd_experiment_id " +
+					"INNER JOIN nd_experiment_stock expstock ON expstock.nd_experiment_id = exp.nd_experiment_id  " +
+					"INNER JOIN stock ON expstock.stock_id = stock.stock_id " +
+					"INNER JOIN nd_experiment_phenotype expp ON ep.nd_experiment_id = expp.nd_experiment_id  " +
+					"INNER JOIN phenotype pheno ON expp.phenotype_id = pheno.phenotype_id " +
+					"SET pheno.value = '" + value + "'" +
+					" WHERE ep.project_id = " + projectId +
+					" AND exp.nd_geolocation_id = " + locationId + 
+					" AND exp.type_id = 1170 " +
+					" AND stock.stock_id = " + stockId +
+					" AND pheno.observable_id = " + cvTermId;
+					
+			SQLQuery statement = getSession().createSQLQuery(sql);
+			int returnVal = statement.executeUpdate();
+			
+            this.flush();
+            this.clear();
+            
+            return returnVal;
+
+		} catch(HibernateException e) {
+			logAndThrowException("Error in updatePhenotypesByProjectIdAndLocationId=" 
+					+ projectId + ", " + locationId + " in PhenotypeDao: " + e.getMessage(), e);
+			return 0;
+		}
+	}
 
 }
