@@ -44,6 +44,9 @@ public class FieldMapLabel implements Serializable{
     /** The plot no. */
     private Integer plotNo;
     
+    /** The plot coordinate. */
+    private String plotCoordinate;
+    
     /** The column. */
     private Integer column;
     
@@ -385,8 +388,18 @@ public class FieldMapLabel implements Serializable{
     public void setPedigree(String pedigree) {
         this.pedigree = pedigree;
     }
+    
+    
 
-    /* (non-Javadoc)
+    public String getPlotCoordinate() {
+		return "Col " + getColumn() + " Range " + getRange();
+	}
+
+	public void setPlotCoordinate(String plotCoordinate) {
+		this.plotCoordinate = plotCoordinate;
+	}
+
+	/* (non-Javadoc)
      * @see java.lang.Object#toString()
      */
     @Override
