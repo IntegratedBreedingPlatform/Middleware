@@ -76,6 +76,7 @@ public class MiddlewareServletContextListener implements ServletContextListener 
     private final static String PARAM_MIDDLEWARE_HIBERNATE_CONFIG = "middleware_hibernate_config_file";
     private final static String PARAM_MIDDLEWARE_DATABASE_PROPERTY_FILE = "middleware_database_property_file";
     private final static String PARAM_WORKBENCH_DATABASE_PROPERTY_FILE = "workbench_database_property_file";
+    private final static String PARAM_MIDDLEWARE_RESOURCE_FILES = "middleware_additional_resources";
 
     private SessionFactory sessionFactoryForLocal;
     private SessionFactory sessionFactoryForCentral;
@@ -100,6 +101,12 @@ public class MiddlewareServletContextListener implements ServletContextListener 
         String hibernateConfigurationFilename = context.getInitParameter(PARAM_MIDDLEWARE_HIBERNATE_CONFIG);
         String databasePropertyFilename = context.getInitParameter(PARAM_MIDDLEWARE_DATABASE_PROPERTY_FILE);
         String workbenchPropertyFilename = context.getInitParameter(PARAM_WORKBENCH_DATABASE_PROPERTY_FILE);
+        String paramResourceFile = context.getInitParameter(PARAM_MIDDLEWARE_RESOURCE_FILES);
+
+        String[] additionalResourceFiles = null;
+        if (paramResourceFile != null && (! paramResourceFile.isEmpty()) ) {
+            additionalResourceFiles = paramResourceFile.split(",");
+        }
 
         if (databasePropertyFilename == null) {
             throw new RuntimeException("'middleware_database_property_file' context parameter not declared! It must be set to the filename of a middleware database property file.");
@@ -116,9 +123,9 @@ public class MiddlewareServletContextListener implements ServletContextListener 
 
             DatabaseConnectionParameters paramsForWorkbench = new DatabaseConnectionParameters(databasePropertyFilename, "workbench");
 
-            sessionFactoryForLocal = SessionFactoryUtil.openSessionFactory(hibernateConfigurationFilename, paramsForLocal);
-            sessionFactoryForCentral = SessionFactoryUtil.openSessionFactory(hibernateConfigurationFilename, paramsForCentral);
-            sessionFactoryForWorkbench = SessionFactoryUtil.openSessionFactory(hibernateConfigurationFilename, paramsForWorkbench);
+            sessionFactoryForLocal = SessionFactoryUtil.openSessionFactory(hibernateConfigurationFilename, paramsForLocal, additionalResourceFiles);
+            sessionFactoryForCentral = SessionFactoryUtil.openSessionFactory(hibernateConfigurationFilename, paramsForCentral, additionalResourceFiles);
+            sessionFactoryForWorkbench = SessionFactoryUtil.openSessionFactory(hibernateConfigurationFilename, paramsForWorkbench, additionalResourceFiles);
 
             context.setAttribute(ATTR_MIDDLEWARE_LOCAL_SESSION_FACTORY, sessionFactoryForLocal);
             context.setAttribute(ATTR_MIDDLEWARE_CENTRAL_SESSION_FACTORY, sessionFactoryForCentral);
