@@ -61,7 +61,7 @@ public abstract class SessionFactoryUtil {
      * @return
      * @throws FileNotFoundException
      */
-    public static SessionFactory openSessionFactory(String hibernateConfigurationFile, DatabaseConnectionParameters params) throws FileNotFoundException {
+    public static SessionFactory openSessionFactory(String hibernateConfigurationFile, DatabaseConnectionParameters params, String... additionalResourceFiles) throws FileNotFoundException {
         if (hibernateConfigurationFile == null) {
             hibernateConfigurationFile = MIDDLEWARE_INTERNAL_HIBERNATE_CFG;
         }
@@ -77,6 +77,10 @@ public abstract class SessionFactoryUtil {
         cfg.setProperty("hibernate.connection.url", connectionUrl);
         cfg.setProperty("hibernate.connection.username", params.getUsername());
         cfg.setProperty("hibernate.connection.password", params.getPassword());
+
+        for (String resourceFile : additionalResourceFiles) {
+            cfg.addResource(resourceFile);
+        }
 
         LOG.info("Opening SessionFactory for local database...");
         return cfg.buildSessionFactory();

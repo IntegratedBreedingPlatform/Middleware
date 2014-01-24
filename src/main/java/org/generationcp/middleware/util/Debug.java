@@ -11,19 +11,24 @@
  *******************************************************************************/
 package org.generationcp.middleware.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Debug {
+
+    private final static Logger LOG = LoggerFactory.getLogger(Debug.class);
 
     public static void println(int indent, String s) {
         for (int i = 0; i < indent; i++) {
-            System.out.print(" ");
+            LOG.debug(" ");
         }
-        System.out.println(s);
+        LOG.debug(s);
     }
 
     public static void print(int indent, String s) {
         for (int i = 0; i < indent; i++) {
-            System.out.print(" ");
+            LOG.debug(" ");
         }
-        System.out.print(s);
+        LOG.debug(s);
     }
 }
