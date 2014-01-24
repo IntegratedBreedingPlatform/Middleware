@@ -94,7 +94,7 @@ public class Location implements Serializable, Comparable<Location>{
     public static String GET_ALL_BREEDING_LOCATIONS = "SELECT locid, ltype, nllp, lname, labbr, snl3id, snl2id, snl1id, cntryid, lrplce, nnpid FROM location WHERE ltype IN (410, 411, 412) ORDER BY lname";
     public static String COUNT_ALL_BREEDING_LOCATIONS = "SELECT count(*) AS count FROM location WHERE ltype IN (410, 411, 412)";
     public static final String GET_LOCATION_NAMES_BY_GIDS =
-            "SELECT gid, lname "
+            "SELECT gid, g.glocn, lname "
             + "FROM germplsm g "
     		+ "LEFT JOIN location l "
             + "ON g.glocn = l.locid "

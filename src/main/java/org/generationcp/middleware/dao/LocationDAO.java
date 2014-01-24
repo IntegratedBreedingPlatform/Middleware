@@ -11,7 +11,11 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.LocationDto;
@@ -392,13 +396,19 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
         return new ArrayList<Location>();
     }
 
-
-
-
-
-
+    public Map<Integer, String> getLocationNamesByLocationIDs(List<Integer> locIds) throws MiddlewareQueryException {
+        Map<Integer, String> toreturn = new HashMap<Integer, String>();
+        
+       List<Location> locations = getLocationByIds(locIds);
+       for (Location location : locations){
+    	   toreturn.put(location.getLocid(), location.getLname());
+       }
+        
+        return toreturn;
+    }
+    
     @SuppressWarnings("unchecked")
-    public Map<Integer, String> getLocationNamesByGIDs(List<Integer> gids) throws MiddlewareQueryException {
+    public Map<Integer, String> getLocationNamesMapByGIDs(List<Integer> gids) throws MiddlewareQueryException {
         Map<Integer, String> toreturn = new HashMap<Integer, String>();
         for(Integer gid : gids){
             toreturn.put(gid, null);
@@ -412,8 +422,37 @@ public class LocationDAO extends GenericDAO<Location, Integer>{
             for(Object result : results){
                 Object resultArray[] = (Object[]) result;
                 Integer gid = (Integer) resultArray[0];
-                String location = (String) resultArray[1];
+                String location = (String) resultArray[2];
                 toreturn.put(gid, location);
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getLocationNamesMapByGIDs(gids=" + gids + ") query from Location " + e.getMessage(), e);
+        }
+        
+        return toreturn;
+    }
+
+
+
+
+    @SuppressWarnings("unchecked")
+    public Map<Integer, LocationDto> getLocationNamesByGIDs(List<Integer> gids) throws MiddlewareQueryException {
+        Map<Integer, LocationDto> toreturn = new HashMap<Integer, LocationDto>();
+        for(Integer gid : gids){
+            toreturn.put(gid, null);
+        }
+        
+        try{
+            SQLQuery query = getSession().createSQLQuery(Location.GET_LOCATION_NAMES_BY_GIDS);
+            query.setParameterList("gids", gids);
+            
+            List<Object> results = query.list();
+            for(Object result : results){
+                Object resultArray[] = (Object[]) result;
+                Integer gid = (Integer) resultArray[0];
+                Integer locid = (Integer) resultArray[1];
+                String locationName = (String) resultArray[2];
+                toreturn.put(gid, new LocationDto(locid, locationName));
             }
         } catch (HibernateException e) {
             logAndThrowException("Error with getLocationNamesByGIDs(gids=" + gids + ") query from Location " + e.getMessage(), e);

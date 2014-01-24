@@ -27,6 +27,7 @@ import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
+import org.generationcp.middleware.domain.dms.LocationDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -1887,7 +1888,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public Map<Integer, String> getLocationNamesByGids (List<Integer> gids) throws MiddlewareQueryException{
     	 Map<Integer, String> toreturn = new HashMap<Integer, String>();
-         
+    	 
          List<Integer> positiveGIDs = new ArrayList<Integer>();
          List<Integer> negativeGIDs = new ArrayList<Integer>();
          
@@ -1900,27 +1901,48 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
              }
          }
          
-         //get data from central and add it to the map
-         if(!positiveGIDs.isEmpty()){
-        	 Map<Integer, String> resultsFromCentral = new HashMap<Integer, String>();
-        	 if (setWorkingDatabase(Database.CENTRAL)) {
-        		 resultsFromCentral = getLocationDao().getLocationNamesByGIDs(positiveGIDs);
-        	 }
-             for(Integer gid : resultsFromCentral.keySet()){
-                 toreturn.put(gid, resultsFromCentral.get(gid));
-             }
-         }
-         
-         //get data from local and add it to the map
+         //get data from local
+         Map<Integer, LocationDto> resultsFromLocal = new HashMap<Integer, LocationDto>();
          if(!negativeGIDs.isEmpty()){
-        	 Map<Integer, String> resultsFromLocal = new HashMap<Integer, String>();
         	 if (setWorkingDatabase(Database.LOCAL)) {
         		 resultsFromLocal = getLocationDao().getLocationNamesByGIDs(negativeGIDs);
         	 }
-             for(Integer gid : resultsFromLocal.keySet()){
-                 toreturn.put(gid, resultsFromLocal.get(gid));
-             }
          }
+         
+         //query central location references for local GIDs and then add to map
+         List<Integer> centralLocationIds = new ArrayList<Integer>();
+         for (LocationDto location : resultsFromLocal.values()){
+        	 Integer locId = location.getId();
+        	 if (locId != null && locId > 0 && !centralLocationIds.contains(locId)){
+        		 centralLocationIds.add(locId);
+        	 }
+         }
+         if (setWorkingDatabase(Database.CENTRAL)){
+        	 Map<Integer, String> centralLocations = new HashMap<Integer, String>();
+        	 if (!centralLocationIds.isEmpty()){
+        		 centralLocations = getLocationDao().getLocationNamesByLocationIDs(centralLocationIds);
+        	 }
+        	 for (Integer gid : resultsFromLocal.keySet()){
+        		 LocationDto location = resultsFromLocal.get(gid);
+        		 Integer locationId = location.getId();
+        		 String locationName = location.getLocationName();
+        		 if (locationId > 0){
+        			 locationName = centralLocations.get(locationId);
+        		 }
+        		 toreturn.put(gid, locationName);
+        	 }
+         }
+
+         
+         //get data from central and add it to the map
+         if(!positiveGIDs.isEmpty()){
+        	 if (setWorkingDatabase(Database.CENTRAL)) {
+        		 toreturn.putAll(getLocationDao().getLocationNamesMapByGIDs(positiveGIDs));
+        	 }
+         }
+         
+        
+         
          
          return toreturn;
     }
