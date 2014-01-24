@@ -884,6 +884,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
      * @throws MiddlewareQueryException 
      */
     public List<Germplasm> searchForGermplasms(String q, Operation o) throws MiddlewareQueryException{
+    	q = q.trim();
     	if(q.equals("")){
     		return new ArrayList<Germplasm>();
     	}
@@ -895,6 +896,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
         	//First priority, germplasms with GID=q
             SQLQuery p1_query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GID);
             p1_query.setParameter("gid", q);
+            p1_query.setParameter("gidLength", q.length());
             p1_query.addEntity("germplsm", Germplasm.class);
             //p1_query.setParameter("deletedStatus", STATUS_DELETED);
 			result.addAll(p1_query.list());

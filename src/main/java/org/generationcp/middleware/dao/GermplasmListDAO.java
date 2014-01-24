@@ -327,6 +327,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
      */
     @SuppressWarnings("unchecked")
     public List<GermplasmList> searchForGermplasmLists(String q, Operation o) throws MiddlewareQueryException{
+    	q = q.trim();
     	if(q.equals("")){
     		return new ArrayList<GermplasmList>();
     	}
@@ -341,6 +342,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer>{
             	query.setParameter("q", "%"+q+"%");
             }
         	query.setParameter("gid", q);
+        	query.setParameter("gidLength", q.length());
         	query.addEntity("listnms", GermplasmList.class);
             List<GermplasmList> germplasmLists = query.list();
 

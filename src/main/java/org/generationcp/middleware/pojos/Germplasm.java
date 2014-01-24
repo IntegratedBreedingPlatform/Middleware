@@ -326,7 +326,7 @@ public class Germplasm implements Serializable{
     public static final String SEARCH_GERMPLASM_BY_GID = 
     		"SELECT germplsm.* " +
     		"FROM germplsm " +
-    		"WHERE gid=:gid";
+    		"WHERE gid=:gid and length(gid) = :gidLength";
     public static final String SEARCH_GERMPLASM_BY_GIDS = 
     		"SELECT germplsm.* " +
     		"FROM germplsm " +
