@@ -205,8 +205,8 @@ public class Lot implements Serializable{
 		builder.append(scaleId);
 		builder.append(", status=");
 		builder.append(status);
-		builder.append(", source=");
-		builder.append(source);
+		builder.append(", source.id=");
+		builder.append(source.getId());
 		builder.append(", comments=");
 		builder.append(comments);
 		builder.append(", transactions=");

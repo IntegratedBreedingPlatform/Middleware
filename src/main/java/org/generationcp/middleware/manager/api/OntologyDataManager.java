@@ -97,7 +97,6 @@ public interface OntologyDataManager {
 	 * @return the term
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	@Deprecated
 	Term addMethod(String name, String definition) throws MiddlewareQueryException;
 	
 	/**
