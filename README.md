@@ -20,6 +20,8 @@ To Build
 <pre>
     mvn clean install -DenvConfig=dev-config-dir  
 </pre>  
+* To build using Eclipse, right-click on the IBPMiddleware project, select Run As --> Maven build..., then input the target discussed above.
+
   
 To Run Tests
 --------------
@@ -29,17 +31,22 @@ To Run Tests
   3.  To run a specific test function: <pre>mvn clean test -Dtest=TestClassName#testFunctionName</pre>
 
 * You need to specify the IBDB database to connect to in the testDatabaseConfig.properties file. 
+
 * All JUnit test suites require the rice database, except for GenotypicDataManager that uses the groundnut crop in testing.
 
 * Similar to building the Middleware, add the -DenvConfig parameter to use a specific configuration.
+
+* To run JUnit tests using Eclipse, right-click on the specific JUnit test suite in the IBPMiddleware project, select Run As --> JUnit test.
+
+
  
 To Use
 -----------
 * To add Middleware as a dependency to your project using Apache Maven, add the following to your list of dependencies:  
 <pre>
-    groupId: org.generationcp  
-    artifactId: middleware  
-    version: 2.1.0  
+    <groupId>org.generationcp</groupId>
+    <artifactId>middleware</artifactId>
+    <version>2.1.0</version>
 </pre>
 
 * Take note of the version.  Use of the latest version is recommended.  
