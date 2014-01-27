@@ -12,21 +12,21 @@ The library is used by different projects such as the IB Workflow System, List M
 To Build
 ----------
 * To build the Middleware API, run the following command in the IBPMiddleware directory:  
-<pre>  
+<pre>
     mvn clean install
 </pre>
     
 * To build using a specific configuration, run the following:  
-<pre>  
+<pre>
     mvn clean install -DenvConfig=dev-config-dir  
 </pre>  
   
 To Run Tests
 --------------
 * To run JUnit tests using the command line, issue the following commands in the IBPMiddleware directory:
-  1.  To run all tests: mvn clean test
-  2.  To run a specific test class: mvn clean test -Dtest=TestClassName
-  3.  To run a specific test function: mvn clean test -Dtest=TestClassName#testFunctionName
+  1.  To run all tests: <pre>mvn clean test</pre>
+  2.  To run a specific test class: <pre>mvn clean test -Dtest=TestClassName</pre>
+  3.  To run a specific test function: <pre>mvn clean test -Dtest=TestClassName#testFunctionName</pre>
 
 * You need to specify the IBDB database to connect to in the testDatabaseConfig.properties file. 
 * All JUnit test suites require the rice database, except for GenotypicDataManager that uses the groundnut crop in testing.
