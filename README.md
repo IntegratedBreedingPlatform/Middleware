@@ -1,10 +1,10 @@
-Middleware
+IBPMiddleware
 ============
 
 Overview
 ----------
 The Middleware API is a library that is used to provide access to Integrated Breeding Program Databases. 
-It consists of Managers corresponding to different systems including Genealogy Management System, Data Management System, 
+It consists of managers corresponding to different systems including Genealogy Management System, Data Management System, 
 Genotypic Data Management System, Germplasm List Management and Seed Inventory Management System. 
 
 The library is used by different projects such as the IB Workflow System, List Manager, Fieldbook, GDMS, etc.
@@ -24,9 +24,9 @@ To Build
 To Run Tests
 --------------
 * To run JUnit tests using the command line, issue the following commands in the IBPMiddleware directory:
-  1.  To run all tests: <pre>mvn clean test</pre>
-  2.  To run a specific test class: <pre>mvn clean test -Dtest=TestClassName</pre>
-  3.  To run a specific test function: <pre>mvn clean test -Dtest=TestClassName#testFunctionName</pre>
+1.  To run all tests: <pre>mvn clean test</pre>
+2.  To run a specific test class: <pre>mvn clean test -Dtest=TestClassName</pre>
+3.  To run a specific test function: <pre>mvn clean test -Dtest=TestClassName#testFunctionName</pre>
 
 * You need to specify the IBDB database to connect to in the testDatabaseConfig.properties file. 
 * All JUnit test suites require the rice database, except for GenotypicDataManager that uses the groundnut crop in testing.
