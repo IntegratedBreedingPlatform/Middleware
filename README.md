@@ -51,9 +51,9 @@ To Use
 -----------
 To add Middleware as a dependency to your project using Apache Maven, add the following to your list of dependencies:  
 <pre>
-    <groupId>org.generationcp</groupId>
-    <artifactId>middleware</artifactId>
-    <version>2.1.0</version>
+    groupId: org.generationcp
+    artifactId: middleware
+    version: 2.1.0
 </pre>
 
 Take note of the version.  Use of the latest version is recommended.  
