@@ -34,6 +34,15 @@ public interface DataImportService {
 	 */
 	int saveDataset(Workbook workbook) throws MiddlewareQueryException;
 	
+    /**
+     * Saves a workbook as a local trial or nursery on the new CHADO schema
+     * 
+     * @param workbook
+     * @param retainValues if true, values of the workbook items are retained, else they are cleared to conserve memory
+     * @return id of created trial or nursery
+     */
+    int saveDataset(Workbook workbook, boolean retainValues) throws MiddlewareQueryException;
+
 	/**
 	 * Given a file, parse the file to create a workbook object
 	 * 

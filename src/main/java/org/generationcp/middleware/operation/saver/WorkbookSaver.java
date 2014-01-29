@@ -133,7 +133,7 @@ public class WorkbookSaver extends Saver {
      * @throws Exception
      */
 	@SuppressWarnings("unchecked")
-	public int saveDataset(Workbook workbook, Map<String, ?> variableMap) throws Exception {
+	public int saveDataset(Workbook workbook, Map<String, ?> variableMap, boolean retainValues) throws Exception {
 		
 		// unpack maps first level - Maps of Strings, Maps of VariableTypeList , Maps of Lists of MeasurementVariable
 		Map<String, List<String>> headerMap = (Map<String, List<String>>) variableMap.get("headerMap");
@@ -189,19 +189,21 @@ public class WorkbookSaver extends Saver {
    		int datasetId = createMeasurementEffectDatasetIfNecessary(workbook, studyId, effectMV, effectVariables, trialVariables);
    		createStocksIfNecessary(datasetId, workbook, effectVariables, trialHeaders);
    		
-   		//clean up some variable references to save memory space before saving the measurement effects
-   		variableMap = null;
-   		headerMap = null;
-   		variableTypeMap = null;
-   		measurementVariableMap = null;
-   		trialVariableTypeList = null;
-   		effectMV = null;
-   		workbook.reset();
-   		workbook.setConditions(null);
-   		workbook.setConstants(null);
-   		workbook.setFactors(null);
-   		workbook.setStudyDetails(null);
-   		workbook.setVariates(null);
+   		if (!retainValues){
+       		//clean up some variable references to save memory space before saving the measurement effects
+       		variableMap = null;
+       		headerMap = null;
+       		variableTypeMap = null;
+       		measurementVariableMap = null;
+       		trialVariableTypeList = null;
+       		effectMV = null;
+       		workbook.reset();
+       		workbook.setConditions(null);
+       		workbook.setConstants(null);
+       		workbook.setFactors(null);
+       		workbook.setStudyDetails(null);
+       		workbook.setVariates(null);
+   		}
    		
    		createMeasurementEffectExperiments(datasetId, effectVariables,  workbook.getObservations(), trialHeaders, trialVariatesMap);
         
