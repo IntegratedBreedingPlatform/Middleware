@@ -19,6 +19,8 @@ public class MeasurementData {
 	
 	private String value;
 	
+	private boolean isEditable;
+	
 	
 	public MeasurementData() {
 	}
@@ -62,4 +64,14 @@ public class MeasurementData {
 	    Debug.println(indent + 3, "Value: " + value);
 	}
 
+	public boolean isEditable() {
+		return isEditable;
+	}
+
+	public void setEditable(boolean isEditable) {
+		this.isEditable = isEditable;
+	}
+
+	
+	
 }

@@ -97,6 +97,18 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     public List<DatasetReference> getDatasetReferences(int studyId) throws MiddlewareQueryException {
         return getStudyDataManager().getDatasetReferences(studyId);
     }
+
+	@Override
+	public int getNextGermplasmId() throws MiddlewareQueryException {
+		return getGermplasmDataManager().getNextNegativeId().intValue();
+	}
+
+	@Override
+	public String getGermplasmIdByName(String name)
+			throws MiddlewareQueryException {
+		return null;
+		//getGermplasmDataManager().getGermplasmByName(name, 0, 1, op);
+	}
     
     
 }

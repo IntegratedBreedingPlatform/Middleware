@@ -30,6 +30,8 @@ public class MeasurementVariable {
 	private String value;
 	
 	private String label;
+	
+	private boolean isFactor;
 
 	public MeasurementVariable() {
 	}
@@ -146,6 +148,14 @@ public class MeasurementVariable {
 	    Debug.println(indent + 3, "Data Type: " + dataType);
 	    Debug.println(indent + 3, "Value: " + value);
 	    Debug.println(indent + 3, "Label: " + label);
+	}
+
+	public boolean isFactor() {
+		return isFactor;
+	}
+
+	public void setFactor(boolean isFactor) {
+		this.isFactor = isFactor;
 	}
 
 	

@@ -1215,5 +1215,10 @@ public interface GermplasmDataManager {
      */
     Map<Integer, Object> getMethodsByGids(List<Integer> gids) throws MiddlewareQueryException;
 
-    
+    /**
+     * Gets the next negative id.
+     *
+     * @return the next negative id
+     */
+    Integer getNextNegativeId() throws MiddlewareQueryException;
 }

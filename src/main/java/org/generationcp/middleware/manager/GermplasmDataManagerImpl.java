@@ -2030,6 +2030,13 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         }
 
         return results;
-    }    
+    }
+
+	@Override
+	public Integer getNextNegativeId() throws MiddlewareQueryException {
+		setWorkingDatabase(Database.LOCAL);
+			 return getGermplasmDao().getNegativeId("gid");
+			
+	}    
     
 }

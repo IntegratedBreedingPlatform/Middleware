@@ -21,6 +21,7 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Location;
 
+// TODO: Auto-generated Javadoc
 /**
  * This is the API for Fieldbook requirements.
  * 
@@ -118,5 +119,24 @@ public interface FieldbookService {
      * @throws MiddlewareQueryException the middleware query exception
      */
     Study getStudy(int studyId) throws MiddlewareQueryException;
+    
+    /**
+     * Gets the next germplasm id.
+     *
+     * @return the next germplasm id
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    int getNextGermplasmId() throws MiddlewareQueryException;
+    
+    /**
+     * Gets the germplasm id by name.
+     *
+     * @param name the name
+     * @return the germplasm id by name
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    String getGermplasmIdByName(String name) throws MiddlewareQueryException;
+    
+    
 
 }
