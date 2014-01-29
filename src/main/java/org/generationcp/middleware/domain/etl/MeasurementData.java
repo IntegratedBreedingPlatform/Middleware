@@ -20,7 +20,7 @@ public class MeasurementData {
 	private String value;
 	
 	private boolean isEditable;
-	
+	private String dataType;
 	
 	public MeasurementData() {
 	}
@@ -29,6 +29,14 @@ public class MeasurementData {
 		super();
 		this.label = label;
 		this.value = value;
+	}
+	
+	public MeasurementData(String label, String value, boolean isEditable, String dataType) {
+		super();
+		this.label = label;
+		this.value = value;
+		this.isEditable = isEditable;
+		this.dataType = dataType;
 	}
 
 	public String getLabel() {
@@ -70,6 +78,14 @@ public class MeasurementData {
 
 	public void setEditable(boolean isEditable) {
 		this.isEditable = isEditable;
+	}
+
+	public String getDataType() {
+		return dataType;
+	}
+
+	public void setDataType(String dataType) {
+		this.dataType = dataType;
 	}
 
 	
