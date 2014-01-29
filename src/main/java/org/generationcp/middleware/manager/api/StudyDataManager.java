@@ -658,4 +658,12 @@ public interface StudyDataManager{
      * @throws MiddlewareQueryException the middleware query exception
      */
     long countAllNurseryAndTrialStudyDetails() throws MiddlewareQueryException;
+
+    /**
+     * Retrieves the folder tree.
+     * 
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    List<FolderReference> getFolderTree() throws MiddlewareQueryException;
 }

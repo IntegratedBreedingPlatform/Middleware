@@ -20,6 +20,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.ExperimentBuilder;
+import org.generationcp.middleware.operation.builder.FolderBuilder;
 import org.generationcp.middleware.operation.builder.MethodBuilder;
 import org.generationcp.middleware.operation.builder.PropertyBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
@@ -1146,5 +1147,9 @@ public abstract class DataManager extends DatabaseBroker{
 
     protected final ListDataPropertySaver getListDataPropertySaver(){
     	return new ListDataPropertySaver(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    protected final FolderBuilder getFolderBuilder() {
+        return new FolderBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }
 }

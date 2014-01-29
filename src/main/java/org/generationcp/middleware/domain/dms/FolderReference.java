@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
+import java.util.List;
+
 
 /**
  * Contains the primary details of a folder - id, name, description.
@@ -19,7 +21,11 @@ package org.generationcp.middleware.domain.dms;
  *
  */
 public class FolderReference extends Reference {
-	
+
+    private Integer parentFolderId;
+    
+    private List<FolderReference> subFolders;
+    
 	public FolderReference(Integer id, String name) {
 		super.setId(id);
 		super.setName(name);
@@ -30,4 +36,45 @@ public class FolderReference extends Reference {
 		super.setName(name);
 		super.setDescription(description);
 	}
+	
+	public FolderReference(Integer parentId, Integer id, String name, String description) {
+	    super.setId(id);
+	    super.setName(name);
+	    super.setDescription(description);
+	    this.parentFolderId = parentId;
+	}
+
+    
+    /**
+     * @return the parentFolderId
+     */
+    public Integer getParentFolderId() {
+        return parentFolderId;
+    }
+
+    
+    /**
+     * @param parentFolderId the parentFolderId to set
+     */
+    public void setParentFolderId(Integer parentFolderId) {
+        this.parentFolderId = parentFolderId;
+    }
+
+    
+    /**
+     * @return the subFolders
+     */
+    public List<FolderReference> getSubFolders() {
+        return subFolders;
+    }
+
+    
+    /**
+     * @param subFolders the subFolders to set
+     */
+    public void setSubFolders(List<FolderReference> subFolders) {
+        this.subFolders = subFolders;
+    }
+
+    
 }

@@ -946,5 +946,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         return count;
     }
 
-
+    @Override
+    public List<FolderReference> getFolderTree() throws MiddlewareQueryException {
+        return getFolderBuilder().buildFolderTree();
+    }
+    
 }

@@ -97,6 +97,13 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	        + " AND pp.type_id = " + TermId.STANDARD_VARIABLE.getId()
 	        + " AND pp.value = :variableId";
 	
+	private static final String GET_ALL_FOLDERS = 
+	        "SELECT pr.object_project_id, pr.subject_project_id, p.name, p.description "
+	        + " FROM project_relationship pr "
+	        + " INNER JOIN project p ON p.project_id = pr.subject_project_id "
+	        + " WHERE pr.type_id = " + TermId.HAS_PARENT_FOLDER.getId() 
+	        ;
+	
 	@SuppressWarnings("unchecked")
 	public List<FolderReference> getRootFolders() throws MiddlewareQueryException{
 		
@@ -819,5 +826,21 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
         return 0;
     }
 
+    public List<FolderReference> getAllFolders() throws MiddlewareQueryException {
+        List<FolderReference> folders = new ArrayList<FolderReference>();
+        try {
+            SQLQuery query = getSession().createSQLQuery(GET_ALL_FOLDERS);
+            List<Object[]> result = query.list();
+            if (result != null && !result.isEmpty()) {
+                for (Object[] row : result) {
+                    folders.add(new FolderReference((Integer) row[0], (Integer) row[1], (String) row[2], (String) row[3]));
+                }
+            }
+            
+        } catch(HibernateException e) {
+            logAndThrowException("Error at getAllFolders, query at DmsProjectDao: " + e.getMessage(), e);
+        }
+        return folders;
+    }
 
 }
