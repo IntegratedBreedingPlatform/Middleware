@@ -15,6 +15,7 @@ package org.generationcp.middleware.service.api;
 import java.util.List;
 
 import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
@@ -22,7 +23,6 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Location;
 
-// TODO: Auto-generated Javadoc
 /**
  * This is the API for Fieldbook requirements.
  * 
@@ -120,6 +120,18 @@ public interface FieldbookService {
      * @throws MiddlewareQueryException the middleware query exception
      */
     Study getStudy(int studyId) throws MiddlewareQueryException;
+
+    /**
+     * Returns the variable id given the property, scale, method, and role (P-S-M-R)
+     * 
+     * @param propertyId
+     * @param scaleId
+     * @param methodId
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    Integer getStandardVariableIdByPropertyScaleMethodRole(String property, String scale, String method, PhenotypicType role)
+    throws MiddlewareQueryException;
     
     /**
      * Gets the next germplasm id.
@@ -146,4 +158,12 @@ public interface FieldbookService {
      * @throws MiddlewareQueryException the middleware query exception
      */
     Workbook getNurseryDataSet(int id) throws MiddlewareQueryException;
+
+    /**
+     * Saves the measurement rows of a workbook as a local trial or nursery on the new CHADO schema
+     * 
+     * @param workbook that contains the measurement rows to save
+     */
+    void saveMeasurementRows(Workbook workbook) throws MiddlewareQueryException;
+
 }

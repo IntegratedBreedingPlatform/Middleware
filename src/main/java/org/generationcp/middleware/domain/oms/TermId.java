@@ -147,6 +147,11 @@ public enum TermId {
 
 	// Stock Type
 	, ENTRY_CODE(8300)
+	, ENTRY_NO (8230)
+	, SOURCE (8378)
+	, CROSS (8377)
+	, DESIG (8250)
+	, CHECK (32791)
 	
 	//Location 
     , TRIAL_LOCATION(8180)

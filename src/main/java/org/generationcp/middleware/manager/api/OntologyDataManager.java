@@ -507,4 +507,16 @@ public interface OntologyDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     void deleteStandardVariable(int stdVariableId) throws MiddlewareQueryException;
+    
+    /**
+     * Returns the variable id given the property, scale, method, and role (P-S-M-R)
+     * 
+     * @param propertyId
+     * @param scaleId
+     * @param methodId
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    Integer getStandardVariableIdByPropertyScaleMethodRole(String property, String scale, String method, PhenotypicType role)
+    throws MiddlewareQueryException;
 }

@@ -499,4 +499,22 @@ public class StandardVariableBuilder extends Builder {
         return term;
     }
 
+    public Integer getIdByPropertyScaleMethodRole(Integer propertyId, Integer scaleId, Integer methodId, PhenotypicType role) 
+    throws MiddlewareQueryException {
+    
+        Integer stdVariableId = null;
+        if (setWorkingDatabase(Database.LOCAL)) {
+            stdVariableId = getCvTermDao().getStandadardVariableIdByPropertyScaleMethodRole(
+                    propertyId, scaleId, methodId, role);
+            
+            if (stdVariableId == null) {
+                if (setWorkingDatabase(Database.CENTRAL)) {
+                    stdVariableId = getCvTermDao().getStandadardVariableIdByPropertyScaleMethodRole(
+                            propertyId, scaleId, methodId, role);
+                }
+            }
+        }
+        return stdVariableId;
+    }
+
 }
