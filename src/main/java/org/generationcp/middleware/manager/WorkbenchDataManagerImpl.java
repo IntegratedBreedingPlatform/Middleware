@@ -64,6 +64,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     private WorkbenchSidebarCategoryDAO workbenchSidebarCategoryDAO;
     private WorkbenchSidebarCategoryLinkDAO workbenchSidebarCategoryLinkDAO;
 
+    private String installationDirectory;
+    
     public WorkbenchDataManagerImpl(HibernateSessionProvider sessionProvider) {
         this.sessionProvider = sessionProvider;
     }
@@ -1403,7 +1405,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     public WorkbenchSetting getWorkbenchSetting() throws MiddlewareQueryException {
         try {
             List<WorkbenchSetting> list = getWorkbenchSettingDao().getAll();
-            return list.isEmpty() ? null : list.get(0);
+            WorkbenchSetting setting = list.isEmpty() ? null : list.get(0);
+            
+            if (setting != null && installationDirectory != null) {
+                setting.setInstallationDirectory(installationDirectory);
+            }
         } catch (Exception e) {
             logAndThrowException("Error encountered while getting workbench setting: " + e.getMessage(), e);
         }
@@ -1649,4 +1655,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         return workbenchSidebarCategoryLinkDAO;
     }
 
+    public String getInstallationDirectory() {
+        return installationDirectory;
+    }
+
+    public void setInstallationDirectory(String installationDirectory) {
+        this.installationDirectory = installationDirectory;
+    }
 }
