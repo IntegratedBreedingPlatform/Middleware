@@ -962,6 +962,12 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
             throw new MiddlewareQueryException("Error in deleteStandardVariable " + e.getMessage(), e);
         }
     }
+
+    @Override
+    public Integer getStandardVariableIdByPropertyScaleMethodRole(Integer propertyId, Integer scaleId, Integer methodId, PhenotypicType role)
+            throws MiddlewareQueryException {
+        return getStandardVariableBuilder().getIdByPropertyScaleMethodRole(propertyId, scaleId, methodId, role);
+    }
 }
 
 

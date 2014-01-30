@@ -1139,4 +1139,47 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
         }
         return properties;
     }
+
+    public Integer getStandadardVariableIdByPropertyScaleMethodRole(Integer propertyId, Integer scaleId, Integer methodId, PhenotypicType role)
+            throws MiddlewareQueryException {
+        try {
+            StringBuilder queryString = new StringBuilder();
+            queryString.append("SELECT DISTINCT cvr.subject_id ");
+            queryString.append("FROM cvterm_relationship cvr ");
+            queryString.append("INNER JOIN cvterm_relationship cvrp ON cvr.subject_id = cvrp.subject_id AND cvrp.type_id = 1200 ");
+            queryString.append("INNER JOIN cvterm_relationship cvrs ON cvr.subject_id = cvrs.subject_id AND cvrs.type_id = 1220 ");
+            queryString.append("INNER JOIN cvterm_relationship cvrm ON cvr.subject_id = cvrm.subject_id AND cvrm.type_id = 1210 ");
+            queryString.append("INNER JOIN cvterm_relationship stinrel ON stinrel.subject_id = cvrm.subject_id AND stinrel.type_id = 1044 ");
+            queryString.append("WHERE cvrp.object_id = :propertyId AND cvrs.object_id = :scaleId AND cvrm.object_id = :methodId ");
+            queryString.append("AND stinrel.object_id IN ( ").append(getStoredInAsString(role)).append(" ) ");
+            queryString.append(" LIMIT 0,1");
+            
+            SQLQuery query = getSession().createSQLQuery(queryString.toString());
+            query.setParameter("propertyId", propertyId);
+            query.setParameter("scaleId", scaleId);
+            query.setParameter("methodId", methodId);
+            
+            Integer id = (Integer) query.uniqueResult();
+                        
+            return id;
+                        
+        } catch(HibernateException e) {
+            logAndThrowException("Error at getStandadardVariableIdByPropertyScaleMethod :" + e.getMessage(), e);
+        }
+        return null;    
+    
+    }
+    
+    private String getStoredInAsString(PhenotypicType role) {
+        StringBuilder sb = new StringBuilder();
+        
+        for (Integer storedin : role.getTypeStorages()) {
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append(storedin);
+        }
+        
+        return sb.toString();
+    }
 }

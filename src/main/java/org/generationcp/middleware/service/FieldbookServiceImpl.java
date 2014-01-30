@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
@@ -98,5 +99,10 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         return getStudyDataManager().getDatasetReferences(studyId);
     }
     
+    @Override
+    public Integer getStandardVariableIdByPropertyScaleMethodRole(Integer propertyId, Integer scaleId, Integer methodId, PhenotypicType role)
+            throws MiddlewareQueryException {
+        return getOntologyDataManager().getStandardVariableIdByPropertyScaleMethodRole(propertyId, scaleId, methodId, role);
+    }
     
 }
