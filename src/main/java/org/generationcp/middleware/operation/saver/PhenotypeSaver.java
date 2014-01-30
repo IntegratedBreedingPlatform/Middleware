@@ -32,52 +32,78 @@ public class PhenotypeSaver extends Saver {
 		setWorkingDatabase(Database.LOCAL);
 		if (variates != null && variates.getVariables() != null && variates.getVariables().size() > 0) {
 			for (Variable variable : variates.getVariables()) {
-				savePhenotype(experimentModel.getNdExperimentId(), variable);
+				save(experimentModel.getNdExperimentId(), variable);
 			}
 		}
 	}
 	
 	public void save(int experimentId, Variable variable) throws MiddlewareQueryException {
-		setWorkingDatabase(Database.LOCAL);
 		Phenotype phenotype = createPhenotype(variable);
-		if (phenotype != null) {
-			getPhenotypeDao().save(phenotype);
-			saveExperimentPhenotype(experimentId, phenotype.getPhenotypeId());
-		}
+        saveOrUpdate(experimentId, phenotype);
 	}
-	
-	
-	public void savePhenotype(int experimentId, Variable variable) throws MiddlewareQueryException {
-		Phenotype phenotype = createPhenotype(variable);
-		if (phenotype != null) {
-			getPhenotypeDao().save(phenotype);
-			saveExperimentPhenotype(experimentId, phenotype.getPhenotypeId());
-		}
-	}
-	
-	private Phenotype createPhenotype(Variable variable) throws MiddlewareQueryException {
-		Phenotype phenotype = null;
-		
-		if (TermId.OBSERVATION_VARIATE.getId() == variable.getVariableType().getStandardVariable().getStoredIn().getId()) {
-			phenotype = getPhenotypeObject(phenotype);
-			phenotype.setValue(variable.getValue());
-			phenotype.setObservableId(variable.getVariableType().getId());
-			phenotype.setUniqueName(phenotype.getPhenotypeId().toString());
-			phenotype.setName(String.valueOf(variable.getVariableType().getId()));
-		}
-		else if (TermId.CATEGORICAL_VARIATE.getId() == variable.getVariableType().getStandardVariable().getStoredIn().getId()) {
-			phenotype = getPhenotypeObject(phenotype);
-			if(variable.getValue()!=null && !variable.getValue().equals("")) {
-				phenotype.setcValue(Double.valueOf(variable.getValue()).intValue()); 
-			}			
-			phenotype.setObservableId(variable.getVariableType().getId());
-			phenotype.setUniqueName(phenotype.getPhenotypeId().toString());
-			phenotype.setName(String.valueOf(variable.getVariableType().getId()));
-		}
-		
-		return phenotype;
-	}
-	
+
+    public void save(int experimentId, Integer variableId, int storedIn, String value, Phenotype phenotype) throws MiddlewareQueryException {
+        phenotype = createPhenotype(variableId, storedIn, value, phenotype);
+        saveOrUpdate(experimentId, phenotype);
+    }
+    
+    private void saveOrUpdate(int experimentId, Phenotype phenotype) throws MiddlewareQueryException{
+        setWorkingDatabase(Database.LOCAL);
+        if (phenotype != null) {
+            getPhenotypeDao().saveOrUpdate(phenotype);
+            saveExperimentPhenotype(experimentId, phenotype.getPhenotypeId());
+        }
+    }
+    
+    private Phenotype createPhenotype(Variable variable) throws MiddlewareQueryException {
+        
+         return createPhenotype(variable.getVariableType().getId()
+                            , variable.getVariableType().getStandardVariable().getStoredIn().getId()
+                            , variable.getValue()
+                            , null);
+        
+        /*
+        Phenotype phenotype = null;
+        
+        if (TermId.OBSERVATION_VARIATE.getId() == variable.getVariableType().getStandardVariable().getStoredIn().getId()) {
+            phenotype = getPhenotypeObject(phenotype);
+            phenotype.setValue(variable.getValue());
+            phenotype.setObservableId(variable.getVariableType().getId());
+            phenotype.setUniqueName(phenotype.getPhenotypeId().toString());
+            phenotype.setName(String.valueOf(variable.getVariableType().getId()));
+        }
+        else if (TermId.CATEGORICAL_VARIATE.getId() == variable.getVariableType().getStandardVariable().getStoredIn().getId()) {
+            phenotype = getPhenotypeObject(phenotype);
+            if(variable.getValue()!=null && !variable.getValue().equals("")) {
+                phenotype.setcValue(Double.valueOf(variable.getValue()).intValue()); 
+            }           
+            phenotype.setObservableId(variable.getVariableType().getId());
+            phenotype.setUniqueName(phenotype.getPhenotypeId().toString());
+            phenotype.setName(String.valueOf(variable.getVariableType().getId()));
+        }
+        
+        return phenotype;
+        */
+        
+    }
+
+	private Phenotype createPhenotype(Integer variableId, int storedIn, String value, Phenotype phenotype) throws MiddlewareQueryException {
+        phenotype = getPhenotypeObject(phenotype);
+        
+        if (TermId.OBSERVATION_VARIATE.getId() == storedIn) {
+            phenotype.setValue(value);
+        } else if (TermId.CATEGORICAL_VARIATE.getId() == storedIn) {
+            if(value != null && !value.equals("")) {
+                phenotype.setcValue(Double.valueOf(value).intValue()); 
+            }           
+        }
+        phenotype.setObservableId(variableId);
+        phenotype.setUniqueName(phenotype.getPhenotypeId().toString());
+        phenotype.setName(String.valueOf(variableId));
+        
+        return phenotype;
+    }
+    
 	private Phenotype getPhenotypeObject(Phenotype phenotype) throws MiddlewareQueryException {
 		if (phenotype == null) {
 			phenotype = new Phenotype();
@@ -93,6 +119,6 @@ public class PhenotypeSaver extends Saver {
 		experimentPhenotype.setExperiment(experimentId);
 		experimentPhenotype.setPhenotype(phenotypeId);
 		
-		getExperimentPhenotypeDao().save(experimentPhenotype);
+		getExperimentPhenotypeDao().saveOrUpdate(experimentPhenotype);
 	}
 }

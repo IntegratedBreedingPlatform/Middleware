@@ -20,6 +20,7 @@ public class MeasurementData {
 	private String value;
 	
 	private boolean isEditable;
+	
 	private String dataType;
 	
 	private int phenotypeId;

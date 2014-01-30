@@ -16,6 +16,9 @@ import java.util.List;
 
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.etl.MeasurementData;
+import org.generationcp.middleware.domain.etl.MeasurementRow;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
@@ -28,8 +31,14 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.service.api.FieldbookService;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FieldbookServiceImpl extends Service implements FieldbookService {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(FieldbookServiceImpl.class);
 
     public FieldbookServiceImpl(
             HibernateSessionProvider sessionProviderForLocal,
@@ -117,10 +126,42 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		 }
 		 return gid;
 	}
-    
-	@Override
-        public Workbook getNurseryDataSet(int id) throws MiddlewareQueryException {
-            Workbook workbook = getWorkbookBuilder().create(id);                        
-            return workbook;
+	
+    @Override
+    public Workbook getNurseryDataSet(int id) throws MiddlewareQueryException {
+        Workbook workbook = getWorkbookBuilder().create(id);
+        return workbook;
+    }
+
+    @Override
+    public void saveMeasurementRows(Workbook workbook) throws MiddlewareQueryException {
+        requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+            
+            List<MeasurementVariable> variates = workbook.getVariates();
+            List<MeasurementRow> observations = workbook.getObservations();
+            
+            for (MeasurementVariable variate : variates){
+                for (MeasurementRow row : observations){
+                    for (MeasurementData field : row.getDataList()){
+                        if (variate.getName().equals(field.getLabel())){
+                            getPhenotypeSaver().save((int) row.getExperimentId(), variate.getTermId(), 
+                                        Integer.valueOf(variate.getStoredIn()), field.getValue(), 
+                                        getPhenotypeDao().getById(field.getPhenotypeId()));
+                        }
+                    }
+                }
+            }
+            
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e, LOG);
         }
+    }
+
 }
