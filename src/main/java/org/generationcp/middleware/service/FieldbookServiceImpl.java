@@ -22,7 +22,9 @@ import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.service.api.FieldbookService;
 
@@ -104,10 +106,15 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public String getGermplasmIdByName(String name)
+	public Integer getGermplasmIdByName(String name)
 			throws MiddlewareQueryException {
-		return null;
-		//getGermplasmDataManager().getGermplasmByName(name, 0, 1, op);
+		
+		 List<Germplasm> germplasmList = getGermplasmDataManager().getGermplasmByName(name, 0, 1, Operation.EQUAL);
+		 Integer gid = null;
+		 if(germplasmList != null && germplasmList.size() > 0){
+			 gid = germplasmList.get(0).getGid();
+		 }
+		 return gid;
 	}
     
     
