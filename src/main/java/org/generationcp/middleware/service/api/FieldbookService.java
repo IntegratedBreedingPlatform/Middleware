@@ -135,7 +135,7 @@ public interface FieldbookService {
      * @return the germplasm id by name
      * @throws MiddlewareQueryException the middleware query exception
      */
-    String getGermplasmIdByName(String name) throws MiddlewareQueryException;
+    Integer getGermplasmIdByName(String name) throws MiddlewareQueryException;
     
     
 
