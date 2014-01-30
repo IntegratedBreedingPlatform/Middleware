@@ -20,8 +20,8 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.builder.WorkbookBuilder;
+import org.generationcp.middleware.operation.saver.PhenotypeSaver;
 import org.generationcp.middleware.operation.saver.WorkbookSaver;
-import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.util.DatabaseBroker;
 import org.slf4j.Logger;
 
@@ -37,6 +37,10 @@ public abstract class Service extends DatabaseBroker {
     protected void logAndThrowException(String message, Throwable e, Logger log) throws MiddlewareQueryException {
         log.error(e.getMessage(), e);
         throw new MiddlewareQueryException(message + e.getMessage(), e);
+    }
+
+    protected final PhenotypeSaver getPhenotypeSaver() {
+        return new PhenotypeSaver(sessionProviderForLocal, sessionProviderForCentral);
     }
 
     protected final WorkbookSaver getWorkbookSaver() {

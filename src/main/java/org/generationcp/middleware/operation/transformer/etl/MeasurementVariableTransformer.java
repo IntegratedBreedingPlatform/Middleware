@@ -3,13 +3,10 @@ package org.generationcp.middleware.operation.transformer.etl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 
 public class MeasurementVariableTransformer extends Transformer {
@@ -26,7 +23,7 @@ public class MeasurementVariableTransformer extends Transformer {
 	    if (variableTypeList != null && variableTypeList.size() > 0) {
 	        for (VariableType variableType : variableTypeList.getVariableTypes()) {
 	            StandardVariable stdVariable = variableType.getStandardVariable();
-	            MeasurementVariable measurementVariable = new MeasurementVariable(stdVariable.getName(), 
+	            MeasurementVariable measurementVariable = new MeasurementVariable(stdVariable.getId(), stdVariable.getName(), 
 	                    stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod().getName(),
 	                    stdVariable.getProperty().getName(), stdVariable.getDataType().getName(), "", 
 	                    variableType.getLocalName());

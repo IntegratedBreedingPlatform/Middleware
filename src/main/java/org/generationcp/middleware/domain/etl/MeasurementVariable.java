@@ -14,6 +14,8 @@ package org.generationcp.middleware.domain.etl;
 import org.generationcp.middleware.util.Debug;
 
 public class MeasurementVariable {
+    
+    private int termId;
 
 	private String name;
 
@@ -50,7 +52,21 @@ public class MeasurementVariable {
 		this.label = label;
 	}
 
-	public String getName() {
+    public MeasurementVariable(int termId, String name, String description, String scale,
+            String method, String property, String dataType, String value, String label) {
+        this(name, description, scale, method, property, dataType, value, label);
+        this.termId = termId;
+    }
+    
+    public int getTermId() {
+        return termId;
+    }
+    
+    public void setTermId(int termId) {
+        this.termId = termId;
+    }
+
+    public String getName() {
 		return name;
 	}
 

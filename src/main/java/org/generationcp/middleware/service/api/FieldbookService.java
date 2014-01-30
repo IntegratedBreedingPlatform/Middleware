@@ -23,7 +23,6 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Location;
 
-// TODO: Auto-generated Javadoc
 /**
  * This is the API for Fieldbook requirements.
  * 
@@ -159,4 +158,12 @@ public interface FieldbookService {
      * @throws MiddlewareQueryException the middleware query exception
      */
     Workbook getNurseryDataSet(int id) throws MiddlewareQueryException;
+
+    /**
+     * Saves the measurement rows of a workbook as a local trial or nursery on the new CHADO schema
+     * 
+     * @param workbook that contains the measurement rows to save
+     */
+    void saveMeasurementRows(Workbook workbook) throws MiddlewareQueryException;
+
 }
