@@ -15,6 +15,9 @@ package org.generationcp.middleware.service.test;
 import java.util.ArrayList;
 import java.util.List;
 
+import junit.framework.Assert;
+
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
@@ -139,6 +142,16 @@ public class TestFieldbookServiceImpl {
         workbook = fieldbookService.getNurseryDataSet(id);
         
         System.out.println(workbook);
+    }
+    
+    @Test
+    public void testGetStandardVariableIdByPropertyScaleMethodRole() throws MiddlewareQueryException {
+        String property = "Germplasm entry";
+        String scale = "Number";
+        String method = "Enumerated";
+        Integer termId = fieldbookService.getStandardVariableIdByPropertyScaleMethodRole(property, scale, method, PhenotypicType.GERMPLASM);
+        System.out.println(termId);
+        Assert.assertEquals((Integer) 8230, termId);
     }
 
     @After
