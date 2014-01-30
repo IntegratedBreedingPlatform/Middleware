@@ -1410,6 +1410,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             if (setting != null && installationDirectory != null) {
                 setting.setInstallationDirectory(installationDirectory);
             }
+            
+            return setting;
         } catch (Exception e) {
             logAndThrowException("Error encountered while getting workbench setting: " + e.getMessage(), e);
         }
