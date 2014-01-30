@@ -19,7 +19,9 @@ import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.operation.saver.WorkbookSaver;
+import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.util.DatabaseBroker;
 import org.slf4j.Logger;
 
@@ -52,5 +54,9 @@ public abstract class Service extends DatabaseBroker {
     protected final GermplasmDataManager getGermplasmDataManager() {
         return new GermplasmDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
     }
+    
+    protected final WorkbookBuilder getWorkbookBuilder() {
+        return new WorkbookBuilder(sessionProviderForLocal, sessionProviderForCentral);
+    } 
     
 }

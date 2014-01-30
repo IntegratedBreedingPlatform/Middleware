@@ -845,6 +845,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         setWorkingDatabase(instance);
         return getDmsProjectDao().getAllStudyDetails(studyType, start, numOfRows);
     }
+    
+    @Override
+    public StudyDetails getStudyDetails(Database instance, StudyType studyType, int studyId) throws MiddlewareQueryException {
+        setWorkingDatabase(instance);
+        return getDmsProjectDao().getStudyDetails(studyType, studyId);
+    }
 
     @SuppressWarnings("unchecked")
     @Override

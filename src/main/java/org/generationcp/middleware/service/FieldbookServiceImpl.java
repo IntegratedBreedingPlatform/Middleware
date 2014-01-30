@@ -17,6 +17,7 @@ import java.util.List;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -117,5 +118,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		 return gid;
 	}
     
-    
+	@Override
+        public Workbook getNurseryDataSet(int id) throws MiddlewareQueryException {
+            Workbook workbook = getWorkbookBuilder().create(id);                        
+            return workbook;
+        }
 }

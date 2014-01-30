@@ -17,6 +17,7 @@ import java.util.List;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Location;
@@ -137,6 +138,12 @@ public interface FieldbookService {
      */
     Integer getGermplasmIdByName(String name) throws MiddlewareQueryException;
     
-    
-
+    /**
+     * Gets the data set.
+     *
+     * @param id the id
+     * @return the data set
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Workbook getNurseryDataSet(int id) throws MiddlewareQueryException;
 }

@@ -22,6 +22,8 @@ public class MeasurementData {
 	private boolean isEditable;
 	private String dataType;
 	
+	private int phenotypeId;
+	
 	public MeasurementData() {
 	}
 	
@@ -54,6 +56,14 @@ public class MeasurementData {
 	public void setValue(String value) {
 		this.value = value;
 	}
+	
+	public int getPhenotypeId() {
+	    return phenotypeId;
+	}
+	
+	public void setPhenotypeId(int phenotypeId) {
+	    this.phenotypeId = phenotypeId;
+	} 
 
 	@Override
 	public String toString() {

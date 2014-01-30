@@ -16,13 +16,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.service.ServiceFactory;
+import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.utils.test.TestNurseryWorkbookUtil;
+import org.generationcp.middleware.utils.test.TestWorkbookUtil;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -38,6 +42,7 @@ public class TestFieldbookServiceImpl {
     
     private static ServiceFactory serviceFactory;
     private static FieldbookService fieldbookService;
+    private static DataImportService dataImportService;
 
     private long startTime;
 
@@ -54,7 +59,7 @@ public class TestFieldbookServiceImpl {
         serviceFactory = new ServiceFactory(local, central);
 
         fieldbookService = serviceFactory.getFieldbookService();
-
+        dataImportService = serviceFactory.getDataImportService();
     }
 
     @Before
@@ -124,6 +129,16 @@ public class TestFieldbookServiceImpl {
     		Debug.println(3, loc.toString());
     	}
     	Debug.println(3, "NUMBER OF RECORDS: " + locations.size());
+    }
+    
+    @Test
+    public void testGetNurseryDataSet() throws MiddlewareQueryException {
+        Workbook workbook = TestNurseryWorkbookUtil.getTestWorkbook();
+        workbook.print(0);
+        int id = dataImportService.saveDataset(workbook);
+        workbook = fieldbookService.getNurseryDataSet(id);
+        
+        System.out.println(workbook);
     }
 
     @After
