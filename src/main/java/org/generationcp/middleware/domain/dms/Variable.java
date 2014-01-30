@@ -22,8 +22,17 @@ public class Variable  implements Comparable<Variable> {
 	private VariableType variableType;
 	
 	private String value;
+	
+	private Integer phenotypeId;
 
 	public Variable() { }
+	
+	public Variable(Integer phenotypeId, VariableType variableType, String value) {
+		this.phenotypeId = phenotypeId;
+		this.variableType = variableType;
+		this.value = value;
+		if (variableType == null) throw new RuntimeException();
+	}
 	
 	public Variable(VariableType variableType, String value) {
 		this.variableType = variableType;
@@ -31,10 +40,28 @@ public class Variable  implements Comparable<Variable> {
 		if (variableType == null) throw new RuntimeException();
 	}
 	
+	public Variable(Integer phenotypeId, VariableType variableType, Double value) {
+		this.phenotypeId = phenotypeId;
+		this.variableType = variableType;
+		if (value != null) {
+			this.value = Double.toString(value);
+		}
+		if (variableType == null) throw new RuntimeException();
+	}
+
 	public Variable(VariableType variableType, Double value) {
 		this.variableType = variableType;
 		if (value != null) {
 			this.value = Double.toString(value);
+		}
+		if (variableType == null) throw new RuntimeException();
+	}
+
+	public Variable(Integer phenotypeId, VariableType variableType, Integer value) {
+		this.phenotypeId = phenotypeId;
+		this.variableType = variableType;
+		if (value != null) {
+			this.value = Integer.toString(value);
 		}
 		if (variableType == null) throw new RuntimeException();
 	}
@@ -160,5 +187,13 @@ public class Variable  implements Comparable<Variable> {
         int compareRank = ((Variable) compareValue).getVariableType().getRank(); 
         return Integer.valueOf(getVariableType().getRank()).compareTo(compareRank);
  	}
+
+	public Integer getPhenotypeId() {
+		return phenotypeId;
+	}
+
+	public void setPhenotypeId(Integer phenotypeId) {
+		this.phenotypeId = phenotypeId;
+	}
 	
 }

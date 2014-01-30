@@ -133,10 +133,10 @@ public class ExperimentBuilder extends Builder {
 			for (Phenotype phenotype : experiment.getPhenotypes()) {
 				VariableType variableType = variableTypes.findById(phenotype.getObservableId());
 				if (variableType.getStandardVariable().getStoredIn().getId() == TermId.OBSERVATION_VARIATE.getId()) {
-					variates.add(new Variable(variableType, phenotype.getValue()));
+					variates.add(new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getValue()));
 				}
 				else {
-					variates.add(new Variable(variableType, phenotype.getcValueId()));
+					variates.add(new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getcValueId()));
 				}
 			}
 		}
