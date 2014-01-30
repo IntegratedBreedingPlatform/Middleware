@@ -81,19 +81,19 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
     
     public List<Location> getAllLocations() throws MiddlewareQueryException{
-    	List<Location> locations = getAllFromCentralAndLocal(getLocationDao());
-    	Collections.sort(locations);
-    	return locations;
+        List<Location> locations = getAllFromCentralAndLocal(getLocationDao());
+        Collections.sort(locations);
+        return locations;
     }
 
     
     @Override
     public List<Location> getAllLocalLocations(int start, int numOfRows) throws MiddlewareQueryException {
-    	if (setWorkingDatabase(Database.LOCAL)) {
-    		return this.getLocationDao().getAll(start, numOfRows);
-    	}
-    	
-    	return new ArrayList<Location>();
+        if (setWorkingDatabase(Database.LOCAL)) {
+            return this.getLocationDao().getAll(start, numOfRows);
+        }
+        
+        return new ArrayList<Location>();
     }
 
     @Override
@@ -312,9 +312,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     @Override
-    public List<Name> getNamesByGID(Integer gid, Integer status, GermplasmNameType type) throws MiddlewareQueryException {   	
-    	return super.getAllFromCentralAndLocalByMethod(getNameDao(), "getByGIDWithFilters", 
-    			new Object[]{gid, status, type}, new Class[]{Integer.class, Integer.class, GermplasmNameType.class});
+    public List<Name> getNamesByGID(Integer gid, Integer status, GermplasmNameType type) throws MiddlewareQueryException {      
+        return super.getAllFromCentralAndLocalByMethod(getNameDao(), "getByGIDWithFilters", 
+                new Object[]{gid, status, type}, new Class[]{Integer.class, Integer.class, GermplasmNameType.class});
 //        return (List<Name>) super.getFromInstanceByIdAndMethod(getNameDao(), gid, "getByGIDWithFilters", 
 //                new Object[]{gid, status, type}, new Class[]{Integer.class, Integer.class, GermplasmNameType.class});
     }
@@ -332,13 +332,13 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     
     @Override
     public String getPreferredNameValueByGID(Integer gid) throws MiddlewareQueryException{
-	    if (setWorkingDatabase(gid)) {
-	        List<Name> names = getNameDao().getByGIDWithFilters(gid, 8, null);
-	        if (!names.isEmpty()) {
-	            return names.get(0).getNval();
-	        }
-	    }
-	    return null;
+        if (setWorkingDatabase(gid)) {
+            List<Name> names = getNameDao().getByGIDWithFilters(gid, 8, null);
+            if (!names.isEmpty()) {
+                return names.get(0).getNval();
+            }
+        }
+        return null;
     }
 
     @Override
@@ -1258,9 +1258,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     @Override
     public List<LocationDetails> getLocationDetailsByLocId(Integer locationId, int start, int numOfRows)
             throws MiddlewareQueryException {
-    	return (List<LocationDetails>) super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getLocationDetails", new Object[] { locationId,
-    		start,numOfRows}, new Class[]{Integer.class,Integer.class,Integer.class});
-    	
+        return (List<LocationDetails>) super.getAllFromCentralAndLocalByMethod(getLocationDao(), "getLocationDetails", new Object[] { locationId,
+            start,numOfRows}, new Class[]{Integer.class,Integer.class,Integer.class});
+        
     }
 
     @Override
@@ -1299,7 +1299,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                 Germplasm germplasmToExpand = singleGermplasm.getGermplasm();
                 
                 if(germplasmToExpand == null){
-                	return singleGermplasm;
+                    return singleGermplasm;
                 }
 
                 if (germplasmToExpand.getGnpgs() < 0) {
@@ -1309,10 +1309,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                         SingleGermplasmCrossElement nextElement = new SingleGermplasmCrossElement();
                         Germplasm gpid1Germplasm = getGermplasmWithPrefName(germplasmToExpand.getGpid1());
                         if(gpid1Germplasm != null){
-	                        nextElement.setGermplasm(gpid1Germplasm);
-	                        return expandGermplasmCross(nextElement, level, forComplexCross);
+                            nextElement.setGermplasm(gpid1Germplasm);
+                            return expandGermplasmCross(nextElement, level, forComplexCross);
                         } else{
-                        	return element;
+                            return element;
                         }
                     } else {
                         return element;
@@ -1363,11 +1363,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                             Germplasm secondGrandParent = null;
                             SingleGermplasmCrossElement secondGrandParentElem = new SingleGermplasmCrossElement();
                             if(firstParent != null){
-	                            firstGrandParent = getGermplasmWithPrefName(firstParent.getGpid1());
-	                            firstGrandParentElem.setGermplasm(firstGrandParent);
-	                            
-	                            secondGrandParent = getGermplasmWithPrefName(firstParent.getGpid2());
-	                            secondGrandParentElem.setGermplasm(secondGrandParent);
+                                firstGrandParent = getGermplasmWithPrefName(firstParent.getGpid1());
+                                firstGrandParentElem.setGermplasm(firstGrandParent);
+                                
+                                secondGrandParent = getGermplasmWithPrefName(firstParent.getGpid2());
+                                secondGrandParentElem.setGermplasm(secondGrandParent);
                             }
 
                             Germplasm thirdGrandParent = null;
@@ -1375,10 +1375,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                             Germplasm fourthGrandParent = null;
                             SingleGermplasmCrossElement fourthGrandParentElem = new SingleGermplasmCrossElement();
                             if(secondParent != null){
-	                            thirdGrandParent = getGermplasmWithPrefName(secondParent.getGpid1());
-	                            thirdGrandParentElem.setGermplasm(thirdGrandParent);
-	                            fourthGrandParent = getGermplasmWithPrefName(secondParent.getGpid2());
-	                            fourthGrandParentElem.setGermplasm(fourthGrandParent);
+                                thirdGrandParent = getGermplasmWithPrefName(secondParent.getGpid1());
+                                thirdGrandParentElem.setGermplasm(thirdGrandParent);
+                                fourthGrandParent = getGermplasmWithPrefName(secondParent.getGpid2());
+                                fourthGrandParentElem.setGermplasm(fourthGrandParent);
                             }
 
                             //expand the grand parents as needed, depends on the level
@@ -1388,65 +1388,65 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                             GermplasmCrossElement expandedFourthGrandParent =  null;
                             
                             if(firstParent != null){
-	                            expandedFirstGrandParent = expandGermplasmCross(firstGrandParentElem, level - 1, forComplexCross);
-	                            expandedSecondGrandParent = expandGermplasmCross(secondGrandParentElem, level - 1, forComplexCross);
+                                expandedFirstGrandParent = expandGermplasmCross(firstGrandParentElem, level - 1, forComplexCross);
+                                expandedSecondGrandParent = expandGermplasmCross(secondGrandParentElem, level - 1, forComplexCross);
                             }
                             
                             if(secondParent != null){
-	                            expandedThirdGrandParent = expandGermplasmCross(thirdGrandParentElem, level - 1, forComplexCross);
-	                            expandedFourthGrandParent = expandGermplasmCross(fourthGrandParentElem, level - 1, forComplexCross);
+                                expandedThirdGrandParent = expandGermplasmCross(thirdGrandParentElem, level - 1, forComplexCross);
+                                expandedFourthGrandParent = expandGermplasmCross(fourthGrandParentElem, level - 1, forComplexCross);
                             }
 
                             //create the cross object for the first pair of grand parents
                             GermplasmCross firstCross = new GermplasmCross();
                             int numOfCrossesForFirst = 0;
                             if(firstParent != null){
-	                            firstCross.setFirstParent(expandedFirstGrandParent);
-	                            firstCross.setSecondParent(expandedSecondGrandParent);
-	                            //compute the number of crosses before this cross
-	                            if (expandedFirstGrandParent instanceof GermplasmCross) {
-	                                numOfCrossesForFirst = ((GermplasmCross) expandedFirstGrandParent).getNumberOfCrossesBefore() + 1;
-	                            }
-	                            firstCross.setNumberOfCrossesBefore(numOfCrossesForFirst);
+                                firstCross.setFirstParent(expandedFirstGrandParent);
+                                firstCross.setSecondParent(expandedSecondGrandParent);
+                                //compute the number of crosses before this cross
+                                if (expandedFirstGrandParent instanceof GermplasmCross) {
+                                    numOfCrossesForFirst = ((GermplasmCross) expandedFirstGrandParent).getNumberOfCrossesBefore() + 1;
+                                }
+                                firstCross.setNumberOfCrossesBefore(numOfCrossesForFirst);
                             }
 
                             //create the cross object for the second pair of grand parents
                             GermplasmCross secondCross = new GermplasmCross();
                             if(secondParent != null){
-	                            secondCross.setFirstParent(expandedThirdGrandParent);
-	                            secondCross.setSecondParent(expandedFourthGrandParent);
-	                            //compute the number of crosses before this cross
-	                            int numOfCrossesForSecond = 0;
-	                            if (expandedThirdGrandParent instanceof GermplasmCross) {
-	                                numOfCrossesForSecond = ((GermplasmCross) expandedThirdGrandParent).getNumberOfCrossesBefore() + 1;
-	                            }
-	                            secondCross.setNumberOfCrossesBefore(numOfCrossesForSecond);
+                                secondCross.setFirstParent(expandedThirdGrandParent);
+                                secondCross.setSecondParent(expandedFourthGrandParent);
+                                //compute the number of crosses before this cross
+                                int numOfCrossesForSecond = 0;
+                                if (expandedThirdGrandParent instanceof GermplasmCross) {
+                                    numOfCrossesForSecond = ((GermplasmCross) expandedThirdGrandParent).getNumberOfCrossesBefore() + 1;
+                                }
+                                secondCross.setNumberOfCrossesBefore(numOfCrossesForSecond);
                             } 
 
                             //create the cross of the two sets of grandparents, this will be returned
                             if(firstParent != null){
-                            	cross.setFirstParent(firstCross);
+                                cross.setFirstParent(firstCross);
                             } else{
-                            	SingleGermplasmCrossElement firstParentElem = new SingleGermplasmCrossElement();
-                            	firstParentElem.setGermplasm(firstParent);
-                            	cross.setFirstParent(firstParentElem);
+                                SingleGermplasmCrossElement firstParentElem = new SingleGermplasmCrossElement();
+                                firstParentElem.setGermplasm(firstParent);
+                                cross.setFirstParent(firstParentElem);
                             }
                             
                             if(secondParent != null){
-                            	cross.setSecondParent(secondCross);
+                                cross.setSecondParent(secondCross);
                             } else{
-                            	SingleGermplasmCrossElement secondParentElem = new SingleGermplasmCrossElement();
-                            	secondParentElem.setGermplasm(secondParent);
-                            	cross.setSecondParent(secondParentElem);
+                                SingleGermplasmCrossElement secondParentElem = new SingleGermplasmCrossElement();
+                                secondParentElem.setGermplasm(secondParent);
+                                cross.setSecondParent(secondParentElem);
                             }
                             
                             //compute the number of crosses before the cross to be returned
                             int numOfCrosses = 0;
                             if(firstParent != null){
-                            	numOfCrosses = numOfCrossesForFirst + 1;
-	                            if (expandedSecondGrandParent instanceof GermplasmCross) {
-	                                numOfCrosses = numOfCrosses + ((GermplasmCross) expandedSecondGrandParent).getNumberOfCrossesBefore() + 1;
-	                            }
+                                numOfCrosses = numOfCrossesForFirst + 1;
+                                if (expandedSecondGrandParent instanceof GermplasmCross) {
+                                    numOfCrosses = numOfCrosses + ((GermplasmCross) expandedSecondGrandParent).getNumberOfCrossesBefore() + 1;
+                                }
                             }
                             cross.setNumberOfCrossesBefore(numOfCrosses);
 
@@ -1526,93 +1526,93 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                                 cross.setSecondParent(firstParentElem);
                                 cross.setNumberOfCrossesBefore(numOfCrossesForGrandParents + 1);
                             } else{
-                            	SingleGermplasmCrossElement firstParentElem = new SingleGermplasmCrossElement();
-                        		firstParentElem.setGermplasm(firstParent);
-                        		SingleGermplasmCrossElement secondParentElem = new SingleGermplasmCrossElement();
-                        		secondParentElem.setGermplasm(secondParent);
-                        		
-                        		cross.setFirstParent(firstParentElem);
-                        		cross.setSecondParent(secondParentElem);
-                        		cross.setNumberOfCrossesBefore(0);
+                                SingleGermplasmCrossElement firstParentElem = new SingleGermplasmCrossElement();
+                                firstParentElem.setGermplasm(firstParent);
+                                SingleGermplasmCrossElement secondParentElem = new SingleGermplasmCrossElement();
+                                secondParentElem.setGermplasm(secondParent);
+                                
+                                cross.setFirstParent(firstParentElem);
+                                cross.setSecondParent(secondParentElem);
+                                cross.setNumberOfCrossesBefore(0);
                             }
 
                         } else if(methodName.contains("backcross")){
-                        	BackcrossElement backcross = new BackcrossElement();
-                        	
-                        	Germplasm firstParent = getGermplasmWithPrefName(germplasmToExpand.getGpid1());
-                        	Germplasm secondParent = getGermplasmWithPrefName(germplasmToExpand.getGpid2());
-                        	
-                        	boolean itsABackCross = false;
-                        	
-                        	//determine which is the recurrent parent
-                        	if(firstParent != null && secondParent != null){
-                        		SingleGermplasmCrossElement recurringParentElem = new SingleGermplasmCrossElement();
-                        		SingleGermplasmCrossElement parentElem = new SingleGermplasmCrossElement();
-	                        	if(secondParent.getGnpgs() >= 2){
-	                        		if(firstParent.getGid().equals(secondParent.getGpid1())
-	                        				|| firstParent.getGid().equals(secondParent.getGpid2())){
-	                        			itsABackCross = true;
-	                        			backcross.setRecurringParentOnTheRight(false);
-	                        			
-	                        			recurringParentElem.setGermplasm(firstParent);
-	                        			
-	                        			Germplasm toCheck = null;
-	                        			if(firstParent.getGid().equals(secondParent.getGpid1()) && secondParent.getGpid2() != null){
-	                        				toCheck = getGermplasmWithPrefName(secondParent.getGpid2());
-	                        			} else if(firstParent.getGid().equals(secondParent.getGpid2()) && secondParent.getGpid1() != null){
-	                        				toCheck = getGermplasmWithPrefName(secondParent.getGpid1());
-	                        			}
-	                        			Object numOfDosesAndOtherParent[] = determineNumberOfRecurringParent(firstParent.getGid(), toCheck);
-	                        			parentElem.setGermplasm((Germplasm) numOfDosesAndOtherParent[1]);
-	                        			
-	                        			backcross.setNumberOfDosesOfRecurringParent(((Integer) numOfDosesAndOtherParent[0]).intValue() + 2);
-	                        		}
-	                        	} else if(firstParent.getGnpgs() >= 2){
-	                        		if(secondParent.getGid().equals(firstParent.getGpid1())
-	                        				|| secondParent.getGid().equals(firstParent.getGpid2())){
-	                        			itsABackCross = true;
-	                        			backcross.setRecurringParentOnTheRight(true);
-	                        			
-	                        			recurringParentElem.setGermplasm(secondParent);
-	                        			
-	                        			Germplasm toCheck = null;
-	                        			if(secondParent.getGid().equals(firstParent.getGpid1()) && firstParent.getGpid2() != null){
-	                        				toCheck = getGermplasmWithPrefName(firstParent.getGpid2());
-	                        			} else if(secondParent.getGid().equals(firstParent.getGpid2()) && firstParent.getGpid1() != null){
-	                        				toCheck = getGermplasmWithPrefName(firstParent.getGpid1());
-	                        			}
-	                        			Object numOfDosesAndOtherParent[] = determineNumberOfRecurringParent(secondParent.getGid(), toCheck);
-	                        			parentElem.setGermplasm((Germplasm) numOfDosesAndOtherParent[1]);
-	                        			
-	                        			backcross.setNumberOfDosesOfRecurringParent(((Integer) numOfDosesAndOtherParent[0]).intValue() + 2);
-	                        		}
-	                        	} else{
-	                        		itsABackCross = false;
-	                        	}
-	                        	
-	                        	if(itsABackCross){
-		                        	GermplasmCrossElement expandedRecurringParent = expandGermplasmCross(recurringParentElem, level - 1, forComplexCross);
-	                    			backcross.setRecurringParent(expandedRecurringParent);
-	                    			
-	                    			GermplasmCrossElement expandedParent = expandGermplasmCross(parentElem, level -1, forComplexCross);
-	                    			backcross.setParent(expandedParent);
-	                    			
-		                        	return backcross;
-	                        	}
-                        	}
-                        	
-                        	if(!itsABackCross){
-                        		SingleGermplasmCrossElement firstParentElem = new SingleGermplasmCrossElement();
-                        		firstParentElem.setGermplasm(firstParent);
-                        		SingleGermplasmCrossElement secondParentElem = new SingleGermplasmCrossElement();
-                        		secondParentElem.setGermplasm(secondParent);
-                        		
-                        		cross.setFirstParent(firstParentElem);
-                        		cross.setSecondParent(secondParentElem);
-                        		cross.setNumberOfCrossesBefore(0);
-                        	}
+                            BackcrossElement backcross = new BackcrossElement();
+                            
+                            Germplasm firstParent = getGermplasmWithPrefName(germplasmToExpand.getGpid1());
+                            Germplasm secondParent = getGermplasmWithPrefName(germplasmToExpand.getGpid2());
+                            
+                            boolean itsABackCross = false;
+                            
+                            //determine which is the recurrent parent
+                            if(firstParent != null && secondParent != null){
+                                SingleGermplasmCrossElement recurringParentElem = new SingleGermplasmCrossElement();
+                                SingleGermplasmCrossElement parentElem = new SingleGermplasmCrossElement();
+                                if(secondParent.getGnpgs() >= 2){
+                                    if(firstParent.getGid().equals(secondParent.getGpid1())
+                                            || firstParent.getGid().equals(secondParent.getGpid2())){
+                                        itsABackCross = true;
+                                        backcross.setRecurringParentOnTheRight(false);
+                                        
+                                        recurringParentElem.setGermplasm(firstParent);
+                                        
+                                        Germplasm toCheck = null;
+                                        if(firstParent.getGid().equals(secondParent.getGpid1()) && secondParent.getGpid2() != null){
+                                            toCheck = getGermplasmWithPrefName(secondParent.getGpid2());
+                                        } else if(firstParent.getGid().equals(secondParent.getGpid2()) && secondParent.getGpid1() != null){
+                                            toCheck = getGermplasmWithPrefName(secondParent.getGpid1());
+                                        }
+                                        Object numOfDosesAndOtherParent[] = determineNumberOfRecurringParent(firstParent.getGid(), toCheck);
+                                        parentElem.setGermplasm((Germplasm) numOfDosesAndOtherParent[1]);
+                                        
+                                        backcross.setNumberOfDosesOfRecurringParent(((Integer) numOfDosesAndOtherParent[0]).intValue() + 2);
+                                    }
+                                } else if(firstParent.getGnpgs() >= 2){
+                                    if(secondParent.getGid().equals(firstParent.getGpid1())
+                                            || secondParent.getGid().equals(firstParent.getGpid2())){
+                                        itsABackCross = true;
+                                        backcross.setRecurringParentOnTheRight(true);
+                                        
+                                        recurringParentElem.setGermplasm(secondParent);
+                                        
+                                        Germplasm toCheck = null;
+                                        if(secondParent.getGid().equals(firstParent.getGpid1()) && firstParent.getGpid2() != null){
+                                            toCheck = getGermplasmWithPrefName(firstParent.getGpid2());
+                                        } else if(secondParent.getGid().equals(firstParent.getGpid2()) && firstParent.getGpid1() != null){
+                                            toCheck = getGermplasmWithPrefName(firstParent.getGpid1());
+                                        }
+                                        Object numOfDosesAndOtherParent[] = determineNumberOfRecurringParent(secondParent.getGid(), toCheck);
+                                        parentElem.setGermplasm((Germplasm) numOfDosesAndOtherParent[1]);
+                                        
+                                        backcross.setNumberOfDosesOfRecurringParent(((Integer) numOfDosesAndOtherParent[0]).intValue() + 2);
+                                    }
+                                } else{
+                                    itsABackCross = false;
+                                }
+                                
+                                if(itsABackCross){
+                                    GermplasmCrossElement expandedRecurringParent = expandGermplasmCross(recurringParentElem, level - 1, forComplexCross);
+                                    backcross.setRecurringParent(expandedRecurringParent);
+                                    
+                                    GermplasmCrossElement expandedParent = expandGermplasmCross(parentElem, level -1, forComplexCross);
+                                    backcross.setParent(expandedParent);
+                                    
+                                    return backcross;
+                                }
+                            }
+                            
+                            if(!itsABackCross){
+                                SingleGermplasmCrossElement firstParentElem = new SingleGermplasmCrossElement();
+                                firstParentElem.setGermplasm(firstParent);
+                                SingleGermplasmCrossElement secondParentElem = new SingleGermplasmCrossElement();
+                                secondParentElem.setGermplasm(secondParent);
+                                
+                                cross.setFirstParent(firstParentElem);
+                                cross.setSecondParent(secondParentElem);
+                                cross.setNumberOfCrossesBefore(0);
+                            }
                         } else if(methodName.contains("cross") && methodName.contains("complex")){
-                        	//get the immediate parents
+                            //get the immediate parents
                             Germplasm firstParent = getGermplasmWithPrefName(germplasmToExpand.getGpid1());
                             SingleGermplasmCrossElement firstParentElem = new SingleGermplasmCrossElement();
                             firstParentElem.setGermplasm(firstParent);
@@ -1635,27 +1635,27 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
                             cross.setSecondParent(expandedSecondParent);
                             cross.setNumberOfCrossesBefore(numOfCrosses);
                         } else if (methodName.contains("cross")){
-                        	Germplasm firstParent = getGermplasmWithPrefName(germplasmToExpand.getGpid1());
-                        	Germplasm secondParent = getGermplasmWithPrefName(germplasmToExpand.getGpid2());
-                        	
-                        	SingleGermplasmCrossElement firstParentElem = new SingleGermplasmCrossElement();
-                    		firstParentElem.setGermplasm(firstParent);
-                    		SingleGermplasmCrossElement secondParentElem = new SingleGermplasmCrossElement();
-                    		secondParentElem.setGermplasm(secondParent);
-                    		
-                    		cross.setFirstParent(firstParentElem);
-                    		cross.setSecondParent(secondParentElem);
-                    		cross.setNumberOfCrossesBefore(0);
+                            Germplasm firstParent = getGermplasmWithPrefName(germplasmToExpand.getGpid1());
+                            Germplasm secondParent = getGermplasmWithPrefName(germplasmToExpand.getGpid2());
+                            
+                            SingleGermplasmCrossElement firstParentElem = new SingleGermplasmCrossElement();
+                            firstParentElem.setGermplasm(firstParent);
+                            SingleGermplasmCrossElement secondParentElem = new SingleGermplasmCrossElement();
+                            secondParentElem.setGermplasm(secondParent);
+                            
+                            cross.setFirstParent(firstParentElem);
+                            cross.setSecondParent(secondParentElem);
+                            cross.setNumberOfCrossesBefore(0);
                         } else{
-                        	SingleGermplasmCrossElement crossElement = new SingleGermplasmCrossElement();
-                        	crossElement.setGermplasm(germplasmToExpand);
-                        	return crossElement;
+                            SingleGermplasmCrossElement crossElement = new SingleGermplasmCrossElement();
+                            crossElement.setGermplasm(germplasmToExpand);
+                            return crossElement;
                         }
 
                         return cross;
                     } else {
                         logAndThrowException("Error with expanding cross, can not find method with id: " + germplasmToExpand.getMethodId(), 
-                        		new Throwable(), LOG);
+                                new Throwable(), LOG);
                     }
                 }
             } else {
@@ -1673,84 +1673,84 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
      * representing the parent crossed with the recurring parent.
      */
     private Object[] determineNumberOfRecurringParent(Integer recurringParentGid, Germplasm toCheck) throws MiddlewareQueryException{
-    	Object toreturn[] = new Object[2];
-    	if(toCheck == null){
-    		toreturn[0] = Integer.valueOf(0);
-    		toreturn[1] = null;
-    	} else if(toCheck.getGpid1() != null && !toCheck.getGpid1().equals(recurringParentGid)
-    			&& toCheck.getGpid2() != null && !toCheck.getGpid2().equals(recurringParentGid)){
-    		toreturn[0] = Integer.valueOf(0);
-    		toreturn[1] = toCheck;
-    	} else if(toCheck.getGpid1() != null && toCheck.getGpid1().equals(recurringParentGid)){
-    		Germplasm nextToCheck = null;
-    		if(toCheck.getGpid2() != null){
-    			nextToCheck = getGermplasmWithPrefName(toCheck.getGpid2());
-    		}
-    		Object returned[] = determineNumberOfRecurringParent(recurringParentGid, nextToCheck);
-    		toreturn[0] = ((Integer) returned[0]) + 1;
-    		toreturn[1] = returned[1];
-    	} else if(toCheck.getGpid2() != null && toCheck.getGpid2().equals(recurringParentGid)){
-    		Germplasm nextToCheck = null;
-    		if(toCheck.getGpid1() != null){
-    			nextToCheck = getGermplasmWithPrefName(toCheck.getGpid1());
-    		}
-    		Object returned[] = determineNumberOfRecurringParent(recurringParentGid, nextToCheck);
-    		toreturn[0] = ((Integer) returned[0]) + 1;
-    		toreturn[1] = returned[1];
-    	}
-    	else{
-    		toreturn[0] = Integer.valueOf(0);
-    		toreturn[1] = toCheck;
-    	}
-    	
-    	return toreturn;
+        Object toreturn[] = new Object[2];
+        if(toCheck == null){
+            toreturn[0] = Integer.valueOf(0);
+            toreturn[1] = null;
+        } else if(toCheck.getGpid1() != null && !toCheck.getGpid1().equals(recurringParentGid)
+                && toCheck.getGpid2() != null && !toCheck.getGpid2().equals(recurringParentGid)){
+            toreturn[0] = Integer.valueOf(0);
+            toreturn[1] = toCheck;
+        } else if(toCheck.getGpid1() != null && toCheck.getGpid1().equals(recurringParentGid)){
+            Germplasm nextToCheck = null;
+            if(toCheck.getGpid2() != null){
+                nextToCheck = getGermplasmWithPrefName(toCheck.getGpid2());
+            }
+            Object returned[] = determineNumberOfRecurringParent(recurringParentGid, nextToCheck);
+            toreturn[0] = ((Integer) returned[0]) + 1;
+            toreturn[1] = returned[1];
+        } else if(toCheck.getGpid2() != null && toCheck.getGpid2().equals(recurringParentGid)){
+            Germplasm nextToCheck = null;
+            if(toCheck.getGpid1() != null){
+                nextToCheck = getGermplasmWithPrefName(toCheck.getGpid1());
+            }
+            Object returned[] = determineNumberOfRecurringParent(recurringParentGid, nextToCheck);
+            toreturn[0] = ((Integer) returned[0]) + 1;
+            toreturn[1] = returned[1];
+        }
+        else{
+            toreturn[0] = Integer.valueOf(0);
+            toreturn[1] = toCheck;
+        }
+        
+        return toreturn;
     }
     
     @Override
     public List<Location> getAllBreedingLocations() throws MiddlewareQueryException {
-    	Database centralInstance = Database.CENTRAL;
-    	Database localInstance = Database.LOCAL;
-    	
-    	List<Location> allLocations = getFromInstanceByMethod(getLocationDAO(), centralInstance, "getAllBreedingLocations", new Object[] {}, new Class[] {});
-    	allLocations.addAll(getFromInstanceByMethod(getLocationDAO(), localInstance, "getAllBreedingLocations", new Object[] {}, new Class[] {}));
-    	
-    	return allLocations;
+        Database centralInstance = Database.CENTRAL;
+        Database localInstance = Database.LOCAL;
+        
+        List<Location> allLocations = getFromInstanceByMethod(getLocationDAO(), centralInstance, "getAllBreedingLocations", new Object[] {}, new Class[] {});
+        allLocations.addAll(getFromInstanceByMethod(getLocationDAO(), localInstance, "getAllBreedingLocations", new Object[] {}, new Class[] {}));
+        
+        return allLocations;
     }
     
     
     @Override
     public Long countAllBreedingLocations() throws MiddlewareQueryException {
-    	return countAllFromCentralAndLocalByMethod(getLocationDAO(), "countAllBreedingLocations", new Object[] {}, new Class[] {});
+        return countAllFromCentralAndLocalByMethod(getLocationDAO(), "countAllBreedingLocations", new Object[] {}, new Class[] {});
     }
 
-	@Override
-	public String getNextSequenceNumberForCrossName(String prefix, Database instance)
-			throws MiddlewareQueryException {
-		String nextSequenceStr = "1";
-		
-		if (setWorkingDatabase(instance, getGermplasmDao())){
-			nextSequenceStr =  getGermplasmDao().getNextSequenceNumberForCrossName(prefix);
-			
-		}
-		
-		return nextSequenceStr;
-	}    
-	
-	@Override
-	public String getNextSequenceNumberForCrossName(String prefix)
-			throws MiddlewareQueryException {
-		String localNextSequenceStr = "1";
-		String centralNextSequenceStr = "1";
-		
-		centralNextSequenceStr = getNextSequenceNumberForCrossName(prefix, Database.CENTRAL);
-		localNextSequenceStr = getNextSequenceNumberForCrossName(prefix, Database.LOCAL);
-		
-		Integer centralNextSequenceInt = Integer.parseInt(centralNextSequenceStr);
-		Integer localNextSequenceInt = Integer.parseInt(localNextSequenceStr);
-		
-		return (centralNextSequenceInt > localNextSequenceInt) ? 
-				centralNextSequenceStr : localNextSequenceStr;
-	}
+    @Override
+    public String getNextSequenceNumberForCrossName(String prefix, Database instance)
+            throws MiddlewareQueryException {
+        String nextSequenceStr = "1";
+        
+        if (setWorkingDatabase(instance, getGermplasmDao())){
+            nextSequenceStr =  getGermplasmDao().getNextSequenceNumberForCrossName(prefix);
+            
+        }
+        
+        return nextSequenceStr;
+    }    
+    
+    @Override
+    public String getNextSequenceNumberForCrossName(String prefix)
+            throws MiddlewareQueryException {
+        String localNextSequenceStr = "1";
+        String centralNextSequenceStr = "1";
+        
+        centralNextSequenceStr = getNextSequenceNumberForCrossName(prefix, Database.CENTRAL);
+        localNextSequenceStr = getNextSequenceNumberForCrossName(prefix, Database.LOCAL);
+        
+        Integer centralNextSequenceInt = Integer.parseInt(centralNextSequenceStr);
+        Integer localNextSequenceInt = Integer.parseInt(localNextSequenceStr);
+        
+        return (centralNextSequenceInt > localNextSequenceInt) ? 
+                centralNextSequenceStr : localNextSequenceStr;
+    }
 
     @Override
     public Map<Integer, String> getPrefferedIdsByGIDs(List<Integer> gids) throws MiddlewareQueryException {
@@ -1794,14 +1794,14 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     
     @Override
     public List<Germplasm> getGermplasmByLocationId(String name, int locationID) throws MiddlewareQueryException {
-    	List<Germplasm> germplasmList = new ArrayList<Germplasm>();
-    	if (setWorkingDatabase(Database.LOCAL)) {
-    		germplasmList.addAll(getGermplasmDao().getByLocationId(name, locationID));
+        List<Germplasm> germplasmList = new ArrayList<Germplasm>();
+        if (setWorkingDatabase(Database.LOCAL)) {
+            germplasmList.addAll(getGermplasmDao().getByLocationId(name, locationID));
         }
-    	if (setWorkingDatabase(Database.CENTRAL)) {
-    		germplasmList.addAll(getGermplasmDao().getByLocationId(name, locationID));
-    	}
-    	return germplasmList;
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            germplasmList.addAll(getGermplasmDao().getByLocationId(name, locationID));
+        }
+        return germplasmList;
     }
     
     @Override
@@ -1814,40 +1814,40 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     
     @Override
     public List<Germplasm> getGermplasmByGidRange(int startGID, int endGID) throws MiddlewareQueryException {
-    	List<Germplasm> germplasmList = new ArrayList<Germplasm>();
-    	
-    	//assumes the lesser value be the start of the range
-    	if(endGID < startGID){ 
-    		int temp = endGID;
-    		endGID = startGID;
-    		startGID = temp;
-    	}
-    	
-    	if (setWorkingDatabase(startGID)) {
-    		germplasmList.addAll(getGermplasmDao().getByGIDRange(startGID, endGID));
-    		return germplasmList;
-    	}
-    	
-    	return null;
+        List<Germplasm> germplasmList = new ArrayList<Germplasm>();
+        
+        //assumes the lesser value be the start of the range
+        if(endGID < startGID){ 
+            int temp = endGID;
+            endGID = startGID;
+            startGID = temp;
+        }
+        
+        if (setWorkingDatabase(startGID)) {
+            germplasmList.addAll(getGermplasmDao().getByGIDRange(startGID, endGID));
+            return germplasmList;
+        }
+        
+        return null;
     }
     
     @Override 
     public List<Germplasm> getGermplasms(List<Integer> gids) throws MiddlewareQueryException{
-    	List<Germplasm> germplasmList = new ArrayList<Germplasm>();
-    	
-    	if (setWorkingDatabase(Database.LOCAL)) {
-    		germplasmList.addAll(getGermplasmDao().getByGIDList(gids));
-    	}
-    	if (setWorkingDatabase(Database.CENTRAL)) {
-    		germplasmList.addAll(getGermplasmDao().getByGIDList(gids));
-    	}
-    	
-    	return germplasmList;
+        List<Germplasm> germplasmList = new ArrayList<Germplasm>();
+        
+        if (setWorkingDatabase(Database.LOCAL)) {
+            germplasmList.addAll(getGermplasmDao().getByGIDList(gids));
+        }
+        if (setWorkingDatabase(Database.CENTRAL)) {
+            germplasmList.addAll(getGermplasmDao().getByGIDList(gids));
+        }
+        
+        return germplasmList;
     }
     
     @Override
     public Map<Integer, String> getPreferredNamesByGids (List<Integer> gids) throws MiddlewareQueryException{
-    	 Map<Integer, String> toreturn = new HashMap<Integer, String>();
+         Map<Integer, String> toreturn = new HashMap<Integer, String>();
          
          List<Integer> positiveGIDs = new ArrayList<Integer>();
          List<Integer> negativeGIDs = new ArrayList<Integer>();
@@ -1887,8 +1887,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     
     @Override
     public Map<Integer, String> getLocationNamesByGids (List<Integer> gids) throws MiddlewareQueryException{
-    	 Map<Integer, String> toreturn = new HashMap<Integer, String>();
-    	 
+         Map<Integer, String> toreturn = new HashMap<Integer, String>();
+         
          List<Integer> positiveGIDs = new ArrayList<Integer>();
          List<Integer> negativeGIDs = new ArrayList<Integer>();
          
@@ -1904,41 +1904,41 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
          //get data from local
          Map<Integer, LocationDto> resultsFromLocal = new HashMap<Integer, LocationDto>();
          if(!negativeGIDs.isEmpty()){
-        	 if (setWorkingDatabase(Database.LOCAL)) {
-        		 resultsFromLocal = getLocationDao().getLocationNamesByGIDs(negativeGIDs);
-        	 }
+             if (setWorkingDatabase(Database.LOCAL)) {
+                 resultsFromLocal = getLocationDao().getLocationNamesByGIDs(negativeGIDs);
+             }
          }
          
          //query central location references for local GIDs and then add to map
          List<Integer> centralLocationIds = new ArrayList<Integer>();
          for (LocationDto location : resultsFromLocal.values()){
-        	 Integer locId = location.getId();
-        	 if (locId != null && locId > 0 && !centralLocationIds.contains(locId)){
-        		 centralLocationIds.add(locId);
-        	 }
+             Integer locId = location.getId();
+             if (locId != null && locId > 0 && !centralLocationIds.contains(locId)){
+                 centralLocationIds.add(locId);
+             }
          }
          if (setWorkingDatabase(Database.CENTRAL)){
-        	 Map<Integer, String> centralLocations = new HashMap<Integer, String>();
-        	 if (!centralLocationIds.isEmpty()){
-        		 centralLocations = getLocationDao().getLocationNamesByLocationIDs(centralLocationIds);
-        	 }
-        	 for (Integer gid : resultsFromLocal.keySet()){
-        		 LocationDto location = resultsFromLocal.get(gid);
-        		 Integer locationId = location.getId();
-        		 String locationName = location.getLocationName();
-        		 if (locationId > 0){
-        			 locationName = centralLocations.get(locationId);
-        		 }
-        		 toreturn.put(gid, locationName);
-        	 }
+             Map<Integer, String> centralLocations = new HashMap<Integer, String>();
+             if (!centralLocationIds.isEmpty()){
+                 centralLocations = getLocationDao().getLocationNamesByLocationIDs(centralLocationIds);
+             }
+             for (Integer gid : resultsFromLocal.keySet()){
+                 LocationDto location = resultsFromLocal.get(gid);
+                 Integer locationId = location.getId();
+                 String locationName = location.getLocationName();
+                 if (locationId > 0){
+                     locationName = centralLocations.get(locationId);
+                 }
+                 toreturn.put(gid, locationName);
+             }
          }
 
          
          //get data from central and add it to the map
          if(!positiveGIDs.isEmpty()){
-        	 if (setWorkingDatabase(Database.CENTRAL)) {
-        		 toreturn.putAll(getLocationDao().getLocationNamesMapByGIDs(positiveGIDs));
-        	 }
+             if (setWorkingDatabase(Database.CENTRAL)) {
+                 toreturn.putAll(getLocationDao().getLocationNamesMapByGIDs(positiveGIDs));
+             }
          }
          
         
@@ -1948,24 +1948,26 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
 
     /**
-     * Search for germplasms given a search term Q
-     * @param q
-     * @param operation
+     * Search for germplasms given a search term Q.
+     * @param q - the search term to be used in query
+     * @param o - operation to be used for comparison (equal or like)
+     * @param includeParents boolean flag to denote whether parents will be included in search results
      * @return - List of germplasms (including parents (level 1) with gid=Q or name like Q or in list name like Q
      * @throws MiddlewareQueryException
      */
-    public List<Germplasm> searchForGermplasm(String q, Operation o) throws MiddlewareQueryException{
+    public List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents)
+            throws MiddlewareQueryException{
         List<Germplasm> resultsFromCentral;
         List<Germplasm> resultsFromLocal;
         List<Germplasm> combinedResults = new ArrayList<Germplasm>();
 
         if (setWorkingDatabase(Database.CENTRAL)) {
-            resultsFromCentral = getGermplasmDao().searchForGermplasms(q, o);
+            resultsFromCentral = getGermplasmDao().searchForGermplasms(q, o, includeParents);
             combinedResults.addAll(resultsFromCentral);
         }
         
         if (setWorkingDatabase(Database.LOCAL)) {
-            resultsFromLocal = getGermplasmDao().searchForGermplasms(q, o);
+            resultsFromLocal = getGermplasmDao().searchForGermplasms(q, o, includeParents);
             combinedResults.addAll(resultsFromLocal);
         }
 
@@ -1974,9 +1976,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
    
     
     public Map<Integer, Integer> getGermplasmDatesByGids(List<Integer> gids) throws MiddlewareQueryException {
-    	Map<Integer, Integer> resultsFromCentral;
-    	Map<Integer, Integer> resultsFromLocal;
-    	Map<Integer, Integer> combinedResults = new HashMap<Integer, Integer>();
+        Map<Integer, Integer> resultsFromCentral;
+        Map<Integer, Integer> resultsFromLocal;
+        Map<Integer, Integer> combinedResults = new HashMap<Integer, Integer>();
 
         if (setWorkingDatabase(Database.CENTRAL)) {
             resultsFromCentral = getGermplasmDao().getGermplasmDatesByGids(gids);
@@ -1984,7 +1986,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         }
         
         if (setWorkingDatabase(Database.LOCAL)) {
-        	resultsFromLocal = getGermplasmDao().getGermplasmDatesByGids(gids);
+            resultsFromLocal = getGermplasmDao().getGermplasmDatesByGids(gids);
             combinedResults.putAll(resultsFromLocal);
         }
 
@@ -1992,19 +1994,19 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
     }
     
     public Map<Integer, Object> getMethodsByGids(List<Integer> gids) throws MiddlewareQueryException {
-    	
-    	Map<Integer, Object> results = new HashMap<Integer, Object>();
-    	
-    	Map<Integer, Integer> centralMethodIds = new HashMap<Integer, Integer>();
-    	Map<Integer, Integer> localMethodIds = new HashMap<Integer, Integer>();
-    	
-    	Map<Integer, Integer> combinedMethodIds = new HashMap<Integer, Integer>();
-    	
+        
+        Map<Integer, Object> results = new HashMap<Integer, Object>();
+        
+        Map<Integer, Integer> centralMethodIds = new HashMap<Integer, Integer>();
+        Map<Integer, Integer> localMethodIds = new HashMap<Integer, Integer>();
+        
+        Map<Integer, Integer> combinedMethodIds = new HashMap<Integer, Integer>();
+        
         if (setWorkingDatabase(Database.CENTRAL)) {
-        	centralMethodIds = getGermplasmDao().getMethodIdsByGids(gids);
+            centralMethodIds = getGermplasmDao().getMethodIdsByGids(gids);
         }
         if (setWorkingDatabase(Database.LOCAL)) {
-        	localMethodIds = getGermplasmDao().getMethodIdsByGids(gids);
+            localMethodIds = getGermplasmDao().getMethodIdsByGids(gids);
         }
         
         combinedMethodIds.putAll(centralMethodIds);
@@ -2012,21 +2014,21 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         
         
         if (setWorkingDatabase(Database.CENTRAL)) {
-        	for(Map.Entry<Integer,Integer> entry: combinedMethodIds.entrySet()){
-        		if(entry.getValue()>=0){
-        			Method method = getMethodDao().getById(entry.getValue(), false);
-        			results.put(entry.getKey(), method);
-        		}
-        	}
+            for(Map.Entry<Integer,Integer> entry: combinedMethodIds.entrySet()){
+                if(entry.getValue()>=0){
+                    Method method = getMethodDao().getById(entry.getValue(), false);
+                    results.put(entry.getKey(), method);
+                }
+            }
         }
 
         if (setWorkingDatabase(Database.LOCAL)) {
-        	for(Map.Entry<Integer,Integer> entry: combinedMethodIds.entrySet()){
-        		if(entry.getValue()<0){
-        			Method method = getMethodDao().getById(entry.getValue(), false);
-        			results.put(entry.getKey(), method);
-        		}
-        	}
+            for(Map.Entry<Integer,Integer> entry: combinedMethodIds.entrySet()){
+                if(entry.getValue()<0){
+                    Method method = getMethodDao().getById(entry.getValue(), false);
+                    results.put(entry.getKey(), method);
+                }
+            }
         }
 
         return results;

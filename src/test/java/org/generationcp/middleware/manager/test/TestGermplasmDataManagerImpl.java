@@ -51,10 +51,10 @@ public class TestGermplasmDataManagerImpl{
     private static ManagerFactory factory;
     private static GermplasmDataManager manager;
 
-	private long startTime;
+    private long startTime;
 
-	@Rule
-	public TestName name = new TestName();
+    @Rule
+    public TestName name = new TestName();
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -66,19 +66,19 @@ public class TestGermplasmDataManagerImpl{
         manager = factory.getGermplasmDataManager();
     }
 
-	@Before
-	public void beforeEachTest() {
+    @Before
+    public void beforeEachTest() {
         Debug.println(0, "#####" + name.getMethodName() + " Start: ");
-		startTime = System.nanoTime();
-	}
-	
-	@After
-	public void afterEachTest() {
-		long elapsedTime = System.nanoTime() - startTime;
-		Debug.println(0, "#####" + name.getMethodName() + ": Elapsed Time = " 
-		        + elapsedTime + " ns = " + ((double) elapsedTime/1000000000) + " s");
-	}
-	
+        startTime = System.nanoTime();
+    }
+    
+    @After
+    public void afterEachTest() {
+        long elapsedTime = System.nanoTime() - startTime;
+        Debug.println(0, "#####" + name.getMethodName() + ": Elapsed Time = " 
+                + elapsedTime + " ns = " + ((double) elapsedTime/1000000000) + " s");
+    }
+    
     @Test
     public void testGetAllLocationsWithStartNumRows() throws Exception {
         List<Location> locationList = manager.getAllLocations(5, 10);
@@ -589,7 +589,7 @@ public class TestGermplasmDataManagerImpl{
         List<Name> names = manager.getNamesByGID(gid, null, null);
         Debug.println(0, "testGetNamesByGID(" + gid + ") RESULTS: " + names.size());
         for (Name name : names){
-        	System.out.println(name);
+            System.out.println(name);
         }
     }
 
@@ -636,13 +636,13 @@ public class TestGermplasmDataManagerImpl{
         String nVal = "C 65-44";
         Debug.println(0, "testGetNameByGIDAndNval(" + gid + ", " + nVal 
                         + ", GetGermplasmByNameModes.NORMAL) RESULTS: " 
-        				+ manager.getNameByGIDAndNval(gid, nVal, GetGermplasmByNameModes.NORMAL));
+                        + manager.getNameByGIDAndNval(gid, nVal, GetGermplasmByNameModes.NORMAL));
         Debug.println(0, "testGetNameByGIDAndNval(" + gid + ", " + nVal 
                         + ", GetGermplasmByNameModes.SPACES_REMOVED) RESULTS: " 
-        				+ manager.getNameByGIDAndNval(gid, nVal, GetGermplasmByNameModes.SPACES_REMOVED));
+                        + manager.getNameByGIDAndNval(gid, nVal, GetGermplasmByNameModes.SPACES_REMOVED));
         Debug.println(0, "testGetNameByGIDAndNval(" + gid + ", " + nVal 
                         + ", GetGermplasmByNameModes.STANDARDIZED) RESULTS: " 
-        				+ manager.getNameByGIDAndNval(gid, nVal, GetGermplasmByNameModes.STANDARDIZED));
+                        + manager.getNameByGIDAndNval(gid, nVal, GetGermplasmByNameModes.STANDARDIZED));
     }
 
     @Test
@@ -959,8 +959,8 @@ public class TestGermplasmDataManagerImpl{
     
     @Test
     public void testGetUserDefinedFieldByFieldTable() throws MiddlewareQueryException {
-    	String tableName="LOCATION";
-    	String fieldType="LTYPE";
+        String tableName="LOCATION";
+        String fieldType="LTYPE";
         List<UserDefinedField> userDefineField = manager
                 .getUserDefinedFieldByFieldTableNameAndType(tableName, fieldType);
         Debug.println(0, "testGetUserDefineFieldByTableNameAndType(type=" + tableName 
@@ -989,20 +989,20 @@ public class TestGermplasmDataManagerImpl{
     
     @Test
     public void testGetNextSequenceNumberForCrossNameInDatabase() throws MiddlewareQueryException{
-    	String prefix = "IR";
-    	Database db = Database.CENTRAL;
-    	Debug.println(0, "Next number in sequence for prefix (" + prefix + ") in " + db + " database: " + 
-    			manager.getNextSequenceNumberForCrossName(prefix, db));
+        String prefix = "IR";
+        Database db = Database.CENTRAL;
+        Debug.println(0, "Next number in sequence for prefix (" + prefix + ") in " + db + " database: " + 
+                manager.getNextSequenceNumberForCrossName(prefix, db));
     }
     
     @Test
     public void testGetNextSequenceNumberForCrossName() throws MiddlewareQueryException{
-    	String prefix = "PARA7A2";
-//    	Debug.println(0, "Next number in sequence for prefix (" + prefix + "): " + 
-//    			manager.getNextSequenceNumberForCrossName(prefix));
+        String prefix = "PARA7A2";
+//      Debug.println(0, "Next number in sequence for prefix (" + prefix + "): " + 
+//              manager.getNextSequenceNumberForCrossName(prefix));
         Debug.println(0, prefix.substring(prefix.length()-1) + " " 
                     + prefix.substring(prefix.length()-1).matches("\\d"));
-	    	
+            
     }
    
     @Test
@@ -1029,27 +1029,27 @@ public class TestGermplasmDataManagerImpl{
     
     @Test
     public void testGetAllMethods() throws Exception {
-    	List<Method> results = manager.getAllMethods();
+        List<Method> results = manager.getAllMethods();
         assertNotNull(results);
         assertTrue(!results.isEmpty());
         for (Method result : results){
-        	Debug.println(0, result.toString());
+            Debug.println(0, result.toString());
         }
         Debug.println(0, "Number of record/s: " +results.size());
     }
     
     @Test
     public void testCountGermplasmByPrefName() throws Exception {
-    	String name = "CHALIMBANA"; //change nval
-    	long count = manager.countGermplasmByPrefName(name);
-    	assertNotNull(count);
-    	Debug.println(0, "testCountGermplasmByPrefName("+name+") Results: " + count);
+        String name = "CHALIMBANA"; //change nval
+        long count = manager.countGermplasmByPrefName(name);
+        assertNotNull(count);
+        Debug.println(0, "testCountGermplasmByPrefName("+name+") Results: " + count);
     }
 
     @Test
     public void testGetAllGermplasm() throws Exception {
-    	List<Germplasm> germplasms = manager.getAllGermplasm(0, 100, Database.CENTRAL);
-    	assertNotNull(germplasms);
+        List<Germplasm> germplasms = manager.getAllGermplasm(0, 100, Database.CENTRAL);
+        assertNotNull(germplasms);
         assertTrue(!germplasms.isEmpty());
         for (Germplasm germplasm : germplasms) {
             Debug.println(0, "  " + germplasm);
@@ -1062,7 +1062,7 @@ public class TestGermplasmDataManagerImpl{
      *  this method to insert a new record
      */
     public void testGetAttributeById() throws Exception {
-    	Integer id = Integer.valueOf(-1);
+        Integer id = Integer.valueOf(-1);
         Attribute attributes = manager.getAttributeById(id);
         assertNotNull(attributes);
         Debug.println(0, "testGetAttributeById("+id+") Results:");
@@ -1071,27 +1071,27 @@ public class TestGermplasmDataManagerImpl{
     
     @Test
     public void testGetCountryById() throws Exception {
-    	Integer id = Integer.valueOf(1);
-    	Country countries = manager.getCountryById(id);
-    	assertNotNull(countries);
+        Integer id = Integer.valueOf(1);
+        Country countries = manager.getCountryById(id);
+        assertNotNull(countries);
         Debug.println(0, "testGetCountryById("+id+") Results:");
         Debug.println(0, "  " + countries);
     }
 
     @Test
     public void testGetLocationByID() throws Exception {
-    	Integer id = Integer.valueOf(1);
-    	Location locid = manager.getLocationByID(id);
-    	assertNotNull(locid);
+        Integer id = Integer.valueOf(1);
+        Location locid = manager.getLocationByID(id);
+        assertNotNull(locid);
         Debug.println(0, "testGetLocationByID("+id+") Results: ");
         Debug.println(0, "  " + locid);
     }
     
     @Test
     public void testGetLocationDetailsByLocId() throws Exception {
-    	Integer locationId = Integer.valueOf(2);
-    	List<LocationDetails> locdetails = manager.getLocationDetailsByLocId(locationId, 0, 100);
-    	assertNotNull(locdetails);
+        Integer locationId = Integer.valueOf(2);
+        List<LocationDetails> locdetails = manager.getLocationDetailsByLocId(locationId, 0, 100);
+        assertNotNull(locdetails);
         assertTrue(!locdetails.isEmpty());
         Debug.println(0, "testGetLocationDetailsByLocId("+locationId+") Results: ");
         for (LocationDetails locdetail : locdetails) {
@@ -1111,35 +1111,35 @@ public class TestGermplasmDataManagerImpl{
     
     @Test
     public void testGetMethodByID() throws Exception {
-    	Integer id = Integer.valueOf(2);
-    	Method methodid = manager.getMethodByID(id);
-    	assertNotNull(methodid);
+        Integer id = Integer.valueOf(2);
+        Method methodid = manager.getMethodByID(id);
+        assertNotNull(methodid);
         Debug.println(0, "testGetMethodByID("+id+") Results: ");
         Debug.println(0, "  " + methodid);
     }
     
     @Test
     public void testGetUserDefinedFieldByID() throws Exception {
-    	Integer id = Integer.valueOf(2);
-    	UserDefinedField result = manager.getUserDefinedFieldByID(id);
-    	assertNotNull(result);
+        Integer id = Integer.valueOf(2);
+        UserDefinedField result = manager.getUserDefinedFieldByID(id);
+        assertNotNull(result);
         Debug.println(0, "  " + result);
     }
     
     @Test
     public void testGetBibliographicReferenceByID() throws Exception {
-    	Integer id = Integer.valueOf(2);
-    	Bibref result = manager.getBibliographicReferenceByID(id);
-    	assertNotNull(result);
+        Integer id = Integer.valueOf(2);
+        Bibref result = manager.getBibliographicReferenceByID(id);
+        assertNotNull(result);
         Debug.println(0, "  " + result);
     }  
     
     @Test
     public void testGetGermplasmByLocationId() throws Exception {
-    	String name = "RCH";
-    	int locationID = 0;
-    	
-    	List<Germplasm> germplasmList = manager.getGermplasmByLocationId(name, locationID);
+        String name = "RCH";
+        int locationID = 0;
+        
+        List<Germplasm> germplasmList = manager.getGermplasmByLocationId(name, locationID);
         assertTrue(germplasmList != null);
 
         Debug.println(0, "testGetGermplasmByLocationId(" + name + ") RESULTS: ");
@@ -1150,10 +1150,10 @@ public class TestGermplasmDataManagerImpl{
     
     @Test
     public void testGetGermplasmByGidRange() throws Exception {
-    	int startGID = 1;
-    	int endGID = 3;
-    	
-    	List<Germplasm> germplasmList = manager.getGermplasmByGidRange(startGID, endGID);
+        int startGID = 1;
+        int endGID = 3;
+        
+        List<Germplasm> germplasmList = manager.getGermplasmByGidRange(startGID, endGID);
         assertTrue(germplasmList != null);
 
         Debug.println(0, "testGetGermplasmByGidRange(" + startGID + "," + endGID + ") RESULTS: ");
@@ -1164,12 +1164,12 @@ public class TestGermplasmDataManagerImpl{
     
     @Test
     public void testGetGermplasmByGIDList() throws Exception {
-    	List<Integer> gids = new ArrayList<Integer>();
-    	gids.add(1);
-    	gids.add(-1);
-    	gids.add(5);
-    	
-    	List<Germplasm> germplasmList = manager.getGermplasms(gids);
+        List<Integer> gids = new ArrayList<Integer>();
+        gids.add(1);
+        gids.add(-1);
+        gids.add(5);
+        
+        List<Germplasm> germplasmList = manager.getGermplasms(gids);
         assertTrue(germplasmList != null);
 
         Debug.println(0, "testGetGermplasmByGidList(" + gids + ") RESULTS: ");
@@ -1212,28 +1212,29 @@ public class TestGermplasmDataManagerImpl{
   public void testSearchGermplasm() throws MiddlewareQueryException{
       //String q = "2003";
       String q = "dinurado";
+      boolean includeParents = true;
             
-      List<Germplasm> results = manager.searchForGermplasm(q, Operation.LIKE);
+      List<Germplasm> results = manager.searchForGermplasm(q, Operation.LIKE, includeParents);
       
       Debug.println(0, "###############################");
       Debug.println(0, " searchForGermplasm("+q+")");
       Debug.println(0, "###############################");
       
       for(Germplasm g : results){
-    	  String name = "";
-    	  if(g.getPreferredName()!=null)
-    		  if(g.getPreferredName().getNval()!=null)
-    			  name = g.getPreferredName().getNval().toString();
+          String name = "";
+          if(g.getPreferredName()!=null)
+              if(g.getPreferredName().getNval()!=null)
+                  name = g.getPreferredName().getNval().toString();
           Debug.println(3, g.getGid() + " - " + name);
       }
   }         
   
   @Test
   public void getGermplasmDatesByGids() throws MiddlewareQueryException{
-	  List<Integer> gids = new ArrayList<Integer>();
-	  gids.add(50533);
-	  gids.add(-1);
-	  Map<Integer,Integer> results = manager.getGermplasmDatesByGids(gids);
+      List<Integer> gids = new ArrayList<Integer>();
+      gids.add(50533);
+      gids.add(-1);
+      Map<Integer,Integer> results = manager.getGermplasmDatesByGids(gids);
       Debug.println(0, "###############################");
       Debug.println(0, " getGermplasmDatesByGids("+gids+")");
       Debug.println(0, "###############################");
@@ -1242,17 +1243,17 @@ public class TestGermplasmDataManagerImpl{
   
   @Test
   public void getMethodsByGids() throws MiddlewareQueryException{
-	  List<Integer> gids = new ArrayList<Integer>();
-	  gids.add(50533);
-	  gids.add(-145);
-	  Map<Integer,Object> results = manager.getMethodsByGids(gids);
+      List<Integer> gids = new ArrayList<Integer>();
+      gids.add(50533);
+      gids.add(-145);
+      Map<Integer,Object> results = manager.getMethodsByGids(gids);
       Debug.println(0, "###############################");
       Debug.println(0, " getGermplasmDatesByGids("+gids+")");
       Debug.println(0, "###############################");
       Debug.println(0, results.toString());
   }  
   
-	@Test
+    @Test
     public void getAttributeTypesByGIDList() throws MiddlewareQueryException {
         List<Integer> gids = new ArrayList<Integer>();
         gids.add(110);
@@ -1266,8 +1267,8 @@ public class TestGermplasmDataManagerImpl{
             Debug.println(0, field.getFname());
         }
     }
-	
-	@Test
+    
+    @Test
     public void getAttributeValuesByTypeAndGIDList() throws MiddlewareQueryException {
         List<Integer> gids = new ArrayList<Integer>();
         gids.add(110);
