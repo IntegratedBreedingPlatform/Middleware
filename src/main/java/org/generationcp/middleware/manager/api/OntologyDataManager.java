@@ -517,6 +517,6 @@ public interface OntologyDataManager {
      * @return
      * @throws MiddlewareQueryException
      */
-    Integer getStandardVariableIdByPropertyScaleMethodRole(Integer propertyId, Integer scaleId, Integer methodId, PhenotypicType role)
+    Integer getStandardVariableIdByPropertyScaleMethodRole(String property, String scale, String method, PhenotypicType role)
     throws MiddlewareQueryException;
 }

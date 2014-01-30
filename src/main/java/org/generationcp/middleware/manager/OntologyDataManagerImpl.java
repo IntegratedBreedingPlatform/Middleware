@@ -964,9 +964,21 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
     }
 
     @Override
-    public Integer getStandardVariableIdByPropertyScaleMethodRole(Integer propertyId, Integer scaleId, Integer methodId, PhenotypicType role)
+    public Integer getStandardVariableIdByPropertyScaleMethodRole(String property, String scale, String method, PhenotypicType role)
             throws MiddlewareQueryException {
+        
+        Integer propertyId = findTermIdByName(property, CvId.PROPERTIES);
+        Integer scaleId = findTermIdByName(scale, CvId.SCALES);
+        Integer methodId = findTermIdByName(method, CvId.METHODS);
         return getStandardVariableBuilder().getIdByPropertyScaleMethodRole(propertyId, scaleId, methodId, role);
+    }
+    
+    private Integer findTermIdByName(String name, CvId cvType)  throws MiddlewareQueryException {
+        Term term = findTermByName(name, CvId.PROPERTIES);
+        if (term != null) {
+            return term.getId();
+        }
+        return null;
     }
 }
 

@@ -19,6 +19,10 @@ public class MeasurementData {
 	
 	private String value;
 	
+	private boolean isEditable;
+	private String dataType;
+	
+	private int phenotypeId;
 	
 	public MeasurementData() {
 	}
@@ -27,6 +31,14 @@ public class MeasurementData {
 		super();
 		this.label = label;
 		this.value = value;
+	}
+	
+	public MeasurementData(String label, String value, boolean isEditable, String dataType) {
+		super();
+		this.label = label;
+		this.value = value;
+		this.isEditable = isEditable;
+		this.dataType = dataType;
 	}
 
 	public String getLabel() {
@@ -44,6 +56,14 @@ public class MeasurementData {
 	public void setValue(String value) {
 		this.value = value;
 	}
+	
+	public int getPhenotypeId() {
+	    return phenotypeId;
+	}
+	
+	public void setPhenotypeId(int phenotypeId) {
+	    this.phenotypeId = phenotypeId;
+	} 
 
 	@Override
 	public String toString() {
@@ -62,4 +82,22 @@ public class MeasurementData {
 	    Debug.println(indent + 3, "Value: " + value);
 	}
 
+	public boolean isEditable() {
+		return isEditable;
+	}
+
+	public void setEditable(boolean isEditable) {
+		this.isEditable = isEditable;
+	}
+
+	public String getDataType() {
+		return dataType;
+	}
+
+	public void setDataType(String dataType) {
+		this.dataType = dataType;
+	}
+
+	
+	
 }

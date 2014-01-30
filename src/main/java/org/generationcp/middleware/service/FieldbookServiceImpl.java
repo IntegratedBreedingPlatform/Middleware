@@ -18,12 +18,15 @@ import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.service.api.FieldbookService;
 
@@ -98,11 +101,33 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     public List<DatasetReference> getDatasetReferences(int studyId) throws MiddlewareQueryException {
         return getStudyDataManager().getDatasetReferences(studyId);
     }
+
+	@Override
+	public int getNextGermplasmId() throws MiddlewareQueryException {
+		return getGermplasmDataManager().getNextNegativeId().intValue();
+	}
+
+	@Override
+	public Integer getGermplasmIdByName(String name)
+			throws MiddlewareQueryException {
+		
+		 List<Germplasm> germplasmList = getGermplasmDataManager().getGermplasmByName(name, 0, 1, Operation.EQUAL);
+		 Integer gid = null;
+		 if(germplasmList != null && germplasmList.size() > 0){
+			 gid = germplasmList.get(0).getGid();
+		 }
+		 return gid;
+	}
     
     @Override
-    public Integer getStandardVariableIdByPropertyScaleMethodRole(Integer propertyId, Integer scaleId, Integer methodId, PhenotypicType role)
+    public Integer getStandardVariableIdByPropertyScaleMethodRole(String property, String scale, String method, PhenotypicType role)
             throws MiddlewareQueryException {
-        return getOntologyDataManager().getStandardVariableIdByPropertyScaleMethodRole(propertyId, scaleId, methodId, role);
+        return getOntologyDataManager().getStandardVariableIdByPropertyScaleMethodRole(property, scale, method, role);
     }
     
+	@Override
+    public Workbook getNurseryDataSet(int id) throws MiddlewareQueryException {
+        Workbook workbook = getWorkbookBuilder().create(id);                        
+        return workbook;
+    }
 }

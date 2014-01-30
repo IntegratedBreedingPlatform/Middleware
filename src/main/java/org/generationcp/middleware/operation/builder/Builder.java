@@ -13,9 +13,12 @@ package org.generationcp.middleware.operation.builder;
 
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.StudyDataManagerImpl;
+import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.saver.CvTermRelationshipSaver;
 import org.generationcp.middleware.operation.saver.CvTermSaver;
 import org.generationcp.middleware.operation.saver.StandardVariableSaver;
+import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.util.DatabaseBroker;
 
 /**
@@ -84,5 +87,13 @@ public abstract class Builder extends DatabaseBroker {
 	
 	protected final CvTermRelationshipSaver getCvTermRelationshipSaver() {
 	    return new CvTermRelationshipSaver(sessionProviderForLocal, sessionProviderForCentral);
+	}
+	
+	protected final StudyDataManager getStudyDataManager() {
+	    return new StudyDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+	}
+	
+	protected final MeasurementVariableTransformer getMeasurementVariableTransformer() {
+	    return new MeasurementVariableTransformer(sessionProviderForLocal, sessionProviderForCentral);
 	}
 }

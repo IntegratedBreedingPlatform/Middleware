@@ -582,6 +582,15 @@ public interface StudyDataManager{
     List<StudyDetails> getStudyDetails(Database instance, StudyType studyType, int start, int numOfRows) throws MiddlewareQueryException;
     
     /**
+     * Gets the study details.
+     *
+     * @param id the id
+     * @return the study details
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    StudyDetails getStudyDetails(Database instance, StudyType studyType, int id) throws MiddlewareQueryException;
+    
+    /**
      * Retrieves the study details of the all nurseries and trials from both central and local in batches
      * ordered by db instance then study name.
      *
@@ -661,9 +670,9 @@ public interface StudyDataManager{
 
     /**
      * Retrieves the folder tree.
-     * 
-     * @return
-     * @throws MiddlewareQueryException
+     *
+     * @return the folder tree
+     * @throws MiddlewareQueryException the middleware query exception
      */
     List<FolderReference> getFolderTree() throws MiddlewareQueryException;
 }

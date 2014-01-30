@@ -18,10 +18,12 @@ import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Location;
 
+// TODO: Auto-generated Javadoc
 /**
  * This is the API for Fieldbook requirements.
  * 
@@ -129,6 +131,32 @@ public interface FieldbookService {
      * @return
      * @throws MiddlewareQueryException
      */
-    Integer getStandardVariableIdByPropertyScaleMethodRole(Integer propertyId, Integer scaleId, Integer methodId, PhenotypicType role)
+    Integer getStandardVariableIdByPropertyScaleMethodRole(String property, String scale, String method, PhenotypicType role)
     throws MiddlewareQueryException;
+    
+    /**
+     * Gets the next germplasm id.
+     *
+     * @return the next germplasm id
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    int getNextGermplasmId() throws MiddlewareQueryException;
+    
+    /**
+     * Gets the germplasm id by name.
+     *
+     * @param name the name
+     * @return the germplasm id by name
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Integer getGermplasmIdByName(String name) throws MiddlewareQueryException;
+    
+    /**
+     * Gets the data set.
+     *
+     * @param id the id
+     * @return the data set
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Workbook getNurseryDataSet(int id) throws MiddlewareQueryException;
 }

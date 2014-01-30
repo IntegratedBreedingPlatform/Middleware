@@ -30,6 +30,10 @@ public class MeasurementVariable {
 	private String value;
 	
 	private String label;
+	
+	private String storedIn;
+	
+	private boolean isFactor;
 
 	public MeasurementVariable() {
 	}
@@ -148,5 +152,19 @@ public class MeasurementVariable {
 	    Debug.println(indent + 3, "Label: " + label);
 	}
 
+	public boolean isFactor() {
+		return isFactor;
+	}
+
+	public void setFactor(boolean isFactor) {
+		this.isFactor = isFactor;
+	}
+
+	public String getStoredIn() {
+	    return storedIn;
+	}
 	
+	public void setStoredIn(String storedIn){
+	    this.storedIn = storedIn;
+	}
 }

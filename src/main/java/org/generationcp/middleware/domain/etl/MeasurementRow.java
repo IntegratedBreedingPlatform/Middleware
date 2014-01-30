@@ -22,6 +22,8 @@ public class MeasurementRow {
 	
 	private long locationId;
 	
+	private int experimentId;
+	
 	private List<MeasurementData> dataList;
 	
 	public MeasurementRow() {
@@ -52,6 +54,14 @@ public class MeasurementRow {
 	public void setLocationId(long locationId) {
 		this.locationId = locationId;
 	}
+	
+	public long getExperimentId() {
+            return experimentId;
+        }
+    
+        public void setExperimentId(int experimentId) {
+                this.experimentId = experimentId;
+        }
 	
 	public List<MeasurementData> getTrialDataList(List<String> trialHeaders) {
 		List<MeasurementData> list = new ArrayList<MeasurementData>();

@@ -37,7 +37,7 @@ import org.generationcp.middleware.pojos.UserDefinedField;
  * 
  */
 public interface GermplasmDataManager {
-	
+    
     /**
      * Searches for all germplasm records which matches the given name. Three
      * searching modes are available; normal search, the spaces on the name will
@@ -192,8 +192,8 @@ public interface GermplasmDataManager {
      * @return All Locations based on the given start and numOfRows
      * @throws MiddlewareQueryException the middleware query exception
      */  
-	List<Location> getAllLocalLocations(int start, int numOfRows)
-			throws MiddlewareQueryException;
+    List<Location> getAllLocalLocations(int start, int numOfRows)
+            throws MiddlewareQueryException;
     
     
     /**
@@ -282,8 +282,8 @@ public interface GermplasmDataManager {
      * @return the locations by name country and type
      * @throws MiddlewareQueryException the middleware query exception
      */
-	List<Location> getLocationsByNameCountryAndType(String name,
-			Country country, Integer type) throws MiddlewareQueryException;
+    List<Location> getLocationsByNameCountryAndType(String name,
+            Country country, Integer type) throws MiddlewareQueryException;
     
 
     /**
@@ -1160,15 +1160,16 @@ public interface GermplasmDataManager {
     /**
      * Search for germplasms given a search term Q.
      *
-     * @param q the q
-     * @param o the o
+     * @param q - the search term to be used in retrieving the germplasm
+     * @param o - the operation to be used for the query (equal or like)
+     * @param includeParents - boolean flag to denote whether parents will be included in search results
      * @return - List of germplasms (including parents (level 1) with gid=Q or name like Q or in list name like Q
      * Given a List of GIDs, return the list of gids mapped to their corresponding location
      * Map<Integer, String>
      * - map of gids to their corresponding location name
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<Germplasm> searchForGermplasm(String q, Operation o) throws MiddlewareQueryException;
+    List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents) throws MiddlewareQueryException;
 
     /**
      * Gets the locations by the given IDs.
@@ -1215,5 +1216,10 @@ public interface GermplasmDataManager {
      */
     Map<Integer, Object> getMethodsByGids(List<Integer> gids) throws MiddlewareQueryException;
 
-    
+    /**
+     * Gets the next negative id.
+     *
+     * @return the next negative id
+     */
+    Integer getNextNegativeId() throws MiddlewareQueryException;
 }
