@@ -46,6 +46,8 @@ public class Workbook {
 	private List<MeasurementVariable> trialConditions;
 	private List<MeasurementVariable> trialConstants;
 	
+	private boolean isCheckFactorAddedOnly;
+	
 	public void reset() {
 		trialHeaders = null;
 		trialVariables = null;
@@ -329,4 +331,14 @@ public class Workbook {
 		}
 	}
 
+	public boolean isCheckFactorAddedOnly() {
+		return isCheckFactorAddedOnly;
+	}
+
+	public void setCheckFactorAddedOnly(boolean isCheckFactorAddedOnly) {
+		this.isCheckFactorAddedOnly = isCheckFactorAddedOnly;
+	}
+
+	
+	
 }
