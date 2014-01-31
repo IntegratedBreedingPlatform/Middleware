@@ -119,13 +119,18 @@ public class PhenotypeSaver extends Saver{
     }
 
     private void saveExperimentPhenotype(int experimentId, int phenotypeId) throws MiddlewareQueryException {
-        ExperimentPhenotype experimentPhenotype = new ExperimentPhenotype();
-
-        experimentPhenotype
+        ExperimentPhenotype experimentPhenotype = getExperimentPhenotypeDao()
+                            .getbyExperimentAndPhenotype(experimentId, phenotypeId);
+        
+        if (experimentPhenotype == null || experimentPhenotype.getExperimentPhenotypeId() == null){
+            experimentPhenotype = new ExperimentPhenotype();
+            experimentPhenotype
                 .setExperimentPhenotypeId(getExperimentPhenotypeDao().getNegativeId("experimentPhenotypeId"));
-        experimentPhenotype.setExperiment(experimentId);
-        experimentPhenotype.setPhenotype(phenotypeId);
+            experimentPhenotype.setExperiment(experimentId);
+            experimentPhenotype.setPhenotype(phenotypeId);
+        }
 
         getExperimentPhenotypeDao().saveOrUpdate(experimentPhenotype);
     }
+
 }

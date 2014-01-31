@@ -11,13 +11,16 @@
  *******************************************************************************/
 package org.generationcp.middleware.service.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.etl.MeasurementData;
+import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
@@ -29,7 +32,6 @@ import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.util.Debug;
 import org.generationcp.middleware.utils.test.TestNurseryWorkbookUtil;
-import org.generationcp.middleware.utils.test.TestWorkbookUtil;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -42,7 +44,7 @@ import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
 public class TestFieldbookServiceImpl {
-    
+        
     private static ServiceFactory serviceFactory;
     private static FieldbookService fieldbookService;
     private static DataImportService dataImportService;
@@ -144,13 +146,41 @@ public class TestFieldbookServiceImpl {
     }
     
     @Test
+    public void testSaveMeasurementRows() throws MiddlewareQueryException {
+        //TODO
+        Workbook workbook = TestNurseryWorkbookUtil.getTestWorkbook();
+        workbook.print(0);
+        int id = dataImportService.saveDataset(workbook);
+        Workbook workbook2 = fieldbookService.getNurseryDataSet(id);
+        
+        List<MeasurementRow> observations = workbook2.getObservations();
+        for (MeasurementRow observation : observations){
+            List<MeasurementData> fields = observation.getDataList();
+            for (MeasurementData field : fields){
+                try {
+                    field.setValue(Integer.valueOf(Integer.valueOf(field.getValue() + 1)).toString()) ;
+                    Debug.println(4, "Updated: " + field.toString());
+                } catch (NumberFormatException e){
+                    // Ignore. Just update numeric values
+                }
+            }
+        }
+        
+        fieldbookService.saveMeasurementRows(workbook2);
+        workbook2.print(0);
+        assertFalse(workbook.equals(workbook2));
+
+    }
+    
+
+    @Test
     public void testGetStandardVariableIdByPropertyScaleMethodRole() throws MiddlewareQueryException {
         String property = "Germplasm entry";
         String scale = "Number";
         String method = "Enumerated";
         Integer termId = fieldbookService.getStandardVariableIdByPropertyScaleMethodRole(property, scale, method, PhenotypicType.GERMPLASM);
         System.out.println(termId);
-        Assert.assertEquals((Integer) 8230, termId);
+        assertEquals((Integer) 8230, termId);
     }
 
     @After

@@ -17,6 +17,7 @@ import org.generationcp.middleware.util.Debug;
 
 public class StudyDetails {
     
+
     private Integer id;
 	
 	private String studyName;
@@ -215,6 +216,100 @@ public class StudyDetails {
 	}
 
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((endDate == null) ? 0 : endDate.hashCode());
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        result = prime * result + ((measurementDatasetName == null) ? 0 : measurementDatasetName.hashCode());
+        result = prime * result + ((objective == null) ? 0 : objective.hashCode());
+        result = prime * result + (int) (parentFolderId ^ (parentFolderId >>> 32));
+        result = prime * result + ((piName == null) ? 0 : piName.hashCode());
+        result = prime * result + ((pmKey == null) ? 0 : pmKey.hashCode());
+        result = prime * result + ((season == null) ? 0 : season.hashCode());
+        result = prime * result + ((siteName == null) ? 0 : siteName.hashCode());
+        result = prime * result + ((startDate == null) ? 0 : startDate.hashCode());
+        result = prime * result + ((studyName == null) ? 0 : studyName.hashCode());
+        result = prime * result + ((studyType == null) ? 0 : studyType.hashCode());
+        result = prime * result + ((title == null) ? 0 : title.hashCode());
+        result = prime * result + ((trialDatasetName == null) ? 0 : trialDatasetName.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        StudyDetails other = (StudyDetails) obj;
+        if (endDate == null) {
+            if (other.endDate != null)
+                return false;
+        } else if (!endDate.equals(other.endDate))
+            return false;
+        if (id == null) {
+            if (other.id != null)
+                return false;
+        } else if (!id.equals(other.id))
+            return false;
+        if (measurementDatasetName == null) {
+            if (other.measurementDatasetName != null)
+                return false;
+        } else if (!measurementDatasetName.equals(other.measurementDatasetName))
+            return false;
+        if (objective == null) {
+            if (other.objective != null)
+                return false;
+        } else if (!objective.equals(other.objective))
+            return false;
+        if (parentFolderId != other.parentFolderId)
+            return false;
+        if (piName == null) {
+            if (other.piName != null)
+                return false;
+        } else if (!piName.equals(other.piName))
+            return false;
+        if (pmKey == null) {
+            if (other.pmKey != null)
+                return false;
+        } else if (!pmKey.equals(other.pmKey))
+            return false;
+        if (season != other.season)
+            return false;
+        if (siteName == null) {
+            if (other.siteName != null)
+                return false;
+        } else if (!siteName.equals(other.siteName))
+            return false;
+        if (startDate == null) {
+            if (other.startDate != null)
+                return false;
+        } else if (!startDate.equals(other.startDate))
+            return false;
+        if (studyName == null) {
+            if (other.studyName != null)
+                return false;
+        } else if (!studyName.equals(other.studyName))
+            return false;
+        if (studyType != other.studyType)
+            return false;
+        if (title == null) {
+            if (other.title != null)
+                return false;
+        } else if (!title.equals(other.title))
+            return false;
+        if (trialDatasetName == null) {
+            if (other.trialDatasetName != null)
+                return false;
+        } else if (!trialDatasetName.equals(other.trialDatasetName))
+            return false;
+        return true;
+    }
+    
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();

@@ -33,7 +33,6 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.FieldbookService;
-import org.generationcp.middleware.util.Debug;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -154,17 +153,23 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
             List<MeasurementVariable> variates = workbook.getVariates();
             List<MeasurementRow> observations = workbook.getObservations();
             
-            for (MeasurementVariable variate : variates){
-                for (MeasurementRow row : observations){
-                    for (MeasurementData field : row.getDataList()){
-                        if (variate.getName().equals(field.getLabel())){
-                            Phenotype phenotype = getPhenotypeDao().getById(field.getPhenotypeId());
-                            if (phenotype == null){
-                                phenotype = new Phenotype();
-                                phenotype.setPhenotypeId(getPhenotypeDao().getNegativeId("phenotypeId"));
+            if (variates != null){
+                for (MeasurementVariable variate : variates){
+                    for (MeasurementRow row : observations){
+                        for (MeasurementData field : row.getDataList()){
+                            if (variate.getName().equals(field.getLabel())){
+                                LOG.debug(workbook.toString());
+                                LOG.debug(row.toString());
+                                LOG.debug(variate.toString());
+                                LOG.debug(field.toString());
+                                Phenotype phenotype = getPhenotypeDao().getById(field.getPhenotypeId());
+                                if (phenotype == null){
+                                    phenotype = new Phenotype();
+                                    phenotype.setPhenotypeId(getPhenotypeDao().getNegativeId("phenotypeId"));
+                                }
+                                getPhenotypeSaver().save((int) row.getExperimentId(), variate.getTermId(), 
+                                            variate.getStoredIn(), field.getValue(), phenotype);
                             }
-                            getPhenotypeSaver().save((int) row.getExperimentId(), variate.getTermId(), 
-                                        variate.getStoredIn(), field.getValue(), phenotype);
                         }
                     }
                 }
