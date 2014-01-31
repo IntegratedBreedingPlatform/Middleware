@@ -67,15 +67,21 @@ public class MeasurementData {
 	} 
 
 	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("MeasurementData [label=");
-		builder.append(label);
-		builder.append(", value=");
-		builder.append(value);
-		builder.append("]");
-		return builder.toString();
-	}
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("MeasurementData [label=");
+        builder.append(label);
+        builder.append(", value=");
+        builder.append(value);
+        builder.append(", isEditable=");
+        builder.append(isEditable);
+        builder.append(", dataType=");
+        builder.append(dataType);
+        builder.append(", phenotypeId=");
+        builder.append(phenotypeId);
+        builder.append("]");
+        return builder.toString();
+    }
 
 	public void print(int indent) {
 		Debug.println(indent, "MeasurementData: ");

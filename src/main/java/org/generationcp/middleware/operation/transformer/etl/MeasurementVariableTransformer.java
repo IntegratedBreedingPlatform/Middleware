@@ -30,7 +30,7 @@ public class MeasurementVariableTransformer extends Transformer {
 	                    stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod().getName(),
 	                    stdVariable.getProperty().getName(), stdVariable.getDataType().getName(), "", 
 	                    label);
-	            measurementVariable.setStoredIn(stdVariable.getStoredIn().getName());
+	            measurementVariable.setStoredIn(stdVariable.getStoredIn().getId());
 	            measurementVariable.setFactor(isFactor);
 	            measurementVariables.add(measurementVariable);
 	        }

@@ -31,7 +31,9 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.FieldbookService;
+import org.generationcp.middleware.util.Debug;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -156,9 +158,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                 for (MeasurementRow row : observations){
                     for (MeasurementData field : row.getDataList()){
                         if (variate.getName().equals(field.getLabel())){
+                            Phenotype phenotype = getPhenotypeDao().getById(field.getPhenotypeId());
+                            if (phenotype == null){
+                                phenotype = new Phenotype();
+                                phenotype.setPhenotypeId(getPhenotypeDao().getNegativeId("phenotypeId"));
+                            }
                             getPhenotypeSaver().save((int) row.getExperimentId(), variate.getTermId(), 
-                                        Integer.valueOf(variate.getStoredIn()), field.getValue(), 
-                                        getPhenotypeDao().getById(field.getPhenotypeId()));
+                                        variate.getStoredIn(), field.getValue(), phenotype);
                         }
                     }
                 }

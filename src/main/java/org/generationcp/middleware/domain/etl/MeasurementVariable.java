@@ -33,7 +33,7 @@ public class MeasurementVariable {
 	
 	private String label;
 	
-	private String storedIn;
+	private int storedIn;
 	
 	private boolean isFactor;
 
@@ -134,27 +134,33 @@ public class MeasurementVariable {
 	}
 
 	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("MeasurementVariable [name=");
-		builder.append(name);
-		builder.append(", description=");
-		builder.append(description);
-		builder.append(", scale=");
-		builder.append(scale);
-		builder.append(", method=");
-		builder.append(method);
-		builder.append(", property=");
-		builder.append(property);
-		builder.append(", dataType=");
-		builder.append(dataType);
-		builder.append(", value=");
-		builder.append(value);
-		builder.append(", label=");
-		builder.append(label);
-		builder.append("]");
-		return builder.toString();
-	}
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("MeasurementVariable [termId=");
+        builder.append(termId);
+        builder.append(", name=");
+        builder.append(name);
+        builder.append(", description=");
+        builder.append(description);
+        builder.append(", scale=");
+        builder.append(scale);
+        builder.append(", method=");
+        builder.append(method);
+        builder.append(", property=");
+        builder.append(property);
+        builder.append(", dataType=");
+        builder.append(dataType);
+        builder.append(", value=");
+        builder.append(value);
+        builder.append(", label=");
+        builder.append(label);
+        builder.append(", storedIn=");
+        builder.append(storedIn);
+        builder.append(", isFactor=");
+        builder.append(isFactor);
+        builder.append("]");
+        return builder.toString();
+    }
 	
 	public void print(int indent) {
 		Debug.println(indent, "MeasurementVariable: ");
@@ -176,11 +182,11 @@ public class MeasurementVariable {
 		this.isFactor = isFactor;
 	}
 
-	public String getStoredIn() {
+	public int getStoredIn() {
 	    return storedIn;
 	}
 	
-	public void setStoredIn(String storedIn){
+	public void setStoredIn(int storedIn){
 	    this.storedIn = storedIn;
 	}
 }
