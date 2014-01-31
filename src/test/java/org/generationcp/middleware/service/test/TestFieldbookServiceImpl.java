@@ -140,8 +140,7 @@ public class TestFieldbookServiceImpl {
         workbook.print(0);
         int id = dataImportService.saveDataset(workbook);
         workbook = fieldbookService.getNurseryDataSet(id);
-        
-        System.out.println(workbook);
+        workbook.print(0);
     }
     
     @Test
