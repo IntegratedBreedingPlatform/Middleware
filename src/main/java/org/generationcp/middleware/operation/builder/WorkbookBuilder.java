@@ -74,7 +74,7 @@ public class WorkbookBuilder extends Builder {
 		
 		long expCount = getStudyDataManager().countExperiments(dataSetId);
 		
-		List<Experiment> experiments = getStudyDataManager().getExperiments(dataSetId, 1, (int)expCount);
+		List<Experiment> experiments = getStudyDataManager().getExperiments(dataSetId, 0, (int)expCount);
 		
 		List<MeasurementVariable> factors = buildFactors(experiments);		
 		List<MeasurementVariable> variates = buildVariates(experiments);
@@ -147,7 +147,7 @@ public class WorkbookBuilder extends Builder {
 	private List<MeasurementVariable> buildVariates(List<Experiment> experiments) {
 	    List<MeasurementVariable> variates = new ArrayList<MeasurementVariable>();
             for (Experiment experiment : experiments) {                
-                variates = getMeasurementVariableTransformer().transform(experiment.getVariates().getVariableTypes(), true);
+                variates = getMeasurementVariableTransformer().transform(experiment.getVariates().getVariableTypes(), false);
                 break;
             }
             return variates;

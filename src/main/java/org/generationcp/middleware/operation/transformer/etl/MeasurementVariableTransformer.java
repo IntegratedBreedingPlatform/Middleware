@@ -26,7 +26,7 @@ public class MeasurementVariableTransformer extends Transformer {
 	            StandardVariable stdVariable = variableType.getStandardVariable();
 	            String label = getLabelOfStoredIn(stdVariable.getStoredIn().getId());
 	            
-	            MeasurementVariable measurementVariable = new MeasurementVariable(stdVariable.getId(), stdVariable.getName(), 
+	            MeasurementVariable measurementVariable = new MeasurementVariable(stdVariable.getId(), variableType.getLocalName(), 
 	                    stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod().getName(),
 	                    stdVariable.getProperty().getName(), stdVariable.getDataType().getName(), "", 
 	                    label);
