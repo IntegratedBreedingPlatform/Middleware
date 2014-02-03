@@ -19,7 +19,9 @@ To build the Middleware API, run the following command in the IBPMiddleware dire
 To build using a specific configuration, run the following:  
 <pre>
     mvn clean install -DenvConfig=dev-config-dir  
-</pre>  
+</pre>   
+
+The directory with specific configuration properties <dev-config-dir> must be placed in /pipeline/config/<dev-config-dir>. Copy the files from an existing config directory (e.g. /pipeline/config/ci) and modify to match your local environment.
 
 To build using Eclipse, right-click on the IBPMiddleware project, select Run As --> Maven build..., then input any of the following:
 <pre>
