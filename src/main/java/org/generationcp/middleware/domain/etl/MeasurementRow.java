@@ -55,7 +55,7 @@ public class MeasurementRow {
 		this.locationId = locationId;
 	}
 	
-	public long getExperimentId() {
+	public int getExperimentId() {
             return experimentId;
         }
     
