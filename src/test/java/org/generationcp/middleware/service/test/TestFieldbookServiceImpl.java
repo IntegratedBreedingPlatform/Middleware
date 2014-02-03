@@ -13,8 +13,6 @@ package org.generationcp.middleware.service.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -147,29 +145,33 @@ public class TestFieldbookServiceImpl {
     
     @Test
     public void testSaveMeasurementRows() throws MiddlewareQueryException {
-        //TODO
-        Workbook workbook = TestNurseryWorkbookUtil.getTestWorkbook();
+
+        // Assumption: there is at least 1 local nursery stored in the database
+        int id = fieldbookService.getAllLocalNurseryDetails().get(0).getId();
+        Workbook workbook = fieldbookService.getNurseryDataSet(id);
         workbook.print(0);
-        int id = dataImportService.saveDataset(workbook);
-        Workbook workbook2 = fieldbookService.getNurseryDataSet(id);
         
-        List<MeasurementRow> observations = workbook2.getObservations();
+        List<MeasurementRow> observations = workbook.getObservations();
         for (MeasurementRow observation : observations){
             List<MeasurementData> fields = observation.getDataList();
             for (MeasurementData field : fields){
                 try {
-                    field.setValue(Integer.valueOf(Integer.valueOf(field.getValue() + 1)).toString()) ;
-                    Debug.println(4, "Updated: " + field.toString());
+                    //Debug.println(4, "Origina: " + field.toString());
+                    if (field.getValue() != null){
+                        field.setValue(Double.valueOf(Double.valueOf(field.getValue()) + 1).toString());
+                        field.setValue(Integer.valueOf(Integer.valueOf(field.getValue()) + 1).toString());
+                        //Debug.println(4, "Updated: " + field.toString());
+                    }
                 } catch (NumberFormatException e){
-                    // Ignore. Just update numeric values
+                    // Ignore. Update only numeric values
                 }
             }
         }
         
-        fieldbookService.saveMeasurementRows(workbook2);
+        fieldbookService.saveMeasurementRows(workbook);
+        Workbook workbook2 = fieldbookService.getNurseryDataSet(id);
         workbook2.print(0);
         assertFalse(workbook.equals(workbook2));
-
     }
     
 

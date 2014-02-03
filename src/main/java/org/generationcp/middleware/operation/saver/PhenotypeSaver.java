@@ -87,8 +87,8 @@ public class PhenotypeSaver extends Saver{
     private void saveOrUpdate(int experimentId, Phenotype phenotype) throws MiddlewareQueryException {
         setWorkingDatabase(Database.LOCAL);
         if (phenotype != null) {
-            getPhenotypeDao().saveOrUpdate(phenotype);
-            saveExperimentPhenotype(experimentId, phenotype.getPhenotypeId());
+            getPhenotypeDao().merge(phenotype);
+            saveOrUpdateExperimentPhenotype(experimentId, phenotype.getPhenotypeId());
         }
     }
 
@@ -119,18 +119,26 @@ public class PhenotypeSaver extends Saver{
     }
 
     private void saveExperimentPhenotype(int experimentId, int phenotypeId) throws MiddlewareQueryException {
+        getExperimentPhenotypeDao().save(createExperimentPhenotype(experimentId, phenotypeId));
+    }
+    
+    private ExperimentPhenotype createExperimentPhenotype(int experimentId, int phenotypeId) throws MiddlewareQueryException {
         ExperimentPhenotype experimentPhenotype = getExperimentPhenotypeDao()
-                            .getbyExperimentAndPhenotype(experimentId, phenotypeId);
-        
-        if (experimentPhenotype == null || experimentPhenotype.getExperimentPhenotypeId() == null){
+                .getbyExperimentAndPhenotype(experimentId, phenotypeId);
+
+        if (experimentPhenotype == null || experimentPhenotype.getExperimentPhenotypeId() == null) {
             experimentPhenotype = new ExperimentPhenotype();
-            experimentPhenotype
-                .setExperimentPhenotypeId(getExperimentPhenotypeDao().getNegativeId("experimentPhenotypeId"));
+            experimentPhenotype.setExperimentPhenotypeId(getExperimentPhenotypeDao().getNegativeId(
+                    "experimentPhenotypeId"));
             experimentPhenotype.setExperiment(experimentId);
             experimentPhenotype.setPhenotype(phenotypeId);
         }
+        return experimentPhenotype;
 
-        getExperimentPhenotypeDao().saveOrUpdate(experimentPhenotype);
+    }
+
+    private void saveOrUpdateExperimentPhenotype(int experimentId, int phenotypeId) throws MiddlewareQueryException {
+        getExperimentPhenotypeDao().merge(createExperimentPhenotype(experimentId, phenotypeId));
     }
 
 }

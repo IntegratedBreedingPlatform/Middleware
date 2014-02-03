@@ -126,7 +126,8 @@ public class MeasurementRow {
 	public void print(int indent) {
 		Debug.println(indent, "MeasurementRow: ");
 		Debug.println(indent + 3, "Stock Id: " + stockId);
-	    Debug.println(indent + 3, "Location Id: " + locationId);
+        Debug.println(indent + 3, "Location Id: " + locationId);
+        Debug.println(indent + 3, "Experiment Id: " + experimentId);
 		Debug.println(indent + 3, "DataList: ");
 		for (MeasurementData data : dataList){
 			data.print(indent + 6);

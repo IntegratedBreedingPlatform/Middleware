@@ -158,10 +158,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                     for (MeasurementRow row : observations){
                         for (MeasurementData field : row.getDataList()){
                             if (variate.getName().equals(field.getLabel())){
-                                LOG.debug(workbook.toString());
-                                LOG.debug(row.toString());
-                                LOG.debug(variate.toString());
-                                LOG.debug(field.toString());
                                 Phenotype phenotype = getPhenotypeDao().getById(field.getPhenotypeId());
                                 if (phenotype == null){
                                     phenotype = new Phenotype();
