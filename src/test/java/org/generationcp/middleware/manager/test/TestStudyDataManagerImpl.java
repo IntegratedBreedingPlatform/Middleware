@@ -1173,4 +1173,23 @@ public class TestStudyDataManagerImpl{
         
     }
     
+    @Test
+    public void testGetFolderTree() throws MiddlewareQueryException {
+        List<FolderReference> tree = manager.getFolderTree();
+        System.out.println("GetFolderTree Test");
+        printFolderTree(tree, 1);
+    }
+    
+    private void printFolderTree(List<FolderReference> tree, int tab) {
+        if (tree != null && tree.size() > 0) {
+            for (FolderReference folder : tree) {
+                for (int i = 0; i < tab; i++) {
+                    System.out.print("\t");
+                }
+                System.out.println(folder.getId() + " - " + folder.getName());
+                printFolderTree(folder.getSubFolders(), tab+1);
+            }
+        }
+    }
+    
 }
