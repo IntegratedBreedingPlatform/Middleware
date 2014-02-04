@@ -62,7 +62,7 @@ public class WorkbookBuilder extends Builder {
 		List<DatasetReference> datasetRefList = getStudyDataManager().getDatasetReferences(id);
 		if (datasetRefList != null) {
 		    for (DatasetReference datasetRef : datasetRefList) {
-		        if (datasetRef.getName().equals("MEASUREMENT_EFEC_" + studyDetails.getStudyName())) {
+		        if (datasetRef.getName().equals("MEASUREMENT EFEC_" + studyDetails.getStudyName())) {
 		            dataSetId = datasetRef.getId();
 		        }
 		    }
