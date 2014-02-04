@@ -27,6 +27,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
@@ -103,7 +104,7 @@ public class WorkbookBuilder extends Builder {
 	            if (!PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(getLabelOfStoredIn(variable.getVariableType().getStandardVariable().getStoredIn().getId()))) {
                         MeasurementData measurementData = new MeasurementData(variable.getVariableType().getLocalName(), 
                                 variable.getValue(), false, 
-                                variable.getVariableType().getStandardVariable().getDataType().getName());
+                                getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()));
                         measurementDataList.add(measurementData);
                     }
 	        }
@@ -111,7 +112,7 @@ public class WorkbookBuilder extends Builder {
 	        for (Variable variable : variates.getVariables()) {
                     MeasurementData measurementData = new MeasurementData(variable.getVariableType().getLocalName(), 
                             variable.getValue(), true,  
-                            variable.getVariableType().getStandardVariable().getDataType().getName());
+                            getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()));
                     measurementData.setPhenotypeId(variable.getPhenotypeId());
                     measurementDataList.add(measurementData);
                 }
@@ -123,6 +124,16 @@ public class WorkbookBuilder extends Builder {
 	    }
 	    
 	    return observations;
+	}
+	
+	private String getDataType(int dataTypeId) {
+	    //datatype ids: 1120, 1125, 1128, 1130
+	    if (dataTypeId == TermId.CHARACTER_VARIABLE.getId() || dataTypeId == TermId.TIMESTAMP_VARIABLE.getId() || 
+	            dataTypeId == TermId.CHARACTER_DBID_VARIABLE.getId() || dataTypeId == TermId.CATEGORICAL_VARIABLE.getId()) {
+	        return "C";
+	    } else {
+	        return "N";
+	    }
 	}
 	
 	private String getLabelOfStoredIn(int storedIn) {
