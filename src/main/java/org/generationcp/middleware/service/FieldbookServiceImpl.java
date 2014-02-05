@@ -31,6 +31,7 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.hibernate.Session;
@@ -177,4 +178,11 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
             logAndThrowException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e, LOG);
         }
     }
+
+	@Override
+	public List<Method> getAllBreedingMethods() throws MiddlewareQueryException {
+		return getGermplasmDataManager().getAllMethods();
+	}
+	
+	
 }

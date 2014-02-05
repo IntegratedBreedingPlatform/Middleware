@@ -170,6 +170,8 @@ public enum TermId {
 	//Planting Order
 	, ROW_COLUMN (32778)
 	, SERPENTINE (32779)
+	
+	,BREEDING_METHOD_ID (8257)
 	;
 	
 	private final int id;
