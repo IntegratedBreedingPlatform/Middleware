@@ -167,7 +167,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                                     phenotype = new Phenotype();
                                     phenotype.setPhenotypeId(getPhenotypeDao().getNegativeId("phenotypeId"));
                                 }
-                                getPhenotypeSaver().save((int) row.getExperimentId(), variate.getTermId(), 
+                                getPhenotypeSaver().saveOrUpdate((int) row.getExperimentId(), variate.getTermId(), 
                                             variate.getStoredIn(), field.getValue(), phenotype);
                             }
                         }

@@ -172,6 +172,14 @@ public enum TermId {
 	, SERPENTINE (32779)
 	
 	,BREEDING_METHOD_ID (8257)
+	
+	//Breeding Methods
+	, SINGLE_PLANT_SELECTION_SF (205)
+	, SELECTED_BULK_SF (206)
+	, RANDOM_BULK_SF (207)
+	
+	//Advance Nursery
+	, PLANTS_SELECTED (8263)
 	;
 	
 	private final int id;
