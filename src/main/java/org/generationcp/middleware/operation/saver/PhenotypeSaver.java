@@ -47,7 +47,7 @@ public class PhenotypeSaver extends Saver{
         }
     }
     
-    public void save(int experimentId, Integer variableId, int storedIn, String value, Phenotype phenotype)
+    public void saveOrUpdate(int experimentId, Integer variableId, int storedIn, String value, Phenotype phenotype)
             throws MiddlewareQueryException {
         phenotype = createPhenotype(variableId, storedIn, value, phenotype);
         saveOrUpdate(experimentId, phenotype);
@@ -122,6 +122,10 @@ public class PhenotypeSaver extends Saver{
         getExperimentPhenotypeDao().save(createExperimentPhenotype(experimentId, phenotypeId));
     }
     
+    private void saveOrUpdateExperimentPhenotype(int experimentId, int phenotypeId) throws MiddlewareQueryException {
+        getExperimentPhenotypeDao().merge(createExperimentPhenotype(experimentId, phenotypeId));
+    }
+
     private ExperimentPhenotype createExperimentPhenotype(int experimentId, int phenotypeId) throws MiddlewareQueryException {
         ExperimentPhenotype experimentPhenotype = getExperimentPhenotypeDao()
                 .getbyExperimentAndPhenotype(experimentId, phenotypeId);
@@ -135,10 +139,6 @@ public class PhenotypeSaver extends Saver{
         }
         return experimentPhenotype;
 
-    }
-
-    private void saveOrUpdateExperimentPhenotype(int experimentId, int phenotypeId) throws MiddlewareQueryException {
-        getExperimentPhenotypeDao().merge(createExperimentPhenotype(experimentId, phenotypeId));
     }
 
 }

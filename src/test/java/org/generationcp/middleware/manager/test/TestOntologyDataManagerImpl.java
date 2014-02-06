@@ -222,7 +222,6 @@ public class TestOntologyDataManagerImpl {
 		Debug.println(0, "Standard variable saved: " + stdVariable.getId());
 	}
 	
-	@SuppressWarnings("deprecation")
     @Test
 	public void testAddMethod() throws Exception {
 		String name = "Test Method " + new Random().nextInt(10000);
@@ -263,7 +262,7 @@ public class TestOntologyDataManagerImpl {
             stdVar.print(0);
         }
     } 
-
+    
     @Test
     public void testFindStandardVariablesByNameOrSynonymWithProperties() throws Exception {
         Debug.println(0, "Test getTraitDetailsByTAbbr");
@@ -276,7 +275,6 @@ public class TestOntologyDataManagerImpl {
         }
     }
 
-    @SuppressWarnings("deprecation")
 	@Test
 	public void testFindMethodById() throws Exception {
 		
@@ -927,8 +925,8 @@ public class TestOntologyDataManagerImpl {
     public void testDeleteOntology() throws Exception {
         String name = "Test Property" + new Random().nextInt(10000);
         String definition = "Property Definition";
-        int isA = 1087;
         /*
+        int isA = 1087;
         Term term = manager.addProperty(name, definition, isA);
         manager.deleteTermAndRelationship(term.getId(), CvId.PROPERTIES, TermId.IS_A.getId(), isA);
         
