@@ -12,6 +12,8 @@
 package org.generationcp.middleware.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -31,12 +33,14 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 public class FieldbookServiceImpl extends Service implements FieldbookService {
     
@@ -163,7 +167,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                                     phenotype = new Phenotype();
                                     phenotype.setPhenotypeId(getPhenotypeDao().getNegativeId("phenotypeId"));
                                 }
-                                getPhenotypeSaver().save((int) row.getExperimentId(), variate.getTermId(), 
+                                getPhenotypeSaver().saveOrUpdate((int) row.getExperimentId(), variate.getTermId(), 
                                             variate.getStoredIn(), field.getValue(), phenotype);
                             }
                         }
@@ -177,4 +181,50 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
             logAndThrowException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e, LOG);
         }
     }
+
+	@Override
+	public List<Method> getAllBreedingMethods() throws MiddlewareQueryException {
+		List<Method> methodList = getGermplasmDataManager().getAllMethods();
+		Collections.sort(methodList, new Comparator<Method>(){
+
+			@Override
+			public int compare(Method o1, Method o2) {
+				 String methodName1 = o1.getMname().toUpperCase();
+			      String methodName2 = o2.getMname().toUpperCase();
+		 
+			      //ascending order
+			      return methodName1.compareTo(methodName2);
+			}
+			
+		});
+		return methodList;
+	}
+
+	@Override
+	public List<Method> getFavoriteBreedingMethods(List<Integer> methodIds)
+			throws MiddlewareQueryException {
+		 List<Method> methodList = new ArrayList<Method>();
+	        
+	        for(int i = 0 ; i < methodIds.size() ; i++){
+	            Integer methodId = methodIds.get(i);
+	            Method method = getGermplasmDataManager().getMethodByID(methodId);
+	            methodList.add(method);
+	        }
+	        
+	        Collections.sort(methodList, new Comparator<Method>(){
+
+				@Override
+				public int compare(Method o1, Method o2) {
+					 String methodName1 = o1.getMname().toUpperCase();
+				      String methodName2 = o2.getMname().toUpperCase();
+			 
+				      //ascending order
+				      return methodName1.compareTo(methodName2);
+				}
+				
+			});
+			return methodList;
+	}
+	
+	
 }

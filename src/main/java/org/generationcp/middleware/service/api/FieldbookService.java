@@ -22,6 +22,7 @@ import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.Method;
 
 /**
  * This is the API for Fieldbook requirements.
@@ -166,4 +167,6 @@ public interface FieldbookService {
      */
     void saveMeasurementRows(Workbook workbook) throws MiddlewareQueryException;
 
+    List<Method> getAllBreedingMethods() throws MiddlewareQueryException;
+    List<Method> getFavoriteBreedingMethods(List<Integer> methodIds)  throws MiddlewareQueryException;
 }

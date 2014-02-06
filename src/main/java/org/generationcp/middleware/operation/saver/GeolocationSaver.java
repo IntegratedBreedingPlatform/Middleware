@@ -32,11 +32,14 @@ public class GeolocationSaver extends Saver {
 		super(sessionProviderForLocal, sessionProviderForCentral);
 	}
 	
-	public Geolocation saveGeolocation(VariableList variableList, MeasurementRow row) throws MiddlewareQueryException {
+	public Geolocation saveGeolocation(VariableList variableList, MeasurementRow row, boolean isNursery) throws MiddlewareQueryException {
 		setWorkingDatabase(Database.LOCAL);
 		
 		Geolocation geolocation = create(variableList, row);
 		if (geolocation != null) {
+			if(isNursery && geolocation.getDescription()==null) {
+				geolocation.setDescription("1");//GCP-7340, GCP-7346 - OCC should have a default value of 1
+			}
 			getGeolocationDao().save(geolocation);
 			return geolocation;
 		}
