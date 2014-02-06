@@ -128,8 +128,11 @@ public class WorkbookParser {
                     errorMessages.add(new Message("error.missing.sheet.description"));
                     /*throw new Error("Error with reading file uploaded. File doesn't have the first sheet - Description");*/
                 }
-            } catch (Exception e) {
-                throw new WorkbookParserException("Error encountered with parseFile(): " + e.getMessage(), e);
+            } catch (IllegalArgumentException e) {
+            	errorMessages.add(new Message("error.missing.sheet.description"));
+                /*throw new Error("Error with reading file uploaded. File doesn't have the first sheet - Description");*/
+            } catch (Exception e){
+            	throw new WorkbookParserException("Error encountered with parseFile(): " + e.getMessage(), e);
             }
 
             try {
@@ -139,6 +142,9 @@ public class WorkbookParser {
                     errorMessages.add(new Message("error.missing.sheet.observation"));
                     /*throw new Error("Error with reading file uploaded. File doesn't have the second sheet - Observation");*/
                 }
+            } catch (IllegalArgumentException e) {
+            	errorMessages.add(new Message("error.missing.sheet.observation"));
+                /*throw new Error("Error with reading file uploaded. File doesn't have the second sheet - Observation");*/
             } catch (Exception e) {
                 throw new WorkbookParserException("Error encountered with parseFile(): " + e.getMessage(), e);
             }
@@ -167,7 +173,7 @@ public class WorkbookParser {
             throw new WorkbookParserException("File not found " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WorkbookParserException("Error accessing file " + e.getMessage(), e);
-        }
+        } 
 
         return currentWorkbook;
     }
