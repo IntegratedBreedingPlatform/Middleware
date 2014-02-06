@@ -219,7 +219,7 @@ public class WorkbookSaver extends Saver {
 
         if (geolocation != null && geolocation.size() > 0) {
             watch.restart("save geolocation");
-            Geolocation g = getGeolocationSaver().saveGeolocation(geolocation, null);
+            Geolocation g = getGeolocationSaver().saveGeolocation(geolocation, null, workbook.isNursery());
             studyLocationId = g.getLocationId();
             if(g.getVariates()!=null && g.getVariates().size() > 0) {
             	VariableList trialVariates = new VariableList();
@@ -254,7 +254,7 @@ public class WorkbookSaver extends Saver {
                 }
                 if(trialInstanceNumbers.add(trialInstanceNumber)) {//if new location (unique by trial instance number)
 		            watch.restart("save geolocation");
-		            Geolocation g = getGeolocationSaver().saveGeolocation(geolocation, row); 
+		            Geolocation g = getGeolocationSaver().saveGeolocation(geolocation, row, workbook.isNursery()); 
 		            locationId = g.getLocationId();
 		            locationIds.add(locationId);
 		            if(g.getVariates()!=null && g.getVariates().size() > 0) {

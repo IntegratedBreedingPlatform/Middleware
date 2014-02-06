@@ -283,7 +283,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
         try {
             trans = session.beginTransaction();
-            Geolocation geolocation = getGeolocationSaver().saveGeolocation(variableList, null);
+            Geolocation geolocation = getGeolocationSaver().saveGeolocation(variableList, null, false);
             int id = geolocation.getLocationId();
             trans.commit();
             return id;

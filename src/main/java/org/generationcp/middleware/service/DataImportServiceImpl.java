@@ -186,8 +186,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         if (locationId != null) {//same location and study
             messages.add(new Message("error.duplicate.study.name"));
         } else {
-            boolean isExisting = checkIfProjectNameIsExisting(studyName);
-            //existing and is not a valid study
+        	boolean isExisting = checkIfProjectNameIsExisting(studyName);
+        	//existing and is not a valid study
             if (isExisting && getStudyId(studyName) == null) {
                 messages.add(new Message("error.duplicate.study.name"));
             }//else we will create a new study or append the data sets to the existing study
@@ -344,6 +344,9 @@ public class DataImportServiceImpl extends Service implements DataImportService 
                     }
                 }
             }
+        }
+        if(workbook.isNursery()) {
+        	return "1";//GCP-7340, GCP-7346
         }
         return null;
     }
