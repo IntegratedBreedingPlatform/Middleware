@@ -12,6 +12,8 @@
 package org.generationcp.middleware.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -38,6 +40,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 public class FieldbookServiceImpl extends Service implements FieldbookService {
     
@@ -181,7 +184,46 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public List<Method> getAllBreedingMethods() throws MiddlewareQueryException {
-		return getGermplasmDataManager().getAllMethods();
+		List<Method> methodList = getGermplasmDataManager().getAllMethods();
+		Collections.sort(methodList, new Comparator<Method>(){
+
+			@Override
+			public int compare(Method o1, Method o2) {
+				 String methodName1 = o1.getMname().toUpperCase();
+			      String methodName2 = o2.getMname().toUpperCase();
+		 
+			      //ascending order
+			      return methodName1.compareTo(methodName2);
+			}
+			
+		});
+		return methodList;
+	}
+
+	@Override
+	public List<Method> getFavoriteBreedingMethods(List<Integer> methodIds)
+			throws MiddlewareQueryException {
+		 List<Method> methodList = new ArrayList<Method>();
+	        
+	        for(int i = 0 ; i < methodIds.size() ; i++){
+	            Integer methodId = methodIds.get(i);
+	            Method method = getGermplasmDataManager().getMethodByID(methodId);
+	            methodList.add(method);
+	        }
+	        
+	        Collections.sort(methodList, new Comparator<Method>(){
+
+				@Override
+				public int compare(Method o1, Method o2) {
+					 String methodName1 = o1.getMname().toUpperCase();
+				      String methodName2 = o2.getMname().toUpperCase();
+			 
+				      //ascending order
+				      return methodName1.compareTo(methodName2);
+				}
+				
+			});
+			return methodList;
 	}
 	
 	

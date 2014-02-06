@@ -168,4 +168,5 @@ public interface FieldbookService {
     void saveMeasurementRows(Workbook workbook) throws MiddlewareQueryException;
 
     List<Method> getAllBreedingMethods() throws MiddlewareQueryException;
+    List<Method> getFavoriteBreedingMethods(List<Integer> methodIds)  throws MiddlewareQueryException;
 }
