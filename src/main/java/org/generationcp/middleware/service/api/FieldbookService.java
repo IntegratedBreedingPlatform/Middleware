@@ -13,6 +13,7 @@
 package org.generationcp.middleware.service.api;
 
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -21,12 +22,14 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.Name;
 
 /**
  * This is the API for Fieldbook requirements.
- * 
  * 
  */
 public interface FieldbookService {
@@ -123,13 +126,14 @@ public interface FieldbookService {
     Study getStudy(int studyId) throws MiddlewareQueryException;
 
     /**
-     * Returns the variable id given the property, scale, method, and role (P-S-M-R)
-     * 
-     * @param propertyId
-     * @param scaleId
-     * @param methodId
-     * @return
-     * @throws MiddlewareQueryException
+     * Returns the variable id given the property, scale, method, and role (P-S-M-R).
+     *
+     * @param property the property
+     * @param scale the scale
+     * @param method the method
+     * @param role the role
+     * @return the standard variable id by property scale method role
+     * @throws MiddlewareQueryException the middleware query exception
      */
     Integer getStandardVariableIdByPropertyScaleMethodRole(String property, String scale, String method, PhenotypicType role)
     throws MiddlewareQueryException;
@@ -161,12 +165,40 @@ public interface FieldbookService {
     Workbook getNurseryDataSet(int id) throws MiddlewareQueryException;
 
     /**
-     * Saves the measurement rows of a workbook as a local trial or nursery on the new CHADO schema
-     * 
+     * Saves the measurement rows of a workbook as a local trial or nursery on the new CHADO schema.
+     *
      * @param workbook that contains the measurement rows to save
+     * @throws MiddlewareQueryException the middleware query exception
      */
     void saveMeasurementRows(Workbook workbook) throws MiddlewareQueryException;
 
+    /**
+     * Gets the all breeding methods.
+     *
+     * @return All breeding methods
+     * @throws MiddlewareQueryException the middleware query exception
+     */
     List<Method> getAllBreedingMethods() throws MiddlewareQueryException;
+
+    /**
+     * Gets the favorite breeding methods.
+     *
+     * @param methodIds the method ids
+     * @return the favorite breeding methods
+     * @throws MiddlewareQueryException the middleware query exception
+     */
     List<Method> getFavoriteBreedingMethods(List<Integer> methodIds)  throws MiddlewareQueryException;
+        
+    /**
+     * Saves germplasm list advanced nursery types.
+     *
+     * @param germplasms the germplasms to add
+     * @param germplasmList the germplasm list to add
+     * 
+     * @return The id of the newly-created germplasm list
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    Integer saveNurseryAdvanceGermplasmList(Map<Germplasm, Name> germplasms, GermplasmList germplasmList) 
+            throws MiddlewareQueryException;
+    
 }
