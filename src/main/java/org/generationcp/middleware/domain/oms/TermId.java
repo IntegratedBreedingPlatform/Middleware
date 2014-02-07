@@ -177,6 +177,7 @@ public enum TermId {
 	, SINGLE_PLANT_SELECTION_SF (205)
 	, SELECTED_BULK_SF (206)
 	, RANDOM_BULK_SF (207)
+	, RANDOM_BULK_CF (507)
 	
 	//Advance Nursery
 	, PLANTS_SELECTED (8263)

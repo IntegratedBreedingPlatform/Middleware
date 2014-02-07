@@ -49,6 +49,8 @@ public enum GermplasmNameType {
     , ALTERNATE_CROSS_NAME(28)
     , CIAT_GERMPLASM_BANK_ACCESSION_NUMBER(1019)
     , UNRESOLVED_NAME(1027)
+    , CIMMYT_SELECTION_HISTORY(1028)
+    , CIMMYT_WHEAT_PEDIGREE(1029)
     ;
 
     private final int userDefinedField;
