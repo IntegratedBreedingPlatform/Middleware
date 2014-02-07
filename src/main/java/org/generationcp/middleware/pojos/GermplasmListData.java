@@ -212,7 +212,8 @@ public class GermplasmListData implements Serializable{
 	}
 
 	public void setProperties(List<ListDataProperty> properties) {
-		this.properties = properties;
+		this.properties.clear();
+		this.properties.addAll(properties);
 	}
 
 	@Override
