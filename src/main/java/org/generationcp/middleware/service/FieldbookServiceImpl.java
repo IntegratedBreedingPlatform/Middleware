@@ -15,7 +15,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
+import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.dao.GermplasmListDAO;
+import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Study;
@@ -32,8 +36,10 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.hibernate.Session;
@@ -225,6 +231,55 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			});
 			return methodList;
 	}
+
+    @Override
+    public Integer saveNurseryAdvanceGermplasmList(Map<Germplasm, Name> germplasms, GermplasmList germplasmList)
+            throws MiddlewareQueryException {
+        Session session = requireLocalDatabaseInstance();
+        Transaction trans = null;
+
+        Integer listId = null;
+
+        GermplasmDAO germplasmDao = getGermplasmDao();
+        NameDAO nameDao = getNameDao();
+        GermplasmListDAO germplasmListDao = getGermplasmListDAO();
+
+        try {
+            trans = session.beginTransaction();
+
+            // Save germplasms
+            for (Germplasm germplasm : germplasms.keySet()) {
+                Name name = germplasms.get(germplasm);
+
+                Integer gId = germplasmDao.getNegativeId("gid");
+                germplasm.setGid(gId);
+                germplasm.setLgid(Integer.valueOf(0));
+
+                Integer nameId = nameDao.getNegativeId("nid");
+                name.setNid(nameId);
+                name.setNstat(Integer.valueOf(1));
+                name.setGermplasmId(gId);
+
+                germplasmDao.saveOrUpdate(germplasm);
+                nameDao.saveOrUpdate(name);
+            }
+
+            // Save germplasm list
+            listId = germplasmListDao.getNegativeId("id");
+            germplasmList.setId(listId);
+            germplasmListDao.saveOrUpdate(germplasmList);
+
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered with FieldbookService.saveNurseryAdvanceGermplasmList(germplasms="
+                    + germplasms + ", germplasmList=" + germplasmList + "): " + e.getMessage(), e, LOG);
+        } finally {
+            session.flush();
+        }
+        return listId;
+
+    }
 	
 	
 }

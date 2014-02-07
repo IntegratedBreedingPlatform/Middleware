@@ -13,8 +13,12 @@ package org.generationcp.middleware.service.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.etl.MeasurementData;
@@ -24,7 +28,12 @@ import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
+import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.service.ServiceFactory;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
@@ -174,17 +183,88 @@ public class TestFieldbookServiceImpl {
         assertFalse(workbook.equals(workbook2));
     }
     
-
     @Test
     public void testGetStandardVariableIdByPropertyScaleMethodRole() throws MiddlewareQueryException {
         String property = "Germplasm entry";
         String scale = "Number";
         String method = "Enumerated";
         Integer termId = fieldbookService.getStandardVariableIdByPropertyScaleMethodRole(property, scale, method, PhenotypicType.GERMPLASM);
-        System.out.println(termId);
+        Debug.println(0, termId.toString());
         assertEquals((Integer) 8230, termId);
     }
 
+    @Test
+    public void testGetAllBreedingMethods() throws MiddlewareQueryException {
+        List<Method> methods = fieldbookService.getAllBreedingMethods();
+        for (Method method : methods){
+            Debug.println(3, method.toString());
+        }
+        assertFalse(methods.isEmpty());
+        Debug.println(3, "#Methods: " + methods.size());
+    }
+
+    @Test
+    public void testSaveNurseryAdvanceGermplasmList() throws MiddlewareQueryException {
+        Map<Germplasm, Name> germplasms = new HashMap<Germplasm, Name>();
+        createGermplasms(germplasms);
+        
+        List<GermplasmListData> listData = new ArrayList<GermplasmListData>();
+        GermplasmList germplasmList = createGermplasmList(listData);
+
+        Integer listId = fieldbookService.saveNurseryAdvanceGermplasmList(germplasms, germplasmList);
+
+        assertTrue(listId != null && listId < 0);
+        
+        Debug.println(3, "Germplasm List Added: ");
+        Debug.println(6, germplasmList.toString());
+        Debug.println(3, "Germplasms Added: ");
+        for (Germplasm germplasm: germplasms.keySet()){
+            Debug.println(6, germplasm.toString());
+        }
+        
+    }
+
+    private void createGermplasms(Map<Germplasm, Name> germplasms) {
+        int NUMBER_OF_ENTRIES = 3;
+        
+        for (int i=0; i< NUMBER_OF_ENTRIES; i++){
+            Germplasm g = new Germplasm();
+            g.setGdate(Integer.valueOf(20140206));
+            g.setGnpgs(Integer.valueOf(0));
+            g.setGpid1(Integer.valueOf(0));
+            g.setGpid2(Integer.valueOf(0));
+            g.setGrplce(Integer.valueOf(0));
+            g.setLocationId(Integer.valueOf(9000));
+            g.setMethodId(Integer.valueOf(1));
+            g.setMgid(Integer.valueOf(1));
+            g.setUserId(Integer.valueOf(1));
+            g.setReferenceId(Integer.valueOf(1));
+    
+            Name n = new Name();
+            n.setLocationId(Integer.valueOf(9000));
+            n.setNdate(Integer.valueOf(20140206));
+            n.setNval("Germplasm_64_" + i + "_" + (int) Math.random()*100);
+            n.setReferenceId(Integer.valueOf(1));
+            n.setTypeId(Integer.valueOf(1));
+            n.setUserId(Integer.valueOf(1));
+            
+            germplasms.put(g, n);
+        }
+    }
+    
+    private GermplasmList createGermplasmList(List<GermplasmListData> listData){
+        String name = "Test List #1_" + "_" + (int) Math.random()*100;
+        GermplasmList germList = new GermplasmList(null, name, Long.valueOf(20140206), "LST", Integer.valueOf(1),
+                name + " Description", null, 1);
+        
+        GermplasmListData germplasmListData = new GermplasmListData(null, germList, Integer.valueOf(2), 1, "EntryCode", "SeedSource",
+                "Germplasm Name 3", "GroupName", 0, 99992);
+        listData.add(germplasmListData);
+        
+        return germList;
+
+    }
+    
     @After
     public void afterEachTest() {
         long elapsedTime = System.nanoTime() - startTime;
