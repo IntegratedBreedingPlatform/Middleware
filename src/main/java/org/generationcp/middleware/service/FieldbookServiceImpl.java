@@ -344,5 +344,33 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
     }
 	
+	@Override
+    public String getCimmytWheatGermplasmNameByGid(int gid) throws MiddlewareQueryException {
+        List<Name> names = getByGidAndNtype(gid, GermplasmNameType.CIMMYT_SELECTION_HISTORY);
+        if (names == null || names.isEmpty()) {
+            names = getByGidAndNtype(gid, GermplasmNameType.UNRESOLVED_NAME);
+        }
+        return (names != null && !names.isEmpty() ? names.get(0).getNval() : null);
+    }
+    
+    private List<Name> getByGidAndNtype(int gid, GermplasmNameType nType) throws MiddlewareQueryException {
+        setWorkingDatabase(Database.CENTRAL);
+        List<Name> names = getNameDao().getByGIDWithFilters(gid, null, nType);
+        if (names == null || names.isEmpty()) {
+            setWorkingDatabase(Database.LOCAL);
+            names = getNameDao().getByGIDWithFilters(gid, null, nType);
+        }
+        return names;
+    }
+
+    @Override
+    public Method getBreedingMethodById(int mid) throws MiddlewareQueryException {
+        return getGermplasmDataManager().getMethodByID(mid);
+    }
+    
+    @Override
+    public Germplasm getGermplasmByGID(int gid) throws MiddlewareQueryException {
+        return getGermplasmDataManager().getGermplasmByGID(gid);
+    }
 	
 }

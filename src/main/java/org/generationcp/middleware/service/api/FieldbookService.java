@@ -226,4 +226,9 @@ public interface FieldbookService {
                 , GermplasmList germplasmList) 
             throws MiddlewareQueryException;
     
+    String getCimmytWheatGermplasmNameByGid(int gid) throws MiddlewareQueryException;
+
+    Method getBreedingMethodById(int mid) throws MiddlewareQueryException;
+    
+    Germplasm getGermplasmByGID(int gid) throws MiddlewareQueryException;
 }
