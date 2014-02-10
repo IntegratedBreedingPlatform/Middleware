@@ -279,50 +279,63 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
                 GermplasmListData germplasmListData = listDataItems.get(germplasm);
 
-                // Save germplasm and name entries if non-existing
+                Germplasm germplasmFound = null;
+
+                // Check if germplasm exists
                 if (germplasm.getGid() != null){
 
-                    Germplasm germplasmFound = getGermplasmDataManager().getGermplasmByGID(germplasm.getGid());
+                    // Check if the given gid exists
+                    germplasmFound = getGermplasmDataManager().getGermplasmByGID(germplasm.getGid());
                     
+                    // Check if the given germplasm name exists
                     if (germplasmFound == null){
-                        
-                        // Germplasm name is the Names entry with NType = 1027, NVal = table.desig, NStat = 0
+                        List<Name> names = germplasms.get(germplasm);
                         String germplasmName = null;
-                        for (Name name: germplasms.get(germplasm)){
-                            if (name.getTypeId() == GermplasmNameType.UNRESOLVED_NAME.getUserDefinedFieldID() 
-                                    && name.getNstat() == 0){
-                                germplasmName = name.getNval();
+
+                        if (names != null){ 
+                            if (names.size() > 1){ // crop == CIMMYT WHEAT (crop with more than one name saved)
+                                // Germplasm name is the Names entry with NType = 1027, NVal = table.desig, NStat = 0
+                                for (Name name: names){
+                                    if (name.getTypeId() == GermplasmNameType.UNRESOLVED_NAME.getUserDefinedFieldID() 
+                                            && name.getNstat() == 0){
+                                        germplasmName = name.getNval();
+                                        break;
+                                    }
+                                }
+                            }else if (names.size() == 1){ // other crops
+                                germplasmName = names.get(0).getNval();
                             }
+                            
                         }
 
                         List<Germplasm> germplasmsFound = getGermplasmDataManager()
-                                                    .getGermplasmByName(germplasmName, 0, 1, Operation.EQUAL);
+                                .getGermplasmByName(germplasmName, 0, 1, Operation.EQUAL);
                         
-                        if (germplasmsFound.size() == 0){
-                            
-                            // Save germplasm
-                            Integer gId = germplasmDao.getNegativeId("gid");
-                            germplasm.setGid(gId);
-                            germplasm.setLgid(Integer.valueOf(0));
-                            germplasmDao.saveOrUpdate(germplasm);
-
-                            // Save name entries
-                            for (Name name: germplasms.get(germplasm)){
-                                Integer nameId = nameDao.getNegativeId("nid");
-                                name.setNid(nameId);
-                                name.setGermplasmId(gId);
-                                nameDao.saveOrUpdate(name);
-                            }
-                            
-                        } else {
-                            germplasm = germplasmsFound.get(0);
+                        if (germplasmsFound.size() > 0){
+                            germplasmFound = germplasmsFound.get(0);
                         }
-                        
-                    } else {
-                        germplasm = germplasmFound;
-                    }                    
+                    } 
                 }
                 
+                // Save germplasm and name entries if non-existing
+                if (germplasmFound == null || germplasmFound.getGid() == null){
+                    Integer gId = germplasmDao.getNegativeId("gid");
+
+                    // Save name entries
+                    for (Name name: germplasms.get(germplasm)){
+                        Integer nameId = nameDao.getNegativeId("nid");
+                        name.setNid(nameId);
+                        name.setGermplasmId(gId);
+                        nameDao.saveOrUpdate(name);
+                    }
+                    
+                    // Save germplasm
+                    germplasm.setGid(gId);
+                    germplasm.setLgid(Integer.valueOf(0));
+                    germplasmDao.saveOrUpdate(germplasm);
+
+                } 
+                               
                 // Save germplasmListData
                 Integer germplasmListDataId = getGermplasmListDataDAO().getNegativeId("id");
                 germplasmListData.setId(germplasmListDataId);

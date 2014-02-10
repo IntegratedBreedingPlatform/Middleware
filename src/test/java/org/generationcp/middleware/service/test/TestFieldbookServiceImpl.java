@@ -28,6 +28,7 @@ import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
+import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
@@ -204,10 +205,10 @@ public class TestFieldbookServiceImpl {
     }
 
     @Test
-    public void testSaveNurseryAdvanceGermplasmList() throws MiddlewareQueryException {
+    public void testSaveNurseryAdvanceGermplasmListCimmytWheat() throws MiddlewareQueryException {
         Map<Germplasm, List<Name>> germplasms = new HashMap<Germplasm, List<Name>>();
         Map<Germplasm, GermplasmListData> listData = new HashMap<Germplasm, GermplasmListData>();
-        GermplasmList germplasmList = createGermplasms(germplasms, listData);
+        GermplasmList germplasmList = createGermplasmsCimmytWheat(germplasms, listData);
         
         Integer listId = fieldbookService.saveNurseryAdvanceGermplasmList(germplasms, listData, germplasmList);
 
@@ -221,67 +222,123 @@ public class TestFieldbookServiceImpl {
         }
         
     }
+    
 
-    private GermplasmList createGermplasms(Map<Germplasm, List<Name>> germplasms, Map<Germplasm, GermplasmListData> listData) {
+    @Test
+    public void testSaveNurseryAdvanceGermplasmListOtherCrop() throws MiddlewareQueryException {
+        Map<Germplasm, List<Name>> germplasms = new HashMap<Germplasm, List<Name>>();
+        Map<Germplasm, GermplasmListData> listData = new HashMap<Germplasm, GermplasmListData>();
+        GermplasmList germplasmList = createGermplasmsOtherCrop(germplasms, listData);
+        
+        Integer listId = fieldbookService.saveNurseryAdvanceGermplasmList(germplasms, listData, germplasmList);
+
+        assertTrue(listId != null && listId < 0);
+        
+        Debug.println(3, "Germplasm List Added: ");
+        Debug.println(6, germplasmList.toString());
+        Debug.println(3, "Germplasms Added: ");
+        for (Germplasm germplasm: germplasms.keySet()){
+            Debug.println(6, germplasm.toString());
+        }
+        
+    }
+    
+    
+    private GermplasmList createGermplasmsCimmytWheat(
+            Map<Germplasm, List<Name>> germplasms, Map<Germplasm, GermplasmListData> listData) {
         
         int NUMBER_OF_ENTRIES = 3;
         
-        String name = "Test List #1_" + "_" + (int) Math.random()*100;
-        GermplasmList germList = new GermplasmList(null, name, Long.valueOf(20140206), "LST", Integer.valueOf(1),
-                name + " Description", null, 1);
+        GermplasmList germList = createGermplasmList();
         
         for (int i=0; i< NUMBER_OF_ENTRIES; i++){
-            Germplasm g = new Germplasm();
-            g.setGdate(Integer.valueOf(20140206));
-            g.setGnpgs(Integer.valueOf(0));
-            g.setGpid1(Integer.valueOf(0));
-            g.setGpid2(Integer.valueOf(0));
-            g.setGrplce(Integer.valueOf(0));
-            g.setLocationId(Integer.valueOf(9000));
-            g.setMethodId(Integer.valueOf(1));
-            g.setMgid(Integer.valueOf(1));
-            g.setUserId(Integer.valueOf(1));
-            g.setReferenceId(Integer.valueOf(1));
+            Germplasm g = createGermplasm();
 
             List<Name> names = new ArrayList<Name>();
-            
-            Name n = new Name();
-            n.setLocationId(Integer.valueOf(9000));
-            n.setNdate(Integer.valueOf(20140206));
-            n.setNval("Germplasm_64_" + i + "_" + (int) Math.random()*100);
-            n.setReferenceId(Integer.valueOf(1));
-            n.setTypeId(Integer.valueOf(1));
-            n.setUserId(Integer.valueOf(1));
+            Name n = createGermplasmName(i);
+            n.setTypeId(GermplasmNameType.UNRESOLVED_NAME.getUserDefinedFieldID());
+            n.setNstat(Integer.valueOf(0));
             names.add(n);
 
-            n = new Name();
-            n.setLocationId(Integer.valueOf(9000));
-            n.setNdate(Integer.valueOf(20140206));
-            n.setNval("Germplasm_64_" + i + "_" + (int) Math.random()*100);
-            n.setReferenceId(Integer.valueOf(1));
-            n.setTypeId(Integer.valueOf(1));
-            n.setUserId(Integer.valueOf(1));
+            n = createGermplasmName(i);
+            n.setTypeId(GermplasmNameType.CIMMYT_SELECTION_HISTORY.getUserDefinedFieldID());
+            n.setNstat(Integer.valueOf(1));
             names.add(n);
 
-            n = new Name();
-            n.setLocationId(Integer.valueOf(9000));
-            n.setNdate(Integer.valueOf(20140206));
-            n.setNval("Germplasm_64_" + i + "_" + (int) Math.random()*100);
-            n.setReferenceId(Integer.valueOf(1));
-            n.setTypeId(Integer.valueOf(1));
-            n.setUserId(Integer.valueOf(1));
+            n = createGermplasmName(i);
+            n.setTypeId(GermplasmNameType.CIMMYT_WHEAT_PEDIGREE.getUserDefinedFieldID());
+            n.setNstat(Integer.valueOf(0));
             names.add(n);
 
             germplasms.put(g, names);
-
-            GermplasmListData germplasmListData = new GermplasmListData(null, null, Integer.valueOf(2), 1, "EntryCode", "SeedSource",
-                    "Germplasm Name 3", "GroupName", 0, 99992);
+            
+            GermplasmListData germplasmListData = this.createGermplasmListData();
             listData.put(g, germplasmListData);
 
         }
         
         return germList;
         
+    }
+        
+    private GermplasmList createGermplasmsOtherCrop(
+            Map<Germplasm, List<Name>> germplasms, Map<Germplasm, GermplasmListData> listData) {
+        
+        int NUMBER_OF_ENTRIES = 3;
+        
+        GermplasmList germList = createGermplasmList();
+        
+        for (int i=0; i< NUMBER_OF_ENTRIES; i++){
+            Germplasm g = createGermplasm();
+
+            List<Name> names = new ArrayList<Name>();
+            names.add(createGermplasmName(1));
+            germplasms.put(g, names);
+
+            GermplasmListData germplasmListData = createGermplasmListData();
+            listData.put(g, germplasmListData);
+        }
+        
+        return germList;        
+    }
+    
+    private GermplasmList createGermplasmList(){
+        String name = "Test List #1_" + "_" + (int) Math.random()*100;
+        GermplasmList germList = new GermplasmList(null, name, Long.valueOf(20140206), "LST", Integer.valueOf(1),
+                name + " Description", null, 1);
+        return germList;
+    }
+    
+    private Germplasm createGermplasm(){
+        Germplasm g = new Germplasm();
+        g.setGdate(Integer.valueOf(20140206));
+        g.setGnpgs(Integer.valueOf(0));
+        g.setGpid1(Integer.valueOf(0));
+        g.setGpid2(Integer.valueOf(0));
+        g.setGrplce(Integer.valueOf(0));
+        g.setLocationId(Integer.valueOf(9000));
+        g.setMethodId(Integer.valueOf(1));
+        g.setMgid(Integer.valueOf(1));
+        g.setUserId(Integer.valueOf(1));
+        g.setReferenceId(Integer.valueOf(1));
+        return g;
+    }
+    
+    private Name createGermplasmName(int i){
+        Name n = new Name();
+        n.setLocationId(Integer.valueOf(9000));
+        n.setNdate(Integer.valueOf(20140206));
+        n.setNval("Germplasm_" + i + "_" + (int) Math.random()*100);
+        n.setReferenceId(Integer.valueOf(1));
+        n.setTypeId(Integer.valueOf(1));
+        n.setNstat(Integer.valueOf(0));
+        n.setUserId(Integer.valueOf(1));
+        return n;
+    }
+    
+    private GermplasmListData createGermplasmListData(){
+        return  new GermplasmListData(null, null, Integer.valueOf(2), 1, "EntryCode", "SeedSource",
+                "Germplasm Name 3", "GroupName", 0, 99992);
     }
         
     @After
