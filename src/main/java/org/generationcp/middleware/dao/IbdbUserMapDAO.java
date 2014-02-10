@@ -69,5 +69,21 @@ public class IbdbUserMapDAO extends GenericDAO<IbdbUserMap, Long>{
         }
         return null;
     }
+    
+    @SuppressWarnings("unchecked")
+   	public IbdbUserMap getIbdbUserMapByUserAndProjectID(Integer workbenchUserId,Long projectId) throws MiddlewareQueryException {
+           try {
+           	if (projectId != null && workbenchUserId != null){
+           		 return (IbdbUserMap) getSession().createCriteria(IbdbUserMap.class)
+                            .add(Restrictions.eq("projectId", projectId))
+                            .add(Restrictions.eq("workbenchUserId", workbenchUserId))
+                            .uniqueResult();
+           	}
+           } catch (HibernateException e) {
+               logAndThrowException("Error with getIbdbUserMapByUserAndProjectID( projectId="
+                       + projectId + ") query from IbdbUserMap: " + e.getMessage(), e);
+           }
+           return null;
+       }
 
 }
