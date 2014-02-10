@@ -173,11 +173,6 @@ public enum TermId {
 	
 	,BREEDING_METHOD_ID (8257)
 	
-	//Breeding Methods
-	, SINGLE_PLANT_SELECTION_SF (205)
-	, SELECTED_BULK_SF (206)
-	, RANDOM_BULK_SF (207)
-	
 	//Advance Nursery
 	, PLANTS_SELECTED (8263)
 	;

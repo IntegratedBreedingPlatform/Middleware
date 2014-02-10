@@ -33,10 +33,12 @@ import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
@@ -233,7 +235,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
     @Override
-    public Integer saveNurseryAdvanceGermplasmList(Map<Germplasm, Name> germplasms, GermplasmList germplasmList)
+    public Integer saveNurseryAdvanceGermplasmList(Map<Germplasm, List<Name>> germplasms
+                            , Map<Germplasm, GermplasmListData> listDataItems
+                            , GermplasmList germplasmList)
             throws MiddlewareQueryException {
         Session session = requireLocalDatabaseInstance();
         Transaction trans = null;
@@ -246,28 +250,87 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
         try {
             trans = session.beginTransaction();
-
-            // Save germplasms
-            for (Germplasm germplasm : germplasms.keySet()) {
-                Name name = germplasms.get(germplasm);
-
-                Integer gId = germplasmDao.getNegativeId("gid");
-                germplasm.setGid(gId);
-                germplasm.setLgid(Integer.valueOf(0));
-
-                Integer nameId = nameDao.getNegativeId("nid");
-                name.setNid(nameId);
-                name.setNstat(Integer.valueOf(1));
-                name.setGermplasmId(gId);
-
-                germplasmDao.saveOrUpdate(germplasm);
-                nameDao.saveOrUpdate(name);
-            }
-
+            
+            /* call Save Listnms;
+            * For each entry in the advance list table
+            * if (gid != null) 
+            *   germplasm = findByGid(gid)
+            *   if (germplasm == null)
+            *      germplasm = findByName(table.desig)
+            *      
+            *  if (germplasm != null) 
+            *      call Save ListData using gid from germplasm.gid
+            *  else 
+            *      call Save Germplasm - note new gid generated
+            *  call Save Names using NType = 1027, NVal = table.desig, NStat = 0         // FB-level
+            *  call Save Names using NType = 1028, NVal = table.germplasmBCID, NStat = 1 // FB-level
+            *  call Save Names using NType = 1029, NVal = table.cross, NStat = 0         // FB-level    
+            *  call Save ListData
+            */
+            
             // Save germplasm list
             listId = germplasmListDao.getNegativeId("id");
             germplasmList.setId(listId);
             germplasmListDao.saveOrUpdate(germplasmList);
+
+
+            // Save germplasms, names, list data
+            for (Germplasm germplasm : germplasms.keySet()) {
+
+                GermplasmListData germplasmListData = listDataItems.get(germplasm);
+
+                // Save germplasm and name entries if non-existing
+                if (germplasm.getGid() != null){
+
+                    Germplasm germplasmFound = getGermplasmDataManager().getGermplasmByGID(germplasm.getGid());
+                    
+                    if (germplasmFound == null){
+                        
+                        // Germplasm name is the Names entry with NType = 1027, NVal = table.desig, NStat = 0
+                        String germplasmName = null;
+                        for (Name name: germplasms.get(germplasm)){
+                            if (name.getTypeId() == GermplasmNameType.UNRESOLVED_NAME.getUserDefinedFieldID() 
+                                    && name.getNstat() == 0){
+                                germplasmName = name.getNval();
+                            }
+                        }
+
+                        List<Germplasm> germplasmsFound = getGermplasmDataManager()
+                                                    .getGermplasmByName(germplasmName, 0, 1, Operation.EQUAL);
+                        
+                        if (germplasmsFound.size() == 0){
+                            
+                            // Save germplasm
+                            Integer gId = germplasmDao.getNegativeId("gid");
+                            germplasm.setGid(gId);
+                            germplasm.setLgid(Integer.valueOf(0));
+                            germplasmDao.saveOrUpdate(germplasm);
+
+                            // Save name entries
+                            for (Name name: germplasms.get(germplasm)){
+                                Integer nameId = nameDao.getNegativeId("nid");
+                                name.setNid(nameId);
+                                name.setGermplasmId(gId);
+                                nameDao.saveOrUpdate(name);
+                            }
+                            
+                        } else {
+                            germplasm = germplasmsFound.get(0);
+                        }
+                        
+                    } else {
+                        germplasm = germplasmFound;
+                    }                    
+                }
+                
+                // Save germplasmListData
+                Integer germplasmListDataId = getGermplasmListDataDAO().getNegativeId("id");
+                germplasmListData.setId(germplasmListDataId);
+                germplasmListData.setGid(germplasm.getGid());
+                germplasmListData.setList(germplasmList);
+                getGermplasmListDataDAO().saveOrUpdate(germplasmListData);
+                
+            }
 
             trans.commit();
         } catch (Exception e) {
@@ -281,5 +344,33 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
     }
 	
+	@Override
+    public String getCimmytWheatGermplasmNameByGid(int gid) throws MiddlewareQueryException {
+        List<Name> names = getByGidAndNtype(gid, GermplasmNameType.CIMMYT_SELECTION_HISTORY);
+        if (names == null || names.isEmpty()) {
+            names = getByGidAndNtype(gid, GermplasmNameType.UNRESOLVED_NAME);
+        }
+        return (names != null && !names.isEmpty() ? names.get(0).getNval() : null);
+    }
+    
+    private List<Name> getByGidAndNtype(int gid, GermplasmNameType nType) throws MiddlewareQueryException {
+        setWorkingDatabase(Database.CENTRAL);
+        List<Name> names = getNameDao().getByGIDWithFilters(gid, null, nType);
+        if (names == null || names.isEmpty()) {
+            setWorkingDatabase(Database.LOCAL);
+            names = getNameDao().getByGIDWithFilters(gid, null, nType);
+        }
+        return names;
+    }
+
+    @Override
+    public Method getBreedingMethodById(int mid) throws MiddlewareQueryException {
+        return getGermplasmDataManager().getMethodByID(mid);
+    }
+    
+    @Override
+    public Germplasm getGermplasmByGID(int gid) throws MiddlewareQueryException {
+        return getGermplasmDataManager().getGermplasmByGID(gid);
+    }
 	
 }

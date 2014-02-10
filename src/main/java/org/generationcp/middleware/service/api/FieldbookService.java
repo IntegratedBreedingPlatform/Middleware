@@ -24,6 +24,7 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
@@ -190,15 +191,44 @@ public interface FieldbookService {
     List<Method> getFavoriteBreedingMethods(List<Integer> methodIds)  throws MiddlewareQueryException;
         
     /**
-     * Saves germplasm list advanced nursery types.
+     * Saves germplasm list advanced nursery types. This method saves the germplasms (and corresponding name) if not found in the database. 
+     * ListData items are always added to the database, before saving the germplasm list.
+     * 
+     * Old Fieldbook Implementation:
+     * 
+     * call Save Listnms;
+     * For each entry in the advance list table
+     * if (gid != null) 
+     *   germplasm = findByGid(gid)
+     *   if (germplasm == null)
+     *      germplasm = findByName(table.desig)
+     *      
+     *  if (germplasm != null) 
+     *      call Save ListData using gid from germplasm.gid
+     *  else 
+     *      call Save Germplasm - note new gid generated
+     *  call Save Names using NType = 1027, NVal = table.desig, NStat = 0
+     *  call Save Names using NType = 1028, NVal = table.germplasmBCID, NStat = 1
+     *  call Save Names using NType = 1029, NVal = table.cross, NStat = 0
+     *  call Save ListData
      *
-     * @param germplasms the germplasms to add
+     * @param germplasms the germplasms to add - the key of the Map is the germplasm to add, 
+     *                                      while the value is its corresponding name values
+     * @param listDataItems the list data to add - the key of the Map is the germplasm 
+     *                                      associated to the germplasm list data value
      * @param germplasmList the germplasm list to add
      * 
      * @return The id of the newly-created germplasm list
      * @throws MiddlewareQueryException the middleware query exception
      */
-    Integer saveNurseryAdvanceGermplasmList(Map<Germplasm, Name> germplasms, GermplasmList germplasmList) 
+    Integer saveNurseryAdvanceGermplasmList(Map<Germplasm, List<Name>> germplasms
+                , Map<Germplasm, GermplasmListData> listDataItems
+                , GermplasmList germplasmList) 
             throws MiddlewareQueryException;
     
+    String getCimmytWheatGermplasmNameByGid(int gid) throws MiddlewareQueryException;
+
+    Method getBreedingMethodById(int mid) throws MiddlewareQueryException;
+    
+    Germplasm getGermplasmByGID(int gid) throws MiddlewareQueryException;
 }

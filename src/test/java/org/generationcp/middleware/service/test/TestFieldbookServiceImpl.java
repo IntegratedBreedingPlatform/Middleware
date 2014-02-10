@@ -205,13 +205,11 @@ public class TestFieldbookServiceImpl {
 
     @Test
     public void testSaveNurseryAdvanceGermplasmList() throws MiddlewareQueryException {
-        Map<Germplasm, Name> germplasms = new HashMap<Germplasm, Name>();
-        createGermplasms(germplasms);
+        Map<Germplasm, List<Name>> germplasms = new HashMap<Germplasm, List<Name>>();
+        Map<Germplasm, GermplasmListData> listData = new HashMap<Germplasm, GermplasmListData>();
+        GermplasmList germplasmList = createGermplasms(germplasms, listData);
         
-        List<GermplasmListData> listData = new ArrayList<GermplasmListData>();
-        GermplasmList germplasmList = createGermplasmList(listData);
-
-        Integer listId = fieldbookService.saveNurseryAdvanceGermplasmList(germplasms, germplasmList);
+        Integer listId = fieldbookService.saveNurseryAdvanceGermplasmList(germplasms, listData, germplasmList);
 
         assertTrue(listId != null && listId < 0);
         
@@ -224,8 +222,13 @@ public class TestFieldbookServiceImpl {
         
     }
 
-    private void createGermplasms(Map<Germplasm, Name> germplasms) {
+    private GermplasmList createGermplasms(Map<Germplasm, List<Name>> germplasms, Map<Germplasm, GermplasmListData> listData) {
+        
         int NUMBER_OF_ENTRIES = 3;
+        
+        String name = "Test List #1_" + "_" + (int) Math.random()*100;
+        GermplasmList germList = new GermplasmList(null, name, Long.valueOf(20140206), "LST", Integer.valueOf(1),
+                name + " Description", null, 1);
         
         for (int i=0; i< NUMBER_OF_ENTRIES; i++){
             Germplasm g = new Germplasm();
@@ -239,7 +242,9 @@ public class TestFieldbookServiceImpl {
             g.setMgid(Integer.valueOf(1));
             g.setUserId(Integer.valueOf(1));
             g.setReferenceId(Integer.valueOf(1));
-    
+
+            List<Name> names = new ArrayList<Name>();
+            
             Name n = new Name();
             n.setLocationId(Integer.valueOf(9000));
             n.setNdate(Integer.valueOf(20140206));
@@ -247,24 +252,38 @@ public class TestFieldbookServiceImpl {
             n.setReferenceId(Integer.valueOf(1));
             n.setTypeId(Integer.valueOf(1));
             n.setUserId(Integer.valueOf(1));
-            
-            germplasms.put(g, n);
+            names.add(n);
+
+            n = new Name();
+            n.setLocationId(Integer.valueOf(9000));
+            n.setNdate(Integer.valueOf(20140206));
+            n.setNval("Germplasm_64_" + i + "_" + (int) Math.random()*100);
+            n.setReferenceId(Integer.valueOf(1));
+            n.setTypeId(Integer.valueOf(1));
+            n.setUserId(Integer.valueOf(1));
+            names.add(n);
+
+            n = new Name();
+            n.setLocationId(Integer.valueOf(9000));
+            n.setNdate(Integer.valueOf(20140206));
+            n.setNval("Germplasm_64_" + i + "_" + (int) Math.random()*100);
+            n.setReferenceId(Integer.valueOf(1));
+            n.setTypeId(Integer.valueOf(1));
+            n.setUserId(Integer.valueOf(1));
+            names.add(n);
+
+            germplasms.put(g, names);
+
+            GermplasmListData germplasmListData = new GermplasmListData(null, null, Integer.valueOf(2), 1, "EntryCode", "SeedSource",
+                    "Germplasm Name 3", "GroupName", 0, 99992);
+            listData.put(g, germplasmListData);
+
         }
-    }
-    
-    private GermplasmList createGermplasmList(List<GermplasmListData> listData){
-        String name = "Test List #1_" + "_" + (int) Math.random()*100;
-        GermplasmList germList = new GermplasmList(null, name, Long.valueOf(20140206), "LST", Integer.valueOf(1),
-                name + " Description", null, 1);
-        
-        GermplasmListData germplasmListData = new GermplasmListData(null, germList, Integer.valueOf(2), 1, "EntryCode", "SeedSource",
-                "Germplasm Name 3", "GroupName", 0, 99992);
-        listData.add(germplasmListData);
         
         return germList;
-
+        
     }
-    
+        
     @After
     public void afterEachTest() {
         long elapsedTime = System.nanoTime() - startTime;
