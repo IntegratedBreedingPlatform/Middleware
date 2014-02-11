@@ -446,10 +446,13 @@ public class Germplasm implements Serializable{
     @Column(name = "gref")
     private Integer referenceId;
 
+    /** Records deletion or replacement for the current record. 0=unchanged, own GID=deleted, replacement GID=replaced */
     @Basic(optional = false)
     @Column(name = "grplce")
     private Integer grplce;
 
+    /*If the current germplasm is a managed sample then MGID contains the GID of the germplasm 
+     * at the root of the management tree, else 0. */
     @Basic(optional = false)
     @Column(name = "mgid")
     private Integer mgid;
@@ -502,6 +505,36 @@ public class Germplasm implements Serializable{
     public Germplasm() {
     }
 
+    public Germplasm(Integer gid, Integer methodId, Integer gnpgs, Integer gpid1, Integer gpid2, Integer userId,
+            Integer lgid, Integer locationId, Integer gdate, Integer referenceId, Integer grplce, Integer mgid,
+            Name preferredName, String preferredAbbreviation, Method method) {
+        super();
+        this.gid = gid;
+        this.methodId = methodId;
+        this.gnpgs = gnpgs;
+        this.gpid1 = gpid1;
+        this.gpid2 = gpid2;
+        this.userId = userId;
+        this.lgid = lgid;
+        this.locationId = locationId;
+        this.gdate = gdate;
+        this.referenceId = referenceId;
+        this.grplce = grplce;
+        this.mgid = mgid;
+        this.preferredName = preferredName;
+        this.preferredAbbreviation = preferredAbbreviation;
+        this.method = method;
+    }
+    
+    public Germplasm(Integer gid, Integer methodId, Integer gnpgs, Integer gpid1, Integer gpid2, Integer userId,
+            Integer lgid, Integer locationId, Integer gdate, Name preferredName) {
+        
+        // gref =0, grplce = 0, mgid = 0
+        this(gid, methodId, gnpgs, gpid1, gpid2, userId, lgid, locationId, gdate
+                , 0, 0, 0, preferredName, null, null);
+    }
+    
+    
     public Germplasm(Integer gid) {
         this.gid = gid;
     }
@@ -732,10 +765,39 @@ public class Germplasm implements Serializable{
 
     @Override
     public String toString() {
-        return "Germplasm [gid=" + gid + ", methodId=" + methodId + ", gnpgs=" + gnpgs + ", gpid1=" + gpid1 + ", gpid2=" + gpid2
-                + ", userId=" + userId + ", lgid=" + lgid + ", locationId=" + locationId + ", gdate=" + gdate + ", referenceId="
-                + referenceId + ", grplce=" + grplce + ", mgid=" + mgid + ", preferredName=" + preferredName + ", preferredAbbreviation="
-                + preferredAbbreviation + ", method=" + method + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append("Germplasm [gid=");
+        builder.append(gid);
+        builder.append(", methodId=");
+        builder.append(methodId);
+        builder.append(", gnpgs=");
+        builder.append(gnpgs);
+        builder.append(", gpid1=");
+        builder.append(gpid1);
+        builder.append(", gpid2=");
+        builder.append(gpid2);
+        builder.append(", userId=");
+        builder.append(userId);
+        builder.append(", lgid=");
+        builder.append(lgid);
+        builder.append(", locationId=");
+        builder.append(locationId);
+        builder.append(", gdate=");
+        builder.append(gdate);
+        builder.append(", referenceId=");
+        builder.append(referenceId);
+        builder.append(", grplce=");
+        builder.append(grplce);
+        builder.append(", mgid=");
+        builder.append(mgid);
+        builder.append(", preferredName=");
+        builder.append(preferredName);
+        builder.append(", preferredAbbreviation=");
+        builder.append(preferredAbbreviation);
+        builder.append(", method=");
+        builder.append(method);
+        builder.append("]");
+        return builder.toString();
     }
     
     
