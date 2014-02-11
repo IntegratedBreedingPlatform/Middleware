@@ -226,9 +226,30 @@ public interface FieldbookService {
                 , GermplasmList germplasmList) 
             throws MiddlewareQueryException;
     
+    /**
+     * Used for retrieving the Cimmyt Wheat Germplasm name.
+     * 
+     * @param gid
+     * @return
+     * @throws MiddlewareQueryException
+     */
     String getCimmytWheatGermplasmNameByGid(int gid) throws MiddlewareQueryException;
 
+    /**
+     * Used for retrieving the breeding method id given a method id.
+     * 
+     * @param mid
+     * @return
+     * @throws MiddlewareQueryException
+     */
     Method getBreedingMethodById(int mid) throws MiddlewareQueryException;
     
+    /** 
+     * Used for retrieving the germplasm given a germplasm id.
+     * 
+     * @param gid
+     * @return
+     * @throws MiddlewareQueryException
+     */
     Germplasm getGermplasmByGID(int gid) throws MiddlewareQueryException;
 }
