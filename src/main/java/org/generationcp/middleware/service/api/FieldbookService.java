@@ -29,7 +29,6 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 
-// TODO: Auto-generated Javadoc
 /**
  * This is the API for Fieldbook requirements.
  * 
@@ -228,39 +227,38 @@ public interface FieldbookService {
             throws MiddlewareQueryException;
     
     /**
-     * Gets the cimmyt wheat germplasm name by gid.
-     *
-     * @param gid the gid
-     * @return the cimmyt wheat germplasm name by gid
-     * @throws MiddlewareQueryException the middleware query exception
+     * Used for retrieving the Cimmyt Wheat Germplasm name.
+     * 
+     * @param gid
+     * @return
+     * @throws MiddlewareQueryException
      */
     String getCimmytWheatGermplasmNameByGid(int gid) throws MiddlewareQueryException;
 
     /**
-     * Gets the breeding method by id.
-     *
-     * @param mid the mid
-     * @return the breeding method by id
-     * @throws MiddlewareQueryException the middleware query exception
+     * Used for retrieving the breeding method id given a method id.
+     * 
+     * @param mid
+     * @return
+     * @throws MiddlewareQueryException
      */
     Method getBreedingMethodById(int mid) throws MiddlewareQueryException;
     
-    /**
-     * Gets the germplasm by gid.
-     *
-     * @param gid the gid
-     * @return the germplasm by gid
-     * @throws MiddlewareQueryException the middleware query exception
+    /** 
+     * Used for retrieving the germplasm given a germplasm id.
+     * 
+     * @param gid
+     * @return
+     * @throws MiddlewareQueryException
      */
     Germplasm getGermplasmByGID(int gid) throws MiddlewareQueryException;
     
     /**
-     * Gets the germplasm list by name.
-     *
-     * @param name the name
-     * @return the germplasm list by name
-     * @throws MiddlewareQueryException the middleware query exception
+     * Get germplasm list by name.
+     * 
+     * @param name
+     * @return
+     * @throws MiddlewareQueryException
      */
     GermplasmList getGermplasmListByName(String name) throws MiddlewareQueryException;
-    
 }

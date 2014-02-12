@@ -271,7 +271,7 @@ public class StandardVariableBuilder extends Builder {
         Term scale = getTermBuilder().findOrSaveTermByName(scaleName, CvId.SCALES);
         Term method = getTermBuilder().findOrSaveTermByName(methodName, CvId.METHODS);
         
-        StandardVariable standardVariable = getByPropertyScaleMethod(property.getId(), scale.getId(), method.getId());
+        StandardVariable standardVariable = getByPropertyScaleMethodRole(property.getId(), scale.getId(), method.getId(), role);
 		
         if (standardVariable == null) {
 			standardVariable = new StandardVariable();
@@ -335,6 +335,17 @@ public class StandardVariableBuilder extends Builder {
 		return standardVariable;
 	}
 	
+    public StandardVariable getByPropertyScaleMethodRole(Integer propertyId, Integer scaleId, Integer methodId, PhenotypicType role) 
+            throws MiddlewareQueryException {
+        
+        Integer stdVariableId =  getIdByPropertyScaleMethodRole(propertyId, scaleId, methodId, role);
+        StandardVariable standardVariable = null;
+        if (stdVariableId != null) {
+            standardVariable = getStandardVariableBuilder().create(stdVariableId);
+        }
+        return standardVariable;
+    }
+    
 	public Integer getIdByPropertyScaleMethod(Integer propertyId, Integer scaleId, Integer methodId) throws MiddlewareQueryException {
 		Integer stdVariableId = null;
 	    if (setWorkingDatabase(Database.LOCAL)) {
@@ -351,7 +362,6 @@ public class StandardVariableBuilder extends Builder {
 	    return stdVariableId;
 	}
 
-	
 	public Map<String, List<StandardVariable>> getStandardVariablesInProjects(List<String> headers) 
 			throws MiddlewareQueryException {
 		Map<String, List<StandardVariable>> standardVariablesInProjects = new HashMap<String, List<StandardVariable>>();
