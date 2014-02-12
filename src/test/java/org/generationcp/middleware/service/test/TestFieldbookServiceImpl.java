@@ -15,7 +15,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -189,7 +191,8 @@ public class TestFieldbookServiceImpl {
         String property = "Germplasm entry";
         String scale = "Number";
         String method = "Enumerated";
-        Integer termId = fieldbookService.getStandardVariableIdByPropertyScaleMethodRole(property, scale, method, PhenotypicType.GERMPLASM);
+        Integer termId = fieldbookService.getStandardVariableIdByPropertyScaleMethodRole(
+                                    property, scale, method, PhenotypicType.GERMPLASM);
         Debug.println(0, termId.toString());
         assertEquals((Integer) 8230, termId);
     }
@@ -304,14 +307,14 @@ public class TestFieldbookServiceImpl {
     
     private GermplasmList createGermplasmList(){
         String name = "Test List #1_" + "_" + (int) Math.random()*100;
-        GermplasmList germList = new GermplasmList(null, name, Long.valueOf(20140206), "LST", Integer.valueOf(1),
-                name + " Description", null, 1);
+        GermplasmList germList = new GermplasmList(null, name, Long.valueOf(20140206)
+                , "LST", Integer.valueOf(1), name + " Description", null, 1);
         return germList;
     }
     
     private Germplasm createGermplasm(){
         Germplasm g = new Germplasm();
-        g.setGdate(Integer.valueOf(20140206));
+        g.setGdate(Integer.valueOf(Integer.valueOf(new SimpleDateFormat("yyyyMMdd").format(new Date()))));
         g.setGnpgs(Integer.valueOf(0));
         g.setGpid1(Integer.valueOf(0));
         g.setGpid2(Integer.valueOf(0));
@@ -327,7 +330,7 @@ public class TestFieldbookServiceImpl {
     private Name createGermplasmName(int i){
         Name n = new Name();
         n.setLocationId(Integer.valueOf(9000));
-        n.setNdate(Integer.valueOf(20140206));
+        n.setNdate(Integer.valueOf(new SimpleDateFormat("yyyyMMdd").format(new Date())));
         n.setNval("Germplasm_" + i + "_" + (int) Math.random()*100);
         n.setReferenceId(Integer.valueOf(1));
         n.setTypeId(Integer.valueOf(1));
@@ -340,11 +343,12 @@ public class TestFieldbookServiceImpl {
         return  new GermplasmListData(null, null, Integer.valueOf(2), 1, "EntryCode", "SeedSource",
                 "Germplasm Name 3", "GroupName", 0, 99992);
     }
-        
+    
     @After
     public void afterEachTest() {
         long elapsedTime = System.nanoTime() - startTime;
-        Debug.println(0, "#####" + name.getMethodName() + ": Elapsed Time = " + elapsedTime + " ns = " + ((double) elapsedTime / 1000000000) + " s");
+        Debug.println(0, "#####" + name.getMethodName() + ": Elapsed Time = " + elapsedTime 
+                + " ns = " + ((double) elapsedTime / 1000000000) + " s");
     }
 
 

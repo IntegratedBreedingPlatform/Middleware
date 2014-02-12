@@ -251,23 +251,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         try {
             trans = session.beginTransaction();
             
-            /* call Save Listnms;
-            * For each entry in the advance list table
-            * if (gid != null) 
-            *   germplasm = findByGid(gid)
-            *   if (germplasm == null)
-            *      germplasm = findByName(table.desig)
-            *      
-            *  if (germplasm != null) 
-            *      call Save ListData using gid from germplasm.gid
-            *  else 
-            *      call Save Germplasm - note new gid generated
-            *  call Save Names using NType = 1027, NVal = table.desig, NStat = 0         // FB-level
-            *  call Save Names using NType = 1028, NVal = table.germplasmBCID, NStat = 1 // FB-level
-            *  call Save Names using NType = 1029, NVal = table.cross, NStat = 0         // FB-level    
-            *  call Save ListData
-            */
-            
             // Save germplasm list
             listId = germplasmListDao.getNegativeId("id");
             germplasmList.setId(listId);
@@ -289,27 +272,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                     
                     // Check if the given germplasm name exists
                     if (germplasmFound == null){
-                        List<Name> names = germplasms.get(germplasm);
-                        String germplasmName = null;
-
-                        if (names != null){ 
-                            if (names.size() > 1){ // crop == CIMMYT WHEAT (crop with more than one name saved)
-                                // Germplasm name is the Names entry with NType = 1027, NVal = table.desig, NStat = 0
-                                for (Name name: names){
-                                    if (name.getTypeId() == GermplasmNameType.UNRESOLVED_NAME.getUserDefinedFieldID() 
-                                            && name.getNstat() == 0){
-                                        germplasmName = name.getNval();
-                                        break;
-                                    }
-                                }
-                            }else if (names.size() == 1){ // other crops
-                                germplasmName = names.get(0).getNval();
-                            }
-                            
-                        }
-
                         List<Germplasm> germplasmsFound = getGermplasmDataManager()
-                                .getGermplasmByName(germplasmName, 0, 1, Operation.EQUAL);
+                                .getGermplasmByName(germplasm.getPreferredName().getNval(), 0, 1, Operation.EQUAL);
                         
                         if (germplasmsFound.size() > 0){
                             germplasmFound = germplasmsFound.get(0);
@@ -375,6 +339,24 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         }
         return names;
     }
+    
+    @Override
+    public GermplasmList getGermplasmListByName(String name) throws MiddlewareQueryException{
+        List<GermplasmList> germplasmLists = getGermplasmListManager()
+                .getGermplasmListByName(name, 0, 1, Operation.EQUAL, Database.CENTRAL);
+        
+        if (germplasmLists.size() > 0){
+            return germplasmLists.get(0);
+        } 
+        germplasmLists = getGermplasmListManager()
+                .getGermplasmListByName(name, 0, 1, Operation.EQUAL, Database.LOCAL);
+            
+        if (germplasmLists.size() > 0){
+            return germplasmLists.get(0);
+        } 
+        return null;
+    }
+
 
     @Override
     public Method getBreedingMethodById(int mid) throws MiddlewareQueryException {
