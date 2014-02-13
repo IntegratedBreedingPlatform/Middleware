@@ -11,6 +11,15 @@
  *******************************************************************************/
 package org.generationcp.middleware.domain.dms;
 
-public class ValueReference extends Reference {
+public class ValueReference extends Reference implements Comparable<ValueReference> {
 
+	public ValueReference(int id, String name) {
+		super.setId(id);
+		super.setName(name);
+	}
+
+	@Override
+	public int compareTo(ValueReference o) {
+		return getName().compareTo(o.getName());
+	}
 }
