@@ -15,10 +15,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -42,6 +44,28 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 			logAndThrowException("Error at getIdsByPropertyTypeAndValue=" + typeId + ", " + value + " query on GeolocationDao: " + e.getMessage(), e);
 		}
 		return new ArrayList<Integer>();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<ValueReference> getDistinctPropertyValues(int stdVarId) throws MiddlewareQueryException {
+		List<ValueReference> results = new ArrayList<ValueReference>();
+		try {
+			String sql = "SELECT DISTINCT value FROM nd_geolocationprop WHERE type_id = :stdVarId ";
+			SQLQuery query = getSession().createSQLQuery(sql);
+			query.setParameter("stdVarId", stdVarId);
+			
+			List<String> list = query.list();
+			int index = 1;
+			if (list != null && !list.isEmpty()) {
+				for (String row : list) {
+					results.add(new ValueReference(index++, row));
+				}
+			}
+			
+		} catch (HibernateException e) {
+			logAndThrowException("Error at getDistinctPropertyValues=" + stdVarId + " query on GeolocationDao: " + e.getMessage(), e);
+		}
+		return results;
 	}
 	
 }

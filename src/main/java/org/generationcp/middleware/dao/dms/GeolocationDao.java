@@ -27,6 +27,7 @@ import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.TrialEnvironment;
 import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
+import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -420,7 +421,114 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 		return null;
 	}
     
-    
+    @SuppressWarnings("unchecked")
+	public List<ValueReference> getDistinctTrialInstances() throws MiddlewareQueryException {
+    	List<ValueReference> results = new ArrayList<ValueReference>();
+    	
+		try {
+			String sql = "SELECT DISTINCT description FROM nd_geolocation";
+			Query query = getSession().createSQLQuery(sql);
+			List<String> list = (List<String>) query.list();
+			int index = 1;
+			if(list != null && !list.isEmpty()) {
+				for (String row : list) {
+					results.add(new ValueReference(index++, row));
+				}
+			}
+						
+		} catch(HibernateException e) {
+			logAndThrowException("Error at getDistinctTrialInstances " + " at GeolocationDao: " + e.getMessage(), e);
+		}
+
+		return results;
+    }
    
- 
+    @SuppressWarnings("unchecked")
+	public List<ValueReference> getDistinctLatitudes() throws MiddlewareQueryException {
+    	List<ValueReference> results = new ArrayList<ValueReference>();
+    	
+		try {
+			String sql = "SELECT DISTINCT latitude FROM nd_geolocation";
+			Query query = getSession().createSQLQuery(sql);
+			List<String> list = (List<String>) query.list();
+			int index = 1;
+			if(list != null && !list.isEmpty()) {
+				for (String row : list) {
+					results.add(new ValueReference(index++, row));
+				}
+			}
+						
+		} catch(HibernateException e) {
+			logAndThrowException("Error at getDistinctLatitudes " + " at GeolocationDao: " + e.getMessage(), e);
+		}
+
+		return results;
+    }
+   
+    @SuppressWarnings("unchecked")
+	public List<ValueReference> getDistinctLongitudes() throws MiddlewareQueryException {
+    	List<ValueReference> results = new ArrayList<ValueReference>();
+    	
+		try {
+			String sql = "SELECT DISTINCT longitude FROM nd_geolocation";
+			Query query = getSession().createSQLQuery(sql);
+			List<String> list = (List<String>) query.list();
+			int index = 1;
+			if(list != null && !list.isEmpty()) {
+				for (String row : list) {
+					results.add(new ValueReference(index++, row));
+				}
+			}
+						
+		} catch(HibernateException e) {
+			logAndThrowException("Error at getDistinctLongitudes " + " at GeolocationDao: " + e.getMessage(), e);
+		}
+
+		return results;
+    }
+   
+    @SuppressWarnings("unchecked")
+	public List<ValueReference> getDistinctAltitudes() throws MiddlewareQueryException {
+    	List<ValueReference> results = new ArrayList<ValueReference>();
+    	
+		try {
+			String sql = "SELECT DISTINCT altitude FROM nd_geolocation";
+			Query query = getSession().createSQLQuery(sql);
+			List<String> list = (List<String>) query.list();
+			int index = 1;
+			if(list != null && !list.isEmpty()) {
+				for (String row : list) {
+					results.add(new ValueReference(index++, row));
+				}
+			}
+						
+		} catch(HibernateException e) {
+			logAndThrowException("Error at getDistinctAltitudes " + " at GeolocationDao: " + e.getMessage(), e);
+		}
+
+		return results;
+    }
+    
+    @SuppressWarnings("unchecked")
+	public List<ValueReference> getDistinctDatums() throws MiddlewareQueryException {
+    	List<ValueReference> results = new ArrayList<ValueReference>();
+    	
+		try {
+			String sql = "SELECT DISTINCT geodetic_datum FROM nd_geolocation";
+			Query query = getSession().createSQLQuery(sql);
+			List<String> list = (List<String>) query.list();
+			int index = 1;
+			if(list != null && !list.isEmpty()) {
+				for (String row : list) {
+					results.add(new ValueReference(index++, row));
+				}
+			}
+						
+		} catch(HibernateException e) {
+			logAndThrowException("Error at getDistinctDatums " + " at GeolocationDao: " + e.getMessage(), e);
+		}
+
+		return results;
+    }
+   
 }
