@@ -14,9 +14,11 @@ package org.generationcp.middleware.service.api;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.StudyDetails;
@@ -271,4 +273,12 @@ public interface FieldbookService {
      * @throws MiddlewareQueryException
      */
     List<ValueReference> getDistinctStandardVariableValues(int stdVarId) throws MiddlewareQueryException;
+    
+    /**
+     * Get all standard variables.
+     * 
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    Set<StandardVariable> getAllStandardVariables() throws MiddlewareQueryException;
 }
