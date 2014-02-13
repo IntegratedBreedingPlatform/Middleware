@@ -18,6 +18,7 @@ import java.util.Map;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
@@ -261,4 +262,13 @@ public interface FieldbookService {
      * @throws MiddlewareQueryException
      */
     GermplasmList getGermplasmListByName(String name) throws MiddlewareQueryException;
+    
+    /**
+     * Get All distinct values given a standard variable id.
+     * 
+     * @param stdVarId
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    List<ValueReference> getDistinctStandardVariableValues(int stdVarId) throws MiddlewareQueryException;
 }

@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.StudyDetails;
@@ -246,6 +247,49 @@ public class TestFieldbookServiceImpl {
         
     }
     
+    @Test
+    public void testGetDistinctStandardVariableValues() throws Exception {
+    	int stdVarId = 8250;
+    	List<ValueReference> list = fieldbookService.getDistinctStandardVariableValues(stdVarId);
+    	for (ValueReference ref : list) {
+    		Debug.println(1, ref.toString());
+    	}
+    	stdVarId = 8135;
+    	list = fieldbookService.getDistinctStandardVariableValues(stdVarId);
+    	for (ValueReference ref : list) {
+    		Debug.println(1, ref.toString());
+    	}
+    	stdVarId = 8170;
+    	list = fieldbookService.getDistinctStandardVariableValues(stdVarId);
+    	for (ValueReference ref : list) {
+    		Debug.println(1, ref.toString());
+    	}
+    	stdVarId = 8191;
+    	list = fieldbookService.getDistinctStandardVariableValues(stdVarId);
+    	for (ValueReference ref : list) {
+    		Debug.println(1, ref.toString());
+    	}
+    	stdVarId = 8192;
+    	list = fieldbookService.getDistinctStandardVariableValues(stdVarId);
+    	for (ValueReference ref : list) {
+    		Debug.println(1, ref.toString());
+    	}
+    	stdVarId = 8193;
+    	list = fieldbookService.getDistinctStandardVariableValues(stdVarId);
+    	for (ValueReference ref : list) {
+    		Debug.println(1, ref.toString());
+    	}
+    	stdVarId = 8194;
+    	list = fieldbookService.getDistinctStandardVariableValues(stdVarId);
+    	for (ValueReference ref : list) {
+    		Debug.println(1, ref.toString());
+    	}
+    	stdVarId = 8007;
+    	list = fieldbookService.getDistinctStandardVariableValues(stdVarId);
+    	for (ValueReference ref : list) {
+    		Debug.println(1, ref.toString());
+    	}
+    }
     
     private GermplasmList createGermplasmsCimmytWheat(
             Map<Germplasm, List<Name>> germplasms, Map<Germplasm, GermplasmListData> listData) {

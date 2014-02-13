@@ -24,6 +24,7 @@ import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.StudyType;
@@ -903,4 +904,42 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
         return folders;
     }
 
+	
+	@SuppressWarnings("unchecked")
+	public List<ValueReference> getDistinctProjectNames() throws MiddlewareQueryException {
+		List<ValueReference> results = new ArrayList<ValueReference>();
+		try {
+			String sql = "SELECT DISTINCT name FROM project ";
+			SQLQuery query = getSession().createSQLQuery(sql);
+			List<String> list = query.list();
+			int index = 1;
+			if (list != null && !list.isEmpty()) {
+				for (String row : list) {
+					results.add(new ValueReference(index++, row));
+				}
+			}
+		} catch(HibernateException e) {
+			logAndThrowException("Error with getDistinctProjectNames() query from Project " + e.getMessage(), e);
+		}
+		return results;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<ValueReference> getDistinctProjectDescriptions() throws MiddlewareQueryException {
+		List<ValueReference> results = new ArrayList<ValueReference>();
+		try {
+			String sql = "SELECT DISTINCT description FROM project ";
+			SQLQuery query = getSession().createSQLQuery(sql);
+			List<String> list = query.list();
+			int index = 1;
+			if (list != null && !list.isEmpty()) {
+				for (String row : list) {
+					results.add(new ValueReference(index++, row));
+				}
+			}
+		} catch(HibernateException e) {
+			logAndThrowException("Error with getDistinctProjectDescription() query from Project " + e.getMessage(), e);
+		}
+		return results;
+	}
 }

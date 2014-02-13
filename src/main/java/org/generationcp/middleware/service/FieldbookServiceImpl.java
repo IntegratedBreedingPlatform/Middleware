@@ -23,6 +23,7 @@ import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -92,8 +93,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         getStudyDataManager().saveOrUpdateFieldmapProperties(info, fieldmapUUID);
     
     }
-
-    
     
     @Override
     public Study getStudy(int studyId) throws MiddlewareQueryException  {
@@ -368,4 +367,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         return getGermplasmDataManager().getGermplasmByGID(gid);
     }
 	
+    @Override
+    public List<ValueReference> getDistinctStandardVariableValues(int stdVarId) throws MiddlewareQueryException {
+    	return getValueReferenceBuilder().getDistinctStandardVariableValues(stdVarId);
+    }
 }

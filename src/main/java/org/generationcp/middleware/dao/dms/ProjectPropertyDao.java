@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.generationcp.middleware.dao.dms;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
@@ -115,5 +117,29 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
                     "Error in getNextRank("    + projectId + ") in ProjectPropertyDao: " + e.getMessage(), e);
         }
 	    return 0;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<ValueReference> getDistinctStandardVariableValues(int stdVarId) throws MiddlewareQueryException {
+		List<ValueReference> results = new ArrayList<ValueReference>();
+		
+		try {
+			String sql = "SELECT DISTINCT type_id, value "
+					+ " FROM projectprop WHERE type_id = :stdVarId ";
+			Query query = getSession().createSQLQuery(sql);
+			query.setParameter("stdVarId", stdVarId);
+			
+			List<Object[]> list = query.list();
+			if (list != null && !list.isEmpty()) {
+				for (Object[] row : list) {
+					results.add(new ValueReference((Integer) row[0], (String) row[1]));
+				}
+			}
+			
+		} catch (HibernateException e) {
+            logAndThrowException(
+                    "Error in getDistinctStandardVariableValues("    + stdVarId + ") in ProjectPropertyDao: " + e.getMessage(), e);
+		}
+		return results;
 	}
 }
