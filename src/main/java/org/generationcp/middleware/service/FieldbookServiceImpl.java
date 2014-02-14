@@ -389,4 +389,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     public Set<StandardVariable> getAllStandardVariables() throws MiddlewareQueryException {
     	return getOntologyDataManager().getAllStandardVariables();
     }
+    
+    @Override
+    public StandardVariable getStandardVariable(int id) throws MiddlewareQueryException {
+    	return getOntologyDataManager().getStandardVariable(id);
+    }
 }
