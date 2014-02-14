@@ -1,4 +1,4 @@
-package org.generationcp.middleware.domain.fieldbook.settings;
+package org.generationcp.middleware.pojos.workbench.settings;
 
 import java.io.Serializable;
 import java.util.List;

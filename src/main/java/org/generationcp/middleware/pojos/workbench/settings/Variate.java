@@ -1,24 +1,22 @@
-package org.generationcp.middleware.domain.fieldbook.settings;
+package org.generationcp.middleware.pojos.workbench.settings;
 
 import java.io.Serializable;
 
-public class Condition  implements Serializable {
+public class Variate  implements Serializable {
 	private String name;
 	private String description;
 	private String property;
 	private String scale;
 	private String method;
 	private String role;
-	private String datatype;
-	private String value;
+	private String datatype;	
 	
-	public Condition(){
+	public Variate(){
 		super();
 	}
 	
-	public Condition(String name, String description, String property,
-			String scale, String method, String role, String datatype,
-			String value) {
+	public Variate(String name, String description, String property,
+			String scale, String method, String role, String datatype) {
 		super();
 		this.name = name;
 		this.description = description;
@@ -27,9 +25,7 @@ public class Condition  implements Serializable {
 		this.method = method;
 		this.role = role;
 		this.datatype = datatype;
-		this.value = value;
 	}
-
 	public String getName() {
 		return name;
 	}
@@ -72,10 +68,6 @@ public class Condition  implements Serializable {
 	public void setDatatype(String datatype) {
 		this.datatype = datatype;
 	}
-	public String getValue() {
-		return value;
-	}
-	public void setValue(String value) {
-		this.value = value;
-	}		
-}
+	
+	
+ }

@@ -1,21 +1,21 @@
-package org.generationcp.middleware.domain.fieldbook.settings;
+package org.generationcp.middleware.pojos.workbench.settings;
 
 import java.io.Serializable;
 
-public class Variate  implements Serializable {
+public class Factor  implements Serializable {
 	private String name;
 	private String description;
 	private String property;
 	private String scale;
 	private String method;
 	private String role;
-	private String datatype;	
+	private String datatype;
 	
-	public Variate(){
+	public Factor(){
 		super();
 	}
 	
-	public Variate(String name, String description, String property,
+	public Factor(String name, String description, String property,
 			String scale, String method, String role, String datatype) {
 		super();
 		this.name = name;
