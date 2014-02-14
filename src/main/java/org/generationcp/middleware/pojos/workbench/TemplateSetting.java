@@ -129,6 +129,11 @@ public class TemplateSetting implements Serializable{
     public Boolean isDefault() {
        return isDefault > 0 ? true : false;
    }
+    
+    //mainly use to set the default to null so we can search all
+    public void setIsDefaultToNull(){
+    	isDefault = null;
+    }
 
 
     @Override

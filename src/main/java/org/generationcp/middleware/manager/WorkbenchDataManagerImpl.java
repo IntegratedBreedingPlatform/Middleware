@@ -1755,8 +1755,10 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
         try {
             trans = session.beginTransaction();
-            List<TemplateSetting> settings = getTemplateSettings(
-                                            new TemplateSetting(id, null, null, null, null, null));
+            TemplateSetting templateSettingsFilter = new TemplateSetting(id, null, null, null, null, null);
+            templateSettingsFilter.setIsDefaultToNull();
+            List<TemplateSetting> settings = getTemplateSettings(templateSettingsFilter);
+            
             if (settings.size() == 1){
                 getTemplateSettingDao().makeTransient(settings.get(0));
             } else {
