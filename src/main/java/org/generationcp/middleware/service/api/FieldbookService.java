@@ -294,4 +294,13 @@ public interface FieldbookService {
      */
     List<ValueReference> getDistinctStandardVariableValues(String property, String scale, String method, PhenotypicType role) 
     		throws MiddlewareQueryException;
+    
+    /**
+     * Get a standard variable given an id
+     * 
+     * @param id
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    StandardVariable getStandardVariable(int id) throws MiddlewareQueryException;
 }
