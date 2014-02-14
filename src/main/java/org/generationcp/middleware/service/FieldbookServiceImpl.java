@@ -408,7 +408,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         List<UserDefinedField> fields = getUserDefinedFieldDao().getByTableNameAndNameLike("LISTNMS", "%Nursery%");
 
         for (UserDefinedField field : fields){
-            NurseryType type = new NurseryType(field.getFldno(), field.getFname(), field.getFdesc());
+            NurseryType type = new NurseryType(field.getFldno(), field.getFname(), field.getFcode(), field.getFdesc());
             nurseryTypes.add(type);
         }
         return nurseryTypes;
