@@ -1037,13 +1037,50 @@ public interface WorkbenchDataManager {
     
     
     /**
-     * Returns the correspoding workbench user id 
+     * Returns the correspoding workbench user id.
      *
-     * @param workbenchUserId - the specified Workbench User ID
+     * @param ibdbUserId the ibdb user id
      * @param projectId - the specified Project ID
      * @return Returns the IBDB User ID associated with the specified Workbench User ID and Project ID.
      * Returns null when there is no IBDB User ID matching the specified Workbench User ID and Project ID.
      * @throws MiddlewareQueryException the middleware query exception
      */
     Integer getWorkbenchUserId(Integer ibdbUserId, Long projectId) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Gets the template settings.
+     *
+     * @param templateSettingFilter the template setting filter
+     * @return the template settings
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<TemplateSetting> getTemplateSettings(TemplateSetting templateSettingFilter) throws MiddlewareQueryException;
+
+    /**
+     * Adds the template setting.
+     *
+     * @param templateSetting the template setting
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    void addTemplateSetting(TemplateSetting templateSetting) throws MiddlewareQueryException;
+
+    /**
+     * Update template setting.
+     *
+     * @param templateSetting the template setting
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    void updateTemplateSetting(TemplateSetting templateSetting) throws MiddlewareQueryException;
+        
+    /**
+     * Delete template setting.
+     *
+     * @param templateSetting the template setting
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    void deleteTemplateSetting(TemplateSetting templateSetting) throws MiddlewareQueryException;
+
+        
+    
 }

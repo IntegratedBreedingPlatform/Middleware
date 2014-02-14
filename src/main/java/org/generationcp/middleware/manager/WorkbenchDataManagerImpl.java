@@ -63,6 +63,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     private ProjectBackupDAO projectBackupDao;
     private WorkbenchSidebarCategoryDAO workbenchSidebarCategoryDAO;
     private WorkbenchSidebarCategoryLinkDAO workbenchSidebarCategoryLinkDAO;
+    private TemplateSettingDAO templateSettingDAO;
 
     private String installationDirectory;
     
@@ -144,9 +145,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         projectUserMysqlAccountDao.setSession(getCurrentSession());
         return projectUserMysqlAccountDao;
     }
-    
-    
-    
     
     
     @Override
@@ -272,6 +270,31 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         }
         projectBackupDao.setSession(getCurrentSession());
         return projectBackupDao;
+    }
+
+
+    private WorkbenchSidebarCategoryDAO getWorkbenchSidebarCategoryDao() {
+        if (workbenchSidebarCategoryDAO == null){
+            workbenchSidebarCategoryDAO = new WorkbenchSidebarCategoryDAO();
+        }
+        workbenchSidebarCategoryDAO.setSession(getCurrentSession());
+        return workbenchSidebarCategoryDAO;
+    }
+
+    private WorkbenchSidebarCategoryLinkDAO getWorkbenchSidebarCategoryLinkDao() {
+        if (workbenchSidebarCategoryLinkDAO == null){
+            workbenchSidebarCategoryLinkDAO = new WorkbenchSidebarCategoryLinkDAO();
+        }
+        workbenchSidebarCategoryLinkDAO.setSession(getCurrentSession());
+        return workbenchSidebarCategoryLinkDAO;
+    }
+
+    private TemplateSettingDAO getTemplateSettingDao() {
+        if (templateSettingDAO == null){
+            templateSettingDAO = new TemplateSettingDAO();
+        }
+        templateSettingDAO.setSession(getCurrentSession());
+        return templateSettingDAO;
     }
 
     private void rollbackTransaction(Transaction trans){
@@ -1652,14 +1675,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         return getWorkbenchSidebarCategoryDao().getAll();
     }
 
-    private WorkbenchSidebarCategoryDAO getWorkbenchSidebarCategoryDao() {
-        if (workbenchSidebarCategoryDAO == null){
-            workbenchSidebarCategoryDAO = new WorkbenchSidebarCategoryDAO();
-        }
-        workbenchSidebarCategoryDAO.setSession(getCurrentSession());
-        return workbenchSidebarCategoryDAO;
-    }
-
     @Override
     public List<WorkbenchSidebarCategoryLink> getAllWorkbenchSidebarLinks() throws MiddlewareQueryException {
         return getWorkbenchSidebarCategoryLinkDao().getAll();
@@ -1670,14 +1685,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         return getWorkbenchSidebarCategoryLinkDao().getAllWorkbenchSidebarLinksByCategoryId(category,0,Integer.MAX_VALUE);
     }
 
-    private WorkbenchSidebarCategoryLinkDAO getWorkbenchSidebarCategoryLinkDao() {
-        if (workbenchSidebarCategoryLinkDAO == null){
-            workbenchSidebarCategoryLinkDAO = new WorkbenchSidebarCategoryLinkDAO();
-        }
-        workbenchSidebarCategoryLinkDAO.setSession(getCurrentSession());
-        return workbenchSidebarCategoryLinkDAO;
-    }
-
     public String getInstallationDirectory() {
         return installationDirectory;
     }
@@ -1685,4 +1692,60 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     public void setInstallationDirectory(String installationDirectory) {
         this.installationDirectory = installationDirectory;
     }
+    
+    @Override
+    public List<TemplateSetting> getTemplateSettings(TemplateSetting templateSettingFilter) throws MiddlewareQueryException{
+        return getTemplateSettingDao().get(templateSettingFilter);        
+    }
+    
+    @Override
+    public void addTemplateSetting(TemplateSetting templateSetting) throws MiddlewareQueryException{
+        Session session = getCurrentSession();
+        Transaction trans = null;
+
+        try {
+            trans = session.beginTransaction();
+            getTemplateSettingDao().saveOrUpdate(templateSetting);
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered while adding Template Setting: " +
+                    "WorkbenchDataManager.addTemplateSetting(templateSetting=" + templateSetting + "): " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void updateTemplateSetting(TemplateSetting templateSetting) throws MiddlewareQueryException{
+        Transaction trans = null;
+        Session session = getCurrentSession();
+        
+        try {
+            trans = session.beginTransaction();
+            getTemplateSettingDao().merge(templateSetting);
+
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Cannot save TemplateSeting: WorkbenchDataManager.updateTemplateSetting(templateSetting=" 
+                    + templateSetting + "): " + e.getMessage(), e);
+        }
+    }
+    
+    @Override
+    public void deleteTemplateSetting(TemplateSetting templateSetting) throws MiddlewareQueryException{
+        Transaction trans = null;
+        Session session = getCurrentSession();
+
+        try {
+            trans = session.beginTransaction();
+            getTemplateSettingDao().makeTransient(templateSetting);
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Cannot delete TemplateSetting: WorkbenchDataManager.deleteTemplateSetting(templateSetting=" 
+                    + templateSetting + "): " + e.getMessage(), e);
+        }
+
+    }
+    
 }

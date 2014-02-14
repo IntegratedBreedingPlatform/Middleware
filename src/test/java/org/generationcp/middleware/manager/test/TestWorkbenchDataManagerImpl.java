@@ -12,6 +12,9 @@
 
 package org.generationcp.middleware.manager.test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.*;
 
 import org.junit.Assert;
@@ -37,6 +40,7 @@ import org.generationcp.middleware.pojos.workbench.ProjectLocationMap;
 import org.generationcp.middleware.pojos.workbench.ProjectMethod;
 import org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount;
 import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
+import org.generationcp.middleware.pojos.workbench.TemplateSetting;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSetting;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
@@ -1089,7 +1093,7 @@ public class TestWorkbenchDataManagerImpl{
         }
     }
 
-  @Test
+    @Test
     public void testSaveProject() throws MiddlewareQueryException {
       Project project1 = new Project();
 
@@ -1231,12 +1235,132 @@ public class TestWorkbenchDataManagerImpl{
 
     }
 
+    @SuppressWarnings("unused")
     private void deleteAllProjects() throws MiddlewareQueryException {
         List<Project> projects = manager.getProjects();
         for (Project project : projects) {
             deleteProject(project);
         }
     }
+    
+
+    @Test
+    public void testGetTemplateSettings() throws MiddlewareQueryException {
+        
+        TemplateSetting templateSetting = createTemplateSetting();
+
+        manager.addTemplateSetting(templateSetting);
+        Debug.println(3, "Added TemplateSetting: " + templateSetting);
+        
+        Integer projectId = templateSetting.getProjectId();
+        String name = templateSetting.getName();
+        Tool tool = templateSetting.getTool();
+        String configuration = templateSetting.getConfiguration();
+        Boolean isDefault = templateSetting.isDefault();
+
+        getTemplateSetting("project_id, name, tool, configuration", new TemplateSetting(null, projectId, name, tool, configuration, null));
+        getTemplateSetting("project_id, tool, name", new TemplateSetting(null, projectId, name, tool, null, null));
+        getTemplateSetting("project_id, tool, configuration", new TemplateSetting(null, projectId, null, tool, configuration, null));
+        getTemplateSetting("project_id, tool, isDefault", new TemplateSetting(null, projectId, null, tool, null, isDefault));
+        getTemplateSetting("name, tool, configuration", new TemplateSetting(null, null, name, tool, configuration, null));
+        
+        manager.deleteTemplateSetting(templateSetting);
+        Debug.println(3, "Database cleanup: templateSetting deleted.");
+
+
+    }
+    
+    private void getTemplateSetting(String filterDescription, TemplateSetting templateSettingFilter) throws MiddlewareQueryException{
+
+        List<TemplateSetting> settings = manager.getTemplateSettings(templateSettingFilter);
+        
+        assertTrue(settings.size() > 0);
+        
+        Debug.println(3, "Retrieve records by " + filterDescription + ": #records = " + settings.size());
+        for (TemplateSetting setting : settings){
+            Debug.println(6, setting.toString());
+        }
+
+    }
+    
+    
+    @Test
+    public void testAddAndDeleteTemplateSettings() throws MiddlewareQueryException {
+
+        TemplateSetting templateSetting = createTemplateSetting();
+
+        manager.addTemplateSetting(templateSetting);
+        Debug.println(3, "testAddTemplateSettings: " + templateSetting);
+        
+        assertNotNull(templateSetting.getTemplateSettingId());
+        
+        manager.deleteTemplateSetting(templateSetting);
+        Debug.println(3, "testDeleteTemplateSettings: " + templateSetting);
+    }
+    
+
+    
+    @Test
+    public void testUpdateTemplateSettings() throws MiddlewareQueryException {
+
+        TemplateSetting templateSetting = createTemplateSetting();
+
+        manager.addTemplateSetting(templateSetting);
+        Debug.println(3, "TemplateSetting added: " + templateSetting);
+        
+        assertNotNull(templateSetting.getTemplateSettingId());
+        
+        templateSetting.setIsDefault(!templateSetting.isDefault());
+        templateSetting.setName(templateSetting.getName() + (int) (Math.random() * 100));
+        
+        manager.updateTemplateSetting(templateSetting);
+        Debug.println(3, "TemplateSetting updated: " + templateSetting);
+        
+        manager.deleteTemplateSetting(templateSetting);
+        Debug.println(3, "Database cleanup: templateSetting deleted.");
+
+    }
+    
+    
+    private TemplateSetting createTemplateSetting() throws MiddlewareQueryException{
+        Integer templateSettingId = null;
+        Integer projectId = -1; 
+        Tool tool = manager.getToolWithName("nursery_manager_fieldbook_web"); 
+        String name = "S9801-PLOT DATA_" + (int) (Math.random() * 1000); 
+        String configuration = (new StringBuffer("<?xml version=\"1.0\"?>")
+                .append("<dataset>")
+                .append("<name>").append(name).append("</name>                        ")
+                .append("<description>PLOT DATA FOR STUDY 1 OF 1998</description>  ")
+                .append("<condition role=\"Study Information\" datatype=\"Character Variable\">")
+                .append("<name>PI</name>")
+                .append("<description>PRINCIPAL INVESTIGATOR</description>")
+                .append("<property>PERSON</property>")
+                .append("<method>ASSIGNED</method>")
+                .append("        <scale>DBCV</scale>")
+                .append("    </condition>")
+                .append("    <factor role=\"Trial design information\" datatype=\"Numeric variable\">")
+                .append("        <name>PLOT</name>")
+                .append("        <description>PLOT NUMBER</description>")
+                .append("        <property>PLOT NUMBER</property>")
+                .append("        <method>ENUMERATED</method>")
+                .append("        <scale>NUMBER</scale>")
+                .append("        <nestedin></nestedin>")
+                .append("    </factor>")
+                .append("    <variate role=\"Observational variate\" datatype=\"Numeric variable\">")
+                .append("        <name>YIELD</name>")
+                .append("        <description>GRAIN YIELD</description>")
+                .append("        <property>GRAIN YIELD</property>")
+                .append("        <method>PADDY RICE</method>")
+                .append("        <scale>kg/ha</scale>")
+                .append("        <samplelevel>PLOT</samplelevel>")
+                .append("    </variate>")
+                .append("</dataset>")).toString();
+        Boolean isDefault = false;
+        
+        return new TemplateSetting(templateSettingId, projectId, name, tool, configuration, isDefault);
+    }
+
+    
 
     @AfterClass
     public static void tearDown() throws Exception {
