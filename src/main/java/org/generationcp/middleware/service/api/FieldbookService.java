@@ -281,4 +281,17 @@ public interface FieldbookService {
      * @throws MiddlewareQueryException
      */
     Set<StandardVariable> getAllStandardVariables() throws MiddlewareQueryException;
+    
+    /**
+     * Get all distinct values given the PSMR combination.
+     * 
+     * @param property
+     * @param scale
+     * @param method
+     * @param role
+     * @return
+     * @throws MiddlewareQueryException
+     */
+    List<ValueReference> getDistinctStandardVariableValues(String property, String scale, String method, PhenotypicType role) 
+    		throws MiddlewareQueryException;
 }

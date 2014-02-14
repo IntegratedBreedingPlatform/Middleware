@@ -375,6 +375,17 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     }
     
     @Override
+    public List<ValueReference> getDistinctStandardVariableValues(String property, String scale, String method, PhenotypicType role) 
+    		throws MiddlewareQueryException {
+    	
+    	Integer stdVarId = getStandardVariableIdByPropertyScaleMethodRole(property, scale, method, role);
+    	if (stdVarId != null) {
+    		return getValueReferenceBuilder().getDistinctStandardVariableValues(stdVarId);
+    	}
+    	return new ArrayList<ValueReference>();
+    }
+
+    @Override
     public Set<StandardVariable> getAllStandardVariables() throws MiddlewareQueryException {
     	return getOntologyDataManager().getAllStandardVariables();
     }
