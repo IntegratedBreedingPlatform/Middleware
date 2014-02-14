@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.generationcp.middleware.domain.dms.NurseryType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementData;
@@ -38,6 +39,7 @@ import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.service.ServiceFactory;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
@@ -387,6 +389,28 @@ public class TestFieldbookServiceImpl {
         return  new GermplasmListData(null, null, Integer.valueOf(2), 1, "EntryCode", "SeedSource",
                 "Germplasm Name 3", "GroupName", 0, 99992);
     }
+    
+    
+    @Test
+    public void testGetAllNurseryTypes() throws MiddlewareQueryException {
+            List<NurseryType> nurseryTypes = fieldbookService.getAllNurseryTypes();
+            
+            for (NurseryType type : nurseryTypes){
+                Debug.println(3, type.toString());
+            }
+            Debug.println(3, "NUMBER OF RECORDS: " + nurseryTypes.size());
+    }
+    
+    @Test
+    public void testGetAllPersons() throws MiddlewareQueryException {
+            List<Person> persons = fieldbookService.getAllPersons();
+            
+            for (Person person : persons){
+                Debug.println(3, person.toString());
+            }
+            Debug.println(3, "NUMBER OF RECORDS: " + persons.size());
+    }
+    
     
     @After
     public void afterEachTest() {

@@ -38,8 +38,26 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer>{
 	            return criteria.list();
         	}
         } catch (HibernateException e) {
-            logAndThrowException("Error with getByFieldTableNameAndType(name=" + tableName+" type= "+fieldType+ " ) query from Location: "
+            logAndThrowException("Error with getByFieldTableNameAndType(name=" + tableName+" type= "+fieldType+ " ) query from UserDefinedField: "
                     + e.getMessage(), e);
+        }
+        return new ArrayList<UserDefinedField>();
+    }
+
+
+    @SuppressWarnings("unchecked")
+    public List<UserDefinedField> getByTableNameAndNameLike(String tableName, String nameLike) throws MiddlewareQueryException {
+        try {
+            if (tableName != null && nameLike != null){
+                Criteria criteria = getSession().createCriteria(UserDefinedField.class);
+                criteria.add(Restrictions.eq("ftable", tableName));
+                criteria.add(Restrictions.like("fname", nameLike));
+                criteria.addOrder(Order.asc("fname"));
+                return criteria.list();
+            }
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getByTableNameAndNameLike(name=" + tableName 
+                    + " nameLike= " + nameLike + " ) query from UserDefinedField: " + e.getMessage(), e);
         }
         return new ArrayList<UserDefinedField>();
     }

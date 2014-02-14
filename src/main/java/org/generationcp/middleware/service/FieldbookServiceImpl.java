@@ -22,6 +22,7 @@ import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.NurseryType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
@@ -45,6 +46,8 @@ import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.hibernate.Session;
@@ -394,4 +397,26 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     public StandardVariable getStandardVariable(int id) throws MiddlewareQueryException {
     	return getOntologyDataManager().getStandardVariable(id);
     }
+    
+    @Override
+    public List<NurseryType> getAllNurseryTypes() throws MiddlewareQueryException{
+        
+        setWorkingDatabase(Database.CENTRAL);
+
+        List<NurseryType> nurseryTypes = new ArrayList<NurseryType>();
+
+        List<UserDefinedField> fields = getUserDefinedFieldDao().getByTableNameAndNameLike("LISTNMS", "%Nursery%");
+
+        for (UserDefinedField field : fields){
+            NurseryType type = new NurseryType(field.getFldno(), field.getFname(), field.getFdesc());
+            nurseryTypes.add(type);
+        }
+        return nurseryTypes;
+    }
+    
+    public List<Person> getAllPersons() throws MiddlewareQueryException {
+        return getUserDataManager().getAllPersons();
+    }
+    
+    
 }

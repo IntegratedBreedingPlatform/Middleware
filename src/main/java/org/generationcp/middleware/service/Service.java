@@ -17,10 +17,12 @@ import org.generationcp.middleware.manager.GermplasmDataManagerImpl;
 import org.generationcp.middleware.manager.GermplasmListManagerImpl;
 import org.generationcp.middleware.manager.OntologyDataManagerImpl;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
+import org.generationcp.middleware.manager.UserDataManagerImpl;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.operation.builder.ValueReferenceBuilder;
 import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.operation.saver.PhenotypeSaver;
@@ -66,6 +68,10 @@ public abstract class Service extends DatabaseBroker {
         return new GermplasmListManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
     }
     
+    protected final UserDataManager getUserDataManager() {
+        return new UserDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+    }
+
     protected final WorkbookBuilder getWorkbookBuilder() {
         return new WorkbookBuilder(sessionProviderForLocal, sessionProviderForCentral);
     }

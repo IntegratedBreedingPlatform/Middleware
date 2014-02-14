@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.NurseryType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
@@ -31,7 +32,9 @@ import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.Person;
 
+// TODO: Auto-generated Javadoc
 /**
  * This is the API for Fieldbook requirements.
  * 
@@ -231,76 +234,95 @@ public interface FieldbookService {
     
     /**
      * Used for retrieving the Cimmyt Wheat Germplasm name.
-     * 
-     * @param gid
-     * @return
-     * @throws MiddlewareQueryException
+     *
+     * @param gid the gid
+     * @return the cimmyt wheat germplasm name by gid
+     * @throws MiddlewareQueryException the middleware query exception
      */
     String getCimmytWheatGermplasmNameByGid(int gid) throws MiddlewareQueryException;
 
     /**
      * Used for retrieving the breeding method id given a method id.
-     * 
-     * @param mid
-     * @return
-     * @throws MiddlewareQueryException
+     *
+     * @param mid the mid
+     * @return the breeding method by id
+     * @throws MiddlewareQueryException the middleware query exception
      */
     Method getBreedingMethodById(int mid) throws MiddlewareQueryException;
     
-    /** 
+    /**
      * Used for retrieving the germplasm given a germplasm id.
-     * 
-     * @param gid
-     * @return
-     * @throws MiddlewareQueryException
+     *
+     * @param gid the gid
+     * @return the germplasm by gid
+     * @throws MiddlewareQueryException the middleware query exception
      */
     Germplasm getGermplasmByGID(int gid) throws MiddlewareQueryException;
     
     /**
      * Get germplasm list by name.
-     * 
-     * @param name
-     * @return
-     * @throws MiddlewareQueryException
+     *
+     * @param name the name
+     * @return the germplasm list by name
+     * @throws MiddlewareQueryException the middleware query exception
      */
     GermplasmList getGermplasmListByName(String name) throws MiddlewareQueryException;
     
     /**
      * Get All distinct values given a standard variable id.
-     * 
-     * @param stdVarId
-     * @return
-     * @throws MiddlewareQueryException
+     *
+     * @param stdVarId the std var id
+     * @return the distinct standard variable values
+     * @throws MiddlewareQueryException the middleware query exception
      */
     List<ValueReference> getDistinctStandardVariableValues(int stdVarId) throws MiddlewareQueryException;
     
     /**
      * Get all standard variables.
-     * 
-     * @return
-     * @throws MiddlewareQueryException
+     *
+     * @return the all standard variables
+     * @throws MiddlewareQueryException the middleware query exception
      */
     Set<StandardVariable> getAllStandardVariables() throws MiddlewareQueryException;
     
     /**
      * Get all distinct values given the PSMR combination.
-     * 
-     * @param property
-     * @param scale
-     * @param method
-     * @param role
-     * @return
-     * @throws MiddlewareQueryException
+     *
+     * @param property the property
+     * @param scale the scale
+     * @param method the method
+     * @param role the role
+     * @return the distinct standard variable values
+     * @throws MiddlewareQueryException the middleware query exception
      */
     List<ValueReference> getDistinctStandardVariableValues(String property, String scale, String method, PhenotypicType role) 
     		throws MiddlewareQueryException;
     
     /**
-     * Get a standard variable given an id
-     * 
-     * @param id
-     * @return
-     * @throws MiddlewareQueryException
+     * Get a standard variable given an id.
+     *
+     * @param id the id
+     * @return the standard variable
+     * @throws MiddlewareQueryException the middleware query exception
      */
     StandardVariable getStandardVariable(int id) throws MiddlewareQueryException;
+    
+    
+    /**
+     * Gets the all nursery types.
+     *
+     * @return the all nursery types
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<NurseryType> getAllNurseryTypes() throws MiddlewareQueryException;
+    
+    /**
+     * Gets the all persons.
+     *
+     * @return the all persons
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    List<Person> getAllPersons() throws MiddlewareQueryException;
+    
+
 }
