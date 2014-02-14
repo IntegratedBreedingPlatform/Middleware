@@ -9,7 +9,17 @@ public class Dataset implements Serializable {
 	private List<Factor> factors;
 	private List<Variate> variates;
 	
-	
+	public Dataset(){
+		super();
+	}
+	public Dataset(String name, List<Condition> conditions,
+			List<Factor> factors, List<Variate> variates) {
+		super();
+		this.name = name;
+		this.conditions = conditions;
+		this.factors = factors;
+		this.variates = variates;
+	}
 	public String getName() {
 		return name;
 	}

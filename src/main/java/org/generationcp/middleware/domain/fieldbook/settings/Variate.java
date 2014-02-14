@@ -9,8 +9,23 @@ public class Variate  implements Serializable {
 	private String scale;
 	private String method;
 	private String role;
-	private String datatype;
+	private String datatype;	
 	
+	public Variate(){
+		super();
+	}
+	
+	public Variate(String name, String description, String property,
+			String scale, String method, String role, String datatype) {
+		super();
+		this.name = name;
+		this.description = description;
+		this.property = property;
+		this.scale = scale;
+		this.method = method;
+		this.role = role;
+		this.datatype = datatype;
+	}
 	public String getName() {
 		return name;
 	}

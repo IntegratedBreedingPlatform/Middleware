@@ -12,6 +12,24 @@ public class Condition  implements Serializable {
 	private String datatype;
 	private String value;
 	
+	public Condition(){
+		super();
+	}
+	
+	public Condition(String name, String description, String property,
+			String scale, String method, String role, String datatype,
+			String value) {
+		super();
+		this.name = name;
+		this.description = description;
+		this.property = property;
+		this.scale = scale;
+		this.method = method;
+		this.role = role;
+		this.datatype = datatype;
+		this.value = value;
+	}
+
 	public String getName() {
 		return name;
 	}
