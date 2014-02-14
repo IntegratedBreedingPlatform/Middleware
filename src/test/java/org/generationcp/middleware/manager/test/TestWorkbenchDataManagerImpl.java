@@ -1299,6 +1299,19 @@ public class TestWorkbenchDataManagerImpl{
     }
     
 
+    @Test
+    public void testDeleteTemplateSettingById() throws MiddlewareQueryException {
+
+        TemplateSetting templateSetting = createTemplateSetting();
+
+        manager.addTemplateSetting(templateSetting);
+        Debug.println(3, "TemplateSetting Added: " + templateSetting);
+        
+        assertNotNull(templateSetting.getTemplateSettingId());
+        
+        manager.deleteTemplateSetting(templateSetting.getTemplateSettingId());
+        Debug.println(3, "TemplateSetting Deleted: " + templateSetting);
+    }
     
     @Test
     public void testUpdateTemplateSettings() throws MiddlewareQueryException {

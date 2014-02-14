@@ -1747,5 +1747,30 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         }
 
     }
-    
+
+    @Override
+    public void deleteTemplateSetting(Integer id) throws MiddlewareQueryException{
+        Transaction trans = null;
+        Session session = getCurrentSession();
+
+        try {
+            trans = session.beginTransaction();
+            List<TemplateSetting> settings = getTemplateSettings(
+                                            new TemplateSetting(id, null, null, null, null, null));
+            if (settings.size() == 1){
+                getTemplateSettingDao().makeTransient(settings.get(0));
+            } else {
+                logAndThrowException("Cannot delete TemplateSetting: WorkbenchDataManager.deleteTemplateSetting(id=" 
+                        + id + ")" );
+            }
+            
+            trans.commit();
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Cannot delete TemplateSetting: WorkbenchDataManager.deleteTemplateSetting(id=" 
+                    + id + "): " + e.getMessage(), e);
+        }
+
+    }
+
 }

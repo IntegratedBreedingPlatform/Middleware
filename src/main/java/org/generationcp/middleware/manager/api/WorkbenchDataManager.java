@@ -1051,7 +1051,7 @@ public interface WorkbenchDataManager {
     /**
      * Gets the template settings.
      *
-     * @param templateSettingFilter the template setting filter
+     * @param templateSettingFilter the template setting filter. Fill only the values to filter. Set all other values to null.
      * @return the template settings
      * @throws MiddlewareQueryException the middleware query exception
      */
@@ -1081,6 +1081,13 @@ public interface WorkbenchDataManager {
      */
     void deleteTemplateSetting(TemplateSetting templateSetting) throws MiddlewareQueryException;
 
-        
+    /**
+     * Delete template setting with the given id.
+     *
+     * @param templateSetting the template setting
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+    void deleteTemplateSetting(Integer id) throws MiddlewareQueryException;
+    
     
 }
