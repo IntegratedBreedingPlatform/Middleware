@@ -16,12 +16,14 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementData;
@@ -370,5 +372,10 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     @Override
     public List<ValueReference> getDistinctStandardVariableValues(int stdVarId) throws MiddlewareQueryException {
     	return getValueReferenceBuilder().getDistinctStandardVariableValues(stdVarId);
+    }
+    
+    @Override
+    public Set<StandardVariable> getAllStandardVariables() throws MiddlewareQueryException {
+    	return getOntologyDataManager().getAllStandardVariables();
     }
 }
