@@ -176,6 +176,9 @@ public enum TermId {
 	
 	//Advance Nursery
 	, PLANTS_SELECTED (8263)
+	
+	//Manage Settings
+	, NURSERY_TYPE (77777)
 	;
 	
 	private final int id;
