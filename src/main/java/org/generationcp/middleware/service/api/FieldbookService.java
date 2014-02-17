@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.DatasetReference;
-import org.generationcp.middleware.domain.dms.NurseryType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
@@ -34,7 +33,6 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
 
-// TODO: Auto-generated Javadoc
 /**
  * This is the API for Fieldbook requirements.
  * 
@@ -314,7 +312,7 @@ public interface FieldbookService {
      * @return the all nursery types
      * @throws MiddlewareQueryException the middleware query exception
      */
-    List<NurseryType> getAllNurseryTypes() throws MiddlewareQueryException;
+    List<ValueReference> getAllNurseryTypes() throws MiddlewareQueryException;
     
     /**
      * Gets the all persons.

@@ -22,7 +22,7 @@ import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
-import org.generationcp.middleware.domain.dms.NurseryType;
+import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
@@ -34,6 +34,7 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
@@ -47,7 +48,6 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.hibernate.Session;
@@ -399,18 +399,21 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     }
     
     @Override
-    public List<NurseryType> getAllNurseryTypes() throws MiddlewareQueryException{
+    public List<ValueReference> getAllNurseryTypes() throws MiddlewareQueryException{
         
         setWorkingDatabase(Database.CENTRAL);
 
-        List<NurseryType> nurseryTypes = new ArrayList<NurseryType>();
+        List<ValueReference> nurseryTypes = new ArrayList<ValueReference>();
 
-        List<UserDefinedField> fields = getUserDefinedFieldDao().getByTableNameAndNameLike("LISTNMS", "%Nursery%");
-
-        for (UserDefinedField field : fields){
-            NurseryType type = new NurseryType(field.getFldno(), field.getFname(), field.getFcode(), field.getFdesc());
-            nurseryTypes.add(type);
+        StandardVariable stdVar = getOntologyDataManager().getStandardVariable(TermId.NURSERY_TYPE.getId());
+        List<Enumeration> validValues = stdVar.getEnumerations();
+        
+        for (Enumeration value : validValues){
+            if (value != null){
+                nurseryTypes.add(new ValueReference(value.getId(), value.getName(), value.getDescription()));
+            }
         }
+        
         return nurseryTypes;
     }
     

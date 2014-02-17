@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.generationcp.middleware.domain.dms.NurseryType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementData;
@@ -393,9 +392,9 @@ public class TestFieldbookServiceImpl {
     
     @Test
     public void testGetAllNurseryTypes() throws MiddlewareQueryException {
-            List<NurseryType> nurseryTypes = fieldbookService.getAllNurseryTypes();
+            List<ValueReference> nurseryTypes = fieldbookService.getAllNurseryTypes();
             
-            for (NurseryType type : nurseryTypes){
+            for (ValueReference type : nurseryTypes){
                 Debug.println(3, type.toString());
             }
             Debug.println(3, "NUMBER OF RECORDS: " + nurseryTypes.size());
