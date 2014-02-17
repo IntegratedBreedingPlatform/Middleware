@@ -66,8 +66,7 @@ public class TemplateSettingDAO extends GenericDAO<TemplateSetting, Integer>{
     @SuppressWarnings("unchecked")
     public List<TemplateSetting> get(TemplateSetting filter) throws MiddlewareQueryException {
         List<TemplateSetting> settings = new ArrayList<TemplateSetting>();
-                
-        //TODO
+              
         try {
             Criteria criteria = getSession().createCriteria(TemplateSetting.class);
             

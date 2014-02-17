@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.manager.test;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -1334,7 +1335,58 @@ public class TestWorkbenchDataManagerImpl{
 
     }
     
-    
+    @Test
+    public void testAddTemplateSettingsSameIsDefaultProjectAndTool() throws MiddlewareQueryException {
+
+        TemplateSetting templateSetting1 = createTemplateSetting();
+        templateSetting1.setIsDefault(Boolean.TRUE);
+        
+        TemplateSetting templateSetting2 = createTemplateSetting();
+        templateSetting2.setIsDefault(Boolean.TRUE);
+
+        manager.addTemplateSetting(templateSetting1);
+        Debug.println(3, "TemplateSetting1 added: " + templateSetting1);
+        manager.addTemplateSetting(templateSetting2);
+        Debug.println(3, "TemplateSetting2 added: " + templateSetting2);
+        Debug.println(3, "TemplateSetting1 updated: " + templateSetting1);
+        
+        assertFalse(templateSetting1.isDefault());
+        assertTrue(templateSetting2.isDefault());
+
+        manager.deleteTemplateSetting(templateSetting1);
+        manager.deleteTemplateSetting(templateSetting2);
+        Debug.println(3, "Database cleanup: template settings deleted.");
+
+    }
+
+    @Test
+    public void testUpdateTemplateSettingsSameIsDefaultProjectAndTool() throws MiddlewareQueryException {
+
+        TemplateSetting templateSetting1 = createTemplateSetting();
+        templateSetting1.setIsDefault(Boolean.FALSE);
+        
+        TemplateSetting templateSetting2 = createTemplateSetting();
+        templateSetting2.setIsDefault(Boolean.TRUE);
+
+        manager.addTemplateSetting(templateSetting1);
+        Debug.println(3, "TemplateSetting1 added: " + templateSetting1);
+        manager.addTemplateSetting(templateSetting2);
+        Debug.println(3, "TemplateSetting2 added: " + templateSetting2);
+        
+        templateSetting1.setIsDefault(Boolean.TRUE);
+        manager.updateTemplateSetting(templateSetting1);
+        Debug.println(3, "TemplateSetting1 update: " + templateSetting1);
+        Debug.println(3, "TemplateSetting2 update: " + templateSetting2);
+        
+        assertTrue(templateSetting1.isDefault());
+        assertFalse(templateSetting2.isDefault());
+
+        manager.deleteTemplateSetting(templateSetting1);
+        manager.deleteTemplateSetting(templateSetting2);
+        Debug.println(3, "Database cleanup: template settings deleted.");
+
+    }
+
     private TemplateSetting createTemplateSetting() throws MiddlewareQueryException{
         Integer templateSettingId = null;
         Integer projectId = -1; 
@@ -1368,7 +1420,7 @@ public class TestWorkbenchDataManagerImpl{
                 .append("        <samplelevel>PLOT</samplelevel>")
                 .append("    </variate>")
                 .append("</dataset>")).toString();
-        Boolean isDefault = false;
+        Boolean isDefault = true;
         
         return new TemplateSetting(templateSettingId, projectId, name, tool, configuration, isDefault);
     }

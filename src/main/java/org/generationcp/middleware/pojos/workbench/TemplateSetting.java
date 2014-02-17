@@ -119,7 +119,9 @@ public class TemplateSetting implements Serializable{
     }
     
     public void setIsDefault(Boolean isDefault) {
-        if (isDefault != null && isDefault){
+        if (isDefault == null){
+            this.isDefault = null;
+        } else if (isDefault){
             this.isDefault = 1;
         } else {
             this.isDefault = 0;

@@ -1704,9 +1704,18 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         Transaction trans = null;
 
         try {
-            trans = session.beginTransaction();
-            getTemplateSettingDao().saveOrUpdate(templateSetting);
-            trans.commit();
+            
+            // Save if non-existing
+            if (getTemplateSettings(templateSetting).size() == 0){
+                trans = session.beginTransaction();
+                updateIsDefaultOfSameProjectAndToolTemplateSetting(templateSetting);            
+                getTemplateSettingDao().save(templateSetting);
+                trans.commit();
+            } else {
+                throw new MiddlewareQueryException("Template setting already exists.");
+            }
+            
+
         } catch (Exception e) {
             rollbackTransaction(trans);
             logAndThrowException("Error encountered while adding Template Setting: " +
@@ -1721,13 +1730,36 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         
         try {
             trans = session.beginTransaction();
-            getTemplateSettingDao().merge(templateSetting);
-
+            updateIsDefaultOfSameProjectAndToolTemplateSetting(templateSetting);
+            getTemplateSettingDao().merge(templateSetting); 
             trans.commit();
         } catch (Exception e) {
             rollbackTransaction(trans);
-            logAndThrowException("Cannot save TemplateSeting: WorkbenchDataManager.updateTemplateSetting(templateSetting=" 
+            logAndThrowException("Cannot update TemplateSeting: WorkbenchDataManager.updateTemplateSetting(templateSetting=" 
                     + templateSetting + "): " + e.getMessage(), e);
+        }
+    }
+
+    /** If the new template setting's isDefault == true, 
+     * set all others with the same project id and tool to isDefault = false
+     */
+    private void updateIsDefaultOfSameProjectAndToolTemplateSetting(
+           TemplateSetting templateSetting) throws MiddlewareQueryException{
+        if (templateSetting.isDefault()){
+            TemplateSetting templateSettingFilter = new TemplateSetting(null, templateSetting.getProjectId(), null, 
+                    templateSetting.getTool(), null, null);
+            
+            List<TemplateSetting> sameProjectAndToolSettings = getTemplateSettings(templateSettingFilter);
+            
+            if (sameProjectAndToolSettings.size() > 0){
+                for (TemplateSetting setting : sameProjectAndToolSettings){
+                    if (setting.getTemplateSettingId() != templateSetting.getTemplateSettingId() 
+                            && setting.isDefault()){
+                        setting.setIsDefault(Boolean.FALSE);
+                        getTemplateSettingDao().merge(setting);
+                    }
+                }
+            }
         }
     }
     
