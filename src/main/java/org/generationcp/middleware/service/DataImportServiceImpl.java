@@ -243,7 +243,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         Map<String, String> psmMap = new HashMap<String, String>();
 
         for (MeasurementVariable measurementVariable : workbookVariables) {
-            String temp = measurementVariable.getProperty().toLowerCase() + "-" + measurementVariable.getScale().toLowerCase() + "-" + measurementVariable.getMethod().toLowerCase();
+            String temp = measurementVariable.getProperty().toLowerCase() + "-" + measurementVariable.getScale().toLowerCase() + "-" + measurementVariable.getMethod().toLowerCase() + measurementVariable.getLabel();
             if (! psmMap.containsKey(temp)) {
                 psmMap.put(temp, measurementVariable.getName());
             } else {
