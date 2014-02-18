@@ -151,6 +151,16 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
         
         return null;
     }
+    
+    @Override
+    public GermplasmListData getGermplasmListDataByListIdAndLrecId(Integer listId, Integer lrecId) throws MiddlewareQueryException {
+    	
+        if (setWorkingDatabase(listId)) {
+            return getGermplasmListDataDAO().getByListIdAndLrecId(listId, lrecId);
+        }
+        
+        return null;
+    }
 
     @Override
     public List<GermplasmListData> getGermplasmListDataByGID(Integer gid, int start, int numOfRows) throws MiddlewareQueryException {
@@ -445,6 +455,12 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
     @Override
     public int deleteGermplasmListDataByListIdEntryId(Integer listId, Integer entryId) throws MiddlewareQueryException {
         GermplasmListData germplasmListData = getGermplasmListDataByListIdAndEntryId(listId, entryId);
+        return deleteGermplasmListData(germplasmListData);
+    }
+    
+    @Override
+    public int deleteGermplasmListDataByListIdLrecId(Integer listId, Integer lrecId) throws MiddlewareQueryException {
+        GermplasmListData germplasmListData = getGermplasmListDataByListIdAndLrecId(listId, lrecId);
         return deleteGermplasmListData(germplasmListData);
     }
 
