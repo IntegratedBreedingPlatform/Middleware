@@ -1699,7 +1699,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     }
     
     @Override
-    public void addTemplateSetting(TemplateSetting templateSetting) throws MiddlewareQueryException{
+    public Integer addTemplateSetting(TemplateSetting templateSetting) throws MiddlewareQueryException{
         Session session = getCurrentSession();
         Transaction trans = null;
 
@@ -1721,6 +1721,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
             logAndThrowException("Error encountered while adding Template Setting: " +
                     "WorkbenchDataManager.addTemplateSetting(templateSetting=" + templateSetting + "): " + e.getMessage(), e);
         }
+        return templateSetting.getTemplateSettingId();
     }
 
     @Override

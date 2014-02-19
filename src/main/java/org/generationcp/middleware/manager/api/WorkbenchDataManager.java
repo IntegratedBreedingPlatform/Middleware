@@ -1063,7 +1063,7 @@ public interface WorkbenchDataManager {
      * @param templateSetting the template setting
      * @throws MiddlewareQueryException the middleware query exception
      */
-    void addTemplateSetting(TemplateSetting templateSetting) throws MiddlewareQueryException;
+    Integer addTemplateSetting(TemplateSetting templateSetting) throws MiddlewareQueryException;
 
     /**
      * Update template setting.
