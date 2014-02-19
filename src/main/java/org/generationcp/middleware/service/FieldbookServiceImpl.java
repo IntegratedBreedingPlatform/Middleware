@@ -162,12 +162,16 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
+        
+        long startTime = System.currentTimeMillis();
 
         try {
             trans = session.beginTransaction();
             
             List<MeasurementVariable> variates = workbook.getVariates();
             List<MeasurementRow> observations = workbook.getObservations();
+            
+            int i = 0;
             
             if (variates != null){
                 for (MeasurementVariable variate : variates){
@@ -181,6 +185,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                                 }
                                 getPhenotypeSaver().saveOrUpdate((int) row.getExperimentId(), variate.getTermId(), 
                                             variate.getStoredIn(), field.getValue(), phenotype);
+
+                                i++;
+                                if ( i % JDBC_BATCH_SIZE == 0 ) {  //flush a batch of inserts and release memory
+                                    session.flush();
+                                    session.clear();
+                                }                                
                             }
                         }
                     }
@@ -192,6 +202,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
             rollbackTransaction(trans);
             logAndThrowException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e, LOG);
         }
+        
+        LOG.debug("========== saveMeasurementRows Duration (ms): " + ((System.currentTimeMillis() - startTime)/60));
+        
     }
 
 	@Override
@@ -252,6 +265,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         GermplasmDAO germplasmDao = getGermplasmDao();
         NameDAO nameDao = getNameDao();
         GermplasmListDAO germplasmListDao = getGermplasmListDAO();
+        
+        long startTime = System.currentTimeMillis();
 
         try {
             trans = session.beginTransaction();
@@ -261,6 +276,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
             germplasmList.setId(listId);
             germplasmListDao.save(germplasmList);
 
+            int i = 0;
 
             // Save germplasms, names, list data
             for (Germplasm germplasm : germplasms.keySet()) {
@@ -311,6 +327,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                 germplasmListData.setGid(germplasm.getGid());
                 germplasmListData.setList(germplasmList);
                 getGermplasmListDataDAO().save(germplasmListData);
+
+                i++;
+                if ( i % JDBC_BATCH_SIZE == 0 ) {  //flush a batch of inserts and release memory
+                    session.flush();
+                    session.clear();
+                }
                 
             }
 
@@ -322,6 +344,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         } finally {
             session.flush();
         }
+
+        LOG.debug("========== saveNurseryAdvanceGermplasmList Duration (ms): " + ((System.currentTimeMillis() - startTime)/60));
 
         return listId;
 
