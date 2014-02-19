@@ -243,6 +243,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                             , Map<Germplasm, GermplasmListData> listDataItems
                             , GermplasmList germplasmList)
             throws MiddlewareQueryException {
+        
         Session session = requireLocalDatabaseInstance();
         Transaction trans = null;
 
@@ -258,7 +259,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
             // Save germplasm list
             listId = germplasmListDao.getNegativeId("id");
             germplasmList.setId(listId);
-            germplasmListDao.saveOrUpdate(germplasmList);
+            germplasmListDao.save(germplasmList);
 
 
             // Save germplasms, names, list data
@@ -294,13 +295,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                         Integer nameId = nameDao.getNegativeId("nid");
                         name.setNid(nameId);
                         name.setGermplasmId(gId);
-                        nameDao.saveOrUpdate(name);
+                        nameDao.save(name);
                     }
                     
                     // Save germplasm
                     germplasm.setGid(gId);
                     germplasm.setLgid(Integer.valueOf(0));
-                    germplasmDao.saveOrUpdate(germplasm);
+                    germplasmDao.save(germplasm);
 
                 } 
                                
@@ -309,7 +310,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                 germplasmListData.setId(germplasmListDataId);
                 germplasmListData.setGid(germplasm.getGid());
                 germplasmListData.setList(germplasmList);
-                getGermplasmListDataDAO().saveOrUpdate(germplasmListData);
+                getGermplasmListDataDAO().save(germplasmListData);
                 
             }
 
@@ -321,6 +322,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         } finally {
             session.flush();
         }
+
         return listId;
 
     }
