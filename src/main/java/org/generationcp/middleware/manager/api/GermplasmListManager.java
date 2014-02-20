@@ -190,6 +190,16 @@ public interface GermplasmListManager{
      * @return List of GermplasmListData POJOs
      */
     GermplasmListData getGermplasmListDataByListIdAndEntryId(Integer listId, Integer entryId) throws MiddlewareQueryException;
+    
+    /**
+     * Returns the germplasm list entry which is identified by the given
+     * parameters.
+     * 
+     * @param listId
+     * @param entryId
+     * @return List of GermplasmListData POJOs
+     */
+    GermplasmListData getGermplasmListDataByListIdAndLrecId(Integer listId, Integer lrecId) throws MiddlewareQueryException;
 
     /**
      * Returns the germplasm list entries associated with the Germplasm
@@ -405,6 +415,22 @@ public interface GermplasmListManager{
      * @throws MiddlewareQueryException
      */
     int deleteGermplasmListDataByListIdEntryId(Integer listId, Integer entryId) throws MiddlewareQueryException;
+    
+    /**
+     * Removes the corresponding {@code GermplasmListData} record from the
+     * database given its List ID and Entry ID.
+     * 
+     * @param listId
+     *            - {@code GermplasmList} ID of the Germplasm List Data to be
+     *            deleted.
+     * @param lrecId
+     *            - {@code GermplasmListData} Entry ID of the Germplasm List
+     *            Data to be deleted.
+     * @return Returns the number of {@code GermplasmListData} records deleted
+     *         from the database.
+     * @throws MiddlewareQueryException
+     */
+    int deleteGermplasmListDataByListIdLrecId(Integer listId, Integer lrecId) throws MiddlewareQueryException;
 
     /**
      * Removes the corresponding {@code GermplasmListData} records from the

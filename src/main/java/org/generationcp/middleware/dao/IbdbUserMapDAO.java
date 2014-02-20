@@ -70,7 +70,6 @@ public class IbdbUserMapDAO extends GenericDAO<IbdbUserMap, Long>{
         return null;
     }
     
-    @SuppressWarnings("unchecked")
    	public IbdbUserMap getIbdbUserMapByUserAndProjectID(Integer workbenchUserId,Long projectId) throws MiddlewareQueryException {
            try {
            	if (projectId != null && workbenchUserId != null){

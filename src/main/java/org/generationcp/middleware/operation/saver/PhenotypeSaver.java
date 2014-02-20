@@ -21,6 +21,7 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentPhenotype;
 import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.util.DatabaseBroker;
 
 public class PhenotypeSaver extends Saver{
 
@@ -31,9 +32,14 @@ public class PhenotypeSaver extends Saver{
 
     public void savePhenotypes(ExperimentModel experimentModel, VariableList variates) throws MiddlewareQueryException {
         setWorkingDatabase(Database.LOCAL);
+        int i=0;
         if (variates != null && variates.getVariables() != null && variates.getVariables().size() > 0) {
             for (Variable variable : variates.getVariables()) {
                 save(experimentModel.getNdExperimentId(), variable);
+                if (i % DatabaseBroker.JDBC_BATCH_SIZE == 0){ // batch save
+                    getPhenotypeDao().flush();
+                    getPhenotypeDao().clear();
+                }
             }
         }
     }

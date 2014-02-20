@@ -102,6 +102,24 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
         }
         return null;
     }
+    
+    public GermplasmListData getByListIdAndLrecId(Integer listId, Integer lrecId) throws MiddlewareQueryException {
+        try {
+        	if (listId != null && lrecId != null){
+	            Criteria criteria = getSession().createCriteria(GermplasmListData.class);
+	            criteria.createAlias("list", "l");
+	            criteria.add(Restrictions.eq("l.id", listId));
+	            criteria.add(Restrictions.eq("id", lrecId));
+	            criteria.add(Restrictions.ne("status", STATUS_DELETED));
+	            criteria.addOrder(Order.asc("id"));
+	            return (GermplasmListData) criteria.uniqueResult();
+        	}
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getByListIdAndEntryId(listId=" + listId + ", lrecId=" + lrecId
+                    + ") query from GermplasmListData " + e.getMessage(), e);
+        }
+        return null;
+    }
 
     @SuppressWarnings("unchecked")
     public List<GermplasmListData> getByGID(Integer gid, int start, int numOfRows) throws MiddlewareQueryException {
