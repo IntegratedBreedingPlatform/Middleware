@@ -14,13 +14,28 @@ package org.generationcp.middleware.domain.dms;
 
 public class ValueReference extends Reference implements Comparable<ValueReference>{
 
+	private String key;
+	
     public ValueReference(int id, String name) {
         super.setId(id);
+        setKey(String.valueOf(id));
         super.setName(name);
+    }
+
+    public ValueReference(String key, String name) {
+        setKey(key);
+        super.setName(name);
+    }
+
+    public ValueReference(String key, String name, String description) {
+        setKey(key);
+        super.setName(name);
+        super.setDescription(description);
     }
 
     public ValueReference(int id, String name, String description) {
         super.setId(id);
+        setKey(String.valueOf(id));
         super.setName(name);
         super.setDescription(description);
     }
@@ -29,4 +44,18 @@ public class ValueReference extends Reference implements Comparable<ValueReferen
     public int compareTo(ValueReference o) {
         return getName().compareTo(o.getName());
     }
+
+	/**
+	 * @return the code
+	 */
+	public String getKey() {
+		return key;
+	}
+
+	/**
+	 * @param code the code to set
+	 */
+	public void setKey(String key) {
+		this.key = key;
+	}
 }

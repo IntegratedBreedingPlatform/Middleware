@@ -124,15 +124,15 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		List<ValueReference> results = new ArrayList<ValueReference>();
 		
 		try {
-			String sql = "SELECT DISTINCT type_id, value "
+			String sql = "SELECT DISTINCT value "
 					+ " FROM projectprop WHERE type_id = :stdVarId ";
 			Query query = getSession().createSQLQuery(sql);
 			query.setParameter("stdVarId", stdVarId);
 			
-			List<Object[]> list = query.list();
+			List<String> list = query.list();
 			if (list != null && !list.isEmpty()) {
-				for (Object[] row : list) {
-					results.add(new ValueReference((Integer) row[0], (String) row[1]));
+				for (String row : list) {
+					results.add(new ValueReference(row, row));
 				}
 			}
 			

@@ -15,11 +15,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Database;
+import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 
 public class ValueReferenceBuilder extends Builder {
 
@@ -33,11 +36,9 @@ public class ValueReferenceBuilder extends Builder {
 		List<ValueReference> list = new ArrayList<ValueReference>();
 		
 		setWorkingDatabase(stdVarId);
-		List<Integer> storedIns = getCvTermRelationshipDao().getObjectIdByTypeAndSubject(TermId.STORED_IN.getId(), stdVarId);
-		Integer storedIn = null;
-		if (storedIns != null && !storedIns.isEmpty()) {
-			storedIn = storedIns.get(0);
-		}
+		List<CVTermRelationship> relationships = getCvTermRelationshipDao().getBySubject(stdVarId);
+		Integer storedIn = getRelationshipValue(relationships, TermId.STORED_IN.getId());
+		Integer dataType = getRelationshipValue(relationships, TermId.HAS_TYPE.getId());
 		
 		//Currently only applicable to Study and Trial Environment variables
 		if (storedIn != null) {
@@ -67,6 +68,17 @@ public class ValueReferenceBuilder extends Builder {
 			}
 			else if (TermId.ALTITUDE_STORAGE.getId() == storedIn) {
 				list = getAltitudes();
+			}
+		}
+		
+		if (dataType != null && dataType == TermId.CATEGORICAL_VARIABLE.getId()) {
+			for (ValueReference ref : list) {
+				if (ref.getKey() != null && NumberUtils.isNumber(ref.getKey())) {
+					setWorkingDatabase(Integer.valueOf(ref.getKey()));
+					CVTerm term = getCvTermDao().getById(Integer.valueOf(ref.getKey()));
+					ref.setName(term.getName());
+					ref.setDescription(term.getDefinition());
+				}
 			}
 		}
 		
@@ -191,5 +203,16 @@ public class ValueReferenceBuilder extends Builder {
 		list.addAll(getGeolocationDao().getDistinctDatums());
 		
 		return list;
+	}
+	
+	private Integer getRelationshipValue(List<CVTermRelationship> relationships, int typeId) {
+		if (relationships != null && !relationships.isEmpty()) {
+			for (CVTermRelationship relationship : relationships) {
+				if (relationship.getTypeId().equals(typeId)) {
+					return relationship.getObjectId();
+				}
+			}
+		}
+		return null;
 	}
 }

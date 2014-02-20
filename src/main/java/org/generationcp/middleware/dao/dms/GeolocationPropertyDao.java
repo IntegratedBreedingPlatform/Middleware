@@ -55,10 +55,9 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 			query.setParameter("stdVarId", stdVarId);
 			
 			List<String> list = query.list();
-			int index = 1;
 			if (list != null && !list.isEmpty()) {
 				for (String row : list) {
-					results.add(new ValueReference(index++, row));
+					results.add(new ValueReference(row, row));
 				}
 			}
 			
