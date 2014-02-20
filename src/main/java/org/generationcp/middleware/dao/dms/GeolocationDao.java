@@ -495,10 +495,9 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			String sql = "SELECT DISTINCT altitude FROM nd_geolocation";
 			Query query = getSession().createSQLQuery(sql);
 			List<String> list = (List<String>) query.list();
-			int index = 1;
 			if(list != null && !list.isEmpty()) {
 				for (String row : list) {
-					results.add(new ValueReference(index++, row));
+					results.add(new ValueReference(row, row));
 				}
 			}
 						
@@ -517,10 +516,9 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			String sql = "SELECT DISTINCT geodetic_datum FROM nd_geolocation";
 			Query query = getSession().createSQLQuery(sql);
 			List<String> list = (List<String>) query.list();
-			int index = 1;
 			if(list != null && !list.isEmpty()) {
 				for (String row : list) {
-					results.add(new ValueReference(index++, row));
+					results.add(new ValueReference(row, row));
 				}
 			}
 						

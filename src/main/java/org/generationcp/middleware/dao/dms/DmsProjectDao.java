@@ -912,10 +912,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			String sql = "SELECT DISTINCT name FROM project ";
 			SQLQuery query = getSession().createSQLQuery(sql);
 			List<String> list = query.list();
-			int index = 1;
 			if (list != null && !list.isEmpty()) {
 				for (String row : list) {
-					results.add(new ValueReference(index++, row));
+					results.add(new ValueReference(row, row));
 				}
 			}
 		} catch(HibernateException e) {
@@ -931,10 +930,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			String sql = "SELECT DISTINCT description FROM project ";
 			SQLQuery query = getSession().createSQLQuery(sql);
 			List<String> list = query.list();
-			int index = 1;
 			if (list != null && !list.isEmpty()) {
 				for (String row : list) {
-					results.add(new ValueReference(index++, row));
+					results.add(new ValueReference(row, row));
 				}
 			}
 		} catch(HibernateException e) {
