@@ -91,4 +91,28 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 		}
 		return null;
 	}
+	
+	public Project getLastOpenedProjectAnyUser() throws MiddlewareQueryException {
+		try {
+			
+				StringBuilder sb = new StringBuilder();
+				sb.append("SELECT {w.*} FROM workbench_project w ")
+						.append("INNER JOIN workbench_project_user_info r ON w.project_id = r.project_id ")
+						.append("WHERE r.last_open_date IS NOT NULL ORDER BY r.last_open_date DESC LIMIT 1 ;");
+	
+				SQLQuery query = getSession().createSQLQuery(sb.toString());
+				query.addEntity("w", Project.class);
+
+	
+				@SuppressWarnings("unchecked")
+				List<Project> projectList = query.list();
+	
+				return projectList.size() > 0 ? projectList.get(0) : null;
+			
+		} catch (HibernateException e) {
+			logAndThrowException("Error with getLastOpenedProjectAnyUser("
+					 + ") query from Project " + e.getMessage(), e);
+		}
+		return null;
+	}
 }

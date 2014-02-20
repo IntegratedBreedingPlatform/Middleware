@@ -1088,6 +1088,22 @@ public interface WorkbenchDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
     void deleteTemplateSetting(Integer id) throws MiddlewareQueryException;
+
+    /**
+     * Returns the project last accessed regardless of user.
+     *
+     * @return the last Project opened by the given user
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+	Project getLastOpenedProjectAnyUser() throws MiddlewareQueryException;
+	
+	/**
+     * Detects whether the selected project in Workbench has changed
+     *
+     * @return True if the project has changed, otherwise false
+     * @throws MiddlewareQueryException the middleware query exception
+     */
+	Boolean isLastOpenedProjectChanged() throws MiddlewareQueryException;
     
     
 }

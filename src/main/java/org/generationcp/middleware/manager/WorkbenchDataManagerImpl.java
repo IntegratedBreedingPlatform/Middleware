@@ -37,6 +37,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
     private HibernateSessionProvider sessionProvider;
 
+    private Project currentlastOpenedProject;
+    
     private CropTypeDAO cropTypeDao;
     private IbdbUserMapDAO ibdbUserMapDao;
     private PersonDAO personDao;
@@ -1806,5 +1808,30 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
         }
 
     }
+    
+    @Override
+    public Project getLastOpenedProjectAnyUser() throws MiddlewareQueryException {
+        return getProjectDao().getLastOpenedProjectAnyUser();
+    }
+    
+    @Override
+    public Boolean isLastOpenedProjectChanged() throws MiddlewareQueryException {
+    	
+    	Project project = getProjectDao().getLastOpenedProjectAnyUser();
+    	
+    	if (currentlastOpenedProject == null){
+    		currentlastOpenedProject = project;
+    		return true;
+    	}
+    	
+    	if (currentlastOpenedProject.getProjectId().equals(project.getProjectId())){
+    		return false;
+    	}else{
+    		currentlastOpenedProject = project;
+    		return true;
+    	}
+    	
+    }
+    
 
 }
