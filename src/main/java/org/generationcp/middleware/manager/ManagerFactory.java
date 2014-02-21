@@ -33,6 +33,7 @@ import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
+import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.util.ResourceFinder;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
@@ -307,6 +308,10 @@ public class ManagerFactory implements Serializable {
     
     public UserDataManager getUserDataManager() {
         return new UserDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    public DataImportServiceImpl getDataImportService() throws ConfigException {
+        return new DataImportServiceImpl(sessionProviderForLocal, sessionProviderForCentral);
     }
 
     /**
