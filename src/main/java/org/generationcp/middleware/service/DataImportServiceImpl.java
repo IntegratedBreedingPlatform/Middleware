@@ -63,67 +63,67 @@ public class DataImportServiceImpl extends Service implements DataImportService 
     @SuppressWarnings("unchecked")
     @Override
     public int saveDataset(Workbook workbook, boolean retainValues) throws MiddlewareQueryException {
-          requireLocalDatabaseInstance();
-          Session session = getCurrentSessionForLocal();
-          Transaction trans = null;
-          Map<String, ?> variableMap = null;
-          TimerWatch timerWatch = new TimerWatch("saveDataset (grand total)", LOG);
-    
-          // Transaction 1 : Transform Variables and save new Ontology Terms
-          // Send : xls workbook
-          // Return : Map of 3 sub maps with transformed variables (ontology fully loaded) - here is how it was loaded : 
-          // -- headers : Strings
-          //         headerMap.put("trialHeaders", trialHeaders);
-          // -- variableTypeLists (VariableTypeList)
-          //          variableTypeMap.put("trialVariableTypeList", trialVariableTypeList);
-          //          variableTypeMap.put("trialVariables", trialVariables);
-          //          variableTypeMap.put("effectVariables", effectVariables);
-          // -- measurementVariables (List<MeasurementVariable>)
-          //          measurementVariableMap.put("trialMV", trialMV);
-          //          measurementVariableMap.put("effectMV", effectMV);
-    
-          try {
-    
-              trans = session.beginTransaction();
-              
-              variableMap = getWorkbookSaver().saveVariables(workbook);
-    
-              trans.commit();
-    
-          } catch (Exception e) {
-              rollbackTransaction(trans);
-              logAndThrowException("Error encountered with saveDataset(): " + e.getMessage(), e, LOG);
-    
-          } finally {
-              timerWatch.stop();
-          }
-    
-          // Transaction 2 : save data
-          // Send : Map of 3 sub maps, with data to create Dataset
-          // Receive int (success/fail)
-          Transaction trans2 = null;
-    
-          try {
-    
-              trans2 = session.beginTransaction();
-    
-              int studyId = getWorkbookSaver().saveDataset(workbook, variableMap, retainValues);
-    
-              trans2.commit();
-    
-              return studyId;
-    
-          } catch (Exception e) {
-              rollbackTransaction(trans2);
-              logAndThrowException("Error encountered with saveDataset(): " + e.getMessage(), e, LOG);
-    
-          } finally {
-              timerWatch.stop();
-          }
-    
-          return 0;
-      }
-  
+        requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+        Map<String, ?> variableMap = null;
+        TimerWatch timerWatch = new TimerWatch("saveDataset (grand total)", LOG);
+
+        // Transaction 1 : Transform Variables and save new Ontology Terms
+        // Send : xls workbook
+        // Return : Map of 3 sub maps with transformed variables (ontology fully loaded) - here is how it was loaded :
+        // -- headers : Strings
+        //         headerMap.put("trialHeaders", trialHeaders);
+        // -- variableTypeLists (VariableTypeList)
+        //          variableTypeMap.put("trialVariableTypeList", trialVariableTypeList);
+        //          variableTypeMap.put("trialVariables", trialVariables);
+        //          variableTypeMap.put("effectVariables", effectVariables);
+        // -- measurementVariables (List<MeasurementVariable>)
+        //          measurementVariableMap.put("trialMV", trialMV);
+        //          measurementVariableMap.put("effectMV", effectMV);
+
+        try {
+
+            trans = session.beginTransaction();
+
+            variableMap = getWorkbookSaver().saveVariables(workbook);
+
+            trans.commit();
+
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered with saveDataset(): " + e.getMessage(), e, LOG);
+
+        } finally {
+            timerWatch.stop();
+        }
+
+        // Transaction 2 : save data
+        // Send : Map of 3 sub maps, with data to create Dataset
+        // Receive int (success/fail)
+        Transaction trans2 = null;
+
+        try {
+
+            trans2 = session.beginTransaction();
+
+            int studyId = getWorkbookSaver().saveDataset(workbook, variableMap, retainValues);
+
+            trans2.commit();
+
+            return studyId;
+
+        } catch (Exception e) {
+            rollbackTransaction(trans2);
+            logAndThrowException("Error encountered with saveDataset(): " + e.getMessage(), e, LOG);
+
+        } finally {
+            timerWatch.stop();
+        }
+
+        return 0;
+    }
+
     @Override
     public Workbook parseWorkbook(File file) throws WorkbookParserException {
         WorkbookParser parser = new WorkbookParser();
@@ -186,8 +186,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         if (locationId != null) {//same location and study
             messages.add(new Message("error.duplicate.study.name"));
         } else {
-        	boolean isExisting = checkIfProjectNameIsExisting(studyName);
-        	//existing and is not a valid study
+            boolean isExisting = checkIfProjectNameIsExisting(studyName);
+            //existing and is not a valid study
             if (isExisting && getStudyId(studyName) == null) {
                 messages.add(new Message("error.duplicate.study.name"));
             }//else we will create a new study or append the data sets to the existing study
@@ -199,40 +199,51 @@ public class DataImportServiceImpl extends Service implements DataImportService 
     }
 
     private void checkForDuplicateVariableNames(OntologyDataManager ontologyDataManager, Workbook workbook, List<Message> messages) throws MiddlewareQueryException, WorkbookParserException {
-        List<MeasurementVariable> workbookVariables = workbook.getAllVariables();
+        List<List<MeasurementVariable>> workbookVariables = new ArrayList<List<MeasurementVariable>>();
+        workbookVariables.add(workbook.getConditions());
+        workbookVariables.add(workbook.getFactors());
+        workbookVariables.add(workbook.getConstants());
+        workbookVariables.add(workbook.getVariates());
         Map<String, MeasurementVariable> variableNameMap = new HashMap<String, MeasurementVariable>();
-        for (MeasurementVariable measurementVariable : workbookVariables) {
-            if (variableNameMap.containsKey(measurementVariable.getName())) {
-                MeasurementVariable var = variableNameMap.get(measurementVariable.getName());
-                messages.add(new Message("error.import.existing.standard.variable.name", measurementVariable.getName(), var.getProperty(),
-                                                var.getMethod(), var.getScale()));
-            } else {
-                variableNameMap.put(measurementVariable.getName(), measurementVariable);
-            }
+        for (List<MeasurementVariable> variableList : workbookVariables) {
 
-            StandardVariable standardVariable = ontologyDataManager.findStandardVariableByTraitScaleMethodNames(measurementVariable.getProperty(),
-                    measurementVariable.getScale(), measurementVariable.getMethod());
-            if (standardVariable == null) {
-                // if standard variable with PSM does not exist, no problem
-                Set<StandardVariable> variableSet = ontologyDataManager.findStandardVariablesByNameOrSynonym(measurementVariable.getName());
 
-                for (StandardVariable variable : variableSet) {
-                    if (variable.getName().equalsIgnoreCase(measurementVariable.getName())) {
-                        messages.add(new Message("error.import.existing.standard.variable.name", measurementVariable.getName(), variable.getProperty().getName(),
-                                variable.getMethod().getName(), variable.getScale().getName()));
-                    }
+            for (MeasurementVariable measurementVariable : variableList) {
+                if (variableNameMap.containsKey(measurementVariable.getName())) {
+                    MeasurementVariable var = variableNameMap.get(measurementVariable.getName());
+                    messages.add(new Message("error.import.existing.standard.variable.name", measurementVariable.getName(), var.getProperty(),
+                            var.getMethod(), var.getScale()));
+                } else {
+                    variableNameMap.put(measurementVariable.getName(), measurementVariable);
                 }
 
-            } else {
-                continue;
-            }
+                PhenotypicType type = (variableList == workbook.getVariates() ? PhenotypicType.VARIATE : PhenotypicType.getPhenotypicTypeForLabel(measurementVariable.getLabel()));
+                Integer varId = ontologyDataManager.getStandardVariableIdByPropertyScaleMethodRole(measurementVariable.getProperty(),
+                        measurementVariable.getScale(), measurementVariable.getMethod(), type);
 
+                if (varId == null) {
+
+                    Set<StandardVariable> variableSet = ontologyDataManager.findStandardVariablesByNameOrSynonym(measurementVariable.getName());
+
+                    for (StandardVariable variable : variableSet) {
+                        if (variable.getName().equalsIgnoreCase(measurementVariable.getName())) {
+                            messages.add(new Message("error.import.existing.standard.variable.name", measurementVariable.getName(), variable.getProperty().getName(),
+                                    variable.getMethod().getName(), variable.getScale().getName()));
+                        }
+                    }
+
+                } else {
+                    continue;
+                }
+
+            }
         }
 
         if (messages.size() > 0) {
             throw new WorkbookParserException(messages);
         }
     }
+
 
     private void checkForDuplicatePSMCombo(Workbook workbook, List<Message> messages) throws MiddlewareQueryException, WorkbookParserException {
         // GCP-6438
@@ -244,7 +255,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
         for (MeasurementVariable measurementVariable : workbookVariables) {
             String temp = measurementVariable.getProperty().toLowerCase() + "-" + measurementVariable.getScale().toLowerCase() + "-" + measurementVariable.getMethod().toLowerCase() + measurementVariable.getLabel();
-            if (! psmMap.containsKey(temp)) {
+            if (!psmMap.containsKey(temp)) {
                 psmMap.put(temp, measurementVariable.getName());
             } else {
                 messages.add(new Message("error.duplicate.psm", psmMap.get(temp), measurementVariable.getName()));
@@ -336,8 +347,12 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         MeasurementRow row = workbook.getObservations().get(0);
         List<MeasurementVariable> trialFactors = workbook.getTrialFactors();
         for (MeasurementVariable mvar : trialFactors) {
-            StandardVariable svar = ontology.findStandardVariableByTraitScaleMethodNames(mvar.getProperty(), mvar.getScale(), mvar.getMethod());
-            if (svar != null) {
+            PhenotypicType type = PhenotypicType.getPhenotypicTypeForLabel(mvar.getLabel());
+            Integer varId = ontology.getStandardVariableIdByPropertyScaleMethodRole(mvar.getProperty(), mvar.getScale(), mvar.getMethod(), type);
+
+
+            if (varId != null) {
+                StandardVariable svar = ontology.getStandardVariable(varId);
                 if (svar.getStoredIn() != null) {
                     if (svar.getStoredIn().getId() == TermId.TRIAL_INSTANCE_STORAGE.getId()) {
                         return row.getMeasurementDataValue(mvar.getName());
@@ -345,8 +360,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
                 }
             }
         }
-        if(workbook.isNursery()) {
-        	return "1";//GCP-7340, GCP-7346
+        if (workbook.isNursery()) {
+            return "1";//GCP-7340, GCP-7346
         }
         return null;
     }
@@ -368,9 +383,11 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
     private Boolean isEntryExists(OntologyDataManager ontology, List<MeasurementVariable> list) throws MiddlewareQueryException {
         for (MeasurementVariable mvar : list) {
+            PhenotypicType type = PhenotypicType.getPhenotypicTypeForLabel(mvar.getLabel());
+            Integer varId = ontology.getStandardVariableIdByPropertyScaleMethodRole(mvar.getProperty(), mvar.getScale(), mvar.getMethod(), type);
 
-            StandardVariable svar = ontology.findStandardVariableByTraitScaleMethodNames(mvar.getProperty(), mvar.getScale(), mvar.getMethod());
-            if (svar != null) {
+            if (varId != null) {
+                StandardVariable svar = ontology.getStandardVariable(varId);
                 if (svar.getStoredIn() != null) {
                     if (svar.getStoredIn().getId() == TermId.ENTRY_NUMBER_STORAGE.getId()) {
                         return true;
