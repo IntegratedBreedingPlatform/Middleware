@@ -34,6 +34,11 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.service.DataImportServiceImpl;
+import org.generationcp.middleware.service.FieldbookServiceImpl;
+import org.generationcp.middleware.service.OntologyServiceImpl;
+import org.generationcp.middleware.service.api.DataImportService;
+import org.generationcp.middleware.service.api.FieldbookService;
+import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.util.ResourceFinder;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
@@ -310,8 +315,16 @@ public class ManagerFactory implements Serializable {
         return new UserDataManagerImpl(sessionProviderForLocal, sessionProviderForCentral);
     }
     
-    public DataImportServiceImpl getDataImportService() throws ConfigException {
+    public FieldbookService getFieldbookMiddlewareService() throws ConfigException {
+        return new FieldbookServiceImpl(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    public DataImportService getDataImportService() throws ConfigException {
         return new DataImportServiceImpl(sessionProviderForLocal, sessionProviderForCentral);
+    }
+    
+    public OntologyService getOntologyService() throws ConfigException {
+        return new OntologyServiceImpl(sessionProviderForLocal, sessionProviderForCentral);
     }
 
     /**

@@ -1104,6 +1104,13 @@ public interface WorkbenchDataManager {
      * @throws MiddlewareQueryException the middleware query exception
      */
 	Boolean isLastOpenedProjectChanged() throws MiddlewareQueryException;
+
+	/**
+     * Close the sessionProvider
+     *
+     * 
+     */
+	void close();
     
     
 }

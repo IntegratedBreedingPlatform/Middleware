@@ -1834,5 +1834,13 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     	
     }
     
+    @Override
+    public void close(){
+    	if (sessionProvider != null){
+    		sessionProvider.close();
+    		System.out.println("Closing WorkbenchDataManager sessionProvider...DONE");
+    	}
+    }
+    
 
 }
