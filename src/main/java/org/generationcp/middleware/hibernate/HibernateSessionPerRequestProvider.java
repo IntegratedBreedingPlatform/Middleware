@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.generationcp.middleware.hibernate;
 
+import java.io.Serializable;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
@@ -30,8 +32,11 @@ import org.hibernate.SessionFactory;
  * 
  * @author Glenn Marintes
  */
-public class HibernateSessionPerRequestProvider implements HibernateSessionProvider {
-    private SessionFactory sessionFactory;
+public class HibernateSessionPerRequestProvider implements HibernateSessionProvider, Serializable {
+   
+	private static final long serialVersionUID = 6165749383476030243L;
+
+	private SessionFactory sessionFactory;
     
     private Session session;
     

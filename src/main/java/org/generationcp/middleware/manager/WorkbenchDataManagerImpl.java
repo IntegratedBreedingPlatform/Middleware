@@ -1838,7 +1838,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     public void close(){
     	if (sessionProvider != null){
     		sessionProvider.close();
-    		System.out.println("Closing WorkbenchDataManager sessionProvider...DONE");
     	}
     }
     
