@@ -1822,7 +1822,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
     	
     	if (currentlastOpenedProject == null){
     		currentlastOpenedProject = project;
-    		return true;
+    		return false;
     	}
     	
     	if (currentlastOpenedProject.getProjectId().equals(project.getProjectId())){
