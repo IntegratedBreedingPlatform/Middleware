@@ -107,7 +107,7 @@ public class TestDataImportServiceImpl {
     public void testParseWorkbook() throws MiddlewareQueryException, WorkbookParserException {
         // Dan V : changed implem so that template path is located in src/test/resources. no need to change per user to reflect file location
 
-        String fileLocation = this.getClass().getClassLoader().getResource("rachetest.xls").getFile();
+        String fileLocation = this.getClass().getClassLoader().getResource("ricetest2.xls").getFile();
         File file = new File(fileLocation);
         Workbook workbook = dataImportService.parseWorkbook(file);
         workbook.print(0);

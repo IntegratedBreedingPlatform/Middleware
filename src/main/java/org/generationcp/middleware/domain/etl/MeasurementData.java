@@ -23,7 +23,7 @@ public class MeasurementData {
 	
 	private String dataType;
 	
-	private int phenotypeId;
+	private Integer phenotypeId;
 	
 	public MeasurementData() {
 	}
@@ -58,11 +58,11 @@ public class MeasurementData {
 		this.value = value;
 	}
 	
-	public int getPhenotypeId() {
+	public Integer getPhenotypeId() {
 	    return phenotypeId;
 	}
 	
-	public void setPhenotypeId(int phenotypeId) {
+	public void setPhenotypeId(Integer phenotypeId) {
 	    this.phenotypeId = phenotypeId;
 	} 
 

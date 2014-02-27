@@ -20,6 +20,7 @@ import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
@@ -77,10 +78,11 @@ public class WorkbookBuilder extends Builder {
 		long expCount = getStudyDataManager().countExperiments(dataSetId);
 		
 		List<Experiment> experiments = getStudyDataManager().getExperiments(dataSetId, 0, (int)expCount);
+		VariableTypeList variables = getDataSetBuilder().getVariableTypes(dataSetId);
 		
 		List<MeasurementVariable> factors = buildFactors(experiments);		
-		List<MeasurementVariable> variates = buildVariates(experiments);
-		List<MeasurementRow> observations = buildObservations(experiments);
+		List<MeasurementVariable> variates = buildVariates(variables); //buildVariates(experiments);
+		List<MeasurementRow> observations = buildObservations(experiments, variables.getVariates());
 		
 		workbook.setStudyDetails(studyDetails);
 		workbook.setFactors(factors);
@@ -92,13 +94,13 @@ public class WorkbookBuilder extends Builder {
 		return workbook;
 	}
 	
-	private List<MeasurementRow> buildObservations(List<Experiment> experiments) {
+	private List<MeasurementRow> buildObservations(List<Experiment> experiments, VariableTypeList variateTypes) {
 	    List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
 	    
 	    for (Experiment experiment : experiments) {
 	        int experimentId = experiment.getId();
 	        VariableList factors = experiment.getFactors();
-	        VariableList variates = experiment.getVariates();
+	        VariableList variates = getCompleteVariatesInExperiment(experiment, variateTypes); //experiment.getVariates();
 	        List<MeasurementData> measurementDataList = new ArrayList<MeasurementData>();
 	        
 	        for (Variable variable : factors.getVariables()) {
@@ -164,4 +166,34 @@ public class WorkbookBuilder extends Builder {
             }
             return variates;
         }
+
+	private List<MeasurementVariable> buildVariates(VariableTypeList variables) { 
+	    List<MeasurementVariable> variates = new ArrayList<MeasurementVariable>();
+	    
+	    if (variables != null && variables.getVariates() != null && !variables.getVariates().getVariableTypes().isEmpty()) {
+	    	variates = getMeasurementVariableTransformer().transform(variables.getVariates(), false);
+	    }
+	    
+	    return variates;
+	}
+	
+	private VariableList getCompleteVariatesInExperiment(Experiment experiment, VariableTypeList variateTypes) {
+		VariableList vlist = new VariableList();
+		
+		for (VariableType vType : variateTypes.getVariableTypes()) {
+			boolean found = false;
+			for (Variable v : experiment.getVariates().getVariables()) {
+				if (v.getVariableType().getId() == vType.getId()) {
+					vlist.add(v);
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				vlist.add(new Variable(vType, (String) null));
+			}
+		}
+		
+		return vlist;
+	}
 }

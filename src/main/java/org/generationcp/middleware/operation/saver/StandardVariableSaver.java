@@ -335,8 +335,13 @@ public class StandardVariableSaver extends Saver {
                         objectId = standardVariable.getDataType().getId();
                     }
                 }
-                
-                if (objectId != null && !objectId.equals(relationship.getObjectId())) {
+                else if (relationship.getTypeId() == TermId.STORED_IN.getId()) {
+                	if (standardVariable.getStoredIn() != null) {
+                		objectId = standardVariable.getStoredIn().getId();
+                	}
+                }
+
+        		if (objectId != null && !objectId.equals(relationship.getObjectId())) {
                     relationship.setObjectId(objectId);
                     getCvTermRelationshipDao().update(relationship);
                 }
@@ -360,10 +365,11 @@ public class StandardVariableSaver extends Saver {
             errorCodes.append(ErrorCode.NON_UNIQUE_NAME.getCode());
         }
 
-        Integer varId = getStandardVariableBuilder().getIdByPropertyScaleMethod(
+        Integer varId = getStandardVariableBuilder().getIdByPropertyScaleMethodRole(
                     standardVariable.getProperty().getId(), 
                     standardVariable.getScale().getId(), 
-                    standardVariable.getMethod().getId());
+                    standardVariable.getMethod().getId(),
+                    standardVariable.getPhenotypicType());
         if (varId != null && (operation == Operation.ADD || operation == Operation.UPDATE && varId != standardVariable.getId())) {
             if (errorCodes == null) {
                 errorCodes = new StringBuilder();

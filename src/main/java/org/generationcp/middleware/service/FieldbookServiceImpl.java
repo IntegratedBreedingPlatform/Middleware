@@ -178,19 +178,24 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                     for (MeasurementRow row : observations){
                         for (MeasurementData field : row.getDataList()){
                             if (variate.getName().equals(field.getLabel())){
-                                Phenotype phenotype = getPhenotypeDao().getById(field.getPhenotypeId());
-                                if (phenotype == null){
+                            	Phenotype phenotype = null;
+                                if (field.getPhenotypeId() != null) {
+	                                phenotype = getPhenotypeDao().getById(field.getPhenotypeId());
+                                }
+                                if (phenotype == null && field.getValue() != null && !"".equals(field.getValue().trim())){
                                     phenotype = new Phenotype();
                                     phenotype.setPhenotypeId(getPhenotypeDao().getNegativeId("phenotypeId"));
                                 }
-                                getPhenotypeSaver().saveOrUpdate((int) row.getExperimentId(), variate.getTermId(), 
-                                            variate.getStoredIn(), field.getValue(), phenotype);
-
-                                i++;
-                                if ( i % JDBC_BATCH_SIZE == 0 ) {  //flush a batch of inserts and release memory
-                                    session.flush();
-                                    session.clear();
-                                }                                
+                                if (phenotype != null) {
+	                                getPhenotypeSaver().saveOrUpdate((int) row.getExperimentId(), variate.getTermId(), 
+	                                            variate.getStoredIn(), field.getValue(), phenotype);
+	
+	                                i++;
+	                                if ( i % JDBC_BATCH_SIZE == 0 ) {  //flush a batch of inserts and release memory
+	                                    session.flush();
+	                                    session.clear();
+	                                }
+                                }
                             }
                         }
                     }

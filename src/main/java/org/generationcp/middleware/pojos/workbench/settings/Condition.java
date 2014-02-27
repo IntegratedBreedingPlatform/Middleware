@@ -11,6 +11,9 @@ public class Condition  implements Serializable {
 	private String role;
 	private String datatype;
 	private String value;
+	private Integer dataTypeId;
+	private Double minRange;
+	private Double maxRange;
 	
 	public Condition(){
 		super();
@@ -18,7 +21,7 @@ public class Condition  implements Serializable {
 	
 	public Condition(String name, String description, String property,
 			String scale, String method, String role, String datatype,
-			String value) {
+			String value, Integer dataTypeId, Double minRange, Double maxRange) {
 		super();
 		this.name = name;
 		this.description = description;
@@ -28,6 +31,9 @@ public class Condition  implements Serializable {
 		this.role = role;
 		this.datatype = datatype;
 		this.value = value;
+		this.dataTypeId = dataTypeId;
+		this.minRange = minRange;
+		this.maxRange = maxRange;
 	}
 
 	public String getName() {
@@ -77,5 +83,30 @@ public class Condition  implements Serializable {
 	}
 	public void setValue(String value) {
 		this.value = value;
-	}		
+	}
+
+	public Integer getDataTypeId() {
+		return dataTypeId;
+	}
+
+	public void setDataTypeId(Integer dataTypeId) {
+		this.dataTypeId = dataTypeId;
+	}
+
+	public Double getMinRange() {
+		return minRange;
+	}
+
+	public void setMinRange(Double minRange) {
+		this.minRange = minRange;
+	}
+
+	public Double getMaxRange() {
+		return maxRange;
+	}
+
+	public void setMaxRange(Double maxRange) {
+		this.maxRange = maxRange;
+	}
+	
 }
