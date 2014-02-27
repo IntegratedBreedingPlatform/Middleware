@@ -3,12 +3,14 @@ package org.generationcp.middleware.operation.transformer.etl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
 
 public class MeasurementVariableTransformer extends Transformer {
 	
@@ -39,6 +41,30 @@ public class MeasurementVariableTransformer extends Transformer {
 	    return measurementVariables;
 	}
 	
+	public List<MeasurementVariable> transform(VariableList variableList, boolean isFactor) {
+		
+	    List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
+	    
+	    if (variableList != null && variableList.size() > 0) {
+	        for (Variable variable : variableList.getVariables()) {
+	        	VariableType variableType = variable.getVariableType();
+	            StandardVariable stdVariable = variableType.getStandardVariable();
+	            String label = getLabelOfStoredIn(stdVariable.getStoredIn().getId());
+	            
+	            MeasurementVariable measurementVariable = new MeasurementVariable(stdVariable.getId(), variableType.getLocalName(), 
+	                    stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod().getName(),
+	                    stdVariable.getProperty().getName(), stdVariable.getDataType().getName(), "", 
+	                    label);
+	            measurementVariable.setStoredIn(stdVariable.getStoredIn().getId());
+	            measurementVariable.setFactor(isFactor);
+	            measurementVariable.setValue(variable.getDisplayValue());
+	            measurementVariables.add(measurementVariable);
+	        }
+	    }
+	    
+	    return measurementVariables;
+	}
+
 	private String getLabelOfStoredIn(int storedIn) {
             return PhenotypicType.getPhenotypicTypeById(storedIn).getLabelList().get(0);
         }

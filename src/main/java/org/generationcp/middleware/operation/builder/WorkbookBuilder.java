@@ -18,6 +18,7 @@ import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableType;
@@ -57,6 +58,8 @@ public class WorkbookBuilder extends Builder {
                  * */
 		
 		StudyDetails studyDetails = getStudyDataManager().getStudyDetails(Database.LOCAL, StudyType.N, id);
+		Study study = getStudyBuilder().createStudy(id);
+		
 		int dataSetId = 0;
 		
 		//get observation dataset
@@ -80,15 +83,17 @@ public class WorkbookBuilder extends Builder {
 		List<Experiment> experiments = getStudyDataManager().getExperiments(dataSetId, 0, (int)expCount);
 		VariableTypeList variables = getDataSetBuilder().getVariableTypes(dataSetId);
 		
-		List<MeasurementVariable> factors = buildFactors(experiments);		
+		List<MeasurementVariable> conditions = buildStudyMeasurementVariables(study.getConditions(), true);
+		List<MeasurementVariable> factors = buildFactors(experiments);
+		List<MeasurementVariable> constants = buildStudyMeasurementVariables(study.getConstants(), false);
 		List<MeasurementVariable> variates = buildVariates(variables); //buildVariates(experiments);
 		List<MeasurementRow> observations = buildObservations(experiments, variables.getVariates());
 		
 		workbook.setStudyDetails(studyDetails);
 		workbook.setFactors(factors);
 		workbook.setVariates(variates);
-		workbook.setConditions(new ArrayList<MeasurementVariable>());
-		workbook.setConstants(new ArrayList<MeasurementVariable>());
+		workbook.setConditions(conditions);
+		workbook.setConstants(constants);
 		workbook.setObservations(observations);
 		
 		return workbook;
@@ -142,6 +147,10 @@ public class WorkbookBuilder extends Builder {
 	private String getLabelOfStoredIn(int storedIn) {
             return PhenotypicType.getPhenotypicTypeById(storedIn).getLabelList().get(0);
         }
+	
+	private List<MeasurementVariable> buildStudyMeasurementVariables(VariableList variableList, boolean isFactor) {
+		return getMeasurementVariableTransformer().transform(variableList, isFactor);
+	}
 	
 	private List<MeasurementVariable> buildFactors(List<Experiment> experiments) {
 	    List<MeasurementVariable> factors = new ArrayList<MeasurementVariable>();
