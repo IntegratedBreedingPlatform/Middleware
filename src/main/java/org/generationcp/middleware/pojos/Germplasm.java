@@ -326,23 +326,25 @@ public class Germplasm implements Serializable{
     public static final String SEARCH_GERMPLASM_BY_GID = 
     		"SELECT germplsm.* " +
     		"FROM germplsm " +
-    		"WHERE gid=:gid and length(gid) = :gidLength";
+    		"WHERE gid=:gid AND length(gid) = :gidLength AND gid!=grplce";
     public static final String SEARCH_GERMPLASM_BY_GID_LIKE = 
     		"SELECT germplsm.* " +
     		"FROM germplsm " +
-    		"WHERE gid LIKE :gid ";    
+    		"WHERE gid LIKE :gid AND gid!=grplce";    
     public static final String SEARCH_GERMPLASM_BY_GIDS = 
     		"SELECT germplsm.* " +
     		"FROM germplsm " +
-    		"WHERE gid IN (:gids)";
+    		"WHERE gid IN (:gids) AND gid!=grplce";
     public static final String SEARCH_GID_BY_GERMPLASM_NAME = 
-    		"SELECT DISTINCT gid " +
+    		"SELECT DISTINCT names.gid AS gid " +
     		"FROM names " +
+    		"LEFT JOIN germplsm ON (names.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) " +
     		"WHERE nstat!=:deletedStatus AND nval LIKE :q " +
     		"LIMIT 5000";
     public static final String SEARCH_GID_BY_GERMPLASM_NAME_EQUAL = 
-    		"SELECT DISTINCT gid " +
+    		"SELECT DISTINCT names.gid AS gid " +
     		"FROM names " +
+    		"LEFT JOIN germplsm ON (names.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) " +
     		"WHERE nstat!=:deletedStatus AND nval = :q " +
     		"LIMIT 5000";
     public static final String SEARCH_LIST_ID_BY_LIST_NAME =
@@ -351,6 +353,7 @@ public class Germplasm implements Serializable{
     		"    SELECT listnms.*, " +
             "        (MATCH(listname) AGAINST(:q)) AS searchScore " +
             "    FROM listnms " +
+            "         LEFT JOIN germplsm ON (names.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) " +
             "    WHERE liststatus!=:deletedStatus " +
             "    GROUP BY listid  " +
             "    HAVING searchScore>0 " +
@@ -362,6 +365,7 @@ public class Germplasm implements Serializable{
     		"    SELECT listnms.*, " +
             "        (MATCH(listname) AGAINST(:q)) AS searchScore " +
             "    FROM listnms " +
+            "         LEFT JOIN germplsm ON (names.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) " +
             "    WHERE liststatus!=:deletedStatus " +
             "        AND listname=:q " +
             "    GROUP BY listid  " +
@@ -371,7 +375,7 @@ public class Germplasm implements Serializable{
     public static final String SEARCH_GERMPLASM_BY_LIST_ID = 
     		"SELECT germplsm.* " +
     		"FROM listdata " +
-    		"	LEFT JOIN germplsm ON listdata.gid=germplsm.gid " +
+    		"	LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) " +
         	"WHERE listid IN (:listids) ";
     public static final String GET_GERMPLASM_DATES_BY_GIDS =
 		"SELECT gid, gdate " +
