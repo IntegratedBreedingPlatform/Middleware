@@ -188,7 +188,7 @@ public class GermplasmDataManagerUtil{
                 }
             } else if (currentChar == '-') {
                 if (ctr - 1 >= 0 && ctr + 1 < stringLength) {
-                    // L-N becomes L^N when there is only one ��� in the name
+                    // L-N becomes L^N when there is only one in the name
                     // and L is not preceded by a space
                     char nextChar = toreturn.charAt(ctr + 1);
                     char previousChar = toreturn.charAt(ctr - 1);
