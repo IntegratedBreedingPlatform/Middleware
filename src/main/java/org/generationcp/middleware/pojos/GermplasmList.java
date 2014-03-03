@@ -98,15 +98,15 @@ public class GermplasmList implements Serializable{
     
     public static String SEARCH_FOR_GERMPLASM_LIST =
     		"SELECT DISTINCT listnms.* " +
-            "FROM listdata " +
-            "       LEFT JOIN listnms ON (listdata.listid=listnms.listid) " +
-            "WHERE liststatus!=9 AND lrstatus!=9 AND ((gid=:gid AND 0!=:gid AND length(gid)=:gidLength) OR desig LIKE :q OR listname LIKE :q) ";
+            "FROM listnms " +
+            "      LEFT JOIN listdata ON (listdata.listid=listnms.listid) " +
+            "WHERE liststatus!=9 AND (lrstatus!=9 OR lrstatus IS NULL) AND ((gid=:gid AND 0!=:gid AND length(gid)=:gidLength) OR desig LIKE :q OR listname LIKE :q) ";
     
     public static String SEARCH_FOR_GERMPLASM_LIST_EQUAL =
     		"SELECT DISTINCT listnms.* " +
-            "FROM listdata " +
-            "       LEFT JOIN listnms ON (listdata.listid=listnms.listid) " +
-            "WHERE liststatus!=9 AND lrstatus!=9 AND ((gid=:gid AND 0!=:gid AND length(gid)=:gidLength) OR desig = :q OR listname = :q) ";
+            "FROM listnms " +
+            "      LEFT JOIN listdata ON (listdata.listid=listnms.listid) " +
+            "WHERE liststatus!=9 AND (lrstatus!=9 OR lrstatus IS NULL) AND ((gid=:gid AND 0!=:gid AND length(gid)=:gidLength) OR desig = :q OR listname = :q) ";
     
     //Full Text version
 //    		"SELECT DISTINCT listid, listname, listdate, listtype, listuid, listdesc, lhierarchy, liststatus, sdate, edate, listlocn, listref, projectid " +
