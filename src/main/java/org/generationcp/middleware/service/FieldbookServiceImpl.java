@@ -183,8 +183,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                             	Phenotype phenotype = null;
                                 if (field.getPhenotypeId() != null) {
 	                                phenotype = getPhenotypeDao().getById(field.getPhenotypeId());
-	                                if (field.getValue() != null && "".equals(field.getValue().trim()) && DATA_TYPE_NUMERIC.equals(field.getDataType().trim().toUpperCase())) {
-	                                	field.setValue(null);
+	                                if (field.getValue() != null) {
+	                                	field.setValue(field.getValue().trim());
 	                                }
                                 }
                                 if (phenotype == null && field.getValue() != null && !"".equals(field.getValue().trim())){

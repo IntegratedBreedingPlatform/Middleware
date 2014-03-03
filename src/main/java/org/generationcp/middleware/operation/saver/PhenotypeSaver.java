@@ -73,13 +73,11 @@ public class PhenotypeSaver extends Saver{
         if (variable.getValue() != null && !"".equals(variable.getValue().trim())) {
 	        if (TermId.OBSERVATION_VARIATE.getId() == variable.getVariableType().getStandardVariable().getStoredIn().getId()) {
 	            phenotype = getPhenotypeObject(phenotype);
-	            if (variable.getValue() != null && "".equals(variable.getValue().trim()) 
-	            	&& (variable.getVariableType().getStandardVariable().getDataType().getId() == TermId.NUMERIC_DBID_VARIABLE.getId()
-        				|| variable.getVariableType().getStandardVariable().getDataType().getId() == TermId.NUMERIC_VARIABLE.getId())) {
-	            	phenotype.setValue(null);
+	            if (variable.getValue() != null) {
+	            	phenotype.setValue(variable.getValue().trim());
 	            }
 	            else {
-	            	phenotype.setValue(variable.getValue());
+	            	phenotype.setValue(null);
 	            }
 	            phenotype.setObservableId(variable.getVariableType().getId());
 	            phenotype.setUniqueName(phenotype.getPhenotypeId().toString());
