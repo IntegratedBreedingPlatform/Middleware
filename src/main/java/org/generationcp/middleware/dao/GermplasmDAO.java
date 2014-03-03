@@ -896,9 +896,16 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             List<Germplasm> resultParents = new ArrayList<Germplasm>();
             
             //First priority, germplasms with GID=q
-            SQLQuery p1_query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GID);
+            
+            SQLQuery p1_query;
+            
+            if(q.contains("%") || q.contains("_")){
+            	p1_query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GID_LIKE);
+            } else {
+            	p1_query = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GID);
+                p1_query.setParameter("gidLength", q.length());
+            }
             p1_query.setParameter("gid", q);
-            p1_query.setParameter("gidLength", q.length());
             p1_query.addEntity("germplsm", Germplasm.class);
             //p1_query.setParameter("deletedStatus", STATUS_DELETED);
             result.addAll(p1_query.list());
