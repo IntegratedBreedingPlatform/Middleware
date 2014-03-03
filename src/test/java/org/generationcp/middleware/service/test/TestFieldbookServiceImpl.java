@@ -408,6 +408,15 @@ public class TestFieldbookServiceImpl {
                 Debug.println(3, person.toString());
             }
             Debug.println(3, "NUMBER OF RECORDS: " + persons.size());
+            Debug.println(3, "Plots with Plants Selected: " + fieldbookService.countPlotsWithPlantsSelectedofNursery(-146));
+    }
+    
+    @Test
+    public void testCountPlotsWithPlantsSelectedofNursery() throws MiddlewareQueryException {
+        Workbook workbook = TestNurseryWorkbookUtil.getTestWorkbook();
+        workbook.print(0);
+        int id = dataImportService.saveDataset(workbook);
+        Debug.println(3, "Plots with Plants Selected: " + fieldbookService.countPlotsWithPlantsSelectedofNursery(id));
     }
     
     

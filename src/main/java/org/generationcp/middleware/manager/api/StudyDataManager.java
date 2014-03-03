@@ -675,4 +675,6 @@ public interface StudyDataManager{
      * @throws MiddlewareQueryException the middleware query exception
      */
     List<FolderReference> getFolderTree() throws MiddlewareQueryException;
+    
+    int countPlotsWithPlantsSelectedofDataset(int dataSetId) throws MiddlewareQueryException;
 }

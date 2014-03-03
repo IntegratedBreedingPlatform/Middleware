@@ -322,5 +322,5 @@ public interface FieldbookService {
      */
     List<Person> getAllPersons() throws MiddlewareQueryException;
     
-
+    int countPlotsWithPlantsSelectedofNursery(int nurseryId) throws MiddlewareQueryException;
 }

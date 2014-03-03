@@ -21,6 +21,7 @@ import java.util.Set;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.NameDAO;
+import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -457,5 +458,27 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         return getUserDataManager().getAllPersons();
     }
     
-    
+    public int countPlotsWithPlantsSelectedofNursery(int nurseryId) throws MiddlewareQueryException {
+        StudyDetails studyDetails = getStudyDataManager().getStudyDetails(Database.LOCAL, StudyType.N, nurseryId);
+        
+        int dataSetId = 0;
+        
+        //get observation dataset
+        List<DatasetReference> datasetRefList = getStudyDataManager().getDatasetReferences(nurseryId);
+        if (datasetRefList != null) {
+            for (DatasetReference datasetRef : datasetRefList) {
+                if (datasetRef.getName().equals("MEASUREMENT EFEC_" + studyDetails.getStudyName()) || 
+                        datasetRef.getName().equals("MEASUREMENT EFECT_" + studyDetails.getStudyName())) {
+                    dataSetId = datasetRef.getId();
+                }
+            }
+        }
+        
+        //if not found in the list using the name, get dataset with Plot Data type
+        if (dataSetId == 0) {
+            dataSetId = getStudyDataManager().findOneDataSetByType(nurseryId, DataSetType.PLOT_DATA).getId();
+        }
+        
+        return getStudyDataManager().countPlotsWithPlantsSelectedofDataset(dataSetId);
+    }
 }
