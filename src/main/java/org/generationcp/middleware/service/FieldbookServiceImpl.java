@@ -60,6 +60,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     
     private static final Logger LOG = LoggerFactory.getLogger(FieldbookServiceImpl.class);
 
+	private static final String DATA_TYPE_NUMERIC = "Numeric variable";
+	
     public FieldbookServiceImpl(
             HibernateSessionProvider sessionProviderForLocal,
             HibernateSessionProvider sessionProviderForCentral) {
@@ -181,6 +183,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                             	Phenotype phenotype = null;
                                 if (field.getPhenotypeId() != null) {
 	                                phenotype = getPhenotypeDao().getById(field.getPhenotypeId());
+	                                if (field.getValue() != null && "".equals(field.getValue().trim()) && DATA_TYPE_NUMERIC.equals(field.getDataType())) {
+	                                	field.setValue(null);
+	                                }
                                 }
                                 if (phenotype == null && field.getValue() != null && !"".equals(field.getValue().trim())){
                                     phenotype = new Phenotype();
