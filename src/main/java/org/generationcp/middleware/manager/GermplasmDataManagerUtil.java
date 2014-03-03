@@ -43,7 +43,7 @@ public class GermplasmDataManagerUtil{
      * i) ^^ becomes ^ 
      * j) REMOVE LEADING OR TRAILING ^ 
      * k) ^) becomes ) and (^ becomes ( l) L-N becomes L^N when there is only one
-     * ��� in the name and L is not preceded by a space 
+     * l) in the name and L is not preceded by a space 
      * m) ^/ becomes / and /^ becomes /
      * 
      * @param name
