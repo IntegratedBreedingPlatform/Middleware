@@ -14,6 +14,7 @@ package org.generationcp.middleware.service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,6 +35,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
+import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -50,6 +52,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -481,4 +484,36 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         
         return getStudyDataManager().countPlotsWithPlantsSelectedofDataset(dataSetId);
     }
+    
+    @Override
+    public List<StandardVariableReference> filterStandardVariablesByMode(List<Integer> storedInIds) throws MiddlewareQueryException {
+    	List<StandardVariableReference> list = new ArrayList<StandardVariableReference>();
+    	
+    	List<CVTerm> variables = new ArrayList<CVTerm>();
+    	
+    	Set<Integer> variableIds = new HashSet<Integer>();
+
+    	addAllVariableIdsInMode(variableIds, storedInIds, Database.CENTRAL);
+    	addAllVariableIdsInMode(variableIds, storedInIds, Database.LOCAL);
+    	
+    	List<Integer> variableIdList = new ArrayList<Integer>(variableIds);
+    	setWorkingDatabase(Database.CENTRAL);
+    	variables.addAll(getCvTermDao().getByIds(variableIdList));
+    	setWorkingDatabase(Database.LOCAL);
+    	variables.addAll(getCvTermDao().getByIds(variableIdList));
+    	
+    	for (CVTerm variable : variables) {
+    		list.add(new StandardVariableReference(variable.getCvTermId(), variable.getName(), variable.getDefinition()));
+    	}
+    	
+    	return list;
+    }
+
+    private void addAllVariableIdsInMode(Set<Integer> variableIds, List<Integer> storedInIds, Database database) throws MiddlewareQueryException {
+    	setWorkingDatabase(database);
+    	for (Integer storedInId : storedInIds) {
+    		variableIds.addAll(getCvTermRelationshipDao().getSubjectIdsByTypeAndObject(TermId.STORED_IN.getId(), storedInId));
+    	}
+    }
+    
 }
