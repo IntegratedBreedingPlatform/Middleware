@@ -21,11 +21,12 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.Name;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 
 /**
  * DAO class for {@link Germplasm}.
@@ -881,10 +882,12 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
      * @param q - the search term to be used
      * @param o - like or equal
      * @param includeParents boolean flag to denote whether parents will be included in search results
+     * @param searchByNameInLocalDbAlso - set this to true if you are using Central session and also want to search germplasm by name for local db
      * @return List of Germplasms
      * @throws MiddlewareQueryException 
      */
-    public List<Germplasm> searchForGermplasms(String q, Operation o, boolean includeParents)
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	public List<Germplasm> searchForGermplasms(String q, Operation o, boolean includeParents, boolean searchByNameInLocalDbAlso, Session localSession)
             throws MiddlewareQueryException{
         q = q.trim();
         if(q.equals("")){
@@ -914,6 +917,19 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             }
             p2_query1.setParameter("deletedStatus", STATUS_DELETED);
             List p2_result1 = p2_query1.list();
+            
+            if(searchByNameInLocalDbAlso && localSession != null){
+            	SQLQuery p2_query2;
+                if(o.equals(Operation.EQUAL)) {
+                        p2_query2 = localSession.createSQLQuery(Germplasm.SEARCH_GID_BY_GERMPLASM_NAME_EQUAL);
+                        p2_query2.setParameter("q", q);
+                } else {
+                        p2_query2 = localSession.createSQLQuery(Germplasm.SEARCH_GID_BY_GERMPLASM_NAME);
+                        p2_query2.setParameter("q", q+"%");
+                }
+                p2_query2.setParameter("deletedStatus", STATUS_DELETED);
+                p2_result1.addAll(p2_query2.list());
+            }
             
             if(p2_result1.size()>0 && p2_result1.get(0)!=null){
                 SQLQuery p2_query2 = getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GIDS);
@@ -973,6 +989,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
                         result.add((Germplasm) g2);
                 }
             }
+            
             return result;
 
         } catch (Exception e) {
