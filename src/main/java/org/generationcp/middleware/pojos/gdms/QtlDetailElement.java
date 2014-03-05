@@ -34,13 +34,12 @@ public class QtlDetailElement implements Serializable{
     }
 
 
-    /**
-     * @param qtlName
-     * @param mapName
-     * @param qtlDetails
-     * @param tRName
-     * @param ontology
-     */
+    public QtlDetailElement(String qtlName, String mapName, QtlDetails qtlDetails) {
+        this.qtlName = qtlName;
+        this.mapName = mapName;
+        this.qtlDetails = qtlDetails;
+    }
+    
     public QtlDetailElement(String qtlName, String mapName, QtlDetails qtlDetails, String tRName, String ontology) {
         this.qtlName = qtlName;
         this.mapName = mapName;

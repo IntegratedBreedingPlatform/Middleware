@@ -202,4 +202,21 @@ public class MapDAO extends GenericDAO<Map, Integer>{
             logAndThrowException("Error in deleteByMapId=" + mapId + " in MapDAO: " + e.getMessage(), e);
         }
     }
+    
+
+    @SuppressWarnings("unchecked")
+    public List<Map> getMapsByIds(List<Integer> mapIds) throws MiddlewareQueryException{
+            try {
+                Criteria criteria = getSession().createCriteria(getPersistentClass());
+                criteria.add(Restrictions.in("mapId", mapIds));
+                
+                return criteria.list();
+
+            } catch(HibernateException e) {
+                logAndThrowException("Error in getMapsByIds=" + mapIds + " in MapDAO: " + e.getMessage(), e);
+            }
+            return new ArrayList<Map>();
+ 
+    }
+    
 }

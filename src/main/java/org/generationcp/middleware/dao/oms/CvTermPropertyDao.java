@@ -41,6 +41,21 @@ public class CvTermPropertyDao extends GenericDAO<CVTermProperty, Integer> {
         return properties;
     }
     
+
+    @SuppressWarnings("unchecked")
+    public List<CVTermProperty> getByCvTermIds(List<Integer> cvTermIds) throws MiddlewareQueryException {
+        List<CVTermProperty> properties = new ArrayList<CVTermProperty>();
+        try {
+            Criteria criteria = getSession().createCriteria(getPersistentClass());
+            criteria.add(Restrictions.in("cvTermId", cvTermIds));
+            properties = criteria.list();
+            
+        } catch(HibernateException e) {
+            logAndThrowException("Error at getByCvTermIds=" + cvTermIds + " query on CVTermPropertyDao: " + e.getMessage(), e);
+        }
+        return properties;
+    }
+    
     @SuppressWarnings("unchecked")
     public List<CVTermProperty> getByCvTermAndType(int cvTermId, int typeId) throws MiddlewareQueryException {
         List<CVTermProperty> properties = new ArrayList<CVTermProperty>();

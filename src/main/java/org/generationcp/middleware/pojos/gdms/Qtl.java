@@ -50,7 +50,7 @@ public class Qtl implements Serializable{
                 + ",CONCAT(gq.qtl_name,'') " 
                 + ",gm.map_id " 
                 + ",CONCAT(gm.map_name,'') "
-                + ",gqd.linkage_group "
+                + ",gqd.linkage_group "  // chromosome
                 + ",gqd.min_position "
                 + ",gqd.max_position "
                 + ",gqd.tid " 
@@ -79,25 +79,26 @@ public class Qtl implements Serializable{
                 + "INNER JOIN cvterm cvt ON gqd.tid = cvt.cvterm_id "
                 + "LEFT JOIN cvtermprop cvtprop ON cvt.cvterm_id = cvtprop.cvterm_id "
         ;
-    public static final String GET_QTL_BY_QTL_IDS = 
+    
+    public static final String GET_QTL_AND_QTL_DETAILS_BY_QTL_IDS = 
             GET_QTL_DETAILS_SELECT 
             + GET_QTL_DETAILS_FROM
             + "WHERE gq.qtl_id in(:qtl_id_list) "
             + "ORDER BY gq.qtl_id";
 
-    public static final String COUNT_QTL_BY_QTL_IDS = 
+    public static final String COUNT_QTL_AND_QTL_DETAILS_BY_QTL_IDS = 
             "SELECT COUNT(*) " 
             + GET_QTL_DETAILS_FROM
             + "WHERE gq.qtl_id in(:qtl_id_list)"; 
 
-    public static final String GET_QTL_BY_NAME = 
+    public static final String GET_QTL_AND_QTL_DETAILS_BY_NAME = 
             GET_QTL_DETAILS_SELECT 
             + GET_QTL_DETAILS_FROM
             + "WHERE   gq.qtl_name LIKE LOWER(:qtlName) "
             + "ORDER BY gq.qtl_id "
             ;
 
-    public static final String COUNT_QTL_BY_NAME = 
+    public static final String COUNT_QTL_AND_QTL_DETAILS_BY_NAME = 
             "SELECT  COUNT(*) " 
             + GET_QTL_DETAILS_FROM
             + "WHERE   gq.qtl_name LIKE LOWER(:qtlName) "

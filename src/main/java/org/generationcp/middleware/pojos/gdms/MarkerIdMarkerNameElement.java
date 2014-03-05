@@ -44,4 +44,17 @@ public class MarkerIdMarkerNameElement{
         this.markerName = markerName;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("MarkerIdMarkerNameElement [markerId=");
+        builder.append(markerId);
+        builder.append(", markerName=");
+        builder.append(markerName);
+        builder.append("]");
+        return builder.toString();
+    }
+
+    
+    
 }

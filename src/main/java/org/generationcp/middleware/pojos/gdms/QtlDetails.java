@@ -229,6 +229,14 @@ public class QtlDetails implements Serializable{
         return id;
     }
     
+    public Integer getQtlId() {
+        return id.getQtlId();
+    }
+
+    public Integer getMapId() {
+        return id.getMapId();
+    }
+    
     public void setQtlId(QtlDetailsPK id) {
         this.id = id;
     }

@@ -258,19 +258,32 @@ public class QtlDetailsDAO  extends GenericDAO<QtlDetails, Integer>{
 		}
     }
 	
-	public List<QtlDetails> getQtlDetailsByMapId(Integer mapId) throws MiddlewareQueryException {
-		try {
-			Criteria criteria = getSession().createCriteria(getPersistentClass());
-			criteria.add(Restrictions.eq("id.mapId", mapId));
-			
-			return criteria.list();
+    public List<QtlDetails> getQtlDetailsByMapId(Integer mapId) throws MiddlewareQueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(getPersistentClass());
+            criteria.add(Restrictions.eq("id.mapId", mapId));
+            
+            return criteria.list();
 
-		} catch(HibernateException e) {
-			logAndThrowException("Error in getQtlDetailsByMapId=" + mapId + " in QtlDetailsDAO: " + e.getMessage(), e);
-		}
-		return new ArrayList<QtlDetails>();
-	}
-	
+        } catch(HibernateException e) {
+            logAndThrowException("Error in getQtlDetailsByMapId=" + mapId + " in QtlDetailsDAO: " + e.getMessage(), e);
+        }
+        return new ArrayList<QtlDetails>();
+    }
+
+    public List<QtlDetails> getQtlDetailsByQtlIds(List<Integer> qtlIds) throws MiddlewareQueryException {
+        try {
+            Criteria criteria = getSession().createCriteria(getPersistentClass());
+            criteria.add(Restrictions.in("id.qtlId", qtlIds));
+            
+            return criteria.list();
+
+        } catch(HibernateException e) {
+            logAndThrowException("Error in getQtlDetailsByQtlId=" + qtlIds + " in QtlDetailsDAO: " + e.getMessage(), e);
+        }
+        return new ArrayList<QtlDetails>();
+    }
+
 	public long countQtlDetailsByMapId(Integer mapId) throws MiddlewareQueryException {
 		try {
 			Criteria criteria = getSession().createCriteria(getPersistentClass());

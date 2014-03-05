@@ -72,7 +72,7 @@ import org.generationcp.middleware.pojos.gdms.QtlDetails;
 import org.generationcp.middleware.pojos.gdms.QtlDetailsPK;
 import org.generationcp.middleware.pojos.gdms.SNPDataRow;
 import org.generationcp.middleware.pojos.gdms.SSRDataRow;
-import org.generationcp.middleware.utils.test.Debug;
+import org.generationcp.middleware.util.Debug;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -87,6 +87,8 @@ public class TestGenotypicDataManagerImpl{
     private static GenotypicDataManager manager;
     
     private long startTime;
+    
+    private int INDENT = 3;
 
     @Rule
     public TestName name = new TestName();
@@ -162,10 +164,8 @@ public class TestGenotypicDataManagerImpl{
         String mapName = "RIL-8 (Yueyou13 x J 11)"; // CENTRAL test data
         List<MapInfo> results = manager.getMapInfoByMapName(mapName, Database.CENTRAL);
 
-        Debug.println(0, "testGetMapInfoByMapName(mapName=" + mapName + ") RESULTS size: " + results.size());
-        for (MapInfo mapInfo : results){
-            Debug.println(0, mapInfo.toString());
-        }
+        Debug.println(0, "testGetMapInfoByMapName(mapName=" + mapName + ") RESULTS: " );
+        Debug.printObjects(INDENT, results);
     }
 
     @Test
@@ -173,10 +173,8 @@ public class TestGenotypicDataManagerImpl{
       String mapName = "GCP-833TestMap"; // LOCAL test data
       List<MapInfo> results = manager.getMapInfoByMapName(mapName, Database.LOCAL);
 
-        Debug.println(0, "testGetMapInfoByMapName(mapName=" + mapName + ") RESULTS size: " + results.size());
-        for (MapInfo mapInfo : results){
-            Debug.println(0, mapInfo.toString());
-        }
+        Debug.println(0, "testGetMapInfoByMapName(mapName=" + mapName + ") RESULTS: ");
+        Debug.printObjects(INDENT, results);
     }
 
     @Test
@@ -373,9 +371,7 @@ public class TestGenotypicDataManagerImpl{
         Debug.println(0, "COUNT IS " + count);
         Debug.println(0, "testGetAllelicValuesFromMappingPopValuesByDatasetId(" + datasetId + ") RESULTS: ");
         if (allelicValues != null) {
-        	for (AllelicValueWithMarkerIdElement elem : allelicValues) {
-        		Debug.println(0, elem.toString());
-        	}
+            Debug.printObjects(INDENT, allelicValues);
         }
     }
 
@@ -395,9 +391,7 @@ public class TestGenotypicDataManagerImpl{
 
         List<MarkerIdMarkerNameElement> markerNames = manager.getMarkerNamesByMarkerIds(markerIds);
         Debug.println(0, "testGetMarkerNamesByMarkerIds(" + markerIds + ") RESULTS: ");
-        for (MarkerIdMarkerNameElement e : markerNames) {
-            Debug.println(0, e.getMarkerId() + " : " + e.getMarkerName());
-        }
+        Debug.printObjects(INDENT, markerNames);
     }
 
     @Test
@@ -564,10 +558,7 @@ public class TestGenotypicDataManagerImpl{
         List<AccMetadataSetPK> accMetadataSets = manager.getGdmsAccMetadatasetByGid(germplasmIds, 0, 
                 (int) manager.countGdmsAccMetadatasetByGid(germplasmIds));
         Debug.println(0, "testGetGdmsAccMetadatasetByGid() RESULTS: ");
-        for (AccMetadataSetPK accMetadataSet : accMetadataSets) {
-            Debug.println(0, accMetadataSet.toString());
-        }
-
+        Debug.printObjects(INDENT, accMetadataSets);
     }
 
     @Test
@@ -640,12 +631,10 @@ public class TestGenotypicDataManagerImpl{
 
         List<AllelicValueElement> results = manager.getIntAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds, 0, 
                 (int) manager.countIntAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds));
+        
         Debug.println(0, "testGetIntAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: ");
-        for (AllelicValueElement result : results){
-        	Debug.println(0, "  " + result);
-        }
-       Debug.println(0, "Number of record/s: " +results.size() );
-       }
+        Debug.printObjects(INDENT, results);
+    }
 
     @Test
     public void testCountIntAlleleValuesForPolymorphicMarkersRetrieval() throws Exception { 
@@ -670,10 +659,7 @@ public class TestGenotypicDataManagerImpl{
         List<AllelicValueElement> results = manager.getCharAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds, 0, 
                 (int) manager.countCharAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds));
         Debug.println(0, "testGetIntAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: ");
-        for (AllelicValueElement result : results){
-        	Debug.println(0, "  " + result);
-        }
-       Debug.println(0, "Number of record/s: " +results.size() );
+        Debug.printObjects(INDENT, results);
     }
 
 
@@ -770,11 +756,9 @@ public class TestGenotypicDataManagerImpl{
 
         List<AllelicValueElement> results = manager.getMappingAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds, 0, 
                 (int) manager.countMappingAlleleValuesForPolymorphicMarkersRetrieval(germplasmIds));
+        
         Debug.println(0, "testGetMappingAlleleValuesForPolymorphicMarkersRetrieval() RESULTS: ");
-        for (AllelicValueElement result : results){
-        	Debug.println(0, "  " + result);
-        }
-       Debug.println(0, "Number of record/s: " +results.size() );
+        Debug.printObjects(INDENT, results);
     }
 
 
@@ -790,10 +774,8 @@ public class TestGenotypicDataManagerImpl{
     @Test
     public void testGetAllQtl() throws Exception {
         List<Qtl> qtls = manager.getAllQtl(0, (int) manager.countAllQtl());
-        Debug.println(0, "testGetAllQtl() RESULTS: " + qtls.size());
-        for (Qtl qtl : qtls){
-            Debug.println(0, "    " + qtl);
-        }
+        Debug.println(0, "testGetAllQtl() RESULTS: ");
+        Debug.printObjects(INDENT, qtls);
     }
 
     @Test
@@ -827,15 +809,18 @@ public class TestGenotypicDataManagerImpl{
         
         assertTrue(results.size() > 0);
         
-        for (QtlDetailElement e : results){
-            Debug.printObject(3, e);
-        }
+        Debug.printFormattedObjects(3, results);
         Debug.println(0, "testGetQtlByNameFromCentral() #records: " + results.size());
     } 
     
     @Test
     public void testGetQtlByNameFromLocal() throws Exception {
         //TODO
+        try{
+            testSetQTL(); // to add a qtl_details entry with name = "TestQTL"
+        } catch (MiddlewareQueryException e){
+            //Ignore. There is already a record for testing.
+        }
         String qtlName = "TestQTL";  
         
         List<QtlDetailElement> results = manager.getQtlByName(qtlName, 0, 
@@ -843,9 +828,7 @@ public class TestGenotypicDataManagerImpl{
         
         assertTrue(results.size() > 0);
  
-        for (QtlDetailElement e : results){
-            Debug.printObject(3, e);
-        }
+        Debug.printFormattedObjects(3, results);
         Debug.println(0, "testGetQtlByNameFromLocal() #records: " + results.size());
     } 
 
@@ -904,7 +887,8 @@ public class TestGenotypicDataManagerImpl{
     @Test
     public void testGetMapIdsByQtlName() throws Exception { 
         String qtlName = "HI Control 08_AhI";     // Crop tested: Groundnut
-        List<Integer> results = manager.getMapIdsByQtlName(qtlName, 0, (int) manager.countMapIdsByQtlName(qtlName));
+        List<Integer> results = manager.getMapIdsByQtlName(qtlName, 0, 
+                (int) manager.countMapIdsByQtlName(qtlName));
         Debug.println(0, "testGetMapIdsByQtlName() RESULTS: " + results);
     }
 
@@ -922,7 +906,8 @@ public class TestGenotypicDataManagerImpl{
         String chromosome = "LG01";
         int min = 0;
         int max = 10;
-        List<Integer> results = manager.getMarkerIdsByQtl(qtlName, chromosome, min, max, 0, (int) manager.countMarkerIdsByQtl(qtlName, chromosome, min, max));
+        List<Integer> results = manager.getMarkerIdsByQtl(qtlName, chromosome, min, max, 0, 
+                (int) manager.countMarkerIdsByQtl(qtlName, chromosome, min, max));
         Debug.println(0, "testGetMarkersByQtl() RESULTS: " + results);
     }
 
@@ -945,9 +930,9 @@ public class TestGenotypicDataManagerImpl{
         List<ParentElement> parentElements = manager.getAllParentsFromMappingPopulation(start, end);
         Debug.println(0, "getAllParentsFromMappingPopulation(" + start + "," + end + ")");
         for (ParentElement parentElement : parentElements) {
-            Debug.println(0, "Parent A NId: " + parentElement.getParentANId() + "  |  Parent B NId: "+parentElement.getParentBGId());
+            Debug.println(3, "Parent A NId: " + parentElement.getParentANId() 
+                    + "  |  Parent B NId: "+parentElement.getParentBGId());
         }
-        
     }    
 
     @Test
@@ -965,9 +950,12 @@ public class TestGenotypicDataManagerImpl{
         List<MapDetailElement> maps = manager.getMapDetailsByName(nameLike, start, end);
         Debug.println(0, "getMapDetailsByName('"+nameLike+"'," + start + "," + end + ")");
         for (MapDetailElement map : maps) {
-            Debug.println(0, "Map: " + map.getMarkerCount() + "  |  maxStartPosition: " + map.getMaxStartPosition() + "  |  linkageGroup: " + map.getLinkageGroup() + "  |  mapName: " + map.getMapName() + "  |  mapType:  " + map.getMapType());
+            Debug.println(0, "Map: " + map.getMarkerCount() 
+                    + "  |  maxStartPosition: " + map.getMaxStartPosition() 
+                    + "  |  linkageGroup: " + map.getLinkageGroup() 
+                    + "  |  mapName: " + map.getMapName() 
+                    + "  |  mapType:  " + map.getMapType());
         }
-        
     }    
 
     @Test
@@ -984,10 +972,7 @@ public class TestGenotypicDataManagerImpl{
         int end = (int) manager.countAllMapDetails();
         List<MapDetailElement> maps = manager.getAllMapDetails(start, end);
         Debug.println(0, "testGetAllMapDetails(" + start + "," + end + ")");
-        for (MapDetailElement map : maps) {
-            Debug.println(0, map.toString());
-        }
-        
+        Debug.printObjects(INDENT, maps);        
     }    
 
     @Test
@@ -1553,17 +1538,13 @@ public class TestGenotypicDataManagerImpl{
         dataRows.add(new QtlDataRow(qtl, qtlDetails));
                 
         Boolean addStatus = manager.setQTL(dataset, datasetUser, dataRows);
-        Debug.println(0, "testSetQTL() Added: " + (addStatus != null ? datasetUser : null) 
-                + (addStatus != null ? dataset : null) + (addStatus != null ? qtlDetails : null) + (addStatus != null ? qtl : null));
 
         assertTrue(addStatus);
+
         Debug.println(0, "testSetQTL() Added: ");
         Debug.println(3, datasetUser.toString()); 
         Debug.println(3, dataset.toString()); 
-        for (QtlDataRow row : dataRows){
-            Debug.println(3, row.toString());
-        }
-
+        Debug.printObjects(INDENT, dataRows);
     }
     
     @Test
@@ -1588,10 +1569,7 @@ public class TestGenotypicDataManagerImpl{
         Debug.println(0, "testSetDArT() Added: ");
         Debug.println(3, dataset.toString()); 
         Debug.println(3, datasetUser.toString()); 
-        for (DartDataRow row : dataRows){
-            Debug.println(3, row.toString());
-        }
-
+        Debug.printObjects(INDENT, dataRows);
     }
     
     @Test
@@ -1638,9 +1616,7 @@ public class TestGenotypicDataManagerImpl{
         Debug.println(0, "testSetSSR() Added: ");
         Debug.println(3, dataset.toString());         
         Debug.println(3, datasetUser.toString()); 
-        for (SSRDataRow row : dataRows){
-            Debug.println(3, row.toString());
-        }
+        Debug.printObjects(INDENT, dataRows);
 
     }
     
@@ -1687,9 +1663,7 @@ public class TestGenotypicDataManagerImpl{
         Debug.println(0, "testSetSNP() Added: ");
         Debug.println(3, dataset.toString());         
         Debug.println(3, datasetUser.toString()); 
-        for (SNPDataRow row : dataRows){
-            Debug.println(3, row.toString());
-        }
+        Debug.printObjects(INDENT, dataRows);
     }
     
     @Test
@@ -1754,10 +1728,7 @@ public class TestGenotypicDataManagerImpl{
         Debug.println(3, dataset.toString());         
         Debug.println(3, datasetUser.toString());    
         Debug.println(3, mappingPop.toString()); 
-        for (MappingABHRow row : dataRows){
-            Debug.println(3, row.toString());
-        }
-
+        Debug.printObjects(INDENT, dataRows);
     }
     
 
@@ -1825,9 +1796,7 @@ public class TestGenotypicDataManagerImpl{
         Debug.println(3, dataset.toString());         
         Debug.println(3, datasetUser.toString());    
         Debug.println(3, mappingPop.toString()); 
-        for (MappingAllelicSNPRow row : dataRows){
-            Debug.println(3, row.toString());
-        }
+        Debug.printObjects(INDENT, dataRows);
     }
     
 
@@ -1882,9 +1851,7 @@ public class TestGenotypicDataManagerImpl{
         Debug.println(3, dataset.toString());         
         Debug.println(3, datasetUser.toString());    
         Debug.println(3, mappingPop.toString()); 
-        for (MappingAllelicSSRDArTRow row : dataRows){
-            Debug.println(3, row.toString());
-        }
+        Debug.printObjects(INDENT, dataRows);
     }
         
 
@@ -1964,29 +1931,24 @@ public class TestGenotypicDataManagerImpl{
     @Test
     public void TestGetMapIDsByQTLName() throws Exception {
         String qtlName = "HI Control 08_AhI";
-        long start = System.currentTimeMillis();
+
         List<Integer> mapIDs = manager.getMapIDsByQTLName(qtlName, 0, 2);
 
-        for (Integer mapID : mapIDs) {
-            Debug.println(0, "Map ID: " + mapID);
-        }
-        
-        long end = System.currentTimeMillis();
         Debug.println(0, "TestGetMapIDsByQTLName(" + qtlName + ")");
-        Debug.println(0, "  QUERY TIME: " + (end - start) + " ms");
+        for (Integer mapID : mapIDs) {
+            Debug.println(3, "Map ID: " + mapID);
+        }
     }
     
     @Test
     public void TestCountMapIDsByQTLName() throws Exception {
         String qtlName = "HI Control 08_AhI";
-        long start = System.currentTimeMillis();
+
         long count = manager.countMapIDsByQTLName(qtlName);
 
-        Debug.println(0, "Count of Map IDs: " + count);
-        
-        long end = System.currentTimeMillis();
         Debug.println(0, "TestCountMapIDsByQTLName(" + qtlName + ")");
-        Debug.println(0, "  QUERY TIME: " + (end - start) + " ms");
+        Debug.println(INDENT, "Count of Map IDs: " + count);
+        
     }
     
     @Test
@@ -1995,15 +1957,12 @@ public class TestGenotypicDataManagerImpl{
         String linkage = "LG01";
         double startPos = 0;
         double endPos = 2.2;
-        long start = System.currentTimeMillis();
-        Set<Integer> markerIDs = manager.getMarkerIDsByMapIDAndLinkageBetweenStartPosition(mapID, linkage, startPos, endPos, 0, 1);
+        Set<Integer> markerIDs = manager.getMarkerIDsByMapIDAndLinkageBetweenStartPosition(
+                                                mapID, linkage, startPos, endPos, 0, 1);
 
         for (Integer markerID : markerIDs) {
-            Debug.println(0, "Marker ID: " + markerID);
+            Debug.println(INDENT, "Marker ID: " + markerID);
         }
-        
-        long end = System.currentTimeMillis();
-        Debug.println(0, "  QUERY TIME: " + (end - start) + " ms");
     }
     
     @Test
@@ -2012,13 +1971,10 @@ public class TestGenotypicDataManagerImpl{
         String linkage = "LG01";
         double startPos = 0;
         double endPos = 2.2;
-        long start = System.currentTimeMillis();
+
         long count = manager.countMarkerIDsByMapIDAndLinkageBetweenStartPosition(mapID, linkage, startPos, endPos);
 
         Debug.println(0, "Count of Marker IDs: " + count);
-        
-        long end = System.currentTimeMillis();
-        Debug.println(0, "  QUERY TIME: " + (end - start) + " ms");
     }
     
     @Test
@@ -2026,28 +1982,19 @@ public class TestGenotypicDataManagerImpl{
         List<Integer> markerIDs = new ArrayList<Integer>();
         markerIDs.add(1317);
         
-        long start = System.currentTimeMillis();
         List<Marker> markerList = manager.getMarkersByMarkerIds(markerIDs, 0, 5);
 
-        for (Marker marker : markerList) {
-            Debug.println(0, "Marker: " + marker);
-        }
-        
-        long end = System.currentTimeMillis();
-        Debug.println(0, "  QUERY TIME: " + (end - start) + " ms");
+        Debug.printObjects(INDENT, markerList);
     }
     
     @Test
     public void testCountMarkersByMarkerIDs() throws Exception {
         List<Integer> markerIDs = new ArrayList<Integer>();
         markerIDs.add(1317);
-        long start = System.currentTimeMillis();
+
         long count = manager.countMarkersByMarkerIds(markerIDs);
 
         Debug.println(0, "Count of Markers: " + count);
-        
-        long end = System.currentTimeMillis();
-        Debug.println(0, "  QUERY TIME: " + (end - start) + " ms");
     }
     
     @Test
@@ -2061,16 +2008,16 @@ public class TestGenotypicDataManagerImpl{
                 (int) manager.countQtlByQtlIds(qtlIds));
         
         assertTrue(results.size() > 0);
-        
-        for (QtlDetailElement e : results){
-            Debug.printObject(3, e);
-        }
-        Debug.println(0, "testGetQtlByQtlIdsFromCentral() #records: " + results.size());
+        Debug.printFormattedObjects(3, results); 
     }
 
     @Test
     public void testGetQtlByQtlIdsFromLocal() throws Exception {
-        //TODO 
+        try{
+            testSetQTL(); // to add a qtl_details entry
+        } catch (MiddlewareQueryException e){
+            //Ignore. There is already a record for testing.
+        }
         List<Integer> qtlIds = new ArrayList<Integer>();
         qtlIds.add(-1);
         qtlIds.add(-2);
@@ -2079,10 +2026,7 @@ public class TestGenotypicDataManagerImpl{
         List<QtlDetailElement> results = manager.getQtlByQtlIds(qtlIds, 0, 
                 (int) manager.countQtlByQtlIds(qtlIds));
         
-        for (QtlDetailElement e : results){
-            Debug.printObject(3, e);
-        }
-        Debug.println(0, "testGetQtlByQtlIdsFromLocal() #records: " + results.size());
+        Debug.printFormattedObjects(INDENT, results);
     }
    
     @Test
@@ -2117,9 +2061,7 @@ public class TestGenotypicDataManagerImpl{
         List<QtlDataElement> results = manager.getQtlDataByQtlTraits(qtlTraits, 0, 
                 (int) manager.countQtlDataByQtlTraits(qtlTraits)); 
         Debug.println(0, "testGetQtlDataByQtlTraits() RESULTS: " + results.size());
-        for (QtlDataElement element : results){
-            Debug.println(0, "    " + element);
-        }
+        Debug.printObjects(INDENT, results);
     }
 
 
@@ -2178,7 +2120,8 @@ public class TestGenotypicDataManagerImpl{
         java.util.Map<Integer, List<String>> markerMaps = manager.getMapNamesByMarkerIds(markerIds);
         assertTrue(markerMaps.size() > 0);
         for (int i = 0;  i < markerIds.size(); i++){
-            Debug.println(3, "Marker ID = " + markerIds.get(i) + " : Map Name/s = " + markerMaps.get(markerIds.get(i)));
+            Debug.println(3, "Marker ID = " + markerIds.get(i) + " : Map Name/s = " 
+                            + markerMaps.get(markerIds.get(i)));
         }
     }
     
@@ -2213,10 +2156,8 @@ public class TestGenotypicDataManagerImpl{
     	assertNotNull(results);
         assertFalse(results.isEmpty());
         Debug.println(0, "testGetAllParentsFromMappingPopulation() Results: ");
-        for (ParentElement result : results){
-        	Debug.println(0, "  " + result);
-        }
-        Debug.println(0, "Number of record/s: "+count+" ");
+        Debug.printObjects(INDENT, results);
+
     }
  
     @Test
@@ -2227,10 +2168,7 @@ public class TestGenotypicDataManagerImpl{
     	assertNotNull(results);
         assertFalse(results.isEmpty());
         Debug.println(0, "testGetMapDetailsByName("+nameLike+")");
-        for (MapDetailElement result : results){
-        	Debug.println(0, "  " + result);
-        }
-        Debug.println(0, "Number of record/s: "+count+" ");
+        Debug.printObjects(3, results);
     }
     
     @Test
@@ -2243,30 +2181,23 @@ public class TestGenotypicDataManagerImpl{
     	assertNotNull(results);
         assertFalse(results.isEmpty());
         Debug.println(0, "testGetMarkersByIds("+markerIds+") Results: ");
-        for (Marker result : results){
-        	Debug.println(0, "  " + result);
-        }
-        Debug.println(0, "Number of record/s: " +results.size() );
+        Debug.printObjects(INDENT, results);
     }
     
     @Test
     public void testCountAllMaps() throws Exception {
-	long count = manager.countAllMaps(Database.LOCAL);
-    assertNotNull(count);
-    Debug.println(0, "testCountAllMaps("+Database.LOCAL+") Results: " + count);	
+        long count = manager.countAllMaps(Database.LOCAL);
+        assertNotNull(count);
+        Debug.println(0, "testCountAllMaps("+Database.LOCAL+") Results: " + count);	
     }
     
     @Test
     public void testGetAllMaps() throws Exception {
-    List<Map> results= manager.getAllMaps(0, 100, Database.LOCAL);
-    assertNotNull(results);
-    assertFalse(results.isEmpty());
-    Debug.println(0, "testGetAllMaps("+Database.LOCAL+") Results:");
-    for (Map result : results){
-    	Debug.println(0, "  " + result);
-    }
-    Debug.println(0, "Number of record/s: " +results.size() );
-    
+        List<Map> results = manager.getAllMaps(0, 100, Database.LOCAL);
+        assertNotNull(results);
+        assertFalse(results.isEmpty());
+        Debug.println(0, "testGetAllMaps(" + Database.LOCAL + ") Results:");
+        Debug.printObjects(INDENT, results);
     }
 
     @Test
@@ -2317,25 +2248,15 @@ public class TestGenotypicDataManagerImpl{
     public void testGetAllFromMarkerMetadatasetByMarker() throws Exception {
         Integer markerId = 3302; 
         List<MarkerMetadataSet> result = manager.getAllFromMarkerMetadatasetByMarker(markerId);
-        Debug.println(0, "testGetAllFromMarkerMetadatasetByMarker(" + markerId + "): " 
-                    + (result != null? result.size() : 0));
-        if (result != null) {
-            for (MarkerMetadataSet elem : result) {
-                Debug.println(4, elem.toString());
-            }
-        }
+        Debug.println(0, "testGetAllFromMarkerMetadatasetByMarker(" + markerId + "): ");
+        Debug.printObjects(INDENT, result);
     }
     @Test
     public void testGetDatasetDetailsByDatasetIds() throws Exception {
         List<Integer> datasetIds = Arrays.asList(3, 4, 5); 
         List<Dataset> result = manager.getDatasetDetailsByDatasetIds(datasetIds);
-        Debug.println(0, "testGetDatasetDetailsByDatasetId(" + datasetIds + "): " 
-                + (result != null? result.size() : 0));
-        if (result != null) {
-            for (Dataset elem : result) {
-                Debug.println(4, elem.toString());
-            }
-        }
+        Debug.println(0, "testGetDatasetDetailsByDatasetId(" + datasetIds + "): ");
+        Debug.printObjects(INDENT, result);
     }
     
     @Test
@@ -2354,40 +2275,23 @@ public class TestGenotypicDataManagerImpl{
         
         Integer datasetId = 5; 
         List<AccMetadataSetPK> result = manager.getAllFromAccMetadataset(gids, datasetId, SetOperation.NOT_IN);
-        Debug.println(0, "testGetAllFromAccMetadataset(gid=" + gids + ", datasetId=" + datasetId + "): " 
-                + (result != null? result.size() : 0));
-        if (result != null) {
-            for (AccMetadataSetPK elem : result) {
-                Debug.println(4, elem.toString());
-            }
-        }
+        Debug.println(0, "testGetAllFromAccMetadataset(gid=" + gids + ", datasetId=" + datasetId + "): ");
+        Debug.printObjects(INDENT, result);
     }
     
     @Test
     public void testGetMapAndMarkerCountByMarkers() throws Exception {
         List<Integer> markerIds = Arrays.asList(1317, 1318, 1788, 1053, 2279, 50);
-        Debug.println(0, "testGetMapAndMarkerCountByMarkers(" + markerIds + ")");
         List<MapDetailElement> details = manager.getMapAndMarkerCountByMarkers(markerIds);
-        if (details != null && details.size() > 0) {
-            Debug.println(0, "FOUND " + details.size() + " records");
-            for (MapDetailElement detail : details) {
-                Debug.println(0, detail.getMapName() + " - " + detail.getMarkerCount());
-            }
-        } else {
-            Debug.println(0, "NO RECORDS FOUND");
-        }
+        Debug.println(0, "testGetMapAndMarkerCountByMarkers(" + markerIds + ")");
+        Debug.printObjects(INDENT, details);
     }
     
     @Test
     public void testGetAllMTAs() throws Exception {
         List<Mta> result = manager.getAllMTAs();
-        Debug.println(0, "testGetAllMTAs(): " 
-                + (result != null? result.size() : 0));
-        if (result != null) {
-            for (Mta elem : result) {
-                Debug.println(4, elem.toString());
-            }
-        }
+        Debug.println(0, "testGetAllMTAs(): ");
+        Debug.printObjects(INDENT, result);
     }
     
     @Test
@@ -2400,13 +2304,8 @@ public class TestGenotypicDataManagerImpl{
     public void testGetMTAsByTrait() throws Exception {
         Integer traitId = 1;
         List<Mta> result = manager.getMTAsByTrait(traitId);
-        Debug.println(0, "testGetMTAsByTrait(): " 
-                + (result != null? result.size() : 0));
-        if (result != null) {
-            for (Mta elem : result) {
-                Debug.println(4, elem.toString());
-            }
-        }
+        Debug.println(0, "testGetMTAsByTrait(): ");
+        Debug.printObjects(INDENT, result);
     }
     
     @Test
@@ -2491,17 +2390,15 @@ public class TestGenotypicDataManagerImpl{
     
     @Test
     public void testGetQtlDetailsByMapId() throws Exception {
-        int mapId = 7;
-        Debug.println(0, "testGetQTLsByMapId(" + mapId + ")");
-        List<QtlDetails> qtls = manager.getQtlDetailsByMapId(mapId);
-        if (qtls != null && qtls.size() > 0) {
-                Debug.println(0, "RESULTS");
-                for (QtlDetails qtl : qtls) {
-                        Debug.println(0, qtl.toString());
-                }
-        } else {
-                Debug.println(0, "NO QTLs FOUND");
+        try{
+            testSetQTL(); // to add a qtl_details entry with map_id = 1
+        } catch (MiddlewareQueryException e){
+            //Ignore. There is already a record for testing.
         }
+        int mapId = 1;
+        List<QtlDetails> qtls = manager.getQtlDetailsByMapId(mapId);
+        Debug.println(0, "testGetQtlDetailsByMapId(" + mapId + ")");
+        Debug.printObjects(INDENT, qtls);
     }
 
     @Test
