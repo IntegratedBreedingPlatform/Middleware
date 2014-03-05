@@ -815,7 +815,6 @@ public class TestGenotypicDataManagerImpl{
     
     @Test
     public void testGetQtlByNameFromLocal() throws Exception {
-        //TODO
         try{
             testSetQTL(); // to add a qtl_details entry with name = "TestQTL"
         } catch (MiddlewareQueryException e){
@@ -832,6 +831,7 @@ public class TestGenotypicDataManagerImpl{
         Debug.println(0, "testGetQtlByNameFromLocal() #records: " + results.size());
     } 
 
+    
     @Test
     public void testCountQtlByName() throws Exception { 
         String qtlName = "HI Control%";     // Crop tested: Groundnut
@@ -2027,6 +2027,23 @@ public class TestGenotypicDataManagerImpl{
                 (int) manager.countQtlByQtlIds(qtlIds));
         
         Debug.printFormattedObjects(INDENT, results);
+    }
+    
+    @Test
+    public void testGetQtlByQtlIdsBothDB() throws Exception {
+        List<Integer> qtlIds = new ArrayList<Integer>();
+        qtlIds.add(1);
+        qtlIds.add(2);
+        qtlIds.add(3);
+        qtlIds.add(-1);
+        qtlIds.add(-2);
+        qtlIds.add(-3);
+      
+        List<QtlDetailElement> results = manager.getQtlByQtlIds(qtlIds, 0, 
+                (int) manager.countQtlByQtlIds(qtlIds));
+        
+        assertTrue(results.size() > 0);
+        Debug.printFormattedObjects(3, results); 
     }
    
     @Test
