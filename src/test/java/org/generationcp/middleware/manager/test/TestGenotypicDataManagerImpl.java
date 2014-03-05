@@ -72,7 +72,7 @@ import org.generationcp.middleware.pojos.gdms.QtlDetails;
 import org.generationcp.middleware.pojos.gdms.QtlDetailsPK;
 import org.generationcp.middleware.pojos.gdms.SNPDataRow;
 import org.generationcp.middleware.pojos.gdms.SSRDataRow;
-import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.utils.test.Debug;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -324,9 +324,14 @@ public class TestGenotypicDataManagerImpl{
 
     @Test
     public void testGetAllelicValuesByGidsAndMarkerNamesForGDMS() throws Exception {
-        List<String> markerNames = Arrays.asList("IPAHM117", "IPAHM130");
-        List<Integer> gids = Arrays.asList(7, 956);
-
+//        List<String> markerNames = Arrays.asList("IPAHM117", "IPAHM130");
+//        List<Integer> gids = Arrays.asList(7, 956);
+        
+        //TODO
+        List<String> markerNames = Arrays.asList("TC5H11");
+        List<Integer> gids = Arrays.asList(1, 1920);
+        
+        
         /* Results will vary depending on the database connected to.
          * As of the moment, we have no data that contains test values in all 3 source tables */
         List<AllelicValueElement> allelicValues = manager.getAllelicValuesByGidsAndMarkerNames(gids, markerNames);
@@ -814,18 +819,41 @@ public class TestGenotypicDataManagerImpl{
     }
     
     @Test
-    public void testGetQtlByName() throws Exception {
+    public void testGetQtlByNameFromCentral() throws Exception {
         String qtlName = "HI Control%";     // Crop tested: Groundnut
-
+        
         List<QtlDetailElement> results = manager.getQtlByName(qtlName, 0, 
                 (int) manager.countQtlByName(qtlName));
-        Debug.println(0, "testGetQtlByName() RESULTS: " + results);
+        
+        assertTrue(results.size() > 0);
+        
+        for (QtlDetailElement e : results){
+            Debug.printObject(3, e);
+        }
+        Debug.println(0, "testGetQtlByNameFromCentral() #records: " + results.size());
+    } 
+    
+    @Test
+    public void testGetQtlByNameFromLocal() throws Exception {
+        //TODO
+        String qtlName = "TestQTL";  
+        
+        List<QtlDetailElement> results = manager.getQtlByName(qtlName, 0, 
+                (int) manager.countQtlByName(qtlName));
+        
+        assertTrue(results.size() > 0);
+ 
+        for (QtlDetailElement e : results){
+            Debug.printObject(3, e);
+        }
+        Debug.println(0, "testGetQtlByNameFromLocal() #records: " + results.size());
     } 
 
     @Test
     public void testCountQtlByName() throws Exception { 
         String qtlName = "HI Control%";     // Crop tested: Groundnut
         long count = manager.countQtlByName(qtlName);
+        assertTrue(count > 0);
         Debug.println(0, "testCountQtlByName() RESULTS: " + count);
     }    
 
@@ -975,7 +1003,7 @@ public class TestGenotypicDataManagerImpl{
         Float maxPosition = 8f; 
         Integer traitId = 1001; // "DE"; 
         String experiment = ""; 
-        Float effect =0f;
+        Integer effect = 0;
         Float scoreValue = 2.5f;
         Float rSquare = 10f; 
         String linkageGroup = "LG06"; 
@@ -1493,7 +1521,7 @@ public class TestGenotypicDataManagerImpl{
         Float maxPosition = 8f; 
         Integer traitId = 1001; //"DE"; 
         String experiment = ""; 
-        Float effect =0f;
+        Integer effect = 0;
         Float scoreValue = 2.5f;
         Float rSquare = 10f; 
         String linkageGroup = "LG06"; 
@@ -2023,26 +2051,62 @@ public class TestGenotypicDataManagerImpl{
     }
     
     @Test
-    public void testGetQTLByQTLIDs() throws Exception {
-        List<Integer> qtlIDs = new ArrayList<Integer>();
-        qtlIDs.add(1);
-        qtlIDs.add(2);
-        qtlIDs.add(3);
+    public void testGetQtlByQtlIdsFromCentral() throws Exception {
+        List<Integer> qtlIds = new ArrayList<Integer>();
+        qtlIds.add(1);
+        qtlIds.add(2);
+        qtlIds.add(3);
       
-        List<QtlDetailElement> results = manager.getQtlByQtlIds(qtlIDs, 0, 
-                (int) manager.countQtlByQtlIds(qtlIDs));
-        Debug.println(0, "testGetQtlByQTLIDs() RESULTS: " + results);
+        List<QtlDetailElement> results = manager.getQtlByQtlIds(qtlIds, 0, 
+                (int) manager.countQtlByQtlIds(qtlIds));
+        
+        assertTrue(results.size() > 0);
+        
+        for (QtlDetailElement e : results){
+            Debug.printObject(3, e);
+        }
+        Debug.println(0, "testGetQtlByQtlIdsFromCentral() #records: " + results.size());
     }
-   
 
     @Test
-    public void testCountQTLByQTLIDs() throws Exception { 
-        List<Integer> qtlIDs = new ArrayList<Integer>();
-        qtlIDs.add(1);
-        qtlIDs.add(2);
-        qtlIDs.add(3);
-        long count = manager.countQtlByQtlIds(qtlIDs);
-        Debug.println(0, "testCountQtlByQTLIDs() RESULTS: " + count);
+    public void testGetQtlByQtlIdsFromLocal() throws Exception {
+        //TODO 
+        List<Integer> qtlIds = new ArrayList<Integer>();
+        qtlIds.add(-1);
+        qtlIds.add(-2);
+        qtlIds.add(-3);
+      
+        List<QtlDetailElement> results = manager.getQtlByQtlIds(qtlIds, 0, 
+                (int) manager.countQtlByQtlIds(qtlIds));
+        
+        for (QtlDetailElement e : results){
+            Debug.printObject(3, e);
+        }
+        Debug.println(0, "testGetQtlByQtlIdsFromLocal() #records: " + results.size());
+    }
+   
+    @Test
+    public void testCountQtlByQtlIdsFromCentral() throws Exception {
+        List<Integer> qtlIds = new ArrayList<Integer>();
+        qtlIds.add(1);
+        qtlIds.add(2);
+        qtlIds.add(3);
+
+        long count = manager.countQtlByQtlIds(qtlIds);
+
+        assertTrue(count > 0);
+        
+        Debug.println(0, "testCountQtlByQtlIdsFromCentral() RESULTS: " + count);
+    }
+
+    @Test
+    public void testCountQtlByQtlIds() throws Exception { 
+        List<Integer> qtlIds = new ArrayList<Integer>();
+        qtlIds.add(1);
+        qtlIds.add(2);
+        qtlIds.add(3);
+        long count = manager.countQtlByQtlIds(qtlIds);
+        Debug.println(0, "testCountQtlByQtlIds() RESULTS: " + count);
     }   
     
     
@@ -2050,7 +2114,8 @@ public class TestGenotypicDataManagerImpl{
     public void testGetQtlDataByQtlTraits() throws Exception {
         List<Integer> qtlTraits = new ArrayList<Integer>();   // Crop tested: Groundnut
 		qtlTraits.add(1001);     // "DE"
-        List<QtlDataElement> results = manager.getQtlDataByQtlTraits(qtlTraits, 0, (int) manager.countQtlDataByQtlTraits(qtlTraits)); 
+        List<QtlDataElement> results = manager.getQtlDataByQtlTraits(qtlTraits, 0, 
+                (int) manager.countQtlDataByQtlTraits(qtlTraits)); 
         Debug.println(0, "testGetQtlDataByQtlTraits() RESULTS: " + results.size());
         for (QtlDataElement element : results){
             Debug.println(0, "    " + element);

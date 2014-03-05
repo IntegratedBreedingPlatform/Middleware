@@ -152,7 +152,7 @@ public class QtlDetails implements Serializable{
     private String experiment;
 
     @Column(name = "effect")
-    private Float effect;
+    private Integer effect;
 
     @Column(name = "score_value")
     private Float scoreValue;
@@ -198,7 +198,7 @@ public class QtlDetails implements Serializable{
         
     }
 
-    public QtlDetails(Integer qtlId, Integer mapId, Float minPosition, Float maxPosition, Integer traitId, String experiment, Float effect,
+    public QtlDetails(Integer qtlId, Integer mapId, Float minPosition, Float maxPosition, Integer traitId, String experiment, Integer effect,
             Float scoreValue, Float rSquare, String linkageGroup, String interactions, String leftFlankingMarker,
             String rightFlankingMarker, Float position, Float clen, String seAdditive, String hvParent, String hvAllele, String lvParent,
             String lvAllele) {
@@ -265,11 +265,11 @@ public class QtlDetails implements Serializable{
         this.experiment = experiment;
     }
     
-    public Float getEffect() {
+    public Integer getEffect() {
         return effect;
     }
     
-    public void setEffect(Float effect) {
+    public void setEffect(Integer effect) {
         this.effect = effect;
     }
     
