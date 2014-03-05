@@ -957,4 +957,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
         return getFolderBuilder().buildFolderTree();
     }
     
+    @Override
+    public int countPlotsWithPlantsSelectedofDataset(int dataSetId) throws MiddlewareQueryException {
+        if (setWorkingDatabase(Database.LOCAL)) {
+            return getPhenotypeDao().countPlantsSelectedOfNursery(dataSetId);
+        }
+        return 0;
+    }
 }
