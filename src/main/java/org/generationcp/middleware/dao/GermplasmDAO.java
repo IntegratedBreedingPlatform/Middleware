@@ -35,6 +35,29 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
 
     private static final String STATUS_DELETED = "9";
 
+    @Override
+    public Germplasm getById(Integer gid,  boolean lock) throws MiddlewareQueryException {
+    	return getById(gid);
+    }
+    	
+    @Override
+    public Germplasm getById(Integer gid) throws MiddlewareQueryException {
+        try {
+            StringBuilder queryString = new StringBuilder();
+            queryString.append("SELECT g.* FROM germplsm g WHERE gid!=grplce AND gid=:gid LIMIT 1");
+            
+            SQLQuery query = getSession().createSQLQuery(queryString.toString());
+            query.setParameter("gid", gid);
+            query.addEntity("g", Germplasm.class);
+
+            return (Germplasm) query.uniqueResult();
+
+        } catch (HibernateException e) {
+            logAndThrowException("Error with getById(gid=" + gid + ") query from Germplasm: " + e.getMessage(), e);
+        }
+        return null;
+    }
+    
     @SuppressWarnings("unchecked")
     public List<Germplasm> getByPrefName(String name, int start, int numOfRows) throws MiddlewareQueryException {
         try {
@@ -65,7 +88,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
             throws MiddlewareQueryException {
         try {
             StringBuilder queryString = new StringBuilder();
-            queryString.append("SELECT DISTINCT {g.*} FROM germplsm g JOIN names n ON g.gid = n.gid WHERE ");
+            queryString.append("SELECT DISTINCT {g.*} FROM germplsm g JOIN names n ON g.gid = n.gid WHERE gid!=grplce AND ");
 
             if (operation == null || operation == Operation.EQUAL) {
                 queryString.append("n.nval = :name ");
@@ -142,7 +165,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer>{
     public long countByName(String name, Operation operation, Integer status, GermplasmNameType type) throws MiddlewareQueryException {
         try {
             StringBuilder queryString = new StringBuilder();
-            queryString.append("SELECT COUNT(DISTINCT g.gid) FROM germplsm g JOIN names n ON g.gid = n.gid WHERE ");
+            queryString.append("SELECT COUNT(DISTINCT g.gid) FROM germplsm g JOIN names n ON g.gid = n.gid WHERE g.gid!=g.grplce AND ");
 
             if (operation == null || operation == Operation.EQUAL) {
                 queryString.append("n.nval = :name ");

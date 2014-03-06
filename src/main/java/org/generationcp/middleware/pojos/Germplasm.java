@@ -269,24 +269,24 @@ public class Germplasm implements Serializable{
                     + "nval LIKE :name ";       
     
     public static final String COUNT_BY_NAME_USING_LIKE =
-            "SELECT COUNT(DISTINCT g.gid) FROM germplsm g JOIN names n ON g.gid = n.gid WHERE "
-                    + "nval LIKE :name ";       
+            "SELECT COUNT(DISTINCT g.gid) FROM germplsm g JOIN names n ON g.gid = n.gid WHERE g.gid!=g.grplce AND "
+                    + "nval LIKE :name";       
     
     public static final String GET_BY_NAME_ALL_MODES_USING_EQUAL =
-            "SELECT DISTINCT {g.*} FROM germplsm g JOIN names n ON g.gid = n.gid WHERE "
-          + "nval = :name OR nval = :noSpaceName OR nval = :standardizedName ";
+            "SELECT DISTINCT {g.*} FROM germplsm g JOIN names n ON g.gid = n.gid WHERE g.gid!=g.grplce AND "
+          + "( nval = :name OR nval = :noSpaceName OR nval = :standardizedName )";
     
     public static final String COUNT_BY_NAME_ALL_MODES_USING_EQUAL =
-            "SELECT COUNT(DISTINCT g.gid) FROM germplsm g JOIN names n ON g.gid = n.gid WHERE "
-            + "nval = :name OR nval = :noSpaceName OR nval = :standardizedName ";       
+            "SELECT COUNT(DISTINCT g.gid) FROM germplsm g JOIN names n ON g.gid = n.gid WHERE g.gid!=g.grplce AND "
+            + "( nval = :name OR nval = :noSpaceName OR nval = :standardizedName )";       
 
     public static final String GET_BY_NAME_ALL_MODES_USING_LIKE =
-            "SELECT DISTINCT {g.*} FROM germplsm g JOIN names n ON g.gid = n.gid WHERE "
-                    + "nval LIKE :name OR nval LIKE :noSpaceName OR nval LIKE :standardizedName ";       
+            "SELECT DISTINCT {g.*} FROM germplsm g JOIN names n ON g.gid = n.gid WHERE g.gid!=g.grplce AND "
+                    + "( nval LIKE :name OR nval LIKE :noSpaceName OR nval LIKE :standardizedName )";       
     
     public static final String COUNT_BY_NAME_ALL_MODES_USING_LIKE =
-            "SELECT COUNT(DISTINCT g.gid) FROM germplsm g JOIN names n ON g.gid = n.gid WHERE "
-                    + "nval LIKE :name OR nval LIKE :noSpaceName OR nval LIKE :standardizedName ";  
+            "SELECT COUNT(DISTINCT g.gid) FROM germplsm g JOIN names n ON g.gid = n.gid WHERE g.gid!=g.grplce AND "
+                    + "( nval LIKE :name OR nval LIKE :noSpaceName OR nval LIKE :standardizedName )";  
     
     public static final String GET_NEXT_IN_SEQUENCE_FOR_CROSS_NAME_PREFIX =
             "SELECT CONVERT(REPLACE(nval, :prefix, ''), SIGNED)+1 AS last_number " +
