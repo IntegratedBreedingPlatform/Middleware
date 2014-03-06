@@ -73,7 +73,12 @@ public class PhenotypeSaver extends Saver{
         if (variable.getValue() != null && !"".equals(variable.getValue().trim())) {
 	        if (TermId.OBSERVATION_VARIATE.getId() == variable.getVariableType().getStandardVariable().getStoredIn().getId()) {
 	            phenotype = getPhenotypeObject(phenotype);
-	            phenotype.setValue(variable.getValue());
+	            if (variable.getValue() != null) {
+	            	phenotype.setValue(variable.getValue().trim());
+	            }
+	            else {
+	            	phenotype.setValue(null);
+	            }
 	            phenotype.setObservableId(variable.getVariableType().getId());
 	            phenotype.setUniqueName(phenotype.getPhenotypeId().toString());
 	            phenotype.setName(String.valueOf(variable.getVariableType().getId()));
@@ -88,6 +93,7 @@ public class PhenotypeSaver extends Saver{
 	            phenotype.setName(String.valueOf(variable.getVariableType().getId()));
 	        }
         }
+        
         return phenotype;
     }
     
@@ -105,7 +111,7 @@ public class PhenotypeSaver extends Saver{
     	if ((value == null || "".equals(value.trim())) && (phenotype == null || phenotype.getPhenotypeId() == null) ){
     		return null;
     	}
-
+    	
     	phenotype = getPhenotypeObject(phenotype);
 
         if (TermId.OBSERVATION_VARIATE.getId() == storedIn) {

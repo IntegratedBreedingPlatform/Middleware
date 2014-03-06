@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, All Rights Reserved.
+ * Copyright (c) 2014, All Rights Reserved.
  * 
  * Generation Challenge Programme (GCP)
  * 
@@ -9,7 +9,7 @@
  * Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  * 
  *******************************************************************************/
-package org.generationcp.middleware.util;
+package org.generationcp.middleware.utils.test;
 
 import java.lang.reflect.Field;
 import java.util.List;

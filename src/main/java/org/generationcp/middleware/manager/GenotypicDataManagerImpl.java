@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -84,6 +85,8 @@ import org.generationcp.middleware.pojos.gdms.QtlDetails;
 import org.generationcp.middleware.pojos.gdms.QtlDetailsPK;
 import org.generationcp.middleware.pojos.gdms.SNPDataRow;
 import org.generationcp.middleware.pojos.gdms.SSRDataRow;
+import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -713,13 +716,34 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public List<QtlDetailElement> getQtlByName(String name, int start, int numOfRows) throws MiddlewareQueryException {
+        List<QtlDetailElement> qtlDetailElements = new ArrayList<QtlDetailElement>();
         if ((name == null) || (name.isEmpty())) {
-            return new ArrayList<QtlDetailElement>();
+            return qtlDetailElements;
         }
 
-        List<String> methods = Arrays.asList("countQtlDetailsByName", "getQtlDetailsByName");
-        return (List<QtlDetailElement>) super.getFromCentralAndLocalByMethod(getQtlDao(), methods, start, numOfRows, 
+        // Get records from CENTRAL
+        qtlDetailElements.addAll(
+                (List<QtlDetailElement>) getFromInstanceByMethod(getQtlDao(), Database.CENTRAL, "getQtlAndQtlDetailsByName", 
+                new Object[]{name, start, numOfRows}, new Class[]{String.class, Integer.TYPE, Integer.TYPE}));
+        
+        // Get records from LOCAL
+        // 1. Get gdms_qtl and gdms_qtl_details based on name from LOCAL
+        List<Qtl> qtlLocal = getFromInstanceByMethod(getQtlDao(), Database.LOCAL, "getQtlByName", 
                 new Object[]{name}, new Class[]{String.class});
+        
+        List<Integer> qtlIds = new ArrayList<Integer>();
+        for(Qtl qtl : qtlLocal){
+            qtlIds.add(qtl.getQtlId());
+        }
+        
+        if (qtlIds != null && qtlIds.size() > 0){
+            List<QtlDetails> qtlDetailsLocal = getFromInstanceByMethod(getQtlDetailsDao(), Database.LOCAL, 
+                    "getQtlDetailsByQtlIds", new Object[]{qtlIds}, new Class[]{List.class});
+
+            qtlDetailElements.addAll(getQtlDetailElementsFromLocal(qtlDetailsLocal, qtlLocal));
+        }
+        return qtlDetailElements;
+
     }
 
     @Override
@@ -727,7 +751,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         if ((name == null) || (name.isEmpty())) {
             return 0;
         }
-        return super.countAllFromCentralAndLocalByMethod(getQtlDao(), "countQtlDetailsByName", new Object[]{name}, new Class[]{String.class});
+        return super.countAllFromCentralAndLocalByMethod(getQtlDao(), "countQtlAndQtlDetailsByName"
+                , new Object[]{name}, new Class[]{String.class});
     }
     
     @Override
@@ -745,13 +770,99 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
     @Override
     public List<QtlDetailElement> getQtlByQtlIds(List<Integer> qtlIds, int start, int numOfRows) throws MiddlewareQueryException {
+        List<QtlDetailElement> qtlDetailElements = new ArrayList<QtlDetailElement>();
+
         if ((qtlIds == null) || (qtlIds.isEmpty())) {
-            return new ArrayList<QtlDetailElement>();
+            return qtlDetailElements;
         }
         
-        List<String> methods = Arrays.asList("countQtlDetailsByQTLIDs", "getQtlDetailsByQTLIDs");
-        return (List<QtlDetailElement>) super.getFromCentralAndLocalByMethod(getQtlDao(), methods, start, numOfRows, 
+        // Get records from CENTRAL
+        qtlDetailElements.addAll(
+                (List<QtlDetailElement>) getFromInstanceByMethod(getQtlDao(), Database.CENTRAL, "getQtlAndQtlDetailsByQtlIds", 
+                new Object[]{qtlIds, start, numOfRows}, new Class[]{List.class, Integer.TYPE, Integer.TYPE}));
+
+        //Get records from LOCAL
+        // 1. Get gdms_qtl and gdms_qtl_details based on qtl_id from LOCAL
+        List<QtlDetails> qtlDetailsLocal = getFromInstanceByMethod(getQtlDetailsDao(), Database.LOCAL, "getQtlDetailsByQtlIds", 
                 new Object[]{qtlIds}, new Class[]{List.class});
+        List<Qtl> qtlLocal = getFromInstanceByMethod(getQtlDao(), Database.LOCAL, "getQtlsByIds", 
+                new Object[]{qtlIds}, new Class[]{List.class});
+
+        qtlDetailElements.addAll(getQtlDetailElementsFromLocal(qtlDetailsLocal, qtlLocal));
+
+        return qtlDetailElements;
+    }
+    
+    
+    private List<QtlDetailElement> getQtlDetailElementsFromLocal(List<QtlDetails> qtlDetailsLocal, List<Qtl> qtlLocal) 
+            throws MiddlewareQueryException{
+
+        //2. Get mapId and traitId from QtlDetails
+        Set<Integer> mapIdSet = new HashSet<Integer>();
+        Set<Integer> traitIdSet = new HashSet<Integer>();
+        for (QtlDetails details : qtlDetailsLocal){
+            mapIdSet.add(details.getId().getMapId());
+            traitIdSet.add(details.getTraitId());
+        }
+        List<Integer> mapIds = new ArrayList<Integer>(mapIdSet);
+        List<Integer> traitIds = new ArrayList<Integer>(traitIdSet);
+        
+        // 3. With retrieved gdms_qtl_details.map_id, get maps from gdms_map central and local 
+        List<Map> maps = new ArrayList<Map>();
+        if (mapIds != null && mapIds.size() > 0){
+            maps = super.getAllFromCentralAndLocalByMethod(getMapDao()
+                , "getMapsByIds", new Object[]{mapIds}, new Class[]{List.class});
+        }
+        // 4. With retrieved gdms_qtl_details.tid, retrieve from cvterm & cvtermprop - central and local 
+        
+        List<CVTerm> cvTerms = new ArrayList<CVTerm>();
+        List<CVTermProperty> cvTermProperties = new ArrayList<CVTermProperty>();
+        if (traitIds != null && traitIds.size() > 0){
+            cvTerms = super.getAllFromCentralAndLocalByMethod(super.getCvTermDao(), "getByIds"
+                , new Object[]{traitIds}, new Class[]{List.class});
+            cvTermProperties = super.getAllFromCentralAndLocalByMethod(super.getCvTermPropertyDao()
+                    , "getByCvTermIds" , new Object[]{traitIds}, new Class[]{List.class});
+        }
+        
+        
+        // Construct qtlDetailsElement        
+            // qtlDetailsLocal
+            // inner join with qtlLocal - on qtlId
+            // inner join with maps.mapId
+            // inner join with cvTerm.traitId
+            // left join with cvTermProperties
+
+        Set<QtlDetailElement> qtlDetailElementsLocal = new HashSet<QtlDetailElement>();
+        
+        for (QtlDetails details : qtlDetailsLocal){
+            for (Qtl qtl : qtlLocal){
+                if (details.getQtlId().equals(qtl.getQtlId())){
+                    for(Map map : maps){
+                        if (details.getMapId().equals(map.getMapId())){
+                            QtlDetailElement element = new QtlDetailElement(qtl.getQtlName(), map.getMapName(), details);
+                            for(CVTerm term : cvTerms){
+                                if (details.getTraitId().equals(term.getCvTermId())){
+                                    element.settRName(term.getName());
+                                    break;
+                                }
+                            }
+                            for(CVTermProperty property: cvTermProperties){
+                                if (details.getTraitId().equals(property.getCvTermId())){
+                                    element.setOntology(property.getValue());
+                                    break;
+                                }
+                            }
+                            qtlDetailElementsLocal.add(element);
+                        }
+                    }
+                } else {
+                    continue;
+                }
+
+            }
+        }
+        
+        return new ArrayList<QtlDetailElement>(qtlDetailElementsLocal);
     }
 
     @Override
@@ -759,7 +870,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         if ((qtlIds == null) || (qtlIds.isEmpty())) {
             return 0;
         }
-        return super.countAllFromCentralAndLocalByMethod(getQtlDao(), "countQtlDetailsByQTLIDs", new Object[]{qtlIds}, new Class[]{List.class});
+        return super.countAllFromCentralAndLocalByMethod(getQtlDao(), "countQtlAndQtlDetailsByQtlIds"
+                , new Object[]{qtlIds}, new Class[]{List.class});
     }
 
     @Override
@@ -1670,7 +1782,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
    
    @Override
    public List<QtlDetails> getQtlDetailsByMapId(Integer mapId) throws MiddlewareQueryException {
-           return getFromInstanceByIdAndMethod(getQtlDetailsDao(), mapId, "getQtlDetailsByMapId", new Object[] {mapId}, new Class[] {Integer.class});
+           return super.getAllFromCentralAndLocalByMethod(getQtlDetailsDao(),  "getQtlDetailsByMapId"
+                   , new Object[] {mapId}, new Class[] {Integer.class});
    }
 
    @Override

@@ -88,6 +88,7 @@ public class TestNurseryWorkbookUtil {
 	//VARIATES
 	public static final String VARIATE1 = "GYLD";
 	public static final String VARIATE2 = "CHALK_PCT";
+	public static final String VARIATE3 = "PLANTS_SELECTED";
 //	public static final String VARIATE2 = "NBEPm2";
 //	public static final String VARIATE3 = "equi-Kkni";
 //	public static final String VARIATE4 = "DTFL";
@@ -231,7 +232,9 @@ public class TestNurseryWorkbookUtil {
 		List<MeasurementVariable> variates = new ArrayList<MeasurementVariable>();
 		
 		variates.add(new MeasurementVariable(VARIATE1, "Grain yield -dry and weigh (kg/ha)", 
-				KG_HA, "Dry and weigh", "Yield", NUMERIC, STUDY, STUDY));		
+				KG_HA, "Dry and weigh", "Yield", NUMERIC, STUDY, STUDY));
+		variates.add(new MeasurementVariable(VARIATE2, "NUMBER OF PLANTS SELECTED", 
+		                NUMBER, "Counted", "PLANTS SELECTED", NUMERIC, STUDY, STUDY));
 		//variates.add(new MeasurementVariable(VARIATE2, "Chalkiness of endosperm - Cervitec (percent)", 
 		//		"Average of Median Percentage", "Cervitec", "Chalkiness of endosperm", NUMERIC, STUDY, STUDY));	
 //		variates.add(new MeasurementVariable(VARIATE2, "(formerly RDTG) Grain Yield", 
@@ -289,6 +292,7 @@ public class TestNurseryWorkbookUtil {
 //			dataList.add(new MeasurementData(ROW, String.valueOf(37+i)));
 //			dataList.add(new MeasurementData(COL, "1"));
 			dataList.add(new MeasurementData(VARIATE1, randomizeValue(random, fmt, 5000)));
+			dataList.add(new MeasurementData(VARIATE1, "15"));
 			//dataList.add(new MeasurementData(VARIATE2, randomizeValue(random, fmt, 100)));
 			
 			row.setDataList(dataList);

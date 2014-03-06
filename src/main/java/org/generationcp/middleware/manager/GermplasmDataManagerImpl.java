@@ -1962,12 +1962,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
         List<Germplasm> combinedResults = new ArrayList<Germplasm>();
 
         if (setWorkingDatabase(Database.CENTRAL)) {
-            resultsFromCentral = getGermplasmDao().searchForGermplasms(q, o, includeParents);
+            resultsFromCentral = getGermplasmDao().searchForGermplasms(q, o, includeParents, true, getCurrentSessionForLocal());
             combinedResults.addAll(resultsFromCentral);
         }
         
         if (setWorkingDatabase(Database.LOCAL)) {
-            resultsFromLocal = getGermplasmDao().searchForGermplasms(q, o, includeParents);
+            resultsFromLocal = getGermplasmDao().searchForGermplasms(q, o, includeParents, false, null);
             combinedResults.addAll(resultsFromLocal);
         }
 

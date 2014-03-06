@@ -14,6 +14,7 @@ package org.generationcp.middleware.service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,6 +22,7 @@ import java.util.Set;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.NameDAO;
+import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -33,6 +35,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
+import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -49,6 +52,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -60,6 +64,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
     
     private static final Logger LOG = LoggerFactory.getLogger(FieldbookServiceImpl.class);
 
+	private static final String DATA_TYPE_NUMERIC = "N";
+	
     public FieldbookServiceImpl(
             HibernateSessionProvider sessionProviderForLocal,
             HibernateSessionProvider sessionProviderForCentral) {
@@ -179,6 +185,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
                         for (MeasurementData field : row.getDataList()){
                             if (variate.getName().equals(field.getLabel())){
                             	Phenotype phenotype = null;
+                                if (field.getValue() != null) {
+                                	field.setValue(field.getValue().trim());
+                                }
                                 if (field.getPhenotypeId() != null) {
 	                                phenotype = getPhenotypeDao().getById(field.getPhenotypeId());
                                 }
@@ -452,5 +461,59 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
         return getUserDataManager().getAllPersons();
     }
     
+    public int countPlotsWithPlantsSelectedofNursery(int nurseryId) throws MiddlewareQueryException {
+        StudyDetails studyDetails = getStudyDataManager().getStudyDetails(Database.LOCAL, StudyType.N, nurseryId);
+        
+        int dataSetId = 0;
+        
+        //get observation dataset
+        List<DatasetReference> datasetRefList = getStudyDataManager().getDatasetReferences(nurseryId);
+        if (datasetRefList != null) {
+            for (DatasetReference datasetRef : datasetRefList) {
+                if (datasetRef.getName().equals("MEASUREMENT EFEC_" + studyDetails.getStudyName()) || 
+                        datasetRef.getName().equals("MEASUREMENT EFECT_" + studyDetails.getStudyName())) {
+                    dataSetId = datasetRef.getId();
+                }
+            }
+        }
+        
+        //if not found in the list using the name, get dataset with Plot Data type
+        if (dataSetId == 0) {
+            dataSetId = getStudyDataManager().findOneDataSetByType(nurseryId, DataSetType.PLOT_DATA).getId();
+        }
+        
+        return getStudyDataManager().countPlotsWithPlantsSelectedofDataset(dataSetId);
+    }
+    
+    @Override
+    public List<StandardVariableReference> filterStandardVariablesByMode(List<Integer> storedInIds) throws MiddlewareQueryException {
+    	List<StandardVariableReference> list = new ArrayList<StandardVariableReference>();
+    	
+    	List<CVTerm> variables = new ArrayList<CVTerm>();
+    	
+    	Set<Integer> variableIds = new HashSet<Integer>();
+
+    	addAllVariableIdsInMode(variableIds, storedInIds, Database.CENTRAL);
+    	addAllVariableIdsInMode(variableIds, storedInIds, Database.LOCAL);
+    	
+    	List<Integer> variableIdList = new ArrayList<Integer>(variableIds);
+    	setWorkingDatabase(Database.CENTRAL);
+    	variables.addAll(getCvTermDao().getByIds(variableIdList));
+    	setWorkingDatabase(Database.LOCAL);
+    	variables.addAll(getCvTermDao().getByIds(variableIdList));
+    	
+    	for (CVTerm variable : variables) {
+    		list.add(new StandardVariableReference(variable.getCvTermId(), variable.getName(), variable.getDefinition()));
+    	}
+    	
+    	return list;
+    }
+
+    private void addAllVariableIdsInMode(Set<Integer> variableIds, List<Integer> storedInIds, Database database) throws MiddlewareQueryException {
+    	setWorkingDatabase(database);
+    	for (Integer storedInId : storedInIds) {
+    		variableIds.addAll(getCvTermRelationshipDao().getSubjectIdsByTypeAndObject(TermId.STORED_IN.getId(), storedInId));
+    	}
+    }
     
 }

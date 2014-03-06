@@ -24,9 +24,12 @@ import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.Qtl;
 import org.generationcp.middleware.pojos.gdms.QtlDetailElement;
+import org.generationcp.middleware.pojos.gdms.QtlDetails;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * DAO class for {@link Qtl}.
@@ -66,121 +69,108 @@ public class QtlDAO  extends GenericDAO<Qtl, Integer>{
         return new ArrayList<Integer>();
     }
 
-    @SuppressWarnings("rawtypes")
-    public List<QtlDetailElement> getQtlDetailsByQTLIDs(List<Integer> qtlIDs, int start, int numOfRows) 
+    public List<QtlDetailElement> getQtlAndQtlDetailsByQtlIds(List<Integer> qtlIDs, int start, int numOfRows) 
     		throws MiddlewareQueryException{
         List<QtlDetailElement> toReturn = new ArrayList<QtlDetailElement>();
 
         try {
         	if (qtlIDs != null && !qtlIDs.isEmpty()){
-	            SQLQuery query = getSession().createSQLQuery(Qtl.GET_QTL_BY_QTL_IDS);
+	            SQLQuery query = getSession().createSQLQuery(Qtl.GET_QTL_AND_QTL_DETAILS_BY_QTL_IDS);
 	            query.setParameterList("qtl_id_list", qtlIDs);
 	            query.setFirstResult(start);
 	            query.setMaxResults(numOfRows);
-	            List results = query.list();
-	
-	            for (Object o : results) {
-	                Object[] result = (Object[]) o;
-	                if (result != null) {
-	                    String qtlName = (String) result[0];
-	                    String mapName = (String) result[1];
-	                    String chromosome = (String) result[2];
-	                    Float minPosition = (Float) result[3];
-	                    Float maxPosition = (Float) result[4];
-	                    Integer traitId = (Integer) result[5];
-	                    String experiment = (String) result[6];
-	                    String leftFlankingMarker = (String) result[7];
-	                    String rightFlankingMarker = (String) result[8];
-	                    Integer effect = (Integer) result[9];
-	                    Float scoreValue = (Float) result[10];
-	                    Float rSquare = (Float) result[11];
-	                    String interactions = (String) result[12];
-	                    String tRName = (String) result[13];
-	                    String ontology = (String) result[14];
-	                                           
-	                    QtlDetailElement element = new QtlDetailElement(
-	                    		qtlName, mapName, chromosome, minPosition, maxPosition, traitId,
-	                            experiment, leftFlankingMarker, rightFlankingMarker, effect, 
-	                            scoreValue, rSquare, interactions, tRName, ontology);
-	                    toReturn.add(element);
-	                }
-	            }
-	
-	            return toReturn;
+	            
+	            toReturn = getQtlAndQtlDetails(query);
         	}
         } catch (HibernateException e) {
-        	logAndThrowException("Error with getQtlDetailsByQTLIDs(qtl ids=" + qtlIDs 
+        	logAndThrowException("Error with getQtlAndQtlDetailsByQtlIds(qtl ids=" + qtlIDs 
         			+ ") query from gdms_qtl_details: " + e.getMessage(), e);
         }
-        return new ArrayList<QtlDetailElement>();
+        return toReturn;
     }
 
-    public long countQtlDetailsByQTLIDs(List<Integer> qtlIDs) throws MiddlewareQueryException {
+    public long countQtlAndQtlDetailsByQtlIds(List<Integer> qtlIDs) throws MiddlewareQueryException {
+        long count = 0;
         try {
-            Query query = getSession().createSQLQuery(Qtl.COUNT_QTL_BY_QTL_IDS);
+            Query query = getSession().createSQLQuery(Qtl.COUNT_QTL_AND_QTL_DETAILS_BY_QTL_IDS);
             query.setParameterList("qtl_id_list", qtlIDs);
             BigInteger result = (BigInteger) query.uniqueResult();
             if (result != null) {
-                return result.longValue();
-            } else {
-                return 0;
-            }
+                count += result.longValue();
+            } 
         } catch (HibernateException e) {
-        	logAndThrowException("Error with countQtlDetailsByQTLIDs(qtl ids=" + qtlIDs + ") query from gdms_qtl_details: "
+        	logAndThrowException("Error with countQtlAndQtlDetailsByQtlIds(qtl ids=" + qtlIDs + ") query from gdms_qtl_details: "
                     + e.getMessage(), e);
         }
-        return 0;
+        return count;
     }
     
-    @SuppressWarnings("rawtypes")
-    public List<QtlDetailElement> getQtlDetailsByName(String name, int start, int numOfRows) throws MiddlewareQueryException{
+    public List<QtlDetailElement> getQtlAndQtlDetailsByName(String name, int start, int numOfRows) throws MiddlewareQueryException{
         List<QtlDetailElement> toReturn = new ArrayList<QtlDetailElement>();
 
         try {
-            SQLQuery query = getSession().createSQLQuery(Qtl.GET_QTL_BY_NAME);
+            SQLQuery query = getSession().createSQLQuery(Qtl.GET_QTL_AND_QTL_DETAILS_BY_NAME);
             query.setParameter("qtlName", name);
             query.setFirstResult(start);
             query.setMaxResults(numOfRows);
-            List results = query.list();
 
-            for (Object o : results) {
-                Object[] result = (Object[]) o;
-                if (result != null) {
-                    String qtlName = (String) result[0];
-                    String mapName = (String) result[1];
-                    String chromosome = (String) result[2];
-                    Float minPosition = (Float) result[3];
-                    Float maxPosition = (Float) result[4];
-                    Integer traitId = (Integer) result[5];
-                    String experiment = (String) result[6];
-                    String leftFlankingMarker = (String) result[7];
-                    String rightFlankingMarker = (String) result[8];
-                    Integer effect = (Integer) result[9];
-                    Float scoreValue = (Float) result[10];
-                    Float rSquare = (Float) result[11];
-                    String interactions = (String) result[12];
-                    String tRName = (String) result[13];
-                    String ontology = (String) result[14];
-                    
-                    QtlDetailElement element = new QtlDetailElement(
-                    		qtlName, mapName, chromosome, minPosition, maxPosition, traitId,
-                            experiment, leftFlankingMarker, rightFlankingMarker, effect, 
-                            scoreValue, rSquare, interactions, tRName, ontology);
-                    toReturn.add(element);
-                }
-            }
-
-            return toReturn;
+            toReturn = getQtlAndQtlDetails(query);
         } catch (HibernateException e) {
         	logAndThrowException("Error with getQtlDetailsByName(name=" + name 
         			+ ") query from gdms_qtl_details: " + e.getMessage(), e);
         }
         return toReturn;
     }
+    
+    @SuppressWarnings("rawtypes")
+    public List<QtlDetailElement> getQtlAndQtlDetails(SQLQuery query) throws HibernateException{
+        List<QtlDetailElement> toReturn = new ArrayList<QtlDetailElement>();
 
-    public long countQtlDetailsByName(String name) throws MiddlewareQueryException {
+        List results = query.list();
+
+        for (Object o : results) {
+            Object[] result = (Object[]) o;
+            if (result != null) {
+                Integer qtlId = (Integer) result[0];
+                String qtlName = (String) result[1];
+                Integer mapId = (Integer) result[2];
+                String mapName = (String) result[3];
+                String chromosome = (String) result[4];
+                Float minPosition = (Float) result[5];
+                Float maxPosition = (Float) result[6];
+                Integer traitId = (Integer) result[7];
+                String experiment = (String) result[8];
+                String leftFlankingMarker = (String) result[9];
+                String rightFlankingMarker = (String) result[10];
+                Integer effect = (Integer) result[11];
+                Float scoreValue = (Float) result[12];
+                Float rSquare = (Float) result[13];
+                String interactions = (String) result[14];
+                Float position = (Float) result[15];
+                Float clen = (Float) result[16];
+                String seAdditive = (String) result[17];
+                String hvParent = (String) result[18];
+                String hvAllele = (String) result[19];
+                String lvParent = (String) result[20];
+                String lvAllele = (String) result[21];
+                String tRName = (String) result[22];
+                String ontology = (String) result[23];
+                
+                QtlDetails qtlDetails = new QtlDetails(qtlId, mapId, minPosition, maxPosition, traitId, experiment, effect,
+                        scoreValue, rSquare, chromosome,  interactions, leftFlankingMarker,
+                        rightFlankingMarker, position, clen, seAdditive, hvParent, hvAllele, lvParent,
+                        lvAllele);
+                
+                QtlDetailElement element = new QtlDetailElement(qtlName, mapName, qtlDetails, tRName, ontology);
+                toReturn.add(element);
+            }
+        }
+        return toReturn;
+    }
+
+    public long countQtlAndQtlDetailsByName(String name) throws MiddlewareQueryException {
         try {
-            Query query = getSession().createSQLQuery(Qtl.COUNT_QTL_BY_NAME);
+            Query query = getSession().createSQLQuery(Qtl.COUNT_QTL_AND_QTL_DETAILS_BY_NAME);
             query.setParameter("qtlName", name);
             BigInteger result = (BigInteger) query.uniqueResult();
             if (result != null) {
@@ -189,7 +179,7 @@ public class QtlDAO  extends GenericDAO<Qtl, Integer>{
                 return 0;
             }
         } catch (HibernateException e) {
-        	logAndThrowException("Error with countQtlDetailsByName(name=" + name 
+        	logAndThrowException("Error with countQtlAndQtlDetailsByName(name=" + name 
         			+ ") query from gdms_qtl_details: " + e.getMessage(), e);
         }
         return 0L;
@@ -342,6 +332,34 @@ public class QtlDAO  extends GenericDAO<Qtl, Integer>{
  	   return qtlNames;
  	}
  	
+ 	@SuppressWarnings("unchecked")
+    public List<Qtl> getQtlsByIds(List<Integer> qtlIds) throws MiddlewareQueryException{
+ 	        try {
+ 	            Criteria criteria = getSession().createCriteria(getPersistentClass());
+ 	            criteria.add(Restrictions.in("qtlId", qtlIds));
+ 	            
+ 	            return criteria.list();
+
+ 	        } catch(HibernateException e) {
+ 	            logAndThrowException("Error in getQtlsByIds=" + qtlIds + " in QtlDAO: " + e.getMessage(), e);
+ 	        }
+ 	        return new ArrayList<Qtl>();
+ 
+ 	}
  	
+    @SuppressWarnings("unchecked")
+    public List<Qtl> getQtlByName(String qtlName) throws MiddlewareQueryException{
+            try {
+                Criteria criteria = getSession().createCriteria(getPersistentClass());
+                criteria.add(Restrictions.eq("qtlName", qtlName));
+                
+                return criteria.list();
+
+            } catch(HibernateException e) {
+                logAndThrowException("Error in getQtlByName=" + qtlName + " in QtlDAO: " + e.getMessage(), e);
+            }
+            return new ArrayList<Qtl>();
+ 
+    }
  	
 }

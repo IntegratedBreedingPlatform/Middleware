@@ -26,17 +26,7 @@ public class QtlDetailElement implements Serializable{
     
     private String qtlName;
     private String mapName;
-    private String chromosome;
-    private Float minPosition;
-    private Float maxPosition;
-    private Integer traitId;
-    private String experiment;
-    private String leftFlankingMarker;
-    private String rightFlankingMarker;
-    private Integer effect;
-    private Float scoreValue;
-    private Float rSquare;
-    private String interactions;
+    private QtlDetails qtlDetails;
     private String tRName;
     private String ontology;
     
@@ -44,31 +34,24 @@ public class QtlDetailElement implements Serializable{
     }
 
 
-    public QtlDetailElement(String qtlName, String mapName, String chromosome, float minPosition, Float maxPosition, Integer traitId,
-            String experiment, String leftFlankingMarker, String rightFlankingMarker, Integer effect, Float scoreValue, Float rSquare,
-            String interactions, String tRName, String ontology) {
-        super();
+    public QtlDetailElement(String qtlName, String mapName, QtlDetails qtlDetails) {
         this.qtlName = qtlName;
         this.mapName = mapName;
-        this.chromosome = chromosome;
-        this.minPosition = minPosition;
-        this.maxPosition = maxPosition;
-        this.traitId = traitId;
-        this.experiment = experiment;
-        this.leftFlankingMarker = leftFlankingMarker;
-        this.rightFlankingMarker = rightFlankingMarker;
-        this.effect = effect;
-        this.scoreValue = scoreValue;
-        this.rSquare = rSquare;
-        this.interactions = interactions;
+        this.qtlDetails = qtlDetails;
+    }
+    
+    public QtlDetailElement(String qtlName, String mapName, QtlDetails qtlDetails, String tRName, String ontology) {
+        this.qtlName = qtlName;
+        this.mapName = mapName;
+        this.qtlDetails = qtlDetails;
         this.tRName = tRName;
         this.ontology = ontology;
     }
-
+    
     public String getQtlName() {
         return qtlName;
     }
-
+    
     public void setQtlName(String qtlName) {
         this.qtlName = qtlName;
     }
@@ -76,107 +59,171 @@ public class QtlDetailElement implements Serializable{
     public String getMapName() {
         return mapName;
     }
-    
+
     public void setMapName(String mapName) {
         this.mapName = mapName;
     }
     
-    public String getChromosome() {
-        return chromosome;
+    public QtlDetails getQtlDetails() {
+        return qtlDetails;
+    }
+    
+    public void setQtlDetails(QtlDetails qtlDetails) {
+        this.qtlDetails = qtlDetails;
     }
 
+    public String getChromosome() {
+        return qtlDetails.getLinkageGroup();
+    }
+    
     public void setChromosome(String chromosome) {
-        this.chromosome = chromosome;
+        qtlDetails.setLinkageGroup(chromosome);
     }
     
     public Float getMinPosition() {
-        return minPosition;
+        return qtlDetails.getMinPosition();
     }
-
+    
     public void setMinPosition(Float minPosition) {
-        this.minPosition = minPosition;
+        qtlDetails.setMinPosition(minPosition);
     }
-
+    
     public Float getMaxPosition() {
-        return maxPosition;
+        return qtlDetails.getMaxPosition();
     }
 
     public void setMaxPosition(Float maxPosition) {
-        this.maxPosition = maxPosition;
+        qtlDetails.setMaxPosition(maxPosition);
     }
     
     public Integer getTraitId() {
-        return traitId;
+        return qtlDetails.getTraitId();
     }
-    
+
     public void setTraitId(Integer traitId) {
-        this.traitId = traitId;
+        qtlDetails.setTraitId(traitId);
     }
     
     public String getExperiment() {
-        return experiment;
+        return qtlDetails.getExperiment();
     }
-    
+
     public void setExperiment(String experiment) {
-        this.experiment = experiment;
+        qtlDetails.setExperiment(experiment);
     }
-    
+
     public String getLeftFlankingMarker() {
-        return leftFlankingMarker;
+        return qtlDetails.getLeftFlankingMarker();
     }
     
     public void setLeftFlankingMarker(String leftFlankingMarker) {
-        this.leftFlankingMarker = leftFlankingMarker;
+        qtlDetails.setLeftFlankingMarker(leftFlankingMarker);
     }
     
     public String getRightFlankingMarker() {
-        return rightFlankingMarker;
+        return qtlDetails.getRightFlankingMarker();
     }
     
     public void setRightFlankingMarker(String rightFlankingMarker) {
-        this.rightFlankingMarker = rightFlankingMarker;
+        qtlDetails.setRightFlankingMarker(rightFlankingMarker);
     }
     
     public Integer getEffect() {
-        return effect;
+        return qtlDetails.getEffect();
     }
     
     public void setEffect(Integer effect) {
-        this.effect = effect;
+        qtlDetails.setEffect(effect);
     }
     
     public Float getScoreValue() {
-        return scoreValue;
+        return qtlDetails.getScoreValue();
     }
     
     public void setScoreValue(Float scoreValue) {
-        this.scoreValue = scoreValue;
+        qtlDetails.setScoreValue(scoreValue);
     }
     
-    public Float getRSquare() {
-        return rSquare;
+    public Float getrSquare() {
+        return qtlDetails.getrSquare();
     }
     
-    public void setRSquare(Float rSquare) {
-        this.rSquare = rSquare;
+    public void setrSquare(Float rSquare) {
+        qtlDetails.setrSquare(rSquare);
     }
-
+    
     public String getInteractions() {
-        return interactions;
+        return qtlDetails.getInteractions();
     }
     
     public void setInteractions(String interactions) {
-        this.interactions = interactions;
+        qtlDetails.setInteractions(interactions);
+    }
+    
+    public Float getPosition() {
+        return qtlDetails.getPosition();
+    }
+    
+    public void setPosition(Float position) {
+        qtlDetails.setPosition(position);
+    }
+    
+    public Float getClen() {
+        return qtlDetails.getClen();
+    }
+    
+    public void setClen(Float clen) {
+        qtlDetails.setClen(clen);
+    }
+    
+    public String getSeAdditive() {
+        return qtlDetails.getSeAdditive();
+    }
+    
+    public void setSeAdditive(String seAdditive) {
+        qtlDetails.setSeAdditive(seAdditive);
+    }
+    
+    public String getHvParent() {
+        return qtlDetails.getHvParent();
     }
 
-    public String getTRName() {
+    public void setHvParent(String hvParent) {
+        qtlDetails.setHvParent(hvParent);
+    }
+    
+    public String getHvAllele() {
+        return qtlDetails.getHvAllele();
+    }
+    
+    public void setHvAllele(String hvAllele) {
+        qtlDetails.setHvAllele(hvAllele);
+    }
+    
+    public String getLvParent() {
+        return qtlDetails.getLvParent();
+    }
+    
+    public void setLvParent(String lvParent) {
+        qtlDetails.setLvParent(lvParent);
+    }
+
+    public String getLvAllele() {
+        return qtlDetails.getLvAllele();
+    }
+    
+    public void setLvAllele(String lvAllele) {
+        qtlDetails.setLvAllele(lvAllele);
+    }
+    
+    public String gettRName() {
         return tRName;
     }
     
-    public void setTRName(String tRName) {
+    public void settRName(String tRName) {
         this.tRName = tRName;
     }
-
+    
     public String getOntology() {
         return ontology;
     }
@@ -185,7 +232,17 @@ public class QtlDetailElement implements Serializable{
         this.ontology = ontology;
     }
 
-    
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((mapName == null) ? 0 : mapName.hashCode());
+        result = prime * result + ((ontology == null) ? 0 : ontology.hashCode());
+        result = prime * result + ((qtlDetails == null) ? 0 : qtlDetails.hashCode());
+        result = prime * result + ((qtlName == null) ? 0 : qtlName.hashCode());
+        result = prime * result + ((tRName == null) ? 0 : tRName.hashCode());
+        return result;
+    }
 
     @Override
     public boolean equals(Object obj) {
@@ -196,142 +253,83 @@ public class QtlDetailElement implements Serializable{
         if (getClass() != obj.getClass())
             return false;
         QtlDetailElement other = (QtlDetailElement) obj;
-        if (chromosome == null) {
-            if (other.chromosome != null)
-                return false;
-        } else if (!chromosome.equals(other.chromosome))
-            return false;
-        if (effect == null) {
-            if (other.effect != null)
-                return false;
-        } else if (!effect.equals(other.effect))
-            return false;
-        if (experiment == null) {
-            if (other.experiment != null)
-                return false;
-        } else if (!experiment.equals(other.experiment))
-            return false;
-        if (interactions == null) {
-            if (other.interactions != null)
-                return false;
-        } else if (!interactions.equals(other.interactions))
-            return false;
-        if (leftFlankingMarker == null) {
-            if (other.leftFlankingMarker != null)
-                return false;
-        } else if (!leftFlankingMarker.equals(other.leftFlankingMarker))
-            return false;
         if (mapName == null) {
             if (other.mapName != null)
                 return false;
         } else if (!mapName.equals(other.mapName))
-            return false;
-        if (maxPosition == null) {
-            if (other.maxPosition != null)
-                return false;
-        } else if (!maxPosition.equals(other.maxPosition))
-            return false;
-        if (minPosition == null) {
-            if (other.minPosition != null)
-                return false;
-        } else if (!minPosition.equals(other.minPosition))
             return false;
         if (ontology == null) {
             if (other.ontology != null)
                 return false;
         } else if (!ontology.equals(other.ontology))
             return false;
+        if (qtlDetails == null) {
+            if (other.qtlDetails != null)
+                return false;
+        } else if (!qtlDetails.equals(other.qtlDetails))
+            return false;
         if (qtlName == null) {
             if (other.qtlName != null)
                 return false;
         } else if (!qtlName.equals(other.qtlName))
-            return false;
-        if (rSquare == null) {
-            if (other.rSquare != null)
-                return false;
-        } else if (!rSquare.equals(other.rSquare))
-            return false;
-        if (rightFlankingMarker == null) {
-            if (other.rightFlankingMarker != null)
-                return false;
-        } else if (!rightFlankingMarker.equals(other.rightFlankingMarker))
-            return false;
-        if (scoreValue == null) {
-            if (other.scoreValue != null)
-                return false;
-        } else if (!scoreValue.equals(other.scoreValue))
             return false;
         if (tRName == null) {
             if (other.tRName != null)
                 return false;
         } else if (!tRName.equals(other.tRName))
             return false;
-        if (traitId == null) {
-            if (other.traitId != null)
-                return false;
-        } else if (!traitId.equals(other.traitId))
-            return false;
         return true;
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((chromosome == null) ? 0 : chromosome.hashCode());
-        result = prime * result + ((effect == null) ? 0 : effect.hashCode());
-        result = prime * result + ((experiment == null) ? 0 : experiment.hashCode());
-        result = prime * result + ((interactions == null) ? 0 : interactions.hashCode());
-        result = prime * result + ((leftFlankingMarker == null) ? 0 : leftFlankingMarker.hashCode());
-        result = prime * result + ((mapName == null) ? 0 : mapName.hashCode());
-        result = prime * result + ((maxPosition == null) ? 0 : maxPosition.hashCode());
-        result = prime * result + ((minPosition == null) ? 0 : minPosition.hashCode());
-        result = prime * result + ((ontology == null) ? 0 : ontology.hashCode());
-        result = prime * result + ((qtlName == null) ? 0 : qtlName.hashCode());
-        result = prime * result + ((rSquare == null) ? 0 : rSquare.hashCode());
-        result = prime * result + ((rightFlankingMarker == null) ? 0 : rightFlankingMarker.hashCode());
-        result = prime * result + ((scoreValue == null) ? 0 : scoreValue.hashCode());
-        result = prime * result + ((tRName == null) ? 0 : tRName.hashCode());
-        result = prime * result + ((traitId == null) ? 0 : traitId.hashCode());
-        return result;
-    }
-
-    
-    
-    @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("QtlDetail [qtlName=");
+        builder.append("QtlDetailElement [qtlName=");
         builder.append(qtlName);
         builder.append(", mapName=");
         builder.append(mapName);
         builder.append(", chromosome=");
-        builder.append(chromosome);
+        builder.append(getChromosome());
         builder.append(", minPosition=");
-        builder.append(minPosition);
+        builder.append(getMinPosition());
         builder.append(", maxPosition=");
-        builder.append(maxPosition);
+        builder.append(getMaxPosition());
         builder.append(", traitId=");
-        builder.append(traitId);
+        builder.append(getTraitId());
         builder.append(", experiment=");
-        builder.append(experiment);
+        builder.append(getExperiment());
         builder.append(", leftFlankingMarker=");
-        builder.append(leftFlankingMarker);
+        builder.append(getLeftFlankingMarker());
         builder.append(", rightFlankingMarker=");
-        builder.append(rightFlankingMarker);
+        builder.append(getRightFlankingMarker());
         builder.append(", effect=");
-        builder.append(effect);
+        builder.append(getEffect());
         builder.append(", scoreValue=");
-        builder.append(scoreValue);
+        builder.append(getScoreValue());
         builder.append(", rSquare=");
-        builder.append(rSquare);
+        builder.append(getrSquare());
         builder.append(", interactions=");
-        builder.append(interactions);
+        builder.append(getInteractions());
+        builder.append(", position=");
+        builder.append(getPosition());
+        builder.append(", clen=");
+        builder.append(getClen());
+        builder.append(", seAdditive=");
+        builder.append(getSeAdditive());
+        builder.append(", hvParent=");
+        builder.append(getHvParent());
+        builder.append(", hvAllele=");
+        builder.append(getHvAllele());
+        builder.append(", lvParent=");
+        builder.append(getLvParent());
+        builder.append(", lvAllele=");
+        builder.append(getLvAllele());
         builder.append(", tRName=");
         builder.append(tRName);
         builder.append(", ontology=");
         builder.append(ontology);
         builder.append("]");
         return builder.toString();
-    }
+    }    
+    
 }
