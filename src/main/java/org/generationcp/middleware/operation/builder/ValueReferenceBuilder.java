@@ -39,39 +39,7 @@ public class ValueReferenceBuilder extends Builder {
 		
 		setWorkingDatabase(stdVarId);
 		List<CVTermRelationship> relationships = getCvTermRelationshipDao().getBySubject(stdVarId);
-		Integer storedIn = getRelationshipValue(relationships, TermId.STORED_IN.getId());
 		Integer dataType = getRelationshipValue(relationships, TermId.HAS_TYPE.getId());
-		
-		//Currently only applicable to Study and Trial Environment variables
-		if (storedIn != null) {
-			if (TermId.STUDY_INFO_STORAGE.getId() == storedIn || TermId.DATASET_INFO_STORAGE.getId() == storedIn) {
-				set = getStudyInformation(stdVarId);
-			}
-			else if (TermId.STUDY_NAME_STORAGE.getId() == storedIn || TermId.DATASET_NAME_STORAGE.getId() == storedIn) {
-				set = getStudyNames();
-			}
-			else if (TermId.STUDY_TITLE_STORAGE.getId() == storedIn || TermId.DATASET_TITLE_STORAGE.getId() == storedIn) {
-				set = getStudyDescriptions();
-			}
-			else if (TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId() == storedIn) {
-				set = getTrialEnvironmentValues(stdVarId);
-			}
-			else if (TermId.TRIAL_INSTANCE_STORAGE.getId() == storedIn) {
-				set = getTrialInstances();
-			}
-			else if (TermId.LATITUDE_STORAGE.getId() == storedIn) {
-				set = getLatitudes();
-			}
-			else if (TermId.LONGITUDE_STORAGE.getId() == storedIn) {
-				set = getLongitudes();
-			}
-			else if (TermId.DATUM_STORAGE.getId() == storedIn) {
-				set = getDatumStorages();
-			}
-			else if (TermId.ALTITUDE_STORAGE.getId() == storedIn) {
-				set = getAltitudes();
-			}
-		}
 		
 		if (dataType != null && dataType == TermId.CATEGORICAL_VARIABLE.getId()) {
 			for (ValueReference ref : set) {
