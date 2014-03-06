@@ -73,6 +73,7 @@ import org.generationcp.middleware.pojos.gdms.QtlDetailsPK;
 import org.generationcp.middleware.pojos.gdms.SNPDataRow;
 import org.generationcp.middleware.pojos.gdms.SSRDataRow;
 import org.generationcp.middleware.util.Debug;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -1086,7 +1087,7 @@ public class TestGenotypicDataManagerImpl{
     
     private Dataset createDataset() throws Exception{
         Integer datasetId = null;       // Crop tested: Groundnut
-        String datasetName = " QTL_ ICGS 44 X ICGS 78";
+        String datasetName = " QTL_ ICGS 44 X ICGS 78" + (int) (Math.random()*1000);
         String datasetDesc = "ICGS 44 X ICGS 78";
         String datasetType = "QTL";
         String genus = "Groundnut"; 
@@ -1314,7 +1315,7 @@ public class TestGenotypicDataManagerImpl{
 
     	Integer markerId = null; //Will be set/overridden by the function
         String markerType = null; //Will be set/overridden by the function
-        String markerName = "SeqTEST";
+        String markerName = "SeqTEST" + (int) (Math.random()*1000);
         String species = "Groundnut";
         String dbAccessionId = null;
         String reference = null;
@@ -2052,11 +2053,8 @@ public class TestGenotypicDataManagerImpl{
         qtlIds.add(1);
         qtlIds.add(2);
         qtlIds.add(3);
-
         long count = manager.countQtlByQtlIds(qtlIds);
-
         assertTrue(count > 0);
-        
         Debug.println(0, "testCountQtlByQtlIdsFromCentral() RESULTS: " + count);
     }
 
@@ -2066,7 +2064,11 @@ public class TestGenotypicDataManagerImpl{
         qtlIds.add(1);
         qtlIds.add(2);
         qtlIds.add(3);
+        qtlIds.add(-1);
+        qtlIds.add(-2);
+        qtlIds.add(-3);
         long count = manager.countQtlByQtlIds(qtlIds);
+        assertTrue(count > 0);
         Debug.println(0, "testCountQtlByQtlIds() RESULTS: " + count);
     }   
     
@@ -2334,27 +2336,34 @@ public class TestGenotypicDataManagerImpl{
         insert into gdms_qtl values (-2, 'TEST QTL2', -7);
         insert into gdms_qtl_details values (-1, -1, 0, 8.1, 0, null, 0, 2.3, 5.4, 'LG01', null, 'GM1959', 'GM2050', 12.01, 0, null, null, null, null, null);
         insert into gdms_qtl_details values (-2, -2, 0, 8.1, 0, null, 0, 2.3, 5.4, 'LG01', null, 'GM1959', 'GM2050', 12.01, 0, null, null, null, null, null);
+
+        //List<Integer> qtlIds = Arrays.asList(-1, -2);
+        //int datasetId = -7;
+
         */
-        List<Integer> qtlIds = Arrays.asList(-1, -2);
-        int datasetId = -7;
-        Debug.println(0, "testDeleteQTLs(qtlIds=" + qtlIds + ", datasetId=" + datasetId);
-        manager.deleteQTLs(qtlIds, datasetId);
-        Debug.println(0, "done with testDeleteQTLs");
+        
+        
+        List<Qtl> qtls = manager.getAllQtl(0, 1);
+        List<Integer> qtlIds = new ArrayList<Integer>();
+        if (qtls != null && qtls.size() > 0){
+                qtlIds.add(qtls.get(0).getQtlId());
+                int datasetId = qtls.get(0).getDatasetId();
+                Debug.println(0, "testDeleteQTLs(qtlIds=" + qtlIds + ", datasetId=" + datasetId);
+                manager.deleteQTLs(qtlIds, datasetId);
+                Debug.println(0, "done with testDeleteQTLs");
+        }
+        
     }
     
     @Test
     public void testDeleteSSRGenotypingDatasets() throws Exception {
-        /* TEST DATA - GROUNDNUT
-        insert into gdms_dataset values(-7, 'TEST DATASET', 'TEST', 'QTL', 'Groundnut', 'Groundnut', '2013-07-24', null, 'int', null, null, null, null,  null, null, null);
-        insert into gdms_dataset_users values (-7, 123);
-        insert into gdms_allele_values values(-4, -7, 1, 1, '238:238', '0.0:0.0', 10);
-        insert into gdms_acc_metadataset values (-7, 1, 1);
-        insert into gdms_marker_metadataset values(-7, 1);
-         */
-        int datasetId = -7;
-        Debug.println(0, "testDeleteSSRGenotypingDatasets(" + datasetId + ")");
-        manager.deleteSSRGenotypingDatasets(datasetId);
-        Debug.println(0, "done with testDeleteSSRGenotypingDatasets");
+        List<Qtl> qtls = manager.getAllQtl(0, 1);
+        if (qtls != null && qtls.size() > 0){
+                int datasetId = qtls.get(0).getDatasetId();
+                Debug.println(0, "testDeleteSSRGenotypingDatasets(" + datasetId + ")");
+                manager.deleteSSRGenotypingDatasets(datasetId);
+                Debug.println(0, "done with testDeleteSSRGenotypingDatasets");
+        }
     }
     
     

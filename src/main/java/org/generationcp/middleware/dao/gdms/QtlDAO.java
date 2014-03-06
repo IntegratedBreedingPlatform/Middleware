@@ -90,20 +90,19 @@ public class QtlDAO  extends GenericDAO<Qtl, Integer>{
     }
 
     public long countQtlAndQtlDetailsByQtlIds(List<Integer> qtlIDs) throws MiddlewareQueryException {
+        long count = 0;
         try {
             Query query = getSession().createSQLQuery(Qtl.COUNT_QTL_AND_QTL_DETAILS_BY_QTL_IDS);
             query.setParameterList("qtl_id_list", qtlIDs);
             BigInteger result = (BigInteger) query.uniqueResult();
             if (result != null) {
-                return result.longValue();
-            } else {
-                return 0;
-            }
+                count += result.longValue();
+            } 
         } catch (HibernateException e) {
         	logAndThrowException("Error with countQtlAndQtlDetailsByQtlIds(qtl ids=" + qtlIDs + ") query from gdms_qtl_details: "
                     + e.getMessage(), e);
         }
-        return 0;
+        return count;
     }
     
     public List<QtlDetailElement> getQtlAndQtlDetailsByName(String name, int start, int numOfRows) throws MiddlewareQueryException{

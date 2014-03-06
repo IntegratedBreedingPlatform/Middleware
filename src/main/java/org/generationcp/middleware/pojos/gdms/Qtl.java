@@ -72,7 +72,7 @@ public class Qtl implements Serializable{
                 + ",cvtprop.value " // ontology
                 ;
 
-    private static final String GET_QTL_DETAILS_FROM =                 
+    private static final String GET_QTL_DETAILS_FROM_CENTRAL =               
             "FROM gdms_qtl_details gqd "
                 + "INNER JOIN gdms_qtl gq ON gq.qtl_id = gqd.qtl_id "
                 + "INNER JOIN gdms_map gm ON gm.map_id = gqd.map_id "
@@ -82,31 +82,33 @@ public class Qtl implements Serializable{
     
     public static final String GET_QTL_AND_QTL_DETAILS_BY_QTL_IDS = 
             GET_QTL_DETAILS_SELECT 
-            + GET_QTL_DETAILS_FROM
+            + GET_QTL_DETAILS_FROM_CENTRAL
             + "WHERE gq.qtl_id in(:qtl_id_list) "
             + "ORDER BY gq.qtl_id";
 
     public static final String COUNT_QTL_AND_QTL_DETAILS_BY_QTL_IDS = 
             "SELECT COUNT(*) " 
-            + GET_QTL_DETAILS_FROM
+            + "FROM gdms_qtl_details gqd "
+            + "INNER JOIN gdms_qtl gq ON gq.qtl_id = gqd.qtl_id "
             + "WHERE gq.qtl_id in(:qtl_id_list)"; 
 
     public static final String GET_QTL_AND_QTL_DETAILS_BY_NAME = 
             GET_QTL_DETAILS_SELECT 
-            + GET_QTL_DETAILS_FROM
+            + GET_QTL_DETAILS_FROM_CENTRAL
             + "WHERE   gq.qtl_name LIKE LOWER(:qtlName) "
             + "ORDER BY gq.qtl_id "
             ;
-
+    
     public static final String COUNT_QTL_AND_QTL_DETAILS_BY_NAME = 
             "SELECT  COUNT(*) " 
-            + GET_QTL_DETAILS_FROM
+            + "FROM gdms_qtl_details gqd "
+            + "INNER JOIN gdms_qtl gq ON gq.qtl_id = gqd.qtl_id "
             + "WHERE   gq.qtl_name LIKE LOWER(:qtlName) "
             ;
     
     public static final String GET_QTL_ID_BY_NAME = 
             GET_QTL_DETAILS_SELECT 
-            + GET_QTL_DETAILS_FROM
+            + GET_QTL_DETAILS_FROM_CENTRAL
             + "FROM gdms_qtl "
             + "WHERE qtl_name LIKE LOWER(:qtlName) "
             + "ORDER BY qtl_id";

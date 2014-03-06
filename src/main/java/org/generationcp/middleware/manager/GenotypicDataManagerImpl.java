@@ -726,6 +726,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
                 (List<QtlDetailElement>) getFromInstanceByMethod(getQtlDao(), Database.CENTRAL, "getQtlAndQtlDetailsByName", 
                 new Object[]{name, start, numOfRows}, new Class[]{String.class, Integer.TYPE, Integer.TYPE}));
         
+        // Get records from LOCAL
         // 1. Get gdms_qtl and gdms_qtl_details based on name from LOCAL
         List<Qtl> qtlLocal = getFromInstanceByMethod(getQtlDao(), Database.LOCAL, "getQtlByName", 
                 new Object[]{name}, new Class[]{String.class});
@@ -735,11 +736,12 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
             qtlIds.add(qtl.getQtlId());
         }
         
-        List<QtlDetails> qtlDetailsLocal = getFromInstanceByMethod(getQtlDetailsDao(), Database.LOCAL, "getQtlDetailsByQtlIds", 
-                new Object[]{qtlIds}, new Class[]{List.class});
+        if (qtlIds != null && qtlIds.size() > 0){
+            List<QtlDetails> qtlDetailsLocal = getFromInstanceByMethod(getQtlDetailsDao(), Database.LOCAL, 
+                    "getQtlDetailsByQtlIds", new Object[]{qtlIds}, new Class[]{List.class});
 
-        qtlDetailElements.addAll(getQtlDetailElementsFromLocal(qtlDetailsLocal, qtlLocal));
-
+            qtlDetailElements.addAll(getQtlDetailElementsFromLocal(qtlDetailsLocal, qtlLocal));
+        }
         return qtlDetailElements;
 
     }
@@ -806,15 +808,22 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
         List<Integer> traitIds = new ArrayList<Integer>(traitIdSet);
         
         // 3. With retrieved gdms_qtl_details.map_id, get maps from gdms_map central and local 
-        List<Map> maps = super.getAllFromCentralAndLocalByMethod(getMapDao()
+        List<Map> maps = new ArrayList<Map>();
+        if (mapIds != null && mapIds.size() > 0){
+            maps = super.getAllFromCentralAndLocalByMethod(getMapDao()
                 , "getMapsByIds", new Object[]{mapIds}, new Class[]{List.class});
-        
+        }
         // 4. With retrieved gdms_qtl_details.tid, retrieve from cvterm & cvtermprop - central and local 
-        List<CVTerm> cvTerms = super.getAllFromCentralAndLocalByMethod(super.getCvTermDao(), "getByIds"
+        
+        List<CVTerm> cvTerms = new ArrayList<CVTerm>();
+        List<CVTermProperty> cvTermProperties = new ArrayList<CVTermProperty>();
+        if (traitIds != null && traitIds.size() > 0){
+            cvTerms = super.getAllFromCentralAndLocalByMethod(super.getCvTermDao(), "getByIds"
                 , new Object[]{traitIds}, new Class[]{List.class});
-
-        List<CVTermProperty> cvTermProperties = super.getAllFromCentralAndLocalByMethod(super.getCvTermPropertyDao()
-                , "getByCvTermIds" , new Object[]{traitIds}, new Class[]{List.class});
+            cvTermProperties = super.getAllFromCentralAndLocalByMethod(super.getCvTermPropertyDao()
+                    , "getByCvTermIds" , new Object[]{traitIds}, new Class[]{List.class});
+        }
+        
         
         // Construct qtlDetailsElement        
             // qtlDetailsLocal
