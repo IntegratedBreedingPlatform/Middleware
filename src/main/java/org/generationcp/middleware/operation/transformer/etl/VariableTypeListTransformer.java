@@ -31,8 +31,11 @@ public class VariableTypeListTransformer extends Transformer {
 		
 		if (measurementVariables != null && measurementVariables.size() > 0) {
     		for (MeasurementVariable measurementVariable : measurementVariables) {
-    			
-    			StandardVariable standardVariable = getStandardVariableBuilder().findOrSave(
+    			StandardVariable standardVariable = null;
+    			if(measurementVariable.getTermId()!=0) {//in etl v2, standard variables are already created before saving the study
+    				standardVariable = getStandardVariableBuilder().create(measurementVariable.getTermId());
+    			} else {
+    				standardVariable = getStandardVariableBuilder().findOrSave(
     					measurementVariable.getName(), 
     					measurementVariable.getDescription(), 
     					measurementVariable.getProperty(),
@@ -40,7 +43,7 @@ public class VariableTypeListTransformer extends Transformer {
     					measurementVariable.getMethod(), 
     					isVariate ? PhenotypicType.VARIATE : PhenotypicType.getPhenotypicTypeForLabel(measurementVariable.getLabel()),
     					measurementVariable.getDataType());
-    			
+    			}
     			VariableType variableType = new VariableType(
     						measurementVariable.getName(), 
     						measurementVariable.getDescription(), 

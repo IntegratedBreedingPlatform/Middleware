@@ -12,7 +12,7 @@
 package org.generationcp.middleware.domain.dms;
 
 /**
- * The different experiment types available - e.g. plot, sample, average, summary.
+ * The different experiment types available - e.g. plot, sample, average, summary, study.
  * @author joyce
  *
  */
@@ -21,5 +21,6 @@ public enum ExperimentType {
 	PLOT,
 	SAMPLE,
 	AVERAGE,
-	SUMMARY
+	SUMMARY,
+	STUDY_INFORMATION
 }

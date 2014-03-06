@@ -11,11 +11,20 @@
  *******************************************************************************/
 package org.generationcp.middleware.service;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.generationcp.middleware.domain.dms.NameSynonym;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -33,9 +42,6 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.util.*;
 
 public class DataImportServiceImpl extends Service implements DataImportService {
 
@@ -437,6 +443,60 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         }
         return locationId;
     }
+
+	@Override
+	public int saveProjectOntology(Workbook workbook)
+			throws MiddlewareQueryException {
+		requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+        TimerWatch timerWatch = new TimerWatch("saveProjectOntology (grand total)", LOG);
+        int studyId = 0;
+        
+        try {
+
+            trans = session.beginTransaction();
+            studyId = getWorkbookSaver().saveProjectOntology(workbook);
+            trans.commit();
+
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered with saveDataset(): " + e.getMessage(), e, LOG);
+
+        } finally {
+            timerWatch.stop();
+        }
+
+		return studyId;
+	}
+	
+	@Override
+	public int saveProjectData(int studyId, int trialDatasetId, int measurementDatasetId, Workbook workbook)
+			throws MiddlewareQueryException {
+		requireLocalDatabaseInstance();
+        Session session = getCurrentSessionForLocal();
+        Transaction trans = null;
+        TimerWatch timerWatch = new TimerWatch("saveProjectData (grand total)", LOG);
+        
+        try {
+
+            trans = session.beginTransaction();
+            getWorkbookSaver().saveProjectData(
+            		studyId, trialDatasetId, measurementDatasetId, workbook);
+            trans.commit();
+
+        } catch (Exception e) {
+            rollbackTransaction(trans);
+            logAndThrowException("Error encountered with saveDataset(): " + e.getMessage(), e, LOG);
+            return 0;
+        } finally {
+            timerWatch.stop();
+        }
+
+		return 1;
+	}
+    
+    
 
 
 }

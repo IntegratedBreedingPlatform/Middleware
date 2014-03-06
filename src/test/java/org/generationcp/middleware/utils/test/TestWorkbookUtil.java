@@ -173,10 +173,10 @@ public class TestWorkbookUtil {
 		List<MeasurementVariable> conditions = new ArrayList<MeasurementVariable>();
 		
 		conditions.add(new MeasurementVariable("PI Name", "Name of Principal Investigator", 
-				DBCV, ASSIGNED, PERSON, CHAR, "", STUDY));		
+				DBCV, ASSIGNED, PERSON, CHAR, "PI Name Value", STUDY));		
 		
 		conditions.add(new MeasurementVariable("PI ID", "ID of Principal Investigator", 
-				DBID, ASSIGNED, PERSON, NUMERIC, "", STUDY));		
+				DBID, ASSIGNED, PERSON, NUMERIC, "PI ID Value", STUDY));		
 		
 		conditions.add(new MeasurementVariable("TRIAL", "TRIAL NUMBER", 
 				NUMBER, ENUMERATED, TRIAL_INSTANCE, NUMERIC, String.valueOf(trialNo), TRIAL));

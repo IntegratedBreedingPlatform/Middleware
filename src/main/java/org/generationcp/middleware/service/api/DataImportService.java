@@ -88,4 +88,21 @@ public interface DataImportService {
      * @throws MiddlewareQueryException
      */
     Integer getLocationIdByProjectNameAndDescription(String projectName, String locationDescription) throws MiddlewareQueryException;
+    
+    
+    /**
+	 * Saves the project ontology from the Workbook
+	 * Tables: project, project_relationship, project_properties
+	 * @param workbook
+	 * @return id of created the study (Table.column = Project.project_id)
+	 */
+    int saveProjectOntology(Workbook workbook) throws MiddlewareQueryException;
+    
+    /**
+	 * Saves the project ontology from the Workbook
+	 * Tables: project, project_relationship, project_properties
+	 * @param workbook
+	 * @return id of created the study (Table.column = Project.project_id)
+	 */
+    int saveProjectData(int studyId, int trialDatasetId, int measurementDatasetId, Workbook workbook) throws MiddlewareQueryException;
 }
