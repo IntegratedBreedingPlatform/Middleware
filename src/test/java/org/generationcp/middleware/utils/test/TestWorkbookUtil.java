@@ -116,6 +116,10 @@ public class TestWorkbookUtil {
 		}
 		return workbook;
 	}
+	
+	public static Workbook getTestWorkbookWithErrors(){
+		return createTestWorkbookWithErrors();
+	}
 
 	public static List<Workbook> getTestWorkbooks(int noOfTrial){
 		if (workbooks == null){
@@ -152,6 +156,20 @@ public class TestWorkbookUtil {
 		
 		return wbook;
 	}
+	
+	private static Workbook createTestWorkbookWithErrors(){
+		Workbook workbook = new Workbook();
+		
+		String studyName = "workbookWithErrors" + new Random().nextInt(10000);
+		createStudyDetails(studyName, workbook);
+		createConditionsWithNoTrial(workbook, 1);
+		createFactorsWithNoEntryAndTrial(workbook);
+		createConstants(workbook);
+		createVariatesWithDuplicatePSM(workbook);
+		createObservations(workbook);
+		
+		return workbook;
+	}
 
 	
 	private static void createStudyDetails(String studyName, Workbook workbook) {
@@ -168,6 +186,26 @@ public class TestWorkbookUtil {
 		workbook.setStudyDetails(details);
 	}
 	
+	private static void createConditionsWithNoTrial(Workbook workbook, int trialNo){
+		List<MeasurementVariable> conditions = new ArrayList<MeasurementVariable>();
+		
+		conditions.add(new MeasurementVariable("PI Name", "Name of Principal Investigator", 
+				DBCV, ASSIGNED, PERSON, CHAR, "PI Name Value", STUDY));		
+		
+		conditions.add(new MeasurementVariable("PI ID", "ID of Principal Investigator", 
+				DBID, ASSIGNED, PERSON, NUMERIC, "PI ID Value", STUDY));
+		
+		conditions.add(new MeasurementVariable("SITE", "TRIAL SITE NAME", 
+				DBCV, ASSIGNED, LOCATION, CHAR, "SITE " + trialNo, TRIAL));		
+		
+		conditions.add(new MeasurementVariable("SITE ID", "TRIAL SITE ID", 
+				DBID, ASSIGNED, LOCATION, NUMERIC, String.valueOf(trialNo), TRIAL));		
+		
+		conditions.add(new MeasurementVariable("DESIGN", "EXPERIMENTAL DESIGN", 
+				TYPE, ASSIGNED, EXPERIMENTAL_DESIGN, CHAR, "", TRIAL));
+		
+		workbook.setConditions(conditions);
+	}
 	
 	private static void createConditions(Workbook workbook, int trialNo){
 		List<MeasurementVariable> conditions = new ArrayList<MeasurementVariable>();
@@ -199,7 +237,33 @@ public class TestWorkbookUtil {
 		workbook.setConditions(conditions);
 	}
 	
-	
+	private static void createFactorsWithNoEntryAndTrial(Workbook workbook){
+		List<MeasurementVariable> factors = new ArrayList<MeasurementVariable>();
+		// Entry Factors
+		factors.add(new MeasurementVariable(GID, "The GID of the germplasm", 
+				DBID, ASSIGNED, GERMPLASM_ID, NUMERIC, STUDY, ENTRY));		
+		
+		factors.add(new MeasurementVariable(DESIG, "The name of the germplasm", 
+				DBCV, ASSIGNED, GERMPLASM_ID, CHAR, STUDY, ENTRY));		
+		
+		factors.add(new MeasurementVariable(CROSS, "The pedigree string of the germplasm", 
+				PEDIGREE_STRING, ASSIGNED, CROSS_HISTORY, CHAR, STUDY, ENTRY));		
+		
+		factors.add(new MeasurementVariable(SEED_SOURCE, "The seed source of the germplasm", 
+				NAME, SELECTED, SEED_SOURCE, CHAR, STUDY, ENTRY));		
+		
+		factors.add(new MeasurementVariable(PLOT, "Plot number ", 
+				NESTED_NUMBER, ENUMERATED, FIELD_PLOT, NUMERIC, STUDY, PLOT));		
+		
+		//Plot Factors
+		factors.add(new MeasurementVariable(BLOCK, "INCOMPLETE BLOCK", 
+				NUMBER, ENUMERATED, BLOCKING_FACTOR, NUMERIC, STUDY, PLOT));	
+		
+		factors.add(new MeasurementVariable(REP, REPLICATION, 
+				NUMBER, ENUMERATED, REPLICATION_FACTOR, NUMERIC, STUDY, PLOT));
+		
+		workbook.setFactors(factors);
+	}	
 	private static void createFactors(Workbook workbook){
 		List<MeasurementVariable> factors = new ArrayList<MeasurementVariable>();
 		// Entry Factors
@@ -252,6 +316,17 @@ public class TestWorkbookUtil {
 		
 		
 		workbook.setConstants(constants);
+	}
+	
+	private static void createVariatesWithDuplicatePSM(Workbook workbook){
+		List<MeasurementVariable> variates = new ArrayList<MeasurementVariable>();
+		
+		variates.add(new MeasurementVariable(VARIATE1, "Grain yield -dry and weigh (kg/ha)", 
+				KG_HA, "Dry and weigh", "Yield", NUMERIC, STUDY, STUDY));		
+		variates.add(new MeasurementVariable(VARIATE2, "Grain yield -dry and weigh (kg/ha)", 
+				KG_HA, "Dry and weigh", "Yield", NUMERIC, STUDY, STUDY));
+		
+		workbook.setVariates(variates);
 	}
 	
 	

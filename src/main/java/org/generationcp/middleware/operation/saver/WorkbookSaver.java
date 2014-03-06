@@ -525,15 +525,18 @@ public class WorkbookSaver extends Saver {
 	@SuppressWarnings("unchecked")
 	public int saveProjectOntology(Workbook workbook) throws Exception {
 		
-		Map<String, ?> variableMap = saveVariables(workbook);
+		final Map<String, ?> variableMap = saveVariables(workbook);
+		workbook.setVariableMap(variableMap);
 		
 		// unpack maps first level - Maps of Strings, Maps of VariableTypeList , Maps of Lists of MeasurementVariable
 		Map<String, VariableTypeList> variableTypeMap = (Map<String, VariableTypeList>) variableMap.get("variableTypeMap");
 		Map<String, List<MeasurementVariable>> measurementVariableMap = (Map<String, List<MeasurementVariable>>) variableMap.get("measurementVariableMap");
 
 		// unpack maps
-		VariableTypeList trialVariables = variableTypeMap.get("trialVariables");
-		VariableTypeList effectVariables = variableTypeMap.get("effectVariables");
+		VariableTypeList trialVariables = new VariableTypeList();
+		trialVariables.addAll(variableTypeMap.get("trialVariables"));//addAll instead of assigning directly to avoid changing the state of the object
+		VariableTypeList effectVariables = new VariableTypeList();
+		effectVariables.addAll(variableTypeMap.get("effectVariables"));//addAll instead of assigning directly to avoid changing the state of the object
 		List<MeasurementVariable> trialMV = measurementVariableMap.get("trialMV");
 		List<MeasurementVariable> effectMV = measurementVariableMap.get("effectMV");
 		
@@ -565,7 +568,10 @@ public class WorkbookSaver extends Saver {
 			int measurementDatasetId,
 			Workbook workbook) throws Exception {
 		
-		Map<String, ?> variableMap = saveVariables(workbook);
+		Map<String, ?> variableMap = workbook.getVariableMap();
+		if(variableMap==null || variableMap.isEmpty()) {
+			variableMap = saveVariables(workbook);
+		}
 		
 		// unpack maps first level - Maps of Strings, Maps of VariableTypeList , Maps of Lists of MeasurementVariable
 		Map<String, List<String>> headerMap = (Map<String, List<String>>) variableMap.get("headerMap");

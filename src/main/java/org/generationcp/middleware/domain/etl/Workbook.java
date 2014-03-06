@@ -13,6 +13,7 @@ package org.generationcp.middleware.domain.etl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.util.Debug;
@@ -45,6 +46,7 @@ public class Workbook {
 	private List<MeasurementVariable> studyConstants;
 	private List<MeasurementVariable> trialConditions;
 	private List<MeasurementVariable> trialConstants;
+	private Map<String, ?> variableMap;
 	
 	private boolean isCheckFactorAddedOnly;
 	
@@ -512,6 +514,15 @@ public class Workbook {
     
 	}
 
+	public Map<String, ?> getVariableMap() {
+		return variableMap;
+	}
+
+	public void setVariableMap(Map<String, ?> variableMap) {
+		this.variableMap = variableMap;
+	}
+
+    
 	
 	
 }

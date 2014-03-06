@@ -13,7 +13,12 @@ package org.generationcp.middleware.service.test;
 
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+
+import junit.framework.Assert;
 
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -266,5 +271,27 @@ public class TestDataImportServiceImpl {
         dataImportService.saveProjectData(studyId, studyId-1, studyId-2, workbook);
         Debug.println(0, "Saved project data:" + studyId + ", name = " + workbook.getStudyDetails().getStudyName());
 
+    }
+    
+    @SuppressWarnings("deprecation")
+    @Test
+	public void testValidateProjectOntology() throws MiddlewareQueryException {
+        Workbook workbook = TestWorkbookUtil.getTestWorkbookWithErrors();
+        workbook.print(0);
+        Map<String,List<Message>> errors = dataImportService.validateProjectOntology(workbook);
+        Assert.assertNotNull(errors);
+        if(errors!=null) {
+        	Debug.println(0, "Errors Identified: ");
+        	for(Map.Entry<String,List<Message>> e: errors.entrySet()) {
+        		Debug.println(3, e.getKey());
+        		for(Message m: e.getValue()) {
+        			if(m.getMessageParams()!=null) {
+        				Debug.println(5, "Key: " + m.getMessageKey() + " Params: "+ Arrays.asList(m.getMessageParams()));
+        			} else {
+        				Debug.println(5, "Key: " + m.getMessageKey());
+        			}
+        		}
+        	}
+        }
     }
 }

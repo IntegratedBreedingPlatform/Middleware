@@ -13,10 +13,13 @@
 package org.generationcp.middleware.service.api;
 
 import java.io.File;
+import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
+import org.generationcp.middleware.util.Message;
 
 /**
  * This is the API for importing data to new schema. The methods here involve
@@ -89,6 +92,13 @@ public interface DataImportService {
      */
     Integer getLocationIdByProjectNameAndDescription(String projectName, String locationDescription) throws MiddlewareQueryException;
     
+    /**
+	 * Validate the project ontology from the Workbook and return the list of errors
+	 * @param workbook
+	 * @return Map<String,List<Message>> - map of errors for each header and global errors
+	 * @throws MiddlewareQueryException
+	 */
+    Map<String,List<Message>> validateProjectOntology(Workbook workbook) throws MiddlewareQueryException;
     
     /**
 	 * Saves the project ontology from the Workbook

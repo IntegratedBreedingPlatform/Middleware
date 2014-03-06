@@ -22,9 +22,9 @@ import java.util.Set;
 import org.generationcp.middleware.domain.dms.NameSynonym;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.etl.Constants;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -175,7 +175,6 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         //GCP-6253
         checkForDuplicateVariableNames(ontology, workbook, messages);
 
-        // temporarily disabled
         checkForDuplicatePSMCombo(workbook, messages);
 
         checkForInvalidLabel(workbook, messages);
@@ -273,6 +272,21 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         }
     }
 
+    private void checkForDuplicatePSMCombo(Workbook workbook, Map<String,List<Message>> errors) {
+        List<MeasurementVariable> workbookVariables = workbook.getAllVariables();
+        Map<String, String> psmMap = new HashMap<String, String>();
+
+        for (MeasurementVariable measurementVariable : workbookVariables) {
+            String temp = measurementVariable.getProperty().toLowerCase() + "-" + measurementVariable.getScale().toLowerCase() + "-" + measurementVariable.getMethod().toLowerCase() + measurementVariable.getLabel();
+            if (!psmMap.containsKey(temp)) {
+                psmMap.put(temp, measurementVariable.getName());
+            } else {
+            	initializeIfNull(errors,measurementVariable.getName());
+            	errors.get(measurementVariable.getName()).add(new Message("error.duplicate.psm", psmMap.get(temp), measurementVariable.getName()));
+            }
+        }
+    }
+    
     private void checkForInvalidLabel(Workbook workbook, List<Message> messages) throws MiddlewareQueryException, WorkbookParserException {
         List<MeasurementVariable> variableList = new ArrayList<MeasurementVariable>();
         variableList.addAll(workbook.getFactors());
@@ -443,6 +457,34 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         }
         return locationId;
     }
+    
+    @Override
+	public Map<String,List<Message>> validateProjectOntology(Workbook workbook) throws MiddlewareQueryException {
+    	Map<String,List<Message>> errors = new HashMap<String, List<Message>>();
+    	
+    	OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(
+                getSessionProviderForLocal(), getSessionProviderForCentral());
+
+    	if (!isEntryExists(ontology, workbook.getFactors())) {
+    		initializeIfNull(errors,Constants.GLOBAL);
+        	errors.get(Constants.GLOBAL).add(new Message("error.entry.doesnt.exist"));
+        }
+
+        if (!workbook.isNursery() && !isTrialInstanceNumberExists(ontology, workbook.getTrialVariables())) {
+        	initializeIfNull(errors,Constants.GLOBAL);
+        	errors.get(Constants.GLOBAL).add(new Message("error.missing.trial.condition"));
+        }
+
+        checkForDuplicatePSMCombo(workbook, errors);
+    	
+        return errors;
+    }
+
+	private <T> void initializeIfNull(Map<String,List<T>> errors, String key) {
+		if(errors.get(key)==null) {
+			errors.put(key, new ArrayList<T>());
+		}
+	}
 
 	@Override
 	public int saveProjectOntology(Workbook workbook)
