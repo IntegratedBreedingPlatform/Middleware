@@ -68,8 +68,8 @@ public class MeasurementRow {
 	
 	public List<MeasurementData> getTrialDataList(List<String> trialHeaders) {
 		List<MeasurementData> list = new ArrayList<MeasurementData>();
-		if(getVariateDataList() != null)
-			return getVariateDataList();
+//		if(getVariateDataList() != null)
+//			return getVariateDataList();
 		
 		if(dataList!=null && !dataList.isEmpty()) {
 			for (MeasurementData data : dataList) {
@@ -84,8 +84,13 @@ public class MeasurementRow {
 	
 	public List<MeasurementData> getNonTrialDataList(List<String> trialHeaders) {
 		List<MeasurementData> list = new ArrayList<MeasurementData>();
-		if(getFactorDataList() != null)
-			return getFactorDataList();
+//		if(getFactorDataList() != null)
+//			list.addAll(getFactorDataList());
+//		if (getVariateDataList() != null) 
+//			list.addAll(getVariateDataList());
+//		if (!list.isEmpty()) {
+//			return list;
+//		}
 		if(dataList!=null && !dataList.isEmpty()) {
 			for (MeasurementData data : dataList) {
 				if(trialHeaders==null || !trialHeaders.contains(data.getLabel())) {
