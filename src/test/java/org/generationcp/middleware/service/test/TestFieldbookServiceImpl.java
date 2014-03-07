@@ -419,6 +419,14 @@ public class TestFieldbookServiceImpl {
         Debug.println(3, "Plots with Plants Selected: " + fieldbookService.countPlotsWithPlantsSelectedofNursery(id));
     }
     
+    @Test
+    public void testGetNurseryVariableSettings() throws MiddlewareQueryException {
+        Workbook workbook = TestNurseryWorkbookUtil.getTestWorkbook();
+        workbook.print(0);
+        int id = dataImportService.saveDataset(workbook);
+        workbook = fieldbookService.getNurseryVariableSettings(id);
+        workbook.print(0);
+    }
     
     @After
     public void afterEachTest() {
