@@ -431,8 +431,8 @@ public class WorkbookSaver extends Saver {
 	private void createStocksIfNecessary(int datasetId, Workbook workbook, VariableTypeList effectVariables,List<String> trialHeaders) throws MiddlewareQueryException {
 		Map<String, Integer> stockMap = getStockModelBuilder().getStockMapForDataset(datasetId);
 
-		TimerWatch watch = new TimerWatch("fetch stocks", LOG);
-		TimerWatch rowWatch = new TimerWatch("for each row", LOG);
+		//TimerWatch watch = new TimerWatch("fetch stocks", LOG);
+		//TimerWatch rowWatch = new TimerWatch("for each row", LOG);
 		
 		Session session = getCurrentSessionForLocal();
 		int i = 0;
@@ -441,7 +441,7 @@ public class WorkbookSaver extends Saver {
 			String stockFactor = getStockFactor(stock);
 			Integer stockId = stockMap.get(stockFactor);
 			if (stockId == null) {
-				rowWatch.restart("--save 1 stock");
+				//rowWatch.restart("--save 1 stock");
 				stockId = getStockSaver().saveStock(stock);
 				stockMap.put(stockFactor, stockId);
 			}
@@ -453,8 +453,8 @@ public class WorkbookSaver extends Saver {
 			i++;
 		}
 		
-		rowWatch.stop();
-		watch.stop();
+		//rowWatch.stop();
+		//watch.stop();
 	}
 	
 	private void createMeasurementEffectExperiments(int datasetId, VariableTypeList effectVariables, 
