@@ -1,5 +1,6 @@
 package org.generationcp.middleware.operation.transformer.etl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -48,6 +49,65 @@ public class VariableListTransformer extends Transformer {
 		}
 		
 		return variableList;
+	}
+	
+	public VariableList transformStockOptimize(List<Integer> variableIndexesList, MeasurementRow mRow, VariableTypeList variableTypeList, List<String> trialHeaders) throws MiddlewareQueryException {
+		VariableList variableList = new VariableList();
+
+		if(mRow == null) {
+			return variableList;
+		}
+		/*
+		List<MeasurementData> nonTrialMD = mRow.getNonTrialDataList(trialHeaders);
+		if (mRow != null &&  nonTrialMD != null && variableTypeList != null && variableTypeList.getVariableTypes() != null) {
+			int nonTrialMDSize = nonTrialMD.size();
+			int variableTypeSize =  variableTypeList.getVariableTypes().size();
+			if (nonTrialMDSize == variableTypeSize) {
+				int i = 0;
+				for (VariableType variableType : variableTypeList.getVariableTypes()) {
+					if (variableType.getStandardVariable().getPhenotypicType() == PhenotypicType.GERMPLASM) {
+						variableList.add(new Variable(variableType, nonTrialMD.get(i).getValue()));
+					}
+					i++;
+				}
+				
+			} else {//else invalid data
+				throw new MiddlewareQueryException("Variables did not match the Measurements Row.");
+			}
+		}
+		*/
+		List<MeasurementData> nonTrialMD = mRow.getNonTrialDataList(trialHeaders);
+		for(Integer index : variableIndexesList)
+			variableList.add(new Variable(variableTypeList.getVariableTypes().get(index), nonTrialMD.get(index).getValue()));
+		return variableList;
+	}
+	
+	public List<Integer> transformStockIndexes(MeasurementRow mRow, VariableTypeList variableTypeList, List<String> trialHeaders) throws MiddlewareQueryException {
+		List<Integer> variableIndexesList = new ArrayList();
+
+		if(mRow == null) {
+			return variableIndexesList;
+		}
+		List<MeasurementData> nonTrialMD = mRow.getNonTrialDataList(trialHeaders);
+		if (mRow != null &&  nonTrialMD != null && variableTypeList != null && variableTypeList.getVariableTypes() != null) {
+			int nonTrialMDSize = nonTrialMD.size();
+			int variableTypeSize =  variableTypeList.getVariableTypes().size();
+			if (nonTrialMDSize == variableTypeSize) {
+				int i = 0;
+				for (VariableType variableType : variableTypeList.getVariableTypes()) {
+					if (variableType.getStandardVariable().getPhenotypicType() == PhenotypicType.GERMPLASM) {
+						//variableList.add(new Variable(variableType, nonTrialMD.get(i).getValue()));
+						variableIndexesList.add(i);
+					}
+					i++;
+				}
+				
+			} else {//else invalid data
+				throw new MiddlewareQueryException("Variables did not match the Measurements Row.");
+			}
+		}
+		
+		return variableIndexesList;
 	}
 	
 	public VariableList transformTrialEnvironment(MeasurementRow mRow, VariableTypeList variableTypeList, List<String> trialHeaders) throws MiddlewareQueryException {

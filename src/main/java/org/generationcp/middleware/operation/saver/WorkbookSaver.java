@@ -436,8 +436,15 @@ public class WorkbookSaver extends Saver {
 		
 		Session session = getCurrentSessionForLocal();
 		int i = 0;
+		List<Integer> variableIndexesList = new ArrayList();
+		//we get the indexes so that in the next rows we dont need to compare anymore per row
+		if(workbook.getObservations() != null && workbook.getObservations().size() != 0){
+			MeasurementRow row = workbook.getObservations().get(0);
+			variableIndexesList  = getVariableListTransformer().transformStockIndexes(row, effectVariables, trialHeaders);
+		}
 		for (MeasurementRow row : workbook.getObservations()) {
-			VariableList stock = getVariableListTransformer().transformStock(row, effectVariables, trialHeaders);
+												
+			VariableList stock = getVariableListTransformer().transformStockOptimize(variableIndexesList, row, effectVariables, trialHeaders);
 			String stockFactor = getStockFactor(stock);
 			Integer stockId = stockMap.get(stockFactor);
 			if (stockId == null) {
