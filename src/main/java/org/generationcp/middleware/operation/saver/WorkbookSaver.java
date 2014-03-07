@@ -280,18 +280,39 @@ public class WorkbookSaver extends Saver {
 	}
 	
 	private String getStockFactor(VariableList stockVariables) {
+		/*
 		for (Variable variable : stockVariables.getVariables()) {
 			if (TermId.ENTRY_NUMBER_STORAGE.getId() == variable.getVariableType().getStandardVariable().getStoredIn().getId()) {
 				return variable.getValue();
 			}
 		}
 		return null;
+		*/
+		
+		Map<String, Variable> variableMap = stockVariables.getVariableMap();
+		if(variableMap != null){
+			Variable var = variableMap.get(Integer.toString(TermId.ENTRY_NUMBER_STORAGE.getId()));
+			if(var != null){
+				return var.getValue();
+			}
+		}
+		return null;
 	}
 	
 	private String getTrialInstanceNumber(VariableList trialVariables) {
+		/*
 		for (Variable variable : trialVariables.getVariables()) {
 			if (TermId.TRIAL_INSTANCE_STORAGE.getId() == variable.getVariableType().getStandardVariable().getStoredIn().getId()) {
 				return variable.getValue();
+			}
+		}
+		return null;
+		*/
+		Map<String, Variable> variableMap = trialVariables.getVariableMap();
+		if(variableMap != null){
+			Variable var = variableMap.get(Integer.toString(TermId.TRIAL_INSTANCE_STORAGE.getId()));
+			if(var != null){
+				return var.getValue();
 			}
 		}
 		return null;
@@ -464,12 +485,14 @@ public class WorkbookSaver extends Saver {
 	}
 	
 	private boolean isTrialFactorInDataset(VariableTypeList list) {
+		
 		for (VariableType var : list.getVariableTypes()) {
 			if (TermId.TRIAL_INSTANCE_STORAGE.getId() == var.getStandardVariable().getStoredIn().getId()) {
 				return true;
 			}
 		}
 		return false;
+		
 	}
 	
 	private VariableType createOccVariableType(int rank) throws MiddlewareQueryException {

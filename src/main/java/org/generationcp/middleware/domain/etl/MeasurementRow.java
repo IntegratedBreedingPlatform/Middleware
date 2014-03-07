@@ -26,8 +26,6 @@ public class MeasurementRow {
 	
 	private List<MeasurementData> dataList;
 	
-	private List<MeasurementData> factorDataList; //added for improvement
-	private List<MeasurementData> variateDataList; //added for improvement
 	
 	public MeasurementRow() {
 	}
@@ -68,8 +66,6 @@ public class MeasurementRow {
 	
 	public List<MeasurementData> getTrialDataList(List<String> trialHeaders) {
 		List<MeasurementData> list = new ArrayList<MeasurementData>();
-//		if(getVariateDataList() != null)
-//			return getVariateDataList();
 		
 		if(dataList!=null && !dataList.isEmpty()) {
 			for (MeasurementData data : dataList) {
@@ -84,13 +80,6 @@ public class MeasurementRow {
 	
 	public List<MeasurementData> getNonTrialDataList(List<String> trialHeaders) {
 		List<MeasurementData> list = new ArrayList<MeasurementData>();
-//		if(getFactorDataList() != null)
-//			list.addAll(getFactorDataList());
-//		if (getVariateDataList() != null) 
-//			list.addAll(getVariateDataList());
-//		if (!list.isEmpty()) {
-//			return list;
-//		}
 		if(dataList!=null && !dataList.isEmpty()) {
 			for (MeasurementData data : dataList) {
 				if(trialHeaders==null || !trialHeaders.contains(data.getLabel())) {
@@ -145,38 +134,6 @@ public class MeasurementRow {
 		for (MeasurementData data : dataList){
 			data.print(indent + 6);
 		}
-	}
-	
-	public void addFactorDataList(MeasurementData measurementData){
-		if(factorDataList == null){
-			factorDataList = new ArrayList();
-		}
-		factorDataList.add(measurementData);
-		
-	}
-	
-	public void addVariateDataList(MeasurementData measurementData){
-		if(variateDataList == null){
-			variateDataList = new ArrayList();
-		}
-		variateDataList.add(measurementData);
-		
-	}
-	
-	public List<MeasurementData> getFactorDataList() {
-		return factorDataList;
-	}
-
-	public void setFactorDataList(List<MeasurementData> factorDataList) {
-		this.factorDataList = factorDataList;
-	}
-
-	public List<MeasurementData> getVariateDataList() {
-		return variateDataList;
-	}
-
-	public void setVariateDataList(List<MeasurementData> variateDataList) {
-		this.variateDataList = variateDataList;
 	}
 	
 	

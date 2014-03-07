@@ -31,7 +31,9 @@ public class VariableListTransformer extends Transformer {
 		}
 		List<MeasurementData> nonTrialMD = mRow.getNonTrialDataList(trialHeaders);
 		if (mRow != null &&  nonTrialMD != null && variableTypeList != null && variableTypeList.getVariableTypes() != null) {
-			if (nonTrialMD.size() == variableTypeList.getVariableTypes().size()) {
+			int nonTrialMDSize = nonTrialMD.size();
+			int variableTypeSize =  variableTypeList.getVariableTypes().size();
+			if (nonTrialMDSize == variableTypeSize) {
 				int i = 0;
 				for (VariableType variableType : variableTypeList.getVariableTypes()) {
 					if (variableType.getStandardVariable().getPhenotypicType() == PhenotypicType.GERMPLASM) {
@@ -58,8 +60,8 @@ public class VariableListTransformer extends Transformer {
 		if (trialMD != null && variableTypeList != null && variableTypeList.getVariableTypes() != null) {
 			if (trialMD.size() == variableTypeList.getVariableTypes().size()) {
 				List<VariableType> varTypes = variableTypeList.getVariableTypes();
-				
-				for(int i = 0, l = varTypes.size(); i < l; i++ ){
+				int varTypeSize = varTypes.size();
+				for(int i = 0, l = varTypeSize; i < l; i++ ){
 					VariableType varType = varTypes.get(i);
 					String value = trialMD.get(i).getValue();
 										
