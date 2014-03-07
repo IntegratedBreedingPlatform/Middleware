@@ -413,6 +413,8 @@ public class WorkbookSaver extends Saver {
 		TimerWatch watch = new TimerWatch("fetch stocks", LOG);
 		TimerWatch rowWatch = new TimerWatch("for each row", LOG);
 		
+		Session session = getCurrentSessionForLocal();
+		int i = 0;
 		for (MeasurementRow row : workbook.getObservations()) {
 			VariableList stock = getVariableListTransformer().transformStock(row, effectVariables, trialHeaders);
 			String stockFactor = getStockFactor(stock);
@@ -423,6 +425,11 @@ public class WorkbookSaver extends Saver {
 				stockMap.put(stockFactor, stockId);
 			}
 			row.setStockId(stockId);
+			if ( i % 50 == 0 ) { //to save memory space - http://docs.jboss.org/hibernate/core/3.3/reference/en/html/batch.html#batch-inserts
+				session.flush();
+				session.clear();
+			}
+			i++;
 		}
 		
 		rowWatch.stop();
