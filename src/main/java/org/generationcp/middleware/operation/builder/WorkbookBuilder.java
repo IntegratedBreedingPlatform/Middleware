@@ -203,6 +203,21 @@ public class WorkbookBuilder extends Builder {
 	    return factors;
 	}
 	
+	private List<MeasurementVariable> buildFactors(VariableTypeList variables) {
+            List<MeasurementVariable> factors = new ArrayList<MeasurementVariable>();
+            VariableTypeList factorList = new VariableTypeList();
+            if (variables != null && variables.getFactors() != null && !variables.getFactors().getVariableTypes().isEmpty()) {
+                for (VariableType variable : variables.getFactors().getVariableTypes()) {
+                    if (!PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(getLabelOfStoredIn(variable.getStandardVariable().getStoredIn().getId()))) {
+                        factorList.add(variable);
+                    }
+                }
+                factors = getMeasurementVariableTransformer().transform(factorList, false);
+            }
+            
+            return factors;
+        }
+	
 	private List<MeasurementVariable> buildVariates(List<Experiment> experiments) {
 	    List<MeasurementVariable> variates = new ArrayList<MeasurementVariable>();
             for (Experiment experiment : experiments) {                
@@ -220,16 +235,6 @@ public class WorkbookBuilder extends Builder {
 	    }
 	    
 	    return variates;
-	}
-	
-	private List<MeasurementVariable> buildFactors(VariableTypeList variables) {
-	    List<MeasurementVariable> factors = new ArrayList<MeasurementVariable>();
-            
-            if (variables != null && variables.getFactors() != null && !variables.getFactors().getVariableTypes().isEmpty()) {
-                factors = getMeasurementVariableTransformer().transform(variables.getFactors(), false);
-            }
-            
-            return factors;
 	}
 	
 	private VariableList getCompleteVariatesInExperiment(Experiment experiment, VariableTypeList variateTypes) {
