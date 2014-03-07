@@ -268,7 +268,10 @@ public class TestDataImportServiceImpl {
         Workbook workbook = TestWorkbookUtil.getTestWorkbook();
         workbook.print(0);
         int studyId = dataImportService.saveProjectOntology(workbook);
-        dataImportService.saveProjectData(studyId, studyId-1, studyId-2, workbook);
+        workbook.setStudyId(studyId);
+        workbook.setTrialDatasetId(studyId-1);
+        workbook.setMeasurementDatesetId(studyId-2); 
+        dataImportService.saveProjectData(workbook);
         Debug.println(0, "Saved project data:" + studyId + ", name = " + workbook.getStudyDetails().getStudyName());
 
     }

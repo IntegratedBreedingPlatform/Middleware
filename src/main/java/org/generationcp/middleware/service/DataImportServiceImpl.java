@@ -513,8 +513,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 	
 	@Override
-	public int saveProjectData(int studyId, int trialDatasetId, int measurementDatasetId, Workbook workbook)
-			throws MiddlewareQueryException {
+	public int saveProjectData(Workbook workbook) throws MiddlewareQueryException {
 		requireLocalDatabaseInstance();
         Session session = getCurrentSessionForLocal();
         Transaction trans = null;
@@ -523,8 +522,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         try {
 
             trans = session.beginTransaction();
-            getWorkbookSaver().saveProjectData(
-            		studyId, trialDatasetId, measurementDatasetId, workbook);
+            getWorkbookSaver().saveProjectData(workbook);
             trans.commit();
 
         } catch (Exception e) {
@@ -536,6 +534,12 @@ public class DataImportServiceImpl extends Service implements DataImportService 
         }
 
 		return 1;
+	}
+
+	@Override
+	public Map<String, List<Message>> validateProjectData(Workbook importData) {
+		// TODO Auto-generated method stub
+		return null;
 	}
     
     

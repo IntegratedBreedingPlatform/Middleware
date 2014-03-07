@@ -544,6 +544,8 @@ public class WorkbookSaver extends Saver {
 		int trialDatasetId = createTrialDatasetIfNecessary(workbook, studyId, trialMV, trialVariables);
 		int measurementDatasetId = createMeasurementEffectDatasetIfNecessary(workbook, studyId, effectMV, effectVariables, trialVariables);
 		
+		workbook.populateStudyAndDatasetIds(studyId, trialDatasetId, measurementDatasetId);
+		
 		if (LOG.isDebugEnabled()){
 			LOG.debug("studyId = "+studyId);
             LOG.debug("trialDatasetId = "+trialDatasetId);
@@ -562,11 +564,11 @@ public class WorkbookSaver extends Saver {
      * @throws Exception
      */
 	@SuppressWarnings("unchecked")
-	public void saveProjectData(
-			int studyId, 
-			int trialDatasetId, 
-			int measurementDatasetId,
-			Workbook workbook) throws Exception {
+	public void saveProjectData(Workbook workbook) throws Exception {
+		
+		int studyId = workbook.getStudyId();
+		int trialDatasetId = workbook.getTrialDatasetId();
+		int measurementDatasetId = workbook.getMeasurementDatesetId();
 		
 		Map<String, ?> variableMap = workbook.getVariableMap();
 		if(variableMap==null || variableMap.isEmpty()) {

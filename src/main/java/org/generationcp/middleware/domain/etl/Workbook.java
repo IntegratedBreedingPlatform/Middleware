@@ -50,6 +50,10 @@ public class Workbook {
 	
 	private boolean isCheckFactorAddedOnly;
 	
+	private Integer studyId;
+	private Integer trialDatasetId;
+	private Integer measurementDatesetId;
+	
 	public void reset() {
 		trialHeaders = null;
 		trialVariables = null;
@@ -522,7 +526,34 @@ public class Workbook {
 		this.variableMap = variableMap;
 	}
 
-    
-	
+    public void populateStudyAndDatasetIds(int studyId, int trialDatasetId, int measurementDatasetId) {
+    	this.studyId = studyId;
+    	this.trialDatasetId = trialDatasetId;
+    	this.measurementDatesetId = measurementDatasetId;
+    }
+
+	public Integer getStudyId() {
+		return studyId;
+	}
+
+	public void setStudyId(Integer studyId) {
+		this.studyId = studyId;
+	}
+
+	public Integer getTrialDatasetId() {
+		return trialDatasetId;
+	}
+
+	public void setTrialDatasetId(Integer trialDatasetId) {
+		this.trialDatasetId = trialDatasetId;
+	}
+
+	public Integer getMeasurementDatesetId() {
+		return measurementDatesetId;
+	}
+
+	public void setMeasurementDatesetId(Integer measurementDatesetId) {
+		this.measurementDatesetId = measurementDatesetId;
+	}
 	
 }

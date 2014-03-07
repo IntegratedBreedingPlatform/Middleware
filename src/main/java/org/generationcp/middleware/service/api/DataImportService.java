@@ -112,7 +112,12 @@ public interface DataImportService {
 	 * Saves the project ontology from the Workbook
 	 * Tables: project, project_relationship, project_properties
 	 * @param workbook
-	 * @return id of created the study (Table.column = Project.project_id)
+	 * @return 1 = successful, 0 = failure
 	 */
-    int saveProjectData(int studyId, int trialDatasetId, int measurementDatasetId, Workbook workbook) throws MiddlewareQueryException;
+    int saveProjectData(Workbook workbook) throws MiddlewareQueryException;
+
+	Map<String, List<Message>> validateProjectData(
+			org.generationcp.middleware.domain.etl.Workbook importData) throws MiddlewareQueryException;
+	
+	
 }
