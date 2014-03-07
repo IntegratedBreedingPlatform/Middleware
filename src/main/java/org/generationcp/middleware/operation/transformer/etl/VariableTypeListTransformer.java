@@ -7,6 +7,7 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -41,12 +42,18 @@ public class VariableTypeListTransformer extends Transformer {
     					isVariate ? PhenotypicType.VARIATE : PhenotypicType.getPhenotypicTypeForLabel(measurementVariable.getLabel()),
     					measurementVariable.getDataType());
     			
-    			VariableType variableType = new VariableType(
-    						measurementVariable.getName(), 
-    						measurementVariable.getDescription(), 
-    						standardVariable, rank++);
+    			if (standardVariable.getId() != TermId.STUDY_NAME.getId() && standardVariable.getId() != TermId.STUDY_TITLE.getId() 
+    					&& standardVariable.getId() != TermId.STUDY_OBJECTIVE.getId() && standardVariable.getId() != TermId.PM_KEY.getId()
+    					&& standardVariable.getId() != TermId.STUDY_TYPE.getId() && standardVariable.getId() != TermId.START_DATE.getId()
+    					&& standardVariable.getId() != TermId.END_DATE.getId()) {
     			
-    			variableTypeList.add(variableType);
+	    			VariableType variableType = new VariableType(
+	    						measurementVariable.getName(), 
+	    						measurementVariable.getDescription(), 
+	    						standardVariable, rank++);
+	    			
+	    			variableTypeList.add(variableType);
+    			}
     		}
 		}
 		
