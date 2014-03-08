@@ -326,4 +326,6 @@ public interface FieldbookService {
     int countPlotsWithPlantsSelectedofNursery(int nurseryId) throws MiddlewareQueryException;
     
     List<StandardVariableReference> filterStandardVariablesByMode(List<Integer> storedInIds) throws MiddlewareQueryException;
+    
+    Workbook getNurseryVariableSettings(int id) throws MiddlewareQueryException;
 }

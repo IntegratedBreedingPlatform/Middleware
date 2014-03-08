@@ -99,6 +99,42 @@ public class WorkbookBuilder extends Builder {
 		return workbook;
 	}
 	
+	public Workbook createNurseryVariableSettings(int id) throws MiddlewareQueryException {
+            Workbook workbook = new Workbook();
+            Study study = getStudyBuilder().createStudy(id);
+            int dataSetId = 0;
+            
+            //get observation dataset
+            if (dataSetId == 0) {
+                List<DatasetReference> datasetRefList = getStudyDataManager().getDatasetReferences(id);
+                if (datasetRefList != null) {
+                    StudyDetails studyDetails = getStudyDataManager().getStudyDetails(Database.LOCAL, StudyType.N, id);
+                    for (DatasetReference datasetRef : datasetRefList) {
+                        if (datasetRef.getName().equals("MEASUREMENT EFEC_" + studyDetails.getStudyName()) || 
+                                datasetRef.getName().equals("MEASUREMENT EFECT_" + studyDetails.getStudyName())) {
+                            dataSetId = datasetRef.getId();
+                        }
+                    }
+                }
+            }
+            
+            //if dataset is not found, get dataset with Plot Data type
+            if (dataSetId == 0) {
+                dataSetId = getStudyDataManager().findOneDataSetByType(id, DataSetType.PLOT_DATA).getId();
+            }
+            
+            VariableTypeList variables = getDataSetBuilder().getVariableTypes(dataSetId);
+            
+            List<MeasurementVariable> factors = buildFactors(variables);
+            List<MeasurementVariable> variates = buildVariates(variables);
+            List<MeasurementVariable> conditions = buildStudyMeasurementVariables(study.getConditions(), true);
+
+            workbook.setFactors(factors);
+            workbook.setVariates(variates);
+            workbook.setConditions(conditions);
+            return workbook;
+	}
+	
 	private List<MeasurementRow> buildObservations(List<Experiment> experiments, VariableTypeList variateTypes) {
 	    List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
 	    
@@ -155,7 +191,7 @@ public class WorkbookBuilder extends Builder {
 	private List<MeasurementVariable> buildFactors(List<Experiment> experiments) {
 	    List<MeasurementVariable> factors = new ArrayList<MeasurementVariable>();
 	    VariableTypeList factorList = new VariableTypeList();
-            for (Experiment experiment : experiments) {    
+            for (Experiment experiment : experiments) {
                 for (Variable variable : experiment.getFactors().getVariables()) {
                     if (!PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(getLabelOfStoredIn(variable.getVariableType().getStandardVariable().getStoredIn().getId()))) {
                         factorList.add(variable.getVariableType());
@@ -166,6 +202,21 @@ public class WorkbookBuilder extends Builder {
             }
 	    return factors;
 	}
+	
+	private List<MeasurementVariable> buildFactors(VariableTypeList variables) {
+            List<MeasurementVariable> factors = new ArrayList<MeasurementVariable>();
+            VariableTypeList factorList = new VariableTypeList();
+            if (variables != null && variables.getFactors() != null && !variables.getFactors().getVariableTypes().isEmpty()) {
+                for (VariableType variable : variables.getFactors().getVariableTypes()) {
+                    if (!PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(getLabelOfStoredIn(variable.getStandardVariable().getStoredIn().getId()))) {
+                        factorList.add(variable);
+                    }
+                }
+                factors = getMeasurementVariableTransformer().transform(factorList, false);
+            }
+            
+            return factors;
+        }
 	
 	private List<MeasurementVariable> buildVariates(List<Experiment> experiments) {
 	    List<MeasurementVariable> variates = new ArrayList<MeasurementVariable>();

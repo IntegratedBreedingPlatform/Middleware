@@ -13,7 +13,9 @@ package org.generationcp.middleware.domain.dms;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.domain.oms.TermId;
 
@@ -24,6 +26,8 @@ public class VariableList {
 
 	private List<Variable> variables = new ArrayList<Variable>();
 	private VariableTypeList variableTypes = null;
+	
+	private Map<String, Variable> variableMap;
 	
 	public void add(Variable variable) {
 		variables.add(variable);
@@ -48,6 +52,15 @@ public class VariableList {
 		return null;
 	}
 
+	public Map<String, Variable> getVariableMap(){
+		if(variableMap == null){
+			variableMap = new HashMap();
+			for (Variable variable : this.getVariables()) {				
+				variableMap.put(Integer.toString(variable.getVariableType().getStandardVariable().getStoredIn().getId()), variable);
+			}
+		}
+		return variableMap;
+	}
 	public List<Variable> getVariables() {
 		return variables;
 	}

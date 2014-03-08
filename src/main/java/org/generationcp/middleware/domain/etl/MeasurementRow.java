@@ -26,6 +26,7 @@ public class MeasurementRow {
 	
 	private List<MeasurementData> dataList;
 	
+	
 	public MeasurementRow() {
 	}
 
@@ -65,6 +66,7 @@ public class MeasurementRow {
 	
 	public List<MeasurementData> getTrialDataList(List<String> trialHeaders) {
 		List<MeasurementData> list = new ArrayList<MeasurementData>();
+		
 		if(dataList!=null && !dataList.isEmpty()) {
 			for (MeasurementData data : dataList) {
 				if(trialHeaders!=null && trialHeaders.contains(data.getLabel())) {
@@ -133,5 +135,6 @@ public class MeasurementRow {
 			data.print(indent + 6);
 		}
 	}
-
+	
+	
 }

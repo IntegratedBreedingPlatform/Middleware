@@ -280,18 +280,39 @@ public class WorkbookSaver extends Saver {
 	}
 	
 	private String getStockFactor(VariableList stockVariables) {
+		/*
 		for (Variable variable : stockVariables.getVariables()) {
 			if (TermId.ENTRY_NUMBER_STORAGE.getId() == variable.getVariableType().getStandardVariable().getStoredIn().getId()) {
 				return variable.getValue();
 			}
 		}
 		return null;
+		*/
+		
+		Map<String, Variable> variableMap = stockVariables.getVariableMap();
+		if(variableMap != null){
+			Variable var = variableMap.get(Integer.toString(TermId.ENTRY_NUMBER_STORAGE.getId()));
+			if(var != null){
+				return var.getValue();
+			}
+		}
+		return null;
 	}
 	
 	private String getTrialInstanceNumber(VariableList trialVariables) {
+		/*
 		for (Variable variable : trialVariables.getVariables()) {
 			if (TermId.TRIAL_INSTANCE_STORAGE.getId() == variable.getVariableType().getStandardVariable().getStoredIn().getId()) {
 				return variable.getValue();
+			}
+		}
+		return null;
+		*/
+		Map<String, Variable> variableMap = trialVariables.getVariableMap();
+		if(variableMap != null){
+			Variable var = variableMap.get(Integer.toString(TermId.TRIAL_INSTANCE_STORAGE.getId()));
+			if(var != null){
+				return var.getValue();
 			}
 		}
 		return null;
@@ -410,23 +431,37 @@ public class WorkbookSaver extends Saver {
 	private void createStocksIfNecessary(int datasetId, Workbook workbook, VariableTypeList effectVariables,List<String> trialHeaders) throws MiddlewareQueryException {
 		Map<String, Integer> stockMap = getStockModelBuilder().getStockMapForDataset(datasetId);
 
-		TimerWatch watch = new TimerWatch("fetch stocks", LOG);
-		TimerWatch rowWatch = new TimerWatch("for each row", LOG);
+		//TimerWatch watch = new TimerWatch("fetch stocks", LOG);
+		//TimerWatch rowWatch = new TimerWatch("for each row", LOG);
 		
+		Session session = getCurrentSessionForLocal();
+		int i = 0;
+		List<Integer> variableIndexesList = new ArrayList();
+		//we get the indexes so that in the next rows we dont need to compare anymore per row
+		if(workbook.getObservations() != null && workbook.getObservations().size() != 0){
+			MeasurementRow row = workbook.getObservations().get(0);
+			variableIndexesList  = getVariableListTransformer().transformStockIndexes(row, effectVariables, trialHeaders);
+		}
 		for (MeasurementRow row : workbook.getObservations()) {
-			VariableList stock = getVariableListTransformer().transformStock(row, effectVariables, trialHeaders);
+												
+			VariableList stock = getVariableListTransformer().transformStockOptimize(variableIndexesList, row, effectVariables, trialHeaders);
 			String stockFactor = getStockFactor(stock);
 			Integer stockId = stockMap.get(stockFactor);
 			if (stockId == null) {
-				rowWatch.restart("--save 1 stock");
+				//rowWatch.restart("--save 1 stock");
 				stockId = getStockSaver().saveStock(stock);
 				stockMap.put(stockFactor, stockId);
 			}
 			row.setStockId(stockId);
+			if ( i % 50 == 0 ) { //to save memory space - http://docs.jboss.org/hibernate/core/3.3/reference/en/html/batch.html#batch-inserts
+				session.flush();
+				session.clear();
+			}
+			i++;
 		}
 		
-		rowWatch.stop();
-		watch.stop();
+		//rowWatch.stop();
+		//watch.stop();
 	}
 	
 	private void createMeasurementEffectExperiments(int datasetId, VariableTypeList effectVariables, 
@@ -457,12 +492,14 @@ public class WorkbookSaver extends Saver {
 	}
 	
 	private boolean isTrialFactorInDataset(VariableTypeList list) {
+		
 		for (VariableType var : list.getVariableTypes()) {
 			if (TermId.TRIAL_INSTANCE_STORAGE.getId() == var.getStandardVariable().getStoredIn().getId()) {
 				return true;
 			}
 		}
 		return false;
+		
 	}
 	
 	private VariableType createOccVariableType(int rank) throws MiddlewareQueryException {
