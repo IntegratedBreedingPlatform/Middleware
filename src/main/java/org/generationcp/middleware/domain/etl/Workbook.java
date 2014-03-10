@@ -279,10 +279,10 @@ public class Workbook {
 
     public List<MeasurementVariable> getAllVariables() {
         List<MeasurementVariable> variableList = new ArrayList<MeasurementVariable>();
-        variableList.addAll(conditions);
-        variableList.addAll(constants);
-        variableList.addAll(factors);
-        variableList.addAll(variates);
+        if (conditions != null) variableList.addAll(conditions);
+        if (constants != null) variableList.addAll(constants);
+        if (factors != null) variableList.addAll(factors);
+        if (variates != null) variableList.addAll(variates);
 
         return variableList;
     }
